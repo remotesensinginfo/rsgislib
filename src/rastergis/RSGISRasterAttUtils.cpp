@@ -910,31 +910,29 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    void RSGISRasterAttUtils::applyClassStrColours(GDALDataset *inImage, std::string classInField, std::map<std::string, rsgis::utils::RSGISColourInt> classColoursPairs) throw(RSGISAttributeTableException)
+    void RSGISRasterAttUtils::applyClassStrColours(GDALDataset *inImage, std::string classInField, std::map<std::string, rsgis::utils::RSGISColourInt> classColoursPairs, int ratBand) throw(RSGISAttributeTableException)
     {
+        
         std::cout << "Import attribute table to memory.\n";
-        const GDALRasterAttributeTable *gdalAttInTmp = inImage->GetRasterBand(1)->GetDefaultRAT();
+        GDALRasterAttributeTable *gdalAttInTmp = inImage->GetRasterBand(ratBand)->GetDefaultRAT();
         GDALRasterAttributeTable *gdalAttIn = NULL;
         
         if((gdalAttInTmp == NULL) || (gdalAttInTmp->GetRowCount() == 0))
         {
-            throw rsgis::RSGISAttributeTableException("The clumps image does not have an attribute table.");
+            std::cout << "Creating new attribute table " << std::endl;
+            gdalAttIn = new GDALDefaultRasterAttributeTable();
         }
         else
         {
-            gdalAttIn = new GDALDefaultRasterAttributeTable(*((GDALDefaultRasterAttributeTable*)gdalAttInTmp));
+            std::cout << "Using existing attribute table " << std::endl;
+            gdalAttIn = gdalAttInTmp;
         }
         
         std::cout << "Find field column indexes in RAT.\n";
-        bool foundInClassIdx = false;
         int colInClassIdx = 0;
-        bool outRedFound = false;
         int outRedIdx = 0;
-        bool outGreenFound = false;
         int outGreenIdx = 0;
-        bool outBlueFound = false;
         int outBlueIdx = 0;
-        bool outAlphaFound = false;
         int outAlphaIdx = 0;
         
         if(gdalAttIn->GetRowCount() == 0)
@@ -943,115 +941,134 @@ namespace rsgis{namespace rastergis{
         }
         else
         {
-            for(int i = 0; i < gdalAttIn->GetColumnCount(); ++i)
-            {
-                if(!foundInClassIdx && (std::string(gdalAttIn->GetNameOfCol(i)) == classInField))
-                {
-                    colInClassIdx = i;
-                    foundInClassIdx = true;
-                }
-                else if(!outRedFound && (std::string(gdalAttIn->GetNameOfCol(i)) == "Red"))
-                {
-                    outRedIdx = i;
-                    outRedFound = true;
-                }
-                else if(!outGreenFound && (std::string(gdalAttIn->GetNameOfCol(i)) == "Green"))
-                {
-                    outGreenIdx = i;
-                    outGreenFound = true;
-                }
-                else if(!outBlueFound && (std::string(gdalAttIn->GetNameOfCol(i)) == "Blue"))
-                {
-                    outBlueIdx = i;
-                    outBlueFound = true;
-                }
-                else if(!outAlphaFound && (std::string(gdalAttIn->GetNameOfCol(i)) == "Alpha"))
-                {
-                    outAlphaIdx = i;
-                    outAlphaFound = true;
-                }
-            }
+            // Get column index for in class
+            colInClassIdx = findColumnIndex(gdalAttIn, classInField);
             
-            if(!foundInClassIdx)
-            {
-                std::string message = std::string("Column ") + classInField + std::string(" is not within the input attribute table.");
-                throw rsgis::RSGISAttributeTableException(message);
-            }
-            
-            if(!outRedFound)
-            {
-                gdalAttIn->CreateColumn("Red", GFT_Integer, GFU_Red);
-                outRedFound = true;
-                outRedIdx = gdalAttIn->GetColumnCount()-1;
-            }
-            
-            if(!outGreenFound)
-            {
-                gdalAttIn->CreateColumn("Green", GFT_Integer, GFU_Green);
-                outGreenFound = true;
-                outGreenIdx = gdalAttIn->GetColumnCount()-1;
-            }
-            
-            if(!outBlueFound)
-            {
-                gdalAttIn->CreateColumn("Blue", GFT_Integer, GFU_Blue);
-                outBlueFound = true;
-                outBlueIdx = gdalAttIn->GetColumnCount()-1;
-            }
-            
-            if(!outAlphaFound)
-            {
-                gdalAttIn->CreateColumn("Alpha", GFT_Integer, GFU_Alpha);
-                outAlphaFound = true;
-                outAlphaIdx = gdalAttIn->GetColumnCount()-1;
-            }
+            // Get or create column indies fr colour columns
+            outRedIdx = findColumnIndexOrCreate(gdalAttIn, "Red", GFT_Integer, GFU_Red);
+            outGreenIdx = findColumnIndexOrCreate(gdalAttIn, "Green", GFT_Integer, GFU_Green);
+            outBlueIdx = findColumnIndexOrCreate(gdalAttIn, "Blue", GFT_Integer, GFU_Blue);
+            outAlphaIdx = findColumnIndexOrCreate(gdalAttIn, "Alpha", GFT_Integer, GFU_Alpha);
         }
         
-        std::cout << "Applying colour to class IDs.\n";
-        size_t numRows = gdalAttIn->GetRowCount();
-        std::string inClassName = 0;
-        int red = 0;
-        int green = 0;
-        int blue = 0;
-        int alpha = 0;
-        unsigned int feedbackStep = numRows/10;
-        unsigned int feedback = 0;
-        std::cout << "Started." << std::flush;
-        for(int i = 0; i < numRows; ++i)
+        std::cout << "Applying colour to class names.\n";
+        size_t nRows = gdalAttIn->GetRowCount();
+        std::string inClassName = "";
+        
+        int nBlocks = floor(((double) nRows) / ((double) RAT_BLOCK_LENGTH));
+        int remainRows = nRows - (nBlocks * RAT_BLOCK_LENGTH );
+        
+        int feedback = nRows/10.0;
+        int feedbackCounter = 0;
+        
+        // Allocate memory for blocks
+        char **inBlockData = new char*[RAT_BLOCK_LENGTH];
+        int *outBlockRed = new int[RAT_BLOCK_LENGTH];
+        int *outBlockGreen = new int[RAT_BLOCK_LENGTH];
+        int *outBlockBlue = new int[RAT_BLOCK_LENGTH];
+        int *outBlockAlpha = new int[RAT_BLOCK_LENGTH];
+        
+        if(feedback != 0){std::cout << "Started " << std::flush;}
+        
+        int rowOffset = 0;
+        for(int i = 0; i < nBlocks; i++)
         {
-            if((numRows > 20) && (i % feedbackStep == 0))
+            rowOffset =  RAT_BLOCK_LENGTH * i;
+            
+            // Read in block
+            gdalAttIn->ValuesIO(GF_Read, colInClassIdx, rowOffset, RAT_BLOCK_LENGTH, inBlockData);
+            
+            // Loop through block
+            for(int m = 0; m < RAT_BLOCK_LENGTH; ++m)
             {
-                std::cout << "." << feedback << "." << std::flush;
-                feedback += 10;
+                // Show progress
+                if((feedback != 0) && (((i*RAT_BLOCK_LENGTH)+m) % feedback) == 0)
+                {
+                    std::cout << "." << feedbackCounter << "." << std::flush;
+                    feedbackCounter = feedbackCounter + 10;
+                }
+                
+                inClassName = inBlockData[m];
+                
+                std::map<std::string, rsgis::utils::RSGISColourInt>::iterator iterClass = classColoursPairs.find(inClassName);
+                if(iterClass == classColoursPairs.end())
+                {
+                    outBlockRed[m] = 0;
+                    outBlockGreen[m] = 0;
+                    outBlockBlue[m] = 0;
+                    outBlockAlpha[m] = 0;
+                }
+                else
+                {
+                    outBlockRed[m] = (*iterClass).second.getRed();
+                    outBlockGreen[m] = (*iterClass).second.getGreen();
+                    outBlockBlue[m] = (*iterClass).second.getBlue();
+                    outBlockAlpha[m] = (*iterClass).second.getAlpha();
+                }
             }
             
-            inClassName = std::string(gdalAttIn->GetValueAsString(i, colInClassIdx));
+            // Write out blocks
+            gdalAttIn->ValuesIO(GF_Write, outRedIdx, rowOffset, RAT_BLOCK_LENGTH, outBlockRed);
+            gdalAttIn->ValuesIO(GF_Write, outGreenIdx, rowOffset, RAT_BLOCK_LENGTH, outBlockGreen);
+            gdalAttIn->ValuesIO(GF_Write, outBlueIdx, rowOffset, RAT_BLOCK_LENGTH, outBlockBlue);
+            gdalAttIn->ValuesIO(GF_Write, outAlphaIdx, rowOffset, RAT_BLOCK_LENGTH, outBlockAlpha);
             
-            std::map<std::string, rsgis::utils::RSGISColourInt>::iterator iterClass = classColoursPairs.find(inClassName);
-            if(iterClass == classColoursPairs.end())
-            {
-                red = 0;
-                green = 0;
-                blue = 0;
-                alpha = 0;
-            }
-            else
-            {
-                red = (*iterClass).second.getRed();
-                green = (*iterClass).second.getGreen();
-                blue = (*iterClass).second.getBlue();
-                alpha = (*iterClass).second.getAlpha();
-            }
-            
-            gdalAttIn->SetValue(i, outRedIdx, red);
-            gdalAttIn->SetValue(i, outGreenIdx, green);
-            gdalAttIn->SetValue(i, outBlueIdx, blue);
-            gdalAttIn->SetValue(i, outAlphaIdx, alpha);
         }
-        std::cout << ".Completed\n";
+        if(remainRows > 0)
+        {
+            rowOffset =  RAT_BLOCK_LENGTH * nBlocks;
+            
+            // Read in block
+            gdalAttIn->ValuesIO(GF_Read, colInClassIdx, rowOffset, remainRows, inBlockData);
+            
+            // Loop through block
+            for(int m = 0; m < remainRows; ++m)
+            {
+                // Show progress
+                if((feedback != 0) && (((nBlocks*RAT_BLOCK_LENGTH)+m) % feedback) == 0)
+                {
+                    std::cout << "." << feedbackCounter << "." << std::flush;
+                    feedbackCounter = feedbackCounter + 10;
+                }
+                
+                inClassName = inBlockData[m];
+                
+                std::map<std::string, rsgis::utils::RSGISColourInt>::iterator iterClass = classColoursPairs.find(inClassName);
+                if(iterClass == classColoursPairs.end())
+                {
+                    outBlockRed[m] = 0;
+                    outBlockGreen[m] = 0;
+                    outBlockBlue[m] = 0;
+                    outBlockAlpha[m] = 0;
+                }
+                else
+                {
+                    outBlockRed[m] = (*iterClass).second.getRed();
+                    outBlockGreen[m] = (*iterClass).second.getGreen();
+                    outBlockBlue[m] = (*iterClass).second.getBlue();
+                    outBlockAlpha[m] = (*iterClass).second.getAlpha();
+                }
+            }
+            
+            // Write out blocks
+            gdalAttIn->ValuesIO(GF_Write, outRedIdx, rowOffset, remainRows, outBlockRed);
+            gdalAttIn->ValuesIO(GF_Write, outGreenIdx, rowOffset, remainRows, outBlockGreen);
+            gdalAttIn->ValuesIO(GF_Write, outBlueIdx, rowOffset, remainRows, outBlockBlue);
+            gdalAttIn->ValuesIO(GF_Write, outAlphaIdx, rowOffset, remainRows, outBlockAlpha);
+        }
+        
+        if(feedback != 0){std::cout << ".Completed\n";}
+        else{std::cout << "Completed\n";}
         
         std::cout << "Adding RAT to output file.\n";
-        inImage->GetRasterBand(1)->SetDefaultRAT(gdalAttIn);
+        inImage->GetRasterBand(ratBand)->SetDefaultRAT(gdalAttIn);
+        
+        // Tidy up
+        delete[] inBlockData;
+        delete[] outBlockRed;
+        delete[] outBlockGreen;
+        delete[] outBlockBlue;
+        delete[] outBlockAlpha;
         
     }
     

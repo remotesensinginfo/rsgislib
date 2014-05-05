@@ -609,14 +609,17 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-/*
-    void executeColourStrClasses(std::string inputImage, std::string classInField, std::map<std::string, RSGISColourIntCmds> classStrColourPairs)throw(RSGISCmdException) {
+
+    void executeColourStrClasses(std::string inputImage, std::string classInField, std::map<std::string, RSGISColourIntCmds> classStrColourPairs, int ratBand)throw(RSGISCmdException)
+    {
         GDALAllRegister();
         GDALDataset *inputDataset;
-        try {
+        try
+        {
             inputDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_Update);
 
-            if(inputDataset == NULL) {
+            if(inputDataset == NULL)
+            {
                 std::string message = std::string("Could not open image ") + inputImage;
                 throw rsgis::RSGISImageException(message.c_str());
             }
@@ -634,14 +637,16 @@ namespace rsgis{ namespace cmds {
             }
 
             rsgis::rastergis::RSGISRasterAttUtils attUtils;
-            attUtils.applyClassStrColours(inputDataset, classInField, ccPairs);
+            attUtils.applyClassStrColours(inputDataset, classInField, ccPairs, ratBand);
 
             GDALClose(inputDataset);
-        } catch(rsgis::RSGISException &e) {
+        }
+        catch(rsgis::RSGISException &e)
+        {
             throw RSGISCmdException(e.what());
         }
     }
-
+/*
     void executeGenerateColourTable(std::string inputImage, std::string clumpsImage, unsigned int redBand, unsigned int greenBand, unsigned int blueBand)throw(RSGISCmdException) {
         GDALAllRegister();
         GDALDataset *inputDataset, *clumpsDataset;
