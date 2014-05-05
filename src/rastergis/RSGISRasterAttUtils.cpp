@@ -491,7 +491,8 @@ namespace rsgis{namespace rastergis{
             {
                 rsgis::RSGISAttributeTableException("There are no columns in the input attribute table.");
             }
-        
+            
+            std::cout << "Finding Attributes in RAT" << std::endl;
             // Find required attributes in RAT
             int *colInIdxs = new int[fields.size()];     // Index in RAT
             int *colBlockIndxs = new int[fields.size()]; // Index in array to store block (array dependent on type)
