@@ -4031,15 +4031,14 @@ namespace rsgis{namespace img{
         double *gdalTranslation = new double[6];
         inData->GetGeoTransform(gdalTranslation);
         
-        // Process dataset in memory
-        GDALDriver *gdalDriver = NULL;
-        gdalDriver = GetGDALDriverManager()->GetDriverByName(outputFormat.c_str());
+        GDALDriver *gdalDriver = GetGDALDriverManager()->GetDriverByName(outputFormat.c_str());
         if(gdalDriver == NULL)
         {
             delete[] gdalTranslation;
             std::string message = std::string("Driver for ") + outputFormat + std::string(" does not exist\n");
             throw RSGISImageException(message.c_str());
         }
+        
         GDALDataset *dataset = gdalDriver->Create(outputFilePath.c_str(), width, height, numBands, eType, NULL);
         if(dataset == NULL)
         {
@@ -4057,7 +4056,6 @@ namespace rsgis{namespace img{
         {
             dataset->SetProjection(proj.c_str());
         }
-        
         delete[] gdalTranslation;
         
         return dataset;
