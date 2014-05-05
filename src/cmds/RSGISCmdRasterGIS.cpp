@@ -39,7 +39,7 @@
 #include "rastergis/RSGISCalcClusterLocation.h"
 #include "rastergis/RSGISFindClumpNeighbours.h"
 #include "rastergis/RSGISFindClumpCatagoryStats.h"
-
+#include "rastergis/RSGISSelectClumps.h"
 
 /*
 #include "rastergis/RSGISRasterAttUtils.h"
@@ -59,7 +59,7 @@
 #include "rastergis/RSGISCalcClumpShapeParameters.h"
 #include "rastergis/RSGISDefineImageTiles.h"
 #include "rastergis/RSGISFindChangeClumps.h"
-#include "rastergis/RSGISSelectClumps.h"
+
 #include "rastergis/RSGISInterpolateClumpValues2Image.h"
  
  #include "math/RSGIS2DInterpolation.h"
@@ -1041,7 +1041,7 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-
+*/
     void executeIdentifyClumpExtremesOnGrid(std::string clumpsImage, std::string inSelectField, std::string outSelectField, std::string eastingsCol, std::string northingsCol, std::string methodStr, unsigned int rows, unsigned int cols, std::string metricField)throw(RSGISCmdException)
     {
         GDALAllRegister();
@@ -1089,7 +1089,7 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-
+/*
     void executeInterpolateClumpValuesToImage(std::string clumpsImage, std::string selectField, std::string eastingsField, std::string northingsField, std::string methodStr, std::string valueField, std::string outputFile, std::string imageFormat, RSGISLibDataType dataType)throw(RSGISCmdException)
     {
         GDALAllRegister();

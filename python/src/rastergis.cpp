@@ -1181,27 +1181,32 @@ static PyObject *RasterGIS_FindChangeClumpsFromStdDev(PyObject *self, PyObject *
     
     Py_RETURN_NONE;
 }
+*/
 
 
-
-static PyObject *RasterGIS_SelectClumpsOnGrid(PyObject *self, PyObject *args) {
+static PyObject *RasterGIS_SelectClumpsOnGrid(PyObject *self, PyObject *args)
+{
     const char *clumpsImage, *inSelectField, *outSelectField, *eastingsCol, *northingsCol, *metricField, *methodStr;
     unsigned int rows, cols;
     
-    if(!PyArg_ParseTuple(args, "sssssssII:selectClumpsOnGrid", &clumpsImage, &inSelectField, &outSelectField, &eastingsCol, &northingsCol, &metricField, &methodStr, &rows, &cols)) {
+    if(!PyArg_ParseTuple(args, "sssssssII:selectClumpsOnGrid", &clumpsImage, &inSelectField, &outSelectField, &eastingsCol, &northingsCol, &metricField, &methodStr, &rows, &cols))
+    {
         return NULL;
     }
     
-    try {
+    try
+    {
         rsgis::cmds::executeIdentifyClumpExtremesOnGrid(std::string(clumpsImage), std::string(inSelectField), std::string(outSelectField), std::string(eastingsCol), std::string(northingsCol), std::string(methodStr), rows, cols, std::string(metricField));
-    } catch (rsgis::cmds::RSGISCmdException &e) {
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
         PyErr_SetString(GETSTATE(self)->error, e.what());
         return NULL;
     }
     
     Py_RETURN_NONE;
 }
-
+/*
 
 static PyObject *RasterGIS_InterpolateClumpValues2Img(PyObject *self, PyObject *args) {
     const char *clumpsImage, *selectField, *eastingsField, *northingsField, *methodStr, *valueField, *outputFile, *imageFormat;
@@ -1789,7 +1794,7 @@ static PyMethodDef RasterGISMethods[] = {
 "   * outName - An integer to uniquely identify the clumps identify as change\n"
 "   * threshold - The number of standard deviations away from the mean above which segments are identified as change.\n"
 "\n\n"},
-
+*/
 {"selectClumpsOnGrid", RasterGIS_SelectClumpsOnGrid, METH_VARARGS,
     "rsgislib.rastergis.selectClumpsOnGrid(clumpsImage, inSelectField, outSelectField, eastingsCol, northingsCol, metricField, methodStr, rows, cols)\n"
     "Selects a segment within a regular grid pattern across the scene. The clump is selected based on the minimum, maximum or closest to the mean.\n"
@@ -1805,7 +1810,7 @@ static PyMethodDef RasterGISMethods[] = {
     "* rows is an unsigned integer which defines the number of rows within which a clump will be selected.\n"
     "* cols is an unsigned integer which defines the number of columns within which a clump will be selected.\n"
     "\n"},
-    
+    /*
 {"interpolateClumpValues2Image", RasterGIS_InterpolateClumpValues2Img, METH_VARARGS,
     "rsgislib.rastergis.interpolateClumpValues2Image(clumpsImage, selectField, eastingsField, northingsField, methodStr, valueField, outputFile, imageFormat, dataType)\n"
     "Interpolates values from clumps to the whole image of pixels.\n"

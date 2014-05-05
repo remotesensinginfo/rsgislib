@@ -63,7 +63,6 @@ namespace rsgis{ namespace cmds {
             
             // Tidy up
             GDALClose(datasets[0]);
-            GDALDestroyDriverManager();
         }
         catch (rsgis::RSGISException &e)
         {
@@ -119,7 +118,6 @@ namespace rsgis{ namespace cmds {
             GDALClose(spectralDataset);
             GDALClose(clumpsDataset);
             GDALClose(pixelMaskDataset);
-            GDALDestroyDriverManager();
         }
         catch (rsgis::RSGISException &e)
         {
@@ -180,7 +178,6 @@ namespace rsgis{ namespace cmds {
             // Tidy up
             GDALClose(inDataset);
             GDALClose(resultDataset);
-            GDALDestroyDriverManager();
         }
         catch (rsgis::RSGISException &e)
         {
@@ -274,7 +271,6 @@ namespace rsgis{ namespace cmds {
             GDALClose(inDataset);
             GDALClose(inClumpDataset);
             GDALClose(resultDataset);
-            GDALDestroyDriverManager();
         }
         catch (rsgis::RSGISException &e)
         {
@@ -291,6 +287,7 @@ namespace rsgis{ namespace cmds {
         try
         {
             GDALAllRegister();
+            std::cout << "Opening clumps file: " << inputImage << std::endl;
             GDALDataset *inDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
             if(inDataset == NULL)
             {
@@ -315,6 +312,7 @@ namespace rsgis{ namespace cmds {
                 std::cout << "Processing using Disk\n";
                 catagoryDataset = inDataset;
                 resultDataset = imgUtils.createCopy(inDataset, 1, outputImage, imageFormat, GDT_UInt32, true, "");
+                std::cout << "Created copy\n";
             }
             
             std::cout << "Performing relabel\n";
@@ -336,7 +334,6 @@ namespace rsgis{ namespace cmds {
             // Tidy up
             GDALClose(inDataset);
             GDALClose(resultDataset);
-            GDALDestroyDriverManager();
         }
         catch (rsgis::RSGISException &e)
         {
@@ -408,7 +405,6 @@ namespace rsgis{ namespace cmds {
             GDALClose(inDataset);
             GDALClose(inClumpDataset);
             GDALClose(resultDataset);
-            GDALDestroyDriverManager();
         }
         catch (rsgis::RSGISException &e)
         {
@@ -467,7 +463,6 @@ namespace rsgis{ namespace cmds {
             // Tidy up
             GDALClose(inDataset);
             GDALClose(resultDataset);
-            GDALDestroyDriverManager();
         }
         catch (rsgis::RSGISException &e)
         {
