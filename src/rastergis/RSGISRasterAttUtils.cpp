@@ -29,7 +29,7 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    void RSGISRasterAttUtils::copyAttColumns(GDALDataset *inImage, GDALDataset *outImage, std::vector<std::string> fields, int ratBand) throw(RSGISAttributeTableException)
+    void RSGISRasterAttUtils::copyAttColumns(GDALDataset *inImage, GDALDataset *outImage, std::vector<std::string> fields, bool copyColours, bool copyHist, int ratBand) throw(RSGISAttributeTableException)
     {
         try 
         {
@@ -37,6 +37,18 @@ namespace rsgis{namespace rastergis{
             GDALRasterAttributeTable *gdalAttIn = inImage->GetRasterBand(ratBand)->GetDefaultRAT();
             GDALRasterAttributeTable *gdalAttOut = NULL;
             GDALRasterAttributeTable *gdalAttOutTmp = outImage->GetRasterBand(ratBand)->GetDefaultRAT();
+           
+            int inRedIdx = 0;
+            int inGreenIdx = 0;
+            int inBlueIdx = 0;
+            int inAlphaIdx = 0;
+            int inHistIndx = 0;
+            
+            int outRedIdx = 0;
+            int outGreenIdx = 0;
+            int outBlueIdx = 0;
+            int outAlphaIdx = 0;
+            int outHistIndx = 0;
             
             if((gdalAttOutTmp == NULL) || (gdalAttOutTmp->GetRowCount() == 0))
             {
@@ -73,28 +85,62 @@ namespace rsgis{namespace rastergis{
             {
                 rsgis::RSGISAttributeTableException("There are no columns in the input attribute table.");
             }
-            else
+
+            for(size_t j = 0; j < fields.size(); ++j)
             {
-                for(size_t j = 0; j < fields.size(); ++j)
+                colInIdxs[j] = findColumnIndex(gdalAttIn, fields.at(j));
+            }
+            
+            for(size_t j = 0; j < fields.size(); ++j)
+            {
+                if(gdalAttIn->GetTypeOfCol(colInIdxs[j]) == GFT_Integer)
                 {
-                    colInIdxs[j] = findColumnIndex(gdalAttIn, fields.at(j));
+                    colOutIdxs[j] = findColumnIndexOrCreate(gdalAttOut, fields.at(j), GFT_Integer, gdalAttIn->GetUsageOfCol(colInIdxs[j]));
                 }
-                
-                for(size_t j = 0; j < fields.size(); ++j)
+                else if(gdalAttIn->GetTypeOfCol(colInIdxs[j]) == GFT_Real)
                 {
-                    if(gdalAttIn->GetTypeOfCol(colInIdxs[j]) == GFT_Integer)
-                    {
-                        colOutIdxs[j] = findColumnIndexOrCreate(gdalAttOut, fields.at(j), GFT_Integer, gdalAttIn->GetUsageOfCol(colInIdxs[j]));
-                    }
-                    else if(gdalAttIn->GetTypeOfCol(colInIdxs[j]) == GFT_Real)
-                    {
-                        colOutIdxs[j] = findColumnIndexOrCreate(gdalAttOut, fields.at(j), GFT_Real, gdalAttIn->GetUsageOfCol(colInIdxs[j]));
-                    }
-                    else if(gdalAttIn->GetTypeOfCol(colInIdxs[j]) == GFT_String)
-                    {
-                        colOutIdxs[j] = findColumnIndexOrCreate(gdalAttOut, fields.at(j), GFT_String, gdalAttIn->GetUsageOfCol(colInIdxs[j]));
-                    }
+                    colOutIdxs[j] = findColumnIndexOrCreate(gdalAttOut, fields.at(j), GFT_Real, gdalAttIn->GetUsageOfCol(colInIdxs[j]));
                 }
+                else if(gdalAttIn->GetTypeOfCol(colInIdxs[j]) == GFT_String)
+                {
+                    colOutIdxs[j] = findColumnIndexOrCreate(gdalAttOut, fields.at(j), GFT_String, gdalAttIn->GetUsageOfCol(colInIdxs[j]));
+                }
+            }
+
+            if(copyColours)
+            {
+                try
+                {
+                    inRedIdx = findColumnIndex(gdalAttIn,"Red");
+                    inGreenIdx = findColumnIndex(gdalAttIn,"Green");
+                    inBlueIdx = findColumnIndex(gdalAttIn,"Blue");
+                    inAlphaIdx = findColumnIndex(gdalAttIn,"Alpha");
+                }
+                catch (rsgis::RSGISAttributeTableException &e)
+                {
+                    std::cerr << "No colour columns in input attribute table - skipping copying" << std::endl;
+                    copyColours = false;
+                }
+
+                // Get or create column indies for colour columns
+                outRedIdx = findColumnIndexOrCreate(gdalAttOut, "Red", GFT_Integer, GFU_Red);
+                outGreenIdx = findColumnIndexOrCreate(gdalAttOut, "Green", GFT_Integer, GFU_Green);
+                outBlueIdx = findColumnIndexOrCreate(gdalAttOut, "Blue", GFT_Integer, GFU_Blue);
+                outAlphaIdx = findColumnIndexOrCreate(gdalAttOut, "Alpha", GFT_Integer, GFU_Alpha);
+            }
+            
+            if(copyHist)
+            {
+                try
+                {
+                    inHistIndx = findColumnIndex(gdalAttIn,"Histogram");
+                }
+                catch (rsgis::RSGISAttributeTableException &e)
+                {
+                    std::cerr << "No histogram column in input attribute table - skipping copying" << std::endl;
+                    copyHist = false;
+                }
+                outHistIndx = findColumnIndexOrCreate(gdalAttOut, "Histogram", GFT_Integer, GFU_PixelCount);
             }
             
             std::cout << "Copying columns to the new attribute table\n";
@@ -148,7 +194,27 @@ namespace rsgis{namespace rastergis{
                         throw rsgis::RSGISAttributeTableException("Column data type was not recognised.");
                     }
                 }
-        
+                
+                if(copyColours)
+                {
+                    // Red
+                    gdalAttIn->ValuesIO(GF_Read, inRedIdx, rowOffset, RAT_BLOCK_LENGTH, blockDataInt);
+                    gdalAttOut->ValuesIO(GF_Write, outRedIdx, rowOffset, RAT_BLOCK_LENGTH, blockDataInt);
+                    
+                    // Green
+                    gdalAttIn->ValuesIO(GF_Read, inGreenIdx, rowOffset, RAT_BLOCK_LENGTH, blockDataInt);
+                    gdalAttOut->ValuesIO(GF_Write, outGreenIdx, rowOffset, RAT_BLOCK_LENGTH, blockDataInt);
+                    
+                    // Blue
+                    gdalAttIn->ValuesIO(GF_Read, inBlueIdx, rowOffset, RAT_BLOCK_LENGTH, blockDataInt);
+                    gdalAttOut->ValuesIO(GF_Write, outBlueIdx, rowOffset, RAT_BLOCK_LENGTH, blockDataInt);
+                }
+                if(copyHist)
+                {
+                    gdalAttIn->ValuesIO(GF_Read, inHistIndx, rowOffset, RAT_BLOCK_LENGTH, blockDataInt);
+                    gdalAttOut->ValuesIO(GF_Write, outHistIndx, rowOffset, RAT_BLOCK_LENGTH, blockDataInt);
+                }
+
             }
             if(remainRows > 0)
             {
@@ -176,6 +242,25 @@ namespace rsgis{namespace rastergis{
                     {
                         throw rsgis::RSGISAttributeTableException("Column data type was not recognised.");
                     }
+                }
+                if(copyColours)
+                {
+                    // Red
+                    gdalAttIn->ValuesIO(GF_Read, inRedIdx, rowOffset, remainRows, blockDataInt);
+                    gdalAttOut->ValuesIO(GF_Write, outRedIdx, rowOffset, remainRows, blockDataInt);
+                    
+                    // Green
+                    gdalAttIn->ValuesIO(GF_Read, inGreenIdx, rowOffset, remainRows, blockDataInt);
+                    gdalAttOut->ValuesIO(GF_Write, outGreenIdx, rowOffset, remainRows, blockDataInt);
+                    
+                    // Blue
+                    gdalAttIn->ValuesIO(GF_Read, inBlueIdx, rowOffset, remainRows, blockDataInt);
+                    gdalAttOut->ValuesIO(GF_Write, outBlueIdx, rowOffset, remainRows, blockDataInt);
+                }
+                if(copyHist)
+                {
+                    gdalAttIn->ValuesIO(GF_Read, inHistIndx, rowOffset, remainRows, blockDataInt);
+                    gdalAttOut->ValuesIO(GF_Write, outHistIndx, rowOffset, remainRows, blockDataInt);
                 }
                 
             }
