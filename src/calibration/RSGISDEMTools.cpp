@@ -891,7 +891,7 @@ namespace rsgis{namespace calib{
         if(vals.size() > 0)
         {
             std::sort(vals.begin(), vals.end());
-            int midpt = floor(vals.size()/2);
+            int midpt = floor(vals.size()/2.0);
             
             output[0] = vals.at(midpt);
         }
@@ -910,7 +910,7 @@ namespace rsgis{namespace calib{
             if(vals.size() > 0)
             {
                 std::sort(vals.begin(), vals.end());
-                int midpt = floor(vals.size()/2);
+                int midpt = floor(vals.size()/2.0);
                 
                 output[0] = vals.at(midpt);
             }
