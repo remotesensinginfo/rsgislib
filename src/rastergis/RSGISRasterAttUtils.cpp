@@ -1296,7 +1296,13 @@ namespace rsgis{namespace rastergis{
             int feedback = nRows/10.0;
             int feedbackCounter = 0;
             
-            std::cout << "Started " << std::flush;
+            // Don't show progress if less rows than block length
+            if(nRows < RAT_BLOCK_LENGTH)
+            {
+                feedback = 0;
+            }
+            
+            if(feedback != 0){std::cout << "Started " << std::flush;}
             
             int rowOffset = 0;
             for(int i = 0; i < nBlocks; i++)
@@ -1340,7 +1346,7 @@ namespace rsgis{namespace rastergis{
                     outData[(nBlocks*RAT_BLOCK_LENGTH)+m] = blockData[m];
                 }
             }
-            std::cout << ".Completed\n";
+            if(feedback != 0){std::cout << ".Completed\n";}
             delete[] blockData;
         }
         catch (RSGISAttributeTableException &e)
@@ -1379,7 +1385,13 @@ namespace rsgis{namespace rastergis{
             int feedback = nRows/10.0;
             int feedbackCounter = 0;
             
-            std::cout << "Started " << std::flush;
+            // Don't show progress if less rows than block length
+            if(nRows < RAT_BLOCK_LENGTH)
+            {
+                feedback = 0;
+            }
+            
+            if(feedback != 0){std::cout << "Started " << std::flush;}
             
             int rowOffset = 0;
             for(int i = 0; i < nBlocks; i++)
@@ -1423,7 +1435,7 @@ namespace rsgis{namespace rastergis{
                     outData[(nBlocks*RAT_BLOCK_LENGTH)+m] = blockData[m];
                 }
             }
-            std::cout << ".Completed\n";
+            if(feedback != 0){std::cout << ".Completed\n";}
             delete[] blockData;
         }
         catch (RSGISAttributeTableException &e)
@@ -1462,7 +1474,13 @@ namespace rsgis{namespace rastergis{
             int feedback = nRows/10.0;
             int feedbackCounter = 0;
             
-            std::cout << "Started " << std::flush;
+            // Don't show progress if less rows than block length
+            if(nRows < RAT_BLOCK_LENGTH)
+            {
+                feedback = 0;
+            }
+            
+            if(feedback != 0){std::cout << "Started " << std::flush;}
             
             int rowOffset = 0;
             for(int i = 0; i < nBlocks; i++)
@@ -1506,7 +1524,7 @@ namespace rsgis{namespace rastergis{
                     outData[(nBlocks*RAT_BLOCK_LENGTH)+m] = blockData[m];
                 }
             }
-            std::cout << ".Completed\n";
+            if(feedback != 0){std::cout << ".Completed\n";}
             delete[] blockData;
         }
         catch (RSGISAttributeTableException &e)
