@@ -40,6 +40,8 @@
 #include "rastergis/RSGISFindClumpNeighbours.h"
 #include "rastergis/RSGISFindClumpCatagoryStats.h"
 #include "rastergis/RSGISSelectClumps.h"
+#include "rastergis/RSGISFindChangeClumps.h"
+#include "rastergis/RSGISRATCalc.h"
 
 /*
 #include "rastergis/RSGISRasterAttUtils.h"
@@ -58,7 +60,7 @@
 #include "rastergis/RSGISClumpBorders.h"
 #include "rastergis/RSGISCalcClumpShapeParameters.h"
 #include "rastergis/RSGISDefineImageTiles.h"
-#include "rastergis/RSGISFindChangeClumps.h"
+
 
 #include "rastergis/RSGISInterpolateClumpValues2Image.h"
  
@@ -249,7 +251,7 @@ namespace rsgis{ namespace cmds {
             }
             delete bandStats;
 
-            clumpsDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
+            clumpsDataset->GetRasterBand(ratBand)->SetMetadataItem("LAYER_TYPE", "thematic");
 
             GDALClose(clumpsDataset);
             GDALClose(imageDataset);
@@ -307,7 +309,7 @@ namespace rsgis{ namespace cmds {
             }
             delete bandPercentiles;
 
-            clumpsDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
+            clumpsDataset->GetRasterBand(ratBand)->SetMetadataItem("LAYER_TYPE", "thematic");
 
             GDALClose(clumpsDataset);
             GDALClose(imageDataset);
@@ -345,7 +347,7 @@ namespace rsgis{ namespace cmds {
             rsgis::rastergis::RSGISFindClumpCatagoryStats findClumpStats;
             findClumpStats.calcCatergoriesOverlaps(clumpsDataset, catsDataset, outColsName, majorityColName, copyClassNames, majClassNameField, classNameField, ratBandClumps, ratBandCats);
 
-            clumpsDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
+            clumpsDataset->GetRasterBand(ratBandClumps)->SetMetadataItem("LAYER_TYPE", "thematic");
 
             GDALClose(clumpsDataset);
             GDALClose(catsDataset);
@@ -1004,11 +1006,12 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-
-    void executeFindChangeClumpsFromStdDev(std::string clumpsImage, std::string classField, std::string changeField, std::vector<std::string> attFields, std::vector<cmds::RSGISClassChangeFieldsCmds> classChangeFields)throw(RSGISCmdException)
+ */
+    void executeFindChangeClumpsFromStdDev(std::string clumpsImage, std::string classField, std::string changeField, std::vector<std::string> attFields, std::vector<cmds::RSGISClassChangeFieldsCmds> classChangeFields, int ratBand)throw(RSGISCmdException)
     {
         try
         {
+            std::cout << "Opening RAT" << std::endl;
             GDALAllRegister();
             GDALDataset *clumpsDataset = (GDALDataset *) GDALOpen(clumpsImage.c_str(), GA_Update);
             if(clumpsDataset == NULL) {
@@ -1030,23 +1033,61 @@ namespace rsgis{ namespace cmds {
                 c->count = 0;
                 classFields->push_back(c);
             }
-
-            rsgis::rastergis::RSGISFindChangeClumps changeClumps;
-            changeClumps.findChangeStdDevThreshold(clumpsDataset, classField, changeField, &attFields, classFields);
-
+            
+            // Initialise (reads columns to memory and sets thresholds)
+            std::cout << "Getting thresholds" << std::endl;
+            rsgis::rastergis::RSGISFindChangeClumpsStdDevThreshold *ratCalcVal = new rsgis::rastergis::RSGISFindChangeClumpsStdDevThreshold(clumpsDataset, classField, changeField, &attFields, classFields);
+            
+            // Setup RATCalc
+            rsgis::rastergis::RSGISRATCalc *ratCalc = new rsgis::rastergis::RSGISRATCalc(ratCalcVal);
+            
+            std::vector<unsigned int> inRealColIdx;
+            std::vector<unsigned int> inIntColIdx;
+            std::vector<unsigned int> inStrColIdx;
+            
+            std::vector<unsigned int> outRealColIdx;
+            std::vector<unsigned int> outIntColIdx;
+            std::vector<unsigned int> outStrColIdx;
+            
+            // In class field
+            inStrColIdx.push_back(ratCalcVal->classColIdx);
+            
+            // Attribute fields
+            for(unsigned int i = 0; i < ratCalcVal->numFields; ++i)
+            {
+                inRealColIdx.push_back(ratCalcVal->fieldIdxs[i]);
+            }
+            
+            // Out change field
+            outIntColIdx.push_back(ratCalcVal->changeFieldIdx);
+            
+            std::cout << "Identifying the change objects\n";
+            // Calculate change
+            ratCalc->calcRATValues(ratCalcVal->attTable, inRealColIdx, inIntColIdx, inStrColIdx, outRealColIdx, outIntColIdx, outStrColIdx);
+            
+            std::cout << "Writing attributes\n";
+            // Set attribute table
+            clumpsDataset->GetRasterBand(ratBand)->SetDefaultRAT(ratCalcVal->attTable);
+            
+            // Close GDAL Dataset
+            GDALClose(clumpsDataset);
+            
+            // Tidy up
             for(std::vector<rastergis::RSGISClassChangeFields*>::iterator classIter = classFields->begin(); classIter != classFields->end(); ++classIter)
             {
                 delete *classIter;
             }
             delete classFields;
-            GDALClose(clumpsDataset);
+            delete ratCalc;
+            delete ratCalcVal;
+
         }
         catch (rsgis::RSGISException &e)
         {
             throw RSGISCmdException(e.what());
         }
     }
-*/
+
     void executeIdentifyClumpExtremesOnGrid(std::string clumpsImage, std::string inSelectField, std::string outSelectField, std::string eastingsCol, std::string northingsCol, std::string methodStr, unsigned int rows, unsigned int cols, std::string metricField)throw(RSGISCmdException)
     {
         GDALAllRegister();
@@ -1094,7 +1135,7 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-/*
+ /*
     void executeInterpolateClumpValuesToImage(std::string clumpsImage, std::string selectField, std::string eastingsField, std::string northingsField, std::string methodStr, std::string valueField, std::string outputFile, std::string imageFormat, RSGISLibDataType dataType)throw(RSGISCmdException)
     {
         GDALAllRegister();

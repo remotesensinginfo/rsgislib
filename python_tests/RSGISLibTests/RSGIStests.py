@@ -82,6 +82,7 @@ class RSGISTests:
         os.system('cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_shape.kea')
         os.system('cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_col.kea')
         os.system('cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_col_str.kea')
+        os.system('cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_change.kea')
         os.system('cp ./Rasters/injune_p142_casi_sub_utm.kea ./TestOutputs/injune_p142_casi_sub_utm.kea')
         
         os.system('cp ./RATS/injune_p142_casi_sub_utm_segs_nostats.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_nostats_addstats.kea')
@@ -477,6 +478,16 @@ class RSGISTests:
         shapes.append(rastergis.ShapeIndex(colName="MainDirection", idx=rsgislib.SHAPE_MAINDIRECTION))
         rastergis.calcShapeIndices(clumps, shapes)
     """
+    def testFindChangeClumpsFromStdDev(self):
+        print("PYTHON TEST: findChangeClumpsFromStdDev")
+        clumps="./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_change.kea"
+        ChangeFeat = collections.namedtuple('ChangeFeats', ['name', 'outName', 'threshold'])
+        changeFeatVals = []
+        attributes = ['b1Mean','b2Mean']
+        changeFeatVals.append(ChangeFeat(name="ClassA", outName=1, threshold=1.0))
+        changeFeatVals.append(ChangeFeat(name="ClassB", outName=2, threshold=1))
+        rastergis.findChangeClumpsFromStdDev(clumps, "outClassStr", "Change", attributes, changeFeatVals)
+    
     def testPopulateStats(self):
         print("PYTHON TEST: populateStats")
         clumps="./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_nostats_addstats.kea"
@@ -901,6 +912,7 @@ if __name__ == '__main__':
         #t.tryFuncAndCatch(t.testFindBoundaryPixels)
         #t.tryFuncAndCatch(t.testCalcBorderLength)
         #t.tryFuncAndCatch(t.testCalcShapeIndices)
+        t.tryFuncAndCatch(t.testFindChangeClumpsFromStdDev)
         
     if testLibraries == 'all' or testLibraries == 'zonalstats':
         
