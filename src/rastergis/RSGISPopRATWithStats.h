@@ -42,6 +42,7 @@
 
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 
 namespace rsgis{namespace rastergis{
 	
