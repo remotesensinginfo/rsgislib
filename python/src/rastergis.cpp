@@ -1052,16 +1052,23 @@ static PyObject *RasterGIS_DefineBorderClumps(PyObject *self, PyObject *args) {
     
     Py_RETURN_NONE;
 }
+*/
 
-static PyObject *RasterGIS_FindChangeClumpsFromStdDev(PyObject *self, PyObject *args) {
+static PyObject *RasterGIS_FindChangeClumpsFromStdDev(PyObject *self, PyObject *args, PyObject *keywds)
+{
     const char *clumpsImage, *classField, *changeField;
     PyObject *pAttFields, *pClassFields;
+    int ratBand = 1;
     
-    if(!PyArg_ParseTuple(args, "sssOO:findChangeClumpsFromStdDev", &clumpsImage, &classField, &changeField, &pAttFields, &pClassFields)) {
+    static char *kwlist[] = {"clumps", "class","change", "attributes", "classChangeFields", "ratband", NULL};
+    
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssOO|i:findChangeClumpsFromStdDev", kwlist, &clumpsImage, &classField, &changeField, &pAttFields, &pClassFields, &ratBand))
+    {
         return NULL;
     }
     
-    if(!PySequence_Check(pAttFields) || !PySequence_Check(pClassFields)) {
+    if(!PySequence_Check(pAttFields) || !PySequence_Check(pClassFields))
+    {
         PyErr_SetString(GETSTATE(self)->error, "last 2 arguments must be sequences");
     }
     
@@ -1104,7 +1111,7 @@ static PyObject *RasterGIS_FindChangeClumpsFromStdDev(PyObject *self, PyObject *
         
         threshold = PyObject_GetAttrString(o, "threshold");
         extractedAttributes.push_back(threshold);
-        if( ( threshold == NULL ) || ( threshold == Py_None ) || !RSGISPY_CHECK_FLOAT(threshold))
+        if( ( threshold == NULL ) || ( threshold == Py_None ) || !(RSGISPY_CHECK_FLOAT(threshold) || RSGISPY_CHECK_INT(threshold)))
         {
             PyErr_SetString(GETSTATE(self)->error, "could not find float attribute \'threshold\'" );
             FreePythonObjects(extractedAttributes);
@@ -1121,7 +1128,7 @@ static PyObject *RasterGIS_FindChangeClumpsFromStdDev(PyObject *self, PyObject *
     
     try
     {
-        rsgis::cmds::executeFindChangeClumpsFromStdDev(std::string(clumpsImage), std::string(classField), std::string(changeField), attFields, classFields);
+        rsgis::cmds::executeFindChangeClumpsFromStdDev(std::string(clumpsImage), std::string(classField), std::string(changeField), attFields, classFields, ratBand);
     }
     catch (rsgis::cmds::RSGISCmdException &e)
     {
@@ -1131,7 +1138,6 @@ static PyObject *RasterGIS_FindChangeClumpsFromStdDev(PyObject *self, PyObject *
     
     Py_RETURN_NONE;
 }
-*/
 
 
 static PyObject *RasterGIS_SelectClumpsOnGrid(PyObject *self, PyObject *args)
@@ -1727,23 +1733,25 @@ static PyMethodDef RasterGISMethods[] = {
 "* tileBoundary is an unsigned int\n"
 "* tileBody is an unsigned int\n"
 "\n"},
-    
-    {"findChangeClumpsFromStdDev", RasterGIS_FindChangeClumpsFromStdDev, METH_VARARGS,
+*/
+    {"findChangeClumpsFromStdDev", (PyCFunction)RasterGIS_FindChangeClumpsFromStdDev, METH_VARARGS | METH_KEYWORDS,
 "rastergis.findChangeClumpsFromStdDev(clumpsImage, classField, changeField, attFields, classChangeFields)\n"
 "Identifies segments which have changed by looking for statistical outliers (std dev) from class population.\n"
 "Where:\n"
 "\n"
-"* clumpsImage is a string containing the name of the input clump file\n"
-"* classField is a string\n"
-"* changeField is a string\n"
-"* attFields is a sequence of strings\n"
+"* clumps is a string containing the name of the input clump file\n"
+"* class is a string providing the name of the column containing classes.\n"
+"* change is a string providing the output name of the change field\n"
+"* attributes is a sequence of strings containing the columns to use when detecting change.\n"
 "* classChangeFields is a sequence of python objects having the following attributes:\n"
 "\n"
 "   * name - The class name in which change is going to be search for\n"
 "   * outName - An integer to uniquely identify the clumps identify as change\n"
 "   * threshold - The number of standard deviations away from the mean above which segments are identified as change.\n"
-"\n\n"},
-*/
+"\n"
+"* ratBand is an int containing band for which the neighbours are to be calculated for (Optional, Default = 1)\n"
+"\n"},
+
 {"selectClumpsOnGrid", RasterGIS_SelectClumpsOnGrid, METH_VARARGS,
     "rsgislib.rastergis.selectClumpsOnGrid(clumpsImage, inSelectField, outSelectField, eastingsCol, northingsCol, metricField, methodStr, rows, cols)\n"
     "Selects a segment within a regular grid pattern across the scene. The clump is selected based on the minimum, maximum or closest to the mean.\n"
