@@ -63,11 +63,6 @@ Where:
 * calcSum - Calculate sum
 * calcMean - Calculate mean
 * calcStDev - Calculate standard deviation
-* calcMedian - Calculate median
-* calcCount - Calculate count
-* calcArea - Calculate clump area 
-* calcLength - Calculate clump lenght
-* calcWidth - Calculate clump width
 
 Example::
 
@@ -121,16 +116,17 @@ Example::
             stDevName = bandName + 'Std'
             outFieldsList.append(stDevName)
         if calcMedian:
+            raise Exception('Median is not currently supported.')
             medianName = bandName + 'Med'
             outFieldsList.append(medianName)
         if calcCount:
+            raise Exception('Count is not currently supported.')
             countName = bandName + 'Pix'
             outFieldsList.append(countName)
 
         stats2Calc.append(rastergis.BandAttStats(band=i+1, 
-                    countField=countName, minField=minName, 
-                    maxField=maxName, sumField=sumName, 
-                    medianField=medianName, stdDevField=stDevName, 
+                    minField=minName, maxField=maxName, 
+                    sumField=sumName, stdDevField=stDevName, 
                     meanField=meanName))
     
     # Calc stats
@@ -142,6 +138,7 @@ Example::
 
     # Calculate shapes, if required
     if calcArea or calcLength or calcWidth or calcLengthWidth:
+        raise Exception('Shape features are not currently supported.')
         print("\nCalculating shape indices")
         shapes = list()
         if calcArea:
