@@ -58,6 +58,7 @@ Methods of initialising KMEANS:
 """
 import os.path
 import os
+import subprocess
 import fnmatch
 import time
 
@@ -103,6 +104,21 @@ INITCLUSTER_DIAGONAL_STDDEV = 2
 INITCLUSTER_DIAGONAL_FULL_ATTACH = 3
 INITCLUSTER_DIAGONAL_STDDEV_ATTACH = 4
 INITCLUSTER_KPP = 5
+
+def getRSGISLibVersion():
+    """ Calls rsgis-config to get the version number. """
+
+    # Try calling rsgis-config to get minor version number
+    try:
+        out = subprocess.Popen('rsgis-config --version',shell=True,stdin=subprocess.PIPE, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+        (stdout, stderr) = out.communicate()
+        versionStr = stdout.decode()
+        versionStr = versionStr.split('\n')[0]
+    except Exception:
+        versionStr = '2.2'
+    return(versionStr)
+
+__version__ = getRSGISLibVersion()
 
 class RSGISPyException(Exception):
     """
