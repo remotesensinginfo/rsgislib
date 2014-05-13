@@ -1299,7 +1299,7 @@ static PyMethodDef RasterGISMethods[] = {
 "   fields = ['NIRAvg', 'BlueAvg', 'GreenAvg', 'RedAvg']\n"
 "   rastergis.copyGDALATTColumns(image, table, fields)\n"
 "\n"
-"To copy subset if columns from one RAT to a new file the following can be used::\n"
+"To copy a subset of columns from one RAT to a new file the following can be used::\n"
 "\n"
 "   import rsgislib\n"
 "   import rsgislib.imageutils\n"
