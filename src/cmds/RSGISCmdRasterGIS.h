@@ -191,7 +191,7 @@ namespace rsgis{ namespace cmds {
     //void executeGenerateColourTable(std::string inputImage, std::string clumpsImage, unsigned int redBand, unsigned int greenBand, unsigned int blueBand)throw(RSGISCmdException);
 
     /** Function to find the majority for class (string - field) from a set of small objects to large objects */
-    //void executeStrClassMajority(std::string baseSegment, std::string infoSegment, std::string baseClassCol, std::string infoClassCol, bool ignoreZero = true)throw(RSGISCmdException);
+    void executeStrClassMajority(std::string baseSegment, std::string infoSegment, std::string baseClassCol, std::string infoClassCol, bool ignoreZero = true, int baseRatBand=1, int infoRatBand=1)throw(RSGISCmdException);
 
     /** Function to classify segments using a spectral distance majority classification */
     //void executeSpecDistMajorityClassifier(std::string inputImage, std::string inClassNameField, std::string outClassNameField, std::string trainingSelectCol, std::string eastingsField, std::string northingsField, std::string areaField, std::string majWeightField, std::vector<std::string> fields, float distThreshold, float specDistThreshold, SpectralDistanceMethodCmds distMethod, float specThresOriginDist)throw(RSGISCmdException);

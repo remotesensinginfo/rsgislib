@@ -723,24 +723,35 @@ static PyObject *RasterGIS_GenerateColourTable(PyObject *self, PyObject *args) {
 
     Py_RETURN_NONE;
 }
-
-static PyObject *RasterGIS_StrClassMajority(PyObject *self, PyObject *args) {
-    const char *baseSegment, *infoSegment, *bassClassCol, *infoClassCol;
+*/
+static PyObject *RasterGIS_StrClassMajority(PyObject *self, PyObject *args, PyObject *keywds) 
+{
+    
+    const char *baseSegment, *infoSegment, *baseClassCol, *infoClassCol;
     int ignoreZero = 1;
+    int baseRatBand = 1;
+    int infoRatBand = 1;
 
-    if(!PyArg_ParseTuple(args, "ssss|i:strClassMajority", &baseSegment, &infoSegment, &bassClassCol, &infoClassCol, &ignoreZero))
+    static char *kwlist[] = {"baseclumps", "infoclumps" "baseclasscol","infoclasscol", "ignorezero","baseratband","inforatband", NULL};
+
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssss|iii:strClassMajority", kwlist, &baseSegment, &infoSegment, &baseClassCol, 
+                                                                        &infoClassCol, &ignoreZero, &baseRatBand, &infoRatBand))
         return NULL;
 
-    try {
-        rsgis::cmds::executeStrClassMajority(std::string(baseSegment), std::string(infoSegment), std::string(bassClassCol), std::string(infoClassCol), ignoreZero);
-    } catch (rsgis::cmds::RSGISCmdException &e) {
+    try 
+    {
+        rsgis::cmds::executeStrClassMajority(std::string(baseSegment), std::string(infoSegment), std::string(baseClassCol), std::string(infoClassCol), 
+                                                infoRatBand, baseRatBand, infoRatBand);
+    } 
+    catch (rsgis::cmds::RSGISCmdException &e) 
+    {
         PyErr_SetString(GETSTATE(self)->error, e.what());
         return NULL;
     }
 
     Py_RETURN_NONE;
 }
-
+/*
 static PyObject *RasterGIS_SpecDistMajorityClassifier(PyObject *self, PyObject *args) {
     const char *inputImage, *inClassNameField, *outClassNameField, *trainingSelectCol, *eastingsField, *northingsField, *areaField, *majWeightField;
     int distMethod;
@@ -1547,17 +1558,20 @@ static PyMethodDef RasterGISMethods[] = {
 "   * blue: int defining the bluecolour component (0 - 255)\n"
 "   * alpha: int defining the alpha colour component (0 - 255)\n"
 "\n"},
-
-    {"strClassMajority", RasterGIS_StrClassMajority, METH_VARARGS,
+*/
+    {"strClassMajority", (PyCFunction)RasterGIS_StrClassMajority, METH_VARARGS | METH_KEYWORDS,
+"rastergis.strClassMajority(baseclumps, infoclumps, baseclasscol, infoclasscol, ignorezero=True, baseratband=1, inforatband=1)\n"
 "Finds the majority for class (string - field) from a set of small objects to large objects\n"
-"rastergis.strClassMajority(baseSegment, infoSegment, baseClassCol, infoClassCol, ignoreZero=True)\n"
+
 "Where:\n"
 "\n"
 "* baseSegment is a the base clumps file, to be attribured.\n"
 "* infoSegment is the file to take attributes from.\n"
-"* baseClassCol the output column name in the baseSegment file.\n"
-"* infoClassCol is the colum name in the infoSegment file.\n"
+"* baseclasscol the output column name in the baseSegment file.\n"
+"* infoclasscol is the colum name in the infoSegment file.\n"
 "* ignoreZero is a boolean specifying if zeros should be ignored in input layer. If set to false values of 0 will be included when calculating the class majority, otherwise the majority calculation will only consider objects with a value greater than 0.\n"
+"* baseratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated in the base clumps."
+"* infoclumps is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated in the info clumps."
 "\nExample::\n"
 "\n"
 "	from rsgislib import rastergis\n"
@@ -1565,7 +1579,7 @@ static PyMethodDef RasterGISMethods[] = {
 "	classRAT='./TestOutputs/RasterGIS/reInt_rat.kea'\n"
 "	rastergis.strClassMajority(clumps, classRAT, 'class_dst', 'class_src')\n"
 "\n"},
-
+/*
     {"specDistMajorityClassifier", RasterGIS_SpecDistMajorityClassifier, METH_VARARGS,
 "rastergis.specDistMajorityClassifier(inputImage, inClassNameField, outClassNameField, trainingSelectCol, eastingsField, northingsField, areaField, majWeightField, fields, distThreshold, specDistThreshold, distMethod, specThreshOriginDist)\n"
 "Classifies segments using a spectral distance majority classification.\n"

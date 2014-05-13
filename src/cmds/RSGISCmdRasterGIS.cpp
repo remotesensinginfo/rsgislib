@@ -42,6 +42,7 @@
 #include "rastergis/RSGISSelectClumps.h"
 #include "rastergis/RSGISFindChangeClumps.h"
 #include "rastergis/RSGISRATCalc.h"
+#include "rastergis/RSGISFindInfoBetweenLayers.h"
 
 /*
 #include "rastergis/RSGISRasterAttUtils.h"
@@ -53,7 +54,6 @@
 #include "rastergis/RSGISFindTopNWithinDist.h"
 #include "rastergis/RSGISFindClosestSpecSpatialFeats.h"
 #include "rastergis/RSGISKNNATTMajorityClassifier.h"
-#include "rastergis/RSGISFindInfoBetweenLayers.h"
 #include "rastergis/RSGISMaxLikelihoodRATClassification.h"
 #include "rastergis/RSGISClassMask.h"
 
@@ -677,8 +677,8 @@ namespace rsgis{ namespace cmds {
         }
 
     }
-
-    void executeStrClassMajority(std::string baseSegment, std::string infoSegment, std::string baseClassCol, std::string infoClassCol, bool ignoreZero)throw(RSGISCmdException) {
+*/
+    void executeStrClassMajority(std::string baseSegment, std::string infoSegment, std::string baseClassCol, std::string infoClassCol, bool ignoreZero, int baseRatBand, int infoRatBand)throw(RSGISCmdException) {
         GDALAllRegister();
         GDALDataset *baseSegDataset, *infoSegDataset;
         try {
@@ -695,7 +695,7 @@ namespace rsgis{ namespace cmds {
             }
 
             rsgis::rastergis::RSGISFindInfoBetweenLayers findClassMajority;
-            findClassMajority.findClassMajority(baseSegDataset, infoSegDataset, baseClassCol, infoClassCol, ignoreZero);
+            findClassMajority.findClassMajority(baseSegDataset, infoSegDataset, baseClassCol, infoClassCol, ignoreZero, baseRatBand, infoRatBand);
 
             GDALClose(baseSegDataset);
             GDALClose(infoSegDataset);
@@ -703,7 +703,7 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-
+/*
     void executeSpecDistMajorityClassifier(std::string inputImage, std::string inClassNameField, std::string outClassNameField, std::string trainingSelectCol, std::string eastingsField, std::string northingsField, std::string areaField, std::string majWeightField, std::vector<std::string> fields, float distThreshold, float specDistThreshold, SpectralDistanceMethodCmds distMethod, float specThresOriginDist)throw(RSGISCmdException) {
         GDALAllRegister();
         GDALDataset *inputDataset;

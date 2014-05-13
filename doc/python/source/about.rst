@@ -27,6 +27,8 @@ To date RSGISLib been used as part of a number of publications and theses, for m
 
 Peter Bunting, Daniel Clewley, Richard M. Lucas and Sam Gillingham. 2014. The Remote Sensing and GIS Software Library (RSGISLib), Computers & Geosciences. Volume 62, Pages 216-226 http://dx.doi.org/10.1016/j.cageo.2013.08.007.
 
+A pre-print is available to download from `here <http://rsgislib.org/publications/pbunting_etal_RSGISLib.pdf>`_.
+
 For storing and processing laser scanning data the Sorted Pulse Data Library (SPDLib) is available to download from http://www.spdlib.org/
 
 **How do I cite RSGISLib?**

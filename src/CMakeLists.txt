@@ -771,7 +771,8 @@ set(LIB_RASTERGIS_H
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISSelectClumps.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISRATCalcValue.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISRATCalc.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindChangeClumps.h	
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindChangeClumps.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindInfoBetweenLayers.h
 	)
 	
 	
@@ -796,7 +797,9 @@ set(LIB_RASTERGIS_CPP
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISRATCalc.cpp
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISRATCalc.h
     ${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindChangeClumps.cpp
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindChangeClumps.h	
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindChangeClumps.h
+    ${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindInfoBetweenLayers.cpp
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindInfoBetweenLayers.h
 	)
 	
 ###############################################################################
