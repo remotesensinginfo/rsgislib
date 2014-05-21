@@ -41,8 +41,10 @@
 #include "ogrsf_frmts.h"
 #include "ogr_api.h"
 
+#include <boost/math/special_functions/fpclassify.hpp>
+
 namespace rsgis{namespace rastergis{
-    
+
     struct RSGISClassChangeFields
     {
         std::string name;
@@ -52,14 +54,17 @@ namespace rsgis{namespace rastergis{
         float *stddev;
         size_t count;
     };
-    
-    
+
+
     class RSGISFindChangeClumpsStdDevThreshold : public RSGISRATCalcValue
     {
     public:
-        RSGISFindChangeClumpsStdDevThreshold(GDALDataset *clumpsDataset, std::string classCol, std::string changeField, std::vector<std::string> *fields, std::vector<rsgis::rastergis::RSGISClassChangeFields*> *classChangeField);
+        RSGISFindChangeClumpsStdDevThreshold(GDALDataset *clumpsDataset, std::string classCol, std::string changeField, std::vector<std::string> *fields,
+                                             std::vector<rsgis::rastergis::RSGISClassChangeFields*> *classChangeField, unsigned int ratBand=1);
         void getThresholds();
-        void calcRATValue(size_t fid, double *inRealCols, unsigned int numInRealCols, int *inIntCols, unsigned int numInIntCols, std::string *inStringCols, unsigned int numInStringCols, double *outRealCols, unsigned int numOutRealCols, int *outIntCols, unsigned int numOutIntCols, std::string *outStringCols, unsigned int numOutStringCols) throw(RSGISAttributeTableException);
+        void calcRATValue(size_t fid, double *inRealCols, unsigned int numInRealCols, int *inIntCols, unsigned int numInIntCols, std::string *inStringCols,
+                          unsigned int numInStringCols, double *outRealCols, unsigned int numOutRealCols, int *outIntCols, unsigned int numOutIntCols,
+                          std::string *outStringCols, unsigned int numOutStringCols) throw(RSGISAttributeTableException);
         ~RSGISFindChangeClumpsStdDevThreshold();
     public:
         GDALRasterAttributeTable *attTable;
@@ -75,11 +80,44 @@ namespace rsgis{namespace rastergis{
         float ***thresholds;
         unsigned int numRows;
         unsigned int numClasses;
-        
-        
     };
-    
-    
+
+    class RSGISGetGlobalClassStats : public RSGISRATCalcValue
+    {
+    /**
+
+    Calculates the global mean and standard deviation for each class in 'classCol' and saves out for each row.
+
+    Output columns have the following names:
+
+    classCol + fields->at(i) + 'Avg'
+    classCol + fields->at(i) + 'Std'
+
+    Very similar to RSGISFindChangeClumpsStdDevThreshold but allows the threshold to be applied externally, or calculation of change based on greater than or less than mean.
+
+    */
+
+    public:
+        RSGISGetGlobalClassStats(GDALDataset *clumpsDataset, std::string classCol, std::vector<std::string> *fields,
+                                 std::vector<rsgis::rastergis::RSGISClassChangeFields*> *classChangeField, unsigned int ratBand=1);
+        void getStats();
+        void calcRATValue(size_t fid, double *inRealCols, unsigned int numInRealCols, int *inIntCols, unsigned int numInIntCols,
+                          std::string *inStringCols, unsigned int numInStringCols, double *outRealCols, unsigned int numOutRealCols,
+                          int *outIntCols, unsigned int numOutIntCols, std::string *outStringCols, unsigned int numOutStringCols) throw(RSGISAttributeTableException);
+        ~RSGISGetGlobalClassStats();
+    public:
+        GDALRasterAttributeTable *attTable;
+        unsigned int *fieldIdxs;
+        unsigned int *classStatsIdx;
+        unsigned int classColIdx;
+        unsigned int numFields;
+    private:
+        std::string classCol;
+        std::vector<std::string> *fields;
+        std::vector<rsgis::rastergis::RSGISClassChangeFields*> *classChangeField;
+        unsigned int numRows;
+        unsigned int numClasses;
+    };
 }}
 
 #endif
