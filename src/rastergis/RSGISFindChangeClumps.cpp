@@ -140,8 +140,11 @@ namespace rsgis{namespace rastergis{
 
                 if(foundClass)
                 {
-                    this->classChangeField->at(classIdx)->means[n] += changeFieldCol[i];
-                    ++this->classChangeField->at(classIdx)->count;
+                    if(boost::math::isfinite(changeFieldCol[i]) && (changeFieldCol[i] != 0))
+                    {
+                        this->classChangeField->at(classIdx)->means[n] += changeFieldCol[i];
+                        ++this->classChangeField->at(classIdx)->count;
+                    }
                 }
             }
             for(std::vector<rsgis::rastergis::RSGISClassChangeFields*>::iterator iterClasses = this->classChangeField->begin(); iterClasses != this->classChangeField->end(); ++iterClasses)
@@ -165,7 +168,12 @@ namespace rsgis{namespace rastergis{
 
                 if(foundClass)
                 {
-                    this->classChangeField->at(classIdx)->stddev[n] += pow(changeFieldCol[i] - classChangeField->at(classIdx)->means[n], 2);
+                    if(boost::math::isfinite(changeFieldCol[i]) && (changeFieldCol[i] != 0))
+                    {
+                        this->classChangeField->at(classIdx)->stddev[n] += pow(changeFieldCol[i] - classChangeField->at(classIdx)->means[n], 2);
+                    }
+
+
                 }
             }
 
