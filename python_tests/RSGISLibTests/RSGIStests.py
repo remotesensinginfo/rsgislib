@@ -913,6 +913,7 @@ if __name__ == '__main__':
         #t.tryFuncAndCatch(t.testCalcBorderLength)
         #t.tryFuncAndCatch(t.testCalcShapeIndices)
         t.tryFuncAndCatch(t.testFindChangeClumpsFromStdDev)
+        t.tryFuncAndCatch(t.testCopyGDLATTColumns)
         
     if testLibraries == 'all' or testLibraries == 'zonalstats':
         
