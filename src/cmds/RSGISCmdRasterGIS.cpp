@@ -63,7 +63,7 @@
 
 
 #include "rastergis/RSGISInterpolateClumpValues2Image.h"
- 
+
  #include "math/RSGIS2DInterpolation.h"
 
 */
@@ -173,7 +173,7 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-    
+
     void executeSpatialLocation(std::string inputImage, unsigned int ratBand, std::string eastingsField, std::string northingsField)throw(RSGISCmdException) {
         try
         {
@@ -417,15 +417,15 @@ namespace rsgis{ namespace cmds {
 
             std::string *bandNames = new std::string[1];
             bandNames[0] = field;
-            
+
             // Get column intex in RAT
             unsigned int columnIndex = attUtils.findColumnIndex(gdalATT, field);
 
             rsgis::rastergis::RSGISExportColumns2ImageCalcImage *calcImageVal = new rsgis::rastergis::RSGISExportColumns2ImageCalcImage(1, gdalATT, columnIndex);
             rsgis::img::RSGISCalcImage calcImage(calcImageVal);
-            
+
             calcImage.calcImage(&inputDataset, 1, 0, outputFile, true, bandNames, imageFormat, RSGIS_to_GDAL_Type(outDataType));
-            
+
             delete calcImageVal;
             delete[] bandNames;
 
@@ -1033,45 +1033,45 @@ namespace rsgis{ namespace cmds {
                 c->count = 0;
                 classFields->push_back(c);
             }
-            
+
             // Initialise (reads columns to memory and sets thresholds)
             std::cout << "Getting thresholds" << std::endl;
-            rsgis::rastergis::RSGISFindChangeClumpsStdDevThreshold *ratCalcVal = new rsgis::rastergis::RSGISFindChangeClumpsStdDevThreshold(clumpsDataset, classField, changeField, &attFields, classFields);
-            
+            rsgis::rastergis::RSGISFindChangeClumpsStdDevThreshold *ratCalcVal = new rsgis::rastergis::RSGISFindChangeClumpsStdDevThreshold(clumpsDataset, classField, changeField, &attFields, classFields, ratBand);
+
             // Setup RATCalc
             rsgis::rastergis::RSGISRATCalc *ratCalc = new rsgis::rastergis::RSGISRATCalc(ratCalcVal);
-            
+
             std::vector<unsigned int> inRealColIdx;
             std::vector<unsigned int> inIntColIdx;
             std::vector<unsigned int> inStrColIdx;
-            
+
             std::vector<unsigned int> outRealColIdx;
             std::vector<unsigned int> outIntColIdx;
             std::vector<unsigned int> outStrColIdx;
-            
+
             // In class field
             inStrColIdx.push_back(ratCalcVal->classColIdx);
-            
+
             // Attribute fields
             for(unsigned int i = 0; i < ratCalcVal->numFields; ++i)
             {
                 inRealColIdx.push_back(ratCalcVal->fieldIdxs[i]);
             }
-            
+
             // Out change field
             outIntColIdx.push_back(ratCalcVal->changeFieldIdx);
-            
+
             std::cout << "Identifying the change objects\n";
             // Calculate change
             ratCalc->calcRATValues(ratCalcVal->attTable, inRealColIdx, inIntColIdx, inStrColIdx, outRealColIdx, outIntColIdx, outStrColIdx);
-            
+
             std::cout << "Writing attributes\n";
             // Set attribute table
             clumpsDataset->GetRasterBand(ratBand)->SetDefaultRAT(ratCalcVal->attTable);
-            
+
             // Close GDAL Dataset
             GDALClose(clumpsDataset);
-            
+
             // Tidy up
             for(std::vector<rastergis::RSGISClassChangeFields*>::iterator classIter = classFields->begin(); classIter != classFields->end(); ++classIter)
             {
@@ -1087,6 +1087,87 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
+
+
+    void executeGetGlobalClassStats(std::string clumpsImage, std::string classField, std::vector<std::string> attFields, std::vector<cmds::RSGISClassChangeFieldsCmds> classChangeFields, int ratBand)throw(RSGISCmdException)
+    {
+        try
+        {
+            std::cout << "Opening RAT" << std::endl;
+            GDALAllRegister();
+            GDALDataset *clumpsDataset = (GDALDataset *) GDALOpen(clumpsImage.c_str(), GA_Update);
+            if(clumpsDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + clumpsImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+
+            std::vector<rastergis::RSGISClassChangeFields *> *classFields = new std::vector<rastergis::RSGISClassChangeFields *>();
+            classFields->reserve(classChangeFields.size());
+
+            for(std::vector<cmds::RSGISClassChangeFieldsCmds>::iterator classIter = classChangeFields.begin(); classIter != classChangeFields.end(); ++classIter)
+            {
+                rastergis::RSGISClassChangeFields *c = new rastergis::RSGISClassChangeFields();
+                c->name = (*classIter).name;
+                c->outName = 0;
+                c->threshold = 0;
+                c->means = NULL;
+                c->stddev = NULL;
+                c->count = 0;
+                classFields->push_back(c);
+            }
+
+            // Initialise (reads columns to memory and sets thresholds)
+            std::cout << "Getting statistics" << std::endl;
+            rsgis::rastergis::RSGISGetGlobalClassStats *ratCalcVal = new rsgis::rastergis::RSGISGetGlobalClassStats(clumpsDataset, classField, &attFields, classFields, ratBand);
+
+            // Setup RATCalc
+            rsgis::rastergis::RSGISRATCalc *ratCalc = new rsgis::rastergis::RSGISRATCalc(ratCalcVal);
+
+            std::vector<unsigned int> inRealColIdx;
+            std::vector<unsigned int> inIntColIdx;
+            std::vector<unsigned int> inStrColIdx;
+
+            std::vector<unsigned int> outRealColIdx;
+            std::vector<unsigned int> outIntColIdx;
+            std::vector<unsigned int> outStrColIdx;
+
+            // In class field
+            inStrColIdx.push_back(ratCalcVal->classColIdx);
+
+            // Out stats fields (mean and standard deviation for each field)
+            for(unsigned int i = 0; i < ratCalcVal->numFields*2; ++i)
+            {
+                outRealColIdx.push_back(ratCalcVal->classStatsIdx[i]);
+            }
+
+            std::cout << "Attributing each row with statistics\n";
+            // Calculate change
+            ratCalc->calcRATValues(ratCalcVal->attTable, inRealColIdx, inIntColIdx, inStrColIdx, outRealColIdx, outIntColIdx, outStrColIdx);
+
+            std::cout << "Writing attributes\n";
+            // Set attribute table
+            clumpsDataset->GetRasterBand(ratBand)->SetDefaultRAT(ratCalcVal->attTable);
+
+            // Close GDAL Dataset
+            GDALClose(clumpsDataset);
+
+            // Tidy up
+            for(std::vector<rastergis::RSGISClassChangeFields*>::iterator classIter = classFields->begin(); classIter != classFields->end(); ++classIter)
+            {
+                delete *classIter;
+            }
+            delete classFields;
+            delete ratCalc;
+            delete ratCalcVal;
+
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+
 
     void executeIdentifyClumpExtremesOnGrid(std::string clumpsImage, std::string inSelectField, std::string outSelectField, std::string eastingsCol, std::string northingsCol, std::string methodStr, unsigned int rows, unsigned int cols, std::string metricField)throw(RSGISCmdException)
     {
@@ -1194,48 +1275,48 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-            
-            
-            
-            
+
+
+
+
     float executeFindGlobalSegmentationScore4Clumps(std::string clumpsImage, std::string inputImage, std::string colPrefix, bool calcNeighbours, float minNormV, float maxNormV, float minNormMI, float maxNormMI, std::vector<cmds::RSGISJXSegQualityScoreBandCmds> *scoreBandComps)throw(RSGISCmdException)
     {
         double returnGSSVal = 0.0;
         GDALAllRegister();
         GDALDataset *clumpsDataset;
         GDALDataset *inputImageDataset;
-        
+
         try
         {
             std::cout.precision(12);
             rsgis::utils::RSGISTextUtils txtUtils;
-            
+
             clumpsDataset = (GDALDataset *) GDALOpen(clumpsImage.c_str(), GA_Update);
             if(clumpsDataset == NULL)
             {
                 std::string message = std::string("Could not open image ") + clumpsImage;
                 throw rsgis::RSGISImageException(message.c_str());
             }
-            
+
             inputImageDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
             if(inputImageDataset == NULL)
             {
                 std::string message = std::string("Could not open image ") + inputImage;
                 throw rsgis::RSGISImageException(message.c_str());
             }
-            
+
             if(calcNeighbours)
             {
                 std::cout << "Populating the clumps with their neighbours\n";
                 rsgis::rastergis::RSGISFindClumpNeighbours findNeighboursObj;
                 findNeighboursObj.findNeighboursKEAImageCalc(clumpsDataset);
             }
-  
+
             unsigned int numImgBands = inputImageDataset->GetRasterCount();
-            
+
             std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats = new std::vector<rsgis::rastergis::RSGISBandAttStats*>();
             bandStats->reserve(numImgBands);
-            
+
             rsgis::rastergis::RSGISBandAttStats *bandStat = NULL;
             for(unsigned int i = 0; i < numImgBands; ++i)
             {
@@ -1256,7 +1337,7 @@ namespace rsgis{ namespace cmds {
                 bandStat->medianField = "";
                 bandStat->calcSum = false;
                 bandStat->sumField = "";
-                
+
                 bandStat->countIdxDef = false;
                 bandStat->minIdxDef = false;
                 bandStat->maxIdxDef = false;
@@ -1264,32 +1345,32 @@ namespace rsgis{ namespace cmds {
                 bandStat->sumIdxDef = false;
                 bandStat->stdDevIdxDef = false;
                 bandStat->medianIdxDef = false;
-                
+
                 bandStats->push_back(bandStat);
             }
-            
+
             std::cout << "Calculating the clump statistics (Mean and Standard Deviation).\n";
             rsgis::rastergis::RSGISCalcClumpStats clumpStats;
             clumpStats.calcImageClumpStatistic(clumpsDataset, inputImageDataset, bandStats);
-            
+
             for(std::vector<rsgis::rastergis::RSGISBandAttStats*>::iterator iterBand = bandStats->begin(); iterBand != bandStats->end(); ++iterBand)
             {
                 delete *iterBand;
             }
             delete bandStats;
-            
+
             std::vector<rsgis::rastergis::JXSegQualityScoreBand*> *scoreComponents = new std::vector<rsgis::rastergis::JXSegQualityScoreBand*>();
             rsgis::rastergis::RSGISCalcSegmentQualityStatistics  calcSegsQuality;
             returnGSSVal = calcSegsQuality.calcJohnsonXie2011Metric(clumpsDataset, numImgBands, colPrefix, minNormV, maxNormV, minNormMI, maxNormMI, scoreComponents);
-            
+
             for(std::vector<rsgis::rastergis::JXSegQualityScoreBand*>::iterator iterScores = scoreComponents->begin(); iterScores != scoreComponents->end(); ++iterScores)
             {
                 scoreBandComps->push_back(cmds::RSGISJXSegQualityScoreBandCmds((*iterScores)->bandVar, (*iterScores)->bandMI, (*iterScores)->bandVarNorm, (*iterScores)->bandMINorm));
-                
+
                 delete *iterScores;
             }
             delete scoreComponents;
-            
+
             GDALClose(clumpsDataset);
             GDALClose(inputImageDataset);
         }
@@ -1301,7 +1382,7 @@ namespace rsgis{ namespace cmds {
         {
             throw RSGISCmdException(e.what());
         }
-        
+
         return returnGSSVal;
     }
 */

@@ -113,7 +113,7 @@ namespace rsgis{ namespace cmds {
             this->bandVarNorm = bandVarNorm;
             this->bandMINorm = bandMINorm;
         };
-        
+
         float bandVar;
         float bandMI;
         float bandVarNorm;
@@ -229,6 +229,9 @@ namespace rsgis{ namespace cmds {
     /** Function to identify segments which have changed by looking for statistical outliers (std dev) from class population */
     void executeFindChangeClumpsFromStdDev(std::string clumpsImage, std::string classField, std::string changeField, std::vector<std::string> attFields, std::vector<cmds::RSGISClassChangeFieldsCmds> classChangeFields, int ratBand=1) throw(RSGISCmdException);
 
+    /** Function to attribute each row with mean and standard deviation for the class population, similar to executeFindChangeClumpsFromStdDev but requires change to be calculated externally */
+    void executeGetGlobalClassStats(std::string clumpsImage, std::string classField, std::vector<std::string> attFields, std::vector<cmds::RSGISClassChangeFieldsCmds> classChangeFields, int ratBand=1) throw(RSGISCmdException);
+
     /** Function to identify an extreme clump/segment with regions of the image, regions defined on a grid */
     void executeIdentifyClumpExtremesOnGrid(std::string clumpsImage, std::string inSelectField, std::string outSelectField, std::string eastingsCol, std::string northingsCol, std::string methodStr, unsigned int rows, unsigned int cols, std::string metricField)throw(RSGISCmdException);
 
@@ -237,7 +240,7 @@ namespace rsgis{ namespace cmds {
 
     /** Function to calculate the 'Global Segmentation Score' for the clumps using a given input image */
     //float executeFindGlobalSegmentationScore4Clumps(std::string clumpsImage, std::string inputImage, std::string colPrefix, bool calcNeighbours, float minNormV, float maxNormV, float minNormMI, float maxNormMI, std::vector<cmds::RSGISJXSegQualityScoreBandCmds> *scoreBandComps)throw(RSGISCmdException);
-    
+
 }}
 
 
