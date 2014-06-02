@@ -191,7 +191,7 @@ namespace rsgis{ namespace cmds {
     //void executeGenerateColourTable(std::string inputImage, std::string clumpsImage, unsigned int redBand, unsigned int greenBand, unsigned int blueBand)throw(RSGISCmdException);
 
     /** Function to find the majority for class (string - field) from a set of small objects to large objects */
-    void executeStrClassMajority(std::string baseSegment, std::string infoSegment, std::string baseClassCol, std::string infoClassCol, bool ignoreZero = true, int baseRatBand=1, int infoRatBand=1)throw(RSGISCmdException);
+    //DAN MISSING FILE?//void executeStrClassMajority(std::string baseSegment, std::string infoSegment, std::string baseClassCol, std::string infoClassCol, bool ignoreZero = true, int baseRatBand=1, int infoRatBand=1)throw(RSGISCmdException);
 
     /** Function to classify segments using a spectral distance majority classification */
     //void executeSpecDistMajorityClassifier(std::string inputImage, std::string inClassNameField, std::string outClassNameField, std::string trainingSelectCol, std::string eastingsField, std::string northingsField, std::string areaField, std::string majWeightField, std::vector<std::string> fields, float distThreshold, float specDistThreshold, SpectralDistanceMethodCmds distMethod, float specThresOriginDist)throw(RSGISCmdException);
@@ -227,10 +227,10 @@ namespace rsgis{ namespace cmds {
     //void executeDefineBorderClumps(std::string clumpsImage, std::string tileImage, std::string outColsName, unsigned int tileOverlap, unsigned int tileBoundary, unsigned int tileBody)throw(RSGISCmdException);
 
     /** Function to identify segments which have changed by looking for statistical outliers (std dev) from class population */
-    void executeFindChangeClumpsFromStdDev(std::string clumpsImage, std::string classField, std::string changeField, std::vector<std::string> attFields, std::vector<cmds::RSGISClassChangeFieldsCmds> classChangeFields, int ratBand=1) throw(RSGISCmdException);
+    //DAN MISSING FILE?//void executeFindChangeClumpsFromStdDev(std::string clumpsImage, std::string classField, std::string changeField, std::vector<std::string> attFields, std::vector<cmds::RSGISClassChangeFieldsCmds> classChangeFields, int ratBand=1) throw(RSGISCmdException);
 
     /** Function to attribute each row with mean and standard deviation for the class population, similar to executeFindChangeClumpsFromStdDev but requires change to be calculated externally */
-    void executeGetGlobalClassStats(std::string clumpsImage, std::string classField, std::vector<std::string> attFields, std::vector<cmds::RSGISClassChangeFieldsCmds> classChangeFields, int ratBand=1) throw(RSGISCmdException);
+    //DAN MISSING FILE?//void executeGetGlobalClassStats(std::string clumpsImage, std::string classField, std::vector<std::string> attFields, std::vector<cmds::RSGISClassChangeFieldsCmds> classChangeFields, int ratBand=1) throw(RSGISCmdException);
 
     /** Function to identify an extreme clump/segment with regions of the image, regions defined on a grid */
     void executeIdentifyClumpExtremesOnGrid(std::string clumpsImage, std::string inSelectField, std::string outSelectField, std::string eastingsCol, std::string northingsCol, std::string methodStr, unsigned int rows, unsigned int cols, std::string metricField)throw(RSGISCmdException);
