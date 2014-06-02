@@ -133,6 +133,8 @@ namespace rsgis{ namespace classifier{
     
     std::map<std::string, RSGISClassInfo*>* RSGISCollapseSegmentsClassification::findAllClassNames(const GDALRasterAttributeTable *inRAT, unsigned int classNameIdx, unsigned int redIdx, unsigned int greenIdx, unsigned int blueIdx, unsigned int alphaIdx)throw(RSGISClassificationException)
     {
+        // Change to use RATCalc interface
+        
         std::map<std::string, RSGISClassInfo*> *classes = new std::map<std::string, RSGISClassInfo*>();
         try
         {
@@ -191,6 +193,8 @@ namespace rsgis{ namespace classifier{
         this->rat = rat;
         this->classNameIdx = classNameIdx;
         this->classes = classes;
+        
+        // Load string column to memory
     }
     
     void RSGISRecodeRasterFromClasses::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
@@ -199,6 +203,7 @@ namespace rsgis{ namespace classifier{
         {
             int val = boost::lexical_cast<int>(bandValues[0]);
             
+            // Read class name from array in memory
             std::string className = rat->GetValueAsString(val, classNameIdx);
             
             std::map<std::string, RSGISClassInfo*>::iterator iterClass = classes->find(className);
