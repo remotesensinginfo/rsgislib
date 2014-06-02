@@ -42,7 +42,7 @@
 #include "rastergis/RSGISSelectClumps.h"
 #include "rastergis/RSGISFindChangeClumps.h"
 #include "rastergis/RSGISRATCalc.h"
-//#include "rastergis/RSGISFindInfoBetweenLayers.h"
+#include "rastergis/RSGISFindInfoBetweenLayers.h"
 
 /*
 #include "rastergis/RSGISRasterAttUtils.h"
