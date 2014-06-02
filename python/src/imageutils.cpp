@@ -323,13 +323,16 @@ static PyObject *ImageUtils_IncludeImages(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-static PyObject *ImageUtils_PopImageStats(PyObject *self, PyObject *args)
+static PyObject *ImageUtils_PopImageStats(PyObject *self, PyObject *args, PyObject *keywds)
 {
     const char *pszInputImage;
-    int useNoDataValue, buildPyramids;
-    float noDataValue;
-    if( !PyArg_ParseTuple(args, "sifi:popImageStats", &pszInputImage, &useNoDataValue, &noDataValue,
-                          &buildPyramids))
+    int useNoDataValue = true;
+    int buildPyramids = true;
+    float noDataValue = 0;
+    static char *kwlist[] = {"image", "usenodataval","nodataval", "calcpyramids", NULL};
+
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "s|ifi:popImageStats", kwlist, &pszInputImage, 
+                    &useNoDataValue, &noDataValue, &buildPyramids))
         return NULL;
     
     try
@@ -1053,14 +1056,14 @@ static PyMethodDef ImageUtilsMethods[] = {
 "\n"},
  
   
-    {"popImageStats", ImageUtils_PopImageStats, METH_VARARGS,
-"rsgislib.imageutils.popImageStats(inputImage, useNoDataValue, noDataValue, buildPyramids)\n"
+    {"popImageStats", (PyCFunction)ImageUtils_PopImageStats, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.popImageStats(image, usenodataval=True,nodataval=0, calcpyramids=True)\n"
 "Calculate the image statistics and build image pyramids populating the image file.\n"
 "\n"
-"* inputImage is a string containing the name of the input file\n"
-"* useNoDataValue is a boolean stating whether the no data value is to be used.\n"
-"* noDataValue is a floating point value to be used as the no data value.\n"
-"* buildPyramids is a boolean stating whether image pyramids should be calculated.\n"
+"* image is a string containing the name of the input file\n"
+"* usenodataval is a boolean stating whether the no data value is to be used (default=True).\n"
+"* nodataval is a floating point value to be used as the no data value (default=0.0).\n"
+"* calcpyramids is a boolean stating whether image pyramids should be calculated (default=True).\n"
 "\nExample::\n"
 "\n"
 "   from rsgislib import imageutils\n"
