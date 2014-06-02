@@ -347,7 +347,7 @@ class RSGISTests:
         print("PYTHON TEST: copyGDALATTColumns")
         table = "./RATS/injune_p142_casi_sub_utm_segs.kea"
         image = "./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_cpcols.kea"
-        fields = ["b1Mean", "b2Mean", "b2Mean"]
+        fields = ["b1Mean", "outClass", "outClassStr"]
         rastergis.copyGDALATTColumns(table, image, fields, copycolours=True, copyhist=False)
     """
     def testSpatialLocation(self):
