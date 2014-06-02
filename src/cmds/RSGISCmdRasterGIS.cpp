@@ -42,7 +42,7 @@
 #include "rastergis/RSGISSelectClumps.h"
 #include "rastergis/RSGISFindChangeClumps.h"
 #include "rastergis/RSGISRATCalc.h"
-#include "rastergis/RSGISFindInfoBetweenLayers.h"
+//#include "rastergis/RSGISFindInfoBetweenLayers.h"
 
 /*
 #include "rastergis/RSGISRasterAttUtils.h"
@@ -678,6 +678,8 @@ namespace rsgis{ namespace cmds {
 
     }
 */
+            
+            /*
     void executeStrClassMajority(std::string baseSegment, std::string infoSegment, std::string baseClassCol, std::string infoClassCol, bool ignoreZero, int baseRatBand, int infoRatBand)throw(RSGISCmdException) {
         GDALAllRegister();
         GDALDataset *baseSegDataset, *infoSegDataset;
@@ -703,6 +705,7 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
+             */
 /*
     void executeSpecDistMajorityClassifier(std::string inputImage, std::string inClassNameField, std::string outClassNameField, std::string trainingSelectCol, std::string eastingsField, std::string northingsField, std::string areaField, std::string majWeightField, std::vector<std::string> fields, float distThreshold, float specDistThreshold, SpectralDistanceMethodCmds distMethod, float specThresOriginDist)throw(RSGISCmdException) {
         GDALAllRegister();
@@ -1007,6 +1010,7 @@ namespace rsgis{ namespace cmds {
         }
     }
  */
+            /*
     void executeFindChangeClumpsFromStdDev(std::string clumpsImage, std::string classField, std::string changeField, std::vector<std::string> attFields, std::vector<cmds::RSGISClassChangeFieldsCmds> classChangeFields, int ratBand)throw(RSGISCmdException)
     {
         try
@@ -1167,7 +1171,7 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-
+        */
 
     void executeIdentifyClumpExtremesOnGrid(std::string clumpsImage, std::string inSelectField, std::string outSelectField, std::string eastingsCol, std::string northingsCol, std::string methodStr, unsigned int rows, unsigned int cols, std::string metricField)throw(RSGISCmdException)
     {

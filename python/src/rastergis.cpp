@@ -740,8 +740,7 @@ static PyObject *RasterGIS_StrClassMajority(PyObject *self, PyObject *args, PyOb
 
     try
     {
-        rsgis::cmds::executeStrClassMajority(std::string(baseSegment), std::string(infoSegment), std::string(baseClassCol), std::string(infoClassCol),
-                                                infoRatBand, baseRatBand, infoRatBand);
+        //rsgis::cmds::executeStrClassMajority(std::string(baseSegment), std::string(infoSegment), std::string(baseClassCol), std::string(infoClassCol), infoRatBand, baseRatBand, infoRatBand);
     }
     catch (rsgis::cmds::RSGISCmdException &e)
     {
@@ -1139,7 +1138,7 @@ static PyObject *RasterGIS_FindChangeClumpsFromStdDev(PyObject *self, PyObject *
 
     try
     {
-        rsgis::cmds::executeFindChangeClumpsFromStdDev(std::string(clumpsImage), std::string(classField), std::string(changeField), attFields, classFields, ratBand);
+        //rsgis::cmds::executeFindChangeClumpsFromStdDev(std::string(clumpsImage), std::string(classField), std::string(changeField), attFields, classFields, ratBand);
     }
     catch (rsgis::cmds::RSGISCmdException &e)
     {
@@ -1206,7 +1205,7 @@ static PyObject *RasterGIS_GetGlobalClassStats(PyObject *self, PyObject *args, P
 
     try
     {
-        rsgis::cmds::executeGetGlobalClassStats(std::string(clumpsImage), std::string(classField), attFields, classFields, ratBand);
+        //rsgis::cmds::executeGetGlobalClassStats(std::string(clumpsImage), std::string(classField), attFields, classFields, ratBand);
     }
     catch (rsgis::cmds::RSGISCmdException &e)
     {

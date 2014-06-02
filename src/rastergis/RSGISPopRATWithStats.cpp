@@ -124,7 +124,7 @@ namespace rsgis{namespace rastergis{
             calcImageStats.calcImage(datasets, 1, 1);
             delete calcImgValStats;
             
-            std::cout << "Writting Stats (Min, Max, Mean, Sum) to Output RAT\n";
+            std::cout << "Writing Stats (Min, Max, Mean, Sum) to Output RAT\n";
             size_t numBlocks = floor((double)numRows/(double)RAT_BLOCK_LENGTH);
             size_t rowsRemain = numRows - (numBlocks * RAT_BLOCK_LENGTH);
             
@@ -144,12 +144,13 @@ namespace rsgis{namespace rastergis{
                         {
                             if(histDataBlock[j] > 0)
                             {
-                                dataBlock[j] = statsData[rowID++][(*iterBands)->minLocalIdx];
+                                dataBlock[j] = statsData[rowID][(*iterBands)->minLocalIdx];
                             }
                             else
                             {
                                 dataBlock[j] = 0.0;
                             }
+                            ++rowID;
                         }
                         rat->ValuesIO(GF_Write, (*iterBands)->minFieldIdx, startRow, RAT_BLOCK_LENGTH, dataBlock);
                     }
@@ -161,12 +162,13 @@ namespace rsgis{namespace rastergis{
                         {
                             if(histDataBlock[j] > 0)
                             {
-                                dataBlock[j] = statsData[rowID++][(*iterBands)->maxLocalIdx];
+                                dataBlock[j] = statsData[rowID][(*iterBands)->maxLocalIdx];
                             }
                             else
                             {
                                 dataBlock[j] = 0.0;
                             }
+                            ++rowID;
                         }
                         rat->ValuesIO(GF_Write, (*iterBands)->maxFieldIdx, startRow, RAT_BLOCK_LENGTH, dataBlock);
                     }
@@ -179,12 +181,13 @@ namespace rsgis{namespace rastergis{
                             if(histDataBlock[j] > 0)
                             {
                                 statsData[rowID][(*iterBands)->meanLocalIdx] = statsData[rowID][(*iterBands)->meanLocalIdx] / histDataBlock[j];
-                                dataBlock[j] = statsData[rowID++][(*iterBands)->meanLocalIdx];
+                                dataBlock[j] = statsData[rowID][(*iterBands)->meanLocalIdx];
                             }
                             else
                             {
                                 dataBlock[j] = 0.0;
                             }
+                            ++rowID;
                         }
                         rat->ValuesIO(GF_Write, (*iterBands)->meanFieldIdx, startRow, RAT_BLOCK_LENGTH, dataBlock);
                     }
@@ -196,12 +199,13 @@ namespace rsgis{namespace rastergis{
                         {
                             if(histDataBlock[j] > 0)
                             {
-                                dataBlock[j] = statsData[rowID++][(*iterBands)->sumLocalIdx];
+                                dataBlock[j] = statsData[rowID][(*iterBands)->sumLocalIdx];
                             }
                             else
                             {
                                 dataBlock[j] = 0.0;
                             }
+                            ++rowID;
                         }
                         rat->ValuesIO(GF_Write, (*iterBands)->sumFieldIdx, startRow, RAT_BLOCK_LENGTH, dataBlock);
                     }
@@ -220,12 +224,13 @@ namespace rsgis{namespace rastergis{
                         {
                             if(histDataBlock[j] > 0)
                             {
-                                dataBlock[j] = statsData[rowID++][(*iterBands)->minLocalIdx];
+                                dataBlock[j] = statsData[rowID][(*iterBands)->minLocalIdx];
                             }
                             else
                             {
                                 dataBlock[j] = 0.0;
                             }
+                            ++rowID;
                         }
                         rat->ValuesIO(GF_Write, (*iterBands)->minFieldIdx, startRow, rowsRemain, dataBlock);
                     }
@@ -237,12 +242,13 @@ namespace rsgis{namespace rastergis{
                         {
                             if(histDataBlock[j] > 0)
                             {
-                                dataBlock[j] = statsData[rowID++][(*iterBands)->maxLocalIdx];
+                                dataBlock[j] = statsData[rowID][(*iterBands)->maxLocalIdx];
                             }
                             else
                             {
                                 dataBlock[j] = 0.0;
                             }
+                            ++rowID;
                         }
                         rat->ValuesIO(GF_Write, (*iterBands)->maxFieldIdx, startRow, rowsRemain, dataBlock);
                     }
@@ -255,12 +261,13 @@ namespace rsgis{namespace rastergis{
                             if(histDataBlock[j] > 0)
                             {
                                 statsData[rowID][(*iterBands)->meanLocalIdx] = statsData[rowID][(*iterBands)->meanLocalIdx] / histDataBlock[j];
-                                dataBlock[j] = statsData[rowID++][(*iterBands)->meanLocalIdx];
+                                dataBlock[j] = statsData[rowID][(*iterBands)->meanLocalIdx];
                             }
                             else
                             {
                                 dataBlock[j] = 0.0;
                             }
+                            ++rowID;
                         }
                         rat->ValuesIO(GF_Write, (*iterBands)->meanFieldIdx, startRow, rowsRemain, dataBlock);
                     }
@@ -272,12 +279,13 @@ namespace rsgis{namespace rastergis{
                         {
                             if(histDataBlock[j] > 0)
                             {
-                                dataBlock[j] = statsData[rowID++][(*iterBands)->sumLocalIdx];
+                                dataBlock[j] = statsData[rowID][(*iterBands)->sumLocalIdx];
                             }
                             else
                             {
                                 dataBlock[j] = 0.0;
                             }
+                            ++rowID;
                         }
                         rat->ValuesIO(GF_Write, (*iterBands)->sumFieldIdx, startRow, rowsRemain, dataBlock);
                     }
@@ -327,6 +335,7 @@ namespace rsgis{namespace rastergis{
                                 {
                                     dataBlock[j] = 0.0;
                                 }
+                                ++rowID;
                             }
                             rat->ValuesIO(GF_Write, (*iterBands)->stdDevFieldIdx, startRow, RAT_BLOCK_LENGTH, dataBlock);
                         }
@@ -347,12 +356,13 @@ namespace rsgis{namespace rastergis{
                                 if(histDataBlock[j] > 0)
                                 {
                                     stdDevData[rowID][(*iterBands)->stdDevLocalIdx] = sqrt(stdDevData[rowID][(*iterBands)->stdDevLocalIdx] / histDataBlock[j]);
-                                    dataBlock[j] = stdDevData[rowID++][(*iterBands)->stdDevLocalIdx];
+                                    dataBlock[j] = stdDevData[rowID][(*iterBands)->stdDevLocalIdx];
                                 }
                                 else
                                 {
                                     dataBlock[j] = 0.0;
                                 }
+                                ++rowID;
                             }
                             rat->ValuesIO(GF_Write, (*iterBands)->stdDevFieldIdx, startRow, rowsRemain, dataBlock);
                         }
@@ -488,12 +498,13 @@ namespace rsgis{namespace rastergis{
                     {
                         if(histDataBlock[j] > 0)
                         {
-                            dataBlock[j] = mathUtils.calcPercentile((*iterFeat)->percentile, binBounds, binWidth, numHistBins, clumpHistData[rowID++]); // calc percentile from the histogram...
+                            dataBlock[j] = mathUtils.calcPercentile((*iterFeat)->percentile, binBounds, binWidth, numHistBins, clumpHistData[rowID]); // calc percentile from the histogram...
                         }
                         else
                         {
                             dataBlock[j] = 0.0;
                         }
+                        ++rowID;
                     }
                     rat->ValuesIO(GF_Write, (*iterFeat)->fieldIdx, startRow, RAT_BLOCK_LENGTH, dataBlock);
                 }
@@ -509,12 +520,13 @@ namespace rsgis{namespace rastergis{
                     {
                         if(histDataBlock[j] > 0)
                         {
-                            dataBlock[j] = mathUtils.calcPercentile((*iterFeat)->percentile, binBounds, binWidth, numHistBins, clumpHistData[rowID++]); // calc percentile from the histogram...
+                            dataBlock[j] = mathUtils.calcPercentile((*iterFeat)->percentile, binBounds, binWidth, numHistBins, clumpHistData[rowID]); // calc percentile from the histogram...
                         }
                         else
                         {
                             dataBlock[j] = 0.0;
                         }
+                        ++rowID;
                     }
                     rat->ValuesIO(GF_Write, (*iterFeat)->fieldIdx, startRow, rowsRemain, dataBlock);
                 }
