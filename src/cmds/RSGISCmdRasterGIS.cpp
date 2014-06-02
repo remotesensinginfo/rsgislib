@@ -1204,7 +1204,6 @@ namespace rsgis{ namespace cmds {
             rsgis::rastergis::RSGISSelectClumpsOnGrid selectClumps;
             selectClumps.selectClumpsOnGrid(clumpsDataset, inSelectField, outSelectField, eastingsCol, northingsCol, metricField, rows, cols, method);
 
-
             GDALClose(clumpsDataset);
         }
         catch(rsgis::RSGISAttributeTableException &e)
