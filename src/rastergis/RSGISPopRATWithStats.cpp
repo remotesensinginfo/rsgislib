@@ -56,8 +56,12 @@ namespace rsgis{namespace rastergis{
             }
             
             // Check whether a standard deviation is to be created (requires second iteration of image).
-            bool calcStdDevs = false;
+            bool calcMins = false;
+            bool calcMaxs = false;
             bool calcMeans = false;
+            bool calcStdDevs = false;
+            bool calcSums = false;
+            
             size_t numFeats2Calc = 0;
             size_t numStdDevs2Calc = 0;
             for(std::vector<rsgis::rastergis::RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
@@ -71,11 +75,13 @@ namespace rsgis{namespace rastergis{
                 if((*iterBands)->calcMin)
                 {
                     (*iterBands)->minFieldIdx = attUtils.findColumnIndexOrCreate(rat, (*iterBands)->minField, GFT_Real);
+                    calcMins = true;
                     (*iterBands)->minLocalIdx = numFeats2Calc++;
                 }
                 if((*iterBands)->calcMax)
                 {
                     (*iterBands)->maxFieldIdx = attUtils.findColumnIndexOrCreate(rat, (*iterBands)->maxField, GFT_Real);
+                    calcMaxs = true;
                     (*iterBands)->maxLocalIdx = numFeats2Calc++;
                 }
                 if((*iterBands)->calcMean)
@@ -93,6 +99,7 @@ namespace rsgis{namespace rastergis{
                 if((*iterBands)->calcSum)
                 {
                     (*iterBands)->sumFieldIdx = attUtils.findColumnIndexOrCreate(rat, (*iterBands)->sumField, GFT_Real);
+                    calcSums = true;
                     (*iterBands)->sumLocalIdx = numFeats2Calc++;
                 }
             }
@@ -124,7 +131,13 @@ namespace rsgis{namespace rastergis{
             calcImageStats.calcImage(datasets, 1, 1);
             delete calcImgValStats;
             
-            std::cout << "Writing Stats (Min, Max, Mean, Sum) to Output RAT\n";
+            std::cout << "Writing Stats (";
+            if(calcMins){std::cout << "Min, ";}
+            if(calcMaxs){std::cout << "Max, ";}
+            if(calcMeans){std::cout << "Mean, ";}
+            if(calcSums){std::cout << "Sum";}
+            std::cout << ") to Output RAT\n";
+            
             size_t numBlocks = floor((double)numRows/(double)RAT_BLOCK_LENGTH);
             size_t rowsRemain = numRows - (numBlocks * RAT_BLOCK_LENGTH);
             

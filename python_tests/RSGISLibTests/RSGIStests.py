@@ -349,6 +349,7 @@ class RSGISTests:
         image = "./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_cpcols.kea"
         fields = ["b1Mean", "outClass", "outClassStr"]
         rastergis.copyGDALATTColumns(table, image, fields, copycolours=True, copyhist=False)
+
     """
     def testSpatialLocation(self):
         print("PYTHON TEST: spatialLocation")
@@ -385,7 +386,7 @@ class RSGISTests:
         spatdistthreshold=100
         outfield="Closest2Feat10"
         rastergis.findSpecClose(image, spatialdist, metricdist, outfield, specdistthreshold, spatdistthreshold)
-    """
+   """ 
     def testPopulateRATWithStats(self):
         print("PYTHON TEST: populateRATWithStats")
         clumps="./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_popstats.kea"
