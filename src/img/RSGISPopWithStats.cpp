@@ -331,7 +331,7 @@ namespace rsgis { namespace img {
         }
     }
 
-    void RSGISPopWithStats::calcPopStats( GDALDataset *hHandle, bool bIgnore, float fIgnoreVal, bool bPyramid )
+    void RSGISPopWithStats::calcPopStats( GDALDataset *hHandle, bool bIgnore, float fIgnoreVal, bool bPyramid ) throw(rsgis::RSGISImageException)
     {
         int band;//, xsize, ysize, osize,nlevel;
         GDALRasterBand *hBand;
@@ -348,6 +348,11 @@ namespace rsgis { namespace img {
             std::cout << "Processing band " << band+1 << " of " << nBands << std::endl;
             
             hBand = hHandle->GetRasterBand( band + 1 );
+            
+            if(strcmp( hBand->GetMetadataItem( "LAYER_TYPE", "" ), "thematic" ) == 0)
+            {
+                throw rsgis::RSGISImageException("Use the rastergis function populateImageWithRasterGISStats (In python rsgislib.rastergis.populateStats) function for thermatic layers.");
+            }
             
             if( bIgnore )
             {
@@ -434,9 +439,9 @@ namespace rsgis { namespace img {
                 hBand->GetHistogram(histminTmp, histmaxTmp, nHistBuckets, pHisto, true, false, StatsTextProgress, &nLastProgress);
             }
             
-            int histoStrLen = nHistBuckets * 8;
-            char *szHistoString = new char[histoStrLen];
-            szHistoString[0] = '\0';
+            //int histoStrLen = nHistBuckets * 8;
+            //char *szHistoString = new char[histoStrLen];
+            //szHistoString[0] = '\0';
 
             /* Mode is the bin with the highest count */
             int maxcount = 0;
@@ -477,8 +482,8 @@ namespace rsgis { namespace img {
                         nWhichMedian = count;
                     }
                 }
-                sprintf( szTemp, "%d|", pHisto[count] );
-                strcat( szHistoString, szTemp );
+                //sprintf( szTemp, "%d|", pHisto[count] );
+                //strcat( szHistoString, szTemp );
             }
 
             float fMedian = nWhichMedian * ((histmax-histmin) / nHistBuckets);
@@ -521,8 +526,8 @@ namespace rsgis { namespace img {
             sprintf( szTemp, "%d", nHistBuckets );
             GDALSetMetadataItem( hBand, "STATISTICS_HISTONUMBINS", szTemp, NULL );
 
-            GDALSetMetadataItem( hBand, "STATISTICS_HISTOBINVALUES", szHistoString, NULL );
-            delete[] szHistoString;
+            //GDALSetMetadataItem( hBand, "STATISTICS_HISTOBINVALUES", szHistoString, NULL );
+            //delete[] szHistoString;
 
             /* set histogram bin function the same as Imagine does
             ie Linear for floats, and direct for integer types
@@ -530,27 +535,31 @@ namespace rsgis { namespace img {
             correctly in Imagine */
             GDALSetMetadataItem( hBand, "STATISTICS_HISTOBINFUNCTION", histoType.c_str(), NULL );
             
-            if(strcmp( hBand->GetMetadataItem( "LAYER_TYPE", "" ), "thematic" ) == 0)
+            
+            // Write the histogram to the RAT
+            GDALRasterAttributeTable *attTable = hBand->GetDefaultRAT();
+            attTable->SetRowCount(nHistBuckets);
+            
+            int numColumns = attTable->GetColumnCount();
+            bool foundCol = false;
+            unsigned int histoColIdx = 0;
+            for(int i = 0; i < numColumns; ++i)
             {
-                GDALColorTable *clrTab = hBand->GetColorTable();
-                if(clrTab == NULL)
+                if(std::string(attTable->GetNameOfCol(i)) == "Histogram")
                 {
-                    std::cout << "Adding a Colour table\n";
-                    clrTab = new GDALColorTable();
-                    GDALColorEntry *clr = NULL;
-                    srand(time(NULL));
-                    for(size_t i = 0; i < nHistBuckets; ++i)
-                    {
-                        clr = new GDALColorEntry();
-                        clr->c1 = rand() % 255 + 1;
-                        clr->c2 = rand() % 255 + 1;
-                        clr->c3 = rand() % 255 + 1;
-                        clr->c4 = 255;
-                        clrTab->SetColorEntry(i, clr);
-                    }
-                    hBand->SetColorTable(clrTab);
+                    foundCol = true;
+                    histoColIdx = i;
+                    break;
                 }
             }
+            
+            if(!foundCol)
+            {
+                attTable->CreateColumn("Histogram", GFT_Real, GFU_PixelCount);
+                histoColIdx = numColumns;
+            }
+            
+            attTable->ValuesIO(GF_Write, histoColIdx, 0, nHistBuckets, pHisto);
             
             free( pHisto );
         }

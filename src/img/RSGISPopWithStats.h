@@ -33,9 +33,11 @@
 #include <stdlib.h>
 #include <ctime>
 
-#include "gdal.h"
-#include "cpl_string.h"
 #include "gdal_priv.h"
+#include "gdal_rat.h"
+#include "cpl_string.h"
+
+#include "common/RSGISImageException.h"
 
 namespace rsgis { namespace img {
     
@@ -119,7 +121,7 @@ namespace rsgis { namespace img {
         float getStdDev(float *pData, int size, float fmean, bool ignore, float ignoreVal);
         float* getSubSampledImage( GDALRasterBand *hBand, int nLevel, int *pnSize );
         void getHistogramIgnore( GDALRasterBand *pBand, double dfMin, double dfMax, int nBuckets, int *panHistogram, int bIncludeOutOfRange, bool bIgnore, float fIgnore );
-        void calcPopStats( GDALDataset *hHandle, bool bIgnore, float fIgnoreVal, bool bPyramid );
+        void calcPopStats( GDALDataset *hHandle, bool bIgnore, float fIgnoreVal, bool bPyramid ) throw(rsgis::RSGISImageException);
     private:
         static const int HISTO_NBINS = 256;
         static const int MINOVERVIEWDIM = 33;
