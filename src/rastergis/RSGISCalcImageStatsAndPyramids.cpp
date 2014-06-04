@@ -96,7 +96,7 @@ namespace rsgis{namespace rastergis{
             band->SetMetadataItem("STATISTICS_HISTOMAX", txtUtils.int64bittostring(maxHistVal).c_str());
             band->SetMetadataItem("STATISTICS_HISTONUMBINS", txtUtils.int64bittostring(maxHistVal).c_str());
             
-            unsigned int histoColIdx = attUtils.findColumnIndexOrCreate(attTable, "Histogram", GFT_Integer, GFU_PixelCount);
+            unsigned int histoColIdx = attUtils.findColumnIndexOrCreate(attTable, "Histogram", GFT_Real, GFU_PixelCount);
             
             unsigned int redColIdx = 0;
             unsigned int greenColIdx = 0;
@@ -110,7 +110,7 @@ namespace rsgis{namespace rastergis{
                 alphaColIdx = attUtils.findColumnIndexOrCreate(attTable, "Alpha", GFT_Integer, GFU_Alpha);
             }
             
-            std::string histoVals = "";
+            //std::string histoVals = "";
             double *dataBlock = new double[RAT_BLOCK_LENGTH];
             int *redBlock = NULL;
             int *greenBlock = NULL;
@@ -132,6 +132,7 @@ namespace rsgis{namespace rastergis{
             {
                 for(size_t j = 0; j < RAT_BLOCK_LENGTH; ++j)
                 {
+                    /*
                     if(rowID == 0)
                     {
                         histoVals = txtUtils.int64bittostring(histo[rowID]);
@@ -140,7 +141,7 @@ namespace rsgis{namespace rastergis{
                     {
                         histoVals += std::string("|") + txtUtils.int64bittostring(histo[rowID]);
                     }
-                    
+                    */
                     if(addColourTable)
                     {
                         if((rowID == 0) & ignoreZero)
@@ -176,6 +177,7 @@ namespace rsgis{namespace rastergis{
             {
                 for(size_t j = 0; j < rowsRemain; ++j)
                 {
+                    /*
                     if(rowID == 0)
                     {
                         histoVals = txtUtils.int64bittostring(histo[rowID]);
@@ -184,6 +186,7 @@ namespace rsgis{namespace rastergis{
                     {
                         histoVals += std::string("|") + txtUtils.int64bittostring(histo[rowID]);
                     }
+                     */
                     if(addColourTable)
                     {
                         if((rowID == 0) & ignoreZero)
@@ -214,7 +217,7 @@ namespace rsgis{namespace rastergis{
                 }
             }
             
-            band->SetMetadataItem("STATISTICS_HISTOBINVALUES", histoVals.c_str());
+            //band->SetMetadataItem("STATISTICS_HISTOBINVALUES", histoVals.c_str());
             
             if(calcImagePyramids)
             {
