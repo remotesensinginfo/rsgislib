@@ -30,7 +30,7 @@ namespace rsgis{namespace img{
 		this->bandValuesWidths = bandValuesWidths;
 	}
 	
-	void RSGISConvertSpectralToUnitArea::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+	void RSGISConvertSpectralToUnitArea::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
 	{
 		if(numBands != numOutBands)
 		{
@@ -86,17 +86,17 @@ namespace rsgis{namespace img{
 		throw RSGISImageCalcException("Not implemented");
 	}
 	
-	void RSGISConvertSpectralToUnitArea::calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException)
+	void RSGISConvertSpectralToUnitArea::calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("Not implemented");
 	}
 	
-	void RSGISConvertSpectralToUnitArea::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException)
+	void RSGISConvertSpectralToUnitArea::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("Not implemented");
 	}
 	
-	bool RSGISConvertSpectralToUnitArea::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException)
+	bool RSGISConvertSpectralToUnitArea::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("Not implemented");
 	}

@@ -37,7 +37,7 @@ namespace rsgis {namespace radar
 			this->ittmax = ittmax;
 			this->parameters = parameters;
 		}
-		void RSGISEstimationAlgorithmFullPolSingleSpeciesPoly::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+		void RSGISEstimationAlgorithmFullPolSingleSpeciesPoly::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
 		{
 			RSGISEstimationConjugateGradient conjGrad;
 			rsgis::math::RSGISVectors vectorUtils;
@@ -581,7 +581,7 @@ namespace rsgis {namespace radar
 			this->ittmax = ittmax;
 			this->parameters = parameters;
 		}
-		void RSGISEstimationAlgorithmDualPolSingleSpeciesPoly::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+		void RSGISEstimationAlgorithmDualPolSingleSpeciesPoly::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
 		{
 			RSGISEstimationConjugateGradient conjGrad;
 			rsgis::math::RSGISVectors vectorUtils;
@@ -868,7 +868,7 @@ namespace rsgis {namespace radar
 
 			this->species = species;
 		}
-		void RSGISEstimationAlgorithmDualPolFPCSingleSpecies::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+		void RSGISEstimationAlgorithmDualPolFPCSingleSpecies::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
 		{
 			RSGISEstimationConjugateGradient conjGrad;
 			rsgis::math::RSGISVectors vectorUtils;
@@ -1101,7 +1101,7 @@ namespace rsgis {namespace radar
 			this->ittmax = ittmax;
 			this->parameters = parameters;
 		}
-		void RSGISEstimationAlgorithmFullPolSingleSpeciesPolyMask::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+		void RSGISEstimationAlgorithmFullPolSingleSpeciesPolyMask::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
 		{
 			RSGISEstimationConjugateGradient conjGrad;
 			rsgis::math::RSGISVectors vectorUtils;
@@ -1442,7 +1442,7 @@ namespace rsgis {namespace radar
 			this->nonForestThreshold = nonForestThreshold;
 			std::cout << "numOutputBands " << numOutputBands << std::endl;
 		}
-		void RSGISEstimationAlgorithmDualPolSingleSpeciesPolyMask::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+		void RSGISEstimationAlgorithmDualPolSingleSpeciesPolyMask::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
 		{
 			RSGISEstimationConjugateGradient conjGrad;
 			rsgis::math::RSGISVectors vectorUtils;
@@ -1706,7 +1706,7 @@ namespace rsgis {namespace radar
 			this->fpcOrder = coeffFPCHV->size - 1;
 			this->species = species;
 		}
-		void RSGISEstimationAlgorithmDualPolFPCMoistureSingleSpecies::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+		void RSGISEstimationAlgorithmDualPolFPCMoistureSingleSpecies::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
 		{
 			RSGISEstimationConjugateGradient conjGrad;
 			rsgis::math::RSGISVectors vectorUtils;
@@ -2009,7 +2009,7 @@ namespace rsgis {namespace radar
 			}
 
 		}
-		void RSGISEstimationAlgorithmSingleSpecies::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+		void RSGISEstimationAlgorithmSingleSpecies::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
 		{
 			rsgis::math::RSGISVectors vectorUtils;
 			rsgis::utils::RSGISAllometricEquations allometric = rsgis::utils::RSGISAllometricEquations();
@@ -2200,7 +2200,7 @@ namespace rsgis {namespace radar
 				}
 			}
 		}
-		void RSGISEstimationAlgorithmSingleSpeciesMask::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+		void RSGISEstimationAlgorithmSingleSpeciesMask::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
 		{
 			rsgis::math::RSGISVectors vectorUtils;
 			rsgis::utils::RSGISAllometricEquations allometric = rsgis::utils::RSGISAllometricEquations();
@@ -2431,7 +2431,7 @@ namespace rsgis {namespace radar
 			}
 
 		}
-		void RSGISEstimationAlgorithmSingleSpeciesPixAP::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+		void RSGISEstimationAlgorithmSingleSpeciesPixAP::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
 		{
 			rsgis::math::RSGISVectors vectorUtils;
 			rsgis::utils::RSGISAllometricEquations allometric = rsgis::utils::RSGISAllometricEquations();
@@ -2661,7 +2661,7 @@ namespace rsgis {namespace radar
 			this->parameters = parameters;
 			this->aPrioriPar = gsl_vector_alloc(2);
 		}
-		void RSGISEstimationAlgorithmDualPolSingleSpeciesMaskPixAP::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+		void RSGISEstimationAlgorithmDualPolSingleSpeciesMaskPixAP::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
 		{
 			rsgis::math::RSGISVectors vectorUtils;
 			rsgis::utils::RSGISAllometricEquations allometric = rsgis::utils::RSGISAllometricEquations();
@@ -2859,7 +2859,7 @@ namespace rsgis {namespace radar
 				throw RSGISException("Number of species is not equal to number of parameters");
 			}
 		}
-		void RSGISEstimationAlgorithmDualPolMultiSpeciesClassification::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+		void RSGISEstimationAlgorithmDualPolMultiSpeciesClassification::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
 		{
 
 			/**
@@ -2984,7 +2984,7 @@ namespace rsgis {namespace radar
 			this->hhFunction = hhFunction;
 			this->hvFunction = hvFunction;
 		}
-		void RSGISEstimationAlgorithmGenerateSimulatedData2Var2Data::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+		void RSGISEstimationAlgorithmGenerateSimulatedData2Var2Data::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
 		{
 			if (bandValues[0] > 0)
 			{

@@ -83,7 +83,7 @@ namespace rsgis{namespace filter{
         this->matrixOperator = matrixOperator;
 	}
 
-	void RSGISMorphologyErode::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISMorphologyErode::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		bool first = true;
 		double *smallest = new double[numBands];
@@ -138,7 +138,7 @@ namespace rsgis{namespace filter{
         this->matrixOperator = matrixOperator;
 	}
     
-	void RSGISMorphologyErodeAll::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISMorphologyErodeAll::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		bool first = true;
 		double smallest = 0;

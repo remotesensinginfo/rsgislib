@@ -1084,7 +1084,7 @@ namespace rsgis { namespace img {
 		this->outMin = outMinIn;
 	}
 	
-	void RSGISLinearStretchImage::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+	void RSGISLinearStretchImage::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
 	{
 		double inDiff = 0;
 		double norm2min = 0;
@@ -1129,7 +1129,7 @@ namespace rsgis { namespace img {
 		this->func = func;
 	}
 	
-	void RSGISFuncLinearStretchImage::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+	void RSGISFuncLinearStretchImage::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
 	{
 		for(int i = 0; i < numBands; i++)
 		{

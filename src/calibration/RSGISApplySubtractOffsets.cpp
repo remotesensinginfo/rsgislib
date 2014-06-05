@@ -34,7 +34,7 @@ namespace rsgis{namespace calib{
         this->useNoDataVal = useNoDataVal;
     }
     
-    void RSGISApplyDarkObjSubtractOffsets::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISApplyDarkObjSubtractOffsets::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
     {
         if( (numBands/2) != this->numImageBands)
         {

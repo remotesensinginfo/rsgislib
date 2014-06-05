@@ -36,7 +36,7 @@ namespace rsgis{namespace radar{
 		this->c2 = c2Coef;
 	}
 	
-	void RSGISCalcSaatchiBiomassCrown::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISCalcSaatchiBiomassCrown::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		// Input Bands Order:
 		// HH
@@ -96,7 +96,7 @@ namespace rsgis{namespace radar{
 		this->c2 = c2Coef;
 	}
 	
-	void RSGISCalcSaatchiBiomassStem::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISCalcSaatchiBiomassStem::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		// Bands Order:
 		// HH
@@ -154,7 +154,7 @@ namespace rsgis{namespace radar{
 		this->b2 = b2Coef;
 	}
 	
-	void RSGISCalcSaatchiBiomassCrownPL::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISCalcSaatchiBiomassCrownPL::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		
 		// Bands Order:
@@ -209,7 +209,7 @@ namespace rsgis{namespace radar{
 		this->c2 = c2Coef;
 	}
 	
-	void RSGISCalcSaatchiNoIABiomassCrown::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISCalcSaatchiNoIABiomassCrown::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		// Input Bands Order:
 		// HH
@@ -257,7 +257,7 @@ namespace rsgis{namespace radar{
 		this->c2 = c2Coef;
 	}
 	
-	void RSGISCalcSaatchiNoIABiomassStem::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISCalcSaatchiNoIABiomassStem::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		// Bands Order:
 		// HH
@@ -309,7 +309,7 @@ namespace rsgis{namespace radar{
 		this->b2 = b2Coef;
 	}
 	
-	void RSGISCalcSaatchiNoIABiomassCrownPL::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISCalcSaatchiNoIABiomassCrownPL::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		
 		// Bands Order:

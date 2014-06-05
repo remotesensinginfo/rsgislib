@@ -154,7 +154,7 @@ namespace rsgis{namespace radar{
                 invValuesObj = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, this->initialParSingle, this->slowOptimiserSingle, this->parameters, this->minMaxVals[estClass]);
 			}
 
-			float *outData = new float[numOutputBands]; // Create array large enough to hold all output bands (more than parameters)
+			double *outData = new double[numOutputBands]; // Create array large enough to hold all output bands (more than parameters)
 			float *inData = new float[this->numBands];
 			bool *indB = new bool[this->numBands];
 			bool *convertdB = new bool[this->numBands];
@@ -311,7 +311,7 @@ namespace rsgis{namespace radar{
 			rsgis::img::RSGISCalcImageValue *invValues;
             gsl_vector *localPar;
             localPar = gsl_vector_alloc(this->numOutputPar);
-            float *outData = new float[numOutputBands]; // Create array large enough to hold all output bands (more than parameters)
+            double *outData = new double[numOutputBands]; // Create array large enough to hold all output bands (more than parameters)
             float *inData = new float[this->numBands];
             bool *indB = new bool[this->numBands];
             bool *convertdB = new bool[this->numBands];
@@ -708,7 +708,7 @@ namespace rsgis{namespace radar{
 				invValuesObj = new RSGISEstimationAlgorithmSingleSpecies(this->numOutputBands, this->initialParSingle, this->slowOptimiserSingle, this->parameters, this->minMaxVals[estClass]);
 			}
 
-			float *outData = new float[numOutputBands]; // Create array large enough to hold all output bands (more than parameters)
+			double *outData = new double[numOutputBands]; // Create array large enough to hold all output bands (more than parameters)
 			float *inData = new float[this->numBands];
 			bool *indB = new bool[this->numBands];
 			bool *convertdB = new bool[this->numBands];
@@ -856,7 +856,7 @@ namespace rsgis{namespace radar{
 			rsgis::img::RSGISCalcImageValue *invValuesObj;
 			rsgis::img::RSGISCalcImageValue *invValues;
 
-            float *outData = new float[numOutputBands]; // Create array large enough to hold all output bands (more than parameters)
+            double *outData = new double[numOutputBands]; // Create array large enough to hold all output bands (more than parameters)
             float *inData = new float[this->numBands];
             bool *indB = new bool[this->numBands];
             bool *convertdB = new bool[this->numBands];

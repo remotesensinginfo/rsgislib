@@ -327,7 +327,7 @@ namespace rsgis{namespace rastergis{
                 calcImageStdDev.calcImage(datasets, 1, 1);
                 delete calcImgValStdDev;
 
-                std::cout << "Writting Standard Deviation Stats to Output RAT\n";
+                std::cout << "Writing Standard Deviation Stats to Output RAT\n";
                 startRow = 0;
                 for(size_t i = 0; i < numBlocks; ++i)
                 {

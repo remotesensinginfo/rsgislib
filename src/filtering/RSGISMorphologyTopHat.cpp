@@ -177,7 +177,7 @@ namespace rsgis{namespace filter{
 
 	}
     
-	void RSGISMorphologyImageDiff::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISMorphologyImageDiff::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{        
         if((numBands/2) != this->numOutBands)
         {

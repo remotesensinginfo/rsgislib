@@ -52,8 +52,8 @@ namespace rsgis{namespace filter{
     public: 
         
         RSGISLeeFilter(int numberOutBands, int size, std::string filenameEnding, unsigned int nLooks, float internalScaleFactor=100);
-        virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
-        virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException){throw RSGISImageFilterException("Not implemented for Lee filter!");};;
+        virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException);
+        virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException){throw RSGISImageFilterException("Not implemented for Lee filter!");};;
         virtual void exportAsImage(std::string filename) throw(RSGISImageFilterException){throw RSGISImageFilterException("No image to output!");};
         ~RSGISLeeFilter();
     protected:

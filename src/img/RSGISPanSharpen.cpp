@@ -34,7 +34,7 @@ namespace rsgis { namespace img {
 		this->imageStats = imageStats;
 	}
 	
-	void RSGISHCSPanSharpen::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+	void RSGISHCSPanSharpen::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
 	{
 		float meanMS = this->imageStats[0];
 		float meanPAN = this->imageStats[1];
@@ -91,7 +91,7 @@ namespace rsgis { namespace img {
 	}
 	
 	
-	void RSGISHCSPanSharpen::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException)
+	void RSGISHCSPanSharpen::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException)
 	{
 		
 		//dataBlock[k][i][j]; k = band; j = y axis; i = x axis

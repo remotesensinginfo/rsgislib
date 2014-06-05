@@ -197,7 +197,7 @@ namespace rsgis{ namespace classifier{
         // Load string column to memory
     }
     
-    void RSGISRecodeRasterFromClasses::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISRecodeRasterFromClasses::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
     {
         try
         {
@@ -245,7 +245,7 @@ namespace rsgis{ namespace classifier{
         this->clrTab = clrTab;
     }
     
-    void RSGISColourImageFromClassRAT::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISColourImageFromClassRAT::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
     {
         try
         {

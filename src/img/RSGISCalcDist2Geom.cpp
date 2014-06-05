@@ -73,12 +73,12 @@ namespace rsgis{namespace img{
         this->imgRes = imgRes;
     }
     
-    void RSGISCalcDistViaIterativeGrowth::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+    void RSGISCalcDistViaIterativeGrowth::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
     {
         output[0] = bandValues[0] * imgRes;
     }
 		
-    void RSGISCalcDistViaIterativeGrowth::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException)
+    void RSGISCalcDistViaIterativeGrowth::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException)
     {
         int midPoint = floor(((float)winSize)/2.0);
                 

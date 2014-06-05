@@ -79,7 +79,7 @@ namespace rsgis{namespace segment{
         this->ignoreZeros = ignoreZeros;
     }
     
-    void RSGISLabelPixelsUsingClustersCalcImg::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISLabelPixelsUsingClustersCalcImg::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
     {
         unsigned int clusterID = 0;
         float minDist = 0;

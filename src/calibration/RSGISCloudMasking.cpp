@@ -70,7 +70,7 @@ namespace rsgis{namespace calib{
         }
     }
     
-    void RSGISLandsatFMaskPass1CloudMasking::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISLandsatFMaskPass1CloudMasking::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
     {
         bool noData = true;
         for(unsigned i = 0; i < numBands; ++i)
@@ -270,7 +270,7 @@ namespace rsgis{namespace calib{
         }
     }
     
-    void RSGISLandsatFMaskPass2ClearSkyCloudProbCloudMasking::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISLandsatFMaskPass2ClearSkyCloudProbCloudMasking::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
     {
         output[0] = 0.0;
         
@@ -473,7 +473,7 @@ namespace rsgis{namespace calib{
         }
     }
     
-    void RSGISLandsatFMaskPass2CloudMasking::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISLandsatFMaskPass2CloudMasking::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
     {
         bool noData = true;
         for(unsigned i = 1; i < numBands; ++i)
@@ -608,7 +608,7 @@ namespace rsgis{namespace calib{
     
     
 
-    void RSGISCalcImageCloudMajorityFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCalcImageCloudMajorityFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
     {
         if(numBands != 1)
         {

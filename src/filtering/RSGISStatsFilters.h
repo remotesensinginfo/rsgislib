@@ -42,8 +42,8 @@ namespace rsgis{namespace filter{
 		{
 		public:
 			RSGISMeanFilter(int numberOutBands, int size, std::string filenameEnding);
-			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
-			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
+			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException);
+			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException);
 			virtual void exportAsImage(std::string filename) throw(RSGISImageFilterException);
 			~RSGISMeanFilter();
 		};
@@ -52,8 +52,8 @@ namespace rsgis{namespace filter{
 		{
 		public:
 			RSGISMedianFilter(int numberOutBands, int size, std::string filenameEnding);
-			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
-			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
+			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException);
+			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException);
 			virtual void exportAsImage(std::string filename) throw(RSGISImageFilterException);
 			~RSGISMedianFilter();
 		};
@@ -62,8 +62,8 @@ namespace rsgis{namespace filter{
 		{
 		public:
 			RSGISModeFilter(int numberOutBands, int size, std::string filenameEnding);
-			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
-			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
+			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException);
+			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException);
 			virtual void exportAsImage(std::string filename) throw(RSGISImageFilterException);
 			~RSGISModeFilter();
 		};
@@ -72,8 +72,8 @@ namespace rsgis{namespace filter{
 		{
 		public:
 			RSGISRangeFilter(int numberOutBands, int size, std::string filenameEnding);
-			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
-			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
+			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException);
+			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException);
 			virtual void exportAsImage(std::string filename) throw(RSGISImageFilterException);
 			~RSGISRangeFilter();
 		};
@@ -82,8 +82,8 @@ namespace rsgis{namespace filter{
 		{
 		public:
 			RSGISStdDevFilter(int numberOutBands, int size, std::string filenameEnding);
-			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
-			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
+			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException);
+			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException);
 			virtual void exportAsImage(std::string filename) throw(RSGISImageFilterException);
 			~RSGISStdDevFilter();
 		};
@@ -98,8 +98,8 @@ namespace rsgis{namespace filter{
         */
 		public:
 			RSGISCoeffOfVarFilter(int numberOutBands, int size, std::string filenameEnding);
-			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
-			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
+			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException);
+			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException);
 			virtual void exportAsImage(std::string filename) throw(RSGISImageFilterException);
 			~RSGISCoeffOfVarFilter();
 		};
@@ -108,8 +108,8 @@ namespace rsgis{namespace filter{
 		{
 		public:
 			RSGISMinFilter(int numberOutBands, int size, std::string filenameEnding);
-			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
-			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
+			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException);
+			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException);
 			virtual void exportAsImage(std::string filename) throw(RSGISImageFilterException);
 			~RSGISMinFilter();
 		};
@@ -118,8 +118,8 @@ namespace rsgis{namespace filter{
 		{
 		public:
 			RSGISMaxFilter(int numberOutBands, int size, std::string filenameEnding);
-			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
-			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
+			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException);
+			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException);
 			virtual void exportAsImage(std::string filename) throw(RSGISImageFilterException);
 			~RSGISMaxFilter();
 		};
@@ -128,8 +128,8 @@ namespace rsgis{namespace filter{
 		{
 		public:
 			RSGISTotalFilter(int numberOutBands, int size, std::string filenameEnding);
-			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
-			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
+			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException);
+			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException);
 			virtual void exportAsImage(std::string filename) throw(RSGISImageFilterException);
 			~RSGISTotalFilter();
 		};
@@ -138,8 +138,8 @@ namespace rsgis{namespace filter{
 		{
 		public:
 			RSGISKuwaharaFilter(int numberOutBands, int size, std::string filenameEnding);
-			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
-			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
+			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException);
+			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException);
 			virtual void exportAsImage(std::string filename) throw(RSGISImageFilterException);
 			~RSGISKuwaharaFilter();
 		};

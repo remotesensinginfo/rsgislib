@@ -758,7 +758,7 @@ namespace rsgis{ namespace classifier{
 		this->clusterCentres = clusterCentres;
 	}
 	
-	void RSGISApplyISODATAClassifierCalcImageVal::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISApplyISODATAClassifierCalcImageVal::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		double minDistance = 0;
 		unsigned int minIdx = 0;

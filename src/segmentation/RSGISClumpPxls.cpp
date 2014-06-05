@@ -754,9 +754,9 @@ namespace rsgis{namespace segment{
             std::cout << "Finding maximum image value\n";
             double maxVal = 0;
             catagoryBand->GetStatistics(false, true, NULL, &maxVal, NULL, NULL);
-            unsigned int maxClumpIdx = boost::lexical_cast<unsigned long>(maxVal);
+            unsigned long maxClumpIdx = boost::lexical_cast<unsigned long>(maxVal);
             
-            unsigned int *clumpIdxLookUp = new unsigned int[maxClumpIdx];
+            unsigned long *clumpIdxLookUp = new unsigned long[maxClumpIdx];
             for(unsigned int i = 0; i < maxClumpIdx; ++i)
             {
                 clumpIdxLookUp[i] = 0;
@@ -765,14 +765,14 @@ namespace rsgis{namespace segment{
             std::cout << "Creating Look up table.\n";
             RSGISCreateRelabelLookupTable *createLookUp = new RSGISCreateRelabelLookupTable(clumpIdxLookUp, maxClumpIdx);
             rsgis::img::RSGISCalcImage calcImgCreateLoopUp = rsgis::img::RSGISCalcImage(createLookUp);
-            calcImgCreateLoopUp.calcImage(&catagories, 1);
+            calcImgCreateLoopUp.calcImage(&catagories, 1, 0);
             delete createLookUp;
             
             
             std::cout << "Applying Look up table.\n";
             RSGISApplyRelabelLookupTable *applyLookUp = new RSGISApplyRelabelLookupTable(clumpIdxLookUp, maxClumpIdx);
             rsgis::img::RSGISCalcImage calcImgApplyLookUp = rsgis::img::RSGISCalcImage(applyLookUp);
-            calcImgApplyLookUp.calcImage(&catagories, 1, clumps);
+            calcImgApplyLookUp.calcImage(&catagories, 1, 0, clumps);
             delete applyLookUp;
             
             delete[] clumpIdxLookUp;
@@ -800,20 +800,22 @@ namespace rsgis{namespace segment{
     
     
 
-    RSGISCreateRelabelLookupTable::RSGISCreateRelabelLookupTable(unsigned int *clumpIdxLookUp, unsigned int numVals):rsgis::img::RSGISCalcImageValue(0)
+    RSGISCreateRelabelLookupTable::RSGISCreateRelabelLookupTable(unsigned long *clumpIdxLookUp, unsigned long numVals):rsgis::img::RSGISCalcImageValue(0)
     {
         this->clumpIdxLookUp = clumpIdxLookUp;
         this->numVals = numVals;
         this->nextVal = 1;
     }
 
-    void RSGISCreateRelabelLookupTable::calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCreateRelabelLookupTable::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException)
     {
         try
         {
-            if((bandValues[0] > 0) & (bandValues[0] < numVals))
+            //std::cout << "intBandValues[0] = " << intBandValues[0] << std::endl;
+            
+            if((intBandValues[0] > 0) & (intBandValues[0] < numVals))
             {
-                size_t fid = boost::lexical_cast<size_t>(bandValues[0]);
+                size_t fid = boost::lexical_cast<size_t>(intBandValues[0]);
                 
                 if(clumpIdxLookUp[fid] == 0)
                 {
@@ -857,19 +859,19 @@ namespace rsgis{namespace segment{
 
     
     
-    RSGISApplyRelabelLookupTable::RSGISApplyRelabelLookupTable(unsigned int *clumpIdxLookUp, unsigned int numVals): rsgis::img::RSGISCalcImageValue(1)
+    RSGISApplyRelabelLookupTable::RSGISApplyRelabelLookupTable(unsigned long *clumpIdxLookUp, unsigned long numVals): rsgis::img::RSGISCalcImageValue(1)
     {
         this->clumpIdxLookUp = clumpIdxLookUp;
         this->numVals = numVals;
     }
 		
-    void RSGISApplyRelabelLookupTable::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISApplyRelabelLookupTable::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(rsgis::img::RSGISImageCalcException)
     {
         try
         {
-            if((bandValues[0] > 0) & (bandValues[0] < numVals))
+            if((intBandValues[0] > 0) & (intBandValues[0] < numVals))
             {
-                size_t fid = boost::lexical_cast<size_t>(bandValues[0]);
+                unsigned long fid = boost::lexical_cast<unsigned long>(intBandValues[0]);
                 
                 output[0] = clumpIdxLookUp[fid];
             }

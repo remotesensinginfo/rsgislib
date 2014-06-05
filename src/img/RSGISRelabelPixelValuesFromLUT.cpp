@@ -70,7 +70,7 @@ namespace rsgis { namespace img {
         this->lut = lut;
     }
 		
-    void RSGISRelabelPixelValuesFromLUTCalcVal::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+    void RSGISRelabelPixelValuesFromLUTCalcVal::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
     {
         if(numBands != numOutBands)
         {

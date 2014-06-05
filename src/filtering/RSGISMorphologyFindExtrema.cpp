@@ -91,7 +91,7 @@ namespace rsgis{namespace filter{
         }
 	}
     
-	void RSGISMorphologyFindLocalMinima::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISMorphologyFindLocalMinima::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
         int cPxlIdx = ((winSize-1)/2);
 		float *values = new float[numBands];
@@ -184,7 +184,7 @@ namespace rsgis{namespace filter{
         this->outVal = 1;
 	}
     
-	void RSGISMorphologyFindLocalMinimaAll::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISMorphologyFindLocalMinimaAll::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		int cPxlIdx = ((winSize-1)/2);
 		float value = 0;

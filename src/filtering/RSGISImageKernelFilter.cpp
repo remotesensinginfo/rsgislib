@@ -29,7 +29,7 @@ namespace rsgis{namespace filter{
 		this->filter = filter;
 	}
 	
-	void RSGISImageKernelFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISImageKernelFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{		
 		if(winSize != size)
 		{
@@ -52,7 +52,7 @@ namespace rsgis{namespace filter{
 		}
 	}
 	
-	bool RSGISImageKernelFilter::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+	bool RSGISImageKernelFilter::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		throw rsgis::img::RSGISImageCalcException("Not implemented");
 	}

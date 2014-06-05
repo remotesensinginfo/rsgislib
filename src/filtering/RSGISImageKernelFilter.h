@@ -41,8 +41,8 @@ namespace rsgis{namespace filter{
 		{
 		public: 
 			RSGISImageKernelFilter(int numberOutBands, int size, std::string filenameEnding, ImageFilter *filter);
-			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
-			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
+			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException);
+			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException);
 			virtual void exportAsImage(std::string filename) throw(RSGISImageFilterException);
 			~RSGISImageKernelFilter();
 		protected:

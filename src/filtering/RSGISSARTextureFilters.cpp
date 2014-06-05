@@ -26,7 +26,7 @@ namespace rsgis{namespace filter{
 
     RSGISNormVarPowerFilter::RSGISNormVarPowerFilter(int numberOutBands, int size, std::string filenameEnding) : RSGISImageFilter(numberOutBands, size, filenameEnding){}
 
-    void RSGISNormVarPowerFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISNormVarPowerFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
         unsigned int middleVal = floor(((float)winSize) / 2);
         unsigned int numVal = 0; // Number of values counted
@@ -90,7 +90,7 @@ namespace rsgis{namespace filter{
 
     RSGISNormVarAmplitudeFilter::RSGISNormVarAmplitudeFilter(int numberOutBands, int size, std::string filenameEnding) : RSGISImageFilter(numberOutBands, size, filenameEnding){}
 
-    void RSGISNormVarAmplitudeFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISNormVarAmplitudeFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
         unsigned int middleVal = floor(((float)winSize) / 2);
         unsigned int numVal = 0; // Number of values counted
@@ -146,7 +146,7 @@ namespace rsgis{namespace filter{
 
     RSGISNormVarLnPowerFilter::RSGISNormVarLnPowerFilter(int numberOutBands, int size, std::string filenameEnding) : RSGISImageFilter(numberOutBands, size, filenameEnding){}
 
-    void RSGISNormVarLnPowerFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISNormVarLnPowerFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
         unsigned int middleVal = floor(((float)winSize) / 2);
         unsigned int numVal = 0; // Number of values counted
@@ -201,7 +201,7 @@ namespace rsgis{namespace filter{
 
     RSGISNormLnFilter::RSGISNormLnFilter(int numberOutBands, int size, std::string filenameEnding) : RSGISImageFilter(numberOutBands, size, filenameEnding){}
 
-    void RSGISNormLnFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISNormLnFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
         unsigned int middleVal = floor(((float)winSize) / 2);
         unsigned int numVal = 0; // Number of values counted
@@ -256,7 +256,7 @@ namespace rsgis{namespace filter{
 
     RSGISTextureVar::RSGISTextureVar(int numberOutBands, int size, std::string filenameEnding) : RSGISImageFilter(numberOutBands, size, filenameEnding){}
 
-    void RSGISTextureVar::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISTextureVar::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
         unsigned int middleVal = floor(((float)winSize) / 2);
         unsigned int numVal = 0; // Number of values counted

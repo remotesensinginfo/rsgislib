@@ -381,7 +381,7 @@ namespace rsgis{namespace img{
         this->offset = offset;
     }
         
-    void RSGISUnconstrainedLinearSpectralUnmixing::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+    void RSGISUnconstrainedLinearSpectralUnmixing::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
     {
         try 
         {
@@ -436,7 +436,7 @@ namespace rsgis{namespace img{
         this->offset = offset;
     }
     
-    void RSGISPartConstrainedLinearSpectralUnmixing::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+    void RSGISPartConstrainedLinearSpectralUnmixing::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
     {
         try 
         {
@@ -488,7 +488,7 @@ namespace rsgis{namespace img{
         this->offset = offset;
     }
     
-    void RSGISExhaustiveLinearSpectralUnmixing::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+    void RSGISExhaustiveLinearSpectralUnmixing::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
     {
         // All values have to be greater than zero.
         

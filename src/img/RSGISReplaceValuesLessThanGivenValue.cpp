@@ -31,7 +31,7 @@ namespace rsgis{namespace img{
 		this->value = value;
 	}
 	
-	void RSGISReplaceValuesLessThanGivenValue::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+	void RSGISReplaceValuesLessThanGivenValue::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
 	{
 		if(numBands != numOutBands)
 		{
@@ -61,17 +61,17 @@ namespace rsgis{namespace img{
 		throw RSGISImageCalcException("Not implemented");
 	}
 	
-	void RSGISReplaceValuesLessThanGivenValue::calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException)
+	void RSGISReplaceValuesLessThanGivenValue::calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("Not implemented");
 	}
 	
-	void RSGISReplaceValuesLessThanGivenValue::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException)
+	void RSGISReplaceValuesLessThanGivenValue::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("Not implemented");
 	}
 	
-	bool RSGISReplaceValuesLessThanGivenValue::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException)
+	bool RSGISReplaceValuesLessThanGivenValue::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("Not implemented");
 	}

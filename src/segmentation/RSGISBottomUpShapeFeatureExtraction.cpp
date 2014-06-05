@@ -278,7 +278,7 @@ namespace rsgis{namespace segment{
         this->numRows = attTable->GetRowCount();
     }
     
-    void RSGISAddFeaturesToOutputImage::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISAddFeaturesToOutputImage::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
     {
         try
         {
@@ -343,7 +343,7 @@ namespace rsgis{namespace segment{
         this->numRows = attTable->GetRowCount();
     }
     
-    void RSGISMaskFeaturesFromFeatureImage::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISMaskFeaturesFromFeatureImage::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
     {
         try
         {
@@ -411,7 +411,7 @@ namespace rsgis{namespace segment{
         this->threshold = threshold;
     }
     
-    void RSGISApplyThresholdToFeatureImage::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISApplyThresholdToFeatureImage::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
     {
         try
         {
@@ -456,7 +456,7 @@ namespace rsgis{namespace segment{
         
     }
     
-    void RSGISGrowFeatures::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISGrowFeatures::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
     {
         try
         {
