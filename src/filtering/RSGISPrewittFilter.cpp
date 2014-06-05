@@ -58,7 +58,7 @@ namespace rsgis{namespace filter{
 		this->filterY[2][2] = 1;
 	}
 	
-	void RSGISPrewittFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISPrewittFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		if(this->size != 3 & winSize != 3)
 		{
@@ -116,7 +116,7 @@ namespace rsgis{namespace filter{
 		
 	}
 
-	bool RSGISPrewittFilter::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+	bool RSGISPrewittFilter::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		throw rsgis::img::RSGISImageCalcException("Not implemented!");
 	}

@@ -1078,7 +1078,7 @@ namespace rsgis{namespace vec{
 		this->stddev = stddev;
 	}
 	
-	void RSGISCalcZonalStatsFromRaster::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISCalcZonalStatsFromRaster::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		throw rsgis::img::RSGISImageCalcException("RSGISCalcZonalStatsFromRaster: No Implemented.");
 	}
@@ -1088,7 +1088,7 @@ namespace rsgis{namespace vec{
 		throw rsgis::img::RSGISImageCalcException("RSGISCalcZonalStatsFromRaster: Not Implemented");
 	}
 	
-	void RSGISCalcZonalStatsFromRaster::calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISCalcZonalStatsFromRaster::calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException)
 	{
 		throw rsgis::img::RSGISImageCalcException("RSGISCalcZonalStatsFromRaster: No Implemented.");
 	}
@@ -1150,12 +1150,12 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISCalcZonalStatsFromRaster::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISCalcZonalStatsFromRaster::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		throw rsgis::img::RSGISImageCalcException("Not implemented");
 	}
 	
-	bool RSGISCalcZonalStatsFromRaster::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+	bool RSGISCalcZonalStatsFromRaster::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		throw rsgis::img::RSGISImageCalcException("Not implemented");
 	}

@@ -83,7 +83,7 @@ namespace rsgis{namespace filter{
         this->matrixOperator = matrixOperator;
 	}
 
-	void RSGISMorphologyDilate::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISMorphologyDilate::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		bool first = true;
 		double *largest = new double[numBands];
@@ -139,7 +139,7 @@ namespace rsgis{namespace filter{
         this->matrixOperator = matrixOperator;
 	}
     
-	void RSGISMorphologyDilateAll::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISMorphologyDilateAll::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		bool first = true;
 		double largest = 0;

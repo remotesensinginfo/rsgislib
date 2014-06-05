@@ -54,7 +54,7 @@ namespace rsgis{ namespace classifier{
 		this->classifier = classifier;
 	}
 	
-	void RSGISApplyClassifier::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISApplyClassifier::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		if(numBands != classifier->getNumVariables())
 		{
@@ -81,18 +81,18 @@ namespace rsgis{ namespace classifier{
 	}
 	
 	
-	void RSGISApplyClassifier::calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISApplyClassifier::calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException)
 	{
 		throw rsgis::img::RSGISImageCalcException("Not implemented");
 	}
 	
 	
-	void RSGISApplyClassifier::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISApplyClassifier::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		throw rsgis::img::RSGISImageCalcException("Not implemented");
 	}
 
-	bool RSGISApplyClassifier::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+	bool RSGISApplyClassifier::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		throw rsgis::img::RSGISImageCalcException("Not implemented");
 	}

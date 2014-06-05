@@ -32,7 +32,7 @@ RSGISImageComposite::RSGISImageComposite(int numberOutBands, unsigned int nCompo
     this->outStat = outStat;
 }
 
-void RSGISImageComposite::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+void RSGISImageComposite::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
 {
     for(int i = 0; i < this->numberOutBands; ++i)
     {

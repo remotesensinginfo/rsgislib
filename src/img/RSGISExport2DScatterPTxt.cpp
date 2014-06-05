@@ -32,7 +32,7 @@ namespace rsgis{namespace img{
 		this->b2 = b2;
 	}
 	
-	void RSGISExport2DScatterPTxt::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+	void RSGISExport2DScatterPTxt::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("Not Implemented.");
 	}
@@ -65,17 +65,17 @@ namespace rsgis{namespace img{
 		throw RSGISImageCalcException("Not Implemented");
 	}
 	
-	void RSGISExport2DScatterPTxt::calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException)
+	void RSGISExport2DScatterPTxt::calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("Not Implemented.");
 	}
 		
-	void RSGISExport2DScatterPTxt::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException)
+	void RSGISExport2DScatterPTxt::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("Not Implemented.");
 	}
 
-	bool RSGISExport2DScatterPTxt::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException)
+	bool RSGISExport2DScatterPTxt::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("Not Implemented.");
 	}

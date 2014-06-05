@@ -349,7 +349,7 @@ namespace rsgis{namespace rastergis{
         this->ratBand = ratBand;
     }
     
-    void RSGISFindNeighboursCalcImage::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISFindNeighboursCalcImage::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
     {
         try
         {
@@ -605,7 +605,7 @@ namespace rsgis{namespace rastergis{
         this->ratBand = ratBand;
     }
     
-    void RSGISIdentifyBoundaryPixels::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISIdentifyBoundaryPixels::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
     {
         try
         {

@@ -574,7 +574,7 @@ namespace rsgis{namespace segment{
         this->numClumps = numClumps;
     }
     
-    void RSGISApplyMeans2Output::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISApplyMeans2Output::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
     {
         try
         {

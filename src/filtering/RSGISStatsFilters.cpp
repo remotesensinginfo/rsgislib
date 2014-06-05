@@ -29,7 +29,7 @@ namespace rsgis{namespace filter{
 
 	}
 
-	void RSGISMeanFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISMeanFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		if(this->size != winSize)
 		{
@@ -52,7 +52,7 @@ namespace rsgis{namespace filter{
 		}
 	}
 
-	bool RSGISMeanFilter::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+	bool RSGISMeanFilter::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		throw rsgis::img::RSGISImageCalcException("Not implemented yet");
 	}
@@ -72,7 +72,7 @@ namespace rsgis{namespace filter{
 
 	}
 
-	void RSGISMedianFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISMedianFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		if(this->size != winSize)
 		{
@@ -103,7 +103,7 @@ namespace rsgis{namespace filter{
 		}
 	}
 
-	bool RSGISMedianFilter::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+	bool RSGISMedianFilter::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		throw rsgis::img::RSGISImageCalcException("Not implemented yet");
 	}
@@ -123,7 +123,7 @@ namespace rsgis{namespace filter{
 
 	}
 
-	void RSGISModeFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISModeFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		if(this->size != winSize)
 		{
@@ -151,7 +151,7 @@ namespace rsgis{namespace filter{
 		delete sortedList;
 	}
 
-	bool RSGISModeFilter::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+	bool RSGISModeFilter::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		throw rsgis::img::RSGISImageCalcException("Not implemented yet");
 	}
@@ -172,7 +172,7 @@ namespace rsgis{namespace filter{
 
 	}
 
-	void RSGISRangeFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISRangeFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		if(this->size != winSize)
 		{
@@ -215,7 +215,7 @@ namespace rsgis{namespace filter{
 		}
 	}
 
-	bool RSGISRangeFilter::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+	bool RSGISRangeFilter::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		throw rsgis::img::RSGISImageCalcException("Not implemented yet");
 	}
@@ -235,7 +235,7 @@ namespace rsgis{namespace filter{
 
 	}
 
-	void RSGISStdDevFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISStdDevFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		if(this->size != winSize)
 		{
@@ -273,7 +273,7 @@ namespace rsgis{namespace filter{
 		}
 	}
 
-	bool RSGISStdDevFilter::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+	bool RSGISStdDevFilter::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		throw rsgis::img::RSGISImageCalcException("Not implemented yet");
 	}
@@ -293,7 +293,7 @@ namespace rsgis{namespace filter{
 
 	}
 
-	void RSGISCoeffOfVarFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISCoeffOfVarFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		if(this->size != winSize)
 		{
@@ -331,7 +331,7 @@ namespace rsgis{namespace filter{
 		}
 	}
 
-	bool RSGISCoeffOfVarFilter::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+	bool RSGISCoeffOfVarFilter::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		throw rsgis::img::RSGISImageCalcException("Not implemented yet");
 	}
@@ -352,7 +352,7 @@ namespace rsgis{namespace filter{
 
 	}
 
-	void RSGISMinFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISMinFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		if(this->size != winSize)
 		{
@@ -388,7 +388,7 @@ namespace rsgis{namespace filter{
 		}
 	}
 
-	bool RSGISMinFilter::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+	bool RSGISMinFilter::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		throw rsgis::img::RSGISImageCalcException("Not implemented yet");
 	}
@@ -408,7 +408,7 @@ namespace rsgis{namespace filter{
 
 	}
 
-	void RSGISMaxFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISMaxFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		if(this->size != winSize)
 		{
@@ -444,7 +444,7 @@ namespace rsgis{namespace filter{
 		}
 	}
 
-	bool RSGISMaxFilter::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+	bool RSGISMaxFilter::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		throw rsgis::img::RSGISImageCalcException("Not implemented yet");
 	}
@@ -464,7 +464,7 @@ namespace rsgis{namespace filter{
 
 	}
 
-	void RSGISTotalFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISTotalFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		if(this->size != winSize)
 		{
@@ -487,7 +487,7 @@ namespace rsgis{namespace filter{
 		}
 	}
 
-	bool RSGISTotalFilter::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+	bool RSGISTotalFilter::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		throw rsgis::img::RSGISImageCalcException("Not implemented yet");
 	}
@@ -507,7 +507,7 @@ namespace rsgis{namespace filter{
 
 	}
 
-	void RSGISKuwaharaFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISKuwaharaFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		if(this->size != winSize)
 		{
@@ -654,7 +654,7 @@ namespace rsgis{namespace filter{
 		delete[] mean;
 	}
 
-	bool RSGISKuwaharaFilter::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+	bool RSGISKuwaharaFilter::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		throw rsgis::img::RSGISImageCalcException("Not implemented yet");
 	}

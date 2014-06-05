@@ -652,7 +652,7 @@ namespace rsgis{ namespace classifier{
 		this->numClusters = numClusters;
 	}
 	
-	void RSGISApplyKMeanClassifierCalcImageVal::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISApplyKMeanClassifierCalcImageVal::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		double minDistance = 0;
 		unsigned int minIdx = 0;

@@ -37,7 +37,7 @@ namespace rsgis{namespace calib{
         this->useNoDataVal = useNoDataVal;
     }
     
-    void RSGISApply6SCoefficientsSingleParam::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISApply6SCoefficientsSingleParam::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
     {
         if(numValues != this->numOutBands)
         {
@@ -119,7 +119,7 @@ namespace rsgis{namespace calib{
         this->useNoDataVal = useNoDataVal;
     }
     
-    void RSGISApply6SCoefficientsElevLUTParam::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISApply6SCoefficientsElevLUTParam::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
     {
         if(numBands-1 != this->numOutBands)
         {
@@ -222,7 +222,7 @@ namespace rsgis{namespace calib{
         this->useNoDataVal = useNoDataVal;
     }
     
-    void RSGISApply6SCoefficientsElevAOTLUTParam::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISApply6SCoefficientsElevAOTLUTParam::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
     {
         if(numBands-2 != this->numOutBands)
         {
@@ -362,7 +362,7 @@ namespace rsgis{namespace calib{
 		}
     }
     
-    void RSGISApply6SCoefficients::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISApply6SCoefficients::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
     {
         if(numValues != this->numOutBands)
         {

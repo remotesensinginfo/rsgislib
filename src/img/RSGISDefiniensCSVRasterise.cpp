@@ -521,7 +521,7 @@ namespace rsgis{namespace img{
 		this->numObjects = numberObjects;
 	}
 	
-	void RSGISDefiniensCSVRasteriseValue::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+	void RSGISDefiniensCSVRasteriseValue::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
 	{
 		if(bandValues[0] < 0 | bandValues[0] >= this->numObjects)
 		{
@@ -546,17 +546,17 @@ namespace rsgis{namespace img{
 		throw RSGISImageCalcException("Not Implemented");
 	}
 	
-	void RSGISDefiniensCSVRasteriseValue::calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException)
+	void RSGISDefiniensCSVRasteriseValue::calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("Not implemented");
 	}
 	
-	void RSGISDefiniensCSVRasteriseValue::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException)
+	void RSGISDefiniensCSVRasteriseValue::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("Not implemented");
 	}
 
-	bool RSGISDefiniensCSVRasteriseValue::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException)
+	bool RSGISDefiniensCSVRasteriseValue::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("Not implemented");
 	}

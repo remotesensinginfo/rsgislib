@@ -30,7 +30,7 @@ namespace rsgis{ namespace img{
 		this->numClasses = numClasses;
 	}
 	
-	void RSGISColourUpImage::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+	void RSGISColourUpImage::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
 	{
 		if(!(numClasses > 0))
 		{
@@ -78,7 +78,7 @@ namespace rsgis{ namespace img{
 		this->numClasses = numClasses;
 	}
 	
-	void RSGISColourUpImageBand::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+	void RSGISColourUpImageBand::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
 	{
 		if(!(numClasses > 0))
 		{

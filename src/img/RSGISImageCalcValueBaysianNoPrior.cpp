@@ -38,7 +38,7 @@ namespace rsgis{namespace img{
 		baysianStats = new rsgis::math::RSGISBaysianStatsNoPrior(function, variance, interval, minVal, maxVal, lowerLimit, upperLimit, deltatype);
 	}
 	
-	void RSGISImageCalcValueBaysianNoPrior::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+	void RSGISImageCalcValueBaysianNoPrior::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
 	{				
 		outputVals = baysianStats->calcImageValueNoPrior(bandValues[0]);
 		
@@ -63,17 +63,17 @@ namespace rsgis{namespace img{
 		throw RSGISImageCalcException("Not Implemented");
 	}
 	
-	void RSGISImageCalcValueBaysianNoPrior::calcImageValue(float *bandValues, int numBands, float *output, geos::geom::Envelope extent) throw(RSGISImageCalcException)
+	void RSGISImageCalcValueBaysianNoPrior::calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("Not implemented");
 	}
 	
-	void RSGISImageCalcValueBaysianNoPrior::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException)
+	void RSGISImageCalcValueBaysianNoPrior::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("Not implemented");
 	}
 
-	bool RSGISImageCalcValueBaysianNoPrior::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException)
+	bool RSGISImageCalcValueBaysianNoPrior::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException)
 	{
 		throw RSGISImageCalcException("Not implemented");
 	}

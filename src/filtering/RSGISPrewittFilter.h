@@ -46,8 +46,8 @@ namespace rsgis{namespace filter{
 			};			
 			
 			RSGISPrewittFilter(int numberOutBands, int size, std::string filenameEnding, FilterDirection filterType);
-			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
-			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException);
+			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException);
+			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException);
 			virtual void exportAsImage(std::string filename) throw(RSGISImageFilterException);
 			~RSGISPrewittFilter();
 		protected:

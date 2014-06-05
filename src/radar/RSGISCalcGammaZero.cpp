@@ -31,7 +31,7 @@ namespace rsgis{namespace radar{
 		this->deg = deg;
 	}
 	
-	void RSGISCalcGammaZero::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISCalcGammaZero::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
 	{
 		// Input bands
 		// Incidence Angle

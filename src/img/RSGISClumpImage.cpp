@@ -103,7 +103,7 @@ namespace rsgis{namespace img{
         nextPixelVal = 1;
     }
     
-    void RSGISUniquePixelClumps::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+    void RSGISUniquePixelClumps::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
     {
         bool validData = true;
         if(noDataDefined)

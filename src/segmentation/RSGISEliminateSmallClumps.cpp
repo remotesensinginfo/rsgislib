@@ -1822,7 +1822,7 @@ namespace rsgis{namespace segment{
         this->outFIDSetFieldIdx = outFIDSetFieldIdx;
     }
     
-    void RSGISApplyOutputFIDs::calcImageValue(float *bandValues, int numBands, float *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISApplyOutputFIDs::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
     {
         unsigned long clumpIdx = 0;
         
@@ -1940,7 +1940,7 @@ namespace rsgis{namespace segment{
         this->numHistVals = numHistVals;
     }
     
-    void RSGISRemoveClumpsBelowThreshold::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, float *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISRemoveClumpsBelowThreshold::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(rsgis::img::RSGISImageCalcException)
     {
         try
         {

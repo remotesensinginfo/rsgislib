@@ -1188,7 +1188,7 @@ namespace rsgis{namespace segment{
         numSingles = 0;
     }
     
-    void RSGISFindSinglePixels::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISFindSinglePixels::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
     {
         try
         {
@@ -1263,7 +1263,7 @@ namespace rsgis{namespace segment{
         this->noDataValProvided = noDataValProvided;
     }
     
-    void RSGISElimSinglePixelsCalcImg::calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISElimSinglePixelsCalcImg::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
     {
         try
         {

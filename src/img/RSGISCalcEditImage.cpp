@@ -223,9 +223,9 @@ namespace rsgis
             int yBlockSize = 0;
             
             float **inputData = NULL;
-            float **outputData = NULL;
+            double **outputData = NULL;
             float *inDataColumn = NULL;
-            float *outDataColumn = NULL;
+            double *outDataColumn = NULL;
             
             GDALRasterBand **rasterBands = NULL;
             
@@ -254,12 +254,12 @@ namespace rsgis
                 }
                 inDataColumn = new float[numBands];
                 
-                outputData = new float*[numBands];
+                outputData = new double*[numBands];
                 for(int i = 0; i < numBands; i++)
                 {
-                    outputData[i] = (float *) CPLMalloc(sizeof(float)*(width*yBlockSize));
+                    outputData[i] = (double *) CPLMalloc(sizeof(double)*(width*yBlockSize));
                 }
-                outDataColumn = new float[numBands];
+                outDataColumn = new double[numBands];
                 
                 int nYBlocks = floor(((double)height) / ((double)yBlockSize));
                 int remainRows = height - (nYBlocks * yBlockSize);
@@ -497,9 +497,9 @@ namespace rsgis
             float **inputDataUpper = NULL;
             float **inputDataMain = NULL;
             float **inputDataLower = NULL;
-            float **outputData = NULL;
+            double **outputData = NULL;
             float ***inDataBlock = NULL;
-            float *outDataColumn = NULL;
+            double *outDataColumn = NULL;
             
             GDALRasterBand **rasterBands = NULL;
             
@@ -584,12 +584,12 @@ namespace rsgis
                     }
                 }
                 
-                outputData = new float*[numBands];
+                outputData = new double*[numBands];
                 for(int i = 0; i < numBands; i++)
                 {
-                    outputData[i] = (float *) CPLMalloc(sizeof(float)*numPxlsInBlock);
+                    outputData[i] = (double *) CPLMalloc(sizeof(double)*numPxlsInBlock);
                 }
-                outDataColumn = new float[numBands];
+                outDataColumn = new double[numBands];
                 
                 
                 //std::cout << "height: " << height << std::endl;

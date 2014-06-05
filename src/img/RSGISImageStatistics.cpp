@@ -935,7 +935,7 @@ namespace rsgis{namespace img{
         this->useNoDataValue = useNoDataValue;
     }
     
-    void RSGISImagePixelSummaries::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+    void RSGISImagePixelSummaries::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
     {
         std::vector<double> *dataVals = new std::vector<double>();
         for(int i = 0; i < numBands; ++i)
