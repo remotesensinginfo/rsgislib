@@ -577,7 +577,7 @@ namespace rsgis{namespace rastergis{
     {
         if(intBandValues[ratBand-1] > 0)
         {
-            size_t fid = boost::lexical_cast<size_t>(intBandValues[ratBand-1]);
+            unsigned long fid = intBandValues[ratBand-1];
 
             for(std::vector<rsgis::rastergis::RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
             {
@@ -658,7 +658,7 @@ namespace rsgis{namespace rastergis{
     {
         if(intBandValues[ratBand-1] > 0)
         {
-            size_t fid = boost::lexical_cast<size_t>(intBandValues[ratBand-1]);
+            unsigned long fid = intBandValues[ratBand-1];
             for(std::vector<rsgis::rastergis::RSGISBandAttStats*>::iterator iterBands = bandStats->begin(); iterBands != bandStats->end(); ++iterBands)
             {
                 if((boost::math::isfinite)(floatBandValues[(*iterBands)->band-1]))
