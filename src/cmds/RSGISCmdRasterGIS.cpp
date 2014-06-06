@@ -679,19 +679,22 @@ namespace rsgis{ namespace cmds {
     }
 */
             
-            /*
-    void executeStrClassMajority(std::string baseSegment, std::string infoSegment, std::string baseClassCol, std::string infoClassCol, bool ignoreZero, int baseRatBand, int infoRatBand)throw(RSGISCmdException) {
+    void executeStrClassMajority(std::string baseSegment, std::string infoSegment, std::string baseClassCol, std::string infoClassCol, bool ignoreZero, int baseRatBand, int infoRatBand)throw(RSGISCmdException)
+    {
         GDALAllRegister();
         GDALDataset *baseSegDataset, *infoSegDataset;
-        try {
+        try
+        {
             baseSegDataset = (GDALDataset *) GDALOpen(baseSegment.c_str(), GA_Update);
-            if(baseSegDataset == NULL) {
+            if(baseSegDataset == NULL)
+            {
                 std::string message = std::string("Could not open image ") + baseSegment;
                 throw rsgis::RSGISImageException(message.c_str());
             }
 
             infoSegDataset = (GDALDataset *) GDALOpen(infoSegment.c_str(), GA_Update);
-            if(infoSegDataset == NULL) {
+            if(infoSegDataset == NULL)
+            {
                 std::string message = std::string("Could not open image ") + infoSegment;
                 throw rsgis::RSGISImageException(message.c_str());
             }
@@ -701,11 +704,13 @@ namespace rsgis{ namespace cmds {
 
             GDALClose(baseSegDataset);
             GDALClose(infoSegDataset);
-        } catch(rsgis::RSGISException &e) {
+        }
+        catch(rsgis::RSGISException &e)
+        {
             throw RSGISCmdException(e.what());
         }
     }
-             */
+            
 /*
     void executeSpecDistMajorityClassifier(std::string inputImage, std::string inClassNameField, std::string outClassNameField, std::string trainingSelectCol, std::string eastingsField, std::string northingsField, std::string areaField, std::string majWeightField, std::vector<std::string> fields, float distThreshold, float specDistThreshold, SpectralDistanceMethodCmds distMethod, float specThresOriginDist)throw(RSGISCmdException) {
         GDALAllRegister();
@@ -1010,7 +1015,7 @@ namespace rsgis{ namespace cmds {
         }
     }
  */
-            /*
+
     void executeFindChangeClumpsFromStdDev(std::string clumpsImage, std::string classField, std::string changeField, std::vector<std::string> attFields, std::vector<cmds::RSGISClassChangeFieldsCmds> classChangeFields, int ratBand)throw(RSGISCmdException)
     {
         try
@@ -1092,7 +1097,6 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-
     void executeGetGlobalClassStats(std::string clumpsImage, std::string classField, std::vector<std::string> attFields, std::vector<cmds::RSGISClassChangeFieldsCmds> classChangeFields, int ratBand)throw(RSGISCmdException)
     {
         try
@@ -1171,8 +1175,7 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-        */
-
+ 
     void executeIdentifyClumpExtremesOnGrid(std::string clumpsImage, std::string inSelectField, std::string outSelectField, std::string eastingsCol, std::string northingsCol, std::string methodStr, unsigned int rows, unsigned int cols, std::string metricField)throw(RSGISCmdException)
     {
         GDALAllRegister();
@@ -1219,7 +1222,7 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
- /*
+  /*
     void executeInterpolateClumpValuesToImage(std::string clumpsImage, std::string selectField, std::string eastingsField, std::string northingsField, std::string methodStr, std::string valueField, std::string outputFile, std::string imageFormat, RSGISLibDataType dataType)throw(RSGISCmdException)
     {
         GDALAllRegister();
