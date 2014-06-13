@@ -386,7 +386,7 @@ class RSGISTests:
         spatdistthreshold=100
         outfield="Closest2Feat10"
         rastergis.findSpecClose(image, spatialdist, metricdist, outfield, specdistthreshold, spatdistthreshold)
-   """ 
+    """ 
     def testPopulateRATWithStats(self):
         print("PYTHON TEST: populateRATWithStats")
         clumps="./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_popstats.kea"
@@ -414,17 +414,26 @@ class RSGISTests:
         fields = ["b1Mean", "b2Mean", "b3Mean"]
         rastergis.export2Ascii(table, output, fields)
 
-    def testExporCols2GDALImage(self):
+    def testExportCol2GDALImage(self):
         print("PYTHON TEST: exportCol2GDALImage")
         clumps="./RATS/injune_p142_casi_sub_utm_segs.kea"
-        output="./TestOutputs/RasterGIS/injune_p142_casi_rgb_export.kea"
+        output="./TestOutputs/RasterGIS/injune_p142_casi_b1Mean_export.kea"
         gdalformat = "KEA"
         dataType = rsgislib.TYPE_32FLOAT
         field = "b1Mean"
         rastergis.exportCol2GDALImage(clumps, output, gdalformat, dataType, field)
-        
+
+    def testExportCols2GDALImage(self):
+        print("PYTHON TEST: exportCols2GDALImage")
+        clumps="./RATS/injune_p142_casi_sub_utm_segs.kea"
+        output="./TestOutputs/RasterGIS/injune_p142_casi_b1-2Mean_export.kea"
+        gdalformat = "KEA"
+        dataType = rsgislib.TYPE_32FLOAT
+        fields = ['b1Mean','b2Mean']
+        rastergis.exportCols2GDALImage(clumps, output, gdalformat, dataType, fields)
+
     def testExportColourClasses(self):
-        print("PYTHON TEST: colourClasses")
+        print('PYTHON TEST: colourClasses')
         clumps='./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_col.kea'
         field = 'outClass'
         classcolours = {}
@@ -434,7 +443,7 @@ class RSGISTests:
         rastergis.colourClasses(clumps, field, classcolours)
         
     def testExportColourClassesStr(self):
-        print("PYTHON TEST: colourClasses (String)")
+        print('PYTHON TEST: colourClasses (String)')
         clumps='./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_col_str.kea'
         field = 'outClassStr'
         classcolours = {}
@@ -442,43 +451,45 @@ class RSGISTests:
         classcolours['ClassA'] = colourCat(red=200, green=50, blue=50, alpha=255)
         classcolours['ClassB'] = colourCat(red=200, green=240, blue=50, alpha=255)
         rastergis.colourClasses(clumps, field, classcolours)
+
     """
     def testFindNeighbours(self):
-        print("PYTHON TEST: findNeighbours")
-        input = "./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_neighbours.kea"
+        print('PYTHON TEST: findNeighbours')
+        input = './TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_neighbours.kea'
         rastergis.findNeighbours(input)
 
     def testFindBoundaryPixels(self):
-        print("PYTHON TEST: findBoundaryPixels")
-        clumps="./RATS/injune_p142_casi_sub_utm_segs.kea"
-        output="./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_borpxls.kea"
-        gdalformat="KEA"
+        print('PYTHON TEST: findBoundaryPixels')
+        clumps='./RATS/injune_p142_casi_sub_utm_segs.kea'
+        output='./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_borpxls.kea'
+        gdalformat='KEA'
         rastergis.findBoundaryPixels(clumps, output, gdalformat)
 
     def testCalcBorderLength(self):
-        print("PYTHON TEST: calcBorderLength")
-        clumps="./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_borlen.kea"
+        print('PYTHON TEST: calcBorderLength')
+        clumps='./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_borlen.kea'
         ignorezeroedges=True
-        colname="borderLen"
+        colname='borderLen'
         rastergis.calcBorderLength(clumps, ignorezeroedges, colname)
 
     def testCalcShapeIndices(self):
-        print("PYTHON TEST: calcShapeIndices")
-        clumps = "./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_shape.kea"
+        print('PYTHON TEST: calcShapeIndices')
+        clumps = './TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_shape.kea'
         shapes = []
-        shapes.append(rastergis.ShapeIndex(colName="Area", idx=rsgislib.SHAPE_SHAPEAREA))
-        shapes.append(rastergis.ShapeIndex(colName="Length", idx=rsgislib.SHAPE_LENGTH))
-        shapes.append(rastergis.ShapeIndex(colName="Width", idx=rsgislib.SHAPE_WIDTH))
-        shapes.append(rastergis.ShapeIndex(colName="BorderLengthIdx", idx=rsgislib.SHAPE_BORDERLENGTH))
-        shapes.append(rastergis.ShapeIndex(colName="Asymmetry", idx=rsgislib.SHAPE_ASYMMETRY))
-        shapes.append(rastergis.ShapeIndex(colName="ShapeIndex", idx=rsgislib.SHAPE_SHAPEINDEX))
-        shapes.append(rastergis.ShapeIndex(colName="Density", idx=rsgislib.SHAPE_DENSITY))
-        shapes.append(rastergis.ShapeIndex(colName="LengthWidthRatio", idx=rsgislib.SHAPE_LENGTHWIDTH))
-        shapes.append(rastergis.ShapeIndex(colName="BorderIndex", idx=rsgislib.SHAPE_BORDERINDEX))
-        shapes.append(rastergis.ShapeIndex(colName="Compactness", idx=rsgislib.SHAPE_COMPACTNESS))
-        shapes.append(rastergis.ShapeIndex(colName="MainDirection", idx=rsgislib.SHAPE_MAINDIRECTION))
+        shapes.append(rastergis.ShapeIndex(colName='Area', idx=rsgislib.SHAPE_SHAPEAREA))
+        shapes.append(rastergis.ShapeIndex(colName='Length', idx=rsgislib.SHAPE_LENGTH))
+        shapes.append(rastergis.ShapeIndex(colName='Width', idx=rsgislib.SHAPE_WIDTH))
+        shapes.append(rastergis.ShapeIndex(colName='BorderLengthIdx', idx=rsgislib.SHAPE_BORDERLENGTH))
+        shapes.append(rastergis.ShapeIndex(colName='Asymmetry', idx=rsgislib.SHAPE_ASYMMETRY))
+        shapes.append(rastergis.ShapeIndex(colName='ShapeIndex', idx=rsgislib.SHAPE_SHAPEINDEX))
+        shapes.append(rastergis.ShapeIndex(colName='Density', idx=rsgislib.SHAPE_DENSITY))
+        shapes.append(rastergis.ShapeIndex(colName='LengthWidthRatio', idx=rsgislib.SHAPE_LENGTHWIDTH))
+        shapes.append(rastergis.ShapeIndex(colName='BorderIndex', idx=rsgislib.SHAPE_BORDERINDEX))
+        shapes.append(rastergis.ShapeIndex(colName='Compactness', idx=rsgislib.SHAPE_COMPACTNESS))
+        shapes.append(rastergis.ShapeIndex(colName='MainDirection', idx=rsgislib.SHAPE_MAINDIRECTION))
         rastergis.calcShapeIndices(clumps, shapes)
     """
+
     def testFindChangeClumpsFromStdDev(self):
         print("PYTHON TEST: findChangeClumpsFromStdDev")
         clumps="./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_change.kea"
@@ -907,7 +918,8 @@ if __name__ == '__main__':
         t.tryFuncAndCatch(t.testPopulateRATWithStats)
         t.tryFuncAndCatch(t.testPopulateRATWithPercentiles)
         t.tryFuncAndCatch(t.testExport2Ascii)
-        t.tryFuncAndCatch(t.testExporCols2GDALImage)
+        t.tryFuncAndCatch(t.testExportCol2GDALImage)
+        t.tryFuncAndCatch(t.testExportCols2GDALImage)
         t.tryFuncAndCatch(t.testPopulateStats)
         #t.tryFuncAndCatch(t.testFindNeighbours)
         #t.tryFuncAndCatch(t.testFindBoundaryPixels)

@@ -1494,14 +1494,14 @@ static PyMethodDef RasterGISMethods[] = {
 */
    {"exportCol2GDALImage", (PyCFunction)RasterGIS_ExportCol2GDALImage, METH_VARARGS | METH_KEYWORDS,
 "rastergis.exportCol2GDALImage(clumps, outimage, gdalformat, datatype, field, ratband=1)\n"
-"Exports columns of the raster attribute table as bands in a GDAL image.\n"
+"Exports column of the raster attribute table as bands in a GDAL image.\n"
 "Where:\n"
 "\n"
 "* clumps is a string containing the name of the input image file with RAT\n"
 "* outimage is a string containing the name of the output gdal file\n"
 "* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
 "* datatype is an int containing one of the values from rsgislib.TYPE_*\n"
-"* field is a strings, providing the name of the column to be exported.\n"
+"* field is a string, providing the name of the column to be exported.\n"
 "* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated."
 "\n"
 "Example::\n"
