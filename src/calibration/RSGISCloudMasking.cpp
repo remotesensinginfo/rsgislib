@@ -586,7 +586,7 @@ namespace rsgis{namespace calib{
             }
             else if(bandValues[pass1Idx] == 6)
             {
-                output[0] = 4; // Snow!
+                output[0] = 2; // SHOULD BE Snow! HOWEVER AT THE MOMENT THIS DOESN'T SEEM TO WORK...
             }
             else
             {
