@@ -122,7 +122,7 @@ namespace rsgis{namespace calib{
             
             //std::cout << "Whiteness = " << ((bandValues[blueIdx]-meanVis)/meanVis + (bandValues[greenIdx]-meanVis)/meanVis + (bandValues[redIdx]-meanVis)/meanVis) << std::endl;
             
-            bool hotTest = ((bandValues[blueIdx]-(0.5*this->scaleFactor)) * (bandValues[redIdx]-(0.08*this->scaleFactor))) < 0;
+            //bool hotTest = ((bandValues[blueIdx]-(0.5*this->scaleFactor)) * (bandValues[redIdx]-(0.08*this->scaleFactor))) < 0;
             
             //std::cout << "Hot Test: " << ((bandValues[blueIdx]-(0.5 * this->scaleFactor)) * (bandValues[redIdx]-(0.08 * this->scaleFactor))) << std::endl;
             
@@ -141,7 +141,7 @@ namespace rsgis{namespace calib{
             }
             else if(waterTest)
             {
-                if(basicTest & whitenessTest & nirswirTest & hotTest)
+                if(basicTest & whitenessTest & nirswirTest)// & hotTest)
                 {
                     output[0] = 5;  // Cloud Water
                 }
@@ -156,7 +156,7 @@ namespace rsgis{namespace calib{
             }
             else
             {
-                if(basicTest & whitenessTest & nirswirTest & hotTest)
+                if(basicTest & whitenessTest & nirswirTest)// & hotTest)
                 {
                     output[0] = 4; // Cloud Land
                 }
