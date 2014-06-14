@@ -953,7 +953,7 @@ namespace rsgis
                         
                         for(int n = 0; n < numBands; n++)
                         {
-                            rasterBands[n]->RasterIO(GF_Write, 0, (numOfLines * i), width, numOfLines, outputData[n], width, numOfLines, GDT_Float32, 0, 0);
+                            rasterBands[n]->RasterIO(GF_Write, 0, (numOfLines * i), width, numOfLines, outputData[n], width, numOfLines, GDT_Float64, 0, 0);
                         }
                     }
                     
