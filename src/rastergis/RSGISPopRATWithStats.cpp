@@ -456,8 +456,8 @@ namespace rsgis{namespace rastergis{
             std::cout << "Image Min = " << imageValMin << " Image Max = " << imageValMax << std::endl;
             
             double imageValsRange = imageValMax - imageValMin;
-            double binWidth = imageValsRange / numHistBins+2;
-            std::cout << "Image Range = " << imageValsRange << " Bin Width = " << binWidth << std::endl;
+            double binWidth = imageValsRange / ((float)numHistBins);
+            std::cout << "Image Range = " << imageValsRange << " Bin Width = " << binWidth << " Number of Bins = " << numHistBins << std::endl;
             
             double *binBounds = new double[numHistBins+1];
             for(unsigned int i = 0; i < numHistBins; ++i)
@@ -732,9 +732,21 @@ namespace rsgis{namespace rastergis{
                         foundBinIdx = true;
                         break;
                     }
+                    else if((i==numBins-1) & ((floatBandValues[imgBand-1] >= binBounds[i])))
+                    {
+                        binIdx = i;
+                        foundBinIdx = true;
+                        break;
+                    }
                 }
                 if(!foundBinIdx)
                 {
+                    std::cout << std::endl;
+                    for(unsigned int i = 0; i < numBins; ++i)
+                    {
+                        std::cout << "Bin [" << i << "] : " << binBounds[i] << " - " << binBounds[i+1] << std::endl;
+                    }
+                    
                     std::cout << "The pixel value which has caused the problem is " << floatBandValues[imgBand-1] << std::endl;
                     throw rsgis::img::RSGISImageCalcException("The image pixel value was not found within the histogram range specified - either too big or too small.");
                 }
