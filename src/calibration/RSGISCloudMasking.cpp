@@ -122,7 +122,7 @@ namespace rsgis{namespace calib{
             
             //std::cout << "Whiteness = " << ((bandValues[blueIdx]-meanVis)/meanVis + (bandValues[greenIdx]-meanVis)/meanVis + (bandValues[redIdx]-meanVis)/meanVis) << std::endl;
             
-            bool hotTest = (((bandValues[blueIdx]/this->scaleFactor)-0.5) * ((bandValues[redIdx]/this->scaleFactor)-0.08)) < 0;
+            bool hotTest = ((bandValues[blueIdx]-(0.5*this->scaleFactor)) * (bandValues[redIdx]-(0.08*this->scaleFactor))) < 0;
             
             //std::cout << "Hot Test: " << ((bandValues[blueIdx]-(0.5 * this->scaleFactor)) * (bandValues[redIdx]-(0.08 * this->scaleFactor))) << std::endl;
             
@@ -133,6 +133,7 @@ namespace rsgis{namespace calib{
             bool waterTest = ((ndvi < 0.01) & (bandValues[nirIdx] < (0.11 * this->scaleFactor))) | ((ndvi < 0.1) & (bandValues[nirIdx] < (0.05 * this->scaleFactor)));
             
             bool snowTest = (ndsi > 0.15) & (bandValues[therm1Idx] < (3.8 * this->scaleFactor)) & (bandValues[nirIdx] > (0.11 * this->scaleFactor)) & (bandValues[greenIdx] > (0.1 * this->scaleFactor));
+            
             
             if(snowTest)
             {

@@ -35,7 +35,8 @@
 #include "img/RSGISImageUtils.h"
 #include "img/RSGISCalcEditImage.h"
 
-//#include "rastergis/RSGISCalcClumpStats.h"
+#include "rastergis/RSGISCalcImageStatsAndPyramids.h"
+#include "rastergis/RSGISPopRATWithStats.h"
 #include "rastergis/RSGISRasterAttUtils.h"
 
 namespace rsgis{ namespace cmds {
@@ -673,13 +674,12 @@ namespace rsgis{ namespace cmds {
     
     void executeLandsatTMCloudFMask(std::string inputTOAImage, std::string inputThermalImage, std::string inputSaturateImage, std::string outputImage, std::string pass1TmpOutImage, std::string cloudLandProbTmpOutImage, std::string gdalFormat, float scaleFactorIn) throw(RSGISCmdException)
     {
-        /*
         GDALAllRegister();
         try
         {
             rsgis::img::RSGISImageUtils imgUtils;
             rsgis::rastergis::RSGISRasterAttUtils ratUtils;
-            rsgis::rastergis::RSGISCalcClumpStats calcClumpStats;
+            rsgis::rastergis::RSGISPopRATWithStats calcClumpStats;
             
             GDALDataset **datasets = NULL;
             std::cout << "Opening: " << inputTOAImage << std::endl;
@@ -730,22 +730,19 @@ namespace rsgis{ namespace cmds {
             
             std::cout << "Adding colour table and histogram to image\n";
             rsgis::rastergis::RSGISPopulateWithImageStats popImageStats;
-            popImageStats.populateImageWithRasterGISStats(pass1DS, true, false);
-            
+            popImageStats.populateImageWithRasterGISStats(pass1DS, true, false, true, 1);
             
             std::cout << "Populating RAT with Thermal Stats\n";
             std::vector<rsgis::rastergis::RSGISBandAttPercentiles *> *bandPercentStats = new std::vector<rsgis::rastergis::RSGISBandAttPercentiles *>();
             rsgis::rastergis::RSGISBandAttPercentiles *tempUpperPercent = new rsgis::rastergis::RSGISBandAttPercentiles();
-            tempUpperPercent->band = 1;
             tempUpperPercent->fieldName = "UpperTempThres";
-            tempUpperPercent->percentile = 82;
+            tempUpperPercent->percentile = 82.5;
             bandPercentStats->push_back(tempUpperPercent);
             rsgis::rastergis::RSGISBandAttPercentiles *tempLowerPercent = new rsgis::rastergis::RSGISBandAttPercentiles();
-            tempLowerPercent->band = 1;
             tempLowerPercent->fieldName = "LowerTempThres";
-            tempLowerPercent->percentile = 17;
+            tempLowerPercent->percentile = 17.5;
             bandPercentStats->push_back(tempLowerPercent);
-            calcClumpStats.calcImageClumpPercentiles(pass1DS, thermDataset, bandPercentStats);
+            calcClumpStats.populateRATWithPercentileStats(pass1DS, thermDataset, 1, bandPercentStats, 1, 200);
             delete tempUpperPercent;
             delete tempLowerPercent;
             delete bandPercentStats;
@@ -777,11 +774,10 @@ namespace rsgis{ namespace cmds {
             
             bandPercentStats = new std::vector<rsgis::rastergis::RSGISBandAttPercentiles *>();
             rsgis::rastergis::RSGISBandAttPercentiles *landCloudProbPercent = new rsgis::rastergis::RSGISBandAttPercentiles();
-            landCloudProbPercent->band = 1;
             landCloudProbPercent->fieldName = "UpperCloudLandThres";
-            landCloudProbPercent->percentile = 82;
+            landCloudProbPercent->percentile = 82.5;
             bandPercentStats->push_back(landCloudProbPercent);
-            calcClumpStats.calcImageClumpPercentiles(pass1DS, pass2DS, bandPercentStats);
+            calcClumpStats.populateRATWithPercentileStats(pass1DS, pass2DS, 1, bandPercentStats, 1, 200);
             delete landCloudProbPercent;
             delete bandPercentStats;
 
@@ -824,7 +820,6 @@ namespace rsgis{ namespace cmds {
         {
             throw RSGISCmdException(e.what());
         }
-         */
     }
                 
 
