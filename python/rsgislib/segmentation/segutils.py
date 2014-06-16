@@ -154,21 +154,21 @@ Example::
     print("Eliminate Single Pixels.")
     kMeansFileZonesNoSgls = os.path.join(tmpath,basename+str("_kmeans_nosgl")+outFileExt)
     kMeansFileZonesNoSglsTmp = os.path.join(tmpath,basename+str("_kmeans_nosglTMP")+outFileExt)
-    rsgislib.segmentation.eliminateSinglePixels(segmentFile, kMeansFileZones, kMeansFileZonesNoSgls, kMeansFileZonesNoSglsTmp, gdalFormat, False, True)
+    rsgislib.segmentation.eliminateSinglePixels(segmentFile, kMeansFileZones, kMeansFileZonesNoSgls, kMeansFileZonesNoSglsTmp, gdalFormat, True, True)
     
     # Clump
     print("Perform clump.")
     initClumpsFile = os.path.join(tmpath,basename+str("_clumps")+outFileExt)
-    rsgislib.segmentation.clump(kMeansFileZonesNoSgls, initClumpsFile, gdalFormat, False, 0)
+    rsgislib.segmentation.clump(kMeansFileZonesNoSgls, initClumpsFile, gdalFormat, True, 0)
     
     # Elimininate small clumps
     print("Eliminate small pixels.")
     elimClumpsFile = os.path.join(tmpath,basename+str("_clumps_elim")+outFileExt)
-    rsgislib.segmentation.RMSmallClumpsStepwise(segmentFile, initClumpsFile, elimClumpsFile, gdalFormat, False, "", False, False, minPxls, distThres)
+    rsgislib.segmentation.RMSmallClumpsStepwise(segmentFile, initClumpsFile, elimClumpsFile, gdalFormat, False, "", False, True, minPxls, distThres)
     
     # Relabel clumps
     print("Relabel clumps.")
-    rsgislib.segmentation.relabelClumps(elimClumpsFile, outputClumps, gdalFormat, False)
+    rsgislib.segmentation.relabelClumps(elimClumpsFile, outputClumps, gdalFormat, True)
     
     # Populate with stats if required.
     if not noStats:
