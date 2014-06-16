@@ -40,7 +40,7 @@ namespace rsgis{namespace calib{
 	class RSGISApplyDarkObjSubtractOffsets : public rsgis::img::RSGISCalcImageValue
     {
     public:
-        RSGISApplyDarkObjSubtractOffsets(unsigned int numImageBands, bool nonNegative, float noDataVal = 0.0, bool useNoDataVal=false);
+        RSGISApplyDarkObjSubtractOffsets(unsigned int numImageBands, bool nonNegative, float noDataVal = 0.0, bool useNoDataVal = false, float darkObjReflVal = 0.0);
         void calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException);
         void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
         void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
@@ -57,6 +57,7 @@ namespace rsgis{namespace calib{
         bool nonNegative;
         float noDataVal;
         bool useNoDataVal;
+        float darkObjReflVal;
     };
     
     

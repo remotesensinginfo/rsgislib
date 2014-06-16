@@ -489,7 +489,7 @@ namespace rsgis{ namespace cmds {
         }
     }
                 
-    void executeApplySubtractOffsets(std::string inputImage, std::string outputImage, std::string offsetImage, bool nonNegative, std::string gdalFormat, rsgis::RSGISLibDataType rsgisOutDataType, float noDataVal, bool useNoDataVal) throw(RSGISCmdException)
+    void executeApplySubtractOffsets(std::string inputImage, std::string outputImage, std::string offsetImage, bool nonNegative, std::string gdalFormat, rsgis::RSGISLibDataType rsgisOutDataType, float noDataVal, bool useNoDataVal, float darkObjReflVal) throw(RSGISCmdException)
     {
         try
         {
@@ -520,7 +520,7 @@ namespace rsgis{ namespace cmds {
             
             std::cout << "Apply offsets to input image...\n";
             
-            rsgis::calib::RSGISApplyDarkObjSubtractOffsets *applyOffsets = new rsgis::calib::RSGISApplyDarkObjSubtractOffsets(numRasterBands, nonNegative, noDataVal, useNoDataVal);
+            rsgis::calib::RSGISApplyDarkObjSubtractOffsets *applyOffsets = new rsgis::calib::RSGISApplyDarkObjSubtractOffsets(numRasterBands, nonNegative, noDataVal, useNoDataVal, darkObjReflVal);
             
             rsgis::img::RSGISCalcImage *calcImage = new rsgis::img::RSGISCalcImage(applyOffsets, "", true);
             calcImage->calcImage(datasets, 2, outputImage, false, NULL, gdalFormat, RSGIS_to_GDAL_Type(rsgisOutDataType));

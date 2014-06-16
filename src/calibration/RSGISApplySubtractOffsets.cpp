@@ -26,12 +26,13 @@
 namespace rsgis{namespace calib{
     
     
-    RSGISApplyDarkObjSubtractOffsets::RSGISApplyDarkObjSubtractOffsets(unsigned int numImageBands, bool nonNegative, float noDataVal, bool useNoDataVal):rsgis::img::RSGISCalcImageValue(numImageBands)
+    RSGISApplyDarkObjSubtractOffsets::RSGISApplyDarkObjSubtractOffsets(unsigned int numImageBands, bool nonNegative, float noDataVal, bool useNoDataVal, float darkObjReflVal):rsgis::img::RSGISCalcImageValue(numImageBands)
     {
         this->numImageBands = numImageBands;
         this->nonNegative = nonNegative;
         this->noDataVal = noDataVal;
         this->useNoDataVal = useNoDataVal;
+        this->darkObjReflVal = darkObjReflVal;
     }
     
     void RSGISApplyDarkObjSubtractOffsets::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
@@ -56,7 +57,7 @@ namespace rsgis{namespace calib{
             }
             else
             {
-                output[i] = bandValues[i] - bandValues[i+this->numImageBands];
+                output[i] = (bandValues[i] - bandValues[i+this->numImageBands]) + this->darkObjReflVal;
             }
             
             if(nonNegative)

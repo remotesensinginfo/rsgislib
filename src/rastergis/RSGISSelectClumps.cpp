@@ -59,8 +59,8 @@ namespace rsgis{namespace rastergis{
             double tileWidth = imgWidth / ((double)cols);
             double tileHeight = imgHeight / ((double)rows);
             
-            std::cout << "Tile Width = " << tileWidth << std::endl;
-            std::cout << "Tile Height = " << tileHeight << std::endl;
+            std::cout << "Tile Width (metres) = " << tileWidth << std::endl;
+            std::cout << "Tile Height (metres) = " << tileHeight << std::endl;
             
             double *selectVal = new double[numTiles];
             unsigned int *selectIdx = new unsigned int[numTiles];
@@ -174,7 +174,6 @@ namespace rsgis{namespace rastergis{
             outIntColIdx.push_back(outSelectIdx);
             outStrColIdx.clear();
             ratCalc.calcRATValues(gdalRAT, inRealColIdx, inIntColIdx, inStrColIdx, outRealColIdx, outIntColIdx, outStrColIdx);
-            
             
             // Clean up memory.
             idx = 0;
