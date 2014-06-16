@@ -1511,7 +1511,7 @@ static PyMethodDef RasterGISMethods[] = {
 "   gdalformat = 'KEA'\n"
 "   datatype = rsgislib.TYPE_32FLOAT\n"
 "   field = 'RedAvg'\n"
-"   rastergis.ExportCol2GDALImage(clumps, outimage, gdalformat, datatype, field)"
+"   rastergis.exportCol2GDALImage(clumps, outimage, gdalformat, datatype, field)"
 "\n"},
 /*
    {"eucDistFromFeature", RasterGIS_EucDistFromFeature, METH_VARARGS,
