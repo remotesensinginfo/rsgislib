@@ -773,9 +773,9 @@ static PyObject *ImageCalibration_ApplySubtractOffsets(PyObject *self, PyObject 
 {
     const char *pszInputFile, *pszInputOffsetsFile, *pszOutputFile, *pszGDALFormat;
     int nDataType, useNoDataValInt, nonNegativeInt;
-    float noDataVal;
+    float noDataVal, darkObjReflVal;
 
-    if( !PyArg_ParseTuple(args, "ssssiiif:applySubtractOffsets", &pszInputFile, &pszInputOffsetsFile, &pszOutputFile, &pszGDALFormat, &nDataType, &nonNegativeInt, &useNoDataValInt, &noDataVal))
+    if( !PyArg_ParseTuple(args, "ssssiiiff:applySubtractOffsets", &pszInputFile, &pszInputOffsetsFile, &pszOutputFile, &pszGDALFormat, &nDataType, &nonNegativeInt, &useNoDataValInt, &noDataVal, &darkObjReflVal))
     {
         return NULL;
     }
@@ -783,7 +783,7 @@ static PyObject *ImageCalibration_ApplySubtractOffsets(PyObject *self, PyObject 
     try
     {
         rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
-        rsgis::cmds::executeApplySubtractOffsets(std::string(pszInputFile), std::string(pszOutputFile), std::string(pszInputOffsetsFile), (bool)nonNegativeInt, std::string(pszGDALFormat), type, noDataVal, (bool)useNoDataValInt);
+        rsgis::cmds::executeApplySubtractOffsets(std::string(pszInputFile), std::string(pszOutputFile), std::string(pszInputOffsetsFile), (bool)nonNegativeInt, std::string(pszGDALFormat), type, noDataVal, (bool)useNoDataValInt, darkObjReflVal);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -1142,7 +1142,7 @@ static PyMethodDef ImageCalibrationMethods[] = {
     "\n"},
     
 {"applySubtractOffsets", ImageCalibration_ApplySubtractOffsets, METH_VARARGS,
-    "imagecalibration.applySubtractOffsets(inputFile, inputOffsetsFile, outputFile, gdalformat, gdaltype, nonNegative, useNoDataVal, noDataVal)\n"
+    "imagecalibration.applySubtractOffsets(inputFile, inputOffsetsFile, outputFile, gdalformat, gdaltype, nonNegative, useNoDataVal, noDataVal, darkObjReflVal)\n"
     "Converts at sensor radiance values to Top of Atmosphere Reflectance.\n"
     "Where:\n"
     "\n"
@@ -1154,6 +1154,7 @@ static PyMethodDef ImageCalibrationMethods[] = {
     "* nonNegative is a boolean specifying whether any negative values from the offset application should be removed (i.e., set to 1; 0 being no data).\n"
     "* useNoDataVal a boolean specifying whether a no data value is present within the input image.\n"
     "* noDataVal is a float specifying the no data value for the input image.\n"
+    "* darkObjReflVal is a float specifying the minimum value within the reflectance value used for the dark targets used for the subtraction"
     "\n"},
 
 {"saturatedPixelsMask", ImageCalibration_saturatedPixelsMask, METH_VARARGS,
