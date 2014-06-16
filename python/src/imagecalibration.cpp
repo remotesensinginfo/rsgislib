@@ -1143,7 +1143,8 @@ static PyMethodDef ImageCalibrationMethods[] = {
     
 {"applySubtractOffsets", ImageCalibration_ApplySubtractOffsets, METH_VARARGS,
     "imagecalibration.applySubtractOffsets(inputFile, inputOffsetsFile, outputFile, gdalformat, gdaltype, nonNegative, useNoDataVal, noDataVal, darkObjReflVal)\n"
-    "Converts at sensor radiance values to Top of Atmosphere Reflectance.\n"
+    "Applies offsets from dark objects.\n"
+    //TODO: Pete add in more details here.
     "Where:\n"
     "\n"
     "* inputFile is a string containing the name of the input image file\n"
@@ -1196,6 +1197,7 @@ static PyMethodDef ImageCalibrationMethods[] = {
     "imagecalibration.applyLandsatTMCloudFMask(inputTOAImage, inputThermalImage, inputSaturateImage, outputImage, pass1OutputTmpImage, cloudProbOutputTmpImage, gdalFormat, scaleFactorIn)\n"
     "Converts at sensor radiance values to Top of Atmosphere Reflectance.\n"
     "Where:\n"
+    "\n"
     "* inputTOAImage is a string containing the name of the input image TOA reflectance file\n"
     "* inputThermalImage is a string containing the name of the input image with at sensor temperature (in celsius)"
     "* inputSaturateImage is a string containing the name of the input image file mask for the saturated pixels per band (including thermal)\n"
