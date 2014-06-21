@@ -179,7 +179,7 @@ namespace rsgis{namespace calib{
             {
                 throw rsgis::img::RSGISImageCalcException("Band is not within input image bands.");
             }
-            output[i] = (this->radGainOff[i].calFactor * bandValues[i])/this->radGainOff[i].bandIntegrate;
+            output[i] = (this->radGainOff[i].absCalFact * bandValues[this->radGainOff[i].band-1])/this->radGainOff[i].effBandWidth;
         }
     }
     

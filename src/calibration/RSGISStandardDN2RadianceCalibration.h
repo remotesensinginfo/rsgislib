@@ -111,8 +111,8 @@ namespace rsgis{namespace calib{
     {
         std::string bandName;
         unsigned int band;
-        float calFactor;
-        float bandIntegrate;
+        double absCalFact;
+        double effBandWidth;
     };
 	
 	class RSGISLandsatRadianceCalibration : public rsgis::img::RSGISCalcImageValue

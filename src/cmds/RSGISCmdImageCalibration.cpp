@@ -821,7 +821,70 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
+    
                 
+                
+    void executeConvertWorldView2ToRadiance(std::string inputImage, std::string outputImage, std::string gdalFormat, std::vector<CmdsWorldView2RadianceGainsOffsets> wv2RadGainOffs)throw(RSGISCmdException)
+    {
+        GDALAllRegister();
+        
+        try
+        {
+            unsigned int numBands = wv2RadGainOffs.size();
+            std::cout << "Opening: " << inputImage << std::endl;
+            GDALDataset *inDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+            if(inDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw RSGISImageException(message.c_str());
+            }
+            
+            if(inDataset->GetRasterCount() != numBands)
+            {
+                std::cerr << "Number of input coefficients = " << numBands << std::endl;
+                std::cerr << "Number of input image bands = " << inDataset->GetRasterCount() << std::endl;
+                throw RSGISImageException("The number of band coefficients needs to equal the number input image bands.");
+            }
+            
+            std::string *outBandNames = new std::string[numBands];
+            
+            rsgis::calib::WorldView2RadianceGainsOffsets *wv2RadGainOffsInternal = new rsgis::calib::WorldView2RadianceGainsOffsets[numBands];
+            
+            unsigned int i = 0;
+            for(std::vector<rsgis::cmds::CmdsWorldView2RadianceGainsOffsets>::iterator iterBands = wv2RadGainOffs.begin(); iterBands != wv2RadGainOffs.end(); ++iterBands)
+            {
+                wv2RadGainOffsInternal[i].band = (*iterBands).band;
+                wv2RadGainOffsInternal[i].absCalFact = (*iterBands).absCalFact;
+                wv2RadGainOffsInternal[i].effBandWidth = (*iterBands).effBandWidth;
+                
+                outBandNames[i] = (*iterBands).bandName;
+                
+                //std::cout << "Band " << wv2RadGainOffsInternal[i].band << "(" << outBandNames[i] << "): Abs = " << wv2RadGainOffsInternal[i].absCalFact << " Bandwidth = " << wv2RadGainOffsInternal[i].effBandWidth << std::endl;
+                
+                ++i;
+            }
+            
+            rsgis::calib::RSGISWorldView2RadianceCalibration *radianceCalibration = new rsgis::calib::RSGISWorldView2RadianceCalibration(numBands, wv2RadGainOffsInternal);
+            rsgis::img::RSGISCalcImage *calcImage = new rsgis::img::RSGISCalcImage(radianceCalibration, "", true);
+            
+            calcImage->calcImage(&inDataset, 1, outputImage, true, outBandNames, gdalFormat);
+
+            GDALClose(inDataset);
+            delete[] wv2RadGainOffsInternal;
+            delete[] outBandNames;
+            
+            delete radianceCalibration;
+            delete calcImage;
+        }
+        catch(RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
 
     
 }}

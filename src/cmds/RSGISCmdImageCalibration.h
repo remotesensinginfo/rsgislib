@@ -94,6 +94,14 @@ namespace rsgis{ namespace cmds {
         std::vector<Cmds6SAOTLUT> aotLUT;
     };
     
+    struct CmdsWorldView2RadianceGainsOffsets
+    {
+        std::string bandName;
+        unsigned int band;
+        double absCalFact;
+        double effBandWidth;
+    };
+    
     /** Function to convert DN landsat scence to radiance */
     void executeConvertLandsat2Radiance(std::string outputImage, std::string gdalFormat, std::vector<CmdsLandsatRadianceGainsOffsets> landsatRadGainOffs)throw(RSGISCmdException);
     
@@ -124,6 +132,8 @@ namespace rsgis{ namespace cmds {
     /** Function to apply the FMask algorithm for classifying cloud for Landsat TM and ETM+ data */
     void executeLandsatTMCloudFMask(std::string inputTOAImage, std::string inputThermalImage, std::string inputSaturateImage, std::string outputImage, std::string pass1TmpOutImage, std::string cloudLandProbTmpOutImage, std::string gdalFormat, float scaleFactorIn) throw(RSGISCmdException);
     
+    /** Function to convert DN WorldView2 scence to radiance */
+    void executeConvertWorldView2ToRadiance(std::string inputImage, std::string outputImage, std::string gdalFormat, std::vector<CmdsWorldView2RadianceGainsOffsets> wv2RadGainOffs)throw(RSGISCmdException);
 
     
 }}
