@@ -47,7 +47,7 @@ Example::
    gdalformat = 'KEA'
    datatype = rsgislib.TYPE_32FLOAT
    fields = ['RedAvg','GreenAvg','BlueAvg']
-   rastergis.ExportCols2GDALImage(clumps, outimage, gdalformat, datatype, fields)
+   rastergis.exportCols2GDALImage(clumps, outimage, gdalformat, datatype, fields)
 
 """
     

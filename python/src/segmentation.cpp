@@ -453,9 +453,9 @@ static PyMethodDef SegmentationMethods[] = {
 "* stretchstatsavail is a bool\n"
 "* stretchstatsfile is a string containing the name of the stretch stats file\n"
 "* storemean is a bool\n"
-" * processinmemory is a bool specifying if processing should be carried out in memory (faster if sufficient RAM is available, set to False if unsure).\n"
-" * minclumpsize is an unsigned integer providing the minimum size for clumps.\n"
-" * specThreshold is a float providing the maximum (Euclidian distance) spectral separation for which to merge clumps. Set to a large value to ignore spectral separation and always merge.\n"
+"* processinmemory is a bool specifying if processing should be carried out in memory (faster if sufficient RAM is available, set to False if unsure).\n"
+"* minclumpsize is an unsigned integer providing the minimum size for clumps.\n"
+"* specThreshold is a float providing the maximum (Euclidian distance) spectral separation for which to merge clumps. Set to a large value to ignore spectral separation and always merge.\n"
 "\n"},
 
     {"relabelClumps", Segmentation_relabelClumps, METH_VARARGS,
