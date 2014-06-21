@@ -2144,43 +2144,43 @@ void RSGISExeImageCalibration::retrieveParameters(xercesc::DOMElement *argElemen
                     std::string sensorBand = std::string(charValue);
                     if(sensorBand == "WV2_Coast")
                     {
-                        this->worldview2RadGainOffs[i].calFactor = 0;
-                        this->worldview2RadGainOffs[i].bandIntegrate = 0.0473;
+                        this->worldview2RadGainOffs[i].absCalFact = 0;
+                        this->worldview2RadGainOffs[i].effBandWidth = 0.0473;
                     }
                     else if(sensorBand == "WV2_Blue")
                     {
-                        this->worldview2RadGainOffs[i].calFactor = 0;
-                        this->worldview2RadGainOffs[i].bandIntegrate = 0.0534;
+                        this->worldview2RadGainOffs[i].absCalFact = 0;
+                        this->worldview2RadGainOffs[i].effBandWidth = 0.0534;
                     }
                     else if(sensorBand == "WV2_Green")
                     {
-                        this->worldview2RadGainOffs[i].calFactor = 0;
-                        this->worldview2RadGainOffs[i].bandIntegrate = 0.0630;
+                        this->worldview2RadGainOffs[i].absCalFact = 0;
+                        this->worldview2RadGainOffs[i].effBandWidth = 0.0630;
                     }
                     else if(sensorBand == "WV2_Yellow")
                     {
-                        this->worldview2RadGainOffs[i].calFactor = 0;
-                        this->worldview2RadGainOffs[i].bandIntegrate = 0.0374;
+                        this->worldview2RadGainOffs[i].absCalFact = 0;
+                        this->worldview2RadGainOffs[i].effBandWidth = 0.0374;
                     }
                     else if(sensorBand == "WV2_Red")
                     {
-                        this->worldview2RadGainOffs[i].calFactor = 0;
-                        this->worldview2RadGainOffs[i].bandIntegrate = 0.0574;
+                        this->worldview2RadGainOffs[i].absCalFact = 0;
+                        this->worldview2RadGainOffs[i].effBandWidth = 0.0574;
                     }
                     else if(sensorBand == "WV2_Red_Edge")
                     {
-                        this->worldview2RadGainOffs[i].calFactor = 0;
-                        this->worldview2RadGainOffs[i].bandIntegrate = 0.393;
+                        this->worldview2RadGainOffs[i].absCalFact = 0;
+                        this->worldview2RadGainOffs[i].effBandWidth = 0.393;
                     }
                     else if(sensorBand == "WV2_NIR1")
                     {
-                        this->worldview2RadGainOffs[i].calFactor = 0;
-                        this->worldview2RadGainOffs[i].bandIntegrate = 0.989;
+                        this->worldview2RadGainOffs[i].absCalFact = 0;
+                        this->worldview2RadGainOffs[i].effBandWidth = 0.989;
                     }
                     else if(sensorBand == "WV2_NIR2")
                     {
-                        this->worldview2RadGainOffs[i].calFactor = 0;
-                        this->worldview2RadGainOffs[i].bandIntegrate = 0.996;
+                        this->worldview2RadGainOffs[i].absCalFact = 0;
+                        this->worldview2RadGainOffs[i].effBandWidth = 0.996;
                     }
                     else
                     {
@@ -2195,7 +2195,7 @@ void RSGISExeImageCalibration::retrieveParameters(xercesc::DOMElement *argElemen
                     if(bandElement->hasAttribute(calFactorXMLStr))
                     {
                         char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(calFactorXMLStr));
-                        this->worldview2RadGainOffs[i].calFactor = mathUtils.strtofloat(std::string(charValue));
+                        this->worldview2RadGainOffs[i].absCalFact = mathUtils.strtofloat(std::string(charValue));
                         xercesc::XMLString::release(&charValue);
                     }
                     else
@@ -2208,7 +2208,7 @@ void RSGISExeImageCalibration::retrieveParameters(xercesc::DOMElement *argElemen
                     if(bandElement->hasAttribute(bandIntegrateXMLStr))
                     {
                         char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(bandIntegrateXMLStr));
-                        this->worldview2RadGainOffs[i].bandIntegrate = mathUtils.strtofloat(std::string(charValue));
+                        this->worldview2RadGainOffs[i].effBandWidth = mathUtils.strtofloat(std::string(charValue));
                         xercesc::XMLString::release(&charValue);
                     }
                     else

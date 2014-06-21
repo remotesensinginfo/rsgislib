@@ -1008,6 +1008,100 @@ static PyObject *ImageCalibration_applyLandsatTMCloudFMask(PyObject *self, PyObj
     Py_RETURN_NONE;
 }
 
+static PyObject *ImageCalibration_worldview2ToRadiance(PyObject *self, PyObject *args)
+{
+    const char *pszInputFile, *pszOutputFile, *pszGDALFormat;
+    PyObject *pBandDefnObj;
+    if( !PyArg_ParseTuple(args, "sssO:worldview2ToRadiance", &pszInputFile, &pszOutputFile, &pszGDALFormat, &pBandDefnObj))
+    {
+        return NULL;
+    }
+    
+    if( !PySequence_Check(pBandDefnObj))
+    {
+        PyErr_SetString(GETSTATE(self)->error, "Last argument must be a sequence");
+        return NULL;
+    }
+    
+    Py_ssize_t nBandDefns = PySequence_Size(pBandDefnObj);
+    std::vector<rsgis::cmds::CmdsWorldView2RadianceGainsOffsets> wv2RadGainOffs;
+    wv2RadGainOffs.reserve(nBandDefns);
+    
+    for( Py_ssize_t n = 0; n < nBandDefns; n++ )
+    {
+        PyObject *o = PySequence_GetItem(pBandDefnObj, n);
+        
+        PyObject *pBandName = PyObject_GetAttrString(o, "bandName");
+        if( ( pBandName == NULL ) || ( pBandName == Py_None ) || !RSGISPY_CHECK_STRING(pBandName) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Could not find string attribute \'bandName\'" );
+            Py_XDECREF(pBandName);
+            Py_DECREF(o);
+            return NULL;
+        }
+        
+        PyObject *pBandIndex = PyObject_GetAttrString(o, "bandIndex");
+        if( ( pBandIndex == NULL ) || ( pBandIndex == Py_None ) || !RSGISPY_CHECK_INT(pBandIndex) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Could not find integer attribute \'bandIndex\'" );
+            Py_DECREF(pBandName);
+            Py_XDECREF(pBandIndex);
+            Py_DECREF(o);
+            return NULL;
+        }
+        
+        PyObject *pAbsCalFact = PyObject_GetAttrString(o, "absCalFact");
+        if( ( pAbsCalFact == NULL ) || ( pAbsCalFact == Py_None ) || !RSGISPY_CHECK_FLOAT(pAbsCalFact) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'absCalFact\'" );
+            Py_DECREF(pBandName);
+            Py_XDECREF(pBandIndex);
+            Py_XDECREF(pAbsCalFact);
+            Py_DECREF(o);
+            return NULL;
+        }
+        
+        PyObject *pEffBandWidth = PyObject_GetAttrString(o, "effBandWidth");
+        if( ( pEffBandWidth == NULL ) || ( pEffBandWidth == Py_None ) || !RSGISPY_CHECK_FLOAT(pEffBandWidth) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'effBandWidth\'" );
+            Py_DECREF(pBandName);
+            Py_XDECREF(pBandIndex);
+            Py_XDECREF(pAbsCalFact);
+            Py_XDECREF(pEffBandWidth);
+            Py_DECREF(o);
+            return NULL;
+        }
+        
+        
+        rsgis::cmds::CmdsWorldView2RadianceGainsOffsets radVals;
+        radVals.bandName = RSGISPY_STRING_EXTRACT(pBandName);
+        radVals.band = RSGISPY_INT_EXTRACT(pBandIndex);
+        radVals.absCalFact = RSGISPY_FLOAT_EXTRACT(pAbsCalFact);
+        radVals.effBandWidth = RSGISPY_FLOAT_EXTRACT(pEffBandWidth);
+        
+        wv2RadGainOffs.push_back(radVals);
+        
+        Py_DECREF(pBandName);
+        Py_XDECREF(pBandIndex);
+        Py_XDECREF(pAbsCalFact);
+        Py_XDECREF(pEffBandWidth);
+        Py_DECREF(o);
+    }
+    
+    try
+    {
+        rsgis::cmds::executeConvertWorldView2ToRadiance(std::string(pszInputFile), std::string(pszOutputFile), std::string(pszGDALFormat), wv2RadGainOffs);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 
 // Our list of functions in this module
 static PyMethodDef ImageCalibrationMethods[] = {
@@ -1204,6 +1298,23 @@ static PyMethodDef ImageCalibrationMethods[] = {
     "* cloudProbOutputTmpImage is a string containing the name of an output tempoary image file for the land cloud probability.\n"
     "* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
     "* scaleFactorIn is a float with the scale factor used to multiple the input image (reflectance and thermal) data.\n"
+    "\n"},
+    
+{"worldview2ToRadiance", ImageCalibration_worldview2ToRadiance, METH_VARARGS,
+    "imagecalibration.worldview2ToRadiance(inputImage, outputImage, gdalformat, bandDefnSeq)\n"
+    "Converts WorldView2 DN values to at sensor radiance.\n"
+    "Where:\n"
+    "\n"
+    "* inputImage is a string containing the name of the input file\n"
+    "* outputImage is a string containing the name of the output file\n"
+    "* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+    "* bandDefnSeq is a sequence of rsgislib.imagecalibration.CmdsWorldView2RadianceGainsOffsets objects that define the inputs\n"
+    "Requires:\n"
+    "\n"
+    "   * bandName - Name of image band in output file.\n"
+    "   * bandIndex - Index (starting from 1) of the band in the image file.\n"
+    "   * absCalFact - ABSCALFACTOR value from WorldView2 XML header.\n"
+    "   * effBandWidth - EFFECTIVEBANDWIDTH value from WorldView2 XML header.\n"
     "\n"},
 
     {NULL}        /* Sentinel */
