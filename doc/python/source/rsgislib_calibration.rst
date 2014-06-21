@@ -30,15 +30,17 @@ Surface Reflectance (DOS)
 .. autofunction:: rsgislib.imagecalibration.applySubtractOffsets
 
 
+Cloud Masking
+--------------
+
+.. autofunction:: rsgislib.imagecalibration.applyLandsatTMCloudFMask
+
+
 Utilities
 ---------
 
 .. autofunction:: rsgislib.imagecalibration.saturatedPixelsMask
-
-Cloud Masking
--------------
-
-.. autofunction:: rsgislib.imagecalibration.applyLandsatTMCloudFMask
+.. autofunction:: rsgislib.imagecalibration.applySubtractOffsets
 
 * :ref:`genindex`
 * :ref:`modindex`
