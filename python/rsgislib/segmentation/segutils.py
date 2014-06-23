@@ -54,7 +54,7 @@ import collections
 import fnmatch
 import osgeo.gdal as gdal
 
-def runShepherdSegmentation(inputImg, outputClumps, outputMeanImg=None, tmpath='.', gdalFormat='KEA', noStats=False, noStretch=False, noDelete=False, numClusters=60, minPxls=100, distThres=100, bands=None, sampling=100, kmMaxIter=200): 
+def runShepherdSegmentation(inputImg, outputClumps, outputMeanImg=None, tmpath='.', gdalFormat='KEA', noStats=False, noStretch=False, noDelete=False, numClusters=60, minPxls=100, distThres=100, bands=None, sampling=100, kmMaxIter=200, processInMem=False): 
     """
 Utility function to call the segmentation algorithm of Shepherd et al. (2014).
 
@@ -74,6 +74,7 @@ Where:
 * bands is an array providing a subset of image bands to use (default is None to use all bands).
 * sampling specify the subsampling of the image for the data used within the KMeans (default = 100; 1 == no subsampling).
 * kmMaxIter maximum iterations for KMeans.
+* processInMem where functions allow it perform processing in memory rather than on disk.
 
 Example::
 
@@ -154,21 +155,21 @@ Example::
     print("Eliminate Single Pixels.")
     kMeansFileZonesNoSgls = os.path.join(tmpath,basename+str("_kmeans_nosgl")+outFileExt)
     kMeansFileZonesNoSglsTmp = os.path.join(tmpath,basename+str("_kmeans_nosglTMP")+outFileExt)
-    rsgislib.segmentation.eliminateSinglePixels(segmentFile, kMeansFileZones, kMeansFileZonesNoSgls, kMeansFileZonesNoSglsTmp, gdalFormat, False, True)
+    rsgislib.segmentation.eliminateSinglePixels(segmentFile, kMeansFileZones, kMeansFileZonesNoSgls, kMeansFileZonesNoSglsTmp, gdalFormat, processInMem, True)
     
     # Clump
     print("Perform clump.")
     initClumpsFile = os.path.join(tmpath,basename+str("_clumps")+outFileExt)
-    rsgislib.segmentation.clump(kMeansFileZonesNoSgls, initClumpsFile, gdalFormat, False, 0)
+    rsgislib.segmentation.clump(kMeansFileZonesNoSgls, initClumpsFile, gdalFormat, processInMem, 0)
     
     # Elimininate small clumps
     print("Eliminate small pixels.")
     elimClumpsFile = os.path.join(tmpath,basename+str("_clumps_elim")+outFileExt)
-    rsgislib.segmentation.RMSmallClumpsStepwise(segmentFile, initClumpsFile, elimClumpsFile, gdalFormat, False, "", False, False, minPxls, distThres)
+    rsgislib.segmentation.RMSmallClumpsStepwise(segmentFile, initClumpsFile, elimClumpsFile, gdalFormat, False, "", False, processInMem, minPxls, distThres)
     
     # Relabel clumps
     print("Relabel clumps.")
-    rsgislib.segmentation.relabelClumps(elimClumpsFile, outputClumps, gdalFormat, False)
+    rsgislib.segmentation.relabelClumps(elimClumpsFile, outputClumps, gdalFormat, processInMem)
     
     # Populate with stats if required.
     if not noStats:
@@ -197,7 +198,7 @@ Example::
             rsgisUtils.deleteDIR(tmpath)
             
             
-def runShepherdSegmentationTestNumClumps(inputImg, outputClumpsBase, outStatsFile, outputMeanImgBase=None, tmpath='.', gdalFormat='KEA', noStats=False, noStretch=False, noDelete=False, numClustersStart=10, numClustersStep=10, numOfClustersSteps=10, minPxls=10, distThres=1000000, bands=None, sampling=100, kmMaxIter=200, minNormV=None, maxNormV=None, minNormMI=None, maxNormMI=None): 
+def runShepherdSegmentationTestNumClumps(inputImg, outputClumpsBase, outStatsFile, outputMeanImgBase=None, tmpath='.', gdalFormat='KEA', noStats=False, noStretch=False, noDelete=False, numClustersStart=10, numClustersStep=10, numOfClustersSteps=10, minPxls=10, distThres=1000000, bands=None, sampling=100, kmMaxIter=200, processInMem=False, minNormV=None, maxNormV=None, minNormMI=None, maxNormMI=None): 
     """
 Utility function to call the segmentation algorithm of Shepherd et al. (2014) and to test are range of 'k' within the kMeans.
 
@@ -220,6 +221,7 @@ Where:
 * bands is an array providing a subset of image bands to use (default is None to use all bands)
 * sampling specify the subsampling of the image for the data used within the KMeans (1 == no subsampling; default is 100)
 * kmMaxIter maximum iterations for KMeans.
+* processInMem where functions allow it perform processing in memory rather than on disk.
 * minNormV is a floating point =None
 * maxNormV=None
 * minNormMI=None
@@ -262,7 +264,7 @@ Example::
         outputClumps = outputClumpsBase + "_c" + str(numClusters) + ".kea"
         outputMeanImg = outputMeanImgBase + "_c" + str(numClusters) + ".kea"
         
-        runShepherdSegmentation(inputImg, outputClumps, outputMeanImg=outputMeanImg, tmpath=tmpath, gdalFormat=gdalFormat, noStats=noStats, noStretch=noStretch, noDelete=noDelete, numClusters=numClusters, minPxls=minPxls, distThres=distThres, bands=bands, sampling=sampling, kmMaxIter=kmMaxIter)
+        runShepherdSegmentation(inputImg, outputClumps, outputMeanImg=outputMeanImg, tmpath=tmpath, gdalFormat=gdalFormat, noStats=noStats, noStretch=noStretch, noDelete=noDelete, numClusters=numClusters, minPxls=minPxls, distThres=distThres, bands=bands, sampling=sampling, kmMaxIter=kmMaxIter, processInMem=processInMem)
         
         segScores = rsgislib.rastergis.calcGlobalSegmentationScore(outputClumps, inputImg, colsPrefix, calcNeighbours, minNormV, maxNormV, minNormMI, maxNormMI)
         
