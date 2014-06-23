@@ -102,6 +102,12 @@ if __name__ == '__main__':
     parser.add_argument("--nodelete", action='store_true', default=False, 
                         help='''Specifies that the temporary images created during processing
                         should not be deleted once processing has been completed.''')
+						
+    # Define the argument for specifying whether processing should be in memory or on disk.
+    parser.add_argument("--inmem", action='store_true', default=False, 
+                        help='''Specifies that processing should be undertaken in memory
+						rather than on disk, this provides some performance improvements
+						but also limits the size of the images which can be processed.''')
     
     # Call the parser to parse the arguments.
     args = parser.parse_args()
@@ -112,4 +118,4 @@ if __name__ == '__main__':
     print('Copyright (C) @RSGISLIB_COPYRIGHT_YEAR@ Peter Bunting and Daniel Clewley')
     print('For support please email @RSGISLIB_PACKAGE_BUGREPORT@')
     
-    rsgislib.segmentation.segutils.runShepherdSegmentation(args.input, args.output, args.outmeanimg, args.tmpath, args.format, args.nostats, args.nostretch, args.nodelete, args.numclusters, args.minpxls, args.distthres, args.band, args.sampling, args.maxiter)
+    rsgislib.segmentation.segutils.runShepherdSegmentation(args.input, args.output, args.outmeanimg, args.tmpath, args.format, args.nostats, args.nostretch, args.nodelete, args.numclusters, args.minpxls, args.distthres, args.band, args.sampling, args.maxiter, args.inmem)
