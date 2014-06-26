@@ -1118,6 +1118,8 @@ set(LIB_VEC_UTILS_CPP
 	${RSGIS_SRC_VEC_DIR}/RSGISVectorSQLClassification.h 
     ${RSGIS_SRC_VEC_DIR}/RSGISVectorUtils.cpp 
 	${RSGIS_SRC_VEC_DIR}/RSGISVectorUtils.h
+	${RSGIS_SRC_VEC_DIR}/RSGISPopulateFeatsElev.cpp
+	${RSGIS_SRC_VEC_DIR}/RSGISPopulateFeatsElev.h
 )
 
 
@@ -1193,6 +1195,7 @@ set(LIB_VEC_H
 	${RSGIS_SRC_VEC_DIR}/RSGISAttCountPolyIntersect.h
 	${RSGIS_SRC_VEC_DIR}/RSGISGenerateConvexHullGroups.h
 	${RSGIS_SRC_VEC_DIR}/RSGISZonalImage2HDF.h
+	${RSGIS_SRC_VEC_DIR}/RSGISPopulateFeatsElev.h
 	)
 	
 	

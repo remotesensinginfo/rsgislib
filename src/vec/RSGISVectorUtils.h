@@ -84,6 +84,7 @@ namespace rsgis{namespace vec{
 			OGRPolygon* moveOGRPolygon(OGRPolygon *poly, double shiftX, double shiftY, double shiftZ) throw(RSGISVectorException);
 			std::vector<std::string>* findUniqueVals(OGRLayer *layer, std::string attribute) throw(RSGISVectorException);
 		};
+
     
 }}
 

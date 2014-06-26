@@ -53,6 +53,8 @@ namespace rsgis{namespace vec{
 		protected:
 			void copyFeatureDefn(OGRLayer *outputSHPLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
 			void copyFeatureData(OGRFeature *inFeature, OGRFeature *outFeature, OGRFeatureDefn *inFeatureDefn, OGRFeatureDefn *outFeatureDefn);
+            void printGeometry(OGRGeometry *geometry);
+            void printRing(OGRLinearRing *inGeomRing);
 			RSGISProcessOGRFeature *processFeatures;
 		};
 }}

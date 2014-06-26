@@ -180,7 +180,7 @@ static PyObject *VectorUtils_PolygonsInPolygon(PyObject *self, PyObject *args)
 
     try
     {
-        rsgis::cmds::excecutePolygonsInPolygon(pszInputVector, pszInputCoverVector, pszOutputDIR, pszAttributeName, force);
+        rsgis::cmds::executePolygonsInPolygon(pszInputVector, pszInputCoverVector, pszOutputDIR, pszAttributeName, force);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -188,6 +188,27 @@ static PyObject *VectorUtils_PolygonsInPolygon(PyObject *self, PyObject *args)
         return NULL;
     }
 
+    Py_RETURN_NONE;
+}
+
+static PyObject *VectorUtils_PopulateGeomZField(PyObject *self, PyObject *args)
+{
+    const char *pszInputVector, *pszInputImage, *pszOutputVector;
+    int force = false;
+    unsigned int imgBand;
+    if( !PyArg_ParseTuple(args, "ssIs|i:populateGeomZField", &pszInputVector, &pszInputImage, &imgBand, &pszOutputVector, &force))
+        return NULL;
+    
+    try
+    {
+        rsgis::cmds::executePopulateGeomZField(pszInputVector, pszInputImage, imgBand, pszOutputVector, force);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
     Py_RETURN_NONE;
 }
 
@@ -275,7 +296,8 @@ static PyMethodDef VectorUtilsMethods[] = {
 
     {"calcarea", VectorUtils_CalcArea, METH_VARARGS, 
 "vectorutils.calcarea(inputvector, outputvector, force)\n"
-"A command to add the area of each polygon to the attribute table, area in the same units as the input dataset (likely m^2 or degrees^2).\n\n"
+"A command to add the area of each polygon to the attribute table, area in the same units \n"
+"as the input dataset (likely m^2 or degrees^2).\n\n"
 "Where:\n"
 "\n"
 "* inputvector is a string containing the name of the input vector\n"
@@ -291,7 +313,8 @@ static PyMethodDef VectorUtilsMethods[] = {
 
     {"polygonsInPolygon", VectorUtils_PolygonsInPolygon, METH_VARARGS, 
 "vectorutils.polygonsInPolygon(inputvector, inputcovervector, outputDIR, attributeName, force)\n"
-"A command to create a new polygon containing only polygons within      cover vector. Loops through attributes and creates a new shapefile for each polygon in the cover vector.\n\n"
+"A command to create a new polygon containing only polygons within cover vector. \n"
+"Loops through attributes and creates a new shapefile for each polygon in the cover vector.\n\n"
 "Where:\n"
 "\n"
 "* inputvector is a string containing the name of the input vector\n"
@@ -307,6 +330,30 @@ static PyMethodDef VectorUtilsMethods[] = {
 "   attribute = 'PSU'\n"
 "   vectorutils.polygonsInPolygon(inputVector, coverVector, outDIR, attribute, True)\n"
 "\n"},
+    
+{"populateGeomZField", VectorUtils_PopulateGeomZField, METH_VARARGS,
+    "vectorutils.populateGeomZField(InputVector, InputImage, imgBand, OutputVector, force)\n"
+    "A command to populate the z field within the vector file making it a 3D vector rather \n"
+    "than just a 2d file.\n\n"
+    "Where:\n"
+    "\n"
+    "* InputVector is a string containing the name of the input vector\n"
+    "* InputImage is a string containing the name of the image (DEM) image\n"
+    "* imgBand is an unsigned int specifying the image band in the image file to be used (note image bands indexes start at 1)\n"
+    "* OutputVector is a string containing the name of the output vector file\n"
+    "* force is a bool, specifying whether to force removal of the output vector if it exists\n"
+    "Example::\n"
+    "\n"
+    "   import rsgislib.vectorutils\n"
+    "\n"
+    "    inputVector = './Polys2D.shp'\n"
+    "    inputImage = './SRTM_90m.kea'\n"
+    "    imgBand = 1\n"
+    "    outputVector = './Polys3D.shp'\n"
+    "    force = True\n"
+    "\n"
+    "    rsgislib.vectorutils.populateGeomZField(inputVector, inputImage, imgBand, outputVector, force)\n"
+    "\n"},
 
     {NULL}        /* Sentinel */
 };

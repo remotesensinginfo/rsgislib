@@ -1,11 +1,11 @@
 /*
- *  RSGISGetOGRGeometries.h
+ *  RSGISPopulateFeatsElev.h
  *  RSGIS_LIB
  *
- *  Created by Pete Bunting on 03/08/2011.
- *  Copyright 2011 RSGISLib. All rights reserved.
+ *  Created by Pete Bunting on 26/06/2014.
+ *  Copyright 2014 RSGISLib. All rights reserved.
  *  This file is part of RSGISLib.
- * 
+ *
  *  RSGISLib is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -21,14 +21,19 @@
  *
  */
 
-#ifndef RSGISGetOGRGeometries_H
-#define RSGISGetOGRGeometries_H
+#ifndef RSGISPopulateFeatsElev_H
+#define RSGISPopulateFeatsElev_H
 
 #include <iostream>
 #include <string>
 #include <list>
 
+#include <boost/algorithm/string/replace.hpp>
+
 #include "ogrsf_frmts.h"
+#include "ogr_geometry.h"
+
+#include "gdal_priv.h"
 
 #include "common/RSGISVectorException.h"
 
@@ -36,30 +41,30 @@
 #include "vec/RSGISProcessOGRFeature.h"
 #include "vec/RSGISVectorUtils.h"
 
+#include "math/RSGISMathsUtils.h"
+
+#include "geos/geom/Envelope.h"
+
 namespace rsgis{namespace vec{
 	
-	class RSGISGetOGRGeometries : public RSGISProcessOGRFeature
+	class RSGISPopulateFeatsElev : public RSGISProcessOGRFeature
 	{
 	public:
-		RSGISGetOGRGeometries(std::vector<OGRGeometry*> *geometries);
-		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-		virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-		virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
-		virtual ~RSGISGetOGRGeometries();
-	protected:
-        std::vector<OGRGeometry*> *geometries;
-	};
-    
-    
-    class RSGISPrintGeometryToConsole : public RSGISProcessOGRFeature
-	{
-	public:
-		RSGISPrintGeometryToConsole();
+		RSGISPopulateFeatsElev(GDALDataset *image, unsigned int band)throw(RSGISVectorException);
 		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
 		virtual void processFeature(OGRFeature *inFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
 		virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
-        void printRing(OGRLinearRing *inGeomRing) throw(RSGISVectorOutputException);
-		virtual ~RSGISPrintGeometryToConsole();
+		double* getPixelColumns(int xPxl, int yPxl);
+        OGRLinearRing* popZfield(OGRLinearRing *inGeomRing) throw(RSGISVectorOutputException);
+		virtual ~RSGISPopulateFeatsElev();
+	private:
+		GDALDataset *image;
+		GDALRasterBand **bands;
+		int numImgBands;
+		geos::geom::Envelope *imageExtent;
+		double imgRes;
+		double *pxlValues;
+        unsigned int band;
     };
 }}
 

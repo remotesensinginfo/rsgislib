@@ -45,7 +45,9 @@ namespace rsgis{ namespace cmds {
     /** Function to calculate polygon area */
     void executeCalcPolyArea(std::string inputVector, std::string outputVector, bool force) throw(RSGISCmdException);
     /** Split polygons in in vector by polygons in cover vector */
-    void excecutePolygonsInPolygon(std::string inputVector, std::string inputCoverVector, std::string output_DIR, std::string attributeName, bool force) throw(RSGISCmdException);
+    void executePolygonsInPolygon(std::string inputVector, std::string inputCoverVector, std::string output_DIR, std::string attributeName, bool force) throw(RSGISCmdException);
+    /** Populate the Z field on the vector geometries */
+    void executePopulateGeomZField(std::string inputVector, std::string inputImage, unsigned int imgBand, std::string outputVector, bool force) throw(RSGISCmdException);
     
 }}
 
