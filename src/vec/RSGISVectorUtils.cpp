@@ -100,6 +100,7 @@ namespace rsgis{namespace vec{
 		{
 			ring->getPoint(i, point);
 			geos::geom::Coordinate coord = geos::geom::Coordinate(point->getX(), point->getY(), point->getZ());
+            //std::cout << "pt: [" << point->getX() << ", " << point->getY() << ", " << point->getZ() << "]" << std::endl;
 			coords->push_back(coord);
 		}
 		

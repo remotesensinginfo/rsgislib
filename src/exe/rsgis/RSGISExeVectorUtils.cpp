@@ -7489,7 +7489,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 
             try
             {
-                rsgis::cmds::excecutePolygonsInPolygon(this->inputVector, this->inputCoverVector, this->output_DIR, this->attributeName, this->force);
+                rsgis::cmds::executePolygonsInPolygon(this->inputVector, this->inputCoverVector, this->output_DIR, this->attributeName, this->force);
             }
             catch(rsgis::RSGISException &e)
             {
