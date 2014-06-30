@@ -179,10 +179,14 @@ namespace rsgis{namespace vec{
             for(unsigned int i = 0; i < numPts; ++i)
             {
                 inGeomRing->getPoint(i, point);
-                if((point->getX() > imageExtent->getMinX()) &&
-                   (point->getX() < imageExtent->getMaxX()) &&
-                   (point->getY() > imageExtent->getMinY()) &&
-                   (point->getY() < imageExtent->getMaxY()))
+                
+                //std::cout << "POINT: [" << point->getX() << ", " << point->getY() << "]" << std::endl;
+                //std::cout << "IMAGE [XMIN, XMAX][YMIN, YMAX]: [" << imageExtent->getMinX() << ", " << imageExtent->getMaxX() << "][" << imageExtent->getMinY() << ", " << imageExtent->getMaxY() << "]" << std::endl;
+                
+                if((point->getX() >= imageExtent->getMinX()) &&
+                   (point->getX() <= imageExtent->getMaxX()) &&
+                   (point->getY() >= imageExtent->getMinY()) &&
+                   (point->getY() <= imageExtent->getMaxY()))
                 {
                     double xDiff = point->getX() - imageExtent->getMinX();
                     double yDiff = imageExtent->getMaxY() - point->getY();
