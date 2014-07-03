@@ -2220,6 +2220,7 @@ namespace rsgis{ namespace cmds {
                 
     float executeImageBandModeEnv(std::string inputImage, float binWidth, unsigned int imgBand, bool noDataValueSpecified, float noDataVal, double latMin, double latMax, double longMin, double longMax)throw(RSGISCmdException)
     {
+        std::cout.precision(12);
         float outputModeVal = 0.0;
         try
         {
@@ -2285,12 +2286,12 @@ namespace rsgis{ namespace cmds {
                 {
                     throw rsgis::RSGISException("Coordinate System Transformation failed (Max).");
                 }
-                std::cout.precision(12);
+                /*
                 std::cout << "Min X: " << xMinLongCon << std::endl;
                 std::cout << "Max X: " << xMaxLongCon << std::endl;
                 std::cout << "Min Y: " << yMinLatCon << std::endl;
                 std::cout << "Max Y: " << yMaxLatCon << std::endl;
-                
+                */
                 if(xMinLongCon > xMaxLongCon)
                 {
                     minX = xMaxLongCon;
@@ -2319,72 +2320,116 @@ namespace rsgis{ namespace cmds {
             std::cout << "Min Y: " << minY << std::endl;
             std::cout << "Max Y: " << maxY << std::endl;
             */
-            rsgis::img::ImageStats **imgStats = new rsgis::img::ImageStats*[numImageBands];
-            for(unsigned int i = 0; i < numImageBands; ++i)
+            double xRange = maxX - minX;
+            double yRange = maxY - minY;
+            
+            double *trans = new double[6];
+            dataset->GetGeoTransform(trans);
+            
+            double xPixRes = trans[1];
+            double yPixRes = trans[5];
+            if(yPixRes < 0)
             {
-                imgStats[i] = new rsgis::img::ImageStats();
-                imgStats[i]->min = 0;
-                imgStats[i]->max = 0;
-                imgStats[i]->mean = 0;
-                imgStats[i]->sum = 0;
-                imgStats[i]->stddev = 0;
+                yPixRes = yPixRes * (-1);
             }
+            delete[] trans;
             
-            rsgis::img::RSGISImageStatistics calcImgStats;
-            calcImgStats.calcImageStatistics(&dataset, 1, imgStats, numImageBands, true, noDataValueSpecified, noDataVal, false, minX, maxX, minY, maxY);
-            
-            //std::cout << "imgStats[imgBand-1]->max = " << imgStats[imgBand-1]->max << std::endl;
-            //std::cout << "imgStats[imgBand-1]->min = " << imgStats[imgBand-1]->min << std::endl;
-            
-            float imgRange = imgStats[imgBand-1]->max - imgStats[imgBand-1]->min;
-            unsigned int numBins = ceil(imgRange / binWidth) + 1;
-            unsigned int *binCounts = new unsigned int[numBins];
-            float *binRanges = new float[numBins+1];
-            float minVal = (imgStats[imgBand-1]->min) - 0.5;
-            /*
-            std::cout << "imgRange = " << imgRange << std::endl;
-            std::cout << "binWidth = " << binWidth << std::endl;
-            std::cout << "ceil(imgRange / binWidth) = " << ceil(imgRange / binWidth) << std::endl;
-            std::cout << "numBins = " << numBins << std::endl;
-            std::cout << "minVal = " << minVal << std::endl;
-            */
-            
-            for(unsigned int i = 0; i < numBins; ++i)
+            if((xPixRes > xRange) & (yPixRes > yRange))
             {
-                binCounts[i] = 0;
-                binRanges[i] = minVal + (binWidth * i);
-                //std::cout << "binRanges[" << i << "] = " << binRanges[i] << std::endl;
+                //std::cout << "Image is area less than pixel area\n";
+                double xCentre = minX + (xRange/2);
+                double yCentre = minY + (yRange/2);
+                
+                //std::cout << "Point: [" << xCentre << ", " << yCentre << "]\n";
+                
+                rsgis::img::RSGISImageUtils imageUtils;
+                outputModeVal = imageUtils.getPixelValue(dataset, imgBand, xCentre, yCentre);
             }
-            binRanges[numBins] = minVal + (binWidth * numBins);
-            //std::cout << "binRanges[" << numBins << "] = " << binRanges[numBins] << std::endl;
-            
-            calcImgStats.calcImageHistogram(&dataset, 1, imgBand, numBins, binRanges, binCounts, noDataValueSpecified, noDataVal, minX, maxX, minY, maxY);
-            
-            bool first = true;
-            unsigned int maxBin = 0;
-            unsigned int maxBinCount = 0;
-            
-            for(unsigned int i = 0; i < numBins; ++i)
+            else
             {
-                if(binCounts[i] > 0.0)
+                rsgis::img::ImageStats **imgStats = new rsgis::img::ImageStats*[numImageBands];
+                for(unsigned int i = 0; i < numImageBands; ++i)
                 {
-                    if(first)
+                    imgStats[i] = new rsgis::img::ImageStats();
+                    imgStats[i]->min = 0;
+                    imgStats[i]->max = 0;
+                    imgStats[i]->mean = 0;
+                    imgStats[i]->sum = 0;
+                    imgStats[i]->stddev = 0;
+                }
+                
+                rsgis::img::RSGISImageStatistics calcImgStats;
+                calcImgStats.calcImageStatistics(&dataset, 1, imgStats, numImageBands, true, noDataValueSpecified, noDataVal, false, minX, maxX, minY, maxY);
+                
+                //std::cout << "imgStats[imgBand-1]->max = " << imgStats[imgBand-1]->max << std::endl;
+                //std::cout << "imgStats[imgBand-1]->min = " << imgStats[imgBand-1]->min << std::endl;
+                
+                float imgRange = imgStats[imgBand-1]->max - imgStats[imgBand-1]->min;
+                unsigned int numBins = ceil(imgRange / binWidth) + 1;
+                unsigned int *binCounts = new unsigned int[numBins];
+                float *binRanges = new float[numBins+1];
+                float minVal = (imgStats[imgBand-1]->min) - 0.5;
+                /*
+                std::cout << "imgRange = " << imgRange << std::endl;
+                std::cout << "binWidth = " << binWidth << std::endl;
+                std::cout << "ceil(imgRange / binWidth) = " << ceil(imgRange / binWidth) << std::endl;
+                std::cout << "numBins = " << numBins << std::endl;
+                std::cout << "minVal = " << minVal << std::endl;
+                */
+                
+                for(unsigned int i = 0; i < numBins; ++i)
+                {
+                    binCounts[i] = 0;
+                    binRanges[i] = minVal + (binWidth * i);
+                    //std::cout << "binRanges[" << i << "] = " << binRanges[i] << std::endl;
+                }
+                binRanges[numBins] = minVal + (binWidth * numBins);
+                //std::cout << "binRanges[" << numBins << "] = " << binRanges[numBins] << std::endl;
+                
+                calcImgStats.calcImageHistogram(&dataset, 1, imgBand, numBins, binRanges, binCounts, noDataValueSpecified, noDataVal, minX, maxX, minY, maxY);
+                
+                bool first = true;
+                unsigned int maxBin = 0;
+                unsigned int maxBinCount = 0;
+                
+                for(unsigned int i = 0; i < numBins; ++i)
+                {
+                    if(binCounts[i] > 0.0)
                     {
-                        maxBin = i;
-                        maxBinCount = binCounts[i];
-                        first = false;
-                    }
-                    else if(binCounts[i] > maxBinCount)
-                    {
-                        maxBin = i;
-                        maxBinCount = binCounts[i];
+                        if(first)
+                        {
+                            maxBin = i;
+                            maxBinCount = binCounts[i];
+                            first = false;
+                        }
+                        else if(binCounts[i] > maxBinCount)
+                        {
+                            maxBin = i;
+                            maxBinCount = binCounts[i];
+                        }
                     }
                 }
-            }
-            
-            if(first)
-            {
-                outputModeVal = std::numeric_limits<double>::signaling_NaN();
+                
+                if(first)
+                {
+                    outputModeVal = std::numeric_limits<double>::signaling_NaN();
+                    delete[] binCounts;
+                    delete[] binRanges;
+                    for(unsigned int i = 0; i < numImageBands; ++i)
+                    {
+                        delete imgStats[i];
+                    }
+                    delete[] imgStats;
+                    
+                    GDALClose(dataset);
+                    
+                    throw rsgis::RSGISException("A mode value could not be calculated as all the histogram bin values were 0.");
+                }
+                else
+                {
+                    outputModeVal = binRanges[maxBin] + ((binRanges[maxBin+1] - binRanges[maxBin])/2);
+                }
+                
                 delete[] binCounts;
                 delete[] binRanges;
                 for(unsigned int i = 0; i < numImageBands; ++i)
@@ -2392,23 +2437,7 @@ namespace rsgis{ namespace cmds {
                     delete imgStats[i];
                 }
                 delete[] imgStats;
-                
-                GDALClose(dataset);
-                
-                throw rsgis::RSGISException("A mode value could not be calculated as all the histogram bin values were 0.");
             }
-            else
-            {
-                outputModeVal = binRanges[maxBin] + ((binRanges[maxBin+1] - binRanges[maxBin])/2);
-            }
-            
-            delete[] binCounts;
-            delete[] binRanges;
-            for(unsigned int i = 0; i < numImageBands; ++i)
-            {
-                delete imgStats[i];
-            }
-            delete[] imgStats;
             
             GDALClose(dataset);
         }
