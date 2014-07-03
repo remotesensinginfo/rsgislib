@@ -4142,6 +4142,80 @@ namespace rsgis{namespace img{
 
     	return closeRes;
     }
+    
+    double RSGISImageUtils::getPixelValue(GDALDataset *image, unsigned int imgBand, double xLoc, double yLoc) throw(RSGISImageException)
+    {
+        double outVal = 0.0;
+        try
+        {
+            unsigned int numImgBands = image->GetRasterCount();
+            
+            if(imgBand > numImgBands)
+            {
+                throw RSGISImageException("The band specified is not within the image.");
+            }
+            unsigned int pxlIdx = imgBand - 1; // set so using array index rather than image.
+            
+            GDALRasterBand *gdalBand = image->GetRasterBand(imgBand);
+            
+            double geoTransform[6];
+            
+            double xMin = 0.0;
+            double yMax = 0.0;
+            
+            double xMax = 0.0;
+            double yMin = 0.0;
+            
+            double imgRes = 0.0;
+            
+            double *pxlValue = (double *) CPLMalloc(sizeof(double));
+            
+            if( image->GetGeoTransform( geoTransform ) == CE_None )
+            {
+                xMin = geoTransform[0];
+                yMax = geoTransform[3];
+                
+                xMax = geoTransform[0] + (image->GetRasterXSize() * geoTransform[1]);
+                yMin = geoTransform[3] + (image->GetRasterYSize() * geoTransform[5]);
+                
+                imgRes = geoTransform[1];
+            }
+            else
+            {
+                throw RSGISImageException("Could not read Geo Transform.");
+            }
+            
+            if((xLoc >= xMin) &&
+               (xLoc <= xMax) &&
+               (yLoc >= yMin) &&
+               (yLoc <= yMax))
+            {
+                double xDiff = xLoc - xMin;
+                double yDiff = yMax - yLoc;
+                
+                int xPxl = static_cast<int> (xDiff/imgRes);
+                int yPxl = static_cast<int> (yDiff/imgRes);
+                
+                gdalBand->RasterIO(GF_Read, xPxl, yPxl, 1, 1, pxlValue, 1, 1, GDT_Float64, 0, 0);
+                outVal = pxlValue[0];
+            }
+            else
+            {
+                throw RSGISImageException("Point not within image file provided\n");
+            }
+            delete pxlValue;
+        }
+        catch(RSGISImageException &e)
+        {
+            throw e;
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISImageException(e.what());
+        }
+        
+        return outVal;
+    }
 
 	RSGISImageUtils::~RSGISImageUtils()
 	{
