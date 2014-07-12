@@ -25,7 +25,7 @@ https://groups.google.com/forum/#!forum/rsgislib-support
 Binary Downloads
 ---------------------
 
-We make binary downloads available for Linux and OS X, build using Python 3, through conda. You can get conda through the Anaconda or Miniconda Python distribution. More details are available at from http://conda.pydata.org
+We make binary downloads available for Linux and OS X, built using Python 3, through conda. You can get conda through the Anaconda or Miniconda Python distribution. More details are available at from http://conda.pydata.org
 
 To install RSGISLib use:
 
