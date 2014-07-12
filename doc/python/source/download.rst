@@ -25,6 +25,21 @@ https://groups.google.com/forum/#!forum/rsgislib-support
 Binary Downloads
 ---------------------
 
-We don't currently make a binary download available, we have in the past made a Mac OSX binary available. If you require a binary then please get in touch.
+We make binary downloads available for Linux and OS X, build using Python 3, through conda. You can get conda through the Anaconda or Miniconda Python distribution. More details are available at from http://conda.pydata.org
+
+To install RSGISLib use:
+
+.. code-block:: bash
+
+    conda install -c https://conda.binstar.org/osgeo rsgislib
+
+You then need to set the following environmental variables:
+
+.. code-block:: bash
+
+    export GDAL_DRIVER_PATH=~/anaconda3/gdalplugins:$GDAL_DRIVER_PATH
+    export GDAL_DATA=~/anaconda3/share/gdal
+
+Changing if you have not installed anaconda to the standard location (or used miniconda which installs to ‘miniconda3′).
 
 

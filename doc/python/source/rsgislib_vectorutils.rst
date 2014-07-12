@@ -19,6 +19,7 @@ Attributes
 .. autofunction:: rsgislib.vectorutils.removeattributes
 .. autofunction:: rsgislib.vectorutils.findreplacetext
 .. autofunction:: rsgislib.vectorutils.calcarea
+.. autofunction:: rsgislib.vectorutils.populateGeomZField
 
 
 Management

@@ -29,6 +29,10 @@ Peter Bunting, Daniel Clewley, Richard M. Lucas and Sam Gillingham. 2014. The Re
 
 A pre-print is available to download from `here <http://rsgislib.org/publications/pbunting_etal_RSGISLib.pdf>`_.
 
+For details of an open source system for Object-Based Image Analysis, using RSGISLib in combination with other libraries see the following open access paper:
+
+Daniel Clewley, Peter Bunting, James Shepherd, Sam Gillingham, Neil Flood, John Dymond, Richard Lucas, John Armston and Mahta Moghaddam. 2014. A Python-Based Open Source System for Geographic Object-Based Image Analysis (GEOBIA) Utilizing Raster Attribute Tables. Remote Sensing. Volume 6, Pages 6111-6135. http://www.mdpi.com/2072-4292/6/7/6111
+
 For storing and processing laser scanning data the Sorted Pulse Data Library (SPDLib) is available to download from http://www.spdlib.org/
 
 **How do I cite RSGISLib?**
@@ -46,6 +50,7 @@ Bibtex::
     	Pages = {216--226},
     	Volume = {62},
     	Year = {2014}}
+
     
 **Is RSGISLib intended to be a substitute for commercial GIS / RS packages or other open source packages?**
 
@@ -77,7 +82,7 @@ For general suggestions submit a ticket on our `issues <https://bitbucket.org/pe
 
 There has been no direct funding to develop RSGISLib or obligations to release it. However, there has been funding which has supported us and allowed us work on it and we feel strongly about the role of open source software in reproducible research.
 
-Pete Bunting is employed by Aberystwyth University and has been since RSGISLib was started, with the exception of a year spent at Landcare Research (New Zealand), where a number of features including the segmentation and Raster GIS were added. Landcare Research continue to provide support for Pete. 
+Pete Bunting is employed by Aberystwyth University and has been since RSGISLib was started, with the exception of a year spent at Landcare Research (New Zealand), where a number of features including the segmentation and Raster GIS were added. Landcare Research continue to provide support for Pete. The Norwegian Space Centre funded development of `issues <https://rsgislib.org/arcsi>`_ ARCSI, which involved adding features to RSGISLib for atmospheric correction of satellite data.
 
 Dan Clewley's PhD (2008 - 2012) was funded by a NERC studentship. He is currently employed in `Mahta Moghaddam's <http://mixil.usc.edu/people/director/>`_ Microwave Systems Sensors and Imaging Lab (MiXIL) at the University of Southern California, primarily funded through a NASA-ESDR award.
 
