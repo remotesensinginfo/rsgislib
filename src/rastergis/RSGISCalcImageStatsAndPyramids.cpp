@@ -48,6 +48,11 @@ namespace rsgis{namespace rastergis{
             
             GDALRasterBand *band = clumpsDataset->GetRasterBand(ratBand);
             
+            if(ignoreZero)
+            {
+                band->SetNoDataValue(0.0);
+            }
+            
             double max = 0;
             double min = 0;
             
