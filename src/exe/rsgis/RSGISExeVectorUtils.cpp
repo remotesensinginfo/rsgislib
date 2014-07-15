@@ -7759,7 +7759,8 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 
 
 							RSGISGeometry geomUtils;
-							geomUtils.mergeTouchingPolygons(polygons);
+							//geomUtils.mergeTouchingPolygons(polygons);
+                            geomUtils.mergeTouchingPolygonsForce(polygons);
 
 							if(attributeDef)
 							{
