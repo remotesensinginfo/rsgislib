@@ -1553,7 +1553,7 @@ static PyMethodDef RasterGISMethods[] = {
 */
     {"export2Ascii",  (PyCFunction)RasterGIS_Export2Ascii, METH_VARARGS | METH_KEYWORDS,
 "rastergis.export2Ascii(clumps, outfile, fields,ratband=1)\n"
-"Exports selected columns from a GDAL RAT to ASCII file (comma separated).\n"
+"Exports selected columns from a GDAL RAT to ASCII file (comma separated). The first column is the object ID (FID).\n"
 "Where:\n"
 "\n"
 "* clumps is a string containing the name of the input RAT \n"

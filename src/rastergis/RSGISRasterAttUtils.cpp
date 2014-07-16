@@ -552,17 +552,16 @@ namespace rsgis{namespace rastergis{
             std::cout << "Copying columns to the ASCII file.\n";
             std::ofstream outFile;
             outFile.open(outputFile.c_str());
+            unsigned int outFID = 0;
             if(outFile.is_open())
             {
                 outFile.precision(12);
 
                 // Write column headings
+                outFile << "FID";
                 for(size_t j = 0; j < fields.size(); ++j)
                 {
-                    if(j != 0)
-                    {
-                        outFile << ",";
-                    }
+                    outFile << ",";
                     outFile << gdalAttIn->GetNameOfCol(colInIdxs[j]);
                 }
                 outFile << std::endl;
@@ -608,13 +607,13 @@ namespace rsgis{namespace rastergis{
                             std::cout << "." << feedbackCounter << "." << std::flush;
                             feedbackCounter = feedbackCounter + 10;
                         }
-
+                        
+                        outFile << outFID; // Write out FID
+                        
                         for(size_t j = 0; j < fields.size(); ++j)
                         {
-                            if(j != 0)
-                            {
-                                outFile << ",";
-                            }
+                            outFile << ",";
+                                
                             if(gdalAttIn->GetTypeOfCol(colInIdxs[j]) == GFT_Integer)
                             {
                                 outFile << blockDataInt[colBlockIndxs[j]][m];
@@ -633,6 +632,7 @@ namespace rsgis{namespace rastergis{
                             }
                         }
                         outFile << std::endl;
+                        ++outFID;
                     }
 
                 }
@@ -668,12 +668,13 @@ namespace rsgis{namespace rastergis{
                             feedbackCounter = feedbackCounter + 10;
                         }
 
+                        outFile << outFID; // Write out FID
+                        
                         for(size_t j = 0; j < fields.size(); ++j)
                         {
-                            if(j != 0)
-                            {
-                                outFile << ",";
-                            }
+
+                            outFile << ",";
+
                             if(gdalAttIn->GetTypeOfCol(colInIdxs[j]) == GFT_Integer)
                             {
                                 outFile << blockDataInt[colBlockIndxs[j]][m];
@@ -692,6 +693,7 @@ namespace rsgis{namespace rastergis{
                             }
                         }
                         outFile << std::endl;
+                        ++outFID;
                     }
                 }
                 if(feedback != 0){std::cout << ".Completed\n";}
