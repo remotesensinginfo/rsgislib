@@ -721,6 +721,36 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
+            
+            
+    void executeGenerateRegularGrid(std::string inputImage, std::string outputClumpImage, std::string imageFormat, unsigned int numXPxls, unsigned int numYPxls)throw(RSGISCmdException)
+    {
+        GDALAllRegister();
+        
+        try
+        {
+            GDALDataset *inputDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+            if(inputDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            rsgis::img::RSGISImageUtils imgUtils;
+            std::cout << "Creating Image Copy\n";
+            GDALDataset *clumpsDataset = imgUtils.createCopy(inputDataset, 1, outputClumpImage, imageFormat, GDT_UInt32);
+            GDALClose(inputDataset);
+            
+            std::cout << "Creating Grid\n";
+            imgUtils.createImageGrid(clumpsDataset, numXPxls, numYPxls);
+            
+            GDALClose(clumpsDataset);
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
     
 }}
 

@@ -399,6 +399,26 @@ static PyObject *Segmentation_meanImage(PyObject *self, PyObject *args)
 }
 
 
+static PyObject *Segmentation_GenerateRegularGrid(PyObject *self, PyObject *args)
+{
+    const char *pszInputImage, *pszOutputImage, *pszGDALFormat;
+    unsigned int numXPxls, numYPxls;
+    if( !PyArg_ParseTuple(args, "sssII:generateRegularGrid", &pszInputImage, &pszOutputImage, &pszGDALFormat, &numXPxls, &numYPxls ))
+        return NULL;
+    
+    try
+    {
+        rsgis::cmds::executeGenerateRegularGrid(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszGDALFormat), numXPxls, numYPxls);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 
 
 // Our list of functions in this module
@@ -519,16 +539,28 @@ static PyMethodDef SegmentationMethods[] = {
 "\n"},
     
     {"meanImage", Segmentation_meanImage, METH_VARARGS,
-        "segmentation.meanImage(inputImage, inputClumps, outputImage, gdalFormat, gdaltype)\n"
-        "A function to generate an image where with the mean value for each clump. Primarily for visualisation and evaluating segmentation.\n"
-        "where:\n"
-        "\n"
-        "* inputImage is a string containing the name of the input image file from which the mean is taken.\n"
-        "* inputClumps is a string containing the name of the input clumps file\n"
-        "* outputImage is a string containing the name of the output image.\n"
-        "* gdalFormat is a string defining the format of the output image.\n"
-        "* gdaltype is an containing one of the values from rsgislib.TYPE_*\n"
-        "\n"},
+"segmentation.meanImage(inputImage, inputClumps, outputImage, gdalFormat, gdaltype)\n"
+"A function to generate an image where with the mean value for each clump. Primarily for visualisation and evaluating segmentation.\n"
+"where:\n"
+"\n"
+"* inputImage is a string containing the name of the input image file from which the mean is taken.\n"
+"* inputClumps is a string containing the name of the input clumps file\n"
+"* outputImage is a string containing the name of the output image.\n"
+"* gdalFormat is a string defining the format of the output image.\n"
+"* gdaltype is an containing one of the values from rsgislib.TYPE_*\n"
+"\n"},
+
+{"generateRegularGrid", Segmentation_GenerateRegularGrid, METH_VARARGS,
+"segmentation.generateRegularGrid(inputImage, outputClumps, gdalFormat, numXPxls, numYPxls)\n"
+"A function to generate an image where with the mean value for each clump. Primarily for visualisation and evaluating segmentation.\n"
+"where:\n"
+"\n"
+"* inputImage is a string containing the name of the input image file specifying the dimensions of the output image.\n"
+"* outputClumps is a string containing the name and path of the output clumps image\n"
+"* gdalFormat is a string defining the format of the output image.\n"
+"* numXPxls is the size of the grid cells in the X axis in pixel units.\n"
+"* numYPxls is the size of the grid cells in the Y axis in pixel units.\n"
+"\n"},
 
     {NULL}        /* Sentinel */
 };
