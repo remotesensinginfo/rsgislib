@@ -4154,7 +4154,6 @@ namespace rsgis{namespace img{
             {
                 throw RSGISImageException("The band specified is not within the image.");
             }
-            unsigned int pxlIdx = imgBand - 1; // set so using array index rather than image.
             
             GDALRasterBand *gdalBand = image->GetRasterBand(imgBand);
             
@@ -4215,6 +4214,58 @@ namespace rsgis{namespace img{
         }
         
         return outVal;
+    }
+    
+    void RSGISImageUtils::createImageGrid(GDALDataset *inData, unsigned int numXPxls, unsigned int numYPxls) throw(RSGISImageException)
+    {
+        try
+        {
+            unsigned long width = inData->GetRasterXSize();
+            unsigned long height = inData->GetRasterYSize();
+            unsigned int numBands = inData->GetRasterCount();
+            if(numBands != 1)
+            {
+                throw RSGISImageException("Data must only have 1 image band.");
+            }
+            
+            GDALRasterBand *rasterBand = inData->GetRasterBand(1);
+            unsigned int *dataVals = new unsigned int[width];
+            
+            for(unsigned int i = 0; i < width; ++i)
+            {
+                dataVals[i] = 0;
+            }
+            
+            unsigned int rowStartVal = 1;
+            unsigned int curPxlVal = 1;
+            
+            for(unsigned long y = 0; y < height; ++y)
+            {
+                if((y % numYPxls) == 0)
+                {
+                    rowStartVal = curPxlVal + 1;
+                }
+                
+                curPxlVal = rowStartVal;
+                
+                for(unsigned long x = 0; x < width; ++x)
+                {
+                    if((x % numXPxls) == 0)
+                    {
+                        ++curPxlVal;
+                    }
+                    dataVals[x] = curPxlVal;
+                }
+                
+                rasterBand->RasterIO(GF_Write, 0, y, width, 1, dataVals, width, 1, GDT_Int32, 0, 0);
+            }
+            
+            delete[] dataVals;
+        }
+        catch(RSGISImageException &e)
+        {
+            throw e;
+        }
     }
 
 	RSGISImageUtils::~RSGISImageUtils()
