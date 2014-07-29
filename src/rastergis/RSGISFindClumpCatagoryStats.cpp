@@ -85,13 +85,20 @@ namespace rsgis{namespace rastergis{
             double minVal = 0;
             catsDS->GetRasterBand(ratBandCats)->ComputeStatistics(false, &minVal, &maxVal, NULL, NULL, RSGISRATStatsTextProgress, &nLastProgress);
             
-            size_t minCat = boost::lexical_cast<size_t>(minVal);
+            if(minVal < 0)
+            {
+                throw rsgis::RSGISAttributeTableException("Minimum class value is 0, values less than zero are invalid.");
+            }
+            
+            size_t minCat = 0;
             size_t maxCat = boost::lexical_cast<size_t>(maxVal);
             size_t numCatVals = (maxCat - minCat)+1;
             
+            /*
             std::cout << "minCat = " << minCat << std::endl;
             std::cout << "maxCat = " << maxCat << std::endl;
             std::cout << "numCatVals = " << numCatVals << std::endl;
+            */
             
             size_t *catsCount = new size_t[numCatVals];
             for(size_t i = 0; i < numCatVals; ++i)
@@ -148,16 +155,34 @@ namespace rsgis{namespace rastergis{
                 }
             }
             
-            unsigned int ratClumpsBand = ratBandClumps - 1;
-            unsigned int ratCatsBand = clumpsDS->GetRasterCount() + ratBandCats - 1;
+            unsigned int ratClumpsBandIdx = ratBandClumps - 1;
+            unsigned int ratCatsBandIdx = clumpsDS->GetRasterCount() + ratBandCats - 1;
             datasets[0] = clumpsDS;
             datasets[1] = catsDS;
-            RSGISCountNumPxlsInCatsPerClump *calcCatClumpCounts = new RSGISCountNumPxlsInCatsPerClump(catStats, cats, ratClumpsBand, ratCatsBand);
+            RSGISCountNumPxlsInCatsPerClump *calcCatClumpCounts = new RSGISCountNumPxlsInCatsPerClump(catStats, cats, ratClumpsBandIdx, ratCatsBandIdx);
             rsgis::img::RSGISCalcImage calcImageCatClumpCounts(calcCatClumpCounts);
             calcImageCatClumpCounts.calcImage(datasets, 2, 0);
             delete calcCatClumpCounts;
             delete[] datasets;
             
+            /*
+            for(size_t i = 0; i < numRows; ++i)
+            {
+                std::cout << i << ": ";
+                for(unsigned int j = 0; j < numCatVals; ++j)
+                {
+                    if(j == 0)
+                    {
+                        std::cout << catStats[i][j];
+                    }
+                    else
+                    {
+                        std::cout << ", " << catStats[i][j];
+                    }
+                }
+                std::cout << std::endl;
+            }
+            */
             
             std::cout << "Writing Majority Values to Output RAT\n";
             size_t numBlocks = floor((double)numRows/(double)RAT_BLOCK_LENGTH);
@@ -183,6 +208,7 @@ namespace rsgis{namespace rastergis{
             }
             size_t startRow = 0;
             size_t rowID = 0;
+            
             for(size_t i = 0; i < numBlocks; ++i)
             {
                 attTableClumps->ValuesIO(GF_Read, histoIdx, startRow, RAT_BLOCK_LENGTH, histDataBlock);
@@ -203,7 +229,8 @@ namespace rsgis{namespace rastergis{
                     {
                         if(histDataBlock[j] > 0)
                         {
-                            dataBlock[j] = ((double)catStats[rowID++][(*iterCats).second.localIdx]) / histDataBlock[j];
+                            //std::cout << "catStats[" << rowID << "][" << (*iterCats).second.localIdx << "] = " << catStats[rowID][(*iterCats).second.localIdx] << std::endl;
+                            dataBlock[j] = ((double)catStats[rowID][(*iterCats).second.localIdx]) / histDataBlock[j];
                             if(majBlockFirst[j])
                             {
                                 if(dataBlock[j] > 0)
@@ -231,6 +258,7 @@ namespace rsgis{namespace rastergis{
                         {
                             dataBlock[j] = 0.0;
                         }
+                        ++rowID;
                     }
                     attTableClumps->ValuesIO(GF_Write, (*iterCats).second.fieldIdx, startRow, RAT_BLOCK_LENGTH, dataBlock);
                 }
@@ -262,7 +290,8 @@ namespace rsgis{namespace rastergis{
                     {
                         if(histDataBlock[j] > 0)
                         {
-                            dataBlock[j] = ((double)catStats[rowID++][(*iterCats).second.localIdx]) / histDataBlock[j];
+                            //std::cout << "catStats[" << rowID << "][" << (*iterCats).second.localIdx << "] = " << catStats[rowID][(*iterCats).second.localIdx] << std::endl;
+                            dataBlock[j] = ((double)catStats[rowID][(*iterCats).second.localIdx]) / histDataBlock[j];
                             if(majBlockFirst[j])
                             {
                                 if(dataBlock[j] > 0)
@@ -290,6 +319,8 @@ namespace rsgis{namespace rastergis{
                         {
                             dataBlock[j] = 0.0;
                         }
+                        
+                        ++rowID;
                     }
                     attTableClumps->ValuesIO(GF_Write, (*iterCats).second.fieldIdx, startRow, rowsRemain, dataBlock);
                 }
@@ -299,7 +330,7 @@ namespace rsgis{namespace rastergis{
                     attTableClumps->ValuesIO(GF_Write, majClassNameColIdx, startRow, rowsRemain, majClassNamesBlock);
                 }
             }
-            
+
             delete[] dataBlock;
             delete[] histDataBlock;
             
@@ -390,6 +421,9 @@ namespace rsgis{namespace rastergis{
             size_t cat = boost::lexical_cast<size_t>(intBandValues[ratCatsBand]);
             size_t localIdx = 0;
             
+            //std::cout << "CAT = " << cat << std::endl;
+            //std::cout << "FID = " << fid << std::endl;
+            
             std::map<size_t,CategoryField>::iterator iterCats = cats->find(cat);
             if(iterCats == cats->end())
             {
@@ -397,9 +431,14 @@ namespace rsgis{namespace rastergis{
                 std::cout << "Cat: " << cat << std::endl;
                 throw rsgis::img::RSGISImageCalcException("Could not find the catergory.");
             }
+            
+            //std::cout << "Local Cat = " << (*iterCats).first << " Cat = " << (*iterCats).second.category << std::endl;
+            
             localIdx = (*iterCats).second.localIdx;
             
             ++this->catStats[fid][localIdx];
+            
+            //std::cout << "local Idx = " << localIdx << " = " << this->catStats[fid][localIdx] << std::endl;
         }
     }
     
