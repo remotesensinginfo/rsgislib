@@ -43,6 +43,7 @@
 #include "rastergis/RSGISFindChangeClumps.h"
 #include "rastergis/RSGISRATCalc.h"
 #include "rastergis/RSGISFindInfoBetweenLayers.h"
+#include "rastergis/RSGISClumpBorders.h"
 
 /*
 #include "rastergis/RSGISRasterAttUtils.h"
@@ -57,7 +58,7 @@
 #include "rastergis/RSGISMaxLikelihoodRATClassification.h"
 #include "rastergis/RSGISClassMask.h"
 
-#include "rastergis/RSGISClumpBorders.h"
+
 #include "rastergis/RSGISCalcClumpShapeParameters.h"
 #include "rastergis/RSGISDefineImageTiles.h"
 
@@ -878,14 +879,16 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-/*
-    void executeCalcBorderLength(std::string inputImage, bool ignoreZeroEdges, std::string outColsName)throw(RSGISCmdException) {
+
+    void executeCalcBorderLength(std::string inputImage, bool ignoreZeroEdges, std::string outColsName)throw(RSGISCmdException)
+    {
         GDALAllRegister();
         GDALDataset *inputDataset;
         try
         {
             inputDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_Update);
-            if(inputDataset == NULL) {
+            if(inputDataset == NULL)
+            {
                 std::string message = std::string("Could not open image ") + inputImage;
                 throw rsgis::RSGISImageException(message.c_str());
             }
@@ -894,16 +897,20 @@ namespace rsgis{ namespace cmds {
             clumpBorders.calcClumpBorderLength(inputDataset, !ignoreZeroEdges, outColsName);
 
             GDALClose(inputDataset);
-        } catch(rsgis::RSGISException &e) {
+        }
+        catch(rsgis::RSGISException &e)
+        {
             throw RSGISCmdException(e.what());
         }
 
     }
 
-    void executeCalcRelBorder(std::string inputImage, std::string outColsName, std::string classNameField, std::string className, bool ignoreZeroEdges)throw(RSGISCmdException) {
+    void executeCalcRelBorder(std::string inputImage, std::string outColsName, std::string classNameField, std::string className, bool ignoreZeroEdges)throw(RSGISCmdException)
+    {
         GDALAllRegister();
         GDALDataset *inputDataset;
-        try {
+        try
+        {
             inputDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_Update);
             if(inputDataset == NULL)
             {
@@ -915,11 +922,13 @@ namespace rsgis{ namespace cmds {
             clumpBorders.calcClumpRelBorderLen2Class(inputDataset, !ignoreZeroEdges, outColsName, classNameField, className);
 
             GDALClose(inputDataset);
-        } catch(rsgis::RSGISException &e) {
+        }
+        catch(rsgis::RSGISException &e)
+        {
             throw RSGISCmdException(e.what());
         }
     }
-
+/*
     void executeCalcShapeIndices(std::string inputImage, std::vector<RSGISShapeParamCmds> shapeIndexes)throw(RSGISCmdException) {
         GDALAllRegister();
         GDALDataset *inputDataset;
