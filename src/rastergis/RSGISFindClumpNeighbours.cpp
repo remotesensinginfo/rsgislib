@@ -267,11 +267,11 @@ namespace rsgis{namespace rastergis{
             kealib::KEAAttributeTable *keaAtt = keaImgIO->getAttributeTable(kealib::kea_att_file, ratBand);
             size_t numRows = keaAtt->getSize();
             
-            std::vector<std::list<size_t>* > *neighbours = new std::vector<std::list<size_t>* >();
+            std::vector<std::vector<size_t>* > *neighbours = new std::vector<std::vector<size_t>* >();
             neighbours->reserve(numRows);
             for(size_t i = 0; i < numRows; ++i)
             {
-                neighbours->push_back(new std::list<size_t>());
+                neighbours->push_back(new std::vector<size_t>());
             }
             
             
@@ -280,32 +280,27 @@ namespace rsgis{namespace rastergis{
             
             imgCalc.calcImageWindowData(&clumpImage, 1, 3);
             
-            std::cout << "Adding Field\n";
-            
-            keaAtt->addAttIntField("NumNeighbours", 0, "");
-            size_t numNeighboursIdx = keaAtt->getFieldIndex("NumNeighbours");
-            std::cout << "added field\n";
-            
-            size_t clump = 0;
-            kealib::KEAATTFeature *attFeat = NULL;
-            std::cout << "Starting loop...\n";
-            for(std::vector<std::list<size_t>* >::iterator iterClumps = neighbours->begin(); iterClumps != neighbours->end(); ++iterClumps)
+            //std::cout << "Adding Field\n";
+            if(!keaAtt->hasField("NumNeighbours"))
             {
-                std::cout << "Get Feature\n";
-                attFeat = keaAtt->getFeature(clump);
-                std::cout << "reserving neighbours space\n";
-                //attFeat->neighbours = new std::vector<size_t>();
-                attFeat->neighbours->reserve((*iterClumps)->size());
-                std::cout << "Set int field to number of neightbours = " << (*iterClumps)->size() << std::endl;
-                attFeat->intFields->at(numNeighboursIdx) = (*iterClumps)->size();
-                std::cout << "Clump " << clump << ":\t" << std::flush;
-                for(std::list<size_t>::iterator iterNeighs = (*iterClumps)->begin(); iterNeighs != (*iterClumps)->end(); ++iterNeighs)
-                {
-                    attFeat->neighbours->push_back((*iterNeighs));
-                    std::cout << " " << (*iterNeighs);
-                }
-                std::cout << std::endl;
-                ++clump;
+                keaAtt->addAttIntField("NumNeighbours", 0, "");
+            }
+            size_t numNeighboursIdx = keaAtt->getFieldIndex("NumNeighbours");
+            //std::cout << "Added field\n";
+            
+            keaAtt->setNeighbours(0, neighbours->size(), neighbours);
+            
+            int64_t *numNeighbours = new int64_t[neighbours->size()];
+            unsigned int i = 0;
+            for(std::vector<std::vector<size_t>* >::iterator iterClumps = neighbours->begin(); iterClumps != neighbours->end(); ++iterClumps)
+            {
+                numNeighbours[i++] = (*iterClumps)->size();
+            }
+            
+            keaAtt->setIntFields(0, neighbours->size(), numNeighboursIdx, numNeighbours);
+            
+            for(std::vector<std::vector<size_t>* >::iterator iterClumps = neighbours->begin(); iterClumps != neighbours->end(); ++iterClumps)
+            {
                 delete *iterClumps;
             }
             delete neighbours;
@@ -342,7 +337,7 @@ namespace rsgis{namespace rastergis{
     
     
     
-    RSGISFindNeighboursCalcImage::RSGISFindNeighboursCalcImage(size_t numRows, std::vector<std::list<size_t>* > *neighbours, unsigned int ratBand) : rsgis::img::RSGISCalcImageValue(0)
+    RSGISFindNeighboursCalcImage::RSGISFindNeighboursCalcImage(size_t numRows, std::vector<std::vector<size_t>* > *neighbours, unsigned int ratBand) : rsgis::img::RSGISCalcImageValue(0)
     {
         this->numRows = numRows;
         this->neighbours = neighbours;
@@ -412,7 +407,7 @@ namespace rsgis{namespace rastergis{
                     else
                     {
                         bool found = false;
-                        for(std::list<size_t>::iterator iterVal = neighbours->at(fid)->begin(); iterVal != neighbours->at(fid)->end(); ++iterVal)
+                        for(std::vector<size_t>::iterator iterVal = neighbours->at(fid)->begin(); iterVal != neighbours->at(fid)->end(); ++iterVal)
                         {
                             if((*iterVal) == fidLeft)
                             {
@@ -462,7 +457,7 @@ namespace rsgis{namespace rastergis{
                     else
                     {
                         bool found = false;
-                        for(std::list<size_t>::iterator iterVal = neighbours->at(fid)->begin(); iterVal != neighbours->at(fid)->end(); ++iterVal)
+                        for(std::vector<size_t>::iterator iterVal = neighbours->at(fid)->begin(); iterVal != neighbours->at(fid)->end(); ++iterVal)
                         {
                             if((*iterVal) == fidUp)
                             {
@@ -511,7 +506,7 @@ namespace rsgis{namespace rastergis{
                     else
                     {
                         bool found = false;
-                        for(std::list<size_t>::iterator iterVal = neighbours->at(fid)->begin(); iterVal != neighbours->at(fid)->end(); ++iterVal)
+                        for(std::vector<size_t>::iterator iterVal = neighbours->at(fid)->begin(); iterVal != neighbours->at(fid)->end(); ++iterVal)
                         {
                             if((*iterVal) == fidRight)
                             {
@@ -560,7 +555,7 @@ namespace rsgis{namespace rastergis{
                     else
                     {
                         bool found = false;
-                        for(std::list<size_t>::iterator iterVal = neighbours->at(fid)->begin(); iterVal != neighbours->at(fid)->end(); ++iterVal)
+                        for(std::vector<size_t>::iterator iterVal = neighbours->at(fid)->begin(); iterVal != neighbours->at(fid)->end(); ++iterVal)
                         {
                             if((*iterVal) == fidDown)
                             {

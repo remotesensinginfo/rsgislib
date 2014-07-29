@@ -212,10 +212,10 @@ namespace rsgis{ namespace cmds {
     void executeFindBoundaryPixels(std::string inputImage, unsigned int ratBand, std::string outputFile, std::string imageFormat)throw(RSGISCmdException);
 
     /** Function to calculate the border length of the clumps */
-    //void executeCalcBorderLength(std::string inputImage, bool ignoreZeroEdges, std::string outColsName)throw(RSGISCmdException);
+    void executeCalcBorderLength(std::string inputImage, bool ignoreZeroEdges, std::string outColsName)throw(RSGISCmdException);
 
     /** Function to calculate the relative border length of the clumps to a class */
-    //void executeCalcRelBorder(std::string inputImage, std::string outColsName, std::string classNameField, std::string className, bool ignoreZeroEdges)throw(RSGISCmdException);
+    void executeCalcRelBorder(std::string inputImage, std::string outColsName, std::string classNameField, std::string className, bool ignoreZeroEdges)throw(RSGISCmdException);
 
     /** Function to command to calculate shape indices for clumps */
     //void executeCalcShapeIndices(std::string inputImage, std::vector<cmds::RSGISShapeParamCmds> shapeIndexes)throw(RSGISCmdException);
