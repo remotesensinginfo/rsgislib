@@ -189,6 +189,28 @@ static PyObject *ImageRegistration_GCP2GDAL(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
+static PyObject *ImageRegistration_ApplyOffset2Image(PyObject *self, PyObject *args)
+{
+    const char *pszInputImage, *pszOutputImage, *pszGDALFormat;
+	int nOutDataType;
+    double xOff, yOff;
+    
+    if( !PyArg_ParseTuple(args, "sssidd:applyOffset2Image", &pszInputImage, &pszOutputImage, &pszGDALFormat, &nOutDataType, &xOff, &yOff))
+        return NULL;
+    
+    try
+    {
+        rsgis::cmds::executeApplyOffset2Image(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszGDALFormat), (rsgis::RSGISLibDataType) nOutDataType, xOff, yOff);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 // Our list of functions in this module
 static PyMethodDef ImageRegistrationMethods[] = {
     {"basicregistration", ImageRegistration_BasicRegistration, METH_VARARGS, 
@@ -356,7 +378,29 @@ static PyMethodDef ImageRegistrationMethods[] = {
 "    dataType = rsgislib.TYPE_32INT\n"
 "    imageregistration.gcp2gdal(inputImage,inputGCPs, outputImage, format, dataType)\n"
 "\n"
-},   
+},
+    
+{"applyOffset2Image", ImageRegistration_ApplyOffset2Image, METH_VARARGS,
+"imageregistration.applyOffset2Image(inputImage, outputImage, gdalformat, outtype, xOff, yOff)\n"
+"Apply a linear X,Y offset to the image header - does not change the pixel values.\n"
+" * inputImage is a string providing the input image.\n"
+" * outputImage is a string providing the output image.\n"
+" * gdalformat is a string providing the output format (e.g., KEA).\n"
+" * type is a rsgislib.TYPE_* value providing the output data type.\n"
+" * xOff is a float specifying the X offset to be applied to the image."
+" * yOff is a float specifying the Y offset to be applied to the image."
+"\n"
+"Example::\n"
+"\n"
+"    from rsgislib import imageregistration\n"
+"    inputImage = './Rasters/injune_p142_casi_sub_utm_single_band_offset3x3y.vrt'\n"
+"    outputImage = './TestOutputs/injune_p142_casi_sub_utm_single_band_offset3x3y_fixed.kea'\n"
+"    format = 'KEA'\n"
+"    dataType = rsgislib.TYPE_32INT\n"
+"    imageregistration.applyOffset2Image(inputImage, outputImage, format, dataType, -3.0, -3.0)\n"
+"\n"
+},
+    
 	{NULL}        /* Sentinel */
 };
 

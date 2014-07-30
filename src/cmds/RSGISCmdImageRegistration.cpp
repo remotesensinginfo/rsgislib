@@ -37,13 +37,17 @@
 #include "registration/RSGISPolynomialImageWarp.h"
 #include "registration/RSGISAddGCPsGDAL.h"
 
+#include "img/RSGISCalcImageValue.h"
+#include "img/RSGISCalcImage.h"
+#include "img/RSGISCopyImage.h"
+
 
 namespace rsgis{ namespace cmds {
 
     void excecuteBasicRegistration(std::string inputReferenceImage, std::string inputFloatingmage, int gcpGap,
                                                   float metricThreshold, int windowSize, int searchArea, float stdDevRefThreshold,
                                                   float stdDevFloatThreshold, int subPixelResolution, unsigned int metricTypeInt,
-                                                  unsigned int outputType, std::string outputGCPFile)
+                                                  unsigned int outputType, std::string outputGCPFile) throw(RSGISCmdException)
     {
         
         try
@@ -132,7 +136,7 @@ namespace rsgis{ namespace cmds {
                                                   float metricThreshold, int windowSize, int searchArea, float stdDevRefThreshold,
                                                   float stdDevFloatThreshold, int subPixelResolution, int distanceThreshold,
                                                   int maxNumIterations, float moveChangeThreshold, float pSmoothness, unsigned int metricTypeInt,
-                                                  unsigned int outputType, std::string outputGCPFile)
+                                                  unsigned int outputType, std::string outputGCPFile) throw(RSGISCmdException)
     {
                 
         try
@@ -220,7 +224,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void excecuteNNWarp(std::string inputImage, std::string outputImage, std::string projFile, std::string inputGCPs, float resolution, std::string imageFormat, bool genTransformImage)
+    void excecuteNNWarp(std::string inputImage, std::string outputImage, std::string projFile, std::string inputGCPs, float resolution, std::string imageFormat, bool genTransformImage) throw(RSGISCmdException)
     {
         
         try
@@ -259,7 +263,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void excecuteTriangularWarp(std::string inputImage, std::string outputImage, std::string projFile, std::string inputGCPs, float resolution, std::string imageFormat, bool genTransformImage)
+    void excecuteTriangularWarp(std::string inputImage, std::string outputImage, std::string projFile, std::string inputGCPs, float resolution, std::string imageFormat, bool genTransformImage) throw(RSGISCmdException)
     {
         
         try
@@ -299,7 +303,7 @@ namespace rsgis{ namespace cmds {
     }
     
     
-    void excecutePolyWarp(std::string inputImage, std::string outputImage, std::string projFile, std::string inputGCPs, float resolution, int polyOrder, std::string imageFormat, bool genTransformImage)
+    void excecutePolyWarp(std::string inputImage, std::string outputImage, std::string projFile, std::string inputGCPs, float resolution, int polyOrder, std::string imageFormat, bool genTransformImage) throw(RSGISCmdException)
     {
         
         try
@@ -338,7 +342,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void excecuteAddGCPsGDAL(std::string inputImage, std::string inputGCPs, std::string outputImage, std::string gdalFormat, RSGISLibDataType outDataType)
+    void excecuteAddGCPsGDAL(std::string inputImage, std::string inputGCPs, std::string outputImage, std::string gdalFormat, RSGISLibDataType outDataType) throw(RSGISCmdException)
     {
         try
         {
@@ -355,5 +359,56 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
+    
+    
+    void executeApplyOffset2Image(std::string inputImage, std::string outputImage, std::string gdalFormat, RSGISLibDataType outDataType, double xOff, double yOff) throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            
+            std::cout << inputImage << std::endl;
+            GDALDataset *dataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+            if(dataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            unsigned int numBands = dataset->GetRasterCount();
+            
+            rsgis::img::RSGISCopyImage copyImage = rsgis::img::RSGISCopyImage(numBands);
+            rsgis::img::RSGISCalcImage *calcImage = new rsgis::img::RSGISCalcImage(&copyImage, "", true);
+            calcImage->calcImage(&dataset, 1, outputImage, false, NULL, gdalFormat, RSGIS_to_GDAL_Type(outDataType));
+            
+            delete calcImage;
+            GDALClose(dataset);
+            
+            GDALDataset *outDataset = (GDALDataset *) GDALOpen(outputImage.c_str(), GA_Update);
+            if(outDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + outputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            double *trans = new double[6];
+            outDataset->GetGeoTransform(trans);
+            trans[0] = trans[0] + xOff;
+            trans[3] = trans[3] + yOff;
+            outDataset->SetGeoTransform(trans);
+            GDALClose(outDataset);
+            delete[] trans;
+        }
+        catch(RSGISException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+    
+    
+    
 }}
 
