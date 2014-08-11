@@ -57,6 +57,9 @@ namespace rsgis{ namespace cmds {
                               std::string outtxtform = "csv", bool ignoreProjection = false, int pixelInPolyMethodInt = 1)throw(RSGISCmdException);
     /** Function to extract the all the pixel values for regions to a HDF5 file */
     void executeZonesImage2HDF5(std::string inputImage, std::string inputVecPolys, std::string outputHDF, bool ignoreProjection = false, int pixelInPolyMethodInt = 1)throw(RSGISCmdException);
+    /** Function to extract the average endmember's defined by polygons for linear spectral unmixing */
+    void executeExtractAvgEndMembers(std::string inputImage, std::string inputVecPolys, std::string outputMatrixFile,
+                                     int pixelInPolyMethodInt = 1)throw(RSGISCmdException);
 }}
 
 

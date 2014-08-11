@@ -22,6 +22,12 @@ These functions take a polygons as input and either calculate statistics from pi
 .. autofunction:: rsgislib.zonalstats.pixelStats2TXT
 .. autofunction:: rsgislib.zonalstats.imageZoneToHDF
 
+Endmember Analysis
+-------------------
+These functions define extract a set of endmembers from an image file to be used for linear spectral unmixing (see imagecalc module).
+
+.. autofunction:: rsgislib.zonalstats.extractAvgEndMembers
+
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
