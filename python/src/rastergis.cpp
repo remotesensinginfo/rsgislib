@@ -1250,27 +1250,33 @@ static PyObject *RasterGIS_SelectClumpsOnGrid(PyObject *self, PyObject *args)
 
     Py_RETURN_NONE;
 }
-/*
 
-static PyObject *RasterGIS_InterpolateClumpValues2Img(PyObject *self, PyObject *args) {
+
+static PyObject *RasterGIS_InterpolateClumpValues2Img(PyObject *self, PyObject *args)
+{
     const char *clumpsImage, *selectField, *eastingsField, *northingsField, *methodStr, *valueField, *outputFile, *imageFormat;
-    int dataType;
+    int dataType, ratBand;
+    ratBand = 1;
 
-    if(!PyArg_ParseTuple(args, "ssssssssi:interpolateClumpValues2Image", &clumpsImage, &selectField, &eastingsField, &northingsField, &methodStr, &valueField, &outputFile, &imageFormat, &dataType)) {
+    if(!PyArg_ParseTuple(args, "ssssssssi|i:interpolateClumpValues2Image", &clumpsImage, &selectField, &eastingsField, &northingsField, &methodStr, &valueField, &outputFile, &imageFormat, &dataType, &ratBand))
+    {
         return NULL;
     }
 
-    try {
+    try
+    {
         rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType) dataType;
-        rsgis::cmds::executeInterpolateClumpValuesToImage(std::string(clumpsImage), std::string(selectField), std::string(eastingsField), std::string(northingsField), std::string(methodStr), std::string(valueField), std::string(outputFile), std::string(imageFormat), type);
-    } catch (rsgis::cmds::RSGISCmdException &e) {
+        rsgis::cmds::executeInterpolateClumpValuesToImage(std::string(clumpsImage), std::string(selectField), std::string(eastingsField), std::string(northingsField), std::string(methodStr), std::string(valueField), std::string(outputFile), std::string(imageFormat), type, ratBand);
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
         PyErr_SetString(GETSTATE(self)->error, e.what());
         return NULL;
     }
 
     Py_RETURN_NONE;
 }
-
+/*
 
 static PyObject *RasterGIS_FindGlobalSegmentationScore(PyObject *self, PyObject *args) {
     const char *clumpsImage, *inputImage, *colPrefix;
@@ -1891,9 +1897,9 @@ static PyMethodDef RasterGISMethods[] = {
     "* rows is an unsigned integer which defines the number of rows within which a clump will be selected.\n"
     "* cols is an unsigned integer which defines the number of columns within which a clump will be selected.\n"
     "\n"},
-    /*
+    
 {"interpolateClumpValues2Image", RasterGIS_InterpolateClumpValues2Img, METH_VARARGS,
-    "rsgislib.rastergis.interpolateClumpValues2Image(clumpsImage, selectField, eastingsField, northingsField, methodStr, valueField, outputFile, imageFormat, dataType)\n"
+    "rsgislib.rastergis.interpolateClumpValues2Image(clumpsImage, selectField, eastingsField, northingsField, methodStr, valueField, outputFile, imageFormat, dataType, ratBand)\n"
     "Interpolates values from clumps to the whole image of pixels.\n"
     "Where:\n"
     "\n"
@@ -1906,9 +1912,10 @@ static PyMethodDef RasterGISMethods[] = {
     "* outputFile is a string for the path to the output image file.\n"
     "* imageFormat is string defining the GDAL format of the output image.\n"
     "* dataType is an containing one of the values from rsgislib.TYPE_*\n"
+    "* ratBand is the image band with which the RAT is associated."
     "\n"},
 
-
+/*
 {"calcGlobalSegmentationScore", RasterGIS_FindGlobalSegmentationScore, METH_VARARGS,
     "rsgislib.rastergis.calcGlobalSegmentationScore(clumpsImage, inputImage, colsPrefix, calcNeighbours, minNormV, maxNormV, minNormMI, maxNormMI)\n"
     "Calculates the Global Score defined in Johnson and Xie 2011 'Unsupervised image segmentation evaluation and "

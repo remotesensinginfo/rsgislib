@@ -158,6 +158,44 @@ namespace rsgis {namespace math{
         float p;
 	};
     
+    class RSGISLinearTrendInterpolator : public RSGIS2DInterpolator
+	{
+	public:
+		RSGISLinearTrendInterpolator():RSGIS2DInterpolator(){};
+        void initInterpolator(std::vector<RSGISInterpolatorDataPoint> *pts) throw(RSGISInterpolationException);
+		double getValue(double eastings, double northings) throw(RSGISInterpolationException);
+		~RSGISLinearTrendInterpolator(){};
+    protected:
+        double a;
+        double b;
+        double c;
+	};
+    
+    class RSGISCombine2DInterpolators : public RSGIS2DInterpolator
+    {
+    public:
+		RSGISCombine2DInterpolators(RSGIS2DInterpolator *interp1, RSGIS2DInterpolator *interp2, double stdDevThres):RSGIS2DInterpolator()
+        {
+            this->interp1 = interp1;
+            this->interp2 = interp2;
+            this->stdDevThres = stdDevThres;
+        };
+        void initInterpolator(std::vector<RSGISInterpolatorDataPoint> *pts) throw(RSGISInterpolationException);
+		double getValue(double eastings, double northings) throw(RSGISInterpolationException);
+		~RSGISCombine2DInterpolators()
+        {
+            delete interp1;
+            delete interp2;
+            this->init = false;
+        };
+    protected:
+        double stdDevThres;
+        double upperThres;
+        double lowerThres;
+        bool init;
+        RSGIS2DInterpolator *interp1;
+        RSGIS2DInterpolator *interp2;
+    };
 
 }}
 

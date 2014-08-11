@@ -236,7 +236,7 @@ namespace rsgis{ namespace cmds {
     void executeIdentifyClumpExtremesOnGrid(std::string clumpsImage, std::string inSelectField, std::string outSelectField, std::string eastingsCol, std::string northingsCol, std::string methodStr, unsigned int rows, unsigned int cols, std::string metricField)throw(RSGISCmdException);
 
     /** Function to interpolate values from clumps to the whole image of pixels */
-    //void executeInterpolateClumpValuesToImage(std::string clumpsImage, std::string selectField, std::string eastingsField, std::string northingsField, std::string methodStr, std::string valueField, std::string outputFile, std::string imageFormat, RSGISLibDataType dataType)throw(RSGISCmdException);
+    void executeInterpolateClumpValuesToImage(std::string clumpsImage, std::string selectField, std::string eastingsField, std::string northingsField, std::string methodStr, std::string valueField, std::string outputFile, std::string imageFormat, RSGISLibDataType dataType, unsigned int ratband)throw(RSGISCmdException);
 
     /** Function to calculate the 'Global Segmentation Score' for the clumps using a given input image */
     //float executeFindGlobalSegmentationScore4Clumps(std::string clumpsImage, std::string inputImage, std::string colPrefix, bool calcNeighbours, float minNormV, float maxNormV, float minNormMI, float maxNormMI, std::vector<cmds::RSGISJXSegQualityScoreBandCmds> *scoreBandComps)throw(RSGISCmdException);
