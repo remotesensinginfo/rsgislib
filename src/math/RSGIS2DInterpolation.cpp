@@ -327,6 +327,184 @@ namespace rsgis {namespace math{
         return outValue;
     }
     
+   
+    void RSGISLinearTrendInterpolator::initInterpolator(std::vector<RSGISInterpolatorDataPoint> *pts) throw(RSGISInterpolationException)
+    {
+        RSGISMatrices matrices;
+		Matrix *matrixA = NULL;
+		Matrix *matrixB = NULL;
+		Matrix *matrixCoFactors = NULL;
+		Matrix *matrixCoFactorsT = NULL;
+		Matrix *outputs = NULL;
+		try
+		{
+			double sXY = 0;
+			double sX = 0;
+			double sXSqu = 0;
+			double sY = 0;
+			double sYSqu = 0;
+			double sXZ = 0;
+			double sYZ = 0;
+			double sZ = 0;
+			
+			for(unsigned int i = 0; i < pts->size(); i++)
+			{
+				sXY += (pts->at(i).x * pts->at(i).y);
+				sX += pts->at(i).x;
+				sXSqu += (pts->at(i).x * pts->at(i).x);
+				sY += pts->at(i).y;
+				sYSqu += (pts->at(i).y * pts->at(i).y);
+				sXZ += (pts->at(i).x * pts->at(i).value);
+				sYZ += (pts->at(i).y * pts->at(i).value);
+				sZ += pts->at(i).value;
+			}
+			
+			matrixA = matrices.createMatrix(3, 3);
+			matrixA->matrix[0] = sXSqu;
+			matrixA->matrix[1] = sXY;
+			matrixA->matrix[2] = sX;
+			matrixA->matrix[3] = sXY;
+			matrixA->matrix[4] = sYSqu;
+			matrixA->matrix[5] = sY;
+			matrixA->matrix[6] = sX;
+			matrixA->matrix[7] = sY;
+			matrixA->matrix[8] = pts->size();
+			matrixB = matrices.createMatrix(1, 3);
+			matrixB->matrix[0] = sXZ;
+			matrixB->matrix[1] = sYZ;
+			matrixB->matrix[2] = sZ;
+			
+			double determinantA = matrices.determinant(matrixA);
+			matrixCoFactors = matrices.cofactors(matrixA);
+			matrixCoFactorsT = matrices.transpose(matrixCoFactors);
+			double multiplier = 1/determinantA;
+			matrices.multipleSingle(matrixCoFactorsT, multiplier);
+			outputs = matrices.multiplication(matrixCoFactorsT, matrixB);
+			a = outputs->matrix[0];
+			b = outputs->matrix[1];
+			c = outputs->matrix[2];
+		}
+		catch(RSGISMatricesException e)
+		{
+			if(matrixA != NULL)
+			{
+                matrices.freeMatrix(matrixA);
+			}
+			if(matrixB != NULL)
+			{
+				matrices.freeMatrix(matrixB);
+			}
+			if(matrixCoFactors != NULL)
+			{
+				matrices.freeMatrix(matrixCoFactors);
+			}
+			if(matrixCoFactorsT != NULL)
+			{
+				matrices.freeMatrix(matrixCoFactorsT);
+			}
+			if(outputs != NULL)
+			{
+				matrices.freeMatrix(outputs);
+			}
+			throw RSGISInterpolationException(e.what());
+		}
+        catch(RSGISException &e)
+        {
+            throw RSGISInterpolationException(e.what());
+        }
+		
+        matrices.freeMatrix(matrixA);
+        matrices.freeMatrix(matrixB);
+        matrices.freeMatrix(matrixCoFactors);
+        matrices.freeMatrix(matrixCoFactorsT);
+        matrices.freeMatrix(outputs);
+    }
+    
+    double RSGISLinearTrendInterpolator::getValue(double eastings, double northings) throw(RSGISInterpolationException)
+    {
+        double outVal = 0.0;
+        try
+        {
+            outVal = (a * eastings) + (b * northings) + c;
+            //std::cout << "Out Value [" << eastings << ", " << northings << "] = " << outVal << std::endl;
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISInterpolationException(e.what());
+        }
+        catch(RSGISInterpolationException &e)
+        {
+            throw e;
+        }
+        
+        return outVal;
+    }
+    
+    
+    
+
+    void RSGISCombine2DInterpolators::initInterpolator(std::vector<RSGISInterpolatorDataPoint> *pts) throw(RSGISInterpolationException)
+    {
+        try
+        {
+            double valSum = 0.0;
+            for(std::vector<RSGISInterpolatorDataPoint>::iterator iterPts = pts->begin(); iterPts != pts->end(); ++iterPts)
+            {
+                valSum += (*iterPts).value;
+            }
+            double meanVal = valSum / pts->size();
+            
+            double valDiffSum = 0.0;
+            for(std::vector<RSGISInterpolatorDataPoint>::iterator iterPts = pts->begin(); iterPts != pts->end(); ++iterPts)
+            {
+                valDiffSum += (((*iterPts).value - meanVal) * ((*iterPts).value - meanVal));
+            }
+            double stdDevVal = sqrt(valDiffSum / pts->size());
+            
+            this->upperThres = meanVal + (stdDevVal * stdDevThres);
+            this->lowerThres = meanVal - (stdDevVal * stdDevThres);
+            
+            std::cout << "Upper = " << upperThres << std::endl;
+            std::cout << "Lower = " << lowerThres << std::endl;
+            
+            this->interp1->initInterpolator(pts);
+            this->interp2->initInterpolator(pts);
+            this->init = true;
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISInterpolationException(e.what());
+        }
+        catch(RSGISInterpolationException &e)
+        {
+            throw e;
+        }
+    }
+    
+    double RSGISCombine2DInterpolators::getValue(double eastings, double northings) throw(RSGISInterpolationException)
+    {
+        double outVal = 0.0;
+        try
+        {
+            outVal = this->interp1->getValue(eastings, northings);
+            
+            if((outVal > upperThres) | (outVal < lowerThres))
+            {
+                outVal = this->interp2->getValue(eastings, northings);
+            }
+            
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISInterpolationException(e.what());
+        }
+        catch(RSGISInterpolationException &e)
+        {
+            throw e;
+        }
+        
+        return outVal;
+    }
     
     
 }}

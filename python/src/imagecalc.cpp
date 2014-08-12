@@ -793,19 +793,26 @@ static PyObject *ImageCalc_ImageStats(PyObject *self, PyObject *args) {
     Py_RETURN_NONE;
 }
 
-static PyObject *ImageCalc_UnconLinearSpecUnmix(PyObject *self, PyObject *args) {
+static PyObject *ImageCalc_UnconLinearSpecUnmix(PyObject *self, PyObject *args)
+{
     const char *inputImage, *imageFormat, *outputFile, *endmembersFile;
-    float lsumGain, lsumOffset;
+    float lsumGain = 1;
+    float lsumOffset = 0;
     int dataType;
 
-    if(!PyArg_ParseTuple(args, "ssiffss:unconLinearSpecUnmix", &inputImage, &imageFormat, &dataType, &lsumGain, &lsumOffset, &outputFile, &endmembersFile))
+    if(!PyArg_ParseTuple(args, "ssiss|ff:unconLinearSpecUnmix", &inputImage, &imageFormat, &dataType, &outputFile, &endmembersFile, &lsumGain, &lsumOffset))
+    {
         return NULL;
+    }
 
     rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)dataType;
 
-    try {
+    try
+    {
         rsgis::cmds::executeUnconLinearSpecUnmix(inputImage, imageFormat, type, lsumGain, lsumOffset, outputFile, endmembersFile);
-    } catch (rsgis::cmds::RSGISCmdException &e) {
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
         PyErr_SetString(GETSTATE(self)->error, e.what());
         return NULL;
     }
@@ -813,19 +820,27 @@ static PyObject *ImageCalc_UnconLinearSpecUnmix(PyObject *self, PyObject *args) 
     Py_RETURN_NONE;
 }
 
-static PyObject *ImageCalc_ExhconLinearSpecUnmix(PyObject *self, PyObject *args) {
+static PyObject *ImageCalc_ExhconLinearSpecUnmix(PyObject *self, PyObject *args)
+{
     const char *inputImage, *imageFormat, *outputFile, *endmembersFile;
-    float lsumGain, lsumOffset, stepResolution;
+    float lsumGain = 1;
+    float lsumOffset = 0;
+    float stepResolution;
     int dataType;
 
-    if(!PyArg_ParseTuple(args, "ssiffssf:exhconLinearSpecUnmix", &inputImage, &imageFormat, &dataType, &lsumGain, &lsumOffset, &outputFile, &endmembersFile, &stepResolution))
+    if(!PyArg_ParseTuple(args, "ssissf|ff:exhconLinearSpecUnmix", &inputImage, &imageFormat, &dataType, &outputFile, &endmembersFile, &stepResolution, &lsumGain, &lsumOffset))
+    {
         return NULL;
+    }
 
     rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)dataType;
 
-    try {
+    try
+    {
         rsgis::cmds::executeExhconLinearSpecUnmix(inputImage, imageFormat, type, lsumGain, lsumOffset, outputFile, endmembersFile, stepResolution);
-    } catch (rsgis::cmds::RSGISCmdException &e) {
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
         PyErr_SetString(GETSTATE(self)->error, e.what());
         return NULL;
     }
@@ -833,19 +848,27 @@ static PyObject *ImageCalc_ExhconLinearSpecUnmix(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-static PyObject *ImageCalc_ConSum1LinearSpecUnmix(PyObject *self, PyObject *args) {
+static PyObject *ImageCalc_ConSum1LinearSpecUnmix(PyObject *self, PyObject *args)
+{
     const char *inputImage, *imageFormat, *outputFile, *endmembersFile;
-    float lsumGain, lsumOffset, lsumWeight;
+    float lsumGain = 1;
+    float lsumOffset = 0;
+    float lsumWeight = 1;
     int dataType;
 
-    if(!PyArg_ParseTuple(args, "ssifffss:conSum1LinearSpecUnmix", &inputImage, &imageFormat, &dataType, &lsumGain, &lsumOffset, &lsumWeight, &outputFile, &endmembersFile))
+    if(!PyArg_ParseTuple(args, "ssifss|ff:conSum1LinearSpecUnmix", &inputImage, &imageFormat, &dataType, &lsumWeight, &outputFile, &endmembersFile, &lsumGain, &lsumOffset))
+    {
         return NULL;
+    }
 
     rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)dataType;
 
-    try {
+    try
+    {
         rsgis::cmds::executeConSum1LinearSpecUnmix(inputImage, imageFormat, type, lsumGain, lsumOffset, lsumWeight, outputFile, endmembersFile);
-    } catch (rsgis::cmds::RSGISCmdException &e) {
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
         PyErr_SetString(GETSTATE(self)->error, e.what());
         return NULL;
     }
@@ -853,19 +876,27 @@ static PyObject *ImageCalc_ConSum1LinearSpecUnmix(PyObject *self, PyObject *args
     Py_RETURN_NONE;
 }
 
-static PyObject *ImageCalc_NnConSum1LinearSpecUnmix(PyObject *self, PyObject *args) {
+static PyObject *ImageCalc_NnConSum1LinearSpecUnmix(PyObject *self, PyObject *args)
+{
     const char *inputImage, *imageFormat, *outputFile, *endmembersFile;
-    float lsumGain, lsumOffset, lsumWeight;
+    float lsumGain = 1;
+    float lsumOffset = 0;
+    float lsumWeight = 1;
     int dataType;
 
-    if(!PyArg_ParseTuple(args, "ssifffss:nnConSum1LinearSpecUnmix", &inputImage, &imageFormat, &dataType, &lsumGain, &lsumOffset, &lsumWeight, &outputFile, &endmembersFile))
+    if(!PyArg_ParseTuple(args, "ssifss|ff:nnConSum1LinearSpecUnmix", &inputImage, &imageFormat, &dataType, &lsumWeight, &outputFile, &endmembersFile, &lsumGain, &lsumOffset))
+    {
         return NULL;
+    }
 
     rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)dataType;
 
-    try {
+    try
+    {
         rsgis::cmds::executeNnConSum1LinearSpecUnmix(inputImage, imageFormat, type, lsumGain, lsumOffset, lsumWeight, outputFile, endmembersFile);
-    } catch (rsgis::cmds::RSGISCmdException &e) {
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
         PyErr_SetString(GETSTATE(self)->error, e.what());
         return NULL;
     }
@@ -1462,59 +1493,129 @@ static PyMethodDef ImageCalcMethods[] = {
 },
 
     {"unconLinearSpecUnmix", ImageCalc_UnconLinearSpecUnmix, METH_VARARGS,
-"imagecalc.unconLinearSpecUnmix(inputImage, gdalformat, gdaltype, lsumGain, lsumOffset, outputFile, endmembersFile)\n"
-"Performs unconstrained linear spectral unmixing of the input image for a set of endmembers\n"
+"imagecalc.unconLinearSpecUnmix(inputImage, gdalformat, gdaltype, outputFile, endmembersFile, lsumGain, lsumOffset)\n"
+"Performs unconstrained linear spectral unmixing of the input image for a set of endmembers.\n"
+"Endmember polygons are extracted using rsgislib.zonalstats.extractAvgEndMembers() where each polygon \n"
+"defines an endmember.\n\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input image file\n"
 "  * gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
 "  * gdaltype is an containing one of the values from rsgislib.TYPE_*\n"
-"  * lsumGain is a float TODO: Complete here and below\n"
-"  * lsumOffset is a float\n"
 "  * outputFile is a string containing the name of the output file\n"
 "  * endmembersFile is a string containing the names of the file containing the end members\n"
+"  * lsumGain is a float specifying a gain which can be applied to the output pixel values (outvalue = offset + (gain * value)). Optional, default = 1.\n"
+"  * lsumOffset is a float specifying an offset which can be applied to the output pixel values (outvalue = offset + (gain * value)). Optional, default = 0.\n"
+"\n"
+"Example::\n"
+"\n"
+"    import rsgislib.zonalstats\n"
+"    import rsgislib.imagecalc\n"
+"    import rsgislib\n"
+"\n"
+"    imageLSImage = \"./LS8_20130519_lat52lon42_r24p204_rad_srefstdmdl.kea\"\n"
+"    unmixedImage = \"./LS8_20130519_lat52lon42_r24p204_rad_srefstdmdl_unmix.kea\"\n"
+"    roiSHP = \"./ROIs.shp\"\n"
+"    endmembersFile = \"./endmembers\"\n"
+"\n"
+"    rsgislib.zonalstats.extractAvgEndMembers(imageLSImage, roiSHP, endmembersFile)\n"
+"\n"
+"    lsumGain = 1.0\n"
+"    lsumOffset = 0.0\n"
+"\n"
+"    endmembersFile = \"./endmembers.mtxt\"\n"
+"    rsgislib.imagecalc.unconLinearSpecUnmix(imageLSImage, \"KEA\", rsgislib.TYPE_32FLOAT, unmixedImage, endmembersFile, lsumGain, lsumOffset)\n"
+"\n\n"
 },
 
     {"exhconLinearSpecUnmix", ImageCalc_ExhconLinearSpecUnmix, METH_VARARGS,
-"imagecalc.exhconLinearSpecUnmix(inputImage, gdalformat, gdaltype, lsumGain, lsumOffset, outputFile, endmembersFile, stepResolution)\n"
-"Performs an exhaustive constrained linear spectral unmixing of the input image for a set of endmembers\n"
+"imagecalc.exhconLinearSpecUnmix(inputImage, gdalformat, gdaltype, outputFile, endmembersFile, stepResolution, lsumGain, lsumOffset)\n"
+"Performs an exhaustive constrained linear spectral unmixing of the input image for a set of endmembers\n\n *** this methods is slow (!!) to execute *** \n"
+"Endmember polygons are extracted using rsgislib.zonalstats.extractAvgEndMembers() where each polygon \n"
+"defines an endmember.\n\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input image file\n"
 "  * gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
 "  * gdaltype is an containing one of the values from rsgislib.TYPE_*\n"
-"  * lsumGain is a float TODO: Complete here and below\n"
-"  * lsumOffset is a float\n"
 "  * outputFile is a string containing the name of the output file\n"
 "  * endmembersFile is a string containing the names of the file containing the end members\n"
-"  * stepResolution is a float\n"
+"  * stepResolution is a float specifying the gap between steps in the search space. Value needs to be between 0 and 1. (i.e., 0.05)\n"
+"  * lsumGain is a float specifying a gain which can be applied to the output pixel values (outvalue = offset + (gain * value)). Optional, default = 1.\n"
+"  * lsumOffset is a float specifying an offset which can be applied to the output pixel values (outvalue = offset + (gain * value)). Optional, default = 0.\n"
+"\n"
+"Example::\n"
+"\n"
+"    import rsgislib.zonalstats\n"
+"    import rsgislib.imagecalc\n"
+"    import rsgislib\n"
+"\n"
+"    imageLSImage = \"./LS8_20130519_lat52lon42_r24p204_rad_srefstdmdl.kea\"\n"
+"    unmixedImage = \"./LS8_20130519_lat52lon42_r24p204_rad_srefstdmdl_unmix.kea\"\n"
+"    roiSHP = \"./ROIs.shp\"\n"
+"    endmembersFile = \"./endmembers\"\n"
+"\n"
+"    rsgislib.zonalstats.extractAvgEndMembers(imageLSImage, roiSHP, endmembersFile)\n"
+"\n"
+"    lsumGain = 1.0\n"
+"    lsumOffset = 0.0\n"
+"\n"
+"    endmembersFile = \"./endmembers.mtxt\"\n"
+"    stepResolution = 0.1\n"
+"    rsgislib.imagecalc.exhconLinearSpecUnmix(imageLSImage, \"KEA\", rsgislib.TYPE_32FLOAT, unmixedImage, endmembersFile, stepResolution, lsumGain, lsumOffset)\n"
+"\n\n"
 },
 
     {"conSum1LinearSpecUnmix", ImageCalc_ConSum1LinearSpecUnmix, METH_VARARGS,
-"imagecalc.conSum1LinearSpecUnmix(inputImage, gdalformat, gdaltype, lsumGain, lsumOffset, lsumWeight, outputFile, endmembersFile, stepResolution)\n"
+"imagecalc.conSum1LinearSpecUnmix(inputImage, gdalformat, gdaltype, lsumWeight, outputFile, endmembersFile, lsumGain, lsumOffset)\n"
 "Performs a partially constrained linear spectral unmixing of the input image for a set of endmembers where the sum of the unmixing will be approximately 1\n"
+"Endmember polygons are extracted using rsgislib.zonalstats.extractAvgEndMembers() where each polygon \n"
+"defines an endmember.\n\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input image file\n"
 "  * gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
 "  * gdaltype is an containing one of the values from rsgislib.TYPE_*\n"
-"  * lsumGain is a float TODO: Complete here and below\n"
-"  * lsumOffset is a float\n"
-"  * lsumWeight is a float\n"
+"  * lsumWeight is a float specifying a weight which is added to the Least-Squares matrix to ensure summation to 1.\n"
 "  * outputFile is a string containing the name of the output file\n"
 "  * endmembersFile is a string containing the names of the file containing the end members\n"
+"  * lsumGain is a float specifying a gain which can be applied to the output pixel values (outvalue = offset + (gain * value)). Optional, default = 1.\n"
+"  * lsumOffset is a float specifying an offset which can be applied to the output pixel values (outvalue = offset + (gain * value)). Optional, default = 0.\n"
+"\n"
+"Example::\n"
+"\n"
+"    import rsgislib.zonalstats\n"
+"    import rsgislib.imagecalc\n"
+"    import rsgislib\n"
+"\n"
+"    imageLSImage = \"./LS8_20130519_lat52lon42_r24p204_rad_srefstdmdl.kea\"\n"
+"    unmixedImage = \"./LS8_20130519_lat52lon42_r24p204_rad_srefstdmdl_unmix.kea\"\n"
+"    roiSHP = \"./ROIs.shp\"\n"
+"    endmembersFile = \"./endmembers\"\n"
+"\n"
+"    rsgislib.zonalstats.extractAvgEndMembers(imageLSImage, roiSHP, endmembersFile)\n"
+"\n"
+"    lsumGain = 1.0\n"
+"    lsumOffset = 0.0\n"
+"    lsumWeight = 40\n"
+"\n"
+"    endmembersFile = \"./endmembers.mtxt\"\n"
+"    rsgislib.imagecalc.conSum1LinearSpecUnmix(imageLSImage, \"KEA\", rsgislib.TYPE_32FLOAT, lsumWeight, unmixedImage, endmembersFile, lsumGain, lsumOffset)\n"
+"\n\n"
 },
 
-    {"nnConSum1LinearSpecUnmix", ImageCalc_NnConSum1LinearSpecUnmix, METH_VARARGS,
-"imagecalc.nnConSum1LinearSpecUnmix(inputImage, gdalformat, gdaltype, lsumGain, lsumOffset, lsumWeight, outputFile, endmembersFile, stepResolution)\n"
-"Performs a constrained linear spectral unmixing of the input image for a set of endmembers where the sum of the unmixing will be approximately 1 and non-negative\n"
+/*    {"nnConSum1LinearSpecUnmix", ImageCalc_NnConSum1LinearSpecUnmix, METH_VARARGS,
+"imagecalc.nnConSum1LinearSpecUnmix(inputImage, gdalformat, gdaltype, lsumWeight, outputFile, endmembersFile, lsumGain, lsumOffset)\n"
+"Performs a constrained linear spectral unmixing of the input image for a set of endmembers where the sum of the unmixing will be approximately 1 and non-negative.\n"
+"Endmember polygons are extracted using rsgislib.zonalstats.extractAvgEndMembers() where each polygon \n"
+"defines an endmember.\n\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input image file\n"
 "  * gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
 "  * gdaltype is an containing one of the values from rsgislib.TYPE_*\n"
-"  * lsumGain is a float TODO: Complete here and below\n"
-"  * lsumOffset is a float\n"
-"  * lsumWeight is a float\n"
+"  * lsumWeight is a float specifying a weight which is added to the Least-Squares matrix to ensure summation to 1.\n"
 "  * outputFile is a string containing the name of the output file\n"
 "  * endmembersFile is a string containing the names of the file containing the end members\n"
-},
+"  * lsumGain is a float specifying a gain which can be applied to the output pixel values (outvalue = offset + (gain * value)). Optional, default = 1.\n"
+"  * lsumOffset is a float specifying an offset which can be applied to the output pixel values (outvalue = offset + (gain * value)). Optional, default = 0.\n"
+},*/
 
     {"allBandsEqualTo", ImageCalc_AllBandsEqualTo, METH_VARARGS,
 "imagecalc.allBandsEqualTo(inputImage, imgValue, outputTrueVal, outputFalseVal, outputImage, gdalformat, gdaltype)\n"

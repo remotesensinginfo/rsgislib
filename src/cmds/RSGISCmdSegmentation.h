@@ -83,6 +83,10 @@ namespace rsgis{ namespace cmds {
     /** Function to remove small clumps */
     void executeRMSmallClumps(std::string clumpsImage, std::string outputImage, float threshold, std::string imgFormat)throw(RSGISCmdException);
     
+    /** Function to produce a regular grid of clumps for a defined image area */
+    void executeGenerateRegularGrid(std::string inputImage, std::string outputClumpImage, std::string imageFormat, unsigned int numXPxls, unsigned int numYPxls)throw(RSGISCmdException);
+    
+    
 }}
 
 

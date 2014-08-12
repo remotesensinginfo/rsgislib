@@ -38,6 +38,8 @@
 #include "common/RSGISClassificationException.h"
 
 #include "rastergis/RSGISRasterAttUtils.h"
+#include "rastergis/RSGISRATCalcValue.h"
+#include "rastergis/RSGISRATCalc.h"
 #include "common/RSGISAttributeTableException.h"
 
 #include "gdal_priv.h"
@@ -67,10 +69,25 @@ namespace rsgis{ namespace classifier{
         std::map<std::string, RSGISClassInfo*>* findAllClassNames(const GDALRasterAttributeTable *inRAT, unsigned int classNameIdx, unsigned int redIdx, unsigned int greenIdx, unsigned int blueIdx, unsigned int alphaIdx) throw(RSGISClassificationException);
     };
     
+    
+    class RSGISFindAllClassNames : public rsgis::rastergis::RSGISRATCalcValue
+    {
+    public:
+        RSGISFindAllClassNames(std::map<std::string, RSGISClassInfo*> *classes);
+        void calcRATValue(size_t fid, double *inRealCols, unsigned int numInRealCols, int *inIntCols, unsigned int numInIntCols, std::string *inStringCols, unsigned int numInStringCols, double *outRealCols, unsigned int numOutRealCols, int *outIntCols, unsigned int numOutIntCols, std::string *outStringCols, unsigned int numOutStringCols) throw(RSGISAttributeTableException);
+        ~RSGISFindAllClassNames();
+    protected:
+        std::map<std::string, RSGISClassInfo*> *classes;
+        unsigned int idVal;
+    };
+    
+    
+    
+    
     class RSGISRecodeRasterFromClasses : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
-		RSGISRecodeRasterFromClasses(const GDALRasterAttributeTable *rat, unsigned int classNameIdx, std::map<std::string, RSGISClassInfo*> *classes);
+		RSGISRecodeRasterFromClasses(const GDALRasterAttributeTable *rat, char **classColVals, size_t classNameColLen, std::map<std::string, RSGISClassInfo*> *classes);
 		void calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException);
 		void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
         void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
@@ -84,7 +101,8 @@ namespace rsgis{ namespace classifier{
 		~RSGISRecodeRasterFromClasses();
 	protected:
         const GDALRasterAttributeTable *rat;
-        unsigned int classNameIdx;
+        char **classColVals;
+        size_t classNameColLen;
 		std::map<std::string, RSGISClassInfo*> *classes;
 	};
     

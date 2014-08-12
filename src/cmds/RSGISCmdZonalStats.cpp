@@ -37,6 +37,7 @@
 #include "vec/RSGISProcessVector.h"
 #include "vec/RSGISZonalStats.h"
 #include "vec/RSGISZonalImage2HDF.h"
+#include "vec/RSGISExtractEndMembers2Matrix.h"
 
 
 namespace rsgis{ namespace cmds {
@@ -666,6 +667,73 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
 
+    }
+        
+    void executeExtractAvgEndMembers(std::string inputImage, std::string inputVecPolys, std::string outputMatrixFile, int pixelInPolyMethodInt)throw(RSGISCmdException)
+    {
+        std::cout.precision(12);
+        // Convert to absolute path
+        std::string inputVecPolysFullPath = std::string(boost::filesystem::absolute(inputVecPolys).c_str());
+        
+        GDALAllRegister();
+        OGRRegisterAll();
+        
+        rsgis::vec::RSGISVectorUtils vecUtils;
+        
+        std::string SHPFileInLayer = vecUtils.getLayerName(inputVecPolysFullPath);
+        
+        GDALDataset *inputImageDS = NULL;
+        OGRDataSource *inputSHPDS = NULL;
+        OGRLayer *inputSHPLayer = NULL;
+        
+        try
+        {
+            /////////////////////////////////////
+            //
+            // Open Input Image.
+            //
+            /////////////////////////////////////
+            inputImageDS = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+            if(inputImageDS == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw RSGISException(message.c_str());
+            }
+            
+            /////////////////////////////////////
+            //
+            // Open Input Shapfile.
+            //
+            /////////////////////////////////////
+            inputSHPDS = OGRSFDriverRegistrar::Open(inputVecPolysFullPath.c_str(), FALSE);
+            if(inputSHPDS == NULL)
+            {
+                std::string message = std::string("Could not open vector file ") + inputVecPolysFullPath;
+                throw RSGISException(message.c_str());
+            }
+            inputSHPLayer = inputSHPDS->GetLayerByName(SHPFileInLayer.c_str());
+            if(inputSHPLayer == NULL)
+            {
+                std::string message = std::string("Could not open vector layer ") + SHPFileInLayer;
+                throw RSGISException(message.c_str());
+            }
+            
+            rsgis::img::pixelInPolyOption pixelInPolyMethod = rsgis::img::pixelInPolyInt2Enum(pixelInPolyMethodInt);
+            
+            rsgis::vec::RSGISExtractEndMembers2Matrix extractEndMembers;
+            extractEndMembers.extractColumnPerPolygon2Matrix(inputImageDS, inputSHPLayer, outputMatrixFile, pixelInPolyMethod);
+            
+            GDALClose(inputImageDS);
+            OGRDataSource::DestroyDataSource(inputSHPDS);
+        }
+        catch(rsgis::RSGISException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
     }
 }}
 

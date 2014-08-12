@@ -42,6 +42,10 @@ Tiles
 ------
 .. autofunction:: rsgislib.segmentation.mergeSegmentationTiles
 
+Other
+-----
+.. autofunction:: rsgislib.segmentation.generateRegularGrid
+
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
