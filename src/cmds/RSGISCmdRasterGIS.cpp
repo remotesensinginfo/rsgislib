@@ -43,6 +43,9 @@
 #include "rastergis/RSGISFindChangeClumps.h"
 #include "rastergis/RSGISRATCalc.h"
 #include "rastergis/RSGISFindInfoBetweenLayers.h"
+#include "rastergis/RSGISClumpBorders.h"
+#include "rastergis/RSGISInterpolateClumpValues2Image.h"
+#include "math/RSGIS2DInterpolation.h"
 
 /*
 #include "rastergis/RSGISRasterAttUtils.h"
@@ -57,15 +60,9 @@
 #include "rastergis/RSGISMaxLikelihoodRATClassification.h"
 #include "rastergis/RSGISClassMask.h"
 
-#include "rastergis/RSGISClumpBorders.h"
+
 #include "rastergis/RSGISCalcClumpShapeParameters.h"
 #include "rastergis/RSGISDefineImageTiles.h"
-
-
-#include "rastergis/RSGISInterpolateClumpValues2Image.h"
-
- #include "math/RSGIS2DInterpolation.h"
-
 */
 namespace rsgis{ namespace cmds {
 
@@ -878,14 +875,16 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-/*
-    void executeCalcBorderLength(std::string inputImage, bool ignoreZeroEdges, std::string outColsName)throw(RSGISCmdException) {
+
+    void executeCalcBorderLength(std::string inputImage, bool ignoreZeroEdges, std::string outColsName)throw(RSGISCmdException)
+    {
         GDALAllRegister();
         GDALDataset *inputDataset;
         try
         {
             inputDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_Update);
-            if(inputDataset == NULL) {
+            if(inputDataset == NULL)
+            {
                 std::string message = std::string("Could not open image ") + inputImage;
                 throw rsgis::RSGISImageException(message.c_str());
             }
@@ -894,16 +893,20 @@ namespace rsgis{ namespace cmds {
             clumpBorders.calcClumpBorderLength(inputDataset, !ignoreZeroEdges, outColsName);
 
             GDALClose(inputDataset);
-        } catch(rsgis::RSGISException &e) {
+        }
+        catch(rsgis::RSGISException &e)
+        {
             throw RSGISCmdException(e.what());
         }
 
     }
 
-    void executeCalcRelBorder(std::string inputImage, std::string outColsName, std::string classNameField, std::string className, bool ignoreZeroEdges)throw(RSGISCmdException) {
+    void executeCalcRelBorder(std::string inputImage, std::string outColsName, std::string classNameField, std::string className, bool ignoreZeroEdges)throw(RSGISCmdException)
+    {
         GDALAllRegister();
         GDALDataset *inputDataset;
-        try {
+        try
+        {
             inputDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_Update);
             if(inputDataset == NULL)
             {
@@ -915,11 +918,13 @@ namespace rsgis{ namespace cmds {
             clumpBorders.calcClumpRelBorderLen2Class(inputDataset, !ignoreZeroEdges, outColsName, classNameField, className);
 
             GDALClose(inputDataset);
-        } catch(rsgis::RSGISException &e) {
+        }
+        catch(rsgis::RSGISException &e)
+        {
             throw RSGISCmdException(e.what());
         }
     }
-
+/*
     void executeCalcShapeIndices(std::string inputImage, std::vector<RSGISShapeParamCmds> shapeIndexes)throw(RSGISCmdException) {
         GDALAllRegister();
         GDALDataset *inputDataset;
@@ -1222,8 +1227,8 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-  /*
-    void executeInterpolateClumpValuesToImage(std::string clumpsImage, std::string selectField, std::string eastingsField, std::string northingsField, std::string methodStr, std::string valueField, std::string outputFile, std::string imageFormat, RSGISLibDataType dataType)throw(RSGISCmdException)
+
+    void executeInterpolateClumpValuesToImage(std::string clumpsImage, std::string selectField, std::string eastingsField, std::string northingsField, std::string methodStr, std::string valueField, std::string outputFile, std::string imageFormat, RSGISLibDataType dataType, unsigned int ratband)throw(RSGISCmdException)
     {
         GDALAllRegister();
         GDALDataset *clumpsDataset;
@@ -1253,8 +1258,21 @@ namespace rsgis{ namespace cmds {
             {
                 interpolator = new rsgis::math::RSGISAllPointsIDWInterpolator(8);
             }
+            else if(methodStr == "plane")
+            {
+                interpolator = new rsgis::math::RSGISLinearTrendInterpolator();
+            }
+            else if(methodStr == "naturalneighbourplane")
+            {
+                interpolator = new rsgis::math::RSGISCombine2DInterpolators(new rsgis::math::RSGISNaturalNeighbor2DInterpolator(), new rsgis::math::RSGISLinearTrendInterpolator(), 1);
+            }
+            else if(methodStr == "nnandnn")
+            {
+                interpolator = new rsgis::math::RSGISCombine2DInterpolators(new rsgis::math::RSGISNaturalNeighbor2DInterpolator(), new rsgis::math::RSGISNearestNeighbour2DInterpolator(), 1);
+            }
             else
             {
+                std::cerr << "Available Interpolators: \'nearestneighbour\', \'naturalneighbour\', \'naturalnearestneighbour\', \'knearestneighbour\', \'idwall\'\n";
                 throw rsgis::RSGISAttributeTableException("The interpolated specified was not recognised.");
             }
 
@@ -1266,7 +1284,7 @@ namespace rsgis{ namespace cmds {
             }
 
             rsgis::rastergis::RSGISInterpolateClumpValues2Image interpClumpVals;
-            interpClumpVals.interpolateImageFromClumps(clumpsDataset, selectField, eastingsField, northingsField, valueField, outputFile, imageFormat, rsgis::cmds::RSGIS_to_GDAL_Type(dataType), interpolator);
+            interpClumpVals.interpolateImageFromClumps(clumpsDataset, selectField, eastingsField, northingsField, valueField, outputFile, imageFormat, rsgis::cmds::RSGIS_to_GDAL_Type(dataType), interpolator, ratband);
 
             delete interpolator;
 
@@ -1283,7 +1301,7 @@ namespace rsgis{ namespace cmds {
     }
 
 
-
+/*
 
     float executeFindGlobalSegmentationScore4Clumps(std::string clumpsImage, std::string inputImage, std::string colPrefix, bool calcNeighbours, float minNormV, float maxNormV, float minNormMI, float maxNormMI, std::vector<cmds::RSGISJXSegQualityScoreBandCmds> *scoreBandComps)throw(RSGISCmdException)
     {

@@ -38,7 +38,7 @@ namespace rsgis{ namespace classifier{
         try
         {
             // Get attribute table...
-            const GDALRasterAttributeTable *inRAT = segments->GetRasterBand(1)->GetDefaultRAT();
+            GDALRasterAttributeTable *inRAT = segments->GetRasterBand(1)->GetDefaultRAT();
             
             if(inRAT == NULL)
             {
@@ -55,7 +55,26 @@ namespace rsgis{ namespace classifier{
             
             // Find Unique column names alone with colour
             std::cout << "Find the class names...\n";
-            std::map<std::string, RSGISClassInfo*> *classes = this->findAllClassNames(inRAT, classNameIdx, redIdx, greenIdx, blueIdx, alphaIdx);
+            //std::map<std::string, RSGISClassInfo*> *classes = this->findAllClassNames(inRAT, classNameIdx, redIdx, greenIdx, blueIdx, alphaIdx);
+            
+            std::map<std::string, RSGISClassInfo*> *classes = new std::map<std::string, RSGISClassInfo*>();
+            
+            RSGISFindAllClassNames findClassNames = RSGISFindAllClassNames(classes);
+            rsgis::rastergis::RSGISRATCalc ratCalc = rsgis::rastergis::RSGISRATCalc(&findClassNames);
+            std::vector<unsigned int> inRealColIdx;
+            std::vector<unsigned int> inIntColIdx;
+            inIntColIdx.push_back(redIdx);
+            inIntColIdx.push_back(greenIdx);
+            inIntColIdx.push_back(blueIdx);
+            inIntColIdx.push_back(alphaIdx);
+            std::vector<unsigned int> inStrColIdx;
+            inStrColIdx.push_back(classNameIdx);
+            std::vector<unsigned int> outRealColIdx;
+            std::vector<unsigned int> outIntColIdx;
+            std::vector<unsigned int> outStrColIdx;
+            ratCalc.calcRATValues(inRAT, inRealColIdx, inIntColIdx, inStrColIdx, outRealColIdx, outIntColIdx, outStrColIdx);
+            
+            
             
             // Assign ID to each class 
             size_t id = 1;
@@ -95,8 +114,11 @@ namespace rsgis{ namespace classifier{
                 ++id;
             }
             
+            size_t classNameColLen = 0;
+            char **classColVals = ratUtils.readStrColumn(inRAT, classNameCol, &classNameColLen);
+            
             // Create new image with new RAT and pixel IDs...
-            RSGISRecodeRasterFromClasses *recodeRaster = new RSGISRecodeRasterFromClasses(inRAT, classNameIdx, classes);
+            RSGISRecodeRasterFromClasses *recodeRaster = new RSGISRecodeRasterFromClasses(inRAT, classColVals, classNameColLen, classes);
             rsgis::img::RSGISCalcImage calcImg = rsgis::img::RSGISCalcImage(recodeRaster, "", true);
             calcImg.calcImage(&segments, 1, outputImage, false, NULL, imageFormat, GDT_Int32);
             delete recodeRaster;
@@ -110,7 +132,7 @@ namespace rsgis{ namespace classifier{
             
             imageDataset->GetRasterBand(1)->SetDefaultRAT(outRAT);
             imageDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
-            
+             
             GDALClose(imageDataset);
         }
         catch(RSGISAttributeTableException &e)
@@ -131,34 +153,47 @@ namespace rsgis{ namespace classifier{
         }
     }
     
-    std::map<std::string, RSGISClassInfo*>* RSGISCollapseSegmentsClassification::findAllClassNames(const GDALRasterAttributeTable *inRAT, unsigned int classNameIdx, unsigned int redIdx, unsigned int greenIdx, unsigned int blueIdx, unsigned int alphaIdx)throw(RSGISClassificationException)
+    RSGISCollapseSegmentsClassification::~RSGISCollapseSegmentsClassification()
     {
-        // Change to use RATCalc interface
         
-        std::map<std::string, RSGISClassInfo*> *classes = new std::map<std::string, RSGISClassInfo*>();
+    }
+    
+    
+    RSGISFindAllClassNames::RSGISFindAllClassNames(std::map<std::string, RSGISClassInfo*> *classes)
+    {
+        this->classes = classes;
+        idVal = 0;
+    }
+    
+    void RSGISFindAllClassNames::calcRATValue(size_t fid, double *inRealCols, unsigned int numInRealCols, int *inIntCols, unsigned int numInIntCols, std::string *inStringCols, unsigned int numInStringCols, double *outRealCols, unsigned int numOutRealCols, int *outIntCols, unsigned int numOutIntCols, std::string *outStringCols, unsigned int numOutStringCols) throw(RSGISAttributeTableException)
+    {
         try
         {
-            size_t numRows = inRAT->GetRowCount();
-            std::string name = "";
-            RSGISClassInfo *classInfo = NULL;
-            size_t id = 1;
-            
-            for(size_t i = 0; i < numRows; ++i)
+            if(numInStringCols == 1)
             {
-                name = inRAT->GetValueAsString(i, classNameIdx);
-                //std::cout << i << ": " << name << std::endl;
-                if((classes->empty()) || (classes->count(name) == 0))
+                if((classes->empty()) || (classes->count(inStringCols[0]) == 0))
                 {
-                    classInfo = new RSGISClassInfo();
-                    classInfo->classname = name;
-                    classInfo->red = inRAT->GetValueAsInt(i, redIdx);
-                    classInfo->green = inRAT->GetValueAsInt(i, greenIdx);
-                    classInfo->blue = inRAT->GetValueAsInt(i, blueIdx);
-                    classInfo->alpha = inRAT->GetValueAsInt(i, alphaIdx);
-                    classInfo->classID = id++;
-                    //std::cout << "Adding class: " << name << std::endl;
-                    classes->insert(std::pair<std::string, RSGISClassInfo*>(name, classInfo));
+                    if(numInIntCols == 4)
+                    {
+                        RSGISClassInfo *classInfo = new RSGISClassInfo();
+                        classInfo->classname = inStringCols[0];
+                        classInfo->red = inIntCols[0];
+                        classInfo->green = inIntCols[1];
+                        classInfo->blue = inIntCols[2];
+                        classInfo->alpha = inIntCols[3];
+                        classInfo->classID = idVal++;
+                        //std::cout << "Adding class: " << inStringCols[0] << std::endl;
+                        classes->insert(std::pair<std::string, RSGISClassInfo*>(inStringCols[0], classInfo));
+                    }
+                    else
+                    {
+                        throw RSGISAttributeTableException("4 columns for RGBA need to be provided.");
+                    }
                 }
+            }
+            else
+            {
+                throw RSGISAttributeTableException("A single string column needs to be provided for the classes column.");
             }
         }
         catch(RSGISAttributeTableException &e)
@@ -177,21 +212,21 @@ namespace rsgis{ namespace classifier{
         {
             throw RSGISClassificationException(e.what());
         }
-        
-        return classes;
     }
     
-    RSGISCollapseSegmentsClassification::~RSGISCollapseSegmentsClassification()
+    RSGISFindAllClassNames::~RSGISFindAllClassNames()
     {
         
     }
     
     
     
-    RSGISRecodeRasterFromClasses::RSGISRecodeRasterFromClasses(const GDALRasterAttributeTable *rat, unsigned int classNameIdx, std::map<std::string, RSGISClassInfo*> *classes) : rsgis::img::RSGISCalcImageValue(1)
+    
+    RSGISRecodeRasterFromClasses::RSGISRecodeRasterFromClasses(const GDALRasterAttributeTable *rat, char **classColVals, size_t classNameColLen, std::map<std::string, RSGISClassInfo*> *classes) : rsgis::img::RSGISCalcImageValue(1)
     {
         this->rat = rat;
-        this->classNameIdx = classNameIdx;
+        this->classColVals = classColVals;
+        this->classNameColLen = classNameColLen;
         this->classes = classes;
         
         // Load string column to memory
@@ -201,10 +236,15 @@ namespace rsgis{ namespace classifier{
     {
         try
         {
-            int val = boost::lexical_cast<int>(bandValues[0]);
+            long val = boost::lexical_cast<long>(bandValues[0]);
             
-            // Read class name from array in memory
-            std::string className = rat->GetValueAsString(val, classNameIdx);
+            if(val >= classNameColLen)
+            {
+                throw rsgis::img::RSGISImageCalcException("Row is not within the RAT.");
+            }
+            
+            std::string className = std::string(classColVals[val]);
+            
             
             std::map<std::string, RSGISClassInfo*>::iterator iterClass = classes->find(className);
             

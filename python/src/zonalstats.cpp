@@ -325,6 +325,29 @@ static PyObject *ZonalStats_ImageZoneToHDF(PyObject *self, PyObject *args)
 }
 
 
+static PyObject *ZonalStats_ExtractAvgEndMembers(PyObject *self, PyObject *args)
+{
+    const char *pszInputImage, *pszInputVector, *pszOutputMatrix;
+    int pixelInPolyMethod = 1;
+    if( !PyArg_ParseTuple(args, "sss|i:extractAvgEndMembers", &pszInputImage, &pszInputVector, &pszOutputMatrix, &pixelInPolyMethod))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeExtractAvgEndMembers(pszInputImage, pszInputVector, pszOutputMatrix, pixelInPolyMethod);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+
 // Our list of functions in this module
 static PyMethodDef ZonalStatsMethods[] = {
     {"pointValue2SHP", ZonalStats_PointValue2SHP, METH_VARARGS, 
@@ -473,6 +496,27 @@ static PyMethodDef ZonalStatsMethods[] = {
     "* inputvector is a string containing the name of the input vector.\n"
     "* outputHDF is a string containing name of the output HDF file.\n"
     "* noProjWarning is a bool, specifying whether to skip printing a warning if the vector and image have a different projections.\n"
+    "* pixelInPolyMethod is the method for determining if a pixel is included with a polygon of type rsgislib.zonalstats.METHOD_*.\n"
+    "\n"
+    "Example::\n"
+    "\n"
+    "    from rsgislib import zonalstats\n"
+    "    inputimage = './Rasters/injune_p142_casi_sub_utm.kea'\n"
+    "    inputvector = './Vectors/injune_p142_crowns_utm.shp'\n"
+    "    outputHDF = './TestOutputs/InjuneP142.hdf'\n"
+    "    zonalstats.imageZoneToHDF(inputimage, inputvector, outputHDF, True, zonalstats.METHOD_POLYCONTAINSPIXELCENTER)\n"
+    "\n"},
+    
+{"extractAvgEndMembers", ZonalStats_ExtractAvgEndMembers, METH_VARARGS,
+    "rsgislib.zonalstats.extractAvgEndMembers(inputimage, inputvector, outputMatrixFile, pixelInPolyMethod=METHOD_POLYCONTAINSPIXELCENTER)\n"
+    "Extract the average endmembers per class which are saved as an appropriate \n"
+    "matrix file to be used within the linear spectral unmixing commands. \n"
+    "Each polygon defined is another endmember in the outputted matric file.\n\n"
+    "Where:\n"
+    "\n"
+    "* inputimage is a string containing the name of the input image.\n"
+    "* inputvector is a string containing the name of the input vector.\n"
+    "* outputMatrixFile is a string containing name of the output matrix file.\n"
     "* pixelInPolyMethod is the method for determining if a pixel is included with a polygon of type rsgislib.zonalstats.METHOD_*.\n"
     "\n"
     "Example::\n"
