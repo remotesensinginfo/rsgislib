@@ -1543,6 +1543,67 @@ namespace rsgis{namespace rastergis{
         }
         return outData;
     }
+    
+    std::vector<std::vector<size_t>* >* RSGISRasterAttUtils::getRATNeighbours(GDALDataset *clumpImage, unsigned int ratBand) throw(RSGISAttributeTableException)
+    {
+        std::vector<std::vector<size_t>* > *neighbours = new std::vector<std::vector<size_t>* >();
+        
+        try
+        {
+            kealib::KEAImageIO *keaImgIO;
+            void *internalData = clumpImage->GetInternalHandle("");
+            if(internalData != NULL)
+            {
+                try
+                {
+                    keaImgIO = static_cast<kealib::KEAImageIO*>(internalData);
+                    
+                    if((keaImgIO == NULL) | (keaImgIO == 0))
+                    {
+                        throw RSGISAttributeTableException("Could not get hold of the internal KEA Image IO Object - was ");
+                    }
+                }
+                catch(RSGISAttributeTableException& e)
+                {
+                    throw e;
+                }
+                catch(boost::numeric::negative_overflow& e)
+                {
+                    throw RSGISAttributeTableException(e.what());
+                }
+                catch(boost::numeric::bad_numeric_cast& e)
+                {
+                    throw RSGISAttributeTableException(e.what());
+                }
+            }
+            else
+            {
+                throw RSGISAttributeTableException("Internal data on GDAL Dataset was NULL - check input file is KEA.");
+            }
+            
+            kealib::KEAAttributeTable *keaAtt = keaImgIO->getAttributeTable(kealib::kea_att_file, ratBand);
+            size_t numRows = keaAtt->getSize();
+            neighbours->reserve(numRows);
+            
+            keaAtt->getNeighbours(0, numRows, neighbours);
+            
+            
+        }
+        catch (RSGISAttributeTableException &e)
+        {
+            throw e;
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw RSGISAttributeTableException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw RSGISAttributeTableException(e.what());
+        }
+        
+        return neighbours;
+    }
 
 
     RSGISRasterAttUtils::~RSGISRasterAttUtils()

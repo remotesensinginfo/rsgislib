@@ -14,6 +14,16 @@ class BandAttStats:
         self.sumField = sumField
         self.meanField = meanField
         self.stdDevField = stdDevField
+        
+class FieldAttStats:
+    """ This is passed to the calcRelDiffNeighStats function """
+    def __init__(self, field, minField=None, maxField=None, sumField=None, stdDevField=None, meanField=None):
+        self.field = field
+        self.minField = minField
+        self.maxField = maxField
+        self.sumField = sumField
+        self.meanField = meanField
+        self.stdDevField = stdDevField
 
 class BandAttPercentiles:
     """ This is passed to the populateRATWithPercentiles function """
