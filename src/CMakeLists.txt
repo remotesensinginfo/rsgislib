@@ -775,6 +775,7 @@ set(LIB_RASTERGIS_H
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindInfoBetweenLayers.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISClumpBorders.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISInterpolateClumpValues2Image.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcNeighbourStats.h
 	)
 	
 	
@@ -806,6 +807,8 @@ set(LIB_RASTERGIS_CPP
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISClumpBorders.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISInterpolateClumpValues2Image.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISInterpolateClumpValues2Image.cpp
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcNeighbourStats.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcNeighbourStats.cpp
 	)
 	
 ###############################################################################
