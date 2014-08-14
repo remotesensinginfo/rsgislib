@@ -35,6 +35,8 @@
 #include "gdal_priv.h"
 #include "gdal_rat.h"
 
+#include "libkea/KEAImageIO.h"
+
 #include "common/RSGISAttributeTableException.h"
 
 #include "utils/RSGISColour.h"
@@ -134,6 +136,8 @@ namespace rsgis{namespace rastergis{
         double* readDoubleColumn(GDALRasterAttributeTable *attTable, std::string colName, size_t *colLen) throw(RSGISAttributeTableException);
         int* readIntColumn(GDALRasterAttributeTable *attTable, std::string colName, size_t *colLen) throw(RSGISAttributeTableException);
         char** readStrColumn(GDALRasterAttributeTable *attTable, std::string colName, size_t *colLen) throw(RSGISAttributeTableException);
+        
+        std::vector<std::vector<size_t>* >* getRATNeighbours(GDALDataset *clumpImage, unsigned int ratBand) throw(RSGISAttributeTableException);
         
         ~RSGISRasterAttUtils();
     };
