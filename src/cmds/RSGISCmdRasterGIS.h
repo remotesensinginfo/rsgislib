@@ -83,6 +83,21 @@ namespace rsgis{ namespace cmds {
         bool calcSum;
         std::string sumField;
     };
+    
+    struct RSGISFieldAttStatsCmds
+    {
+        std::string field;
+        bool calcMin;
+        std::string minField;
+        bool calcMax;
+        std::string maxField;
+        bool calcMean;
+        std::string meanField;
+        bool calcStdDev;
+        std::string stdDevField;
+        bool calcSum;
+        std::string sumField;
+    };
 
     struct RSGISBandAttPercentilesCmds
     {
@@ -241,6 +256,13 @@ namespace rsgis{ namespace cmds {
     /** Function to calculate the 'Global Segmentation Score' for the clumps using a given input image */
     //float executeFindGlobalSegmentationScore4Clumps(std::string clumpsImage, std::string inputImage, std::string colPrefix, bool calcNeighbours, float minNormV, float maxNormV, float minNormMI, float maxNormMI, std::vector<cmds::RSGISJXSegQualityScoreBandCmds> *scoreBandComps)throw(RSGISCmdException);
 
+    /** Function to calculate relative difference statistic to neighbouring clumps. */
+    void executeCalcRelDiffNeighbourStats(std::string clumpsImage, rsgis::cmds::RSGISFieldAttStatsCmds *fieldStatsCmds, bool useAbsDiff, unsigned int ratBand)throw(RSGISCmdException);
+    
+    /** Function to undertaken region growing of a class */
+    void executeClassRegionGrowing(std::string clumpsImage, unsigned int ratBand)throw(RSGISCmdException);
+    
+    
 }}
 
 

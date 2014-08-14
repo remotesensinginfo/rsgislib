@@ -1276,6 +1276,98 @@ static PyObject *RasterGIS_InterpolateClumpValues2Img(PyObject *self, PyObject *
 
     Py_RETURN_NONE;
 }
+
+static PyObject *RasterGIS_CalcRelDiffNeighbourStats(PyObject *self, PyObject *args)
+{
+    const char *clumpsImage;
+    PyObject *fieldObj;
+    int useAbsDiff;
+    useAbsDiff = 0;
+    int ratBand;
+    ratBand = 1;
+    
+    if(!PyArg_ParseTuple(args, "sOi|i:calcRelDiffNeighStats", &clumpsImage, &fieldObj, &useAbsDiff, &ratBand))
+    {
+        return NULL;
+    }
+    
+    // declare and initialise pointers for all the attributes of the struct
+    PyObject *pField, *pMinField, *pMaxField, *pStdDevField, *pSumField, *pMeanField;
+    pField = pMinField = pMaxField = pMeanField = pStdDevField = pSumField = NULL;
+    
+    rsgis::cmds::RSGISFieldAttStatsCmds *cmdObj = new rsgis::cmds::RSGISFieldAttStatsCmds();
+    
+    std::vector<PyObject*> extractedAttributes;     // store a list of extracted pyobjects to dereference
+    extractedAttributes.push_back(fieldObj);
+    
+    pField = PyObject_GetAttrString(fieldObj, "field");
+    extractedAttributes.push_back(pField);
+    if( ( pField == NULL ) || ( pField == Py_None ) )
+    {
+        PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'field\'" );
+        FreePythonObjects(extractedAttributes);
+        return NULL;
+    }
+    
+    pMinField = PyObject_GetAttrString(fieldObj, "minField");
+    extractedAttributes.push_back(pMinField);
+    cmdObj->calcMin =  !(pMinField == NULL || !RSGISPY_CHECK_STRING(pMinField));
+    
+    pMaxField = PyObject_GetAttrString(fieldObj, "maxField");
+    extractedAttributes.push_back(pMaxField);
+    cmdObj->calcMax = !(pMaxField == NULL || !RSGISPY_CHECK_STRING(pMaxField));
+    
+    pMeanField = PyObject_GetAttrString(fieldObj, "meanField");
+    extractedAttributes.push_back(pMeanField);
+    cmdObj->calcMean = !(pMeanField == NULL || !RSGISPY_CHECK_STRING(pMeanField));
+    
+    pStdDevField = PyObject_GetAttrString(fieldObj, "stdDevField");
+    extractedAttributes.push_back(pStdDevField);
+    cmdObj->calcStdDev = !(pStdDevField == NULL || !RSGISPY_CHECK_STRING(pStdDevField));
+    
+    pSumField = PyObject_GetAttrString(fieldObj, "sumField");
+    extractedAttributes.push_back(pSumField);
+    cmdObj->calcSum = !(pSumField == NULL || !RSGISPY_CHECK_STRING(pSumField));
+    
+    // extract the values from the objects
+    cmdObj->field = RSGISPY_STRING_EXTRACT(pField);
+    // check the calcValue and extract fields if required
+    if(cmdObj->calcMax)
+    {
+        cmdObj->maxField = RSGISPY_STRING_EXTRACT(pMaxField);
+    }
+    if(cmdObj->calcMean)
+    {
+        cmdObj->meanField = RSGISPY_STRING_EXTRACT(pMeanField);
+    }
+    if(cmdObj->calcMin)
+    {
+        cmdObj->minField = RSGISPY_STRING_EXTRACT(pMinField);
+    }
+    if(cmdObj->calcStdDev)
+    {
+        cmdObj->stdDevField = RSGISPY_STRING_EXTRACT(pStdDevField);
+    }
+    if(cmdObj->calcSum)
+    {
+        cmdObj->sumField = RSGISPY_STRING_EXTRACT(pSumField);
+    }
+    
+    FreePythonObjects(extractedAttributes);
+    
+    try
+    {
+        rsgis::cmds::executeCalcRelDiffNeighbourStats(std::string(clumpsImage), cmdObj, (useAbsDiff != 0), ratBand);
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 /*
 
 static PyObject *RasterGIS_FindGlobalSegmentationScore(PyObject *self, PyObject *args) {
@@ -1833,7 +1925,7 @@ static PyMethodDef RasterGISMethods[] = {
 */
     {"findChangeClumpsFromStdDev", (PyCFunction)RasterGIS_FindChangeClumpsFromStdDev, METH_VARARGS | METH_KEYWORDS,
 "rastergis.findChangeClumpsFromStdDev(clumpsImage, classfield, changeField, attFields, classChangeFields)\n"
-"Identifies segments which have changed by looking for statistical outliers (std dev) from class population.\n"
+"Identifies segments which have changed by looking for statistical outliers (std dev) from class population.\n\n"
 "Where:\n"
 "\n"
 "* clumps is a string containing the name of the input clump file\n"
@@ -1848,7 +1940,7 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"
 "* ratBand is an int containing band for which the neighbours are to be calculated for (Optional, Default = 1)\n"
 "\nExample::\n"
-"   import collections"
+"   import collections\n"
 "   from rsgislib import rastergis\n"
 "   clumpsImage='injune_p142_casi_sub_utm_segs_popstats.kea'\n"
 "   ChangeFeat = collections.namedtuple('ChangeFeats', ['name', 'outName', 'threshold'])\n"
@@ -1914,6 +2006,24 @@ static PyMethodDef RasterGISMethods[] = {
     "* dataType is an containing one of the values from rsgislib.TYPE_*\n"
     "* ratBand is the image band with which the RAT is associated."
     "\n"},
+    
+
+{"calcRelDiffNeighStats", RasterGIS_CalcRelDiffNeighbourStats, METH_VARARGS,
+"rsgislib.rastergis.calcRelDiffNeighStats(clumpsImage, fieldstats, ratBand)\n"
+"Calculates stuff....\n"
+"Where:\n"
+"\n"
+"* clumpsImage is a string containing the name of the input clump file\n"
+"* fieldstats has the following fields\n"
+"\n"
+"      * field: string defining the field in the RAT to compare to.\n"
+"      * minField: string defining the name of the field for min value\n"
+"      * maxField: string defining the name of the field for max value\n"
+"      * sumField: string defining the name of the field for sum value\n"
+"      * meanField: string defining the name of the field for mean value\n"
+"      * stdDevField: string defining the name of the field for standard deviation value\n"
+"* ratBand is the image band with which the RAT is associated."
+"\n"},
 
 /*
 {"calcGlobalSegmentationScore", RasterGIS_FindGlobalSegmentationScore, METH_VARARGS,
