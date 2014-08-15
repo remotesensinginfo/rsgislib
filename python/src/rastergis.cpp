@@ -2010,7 +2010,8 @@ static PyMethodDef RasterGISMethods[] = {
 
 {"calcRelDiffNeighStats", RasterGIS_CalcRelDiffNeighbourStats, METH_VARARGS,
 "rsgislib.rastergis.calcRelDiffNeighStats(clumpsImage, fieldstats, ratBand)\n"
-"Calculates stuff....\n"
+"Calculates the difference (relative or absolute) between each clump and it's\n"
+"neighbours. The differences can be summarised as min, max, mean, std dev or sum.\n"
 "Where:\n"
 "\n"
 "* clumpsImage is a string containing the name of the input clump file\n"
@@ -2022,7 +2023,17 @@ static PyMethodDef RasterGISMethods[] = {
 "      * sumField: string defining the name of the field for sum value\n"
 "      * meanField: string defining the name of the field for mean value\n"
 "      * stdDevField: string defining the name of the field for standard deviation value\n"
-"* ratBand is the image band with which the RAT is associated."
+"* ratBand is the image band with which the RAT is associated.\n"
+"\nExample::\n"
+"    import rsgislib.rastergis\n"
+"\n"
+"    inputImage = \"./RapidEye_20130625_lat53lon389_tid3063312_oid167771_rad_toa_segs_neigh.kea\"\n"
+"    ratBand = 1\n"
+"\n"
+"    rsgislib.rastergis.findNeighbours(inputImage, ratBand)\n"
+"\n"
+"    fieldInfo = rsgislib.rastergis.FieldAttStats(field=\"NIRMean\", minField=\"MinNIRMeanDiff\", maxField=\"MaxNIRMeanDiff\")\n"
+"    rsgislib.rastergis.calcRelDiffNeighStats(inputImage, fieldInfo, False, ratBand)\n"
 "\n"},
 
 /*
