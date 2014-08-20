@@ -586,6 +586,7 @@ set(LIB_MATH_H
 	${RSGIS_SRC_MATH_DIR}/RSGISMaximumLikelihood.h
 	${RSGIS_SRC_MATH_DIR}/RSGISMaximumLikelihoodException.h
 	${RSGIS_SRC_MATH_DIR}/RSGIS2DInterpolation.h
+	${RSGIS_SRC_MATH_DIR}/RSGISLogicExpEvaluation.h
 	)
 	
 set(LIB_MATH_CPP
@@ -658,6 +659,8 @@ set(LIB_MATH_CPP
 	${RSGIS_SRC_MATH_DIR}/RSGISMaximumLikelihoodException.h
 	${RSGIS_SRC_MATH_DIR}/RSGIS2DInterpolation.cpp
 	${RSGIS_SRC_MATH_DIR}/RSGIS2DInterpolation.h
+	${RSGIS_SRC_MATH_DIR}/RSGISLogicExpEvaluation.cpp
+	${RSGIS_SRC_MATH_DIR}/RSGISLogicExpEvaluation.h
 	)
 ###############################################################################
 
@@ -776,6 +779,8 @@ set(LIB_RASTERGIS_H
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISClumpBorders.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISInterpolateClumpValues2Image.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcNeighbourStats.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISClumpRegionGrowing.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISBinaryClassifyClumps.h
 	)
 	
 	
@@ -809,6 +814,10 @@ set(LIB_RASTERGIS_CPP
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISInterpolateClumpValues2Image.cpp
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcNeighbourStats.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcNeighbourStats.cpp
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISClumpRegionGrowing.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISClumpRegionGrowing.cpp
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISBinaryClassifyClumps.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISBinaryClassifyClumps.cpp
 	)
 	
 ###############################################################################

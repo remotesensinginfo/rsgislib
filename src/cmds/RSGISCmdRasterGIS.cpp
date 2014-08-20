@@ -46,6 +46,7 @@
 #include "rastergis/RSGISClumpBorders.h"
 #include "rastergis/RSGISInterpolateClumpValues2Image.h"
 #include "rastergis/RSGISCalcNeighbourStats.h"
+#include "rastergis/RSGISBinaryClassifyClumps.h"
 
 
 /*
@@ -1473,8 +1474,40 @@ namespace rsgis{ namespace cmds {
                 std::string message = std::string("Could not open image ") + clumpsImage;
                 throw rsgis::RSGISImageException(message.c_str());
             }
+
             
             
+            
+            GDALClose(clumpsDataset);
+        }
+        catch(rsgis::RSGISAttributeTableException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+            
+            
+    void executeBinaryClassify(std::string clumpsImage, unsigned int ratBand, std::string xmlBlock, std::string outColumn)throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            std::cout.precision(12);
+            
+            GDALDataset *clumpsDataset = (GDALDataset *) GDALOpen(clumpsImage.c_str(), GA_Update);
+            if(clumpsDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + clumpsImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            //std::cout << "XML: " << xmlBlock << std::endl;
+            
+            rsgis::rastergis::RSGISBinaryClassifyClumps classClumps;
+            classClumps.classifyClumps(clumpsDataset, ratBand, xmlBlock, outColumn);
             
             GDALClose(clumpsDataset);
         }
