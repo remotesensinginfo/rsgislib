@@ -262,7 +262,8 @@ namespace rsgis{ namespace cmds {
     /** Function to undertaken region growing of a class */
     void executeClassRegionGrowing(std::string clumpsImage, unsigned int ratBand)throw(RSGISCmdException);
     
-    
+    /** Function to evaluate regions to produce a binary classification */
+    void executeBinaryClassify(std::string clumpsImage, unsigned int ratBand, std::string xmlBlock, std::string outColumn)throw(RSGISCmdException);
 }}
 
 

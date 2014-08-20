@@ -1544,6 +1544,95 @@ namespace rsgis{namespace rastergis{
         return outData;
     }
     
+    std::string* RSGISRasterAttUtils::readStrColumnStdStr(GDALRasterAttributeTable *attTable, std::string colName, size_t *colLen) throw(RSGISAttributeTableException)
+    {
+        std::string *outData = NULL;
+        try
+        {
+            int columnIndex = this->findColumnIndex(attTable, colName);
+            
+            // Iterate through blocks
+            size_t nRows = attTable->GetRowCount();
+            *colLen = nRows;
+            unsigned int nBlocks = floor(((double) nRows) / ((double) RAT_BLOCK_LENGTH));
+            unsigned int remainRows = nRows - (nBlocks * RAT_BLOCK_LENGTH );
+            
+            outData = new std::string[nRows];
+            
+            char **blockData = new char*[RAT_BLOCK_LENGTH];
+            
+            int feedback = nRows/10.0;
+            int feedbackCounter = 0;
+            
+            // Don't show progress if less rows than block length
+            if(nRows < RAT_BLOCK_LENGTH)
+            {
+                feedback = 0;
+            }
+            
+            if(feedback != 0){std::cout << "Started " << std::flush;}
+            
+            int rowOffset = 0;
+            for(int i = 0; i < nBlocks; i++)
+            {
+                rowOffset =  RAT_BLOCK_LENGTH * i;
+                
+                // Read block
+                attTable->ValuesIO(GF_Read, columnIndex, rowOffset, RAT_BLOCK_LENGTH, blockData);
+                
+                // Loop through block
+                
+                for(int m = 0; m < RAT_BLOCK_LENGTH; ++m)
+                {
+                    // Show progress
+                    if((feedback != 0) && (((i*RAT_BLOCK_LENGTH)+m) % feedback) == 0)
+                    {
+                        std::cout << "." << feedbackCounter << "." << std::flush;
+                        feedbackCounter = feedbackCounter + 10;
+                    }
+                    outData[(i*RAT_BLOCK_LENGTH)+m] = std::string(blockData[m]);
+                }
+                
+            }
+            if(remainRows > 0)
+            {
+                rowOffset =  RAT_BLOCK_LENGTH * nBlocks;
+                
+                // Read block
+                attTable->ValuesIO(GF_Read, columnIndex, rowOffset, remainRows, blockData);
+                
+                // Loop through block
+                
+                for(int m = 0; m < remainRows; ++m)
+                {
+                    // Show progress
+                    if((feedback != 0) && (((nBlocks*RAT_BLOCK_LENGTH)+m) % feedback) == 0)
+                    {
+                        std::cout << "." << feedbackCounter << "." << std::flush;
+                        feedbackCounter = feedbackCounter + 10;
+                    }
+                    outData[(nBlocks*RAT_BLOCK_LENGTH)+m] = std::string(blockData[m]);
+                }
+            }
+            if(feedback != 0){std::cout << ".Completed\n";}
+            delete[] blockData;
+        }
+        catch (RSGISAttributeTableException &e)
+        {
+            throw e;
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw RSGISAttributeTableException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw RSGISAttributeTableException(e.what());
+        }
+        
+        return outData;
+    }
+    
     std::vector<std::vector<size_t>* >* RSGISRasterAttUtils::getRATNeighbours(GDALDataset *clumpImage, unsigned int ratBand) throw(RSGISAttributeTableException)
     {
         std::vector<std::vector<size_t>* > *neighbours = new std::vector<std::vector<size_t>* >();
@@ -1603,6 +1692,96 @@ namespace rsgis{namespace rastergis{
         }
         
         return neighbours;
+    }
+    
+    
+    void RSGISRasterAttUtils::writeStrColumn(GDALRasterAttributeTable *attTable, std::string colName, std::string *strDataVal, size_t colLen) throw(RSGISAttributeTableException)
+    {
+        try
+        {
+            // Iterate through blocks
+            size_t nRows = attTable->GetRowCount();
+            
+            if(nRows != colLen)
+            {
+                throw RSGISAttributeTableException("The column length provided and the length of the RAT are not equal...");
+            }
+            
+            unsigned int columnIndex = this->findColumnIndexOrCreate(attTable, colName, GFT_String);
+            
+            unsigned int nBlocks = floor(((double) nRows) / ((double) RAT_BLOCK_LENGTH));
+            unsigned int remainRows = nRows - (nBlocks * RAT_BLOCK_LENGTH );
+            
+            char **blockData = new char*[RAT_BLOCK_LENGTH];
+            
+            int feedback = nRows/10.0;
+            int feedbackCounter = 0;
+            
+            // Don't show progress if less rows than block length
+            if(nRows < RAT_BLOCK_LENGTH)
+            {
+                feedback = 0;
+            }
+            
+            if(feedback != 0){std::cout << "Started " << std::flush;}
+            
+            int rowOffset = 0;
+            for(int i = 0; i < nBlocks; i++)
+            {
+                rowOffset =  RAT_BLOCK_LENGTH * i;
+                
+                // Loop through block
+                
+                for(int m = 0; m < RAT_BLOCK_LENGTH; ++m)
+                {
+                    // Show progress
+                    if((feedback != 0) && (((i*RAT_BLOCK_LENGTH)+m) % feedback) == 0)
+                    {
+                        std::cout << "." << feedbackCounter << "." << std::flush;
+                        feedbackCounter = feedbackCounter + 10;
+                    }
+                    strcpy(blockData[m], strDataVal[(i*RAT_BLOCK_LENGTH)+m].c_str());
+                }
+                
+                // Write block
+                attTable->ValuesIO(GF_Write, columnIndex, rowOffset, RAT_BLOCK_LENGTH, blockData);
+                
+            }
+            if(remainRows > 0)
+            {
+                rowOffset =  RAT_BLOCK_LENGTH * nBlocks;
+                
+                // Loop through block
+                for(int m = 0; m < remainRows; ++m)
+                {
+                    // Show progress
+                    if((feedback != 0) && (((nBlocks*RAT_BLOCK_LENGTH)+m) % feedback) == 0)
+                    {
+                        std::cout << "." << feedbackCounter << "." << std::flush;
+                        feedbackCounter = feedbackCounter + 10;
+                    }
+                    strcpy(blockData[m], strDataVal[(nBlocks*RAT_BLOCK_LENGTH)+m].c_str());
+                }
+                
+                // Read block
+                attTable->ValuesIO(GF_Write, columnIndex, rowOffset, remainRows, blockData);
+            }
+            if(feedback != 0){std::cout << ".Completed\n";}
+            delete[] blockData;
+            
+        }
+        catch (RSGISAttributeTableException &e)
+        {
+            throw e;
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw RSGISAttributeTableException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw RSGISAttributeTableException(e.what());
+        }
     }
 
 

@@ -1368,6 +1368,30 @@ static PyObject *RasterGIS_CalcRelDiffNeighbourStats(PyObject *self, PyObject *a
     Py_RETURN_NONE;
 }
 
+
+static PyObject *RasterGIS_BinaryClassification(PyObject *self, PyObject *args)
+{
+    const char *clumpsImage, *xmlFile, *outColumn;
+    unsigned int ratBand = 1;
+    
+    if(!PyArg_ParseTuple(args, "sss|I:binaryClassification", &clumpsImage, &xmlFile, &outColumn, &ratBand))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeBinaryClassify(std::string(clumpsImage), ratBand, std::string(xmlFile), std::string(outColumn));
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 /*
 
 static PyObject *RasterGIS_FindGlobalSegmentationScore(PyObject *self, PyObject *args) {
@@ -2034,6 +2058,18 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"
 "    fieldInfo = rsgislib.rastergis.FieldAttStats(field=\"NIRMean\", minField=\"MinNIRMeanDiff\", maxField=\"MaxNIRMeanDiff\")\n"
 "    rsgislib.rastergis.calcRelDiffNeighStats(inputImage, fieldInfo, False, ratBand)\n"
+"\n"},
+    
+    
+{"binaryClassification", RasterGIS_BinaryClassification, METH_VARARGS,
+"rsgislib.rastergis.binaryClassification(clumpsImage, xmlBlock, outColumn, ratBand)\n"
+"Calculates a binary classificvation (1, 0) given a set of logical conditions.\n"
+"Where:\n"
+"\n"
+"* clumpsImage is a string containing the name of the input clump file\n"
+"* xmlBlock is a string with a block of XML which is to be parsed for the logical expression.\n"
+"* outColumn is a string with the name out of the output column.\n"
+"* ratBand is an (optional; default 1) integer with the image band with which the RAT is associated.\n"
 "\n"},
 
 /*
