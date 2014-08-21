@@ -264,6 +264,10 @@ namespace rsgis{ namespace cmds {
     
     /** Function to evaluate regions to produce a binary classification */
     void executeBinaryClassify(std::string clumpsImage, unsigned int ratBand, std::string xmlBlock, std::string outColumn)throw(RSGISCmdException);
+    
+    /** Function for populating an attribute table from an image with 'mean-lit' values. */
+    void executePopulateRATWithMeanLitStats(std::string inputImage, std::string clumpsImage, std::string inputMeanLitImage, unsigned int meanlitBand, std::string meanLitColumn, std::string pxlCountCol, std::vector<rsgis::cmds::RSGISBandAttStatsCmds*> *bandStatsCmds, unsigned int ratBand)throw(RSGISCmdException);
+    
 }}
 
 

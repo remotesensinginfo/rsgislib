@@ -1521,5 +1521,82 @@ namespace rsgis{ namespace cmds {
         }
     }
             
+            
+    void executePopulateRATWithMeanLitStats(std::string inputImage, std::string clumpsImage, std::string inputMeanLitImage, unsigned int meanlitBand, std::string meanLitColumn, std::string pxlCountCol, std::vector<rsgis::cmds::RSGISBandAttStatsCmds*> *bandStatsCmds, unsigned int ratBand)throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            
+            GDALDataset *clumpsDataset = (GDALDataset *) GDALOpenShared(clumpsImage.c_str(), GA_Update);
+            if(clumpsDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + clumpsImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            GDALDataset *imageDataset = (GDALDataset *) GDALOpenShared(inputImage.c_str(), GA_ReadOnly);
+            if(imageDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            GDALDataset *imageMeanLitDataset = (GDALDataset *) GDALOpenShared(inputMeanLitImage.c_str(), GA_ReadOnly);
+            if(imageMeanLitDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputMeanLitImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            if((meanlitBand == 0) | (meanlitBand > imageMeanLitDataset->GetRasterCount()))
+            {
+                throw rsgis::RSGISImageException("Specified image mean-lit band is not within the mean-lit image.");
+            }
+            
+            std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats = new std::vector<rsgis::rastergis::RSGISBandAttStats*>();
+            bandStats->reserve(bandStatsCmds->size());
+            
+            rsgis::rastergis::RSGISBandAttStats *bandStat = NULL;
+            for(std::vector<rsgis::cmds::RSGISBandAttStatsCmds*>::iterator iterBand = bandStatsCmds->begin(); iterBand != bandStatsCmds->end(); ++iterBand)
+            {
+                bandStat = new rsgis::rastergis::RSGISBandAttStats();
+                bandStat->band = (*iterBand)->band;
+                bandStat->calcMin = (*iterBand)->calcMin;
+                bandStat->minField = (*iterBand)->minField;
+                bandStat->calcMax = (*iterBand)->calcMax;
+                bandStat->maxField = (*iterBand)->maxField;
+                bandStat->calcMean = (*iterBand)->calcMean;
+                bandStat->meanField = (*iterBand)->meanField;
+                bandStat->calcStdDev = (*iterBand)->calcStdDev;
+                bandStat->stdDevField = (*iterBand)->stdDevField;
+                bandStat->calcSum = (*iterBand)->calcSum;
+                bandStat->sumField = (*iterBand)->sumField;
+                
+                bandStats->push_back(bandStat);
+            }
+            
+            rsgis::rastergis::RSGISPopRATWithStats clumpStats;
+            clumpStats.populateRATWithMeanLitStats(clumpsDataset, imageDataset, imageMeanLitDataset, meanlitBand, meanLitColumn, pxlCountCol, bandStats, ratBand);
+            
+            for(std::vector<rsgis::rastergis::RSGISBandAttStats*>::iterator iterBand = bandStats->begin(); iterBand != bandStats->end(); ++iterBand)
+            {
+                delete *iterBand;
+            }
+            delete bandStats;
+            
+            clumpsDataset->GetRasterBand(ratBand)->SetMetadataItem("LAYER_TYPE", "thematic");
+            
+            GDALClose(clumpsDataset);
+            GDALClose(imageDataset);
+            GDALClose(imageMeanLitDataset);
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+            
 }}
 
