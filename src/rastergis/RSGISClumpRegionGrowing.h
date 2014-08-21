@@ -33,8 +33,11 @@
 #include "common/RSGISAttributeTableException.h"
 
 #include "math/RSGISMathsUtils.h"
+#include "math/RSGISLogicExpEvaluation.h"
 
 #include "rastergis/RSGISRasterAttUtils.h"
+#include "rastergis/RSGISBinaryClassifyClumps.h"
+
 
 namespace rsgis{namespace rastergis{
     
@@ -42,7 +45,7 @@ namespace rsgis{namespace rastergis{
     {
     public:
         RSGISClumpRegionGrowing();
-        void growClassRegion(GDALDataset *inputClumps, std::string classColumn, std::string classVal, int maxIter, unsigned int ratBand)throw(RSGISAttributeTableException);
+        void growClassRegion(GDALDataset *inputClumps, std::string classColumn, std::string classVal, int maxIter, unsigned int ratBand, std::string xmlBlock)throw(RSGISAttributeTableException);
         ~RSGISClumpRegionGrowing();
     };
     

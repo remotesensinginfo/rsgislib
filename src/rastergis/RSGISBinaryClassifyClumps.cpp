@@ -499,7 +499,6 @@ namespace rsgis{namespace rastergis{
             std::vector<rsgis::rastergis::RSGISColumnLogicIdxs*> *colIdxes = new std::vector<rsgis::rastergis::RSGISColumnLogicIdxs*>();
             rsgis::math::RSGISLogicExpression* exp = parseLogicXMLObj.parseLogicXML(xmlBlock, colIdxes);
             
-            std::cout << "Expression = " << exp->getExpName() << std::endl;
             unsigned outColIdx = attUtils.findColumnIndexOrCreate(rat, outColumn, GFT_Integer);
             
             std::vector<unsigned int> inRealColIdx;
