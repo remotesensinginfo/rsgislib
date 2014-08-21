@@ -260,7 +260,7 @@ namespace rsgis{ namespace cmds {
     void executeCalcRelDiffNeighbourStats(std::string clumpsImage, rsgis::cmds::RSGISFieldAttStatsCmds *fieldStatsCmds, bool useAbsDiff, unsigned int ratBand)throw(RSGISCmdException);
     
     /** Function to undertaken region growing of a class */
-    void executeClassRegionGrowing(std::string clumpsImage, unsigned int ratBand)throw(RSGISCmdException);
+    void executeClassRegionGrowing(std::string clumpsImage, unsigned int ratBand, std::string classColumn, std::string classVal, int maxIter, std::string xmlBlock)throw(RSGISCmdException);
     
     /** Function to evaluate regions to produce a binary classification */
     void executeBinaryClassify(std::string clumpsImage, unsigned int ratBand, std::string xmlBlock, std::string outColumn)throw(RSGISCmdException);

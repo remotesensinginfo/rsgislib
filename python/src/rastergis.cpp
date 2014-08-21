@@ -1371,17 +1371,41 @@ static PyObject *RasterGIS_CalcRelDiffNeighbourStats(PyObject *self, PyObject *a
 
 static PyObject *RasterGIS_BinaryClassification(PyObject *self, PyObject *args)
 {
-    const char *clumpsImage, *xmlFile, *outColumn;
+    const char *clumpsImage, *xmlBlock, *outColumn;
     unsigned int ratBand = 1;
     
-    if(!PyArg_ParseTuple(args, "sss|I:binaryClassification", &clumpsImage, &xmlFile, &outColumn, &ratBand))
+    if(!PyArg_ParseTuple(args, "sss|I:binaryClassification", &clumpsImage, &xmlBlock, &outColumn, &ratBand))
     {
         return NULL;
     }
     
     try
     {
-        rsgis::cmds::executeBinaryClassify(std::string(clumpsImage), ratBand, std::string(xmlFile), std::string(outColumn));
+        rsgis::cmds::executeBinaryClassify(std::string(clumpsImage), ratBand, std::string(xmlBlock), std::string(outColumn));
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+static PyObject *RasterGIS_RegionGrowClass(PyObject *self, PyObject *args)
+{
+    const char *clumpsImage, *xmlBlock, *classColumn, *classVal;
+    unsigned int ratBand = 1;
+    int maxNumIter = -1;
+    
+    if(!PyArg_ParseTuple(args, "ssss|iI:regionGrowClass", &clumpsImage, &xmlBlock, &classColumn, &classVal, &maxNumIter, &ratBand))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeClassRegionGrowing(std::string(clumpsImage), ratBand, std::string(classColumn), std::string(classVal), maxNumIter, std::string(xmlBlock));
     }
     catch (rsgis::cmds::RSGISCmdException &e)
     {
@@ -2063,13 +2087,69 @@ static PyMethodDef RasterGISMethods[] = {
     
 {"binaryClassification", RasterGIS_BinaryClassification, METH_VARARGS,
 "rsgislib.rastergis.binaryClassification(clumpsImage, xmlBlock, outColumn, ratBand)\n"
-"Calculates a binary classificvation (1, 0) given a set of logical conditions.\n"
+"Calculates a binary classification (1, 0) given a set of logical conditions.\n"
 "Where:\n"
 "\n"
 "* clumpsImage is a string containing the name of the input clump file\n"
 "* xmlBlock is a string with a block of XML which is to be parsed for the logical expression.\n"
 "* outColumn is a string with the name out of the output column.\n"
 "* ratBand is an (optional; default 1) integer with the image band with which the RAT is associated.\n"
+"\nExample::\n"
+"    #!/usr/bin/env python\n"
+"\n"
+"    from rsgislib import rastergis\n"
+"    import xml.etree.cElementTree as ET\n"
+"\n"
+"    ET.register_namespace(\"rsgis\", \"http://www.rsgislib.org/xml/\")\n"
+"    rootElem = ET.Element(\"{http://www.rsgislib.org/xml/}ratlogicexps\")\n"
+"    expRoot = ET.SubElement(rootElem, \"{http://www.rsgislib.org/xml/}expression\", {'operation':'and'})\n"
+"    ET.SubElement(expRoot, \"{http://www.rsgislib.org/xml/}expression\", {'operation':'evaluate','operator':'eq','column':'ClustersClass','threshold':'6'})\n"
+"    ET.SubElement(expRoot, \"{http://www.rsgislib.org/xml/}expression\", {'operation':'evaluate','operator':'gt','column':'NIRMean','threshold':'300'})\n"
+"\n"
+"    xmlBlock = ET.tostring(rootElem, encoding='utf8', method='xml').decode(\"utf-8\")\n"
+"    print(xmlBlock)\n"
+"\n"
+"    inputimage = \"RapidEye_20130625_lat53lon389_tid3063312_oid167771_rad_toa_segs.kea\"\n"
+"    outClassColumn = \"Classification\"\n"
+"\n"
+"    rastergis.binaryClassification(inputimage, xmlBlock, outClassColumn)\n"
+"\n"},
+    
+{"regionGrowClass", RasterGIS_RegionGrowClass, METH_VARARGS,
+"rsgislib.rastergis.regionGrowClass(clumpsImage, xmlBlock, classColumn, classVal, maxNumIter, ratBand)\n"
+"Using a logical expression a class (classVal) defined within the classColumn is grown until.\n"
+"either the maximum number of iterations (maxNumIter) is reached or there all clumps meeting the\n"
+"criteria have been met (set maxNumIter to be -1).\n"
+"Where:\n"
+"\n"
+"* clumpsImage is a string containing the name of the input clump file\n"
+"* xmlBlock is a string with a block of XML which is to be parsed for the logical expression.\n"
+"* classColumn is a string with the name column containing the classification.\n"
+"* classVal is a string with the name of the class to be grown\n"
+"* maxNumIter is the maximum number of iterations to used for the growth (optional; default is -1, i.e., no max number of iterations\n"
+"* ratBand is an (optional; default 1) integer with the image band with which the RAT is associated.\n"
+"\nExample::\n"
+"    #!/usr/bin/env python\n"
+"\n"
+"    from rsgislib import rastergis\n"
+"    import xml.etree.cElementTree as ET\n"
+"\n"
+"    ET.register_namespace(\"rsgis\", \"http://www.rsgislib.org/xml/\")\n"
+"    rootElem = ET.Element(\"{http://www.rsgislib.org/xml/}ratlogicexps\")\n"
+"    expRoot = ET.SubElement(rootElem, \"{http://www.rsgislib.org/xml/}expression\", {'operation':'or'})\n"
+"    ET.SubElement(expRoot, \"{http://www.rsgislib.org/xml/}expression\", {'operation':'evaluate','operator':'gt','column':'GreenMean','threshold':'150'})\n"
+"    ET.SubElement(expRoot, \"{http://www.rsgislib.org/xml/}expression\", {'operation':'evaluate','operator':'gt','column':'RedMean','threshold':'150'})\n"
+"\n"
+"    xmlBlock = ET.tostring(rootElem, encoding='utf8', method='xml').decode(\"utf-8\")\n"
+"    print(xmlBlock)\n"
+"\n"
+"    inputimage = \"RapidEye_20130625_lat53lon389_tid3063312_oid167771_rad_toa_segs.kea\"\n"
+"    classColumn = \"ClustersClass\"\n"
+"    classVal = \"6\"\n"
+"    maxIters = -1\n"
+"\n"
+"    rastergis.findNeighbours(inputimage)\n"
+"    rastergis.regionGrowClass(inputimage, xmlBlock, classColumn, classVal, maxIters)\n"
 "\n"},
 
 /*

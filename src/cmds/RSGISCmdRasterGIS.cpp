@@ -47,6 +47,7 @@
 #include "rastergis/RSGISInterpolateClumpValues2Image.h"
 #include "rastergis/RSGISCalcNeighbourStats.h"
 #include "rastergis/RSGISBinaryClassifyClumps.h"
+#include "rastergis/RSGISClumpRegionGrowing.h"
 
 
 /*
@@ -1461,7 +1462,7 @@ namespace rsgis{ namespace cmds {
     }
       
             
-    void executeClassRegionGrowing(std::string clumpsImage, unsigned int ratBand)throw(RSGISCmdException)
+    void executeClassRegionGrowing(std::string clumpsImage, unsigned int ratBand, std::string classColumn, std::string classVal, int maxIter, std::string xmlBlock)throw(RSGISCmdException)
     {
         try
         {
@@ -1475,8 +1476,8 @@ namespace rsgis{ namespace cmds {
                 throw rsgis::RSGISImageException(message.c_str());
             }
 
-            
-            
+            rsgis::rastergis::RSGISClumpRegionGrowing growClumpRegions;
+            growClumpRegions.growClassRegion(clumpsDataset, classColumn, classVal, maxIter, ratBand, xmlBlock);
             
             GDALClose(clumpsDataset);
         }
@@ -1504,7 +1505,6 @@ namespace rsgis{ namespace cmds {
                 std::string message = std::string("Could not open image ") + clumpsImage;
                 throw rsgis::RSGISImageException(message.c_str());
             }
-            //std::cout << "XML: " << xmlBlock << std::endl;
             
             rsgis::rastergis::RSGISBinaryClassifyClumps classClumps;
             classClumps.classifyClumps(clumpsDataset, ratBand, xmlBlock, outColumn);
