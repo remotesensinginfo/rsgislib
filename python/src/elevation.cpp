@@ -156,7 +156,7 @@ static PyObject *Elevation_calcShadowMask(PyObject *self, PyObject *args)
 {
     const char *pszInputImage, *pszOutputFile, *pszGDALFormat;
     float azimuth, zenith, maxHeight = 0.0;
-    if( !PyArg_ParseTuple(args, "ssffs:shadowmask", &pszInputImage, &pszOutputFile, &azimuth, &zenith, &maxHeight, &pszGDALFormat))
+    if( !PyArg_ParseTuple(args, "ssfffs:shadowmask", &pszInputImage, &pszOutputFile, &azimuth, &zenith, &maxHeight, &pszGDALFormat))
         return NULL;
     
     try
