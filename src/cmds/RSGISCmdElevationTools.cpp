@@ -146,6 +146,18 @@ namespace rsgis{ namespace cmds {
         {
             GDALAllRegister();
             
+            if((solarZenith < 0) | (solarZenith > 90))
+            {
+                throw rsgis::RSGISException("The solar zenith should be between 0 and 90 degrees.");
+            }
+            
+            if((solarAzimuth < 0) | (solarAzimuth > 360))
+            {
+                throw rsgis::RSGISException("The solar azimuth should be between 0 and 360 degrees.");
+            }
+            
+            solarZenith = 90 - solarZenith;
+            
             std::cout << "Open " << demImage << std::endl;
             GDALDataset *dataset = (GDALDataset *) GDALOpen(demImage.c_str(), GA_ReadOnly);
             if(dataset == NULL)
@@ -200,6 +212,7 @@ namespace rsgis{ namespace cmds {
             }
             
             solarZenith = 90 - solarZenith;
+            solarAzimuth = solarAzimuth - 180;
             
             std::cout << "Open " << demImage << std::endl;
             GDALDataset *dataset = (GDALDataset *) GDALOpen(demImage.c_str(), GA_ReadOnly);
@@ -225,8 +238,8 @@ namespace rsgis{ namespace cmds {
             rsgis::calib::RSGISCalcShadowBinaryMask *calcShadowMask = new rsgis::calib::RSGISCalcShadowBinaryMask(1, dataset, 1, imageEWRes, imageNSRes, solarZenith, solarAzimuth, maxHeight);
             
             rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(calcShadowMask, "", true);
-            calcImage.calcImageWindowData(&dataset, 1, outputImage, 3, outImageFormat, GDT_Byte);
             
+            calcImage.calcImageExtent(&dataset, 1, outputImage, outImageFormat, GDT_Byte);
             
             GDALClose(dataset);
             delete calcShadowMask;
