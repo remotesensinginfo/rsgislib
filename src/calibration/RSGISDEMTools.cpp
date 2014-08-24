@@ -341,7 +341,7 @@ namespace rsgis{namespace calib{
 		
     void RSGISCalcShadowBinaryMask::calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException)
     {
-        float outputValue = 1;
+        float outputValue = 0;
         
         try 
         {
@@ -389,7 +389,7 @@ namespace rsgis{namespace calib{
             {
                 if((*iterPxls)->pt->z < (*iterPxls)->value)
                 {
-                    outputValue = 0;
+                    outputValue = 1;
                     break;
                 }
             }
@@ -408,7 +408,7 @@ namespace rsgis{namespace calib{
             throw e;
         }
         
-        //if shadow then outputValue = 0;
+        //if shadow then outputValue == 1;
         
         output[0] = outputValue;
     }
