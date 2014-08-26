@@ -1740,7 +1740,7 @@ namespace rsgis{namespace rastergis{
                         std::cout << "." << feedbackCounter << "." << std::flush;
                         feedbackCounter = feedbackCounter + 10;
                     }
-                    strcpy(blockData[m], strDataVal[(i*RAT_BLOCK_LENGTH)+m].c_str());
+                    blockData[m] = const_cast<char*>(strDataVal[(i*RAT_BLOCK_LENGTH)+m].c_str());
                 }
                 
                 // Write block
@@ -1760,7 +1760,7 @@ namespace rsgis{namespace rastergis{
                         std::cout << "." << feedbackCounter << "." << std::flush;
                         feedbackCounter = feedbackCounter + 10;
                     }
-                    strcpy(blockData[m], strDataVal[(nBlocks*RAT_BLOCK_LENGTH)+m].c_str());
+                    blockData[m] = const_cast<char*>(strDataVal[(nBlocks*RAT_BLOCK_LENGTH)+m].c_str());
                 }
                 
                 // Read block
