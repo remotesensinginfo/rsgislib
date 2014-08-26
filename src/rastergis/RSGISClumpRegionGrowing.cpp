@@ -186,6 +186,7 @@ namespace rsgis{namespace rastergis{
                 }
                 std::cout << ".Completed\n";
                 std::cout << "Iteration " << numIter << " changed " << numChangeFeats << " features\n";
+
                 numChangeFeats = 0;
                 //unsigned int changeCountTmp = 0;
                 // Copy class names to 'main' array...
@@ -206,9 +207,11 @@ namespace rsgis{namespace rastergis{
                 }
                 ++numIter;
             }
-            
+            std::cout << "Writing classification column\n";
             
             attUtils.writeStrColumn(rat, classColumn, classColVals, colLen);
+            
+            std::cout << "Tidying up...\n";
             
             delete[] classColVals;
             delete[] classColValsTmp;
@@ -228,6 +231,7 @@ namespace rsgis{namespace rastergis{
                 delete[] *iterCols;
             }
             delete ratCols;
+            std::cout << "Completed.\n";
         }
         catch(RSGISAttributeTableException &e)
         {
