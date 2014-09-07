@@ -20,12 +20,6 @@
  *
  */
 
-/// Calculates the Baysian probability of B given A, with no prior information on the distrobution of B
-
-/**
-
-*/
-
 
 #ifndef RSGISBaysianIntergrateFunctionNoPrior_H
 #define RSGISBaysianIntergrateFunctionNoPrior_H
