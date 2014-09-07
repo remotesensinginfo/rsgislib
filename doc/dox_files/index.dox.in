@@ -1,0 +1,10 @@
+/** \mainpage Remote Sensing and GIS Library
+
+
+Doxygen Documentation for @RSGISLIB_PACKAGE_STRING@.
+
+Copyright (C) @RSGISLIB_COPYRIGHT_YEAR@ Peter Bunting and Daniel Clewley
+
+For support please email @RSGISLIB_PACKAGE_BUGREPORT@.
+
+*/

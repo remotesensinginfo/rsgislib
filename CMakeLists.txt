@@ -26,7 +26,7 @@ set (PROJECT_TOOLS_DIR tools)
 set (PROJECT_XML_DIR xml_standards)
 
 # The version number.
-set (RSGISLIB_HG_COMMIT 929)
+set (RSGISLIB_HG_COMMIT 930)
 set (RSGISLIB_VERSION_MAJOR 2)
 set (RSGISLIB_VERSION_MINOR 2)
 set (RSGISLIB_VERSION "${RSGISLIB_VERSION_MAJOR}.${RSGISLIB_VERSION_MINOR}.${RSGISLIB_HG_COMMIT}")
@@ -368,6 +368,8 @@ endif(RSGISLIB_WITH_UTILTIES)
 if (RSGISLIB_WITH_DOCUMENTS)
 	configure_file ( "${PROJECT_XML_DIR}/input.xml.in" "${PROJECT_XML_DIR}/RSGISLib_XML_Listing.xml" )
 	configure_file ( "${PROJECT_TOOLS_DIR}/rsgislibxmllist.sh.in" "${PROJECT_BINARY_DIR}/rsgislibxmllist" )
+	configure_file ( "${PROJECT_DOC_DIR}/Doxyfile.in" "${PROJECT_DOC_DIR}/Doxyfile" )
+	configure_file ( "${PROJECT_DOC_DIR}/dox_files/index.dox.in" "${PROJECT_DOC_DIR}/dox_files/index.dox" )
 endif(RSGISLIB_WITH_DOCUMENTS)
 
 # Python 

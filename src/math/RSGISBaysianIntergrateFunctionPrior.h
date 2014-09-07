@@ -20,12 +20,6 @@
  *
  */
 
-/// Calculates the Baysian probability of B given A, with prior information on the distrobution of B
-
-/**
- The prior information on the distrobution of B is passed in as a second function.
- */
-
 
 #ifndef RSGISBaysianIntergrateFunctionPrior_H
 #define RSGISBaysianIntergrateFunctionPrior_H
