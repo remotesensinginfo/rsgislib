@@ -74,7 +74,7 @@ namespace rsgis{namespace img{
 				//matrix[i] = new double[numInBandsDSB];
 				for(int j = 0; j < numInBandsDSB; j++)
 				{
-					std::cout << "Matrix[" << i << "][" << j << "]: ";
+                    std::cout << "Matrix[" << i << "][" << j << "]: ";
 					std::cout.flush();
 					//calcImageSingleValue->setBandB(j);
 					calcImageSingleValue->reset();
@@ -82,21 +82,6 @@ namespace rsgis{namespace img{
 					outputMatrix->matrix[counter++] = outputValue[0];
 				}
 			}
-			
-			counter = 0;
-			for(int i = 0; i < outputMatrix->m; i++)
-			{
-				for(int j = 0; j < outputMatrix->n; j++)
-				{
-					std::cout << outputMatrix->matrix[counter++] << ", ";
-				}
-				std::cout << std::endl;
-			}
-		
-			/*
-			matrixUtils.saveMatrix2txt(outputMatrix, outputFile);
-			matrixUtils.saveMatrix2GridTxt(outputMatrix, outputFile);
-			matrixUtils.saveMatrix2Binary(outputMatrix, outputFile);*/
 			
 		}
 		catch(RSGISImageCalcException &e)

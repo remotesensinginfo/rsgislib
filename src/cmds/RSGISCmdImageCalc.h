@@ -82,7 +82,7 @@ namespace rsgis{ namespace cmds {
     /** Function to perform image normalisation */
     void executeNormalisation(std::vector<std::string> inputImages, std::vector<std::string> outputImages, bool calcInMinMax, double inMin, double inMax, double outMin, double outMax)throw(RSGISCmdException);
     /** Function to calculate the correlation between 2 images */
-    void executeCorrelation(std::string inputImageA, std::string inputImageB, std::string outputMatrix) throw(RSGISCmdException);
+    double** executeCorrelation(std::string inputImageA, std::string inputImageB, std::string outputMatrixFile = "", unsigned int *nrows = 0, unsigned int *ncols = 0) throw(RSGISCmdException);
     /** Function to calculate the covariance between 2 images */
     void executeCovariance(std::string inputImageA, std::string inputImageB, std::string inputMatrixA, std::string inputMatrixB, bool shouldCalcMean, std::string outputMatrix)throw(RSGISCmdException);
     /** Function to calculate the mean vector of an image */

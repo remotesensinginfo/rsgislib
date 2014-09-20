@@ -127,9 +127,11 @@ class RSGISTests:
 
     def testCorrelation(self):
         print("PYTHON TEST: Testing correlation")
-        inImage = inFileName
-        outImage = path+"TestOutputs/PSU142Correlation"
-        imagecalc.correlation(inImage, inImage, outImage)
+        inImageA = inFileName
+        inImageB = inFileName
+        outMatrix = imagecalc.correlation(inImageA, inImageB)
+        if int(outMatrix[0][0]) != 1:
+            raise Exception('First value of output correlation matrix is incorrect, expected 1, got {}'.format(outMatrix[0][0]))
 
     def testCovariance1(self):
         print("PYTHON TEST: Testing covariance - with mean calculation")
@@ -886,6 +888,7 @@ if __name__ == '__main__':
         t.tryFuncAndCatch(t.testMahalanobisDistImg2Window)
         t.tryFuncAndCatch(t.testCalcPxlColStats)
         t.tryFuncAndCatch(t.testPxlColRegression)
+        t.tryFuncAndCatch(t.testCorrelation)
         t.tryFuncAndCatch(t.testCorrelationWindow)
         
     if testLibraries == 'all' or testLibraries == 'imageutils':

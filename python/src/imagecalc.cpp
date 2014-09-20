@@ -516,20 +516,51 @@ static PyObject *ImageCalc_Normalisation(PyObject *self, PyObject *args) {
     Py_RETURN_NONE;
 }
 
-static PyObject *ImageCalc_Correlation(PyObject *self, PyObject *args) {
-    const char *inputImageA, *inputImageB, *outputMatrix;
+static PyObject *ImageCalc_Correlation(PyObject *self, PyObject *args, PyObject *keywds) 
+{
+    const char *inputImageA, *inputImageB;
+    const char *outputMatrixFile = "";
+    PyObject *outCorrelationMatrixList = NULL;
+    PyObject *outRow = NULL;
+    static char *kwlist[] = {"imageA", "imageB", "outmatrixfile",  NULL};
 
-    if(!PyArg_ParseTuple(args, "sss:correlation", &inputImageA, &inputImageB, &outputMatrix))
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ss|s:correlation", kwlist, &inputImageA, &inputImageB, &outputMatrixFile))
         return NULL;
 
-    try {
-        rsgis::cmds::executeCorrelation(inputImageA, inputImageB, outputMatrix);
-    } catch (rsgis::cmds::RSGISCmdException &e) {
+    try 
+    {
+        unsigned int nrows = 0;
+        unsigned int ncols = 0;
+        double **outputMatrix = NULL;
+
+        outputMatrix = rsgis::cmds::executeCorrelation(inputImageA, inputImageB, outputMatrixFile, &nrows, &ncols);
+
+        outCorrelationMatrixList = PyTuple_New(nrows);
+        
+        for(unsigned int j = 0; j < nrows; ++j)
+        {
+           outRow = PyTuple_New(ncols);
+           for(unsigned int i = 0; i < ncols; ++i) 
+           {
+               if(PyTuple_SetItem(outRow, i, Py_BuildValue("f", outputMatrix[j][i])) == -1)
+               {
+                    throw rsgis::cmds::RSGISCmdException("Failed to add a value to row");
+               }
+           }
+           if(PyTuple_SetItem(outCorrelationMatrixList, j, Py_BuildValue("O", outRow)) == -1)
+           {
+               throw rsgis::cmds::RSGISCmdException("Failed to add a row to column");
+           }
+        }
+
+    } 
+    catch (rsgis::cmds::RSGISCmdException &e) 
+    {
         PyErr_SetString(GETSTATE(self)->error, e.what());
         return NULL;
     }
 
-    Py_RETURN_NONE;
+    return outCorrelationMatrixList;
 }
 
 static PyObject *ImageCalc_Covariance(PyObject *self, PyObject *args) {
@@ -1365,14 +1396,23 @@ static PyMethodDef ImageCalcMethods[] = {
 "  * outMax is a float specifying the TODO\n"
 },
 
-    {"correlation", ImageCalc_Correlation, METH_VARARGS,
-"imagecalc.correlation(inputImageA, inputImageB, outputMatrix)\n"
+    {"correlation", (PyCFunction)ImageCalc_Correlation, METH_VARARGS | METH_KEYWORDS,
+"imagecalc.correlation(imageA, imageB, outmatrixfile=None)\n"
 "Calculates the correlation between two images\n"
-"where:\n"
-"  * inputImageA is a string containing the name of the first input image file\n"
-"  * inputImageB is a string containing the name of the second input image file\n"
-"  * outputMatrix is a string containing the name of the output matrix\n"
-},
+"\nWhere:\n"
+" * inputImageA is a string containing the name of the first input image file\n"
+" * inputImageB is a string containing the name of the second input image file\n"
+" * outputMatrix is a string containing the basename of the output matrix (optional)\n"
+"\nReturns:\n"
+" * Correlation matrix (tuple of tuples)"
+"\nExample::\n"
+"\n"
+"   from rsgislib import imagecalc\n"
+"   inImageA = 'imageA.kea'\n"
+"   inImageB = 'imageB.kea'\n"
+"   outMatrixBase = 'imageABCorrelation'\n"
+"   outMatrix = imagecalc.correlation(inImage, inImage, outMatrixBase)\n"
+"\n"},
 
     {"covariance", ImageCalc_Covariance, METH_VARARGS,
 "imagecalc.covariance(inputImageA, inputImageB, inputMatrixA, inputMatrixB, shouldCalcMean, outputMatrix)\n"

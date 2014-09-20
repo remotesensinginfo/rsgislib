@@ -774,7 +774,7 @@ namespace rsgis{ namespace cmds {
 
     }
 
-    void executeCorrelation(std::string inputImageA, std::string inputImageB, std::string outputMatrix) throw(RSGISCmdException)
+    double** executeCorrelation(std::string inputImageA, std::string inputImageB, std::string outputMatrixFile, unsigned int *nrows, unsigned int *ncols) throw(RSGISCmdException)
     {
         GDALAllRegister();
         GDALDataset **datasetsA = NULL;
@@ -813,21 +813,46 @@ namespace rsgis{ namespace cmds {
             calcImgSingle = new rsgis::img::RSGISCalcImageSingle(calcCC);
             calcImgMatrix = new rsgis::img::RSGISCalcImageMatrix(calcImgSingle);
             correlationMatrix = calcImgMatrix->calcImageMatrix(datasetsA, datasetsB, 1);
-            matrixUtils.saveMatrix2txt(correlationMatrix, outputMatrix);
+            // Save matrix to file (if provided)
+            if(outputMatrixFile != "")
+            {
+                matrixUtils.saveMatrix2txt(correlationMatrix, outputMatrixFile);
+            }
+            
+            // Copy values to output array
+            *nrows = correlationMatrix->n;
+            *ncols = correlationMatrix->m;
+            
+            double **outMatrix = new double*[correlationMatrix->n];
 
+            int count = 0;
+            for(unsigned int j = 0; j < correlationMatrix->n; ++j)
+            {
+                outMatrix[j] = new double[correlationMatrix->m];
+                for(unsigned int i = 0; i < correlationMatrix->m; ++i)
+                {
+                    outMatrix[j][i] = correlationMatrix->matrix[count];
+                    ++count;
+                }
+            }
+            
             delete calcCC;
             delete calcImgMatrix;
             delete calcImgSingle;
 
-            if(datasetsA[0] != NULL) {
+            if(datasetsA[0] != NULL)
+            {
                 GDALClose(datasetsA[0]);
             }
-            if(datasetsB[0] != NULL) {
+            if(datasetsB[0] != NULL)
+            {
                 GDALClose(datasetsB[0]);
             }
-
+            
             delete [] datasetsA;
             delete [] datasetsB;
+            
+            return outMatrix;
         }
         catch(rsgis::RSGISException &e)
         {
