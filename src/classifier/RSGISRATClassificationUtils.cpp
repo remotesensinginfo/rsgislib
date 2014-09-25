@@ -120,7 +120,7 @@ namespace rsgis{ namespace classifier{
             // Create new image with new RAT and pixel IDs...
             RSGISRecodeRasterFromClasses *recodeRaster = new RSGISRecodeRasterFromClasses(inRAT, classColVals, classNameColLen, classes);
             rsgis::img::RSGISCalcImage calcImg = rsgis::img::RSGISCalcImage(recodeRaster, "", true);
-            calcImg.calcImage(&segments, 1, outputImage, false, NULL, imageFormat, GDT_Int32);
+            calcImg.calcImage(&segments, 1, 0, outputImage, false, NULL, imageFormat, GDT_Int32);
             delete recodeRaster;
             
             GDALDataset *imageDataset = (GDALDataset *) GDALOpen(outputImage.c_str(), GA_Update);
@@ -232,18 +232,16 @@ namespace rsgis{ namespace classifier{
         // Load string column to memory
     }
     
-    void RSGISRecodeRasterFromClasses::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISRecodeRasterFromClasses::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(rsgis::img::RSGISImageCalcException)
     {
         try
         {
-            long val = boost::lexical_cast<long>(bandValues[0]);
-            
-            if(val >= classNameColLen)
+            if(intBandValues[0] >= classNameColLen)
             {
                 throw rsgis::img::RSGISImageCalcException("Row is not within the RAT.");
             }
             
-            std::string className = std::string(classColVals[val]);
+            std::string className = std::string(classColVals[intBandValues[0]]);
             
             
             std::map<std::string, RSGISClassInfo*>::iterator iterClass = classes->find(className);
