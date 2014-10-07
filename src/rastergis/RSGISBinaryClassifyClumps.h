@@ -50,7 +50,7 @@
 
 namespace rsgis{namespace rastergis{
     
-    struct RSGISColumnLogicIdxs
+    struct DllExport RSGISColumnLogicIdxs
     {
         std::string column1Name;
         unsigned int col1Idx;
@@ -63,7 +63,7 @@ namespace rsgis{namespace rastergis{
     };
     
     
-    class RSGISRATLogicXMLParse
+    class DllExport RSGISRATLogicXMLParse
     {
     public:
         RSGISRATLogicXMLParse(){};
@@ -72,7 +72,7 @@ namespace rsgis{namespace rastergis{
         ~RSGISRATLogicXMLParse(){};
     };
     
-    class RSGISBinaryClassifyClumps
+    class DllExport RSGISBinaryClassifyClumps
     {
     public:
         RSGISBinaryClassifyClumps();
@@ -81,7 +81,7 @@ namespace rsgis{namespace rastergis{
     };
     
     
-    class RSGISBinaryClumpClassifier : public RSGISRATCalcValue
+    class DllExport RSGISBinaryClumpClassifier : public RSGISRATCalcValue
     {
     public:
         RSGISBinaryClumpClassifier(std::vector<rsgis::rastergis::RSGISColumnLogicIdxs*> *colIdxes, rsgis::math::RSGISLogicExpression *exp);

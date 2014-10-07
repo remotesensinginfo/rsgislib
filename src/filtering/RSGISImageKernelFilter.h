@@ -37,7 +37,7 @@
 namespace rsgis{namespace filter{
 	
 	
-	class RSGISImageKernelFilter : public RSGISImageFilter
+	class DllExport RSGISImageKernelFilter : public RSGISImageFilter
 		{
 		public: 
 			RSGISImageKernelFilter(int numberOutBands, int size, std::string filenameEnding, ImageFilter *filter);

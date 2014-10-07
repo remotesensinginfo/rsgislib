@@ -34,7 +34,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISClassPolygon : public RSGISPolygonData
+	class DllExport RSGISClassPolygon : public RSGISPolygonData
 		{
 		public:
 			RSGISClassPolygon(std::string classAttribute);

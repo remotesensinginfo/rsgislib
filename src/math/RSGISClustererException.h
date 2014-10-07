@@ -27,7 +27,7 @@
 
 namespace rsgis{namespace math{
         
-    class RSGISClustererException : public RSGISMathException
+    class DllExport RSGISClustererException : public RSGISMathException
         {
         public:
             RSGISClustererException();

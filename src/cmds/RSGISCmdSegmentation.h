@@ -32,7 +32,7 @@
 
 namespace rsgis{ namespace cmds {
     
-    struct FeatureShapeDescription
+    struct DllExport FeatureShapeDescription
     {
         bool area;
         double areaLower;

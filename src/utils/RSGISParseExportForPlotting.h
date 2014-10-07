@@ -55,7 +55,7 @@ namespace rsgis{namespace utils{
 		triangle3d
 	};
 	
-	class RSGISParseExportForPlotting
+	class DllExport RSGISParseExportForPlotting
 		{
 		public:
 			RSGISParseExportForPlotting();

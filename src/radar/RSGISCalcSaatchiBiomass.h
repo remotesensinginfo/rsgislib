@@ -38,7 +38,7 @@ namespace rsgis
 	/// Radar utilities
 	{
         
-		class RSGISCalcSaatchiBiomassCrown : public rsgis::img::RSGISCalcImageValue
+		class DllExport RSGISCalcSaatchiBiomassCrown : public rsgis::img::RSGISCalcImageValue
 			/// Estimates Crown Biomass from L or P band data with correction for local incidence angle.			
 			/** Called using:
 			sartools -s -c -i \<input images\> -o \<output image\> -a0 \<a0\> -a1 \<a1\> -a2 \<a2\> -b1 \<b1\> -b2 \<b2\> -c1 \<c1\> -c2 \<c2\>
@@ -77,7 +77,7 @@ namespace rsgis
 				double c2;
 			};
 		
-		class RSGISCalcSaatchiBiomassStem : public rsgis::img::RSGISCalcImageValue
+		class DllExport RSGISCalcSaatchiBiomassStem : public rsgis::img::RSGISCalcImageValue
 			 /// Estimates stem Biomass from L or P band data with correction for local incidence angle.
 			/** Called using:
 			sartools -s -st -i \<input images> -o \<output image> -a0 \<a0> -a1 \<a1> -a2 \<a2> -b1 \<b1> -b2 \<b2> -c1 \<c1> -c2 \<c2>
@@ -117,7 +117,7 @@ namespace rsgis
 			};
 		
 		
-		class RSGISCalcSaatchiBiomassCrownPL : public rsgis::img::RSGISCalcImageValue
+		class DllExport RSGISCalcSaatchiBiomassCrownPL : public rsgis::img::RSGISCalcImageValue
 			 /// Estimates crown Biomass from L and P band data with correction for local incidence angle.
 			/** Called using:
 			sartools -s -cPL -i \<input images> -o \<output image> -a0 \<a0> -a1 \<a1> -a2 \<a2> -b1 \<b1> -b2 \<b2> -c1 \<c1> -c2 \<c2>
@@ -154,7 +154,7 @@ namespace rsgis
 				double b2;
 			};
 		
-		class RSGISCalcSaatchiNoIABiomassCrown : public rsgis::img::RSGISCalcImageValue
+		class DllExport RSGISCalcSaatchiNoIABiomassCrown : public rsgis::img::RSGISCalcImageValue
 			 /// Estimates crown Biomass from L or P band data with no correction for local incidence angle.
 			/** 
 			This implements a version where the difference between incidence angle and local incidence angle is assumed to be zero,
@@ -189,7 +189,7 @@ namespace rsgis
 				double c2;
 			};
 		
-		class RSGISCalcSaatchiNoIABiomassStem : public rsgis::img::RSGISCalcImageValue
+		class DllExport RSGISCalcSaatchiNoIABiomassStem : public rsgis::img::RSGISCalcImageValue
 			 /// Estimates stem Biomass from L or P band data with no correction for local incidence angle.
 			/** 
 			This implements a modification of Saatchi's algorithm by LeToan whereby the difference between the incidence angle and local incidence angle is assumed to be zero, 
@@ -231,7 +231,7 @@ namespace rsgis
 			};
 		
 		
-		class RSGISCalcSaatchiNoIABiomassCrownPL : public rsgis::img::RSGISCalcImageValue
+		class DllExport RSGISCalcSaatchiNoIABiomassCrownPL : public rsgis::img::RSGISCalcImageValue
 			/// Estimates crown Biomass from L and P band data with no correction for local incidence angle.
 			/** 
 			This implements a version where the difference between incidence angle and local incidence angle is assumed to be zero.

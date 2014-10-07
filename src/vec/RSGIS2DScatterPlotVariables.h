@@ -48,7 +48,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGIS2DScatterPlotVariables : public RSGISProcessOGRFeature
+	class DllExport RSGIS2DScatterPlotVariables : public RSGISProcessOGRFeature
 	{
 	public:
 		RSGIS2DScatterPlotVariables(rsgis::utils::RSGISExportForPlottingIncremental *plotter, std::string col1, std::string col2);

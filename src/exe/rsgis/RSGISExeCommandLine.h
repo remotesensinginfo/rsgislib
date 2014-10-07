@@ -42,7 +42,7 @@ using namespace std;
 using namespace xercesc;
 using namespace rsgis;
 
-class RSGISExeCommandLine : public RSGISAlgorithmParameters
+class DllExport RSGISExeCommandLine : public RSGISAlgorithmParameters
 	{
 	public:
 		

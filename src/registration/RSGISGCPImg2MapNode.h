@@ -27,9 +27,11 @@
 
 #include <math.h>
 
+#include "common/RSGISCommons.h"
+
 namespace rsgis{namespace reg{
 	
-	class RSGISGCPImg2MapNode
+	class DllExport RSGISGCPImg2MapNode
 	{
 	public:
 		RSGISGCPImg2MapNode(double eastings, double northings, float imgXIn, float imgYIn);

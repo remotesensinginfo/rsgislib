@@ -46,7 +46,7 @@
 
 namespace rsgis{namespace img{
 	
-	struct ImageStats
+	struct DllExport ImageStats
 	{
 		double mean;
 		double max;
@@ -55,7 +55,7 @@ namespace rsgis{namespace img{
         double sum;
 	};
 	
-	class RSGISImageStatistics
+	class DllExport RSGISImageStatistics
     {
     public: 
         RSGISImageStatistics();
@@ -67,7 +67,7 @@ namespace rsgis{namespace img{
     };
 	
 	
-	class RSGISCalcImageStatistics : public RSGISCalcImageValue
+	class DllExport RSGISCalcImageStatistics : public RSGISCalcImageValue
     {
     public: 
         RSGISCalcImageStatistics(int numberOutBands, int numInputBands, bool calcSD, rsgis::math::RSGISMathFunction *func, bool ignoreZeros, bool onePassSD = false);
@@ -103,7 +103,7 @@ namespace rsgis{namespace img{
         rsgis::math::RSGISMathFunction *func;
     };
     
-    class RSGISCalcImageStatisticsNoData : public RSGISCalcImageValue
+    class DllExport RSGISCalcImageStatisticsNoData : public RSGISCalcImageValue
     {
     public:
         RSGISCalcImageStatisticsNoData(int numInputBands, bool calcSD, rsgis::math::RSGISMathFunction *func, bool noDataSpecified, float noDataVal, bool onePassSD);
@@ -140,7 +140,7 @@ namespace rsgis{namespace img{
         rsgis::math::RSGISMathFunction *func;
     };
     
-    class RSGISCalcImageStatisticsAllBands : public RSGISCalcImageValue
+    class DllExport RSGISCalcImageStatisticsAllBands : public RSGISCalcImageValue
     {
     public: 
         RSGISCalcImageStatisticsAllBands(int numberOutBands, bool calcSD, rsgis::math::RSGISMathFunction *func, bool ignoreZeros);
@@ -174,7 +174,7 @@ namespace rsgis{namespace img{
         
     };
     
-    class RSGISImagePercentiles
+    class DllExport RSGISImagePercentiles
     {
     public:
         RSGISImagePercentiles();
@@ -184,7 +184,7 @@ namespace rsgis{namespace img{
     };
     
     
-    class RSGISImagePixelSummaries: public RSGISCalcImageValue
+    class DllExport RSGISImagePixelSummaries: public RSGISCalcImageValue
     {
     public:
         RSGISImagePixelSummaries(unsigned int numOutBands, rsgis::math::RSGISStatsSummary *statsSummary, float noDataValue=0, bool useNoDataValue=false);
@@ -207,7 +207,7 @@ namespace rsgis{namespace img{
     
     
     
-    class RSGISCalcImageHistogramNoData : public RSGISCalcImageValue
+    class DllExport RSGISCalcImageHistogramNoData : public RSGISCalcImageValue
     {
     public:
         RSGISCalcImageHistogramNoData(unsigned int imgBand, bool noDataSpecified, float noDataVal, unsigned int numBins, float *binRanges, unsigned int *binCounts);

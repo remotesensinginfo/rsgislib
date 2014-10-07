@@ -35,7 +35,7 @@ namespace rsgis
 	{
         
 		/// Function for calculating gamma0 for a given value of biomass.
-		class RSGISDefaultSplitBiomassFunction : public rsgis::math::RSGISMathFunction
+		class DllExport RSGISDefaultSplitBiomassFunction : public rsgis::math::RSGISMathFunction
 			{
 				
 				/*

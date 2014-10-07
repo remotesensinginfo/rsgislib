@@ -47,7 +47,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISVectorZonalStatsPtxtOut : public RSGISProcessOGRFeature
+	class DllExport RSGISVectorZonalStatsPtxtOut : public RSGISProcessOGRFeature
 	{
 	public:
 		RSGISVectorZonalStatsPtxtOut(GDALDataset *image, rsgis::utils::RSGISExportForPlottingIncremental *plotter, int bX, int bY, int bZ, int bC ) throw(RSGISVectorException);

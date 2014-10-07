@@ -43,7 +43,7 @@
 
 namespace rsgis{namespace segment{
     
-    struct ImgSeeds
+    struct DllExport ImgSeeds
     {
         ImgSeeds()
         {
@@ -65,7 +65,7 @@ namespace rsgis{namespace segment{
         unsigned long seedID;
     };
     
-    struct ClumpSeed
+    struct DllExport ClumpSeed
     {
         ClumpSeed()
         {
@@ -80,7 +80,7 @@ namespace rsgis{namespace segment{
         unsigned long seedID;
     };
     
-    struct BandThreshold
+    struct DllExport BandThreshold
     {
         BandThreshold()
         {
@@ -95,7 +95,7 @@ namespace rsgis{namespace segment{
         float threshold;
     };
     
-    class RSGISFindClumpIDs
+    class DllExport RSGISFindClumpIDs
     {
     public:
         RSGISFindClumpIDs();
@@ -105,7 +105,7 @@ namespace rsgis{namespace segment{
     };
     
     
-    class RSGISRegionGrowingSegmentation
+    class DllExport RSGISRegionGrowingSegmentation
     {
     public:
         RSGISRegionGrowingSegmentation();
@@ -116,7 +116,7 @@ namespace rsgis{namespace segment{
     };
     
     
-    class RSGISGenerateSeeds
+    class DllExport RSGISGenerateSeeds
     {
     public:
         RSGISGenerateSeeds();
@@ -125,7 +125,7 @@ namespace rsgis{namespace segment{
         ~RSGISGenerateSeeds();
     };
     
-    class RSGISSelectClumps
+    class DllExport RSGISSelectClumps
     {
     public:
         enum ClumpSelection 

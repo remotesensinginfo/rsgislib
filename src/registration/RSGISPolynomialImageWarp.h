@@ -46,7 +46,7 @@
 
 namespace rsgis{namespace reg{
 	
-	class RSGISPolynomialImageWarp : public RSGISWarpImage
+	class DllExport RSGISPolynomialImageWarp : public RSGISWarpImage
 	{
 	public:
 		RSGISPolynomialImageWarp(std::string inputImage, std::string outputImage, std::string outProjWKT, std::string gcpFilePath, float outImgRes, RSGISWarpImageInterpolator *interpolator, unsigned int polyOrder = 2, std::string gdalFormat = "ENVI");

@@ -50,7 +50,7 @@ namespace rsgis {namespace radar{
 	 * The third 'RSGISEstimationConjugateGradient2Var2Data' inherits from 'RSGISEstimationOptimiser'.
 	 * it takes a function therefore any function is used, as long as partial differentials are provided.
 	 */
-	class RSGISEstimationConjugateGradient
+	class DllExport RSGISEstimationConjugateGradient
 		{
 		public:
 			RSGISEstimationConjugateGradient();
@@ -66,7 +66,7 @@ namespace rsgis {namespace radar{
 		private:
 		};
 
-	class RSGISEstimationConjugateGradient2DPoly2Channel : public RSGISEstimationOptimiser
+	class DllExport RSGISEstimationConjugateGradient2DPoly2Channel : public RSGISEstimationOptimiser
 	{
 	public:
 		RSGISEstimationConjugateGradient2DPoly2Channel(gsl_matrix *coeffHH, gsl_matrix *coeffHV, 
@@ -89,7 +89,7 @@ namespace rsgis {namespace radar{
 		int nPar; // Parameters to be retrieved
 	};
 	
-	class RSGISEstimationConjugateGradient3DPoly3Channel : public RSGISEstimationOptimiser
+	class DllExport RSGISEstimationConjugateGradient3DPoly3Channel : public RSGISEstimationOptimiser
 	{
 	public:
 		RSGISEstimationConjugateGradient3DPoly3Channel(gsl_matrix *inCoeffHH, gsl_matrix *inCoeffHV, gsl_matrix *inCoeffVV,
@@ -119,7 +119,7 @@ namespace rsgis {namespace radar{
 		int nPar;   // Parameters to be retrieved
 	};
 	
-	class RSGISEstimationConjugateGradient3DPoly4Channel : public RSGISEstimationOptimiser
+	class DllExport RSGISEstimationConjugateGradient3DPoly4Channel : public RSGISEstimationOptimiser
 	{
 	public:
 		RSGISEstimationConjugateGradient3DPoly4Channel(gsl_matrix *coeffA, gsl_matrix *coeffB, gsl_matrix *coeffC, gsl_matrix *coeffD,
@@ -151,7 +151,7 @@ namespace rsgis {namespace radar{
 	};
 	
 	
-	class RSGISEstimationConjugateGradient2Var2Data : public RSGISEstimationOptimiser
+	class DllExport RSGISEstimationConjugateGradient2Var2Data : public RSGISEstimationOptimiser
 	{
 		/**
 		 Preconditioned conjugate gradient optimiser, takes two 'rsgis::math::RSGISMathTwoVariableFunction' as input.
@@ -183,7 +183,7 @@ namespace rsgis {namespace radar{
 		double minError;
 	};
 	
-	class RSGISEstimationConjugateGradient2Var3Data : public RSGISEstimationOptimiser
+	class DllExport RSGISEstimationConjugateGradient2Var3Data : public RSGISEstimationOptimiser
 	{
 		/**
 		 Preconditioned conjugate gradient optimiser, takes three 'rsgis::math::RSGISMathTwoVariableFunction' as input.
@@ -217,7 +217,7 @@ namespace rsgis {namespace radar{
 		double minError;
 	};
 	
-	class RSGISEstimationConjugateGradient2Var2DataWithRestarts : public RSGISEstimationOptimiser
+	class DllExport RSGISEstimationConjugateGradient2Var2DataWithRestarts : public RSGISEstimationOptimiser
 	{
 	public:
 		RSGISEstimationConjugateGradient2Var2DataWithRestarts(rsgis::math::RSGISMathTwoVariableFunction *functionA, 
@@ -251,7 +251,7 @@ namespace rsgis {namespace radar{
 		RSGISEstimationConjugateGradient2Var2Data *conjGradOpt;
 	};
 	
-	class RSGISEstimationConjugateGradient2Var3DataWithRestarts : public RSGISEstimationOptimiser
+	class DllExport RSGISEstimationConjugateGradient2Var3DataWithRestarts : public RSGISEstimationOptimiser
 	{
 	public:
 		RSGISEstimationConjugateGradient2Var3DataWithRestarts(rsgis::math::RSGISMathTwoVariableFunction *functionA, 
@@ -287,7 +287,7 @@ namespace rsgis {namespace radar{
 		RSGISEstimationConjugateGradient2Var3Data *conjGradOpt;
 	};
 	
-	class RSGISEstimationConjugateGradient3Var3DataWithRestarts : public RSGISEstimationOptimiser
+	class DllExport RSGISEstimationConjugateGradient3Var3DataWithRestarts : public RSGISEstimationOptimiser
 	{
 	public:
 		RSGISEstimationConjugateGradient3Var3DataWithRestarts(gsl_matrix *coeffHH, gsl_matrix *coeffHV, gsl_matrix *coeffVV,
@@ -320,7 +320,7 @@ namespace rsgis {namespace radar{
 		RSGISEstimationConjugateGradient3DPoly3Channel *conjGradOpt;
 	};
 	
-	class RSGISEstimationConjugateGradient3Var4DataWithRestarts : public RSGISEstimationOptimiser
+	class DllExport RSGISEstimationConjugateGradient3Var4DataWithRestarts : public RSGISEstimationOptimiser
 	{
 	public:
 		RSGISEstimationConjugateGradient3Var4DataWithRestarts(gsl_matrix *coeffA, gsl_matrix *coeffB, gsl_matrix *coeffC, gsl_matrix *coeffD,

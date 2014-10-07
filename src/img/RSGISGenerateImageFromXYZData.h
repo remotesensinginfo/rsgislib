@@ -38,7 +38,7 @@
 
 namespace rsgis { namespace img {	
 		
-	class RSGISGenerateImageFromXYZData
+	class DllExport RSGISGenerateImageFromXYZData
 	{
 		struct XYZData
 		{

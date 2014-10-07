@@ -40,13 +40,13 @@ namespace rsgis{namespace math{
 	 * n - size
 	 */
 	
-	struct Vector
+	struct DllExport Vector
 	{
 		double *vector;
 		int n;
 	};
 	
-	class RSGISVectors
+	class DllExport RSGISVectors
 		{
 		public:
 			RSGISVectors();

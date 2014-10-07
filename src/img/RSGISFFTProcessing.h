@@ -34,7 +34,7 @@
 
 namespace rsgis{namespace img{
 	
-	class RSGISFFTProcessing
+	class DllExport RSGISFFTProcessing
 		{
 		public:
 			RSGISFFTProcessing();

@@ -36,7 +36,7 @@
 
 namespace rsgis{namespace math{
 	
-	class RSGISGlobalHillClimbingOptimiser2D : public RSGISGlobalOptimiser2D
+	class DllExport RSGISGlobalHillClimbingOptimiser2D : public RSGISGlobalOptimiser2D
 		{
 		public:
 			RSGISGlobalHillClimbingOptimiser2D(RSGISGlobalOptimisationFunction *func, bool maximise, int maxNumIterations);
@@ -47,7 +47,7 @@ namespace rsgis{namespace math{
 			int maxNumIterations;
 		};
 	
-	class RSGISGlobalHillClimbingOptimiser2DVaryNumPts : public RSGISGlobalOptimiser2D
+	class DllExport RSGISGlobalHillClimbingOptimiser2DVaryNumPts : public RSGISGlobalOptimiser2D
 	{
 	public:
 		RSGISGlobalHillClimbingOptimiser2DVaryNumPts(RSGISGlobalOptimisationFunction *func, bool maximise, int maxNumIterations);

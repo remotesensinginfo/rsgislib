@@ -42,7 +42,7 @@
 
 namespace rsgis{namespace reg{
 
-	class RSGISBasicImageRegistration : public RSGISImageRegistration
+	class DllExport RSGISBasicImageRegistration : public RSGISImageRegistration
 	{
 	public:
 		RSGISBasicImageRegistration(GDALDataset *reference, GDALDataset *floating, unsigned int gap, float metricThreshold, unsigned int windowSize, unsigned int searchArea, RSGISImageSimilarityMetric *metric, float stdDevRefThreshold, float stdDevFloatThreshold, unsigned int subPixelResolution);

@@ -46,7 +46,7 @@ namespace rsgis{namespace math{
 		muparser
 	};
 	
-	class RSGISFunctionPolynomial : public RSGISMathFunction
+	class DllExport RSGISFunctionPolynomial : public RSGISMathFunction
 	{
 		/// Polynomial function
 	public: 
@@ -60,7 +60,7 @@ namespace rsgis{namespace math{
 		double *coefficients;
 		int order;
 	};
-	class RSGISFunctionPolynomialGSL : public RSGISMathFunction
+	class DllExport RSGISFunctionPolynomialGSL : public RSGISMathFunction
 	{
 		/// Polynomial function, with coefficients read as GSL vector
 	public: 
@@ -74,7 +74,7 @@ namespace rsgis{namespace math{
 		gsl_vector *coefficients;
 		int order;
 	};
-	class RSGISFunctionLn : public RSGISMathFunction
+	class DllExport RSGISFunctionLn : public RSGISMathFunction
 	{
 		/// a + b Ln(x)
 	public: 
@@ -89,7 +89,7 @@ namespace rsgis{namespace math{
 		double coeffB;
 	};
 	
-	class RSGISFunction2VarLn : public RSGISMathTwoVariableFunction
+	class DllExport RSGISFunction2VarLn : public RSGISMathTwoVariableFunction
  	{
 		/// a + (b * y) + (c * y * ln(x))
 	public: 
@@ -106,7 +106,7 @@ namespace rsgis{namespace math{
 		double coeffC;
 	};
 	
-	class RSGISFunctionLinXfLinY : public RSGISMathTwoVariableFunction
+	class DllExport RSGISFunctionLinXfLinY : public RSGISMathTwoVariableFunction
  	{
 		/// (b0 + b1 y) + (c0 + c1 y) * x
 	public: 
@@ -125,7 +125,7 @@ namespace rsgis{namespace math{
 
 	};
 	
-	class RSGISFunction2VarLnQuadratic : public RSGISMathTwoVariableFunction
+	class DllExport RSGISFunction2VarLnQuadratic : public RSGISMathTwoVariableFunction
  	{
 		/// a + b ln(x) + c y ln(x^2)  
 	public: 
@@ -142,7 +142,7 @@ namespace rsgis{namespace math{
 		double coeffC;
 	};
 	
-	class RSGISFunction2Var2DataLeastSquares : public RSGISMathTwoVariableFunction
+	class DllExport RSGISFunction2Var2DataLeastSquares : public RSGISMathTwoVariableFunction
  	{
 		/// Least squares
 	public: 
@@ -160,7 +160,7 @@ namespace rsgis{namespace math{
 		double dataB;
 	};
 	
-	class RSGISFunction2Var3DataLeastSquares : public RSGISMathTwoVariableFunction
+	class DllExport RSGISFunction2Var3DataLeastSquares : public RSGISMathTwoVariableFunction
  	{
 		/// Least squares
 	public: 
@@ -180,7 +180,7 @@ namespace rsgis{namespace math{
 		double dataC;
 	};
 	
-	class RSGISFunction2Var2DataPreconditionedLeastSquares : public RSGISMathTwoVariableFunction
+	class DllExport RSGISFunction2Var2DataPreconditionedLeastSquares : public RSGISMathTwoVariableFunction
  	{
 		/// Least squares with preconditioning
 		/** L(X) = 1/2 { || f(X) - d0 || ^2 + || X - Xap || ^2 } */
@@ -208,7 +208,7 @@ namespace rsgis{namespace math{
 		bool useAP;
 	};
 	
-	class RSGISFunction2Var3DataPreconditionedLeastSquares : public RSGISMathTwoVariableFunction
+	class DllExport RSGISFunction2Var3DataPreconditionedLeastSquares : public RSGISMathTwoVariableFunction
  	{
 		/// Least squares with preconditioning
 		/** L(X) = 1/2 { || f(X) - d0 || ^2 + || X - Xap || ^2 } */
@@ -239,7 +239,7 @@ namespace rsgis{namespace math{
 		bool useAP;
 	};
 	
-	class RSGISFunction3Var3DataPreconditionedLeastSquares : public RSGISMathThreeVariableFunction
+	class DllExport RSGISFunction3Var3DataPreconditionedLeastSquares : public RSGISMathThreeVariableFunction
  	{
 		/// Least squares with preconditioning
 		/** L(X) = 1/2 { || f(X) - d0 || ^2 + || X - Xap || ^2 } */
@@ -272,7 +272,7 @@ namespace rsgis{namespace math{
 		bool useAP;
 	};
 
-	class RSGISFunction3Var4DataPreconditionedLeastSquares : public RSGISMathThreeVariableFunction
+	class DllExport RSGISFunction3Var4DataPreconditionedLeastSquares : public RSGISMathThreeVariableFunction
  	{
 		/// Least squares with preconditioning
 		/** L(X) = 1/2 { || f(X) - d0 || ^2 + || X - Xap || ^2 } */
@@ -308,7 +308,7 @@ namespace rsgis{namespace math{
 	};
 	
 	
-	class RSGISFunctionEstimationLeastSquares : public RSGISMathTwoVariableFunction
+	class DllExport RSGISFunctionEstimationLeastSquares : public RSGISMathTwoVariableFunction
  	{
 		/// Least squares
 	public: 
@@ -326,7 +326,7 @@ namespace rsgis{namespace math{
 		double dataB;
 	};
 	
-	class RSGISFunction2DPoly : public RSGISMathTwoVariableFunction
+	class DllExport RSGISFunction2DPoly : public RSGISMathTwoVariableFunction
  	{
 		/// Two dimensional polynomial function
 		/** z = a0(y) + a1(y)b + a2(y)b^2
@@ -348,7 +348,7 @@ namespace rsgis{namespace math{
 		int orderY;
 	};
 	
-	class RSGISFunction3DPoly : public RSGISMathThreeVariableFunction
+	class DllExport RSGISFunction3DPoly : public RSGISMathThreeVariableFunction
  	{
 		/// Two dimensional polynomial function
 		/** z = a0(y) + a1(y)b + a2(y)b^2
@@ -372,7 +372,7 @@ namespace rsgis{namespace math{
 		int orderZ;
 	};
     
-	class RSGISFunctionNDPoly : public RSGISMathNVariableFunction
+	class DllExport RSGISFunctionNDPoly : public RSGISMathNVariableFunction
  	{
 		/// N dimensional polynomial function
 		/** z = a0(y) + a1(y)b + a2(y)b^2
@@ -393,7 +393,7 @@ namespace rsgis{namespace math{
 	};
     
 	
-	class RSGISFunctionRosenbrocksParabolicValley : public RSGISMathTwoVariableFunction
+	class DllExport RSGISFunctionRosenbrocksParabolicValley : public RSGISMathTwoVariableFunction
  	{
 		/// Rosenbrock's Parabolic Valley (Rosenbrock, 1960).
 	public: 
@@ -406,7 +406,7 @@ namespace rsgis{namespace math{
 		virtual ~RSGISFunctionRosenbrocksParabolicValley(){};
 	};
 	
-	class RSGISFunctionReturnZero : public RSGISMathFunction
+	class DllExport RSGISFunctionReturnZero : public RSGISMathFunction
 	{
 		/// Returns zero
 	public: 
@@ -419,7 +419,7 @@ namespace rsgis{namespace math{
 	private:
 	};
 	
-	class RSGISFunctionMuParser : public RSGISMathFunction
+	class DllExport RSGISFunctionMuParser : public RSGISMathFunction
 	{
 		/// Uses muParser to define function and optionally first derivative
 		/** The function is passes in as an mu parser string.
@@ -442,7 +442,7 @@ namespace rsgis{namespace math{
 		bool usedX; // Check if using derivative information
 	};
 	
-	class RSGISFunctionMuParser2Var : public RSGISMathTwoVariableFunction
+	class DllExport RSGISFunctionMuParser2Var : public RSGISMathTwoVariableFunction
 	{
 		/// Uses muParser to define function and optionally first derivative
 		/** The function is passes in as an mu parser string.

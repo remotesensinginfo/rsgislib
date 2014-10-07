@@ -49,7 +49,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISZonalLSSMeanVar : public RSGISProcessOGRFeature
+	class DllExport RSGISZonalLSSMeanVar : public RSGISProcessOGRFeature
 	{
 	public:
 		RSGISZonalLSSMeanVar(GDALDataset *image, MeanAttributes** attributes, int numAttributes, bool outPxlCount, int winSize, double offsetSize, rsgis::img::pixelInPolyOption method);
@@ -77,7 +77,7 @@ namespace rsgis{namespace vec{
 		rsgis::img::pixelInPolyOption method; 
 	};
 	
-	class RSGISCalcZonalLSSMeanVar : public rsgis::img::RSGISCalcImageSingleValue
+	class DllExport RSGISCalcZonalLSSMeanVar : public rsgis::img::RSGISCalcImageSingleValue
 	{
 	public: 
 		RSGISCalcZonalLSSMeanVar(int numOutputValues, MeanAttributes **attributes, int numAttributes);

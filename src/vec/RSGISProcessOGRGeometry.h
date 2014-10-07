@@ -35,7 +35,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISProcessOGRGeometry
+	class DllExport RSGISProcessOGRGeometry
 		{
 		public:
 			RSGISProcessOGRGeometry(){};

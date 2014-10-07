@@ -33,7 +33,7 @@
 
 namespace rsgis{ namespace cmds {
 
-    struct RSGISFilterParameters
+    struct DllExport RSGISFilterParameters
     {
         std::string type;
         std::string fileEnding;

@@ -48,7 +48,7 @@
 
 namespace rsgis{namespace vec{
 	
-	struct MeanAttributes
+	struct DllExport MeanAttributes
 	{
 		std::string name;
 		int numBands;
@@ -58,7 +58,7 @@ namespace rsgis{namespace vec{
 		
 	};
 	
-	class RSGISZonalMeanStats : public RSGISProcessOGRFeature
+	class DllExport RSGISZonalMeanStats : public RSGISProcessOGRFeature
 		{
 		public:
 			RSGISZonalMeanStats(GDALDataset *image, GDALDataset *rasterFeatures, MeanAttributes** attributes, int numAttributes, bool outPxlCount);
@@ -77,7 +77,7 @@ namespace rsgis{namespace vec{
 			rsgis::img::RSGISCalcImageSingleValue *calcValue;
 		};
 	
-	class RSGISCalcZonalMeanFromRasterPolygon : public rsgis::img::RSGISCalcImageSingleValue
+	class DllExport RSGISCalcZonalMeanFromRasterPolygon : public rsgis::img::RSGISCalcImageSingleValue
 		{
 		public: 
 			RSGISCalcZonalMeanFromRasterPolygon(int numOutputValues, MeanAttributes **attributes, int numAttributes);
@@ -96,7 +96,7 @@ namespace rsgis{namespace vec{
 			int numAttributes;
 		};
 	
-	class RSGISZonalMeanStatsPoly : public RSGISProcessOGRFeature
+	class DllExport RSGISZonalMeanStatsPoly : public RSGISProcessOGRFeature
 	{
 	public:
 		RSGISZonalMeanStatsPoly(GDALDataset *image, MeanAttributes** attributes, int numAttributes, bool outPxlCount, rsgis::img::pixelInPolyOption method, bool dB = false);
@@ -116,7 +116,7 @@ namespace rsgis{namespace vec{
 		rsgis::img::pixelInPolyOption method; 
 	};
 	
-	class RSGISCalcZonalMeanFromPolygon : public rsgis::img::RSGISCalcImageSingleValue
+	class DllExport RSGISCalcZonalMeanFromPolygon : public rsgis::img::RSGISCalcImageSingleValue
 	{
 	public: 
 		RSGISCalcZonalMeanFromPolygon(int numOutputValues, MeanAttributes **attributes, int numAttributes);
@@ -135,7 +135,7 @@ namespace rsgis{namespace vec{
 		int numAttributes;
 	};
 	
-	class RSGISCalcZonalMeanFromPolygondB : public rsgis::img::RSGISCalcImageSingleValue
+	class DllExport RSGISCalcZonalMeanFromPolygondB : public rsgis::img::RSGISCalcImageSingleValue
 	{
 	public: 
 		RSGISCalcZonalMeanFromPolygondB(int numOutputValues, MeanAttributes **attributes, int numAttributes);
@@ -154,7 +154,7 @@ namespace rsgis{namespace vec{
 		int numAttributes;
 	};
 	
-	class RSGISZonalWeightedMeanStatsPoly : public RSGISProcessOGRFeature
+	class DllExport RSGISZonalWeightedMeanStatsPoly : public RSGISProcessOGRFeature
 	{
 	public:
 		RSGISZonalWeightedMeanStatsPoly(GDALDataset *image, MeanAttributes** attributes, int numAttributes, bool outPxlCount);
@@ -173,7 +173,7 @@ namespace rsgis{namespace vec{
 		rsgis::img::RSGISCalcImageSingleValue *calcValue;
 	};
 	
-	class RSGISCalcZonalWeightedMeanStatsPoly : public rsgis::img::RSGISCalcImageSingleValue
+	class DllExport RSGISCalcZonalWeightedMeanStatsPoly : public rsgis::img::RSGISCalcImageSingleValue
 	{
 	public: 
 		RSGISCalcZonalWeightedMeanStatsPoly(int numOutputValues, MeanAttributes **attributes, int numAttributes);

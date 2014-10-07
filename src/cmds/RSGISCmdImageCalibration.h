@@ -32,7 +32,7 @@
 
 namespace rsgis{ namespace cmds {
     
-    struct CmdsLandsatRadianceGainsOffsets
+    struct DllExport CmdsLandsatRadianceGainsOffsets
     {
         std::string imagePath;
         std::string bandName;
@@ -43,7 +43,7 @@ namespace rsgis{ namespace cmds {
         float qCalMin;
     };
     
-    struct CmdsSaturatedPixel
+    struct DllExport CmdsSaturatedPixel
     {
         std::string imagePath;
         std::string bandName;
@@ -51,7 +51,7 @@ namespace rsgis{ namespace cmds {
         float satVal;
     };
     
-    struct CmdsLandsatThermalCoeffs
+    struct DllExport CmdsLandsatThermalCoeffs
     {
         std::string bandName;
         unsigned int band;
@@ -59,7 +59,7 @@ namespace rsgis{ namespace cmds {
         float k2;
     };
     
-    struct CmdsLandsatRadianceGainsOffsetsMultiAdd
+    struct DllExport CmdsLandsatRadianceGainsOffsetsMultiAdd
     {
         std::string imagePath;
         std::string bandName;
@@ -68,7 +68,7 @@ namespace rsgis{ namespace cmds {
         float multiVal;
     };
     
-    struct Cmds6SElevationLUT
+    struct DllExport Cmds6SElevationLUT
     {
         float elev;
         unsigned int *imageBands;
@@ -78,7 +78,7 @@ namespace rsgis{ namespace cmds {
         unsigned int numValues;
     };
     
-    struct Cmds6SAOTLUT
+    struct DllExport Cmds6SAOTLUT
     {
         float aot;
         unsigned int *imageBands;
@@ -88,13 +88,13 @@ namespace rsgis{ namespace cmds {
         unsigned int numValues;
     };
     
-    struct Cmds6SBaseElevAOTLUT
+    struct DllExport Cmds6SBaseElevAOTLUT
     {
         float elev;
         std::vector<Cmds6SAOTLUT> aotLUT;
     };
     
-    struct CmdsWorldView2RadianceGainsOffsets
+    struct DllExport CmdsWorldView2RadianceGainsOffsets
     {
         std::string bandName;
         unsigned int band;

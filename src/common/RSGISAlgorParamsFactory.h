@@ -30,7 +30,7 @@
 
 namespace rsgis
 {    
-	class RSGISAlgorParamsFactory
+	class DllExport RSGISAlgorParamsFactory
 		{
 		public:
 			RSGISAlgorParamsFactory(std::vector<RSGISAlgorithmParameters*> *params);

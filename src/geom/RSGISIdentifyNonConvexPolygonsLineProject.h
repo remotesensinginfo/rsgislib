@@ -39,7 +39,7 @@
 
 namespace rsgis{namespace geom{
 	
-	class RSGISIdentifyNonConvexPolygonsLineProject : public RSGISIdentifyNonConvexPolygons
+	class DllExport RSGISIdentifyNonConvexPolygonsLineProject : public RSGISIdentifyNonConvexPolygons
 		{
 		public:
 			RSGISIdentifyNonConvexPolygonsLineProject(float resolution);

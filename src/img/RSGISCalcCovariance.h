@@ -34,7 +34,7 @@
 
 namespace rsgis{namespace img{
 	
-	class RSGISCalcCovariance : public RSGISCalcImageSingleValue
+	class DllExport RSGISCalcCovariance : public RSGISCalcImageSingleValue
 		{
 		public:
 			RSGISCalcCovariance(int numOutputValues, rsgis::math::Matrix *aMeans, rsgis::math::Matrix *bMeans);
@@ -53,7 +53,7 @@ namespace rsgis{namespace img{
     
     
     
-    class RSGISCreateCovarianceMatrix: public RSGISCalcImageValue
+    class DllExport RSGISCreateCovarianceMatrix: public RSGISCalcImageValue
     {
     public:
         RSGISCreateCovarianceMatrix(rsgis::math::Vector *meanVector, rsgis::math::Matrix *covarianceMatrix);

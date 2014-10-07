@@ -47,7 +47,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISPopulateTopPowerSet : public RSGISProcessOGRFeature
+	class DllExport RSGISPopulateTopPowerSet : public RSGISProcessOGRFeature
 		{
 		public:
 			RSGISPopulateTopPowerSet(GDALDataset *image, GDALDataset *rasterFeatures, CountAttributes** attributes, int numAttributes, int nTop);

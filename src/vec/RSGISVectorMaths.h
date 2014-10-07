@@ -32,13 +32,13 @@
 
 namespace rsgis{namespace vec{
 	
-	struct VariableFields 
+	struct DllExport VariableFields 
 	{
         std::string name;
         std::string fieldName;
 	};
 	
-	class RSGISVectorMaths : public RSGISProcessOGRFeature
+	class DllExport RSGISVectorMaths : public RSGISProcessOGRFeature
 	{
 	public:
 		RSGISVectorMaths(VariableFields **variables, int numVariables, std::string mathsExpression, std::string outHeading);

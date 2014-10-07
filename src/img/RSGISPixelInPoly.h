@@ -45,7 +45,7 @@ namespace rsgis{namespace img {
 		polyAreaInPixel /// Percent of polygon area that is within pixel
 	};
 
-	class RSGISPixelInPoly
+	class DllExport RSGISPixelInPoly
 	{
 	public:
 		RSGISPixelInPoly(pixelInPolyOption method);

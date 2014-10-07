@@ -36,7 +36,7 @@ namespace rsgis
 {
 	namespace radar
 	{        
-		class RSGISCalcGammaZero : public rsgis::img::RSGISCalcImageValue
+		class DllExport RSGISCalcGammaZero : public rsgis::img::RSGISCalcImageValue
 			{
 			public: 
 				RSGISCalcGammaZero(int numberOutBands, bool deg);

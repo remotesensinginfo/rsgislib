@@ -34,7 +34,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISClusteredClassificationPolygon : public RSGISPolygonData
+	class DllExport RSGISClusteredClassificationPolygon : public RSGISPolygonData
 		{
 		public:
 			RSGISClusteredClassificationPolygon();

@@ -29,7 +29,7 @@
 
 namespace rsgis{namespace math{
 	
-    class RSGISBaysianIntergrateFunctionNoPrior : public RSGISMathFunction
+    class DllExport RSGISBaysianIntergrateFunctionNoPrior : public RSGISMathFunction
         {
         public:
             RSGISBaysianIntergrateFunctionNoPrior(RSGISMathFunction *function, double variance);

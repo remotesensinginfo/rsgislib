@@ -32,7 +32,7 @@
 
 namespace rsgis { namespace modeling{
     
-	class RSGISModelTree : public RSGISModelAddVegetation
+	class DllExport RSGISModelTree : public RSGISModelAddVegetation
 	{
 	public:
 		RSGISModelTree(std::vector<double> *modelPar, 

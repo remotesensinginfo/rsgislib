@@ -27,7 +27,7 @@
 
 namespace rsgis
 {    
-	class RSGISCommandLineException : public RSGISException
+	class DllExport RSGISCommandLineException : public RSGISException
 		{
 		public:
 			RSGISCommandLineException();

@@ -35,7 +35,7 @@
 
 namespace rsgis { namespace img {
 	
-    class RSGISGenHistogram
+    class DllExport RSGISGenHistogram
     {
     public:
         RSGISGenHistogram();
@@ -44,7 +44,7 @@ namespace rsgis { namespace img {
         ~RSGISGenHistogram();
     };
 	
-	class RSGISGenHistogramCalcVal : public RSGISCalcImageValue
+	class DllExport RSGISGenHistogramCalcVal : public RSGISCalcImageValue
 	{
 	public:
 		RSGISGenHistogramCalcVal(unsigned int *bins, float *binRanges, unsigned int band, unsigned int numBins, float maskValue, float binWidth);
@@ -68,7 +68,7 @@ namespace rsgis { namespace img {
         unsigned int numBins;
 	};
     
-    class RSGISGenHistogramNoMaskCalcVal : public RSGISCalcImageValue
+    class DllExport RSGISGenHistogramNoMaskCalcVal : public RSGISCalcImageValue
 	{
 	public:
 		RSGISGenHistogramNoMaskCalcVal(unsigned int *bins, float *binRanges, unsigned int band, unsigned int numBins, float binWidth);

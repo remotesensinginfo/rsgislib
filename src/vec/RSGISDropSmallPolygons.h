@@ -36,7 +36,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISDropSmallPolygons
+	class DllExport RSGISDropSmallPolygons
 	{
 	public:
 		RSGISDropSmallPolygons();

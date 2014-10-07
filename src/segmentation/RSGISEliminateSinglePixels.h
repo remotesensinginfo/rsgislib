@@ -41,7 +41,7 @@
 
 namespace rsgis{namespace segment{
     
-    class RSGISEliminateSinglePixels
+    class DllExport RSGISEliminateSinglePixels
     {
     public:
         RSGISEliminateSinglePixels();
@@ -56,7 +56,7 @@ namespace rsgis{namespace segment{
     
     
     
-    class RSGISFindSinglePixels : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISFindSinglePixels : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
 		RSGISFindSinglePixels(float noDataVal, bool noDataValProvided);
@@ -80,7 +80,7 @@ namespace rsgis{namespace segment{
 	};
     
     
-    class RSGISElimSinglePixelsCalcImg : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISElimSinglePixelsCalcImg : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
 		RSGISElimSinglePixelsCalcImg(float noDataVal, bool noDataValProvided);

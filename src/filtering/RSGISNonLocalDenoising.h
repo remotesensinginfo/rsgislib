@@ -42,7 +42,7 @@
 
 namespace rsgis{namespace filter{
 	
-	class RSGISApplyNonLocalDenoising
+	class DllExport RSGISApplyNonLocalDenoising
     {
         /**
             Implemention of the Non-local image denoising algorithm described in:

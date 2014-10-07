@@ -38,7 +38,7 @@
 
 namespace rsgis{namespace geom{
 	
-	class RSGISCircle
+	class DllExport RSGISCircle
 		{
 		public:
 			RSGISCircle(RSGIS2DPoint *centre, double radius);

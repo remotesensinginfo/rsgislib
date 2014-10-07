@@ -33,7 +33,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISEmptyPolygon : public RSGISPolygonData
+	class DllExport RSGISEmptyPolygon : public RSGISPolygonData
 		{
 		public:
 			RSGISEmptyPolygon();

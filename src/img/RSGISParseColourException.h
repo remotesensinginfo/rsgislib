@@ -29,7 +29,7 @@ namespace rsgis
 {
 	namespace img
 	{
-		class RSGISParseColourException : public rsgis::RSGISImageException
+		class DllExport RSGISParseColourException : public rsgis::RSGISImageException
 			{
 			public:
 				RSGISParseColourException();

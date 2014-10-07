@@ -39,7 +39,7 @@
 
 namespace rsgis{namespace filter{
 	
-	class RSGISFilterBank
+	class DllExport RSGISFilterBank
 		{
 		public: 
 			RSGISFilterBank();

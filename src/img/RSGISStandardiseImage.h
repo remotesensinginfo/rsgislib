@@ -34,7 +34,7 @@ namespace rsgis
 {
 	namespace img
 	{
-		class RSGISStandardiseImage : public RSGISCalcImageValue
+		class DllExport RSGISStandardiseImage : public RSGISCalcImageValue
 			{
 			public: 
 				RSGISStandardiseImage(int numberOutBands, rsgis::math::Matrix *meanVector);

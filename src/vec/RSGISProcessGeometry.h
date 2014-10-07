@@ -41,7 +41,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISProcessGeometry
+	class DllExport RSGISProcessGeometry
 		{
 		public:
 			RSGISProcessGeometry(RSGISProcessOGRGeometry *processGeom);

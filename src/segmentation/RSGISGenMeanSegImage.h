@@ -38,7 +38,7 @@
 
 namespace rsgis{namespace segment{
     
-    class RSGISGenMeanSegImage
+    class DllExport RSGISGenMeanSegImage
     {
     public:
         RSGISGenMeanSegImage();
@@ -50,7 +50,7 @@ namespace rsgis{namespace segment{
     
     
     
-    class RSGISPopulateMeans : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISPopulateMeans : public rsgis::img::RSGISCalcImageValue
     {
     public:
         RSGISPopulateMeans(std::vector<rsgis::img::ImgClumpMean*> *clumpTable, unsigned int numSpecBands, unsigned int numClumps);
@@ -72,7 +72,7 @@ namespace rsgis{namespace segment{
     };
     
     
-    class RSGISApplyMeans2Output : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISApplyMeans2Output : public rsgis::img::RSGISCalcImageValue
     {
     public:
         RSGISApplyMeans2Output(std::vector<rsgis::img::ImgClumpMean*> *clumpTable, unsigned int numSpecBands, unsigned int numClumps);

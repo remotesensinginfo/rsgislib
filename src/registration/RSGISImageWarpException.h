@@ -29,7 +29,7 @@
 
 namespace rsgis{namespace reg{
 	
-	class RSGISImageWarpException : public rsgis::RSGISRegistrationException
+	class DllExport RSGISImageWarpException : public rsgis::RSGISRegistrationException
 	{
 	public:
 		RSGISImageWarpException();

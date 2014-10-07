@@ -38,7 +38,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISOGRPolygonReader : public RSGISProcessOGRFeature
+	class DllExport RSGISOGRPolygonReader : public RSGISProcessOGRFeature
 	{
 	public:
 		RSGISOGRPolygonReader(std::vector<OGRPolygon*> *polygons);

@@ -39,7 +39,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISConvertToASCII : public RSGISProcessOGRFeature
+	class DllExport RSGISConvertToASCII : public RSGISProcessOGRFeature
 		{
 		public:
 			RSGISConvertToASCII(std::string outputTextFile);

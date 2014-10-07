@@ -80,7 +80,7 @@ namespace rsgis{namespace math{
         rsgis_descending = 2
     };
     
-    struct RSGISStatsSummary
+    struct DllExport RSGISStatsSummary
     {
         bool calcMin;
         bool calcMax;
@@ -96,7 +96,7 @@ namespace rsgis{namespace math{
         double median;
     };
 	
-	class RSGISMathsUtils
+	class DllExport RSGISMathsUtils
 		{
 		public:
 			RSGISMathsUtils();

@@ -37,7 +37,7 @@
 
 namespace rsgis{namespace segment{
     
-    class RSGISMergeSmallClumps
+    class DllExport RSGISMergeSmallClumps
     {
     public:
         RSGISMergeSmallClumps();

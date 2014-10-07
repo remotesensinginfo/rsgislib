@@ -102,7 +102,7 @@ using namespace rsgis::utils;
 using namespace rsgis::vec;
 using namespace rsgis::datastruct;
 
-class RSGISExeImageUtils : public RSGISAlgorithmParameters
+class DllExport RSGISExeImageUtils : public RSGISAlgorithmParameters
 	{
 	public:
 

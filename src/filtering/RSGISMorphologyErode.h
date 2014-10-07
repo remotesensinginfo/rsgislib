@@ -35,7 +35,7 @@
 
 namespace rsgis{namespace filter{
     
-    class RSGISImageMorphologyErode
+    class DllExport RSGISImageMorphologyErode
     {
     public:
         RSGISImageMorphologyErode();
@@ -44,7 +44,7 @@ namespace rsgis{namespace filter{
         ~RSGISImageMorphologyErode(){};
     };
     
-    class RSGISMorphologyErode : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISMorphologyErode : public rsgis::img::RSGISCalcImageValue
     {
     public: 
         RSGISMorphologyErode(int numberOutBands, rsgis::math::Matrix *matrixOperator); 			
@@ -64,7 +64,7 @@ namespace rsgis{namespace filter{
         rsgis::math::Matrix *matrixOperator;
     };
     
-    class RSGISMorphologyErodeAll : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISMorphologyErodeAll : public rsgis::img::RSGISCalcImageValue
     {
     public: 
         RSGISMorphologyErodeAll(int numberOutBands, rsgis::math::Matrix *matrixOperator); 			

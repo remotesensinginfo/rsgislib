@@ -36,7 +36,7 @@
 
 namespace rsgis {namespace radar{
     
-	class RSGISEstimationLinearLeastSquares : public RSGISEstimationOptimiser
+	class DllExport RSGISEstimationLinearLeastSquares : public RSGISEstimationOptimiser
 	{
 	public:
 		RSGISEstimationLinearLeastSquares(gsl_matrix *coefficients);
@@ -50,7 +50,7 @@ namespace rsgis {namespace radar{
 		gsl_vector *offsets;
 	};
 	
-	class RSGISEstimationLinearize : public RSGISEstimationOptimiser
+	class DllExport RSGISEstimationLinearize : public RSGISEstimationOptimiser
 	{
 	public:
 		RSGISEstimationLinearize(gsl_matrix *coefficients);
@@ -64,7 +64,7 @@ namespace rsgis {namespace radar{
 		gsl_vector *offsets;
 	};
 	
-	class RSGISEstimationLinearizeWithPriors : public RSGISEstimationOptimiser
+	class DllExport RSGISEstimationLinearizeWithPriors : public RSGISEstimationOptimiser
 	{
 	public:
 		RSGISEstimationLinearizeWithPriors(gsl_matrix *coefficients,

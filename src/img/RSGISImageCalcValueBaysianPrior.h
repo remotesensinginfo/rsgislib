@@ -37,7 +37,7 @@
 #include "gdal_priv.h"
 
 namespace rsgis{namespace img{
-	class RSGISImageCalcValueBaysianPrior	: public RSGISCalcImageValue
+	class DllExport RSGISImageCalcValueBaysianPrior	: public RSGISCalcImageValue
 		{
 		public:
 			RSGISImageCalcValueBaysianPrior(int numberOutBands, rsgis::math::RSGISMathFunction *function, rsgis::math::RSGISProbDistro *probDistro, double variance, double interval, double minVal, double maxVal, double lowerLimit, double upperLimit, rsgis::math::deltatypedef deltatype);

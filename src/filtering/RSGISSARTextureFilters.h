@@ -36,7 +36,7 @@
 
 namespace rsgis{namespace filter{
 
-	class RSGISNormVarPowerFilter : public RSGISImageFilter
+	class DllExport RSGISNormVarPowerFilter : public RSGISImageFilter
     {
         /**
 
@@ -55,7 +55,7 @@ namespace rsgis{namespace filter{
         ~RSGISNormVarPowerFilter(){};
     };
 
-    class RSGISNormVarAmplitudeFilter : public RSGISImageFilter
+    class DllExport RSGISNormVarAmplitudeFilter : public RSGISImageFilter
     {
         /**
 
@@ -74,7 +74,7 @@ namespace rsgis{namespace filter{
         ~RSGISNormVarAmplitudeFilter(){};
     };
 
-    class RSGISNormVarLnPowerFilter : public RSGISImageFilter
+    class DllExport RSGISNormVarLnPowerFilter : public RSGISImageFilter
     {
         /**
 
@@ -93,7 +93,7 @@ namespace rsgis{namespace filter{
         ~RSGISNormVarLnPowerFilter(){};
     };
 
-    class RSGISNormLnFilter : public RSGISImageFilter
+    class DllExport RSGISNormLnFilter : public RSGISImageFilter
     {
         /**
 
@@ -112,7 +112,7 @@ namespace rsgis{namespace filter{
         ~RSGISNormLnFilter(){};
     };
 
-    class RSGISTextureVar : public RSGISImageFilter
+    class DllExport RSGISTextureVar : public RSGISImageFilter
     {
         /**
 

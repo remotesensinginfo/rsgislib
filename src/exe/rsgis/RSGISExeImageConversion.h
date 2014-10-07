@@ -57,7 +57,7 @@ using namespace rsgis::math;
 using namespace rsgis::img;
 using namespace rsgis::utils;
 
-class RSGISExeImageConversion : public RSGISAlgorithmParameters
+class DllExport RSGISExeImageConversion : public RSGISAlgorithmParameters
 	{
 	public:
 		

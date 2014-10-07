@@ -33,7 +33,7 @@
 
 namespace rsgis{namespace geom{
 	
-	class RSGIS2DPoint
+	class DllExport RSGIS2DPoint
 		{
 		public:
 			RSGIS2DPoint();

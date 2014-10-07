@@ -27,6 +27,8 @@
 
 #include "RSGISnnls.h"
 
+#include "common/RSGISCommons.h"
+
 namespace rsgis{namespace math{
     
     /* Table of constant values */

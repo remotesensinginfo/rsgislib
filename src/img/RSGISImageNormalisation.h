@@ -37,14 +37,14 @@
 
 namespace rsgis{namespace img{
 	
-	class RSGISImageNormalisation
+	class DllExport RSGISImageNormalisation
 		{
 		public: 
 			RSGISImageNormalisation();
 			void normaliseImage(GDALDataset *dataset, double *imageMax, double *imageMin, double *outMax, double *outMin, bool calcStats, std::string outputImage)throw(RSGISImageCalcException,RSGISImageBandException);
 		};
 	
-	class RSGISNormaliseImage : public RSGISCalcImageValue
+	class DllExport RSGISNormaliseImage : public RSGISCalcImageValue
 		{
 		public: 
 			RSGISNormaliseImage(int numberOutBands, double *imageMaxIn, double *imageMinIn, double *outMaxIn, double *outMinIn);

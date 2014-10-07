@@ -36,7 +36,7 @@
 
 namespace rsgis{namespace calib{
     
-	struct LandsatRadianceGainsOffsets
+	struct DllExport LandsatRadianceGainsOffsets
     {
         unsigned int band;
         float lMax;
@@ -45,27 +45,27 @@ namespace rsgis{namespace calib{
         float qCalMin;
     };
     
-    struct RSGISSaturatedPixelInfo
+    struct DllExport RSGISSaturatedPixelInfo
     {
         unsigned int band;
         float satVal;
     };
     
-    struct LandsatRadianceGainsOffsetsMultiAdd
+    struct DllExport LandsatRadianceGainsOffsetsMultiAdd
     {
         unsigned int band;
         float addVal;
         float multiVal;
     };
     
-    struct SPOTRadianceGainsOffsets
+    struct DllExport SPOTRadianceGainsOffsets
     {
         std::string bandName;
         unsigned int band;
         float gain;
     };
     
-    struct IkonosRadianceGainsOffsets
+    struct DllExport IkonosRadianceGainsOffsets
     {
         std::string bandName;
         unsigned int band;
@@ -73,14 +73,14 @@ namespace rsgis{namespace calib{
         float bandwidth;
     };
     
-    struct ASTERRadianceGainsOffsets
+    struct DllExport ASTERRadianceGainsOffsets
     {
         std::string bandName;
         unsigned int band;
         float unitConCoef;
     };
     
-    struct IRSRadianceGainsOffsets
+    struct DllExport IRSRadianceGainsOffsets
     {
         std::string bandName;
         unsigned int band;
@@ -90,7 +90,7 @@ namespace rsgis{namespace calib{
         float qCalMin;
     };
     
-    struct Quickbird16bitRadianceGainsOffsets
+    struct DllExport Quickbird16bitRadianceGainsOffsets
     {
         std::string bandName;
         unsigned int band;
@@ -98,7 +98,7 @@ namespace rsgis{namespace calib{
         float bandIntegrate;
     };
     
-    struct Quickbird8bitRadianceGainsOffsets
+    struct DllExport Quickbird8bitRadianceGainsOffsets
     {
         std::string bandName;
         unsigned int band;
@@ -107,7 +107,7 @@ namespace rsgis{namespace calib{
         float k;
     };
     
-    struct WorldView2RadianceGainsOffsets
+    struct DllExport WorldView2RadianceGainsOffsets
     {
         std::string bandName;
         unsigned int band;
@@ -115,7 +115,7 @@ namespace rsgis{namespace calib{
         double effBandWidth;
     };
 	
-	class RSGISLandsatRadianceCalibration : public rsgis::img::RSGISCalcImageValue
+	class DllExport RSGISLandsatRadianceCalibration : public rsgis::img::RSGISCalcImageValue
     {
     public: 
         RSGISLandsatRadianceCalibration(unsigned int numberOutBands, LandsatRadianceGainsOffsets *radGainOff):rsgis::img::RSGISCalcImageValue(numberOutBands)
@@ -137,7 +137,7 @@ namespace rsgis{namespace calib{
         LandsatRadianceGainsOffsets *radGainOff;
     };
     
-    class RSGISLandsatRadianceCalibrationMultiAdd : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISLandsatRadianceCalibrationMultiAdd : public rsgis::img::RSGISCalcImageValue
     {
     public:
         RSGISLandsatRadianceCalibrationMultiAdd(unsigned int numberOutBands, LandsatRadianceGainsOffsetsMultiAdd *radGainOff):rsgis::img::RSGISCalcImageValue(numberOutBands)
@@ -159,7 +159,7 @@ namespace rsgis{namespace calib{
         LandsatRadianceGainsOffsetsMultiAdd *radGainOff;
     };
     
-    class RSGISSPOTRadianceCalibration : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISSPOTRadianceCalibration : public rsgis::img::RSGISCalcImageValue
     {
     public: 
         RSGISSPOTRadianceCalibration(unsigned int numberOutBands, SPOTRadianceGainsOffsets *radGainOff):rsgis::img::RSGISCalcImageValue(numberOutBands)
@@ -181,7 +181,7 @@ namespace rsgis{namespace calib{
         SPOTRadianceGainsOffsets *radGainOff;
     };
     
-    class RSGISIkonosRadianceCalibration : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISIkonosRadianceCalibration : public rsgis::img::RSGISCalcImageValue
     {
     public: 
         RSGISIkonosRadianceCalibration(unsigned int numberOutBands, IkonosRadianceGainsOffsets *radGainOff):rsgis::img::RSGISCalcImageValue(numberOutBands)
@@ -203,7 +203,7 @@ namespace rsgis{namespace calib{
         IkonosRadianceGainsOffsets *radGainOff;
     };
     
-    class RSGISASTERRadianceCalibration : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISASTERRadianceCalibration : public rsgis::img::RSGISCalcImageValue
     {
     public: 
         RSGISASTERRadianceCalibration(unsigned int numberOutBands, ASTERRadianceGainsOffsets *radGainOff):rsgis::img::RSGISCalcImageValue(numberOutBands)
@@ -225,7 +225,7 @@ namespace rsgis{namespace calib{
         ASTERRadianceGainsOffsets *radGainOff;
     };
     
-    class RSGISIRSRadianceCalibration : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISIRSRadianceCalibration : public rsgis::img::RSGISCalcImageValue
     {
     public: 
         RSGISIRSRadianceCalibration(unsigned int numberOutBands, IRSRadianceGainsOffsets *radGainOff):rsgis::img::RSGISCalcImageValue(numberOutBands)
@@ -247,7 +247,7 @@ namespace rsgis{namespace calib{
         IRSRadianceGainsOffsets *radGainOff;
     };
 
-	class RSGISQuickbird16bitRadianceCalibration : public rsgis::img::RSGISCalcImageValue
+	class DllExport RSGISQuickbird16bitRadianceCalibration : public rsgis::img::RSGISCalcImageValue
     {
     public: 
         RSGISQuickbird16bitRadianceCalibration(unsigned int numberOutBands, Quickbird16bitRadianceGainsOffsets *radGainOff):rsgis::img::RSGISCalcImageValue(numberOutBands)
@@ -269,7 +269,7 @@ namespace rsgis{namespace calib{
         Quickbird16bitRadianceGainsOffsets *radGainOff;
     };
     
-    class RSGISQuickbird8bitRadianceCalibration : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISQuickbird8bitRadianceCalibration : public rsgis::img::RSGISCalcImageValue
     {
     public: 
         RSGISQuickbird8bitRadianceCalibration(unsigned int numberOutBands, Quickbird8bitRadianceGainsOffsets *radGainOff):rsgis::img::RSGISCalcImageValue(numberOutBands)
@@ -291,7 +291,7 @@ namespace rsgis{namespace calib{
         Quickbird8bitRadianceGainsOffsets *radGainOff;
     };
 
-    class RSGISWorldView2RadianceCalibration : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISWorldView2RadianceCalibration : public rsgis::img::RSGISCalcImageValue
     {
     public: 
         RSGISWorldView2RadianceCalibration(unsigned int numberOutBands, WorldView2RadianceGainsOffsets *radGainOff):rsgis::img::RSGISCalcImageValue(numberOutBands)
@@ -314,7 +314,7 @@ namespace rsgis{namespace calib{
     };
 
     
-    class RSGISIdentifySaturatePixels : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISIdentifySaturatePixels : public rsgis::img::RSGISCalcImageValue
     {
     public:
         RSGISIdentifySaturatePixels(unsigned int numberOutBands, RSGISSaturatedPixelInfo *saturatePxlInfo):rsgis::img::RSGISCalcImageValue(numberOutBands)

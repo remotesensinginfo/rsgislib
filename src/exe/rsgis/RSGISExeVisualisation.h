@@ -56,7 +56,7 @@ using namespace rsgis::utils;
 using namespace rsgis::vec;
 
 
-class RSGISExeVisualisation : public RSGISAlgorithmParameters
+class DllExport RSGISExeVisualisation : public RSGISAlgorithmParameters
 	{
 	public:
 		

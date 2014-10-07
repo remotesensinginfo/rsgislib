@@ -33,7 +33,7 @@
 
 namespace rsgis{namespace math{
 	
-	class RSGISGlobalOptimisationFunction
+	class DllExport RSGISGlobalOptimisationFunction
 		{
 		public:
 			virtual double calcValue(std::vector<geos::geom::Coordinate*> *coords) throw(RSGISOptimisationException) = 0;

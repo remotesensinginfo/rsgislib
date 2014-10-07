@@ -50,7 +50,7 @@
 
 namespace rsgisexe{
 
-class RSGISExeImageCalibration : public rsgis::RSGISAlgorithmParameters
+class DllExport RSGISExeImageCalibration : public rsgis::RSGISAlgorithmParameters
 {
 public:
 	enum options 

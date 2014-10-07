@@ -67,7 +67,7 @@ namespace rsgis { namespace modeling{
 	 * Distribution of large branch angles into the incidence plane <br>
 	 *
 	 */
-	class RSGISModelTreeCanopy : public RSGISModelAddVegetation
+	class DllExport RSGISModelTreeCanopy : public RSGISModelAddVegetation
 	{
 	public:
 		RSGISModelTreeCanopy(std::vector<double> *modelPar, rsgis::math::RSGISProbDistro *leafPosHDistro, rsgis::math::RSGISProbDistro *leafPosVDistro, rsgis::math::RSGISProbDistro *leafThetaDistro,

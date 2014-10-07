@@ -38,7 +38,7 @@
 
 namespace rsgis{namespace geom{
 	
-	class RSGISDelaunayTriangulation
+	class DllExport RSGISDelaunayTriangulation
 		{
 		public:
 			/***

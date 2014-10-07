@@ -44,7 +44,7 @@
 
 namespace rsgis{namespace segment{
  /*
-    struct FeatureShapeDescription
+    struct DllExport FeatureShapeDescription
     {
         bool area;
         double areaLower;
@@ -56,7 +56,7 @@ namespace rsgis{namespace segment{
         unsigned int lenWidthIdx;
     };
     
-    class RSGISBottomUpShapeFeatureExtraction
+    class DllExport RSGISBottomUpShapeFeatureExtraction
     {
     public:
         RSGISBottomUpShapeFeatureExtraction();
@@ -70,7 +70,7 @@ namespace rsgis{namespace segment{
     
    
     
-    class RSGISAddFeaturesToOutputImage : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISAddFeaturesToOutputImage : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
 		RSGISAddFeaturesToOutputImage(GDALRasterAttributeTable *attTable, unsigned int featIdx);
@@ -92,7 +92,7 @@ namespace rsgis{namespace segment{
 	};
     
     
-    class RSGISMaskFeaturesFromFeatureImage : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISMaskFeaturesFromFeatureImage : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
 		RSGISMaskFeaturesFromFeatureImage(GDALRasterAttributeTable *attTable, unsigned int featIdx);
@@ -114,7 +114,7 @@ namespace rsgis{namespace segment{
 	};
     
     
-    class RSGISApplyThresholdToFeatureImage : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISApplyThresholdToFeatureImage : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
 		RSGISApplyThresholdToFeatureImage(float threshold);
@@ -134,7 +134,7 @@ namespace rsgis{namespace segment{
         float threshold;
 	};
     
-    class RSGISGrowFeatures : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISGrowFeatures : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
 		RSGISGrowFeatures();

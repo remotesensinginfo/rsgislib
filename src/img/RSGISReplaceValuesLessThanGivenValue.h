@@ -42,7 +42,7 @@ namespace rsgis{namespace img{
 	 *
 	 */
 	
-	class RSGISReplaceValuesLessThanGivenValue : public RSGISCalcImageValue
+	class DllExport RSGISReplaceValuesLessThanGivenValue : public RSGISCalcImageValue
 	{
 	public: 
 		RSGISReplaceValuesLessThanGivenValue(int numberOutBands, float threshold, float value);

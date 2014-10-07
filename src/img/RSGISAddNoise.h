@@ -45,7 +45,7 @@ namespace rsgis
 			percentGaussianNoise
 		};
 		
-		class RSGISAddRandomNoise : public RSGISCalcImageValue
+		class DllExport RSGISAddRandomNoise : public RSGISCalcImageValue
 			{
 			public: 
 				RSGISAddRandomNoise(int numberOutBands, float scale);
@@ -64,7 +64,7 @@ namespace rsgis
 				float scale;
 			};
 		
-		class RSGISAddRandomGaussianNoisePercent : public RSGISCalcImageValue
+		class DllExport RSGISAddRandomGaussianNoisePercent : public RSGISCalcImageValue
 		{
 		public: 
 			RSGISAddRandomGaussianNoisePercent(int numberOutBands, float scale);

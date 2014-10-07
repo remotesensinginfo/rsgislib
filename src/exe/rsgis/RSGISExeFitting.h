@@ -63,7 +63,7 @@ using namespace rsgis::utils;
 * - threeDimensionalPolyfit - for fitting a three dimensional nth order polynomial euqation using /maths/RSGISPolyFit \n 
 */ 
 
-class RSGISExeFitting : public rsgis::RSGISAlgorithmParameters
+class DllExport RSGISExeFitting : public rsgis::RSGISAlgorithmParameters
 	{
 		
 		enum options

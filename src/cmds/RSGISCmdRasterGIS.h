@@ -69,7 +69,7 @@ namespace rsgis{ namespace cmds {
         rsgis_shapeindex = 16
     };
 
-    struct RSGISBandAttStatsCmds
+    struct DllExport RSGISBandAttStatsCmds
     {
         unsigned int band;
         bool calcMin;
@@ -84,7 +84,7 @@ namespace rsgis{ namespace cmds {
         std::string sumField;
     };
     
-    struct RSGISFieldAttStatsCmds
+    struct DllExport RSGISFieldAttStatsCmds
     {
         std::string field;
         bool calcMin;
@@ -99,27 +99,27 @@ namespace rsgis{ namespace cmds {
         std::string sumField;
     };
 
-    struct RSGISBandAttPercentilesCmds
+    struct DllExport RSGISBandAttPercentilesCmds
     {
         float percentile;
         std::string fieldName;
     };
 /*
-    struct RSGISShapeParamCmds
+    struct DllExport RSGISShapeParamCmds
     {
         rsgisshapeindexcmds idx;
         std::string colName;
         unsigned int colIdx;
     };
 */
-    struct RSGISClassChangeFieldsCmds
+    struct DllExport RSGISClassChangeFieldsCmds
     {
         std::string name;
         int outName;
         float threshold;
     };
  /*
-    struct RSGISJXSegQualityScoreBandCmds
+    struct DllExport RSGISJXSegQualityScoreBandCmds
     {
         RSGISJXSegQualityScoreBandCmds(float bandVar, float bandMI, float bandVarNorm, float bandMINorm)
         {
@@ -136,7 +136,7 @@ namespace rsgis{ namespace cmds {
     };
  */
 
-    class RSGISColourIntCmds {
+    class DllExport RSGISColourIntCmds {
     public:
         RSGISColourIntCmds() { this->red = 0; this->green = 0; this->blue = 0; this->alpha = 0; };
         RSGISColourIntCmds(int r, int g, int b, int a) { this->red = r; this->green = g; this->blue = b; this->alpha = a;};

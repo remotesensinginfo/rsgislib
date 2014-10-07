@@ -37,7 +37,7 @@ namespace rsgis{ namespace classifier{
 		middle = 1
 	};
 	
-	class RSGISMinimumDistanceClassifier : public RSGISClassifier
+	class DllExport RSGISMinimumDistanceClassifier : public RSGISClassifier
 		{
 		public:
 			RSGISMinimumDistanceClassifier(ClassData **trainingData, int numClasses, MinDistCentreType centreType)  throw(RSGISClassificationException);

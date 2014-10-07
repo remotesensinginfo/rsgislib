@@ -32,7 +32,7 @@
 
 namespace rsgis{namespace img{
 	
-	class RSGISCalcRMSE : public RSGISCalcImageSingleValue
+	class DllExport RSGISCalcRMSE : public RSGISCalcImageSingleValue
 	{
 		/// Loops though bands and loads pixel values to vectors
 	public: 

@@ -41,7 +41,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISVectorMorphology : public RSGISProcessOGRGeometry
+	class DllExport RSGISVectorMorphology : public RSGISProcessOGRGeometry
 		{
 		public:
 			RSGISVectorMorphology(float buffer, rsgis::geom::Morphology morphologytype);

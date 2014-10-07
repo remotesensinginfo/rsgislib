@@ -47,7 +47,7 @@
 
 namespace rsgis { namespace img {
     
-    struct BandSpecThresholdStats
+    struct DllExport BandSpecThresholdStats
     {
         BandSpecThresholdStats(){};
         BandSpecThresholdStats(size_t band, float imgMin, float imgMax, float origMin, float origMax)
@@ -66,7 +66,7 @@ namespace rsgis { namespace img {
     };
     
 
-	class RSGISStretchImage
+	class DllExport RSGISStretchImage
 	{
 	public:
 		RSGISStretchImage(GDALDataset *inputImage, std::string outputImage, bool outStats, std::string outStatsFile, bool ignoreZeros, bool onePassSD, std::string imageFormat, GDALDataType outDataType);
@@ -149,7 +149,7 @@ namespace rsgis { namespace img {
         GDALDataType outDataType;
 	};
     
-    class RSGISStretchImageWithStats
+    class DllExport RSGISStretchImageWithStats
 	{
 	public:
 		RSGISStretchImageWithStats(GDALDataset *inputImage, std::string outputImage, std::string inStatsFile, std::string imageFormat, GDALDataType outDataType);
@@ -227,7 +227,7 @@ namespace rsgis { namespace img {
         GDALDataType outDataType;
 	};
 
-	class RSGISExponentStretchFunction : public rsgis::math::RSGISMathFunction
+	class DllExport RSGISExponentStretchFunction : public rsgis::math::RSGISMathFunction
 	{
 	public:
 		RSGISExponentStretchFunction(){};
@@ -238,7 +238,7 @@ namespace rsgis { namespace img {
 		~RSGISExponentStretchFunction(){};
 	};
 
-	class RSGISLogrithmStretchFunction : public rsgis::math::RSGISMathFunction
+	class DllExport RSGISLogrithmStretchFunction : public rsgis::math::RSGISMathFunction
 	{
 	public:
 		RSGISLogrithmStretchFunction(){};
@@ -249,7 +249,7 @@ namespace rsgis { namespace img {
 		~RSGISLogrithmStretchFunction(){};
 	};
 
-	class RSGISPowerLawStretchFunction : public rsgis::math::RSGISMathFunction
+	class DllExport RSGISPowerLawStretchFunction : public rsgis::math::RSGISMathFunction
 	{
 	public:
 		RSGISPowerLawStretchFunction(float power){this->power = power;};
@@ -264,7 +264,7 @@ namespace rsgis { namespace img {
 
 
 
-	class RSGISLinearStretchImage : public RSGISCalcImageValue
+	class DllExport RSGISLinearStretchImage : public RSGISCalcImageValue
 	{
 	public:
 		RSGISLinearStretchImage(int numberOutBands, double *imageMaxIn, double *imageMinIn, double *outMaxIn, double *outMinIn);
@@ -287,7 +287,7 @@ namespace rsgis { namespace img {
 	};
 
 
-	class RSGISFuncLinearStretchImage : public RSGISCalcImageValue
+	class DllExport RSGISFuncLinearStretchImage : public RSGISCalcImageValue
 	{
 	public:
 		RSGISFuncLinearStretchImage(int numberOutBands, double *imageMaxIn, double *imageMinIn, double *outMaxIn, double *outMinIn, rsgis::math::RSGISMathFunction *func);

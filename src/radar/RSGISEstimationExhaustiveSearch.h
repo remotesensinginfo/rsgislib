@@ -40,7 +40,7 @@
 
 namespace rsgis {namespace radar{
     
-	class RSGISEstimationExhaustiveSearch2Var2Data : public RSGISEstimationOptimiser
+	class DllExport RSGISEstimationExhaustiveSearch2Var2Data : public RSGISEstimationOptimiser
 	{
 	public:
 		RSGISEstimationExhaustiveSearch2Var2Data(rsgis::math::RSGISMathTwoVariableFunction *functionHH, rsgis::math::RSGISMathTwoVariableFunction *functionHV, double *minMaxIntervalA, double *minMaxIntervalB);
@@ -56,7 +56,7 @@ namespace rsgis {namespace radar{
 		double *minMaxIntervalB;
 	};
 	
-	class RSGISEstimationExhaustiveSearch2Var2DataExportPoints : public RSGISEstimationOptimiser
+	class DllExport RSGISEstimationExhaustiveSearch2Var2DataExportPoints : public RSGISEstimationOptimiser
 	{
 	public:
 		RSGISEstimationExhaustiveSearch2Var2DataExportPoints(rsgis::math::RSGISMathTwoVariableFunction *functionHH, rsgis::math::RSGISMathTwoVariableFunction *functionHV, double *minMaxIntervalA, double *minMaxIntervalB, std::string outFilenameBase);
@@ -74,7 +74,7 @@ namespace rsgis {namespace radar{
 		int nMinimiseRuns;
 	};
 	
-	class RSGISEstimationExhaustiveSearch2Var2DataWithAP : public RSGISEstimationOptimiser
+	class DllExport RSGISEstimationExhaustiveSearch2Var2DataWithAP : public RSGISEstimationOptimiser
 	{
 	public:
 		RSGISEstimationExhaustiveSearch2Var2DataWithAP(rsgis::math::RSGISMathTwoVariableFunction *functionHH, rsgis::math::RSGISMathTwoVariableFunction *functionHV,
@@ -98,7 +98,7 @@ namespace rsgis {namespace radar{
 		double *minMaxIntervalB;
 	};
 	
-	class RSGISEstimationExhaustiveSearch2Var3Data : public RSGISEstimationOptimiser
+	class DllExport RSGISEstimationExhaustiveSearch2Var3Data : public RSGISEstimationOptimiser
 	{
 	public:
 		RSGISEstimationExhaustiveSearch2Var3Data(rsgis::math::RSGISMathTwoVariableFunction *function1, rsgis::math::RSGISMathTwoVariableFunction *function2, rsgis::math::RSGISMathTwoVariableFunction *function3, double *minMaxIntervalA, double *minMaxIntervalB);
@@ -115,7 +115,7 @@ namespace rsgis {namespace radar{
 		double *minMaxIntervalB;
 	};
 	
-	class RSGISEstimationExhaustiveSearch2Var3DataExportPoints : public RSGISEstimationOptimiser
+	class DllExport RSGISEstimationExhaustiveSearch2Var3DataExportPoints : public RSGISEstimationOptimiser
 	{
 	public:
 		RSGISEstimationExhaustiveSearch2Var3DataExportPoints(rsgis::math::RSGISMathTwoVariableFunction *function1, rsgis::math::RSGISMathTwoVariableFunction *function2, rsgis::math::RSGISMathTwoVariableFunction *function3, double *minMaxIntervalA, double *minMaxIntervalB, std::string outFilenameBase);
@@ -134,7 +134,7 @@ namespace rsgis {namespace radar{
 		int nMinimiseRuns;
 	};
 	
-	class RSGISEstimationExhaustiveSearchWithGSLOptimiser2Var2Data : public RSGISEstimationOptimiser
+	class DllExport RSGISEstimationExhaustiveSearchWithGSLOptimiser2Var2Data : public RSGISEstimationOptimiser
 	{
 	public:
 		RSGISEstimationExhaustiveSearchWithGSLOptimiser2Var2Data(rsgis::math::RSGISMathTwoVariableFunction *functionHH, rsgis::math::RSGISMathTwoVariableFunction *functionHV, double *minMaxIntervalA, double *minMaxIntervalB);

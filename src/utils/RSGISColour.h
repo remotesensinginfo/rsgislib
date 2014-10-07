@@ -27,9 +27,11 @@
 #include <string>
 #include <iostream>
 
+#include "common/RSGISCommons.h"
+
 namespace rsgis{namespace utils{
     
-	class RSGISColour
+	class DllExport RSGISColour
 		{
 		public:
 			RSGISColour();
@@ -46,7 +48,7 @@ namespace rsgis{namespace utils{
 			double alpha;
 		};
     
-    class RSGISColourInt
+    class DllExport RSGISColourInt
     {
     public:
         RSGISColourInt();

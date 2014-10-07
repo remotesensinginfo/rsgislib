@@ -86,13 +86,13 @@ namespace rsgis{namespace geom{
 		}
 	};
 	
-	struct point2D
+	struct DllExport point2D
 	{
 		double x;
 		double y;
 	};
 	
-	struct point3D
+	struct DllExport point3D
 	{
 		double x;
 		double y;
@@ -108,7 +108,7 @@ namespace rsgis{namespace geom{
 		erosion
 	};
 	
-	class RSGISGeometry
+	class DllExport RSGISGeometry
 	{
 	public:
 		RSGISGeometry();

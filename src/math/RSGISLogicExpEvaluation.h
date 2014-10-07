@@ -29,7 +29,7 @@
 
 namespace rsgis{namespace math{
     
-    class RSGISMathLogicException : public RSGISMathException
+    class DllExport RSGISMathLogicException : public RSGISMathException
     {
     public:
         RSGISMathLogicException() : RSGISMathException("A RSGISMathLogicException has been created.."){};
@@ -38,7 +38,7 @@ namespace rsgis{namespace math{
     };
     
     
-	class RSGISLogicExpression
+	class DllExport RSGISLogicExpression
     {
     public:
         RSGISLogicExpression(std::string expName){this->expName = expName;};
@@ -50,7 +50,7 @@ namespace rsgis{namespace math{
     };
     
     
-    class RSGISLogicAndExpression : public RSGISLogicExpression
+    class DllExport RSGISLogicAndExpression : public RSGISLogicExpression
     {
     public:
         RSGISLogicAndExpression(std::vector<RSGISLogicExpression*> *exps) : RSGISLogicExpression("And")
@@ -70,7 +70,7 @@ namespace rsgis{namespace math{
         std::vector<RSGISLogicExpression*> *exps;
     };
     
-    class RSGISLogicOrExpression : public RSGISLogicExpression
+    class DllExport RSGISLogicOrExpression : public RSGISLogicExpression
     {
     public:
         RSGISLogicOrExpression(std::vector<RSGISLogicExpression*> *exps) : RSGISLogicExpression("Or")
@@ -90,7 +90,7 @@ namespace rsgis{namespace math{
         std::vector<RSGISLogicExpression*> *exps;
     };
     
-    class RSGISLogicNotExpression : public RSGISLogicExpression
+    class DllExport RSGISLogicNotExpression : public RSGISLogicExpression
     {
     public:
         RSGISLogicNotExpression(RSGISLogicExpression *exp) : RSGISLogicExpression("Not")
@@ -106,7 +106,7 @@ namespace rsgis{namespace math{
         RSGISLogicExpression *exp;
     };
     
-    class RSGISLogicEqualsExpression : public RSGISLogicExpression
+    class DllExport RSGISLogicEqualsExpression : public RSGISLogicExpression
     {
     public:
         RSGISLogicEqualsExpression(std::vector<RSGISLogicExpression*> *exps) : RSGISLogicExpression("Equals")
@@ -126,7 +126,7 @@ namespace rsgis{namespace math{
         std::vector<RSGISLogicExpression*> *exps;
     };
     
-    class RSGISLogicEqualsValueExpression : public RSGISLogicExpression
+    class DllExport RSGISLogicEqualsValueExpression : public RSGISLogicExpression
     {
     public:
         RSGISLogicEqualsValueExpression(double *val1, double *val2) : RSGISLogicExpression("EqVals")
@@ -141,7 +141,7 @@ namespace rsgis{namespace math{
         double *val2;
     };
     
-    class RSGISLogicGreaterThanValueExpression : public RSGISLogicExpression
+    class DllExport RSGISLogicGreaterThanValueExpression : public RSGISLogicExpression
     {
     public:
         RSGISLogicGreaterThanValueExpression(double *val1, double *val2) : RSGISLogicExpression("Greater Than")
@@ -158,7 +158,7 @@ namespace rsgis{namespace math{
     };
     
     
-    class RSGISLogicLessThanValueExpression : public RSGISLogicExpression
+    class DllExport RSGISLogicLessThanValueExpression : public RSGISLogicExpression
     {
     public:
         RSGISLogicLessThanValueExpression(double *val1, double *val2) : RSGISLogicExpression("Less Than")
@@ -174,7 +174,7 @@ namespace rsgis{namespace math{
     };
     
     
-    class RSGISLogicGreaterEqualToValueExpression : public RSGISLogicExpression
+    class DllExport RSGISLogicGreaterEqualToValueExpression : public RSGISLogicExpression
     {
     public:
         RSGISLogicGreaterEqualToValueExpression(double *val1, double *val2) : RSGISLogicExpression("Greater Than Equal")
@@ -190,7 +190,7 @@ namespace rsgis{namespace math{
     };
     
     
-    class RSGISLogicLessEqualToValueExpression : public RSGISLogicExpression
+    class DllExport RSGISLogicLessEqualToValueExpression : public RSGISLogicExpression
     {
     public:
         RSGISLogicLessEqualToValueExpression(double *val1, double *val2) : RSGISLogicExpression("Less Than Equal")
@@ -205,7 +205,7 @@ namespace rsgis{namespace math{
         double *val2;
     };
     
-    class RSGISLogicNotValueExpression : public RSGISLogicExpression
+    class DllExport RSGISLogicNotValueExpression : public RSGISLogicExpression
     {
     public:
         RSGISLogicNotValueExpression(double *val1, double *val2) : RSGISLogicExpression("Not Equal")

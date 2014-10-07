@@ -36,7 +36,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISRemovePolygonHoles
+	class DllExport RSGISRemovePolygonHoles
 	{
 	public:
 		RSGISRemovePolygonHoles(float areaThreshold=0, bool areaThresholdUsed=false);

@@ -36,7 +36,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISProcessOGRFeature
+	class DllExport RSGISProcessOGRFeature
 		{
 		public:
 			RSGISProcessOGRFeature(){};

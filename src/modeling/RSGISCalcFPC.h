@@ -37,7 +37,7 @@ namespace rsgis { namespace modeling {
 	 * J. Appl. Remote Sens. (2009) vol. 3 (1) pp. 033540<br>
 	 * Takes RSGISTransect, to which trees have been added.<br>
 	 */
-	class RSGISCalcFPC
+	class DllExport RSGISCalcFPC
 	{
 	public:
 		RSGISCalcFPC(RSGISTransect *transect);

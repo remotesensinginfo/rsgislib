@@ -37,14 +37,14 @@
 
 namespace rsgis{namespace vec{
 	
-	struct ClassInfo
+	struct DllExport ClassInfo
 	{
 		std::string name;
 		float proportion;
 		double totalArea;
 	};
 	
-	class RSGISClusterData : public RSGISPolygonData
+	class DllExport RSGISClusterData : public RSGISPolygonData
 	{
 	public:
 		RSGISClusterData();

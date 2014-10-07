@@ -71,7 +71,7 @@
 
 namespace rsgisexe{
 
-class RSGISExeClassification : public rsgis::RSGISAlgorithmParameters
+class DllExport RSGISExeClassification : public rsgis::RSGISAlgorithmParameters
 	{
 	public:
 		

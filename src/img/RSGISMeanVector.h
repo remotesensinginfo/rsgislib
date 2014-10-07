@@ -31,7 +31,7 @@
 
 namespace rsgis{namespace img{
 	
-	class RSGISCalcMeanVectorIndividual : public RSGISCalcImageSingleValue
+	class DllExport RSGISCalcMeanVectorIndividual : public RSGISCalcImageSingleValue
 		{
 		public:
 			RSGISCalcMeanVectorIndividual(int numOutputValues);
@@ -47,7 +47,7 @@ namespace rsgis{namespace img{
 			double sum;
 		};
 	
-	class RSGISCalcMeanVectorAll : public RSGISCalcImageSingleValue
+	class DllExport RSGISCalcMeanVectorAll : public RSGISCalcImageSingleValue
 		{
 		public:
 			RSGISCalcMeanVectorAll(int numOutputValues);

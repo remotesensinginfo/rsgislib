@@ -37,7 +37,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISAppendToVectorLayer
+	class DllExport RSGISAppendToVectorLayer
 	{
 	public:
 		RSGISAppendToVectorLayer();

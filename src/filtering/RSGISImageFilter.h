@@ -35,14 +35,14 @@
 
 namespace rsgis{namespace filter{
 	
-	struct ImageFilter
+	struct DllExport ImageFilter
 	{
 		int size;
 		float **filter;
 	};
 	
 	
-	class RSGISImageFilter : public rsgis::img::RSGISCalcImageValue
+	class DllExport RSGISImageFilter : public rsgis::img::RSGISCalcImageValue
 		{
 		public: 
 			RSGISImageFilter(int numberOutBands, int size, std::string filenameEnding);

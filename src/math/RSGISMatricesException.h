@@ -27,7 +27,7 @@
 
 namespace rsgis{namespace math{        
 
-    class RSGISMatricesException : public RSGISMathException
+    class DllExport RSGISMatricesException : public RSGISMathException
         {
         public:
             RSGISMatricesException();

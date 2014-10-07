@@ -28,7 +28,7 @@
 
 namespace rsgis{namespace math{        
 
-    class RSGISMultivariantStatsException : public RSGISException
+    class DllExport RSGISMultivariantStatsException : public RSGISException
         {
         public:
             RSGISMultivariantStatsException();

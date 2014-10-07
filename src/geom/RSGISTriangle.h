@@ -47,7 +47,7 @@
 
 namespace rsgis{namespace geom{
 	
-	class RSGISTriangle
+	class DllExport RSGISTriangle
 		{
 		public:
 			/***

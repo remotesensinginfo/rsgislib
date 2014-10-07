@@ -40,7 +40,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISCalcPolygonArea : public RSGISProcessOGRFeature
+	class DllExport RSGISCalcPolygonArea : public RSGISProcessOGRFeature
 		{
 		public:
 			RSGISCalcPolygonArea();

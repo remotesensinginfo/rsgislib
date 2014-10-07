@@ -45,7 +45,7 @@
 
 namespace rsgis{namespace img{
 	
-	class RSGISDefiniensCSVRasterise
+	class DllExport RSGISDefiniensCSVRasterise
 		{
 		public:
 			RSGISDefiniensCSVRasterise(bool projFromImage, std::string proj);
@@ -64,7 +64,7 @@ namespace rsgis{namespace img{
             std::string proj;
 		};
 	
-	class RSGISDefiniensCSVRasteriseValue : public RSGISCalcImageValue
+	class DllExport RSGISDefiniensCSVRasteriseValue : public RSGISCalcImageValue
 		{
 		public: 
 			RSGISDefiniensCSVRasteriseValue(int numberOutBands, float **csvData, int numberObjects);

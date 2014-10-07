@@ -26,9 +26,11 @@
 #include <iostream>
 #include <string>
 
+#include "RSGISCmdCommon.h"
+
 namespace rsgis{ namespace cmds {
 
-	class RSGISCmdException : public std::exception
+	class DllExport RSGISCmdException : public std::exception
 	{
     public:
         RSGISCmdException();

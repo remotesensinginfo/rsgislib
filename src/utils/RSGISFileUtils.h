@@ -35,7 +35,7 @@
 
 namespace rsgis{namespace utils{
         
-    class RSGISFileUtils
+    class DllExport RSGISFileUtils
     {
         public: 
             RSGISFileUtils();

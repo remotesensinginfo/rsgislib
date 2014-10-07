@@ -47,7 +47,7 @@ namespace rsgis{namespace geom{
 	
 	typedef boost::adjacency_list< boost::vecS, boost::vecS, boost::undirectedS, boost::property< boost::vertex_name_t, std::string >, boost::property< boost::edge_weight_t, float > > ClusterGraph;
 	
-	class RSGISMinSpanTreeClustererEdgeLenThreshold : public RSGISSpatialClustererInterface
+	class DllExport RSGISMinSpanTreeClustererEdgeLenThreshold : public RSGISSpatialClustererInterface
 		{
 		public:
 			RSGISMinSpanTreeClustererEdgeLenThreshold(float lengththreshold);

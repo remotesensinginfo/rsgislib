@@ -55,7 +55,7 @@ namespace rsgis
             rsgis_8connect
         };
         
-        struct ImagePixelValuePt
+        struct DllExport ImagePixelValuePt
         {
             geos::geom::Coordinate *pt;
             uint_fast32_t imgX;
@@ -63,7 +63,7 @@ namespace rsgis
             float value;
         };
         
-        struct PxlLoc
+        struct DllExport PxlLoc
         {
             PxlLoc(){};
             PxlLoc( unsigned int xPos,  unsigned int yPos)
@@ -75,7 +75,7 @@ namespace rsgis
             unsigned int yPos;
         };
         
-        struct ImgClump
+        struct DllExport ImgClump
         {
             ImgClump(unsigned long clumpID)
             {
@@ -89,7 +89,7 @@ namespace rsgis
             bool active;
         };
         
-        struct ImgClumpSum
+        struct DllExport ImgClumpSum
         {
             ImgClumpSum(unsigned int clumpID)
             {
@@ -102,7 +102,7 @@ namespace rsgis
             bool active;
         };
         
-        struct ImgClumpMean
+        struct DllExport ImgClumpMean
         {
             ImgClumpMean(unsigned long clumpID)
             {
@@ -115,7 +115,7 @@ namespace rsgis
             float *meanVals;
         };
         
-        struct ImgClumpRG
+        struct DllExport ImgClumpRG
         {
             ImgClumpRG(unsigned long clumpID)
             {
@@ -132,7 +132,7 @@ namespace rsgis
             unsigned long seedVal;
         };
         
-		class RSGISImageUtils
+		class DllExport RSGISImageUtils
 			{
 			public:
 				RSGISImageUtils(double resDiffThresh = 0.0001);

@@ -37,7 +37,7 @@
 
 namespace rsgis{namespace img{
 	
-	class RSGISCalcImageMatrix
+	class DllExport RSGISCalcImageMatrix
 		{
 		public:
 			RSGISCalcImageMatrix(RSGISCalcImageSingle *calcImage);

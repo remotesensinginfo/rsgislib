@@ -29,7 +29,7 @@ namespace rsgis
 {
 	namespace filter
 	{
-		class RSGISImageFilterException : public rsgis::RSGISImageException
+		class DllExport RSGISImageFilterException : public rsgis::RSGISImageException
 			{
 			public:
 				RSGISImageFilterException();

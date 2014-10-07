@@ -34,14 +34,14 @@
 
 namespace rsgis{namespace img{
 	
-	class RSGISMaskImage
+	class DllExport RSGISMaskImage
 		{
 		public: 
 			RSGISMaskImage();
 			void maskImage(GDALDataset *dataset, GDALDataset *mask, std::string outputImage, std::string imageFormat, GDALDataType outDataType, double outputValue, double maskValue)throw(RSGISImageCalcException,RSGISImageBandException);
 		};
 	
-	class RSGISApplyImageMask : public RSGISCalcImageValue
+	class DllExport RSGISApplyImageMask : public RSGISCalcImageValue
 		{
 		public: 
 			RSGISApplyImageMask(int numberOutBands, double outputValue, double maskValue);

@@ -33,7 +33,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISPointsInterpolator
+	class DllExport RSGISPointsInterpolator
 		{
 		public:
 			RSGISPointsInterpolator(){};
@@ -41,7 +41,7 @@ namespace rsgis{namespace vec{
 			virtual ~RSGISPointsInterpolator(){};
 		};
 	
-	class RSGISInverseWeightedDistanceInterpolator : public RSGISPointsInterpolator
+	class DllExport RSGISInverseWeightedDistanceInterpolator : public RSGISPointsInterpolator
 		{
 		public:
 			RSGISInverseWeightedDistanceInterpolator(double power);

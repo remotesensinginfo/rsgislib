@@ -38,7 +38,7 @@
 
 namespace rsgis{ namespace utils{
     
-	struct ImageFootPrintPoly
+	struct DllExport ImageFootPrintPoly
 	{
 		std::string scene;
 		int fid;
@@ -52,7 +52,7 @@ namespace rsgis{ namespace utils{
 		double llN;
 	};
 	
-	class RSGISImageFootprintPolygonsCSVParse
+	class DllExport RSGISImageFootprintPolygonsCSVParse
 	{
 		public:
 			RSGISImageFootprintPolygonsCSVParse();

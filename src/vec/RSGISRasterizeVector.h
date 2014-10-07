@@ -48,7 +48,7 @@
 
 namespace rsgis{namespace vec{
 		
-	class RSGISRasterizeVector
+	class DllExport RSGISRasterizeVector
 		{
 		public:
 			RSGISRasterizeVector();

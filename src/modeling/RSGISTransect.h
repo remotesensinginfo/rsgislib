@@ -34,7 +34,7 @@ namespace rsgis{namespace modeling {
 	/** Class to store transect data
 	 * Data is stored as char.
 	 */
-	class RSGISTransect
+	class DllExport RSGISTransect
 	{
 	public:
 		RSGISTransect(unsigned int transectLenght, unsigned int transectWidth, unsigned int transectHeight, double transectRes);

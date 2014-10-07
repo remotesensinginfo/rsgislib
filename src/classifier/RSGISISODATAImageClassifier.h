@@ -48,7 +48,7 @@
 
 namespace rsgis{ namespace classifier{
 	
-	class RSGISISODATAClassifier
+	class DllExport RSGISISODATAClassifier
 	{
 	public:
 		RSGISISODATAClassifier(std::string inputImageFile, bool printinfo);
@@ -68,7 +68,7 @@ namespace rsgis{ namespace classifier{
 		bool printinfo;
 	};
 	
-	class RSGISISODATACalcPixelClusterCalcImageVal : public rsgis::img::RSGISCalcImageValue
+	class DllExport RSGISISODATACalcPixelClusterCalcImageVal : public rsgis::img::RSGISCalcImageValue
 	{
 	public: 
 		RSGISISODATACalcPixelClusterCalcImageVal(int numOutBands, std::vector<ClusterCentreISO*> *clusterCentres, unsigned int numImageBands);
@@ -94,7 +94,7 @@ namespace rsgis{ namespace classifier{
 		unsigned long numVals;
 	};
 	
-	class RSGISISODATACalcPixelClusterStdDevCalcImageVal : public rsgis::img::RSGISCalcImageValue
+	class DllExport RSGISISODATACalcPixelClusterStdDevCalcImageVal : public rsgis::img::RSGISCalcImageValue
 	{
 	public: 
 		RSGISISODATACalcPixelClusterStdDevCalcImageVal(int numOutBands, std::vector<ClusterCentreISO*> *clusterCentres, unsigned int numImageBands);
@@ -115,7 +115,7 @@ namespace rsgis{ namespace classifier{
 		unsigned int numImageBands;
 	};
 	
-	class RSGISApplyISODATAClassifierCalcImageVal : public rsgis::img::RSGISCalcImageValue
+	class DllExport RSGISApplyISODATAClassifierCalcImageVal : public rsgis::img::RSGISCalcImageValue
 	{
 	public: 
 		RSGISApplyISODATAClassifierCalcImageVal(int numOutBands, std::vector<ClusterCentreISO*> *clusterCentres);

@@ -46,7 +46,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISVectorProcessing
+	class DllExport RSGISVectorProcessing
 		{
 		public:
 			RSGISVectorProcessing();

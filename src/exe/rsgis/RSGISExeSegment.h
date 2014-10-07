@@ -67,7 +67,7 @@
 
 namespace rsgisexe{
 
-    class RSGISExeSegment : public rsgis::RSGISAlgorithmParameters
+    class DllExport RSGISExeSegment : public rsgis::RSGISAlgorithmParameters
 	{
 	public:
 		enum options 

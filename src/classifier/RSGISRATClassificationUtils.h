@@ -49,7 +49,7 @@
 
 namespace rsgis{ namespace classifier{
 	
-    struct RSGISClassInfo
+    struct DllExport RSGISClassInfo
     {
         std::string classname;
         int red;
@@ -59,7 +59,7 @@ namespace rsgis{ namespace classifier{
         size_t classID;
     };
     
-    class RSGISCollapseSegmentsClassification
+    class DllExport RSGISCollapseSegmentsClassification
     {
     public:
         RSGISCollapseSegmentsClassification();
@@ -70,7 +70,7 @@ namespace rsgis{ namespace classifier{
     };
     
     
-    class RSGISFindAllClassNames : public rsgis::rastergis::RSGISRATCalcValue
+    class DllExport RSGISFindAllClassNames : public rsgis::rastergis::RSGISRATCalcValue
     {
     public:
         RSGISFindAllClassNames(std::map<std::string, RSGISClassInfo*> *classes);
@@ -84,7 +84,7 @@ namespace rsgis{ namespace classifier{
     
     
     
-    class RSGISRecodeRasterFromClasses : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISRecodeRasterFromClasses : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
 		RSGISRecodeRasterFromClasses(const GDALRasterAttributeTable *rat, char **classColVals, size_t classNameColLen, std::map<std::string, RSGISClassInfo*> *classes);
@@ -114,7 +114,7 @@ namespace rsgis{ namespace classifier{
     
     
     
-    class RSGISColourImageFromClassRAT : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISColourImageFromClassRAT : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
 		RSGISColourImageFromClassRAT(GDALColorTable *clrTab);

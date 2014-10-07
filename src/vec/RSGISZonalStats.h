@@ -61,7 +61,7 @@ namespace rsgis
 {
 	namespace vec
 	{
-		struct imagestats
+		struct DllExport imagestats
 		{
 			double mean;
 			double max;
@@ -73,7 +73,7 @@ namespace rsgis
 			bool first;
 		};
 		
-		struct classzonalstats
+		struct DllExport classzonalstats
 		{
 			std::string name;
 			float threshold;
@@ -82,7 +82,7 @@ namespace rsgis
 			int *bands;
 		};
 		
-		struct ZonalAttributes
+		struct DllExport ZonalAttributes
 		{
 			std::string name;
 			std::string minName;
@@ -120,7 +120,7 @@ namespace rsgis
 				void outputData2Text(std::string outputTxt, bool **toCalc, imagestats **stats, int numFeatures, int numAttributes) throw(rsgis::utils::RSGISTextException);
 			};
 		
-		class RSGISCalcZonalStatsFromRaster : public rsgis::img::RSGISCalcImageValue
+		class DllExport RSGISCalcZonalStatsFromRaster : public rsgis::img::RSGISCalcImageValue
 			{
 			public: 
 				RSGISCalcZonalStatsFromRaster(int numberOutBands, imagestats **stats, int numInBands, int numFeatures, bool stddev);
@@ -143,7 +143,7 @@ namespace rsgis
 				bool stddev;
 			};
 		
-		class RSGISZonalStats : public RSGISProcessOGRFeature
+		class DllExport RSGISZonalStats : public RSGISProcessOGRFeature
 		{
 			/** Zonal stats, takes rasterised version of vector
 			    and calculates statistics for each attribute
@@ -170,7 +170,7 @@ namespace rsgis
 			std::ofstream outZonalFile;
 		};
 		
-		class RSGISCalcZonalStatsFromRasterPolygon : public rsgis::img::RSGISCalcImageSingleValue
+		class DllExport RSGISCalcZonalStatsFromRasterPolygon : public rsgis::img::RSGISCalcImageSingleValue
 		{
 			/** Calculte statistics and save to data array
 			 *  Array is in the form:
@@ -208,7 +208,7 @@ namespace rsgis
 			int numAttributes;
 		};		
 		
-		class RSGISZonalStatsPoly : public RSGISProcessOGRFeature
+		class DllExport RSGISZonalStatsPoly : public RSGISProcessOGRFeature
 		{
 			/** Zonal stats, does not require rasterised version of vector
 			 and calculates statistics for each attribute
@@ -236,7 +236,7 @@ namespace rsgis
 			std::ofstream outZonalFile;
 		};
 		
-		class RSGISCalcZonalStatsFromPolygon : public rsgis::img::RSGISCalcImageSingleValue
+		class DllExport RSGISCalcZonalStatsFromPolygon : public rsgis::img::RSGISCalcImageSingleValue
 		{
 			/** Calculte statistics and save to data array
 			 *  Array is in the form:

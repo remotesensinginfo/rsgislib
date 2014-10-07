@@ -46,7 +46,7 @@
 
 namespace rsgis{namespace geom{
 	
-	class RSGISIdentifyNonConvexPolygonsDelaunay : public RSGISIdentifyNonConvexPolygons
+	class DllExport RSGISIdentifyNonConvexPolygonsDelaunay : public RSGISIdentifyNonConvexPolygons
 		{
 		public:
 			RSGISIdentifyNonConvexPolygonsDelaunay();

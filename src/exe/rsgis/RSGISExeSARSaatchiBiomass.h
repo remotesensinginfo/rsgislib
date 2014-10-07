@@ -109,7 +109,7 @@ using namespace rsgis::math;
 * c2="0" \n
 */
 
-class RSGISExeSARSaatchiBiomass : public RSGISAlgorithmParameters
+class DllExport RSGISExeSARSaatchiBiomass : public RSGISAlgorithmParameters
 	{
 	
 	enum options

@@ -42,7 +42,7 @@
 
 namespace rsgis{namespace rastergis{
     
-    class RSGISClumpBorders
+    class DllExport RSGISClumpBorders
     {
     public:
         RSGISClumpBorders();
@@ -53,7 +53,7 @@ namespace rsgis{namespace rastergis{
     };
     
     
-    class RSGISCalcBorderLenInPixels : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISCalcBorderLenInPixels : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
 		RSGISCalcBorderLenInPixels(double *borderLen, size_t numRows, double xRes, double yRes, bool includeZeros=false);
@@ -76,7 +76,7 @@ namespace rsgis{namespace rastergis{
         double yRes;
 	};
     
-    class RSGISCalcBorderLenInPixelsWithClass : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISCalcBorderLenInPixelsWithClass : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
 		RSGISCalcBorderLenInPixelsWithClass(double *borderLen, double *classBorderLen, std::string *classNames, size_t numRows, double xRes, double yRes, std::string className, bool includeZeros=false);

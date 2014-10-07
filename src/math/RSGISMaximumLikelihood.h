@@ -42,7 +42,7 @@
 namespace rsgis {namespace math{
     
     #define CTINY 1.0e-32
-    typedef struct MaximumLikelihood
+    typedef struct DllExport MaximumLikelihood
     {
         /**
          * number of classes
@@ -87,7 +87,7 @@ namespace rsgis {namespace math{
     } MaximumLikelihood;
 
 
-    class RSGISMaximumLikelihood
+    class DllExport RSGISMaximumLikelihood
     {
     public:
         RSGISMaximumLikelihood();

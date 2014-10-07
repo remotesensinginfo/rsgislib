@@ -38,7 +38,7 @@
 
 namespace rsgis{namespace img{
     
-    struct RSGISImageValidDataMetric
+    struct DllExport RSGISImageValidDataMetric
     {
         std::string imageFile;
         unsigned int validPxlCount;
@@ -52,7 +52,7 @@ namespace rsgis{namespace img{
         return ( first.validPxlFunc < second.validPxlFunc );
     }
     
-    class RSGISImageMosaic
+    class DllExport RSGISImageMosaic
     /**
      overlapBehaviour:
       0 - overwrite mosic with new pixel value
@@ -72,7 +72,7 @@ namespace rsgis{namespace img{
     };
     
     
-    class RSGISCountValidPixels : public RSGISCalcImageValue
+    class DllExport RSGISCountValidPixels : public RSGISCalcImageValue
     {
     public:
         RSGISCountValidPixels(RSGISImageValidDataMetric *validPxlsObj, float noDataVal);

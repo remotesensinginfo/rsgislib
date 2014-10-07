@@ -40,7 +40,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISGetAttributeValues : public RSGISProcessOGRFeature
+	class DllExport RSGISGetAttributeValues : public RSGISProcessOGRFeature
 		{
 		public:
 			RSGISGetAttributeValues(std::list<double> *values, std::string attribute);

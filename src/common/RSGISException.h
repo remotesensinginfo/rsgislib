@@ -31,9 +31,11 @@
 #include <iostream>
 #include <string>
 
+#include "RSGISCommons.h"
+
 namespace rsgis
 {    
-	class RSGISException : public std::exception
+	class DllExport RSGISException : public std::exception
 	{
 		public:
 			RSGISException();

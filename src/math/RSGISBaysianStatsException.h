@@ -27,7 +27,7 @@
 
 namespace rsgis{namespace math{
         
-    class RSGISBaysianStatsException : public RSGISException
+    class DllExport RSGISBaysianStatsException : public RSGISException
         {
         public:
             RSGISBaysianStatsException();

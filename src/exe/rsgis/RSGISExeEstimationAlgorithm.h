@@ -65,7 +65,7 @@ using namespace rsgis::utils;
 
 /// Executable for parameter estimation from Radar data using an estimation algorithm
 
-class RSGISExeEstimationAlgorithm : public RSGISAlgorithmParameters
+class DllExport RSGISExeEstimationAlgorithm : public RSGISAlgorithmParameters
 	{
 		
 	enum options

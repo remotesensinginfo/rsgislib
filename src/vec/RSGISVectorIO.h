@@ -46,7 +46,7 @@
 #include "utils/RSGISImageFootprintPolygonsCSVParse.h"
 
 namespace rsgis{namespace vec{
-	class RSGISVectorIO
+	class DllExport RSGISVectorIO
 		{
 		public:
 			RSGISVectorIO();

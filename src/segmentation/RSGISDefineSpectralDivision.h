@@ -46,7 +46,7 @@
 
 namespace rsgis{namespace segment{
     
-    class RSGISDefineSpectralDivision
+    class DllExport RSGISDefineSpectralDivision
     {
     public:
         RSGISDefineSpectralDivision();

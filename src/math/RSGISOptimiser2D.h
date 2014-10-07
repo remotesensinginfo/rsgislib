@@ -35,7 +35,7 @@
 
 namespace rsgis{namespace math{
     
-	class RSGISOptimiser2D
+	class DllExport RSGISOptimiser2D
 		{
 		public:
 			RSGISOptimiser2D(RSGISOptimisationFunction *func, bool maximise)

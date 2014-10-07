@@ -40,7 +40,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISRemoveContainedPolygons
+	class DllExport RSGISRemoveContainedPolygons
 	{
 	public:
 		RSGISRemoveContainedPolygons();

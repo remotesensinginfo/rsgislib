@@ -38,7 +38,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISVectorAttributeFindReplace : public RSGISProcessOGRFeature
+	class DllExport RSGISVectorAttributeFindReplace : public RSGISProcessOGRFeature
 		{
 		public:
 			RSGISVectorAttributeFindReplace(std::string attribute, std::string find, std::string replace);

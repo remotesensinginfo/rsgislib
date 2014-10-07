@@ -36,7 +36,7 @@ namespace rsgis
 {
 	namespace img
 	{
-        class RSGISCalcImgValueAlongsideOut
+        class DllExport RSGISCalcImgValueAlongsideOut
         {
         public:
             RSGISCalcImgValueAlongsideOut(){};
@@ -44,7 +44,7 @@ namespace rsgis
             virtual ~RSGISCalcImgValueAlongsideOut(){};
         };
         
-		class RSGISCalcImgAlongsideOut
+		class DllExport RSGISCalcImgAlongsideOut
         {
         public:
             RSGISCalcImgAlongsideOut(RSGISCalcImgValueAlongsideOut *valueCalc);

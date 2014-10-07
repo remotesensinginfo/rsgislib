@@ -73,7 +73,7 @@ using namespace rsgis::math;
 using namespace rsgis::vec;
 using namespace rsgis::utils;
 
-class RSGISExeZonalStats : public RSGISAlgorithmParameters
+class DllExport RSGISExeZonalStats : public RSGISAlgorithmParameters
 	{
 	public:
 

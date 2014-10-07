@@ -38,7 +38,7 @@
 namespace rsgis{namespace img{
     
     
-    class RSGISLinearFit2Column: public RSGISCalcImageValue
+    class DllExport RSGISLinearFit2Column: public RSGISCalcImageValue
     {
     public:
         RSGISLinearFit2Column(std::vector<float> bandXValues, float noDataValue=0, bool useNoDataValue=false);

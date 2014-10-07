@@ -35,7 +35,7 @@
 namespace rsgis {namespace math{
     
 	/// Class to perform polynomaial fitting	
-	class RSGISLinearFit
+	class DllExport RSGISLinearFit
 	{
 	public:
 		RSGISLinearFit();

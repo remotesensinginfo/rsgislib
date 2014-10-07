@@ -32,7 +32,7 @@ namespace rsgis
 {
 	namespace img
 	{
-		class RSGISImageBandException : public rsgis::RSGISImageException
+		class DllExport RSGISImageBandException : public rsgis::RSGISImageException
 		{
 			public:
 				RSGISImageBandException();

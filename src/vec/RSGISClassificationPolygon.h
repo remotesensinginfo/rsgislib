@@ -31,7 +31,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISClassificationPolygon : public rsgis::geom::RSGISPolygon
+	class DllExport RSGISClassificationPolygon : public rsgis::geom::RSGISPolygon
 		{
 		public:
 			RSGISClassificationPolygon();

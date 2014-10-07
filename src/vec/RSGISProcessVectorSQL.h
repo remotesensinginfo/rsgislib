@@ -42,7 +42,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISProcessVectorSQL
+	class DllExport RSGISProcessVectorSQL
 	{
 	public:
 		RSGISProcessVectorSQL(RSGISProcessOGRFeature *processFeatures);

@@ -43,7 +43,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISPixelAreaCountInPolygon : public RSGISProcessOGRFeature
+	class DllExport RSGISPixelAreaCountInPolygon : public RSGISProcessOGRFeature
 		{
 		public:
 			RSGISPixelAreaCountInPolygon(GDALDataset *rasterFeatures);
@@ -61,7 +61,7 @@ namespace rsgis{namespace vec{
 		};
 	
 	
-	class RSGISCalcPixelCountFromRasterPolygon : public rsgis::img::RSGISCalcImageSingleValue
+	class DllExport RSGISCalcPixelCountFromRasterPolygon : public rsgis::img::RSGISCalcImageSingleValue
 		{
 		public: 
 			RSGISCalcPixelCountFromRasterPolygon(int numOutputValues);

@@ -32,7 +32,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISImageTileVector : public RSGISPolygonData
+	class DllExport RSGISImageTileVector : public RSGISPolygonData
 		{
 		public:
 			RSGISImageTileVector(std::string filenameAttribute);

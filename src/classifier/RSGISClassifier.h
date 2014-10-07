@@ -35,14 +35,14 @@
 
 namespace rsgis{ namespace classifier{
     
-	struct ClassData
+	struct DllExport ClassData
 	{
 		std::string className;
 		int classID;
         rsgis::math::Matrix *data;
 	};
 	
-	struct ClusterCentre
+	struct DllExport ClusterCentre
 	{
 		std::string className;
 		int classID;
@@ -50,7 +50,7 @@ namespace rsgis{ namespace classifier{
 		unsigned int numVals;
 	};
 	
-	struct ClusterCentreISO
+	struct DllExport ClusterCentreISO
 	{
 		std::string className;
 		int classID;
@@ -61,7 +61,7 @@ namespace rsgis{ namespace classifier{
 		double avgDist;
 	};
 	
-	class RSGISClassifier
+	class DllExport RSGISClassifier
 	{
 	public:
 		RSGISClassifier(ClassData **trainingData, int numClasses) throw(RSGISClassificationException);
@@ -76,7 +76,7 @@ namespace rsgis{ namespace classifier{
 		int numVariables;
 	};
 	
-	class RSGISApplyClassifier : public rsgis::img::RSGISCalcImageValue
+	class DllExport RSGISApplyClassifier : public rsgis::img::RSGISCalcImageValue
 	{
 	public: 
 		RSGISApplyClassifier(int numberOutBands, RSGISClassifier *classifier);

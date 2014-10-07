@@ -57,7 +57,7 @@
 
 namespace rsgis{ namespace classifier{
         
-	class RSGISClassificationUtils
+	class DllExport RSGISClassificationUtils
     {
     public:
         RSGISClassificationUtils();
@@ -67,7 +67,7 @@ namespace rsgis{ namespace classifier{
         ~RSGISClassificationUtils();
     };
     
-    class RSGISEliminateSingleClassPixels
+    class DllExport RSGISEliminateSingleClassPixels
     {
     public:
         RSGISEliminateSingleClassPixels();

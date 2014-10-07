@@ -27,7 +27,7 @@
 
 namespace rsgis 
 {    
-	class RSGISVectorException : public RSGISException
+	class DllExport RSGISVectorException : public RSGISException
 		{
 		public:
 			RSGISVectorException();

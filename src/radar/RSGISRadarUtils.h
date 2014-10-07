@@ -37,7 +37,7 @@ namespace rsgis
 	namespace radar
 	{
         
-		class RSGISConvert2dB : public rsgis::img::RSGISCalcImageValue
+		class DllExport RSGISConvert2dB : public rsgis::img::RSGISCalcImageValue
 			/**
 			 * Class to convert from intensity to dB using the following formula:<br>
 			 * dB = (10 * log10(intensity)) + calFactor <br>

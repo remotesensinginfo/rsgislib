@@ -54,7 +54,7 @@ namespace rsgis{namespace rastergis{
         meanMethod = 3,
     };
     
-    class RSGISSelectClumpsOnGrid
+    class DllExport RSGISSelectClumpsOnGrid
     {
     public:
         RSGISSelectClumpsOnGrid();
@@ -63,7 +63,7 @@ namespace rsgis{namespace rastergis{
     };
     
     
-    class RSGISCalcTileStats : public RSGISRATCalcValue
+    class DllExport RSGISCalcTileStats : public RSGISRATCalcValue
     {
     public:
         RSGISCalcTileStats(unsigned int numRows, unsigned int numCols, double *selectVal, unsigned int *selectIdx, std::vector<unsigned int> **tileIdxs, OGREnvelope **tilesEnvs, bool *first, RSGISSelectMethods method);
@@ -80,7 +80,7 @@ namespace rsgis{namespace rastergis{
         RSGISSelectMethods method;
     };
     
-    class RSGISSelectClumpClosest2TileMean : public RSGISRATCalcValue
+    class DllExport RSGISSelectClumpClosest2TileMean : public RSGISRATCalcValue
     {
     public:
         RSGISSelectClumpClosest2TileMean(unsigned int numRows, unsigned int numCols, double *selectVal, double *selectDistVal, unsigned int *selectIdx, std::vector<unsigned int> **tileIdxs, OGREnvelope **tilesEnvs, bool *first);
@@ -98,7 +98,7 @@ namespace rsgis{namespace rastergis{
     };
     
     
-    class RSGISWriteSelectedClumpsColumn : public RSGISRATCalcValue
+    class DllExport RSGISWriteSelectedClumpsColumn : public RSGISRATCalcValue
     {
     public:
         RSGISWriteSelectedClumpsColumn(unsigned int *selectIdx, unsigned int numIdxes);

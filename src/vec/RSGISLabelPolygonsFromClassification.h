@@ -52,7 +52,7 @@ namespace rsgis{namespace vec{
 		speciesArea
 	};
 	
-	class RSGISLabelPolygonsFromClassification : public RSGISProcessOGRFeature
+	class DllExport RSGISLabelPolygonsFromClassification : public RSGISProcessOGRFeature
 	{
 	public:
 		RSGISLabelPolygonsFromClassification(RSGISClassPolygon **labelsClassData, unsigned long numFeatures, dominantspecies dominant);

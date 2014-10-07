@@ -63,7 +63,7 @@ namespace rsgis{namespace calib{
      * If output type is set to 1 then output is radians if 0 then degrees.
      *
      */
-	class RSGISCalcSlope: public rsgis::img::RSGISCalcImageValue
+	class DllExport RSGISCalcSlope: public rsgis::img::RSGISCalcImageValue
 	{
 	public: 
 		RSGISCalcSlope(int numberOutBands, unsigned int band, float ewRes, float nsRes, int outType);
@@ -85,7 +85,7 @@ namespace rsgis{namespace calib{
         int outType;
 	};
     
-    class RSGISCalcAspect : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISCalcAspect : public rsgis::img::RSGISCalcImageValue
 	{
 	public: 
 		RSGISCalcAspect(int numberOutBands, unsigned int band, float ewRes, float nsRes);
@@ -106,7 +106,7 @@ namespace rsgis{namespace calib{
         float nsRes;
 	};
     
-    class RSGISRecodeAspect : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISRecodeAspect : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
 		RSGISRecodeAspect();
@@ -123,7 +123,7 @@ namespace rsgis{namespace calib{
 		~RSGISRecodeAspect();
 	};
     
-    class RSGISCalcSlopeAspect : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISCalcSlopeAspect : public rsgis::img::RSGISCalcImageValue
 	{
 	public: 
 		RSGISCalcSlopeAspect(int numberOutBands, unsigned int band, float ewRes, float nsRes);
@@ -145,7 +145,7 @@ namespace rsgis{namespace calib{
 	};
     
     
-	class RSGISCalcHillShade : public rsgis::img::RSGISCalcImageValue
+	class DllExport RSGISCalcHillShade : public rsgis::img::RSGISCalcImageValue
 	{
 	public: 
 		RSGISCalcHillShade(int numberOutBands, unsigned int band, float ewRes, float nsRes, float sunZenith, float sunAzimuth);
@@ -168,7 +168,7 @@ namespace rsgis{namespace calib{
         float sunAzimuth;
 	};
     
-    class RSGISCalcShadowBinaryMask : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISCalcShadowBinaryMask : public rsgis::img::RSGISCalcImageValue
 	{
 	public: 
 		RSGISCalcShadowBinaryMask(int numberOutBands, GDALDataset *inputImage, unsigned int band, float ewRes, float nsRes, float sunZenith, float sunAzimuth, float maxElevHeight);
@@ -196,7 +196,7 @@ namespace rsgis{namespace calib{
         GDALDataset *inputImage;
 	};
     
-    class RSGISCalcRayIncidentAngle : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISCalcRayIncidentAngle : public rsgis::img::RSGISCalcImageValue
 	{
 	public: 
 		RSGISCalcRayIncidentAngle(int numberOutBands, unsigned int band, float ewRes, float nsRes, float sunZenith, float sunAzimuth);
@@ -219,7 +219,7 @@ namespace rsgis{namespace calib{
         float sunAzimuth;
 	};
     
-    class RSGISCalcRayExitanceAngle : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISCalcRayExitanceAngle : public rsgis::img::RSGISCalcImageValue
 	{
 	public: 
 		RSGISCalcRayExitanceAngle(int numberOutBands, unsigned int band, float ewRes, float nsRes, float viewZenith, float viewAzimuth);
@@ -242,7 +242,7 @@ namespace rsgis{namespace calib{
         float viewAzimuth;
 	};
     
-    class RSGISCalcRayIncidentAndExitanceAngles : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISCalcRayIncidentAndExitanceAngles : public rsgis::img::RSGISCalcImageValue
 	{
 	public: 
 		RSGISCalcRayIncidentAndExitanceAngles(int numberOutBands, unsigned int band, float ewRes, float nsRes, float sunZenith, float sunAzimuth, float viewZenith, float viewAzimuth);
@@ -270,7 +270,7 @@ namespace rsgis{namespace calib{
     
     
     
-    class RSGISFillDEMHoles : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISFillDEMHoles : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
 		RSGISFillDEMHoles(float holeValue, float nodata);
@@ -295,7 +295,7 @@ namespace rsgis{namespace calib{
 
     
     
-    class RSGISInFillDerivedHoles : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISInFillDerivedHoles : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
 		RSGISInFillDerivedHoles(float holeValue);
@@ -314,7 +314,7 @@ namespace rsgis{namespace calib{
         float holeValue;
 	};
     
-    class RSGISFilterDTMWithAspectMedianFilter : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISFilterDTMWithAspectMedianFilter : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
 		RSGISFilterDTMWithAspectMedianFilter(float aspectRange);

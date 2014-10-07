@@ -30,7 +30,7 @@
 
 namespace rsgis{namespace filter{
 	
-	class RSGISCalcLapacianFilter : public RSGISCalcFilter
+	class DllExport RSGISCalcLapacianFilter : public RSGISCalcFilter
 		{
 		public: 
 			RSGISCalcLapacianFilter(float stddev);
@@ -40,7 +40,7 @@ namespace rsgis{namespace filter{
 			float stddev;
 		};
 	
-	class RSGISCalcGaussianSmoothFilter : public RSGISCalcFilter
+	class DllExport RSGISCalcGaussianSmoothFilter : public RSGISCalcFilter
 		{
 		public: 
 			RSGISCalcGaussianSmoothFilter(float stddevX, float stddevY, float angle);
@@ -52,7 +52,7 @@ namespace rsgis{namespace filter{
 			float angle;
 		};
 	
-	class RSGISCalcGaussianFirstDerivativeFilter : public RSGISCalcFilter
+	class DllExport RSGISCalcGaussianFirstDerivativeFilter : public RSGISCalcFilter
 		{
 		public: 
 			RSGISCalcGaussianFirstDerivativeFilter(float stddevX, float stddevY, float angle);
@@ -64,7 +64,7 @@ namespace rsgis{namespace filter{
 			float angle;
 		};
 	
-	class RSGISCalcGaussianSecondDerivativeFilter : public RSGISCalcFilter
+	class DllExport RSGISCalcGaussianSecondDerivativeFilter : public RSGISCalcFilter
 		{
 		public: 
 			RSGISCalcGaussianSecondDerivativeFilter(float stddevX, float stddevY, float angle);

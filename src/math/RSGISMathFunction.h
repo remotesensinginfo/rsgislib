@@ -28,7 +28,7 @@
 
 namespace rsgis{namespace math{
         
-	class RSGISMathFunction
+	class DllExport RSGISMathFunction
 	{
 		/** RSGISMathFunction
 		 * Abstract class for single variable function
@@ -42,7 +42,7 @@ namespace rsgis{namespace math{
 		virtual ~RSGISMathFunction(){};
 	};
 	
-	class RSGISMathTwoVariableFunction
+	class DllExport RSGISMathTwoVariableFunction
 	{
 		/** RSGISMathTwoVariableFunction
 		 *  Abstract class for two variable function
@@ -57,7 +57,7 @@ namespace rsgis{namespace math{
 		virtual ~RSGISMathTwoVariableFunction(){};
 	};
 	
-	class RSGISMathThreeVariableFunction
+	class DllExport RSGISMathThreeVariableFunction
 	{
 		/** RSGISMathThreeVariableFunction
 		 *  Abstract class two variable function
@@ -73,7 +73,7 @@ namespace rsgis{namespace math{
 		virtual ~RSGISMathThreeVariableFunction(){};
 	};
     
-    class RSGISMathNVariableFunction
+    class DllExport RSGISMathNVariableFunction
 	{
 		/** RSGISMathThreeVariableFunction
 		 *  Abstract class two variable function

@@ -35,7 +35,7 @@
 
 namespace rsgis{namespace filter{
     
-    class RSGISImageMorphologyGradient
+    class DllExport RSGISImageMorphologyGradient
     {
     public:
         RSGISImageMorphologyGradient();
@@ -44,7 +44,7 @@ namespace rsgis{namespace filter{
         ~RSGISImageMorphologyGradient(){};
     };
     
-    class RSGISMorphologyGradient : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISMorphologyGradient : public rsgis::img::RSGISCalcImageValue
     {
     public: 
         RSGISMorphologyGradient(int numberOutBands, rsgis::math::Matrix *matrixOperator); 			
@@ -64,7 +64,7 @@ namespace rsgis{namespace filter{
         rsgis::math::Matrix *matrixOperator;
     };
     
-    class RSGISMorphologyGradientAll : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISMorphologyGradientAll : public rsgis::img::RSGISCalcImageValue
     {
     public: 
         RSGISMorphologyGradientAll(int numberOutBands, rsgis::math::Matrix *matrixOperator); 			

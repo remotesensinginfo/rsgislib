@@ -32,7 +32,7 @@
 
 namespace rsgis{namespace img{
 	
-	class RSGISImageBand2Matrix : public RSGISCalcImageSingleValue
+	class DllExport RSGISImageBand2Matrix : public RSGISCalcImageSingleValue
 		{
 		public:
 			RSGISImageBand2Matrix(int numOutputValues, int band, int x, int y);

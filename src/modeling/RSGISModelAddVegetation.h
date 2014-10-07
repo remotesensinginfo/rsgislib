@@ -41,7 +41,7 @@
 
 namespace rsgis{namespace modeling{
     
-	class RSGISModelAddVegetation
+	class DllExport RSGISModelAddVegetation
 	{
 	/** Abstract class to model vegetation
 	 *  Passed into RSGISModelTransect to add vegetation to a transect

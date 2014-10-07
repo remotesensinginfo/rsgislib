@@ -39,7 +39,7 @@
 namespace rsgis{namespace img{
 
 
-	class RSGISApplySingleVarFunction : public RSGISCalcImageValue
+	class DllExport RSGISApplySingleVarFunction : public RSGISCalcImageValue
 	{
 		/// Applies RSGISMathFunction to image
 	public: 
@@ -59,7 +59,7 @@ namespace rsgis{namespace img{
 		float ignoreVal;
 	};
 	
-	class RSGISApplyTwoVarFunction : public RSGISCalcImageValue
+	class DllExport RSGISApplyTwoVarFunction : public RSGISCalcImageValue
 	{
 		/// Applies RSGISMathTwoVariableFunction to image
 	public: 
@@ -81,7 +81,7 @@ namespace rsgis{namespace img{
 	};
 	
 	
-	class RSGISApplyThreeVarFunction : public RSGISCalcImageValue
+	class DllExport RSGISApplyThreeVarFunction : public RSGISCalcImageValue
 	{
 		/// Applies RSGISMathThreeVariableFunction to image
 	public: 

@@ -40,7 +40,7 @@
 
 namespace rsgis{namespace segment{
     
-    struct ImgClumpRGB
+    struct DllExport ImgClumpRGB
     {
         ImgClumpRGB(unsigned long clumpID)
         {
@@ -53,7 +53,7 @@ namespace rsgis{namespace segment{
     };
     
     
-    class RSGISRandomColourClumps
+    class DllExport RSGISRandomColourClumps
     {
     public:
         RSGISRandomColourClumps();

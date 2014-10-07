@@ -38,7 +38,7 @@
 namespace rsgis{namespace img{
 
 	
-	class RSGISImageMaths : public RSGISCalcImageValue
+	class DllExport RSGISImageMaths : public RSGISCalcImageValue
 	{
 	public: 
 		RSGISImageMaths(int numberOutBands, mu::Parser *muParser);
@@ -58,7 +58,7 @@ namespace rsgis{namespace img{
         mu::value_type inVal;
 	};
     
-    class RSGISAllBandsEqualTo : public RSGISCalcImageValue
+    class DllExport RSGISAllBandsEqualTo : public RSGISCalcImageValue
 	{
 	public: 
 		RSGISAllBandsEqualTo(int numberOutBands, float value, float outTrueVal, float outFalseVal);

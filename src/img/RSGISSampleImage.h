@@ -39,7 +39,7 @@
 
 namespace rsgis{namespace img{
 
-    class RSGISSampleImage
+    class DllExport RSGISSampleImage
     {
     public:
         RSGISSampleImage();
@@ -47,7 +47,7 @@ namespace rsgis{namespace img{
         ~RSGISSampleImage();
     };
     
-    class RSGISSampleCalcImage : public RSGISCalcImageValue
+    class DllExport RSGISSampleCalcImage : public RSGISCalcImageValue
     {
     public:
         RSGISSampleCalcImage(unsigned int sample, float noData, bool useNoData, rsgis::utils::RSGISExportColumnData2HDF *dataExport, float *dataRow);

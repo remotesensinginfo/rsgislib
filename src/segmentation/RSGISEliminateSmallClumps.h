@@ -50,7 +50,7 @@
 
 namespace rsgis{namespace segment{
     
-    class RSGISEliminateSmallClumps
+    class DllExport RSGISEliminateSmallClumps
     {
     public:
         RSGISEliminateSmallClumps();
@@ -66,7 +66,7 @@ namespace rsgis{namespace segment{
         //rsgis::rastergis::RSGISFeature* getEliminatedNeighbour(rsgis::rastergis::RSGISFeature *feat, rsgis::rastergis::RSGISAttributeTable *attTable, unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx)throw(rsgis::RSGISAttributeTableException);
     };
     /*
-    class RSGISEliminateFeature : public rsgis::rastergis::RSGISProcessFeature
+    class DllExport RSGISEliminateFeature : public rsgis::rastergis::RSGISProcessFeature
     {
     public:
         RSGISEliminateFeature(unsigned int eliminatedFieldIdx, unsigned int mergedToFIDIdx, float specThreshold, unsigned int pxlCountIdx, std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats, std::vector<std::pair<unsigned long, unsigned long> > *eliminationPairs, bool bandStatsAvail, double *stretch2reflOffs, double *stretch2reflGains);
@@ -89,7 +89,7 @@ namespace rsgis{namespace segment{
     */
     
     /*
-    class RSGISApplyOutputFIDs : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISApplyOutputFIDs : public rsgis::img::RSGISCalcImageValue
     {
     public:
         RSGISApplyOutputFIDs(rsgis::rastergis::RSGISAttributeTable *attTable, unsigned int outFIDIdx, unsigned int outFIDSetFieldIdx);
@@ -111,7 +111,7 @@ namespace rsgis{namespace segment{
     };
     */
     
-    class RSGISPopulateMeansPxlLocs : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISPopulateMeansPxlLocs : public rsgis::img::RSGISCalcImageValue
     {
     public:
         RSGISPopulateMeansPxlLocs(std::vector<rsgis::img::ImgClump*> *clumpTable, unsigned int numSpecBands);
@@ -133,7 +133,7 @@ namespace rsgis{namespace segment{
     
     
 
-    class RSGISRemoveClumpsBelowThreshold : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISRemoveClumpsBelowThreshold : public rsgis::img::RSGISCalcImageValue
     {
     public:
         RSGISRemoveClumpsBelowThreshold(float threshold, int *clumpHisto, size_t numHistVals);

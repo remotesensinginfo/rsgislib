@@ -33,7 +33,7 @@
 
 namespace rsgis{namespace geom{
 	/// Abstract interface to implement Spatial Clusterers
-	class RSGISSpatialClustererInterface
+	class DllExport RSGISSpatialClustererInterface
 		{
 		public:
 			virtual std::list<RSGIS2DPoint*>** clusterData(std::vector<RSGIS2DPoint*> *data, int *numclusters, double *threshold) throw(rsgis::math::RSGISClustererException) = 0;

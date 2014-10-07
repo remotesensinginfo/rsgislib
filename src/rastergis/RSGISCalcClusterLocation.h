@@ -43,7 +43,7 @@
 
 namespace rsgis{namespace rastergis{
 	
-    class RSGISCalcClusterLocation
+    class DllExport RSGISCalcClusterLocation
     {
     public:
         RSGISCalcClusterLocation();
@@ -53,7 +53,7 @@ namespace rsgis{namespace rastergis{
     
     
     
-	class RSGISCalcClusterLocationCalcValue : public rsgis::img::RSGISCalcImageValue
+	class DllExport RSGISCalcClusterLocationCalcValue : public rsgis::img::RSGISCalcImageValue
 	{
 	public: 
 		RSGISCalcClusterLocationCalcValue(double **spatialLoc, unsigned int ratBand);

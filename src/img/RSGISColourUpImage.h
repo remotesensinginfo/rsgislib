@@ -41,7 +41,7 @@
 
 namespace rsgis{ namespace img{
 	
-	struct ClassColour
+	struct DllExport ClassColour
 	{
         std::string className;
 		int classID;
@@ -54,7 +54,7 @@ namespace rsgis{ namespace img{
 		int numInputBands;
 	};
 	
-	class RSGISColourUpImage : public RSGISCalcImageValue
+	class DllExport RSGISColourUpImage : public RSGISCalcImageValue
 		{
 		public: 
 			RSGISColourUpImage(int numberOutBands, ClassColour **classColour, int numClasses);
@@ -74,7 +74,7 @@ namespace rsgis{ namespace img{
 			int numClasses;
 		};
     
-    class RSGISColourUpImageBand : public RSGISCalcImageValue
+    class DllExport RSGISColourUpImageBand : public RSGISCalcImageValue
     {
     public: 
         RSGISColourUpImageBand(int numberOutBands, ClassColour **classColour, int numClasses);
@@ -94,7 +94,7 @@ namespace rsgis{ namespace img{
         int numClasses;
     };
 	
-	class RSGISClassColourReader
+	class DllExport RSGISClassColourReader
 	{
 	public:
 		RSGISClassColourReader();

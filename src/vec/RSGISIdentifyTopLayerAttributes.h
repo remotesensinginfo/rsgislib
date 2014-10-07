@@ -43,7 +43,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISFloatAttribute
+	class DllExport RSGISFloatAttribute
 		{
 		public:
 			RSGISFloatAttribute(std::string name, double value);
@@ -63,7 +63,7 @@ namespace rsgis{namespace vec{
 			double value;
 		};
 	
-	class RSGISIdentifyTopLayerAttributes : public RSGISProcessOGRFeature
+	class DllExport RSGISIdentifyTopLayerAttributes : public RSGISProcessOGRFeature
 		{
 		public:
 			RSGISIdentifyTopLayerAttributes(std::string *attributes, int numAttributes, int numTop, rsgis::math::rsgissummarytype summary);

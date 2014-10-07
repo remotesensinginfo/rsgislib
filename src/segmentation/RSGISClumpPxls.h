@@ -38,7 +38,7 @@
 
 namespace rsgis{namespace segment{
 
-    class RSGISClumpPxls
+    class DllExport RSGISClumpPxls
     {
     public:
         RSGISClumpPxls();
@@ -51,7 +51,7 @@ namespace rsgis{namespace segment{
         inline bool allValueEqual(unsigned int *vals1, unsigned int *vals2, unsigned int numVals);
     };
     
-    class RSGISRelabelClumps
+    class DllExport RSGISRelabelClumps
     {
     public:
         RSGISRelabelClumps();
@@ -60,7 +60,7 @@ namespace rsgis{namespace segment{
         ~RSGISRelabelClumps();
     };
     
-    class RSGISCreateRelabelLookupTable : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISCreateRelabelLookupTable : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
 		RSGISCreateRelabelLookupTable(unsigned long *clumpIdxLookUp, unsigned long numVals);
@@ -82,7 +82,7 @@ namespace rsgis{namespace segment{
 	};
     
     
-    class RSGISApplyRelabelLookupTable : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISApplyRelabelLookupTable : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
 		RSGISApplyRelabelLookupTable(unsigned long *clumpIdxLookUp, unsigned long numVals);

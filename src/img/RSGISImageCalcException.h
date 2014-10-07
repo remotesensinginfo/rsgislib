@@ -29,7 +29,7 @@ namespace rsgis
 {
 	namespace img
 	{
-		class RSGISImageCalcException : public rsgis::RSGISImageException
+		class DllExport RSGISImageCalcException : public rsgis::RSGISImageException
 			{
 			public:
 				RSGISImageCalcException();

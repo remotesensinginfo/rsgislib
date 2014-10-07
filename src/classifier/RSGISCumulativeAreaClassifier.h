@@ -43,7 +43,7 @@ namespace rsgis { namespace classifier {
 	 */
 	
 	
-	class RSGISCumulativeAreaClassifierGenRules : public rsgis::img::RSGISCalcImageValue
+	class DllExport RSGISCumulativeAreaClassifierGenRules : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
 		RSGISCumulativeAreaClassifierGenRules(int numOutBands, rsgis::math::Matrix *bandValuesWidths, rsgis::math::Matrix *samples);
@@ -66,7 +66,7 @@ namespace rsgis { namespace classifier {
 	};
 	
 	/// Classify rule image produced by the cumulative area classifier
-	class RSGISCumulativeAreaClassifierDecide : public rsgis::img::RSGISCalcImageValue
+	class DllExport RSGISCumulativeAreaClassifierDecide : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
 		RSGISCumulativeAreaClassifierDecide(int numOutBands, double threshold);

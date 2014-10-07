@@ -27,7 +27,7 @@
 
 namespace rsgis 
 {    
-	class RSGISLiDARException : public RSGISException
+	class DllExport RSGISLiDARException : public RSGISException
 	{
 	public:
 		RSGISLiDARException();

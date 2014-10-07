@@ -42,7 +42,7 @@
 
 namespace rsgis{namespace reg{
     
-	class RSGISImagePixelRegistration : public RSGISImageRegistration
+	class DllExport RSGISImagePixelRegistration : public RSGISImageRegistration
 	{
 	public:
 		RSGISImagePixelRegistration(GDALDataset *reference, GDALDataset *floating, std::string outputImagePath, std::string outputFormat, unsigned int windowSize, unsigned int searchArea, RSGISImageSimilarityMetric *metric, unsigned int subPixelResolution);

@@ -38,7 +38,7 @@
 
 namespace rsgis{namespace filter{
 
-	class RSGISMeanFilter : public RSGISImageFilter
+	class DllExport RSGISMeanFilter : public RSGISImageFilter
 		{
 		public:
 			RSGISMeanFilter(int numberOutBands, int size, std::string filenameEnding);
@@ -48,7 +48,7 @@ namespace rsgis{namespace filter{
 			~RSGISMeanFilter();
 		};
 
-	class RSGISMedianFilter : public RSGISImageFilter
+	class DllExport RSGISMedianFilter : public RSGISImageFilter
 		{
 		public:
 			RSGISMedianFilter(int numberOutBands, int size, std::string filenameEnding);
@@ -58,7 +58,7 @@ namespace rsgis{namespace filter{
 			~RSGISMedianFilter();
 		};
 
-	class RSGISModeFilter : public RSGISImageFilter
+	class DllExport RSGISModeFilter : public RSGISImageFilter
 		{
 		public:
 			RSGISModeFilter(int numberOutBands, int size, std::string filenameEnding);
@@ -68,7 +68,7 @@ namespace rsgis{namespace filter{
 			~RSGISModeFilter();
 		};
 
-	class RSGISRangeFilter : public RSGISImageFilter
+	class DllExport RSGISRangeFilter : public RSGISImageFilter
 		{
 		public:
 			RSGISRangeFilter(int numberOutBands, int size, std::string filenameEnding);
@@ -78,7 +78,7 @@ namespace rsgis{namespace filter{
 			~RSGISRangeFilter();
 		};
 
-	class RSGISStdDevFilter : public RSGISImageFilter
+	class DllExport RSGISStdDevFilter : public RSGISImageFilter
 		{
 		public:
 			RSGISStdDevFilter(int numberOutBands, int size, std::string filenameEnding);
@@ -88,7 +88,7 @@ namespace rsgis{namespace filter{
 			~RSGISStdDevFilter();
 		};
 
-    class RSGISCoeffOfVarFilter : public RSGISImageFilter
+    class DllExport RSGISCoeffOfVarFilter : public RSGISImageFilter
 		{
         /**
 
@@ -104,7 +104,7 @@ namespace rsgis{namespace filter{
 			~RSGISCoeffOfVarFilter();
 		};
 
-	class RSGISMinFilter : public RSGISImageFilter
+	class DllExport RSGISMinFilter : public RSGISImageFilter
 		{
 		public:
 			RSGISMinFilter(int numberOutBands, int size, std::string filenameEnding);
@@ -114,7 +114,7 @@ namespace rsgis{namespace filter{
 			~RSGISMinFilter();
 		};
 
-	class RSGISMaxFilter : public RSGISImageFilter
+	class DllExport RSGISMaxFilter : public RSGISImageFilter
 		{
 		public:
 			RSGISMaxFilter(int numberOutBands, int size, std::string filenameEnding);
@@ -124,7 +124,7 @@ namespace rsgis{namespace filter{
 			~RSGISMaxFilter();
 		};
 
-	class RSGISTotalFilter : public RSGISImageFilter
+	class DllExport RSGISTotalFilter : public RSGISImageFilter
 		{
 		public:
 			RSGISTotalFilter(int numberOutBands, int size, std::string filenameEnding);
@@ -134,7 +134,7 @@ namespace rsgis{namespace filter{
 			~RSGISTotalFilter();
 		};
 
-	class RSGISKuwaharaFilter : public RSGISImageFilter
+	class DllExport RSGISKuwaharaFilter : public RSGISImageFilter
 		{
 		public:
 			RSGISKuwaharaFilter(int numberOutBands, int size, std::string filenameEnding);

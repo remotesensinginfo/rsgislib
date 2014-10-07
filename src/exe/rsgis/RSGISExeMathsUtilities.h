@@ -50,7 +50,7 @@ using namespace rsgis;
 using namespace rsgis::utils;
 using namespace rsgis::math;
 
-class RSGISExeMathsUtilities : public RSGISAlgorithmParameters
+class DllExport RSGISExeMathsUtilities : public RSGISAlgorithmParameters
 	{
 	public:
 		

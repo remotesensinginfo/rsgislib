@@ -40,7 +40,7 @@
 namespace rsgis{namespace img{
 	
     
-    class RSGISExtractImageValues
+    class DllExport RSGISExtractImageValues
     {
     public:
         RSGISExtractImageValues();
@@ -49,7 +49,7 @@ namespace rsgis{namespace img{
     };
     
 	
-	class RSGISExtractImageValuesWithMask : public RSGISCalcImageValue
+	class DllExport RSGISExtractImageValuesWithMask : public RSGISCalcImageValue
 	{
 	public:
 		RSGISExtractImageValuesWithMask(std::vector<float*> *pxlVals, float maskValue);

@@ -37,7 +37,7 @@
 namespace rsgis{namespace calib{
     
     
-	class RSGISApplyDarkObjSubtractOffsets : public rsgis::img::RSGISCalcImageValue
+	class DllExport RSGISApplyDarkObjSubtractOffsets : public rsgis::img::RSGISCalcImageValue
     {
     public:
         RSGISApplyDarkObjSubtractOffsets(unsigned int numImageBands, bool nonNegative, float noDataVal = 0.0, bool useNoDataVal = false, float darkObjReflVal = 0.0);

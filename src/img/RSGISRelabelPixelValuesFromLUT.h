@@ -38,7 +38,7 @@
 
 namespace rsgis { namespace img {
 	
-    class RSGISRelabelPixelValuesFromLUT
+    class DllExport RSGISRelabelPixelValuesFromLUT
     {
     public:
         RSGISRelabelPixelValuesFromLUT();
@@ -47,7 +47,7 @@ namespace rsgis { namespace img {
     };
     
 	
-	class RSGISRelabelPixelValuesFromLUTCalcVal : public RSGISCalcImageValue
+	class DllExport RSGISRelabelPixelValuesFromLUTCalcVal : public RSGISCalcImageValue
 	{
 	public:
 		RSGISRelabelPixelValuesFromLUTCalcVal(int numOutBands, gsl_matrix *lut);

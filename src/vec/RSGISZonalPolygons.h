@@ -32,7 +32,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISZonalPolygons : public RSGISPolygonData
+	class DllExport RSGISZonalPolygons : public RSGISPolygonData
 		{
 		public:
 			RSGISZonalPolygons(int numBands, bool **toCalc);

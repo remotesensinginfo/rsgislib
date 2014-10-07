@@ -59,7 +59,7 @@ using namespace rsgis::utils;
 using namespace rsgis::vec;
 using namespace geos::geom;
 
-class RSGISExeFFTUtils : public RSGISAlgorithmParameters
+class DllExport RSGISExeFFTUtils : public RSGISAlgorithmParameters
 	{
 	public:
 		

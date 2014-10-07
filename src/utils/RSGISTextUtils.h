@@ -62,7 +62,7 @@ namespace rsgis{namespace utils{
         }
     };
     
-	class RSGISTextUtils
+	class DllExport RSGISTextUtils
 		{
 		public:
 			RSGISTextUtils();
@@ -108,7 +108,7 @@ namespace rsgis{namespace utils{
 			~RSGISTextUtils();
 		};
 	
-	class RSGISTextFileLineReader
+	class DllExport RSGISTextFileLineReader
 	{
 	public:
 		RSGISTextFileLineReader();

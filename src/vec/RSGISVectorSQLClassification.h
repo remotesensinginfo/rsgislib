@@ -36,13 +36,13 @@
 
 namespace rsgis{namespace vec{
 	
-	struct sqlclass
+	struct DllExport sqlclass
 	{
         std::string name;
 		std::string sql;
 	};
 	
-	class RSGISVectorSQLClassification
+	class DllExport RSGISVectorSQLClassification
 		{
 		public:
 			RSGISVectorSQLClassification();

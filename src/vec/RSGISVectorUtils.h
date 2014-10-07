@@ -52,7 +52,7 @@
 
 namespace rsgis{namespace vec{
     
-	class RSGISVectorUtils
+	class DllExport RSGISVectorUtils
 		{
 		public:
 			std::string getLayerName(std::string filepath);

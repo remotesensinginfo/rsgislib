@@ -45,7 +45,7 @@
 
 namespace rsgis{namespace rastergis{
     
-    class RSGISFindClumpNeighbours
+    class DllExport RSGISFindClumpNeighbours
     {
     public:
         RSGISFindClumpNeighbours();
@@ -56,7 +56,7 @@ namespace rsgis{namespace rastergis{
     
     
     
-    class RSGISFindNeighboursCalcImage : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISFindNeighboursCalcImage : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
 		RSGISFindNeighboursCalcImage(size_t numRows, std::vector<std::vector<size_t>* > *neighbours, unsigned int ratBand);
@@ -78,7 +78,7 @@ namespace rsgis{namespace rastergis{
 	};
     
     
-    class RSGISIdentifyBoundaryPixels : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISIdentifyBoundaryPixels : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
 		RSGISIdentifyBoundaryPixels(unsigned int ratBand);

@@ -32,7 +32,7 @@
 
 namespace rsgis{ namespace math {
     
-	class RSGISRandDistroGaussian : public RSGISProbDistro
+	class DllExport RSGISRandDistroGaussian : public RSGISProbDistro
 	{
 	/** Randomly sample from a gausian distrobution.
 	 *  Uses GSL library, see http://www.gnu.org/software/gsl/manual/html_node/The-Gaussian-Distribution.html
@@ -50,7 +50,7 @@ namespace rsgis{ namespace math {
 		gsl_rng *gslRand;
 	};
 	
-	class RSGISPsudoRandDistroGaussian : public RSGISProbDistro
+	class DllExport RSGISPsudoRandDistroGaussian : public RSGISProbDistro
 	{
 	/** Randomly sample from a gausian distrobution.
 	 *  Uses GSL library, see http://www.gnu.org/software/gsl/manual/html_node/The-Gaussian-Distribution.html
@@ -68,7 +68,7 @@ namespace rsgis{ namespace math {
 		gsl_rng *gslRand;
 	};
 	
-	class RSGISRandDistroGamma : public RSGISProbDistro
+	class DllExport RSGISRandDistroGamma : public RSGISProbDistro
 	{
 	/** Randomly sample from a gamma distrobution.
 	 *  Uses GSL library, see http://www.gnu.org/software/gsl/manual/html_node/The-Gamma-Distribution.html
@@ -86,7 +86,7 @@ namespace rsgis{ namespace math {
 		gsl_rng *gslRand;
 	};
 	
-	class RSGISPsudoRandDistroGamma : public RSGISProbDistro
+	class DllExport RSGISPsudoRandDistroGamma : public RSGISProbDistro
 	{
 	/** Randomly sample from a gamma distrobution.
 	 *  Uses GSL library, see http://www.gnu.org/software/gsl/manual/html_node/The-Gamma-Distribution.html
@@ -104,7 +104,7 @@ namespace rsgis{ namespace math {
 		gsl_rng *gslRand;
 	};
 		
-	class RSGISRandDistroUniformInt : public RSGISProbDistro
+	class DllExport RSGISRandDistroUniformInt : public RSGISProbDistro
 	{
 	/** Returns a random integeger between minVal and maxVal
 	 *  Uses GSL library, see http://www.gnu.org/software/gsl/manual/html_node/Random-Number-Generation.html
@@ -122,7 +122,7 @@ namespace rsgis{ namespace math {
 		gsl_rng *gslRand;
 	};
 	
-	class RSGISPsudoRandDistroUniformInt : public RSGISProbDistro
+	class DllExport RSGISPsudoRandDistroUniformInt : public RSGISProbDistro
 	{
 	/** Returns a random integeger between minVal and maxVal
 	 *  Uses GSL library, see http://www.gnu.org/software/gsl/manual/html_node/Random-Number-Generation.html
@@ -140,7 +140,7 @@ namespace rsgis{ namespace math {
 		gsl_rng *gslRand;
 	};
 	
-	class RSGISRandDistroUniformDouble : public RSGISProbDistro
+	class DllExport RSGISRandDistroUniformDouble : public RSGISProbDistro
 	{
 		/** Returns a random double between minVal and maxVal
 		 *  Uses GSL library, see http://www.gnu.org/software/gsl/manual/html_node/Random-Number-Generation.html
@@ -158,7 +158,7 @@ namespace rsgis{ namespace math {
 		gsl_rng *gslRand;
 	};
 	
-	class RSGISPsudoRandDistroUniformDouble : public RSGISProbDistro
+	class DllExport RSGISPsudoRandDistroUniformDouble : public RSGISProbDistro
 	{
 		/** Returns a random double between minVal and maxVal
 		 *  Uses GSL library, see http://www.gnu.org/software/gsl/manual/html_node/Random-Number-Generation.html
@@ -176,7 +176,7 @@ namespace rsgis{ namespace math {
 		gsl_rng *gslRand;
 	};
 	
-	class RSGISPsudoRandDistNeymanTypeA : public RSGISProbDistro
+	class DllExport RSGISPsudoRandDistNeymanTypeA : public RSGISProbDistro
 	{			
 		/// Statistical function for a Neyman Type A distribution.
 	public:
