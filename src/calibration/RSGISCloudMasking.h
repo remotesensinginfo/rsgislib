@@ -37,7 +37,7 @@
 
 namespace rsgis{namespace calib{
     
-	class RSGISLandsatFMaskPass1CloudMasking : public rsgis::img::RSGISCalcImageValue
+	class DllExport RSGISLandsatFMaskPass1CloudMasking : public rsgis::img::RSGISCalcImageValue
     {
     public:
         RSGISLandsatFMaskPass1CloudMasking(unsigned int scaleFactor, unsigned int numLSBands)throw(rsgis::img::RSGISImageCalcException);
@@ -65,7 +65,7 @@ namespace rsgis{namespace calib{
         unsigned int therm2Idx;
     };
     
-    class RSGISLandsatFMaskPass2ClearSkyCloudProbCloudMasking : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISLandsatFMaskPass2ClearSkyCloudProbCloudMasking : public rsgis::img::RSGISCalcImageValue
     {
     public:
         RSGISLandsatFMaskPass2ClearSkyCloudProbCloudMasking(unsigned int scaleFactor, unsigned int numLSBands, double water82ndThres, double land82ndThres, double land17thThres)throw(rsgis::img::RSGISImageCalcException);
@@ -107,7 +107,7 @@ namespace rsgis{namespace calib{
         double land17thThres;
     };
     
-    class RSGISLandsatFMaskPass2CloudMasking : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISLandsatFMaskPass2CloudMasking : public rsgis::img::RSGISCalcImageValue
     {
     public:
         RSGISLandsatFMaskPass2CloudMasking(unsigned int scaleFactor, unsigned int numThermalBands, double water82ndThres, double land82ndThres, double land17thThres, double landCloudProb82ndThres)throw(rsgis::img::RSGISImageCalcException);
@@ -151,7 +151,7 @@ namespace rsgis{namespace calib{
     };
     
     
-    class RSGISCalcImageCloudMajorityFilter : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISCalcImageCloudMajorityFilter : public rsgis::img::RSGISCalcImageValue
     {
     public:
         RSGISCalcImageCloudMajorityFilter():rsgis::img::RSGISCalcImageValue(1){};

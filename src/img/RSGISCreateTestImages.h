@@ -32,7 +32,7 @@
 
 namespace rsgis{namespace img{
 	
-	class RSGISCreateTestImages
+	class DllExport RSGISCreateTestImages
 		{
 		public:
 			RSGISCreateTestImages();

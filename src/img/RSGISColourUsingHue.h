@@ -37,7 +37,7 @@
 namespace rsgis { namespace img {
 	
 	
-	class RSGISColourUsingHue : public RSGISCalcImageValue
+	class DllExport RSGISColourUsingHue : public RSGISCalcImageValue
 	{
 	public:
 		RSGISColourUsingHue(int numOutBands, int imageBand, float lowerRangeVal, float upperRangeVal, float background);

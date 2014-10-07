@@ -37,7 +37,7 @@
 namespace rsgis{namespace img{
 	
 	
-	class RSGISExport2DScatterPTxt : public RSGISCalcImageValue
+	class DllExport RSGISExport2DScatterPTxt : public RSGISCalcImageValue
 	{
 	public: 
 		RSGISExport2DScatterPTxt(rsgis::utils::RSGISExportForPlottingIncremental *plotter, int b1, int b2);

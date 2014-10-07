@@ -32,7 +32,7 @@
 
 namespace rsgis{ namespace cmds {
 
-    struct RSGISBandAttZonalStatsCmds
+    struct DllExport RSGISBandAttZonalStatsCmds
     {
         float minThreshold;
         float maxThreshold;

@@ -33,14 +33,14 @@
 
 namespace rsgis {namespace math{
 	
-    struct RSGISClusterCentre
+    struct DllExport RSGISClusterCentre
     {
         std::vector<float> centre;
         unsigned int numPxl;
         std::vector<float> stdDev;
     };
     
-    class RSGISClusterer
+    class DllExport RSGISClusterer
 	{
 	public:
 		RSGISClusterer(){};
@@ -94,7 +94,7 @@ namespace rsgis {namespace math{
         init_kpp
     };
     
-    class RSGISKMeansClusterer: public RSGISClusterer
+    class DllExport RSGISKMeansClusterer: public RSGISClusterer
     {
     public:
 		RSGISKMeansClusterer(InitClustererMethods initCentres);
@@ -104,7 +104,7 @@ namespace rsgis {namespace math{
         InitClustererMethods initCentres;
     };
     
-    class RSGISISODataClusterer: public RSGISClusterer
+    class DllExport RSGISISODataClusterer: public RSGISClusterer
     {
     public:
 		RSGISISODataClusterer(InitClustererMethods initCentres, float minDistBetweenClusters, unsigned int minNumFeatures, float maxStdDev, unsigned int minNumClusters, unsigned int startIteration, unsigned int endIteration);

@@ -32,7 +32,7 @@
 
 namespace rsgis{namespace img{
 	
-	class RSGISPopulateMatrix : public RSGISCalcImageSingleValue
+	class DllExport RSGISPopulateMatrix : public RSGISCalcImageSingleValue
 		{
 		public:
 			RSGISPopulateMatrix(int numOutputValues, int numPixels);

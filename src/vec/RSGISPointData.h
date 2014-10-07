@@ -35,7 +35,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISPointData
+	class DllExport RSGISPointData
 		{
 		public:
 			RSGISPointData();

@@ -57,7 +57,7 @@
 
 namespace rsgis { namespace vec {
 
-	class RSGISParseLandXML
+	class DllExport RSGISParseLandXML
 		{
 		public:
 			RSGISParseLandXML();

@@ -57,7 +57,7 @@ namespace rsgis
 {
 	namespace img
 	{        
-        class RSGISExtractImagePixelsOnLine
+        class DllExport RSGISExtractImagePixelsOnLine
         {
         public:
             RSGISExtractImagePixelsOnLine();

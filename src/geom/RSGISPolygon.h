@@ -42,7 +42,7 @@
 
 namespace rsgis{namespace geom{
 	
-	class RSGISPolygon : public RSGIS2DPoint
+	class DllExport RSGISPolygon : public RSGIS2DPoint
 		{
 		public:
 			RSGISPolygon();

@@ -47,7 +47,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISPopulateFeatsElev : public RSGISProcessOGRFeature
+	class DllExport RSGISPopulateFeatsElev : public RSGISProcessOGRFeature
 	{
 	public:
 		RSGISPopulateFeatsElev(GDALDataset *image, unsigned int band)throw(RSGISVectorException);

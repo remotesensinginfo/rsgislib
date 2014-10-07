@@ -50,7 +50,7 @@
 
 namespace rsgisexe{
 
-    class RSGISExeElevationDataTools : public rsgis::RSGISAlgorithmParameters
+    class DllExport RSGISExeElevationDataTools : public rsgis::RSGISAlgorithmParameters
     {
     public:
         enum options 

@@ -40,14 +40,14 @@
 
 namespace rsgis{namespace reg{
 	
-	class RSGISWarpImageInterpolator
+	class DllExport RSGISWarpImageInterpolator
 	{
 	public:
 		virtual void calcValue(GDALDataset *image, float *outValues, unsigned int numOutVals, double eastings, double northings, unsigned int xPxl, unsigned int yPxl, float inImgRes, float outImgRes) throw(RSGISImageWarpException) = 0;
 		virtual ~RSGISWarpImageInterpolator(){};
 	};
 		
-	class RSGISWarpImageNNInterpolator : public RSGISWarpImageInterpolator
+	class DllExport RSGISWarpImageNNInterpolator : public RSGISWarpImageInterpolator
 	{
 	public:
 		RSGISWarpImageNNInterpolator(){};

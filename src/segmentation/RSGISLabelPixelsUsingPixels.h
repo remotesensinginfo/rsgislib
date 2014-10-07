@@ -40,7 +40,7 @@
 
 namespace rsgis{namespace segment{
 
-    class RSGISLabelPixelsUsingPixelsCalcImg : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISLabelPixelsUsingPixelsCalcImg : public rsgis::img::RSGISCalcImageValue
     {
     public: 
         RSGISLabelPixelsUsingPixelsCalcImg(int numberOutBands, bool ignoreZeros);

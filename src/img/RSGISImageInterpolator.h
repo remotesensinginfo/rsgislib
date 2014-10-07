@@ -30,7 +30,7 @@
 
 namespace rsgis{namespace img{
 	
-	class RSGISInterpolator
+	class DllExport RSGISInterpolator
 		{
 		public:
 			RSGISInterpolator();
@@ -38,7 +38,7 @@ namespace rsgis{namespace img{
 			virtual ~RSGISInterpolator();
 		};
 	
-	class RSGISCubicInterpolator : public RSGISInterpolator
+	class DllExport RSGISCubicInterpolator : public RSGISInterpolator
 		{
 		public:
 			RSGISCubicInterpolator();
@@ -47,21 +47,21 @@ namespace rsgis{namespace img{
 			double estimateNewValueFromCurve(double *pixels, double shift);
 		};
 
-	class RSGISBilinearAreaInterpolator : public RSGISInterpolator
+	class DllExport RSGISBilinearAreaInterpolator : public RSGISInterpolator
 		{
 		public:
 			RSGISBilinearAreaInterpolator();
 			double interpolate(double xShift, double yShift, double *pixels) throw(rsgis::RSGISImageException);
 		};
 	
-	class RSGISBilinearPointInterpolator : public RSGISInterpolator
+	class DllExport RSGISBilinearPointInterpolator : public RSGISInterpolator
 		{
 		public:
 			RSGISBilinearPointInterpolator();
 			double interpolate(double xShift, double yShift, double *pixels) throw(rsgis::RSGISImageException);
 		};
 	
-	class RSGISNearestNeighbourInterpolator : public RSGISInterpolator
+	class DllExport RSGISNearestNeighbourInterpolator : public RSGISInterpolator
 		{
 		public:
 			RSGISNearestNeighbourInterpolator();
@@ -70,7 +70,7 @@ namespace rsgis{namespace img{
 			int findIndexOfMax(double *arr, int size);
 		};
 	
-	class RSGISTriangulationInterpolator : public RSGISInterpolator
+	class DllExport RSGISTriangulationInterpolator : public RSGISInterpolator
 		{
 		public:
 			RSGISTriangulationInterpolator();

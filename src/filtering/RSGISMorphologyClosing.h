@@ -40,7 +40,7 @@
 namespace rsgis{namespace filter{
     
     // DILATION + EROSION
-    class RSGISImageMorphologyClosing
+    class DllExport RSGISImageMorphologyClosing
     {
     public:
         RSGISImageMorphologyClosing();

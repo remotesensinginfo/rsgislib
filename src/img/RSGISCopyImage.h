@@ -34,7 +34,7 @@
 namespace rsgis{namespace img{
 	
 	
-	class RSGISCopyImage : public RSGISCalcImageValue
+	class DllExport RSGISCopyImage : public RSGISCalcImageValue
 		{
 		public: 
 			RSGISCopyImage(int numberOutBands);
@@ -51,7 +51,7 @@ namespace rsgis{namespace img{
 			~RSGISCopyImage();
 		};
     
-    class RSGISCopyImageBandSelect : public RSGISCalcImageValue
+    class DllExport RSGISCopyImageBandSelect : public RSGISCalcImageValue
     {
     public:
         RSGISCopyImageBandSelect(std::vector<unsigned int> bands);

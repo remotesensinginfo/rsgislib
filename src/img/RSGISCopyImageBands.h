@@ -36,7 +36,7 @@
 
 namespace rsgis{namespace img{
 	
-	class RSGISCopyImageBands
+	class DllExport RSGISCopyImageBands
 		{
 		public:
 			RSGISCopyImageBands();
@@ -44,7 +44,7 @@ namespace rsgis{namespace img{
 		};
 	
 	
-	class RSGISIdentifyImageValues : public RSGISCalcImageValue
+	class DllExport RSGISIdentifyImageValues : public RSGISCalcImageValue
 		{
 		public:
 			RSGISIdentifyImageValues(int numberOutBands, int *outBands);

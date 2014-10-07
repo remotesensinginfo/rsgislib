@@ -42,7 +42,7 @@
 
 namespace rsgis{namespace rastergis{
 
-    struct RSGISFieldAttStats
+    struct DllExport RSGISFieldAttStats
     {
         std::string field;
         unsigned int fieldIdx;
@@ -63,7 +63,7 @@ namespace rsgis{namespace rastergis{
         unsigned int sumFieldIdx;
     };
     
-    class RSGISCalcNeighbourStats
+    class DllExport RSGISCalcNeighbourStats
     {
     public:
         RSGISCalcNeighbourStats();

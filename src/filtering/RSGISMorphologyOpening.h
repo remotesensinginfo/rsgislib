@@ -39,7 +39,7 @@
 
 namespace rsgis{namespace filter{
     
-    class RSGISImageMorphologyOpening
+    class DllExport RSGISImageMorphologyOpening
     {
     public:
         RSGISImageMorphologyOpening();

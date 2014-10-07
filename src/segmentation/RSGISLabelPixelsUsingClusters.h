@@ -41,7 +41,7 @@
 
 namespace rsgis{namespace segment{
     
-    class RSGISLabelPixelsUsingClusters
+    class DllExport RSGISLabelPixelsUsingClusters
     {
     public:
         RSGISLabelPixelsUsingClusters();
@@ -49,7 +49,7 @@ namespace rsgis{namespace segment{
         ~RSGISLabelPixelsUsingClusters();
     };
     
-    class RSGISLabelPixelsUsingClustersCalcImg : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISLabelPixelsUsingClustersCalcImg : public rsgis::img::RSGISCalcImageValue
     {
     public: 
         RSGISLabelPixelsUsingClustersCalcImg(int numberOutBands, rsgis::math::Matrix *clusterCentres, bool ignoreZeros);

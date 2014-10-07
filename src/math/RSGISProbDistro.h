@@ -25,9 +25,11 @@
 
 #include <math.h>
 
+#include "common/RSGISCommons.h"
+
 namespace rsgis{namespace math{
 
-	class RSGISProbDistro
+	class DllExport RSGISProbDistro
 	{
 	public:
 		RSGISProbDistro(){};

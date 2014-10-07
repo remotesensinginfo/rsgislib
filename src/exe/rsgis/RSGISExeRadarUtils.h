@@ -52,7 +52,7 @@ using namespace rsgis::radar;
 
 /// General Radar utilities
 
-class RSGISExeRadarUtils : public RSGISAlgorithmParameters
+class DllExport RSGISExeRadarUtils : public RSGISAlgorithmParameters
 	{
 		/**
 		 * General Radar Utils<br>

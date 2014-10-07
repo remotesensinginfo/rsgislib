@@ -29,10 +29,12 @@
 #include "math/RSGISProbDistro.h"
 #include "math/RSGISMathException.h"
 
+#include "common/RSGISCommons.h"
+
 
 namespace rsgis{namespace math{
     	
-	class RSGISProbDistGamma : public RSGISProbDistro
+	class DllExport RSGISProbDistGamma : public RSGISProbDistro
 	{
 		/// Statistical function for a Gamma distribution.
 		/**
@@ -54,7 +56,7 @@ namespace rsgis{namespace math{
 		double invShpSclGammaShp;
 		float value;
 	};
-	class RSGISProbDistExponential : public RSGISProbDistro
+	class DllExport RSGISProbDistExponential : public RSGISProbDistro
 	{			
 		/// Statistical function for an Exponential distribution.
 		/**
@@ -73,7 +75,7 @@ namespace rsgis{namespace math{
 		double rate;
 		float value;
 	};
-	class RSGISProbDistNormal : public RSGISProbDistro
+	class DllExport RSGISProbDistNormal : public RSGISProbDistro
 	{			
 		/// Statistical function for a Normal (Gaussian) distribution.
 		/**
@@ -94,7 +96,7 @@ namespace rsgis{namespace math{
 		double stdev;
 		float value;
 	};
-	class RSGISProbDistNeymanTypeA : public RSGISProbDistro
+	class DllExport RSGISProbDistNeymanTypeA : public RSGISProbDistro
 	{			
 		/// Statistical function for a Neyman Type A distribution.
 	public:
@@ -111,7 +113,7 @@ namespace rsgis{namespace math{
 		float value;
 	};
 	
-	class RSGISProbDistReturnVal : public RSGISProbDistro
+	class DllExport RSGISProbDistReturnVal : public RSGISProbDistro
 	{			
 		/// Returns value (use to provide constant in place of distrobution)
 	public:

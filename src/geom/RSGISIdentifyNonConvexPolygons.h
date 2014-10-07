@@ -38,7 +38,7 @@
 
 namespace rsgis{namespace geom{
 	
-	class RSGISIdentifyNonConvexPolygons
+	class DllExport RSGISIdentifyNonConvexPolygons
 		{
 		public:
 			virtual std::vector<geos::geom::Polygon*>* retrievePolygons(std::list<RSGIS2DPoint*> **clusters, int numClusters) throw(RSGISGeometryException) = 0;

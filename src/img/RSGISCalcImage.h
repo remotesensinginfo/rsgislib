@@ -48,7 +48,7 @@ namespace rsgis
 {
 	namespace img
 	{
-		class RSGISCalcImage
+		class DllExport RSGISCalcImage
 			{
 			public:
 				RSGISCalcImage(RSGISCalcImageValue *valueCalc, std::string proj="", bool useImageProj=true);

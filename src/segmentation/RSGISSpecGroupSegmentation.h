@@ -36,7 +36,7 @@
 
 namespace rsgis{namespace segment{
     
-    class RSGISSpecGroupSegmentation
+    class DllExport RSGISSpecGroupSegmentation
     {
     public:
         RSGISSpecGroupSegmentation();

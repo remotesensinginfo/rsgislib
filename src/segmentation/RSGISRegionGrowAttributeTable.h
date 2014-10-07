@@ -41,7 +41,7 @@
 
 namespace rsgis{namespace segment{
 /*
-    class RSGISRegionGrowAttributeTable
+    class DllExport RSGISRegionGrowAttributeTable
     {
     public:
         RSGISRegionGrowAttributeTable();

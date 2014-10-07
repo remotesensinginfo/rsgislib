@@ -44,7 +44,7 @@
 
 namespace rsgis{namespace img{
 
-    class RSGISCalcImgPxlNeighboursDist: public RSGISCalcImageValue
+    class DllExport RSGISCalcImgPxlNeighboursDist: public RSGISCalcImageValue
     {
     public:
         RSGISCalcImgPxlNeighboursDist();
@@ -65,7 +65,7 @@ namespace rsgis{namespace img{
     };
     
     
-    class RSGISCalcImgPxl2WindowDist: public RSGISCalcImageValue
+    class DllExport RSGISCalcImgPxl2WindowDist: public RSGISCalcImageValue
     {
     public:
         RSGISCalcImgPxl2WindowDist(gsl_matrix *invCovarianceMatrix, rsgis::math::Vector *varMeans, gsl_vector *dVals, gsl_vector *outVec);
@@ -90,7 +90,7 @@ namespace rsgis{namespace img{
 
     };
 
-    class RSGISCalcImage2ImageCorrelation: public RSGISCalcImageValue
+    class DllExport RSGISCalcImage2ImageCorrelation: public RSGISCalcImageValue
     {
     /** Calculates correlation between a window of two image bands.
         Designed for change detection where input is a stack of:

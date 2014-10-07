@@ -43,7 +43,7 @@
 
 namespace rsgis{namespace vec{
 	
-	struct FuzzyAttributes
+	struct DllExport FuzzyAttributes
 	{
 		std::string name;
 		std::string fuzzyClass;
@@ -52,14 +52,14 @@ namespace rsgis{namespace vec{
 		int *bands;
 	};
 	
-	struct FuzzyClassSet
+	struct DllExport FuzzyClassSet
 	{
 		std::string name;
 		int index;
 		int count;
 	};
 	
-	class RSGISCalcFuzzyZonalStatsFromRasterPolygon : public rsgis::img::RSGISCalcImageSingleValue
+	class DllExport RSGISCalcFuzzyZonalStatsFromRasterPolygon : public rsgis::img::RSGISCalcImageSingleValue
 		{
 		public: 
 			RSGISCalcFuzzyZonalStatsFromRasterPolygon(int numOutputValues, FuzzyAttributes **attributes, int numAttributes, float binsize, float hardThreshold);
@@ -85,7 +85,7 @@ namespace rsgis{namespace vec{
 		};
 	
 	
-	class RSGISFuzzyZonalStats : public RSGISProcessOGRFeature
+	class DllExport RSGISFuzzyZonalStats : public RSGISProcessOGRFeature
 		{
 		public:
 			RSGISFuzzyZonalStats(GDALDataset *image, GDALDataset *rasterFeatures, FuzzyAttributes** attributes, int numAttributes, float binSize, float threshold, bool outPxlCount, std::string classattribute);

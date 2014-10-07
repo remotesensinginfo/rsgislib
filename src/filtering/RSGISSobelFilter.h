@@ -35,7 +35,7 @@
 
 namespace rsgis{namespace filter{
 		
-	class RSGISSobelFilter : public RSGISImageFilter
+	class DllExport RSGISSobelFilter : public RSGISImageFilter
 		{
 		public: 
 			

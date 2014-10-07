@@ -53,7 +53,7 @@ namespace rsgis
 {
 	namespace radar
 	{
-		class RSGISEstimationAlgorithmFullPolSingleSpeciesPoly : public rsgis::img::RSGISCalcImageValue
+		class DllExport RSGISEstimationAlgorithmFullPolSingleSpeciesPoly : public rsgis::img::RSGISCalcImageValue
 		{
 			/// Estimates parameters from full-pol SAR data for a single species
 			public: 
@@ -79,7 +79,7 @@ namespace rsgis
 				int ittmax;
 			};
 		
-		class RSGISEstimationAlgorithmDualPolSingleSpeciesPoly : public rsgis::img::RSGISCalcImageValue
+		class DllExport RSGISEstimationAlgorithmDualPolSingleSpeciesPoly : public rsgis::img::RSGISCalcImageValue
 		{
 			/// Estimates parameters from dual-pol SAR data for a single species
 			public: 
@@ -104,7 +104,7 @@ namespace rsgis
 				int ittmax;
 			};
 		
-		class RSGISEstimationAlgorithmDualPolFPCSingleSpecies : public rsgis::img::RSGISCalcImageValue
+		class DllExport RSGISEstimationAlgorithmDualPolFPCSingleSpecies : public rsgis::img::RSGISCalcImageValue
 		{
 			/// Estimates parameters from dual-pol SAR data, FPC for a single species
 			/**
@@ -141,7 +141,7 @@ namespace rsgis
 			int ittmax;
 		};
 		
-		class RSGISEstimationAlgorithmFullPolSingleSpeciesPolyMask : public rsgis::img::RSGISCalcImageValue
+		class DllExport RSGISEstimationAlgorithmFullPolSingleSpeciesPolyMask : public rsgis::img::RSGISCalcImageValue
 		{
 			/// Estimates parameters from full-pol SAR data for a single species defined using a mask
 			public: 
@@ -167,7 +167,7 @@ namespace rsgis
 				int ittmax;
 			};
 		
-		class RSGISEstimationAlgorithmDualPolSingleSpeciesPolyMask : public rsgis::img::RSGISCalcImageValue
+		class DllExport RSGISEstimationAlgorithmDualPolSingleSpeciesPolyMask : public rsgis::img::RSGISCalcImageValue
 		{
 			/// Estimates parameters from dual-pol SAR data for a single species defined using a mask
 			public: 
@@ -193,7 +193,7 @@ namespace rsgis
 				double nonForestThreshold;
 			};
 		
-		class RSGISEstimationAlgorithmDualPolFPCMoistureSingleSpecies : public rsgis::img::RSGISCalcImageValue
+		class DllExport RSGISEstimationAlgorithmDualPolFPCMoistureSingleSpecies : public rsgis::img::RSGISCalcImageValue
 		{
 			/// Estimates parameters from dual-pol SAR data, FPC and moisture for a single species
 			/**
@@ -232,7 +232,7 @@ namespace rsgis
 			int ittmax;
 		};
 		
-		class RSGISEstimationAlgorithmSingleSpecies : public rsgis::img::RSGISCalcImageValue
+		class DllExport RSGISEstimationAlgorithmSingleSpecies : public rsgis::img::RSGISCalcImageValue
 		{
 			/// Estimates parameters from SAR data for a single species.
 			/** 
@@ -269,7 +269,7 @@ namespace rsgis
 			bool useDefaultMinMax; // Use default min-max values for parameters
 		};
 		
-		class RSGISEstimationAlgorithmSingleSpeciesMask : public rsgis::img::RSGISCalcImageValue
+		class DllExport RSGISEstimationAlgorithmSingleSpeciesMask : public rsgis::img::RSGISCalcImageValue
 		{
 			/// Estimates parameters from SAR data for a single species. Takes an D+1 band image (where D is the total number of data channels)
 			/// where the first band is used to classify forest / non-forest areas.
@@ -309,7 +309,7 @@ namespace rsgis
 			bool useDefaultMinMax; // Use default min-max values for parameters
 		};
 		
-		class RSGISEstimationAlgorithmSingleSpeciesPixAP : public rsgis::img::RSGISCalcImageValue
+		class DllExport RSGISEstimationAlgorithmSingleSpeciesPixAP : public rsgis::img::RSGISCalcImageValue
 		{
 			/// Estimates parameters from SAR data for a single species. Takes pixel based a priori estimates.
 			/** 
@@ -346,7 +346,7 @@ namespace rsgis
 			bool useDefaultMinMax; // Use default min-max values for parameters
 		};
 		
-		class RSGISEstimationAlgorithmDualPolSingleSpeciesMaskPixAP : public rsgis::img::RSGISCalcImageValue
+		class DllExport RSGISEstimationAlgorithmDualPolSingleSpeciesMaskPixAP : public rsgis::img::RSGISCalcImageValue
 		{
 			/** Estimates parameters from dual-pol SAR data for a single species. <br>
 			 * A priori estimates for each pixel are passed in as image bands.<br>
@@ -385,7 +385,7 @@ namespace rsgis
 			gsl_vector *aPrioriPar;
 		};
 		
-		class RSGISEstimationAlgorithmDualPolMultiSpeciesClassification : public rsgis::img::RSGISCalcImageValue
+		class DllExport RSGISEstimationAlgorithmDualPolMultiSpeciesClassification : public rsgis::img::RSGISCalcImageValue
 		{
 			/// Estimates parameters from dual-pol SAR data for a single species. Takes a 3 band image
 			/// where the first band is a classification.
@@ -418,7 +418,7 @@ namespace rsgis
 			std::vector<RSGISEstimationOptimiser*> *estOptimiser;
 		};
 		
-		class RSGISEstimationAlgorithmGenerateSimulatedData2Var2Data : public rsgis::img::RSGISCalcImageValue
+		class DllExport RSGISEstimationAlgorithmGenerateSimulatedData2Var2Data : public rsgis::img::RSGISCalcImageValue
 		{
 			/// Generates simulated data
 		public: 

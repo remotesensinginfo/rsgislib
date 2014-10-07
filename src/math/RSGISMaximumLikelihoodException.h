@@ -27,7 +27,7 @@
 
 namespace rsgis{namespace math{        
 
-    class RSGISMaximumLikelihoodException : public RSGISMathException
+    class DllExport RSGISMaximumLikelihoodException : public RSGISMathException
         {
         public:
             RSGISMaximumLikelihoodException();

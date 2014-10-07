@@ -59,14 +59,14 @@
 
 namespace rsgis{namespace vec{
 		
-	struct ClassVariables
+	struct DllExport ClassVariables
 	{
 		std::string name;
         rsgis::math::Matrix *matrix;
 		int numPxls;
 	};
 	
-	class RSGISZonalStats2Matrix
+	class DllExport RSGISZonalStats2Matrix
 	{
 	public:
 		RSGISZonalStats2Matrix();
@@ -75,7 +75,7 @@ namespace rsgis{namespace vec{
 		~RSGISZonalStats2Matrix();
 	};
     
-    class RSGISPixelVals22Txt : public RSGISProcessOGRFeature
+    class DllExport RSGISPixelVals22Txt : public RSGISProcessOGRFeature
     {
         /** Save pixel values to text file. Saves the values of all pixels within a text file to a text file.
          */
@@ -102,7 +102,7 @@ namespace rsgis{namespace vec{
         unsigned int maxPrintout; // Max features to print out
     };
     
-    class RSGISCalcPixelValsFromPolygon : public rsgis::img::RSGISCalcImageSingleValue
+    class DllExport RSGISCalcPixelValsFromPolygon : public rsgis::img::RSGISCalcImageSingleValue
     {
     public:
         RSGISCalcPixelValsFromPolygon(std::vector<double> **pixelValues, unsigned int numInBands);

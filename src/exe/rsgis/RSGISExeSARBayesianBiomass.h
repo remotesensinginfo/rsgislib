@@ -132,7 +132,7 @@ using namespace rsgis::math;
 */
 
 
-class RSGISExeSARBayesianBiomass : public RSGISAlgorithmParameters
+class DllExport RSGISExeSARBayesianBiomass : public RSGISAlgorithmParameters
 	{
 		enum options
 		{

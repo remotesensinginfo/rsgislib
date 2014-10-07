@@ -31,7 +31,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISIntValuePolygon : public rsgis::geom::RSGISPolygon
+	class DllExport RSGISIntValuePolygon : public rsgis::geom::RSGISPolygon
 	{
 	public:
 		RSGISIntValuePolygon();

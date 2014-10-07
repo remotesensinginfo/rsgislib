@@ -30,7 +30,7 @@ namespace rsgis
 {
 	namespace vec
 	{
-		class RSGISVectorZonalException : public rsgis::RSGISVectorException
+		class DllExport RSGISVectorZonalException : public rsgis::RSGISVectorException
 			{
 			public:
 				RSGISVectorZonalException();

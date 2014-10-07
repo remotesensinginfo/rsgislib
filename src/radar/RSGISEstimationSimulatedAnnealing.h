@@ -41,7 +41,7 @@
 
 namespace rsgis {namespace radar{
 
-	class RSGISEstimationSimulatedAnnealingWithAP : public RSGISEstimationOptimiser
+	class DllExport RSGISEstimationSimulatedAnnealingWithAP : public RSGISEstimationOptimiser
     {
         /// Simulated Annealing to use in Estimation algorithm
     public:

@@ -39,7 +39,7 @@
 
 namespace rsgis{namespace filter{
     
-    class RSGISImageMorphologyTopHat
+    class DllExport RSGISImageMorphologyTopHat
     {
     public:
         RSGISImageMorphologyTopHat();
@@ -49,7 +49,7 @@ namespace rsgis{namespace filter{
     };
     
     
-    class RSGISMorphologyImageDiff : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISMorphologyImageDiff : public rsgis::img::RSGISCalcImageValue
     {
     public: 
         RSGISMorphologyImageDiff(int numberOutBands); 			

@@ -32,7 +32,7 @@
 
 namespace rsgis{namespace geom{
 	
-	class RSGISAbstractOutlinePolygon
+	class DllExport RSGISAbstractOutlinePolygon
 		{
 		public:
 			virtual geos::geom::Polygon* createOutline(geos::geom::MultiPolygon *mPoly) throw(RSGISGeometryException)=0;

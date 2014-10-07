@@ -27,7 +27,7 @@
 
 namespace rsgis{namespace math{        
 
-    class RSGISOptimisationException : public RSGISMathException
+    class DllExport RSGISOptimisationException : public RSGISMathException
         {
         public:
             RSGISOptimisationException();

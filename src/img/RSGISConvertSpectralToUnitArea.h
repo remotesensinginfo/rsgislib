@@ -45,7 +45,7 @@ namespace rsgis{namespace img{
 	 *
 	 */
 	
-	class RSGISConvertSpectralToUnitArea : public RSGISCalcImageValue
+	class DllExport RSGISConvertSpectralToUnitArea : public RSGISCalcImageValue
 	{
 	public: 
 		RSGISConvertSpectralToUnitArea(int numberOutBands, rsgis::math::Matrix *bandValuesWidths);

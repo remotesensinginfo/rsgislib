@@ -45,7 +45,7 @@ using namespace rsgis;
 using namespace rsgis::img;
 using namespace rsgis::math;
 
-class RSGISExeCreateTestImages : public RSGISAlgorithmParameters
+class DllExport RSGISExeCreateTestImages : public RSGISAlgorithmParameters
 	{
 	public:
 		

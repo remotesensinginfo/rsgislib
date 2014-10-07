@@ -27,7 +27,7 @@
 
 namespace rsgis{namespace geom{
 		
-    class RSGISGeometryException : public rsgis::RSGISException
+    class DllExport RSGISGeometryException : public rsgis::RSGISException
         {
         public:
             RSGISGeometryException();

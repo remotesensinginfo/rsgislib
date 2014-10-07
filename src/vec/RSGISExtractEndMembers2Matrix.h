@@ -48,7 +48,7 @@
 
 namespace rsgis{namespace vec{    
     
-	class RSGISExtractEndMembers2Matrix
+	class DllExport RSGISExtractEndMembers2Matrix
 	{
 	public:
 		RSGISExtractEndMembers2Matrix();
@@ -57,7 +57,7 @@ namespace rsgis{namespace vec{
 	};
     
     
-    class RSGISCalcSumValues : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISCalcSumValues : public rsgis::img::RSGISCalcImageValue
     {
     public: 
         RSGISCalcSumValues(float *sumVals, unsigned int *countVals, unsigned int numSumVals);
@@ -79,7 +79,7 @@ namespace rsgis{namespace vec{
     };
     
     
-    class RSGISExtractSumPixelValues
+    class DllExport RSGISExtractSumPixelValues
     {
     public:
         RSGISExtractSumPixelValues(unsigned int numImageBands, RSGISCalcSumValues *valueCalc, GDALDataset **datasets, int numDS, rsgis::img::pixelInPolyOption pixelPolyOption);

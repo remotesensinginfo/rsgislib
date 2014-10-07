@@ -38,7 +38,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISGetOGRGeometries : public RSGISProcessOGRFeature
+	class DllExport RSGISGetOGRGeometries : public RSGISProcessOGRFeature
 	{
 	public:
 		RSGISGetOGRGeometries(std::vector<OGRGeometry*> *geometries);
@@ -51,7 +51,7 @@ namespace rsgis{namespace vec{
 	};
     
     
-    class RSGISPrintGeometryToConsole : public RSGISProcessOGRFeature
+    class DllExport RSGISPrintGeometryToConsole : public RSGISProcessOGRFeature
 	{
 	public:
 		RSGISPrintGeometryToConsole();

@@ -55,7 +55,7 @@ typedef std::map<CGALPoint, CGALCoordType, K::Less_xy_2>     PointValueMap;
 
 namespace rsgis {namespace math{
     
-    class RSGISInterpolationException : public RSGISMathException
+    class DllExport RSGISInterpolationException : public RSGISMathException
     {
     public:
         RSGISInterpolationException():RSGISMathException("A RSGISInterpolationException has been created.."){};
@@ -63,7 +63,7 @@ namespace rsgis {namespace math{
         RSGISInterpolationException(std::string message):RSGISMathException(message){};
     };
     
-    struct RSGISInterpolatorDataPoint
+    struct DllExport RSGISInterpolatorDataPoint
     {
         RSGISInterpolatorDataPoint(double _x, double _y, double _value)
         {
@@ -76,7 +76,7 @@ namespace rsgis {namespace math{
         double value;
     };
     
-    class RSGIS2DInterpolator
+    class DllExport RSGIS2DInterpolator
 	{
 	public:
 		RSGIS2DInterpolator(){};
@@ -87,7 +87,7 @@ namespace rsgis {namespace math{
 		bool initialised;
 	};
     
-    class RSGISSearchKNN2DInterpolator: public RSGIS2DInterpolator
+    class DllExport RSGISSearchKNN2DInterpolator: public RSGIS2DInterpolator
 	{
 	public:
 		RSGISSearchKNN2DInterpolator(unsigned int k);
@@ -100,7 +100,7 @@ namespace rsgis {namespace math{
         std::vector<RSGISInterpolatorDataPoint> *dataPTS;
 	};
     
-    class RSGIS2DTriagulatorInterpolator: public RSGIS2DInterpolator
+    class DllExport RSGIS2DTriagulatorInterpolator: public RSGIS2DInterpolator
 	{
 	public:
 		RSGIS2DTriagulatorInterpolator():RSGIS2DInterpolator(){};
@@ -112,7 +112,7 @@ namespace rsgis {namespace math{
         PointValueMap *values;
 	};
     
-	class RSGISNearestNeighbour2DInterpolator : public RSGIS2DTriagulatorInterpolator
+	class DllExport RSGISNearestNeighbour2DInterpolator : public RSGIS2DTriagulatorInterpolator
 	{
 	public:
 		RSGISNearestNeighbour2DInterpolator():RSGIS2DTriagulatorInterpolator(){};
@@ -120,7 +120,7 @@ namespace rsgis {namespace math{
 		~RSGISNearestNeighbour2DInterpolator(){};
 	};
     
-    class RSGISNaturalNeighbor2DInterpolator :public RSGIS2DTriagulatorInterpolator
+    class DllExport RSGISNaturalNeighbor2DInterpolator :public RSGIS2DTriagulatorInterpolator
 	{
 	public:
 		RSGISNaturalNeighbor2DInterpolator():RSGIS2DTriagulatorInterpolator(){};
@@ -128,7 +128,7 @@ namespace rsgis {namespace math{
 		~RSGISNaturalNeighbor2DInterpolator(){};
 	};
     
-    class RSGISNaturalNearestNeighbor2DInterpolator :public RSGIS2DTriagulatorInterpolator
+    class DllExport RSGISNaturalNearestNeighbor2DInterpolator :public RSGIS2DTriagulatorInterpolator
 	{
 	public:
 		RSGISNaturalNearestNeighbor2DInterpolator():RSGIS2DTriagulatorInterpolator(){};
@@ -137,7 +137,7 @@ namespace rsgis {namespace math{
 	};
     
     
-    class RSGISKNearestNeighbour2DInterpolator : public RSGISSearchKNN2DInterpolator
+    class DllExport RSGISKNearestNeighbour2DInterpolator : public RSGISSearchKNN2DInterpolator
 	{
 	public:
 		RSGISKNearestNeighbour2DInterpolator(unsigned int k):RSGISSearchKNN2DInterpolator(k){};
@@ -146,7 +146,7 @@ namespace rsgis {namespace math{
 	};
     
     
-    class RSGISAllPointsIDWInterpolator : public RSGIS2DInterpolator
+    class DllExport RSGISAllPointsIDWInterpolator : public RSGIS2DInterpolator
 	{
 	public:
 		RSGISAllPointsIDWInterpolator(float p):RSGIS2DInterpolator(){this->p = p;};
@@ -158,7 +158,7 @@ namespace rsgis {namespace math{
         float p;
 	};
     
-    class RSGISLinearTrendInterpolator : public RSGIS2DInterpolator
+    class DllExport RSGISLinearTrendInterpolator : public RSGIS2DInterpolator
 	{
 	public:
 		RSGISLinearTrendInterpolator():RSGIS2DInterpolator(){};
@@ -171,7 +171,7 @@ namespace rsgis {namespace math{
         double c;
 	};
     
-    class RSGISCombine2DInterpolators : public RSGIS2DInterpolator
+    class DllExport RSGISCombine2DInterpolators : public RSGIS2DInterpolator
     {
     public:
 		RSGISCombine2DInterpolators(RSGIS2DInterpolator *interp1, RSGIS2DInterpolator *interp2, double stdDevThres):RSGIS2DInterpolator()

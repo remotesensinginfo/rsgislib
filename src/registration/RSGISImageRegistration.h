@@ -52,11 +52,11 @@
 
 namespace rsgis{namespace reg{
     
-	class RSGISImageRegistration
+	class DllExport RSGISImageRegistration
 	{
 	public:
 		
-		struct TiePoint 
+		struct DllExport TiePoint
 		{
 			double eastings;
 			double northings;
@@ -103,7 +103,7 @@ namespace rsgis{namespace reg{
 			}
 		};
 		
-		struct OverlapRegion
+		struct DllExport OverlapRegion
 		{
 			double tlX;
 			double tlY;

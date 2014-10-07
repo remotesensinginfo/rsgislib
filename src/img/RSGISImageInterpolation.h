@@ -37,7 +37,7 @@
 
 namespace rsgis{namespace img{
 	
-	class RSGISImageInterpolation
+	class DllExport RSGISImageInterpolation
 		{
 		public:
 			RSGISImageInterpolation(RSGISInterpolator *interpolator);
@@ -60,7 +60,7 @@ namespace rsgis{namespace img{
 		};
     
     
-    class RSGISPopulateImageFromInterpolator
+    class DllExport RSGISPopulateImageFromInterpolator
     {
     public:
         RSGISPopulateImageFromInterpolator();

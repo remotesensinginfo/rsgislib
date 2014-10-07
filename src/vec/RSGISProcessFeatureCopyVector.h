@@ -39,7 +39,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISProcessFeatureCopyVector : public RSGISProcessOGRFeature
+	class DllExport RSGISProcessFeatureCopyVector : public RSGISProcessOGRFeature
 		{
 		public:
 			RSGISProcessFeatureCopyVector();

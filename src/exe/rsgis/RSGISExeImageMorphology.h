@@ -61,7 +61,7 @@ using namespace rsgis::utils;
 using namespace rsgis::math;
 using namespace rsgis::filter;
 
-class RSGISExeImageMorphology : public RSGISAlgorithmParameters
+class DllExport RSGISExeImageMorphology : public RSGISAlgorithmParameters
 {
 public:
     enum options 

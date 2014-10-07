@@ -41,7 +41,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISGeometryRotateAroundFixedPoint : public RSGISProcessOGRGeometry
+	class DllExport RSGISGeometryRotateAroundFixedPoint : public RSGISProcessOGRGeometry
 		{
 		public:
 			RSGISGeometryRotateAroundFixedPoint(geos::geom::Coordinate *fixedPt, float angle);

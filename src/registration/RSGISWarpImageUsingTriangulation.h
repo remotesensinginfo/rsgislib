@@ -62,7 +62,7 @@ namespace rsgis{namespace reg{
     typedef std::vector< std::pair<CGALPoint, CGALCoordType> >   CoordinateVector;
     typedef std::map<CGALPoint, rsgis::reg::RSGISGCPImg2MapNode*, K::Less_xy_2>     PointValueMap;
     
-	class RSGISWarpImageUsingTriangulation : public RSGISWarpImage
+	class DllExport RSGISWarpImageUsingTriangulation : public RSGISWarpImage
 	{
 	public:
 		RSGISWarpImageUsingTriangulation(std::string inputImage, std::string outputImage, std::string outProjWKT, std::string gcpFilePath, float outImgRes, RSGISWarpImageInterpolator *interpolator, std::string gdalFormat);

@@ -47,7 +47,7 @@ namespace rsgis{namespace img{
         rsgis_stratifiedpts
 	};
     
-    struct RSGISAccPoint
+    struct DllExport RSGISAccPoint
     {
         unsigned int ptID;
         double eastings;
@@ -84,7 +84,7 @@ namespace rsgis{namespace img{
         }
     };
     
-	class RSGISGenAccuracyPoints
+	class DllExport RSGISGenAccuracyPoints
     {
     public:
         RSGISGenAccuracyPoints();

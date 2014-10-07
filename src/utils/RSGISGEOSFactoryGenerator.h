@@ -30,10 +30,12 @@
 #include "geos/geom/GeometryFactory.h"
 #include "geos/geom/PrecisionModel.h"
 
+#include "common/RSGISCommons.h"
+
 namespace rsgis{namespace utils{
 	
     
-	class RSGISGEOSFactoryGenerator
+	class DllExport RSGISGEOSFactoryGenerator
 		{
 		public: 
 			static RSGISGEOSFactoryGenerator* getInstance();

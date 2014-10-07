@@ -95,7 +95,7 @@
 
 namespace rsgisexe{
 
-    class RSGISExeImageCalculation : public rsgis::RSGISAlgorithmParameters
+    class DllExport RSGISExeImageCalculation : public rsgis::RSGISAlgorithmParameters
 	{
 	public:
 		

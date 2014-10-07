@@ -37,7 +37,7 @@
 
 namespace rsgis{namespace utils{
     
-	struct enviroi
+	struct DllExport enviroi
 	{
 		std::string name;
 		int samples;
@@ -45,7 +45,7 @@ namespace rsgis{namespace utils{
 		rsgis::math::Matrix *data;
 	};
 	
-	class RSGISReadENVIASCIIROI
+	class DllExport RSGISReadENVIASCIIROI
 		{
 		public:
 			RSGISReadENVIASCIIROI(std::string file)throw(rsgis::RSGISInputStreamException,RSGISTextException);

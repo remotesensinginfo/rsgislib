@@ -30,7 +30,7 @@
 
 namespace rsgis{namespace filter{
 
-	class RSGISGenerateFilter
+	class DllExport RSGISGenerateFilter
 		{
 		public: 
 			RSGISGenerateFilter(RSGISCalcFilter *calcFilter);

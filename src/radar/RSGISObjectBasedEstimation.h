@@ -58,7 +58,7 @@
 
 namespace rsgis{namespace radar{
 
-	class RSGISObjectBasedEstimation : public rsgis::vec::RSGISProcessOGRFeature
+	class DllExport RSGISObjectBasedEstimation : public rsgis::vec::RSGISProcessOGRFeature
 	{
 	public:
 		RSGISObjectBasedEstimation(GDALDataset *inputImage, GDALDataset *outputImage, GDALDataset *rasterFeatures, std::vector<gsl_vector*> *initialPar, std::vector<RSGISEstimationOptimiser*> *slowOptimiser, std::vector<RSGISEstimationOptimiser*> *fastOptimiser, estParameters parameters, double ***minMaxVals = NULL, std::string classHeading = "", bool useClass = false);
@@ -92,7 +92,7 @@ namespace rsgis{namespace radar{
 
 	};
 
-    class RSGISObjectBasedEstimationObjectAP : public rsgis::vec::RSGISProcessOGRFeature
+    class DllExport RSGISObjectBasedEstimationObjectAP : public rsgis::vec::RSGISProcessOGRFeature
 	{
 	public:
 		RSGISObjectBasedEstimationObjectAP(GDALDataset *inputImage, GDALDataset *outputImage, GDALDataset *rasterFeatures, std::vector<gsl_vector*> *initialPar, std::vector<RSGISEstimationOptimiser*> *slowOptimiser, std::vector<RSGISEstimationOptimiser*> *fastOptimiser, estParameters parameters, std::string *apParField, double ***minMaxVals = NULL, std::string classHeading = "", bool useClass = false);
@@ -131,7 +131,7 @@ namespace rsgis{namespace radar{
         rsgis::math::RSGISMathTwoVariableFunction *functionB;
 	};
 
-	class RSGISObjectBasedEstimationGetObjVals : public rsgis::img::RSGISCalcImageSingleValue
+	class DllExport RSGISObjectBasedEstimationGetObjVals : public rsgis::img::RSGISCalcImageSingleValue
 	{
 		/// Loops though bands and loads pixel values to vectors
 	public:
@@ -149,7 +149,7 @@ namespace rsgis{namespace radar{
 	};
 
 
-	class RSGISEstimationAssignAP : public RSGISEstimationOptimiser
+	class DllExport RSGISEstimationAssignAP : public RSGISEstimationOptimiser
 	{
 		/// Assign output vector to initial parameters
 		/** - Intended to assign object classification to pixels within object, 
@@ -164,7 +164,7 @@ namespace rsgis{namespace radar{
 	private:
 	};
     
-    class RSGISEstimationNoEstimation : public RSGISEstimationOptimiser
+    class DllExport RSGISEstimationNoEstimation : public RSGISEstimationOptimiser
     {
         /// Class to skip estimation for a class.
         /** Intended to be used within object based estimation as the slow optimiser, 

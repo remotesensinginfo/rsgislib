@@ -31,7 +31,7 @@
 
 namespace rsgis{namespace reg{
     		
-	class RSGISImageSimilarityMetric
+	class DllExport RSGISImageSimilarityMetric
 	{
 	public:
 		virtual float calcValue(float **reference, float **floating, unsigned int numVals, unsigned int numDims) throw(rsgis::math::RSGISMathException)=0;

@@ -44,7 +44,7 @@ namespace rsgis { namespace classifier {
 	 */
 	
 	
-	class RSGISSpectralCorrelationMapperRule : public rsgis::img::RSGISCalcImageValue
+	class DllExport RSGISSpectralCorrelationMapperRule : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
 		RSGISSpectralCorrelationMapperRule(int numOutBands, gsl_matrix *refSpectra);
@@ -65,7 +65,7 @@ namespace rsgis { namespace classifier {
 	};
 		
 	/// Classify rule image produced by SAM
-	class RSGISSpectralCorrelationMapperClassifier : public rsgis::img::RSGISCalcImageValue
+	class DllExport RSGISSpectralCorrelationMapperClassifier : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
 		RSGISSpectralCorrelationMapperClassifier(int numOutBands, double threashold);

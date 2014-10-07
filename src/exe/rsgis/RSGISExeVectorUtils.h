@@ -119,7 +119,7 @@ using namespace rsgis::vec;
 using namespace rsgis::geom;
 using namespace geos::geom;
 
-class RSGISExeVectorUtils : public RSGISAlgorithmParameters
+class DllExport RSGISExeVectorUtils : public RSGISAlgorithmParameters
 	{
 	public:
 

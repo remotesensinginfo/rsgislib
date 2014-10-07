@@ -30,7 +30,7 @@
 
 namespace rsgis
 {    
-	struct argpair
+	struct DllExport argpair
 	{
 		std::string arg;
 		std::string *value;
@@ -38,7 +38,7 @@ namespace rsgis
 	};
 	
 	
-	class RSGISCommandLineParser
+	class DllExport RSGISCommandLineParser
 		{
 		public:
 			RSGISCommandLineParser();

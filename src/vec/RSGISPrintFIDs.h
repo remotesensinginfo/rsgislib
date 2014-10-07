@@ -39,7 +39,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISPrintFIDs : public RSGISProcessOGRFeature
+	class DllExport RSGISPrintFIDs : public RSGISProcessOGRFeature
 		{
 		public:
 			RSGISPrintFIDs();

@@ -37,7 +37,7 @@
 
 namespace rsgis{namespace img{
 	
-	class RSGISCountValsAboveThresInCol : public RSGISCalcImageValue
+	class DllExport RSGISCountValsAboveThresInCol : public RSGISCalcImageValue
 	{
 	public: 
 		RSGISCountValsAboveThresInCol(int numberOutBands, float upper, float lower);

@@ -44,7 +44,7 @@
 
 namespace rsgis{namespace rastergis{
 
-    class RSGISFindInfoBetweenLayers
+    class DllExport RSGISFindInfoBetweenLayers
     {
     public:
         RSGISFindInfoBetweenLayers();
@@ -53,7 +53,7 @@ namespace rsgis{namespace rastergis{
     };
 
 
-    class RSGISCalcClumpClassMajorities : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISCalcClumpClassMajorities : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
 		RSGISCalcClumpClassMajorities(char **baseColData, char **infoColData, std::vector<char*> classes, unsigned int **clumpCounter, bool ignoreZero = true);

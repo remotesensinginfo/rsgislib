@@ -50,7 +50,7 @@
 
 namespace rsgis{namespace vec{
     
-	class RSGISZonalImage2HDF
+	class DllExport RSGISZonalImage2HDF
 	{
 	public:
 		RSGISZonalImage2HDF();
@@ -59,7 +59,7 @@ namespace rsgis{namespace vec{
 	};
     
     
-    class RSGISExtractPixelValues : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISExtractPixelValues : public rsgis::img::RSGISCalcImageValue
     {
     public:
         RSGISExtractPixelValues(std::vector<float*> *pxlVals);
@@ -79,7 +79,7 @@ namespace rsgis{namespace vec{
     };
     
     
-    class RSGISExtractZonalPixelValues
+    class DllExport RSGISExtractZonalPixelValues
     {
     public:
         RSGISExtractZonalPixelValues(RSGISExtractPixelValues *valueCalc, GDALDataset **datasets, int numDS, rsgis::img::pixelInPolyOption pixelPolyOption);

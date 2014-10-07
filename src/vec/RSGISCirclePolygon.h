@@ -34,7 +34,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISCirclePolygon : public RSGISPolygonData
+	class DllExport RSGISCirclePolygon : public RSGISPolygonData
 		{
 		public:
 			RSGISCirclePolygon(std::string radiusAttribute, std::string areaAttribute, std::string heightAttribute);

@@ -29,7 +29,7 @@
 
 namespace rsgis{namespace math{
     
-    class RSGISMathException : public rsgis::RSGISException
+    class DllExport RSGISMathException : public rsgis::RSGISException
     {
     public:
         RSGISMathException();

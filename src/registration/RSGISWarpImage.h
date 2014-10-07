@@ -51,7 +51,7 @@
 
 namespace rsgis{namespace reg{
     
-	class RSGISWarpImage
+	class DllExport RSGISWarpImage
 	{
 	public:
 		RSGISWarpImage(std::string inputImage, std::string outputImage, std::string outProjWKT, std::string gcpFilePath, float outImgRes, RSGISWarpImageInterpolator *interpolator, std::string gdalFormat);

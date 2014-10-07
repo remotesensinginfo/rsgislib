@@ -35,7 +35,7 @@
 
 namespace rsgis{namespace reg{
     
-	class RSGISEuclideanSimilarityMetric : public RSGISImageSimilarityMetric
+	class DllExport RSGISEuclideanSimilarityMetric : public RSGISImageSimilarityMetric
 	{
 	public:
 		RSGISEuclideanSimilarityMetric(){};
@@ -44,7 +44,7 @@ namespace rsgis{namespace reg{
 		~RSGISEuclideanSimilarityMetric(){};
 	};
 
-	class RSGISManhattanSimilarityMetric : public RSGISImageSimilarityMetric // Also referred to as the taxicab distance
+	class DllExport RSGISManhattanSimilarityMetric : public RSGISImageSimilarityMetric // Also referred to as the taxicab distance
 	{
 	public:
 		RSGISManhattanSimilarityMetric(){};
@@ -53,7 +53,7 @@ namespace rsgis{namespace reg{
 		~RSGISManhattanSimilarityMetric(){};
 	};
 
-	class RSGISSquaredDifferenceSimilarityMetric : public RSGISImageSimilarityMetric
+	class DllExport RSGISSquaredDifferenceSimilarityMetric : public RSGISImageSimilarityMetric
 	{
 	public:
 		RSGISSquaredDifferenceSimilarityMetric(){};
@@ -62,7 +62,7 @@ namespace rsgis{namespace reg{
 		~RSGISSquaredDifferenceSimilarityMetric(){};
 	};
 
-	class RSGISCorrelationSimilarityMetric : public RSGISImageSimilarityMetric
+	class DllExport RSGISCorrelationSimilarityMetric : public RSGISImageSimilarityMetric
 	{
 	public:
 		RSGISCorrelationSimilarityMetric(){};

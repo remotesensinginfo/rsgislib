@@ -51,7 +51,7 @@ namespace rsgis{namespace utils{
     static const unsigned int HDF5_WRITE_DEFLATE( 1 );
     static const hsize_t HDF5_WRITE_CHUNK_SIZE( 250 ); //100
     
-	class RSGISExportColumnData2HDF
+	class DllExport RSGISExportColumnData2HDF
 	{
 	public:
 		RSGISExportColumnData2HDF();

@@ -50,7 +50,7 @@ namespace rsgis {namespace radar{
 	void dFunction(const gsl_vector *predictParams, void *parameters, gsl_vector *df);
 	void completeFunction(const gsl_vector *predictParams, void *parameters, double *f, gsl_vector *df);
 
-	class RSGISEstimationGSLOptimiser : public RSGISEstimationOptimiser
+	class DllExport RSGISEstimationGSLOptimiser : public RSGISEstimationOptimiser
 	{
 	public:
 		RSGISEstimationGSLOptimiser();
@@ -61,7 +61,7 @@ namespace rsgis {namespace radar{
 		~RSGISEstimationGSLOptimiser();
 	};
 	
-	class RSGISEstimationGSLOptimiserNoGradient : public RSGISEstimationOptimiser
+	class DllExport RSGISEstimationGSLOptimiserNoGradient : public RSGISEstimationOptimiser
 	{
 	public:
 		RSGISEstimationGSLOptimiserNoGradient();

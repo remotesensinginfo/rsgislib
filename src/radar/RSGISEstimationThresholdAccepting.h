@@ -39,7 +39,7 @@
 
 namespace rsgis {namespace radar{
     
-	class RSGISEstimationThresholdAccepting2Var2Data : public RSGISEstimationOptimiser
+	class DllExport RSGISEstimationThresholdAccepting2Var2Data : public RSGISEstimationOptimiser
 	{
 		/// Simulated Annealing to use in Estimation algorithm
 	public:
@@ -75,7 +75,7 @@ namespace rsgis {namespace radar{
 		rsgis::math::RSGISMathTwoVariableFunction *functionHV;
 	};
 	
-	class RSGISEstimationThresholdAccepting2Var2DataWithAP : public RSGISEstimationOptimiser
+	class DllExport RSGISEstimationThresholdAccepting2Var2DataWithAP : public RSGISEstimationOptimiser
 	{
 		/// Simulated Annealing to use in Estimation algorithm
 	public:
@@ -118,7 +118,7 @@ namespace rsgis {namespace radar{
 		gsl_vector *aPrioriPar;
 	};
 	
-	class RSGISEstimationThresholdAccepting2Var3Data : public RSGISEstimationOptimiser
+	class DllExport RSGISEstimationThresholdAccepting2Var3Data : public RSGISEstimationOptimiser
 	{
 		/// Simulated Annealing to use in Estimation algorithm
 	public:
@@ -156,7 +156,7 @@ namespace rsgis {namespace radar{
 		rsgis::math::RSGISMathTwoVariableFunction *functionVV;
 	};
 	
-	class RSGISEstimationThresholdAccepting2Var3DataWithAP : public RSGISEstimationOptimiser
+	class DllExport RSGISEstimationThresholdAccepting2Var3DataWithAP : public RSGISEstimationOptimiser
 	{
 		/// Simulated Annealing to use in Estimation algorithm
 	public:
@@ -201,7 +201,7 @@ namespace rsgis {namespace radar{
 		gsl_vector *aPrioriPar;
 	};
 	
-	class RSGISEstimationThresholdAccepting3Var3DataWithAP : public RSGISEstimationOptimiser
+	class DllExport RSGISEstimationThresholdAccepting3Var3DataWithAP : public RSGISEstimationOptimiser
 	{
 		/// Simulated Annealing to use in Estimation algorithm
 	public:
@@ -248,7 +248,7 @@ namespace rsgis {namespace radar{
 		gsl_vector *aPrioriPar;
 	};
 	
-	class RSGISEstimationThresholdAccepting3Var4DataWithAP : public RSGISEstimationOptimiser
+	class DllExport RSGISEstimationThresholdAccepting3Var4DataWithAP : public RSGISEstimationOptimiser
 	{
 		/// Simulated Annealing to use in Estimation algorithm
 	public:

@@ -33,7 +33,7 @@
 
 namespace rsgis{namespace img{
 	
-	class RSGISCalcImageSingleValue
+	class DllExport RSGISCalcImageSingleValue
 		{
 		public:
 			RSGISCalcImageSingleValue(int numOutputValues);

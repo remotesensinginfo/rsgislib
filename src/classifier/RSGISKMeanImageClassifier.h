@@ -48,7 +48,7 @@
 
 namespace rsgis{ namespace classifier{
 	
-	class RSGISKMeansClassifier
+	class DllExport RSGISKMeansClassifier
 	{
 	public:
 		RSGISKMeansClassifier(std::string inputImageFile, bool printinfo);
@@ -68,7 +68,7 @@ namespace rsgis{ namespace classifier{
 		bool printinfo;
 	};
 	
-	class RSGISKMeanCalcPixelClusterCalcImageVal : public rsgis::img::RSGISCalcImageValue
+	class DllExport RSGISKMeanCalcPixelClusterCalcImageVal : public rsgis::img::RSGISCalcImageValue
 	{
 	public: 
 		RSGISKMeanCalcPixelClusterCalcImageVal(int numOutBands, ClusterCentre **clusterCentres, unsigned int numClusters, unsigned int numImageBands);
@@ -94,7 +94,7 @@ namespace rsgis{ namespace classifier{
 		unsigned int numImageBands;
 	};
 	
-	class RSGISCalcDist2NrCentreCalcImageVal : public rsgis::img::RSGISCalcImageValue
+	class DllExport RSGISCalcDist2NrCentreCalcImageVal : public rsgis::img::RSGISCalcImageValue
 	{
 	public: 
 		RSGISCalcDist2NrCentreCalcImageVal(int numOutBands, ClusterCentre **clusterCentres, unsigned int numClusters);
@@ -119,7 +119,7 @@ namespace rsgis{ namespace classifier{
 	};
 	
 	
-	class RSGISCalcDist2NrCentreDistributionCalcImageVal : public rsgis::img::RSGISCalcImageValue
+	class DllExport RSGISCalcDist2NrCentreDistributionCalcImageVal : public rsgis::img::RSGISCalcImageValue
 	{
 	public: 
 		RSGISCalcDist2NrCentreDistributionCalcImageVal(int numOutBands, ClusterCentre **clusterCentres, unsigned int numClusters, double sqDistance);
@@ -142,7 +142,7 @@ namespace rsgis{ namespace classifier{
 	
 	
 	
-	class RSGISApplyKMeanClassifierCalcImageVal : public rsgis::img::RSGISCalcImageValue
+	class DllExport RSGISApplyKMeanClassifierCalcImageVal : public rsgis::img::RSGISCalcImageValue
 	{
 	public: 
 		RSGISApplyKMeanClassifierCalcImageVal(int numOutBands, ClusterCentre **clusterCentres, unsigned int numClusters);

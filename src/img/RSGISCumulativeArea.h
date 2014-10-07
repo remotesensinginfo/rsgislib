@@ -37,7 +37,7 @@
 namespace rsgis { namespace img {
 	
 	
-	class RSGISCumulativeArea : public RSGISCalcImageValue
+	class DllExport RSGISCumulativeArea : public RSGISCalcImageValue
 	{
 	public:
 		RSGISCumulativeArea(int numOutBands, rsgis::math::Matrix *bandValuesWidths);

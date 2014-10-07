@@ -31,13 +31,13 @@
 
 namespace rsgis{namespace math{
 	    
-	struct point2D
+	struct DllExport point2D
 	{
 		double x;
 		double y;
 	};
 	
-	class RSGISIntergration
+	class DllExport RSGISIntergration
 		{
 		public:
 			RSGISIntergration(RSGISMathFunction *function);

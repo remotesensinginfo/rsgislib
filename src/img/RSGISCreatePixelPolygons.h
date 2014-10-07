@@ -41,7 +41,7 @@
 namespace rsgis{namespace img{
 	
 	
-	class RSGISCreatePixelPolygons : public RSGISCalcImageValue
+	class DllExport RSGISCreatePixelPolygons : public RSGISCalcImageValue
 	{
 	public: 
 		RSGISCreatePixelPolygons(std::vector<geos::geom::Polygon*> *polys, float threshold);

@@ -37,13 +37,13 @@
 
 namespace rsgis{namespace img{
 	
-	struct VariableBands
+	struct DllExport VariableBands
 	{
         std::string name;
 		int band;
 	};
 	
-	class RSGISBandMath : public RSGISCalcImageValue
+	class DllExport RSGISBandMath : public RSGISCalcImageValue
 		{
 		public: 
 			RSGISBandMath(int numberOutBands, VariableBands **variables, int numVariables, mu::Parser *muParser);

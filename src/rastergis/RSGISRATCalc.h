@@ -37,7 +37,7 @@
 
 namespace rsgis{namespace rastergis{
     
-    class RSGISRATCalc
+    class DllExport RSGISRATCalc
     {
     public:
         RSGISRATCalc(RSGISRATCalcValue *ratCalcVal);

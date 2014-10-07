@@ -45,7 +45,7 @@
 namespace rsgis{namespace rastergis{
     
     
-    class RSGISPopulateWithImageStats
+    class DllExport RSGISPopulateWithImageStats
     {
     public:
         RSGISPopulateWithImageStats();
@@ -54,7 +54,7 @@ namespace rsgis{namespace rastergis{
     };
     
     
-    class RSGISGetClumpsHistogram : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISGetClumpsHistogram : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
 		RSGISGetClumpsHistogram(size_t *histogram, size_t maxVal);

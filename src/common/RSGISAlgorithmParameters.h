@@ -34,7 +34,7 @@
 
 namespace rsgis
 {	
-	class RSGISAlgorithmParameters
+	class DllExport RSGISAlgorithmParameters
 		{
 		public:
 			RSGISAlgorithmParameters();

@@ -49,7 +49,7 @@
 
 namespace rsgis{namespace rastergis{
     
-    class RSGISInterpolateClumpValues2Image
+    class DllExport RSGISInterpolateClumpValues2Image
     {
     public:
         RSGISInterpolateClumpValues2Image();
@@ -58,7 +58,7 @@ namespace rsgis{namespace rastergis{
     };
     
     
-    class RSGISExtractPtValues : public RSGISRATCalcValue
+    class DllExport RSGISExtractPtValues : public RSGISRATCalcValue
     {
     public:
         RSGISExtractPtValues(std::vector<rsgis::math::RSGISInterpolatorDataPoint> *pts, unsigned int *numSelectValues);

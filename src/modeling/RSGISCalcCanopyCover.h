@@ -34,7 +34,7 @@
 
 namespace rsgis { namespace modeling {
 
-	class RSGISCalcCanopyCover
+	class DllExport RSGISCalcCanopyCover
 	{
 		/** Class to calculate the percent crown cover from a transect.
 		 * Crown cover (CC) is defined as the percentage of ground area covered by 

@@ -43,7 +43,7 @@
 
 namespace rsgis{namespace reg{
     
-	class RSGISAddGCPsGDAL
+	class DllExport RSGISAddGCPsGDAL
 	{
 	public:
         RSGISAddGCPsGDAL(std::string inFileName, std::string gcpFilePath, std::string outFileName = "",  std::string gdalFormat = "KEA", GDALDataType gdalDataType = GDT_Float32);

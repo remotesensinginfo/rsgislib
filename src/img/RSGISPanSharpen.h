@@ -33,7 +33,7 @@
 
 namespace rsgis { namespace img {
 
-	class RSGISHCSPanSharpen : public RSGISCalcImageValue
+	class DllExport RSGISHCSPanSharpen : public RSGISCalcImageValue
 	{
 		/** 
 		 Implements Hyperspherical Colour Space (HSC) Pan Sharpening from the following paper:
@@ -64,7 +64,7 @@ namespace rsgis { namespace img {
 		float *imageStats;
 	};
 
-	class RSGISHCSPanSharpenCalcMeanStats : public RSGISCalcImageValue
+	class DllExport RSGISHCSPanSharpenCalcMeanStats : public RSGISCalcImageValue
 	{
 	public:
 		RSGISHCSPanSharpenCalcMeanStats(int numberOutBands, float *outStats);
@@ -88,7 +88,7 @@ namespace rsgis { namespace img {
 		long int nPix;
 	};
 
-	class RSGISHCSPanSharpenCalcSDStats : public RSGISCalcImageValue
+	class DllExport RSGISHCSPanSharpenCalcSDStats : public RSGISCalcImageValue
 	{
 	public:
 		RSGISHCSPanSharpenCalcSDStats(int numberOutBands, float *outStats);

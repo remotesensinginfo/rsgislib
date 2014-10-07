@@ -41,7 +41,7 @@
 
 namespace rsgis{namespace rastergis{
     
-    class RSGISClumpRegionGrowing
+    class DllExport RSGISClumpRegionGrowing
     {
     public:
         RSGISClumpRegionGrowing();

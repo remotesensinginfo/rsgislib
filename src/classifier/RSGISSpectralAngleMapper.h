@@ -34,7 +34,7 @@
 
 namespace rsgis { namespace classifier {
     
-	class RSGISSpectralAngleMapperRule : public rsgis::img::RSGISCalcImageValue
+	class DllExport RSGISSpectralAngleMapperRule : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
 		RSGISSpectralAngleMapperRule(int numOutBands, gsl_matrix *refSpectra);
@@ -54,7 +54,7 @@ namespace rsgis { namespace classifier {
 		gsl_matrix *refSpectra;
 	};
 	
-	class RSGISSpectralAngleMapperED : public rsgis::img::RSGISCalcImageValue
+	class DllExport RSGISSpectralAngleMapperED : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
 		RSGISSpectralAngleMapperED(int numOutBands, gsl_matrix *refSpectra);
@@ -74,7 +74,7 @@ namespace rsgis { namespace classifier {
 	};
 	
 	/// Classify rule image produced by SAM
-	class RSGISSpectralAngleMapperClassifier : public rsgis::img::RSGISCalcImageValue
+	class DllExport RSGISSpectralAngleMapperClassifier : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
 		RSGISSpectralAngleMapperClassifier(int numOutBands, double threashold);

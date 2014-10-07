@@ -35,7 +35,7 @@ namespace rsgis
 {
 	namespace math
 	{        
-		class RSGISSingularValueDecomposition
+		class DllExport RSGISSingularValueDecomposition
         /// Class to preform singular value decomposition on a matrix using the GSL library
         /**
          *Versions to comptute using the RSGIS standard of matrix and GSL standard are included.

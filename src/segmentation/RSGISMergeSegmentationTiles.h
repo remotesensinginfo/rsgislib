@@ -40,7 +40,7 @@
 
 namespace rsgis{namespace segment{
 
-    class RSGISMergeSegmentationTiles
+    class DllExport RSGISMergeSegmentationTiles
     {
     public:
         RSGISMergeSegmentationTiles();

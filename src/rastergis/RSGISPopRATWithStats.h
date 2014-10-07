@@ -46,7 +46,7 @@
 
 namespace rsgis{namespace rastergis{
 	
-    struct RSGISBandAttStats
+    struct DllExport RSGISBandAttStats
     {
         unsigned int band;
         bool calcMin;
@@ -71,14 +71,14 @@ namespace rsgis{namespace rastergis{
         unsigned int sumLocalIdx;
     };
     
-    struct RSGISBandAttPercentiles
+    struct DllExport RSGISBandAttPercentiles
     {
         float percentile;
         std::string fieldName;
         unsigned int fieldIdx;
     };
     
-    class RSGISPopRATWithStats
+    class DllExport RSGISPopRATWithStats
     {
     public:
         RSGISPopRATWithStats();
@@ -88,7 +88,7 @@ namespace rsgis{namespace rastergis{
         ~RSGISPopRATWithStats();
     };
     
-    class RSGISCalcClusterPxlValueStats : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISCalcClusterPxlValueStats : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
 		RSGISCalcClusterPxlValueStats(double **statsData, std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats, bool *firstVal, unsigned int ratBand);
@@ -110,7 +110,7 @@ namespace rsgis{namespace rastergis{
         unsigned int ratBand;
     };
     
-    class RSGISCalcClusterPxlValueStdDev : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISCalcClusterPxlValueStdDev : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
 		RSGISCalcClusterPxlValueStdDev(double **stdDevData, double **statsData, std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats, bool *firstVal, unsigned int ratBand);
@@ -134,7 +134,7 @@ namespace rsgis{namespace rastergis{
 	};
     
     
-    class RSGISCalcClusterPxlValueHistograms : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISCalcClusterPxlValueHistograms : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
 		RSGISCalcClusterPxlValueHistograms(unsigned int **clumpHistData, double *binBounds, unsigned int numBins, unsigned int ratBand, unsigned int imgBand);
@@ -159,7 +159,7 @@ namespace rsgis{namespace rastergis{
     
     
     
-    class RSGISCalcClusterPxlValueStatsMeanLit : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISCalcClusterPxlValueStatsMeanLit : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
 		RSGISCalcClusterPxlValueStatsMeanLit(double **statsData, double *pxlCount, double *meanLitColVals, unsigned int meanLitBandArrIdx, std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats, bool *firstVal, unsigned int ratBand);
@@ -184,7 +184,7 @@ namespace rsgis{namespace rastergis{
         unsigned int ratBand;
     };
     
-    class RSGISCalcClusterPxlValueStdDevMeanLit : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISCalcClusterPxlValueStdDevMeanLit : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
 		RSGISCalcClusterPxlValueStdDevMeanLit(double **stdDevData, double **statsData, double *pxlCount, double *meanLitColVals, unsigned int meanLitBandArrIdx, std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats, bool *firstVal, unsigned int ratBand);

@@ -43,7 +43,7 @@
 
 namespace rsgis{namespace vec{
 	
-	struct CountAttributes
+	struct DllExport CountAttributes
 	{
         std::string name;
 		int numBands;
@@ -51,7 +51,7 @@ namespace rsgis{namespace vec{
 		float *thresholds;
 	};
 	
-	class RSGISZonalCountStats : public RSGISProcessOGRFeature
+	class DllExport RSGISZonalCountStats : public RSGISProcessOGRFeature
 		{
 		public:
 			RSGISZonalCountStats(GDALDataset *image, GDALDataset *rasterFeatures, CountAttributes** attributes, int numAttributes, bool outPxlCount, bool outEmptyCount);
@@ -72,7 +72,7 @@ namespace rsgis{namespace vec{
 		};
 	
 	
-	class RSGISCalcZonalCountFromRasterPolygon : public rsgis::img::RSGISCalcImageSingleValue
+	class DllExport RSGISCalcZonalCountFromRasterPolygon : public rsgis::img::RSGISCalcImageSingleValue
 		{
 		public: 
 			RSGISCalcZonalCountFromRasterPolygon(int numOutputValues, CountAttributes **attributes, int numAttributes);

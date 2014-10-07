@@ -34,7 +34,7 @@ namespace rsgis
 {
 	namespace radar
 	{        
-		class RSGISSoilDielectricMixingModel
+		class DllExport RSGISSoilDielectricMixingModel
 			{
 			/**
 			 * This class implemnets the dielectic mixing model from the following refference to calculate the complex dielectic of soil:<br>

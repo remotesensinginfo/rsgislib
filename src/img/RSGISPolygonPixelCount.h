@@ -31,7 +31,7 @@
 
 namespace rsgis{namespace img{
 	
-	class RSGISPolygonPixelCount : public RSGISCalcImageSingleValue
+	class DllExport RSGISPolygonPixelCount : public RSGISCalcImageSingleValue
 		{
 		public:
 			RSGISPolygonPixelCount(int numOutputValues);

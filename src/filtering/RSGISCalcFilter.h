@@ -28,7 +28,7 @@
 
 namespace rsgis{namespace filter{
 	
-	class RSGISCalcFilter
+	class DllExport RSGISCalcFilter
 		{
 		public: 
 			RSGISCalcFilter(){};

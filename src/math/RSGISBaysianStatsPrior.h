@@ -34,7 +34,7 @@ namespace rsgis
 {
 	namespace math
 	{        
-		class RSGISBaysianStatsPrior			
+		class DllExport RSGISBaysianStatsPrior			
 			{
 			public:
 				RSGISBaysianStatsPrior(RSGISMathFunction *function, RSGISProbDistro *probDist , double variance, double interval, double minVal, double maxVal, double lowerLimit, double upperLimit, deltatypedef deltatype) throw(RSGISBaysianStatsException);

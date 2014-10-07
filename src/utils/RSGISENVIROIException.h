@@ -28,7 +28,7 @@
 
 namespace rsgis{namespace utils	{
     
-    class RSGISENVIROIException : public rsgis::RSGISException
+    class DllExport RSGISENVIROIException : public rsgis::RSGISException
         {
         public:
             RSGISENVIROIException();

@@ -52,7 +52,7 @@
 
 namespace rsgis{namespace geom{
 	
-	class RSGISIdentifyNonConvexPolygonsSnakes : public RSGISIdentifyNonConvexPolygons
+	class DllExport RSGISIdentifyNonConvexPolygonsSnakes : public RSGISIdentifyNonConvexPolygons
 		{
 		public:
 			RSGISIdentifyNonConvexPolygonsSnakes(double resolution, OGRSpatialReference* spatialRef, double alpha, double beta, double gamma, double delta, int maxNumIterations);
@@ -81,7 +81,7 @@ namespace rsgis{namespace geom{
 		};
 	
 	
-	class RSGISSnakeNonConvexGlobalOptimisationFunction : public rsgis::math::RSGISGlobalOptimisationFunction
+	class DllExport RSGISSnakeNonConvexGlobalOptimisationFunction : public rsgis::math::RSGISGlobalOptimisationFunction
 		{
 		public:
 			RSGISSnakeNonConvexGlobalOptimisationFunction(GDALDataset *image, double alpha, double beta, double gamma);
@@ -100,7 +100,7 @@ namespace rsgis{namespace geom{
 			double gamma;
 		};
 	
-	class RSGISSnakeNonConvexLineProjGlobalOptimisationFunction : public rsgis::math::RSGISGlobalOptimisationFunction
+	class DllExport RSGISSnakeNonConvexLineProjGlobalOptimisationFunction : public rsgis::math::RSGISGlobalOptimisationFunction
 		{
 		public:
 			RSGISSnakeNonConvexLineProjGlobalOptimisationFunction(GDALDataset *image, double alpha, double beta, double gamma, double delta, std::vector<geos::geom::LineSegment*> *lines);

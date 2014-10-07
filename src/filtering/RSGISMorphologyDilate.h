@@ -35,7 +35,7 @@
 
 namespace rsgis{namespace filter{
     
-    class RSGISImageMorphologyDilate
+    class DllExport RSGISImageMorphologyDilate
     {
     public:
         RSGISImageMorphologyDilate();
@@ -44,7 +44,7 @@ namespace rsgis{namespace filter{
         ~RSGISImageMorphologyDilate(){};
     };
     
-    class RSGISMorphologyDilate : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISMorphologyDilate : public rsgis::img::RSGISCalcImageValue
     {
     public: 
         RSGISMorphologyDilate(int numberOutBands, rsgis::math::Matrix *matrixOperator); 			
@@ -64,7 +64,7 @@ namespace rsgis{namespace filter{
         rsgis::math::Matrix *matrixOperator;
     };
     
-    class RSGISMorphologyDilateAll : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISMorphologyDilateAll : public rsgis::img::RSGISCalcImageValue
     {
     public: 
         RSGISMorphologyDilateAll(int numberOutBands, rsgis::math::Matrix *matrixOperator); 			

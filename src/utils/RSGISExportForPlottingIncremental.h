@@ -37,7 +37,7 @@
 
 namespace rsgis{namespace utils{
     
-	class RSGISExportForPlottingIncremental
+	class DllExport RSGISExportForPlottingIncremental
 	{
 	public:
 		RSGISExportForPlottingIncremental();

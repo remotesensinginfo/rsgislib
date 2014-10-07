@@ -29,7 +29,7 @@
 
 namespace rsgis{namespace datastruct{
     
-    class RSGISListException : public rsgis::RSGISException
+    class DllExport RSGISListException : public rsgis::RSGISException
         {
         public:
             RSGISListException();

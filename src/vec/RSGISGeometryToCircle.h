@@ -46,7 +46,7 @@
 
 namespace rsgis{namespace vec{
 
-	class RSGISGeometryToCircle : public RSGISProcessOGRFeature
+	class DllExport RSGISGeometryToCircle : public RSGISProcessOGRFeature
 		{
 			enum calcOptions
 			{

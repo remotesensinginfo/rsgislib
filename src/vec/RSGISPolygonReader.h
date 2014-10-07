@@ -43,7 +43,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISPolygonReader : public RSGISProcessOGRFeature
+	class DllExport RSGISPolygonReader : public RSGISProcessOGRFeature
 		{
 		public:
 			RSGISPolygonReader(std::list<rsgis::geom::RSGIS2DPoint*> *data);

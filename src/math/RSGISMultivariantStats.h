@@ -29,7 +29,7 @@
 
 namespace rsgis{namespace math{
     	
-	class RSGISMultivariantStats
+	class DllExport RSGISMultivariantStats
 		{
 		public:
 			RSGISMultivariantStats();

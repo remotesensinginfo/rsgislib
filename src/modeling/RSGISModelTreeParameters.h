@@ -32,7 +32,7 @@
 namespace rsgis { namespace modeling {
     
 	/// Abstract tree class
-	class RSGISTree 
+	class DllExport RSGISTree 
 	{
 	public:
 		RSGISTree(){};
@@ -61,7 +61,7 @@ namespace rsgis { namespace modeling {
 	 *  Dwyer et al. Carbon for conservation: Assessing the potential for win–win investment in an extensive …. Agriculture (2009)
 	 *  http://linkinghub.elsevier.com/retrieve/pii/S0167880909001741
 	 */
-	class RSGISAcaciaHarpophylla : public RSGISTree 
+	class DllExport RSGISAcaciaHarpophylla : public RSGISTree 
 	{
 	public:
 		RSGISAcaciaHarpophylla(double treeHeight);

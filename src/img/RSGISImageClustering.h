@@ -39,7 +39,7 @@
 
 namespace rsgis{namespace img{
     
-    class RSGISImageClustering
+    class DllExport RSGISImageClustering
     {
     public:
         RSGISImageClustering();

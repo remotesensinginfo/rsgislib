@@ -33,7 +33,7 @@ namespace rsgis
 	namespace modeling
 	{
 		/// Exception for modelling class
-		class RSGISModelingException : public rsgis::RSGISException
+		class DllExport RSGISModelingException : public rsgis::RSGISException
 		{
 		public:
 			RSGISModelingException();

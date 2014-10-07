@@ -39,7 +39,7 @@
 
 namespace rsgis{ namespace utils{
     
-	struct PlotPoly
+	struct DllExport PlotPoly
 	{
 		int fid;
 		int zone;
@@ -57,7 +57,7 @@ namespace rsgis{ namespace utils{
 		std::string issues;
 	};
 	
-	class RSGISPlotPolygonsCSVParse
+	class DllExport RSGISPlotPolygonsCSVParse
 	{
 		public:
 			RSGISPlotPolygonsCSVParse();

@@ -40,11 +40,11 @@
 
 namespace rsgis{namespace reg{
     
-	class RSGISSingleConnectLayerImageRegistration : public RSGISImageRegistration
+	class DllExport RSGISSingleConnectLayerImageRegistration : public RSGISImageRegistration
 	{
 	public:
 		
-		struct TiePointInSingleLayer
+		struct DllExport TiePointInSingleLayer
 		{
 			TiePoint *tiePt;
 			std::list<TiePoint*> *nrTiePts;

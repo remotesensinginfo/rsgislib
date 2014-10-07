@@ -30,9 +30,11 @@
 
 #include "utils/RSGISAllometricSpecies.h"
 
+#include "common/RSGISCommons.h"
+
 namespace rsgis{namespace utils{
         
-    class RSGISAllometricEquations
+    class DllExport RSGISAllometricEquations
         {
         public:
             RSGISAllometricEquations();

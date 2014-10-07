@@ -42,7 +42,7 @@ namespace rsgis { namespace img {
         
     };
     
-	class RSGISImageComposite : public RSGISCalcImageValue
+	class DllExport RSGISImageComposite : public RSGISCalcImageValue
 	{
 
 	public: 

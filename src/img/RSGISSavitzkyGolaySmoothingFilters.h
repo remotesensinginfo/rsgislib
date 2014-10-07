@@ -49,7 +49,7 @@ namespace rsgis{namespace img{
 	 *
 	 */
 	
-	class RSGISSavitzkyGolaySmoothingFilters : public RSGISCalcImageValue
+	class DllExport RSGISSavitzkyGolaySmoothingFilters : public RSGISCalcImageValue
 	{
 	public: 
 		RSGISSavitzkyGolaySmoothingFilters(int numberOutBands, int order, int window, rsgis::math::Vector *imagebandValues);

@@ -37,7 +37,7 @@
 
 namespace rsgis{namespace utils{
         
-    class RSGISExportForPlotting
+    class DllExport RSGISExportForPlotting
         {
         public: 
             static RSGISExportForPlotting* getInstance(std::string filepath);

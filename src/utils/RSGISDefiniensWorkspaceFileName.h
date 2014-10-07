@@ -32,7 +32,7 @@
 
 namespace rsgis{namespace utils{
         
-    class RSGISDefiniensWorkspaceFileName
+    class DllExport RSGISDefiniensWorkspaceFileName
         {
         public:
             RSGISDefiniensWorkspaceFileName(std::string filename);

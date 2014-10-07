@@ -35,7 +35,7 @@
 
 namespace rsgis{namespace filter{
     
-    class RSGISImageMorphologyFindExtrema
+    class DllExport RSGISImageMorphologyFindExtrema
     {
     public:
         enum RSGISMinimaOutputs
@@ -49,7 +49,7 @@ namespace rsgis{namespace filter{
         ~RSGISImageMorphologyFindExtrema(){};
     };
     
-    class RSGISMorphologyFindLocalMinima : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISMorphologyFindLocalMinima : public rsgis::img::RSGISCalcImageValue
     {
     public: 
         RSGISMorphologyFindLocalMinima(int numberOutBands, rsgis::math::Matrix *matrixOperator, RSGISImageMorphologyFindExtrema::RSGISMinimaOutputs outputType, bool allowEquals); 			
@@ -72,7 +72,7 @@ namespace rsgis{namespace filter{
         unsigned long *outVal;
     };
     
-    class RSGISMorphologyFindLocalMinimaAll : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISMorphologyFindLocalMinimaAll : public rsgis::img::RSGISCalcImageValue
     {
     public: 
         RSGISMorphologyFindLocalMinimaAll(int numberOutBands, rsgis::math::Matrix *matrixOperator, RSGISImageMorphologyFindExtrema::RSGISMinimaOutputs outputType, bool allowEquals); 			

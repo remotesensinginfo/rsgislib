@@ -113,7 +113,7 @@ namespace rsgis { namespace img {
     };
     
     
-    class RSGISPopWithStats
+    class DllExport RSGISPopWithStats
     {
     public:
         void addpyramid( GDALDataset *handle );

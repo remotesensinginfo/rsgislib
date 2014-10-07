@@ -46,7 +46,7 @@
 
 namespace rsgis{namespace rastergis{
     
-    class RSGISExportColumns2ImageCalcImage : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISExportColumns2ImageCalcImage : public rsgis::img::RSGISCalcImageValue
 	{
 	public: 
 		RSGISExportColumns2ImageCalcImage(int numberOutBands, GDALRasterAttributeTable *attTable, unsigned int columnIndex);

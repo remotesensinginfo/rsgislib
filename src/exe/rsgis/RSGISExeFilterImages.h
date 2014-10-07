@@ -54,7 +54,7 @@
 
 namespace rsgisexe{
 
-class RSGISExeFilterImages : public rsgis::RSGISAlgorithmParameters
+class DllExport RSGISExeFilterImages : public rsgis::RSGISAlgorithmParameters
 	{
 	public:
 		

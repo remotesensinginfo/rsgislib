@@ -37,7 +37,7 @@ namespace rsgis {namespace radar{
 		unknown
 	};
 	
-	class RSGISEstimationOptimiser
+	class DllExport RSGISEstimationOptimiser
 	{
 	public:
 		RSGISEstimationOptimiser(){};

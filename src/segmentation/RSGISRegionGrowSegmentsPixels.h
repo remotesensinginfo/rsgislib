@@ -45,7 +45,7 @@
 
 namespace rsgis{namespace segment{
 /*
-    struct RSGISRegionGrowPxlSeeds
+    struct DllExport RSGISRegionGrowPxlSeeds
     {
         RSGISRegionGrowPxlSeeds()
         {
@@ -63,7 +63,7 @@ namespace rsgis{namespace segment{
     };
     
     
-    class RSGISRegionGrowSegmentsPixels
+    class DllExport RSGISRegionGrowSegmentsPixels
     {
     public:
         RSGISRegionGrowSegmentsPixels(GDALDataset *inRefl, GDALDataset *outDataset)throw(rsgis::RSGISImageException);
@@ -101,7 +101,7 @@ namespace rsgis{namespace segment{
     };
     
     
-    class RSGISFindRegionGrowingSeeds
+    class DllExport RSGISFindRegionGrowingSeeds
     {
     public:
         RSGISFindRegionGrowingSeeds();

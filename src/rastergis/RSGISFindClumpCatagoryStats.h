@@ -49,7 +49,7 @@
 
 namespace rsgis{namespace rastergis{
 	
-    struct CategoryField
+    struct DllExport CategoryField
     {
         size_t category;
         std::string fieldName;
@@ -58,7 +58,7 @@ namespace rsgis{namespace rastergis{
         size_t localIdx;
     };
     
-    class RSGISFindClumpCatagoryStats
+    class DllExport RSGISFindClumpCatagoryStats
     {
     public:
         RSGISFindClumpCatagoryStats();
@@ -67,7 +67,7 @@ namespace rsgis{namespace rastergis{
     };
 	
     
-    class RSGISCountNumPxlsInCats : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISCountNumPxlsInCats : public rsgis::img::RSGISCalcImageValue
 	{
 	public: 
 		RSGISCountNumPxlsInCats(size_t *catsCount, size_t minCat, size_t numCatVals, unsigned int ratBandCats);
@@ -90,7 +90,7 @@ namespace rsgis{namespace rastergis{
 	};
     
     
-    class RSGISCountNumPxlsInCatsPerClump : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISCountNumPxlsInCatsPerClump : public rsgis::img::RSGISCalcImageValue
 	{
 	public: 
 		RSGISCountNumPxlsInCatsPerClump(unsigned int **catStats, std::map<size_t,CategoryField> *cats, unsigned int ratClumpsBand, unsigned int ratCatsBand);

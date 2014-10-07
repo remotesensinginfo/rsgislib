@@ -36,7 +36,7 @@ namespace rsgis
 {
 	namespace img
 	{
-		class RSGISApplyEigenvectors : public RSGISCalcImageValue
+		class DllExport RSGISApplyEigenvectors : public RSGISCalcImageValue
 			{
 			public: 
 				RSGISApplyEigenvectors(int numberOutBands, rsgis::math::Matrix *eigenvectors);

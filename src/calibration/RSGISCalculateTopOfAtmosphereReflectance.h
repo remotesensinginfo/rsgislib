@@ -50,7 +50,7 @@ namespace rsgis{namespace calib{
         return solarDist;
     }
     
-	class RSGISCalculateTopOfAtmosphereReflectance : public rsgis::img::RSGISCalcImageValue
+	class DllExport RSGISCalculateTopOfAtmosphereReflectance : public rsgis::img::RSGISCalcImageValue
     {
     public: 
         RSGISCalculateTopOfAtmosphereReflectance(int numberOutBands, float *solarIrradiance, double distance, float solarZenith, float scaleFactor = 1);
@@ -72,7 +72,7 @@ namespace rsgis{namespace calib{
         float scaleFactor;
     };
     
-    class RSGISCalculateTOAThermalBrightness : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISCalculateTOAThermalBrightness : public rsgis::img::RSGISCalcImageValue
     {
     public:
         RSGISCalculateTOAThermalBrightness(int numberOutBands, float *k1, float *k2, float scaleFactor = 1);

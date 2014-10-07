@@ -30,7 +30,7 @@
 
 namespace rsgis{namespace math{
     	
-	class RSGISPrincipalComponentAnalysis
+	class DllExport RSGISPrincipalComponentAnalysis
 		{
 		public:
 			RSGISPrincipalComponentAnalysis(Matrix *inputData) throw(RSGISMatricesException,RSGISMultivariantStatsException);

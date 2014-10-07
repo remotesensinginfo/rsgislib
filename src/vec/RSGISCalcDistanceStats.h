@@ -40,7 +40,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISCalcMinDists2Polys : public RSGISProcessOGRFeature
+	class DllExport RSGISCalcMinDists2Polys : public RSGISProcessOGRFeature
     {
     public:
         RSGISCalcMinDists2Polys(std::vector<OGRGeometry*> *polys);

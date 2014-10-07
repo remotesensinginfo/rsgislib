@@ -36,7 +36,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISCopyCheckPolygons
+	class DllExport RSGISCopyCheckPolygons
 	{
 	public:
 		RSGISCopyCheckPolygons();

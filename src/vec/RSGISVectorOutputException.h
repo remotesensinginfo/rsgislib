@@ -30,7 +30,7 @@ namespace rsgis
 {
 	namespace vec
 	{
-		class RSGISVectorOutputException : public RSGISVectorException
+		class DllExport RSGISVectorOutputException : public RSGISVectorException
 			{
 			public:
 				RSGISVectorOutputException();

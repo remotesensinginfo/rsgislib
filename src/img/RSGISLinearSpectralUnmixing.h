@@ -50,7 +50,7 @@
 
 namespace rsgis{namespace img{
     
-    class RSGISCalcLinearSpectralUnmixing
+    class DllExport RSGISCalcLinearSpectralUnmixing
     {
     public:
         RSGISCalcLinearSpectralUnmixing(std::string gdalFormat="ENVI", GDALDataType gdalDataType=GDT_Float32, float gain=1, float offset=0);
@@ -67,7 +67,7 @@ namespace rsgis{namespace img{
     };
     
     
-    class RSGISUnconstrainedLinearSpectralUnmixing : public RSGISCalcImageValue
+    class DllExport RSGISUnconstrainedLinearSpectralUnmixing : public RSGISCalcImageValue
     {
     public: 
         RSGISUnconstrainedLinearSpectralUnmixing(int numberOutBands, gsl_matrix *endmembers, gsl_matrix *V, gsl_vector *S, gsl_vector *work, gsl_vector *b, gsl_vector *x, float gain, float offset);
@@ -93,7 +93,7 @@ namespace rsgis{namespace img{
         float offset;
     };
     
-    class RSGISPartConstrainedLinearSpectralUnmixing : public RSGISCalcImageValue
+    class DllExport RSGISPartConstrainedLinearSpectralUnmixing : public RSGISCalcImageValue
     {
     public: 
         RSGISPartConstrainedLinearSpectralUnmixing(int numberOutBands, float weight, gsl_matrix *endmembers, gsl_matrix *V, gsl_vector *S, gsl_vector *work, gsl_vector *b, gsl_vector *x, float gain, float offset);
@@ -120,7 +120,7 @@ namespace rsgis{namespace img{
         float offset;
     };
     
-    class RSGISExhaustiveLinearSpectralUnmixing : public RSGISCalcImageValue
+    class DllExport RSGISExhaustiveLinearSpectralUnmixing : public RSGISCalcImageValue
     {
     public: 
         RSGISExhaustiveLinearSpectralUnmixing(int numberOutBands, gsl_matrix *endmembers, float stepRes, float gain, float offset);

@@ -38,13 +38,13 @@
 
 namespace rsgis{namespace vec{
 	
-	struct Attribute
+	struct DllExport Attribute
 	{
         std::string name;
 		OGRFieldType type;
 	};
 	
-	class RSGISAddAttributes : public RSGISProcessOGRFeature
+	class DllExport RSGISAddAttributes : public RSGISProcessOGRFeature
 		{
 		public:
 			RSGISAddAttributes(Attribute **attributes, int numAttributes);

@@ -38,7 +38,7 @@ namespace rsgis
 {
 	namespace img
 	{
-		class RSGISAddBands
+		class DllExport RSGISAddBands
 		{
 			public:
 				RSGISAddBands();

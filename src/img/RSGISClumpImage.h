@@ -39,7 +39,7 @@ namespace rsgis
 {
 	namespace img
 	{
-        class RSGISClumpImage : public RSGISCalcImgValueAlongsideOut
+        class DllExport RSGISClumpImage : public RSGISCalcImgValueAlongsideOut
         {
         public:
             RSGISClumpImage():RSGISCalcImgValueAlongsideOut()
@@ -53,7 +53,7 @@ namespace rsgis
         };
         
         
-        class RSGISUniquePixelClumps : public RSGISCalcImageValue
+        class DllExport RSGISUniquePixelClumps : public RSGISCalcImageValue
         {
         public:
             RSGISUniquePixelClumps(bool noDataDefined, float noDataVal);

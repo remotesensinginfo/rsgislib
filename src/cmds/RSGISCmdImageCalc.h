@@ -33,14 +33,14 @@
 
 namespace rsgis{ namespace cmds {
 
-    struct VariableStruct
+    struct DllExport VariableStruct
     {
         std::string image;
         std::string name;
         int bandNum;
     };
     
-    struct ImageStatsCmds
+    struct DllExport ImageStatsCmds
 	{
 		double mean;
 		double max;

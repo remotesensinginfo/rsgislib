@@ -32,7 +32,7 @@
 
 namespace rsgis{ namespace classifier{
     
-	class RSGISNearestNeighbourClassifier : public RSGISClassifier
+	class DllExport RSGISNearestNeighbourClassifier : public RSGISClassifier
 		{
 		public:
 			RSGISNearestNeighbourClassifier(ClassData **trainingData, int numClasses)  throw(RSGISClassificationException);

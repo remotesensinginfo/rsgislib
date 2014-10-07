@@ -117,7 +117,7 @@ namespace rsgis{namespace rastergis{
         return true;
     };
     
-    class RSGISRasterAttUtils
+    class DllExport RSGISRasterAttUtils
     {
     public:
         RSGISRasterAttUtils();

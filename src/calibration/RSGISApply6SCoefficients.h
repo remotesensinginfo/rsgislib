@@ -40,7 +40,7 @@
 namespace rsgis{namespace calib{
     
     
-    struct LUT6SElevation
+    struct DllExport LUT6SElevation
     {
         float elev;
         unsigned int *imageBands;
@@ -50,7 +50,7 @@ namespace rsgis{namespace calib{
         unsigned int numValues;
     };
     
-    struct LUT6SAOT
+    struct DllExport LUT6SAOT
     {
         float aot;
         unsigned int *imageBands;
@@ -60,13 +60,13 @@ namespace rsgis{namespace calib{
         unsigned int numValues;
     };
     
-    struct LUT6SBaseElevAOT
+    struct DllExport LUT6SBaseElevAOT
     {
         float elev;
         std::vector<LUT6SAOT> aotLUT;
     };
 	    
-	class RSGISApply6SCoefficientsSingleParam : public rsgis::img::RSGISCalcImageValue
+	class DllExport RSGISApply6SCoefficientsSingleParam : public rsgis::img::RSGISCalcImageValue
     {
     public: 
         RSGISApply6SCoefficientsSingleParam(unsigned int *imageBands, float *aX, float *bX, float *cX, int numValues, float noDataVal = 0.0, bool useNoDataVal=false, float scaleFactor = 1.0);
@@ -94,7 +94,7 @@ namespace rsgis{namespace calib{
     
     
     
-    class RSGISApply6SCoefficientsElevLUTParam : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISApply6SCoefficientsElevLUTParam : public rsgis::img::RSGISCalcImageValue
     {
     public:
         RSGISApply6SCoefficientsElevLUTParam(unsigned int numOutBands, std::vector<LUT6SElevation> *lut, float noDataVal = 0.0, bool useNoDataVal=false, float scaleFactor = 1.0);
@@ -117,7 +117,7 @@ namespace rsgis{namespace calib{
     };
     
     
-    class RSGISApply6SCoefficientsElevAOTLUTParam : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISApply6SCoefficientsElevAOTLUTParam : public rsgis::img::RSGISCalcImageValue
     {
     public:
         RSGISApply6SCoefficientsElevAOTLUTParam(unsigned int numOutBands, std::vector<LUT6SBaseElevAOT> *lut, float noDataVal = 0.0, bool useNoDataVal=false, float scaleFactor = 1.0);
@@ -141,7 +141,7 @@ namespace rsgis{namespace calib{
     
     
     
-    class RSGISApply6SCoefficients : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISApply6SCoefficients : public rsgis::img::RSGISCalcImageValue
     {
 		/** Class to apply 6S coeffiecients to an image
          Coefficients are supplied for each band.

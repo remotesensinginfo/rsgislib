@@ -45,7 +45,7 @@
 
 namespace rsgis{namespace rastergis{
 
-    struct RSGISClassChangeFields
+    struct DllExport RSGISClassChangeFields
     {
         std::string name;
         int outName;
@@ -56,7 +56,7 @@ namespace rsgis{namespace rastergis{
     };
 
 
-    class RSGISFindChangeClumpsStdDevThreshold : public RSGISRATCalcValue
+    class DllExport RSGISFindChangeClumpsStdDevThreshold : public RSGISRATCalcValue
     {
     public:
         RSGISFindChangeClumpsStdDevThreshold(GDALDataset *clumpsDataset, std::string classCol, std::string changeField, std::vector<std::string> *fields,
@@ -82,7 +82,7 @@ namespace rsgis{namespace rastergis{
         unsigned int numClasses;
     };
 
-    class RSGISGetGlobalClassStats : public RSGISRATCalcValue
+    class DllExport RSGISGetGlobalClassStats : public RSGISRATCalcValue
     {
     /**
 

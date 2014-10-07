@@ -39,7 +39,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISCreateListOfAttributeValues : public RSGISProcessOGRFeature
+	class DllExport RSGISCreateListOfAttributeValues : public RSGISProcessOGRFeature
 	{
 	public:
 		RSGISCreateListOfAttributeValues(std::vector<std::string> *attributes,std::string attribute);

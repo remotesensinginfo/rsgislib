@@ -45,7 +45,7 @@
 
 namespace rsgis{namespace img{
 	
-	class RSGISCalcDist2Geom : public RSGISCalcImageValue
+	class DllExport RSGISCalcDist2Geom : public RSGISCalcImageValue
 	{
 	public: 
 		RSGISCalcDist2Geom(int numberOutBands, OGRGeometryCollection *geomCollection, OGRGeometryCollection *geomOrigCollection);
@@ -65,7 +65,7 @@ namespace rsgis{namespace img{
         OGRGeometryCollection *geomOrigCollection;
 	};
     
-    class RSGISCalcDistViaIterativeGrowth : public RSGISCalcImageValue
+    class DllExport RSGISCalcDistViaIterativeGrowth : public RSGISCalcImageValue
 	{
 	public:
 		RSGISCalcDistViaIterativeGrowth(double imgRes);

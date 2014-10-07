@@ -80,7 +80,7 @@ using namespace rsgis::geom;
 using namespace rsgis::vec;
 
 
-class RSGISExePostClassification : public RSGISAlgorithmParameters
+class DllExport RSGISExePostClassification : public RSGISAlgorithmParameters
 	{
 	public:
 
@@ -121,7 +121,7 @@ class RSGISExePostClassification : public RSGISAlgorithmParameters
 			edgelength
 		};
 
-		struct EdgeLengthPair
+		struct DllExport EdgeLengthPair
 		{
 			std::string classname;
 			float lengththreshold;

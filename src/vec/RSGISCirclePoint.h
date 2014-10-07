@@ -34,7 +34,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISCirclePoint : public RSGISPointData
+	class DllExport RSGISCirclePoint : public RSGISPointData
 		{
 		public:
 			RSGISCirclePoint(std::string radiusAttribute, std::string areaAttribute, std::string heightAttribute);

@@ -43,7 +43,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISGenerateConvexHullGroups
+	class DllExport RSGISGenerateConvexHullGroups
 	{
 	public:
 		RSGISGenerateConvexHullGroups();

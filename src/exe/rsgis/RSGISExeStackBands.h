@@ -51,7 +51,7 @@ using namespace rsgis;
 using namespace rsgis::img;
 using namespace rsgis::utils;
 
-class RSGISExeStackBands : public RSGISAlgorithmParameters
+class DllExport RSGISExeStackBands : public RSGISAlgorithmParameters
 	{
 	public:
 		RSGISExeStackBands();

@@ -46,7 +46,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISVectorZonalStats : public RSGISProcessOGRFeature
+	class DllExport RSGISVectorZonalStats : public RSGISProcessOGRFeature
 	{
 	public:
 		RSGISVectorZonalStats(GDALDataset *image, std::string outZonalFileName = "", bool useBandNames = false, bool shortenFileNames = true);

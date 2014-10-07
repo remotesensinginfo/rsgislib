@@ -42,7 +42,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISVectorBuffer : public RSGISProcessOGRGeometry
+	class DllExport RSGISVectorBuffer : public RSGISProcessOGRGeometry
 		{
 		public:
 			RSGISVectorBuffer(float buffer);

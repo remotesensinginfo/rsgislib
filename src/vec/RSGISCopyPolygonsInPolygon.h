@@ -36,7 +36,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISCopyPolygonsInPolygon
+	class DllExport RSGISCopyPolygonsInPolygon
 	{
 	public:
 		RSGISCopyPolygonsInPolygon();

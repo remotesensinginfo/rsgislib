@@ -41,7 +41,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISCopyFeatures : public RSGISProcessOGRFeature
+	class DllExport RSGISCopyFeatures : public RSGISProcessOGRFeature
 	{
 	public:
 		RSGISCopyFeatures();
@@ -52,7 +52,7 @@ namespace rsgis{namespace vec{
 	};
     
     
-    class RSGISCopyFeaturesAddFIDCol : public RSGISProcessOGRFeature
+    class DllExport RSGISCopyFeaturesAddFIDCol : public RSGISProcessOGRFeature
 	{
 	public:
 		RSGISCopyFeaturesAddFIDCol(unsigned int initFID);

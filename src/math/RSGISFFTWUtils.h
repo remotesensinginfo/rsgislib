@@ -31,7 +31,7 @@
 
 namespace rsgis{namespace math{
 	    
-	class RSGISFFTWUtils
+	class DllExport RSGISFFTWUtils
 		{
 		public:
 			RSGISFFTWUtils();

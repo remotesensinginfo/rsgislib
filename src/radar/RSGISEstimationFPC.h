@@ -33,7 +33,7 @@
 
 namespace rsgis { namespace radar{
     
-    class RSGISEstimationFPCCanopyScattering : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISEstimationFPCCanopyScattering : public rsgis::img::RSGISCalcImageValue
     {
         /// Calculate canopy scattering from FPC
         /** Takes FPC image and returns canopy scattering in HH, HV and VV.
@@ -58,7 +58,7 @@ namespace rsgis { namespace radar{
         rsgis::math::RSGISMathFunction *calcScatteringVV;
     };
     
-    class RSGISEstimationFPCCanopyAttenuation : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISEstimationFPCCanopyAttenuation : public rsgis::img::RSGISCalcImageValue
     {
     public:
         /// Calculate canopy attenuation from FPC
@@ -82,7 +82,7 @@ namespace rsgis { namespace radar{
         rsgis::math::RSGISMathFunction *calcAttenuationV;
     };
     
-    class RSGISEstimationFPCCanopyScatteringAttenuation : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISEstimationFPCCanopyScatteringAttenuation : public rsgis::img::RSGISCalcImageValue
     {
         /// Calculate canopy scattering and attenuation from FPC
         /** Takes FPC image and returns 5 band image with canopy scattering in HH, HV and VV and
@@ -109,7 +109,7 @@ namespace rsgis { namespace radar{
         rsgis::math::RSGISMathFunction *calcAttenuationV;
     };
     
-    class RSGISEstimationFPCDualPolTrunkGround : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISEstimationFPCDualPolTrunkGround : public rsgis::img::RSGISCalcImageValue
     {
         /// Calculates calcuates trunk-ground + ground return from total backscatter using FPC
         /** Takes 2 band image FPC, HH, HV
@@ -137,7 +137,7 @@ namespace rsgis { namespace radar{
         rsgis::math::RSGISMathFunction *calcAttenuationV;
     };
     
-    class RSGISEstimationFPCFullPolTrunkGroundDualPol : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISEstimationFPCFullPolTrunkGroundDualPol : public rsgis::img::RSGISCalcImageValue
     {
         /// Calculates calcuates trunk-ground + ground return from total backscatter using FPC
         /** Takes 4 band image FPC, HH, HV, VV

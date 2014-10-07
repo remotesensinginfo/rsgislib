@@ -12,12 +12,14 @@
 #include <stdio.h>
 #include <math.h>
 
+#include "common/RSGISCommons.h"
+
 #define nnls_max(a,b) ((a) >= (b) ? (a) : (b))
 #define nnls_abs(x) ((x) >= 0 ? (x) : -(x))
 
 namespace rsgis{namespace math{
         
-    class RSGISNNLS
+    class DllExport RSGISNNLS
     {
     public:
         RSGISNNLS(){};

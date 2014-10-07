@@ -47,7 +47,7 @@
 
 namespace rsgis{namespace vec{    
     /*
-	class RSGISAttCountPolyIntersect
+	class DllExport RSGISAttCountPolyIntersect
 	{
 	public:
 		RSGISAttCountPolyIntersect();
@@ -58,7 +58,7 @@ namespace rsgis{namespace vec{
 	};
     
     
-    class RSGISCalcValueCountInAttTable : public rsgis::img::RSGISCalcImageValue
+    class DllExport RSGISCalcValueCountInAttTable : public rsgis::img::RSGISCalcImageValue
     {
     public: 
         RSGISCalcValueCountInAttTable(rsgis::rastergis::RSGISAttributeTable *attTable, unsigned int fieldIdx);
@@ -77,7 +77,7 @@ namespace rsgis{namespace vec{
         unsigned int fieldIdx;
     };
     
-    class RSGISPopulateAttTableForPolygonIntersect
+    class DllExport RSGISPopulateAttTableForPolygonIntersect
     {
     public:
         RSGISPopulateAttTableForPolygonIntersect(RSGISCalcValueCountInAttTable *valueCalc, GDALDataset **datasets, int numDS, rsgis::img::pixelInPolyOption pixelPolyOption);

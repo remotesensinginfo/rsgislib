@@ -45,7 +45,7 @@ namespace rsgis{namespace math{
 	 * m - x axis
 	 * n - y axis
 	 */
-	struct Matrix
+	struct DllExport Matrix
 	{
 		double *matrix;
 		int m;
@@ -60,7 +60,7 @@ namespace rsgis{namespace math{
 	};
 	
 	
-	class RSGISMatrices
+	class DllExport RSGISMatrices
 		{
 		public:
 			RSGISMatrices();

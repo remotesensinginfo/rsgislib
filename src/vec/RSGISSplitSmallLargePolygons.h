@@ -37,7 +37,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISSplitSmallLargePolygons
+	class DllExport RSGISSplitSmallLargePolygons
 	{
 	public:
 		RSGISSplitSmallLargePolygons();

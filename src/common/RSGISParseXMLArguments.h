@@ -40,7 +40,7 @@
 
 namespace rsgis
 {
-	class RSGISParseXMLArguments
+	class DllExport RSGISParseXMLArguments
 		{
 		public:
 			RSGISParseXMLArguments(std::string xmlFile);

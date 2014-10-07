@@ -46,7 +46,7 @@
 
 namespace rsgis{namespace vec{
 	
-	class RSGISPolygonData
+	class DllExport RSGISPolygonData
 		{
 		public:
 			RSGISPolygonData();

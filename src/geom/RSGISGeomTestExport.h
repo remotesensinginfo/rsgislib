@@ -45,7 +45,7 @@
 #include "utils/RSGISFileUtils.h"
 
 namespace rsgis{namespace geom{
-	class RSGISGeomTestExport
+	class DllExport RSGISGeomTestExport
 		{
 		public:
 			RSGISGeomTestExport();

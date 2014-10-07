@@ -39,7 +39,7 @@
 
 namespace rsgis{namespace img{
 
-	class RSGISCalculateImageMovementSpeed : public RSGISCalcImageValue
+	class DllExport RSGISCalculateImageMovementSpeed : public RSGISCalcImageValue
 	{
 	public:
 		RSGISCalculateImageMovementSpeed(int numberOutBands, int numImages, unsigned int *imageBands, float *times, float upper, float lower);
