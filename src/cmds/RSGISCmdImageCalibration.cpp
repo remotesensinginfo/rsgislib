@@ -886,6 +886,66 @@ namespace rsgis{ namespace cmds {
         }
     }
 
+                
+    void executeConvertSPOT5ToRadiance(std::string inputImage, std::string outputImage, std::string gdalFormat, std::vector<CmdsSPOTRadianceGainsOffsets> spot5RadGainOffs)throw(RSGISCmdException)
+    {
+        GDALAllRegister();
+        
+        try
+        {
+            unsigned int numBands = spot5RadGainOffs.size();
+            std::cout << "Opening: " << inputImage << std::endl;
+            GDALDataset *inDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+            if(inDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw RSGISImageException(message.c_str());
+            }
+            
+            if(inDataset->GetRasterCount() != numBands)
+            {
+                std::cerr << "Number of input coefficients = " << numBands << std::endl;
+                std::cerr << "Number of input image bands = " << inDataset->GetRasterCount() << std::endl;
+                throw RSGISImageException("The number of band coefficients needs to equal the number input image bands.");
+            }
+            
+            std::string *outBandNames = new std::string[numBands];
+            
+            rsgis::calib::SPOTRadianceGainsOffsets *spot5RadGainOffsInternal = new rsgis::calib::SPOTRadianceGainsOffsets[numBands];
+            
+            unsigned int i = 0;
+            for(std::vector<rsgis::cmds::CmdsSPOTRadianceGainsOffsets>::iterator iterBands = spot5RadGainOffs.begin(); iterBands != spot5RadGainOffs.end(); ++iterBands)
+            {
+                spot5RadGainOffsInternal[i].band = (*iterBands).band;
+                spot5RadGainOffsInternal[i].gain = (*iterBands).gain;
+                spot5RadGainOffsInternal[i].bias = (*iterBands).bias;
+                
+                outBandNames[i] = (*iterBands).bandName;
+                ++i;
+            }
+            
+            rsgis::calib::RSGISSPOTRadianceCalibration *radianceCalibration = new rsgis::calib::RSGISSPOTRadianceCalibration(numBands, spot5RadGainOffsInternal);
+            rsgis::img::RSGISCalcImage *calcImage = new rsgis::img::RSGISCalcImage(radianceCalibration, "", true);
+            
+            calcImage->calcImage(&inDataset, 1, outputImage, true, outBandNames, gdalFormat);
+            
+            GDALClose(inDataset);
+            delete[] spot5RadGainOffsInternal;
+            delete[] outBandNames;
+            
+            delete radianceCalibration;
+            delete calcImage;
+        }
+        catch(RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+                
     
 }}
 

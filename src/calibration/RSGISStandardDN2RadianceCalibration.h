@@ -60,8 +60,8 @@ namespace rsgis{namespace calib{
     
     struct DllExport SPOTRadianceGainsOffsets
     {
-        std::string bandName;
         unsigned int band;
+        float bias;
         float gain;
     };
     

@@ -174,9 +174,6 @@ set(GEOS_LIB_PATH /usr/local/lib CACHE PATH "Library PATH for GEOS")
 set(XERCESC_INCLUDE_DIR /usr/local/include CACHE PATH "Include PATH for Xerces-c")
 set(XERCESC_LIB_PATH /usr/local/lib CACHE PATH "Library PATH for Xerces-c")
 
-set(FFTW_INCLUDE_DIR /usr/local/include CACHE PATH "Include PATH for FFTW")
-set(FFTW_LIB_PATH /usr/local/lib CACHE PATH "Library PATH for FFTW")
-
 set(MUPARSER_INCLUDE_DIR /usr/local/include CACHE PATH "Include PATH for MU Parser")
 set(MUPARSER_LIB_PATH /usr/local/lib CACHE PATH "Library PATH for MU Parser")
 
@@ -313,9 +310,6 @@ set(GSL_LIBRARIES -L${GSL_LIB_PATH} -lgsl -lgslcblas)
 
 include_directories(${XERCESC_INCLUDE_DIR})
 set(XERCESC_LIBRARIES -L${XERCESC_LIB_PATH} -lxerces-c)
-
-include_directories(${FFTW_INCLUDE_DIR})
-set(FFTW_LIBRARIES -L${FFTW_LIB_PATH} -lfftw3)
 
 include_directories(${MUPARSER_INCLUDE_DIR})
 set(MUPARSER_LIBRARIES -L${MUPARSER_LIB_PATH} -lmuparser)

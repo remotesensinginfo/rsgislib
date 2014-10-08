@@ -139,6 +139,7 @@ void RSGISExeFFTUtils::runAlgorithm() throw(RSGISException)
 	{
 		if(option == RSGISExeFFTUtils::fftImage)
 		{
+            /*
 			GDALAllRegister();
 			GDALDataset **datasets = NULL;
 			
@@ -182,9 +183,11 @@ void RSGISExeFFTUtils::runAlgorithm() throw(RSGISException)
 			delete img2matrix;
 			delete calcImage;
 			GDALClose(datasets[0]);
+             */
 		}
 		else if(option == RSGISExeFFTUtils::fftMatrix)
 		{
+            /*
 			GDALAllRegister();
 			GDALDataset **datasets = NULL;
 			
@@ -231,9 +234,11 @@ void RSGISExeFFTUtils::runAlgorithm() throw(RSGISException)
 			{
 				throw RSGISException(e.what());
 			}
+             */
 		}
 		else if(option == RSGISExeFFTUtils::sizeAngleMatrix)
 		{
+            /*
 			RSGISFFTProcessing fftProcessing;
 			RSGISFFTWUtils fftwUtils;
 			RSGISMatrices matrixUtils;
@@ -253,9 +258,11 @@ void RSGISExeFFTUtils::runAlgorithm() throw(RSGISException)
 			{
 				throw RSGISException(e.what());
 			}
+             */
 		}
 		else if(option == RSGISExeFFTUtils::sizeAngleImage)
 		{
+            /*
 			GDALAllRegister();
 			GDALDataset **datasets = NULL;
 			
@@ -310,9 +317,11 @@ void RSGISExeFFTUtils::runAlgorithm() throw(RSGISException)
 			{
 				throw RSGISException(e.what());
 			}
+             */
 		}
 		else if(option == RSGISExeFFTUtils::sizeAngleFFT)
 		{
+            /*
 			GDALAllRegister();
 			GDALDataset **datasets = NULL;
 			
@@ -357,9 +366,11 @@ void RSGISExeFFTUtils::runAlgorithm() throw(RSGISException)
 			{
 				throw RSGISException(e.what());
 			}
+             */
 		}
 		else if(option == RSGISExeFFTUtils::shiftFFTW)
 		{
+            /*
 			GDALAllRegister();
 			GDALDataset **datasets = NULL;
 			
@@ -406,6 +417,7 @@ void RSGISExeFFTUtils::runAlgorithm() throw(RSGISException)
 			{
 				throw RSGISException(e.what());
 			}
+             */
 		}
 		else
 		{

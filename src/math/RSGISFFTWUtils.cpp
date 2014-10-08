@@ -29,7 +29,7 @@ namespace rsgis{namespace math{
 	{
 		
 	}
-	
+	/*
 	Matrix* RSGISFFTWUtils::computeFFTW(Matrix *inputData)
 	{
 		RSGISMatrices matrixUtils;
@@ -213,7 +213,7 @@ namespace rsgis{namespace math{
 			}
 		}
 	}
-	
+	*/
 	RSGISFFTWUtils::~RSGISFFTWUtils()
 	{
 		

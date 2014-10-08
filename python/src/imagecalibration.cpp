@@ -1102,6 +1102,100 @@ static PyObject *ImageCalibration_worldview2ToRadiance(PyObject *self, PyObject 
     Py_RETURN_NONE;
 }
 
+static PyObject *ImageCalibration_spot5ToRadiance(PyObject *self, PyObject *args)
+{
+    const char *pszInputFile, *pszOutputFile, *pszGDALFormat;
+    PyObject *pBandDefnObj;
+    if( !PyArg_ParseTuple(args, "sssO:spot5ToRadiance", &pszInputFile, &pszOutputFile, &pszGDALFormat, &pBandDefnObj))
+    {
+        return NULL;
+    }
+    
+    if( !PySequence_Check(pBandDefnObj))
+    {
+        PyErr_SetString(GETSTATE(self)->error, "Last argument must be a sequence");
+        return NULL;
+    }
+    
+    Py_ssize_t nBandDefns = PySequence_Size(pBandDefnObj);
+    std::vector<rsgis::cmds::CmdsSPOTRadianceGainsOffsets> spot5RadGainOffs;
+    spot5RadGainOffs.reserve(nBandDefns);
+    
+    for( Py_ssize_t n = 0; n < nBandDefns; n++ )
+    {
+        PyObject *o = PySequence_GetItem(pBandDefnObj, n);
+        
+        PyObject *pBandName = PyObject_GetAttrString(o, "bandName");
+        if( ( pBandName == NULL ) || ( pBandName == Py_None ) || !RSGISPY_CHECK_STRING(pBandName) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Could not find string attribute \'bandName\'" );
+            Py_XDECREF(pBandName);
+            Py_DECREF(o);
+            return NULL;
+        }
+        
+        PyObject *pBandIndex = PyObject_GetAttrString(o, "bandIndex");
+        if( ( pBandIndex == NULL ) || ( pBandIndex == Py_None ) || !RSGISPY_CHECK_INT(pBandIndex) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Could not find integer attribute \'bandIndex\'" );
+            Py_DECREF(pBandName);
+            Py_XDECREF(pBandIndex);
+            Py_DECREF(o);
+            return NULL;
+        }
+        
+        PyObject *pGain = PyObject_GetAttrString(o, "gain");
+        if( ( pGain == NULL ) || ( pGain == Py_None ) || !RSGISPY_CHECK_FLOAT(pGain) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'gain\'" );
+            Py_DECREF(pBandName);
+            Py_XDECREF(pBandIndex);
+            Py_XDECREF(pGain);
+            Py_DECREF(o);
+            return NULL;
+        }
+        
+        PyObject *pBias = PyObject_GetAttrString(o, "bias");
+        if( ( pBias == NULL ) || ( pBias == Py_None ) || !RSGISPY_CHECK_FLOAT(pBias) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'bias\'" );
+            Py_DECREF(pBandName);
+            Py_XDECREF(pBandIndex);
+            Py_XDECREF(pGain);
+            Py_XDECREF(pBias);
+            Py_DECREF(o);
+            return NULL;
+        }
+        
+        
+        rsgis::cmds::CmdsSPOTRadianceGainsOffsets radVals;
+        radVals.bandName = RSGISPY_STRING_EXTRACT(pBandName);
+        radVals.band = RSGISPY_INT_EXTRACT(pBandIndex);
+        radVals.gain = RSGISPY_FLOAT_EXTRACT(pGain);
+        radVals.bias = RSGISPY_FLOAT_EXTRACT(pBias);
+        
+        spot5RadGainOffs.push_back(radVals);
+        
+        Py_DECREF(pBandName);
+        Py_XDECREF(pBandIndex);
+        Py_XDECREF(pGain);
+        Py_XDECREF(pBias);
+        Py_DECREF(o);
+    }
+    
+    try
+    {
+        rsgis::cmds::executeConvertSPOT5ToRadiance(std::string(pszInputFile), std::string(pszOutputFile), std::string(pszGDALFormat), spot5RadGainOffs);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 
 // Our list of functions in this module
 static PyMethodDef ImageCalibrationMethods[] = {
@@ -1317,6 +1411,23 @@ static PyMethodDef ImageCalibrationMethods[] = {
     "   * bandIndex - Index (starting from 1) of the band in the image file.\n"
     "   * absCalFact - ABSCALFACTOR value from WorldView2 XML header.\n"
     "   * effBandWidth - EFFECTIVEBANDWIDTH value from WorldView2 XML header.\n"
+    "\n"},
+    
+{"spot5ToRadiance", ImageCalibration_spot5ToRadiance, METH_VARARGS,
+    "imagecalibration.spot5ToRadiance(inputImage, outputImage, gdalformat, bandDefnSeq)\n"
+    "Converts WorldView2 DN values to at sensor radiance.\n"
+    "Where:\n"
+    "\n"
+    "* inputImage is a string containing the name of the input file\n"
+    "* outputImage is a string containing the name of the output file\n"
+    "* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+    "* bandDefnSeq is a sequence of rsgislib.imagecalibration.CmdsSPOT5RadianceGainsOffsets objects that define the inputs\n"
+    "Requires:\n"
+    "\n"
+    "   * bandName - Name of image band in output file.\n"
+    "   * bandIndex - Index (starting from 1) of the band in the image file.\n"
+    "   * gain - PHYSICAL_GAIN value from SPOT5 XML header.\n"
+    "   * bias - PHYSICAL_BIAS value from SPOT5 XML header.\n"
     "\n"},
 
     {NULL}        /* Sentinel */
