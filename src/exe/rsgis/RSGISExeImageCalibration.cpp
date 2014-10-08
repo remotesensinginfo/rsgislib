@@ -1321,19 +1321,6 @@ void RSGISExeImageCalibration::retrieveParameters(xercesc::DOMElement *argElemen
             {
                 bandElement = static_cast<xercesc::DOMElement*>(bandsNodesList->item(i));
                 
-                XMLCh *bandNameXMLStr = xercesc::XMLString::transcode("name");
-                if(bandElement->hasAttribute(bandNameXMLStr))
-                {
-                    char *charValue = xercesc::XMLString::transcode(bandElement->getAttribute(bandNameXMLStr));
-                    this->spotRadGainOffs[i].bandName = std::string(charValue);
-                    xercesc::XMLString::release(&charValue);
-                }
-                else
-                {
-                    throw rsgis::RSGISXMLArgumentsException("No \'name\' attribute was provided.");
-                }
-                xercesc::XMLString::release(&bandNameXMLStr);
-                
                 XMLCh *bandImageXMLStr = xercesc::XMLString::transcode("image");
                 if(bandElement->hasAttribute(bandImageXMLStr))
                 {
@@ -2663,7 +2650,7 @@ void RSGISExeImageCalibration::runAlgorithm() throw(rsgis::RSGISException)
 			std::cout << "Output Image: " << this->outputImage << std::endl;
 			for(unsigned int i = 0; i < numBands; ++i)
 			{
-				std::cout << i << ")\t name = " << spotRadGainOffs[i].bandName << " band = " << spotRadGainOffs[i].band << std::endl;
+				std::cout << i << ")\t band = " << spotRadGainOffs[i].band << std::endl;
 			}
             
 			GDALAllRegister();
@@ -2698,7 +2685,7 @@ void RSGISExeImageCalibration::runAlgorithm() throw(rsgis::RSGISException)
 					}
 					
 					this->spotRadGainOffs[i].band = totalNumRasterBands + this->spotRadGainOffs[i].band-1;
-					outBandNames[i] = this->spotRadGainOffs[i].bandName;
+					outBandNames[i] = "Band";
                     
 					totalNumRasterBands += numRasterBands;
 				}	

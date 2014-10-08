@@ -24,7 +24,7 @@
 #define RSGISFFTWUtils_H
 
 #include <complex>
-#include <fftw3.h>
+//#include <fftw3.h>
 #include <math.h>
 #include "RSGISMatrices.h"
 #include "RSGISMatricesException.h"
@@ -35,9 +35,11 @@ namespace rsgis{namespace math{
 		{
 		public:
 			RSGISFFTWUtils();
+            /*
 			Matrix* computeFFTW(Matrix *inputData);
 			void fftwShift(fftw_complex *in, fftw_complex *out, int width, int height);
 			void fftwShift(Matrix *in, Matrix *out);
+             */
 			~RSGISFFTWUtils();
 		};
 }}
