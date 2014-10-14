@@ -126,7 +126,7 @@ namespace rsgis{ namespace cmds {
     /** Function to generate a histogram and return it */
     unsigned int* executeGetHistogram(std::string inputImage, unsigned int imgBand, double binWidth, unsigned int *nBins, bool calcInMinMax, double *inMin, double *inMax)throw(RSGISCmdException);
     /** Function to calculate image band percentiles */
-    void executeBandPercentile(std::string inputImage, float percentile, float noDataValue, bool noDataValueSpecified, std::string outputFile)throw(RSGISCmdException);
+    std::vector<double> executeBandPercentile(std::string inputImage, float percentile, float noDataValue, bool noDataValueSpecified)throw(RSGISCmdException);
     /** Function to calculate the distance to the nearest geometry for every pixel in an image */
     void executeImageDist2Geoms(std::string inputImage, std::string inputVector, std::string imageFormat, std::string outputImage)throw(RSGISCmdException);
     /** Function to calculate correlation for windows */

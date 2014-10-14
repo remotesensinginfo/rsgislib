@@ -794,6 +794,63 @@ static PyObject *ImageCalibration_ApplySubtractOffsets(PyObject *self, PyObject 
     Py_RETURN_NONE;
 }
 
+static PyObject *ImageCalibration_ApplySubtractSingleOffsets(PyObject *self, PyObject *args)
+{
+    const char *pszInputFile, *pszOutputFile, *pszGDALFormat;
+    int nDataType, useNoDataValInt, nonNegativeInt;
+    float noDataVal, darkObjReflVal;
+    PyObject *pImageOffsetsObj;
+    
+    if( !PyArg_ParseTuple(args, "sssiiiffO:applySubtractSingleOffsets", &pszInputFile, &pszOutputFile, &pszGDALFormat, &nDataType, &nonNegativeInt, &useNoDataValInt, &noDataVal, &darkObjReflVal, &pImageOffsetsObj))
+    {
+        return NULL;
+    }
+    
+    if( !PySequence_Check(pImageOffsetsObj))
+    {
+        PyErr_SetString(GETSTATE(self)->error, "Last argument must be a sequence");
+        return NULL;
+    }
+    
+    Py_ssize_t nImageOffsDefns = PySequence_Size(pImageOffsetsObj);
+    unsigned int numImgOffsVals = nImageOffsDefns;
+    std::vector<double> imageOffsVals = std::vector<double>();
+    imageOffsVals.reserve(numImgOffsVals);
+    
+    for( Py_ssize_t n = 0; n < nImageOffsDefns; n++ )
+    {
+        PyObject *o = PySequence_GetItem(pImageOffsetsObj, n);
+        
+        PyObject *pOffset = PyObject_GetAttrString(o, "offset");
+        if( ( pOffset == NULL ) || ( pOffset == Py_None ) || !RSGISPY_CHECK_FLOAT(pOffset) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'offset\'" );
+            Py_XDECREF(pOffset);
+            Py_DECREF(o);
+            return NULL;
+        }
+        
+        imageOffsVals.push_back(RSGISPY_FLOAT_EXTRACT(pOffset));
+        
+        Py_DECREF(pOffset);
+        Py_DECREF(o);
+    }
+    
+    
+    try
+    {
+        rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
+        rsgis::cmds::executeApplySubtractSingleOffsets(std::string(pszInputFile), std::string(pszOutputFile), imageOffsVals, (bool)nonNegativeInt, std::string(pszGDALFormat), type, noDataVal, (bool)useNoDataValInt, darkObjReflVal);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 static PyObject *ImageCalibration_saturatedPixelsMask(PyObject *self, PyObject *args)
 {
     const char *pszOutputFile, *pszGDALFormat;
@@ -1327,6 +1384,23 @@ static PyMethodDef ImageCalibrationMethods[] = {
     "            * \'aX\' - A float for the aX coefficient.\n"
     "            * \'bX\' - A float for the bX coefficient.\n"
     "            * \'cX\' - A float for the cX coefficient.\n"
+    "\n"},
+    
+{"applySubtractSingleOffsets", ImageCalibration_ApplySubtractSingleOffsets, METH_VARARGS,
+    "imagecalibration.applySubtractSingleOffsets(inputFile, outputFile, gdalformat, gdaltype, nonNegative, useNoDataVal, noDataVal, darkObjReflVal, offsetsList)\n"
+    "Applies offsets from dark objects.\n"
+    //TODO: Pete add in more details here.
+    "Where:\n"
+    "\n"
+    "* inputFile is a string containing the name of the input image file\n"
+    "* outputFile is a string containing the name of the output image file\n"
+    "* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+    "* gdaltype is an containing one of the values from rsgislib.TYPE_*\n"
+    "* nonNegative is a boolean specifying whether any negative values from the offset application should be removed (i.e., set to 1; 0 being no data).\n"
+    "* useNoDataVal a boolean specifying whether a no data value is present within the input image.\n"
+    "* noDataVal is a float specifying the no data value for the input image.\n"
+    "* darkObjReflVal is a float specifying the minimum value within the reflectance value used for the dark targets used for the subtraction"
+    "* offsetsList is a list of offset values to be applied to the input image bands (specified with keyword 'offset')."
     "\n"},
     
 {"applySubtractOffsets", ImageCalibration_ApplySubtractOffsets, METH_VARARGS,

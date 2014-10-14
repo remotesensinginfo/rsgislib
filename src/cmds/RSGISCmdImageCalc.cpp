@@ -1949,10 +1949,16 @@ namespace rsgis{ namespace cmds {
         return bins;
     }
 
-    void executeBandPercentile(std::string inputImage, float percentile, float noDataValue, bool noDataValueSpecified, std::string outputFile)throw(RSGISCmdException)
+    std::vector<double> executeBandPercentile(std::string inputImage, float percentile, float noDataValue, bool noDataValueSpecified)throw(RSGISCmdException)
     {
+        std::vector<double> outVals;
         try
         {
+            if((percentile < 0) | (percentile > 1))
+            {
+                throw RSGISException("Percentile value must be between 0 - 1.");
+            }
+            
             GDALAllRegister();
             GDALDataset *imageDataset = (GDALDataset *) GDALOpenShared(inputImage.c_str(), GA_ReadOnly);
             if(imageDataset == NULL)
@@ -1965,8 +1971,17 @@ namespace rsgis{ namespace cmds {
             rsgis::img::RSGISImagePercentiles calcPercentiles;
 
             rsgis::math::Matrix *bandPercentiles = calcPercentiles.getPercentilesForAllBands(imageDataset, percentile, noDataValue, noDataValueSpecified);
-
-            matrixUtils.saveMatrix2GridTxt(bandPercentiles, outputFile);
+            
+            //std::cout << "m = " << bandPercentiles->m << std::endl;
+            //std::cout << "n = " << bandPercentiles->n << std::endl;
+            
+            for(unsigned int i = 0; i < bandPercentiles->n; ++i)
+            {
+                outVals.push_back(bandPercentiles->matrix[i]);
+            }
+            
+            //matrixUtils.printMatrix(bandPercentiles);
+            //matrixUtils.saveMatrix2GridTxt(bandPercentiles, outputFile);
             matrixUtils.freeMatrix(bandPercentiles);
 
             GDALClose(imageDataset);
@@ -1975,6 +1990,8 @@ namespace rsgis{ namespace cmds {
         {
             throw RSGISCmdException(e.what());
         }
+        
+        return outVals;
     }
 
     void executeImageDist2Geoms(std::string inputImage, std::string inputVector, std::string imageFormat, std::string outputImage)throw(RSGISCmdException)

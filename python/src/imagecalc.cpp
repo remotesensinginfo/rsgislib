@@ -1044,21 +1044,49 @@ static PyObject *ImageCalc_GetHistogram(PyObject *self, PyObject *args) {
 }
 
 static PyObject *ImageCalc_BandPercentile(PyObject *self, PyObject *args) {
-    const char *inputImage, *outputFile;
-    float percentile, noDataValue;
+    const char *inputImage;
+    float percentile;
     int noDataValueSpecified;
+    PyObject *noDataValueObj;
 
-    if(!PyArg_ParseTuple(args, "sffis:bandPercentile", &inputImage, &percentile, &noDataValue, &noDataValueSpecified, &outputFile))
+    if(!PyArg_ParseTuple(args, "sfO:bandPercentile", &inputImage, &percentile, &noDataValueObj))
+    {
         return NULL;
-
-    try {
-        rsgis::cmds::executeBandPercentile(inputImage, percentile, noDataValue, noDataValueSpecified, outputFile);
-    } catch (rsgis::cmds::RSGISCmdException &e) {
+    }
+    
+    bool haveNoDataValue = false;
+    float noDataValue = 0.0;
+    if(noDataValueObj != Py_None)
+    {
+        if(RSGISPY_CHECK_FLOAT(noDataValueObj) | RSGISPY_CHECK_INT(noDataValueObj))
+        {
+            noDataValue = RSGISPY_FLOAT_EXTRACT(noDataValueObj);
+            haveNoDataValue = true;
+        }
+    }
+    
+    PyObject *outVals = NULL;
+    try
+    {
+        std::vector<double> outPercentileVals = rsgis::cmds::executeBandPercentile(inputImage, percentile, noDataValue, haveNoDataValue);
+        
+        Py_ssize_t listLen = outPercentileVals.size();
+        outVals = PyTuple_New(listLen);
+        for(unsigned int i = 0; i < outPercentileVals.size(); ++i)
+        {
+            if(PyTuple_SetItem(outVals, i, Py_BuildValue("d", outPercentileVals.at(i))) == -1)
+            {
+                throw rsgis::cmds::RSGISCmdException("Failed to add \'percentile\' value to the list...");
+            }
+        }
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
         PyErr_SetString(GETSTATE(self)->error, e.what());
         return NULL;
     }
-
-    Py_RETURN_NONE;
+    
+    return outVals;
 }
 
 static PyObject *ImageCalc_ImageDist2Geoms(PyObject *self, PyObject *args) {
@@ -1699,14 +1727,12 @@ static PyMethodDef ImageCalcMethods[] = {
 },
 
     {"bandPercentile", ImageCalc_BandPercentile, METH_VARARGS,
-"imagecalc.bandPercentile(inputImage, percentile, noDataValue, noDataValueSpecified, outputFile)\n"
-"Calculates image band percentiles\n"
+"imagecalc.bandPercentile(inputImage, percentile, noDataValue)\n"
+"Calculates image band percentiles for the input image and results a list of values\n"
 "where:\n"
 "  * inputImage is a string containing the name of the input image file\n"
-"  * percentile is a float TODO: more info\n"
-"  * noDataValue is a float specifying the value used to represent no data\n"
-"  * noDataValueSpecified is a boolean specifying whether to use the previous noDataValue parameter\n"
-"  * outputFile is a string containing the name of the file for histogram output\n"
+"  * percentile is a float between 0 -- 1 specifying the percentile to be calculated.\n"
+"  * noDataValue is a float specifying the value used to represent no data (used None when no value is to be specified).\n"
 },
 
     {"imageDist2Geoms", ImageCalc_ImageDist2Geoms, METH_VARARGS,

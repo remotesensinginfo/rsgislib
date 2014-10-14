@@ -48,7 +48,7 @@ namespace rsgis{namespace calib{
             {
                 if(bandValues[i] != noDataVal)
                 {
-                    output[i] = bandValues[i] - bandValues[i+this->numImageBands];
+                    output[i] = (bandValues[i] - bandValues[i+this->numImageBands]) + this->darkObjReflVal;
                 }
                 else
                 {
@@ -72,6 +72,53 @@ namespace rsgis{namespace calib{
     }
     
     RSGISApplyDarkObjSubtractOffsets::~RSGISApplyDarkObjSubtractOffsets()
+    {
+        
+    }
+    
+    
+    RSGISApplyDarkObjSubtractSingleOffsets::RSGISApplyDarkObjSubtractSingleOffsets(unsigned int numImageBands, std::vector<double> offsetValues, bool nonNegative, float noDataVal, bool useNoDataVal, float darkObjReflVal):rsgis::img::RSGISCalcImageValue(numImageBands)
+    {
+        this->numImageBands = numImageBands;
+        this->nonNegative = nonNegative;
+        this->noDataVal = noDataVal;
+        this->useNoDataVal = useNoDataVal;
+        this->darkObjReflVal = darkObjReflVal;
+        this->offsetValues = offsetValues;
+    }
+    
+    void RSGISApplyDarkObjSubtractSingleOffsets::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+    {
+        for(unsigned int i = 0; i < this->numImageBands; ++i)
+        {
+            if(this->useNoDataVal)
+            {
+                if(bandValues[i] != noDataVal)
+                {
+                    output[i] = (bandValues[i] - this->offsetValues.at(i)) + this->darkObjReflVal;
+                }
+                else
+                {
+                    output[i] = noDataVal;
+                }
+            }
+            else
+            {
+                output[i] = (bandValues[i] - bandValues[i+this->numImageBands]) + this->darkObjReflVal;
+            }
+            
+            if(nonNegative)
+            {
+                if(output[i] < 0)
+                {
+                    output[i] = 1.0;
+                }
+            }
+        }
+        
+    }
+    
+    RSGISApplyDarkObjSubtractSingleOffsets::~RSGISApplyDarkObjSubtractSingleOffsets()
     {
         
     }

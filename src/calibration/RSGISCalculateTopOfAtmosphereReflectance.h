@@ -35,6 +35,8 @@
 #include "img/RSGISCalcImageValue.h"
 #include "img/RSGISCalcImage.h"
 
+#include "boost/date_time/gregorian/gregorian.hpp"
+
 namespace rsgis{namespace calib{
     
     inline double rsgisCalcSolarDistance(int julianDay)throw(rsgis::RSGISException)
@@ -48,6 +50,13 @@ namespace rsgis{namespace calib{
         //cout << "cos(radiansJulianDay) = " << cos(radiansJulianDay) << endl;
         double solarDist = 1 - 0.01672 * cos(radiansJulianDay);
         return solarDist;
+    }
+    
+    inline unsigned int rsgisGetJulianDay(unsigned int day, unsigned int month, unsigned int year)throw(rsgis::RSGISException)
+    {
+        boost::gregorian::date d(year,month,day);
+        int julianDay = d.julian_day();
+        return julianDay;
     }
     
 	class DllExport RSGISCalculateTopOfAtmosphereReflectance : public rsgis::img::RSGISCalcImageValue
@@ -70,6 +79,7 @@ namespace rsgis{namespace calib{
         double distance;
         float solarZenith;
         float scaleFactor;
+        double distSq;
     };
     
     class DllExport RSGISCalculateTOAThermalBrightness : public rsgis::img::RSGISCalcImageValue
