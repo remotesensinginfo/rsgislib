@@ -31,6 +31,7 @@ namespace rsgis{namespace calib{
         this->distance = distance;
         this->solarZenith = solarZenith;
         this->scaleFactor = scaleFactor;
+        this->distSq = distance * distance;
     }
     
     void RSGISCalculateTopOfAtmosphereReflectance::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
@@ -39,8 +40,6 @@ namespace rsgis{namespace calib{
         {
             throw rsgis::img::RSGISImageCalcException("The number of input and output image bands needs to be the same.");
         }
-        
-        double distSq = distance * distance;
         
         for(int i = 0; i < this->numOutBands; ++i)
         {

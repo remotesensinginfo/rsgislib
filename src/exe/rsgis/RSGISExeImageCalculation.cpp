@@ -3597,7 +3597,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
             }
 
             try {
-                rsgis::cmds::executeBandPercentile(this->inputImage, this->percentile, this->noDataValue, this->noDataValueSpecified, this->outputFile);
+                rsgis::cmds::executeBandPercentile(this->inputImage, this->percentile, this->noDataValue, this->noDataValueSpecified);
 			} catch (rsgis::RSGISException &e) {
                 throw rsgis::RSGISException(e.what());
             } catch (rsgis::cmds::RSGISCmdException &e) {

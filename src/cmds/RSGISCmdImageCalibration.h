@@ -146,7 +146,8 @@ namespace rsgis{ namespace cmds {
     /** Function to apply the FMask algorithm for classifying cloud for Landsat TM and ETM+ data */
     void executeLandsatTMCloudFMask(std::string inputTOAImage, std::string inputThermalImage, std::string inputSaturateImage, std::string outputImage, std::string pass1TmpOutImage, std::string cloudLandProbTmpOutImage, std::string gdalFormat, float scaleFactorIn) throw(RSGISCmdException);
     
-    
+    /** Function to apply DOS offsets (per band) to the input image */
+    void executeApplySubtractSingleOffsets(std::string inputImage, std::string outputImage, std::vector<double> offsetValues, bool nonNegative, std::string gdalFormat, rsgis::RSGISLibDataType rsgisOutDataType, float noDataVal, bool useNoDataVal, float darkObjReflVal) throw(RSGISCmdException);
 
     
 }}

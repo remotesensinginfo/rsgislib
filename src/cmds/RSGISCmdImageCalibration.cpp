@@ -212,8 +212,15 @@ namespace rsgis{ namespace cmds {
             
             double solarDistance = 0;
             
+            if(!useJulianDay)
+            {
+                julianDay = rsgis::calib::rsgisGetJulianDay(day, month, year);
+                //std::cout << "Julian Day = " << julianDay << std::endl;
+            }
+            
             solarDistance = rsgis::calib::rsgisCalcSolarDistance(julianDay);
-
+            //std::cout << "Solar Dist = " << solarDistance << std::endl;
+            //std::cout << "Solar Zenith = " << solarZenith << std::endl;
             
             calcTopAtmosRefl = new rsgis::calib::RSGISCalculateTopOfAtmosphereReflectance(numRasterBands, solarIrradiance, solarDistance, solarZenith, scaleFactor);
             
@@ -937,6 +944,48 @@ namespace rsgis{ namespace cmds {
             delete calcImage;
         }
         catch(RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+                
+    void executeApplySubtractSingleOffsets(std::string inputImage, std::string outputImage, std::vector<double> offsetValues, bool nonNegative, std::string gdalFormat, rsgis::RSGISLibDataType rsgisOutDataType, float noDataVal, bool useNoDataVal, float darkObjReflVal) throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            
+            std::cout << "Open input image: \'" << inputImage << "\'" << std::endl;
+            GDALDataset *dataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+            if(dataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+
+            
+            if(dataset->GetRasterCount() != offsetValues.size())
+            {
+                throw rsgis::RSGISImageException("The two input images need to have the same number of image bands.");
+            }
+            int numRasterBands = dataset->GetRasterCount();
+            
+            std::cout << "Apply offsets to input image...\n";
+            rsgis::calib::RSGISApplyDarkObjSubtractSingleOffsets *applyOffsets = new rsgis::calib::RSGISApplyDarkObjSubtractSingleOffsets(numRasterBands, offsetValues, nonNegative, noDataVal, useNoDataVal, darkObjReflVal);
+            
+            rsgis::img::RSGISCalcImage *calcImage = new rsgis::img::RSGISCalcImage(applyOffsets, "", true);
+            calcImage->calcImage(&dataset, 1, outputImage, false, NULL, gdalFormat, RSGIS_to_GDAL_Type(rsgisOutDataType));
+            
+            delete applyOffsets;
+            delete calcImage;
+            
+            GDALClose(dataset);
+        }
+        catch(rsgis::RSGISException &e)
         {
             throw RSGISCmdException(e.what());
         }
