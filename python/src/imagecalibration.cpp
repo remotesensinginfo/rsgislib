@@ -444,7 +444,6 @@ static PyObject *ImageCalibration_Apply6SCoefficentsSingleParam(PyObject *self, 
     Py_RETURN_NONE;
 }
 
-
 static PyObject *ImageCalibration_Apply6SCoefficentsElevLUTParam(PyObject *self, PyObject *args)
 {
     const char *pszInputRadFile, *pszInputDEMFile, *pszOutputFile, *pszGDALFormat;
@@ -582,7 +581,6 @@ static PyObject *ImageCalibration_Apply6SCoefficentsElevLUTParam(PyObject *self,
     
     Py_RETURN_NONE;
 }
-
 
 static PyObject *ImageCalibration_Apply6SCoefficentsElevAOTLUTParam(PyObject *self, PyObject *args)
 {
@@ -767,7 +765,6 @@ static PyObject *ImageCalibration_Apply6SCoefficentsElevAOTLUTParam(PyObject *se
     
     Py_RETURN_NONE;
 }
-
 
 static PyObject *ImageCalibration_ApplySubtractOffsets(PyObject *self, PyObject *args)
 {

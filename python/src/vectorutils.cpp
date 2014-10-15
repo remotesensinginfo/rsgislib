@@ -212,6 +212,74 @@ static PyObject *VectorUtils_PopulateGeomZField(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
+static PyObject *VectorUtils_VectorMaths(PyObject *self, PyObject *args)
+{
+    const char *pszInputVector, *pszOutputVector, *pszExpression, *pszOutColName;
+    int force = false;
+    PyObject *pVarsObj;
+    if( !PyArg_ParseTuple(args, "ssssO|i:vectorMaths", &pszInputVector, &pszOutputVector, &pszOutColName, &pszExpression, &pVarsObj, &force))
+    {
+        return NULL;
+    }
+    
+    if( !PySequence_Check(pVarsObj))
+    {
+        PyErr_SetString(GETSTATE(self)->error, "variables argument must be a sequence");
+        return NULL;
+    }
+    
+    Py_ssize_t nVarsDefns = PySequence_Size(pVarsObj);
+    unsigned int numVars = nVarsDefns;
+    std::vector<rsgis::cmds::RSGISVariableFieldCmds> vars = std::vector<rsgis::cmds::RSGISVariableFieldCmds>();
+    vars.reserve(numVars);
+    
+    for( Py_ssize_t n = 0; n < nVarsDefns; n++ )
+    {
+        PyObject *o = PySequence_GetItem(pVarsObj, n);
+        
+        PyObject *pName = PyObject_GetAttrString(o, "name");
+        if( ( pName == NULL ) || ( pName == Py_None ) || !RSGISPY_CHECK_STRING(pName) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Could not find string attribute \'name\'" );
+            Py_DECREF(pName);
+            Py_DECREF(o);
+            return NULL;
+        }
+        
+        PyObject *pFieldName = PyObject_GetAttrString(o, "fieldName");
+        if( ( pFieldName == NULL ) || ( pFieldName == Py_None ) || !RSGISPY_CHECK_STRING(pFieldName) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Could not find string attribute \'fieldName\'" );
+            Py_DECREF(pName);
+            Py_DECREF(pFieldName);
+            Py_DECREF(o);
+            return NULL;
+        }
+        
+        rsgis::cmds::RSGISVariableFieldCmds var;
+        var.name = RSGISPY_STRING_EXTRACT(pName);
+        var.fieldName = RSGISPY_STRING_EXTRACT(pFieldName);
+        
+        vars.push_back(var);
+        
+        Py_DECREF(pName);
+        Py_DECREF(pFieldName);
+        Py_DECREF(o);
+    }
+    
+    try
+    {
+        rsgis::cmds::executeVectorMaths(std::string(pszInputVector), std::string(pszOutputVector), std::string(pszOutColName), std::string(pszExpression), force, vars);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 // Our list of functions in this module
 static PyMethodDef VectorUtilsMethods[] = {
     {"generateConvexHullsGroups", VectorUtils_GenerateConvexHullsGroups, METH_VARARGS, 
@@ -353,6 +421,18 @@ static PyMethodDef VectorUtilsMethods[] = {
     "    force = True\n"
     "\n"
     "    rsgislib.vectorutils.populateGeomZField(inputVector, inputImage, imgBand, outputVector, force)\n"
+    "\n"},
+{"vectorMaths", VectorUtils_VectorMaths, METH_VARARGS,
+    "vectorutils.vectorMaths(inputVector, outputVector, outputColName, expression, variables, force)\n"
+    "A command to calculate a number column from data in existing columns.\n\n"
+    "Where:\n"
+    "\n"
+    "* inputVector is a string containing the name of the input vector\n"
+    "* outputVector is a string containing the name of the output vector file\n"
+    "* outputColName is a string containing the name of the output column\n"
+    "* expression is a string containing the muparser expression to be calculated.\n"
+    "* variables is a list defining the names of the variables used within the expression\n and defining which columns they are in the inputVector.\n The must be a list and contain two fields \'name\' and \'fieldName\'.\n"
+    "* force is a bool, specifying whether to force removal of the output vector if it exists\n"
     "\n"},
 
     {NULL}        /* Sentinel */
