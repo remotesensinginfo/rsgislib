@@ -30,7 +30,14 @@
 #include "common/RSGISCommons.h"
 #include "RSGISCmdException.h"
 
-namespace rsgis{ namespace cmds {
+namespace rsgis{ namespace cmds{
+    
+    struct DllExport RSGISVariableFieldCmds
+    {
+        std::string name;
+        std::string fieldName;
+    };
+    
     
     /** Function to produce convex hulls for groups of (X, Y, Attribute) point locations */
     void executeGenerateConvexHullsGroups(std::string inputFile, std::string outputVector, std::string outVecProj, bool force, unsigned int eastingsColIdx, unsigned int northingsColIdx, unsigned int attributeColIdx)throw(RSGISCmdException);
@@ -48,6 +55,8 @@ namespace rsgis{ namespace cmds {
     void executePolygonsInPolygon(std::string inputVector, std::string inputCoverVector, std::string output_DIR, std::string attributeName, bool force) throw(RSGISCmdException);
     /** Populate the Z field on the vector geometries */
     void executePopulateGeomZField(std::string inputVector, std::string inputImage, unsigned int imgBand, std::string outputVector, bool force) throw(RSGISCmdException);
+    /** Function to calculate a maths functions between  */
+    void executeVectorMaths(std::string inputVector, std::string outputVector, std::string outColumn, std::string expression, bool force, std::vector<RSGISVariableFieldCmds> vars) throw(RSGISCmdException);
     
 }}
 

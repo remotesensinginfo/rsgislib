@@ -9,6 +9,8 @@ Radiance
 
 .. autofunction:: rsgislib.imagecalibration.landsat2Radiance
 .. autofunction:: rsgislib.imagecalibration.landsat2RadianceMultiAdd
+.. autofunction:: rsgislib.imagecalibration.spot5ToRadiance
+.. autofunction:: rsgislib.imagecalibration.worldview2ToRadiance
 
 Top-of Atmosphere Reflectance
 -------------------------------
@@ -28,6 +30,7 @@ Surface Reflectance (DOS)
 -------------------------
 
 .. autofunction:: rsgislib.imagecalibration.applySubtractOffsets
+.. autofunction:: rsgislib.imagecalibration.applySubtractSingleOffsets
 
 
 Cloud Masking
@@ -40,7 +43,7 @@ Utilities
 ---------
 
 .. autofunction:: rsgislib.imagecalibration.saturatedPixelsMask
-.. autofunction:: rsgislib.imagecalibration.applySubtractOffsets
+
 
 * :ref:`genindex`
 * :ref:`modindex`

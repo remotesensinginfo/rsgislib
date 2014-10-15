@@ -5,7 +5,6 @@ RSGISLib Vector Utils Module
    :members:
    :undoc-members:
 
-
 Geometry
 ---------
 
@@ -16,6 +15,7 @@ Geometry
 Attributes
 -----------
 
+.. autofunction:: rsgislib.vectorutils.vectorMaths
 .. autofunction:: rsgislib.vectorutils.removeattributes
 .. autofunction:: rsgislib.vectorutils.findreplacetext
 .. autofunction:: rsgislib.vectorutils.calcarea
