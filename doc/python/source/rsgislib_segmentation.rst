@@ -26,11 +26,11 @@ Elimination
 --------------
 .. autofunction:: rsgislib.segmentation.eliminateSinglePixels
 .. autofunction:: rsgislib.segmentation.rmSmallClumps
-.. autofunction:: rsgislib.segmentation.RMSmallClumpsStepwise
+.. autofunction:: rsgislib.segmentation.rmSmallClumpsStepwise
 
 Join / Union
 -------------
-.. autofunction:: rsgislib.segmentation.UnionOfClumps
+.. autofunction:: rsgislib.segmentation.unionOfClumps
 
 
 Visualisation
