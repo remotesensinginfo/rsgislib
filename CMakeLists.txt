@@ -159,6 +159,8 @@ set(RSGISLIB_WITH_RSGISEXE TRUE CACHE BOOL "Choose if RSGISLib rsgisexe command 
 set(RSGISLIB_WITH_UTILTIES TRUE CACHE BOOL "Choose if RSGISLib utilities should be built")
 set(RSGISLIB_WITH_DOCUMENTS TRUE CACHE BOOL "Choose if RSGISLib documentation should be installed.")
 
+set(PYTHON_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX} CACHE PATH "Install path for Python libraries.")
+
 set(BOOST_INCLUDE_DIR /usr/local/include CACHE PATH "Include PATH for Boost")
 set(BOOST_LIB_PATH /usr/local/lib CACHE PATH "Library PATH for Boost")
 
@@ -400,7 +402,7 @@ endif(RSGISLIB_WITH_DOCUMENTS)
 
 # Python 
 if (BUILD_PYTHON_BINDINGS)
-  install(CODE "execute_process(COMMAND ${PYTHON_EXE} \"setup.py\" \"install\" \"--prefix=${CMAKE_INSTALL_PREFIX}\"  WORKING_DIRECTORY \"python\")")
+  install(CODE "execute_process(COMMAND ${PYTHON_EXE} \"setup.py\" \"install\" \"--prefix=${PYTHON_INSTALL_PREFIX}\"  WORKING_DIRECTORY \"python\")")
 endif(BUILD_PYTHON_BINDINGS)
 
 ###############################################################################
