@@ -293,10 +293,11 @@ class RSGISTests:
     def testBandPercentile(self):
         print("PYTHON TEST: Band Percentile")
         image = path + "Rasters/injune_p142_casi_sub_right_utm.kea"
-        output = path + "TestOutputs/PSU142_bandpercentile"
         percentile = 0.25
         nodata = 0
-        imagecalc.bandPercentile(image, percentile, nodata, True, output)
+        outpercentiles = imagecalc.bandPercentile(image, percentile, nodata)
+        if int(outpercentiles[0]) != 2723:
+            raise Exception('Incorrect percentile value returned. Expected 2723, got {}'.format(outpercentiles[0]))
 
     def testMahalanobisDistWindow(self):
         print("PYTHON TEST: MahalanobisDistWindow")
@@ -872,7 +873,8 @@ if __name__ == '__main__':
     
     if testLibraries == 'all' or testLibraries == 'imagecalc':
         """ ImageCalc functions """
-
+        t.testBandPercentile()
+        exit()
         t.tryFuncAndCatch(t.testNormalise1)
         t.tryFuncAndCatch(t.testNormalise2)
         t.tryFuncAndCatch(t.testCorrelation)
@@ -908,7 +910,6 @@ if __name__ == '__main__':
         t.tryFuncAndCatch(t.testMahalanobisDistImg2Window)
         t.tryFuncAndCatch(t.testCalcPxlColStats)
         t.tryFuncAndCatch(t.testPxlColRegression)
-        t.tryFuncAndCatch(t.testCorrelation)
         t.tryFuncAndCatch(t.testCorrelationWindow)
         
     if testLibraries == 'all' or testLibraries == 'imageutils':
