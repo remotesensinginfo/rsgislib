@@ -136,7 +136,7 @@ static PyObject *Segmentation_RMSmallClumpsStepwise(PyObject *self, PyObject *ar
     int storeMean,processInMemory,stretchStatsAvail;
     unsigned int minClumpSize;
     float specThreshold;                   
-    if( !PyArg_ParseTuple(args, "ssssisiiIf:RMSmallClumpsStepwise", &pszInputImage, &pszClumpsImage, &pszOutputImage, &pszGDALFormat,
+    if( !PyArg_ParseTuple(args, "ssssisiiIf:rmSmallClumpsStepwise", &pszInputImage, &pszClumpsImage, &pszOutputImage, &pszGDALFormat,
                     &stretchStatsAvail, &pszStretchStatsFile, &storeMean, &processInMemory, &minClumpSize, &specThreshold))            
         return NULL;
     
@@ -461,8 +461,8 @@ static PyMethodDef SegmentationMethods[] = {
 "* nodata is None or float\n"
 "\n"},
 
-    {"RMSmallClumpsStepwise", Segmentation_RMSmallClumpsStepwise, METH_VARARGS,
-"segmentation.RMSmallClumpsStepwise(inputimage, clumpsimage, outputimage, gdalformat, stretchstatsavail, stretchstatsfile, storemean, processinmemory, minclumpsize, specThreshold)\n"
+    {"rmSmallClumpsStepwise", Segmentation_RMSmallClumpsStepwise, METH_VARARGS,
+"segmentation.rmSmallClumpsStepwise(inputimage, clumpsimage, outputimage, gdalformat, stretchstatsavail, stretchstatsfile, storemean, processinmemory, minclumpsize, specThreshold)\n"
 "eliminate clumps smaller than a given size from the scene, small clumps will be combined with their spectrally closest neighbouring  clump in a stepwise fashion unless over spectral distance threshold\n"
 "where:\n"
 "\n"
@@ -489,7 +489,7 @@ static PyMethodDef SegmentationMethods[] = {
 "* processinmemory is a bool specifying if processing should be carried out in memory (faster if sufficient RAM is available, set to False if unsure).\n"
 "\n"},
                                 
-    {"UnionOfClumps", Segmentation_unionOfClumps, METH_VARARGS,
+    {"unionOfClumps", Segmentation_unionOfClumps, METH_VARARGS,
 "segmentation.unionOfClumps(outputimage, gdalformat, inputimagepaths, nodata)\n"
 "Union of clumps\n"
 "where:\n"

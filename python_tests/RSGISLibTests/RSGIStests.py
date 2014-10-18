@@ -40,6 +40,8 @@ try:
     from rsgislib import zonalstats
     from rsgislib import imageregistration
     from rsgislib import imagefilter
+    from rsgislib import segmentation
+    from rsgislib.segmentation import segutils
     from rsgislib.imagecalc import BandDefn
 except ImportError as err:
     print(err)
@@ -833,6 +835,24 @@ class RSGISTests:
         dataType = rsgislib.TYPE_32FLOAT
         imagefilter.LeungMalikFilterBank(inputImage, outputImageBase, gdalFormat, outExt, dataType)
 
+    # Segmentation
+    def testUnionOfClumps(self):
+        clumps1='./RATS/injune_p142_casi_sub_utm_segs.kea'
+        clumps2='./RATS/injune_p142_casi_sub_utm_segs.kea'
+        outputimage = './TestOutputs/injune_p142_casi_sub_utm_segs_union_test.kea'
+        inputimagepaths = [clumps1,clumps2]
+        gdalFormat = 'KEA'
+        
+        segmentation.unionOfClumps(outputimage, gdalFormat, inputimagepaths, 0)
+
+    def testRunShepherdSegmentation(self):
+        inputImage = './Rasters/injune_p142_casi_sub_utm.kea'
+        clumpsFile = './TestOutputs/injune_p142_casi_sub_utm_seg_test.kea'
+        meanImage = './TestOutputs/injune_p142_casi_sub_utm_seg_test_mean.kea'
+
+        segmentation.segutils.runShepherdSegmentation(inputImage, clumpsFile,
+                       meanImage, numClusters=100, minPxls=100)
+
 if __name__ == '__main__':
 
     t = RSGISTests()
@@ -968,6 +988,12 @@ if __name__ == '__main__':
         t.tryFuncAndCatch(t.testFilter)
         #t.tryFuncAndCatch(t.testLeungMalikFilterBank) # Skip as it takes a while
     
+    if testLibraries == 'all' or testLibraries == 'segmentation':
+        """ Image filter functions """ 
+        t.tryFuncAndCatch(t.testUnionOfClumps)
+        t.tryFuncAndCatch(t.testRunShepherdSegmentation)
+
+
     print("%s TESTS COMPLETED - %s FAILURES LISTED BELOW:"%(t.numTests, len(t.failures)))
     if(len(t.failures)):
         for failure in t.failures:

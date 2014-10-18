@@ -165,7 +165,7 @@ Example::
     # Elimininate small clumps
     print("Eliminate small pixels.")
     elimClumpsFile = os.path.join(tmpath,basename+str("_clumps_elim")+outFileExt)
-    rsgislib.segmentation.RMSmallClumpsStepwise(segmentFile, initClumpsFile, elimClumpsFile, gdalFormat, False, "", False, processInMem, minPxls, distThres)
+    rsgislib.segmentation.rmSmallClumpsStepwise(segmentFile, initClumpsFile, elimClumpsFile, gdalFormat, False, "", False, processInMem, minPxls, distThres)
     
     # Relabel clumps
     print("Relabel clumps.")
