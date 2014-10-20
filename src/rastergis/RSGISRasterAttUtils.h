@@ -142,6 +142,7 @@ namespace rsgis{namespace rastergis{
         
         void writeStrColumn(GDALRasterAttributeTable *attTable, std::string colName, std::string *strDataVal, size_t colLen) throw(RSGISAttributeTableException);
         void writeIntColumn(GDALRasterAttributeTable *attTable, std::string colName, int *intDataVal, size_t colLen) throw(RSGISAttributeTableException);
+        void writeRealColumn(GDALRasterAttributeTable *attTable, std::string colName, double *realDataVal, size_t colLen) throw(RSGISAttributeTableException);
         
         ~RSGISRasterAttUtils();
     };
