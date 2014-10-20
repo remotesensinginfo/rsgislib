@@ -48,6 +48,7 @@
 #include "rastergis/RSGISCalcNeighbourStats.h"
 #include "rastergis/RSGISBinaryClassifyClumps.h"
 #include "rastergis/RSGISClumpRegionGrowing.h"
+#include "rastergis/RSGISDefineClumpsInTiles.h"
 
 
 /*
@@ -970,6 +971,7 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
+*/
 
     void executeDefineClumpTilePositions(std::string clumpsImage, std::string tileImage, std::string outColsName, unsigned int tileOverlap, unsigned int tileBoundary, unsigned int tileBody)throw(RSGISCmdException) {
         GDALAllRegister();
@@ -987,7 +989,7 @@ namespace rsgis{ namespace cmds {
                 throw rsgis::RSGISImageException(message.c_str());
             }
 
-            rsgis::rastergis::RSGISDefineSegmentsWithinTiles defineSegsInTile;
+            rsgis::rastergis::RSGISDefineClumpsInTiles defineSegsInTile;
             defineSegsInTile.defineSegmentTilePos(clumpsDataset, tileDataset, outColsName, tileOverlap, tileBoundary, tileBody);
 
             GDALClose(clumpsDataset);
@@ -1014,7 +1016,7 @@ namespace rsgis{ namespace cmds {
                 throw rsgis::RSGISImageException(message.c_str());
             }
 
-            rsgis::rastergis::RSGISDefineSegmentsWithinTiles defineSegsInTile;
+            rsgis::rastergis::RSGISDefineClumpsInTiles defineSegsInTile;
             defineSegsInTile.defineBorderSegmentsUsingMask(clumpsDataset, maskDataset, outColsName, tileOverlap, tileBoundary, tileBody);
 
             GDALClose(clumpsDataset);
@@ -1023,7 +1025,6 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
- */
 
     void executeFindChangeClumpsFromStdDev(std::string clumpsImage, std::string classField, std::string changeField, std::vector<std::string> attFields, std::vector<cmds::RSGISClassChangeFieldsCmds> classChangeFields, int ratBand)throw(RSGISCmdException)
     {
