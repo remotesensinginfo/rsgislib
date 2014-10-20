@@ -1036,6 +1036,7 @@ static PyObject *RasterGIS_CalcShapeIndices(PyObject *self, PyObject *args) {
 
     Py_RETURN_NONE;
 }
+*/
 
 static PyObject *RasterGIS_DefineClumpTilePositions(PyObject *self, PyObject *args) {
     const char *clumpsImage, *tileImage, *outColsName;
@@ -1072,7 +1073,7 @@ static PyObject *RasterGIS_DefineBorderClumps(PyObject *self, PyObject *args) {
 
     Py_RETURN_NONE;
 }
-*/
+
 
 static PyObject *RasterGIS_FindChangeClumpsFromStdDev(PyObject *self, PyObject *args, PyObject *keywds)
 {
@@ -2065,6 +2066,7 @@ static PyMethodDef RasterGISMethods[] = {
 "   rastergis.calcShapeIndices(clumps, shapes)\n"
 "\n"
 "\n"},
+*/
 
     {"defineClumpTilePositions", RasterGIS_DefineClumpTilePositions, METH_VARARGS,
 "rastergis.defineClumpTilePositions(clumpsImage, tileImage, outColsName, tileOverlap, tileBoundary, tileBody)\n"
@@ -2091,7 +2093,7 @@ static PyMethodDef RasterGISMethods[] = {
 "* tileBoundary is an unsigned int\n"
 "* tileBody is an unsigned int\n"
 "\n"},
-*/
+
     {"findChangeClumpsFromStdDev", (PyCFunction)RasterGIS_FindChangeClumpsFromStdDev, METH_VARARGS | METH_KEYWORDS,
 "rastergis.findChangeClumpsFromStdDev(clumpsImage, classfield, changeField, attFields, classChangeFields)\n"
 "Identifies segments which have changed by looking for statistical outliers (std dev) from class population.\n\n"
