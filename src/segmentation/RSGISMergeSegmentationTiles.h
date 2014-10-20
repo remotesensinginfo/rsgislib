@@ -53,13 +53,11 @@ namespace rsgis{namespace segment{
         void mergeClumpImages(GDALDataset *outputDataset, std::vector<std::string> inputImagePaths) throw(rsgis::img::RSGISImageCalcException);
         ~RSGISMergeSegmentationTiles();
     protected:
-        unsigned int findColumnIndex(const GDALRasterAttributeTable *gdalATT, std::string colName) throw(RSGISException);
-        unsigned int findColumnIndexOrCreate(GDALRasterAttributeTable *gdalATT, std::string colName, GDALRATFieldType dType) throw(RSGISException);
-        size_t numberBodyClumps(GDALRasterAttributeTable *gdalATT, unsigned int outColIdx, unsigned int clumpPosColIdx, int tileBody, size_t clumpsOffset) throw(RSGISException);
-        size_t numberClumps(GDALRasterAttributeTable *gdalATT, unsigned int outColIdx, size_t clumpsOffset) throw(RSGISException);
-        void addTileBodyClumps(GDALDataset *outputDataset, GDALDataset *tileDataset, GDALDataset *borderMaskDataset, const GDALRasterAttributeTable *gdalATT, unsigned int outClumpIDColIdx, unsigned int clumpPosColIdx, unsigned int tileBody, unsigned int tileBoundary) throw(rsgis::img::RSGISImageCalcException);
+        size_t numberBodyClumps(GDALRasterAttributeTable *gdalATT, std::string outColName, std::string clumpPosColName, int tileBody, size_t clumpsOffset) throw(RSGISException);
+        size_t numberClumps(GDALRasterAttributeTable *gdalATT, std::string outColName, size_t clumpsOffset) throw(RSGISException);
+        void addTileBodyClumps(GDALDataset *outputDataset, GDALDataset *tileDataset, GDALDataset *borderMaskDataset, GDALRasterAttributeTable *gdalATT, std::string outClumpIDColName, std::string clumpPosColName, unsigned int tileBody, unsigned int tileBoundary) throw(rsgis::img::RSGISImageCalcException);
         void addTileBorder2Mask(GDALDataset *tileDataset, GDALDataset *borderMaskDataset, GDALRasterAttributeTable *gdalATT, std::string clumpPosColName, unsigned int tileBoundary) throw(rsgis::img::RSGISImageCalcException);
-        void addImageClumps(GDALDataset *outputDataset, GDALDataset *clumpsDataset, const GDALRasterAttributeTable *gdalATT, unsigned int outClumpIDColIdx) throw(rsgis::img::RSGISImageCalcException);
+        void addImageClumps(GDALDataset *outputDataset, GDALDataset *clumpsDataset, GDALRasterAttributeTable *gdalATT, std::string outClumpIDColName) throw(rsgis::img::RSGISImageCalcException);
     };
     
     
