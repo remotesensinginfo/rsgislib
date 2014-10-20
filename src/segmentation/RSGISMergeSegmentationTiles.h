@@ -35,6 +35,10 @@
 #include "img/RSGISCalcImageValue.h"
 #include "img/RSGISCalcImage.h"
 
+#include "common/RSGISAttributeTableException.h"
+
+#include "rastergis/RSGISRasterAttUtils.h"
+
 #include "gdal_priv.h"
 #include "gdal_rat.h"
 
@@ -54,7 +58,7 @@ namespace rsgis{namespace segment{
         size_t numberBodyClumps(GDALRasterAttributeTable *gdalATT, unsigned int outColIdx, unsigned int clumpPosColIdx, int tileBody, size_t clumpsOffset) throw(RSGISException);
         size_t numberClumps(GDALRasterAttributeTable *gdalATT, unsigned int outColIdx, size_t clumpsOffset) throw(RSGISException);
         void addTileBodyClumps(GDALDataset *outputDataset, GDALDataset *tileDataset, GDALDataset *borderMaskDataset, const GDALRasterAttributeTable *gdalATT, unsigned int outClumpIDColIdx, unsigned int clumpPosColIdx, unsigned int tileBody, unsigned int tileBoundary) throw(rsgis::img::RSGISImageCalcException);
-        void addTileBorder2Mask(GDALDataset *tileDataset, GDALDataset *borderMaskDataset, const GDALRasterAttributeTable *gdalATT, unsigned int clumpPosColIdx, unsigned int tileBoundary) throw(rsgis::img::RSGISImageCalcException);
+        void addTileBorder2Mask(GDALDataset *tileDataset, GDALDataset *borderMaskDataset, GDALRasterAttributeTable *gdalATT, std::string clumpPosColName, unsigned int tileBoundary) throw(rsgis::img::RSGISImageCalcException);
         void addImageClumps(GDALDataset *outputDataset, GDALDataset *clumpsDataset, const GDALRasterAttributeTable *gdalATT, unsigned int outClumpIDColIdx) throw(rsgis::img::RSGISImageCalcException);
     };
     
