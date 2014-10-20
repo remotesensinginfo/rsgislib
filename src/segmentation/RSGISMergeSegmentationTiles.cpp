@@ -33,10 +33,10 @@ namespace rsgis{namespace segment{
     {
         try
         {
-            const GDALRasterAttributeTable *attTable = NULL;
+            GDALRasterAttributeTable *attTable = NULL;
             size_t numRows = 0;
             double maxVal = 0;
-            unsigned int clumpPosColIdx = 0;
+            //unsigned int clumpPosColIdx = 0;
             
             for(std::vector<std::string>::iterator iterFiles = inputImagePaths.begin(); iterFiles != inputImagePaths.end(); ++iterFiles)
             {
@@ -64,9 +64,9 @@ namespace rsgis{namespace segment{
                     throw RSGISImageException("Number of rows and maximum image pixel value does not match.");
                 }
                                 
-                clumpPosColIdx = this->findColumnIndex(attTable, colsName);
+                //clumpPosColIdx = this->findColumnIndex(attTable, colsName);
                                 
-                this->addTileBorder2Mask(inImage, borderMaskDataset, attTable, clumpPosColIdx, tileBoundary);
+                this->addTileBorder2Mask(inImage, borderMaskDataset, attTable, colsName, tileBoundary);
                 
                 GDALClose(inImage);
             }
@@ -577,7 +577,7 @@ namespace rsgis{namespace segment{
         }
     }
     
-    void RSGISMergeSegmentationTiles::addTileBorder2Mask(GDALDataset *tileDataset, GDALDataset *borderMaskDataset, const GDALRasterAttributeTable *gdalATT, unsigned int clumpPosColIdx, unsigned int tileBoundary) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISMergeSegmentationTiles::addTileBorder2Mask(GDALDataset *tileDataset, GDALDataset *borderMaskDataset, GDALRasterAttributeTable *gdalATT, std::string clumpPosColName, unsigned int tileBoundary) throw(rsgis::img::RSGISImageCalcException)
     {
         rsgis::img::RSGISImageUtils imgUtils;
         try
@@ -622,8 +622,11 @@ namespace rsgis{namespace segment{
             int remainRows = height - (nYBlocks * yBlockSize);
             int rowOffset = 0;
             
+            // read existing column values
+            rsgis::rastergis::RSGISRasterAttUtils attUtils;
+            size_t numRows = 0;
+            int *posVals = attUtils.readIntColumn(gdalATT, clumpPosColName, &numRows);
             size_t fid = 0;
-            size_t numRows = gdalATT->GetRowCount();
             std::cout << "Number of Rows = " << numRows << std::endl;
             
 			int feedback = height/10;
@@ -673,7 +676,7 @@ namespace rsgis{namespace segment{
                                 throw rsgis::img::RSGISImageCalcException(e.what());
                             }
                             
-                            if(gdalATT->GetValueAsInt(fid, clumpPosColIdx) == tileBoundary)
+                            if(posVals[fid] == tileBoundary)
                             {
                                 imgMaskData[(m*width)+j] = 1;
                             }
@@ -726,7 +729,7 @@ namespace rsgis{namespace segment{
                                 throw rsgis::img::RSGISImageCalcException(e.what());
                             }
                             
-                            if(gdalATT->GetValueAsInt(fid, clumpPosColIdx) == tileBoundary)
+                            if(posVals[fid] == tileBoundary)
                             {
                                 imgMaskData[(m*width)+j] = 1;
                                 //std::cout << fid << " = " << imgOutData[(m*width)+j] << std::endl;
