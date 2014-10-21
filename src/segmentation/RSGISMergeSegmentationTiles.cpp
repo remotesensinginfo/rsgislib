@@ -40,7 +40,7 @@ namespace rsgis{namespace segment{
             for(std::vector<std::string>::iterator iterFiles = inputImagePaths.begin(); iterFiles != inputImagePaths.end(); ++iterFiles)
             {
                 std::cout << "\t Opening - " << (*iterFiles) << std::endl;
-                GDALDataset *inImage = (GDALDataset *) GDALOpen((*iterFiles).c_str(), GA_ReadOnly);
+                GDALDataset *inImage = (GDALDataset *) GDALOpen((*iterFiles).c_str(), GA_Update);
                 if(inImage == NULL)
                 {
                     std::string message = std::string("Could not open image ") + (*iterFiles);
@@ -91,30 +91,29 @@ namespace rsgis{namespace segment{
         try
         {
             GDALRasterAttributeTable *attTable = NULL;
-            GDALRasterAttributeTable *attTableTmp = NULL;
             size_t numRows = 0;
             double maxVal = 0;
             size_t clumpsOffset = 0;
             size_t numClumps = 0;
-            
+                           
             for(std::vector<std::string>::iterator iterFiles = inputImagePaths.begin(); iterFiles != inputImagePaths.end(); ++iterFiles)
             {
                 std::cout << "\t Opening - " << (*iterFiles) << std::endl;
-                GDALDataset *inImage = (GDALDataset *) GDALOpen((*iterFiles).c_str(), GA_ReadOnly);
+                GDALDataset *inImage = (GDALDataset *) GDALOpen((*iterFiles).c_str(), GA_Update);
                 if(inImage == NULL)
                 {
                     std::string message = std::string("Could not open image ") + (*iterFiles);
                     throw rsgis::RSGISImageException(message.c_str());
                 }
                 
-                attTableTmp = inImage->GetRasterBand(1)->GetDefaultRAT();
+                attTable = inImage->GetRasterBand(1)->GetDefaultRAT();
                 
-                if(attTableTmp == NULL)
+                if(attTable == NULL)
                 {
                     throw RSGISImageException("Input image does not have an attribute table.");
                 }
                 
-                numRows = attTableTmp->GetRowCount();
+                numRows = attTable->GetRowCount();
                 
                 inImage->GetRasterBand(1)->GetStatistics(false, true, NULL, &maxVal, NULL, NULL);
                 
@@ -122,8 +121,6 @@ namespace rsgis{namespace segment{
                 {
                     throw RSGISImageException("Number of rows and maximum image pixel value does not match.");
                 }
-                
-                attTable = new GDALDefaultRasterAttributeTable(*((GDALDefaultRasterAttributeTable*)attTableTmp));
                 
                 std::cout << "Row Count: " << numRows << std::endl;
                 
@@ -163,7 +160,6 @@ namespace rsgis{namespace segment{
         try
         {
             GDALRasterAttributeTable *attTable = NULL;
-            GDALRasterAttributeTable *attTableTmp = NULL;
             size_t numRows = 0;
             double maxVal = 0;
             size_t clumpsOffset = 0;
@@ -175,21 +171,21 @@ namespace rsgis{namespace segment{
             for(std::vector<std::string>::iterator iterFiles = inputImagePaths.begin(); iterFiles != inputImagePaths.end(); ++iterFiles)
             {
                 std::cout << "\t Opening - " << (*iterFiles) << std::endl;
-                GDALDataset *inImage = (GDALDataset *) GDALOpen((*iterFiles).c_str(), GA_ReadOnly);
+                GDALDataset *inImage = (GDALDataset *) GDALOpen((*iterFiles).c_str(), GA_Update);
                 if(inImage == NULL)
                 {
                     std::string message = std::string("Could not open image ") + (*iterFiles);
                     throw rsgis::RSGISImageException(message.c_str());
                 }
                 
-                attTableTmp = inImage->GetRasterBand(1)->GetDefaultRAT();
+                attTable = inImage->GetRasterBand(1)->GetDefaultRAT();
                 
-                if(attTableTmp == NULL)
+                if(attTable == NULL)
                 {
                     throw RSGISImageException("Input image does not have an attribute table.");
                 }
                 
-                numRows = attTableTmp->GetRowCount();
+                numRows = attTable->GetRowCount();
                 
                 inImage->GetRasterBand(1)->GetStatistics(false, true, NULL, &maxVal, NULL, NULL);
                 
@@ -197,8 +193,6 @@ namespace rsgis{namespace segment{
                 {
                     throw RSGISImageException("Number of rows and maximum image pixel value does not match.");
                 }
-                
-                attTable = new GDALDefaultRasterAttributeTable(*((GDALDefaultRasterAttributeTable*)attTableTmp));
                 
                 std::cout << "Row Count: " << numRows << std::endl;
                 
