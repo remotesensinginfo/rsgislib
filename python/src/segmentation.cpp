@@ -309,7 +309,7 @@ static PyObject *Segmentation_mergeClumpImages(PyObject *self, PyObject *args)
     const char *pszOutputImage;
     PyObject *pInputListObj;
     std::string inputImage;
-    if( !PyArg_ParseTuple(args, "sO:mergeClumpImages", &pInputListObj, &pszOutputImage))
+    if( !PyArg_ParseTuple(args, "Os:mergeClumpImages", &pInputListObj, &pszOutputImage))
         return NULL;
 
     Py_ssize_t nInputImages = PyList_Size(pInputListObj);
