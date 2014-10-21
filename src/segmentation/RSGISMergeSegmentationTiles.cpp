@@ -160,13 +160,18 @@ namespace rsgis{namespace segment{
         try
         {
             GDALRasterAttributeTable *attTable = NULL;
+            GDALRasterAttributeTable *outAttTable = NULL;
             size_t numRows = 0;
             double maxVal = 0;
             size_t clumpsOffset = 0;
             size_t numClumps = 0;
             
-            outputDataset->GetRasterBand(1)->GetStatistics(false, true, NULL, &maxVal, NULL, NULL);
-            clumpsOffset = maxVal;
+            // Get maximum clumpid
+            //outputDataset->GetRasterBand(1)->GetStatistics(false, true, NULL, &maxVal, NULL, NULL);
+            //clumpsOffset = maxVal;
+            
+            outAttTable = outputDataset->GetRasterBand(1)->GetDefaultRAT();
+            clumpsOffset = outAttTable->GetRowCount();            
             
             for(std::vector<std::string>::iterator iterFiles = inputImagePaths.begin(); iterFiles != inputImagePaths.end(); ++iterFiles)
             {
