@@ -304,6 +304,55 @@ static PyObject *Segmentation_mergeSegmentationTiles(PyObject *self, PyObject *a
 }
 
 
+static PyObject *Segmentation_mergeClumpImages(PyObject *self, PyObject *args)
+{
+    const char *pszOutputImage;
+    PyObject *pInputListObj;
+    std::string inputImage;
+    if( !PyArg_ParseTuple(args, "sO:mergeClumpImages", &pInputListObj, &pszOutputImage))
+        return NULL;
+
+    Py_ssize_t nInputImages = PyList_Size(pInputListObj);
+    if( nInputImages < 0)
+    {
+        PyErr_SetString(GETSTATE(self)->error, "last argument must be a list");
+        return NULL;
+    }
+    
+    std::vector<std::string> inputImagePaths;
+    for(Py_ssize_t n = 0; n < nInputImages; n++)
+    {
+        
+        PyObject *strObj;
+        strObj = PyList_GetItem(pInputListObj, n);
+        if( !RSGISPY_CHECK_STRING(strObj) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "must pass a list of strings");
+            Py_DECREF(strObj);
+            return NULL;
+        }
+        inputImage = RSGISPY_STRING_EXTRACT(strObj);
+        inputImagePaths.push_back(inputImage);      
+        Py_DECREF(strObj);
+    
+    }    
+    
+    try
+    {
+                        
+        rsgis::cmds::executeMergeClumpImages(inputImagePaths, pszOutputImage);
+
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
+
+
 static PyObject *Segmentation_findTileBordersMask(PyObject *self, PyObject *args)
 {
     const char *pszBorderMaskImage, *pszColsName;
@@ -502,7 +551,7 @@ static PyMethodDef SegmentationMethods[] = {
 
     {"mergeSegmentationTiles", Segmentation_mergeSegmentationTiles, METH_VARARGS,
 "segmentation.mergeSegmentationTiles(outputimage, bordermaskimage, tileboundary, tileoverlap, tilebody, colsname, inputimagepaths)\n"
-"Merge segmentation tiles\n"
+"Merge body clumps from tile segmentations into outputfile\n"
 "where:\n"
 "\n"
 " * outputimage is a string containing the name of the output file\n"
@@ -512,6 +561,15 @@ static PyMethodDef SegmentationMethods[] = {
 " * tilebody is an unsigned integer containing the tile body pixel value\n"
 " * colsname is a string containing the name of the object id column\n"
 " * inputimagepaths is a list of input image paths\n"
+"\n"},
+
+    {"mergeClumpImages", Segmentation_mergeClumpImages, METH_VARARGS,
+"segmentation.mergeClumpImages(inputimagepaths, outputimage)\n"
+"Merge all clumps from tile segmentations into outputfile\n"
+"where:\n"
+"\n"
+" * inputimagepaths is a list of input image paths\n"
+" * outputimage is a string containing the name of the output file\n"
 "\n"},
 
     {"findTileBordersMask", Segmentation_findTileBordersMask, METH_VARARGS,
