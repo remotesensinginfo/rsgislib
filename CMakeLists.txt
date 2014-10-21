@@ -26,7 +26,7 @@ set (PROJECT_TOOLS_DIR tools)
 set (PROJECT_XML_DIR xml_standards)
 
 # The version number.
-set (RSGISLIB_HG_COMMIT 948)
+set (RSGISLIB_HG_COMMIT 957)
 set (RSGISLIB_VERSION_MAJOR 2)
 set (RSGISLIB_VERSION_MINOR 3)
 set (RSGISLIB_VERSION "${RSGISLIB_VERSION_MAJOR}.${RSGISLIB_VERSION_MINOR}.${RSGISLIB_HG_COMMIT}")
@@ -317,7 +317,7 @@ include_directories(${MUPARSER_INCLUDE_DIR})
 set(MUPARSER_LIBRARIES -L${MUPARSER_LIB_PATH} -lmuparser)
 
 include_directories(${CGAL_INCLUDE_DIR})
-set(CGAL_LIBRARY -L${CGAL_LIB_PATH} -lCGAL -lgmp)
+set(CGAL_LIBRARIES -L${CGAL_LIB_PATH} -lCGAL -lgmp)
 
 include_directories(${HDF5_INCLUDE_DIR})
 set(HDF5_LIBRARIES -L${HDF5_LIB_PATH} -lhdf5 -lhdf5_hl -lhdf5_cpp)
