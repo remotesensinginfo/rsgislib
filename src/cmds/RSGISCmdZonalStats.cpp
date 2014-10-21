@@ -31,6 +31,7 @@
 #include "math/RSGISMatrices.h"
 
 #include "img/RSGISPixelInPoly.h"
+//#include "img/RSGISPixelInPoly.cpp"
 
 #include "vec/RSGISVectorZonalStats.h"
 #include "vec/RSGISZonalStats2Matrix.h"

@@ -62,7 +62,7 @@ namespace rsgis{namespace img {
 		}
 		else if(method == polyOverlapsOrContainsPixel) // Polygon overlaps or contains the pixel
 		{
-			if (poly->Overlaps(pixel) or poly->Contains(pixel))
+			if (poly->Overlaps(pixel) | poly->Contains(pixel))
 			{
 				returnVal = true;
 			}
