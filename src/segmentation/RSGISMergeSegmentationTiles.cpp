@@ -166,12 +166,15 @@ namespace rsgis{namespace segment{
             size_t clumpsOffset = 0;
             size_t numClumps = 0;
             
-            // Get maximum clumpid
-            //outputDataset->GetRasterBand(1)->GetStatistics(false, true, NULL, &maxVal, NULL, NULL);
-            //clumpsOffset = maxVal;
-            
+            // Get maximum clumpid           
+            outputDataset->GetRasterBand(1)->GetStatistics(false, true, NULL, &maxVal, NULL, NULL);
+            clumpsOffset = maxVal+1;
             outAttTable = outputDataset->GetRasterBand(1)->GetDefaultRAT();
-            clumpsOffset = outAttTable->GetRowCount();            
+            numRows = outAttTable->GetRowCount();
+            if(maxVal > numRows)
+            {
+                outAttTable->SetRowCount(clumpsOffset);
+            }           
             
             for(std::vector<std::string>::iterator iterFiles = inputImagePaths.begin(); iterFiles != inputImagePaths.end(); ++iterFiles)
             {
@@ -248,7 +251,7 @@ namespace rsgis{namespace segment{
             size_t currentNumRows = 0;
             int *posVals = attUtils.readIntColumn(gdalATT, clumpPosColName, &currentNumRows);
             
-            for(size_t i = 1; i < numRows; ++i)
+            for(size_t i = 0; i < numRows; ++i)
             {
                 if(posVals[i] == tileBody)
                 {
@@ -286,7 +289,7 @@ namespace rsgis{namespace segment{
             int *colVals = new int[numRows];
             std::cout << "Number of Rows = " << numRows << std::endl;
                       
-            for(size_t i = 1; i < numRows; ++i)
+            for(size_t i = 0; i < numRows; ++i)
             {
                 colVals[i] = (int)clumpsOffset++;
                 ++numClumps;
