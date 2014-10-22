@@ -48,6 +48,7 @@
 #include "rastergis/RSGISCalcNeighbourStats.h"
 #include "rastergis/RSGISBinaryClassifyClumps.h"
 #include "rastergis/RSGISClumpRegionGrowing.h"
+#include "rastergis/RSGISCollapseRAT.h"
 
 
 /*
@@ -1587,6 +1588,36 @@ namespace rsgis{ namespace cmds {
             GDALClose(clumpsDataset);
             GDALClose(imageDataset);
             GDALClose(imageMeanLitDataset);
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+            
+            
+            
+    void executeCollapseRAT(std::string clumpsImage, unsigned int ratBand, std::string selectColumn, std::string outImage, std::string gdalFormat)throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            
+            GDALDataset *clumpsDataset = (GDALDataset *) GDALOpenShared(clumpsImage.c_str(), GA_ReadOnly);
+            if(clumpsDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + clumpsImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            rsgis::rastergis::RSGISCollapseRAT collapseRat = rsgis::rastergis::RSGISCollapseRAT();
+            collapseRat.classifyClumps(clumpsDataset, ratBand, selectColumn, outImage, gdalFormat);
+            
+            GDALClose(clumpsDataset);
         }
         catch(rsgis::RSGISException &e)
         {
