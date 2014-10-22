@@ -268,6 +268,10 @@ namespace rsgis{ namespace cmds {
     /** Function for populating an attribute table from an image with 'mean-lit' values. */
     void executePopulateRATWithMeanLitStats(std::string inputImage, std::string clumpsImage, std::string inputMeanLitImage, unsigned int meanlitBand, std::string meanLitColumn, std::string pxlCountCol, std::vector<rsgis::cmds::RSGISBandAttStatsCmds*> *bandStatsCmds, unsigned int ratBand)throw(RSGISCmdException);
     
+    /** Function for collapsing a RAT and assocated image clumps based on a binary column 'selected' column in the RAT */
+    void executeCollapseRAT(std::string clumpsImage, unsigned int ratBand, std::string selectColumn, std::string outImage, std::string gdalFormat)throw(RSGISCmdException);
+    
+    
 }}
 
 

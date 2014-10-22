@@ -1783,7 +1783,45 @@ namespace rsgis{namespace rastergis{
             throw RSGISAttributeTableException(e.what());
         }
     }
-
+    
+    std::vector<RSGISRATCol>* RSGISRasterAttUtils::getRatColumnsList(GDALRasterAttributeTable *gdalATT) throw(RSGISAttributeTableException)
+    {
+        std::vector<RSGISRATCol> *ratCols = new std::vector<RSGISRATCol>();
+        try
+        {
+            unsigned int numCols = gdalATT->GetColumnCount();
+            ratCols->reserve(numCols);
+            
+            RSGISRATCol colDetails = RSGISRATCol();
+            for(unsigned int i = 0; i < numCols; ++i)
+            {
+                colDetails = RSGISRATCol();
+                
+                colDetails.name = std::string(gdalATT->GetNameOfCol(i));
+                colDetails.idx = i;
+                colDetails.usage = gdalATT->GetUsageOfCol(i);
+                colDetails.type = gdalATT->GetTypeOfCol(i);
+                                
+                ratCols->push_back(colDetails);
+            }
+            
+        }
+        catch (RSGISAttributeTableException &e)
+        {
+            throw e;
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw RSGISAttributeTableException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw RSGISAttributeTableException(e.what());
+        }
+        
+        return ratCols;
+    }
+    
 
     RSGISRasterAttUtils::~RSGISRasterAttUtils()
     {

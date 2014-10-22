@@ -781,6 +781,7 @@ set(LIB_RASTERGIS_H
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcNeighbourStats.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISClumpRegionGrowing.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISBinaryClassifyClumps.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCollapseRAT.h
 	)
 	
 	
@@ -818,6 +819,8 @@ set(LIB_RASTERGIS_CPP
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISClumpRegionGrowing.cpp
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISBinaryClassifyClumps.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISBinaryClassifyClumps.cpp
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCollapseRAT.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCollapseRAT.cpp
 	)
 	
 ###############################################################################
