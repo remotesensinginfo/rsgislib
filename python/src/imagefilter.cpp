@@ -247,15 +247,15 @@ static PyObject *ImageFilter_LeungMalikFilterBank(PyObject *self, PyObject *args
 // Our list of functions in this module
 static PyMethodDef ImageFilterMethods[] = {
     {"applyfilters", ImageFilter_Filter, METH_VARARGS, 
-"imagefilter.applyfilters(inputimage, outputImageBase, filterparameters, gdalFormat, outExt, dataType)\n"
+"imagefilter.applyfilters(inputimage, outputImageBase, filterparameters, gdalformat, outExt, datatype)\n"
 "Filters images\n"
 "Where:\n"
 "\n"
 "* inputimage is a string containing the name of the input image\n"
 "* outputImageBase is a string containing the base name of the output images\n"
 "* filterparameters is list of rsgislib.imagefilter.FilterParameters objects providing the type of filter and required parameters (see example)\n"
-"* gdalFormat is a string containing the GDAL format for the output file - eg 'KEA'\n"
-"* dataType is an int containing one of the values from rsgislib.TYPE_*\n"
+"* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+"* datatype is an int containing one of the values from rsgislib.TYPE_*\n"
 "\n"
 "Example::\n"
 "\n"
@@ -263,9 +263,9 @@ static PyMethodDef ImageFilterMethods[] = {
 "   from rsgislib import imagefilter\n"
 "   inputImage = './Rasters/injune_p142_casi_sub_utm_single_band.vrt'\n"
 "   outputImageBase = './TestOutputs/injune_p142_casi_sub_utm_single_band'\n"
-"   gdalFormat = 'KEA'\n"
+"   gdalformat = 'KEA'\n"
 "   outExt = 'kea'\n"
-"   dataType = rsgislib.TYPE_32FLOAT\n"
+"   datatype = rsgislib.TYPE_32FLOAT\n"
 "   filters = []\n"
 "   filters.append(imagefilter.FilterParameters(filterType = 'GaussianSmooth', fileEnding = 'gausmooth', size=3, stddevX = 1., stddevY = 1, angle = 0.) )\n"
 "   filters.append(imagefilter.FilterParameters(filterType = 'Gaussian1st', fileEnding = 'gau1st', size=3, stddevX = 1., stddevY = 1, angle = 0.) )\n"
@@ -293,11 +293,11 @@ static PyMethodDef ImageFilterMethods[] = {
 "   filters.append(imagefilter.FilterParameters(filterType = 'NormVarLn', fileEnding = 'normvarln', size=3) )\n"
 "   filters.append(imagefilter.FilterParameters(filterType = 'TextureVar', fileEnding = 'texturevar', size=3) )\n"
 "   # Apply filters\n"
-"   imagefilter.applyfilters(inputImage, outputImageBase, filters, gdalFormat, outExt, dataType)\n"
+"   imagefilter.applyfilters(inputImage, outputImageBase, filters, gdalformat, outExt, datatype)\n"
 "\n"},
 
     {"LeungMalikFilterBank", ImageFilter_LeungMalikFilterBank, METH_VARARGS, 
-"imagefilter.(inputimage, outputImageBase, gdalFormat, outExt, dataType)\n"
+"imagefilter.(inputimage, outputImageBase, gdalformat, outExt, datatype)\n"
 "Implements the Leung-Malik filter bank described in:\n"
 "Leung, T., Malik, J., 2001. Representing and recognizing the visual appearance of materials using three-dimensional textons.\n"
 "International Journal of Computer Vision 43 (1), 29-44.\n"
@@ -305,8 +305,8 @@ static PyMethodDef ImageFilterMethods[] = {
 "\n"
 "* inputimage is a string containing the name of the input image\n"
 "* outputImageBase is a string containing the base name of the output images\n"
-"* gdalFormat is a string containing the GDAL format for the output file - eg 'KEA'\n"
-"* dataType is an int containing one of the values from rsgislib.TYPE_*\n"
+"* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+"* datatype is an int containing one of the values from rsgislib.TYPE_*\n"
 "\n"
 "Example::\n"
 "\n"
@@ -314,10 +314,10 @@ static PyMethodDef ImageFilterMethods[] = {
 "   from rsgislib import imagefilter\n"
 "   inputImage = './Rasters/injune_p142_casi_sub_utm_single_band.vrt'\n"
 "   outputImageBase = './TestOutputs/injune_p142_casi_sub_utm_single_band'\n"
-"   gdalFormat = 'KEA'\n"
+"   gdalformat = 'KEA'\n"
 "   outExt = 'kea'\n"
-"   dataType = rsgislib.TYPE_32FLOAT\n"
-"   imagefilter.LeungMalikFilterBank(inputImage, outputImageBase, gdalFormat, outExt, dataType)\n"
+"   datatype = rsgislib.TYPE_32FLOAT\n"
+"   imagefilter.LeungMalikFilterBank(inputImage, outputImageBase, gdalformat, outExt, datatype)\n"
 "\n"},
 
     {NULL}        /* Sentinel */

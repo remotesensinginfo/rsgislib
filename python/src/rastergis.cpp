@@ -1980,7 +1980,7 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"},
 
     {"classMask", RasterGIS_ClassMask, METH_VARARGS,
-"rastergis.classMask(inputImage, classField, className, outputFile, gdalFormat, gdalType)\n"
+"rastergis.classMask(inputImage, classField, className, outputFile, gdalformat, gdalType)\n"
 "Generates a mask for a particular class\n"
 "Where:\n"
 "\n"
@@ -1988,8 +1988,8 @@ static PyMethodDef RasterGISMethods[] = {
 "* classField is a string\n"
 "* className is a string\n"
 "* outputFile is a string containing the name of the output file\n"
-"* gdalFormat is a string containing the GDAL format for the output file - eg 'KEA'\n"
-"* gdaltype is an int containing one of the values from rsgislib.TYPE_*\n"
+"* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+"* datatype is an int containing one of the values from rsgislib.TYPE_*\n"
 "\n"},
 */
     {"findNeighbours", RasterGIS_FindNeighbours, METH_VARARGS,
@@ -2002,13 +2002,13 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"},
 
     {"findBoundaryPixels", RasterGIS_FindBoundaryPixels, METH_VARARGS,
-"rastergis.findBoundaryPixels(inputImage, outputFile, gdalFormat, ratBand)\n"
+"rastergis.findBoundaryPixels(inputImage, outputFile, gdalformat, ratBand)\n"
 "Identifies the pixels on the boundary of the clumps\n"
 "Where:\n"
 "\n"
 "* inputImage is a string containing the name of the input image file\n"
 "* outputFile is a string containing the name of the output file\n"
-"* gdalFormat is a string containing the GDAL format for the output file - (Optional, Default = 'KEA')\n"
+"* gdalformat is a string containing the GDAL format for the output file - (Optional, Default = 'KEA')\n"
 "* ratBand is an int containing band for which the neighbours are to be calculated for (Optional, Default = 1)\n"
 "\n"},
 
@@ -2162,7 +2162,7 @@ static PyMethodDef RasterGISMethods[] = {
     "\n"},
     
 {"interpolateClumpValues2Image", RasterGIS_InterpolateClumpValues2Img, METH_VARARGS,
-    "rsgislib.rastergis.interpolateClumpValues2Image(clumpsImage, selectField, eastingsField, northingsField, methodStr, valueField, outputFile, imageFormat, dataType, ratBand)\n"
+    "rsgislib.rastergis.interpolateClumpValues2Image(clumpsImage, selectField, eastingsField, northingsField, methodStr, valueField, outputFile, gdalformat, gdaltype, ratBand)\n"
     "Interpolates values from clumps to the whole image of pixels.\n"
     "Where:\n"
     "\n"
@@ -2173,8 +2173,8 @@ static PyMethodDef RasterGISMethods[] = {
     "* methodStr is a string which defines a column with a value for each clump which will be used for the distance, nearestneighbour or naturalneighbour or naturalnearestneighbour or knearestneighbour or idwall anaylsis.\n"
     "* valueField is a string which defines a column containing the values to be interpolated creating the new image.\n"
     "* outputFile is a string for the path to the output image file.\n"
-    "* imageFormat is string defining the GDAL format of the output image.\n"
-    "* dataType is an containing one of the values from rsgislib.TYPE_*\n"
+    "* gdalformat is string defining the GDAL format of the output image.\n"
+    "* datatype is an containing one of the values from rsgislib.TYPE_*\n"
     "* ratBand is the image band with which the RAT is associated."
     "\n"},
     
