@@ -142,24 +142,24 @@ class RSGISPyUtils (object):
     A class with useful utilities within RSGISLib.
     """
     
-    def getFileExtension(self, format):
+    def getFileExtension(self, gdalformat):
         """
         A function to get the extension for a given file format 
         (NOTE, currently only KEA, GTIFF, HFA, PCI and ENVI are supported).
         """
         ext = ".NA"
-        if format.lower() == "kea":
+        if gdalformat.lower() == "kea":
             ext = ".kea"
-        elif format.lower() == "gtiff":
+        elif gdalformat.lower() == "gtiff":
             ext = ".tif"
-        elif format.lower() == "hfa":
+        elif gdalformat.lower() == "hfa":
             ext = ".img"
-        elif format.lower() == "envi":
+        elif gdalformat.lower() == "envi":
             ext = ".env"
-        elif format.lower() == "pcidsk":
+        elif gdalformat.lower() == "pcidsk":
             ext = ".pix"
         else:
-            raise RSGISPyException("The extension for the format specified is unknown.")
+            raise RSGISPyException("The extension for the gdalformat specified is unknown.")
         return ext
     
     def getGDALFormatFromExt(self, fileName):
