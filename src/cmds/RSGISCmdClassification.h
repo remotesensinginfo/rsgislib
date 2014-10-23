@@ -34,10 +34,10 @@
 namespace rsgis{ namespace cmds {
 
     /** A function to collapse a segmentation RAT to a classification (i.e., 1 row per class) */
-    void executeCollapseRAT2Class(std::string clumpsImage, std::string outputImage, std::string outImageFormat, std::string classColumn)throw(RSGISCmdException);
+    DllExport void executeCollapseRAT2Class(std::string clumpsImage, std::string outputImage, std::string outImageFormat, std::string classColumn)throw(RSGISCmdException);
     
     /** A function to generate a 3 band colour image from the colour table */
-    void executeGenerate3BandFromColourTable(std::string clumpsImage, std::string outputImage, std::string outImageFormat)throw(RSGISCmdException);
+    DllExport void executeGenerate3BandFromColourTable(std::string clumpsImage, std::string outputImage, std::string outImageFormat)throw(RSGISCmdException);
     
 }}
 #endif

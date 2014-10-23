@@ -20,11 +20,11 @@
  *
  */
 
+#define _USE_MATH_DEFINES
+#include <cmath>
+
 #include "rsgispy_common.h"
 #include "cmds/RSGISCmdImageCalibration.h"
-
-#include <cmath>
-#define _USE_MATH_DEFINES
 
 /* An exception object for this module */
 /* created in the init function */
