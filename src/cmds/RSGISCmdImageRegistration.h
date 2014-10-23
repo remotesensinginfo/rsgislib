@@ -33,35 +33,35 @@
 namespace rsgis{ namespace cmds {
 
     /** Basic image registration */
-    void excecuteBasicRegistration(std::string inputReferenceImage, std::string inputFloatingmage, int gcpGap,
+    DllExport void excecuteBasicRegistration(std::string inputReferenceImage, std::string inputFloatingmage, int gcpGap,
                                    float metricThreshold, int windowSize, int searchArea, float stdDevRefThreshold,
                                    float stdDevFloatThreshold, int subPixelResolution, unsigned int metricTypeInt,
                                    unsigned int outputType, std::string outputGCPFile)throw(RSGISCmdException);
     
     /** Single connected layer image registration */
-    void excecuteSingleLayerConnectedRegistration(std::string inputReferenceImage, std::string inputFloatingmage, int gcpGap,
+    DllExport void excecuteSingleLayerConnectedRegistration(std::string inputReferenceImage, std::string inputFloatingmage, int gcpGap,
                                                   float metricThreshold, int windowSize, int searchArea, float stdDevRefThreshold,
                                                   float stdDevFloatThreshold, int subPixelResolution, int distanceThreshold,
                                                   int maxNumIterations, float moveChangeThreshold, float pSmoothness, unsigned int metricTypeInt,
                                                   unsigned int outputType, std::string outputGCPFile)throw(RSGISCmdException);
 
     /** Warp image using triangulation interpolation */
-    void excecuteTriangularWarp(std::string inputImage, std::string outputImage, std::string projFile, std::string inputGCPs,
+    DllExport void excecuteTriangularWarp(std::string inputImage, std::string outputImage, std::string projFile, std::string inputGCPs,
                         float resolution, std::string imageFormat = "KEA", bool genTransformImage = false)throw(RSGISCmdException);
     
     /** Warp image using NN interpolation */
-    void excecuteNNWarp(std::string inputImage, std::string outputImage, std::string projFile, std::string inputGCPs,
+    DllExport void excecuteNNWarp(std::string inputImage, std::string outputImage, std::string projFile, std::string inputGCPs,
                         float resolution, std::string imageFormat = "KEA", bool genTransformImage = false)throw(RSGISCmdException);
     
     /** Warp image using polynominal interpolation */
-    void excecutePolyWarp(std::string inputImage, std::string outputImage, std::string projFile, std::string inputGCPs,
+    DllExport void excecutePolyWarp(std::string inputImage, std::string outputImage, std::string projFile, std::string inputGCPs,
                         float resolution, int polyOrder = 3, std::string imageFormat = "KEA", bool genTransformImage = false)throw(RSGISCmdException);
     
     /** Add tie points to GCP */
-    void excecuteAddGCPsGDAL(std::string inputImage, std::string inputGCPs, std::string outputImage, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException);
+    DllExport void excecuteAddGCPsGDAL(std::string inputImage, std::string inputGCPs, std::string outputImage, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException);
     
     /** Apply offset to image file */
-    void executeApplyOffset2Image(std::string inputImage, std::string outputImage, std::string gdalFormat, RSGISLibDataType outDataType, double xOff, double yOff)throw(RSGISCmdException);
+    DllExport void executeApplyOffset2Image(std::string inputImage, std::string outputImage, std::string gdalFormat, RSGISLibDataType outDataType, double xOff, double yOff)throw(RSGISCmdException);
 }}
 
 

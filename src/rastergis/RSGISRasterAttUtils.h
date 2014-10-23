@@ -117,6 +117,14 @@ namespace rsgis{namespace rastergis{
         return true;
     };
     
+    struct DllExport RSGISRATCol
+    {
+        std::string name;
+        unsigned int idx;
+        GDALRATFieldType type;
+        GDALRATFieldUsage usage;
+    };
+    
     class DllExport RSGISRasterAttUtils
     {
     public:
@@ -132,7 +140,6 @@ namespace rsgis{namespace rastergis{
         double readDoubleColumnVal(const GDALRasterAttributeTable *gdalATT, std::string colName, unsigned int row) throw(RSGISAttributeTableException);
         long readIntColumnVal(const GDALRasterAttributeTable *gdalATT, std::string colName, unsigned int row) throw(RSGISAttributeTableException);
         std::string readStringColumnVal(const GDALRasterAttributeTable *gdalATT, std::string colName, unsigned int row) throw(RSGISAttributeTableException);
-        
         double* readDoubleColumn(GDALRasterAttributeTable *attTable, std::string colName, size_t *colLen) throw(RSGISAttributeTableException);
         int* readIntColumn(GDALRasterAttributeTable *attTable, std::string colName, size_t *colLen) throw(RSGISAttributeTableException);
         char** readStrColumn(GDALRasterAttributeTable *attTable, std::string colName, size_t *colLen) throw(RSGISAttributeTableException);
@@ -141,6 +148,8 @@ namespace rsgis{namespace rastergis{
         std::vector<std::vector<size_t>* >* getRATNeighbours(GDALDataset *clumpImage, unsigned int ratBand) throw(RSGISAttributeTableException);
         
         void writeStrColumn(GDALRasterAttributeTable *attTable, std::string colName, std::string *strDataVal, size_t colLen) throw(RSGISAttributeTableException);
+        
+        std::vector<RSGISRATCol>* getRatColumnsList(GDALRasterAttributeTable *gdalATT) throw(RSGISAttributeTableException);
         
         ~RSGISRasterAttUtils();
     };

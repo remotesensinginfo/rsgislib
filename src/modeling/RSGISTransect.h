@@ -37,7 +37,7 @@ namespace rsgis{namespace modeling {
 	class DllExport RSGISTransect
 	{
 	public:
-		RSGISTransect(unsigned int transectLenght, unsigned int transectWidth, unsigned int transectHeight, double transectRes);
+		RSGISTransect(unsigned int transectLength, unsigned int transectWidth, unsigned int transectHeight, double transectRes);
 		/// Set all values to zero
 		void setZero();
 		/// Set all values to newVal
@@ -64,7 +64,7 @@ namespace rsgis{namespace modeling {
 		void exportSPD(std::string outFileName);
 		~RSGISTransect();
 	protected:
-		unsigned int transectLenght;
+		unsigned int transectLength;
 		unsigned int transectWidth;
 		unsigned int transectHeight;
 		double transectRes;

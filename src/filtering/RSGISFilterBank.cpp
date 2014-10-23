@@ -60,7 +60,7 @@ namespace rsgis{namespace filter{
 			for(int i = 0; i < size; i++)
 			{
 				std::cout << "Executing filter " << (i+1) << " of " << size << std::endl;
-				filename = outImageBase + std::string("_") + this->filters->at(i)->getFileNameEnding() + "." + imgExt;
+				filename = outImageBase + this->filters->at(i)->getFileNameEnding() + "." + imgExt;
 				dynamic_cast<rsgis::img::RSGISCalcImageValue*>(this->filters->at(i))->setNumOutBands(numOutBands);
 				this->filters->at(i)->runFilter(datasets, numDS, filename, gdalFormat, outDataType);
 			}

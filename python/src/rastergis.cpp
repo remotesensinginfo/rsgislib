@@ -1595,6 +1595,30 @@ static PyObject *RasterGIS_PopulateRATWithMeanLitStats(PyObject *self, PyObject 
     Py_RETURN_NONE;
 }
 
+static PyObject *RasterGIS_CollapseRAT(PyObject *self, PyObject *args)
+{
+    const char *clumpsImage, *selectField, *outputFile, *imageFormat;
+    int ratBand;
+    ratBand = 1;
+    
+    if(!PyArg_ParseTuple(args, "ssss|i:collapseRAT", &clumpsImage, &selectField, &outputFile, &imageFormat, &ratBand))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeCollapseRAT(std::string(clumpsImage), ratBand, std::string(selectField), std::string(outputFile), std::string(imageFormat));
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 
 static PyMethodDef RasterGISMethods[] = {
     {"populateStats", (PyCFunction)RasterGIS_PopulateStats, METH_VARARGS | METH_KEYWORDS,
@@ -2326,6 +2350,18 @@ static PyMethodDef RasterGISMethods[] = {
     "   bandStats.append(rastergis.BandAttStats(band=5, meanField='NIRMeanML', stdDevField='NIRStdDevML'))\n"
     "   rastergis.populateRATWithMeanLitStats(valsimage=inputImage, clumps=segmentClumps, meanLitImage=ndviImage, meanlitBand=1, meanLitCol='NDVIMean', pxlCountCol='MLPxlCount', bandstats=bandStats, ratband=1)\n"
     "\n"},
+    
+    {"collapseRAT", RasterGIS_CollapseRAT, METH_VARARGS,
+        "rsgislib.rastergis.collapseRAT(clumpsImage, selectField, outputFile, gdalformat, ratBand)\n"
+        "Collapses the image and rat to a set of selected rows (defined with a value of 1 in the selected column).\n"
+        "Where:\n"
+        "\n"
+        "* clumpsImage is a string containing the name of the input clump file\n"
+        "* selectField is a string containing the name of the binary column used to selected the rows to which the RAT is to be collapsed to.\n"
+        "* outputFile is a string with the output file name\n"
+        "* gdalformat is a string with the output image file format - note only KEA and HFA support RATs.\n"
+        "* ratBand is the image band with which the RAT is associated.\n"
+        "\n"},
     
     {NULL}        /* Sentinel */
 };

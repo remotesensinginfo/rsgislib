@@ -106,8 +106,8 @@ namespace rsgis{ namespace cmds {
         {
             
             // Convert to absolute path
-            inputVector = boost::filesystem::absolute(inputVector).c_str();
-            outputVector = boost::filesystem::absolute(outputVector).c_str();
+            inputVector = boost::filesystem::absolute(inputVector).string();
+            outputVector = boost::filesystem::absolute(outputVector).string();
             
             OGRRegisterAll();
             
@@ -223,8 +223,8 @@ namespace rsgis{ namespace cmds {
         try
         {
             // Convert to absolute path
-            inputVector = boost::filesystem::absolute(inputVector).c_str();
-            outputVector = boost::filesystem::absolute(outputVector).c_str();
+            inputVector = boost::filesystem::absolute(inputVector).string();
+            outputVector = boost::filesystem::absolute(outputVector).string();
             
             OGRRegisterAll();
             
@@ -337,7 +337,7 @@ namespace rsgis{ namespace cmds {
         try
         {
             // Convert to absolute path
-            inputVector = boost::filesystem::absolute(inputVector).c_str();
+            inputVector = boost::filesystem::absolute(inputVector).string();
             
             OGRRegisterAll();
             
@@ -436,7 +436,7 @@ namespace rsgis{ namespace cmds {
         try
         {
             // Convert to absolute path
-            inputVector = boost::filesystem::absolute(inputVector).c_str();
+            inputVector = boost::filesystem::absolute(inputVector).string();
             
             
             OGRRegisterAll();
@@ -499,8 +499,8 @@ namespace rsgis{ namespace cmds {
         try
         {
             // Convert to absolute path
-            inputVector = boost::filesystem::absolute(inputVector).c_str();
-            outputVector = boost::filesystem::absolute(outputVector).c_str();
+            inputVector = boost::filesystem::absolute(inputVector).string();
+            outputVector = boost::filesystem::absolute(outputVector).string();
             
             
             OGRRegisterAll();
@@ -615,9 +615,9 @@ namespace rsgis{ namespace cmds {
         try
         {
             // Convert to absolute path
-            inputVector = boost::filesystem::absolute(inputVector).c_str();
-            inputCoverVector = boost::filesystem::absolute(inputCoverVector).c_str();
-            output_DIR = boost::filesystem::absolute(output_DIR).c_str();
+            inputVector = boost::filesystem::absolute(inputVector).string();
+            inputCoverVector = boost::filesystem::absolute(inputCoverVector).string();
+            output_DIR = boost::filesystem::absolute(output_DIR).string();
             
             OGRRegisterAll();
             
@@ -805,7 +805,7 @@ namespace rsgis{ namespace cmds {
     void executePopulateGeomZField(std::string inputVector, std::string inputImage, unsigned int imgBand, std::string outputVector, bool force) throw(RSGISCmdException)
     {
         // Convert to absolute path
-        inputVector = boost::filesystem::absolute(inputVector).c_str();
+        inputVector = boost::filesystem::absolute(inputVector).string();
         
         GDALAllRegister();
         OGRRegisterAll();
@@ -966,8 +966,8 @@ namespace rsgis{ namespace cmds {
         try
         {
             // Convert to absolute path
-            inputVector = boost::filesystem::absolute(inputVector).c_str();
-            outputVector = boost::filesystem::absolute(outputVector).c_str();
+            inputVector = boost::filesystem::absolute(inputVector).string();
+            outputVector = boost::filesystem::absolute(outputVector).string();
             
             
             OGRRegisterAll();
