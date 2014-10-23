@@ -304,8 +304,8 @@ static PyMethodDef ImageRegistrationMethods[] = {
 "    outputImage = './TestOutputs/injune_p142_casi_sub_utm_single_band_offset3x3y_twarp.kea'\n"
 "    wktStringFile = './Vectors/injune_p142_crowns_utm.prj'\n"
 "    resolution = 1\n"
-"    format = 'KEA'\n"
-"    imageregistration.triangularwarp(inputImage,inputGCPs, outputImage, wktStringFile, resolution, format)\n"
+"    gdalformat = 'KEA'\n"
+"    imageregistration.triangularwarp(inputImage,inputGCPs, outputImage, wktStringFile, resolution, gdalformat)\n"
 "\n"
 },  
 
@@ -328,8 +328,8 @@ static PyMethodDef ImageRegistrationMethods[] = {
 "    outputImage = './TestOutputs/injune_p142_casi_sub_utm_single_band_offset3x3y_nnwarp.kea'\n"
 "    wktStringFile = './Vectors/injune_p142_crowns_utm.prj'\n"
 "    resolution = 1\n"
-"    format = 'KEA'\n"
-"    imageregistration.nnwarp(inputImage,inputGCPs, outputImage, wktStringFile, resolution, format)\n"
+"    gdalformat = 'KEA'\n"
+"    imageregistration.nnwarp(inputImage,inputGCPs, outputImage, wktStringFile, resolution, gdalformat)\n"
 "\n"
 },  
 
@@ -354,8 +354,8 @@ static PyMethodDef ImageRegistrationMethods[] = {
 "    wktStringFile = './Vectors/injune_p142_crowns_utm.prj'\n"
 "    resolution = 1\n"
 "    polyOrder = 3\n"
-"    format = 'KEA'\n"
-"    imageregistration.polywarp(inputImage,inputGCPs, outputImage, wktStringFile, resolution, polyOrder, format)\n"
+"    gdalformat = 'KEA'\n"
+"    imageregistration.polywarp(inputImage,inputGCPs, outputImage, wktStringFile, resolution, polyOrder, gdalformat)\n"
 "\n"
 },  
 
