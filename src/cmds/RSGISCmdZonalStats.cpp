@@ -47,7 +47,7 @@ namespace rsgis{ namespace cmds {
                            bool force, bool useBandNames, bool shortenBandNames)throw(RSGISCmdException)
     {
         // Convert to absolute path
-        inputVecPolys = boost::filesystem::absolute(inputVecPolys).c_str();
+        inputVecPolys = boost::filesystem::absolute(inputVecPolys).string();
 
         GDALAllRegister();
         OGRRegisterAll();
