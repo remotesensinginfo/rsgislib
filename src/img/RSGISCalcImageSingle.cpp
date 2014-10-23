@@ -606,7 +606,7 @@ namespace rsgis{namespace img{
 			
 			geos::geom::Envelope *bufferedEnvelope = NULL;
 			
-			if (env->getWidth() < pxlWidth or env->getHeight() < pxlHeight) 
+			if ((env->getWidth() < pxlWidth) | (env->getHeight() < pxlHeight))
 			{
 				//std::cout << "BUFFERING\n";
 				buffer = true;
@@ -949,7 +949,7 @@ namespace rsgis{namespace img{
 			
 			geos::geom::Envelope *bufferedEnvelope = NULL;
 			
-			if (env->getWidth() < pixelXRes or env->getHeight() < pixelYRes) 
+			if ((env->getWidth() < pixelXRes) | (env->getHeight() < pixelYRes))
 			{
 				buffer = true;
 				bufferedEnvelope = new geos::geom::Envelope(env->getMinX() - pixelXRes / 2, env->getMaxX() + pixelXRes / 2, env->getMinY() - pixelYRes / 2, env->getMaxY() + pixelYRes / 2);

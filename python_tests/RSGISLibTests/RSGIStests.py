@@ -873,8 +873,6 @@ if __name__ == '__main__':
     
     if testLibraries == 'all' or testLibraries == 'imagecalc':
         """ ImageCalc functions """
-        t.testBandPercentile()
-        exit()
         t.tryFuncAndCatch(t.testNormalise1)
         t.tryFuncAndCatch(t.testNormalise2)
         t.tryFuncAndCatch(t.testCorrelation)
@@ -975,8 +973,6 @@ if __name__ == '__main__':
     if testLibraries == 'all' or testLibraries == 'vectorutils':
         
         """ Vector Utils functions """
-        t.testPolygonsInPolygon()
-        sys.exit()
         t.tryFuncAndCatch(t.testRemoveAttributes)
         t.tryFuncAndCatch(t.testBufferVector)
         t.tryFuncAndCatch(t.testPrintPolyGeom)

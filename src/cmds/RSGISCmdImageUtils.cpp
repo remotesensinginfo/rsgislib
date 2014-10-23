@@ -806,7 +806,7 @@ namespace rsgis{ namespace cmds {
             rsgis::vec::RSGISVectorUtils vecUtils;
 
             // Convert to absolute path
-            inputVector = boost::filesystem::absolute(inputVector).c_str();
+            inputVector = boost::filesystem::absolute(inputVector).string();
 
             std::string vectorLayerName = vecUtils.getLayerName(inputVector);
             int numImageBands = 0;
@@ -887,7 +887,7 @@ namespace rsgis{ namespace cmds {
             rsgis::vec::RSGISVectorUtils vecUtils;
 
             // Convert to absolute path
-            inputVector = boost::filesystem::absolute(inputVector).c_str();
+            inputVector = boost::filesystem::absolute(inputVector).string();
 
             std::string vectorLayerName = vecUtils.getLayerName(inputVector);
             int numImageBands = 0;

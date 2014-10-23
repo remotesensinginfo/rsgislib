@@ -50,6 +50,7 @@
 #include "img/RSGISCalcRMSE.h"
 #include "img/RSGISApplyFunction.h"
 #include "img/RSGISLinearSpectralUnmixing.h"
+#include "img/RSGISGenHistogram.h"
 
 
 #include "math/RSGISVectors.h"
@@ -68,8 +69,6 @@
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_linalg.h>
 #include <gsl/gsl_blas.h>
-
-#include "exe/rsgis/RSGISExeImageCalculation.h"
 
 #include "muParser.h"
 

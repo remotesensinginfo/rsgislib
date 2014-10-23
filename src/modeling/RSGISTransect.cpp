@@ -25,9 +25,9 @@
 
 namespace rsgis{ namespace modeling  {
     
-	RSGISTransect::RSGISTransect(unsigned int transectWidth, unsigned int transectLenght, unsigned int transectHeight, double transectRes)
+	RSGISTransect::RSGISTransect(unsigned int transectWidth, unsigned int transectLength, unsigned int transectHeight, double transectRes)
 	{
-		this->transectLenght = transectLenght;
+		this->transectLength = transectLength;
 		this->transectWidth = transectWidth;
 		this->transectHeight = transectHeight;
 		this->transectRes = transectRes;
@@ -36,8 +36,8 @@ namespace rsgis{ namespace modeling  {
 		this->transectData = new char**[transectWidth];
 		for(unsigned int i = 0; i < transectWidth; ++i)
 		{
-			transectData[i] = new char*[transectLenght];
-			for(unsigned int j = 0; j < transectLenght; ++j)
+			transectData[i] = new char*[transectLength];
+			for(unsigned int j = 0; j < transectLength; ++j)
 			{
 				transectData[i][j] = new char[transectHeight];
 				for(unsigned int k = 0; k < transectHeight; ++k)
@@ -54,7 +54,7 @@ namespace rsgis{ namespace modeling  {
 		// Set all values of the array to zero
 		for(unsigned int i = 0; i < transectWidth; ++i)
 		{
-			for(unsigned int j = 0; j < transectLenght; ++j)
+			for(unsigned int j = 0; j < transectLength; ++j)
 			{
 				for(unsigned int k = 0; k < transectHeight; ++k)
 				{
@@ -68,7 +68,7 @@ namespace rsgis{ namespace modeling  {
 		// Set all values of the array to newVal
 		for(unsigned int i = 0; i < transectWidth; ++i)
 		{
-			for(unsigned int j = 0; j < transectLenght; ++j)
+			for(unsigned int j = 0; j < transectLength; ++j)
 			{
 				for(unsigned int k = 0; k < transectHeight; ++k)
 				{
@@ -85,7 +85,7 @@ namespace rsgis{ namespace modeling  {
 	unsigned int RSGISTransect::getLenth()
 	{
 		// Retruns transect lenght (y) in voxels
-		return this->transectLenght;;
+		return this->transectLength;;
 	}
 	unsigned int RSGISTransect::getHeight()
 	{
@@ -104,7 +104,7 @@ namespace rsgis{ namespace modeling  {
 		{
 			throw RSGISModelingException("Width greater than transect max!");
 		}
-		if(yCord >= transectLenght)
+		if(yCord >= transectLength)
 		{
 			throw RSGISModelingException("Lenght greater than transect max!");
 		}
@@ -124,7 +124,7 @@ namespace rsgis{ namespace modeling  {
 		{
 			throw RSGISModelingException("Width greater than transect max!");
 		}
-		if(yCord > transectLenght)
+		if(yCord > transectLength)
 		{
 			throw RSGISModelingException("Length greater than transect max!");
 		}
@@ -135,9 +135,9 @@ namespace rsgis{ namespace modeling  {
 		
 		// Only sets value if within transect, ignore is outside.
 		
-		if(xCord > 0 and yCord > 0 and zCord > 0)
+		if((xCord > 0) & (yCord > 0) & (zCord > 0))
 		{
-			if(xCord < transectWidth and yCord < transectLenght and zCord < transectHeight) 
+			if((xCord < transectWidth) & (yCord < transectLength) & (zCord < transectHeight))
 			{
 				transectData[xCord][yCord][this->transectHeight - zCord] = transectVal;
 			}
@@ -149,7 +149,7 @@ namespace rsgis{ namespace modeling  {
 		
 		for(unsigned int i = 0; i < transectWidth; ++i)
 		{
-			for(unsigned int j = 0; j < transectLenght; ++j)
+			for(unsigned int j = 0; j < transectLength; ++j)
 			{
 				for(unsigned int k = 0; k < transectHeight; ++k)
 				{
@@ -168,12 +168,12 @@ namespace rsgis{ namespace modeling  {
 	{
 		// Generate image - Produces an ENVI file displaying a flattened view of the canopy
         rsgis::math::RSGISMatrices matrixUtils;
-		rsgis::math::Matrix *imageMatrix = matrixUtils.createMatrix(transectLenght, transectWidth);
+		rsgis::math::Matrix *imageMatrix = matrixUtils.createMatrix(transectLength, transectWidth);
 		
 		int mIndex = 0;
 		int mElement = 0;
 		
-		for(unsigned int i = 0; i < transectLenght; i++)
+		for(unsigned int i = 0; i < transectLength; i++)
 		{
 			for(unsigned int j = 0; j < transectWidth; j++)
 			{
@@ -214,7 +214,7 @@ namespace rsgis{ namespace modeling  {
 		
 		for(unsigned int i = 0; i < transectWidth; i++)
 		{
-			for(unsigned int j = 0; j < transectLenght; j++)
+			for(unsigned int j = 0; j < transectLength; j++)
 			{
 				for(unsigned int k = 0; k < transectHeight; k++)
 				{
@@ -246,7 +246,7 @@ namespace rsgis{ namespace modeling  {
 	{
 		for(unsigned int i = 0; i < transectWidth; ++i)
 		{
-			for(unsigned int j = 0; j < transectLenght; ++j)
+			for(unsigned int j = 0; j < transectLength; ++j)
 			{
 				delete[] transectData[i][j];
 			}

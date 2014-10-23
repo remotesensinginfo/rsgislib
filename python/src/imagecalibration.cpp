@@ -20,6 +20,9 @@
  *
  */
 
+#define _USE_MATH_DEFINES
+#include <cmath>
+
 #include "rsgispy_common.h"
 #include "cmds/RSGISCmdImageCalibration.h"
 
@@ -1492,11 +1495,11 @@ static PyMethodDef ImageCalibrationMethods[] = {
     "* inputImage is a string containing the name of the input file\n"
     "* outputImage is a string containing the name of the output file\n"
     "* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
-    "* bandDefnSeq is a sequence of rsgislib.imagecalibration.CmdsSPOT5RadianceGainsOffsets objects that define the inputs\n"
+    "* bandDefnSeq is a sequence of rsgislib.imagecalibration.CmdsSPOT5RadianceGainsOffsets objects in order of the input image bands that define the inputs\n"
     "Requires:\n"
     "\n"
     "   * bandName - Name of image band in output file.\n"
-    "   * bandIndex - Index (starting from 1) of the band in the image file.\n"
+    "   * bandIndex - Index (starting from 1) of the output image band order (i.e., to reorder the image bands).\n"
     "   * gain - PHYSICAL_GAIN value from SPOT5 XML header.\n"
     "   * bias - PHYSICAL_BIAS value from SPOT5 XML header.\n"
     "\n"},

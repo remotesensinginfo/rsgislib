@@ -75,7 +75,7 @@ namespace rsgis{namespace rastergis{
             
             for(unsigned long i = 0; i < maxClumpIdx; ++i)
             {
-                neighbours->push_back(new std::list<unsigned long>());
+                neighbours->push_back(new std::list<size_t>());
             }
             
             int windowSize = 3;
