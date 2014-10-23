@@ -9,6 +9,7 @@ Utilities
 ---------
 
 .. autofunction:: rsgislib.rastergis.ratutils.populateImageStats
+.. autofunction:: rsgislib.rastergis.collapseRAT
 
 Attribute Segments
 -------------------
