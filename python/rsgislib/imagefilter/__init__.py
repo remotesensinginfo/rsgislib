@@ -31,6 +31,7 @@ Where:
 * datatype - Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
 
 Example::
+
     import rsgislib
     from rsgislib import imagefilter
     inputImage = 'jers1palsar_stack.kea'
@@ -55,6 +56,7 @@ Where:
 * datatype - Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
 
 Example::
+
     import rsgislib
     from rsgislib import imagefilter
     inputImage = 'jers1palsar_stack.kea'
@@ -79,6 +81,7 @@ Where:
 * datatype - Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
 
 Example::
+
     import rsgislib
     from rsgislib import imagefilter
     inputImage = 'jers1palsar_stack.kea'
@@ -103,6 +106,7 @@ Where:
 * datatype - Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
 
 Example::
+
     import rsgislib
     from rsgislib import imagefilter
     inputImage = 'jers1palsar_stack.kea'
@@ -128,6 +132,7 @@ Where:
 * datatype - Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
 
 Example::
+
     import rsgislib
     from rsgislib import imagefilter
     inputImage = 'jers1palsar_stack.kea'
@@ -155,6 +160,7 @@ Where:
 * datatype - Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
 
 Example::
+
     import rsgislib
     from rsgislib import imagefilter
     inputImage = 'jers1palsar_stack.kea'
@@ -182,6 +188,7 @@ Where:
 * datatype - Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
 
 Example::
+
     import rsgislib
     from rsgislib import imagefilter
     inputImage = 'jers1palsar_stack.kea'
@@ -209,6 +216,7 @@ Where:
 * datatype - Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
 
 Example::
+
     import rsgislib
     from rsgislib import imagefilter
     inputImage = 'jers1palsar_stack.kea'
@@ -234,6 +242,7 @@ Where:
 * datatype - Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
 
 Example::
+
     import rsgislib
     from rsgislib import imagefilter
     inputImage = 'jers1palsar_stack.kea'
@@ -260,6 +269,7 @@ Where:
 * datatype - Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
 
 Example::
+
     import rsgislib
     from rsgislib import imagefilter
     inputImage = 'jers1palsar_stack.kea'
