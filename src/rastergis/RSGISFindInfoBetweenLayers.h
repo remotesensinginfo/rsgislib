@@ -56,7 +56,7 @@ namespace rsgis{namespace rastergis{
     class DllExport RSGISCalcClumpClassMajorities : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
-		RSGISCalcClumpClassMajorities(char **baseColData, char **infoColData, std::vector<char*> classes, unsigned int **clumpCounter, bool ignoreZero = true);
+        RSGISCalcClumpClassMajorities(std::string *baseColData, std::string *infoColData, std::vector<std::string> classes, unsigned int **clumpCounter, bool ignoreZero = true);
 		void calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
 		void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException);
         void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
@@ -69,9 +69,9 @@ namespace rsgis{namespace rastergis{
 		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
 		~RSGISCalcClumpClassMajorities();
     protected:
-        char **baseColData;
-        char **infoColData;
-        std::vector<char*> classes;
+        std::string *baseColData;
+        std::string *infoColData;
+        std::vector<std::string> classes;
         unsigned int **clumpCounter;
         bool ignoreZero;
 	};
