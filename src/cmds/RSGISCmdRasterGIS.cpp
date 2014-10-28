@@ -1033,7 +1033,8 @@ namespace rsgis{ namespace cmds {
             std::cout << "Opening RAT" << std::endl;
             GDALAllRegister();
             GDALDataset *clumpsDataset = (GDALDataset *) GDALOpen(clumpsImage.c_str(), GA_Update);
-            if(clumpsDataset == NULL) {
+            if(clumpsDataset == NULL)
+            {
                 std::string message = std::string("Could not open image ") + clumpsImage;
                 throw rsgis::RSGISImageException(message.c_str());
             }
@@ -1084,9 +1085,9 @@ namespace rsgis{ namespace cmds {
             // Calculate change
             ratCalc->calcRATValues(ratCalcVal->attTable, inRealColIdx, inIntColIdx, inStrColIdx, outRealColIdx, outIntColIdx, outStrColIdx);
 
-            std::cout << "Writing attributes\n";
+            //std::cout << "Writing attributes\n";
             // Set attribute table
-            clumpsDataset->GetRasterBand(ratBand)->SetDefaultRAT(ratCalcVal->attTable);
+            //clumpsDataset->GetRasterBand(ratBand)->SetDefaultRAT(ratCalcVal->attTable);
 
             // Close GDAL Dataset
             GDALClose(clumpsDataset);

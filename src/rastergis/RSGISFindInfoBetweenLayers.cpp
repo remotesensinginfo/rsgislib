@@ -67,27 +67,27 @@ namespace rsgis{namespace rastergis{
             std::string colName = "";
 
             // Get column indices
-            baseClassIdx = attUtils.findColumnIndexOrCreate(baseATable, baseClassCol,GFT_String);
+            baseClassIdx = attUtils.findColumnIndexOrCreate(baseATable, baseClassCol, GFT_String);
             infoClassIdx = attUtils.findColumnIndex(infoATable,infoClassCol);
 
             // Load columnns to memory
-            char **baseColData = NULL;
-            char **infoColData = NULL;
+            std::string *baseColData = NULL;
+            std::string *infoColData = NULL;
             
-            baseColData = attUtils.readStrColumn(baseATable, baseClassCol, &numBaseRows);
-            infoColData = attUtils.readStrColumn(infoATable, infoClassCol, &numInfoRows);
+            baseColData = attUtils.readStrColumnStdStr(baseATable, baseClassCol, &numBaseRows);
+            infoColData = attUtils.readStrColumnStdStr(infoATable, infoClassCol, &numInfoRows);
             
             // Find all the classes in the info column.
             std::cout << "Finding all classes in the info dataset column\n";
-            std::vector<char*> classes;
-            char *rowClass = "";
+            std::vector<std::string> classes;
+            std::string rowClass = "";
             bool found = false;
             for(size_t i = 0; i < numInfoRows; ++i)
             {
                 rowClass = infoColData[i];
 
                 found = false;
-                for(std::vector<char*>::iterator iterClass = classes.begin(); iterClass != classes.end(); ++iterClass)
+                for(std::vector<std::string>::iterator iterClass = classes.begin(); iterClass != classes.end(); ++iterClass)
                 {
                     if(rowClass == *iterClass)
                     {
@@ -104,7 +104,7 @@ namespace rsgis{namespace rastergis{
 
             std::cout << "Available Classes:\n";
             unsigned int idx = 0;
-            for(std::vector<char*>::iterator iterClass = classes.begin(); iterClass != classes.end(); ++iterClass)
+            for(std::vector<std::string>::iterator iterClass = classes.begin(); iterClass != classes.end(); ++iterClass)
             {
                 std::cout << idx++ << ") Class: \'" << *iterClass << "\'" << std::endl;
             }
@@ -184,7 +184,8 @@ namespace rsgis{namespace rastergis{
             delete[] clumpMajorityIdx;
             
             // Write out
-            baseATable->ValuesIO(GF_Write, baseClassIdx, 0, numBaseRows, baseColData);
+            attUtils.writeStrColumn(baseATable, baseClassCol, baseColData, numBaseRows);
+            //baseATable->ValuesIO(GF_Write, baseClassIdx, 0, numBaseRows, );
 
             baseSegmentsDS->GetRasterBand(1)->SetDefaultRAT(baseATable);
             
@@ -205,7 +206,7 @@ namespace rsgis{namespace rastergis{
     }
 
 
-    RSGISCalcClumpClassMajorities::RSGISCalcClumpClassMajorities(char **baseColData, char **infoColData, std::vector<char*> classes, unsigned int **clumpCounter, bool ignoreZero) : rsgis::img::RSGISCalcImageValue(0)
+    RSGISCalcClumpClassMajorities::RSGISCalcClumpClassMajorities(std::string *baseColData, std::string *infoColData, std::vector<std::string> classes, unsigned int **clumpCounter, bool ignoreZero) : rsgis::img::RSGISCalcImageValue(0)
     {
         this->baseColData = baseColData;
         this->infoColData = infoColData;
@@ -234,7 +235,7 @@ namespace rsgis{namespace rastergis{
 
             unsigned int idx = 0;
             bool foundClass = false;
-            for(std::vector<char*>::iterator iterClass = classes.begin(); iterClass != classes.end(); ++iterClass)
+            for(std::vector<std::string>::iterator iterClass = classes.begin(); iterClass != classes.end(); ++iterClass)
             {
                 if(classVal == *iterClass)
                 {
