@@ -62,7 +62,7 @@ namespace rsgis{namespace rastergis{
             
             double maxVal = 0;
             int nLastProgress = -1;
-            clumpsDS->GetRasterBand(ratBandClumps)->ComputeStatistics(false, NULL, &maxVal, NULL, NULL, RSGISRATStatsTextProgress, &nLastProgress);
+            clumpsDS->GetRasterBand(ratBandClumps)->ComputeStatistics(false, NULL, &maxVal, NULL, NULL,  (GDALProgressFunc)RSGISRATStatsTextProgress, &nLastProgress);
             
             if(maxVal > numRows)
             {
@@ -83,7 +83,7 @@ namespace rsgis{namespace rastergis{
             // Find the range of category values. 
             std::cout << "Find the available categories\n";
             double minVal = 0;
-            catsDS->GetRasterBand(ratBandCats)->ComputeStatistics(false, &minVal, &maxVal, NULL, NULL, RSGISRATStatsTextProgress, &nLastProgress);
+            catsDS->GetRasterBand(ratBandCats)->ComputeStatistics(false, &minVal, &maxVal, NULL, NULL,  (GDALProgressFunc)RSGISRATStatsTextProgress, &nLastProgress);
             
             if(minVal < 0)
             {

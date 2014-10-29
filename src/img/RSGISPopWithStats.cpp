@@ -65,7 +65,7 @@ namespace rsgis { namespace img {
         }
         
         int nLastProgress = -1;
-        handle->BuildOverviews( pszType, nOverviews, nLevels, 0, NULL, StatsTextProgress, &nLastProgress );
+        handle->BuildOverviews( pszType, nOverviews, nLevels, 0, NULL,  (GDALProgressFunc)StatsTextProgress, &nLastProgress );
     }
 
     void RSGISPopWithStats::getRangeMean(float *pData,int size,float &min,float &max,float &mean, bool ignore, float ignoreVal)
@@ -364,7 +364,7 @@ namespace rsgis { namespace img {
             /* Find min, Max and mean */ 
             double fmin=0, fmax=0, fMean=0, fStdDev=0;
             int nLastProgress = -1;
-            hBand->ComputeStatistics(false, &fmin, &fmax, &fMean, &fStdDev, StatsTextProgress, &nLastProgress);
+            hBand->ComputeStatistics(false, &fmin, &fmax, &fMean, &fStdDev,  (GDALProgressFunc)StatsTextProgress, &nLastProgress);
 
             /* Write Statistics */
             sprintf( szTemp, "%f", fmin );
@@ -436,7 +436,7 @@ namespace rsgis { namespace img {
             else
             {
                 int nLastProgress = -1;
-                hBand->GetHistogram(histminTmp, histmaxTmp, nHistBuckets, pHisto, true, false, StatsTextProgress, &nLastProgress);
+                hBand->GetHistogram(histminTmp, histmaxTmp, nHistBuckets, pHisto, true, false,  (GDALProgressFunc)StatsTextProgress, &nLastProgress);
             }
             
             //int histoStrLen = nHistBuckets * 8;

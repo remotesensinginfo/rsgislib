@@ -26,10 +26,12 @@
 # Email: sec14@aber.ac.uk
 # Date: 30/07/2013
 # Version: 1.0
+# Version: 1.1 - Data copying now has Windows support.
 #
 #############################################################################
 
 import sys, os
+import shutil
 import collections
 try:
     import rsgislib
@@ -74,21 +76,27 @@ class RSGISTests:
     def copyData(self):
         """ Copy data files from original directory to test directory """
         print("COPYING DATA")
-        os.system('cp ./RATS/injune_p142_casi_sub_utm_segs_nostats.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_cptab.kea')
-        os.system('cp ./RATS/injune_p142_casi_sub_utm_segs_nostats.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_cpcols.kea')
-        os.system('cp ./RATS/injune_p142_casi_sub_utm_segs_nostats.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_spatloc_eucdist.kea')
-        os.system('cp ./RATS/injune_p142_casi_sub_utm_segs_nostats.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_popstats.kea')
-        os.system('cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_neighbours.kea')
-        os.system('cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_borlen.kea')
-        os.system('cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_borlen.kea')
-        os.system('cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_shape.kea')
-        os.system('cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_col.kea')
-        os.system('cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_col_str.kea')
-        os.system('cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_change.kea')
-        os.system('cp ./Rasters/injune_p142_casi_sub_utm.kea ./TestOutputs/injune_p142_casi_sub_utm.kea')
+        shutil.copy2('RATS/injune_p142_casi_sub_utm_segs_nostats.kea', 'TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_cptab.kea')
+        shutil.copy2('RATS/injune_p142_casi_sub_utm_segs_nostats.kea', 'TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_cpcols.kea')
+        shutil.copy2('RATS/injune_p142_casi_sub_utm_segs_nostats.kea', 'TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_spatloc_eucdist.kea')
+        shutil.copy2('RATS/injune_p142_casi_sub_utm_segs_nostats.kea', 'TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_popstats.kea')
+        shutil.copy2('RATS/injune_p142_casi_sub_utm_segs.kea', 'TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_neighbours.kea')
+        shutil.copy2('RATS/injune_p142_casi_sub_utm_segs.kea', 'TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_borlen.kea')
+        shutil.copy2('RATS/injune_p142_casi_sub_utm_segs.kea', 'TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_borlen.kea')
+        shutil.copy2('RATS/injune_p142_casi_sub_utm_segs.kea', 'TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_shape.kea')
+        shutil.copy2('RATS/injune_p142_casi_sub_utm_segs.kea', 'TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_col.kea')
+        shutil.copy2('RATS/injune_p142_casi_sub_utm_segs.kea', 'TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_col_str.kea')
+        shutil.copy2('RATS/injune_p142_casi_sub_utm_segs.kea', 'TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_change.kea')
+        shutil.copy2('Rasters/injune_p142_casi_sub_utm.kea', 'TestOutputs/injune_p142_casi_sub_utm.kea')
         
-        os.system('cp ./RATS/injune_p142_casi_sub_utm_segs_nostats.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_nostats_addstats.kea')
-        os.system('cp ./Vectors/injune_p142_psu_utm.* ./TestOutputs/')
+        shutil.copy2('RATS/injune_p142_casi_sub_utm_segs_nostats.kea', 'TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_nostats_addstats.kea')
+        shutil.copy2('Vectors/injune_p142_psu_utm.dbf', 'TestOutputs/')
+        shutil.copy2('Vectors/injune_p142_psu_utm.prj', 'TestOutputs/')
+        shutil.copy2('Vectors/injune_p142_psu_utm.sbn', 'TestOutputs/')
+        shutil.copy2('Vectors/injune_p142_psu_utm.sbx', 'TestOutputs/')
+        shutil.copy2('Vectors/injune_p142_psu_utm.shp', 'TestOutputs/')
+        shutil.copy2('Vectors/injune_p142_psu_utm.shp_utm.xml', 'TestOutputs/')
+        shutil.copy2('Vectors/injune_p142_psu_utm.shx', 'TestOutputs/')
     
     def checkDIRStructure(self):
         """ Create directory and sub directories for test
@@ -108,10 +116,7 @@ class RSGISTests:
     def removeTestFiles(self):
         """ Removes all files in test directory """
         print('Removing test files')
-        os.system('rm ' + self.testOutputsDIR + '/* 2> /dev/null')
-        os.system('rm ' + self.testRasterGISDIR + '/* 2> /dev/null')
-        os.system('rm ' + self.testTilesDIR + '/* 2> /dev/null')
-        os.system('rm ' + self.testZonalTXTDIR + '/* 2> /dev/null')
+        shutil.rmtree('TestOutputs/')
 
     # Image Calc
 
@@ -990,6 +995,7 @@ if __name__ == '__main__':
         t.tryFuncAndCatch(t.testUnionOfClumps)
         t.tryFuncAndCatch(t.testRunShepherdSegmentation)
 
+    t.removeTestFiles()
 
     print("%s TESTS COMPLETED - %s FAILURES LISTED BELOW:"%(t.numTests, len(t.failures)))
     if(len(t.failures)):
