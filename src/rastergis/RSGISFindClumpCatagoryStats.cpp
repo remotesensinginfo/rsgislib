@@ -230,7 +230,8 @@ namespace rsgis{namespace rastergis{
                         if(histDataBlock[j] > 0)
                         {
                             //std::cout << "catStats[" << rowID << "][" << (*iterCats).second.localIdx << "] = " << catStats[rowID][(*iterCats).second.localIdx] << std::endl;
-                            dataBlock[j] = ((double)catStats[rowID][(*iterCats).second.localIdx]) / histDataBlock[j];
+                            dataBlock[j] = ((double)catStats[rowID][(*iterCats).second.localIdx]) / ((double)histDataBlock[j]);
+                            //std::cout << j << " = " << ((double)catStats[rowID][(*iterCats).second.localIdx]) << "/" << ((double)histDataBlock[j]) << " = " << dataBlock[j] << std::endl;
                             if(majBlockFirst[j])
                             {
                                 if(dataBlock[j] > 0)
@@ -291,7 +292,8 @@ namespace rsgis{namespace rastergis{
                         if(histDataBlock[j] > 0)
                         {
                             //std::cout << "catStats[" << rowID << "][" << (*iterCats).second.localIdx << "] = " << catStats[rowID][(*iterCats).second.localIdx] << std::endl;
-                            dataBlock[j] = ((double)catStats[rowID][(*iterCats).second.localIdx]) / histDataBlock[j];
+                            dataBlock[j] = ((double)catStats[rowID][(*iterCats).second.localIdx]) / ((double)histDataBlock[j]);
+                            //std::cout << j << " = " << ((double)catStats[rowID][(*iterCats).second.localIdx]) << "/" << ((double)histDataBlock[j]) << " = " << dataBlock[j] << std::endl;
                             if(majBlockFirst[j])
                             {
                                 if(dataBlock[j] > 0)

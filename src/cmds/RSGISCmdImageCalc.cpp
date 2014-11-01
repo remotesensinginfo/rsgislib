@@ -74,11 +74,8 @@
 
 namespace rsgis{ namespace cmds {
 
-    void executeBandMaths(VariableStruct *variables, unsigned int numVars, std::string outputImage, std::string mathsExpression, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException)
+    void executeBandMaths(VariableStruct *variables, unsigned int numVars, std::string outputImage, std::string mathsExpression, std::string gdalFormat, RSGISLibDataType outDataType, bool useExpAsbandName)throw(RSGISCmdException)
     {
-        std::string *outBandName = new std::string[1];
-        outBandName[0] = mathsExpression;
-
         GDALAllRegister();
         GDALDataset **datasets = NULL;
         rsgis::img::RSGISBandMath *bandmaths = NULL;
@@ -87,6 +84,13 @@ namespace rsgis{ namespace cmds {
 
         try
         {
+            std::string *outBandName = NULL;
+            if(useExpAsbandName)
+            {
+                outBandName  = new std::string[1];
+                outBandName[0] = mathsExpression;
+            }
+            
             rsgis::img::VariableBands **processVaribles = new rsgis::img::VariableBands*[numVars];
             datasets = new GDALDataset*[numVars];
 
@@ -129,7 +133,7 @@ namespace rsgis{ namespace cmds {
             bandmaths = new rsgis::img::RSGISBandMath(1, processVaribles, numVars, muParser);
 
             calcImage = new rsgis::img::RSGISCalcImage(bandmaths, "", true);
-            calcImage->calcImage(datasets, numVars, outputImage, true, outBandName, gdalFormat, RSGIS_to_GDAL_Type(outDataType));
+            calcImage->calcImage(datasets, numVars, outputImage, useExpAsbandName, outBandName, gdalFormat, RSGIS_to_GDAL_Type(outDataType));
 
             for(int i = 0; i < numVars; ++i)
             {
@@ -144,7 +148,10 @@ namespace rsgis{ namespace cmds {
             delete muParser;
             delete bandmaths;
             delete calcImage;
-            delete[] outBandName;
+            if(useExpAsbandName)
+            {
+                delete[] outBandName;
+            }
             //GDALDestroyDriverManager();
         }
         catch(rsgis::RSGISImageException &e)
@@ -166,7 +173,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeImageMaths(std::string inputImage, std::string outputImage, std::string mathsExpression, std::string imageFormat, RSGISLibDataType outDataType)throw(RSGISCmdException)
+    void executeImageMaths(std::string inputImage, std::string outputImage, std::string mathsExpression, std::string imageFormat, RSGISLibDataType outDataType, bool useExpAsbandName)throw(RSGISCmdException)
     {
         GDALAllRegister();
         GDALDataset **datasets = NULL;
@@ -176,6 +183,13 @@ namespace rsgis{ namespace cmds {
 
         try
         {
+            std::string *outBandName = NULL;
+            if(useExpAsbandName)
+            {
+                outBandName  = new std::string[1];
+                outBandName[0] = mathsExpression;
+            }
+            
             datasets = new GDALDataset*[1];
 
             datasets[0] = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
@@ -194,11 +208,17 @@ namespace rsgis{ namespace cmds {
             imageMaths = new rsgis::img::RSGISImageMaths(numRasterBands, muParser);
 
             calcImage = new rsgis::img::RSGISCalcImage(imageMaths, "", true);
-            calcImage->calcImage(datasets, 1, outputImage, false, NULL, imageFormat, RSGIS_to_GDAL_Type(outDataType));
+            calcImage->calcImage(datasets, 1, outputImage, useExpAsbandName, outBandName, imageFormat, RSGIS_to_GDAL_Type(outDataType));
 
             GDALClose(datasets[0]);
             delete[] datasets;
 
+            
+            if(useExpAsbandName)
+            {
+                delete[] outBandName;
+            }
+            
             delete muParser;
             delete imageMaths;
             delete calcImage;

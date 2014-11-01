@@ -38,13 +38,16 @@ struct ImageCalcState
 static struct ImageCalcState _state;
 #endif
 
-static PyObject *ImageCalc_BandMath(PyObject *self, PyObject *args) {
+static PyObject *ImageCalc_BandMath(PyObject *self, PyObject *args)
+{
     const char *pszOutputFile, *pszExpression, *pszGDALFormat;
     int nDataType;
+    int bExpBandName = 0;
     PyObject *pBandDefnObj;
-    if( !PyArg_ParseTuple(args, "sssiO:bandMath", &pszOutputFile, &pszExpression, &pszGDALFormat,
-                                        &nDataType, &pBandDefnObj))
+    if( !PyArg_ParseTuple(args, "sssiO|i:bandMath", &pszOutputFile, &pszExpression, &pszGDALFormat, &nDataType, &pBandDefnObj, &bExpBandName))
+    {
         return NULL;
+    }
 
     // we made these values the same so should work
     rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
@@ -107,7 +110,8 @@ static PyObject *ImageCalc_BandMath(PyObject *self, PyObject *args) {
 
     try
     {
-        rsgis::cmds::executeBandMaths(pRSGISStruct, nBandDefns, pszOutputFile, pszExpression, pszGDALFormat, type);
+        bool useExpAsbandName = (bool)bExpBandName;
+        rsgis::cmds::executeBandMaths(pRSGISStruct, nBandDefns, pszOutputFile, pszExpression, pszGDALFormat, type, useExpAsbandName);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -120,18 +124,21 @@ static PyObject *ImageCalc_BandMath(PyObject *self, PyObject *args) {
     Py_RETURN_NONE;
 }
 
-static PyObject *ImageCalc_ImageMath(PyObject *self, PyObject *args) {
+static PyObject *ImageCalc_ImageMath(PyObject *self, PyObject *args)
+{
     const char *pszInputImage, *pszOutputFile, *pszExpression, *pszGDALFormat;
     int nDataType;
-    if( !PyArg_ParseTuple(args, "ssssi:bandMath", &pszInputImage, &pszOutputFile, &pszExpression,
-                                &pszGDALFormat, &nDataType ))
+    int bExpBandName = 0;
+    if( !PyArg_ParseTuple(args, "ssssii:bandMath", &pszInputImage, &pszOutputFile, &pszExpression, &pszGDALFormat, &nDataType, &bExpBandName))
+    {
         return NULL;
-
-    rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
+    }
 
     try
     {
-        rsgis::cmds::executeImageMaths(pszInputImage, pszOutputFile, pszExpression, pszGDALFormat, type);
+        rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
+        bool useExpAsbandName = (bool)bExpBandName;
+        rsgis::cmds::executeImageMaths(pszInputImage, pszOutputFile, pszExpression, pszGDALFormat, type, useExpAsbandName);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -1243,7 +1250,7 @@ static PyObject *ImageCalc_GetImageBandModeInEnv(PyObject *self, PyObject *args)
 // Our list of functions in this module
 static PyMethodDef ImageCalcMethods[] = {
     {"bandMath", ImageCalc_BandMath, METH_VARARGS,
-"imagecalc.bandMath(outputImage, expression, gdalformat, datatype, bandDefnSeq)\n"
+"imagecalc.bandMath(outputImage, expression, gdalformat, datatype, bandDefnSeq, useExpAsbandName)\n"
 "Performs band math calculation.\n"
 "where:\n"
 "  * outputImage is a string containing the name of the output file\n"
@@ -1251,6 +1258,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "  * gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
 "  * datatype is an containing one of the values from rsgislib.TYPE_*\n"
 "  * bandDefnSeq is a sequence of rsgislib.imagecalc.BandDefn objects that define the inputs\n"
+"  * useExpAsbandName is an optional bool specifying whether the band name should be the expression (Default = False).\n"
 "Example::\n"
 "\n"
 "   import rsgislib\n"
@@ -1267,7 +1275,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "\n"},
 
     {"imageMath", ImageCalc_ImageMath, METH_VARARGS,
-"imagecalc.imageMath(inputImage, outputImage, expression, gdalformat, datatype)\n"
+"imagecalc.imageMath(inputImage, outputImage, expression, gdalformat, datatype, useExpAsbandName)\n"
 "Performs image math calculation.\n"
 "where:\n"
 "  * inimage is a string containing the name of the input file\n"
@@ -1275,6 +1283,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "  * expression is a string containing the expression to run over the images, uses myparser syntax.\n"
 "  * gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
 "  * datatype is an containing one of the values from rsgislib.TYPE_*\n"
+"  * useExpAsbandName is an optional bool specifying whether the band name should be the expression (Default = False).\n"
 "Example::\n"
 "\n"
 "   import rsgislib\n"
