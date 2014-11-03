@@ -129,7 +129,7 @@ static PyObject *ImageCalc_ImageMath(PyObject *self, PyObject *args)
     const char *pszInputImage, *pszOutputFile, *pszExpression, *pszGDALFormat;
     int nDataType;
     int bExpBandName = 0;
-    if( !PyArg_ParseTuple(args, "ssssii:bandMath", &pszInputImage, &pszOutputFile, &pszExpression, &pszGDALFormat, &nDataType, &bExpBandName))
+    if( !PyArg_ParseTuple(args, "ssssi|i:imageMath", &pszInputImage, &pszOutputFile, &pszExpression, &pszGDALFormat, &nDataType, &bExpBandName))
     {
         return NULL;
     }
