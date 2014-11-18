@@ -38,7 +38,7 @@ Example::
     # Semi-major and semi-minor for WGS-84 ellipse
     ellipse = [6378137.0, 6356752.314245]
     
-    radlat = numpy.deg2rad(lat)
+    radlat = numpy.deg2rad(latitude)
     
     Rsq = (ellipse[0]*numpy.cos(radlat))**2+(ellipse[1]*numpy.sin(radlat))**2
     Mlat = (ellipse[0]*ellipse[1])**2/(Rsq**1.5)
@@ -74,7 +74,7 @@ Example::
     # Semi-major and semi-minor for WGS-84 ellipse
     ellipse = [6378137.0, 6356752.314245]
     
-    radlat = numpy.deg2rad(lat)
+    radlat = numpy.deg2rad(latitude)
     
     Rsq = (ellipse[0]*numpy.cos(radlat))**2+(ellipse[1]*numpy.sin(radlat))**2
     Mlat = (ellipse[0]*ellipse[1])**2/(Rsq**1.5)
