@@ -45,6 +45,7 @@ try:
     from rsgislib import segmentation
     from rsgislib.segmentation import segutils
     from rsgislib.imagecalc import BandDefn
+    from rsgislib import tools
 except ImportError as err:
     print(err)
     sys.exit()
@@ -859,6 +860,13 @@ class RSGISTests:
         segmentation.segutils.runShepherdSegmentation(inputImage, clumpsFile,
                        meanImage, numClusters=100, minPxls=100)
 
+    # Tools
+    def testMetres2Degrees(self):
+        print(tools.metres_to_degrees(52,1,1))
+
+    def testDegrees2Metres(self):
+        print(tools.degrees_to_metres(52,1,1))
+
 if __name__ == '__main__':
 
     t = RSGISTests()
@@ -994,6 +1002,11 @@ if __name__ == '__main__':
         """ Image filter functions """ 
         t.tryFuncAndCatch(t.testUnionOfClumps)
         t.tryFuncAndCatch(t.testRunShepherdSegmentation)
+
+
+    if testLibraries == 'all' or testLibraries == 'tools':
+        t.tryFuncAndCatch(t.testMetres2Degrees)    
+        t.tryFuncAndCatch(t.testDegrees2Metres)    
 
     t.removeTestFiles()
 
