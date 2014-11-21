@@ -100,7 +100,7 @@ namespace rsgis{ namespace cmds {
     /** Function that counts the number of values with a given range for each column*/
     DllExport void executeCountValsInCols(std::string inputImage, float upper, float lower, std::string outputImage)throw(RSGISCmdException);
     /** Function to calculate the root mean squared error between 2 images */
-    DllExport void executeCalculateRMSE(std::string inputImageA, int inputBandA, std::string inputImageB, int inputBandB)throw(RSGISCmdException);
+    DllExport double executeCalculateRMSE(std::string inputImageA, int inputBandA, std::string inputImageB, int inputBandB)throw(RSGISCmdException);
     /** Function to apply 2 var function to image */
     DllExport void executeApply2VarFunction(std::string inputImage, void *twoVarFunction, std::string outputImage)throw(RSGISCmdException);
     /** Function to apply 3 var function to image */
@@ -135,6 +135,8 @@ namespace rsgis{ namespace cmds {
     DllExport void executeImageBandStatsEnv(std::string inputImage, rsgis::cmds::ImageStatsCmds *stats, unsigned int imgBand, bool noDataValueSpecified, float noDataVal, double latMin, double latMax, double longMin, double longMax)throw(RSGISCmdException);
     /** Function to calculate the mode for an individual image band within an envelope defined in Lat / Long */
     DllExport float executeImageBandModeEnv(std::string inputImage, float binWidth, unsigned int imgBand, bool noDataValueSpecified, float noDataVal, double latMin, double latMax, double longMin, double longMax)throw(RSGISCmdException);
+    /** A function to calculate a 2D histogram comparison of two images */
+    DllExport double executeImageComparison2dHisto(std::string inputImage1, std::string inputImage2, std::string outputImage, std::string gdalFormat, unsigned int img1Band, unsigned int img2Band, unsigned int numBins, double *binWidthImg1, double *binWidthImg2, double img1Min, double img1Max, double img2Min, double img2Max, double img1Scale=1.0, double img2Scale=1.0, double img1Off=0.0, double img2Off=0.0, bool normOutput=false) throw(RSGISCmdException);
     
     
 }}

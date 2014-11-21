@@ -116,6 +116,7 @@ namespace rsgis{ namespace cmds {
     /** A function to calculate summary statistics for every band in a stack or every n bands */
     DllExport void executeStackStats(std::string inputImage, std::string outputImage, std::string calcStat, bool allBands, unsigned int numBands, std::string gdalFormat, RSGISLibDataType outDataType) throw(RSGISCmdException);
     
+    
 }}
 
 

@@ -768,16 +768,27 @@ static PyObject *ImageCalc_CalculateRMSE(PyObject *self, PyObject *args) {
     unsigned int bandA, bandB;
 
     if(!PyArg_ParseTuple(args, "sIsI:calculateRMSE", &inputImageA, &bandA, &inputImageB, &bandB))
+    {
         return NULL;
-
-    try {
-        rsgis::cmds::executeCalculateRMSE(inputImageA, bandA, inputImageB, bandB);
-    } catch (rsgis::cmds::RSGISCmdException &e) {
+    }
+    
+    
+    PyObject *outVal = PyTuple_New(1);
+    try
+    {
+        double rmseVal = rsgis::cmds::executeCalculateRMSE(inputImageA, bandA, inputImageB, bandB);
+        if(PyTuple_SetItem(outVal, 0, Py_BuildValue("d", rmseVal)) == -1)
+        {
+            throw rsgis::cmds::RSGISCmdException("Failed to add \'RMSE\' value to the list...");
+        }
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
         PyErr_SetString(GETSTATE(self)->error, e.what());
         return NULL;
     }
 
-    Py_RETURN_NONE;
+    return outVal;
 }
 
 static PyObject *ImageCalc_Dist2Geoms(PyObject *self, PyObject *args) {
@@ -1199,7 +1210,8 @@ static PyObject *ImageCalc_GetImageStatsInEnv(PyObject *self, PyObject *args) {
 }
 
 
-static PyObject *ImageCalc_GetImageBandModeInEnv(PyObject *self, PyObject *args) {
+static PyObject *ImageCalc_GetImageBandModeInEnv(PyObject *self, PyObject *args)
+{
     const char *inputImage;
     unsigned int imgBand;
     double latMin, latMax, longMin, longMax;
@@ -1242,7 +1254,54 @@ static PyObject *ImageCalc_GetImageBandModeInEnv(PyObject *self, PyObject *args)
     return outVal;
 }
 
-
+static PyObject *ImageCalc_Get2DImageHistogram(PyObject *self, PyObject *args)
+{
+    const char *inputImage1, *inputImage2, *outputImage, *gdalFormat;
+    unsigned int img1Band, img2Band, numBins;
+    int normOutput;
+    double img1Min = 0.0;
+    double img1Max = 0.0;
+    double img2Min = 0.0;
+    double img2Max = 0.0;
+    double img1Scale = 1.0;
+    double img2Scale = 1.0;
+    double img1Off = 0.0;
+    double img2Off = 0.0;
+    
+    if(!PyArg_ParseTuple(args, "ssssIIIddddddddi:get2DImageHistogram", &inputImage1, &inputImage2, &outputImage, &gdalFormat, &img1Band, &img2Band, &numBins, &img1Min, &img1Max, &img2Min, &img2Max, &img1Scale, &img2Scale, &img1Off, &img2Off, &normOutput))
+    {
+        return NULL;
+    }
+    
+    PyObject *outVal = PyTuple_New(3);
+    try
+    {
+        double binWidthImg1 = 0.0;
+        double binWidthImg2 = 0.0;
+        
+        double rSq = rsgis::cmds::executeImageComparison2dHisto(std::string(inputImage1), std::string(inputImage2), std::string(outputImage), std::string(gdalFormat), img1Band, img2Band, numBins, &binWidthImg1, &binWidthImg2, img1Min, img1Max, img2Min, img2Max, img1Scale, img2Scale, img1Off, img2Off, ((bool)normOutput));
+                
+        if(PyTuple_SetItem(outVal, 0, Py_BuildValue("d", binWidthImg1)) == -1)
+        {
+            throw rsgis::cmds::RSGISCmdException("Failed to add \'binWidthImg1\' value to the list...");
+        }
+        if(PyTuple_SetItem(outVal, 1, Py_BuildValue("d", binWidthImg2)) == -1)
+        {
+            throw rsgis::cmds::RSGISCmdException("Failed to add \'binWidthImg2\' value to the list...");
+        }
+        if(PyTuple_SetItem(outVal, 2, Py_BuildValue("d", rSq)) == -1)
+        {
+            throw rsgis::cmds::RSGISCmdException("Failed to add \'rSq\' value to the list...");
+        }
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    return outVal;
+}
 
 
 
@@ -1825,8 +1884,29 @@ static PyMethodDef ImageCalcMethods[] = {
     "  * longMax is a double specifying the maximum longitude of the BBOX\n"
     "returns:\n"
     "  * float with image mode for the region within the BBOX.\n"
-
 },
+    
+{"get2DImageHistogram", ImageCalc_Get2DImageHistogram, METH_VARARGS,
+    "imagecalc.get2DImageHistogram(inputImage1, inputImage2, outputImage, gdalFormat, img1Band, img2Band, numBins, img1Min, img1Max, img2Min, img2Max, normOutput)\n"
+    "Calculates at 2D histogram between two bands of two input images"
+    "where:\n"
+    "  * inputImage1 is a string containing the name of the first input image file\n"
+    "  * inputImage2 is a string containing the name of the second input image file\n"
+    "  * outputImage is a string containing the name of the output image file containing the histogram.\n"
+    "  * gdalFormat is a string specifying output image format.\n"
+    "  * img1Band is an unsigned integer specifying the image band from image 1 to be used.\n"
+    "  * img2Band is an unsigned integer specifying the image band from image 2 to be used.\n"
+    "  * numBins is an unsigned integer specifying the number of bins to be used on each histogram axis\n"
+    "            (it'll produce a square histogram).\n"
+    "  * img1Min is a double specifying the minimum image value for image 1 to be used in the histogram.\n"
+    "  * img1Max is a double specifying the maximum image value for image 1 to be used in the histogram.\n"
+    "  * img2Min is a double specifying the minimum image value for image 2 to be used in the histogram.\n"
+    "  * img2Max is a double specifying the maximum image value for image 2 to be used in the histogram.\n"
+    "  * normOutput is a boolean specifying whether the output histogram should be normalised to unit volume.\n"
+    "returns:\n"
+    "  * double with bin width of the axis of image 1.\n"
+    "  * double with bin width of the axis of image 2.\n"
+    },
 
     {NULL}        /* Sentinel */
 };
