@@ -34,7 +34,9 @@
 # Version 1.0 - Created.
 # Version 1.1 - Update to be included into RSGISLib python modules tree.
 #
-############################################################################
+###########################################################################
+# Import shutil
+import shutil
 # Import the rsgislib module
 import rsgislib
 # Import the image utilities module from rsgislib
@@ -47,7 +49,6 @@ import rsgislib.segmentation
 import rsgislib.rastergis
 # Import the module from rsgislib
 import rsgislib
-import os.path
 import os
 # Import the collections module
 import collections
@@ -99,6 +100,12 @@ Example::
     if not os.path.isdir(tmpath):
         os.makedirs(tmpath)
         createdDIR = True
+
+    # Get data type of input image
+    gdalDS = gdal.Open(inputImg, gdal.GA_ReadOnly)
+    rsgisUtils = rsgislib.RSGISPyUtils()
+    input_datatype = rsgisUtils.getRSGISLibDataType(gdal.GetDataTypeName(gdalDS.GetRasterBand(1).DataType))
+    gdalDS = None
         
     # Select Image Bands if required
     inputImgBands = inputImg
@@ -106,12 +113,8 @@ Example::
     if not bands == None:
         print("Subsetting the image bands")
         selectBands = True
-        gdalDS = gdal.Open(inputImg, gdal.GA_ReadOnly)
-        rsgisUtils = rsgislib.RSGISPyUtils()
-        dType = rsgisUtils.getRSGISLibDataType(gdal.GetDataTypeName(gdalDS.GetRasterBand(1).DataType))
-        gdalDS = None
         inputImgBands = os.path.join(tmpath,basename+str("_bselect")+outFileExt)
-        rsgislib.imageutils.selectImageBands(inputImg, inputImgBands, gdalformat, dType, bands)        
+        rsgislib.imageutils.selectImageBands(inputImg, inputImgBands, gdalformat, input_datatype, bands)        
     
     # Stretch input data if required.
     segmentFile = inputImgBands
@@ -121,19 +124,19 @@ Example::
         strchFileOffset = os.path.join(tmpath,basename+str("_stchdonlyOff")+outFileExt)
         strchMaskFile = os.path.join(tmpath,basename+str("_stchdmaskonly")+outFileExt)
         print("Stretch Input Image")
-        rsgislib.imageutils.stretchImage(inputImgBands, strchFile, False, "", True, False, gdalformat, rsgislib.TYPE_32FLOAT, rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
+        rsgislib.imageutils.stretchImage(inputImgBands, strchFile, False, "", True, False, gdalformat, rsgislib.TYPE_8INT, rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
         
         print("Add 1 to stretched file to ensure there are no all zeros (i.e., no data) regions created.")
-        rsgislib.imagecalc.imageMath(strchFile, strchFileOffset, "b1+1", gdalformat, rsgislib.TYPE_32FLOAT)
+        rsgislib.imagecalc.imageMath(strchFile, strchFileOffset, "b1+1", gdalformat, rsgislib.TYPE_8INT)
         
         print("Create Input Image Mask.")
         ImgBand = collections.namedtuple('ImgBands', ['bandName', 'fileName', 'bandIndex'])
         bandMathBands = list()
         bandMathBands.append(ImgBand(bandName="b1", fileName=inputImgBands, bandIndex=1))
-        rsgislib.imagecalc.bandMath(strchMaskFile, "b1==0?1:0", gdalformat, rsgislib.TYPE_32FLOAT, bandMathBands)
+        rsgislib.imagecalc.bandMath(strchMaskFile, "b1==0?1:0", gdalformat, rsgislib.TYPE_8INT, bandMathBands)
         
         print("Mask stretched Image.")
-        rsgislib.imageutils.maskImage(strchFileOffset, strchMaskFile, segmentFile, gdalformat, rsgislib.TYPE_32FLOAT, 0, 1)
+        rsgislib.imageutils.maskImage(strchFileOffset, strchMaskFile, segmentFile, gdalformat, rsgislib.TYPE_8INT, 0, 1)
         
         if not noDelete:
             # Deleting extra files
@@ -178,7 +181,7 @@ Example::
     
     # Create mean image if required.
     if not (outputMeanImg == None):
-        rsgislib.segmentation.meanImage(inputImg, outputClumps, outputMeanImg, gdalformat, rsgislib.TYPE_32FLOAT)
+        rsgislib.segmentation.meanImage(inputImg, outputClumps, outputMeanImg, gdalformat, input_datatype)
         if not noStats:
             rsgislib.imageutils.popImageStats(outputMeanImg, True, 0, True)
         
@@ -195,7 +198,7 @@ Example::
         if not noStretch:
             rsgisUtils.deleteFileWithBasename(segmentFile)
         if createdDIR:
-            rsgisUtils.deleteDIR(tmpath)
+            shutil.rmtree(tmpath)
             
             
 def runShepherdSegmentationTestNumClumps(inputImg, outputClumpsBase, outStatsFile, outputMeanImgBase=None, tmpath='.', gdalformat='KEA', noStats=False, noStretch=False, noDelete=False, numClustersStart=10, numClustersStep=10, numOfClustersSteps=10, minPxls=10, distThres=1000000, bands=None, sampling=100, kmMaxIter=200, processInMem=False, minNormV=None, maxNormV=None, minNormMI=None, maxNormMI=None): 
