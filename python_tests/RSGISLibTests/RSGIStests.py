@@ -27,11 +27,12 @@
 # Date: 30/07/2013
 # Version: 1.0
 # Version: 1.1 - Data copying now has Windows support.
-#
+# Version: 1.2 - Updated to use argparse
 #############################################################################
 
 import sys, os
 import shutil
+import argparse
 import collections
 try:
     import rsgislib
@@ -869,22 +870,26 @@ class RSGISTests:
 
 if __name__ == '__main__':
 
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--all", action='store_true', default=False, help="Run all tests")
+    parser.add_argument("--imagecalc", action='store_true', default=False, help="Run imagecalc tests")
+    parser.add_argument("--imagefilter", action='store_true', default=False, help="Run imagefilter tests")
+    parser.add_argument("--imageregistration", action='store_true', default=False, help="Run imageregistration tests")
+    parser.add_argument("--imageutils", action='store_true', default=False, help="Run imageutils tests")
+    parser.add_argument("--rastergis", action='store_true', default=False, help="Run rastergis tests")
+    parser.add_argument("--segmentation", action='store_true', default=False, help="Run segmentation tests")
+    parser.add_argument("--tools", action='store_true', default=False, help="Run tools tests")
+    parser.add_argument("--vectorutils", action='store_true', default=False, help="Run vectorutils tests")
+    parser.add_argument("--zonalstats", action='store_true', default=False, help="Run zonalstats tests")
+    args = parser.parse_args() 
+
     t = RSGISTests()
 
-    # Get libraries to test (defaults to all)
-    testLibraries = 'all'
-    
-    if len(sys.argv) >= 2:
-        testLibraries = sys.argv[1].lower()
-        if testLibraries == 'clean':
-            t.removeTestFiles()
-            sys.exit()
-    
     """ Check directory structure and copy Data """
     t.checkDIRStructure()
     t.copyData()
     
-    if testLibraries == 'all' or testLibraries == 'imagecalc':
+    if args.all or args.imagecalc:
         """ ImageCalc functions """
         t.tryFuncAndCatch(t.testNormalise1)
         t.tryFuncAndCatch(t.testNormalise2)
@@ -923,7 +928,7 @@ if __name__ == '__main__':
         t.tryFuncAndCatch(t.testPxlColRegression)
         t.tryFuncAndCatch(t.testCorrelationWindow)
         
-    if testLibraries == 'all' or testLibraries == 'imageutils':
+    if args.all or args.imageutils:
         
         """ ImageUtils functions """
         t.tryFuncAndCatch(t.testCreateTiles)
@@ -939,7 +944,7 @@ if __name__ == '__main__':
         t.tryFuncAndCatch(t.testStretchImage)
         t.tryFuncAndCatch(t.testSetBandNames)
         
-    if testLibraries == 'all' or testLibraries == 'rastergis':
+    if args.all or args.rastergis:
     
         """ RasterGIS functions """
         t.tryFuncAndCatch(t.testCopyGDLATT)
@@ -963,7 +968,7 @@ if __name__ == '__main__':
         t.tryFuncAndCatch(t.testFindChangeClumpsFromStdDev)
         t.tryFuncAndCatch(t.testCopyGDLATTColumns)
         
-    if testLibraries == 'all' or testLibraries == 'zonalstats':
+    if args.all or args.zonalstats:
         
         """ Zonal Stats functions """
         t.tryFuncAndCatch(t.testPointValue2SHP)
@@ -973,7 +978,7 @@ if __name__ == '__main__':
         t.tryFuncAndCatch(t.testPixelVals2TXT)
         t.tryFuncAndCatch(t.testImageZone2HDF)
         
-    if testLibraries == 'all' or testLibraries == 'imageregistration':
+    if args.all or args.imageregistration:
         
         """ Image Registration functions """
         t.tryFuncAndCatch(t.testBasicRegistration)
@@ -983,7 +988,7 @@ if __name__ == '__main__':
         t.tryFuncAndCatch(t.testNNWarp)
         t.tryFuncAndCatch(t.testPolyWarp)
     
-    if testLibraries == 'all' or testLibraries == 'vectorutils':
+    if args.all or args.vectorutils:
         
         """ Vector Utils functions """
         t.tryFuncAndCatch(t.testRemoveAttributes)
@@ -993,18 +998,18 @@ if __name__ == '__main__':
         t.tryFuncAndCatch(t.testCalcArea)
         t.tryFuncAndCatch(t.testPolygonsInPolygon)
 
-    if testLibraries == 'all' or testLibraries == 'imagefilter':
+    if args.all or args.imagefilter:
         """ Image filter functions """ 
         t.tryFuncAndCatch(t.testFilter)
         #t.tryFuncAndCatch(t.testLeungMalikFilterBank) # Skip as it takes a while
     
-    if testLibraries == 'all' or testLibraries == 'segmentation':
+    if args.all or args.segmentation:
         """ Image filter functions """ 
         t.tryFuncAndCatch(t.testUnionOfClumps)
         t.tryFuncAndCatch(t.testRunShepherdSegmentation)
 
 
-    if testLibraries == 'all' or testLibraries == 'tools':
+    if args.all or args.tools:
         t.tryFuncAndCatch(t.testMetres2Degrees)    
         t.tryFuncAndCatch(t.testDegrees2Metres)    
 
