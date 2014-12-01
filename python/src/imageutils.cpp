@@ -348,16 +348,18 @@ static PyObject *ImageUtils_PopImageStats(PyObject *self, PyObject *args, PyObje
     Py_RETURN_NONE;
 }
 
-static PyObject *ImageUtils_AssignProj(PyObject *self, PyObject *args)
+static PyObject *ImageUtils_AssignProj(PyObject *self, PyObject *args, PyObject *keywds)
 {
+    static char *kwlist[] = {"inimage", "wktString", "wktFile"};
     const char *pszInputImage;
     std::string pszInputProj = "";
     std::string pszInputProjFile = "";
     bool readWKTFromFile = false;
-    PyObject *pszInputProjObj;
-    PyObject *pszInputProjFileObj;
+    PyObject *pszInputProjObj = Py_None;
+    PyObject *pszInputProjFileObj = Py_None;
     
-    if( !PyArg_ParseTuple(args, "sOO:assignProj", &pszInputImage, &pszInputProjObj, &pszInputProjFileObj))
+
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "s|OO:assignProj", kwlist, &pszInputImage, &pszInputProjObj, &pszInputProjFileObj))
         return NULL;
     
     if(pszInputProjObj == Py_None)
@@ -1071,13 +1073,36 @@ static PyMethodDef ImageUtilsMethods[] = {
 "   imageutils.popImageStats(inputImage,True,0.,True)\n"
 "\n"},
     
-    {"assignProj", ImageUtils_AssignProj, METH_VARARGS,
-"rsgislib.imageutils.assignProj(inputImage, wktString, wktStringFile)\n"
+    {"assignProj", (PyCFunction)ImageUtils_AssignProj, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.assignProj(inputImage, wktString, wktFile)\n"
 "Assign a projection to the input GDAL image file.\n"
 "\n"
 "* inputImage is a string containing the name of the input file\n"
 "* wktString is the wkt string to be assigned to the image. If None then it will be read from the wktStringFile.\n"
-"* wktStringFile is a file path to a text file containing the WKT string to be assigned. This is ignored if wktString is not None.\n"
+"* wktFile is a file path to a text file containing the WKT string to be assigned. This is ignored if wktString is not None.\n"
+"\nExample::\n"
+"\n"
+"   from rsgislib import imageutils\n"
+"   wktString = '''PROJCS[\"WGS 84 / UTM zone 55S\",\n"
+"    GEOGCS[\"WGS 84\",\n"
+"        DATUM[\"WGS_1984\",\n"
+"            SPHEROID[\"WGS 84\",6378137,298.257223563,\n"
+"                AUTHORITY[\"EPSG\",\"7030\"]],\n"
+"            AUTHORITY[\"EPSG\",\"6326\"]],\n"
+"        PRIMEM[\"Greenwich\",0],\n"
+"        UNIT[\"degree\",0.0174532925199433],\n"
+"        AUTHORITY[\"EPSG\",\"4326\"]],\n"
+"    PROJECTION[\"Transverse_Mercator\"],\n"
+"    PARAMETER[\"latitude_of_origin\",0],\n"
+"    PARAMETER[\"central_meridian\",147],\n"
+"    PARAMETER[\"scale_factor\",0.9996],\n"
+"    PARAMETER[\"false_easting\",500000],\n"
+"    PARAMETER[\"false_northing\",10000000],\n"
+"    UNIT[\"metre\",1,\n"
+"        AUTHORITY[\"EPSG\",\"9001\"]],\n"
+"    AUTHORITY[\"EPSG\",\"32755\"]]'''\n"
+"   inputImage = './TestOutputs/injune_p142_casi_sub_utm.kea'\n"
+"   imageutils.assignProj(inputImage, wktString)\n"
 "\n"},
     
     {"copyProjFromImage", ImageUtils_CopyProjFromImage, METH_VARARGS,
