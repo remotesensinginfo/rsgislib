@@ -1212,6 +1212,74 @@ namespace rsgis{ namespace cmds {
         }
     }
             
+    void executeProduceRegularGridImage(std::string inputImage, std::string outputImage, std::string gdalFormat, float pxlRes, int minVal, int maxVal, bool singleLine) throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            GDALDataset *inDataset = NULL;
+            GDALDataset *outDataset = NULL;
+            
+            inDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+            if(inDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw RSGISImageException(message.c_str());
+            }
+            
+            double *trans = new double[6];
+            inDataset->GetGeoTransform(trans);
+            
+            double xRes = trans[1];
+            if(xRes < 0)
+            {
+                xRes = xRes * -1;
+            }
+            double yRes = trans[5];
+            if(yRes < 0)
+            {
+                yRes = yRes * -1;
+            }
+            
+            trans[1] = pxlRes;
+            trans[5] = pxlRes * (-1);
+            
+            
+            std::cout << "Image Pixel Ratio: [" << (xRes/pxlRes) << "," << (yRes/pxlRes) << "]\n";
+            
+            int xSize = (inDataset->GetRasterXSize() * (xRes/pxlRes));
+            int ySize = (inDataset->GetRasterYSize() * (yRes/pxlRes));
+            
+            std::cout << "Image Size: [" << xSize << "," << ySize << "]\n";
+            
+            std::string proj = "";
+            
+            rsgis::img::RSGISImageUtils imgUtils;
+            outDataset = imgUtils.createBlankImage(outputImage, trans, xSize, ySize, 1, proj, 0.0, gdalFormat, GDT_Int32);
+            outDataset->SetProjection(inDataset->GetProjectionRef());
+            
+            // Populate with pixel values.
+            imgUtils.populateImagePixelsInRange(outDataset, minVal, maxVal, singleLine);
+            
+            outDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
+            
+            // Tidy up
+            GDALClose(inDataset);
+            GDALClose(outDataset);
+        }
+        catch (RSGISImageException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (RSGISException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
             
     
             

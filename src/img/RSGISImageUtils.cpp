@@ -4267,6 +4267,68 @@ namespace rsgis{namespace img{
             throw e;
         }
     }
+    
+    void RSGISImageUtils::populateImagePixelsInRange(GDALDataset *image, int minVal, int maxVal, bool singleLine) throw(RSGISImageException)
+    {
+        try
+        {
+            if(minVal >= maxVal)
+            {
+                throw RSGISImageException("Min value must be smaller than Max value.");
+            }
+            
+            unsigned long width = image->GetRasterXSize();
+            unsigned long height = image->GetRasterYSize();
+            unsigned int numBands = image->GetRasterCount();
+            if(numBands != 1)
+            {
+                throw RSGISImageException("Data must only have 1 image band.");
+            }
+            
+            GDALRasterBand *rasterBand = image->GetRasterBand(1);
+            unsigned int *dataVals = new unsigned int[width];
+            
+            for(unsigned int i = 0; i < width; ++i)
+            {
+                dataVals[i] = 0;
+            }
+            
+            int range = maxVal - minVal;
+            int curPxlVal = minVal;
+            int rangeLineCount = 0;
+            
+            for(unsigned long y = 0; y < height; ++y)
+            {
+                if(!singleLine)
+                {
+                    curPxlVal = minVal + rangeLineCount;
+                }
+                
+                for(unsigned long x = 0; x < width; ++x)
+                {
+                    if(curPxlVal > maxVal)
+                    {
+                        curPxlVal = minVal;
+                    }
+                    dataVals[x] = curPxlVal;
+                    ++curPxlVal;
+                }
+                
+                rasterBand->RasterIO(GF_Write, 0, y, width, 1, dataVals, width, 1, GDT_Int32, 0, 0);
+                ++rangeLineCount;
+                if(rangeLineCount > range)
+                {
+                    rangeLineCount = 0;
+                }
+            }
+            
+            delete[] dataVals;
+        }
+        catch(RSGISImageException &e)
+        {
+            throw e;
+        }
+    }
 
 	RSGISImageUtils::~RSGISImageUtils()
 	{

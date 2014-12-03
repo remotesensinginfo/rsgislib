@@ -890,6 +890,33 @@ static PyObject *ImageUtils_OrderImagesUsingPropValidData(PyObject *self, PyObje
     return outImagesList;
 }
 
+
+static PyObject *ImageUtils_GenSamplingGrid(PyObject *self, PyObject *args)
+{
+    const char *pszInputImage, *pszOutputImage, *pszGDALFormat;
+    float pxlRes = 0.0;
+    int minVal = 0;
+    int maxVal = 1;
+    int singleLine = false;
+    
+    if( !PyArg_ParseTuple(args, "sssfiii:genSamplingGrid", &pszInputImage, &pszOutputImage, &pszGDALFormat, &pxlRes, &minVal, &maxVal, &singleLine))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeProduceRegularGridImage(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszGDALFormat), pxlRes, minVal, maxVal, (bool)singleLine);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 // Our list of functions in this module
 static PyMethodDef ImageUtilsMethods[] = {
     {"stretchImage", ImageUtils_StretchImage, METH_VARARGS, 
@@ -1330,6 +1357,20 @@ static PyMethodDef ImageUtilsMethods[] = {
     "\n"
     "Returns: a list of images ordered, from low to high (i.e., the first image will be the image \n"
     "         with the smallest number of valid image pixels).\n"
+    "\n"},
+    
+{"genSamplingGrid", ImageUtils_GenSamplingGrid, METH_VARARGS,
+    "imageutils.genSamplingGrid(InputImage, OutputImage, gdalformat, pxlRes, minVal, maxVal, singleLine)\n"
+    "Generate a regular sampling grid.\n"
+    "\n"
+    "* InputImage is a string specifying an image which defines the area of interest.\n"
+    "* OutputImage is a string specifying an output image location.\n"
+    "* gdalformat is a string providing the gdalformat of the output image (e.g., KEA).\n"
+    "* pxlRes is a float specifying the output image resolution.\n"
+    "* minVal is a minimum value for the output image pixel values.\n"
+    "* maxVal is a maximum value for the output image pixel values.\n"
+    "* singleLine is a boolean specifying whether the image is seen as a single \n"
+    "             line or new line with an offset in the starting value.\n"
     "\n"},
 
 
