@@ -115,8 +115,11 @@ namespace rsgis{ namespace cmds {
     
     /** A function to calculate summary statistics for every band in a stack or every n bands */
     DllExport void executeStackStats(std::string inputImage, std::string outputImage, std::string calcStat, bool allBands, unsigned int numBands, std::string gdalFormat, RSGISLibDataType outDataType) throw(RSGISCmdException);
+
+    /** A function to produce an image with pixel values on a cycle with a specified range */
+    DllExport void executeProduceRegularGridImage(std::string inputImage, std::string outputImage, std::string gdalFormat, float pxlRes, int minVal=0, int maxVal=1, bool singleLine=false) throw(RSGISCmdException);
     
-    
+
 }}
 
 

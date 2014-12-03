@@ -175,6 +175,7 @@ namespace rsgis
                 bool closeResTest(double baseRes, double targetRes);
                 double getPixelValue(GDALDataset *image, unsigned int imgBand, double xLoc, double yLoc) throw(RSGISImageException);
                 void createImageGrid(GDALDataset *inData, unsigned int numXPxls, unsigned int numYPxls) throw(RSGISImageException);
+                void populateImagePixelsInRange(GDALDataset *image, int minVal, int maxVal, bool singleLine) throw(RSGISImageException);
                 ~RSGISImageUtils();
 			private:
                 double resDiffThresh; // Maximum difference between image resolutions (as a fraction).

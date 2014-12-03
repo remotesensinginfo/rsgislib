@@ -210,6 +210,9 @@ def plotImageComparison(inputImage1, inputImage2, img1Band, img2Band, outputPlot
         
         imPlot = plt.imshow(dataArr, cmap=cmap, aspect='equal', interpolation=interp, norm=mClrs.Normalize(vmin=minVal, vmax=maxVal), vmin=minVal, vmax=maxVal, origin=[0,0], extent=[img1MinSc, img1MaxSc, img2MinSc, img2MaxSc])
         plt.grid(color='k', linestyle='--', linewidth=0.5)
+        rSqStr = ''
+        if rSq < 0:
+            rSq = 0.00
         rSqStr = "$r^2 = " + str(round(rSq, 3)) + "$"
         plt.text(0.05, 0.95, rSqStr, va='center', transform=ax1.transAxes)
         fig.colorbar(imPlot)
