@@ -70,3 +70,11 @@ def rasterise2Image(inputVec, inputImage, outImage, gdalFormat):
         raise e
 
 
+def copyShapefile2RAT(inputVec, inputImage, outputImage):
+    try:
+        rasterise2Image(inputVec, inputImage, outputImage, "KEA")
+        rsgislib.rastergis.importVecAtts(outputImage, inputVec, None)
+    except Exception as e:
+        raise e
+
+

@@ -35,6 +35,9 @@
 #include "gdal_priv.h"
 #include "gdal_rat.h"
 
+#include "ogrsf_frmts.h"
+#include "ogr_api.h"
+
 #include "libkea/KEAImageIO.h"
 
 #include "common/RSGISAttributeTableException.h"
@@ -144,13 +147,10 @@ namespace rsgis{namespace rastergis{
         int* readIntColumn(GDALRasterAttributeTable *attTable, std::string colName, size_t *colLen) throw(RSGISAttributeTableException);
         char** readStrColumn(GDALRasterAttributeTable *attTable, std::string colName, size_t *colLen) throw(RSGISAttributeTableException);
         std::string* readStrColumnStdStr(GDALRasterAttributeTable *attTable, std::string colName, size_t *colLen) throw(RSGISAttributeTableException);
-        
         std::vector<std::vector<size_t>* >* getRATNeighbours(GDALDataset *clumpImage, unsigned int ratBand) throw(RSGISAttributeTableException);
-        
         void writeStrColumn(GDALRasterAttributeTable *attTable, std::string colName, std::string *strDataVal, size_t colLen) throw(RSGISAttributeTableException);
-        
         std::vector<RSGISRATCol>* getRatColumnsList(GDALRasterAttributeTable *gdalATT) throw(RSGISAttributeTableException);
-        
+        std::vector<RSGISRATCol>* getVectorColumns(OGRLayer *layer) throw(RSGISAttributeTableException);
         ~RSGISRasterAttUtils();
     };
 	
