@@ -57,6 +57,12 @@ namespace rsgis{ namespace cmds{
     DllExport void executePopulateGeomZField(std::string inputVector, std::string inputImage, unsigned int imgBand, std::string outputVector, bool force) throw(RSGISCmdException);
     /** Function to calculate a maths functions between  */
     DllExport void executeVectorMaths(std::string inputVector, std::string outputVector, std::string outColumn, std::string expression, bool force, std::vector<RSGISVariableFieldCmds> vars) throw(RSGISCmdException);
+    /** Function to add a FID column to a shapefile  */
+    DllExport void executeAddFIDColumn(std::string inputVector, std::string outputVector, bool force) throw(RSGISCmdException);
+    
+    
+    
+    
     
 }}
 

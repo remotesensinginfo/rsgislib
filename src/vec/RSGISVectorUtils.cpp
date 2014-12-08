@@ -714,5 +714,27 @@ namespace rsgis{namespace vec{
 		
 		return values;
 	}
+    
+    
+    std::vector<std::string>* RSGISVectorUtils::getColumnNames(OGRLayer *layer) throw(RSGISVectorException)
+    {
+        std::vector<std::string> *colNames = new std::vector<std::string>();
+        try
+        {
+            OGRFeatureDefn *ogrFeatDef = layer->GetLayerDefn();
+            int numFields = ogrFeatDef->GetFieldCount();
+            for(int i = 0; i < numFields; ++i)
+            {
+                OGRFieldDefn *fieldDef = ogrFeatDef->GetFieldDefn(i);
+                colNames->push_back(std::string(fieldDef->GetNameRef()));
+            }
+            
+        }
+        catch (RSGISVectorException &e)
+        {
+            throw e;
+        }
+        return colNames;
+    }
 	
 }}
