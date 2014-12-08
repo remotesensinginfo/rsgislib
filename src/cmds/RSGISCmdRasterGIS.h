@@ -271,6 +271,10 @@ namespace rsgis{ namespace cmds {
     /** Function for collapsing a RAT and assocated image clumps based on a binary column 'selected' column in the RAT */
     DllExport void executeCollapseRAT(std::string clumpsImage, unsigned int ratBand, std::string selectColumn, std::string outImage, std::string gdalFormat)throw(RSGISCmdException);
     
+    /** Function for importing attribute table from a shapefile into a RAT */
+    DllExport void executeImportShpAtts(std::string clumpsImage, unsigned int ratBand, std::string inputVector, std::vector<std::string> *colNames=NULL)throw(RSGISCmdException);
+    
+    
     
 }}
 

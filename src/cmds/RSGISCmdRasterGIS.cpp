@@ -23,6 +23,8 @@
 #include "RSGISCmdRasterGIS.h"
 #include "RSGISCmdParent.h"
 
+#include <boost/filesystem.hpp>
+
 #include "common/RSGISImageException.h"
 #include "common/RSGISAttributeTableException.h"
 
@@ -31,6 +33,8 @@
 #include "utils/RSGISTextUtils.h"
 
 #include "img/RSGISCalcImage.h"
+
+#include "vec/RSGISVectorUtils.h"
 
 #include "rastergis/RSGISRasterAttUtils.h"
 #include "rastergis/RSGISExportColumns2Image.h"
@@ -49,6 +53,7 @@
 #include "rastergis/RSGISBinaryClassifyClumps.h"
 #include "rastergis/RSGISClumpRegionGrowing.h"
 #include "rastergis/RSGISCollapseRAT.h"
+#include "rastergis/RSGISInputShapefileAttributes2RAT.h"
 
 
 /*
@@ -1619,6 +1624,79 @@ namespace rsgis{ namespace cmds {
             collapseRat.classifyClumps(clumpsDataset, ratBand, selectColumn, outImage, gdalFormat);
             
             GDALClose(clumpsDataset);
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+            
+            
+            
+            
+            
+    void executeImportShpAtts(std::string clumpsImage, unsigned int ratBand, std::string inputVector, std::vector<std::string> *colNames)throw(RSGISCmdException)
+    {
+        try
+        {
+            if((colNames != NULL) & (colNames->empty()))
+            {
+                throw RSGISCmdException("The list of column names is empty.");
+            }
+            
+            GDALAllRegister();
+            OGRRegisterAll();
+            
+            GDALDataset *clumpsDataset = (GDALDataset *) GDALOpenShared(clumpsImage.c_str(), GA_Update);
+            if(clumpsDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + clumpsImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            rsgis::vec::RSGISVectorUtils vecUtils;
+            /////////////////////////////////////
+            //
+            // Open Input Shapfile.
+            //
+            /////////////////////////////////////
+            inputVector = boost::filesystem::absolute(inputVector).string();
+            OGRDataSource *inputSHPDS = OGRSFDriverRegistrar::Open(inputVector.c_str(), FALSE);
+            if(inputSHPDS == NULL)
+            {
+                std::string message = std::string("Could not open vector file ") + inputVector;
+                throw RSGISFileException(message.c_str());
+            }
+            std::string SHPFileInLayer = vecUtils.getLayerName(inputVector);
+            OGRLayer *inputSHPLayer = inputSHPDS->GetLayerByName(SHPFileInLayer.c_str());
+            if(inputSHPLayer == NULL)
+            {
+                std::string message = std::string("Could not open vector layer ") + SHPFileInLayer;
+                throw RSGISFileException(message.c_str());
+            }
+            
+            if(colNames == NULL)
+            {
+                std::cout << "No column names were specified so copying them all.\n";
+                colNames = vecUtils.getColumnNames(inputSHPLayer);
+            }
+            
+            std::cout << "Importing columns: \n";
+            for(std::vector<std::string>::iterator iterCols = colNames->begin(); iterCols != colNames->end(); ++iterCols)
+            {
+                std::cout << "\t\'" << *iterCols << "\'" << std::endl;
+            }
+            
+            rsgis::rastergis::RSGISInputShapefileAttributes2RAT copyShpAtts2RAT;
+            copyShpAtts2RAT.copyVectorAtt2Rat(clumpsDataset, ratBand, inputSHPLayer, colNames);
+            
+            delete colNames;
+            GDALClose(clumpsDataset);
+            OGRDataSource::DestroyDataSource(inputSHPDS);
         }
         catch(rsgis::RSGISException &e)
         {

@@ -1620,6 +1620,50 @@ static PyObject *RasterGIS_CollapseRAT(PyObject *self, PyObject *args)
 }
 
 
+static PyObject *RasterGIS_ImportVecAtts(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    const char *clumpsImage, *vectorFile;
+    PyObject *pColNamesList;
+    int ratBand;
+    ratBand = 1;
+    
+    static char *kwlist[] = {"clumps", "vector", "colnames", "ratband", NULL};
+    
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssO|i:importVecAtts", kwlist, &clumpsImage, &vectorFile, &pColNamesList, &ratBand))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        std::vector<std::string> *colNames = NULL;
+        if(PySequence_Check(pColNamesList))
+        {
+            Py_ssize_t nCmds = PySequence_Size(pColNamesList);
+            colNames = new std::vector<std::string>();
+            colNames->reserve(nCmds);
+            
+            for(int i = 0; i < nCmds; ++i)
+            {
+                PyObject *o = PySequence_GetItem(pColNamesList, i);     // get the python object
+                
+                std::string strVal = RSGISPY_STRING_EXTRACT(o); // Get string
+                colNames->push_back(strVal);
+            }
+        }
+        
+        rsgis::cmds::executeImportShpAtts(std::string(clumpsImage), ratBand, std::string(vectorFile), colNames);
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+
 static PyMethodDef RasterGISMethods[] = {
     {"populateStats", (PyCFunction)RasterGIS_PopulateStats, METH_VARARGS | METH_KEYWORDS,
 "rastergis.populateStats(clumps=string, addclrtab=boolean, calcpyramids=boolean, ignorezero=boolean, ratband=int)\n"
@@ -2315,53 +2359,72 @@ static PyMethodDef RasterGISMethods[] = {
     */
 
 {"populateRATWithMeanLitStats", (PyCFunction)RasterGIS_PopulateRATWithMeanLitStats, METH_VARARGS | METH_KEYWORDS,
-    "rsgislib.rastergis.populateRATWithMeanLitStats(valsimage=string, clumps=string, meanLitImage=string, meanlitBand=int, meanLitCol=string, pxlCountCol=string, bandstats=rsgislib.rastergis.BandAttStats, ratband=int)\n"
-    "Populates an attribute table with statistics from an input values image where only the pixels with a band value above a defined threshold are used.\n"
-    "This is something referred to as the mean-lit statistics, i.e., the sunlit pixels within the object.\n"
-    "Where:\n"
-    "\n"
-    "* valsimage is a string containing the name of the input image file from which the clumps are to populated.\n"
-    "* clumps is a string containing the name of the input clumps image file\n"
-    "* meanLitImage is a string containing the name of the input image containing the band to be used for the mean-lit stats.\n"
-    "* meanLitBand is an unsigned integer specifying the image band to be used within the meanLitImage.\n"
-    "* meanLitCol is a string specifying the column to be used for the 'mean' for each object in the mean-lit calculation\n"
-    "* pxlCountCol is a string specifying the output column in the RAT where the count for the number of pixels within each clump used for the stats is outputted.\n"
-    "* bandstats is a sequence of rsgislib.rastergis.BandAttStats objects that have attributes in line with rsgis.cmds.RSGISBandAttStatsCmds\n"
-    "\n"
-    "      * band: int defining the image band to process\n"
-    "      * minField: string defining the name of the field for min value\n"
-    "      * maxField: string defining the name of the field for max value\n"
-    "      * sumField: string defining the name of the field for sum value\n"
-    "      * meanField: string defining the name of the field for mean value\n"
-    "      * stdDevField: string defining the name of the field for standard deviation value\n"
-    "* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated.\n"
-    "\n"
-    "Example::\n"
-    "\n"
-    "   from rsgislib import rastergis\n"
-    "   inputImage = \"RapidEye_20130625_lat53lon389_tid3063312_oid167771_rad_toa.kea\"\n"
-    "   segmentClumps = \"RapidEye_20130625_lat53lon389_tid3063312_oid167771_rad_toa_segs.kea\"\n"
-    "   ndviImage = \"RapidEye_20130625_lat53lon389_tid3063312_oid167771_rad_toa_ndvi.kea\"\n"
-    "   bandStats = []\n"
-    "   bandStats.append(rastergis.BandAttStats(band=1, meanField='BlueMeanML', stdDevField='BlueStdDevML'))\n"
-    "   bandStats.append(rastergis.BandAttStats(band=2, meanField='GreenMeanML', stdDevField='GreenStdDevML'))\n"
-    "   bandStats.append(rastergis.BandAttStats(band=3, meanField='RedMeanML', stdDevField='RedStdDevML'))\n"
-    "   bandStats.append(rastergis.BandAttStats(band=4, meanField='RedEdgeMeanML', stdDevField='RedEdgeStdDevML'))\n"
-    "   bandStats.append(rastergis.BandAttStats(band=5, meanField='NIRMeanML', stdDevField='NIRStdDevML'))\n"
-    "   rastergis.populateRATWithMeanLitStats(valsimage=inputImage, clumps=segmentClumps, meanLitImage=ndviImage, meanlitBand=1, meanLitCol='NDVIMean', pxlCountCol='MLPxlCount', bandstats=bandStats, ratband=1)\n"
-    "\n"},
-    
-    {"collapseRAT", RasterGIS_CollapseRAT, METH_VARARGS,
-        "rsgislib.rastergis.collapseRAT(clumpsImage, selectField, outputFile, gdalformat, ratBand)\n"
-        "Collapses the image and rat to a set of selected rows (defined with a value of 1 in the selected column).\n"
-        "Where:\n"
-        "\n"
-        "* clumpsImage is a string containing the name of the input clump file\n"
-        "* selectField is a string containing the name of the binary column used to selected the rows to which the RAT is to be collapsed to.\n"
-        "* outputFile is a string with the output file name\n"
-        "* gdalformat is a string with the output image file format - note only KEA and HFA support RATs.\n"
-        "* ratBand is the image band with which the RAT is associated.\n"
-        "\n"},
+"rsgislib.rastergis.populateRATWithMeanLitStats(valsimage=string, clumps=string, meanLitImage=string, meanlitBand=int, meanLitCol=string, pxlCountCol=string, bandstats=rsgislib.rastergis.BandAttStats, ratband=int)\n"
+"Populates an attribute table with statistics from an input values image where only the pixels with a band value above a defined threshold are used.\n"
+"This is something referred to as the mean-lit statistics, i.e., the sunlit pixels within the object.\n"
+"Where:\n"
+"\n"
+"* valsimage is a string containing the name of the input image file from which the clumps are to populated.\n"
+"* clumps is a string containing the name of the input clumps image file\n"
+"* meanLitImage is a string containing the name of the input image containing the band to be used for the mean-lit stats.\n"
+"* meanLitBand is an unsigned integer specifying the image band to be used within the meanLitImage.\n"
+"* meanLitCol is a string specifying the column to be used for the 'mean' for each object in the mean-lit calculation\n"
+"* pxlCountCol is a string specifying the output column in the RAT where the count for the number of pixels within each clump used for the stats is outputted.\n"
+"* bandstats is a sequence of rsgislib.rastergis.BandAttStats objects that have attributes in line with rsgis.cmds.RSGISBandAttStatsCmds\n"
+"\n"
+"      * band: int defining the image band to process\n"
+"      * minField: string defining the name of the field for min value\n"
+"      * maxField: string defining the name of the field for max value\n"
+"      * sumField: string defining the name of the field for sum value\n"
+"      * meanField: string defining the name of the field for mean value\n"
+"      * stdDevField: string defining the name of the field for standard deviation value\n"
+"* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated.\n"
+"\n"
+"Example::\n"
+"\n"
+"   from rsgislib import rastergis\n"
+"   inputImage = \"RapidEye_20130625_lat53lon389_tid3063312_oid167771_rad_toa.kea\"\n"
+"   segmentClumps = \"RapidEye_20130625_lat53lon389_tid3063312_oid167771_rad_toa_segs.kea\"\n"
+"   ndviImage = \"RapidEye_20130625_lat53lon389_tid3063312_oid167771_rad_toa_ndvi.kea\"\n"
+"   bandStats = []\n"
+"   bandStats.append(rastergis.BandAttStats(band=1, meanField='BlueMeanML', stdDevField='BlueStdDevML'))\n"
+"   bandStats.append(rastergis.BandAttStats(band=2, meanField='GreenMeanML', stdDevField='GreenStdDevML'))\n"
+"   bandStats.append(rastergis.BandAttStats(band=3, meanField='RedMeanML', stdDevField='RedStdDevML'))\n"
+"   bandStats.append(rastergis.BandAttStats(band=4, meanField='RedEdgeMeanML', stdDevField='RedEdgeStdDevML'))\n"
+"   bandStats.append(rastergis.BandAttStats(band=5, meanField='NIRMeanML', stdDevField='NIRStdDevML'))\n"
+"   rastergis.populateRATWithMeanLitStats(valsimage=inputImage, clumps=segmentClumps, meanLitImage=ndviImage, meanlitBand=1, meanLitCol='NDVIMean', pxlCountCol='MLPxlCount', bandstats=bandStats, ratband=1)\n"
+"\n"},
+
+{"collapseRAT", RasterGIS_CollapseRAT, METH_VARARGS,
+"rsgislib.rastergis.collapseRAT(clumpsImage, selectField, outputFile, gdalformat, ratBand)\n"
+"Collapses the image and rat to a set of selected rows (defined with a value of 1 in the selected column).\n"
+"Where:\n"
+"\n"
+"* clumpsImage is a string containing the name of the input clump file\n"
+"* selectField is a string containing the name of the binary column used to selected the rows to which the RAT is to be collapsed to.\n"
+"* outputFile is a string with the output file name\n"
+"* gdalformat is a string with the output image file format - note only KEA and HFA support RATs.\n"
+"* ratBand is the image band with which the RAT is associated.\n"
+"\n"},
+
+
+{"importVecAtts", (PyCFunction)RasterGIS_ImportVecAtts, METH_VARARGS | METH_KEYWORDS,
+"rastergis.importVecAtts(clumps, vector, colnames,ratband=1)\n"
+"Copies the attributes from an input shapefile to the RAT.\n"
+"Where:\n"
+"\n"
+"* clumps is a string containing the name of the input file with RAT\n"
+"* vector is a string containing the file path of the input vector file\n"
+"* colnames is a list of strings specifying the columns to be copied to the RAT. If 'None' then all attributes will be copied.\n"
+"* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated.\n"
+"\n"
+"Example::\n"
+"\n"
+"   from rsgislib import rastergis\n"
+"   clumps = 'clumpsFiles.kea'\n"
+"   vectorFile = 'vectorFile.shp'\n"
+"   rastergis.importVecAtts(clumps, vectorFile, None)\n"
+"\n"},
     
     {NULL}        /* Sentinel */
 };
