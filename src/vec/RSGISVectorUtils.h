@@ -83,6 +83,7 @@ namespace rsgis{namespace vec{
             OGRPolygon* removeHolesOGRPolygon(OGRPolygon *poly, float areaThreshold) throw(RSGISVectorException);
 			OGRPolygon* moveOGRPolygon(OGRPolygon *poly, double shiftX, double shiftY, double shiftZ) throw(RSGISVectorException);
 			std::vector<std::string>* findUniqueVals(OGRLayer *layer, std::string attribute) throw(RSGISVectorException);
+            std::vector<std::string>* getColumnNames(OGRLayer *layer) throw(RSGISVectorException);
 		};
 
     

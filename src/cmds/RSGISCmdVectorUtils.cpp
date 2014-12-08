@@ -41,6 +41,7 @@
 #include "vec/RSGISPopulateFeatsElev.h"
 #include "vec/RSGISGetOGRGeometries.h"
 #include "vec/RSGISVectorMaths.h"
+#include "vec/RSGISCopyFeatures.h"
 
 #include "utils/RSGISTextUtils.h"
 #include "utils/RSGISFileUtils.h"
@@ -1073,6 +1074,117 @@ namespace rsgis{ namespace cmds {
             
             delete processVector;
             delete processFeature;            
+        }
+        catch(rsgis::RSGISVectorException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+            
+            
+    void executeAddFIDColumn(std::string inputVector, std::string outputVector, bool force) throw(RSGISCmdException)
+    {
+        try
+        {
+            // Convert to absolute path
+            inputVector = boost::filesystem::absolute(inputVector).string();
+            outputVector = boost::filesystem::absolute(outputVector).string();
+            
+            OGRRegisterAll();
+            
+            rsgis::utils::RSGISFileUtils fileUtils;
+            rsgis::vec::RSGISVectorUtils vecUtils;
+            
+            std::string SHPFileInLayer = vecUtils.getLayerName(inputVector);
+            std::string SHPFileOutLayer = vecUtils.getLayerName(outputVector);
+            
+            OGRDataSource *inputSHPDS = NULL;
+            OGRLayer *inputSHPLayer = NULL;
+            OGRSFDriver *shpFiledriver = NULL;
+            OGRDataSource *outputSHPDS = NULL;
+            OGRLayer *outputSHPLayer = NULL;
+            OGRSpatialReference* inputSpatialRef = NULL;
+            OGRFeatureDefn *inFeatureDefn = NULL;
+            
+            std::string outputDIR = "";
+            
+            outputDIR = fileUtils.getFileDirectoryPath(outputVector);
+            
+            if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
+            {
+                if(force)
+                {
+                    vecUtils.deleteSHP(outputDIR, SHPFileOutLayer);
+                }
+                else
+                {
+                    throw RSGISException("Shapefile already exists, either delete or select force.");
+                }
+            }
+            
+            /////////////////////////////////////
+            //
+            // Open Input Shapfile.
+            //
+            /////////////////////////////////////
+            //std::cout << "Input Vector: " << inputVector << std::endl;
+            inputSHPDS = OGRSFDriverRegistrar::Open(inputVector.c_str(), FALSE);
+            if(inputSHPDS == NULL)
+            {
+                std::string message = std::string("Could not open vector file ") + inputVector;
+                throw RSGISFileException(message.c_str());
+            }
+            inputSHPLayer = inputSHPDS->GetLayerByName(SHPFileInLayer.c_str());
+            if(inputSHPLayer == NULL)
+            {
+                std::string message = std::string("Could not open vector layer ") + SHPFileInLayer;
+                throw RSGISFileException(message.c_str());
+            }
+            inputSpatialRef = inputSHPLayer->GetSpatialRef();
+            inFeatureDefn = inputSHPLayer->GetLayerDefn();
+            
+            /////////////////////////////////////
+            //
+            // Create Output Shapfile.
+            //
+            /////////////////////////////////////
+            //std::cout << "Output Vector: " << outputVector << std::endl;
+            const char *pszDriverName = "ESRI Shapefile";
+            shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName);
+            if( shpFiledriver == NULL )
+            {
+                throw rsgis::vec::RSGISVectorOutputException("SHP driver not available.");
+            }
+            outputSHPDS = shpFiledriver->CreateDataSource(outputVector.c_str(), NULL);
+            if( outputSHPDS == NULL )
+            {
+                std::string message = std::string("Could not create vector file ") + outputVector;
+                throw rsgis::vec::RSGISVectorOutputException(message.c_str());
+            }
+            outputSHPLayer = outputSHPDS->CreateLayer(SHPFileOutLayer.c_str(), inputSpatialRef, inFeatureDefn->GetGeomType(), NULL );
+            if( outputSHPLayer == NULL )
+            {
+                std::string message = std::string("Could not create vector layer ") + SHPFileOutLayer;
+                throw rsgis::vec::RSGISVectorOutputException(message.c_str());
+            }
+            
+            rsgis::vec::RSGISCopyFeaturesAddFIDCol *copyFeatures = new rsgis::vec::RSGISCopyFeaturesAddFIDCol(1);
+            rsgis::vec::RSGISProcessVector *processVector = new rsgis::vec::RSGISProcessVector(copyFeatures);
+            processVector->processVectors(inputSHPLayer, outputSHPLayer, true, true, false);
+            
+            delete copyFeatures;
+            delete processVector;
+            
+            OGRDataSource::DestroyDataSource(inputSHPDS);
+            OGRDataSource::DestroyDataSource(outputSHPDS);
         }
         catch(rsgis::RSGISVectorException &e)
         {
