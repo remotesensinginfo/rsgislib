@@ -86,6 +86,8 @@ namespace rsgis{ namespace cmds {
     /** Function to produce a regular grid of clumps for a defined image area */
     DllExport void executeGenerateRegularGrid(std::string inputImage, std::string outputClumpImage, std::string imageFormat, unsigned int numXPxls, unsigned int numYPxls)throw(RSGISCmdException);
     
+    /** Function to include a clumped masked region into an existing segmebtation */
+    DllExport void executeIncludeClumpedRegion(std::string inputClumps, std::string inputRegion, std::string outputClumpImage, std::string imageFormat)throw(RSGISCmdException);
     
 }}
 

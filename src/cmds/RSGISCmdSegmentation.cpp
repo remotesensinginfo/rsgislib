@@ -39,6 +39,7 @@
 #include "segmentation/RSGISRandomColourClumps.h"
 #include "segmentation/RSGISMergeSegmentationTiles.h"
 #include "segmentation/RSGISBottomUpShapeFeatureExtraction.h"
+#include "segmentation/RSGISMergeSegmentations.h"
 
 #include "rastergis/RSGISRasterAttUtils.h"
 #include "rastergis/RSGISCalcImageStatsAndPyramids.h"
@@ -317,7 +318,6 @@ namespace rsgis{ namespace cmds {
             
             std::cout << "Performing relabel\n";
             rsgis::segment::RSGISRelabelClumps relabelImg;
-            //relabelImg.relabelClumps(catagoryDataset, resultDataset);
             relabelImg.relabelClumpsCalcImg(catagoryDataset, resultDataset);
             
             if(processInMemory)
@@ -745,6 +745,65 @@ namespace rsgis{ namespace cmds {
             imgUtils.createImageGrid(clumpsDataset, numXPxls, numYPxls);
             
             GDALClose(clumpsDataset);
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+            
+            
+    void executeIncludeClumpedRegion(std::string inputClumps, std::string inputRegion, std::string outputClumpImage, std::string imageFormat)throw(RSGISCmdException)
+    {
+        GDALAllRegister();
+        
+        try
+        {
+            GDALDataset *inputClumpsDS = (GDALDataset *) GDALOpen(inputClumps.c_str(), GA_ReadOnly);
+            if(inputClumpsDS == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputClumps;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            if(inputClumpsDS->GetRasterCount() > 1)
+            {
+                GDALClose(inputClumpsDS);
+                throw rsgis::RSGISImageException("Input clumps image must only have 1 image band.");
+            }
+            
+            GDALDataset *inputRegionsDS = (GDALDataset *) GDALOpen(inputRegion.c_str(), GA_ReadOnly);
+            if(inputRegionsDS == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputRegion;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            if(inputRegionsDS->GetRasterCount() > 1)
+            {
+                GDALClose(inputClumpsDS);
+                GDALClose(inputRegionsDS);
+                throw rsgis::RSGISImageException("Input regions image must only have 1 image band.");
+            }
+            
+            rsgis::segment::RSGISMergeSegmentations mergeAddSegs;
+            mergeAddSegs.includeRegions(inputClumpsDS, inputRegionsDS, outputClumpImage, imageFormat);
+            
+            GDALClose(inputClumpsDS);
+            GDALClose(inputRegionsDS);
+            
+            // Add colour table and pyramids
+            GDALDataset *outputClumpsDS = (GDALDataset *) GDALOpen(outputClumpImage.c_str(), GA_Update);
+            if(outputClumpsDS == NULL)
+            {
+                std::string message = std::string("Could not open image ") + outputClumpImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            outputClumpsDS->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
+            
+            rsgis::rastergis::RSGISPopulateWithImageStats popImageStats;
+            popImageStats.populateImageWithRasterGISStats(outputClumpsDS, true, true, true, 1);
+            GDALClose(outputClumpsDS);
         }
         catch (rsgis::RSGISException &e)
         {

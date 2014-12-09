@@ -420,6 +420,29 @@ static PyObject *Segmentation_GenerateRegularGrid(PyObject *self, PyObject *args
 }
 
 
+static PyObject *Segmentation_IncludeRegionsInClumps(PyObject *self, PyObject *args)
+{
+    const char *pszClumpsImage, *pszRegionsImage, *pszOutputImage, *pszGDALFormat;
+
+    if( !PyArg_ParseTuple(args, "ssss:includeRegionsInClumps", &pszClumpsImage, &pszRegionsImage, &pszOutputImage, &pszGDALFormat ))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeIncludeClumpedRegion(std::string(pszClumpsImage), std::string(pszRegionsImage), std::string(pszOutputImage), std::string(pszGDALFormat));
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+
 
 // Our list of functions in this module
 static PyMethodDef SegmentationMethods[] = {
@@ -560,6 +583,18 @@ static PyMethodDef SegmentationMethods[] = {
 "* gdalformat is a string defining the format of the output image.\n"
 "* numXPxls is the size of the grid cells in the X axis in pixel units.\n"
 "* numYPxls is the size of the grid cells in the Y axis in pixel units.\n"
+"\n"},
+    
+{"includeRegionsInClumps", Segmentation_IncludeRegionsInClumps, METH_VARARGS,
+"segmentation.includeRegionsInClumps(clumpsImage, regionsImage, outputClumps, gdalFormat)\n"
+"A function to include a set of clumped regions within an existing clumps (i.e., segmentation) image.\n"
+"NOTE. You should run the relabelClumps function on the output of this command before using further.\n"
+"where:\n"
+"\n"
+"* clumpsImage is a string containing the filepath for the input clumps image.\n"
+"* regionsImage is a string containing the filepath for the input regions image.\n"
+"* outputClumps is a string containing the name and path of the output clumps image\n"
+"* gdalFormat is a string defining the format of the output image.\n"
 "\n"},
 
     {NULL}        /* Sentinel */
