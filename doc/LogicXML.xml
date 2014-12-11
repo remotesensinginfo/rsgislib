@@ -53,4 +53,17 @@
 	
 	<rsgis:expression operation="evaluate" operator="lteq" column1="string" column2="string" />
 	
+	
+	<rsgis:expression operation="evaluate" operator="eq" column="string" />
+	
+	<rsgis:expression operation="evaluate" operator="noteq" column="string" />
+	
+	<rsgis:expression operation="evaluate" operator="gt" column="string"  />
+	
+	<rsgis:expression operation="evaluate" operator="lt" column="string" />
+	
+	<rsgis:expression operation="evaluate" operator="gteq" column="string" />
+	
+	<rsgis:expression operation="evaluate" operator="lteq" column="string" />
+	
 </rsgis:ratlogicexps>

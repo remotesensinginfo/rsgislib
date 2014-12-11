@@ -26,6 +26,10 @@ Management
 -----------
 .. autofunction:: rsgislib.vectorutils.polygonsInPolygon
 
+Rasterisation
+-------------
+.. autofunction:: rsgislib.vectorutils.rasterise2Image
+.. autofunction:: rsgislib.vectorutils.copyShapefile2RAT
 
 * :ref:`genindex`
 * :ref:`modindex`

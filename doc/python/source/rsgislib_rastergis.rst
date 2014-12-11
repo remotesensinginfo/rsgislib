@@ -43,6 +43,7 @@ Classification
 
 .. autofunction:: rsgislib.rastergis.binaryClassification
 .. autofunction:: rsgislib.rastergis.regionGrowClass
+.. autofunction:: rsgislib.rastergis.regionGrowClassNeighCritera
 
 Change Detection
 -----------------
@@ -58,6 +59,7 @@ Copy & Export
 .. autofunction:: rsgislib.rastergis.copyGDALATTColumns
 .. autofunction:: rsgislib.rastergis.copyRAT
 .. autofunction:: rsgislib.rastergis.interpolateClumpValues2Image
+.. autofunction:: rsgislib.rastergis.importVecAtts
 
 Colour Tables
 ---------------
