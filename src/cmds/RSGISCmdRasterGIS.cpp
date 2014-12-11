@@ -1468,7 +1468,6 @@ namespace rsgis{ namespace cmds {
         }
     }
       
-            
     void executeClassRegionGrowing(std::string clumpsImage, unsigned int ratBand, std::string classColumn, std::string classVal, int maxIter, std::string xmlBlock)throw(RSGISCmdException)
     {
         try
@@ -1498,7 +1497,6 @@ namespace rsgis{ namespace cmds {
         }
     }
             
-            
     void executeBinaryClassify(std::string clumpsImage, unsigned int ratBand, std::string xmlBlock, std::string outColumn)throw(RSGISCmdException)
     {
         try
@@ -1527,7 +1525,6 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-            
             
     void executePopulateRATWithMeanLitStats(std::string inputImage, std::string clumpsImage, std::string inputMeanLitImage, unsigned int meanlitBand, std::string meanLitColumn, std::string pxlCountCol, std::vector<rsgis::cmds::RSGISBandAttStatsCmds*> *bandStatsCmds, unsigned int ratBand)throw(RSGISCmdException)
     {
@@ -1605,8 +1602,6 @@ namespace rsgis{ namespace cmds {
         }
     }
             
-            
-            
     void executeCollapseRAT(std::string clumpsImage, unsigned int ratBand, std::string selectColumn, std::string outImage, std::string gdalFormat)throw(RSGISCmdException)
     {
         try
@@ -1634,10 +1629,6 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-            
-            
-            
-            
             
     void executeImportShpAtts(std::string clumpsImage, unsigned int ratBand, std::string inputVector, std::vector<std::string> *colNames)throw(RSGISCmdException)
     {
@@ -1703,6 +1694,35 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
         catch(std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+            
+    void executeClassRegionGrowingNeighCritera(std::string clumpsImage, unsigned int ratBand, std::string classColumn, std::string classVal, int maxIter, std::string xmlBlockGrowCriteria, std::string xmlBlockNeighCriteria)throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            std::cout.precision(12);
+            
+            GDALDataset *clumpsDataset = (GDALDataset *) GDALOpen(clumpsImage.c_str(), GA_Update);
+            if(clumpsDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + clumpsImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            rsgis::rastergis::RSGISClumpRegionGrowing growClumpRegions;
+            growClumpRegions.growClassRegionNeighCriteria(clumpsDataset, classColumn, classVal, maxIter, ratBand, xmlBlockGrowCriteria, xmlBlockNeighCriteria);
+            
+            GDALClose(clumpsDataset);
+        }
+        catch(rsgis::RSGISAttributeTableException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (rsgis::RSGISException &e)
         {
             throw RSGISCmdException(e.what());
         }
