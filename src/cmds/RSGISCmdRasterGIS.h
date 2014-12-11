@@ -274,7 +274,8 @@ namespace rsgis{ namespace cmds {
     /** Function for importing attribute table from a shapefile into a RAT */
     DllExport void executeImportShpAtts(std::string clumpsImage, unsigned int ratBand, std::string inputVector, std::vector<std::string> *colNames=NULL)throw(RSGISCmdException);
     
-    
+    /** Function to undertaken region growing of a class with a neighbour / object criteria */
+    DllExport void executeClassRegionGrowingNeighCritera(std::string clumpsImage, unsigned int ratBand, std::string classColumn, std::string classVal, int maxIter, std::string xmlBlockGrowCriteria, std::string xmlBlockNeighCriteria)throw(RSGISCmdException);
     
 }}
 

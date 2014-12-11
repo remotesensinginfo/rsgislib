@@ -1663,6 +1663,30 @@ static PyObject *RasterGIS_ImportVecAtts(PyObject *self, PyObject *args, PyObjec
     Py_RETURN_NONE;
 }
 
+static PyObject *RasterGIS_RegionGrowClassNeighCritera(PyObject *self, PyObject *args)
+{
+    const char *clumpsImage, *xmlBlockGrowCriteria, *xmlBlockNeighCriteria, *classColumn, *classVal;
+    unsigned int ratBand = 1;
+    int maxNumIter = -1;
+    
+    if(!PyArg_ParseTuple(args, "sssss|iI:regionGrowClassNeighCritera", &clumpsImage, &xmlBlockGrowCriteria, &xmlBlockNeighCriteria, &classColumn, &classVal, &maxNumIter, &ratBand))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeClassRegionGrowingNeighCritera(std::string(clumpsImage), ratBand, std::string(classColumn), std::string(classVal), maxNumIter, std::string(xmlBlockGrowCriteria), std::string(xmlBlockNeighCriteria));
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 
 static PyMethodDef RasterGISMethods[] = {
     {"populateStats", (PyCFunction)RasterGIS_PopulateStats, METH_VARARGS | METH_KEYWORDS,
@@ -2425,7 +2449,50 @@ static PyMethodDef RasterGISMethods[] = {
 "   vectorFile = 'vectorFile.shp'\n"
 "   rastergis.importVecAtts(clumps, vectorFile, None)\n"
 "\n"},
-    
+
+{"regionGrowClassNeighCritera", RasterGIS_RegionGrowClassNeighCritera, METH_VARARGS,
+"rsgislib.rastergis.regionGrowClassNeighCritera(clumpsImage, xmlBlockGrowCriteria, xmlBlockNeighCriteria, classColumn, classVal, maxNumIter, ratBand)\n"
+"Using a logical expression a class (classVal) defined within the classColumn is grown until.\n"
+"either the maximum number of iterations (maxNumIter) is reached or there all clumps meeting the\n"
+"criteria have been met (set maxNumIter to be -1).\n"
+"Where:\n"
+"\n"
+"* clumpsImage is a string containing the name of the input clump file\n"
+"* xmlBlockGrowCriteria is a string with a block of XML which is to be parsed for the \nlogical expression for the region growing.\n"
+"* xmlBlockNeighCriteria is a string with a block of XML which is to be parsed for the \nlogical expression for stating whether a feature is a neighbour which can be considered.\n"
+"* classColumn is a string with the name column containing the classification.\n"
+"* classVal is a string with the name of the class to be grown\n"
+"* maxNumIter is the maximum number of iterations to used for the growth (optional; default is -1, i.e., no max number of iterations\n"
+"* ratBand is an (optional; default 1) integer with the image band with which the RAT is associated.\n"
+"\nExample::\n"
+"\n"
+"    from rsgislib import rastergis\n"
+"    import xml.etree.cElementTree as ET\n"
+"\n"
+"    ET.register_namespace(\"rsgis\", \"http://www.rsgislib.org/xml/\")\n"
+"    rootElemCriteria = ET.Element(\"{http://www.rsgislib.org/xml/}ratlogicexps\")\n"
+"    andElem = ET.SubElement(rootElemCriteria, \"{http://www.rsgislib.org/xml/}expression\", {'operation':'and'})\n"
+"    ET.SubElement(andElem, \"{http://www.rsgislib.org/xml/}expression\", {'operation':'evaluate','operator':'gt','column':'HHdB','threshold':'-10'})\n"
+"    ET.SubElement(andElem, \"{http://www.rsgislib.org/xml/}expression\", {'operation':'evaluate','operator':'lt','column':'dist2Sea','threshold':'2000'})\n"
+"    xmlBlockGrowCriteria = ET.tostring(rootElemCriteria, encoding='utf8', method='xml').decode(\"utf-8\")\n"
+"\n"
+"    print(xmlBlockGrowCriteria)\n"
+"\n"
+"    ET.register_namespace(\"rsgis\", \"http://www.rsgislib.org/xml/\")\n"
+"    rootElemNeigh = ET.Element(\"{http://www.rsgislib.org/xml/}ratlogicexps\")\n"
+"    ET.SubElement(rootElemNeigh, \"{http://www.rsgislib.org/xml/}expression\", {'operation':'evaluate','operator':'lt','column':'dist2Sea'})\n"
+"    xmlBlockNeighCriteria = ET.tostring(rootElemNeigh, encoding='utf8', method='xml').decode(\"utf-8\")\n"
+"\n"
+"    print(xmlBlockNeighCriteria)\n"
+"\n"
+"    inputimage = \"N00E103_classification_grown.kea\"\n"
+"    classColumn = \"Classification\"\n"
+"    classVal = \"Mangroves\"\n"
+"    maxIters = -1\n"
+"    rastergis.findNeighbours(inputimage)\n"
+"    rastergis.regionGrowClassNeighCritera(inputimage, xmlBlockGrowCriteria, xmlBlockNeighCriteria, classColumn, classVal, maxIters)\n"
+"\n"},
+
     {NULL}        /* Sentinel */
 };
 
