@@ -1,8 +1,6 @@
 RSGISLib Image Filter Module
 =================================
 .. automodule:: rsgislib.imagefilter
-   :members:
-   :undoc-members:
 
 Filter Banks
 -------------
