@@ -2,8 +2,6 @@ RSGISLib Vector Utils Module
 =================================
 
 .. automodule:: rsgislib.vectorutils
-   :members:
-   :undoc-members:
 
 Geometry
 ---------

@@ -65,7 +65,6 @@ Colour Tables
 ---------------
 .. autofunction:: rsgislib.rastergis.colourClasses
 .. autofunction:: rsgislib.rastergis.generateColourTable
-.. autofunction:: rsgislib.rastergis.copyCategoriesColours
 
 
 * :ref:`genindex`
