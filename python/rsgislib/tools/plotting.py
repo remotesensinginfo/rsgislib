@@ -157,26 +157,26 @@ def plotImageComparison(inputImage1, inputImage2, img1Band, img2Band, outputPlot
         tmpOutFile = os.path.splitext(outputPlotFile)[0] + "_hist2dimgtmp.kea"
         #tmpOutFileStch = os.path.splitext(outputPlotFile)[0] + "_hist2dimgtmpStch.kea"
         
-        if (img1Min == None) or (img1Max == None):
+        if (img1Min is None) or (img1Max is None):
             # Calculate image 1 stats
             imgGDALDS = gdal.Open(inputImage1, gdal.GA_ReadOnly)
             imgGDALBand = imgGDALDS.GetRasterBand(img1Band)
             min, max = imgGDALBand.ComputeRasterMinMax(False)
             imgGDALDS = None
-            if img1Min == None:
+            if img1Min is None:
                 img1Min = min
-            if img1Max == None:
+            if img1Max is None:
                 img1Max = max
             
-        if (img2Min == None) or (img2Max == None):
+        if (img2Min is None) or (img2Max is None):
             # Calculate image 2 stats
             imgGDALDS = gdal.Open(inputImage2, gdal.GA_ReadOnly)
             imgGDALBand = imgGDALDS.GetRasterBand(img2Band)
             min, max = imgGDALBand.ComputeRasterMinMax(False)
             imgGDALDS = None
-            if img2Min == None:
+            if img2Min is None:
                 img2Min = min
-            if img2Max == None:
+            if img2Max is None:
                 img2Max = max
         
         outBinSizeImg1, outBinSizeImg2, rSq = imagecalc.get2DImageHistogram(inputImage1, inputImage2, tmpOutFile, gdalFormat, img1Band, img2Band, numBins, img1Min, img1Max, img2Min, img2Max, img1Scale, img2Scale, img1Off, img2Off, normOutput)

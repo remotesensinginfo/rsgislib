@@ -29,7 +29,8 @@ from rsgislib import imageutils
 from rsgislib import rastergis
 
 def rasterise2Image(inputVec, inputImage, outImage, gdalFormat):
-""" A utillity to rasterise a shapefile into an image covering the same region and at the same resolution as the input image. 
+    """ 
+A utillity to rasterise a shapefile into an image covering the same region and at the same resolution as the input image. 
 
 Where:
 
@@ -44,11 +45,11 @@ Example::
     
     inputVector = 'crowns.shp'
     inputImage = 'injune_p142_casi_sub_utm.kea'
-	outputImage = 'psu142_crowns.kea'
-	    
+    outputImage = 'psu142_crowns.kea'
+        
     vectorutils.rasterise2Image(inputVector, inputImage, outputImage, 'KEA')
 
-"""
+    """
     try:
         # Check gdal is available
         if not haveGDALPy:
@@ -91,7 +92,8 @@ Example::
 
 
 def copyShapefile2RAT(inputVec, inputImage, outputImage):
-""" A utillity to create raster copy of a shapefile. The output image is a KEA file and the attribute table has the attributes from the shapefile. 
+    """
+A utillity to create raster copy of a shapefile. The output image is a KEA file and the attribute table has the attributes from the shapefile. 
 
 Where:
 
@@ -102,14 +104,14 @@ Where:
 Example::
 
     from rsgislib import vectorutils
-    
+     
     inputVector = 'crowns.shp'
     inputImage = 'injune_p142_casi_sub_utm.kea'
-	outputImage = 'psu142_crowns.kea'
-	    
+    outputImage = 'psu142_crowns.kea'
+        
     vectorutils.copyShapefile2RAT(inputVector, inputImage, outputImage)
 
-"""
+    """
     try:
         rasterise2Image(inputVec, inputImage, outputImage, "KEA")
         rsgislib.rastergis.importVecAtts(outputImage, inputVec, None)
