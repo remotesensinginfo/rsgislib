@@ -37,6 +37,7 @@ Attribute Segments
 .. autofunction:: rsgislib.rastergis.spatialLocation
 .. autofunction:: rsgislib.rastergis.specDistMajorityClassifier
 .. autofunction:: rsgislib.rastergis.strClassMajority
+.. autofunction:: rsgislib.rastergis.populateRATWithMode
 
 Classification
 --------------

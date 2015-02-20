@@ -280,7 +280,6 @@ namespace rsgis{namespace rastergis{
             std::vector<rsgis::rastergis::RSGISColumnLogicIdxs*> *colIdxesCritExp = new std::vector<rsgis::rastergis::RSGISColumnLogicIdxs*>();
             rsgis::math::RSGISLogicExpression* expCrit = parseLogicXMLObj.parseLogicXML(xmlBlockCriteria, colIdxesCritExp);
             
-            
             std::vector<rsgis::rastergis::RSGISColumnLogicIdxs*> *colIdxesNeighExp = new std::vector<rsgis::rastergis::RSGISColumnLogicIdxs*>();
             rsgis::math::RSGISLogicExpression* expNeigh = parseLogicXMLObj.parseLogicXML(xmlBlockNeighCriteria, colIdxesNeighExp);
             
@@ -403,6 +402,9 @@ namespace rsgis{namespace rastergis{
                         std::cout << "." << feedbackCounter << "." << std::flush;
                         feedbackCounter = feedbackCounter + 10;
                     }
+                    
+                    //std::cout << "Processing row " << i << std::endl;
+                    //std::cout << "Class Value = " << classVal << " Row class = " << classColVals[i] << std::endl;
                     
                     if(classColVals[i] == classVal)
                     {

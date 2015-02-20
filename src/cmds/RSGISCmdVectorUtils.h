@@ -59,6 +59,8 @@ namespace rsgis{ namespace cmds{
     DllExport void executeVectorMaths(std::string inputVector, std::string outputVector, std::string outColumn, std::string expression, bool force, std::vector<RSGISVariableFieldCmds> vars) throw(RSGISCmdException);
     /** Function to add a FID column to a shapefile  */
     DllExport void executeAddFIDColumn(std::string inputVector, std::string outputVector, bool force) throw(RSGISCmdException);
+    /** Function to find the common extent of list of images and create a shapefile for the extent  */
+    DllExport void executeFindCommonImgExtent(std::vector<std::string> inputImages, std::string outputVector, bool force) throw(RSGISCmdException);
     
     
     

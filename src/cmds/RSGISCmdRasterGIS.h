@@ -172,6 +172,9 @@ namespace rsgis{ namespace cmds {
     /** Function for populating the attribute table with the proporations of intersecting catagories */
     DllExport void executePopulateCategoryProportions(std::string categoriesImage, std::string clumpsImage, std::string outColsName, std::string majorityColName, bool copyClassNames, std::string majClassNameField, std::string classNameField, unsigned int ratBandClumps, unsigned int ratBandCats)throw(RSGISCmdException);
 
+    /** Function for populating the attribute table with the mode of intersecting catagories */
+    DllExport void executePopulateRATWithMode(std::string inputImage, std::string clumpsImage, std::string outColsName, bool useNoDataVal, long noDataVal, unsigned int modeBand, unsigned int ratBand)throw(RSGISCmdException);
+    
     /** Function for copying an attribute tables colour table to another table based on class column */
     //DllExport void executeCopyCategoriesColours(std::string categoriesImage, std::string clumpsImage, std::string classField)throw(RSGISCmdException);
 
