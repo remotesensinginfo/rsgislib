@@ -1,0 +1,62 @@
+#!/usr/bin/env python
+
+#############################################
+# rsgislibcalcindices.py
+#
+#  Copyright 2015 RSGISLib.
+#
+#  RSGISLib: 'The remote sensing and GIS Software Library'
+#
+#  RSGISLib is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  RSGISLib is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with RSGISLib.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Purpose:  Calculate useful indices quickly and easily.
+#
+# Author: Pete Bunting
+# Email: petebunting@mac.com
+# Date: 20/02/2015
+# Version: 1.0
+# 
+#############################################
+import sys, argparse
+
+try:
+    from rsgislib import imagecalc
+except ImportError:
+    print("ERROR: Couldn't import RSGISLib python modules")
+    sys.exit()
+
+if __name__ == '__main__':    
+    parser = argparse.ArgumentParser(prog='rsgislibcalcindices.py')
+
+    parser.add_argument("-i", "--input", type=str, help='''Specify the input image file.''')
+    parser.add_argument("-o", "--output", type=str,help='''Specify the output image file.''')
+    parser.add_argument("-c", "--calc", type=str, choices=['ndvi', 'wbi'], help='''Specify the indice to calculate (nvdi, wbi)''')
+    parser.add_argument("-s", "--stats", action='store_true', default=False, help='''Specifies that the image statistics and pyramids should be build for all output images.''')
+    parser.add_argument("-b", "--bands", type=int, nargs='+', help='''Specify the image bands for the index (NDVI: Red, NIR. WBI: Blue, NIR)''')
+    parser.add_argument("-f", "--format", type=str, default='KEA', help='''Specify the output image file format (Default: KEA).''')
+    # Call the parser to parse the arguments.
+    args = parser.parse_args()
+        
+
+    if args.calc == "ndvi":
+        imagecalc.calcNDVI(args.input, args.bands[0], args.bands[1], args.output, args.stats, args.format)
+    elif args.calc == "wbi":
+        imagecalc.calcWBI(args.input, args.bands[0], args.bands[1], args.output, args.stats, args.format)
+    else:
+        print("Don't recongise indice specified.")
+        
+        
+        
+        
+        
