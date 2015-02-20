@@ -368,6 +368,46 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
+            
+    void executePopulateRATWithMode(std::string inputImage, std::string clumpsImage, std::string outColsName, bool useNoDataVal, long noDataVal, unsigned int modeBand, unsigned int ratBand)throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            std::cout << "Opening Clumps Image: " << clumpsImage << std::endl;
+            GDALDataset *clumpsDataset = (GDALDataset *) GDALOpenShared(clumpsImage.c_str(), GA_Update);
+            if(clumpsDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + clumpsImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            std::cout << "Opening Input Image: " << inputImage << std::endl;
+            GDALDataset *inDataset = (GDALDataset *) GDALOpenShared(inputImage.c_str(), GA_ReadOnly);
+            if(inDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            rsgis::rastergis::RSGISPopRATWithStats popRATStats;
+            popRATStats.populateRATWithModeStats(clumpsDataset, inDataset, outColsName, useNoDataVal, noDataVal, modeBand, ratBand);
+            
+            clumpsDataset->GetRasterBand(ratBand)->SetMetadataItem("LAYER_TYPE", "thematic");
+            
+            GDALClose(clumpsDataset);
+            GDALClose(inDataset);
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+            
+            
 /*
     void executeCopyCategoriesColours(std::string categoriesImage, std::string clumpsImage, std::string classField)throw(RSGISCmdException) {
         try

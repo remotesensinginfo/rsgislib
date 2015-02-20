@@ -11,6 +11,7 @@ Projection
 .. autofunction:: rsgislib.imageutils.assignSpatialInfo
 .. autofunction:: rsgislib.imageutils.copyProjFromImage
 .. autofunction:: rsgislib.imageutils.copySpatialAndProjFromImage
+.. autofunction:: rsgislib.imageutils.resampleImage2Match
 
 Tile & Mosaic
 --------------
@@ -33,7 +34,8 @@ Subset / Mask
 .. autofunction:: rsgislib.imageutils.subset
 .. autofunction:: rsgislib.imageutils.subset2img
 .. autofunction:: rsgislib.imageutils.subset2polys
-
+.. autofunction:: rsgislib.imageutils.subsetImgs2CommonExtent
+.. autofunction:: rsgislib.imageutils.buildImgSubDict
 
 Extract
 --------
