@@ -59,6 +59,10 @@ Geometry
 .. autofunction:: rsgislib.imagecalc.mahalanobisDist2ImgFilter
 .. autofunction:: rsgislib.imagecalc.imageCalcDistance
 
+Image Indices
+-------------
+.. autofunction:: rsgislib.imagecalc.calcNDVI
+.. autofunction:: rsgislib.imagecalc.calcWBI
 
 Other
 ------
