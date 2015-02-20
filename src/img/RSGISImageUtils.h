@@ -144,6 +144,7 @@ namespace rsgis
                 void getImageOverlapCut2Env(GDALDataset **datasets, int numDS,  int **dsOffsets, int *width, int *height, double *gdalTransform, geos::geom::Envelope *env) throw(RSGISImageBandException);
                 void getImageOverlapCut2Env(GDALDataset **datasets, int numDS,  int **dsOffsets, int *width, int *height, double *gdalTransform, geos::geom::Envelope *env, int *maxBlockX, int *maxBlockY) throw(RSGISImageBandException);
 				void getImageOverlap(GDALDataset **datasets, int numDS, int *width, int *height, geos::geom::Envelope *env) throw(RSGISImageBandException);
+                void getImageOverlap(GDALDataset **datasets, int numDS, geos::geom::Envelope *env) throw(RSGISImageBandException);
 				void getImagesExtent(GDALDataset **datasets, int numDS, int *width, int *height, double *gdalTransform) throw(RSGISImageBandException);
                 void getImagesExtent(std::string *inputImages, int numDS, int *width, int *height, double *gdalTransform) throw(RSGISImageBandException);
                 OGREnvelope* getSpatialExtent(GDALDataset *dataset) throw(RSGISImageBandException);                

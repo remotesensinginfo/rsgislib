@@ -1808,6 +1808,162 @@ namespace rsgis{namespace img{
 			delete[] ySize;
 		}
 	}
+    
+    void RSGISImageUtils::getImageOverlap(GDALDataset **datasets, int numDS, geos::geom::Envelope *env) throw(RSGISImageBandException)
+    {
+        double **transformations = new double*[numDS];
+        int *xSize = new int[numDS];
+        int *ySize = new int[numDS];
+        for(int i = 0; i < numDS; i++)
+        {
+            transformations[i] = new double[6];
+            datasets[i]->GetGeoTransform(transformations[i]);
+            xSize[i] = datasets[i]->GetRasterXSize();
+            ySize[i] = datasets[i]->GetRasterYSize();
+            //std::cout << "TL [" << transformations[i][0] << "," << transformations[i][3] << "]\n";
+            //std::cout << "Res [" << transformations[i][1] << "," << transformations[i][5] << "]\n";
+        }
+        double rotateX = 0;
+        double rotateY = 0;
+        double minX = 0;
+        double maxX = 0;
+        double tmpMaxX = 0;
+        double minY = 0;
+        double tmpMinY = 0;
+        double maxY = 0;
+        const char *proj = NULL;
+        bool first = true;
+        
+        try
+        {
+            
+            // Calculate Image Overlap.
+            for(int i = 0; i < numDS; i++)
+            {
+                if(first)
+                {
+                    rotateX = transformations[i][2];
+                    rotateY = transformations[i][4];
+                    
+                    if(transformations[i][5] < 0)
+                    {
+                        transformations[i][5] = transformations[i][5] * (-1);
+                    }
+   
+                    minX = transformations[i][0];
+                    maxY = transformations[i][3];
+                    
+                    maxX = minX + (xSize[i] * transformations[i][1]);
+                    minY = maxY - (ySize[i] * transformations[i][5]);
+                    
+                    proj = datasets[i]->GetProjectionRef(); // Get projection of first band in image
+                    
+                    first = false;
+                    
+                    //std::cout << "X: [" << minX << "," << maxX << "]\n";
+                    //std::cout << "Y: [" << minY << "," << maxY << "]\n\n";
+                }
+                else
+                {
+                    if(std::string(datasets[i]->GetProjectionRef()) != std::string(proj))
+                    {
+                        std::cerr << "WARNING: \'" << datasets[i]->GetFileList()[0] << "\' does not have the same projection...\n";
+                    }
+                    
+                    if(transformations[i][2] != rotateX & transformations[i][4] != rotateY)
+                    {
+                        throw RSGISImageBandException("Not all image bands have the same rotation..");
+                    }
+                    
+                    if(transformations[i][0] > minX)
+                    {
+                        minX = transformations[i][0];
+                    }
+                    
+                    if(transformations[i][3] < maxY)
+                    {
+                        maxY = transformations[i][3];
+                    }
+                    
+                    if(transformations[i][5] < 0)
+                    {
+                        transformations[i][5] = transformations[i][5] * (-1);
+                    }
+                    
+                    tmpMaxX = transformations[i][0] + (xSize[i] * transformations[i][1]);
+                    tmpMinY = transformations[i][3] - (ySize[i] * transformations[i][5]);
+                    
+                    if(tmpMaxX < maxX)
+                    {
+                        maxX = tmpMaxX;
+                    }
+                    
+                    if(tmpMinY > minY)
+                    {
+                        minY = tmpMinY;
+                    }
+                    
+                    
+                    //std::cout << "X: [" << transformations[i][0] << "," << tmpMaxX << "]\n";
+                    //std::cout << "Y: [" << tmpMinY << "," << maxY << "]\n";
+                    
+                    //std::cout << "X Overlap: [" << minX << "," << maxX << "]\n";
+                    //std::cout << "Y Overlap: [" << minY << "," << maxY << "]\n\n";
+                }
+            }
+            
+            if(maxX - minX <= 0)
+            {
+                std::cout << "X: [" << minX << ", " << maxX << "]\n";
+                throw RSGISImageBandException("Images do not overlap in the X axis");
+            }
+            
+            if(maxY - minY <= 0)
+            {
+                std::cout << "Y: [" << minY << ", " << maxY << "]\n";
+                throw RSGISImageBandException("Images do not overlap in the Y axis");
+            }
+            
+            env->init(minX, maxX, minY, maxY);
+        }
+        catch(RSGISImageBandException& e)
+        {
+            if(transformations != NULL)
+            {
+                for(int i = 0; i < numDS; i++)
+                {
+                    delete[] transformations[i];
+                }
+                delete[] transformations;
+            }
+            if(xSize != NULL)
+            {
+                delete[] xSize;
+            }
+            if(ySize != NULL)
+            {
+                delete[] ySize;
+            }
+            throw e;
+        }
+        
+        if(transformations != NULL)
+        {
+            for(int i = 0; i < numDS; i++)
+            {
+                delete[] transformations[i];
+            }
+            delete[] transformations;
+        }
+        if(xSize != NULL)
+        {
+            delete[] xSize;
+        }
+        if(ySize != NULL)
+        {
+            delete[] ySize;
+        }
+    }
 	
 	void RSGISImageUtils::getImagesExtent(GDALDataset **datasets, int numDS, int *width, int *height, double *gdalTransform) throw(RSGISImageBandException)
 	{

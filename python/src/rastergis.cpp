@@ -426,6 +426,35 @@ static PyObject *RasterGIS_PopulateCategoryProportions(PyObject *self, PyObject 
     Py_RETURN_NONE;
 }
 
+static PyObject *RasterGIS_PopulateRATWithMode(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    const char *clumpsImage, *inputImage, *outColsName;
+    long noDataVal = 0;
+    int useNoDataVal = false;
+    unsigned int ratBand = 1;
+    unsigned int modeBand = 1;
+    
+    static char *kwlist[] = {"valsimage", "clumps", "outcolsname", "usenodata", "nodataval", "modeband", "ratband", NULL};
+    
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sss|ilII:populateRATWithMode", kwlist, &inputImage, &clumpsImage, &outColsName, &useNoDataVal, &noDataVal, &modeBand, &ratBand))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        bool useNoDataBool = (bool) useNoDataVal;
+        rsgis::cmds::executePopulateRATWithMode(std::string(inputImage), std::string(clumpsImage), std::string(outColsName), useNoDataBool, noDataVal, modeBand, ratBand);
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 /*
 static PyObject *RasterGIS_CopyCategoriesColours(PyObject *self, PyObject *args) {
     const char *clumpsImage, *categoriesImage, *classField;
@@ -1850,6 +1879,21 @@ static PyMethodDef RasterGISMethods[] = {
 "* ratbandclumps is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated in the clumps image.\n"
 "* ratbandcats is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated in the catagories image.\n"
 "\n"},
+    
+{"populateRATWithMode", (PyCFunction)RasterGIS_PopulateRATWithMode, METH_VARARGS | METH_KEYWORDS,
+    "rastergis.populateRATWithMode(valsimage=string, clumps=string, outcolsname=string, usenodata=boolean, nodataval=long, modeband=uint ratband=uint)\n"
+    "Populates the attribute table with the mode of from a single band in the input image.\n"
+    "Note this only makes sense if the input pixel values are integers.\n"
+    "Where:\n"
+    "\n"
+    "* valsimage is a string containing the name of the input image file from which the mode is calculated\n"
+    "* clumpsImage is a string containing the name of the input clump file to which the mode will be populated.\n"
+    "* outColsName is a string representing the name for the output column containing the mode.\n"
+    "* usenodata is a boolean defining whether the no data value should be ignored (Optional, Default = False).\n"
+    "* nodataval is a long defining the no data value to be used (Optional, Default = 0)\n"
+    "* modeband is an optional (default = 1) integer parameter specifying the image band for which the mode is to be calculated.\n"
+    "* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated in the clumps image.\n"
+    "\n"},
 /*
    {"copyCategoriesColours", RasterGIS_CopyCategoriesColours, METH_VARARGS,
 "rastergis.copyCategoriesColours(categoriesImage, clumpsImage, classField)\n"

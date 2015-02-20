@@ -22,6 +22,7 @@
 
 #include "rsgispy_common.h"
 #include "cmds/RSGISCmdVectorUtils.h"
+#include <vector>
 
 /* An exception object for this module */
 /* created in the init function */
@@ -36,6 +37,30 @@ struct VectorUtilsState
 #define GETSTATE(m) (&_state)
 static struct VectorUtilsState _state;
 #endif
+
+static std::vector<std::string> ExtractStringVectorFromSequence(PyObject *sequence, int *nElements) {
+    Py_ssize_t nFields = PySequence_Size(sequence);
+    *nElements = nFields;
+    std::vector<std::string> stringsArray;
+    stringsArray.reserve(*nElements);
+    
+    for(int i = 0; i < nFields; ++i)
+    {
+        PyObject *stringObj = PySequence_GetItem(sequence, i);
+        
+        if(!RSGISPY_CHECK_STRING(stringObj)) {
+            PyErr_SetString(GETSTATE(sequence)->error, "Fields must be strings");
+            Py_DECREF(stringObj);
+            return stringsArray;
+        }
+        
+        stringsArray.push_back(RSGISPY_STRING_EXTRACT(stringObj));
+        Py_DECREF(stringObj);
+    }
+    
+    return stringsArray;
+}
+
 
 /*
 Will probably want this later - comment out for now to prevernt warnings
@@ -303,6 +328,38 @@ static PyObject *VectorUtils_AddFIDColumn(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
+static PyObject *VectorUtils_FindCommonImgExtent(PyObject *self, PyObject *args)
+{
+    PyObject *pInputImages;
+    const char *pszOutputVector;
+    int force = false;
+    if( !PyArg_ParseTuple(args, "Os|i:findCommonImgExtent", &pInputImages, &pszOutputVector, &force))
+    {
+        return NULL;
+    }
+    
+    // Extract list of images to array of strings.
+    int numImages = 0;
+    std::vector<std::string> inputImages = ExtractStringVectorFromSequence(pInputImages, &numImages);
+    if(numImages == 0)
+    {
+        PyErr_SetString(GETSTATE(self)->error, "No input images provided");
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeFindCommonImgExtent(inputImages, std::string(pszOutputVector), force);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 
 // Our list of functions in this module
 static PyMethodDef VectorUtilsMethods[] = {
@@ -447,17 +504,17 @@ static PyMethodDef VectorUtilsMethods[] = {
     "    rsgislib.vectorutils.populateGeomZField(inputVector, inputImage, imgBand, outputVector, force)\n"
     "\n"},
 {"vectorMaths", VectorUtils_VectorMaths, METH_VARARGS,
-    "vectorutils.vectorMaths(inputVector, outputVector, outputColName, expression, variables, force)\n"
-    "A command to calculate a number column from data in existing columns.\n\n"
-    "Where:\n"
-    "\n"
-    "* inputVector is a string containing the name of the input vector\n"
-    "* outputVector is a string containing the name of the output vector file\n"
-    "* outputColName is a string containing the name of the output column\n"
-    "* expression is a string containing the muparser expression to be calculated.\n"
-    "* variables is a list defining the names of the variables used within the expression\n and defining which columns they are in the inputVector.\n The must be a list and contain two fields \'name\' and \'fieldName\'.\n"
-    "* force is a bool, specifying whether to force removal of the output vector if it exists\n"
-    "\n"},
+"vectorutils.vectorMaths(inputVector, outputVector, outputColName, expression, variables, force)\n"
+"A command to calculate a number column from data in existing columns.\n\n"
+"Where:\n"
+"\n"
+"* inputVector is a string containing the name of the input vector\n"
+"* outputVector is a string containing the name of the output vector file\n"
+"* outputColName is a string containing the name of the output column\n"
+"* expression is a string containing the muparser expression to be calculated.\n"
+"* variables is a list defining the names of the variables used within the expression\n and defining which columns they are in the inputVector.\n The must be a list and contain two fields \'name\' and \'fieldName\'.\n"
+"* force is a bool, specifying whether to force removal of the output vector if it exists\n"
+"\n"},
 
 {"addFIDColumn", VectorUtils_AddFIDColumn, METH_VARARGS,
 "vectorutils.addFIDColumn(inputvector, outputvector, force)\n"
@@ -473,6 +530,23 @@ static PyMethodDef VectorUtilsMethods[] = {
 "   inputVector = './Vectors/injune_p142_psu_utm.shp'\n"
 "   outputVector = './TestOutputs/injune_p142_psu_utm_fid.shp'\n"
 "   vectorutils.addFIDColumn(inputVector, outputVector, True)\n"
+"\n"},
+    
+{"findCommonImgExtent", VectorUtils_FindCommonImgExtent, METH_VARARGS,
+"vectorutils.findCommonImgExtent(inputImages, outputvector, force)\n"
+"A command to create a shapefile representing the region of common extent\n"
+"for the list of input images.\n\n"
+"Where:\n"
+"\n"
+"* inputImages is a list of strings containing the names of the input image files\n"
+"* outputvector is a string containing the name of the output vector\n"
+"* force is a bool, specifying whether to force removal of the output vector if it exists\n"
+"Example::\n"
+"\n"
+"   from rsgislib import vectorutils\n"
+"   inputImages = ['img1.kea', 'img2.kea', 'img3.kea', 'img4.kea', 'img5.kea']\n"
+"   outputVector = 'imgSubExtent.shp'\n"
+"   vectorutils.findCommonImgExtent(inputImages, outputVector, True)\n"
 "\n"},
     
     {NULL}        /* Sentinel */

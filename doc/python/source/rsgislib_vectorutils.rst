@@ -31,6 +31,10 @@ Rasterisation
 .. autofunction:: rsgislib.vectorutils.rasterise2Image
 .. autofunction:: rsgislib.vectorutils.copyShapefile2RAT
 
+Image Information
+-----------------
+.. autofunction:: rsgislib.vectorutils.findCommonImgExtent
+
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`

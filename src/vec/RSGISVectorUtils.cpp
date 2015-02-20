@@ -481,8 +481,22 @@ namespace rsgis{namespace vec{
 		ogrPoly->addRingDirectly(ogrRing);
 
 		return ogrPoly;
-		
 	}
+    
+    OGRPolygon* RSGISVectorUtils::createOGRPolygon(geos::geom::Envelope *env) throw(RSGISVectorException)
+    {
+        OGRPolygon *ogrPoly = new OGRPolygon();
+        
+        OGRLinearRing *ogrRing = new OGRLinearRing();
+        ogrRing->addPoint(env->getMinX(), env->getMaxY(), 0);
+        ogrRing->addPoint(env->getMaxX(), env->getMaxY(), 0);
+        ogrRing->addPoint(env->getMaxX(), env->getMinY(), 0);
+        ogrRing->addPoint(env->getMinX(), env->getMinY(), 0);
+        ogrRing->addPoint(env->getMinX(), env->getMaxY(), 0);
+        ogrPoly->addRingDirectly(ogrRing);
+        
+        return ogrPoly;
+    }
 	
 	OGRPolygon* RSGISVectorUtils::checkCloseOGRPolygon(OGRPolygon *poly) throw(RSGISVectorException)
 	{
