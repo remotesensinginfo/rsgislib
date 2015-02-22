@@ -267,8 +267,8 @@ namespace rsgis{namespace rastergis{
             if(feedback != 0){std::cout << ".Completed\n";}
             else{std::cout << "Completed\n";}
 
-            std::cout << "Adding RAT to output file.\n";
-            outImage->GetRasterBand(ratBand)->SetDefaultRAT(gdalAttOut);
+            //std::cout << "Adding RAT to output file.\n";
+            //outImage->GetRasterBand(ratBand)->SetDefaultRAT(gdalAttOut);
 
             // Tidy up
             delete[] blockDataInt;
