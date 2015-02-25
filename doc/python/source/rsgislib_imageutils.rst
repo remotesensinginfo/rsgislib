@@ -36,6 +36,7 @@ Subset / Mask
 .. autofunction:: rsgislib.imageutils.subset2polys
 .. autofunction:: rsgislib.imageutils.subsetImgs2CommonExtent
 .. autofunction:: rsgislib.imageutils.buildImgSubDict
+.. autofunction:: rsgislib.imageutils.genFiniteMask
 
 Extract
 --------

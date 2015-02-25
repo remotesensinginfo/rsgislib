@@ -917,6 +917,33 @@ static PyObject *ImageUtils_GenSamplingGrid(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
+
+static PyObject *ImageUtils_GenFiniteMask(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    static char *kwlist[] = {"inimage", "outimage", "format"};
+    const char *pszInputImage = "";
+    const char *pszOutputImage = "";
+    const char *pszGDALFormat = "";
+    
+    
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sss:genFiniteMask", kwlist, &pszInputImage, &pszOutputImage, &pszGDALFormat))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeFiniteImageMask(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszGDALFormat));
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 // Our list of functions in this module
 static PyMethodDef ImageUtilsMethods[] = {
     {"stretchImage", ImageUtils_StretchImage, METH_VARARGS, 
@@ -1372,6 +1399,22 @@ static PyMethodDef ImageUtilsMethods[] = {
     "* singleLine is a boolean specifying whether the image is seen as a single \n"
     "             line or new line with an offset in the starting value.\n"
     "\n"},
+    
+{"genFiniteMask", (PyCFunction)ImageUtils_GenFiniteMask, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.genFiniteMask(inimage=string, outimage=string, format=string)\n"
+"Calculate the image statistics and build image pyramids populating the image file.\n"
+"\n"
+"* inimage is a string containing the name of the input file\n"
+"* outimage is a string containing the name of the output file.\n"
+"* format is a string with the GDAL output file format.\n"
+"\n"
+"\nExample::\n"
+"\n"
+"   from rsgislib import imageutils\n"
+"   inputImage = './injune_p142_casi_sub_utm.kea'\n"
+"   outputImage = './injune_p142_casi_sub_utm.kea'\n"
+"   imageutils.genFiniteMask(inputImage, outputImage, \'KEA\')\n"
+"\n"},
 
 
     {NULL}        /* Sentinel */

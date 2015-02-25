@@ -139,8 +139,39 @@ Example::
 
 
 def plotImageComparison(inputImage1, inputImage2, img1Band, img2Band, outputPlotFile, numBins=100, img1Min=None, img1Max=None, img2Min=None, img2Max=None, img1Scale=1, img2Scale=1, img1Off=0, img2Off=0, normOutput=False, plotTitle='2D Histogram', xLabel='X Axis', yLabel='Y Axis', ctable='jet', interp='nearest'):
-    """
-    Hello World - need some docs...
+    """A function to plot two images against each other. 
+Where:
+
+* inputImage1 is a string with the path to the first image.
+* inputImage2 is a string with the path to the second image.
+* img1Band is an int specifying the band in the first image to be plotted.
+* img2Band is an int specifying the band in the second image to be plotted.
+* outputPlotFile is a string specifying the output PDF for the plot.
+* numBins is an int specifying the number of bins within each axis of the histogram (default: 100)
+* img1Min is a double specifying the minimum value to be used in the histogram from image 1. If value is None then taken from the image.
+* img1Max is a double specifying the maximum value to be used in the histogram from image 1. If value is None then taken from the image.
+* img2Min is a double specifying the minimum value to be used in the histogram from image 2. If value is None then taken from the image.
+* img2Max is a double specifying the maximum value to be used in the histogram from image 2. If value is None then taken from the image.
+* img1Scale is a double specifying the scale for image 1 (Default 1).
+* img2Scale is a double specifying the scale for image 2 (Default 1).
+* img1Off is a double specifying the offset for image 1 (Default 0).
+* img2Off is a double specifying the offset for image 2 (Default 0).
+* normOutput is a boolean specifying whether the histogram should be normalised (Default: False).
+* plotTitle is a string specifying the title of the plot (Default: '2D Histogram').
+* xLabel is a string specifying the x axis label (Default: 'X Axis')
+* yLabel is a string specifying the y axis label (Default: 'Y Axis')
+* ctable is a string specifying the colour table to be used (Default: jet), list of available colour tables specified by matplotlib: http://matplotlib.org/examples/color/colormaps_reference.html
+* interp is a string specifying the interpolation algorithm to be used (Default: 'nearest'). Available values are ‘none’, ‘nearest’, ‘bilinear’, ‘bicubic’, ‘spline16’, ‘spline36’, ‘hanning’, ‘hamming’, ‘hermite’, ‘kaiser’, ‘quadric’, ‘catrom’, ‘gaussian’, ‘bessel’, ‘mitchell’, ‘sinc’, ‘lanczos’.
+    
+Example::
+from rsgislib.tools import plotting
+
+inputImage1 = 'LS5TM_20000613_lat10lon6217_r67p231_rad_sref_ndvi.kea'
+inputImage2 = 'LS5TM_20000613_lat10lon6217_r67p231_rad_ndvi.kea'
+outputPlotFile = 'ARCSI_RAD_SREF_NDVI.pdf'
+
+plotting.plotImageComparison(inputImage1, inputImage2, 1, 1, outputPlotFile, img1Min=-0.5, img1Max=1, img2Min=-0.5, img2Max=1, plotTitle='ARCSI SREF NDVI vs ARCSI RAD NDVI', xLabel='ARCSI SREF NDVI', yLabel='ARCSI RAD NDVI')
+    
     """
     try:
         # Check gdal is available

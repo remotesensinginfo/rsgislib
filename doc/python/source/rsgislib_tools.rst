@@ -10,6 +10,7 @@ Plotting
 These functions make use of rsgislib functions and matplotlib to provide useful plotting functionality.
 
 .. autofunction:: rsgislib.tools.plotImageSpectra
+.. autofunction:: rsgislib.tools.plotImageComparison
 
 Projection
 -----------
