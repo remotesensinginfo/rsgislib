@@ -42,6 +42,7 @@
 #include "img/RSGISAddBands.h"
 #include "img/RSGISExtractImageValues.h"
 #include "img/RSGISImageComposite.h"
+#include "img/RSGISMaskImage.h"
 
 #include "vec/RSGISImageTileVector.h"
 #include "vec/RSGISVectorOutputException.h"
@@ -1282,6 +1283,49 @@ namespace rsgis{ namespace cmds {
     }
             
     
+    void executeFiniteImageMask(std::string inputImage, std::string outputImage, std::string gdalFormat) throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            GDALDataset *dataset = NULL;
+            
+            dataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+            if(dataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw RSGISImageException(message.c_str());
+            }
+            
+            rsgis::img::RSGISMaskImage maskImg;
+            maskImg.genFiniteImgMask(dataset, outputImage, gdalFormat);
+            
+            
+            GDALDataset *outDataset = (GDALDataset *) GDALOpen(outputImage.c_str(), GA_Update);
+            if(outDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + outputImage;
+                throw RSGISImageException(message.c_str());
+            }
+            outDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
+            
+            // Tidy up
+            GDALClose(dataset);
+            GDALClose(dataset);
+        }
+        catch (RSGISImageException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (RSGISException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
             
     
 }}

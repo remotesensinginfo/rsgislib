@@ -119,6 +119,8 @@ namespace rsgis{ namespace cmds {
     /** A function to produce an image with pixel values on a cycle with a specified range */
     DllExport void executeProduceRegularGridImage(std::string inputImage, std::string outputImage, std::string gdalFormat, float pxlRes, int minVal=0, int maxVal=1, bool singleLine=false) throw(RSGISCmdException);
     
+    /** A function to produce a binary image for regions with finite data values */
+    DllExport void executeFiniteImageMask(std::string inputImage, std::string outputImage, std::string gdalFormat) throw(RSGISCmdException);
 
 }}
 
