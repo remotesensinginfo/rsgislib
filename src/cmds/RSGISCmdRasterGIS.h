@@ -38,6 +38,25 @@ namespace rsgis{ namespace cmds {
         stdEucSpecDist,
         originWeightedEuc
     };
+    
+    enum rsgisKNNSummeriseCmd
+    {
+        rsgisKNNMode = 1,
+        rsgisKNNMean = 2,
+        rsgisKNNMedian = 3,
+        rsgisKNNMin = 4,
+        rsgisKNNMax = 5,
+        rsgisKNNStdDev = 6
+    };
+    
+    enum rsgisKNNDistCmd
+    {
+        rsgisKNNEuclidean = 1,
+        rsgisKNNMahalanobis = 2,
+        rsgisKNNManhattan = 3,
+        rsgisKNNChebyshev = 4,
+        rsgisKNNMinkowski = 5
+    };
 
     enum rsgismlpriorscmds
     {
@@ -190,8 +209,8 @@ namespace rsgis{ namespace cmds {
     /** Function to calculate the features within a given spatial and spectral distance */
     //DllExport void executeFindSpecClose(std::string inputImage, std::string distanceField, std::string spatialDistField, std::string outputField, float specDistThreshold, float distThreshold)throw(RSGISCmdException);
 
-    /** Function to classify segments using KNN majority classification */
-    //DllExport void executeKnnMajorityClassifier(std::string inputImage, std::string inClassNameField, std::string outClassNameField, std::string trainingSelectCol, std::string eastingsField, std::string northingsField, std::string areaField, std::string majWeightField, std::vector<std::string> fields, unsigned int nFeatures, float distThreshold, float weightA, DllExport void *majorMethod)throw(RSGISCmdException);
+    /** Function to extrapolate values on segments using KNN, use mode for classification */
+    DllExport void executeApplyKNN(std::string inClumpsImage, unsigned int ratBand, std::string inExtrapField, std::string outExtrapField, std::string trainRegionsField, std::vector<std::string> fields, unsigned int kFeatures, rsgisKNNDistCmd distKNNCmd, float distThreshold, rsgisKNNSummeriseCmd summeriseKNNCmd) throw(RSGISCmdException);
 
     /** Function to export columns from a GDAL RAT to ascii */
     DllExport void executeExport2Ascii(std::string inputImage, std::string outputFile, std::vector<std::string> fields, int ratBand=1)throw(RSGISCmdException);

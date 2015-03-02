@@ -29,6 +29,7 @@
 #include "common/RSGISAttributeTableException.h"
 
 #include "math/RSGIS2DInterpolation.h"
+#include "math/RSGISMathsUtils.h"
 
 #include "utils/RSGISTextUtils.h"
 
@@ -54,6 +55,7 @@
 #include "rastergis/RSGISClumpRegionGrowing.h"
 #include "rastergis/RSGISCollapseRAT.h"
 #include "rastergis/RSGISInputShapefileAttributes2RAT.h"
+#include "rastergis/RSGISRATKNN.h"
 
 
 /*
@@ -551,31 +553,99 @@ namespace rsgis{ namespace cmds {
         }
 
     }
-
-    void executeKnnMajorityClassifier(std::string inputImage, std::string inClassNameField, std::string outClassNameField, std::string trainingSelectCol, std::string eastingsField, std::string northingsField, std::string areaField, std::string majWeightField, std::vector<std::string> fields, unsigned int nFeatures, float distThreshold, float weightA, void *majorMethod)throw(RSGISCmdException) {
+*/
+    void executeApplyKNN(std::string inClumpsImage, unsigned int ratBand, std::string inExtrapField, std::string outExtrapField, std::string trainRegionsField, std::vector<std::string> fields, unsigned int kFeatures, rsgisKNNDistCmd distKNNCmd, float distThreshold, rsgisKNNSummeriseCmd summeriseKNNCmd) throw(RSGISCmdException)
+    {
         GDALAllRegister();
-        GDALDataset *inputDataset;
+        GDALDataset *clumpsDataset;
 
-        try {
-            inputDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_Update);
-
-            if(inputDataset == NULL) {
-                std::string message = std::string("Could not open image ") + inputImage;
+        try
+        {
+            clumpsDataset = (GDALDataset *) GDALOpen(inClumpsImage.c_str(), GA_Update);
+            if(clumpsDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inClumpsImage;
                 throw rsgis::RSGISImageException(message.c_str());
             }
-
-            rsgis::rastergis::ClassMajorityMethod *majMethodPtr = (rsgis::rastergis::ClassMajorityMethod *) majorMethod;
-
-            rsgis::rastergis::RSGISKNNATTMajorityClassifier knnMajorityClass;
-            knnMajorityClass.applyKNNClassifier(inputDataset, inClassNameField, outClassNameField, trainingSelectCol, eastingsField, northingsField, areaField, majWeightField, fields, nFeatures, distThreshold,weightA, *majMethodPtr);
-
-            GDALClose(inputDataset);
-        } catch(rsgis::RSGISException &e) {
+            
+            rsgis::math::rsgisdistmetrics distKNN = rsgis::math::rsgis_mahalanobis;
+            if(distKNNCmd == rsgisKNNEuclidean)
+            {
+                distKNN = rsgis::math::rsgis_euclidean;
+            }
+            else if(distKNNCmd == rsgisKNNMahalanobis)
+            {
+                distKNN = rsgis::math::rsgis_mahalanobis;
+            }
+            else if(distKNNCmd == rsgisKNNManhattan)
+            {
+                distKNN = rsgis::math::rsgis_manhatten;
+            }
+            else if(distKNNCmd == rsgisKNNChebyshev)
+            {
+                distKNN = rsgis::math::rsgis_chebyshev;
+            }
+            else if(distKNNCmd == rsgisKNNMinkowski)
+            {
+                distKNN = rsgis::math::rsgis_minkowski;
+            }
+            else
+            {
+                throw RSGISCmdException("Distance metric not recognised.");
+            }
+            
+            rsgis::math::rsgissummarytype summeriseKNN = rsgis::math::sumtype_mean;
+            if(summeriseKNNCmd == rsgisKNNMode)
+            {
+                summeriseKNN = rsgis::math::sumtype_mode;
+            }
+            else if(summeriseKNNCmd == rsgisKNNMean)
+            {
+                summeriseKNN = rsgis::math::sumtype_mean;
+            }
+            else if(summeriseKNNCmd == rsgisKNNMedian)
+            {
+                summeriseKNN = rsgis::math::sumtype_median;
+            }
+            else if(summeriseKNNCmd == rsgisKNNMin)
+            {
+                summeriseKNN = rsgis::math::sumtype_min;
+            }
+            else if(summeriseKNNCmd == rsgisKNNMax)
+            {
+                summeriseKNN = rsgis::math::sumtype_max;
+            }
+            else if(summeriseKNNCmd == rsgisKNNStdDev)
+            {
+                summeriseKNN = rsgis::math::sumtype_stddev;
+            }
+            else
+            {
+                throw RSGISCmdException("Summary method not recognised.");
+            }
+            
+            std::cout << "Applying KNN\n";
+            rsgis::rastergis::RSGISApplyRATKNN applyKNN;
+            applyKNN.applyKNNExtrapolation(clumpsDataset, inExtrapField, outExtrapField, trainRegionsField, fields, kFeatures, distKNN, distThreshold, summeriseKNN, ratBand);
+            std::cout << "Completed KNN\n";
+            
+            GDALClose(clumpsDataset);
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(RSGISCmdException e)
+        {
+            throw e;
+        }
+        catch(std::exception &e)
+        {
             throw RSGISCmdException(e.what());
         }
 
     }
-*/
+
     void executeExport2Ascii(std::string inputImage, std::string outputFile, std::vector<std::string> fields, int ratBand)throw(RSGISCmdException)
     {
         GDALAllRegister();

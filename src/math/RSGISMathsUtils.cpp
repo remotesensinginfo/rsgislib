@@ -669,6 +669,12 @@ namespace rsgis{namespace math{
                     std::sort(data->begin(), data->end());
                     stats->median = gsl_stats_median_from_sorted_data(&(*data)[0], 1, data->size());
                 }
+                if(stats->calcMode)
+                {
+                    throw RSGISMathException("Mode is not yet implemented.");
+                    //std::sort(data->begin(), data->end());
+                    //stats->median = gsl_stats_median_from_sorted_data(&(*data)[0], 1, data->size());
+                }
             }
             else
             {
@@ -695,6 +701,10 @@ namespace rsgis{namespace math{
                 if(stats->calcMedian)
                 {
                     stats->median = 0;
+                }
+                if(stats->calcMode)
+                {
+                    stats->mode = 0;
                 }
             }
         }
@@ -823,5 +833,95 @@ namespace rsgis{namespace math{
         return percentVal;
     }
 
+    double* RSGISMathsUtils::calcMeanVector(double **data, size_t n, size_t m, size_t sMIdx, size_t eMIdx) throw(RSGISMathException)
+    {
+        size_t numVals = eMIdx - sMIdx;
+        double *meanVec = new double[numVals];
+        try
+        {
+            for(size_t i = 0; i < numVals; ++i)
+            {
+                meanVec[i] = 0.0;
+            }
+            
+            for(size_t i = sMIdx, j = 0; i < eMIdx; ++i, ++j)
+            {
+                for(size_t k = 0; k < n; ++k)
+                {
+                    meanVec[j] += data[k][i];
+                }
+            }
+            
+            for(size_t i = 0; i < numVals; ++i)
+            {
+                meanVec[i] /= n;
+            }
+        }
+        catch(RSGISMathException &e)
+        {
+            throw e;
+        }
+        catch(RSGISException &e)
+        {
+            throw RSGISMathException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISMathException(e.what());
+        }
+        
+        return meanVec;
+    }
+    
+    double** RSGISMathsUtils::calcCovarianceMatrix(double **data, double *meanVec, size_t n, size_t m, size_t sMIdx, size_t eMIdx) throw(RSGISMathException)
+    {
+        size_t numVals = eMIdx - sMIdx;
+        double **covarMatrix = new double*[numVals];
+        try
+        {
+            for(size_t i = 0; i < numVals; ++i)
+            {
+                covarMatrix[i] = new double[numVals];
+                for(size_t j = 0; j < numVals; ++j)
+                {
+                    covarMatrix[i][j] = 0.0;
+                }
+            }
+            
+            double var1 = 0.0;
+            double var2 = 0.0;
+            
+            for(size_t i = sMIdx, j = 0; i < eMIdx; ++i, ++j)
+            {
+                for(size_t a = sMIdx, b = 0; a < eMIdx; ++a, ++b)
+                {
+                    //std::cout << "Matrix [" << i << ", " << a << "] = ";
+                    var1 = 0.0;
+                    var2 = 0.0;
+                    for(size_t k = 0; k < n; ++k)
+                    {
+                        covarMatrix[j][b] += ((data[k][i] - meanVec[j]) * (data[k][a] - meanVec[b]));
+                    }
+                    covarMatrix[j][b] /= (n-1);
+                    //std::cout << covarMatrix[j][b] << std::endl;
+                }
+            }            
+        }
+        catch(RSGISMathException &e)
+        {
+            throw e;
+        }
+        catch(RSGISException &e)
+        {
+            throw RSGISMathException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISMathException(e.what());
+        }
+        
+        return covarMatrix;
+    }
+    
 }}
 
