@@ -46,6 +46,10 @@ Classification
 .. autofunction:: rsgislib.rastergis.regionGrowClass
 .. autofunction:: rsgislib.rastergis.regionGrowClassNeighCritera
 
+Extrapolation
+-------------
+.. autofunction:: rsgislib.rastergis.applyKNN
+
 Change Detection
 -----------------
 

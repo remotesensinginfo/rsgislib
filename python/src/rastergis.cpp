@@ -49,15 +49,18 @@ static void FreePythonObjects(std::vector<PyObject*> toFree) {
 /**
  * Helper Function for converting a python sequence of strings to a vector
  */
-static std::vector<std::string> ExtractVectorStringFromSequence(PyObject *sequence) {
+static std::vector<std::string> ExtractVectorStringFromSequence(PyObject *sequence)
+{
     Py_ssize_t nFields = PySequence_Size(sequence);
     std::vector<std::string> fields;
     fields.reserve(nFields);
 
-    for(int i = 0; i < nFields; ++i) {
+    for(int i = 0; i < nFields; ++i)
+    {
         PyObject *fieldObj = PySequence_GetItem(sequence, i);
 
-        if(!RSGISPY_CHECK_STRING(fieldObj)) {
+        if(!RSGISPY_CHECK_STRING(fieldObj))
+        {
             PyErr_SetString(GETSTATE(sequence)->error, "Fields must be strings");
             Py_DECREF(fieldObj);
             fields.clear();
@@ -500,68 +503,7 @@ static PyObject *RasterGIS_ExportCol2GDALImage(PyObject *self, PyObject *args, P
 
     Py_RETURN_NONE;
 }
-/*
-static PyObject *RasterGIS_EucDistFromFeature(PyObject *self, PyObject *args) {
-    const char *inputImage, *outputField;
-    int fid;
-    PyObject *pFields;
 
-    if(!PyArg_ParseTuple(args, "sisO:eucDistFromFeature", &inputImage, &fid, &outputField, &pFields))
-        return NULL;
-
-    if(!PySequence_Check(pFields)) {
-        PyErr_SetString(GETSTATE(self)->error, "last argument must be a sequence");
-        return NULL;
-    }
-
-    std::vector<std::string> fields = ExtractVectorStringFromSequence(pFields);
-    if(fields.size() == 0) { return NULL; }
-
-    try {
-        rsgis::cmds::executeEucDistFromFeature(std::string(inputImage), (size_t)fid, std::string(outputField), fields);
-    } catch (rsgis::cmds::RSGISCmdException &e) {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
-    }
-
-    Py_RETURN_NONE;
-}
-
-static PyObject *RasterGIS_FindTopN(PyObject *self, PyObject *args) {
-    const char *inputImage, *outputField, *spatialDistField, *distanceField;
-    unsigned int nFeatures;
-    float distThreshold;
-
-    if(!PyArg_ParseTuple(args, "ssssIf:findTopN", &inputImage, &spatialDistField, &distanceField, &outputField, &nFeatures, &distThreshold))
-        return NULL;
-
-    try {
-        rsgis::cmds::executeFindTopN(std::string(inputImage), std::string(spatialDistField), std::string(distanceField), std::string(outputField), nFeatures, distThreshold);
-    } catch (rsgis::cmds::RSGISCmdException &e) {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
-    }
-
-    Py_RETURN_NONE;
-}
-
-static PyObject *RasterGIS_FindSpecClose(PyObject *self, PyObject *args) {
-    const char *inputImage, *outputField, *spatialDistField, *distanceField;
-    float distThreshold, specDistThreshold;
-
-    if(!PyArg_ParseTuple(args, "ssssff:findSpecClose", &inputImage, &spatialDistField, &distanceField, &outputField, &specDistThreshold, &distThreshold))
-        return NULL;
-
-    try {
-        rsgis::cmds::executeFindSpecClose(std::string(inputImage), std::string(distanceField), std::string(spatialDistField), std::string(outputField), specDistThreshold, distThreshold);
-    } catch (rsgis::cmds::RSGISCmdException &e) {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
-    }
-
-    Py_RETURN_NONE;
-}
-*/
 static PyObject *RasterGIS_Export2Ascii(PyObject *self, PyObject *args, PyObject *keywds)
 {
     const char *inputImage, *outputFile;
@@ -593,6 +535,7 @@ static PyObject *RasterGIS_Export2Ascii(PyObject *self, PyObject *args, PyObject
 
     Py_RETURN_NONE;
 }
+
 /*
 static PyObject *RasterGIS_ClassTranslate(PyObject *self, PyObject *args) {
     const char *inputImage, *classInField, *classOutField;
@@ -628,6 +571,7 @@ static PyObject *RasterGIS_ClassTranslate(PyObject *self, PyObject *args) {
     Py_RETURN_NONE;
 }
 */
+
 static PyObject *RasterGIS_ColourClasses(PyObject *self, PyObject *args, PyObject *keywds)
 {
     const char *inputImage, *classInField;
@@ -734,6 +678,7 @@ static PyObject *RasterGIS_ColourClasses(PyObject *self, PyObject *args, PyObjec
 
     Py_RETURN_NONE;
 }
+
 /*
 static PyObject *RasterGIS_GenerateColourTable(PyObject *self, PyObject *args) {
     const char *inputImage, *clumpsImage;
@@ -753,6 +698,7 @@ static PyObject *RasterGIS_GenerateColourTable(PyObject *self, PyObject *args) {
     Py_RETURN_NONE;
 }
 */
+
 static PyObject *RasterGIS_StrClassMajority(PyObject *self, PyObject *args, PyObject *keywds)
 {
 
@@ -779,6 +725,7 @@ static PyObject *RasterGIS_StrClassMajority(PyObject *self, PyObject *args, PyOb
 
     Py_RETURN_NONE;
 }
+
 /*
 static PyObject *RasterGIS_SpecDistMajorityClassifier(PyObject *self, PyObject *args) {
     const char *inputImage, *inClassNameField, *outClassNameField, *trainingSelectCol, *eastingsField, *northingsField, *areaField, *majWeightField;
@@ -901,6 +848,7 @@ static PyObject *RasterGIS_ClassMask(PyObject *self, PyObject *args) {
     Py_RETURN_NONE;
 }
 */
+
 static PyObject *RasterGIS_FindNeighbours(PyObject *self, PyObject *args)
 {
     const char *inputImage;
@@ -993,6 +941,7 @@ static PyObject *RasterGIS_CalcRelBorder(PyObject *self, PyObject *args)
 
     Py_RETURN_NONE;
 }
+
 /*
 static PyObject *RasterGIS_CalcShapeIndices(PyObject *self, PyObject *args) {
     const char *inputImage;
@@ -1255,8 +1204,6 @@ static PyObject *RasterGIS_GetGlobalClassStats(PyObject *self, PyObject *args, P
     Py_RETURN_NONE;
 }
 
-
-
 static PyObject *RasterGIS_SelectClumpsOnGrid(PyObject *self, PyObject *args)
 {
     const char *clumpsImage, *inSelectField, *outSelectField, *eastingsCol, *northingsCol, *metricField, *methodStr;
@@ -1279,7 +1226,6 @@ static PyObject *RasterGIS_SelectClumpsOnGrid(PyObject *self, PyObject *args)
 
     Py_RETURN_NONE;
 }
-
 
 static PyObject *RasterGIS_InterpolateClumpValues2Img(PyObject *self, PyObject *args)
 {
@@ -1397,7 +1343,6 @@ static PyObject *RasterGIS_CalcRelDiffNeighbourStats(PyObject *self, PyObject *a
     Py_RETURN_NONE;
 }
 
-
 static PyObject *RasterGIS_BinaryClassification(PyObject *self, PyObject *args)
 {
     const char *clumpsImage, *xmlBlock, *outColumn;
@@ -1501,7 +1446,6 @@ static PyObject *RasterGIS_FindGlobalSegmentationScore(PyObject *self, PyObject 
     return outList;
 }
 */
-
 
 static PyObject *RasterGIS_PopulateRATWithMeanLitStats(PyObject *self, PyObject *args, PyObject *keywds)
 {
@@ -1648,7 +1592,6 @@ static PyObject *RasterGIS_CollapseRAT(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-
 static PyObject *RasterGIS_ImportVecAtts(PyObject *self, PyObject *args, PyObject *keywds)
 {
     const char *clumpsImage, *vectorFile;
@@ -1716,6 +1659,53 @@ static PyObject *RasterGIS_RegionGrowClassNeighCritera(PyObject *self, PyObject 
     Py_RETURN_NONE;
 }
 
+
+static PyObject *RasterGIS_ApplyKNN(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    const char *inClumpsImage = "";
+    unsigned int ratBand = 1;
+    const char *inExtrapField = "";
+    const char *outExtrapField = "";
+    const char *trainRegionsField = "";
+    PyObject *pFields;
+    unsigned int kFeatures = 12;
+    float distThreshold = 100000;
+    int distKNNInt = rsgis::cmds::rsgisKNNMahalanobis;
+    int summeriseKNNInt = rsgis::cmds::rsgisKNNMean;
+    
+    static char *kwlist[] = {"clumps", "inExtrapField", "outExtrapField", "trainRegionsField", "fields", "kFeat", "distKNN", "summeriseKNN", "distThres", "ratband", NULL};
+    
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssssO|IiifI:applyKNN", kwlist, &inClumpsImage, &inExtrapField, &outExtrapField, &trainRegionsField, &pFields, &kFeatures, &distKNNInt, &summeriseKNNInt, &distThreshold, &ratBand))
+    {
+        return NULL;
+    }
+    
+    if(!PySequence_Check(pFields)) {
+        PyErr_SetString(GETSTATE(self)->error, "last argument must be a sequence");
+        return NULL;
+    }
+    
+    std::vector<std::string> fields = ExtractVectorStringFromSequence(pFields);
+    if(fields.size() == 0)
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::rsgisKNNDistCmd distKNN = static_cast<rsgis::cmds::rsgisKNNDistCmd>(distKNNInt);
+        rsgis::cmds::rsgisKNNSummeriseCmd summeriseKNN = static_cast<rsgis::cmds::rsgisKNNSummeriseCmd>(summeriseKNNInt);
+        
+        rsgis::cmds::executeApplyKNN(std::string(inClumpsImage), ratBand, std::string(inExtrapField), std::string(outExtrapField), std::string(trainRegionsField), fields, kFeatures, distKNN, distThreshold, summeriseKNN);
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
 
 static PyMethodDef RasterGISMethods[] = {
     {"populateStats", (PyCFunction)RasterGIS_PopulateStats, METH_VARARGS | METH_KEYWORDS,
@@ -1926,44 +1916,7 @@ static PyMethodDef RasterGISMethods[] = {
 "   field = 'RedAvg'\n"
 "   rastergis.exportCol2GDALImage(clumps, outimage, gdalformat, datatype, field)"
 "\n"},
-/*
-   {"eucDistFromFeature", RasterGIS_EucDistFromFeature, METH_VARARGS,
-"rastergis.eucDistFromFeature(inputImage, fid, outputField, fields)\n"
-"Calculates the euclidean distance from a feature to all other features.\n"
-"Where:\n"
-"\n"
-"* inputImage is a string containing the name of the input image file TODO: check and expand\n"
-"* fid is an integer\n"
-"* outputField is a string continaing the name of the output field\n"
-"* fields is a sequence of strings\n"
-"\n"},
-
-   {"findTopN", RasterGIS_FindTopN, METH_VARARGS,
-"rastergis.findTopN(inputImage, spatialDistField, distanceField, outputField, nFeatures, distThreshold)\n"
-"Calculates the top N features within a given spatial distance\n"
-"Where:\n"
-"\n"
-"* inputImage is a string containing the name of the input image file TODO: check and expand\n"
-"* spatialDistField is a string containing the name of the field containing the spatial distance\n"
-"* distanceField is a string containing the name of the field containing the distance\n"
-"* outputField is a string continaing the name of the output field\n"
-"* nFeatures is an int containing the number of features to find\n"
-"* distThreshold is a float specifying the distance threshold with which to operate\n"
-"\n"},
-
-   {"findSpecClose", RasterGIS_FindSpecClose, METH_VARARGS,
-"rastergis.findSpecClose(inputImage, spatialDistField, distanceField, outputField, specDistThreshold, distThreshold)\n"
-"Calculates the features within a given spatial and spectral distance\n"
-"Where:\n"
-"\n"
-"* inputImage is a string containing the name of the input image file TODO: check and expand\n"
-"* spatialDistField is a string containing the name of the field containing the spatial distance\n"
-"* distanceField is a string containing the name of the field containing the distance\n"
-"* outputField is a string continaing the name of the output field\n"
-"* specDistThreshold is a float specifying the spectral distance threshold with which to operate\n"
-"* distThreshold is a float specifying the spatial distance threshold with which to operate\n"
-"\n"},
-*/
+    
     {"export2Ascii",  (PyCFunction)RasterGIS_Export2Ascii, METH_VARARGS | METH_KEYWORDS,
 "rastergis.export2Ascii(clumps, outfile, fields,ratband=1)\n"
 "Exports selected columns from a GDAL RAT to ASCII file (comma separated). The first column is the object ID (FID).\n"
@@ -2537,6 +2490,30 @@ static PyMethodDef RasterGISMethods[] = {
 "    rastergis.regionGrowClassNeighCritera(inputimage, xmlBlockGrowCriteria, xmlBlockNeighCriteria, classColumn, classVal, maxIters)\n"
 "\n"},
 
+{"applyKNN", (PyCFunction)RasterGIS_ApplyKNN, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.rastergis.applyKNN(clumps=string, inExtrapField=string, outExtrapField=string, trainRegionsField=string, fields=list<string>, kFeat=uint, distKNN=int, summeriseKNN=int, distThres=float, ratband=int)\n"
+"This function uses the KNN algorithm to allow data values to be extrapolated to segments.\n"
+"Where:\n"
+"\n"
+"* clumps is a string containing the name of the input clumps image file\n"
+"* inExtrapField is a string containing the name of the field with the values used for the extrapolation.\n"
+"* outExtrapField is a string containing the name of the field where the extrapolated values will be written to.\n"
+"* trainRegionsField is a string containing the name of the field specifying the clumps to be used as training - binary column (1 == training region).\n"
+"* fields is a list of strings specifying the fields which will be used to calculate distance.\n"
+"* kFeat is an unsigned integer specifying the number of nearest features (i.e., K) to be used (Default: 12) \n"
+"* distKNN specifies how the distance to identify NN is calculated (rsgislib.DIST_EUCLIDEAN, rsgislib.DIST_MANHATTEN, rsgislib.DIST_MAHALANOBIS, rsgislib.DIST_MINKOWSKI, rsgislib.DIST_CHEBYSHEV; Default: rsgislib.DIST_MAHALANOBIS).\n"
+"* summeriseKNN specifies how the extrapolation value is calculated (rsgislib.SUMTYPE_MODE, rsgislib.SUMTYPE_MEAN, rsgislib.SUMTYPE_MEDIAN, rsgislib.SUMTYPE_MIN, rsgislib.SUMTYPE_MAX, rsgislib.SUMTYPE_STDDEV; Default: rsgislib.SUMTYPE_MEDIAN). Mode is used for classification.\n"
+"* distThres is a maximum distance threshold over which features will not be included within the \'k\'.\n"
+"* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated.\n"
+"\nExample::\n"
+"    from rsgislib import rastergis\n"
+"    import rsgislib\n"
+"\n"
+"    forestClumpsImg='./LS5TM_20110428_forestclumps.kea'\n"
+"\n"
+"    rastergis.applyKNN(clumps=forestClumpsImg, inExtrapField='HP95', outExtrapField='HP95Pred', trainRegionsField='LiDARForest', fields=['RedRefl','GreenRefl','BlueRefl'], kFeat=12, distKNN=rsgislib.DIST_EUCLIDEAN, summeriseKNN=rsgislib.SUMTYPE_MEDIAN, distThres=25)\n\n"
+"\n"},
+    
     {NULL}        /* Sentinel */
 };
 

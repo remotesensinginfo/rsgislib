@@ -587,6 +587,7 @@ set(LIB_MATH_H
 	${RSGIS_SRC_MATH_DIR}/RSGISMaximumLikelihoodException.h
 	${RSGIS_SRC_MATH_DIR}/RSGIS2DInterpolation.h
 	${RSGIS_SRC_MATH_DIR}/RSGISLogicExpEvaluation.h
+	${RSGIS_SRC_MATH_DIR}/RSGISDistMetrics.h
 	)
 	
 set(LIB_MATH_CPP
@@ -661,6 +662,8 @@ set(LIB_MATH_CPP
 	${RSGIS_SRC_MATH_DIR}/RSGIS2DInterpolation.h
 	${RSGIS_SRC_MATH_DIR}/RSGISLogicExpEvaluation.cpp
 	${RSGIS_SRC_MATH_DIR}/RSGISLogicExpEvaluation.h
+	${RSGIS_SRC_MATH_DIR}/RSGISDistMetrics.cpp
+	${RSGIS_SRC_MATH_DIR}/RSGISDistMetrics.h
 	)
 ###############################################################################
 
@@ -783,6 +786,7 @@ set(LIB_RASTERGIS_H
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISBinaryClassifyClumps.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCollapseRAT.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISInputShapefileAttributes2RAT.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISRATKNN.h
 	)
 	
 	
@@ -824,6 +828,8 @@ set(LIB_RASTERGIS_CPP
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCollapseRAT.cpp
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISInputShapefileAttributes2RAT.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISInputShapefileAttributes2RAT.cpp
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISRATKNN.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISRATKNN.cpp
 	)
 	
 ###############################################################################

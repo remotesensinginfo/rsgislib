@@ -33,7 +33,7 @@ namespace rsgis{namespace rastergis{
     {
         try
         {
-            std::cout << "Import attribute tables to memory.\n";
+            std::cout << "Open Attribute Table.\n";
             GDALRasterAttributeTable *gdalAtt = clumpsDataset->GetRasterBand(ratband)->GetDefaultRAT();
             
             if((gdalAtt == NULL) || (gdalAtt->GetRowCount() == 0))
