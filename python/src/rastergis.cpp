@@ -2505,14 +2505,20 @@ static PyMethodDef RasterGISMethods[] = {
 "* summeriseKNN specifies how the extrapolation value is calculated (rsgislib.SUMTYPE_MODE, rsgislib.SUMTYPE_MEAN, rsgislib.SUMTYPE_MEDIAN, rsgislib.SUMTYPE_MIN, rsgislib.SUMTYPE_MAX, rsgislib.SUMTYPE_STDDEV; Default: rsgislib.SUMTYPE_MEDIAN). Mode is used for classification.\n"
 "* distThres is a maximum distance threshold over which features will not be included within the \'k\'.\n"
 "* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated.\n"
-"\nExample::\n"
+"\nExample::\n\n"
 "    from rsgislib import rastergis\n"
+"    from rsgislib import imageutils\n"
 "    import rsgislib\n"
 "\n"
 "    forestClumpsImg='./LS5TM_20110428_forestclumps.kea'\n"
 "\n"
-"    rastergis.applyKNN(clumps=forestClumpsImg, inExtrapField='HP95', outExtrapField='HP95Pred', trainRegionsField='LiDARForest', fields=['RedRefl','GreenRefl','BlueRefl'], kFeat=12, distKNN=rsgislib.DIST_EUCLIDEAN, summeriseKNN=rsgislib.SUMTYPE_MEDIAN, distThres=25)\n\n"
-"\n"},
+"    rastergis.applyKNN(clumps=forestClumpsImg, inExtrapField='HP95', outExtrapField='HP95Pred', trainRegionsField='LiDARForest', fields=['RedRefl','GreenRefl','BlueRefl'], kFeat=12, distKNN=rsgislib.DIST_EUCLIDEAN, summeriseKNN=rsgislib.SUMTYPE_MEDIAN, distThres=25)\n"
+"\n"
+"    # Export predicted column to GDAL image\n"
+"    forestHeightImg='./LS5TM_20110428_forest95Height.kea'\n"
+"    rastergis.exportCol2GDALImage(forestClumpsImg, forestHeightImg, 'KEA', rsgislib.TYPE_32FLOAT, 'HP95Pred')\n"
+"    imageutils.popImageStats(forestHeightImg,True,0.,True)\n"
+"\n\n"},
     
     {NULL}        /* Sentinel */
 };
