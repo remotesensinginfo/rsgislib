@@ -29,7 +29,7 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    void RSGISApplyRATKNN::applyKNNExtrapolation(GDALDataset *clumpsDS, std::string inExtrapField, std::string outExtrapField, std::string trainRegionsField, std::vector<std::string> fields, unsigned int kFeatures, rsgis::math::rsgisdistmetrics distKNN, float distThreshold, rsgis::math::rsgissummarytype summeriseKNN, unsigned int ratBand) throw(RSGISAttributeTableException)
+    void RSGISApplyRATKNN::applyKNNExtrapolation(GDALDataset *clumpsDS, std::string inExtrapField, std::string outExtrapField, std::string trainRegionsField, std::string applyRegionsField, bool useApplyField, std::vector<std::string> fields, unsigned int kFeatures, rsgis::math::rsgisdistmetrics distKNN, float distThreshold, rsgis::math::rsgissummarytype summeriseKNN, unsigned int ratBand) throw(RSGISAttributeTableException)
     {
         try
         {
@@ -45,6 +45,11 @@ namespace rsgis{namespace rastergis{
             
             unsigned int inExtrapFieldIdx = attUtils.findColumnIndex(gdalAtt, inExtrapField);
             unsigned int trainRegFieldIdx = attUtils.findColumnIndex(gdalAtt, trainRegionsField);
+            unsigned int applyRegFieldIdx = 0;
+            if(useApplyField)
+            {
+                applyRegFieldIdx = attUtils.findColumnIndex(gdalAtt, applyRegionsField);
+            }
             unsigned int outExtrapFieldIdx = attUtils.findColumnIndexOrCreate(gdalAtt, outExtrapField, gdalAtt->GetTypeOfCol(inExtrapFieldIdx));
             
             
@@ -197,6 +202,10 @@ namespace rsgis{namespace rastergis{
             // Perform KNN
             std::cout << "Perform KNN\n";
             inIntColIdx.clear();
+            if(useApplyField)
+            {
+                inIntColIdx.push_back(applyRegFieldIdx);
+            }
             outRealColIdx.push_back(outExtrapFieldIdx);
             RSGISPerformKNNCalcValues performKNN = RSGISPerformKNNCalcValues(trainData, numTrainFeats, numFloatVals, kFeatures, calcDist, distThreshold, mathSumStats);
             ratCalc = RSGISRATCalc(&performKNN);
@@ -327,53 +336,68 @@ namespace rsgis{namespace rastergis{
         //std::cout << "Processing Row " << fid << std::endl;
         try
         {
-            // Find K NN samples from training data
-            std::list<std::pair<double, double*> > *kVals = new std::list<std::pair<double, double*> >();
-            this->findKVals(kVals, inRealCols);
-            
-            // Derive new value from K NN samples
-            std::vector<double> data;
-            for(std::list<std::pair<double, double*> >::iterator iterFeat = kVals->begin(); iterFeat != kVals->end(); ++iterFeat)
+            bool performKNN = true;
+            if(numInIntCols == 1)
             {
-                data.push_back((*iterFeat).second[0]);
+                if(inIntCols[0] != 1)
+                {
+                    performKNN = false;
+                }
             }
-            rsgis::math::RSGISMathsUtils mathUtils;
-            mathUtils.generateStats(&data, this->mathSumStats);
-            
-            // Write to output column
-            if(this->mathSumStats->calcMean)
+            if(performKNN)
             {
-                outRealCols[0] = this->mathSumStats->mean;
-            }
-            else if(this->mathSumStats->calcMedian)
-            {
-                outRealCols[0] = this->mathSumStats->median;
-            }
-            else if(this->mathSumStats->calcMax)
-            {
-                outRealCols[0] = this->mathSumStats->max;
-            }
-            else if(this->mathSumStats->calcMin)
-            {
-                outRealCols[0] = this->mathSumStats->min;
-            }
-            else if(this->mathSumStats->calcMode)
-            {
-                outRealCols[0] = this->mathSumStats->mode;
-            }
-            else if(this->mathSumStats->calcStdDev)
-            {
-                outRealCols[0] = this->mathSumStats->stdDev;
-            }
-            else if(this->mathSumStats->calcSum)
-            {
-                outRealCols[0] = this->mathSumStats->sum;
+                // Find K NN samples from training data
+                std::list<std::pair<double, double*> > *kVals = new std::list<std::pair<double, double*> >();
+                this->findKVals(kVals, inRealCols);
+                
+                // Derive new value from K NN samples
+                std::vector<double> data;
+                for(std::list<std::pair<double, double*> >::iterator iterFeat = kVals->begin(); iterFeat != kVals->end(); ++iterFeat)
+                {
+                    data.push_back((*iterFeat).second[0]);
+                }
+                rsgis::math::RSGISMathsUtils mathUtils;
+                mathUtils.generateStats(&data, this->mathSumStats);
+                
+                // Write to output column
+                if(this->mathSumStats->calcMean)
+                {
+                    outRealCols[0] = this->mathSumStats->mean;
+                }
+                else if(this->mathSumStats->calcMedian)
+                {
+                    outRealCols[0] = this->mathSumStats->median;
+                }
+                else if(this->mathSumStats->calcMax)
+                {
+                    outRealCols[0] = this->mathSumStats->max;
+                }
+                else if(this->mathSumStats->calcMin)
+                {
+                    outRealCols[0] = this->mathSumStats->min;
+                }
+                else if(this->mathSumStats->calcMode)
+                {
+                    outRealCols[0] = this->mathSumStats->mode;
+                }
+                else if(this->mathSumStats->calcStdDev)
+                {
+                    outRealCols[0] = this->mathSumStats->stdDev;
+                }
+                else if(this->mathSumStats->calcSum)
+                {
+                    outRealCols[0] = this->mathSumStats->sum;
+                }
+                else
+                {
+                    throw RSGISAttributeTableException("Summarise option unknown.");
+                }
+                delete kVals;
             }
             else
             {
-                throw RSGISAttributeTableException("Summarise option unknown.");
+                outRealCols[0] = std::numeric_limits<double>::signaling_NaN();
             }
-            delete kVals;
         }
         catch (RSGISAttributeTableException &e)
         {

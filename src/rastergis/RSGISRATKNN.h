@@ -47,7 +47,7 @@ namespace rsgis{namespace rastergis{
     {
     public:
         RSGISApplyRATKNN();
-        void applyKNNExtrapolation(GDALDataset *clumpsDS, std::string inExtrapField, std::string outExtrapField, std::string trainRegionsField, std::vector<std::string> fields, unsigned int kFeatures=12, rsgis::math::rsgisdistmetrics distKNN=rsgis::math::rsgis_mahalanobis, float distThreshold=100000, rsgis::math::rsgissummarytype summeriseKNN=rsgis::math::sumtype_median, unsigned int ratBand=1) throw(RSGISAttributeTableException);
+        void applyKNNExtrapolation(GDALDataset *clumpsDS, std::string inExtrapField, std::string outExtrapField, std::string trainRegionsField, std::string applyRegionsField, bool useApplyField, std::vector<std::string> fields, unsigned int kFeatures=12, rsgis::math::rsgisdistmetrics distKNN=rsgis::math::rsgis_mahalanobis, float distThreshold=100000, rsgis::math::rsgissummarytype summeriseKNN=rsgis::math::sumtype_median, unsigned int ratBand=1) throw(RSGISAttributeTableException);
         ~RSGISApplyRATKNN();
     };
     
