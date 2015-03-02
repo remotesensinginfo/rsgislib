@@ -554,7 +554,7 @@ namespace rsgis{ namespace cmds {
 
     }
 */
-    void executeApplyKNN(std::string inClumpsImage, unsigned int ratBand, std::string inExtrapField, std::string outExtrapField, std::string trainRegionsField, std::vector<std::string> fields, unsigned int kFeatures, rsgisKNNDistCmd distKNNCmd, float distThreshold, rsgisKNNSummeriseCmd summeriseKNNCmd) throw(RSGISCmdException)
+    void executeApplyKNN(std::string inClumpsImage, unsigned int ratBand, std::string inExtrapField, std::string outExtrapField, std::string trainRegionsField, std::string applyRegionsField, bool useApplyField, std::vector<std::string> fields, unsigned int kFeatures, rsgisKNNDistCmd distKNNCmd, float distThreshold, rsgisKNNSummeriseCmd summeriseKNNCmd) throw(RSGISCmdException)
     {
         GDALAllRegister();
         GDALDataset *clumpsDataset;
@@ -626,7 +626,7 @@ namespace rsgis{ namespace cmds {
             
             std::cout << "Applying KNN\n";
             rsgis::rastergis::RSGISApplyRATKNN applyKNN;
-            applyKNN.applyKNNExtrapolation(clumpsDataset, inExtrapField, outExtrapField, trainRegionsField, fields, kFeatures, distKNN, distThreshold, summeriseKNN, ratBand);
+            applyKNN.applyKNNExtrapolation(clumpsDataset, inExtrapField, outExtrapField, trainRegionsField, applyRegionsField, useApplyField, fields, kFeatures, distKNN, distThreshold, summeriseKNN, ratBand);
             std::cout << "Completed KNN\n";
             
             GDALClose(clumpsDataset);

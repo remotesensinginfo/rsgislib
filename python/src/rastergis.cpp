@@ -1667,20 +1667,22 @@ static PyObject *RasterGIS_ApplyKNN(PyObject *self, PyObject *args, PyObject *ke
     const char *inExtrapField = "";
     const char *outExtrapField = "";
     const char *trainRegionsField = "";
+    PyObject *applyRegionsFieldObj;
     PyObject *pFields;
     unsigned int kFeatures = 12;
     float distThreshold = 100000;
     int distKNNInt = rsgis::cmds::rsgisKNNMahalanobis;
     int summeriseKNNInt = rsgis::cmds::rsgisKNNMean;
     
-    static char *kwlist[] = {"clumps", "inExtrapField", "outExtrapField", "trainRegionsField", "fields", "kFeat", "distKNN", "summeriseKNN", "distThres", "ratband", NULL};
+    static char *kwlist[] = {"clumps", "inExtrapField", "outExtrapField", "trainRegionsField", "applyRegionsField", "fields", "kFeat", "distKNN", "summeriseKNN", "distThres", "ratband", NULL};
     
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssssO|IiifI:applyKNN", kwlist, &inClumpsImage, &inExtrapField, &outExtrapField, &trainRegionsField, &pFields, &kFeatures, &distKNNInt, &summeriseKNNInt, &distThreshold, &ratBand))
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssssOO|IiifI:applyKNN", kwlist, &inClumpsImage, &inExtrapField, &outExtrapField, &trainRegionsField, &applyRegionsFieldObj, &pFields, &kFeatures, &distKNNInt, &summeriseKNNInt, &distThreshold, &ratBand))
     {
         return NULL;
     }
     
-    if(!PySequence_Check(pFields)) {
+    if(!PySequence_Check(pFields))
+    {
         PyErr_SetString(GETSTATE(self)->error, "last argument must be a sequence");
         return NULL;
     }
@@ -1691,12 +1693,20 @@ static PyObject *RasterGIS_ApplyKNN(PyObject *self, PyObject *args, PyObject *ke
         return NULL;
     }
     
+    std::string applyRegionsField = "";
+    bool applyRegions = false;
+    if(RSGISPY_CHECK_STRING(applyRegionsFieldObj))
+    {
+        applyRegionsField = RSGISPY_STRING_EXTRACT(applyRegionsFieldObj);
+        applyRegions = true;
+    }
+    
     try
     {
         rsgis::cmds::rsgisKNNDistCmd distKNN = static_cast<rsgis::cmds::rsgisKNNDistCmd>(distKNNInt);
         rsgis::cmds::rsgisKNNSummeriseCmd summeriseKNN = static_cast<rsgis::cmds::rsgisKNNSummeriseCmd>(summeriseKNNInt);
         
-        rsgis::cmds::executeApplyKNN(std::string(inClumpsImage), ratBand, std::string(inExtrapField), std::string(outExtrapField), std::string(trainRegionsField), fields, kFeatures, distKNN, distThreshold, summeriseKNN);
+        rsgis::cmds::executeApplyKNN(std::string(inClumpsImage), ratBand, std::string(inExtrapField), std::string(outExtrapField), std::string(trainRegionsField), applyRegionsField, applyRegions, fields, kFeatures, distKNN, distThreshold, summeriseKNN);
     }
     catch (rsgis::cmds::RSGISCmdException &e)
     {
@@ -2491,7 +2501,7 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"},
 
 {"applyKNN", (PyCFunction)RasterGIS_ApplyKNN, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.rastergis.applyKNN(clumps=string, inExtrapField=string, outExtrapField=string, trainRegionsField=string, fields=list<string>, kFeat=uint, distKNN=int, summeriseKNN=int, distThres=float, ratband=int)\n"
+"rsgislib.rastergis.applyKNN(clumps=string, inExtrapField=string, outExtrapField=string, trainRegionsField=string, applyRegionsField=string, fields=list<string>, kFeat=uint, distKNN=int, summeriseKNN=int, distThres=float, ratband=int)\n"
 "This function uses the KNN algorithm to allow data values to be extrapolated to segments.\n"
 "Where:\n"
 "\n"
@@ -2499,6 +2509,7 @@ static PyMethodDef RasterGISMethods[] = {
 "* inExtrapField is a string containing the name of the field with the values used for the extrapolation.\n"
 "* outExtrapField is a string containing the name of the field where the extrapolated values will be written to.\n"
 "* trainRegionsField is a string containing the name of the field specifying the clumps to be used as training - binary column (1 == training region).\n"
+"* applyRegionsField is a string containing the name of the field specifying the regions for which KNN is to be applued - binary column (1 == regions to be calculated). If None then ignored and applied to all."
 "* fields is a list of strings specifying the fields which will be used to calculate distance.\n"
 "* kFeat is an unsigned integer specifying the number of nearest features (i.e., K) to be used (Default: 12) \n"
 "* distKNN specifies how the distance to identify NN is calculated (rsgislib.DIST_EUCLIDEAN, rsgislib.DIST_MANHATTEN, rsgislib.DIST_MAHALANOBIS, rsgislib.DIST_MINKOWSKI, rsgislib.DIST_CHEBYSHEV; Default: rsgislib.DIST_MAHALANOBIS).\n"
@@ -2512,7 +2523,7 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"
 "    forestClumpsImg='./LS5TM_20110428_forestclumps.kea'\n"
 "\n"
-"    rastergis.applyKNN(clumps=forestClumpsImg, inExtrapField='HP95', outExtrapField='HP95Pred', trainRegionsField='LiDARForest', fields=['RedRefl','GreenRefl','BlueRefl'], kFeat=12, distKNN=rsgislib.DIST_EUCLIDEAN, summeriseKNN=rsgislib.SUMTYPE_MEDIAN, distThres=25)\n"
+"    rastergis.applyKNN(clumps=forestClumpsImg, inExtrapField='HP95', outExtrapField='HP95Pred', trainRegionsField='LiDARForest', applyRegionsField=None, fields=['RedRefl','GreenRefl','BlueRefl'], kFeat=12, distKNN=rsgislib.DIST_EUCLIDEAN, summeriseKNN=rsgislib.SUMTYPE_MEDIAN, distThres=25)\n"
 "\n"
 "    # Export predicted column to GDAL image\n"
 "    forestHeightImg='./LS5TM_20110428_forest95Height.kea'\n"
