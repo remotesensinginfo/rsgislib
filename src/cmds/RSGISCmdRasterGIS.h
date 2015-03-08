@@ -299,6 +299,9 @@ namespace rsgis{ namespace cmds {
     /** Function to undertaken region growing of a class with a neighbour / object criteria */
     DllExport void executeClassRegionGrowingNeighCritera(std::string clumpsImage, unsigned int ratBand, std::string classColumn, std::string classVal, int maxIter, std::string xmlBlockGrowCriteria, std::string xmlBlockNeighCriteria)throw(RSGISCmdException);
     
+    /** Function to statistically sample the RAT using a histogram method for a single variable. */
+    DllExport void executeHistSampling(std::string clumpsImage, unsigned int ratBand, std::string varCol, std::string outSelectCol, float propOfSample, float binWidth, bool classRestrict=false, std::string classColumn="", std::string classVal="")throw(RSGISCmdException);
+    
 }}
 
 

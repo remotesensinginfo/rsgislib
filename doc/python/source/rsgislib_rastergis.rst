@@ -39,6 +39,10 @@ Attribute Segments
 .. autofunction:: rsgislib.rastergis.strClassMajority
 .. autofunction:: rsgislib.rastergis.populateRATWithMode
 
+Sampling
+--------
+.. autofunction:: rsgislib.rastergis.histoSampling
+
 Classification
 --------------
 

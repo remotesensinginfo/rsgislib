@@ -957,5 +957,76 @@ namespace rsgis{namespace math{
         return covarMatrix;
     }
     
+    
+    std::vector<std::pair<size_t, double> >* RSGISMathsUtils::sampleUseHistogramMethod(std::vector<std::pair<size_t, double> > *inData, double minVal, double maxVal, double binWidth, float propOfPop) throw(RSGISMathException)
+    {
+        std::vector<std::pair<size_t, double> > *outData = new std::vector<std::pair<size_t, double> >();
+        try
+        {
+            //std::cout << "Range = " << (maxVal - minVal) << std::endl;
+            size_t numBins = static_cast<size_t>((maxVal - minVal)/binWidth)+1;
+            std::cout << "Number of Histogram Bins = " << numBins << std::endl;
+            std::list<std::pair<size_t, double> > **hist = new std::list<std::pair<size_t, double> >*[numBins];
+
+            for(size_t i = 0; i < numBins; ++i)
+            {
+                hist[i] = new std::list<std::pair<size_t, double> >();
+            }
+            
+            size_t idx = 0;
+            double val = 0.0;
+            for(std::vector<std::pair<size_t, double> >::iterator iterData = inData->begin(); iterData != inData->end(); ++iterData)
+            {
+                val = (*iterData).second;
+                if((val >= minVal) & (val <= maxVal))
+                {
+                    idx = static_cast<size_t>((val-minVal)/binWidth);
+                    //std::cout << "IDX = " << idx << std::endl;
+                    hist[idx]->push_back(*iterData);
+                }
+            }
+            
+            size_t numVals = static_cast<size_t>(1/propOfPop);
+            
+            size_t nextVal = 0;
+            size_t j = 0;
+            for(size_t i = 0; i < numBins; ++i)
+            {
+                //numVals = static_cast<size_t>(hist[i]->size()*propOfPop);
+                //std::cout << "BIN " << i << ": " << hist[i]->size() << " = " << hist[i]->size()*propOfPop << std::endl;
+
+                hist[i]->sort(comparePairsData);
+                nextVal = 0;
+                j = 0;
+                for(std::list<std::pair<size_t, double> >::iterator iterData = hist[i]->begin(); iterData != hist[i]->end(); ++iterData)
+                {
+                    if(j == nextVal)
+                    {
+                        outData->push_back((*iterData));
+                        nextVal += numVals;
+                    }
+                    
+                    ++j;
+                }
+                
+                delete hist[i];
+            }
+            delete[] hist;
+        }
+        catch(RSGISMathException &e)
+        {
+            throw e;
+        }
+        catch(RSGISException &e)
+        {
+            throw RSGISMathException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISMathException(e.what());
+        }
+        return outData;
+    }
+    
 }}
 
