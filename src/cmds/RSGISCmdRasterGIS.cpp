@@ -1838,5 +1838,40 @@ namespace rsgis{ namespace cmds {
         }
     }
             
+            
+    DllExport void executeHistSampling(std::string clumpsImage, unsigned int ratBand, std::string varCol, std::string outSelectCol, float propOfSample, float binWidth, bool classRestrict, std::string classColumn, std::string classVal)throw(RSGISCmdException)
+    {
+        try
+        {
+            if((propOfSample <= 0) | (propOfSample >= 1))
+            {
+                throw rsgis::RSGISException("The proportion of the sample should be > 0 and < 1.");
+            }
+            
+            GDALAllRegister();
+            std::cout.precision(12);
+            
+            GDALDataset *clumpsDataset = (GDALDataset *) GDALOpen(clumpsImage.c_str(), GA_Update);
+            if(clumpsDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + clumpsImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            rsgis::rastergis::RSGISStatsSamplingClumps statsSampling;
+            statsSampling.histogramSampling(clumpsDataset, varCol, outSelectCol, propOfSample, binWidth, classRestrict, classColumn, classVal, ratBand);
+            
+            GDALClose(clumpsDataset);
+        }
+        catch(rsgis::RSGISAttributeTableException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+            
 }}
 

@@ -391,6 +391,228 @@ namespace rsgis{namespace rastergis{
     
     
     
+    RSGISStatsSamplingClumps::RSGISStatsSamplingClumps()
+    {
+        
+    }
+    
+    void RSGISStatsSamplingClumps::histogramSampling(GDALDataset *clumpsDataset, std::string varCol, std::string outSelectCol, float propOfSample, float binWidth, bool classRestrict, std::string classColumn, std::string classVal, unsigned int ratBand)throw(rsgis::RSGISAttributeTableException)
+    {
+        try
+        {
+            std::cout << "Import attribute tables to memory.\n";
+            GDALRasterAttributeTable *gdalRAT = clumpsDataset->GetRasterBand(1)->GetDefaultRAT();
+            size_t numClumps = gdalRAT->GetRowCount();
+            
+            
+            RSGISRasterAttUtils ratUtils;
+            rsgis::math::RSGISMathsUtils mathUtils;
+            
+            unsigned int varColIdx = ratUtils.findColumnIndex(gdalRAT, varCol);
+            unsigned int classNamesColIdx = 0;
+            
+            //std::vector<double> *colFloatVals = ratUtils.readDoubleColumnAsVec(gdalRAT, varCol);
+            /*for(std::vector<double>::iterator iterData = colFloatVals->begin(); iterData != colFloatVals->end(); ++iterData)
+            {
+                std::cout << *iterData << std::endl;
+            }*/
+            //size_t numClumps = colFloatVals->size();
+            //std::cout << "Number of Values = " << numClumps << std::endl;
+            
+            double minVal = 0.0;
+            double maxVal = 0.0;
+            size_t numVals = 0;
+            
+            RSGISCalcClassMinMax calcMinMaxStats = RSGISCalcClassMinMax(classRestrict, classVal, &minVal, &maxVal, &numVals);
+            RSGISRATCalc ratCalcMinMax = RSGISRATCalc(&calcMinMaxStats);
+            std::vector<unsigned int> inRealColIdx;
+            inRealColIdx.push_back(varColIdx);
+            std::vector<unsigned int> inIntColIdx;
+            std::vector<unsigned int> inStrColIdx;
+            if(classRestrict)
+            {
+                classNamesColIdx = ratUtils.findColumnIndex(gdalRAT, classColumn);
+                inStrColIdx.push_back(classNamesColIdx);
+            }
+            std::vector<unsigned int> outRealColIdx;
+            std::vector<unsigned int> outIntColIdx;
+            std::vector<unsigned int> outStrColIdx;
+            ratCalcMinMax.calcRATValues(gdalRAT, inRealColIdx, inIntColIdx, inStrColIdx, outRealColIdx, outIntColIdx, outStrColIdx);
+            
+            std::cout << "DATA [" << minVal << ", " << maxVal << "]: " << (maxVal-minVal) << "\t Num Vals = " << numVals << "\n";
+            
+            std::vector<std::pair<size_t, double> > *dataPairs = new std::vector<std::pair<size_t, double> >();
+            dataPairs->reserve(numVals);
+            
+            RSGISCalcGenVecPairs genVecPairs = RSGISCalcGenVecPairs(classRestrict, classVal, dataPairs);
+            RSGISRATCalc ratGenVecPairs = RSGISRATCalc(&genVecPairs);
+            ratGenVecPairs.calcRATValues(gdalRAT, inRealColIdx, inIntColIdx, inStrColIdx, outRealColIdx, outIntColIdx, outStrColIdx);
+            
+            //std::cout << "Bin Width = " << binWidth << std::endl;
+            
+            std::vector<std::pair<size_t, double> > *selClumps = mathUtils.sampleUseHistogramMethod(dataPairs, minVal, maxVal, binWidth, propOfSample);
+            delete dataPairs;
+            
+            unsigned int outFieldIdx = ratUtils.findColumnIndexOrCreate(gdalRAT, outSelectCol, GFT_Integer);
+            
+            int *outSelectData = new int[numClumps];
+            for(size_t i = 0; i < numClumps; ++i)
+            {
+                outSelectData[i] = 0;
+            }
+            
+            for(std::vector<std::pair<size_t, double> >::iterator iterClumps = selClumps->begin(); iterClumps != selClumps->end(); ++iterClumps)
+            {
+                outSelectData[(*iterClumps).first] = 1;
+            }
+            delete selClumps;
+            
+            gdalRAT->ValuesIO(GF_Write, outFieldIdx, 0, numClumps, outSelectData);
+        }
+        catch(rsgis::RSGISAttributeTableException &e)
+        {
+            throw e;
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw rsgis::RSGISAttributeTableException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw e;
+        }
+    }
+    
+    RSGISStatsSamplingClumps::~RSGISStatsSamplingClumps()
+    {
+        
+    }
+    
+    RSGISCalcClassMinMax::RSGISCalcClassMinMax(bool useClassName, std::string className, double *minVal, double *maxVal, size_t *numVals):RSGISRATCalcValue()
+    {
+        this->useClassName = useClassName;
+        this->className = className;
+        this->minVal = minVal;
+        this->maxVal = maxVal;
+        this->firstVal = true;
+        this->numVals = numVals;
+    }
+    
+    void RSGISCalcClassMinMax::calcRATValue(size_t fid, double *inRealCols, unsigned int numInRealCols, int *inIntCols, unsigned int numInIntCols, std::string *inStringCols, unsigned int numInStringCols, double *outRealCols, unsigned int numOutRealCols, int *outIntCols, unsigned int numOutIntCols, std::string *outStringCols, unsigned int numOutStringCols) throw(RSGISAttributeTableException)
+    {
+        if(fid > 0)
+        {
+            if(numInRealCols == 0)
+            {
+                throw rsgis::RSGISAttributeTableException("RSGISCalcClassMinMax::calcRATValue must have at least 1 double column specified.");
+            }
+            
+            if(useClassName)
+            {
+                if(numInStringCols != 1)
+                {
+                    throw rsgis::RSGISAttributeTableException("RSGISCalcClassMinMax::calcRATValue must have 1 string column specified if class names are to be used.");
+                }
+                
+                if(inStringCols[0] == className)
+                {
+                    if(firstVal)
+                    {
+                        *minVal = inRealCols[0];
+                        *maxVal = inRealCols[0];
+                        firstVal = false;
+                    }
+                    else
+                    {
+                        if(inRealCols[0] < (*minVal))
+                        {
+                            *minVal = inRealCols[0];
+                        }
+                        
+                        if(inRealCols[0] > (*maxVal))
+                        {
+                            *maxVal = inRealCols[0];
+                        }
+                    }
+                    ++(*numVals);
+                }
+            }
+            else
+            {
+                if(firstVal)
+                {
+                    *minVal = inRealCols[0];
+                    *maxVal = inRealCols[0];
+                    firstVal = false;
+                }
+                else
+                {
+                    if(inRealCols[0] < (*minVal))
+                    {
+                        *minVal = inRealCols[0];
+                    }
+                    
+                    if(inRealCols[0] > (*maxVal))
+                    {
+                        *maxVal = inRealCols[0];
+                    }
+                }
+                ++(*numVals);
+            }
+        }
+    }
+    
+    RSGISCalcClassMinMax::~RSGISCalcClassMinMax()
+    {
+        
+    }
+    
+    
+    
+    
+    RSGISCalcGenVecPairs::RSGISCalcGenVecPairs(bool useClassName, std::string className, std::vector<std::pair<size_t, double> > *dataPairs)
+    {
+        this->useClassName = useClassName;
+        this->className = className;
+        this->dataPairs = dataPairs;
+    }
+    
+    void RSGISCalcGenVecPairs::calcRATValue(size_t fid, double *inRealCols, unsigned int numInRealCols, int *inIntCols, unsigned int numInIntCols, std::string *inStringCols, unsigned int numInStringCols, double *outRealCols, unsigned int numOutRealCols, int *outIntCols, unsigned int numOutIntCols, std::string *outStringCols, unsigned int numOutStringCols) throw(RSGISAttributeTableException)
+    {
+        if(fid > 0)
+        {
+            if(numInRealCols == 0)
+            {
+                throw rsgis::RSGISAttributeTableException("RSGISCalcClassMinMax::calcRATValue must have at least 1 double column specified.");
+            }
+            
+            if(useClassName)
+            {
+                if(numInStringCols != 1)
+                {
+                    throw rsgis::RSGISAttributeTableException("RSGISCalcClassMinMax::calcRATValue must have 1 string column specified if class names are to be used.");
+                }
+                
+                if(inStringCols[0] == className)
+                {
+                    dataPairs->push_back(std::pair<size_t, double>(fid, inRealCols[0]));
+                }
+            }
+            else
+            {
+                dataPairs->push_back(std::pair<size_t, double>(fid, inRealCols[0]));
+            }
+        }
+
+    }
+    
+    RSGISCalcGenVecPairs::~RSGISCalcGenVecPairs()
+    {
+        
+    }
+
+    
+    
 }}
 
 

@@ -1717,6 +1717,45 @@ static PyObject *RasterGIS_ApplyKNN(PyObject *self, PyObject *args, PyObject *ke
     Py_RETURN_NONE;
 }
 
+static PyObject *RasterGIS_HistoSampling(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    const char *inClumpsImage = "";
+    unsigned int ratBand = 1;
+    const char *varCol = "";
+    const char *outSelectCol = "";
+    const char *classVal = "";
+    PyObject *classColumnObj;
+    float binWidth = 1;
+    float propOfSample = 0.1;
+    
+    static char *kwlist[] = {"clumps", "varCol", "outSelectCol", "propOfSample", "binWidth", "classColumn", "classVal", "ratband", NULL};
+    
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssff|OsI:histoSampling", kwlist, &inClumpsImage, &varCol, &outSelectCol, &propOfSample, &binWidth, &classColumnObj, &classVal, &ratBand))
+    {
+        return NULL;
+    }
+    
+    std::string classColumn = "";
+    bool classRestrict = false;
+    if(RSGISPY_CHECK_STRING(classColumnObj))
+    {
+        classColumn = RSGISPY_STRING_EXTRACT(classColumnObj);
+        classRestrict = true;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeHistSampling(std::string(inClumpsImage), ratBand, std::string(varCol), std::string(outSelectCol), propOfSample, binWidth, classRestrict, classColumn, std::string(classVal));
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 static PyMethodDef RasterGISMethods[] = {
     {"populateStats", (PyCFunction)RasterGIS_PopulateStats, METH_VARARGS | METH_KEYWORDS,
 "rastergis.populateStats(clumps=string, addclrtab=boolean, calcpyramids=boolean, ignorezero=boolean, ratband=int)\n"
@@ -2529,6 +2568,26 @@ static PyMethodDef RasterGISMethods[] = {
 "    forestHeightImg='./LS5TM_20110428_forest95Height.kea'\n"
 "    rastergis.exportCol2GDALImage(forestClumpsImg, forestHeightImg, 'KEA', rsgislib.TYPE_32FLOAT, 'HP95Pred')\n"
 "    imageutils.popImageStats(forestHeightImg,True,0.,True)\n"
+"\n\n"},
+    
+{"histoSampling", (PyCFunction)RasterGIS_HistoSampling, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.rastergis.histoSampling(clumps=string, varCol=string, outSelectCol=string, propOfSample=float, binWidth=float, classColumn=string, classVal=string, ratband=int)\n"
+"This function performs a histogram based sampling of the RAT for a specific column.\n"
+"The output is a binary column within the RAT where rows with a value of 1 are the selected clumps.\n"
+"Where:\n"
+"\n"
+"* clumps is a string containing the name of the input clumps image file\n"
+"* varCol is a string containing the name of the field with the values used for the sampling.\n"
+"* outSelectCol is a string containing the name of the field where the binary output will be written (1 for selected clumps).\n"
+"* propOfSample is a float specifying the proportion of the datasets which should be within the outputted sample. Values range of 0-1. 0.5 would be a 50% sample."
+"* binWidth is a float specifying the width of each histogram bin.\n"
+"* classColumn is a string specifying a field within which classes have been defined. This can be used to only apply the sampling to a thematic subset of the RAT. If set as None then this is ignored. (Default = None)\n"
+"* classVal is a string specifying the class it will be limited to.\n"
+"* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated.\n"
+"\nExample::\n\n"
+"    from rsgislib import rastergis\n"
+"\n"
+"    rastergis.histoSampling(clumps='N00E103_10_grid_knn.kea', varCol='HH', outSelectCol='HHSampling', propOfSample=0.25, binWidth=0.01, classColumn='Class', classVal='2')\n"
 "\n\n"},
     
     {NULL}        /* Sentinel */
