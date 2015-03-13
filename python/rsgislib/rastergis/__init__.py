@@ -5,6 +5,25 @@ The Raster GIS module contains functions for attributing and manipulating raster
 # import the C++ extension into this level
 from ._rastergis import *
 
+haveGDALPy = True
+try:
+    import osgeo.gdal as gdal
+except ImportError as gdalErr:
+    haveGDALPy = False
+
+haveNumpy = True
+try:
+    import numpy
+except ImportError as numErr:
+    haveNumpy = False
+
+haveHDF5 = True
+try:
+    import h5py
+except ImportError as h5Err:
+    haveHDF5 = False
+
+
 class BandAttStats:
     """ This is passed to the populateRATWithStats function """
     def __init__(self, band, minField=None, maxField=None, sumField=None, stdDevField=None, meanField=None):
@@ -88,3 +107,11 @@ Example::
     print('Removing temp files')
     for tempFile in tempFileList:
         rsgisUtils.deleteFileWithBasename(tempFile)
+
+
+
+
+
+
+
+

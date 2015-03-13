@@ -302,6 +302,13 @@ namespace rsgis{ namespace cmds {
     /** Function to statistically sample the RAT using a histogram method for a single variable. */
     DllExport void executeHistSampling(std::string clumpsImage, unsigned int ratBand, std::string varCol, std::string outSelectCol, float propOfSample, float binWidth, bool classRestrict=false, std::string classColumn="", std::string classVal="")throw(RSGISCmdException);
     
+    /** Function to fit a Gaussian mixture model to histogram */
+    DllExport void executeFitHistGausianMixtureModel(std::string clumpsImage, unsigned int ratBand, std::string outH5File, std::string varCol, float binWidth, std::string classColumn, std::string classVal, bool outputHist, std::string outHistFile)throw(RSGISCmdException);
+
+    /** Function to fit a Gaussian mixture model to histogram and to split the class accordingly */
+    DllExport void executeClassSplitFitHistGausianMixtureModel(std::string clumpsImage, unsigned int ratBand, std::string outColumn, std::string varCol, float binWidth, std::string classColumn, std::string classVal)throw(RSGISCmdException);
+
+    
 }}
 
 
