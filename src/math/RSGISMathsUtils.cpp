@@ -1028,5 +1028,97 @@ namespace rsgis{namespace math{
         return outData;
     }
     
+    std::vector<std::pair<size_t, double> >** RSGISMathsUtils::calcHistogram(std::vector<std::pair<size_t, double> > *inData, double minVal, double maxVal, double binWidth, size_t *numBins) throw(RSGISMathException)
+    {
+        std::vector<std::pair<size_t, double> > **hist = NULL;
+        try
+        {
+            *numBins = static_cast<size_t>((maxVal - minVal)/binWidth)+1;
+            std::cout << "Number of Histogram Bins = " << *numBins << std::endl;
+            hist = new std::vector<std::pair<size_t, double> >*[*numBins];
+            for(size_t i = 0; i < *numBins; ++i)
+            {
+                hist[i] = new std::vector<std::pair<size_t, double> >();
+            }
+            
+            size_t idx = 0;
+            double val = 0.0;
+            for(std::vector<std::pair<size_t, double> >::iterator iterData = inData->begin(); iterData != inData->end(); ++iterData)
+            {
+                val = (*iterData).second;
+                if((val >= minVal) & (val <= maxVal))
+                {
+                    idx = static_cast<size_t>((val-minVal)/binWidth);
+                    //std::cout << "IDX = " << idx << std::endl;
+                    hist[idx]->push_back(*iterData);
+                }
+            }
+        }
+        catch(RSGISMathException &e)
+        {
+            throw e;
+        }
+        catch(RSGISException &e)
+        {
+            throw RSGISMathException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISMathException(e.what());
+        }
+        return hist;
+    }
+    
+    
+    std::vector<std::pair<double, double> >* RSGISMathsUtils::calcHistogram(std::vector<double> *data, double minVal, double maxVal, double binWidth, bool norm) throw(RSGISMathException)
+    {
+        std::vector<std::pair<double, double> > *hist = new std::vector<std::pair<double, double> >();
+        try
+        {
+            size_t numBins = static_cast<size_t>((maxVal - minVal)/binWidth)+1;
+            std::cout << "Number of Histogram Bins = " << numBins << std::endl;
+            hist->reserve(numBins);
+            
+            double binCentre = minVal + (binWidth/2);
+            for(size_t i = 0; i < numBins; ++i)
+            {
+                hist->push_back(std::pair<double, double>(binCentre, 0.0));
+                binCentre += binWidth;
+            }
+            
+            size_t idx = 0;
+            for(std::vector<double>::iterator iterData = data->begin(); iterData != data->end(); ++iterData)
+            {
+                if(((*iterData) >= minVal) & ((*iterData) <= maxVal))
+                {
+                    idx = static_cast<size_t>(((*iterData)-minVal)/binWidth);
+                    //std::cout << "IDX = " << idx << std::endl;
+                    hist->at(idx).second = hist->at(idx).second + 1;
+                }
+            }
+            
+            if(norm)
+            {
+                for(size_t i = 0; i < numBins; ++i)
+                {
+                    hist->at(i).second = hist->at(i).second / data->size();
+                }
+            }
+        }
+        catch(RSGISMathException &e)
+        {
+            throw e;
+        }
+        catch(RSGISException &e)
+        {
+            throw RSGISMathException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISMathException(e.what());
+        }
+        return hist;
+    }
+    
 }}
 

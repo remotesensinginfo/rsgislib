@@ -1756,6 +1756,77 @@ static PyObject *RasterGIS_HistoSampling(PyObject *self, PyObject *args, PyObjec
     Py_RETURN_NONE;
 }
 
+
+static PyObject *RasterGIS_FitHistGausianMixtureModel(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    const char *inClumpsImage = "";
+    unsigned int ratBand = 1;
+    const char *varCol = "";
+    const char *outH5File = "";
+    PyObject *outHistFileObj;
+    const char *classVal = "";
+    const char *classColumn = "";
+    float binWidth = 1;
+    
+    static char *kwlist[] = {"clumps", "outH5File", "outHistFile", "varCol", "binWidth", "classColumn", "classVal", "ratband", NULL};
+    
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssOsfss|I:fitHistGausianMixtureModel", kwlist, &inClumpsImage, &outH5File, &outHistFileObj, &varCol, &binWidth, &classColumn, &classVal, &ratBand))
+    {
+        return NULL;
+    }
+    
+    std::string outHistFile = "";
+    bool outputHist = false;
+    if(RSGISPY_CHECK_STRING(outHistFileObj))
+    {
+        outHistFile = RSGISPY_STRING_EXTRACT(outHistFileObj);
+        outputHist = true;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeFitHistGausianMixtureModel(std::string(inClumpsImage), ratBand, std::string(outH5File), std::string(varCol), binWidth, std::string(classColumn), std::string(classVal), outputHist, outHistFile);
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+
+static PyObject *RasterGIS_ClassSplitFitHistGausianMixtureModel(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    const char *inClumpsImage = "";
+    unsigned int ratBand = 1;
+    const char *varCol = "";
+    const char *outColumn = "";
+    const char *classVal = "";
+    const char *classColumn = "";
+    float binWidth = 1;
+    
+    static char *kwlist[] = {"clumps", "outCol", "varCol", "binWidth", "classColumn", "classVal", "ratband", NULL};
+    
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssfss|I:classSplitFitHistGausianMixtureModel", kwlist, &inClumpsImage, &outColumn, &varCol, &binWidth, &classColumn, &classVal, &ratBand))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeClassSplitFitHistGausianMixtureModel(std::string(inClumpsImage), ratBand, std::string(outColumn), std::string(varCol), binWidth, std::string(classColumn), std::string(classVal));
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 static PyMethodDef RasterGISMethods[] = {
     {"populateStats", (PyCFunction)RasterGIS_PopulateStats, METH_VARARGS | METH_KEYWORDS,
 "rastergis.populateStats(clumps=string, addclrtab=boolean, calcpyramids=boolean, ignorezero=boolean, ratband=int)\n"
@@ -2569,7 +2640,6 @@ static PyMethodDef RasterGISMethods[] = {
 "    rastergis.exportCol2GDALImage(forestClumpsImg, forestHeightImg, 'KEA', rsgislib.TYPE_32FLOAT, 'HP95Pred')\n"
 "    imageutils.popImageStats(forestHeightImg,True,0.,True)\n"
 "\n\n"},
-    
 {"histoSampling", (PyCFunction)RasterGIS_HistoSampling, METH_VARARGS | METH_KEYWORDS,
 "rsgislib.rastergis.histoSampling(clumps=string, varCol=string, outSelectCol=string, propOfSample=float, binWidth=float, classColumn=string, classVal=string, ratband=int)\n"
 "This function performs a histogram based sampling of the RAT for a specific column.\n"
@@ -2589,7 +2659,41 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"
 "    rastergis.histoSampling(clumps='N00E103_10_grid_knn.kea', varCol='HH', outSelectCol='HHSampling', propOfSample=0.25, binWidth=0.01, classColumn='Class', classVal='2')\n"
 "\n\n"},
-    
+{"fitHistGausianMixtureModel", (PyCFunction)RasterGIS_FitHistGausianMixtureModel, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.rastergis.fitHistGausianMixtureModel(clumps=string, outH5File=string, outHistFile=string, varCol=string, binWidth=float, classColumn=string, classVal=string, ratband=int)\n"
+"This function fits a Gaussian mixture model to the histogram for a variable in the RAT. \n"
+"Where:\n"
+"\n"
+"* clumps is a string containing the name of the input clumps image file\n"
+"* outH5File is a string for a HDF5 with the fitted Gaussians.\n"
+"* outHistFile is a string to output the Histrogram as a HDF5 file.\n"
+"* varCol is a string containing the name of the field with the values used for the sampling.\n"
+"* binWidth is a float specifying the width of each histogram bin.\n"
+"* classColumn is a string specifying a field within which classes have been defined.\n"
+"* classVal is a string specifying the class it will be limited to.\n"
+"* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated.\n"
+"\nExample::\n\n"
+"    from rsgislib import rastergis\n"
+"\n"
+"    rastergis.fitHistGausianMixtureModel(clumps='FrenchGuiana_10_ALL_sl_HH_lee_UTM_mosaic_dB_segs.kea', outH5File='gaufit.h5', outHistFile='histfile.h5', varCol='HVdB', binWidth=0.1, classColumn='Classes', classVal='Mangrove')\n"
+"\n\n"},
+{"classSplitFitHistGausianMixtureModel", (PyCFunction)RasterGIS_ClassSplitFitHistGausianMixtureModel, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.rastergis.classSplitFitHistGausianMixtureModel(clumps=string, outCol=string, varCol=string, binWidth=float, classColumn=string, classVal=string, ratband=int)\n"
+"This function fits a Gaussian mixture model to the histogram for a variable in the RAT and uses it to split the class into a series of subclasses.\n"
+"Where:\n"
+"\n"
+"* clumps is a string containing the name of the input clumps image file\n"
+"* outCol is a string for a HDF5 with the fitted Gaussians.\n"
+"* varCol is a string containing the name of the field with the values used for the sampling.\n"
+"* binWidth is a float specifying the width of each histogram bin.\n"
+"* classColumn is a string specifying a field within which classes have been defined.\n"
+"* classVal is a string specifying the class it will be limited to.\n"
+"* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated.\n"
+"\nExample::\n\n"
+"    from rsgislib import rastergis\n"
+"\n"
+"    rastergis.classSplitFitHistGausianMixtureModel(clumps='FrenchGuiana_10_ALL_sl_HH_lee_UTM_mosaic_dB_segs.kea', outCol='MangroveSubClass', varCol='HVdB', binWidth=0.1, classColumn='Classes', classVal='Mangroves')\n"
+"\n\n"},
     {NULL}        /* Sentinel */
 };
 

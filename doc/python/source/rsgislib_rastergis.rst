@@ -59,6 +59,12 @@ Change Detection
 
 .. autofunction:: rsgislib.rastergis.findChangeClumpsFromStdDev
 .. autofunction:: rsgislib.rastergis.getGlobalClassStats
+.. autofunction:: rsgislib.rastergis.classSplitFitHistGausianMixtureModel
+
+Statistics
+----------
+.. autofunction:: rsgislib.rastergis.fitHistGausianMixtureModel
+.. autofunction:: rsgislib.rastergis.ratutils.calcPlotGaussianHistoModel
 
 Copy & Export
 ----------------

@@ -40,6 +40,9 @@
 #include "rastergis/RSGISRATCalcValue.h"
 #include "rastergis/RSGISRATCalc.h"
 
+#include "math/RSGISMathsUtils.h"
+#include "math/RSGISFitGaussianMixModel.h"
+
 #include "gdal_priv.h"
 #include "ogrsf_frmts.h"
 #include "ogr_api.h"
@@ -147,6 +150,15 @@ namespace rsgis{namespace rastergis{
         bool useClassName;
         std::string className;
         std::vector<std::pair<size_t, double> > *dataPairs;
+    };
+    
+    
+    class DllExport RSGISSelectClumpsGMMSplit
+    {
+    public:
+        RSGISSelectClumpsGMMSplit();
+        void splitClassUsingGMM(GDALDataset *clumpsDataset, std::string outCol, std::string varCol, float binWidth, std::string classColumn, std::string classVal, unsigned int ratBand=1)throw(RSGISAttributeTableException);
+        ~RSGISSelectClumpsGMMSplit();
     };
     
     

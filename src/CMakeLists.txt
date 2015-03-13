@@ -1,6 +1,7 @@
 
 ###############################################################################
 # set file locations
+set(CMPFIT_SRC_DIR math/cmpfit)
 set(RSGIS_SRC_CALIBRATION_DIR calibration)
 set(RSGIS_SRC_CLASSIFY_DIR classifier)
 set(RSGIS_SRC_COMMON_DIR common)
@@ -19,6 +20,19 @@ set(RSGIS_SRC_VEC_DIR vec)
 set(RSGIS_SRC_CMDS_DIR cmds)
 set(RSGIS_SRC_EXE_DIR exe/rsgis)
 ###############################################################################
+
+###############################################################################
+# Files within the cmpfit Library.
+set(LIB_CMPFIT_H
+	${CMPFIT_SRC_DIR}/rsgis_mpfit.h
+	)
+	
+set(LIB_CMPFIT_CPP
+	${CMPFIT_SRC_DIR}/rsgis_mpfit.c
+	${CMPFIT_SRC_DIR}/rsgis_mpfit.h
+	)
+###############################################################################
+
 
 ###############################################################################
 # Files within the calibration Library.
@@ -588,6 +602,7 @@ set(LIB_MATH_H
 	${RSGIS_SRC_MATH_DIR}/RSGIS2DInterpolation.h
 	${RSGIS_SRC_MATH_DIR}/RSGISLogicExpEvaluation.h
 	${RSGIS_SRC_MATH_DIR}/RSGISDistMetrics.h
+	${RSGIS_SRC_MATH_DIR}/RSGISFitGaussianMixModel.h
 	)
 	
 set(LIB_MATH_CPP
@@ -664,6 +679,8 @@ set(LIB_MATH_CPP
 	${RSGIS_SRC_MATH_DIR}/RSGISLogicExpEvaluation.h
 	${RSGIS_SRC_MATH_DIR}/RSGISDistMetrics.cpp
 	${RSGIS_SRC_MATH_DIR}/RSGISDistMetrics.h
+	${RSGIS_SRC_MATH_DIR}/RSGISFitGaussianMixModel.cpp
+	${RSGIS_SRC_MATH_DIR}/RSGISFitGaussianMixModel.h
 	)
 ###############################################################################
 
@@ -787,6 +804,7 @@ set(LIB_RASTERGIS_H
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCollapseRAT.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISInputShapefileAttributes2RAT.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISRATKNN.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISRATFunctionFitting.h
 	)
 	
 	
@@ -830,6 +848,8 @@ set(LIB_RASTERGIS_CPP
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISInputShapefileAttributes2RAT.cpp
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISRATKNN.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISRATKNN.cpp
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISRATFunctionFitting.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISRATFunctionFitting.cpp
 	)
 	
 ###############################################################################
@@ -1297,6 +1317,7 @@ set(EXE_RSGISEXE_CPP
 # Group source files for IDE source explorers
 source_group("CMake Files" FILES CMakeLists.txt)
 source_group("RSGISEXE" FILES ${EXE_RSGISEXE_CPP} )
+source_group("cmpfit" FILES ${LIB_CMPFIT_CPP})
 source_group("Calibration" FILES ${LIB_CALIBRATION_CPP})
 source_group("Classify" FILES ${LIB_CLASSIFY_CPP})
 source_group("Commands" FILES ${LIB_COMMANDS_CPP})
@@ -1330,7 +1351,7 @@ target_link_libraries(${RSGISLIB_COMMONS_LIB_NAME} ${BOOST_LIBRARIES} ${XERCESC_
 add_library( ${RSGISLIB_DATASTRUCT_LIB_NAME} ${LIB_DATASTRUCT_CPP} )
 target_link_libraries(${RSGISLIB_DATASTRUCT_LIB_NAME} ${RSGISLIB_COMMONS_LIB_NAME} ${BOOST_LIBRARIES} ${GMP_LIBRARIES} ${MPFR_LIBRARIES} )
 
-add_library( ${RSGISLIB_MATHS_LIB_NAME} ${LIB_MATH_CPP} )
+add_library( ${RSGISLIB_MATHS_LIB_NAME} ${LIB_MATH_CPP} ${LIB_CMPFIT_CPP} )
 target_link_libraries(${RSGISLIB_MATHS_LIB_NAME} ${RSGISLIB_COMMONS_LIB_NAME} ${BOOST_LIBRARIES} ${GSL_LIBRARIES} ${MUPARSER_LIBRARIES} ${GEOS_LIBRARIES} ${GDAL_LIBRARIES} ${GMP_LIBRARIES} ${MPFR_LIBRARIES} ${KEA_LIBRARIES} ${CGAL_LIBRARIES} )
 
 add_library( ${RSGISLIB_UTILS_LIB_NAME} ${LIB_UTILS_CPP} )
