@@ -44,7 +44,7 @@
 #include "ogrsf_frmts.h"
 #include "ogr_api.h"
 
-#include "H5cpp.h"
+#include "H5Cpp.h"
 
 namespace rsgis{namespace rastergis{
     
