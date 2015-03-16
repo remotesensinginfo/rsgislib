@@ -120,7 +120,7 @@ Example::
 
 """
     try:
-        rasterise2Image(inputVec, inputImage, outputImage, "KEA")
+        rasterise2Image(inputVec, inputImage, outputImage, "KEA", "FID")
         rsgislib.rastergis.importVecAtts(outputImage, inputVec, None)
     except Exception as e:
         raise e
