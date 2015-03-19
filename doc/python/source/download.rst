@@ -31,13 +31,13 @@ To install RSGISLib use:
 
 .. code-block:: bash
 
-    conda install -c https://conda.binstar.org/osgeo rsgislib
+    conda install -c osgeo rsgislib
 
 You then need to set the following environmental variables:
 
 .. code-block:: bash
 
-    export GDAL_DRIVER_PATH=~/anaconda3/gdalplugins:$GDAL_DRIVER_PATH
+    export GDAL_DRIVER_PATH=~/anaconda3/lib/gdalplugins:$GDAL_DRIVER_PATH
     export GDAL_DATA=~/anaconda3/share/gdal
 
 Changing if you have not installed anaconda to the standard location (or used miniconda which installs to ‘miniconda3′).
