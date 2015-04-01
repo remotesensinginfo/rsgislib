@@ -3177,7 +3177,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 
 			try
             {
-                rsgis::cmds::executeBandMaths(variables, numVars, outputImage, mathsExpression, imageFormat, rsgisOutDataType);
+                rsgis::cmds::executeBandMaths(variables, numVars, outputImage, mathsExpression, imageFormat, rsgisOutDataType, false);
                 delete[] variables;
             }
             catch (rsgis::RSGISException &e)
@@ -3236,7 +3236,7 @@ void RSGISExeImageCalculation::runAlgorithm() throw(rsgis::RSGISException)
 
             try
             {
-                rsgis::cmds::executeImageMaths(this->inputImage, this->outputImage, this->mathsExpression, this->imageFormat, rsgisOutDataType);
+                rsgis::cmds::executeImageMaths(this->inputImage, this->outputImage, this->mathsExpression, this->imageFormat, rsgisOutDataType, false);
             }
             catch (rsgis::RSGISException &e)
             {

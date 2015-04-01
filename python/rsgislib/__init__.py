@@ -54,6 +54,28 @@ Methods of initialising KMEANS:
     * INITCLUSTER_DIAGONAL_FULL_ATTACH = 3
     * INITCLUSTER_DIAGONAL_STDDEV_ATTACH = 4
     * INITCLUSTER_KPP = 5
+    
+    
+Methods of calculating distance:
+
+    * DIST_UNDEFINED = 0
+    * DIST_EUCLIDEAN = 1
+    * DIST_MAHALANOBIS = 2
+    * DIST_MANHATTEN = 3
+    * DIST_MINKOWSKI = 4
+    * DIST_CHEBYSHEV = 5
+    * DIST_MUTUALINFO = 6
+    
+Methods of summerising data:
+
+    * SUMTYPE_UNDEFINED = 0
+    * SUMTYPE_MODE = 1
+    * SUMTYPE_MEAN = 2
+    * SUMTYPE_MEDIAN = 3
+    * SUMTYPE_MIN = 4
+    * SUMTYPE_MAX = 5
+    * SUMTYPE_STDDEV = 6
+    * SUMTYPE_COUNT = 7
 
 """
 import os.path
@@ -73,6 +95,23 @@ TYPE_32UINT = 7
 TYPE_64UINT = 8
 TYPE_32FLOAT = 9
 TYPE_64FLOAT = 10
+
+DIST_UNDEFINED = 0
+DIST_EUCLIDEAN = 1
+DIST_MAHALANOBIS = 2
+DIST_MANHATTEN = 3
+DIST_MINKOWSKI = 4
+DIST_CHEBYSHEV = 5
+DIST_MUTUALINFO = 6
+
+SUMTYPE_UNDEFINED = 0
+SUMTYPE_MODE = 1
+SUMTYPE_MEAN = 2
+SUMTYPE_MEDIAN = 3
+SUMTYPE_MIN = 4
+SUMTYPE_MAX = 5
+SUMTYPE_STDDEV = 6
+SUMTYPE_COUNT = 7
 
 METHOD_SAMPLES = 0      # as calculated by ML
 METHOD_AREA = 1         # priors set by the relative area
@@ -142,24 +181,24 @@ class RSGISPyUtils (object):
     A class with useful utilities within RSGISLib.
     """
     
-    def getFileExtension(self, format):
+    def getFileExtension(self, gdalformat):
         """
         A function to get the extension for a given file format 
         (NOTE, currently only KEA, GTIFF, HFA, PCI and ENVI are supported).
         """
         ext = ".NA"
-        if format.lower() == "kea":
+        if gdalformat.lower() == "kea":
             ext = ".kea"
-        elif format.lower() == "gtiff":
+        elif gdalformat.lower() == "gtiff":
             ext = ".tif"
-        elif format.lower() == "hfa":
+        elif gdalformat.lower() == "hfa":
             ext = ".img"
-        elif format.lower() == "envi":
+        elif gdalformat.lower() == "envi":
             ext = ".env"
-        elif format.lower() == "pcidsk":
+        elif gdalformat.lower() == "pcidsk":
             ext = ".pix"
         else:
-            raise RSGISPyException("The extension for the format specified is unknown.")
+            raise RSGISPyException("The extension for the gdalformat specified is unknown.")
         return ext
     
     def getGDALFormatFromExt(self, fileName):

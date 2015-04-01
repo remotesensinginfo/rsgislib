@@ -23,6 +23,9 @@
 #ifndef RSGISCalcImageFilters_H
 #define RSGISCalcImageFilters_H
 
+#define _USE_MATH_DEFINES
+#include <cmath>
+
 #include <math.h>
 #include <iostream>
 #include "filtering/RSGISImageFilterException.h"

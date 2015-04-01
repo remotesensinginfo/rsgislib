@@ -256,7 +256,7 @@ namespace rsgis{namespace math{
 		/// Calculates the inverse of a 2 x 2 gsl_matrix
 		
 		// Check for diagonal matrix
-		if(gsl_matrix_get(inMatrix, 0, 1) == 0 and gsl_matrix_get(inMatrix, 1, 0) == 0)
+		if(gsl_matrix_get(inMatrix, 0, 1) == 0 & gsl_matrix_get(inMatrix, 1, 0) == 0)
 		{
 			for(unsigned int i = 0; i < inMatrix->size1; i++) // Loop through matirx rows
 			{
@@ -622,7 +622,7 @@ namespace rsgis{namespace math{
 							{
 								word = strLine.substr(start, i-start);								
 								value = strtod(word.c_str(), NULL);
-								if(isnan(value))
+								if(boost::math::isnan(value))
 								{
 									value = 0;
 								}

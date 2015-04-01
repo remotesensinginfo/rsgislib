@@ -2,8 +2,6 @@ RSGISLib Vector Utils Module
 =================================
 
 .. automodule:: rsgislib.vectorutils
-   :members:
-   :undoc-members:
 
 Geometry
 ---------
@@ -26,6 +24,14 @@ Management
 -----------
 .. autofunction:: rsgislib.vectorutils.polygonsInPolygon
 
+Rasterisation
+-------------
+.. autofunction:: rsgislib.vectorutils.rasterise2Image
+.. autofunction:: rsgislib.vectorutils.copyShapefile2RAT
+
+Image Information
+-----------------
+.. autofunction:: rsgislib.vectorutils.findCommonImgExtent
 
 * :ref:`genindex`
 * :ref:`modindex`

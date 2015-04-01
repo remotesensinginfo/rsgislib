@@ -50,6 +50,7 @@
 #include "img/RSGISCalcRMSE.h"
 #include "img/RSGISApplyFunction.h"
 #include "img/RSGISLinearSpectralUnmixing.h"
+#include "img/RSGISGenHistogram.h"
 
 
 #include "math/RSGISVectors.h"
@@ -69,17 +70,12 @@
 #include <gsl/gsl_linalg.h>
 #include <gsl/gsl_blas.h>
 
-#include "exe/rsgis/RSGISExeImageCalculation.h"
-
 #include "muParser.h"
 
 namespace rsgis{ namespace cmds {
 
-    void executeBandMaths(VariableStruct *variables, unsigned int numVars, std::string outputImage, std::string mathsExpression, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException)
+    void executeBandMaths(VariableStruct *variables, unsigned int numVars, std::string outputImage, std::string mathsExpression, std::string gdalFormat, RSGISLibDataType outDataType, bool useExpAsbandName)throw(RSGISCmdException)
     {
-        std::string *outBandName = new std::string[1];
-        outBandName[0] = mathsExpression;
-
         GDALAllRegister();
         GDALDataset **datasets = NULL;
         rsgis::img::RSGISBandMath *bandmaths = NULL;
@@ -88,6 +84,13 @@ namespace rsgis{ namespace cmds {
 
         try
         {
+            std::string *outBandName = NULL;
+            if(useExpAsbandName)
+            {
+                outBandName  = new std::string[1];
+                outBandName[0] = mathsExpression;
+            }
+            
             rsgis::img::VariableBands **processVaribles = new rsgis::img::VariableBands*[numVars];
             datasets = new GDALDataset*[numVars];
 
@@ -130,7 +133,7 @@ namespace rsgis{ namespace cmds {
             bandmaths = new rsgis::img::RSGISBandMath(1, processVaribles, numVars, muParser);
 
             calcImage = new rsgis::img::RSGISCalcImage(bandmaths, "", true);
-            calcImage->calcImage(datasets, numVars, outputImage, true, outBandName, gdalFormat, RSGIS_to_GDAL_Type(outDataType));
+            calcImage->calcImage(datasets, numVars, outputImage, useExpAsbandName, outBandName, gdalFormat, RSGIS_to_GDAL_Type(outDataType));
 
             for(int i = 0; i < numVars; ++i)
             {
@@ -145,7 +148,10 @@ namespace rsgis{ namespace cmds {
             delete muParser;
             delete bandmaths;
             delete calcImage;
-            delete[] outBandName;
+            if(useExpAsbandName)
+            {
+                delete[] outBandName;
+            }
             //GDALDestroyDriverManager();
         }
         catch(rsgis::RSGISImageException &e)
@@ -167,7 +173,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeImageMaths(std::string inputImage, std::string outputImage, std::string mathsExpression, std::string imageFormat, RSGISLibDataType outDataType)throw(RSGISCmdException)
+    void executeImageMaths(std::string inputImage, std::string outputImage, std::string mathsExpression, std::string imageFormat, RSGISLibDataType outDataType, bool useExpAsbandName)throw(RSGISCmdException)
     {
         GDALAllRegister();
         GDALDataset **datasets = NULL;
@@ -177,6 +183,13 @@ namespace rsgis{ namespace cmds {
 
         try
         {
+            std::string *outBandName = NULL;
+            if(useExpAsbandName)
+            {
+                outBandName  = new std::string[1];
+                outBandName[0] = mathsExpression;
+            }
+            
             datasets = new GDALDataset*[1];
 
             datasets[0] = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
@@ -195,11 +208,17 @@ namespace rsgis{ namespace cmds {
             imageMaths = new rsgis::img::RSGISImageMaths(numRasterBands, muParser);
 
             calcImage = new rsgis::img::RSGISCalcImage(imageMaths, "", true);
-            calcImage->calcImage(datasets, 1, outputImage, false, NULL, imageFormat, RSGIS_to_GDAL_Type(outDataType));
+            calcImage->calcImage(datasets, 1, outputImage, useExpAsbandName, outBandName, imageFormat, RSGIS_to_GDAL_Type(outDataType));
 
             GDALClose(datasets[0]);
             delete[] datasets;
 
+            
+            if(useExpAsbandName)
+            {
+                delete[] outBandName;
+            }
+            
             delete muParser;
             delete imageMaths;
             delete calcImage;
@@ -1366,7 +1385,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeCalculateRMSE(std::string inputImageA, int inputBandA, std::string inputImageB, int inputBandB)throw(RSGISCmdException)
+    double executeCalculateRMSE(std::string inputImageA, int inputBandA, std::string inputImageB, int inputBandB)throw(RSGISCmdException)
     {
         GDALAllRegister();
         GDALDataset **datasetsA = NULL;
@@ -1374,18 +1393,19 @@ namespace rsgis{ namespace cmds {
 
         rsgis::img::RSGISCalcImageSingle *calcImgSingle = NULL;
         rsgis::img::RSGISCalcRMSE *calculateRSME = NULL;
-        double *outRMSE;
-        outRMSE = new double[1];
-
+        
+        double rmse = 0.0;
         std::cout << "Calculating RMSE between: " << inputImageA << " (Band " << inputBandA + 1 << ") and " << inputImageB << " (Band " << inputBandB + 1 << ")" << std::endl;
 
-        try {
-
+        try
+        {
+            double *outRMSE = new double[1];
             datasetsA = new GDALDataset*[1];
             std::cout << inputImageA << std::endl;
             datasetsA[0] = (GDALDataset *) GDALOpenShared(inputImageA.c_str(), GA_ReadOnly);
 
-            if(datasetsA[0] == NULL) {
+            if(datasetsA[0] == NULL)
+            {
                 std::string message = std::string("Could not open image ") + inputImageA;
                 throw rsgis::RSGISImageException(message.c_str());
             }
@@ -1394,7 +1414,8 @@ namespace rsgis{ namespace cmds {
             std::cout << inputImageB << std::endl;
             datasetsB[0] = (GDALDataset *) GDALOpenShared(inputImageB.c_str(), GA_ReadOnly);
 
-            if(datasetsB[0] == NULL) {
+            if(datasetsB[0] == NULL)
+            {
                 std::string message = std::string("Could not open image ") + inputImageB;
                 throw rsgis::RSGISImageException(message.c_str());
             }
@@ -1402,26 +1423,34 @@ namespace rsgis{ namespace cmds {
             calculateRSME = new rsgis::img::RSGISCalcRMSE(1);
             calcImgSingle = new rsgis::img::RSGISCalcImageSingle(calculateRSME);
             calcImgSingle->calcImage(datasetsA, datasetsB, 1, outRMSE, inputBandA, inputBandB);
-
+            
+            rmse = outRMSE[0];
+            
             std::cout << "RMSE = " << outRMSE[0] << std::endl;
 
             delete calculateRSME;
             delete calcImgSingle;
             delete[] outRMSE;
 
-            if(datasetsA != NULL) {
+            if(datasetsA != NULL)
+            {
                 GDALClose(datasetsA [0]);
                 delete[] datasetsA;
             }
 
-            if(datasetsB != NULL) {
+            if(datasetsB != NULL)
+            {
                 GDALClose(datasetsB[0]);
                 delete[] datasetsB;
             }
 
-        } catch(rsgis::RSGISException e) {
+        }
+        catch(rsgis::RSGISException e)
+        {
             throw RSGISCmdException(e.what());
         }
+        
+        return rmse;
     }
 
     void executeApply2VarFunction(std::string inputImage, void *twoVarFunction, std::string outputImage)throw(RSGISCmdException)
@@ -2493,6 +2522,180 @@ namespace rsgis{ namespace cmds {
         }
         
         return outputModeVal;
+    }
+                
+                
+    double executeImageComparison2dHisto(std::string inputImage1, std::string inputImage2, std::string outputImage, std::string gdalFormat, unsigned int img1Band, unsigned int img2Band, unsigned int numBins, double *binWidthImg1, double *binWidthImg2, double img1Min, double img1Max, double img2Min, double img2Max, double img1Scale, double img2Scale, double img1Off, double img2Off, bool normOutput) throw(RSGISCmdException)
+    {
+        double rSq = 0.0;
+        try
+        {
+            GDALAllRegister();
+            GDALDataset **imgDatasets = new GDALDataset*[2];
+            
+            imgDatasets[0] = (GDALDataset *) GDALOpen(inputImage1.c_str(), GA_ReadOnly);
+            if(imgDatasets[0] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage1;
+                throw RSGISImageException(message.c_str());
+            }
+            
+            imgDatasets[1] = (GDALDataset *) GDALOpen(inputImage2.c_str(), GA_ReadOnly);
+            if(imgDatasets[1] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage2;
+                throw RSGISImageException(message.c_str());
+            }
+            
+            unsigned int numImg1RasterBands = imgDatasets[0]->GetRasterCount();
+            unsigned int numImg2RasterBands = imgDatasets[1]->GetRasterCount();
+            
+            unsigned int img1BandIdx = 0;
+            unsigned int img2BandIdx = 0;
+            
+            if((img1Band == 0) | (img1Band > numImg1RasterBands))
+            {
+                throw RSGISImageException("Image Band is not within image 1");
+            }
+            if((img2Band == 0) | (img2Band > numImg2RasterBands))
+            {
+                throw RSGISImageException("Image Band is not within image 1");
+            }
+            img1BandIdx = img1Band - 1;
+            img2BandIdx = (numImg1RasterBands + img2Band) - 1;
+            
+            //std::cout << "Image 1 Band Index (Band " << img1Band << ") = " << img1BandIdx << std::endl;
+            //std::cout << "Image 2 Band Index (Band " << img2Band << ") = " << img2BandIdx << std::endl;
+            
+            double img1Range = (img1Off+(img1Max*img1Scale)) - (img1Off+(img1Min*img1Scale));
+            double img2Range = (img1Off+(img2Max*img2Scale)) - (img1Off+(img2Min*img1Scale));
+            
+            *binWidthImg1 = img1Range/(numBins-1);
+            *binWidthImg2 = img2Range/(numBins-1);
+            
+            double **histgramMatrix = new double*[numBins];
+            for(unsigned int i = 0; i < numBins; ++i)
+            {
+                histgramMatrix[i] = new double[numBins];
+                for(unsigned int j = 0; j < numBins; ++j)
+                {
+                    histgramMatrix[i][j] = 0.0;
+                }
+            }
+            double *img1Bins = new double[numBins+1];
+            for(unsigned int i = 0; i < numBins; ++i)
+            {
+                if(i == 0)
+                {
+                    img1Bins[i] = img1Min;
+                }
+                else
+                {
+                    img1Bins[i] = img1Bins[i-1] + (*binWidthImg1);
+                    //std::cout << "Image 1 Bin " << i << "[" << img1Bins[i-1] << ", " << img1Bins[i] << "]\n";
+                }
+            }
+            img1Bins[numBins] = img1Bins[numBins-1] + (*binWidthImg1);
+            //std::cout << "Image 1 Bin " << numBins << "[" << img1Bins[numBins-1] << ", " << img1Bins[numBins] << "]\n";
+            
+            double *img2Bins = new double[numBins+1];
+            for(unsigned int i = 0; i < numBins; ++i)
+            {
+                if(i == 0)
+                {
+                    img2Bins[i] = img2Min;
+                }
+                else
+                {
+                    img2Bins[i] = img2Bins[i-1] + (*binWidthImg2);
+                    //std::cout << "Image 2 Bin " << i << "[" << img1Bins[i-1] << ", " << img1Bins[i] << "]\n";
+                }
+            }
+            img2Bins[numBins] = img2Bins[numBins-1] + (*binWidthImg2);
+            //std::cout << "Image 2 Bin " << numBins << "[" << img1Bins[numBins-1] << ", " << img1Bins[numBins] << "]\n";
+            
+            rsgis::img::RSGISGenHistogram genHist;
+            genHist.gen2DHistogram(imgDatasets, 2, img1BandIdx, img2BandIdx, histgramMatrix, numBins, img1Bins, img2Bins, img1Scale, img2Scale, img1Off, img2Off, &rSq);
+            
+            if(normOutput)
+            {
+                double histSum = 0.0;
+                for(unsigned int i = 0; i < numBins; ++i)
+                {
+                    for(unsigned int j = 0; j < numBins; ++j)
+                    {
+                        histSum += histgramMatrix[i][j];
+                    }
+                }
+                
+                for(unsigned int i = 0; i < numBins; ++i)
+                {
+                    for(unsigned int j = 0; j < numBins; ++j)
+                    {
+                        histgramMatrix[i][j] = histgramMatrix[i][j] / histSum;
+                    }
+                }
+            }
+            
+            double *transformation = new double[6];
+            transformation[0] = 1;
+            transformation[1] = 1;
+            transformation[2] = 0;
+            transformation[3] = 1;
+            transformation[4] = 0;
+            transformation[5] = -1;
+            
+            std::vector<std::string> bandNames;
+            bandNames.push_back("Histogram");
+            
+            rsgis::img::RSGISImageUtils imgUtils;
+            GDALDataset *outImgDS = NULL;
+            if(normOutput)
+            {
+                outImgDS = imgUtils.createBlankImage(outputImage, transformation, numBins, numBins, 1, "", 0.0, bandNames, gdalFormat, GDT_Float32);
+            }
+            else
+            {
+                outImgDS = imgUtils.createBlankImage(outputImage, transformation, numBins, numBins, 1, "", 0.0, bandNames, gdalFormat, GDT_UInt32);
+            }
+            delete[] transformation;
+            
+            GDALRasterBand *outImgGDALBand = outImgDS->GetRasterBand(1);
+            for(unsigned int i = 0; i < numBins; ++i)
+            {
+                //histgramMatrix[(numBins-1)-i] - reverse y axis.
+                outImgGDALBand->RasterIO(GF_Write, 0, i, numBins, 1, histgramMatrix[i], numBins, 1, GDT_Float64, 0, 0);
+            }
+            
+            // Tidy up
+            GDALClose(outImgDS);
+            GDALClose(imgDatasets[0]);
+            GDALClose(imgDatasets[1]);
+            delete[] imgDatasets;
+            
+            delete[] img1Bins;
+            delete[] img2Bins;
+            for(unsigned int i = 0; i < numBins; ++i)
+            {
+                delete[] histgramMatrix[i];
+            }
+            delete[] histgramMatrix;
+            
+        }
+        catch (RSGISImageException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (RSGISException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        
+        return rSq;
     }
                 
 }}

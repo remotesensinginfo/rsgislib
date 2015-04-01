@@ -92,6 +92,38 @@ namespace rsgis{namespace img{
 			delete applyMask;
 		}
 	}
+    
+    void RSGISMaskImage::genFiniteImgMask(GDALDataset *dataset, std::string outputImage, std::string imageFormat)throw(RSGISImageCalcException,RSGISImageBandException)
+    {
+        RSGISCalcImage *calcImg = NULL;
+        try
+        {
+            RSGISCreateFiniteImageMask createMask = RSGISCreateFiniteImageMask();
+            calcImg = new RSGISCalcImage(&createMask, "", true);
+            calcImg->calcImage(&dataset, 1, outputImage, false, NULL, imageFormat, GDT_Byte);
+        }
+        catch(RSGISImageCalcException e)
+        {
+            if(calcImg != NULL)
+            {
+                delete calcImg;
+            }
+            throw e;
+        }
+        catch(RSGISImageBandException e)
+        {
+            if(calcImg != NULL)
+            {
+                delete calcImg;
+            }
+            throw e;
+        }
+        
+        if(calcImg != NULL)
+        {
+            delete calcImg;
+        }
+    }
 	
 	RSGISApplyImageMask::RSGISApplyImageMask(int numberOutBands, double outputValue, double maskValue) : RSGISCalcImageValue(numberOutBands)
 	{
@@ -146,5 +178,39 @@ namespace rsgis{namespace img{
 	{
 		
 	}
+    
+    
+ 
+    RSGISCreateFiniteImageMask::RSGISCreateFiniteImageMask() :RSGISCalcImageValue(1)
+    {
+        
+    }
+    
+    void RSGISCreateFiniteImageMask::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+    {
+        bool finiteVal = true;
+        for(int i = 0; i < numBands; ++i)
+        {
+            if(!boost::math::isfinite(bandValues[i]))
+            {
+                finiteVal = false;
+            }
+        }
+        
+        if(finiteVal)
+        {
+            output[0] = 1;
+        }
+        else
+        {
+            output[0] = 0;
+        }
+    }
+    
+    RSGISCreateFiniteImageMask::~RSGISCreateFiniteImageMask()
+    {
+        
+    }
+    
 	
 }}

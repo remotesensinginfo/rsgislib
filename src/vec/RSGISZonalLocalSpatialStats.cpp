@@ -79,7 +79,7 @@ namespace rsgis{namespace vec{
 			{
 				for (double y = 0 - looksY; y <= 0 + looksY; y++) // Move in y direction
 				{
-					if(x == 0 and y == 0) // For centre pixel use previously calculated average
+					if((x == 0) & (y == 0)) // For centre pixel use previously calculated average
 					{
 						for (int i = 1; i < dataSize; i++) 
 						{

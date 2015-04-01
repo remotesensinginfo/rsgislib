@@ -50,6 +50,14 @@
 
 namespace rsgis{namespace rastergis{
     
+    enum DllExport RSGISLogicExpType
+    {
+        rsgis_expNA = 0,
+        rsgis_singlecolthres = 1,
+        rsgis_multicols = 2,
+        rsgis_singlecol = 3
+    };
+    
     struct DllExport RSGISColumnLogicIdxs
     {
         std::string column1Name;
@@ -60,8 +68,8 @@ namespace rsgis{namespace rastergis{
         double col2Val;
         double thresholdVal;
         bool useThreshold;
+        bool singleCol;
     };
-    
     
     class DllExport RSGISRATLogicXMLParse
     {

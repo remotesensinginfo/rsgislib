@@ -49,7 +49,7 @@ namespace rsgis{namespace rastergis{
             
             double maxVal = 0;
             int nLastProgress = -1;
-            dataset->GetRasterBand(ratBand)->ComputeStatistics(false, NULL, &maxVal, NULL, NULL, RSGISRATStatsTextProgress, &nLastProgress);
+            dataset->GetRasterBand(ratBand)->ComputeStatistics(false, NULL, &maxVal, NULL, NULL,  (GDALProgressFunc)RSGISRATStatsTextProgress, &nLastProgress);
             
             if(maxVal > numRows)
             {                

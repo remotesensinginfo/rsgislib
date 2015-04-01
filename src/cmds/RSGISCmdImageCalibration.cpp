@@ -923,11 +923,16 @@ namespace rsgis{ namespace cmds {
             unsigned int i = 0;
             for(std::vector<rsgis::cmds::CmdsSPOTRadianceGainsOffsets>::iterator iterBands = spot5RadGainOffs.begin(); iterBands != spot5RadGainOffs.end(); ++iterBands)
             {
+                if(((*iterBands).band < 1) | ((*iterBands).band > 4))
+                {
+                    throw RSGISImageException("Image bands must be between 1 and 4.");
+                }
+                
                 spot5RadGainOffsInternal[i].band = (*iterBands).band;
                 spot5RadGainOffsInternal[i].gain = (*iterBands).gain;
                 spot5RadGainOffsInternal[i].bias = (*iterBands).bias;
                 
-                outBandNames[i] = (*iterBands).bandName;
+                outBandNames[spot5RadGainOffsInternal[i].band-1] = (*iterBands).bandName;
                 ++i;
             }
             

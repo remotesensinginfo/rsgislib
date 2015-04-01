@@ -40,6 +40,9 @@
 #include "rastergis/RSGISRATCalcValue.h"
 #include "rastergis/RSGISRATCalc.h"
 
+#include "math/RSGISMathsUtils.h"
+#include "math/RSGISFitGaussianMixModel.h"
+
 #include "gdal_priv.h"
 #include "ogrsf_frmts.h"
 #include "ogr_api.h"
@@ -54,6 +57,7 @@ namespace rsgis{namespace rastergis{
         meanMethod = 3,
     };
     
+
     class DllExport RSGISSelectClumpsOnGrid
     {
     public:
@@ -108,6 +112,56 @@ namespace rsgis{namespace rastergis{
         unsigned int *selectIdx;
         unsigned int numIdxes;
     };
+    
+    
+    
+    class DllExport RSGISStatsSamplingClumps
+    {
+    public:
+        RSGISStatsSamplingClumps();
+        void histogramSampling(GDALDataset *clumpsDataset, std::string varCol, std::string outSelectCol, float propOfSample, float binWidth, bool classRestrict=false, std::string classColumn="", std::string classVal="", unsigned int ratBand=1)throw(rsgis::RSGISAttributeTableException);
+        ~RSGISStatsSamplingClumps();
+    };
+    
+    
+    class DllExport RSGISCalcClassMinMax : public RSGISRATCalcValue
+    {
+    public:
+        RSGISCalcClassMinMax(bool useClassName, std::string className, double *minVal, double *maxVal, size_t *numVals);
+        void calcRATValue(size_t fid, double *inRealCols, unsigned int numInRealCols, int *inIntCols, unsigned int numInIntCols, std::string *inStringCols, unsigned int numInStringCols, double *outRealCols, unsigned int numOutRealCols, int *outIntCols, unsigned int numOutIntCols, std::string *outStringCols, unsigned int numOutStringCols) throw(RSGISAttributeTableException);
+        ~RSGISCalcClassMinMax();
+    private:
+        bool useClassName;
+        std::string className;
+        double *minVal;
+        double *maxVal;
+        bool firstVal;
+        size_t *numVals;
+    };
+    
+    
+    class DllExport RSGISCalcGenVecPairs : public RSGISRATCalcValue
+    {
+    public:
+        RSGISCalcGenVecPairs(bool useClassName, std::string className, std::vector<std::pair<size_t, double> > *dataPairs);
+        void calcRATValue(size_t fid, double *inRealCols, unsigned int numInRealCols, int *inIntCols, unsigned int numInIntCols, std::string *inStringCols, unsigned int numInStringCols, double *outRealCols, unsigned int numOutRealCols, int *outIntCols, unsigned int numOutIntCols, std::string *outStringCols, unsigned int numOutStringCols) throw(RSGISAttributeTableException);
+        ~RSGISCalcGenVecPairs();
+    private:
+        bool useClassName;
+        std::string className;
+        std::vector<std::pair<size_t, double> > *dataPairs;
+    };
+    
+    
+    class DllExport RSGISSelectClumpsGMMSplit
+    {
+    public:
+        RSGISSelectClumpsGMMSplit();
+        void splitClassUsingGMM(GDALDataset *clumpsDataset, std::string outCol, std::string varCol, float binWidth, std::string classColumn, std::string classVal, unsigned int ratBand=1)throw(RSGISAttributeTableException);
+        ~RSGISSelectClumpsGMMSplit();
+    };
+    
+    
     
     
 }}

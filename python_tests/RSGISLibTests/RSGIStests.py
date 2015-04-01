@@ -26,10 +26,13 @@
 # Email: sec14@aber.ac.uk
 # Date: 30/07/2013
 # Version: 1.0
-#
+# Version: 1.1 - Data copying now has Windows support.
+# Version: 1.2 - Updated to use argparse
 #############################################################################
 
 import sys, os
+import shutil
+import argparse
 import collections
 try:
     import rsgislib
@@ -43,6 +46,7 @@ try:
     from rsgislib import segmentation
     from rsgislib.segmentation import segutils
     from rsgislib.imagecalc import BandDefn
+    from rsgislib import tools
 except ImportError as err:
     print(err)
     sys.exit()
@@ -74,21 +78,27 @@ class RSGISTests:
     def copyData(self):
         """ Copy data files from original directory to test directory """
         print("COPYING DATA")
-        os.system('cp ./RATS/injune_p142_casi_sub_utm_segs_nostats.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_cptab.kea')
-        os.system('cp ./RATS/injune_p142_casi_sub_utm_segs_nostats.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_cpcols.kea')
-        os.system('cp ./RATS/injune_p142_casi_sub_utm_segs_nostats.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_spatloc_eucdist.kea')
-        os.system('cp ./RATS/injune_p142_casi_sub_utm_segs_nostats.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_popstats.kea')
-        os.system('cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_neighbours.kea')
-        os.system('cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_borlen.kea')
-        os.system('cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_borlen.kea')
-        os.system('cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_shape.kea')
-        os.system('cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_col.kea')
-        os.system('cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_col_str.kea')
-        os.system('cp ./RATS/injune_p142_casi_sub_utm_segs.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_change.kea')
-        os.system('cp ./Rasters/injune_p142_casi_sub_utm.kea ./TestOutputs/injune_p142_casi_sub_utm.kea')
+        shutil.copy2('RATS/injune_p142_casi_sub_utm_segs_nostats.kea', 'TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_cptab.kea')
+        shutil.copy2('RATS/injune_p142_casi_sub_utm_segs_nostats.kea', 'TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_cpcols.kea')
+        shutil.copy2('RATS/injune_p142_casi_sub_utm_segs_nostats.kea', 'TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_spatloc_eucdist.kea')
+        shutil.copy2('RATS/injune_p142_casi_sub_utm_segs_nostats.kea', 'TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_popstats.kea')
+        shutil.copy2('RATS/injune_p142_casi_sub_utm_segs.kea', 'TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_neighbours.kea')
+        shutil.copy2('RATS/injune_p142_casi_sub_utm_segs.kea', 'TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_borlen.kea')
+        shutil.copy2('RATS/injune_p142_casi_sub_utm_segs.kea', 'TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_borlen.kea')
+        shutil.copy2('RATS/injune_p142_casi_sub_utm_segs.kea', 'TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_shape.kea')
+        shutil.copy2('RATS/injune_p142_casi_sub_utm_segs.kea', 'TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_col.kea')
+        shutil.copy2('RATS/injune_p142_casi_sub_utm_segs.kea', 'TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_col_str.kea')
+        shutil.copy2('RATS/injune_p142_casi_sub_utm_segs.kea', 'TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_change.kea')
+        shutil.copy2('Rasters/injune_p142_casi_sub_utm.kea', 'TestOutputs/injune_p142_casi_sub_utm.kea')
         
-        os.system('cp ./RATS/injune_p142_casi_sub_utm_segs_nostats.kea ./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_nostats_addstats.kea')
-        os.system('cp ./Vectors/injune_p142_psu_utm.* ./TestOutputs/')
+        shutil.copy2('RATS/injune_p142_casi_sub_utm_segs_nostats.kea', 'TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_nostats_addstats.kea')
+        shutil.copy2('Vectors/injune_p142_psu_utm.dbf', 'TestOutputs/')
+        shutil.copy2('Vectors/injune_p142_psu_utm.prj', 'TestOutputs/')
+        shutil.copy2('Vectors/injune_p142_psu_utm.sbn', 'TestOutputs/')
+        shutil.copy2('Vectors/injune_p142_psu_utm.sbx', 'TestOutputs/')
+        shutil.copy2('Vectors/injune_p142_psu_utm.shp', 'TestOutputs/')
+        shutil.copy2('Vectors/injune_p142_psu_utm.shp_utm.xml', 'TestOutputs/')
+        shutil.copy2('Vectors/injune_p142_psu_utm.shx', 'TestOutputs/')
     
     def checkDIRStructure(self):
         """ Create directory and sub directories for test
@@ -108,10 +118,7 @@ class RSGISTests:
     def removeTestFiles(self):
         """ Removes all files in test directory """
         print('Removing test files')
-        os.system('rm ' + self.testOutputsDIR + '/* 2> /dev/null')
-        os.system('rm ' + self.testRasterGISDIR + '/* 2> /dev/null')
-        os.system('rm ' + self.testTilesDIR + '/* 2> /dev/null')
-        os.system('rm ' + self.testZonalTXTDIR + '/* 2> /dev/null')
+        shutil.rmtree('TestOutputs/')
 
     # Image Calc
 
@@ -293,10 +300,11 @@ class RSGISTests:
     def testBandPercentile(self):
         print("PYTHON TEST: Band Percentile")
         image = path + "Rasters/injune_p142_casi_sub_right_utm.kea"
-        output = path + "TestOutputs/PSU142_bandpercentile"
         percentile = 0.25
         nodata = 0
-        imagecalc.bandPercentile(image, percentile, nodata, True, output)
+        outpercentiles = imagecalc.bandPercentile(image, percentile, nodata)
+        if int(outpercentiles[0]) != 2723:
+            raise Exception('Incorrect percentile value returned. Expected 2723, got {}'.format(outpercentiles[0]))
 
     def testMahalanobisDistWindow(self):
         print("PYTHON TEST: MahalanobisDistWindow")
@@ -853,26 +861,36 @@ class RSGISTests:
         segmentation.segutils.runShepherdSegmentation(inputImage, clumpsFile,
                        meanImage, numClusters=100, minPxls=100)
 
+    # Tools
+    def testMetres2Degrees(self):
+        print(tools.metres_to_degrees(52,1,1))
+
+    def testDegrees2Metres(self):
+        print(tools.degrees_to_metres(52,1,1))
+
 if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--all", action='store_true', default=False, help="Run all tests")
+    parser.add_argument("--imagecalc", action='store_true', default=False, help="Run imagecalc tests")
+    parser.add_argument("--imagefilter", action='store_true', default=False, help="Run imagefilter tests")
+    parser.add_argument("--imageregistration", action='store_true', default=False, help="Run imageregistration tests")
+    parser.add_argument("--imageutils", action='store_true', default=False, help="Run imageutils tests")
+    parser.add_argument("--rastergis", action='store_true', default=False, help="Run rastergis tests")
+    parser.add_argument("--segmentation", action='store_true', default=False, help="Run segmentation tests")
+    parser.add_argument("--tools", action='store_true', default=False, help="Run tools tests")
+    parser.add_argument("--vectorutils", action='store_true', default=False, help="Run vectorutils tests")
+    parser.add_argument("--zonalstats", action='store_true', default=False, help="Run zonalstats tests")
+    args = parser.parse_args() 
 
     t = RSGISTests()
 
-    # Get libraries to test (defaults to all)
-    testLibraries = 'all'
-    
-    if len(sys.argv) >= 2:
-        testLibraries = sys.argv[1].lower()
-        if testLibraries == 'clean':
-            t.removeTestFiles()
-            sys.exit()
-    
     """ Check directory structure and copy Data """
     t.checkDIRStructure()
     t.copyData()
     
-    if testLibraries == 'all' or testLibraries == 'imagecalc':
+    if args.all or args.imagecalc:
         """ ImageCalc functions """
-
         t.tryFuncAndCatch(t.testNormalise1)
         t.tryFuncAndCatch(t.testNormalise2)
         t.tryFuncAndCatch(t.testCorrelation)
@@ -908,10 +926,9 @@ if __name__ == '__main__':
         t.tryFuncAndCatch(t.testMahalanobisDistImg2Window)
         t.tryFuncAndCatch(t.testCalcPxlColStats)
         t.tryFuncAndCatch(t.testPxlColRegression)
-        t.tryFuncAndCatch(t.testCorrelation)
         t.tryFuncAndCatch(t.testCorrelationWindow)
         
-    if testLibraries == 'all' or testLibraries == 'imageutils':
+    if args.all or args.imageutils:
         
         """ ImageUtils functions """
         t.tryFuncAndCatch(t.testCreateTiles)
@@ -927,7 +944,7 @@ if __name__ == '__main__':
         t.tryFuncAndCatch(t.testStretchImage)
         t.tryFuncAndCatch(t.testSetBandNames)
         
-    if testLibraries == 'all' or testLibraries == 'rastergis':
+    if args.all or args.rastergis:
     
         """ RasterGIS functions """
         t.tryFuncAndCatch(t.testCopyGDLATT)
@@ -951,7 +968,7 @@ if __name__ == '__main__':
         t.tryFuncAndCatch(t.testFindChangeClumpsFromStdDev)
         t.tryFuncAndCatch(t.testCopyGDLATTColumns)
         
-    if testLibraries == 'all' or testLibraries == 'zonalstats':
+    if args.all or args.zonalstats:
         
         """ Zonal Stats functions """
         t.tryFuncAndCatch(t.testPointValue2SHP)
@@ -961,7 +978,7 @@ if __name__ == '__main__':
         t.tryFuncAndCatch(t.testPixelVals2TXT)
         t.tryFuncAndCatch(t.testImageZone2HDF)
         
-    if testLibraries == 'all' or testLibraries == 'imageregistration':
+    if args.all or args.imageregistration:
         
         """ Image Registration functions """
         t.tryFuncAndCatch(t.testBasicRegistration)
@@ -971,11 +988,9 @@ if __name__ == '__main__':
         t.tryFuncAndCatch(t.testNNWarp)
         t.tryFuncAndCatch(t.testPolyWarp)
     
-    if testLibraries == 'all' or testLibraries == 'vectorutils':
+    if args.all or args.vectorutils:
         
         """ Vector Utils functions """
-        t.testPolygonsInPolygon()
-        sys.exit()
         t.tryFuncAndCatch(t.testRemoveAttributes)
         t.tryFuncAndCatch(t.testBufferVector)
         t.tryFuncAndCatch(t.testPrintPolyGeom)
@@ -983,16 +998,22 @@ if __name__ == '__main__':
         t.tryFuncAndCatch(t.testCalcArea)
         t.tryFuncAndCatch(t.testPolygonsInPolygon)
 
-    if testLibraries == 'all' or testLibraries == 'imagefilter':
+    if args.all or args.imagefilter:
         """ Image filter functions """ 
         t.tryFuncAndCatch(t.testFilter)
         #t.tryFuncAndCatch(t.testLeungMalikFilterBank) # Skip as it takes a while
     
-    if testLibraries == 'all' or testLibraries == 'segmentation':
+    if args.all or args.segmentation:
         """ Image filter functions """ 
         t.tryFuncAndCatch(t.testUnionOfClumps)
         t.tryFuncAndCatch(t.testRunShepherdSegmentation)
 
+
+    if args.all or args.tools:
+        t.tryFuncAndCatch(t.testMetres2Degrees)    
+        t.tryFuncAndCatch(t.testDegrees2Metres)    
+
+    t.removeTestFiles()
 
     print("%s TESTS COMPLETED - %s FAILURES LISTED BELOW:"%(t.numTests, len(t.failures)))
     if(len(t.failures)):

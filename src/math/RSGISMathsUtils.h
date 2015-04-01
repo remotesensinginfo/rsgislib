@@ -28,6 +28,8 @@
 #include <math.h>
 #include <stdio.h>
 #include <algorithm>
+#include <vector>
+#include <list>
 
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/lexical_cast.hpp>
@@ -51,7 +53,8 @@ namespace rsgis{namespace math{
 		sumtype_aggregate,
 		sumtype_value,
 		sumtype_histogram,
-        sumtype_median
+        sumtype_median,
+        sumtype_mode
 	};
     
     enum rsgiscomparetype
@@ -66,12 +69,12 @@ namespace rsgis{namespace math{
     
     enum rsgisdistmetrics
     {
-        rsgis_euclidean,
-        rsgis_manhatten,
-        rsgis_mahalanobis,
-        rsgis_minkowski,
-        rsgis_chebyshev,
-        rsgis_mutualinfo
+        rsgis_euclidean = 1,
+        rsgis_manhatten = 2,
+        rsgis_mahalanobis = 3,
+        rsgis_minkowski = 4,
+        rsgis_chebyshev = 5,
+        rsgis_mutualinfo = 6
     };
     
     enum rsgissort
@@ -88,12 +91,19 @@ namespace rsgis{namespace math{
         bool calcSum;
         bool calcStdDev;
         bool calcMedian;
+        bool calcMode;
         double min;
         double max;
         double mean;
         double sum;
         double stdDev;
         double median;
+        double mode;
+    };
+    
+    inline bool comparePairsData(std::pair<size_t, double> firstVal, std::pair<size_t, double> secondVal)
+    {
+        return firstVal.second > secondVal.second;
     };
 	
 	class DllExport RSGISMathsUtils
@@ -123,6 +133,11 @@ namespace rsgis{namespace math{
             void initStatsSummaryValues(RSGISStatsSummary *stats);
             bool angleWithinRange(float angle, float lower, float upper);
             double calcPercentile(float percentile, double *binBounds, double binWidth, unsigned int numBins, unsigned int *hist) throw(RSGISMathException);
+            double* calcMeanVector(double **data, size_t n, size_t m, size_t sMIdx, size_t eMIdx) throw(RSGISMathException);
+            double** calcCovarianceMatrix(double **data, double *meanVec, size_t n, size_t m, size_t sMIdx, size_t eMIdx) throw(RSGISMathException);
+            std::vector<std::pair<size_t, double> >* sampleUseHistogramMethod(std::vector<std::pair<size_t, double> > *inData, double minVal, double maxVal, double binWidth, float propOfPop) throw(RSGISMathException);
+            std::vector<std::pair<size_t, double> >** calcHistogram(std::vector<std::pair<size_t, double> > *inData, double minVal, double maxVal, double binWidth, size_t *numBins) throw(RSGISMathException);
+            std::vector<std::pair<double, double> >* calcHistogram(std::vector<double> *data, double minVal, double maxVal, double binWidth, bool norm) throw(RSGISMathException);
 		};
 	
 }}

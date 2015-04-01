@@ -40,13 +40,34 @@
 
 import sys
 import rsgislib
+import math
 from rsgislib import rastergis
 
+haveGDALPy = True
 try:
     import osgeo.gdal as gdal
-except ImportError:
-    print("ERROR: Couldn't import GDAL python bindings")
-    sys.exit()
+except ImportError as gdalErr:
+    haveGDALPy = False
+
+haveMatPlotLib = True
+try:
+    import matplotlib.pyplot as plt
+    import matplotlib.colors as mClrs
+except ImportError as pltErr:
+    haveMatPlotLib = False   
+    
+haveNumpy = True
+try:
+    import numpy
+except ImportError as numErr:
+    haveNumpy = False
+
+haveHDF5 = True
+try:
+    import h5py
+except ImportError as h5Err:
+    haveHDF5 = False
+
 
 def populateImageStats(inputImage, clumpsFile, outascii=None, threshold=0.0, calcMin=False, calcMax=False, calcSum=False, calcMean=False, calcStDev=False, calcMedian=False, calcCount=False, calcArea=False, calcLength=False, calcWidth=False, calcLengthWidth=False):
     
@@ -72,7 +93,10 @@ Example::
     ratutils.populateImageStats(inputImage, clumpsFile, calcMean=True)
 
     """
-
+    # Check gdal is available
+    if not haveGDALPy:
+        raise Exception("The GDAL python bindings required for this function could not be imported\n\t" + gdalErr)
+    
     # Open image
     dataset = gdal.Open(inputImage, gdal.GA_ReadOnly)
     
@@ -166,3 +190,115 @@ Example::
         t.end()
 
 
+
+
+def calcPlotGaussianHistoModel(clumpsFile, outGausH5File, outHistH5File, outPlotFile, varCol, binWidth, classColumn, classVal, plotTitle):
+    """ Extracts a column from the RAT, masking by a class calculating the histogram and 
+        fitting a Gaussian mixture model to the histogram. Outputs include a plot and HDF5
+        files of the histogram and gaussian parameters.
+
+Where:
+
+* clumpsFile - input clumps file with populated RAT.
+* outGausH5File - the output HDF5 file for the Gaussian Mixture Model
+* outHistH5File - the output HDF5 file for the histogram.
+* outPlotFile - the output PDF file for the plot
+* varCol - Column within the RAT for the variable to be used for the histogram
+* binWidth - Bin width for the histogram
+* classColumn - Column where the classes are specified
+* classVal - Class used to mask the input variable
+* plotTitle - title for the plot
+
+Example::
+
+    from rsgislib.rastergis import ratutils
+    
+    clumpsFile = "FrenchGuiana_10_ALL_sl_HH_lee_UTM_mosaic_dB_segs.kea"
+    outGausH5File = "gaufit.h5"
+    outHistH5File = "histfile.h5"
+    outPlotFile = "Plot.pdf"
+    varCol = "HVdB"
+    binWidth = 0.1
+    classColumn = "Classes"
+    classVal = "Mangrove"
+    plotTitle = "HV dB Backscater from Mangroves; French Guiana"
+    
+    ratutils.calcPlotGaussianHistoModel(clumpsFile, outGausH5File, outHistH5File, outPlotFile, varCol, binWidth, classColumn, classVal, plotTitle)
+
+    """
+    # Check numpy is available
+    if not haveNumpy:
+        raise Exception("The numpy module is required for this function could not be imported\n\t" + numErr)
+    # Check gdal is available
+    if not haveGDALPy:
+        raise Exception("The GDAL python bindings required for this function could not be imported\n\t" + gdalErr)
+    # Check matplotlib is available
+    if not haveMatPlotLib:
+        raise Exception("The matplotlib module is required for this function could not be imported\n\t" + pltErr)       
+    # Check hdf5 is available
+    if not haveHDF5:
+        raise Exception("The hdf5 module is required for this function could not be imported\n\t" + h5Err)
+        
+    # Calculate histogram and fit Gaussian Mixture Model
+    rastergis.fitHistGausianMixtureModel(clumps=clumpsFile, outH5File=outGausH5File, outHistFile=outHistH5File, varCol=varCol, binWidth=binWidth, classColumn=classColumn, classVal=classVal)
+    
+    
+    if not h5py.is_hdf5(outGausH5File):
+        raise Exception(outGausH5File + " is not a HDF5 file.")
+        
+    if not h5py.is_hdf5(outHistH5File):
+        raise Exception(outHistH5File + " is not a HDF5 file.")
+
+    gausFile = h5py.File(outGausH5File,'r')
+    gausParams = gausFile['/DATA/DATA']
+    
+    
+    histFile = h5py.File(outHistH5File,'r')
+    histData = histFile['/DATA/DATA']
+    
+    xVals = []
+    xValsHist = []
+    histBins = []
+    
+    for histBin in histData:
+        xValsHist.append(histBin[0]-(binWidth/2))
+        xVals.append(histBin[0])
+        histBins.append(histBin[1])
+            
+    gAmpVals = []
+    gFWHMVals = []
+    gOffVals = []
+    gNoiseVals = []
+    noiseVal = 0.0
+    
+    for gausParam in gausParams:
+        gOffVals.append(gausParam[0])
+        gAmpVals.append(gausParam[1])
+        gFWHMVals.append(gausParam[2])
+        noiseVal = gausParam[3]
+    
+    fig, ax = plt.subplots()
+    histBars = ax.bar(xValsHist, histBins, width=binWidth, color='#A7A7A7', edgecolor='#A7A7A7')
+    
+    predVals = numpy.zeros(len(xVals))
+    for i in range(len(xVals)):
+        gNoiseVals.append(noiseVal)
+        for j in range(len(gOffVals)):
+            predVals[i] = predVals[i] + (gAmpVals[j] * math.exp((-1.0)*(pow(xVals[i] - gOffVals[j], 2)/(2.0 * pow(gFWHMVals[j], 2)))))
+        predVals[i] = predVals[i] + noiseVal
+    
+    ax.plot(xVals, predVals, color='red')
+    ax.plot(xVals, gNoiseVals, color='blue', linestyle='dashed')
+    
+    ax.set_ylabel('Freq.')
+    ax.set_title(plotTitle)
+    plt.savefig(outPlotFile, format='PDF')
+    
+    gausFile.close()
+    histFile.close()
+    
+    
+    
+    
+    
+    

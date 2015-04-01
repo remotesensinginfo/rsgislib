@@ -48,7 +48,7 @@ namespace rsgis{namespace rastergis{
             size_t numRows = rat->GetRowCount();
             double maxClumpID = 0.0;
             int nLastProgress = -1;
-            inputClumps->GetRasterBand(ratBand)->ComputeStatistics(false, NULL, &maxClumpID, NULL, NULL, RSGISRATStatsTextProgress, &nLastProgress);
+            inputClumps->GetRasterBand(ratBand)->ComputeStatistics(false, NULL, &maxClumpID, NULL, NULL,  (GDALProgressFunc)RSGISRATStatsTextProgress, &nLastProgress);
             if(maxClumpID > numRows)
             {
                 numRows = boost::lexical_cast<size_t>(maxClumpID);
@@ -442,7 +442,7 @@ namespace rsgis{namespace rastergis{
             size_t numRows = rat->GetRowCount();
             double maxClumpID = 0.0;
             int nLastProgress = -1;
-            inputClumps->GetRasterBand(ratBand)->ComputeStatistics(false, NULL, &maxClumpID, NULL, NULL, RSGISRATStatsTextProgress, &nLastProgress);
+            inputClumps->GetRasterBand(ratBand)->ComputeStatistics(false, NULL, &maxClumpID, NULL, NULL,  (GDALProgressFunc)RSGISRATStatsTextProgress, &nLastProgress);
             if(maxClumpID > numRows)
             {
                 numRows = boost::lexical_cast<size_t>(maxClumpID);
@@ -451,11 +451,11 @@ namespace rsgis{namespace rastergis{
             double imageValMin = 0.0;
             double imageValMax = 0.0;
             nLastProgress = -1;
-            inputValsImage->GetRasterBand(band)->ComputeStatistics(false, &imageValMin, &imageValMax, NULL, NULL, RSGISRATStatsTextProgress, &nLastProgress);
+            inputValsImage->GetRasterBand(band)->ComputeStatistics(false, &imageValMin, &imageValMax, NULL, NULL,  (GDALProgressFunc)RSGISRATStatsTextProgress, &nLastProgress);
             
             std::cout << "Image Min = " << imageValMin << " Image Max = " << imageValMax << std::endl;
             
-            double imageValsRange = imageValMax - imageValMin;
+            double imageValsRange = (imageValMax - imageValMin) + 1;
             double binWidth = imageValsRange / ((float)numHistBins);
             std::cout << "Image Range = " << imageValsRange << " Bin Width = " << binWidth << " Number of Bins = " << numHistBins << std::endl;
             
@@ -588,7 +588,7 @@ namespace rsgis{namespace rastergis{
             size_t numRows = rat->GetRowCount();
             double maxClumpID = 0.0;
             int nLastProgress = -1;
-            inputClumps->GetRasterBand(ratBand)->ComputeStatistics(false, NULL, &maxClumpID, NULL, NULL, RSGISRATStatsTextProgress, &nLastProgress);
+            inputClumps->GetRasterBand(ratBand)->ComputeStatistics(false, NULL, &maxClumpID, NULL, NULL,  (GDALProgressFunc)RSGISRATStatsTextProgress, &nLastProgress);
             if(maxClumpID > numRows)
             {
                 numRows = boost::lexical_cast<size_t>(maxClumpID);
@@ -965,6 +965,147 @@ namespace rsgis{namespace rastergis{
         }
     }
     
+    void RSGISPopRATWithStats::populateRATWithModeStats(GDALDataset *inputClumps, GDALDataset *inputValsImage, std::string outColsName, bool useNoDataVal, long noDataVal, unsigned int modeBand, unsigned int ratBand)throw(RSGISAttributeTableException)
+    {
+        try
+        {
+            if(ratBand == 0)
+            {
+                throw rsgis::RSGISAttributeTableException("RAT Band must be greater than zero.");
+            }
+            if(ratBand > inputClumps->GetRasterCount())
+            {
+                throw rsgis::RSGISAttributeTableException("RAT Band is larger than the number of bands within the image.");
+            }
+            RSGISRasterAttUtils attUtils;
+            GDALRasterAttributeTable *rat = inputClumps->GetRasterBand(ratBand)->GetDefaultRAT();
+            size_t numRows = rat->GetRowCount();
+            double maxClumpID = 0.0;
+            int nLastProgress = -1;
+            inputClumps->GetRasterBand(ratBand)->ComputeStatistics(false, NULL, &maxClumpID, NULL, NULL,  (GDALProgressFunc)RSGISRATStatsTextProgress, &nLastProgress);
+            if(maxClumpID > numRows)
+            {
+                numRows = boost::lexical_cast<size_t>(maxClumpID);
+                rat->SetRowCount(numRows);
+            }
+            
+            
+            unsigned int modeColIdx = attUtils.findColumnIndexOrCreate(rat, outColsName, GFT_Integer);
+            
+            long modeMin = 0;
+            long modeMax = 0;
+            
+            RSGISCalcImageMinMaxIntVals *calcImgValStatsMinMax = new RSGISCalcImageMinMaxIntVals(&modeMin, &modeMax, useNoDataVal, noDataVal, modeBand);
+            rsgis::img::RSGISCalcImage calcImageStatsMinMax(calcImgValStatsMinMax);
+            calcImageStatsMinMax.calcImage(&inputValsImage, 1, 0);
+            delete calcImgValStatsMinMax;
+            
+            std::cout << "Min " << modeMin << std::endl;
+            std::cout << "Max " << modeMax << std::endl;
+            
+            unsigned int modeRange = (modeMax - modeMin) + 1;
+            
+            std::cout << "Range " << modeRange << std::endl;
+            
+            unsigned long **clumpHists = new unsigned long*[numRows];
+            for(size_t i = 0; i < numRows; ++i)
+            {
+                clumpHists[i] = new unsigned long[modeRange];
+                for(unsigned int j = 0; j < modeRange; ++j)
+                {
+                    clumpHists[i][j] = 0;
+                }
+            }
+            long *modeBinVals = new long[modeRange];
+            for(unsigned int i = 0; i < modeRange; ++i)
+            {
+                modeBinVals[i] = modeMin + i;
+                if(i == 0)
+                {
+                    std::cout << "[" << modeBinVals[i];
+                }
+                else
+                {
+                    std::cout << ", " << modeBinVals[i];
+                }
+            }
+            std::cout << "]\n";
+            
+            GDALDataset **datasets = new GDALDataset*[2];
+            datasets[0] = inputClumps;
+            datasets[1] = inputValsImage;
+            
+            unsigned int ratBandIdx = ratBand-1;
+            unsigned int imgBandIdx = (inputClumps->GetRasterCount()) + (modeBand-1);
+            
+            
+            RSGISCalcClusterModeHistograms *calcImgValStatsHist = new RSGISCalcClusterModeHistograms(clumpHists, modeBinVals, modeRange, useNoDataVal, noDataVal, ratBandIdx, imgBandIdx);
+            rsgis::img::RSGISCalcImage calcImageStatsHist(calcImgValStatsHist);
+            calcImageStatsHist.calcImage(datasets, 2, 0);
+            delete calcImgValStatsHist;
+            delete[] datasets;
+            
+            int *outVal = new int[numRows];
+            long maxCount = 0;
+            int maxCat = 0;
+            for(size_t i = 0; i < numRows; ++i)
+            {
+                //std::cout << i << ":\t[";
+                for(unsigned int j = 0; j < modeRange; ++j)
+                {
+                    if(j == 0)
+                    {
+                        maxCount = clumpHists[i][j];
+                        maxCat = modeBinVals[j];
+                    }
+                    else if(clumpHists[i][j] > maxCount)
+                    {
+                        maxCount = clumpHists[i][j];
+                        maxCat = modeBinVals[j];
+                    }
+                    
+                    /*
+                    if(j == 0)
+                    {
+                        std::cout << clumpHists[i][j];
+                    }
+                    else
+                    {
+                        std::cout << ", " << clumpHists[i][j];
+                    }
+                     */
+                }
+                outVal[i] = maxCat;
+                //std::cout << "] = " << outVal[i] << "\n";
+            }
+            
+            
+            
+            
+            std::cout << "Writing Stats to RAT\n";
+            rat->ValuesIO(GF_Write, modeColIdx, 0, numRows, outVal);
+            
+            
+            for(size_t i = 0; i < numRows; ++i)
+            {
+                delete[] clumpHists[i];;
+            }
+            delete[] clumpHists;
+            delete[] outVal;
+        }
+        catch(RSGISAttributeTableException &e)
+        {
+            throw e;
+        }
+        catch(RSGISException &e)
+        {
+            throw RSGISAttributeTableException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISAttributeTableException(e.what());
+        }
+    }
     
     RSGISPopRATWithStats::~RSGISPopRATWithStats()
     {
@@ -1297,14 +1438,114 @@ namespace rsgis{namespace rastergis{
     
     
     
+
+    RSGISCalcImageMinMaxIntVals::RSGISCalcImageMinMaxIntVals(long *minVal, long *maxVal, bool useNoDataVal, long noDataVal, int band) : rsgis::img::RSGISCalcImageValue(0)
+    {
+        this->minVal = minVal;
+        this->maxVal = maxVal;
+        this->first = true;
+        this->useNoDataVal = useNoDataVal;
+        this->noDataVal = noDataVal;
+        this->band = band;
+    }
+    
+    void RSGISCalcImageMinMaxIntVals::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException)
+    {
+        if(numIntVals == 0)
+        {
+            throw rsgis::img::RSGISImageCalcException("RSGISCalcImageMinMaxIntVals only calcs for int vals, there are none.");
+        }
+        else if(numIntVals < (band-1))
+        {
+            std::cout << "Band = " << band << std::endl;
+            std::cout << "Num Int Vals = " << numIntVals << std::endl;
+            throw rsgis::img::RSGISImageCalcException("Band is not within the dataset.");
+        }
+        
+        if(useNoDataVal && (intBandValues[band-1] == noDataVal))
+        {
+            // ignore
+        }
+        else
+        {
+            if(first)
+            {
+                *minVal = intBandValues[band-1];
+                *maxVal = intBandValues[band-1];
+                first = false;
+            }
+            else if(intBandValues[band-1] < (*minVal))
+            {
+                *minVal = intBandValues[band-1];
+            }
+            else if(intBandValues[band-1] > (*maxVal))
+            {
+                *maxVal = intBandValues[band-1];
+            }
+        }
+        
+        
+    }
+    
+    RSGISCalcImageMinMaxIntVals::~RSGISCalcImageMinMaxIntVals()
+    {
+        
+    }
     
     
+    RSGISCalcClusterModeHistograms::RSGISCalcClusterModeHistograms(unsigned long **clumpHists, long *modeBinVals, unsigned int numBins, bool useNoDataVal, long noDataVal, unsigned int ratBandIdx, unsigned int imgBandIdx): rsgis::img::RSGISCalcImageValue(0)
+    {
+        this->clumpHists = clumpHists;
+        this->modeBinVals = modeBinVals;
+        this->numBins = numBins;
+        this->ratBandIdx = ratBandIdx;
+        this->imgBandIdx = imgBandIdx;
+        this->useNoDataVal = useNoDataVal;
+        this->noDataVal = noDataVal;
+    }
     
-    
-    
-    
-    
-    
+    void RSGISCalcClusterModeHistograms::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException)
+    {
+        if(numIntVals == 0)
+        {
+            throw rsgis::img::RSGISImageCalcException("RSGISCalcImageMinMaxIntVals only calcs for int vals, there are none.");
+        }
+        if(intBandValues[ratBandIdx] > 0)
+        {
+            unsigned long fid = intBandValues[ratBandIdx];
+            long imgVal = intBandValues[imgBandIdx];
+            if(useNoDataVal && (noDataVal == imgVal))
+            {
+                // ignore
+            }
+            else
+            {
+                //std::cout << "FID = " << fid << std::endl;
+                bool found = false;
+                for(unsigned int i = 0; i < numBins; ++i)
+                {
+                    //std::cout << "\t[" << imgVal << " =? " << modeBinVals[i] << "]\n";
+                    if(imgVal == modeBinVals[i])
+                    {
+                        ++clumpHists[fid][i];
+                        //std::cout << "FOUND\t Count = " << clumpHists[fid][i] << std::endl;
+                        found = true;
+                        break;
+                    }
+                }
+                if(!found)
+                {
+                    std::cout << "Image Value = " << imgVal << std::endl;
+                    throw rsgis::img::RSGISImageCalcException("Image value was not within the range of the mode histogram.");
+                }
+            }
+        }
+    }
+
+    RSGISCalcClusterModeHistograms::~RSGISCalcClusterModeHistograms()
+    {
+        
+    }
     
     
 }}

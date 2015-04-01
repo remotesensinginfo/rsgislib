@@ -481,8 +481,22 @@ namespace rsgis{namespace vec{
 		ogrPoly->addRingDirectly(ogrRing);
 
 		return ogrPoly;
-		
 	}
+    
+    OGRPolygon* RSGISVectorUtils::createOGRPolygon(geos::geom::Envelope *env) throw(RSGISVectorException)
+    {
+        OGRPolygon *ogrPoly = new OGRPolygon();
+        
+        OGRLinearRing *ogrRing = new OGRLinearRing();
+        ogrRing->addPoint(env->getMinX(), env->getMaxY(), 0);
+        ogrRing->addPoint(env->getMaxX(), env->getMaxY(), 0);
+        ogrRing->addPoint(env->getMaxX(), env->getMinY(), 0);
+        ogrRing->addPoint(env->getMinX(), env->getMinY(), 0);
+        ogrRing->addPoint(env->getMinX(), env->getMaxY(), 0);
+        ogrPoly->addRingDirectly(ogrRing);
+        
+        return ogrPoly;
+    }
 	
 	OGRPolygon* RSGISVectorUtils::checkCloseOGRPolygon(OGRPolygon *poly) throw(RSGISVectorException)
 	{
@@ -714,5 +728,27 @@ namespace rsgis{namespace vec{
 		
 		return values;
 	}
+    
+    
+    std::vector<std::string>* RSGISVectorUtils::getColumnNames(OGRLayer *layer) throw(RSGISVectorException)
+    {
+        std::vector<std::string> *colNames = new std::vector<std::string>();
+        try
+        {
+            OGRFeatureDefn *ogrFeatDef = layer->GetLayerDefn();
+            int numFields = ogrFeatDef->GetFieldCount();
+            for(int i = 0; i < numFields; ++i)
+            {
+                OGRFieldDefn *fieldDef = ogrFeatDef->GetFieldDefn(i);
+                colNames->push_back(std::string(fieldDef->GetNameRef()));
+            }
+            
+        }
+        catch (RSGISVectorException &e)
+        {
+            throw e;
+        }
+        return colNames;
+    }
 	
 }}

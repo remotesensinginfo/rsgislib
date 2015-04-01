@@ -99,10 +99,10 @@ namespace rsgis{namespace rastergis{
         RSGISRasterAttUtils attUtils;
 
         // Load classes column to memory
-        char **classNamesCol = NULL;
+        std::string *classNamesCol = NULL;
         size_t colLen = 0;
 
-        classNamesCol = attUtils.readStrColumn(attTable, this->classCol, &colLen);
+        classNamesCol = attUtils.readStrColumnStdStr(attTable, this->classCol, &colLen);
 
         if(colLen != this->numRows)
         {
@@ -112,11 +112,8 @@ namespace rsgis{namespace rastergis{
         // Itterate through fields (only load one column to memory at a time)
         for(unsigned int n = 0; n < this->numFields; ++n)
         {
-
             // Load column to memory
-            double *changeFieldCol = NULL;
-
-            changeFieldCol = attUtils.readDoubleColumn(attTable, this->fields->at(n), &colLen);
+            double *changeFieldCol = attUtils.readDoubleColumn(attTable, this->fields->at(n), &colLen);
 
             if(colLen != this->numRows)
             {
@@ -181,7 +178,7 @@ namespace rsgis{namespace rastergis{
             {
                 (*iterClasses)->stddev[n] = sqrt((*iterClasses)->stddev[n] / (*iterClasses)->count);
             }
-            delete changeFieldCol;
+            delete[] changeFieldCol;
         }
 
         // Get thresholds
@@ -198,7 +195,7 @@ namespace rsgis{namespace rastergis{
             ++idx;
         }
 
-        delete classNamesCol;
+        delete[] classNamesCol;
     }
 
     void RSGISFindChangeClumpsStdDevThreshold::calcRATValue(size_t fid, double *inRealCols, unsigned int numInRealCols,
@@ -211,7 +208,7 @@ namespace rsgis{namespace rastergis{
         bool withinClass = false;
 
         std::string className = inStringCols[0];
-
+        
         bool foundClass = false;
         unsigned int classIdx = 0;
         for(std::vector<rsgis::rastergis::RSGISClassChangeFields*>::iterator iterClasses = this->classChangeField->begin(); iterClasses != this->classChangeField->end(); ++iterClasses)
@@ -243,6 +240,10 @@ namespace rsgis{namespace rastergis{
             {
                 outIntCols[0] = 0;
             }
+        }
+        else
+        {
+            outIntCols[0] = 0;
         }
 
     }
@@ -418,7 +419,7 @@ namespace rsgis{namespace rastergis{
             {
                 (*iterClasses)->stddev[n] = sqrt((*iterClasses)->stddev[n] / (*iterClasses)->count);
             }
-            delete changeFieldCol;
+            delete[] changeFieldCol;
         }
     }
 

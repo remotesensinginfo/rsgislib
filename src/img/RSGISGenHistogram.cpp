@@ -127,6 +127,67 @@ namespace rsgis { namespace img {
         return bins;
     }
     
+    void RSGISGenHistogram::gen2DHistogram(GDALDataset **datasets, unsigned int numDS, unsigned int img1BandIdx, unsigned int img2BandIdx, double **histgramMatrix, unsigned int numBins, double *img1Bins, double *img2Bins, double img1Scale, double img2Scale, double img1Off, double img2Off, double *rSq)throw(RSGISImageCalcException)
+    {
+        try
+        {
+            RSGISGen2DHistogramCalcVal *genHists = new RSGISGen2DHistogramCalcVal(img1BandIdx, img2BandIdx, histgramMatrix, numBins, img1Bins, img2Bins, img1Scale, img2Scale, img1Off, img2Off);
+            RSGISCalcImage calcImage = RSGISCalcImage(genHists);
+            calcImage.calcImage(datasets, numDS);
+            delete genHists;
+            
+            double img1Mean = 0.0;
+            double img1N = 0.0;
+            double lclN = 0.0;
+            double binValImg1 = 0.0;
+            for(unsigned int i = 0; i < numBins; ++i)
+            {
+                lclN = 0.0;
+                binValImg1 = img1Bins[i] + ((img1Bins[i+1]-img1Bins[i])/2);
+                for(unsigned int j = 0; j < numBins; ++j)
+                {
+                    lclN += histgramMatrix[i][j];
+                }
+                img1Mean += (lclN * binValImg1);
+                img1N += lclN;
+            }
+            img1Mean = img1Mean / img1N;
+            
+            double img1Diff2Mean = 0.0;
+            double img1DiffImg2 = 0.0;
+            double binValImg2 = 0.0;
+            for(unsigned int i = 0; i < numBins; ++i)
+            {
+                lclN = 0.0;
+                binValImg1 = img1Bins[i] + ((img1Bins[i+1]-img1Bins[i])/2);
+                for(unsigned int j = 0; j < numBins; ++j)
+                {
+                    lclN += histgramMatrix[i][j];
+                    binValImg2 = img2Bins[j] + ((img2Bins[j+1]-img2Bins[j])/2);
+                    for(unsigned int n = 0; n < histgramMatrix[i][j]; ++n)
+                    {
+                        img1DiffImg2 += ((binValImg1 - binValImg2) * (binValImg1 - binValImg2));
+                    }
+                }
+                
+                for(unsigned int n = 0; n < lclN; ++n)
+                {
+                    img1Diff2Mean += ((binValImg1 - img1Mean) * (binValImg1 - img1Mean));
+                }
+            }
+            
+            *rSq = 1 - (img1DiffImg2 / img1Diff2Mean);
+        }
+        catch (RSGISImageCalcException &e)
+        {
+            throw e;
+        }
+        catch (RSGISException &e)
+        {
+            throw e;
+        }
+    }
+    
     RSGISGenHistogram::~RSGISGenHistogram()
     {
         
@@ -224,6 +285,84 @@ namespace rsgis { namespace img {
         
 	}
 	
+    
+    
+    
+    RSGISGen2DHistogramCalcVal::RSGISGen2DHistogramCalcVal(unsigned int img1BandIdx, unsigned int img2BandIdx, double **histgramMatrix, unsigned int numBins, double *img1Bins, double *img2Bins, double img1Scale, double img2Scale, double img1Off, double img2Off): RSGISCalcImageValue(0)
+    {
+        this->img1BandIdx = img1BandIdx;
+        this->img2BandIdx = img2BandIdx;
+        this->histgramMatrix = histgramMatrix;
+        this->numBins = numBins;
+        this->img1Bins = img1Bins;
+        this->img2Bins = img2Bins;
+        this->img1Scale = img1Scale;
+        this->img2Scale = img2Scale;
+        this->img1Off = img1Off;
+        this->img2Off = img2Off;
+    }
+    
+    void RSGISGen2DHistogramCalcVal::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+    {
+        try
+        {
+            if(numBands <= 1)
+            {
+                throw RSGISImageCalcException("Must be at least 2 bands.");
+            }
+            
+            float img1Val = this->img1Off + (bandValues[img1BandIdx]*this->img1Scale);
+            float img2Val = this->img2Off + (bandValues[img2BandIdx]*this->img2Scale);
+            
+            bool foundBinImg1 = false;
+            unsigned int img1Bin = 0;
+            
+            for(unsigned i = 0; i < numBins; ++i)
+            {
+                if((img1Val >= img1Bins[i]) & (img1Val < img1Bins[i+1]))
+                {
+                    img1Bin = i;
+                    foundBinImg1 = true;
+                    break;
+                }
+            }
+            
+            
+            if(foundBinImg1)
+            {
+                unsigned int img2Bin = 0;
+                bool foundBinImg2 = false;
+                for(unsigned i = 0; i < numBins; ++i)
+                {
+                    if((img2Val >= img2Bins[i]) & (img2Val < img2Bins[i+1]))
+                    {
+                        img2Bin = i;
+                        foundBinImg2 = true;
+                        break;
+                    }
+                }
+                
+                if(foundBinImg2)
+                {
+                    this->histgramMatrix[img1Bin][img2Bin] = this->histgramMatrix[img1Bin][img2Bin] + 1;
+                }
+            }
+            
+        }
+        catch (RSGISImageCalcException &e)
+        {
+            throw e;
+        }
+    }
+    
+    RSGISGen2DHistogramCalcVal::~RSGISGen2DHistogramCalcVal()
+    {
+        
+    }
+
+    
+    
+    
 	
 }}
 
