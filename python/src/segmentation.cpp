@@ -491,6 +491,26 @@ static PyObject *Segmentation_IncludeRegionsInClumps(PyObject *self, PyObject *a
     Py_RETURN_NONE;
 }
 
+static PyObject *Segmentation_mergeSegments2Neighbours(PyObject *self, PyObject *args)
+{
+    const char *pszInputClumpsImage, *pszInputSpecImage, *pszOutputImage, *pszGDALFormat, *selectClumpsCol;
+    if( !PyArg_ParseTuple(args, "sssss:relabelClumps", &pszInputClumpsImage, &pszInputSpecImage, &pszOutputImage, &pszGDALFormat, &selectClumpsCol ))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeMergeSelectClumps2Neighbour(std::string(pszInputSpecImage), std::string(pszInputClumpsImage), std::string(pszOutputImage), std::string(pszGDALFormat), std::string(selectClumpsCol));
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
 
 
 // Our list of functions in this module
@@ -653,6 +673,18 @@ static PyMethodDef SegmentationMethods[] = {
 "* regionsImage is a string containing the filepath for the input regions image.\n"
 "* outputClumps is a string containing the name and path of the output clumps image\n"
 "* gdalFormat is a string defining the format of the output image.\n"
+"\n"},
+    
+{"mergeSegments2Neighbours", Segmentation_mergeSegments2Neighbours, METH_VARARGS,
+"segmentation.mergeSegments2Neighbours(clumpsImage, spectralImage, outputClumps, gdalFormat)\n"
+"A function to merge some selected clumps with the neighbours based on colour (spectral) distance.\n"
+"where:\n"
+"\n"
+"* clumpsImage is a string containing the filepath for the input clumps image.\n"
+"* spectralImage is a string containing the filepath for the input image used to define 'distance'.\n"
+"* outputClumps is a string containing the name and path of the output clumps image\n"
+"* gdalFormat is a string defining the format of the output image.\n"
+"* selectClumpsCol is a string defining the binary column for defining the segments to be merged (1 == selected clumps).\n"
 "\n"},
 
     {NULL}        /* Sentinel */

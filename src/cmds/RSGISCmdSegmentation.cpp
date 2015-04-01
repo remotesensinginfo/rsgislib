@@ -40,9 +40,12 @@
 #include "segmentation/RSGISMergeSegmentationTiles.h"
 #include "segmentation/RSGISBottomUpShapeFeatureExtraction.h"
 #include "segmentation/RSGISMergeSegmentations.h"
+#include "segmentation/RSGISMergeSegments.h"
 
 #include "rastergis/RSGISRasterAttUtils.h"
 #include "rastergis/RSGISCalcImageStatsAndPyramids.h"
+#include "rastergis/RSGISExportColumns2Image.h"
+
 
 namespace rsgis{ namespace cmds {
     
@@ -808,6 +811,67 @@ namespace rsgis{ namespace cmds {
         catch (rsgis::RSGISException &e)
         {
             throw RSGISCmdException(e.what());
+        }
+    }
+            
+    void executeMergeSelectClumps2Neighbour(std::string inputImage, std::string clumpsImage, std::string outputImage, std::string imageFormat, std::string selectClumpsCol)throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            GDALDataset *spectralDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+            if(spectralDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            GDALDataset *clumpDataset = (GDALDataset *) GDALOpen(clumpsImage.c_str(), GA_Update);
+            if(clumpDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + clumpsImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            std::cout << "Merge Clumps\n";
+            rsgis::segment::RSGISMergeSegments mergeSegs;
+            mergeSegs.mergeSelectedClumps(clumpDataset, spectralDataset, selectClumpsCol);
+            
+            rsgis::rastergis::RSGISRasterAttUtils attUtils;
+            GDALRasterAttributeTable *gdalATT = clumpDataset->GetRasterBand(1)->GetDefaultRAT();
+            
+            // Get column intex in RAT
+            unsigned int columnIndex = attUtils.findColumnIndex(gdalATT, "OutClumpIDs");
+            
+            rsgis::rastergis::RSGISExportColumns2ImageCalcImage *calcImageVal = new rsgis::rastergis::RSGISExportColumns2ImageCalcImage(1, gdalATT, columnIndex);
+            rsgis::img::RSGISCalcImage calcImage(calcImageVal);
+            
+            calcImage.calcImage(&clumpDataset, 1, 0, outputImage, false, NULL, imageFormat, GDT_Int32);
+            delete calcImageVal;
+            
+            GDALDataset *outputClumpsDS = (GDALDataset *) GDALOpen(outputImage.c_str(), GA_Update);
+            if(outputClumpsDS == NULL)
+            {
+                std::string message = std::string("Could not open image ") + outputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            outputClumpsDS->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
+            
+            rsgis::rastergis::RSGISPopulateWithImageStats popImageStats;
+            popImageStats.populateImageWithRasterGISStats(outputClumpsDS, true, true, true, 1);
+            
+            // Tidy up
+            GDALClose(spectralDataset);
+            GDALClose(clumpDataset);
+            GDALClose(outputClumpsDS);
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw rsgis::cmds::RSGISCmdException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw rsgis::cmds::RSGISCmdException(e.what());
         }
     }
     

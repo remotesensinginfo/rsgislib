@@ -89,6 +89,10 @@ namespace rsgis{ namespace cmds {
     /** Function to include a clumped masked region into an existing segmebtation */
     DllExport void executeIncludeClumpedRegion(std::string inputClumps, std::string inputRegion, std::string outputClumpImage, std::string imageFormat)throw(RSGISCmdException);
     
+    /** Function to merge selected clumps to neighbour with closest values from input image */
+    DllExport void executeMergeSelectClumps2Neighbour(std::string inputImage, std::string clumpsImage, std::string outputImage, std::string imageFormat, std::string selectClumpsCol)throw(RSGISCmdException);
+    
+    
 }}
 
 

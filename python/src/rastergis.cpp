@@ -1828,6 +1828,32 @@ static PyObject *RasterGIS_ClassSplitFitHistGausianMixtureModel(PyObject *self, 
     Py_RETURN_NONE;
 }
 
+static PyObject *RasterGIS_PopulateRATWithPropValidPxls(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    const char *clumpsImage, *inputImage, *outColsName;
+    float noDataVal = 0;
+    unsigned int ratBand = 1;
+    
+    static char *kwlist[] = {"valsimage", "clumps", "outcolsname","nodataval", "ratband", NULL};
+    
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssf|I:populateRATWithPropValidPxls", kwlist, &inputImage, &clumpsImage, &outColsName, &noDataVal, &ratBand))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeCalcPropOfValidPixelsInClump(std::string(inputImage), std::string(clumpsImage), ratBand, std::string(outColsName), noDataVal);
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 static PyMethodDef RasterGISMethods[] = {
     {"populateStats", (PyCFunction)RasterGIS_PopulateStats, METH_VARARGS | METH_KEYWORDS,
 "rastergis.populateStats(clumps=string, addclrtab=boolean, calcpyramids=boolean, ignorezero=boolean, ratband=int)\n"
@@ -2696,6 +2722,18 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"
 "    rastergis.classSplitFitHistGausianMixtureModel(clumps='FrenchGuiana_10_ALL_sl_HH_lee_UTM_mosaic_dB_segs.kea', outCol='MangroveSubClass', varCol='HVdB', binWidth=0.1, classColumn='Classes', classVal='Mangroves')\n"
 "\n\n"},
+{"populateRATWithPropValidPxls", (PyCFunction)RasterGIS_PopulateRATWithPropValidPxls, METH_VARARGS | METH_KEYWORDS,
+    "rastergis.populateRATWithPropValidPxls(valsimage=string, clumps=string, outcolsname=string, nodataval=float, ratband=uint)\n"
+    "Populates the attribute table with the proportion of valid pixels within the clump.\n"
+    "Where:\n"
+    "\n"
+    "* valsimage is a string containing the name of the input image file from which the valid pixels are to be identified\n"
+    "* clumpsImage is a string containing the name of the input clump file to which the proportion will be populated.\n"
+    "* outColsName is a string representing the name for the output column containing the proportion.\n"
+    "* nodataval is a float defining the no data value to be used.\n"
+    "* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated in the clumps image.\n"
+    "\n"},
+    
     {NULL}        /* Sentinel */
 };
 

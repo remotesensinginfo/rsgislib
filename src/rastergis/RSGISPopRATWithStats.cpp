@@ -1107,6 +1107,82 @@ namespace rsgis{namespace rastergis{
         }
     }
     
+    void RSGISPopRATWithStats::populateRATWithPopValidPixels(GDALDataset *inputClumps, GDALDataset *inputValsImage, std::string outColsName, double noDataVal, unsigned int ratBand)throw(RSGISAttributeTableException)
+    {
+        try
+        {
+            if(ratBand == 0)
+            {
+                throw rsgis::RSGISAttributeTableException("RAT Band must be greater than zero.");
+            }
+            if(ratBand > inputClumps->GetRasterCount())
+            {
+                throw rsgis::RSGISAttributeTableException("RAT Band is larger than the number of bands within the image.");
+            }
+            RSGISRasterAttUtils attUtils;
+            GDALRasterAttributeTable *rat = inputClumps->GetRasterBand(ratBand)->GetDefaultRAT();
+            size_t numRows = rat->GetRowCount();
+            double maxClumpID = 0.0;
+            int nLastProgress = -1;
+            inputClumps->GetRasterBand(ratBand)->ComputeStatistics(false, NULL, &maxClumpID, NULL, NULL,  (GDALProgressFunc)RSGISRATStatsTextProgress, &nLastProgress);
+            if(maxClumpID > numRows)
+            {
+                numRows = boost::lexical_cast<size_t>(maxClumpID);
+                rat->SetRowCount(numRows);
+            }
+            
+            unsigned long *numPxls = new unsigned long[numRows];
+            unsigned long *numValidPxls = new unsigned long[numRows];
+            for(size_t i = 0; i < numRows; ++i)
+            {
+                numPxls[i] = 0.0;
+                numValidPxls[i] = 0.0;
+            }
+            GDALDataset **datasets = new GDALDataset*[2];
+            datasets[0] = inputClumps;
+            datasets[1] = inputValsImage;
+            
+            RSGISCalcCountValidPxlValues *calcImgValidPxlStats = new RSGISCalcCountValidPxlValues(numPxls, numValidPxls, numRows, noDataVal, ratBand-1);
+            rsgis::img::RSGISCalcImage calcImageValidPxls(calcImgValidPxlStats);
+            calcImageValidPxls.calcImage(datasets, 1, 1);
+            delete calcImgValidPxlStats;
+            delete[] datasets;
+            
+            double *outVal = new double[numRows];
+            for(size_t i = 0; i < numRows; ++i)
+            {
+                if((numValidPxls[i] > 0) & (numPxls[i] > 0))
+                {
+                    outVal[i] = ((double)numValidPxls[i]) / ((double)numPxls[i]);
+                }
+                else
+                {
+                    outVal[i] = 0.0;
+                }
+                //std::cout << i << ": " << outVal[i] << std::endl;
+            }
+            
+            std::cout << "Writing Stats to RAT\n";
+            attUtils.writeRealColumn(rat, outColsName, outVal, numRows);
+            
+            delete[] numPxls;
+            delete[] numValidPxls;
+            delete[] outVal;
+        }
+        catch(RSGISAttributeTableException &e)
+        {
+            throw e;
+        }
+        catch(RSGISException &e)
+        {
+            throw RSGISAttributeTableException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISAttributeTableException(e.what());
+        }
+    }
+    
     RSGISPopRATWithStats::~RSGISPopRATWithStats()
     {
         
@@ -1543,6 +1619,52 @@ namespace rsgis{namespace rastergis{
     }
 
     RSGISCalcClusterModeHistograms::~RSGISCalcClusterModeHistograms()
+    {
+        
+    }
+    
+    
+    
+    
+    RSGISCalcCountValidPxlValues::RSGISCalcCountValidPxlValues(unsigned long *numPxls, unsigned long *numValidPxls, unsigned long numFeats, double noDataVal, unsigned int ratBandIdx): rsgis::img::RSGISCalcImageValue(0)
+    {
+        this->numPxls = numPxls;
+        this->numValidPxls = numValidPxls;
+        this->numFeats = numFeats;
+        this->noDataVal = noDataVal;
+        this->ratBandIdx = ratBandIdx;
+    }
+    
+    void RSGISCalcCountValidPxlValues::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException)
+    {
+        if(intBandValues[ratBandIdx] > 0)
+        {
+            unsigned long fid = intBandValues[ratBandIdx];
+            
+            bool valid = true;
+            for(unsigned int i = 0; i < numfloatVals; ++i)
+            {
+                if(!boost::math::isfinite(floatBandValues[i]))
+                {
+                    valid = false;
+                    break;
+                }
+                else if(floatBandValues[i] == this->noDataVal)
+                {
+                    valid = false;
+                    break;
+                }
+            }
+            
+            ++this->numPxls[fid];
+            if(valid)
+            {
+                ++this->numValidPxls[fid];
+            }
+        }
+    }
+    
+    RSGISCalcCountValidPxlValues::~RSGISCalcCountValidPxlValues()
     {
         
     }

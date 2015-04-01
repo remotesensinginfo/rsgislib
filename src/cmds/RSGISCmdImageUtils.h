@@ -122,6 +122,8 @@ namespace rsgis{ namespace cmds {
     /** A function to produce a binary image for regions with finite data values */
     DllExport void executeFiniteImageMask(std::string inputImage, std::string outputImage, std::string gdalFormat) throw(RSGISCmdException);
 
+
+    
 }}
 
 
