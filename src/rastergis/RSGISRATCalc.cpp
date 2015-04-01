@@ -220,7 +220,9 @@ namespace rsgis{namespace rastergis{
                     
                     for(unsigned int n = 0; n < numOutStrCols; ++n)
                     {
-                        outStrData[n][j] =  const_cast<char*>(sCalcOutVals[n].c_str());
+                        outStrData[n][j] = new char[sCalcOutVals[n].size()];
+                        strcpy(outStrData[n][j], sCalcOutVals[n].c_str());
+                        //outStrData[n][j] = const_cast<char*>(sCalcOutVals[n].c_str());
                     }
                     
                     ++rowID;
@@ -312,7 +314,9 @@ namespace rsgis{namespace rastergis{
                     
                     for(unsigned int n = 0; n < numOutStrCols; ++n)
                     {
-                        outStrData[n][j] =  const_cast<char*>(sCalcOutVals[n].c_str());
+                        outStrData[n][j] = new char[sCalcOutVals[n].size()];
+                        strcpy(outStrData[n][j], sCalcOutVals[n].c_str());
+                        //outStrData[n][j] =  const_cast<char*>(sCalcOutVals[n].c_str());
                     }
                     
                     ++rowID;

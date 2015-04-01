@@ -38,6 +38,8 @@
 #include <gsl/gsl_eigen.h>
 #include <gsl/gsl_math.h>
 
+#include <boost/math/special_functions/fpclassify.hpp>
+
 namespace rsgis{namespace math{
 	/// Utilities for RSGIS and GSL matrices
     

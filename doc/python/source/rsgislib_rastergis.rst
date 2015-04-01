@@ -9,6 +9,7 @@ Utilities
 ---------
 
 .. autofunction:: rsgislib.rastergis.ratutils.populateImageStats
+.. autofunction:: rsgislib.rastergis.collapseRAT
 
 Attribute Segments
 -------------------
@@ -36,18 +37,34 @@ Attribute Segments
 .. autofunction:: rsgislib.rastergis.spatialLocation
 .. autofunction:: rsgislib.rastergis.specDistMajorityClassifier
 .. autofunction:: rsgislib.rastergis.strClassMajority
+.. autofunction:: rsgislib.rastergis.populateRATWithMode
+
+Sampling
+--------
+.. autofunction:: rsgislib.rastergis.histoSampling
 
 Classification
 --------------
 
 .. autofunction:: rsgislib.rastergis.binaryClassification
 .. autofunction:: rsgislib.rastergis.regionGrowClass
+.. autofunction:: rsgislib.rastergis.regionGrowClassNeighCritera
+
+Extrapolation
+-------------
+.. autofunction:: rsgislib.rastergis.applyKNN
 
 Change Detection
 -----------------
 
 .. autofunction:: rsgislib.rastergis.findChangeClumpsFromStdDev
 .. autofunction:: rsgislib.rastergis.getGlobalClassStats
+.. autofunction:: rsgislib.rastergis.classSplitFitHistGausianMixtureModel
+
+Statistics
+----------
+.. autofunction:: rsgislib.rastergis.fitHistGausianMixtureModel
+.. autofunction:: rsgislib.rastergis.ratutils.calcPlotGaussianHistoModel
 
 Copy & Export
 ----------------
@@ -57,12 +74,12 @@ Copy & Export
 .. autofunction:: rsgislib.rastergis.copyGDALATTColumns
 .. autofunction:: rsgislib.rastergis.copyRAT
 .. autofunction:: rsgislib.rastergis.interpolateClumpValues2Image
+.. autofunction:: rsgislib.rastergis.importVecAtts
 
 Colour Tables
 ---------------
 .. autofunction:: rsgislib.rastergis.colourClasses
 .. autofunction:: rsgislib.rastergis.generateColourTable
-.. autofunction:: rsgislib.rastergis.copyCategoriesColours
 
 
 * :ref:`genindex`

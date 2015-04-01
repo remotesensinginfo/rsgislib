@@ -1808,6 +1808,162 @@ namespace rsgis{namespace img{
 			delete[] ySize;
 		}
 	}
+    
+    void RSGISImageUtils::getImageOverlap(GDALDataset **datasets, int numDS, geos::geom::Envelope *env) throw(RSGISImageBandException)
+    {
+        double **transformations = new double*[numDS];
+        int *xSize = new int[numDS];
+        int *ySize = new int[numDS];
+        for(int i = 0; i < numDS; i++)
+        {
+            transformations[i] = new double[6];
+            datasets[i]->GetGeoTransform(transformations[i]);
+            xSize[i] = datasets[i]->GetRasterXSize();
+            ySize[i] = datasets[i]->GetRasterYSize();
+            //std::cout << "TL [" << transformations[i][0] << "," << transformations[i][3] << "]\n";
+            //std::cout << "Res [" << transformations[i][1] << "," << transformations[i][5] << "]\n";
+        }
+        double rotateX = 0;
+        double rotateY = 0;
+        double minX = 0;
+        double maxX = 0;
+        double tmpMaxX = 0;
+        double minY = 0;
+        double tmpMinY = 0;
+        double maxY = 0;
+        const char *proj = NULL;
+        bool first = true;
+        
+        try
+        {
+            
+            // Calculate Image Overlap.
+            for(int i = 0; i < numDS; i++)
+            {
+                if(first)
+                {
+                    rotateX = transformations[i][2];
+                    rotateY = transformations[i][4];
+                    
+                    if(transformations[i][5] < 0)
+                    {
+                        transformations[i][5] = transformations[i][5] * (-1);
+                    }
+   
+                    minX = transformations[i][0];
+                    maxY = transformations[i][3];
+                    
+                    maxX = minX + (xSize[i] * transformations[i][1]);
+                    minY = maxY - (ySize[i] * transformations[i][5]);
+                    
+                    proj = datasets[i]->GetProjectionRef(); // Get projection of first band in image
+                    
+                    first = false;
+                    
+                    //std::cout << "X: [" << minX << "," << maxX << "]\n";
+                    //std::cout << "Y: [" << minY << "," << maxY << "]\n\n";
+                }
+                else
+                {
+                    if(std::string(datasets[i]->GetProjectionRef()) != std::string(proj))
+                    {
+                        std::cerr << "WARNING: \'" << datasets[i]->GetFileList()[0] << "\' does not have the same projection...\n";
+                    }
+                    
+                    if(transformations[i][2] != rotateX & transformations[i][4] != rotateY)
+                    {
+                        throw RSGISImageBandException("Not all image bands have the same rotation..");
+                    }
+                    
+                    if(transformations[i][0] > minX)
+                    {
+                        minX = transformations[i][0];
+                    }
+                    
+                    if(transformations[i][3] < maxY)
+                    {
+                        maxY = transformations[i][3];
+                    }
+                    
+                    if(transformations[i][5] < 0)
+                    {
+                        transformations[i][5] = transformations[i][5] * (-1);
+                    }
+                    
+                    tmpMaxX = transformations[i][0] + (xSize[i] * transformations[i][1]);
+                    tmpMinY = transformations[i][3] - (ySize[i] * transformations[i][5]);
+                    
+                    if(tmpMaxX < maxX)
+                    {
+                        maxX = tmpMaxX;
+                    }
+                    
+                    if(tmpMinY > minY)
+                    {
+                        minY = tmpMinY;
+                    }
+                    
+                    
+                    //std::cout << "X: [" << transformations[i][0] << "," << tmpMaxX << "]\n";
+                    //std::cout << "Y: [" << tmpMinY << "," << maxY << "]\n";
+                    
+                    //std::cout << "X Overlap: [" << minX << "," << maxX << "]\n";
+                    //std::cout << "Y Overlap: [" << minY << "," << maxY << "]\n\n";
+                }
+            }
+            
+            if(maxX - minX <= 0)
+            {
+                std::cout << "X: [" << minX << ", " << maxX << "]\n";
+                throw RSGISImageBandException("Images do not overlap in the X axis");
+            }
+            
+            if(maxY - minY <= 0)
+            {
+                std::cout << "Y: [" << minY << ", " << maxY << "]\n";
+                throw RSGISImageBandException("Images do not overlap in the Y axis");
+            }
+            
+            env->init(minX, maxX, minY, maxY);
+        }
+        catch(RSGISImageBandException& e)
+        {
+            if(transformations != NULL)
+            {
+                for(int i = 0; i < numDS; i++)
+                {
+                    delete[] transformations[i];
+                }
+                delete[] transformations;
+            }
+            if(xSize != NULL)
+            {
+                delete[] xSize;
+            }
+            if(ySize != NULL)
+            {
+                delete[] ySize;
+            }
+            throw e;
+        }
+        
+        if(transformations != NULL)
+        {
+            for(int i = 0; i < numDS; i++)
+            {
+                delete[] transformations[i];
+            }
+            delete[] transformations;
+        }
+        if(xSize != NULL)
+        {
+            delete[] xSize;
+        }
+        if(ySize != NULL)
+        {
+            delete[] ySize;
+        }
+    }
 	
 	void RSGISImageUtils::getImagesExtent(GDALDataset **datasets, int numDS, int *width, int *height, double *gdalTransform) throw(RSGISImageBandException)
 	{
@@ -4258,6 +4414,68 @@ namespace rsgis{namespace img{
                 }
                 
                 rasterBand->RasterIO(GF_Write, 0, y, width, 1, dataVals, width, 1, GDT_Int32, 0, 0);
+            }
+            
+            delete[] dataVals;
+        }
+        catch(RSGISImageException &e)
+        {
+            throw e;
+        }
+    }
+    
+    void RSGISImageUtils::populateImagePixelsInRange(GDALDataset *image, int minVal, int maxVal, bool singleLine) throw(RSGISImageException)
+    {
+        try
+        {
+            if(minVal >= maxVal)
+            {
+                throw RSGISImageException("Min value must be smaller than Max value.");
+            }
+            
+            unsigned long width = image->GetRasterXSize();
+            unsigned long height = image->GetRasterYSize();
+            unsigned int numBands = image->GetRasterCount();
+            if(numBands != 1)
+            {
+                throw RSGISImageException("Data must only have 1 image band.");
+            }
+            
+            GDALRasterBand *rasterBand = image->GetRasterBand(1);
+            unsigned int *dataVals = new unsigned int[width];
+            
+            for(unsigned int i = 0; i < width; ++i)
+            {
+                dataVals[i] = 0;
+            }
+            
+            int range = maxVal - minVal;
+            int curPxlVal = minVal;
+            int rangeLineCount = 0;
+            
+            for(unsigned long y = 0; y < height; ++y)
+            {
+                if(!singleLine)
+                {
+                    curPxlVal = minVal + rangeLineCount;
+                }
+                
+                for(unsigned long x = 0; x < width; ++x)
+                {
+                    if(curPxlVal > maxVal)
+                    {
+                        curPxlVal = minVal;
+                    }
+                    dataVals[x] = curPxlVal;
+                    ++curPxlVal;
+                }
+                
+                rasterBand->RasterIO(GF_Write, 0, y, width, 1, dataVals, width, 1, GDT_Int32, 0, 0);
+                ++rangeLineCount;
+                if(rangeLineCount > range)
+                {
+                    rangeLineCount = 0;
+                }
             }
             
             delete[] dataVals;

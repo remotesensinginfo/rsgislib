@@ -40,23 +40,23 @@ namespace rsgis{ namespace cmds {
     };
     
     /** A function to generate a slope layer */
-    void executeCalcSlope(std::string demImage, std::string outputImage, RSGISAngleMeasure outAngleUnit, std::string outImageFormat)throw(RSGISCmdException);
+    DllExport void executeCalcSlope(std::string demImage, std::string outputImage, RSGISAngleMeasure outAngleUnit, std::string outImageFormat)throw(RSGISCmdException);
     /** A function to generate an aspect layer */
-    void executeCalcAspect(std::string demImage, std::string outputImage, std::string outImageFormat)throw(RSGISCmdException);
+    DllExport void executeCalcAspect(std::string demImage, std::string outputImage, std::string outImageFormat)throw(RSGISCmdException);
     
     /** A function to categorise an aspect layer */
-    void executeCatagoriseAspect(std::string aspectImage, std::string outputImage, std::string outImageFormat)throw(RSGISCmdException);
+    DllExport void executeCatagoriseAspect(std::string aspectImage, std::string outputImage, std::string outImageFormat)throw(RSGISCmdException);
     
     /** A function to generate a hillshade layer */
-    void executeCalcHillshade(std::string demImage, std::string outputImage, float solarAzimuth, float solarZenith, std::string outImageFormat)throw(RSGISCmdException);
+    DllExport void executeCalcHillshade(std::string demImage, std::string outputImage, float solarAzimuth, float solarZenith, std::string outImageFormat)throw(RSGISCmdException);
     /** A function to generate a shadow mask layer */
-    void executeCalcShadowMask(std::string demImage, std::string outputImage, float solarAzimuth, float solarZenith, float maxHeight, std::string outImageFormat)throw(RSGISCmdException);
+    DllExport void executeCalcShadowMask(std::string demImage, std::string outputImage, float solarAzimuth, float solarZenith, float maxHeight, std::string outImageFormat)throw(RSGISCmdException);
     /** A function to generate a local incidence angle layer given the sun position */
-    void executeCalcLocalIncidenceAngle(std::string demImage, std::string outputImage, float solarAzimuth, float solarZenith, std::string outImageFormat)throw(RSGISCmdException);
+    DllExport void executeCalcLocalIncidenceAngle(std::string demImage, std::string outputImage, float solarAzimuth, float solarZenith, std::string outImageFormat)throw(RSGISCmdException);
     /** A function to generate a local exitance angle layer given a viewers position */
-    void executeCalcLocalExitanceAngle(std::string demImage, std::string outputImage, float azimuth, float zenith, std::string outImageFormat)throw(RSGISCmdException);
+    DllExport void executeCalcLocalExitanceAngle(std::string demImage, std::string outputImage, float azimuth, float zenith, std::string outImageFormat)throw(RSGISCmdException);
     /** A function to filter a DTM using a variable filter with respect to aspect */
-    void executeDTMAspectMedianFilter(std::string demImage, std::string aspectImage, std::string outputImage, float aspectRange, int winHSize, std::string outImageFormat)throw(RSGISCmdException);
+    DllExport void executeDTMAspectMedianFilter(std::string demImage, std::string aspectImage, std::string outputImage, float aspectRange, int winHSize, std::string outImageFormat)throw(RSGISCmdException);
     
 }}
 

@@ -33,3 +33,52 @@ class StatsSummary:
         self.calcMean = calcMean
         self.calcStdDev = calcStdDev
         self.calcMedian = calcMedian
+
+
+def calcNDVI(image, rBand, nBand, outImage, stats=True, gdalFormat='KEA'):
+    """ Helper function to calculate NDVI 
+    
+Where:
+
+* image is a string specifying the input image file.
+* rBand is an int specifying the red band in the input image (band indexing starts at 1)
+* nBand is an int specifying the nir band in the input image (band indexing starts at 1)
+* outImage is a string specifying the output image file.
+* stats is a boolean specifying whether pyramids and stats should be calculated (Default: True)
+* gdalFormat is a string specifing the output image file format (Default: KEA)
+    
+"""
+    from rsgislib import imageutils
+    import rsgislib
+    expression = '(nir-red)/(nir+red)'
+    bandDefns = []
+    bandDefns.append(BandDefn('red', image, rBand))
+    bandDefns.append(BandDefn('nir', image, nBand))
+    bandMath(outImage, expression, gdalFormat, rsgislib.TYPE_32FLOAT, bandDefns)
+    if stats:
+        imageutils.popImageStats(outImage,False,0.,True)
+
+def calcWBI(image, bBand, nBand, outImage, stats=True, gdalFormat='KEA'):
+    """ Helper function to calculate WBI 
+    
+Where:
+
+* image is a string specifying the input image file.
+* bBand is an int specifying the blue band in the input image (band indexing starts at 1)
+* nBand is an int specifying the nir band in the input image (band indexing starts at 1)
+* outImage is a string specifying the output image file.
+* stats is a boolean specifying whether pyramids and stats should be calculated (Default: True)
+* gdalFormat is a string specifing the output image file format (Default: KEA)
+    
+"""
+    from rsgislib import imageutils
+    import rsgislib
+    expression = 'blue/nir'
+    bandDefns = []
+    bandDefns.append(BandDefn('blue', image, bBand))
+    bandDefns.append(BandDefn('nir', image, nBand))
+    bandMath(outImage, expression, gdalFormat, rsgislib.TYPE_32FLOAT, bandDefns)
+    if stats:
+        imageutils.popImageStats(outImage,False,0.,True)
+
+

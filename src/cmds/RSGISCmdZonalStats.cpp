@@ -31,6 +31,7 @@
 #include "math/RSGISMatrices.h"
 
 #include "img/RSGISPixelInPoly.h"
+#include "img/RSGISPixelInPoly.cpp"
 
 #include "vec/RSGISVectorZonalStats.h"
 #include "vec/RSGISZonalStats2Matrix.h"
@@ -46,7 +47,7 @@ namespace rsgis{ namespace cmds {
                            bool force, bool useBandNames, bool shortenBandNames)throw(RSGISCmdException)
     {
         // Convert to absolute path
-        inputVecPolys = boost::filesystem::absolute(inputVecPolys).c_str();
+        inputVecPolys = boost::filesystem::absolute(inputVecPolys).string();
 
         GDALAllRegister();
         OGRRegisterAll();
@@ -197,7 +198,7 @@ namespace rsgis{ namespace cmds {
                            bool ignoreProjection, int pixelInPolyMethodInt, bool shortenBandNames) throw(RSGISCmdException)
     {
         // Convert to absolute path
-        inputVecPolys = boost::filesystem::absolute(inputVecPolys).c_str();
+        inputVecPolys = boost::filesystem::absolute(inputVecPolys).string();
 
         // Convert from int to enum
         rsgis::img::pixelInPolyOption pixelInPolyMethod = rsgis::img::pixelInPolyInt2Enum(pixelInPolyMethodInt);
@@ -495,7 +496,7 @@ namespace rsgis{ namespace cmds {
                               bool ignoreProjection, int pixelInPolyMethodInt) throw(RSGISCmdException)
     {
         // Convert to absolute path
-        inputVecPolys = boost::filesystem::absolute(inputVecPolys).c_str();
+        inputVecPolys = boost::filesystem::absolute(inputVecPolys).string();
 
         rsgis::math::outTXTform  rOutTextForm = rsgis::math::csv;
         if(outtxtform == "mtxt"){rOutTextForm = rsgis::math::mtxt;}
@@ -603,7 +604,7 @@ namespace rsgis{ namespace cmds {
     {
         std::cout.precision(12);
         // Convert to absolute path
-        std::string inputVecPolysFullPath = std::string(boost::filesystem::absolute(inputVecPolys).c_str());
+        std::string inputVecPolysFullPath = std::string(boost::filesystem::absolute(inputVecPolys).string());
 
         GDALAllRegister();
         OGRRegisterAll();
@@ -673,7 +674,7 @@ namespace rsgis{ namespace cmds {
     {
         std::cout.precision(12);
         // Convert to absolute path
-        std::string inputVecPolysFullPath = std::string(boost::filesystem::absolute(inputVecPolys).c_str());
+        std::string inputVecPolysFullPath = std::string(boost::filesystem::absolute(inputVecPolys).string());
         
         GDALAllRegister();
         OGRRegisterAll();

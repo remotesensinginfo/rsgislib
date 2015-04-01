@@ -469,6 +469,29 @@ static PyObject *Segmentation_GenerateRegularGrid(PyObject *self, PyObject *args
 }
 
 
+static PyObject *Segmentation_IncludeRegionsInClumps(PyObject *self, PyObject *args)
+{
+    const char *pszClumpsImage, *pszRegionsImage, *pszOutputImage, *pszGDALFormat;
+
+    if( !PyArg_ParseTuple(args, "ssss:includeRegionsInClumps", &pszClumpsImage, &pszRegionsImage, &pszOutputImage, &pszGDALFormat ))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeIncludeClumpedRegion(std::string(pszClumpsImage), std::string(pszRegionsImage), std::string(pszOutputImage), std::string(pszGDALFormat));
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+
 
 // Our list of functions in this module
 static PyMethodDef SegmentationMethods[] = {
@@ -586,38 +609,50 @@ static PyMethodDef SegmentationMethods[] = {
 "\n"},
 
     {"rmSmallClumps", Segmentation_rmSmallClumps, METH_VARARGS,
-"segmentation.rmSmallClumps(clumpsImage, outputImage, threshold, gdalFormat)\n"
+"segmentation.rmSmallClumps(clumpsImage, outputImage, threshold, gdalformat)\n"
 "A function to remove small clumps and set them with a value of 0 (i.e., no data) \n"
 "where:\n"
 "\n"
 "* clumpsImage is a string containing the name of the input clumps file - note a column called \'Histogram\'.\n"
 "* outputImage is a string containing the name of the output clumps file\n"
 "* threshold is a float containing the area threshold (in pixels)\n"
-"* gdalFormat is a string defining the format of the output image.\n"
+"* gdalformat is a string defining the format of the output image.\n"
 "\n"},
     
     {"meanImage", Segmentation_meanImage, METH_VARARGS,
-"segmentation.meanImage(inputImage, inputClumps, outputImage, gdalFormat, gdaltype)\n"
+"segmentation.meanImage(inputImage, inputClumps, outputImage, gdalformat, datatype)\n"
 "A function to generate an image where with the mean value for each clump. Primarily for visualisation and evaluating segmentation.\n"
 "where:\n"
 "\n"
 "* inputImage is a string containing the name of the input image file from which the mean is taken.\n"
 "* inputClumps is a string containing the name of the input clumps file\n"
 "* outputImage is a string containing the name of the output image.\n"
-"* gdalFormat is a string defining the format of the output image.\n"
-"* gdaltype is an containing one of the values from rsgislib.TYPE_*\n"
+"* gdalformat is a string defining the format of the output image.\n"
+"* datatype is an containing one of the values from rsgislib.TYPE_*\n"
 "\n"},
 
 {"generateRegularGrid", Segmentation_GenerateRegularGrid, METH_VARARGS,
-"segmentation.generateRegularGrid(inputImage, outputClumps, gdalFormat, numXPxls, numYPxls)\n"
+"segmentation.generateRegularGrid(inputImage, outputClumps, gdalformat, numXPxls, numYPxls)\n"
 "A function to generate an image where with the mean value for each clump. Primarily for visualisation and evaluating segmentation.\n"
 "where:\n"
 "\n"
 "* inputImage is a string containing the name of the input image file specifying the dimensions of the output image.\n"
 "* outputClumps is a string containing the name and path of the output clumps image\n"
-"* gdalFormat is a string defining the format of the output image.\n"
+"* gdalformat is a string defining the format of the output image.\n"
 "* numXPxls is the size of the grid cells in the X axis in pixel units.\n"
 "* numYPxls is the size of the grid cells in the Y axis in pixel units.\n"
+"\n"},
+    
+{"includeRegionsInClumps", Segmentation_IncludeRegionsInClumps, METH_VARARGS,
+"segmentation.includeRegionsInClumps(clumpsImage, regionsImage, outputClumps, gdalFormat)\n"
+"A function to include a set of clumped regions within an existing clumps (i.e., segmentation) image.\n"
+"NOTE. You should run the relabelClumps function on the output of this command before using further.\n"
+"where:\n"
+"\n"
+"* clumpsImage is a string containing the filepath for the input clumps image.\n"
+"* regionsImage is a string containing the filepath for the input regions image.\n"
+"* outputClumps is a string containing the name and path of the output clumps image\n"
+"* gdalFormat is a string defining the format of the output image.\n"
 "\n"},
 
     {NULL}        /* Sentinel */

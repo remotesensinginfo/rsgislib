@@ -348,16 +348,18 @@ static PyObject *ImageUtils_PopImageStats(PyObject *self, PyObject *args, PyObje
     Py_RETURN_NONE;
 }
 
-static PyObject *ImageUtils_AssignProj(PyObject *self, PyObject *args)
+static PyObject *ImageUtils_AssignProj(PyObject *self, PyObject *args, PyObject *keywds)
 {
+    static char *kwlist[] = {"inimage", "wktString", "wktFile"};
     const char *pszInputImage;
     std::string pszInputProj = "";
     std::string pszInputProjFile = "";
     bool readWKTFromFile = false;
-    PyObject *pszInputProjObj;
-    PyObject *pszInputProjFileObj;
+    PyObject *pszInputProjObj = Py_None;
+    PyObject *pszInputProjFileObj = Py_None;
     
-    if( !PyArg_ParseTuple(args, "sOO:assignProj", &pszInputImage, &pszInputProjObj, &pszInputProjFileObj))
+
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "s|OO:assignProj", kwlist, &pszInputImage, &pszInputProjObj, &pszInputProjFileObj))
         return NULL;
     
     if(pszInputProjObj == Py_None)
@@ -888,10 +890,64 @@ static PyObject *ImageUtils_OrderImagesUsingPropValidData(PyObject *self, PyObje
     return outImagesList;
 }
 
+
+static PyObject *ImageUtils_GenSamplingGrid(PyObject *self, PyObject *args)
+{
+    const char *pszInputImage, *pszOutputImage, *pszGDALFormat;
+    float pxlRes = 0.0;
+    int minVal = 0;
+    int maxVal = 1;
+    int singleLine = false;
+    
+    if( !PyArg_ParseTuple(args, "sssfiii:genSamplingGrid", &pszInputImage, &pszOutputImage, &pszGDALFormat, &pxlRes, &minVal, &maxVal, &singleLine))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeProduceRegularGridImage(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszGDALFormat), pxlRes, minVal, maxVal, (bool)singleLine);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+
+static PyObject *ImageUtils_GenFiniteMask(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    static char *kwlist[] = {"inimage", "outimage", "format"};
+    const char *pszInputImage = "";
+    const char *pszOutputImage = "";
+    const char *pszGDALFormat = "";
+    
+    
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sss:genFiniteMask", kwlist, &pszInputImage, &pszOutputImage, &pszGDALFormat))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeFiniteImageMask(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszGDALFormat));
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 // Our list of functions in this module
 static PyMethodDef ImageUtilsMethods[] = {
     {"stretchImage", ImageUtils_StretchImage, METH_VARARGS, 
-"imageutils.stretchImage(inputimage, outputimage, saveoutstats, outstatsfile, ignorezeros, onepasssd, gdalformat, outtype, stretchtype, stretchparam)\n"
+"imageutils.stretchImage(inputimage, outputimage, saveoutstats, outstatsfile, ignorezeros, onepasssd, gdalformat, datatype, stretchtype, stretchparam)\n"
 "Stretches (scales) pixel values from 0 - 255, normally for display although also used for normalisation.\n"
 "Where:\n"
 "\n"
@@ -902,7 +958,7 @@ static PyMethodDef ImageUtilsMethods[] = {
 "* ignorezeros is a bool specifying if pixels with a value of zero should be ignored.\n"
 "* onepasssd is a bool specifying if is single pass should be used for calculating standard deviation (faster but less accurate)\n"
 "* gdalformat is a string providing the output gdalformat of the tiles (e.g., KEA).\n"
-"* outtype is a rsgislib.TYPE_* value providing the output data type.\n"
+"* datatype is a rsgislib.TYPE_* value providing the output data type.\n"
 "* stretchtype is a STRETCH_* value providing the type of stretch, options are:\n"
 "\n"
 "   * imageutils.STRETCH_LINEARMINMAX - Stretches between min and max.\n"
@@ -920,8 +976,8 @@ static PyMethodDef ImageUtilsMethods[] = {
 "   inputImage = './Rasters/injune_p142_casi_sub_utm.kea'\n"
 "   outputImage = './TestOutputs/injune_p142_casi_sub_utm_2sd.kea'\n"
 "   gdalformat = 'KEA'\n"
-"   dataType = rsgislib.TYPE_8INT\n"
-"   imageutils.stretchImage(inputImage, outputImage, False, '', True, False, gdalformat, dataType, imageutils.STRETCH_LINEARSTDDEV, 2)\n"
+"   datatype = rsgislib.TYPE_8INT\n"
+"   imageutils.stretchImage(inputImage, outputImage, False, '', True, False, gdalformat, datatype, imageutils.STRETCH_LINEARSTDDEV, 2)\n"
 "\n"},
 
     {"stretchImageWithStats", ImageUtils_StretchImageWithStats, METH_VARARGS, 
@@ -935,7 +991,7 @@ static PyMethodDef ImageUtilsMethods[] = {
 "* ignorezeros is a bool specifying if pixels with a value of zero should be ignored.\n"
 "* onepasssd is a bool specifying if is single pass should be used for calculating standard deviation (faster but less accurate)\n"
 "* gdalformat is a string providing the output gdalformat of the tiles (e.g., KEA).\n"
-"* outtype is a rsgislib.TYPE_* value providing the output data type.\n"
+"* datatype is a rsgislib.TYPE_* value providing the output data type.\n"
 "* stretchtype is a STRETCH_* value providing the type of stretch, options are:\n"
 "\n"
 "   * imageutils.STRETCH_LINEARMINMAX - Stretches between min and max.\n"
@@ -954,12 +1010,12 @@ static PyMethodDef ImageUtilsMethods[] = {
 "   inputImageStats = './Rasters/injune_p142_casi_sub_utm_stats.txt'\n"
 "   outputImage = './TestOutputs/injune_p142_casi_sub_utm_2sd.kea'\n"
 "   gdalformat = 'KEA'\n"
-"   dataType = rsgislib.TYPE_8INT\n"
-"   imageutils.stretchImageWithStats(inputImage, outputImage, inputImageStats, True, False, gdalformat, dataType, imageutils.STRETCH_LINEARSTDDEV, 2)\n"
+"   datatype = rsgislib.TYPE_8INT\n"
+"   imageutils.stretchImageWithStats(inputImage, outputImage, inputImageStats, True, False, gdalformat, datatype, imageutils.STRETCH_LINEARSTDDEV, 2)\n"
 "\n"},
 
     {"maskImage", ImageUtils_maskImage, METH_VARARGS,
-"imageutils.maskImage(inputimage, imagemask, outputimage, gdalformat, type, outvalue, maskvalue)"
+"imageutils.maskImage(inputimage, imagemask, outputimage, gdalformat, datatype, outvalue, maskvalue)"
 "Mask image.\n"
 "Where:\n"
 "\n"
@@ -967,13 +1023,13 @@ static PyMethodDef ImageUtilsMethods[] = {
 "* imagemask is a string\n"
 "* outputimage is a string\n"
 "* gdalformat is a string\n"
-"* type is a rsgislib.TYPE_* value\n"
+"* datatype is a rsgislib.TYPE_* value\n"
 "* outvalue is a float\n"
 "* maskvalue is a float\n"
 "\n"},
 
     {"createTiles", ImageUtils_createTiles, METH_VARARGS,
-"imageutils.createTiles(inputimage, baseimage, width, height, overlap, offsettiling, gdalformat, type, ext)\n"     
+"imageutils.createTiles(inputimage, baseimage, width, height, overlap, offsettiling, gdalformat, datatype, ext)\n"     
 "Create tiles from a larger image, useful for splitting a large image into multiple smaller ones for processing.\n"
 "Where\n"
 "\n"
@@ -984,7 +1040,7 @@ static PyMethodDef ImageUtilsMethods[] = {
 "* overlap is the overlap between tiles, in pixels\n"
 "* offsettiling is a bool, determining if tiles should start halfway into the image\n    useful for generating overlapping sets of tiles.\n"
 "* gdalformat is a string providing the output gdalformat of the tiles (e.g., KEA).\n"
-"* type is a rsgislib.TYPE_* value providing the output data type of the tiles.\n"
+"* datatype is a rsgislib.TYPE_* value providing the output data type of the tiles.\n"
 "* ext is a string providing the extension for the tiles (as required by the specified data type).\n"
 "\nA list of strings containing the filenames is returned.\n"
 "Example::\n"
@@ -997,10 +1053,10 @@ static PyMethodDef ImageUtilsMethods[] = {
 "   height = width\n"
 "   overlap = 5\n"
 "   offsettiling = 0\n"
-"   format = 'KEA'\n"
-"   dataType = rsgislib.TYPE_32INT\n"
+"   gdalformat = 'KEA'\n"
+"   datatype = rsgislib.TYPE_32INT\n"
 "   ext='kea'\n"
-"   imageutils.createTiles(inputImage, outBase, width, height, overlap, offsettiling, gdalformat, dataType, ext)\n"
+"   imageutils.createTiles(inputImage, outBase, width, height, overlap, offsettiling, gdalformat, datatype, ext)\n"
 "\n"},
     
     {"createImageMosaic", ImageUtils_createImageMosaic, METH_VARARGS,
@@ -1032,9 +1088,9 @@ static PyMethodDef ImageUtilsMethods[] = {
 "	skipVal = 0.\n"
 "	skipBand = 1\n"
 "	overlapBehaviour = 0\n"
-"	format = 'KEA'\n"
-"	dataType = rsgislib.TYPE_32FLOAT\n"
-"	imageutils.createImageMosaic(inputList, outImage, backgroundVal, skipVal, skipBand, overlapBehaviour, gdalformat, dataType)\n"
+"	gdalformat = 'KEA'\n"
+"	datatype = rsgislib.TYPE_32FLOAT\n"
+"	imageutils.createImageMosaic(inputList, outImage, backgroundVal, skipVal, skipBand, overlapBehaviour, gdalformat, datatype)\n"
 "\n"},
  
     {"includeImages", ImageUtils_IncludeImages, METH_VARARGS,
@@ -1071,13 +1127,36 @@ static PyMethodDef ImageUtilsMethods[] = {
 "   imageutils.popImageStats(inputImage,True,0.,True)\n"
 "\n"},
     
-    {"assignProj", ImageUtils_AssignProj, METH_VARARGS,
-"rsgislib.imageutils.assignProj(inputImage, wktString, wktStringFile)\n"
+    {"assignProj", (PyCFunction)ImageUtils_AssignProj, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.assignProj(inputImage, wktString, wktFile)\n"
 "Assign a projection to the input GDAL image file.\n"
 "\n"
 "* inputImage is a string containing the name of the input file\n"
 "* wktString is the wkt string to be assigned to the image. If None then it will be read from the wktStringFile.\n"
-"* wktStringFile is a file path to a text file containing the WKT string to be assigned. This is ignored if wktString is not None.\n"
+"* wktFile is a file path to a text file containing the WKT string to be assigned. This is ignored if wktString is not None.\n"
+"\nExample::\n"
+"\n"
+"   from rsgislib import imageutils\n"
+"   wktString = '''PROJCS[\"WGS 84 / UTM zone 55S\",\n"
+"    GEOGCS[\"WGS 84\",\n"
+"        DATUM[\"WGS_1984\",\n"
+"            SPHEROID[\"WGS 84\",6378137,298.257223563,\n"
+"                AUTHORITY[\"EPSG\",\"7030\"]],\n"
+"            AUTHORITY[\"EPSG\",\"6326\"]],\n"
+"        PRIMEM[\"Greenwich\",0],\n"
+"        UNIT[\"degree\",0.0174532925199433],\n"
+"        AUTHORITY[\"EPSG\",\"4326\"]],\n"
+"    PROJECTION[\"Transverse_Mercator\"],\n"
+"    PARAMETER[\"latitude_of_origin\",0],\n"
+"    PARAMETER[\"central_meridian\",147],\n"
+"    PARAMETER[\"scale_factor\",0.9996],\n"
+"    PARAMETER[\"false_easting\",500000],\n"
+"    PARAMETER[\"false_northing\",10000000],\n"
+"    UNIT[\"metre\",1,\n"
+"        AUTHORITY[\"EPSG\",\"9001\"]],\n"
+"    AUTHORITY[\"EPSG\",\"32755\"]]'''\n"
+"   inputImage = './TestOutputs/injune_p142_casi_sub_utm.kea'\n"
+"   imageutils.assignProj(inputImage, wktString)\n"
 "\n"},
     
     {"copyProjFromImage", ImageUtils_CopyProjFromImage, METH_VARARGS,
@@ -1120,13 +1199,13 @@ static PyMethodDef ImageUtilsMethods[] = {
 "\n"},
 
     {"selectImageBands", ImageUtils_SelectImageBands, METH_VARARGS,
-"rsgislib.imageutils.selectImageBands(inputImage, outputImage, gdalformat, type, bands)\n"
+"rsgislib.imageutils.selectImageBands(inputImage, outputImage, gdalformat, datatype, bands)\n"
 "Copy selected image bands from an image to a new image.\n"
 "\n"
 "* inputImage is a string containing the name and path of the input file\n"
 "* outputImage is a string containing the name and path of the output file.\n"
 "* gdalformat is a string providing the gdalformat of the output image (e.g., KEA).\n"
-"* type is a rsgislib.TYPE_* value providing the data type of the output image.\n"
+"* datatype is a rsgislib.TYPE_* value providing the data type of the output image.\n"
 "* bands is a list of integers for the bands in the input image to exported to the output image (Note band count starts at 1)."
 "\nExample::\n"
 "\n"
@@ -1137,7 +1216,7 @@ static PyMethodDef ImageUtilsMethods[] = {
 "\n"},
 
     {"subset", ImageUtils_Subset, METH_VARARGS,
-"imageutils.subset(inputimage, inputvector, outputimage, gdalformat, type)"
+"imageutils.subset(inputimage, inputvector, outputimage, gdalformat, datatype)"
 "Subset an image to the bounding box of a vector.\n"
 "Where:\n"
 "\n"
@@ -1145,7 +1224,7 @@ static PyMethodDef ImageUtilsMethods[] = {
 "* inputvector is a string providing the vector which the image is to be clipped to. \n"
 "* outputimage is a string providing the output image. \n"
 "* gdalformat is a string providing the gdalformat of the output image (e.g., KEA).\n"
-"* type is a rsgislib.TYPE_* value providing the data type of the output image.\n"
+"* datatype is a rsgislib.TYPE_* value providing the data type of the output image.\n"
 "Example::\n"
 "\n"
 "   import rsgislib\n"
@@ -1154,12 +1233,12 @@ static PyMethodDef ImageUtilsMethods[] = {
 "   inputVector = './Vectors/injune_p142_plot_location_utm.shp'\n"
 "   outputImage = './TestOutputs/injune_p142_casi_sub_utm_subset.kea'\n"
 "   gdalformat = 'KEA'\n"
-"   dataType = rsgislib.TYPE_32FLOAT\n"
-"   imageutils.subset(inputImage, inputVector, outputImage, gdalformat, dataType)\n"
+"   datatype = rsgislib.TYPE_32FLOAT\n"
+"   imageutils.subset(inputImage, inputVector, outputImage, gdalformat, datatype)\n"
 "\n"},
 
     {"subset2polys", ImageUtils_Subset2Polys, METH_VARARGS,
-"imageutils.subset(inputimage, inputvector, attribute, baseimage, gdalformat, type, ext)"
+"imageutils.subset(inputimage, inputvector, attribute, baseimage, gdalformat, datatype, ext)"
 "Subset an image to the bounding box of a each polygon in an input vector.\n"
 "Useful for splitting an image into tiles of unequal sizes.\n"
 "Where:\n"
@@ -1169,7 +1248,7 @@ static PyMethodDef ImageUtilsMethods[] = {
 "* attribute is a string providing the attribute in the vector to use for the ouput name\n"
 "* baseimage is a string providing the base name of the output file. The specified attribute of each polygon and extension will be appended."
 "* gdalformat is a string providing the output gdalformat of the subsets (e.g., KEA).\n"
-"* type is a rsgislib.TYPE_* value providing the output data type of the subsets.\n"
+"* datatype is a rsgislib.TYPE_* value providing the output data type of the subsets.\n"
 "* ext is a string providing the extension for the tiles (as required by the specified data gdalformat).\n"
 "\nA list of strings containing the filenames is returned.\n"
 "Example::\n"
@@ -1181,9 +1260,9 @@ static PyMethodDef ImageUtilsMethods[] = {
 "   attribute = 'PLOTNO'\n"
 "   outputImageBase = './TestOutputs/injune_p142_casi_sub_utm_subset_polys_'\n"
 "   gdalformat = 'KEA'\n"
-"   dataType = rsgislib.TYPE_32FLOAT\n"
+"   gdaltype = rsgislib.TYPE_32FLOAT\n"
 "   ext = 'kea'\n"
-"   imageutils.subset2polys(inputImage, inputVector, attribute, outputImageBase, gdalformat, dataType, ext)\n"
+"   imageutils.subset2polys(inputImage, inputVector, attribute, outputImageBase, gdalformat, gdaltype, ext)\n"
 "\n"},
 
     {"subset2img", ImageUtils_Subset2Img, METH_VARARGS,
@@ -1195,7 +1274,7 @@ static PyMethodDef ImageUtilsMethods[] = {
 "* inputvector is a string providing the image which the 'inputimage' is to be clipped to. \n"
 "* outputimage is a string providing the output image. \n"
 "* gdalformat is a string providing the gdalformat of the output image (e.g., KEA).\n"
-"* type is a rsgislib.TYPE_* value providing the data type of the output image.\n"
+"* datatype is a rsgislib.TYPE_* value providing the data type of the output image.\n"
 "Example::\n"
 "\n"
 "   import rsgislib\n"
@@ -1204,8 +1283,8 @@ static PyMethodDef ImageUtilsMethods[] = {
 "   inputVector = './Vectors/injune_p142_plot_location_utm.shp'\n"
 "   outputImage = './TestOutputs/injune_p142_casi_sub_utm_subset.kea'\n"
 "   gdalformat = 'KEA'\n"
-"   dataType = rsgislib.TYPE_32FLOAT\n"
-"   imageutils.subset(inputImage, inputVector, outputImage, gdalformat, dataType)\n"
+"   gdaltype = rsgislib.TYPE_32FLOAT\n"
+"   imageutils.subset(inputImage, inputVector, outputImage, gdalformat, datatype)\n"
 "\n"},
     
     
@@ -1228,12 +1307,12 @@ static PyMethodDef ImageUtilsMethods[] = {
     "   bandNamesList = ['Image1','Image2']\n"
     "   outputImage = './TestOutputs/injune_p142_casi_sub_stack.kea'\n"
     "   gdalformat = 'KEA'\n"
-    "   dataType = rsgislib.TYPE_32FLOAT\n"
-    "   imageutils.stackImageBands(imageList, bandNamesList, outputImage, None, 0, gdalformat, dataType)\n"
+    "   gdaltype = rsgislib.TYPE_32FLOAT\n"
+    "   imageutils.stackImageBands(imageList, bandNamesList, outputImage, None, 0, gdalformat, gdaltype)\n"
     "\n"},
     
 {"createBlankImage", ImageUtils_CreateBlankImage, METH_VARARGS,
-    "imageutils.createBlankImage(outputImage, numBands, width, height, tlX, tlY, res, pxlVal, wktFile, wktString, gdalformat, type)\n"
+    "imageutils.createBlankImage(outputImage, numBands, width, height, tlX, tlY, res, pxlVal, wktFile, wktString, gdalformat, gdaltype)\n"
     "Create a new blank image with the parameters specified.\n"
 	"\n"
     "* outputImage is a string containing the name and path for the outputted image.\n"
@@ -1247,13 +1326,13 @@ static PyMethodDef ImageUtilsMethods[] = {
     "* wktFile is a string specifying the location of a file containing the WKT string representing the coordinate system and projection of the output image (if specified this parameter overrides the wktString parameter).\n"
     "* wktString is a string specifying the WKT string representing the coordinate system and projection of the output image.\n"
     "* gdalformat is a string providing the gdalformat of the output image (e.g., KEA).\n"
-    "* type is a rsgislib.TYPE_* value providing the data type of the output image.\n"
+    "* gdaltype is a rsgislib.TYPE_* value providing the data type of the output image.\n"
     "\nExample::\n"
     "\n"
     "\n"},
 
 {"createCopyImage", ImageUtils_CreateCopyImage, METH_VARARGS,
-    "imageutils.createCopyImage(inputImage, outputImage, numBands, pxlVal, gdalformat, type)\n"
+    "imageutils.createCopyImage(inputImage, outputImage, numBands, pxlVal, gdalformat, datatype)\n"
     "Create a new blank image with the parameters specified.\n"
 	"\n"
     "* inputImage is a string containing the name and path for the input image, which is to be copied.\n"
@@ -1261,18 +1340,18 @@ static PyMethodDef ImageUtilsMethods[] = {
     "* numBands is an integer specifying the number of image bands in the output image.\n"
     "* pxlVal is a float specifying the pixel value of the output image.\n"
     "* gdalformat is a string providing the gdalformat of the output image (e.g., KEA).\n"
-    "* type is a rsgislib.TYPE_* value providing the data type of the output image.\n"
+    "* datatype is a rsgislib.TYPE_* value providing the data type of the output image.\n"
     "\nExample::\n"
     "\n"
     "   inputImage = './Rasters/injune_p142_casi_sub_utm.kea'\n"
     "   outputImage = './TestOutputs/injune_p142_casi_sub_utm_blank.kea'\n"
     "   gdalformat = 'KEA'\n"
-    "   dataType = rsgislib.TYPE_32FLOAT\n"
-    "   imageutils.createCopyImage(inputImage, outputImage, 1, 3, gdalformat, dataType)\n"
+    "   datatype = rsgislib.TYPE_32FLOAT\n"
+    "   imageutils.createCopyImage(inputImage, outputImage, 1, 3, gdalformat, datatype)\n"
     "\n"},
 
 {"stackStats", ImageUtils_StackStats, METH_VARARGS,
-    "imageutils.stackStats(inputImage, outputImage, numBands, stat, gdalformat, type)\n"
+    "imageutils.stackStats(inputImage, outputImage, numBands, stat, gdalformat, datatype)\n"
     "Calculate statistics for every pixel in a stack of image. If all bands are used a single band image is produced with the specified statistics.\n"
     "If a number of bands are specified statistics are taken over every n bands to provide an image with B / n bands (where B is the number of input bands. \
     For example, can be used to produce monthly composite images from a stack with images from every day.\n"
@@ -1282,7 +1361,7 @@ static PyMethodDef ImageUtilsMethods[] = {
     "* numBands is an integer specifying the number of image bands in the output image, pass 'None' to use all bands.\n"
     "* stat is a string providing the statistics to calculate, options are 'mean', 'min', 'max', and 'range'.\n"
     "* gdalformat is a string providing the gdalformat of the output image (e.g., KEA).\n"
-    "* type is a rsgislib.TYPE_* value providing the data type of the output image.\n"
+    "* datatype is a rsgislib.TYPE_* value providing the data type of the output image.\n"
     "\n"
     "Example::\n"
     "\n"
@@ -1291,8 +1370,8 @@ static PyMethodDef ImageUtilsMethods[] = {
     "   inputImage = './Rasters/injune_p142_casi_sub_utm.kea'\n"
     "   outputImage = './TestOutputs/injune_p142_casi_sub_utm_stackStats.kea'\n"
     "   gdalformat = 'KEA'\n"
-    "   dataType = rsgislib.TYPE_32FLOAT\n"
-    "   imageutils.stackStats(inputImage, outputImage, None, 'mean', gdalformat, dataType)\n"
+    "   datatype = rsgislib.TYPE_32FLOAT\n"
+    "   imageutils.stackStats(inputImage, outputImage, None, 'mean', gdalformat, datatype)\n"
     "\n"},
     
 {"orderImageUsingValidPxls", ImageUtils_OrderImagesUsingPropValidData, METH_VARARGS,
@@ -1306,6 +1385,36 @@ static PyMethodDef ImageUtilsMethods[] = {
     "Returns: a list of images ordered, from low to high (i.e., the first image will be the image \n"
     "         with the smallest number of valid image pixels).\n"
     "\n"},
+    
+{"genSamplingGrid", ImageUtils_GenSamplingGrid, METH_VARARGS,
+    "imageutils.genSamplingGrid(InputImage, OutputImage, gdalformat, pxlRes, minVal, maxVal, singleLine)\n"
+    "Generate a regular sampling grid.\n"
+    "\n"
+    "* InputImage is a string specifying an image which defines the area of interest.\n"
+    "* OutputImage is a string specifying an output image location.\n"
+    "* gdalformat is a string providing the gdalformat of the output image (e.g., KEA).\n"
+    "* pxlRes is a float specifying the output image resolution.\n"
+    "* minVal is a minimum value for the output image pixel values.\n"
+    "* maxVal is a maximum value for the output image pixel values.\n"
+    "* singleLine is a boolean specifying whether the image is seen as a single \n"
+    "             line or new line with an offset in the starting value.\n"
+    "\n"},
+    
+{"genFiniteMask", (PyCFunction)ImageUtils_GenFiniteMask, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.genFiniteMask(inimage=string, outimage=string, format=string)\n"
+"Calculate the image statistics and build image pyramids populating the image file.\n"
+"\n"
+"* inimage is a string containing the name of the input file\n"
+"* outimage is a string containing the name of the output file.\n"
+"* format is a string with the GDAL output file format.\n"
+"\n"
+"\nExample::\n"
+"\n"
+"   from rsgislib import imageutils\n"
+"   inputImage = './injune_p142_casi_sub_utm.kea'\n"
+"   outputImage = './injune_p142_casi_sub_utm.kea'\n"
+"   imageutils.genFiniteMask(inputImage, outputImage, \'KEA\')\n"
+"\n"},
 
 
     {NULL}        /* Sentinel */

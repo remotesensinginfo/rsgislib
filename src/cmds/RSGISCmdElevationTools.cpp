@@ -211,9 +211,6 @@ namespace rsgis{ namespace cmds {
                 throw rsgis::RSGISException("The solar azimuth should be between 0 and 360 degrees.");
             }
             
-            solarZenith = 90 - solarZenith;
-            solarAzimuth = solarAzimuth - 180;
-            
             std::cout << "Open " << demImage << std::endl;
             GDALDataset *dataset = (GDALDataset *) GDALOpen(demImage.c_str(), GA_ReadOnly);
             if(dataset == NULL)
@@ -234,6 +231,10 @@ namespace rsgis{ namespace cmds {
             }
             
             delete[] transformation;
+            
+            
+            solarZenith = 90 - solarZenith;
+            solarAzimuth = solarAzimuth - 180;
             
             rsgis::calib::RSGISCalcShadowBinaryMask *calcShadowMask = new rsgis::calib::RSGISCalcShadowBinaryMask(1, dataset, 1, imageEWRes, imageNSRes, solarZenith, solarAzimuth, maxHeight);
             

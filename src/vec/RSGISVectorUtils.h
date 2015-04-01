@@ -78,11 +78,13 @@ namespace rsgis{namespace vec{
 			geos::geom::GeometryCollection* createGeomCollection(std::vector<geos::geom::Polygon*> *polys) throw(RSGISVectorException);
 			geos::geom::Polygon* createPolygon(double tlX, double tlY, double brX, double brY) throw(RSGISVectorException);
 			OGRPolygon* createOGRPolygon(double tlX, double tlY, double brX, double brY) throw(RSGISVectorException);
+            OGRPolygon* createOGRPolygon(geos::geom::Envelope *env) throw(RSGISVectorException);
 			OGRPolygon* checkCloseOGRPolygon(OGRPolygon *poly) throw(RSGISVectorException);
 			OGRPolygon* removeHolesOGRPolygon(OGRPolygon *poly) throw(RSGISVectorException);
             OGRPolygon* removeHolesOGRPolygon(OGRPolygon *poly, float areaThreshold) throw(RSGISVectorException);
 			OGRPolygon* moveOGRPolygon(OGRPolygon *poly, double shiftX, double shiftY, double shiftZ) throw(RSGISVectorException);
 			std::vector<std::string>* findUniqueVals(OGRLayer *layer, std::string attribute) throw(RSGISVectorException);
+            std::vector<std::string>* getColumnNames(OGRLayer *layer) throw(RSGISVectorException);
 		};
 
     

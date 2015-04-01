@@ -144,6 +144,7 @@ namespace rsgis
                 void getImageOverlapCut2Env(GDALDataset **datasets, int numDS,  int **dsOffsets, int *width, int *height, double *gdalTransform, geos::geom::Envelope *env) throw(RSGISImageBandException);
                 void getImageOverlapCut2Env(GDALDataset **datasets, int numDS,  int **dsOffsets, int *width, int *height, double *gdalTransform, geos::geom::Envelope *env, int *maxBlockX, int *maxBlockY) throw(RSGISImageBandException);
 				void getImageOverlap(GDALDataset **datasets, int numDS, int *width, int *height, geos::geom::Envelope *env) throw(RSGISImageBandException);
+                void getImageOverlap(GDALDataset **datasets, int numDS, geos::geom::Envelope *env) throw(RSGISImageBandException);
 				void getImagesExtent(GDALDataset **datasets, int numDS, int *width, int *height, double *gdalTransform) throw(RSGISImageBandException);
                 void getImagesExtent(std::string *inputImages, int numDS, int *width, int *height, double *gdalTransform) throw(RSGISImageBandException);
                 OGREnvelope* getSpatialExtent(GDALDataset *dataset) throw(RSGISImageBandException);                
@@ -175,6 +176,7 @@ namespace rsgis
                 bool closeResTest(double baseRes, double targetRes);
                 double getPixelValue(GDALDataset *image, unsigned int imgBand, double xLoc, double yLoc) throw(RSGISImageException);
                 void createImageGrid(GDALDataset *inData, unsigned int numXPxls, unsigned int numYPxls) throw(RSGISImageException);
+                void populateImagePixelsInRange(GDALDataset *image, int minVal, int maxVal, bool singleLine) throw(RSGISImageException);
                 ~RSGISImageUtils();
 			private:
                 double resDiffThresh; // Maximum difference between image resolutions (as a fraction).

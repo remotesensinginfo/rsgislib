@@ -34,7 +34,9 @@
 # Version 1.0 - Created.
 # Version 1.1 - Update to be included into RSGISLib python modules tree.
 #
-############################################################################
+###########################################################################
+# Import shutil
+import shutil
 # Import the rsgislib module
 import rsgislib
 # Import the image utilities module from rsgislib
@@ -47,14 +49,13 @@ import rsgislib.segmentation
 import rsgislib.rastergis
 # Import the module from rsgislib
 import rsgislib
-import os.path
 import os
 # Import the collections module
 import collections
 import fnmatch
 import osgeo.gdal as gdal
 
-def runShepherdSegmentation(inputImg, outputClumps, outputMeanImg=None, tmpath='.', gdalFormat='KEA', noStats=False, noStretch=False, noDelete=False, numClusters=60, minPxls=100, distThres=100, bands=None, sampling=100, kmMaxIter=200, processInMem=False): 
+def runShepherdSegmentation(inputImg, outputClumps, outputMeanImg=None, tmpath='.', gdalformat='KEA', noStats=False, noStretch=False, noDelete=False, numClusters=60, minPxls=100, distThres=100, bands=None, sampling=100, kmMaxIter=200, processInMem=False): 
     """
 Utility function to call the segmentation algorithm of Shepherd et al. (2014).
 
@@ -93,12 +94,18 @@ Example::
     basefile = os.path.basename(inputImg)
     basename = os.path.splitext(basefile)[0]
     
-    outFileExt = rsgisUtils.getFileExtension(gdalFormat)
+    outFileExt = rsgisUtils.getFileExtension(gdalformat)
     
     createdDIR = False
     if not os.path.isdir(tmpath):
         os.makedirs(tmpath)
         createdDIR = True
+
+    # Get data type of input image
+    gdalDS = gdal.Open(inputImg, gdal.GA_ReadOnly)
+    rsgisUtils = rsgislib.RSGISPyUtils()
+    input_datatype = rsgisUtils.getRSGISLibDataType(gdal.GetDataTypeName(gdalDS.GetRasterBand(1).DataType))
+    gdalDS = None
         
     # Select Image Bands if required
     inputImgBands = inputImg
@@ -106,12 +113,8 @@ Example::
     if not bands == None:
         print("Subsetting the image bands")
         selectBands = True
-        gdalDS = gdal.Open(inputImg, gdal.GA_ReadOnly)
-        rsgisUtils = rsgislib.RSGISPyUtils()
-        dType = rsgisUtils.getRSGISLibDataType(gdal.GetDataTypeName(gdalDS.GetRasterBand(1).DataType))
-        gdalDS = None
         inputImgBands = os.path.join(tmpath,basename+str("_bselect")+outFileExt)
-        rsgislib.imageutils.selectImageBands(inputImg, inputImgBands, gdalFormat, dType, bands)        
+        rsgislib.imageutils.selectImageBands(inputImg, inputImgBands, gdalformat, input_datatype, bands)        
     
     # Stretch input data if required.
     segmentFile = inputImgBands
@@ -121,19 +124,19 @@ Example::
         strchFileOffset = os.path.join(tmpath,basename+str("_stchdonlyOff")+outFileExt)
         strchMaskFile = os.path.join(tmpath,basename+str("_stchdmaskonly")+outFileExt)
         print("Stretch Input Image")
-        rsgislib.imageutils.stretchImage(inputImgBands, strchFile, False, "", True, False, gdalFormat, rsgislib.TYPE_32FLOAT, rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
+        rsgislib.imageutils.stretchImage(inputImgBands, strchFile, False, "", True, False, gdalformat, rsgislib.TYPE_8INT, rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
         
         print("Add 1 to stretched file to ensure there are no all zeros (i.e., no data) regions created.")
-        rsgislib.imagecalc.imageMath(strchFile, strchFileOffset, "b1+1", gdalFormat, rsgislib.TYPE_32FLOAT)
+        rsgislib.imagecalc.imageMath(strchFile, strchFileOffset, "b1+1", gdalformat, rsgislib.TYPE_8INT)
         
         print("Create Input Image Mask.")
         ImgBand = collections.namedtuple('ImgBands', ['bandName', 'fileName', 'bandIndex'])
         bandMathBands = list()
         bandMathBands.append(ImgBand(bandName="b1", fileName=inputImgBands, bandIndex=1))
-        rsgislib.imagecalc.bandMath(strchMaskFile, "b1==0?1:0", gdalFormat, rsgislib.TYPE_32FLOAT, bandMathBands)
+        rsgislib.imagecalc.bandMath(strchMaskFile, "b1==0?1:0", gdalformat, rsgislib.TYPE_8INT, bandMathBands)
         
         print("Mask stretched Image.")
-        rsgislib.imageutils.maskImage(strchFileOffset, strchMaskFile, segmentFile, gdalFormat, rsgislib.TYPE_32FLOAT, 0, 1)
+        rsgislib.imageutils.maskImage(strchFileOffset, strchMaskFile, segmentFile, gdalformat, rsgislib.TYPE_8INT, 0, 1)
         
         if not noDelete:
             # Deleting extra files
@@ -149,27 +152,27 @@ Example::
     # Apply KMEANS
     print("Apply KMeans to image.")
     kMeansFileZones = os.path.join(tmpath,basename+str("_kmeans")+outFileExt)
-    rsgislib.segmentation.labelPixelsFromClusterCentres(segmentFile, kMeansFileZones, outMatrixFile+str(".gmtxt"), True, gdalFormat)
+    rsgislib.segmentation.labelPixelsFromClusterCentres(segmentFile, kMeansFileZones, outMatrixFile+str(".gmtxt"), True, gdalformat)
     
     # Elimininate Single Pixels
     print("Eliminate Single Pixels.")
     kMeansFileZonesNoSgls = os.path.join(tmpath,basename+str("_kmeans_nosgl")+outFileExt)
     kMeansFileZonesNoSglsTmp = os.path.join(tmpath,basename+str("_kmeans_nosglTMP")+outFileExt)
-    rsgislib.segmentation.eliminateSinglePixels(segmentFile, kMeansFileZones, kMeansFileZonesNoSgls, kMeansFileZonesNoSglsTmp, gdalFormat, processInMem, True)
+    rsgislib.segmentation.eliminateSinglePixels(segmentFile, kMeansFileZones, kMeansFileZonesNoSgls, kMeansFileZonesNoSglsTmp, gdalformat, processInMem, True)
     
     # Clump
     print("Perform clump.")
     initClumpsFile = os.path.join(tmpath,basename+str("_clumps")+outFileExt)
-    rsgislib.segmentation.clump(kMeansFileZonesNoSgls, initClumpsFile, gdalFormat, processInMem, 0)
+    rsgislib.segmentation.clump(kMeansFileZonesNoSgls, initClumpsFile, gdalformat, processInMem, 0)
     
     # Elimininate small clumps
     print("Eliminate small pixels.")
     elimClumpsFile = os.path.join(tmpath,basename+str("_clumps_elim")+outFileExt)
-    rsgislib.segmentation.rmSmallClumpsStepwise(segmentFile, initClumpsFile, elimClumpsFile, gdalFormat, False, "", False, processInMem, minPxls, distThres)
+    rsgislib.segmentation.rmSmallClumpsStepwise(segmentFile, initClumpsFile, elimClumpsFile, gdalformat, False, "", False, processInMem, minPxls, distThres)
     
     # Relabel clumps
     print("Relabel clumps.")
-    rsgislib.segmentation.relabelClumps(elimClumpsFile, outputClumps, gdalFormat, processInMem)
+    rsgislib.segmentation.relabelClumps(elimClumpsFile, outputClumps, gdalformat, processInMem)
     
     # Populate with stats if required.
     if not noStats:
@@ -178,7 +181,7 @@ Example::
     
     # Create mean image if required.
     if not (outputMeanImg == None):
-        rsgislib.segmentation.meanImage(inputImg, outputClumps, outputMeanImg, gdalFormat, rsgislib.TYPE_32FLOAT)
+        rsgislib.segmentation.meanImage(inputImg, outputClumps, outputMeanImg, gdalformat, input_datatype)
         if not noStats:
             rsgislib.imageutils.popImageStats(outputMeanImg, True, 0, True)
         
@@ -195,10 +198,10 @@ Example::
         if not noStretch:
             rsgisUtils.deleteFileWithBasename(segmentFile)
         if createdDIR:
-            rsgisUtils.deleteDIR(tmpath)
+            shutil.rmtree(tmpath)
             
             
-def runShepherdSegmentationTestNumClumps(inputImg, outputClumpsBase, outStatsFile, outputMeanImgBase=None, tmpath='.', gdalFormat='KEA', noStats=False, noStretch=False, noDelete=False, numClustersStart=10, numClustersStep=10, numOfClustersSteps=10, minPxls=10, distThres=1000000, bands=None, sampling=100, kmMaxIter=200, processInMem=False, minNormV=None, maxNormV=None, minNormMI=None, maxNormMI=None): 
+def runShepherdSegmentationTestNumClumps(inputImg, outputClumpsBase, outStatsFile, outputMeanImgBase=None, tmpath='.', gdalformat='KEA', noStats=False, noStretch=False, noDelete=False, numClustersStart=10, numClustersStep=10, numOfClustersSteps=10, minPxls=10, distThres=1000000, bands=None, sampling=100, kmMaxIter=200, processInMem=False, minNormV=None, maxNormV=None, minNormMI=None, maxNormMI=None): 
     """
 Utility function to call the segmentation algorithm of Shepherd et al. (2014) and to test are range of 'k' within the kMeans.
 
@@ -264,7 +267,7 @@ Example::
         outputClumps = outputClumpsBase + "_c" + str(numClusters) + ".kea"
         outputMeanImg = outputMeanImgBase + "_c" + str(numClusters) + ".kea"
         
-        runShepherdSegmentation(inputImg, outputClumps, outputMeanImg=outputMeanImg, tmpath=tmpath, gdalFormat=gdalFormat, noStats=noStats, noStretch=noStretch, noDelete=noDelete, numClusters=numClusters, minPxls=minPxls, distThres=distThres, bands=bands, sampling=sampling, kmMaxIter=kmMaxIter, processInMem=processInMem)
+        runShepherdSegmentation(inputImg, outputClumps, outputMeanImg=outputMeanImg, tmpath=tmpath, gdalformat=gdalformat, noStats=noStats, noStretch=noStretch, noDelete=noDelete, numClusters=numClusters, minPxls=minPxls, distThres=distThres, bands=bands, sampling=sampling, kmMaxIter=kmMaxIter, processInMem=processInMem)
         
         segScores = rsgislib.rastergis.calcGlobalSegmentationScore(outputClumps, inputImg, colsPrefix, calcNeighbours, minNormV, maxNormV, minNormMI, maxNormMI)
         
@@ -361,7 +364,7 @@ Example::
     fileStats.close()
     print("Complete.\n")
     
-def runShepherdSegmentationTestMinObjSize(inputImg, outputClumpsBase, outStatsFile, outputMeanImgBase=None, tmpath='.', gdalFormat='KEA', noStats=False, noStretch=False, noDelete=False, numClusters=100, minPxlsStart=10, minPxlsStep=5, numOfMinPxlsSteps=20, distThres=1000000, bands=None, sampling=100, kmMaxIter=200, minNormV=None, maxNormV=None, minNormMI=None, maxNormMI=None): 
+def runShepherdSegmentationTestMinObjSize(inputImg, outputClumpsBase, outStatsFile, outputMeanImgBase=None, tmpath='.', gdalformat='KEA', noStats=False, noStretch=False, noDelete=False, numClusters=100, minPxlsStart=10, minPxlsStep=5, numOfMinPxlsSteps=20, distThres=1000000, bands=None, sampling=100, kmMaxIter=200, minNormV=None, maxNormV=None, minNormMI=None, maxNormMI=None): 
     """
 Utility function to call the segmentation algorithm of Shepherd et al. (2014) and to test are range of 'k' within the kMeans.
 
@@ -426,7 +429,7 @@ Example::
         outputClumps = outputClumpsBase + "_mp" + str(minPxls) + ".kea"
         outputMeanImg = outputMeanImgBase + "_mp" + str(minPxls) + ".kea"
         
-        runShepherdSegmentation(inputImg, outputClumps, outputMeanImg=outputMeanImg, tmpath=tmpath, gdalFormat=gdalFormat, noStats=noStats, noStretch=noStretch, noDelete=noDelete, numClusters=numClusters, minPxls=minPxls, distThres=distThres, bands=bands, sampling=sampling, kmMaxIter=kmMaxIter)
+        runShepherdSegmentation(inputImg, outputClumps, outputMeanImg=outputMeanImg, tmpath=tmpath, gdalformat=gdalformat, noStats=noStats, noStretch=noStretch, noDelete=noDelete, numClusters=numClusters, minPxls=minPxls, distThres=distThres, bands=bands, sampling=sampling, kmMaxIter=kmMaxIter)
         
         segScores = rsgislib.rastergis.calcGlobalSegmentationScore(outputClumps, inputImg, colsPrefix, calcNeighbours, minNormV, maxNormV, minNormMI, maxNormMI)
         

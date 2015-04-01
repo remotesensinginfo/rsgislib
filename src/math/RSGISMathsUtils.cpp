@@ -669,6 +669,46 @@ namespace rsgis{namespace math{
                     std::sort(data->begin(), data->end());
                     stats->median = gsl_stats_median_from_sorted_data(&(*data)[0], 1, data->size());
                 }
+                if(stats->calcMode)
+                {
+                    double minVal = 0.0;
+                    double maxVal = 0.0;
+                    gsl_stats_minmax (&minVal, &maxVal, &(*data)[0], 1, data->size());
+                    long minBin = floor(minVal);
+                    long maxBin = floor(maxVal+1);
+                    long numBins = maxBin - minBin;
+                    long *bins = new long[numBins];
+                    for(long i = 0; i < numBins; ++i)
+                    {
+                        bins[i] = 0;
+                    }
+                    
+                    long tmpVal = 0;
+                    long tmpBin = 0;
+                    for(std::vector<double>::iterator iterVals = data->begin(); iterVals != data->end(); ++iterVals)
+                    {
+                        tmpVal = floor(*iterVals);
+                        tmpBin = tmpVal - minBin;
+                        ++bins[tmpBin];
+                    }
+                    
+                    long maxFreqBinIdx = 0;
+                    for(long i = 0; i < numBins; ++i)
+                    {
+                        if(i == 0)
+                        {
+                            maxFreqBinIdx = 0;
+                        }
+                        else if(bins[i] > bins[maxFreqBinIdx])
+                        {
+                            maxFreqBinIdx = i;
+                        }
+                    }
+                    
+                    stats->mode = minBin + maxFreqBinIdx;
+                    
+                    delete[] bins;
+                }
             }
             else
             {
@@ -695,6 +735,10 @@ namespace rsgis{namespace math{
                 if(stats->calcMedian)
                 {
                     stats->median = 0;
+                }
+                if(stats->calcMode)
+                {
+                    stats->mode = 0;
                 }
             }
         }
@@ -823,5 +867,258 @@ namespace rsgis{namespace math{
         return percentVal;
     }
 
+    double* RSGISMathsUtils::calcMeanVector(double **data, size_t n, size_t m, size_t sMIdx, size_t eMIdx) throw(RSGISMathException)
+    {
+        size_t numVals = eMIdx - sMIdx;
+        double *meanVec = new double[numVals];
+        try
+        {
+            for(size_t i = 0; i < numVals; ++i)
+            {
+                meanVec[i] = 0.0;
+            }
+            
+            for(size_t i = sMIdx, j = 0; i < eMIdx; ++i, ++j)
+            {
+                for(size_t k = 0; k < n; ++k)
+                {
+                    meanVec[j] += data[k][i];
+                }
+            }
+            
+            for(size_t i = 0; i < numVals; ++i)
+            {
+                meanVec[i] /= n;
+            }
+        }
+        catch(RSGISMathException &e)
+        {
+            throw e;
+        }
+        catch(RSGISException &e)
+        {
+            throw RSGISMathException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISMathException(e.what());
+        }
+        
+        return meanVec;
+    }
+    
+    double** RSGISMathsUtils::calcCovarianceMatrix(double **data, double *meanVec, size_t n, size_t m, size_t sMIdx, size_t eMIdx) throw(RSGISMathException)
+    {
+        size_t numVals = eMIdx - sMIdx;
+        double **covarMatrix = new double*[numVals];
+        try
+        {
+            for(size_t i = 0; i < numVals; ++i)
+            {
+                covarMatrix[i] = new double[numVals];
+                for(size_t j = 0; j < numVals; ++j)
+                {
+                    covarMatrix[i][j] = 0.0;
+                }
+            }
+            
+            double var1 = 0.0;
+            double var2 = 0.0;
+            
+            for(size_t i = sMIdx, j = 0; i < eMIdx; ++i, ++j)
+            {
+                for(size_t a = sMIdx, b = 0; a < eMIdx; ++a, ++b)
+                {
+                    //std::cout << "Matrix [" << i << ", " << a << "] = ";
+                    var1 = 0.0;
+                    var2 = 0.0;
+                    for(size_t k = 0; k < n; ++k)
+                    {
+                        covarMatrix[j][b] += ((data[k][i] - meanVec[j]) * (data[k][a] - meanVec[b]));
+                    }
+                    covarMatrix[j][b] /= (n-1);
+                    //std::cout << covarMatrix[j][b] << std::endl;
+                }
+            }            
+        }
+        catch(RSGISMathException &e)
+        {
+            throw e;
+        }
+        catch(RSGISException &e)
+        {
+            throw RSGISMathException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISMathException(e.what());
+        }
+        
+        return covarMatrix;
+    }
+    
+    
+    std::vector<std::pair<size_t, double> >* RSGISMathsUtils::sampleUseHistogramMethod(std::vector<std::pair<size_t, double> > *inData, double minVal, double maxVal, double binWidth, float propOfPop) throw(RSGISMathException)
+    {
+        std::vector<std::pair<size_t, double> > *outData = new std::vector<std::pair<size_t, double> >();
+        try
+        {
+            //std::cout << "Range = " << (maxVal - minVal) << std::endl;
+            size_t numBins = static_cast<size_t>((maxVal - minVal)/binWidth)+1;
+            std::cout << "Number of Histogram Bins = " << numBins << std::endl;
+            std::list<std::pair<size_t, double> > **hist = new std::list<std::pair<size_t, double> >*[numBins];
+
+            for(size_t i = 0; i < numBins; ++i)
+            {
+                hist[i] = new std::list<std::pair<size_t, double> >();
+            }
+            
+            size_t idx = 0;
+            double val = 0.0;
+            for(std::vector<std::pair<size_t, double> >::iterator iterData = inData->begin(); iterData != inData->end(); ++iterData)
+            {
+                val = (*iterData).second;
+                if((val >= minVal) & (val <= maxVal))
+                {
+                    idx = static_cast<size_t>((val-minVal)/binWidth);
+                    //std::cout << "IDX = " << idx << std::endl;
+                    hist[idx]->push_back(*iterData);
+                }
+            }
+            
+            size_t numVals = static_cast<size_t>(1/propOfPop);
+            
+            size_t nextVal = 0;
+            size_t j = 0;
+            for(size_t i = 0; i < numBins; ++i)
+            {
+                //numVals = static_cast<size_t>(hist[i]->size()*propOfPop);
+                //std::cout << "BIN " << i << ": " << hist[i]->size() << " = " << hist[i]->size()*propOfPop << std::endl;
+
+                hist[i]->sort(comparePairsData);
+                nextVal = 0;
+                j = 0;
+                for(std::list<std::pair<size_t, double> >::iterator iterData = hist[i]->begin(); iterData != hist[i]->end(); ++iterData)
+                {
+                    if(j == nextVal)
+                    {
+                        outData->push_back((*iterData));
+                        nextVal += numVals;
+                    }
+                    
+                    ++j;
+                }
+                
+                delete hist[i];
+            }
+            delete[] hist;
+        }
+        catch(RSGISMathException &e)
+        {
+            throw e;
+        }
+        catch(RSGISException &e)
+        {
+            throw RSGISMathException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISMathException(e.what());
+        }
+        return outData;
+    }
+    
+    std::vector<std::pair<size_t, double> >** RSGISMathsUtils::calcHistogram(std::vector<std::pair<size_t, double> > *inData, double minVal, double maxVal, double binWidth, size_t *numBins) throw(RSGISMathException)
+    {
+        std::vector<std::pair<size_t, double> > **hist = NULL;
+        try
+        {
+            *numBins = static_cast<size_t>((maxVal - minVal)/binWidth)+1;
+            std::cout << "Number of Histogram Bins = " << *numBins << std::endl;
+            hist = new std::vector<std::pair<size_t, double> >*[*numBins];
+            for(size_t i = 0; i < *numBins; ++i)
+            {
+                hist[i] = new std::vector<std::pair<size_t, double> >();
+            }
+            
+            size_t idx = 0;
+            double val = 0.0;
+            for(std::vector<std::pair<size_t, double> >::iterator iterData = inData->begin(); iterData != inData->end(); ++iterData)
+            {
+                val = (*iterData).second;
+                if((val >= minVal) & (val <= maxVal))
+                {
+                    idx = static_cast<size_t>((val-minVal)/binWidth);
+                    //std::cout << "IDX = " << idx << std::endl;
+                    hist[idx]->push_back(*iterData);
+                }
+            }
+        }
+        catch(RSGISMathException &e)
+        {
+            throw e;
+        }
+        catch(RSGISException &e)
+        {
+            throw RSGISMathException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISMathException(e.what());
+        }
+        return hist;
+    }
+    
+    
+    std::vector<std::pair<double, double> >* RSGISMathsUtils::calcHistogram(std::vector<double> *data, double minVal, double maxVal, double binWidth, bool norm) throw(RSGISMathException)
+    {
+        std::vector<std::pair<double, double> > *hist = new std::vector<std::pair<double, double> >();
+        try
+        {
+            size_t numBins = static_cast<size_t>((maxVal - minVal)/binWidth)+1;
+            std::cout << "Number of Histogram Bins = " << numBins << std::endl;
+            hist->reserve(numBins);
+            
+            double binCentre = minVal + (binWidth/2);
+            for(size_t i = 0; i < numBins; ++i)
+            {
+                hist->push_back(std::pair<double, double>(binCentre, 0.0));
+                binCentre += binWidth;
+            }
+            
+            size_t idx = 0;
+            for(std::vector<double>::iterator iterData = data->begin(); iterData != data->end(); ++iterData)
+            {
+                if(((*iterData) >= minVal) & ((*iterData) <= maxVal))
+                {
+                    idx = static_cast<size_t>(((*iterData)-minVal)/binWidth);
+                    //std::cout << "IDX = " << idx << std::endl;
+                    hist->at(idx).second = hist->at(idx).second + 1;
+                }
+            }
+            
+            if(norm)
+            {
+                for(size_t i = 0; i < numBins; ++i)
+                {
+                    hist->at(i).second = hist->at(i).second / data->size();
+                }
+            }
+        }
+        catch(RSGISMathException &e)
+        {
+            throw e;
+        }
+        catch(RSGISException &e)
+        {
+            throw RSGISMathException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISMathException(e.what());
+        }
+        return hist;
+    }
+    
 }}
 

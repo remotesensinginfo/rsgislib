@@ -20,6 +20,9 @@
  *
  */
 
+#define _USE_MATH_DEFINES
+#include <cmath>
+
 #include "rsgispy_common.h"
 #include "cmds/RSGISCmdImageCalibration.h"
 
@@ -1290,14 +1293,14 @@ static PyMethodDef ImageCalibrationMethods[] = {
     "\n"},
     
 {"radiance2TOARefl", ImageCalibration_Radiance2TOARefl, METH_VARARGS,
-    "imagecalibration.radiance2TOARefl(inputFile, outputFile, gdalFormat, gdaltype, scaleFactor, julianDay, solarZenith, solarIrradianceVals)\n"
+    "imagecalibration.radiance2TOARefl(inputFile, outputFile, gdalFormat, datatype, scaleFactor, julianDay, solarZenith, solarIrradianceVals)\n"
     "Converts at sensor radiance values to Top of Atmosphere Reflectance.\n"
     "Where:\n"
     "\n"
     "* inputFile is a string containing the name of the input image file\n"
     "* outputFile is a string containing the name of the output image file\n"
     "* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
-    "* gdaltype is an containing one of the values from rsgislib.TYPE_*\n"
+    "* datatype is an containing one of the values from rsgislib.TYPE_*\n"
     "* scaleFactor is a float which can be used to scale the output pixel values (e.g., multiple by 1000), set as 1 if not wanted.\n"
     "* year is an int with the year of the sensor acquisition.\n"
     "* month is an int with the month of the sensor acquisition.\n"
@@ -1307,14 +1310,14 @@ static PyMethodDef ImageCalibrationMethods[] = {
     "\n"},
 
 {"apply6SCoeffSingleParam", ImageCalibration_Apply6SCoefficentsSingleParam, METH_VARARGS,
-    "imagecalibration.apply6SCoeffSingleParam(inputFile, outputFile, gdalFormat, gdaltype, scaleFactor, noDataValue, useNoDataValue, bandCoeffs)\n"
+    "imagecalibration.apply6SCoeffSingleParam(inputFile, outputFile, gdalFormat, datatype, scaleFactor, noDataValue, useNoDataValue, bandCoeffs)\n"
     "Converts at sensor radiance values to surface reflectance by applying coefficients from the 6S model for each band (aX, bX, cX).\n"
     "Where:\n"
     "\n"
     "* inputFile is a string containing the name of the input image file\n"
     "* outputFile is a string containing the name of the output image file\n"
     "* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
-    "* gdaltype is an containing one of the values from rsgislib.TYPE_*\n"
+    "* datatype is an containing one of the values from rsgislib.TYPE_*\n"
     "* scaleFactor is a float which can be used to scale the output pixel values (e.g., multiple by 1000), set as 1 for no scaling.\n"
     "* noDataValue is a float which if all bands contain that value will be ignored.\n"
     "* useNoDataValue is a boolean as to whether the no data value specified is to be used.\n"
@@ -1328,7 +1331,7 @@ static PyMethodDef ImageCalibrationMethods[] = {
     "\n"},
     
 {"apply6SCoeffElevLUTParam", ImageCalibration_Apply6SCoefficentsElevLUTParam, METH_VARARGS,
-    "imagecalibration.apply6SCoeffElevLUTParam(inputRadFile, inputDEMFile, outputFile, gdalFormat, gdaltype, scaleFactor, noDataValue, useNoDataValue, lutElev)\n"
+    "imagecalibration.apply6SCoeffElevLUTParam(inputRadFile, inputDEMFile, outputFile, gdalFormat, datatype, scaleFactor, noDataValue, useNoDataValue, lutElev)\n"
     "Converts at sensor radiance values to surface reflectance by applying coefficients from the 6S model for each band (aX, bX, cX), where the coefficients can be varied for surface elevation.\n"
     "Where:\n"
     "\n"
@@ -1336,7 +1339,7 @@ static PyMethodDef ImageCalibrationMethods[] = {
     "* inputDEMFile is a string containing the name of the input DEM image file (needs to be the same projection and resolution as radiance image.)\n"
     "* outputFile is a string containing the name of the output image file\n"
     "* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
-    "* gdaltype is an containing one of the values from rsgislib.TYPE_*\n"
+    "* datatype is an containing one of the values from rsgislib.TYPE_*\n"
     "* scaleFactor is a float which can be used to scale the output pixel values (e.g., multiple by 1000), set as 1 for no scaling.\n"
     "* noDataValue is a float which if all bands contain that value will be ignored.\n"
     "* useNoDataValue is a boolean as to whether the no data value specified is to be used.\n"
@@ -1354,7 +1357,7 @@ static PyMethodDef ImageCalibrationMethods[] = {
     "\n"},
     
 {"apply6SCoeffElevAOTLUTParam", ImageCalibration_Apply6SCoefficentsElevAOTLUTParam, METH_VARARGS,
-    "imagecalibration.apply6SCoeffElevLUTParam(inputRadFile, inputDEMFile, inputAOTImage, outputFile, gdalFormat, gdaltype, scaleFactor, noDataValue, useNoDataValue, lutElevAOT)\n"
+    "imagecalibration.apply6SCoeffElevLUTParam(inputRadFile, inputDEMFile, inputAOTImage, outputFile, gdalFormat, datatype, scaleFactor, noDataValue, useNoDataValue, lutElevAOT)\n"
     "Converts at sensor radiance values to surface reflectance by applying coefficients from the 6S model for each band (aX, bX, cX), where the coefficients can be varied for surface elevation.\n"
     "Where:\n"
     "\n"
@@ -1363,7 +1366,7 @@ static PyMethodDef ImageCalibrationMethods[] = {
     "* inputAOTImage is a string containing the name of the input AOT image file (needs to be the same projection and resolution as radiance image.)\n"
     "* outputFile is a string containing the name of the output image file\n"
     "* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
-    "* gdaltype is an containing one of the values from rsgislib.TYPE_*\n"
+    "* datatype is an containing one of the values from rsgislib.TYPE_*\n"
     "* scaleFactor is a float which can be used to scale the output pixel values (e.g., multiple by 1000), set as 1 for no scaling.\n"
     "* noDataValue is a float which if all bands contain that value will be ignored.\n"
     "* useNoDataValue is a boolean as to whether the no data value specified is to be used.\n"
@@ -1384,7 +1387,7 @@ static PyMethodDef ImageCalibrationMethods[] = {
     "\n"},
     
 {"applySubtractSingleOffsets", ImageCalibration_ApplySubtractSingleOffsets, METH_VARARGS,
-    "imagecalibration.applySubtractSingleOffsets(inputFile, outputFile, gdalformat, gdaltype, nonNegative, useNoDataVal, noDataVal, darkObjReflVal, offsetsList)\n"
+    "imagecalibration.applySubtractSingleOffsets(inputFile, outputFile, gdalformat, datatype, nonNegative, useNoDataVal, noDataVal, darkObjReflVal, offsetsList)\n"
     "Applies offsets from dark objects.\n"
     //TODO: Pete add in more details here.
     "Where:\n"
@@ -1392,7 +1395,7 @@ static PyMethodDef ImageCalibrationMethods[] = {
     "* inputFile is a string containing the name of the input image file\n"
     "* outputFile is a string containing the name of the output image file\n"
     "* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
-    "* gdaltype is an containing one of the values from rsgislib.TYPE_*\n"
+    "* datatype is an containing one of the values from rsgislib.TYPE_*\n"
     "* nonNegative is a boolean specifying whether any negative values from the offset application should be removed (i.e., set to 1; 0 being no data).\n"
     "* useNoDataVal a boolean specifying whether a no data value is present within the input image.\n"
     "* noDataVal is a float specifying the no data value for the input image.\n"
@@ -1401,7 +1404,7 @@ static PyMethodDef ImageCalibrationMethods[] = {
     "\n"},
     
 {"applySubtractOffsets", ImageCalibration_ApplySubtractOffsets, METH_VARARGS,
-    "imagecalibration.applySubtractOffsets(inputFile, inputOffsetsFile, outputFile, gdalformat, gdaltype, nonNegative, useNoDataVal, noDataVal, darkObjReflVal)\n"
+    "imagecalibration.applySubtractOffsets(inputFile, inputOffsetsFile, outputFile, gdalformat, datatype, nonNegative, useNoDataVal, noDataVal, darkObjReflVal)\n"
     "Applies offsets from dark objects.\n"
     //TODO: Pete add in more details here.
     "Where:\n"
@@ -1410,7 +1413,7 @@ static PyMethodDef ImageCalibrationMethods[] = {
     "* inputOffsetsFile is a string containing the name of the input offsets image file, which must have the same number of bands as the input image."
     "* outputFile is a string containing the name of the output image file\n"
     "* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
-    "* gdaltype is an containing one of the values from rsgislib.TYPE_*\n"
+    "* datatype is an containing one of the values from rsgislib.TYPE_*\n"
     "* nonNegative is a boolean specifying whether any negative values from the offset application should be removed (i.e., set to 1; 0 being no data).\n"
     "* useNoDataVal a boolean specifying whether a no data value is present within the input image.\n"
     "* noDataVal is a float specifying the no data value for the input image.\n"
@@ -1434,14 +1437,14 @@ static PyMethodDef ImageCalibrationMethods[] = {
     "\n"},
 
 {"landsatThermalRad2Brightness", ImageCalibration_landsatThermalRad2Brightness, METH_VARARGS,
-    "imagecalibration.landsatThermalRad2Brightness(inputImage, outputImage, gdalformat, gdaltype, scaleFactor, bandDefnSeq)\n"
+    "imagecalibration.landsatThermalRad2Brightness(inputImage, outputImage, gdalformat, datatype, scaleFactor, bandDefnSeq)\n"
     "Converts Landsat TM thermal radiation to degrees celsius for at sensor temperature.\n"
     "Where:\n"
     "\n"
     "* inputImage is a string containing the name of the input file path.\n"
     "outputImage is a string containing the name of the output file path.\n"
     "* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
-    "* gdaltype is an containing one of the values from rsgislib.TYPE_*\n"
+    "* datatype is an containing one of the values from rsgislib.TYPE_*\n"
     "* scaleFactor is a float which can be used to scale the output pixel values (e.g., multiple by 1000), set as 1 for no scaling.\n"
     "* bandDefnSeq is a sequence of rsgislib.imagecalibration.CmdsLandsatThermalCoeffs objects that define the inputs\n"
     "Requires:\n"
@@ -1492,11 +1495,11 @@ static PyMethodDef ImageCalibrationMethods[] = {
     "* inputImage is a string containing the name of the input file\n"
     "* outputImage is a string containing the name of the output file\n"
     "* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
-    "* bandDefnSeq is a sequence of rsgislib.imagecalibration.CmdsSPOT5RadianceGainsOffsets objects that define the inputs\n"
+    "* bandDefnSeq is a sequence of rsgislib.imagecalibration.CmdsSPOT5RadianceGainsOffsets objects in order of the input image bands that define the inputs\n"
     "Requires:\n"
     "\n"
     "   * bandName - Name of image band in output file.\n"
-    "   * bandIndex - Index (starting from 1) of the band in the image file.\n"
+    "   * bandIndex - Index (starting from 1) of the output image band order (i.e., to reorder the image bands).\n"
     "   * gain - PHYSICAL_GAIN value from SPOT5 XML header.\n"
     "   * bias - PHYSICAL_BIAS value from SPOT5 XML header.\n"
     "\n"},

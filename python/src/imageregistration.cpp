@@ -304,8 +304,8 @@ static PyMethodDef ImageRegistrationMethods[] = {
 "    outputImage = './TestOutputs/injune_p142_casi_sub_utm_single_band_offset3x3y_twarp.kea'\n"
 "    wktStringFile = './Vectors/injune_p142_crowns_utm.prj'\n"
 "    resolution = 1\n"
-"    format = 'KEA'\n"
-"    imageregistration.triangularwarp(inputImage,inputGCPs, outputImage, wktStringFile, resolution, format)\n"
+"    gdalformat = 'KEA'\n"
+"    imageregistration.triangularwarp(inputImage,inputGCPs, outputImage, wktStringFile, resolution, gdalformat)\n"
 "\n"
 },  
 
@@ -328,8 +328,8 @@ static PyMethodDef ImageRegistrationMethods[] = {
 "    outputImage = './TestOutputs/injune_p142_casi_sub_utm_single_band_offset3x3y_nnwarp.kea'\n"
 "    wktStringFile = './Vectors/injune_p142_crowns_utm.prj'\n"
 "    resolution = 1\n"
-"    format = 'KEA'\n"
-"    imageregistration.nnwarp(inputImage,inputGCPs, outputImage, wktStringFile, resolution, format)\n"
+"    gdalformat = 'KEA'\n"
+"    imageregistration.nnwarp(inputImage,inputGCPs, outputImage, wktStringFile, resolution, gdalformat)\n"
 "\n"
 },  
 
@@ -354,19 +354,19 @@ static PyMethodDef ImageRegistrationMethods[] = {
 "    wktStringFile = './Vectors/injune_p142_crowns_utm.prj'\n"
 "    resolution = 1\n"
 "    polyOrder = 3\n"
-"    format = 'KEA'\n"
-"    imageregistration.polywarp(inputImage,inputGCPs, outputImage, wktStringFile, resolution, polyOrder, format)\n"
+"    gdalformat = 'KEA'\n"
+"    imageregistration.polywarp(inputImage,inputGCPs, outputImage, wktStringFile, resolution, polyOrder, gdalformat)\n"
 "\n"
 },  
 
     {"gcp2gdal", ImageRegistration_GCP2GDAL, METH_VARARGS, 
-"imageregistration.gcp2gdal(inputimage, inputgcps, outputimage, gdalformat, outtype)\n"
+"imageregistration.gcp2gdal(inputimage, inputgcps, outputimage, gdalformat, datatype)\n"
 "Adds tie points to GDAL file, suitable for warping using the gdalwarp command.\n"
 " * inputimage is a string providing the input image.\n"
 " * inputgcps is a string providing the input text file containing the tie points.\n"
 " * outputimage is a string providing the output image.\n"
 " * gdalformat is a string providing the output format (e.g., KEA).\n"
-" * type is a rsgislib.TYPE_* value providing the output data type.\n"
+" * datatype is a rsgislib.TYPE_* value providing the output data type.\n"
 "\n"
 "Example::\n"
 "\n"
@@ -374,19 +374,19 @@ static PyMethodDef ImageRegistrationMethods[] = {
 "    inputImage = './Rasters/injune_p142_casi_sub_utm_single_band_offset3x3y.vrt'\n"
 "    inputGCPs = './TestOutputs/injune_p142_casi_sub_utm_tie_points_basic.txt'\n"
 "    outputImage = './TestOutputs/injune_p142_casi_sub_utm_single_band_offset3x3y_gcps.kea'\n"
-"    format = 'KEA'\n"
-"    dataType = rsgislib.TYPE_32INT\n"
-"    imageregistration.gcp2gdal(inputImage,inputGCPs, outputImage, format, dataType)\n"
+"    gdalformat = 'KEA'\n"
+"    datatype = rsgislib.TYPE_32INT\n"
+"    imageregistration.gcp2gdal(inputImage,inputGCPs, outputImage, gdalformat, gdaltype)\n"
 "\n"
 },
     
 {"applyOffset2Image", ImageRegistration_ApplyOffset2Image, METH_VARARGS,
-"imageregistration.applyOffset2Image(inputImage, outputImage, gdalformat, outtype, xOff, yOff)\n"
+"imageregistration.applyOffset2Image(inputImage, outputImage, gdalformat, gdaltype, xOff, yOff)\n"
 "Apply a linear X,Y offset to the image header - does not change the pixel values.\n"
 " * inputImage is a string providing the input image.\n"
 " * outputImage is a string providing the output image.\n"
 " * gdalformat is a string providing the output format (e.g., KEA).\n"
-" * type is a rsgislib.TYPE_* value providing the output data type.\n"
+" * gdaltype is a rsgislib.TYPE_* value providing the output data type.\n"
 " * xOff is a float specifying the X offset to be applied to the image."
 " * yOff is a float specifying the Y offset to be applied to the image."
 "\n"
@@ -395,9 +395,9 @@ static PyMethodDef ImageRegistrationMethods[] = {
 "    from rsgislib import imageregistration\n"
 "    inputImage = './Rasters/injune_p142_casi_sub_utm_single_band_offset3x3y.vrt'\n"
 "    outputImage = './TestOutputs/injune_p142_casi_sub_utm_single_band_offset3x3y_fixed.kea'\n"
-"    format = 'KEA'\n"
-"    dataType = rsgislib.TYPE_32INT\n"
-"    imageregistration.applyOffset2Image(inputImage, outputImage, format, dataType, -3.0, -3.0)\n"
+"    gdalformat = 'KEA'\n"
+"    datatype = rsgislib.TYPE_32INT\n"
+"    imageregistration.applyOffset2Image(inputImage, outputImage, gdalformat, datatype, -3.0, -3.0)\n"
 "\n"
 },
     

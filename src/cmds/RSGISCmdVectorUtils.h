@@ -40,23 +40,31 @@ namespace rsgis{ namespace cmds{
     
     
     /** Function to produce convex hulls for groups of (X, Y, Attribute) point locations */
-    void executeGenerateConvexHullsGroups(std::string inputFile, std::string outputVector, std::string outVecProj, bool force, unsigned int eastingsColIdx, unsigned int northingsColIdx, unsigned int attributeColIdx)throw(RSGISCmdException);
+    DllExport void executeGenerateConvexHullsGroups(std::string inputFile, std::string outputVector, std::string outVecProj, bool force, unsigned int eastingsColIdx, unsigned int northingsColIdx, unsigned int attributeColIdx)throw(RSGISCmdException);
     /** Function to copy geometry but remove attributes */
-    void executeRemoveAttributes(std::string inputVector, std::string outputVector, bool force)throw(RSGISCmdException);
+    DllExport void executeRemoveAttributes(std::string inputVector, std::string outputVector, bool force)throw(RSGISCmdException);
     /** Function to buffer vector */
-    void executeBufferVector(std::string inputVector, std::string outputVector, float bufferDist, bool force)throw(RSGISCmdException);
+    DllExport void executeBufferVector(std::string inputVector, std::string outputVector, float bufferDist, bool force)throw(RSGISCmdException);
     /** Function to print polygon geometry */
-    void executePrintPolyGeom(std::string inputVector) throw(RSGISCmdException);
+    DllExport void executePrintPolyGeom(std::string inputVector) throw(RSGISCmdException);
     /** Function to find and replace text within an attribute table */
-    void executeFindReplaceText(std::string inputVector, std::string attribute, std::string find, std::string replace) throw(RSGISCmdException);
+    DllExport void executeFindReplaceText(std::string inputVector, std::string attribute, std::string find, std::string replace) throw(RSGISCmdException);
     /** Function to calculate polygon area */
-    void executeCalcPolyArea(std::string inputVector, std::string outputVector, bool force) throw(RSGISCmdException);
+    DllExport void executeCalcPolyArea(std::string inputVector, std::string outputVector, bool force) throw(RSGISCmdException);
     /** Split polygons in in vector by polygons in cover vector */
-    void executePolygonsInPolygon(std::string inputVector, std::string inputCoverVector, std::string output_DIR, std::string attributeName, bool force) throw(RSGISCmdException);
+    DllExport void executePolygonsInPolygon(std::string inputVector, std::string inputCoverVector, std::string output_DIR, std::string attributeName, bool force) throw(RSGISCmdException);
     /** Populate the Z field on the vector geometries */
-    void executePopulateGeomZField(std::string inputVector, std::string inputImage, unsigned int imgBand, std::string outputVector, bool force) throw(RSGISCmdException);
+    DllExport void executePopulateGeomZField(std::string inputVector, std::string inputImage, unsigned int imgBand, std::string outputVector, bool force) throw(RSGISCmdException);
     /** Function to calculate a maths functions between  */
-    void executeVectorMaths(std::string inputVector, std::string outputVector, std::string outColumn, std::string expression, bool force, std::vector<RSGISVariableFieldCmds> vars) throw(RSGISCmdException);
+    DllExport void executeVectorMaths(std::string inputVector, std::string outputVector, std::string outColumn, std::string expression, bool force, std::vector<RSGISVariableFieldCmds> vars) throw(RSGISCmdException);
+    /** Function to add a FID column to a shapefile  */
+    DllExport void executeAddFIDColumn(std::string inputVector, std::string outputVector, bool force) throw(RSGISCmdException);
+    /** Function to find the common extent of list of images and create a shapefile for the extent  */
+    DllExport void executeFindCommonImgExtent(std::vector<std::string> inputImages, std::string outputVector, bool force) throw(RSGISCmdException);
+    
+    
+    
+    
     
 }}
 

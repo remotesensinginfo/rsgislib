@@ -754,7 +754,7 @@ namespace rsgis{namespace segment{
             std::cout << "Finding maximum image value\n";
             double maxVal = 0;
             catagoryBand->GetStatistics(false, true, NULL, &maxVal, NULL, NULL);
-            unsigned long maxClumpIdx = boost::lexical_cast<unsigned long>(maxVal);
+            unsigned long maxClumpIdx = boost::lexical_cast<unsigned long>(maxVal)+1;
             
             unsigned long *clumpIdxLookUp = new unsigned long[maxClumpIdx];
             for(unsigned int i = 0; i < maxClumpIdx; ++i)

@@ -273,7 +273,7 @@ namespace rsgis{namespace rastergis{
                 XMLCh *thresholdXMLStr = xercesc::XMLString::transcode("threshold");
                 std::string thresholdStr = "";
                 double thresholdVal = 0.0;
-                bool valueColVersion = true;
+                RSGISLogicExpType expType = rsgis_expNA;
                 XMLCh *column1XMLStr = xercesc::XMLString::transcode("column1");
                 std::string column1Str = "";
                 XMLCh *column2XMLStr = xercesc::XMLString::transcode("column2");
@@ -290,11 +290,11 @@ namespace rsgis{namespace rastergis{
                     thresholdVal = mathUtils.strtodouble(thresholdStr);
                     xercesc::XMLString::release(&charValue2);
                     
-                    valueColVersion = true;
+                    expType = rsgis_singlecolthres;
                     bool found = false;
                     for(std::vector<RSGISColumnLogicIdxs*>::iterator iterLogics = colIdxes->begin(); iterLogics != colIdxes->end(); ++iterLogics)
                     {
-                        if(((*iterLogics)->column1Name == columnStr) & ((*iterLogics)->useThreshold) && ((*iterLogics)->thresholdVal == thresholdVal))
+                        if(((*iterLogics)->column1Name == columnStr) & ((*iterLogics)->useThreshold) & ((*iterLogics)->singleCol) && ((*iterLogics)->thresholdVal == thresholdVal))
                         {
                             logicObj = *iterLogics;
                             found = true;
@@ -306,6 +306,7 @@ namespace rsgis{namespace rastergis{
                         logicObj->column1Name = columnStr;
                         logicObj->useThreshold = true;
                         logicObj->thresholdVal = thresholdVal;
+                        logicObj->singleCol = true;
                         colIdxes->push_back(logicObj);
                     }
                 }
@@ -319,12 +320,12 @@ namespace rsgis{namespace rastergis{
                     column2Str = std::string(charValue2);
                     xercesc::XMLString::release(&charValue2);
                     
-                    valueColVersion = false;
+                    expType = rsgis_multicols;
                     
                     bool found = false;
                     for(std::vector<RSGISColumnLogicIdxs*>::iterator iterLogics = colIdxes->begin(); iterLogics != colIdxes->end(); ++iterLogics)
                     {
-                        if(((*iterLogics)->column1Name == column1Str) & ((*iterLogics)->column2Name == column2Str) & (!(*iterLogics)->useThreshold))
+                        if(((*iterLogics)->column1Name == column1Str) & ((*iterLogics)->column2Name == column2Str) & (!(*iterLogics)->useThreshold) & (!((*iterLogics)->singleCol)))
                         {
                             logicObj = *iterLogics;
                             found = true;
@@ -336,6 +337,33 @@ namespace rsgis{namespace rastergis{
                         logicObj->column1Name = column1Str;
                         logicObj->column2Name = column2Str;
                         logicObj->useThreshold = false;
+                        logicObj->singleCol = false;
+                        colIdxes->push_back(logicObj);
+                    }
+                }
+                else if(expElement->hasAttribute(columnXMLStr))
+                {
+                    char *charValue = xercesc::XMLString::transcode(expElement->getAttribute(columnXMLStr));
+                    columnStr = std::string(charValue);
+                    xercesc::XMLString::release(&charValue);
+                    
+                    expType = rsgis_singlecol;
+                    bool found = false;
+                    for(std::vector<RSGISColumnLogicIdxs*>::iterator iterLogics = colIdxes->begin(); iterLogics != colIdxes->end(); ++iterLogics)
+                    {
+                        if(((*iterLogics)->column1Name == columnStr) & (!((*iterLogics)->useThreshold)) & ((*iterLogics)->singleCol))
+                        {
+                            logicObj = *iterLogics;
+                            found = true;
+                        }
+                    }
+                    if(!found)
+                    {
+                        logicObj = new RSGISColumnLogicIdxs();
+                        logicObj->column1Name = columnStr;
+                        logicObj->useThreshold = false;
+                        logicObj->thresholdVal = 0;
+                        logicObj->singleCol = true;
                         colIdxes->push_back(logicObj);
                     }
                 }
@@ -346,68 +374,116 @@ namespace rsgis{namespace rastergis{
                 
                 if(xercesc::XMLString::equals(operatorStr, expEq))
                 {
-                    if(valueColVersion)
+                    if(expType == rsgis_singlecolthres)
                     {
                         outExp = new rsgis::math::RSGISLogicEqualsValueExpression(&logicObj->col1Val, &logicObj->thresholdVal);
                     }
-                    else
+                    else if(expType == rsgis_multicols)
                     {
                         outExp = new rsgis::math::RSGISLogicEqualsValueExpression(&logicObj->col1Val, &logicObj->col2Val);
+                    }
+                    else if(expType == rsgis_singlecol)
+                    {
+                        outExp = new rsgis::math::RSGISLogicEqualsValueExpression(&logicObj->col1Val, &logicObj->col2Val);
+                    }
+                    else
+                    {
+                        throw RSGISAttributeTableException("The expression type was not recognised");
                     }
                 }
                 else if(xercesc::XMLString::equals(operatorStr, expNotEq))
                 {
-                    if(valueColVersion)
+                    if(expType == rsgis_singlecolthres)
                     {
                         outExp = new rsgis::math::RSGISLogicNotValueExpression(&logicObj->col1Val, &logicObj->thresholdVal);
                     }
-                    else
+                    else if(expType == rsgis_multicols)
                     {
                         outExp = new rsgis::math::RSGISLogicNotValueExpression(&logicObj->col1Val, &logicObj->col2Val);
+                    }
+                    else if(expType == rsgis_singlecol)
+                    {
+                        outExp = new rsgis::math::RSGISLogicNotValueExpression(&logicObj->col1Val, &logicObj->col2Val);
+                    }
+                    else
+                    {
+                        throw RSGISAttributeTableException("The expression type was not recognised");
                     }
                 }
                 else if(xercesc::XMLString::equals(operatorStr, expGt))
                 {
-                    if(valueColVersion)
+                    if(expType == rsgis_singlecolthres)
                     {
                         outExp = new rsgis::math::RSGISLogicGreaterThanValueExpression(&logicObj->col1Val, &logicObj->thresholdVal);
                     }
-                    else
+                    else if(expType == rsgis_multicols)
                     {
                         outExp = new rsgis::math::RSGISLogicGreaterThanValueExpression(&logicObj->col1Val, &logicObj->col2Val);
+                    }
+                    else if(expType == rsgis_singlecol)
+                    {
+                        outExp = new rsgis::math::RSGISLogicGreaterThanValueExpression(&logicObj->col1Val, &logicObj->col2Val);
+                    }
+                    else
+                    {
+                        throw RSGISAttributeTableException("The expression type was not recognised");
                     }
                 }
                 else if(xercesc::XMLString::equals(operatorStr, expLt))
                 {
-                    if(valueColVersion)
+                    if(expType == rsgis_singlecolthres)
                     {
                         outExp = new rsgis::math::RSGISLogicLessThanValueExpression(&logicObj->col1Val, &logicObj->thresholdVal);
                     }
-                    else
+                    else if(expType == rsgis_multicols)
                     {
                         outExp = new rsgis::math::RSGISLogicLessThanValueExpression(&logicObj->col1Val, &logicObj->col2Val);
+                    }
+                    else if(expType == rsgis_singlecol)
+                    {
+                        outExp = new rsgis::math::RSGISLogicLessThanValueExpression(&logicObj->col1Val, &logicObj->col2Val);
+                    }
+                    else
+                    {
+                        throw RSGISAttributeTableException("The expression type was not recognised");
                     }
                 }
                 else if(xercesc::XMLString::equals(operatorStr, expGtEq))
                 {
-                    if(valueColVersion)
+                    if(expType == rsgis_singlecolthres)
                     {
                         outExp = new rsgis::math::RSGISLogicGreaterEqualToValueExpression(&logicObj->col1Val, &logicObj->thresholdVal);
                     }
-                    else
+                    else if(expType == rsgis_multicols)
                     {
                         outExp = new rsgis::math::RSGISLogicGreaterEqualToValueExpression(&logicObj->col1Val, &logicObj->col2Val);
+                    }
+                    else if(expType == rsgis_singlecol)
+                    {
+                        outExp = new rsgis::math::RSGISLogicGreaterEqualToValueExpression(&logicObj->col1Val, &logicObj->col2Val);
+                    }
+                    else
+                    {
+                        throw RSGISAttributeTableException("The expression type was not recognised");
                     }
                 }
                 else if(xercesc::XMLString::equals(operatorStr, expLtEq))
                 {
-                    if(valueColVersion)
+                    if(expType == rsgis_singlecolthres)
                     {
                         outExp = new rsgis::math::RSGISLogicLessEqualToValueExpression(&logicObj->col1Val, &logicObj->thresholdVal);
                     }
-                    else
+                    else if(expType == rsgis_multicols)
                     {
                         outExp = new rsgis::math::RSGISLogicLessEqualToValueExpression(&logicObj->col1Val, &logicObj->col2Val);
+                    }
+                    else if(expType == rsgis_singlecol)
+                    {
+                        outExp = new rsgis::math::RSGISLogicLessEqualToValueExpression(&logicObj->col1Val, &logicObj->col2Val);
+                    }
+                    else
+                    {
+                        throw RSGISAttributeTableException("The expression type was not recognised");
                     }
                 }
                 else
