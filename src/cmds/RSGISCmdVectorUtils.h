@@ -61,7 +61,8 @@ namespace rsgis{ namespace cmds{
     DllExport void executeAddFIDColumn(std::string inputVector, std::string outputVector, bool force) throw(RSGISCmdException);
     /** Function to find the common extent of list of images and create a shapefile for the extent  */
     DllExport void executeFindCommonImgExtent(std::vector<std::string> inputImages, std::string outputVector, bool force) throw(RSGISCmdException);
-    
+    /** Function to split the polygons within a shapefile into different shapefiles using an attribute  */
+    DllExport void executeSplitFeatures(std::string inputVector, std::string outputVectorBase, bool force) throw(RSGISCmdException);
     
     
     
