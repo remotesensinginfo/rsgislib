@@ -260,8 +260,8 @@ namespace rsgis{ namespace cmds {
     /** Function to define the position within the file of the clumps */
     DllExport void executeDefineClumpTilePositions(std::string clumpsImage, std::string tileImage, std::string outColsName, unsigned int tileOverlap, unsigned int tileBoundary, unsigned int tileBody)throw(RSGISCmdException);
 
-    /** Function to define the clumps which are on the border within the file of the clumps using a mask */
-    DllExport void executeDefineBorderClumps(std::string clumpsImage, std::string tileImage, std::string outColsName, unsigned int tileOverlap, unsigned int tileBoundary, unsigned int tileBody)throw(RSGISCmdException);
+    /** Function to define the clumps which are on the border within the file of the clumps */
+    DllExport void executeDefineBorderClumps(std::string clumpsImage, std::string outColsName)throw(RSGISCmdException);
 
     /** Function to identify segments which have changed by looking for statistical outliers (std dev) from class population */
     DllExport void executeFindChangeClumpsFromStdDev(std::string clumpsImage, std::string classField, std::string changeField, std::vector<std::string> attFields, std::vector<cmds::RSGISClassChangeFieldsCmds> classChangeFields, int ratBand=1) throw(RSGISCmdException);

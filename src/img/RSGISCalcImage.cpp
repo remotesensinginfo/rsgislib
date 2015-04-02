@@ -3896,7 +3896,6 @@ namespace rsgis{namespace img{
 		}
     }
     
-    
     void RSGISCalcImage::calcImageInEnv(GDALDataset **datasets, int numDS, geos::geom::Envelope *env) throw(RSGISImageCalcException,RSGISImageBandException)
     {
         GDALAllRegister();
@@ -4186,9 +4185,6 @@ namespace rsgis{namespace img{
 			delete[] inputRasterBands;
 		}
     }
-    
-    
-	
     
     void RSGISCalcImage::calcImagePosPxl(GDALDataset **datasets, int numDS) throw(RSGISImageCalcException,RSGISImageBandException)
 	{
@@ -10970,6 +10966,131 @@ namespace rsgis{namespace img{
 		}		
 	}
 	
+    void RSGISCalcImage::calcImageBorderPixels(GDALDataset *dataset, bool returnInt) throw(RSGISImageCalcException,RSGISImageBandException)
+    {
+        GDALAllRegister();
+        
+        try
+        {
+            unsigned int imgWidth = dataset->GetRasterXSize();
+            unsigned int imgHeight = dataset->GetRasterYSize();
+            unsigned int numBands = dataset->GetRasterCount();
+            
+            GDALRasterBand **gdalBands = new GDALRasterBand*[numBands];
+            for(unsigned int i = 0; i < numBands; ++i)
+            {
+                gdalBands[i] = dataset->GetRasterBand(i+1);
+            }
+            
+            unsigned int numfloatVals = 0;
+            float *pxlFloatVals = NULL;
+            unsigned int numIntVals = 0;
+            long *pxlIntVals = NULL;
+            if(returnInt)
+            {
+                numIntVals = numBands;
+                pxlIntVals = new long[numIntVals];
+            }
+            else
+            {
+                numfloatVals = numBands;
+                pxlFloatVals = new float[numfloatVals];
+            }
+            
+            int tmpVal = 0;
+            
+            std::cout << "Processing Top and Bottom Pixels\n";
+            // Top and Bottom pixels
+            for(unsigned int x = 0; x < imgWidth; ++x)
+            {
+                // Top
+                for(unsigned int b = 0; b < numBands; ++b)
+                {
+                    if(returnInt)
+                    {
+                        gdalBands[b]->RasterIO(GF_Read, x, 0, 1, 1, &tmpVal, 1, 1, GDT_Int32, 0, 0);
+                        pxlIntVals[b] = tmpVal;
+                    }
+                    else
+                    {
+                        gdalBands[b]->RasterIO(GF_Read, x, 0, 1, 1, &pxlFloatVals[b], 1, 1, GDT_Float32, 0, 0);
+                    }
+                }
+                //std::cout << "[" << x << ", " << 0 << "]" << std::endl;
+                this->calc->calcImageValue(pxlIntVals, numIntVals, pxlFloatVals, numfloatVals);
+                
+                // Bottom
+                for(unsigned int b = 0; b < numBands; ++b)
+                {
+                    if(returnInt)
+                    {
+                        gdalBands[b]->RasterIO(GF_Read, x, (imgHeight-1), 1, 1, &tmpVal, 1, 1, GDT_Int32, 0, 0);
+                        pxlIntVals[b] = tmpVal;
+                    }
+                    else
+                    {
+                        gdalBands[b]->RasterIO(GF_Read, x, (imgHeight-1), 1, 1, &pxlFloatVals[b], 1, 1, GDT_Float32, 0, 0);
+                    }
+                }
+                //std::cout << "[" << x << ", " << (imgHeight-1) << "]" << std::endl;
+                this->calc->calcImageValue(pxlIntVals, numIntVals, pxlFloatVals, numfloatVals);
+            }
+            
+            std::cout << "Processing Left and Right Pixels\n";
+            // Left and right pixels
+            for(unsigned int y = 0; y < imgHeight; ++y)
+            {
+                // Left
+                for(unsigned int b = 0; b < numBands; ++b)
+                {
+                    if(returnInt)
+                    {
+                        gdalBands[b]->RasterIO(GF_Read, 0, y, 1, 1, &pxlIntVals[b], 1, 1, GDT_Int32, 0, 0);
+                    }
+                    else
+                    {
+                        gdalBands[b]->RasterIO(GF_Read, 0, y, 1, 1, &pxlFloatVals[b], 1, 1, GDT_Float32, 0, 0);
+                    }
+                }
+                //std::cout << "[" << 0 << ", " << y << "]" << std::endl;
+                this->calc->calcImageValue(pxlIntVals, numIntVals, pxlFloatVals, numfloatVals);
+                
+                // Right
+                for(unsigned int b = 0; b < numBands; ++b)
+                {
+                    if(returnInt)
+                    {
+                        gdalBands[b]->RasterIO(GF_Read, (imgWidth-1), y, 1, 1, &pxlIntVals[b], 1, 1, GDT_Int32, 0, 0);
+                    }
+                    else
+                    {
+                        gdalBands[b]->RasterIO(GF_Read, (imgWidth-1), y, 1, 1, &pxlFloatVals[b], 1, 1, GDT_Float32, 0, 0);
+                    }
+                }
+                //std::cout << "[" << (imgWidth-1) << ", " << 0 << "]" << std::endl;
+                this->calc->calcImageValue(pxlIntVals, numIntVals, pxlFloatVals, numfloatVals);
+            }
+            
+            delete[] gdalBands;
+            delete[] pxlFloatVals;
+            delete[] pxlIntVals;
+        }
+        catch (RSGISImageCalcException &e)
+        {
+            throw e;
+        }
+        catch (RSGISImageBandException &e)
+        {
+            throw e;
+        }
+        catch (RSGISException &e)
+        {
+            throw RSGISImageCalcException(e.what());
+        }
+        
+        
+    }
+    
 	RSGISCalcImage::~RSGISCalcImage()
 	{
 		
