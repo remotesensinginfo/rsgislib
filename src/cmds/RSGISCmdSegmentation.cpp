@@ -42,6 +42,7 @@
 #include "segmentation/RSGISMergeSegmentations.h"
 #include "segmentation/RSGISMergeSegments.h"
 #include "segmentation/RSGISCreateImageGrid.h"
+#include "segmentation/RSGISDropClumps.h"
 
 #include "rastergis/RSGISRasterAttUtils.h"
 #include "rastergis/RSGISCalcImageStatsAndPyramids.h"
@@ -874,6 +875,35 @@ namespace rsgis{ namespace cmds {
             GDALClose(spectralDataset);
             GDALClose(clumpDataset);
             GDALClose(outputClumpsDS);
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw rsgis::cmds::RSGISCmdException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw rsgis::cmds::RSGISCmdException(e.what());
+        }
+    }
+            
+            
+    void executeDropSelectedClumps(std::string clumpsImage, std::string outputImage, std::string imageFormat, std::string selectClumpsCol)throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            GDALDataset *clumpDataset = (GDALDataset *) GDALOpen(clumpsImage.c_str(), GA_Update);
+            if(clumpDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + clumpsImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            std::cout << "Merge Clumps\n";
+            rsgis::segment::RSGISDropClumps dropSegs;
+            dropSegs.dropSelectedClumps(clumpDataset, outputImage, selectClumpsCol, imageFormat, 1);
+            
+            GDALClose(clumpDataset);
         }
         catch (rsgis::RSGISException &e)
         {

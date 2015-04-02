@@ -92,6 +92,9 @@ namespace rsgis{ namespace cmds {
     /** Function to merge selected clumps to neighbour with closest values from input image */
     DllExport void executeMergeSelectClumps2Neighbour(std::string inputImage, std::string clumpsImage, std::string outputImage, std::string imageFormat, std::string selectClumpsCol)throw(RSGISCmdException);
     
+    /** Function to drop selected clumps from the segmentation */
+    DllExport void executeDropSelectedClumps(std::string clumpsImage, std::string outputImage, std::string imageFormat, std::string selectClumpsCol)throw(RSGISCmdException);
+    
     
 }}
 

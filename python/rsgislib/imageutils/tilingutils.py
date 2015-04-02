@@ -84,7 +84,7 @@ try:
 except ImportError as numpyErr:
     haveNumpy = False
 
-def createMinDataTiles(inputImage, outshp, width, height, validDataThreshold, offset=False, force=True, tmpdir='tilestemp'):
+def createMinDataTiles(inputImage, outshp, width, height, validDataThreshold, maskIntersect=None, offset=False, force=True, tmpdir='tilestemp'):
     """
     A function to create a tiling for an input image where each tile has a minimum amount of valid data.
     * inputImage is a string for the image to be tiled
@@ -119,6 +119,17 @@ def createMinDataTiles(inputImage, outshp, width, height, validDataThreshold, of
     ratDS = None
     
     segmentation.mergeSegments2Neighbours(tileClumpsImage, inputImage, tileMergedClumpsImage, 'KEA', "Selected")
+    
+    if not maskIntersect == None:
+        bs = []
+        bs.append(rastergis.BandAttStats(band=1, maxField='Mask'))
+        rastergis.populateRATWithStats(maskIntersect, tileMergedClumpsImage, bs)
+        ratDS = gdal.Open(tileMergedClumpsImage, gdal.GA_Update)
+        MaskField = rat.readColumn(ratDS, "Mask")
+        Selected = numpy.zeros_like(MaskField, dtype=int)
+        Selected[MaskField == 1] = 1
+        rat.writeColumn(ratDS, "Selected", Selected)
+        ratDS = None
     
     tilesDS = gdal.Open(tileMergedClumpsImage, gdal.GA_ReadOnly)
     tilesDSBand = tilesDS.GetRasterBand(1)
