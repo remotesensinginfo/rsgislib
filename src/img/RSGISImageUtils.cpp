@@ -4480,8 +4480,9 @@ namespace rsgis{namespace img{
         return outVal;
     }
     
-    void RSGISImageUtils::createImageGrid(GDALDataset *inData, unsigned int numXPxls, unsigned int numYPxls) throw(RSGISImageException)
+    void RSGISImageUtils::createImageGrid(GDALDataset *inData, unsigned int numXPxls, unsigned int numYPxls, bool offset) throw(RSGISImageException)
     {
+        //std::cerr << "WARNING: RSGISImageUtils::createImageGrid shouldn't be used; use rsgis::segment::RSGISCreateImageGrid\n";
         try
         {
             unsigned long width = inData->GetRasterXSize();
@@ -4500,28 +4501,35 @@ namespace rsgis{namespace img{
                 dataVals[i] = 0;
             }
             
-            unsigned int rowStartVal = 1;
-            unsigned int curPxlVal = 1;
-            
-            for(unsigned long y = 0; y < height; ++y)
+            if(!offset)
             {
-                if((y % numYPxls) == 0)
-                {
-                    rowStartVal = curPxlVal + 1;
-                }
+                unsigned int rowStartVal = 1;
+                unsigned int curPxlVal = 1;
                 
-                curPxlVal = rowStartVal;
-                
-                for(unsigned long x = 0; x < width; ++x)
+                for(unsigned long y = 0; y < height; ++y)
                 {
-                    if((x % numXPxls) == 0)
+                    if((y % numYPxls) == 0)
                     {
-                        ++curPxlVal;
+                        rowStartVal = curPxlVal + 1;
                     }
-                    dataVals[x] = curPxlVal;
+                    
+                    curPxlVal = rowStartVal;
+                    
+                    for(unsigned long x = 0; x < width; ++x)
+                    {
+                        if((x % numXPxls) == 0)
+                        {
+                            ++curPxlVal;
+                        }
+                        dataVals[x] = curPxlVal;
+                    }
+                    
+                    rasterBand->RasterIO(GF_Write, 0, y, width, 1, dataVals, width, 1, GDT_Int32, 0, 0);
                 }
-                
-                rasterBand->RasterIO(GF_Write, 0, y, width, 1, dataVals, width, 1, GDT_Int32, 0, 0);
+            }
+            else
+            {
+                throw RSGISImageException("RSGISImageUtils::createImageGrid with offset not implemented.");
             }
             
             delete[] dataVals;

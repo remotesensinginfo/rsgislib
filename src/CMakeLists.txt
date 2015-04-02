@@ -927,6 +927,7 @@ set(LIB_SEGMENTATION_H
 	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISBottomUpShapeFeatureExtraction.h
 	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISMergeSegmentations.h
 	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISMergeSegments.h
+	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISCreateImageGrid.h
 	)
 	
 set(LIB_SEGMENTATION_CPP
@@ -964,6 +965,8 @@ set(LIB_SEGMENTATION_CPP
 	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISMergeSegmentations.h
 	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISMergeSegments.cpp
 	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISMergeSegments.h
+	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISCreateImageGrid.cpp
+	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISCreateImageGrid.h
 	)
 ###############################################################################
 
