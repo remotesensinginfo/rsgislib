@@ -452,12 +452,15 @@ static PyObject *Segmentation_GenerateRegularGrid(PyObject *self, PyObject *args
 {
     const char *pszInputImage, *pszOutputImage, *pszGDALFormat;
     unsigned int numXPxls, numYPxls;
-    if( !PyArg_ParseTuple(args, "sssII:generateRegularGrid", &pszInputImage, &pszOutputImage, &pszGDALFormat, &numXPxls, &numYPxls ))
+    int offset = 0;
+    if( !PyArg_ParseTuple(args, "sssII|i:generateRegularGrid", &pszInputImage, &pszOutputImage, &pszGDALFormat, &numXPxls, &numYPxls, &offset))
+    {
         return NULL;
+    }
     
     try
     {
-        rsgis::cmds::executeGenerateRegularGrid(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszGDALFormat), numXPxls, numYPxls);
+        rsgis::cmds::executeGenerateRegularGrid(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszGDALFormat), numXPxls, numYPxls, (bool)offset);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -652,7 +655,7 @@ static PyMethodDef SegmentationMethods[] = {
 "\n"},
 
 {"generateRegularGrid", Segmentation_GenerateRegularGrid, METH_VARARGS,
-"segmentation.generateRegularGrid(inputImage, outputClumps, gdalformat, numXPxls, numYPxls)\n"
+"segmentation.generateRegularGrid(inputImage, outputClumps, gdalformat, numXPxls, numYPxls, offset)\n"
 "A function to generate an image where with the mean value for each clump. Primarily for visualisation and evaluating segmentation.\n"
 "where:\n"
 "\n"
@@ -661,6 +664,7 @@ static PyMethodDef SegmentationMethods[] = {
 "* gdalformat is a string defining the format of the output image.\n"
 "* numXPxls is the size of the grid cells in the X axis in pixel units.\n"
 "* numYPxls is the size of the grid cells in the Y axis in pixel units.\n"
+"* offset is a boolean specifying whether the grid should be offset, i.e., starts half way point of numXPxls and numYPxls (Default is false; optional)"
 "\n"},
     
 {"includeRegionsInClumps", Segmentation_IncludeRegionsInClumps, METH_VARARGS,

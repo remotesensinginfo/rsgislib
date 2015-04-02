@@ -84,7 +84,7 @@ try:
 except ImportError as numpyErr:
     haveNumpy = False
 
-def createMinDataTiles(inputImage, outshp, width, height, validDataThreshold, force=True, tmpdir='tilestemp'):
+def createMinDataTiles(inputImage, outshp, width, height, validDataThreshold, offset=False, force=True, tmpdir='tilestemp'):
     """
     A function to create a tiling for an input image where each tile has a minimum amount of valid data.
     * inputImage is a string for the image to be tiled
@@ -107,7 +107,7 @@ def createMinDataTiles(inputImage, outshp, width, height, validDataThreshold, fo
     tileClumpsImage = os.path.join(tmpdir, inImgBaseName+'_tilesimg.kea')
     tileMergedClumpsImage = os.path.join(tmpdir, inImgBaseName+'_tilesmergeimg.kea')
     
-    segmentation.generateRegularGrid(inputImage, tileClumpsImage, 'KEA', width, height)
+    segmentation.generateRegularGrid(inputImage, tileClumpsImage, 'KEA', width, height, offset)
     rastergis.populateStats(tileClumpsImage, True, True)
     rastergis.populateRATWithPropValidPxls(inputImage, tileClumpsImage, "ValidPxls", 0.0)
     

@@ -41,6 +41,7 @@
 #include "segmentation/RSGISBottomUpShapeFeatureExtraction.h"
 #include "segmentation/RSGISMergeSegmentations.h"
 #include "segmentation/RSGISMergeSegments.h"
+#include "segmentation/RSGISCreateImageGrid.h"
 
 #include "rastergis/RSGISRasterAttUtils.h"
 #include "rastergis/RSGISCalcImageStatsAndPyramids.h"
@@ -726,7 +727,7 @@ namespace rsgis{ namespace cmds {
     }
             
             
-    void executeGenerateRegularGrid(std::string inputImage, std::string outputClumpImage, std::string imageFormat, unsigned int numXPxls, unsigned int numYPxls)throw(RSGISCmdException)
+    void executeGenerateRegularGrid(std::string inputImage, std::string outputClumpImage, std::string imageFormat, unsigned int numXPxls, unsigned int numYPxls, bool offset)throw(RSGISCmdException)
     {
         GDALAllRegister();
         
@@ -745,7 +746,16 @@ namespace rsgis{ namespace cmds {
             GDALClose(inputDataset);
             
             std::cout << "Creating Grid\n";
-            imgUtils.createImageGrid(clumpsDataset, numXPxls, numYPxls);
+            //imgUtils.createImageGrid(clumpsDataset, numXPxls, numYPxls, offset);
+            rsgis::segment::RSGISCreateImageGrid createGrid;
+            if(offset)
+            {
+                createGrid.createClumpsOffsetGrid(clumpsDataset, numXPxls, numYPxls);
+            }
+            else
+            {
+                createGrid.createClumpsGrid(clumpsDataset, numXPxls, numYPxls);
+            }
             
             GDALClose(clumpsDataset);
         }

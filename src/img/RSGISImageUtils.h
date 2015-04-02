@@ -176,7 +176,7 @@ namespace rsgis
                 void createKMLText(std::string inputImage, std::string outKMLFile) throw(RSGISImageBandException);
                 bool closeResTest(double baseRes, double targetRes);
                 double getPixelValue(GDALDataset *image, unsigned int imgBand, double xLoc, double yLoc) throw(RSGISImageException);
-                void createImageGrid(GDALDataset *inData, unsigned int numXPxls, unsigned int numYPxls) throw(RSGISImageException);
+                void createImageGrid(GDALDataset *inData, unsigned int numXPxls, unsigned int numYPxls, bool offset) throw(RSGISImageException);
                 void populateImagePixelsInRange(GDALDataset *image, int minVal, int maxVal, bool singleLine) throw(RSGISImageException);
                 ~RSGISImageUtils();
 			private:
