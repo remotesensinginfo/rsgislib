@@ -1035,16 +1035,19 @@ static PyObject *RasterGIS_DefineClumpTilePositions(PyObject *self, PyObject *ar
 }
 
 static PyObject *RasterGIS_DefineBorderClumps(PyObject *self, PyObject *args) {
-    const char *clumpsImage, *tileImage, *outColsName;
-    unsigned int tileOverlap, tileBoundary, tileBody;
+    const char *clumpsImage, *outColsName;
 
-    if(!PyArg_ParseTuple(args, "sssIII:defineBorderClumps", &clumpsImage, &tileImage, &outColsName, &tileOverlap, &tileBoundary, &tileBody)) {
+    if(!PyArg_ParseTuple(args, "ss:defineBorderClumps", &clumpsImage, &outColsName))
+    {
         return NULL;
     }
 
-    try {
-        rsgis::cmds::executeDefineBorderClumps(std::string(clumpsImage), std::string(tileImage), std::string(outColsName), tileOverlap, tileBoundary, tileBody);
-    } catch (rsgis::cmds::RSGISCmdException &e) {
+    try
+    {
+        rsgis::cmds::executeDefineBorderClumps(std::string(clumpsImage), std::string(outColsName));
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
         PyErr_SetString(GETSTATE(self)->error, e.what());
         return NULL;
     }

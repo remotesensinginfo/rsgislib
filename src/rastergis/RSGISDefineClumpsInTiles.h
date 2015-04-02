@@ -64,6 +64,7 @@ namespace rsgis{namespace rastergis{
         RSGISDefineClumpsInTiles();
         void defineSegmentTilePos(GDALDataset *clumpsDataset, GDALDataset *tileDataset, std::string outColName, unsigned int tileOverlap, unsigned int tileBoundary, unsigned int tileBody) throw(RSGISImageException, RSGISAttributeTableException);
         void defineBorderSegmentsUsingMask(GDALDataset *clumpsDataset, GDALDataset *maskDataset, std::string outColName, unsigned int tileOverlap, unsigned int tileBoundary, unsigned int tileBody) throw(RSGISImageException, RSGISAttributeTableException);
+        void defineBorderSegments(GDALDataset *clumpsDataset, std::string outColName) throw(RSGISImageException, RSGISAttributeTableException);
         ~RSGISDefineClumpsInTiles();
     };
     
@@ -90,6 +91,27 @@ namespace rsgis{namespace rastergis{
         unsigned int tileBoundary;
         unsigned int tileBody;
 	};
+    
+    
+    class DllExport RSGISFindImageBorder : public rsgis::img::RSGISCalcImageValue
+    {
+    public:
+        RSGISFindImageBorder(size_t numRows, int *borderMask);
+        void calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException);
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent)throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        ~RSGISFindImageBorder();
+    private:
+        size_t numRows;
+        int *borderMask;
+    };
         
 
 }}

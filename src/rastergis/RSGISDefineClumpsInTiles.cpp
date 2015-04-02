@@ -33,7 +33,6 @@ namespace rsgis{namespace rastergis{
     {
         try
         {
-            
             // Get Attribute table
             GDALRasterAttributeTable *attTable = clumpsDataset->GetRasterBand(1)->GetDefaultRAT();
             
@@ -118,7 +117,6 @@ namespace rsgis{namespace rastergis{
             throw RSGISImageException(e.what());
         }
     }
-
 
     void RSGISDefineClumpsInTiles::defineBorderSegmentsUsingMask(GDALDataset *clumpsDataset, GDALDataset *maskDataset, std::string outColName, unsigned int tileOverlap, unsigned int tileBoundary, unsigned int tileBody) throw(RSGISImageException, RSGISAttributeTableException)
     {
@@ -206,7 +204,43 @@ namespace rsgis{namespace rastergis{
         }
     }
 
-
+    void RSGISDefineClumpsInTiles::defineBorderSegments(GDALDataset *clumpsDataset, std::string outColName) throw(RSGISImageException, RSGISAttributeTableException)
+    {
+        // Get Attribute table
+        GDALRasterAttributeTable *attTable = clumpsDataset->GetRasterBand(1)->GetDefaultRAT();
+        
+        size_t numRows = attTable->GetRowCount();
+        if(numRows == 0)
+        {
+            throw rsgis::RSGISAttributeTableException("RAT has no rows, i.e., it is empty!");
+        }
+        
+        // Make sure it is long enough and extend if required.
+        double maxVal = 0;
+        clumpsDataset->GetRasterBand(1)->GetStatistics(false, true, NULL, &maxVal, NULL, NULL);
+        
+        if(maxVal > numRows)
+        {
+            attTable->SetRowCount(maxVal+1);
+        }
+        numRows = attTable->GetRowCount();
+        
+        int *borderMask = new int[numRows];
+        for(size_t i = 0; i < numRows; ++i)
+        {
+            borderMask[i] = 0;
+        }
+        
+        RSGISFindImageBorder *findImageBorders = new RSGISFindImageBorder(numRows, borderMask);
+        rsgis::img::RSGISCalcImage calcImageStats(findImageBorders);
+        calcImageStats.calcImageBorderPixels(clumpsDataset, true);
+        delete findImageBorders;
+        
+        RSGISRasterAttUtils attUtils;
+        attUtils.writeIntColumn(attTable, outColName, borderMask, numRows);
+        
+        delete[] borderMask;
+    }
     
     RSGISDefineClumpsInTiles::~RSGISDefineClumpsInTiles()
     {
@@ -247,6 +281,34 @@ namespace rsgis{namespace rastergis{
     }
     
     RSGISFindClumpPositionsInTile::~RSGISFindClumpPositionsInTile()
+    {
+        
+    }
+    
+    
+    RSGISFindImageBorder::RSGISFindImageBorder(size_t numRows, int *borderMask): rsgis::img::RSGISCalcImageValue(0)
+    {
+        this->numRows = numRows;
+        this->borderMask = borderMask;
+    }
+    
+    void RSGISFindImageBorder::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException)
+    {
+        if(numIntVals == 1)
+        {
+            //std::cout << "FID = " << intBandValues[0] << std::endl;
+            if((intBandValues[0] > 0) & (intBandValues[0] < numRows))
+            {
+                this->borderMask[intBandValues[0]] = 1;
+            }
+        }
+        else
+        {
+            throw rsgis::img::RSGISImageCalcException("RSGISFindImageBorder must have a single int inputted.");
+        }
+    }
+
+    RSGISFindImageBorder::~RSGISFindImageBorder()
     {
         
     }

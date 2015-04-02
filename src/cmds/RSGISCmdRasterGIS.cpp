@@ -1109,29 +1109,26 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeDefineBorderClumps(std::string clumpsImage, std::string tileImage, std::string outColsName, unsigned int tileOverlap, unsigned int tileBoundary, unsigned int tileBody)throw(RSGISCmdException) {
+    void executeDefineBorderClumps(std::string clumpsImage, std::string outColsName)throw(RSGISCmdException)
+    {
         GDALAllRegister();
-        GDALDataset *clumpsDataset, *maskDataset;
 
-        try {
-            clumpsDataset = (GDALDataset *) GDALOpen(clumpsImage.c_str(), GA_Update);
-            if(clumpsDataset == NULL) {
+        try
+        {
+            GDALDataset *clumpsDataset = (GDALDataset *) GDALOpen(clumpsImage.c_str(), GA_Update);
+            if(clumpsDataset == NULL)
+            {
                 std::string message = std::string("Could not open image ") + clumpsImage;
                 throw rsgis::RSGISImageException(message.c_str());
             }
 
-            maskDataset = (GDALDataset *) GDALOpen(tileImage.c_str(), GA_ReadOnly);
-            if(maskDataset == NULL) {
-                std::string message = std::string("Could not open image ") + tileImage;
-                throw rsgis::RSGISImageException(message.c_str());
-            }
-
             rsgis::rastergis::RSGISDefineClumpsInTiles defineSegsInTile;
-            defineSegsInTile.defineBorderSegmentsUsingMask(clumpsDataset, maskDataset, outColsName, tileOverlap, tileBoundary, tileBody);
+            defineSegsInTile.defineBorderSegments(clumpsDataset, outColsName);
 
             GDALClose(clumpsDataset);
-            GDALClose(maskDataset);
-        } catch(rsgis::RSGISException &e) {
+        }
+        catch(rsgis::RSGISException &e)
+        {
             throw RSGISCmdException(e.what());
         }
     }
