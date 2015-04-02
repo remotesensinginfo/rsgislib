@@ -228,4 +228,4 @@ Example::
         inImagesDict.append({'IN':image, 'OUT':outImg, 'TYPE':datatype})
 
     return inImagesDict
-    
+
