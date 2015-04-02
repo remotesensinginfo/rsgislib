@@ -1144,6 +1144,65 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
+            
+    void executeCreateCopyBlankImageVecExtent(std::string inputImage, std::string inputVector, std::string outputImage, unsigned int numBands, float pxlVal, std::string gdalFormat, RSGISLibDataType outDataType) throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            OGRRegisterAll();
+            GDALDataset *inDataset = NULL;
+            inDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+            if(inDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw RSGISImageException(message.c_str());
+            }
+            
+            OGRDataSource *inputVecDS = NULL;
+            OGRLayer *inputVecLayer = NULL;
+            // Convert to absolute path
+            inputVector = boost::filesystem::absolute(inputVector).string();
+            rsgis::vec::RSGISVectorUtils vecUtils;
+            std::string vectorLayerName = vecUtils.getLayerName(inputVector);
+            
+            // Open vector
+            inputVecDS = OGRSFDriverRegistrar::Open(inputVector.c_str(), FALSE);
+            if(inputVecDS == NULL)
+            {
+                std::string message = std::string("Could not open vector file ") + inputVector;
+                throw RSGISFileException(message.c_str());
+            }
+            inputVecLayer = inputVecDS->GetLayerByName(vectorLayerName.c_str());
+            if(inputVecLayer == NULL)
+            {
+                std::string message = std::string("Could not open vector layer ") + vectorLayerName;
+                throw RSGISFileException(message.c_str());
+            }
+            OGREnvelope ogrExtent;
+            inputVecLayer->GetExtent(&ogrExtent);
+            geos::geom::Envelope extent = geos::geom::Envelope(ogrExtent.MinX, ogrExtent.MaxX, ogrExtent.MinY, ogrExtent.MaxY);
+            
+            rsgis::img::RSGISImageUtils imgUtils;
+            GDALDataset *outDataset = imgUtils.createCopy(inDataset, numBands, outputImage, gdalFormat, RSGIS_to_GDAL_Type(outDataType), extent);
+            imgUtils.assignValGDALDataset(outDataset, pxlVal);
+            
+            GDALClose(inDataset);
+            GDALClose(outDataset);
+        }
+        catch (RSGISImageException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (RSGISException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
 
     void executeStackStats(std::string inputImage, std::string outputImage, std::string calcStat, bool allBands, unsigned int numBands, std::string imageFormat, RSGISLibDataType outDataType) throw(RSGISCmdException)
     {

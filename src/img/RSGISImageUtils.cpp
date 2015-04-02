@@ -4217,6 +4217,114 @@ namespace rsgis{namespace img{
         return dataset;
         
     }
+    
+    GDALDataset* RSGISImageUtils::createCopy(GDALDataset *inData, unsigned int numBands, std::string outputFilePath, std::string outputFormat, GDALDataType eType, geos::geom::Envelope extent, bool useImgProj, std::string proj)throw(RSGISImageException)
+    {
+        GDALDataset *dataset = NULL;
+        try
+        {
+            double outImgMinX = 0.0;
+            //double outImgMaxX = 0.0;
+            //double outImgMinY = 0.0;
+            double outImgMaxY = 0.0;
+            unsigned long outImgWidth = 0;
+            unsigned long outImgHeight = 0;
+            
+            unsigned long width = inData->GetRasterXSize();
+            unsigned long height = inData->GetRasterYSize();
+            
+            double *gdalTranslation = new double[6];
+            inData->GetGeoTransform(gdalTranslation);
+            
+            double xPxlSize = gdalTranslation[1];
+            double yPxlSize = gdalTranslation[5] * (-1);
+            
+            double imgMinX = gdalTranslation[0];
+            double imgMaxX = imgMinX + (gdalTranslation[1] * width);
+            double imgMaxY = gdalTranslation[3];
+            double imgMinY = imgMaxY + (gdalTranslation[5] * height);
+            
+            // Check extent is within image.
+            if( (extent.getMinX() >= imgMinX) & (extent.getMaxX() <= imgMaxX) & (extent.getMinY() >= imgMinY) & (extent.getMaxY() <= imgMinY) )
+            {
+                delete[] gdalTranslation;
+                throw RSGISImageException("Extent needs to be within the image extent.");
+            }
+            
+            //std::cout << "IMG: [" << imgMinX << ", " << imgMaxX << "][" << imgMinY << ", " << imgMaxY << "]\n";
+            //std::cout << "VEC: [" << extent.getMinX() << ", " << extent.getMaxX() << "][" << extent.getMinY() << ", " << extent.getMaxY() << "]\n";
+            
+            // Find Min X
+            double xMinDiff = extent.getMinX() - imgMinX;
+            unsigned int numPxls2ExtXMin = floor(xMinDiff/xPxlSize);
+            outImgMinX = imgMinX + (numPxls2ExtXMin * xPxlSize);
+            
+            //std::cout << "outImgMinX = " << outImgMinX << std::endl;
+            
+            // Find Max Y
+            double yMaxDiff = imgMaxY - extent.getMaxY();
+            unsigned int numPxls2ExtYMax = floor(yMaxDiff/yPxlSize);
+            outImgMaxY = imgMaxY - (numPxls2ExtYMax * yPxlSize);
+            
+            //std::cout << "outImgMaxY = " << outImgMaxY << std::endl;
+            
+            // Find Max X and width
+            double xMaxDiff = extent.getMaxX() - outImgMinX;
+            outImgWidth = ceil(xMaxDiff/xPxlSize);
+            //outImgMaxX = outImgMinX + (outImgWidth * xPxlSize);
+            
+            //std::cout << "outImgMaxX = " << outImgMaxX << std::endl;
+            //std::cout << "outImgWidth = " << outImgWidth << std::endl;
+            
+            // Find Min Y and height
+            double yMinDiff = outImgMaxY - extent.getMinY();
+            outImgHeight = ceil(yMinDiff/yPxlSize);
+            //outImgMinY = outImgMaxY - (outImgHeight * yPxlSize);
+            
+            //std::cout << "outImgMaxX = " << outImgMaxX << std::endl;
+            //std::cout << "outImgWidth = " << outImgWidth << std::endl;
+            
+            //std::cout << "outImgMinY = " << outImgMinY << std::endl;
+            //std::cout << "outImgHeight = " << outImgHeight << std::endl;
+            
+            //std::cout << "OUT: [" << outImgMinX << ", " << outImgMaxX << "][" << outImgMinY << ", " << outImgMaxY << "]\n";
+            //std::cout << "IMG DIMS [" << outImgWidth << ", " << outImgHeight << "]\n";
+            gdalTranslation[0] = outImgMinX;
+            gdalTranslation[3] = outImgMaxY;
+            
+            GDALDriver *gdalDriver = GetGDALDriverManager()->GetDriverByName(outputFormat.c_str());
+            if(gdalDriver == NULL)
+            {
+                delete[] gdalTranslation;
+                std::string message = std::string("Driver for ") + outputFormat + std::string(" does not exist\n");
+                throw RSGISImageException(message.c_str());
+            }
+            
+            dataset = gdalDriver->Create(outputFilePath.c_str(), outImgWidth, outImgHeight, numBands, eType, NULL);
+            if(dataset == NULL)
+            {
+                delete[] gdalTranslation;
+                std::string message = std::string("Could not create GDALDataset.");
+                throw RSGISImageException(message);
+            }
+            
+            dataset->SetGeoTransform(gdalTranslation);
+            if(useImgProj)
+            {
+                dataset->SetProjection(inData->GetProjectionRef());
+            }
+            else
+            {
+                dataset->SetProjection(proj.c_str());
+            }
+            delete[] gdalTranslation;
+        }
+        catch(RSGISImageException &e)
+        {
+            throw e;
+        }
+        return dataset;
+    }
 
     void RSGISImageUtils::createKMLText(std::string inputImage, std::string outKMLFile) throw(RSGISImageBandException)
     {

@@ -28,7 +28,7 @@ from rsgislib import imageutils
 # Import the RSGISLib RasterGIS module
 from rsgislib import rastergis
 
-def rasterise2Image(inputVec, inputImage, outImage, gdalFormat="KEA", shpAtt=None):
+def rasterise2Image(inputVec, inputImage, outImage, gdalFormat="KEA", shpAtt=None, shpExt=False):
     """ A utillity to rasterise a shapefile into an image covering the same region and at the same resolution as the input image. 
 
 Where:
@@ -39,7 +39,7 @@ Where:
 * gdalFormat is the output image format (Default: KEA).
 * shpAtt is a string specifying the attribute to be rasterised, value of None creates a 
               binary mask and \"FID\" creates a temp shapefile with a "FID" column and rasterises that column.
-
+* shpExt is a boolean specifying that the output image should be cut to the same extent as the input shapefile (Default is False and therefore output image will be the same as the input).
 Example::
 
     from rsgislib import vectorutils
@@ -60,7 +60,10 @@ Example::
             raise Exception("The OGR python bindings required for this function could not be imported\n\t" + ogrErr)
         
         print("Creating output image")
-        imageutils.createCopyImage(inputImage, outImage, 1, 0, gdalFormat, rsgislib.TYPE_32UINT)
+        if shpExt:
+            imageutils.createCopyImageVecExtent(inputImage, inputVec, outImage, 1, 0, gdalFormat, rsgislib.TYPE_32UINT)
+        else:
+            imageutils.createCopyImage(inputImage, outImage, 1, 0, gdalFormat, rsgislib.TYPE_32UINT)
         
         if shpAtt == "FID":   
             tmpVector = os.path.splitext(inputVec)[0] + "_tmpFIDFile.shp"

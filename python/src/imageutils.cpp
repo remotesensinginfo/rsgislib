@@ -801,6 +801,29 @@ static PyObject *ImageUtils_CreateCopyImage(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
+static PyObject *ImageUtils_CreateCopyImageVecExtent(PyObject *self, PyObject *args)
+{
+    const char *pszInputImage, *pszOutputImage, *pszExtentShp, *pszGDALFormat;
+    int nOutDataType;
+    unsigned int numBands;
+    float pxlVal = 0;
+    
+    if( !PyArg_ParseTuple(args, "sssIfsi:createCopyImageVecExtent", &pszInputImage, &pszExtentShp, &pszOutputImage, &numBands, &pxlVal, &pszGDALFormat, &nOutDataType))
+        return NULL;
+    
+    try
+    {
+        rsgis::cmds::executeCreateCopyBlankImageVecExtent(std::string(pszInputImage), std::string(pszExtentShp), std::string(pszOutputImage), numBands, pxlVal, std::string(pszGDALFormat), (rsgis::RSGISLibDataType)nOutDataType);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 
 static PyObject *ImageUtils_StackStats(PyObject *self, PyObject *args)
 {
@@ -1348,6 +1371,27 @@ static PyMethodDef ImageUtilsMethods[] = {
     "   gdalformat = 'KEA'\n"
     "   datatype = rsgislib.TYPE_32FLOAT\n"
     "   imageutils.createCopyImage(inputImage, outputImage, 1, 3, gdalformat, datatype)\n"
+    "\n"},
+    
+{"createCopyImageVecExtent", ImageUtils_CreateCopyImageVecExtent, METH_VARARGS,
+    "imageutils.createCopyImageVecExtent(inputImage, shpFile, outputImage, numBands, pxlVal, gdalformat, datatype)\n"
+    "Create a new blank image with the parameters specified but with the extent of the inputted shapefile.\n"
+    "\n"
+    "* inputImage is a string containing the name and path for the input image, which is to be copied.\n"
+    "* shpFile is a string specifying the name and path of the shapefile to which the image extent will be cut\n"
+    "* outputImage is a string containing the name and path for the outputted image.\n"
+    "* numBands is an integer specifying the number of image bands in the output image.\n"
+    "* pxlVal is a float specifying the pixel value of the output image.\n"
+    "* gdalformat is a string providing the gdalformat of the output image (e.g., KEA).\n"
+    "* datatype is a rsgislib.TYPE_* value providing the data type of the output image.\n"
+    "\nExample::\n"
+    "\n"
+    "   inputImage = './Rasters/injune_p142_casi_sub_utm.kea'\n"
+    "   shpFile = './Rasters/injune_p142_roi.shp'\n"
+    "   outputImage = './TestOutputs/injune_p142_casi_sub_utm_blank.kea'\n"
+    "   gdalformat = 'KEA'\n"
+    "   datatype = rsgislib.TYPE_32FLOAT\n"
+    "   imageutils.createCopyImageVecExtent(inputImage, shpFile, outputImage, 3, 1, gdalformat, datatype)\n"
     "\n"},
 
 {"stackStats", ImageUtils_StackStats, METH_VARARGS,
