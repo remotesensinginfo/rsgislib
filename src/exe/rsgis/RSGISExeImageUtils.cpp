@@ -4890,7 +4890,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
             
             try
             {
-                rsgis::cmds::excecuteSubset(this->inputImage, this->inputVector, this->outputImage, this->imageFormat, this->rsgisOutDataType);
+                rsgis::cmds::executeSubset(this->inputImage, this->inputVector, this->outputImage, this->imageFormat, this->rsgisOutDataType);
             }
             catch(rsgis::cmds::RSGISCmdException &e)
             {
@@ -4906,7 +4906,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
         
             try
             {
-                rsgis::cmds::excecuteSubset2Polys(this->inputImage, this->inputVector, this->filenameAttribute, this->outputImage, this->imageFormat, this->rsgisOutDataType, this->outFileExtension);
+                rsgis::cmds::executeSubset2Polys(this->inputImage, this->inputVector, this->filenameAttribute, this->outputImage, this->imageFormat, this->rsgisOutDataType, this->outFileExtension);
             }
 			catch(RSGISException e)
 			{
@@ -5460,7 +5460,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
             std::cout << "Output: " << this->outputImage << std::endl;
             try
             {
-                rsgis::cmds::excecuteSubset2Img(this->inputImage, this->inputROIImage, this->outputImage, this->imageFormat, this->rsgisOutDataType);
+                rsgis::cmds::executeSubset2Img(this->inputImage, this->inputROIImage, this->outputImage, this->imageFormat, this->rsgisOutDataType);
             }
             catch (rsgis::cmds::RSGISCmdException &e)
             {

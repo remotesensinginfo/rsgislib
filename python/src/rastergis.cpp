@@ -182,6 +182,30 @@ static PyObject *RasterGIS_SpatialLocation(PyObject *self, PyObject *args, PyObj
     Py_RETURN_NONE;
 }
 
+static PyObject *RasterGIS_SpatialExtent(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    const char *inputImage, *minXCol, *maxXCol, *minYCol, *maxYCol;
+    unsigned int ratBand = 1;
+    static char *kwlist[] = {"clumps", "minX", "maxX", "minY", "maxY", "ratband", NULL};
+    
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssss|I:spatialExtent", kwlist, &inputImage, &minXCol, &maxXCol, &minYCol, &maxYCol, &ratBand))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeSpatialLocationExtent(std::string(inputImage), ratBand, std::string(minXCol), std::string(maxXCol), std::string(minYCol), std::string(maxYCol));
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 static PyObject *RasterGIS_PopulateRATWithStats(PyObject *self, PyObject *args, PyObject *keywds)
 {
     const char *inputImage, *clumpsImage;
@@ -1945,6 +1969,28 @@ static PyMethodDef RasterGISMethods[] = {
 "   eastings = 'Easting'\n"
 "   northings = 'Northing'\n"
 "   rastergis.spatialLocation(image, eastings, northings)\n"
+"\n"},
+    
+{"spatialExtent", (PyCFunction)RasterGIS_SpatialExtent, METH_VARARGS | METH_KEYWORDS,
+"rastergis.spatialExtent(clumps=string, minX=string, maxX=string, minY=string, maxY=string, ratband=int)\n"
+"Adds spatial extent for each clump to the attribute table\n"
+"Where:\n"
+"* inputImage is a string containing the name of the input image file\n"
+"* minX is a string containing the name of the min X field\n"
+"* maxX is a string containing the name of the max X field\n"
+"* minY is a string containing the name of the min Y field\n"
+"* maxY is a string containing the name of the max Y field\n"
+"* ratband is an integer containing the band number for the RAT (Optional, default = 1)\n"
+"\n"
+"Example::\n"
+"\n"
+"   from rsgislib import rastergis\n"
+"   image = 'injune_p142_casi_sub_utm_segs_spatloc_eucdist.kea'\n"
+"   minX = 'minX'\n"
+"   maxX = 'maxX'\n"
+"   minY = 'minY'\n"
+"   maxY = 'maxY'\n"
+"   rastergis.spatialLocation(image, minX, maxX, minY, maxY)\n"
 "\n"},
 
     {"populateRATWithStats", (PyCFunction)RasterGIS_PopulateRATWithStats, METH_VARARGS | METH_KEYWORDS,
