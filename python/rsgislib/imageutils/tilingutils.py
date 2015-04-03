@@ -109,6 +109,25 @@ def createMinDataTiles(inputImage, outshp, width, height, validDataThreshold, ma
     
     segmentation.generateRegularGrid(inputImage, tileClumpsImage, 'KEA', width, height, offset)
     rastergis.populateStats(tileClumpsImage, True, True)
+    
+    if not maskIntersect == None:
+        bs = []
+        bs.append(rastergis.BandAttStats(band=1, maxField='Mask'))
+        rastergis.populateRATWithStats(maskIntersect, tileClumpsImage, bs)
+        ratDS = gdal.Open(tileClumpsImage, gdal.GA_Update)
+        MaskField = rat.readColumn(ratDS, "Mask")
+        Selected = numpy.zeros_like(MaskField, dtype=int)
+        Selected[MaskField == 0] = 1
+        rat.writeColumn(ratDS, "Selected", Selected)
+        ratDS = None
+        
+        tileClumpsImageDropClumps = os.path.join(tmpdir, inImgBaseName+'_tilesimgdropped.kea')
+
+        segmentation.dropSelectedClumps(tileClumpsImage, tileClumpsImageDropClumps, 'KEA', 'Selected')
+        os.remove(tileClumpsImage)
+        tileClumpsImage = tileClumpsImageDropClumps
+    
+        
     rastergis.populateRATWithPropValidPxls(inputImage, tileClumpsImage, "ValidPxls", 0.0)
     
     ratDS = gdal.Open(tileClumpsImage, gdal.GA_Update)
@@ -117,20 +136,9 @@ def createMinDataTiles(inputImage, outshp, width, height, validDataThreshold, ma
     Selected[ValidPxls < validDataThreshold] = 1
     rat.writeColumn(ratDS, "Selected", Selected)
     ratDS = None
-    
+        
     segmentation.mergeSegments2Neighbours(tileClumpsImage, inputImage, tileMergedClumpsImage, 'KEA', "Selected")
-    
-    if not maskIntersect == None:
-        bs = []
-        bs.append(rastergis.BandAttStats(band=1, maxField='Mask'))
-        rastergis.populateRATWithStats(maskIntersect, tileMergedClumpsImage, bs)
-        ratDS = gdal.Open(tileMergedClumpsImage, gdal.GA_Update)
-        MaskField = rat.readColumn(ratDS, "Mask")
-        Selected = numpy.zeros_like(MaskField, dtype=int)
-        Selected[MaskField == 1] = 1
-        rat.writeColumn(ratDS, "Selected", Selected)
-        ratDS = None
-    
+       
     tilesDS = gdal.Open(tileMergedClumpsImage, gdal.GA_ReadOnly)
     tilesDSBand = tilesDS.GetRasterBand(1)
     
@@ -144,7 +152,7 @@ def createMinDataTiles(inputImage, outshp, width, height, validDataThreshold, ma
     dst_ds = drv.CreateDataSource( outshp )
     dst_layer = dst_ds.CreateLayer(dst_layername, srs = None )
     
-    gdal.Polygonize( tilesDSBand, None, dst_layer, -1, [], callback=None )
+    gdal.Polygonize( tilesDSBand, tilesDSBand, dst_layer, -1, [], callback=None )
     
     tilesDS = None
     dst_ds = None
@@ -154,7 +162,6 @@ def createMinDataTiles(inputImage, outshp, width, height, validDataThreshold, ma
     else:
         os.remove(tileClumpsImage)
         os.remove(tileMergedClumpsImage)
-
 
 def createTileMaskImages(inputImage, tileShp, outTilesImgBase, tmpdir='tilestemp'):
     """

@@ -51,8 +51,8 @@ namespace rsgis{namespace segment{
             }
             
             size_t *newClumpIds = new size_t[numRows];
-            size_t clumpID = 0;
-            for(size_t i = 0; i < numRows; ++i)
+            size_t clumpID = 1;
+            for(size_t i = 1; i < numRows; ++i)
             {
                 if(selectCol[i] == 1)
                 {
