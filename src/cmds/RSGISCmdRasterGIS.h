@@ -181,6 +181,9 @@ namespace rsgis{ namespace cmds {
 
     /** Function for adding spatial location columns to the attribute table */
     DllExport void executeSpatialLocation(std::string inputImage, unsigned int ratBand, std::string eastingsField, std::string northingsField)throw(RSGISCmdException);
+    
+    /** Function for adding the spatial extent for each clump as columns to the attribute table */
+    DllExport void executeSpatialLocationExtent(std::string inputImage, unsigned int ratBand, std::string minXCol, std::string maxXCol, std::string minYCol, std::string maxYCol)throw(RSGISCmdException);
 
     /** Function for populating an attribute table from an image */
     DllExport void executePopulateRATWithStats(std::string inputImage, std::string clumpsImage, std::vector<rsgis::cmds::RSGISBandAttStatsCmds*> *bandStatsCmds, unsigned int ratBand)throw(RSGISCmdException);
