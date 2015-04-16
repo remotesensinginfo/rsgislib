@@ -42,6 +42,7 @@
 #include "vec/RSGISGetOGRGeometries.h"
 #include "vec/RSGISVectorMaths.h"
 #include "vec/RSGISCopyFeatures.h"
+#include "vec/RSGISVectorProcessing.h"
 
 #include "img/RSGISImageUtils.h"
 
@@ -1302,6 +1303,63 @@ namespace rsgis{ namespace cmds {
             throw e;
         }
         catch(RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+            
+            
+    void executeSplitFeatures(std::string inputVector, std::string outputVectorBase, bool force) throw(RSGISCmdException)
+    {
+        // Convert to absolute path
+        inputVector = boost::filesystem::absolute(inputVector).string();
+        outputVectorBase = boost::filesystem::absolute(outputVectorBase).string();
+        
+        OGRRegisterAll();
+        
+        rsgis::utils::RSGISFileUtils fileUtils;
+        rsgis::vec::RSGISVectorUtils vecUtils;
+        rsgis::vec::RSGISVectorProcessing vecProcessing;
+        
+        std::string SHPFileInLayer = vecUtils.getLayerName(inputVector);
+        
+
+        OGRDataSource *inputSHPDS = NULL;
+        OGRLayer *inputSHPLayer = NULL;
+        
+        try
+        {
+            /////////////////////////////////////
+            //
+            // Open Input Shapfile.
+            //
+            /////////////////////////////////////
+            inputSHPDS = OGRSFDriverRegistrar::Open(inputVector.c_str(), FALSE);
+            if(inputSHPDS == NULL)
+            {
+                std::string message = std::string("Could not open vector file ") + inputVector;
+                throw RSGISFileException(message.c_str());
+            }
+            inputSHPLayer = inputSHPDS->GetLayerByName(SHPFileInLayer.c_str());
+            if(inputSHPLayer == NULL)
+            {
+                std::string message = std::string("Could not open vector layer ") + SHPFileInLayer;
+                throw RSGISFileException(message.c_str());
+            }
+            
+            vecProcessing.splitFeatures(inputSHPLayer, outputVectorBase, force);
+            
+            OGRDataSource::DestroyDataSource(inputSHPDS);
+        }
+        catch(rsgis::RSGISVectorException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(rsgis::RSGISException &e)
         {
             throw RSGISCmdException(e.what());
         }

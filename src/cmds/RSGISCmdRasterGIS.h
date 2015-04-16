@@ -181,6 +181,9 @@ namespace rsgis{ namespace cmds {
 
     /** Function for adding spatial location columns to the attribute table */
     DllExport void executeSpatialLocation(std::string inputImage, unsigned int ratBand, std::string eastingsField, std::string northingsField)throw(RSGISCmdException);
+    
+    /** Function for adding the spatial extent for each clump as columns to the attribute table */
+    DllExport void executeSpatialLocationExtent(std::string inputImage, unsigned int ratBand, std::string minXCol, std::string maxXCol, std::string minYCol, std::string maxYCol)throw(RSGISCmdException);
 
     /** Function for populating an attribute table from an image */
     DllExport void executePopulateRATWithStats(std::string inputImage, std::string clumpsImage, std::vector<rsgis::cmds::RSGISBandAttStatsCmds*> *bandStatsCmds, unsigned int ratBand)throw(RSGISCmdException);
@@ -258,16 +261,16 @@ namespace rsgis{ namespace cmds {
     //DllExport void executeCalcShapeIndices(std::string inputImage, std::vector<cmds::RSGISShapeParamCmds> shapeIndexes)throw(RSGISCmdException);
 
     /** Function to define the position within the file of the clumps */
-    //DllExport void executeDefineClumpTilePositions(std::string clumpsImage, std::string tileImage, std::string outColsName, unsigned int tileOverlap, unsigned int tileBoundary, unsigned int tileBody)throw(RSGISCmdException);
+    DllExport void executeDefineClumpTilePositions(std::string clumpsImage, std::string tileImage, std::string outColsName, unsigned int tileOverlap, unsigned int tileBoundary, unsigned int tileBody)throw(RSGISCmdException);
 
-    /** Function to define the clumps which are on the border within the file of the clumps using a mask */
-    //DllExport void executeDefineBorderClumps(std::string clumpsImage, std::string tileImage, std::string outColsName, unsigned int tileOverlap, unsigned int tileBoundary, unsigned int tileBody)throw(RSGISCmdException);
+    /** Function to define the clumps which are on the border within the file of the clumps */
+    DllExport void executeDefineBorderClumps(std::string clumpsImage, std::string outColsName)throw(RSGISCmdException);
 
     /** Function to identify segments which have changed by looking for statistical outliers (std dev) from class population */
     DllExport void executeFindChangeClumpsFromStdDev(std::string clumpsImage, std::string classField, std::string changeField, std::vector<std::string> attFields, std::vector<cmds::RSGISClassChangeFieldsCmds> classChangeFields, int ratBand=1) throw(RSGISCmdException);
 
     /** Function to attribute each row with mean and standard deviation for the class population, similar to executeFindChangeClumpsFromStdDev but requires change to be calculated externally */
-   DllExport void executeGetGlobalClassStats(std::string clumpsImage, std::string classField, std::vector<std::string> attFields, std::vector<cmds::RSGISClassChangeFieldsCmds> classChangeFields, int ratBand=1) throw(RSGISCmdException);
+    DllExport void executeGetGlobalClassStats(std::string clumpsImage, std::string classField, std::vector<std::string> attFields, std::vector<cmds::RSGISClassChangeFieldsCmds> classChangeFields, int ratBand=1) throw(RSGISCmdException);
 
     /** Function to identify an extreme clump/segment with regions of the image, regions defined on a grid */
     DllExport void executeIdentifyClumpExtremesOnGrid(std::string clumpsImage, std::string inSelectField, std::string outSelectField, std::string eastingsCol, std::string northingsCol, std::string methodStr, unsigned int rows, unsigned int cols, std::string metricField)throw(RSGISCmdException);
@@ -307,7 +310,9 @@ namespace rsgis{ namespace cmds {
 
     /** Function to fit a Gaussian mixture model to histogram and to split the class accordingly */
     DllExport void executeClassSplitFitHistGausianMixtureModel(std::string clumpsImage, unsigned int ratBand, std::string outColumn, std::string varCol, float binWidth, std::string classColumn, std::string classVal)throw(RSGISCmdException);
-
+    
+    /** Function which populates the RAT with proportion of valid pixels within a clump */
+    DllExport void executeCalcPropOfValidPixelsInClump(std::string inputImage, std::string clumpsImage, unsigned int ratBand, std::string outColumn, double noDataVal=0)throw(RSGISCmdException);
     
 }}
 

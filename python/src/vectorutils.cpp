@@ -61,16 +61,6 @@ static std::vector<std::string> ExtractStringVectorFromSequence(PyObject *sequen
     return stringsArray;
 }
 
-
-/*
-Will probably want this later - comment out for now to prevernt warnings
-static void FreePythonObjects(std::vector<PyObject*> toFree) {
-    std::vector<PyObject*>::iterator iter;
-    for(iter = toFree.begin(); iter != toFree.end(); ++iter) {
-        Py_XDECREF(*iter);
-    }
-}*/
-
 static PyObject *VectorUtils_GenerateConvexHullsGroups(PyObject *self, PyObject *args)
 {
     const char *pszInputFile, *pszOutputVector, *pszOutVecProj;
@@ -361,6 +351,29 @@ static PyObject *VectorUtils_FindCommonImgExtent(PyObject *self, PyObject *args)
 }
 
 
+static PyObject *VectorUtils_SplitFeatures(PyObject *self, PyObject *args)
+{
+    const char *pszInputVector, *pszOutputVectorBase;
+    int force = false;
+    if( !PyArg_ParseTuple(args, "ss|i:splitFeatures", &pszInputVector, &pszOutputVectorBase, &force))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeSplitFeatures(std::string(pszInputVector), std::string(pszOutputVectorBase), ((bool)force));
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+
 // Our list of functions in this module
 static PyMethodDef VectorUtilsMethods[] = {
     {"generateConvexHullsGroups", VectorUtils_GenerateConvexHullsGroups, METH_VARARGS, 
@@ -547,6 +560,23 @@ static PyMethodDef VectorUtilsMethods[] = {
 "   inputImages = ['img1.kea', 'img2.kea', 'img3.kea', 'img4.kea', 'img5.kea']\n"
 "   outputVector = 'imgSubExtent.shp'\n"
 "   vectorutils.findCommonImgExtent(inputImages, outputVector, True)\n"
+"\n"},
+    
+{"splitFeatures", VectorUtils_SplitFeatures, METH_VARARGS,
+"vectorutils.splitFeatures(inputvector, outputvectorbase, force)\n"
+"A command to split features into seperate shapefiles.\n\n"
+"Where:\n"
+"\n"
+"* inputvector is a string containing the name of the input vector\n"
+"* outputvectorbase is a string containing the base path and name of the output vectors\n"
+"* force is a bool, specifying whether to force removal of the output vector if it exists\n"
+"\n"
+"Example::\n"
+"\n"
+"   from rsgislib import vectorutils\n"
+"   inputVector = './Vectors/injune_p142_psu_utm.shp'\n"
+"   outputVectorBase = './TestOutputs/injune_p142_psu_utm_'\n"
+"   vectorutils.splitFeatures(inputVector, outputVectorBase, True)\n"
 "\n"},
     
     {NULL}        /* Sentinel */

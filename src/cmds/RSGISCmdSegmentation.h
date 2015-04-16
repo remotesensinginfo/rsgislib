@@ -84,10 +84,17 @@ namespace rsgis{ namespace cmds {
     DllExport void executeRMSmallClumps(std::string clumpsImage, std::string outputImage, float threshold, std::string imgFormat)throw(RSGISCmdException);
     
     /** Function to produce a regular grid of clumps for a defined image area */
-    DllExport void executeGenerateRegularGrid(std::string inputImage, std::string outputClumpImage, std::string imageFormat, unsigned int numXPxls, unsigned int numYPxls)throw(RSGISCmdException);
+    DllExport void executeGenerateRegularGrid(std::string inputImage, std::string outputClumpImage, std::string imageFormat, unsigned int numXPxls, unsigned int numYPxls, bool offset)throw(RSGISCmdException);
     
     /** Function to include a clumped masked region into an existing segmebtation */
     DllExport void executeIncludeClumpedRegion(std::string inputClumps, std::string inputRegion, std::string outputClumpImage, std::string imageFormat)throw(RSGISCmdException);
+    
+    /** Function to merge selected clumps to neighbour with closest values from input image */
+    DllExport void executeMergeSelectClumps2Neighbour(std::string inputImage, std::string clumpsImage, std::string outputImage, std::string imageFormat, std::string selectClumpsCol)throw(RSGISCmdException);
+    
+    /** Function to drop selected clumps from the segmentation */
+    DllExport void executeDropSelectedClumps(std::string clumpsImage, std::string outputImage, std::string imageFormat, std::string selectClumpsCol)throw(RSGISCmdException);
+    
     
 }}
 

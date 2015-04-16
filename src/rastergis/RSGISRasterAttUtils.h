@@ -152,6 +152,8 @@ namespace rsgis{namespace rastergis{
         std::vector<std::string>* readStrColumnAsVec(GDALRasterAttributeTable *attTable, std::string colName) throw(RSGISAttributeTableException);
         std::vector<std::vector<size_t>* >* getRATNeighbours(GDALDataset *clumpImage, unsigned int ratBand) throw(RSGISAttributeTableException);
         void writeStrColumn(GDALRasterAttributeTable *attTable, std::string colName, std::string *strDataVal, size_t colLen) throw(RSGISAttributeTableException);
+        void writeIntColumn(GDALRasterAttributeTable *attTable, std::string colName, int *intDataVal, size_t colLen) throw(RSGISAttributeTableException);
+        void writeRealColumn(GDALRasterAttributeTable *attTable, std::string colName, double *realDataVal, size_t colLen) throw(RSGISAttributeTableException);
         std::vector<RSGISRATCol>* getRatColumnsList(GDALRasterAttributeTable *gdalATT) throw(RSGISAttributeTableException);
         std::vector<RSGISRATCol>* getVectorColumns(OGRLayer *layer) throw(RSGISAttributeTableException);
         ~RSGISRasterAttUtils();

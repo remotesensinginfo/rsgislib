@@ -182,6 +182,30 @@ static PyObject *RasterGIS_SpatialLocation(PyObject *self, PyObject *args, PyObj
     Py_RETURN_NONE;
 }
 
+static PyObject *RasterGIS_SpatialExtent(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    const char *inputImage, *minXCol, *maxXCol, *minYCol, *maxYCol;
+    unsigned int ratBand = 1;
+    static char *kwlist[] = {"clumps", "minX", "maxX", "minY", "maxY", "ratband", NULL};
+    
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssss|I:spatialExtent", kwlist, &inputImage, &minXCol, &maxXCol, &minYCol, &maxYCol, &ratBand))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeSpatialLocationExtent(std::string(inputImage), ratBand, std::string(minXCol), std::string(maxXCol), std::string(minYCol), std::string(maxYCol));
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 static PyObject *RasterGIS_PopulateRATWithStats(PyObject *self, PyObject *args, PyObject *keywds)
 {
     const char *inputImage, *clumpsImage;
@@ -1014,6 +1038,7 @@ static PyObject *RasterGIS_CalcShapeIndices(PyObject *self, PyObject *args) {
 
     Py_RETURN_NONE;
 }
+*/
 
 static PyObject *RasterGIS_DefineClumpTilePositions(PyObject *self, PyObject *args) {
     const char *clumpsImage, *tileImage, *outColsName;
@@ -1034,23 +1059,26 @@ static PyObject *RasterGIS_DefineClumpTilePositions(PyObject *self, PyObject *ar
 }
 
 static PyObject *RasterGIS_DefineBorderClumps(PyObject *self, PyObject *args) {
-    const char *clumpsImage, *tileImage, *outColsName;
-    unsigned int tileOverlap, tileBoundary, tileBody;
+    const char *clumpsImage, *outColsName;
 
-    if(!PyArg_ParseTuple(args, "sssIII:defineBorderClumps", &clumpsImage, &tileImage, &outColsName, &tileOverlap, &tileBoundary, &tileBody)) {
+    if(!PyArg_ParseTuple(args, "ss:defineBorderClumps", &clumpsImage, &outColsName))
+    {
         return NULL;
     }
 
-    try {
-        rsgis::cmds::executeDefineBorderClumps(std::string(clumpsImage), std::string(tileImage), std::string(outColsName), tileOverlap, tileBoundary, tileBody);
-    } catch (rsgis::cmds::RSGISCmdException &e) {
+    try
+    {
+        rsgis::cmds::executeDefineBorderClumps(std::string(clumpsImage), std::string(outColsName));
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
         PyErr_SetString(GETSTATE(self)->error, e.what());
         return NULL;
     }
 
     Py_RETURN_NONE;
 }
-*/
+
 
 static PyObject *RasterGIS_FindChangeClumpsFromStdDev(PyObject *self, PyObject *args, PyObject *keywds)
 {
@@ -1827,6 +1855,32 @@ static PyObject *RasterGIS_ClassSplitFitHistGausianMixtureModel(PyObject *self, 
     Py_RETURN_NONE;
 }
 
+static PyObject *RasterGIS_PopulateRATWithPropValidPxls(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    const char *clumpsImage, *inputImage, *outColsName;
+    float noDataVal = 0;
+    unsigned int ratBand = 1;
+    
+    static char *kwlist[] = {"valsimage", "clumps", "outcolsname","nodataval", "ratband", NULL};
+    
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssf|I:populateRATWithPropValidPxls", kwlist, &inputImage, &clumpsImage, &outColsName, &noDataVal, &ratBand))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeCalcPropOfValidPixelsInClump(std::string(inputImage), std::string(clumpsImage), ratBand, std::string(outColsName), noDataVal);
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 static PyMethodDef RasterGISMethods[] = {
     {"populateStats", (PyCFunction)RasterGIS_PopulateStats, METH_VARARGS | METH_KEYWORDS,
 "rastergis.populateStats(clumps=string, addclrtab=boolean, calcpyramids=boolean, ignorezero=boolean, ratband=int)\n"
@@ -1915,6 +1969,28 @@ static PyMethodDef RasterGISMethods[] = {
 "   eastings = 'Easting'\n"
 "   northings = 'Northing'\n"
 "   rastergis.spatialLocation(image, eastings, northings)\n"
+"\n"},
+    
+{"spatialExtent", (PyCFunction)RasterGIS_SpatialExtent, METH_VARARGS | METH_KEYWORDS,
+"rastergis.spatialExtent(clumps=string, minX=string, maxX=string, minY=string, maxY=string, ratband=int)\n"
+"Adds spatial extent for each clump to the attribute table\n"
+"Where:\n"
+"* inputImage is a string containing the name of the input image file\n"
+"* minX is a string containing the name of the min X field\n"
+"* maxX is a string containing the name of the max X field\n"
+"* minY is a string containing the name of the min Y field\n"
+"* maxY is a string containing the name of the max Y field\n"
+"* ratband is an integer containing the band number for the RAT (Optional, default = 1)\n"
+"\n"
+"Example::\n"
+"\n"
+"   from rsgislib import rastergis\n"
+"   image = 'injune_p142_casi_sub_utm_segs_spatloc_eucdist.kea'\n"
+"   minX = 'minX'\n"
+"   maxX = 'maxX'\n"
+"   minY = 'minY'\n"
+"   maxY = 'maxY'\n"
+"   rastergis.spatialLocation(image, minX, maxX, minY, maxY)\n"
 "\n"},
 
     {"populateRATWithStats", (PyCFunction)RasterGIS_PopulateRATWithStats, METH_VARARGS | METH_KEYWORDS,
@@ -2274,6 +2350,7 @@ static PyMethodDef RasterGISMethods[] = {
 "   rastergis.calcShapeIndices(clumps, shapes)\n"
 "\n"
 "\n"},
+*/
 
     {"defineClumpTilePositions", RasterGIS_DefineClumpTilePositions, METH_VARARGS,
 "rastergis.defineClumpTilePositions(clumpsImage, tileImage, outColsName, tileOverlap, tileBoundary, tileBody)\n"
@@ -2300,7 +2377,7 @@ static PyMethodDef RasterGISMethods[] = {
 "* tileBoundary is an unsigned int\n"
 "* tileBody is an unsigned int\n"
 "\n"},
-*/
+
     {"findChangeClumpsFromStdDev", (PyCFunction)RasterGIS_FindChangeClumpsFromStdDev, METH_VARARGS | METH_KEYWORDS,
 "rastergis.findChangeClumpsFromStdDev(clumpsImage, classfield, changeField, attFields, classChangeFields)\n"
 "Identifies segments which have changed by looking for statistical outliers (std dev) from class population.\n\n"
@@ -2694,6 +2771,18 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"
 "    rastergis.classSplitFitHistGausianMixtureModel(clumps='FrenchGuiana_10_ALL_sl_HH_lee_UTM_mosaic_dB_segs.kea', outCol='MangroveSubClass', varCol='HVdB', binWidth=0.1, classColumn='Classes', classVal='Mangroves')\n"
 "\n\n"},
+{"populateRATWithPropValidPxls", (PyCFunction)RasterGIS_PopulateRATWithPropValidPxls, METH_VARARGS | METH_KEYWORDS,
+    "rastergis.populateRATWithPropValidPxls(valsimage=string, clumps=string, outcolsname=string, nodataval=float, ratband=uint)\n"
+    "Populates the attribute table with the proportion of valid pixels within the clump.\n"
+    "Where:\n"
+    "\n"
+    "* valsimage is a string containing the name of the input image file from which the valid pixels are to be identified\n"
+    "* clumpsImage is a string containing the name of the input clump file to which the proportion will be populated.\n"
+    "* outColsName is a string representing the name for the output column containing the proportion.\n"
+    "* nodataval is a float defining the no data value to be used.\n"
+    "* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated in the clumps image.\n"
+    "\n"},
+    
     {NULL}        /* Sentinel */
 };
 
