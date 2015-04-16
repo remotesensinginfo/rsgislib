@@ -333,9 +333,6 @@ class RSGISTests:
         s = imagecalc.StatsSummary(calcMin=True, calcMax=True, calcSum=True, calcMean=True, calcMedian=True, calcStdDev=True, min=0.0)
         imagecalc.imagePixelColumnSummary(image, output, s, gdalformat, dataType, 0, True)
 
-    def testPxlColRegression(self):
-        print("PYTHON TEST: pxlColRegression - skipping due to lack of bandvalues file.txt")
-
     def testCorrelationWindow(self):
         print("PYTHON TEST: correlationWindow")
         image = path + "Rasters/injune_p142_casi_sub_utm.kea"
@@ -346,6 +343,22 @@ class RSGISTests:
         gdalformat = "KEA"
         dataType = rsgislib.TYPE_32FLOAT
         imagecalc.correlationWindow(image, output, window, bandA, bandB, gdalformat, dataType)
+
+
+    def testImagePixelLinearFit(self):
+        print("PYTHON TEST: imagePixelLinearFit")
+        image = path + "Rasters/injune_p142_casi_sub_utm.kea"
+        output = path + "TestOutputs/injune_p142_casi_sub_utm_linear_fit.kea"
+        gdalformat = "KEA"
+        bandValues = [446,530,549,569,598,633,680,696,714,732,741,752,800,838]
+        
+        bandValuesFile =  path + "TestOutputs/injune_p142_casi_wavelengths.txt"
+         
+        with open(bandValuesFile,'w') as f:
+            for bandVal in bandValues:
+                f.write(str(bandVal) + '\n')
+
+        imagecalc.imagePixelLinearFit(image, output, gdalformat, bandValuesFile, 0, True)
 
     # Raster GIS
 
@@ -925,8 +938,8 @@ if __name__ == '__main__':
         t.tryFuncAndCatch(t.testMahalanobisDistWindow)
         t.tryFuncAndCatch(t.testMahalanobisDistImg2Window)
         t.tryFuncAndCatch(t.testCalcPxlColStats)
-        t.tryFuncAndCatch(t.testPxlColRegression)
         t.tryFuncAndCatch(t.testCorrelationWindow)
+        t.tryFuncAndCatch(t.testImagePixelLinearFit)
         
     if args.all or args.imageutils:
         
