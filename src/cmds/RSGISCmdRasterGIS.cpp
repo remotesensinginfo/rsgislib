@@ -57,12 +57,9 @@
 #include "rastergis/RSGISInputShapefileAttributes2RAT.h"
 #include "rastergis/RSGISRATKNN.h"
 #include "rastergis/RSGISRATFunctionFitting.h"
+#include "rastergis/RSGISDefineClumpsInTiles.h"
 
 /*
-#include "rastergis/RSGISRasterAttUtils.h"
-#include "rastergis/RSGISPopRATWithStats.h"
-#include "rastergis/RSGISCalcImageStatsAndPyramids.h"
-#include "rastergis/RSGISCalcClumpStats.h"
 
 #include "rastergis/RSGISCalcEucDistanceInAttTable.h"
 #include "rastergis/RSGISFindTopNWithinDist.h"
@@ -70,9 +67,7 @@
 #include "rastergis/RSGISKNNATTMajorityClassifier.h"
 #include "rastergis/RSGISMaxLikelihoodRATClassification.h"
 #include "rastergis/RSGISClassMask.h"
-
 #include "rastergis/RSGISCalcClumpShapeParameters.h"
-#include "rastergis/RSGISDefineImageTiles.h"
 */
 
 
@@ -183,7 +178,8 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeSpatialLocation(std::string inputImage, unsigned int ratBand, std::string eastingsField, std::string northingsField)throw(RSGISCmdException) {
+    void executeSpatialLocation(std::string inputImage, unsigned int ratBand, std::string eastingsField, std::string northingsField)throw(RSGISCmdException)
+    {
         try
         {
             GDALAllRegister();
@@ -198,6 +194,34 @@ namespace rsgis{ namespace cmds {
             rsgis::rastergis::RSGISCalcClusterLocation calcLoc;
             calcLoc.populateAttWithClumpLocation(inputDataset, ratBand, eastingsField, northingsField);
 
+            GDALClose(inputDataset);
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+            
+    void executeSpatialLocationExtent(std::string inputImage, unsigned int ratBand, std::string minXCol, std::string maxXCol, std::string minYCol, std::string maxYCol)throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            
+            GDALDataset *inputDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_Update);
+            if(inputDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            rsgis::rastergis::RSGISCalcClusterLocation calcLoc;
+            calcLoc.populateAttWithClumpLocationExtent(inputDataset, ratBand, minXCol, maxXCol, minYCol, maxYCol);
+            
             GDALClose(inputDataset);
         }
         catch(rsgis::RSGISException &e)
@@ -1086,6 +1110,7 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
+*/
 
     void executeDefineClumpTilePositions(std::string clumpsImage, std::string tileImage, std::string outColsName, unsigned int tileOverlap, unsigned int tileBoundary, unsigned int tileBody)throw(RSGISCmdException) {
         GDALAllRegister();
@@ -1103,7 +1128,7 @@ namespace rsgis{ namespace cmds {
                 throw rsgis::RSGISImageException(message.c_str());
             }
 
-            rsgis::rastergis::RSGISDefineSegmentsWithinTiles defineSegsInTile;
+            rsgis::rastergis::RSGISDefineClumpsInTiles defineSegsInTile;
             defineSegsInTile.defineSegmentTilePos(clumpsDataset, tileDataset, outColsName, tileOverlap, tileBoundary, tileBody);
 
             GDALClose(clumpsDataset);
@@ -1113,33 +1138,29 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeDefineBorderClumps(std::string clumpsImage, std::string tileImage, std::string outColsName, unsigned int tileOverlap, unsigned int tileBoundary, unsigned int tileBody)throw(RSGISCmdException) {
+    void executeDefineBorderClumps(std::string clumpsImage, std::string outColsName)throw(RSGISCmdException)
+    {
         GDALAllRegister();
-        GDALDataset *clumpsDataset, *maskDataset;
 
-        try {
-            clumpsDataset = (GDALDataset *) GDALOpen(clumpsImage.c_str(), GA_Update);
-            if(clumpsDataset == NULL) {
+        try
+        {
+            GDALDataset *clumpsDataset = (GDALDataset *) GDALOpen(clumpsImage.c_str(), GA_Update);
+            if(clumpsDataset == NULL)
+            {
                 std::string message = std::string("Could not open image ") + clumpsImage;
                 throw rsgis::RSGISImageException(message.c_str());
             }
 
-            maskDataset = (GDALDataset *) GDALOpen(tileImage.c_str(), GA_ReadOnly);
-            if(maskDataset == NULL) {
-                std::string message = std::string("Could not open image ") + tileImage;
-                throw rsgis::RSGISImageException(message.c_str());
-            }
-
-            rsgis::rastergis::RSGISDefineSegmentsWithinTiles defineSegsInTile;
-            defineSegsInTile.defineBorderSegmentsUsingMask(clumpsDataset, maskDataset, outColsName, tileOverlap, tileBoundary, tileBody);
+            rsgis::rastergis::RSGISDefineClumpsInTiles defineSegsInTile;
+            defineSegsInTile.defineBorderSegments(clumpsDataset, outColsName);
 
             GDALClose(clumpsDataset);
-            GDALClose(maskDataset);
-        } catch(rsgis::RSGISException &e) {
+        }
+        catch(rsgis::RSGISException &e)
+        {
             throw RSGISCmdException(e.what());
         }
     }
- */
 
     void executeFindChangeClumpsFromStdDev(std::string clumpsImage, std::string classField, std::string changeField, std::vector<std::string> attFields, std::vector<cmds::RSGISClassChangeFieldsCmds> classChangeFields, int ratBand)throw(RSGISCmdException)
     {
@@ -1921,6 +1942,47 @@ namespace rsgis{ namespace cmds {
             classGMMSampling.splitClassUsingGMM(clumpsDataset, outColumn, varCol, binWidth, classColumn, classVal, ratBand);
             
             GDALClose(clumpsDataset);
+        }
+        catch(rsgis::RSGISAttributeTableException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+            
+    void executeCalcPropOfValidPixelsInClump(std::string inputImage, std::string clumpsImage, unsigned int ratBand, std::string outColumn, double noDataVal)throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            std::cout.precision(12);
+            
+            std::cout << "Opening Clumps Image: " << clumpsImage << std::endl;
+            GDALDataset *clumpsDataset = (GDALDataset *) GDALOpen(clumpsImage.c_str(), GA_Update);
+            if(clumpsDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + clumpsImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            std::cout << "Opening Input Image: " << inputImage << std::endl;
+            GDALDataset *inDataset = (GDALDataset *) GDALOpenShared(inputImage.c_str(), GA_ReadOnly);
+            if(inDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            rsgis::rastergis::RSGISPopRATWithStats popRATStats;
+            popRATStats.populateRATWithPopValidPixels(clumpsDataset, inDataset, outColumn, noDataVal, ratBand);
+            
+            clumpsDataset->GetRasterBand(ratBand)->SetMetadataItem("LAYER_TYPE", "thematic");
+            
+            GDALClose(clumpsDataset);
+            GDALClose(inDataset);
         }
         catch(rsgis::RSGISAttributeTableException &e)
         {

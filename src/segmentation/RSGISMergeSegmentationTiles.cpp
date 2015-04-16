@@ -33,15 +33,14 @@ namespace rsgis{namespace segment{
     {
         try
         {
-            const GDALRasterAttributeTable *attTable = NULL;
+            GDALRasterAttributeTable *attTable = NULL;
             size_t numRows = 0;
             double maxVal = 0;
-            unsigned int clumpPosColIdx = 0;
             
             for(std::vector<std::string>::iterator iterFiles = inputImagePaths.begin(); iterFiles != inputImagePaths.end(); ++iterFiles)
             {
                 std::cout << "\t Opening - " << (*iterFiles) << std::endl;
-                GDALDataset *inImage = (GDALDataset *) GDALOpen((*iterFiles).c_str(), GA_ReadOnly);
+                GDALDataset *inImage = (GDALDataset *) GDALOpen((*iterFiles).c_str(), GA_Update);
                 if(inImage == NULL)
                 {
                     std::string message = std::string("Could not open image ") + (*iterFiles);
@@ -64,9 +63,7 @@ namespace rsgis{namespace segment{
                     throw RSGISImageException("Number of rows and maximum image pixel value does not match.");
                 }
                                 
-                clumpPosColIdx = this->findColumnIndex(attTable, colsName);
-                                
-                this->addTileBorder2Mask(inImage, borderMaskDataset, attTable, clumpPosColIdx, tileBoundary);
+                this->addTileBorder2Mask(inImage, borderMaskDataset, attTable, colsName, tileBoundary);
                 
                 GDALClose(inImage);
             }
@@ -94,32 +91,29 @@ namespace rsgis{namespace segment{
         try
         {
             GDALRasterAttributeTable *attTable = NULL;
-            const GDALRasterAttributeTable *attTableTmp = NULL;
             size_t numRows = 0;
             double maxVal = 0;
-            unsigned int clumpPosColIdx = 0;
-            unsigned int outClumpIDColIdx = 0;
             size_t clumpsOffset = 0;
             size_t numClumps = 0;
-            
+                           
             for(std::vector<std::string>::iterator iterFiles = inputImagePaths.begin(); iterFiles != inputImagePaths.end(); ++iterFiles)
             {
                 std::cout << "\t Opening - " << (*iterFiles) << std::endl;
-                GDALDataset *inImage = (GDALDataset *) GDALOpen((*iterFiles).c_str(), GA_ReadOnly);
+                GDALDataset *inImage = (GDALDataset *) GDALOpen((*iterFiles).c_str(), GA_Update);
                 if(inImage == NULL)
                 {
                     std::string message = std::string("Could not open image ") + (*iterFiles);
                     throw rsgis::RSGISImageException(message.c_str());
                 }
                 
-                attTableTmp = inImage->GetRasterBand(1)->GetDefaultRAT();
+                attTable = inImage->GetRasterBand(1)->GetDefaultRAT();
                 
-                if(attTableTmp == NULL)
+                if(attTable == NULL)
                 {
                     throw RSGISImageException("Input image does not have an attribute table.");
                 }
                 
-                numRows = attTableTmp->GetRowCount();
+                numRows = attTable->GetRowCount();
                 
                 inImage->GetRasterBand(1)->GetStatistics(false, true, NULL, &maxVal, NULL, NULL);
                 
@@ -128,23 +122,17 @@ namespace rsgis{namespace segment{
                     throw RSGISImageException("Number of rows and maximum image pixel value does not match.");
                 }
                 
-                attTable = new GDALDefaultRasterAttributeTable(*((GDALDefaultRasterAttributeTable*)attTableTmp));
-                
                 std::cout << "Row Count: " << numRows << std::endl;
-                
-                clumpPosColIdx = this->findColumnIndex(attTable, colsName);
-                
-                outClumpIDColIdx = this->findColumnIndexOrCreate(attTable, "GlobalClumpID", GFT_Integer);
                 
                 std::cout << "Clumps offset: " << clumpsOffset << std::endl;
                 
-                numClumps = this->numberBodyClumps(attTable, outClumpIDColIdx, clumpPosColIdx, tileBody, clumpsOffset);
+                numClumps = this->numberBodyClumps(attTable, "GlobalClumpID", colsName, tileBody, clumpsOffset);
                 
                 std::cout << "Number of body clumps: " << numClumps << std::endl;
                 
                 clumpsOffset += numClumps;
                                 
-                this->addTileBodyClumps(outputDataset, inImage, borderMaskDataset, attTable, outClumpIDColIdx, clumpPosColIdx, tileBody, tileBoundary);
+                this->addTileBodyClumps(outputDataset, inImage, borderMaskDataset, attTable, "GlobalClumpID", colsName, tileBody, tileBoundary);
                 
                 GDALClose(inImage);
             }
@@ -172,34 +160,40 @@ namespace rsgis{namespace segment{
         try
         {
             GDALRasterAttributeTable *attTable = NULL;
-            const GDALRasterAttributeTable *attTableTmp = NULL;
+            GDALRasterAttributeTable *outAttTable = NULL;
             size_t numRows = 0;
             double maxVal = 0;
-            unsigned int outClumpIDColIdx = 0;
             size_t clumpsOffset = 0;
             size_t numClumps = 0;
             
+            // Get maximum clumpid           
             outputDataset->GetRasterBand(1)->GetStatistics(false, true, NULL, &maxVal, NULL, NULL);
-            clumpsOffset = maxVal;
+            clumpsOffset = maxVal+1;
+            outAttTable = outputDataset->GetRasterBand(1)->GetDefaultRAT();
+            numRows = outAttTable->GetRowCount();
+            if(maxVal > numRows)
+            {
+                outAttTable->SetRowCount(clumpsOffset);
+            }           
             
             for(std::vector<std::string>::iterator iterFiles = inputImagePaths.begin(); iterFiles != inputImagePaths.end(); ++iterFiles)
             {
                 std::cout << "\t Opening - " << (*iterFiles) << std::endl;
-                GDALDataset *inImage = (GDALDataset *) GDALOpen((*iterFiles).c_str(), GA_ReadOnly);
+                GDALDataset *inImage = (GDALDataset *) GDALOpen((*iterFiles).c_str(), GA_Update);
                 if(inImage == NULL)
                 {
                     std::string message = std::string("Could not open image ") + (*iterFiles);
                     throw rsgis::RSGISImageException(message.c_str());
                 }
                 
-                attTableTmp = inImage->GetRasterBand(1)->GetDefaultRAT();
+                attTable = inImage->GetRasterBand(1)->GetDefaultRAT();
                 
-                if(attTableTmp == NULL)
+                if(attTable == NULL)
                 {
                     throw RSGISImageException("Input image does not have an attribute table.");
                 }
                 
-                numRows = attTableTmp->GetRowCount();
+                numRows = attTable->GetRowCount();
                 
                 inImage->GetRasterBand(1)->GetStatistics(false, true, NULL, &maxVal, NULL, NULL);
                 
@@ -208,23 +202,20 @@ namespace rsgis{namespace segment{
                     throw RSGISImageException("Number of rows and maximum image pixel value does not match.");
                 }
                 
-                attTable = new GDALDefaultRasterAttributeTable(*((GDALDefaultRasterAttributeTable*)attTableTmp));
-                
                 std::cout << "Row Count: " << numRows << std::endl;
-                                
-                outClumpIDColIdx = this->findColumnIndexOrCreate(attTable, "GlobalClumpID", GFT_Integer);
                 
                 std::cout << "Clumps offset: " << clumpsOffset << std::endl;
                 
-                numClumps = this->numberClumps(attTable, outClumpIDColIdx, clumpsOffset);
+                numClumps = this->numberClumps(attTable, "GlobalClumpID", clumpsOffset);
                 
                 std::cout << "Number of body clumps: " << numClumps << std::endl;
                 
                 clumpsOffset += numClumps;
                 
-                this->addImageClumps(outputDataset, inImage, attTable, outClumpIDColIdx);
+                this->addImageClumps(outputDataset, inImage, attTable, "GlobalClumpID");
                 
                 GDALClose(inImage);
+                
             }
         }
         catch (rsgis::img::RSGISImageCalcException &e)
@@ -245,73 +236,35 @@ namespace rsgis{namespace segment{
         }
     }
     
-    unsigned int RSGISMergeSegmentationTiles::findColumnIndex(const GDALRasterAttributeTable *gdalATT, std::string colName) throw(RSGISException)
-    {
-        int numColumns = gdalATT->GetColumnCount();
-        bool foundCol = false;
-        unsigned int colIdx = 0;
-        for(int i = 0; i < numColumns; ++i)
-        {
-            if(std::string(gdalATT->GetNameOfCol(i)) == colName)
-            {
-                foundCol = true;
-                colIdx = i;
-                break;
-            }
-        }
-        
-        if(!foundCol)
-        {
-            std::string message = std::string("The column ") + colName + std::string(" could not be found.");
-            throw RSGISException(message);
-        }
-        
-        return colIdx;
-    }
-    
-    unsigned int RSGISMergeSegmentationTiles::findColumnIndexOrCreate(GDALRasterAttributeTable *gdalATT, std::string colName, GDALRATFieldType dType) throw(RSGISException)
-    {
-        int numColumns = gdalATT->GetColumnCount();
-        bool foundCol = false;
-        unsigned int colIdx = 0;
-        for(int i = 0; i < numColumns; ++i)
-        {
-            if(std::string(gdalATT->GetNameOfCol(i)) == colName)
-            {
-                foundCol = true;
-                colIdx = i;
-                break;
-            }
-        }
-        
-        if(!foundCol)
-        {
-            gdalATT->CreateColumn(colName.c_str(), dType, GFU_Generic);
-            colIdx = numColumns;
-        }
-        
-        return colIdx;
-    }
-    
-    size_t RSGISMergeSegmentationTiles::numberBodyClumps(GDALRasterAttributeTable *gdalATT, unsigned int outColIdx, unsigned int clumpPosColIdx, int tileBody, size_t clumpsOffset) throw(RSGISException)
+    size_t RSGISMergeSegmentationTiles::numberBodyClumps(GDALRasterAttributeTable *gdalATT, std::string outColName, std::string clumpPosColName, int tileBody, size_t clumpsOffset) throw(RSGISException)
     {
         size_t numBodyClumps = 0;
         try
         {
+            // create new clumpid col
             size_t numRows = gdalATT->GetRowCount();
+            int *colVals = new int[numRows];
+            std::cout << "Number of Rows = " << numRows << std::endl;
             
-            for(size_t i = 1; i < numRows; ++i)
+            // read existing clumpid values
+            rsgis::rastergis::RSGISRasterAttUtils attUtils;
+            size_t currentNumRows = 0;
+            int *posVals = attUtils.readIntColumn(gdalATT, clumpPosColName, &currentNumRows);
+            
+            for(size_t i = 0; i < numRows; ++i)
             {
-                if(gdalATT->GetValueAsInt(i, clumpPosColIdx) == tileBody)
+                if(posVals[i] == tileBody)
                 {
-                    gdalATT->SetValue(i, outColIdx, ((int)clumpsOffset++));
+                    colVals[i] = (int)clumpsOffset++;
                     ++numBodyClumps;
                 }
                 else
                 {
-                    gdalATT->SetValue(i, outColIdx, 0);
+                    colVals[i] = 0;
                 }
             }
+            
+            attUtils.writeIntColumn(gdalATT, outColName, colVals, numRows);
             
         }
         catch (rsgis::RSGISException &e)
@@ -326,18 +279,24 @@ namespace rsgis{namespace segment{
         return numBodyClumps;
     }
     
-    size_t RSGISMergeSegmentationTiles::numberClumps(GDALRasterAttributeTable *gdalATT, unsigned int outColIdx, size_t clumpsOffset) throw(RSGISException)
+    size_t RSGISMergeSegmentationTiles::numberClumps(GDALRasterAttributeTable *gdalATT, std::string outColName, size_t clumpsOffset) throw(RSGISException)
     {
+        rsgis::rastergis::RSGISRasterAttUtils attUtils;
         size_t numClumps = 0;
         try
         {
             size_t numRows = gdalATT->GetRowCount();
-            
-            for(size_t i = 1; i < numRows; ++i)
+            int *colVals = new int[numRows];
+            std::cout << "Number of Rows = " << numRows << std::endl;
+                      
+            for(size_t i = 0; i < numRows; ++i)
             {
-                gdalATT->SetValue(i, outColIdx, ((int)clumpsOffset++));
+                colVals[i] = (int)clumpsOffset++;
                 ++numClumps;
             }
+            
+            rsgis::rastergis::RSGISRasterAttUtils attUtils;
+            attUtils.writeIntColumn(gdalATT, outColName, colVals, numRows);
             
         }
         catch (rsgis::RSGISException &e)
@@ -352,7 +311,7 @@ namespace rsgis{namespace segment{
         return numClumps;
     }
     
-    void RSGISMergeSegmentationTiles::addTileBodyClumps(GDALDataset *outputDataset, GDALDataset *tileDataset, GDALDataset *borderMaskDataset, const GDALRasterAttributeTable *gdalATT, unsigned int outClumpIDColIdx, unsigned int clumpPosColIdx, unsigned int tileBody, unsigned int tileBoundary) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISMergeSegmentationTiles::addTileBodyClumps(GDALDataset *outputDataset, GDALDataset *tileDataset, GDALDataset *borderMaskDataset, GDALRasterAttributeTable *gdalATT, std::string outClumpIDColName, std::string clumpPosColName, unsigned int tileBody, unsigned int tileBoundary) throw(rsgis::img::RSGISImageCalcException)
     {
         rsgis::img::RSGISImageUtils imgUtils;
         try
@@ -406,9 +365,13 @@ namespace rsgis{namespace segment{
             int remainRows = height - (nYBlocks * yBlockSize);
             int rowOffset = 0;
             
+            // read existing column values
+            rsgis::rastergis::RSGISRasterAttUtils attUtils;
+            size_t numRows = 0;
+            int *posVals = attUtils.readIntColumn(gdalATT, clumpPosColName, &numRows);
+            int *clumpIdVals = attUtils.readIntColumn(gdalATT, outClumpIDColName, &numRows);
             size_t fid = 0;
-            size_t numRows = gdalATT->GetRowCount();
-            std::cout << "Number of Rows = " << numRows << std::endl;
+            std::cout << "Number of Rows = " << numRows << std::endl;            
             
 			int feedback = height/10;
 			int feedbackCounter = 0;
@@ -459,12 +422,12 @@ namespace rsgis{namespace segment{
                                 throw rsgis::img::RSGISImageCalcException(e.what());
                             }
                             
-                            if(gdalATT->GetValueAsInt(fid, clumpPosColIdx) == tileBody)
+                            if(posVals[fid] == tileBody)
                             {
-                                imgOutData[(m*width)+j] = gdalATT->GetValueAsInt(fid, outClumpIDColIdx);
+                                imgOutData[(m*width)+j] = clumpIdVals[fid];
                                 //std::cout << fid << " = " << imgOutData[(m*width)+j] << std::endl;
                             }
-                            else if(gdalATT->GetValueAsInt(fid, clumpPosColIdx) == tileBoundary)
+                            else if(posVals[fid] == tileBoundary)
                             {
                                 imgMaskData[(m*width)+j] = 1;
                             }
@@ -521,12 +484,12 @@ namespace rsgis{namespace segment{
                                 throw rsgis::img::RSGISImageCalcException(e.what());
                             }
                             
-                            if(gdalATT->GetValueAsInt(fid, clumpPosColIdx) == tileBody)
+                            if(posVals[fid] == tileBody)
                             {
-                                imgOutData[(m*width)+j] = gdalATT->GetValueAsInt(fid, outClumpIDColIdx);
+                                imgOutData[(m*width)+j] = clumpIdVals[fid];
                                 //std::cout << fid << " = " << imgOutData[(m*width)+j] << std::endl;
                             }
-                            else if(gdalATT->GetValueAsInt(fid, clumpPosColIdx) == tileBoundary)
+                            else if(posVals[fid] == tileBoundary)
                             {
                                 imgMaskData[(m*width)+j] = 1;
                                 //std::cout << fid << " = " << imgOutData[(m*width)+j] << std::endl;
@@ -554,6 +517,8 @@ namespace rsgis{namespace segment{
                 delete[] dsOffsets[i];
             }
             delete[] dsOffsets;
+            delete[] posVals;
+            delete[] clumpIdVals;
         }
         catch(rsgis::img::RSGISImageCalcException& e)
         {
@@ -577,7 +542,7 @@ namespace rsgis{namespace segment{
         }
     }
     
-    void RSGISMergeSegmentationTiles::addTileBorder2Mask(GDALDataset *tileDataset, GDALDataset *borderMaskDataset, const GDALRasterAttributeTable *gdalATT, unsigned int clumpPosColIdx, unsigned int tileBoundary) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISMergeSegmentationTiles::addTileBorder2Mask(GDALDataset *tileDataset, GDALDataset *borderMaskDataset, GDALRasterAttributeTable *gdalATT, std::string clumpPosColName, unsigned int tileBoundary) throw(rsgis::img::RSGISImageCalcException)
     {
         rsgis::img::RSGISImageUtils imgUtils;
         try
@@ -622,8 +587,11 @@ namespace rsgis{namespace segment{
             int remainRows = height - (nYBlocks * yBlockSize);
             int rowOffset = 0;
             
+            // read existing column values
+            rsgis::rastergis::RSGISRasterAttUtils attUtils;
+            size_t numRows = 0;
+            int *posVals = attUtils.readIntColumn(gdalATT, clumpPosColName, &numRows);
             size_t fid = 0;
-            size_t numRows = gdalATT->GetRowCount();
             std::cout << "Number of Rows = " << numRows << std::endl;
             
 			int feedback = height/10;
@@ -673,7 +641,7 @@ namespace rsgis{namespace segment{
                                 throw rsgis::img::RSGISImageCalcException(e.what());
                             }
                             
-                            if(gdalATT->GetValueAsInt(fid, clumpPosColIdx) == tileBoundary)
+                            if(posVals[fid] == tileBoundary)
                             {
                                 imgMaskData[(m*width)+j] = 1;
                             }
@@ -726,7 +694,7 @@ namespace rsgis{namespace segment{
                                 throw rsgis::img::RSGISImageCalcException(e.what());
                             }
                             
-                            if(gdalATT->GetValueAsInt(fid, clumpPosColIdx) == tileBoundary)
+                            if(posVals[fid] == tileBoundary)
                             {
                                 imgMaskData[(m*width)+j] = 1;
                                 //std::cout << fid << " = " << imgOutData[(m*width)+j] << std::endl;
@@ -750,6 +718,7 @@ namespace rsgis{namespace segment{
                 delete[] dsOffsets[i];
             }
             delete[] dsOffsets;
+            delete[] posVals;
         }
         catch(rsgis::img::RSGISImageCalcException& e)
         {
@@ -773,7 +742,7 @@ namespace rsgis{namespace segment{
         }
     }
     
-    void RSGISMergeSegmentationTiles::addImageClumps(GDALDataset *outputDataset, GDALDataset *clumpsDataset, const GDALRasterAttributeTable *gdalATT, unsigned int outClumpIDColIdx) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISMergeSegmentationTiles::addImageClumps(GDALDataset *outputDataset, GDALDataset *clumpsDataset, GDALRasterAttributeTable *gdalATT, std::string outClumpIDColName) throw(rsgis::img::RSGISImageCalcException)
     {
         rsgis::img::RSGISImageUtils imgUtils;
         try
@@ -818,10 +787,13 @@ namespace rsgis{namespace segment{
             int remainRows = height - (nYBlocks * yBlockSize);
             int rowOffset = 0;
             
+            // read existing column values
+            rsgis::rastergis::RSGISRasterAttUtils attUtils;
+            size_t numRows = 0;
+            int *clumpIdVals = attUtils.readIntColumn(gdalATT, outClumpIDColName, &numRows);
             size_t fid = 0;
-            size_t numRows = gdalATT->GetRowCount();
             std::cout << "Number of Rows = " << numRows << std::endl;
-            
+                     
 			int feedback = height/10;
 			int feedbackCounter = 0;
 			std::cout << "Started" << std::flush;
@@ -869,7 +841,7 @@ namespace rsgis{namespace segment{
                                 throw rsgis::img::RSGISImageCalcException(e.what());
                             }
                             
-                            imgOutData[(m*width)+j] = gdalATT->GetValueAsInt(fid, outClumpIDColIdx);
+                            imgOutData[(m*width)+j] = clumpIdVals[fid];
                             
                         }
                     }
@@ -919,7 +891,7 @@ namespace rsgis{namespace segment{
                                 throw rsgis::img::RSGISImageCalcException(e.what());
                             }
                             
-                            imgOutData[(m*width)+j] = gdalATT->GetValueAsInt(fid, outClumpIDColIdx);
+                            imgOutData[(m*width)+j] = clumpIdVals[fid];
                         }
                     }
                 }
@@ -939,6 +911,7 @@ namespace rsgis{namespace segment{
                 delete[] dsOffsets[i];
             }
             delete[] dsOffsets;
+            delete[] clumpIdVals;
         }
         catch(rsgis::img::RSGISImageCalcException& e)
         {

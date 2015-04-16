@@ -304,6 +304,55 @@ static PyObject *Segmentation_mergeSegmentationTiles(PyObject *self, PyObject *a
 }
 
 
+static PyObject *Segmentation_mergeClumpImages(PyObject *self, PyObject *args)
+{
+    const char *pszOutputImage;
+    PyObject *pInputListObj;
+    std::string inputImage;
+    if( !PyArg_ParseTuple(args, "Os:mergeClumpImages", &pInputListObj, &pszOutputImage))
+        return NULL;
+
+    Py_ssize_t nInputImages = PyList_Size(pInputListObj);
+    if( nInputImages < 0)
+    {
+        PyErr_SetString(GETSTATE(self)->error, "last argument must be a list");
+        return NULL;
+    }
+    
+    std::vector<std::string> inputImagePaths;
+    for(Py_ssize_t n = 0; n < nInputImages; n++)
+    {
+        
+        PyObject *strObj;
+        strObj = PyList_GetItem(pInputListObj, n);
+        if( !RSGISPY_CHECK_STRING(strObj) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "must pass a list of strings");
+            Py_DECREF(strObj);
+            return NULL;
+        }
+        inputImage = RSGISPY_STRING_EXTRACT(strObj);
+        inputImagePaths.push_back(inputImage);      
+        Py_DECREF(strObj);
+    
+    }    
+    
+    try
+    {
+                        
+        rsgis::cmds::executeMergeClumpImages(inputImagePaths, pszOutputImage);
+
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
+
+
 static PyObject *Segmentation_findTileBordersMask(PyObject *self, PyObject *args)
 {
     const char *pszBorderMaskImage, *pszColsName;
@@ -403,12 +452,15 @@ static PyObject *Segmentation_GenerateRegularGrid(PyObject *self, PyObject *args
 {
     const char *pszInputImage, *pszOutputImage, *pszGDALFormat;
     unsigned int numXPxls, numYPxls;
-    if( !PyArg_ParseTuple(args, "sssII:generateRegularGrid", &pszInputImage, &pszOutputImage, &pszGDALFormat, &numXPxls, &numYPxls ))
+    int offset = 0;
+    if( !PyArg_ParseTuple(args, "sssII|i:generateRegularGrid", &pszInputImage, &pszOutputImage, &pszGDALFormat, &numXPxls, &numYPxls, &offset))
+    {
         return NULL;
+    }
     
     try
     {
-        rsgis::cmds::executeGenerateRegularGrid(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszGDALFormat), numXPxls, numYPxls);
+        rsgis::cmds::executeGenerateRegularGrid(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszGDALFormat), numXPxls, numYPxls, (bool)offset);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -442,6 +494,47 @@ static PyObject *Segmentation_IncludeRegionsInClumps(PyObject *self, PyObject *a
     Py_RETURN_NONE;
 }
 
+static PyObject *Segmentation_mergeSegments2Neighbours(PyObject *self, PyObject *args)
+{
+    const char *pszInputClumpsImage, *pszInputSpecImage, *pszOutputImage, *pszGDALFormat, *selectClumpsCol;
+    if( !PyArg_ParseTuple(args, "sssss:mergeSegments2Neighbours", &pszInputClumpsImage, &pszInputSpecImage, &pszOutputImage, &pszGDALFormat, &selectClumpsCol ))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeMergeSelectClumps2Neighbour(std::string(pszInputSpecImage), std::string(pszInputClumpsImage), std::string(pszOutputImage), std::string(pszGDALFormat), std::string(selectClumpsCol));
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+static PyObject *Segmentation_dropSelectedSegments(PyObject *self, PyObject *args)
+{
+    const char *pszInputClumpsImage, *pszOutputImage, *pszGDALFormat, *selectClumpsCol;
+    if( !PyArg_ParseTuple(args, "ssss:dropSelectedClumps", &pszInputClumpsImage, &pszOutputImage, &pszGDALFormat, &selectClumpsCol ))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeDropSelectedClumps(std::string(pszInputClumpsImage), std::string(pszOutputImage), std::string(pszGDALFormat), std::string(selectClumpsCol));
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
 
 
 // Our list of functions in this module
@@ -525,7 +618,7 @@ static PyMethodDef SegmentationMethods[] = {
 
     {"mergeSegmentationTiles", Segmentation_mergeSegmentationTiles, METH_VARARGS,
 "segmentation.mergeSegmentationTiles(outputimage, bordermaskimage, tileboundary, tileoverlap, tilebody, colsname, inputimagepaths)\n"
-"Merge segmentation tiles\n"
+"Merge body clumps from tile segmentations into outputfile\n"
 "where:\n"
 "\n"
 " * outputimage is a string containing the name of the output file\n"
@@ -535,6 +628,15 @@ static PyMethodDef SegmentationMethods[] = {
 " * tilebody is an unsigned integer containing the tile body pixel value\n"
 " * colsname is a string containing the name of the object id column\n"
 " * inputimagepaths is a list of input image paths\n"
+"\n"},
+
+    {"mergeClumpImages", Segmentation_mergeClumpImages, METH_VARARGS,
+"segmentation.mergeClumpImages(inputimagepaths, outputimage)\n"
+"Merge all clumps from tile segmentations into outputfile\n"
+"where:\n"
+"\n"
+" * inputimagepaths is a list of input image paths\n"
+" * outputimage is a string containing the name of the output file\n"
 "\n"},
 
     {"findTileBordersMask", Segmentation_findTileBordersMask, METH_VARARGS,
@@ -574,7 +676,7 @@ static PyMethodDef SegmentationMethods[] = {
 "\n"},
 
 {"generateRegularGrid", Segmentation_GenerateRegularGrid, METH_VARARGS,
-"segmentation.generateRegularGrid(inputImage, outputClumps, gdalformat, numXPxls, numYPxls)\n"
+"segmentation.generateRegularGrid(inputImage, outputClumps, gdalformat, numXPxls, numYPxls, offset)\n"
 "A function to generate an image where with the mean value for each clump. Primarily for visualisation and evaluating segmentation.\n"
 "where:\n"
 "\n"
@@ -583,6 +685,7 @@ static PyMethodDef SegmentationMethods[] = {
 "* gdalformat is a string defining the format of the output image.\n"
 "* numXPxls is the size of the grid cells in the X axis in pixel units.\n"
 "* numYPxls is the size of the grid cells in the Y axis in pixel units.\n"
+"* offset is a boolean specifying whether the grid should be offset, i.e., starts half way point of numXPxls and numYPxls (Default is false; optional)"
 "\n"},
     
 {"includeRegionsInClumps", Segmentation_IncludeRegionsInClumps, METH_VARARGS,
@@ -596,6 +699,32 @@ static PyMethodDef SegmentationMethods[] = {
 "* outputClumps is a string containing the name and path of the output clumps image\n"
 "* gdalFormat is a string defining the format of the output image.\n"
 "\n"},
+    
+{"mergeSegments2Neighbours", Segmentation_mergeSegments2Neighbours, METH_VARARGS,
+"segmentation.mergeSegments2Neighbours(clumpsImage, spectralImage, outputClumps, gdalFormat)\n"
+"A function to merge some selected clumps with the neighbours based on colour (spectral) distance.\n"
+"where:\n"
+"\n"
+"* clumpsImage is a string containing the filepath for the input clumps image.\n"
+"* spectralImage is a string containing the filepath for the input image used to define 'distance'.\n"
+"* outputClumps is a string containing the name and path of the output clumps image\n"
+"* gdalFormat is a string defining the format of the output image.\n"
+"* selectClumpsCol is a string defining the binary column for defining the segments to be merged (1 == selected clumps).\n"
+"\n"},
+    
+{"dropSelectedClumps", Segmentation_dropSelectedSegments, METH_VARARGS,
+"segmentation.dropSelectedClumps(clumpsImage, outputClumps, gdalFormat)\n"
+"A function to drop the selected clumps from the segmentation.\n"
+"where:\n"
+"\n"
+"* clumpsImage is a string containing the filepath for the input clumps image.\n"
+"* outputClumps is a string containing the name and path of the output clumps image\n"
+"* gdalFormat is a string defining the format of the output image.\n"
+"* selectClumpsCol is a string defining the binary column for defining the segments to be merged (1 == selected clumps).\n"
+"\n"},
+    
+    
+    
 
     {NULL}        /* Sentinel */
 };
