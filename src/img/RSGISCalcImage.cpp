@@ -1212,7 +1212,7 @@ namespace rsgis{namespace img{
 				{
 					if(inputIntData[i] != NULL)
 					{
-						delete[] inputIntData[i];
+						CPLFree(inputIntData[i]);
 					}
 				}
 				delete[] inputIntData;
@@ -1323,7 +1323,7 @@ namespace rsgis{namespace img{
 				{
 					if(inputIntData[i] != NULL)
 					{
-						delete[] inputIntData[i];
+						CPLFree(inputIntData[i]);
 					}
 				}
 				delete[] inputIntData;
@@ -1435,7 +1435,7 @@ namespace rsgis{namespace img{
             {
                 if(inputIntData[i] != NULL)
                 {
-                    delete[] inputIntData[i];
+                    CPLFree(inputIntData[i]);
                 }
             }
             delete[] inputIntData;
@@ -1736,7 +1736,7 @@ namespace rsgis{namespace img{
 				{
 					if(inputIntData[i] != NULL)
 					{
-						delete[] inputIntData[i];
+						CPLFree(inputIntData[i]);
 					}
 				}
 				delete[] inputIntData;
@@ -1824,7 +1824,7 @@ namespace rsgis{namespace img{
 				{
 					if(inputIntData[i] != NULL)
 					{
-						delete[] inputIntData[i];
+						CPLFree(inputIntData[i]);
 					}
 				}
 				delete[] inputIntData;
@@ -1911,7 +1911,7 @@ namespace rsgis{namespace img{
             {
                 if(inputIntData[i] != NULL)
                 {
-                    delete[] inputIntData[i];
+                    CPLFree(inputIntData[i]);
                 }
             }
             delete[] inputIntData;
@@ -2251,7 +2251,7 @@ namespace rsgis{namespace img{
 				{
 					if(inputIntData[i] != NULL)
 					{
-						delete[] inputIntData[i];
+						CPLFree(inputIntData[i]);
 					}
 				}
 				delete[] inputIntData;
@@ -2362,7 +2362,7 @@ namespace rsgis{namespace img{
 				{
 					if(inputIntData[i] != NULL)
 					{
-						delete[] inputIntData[i];
+						CPLFree(inputIntData[i]);
 					}
 				}
 				delete[] inputIntData;
@@ -2472,7 +2472,7 @@ namespace rsgis{namespace img{
             {
                 if(inputIntData[i] != NULL)
                 {
-                    delete[] inputIntData[i];
+                    CPLFree(inputIntData[i]);
                 }
             }
             delete[] inputIntData;
@@ -5024,7 +5024,7 @@ namespace rsgis{namespace img{
 				{
 					if(inputIntData[i] != NULL)
 					{
-						delete[] inputIntData[i];
+						CPLFree(inputIntData[i]);
 					}
 				}
 				delete[] inputIntData;
@@ -5112,7 +5112,7 @@ namespace rsgis{namespace img{
 				{
 					if(inputIntData[i] != NULL)
 					{
-						delete[] inputIntData[i];
+						CPLFree(inputIntData[i]);
 					}
 				}
 				delete[] inputIntData;
@@ -5199,7 +5199,7 @@ namespace rsgis{namespace img{
             {
                 if(inputIntData[i] != NULL)
                 {
-                    delete[] inputIntData[i];
+                    CPLFree(inputIntData[i]);
                 }
             }
             delete[] inputIntData;

@@ -231,7 +231,7 @@ static PyObject *Segmentation_unionOfClumps(PyObject *self, PyObject *args)
         }
         inputImage = RSGISPY_STRING_EXTRACT(strObj);
         inputImagePaths.push_back(inputImage);      
-        Py_DECREF(strObj);
+        //Py_DECREF(strObj);
     
     }    
     
@@ -283,7 +283,7 @@ static PyObject *Segmentation_mergeSegmentationTiles(PyObject *self, PyObject *a
         }
         inputImage = RSGISPY_STRING_EXTRACT(strObj);
         inputImagePaths.push_back(inputImage);      
-        Py_DECREF(strObj);
+        //Py_DECREF(strObj);
     
     }    
     
@@ -333,7 +333,7 @@ static PyObject *Segmentation_mergeClumpImages(PyObject *self, PyObject *args)
         }
         inputImage = RSGISPY_STRING_EXTRACT(strObj);
         inputImagePaths.push_back(inputImage);      
-        Py_DECREF(strObj);
+        //Py_DECREF(strObj);
     
     }    
     
@@ -384,7 +384,7 @@ static PyObject *Segmentation_findTileBordersMask(PyObject *self, PyObject *args
         }
         inputImage = RSGISPY_STRING_EXTRACT(strObj);
         inputImagePaths.push_back(inputImage);      
-        Py_DECREF(strObj);
+        //Py_DECREF(strObj);
     
     }    
     
