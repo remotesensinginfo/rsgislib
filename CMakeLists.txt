@@ -26,7 +26,7 @@ set (PROJECT_TOOLS_DIR tools)
 set (PROJECT_XML_DIR xml_standards)
 
 # The version number.
-set (RSGISLIB_HG_COMMIT 1036)
+set (RSGISLIB_HG_COMMIT 1038)
 set (RSGISLIB_VERSION_MAJOR 2)
 set (RSGISLIB_VERSION_MINOR 3)
 set (RSGISLIB_VERSION "${RSGISLIB_VERSION_MAJOR}.${RSGISLIB_VERSION_MINOR}.${RSGISLIB_HG_COMMIT}")
@@ -178,7 +178,7 @@ set(KEA_LIB_PATH /usr/local/lib CACHE PATH "Library PATH for KEA")
 
 ###############################################################################
 # CMake settings
-cmake_minimum_required(VERSION 2.6.0)
+cmake_minimum_required(VERSION 2.8.12)
 
 IF(NOT CMAKE_BUILD_TYPE)
   #SET(CMAKE_BUILD_TYPE "DEBUG")
@@ -191,6 +191,8 @@ set(CMAKE_COLOR_MAKEFILE ON)
 
 # Allow advanced users to generate Makefiles printing detailed commands
 mark_as_advanced(CMAKE_VERBOSE_MAKEFILE)
+
+set(CMAKE_MACOSX_RPATH 1)
 
 # Path to additional CMake modules
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ./cmake/modules/)
