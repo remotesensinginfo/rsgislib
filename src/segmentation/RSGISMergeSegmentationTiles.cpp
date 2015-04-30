@@ -505,9 +505,9 @@ namespace rsgis{namespace segment{
             }
             std::cout << " Complete.\n";
             
-            delete[] imgInData;
-            delete[] imgOutData;
-            delete[] imgMaskData;
+            CPLFree(imgInData);
+            CPLFree(imgOutData);
+            CPLFree(imgMaskData);
             delete[] outOffset;
             delete[] inOffset;
             delete[] maskOffset;
@@ -708,8 +708,8 @@ namespace rsgis{namespace segment{
             }
             std::cout << " Complete.\n";
             
-            delete[] imgInData;
-            delete[] imgMaskData;
+            CPLFree(imgInData);
+            CPLFree(imgMaskData);
             delete[] inOffset;
             delete[] maskOffset;
             delete[] gdalTranslation;
@@ -901,8 +901,8 @@ namespace rsgis{namespace segment{
             }
             std::cout << " Complete.\n";
             
-            delete[] imgInData;
-            delete[] imgOutData;
+            CPLFree(imgInData);
+            CPLFree(imgOutData);
             delete[] outOffset;
             delete[] inOffset;
             delete[] gdalTranslation;

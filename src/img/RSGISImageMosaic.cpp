@@ -1241,7 +1241,7 @@ namespace rsgis{namespace img{
                         }
                     }
                 }
-				delete imgData;
+				CPLFree(imgData);
                 GDALClose(dataset);
 			}
 			std::cout << ".complete\n";
