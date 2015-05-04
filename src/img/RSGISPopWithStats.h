@@ -120,7 +120,7 @@ namespace rsgis { namespace img {
         void getRangeMean(float *pData,int size,float &min,float &max,float &mean, bool ignore, float ignoreVal);
         float getStdDev(float *pData, int size, float fmean, bool ignore, float ignoreVal);
         float* getSubSampledImage( GDALRasterBand *hBand, int nLevel, int *pnSize );
-        void getHistogramIgnore( GDALRasterBand *pBand, double dfMin, double dfMax, int nBuckets, int *panHistogram, int bIncludeOutOfRange, bool bIgnore, float fIgnore );
+        void getHistogramIgnore( GDALRasterBand *pBand, double dfMin, double dfMax, int nBuckets, GUIntBig *panHistogram, int bIncludeOutOfRange, bool bIgnore, float fIgnore );
         void calcPopStats( GDALDataset *hHandle, bool bIgnore, float fIgnoreVal, bool bPyramid ) throw(rsgis::RSGISImageException);
     private:
         static const int HISTO_NBINS = 256;

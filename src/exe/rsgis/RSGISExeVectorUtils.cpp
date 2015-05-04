@@ -4548,10 +4548,10 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
 
-			OGRDataSource *inputSHPDS = NULL;
+			GDALDataset *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
-			OGRSFDriver *shpFiledriver = NULL;
-			OGRDataSource *outputSHPDS = NULL;
+			GDALDriver *shpFiledriver = NULL;
+			GDALDataset *outputSHPDS = NULL;
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
 
@@ -4580,7 +4580,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Open Input Shapfile.
 				//
 				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);   
 				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputVector;
@@ -4600,12 +4600,12 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				//
 				/////////////////////////////////////
 				const char *pszDriverName = "ESRI Shapefile";
-				shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName );
+				shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
 				if( shpFiledriver == NULL )
 				{
 					throw RSGISVectorOutputException("SHP driver not available.");
 				}
-				outputSHPDS = shpFiledriver->CreateDataSource(this->outputVector.c_str(), NULL);
+				outputSHPDS = shpFiledriver->Create(this->outputVector.c_str(), 0, 0, 0, GDT_Unknown, NULL );
 				if( outputSHPDS == NULL )
 				{
 					string message = string("Could not create vector file ") + this->outputVector;
@@ -4623,8 +4623,8 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 
 				processVector->processVectors(inputSHPLayer, outputSHPLayer, true, false, false);
 
-				OGRDataSource::DestroyDataSource(inputSHPDS);
-				OGRDataSource::DestroyDataSource(outputSHPDS);
+				GDALClose(inputSHPDS);
+				GDALClose(outputSHPDS);
 
 				delete processVector;
 				delete processFeature;
@@ -4683,7 +4683,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 
-			OGRDataSource *inputSHPDS = NULL;
+			GDALDataset *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 
 			try
@@ -4693,7 +4693,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Open Input Shapfile.
 				//
 				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);   
 				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputVector;
@@ -4708,7 +4708,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 
 				vecProcessing.listAttributes(inputSHPLayer);
 
-				OGRDataSource::DestroyDataSource(inputSHPDS);
+				GDALClose(inputSHPDS);
 
 				//OGRCleanupAll();
 			}
@@ -4734,7 +4734,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 
-			OGRDataSource *inputSHPDS = NULL;
+			GDALDataset *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 
 			try
@@ -4744,7 +4744,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Open Input Shapfile.
 				//
 				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE, NULL);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(this->inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);
 				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputVector;
@@ -4759,7 +4759,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 
 				vecProcessing.printAttribute(inputSHPLayer, this->attribute);
 
-				OGRDataSource::DestroyDataSource(inputSHPDS);
+				GDALClose(inputSHPDS);
 
 				//OGRCleanupAll();
 			}
@@ -4787,10 +4787,10 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
 
-			OGRDataSource *inputSHPDS = NULL;
+			GDALDataset *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
-			OGRSFDriver *shpFiledriver = NULL;
-			OGRDataSource *outputSHPDS = NULL;
+			GDALDriver *shpFiledriver = NULL;
+			GDALDataset *outputSHPDS = NULL;
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
 
@@ -4816,7 +4816,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Open Input Shapfile.
 				//
 				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);   
 				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputVector;
@@ -4836,12 +4836,12 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				//
 				/////////////////////////////////////
 				const char *pszDriverName = "ESRI Shapefile";
-				shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName );
+				shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
 				if( shpFiledriver == NULL )
 				{
 					throw RSGISVectorOutputException("SHP driver not available.");
 				}
-				outputSHPDS = shpFiledriver->CreateDataSource(this->outputVector.c_str(), NULL);
+				outputSHPDS = shpFiledriver->Create(this->outputVector.c_str(), 0, 0, 0, GDT_Unknown, NULL );
 				if( outputSHPDS == NULL )
 				{
 					string message = string("Could not create vector file ") + this->outputVector;
@@ -4859,8 +4859,8 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 
 				processVector->processVectors(inputSHPLayer, outputSHPLayer, true, false, true);
 
-				OGRDataSource::DestroyDataSource(inputSHPDS);
-				OGRDataSource::DestroyDataSource(outputSHPDS);
+				GDALClose(inputSHPDS);
+				GDALClose(outputSHPDS);
 
 				delete[] attributes;
 
@@ -4894,10 +4894,10 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
 
-			OGRDataSource *inputSHPDS = NULL;
+			GDALDataset *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
-			OGRSFDriver *shpFiledriver = NULL;
-			OGRDataSource *outputSHPDS = NULL;
+			GDALDriver *shpFiledriver = NULL;
+			GDALDataset *outputSHPDS = NULL;
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
 
@@ -4923,7 +4923,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Open Input Shapfile.
 				//
 				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);   
 				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputVector;
@@ -4943,12 +4943,12 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				//
 				/////////////////////////////////////
 				const char *pszDriverName = "ESRI Shapefile";
-				shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName );
+				shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
 				if( shpFiledriver == NULL )
 				{
 					throw RSGISVectorOutputException("SHP driver not available.");
 				}
-				outputSHPDS = shpFiledriver->CreateDataSource(this->outputVector.c_str(), NULL);
+				outputSHPDS = shpFiledriver->Create(this->outputVector.c_str(), 0, 0, 0, GDT_Unknown, NULL );
 				if( outputSHPDS == NULL )
 				{
 					string message = string("Could not create vector file ") + this->outputVector;
@@ -4966,8 +4966,8 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 
 				processVector->processVectors(inputSHPLayer, outputSHPLayer, true, false, false);
 
-				OGRDataSource::DestroyDataSource(inputSHPDS);
-				OGRDataSource::DestroyDataSource(outputSHPDS);
+				GDALClose(inputSHPDS);
+				GDALClose(outputSHPDS);
 				delete processVector;
 				delete processFeature;
 
@@ -5000,10 +5000,10 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
 
-			OGRDataSource *inputSHPDS = NULL;
+			GDALDataset *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
-			OGRSFDriver *shpFiledriver = NULL;
-			OGRDataSource *outputSHPDS = NULL;
+			GDALDriver *shpFiledriver = NULL;
+			GDALDataset *outputSHPDS = NULL;
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
 
@@ -5032,7 +5032,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Open Input Shapfile.
 				//
 				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);   
 				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputVector;
@@ -5056,12 +5056,12 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				//
 				/////////////////////////////////////
 				const char *pszDriverName = "ESRI Shapefile";
-				shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName );
+				shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
 				if( shpFiledriver == NULL )
 				{
 					throw RSGISVectorOutputException("SHP driver not available.");
 				}
-				outputSHPDS = shpFiledriver->CreateDataSource(this->outputVector.c_str(), NULL);
+				outputSHPDS = shpFiledriver->Create(this->outputVector.c_str(), 0, 0, 0, GDT_Unknown, NULL );
 				if( outputSHPDS == NULL )
 				{
 					string message = string("Could not create vector file ") + this->outputVector;
@@ -5079,8 +5079,8 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 
 				processVector->processVectors(inputSHPLayer, outputSHPLayer, true, false, false);
 
-				OGRDataSource::DestroyDataSource(inputSHPDS);
-				OGRDataSource::DestroyDataSource(outputSHPDS);
+				GDALClose(inputSHPDS);
+				GDALClose(outputSHPDS);
 
 				delete processVector;
 				delete processFeature;
@@ -5109,7 +5109,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 
-			OGRDataSource *inputSHPDS = NULL;
+			GDALDataset *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 
 			try
@@ -5119,7 +5119,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Open Input Shapfile.
 				//
 				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);   
 				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputVector;
@@ -5137,7 +5137,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 
 				processVector->processVectorsNoOutput(inputSHPLayer, true);
 
-				OGRDataSource::DestroyDataSource(inputSHPDS);
+				GDALClose(inputSHPDS);
 
 				delete processVector;
 				delete processFeature;
@@ -5170,10 +5170,10 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
 
 			GDALDataset *inputPolysImage = NULL;
-			OGRDataSource *inputSHPDS = NULL;
+			GDALDataset *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
-			OGRSFDriver *shpFiledriver = NULL;
-			OGRDataSource *outputSHPDS = NULL;
+			GDALDriver *shpFiledriver = NULL;
+			GDALDataset *outputSHPDS = NULL;
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
 
@@ -5202,7 +5202,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Open Input Shapfile.
 				//
 				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);   
 				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputVector;
@@ -5222,12 +5222,12 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				//
 				/////////////////////////////////////
 				const char *pszDriverName = "ESRI Shapefile";
-				shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName );
+				shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
 				if( shpFiledriver == NULL )
 				{
 					throw RSGISVectorOutputException("SHP driver not available.");
 				}
-				outputSHPDS = shpFiledriver->CreateDataSource(this->outputVector.c_str(), NULL);
+				outputSHPDS = shpFiledriver->Create(this->outputVector.c_str(), 0, 0, 0, GDT_Unknown, NULL );
 				if( outputSHPDS == NULL )
 				{
 					string message = string("Could not create vector file ") + this->outputVector;
@@ -5257,8 +5257,8 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 
 				processVector->processVectors(inputSHPLayer, outputSHPLayer, true, true, false);
 
-				OGRDataSource::DestroyDataSource(inputSHPDS);
-				OGRDataSource::DestroyDataSource(outputSHPDS);
+				GDALClose(inputSHPDS);
+				GDALClose(outputSHPDS);
 				GDALClose(inputPolysImage);
 
 				delete processVector;
@@ -5290,7 +5290,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 
-			OGRDataSource *inputSHPDS = NULL;
+			GDALDataset *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 
 			RSGISProcessVector *processVector = NULL;
@@ -5304,7 +5304,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Open Input Shapfile.
 				//
 				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);   
 				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputVector;
@@ -5322,7 +5322,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 
 				processVector->processVectorsNoOutput(inputSHPLayer, false);
 
-				OGRDataSource::DestroyDataSource(inputSHPDS);
+				GDALClose(inputSHPDS);
 
 				delete processVector;
 				delete processFeature;
@@ -5356,10 +5356,10 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
 
-			OGRDataSource *inputSHPDS = NULL;
+			GDALDataset *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
-			OGRSFDriver *shpFiledriver = NULL;
-			OGRDataSource *outputSHPDS = NULL;
+			GDALDriver *shpFiledriver = NULL;
+			GDALDataset *outputSHPDS = NULL;
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
 			OGRFeatureDefn *inFeatureDefn = NULL;
@@ -5389,7 +5389,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Open Input Shapfile.
 				//
 				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);   
 				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputVector;
@@ -5410,12 +5410,12 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				//
 				/////////////////////////////////////
 				const char *pszDriverName = "ESRI Shapefile";
-				shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName );
+				shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
 				if( shpFiledriver == NULL )
 				{
 					throw RSGISVectorOutputException("SHP driver not available.");
 				}
-				outputSHPDS = shpFiledriver->CreateDataSource(this->outputVector.c_str(), NULL);
+				outputSHPDS = shpFiledriver->Create(this->outputVector.c_str(), 0, 0, 0, GDT_Unknown, NULL );
 				if( outputSHPDS == NULL )
 				{
 					string message = string("Could not create vector file ") + this->outputVector;
@@ -5433,8 +5433,8 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 
 				processVector->processGeometry(inputSHPLayer, outputSHPLayer, true, false);
 
-				OGRDataSource::DestroyDataSource(inputSHPDS);
-				OGRDataSource::DestroyDataSource(outputSHPDS);
+				GDALClose(inputSHPDS);
+				GDALClose(outputSHPDS);
 
 				delete processVector;
 				delete processGeom;
@@ -5480,7 +5480,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 
-			OGRDataSource *inputSHPDS = NULL;
+			GDALDataset *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 
 			try
@@ -5490,7 +5490,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Open Input Shapfile.
 				//
 				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);   
 				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputVector;
@@ -5505,7 +5505,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 
 				vecProcessing.splitFeatures(inputSHPLayer, this->output_DIR, this->force);
 
-				OGRDataSource::DestroyDataSource(inputSHPDS);
+				GDALClose(inputSHPDS);
 				//OGRCleanupAll();
 			}
 			catch (RSGISException& e)
@@ -5529,7 +5529,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 
-			OGRDataSource *inputSHPDS = NULL;
+			GDALDataset *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSpatialReference* spatialRef = NULL;
 
@@ -5543,7 +5543,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Open Input Shapfile.
 				//
 				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);   
 				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputVector;
@@ -5622,7 +5622,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					delete polygons;
 				}
 
-				OGRDataSource::DestroyDataSource(inputSHPDS);
+				GDALClose(inputSHPDS);
 				//OGRCleanupAll();
 			}
 			catch (RSGISException& e)
@@ -5646,7 +5646,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 
-			OGRDataSource *inputSHPDS = NULL;
+			GDALDataset *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSpatialReference* spatialRef = NULL;
 
@@ -5660,7 +5660,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Open Input Shapfile.
 				//
 				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);   
 				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputVector;
@@ -5715,7 +5715,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				}
 				delete polygons;
 
-				OGRDataSource::DestroyDataSource(inputSHPDS);
+				GDALClose(inputSHPDS);
 				//OGRCleanupAll();
 			}
 			catch (RSGISException& e)
@@ -5739,7 +5739,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 
-			OGRDataSource *inputSHPDS = NULL;
+			GDALDataset *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSpatialReference* spatialRef = NULL;
 
@@ -5753,7 +5753,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Open Input Shapfile.
 				//
 				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);   
 				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputVector;
@@ -5817,7 +5817,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 
 				delete identifyNonConvexPolygons;
 
-				OGRDataSource::DestroyDataSource(inputSHPDS);
+				GDALClose(inputSHPDS);
 				//OGRCleanupAll();
 			}
 			catch (RSGISException& e)
@@ -5841,7 +5841,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 
-			OGRDataSource *inputSHPDS = NULL;
+			GDALDataset *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSpatialReference* spatialRef = NULL;
 
@@ -5855,7 +5855,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Open Input Shapfile.
 				//
 				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);   
 				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputVector;
@@ -5896,7 +5896,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				}
 				delete polygons;
 
-				OGRDataSource::DestroyDataSource(inputSHPDS);
+				GDALClose(inputSHPDS);
 				//OGRCleanupAll();
 			}
 			catch (RSGISException e)
@@ -5920,7 +5920,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 
-			OGRDataSource *inputSHPDS = NULL;
+			GDALDataset *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSpatialReference* spatialRef = NULL;
 
@@ -5934,7 +5934,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Open Input Shapfile.
 				//
 				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);   
 				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputVector;
@@ -5973,7 +5973,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				}
 				delete polygons;
 
-				OGRDataSource::DestroyDataSource(inputSHPDS);
+				GDALClose(inputSHPDS);
 				//OGRCleanupAll();
 			}
 			catch (RSGISException& e)
@@ -5997,7 +5997,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 
-			OGRDataSource *inputSHPDS = NULL;
+			GDALDataset *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSpatialReference* spatialRef = NULL;
 
@@ -6011,7 +6011,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Open Input Shapfile.
 				//
 				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);   
 				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputVector;
@@ -6050,7 +6050,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				}
 				delete polygons;
 
-				OGRDataSource::DestroyDataSource(inputSHPDS);
+				GDALClose(inputSHPDS);
 				//OGRCleanupAll();
 			}
 			catch (RSGISException& e)
@@ -6074,7 +6074,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 
-			OGRDataSource *inputSHPDS = NULL;
+			GDALDataset *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSpatialReference* spatialRef = NULL;
 
@@ -6088,7 +6088,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Open Input Shapfile.
 				//
 				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);   
 				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputVector;
@@ -6109,7 +6109,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				cout << "Read input Shapefile\n";
 				processVector->processVectorsNoOutput(inputSHPLayer, false);
 
-				OGRDataSource::DestroyDataSource(inputSHPDS);
+				GDALClose(inputSHPDS);
 				delete processVector;
 				delete processFeature;
 
@@ -6152,7 +6152,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 
-			OGRDataSource *inputSHPDS = NULL;
+			GDALDataset *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSpatialReference* spatialRef = NULL;
 
@@ -6166,7 +6166,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Open Input Shapfile.
 				//
 				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);   
 				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputVector;
@@ -6225,7 +6225,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 
 				delete RSGISGEOSFactoryGenerator::getInstance();
 
-				OGRDataSource::DestroyDataSource(inputSHPDS);
+				GDALClose(inputSHPDS);
 				//OGRCleanupAll();
 			}
 			catch(RSGISException &e)
@@ -6251,7 +6251,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 
-			OGRDataSource *inputSHPDS = NULL;
+			GDALDataset *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSpatialReference* spatialRef = NULL;
 
@@ -6265,7 +6265,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Open Input Shapfile.
 				//
 				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);   
 				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputVector;
@@ -6313,7 +6313,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 
 				delete RSGISGEOSFactoryGenerator::getInstance();
 
-				OGRDataSource::DestroyDataSource(inputSHPDS);
+				GDALClose(inputSHPDS);
 				//OGRCleanupAll();
 			}
 			catch(RSGISException &e)
@@ -6339,7 +6339,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 
-			OGRDataSource *inputSHPDS = NULL;
+			GDALDataset *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSpatialReference* spatialRef = NULL;
 
@@ -6353,7 +6353,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Open Input Shapfile.
 				//
 				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);   
 				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputVector;
@@ -6398,7 +6398,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				}
 				delete newPolys;
 
-				OGRDataSource::DestroyDataSource(inputSHPDS);
+				GDALClose(inputSHPDS);
 				//OGRCleanupAll();
 			}
 			catch(RSGISException e)
@@ -6425,7 +6425,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 
-			OGRDataSource *inputSHPDS = NULL;
+			GDALDataset *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSpatialReference* spatialRef = NULL;
 
@@ -6439,7 +6439,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Open Input Shapfile.
 				//
 				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);   
 				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputVector;
@@ -6484,7 +6484,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				}
 				delete newPolys;
 
-				OGRDataSource::DestroyDataSource(inputSHPDS);
+				GDALClose(inputSHPDS);
 				//OGRCleanupAll();
 			}
 			catch(RSGISException e)
@@ -6510,7 +6510,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 
-			OGRDataSource *inputSHPDS = NULL;
+			GDALDataset *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSpatialReference* spatialRef = NULL;
 
@@ -6524,7 +6524,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Open Input Shapfile.
 				//
 				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);   
 				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputVector;
@@ -6563,7 +6563,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				}
 				delete polygons;
 
-				OGRDataSource::DestroyDataSource(inputSHPDS);
+				GDALClose(inputSHPDS);
 				//OGRCleanupAll();
 			}
 			catch(RSGISException e)
@@ -6588,7 +6588,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 
 				string SHPFileInLayer = "";
 
-				OGRDataSource *inputSHPDS = NULL;
+				GDALDataset *inputSHPDS = NULL;
 				OGRLayer *inputSHPLayer = NULL;
 
 				RSGISProcessVector *processVector = NULL;
@@ -6612,7 +6612,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 						/////////////////////////////////////
 						SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 
-						inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+						inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);   
 						if(inputSHPDS == NULL)
 						{
 							string message = string("Could not open vector file ") + this->inputVector;
@@ -6628,7 +6628,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 						// Get data from attribute..
 						processVector->processVectorsNoOutput(inputSHPLayer, false);
 
-						OGRDataSource::DestroyDataSource(inputSHPDS);
+						GDALClose(inputSHPDS);
 					}
 
 					string filename = fileUtils.getFileNameNoExtension(outputPlot);
@@ -6675,7 +6675,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				RSGISVectorUtils vecUtils;
 				RSGISRasterizeVector rasteriseVec;
 
-				OGRDataSource *inputSHPDS = NULL;
+				GDALDataset *inputSHPDS = NULL;
 				OGRLayer *inputSHPLayer = NULL;
 
 				GDALDriver *gdalDriver = NULL;
@@ -6688,7 +6688,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				/////////////////////////////////////
 				string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);   
 				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputVector;
@@ -6754,7 +6754,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				rasteriseVec.rasterizeLayer(inputSHPLayer, imageData, this->attribute, this->method);
 
 				GDALClose(imageData);
-				OGRDataSource::DestroyDataSource(inputSHPDS);
+				GDALClose(inputSHPDS);
 				//OGRCleanupAll();
 			}
 			catch(RSGISException &e)
@@ -6780,7 +6780,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				RSGISVectorUtils vecUtils;
 				RSGISRasterizeVector rasteriseVec;
 
-				OGRDataSource *inputSHPDS = NULL;
+				GDALDataset *inputSHPDS = NULL;
 				OGRLayer *inputSHPLayer = NULL;
 
 				/////////////////////////////////////
@@ -6790,7 +6790,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				/////////////////////////////////////
 				string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);   
 				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputVector;
@@ -6814,7 +6814,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				rasteriseVec.rasterizeLayer(inputSHPLayer, imgDataset, this->attribute, this->method);
 
 				GDALClose(imgDataset);
-				OGRDataSource::DestroyDataSource(inputSHPDS);
+				GDALClose(inputSHPDS);
 				//OGRCleanupAll();
 			}
 			catch(RSGISException &e)
@@ -6937,7 +6937,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 
-			OGRDataSource *inputSHPDS = NULL;
+			GDALDataset *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSpatialReference* spatialRef = NULL;
 
@@ -6951,7 +6951,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Open Input Shapfile.
 				//
 				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);   
 				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputVector;
@@ -7038,7 +7038,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				}
 				delete polygons;
 
-				OGRDataSource::DestroyDataSource(inputSHPDS);
+				GDALClose(inputSHPDS);
 				//OGRCleanupAll();
 			}
 			catch(RSGISException e)
@@ -7066,7 +7066,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 
-			OGRDataSource *inputSHPDS = NULL;
+			GDALDataset *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 
 			RSGISProcessVector *processVector = NULL;
@@ -7079,7 +7079,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Open Input Shapfile.
 				//
 				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);   
 				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputVector;
@@ -7106,7 +7106,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				delete processFeature;
 
 
-				OGRDataSource::DestroyDataSource(inputSHPDS);
+				GDALClose(inputSHPDS);
 				//OGRCleanupAll();
 			}
 			catch(RSGISException e)
@@ -7133,10 +7133,10 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
 
-			OGRDataSource *inputSHPDS = NULL;
+			GDALDataset *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
-			OGRSFDriver *shpFiledriver = NULL;
-			OGRDataSource *outputSHPDS = NULL;
+			GDALDriver *shpFiledriver = NULL;
+			GDALDataset *outputSHPDS = NULL;
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
 
@@ -7162,7 +7162,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Open Input Shapfile.
 				//
 				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);   
 				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputVector;
@@ -7186,12 +7186,12 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				//
 				/////////////////////////////////////
 				const char *pszDriverName = "ESRI Shapefile";
-				shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName );
+				shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
 				if( shpFiledriver == NULL )
 				{
 					throw RSGISVectorOutputException("SHP driver not available.");
 				}
-				outputSHPDS = shpFiledriver->CreateDataSource(this->outputVector.c_str(), NULL);
+				outputSHPDS = shpFiledriver->Create(this->outputVector.c_str(), 0, 0, 0, GDT_Unknown, NULL );
 				if( outputSHPDS == NULL )
 				{
 					string message = string("Could not create vector file ") + this->outputVector;
@@ -7209,14 +7209,14 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				{
 					copyCheckPolygons.copyCheckPolygons(inputSHPLayer, outputSHPLayer, true);
 
-					OGRDataSource::DestroyDataSource(inputSHPDS);
-					OGRDataSource::DestroyDataSource(outputSHPDS);
+					GDALClose(inputSHPDS);
+					GDALClose(outputSHPDS);
 					//OGRCleanupAll();
 				}
 				catch (RSGISVectorException &e)
 				{
-					OGRDataSource::DestroyDataSource(inputSHPDS);
-					OGRDataSource::DestroyDataSource(outputSHPDS);
+					GDALClose(inputSHPDS);
+					GDALClose(outputSHPDS);
 					//OGRCleanupAll();
 					throw e;
 				}
@@ -7244,10 +7244,10 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 
-			OGRDataSource *inputSHPDS = NULL;
+			GDALDataset *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
-			OGRSFDriver *shpFiledriver = NULL;
-			OGRDataSource *outputSHPDS = NULL;
+			GDALDriver *shpFiledriver = NULL;
+			GDALDataset *outputSHPDS = NULL;
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
 
@@ -7260,7 +7260,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			try
 			{
 				const char *pszDriverName = "ESRI Shapefile";
-				shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName );
+				shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
 				if( shpFiledriver == NULL )
 				{
 					throw RSGISVectorOutputException("SHP driver not available.");
@@ -7271,7 +7271,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Open Input Shapfile.
 				//
 				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);   
 				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputVector;
@@ -7332,7 +7332,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					// Create Output Shapfile.
 					//
 					/////////////////////////////////////
-					outputSHPDS = shpFiledriver->CreateDataSource(outputShpFilePath.c_str(), NULL);
+					outputSHPDS = shpFiledriver->Create(outputShpFilePath.c_str(), 0, 0, 0, GDT_Unknown, NULL );
 					if( outputSHPDS == NULL )
 					{
 						string message = string("Could not create vector file ") + outputShpFilePath;
@@ -7351,9 +7351,9 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 
 					processVectorSQL->processVectors(inputSHPDS, outputSHPLayer, true, false, sql);
 
-					OGRDataSource::DestroyDataSource(outputSHPDS);
+					GDALClose(outputSHPDS);
 				}
-				OGRDataSource::DestroyDataSource(inputSHPDS);
+				GDALClose(inputSHPDS);
 
 				delete processFeature;
 				delete processVectorSQL;
@@ -7383,10 +7383,10 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
 
-			OGRDataSource *inputSHPDS = NULL;
+			GDALDataset *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
-			OGRSFDriver *shpFiledriver = NULL;
-			OGRDataSource *outputSHPDS = NULL;
+			GDALDriver *shpFiledriver = NULL;
+			GDALDataset *outputSHPDS = NULL;
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
 
@@ -7412,7 +7412,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Open Input Shapfile.
 				//
 				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);   
 				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputVector;
@@ -7436,12 +7436,12 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				//
 				/////////////////////////////////////
 				const char *pszDriverName = "ESRI Shapefile";
-				shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName );
+				shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
 				if( shpFiledriver == NULL )
 				{
 					throw RSGISVectorOutputException("SHP driver not available.");
 				}
-				outputSHPDS = shpFiledriver->CreateDataSource(this->outputVector.c_str(), NULL);
+				outputSHPDS = shpFiledriver->Create(this->outputVector.c_str(), 0, 0, 0, GDT_Unknown, NULL );
 				if( outputSHPDS == NULL )
 				{
 					string message = string("Could not create vector file ") + this->outputVector;
@@ -7461,14 +7461,14 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					unsigned long numOutPolys = removeContainedPolys.removeContainedPolygons(inputSHPLayer, outputSHPLayer);
 					cout << numOutPolys << " Polygons have been outputted.\n";
 
-					OGRDataSource::DestroyDataSource(inputSHPDS);
-					OGRDataSource::DestroyDataSource(outputSHPDS);
+					GDALClose(inputSHPDS);
+					GDALClose(outputSHPDS);
 
 				}
 				catch (RSGISVectorException &e)
 				{
-					OGRDataSource::DestroyDataSource(inputSHPDS);
-					OGRDataSource::DestroyDataSource(outputSHPDS);
+					GDALClose(inputSHPDS);
+					GDALClose(outputSHPDS);
 					throw e;
 				}
 
@@ -7519,15 +7519,15 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			string SHPFileOutLayer = "";
 			string outputDIR = "";
 
-			OGRDataSource *inputSHPDS = NULL;
+			GDALDataset *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
-			OGRSFDriver *shpFiledriver = NULL;
-			OGRDataSource *outputSHPDS = NULL;
+			GDALDriver *shpFiledriver = NULL;
+			GDALDataset *outputSHPDS = NULL;
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
 
 			const char *pszDriverName = "ESRI Shapefile";
-			shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName );
+			shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
 			if( shpFiledriver == NULL )
 			{
 				throw RSGISVectorOutputException("SHP driver not available.");
@@ -7577,7 +7577,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 						// Open Input Shapfile.
 						//
 						/////////////////////////////////////
-						inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+						inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);   
 						if(inputSHPDS == NULL)
 						{
 							string message = string("Could not open vector file ") + this->inputVector;
@@ -7601,7 +7601,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 						//
 						/////////////////////////////////////
 
-						outputSHPDS = shpFiledriver->CreateDataSource(this->outputVector.c_str(), NULL);
+						outputSHPDS = shpFiledriver->Create(this->outputVector.c_str(), 0, 0, 0, GDT_Unknown, NULL );
 						if( outputSHPDS == NULL )
 						{
 							string message = string("Could not create vector file ") + this->outputVector;
@@ -7619,14 +7619,14 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 							unsigned long numOutPolys = removeContainedPolys.removeContainedPolygons(inputSHPLayer, outputSHPLayer);
 							cout << numOutPolys << " Polygons have been outputted.\n";
 
-							OGRDataSource::DestroyDataSource(inputSHPDS);
-							OGRDataSource::DestroyDataSource(outputSHPDS);
+							GDALClose(inputSHPDS);
+							GDALClose(outputSHPDS);
 
 						}
 						catch (RSGISVectorException &e)
 						{
-							OGRDataSource::DestroyDataSource(inputSHPDS);
-							OGRDataSource::DestroyDataSource(outputSHPDS);
+							GDALClose(inputSHPDS);
+							GDALClose(outputSHPDS);
 							throw e;
 						}
 					}
@@ -7666,7 +7666,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			string SHPFileOutLayer = "";
 			string outputDIR = "";
 
-			OGRDataSource *inputSHPDS = NULL;
+			GDALDataset *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
 
@@ -7719,7 +7719,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 						// Open Input Shapfile.
 						//
 						/////////////////////////////////////
-						inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+						inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);   
 						if(inputSHPDS == NULL)
 						{
 							string message = string("Could not open vector file ") + this->inputVector;
@@ -7779,12 +7779,12 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 							}
 
 
-							OGRDataSource::DestroyDataSource(inputSHPDS);
+							GDALClose(inputSHPDS);
 
 						}
 						catch (RSGISVectorException &e)
 						{
-							OGRDataSource::DestroyDataSource(inputSHPDS);
+							GDALClose(inputSHPDS);
 							throw e;
 						}
 					}
@@ -7822,17 +7822,17 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			string SHPFileOutLayerLarge = vecUtils.getLayerName(this->outputlarge);
 			string SHPFileOutLayerSmall = vecUtils.getLayerName(this->outputsmall);
 
-			OGRDataSource *inputSHPDS = NULL;
+			GDALDataset *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
-			OGRSFDriver *shpFiledriver = NULL;
-			OGRDataSource *outputSHPDSLarge = NULL;
+			GDALDriver *shpFiledriver = NULL;
+			GDALDataset *outputSHPDSLarge = NULL;
 			OGRLayer *outputSHPLayerLarge = NULL;
-			OGRDataSource *outputSHPDSSmall = NULL;
+			GDALDataset *outputSHPDSSmall = NULL;
 			OGRLayer *outputSHPLayerSmall = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
 
 			const char *pszDriverName = "ESRI Shapefile";
-			shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName );
+			shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
 			if( shpFiledriver == NULL )
 			{
 				throw RSGISVectorOutputException("SHP driver not available.");
@@ -7874,7 +7874,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Open Input Shapfile.
 				//
 				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);   
 				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputVector;
@@ -7897,7 +7897,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Create Output Shapfile Large
 				//
 				/////////////////////////////////////
-				outputSHPDSLarge = shpFiledriver->CreateDataSource(this->outputlarge.c_str(), NULL);
+				outputSHPDSLarge = shpFiledriver->Create(this->outputlarge.c_str(), 0, 0, 0, GDT_Unknown, NULL );
 				if( outputSHPDSLarge == NULL )
 				{
 					string message = string("Could not create vector file ") + this->outputlarge;
@@ -7915,7 +7915,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Create Output Shapfile Small
 				//
 				/////////////////////////////////////
-				outputSHPDSSmall = shpFiledriver->CreateDataSource(this->outputsmall.c_str(), NULL);
+				outputSHPDSSmall = shpFiledriver->Create(this->outputsmall.c_str(), 0, 0, 0, GDT_Unknown, NULL );
 				if( outputSHPDSSmall == NULL )
 				{
 					string message = string("Could not create vector file ") + this->outputsmall;
@@ -7933,16 +7933,16 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					RSGISSplitSmallLargePolygons splitSmallLarge;
 					splitSmallLarge.splitPolygons(inputSHPLayer, outputSHPLayerSmall, outputSHPLayerLarge, threshold);
 
-					OGRDataSource::DestroyDataSource(inputSHPDS);
-					OGRDataSource::DestroyDataSource(outputSHPDSLarge);
-					OGRDataSource::DestroyDataSource(outputSHPDSSmall);
+					GDALClose(inputSHPDS);
+					GDALClose(outputSHPDSLarge);
+					GDALClose(outputSHPDSSmall);
 					//OGRCleanupAll();
 				}
 				catch (RSGISVectorException &e)
 				{
-					OGRDataSource::DestroyDataSource(inputSHPDS);
-					OGRDataSource::DestroyDataSource(outputSHPDSLarge);
-					OGRDataSource::DestroyDataSource(outputSHPDSSmall);
+					GDALClose(inputSHPDS);
+					GDALClose(outputSHPDSLarge);
+					GDALClose(outputSHPDSSmall);
 					//OGRCleanupAll();
 					throw e;
 				}
@@ -7973,12 +7973,12 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			string SHPFileInLayerGeom = vecUtils.getLayerName(this->inputGeometry);
 			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
 
-			OGRDataSource *inputSHPDS = NULL;
+			GDALDataset *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
-			OGRDataSource *inputSHPDSGeom = NULL;
+			GDALDataset *inputSHPDSGeom = NULL;
 			OGRLayer *inputSHPLayerGeom = NULL;
-			OGRSFDriver *shpFiledriver = NULL;
-			OGRDataSource *outputSHPDS = NULL;
+			GDALDriver *shpFiledriver = NULL;
+			GDALDataset *outputSHPDS = NULL;
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
 
@@ -8007,7 +8007,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Open Input Shapfile. (Geometry)
 				//
 				/////////////////////////////////////
-				inputSHPDSGeom = OGRSFDriverRegistrar::Open(this->inputGeometry.c_str(), FALSE);
+				inputSHPDSGeom = (GDALDataset*) GDALOpenEx(this->inputGeometry.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);
 				if(inputSHPDSGeom == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputGeometry;
@@ -8025,7 +8025,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Open Input Shapfile.
 				//
 				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);   
 				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputVector;
@@ -8049,12 +8049,12 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				//
 				/////////////////////////////////////
 				const char *pszDriverName = "ESRI Shapefile";
-				shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName );
+				shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
 				if( shpFiledriver == NULL )
 				{
 					throw RSGISVectorOutputException("SHP driver not available.");
 				}
-				outputSHPDS = shpFiledriver->CreateDataSource(this->outputVector.c_str(), NULL);
+				outputSHPDS = shpFiledriver->Create(this->outputVector.c_str(), 0, 0, 0, GDT_Unknown, NULL );
 				if( outputSHPDS == NULL )
 				{
 					string message = string("Could not create vector file ") + this->outputVector;
@@ -8082,14 +8082,14 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					unsigned long numOutPolys = removeContainedPolys.removeContainedPolygons(inputSHPLayer, outputSHPLayer, polys);
 					cout << numOutPolys << " Polygons have been outputted.\n";
 
-					OGRDataSource::DestroyDataSource(inputSHPDS);
-					OGRDataSource::DestroyDataSource(outputSHPDS);
+					GDALClose(inputSHPDS);
+					GDALClose(outputSHPDS);
 
 				}
 				catch (RSGISVectorException &e)
 				{
-					OGRDataSource::DestroyDataSource(inputSHPDS);
-					OGRDataSource::DestroyDataSource(outputSHPDS);
+					GDALClose(inputSHPDS);
+					GDALClose(outputSHPDS);
 					throw e;
 				}
 
@@ -8126,10 +8126,10 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			string SHPFileInLayer = "";
 			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
 
-			OGRDataSource *inputSHPDS = NULL;
+			GDALDataset *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
-			OGRSFDriver *shpFiledriver = NULL;
-			OGRDataSource *outputSHPDS = NULL;
+			GDALDriver *shpFiledriver = NULL;
+			GDALDataset *outputSHPDS = NULL;
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
 
@@ -8165,7 +8165,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					/////////////////////////////////////
 					SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 
-					inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+					inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);   
 					if(inputSHPDS == NULL)
 					{
 						string message = string("Could not open vector file ") + this->inputVector;
@@ -8192,12 +8192,12 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 						//
 						/////////////////////////////////////
 						const char *pszDriverName = "ESRI Shapefile";
-						shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName );
+						shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
 						if( shpFiledriver == NULL )
 						{
 							throw RSGISVectorOutputException("SHP driver not available.");
 						}
-						outputSHPDS = shpFiledriver->CreateDataSource(this->outputVector.c_str(), NULL);
+						outputSHPDS = shpFiledriver->Create(this->outputVector.c_str(), 0, 0, 0, GDT_Unknown, NULL );
 						if( outputSHPDS == NULL )
 						{
 							string message = string("Could not create vector file ") + this->outputVector;
@@ -8226,20 +8226,20 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 					{
 						appendToVector.appendLayer(inputSHPLayer, outputSHPLayer, ignoreAttr);
 
-						OGRDataSource::DestroyDataSource(inputSHPDS);
+						GDALClose(inputSHPDS);
 
 					}
 					catch (RSGISVectorException &e)
 					{
-						OGRDataSource::DestroyDataSource(inputSHPDS);
-						OGRDataSource::DestroyDataSource(outputSHPDS);
+						GDALClose(inputSHPDS);
+						GDALClose(outputSHPDS);
 						//OGRCleanupAll();
 						throw e;
 					}
 
 				}
 
-				OGRDataSource::DestroyDataSource(outputSHPDS);
+				GDALClose(outputSHPDS);
 				//OGRCleanupAll();
 			}
 			catch (RSGISException& e)
@@ -8265,10 +8265,10 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
 
-			OGRDataSource *inputSHPDS = NULL;
+			GDALDataset *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
-			OGRSFDriver *shpFiledriver = NULL;
-			OGRDataSource *outputSHPDS = NULL;
+			GDALDriver *shpFiledriver = NULL;
+			GDALDataset *outputSHPDS = NULL;
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
 
@@ -8294,7 +8294,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Open Input Shapfile.
 				//
 				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);   
 				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputVector;
@@ -8318,12 +8318,12 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				//
 				/////////////////////////////////////
 				const char *pszDriverName = "ESRI Shapefile";
-				shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName );
+				shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
 				if( shpFiledriver == NULL )
 				{
 					throw RSGISVectorOutputException("SHP driver not available.");
 				}
-				outputSHPDS = shpFiledriver->CreateDataSource(this->outputVector.c_str(), NULL);
+				outputSHPDS = shpFiledriver->Create(this->outputVector.c_str(), 0, 0, 0, GDT_Unknown, NULL );
 				if( outputSHPDS == NULL )
 				{
 					string message = string("Could not create vector file ") + this->outputVector;
@@ -8341,14 +8341,14 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				{
 					copyCheckPolygons.copyCheckPolygons(inputSHPLayer, outputSHPLayer, true);
 
-					OGRDataSource::DestroyDataSource(inputSHPDS);
-					OGRDataSource::DestroyDataSource(outputSHPDS);
+					GDALClose(inputSHPDS);
+					GDALClose(outputSHPDS);
 					//OGRCleanupAll();
 				}
 				catch (RSGISVectorException &e)
 				{
-					OGRDataSource::DestroyDataSource(inputSHPDS);
-					OGRDataSource::DestroyDataSource(outputSHPDS);
+					GDALClose(inputSHPDS);
+					GDALClose(outputSHPDS);
 					//OGRCleanupAll();
 					throw e;
 				}
@@ -8380,10 +8380,10 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
 
-			OGRDataSource *inputSHPDS = NULL;
+			GDALDataset *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
-			OGRSFDriver *shpFiledriver = NULL;
-			OGRDataSource *outputSHPDS = NULL;
+			GDALDriver *shpFiledriver = NULL;
+			GDALDataset *outputSHPDS = NULL;
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
 
@@ -8409,7 +8409,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Open Input Shapfile.
 				//
 				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);   
 				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputVector;
@@ -8433,12 +8433,12 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				//
 				/////////////////////////////////////
 				const char *pszDriverName = "ESRI Shapefile";
-				shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName );
+				shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
 				if( shpFiledriver == NULL )
 				{
 					throw RSGISVectorOutputException("SHP driver not available.");
 				}
-				outputSHPDS = shpFiledriver->CreateDataSource(this->outputVector.c_str(), NULL);
+				outputSHPDS = shpFiledriver->Create(this->outputVector.c_str(), 0, 0, 0, GDT_Unknown, NULL );
 				if( outputSHPDS == NULL )
 				{
 					string message = string("Could not create vector file ") + this->outputVector;
@@ -8457,14 +8457,14 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
                     RSGISRemovePolygonHoles removePolyHolesObj = RSGISRemovePolygonHoles(this->threshold, this->areaThresholdProvided);
                     removePolyHolesObj.removeholes(inputSHPLayer, outputSHPLayer);
 
-					OGRDataSource::DestroyDataSource(inputSHPDS);
-					OGRDataSource::DestroyDataSource(outputSHPDS);
+					GDALClose(inputSHPDS);
+					GDALClose(outputSHPDS);
 					//OGRCleanupAll();
 				}
 				catch (RSGISVectorException &e)
 				{
-					OGRDataSource::DestroyDataSource(inputSHPDS);
-					OGRDataSource::DestroyDataSource(outputSHPDS);
+					GDALClose(inputSHPDS);
+					GDALClose(outputSHPDS);
 					//OGRCleanupAll();
 					throw e;
 				}
@@ -8493,10 +8493,10 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
 
-			OGRDataSource *inputSHPDS = NULL;
+			GDALDataset *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
-			OGRSFDriver *shpFiledriver = NULL;
-			OGRDataSource *outputSHPDS = NULL;
+			GDALDriver *shpFiledriver = NULL;
+			GDALDataset *outputSHPDS = NULL;
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
 
@@ -8522,7 +8522,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Open Input Shapfile.
 				//
 				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);   
 				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputVector;
@@ -8546,12 +8546,12 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				//
 				/////////////////////////////////////
 				const char *pszDriverName = "ESRI Shapefile";
-				shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName );
+				shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
 				if( shpFiledriver == NULL )
 				{
 					throw RSGISVectorOutputException("SHP driver not available.");
 				}
-				outputSHPDS = shpFiledriver->CreateDataSource(this->outputVector.c_str(), NULL);
+				outputSHPDS = shpFiledriver->Create(this->outputVector.c_str(), 0, 0, 0, GDT_Unknown, NULL );
 				if( outputSHPDS == NULL )
 				{
 					string message = string("Could not create vector file ") + this->outputVector;
@@ -8569,14 +8569,14 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				{
 					dropSmallPolys.dropSmallPolys(inputSHPLayer, outputSHPLayer, threshold);
 
-					OGRDataSource::DestroyDataSource(inputSHPDS);
-					OGRDataSource::DestroyDataSource(outputSHPDS);
+					GDALClose(inputSHPDS);
+					GDALClose(outputSHPDS);
 					//OGRCleanupAll();
 				}
 				catch (RSGISVectorException &e)
 				{
-					OGRDataSource::DestroyDataSource(inputSHPDS);
-					OGRDataSource::DestroyDataSource(outputSHPDS);
+					GDALClose(inputSHPDS);
+					GDALClose(outputSHPDS);
 					//OGRCleanupAll();
 					throw e;
 				}
@@ -8604,7 +8604,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 
-			OGRDataSource *inputSHPDS = NULL;
+			GDALDataset *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSpatialReference* spatialRef = NULL;
 
@@ -8618,7 +8618,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Open Input Shapfile.
 				//
 				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);   
 				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputVector;
@@ -8671,7 +8671,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				delete polygons;
 				delete largestPolyVec;
 
-				OGRDataSource::DestroyDataSource(inputSHPDS);
+				GDALClose(inputSHPDS);
 				//OGRCleanupAll();
 			}
 			catch(RSGISException e)
@@ -8728,7 +8728,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
 
-			OGRDataSource *inputSHPDS = NULL;
+			GDALDataset *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRSpatialReference* spatialRef = NULL;
 
@@ -8742,7 +8742,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Open Input Shapfile.
 				//
 				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);   
 				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputVector;
@@ -8812,7 +8812,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				}
 				delete outPoly;
 
-				OGRDataSource::DestroyDataSource(inputSHPDS);
+				GDALClose(inputSHPDS);
 				//OGRCleanupAll();
 			}
 			catch(RSGISException e)
@@ -8919,10 +8919,10 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputFile);
 			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
 
-			OGRDataSource *inputSHPDS = NULL;
+			GDALDataset *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
-			OGRSFDriver *shpFiledriver = NULL;
-			OGRDataSource *outputSHPDS = NULL;
+			GDALDriver *shpFiledriver = NULL;
+			GDALDataset *outputSHPDS = NULL;
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
 			OGRFeatureDefn *inFeatureDefn = NULL;
@@ -8952,7 +8952,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Open Input Shapfile.
 				//
 				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputFile.c_str(), FALSE);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(this->inputFile.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);
 				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputFile;
@@ -8977,12 +8977,12 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				//
 				/////////////////////////////////////
 				const char *pszDriverName = "ESRI Shapefile";
-				shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName );
+				shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
 				if( shpFiledriver == NULL )
 				{
 					throw RSGISVectorOutputException("SHP driver not available.");
 				}
-				outputSHPDS = shpFiledriver->CreateDataSource(this->outputVector.c_str(), NULL);
+				outputSHPDS = shpFiledriver->Create(this->outputVector.c_str(), 0, 0, 0, GDT_Unknown, NULL );
 				if( outputSHPDS == NULL )
 				{
 					string message = string("Could not create vector file ") + this->outputVector;
@@ -9018,8 +9018,8 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				processVector = new RSGISProcessVector(processFeature);
 				processVector->processVectors(inputSHPLayer, outputSHPLayer, true, true, false);
 
-				OGRDataSource::DestroyDataSource(inputSHPDS);
-				OGRDataSource::DestroyDataSource(outputSHPDS);
+				GDALClose(inputSHPDS);
+				GDALClose(outputSHPDS);
 
 				delete processVector;
 				delete processFeature;
@@ -9050,10 +9050,10 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputFile);
 			string SHPFileOutLayer = vecUtils.getLayerName(this->outputVector);
 
-			OGRDataSource *inputSHPDS = NULL;
+			GDALDataset *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
-			OGRSFDriver *shpFiledriver = NULL;
-			OGRDataSource *outputSHPDS = NULL;
+			GDALDriver *shpFiledriver = NULL;
+			GDALDataset *outputSHPDS = NULL;
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
 			OGRFeatureDefn *inFeatureDefn = NULL;
@@ -9080,7 +9080,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Open Input Shapfile.
 				//
 				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputFile.c_str(), FALSE);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(this->inputFile.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);
 				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputFile;
@@ -9102,12 +9102,12 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				//
 				/////////////////////////////////////
 				const char *pszDriverName = "ESRI Shapefile";
-				shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName );
+				shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
 				if( shpFiledriver == NULL )
 				{
 					throw RSGISVectorOutputException("SHP driver not available.");
 				}
-				outputSHPDS = shpFiledriver->CreateDataSource(this->outputVector.c_str(), NULL);
+				outputSHPDS = shpFiledriver->Create(this->outputVector.c_str(), 0, 0, 0, GDT_Unknown, NULL );
 				if( outputSHPDS == NULL )
 				{
 					string message = string("Could not create vector file ") + this->outputVector;
@@ -9130,8 +9130,8 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 
                 delete copyFeatures;
 
-				OGRDataSource::DestroyDataSource(inputSHPDS);
-				OGRDataSource::DestroyDataSource(outputSHPDS);
+				GDALClose(inputSHPDS);
+				GDALClose(outputSHPDS);
 
 				//OGRCleanupAll();
 			}
@@ -9159,7 +9159,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 
 			string SHPFileInLayer = vecUtils.getLayerName(this->inputFile);
 
-			OGRDataSource *inputSHPDS = NULL;
+			GDALDataset *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			try
 			{
@@ -9169,7 +9169,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Open Input Shapfile.
 				//
 				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputFile.c_str(), FALSE);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(this->inputFile.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);
 				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputFile;
@@ -9220,7 +9220,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
                 }
                 delete ogrGeoms;
 
-				OGRDataSource::DestroyDataSource(inputSHPDS);
+				GDALClose(inputSHPDS);
 
 				//OGRCleanupAll();
 			}
@@ -9250,10 +9250,10 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
                 RSGISFileUtils fileUtils;
                 RSGISVectorUtils vecUtils;
 
-                OGRDataSource *inputSHPDS = NULL;
+                GDALDataset *inputSHPDS = NULL;
                 OGRLayer *inputSHPLayer = NULL;
-                OGRSFDriver *shpFiledriver = NULL;
-                OGRDataSource *outputSHPDS = NULL;
+                GDALDriver *shpFiledriver = NULL;
+                GDALDataset *outputSHPDS = NULL;
                 OGRLayer *outputSHPLayer = NULL;
                 OGRFeatureDefn *inFeatureDefn = NULL;
 
@@ -9279,7 +9279,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Open Input Shapfile.
 				//
 				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);   
 				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputVector;
@@ -9303,12 +9303,12 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				//
 				/////////////////////////////////////
 				const char *pszDriverName = "ESRI Shapefile";
-				shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName );
+				shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
 				if( shpFiledriver == NULL )
 				{
 					throw RSGISVectorOutputException("SHP driver not available.");
 				}
-				outputSHPDS = shpFiledriver->CreateDataSource(this->outputVector.c_str(), NULL);
+				outputSHPDS = shpFiledriver->Create(this->outputVector.c_str(), 0, 0, 0, GDT_Unknown, NULL );
 				if( outputSHPDS == NULL )
 				{
 					string message = string("Could not create vector file ") + this->outputVector;
@@ -9328,8 +9328,8 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
                 delete copyFeatures;
                 delete processVector;
 
-                OGRDataSource::DestroyDataSource(inputSHPDS);
-                OGRDataSource::DestroyDataSource(outputSHPDS);
+                GDALClose(inputSHPDS);
+                GDALClose(outputSHPDS);
             }
             catch (RSGISException &e)
             {
@@ -9351,7 +9351,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
                 //RSGISFileUtils fileUtils;
                 RSGISVectorUtils vecUtils;
 
-                OGRDataSource *inputSHPDS = NULL;
+                GDALDataset *inputSHPDS = NULL;
                 OGRLayer *inputSHPLayer = NULL;
 
                 string SHPFileInLayer = vecUtils.getLayerName(this->inputVector);
@@ -9361,7 +9361,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Open Input Shapfile.
 				//
 				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);   
 				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputVector;
@@ -9380,7 +9380,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
                 cout << wktPrettySpatialRef[0] << endl;
                 OGRFree(wktPrettySpatialRef);
 
-                OGRDataSource::DestroyDataSource(inputSHPDS);
+                GDALClose(inputSHPDS);
             }
             catch (RSGISException &e)
             {
@@ -9405,10 +9405,10 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
                 RSGISFileUtils fileUtils;
                 RSGISVectorUtils vecUtils;
 
-                OGRDataSource *inputSHPDS = NULL;
+                GDALDataset *inputSHPDS = NULL;
                 OGRLayer *inputSHPLayer = NULL;
-                OGRSFDriver *shpFiledriver = NULL;
-                OGRDataSource *outputSHPDS = NULL;
+                GDALDriver *shpFiledriver = NULL;
+                GDALDataset *outputSHPDS = NULL;
                 OGRLayer *outputSHPLayer = NULL;
                 OGRFeatureDefn *inFeatureDefn = NULL;
 
@@ -9434,7 +9434,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Open Input Shapfile.
 				//
 				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);   
 				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputVector;
@@ -9456,12 +9456,12 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				//
 				/////////////////////////////////////
 				const char *pszDriverName = "ESRI Shapefile";
-				shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName );
+				shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
 				if( shpFiledriver == NULL )
 				{
 					throw RSGISVectorOutputException("SHP driver not available.");
 				}
-				outputSHPDS = shpFiledriver->CreateDataSource(this->outputVector.c_str(), NULL);
+				outputSHPDS = shpFiledriver->Create(this->outputVector.c_str(), 0, 0, 0, GDT_Unknown, NULL );
 				if( outputSHPDS == NULL )
 				{
 					string message = string("Could not create vector file ") + this->outputVector;
@@ -9481,8 +9481,8 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
                 delete copyFeatures;
                 delete processVector;
 
-                OGRDataSource::DestroyDataSource(inputSHPDS);
-                OGRDataSource::DestroyDataSource(outputSHPDS);
+                GDALClose(inputSHPDS);
+                GDALClose(outputSHPDS);
             }
             catch (RSGISException &e)
             {
@@ -9508,12 +9508,12 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
                 RSGISFileUtils fileUtils;
                 RSGISVectorUtils vecUtils;
 
-                OGRDataSource *inputSHPDS = NULL;
+                GDALDataset *inputSHPDS = NULL;
                 OGRLayer *inputSHPLayer = NULL;
-                OGRDataSource *inputPolysSHPDS = NULL;
+                GDALDataset *inputPolysSHPDS = NULL;
                 OGRLayer *inputPolysSHPLayer = NULL;
-                OGRSFDriver *shpFiledriver = NULL;
-                OGRDataSource *outputSHPDS = NULL;
+                GDALDriver *shpFiledriver = NULL;
+                GDALDataset *outputSHPDS = NULL;
                 OGRLayer *outputSHPLayer = NULL;
                 OGRFeatureDefn *inFeatureDefn = NULL;
 
@@ -9540,7 +9540,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Open Input Shapfile.
 				//
 				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);   
 				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputVector;
@@ -9562,7 +9562,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				// Open Input Polygons Shapfile.
 				//
 				/////////////////////////////////////
-				inputPolysSHPDS = OGRSFDriverRegistrar::Open(this->inputGeometry.c_str(), FALSE);
+				inputPolysSHPDS = (GDALDataset*) GDALOpenEx(this->inputGeometry.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);
 				if(inputPolysSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputGeometry;
@@ -9581,12 +9581,12 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				//
 				/////////////////////////////////////
 				const char *pszDriverName = "ESRI Shapefile";
-				shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName );
+				shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
 				if( shpFiledriver == NULL )
 				{
 					throw RSGISVectorOutputException("SHP driver not available.");
 				}
-				outputSHPDS = shpFiledriver->CreateDataSource(this->outputVector.c_str(), NULL);
+				outputSHPDS = shpFiledriver->Create(this->outputVector.c_str(), 0, 0, 0, GDT_Unknown, NULL );
 				if( outputSHPDS == NULL )
 				{
 					string message = string("Could not create vector file ") + this->outputVector;
@@ -9623,9 +9623,9 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
                 }
                 delete polys;
 
-                OGRDataSource::DestroyDataSource(inputSHPDS);
-                OGRDataSource::DestroyDataSource(inputPolysSHPDS);
-                OGRDataSource::DestroyDataSource(outputSHPDS);
+                GDALClose(inputSHPDS);
+                GDALClose(inputPolysSHPDS);
+                GDALClose(outputSHPDS);
             }
             catch (RSGISException &e)
             {

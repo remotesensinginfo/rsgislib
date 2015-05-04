@@ -5343,12 +5343,12 @@ void RSGISExeEstimationAlgorithm::runAlgorithm() throw(RSGISException)
 			GDALDataset *outputImageDS = NULL;
 			GDALDataset **dataset = NULL;
 			GDALDataset *inputRasterFeaturesDS = NULL;
-			OGRDataSource *inputSHPDS = NULL;
-			OGRDataSource *outputSHPDS = NULL;
+			GDALDataset *inputSHPDS = NULL;
+			GDALDataset *outputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			OGRLayer *outputSHPLayer = NULL;
 			OGRSpatialReference* inputSpatialRef = NULL;
-			OGRSFDriver *shpFiledriver = NULL;
+			GDALDriver *shpFiledriver = NULL;
 
 			string outputDIR = "";
 
@@ -5397,7 +5397,7 @@ void RSGISExeEstimationAlgorithm::runAlgorithm() throw(RSGISException)
 				delete[] dataset;
 
 				// OPEN INPUT SHAPEFILE
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->inputObjPolys.c_str(), FALSE);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(this->inputObjPolys.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);
 				if(inputSHPDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputObjPolys;
@@ -5432,12 +5432,12 @@ void RSGISExeEstimationAlgorithm::runAlgorithm() throw(RSGISException)
 					}
 
 					const char *pszDriverName = "ESRI Shapefile";
-					shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName );
+					shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
 					if( shpFiledriver == NULL )
 					{
 						throw RSGISException("SHP driver not available.");
 					}
-					outputSHPDS = shpFiledriver->CreateDataSource(this->outputSHP.c_str(), NULL);
+					outputSHPDS = shpFiledriver->Create(this->outputSHP.c_str(), 0, 0, 0, GDT_Unknown, NULL );
 					if( outputSHPDS == NULL )
 					{
 						string message = string("Could not create vector file ") + this->outputSHP;
@@ -5530,11 +5530,11 @@ void RSGISExeEstimationAlgorithm::runAlgorithm() throw(RSGISException)
 				GDALClose(inputImageDS); // Close input image
 				GDALClose(outputImageDS); // Close output image
 				cout << "Image closed OK" << endl;
-				OGRDataSource::DestroyDataSource(inputSHPDS); // Close inputshape
+				GDALClose(inputSHPDS); // Close inputshape
 				cout << "Input Object SHP closed OK" << endl;
 				if (this->createOutSHP)
 				{
-					OGRDataSource::DestroyDataSource(outputSHPDS); // Close outputshape
+					GDALClose(outputSHPDS); // Close outputshape
 					cout << "Output SHP closed OK" << endl;
 				}
 

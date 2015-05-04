@@ -798,7 +798,7 @@ namespace rsgis{ namespace cmds {
             OGRRegisterAll();
 
             GDALDataset **dataset = NULL;
-            OGRDataSource *inputVecDS = NULL;
+            GDALDataset *inputVecDS = NULL;
             OGRLayer *inputVecLayer = NULL;
 
             rsgis::img::RSGISCopyImage *copyImage = NULL;
@@ -825,7 +825,7 @@ namespace rsgis{ namespace cmds {
             std::cout << "Raster Band Count = " << numImageBands << std::endl;
 
             // Open vector
-            inputVecDS = OGRSFDriverRegistrar::Open(inputVector.c_str(), FALSE);
+            inputVecDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);
             if(inputVecDS == NULL)
             {
                 std::string message = std::string("Could not open vector file ") + inputVector;
@@ -847,7 +847,7 @@ namespace rsgis{ namespace cmds {
 
             GDALClose(dataset[0]);
             delete[] dataset;
-            OGRDataSource::DestroyDataSource(inputVecDS);
+            GDALClose(inputVecDS);
             OGRCleanupAll();
             //GDALDestroyDriverManager();
             delete calcImage;
@@ -917,7 +917,7 @@ namespace rsgis{ namespace cmds {
             OGRRegisterAll();
 
             GDALDataset **dataset = NULL;
-            OGRDataSource *inputVecDS = NULL;
+            GDALDataset *inputVecDS = NULL;
             OGRLayer *inputVecLayer = NULL;
 
             rsgis::img::RSGISCopyImage *copyImage = NULL;
@@ -949,7 +949,7 @@ namespace rsgis{ namespace cmds {
             std::cout << "Raster Band Count = " << numImageBands << std::endl;
 
             // Open vector
-            inputVecDS = OGRSFDriverRegistrar::Open(inputVector.c_str(), FALSE);
+            inputVecDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);
             if(inputVecDS == NULL)
             {
                 std::string message = std::string("Could not open vector file ") + inputVector;
@@ -1014,7 +1014,7 @@ namespace rsgis{ namespace cmds {
 
             GDALClose(dataset[0]);
             delete[] dataset;
-            OGRDataSource::DestroyDataSource(inputVecDS);
+            GDALClose(inputVecDS);
             OGRCleanupAll();
             //GDALDestroyDriverManager();
             delete calcImage;
@@ -1197,7 +1197,7 @@ namespace rsgis{ namespace cmds {
                 throw RSGISImageException(message.c_str());
             }
             
-            OGRDataSource *inputVecDS = NULL;
+            GDALDataset *inputVecDS = NULL;
             OGRLayer *inputVecLayer = NULL;
             // Convert to absolute path
             inputVector = boost::filesystem::absolute(inputVector).string();
@@ -1205,7 +1205,7 @@ namespace rsgis{ namespace cmds {
             std::string vectorLayerName = vecUtils.getLayerName(inputVector);
             
             // Open vector
-            inputVecDS = OGRSFDriverRegistrar::Open(inputVector.c_str(), FALSE);
+            inputVecDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);
             if(inputVecDS == NULL)
             {
                 std::string message = std::string("Could not open vector file ") + inputVector;

@@ -1321,7 +1321,7 @@ void RSGISExeClassification::runAlgorithm() throw(rsgis::RSGISException)
 			
 			std::string SHPFileInLayer = vecUtils.getLayerName(this->vector);
 			
-			OGRDataSource *inputSHPDS = NULL;
+			GDALDataset *inputSHPDS = NULL;
 			OGRLayer *inputSHPLayer = NULL;
 			
 			try
@@ -1331,7 +1331,7 @@ void RSGISExeClassification::runAlgorithm() throw(rsgis::RSGISException)
 				// Open Input Shapfile.
 				//
 				/////////////////////////////////////
-				inputSHPDS = OGRSFDriverRegistrar::Open(this->vector.c_str(), TRUE, NULL);
+				inputSHPDS = (GDALDataset*) GDALOpenEx(this->vector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);
 				if(inputSHPDS == NULL)
 				{
 					std::string message = std::string("Could not open vector file ") + this->vector;
@@ -1351,7 +1351,7 @@ void RSGISExeClassification::runAlgorithm() throw(rsgis::RSGISException)
 				}
 				vecSQLClass.classifyVector(inputSHPDS, inputSHPLayer, this->rules, this->numClasses, this->classAttribute);
 				
-				OGRDataSource::DestroyDataSource(inputSHPDS);
+				GDALClose(inputSHPDS);
 				OGRCleanupAll();
 			}
 			catch (rsgis::RSGISException e) 
