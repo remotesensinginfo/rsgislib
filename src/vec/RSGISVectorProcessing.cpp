@@ -101,8 +101,8 @@ namespace rsgis{namespace vec{
 		
 		OGRFeature *inFeature = NULL;
 		OGRFeatureDefn *inFeatureDefn = NULL;
-		OGRSFDriver *shpFiledriver = NULL;
-		OGRDataSource *outputSHPDS = NULL;
+		GDALDriver *shpFiledriver = NULL;
+		GDALDataset *outputSHPDS = NULL;
 		OGRLayer *outputSHPLayer = NULL;
 		OGRSpatialReference* inputSpatialRef = NULL;
 		
@@ -163,12 +163,12 @@ namespace rsgis{namespace vec{
 				//
 				/////////////////////////////////////
 				const char *pszDriverName = "ESRI Shapefile";
-				shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName );
+				shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
 				if( shpFiledriver == NULL )
 				{
 					throw RSGISVectorOutputException("SHP driver not available.");
 				}
-				outputSHPDS = shpFiledriver->CreateDataSource(outputVector.c_str(), NULL);
+				outputSHPDS = shpFiledriver->Create(outputVector.c_str(), 0, 0, 0, GDT_Unknown, NULL );
 				if( outputSHPDS == NULL )
 				{
 					std::string message = std::string("Could not create vector file ") + outputVector;
@@ -187,7 +187,7 @@ namespace rsgis{namespace vec{
 				}				
 				
 				OGRFeature::DestroyFeature(inFeature);
-				OGRDataSource::DestroyDataSource(outputSHPDS);
+				GDALClose(outputSHPDS);
 				i++;
 			}
 			std::cout << " Complete.\n";

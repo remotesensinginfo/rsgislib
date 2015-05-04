@@ -160,7 +160,7 @@ namespace rsgis { namespace img {
         return pData;
     }
       
-    void RSGISPopWithStats::getHistogramIgnore( GDALRasterBand *pBand, double dfMin, double dfMax, int nBuckets, int *panHistogram, int bIncludeOutOfRange, bool bIgnore, float fIgnore)
+    void RSGISPopWithStats::getHistogramIgnore( GDALRasterBand *pBand, double dfMin, double dfMax, int nBuckets, GUIntBig *panHistogram, int bIncludeOutOfRange, bool bIgnore, float fIgnore)
     {        
         int nBlockXSize, nBlockYSize;
         pBand->GetBlockSize( &nBlockXSize, &nBlockYSize );
@@ -384,7 +384,7 @@ namespace rsgis { namespace img {
             fmin = fmin == fmax ? fmin - 1e-05 : fmin;
 
             /* Calc the histogram */
-            int *pHisto;
+            //int *pHisto;
             int nHistBuckets;
             float histmin = 0, histmax = 0, histminTmp = 0, histmaxTmp = 0;
             if( hBand->GetRasterDataType() == GDT_Byte )
@@ -428,13 +428,15 @@ namespace rsgis { namespace img {
                     histmaxTmp = histmax;
                 }
             }
-            pHisto = (int*)calloc(nHistBuckets, sizeof(int));
+            //pHisto = (int*)calloc(nHistBuckets, sizeof(int));
+            GUIntBig pHisto[nHistBuckets];
             if(bIgnore)
             {
                 this->getHistogramIgnore(hBand, histminTmp, histmaxTmp, nHistBuckets, pHisto, false, bIgnore, fIgnoreVal);
             }
             else
             {
+                // TODO: Are hardcoding 'bApproxOK' to false, might want to allow setting to true
                 int nLastProgress = -1;
                 hBand->GetHistogram(histminTmp, histmaxTmp, nHistBuckets, pHisto, true, false,  (GDALProgressFunc)StatsTextProgress, &nLastProgress);
             }
@@ -559,7 +561,7 @@ namespace rsgis { namespace img {
                 histoColIdx = numColumns;
             }
             
-            attTable->ValuesIO(GF_Write, histoColIdx, 0, nHistBuckets, pHisto);
+            attTable->ValuesIO(GF_Write, histoColIdx, 0, nHistBuckets, (int*) pHisto);
             
             free( pHisto );
         }

@@ -1787,7 +1787,7 @@ namespace rsgis{ namespace cmds {
             //
             /////////////////////////////////////
             inputVector = boost::filesystem::absolute(inputVector).string();
-            OGRDataSource *inputSHPDS = OGRSFDriverRegistrar::Open(inputVector.c_str(), FALSE);
+            GDALDataset *inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);
             if(inputSHPDS == NULL)
             {
                 std::string message = std::string("Could not open vector file ") + inputVector;
@@ -1818,7 +1818,7 @@ namespace rsgis{ namespace cmds {
             
             delete colNames;
             GDALClose(clumpsDataset);
-            OGRDataSource::DestroyDataSource(inputSHPDS);
+            GDALClose(inputSHPDS);
         }
         catch(rsgis::RSGISException &e)
         {

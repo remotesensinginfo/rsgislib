@@ -4010,7 +4010,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 			OGRRegisterAll();
 
 			GDALDataset **dataset = NULL;
-			OGRDataSource *inputVecDS = NULL;
+			GDALDataset *inputVecDS = NULL;
 			OGRLayer *inputVecLayer = NULL;
 
 			RSGISCopyImage *copyImage = NULL;
@@ -4041,7 +4041,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 				cout << "Raster Band Count = " << numImageBands << endl;
 
 				// Open vector
-				inputVecDS = OGRSFDriverRegistrar::Open(this->inputVector.c_str(), FALSE);
+				inputVecDS = (GDALDataset*) GDALOpenEx(this->inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);
 				if(inputVecDS == NULL)
 				{
 					string message = string("Could not open vector file ") + this->inputVector;
@@ -4106,7 +4106,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 
 				GDALClose(dataset[0]);
 				delete[] dataset;
-				OGRDataSource::DestroyDataSource(inputVecDS);
+				GDALClose(inputVecDS);
 				OGRCleanupAll();
 				GDALDestroyDriverManager();
 				delete calcImage;
