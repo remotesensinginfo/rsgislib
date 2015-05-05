@@ -39,21 +39,32 @@ static struct ImageUtilsState _state;
 #endif
 
 // Helper function to extract python sequence to array of strings
-static std::string *ExtractStringArrayFromSequence(PyObject *sequence, int *nElements) {
+static std::string *ExtractStringArrayFromSequence(PyObject *sequence, int *nElements)
+{
     Py_ssize_t nFields = PySequence_Size(sequence);
     *nElements = nFields;
+    if(nFields == 0)
+    {
+        return NULL;
+    }
     std::string *stringsArray = new std::string[nFields];
 
-    for(int i = 0; i < nFields; ++i) {
+    for(int i = 0; i < nFields; ++i)
+    {
         PyObject *stringObj = PySequence_GetItem(sequence, i);
-
-        if(!RSGISPY_CHECK_STRING(stringObj)) {
+        
+        if(!RSGISPY_CHECK_STRING(stringObj))
+        {
+            std::cout << "Error: Sequence fields must be strings\n";
             PyErr_SetString(GETSTATE(sequence)->error, "Fields must be strings");
             Py_DECREF(stringObj);
-            return stringsArray;
+            delete[] stringsArray;
+            *nElements = 0;
+            return NULL;
         }
 
         stringsArray[i] = RSGISPY_STRING_EXTRACT(stringObj);
+        
         Py_DECREF(stringObj);
     }
 
@@ -70,9 +81,11 @@ static std::vector<std::string> ExtractStringVectorFromSequence(PyObject *sequen
     {
         PyObject *stringObj = PySequence_GetItem(sequence, i);
         
-        if(!RSGISPY_CHECK_STRING(stringObj)) {
+        if(!RSGISPY_CHECK_STRING(stringObj))
+        {
             PyErr_SetString(GETSTATE(sequence)->error, "Fields must be strings");
             Py_DECREF(stringObj);
+            *nElements = stringsArray.size();
             return stringsArray;
         }
         
@@ -711,7 +724,9 @@ static PyObject *ImageUtils_StackImageBands(PyObject *self, PyObject *args)
     PyObject *pimageBandNames = NULL;
     
     if( !PyArg_ParseTuple(args, "OOsOfsi:stackImageBands", &pInputImages, &pimageBandNames, &pszOutputFile, &skipValueObj, &noDataValue, &pszGDALFormat, &nDataType))
+    {
         return NULL;
+    }
     
     bool skipPixels = false;
     float skipValue = 0.0;
@@ -724,7 +739,8 @@ static PyObject *ImageUtils_StackImageBands(PyObject *self, PyObject *args)
         }
     }
     
-    if(!PySequence_Check(pInputImages)) {
+    if(!PySequence_Check(pInputImages))
+    {
         PyErr_SetString(GETSTATE(self)->error, "First argument must be a sequence with a list of band names.");
         return NULL;
     }
