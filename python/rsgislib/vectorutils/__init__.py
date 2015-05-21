@@ -181,6 +181,7 @@ Example::
     gdalImgMaskData = None
     imgMaskBand = None
     if not maskImg == None:
+        print("Using mask")
         gdalImgMaskData = gdal.Open(maskImg)
         imgMaskBand = gdalImgData.GetRasterBand(imgMaskBandNo)
 
