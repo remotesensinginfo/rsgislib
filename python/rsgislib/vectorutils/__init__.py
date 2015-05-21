@@ -17,6 +17,14 @@ try:
 except ImportError as ogrErr:
     haveOGRPy = False
 
+
+haveOSRPy = True
+try:
+    import osgeo.osr as osr
+except ImportError as osrErr:
+    haveOSRPy = False
+
+
 import os.path
 
 # Import the RSGISLib module
@@ -58,6 +66,8 @@ Example::
         # Check ogr is available
         if not haveOGRPy:
             raise Exception("The OGR python bindings required for this function could not be imported\n\t" + ogrErr)
+        
+        gdal.UseExceptions()
         
         print("Creating output image")
         if shpExt:
@@ -128,4 +138,70 @@ Example::
     except Exception as e:
         raise e
 
+
+def polygoniseRaster(inputImg, outShp, imgBandNo=1, maskImg=None, imgMaskBandNo=1 ):
+    """ A utillity to polygonise a raster to a ESRI Shapefile. 
+    
+Where:
+
+* inputImg is a string specifying the input image file to be polygonised
+* outShp is a string specifying the output shapefile path. If it exists it will be deleted and overwritten.
+* imgBandNo is an int specifying the image band to be polygonised. (default = 1)
+* maskImg is an optional string mask file specifying a no data mask (default = None)
+* imgMaskBandNo is an int specifying the image band to be used the mask (default = 1)
+
+Example::
+
+    from rsgislib import vectorutils
+     
+    inputVector = 'crowns.shp'
+    inputImage = 'injune_p142_casi_sub_utm.kea'
+    outputImage = 'psu142_crowns.kea'
+        
+    vectorutils.copyShapefile2RAT(inputVector, inputImage, outputImage)
+
+"""
+    # Check gdal is available
+    if not haveGDALPy:
+        raise Exception("The GDAL python bindings required for this function could not be imported\n\t" + gdalErr)
+    # Check ogr is available
+    if not haveOGRPy:
+        raise Exception("The OGR python bindings required for this function could not be imported\n\t" + ogrErr)    
+    # Check osr is available
+    if not haveOSRPy:
+        raise Exception("The OSR python bindings required for this function could not be imported\n\t" + osrErr)
+    
+    gdal.UseExceptions()
+    
+    gdalImgData = gdal.Open(inputImg)
+    imgBand = gdalImgData.GetRasterBand(imgBandNo)
+    imgsrs = osr.SpatialReference()
+    imgsrs.ImportFromWkt(gdalImgData.GetProjectionRef())
+    
+    gdalImgMaskData = None
+    imgMaskBand = None
+    if not maskImg == None:
+        gdalImgMaskData = gdal.Open(maskImg)
+        imgMaskBand = gdalImgData.GetRasterBand(imgMaskBandNo)
+
+    
+    driver = ogr.GetDriverByName("ESRI Shapefile")
+    if os.path.exists(outShp):
+        driver.DeleteDataSource(outShp)
+    outDatasource = driver.CreateDataSource(outShp)
+    
+    layerName = os.path.splitext(os.path.basename(outShp))[0]
+    outLayer = outDatasource.CreateLayer(layerName, srs=imgsrs)
+    
+    newField = ogr.FieldDefn('PXLVAL', ogr.OFTInteger)
+    outLayer.CreateField(newField)
+    dstFieldIdx = outLayer.GetLayerDefn().GetFieldIndex('PXLVAL')
+    
+    print("Polygonising...")
+    gdal.Polygonize(imgBand, imgMaskBand, outLayer, dstFieldIdx, [], callback=gdal.TermProgress )
+    print("Completed")
+    outDatasource.Destroy()
+    gdalImgData = None
+    if not maskImg == None:
+        gdalImgMaskData = None
 
