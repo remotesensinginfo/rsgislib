@@ -77,6 +77,72 @@ namespace rsgis{namespace vec{
     {
         
     }
+    
+    
+    
+    
+    
+    
+    RSGISCalcMinDist2Geoms::RSGISCalcMinDist2Geoms(std::vector<OGRGeometry*> *geoms)
+    {
+        this->geoms = geoms;
+    }
+    
+    void RSGISCalcMinDist2Geoms::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+    {
+        try
+        {
+            OGRGeometry *geom = inFeature->GetGeometryRef();
+            OGRFeatureDefn *outFeatureDefn = outFeature->GetDefnRef();
+
+            double dist = 0.0;
+            double minDist = 0.0;
+            bool first = true;
+            for(std::vector<OGRGeometry*>::iterator iterGeoms = geoms->begin(); iterGeoms != geoms->end(); ++iterGeoms)
+            {
+                if(!geom->Equals(*iterGeoms))
+                {
+                    dist = geom->Distance(*iterGeoms);
+                    if(first)
+                    {
+                        minDist = dist;
+                        first = false;
+                    }
+                    else if(dist < minDist)
+                    {
+                        minDist = dist;
+                    }
+                }
+            }
+            
+            outFeature->SetField(outFeatureDefn->GetFieldIndex("MinDist"), minDist);
+            
+        }
+        catch (RSGISVectorException &e)
+        {
+            throw e;
+        }
+    }
+    
+    void RSGISCalcMinDist2Geoms::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+    {
+        OGRFieldDefn shpField("MinDist", OFTReal);
+        shpField.SetPrecision(10);
+        if( outputLayer->CreateField( &shpField ) != OGRERR_NONE )
+        {
+            std::string message = std::string("Creating shapefile field \'MinDist\' has failed");
+            throw RSGISVectorOutputException(message.c_str());
+        }
+    }
+    
+    RSGISCalcMinDist2Geoms::~RSGISCalcMinDist2Geoms()
+    {
+        
+    }
+    
+    
+    
+    
 }}
 
 

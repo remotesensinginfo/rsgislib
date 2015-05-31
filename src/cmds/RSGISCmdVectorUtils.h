@@ -63,8 +63,12 @@ namespace rsgis{ namespace cmds{
     DllExport void executeFindCommonImgExtent(std::vector<std::string> inputImages, std::string outputVector, bool force) throw(RSGISCmdException);
     /** Function to split the polygons within a shapefile into different shapefiles using an attribute  */
     DllExport void executeSplitFeatures(std::string inputVector, std::string outputVectorBase, bool force) throw(RSGISCmdException);
-    
-    
+    /** Function to export a binary image to points */
+    DllExport void executeExportPxls2Pts(std::string inputImage, std::string outputVec, bool force, float maskVal) throw(RSGISCmdException);
+    /** Function spaitally cluster points using a graph and minimum spanning trees */
+    DllExport void executeSpatialClusterGeomss(std::string inputPointsVec, std::string outputPointsVec, float edgeLenSDThres, bool force) throw(RSGISCmdException);
+    /** Function to calculate the distance to the nearest geometry */
+    DllExport void executeCalcDist2NearestGeom(std::string inputVec, std::string outputVec, bool force) throw(RSGISCmdException);
     
     
 }}
