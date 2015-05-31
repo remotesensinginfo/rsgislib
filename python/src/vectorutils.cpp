@@ -374,6 +374,53 @@ static PyObject *VectorUtils_SplitFeatures(PyObject *self, PyObject *args)
 }
 
 
+static PyObject *VectorUtils_ExportPxls2Pts(PyObject *self, PyObject *args)
+{
+    const char *pszInputImg, *pszOutputVector;
+    int force = false;
+    float maskVal = 0.0;
+    if( !PyArg_ParseTuple(args, "ssf|i:exportPxls2Pts", &pszInputImg, &pszOutputVector, &maskVal, &force))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeExportPxls2Pts(pszInputImg, pszOutputVector, force, maskVal);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+static PyObject *VectorUtils_Dist2NearestGeom(PyObject *self, PyObject *args)
+{
+    const char *pszInputVector, *pszOutputVector;
+    int force = false;
+    
+    if( !PyArg_ParseTuple(args, "ss|i:dist2NearestGeom", &pszInputVector, &pszOutputVector, &force))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeCalcDist2NearestGeom(std::string(pszInputVector), std::string(pszOutputVector), force);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+
 // Our list of functions in this module
 static PyMethodDef VectorUtilsMethods[] = {
     {"generateConvexHullsGroups", VectorUtils_GenerateConvexHullsGroups, METH_VARARGS, 
@@ -577,6 +624,31 @@ static PyMethodDef VectorUtilsMethods[] = {
 "   inputVector = './Vectors/injune_p142_psu_utm.shp'\n"
 "   outputVectorBase = './TestOutputs/injune_p142_psu_utm_'\n"
 "   vectorutils.splitFeatures(inputVector, outputVectorBase, True)\n"
+"\n"},
+
+{"exportPxls2Pts", VectorUtils_ExportPxls2Pts, METH_VARARGS,
+"vectorutils.exportPxls2Pts(inputimg, outputvector, maskVal, force)\n"
+"A command to export image pixel which a specific value to a shapefile as points.\n\n"
+"Where:\n"
+"\n"
+"* inputimg is a string containing the name of the input image\n"
+"* outputvector is a string containing the name of the output vector\n"
+"* maskVal is a float specifying the value of the image pixels to be exported\n"
+"* force is a bool, specifying whether to force removal of the output vector if it exists\n"
+"Example::\n"
+"\n"
+"\n"},
+    
+{"dist2NearestGeom", VectorUtils_Dist2NearestGeom, METH_VARARGS,
+"vectorutils.dist2NearestGeom(inputVector, outputVector, force)\n"
+"A command to calculate the distance from each geometry to its nearest neighbouring geometry.\n\n"
+"Where:\n"
+"\n"
+"* inputVector is a string containing the name of the input vector\n"
+"* outputVector is a string containing the name of the output vector\n"
+"* force is a bool, specifying whether to force removal of the output vector if it exists\n"
+"Example::\n"
+"\n"
 "\n"},
     
     {NULL}        /* Sentinel */

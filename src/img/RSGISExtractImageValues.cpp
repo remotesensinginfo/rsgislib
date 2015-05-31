@@ -122,6 +122,77 @@ namespace rsgis{namespace img{
         
     }
     
+    
+    
+    
+    
+    
+    
+    
+    RSGISExtractPxlsAsPts::RSGISExtractPxlsAsPts()
+    {
+        
+    }
+    
+    void RSGISExtractPxlsAsPts::exportPixelsAsPoints(GDALDataset *image, OGRLayer *vecLayer, float maskVal) throw(RSGISImageException)
+    {
+        try
+        {
+            RSGISExtractPxlsAsPtsImgCalc *extractPxls = new RSGISExtractPxlsAsPtsImgCalc(vecLayer, maskVal);
+            RSGISCalcImage calcImg = RSGISCalcImage(extractPxls, "", true);
+            
+            calcImg.calcImageExtent(&image, 1);
+            
+            delete extractPxls;
+        }
+        catch (RSGISImageException &e)
+        {
+            throw e;
+        }
+        catch (RSGISException &e)
+        {
+            throw RSGISImageException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw RSGISImageException(e.what());
+        }
+    }
+    
+    RSGISExtractPxlsAsPts::~RSGISExtractPxlsAsPts()
+    {
+        
+    }
+    
+
+    RSGISExtractPxlsAsPtsImgCalc::RSGISExtractPxlsAsPtsImgCalc(OGRLayer *vecLayer, float maskValue) : RSGISCalcImageValue(0)
+    {
+        this->vecLayer = vecLayer;
+        this->maskValue = maskValue;
+        this->featDefn = vecLayer->GetLayerDefn();
+    }
+    
+    void RSGISExtractPxlsAsPtsImgCalc::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException)
+    {
+        if(bandValues[0] == maskValue)
+        {
+            geos::geom::Coordinate centre;
+            extent.centre(centre);
+            
+            OGRFeature *poFeature = new OGRFeature(featDefn);
+            OGRPoint *pt = new OGRPoint(centre.x, centre.y, 0.0);
+            poFeature->SetGeometryDirectly(pt);
+            vecLayer->CreateFeature(poFeature);
+        }
+    }
+
+    RSGISExtractPxlsAsPtsImgCalc::~RSGISExtractPxlsAsPtsImgCalc()
+    {
+        
+    }
+
+    
+    
 }}
 
 
