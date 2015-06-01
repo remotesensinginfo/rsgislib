@@ -1459,66 +1459,14 @@ namespace rsgis{ namespace cmds {
         }
     }
             
-            
-    void executeSpatialClusterGeoms(std::string inputPointsVec, std::string outputPointsVec, float edgeLenSDThres, bool force) throw(RSGISCmdException)
+    double executeCalcDist2NearestGeom(std::string inputVec, std::string outputVec, bool force) throw(RSGISCmdException)
     {
-        try
-        {
-            // Convert to absolute path
-            inputPointsVec = boost::filesystem::absolute(inputPointsVec).string();
-            outputPointsVec = boost::filesystem::absolute(outputPointsVec).string();
-            
-            OGRRegisterAll();
-            
-            rsgis::utils::RSGISFileUtils fileUtils;
-            rsgis::vec::RSGISVectorUtils vecUtils;
-            
-            std::string SHPFileInLayer = vecUtils.getLayerName(inputPointsVec);
-            
-            /////////////////////////////////////
-            //
-            // Open Input Shapfile.
-            //
-            /////////////////////////////////////
-            OGRDataSource *inputSHPDS = OGRSFDriverRegistrar::Open(inputPointsVec.c_str(), FALSE);
-            if(inputSHPDS == NULL)
-            {
-                std::string message = std::string("Could not open vector file ") + inputPointsVec;
-                throw RSGISFileException(message.c_str());
-            }
-            OGRLayer *inputSHPLayer = inputSHPDS->GetLayerByName(SHPFileInLayer.c_str());
-            if(inputSHPLayer == NULL)
-            {
-                std::string message = std::string("Could not open vector layer ") + SHPFileInLayer;
-                throw RSGISFileException(message.c_str());
-            }
-            
-            
-            
-            
-            OGRDataSource::DestroyDataSource(inputSHPDS);
-        }
-        catch(rsgis::RSGISVectorException &e)
-        {
-            throw RSGISCmdException(e.what());
-        }
-        catch(rsgis::RSGISException &e)
-        {
-            throw RSGISCmdException(e.what());
-        }
-        catch (std::exception &e)
-        {
-            throw RSGISCmdException(e.what());
-        }
-    }
-            
-            
-    void executeCalcDist2NearestGeom(std::string inputVec, std::string outputVec, bool force) throw(RSGISCmdException)
-    {
+        double maxMinDist = 0.0;
         try
         {
             // Convert to absolute path
             inputVec = boost::filesystem::absolute(inputVec).string();
+            outputVec = boost::filesystem::absolute(outputVec).string();
             
             OGRRegisterAll();
             
@@ -1598,8 +1546,130 @@ namespace rsgis{ namespace cmds {
             rsgis::vec::RSGISProcessVector processVector = rsgis::vec::RSGISProcessVector(&calcMinDist);
             processVector.processVectors(inputSHPLayer, outputSHPLayer, false, false, false);
             
+            maxMinDist = calcMinDist.getMaxMinDist();
+            
             OGRDataSource::DestroyDataSource(inputSHPDS);
             OGRDataSource::DestroyDataSource(outputSHPDS);
+        }
+        catch(rsgis::RSGISVectorException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        
+        return maxMinDist;
+    }
+            
+            
+    double executeCalcMaxDist2NearestGeom(std::string inputVec) throw(RSGISCmdException)
+    {
+        double maxMinDist = 0.0;
+        try
+        {
+            // Convert to absolute path
+            inputVec = boost::filesystem::absolute(inputVec).string();
+            
+            OGRRegisterAll();
+            
+            rsgis::utils::RSGISFileUtils fileUtils;
+            rsgis::vec::RSGISVectorUtils vecUtils;
+            
+            std::string SHPFileInLayer = vecUtils.getLayerName(inputVec);
+            
+            /////////////////////////////////////
+            //
+            // Open Input Shapfile.
+            //
+            /////////////////////////////////////
+            OGRDataSource *inputSHPDS = OGRSFDriverRegistrar::Open(inputVec.c_str(), FALSE);
+            if(inputSHPDS == NULL)
+            {
+                std::string message = std::string("Could not open vector file ") + inputVec;
+                throw RSGISFileException(message.c_str());
+            }
+            OGRLayer *inputSHPLayer = inputSHPDS->GetLayerByName(SHPFileInLayer.c_str());
+            if(inputSHPLayer == NULL)
+            {
+                std::string message = std::string("Could not open vector layer ") + SHPFileInLayer;
+                throw RSGISFileException(message.c_str());
+            }
+            
+            // Read in Geometries...
+            std::vector<OGRGeometry*> *ogrGeoms = new std::vector<OGRGeometry*>();
+            rsgis::vec::RSGISGetOGRGeometries getOGRGeoms = rsgis::vec::RSGISGetOGRGeometries(ogrGeoms);
+            rsgis::vec::RSGISProcessVector processVectorGetGeoms = rsgis::vec::RSGISProcessVector(&getOGRGeoms);
+            processVectorGetGeoms.processVectorsNoOutput(inputSHPLayer, false);
+            
+            // Iterate through features and calc dist...
+            rsgis::vec::RSGISCalcMinDist2Geoms calcMinDist = rsgis::vec::RSGISCalcMinDist2Geoms(ogrGeoms);
+            rsgis::vec::RSGISProcessVector processVector = rsgis::vec::RSGISProcessVector(&calcMinDist);
+            processVector.processVectorsNoOutput(inputSHPLayer, false);
+            maxMinDist = calcMinDist.getMaxMinDist();
+            
+            OGRDataSource::DestroyDataSource(inputSHPDS);
+        }
+        catch(rsgis::RSGISVectorException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        
+        return maxMinDist;
+    }
+            
+            
+            
+    void executeSpatialGraphClusterGeoms(std::string inputVec, std::string outputVec, float edgeLenSDThres, double maxEdgeLen, bool force, std::string shpFileEdges, bool outShpEdges, std::string h5EdgeLengths, bool outH5EdgeLens) throw(RSGISCmdException)
+    {
+        try
+        {
+            // Convert to absolute path
+            inputVec = boost::filesystem::absolute(inputVec).string();
+            outputVec = boost::filesystem::absolute(outputVec).string();
+            
+            OGRRegisterAll();
+            
+            rsgis::utils::RSGISFileUtils fileUtils;
+            rsgis::vec::RSGISVectorUtils vecUtils;
+            
+            std::string SHPFileInLayer = vecUtils.getLayerName(inputVec);
+            
+            /////////////////////////////////////
+            //
+            // Open Input Shapfile.
+            //
+            /////////////////////////////////////
+            OGRDataSource *inputSHPDS = OGRSFDriverRegistrar::Open(inputVec.c_str(), FALSE);
+            if(inputSHPDS == NULL)
+            {
+                std::string message = std::string("Could not open vector file ") + inputVec;
+                throw RSGISFileException(message.c_str());
+            }
+            OGRLayer *inputSHPLayer = inputSHPDS->GetLayerByName(SHPFileInLayer.c_str());
+            if(inputSHPLayer == NULL)
+            {
+                std::string message = std::string("Could not open vector layer ") + SHPFileInLayer;
+                throw RSGISFileException(message.c_str());
+            }
+            
+            
+            
+            
+            OGRDataSource::DestroyDataSource(inputSHPDS);
         }
         catch(rsgis::RSGISVectorException &e)
         {

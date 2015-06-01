@@ -86,6 +86,8 @@ namespace rsgis{namespace vec{
     RSGISCalcMinDist2Geoms::RSGISCalcMinDist2Geoms(std::vector<OGRGeometry*> *geoms)
     {
         this->geoms = geoms;
+        this->firstGeom = true;
+        this->maxMinDist = 0.0;
     }
     
     void RSGISCalcMinDist2Geoms::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
@@ -115,8 +117,60 @@ namespace rsgis{namespace vec{
                 }
             }
             
+            if(firstGeom)
+            {
+                maxMinDist = minDist;
+                firstGeom = false;
+            }
+            else if(minDist > maxMinDist)
+            {
+                maxMinDist = minDist;
+            }
+                
             outFeature->SetField(outFeatureDefn->GetFieldIndex("MinDist"), minDist);
             
+        }
+        catch (RSGISVectorException &e)
+        {
+            throw e;
+        }
+    }
+    
+    void RSGISCalcMinDist2Geoms::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+    {
+        try
+        {
+            OGRGeometry *geom = feature->GetGeometryRef();
+            
+            double dist = 0.0;
+            double minDist = 0.0;
+            bool first = true;
+            for(std::vector<OGRGeometry*>::iterator iterGeoms = geoms->begin(); iterGeoms != geoms->end(); ++iterGeoms)
+            {
+                if(!geom->Equals(*iterGeoms))
+                {
+                    dist = geom->Distance(*iterGeoms);
+                    if(first)
+                    {
+                        minDist = dist;
+                        first = false;
+                    }
+                    else if(dist < minDist)
+                    {
+                        minDist = dist;
+                    }
+                }
+            }
+            
+            if(firstGeom)
+            {
+                maxMinDist = minDist;
+                firstGeom = false;
+            }
+            else if(minDist > maxMinDist)
+            {
+                maxMinDist = minDist;
+            }
         }
         catch (RSGISVectorException &e)
         {

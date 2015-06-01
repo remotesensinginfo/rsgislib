@@ -407,9 +407,95 @@ static PyObject *VectorUtils_Dist2NearestGeom(PyObject *self, PyObject *args)
         return NULL;
     }
     
+    PyObject *outVal = PyTuple_New(1);
     try
     {
-        rsgis::cmds::executeCalcDist2NearestGeom(std::string(pszInputVector), std::string(pszOutputVector), force);
+        double dist = rsgis::cmds::executeCalcDist2NearestGeom(std::string(pszInputVector), std::string(pszOutputVector), force);
+        if(PyTuple_SetItem(outVal, 0, Py_BuildValue("d", dist)) == -1)
+        {
+            throw rsgis::cmds::RSGISCmdException("Failed to add \'distance\' value to the list...");
+        }
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    return outVal;
+}
+
+static PyObject *VectorUtils_CalcMaxDist2NearestGeom(PyObject *self, PyObject *args)
+{
+    const char *pszInputVector;
+    
+    if( !PyArg_ParseTuple(args, "s:calcMaxDist2NearestGeom", &pszInputVector))
+    {
+        return NULL;
+    }
+    
+    PyObject *outVal = PyTuple_New(1);
+    try
+    {
+        double dist = rsgis::cmds::executeCalcMaxDist2NearestGeom(std::string(pszInputVector));
+        if(PyTuple_SetItem(outVal, 0, Py_BuildValue("d", dist)) == -1)
+        {
+            throw rsgis::cmds::RSGISCmdException("Failed to add \'distance\' value to the list...");
+        }
+
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    return outVal;
+}
+
+static PyObject *VectorUtils_SpatialGraphClusterGeoms(PyObject *self, PyObject *args)
+{
+    const char *pszInputVector;
+    const char *pszOutputVector;
+    float sdEdgeLen = 0.0;
+    double maxEdgeLen = 0.0;
+    int force = false;
+    PyObject *pszOutShpEdgesObj;
+    PyObject *pszOutH5EdgeLensObj;
+    
+    if( !PyArg_ParseTuple(args, "ssfd|iOO:spatialGraphClusterGeoms", &pszInputVector, &pszOutputVector, &sdEdgeLen, &maxEdgeLen, &force, &pszOutShpEdgesObj, &pszOutH5EdgeLensObj))
+    {
+        return NULL;
+    }
+    
+    std::string shpFileEdges="";
+    bool outShpEdges=false;
+    std::string h5EdgeLengths="";
+    bool outH5EdgeLens=false;
+    
+    if( ( pszOutShpEdgesObj == NULL ) || ( pszOutShpEdgesObj == Py_None ) || !RSGISPY_CHECK_STRING(pszOutShpEdgesObj) )
+    {
+        outShpEdges = false;
+    }
+    else
+    {
+        outShpEdges = true;
+        shpFileEdges = RSGISPY_STRING_EXTRACT(pszOutShpEdgesObj);
+    }
+    
+    if( ( pszOutH5EdgeLensObj == NULL ) || ( pszOutH5EdgeLensObj == Py_None ) || !RSGISPY_CHECK_STRING(pszOutH5EdgeLensObj) )
+    {
+        outH5EdgeLens = false;
+    }
+    else
+    {
+        outH5EdgeLens = true;
+        h5EdgeLengths = RSGISPY_STRING_EXTRACT(pszOutH5EdgeLensObj);
+    }
+    
+    try
+    {
+        rsgis::cmds::executeSpatialGraphClusterGeoms(std::string(pszInputVector), std::string(pszOutputVector), sdEdgeLen, maxEdgeLen, force, shpFileEdges, outShpEdges, h5EdgeLengths, outH5EdgeLens);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -641,7 +727,8 @@ static PyMethodDef VectorUtilsMethods[] = {
     
 {"dist2NearestGeom", VectorUtils_Dist2NearestGeom, METH_VARARGS,
 "vectorutils.dist2NearestGeom(inputVector, outputVector, force)\n"
-"A command to calculate the distance from each geometry to its nearest neighbouring geometry.\n\n"
+"A command to calculate the distance from each geometry to its nearest neighbouring geometry.\n"
+"The function also returns the maximum minimum distance between the geometries.\n\n"
 "Where:\n"
 "\n"
 "* inputVector is a string containing the name of the input vector\n"
@@ -650,6 +737,34 @@ static PyMethodDef VectorUtilsMethods[] = {
 "Example::\n"
 "\n"
 "\n"},
+    
+{"calcMaxDist2NearestGeom", VectorUtils_CalcMaxDist2NearestGeom, METH_VARARGS,
+"vectorutils.calcMaxDist2NearestGeom(inputVector)\n"
+"A command to calculate the maximum minimum distance between the geometries.\n\n"
+"Where:\n"
+"\n"
+"* inputVector is a string containing the name of the input vector\n"
+"Example::\n"
+"\n"
+"\n"},
+   
+{"spatialGraphClusterGeoms", VectorUtils_SpatialGraphClusterGeoms, METH_VARARGS,
+"vectorutils.spatialGraphClusterGeoms(inputVector, outputVector, sdEdgeLen, maxEdgeLen, force, outShpEdges, &outH5EdgeLens)\n"
+"A command to spatial cluster using a minimum spanning tree approach (Bunting et al 2010).\n\n"
+"Where:\n"
+"\n"
+"* inputVector is a string containing the name of the input vector\n"
+"* outputVector is a string containing the name of the output vector\n"
+"* sdEdgeLen is a float\n"
+"* maxEdgeLen is a double"
+"* force is a bool, specifying whether to force removal of the output vector if it exists\n"
+"* outShpEdges is a string containing the path for an output vector to export minimum spanning tree edges as a shapefile.\n"
+"* outH5EdgeLens is a string containing the path for an output hdf5 file to export the minimum spanning tree edge lengths.\n"
+"Example::\n"
+"\n"
+"\n"},
+    
+    
     
     {NULL}        /* Sentinel */
 };
