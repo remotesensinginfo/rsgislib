@@ -61,6 +61,19 @@ namespace rsgis{namespace vec{
         void printRing(OGRLinearRing *inGeomRing) throw(RSGISVectorOutputException);
 		virtual ~RSGISPrintGeometryToConsole();
     };
+    
+    
+    class DllExport RSGISOGRPointReader : public RSGISProcessOGRFeature
+    {
+    public:
+        RSGISOGRPointReader(std::vector<OGRPoint*> *points);
+        void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
+        void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
+        void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
+        ~RSGISOGRPointReader();
+    protected:
+        std::vector<OGRPoint*> *points;
+    };
 }}
 
 #endif

@@ -39,7 +39,6 @@ namespace rsgis{namespace vec{
 	{
 		OGRwkbGeometryType geometryType = feature->GetGeometryRef()->getGeometryType();
 		
-		// Calculate the centre coordinates
 		if( geometryType == wkbPolygon )
 		{
 			OGRPolygon *polygon = (OGRPolygon *) feature->GetGeometryRef()->clone();
@@ -61,6 +60,7 @@ namespace rsgis{namespace vec{
 	{
 
 	}
+    
 }}
 
 

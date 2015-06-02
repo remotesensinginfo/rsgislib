@@ -71,7 +71,8 @@ namespace rsgis{ namespace cmds{
     DllExport double executeCalcMaxDist2NearestGeom(std::string inputVec) throw(RSGISCmdException);
     /** Function spaitally cluster points using a graph */
     DllExport void executeSpatialGraphClusterGeoms(std::string inputVec, std::string outputVec, bool useMinSpanTree, float edgeLenSDThres, double maxEdgeLen, bool force, std::string shpFileEdges="", bool outShpEdges=false, std::string h5EdgeLengths="", bool outH5EdgeLens=false) throw(RSGISCmdException);
-    
+    /** Function to create a polygon from a set of points */
+    DllExport void executeFitPolygonToPoints(std::string inputVec, std::string outputVec, double alphaVal, bool force) throw(RSGISCmdException);
 }}
 
 

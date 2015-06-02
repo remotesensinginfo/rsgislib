@@ -40,12 +40,14 @@
 #include "vec/RSGISCopyPolygonsInPolygon.h"
 #include "vec/RSGISPopulateFeatsElev.h"
 #include "vec/RSGISGetOGRGeometries.h"
+#include "vec/RSGISOGRPolygonReader.h"
 #include "vec/RSGISVectorMaths.h"
 #include "vec/RSGISCopyFeatures.h"
 #include "vec/RSGISVectorProcessing.h"
 #include "vec/RSGISCalcDistanceStats.h"
 #include "vec/RSGISPolygonReader.h"
 
+#include "geom/RSGISFitPolygon2Points.h"
 #include "geom/RSGISMinSpanTreeClustererStdDevThreshold.h"
 
 #include "img/RSGISImageUtils.h"
@@ -1724,7 +1726,6 @@ namespace rsgis{ namespace cmds {
             {
                 std::list<geos::geom::Point*> **points = new std::list<geos::geom::Point*>*[numClusters];
                 std::list<rsgis::geom::RSGIS2DPoint*>::iterator iter2DPts;
-                rsgis::geom::RSGISPolygon *tmpRSGISPoint;
                 for(int i = 0; i < numClusters; ++i)
                 {
                     points[i] = new std::list<geos::geom::Point*>();
@@ -1741,6 +1742,80 @@ namespace rsgis{ namespace cmds {
                 throw RSGISFileException("Can only export point or polygon shapefiles...");
             }
             
+            delete rsgis::utils::RSGISGEOSFactoryGenerator::getInstance();
+            OGRDataSource::DestroyDataSource(inputSHPDS);
+        }
+        catch(rsgis::RSGISVectorException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+    
+    
+    void executeFitPolygonToPoints(std::string inputVec, std::string outputVec, double alphaVal, bool force) throw(RSGISCmdException)
+    {
+        try
+        {
+            // Convert to absolute path
+            inputVec = boost::filesystem::absolute(inputVec).string();
+            outputVec = boost::filesystem::absolute(outputVec).string();
+            
+            OGRRegisterAll();
+            
+            rsgis::utils::RSGISFileUtils fileUtils;
+            rsgis::vec::RSGISVectorUtils vecUtils;
+            
+            std::string SHPFileInLayer = vecUtils.getLayerName(inputVec);
+            
+            /////////////////////////////////////
+            //
+            // Open Input Shapfile.
+            //
+            /////////////////////////////////////
+            OGRDataSource *inputSHPDS = OGRSFDriverRegistrar::Open(inputVec.c_str(), FALSE);
+            if(inputSHPDS == NULL)
+            {
+                std::string message = std::string("Could not open vector file ") + inputVec;
+                throw RSGISFileException(message.c_str());
+            }
+            OGRLayer *inputSHPLayer = inputSHPDS->GetLayerByName(SHPFileInLayer.c_str());
+            if(inputSHPLayer == NULL)
+            {
+                std::string message = std::string("Could not open vector layer ") + SHPFileInLayer;
+                throw RSGISFileException(message.c_str());
+            }
+            OGRSpatialReference *spatialRef = inputSHPLayer->GetSpatialRef();
+            OGRFeatureDefn *inFeatureDefn = inputSHPLayer->GetLayerDefn();
+            OGRwkbGeometryType wktGeomType = inFeatureDefn->GetGeomType();
+            
+            if(wktGeomType != wkbPoint)
+            {
+                throw rsgis::RSGISVectorException("Input shapefile must be of type points.");
+                OGRDataSource::DestroyDataSource(inputSHPDS);
+            }
+            
+            std::vector<OGRPoint*> *inPts = new std::vector<OGRPoint*>();
+            rsgis::vec::RSGISOGRPointReader processFeature = rsgis::vec::RSGISOGRPointReader(inPts);
+            rsgis::vec::RSGISProcessVector *processVector = new rsgis::vec::RSGISProcessVector(&processFeature);
+        
+            std::cout << "Read input Shapefile\n";
+            processVector->processVectorsNoOutput(inputSHPLayer, false);
+            delete processVector;
+            
+            rsgis::geom::RSGISFitAlphaShapesPolygonToPoints fitPoly;
+            OGRPolygon *poly = fitPoly.fitPolygon(inPts, alphaVal);
+            
+
+            delete inPts;
+        
             delete rsgis::utils::RSGISGEOSFactoryGenerator::getInstance();
             OGRDataSource::DestroyDataSource(inputSHPDS);
         }

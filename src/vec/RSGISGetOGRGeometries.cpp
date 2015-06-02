@@ -153,4 +153,42 @@ namespace rsgis{namespace vec{
         
     }
     
+    
+    RSGISOGRPointReader::RSGISOGRPointReader(std::vector<OGRPoint*> *points)
+    {
+        this->points = points;
+    }
+    
+    void RSGISOGRPointReader::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+    {
+        throw RSGISVectorException("Not implemented..");
+    }
+    
+    void RSGISOGRPointReader::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+    {
+        OGRwkbGeometryType geometryType = feature->GetGeometryRef()->getGeometryType();
+        
+        if( geometryType == wkbPoint )
+        {
+            OGRPoint *point = (OGRPoint *) feature->GetGeometryRef()->clone();
+            points->push_back(point);
+        }
+        else
+        {
+            std::string message = std::string("Unsupport data type: ") + std::string(feature->GetGeometryRef()->getGeometryName());
+            throw RSGISVectorException(message);
+        }
+    }
+    
+    void RSGISOGRPointReader::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+    {
+        // Nothing to do!
+    }
+    
+    RSGISOGRPointReader::~RSGISOGRPointReader()
+    {
+        
+    }
+
+    
 }}

@@ -313,6 +313,7 @@ set(LIB_GEOM_H
 	${RSGIS_SRC_GEOM_DIR}/RSGISMinSpanTreeClustererEdgeLenThreshold.h 
 	${RSGIS_SRC_GEOM_DIR}/RSGISMinSpanTreeClustererStdDevThreshold.h 
 	${RSGIS_SRC_GEOM_DIR}/RSGISIdentifyNonConvexPolygonsSnakes.h
+	${RSGIS_SRC_GEOM_DIR}/RSGISFitPolygon2Points.h
 	)
 	
 set(LIB_GEOM_CPP
@@ -345,6 +346,8 @@ set(LIB_GEOM_CPP
 	${RSGIS_SRC_GEOM_DIR}/RSGISMinSpanTreeClustererStdDevThreshold.h 
 	${RSGIS_SRC_GEOM_DIR}/RSGISIdentifyNonConvexPolygonsSnakes.cpp 
 	${RSGIS_SRC_GEOM_DIR}/RSGISIdentifyNonConvexPolygonsSnakes.h
+	${RSGIS_SRC_GEOM_DIR}/RSGISFitPolygon2Points.cpp
+	${RSGIS_SRC_GEOM_DIR}/RSGISFitPolygon2Points.h
 	)
 ###############################################################################
 

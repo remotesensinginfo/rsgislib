@@ -53,7 +53,7 @@ namespace rsgis{namespace vec{
 			void readPoints(OGRLayer *vector, RSGISPointData **data, unsigned long numFeatures) throw(RSGISVectorException);
 			void readPolygons(OGRLayer *vector, RSGISPolygonData **data, unsigned long numFeatures) throw(RSGISVectorException);
 			void readOGRLineString2GEOSLinsSegment(OGRLineString *inLine, std::vector<geos::geom::LineSegment> *outLines); /// Read polyline as GEOS Line sement, where there are more than 2 vertices the first and last will be used.
-			void exportPoints2Shp(OGRLayer *outputSHP, RSGISPointData **data, int numFeatures) throw(RSGISVectorOutputException);
+            void exportPoints2Shp(OGRLayer *outputSHP, RSGISPointData **data, int numFeatures) throw(RSGISVectorOutputException);
 			void exportPolygons2Shp(OGRLayer *outputSHP, RSGISPolygonData **data, int numFeatures) throw(RSGISVectorOutputException);
 			void exportPolygons2Shp(OGRLayer *outputSHP, std::vector<RSGISPolygonData*> *data) throw(RSGISVectorOutputException);
 			void exportGEOSPolygons2SHP(std::string outputFile, geos::geom::Polygon **polys, int numFeatures) throw(RSGISVectorOutputException);

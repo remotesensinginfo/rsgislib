@@ -508,6 +508,34 @@ static PyObject *VectorUtils_SpatialGraphClusterGeoms(PyObject *self, PyObject *
 }
 
 
+static PyObject *VectorUtils_FitPolygon2Points(PyObject *self, PyObject *args)
+{
+    const char *pszInputVector;
+    const char *pszOutputVector;
+    int force = false;
+    double alphaVal = -1.0;
+    
+    if( !PyArg_ParseTuple(args, "ss|di:fitPolygon2Points", &pszInputVector, &pszOutputVector, &alphaVal, &force))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeFitPolygonToPoints(std::string(pszInputVector), std::string(pszOutputVector), alphaVal, force);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+
+
+
 // Our list of functions in this module
 static PyMethodDef VectorUtilsMethods[] = {
     {"generateConvexHullsGroups", VectorUtils_GenerateConvexHullsGroups, METH_VARARGS, 
@@ -765,6 +793,19 @@ static PyMethodDef VectorUtilsMethods[] = {
 "Example::\n"
 "\n"
 "\n"},
+    
+{"fitPolygon2Points", VectorUtils_FitPolygon2Points, METH_VARARGS,
+"vectorutils.fitPolygon2Points(inputVector, outputVector, alphaVal. force)\n"
+"A command fit a polygon to the points inputted.\n\n"
+"Where:\n"
+"\n"
+"* inputVector is a string containing the name of the input vector (must be points)\n"
+"* outputVector is a string containing the name of the output vector\n"
+"* alphaVal is a double specifying the alpha value to use for the calculation (if negative optimal will be calculated; default)\n"
+"* force is a bool, specifying whether to force removal of the output vector if it exists\n"
+"Example::\n"
+"\n"
+        "\n"},
     
     
     
