@@ -1516,6 +1516,98 @@ namespace rsgis{namespace vec{
 			throw RSGISVectorOutputException(e.what());
 		}
 	}
+    
+    void RSGISVectorIO::exportGEOSPointClusters2SHP(std::string outputFile, bool deleteIfPresent, std::list<geos::geom::Point*> **points, int numClusters, OGRSpatialReference* spatialRef) throw(RSGISVectorOutputException)
+    {
+        try
+        {
+            OGRRegisterAll();
+            RSGISVectorUtils vecUtils;
+            rsgis::utils::RSGISFileUtils fileUtils;
+            
+            /////////////////////////////////////
+            //
+            // Check whether file already present.
+            //
+            /////////////////////////////////////
+            std::string SHPFileOutLayer = vecUtils.getLayerName(outputFile);
+            std::string outputDIR = fileUtils.getFileDirectoryPath(outputFile);
+            
+            if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
+            {
+                if(deleteIfPresent)
+                {
+                    vecUtils.deleteSHP(outputDIR, SHPFileOutLayer);
+                }
+                else
+                {
+                    throw RSGISException("Shapefile already exists, either delete or select force.");
+                }
+            }
+            
+            
+            OGRSFDriver *shpFiledriver = NULL;
+            OGRDataSource *outputSHPDS = NULL;
+            OGRLayer *outputSHPLayer = NULL;
+            /////////////////////////////////////
+            //
+            // Create Output Shapfile.
+            //
+            /////////////////////////////////////
+            const char *pszDriverName = "ESRI Shapefile";
+            shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName );
+            if( shpFiledriver == NULL )
+            {
+                throw RSGISVectorOutputException("SHP driver not available.");
+            }
+            outputSHPDS = shpFiledriver->CreateDataSource(outputFile.c_str(), NULL);
+            if( outputSHPDS == NULL )
+            {
+                std::string message = std::string("Could not create vector file ") + outputFile;
+                throw RSGISVectorOutputException(message.c_str());
+            }
+            
+            outputSHPLayer = outputSHPDS->CreateLayer(SHPFileOutLayer.c_str(), spatialRef, wkbPoint, NULL );
+            if( outputSHPLayer == NULL )
+            {
+                std::string message = std::string("Could not create vector layer ") + SHPFileOutLayer;
+                throw RSGISVectorOutputException(message.c_str());
+            }
+            
+            OGRFieldDefn shpField("cluster", OFTReal);
+            shpField.SetPrecision(2);
+            if(outputSHPLayer->CreateField( &shpField ) != OGRERR_NONE )
+            {
+                throw RSGISVectorOutputException("Creating shapefile field cluster has failed");
+            }
+            
+            OGRFeatureDefn *outputDefn = outputSHPLayer->GetLayerDefn();
+            OGRFeature *featureOutput = NULL;
+            
+            // Write Polygons to file
+            std::list<geos::geom::Point*>::iterator iterPoints;
+            for(int i = 0; i < numClusters; ++i)
+            {
+                for(iterPoints = points[i]->begin(); iterPoints != points[i]->end(); ++iterPoints)
+                {
+                    featureOutput = OGRFeature::CreateFeature(outputDefn);
+                    featureOutput->SetField(outputDefn->GetFieldIndex("cluster"), i);
+                    featureOutput->SetGeometryDirectly(vecUtils.convertGEOSPoint2OGRPoint((*iterPoints)));
+                    
+                    if( outputSHPLayer->CreateFeature(featureOutput) != OGRERR_NONE )
+                    {
+                        throw RSGISVectorOutputException("Failed to write feature to the output shapefile.");
+                    }
+                    OGRFeature::DestroyFeature(featureOutput);
+                }
+            }
+            OGRDataSource::DestroyDataSource(outputSHPDS);
+        }
+        catch(RSGISException &e)
+        {
+            throw RSGISVectorOutputException(e.what());
+        }
+    }
 	
 	void RSGISVectorIO::exportGEOSMultiPolygonClusters2SHP(std::string outputFile, bool deleteIfPresent, std::list<geos::geom::Polygon*> **polygons, int numClusters, OGRSpatialReference* spatialRef) throw(RSGISVectorOutputException)
 	{

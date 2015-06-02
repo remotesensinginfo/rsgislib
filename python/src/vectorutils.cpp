@@ -460,10 +460,11 @@ static PyObject *VectorUtils_SpatialGraphClusterGeoms(PyObject *self, PyObject *
     float sdEdgeLen = 0.0;
     double maxEdgeLen = 0.0;
     int force = false;
+    int useMinSpanTree = true;
     PyObject *pszOutShpEdgesObj;
     PyObject *pszOutH5EdgeLensObj;
     
-    if( !PyArg_ParseTuple(args, "ssfd|iOO:spatialGraphClusterGeoms", &pszInputVector, &pszOutputVector, &sdEdgeLen, &maxEdgeLen, &force, &pszOutShpEdgesObj, &pszOutH5EdgeLensObj))
+    if( !PyArg_ParseTuple(args, "ssifd|iOO:spatialGraphClusterGeoms", &pszInputVector, &pszOutputVector, &useMinSpanTree, &sdEdgeLen, &maxEdgeLen, &force, &pszOutShpEdgesObj, &pszOutH5EdgeLensObj))
     {
         return NULL;
     }
@@ -495,7 +496,7 @@ static PyObject *VectorUtils_SpatialGraphClusterGeoms(PyObject *self, PyObject *
     
     try
     {
-        rsgis::cmds::executeSpatialGraphClusterGeoms(std::string(pszInputVector), std::string(pszOutputVector), sdEdgeLen, maxEdgeLen, force, shpFileEdges, outShpEdges, h5EdgeLengths, outH5EdgeLens);
+        rsgis::cmds::executeSpatialGraphClusterGeoms(std::string(pszInputVector), std::string(pszOutputVector), useMinSpanTree, sdEdgeLen, maxEdgeLen, force, shpFileEdges, outShpEdges, h5EdgeLengths, outH5EdgeLens);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -749,12 +750,13 @@ static PyMethodDef VectorUtilsMethods[] = {
 "\n"},
    
 {"spatialGraphClusterGeoms", VectorUtils_SpatialGraphClusterGeoms, METH_VARARGS,
-"vectorutils.spatialGraphClusterGeoms(inputVector, outputVector, sdEdgeLen, maxEdgeLen, force, outShpEdges, &outH5EdgeLens)\n"
+"vectorutils.spatialGraphClusterGeoms(inputVector, outputVector, useMinSpanTree, sdEdgeLen, maxEdgeLen, force, outShpEdges, outH5EdgeLens)\n"
 "A command to spatial cluster using a minimum spanning tree approach (Bunting et al 2010).\n\n"
 "Where:\n"
 "\n"
 "* inputVector is a string containing the name of the input vector\n"
 "* outputVector is a string containing the name of the output vector\n"
+"* useMinSpanTree is a boolean specifying whether a minimum spanning tree should be used rather than just a graph.\n"
 "* sdEdgeLen is a float\n"
 "* maxEdgeLen is a double"
 "* force is a bool, specifying whether to force removal of the output vector if it exists\n"

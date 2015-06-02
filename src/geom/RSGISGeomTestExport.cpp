@@ -619,6 +619,95 @@ namespace rsgis{namespace geom{
 		}
 		OGRDataSource::DestroyDataSource(outputSHPDS);
 	}
+    
+    void RSGISGeomTestExport::exportGEOSLineSegments2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::LineSegment*> *lines, std::vector<double> *vals) throw(RSGISGeometryException)
+    {
+        if(lines->size() != vals->size())
+        {
+            throw RSGISGeometryException("The number of values and number of lines is not equal.");
+        }
+        
+        OGRRegisterAll();
+        rsgis::utils::RSGISFileUtils fileUtils;
+        
+        /////////////////////////////////////
+        //
+        // Check whether file already present.
+        //
+        /////////////////////////////////////
+        std::string SHPFileOutLayer = this->getLayerName(outputFile);
+        std::string outputDIR = fileUtils.getFileDirectoryPath(outputFile);
+        
+        if(this->checkDIR4SHP(outputDIR, SHPFileOutLayer))
+        {
+            if(deleteIfPresent)
+            {
+                this->deleteSHP(outputDIR, SHPFileOutLayer);
+            }
+            else
+            {
+                throw RSGISGeometryException("Shapefile already exists, either delete or select force.");
+            }
+        }
+        
+        
+        OGRSFDriver *shpFiledriver = NULL;
+        OGRDataSource *outputSHPDS = NULL;
+        OGRLayer *outputSHPLayer = NULL;
+        /////////////////////////////////////
+        //
+        // Create Output Shapfile.
+        //
+        /////////////////////////////////////
+        const char *pszDriverName = "ESRI Shapefile";
+        shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName );
+        if( shpFiledriver == NULL )
+        {
+            throw RSGISGeometryException("SHP driver not available.");
+        }
+        outputSHPDS = shpFiledriver->CreateDataSource(outputFile.c_str(), NULL);
+        if( outputSHPDS == NULL )
+        {
+            std::string message = std::string("Could not create vector file ") + outputFile;
+            throw RSGISGeometryException(message.c_str());
+        }
+        
+        outputSHPLayer = outputSHPDS->CreateLayer(SHPFileOutLayer.c_str(), NULL, wkbLineString, NULL );
+        if( outputSHPLayer == NULL )
+        {
+            std::string message = std::string("Could not create vector layer ") + SHPFileOutLayer;
+            throw RSGISGeometryException(message.c_str());
+        }
+        
+        OGRFieldDefn shpField("value", OFTReal);
+        shpField.SetPrecision(2);
+        if(outputSHPLayer->CreateField( &shpField ) != OGRERR_NONE )
+        {
+            throw RSGISGeometryException("Creating shapefile field value has failed");
+        }
+        
+        OGRFeatureDefn *outputDefn = outputSHPLayer->GetLayerDefn();
+        OGRFeature *featureOutput = NULL;
+        
+        // Write Polygons to file
+        std::vector<geos::geom::LineSegment*>::iterator iterlines;
+        unsigned int i = 0;
+        for(iterlines = lines->begin(); iterlines != lines->end(); iterlines++)
+        {
+            //std::cout << "GML: " << (*iterlines)->tostd::string() << std::endl;
+            featureOutput = OGRFeature::CreateFeature(outputDefn);
+            featureOutput->SetField(outputDefn->GetFieldIndex("value"), vals->at(i));
+            featureOutput->SetGeometryDirectly(this->convertGEOSLineSegment2OGRLineString((*iterlines)));
+            
+            if( outputSHPLayer->CreateFeature(featureOutput) != OGRERR_NONE )
+            {
+                throw RSGISGeometryException("Failed to write feature to the output shapefile.");
+            }
+            OGRFeature::DestroyFeature(featureOutput);
+            ++i;
+        }
+        OGRDataSource::DestroyDataSource(outputSHPDS);
+    }
 	
 	RSGISGeomTestExport::~RSGISGeomTestExport()
 	{

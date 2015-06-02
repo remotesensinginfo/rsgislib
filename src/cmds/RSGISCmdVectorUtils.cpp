@@ -44,12 +44,16 @@
 #include "vec/RSGISCopyFeatures.h"
 #include "vec/RSGISVectorProcessing.h"
 #include "vec/RSGISCalcDistanceStats.h"
+#include "vec/RSGISPolygonReader.h"
+
+#include "geom/RSGISMinSpanTreeClustererStdDevThreshold.h"
 
 #include "img/RSGISImageUtils.h"
 #include "img/RSGISExtractImageValues.h"
 
 #include "utils/RSGISTextUtils.h"
 #include "utils/RSGISFileUtils.h"
+#include "utils/RSGISGEOSFactoryGenerator.h"
 
 #include "geos/geom/Coordinate.h"
 
@@ -1536,12 +1540,14 @@ namespace rsgis{ namespace cmds {
             }
 
             // Read in Geometries...
+            std::cout << "Read in the geometries\n";
             std::vector<OGRGeometry*> *ogrGeoms = new std::vector<OGRGeometry*>();
             rsgis::vec::RSGISGetOGRGeometries getOGRGeoms = rsgis::vec::RSGISGetOGRGeometries(ogrGeoms);
             rsgis::vec::RSGISProcessVector processVectorGetGeoms = rsgis::vec::RSGISProcessVector(&getOGRGeoms);
             processVectorGetGeoms.processVectorsNoOutput(inputSHPLayer, false);
             
             // Iterate through features and calc dist...
+            std::cout << "Calculate Distances\n";
             rsgis::vec::RSGISCalcMinDist2Geoms calcMinDist = rsgis::vec::RSGISCalcMinDist2Geoms(ogrGeoms);
             rsgis::vec::RSGISProcessVector processVector = rsgis::vec::RSGISProcessVector(&calcMinDist);
             processVector.processVectors(inputSHPLayer, outputSHPLayer, false, false, false);
@@ -1602,12 +1608,14 @@ namespace rsgis{ namespace cmds {
             }
             
             // Read in Geometries...
+            std::cout << "Read in the geometries\n";
             std::vector<OGRGeometry*> *ogrGeoms = new std::vector<OGRGeometry*>();
             rsgis::vec::RSGISGetOGRGeometries getOGRGeoms = rsgis::vec::RSGISGetOGRGeometries(ogrGeoms);
             rsgis::vec::RSGISProcessVector processVectorGetGeoms = rsgis::vec::RSGISProcessVector(&getOGRGeoms);
             processVectorGetGeoms.processVectorsNoOutput(inputSHPLayer, false);
             
             // Iterate through features and calc dist...
+            std::cout << "Calculate Distances\n";
             rsgis::vec::RSGISCalcMinDist2Geoms calcMinDist = rsgis::vec::RSGISCalcMinDist2Geoms(ogrGeoms);
             rsgis::vec::RSGISProcessVector processVector = rsgis::vec::RSGISProcessVector(&calcMinDist);
             processVector.processVectorsNoOutput(inputSHPLayer, false);
@@ -1633,7 +1641,7 @@ namespace rsgis{ namespace cmds {
             
             
             
-    void executeSpatialGraphClusterGeoms(std::string inputVec, std::string outputVec, float edgeLenSDThres, double maxEdgeLen, bool force, std::string shpFileEdges, bool outShpEdges, std::string h5EdgeLengths, bool outH5EdgeLens) throw(RSGISCmdException)
+    void executeSpatialGraphClusterGeoms(std::string inputVec, std::string outputVec, bool useMinSpanTree, float edgeLenSDThres, double maxEdgeLen, bool force, std::string shpFileEdges, bool outShpEdges, std::string h5EdgeLengths, bool outH5EdgeLens) throw(RSGISCmdException)
     {
         try
         {
@@ -1665,10 +1673,75 @@ namespace rsgis{ namespace cmds {
                 std::string message = std::string("Could not open vector layer ") + SHPFileInLayer;
                 throw RSGISFileException(message.c_str());
             }
+            OGRSpatialReference *spatialRef = inputSHPLayer->GetSpatialRef();
+            OGRFeatureDefn *inFeatureDefn = inputSHPLayer->GetLayerDefn();
+            OGRwkbGeometryType wktGeomType = inFeatureDefn->GetGeomType();
             
             
+            std::vector<rsgis::geom::RSGIS2DPoint*> *polyData = new std::vector<rsgis::geom::RSGIS2DPoint*>();
+            rsgis::vec::RSGISProcessVector *processVector = NULL;
+            if(wktGeomType == wkbPolygon)
+            {
+                rsgis::vec::RSGISPolygonReader processFeature = rsgis::vec::RSGISPolygonReader(polyData);
+                processVector = new rsgis::vec::RSGISProcessVector(&processFeature);
+            }
+            else if(wktGeomType == wkbPoint)
+            {
+                rsgis::vec::RSGISPointReader processFeature = rsgis::vec::RSGISPointReader(polyData);
+                processVector = new rsgis::vec::RSGISProcessVector(&processFeature);
+            }
+            else
+            {
+                throw RSGISFileException("Can only process point or polygon shapefiles...");
+            }
+            std::cout << "Read input Shapefile\n";
+            processVector->processVectorsNoOutput(inputSHPLayer, false);
+            delete processVector;
             
+            rsgis::geom::RSGISGraphGeomClusterer clusterer = rsgis::geom::RSGISGraphGeomClusterer(useMinSpanTree, edgeLenSDThres, maxEdgeLen, shpFileEdges, outShpEdges, h5EdgeLengths, outH5EdgeLens);
+            int numClusters = 0;
+            double sdThresVal = 0.0;
+            std::list<rsgis::geom::RSGIS2DPoint*> **outClusters = clusterer.clusterData(polyData, &numClusters, &sdThresVal);
             
+            rsgis::vec::RSGISVectorIO vecIO;
+            if(wktGeomType == wkbPolygon)
+            {
+                std::list<geos::geom::Polygon*> **polygons = new std::list<geos::geom::Polygon*>*[numClusters];
+                std::list<rsgis::geom::RSGIS2DPoint*>::iterator iter2DPts;
+                rsgis::geom::RSGISPolygon *tmpRSGISPoly;
+                for(int i = 0; i < numClusters; ++i)
+                {
+                    polygons[i] = new std::list<geos::geom::Polygon*>();
+                    for(iter2DPts = outClusters[i]->begin(); iter2DPts != outClusters[i]->end(); ++iter2DPts)
+                    {
+                        tmpRSGISPoly = (rsgis::geom::RSGISPolygon*) *iter2DPts;
+                        polygons[i]->push_back(tmpRSGISPoly->getPolygon());
+                    }
+                }
+                vecIO.exportGEOSPolygonClusters2SHP(outputVec, force, polygons, numClusters, spatialRef);
+            }
+            else if(wktGeomType == wkbPoint)
+            {
+                std::list<geos::geom::Point*> **points = new std::list<geos::geom::Point*>*[numClusters];
+                std::list<rsgis::geom::RSGIS2DPoint*>::iterator iter2DPts;
+                rsgis::geom::RSGISPolygon *tmpRSGISPoint;
+                for(int i = 0; i < numClusters; ++i)
+                {
+                    points[i] = new std::list<geos::geom::Point*>();
+                    for(iter2DPts = outClusters[i]->begin(); iter2DPts != outClusters[i]->end(); ++iter2DPts)
+                    {
+                        points[i]->push_back((*iter2DPts)->getAsGeosPoint());
+                    }
+                }
+                
+                vecIO.exportGEOSPointClusters2SHP(outputVec, force, points, numClusters, spatialRef);
+            }
+            else
+            {
+                throw RSGISFileException("Can only export point or polygon shapefiles...");
+            }
+            
+            delete rsgis::utils::RSGISGEOSFactoryGenerator::getInstance();
             OGRDataSource::DestroyDataSource(inputSHPDS);
         }
         catch(rsgis::RSGISVectorException &e)
