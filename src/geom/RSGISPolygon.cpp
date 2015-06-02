@@ -108,6 +108,40 @@ namespace rsgis{namespace geom{
 			delete coords;
 		}
 	}
+    
+    double RSGISPolygon::distance(RSGIS2DPoint *pt)
+    {
+        double dist = 0.0;
+        if (typeid(*pt) == typeid(RSGISPolygon))
+        {
+            //std::cout << "\t Is a polygon:\n";
+            RSGISPolygon *poly = dynamic_cast<RSGISPolygon*>(pt);
+            dist = poly->getPolygon()->distance(this->getPolygon());
+        }
+        else
+        {
+            geos::geom::Point *geosPt = pt->getAsGeosPoint();
+            dist = this->getPolygon()->distance(geosPt);
+            delete geosPt;
+        }
+        //std::cout << "RSGISPolygon::distance(RSGIS2DPoint *pt) dist = " << dist << std::endl;
+        return dist;
+    }
+    
+    double RSGISPolygon::distance(RSGISPolygon *poly)
+    {
+        double dist = poly->getPolygon()->distance(this->getPolygon());
+        return dist;
+    }
+    
+    double RSGISPolygon::distance(geos::geom::Coordinate *pt)
+    {
+        geos::geom::GeometryFactory* geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+        geos::geom::Point *geosPt = geomFactory->createPoint(*point);
+        double dist = this->getPolygon()->distance(geosPt);
+        delete geosPt;
+        return dist;
+    }
 	
 	RSGISPolygon::~RSGISPolygon()
 	{

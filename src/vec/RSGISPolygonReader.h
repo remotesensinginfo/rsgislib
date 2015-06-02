@@ -58,6 +58,18 @@ namespace rsgis{namespace vec{
             std::vector<rsgis::geom::RSGIS2DPoint*> *dataVector;
 			bool listtype;
 		};
+    
+    class DllExport RSGISPointReader : public RSGISProcessOGRFeature
+    {
+    public:
+        RSGISPointReader(std::vector<rsgis::geom::RSGIS2DPoint*> *data);
+        virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
+        virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
+        virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
+        virtual ~RSGISPointReader();
+    protected:
+        std::vector<rsgis::geom::RSGIS2DPoint*> *dataVector;
+    };
 }}
 
 #endif

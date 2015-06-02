@@ -56,6 +56,18 @@ namespace rsgis{namespace geom{
 	{
 		return point;
 	}
+    
+    geos::geom::Coordinate RSGIS2DPoint::getCoordPoint()
+    {
+        return geos::geom::Coordinate(this->point->x, this->point->y);
+    }
+    
+    geos::geom::Point* RSGIS2DPoint::getAsGeosPoint()
+    {
+        geos::geom::GeometryFactory* geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+        geos::geom::Point *geosPt = geomFactory->createPoint(*point);
+        return geosPt;
+    }
 	
 	double RSGIS2DPoint::getX()
 	{

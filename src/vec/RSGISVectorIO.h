@@ -72,7 +72,8 @@ namespace rsgis{namespace vec{
 			void exportRSGISPolygonsClusters2SHP(std::list<rsgis::geom::RSGIS2DPoint*> **clusters, int numClusters, std::string outputFile, bool force, rsgis::geom::RSGISIdentifyNonConvexPolygons *createPolygon);
 			void exportLinesAsShp(std::string outputFile, std::list<double> *x1, std::list<double> *y1, std::list<double> *x2, std::list<double> *y2, bool force) throw(RSGISVectorOutputException);
 			void exportGEOSPolygonClusters2SHP(std::string outputFile, bool deleteIfPresent, std::list<geos::geom::Polygon*> **polygons, int numClusters, OGRSpatialReference* spatialRef) throw(RSGISVectorOutputException);
-			void exportGEOSMultiPolygonClusters2SHP(std::string outputFile, bool deleteIfPresent, std::list<geos::geom::Polygon*> **polygons, int numClusters, OGRSpatialReference* spatialRef) throw(RSGISVectorOutputException);
+            void exportGEOSPointClusters2SHP(std::string outputFile, bool deleteIfPresent, std::list<geos::geom::Point*> **points, int numClusters, OGRSpatialReference* spatialRef) throw(RSGISVectorOutputException);
+            void exportGEOSMultiPolygonClusters2SHP(std::string outputFile, bool deleteIfPresent, std::list<geos::geom::Polygon*> **polygons, int numClusters, OGRSpatialReference* spatialRef) throw(RSGISVectorOutputException);
 			void exportGEOSPolygons2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::Polygon*> *polys, OGRSpatialReference* spatialRef, std::vector<std::string> *numericColsName, std::vector<std::string> *textColsName, std::vector<float> **numericColsData, std::vector<std::string> **textColsData) throw(RSGISVectorOutputException);
 			void exportPolygons2Layer(OGRLayer *outLayer, std::list<OGRPolygon*> *polys) throw(RSGISVectorOutputException);
 			~RSGISVectorIO();

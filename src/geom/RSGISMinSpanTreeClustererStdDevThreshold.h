@@ -26,6 +26,8 @@
 #include <iostream>
 #include <string>
 #include <list>
+#include <algorithm>
+#include <iterator>
 
 #include "geom/RSGIS2DPoint.h"
 #include "geom/RSGISSpatialClustererInterface.h"
@@ -33,14 +35,37 @@
 
 #include "math/RSGISClustererException.h"
 
+#include "utils/RSGISExportData2HDF.h"
+
 #include <boost/config.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/graph/kruskal_min_spanning_tree.hpp>
 #include <boost/graph/connected_components.hpp>
 
+#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
+#include <CGAL/Delaunay_triangulation_2.h>
+#include <CGAL/Interpolation_traits_2.h>
+#include <CGAL/natural_neighbor_coordinates_2.h>
+#include <CGAL/interpolation_functions.h>
+#include <CGAL/algorithm.h>
+#include <CGAL/Origin.h>
+#include <CGAL/squared_distance_2.h>
+
 namespace rsgis{namespace geom{
-	
+
+    typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
+    typedef K::FT                                         CGALCoordType;
+    typedef K::Vector_2                                   CGALVector;
+    typedef K::Point_2                                    CGALPoint;
+    
+    typedef CGAL::Delaunay_triangulation_2<K>             DelaunayTriangulation;
+    typedef CGAL::Interpolation_traits_2<K>               InterpTraits;
+    typedef CGAL::Delaunay_triangulation_2<K>::Vertex_handle    Vertex_handle;
+    
+    typedef std::vector< std::pair<CGALPoint, CGALCoordType> >   CoordinateVector;
+    typedef std::map<CGALPoint, CGALCoordType, K::Less_xy_2>     PointValueMap;
+    
 	/// Class that implments the abstract interface RSGISSpatialClustererInterface.
 	/// The clusterer calculates the minimum spanning tree from a delaunay triangulation 
 	/// and removes the edges above a given number of standard deviations.
@@ -59,6 +84,27 @@ namespace rsgis{namespace geom{
 			ClusterGraph* constructGraph(RSGISDelaunayTriangulation *tri, std::vector<RSGIS2DPoint*> *data);
 			void constructMinimumSpanningTree(ClusterGraph *cg);
 		};
+    
+    
+    class DllExport RSGISGraphGeomClusterer : public RSGISSpatialClustererInterface
+    {
+    public:
+        RSGISGraphGeomClusterer(bool useMinSpanTree, float stddevthreshold, double maxEdgeLength, std::string shpFileEdges, bool outShpEdges, std::string h5EdgeLengths, bool outH5EdgeLens);
+        virtual std::list<RSGIS2DPoint*>** clusterData(std::vector<RSGIS2DPoint*> *data, int *numclusters, double *threshold) throw(rsgis::math::RSGISClustererException);
+        virtual ~RSGISGraphGeomClusterer();
+    protected:
+        bool useMinSpanTree;
+        float stddevthreshold;
+        double maxEdgeLength;
+        std::string shpFileEdges;
+        bool outShpEdges;
+        std::string h5EdgeLengths;
+        bool outH5EdgeLens;
+        ClusterGraph* constructGraph(DelaunayTriangulation *dt, PointValueMap *values, std::vector<RSGIS2DPoint*> *data) throw(rsgis::math::RSGISClustererException);
+        void constructMinimumSpanningTree(ClusterGraph *cg) throw(rsgis::math::RSGISClustererException);
+    };
+    
+    
 }}
 
 #endif
