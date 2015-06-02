@@ -49,6 +49,11 @@ namespace rsgis{namespace vec{
 	protected:
         std::vector<OGRPolygon*> *polygons;
 	};
+    
+    
+   
+    
+    
 }}
 
 #endif
