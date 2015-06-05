@@ -56,6 +56,8 @@ namespace rsgis{namespace geom{
 			virtual unsigned int getClassID();
 			virtual double distance(RSGIS2DPoint *pt);
 			virtual double distance(geos::geom::Coordinate *pt);
+            virtual bool equals(RSGIS2DPoint *pt);
+            virtual bool equals(geos::geom::Coordinate *pt);
 			friend std::ostream& operator<<(std::ostream& ostr, const RSGIS2DPoint& pt);
             std::ostream& operator<<(std::ostream& ostr);
 			bool operator==(RSGIS2DPoint pt) const;

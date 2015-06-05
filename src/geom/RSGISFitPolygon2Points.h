@@ -46,6 +46,12 @@
 #include <CGAL/Delaunay_triangulation_2.h>
 #include <CGAL/Alpha_shape_2.h>
 
+#include <boost/config.hpp>
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/tuple/tuple.hpp>
+#include <boost/graph/kruskal_min_spanning_tree.hpp>
+#include <boost/graph/connected_components.hpp>
+
 namespace rsgis{namespace geom{
 
     typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
@@ -59,12 +65,19 @@ namespace rsgis{namespace geom{
     typedef CGAL::Alpha_shape_2<Triangulation_2>  Alpha_shape_2;
     typedef Alpha_shape_2::Alpha_shape_edges_iterator Alpha_shape_edges_iterator;
     
+    typedef boost::adjacency_list< boost::vecS, boost::vecS, boost::undirectedS, boost::property< boost::vertex_name_t, std::string >, boost::property< boost::edge_weight_t, float > > EdgesGraph;
+    typedef boost::graph_traits<EdgesGraph>::vertex_descriptor vertexDescr;
+    typedef boost::graph_traits<EdgesGraph>::edge_descriptor edgeDescr;
+    
     class DllExport RSGISFitAlphaShapesPolygonToPoints
     {
     public:
         RSGISFitAlphaShapesPolygonToPoints();
-        OGRPolygon* fitPolygon(std::vector<OGRPoint*> *pts, double alphaVal) throw(RSGISGeometryException);
+        geos::geom::Polygon* fitPolygon(std::vector<OGRPoint*> *pts, double alphaVal) throw(RSGISGeometryException);
         ~RSGISFitAlphaShapesPolygonToPoints();
+    protected:
+        geos::geom::Polygon* extractPolygonFromEdges(std::vector<geos::geom::LineSegment *> *lines) throw(RSGISGeometryException);
+        void createCoordSequence(EdgesGraph *edgesGraph, vertexDescr currV, std::vector<int> *mark, std::vector<RSGIS2DPoint*> *ptVerts, geos::geom::CoordinateSequence *coords, std::vector<geos::geom::CoordinateSequence*> *loops);
     };
     
 }}

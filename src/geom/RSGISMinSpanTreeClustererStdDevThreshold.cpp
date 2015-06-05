@@ -69,7 +69,7 @@ namespace rsgis{namespace geom{
 				*threshold = removal_threshold;
 				double edgeWeight = 0;
 				
-				for (boost::tie(edgeIter, e_end) = boost::edges(*cg); edgeIter != e_end; )
+				for(boost::tie(edgeIter, e_end) = boost::edges(*cg); edgeIter != e_end; )
 				{
 					edgeWeight = boost::get(weight, *edgeIter);
 					if( (edgeWeight > removal_threshold) | (edgeWeight > this->maxEdgeLength))
@@ -443,9 +443,6 @@ namespace rsgis{namespace geom{
         ClusterGraph *cg = new ClusterGraph(data->size());
         try
         {
-            // Create graph with vertex's
-            ClusterGraph *cg = new ClusterGraph(data->size());
-            
             // Add edges
             std::cout << "Adding Edges to Graph (may take some time ...) \n";
             bool edge1Present = false;

@@ -58,6 +58,7 @@
 #include "utils/RSGISGEOSFactoryGenerator.h"
 
 #include "geos/geom/Coordinate.h"
+#include "geos/geom/Polygon.h"
 
 namespace rsgis{ namespace cmds {
     
@@ -1811,8 +1812,12 @@ namespace rsgis{ namespace cmds {
             delete processVector;
             
             rsgis::geom::RSGISFitAlphaShapesPolygonToPoints fitPoly;
-            OGRPolygon *poly = fitPoly.fitPolygon(inPts, alphaVal);
+            geos::geom::Polygon *poly = fitPoly.fitPolygon(inPts, alphaVal);
             
+            std::vector<geos::geom::Polygon*> polys;
+            polys.push_back(poly);
+            rsgis::vec::RSGISVectorIO vecIO;
+            vecIO.exportGEOSPolygons2SHP(outputVec, force, &polys, spatialRef);
 
             delete inPts;
         
