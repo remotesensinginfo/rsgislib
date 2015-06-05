@@ -534,6 +534,33 @@ static PyObject *VectorUtils_FitPolygon2Points(PyObject *self, PyObject *args)
 }
 
 
+static PyObject *VectorUtils_FitPolygons2PointClusters(PyObject *self, PyObject *args)
+{
+    const char *pszInputVector;
+    const char *pszOutputVector;
+    const char *clustersField;
+    int force = false;
+    double alphaVal = -1.0;
+    
+    if( !PyArg_ParseTuple(args, "sss|di:fitPolygons2PointClusters", &pszInputVector, &pszOutputVector, &clustersField, &alphaVal, &force))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeFitPolygonsToPointClusters(std::string(pszInputVector), std::string(pszOutputVector), std::string(clustersField), alphaVal, force);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+
 
 
 // Our list of functions in this module
@@ -805,7 +832,21 @@ static PyMethodDef VectorUtilsMethods[] = {
 "* force is a bool, specifying whether to force removal of the output vector if it exists\n"
 "Example::\n"
 "\n"
-        "\n"},
+"\n"},
+    
+{"fitPolygons2PointClusters", VectorUtils_FitPolygons2PointClusters, METH_VARARGS,
+"vectorutils.fitPolygons2PointClusters(inputVector, outputVector, clusterField, alphaVal. force)\n"
+"A command fit a polygon to the points inputted.\n\n"
+"Where:\n"
+"\n"
+"* inputVector is a string containing the name of the input vector (must be points)\n"
+"* outputVector is a string containing the name of the output vector\n"
+"* clusterField is a string specifying the column in the input shapefile which specifies the clusters\n"
+"* alphaVal is a double specifying the alpha value to use for the calculation (if negative optimal will be calculated; default)\n"
+"* force is a bool, specifying whether to force removal of the output vector if it exists\n"
+"Example::\n"
+"\n"
+"\n"},
     
     
     

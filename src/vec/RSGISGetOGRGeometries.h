@@ -74,6 +74,8 @@ namespace rsgis{namespace vec{
     protected:
         std::vector<OGRPoint*> *points;
     };
+    
+    
 }}
 
 #endif

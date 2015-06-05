@@ -324,6 +324,7 @@ namespace rsgis{namespace geom{
             }
             */
             
+            bool skip = false;
             std::vector<geos::geom::CoordinateSequence*> *loops = new std::vector<geos::geom::CoordinateSequence*>();
             boost::graph_traits<EdgesGraph>::adjacency_iterator vi, vi_end;
             for(size_t i = 0; i < num_comp; ++i)
@@ -408,65 +409,69 @@ namespace rsgis{namespace geom{
                 }
                 else if(compNumGt2Edges[i] > 1)
                 {
-                    throw RSGISGeometryException("The number of component edges with more than 2 edges is greater than 1 - an implementation for this has not yet been done...");
+                    std::cerr << "WARNING: The number of component edges with more than 2 edges is greater than 1 - an implementation for this has not yet been done...\n";
+                    skip = true;
+                    //throw RSGISGeometryException("The number of component edges with more than 2 edges is greater than 1 - an implementation for this has not yet been done...");
                 }
                 //std::cout << "\n\n";
             }
             
-            
-            geos::geom::GeometryFactory *geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
-            if( compCoords.size() > 1)
+            if(!skip)
             {
-                int maxIdx = -1;
-                geos::geom::Envelope maxEnv;
-                geos::geom::Envelope curEnv;
-                for(size_t i = 0; i < compCoords.size(); ++i)
+                geos::geom::GeometryFactory *geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+                if( compCoords.size() > 1)
                 {
-                    if(i == 0)
+                    int maxIdx = -1;
+                    geos::geom::Envelope maxEnv;
+                    geos::geom::Envelope curEnv;
+                    for(size_t i = 0; i < compCoords.size(); ++i)
                     {
-                        maxIdx = i;
-                        maxEnv.setToNull();
-                        compCoords.at(i)->expandEnvelope(maxEnv);
-                    }
-                    else
-                    {
-                        curEnv.setToNull();
-                        compCoords.at(i)->expandEnvelope(curEnv);
-                        if(curEnv.covers(maxEnv))
+                        if(i == 0)
                         {
                             maxIdx = i;
-                            maxEnv = curEnv;
+                            maxEnv.setToNull();
+                            compCoords.at(i)->expandEnvelope(maxEnv);
                         }
-                    }
-                }
-                
-                std::cout << "Component " << maxIdx << " is the polygon boundary the rest are holes\n";
-                
-                //createLinearRing(CoordinateSequence *newCoords)
-                //createPolygon (LinearRing *shell, std::vector< Geometry * > *holes)
-                geos::geom::LinearRing *ring = NULL;
-                std::vector<geos::geom::Geometry*> *holes = new std::vector<geos::geom::Geometry*>();
-                for(size_t i = 0; i < compCoords.size(); ++i)
-                {
-                    if(i == maxIdx)
-                    {
-                        ring = geomFactory->createLinearRing(compCoords.at(i));
-                    }
-                    else
-                    {
-                        if(compCoords.at(i)->size() > 3)
+                        else
                         {
-                            holes->push_back(geomFactory->createLinearRing(compCoords.at(i)));
+                            curEnv.setToNull();
+                            compCoords.at(i)->expandEnvelope(curEnv);
+                            if(curEnv.covers(maxEnv))
+                            {
+                                maxIdx = i;
+                                maxEnv = curEnv;
+                            }
                         }
                     }
+                    
+                    std::cout << "Component " << maxIdx << " is the polygon boundary the rest are holes\n";
+                    
+                    //createLinearRing(CoordinateSequence *newCoords)
+                    //createPolygon (LinearRing *shell, std::vector< Geometry * > *holes)
+                    geos::geom::LinearRing *ring = NULL;
+                    std::vector<geos::geom::Geometry*> *holes = new std::vector<geos::geom::Geometry*>();
+                    for(size_t i = 0; i < compCoords.size(); ++i)
+                    {
+                        if(i == maxIdx)
+                        {
+                            ring = geomFactory->createLinearRing(compCoords.at(i));
+                        }
+                        else
+                        {
+                            if(compCoords.at(i)->size() > 3)
+                            {
+                                holes->push_back(geomFactory->createLinearRing(compCoords.at(i)));
+                            }
+                        }
+                    }
+                    poly = geomFactory->createPolygon(ring, holes);
                 }
-                poly = geomFactory->createPolygon(ring, holes);
-            }
-            else
-            {
-                geos::geom::LinearRing *ring = geomFactory->createLinearRing(compCoords.at(0));
-                std::vector<geos::geom::Geometry*> *holes = new std::vector<geos::geom::Geometry*>();
-                poly = geomFactory->createPolygon(ring, holes);
+                else
+                {
+                    geos::geom::LinearRing *ring = geomFactory->createLinearRing(compCoords.at(0));
+                    std::vector<geos::geom::Geometry*> *holes = new std::vector<geos::geom::Geometry*>();
+                    poly = geomFactory->createPolygon(ring, holes);
+                }
             }
             
             

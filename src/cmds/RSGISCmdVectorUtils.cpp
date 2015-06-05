@@ -46,6 +46,7 @@
 #include "vec/RSGISVectorProcessing.h"
 #include "vec/RSGISCalcDistanceStats.h"
 #include "vec/RSGISPolygonReader.h"
+#include "vec/RSGISGetAttributeValues.h"
 
 #include "geom/RSGISFitPolygon2Points.h"
 #include "geom/RSGISMinSpanTreeClustererStdDevThreshold.h"
@@ -1821,6 +1822,132 @@ namespace rsgis{ namespace cmds {
 
             delete inPts;
         
+            delete rsgis::utils::RSGISGEOSFactoryGenerator::getInstance();
+            OGRDataSource::DestroyDataSource(inputSHPDS);
+        }
+        catch(rsgis::RSGISVectorException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+            
+            
+    void executeFitPolygonsToPointClusters(std::string inputVec, std::string outputVec, std::string clusterField, double alphaVal, bool force) throw(RSGISCmdException)
+    {
+        try
+        {
+            // Convert to absolute path
+            inputVec = boost::filesystem::absolute(inputVec).string();
+            outputVec = boost::filesystem::absolute(outputVec).string();
+            
+            OGRRegisterAll();
+            
+            rsgis::utils::RSGISFileUtils fileUtils;
+            rsgis::vec::RSGISVectorUtils vecUtils;
+            
+            std::string SHPFileInLayer = vecUtils.getLayerName(inputVec);
+            
+            /////////////////////////////////////
+            //
+            // Open Input Shapfile.
+            //
+            /////////////////////////////////////
+            OGRDataSource *inputSHPDS = OGRSFDriverRegistrar::Open(inputVec.c_str(), FALSE);
+            if(inputSHPDS == NULL)
+            {
+                std::string message = std::string("Could not open vector file ") + inputVec;
+                throw RSGISFileException(message.c_str());
+            }
+            OGRLayer *inputSHPLayer = inputSHPDS->GetLayerByName(SHPFileInLayer.c_str());
+            if(inputSHPLayer == NULL)
+            {
+                std::string message = std::string("Could not open vector layer ") + SHPFileInLayer;
+                throw RSGISFileException(message.c_str());
+            }
+            OGRSpatialReference *spatialRef = inputSHPLayer->GetSpatialRef();
+            OGRFeatureDefn *inFeatureDefn = inputSHPLayer->GetLayerDefn();
+            OGRwkbGeometryType wktGeomType = inFeatureDefn->GetGeomType();
+            
+            if(wktGeomType != wkbPoint)
+            {
+                throw rsgis::RSGISVectorException("Input shapefile must be of type points.");
+                OGRDataSource::DestroyDataSource(inputSHPDS);
+            }
+            
+            std::list<double> *clusters = new std::list<double>();
+            rsgis::vec::RSGISGetAttributeValues getAttVals = rsgis::vec::RSGISGetAttributeValues(clusters, clusterField);
+            rsgis::vec::RSGISProcessVector *processVector = new rsgis::vec::RSGISProcessVector(&getAttVals);
+            
+            std::cout << "Read attributes from input shapefile\n";
+            processVector->processVectorsNoOutput(inputSHPLayer, false);
+            delete processVector;
+            
+            std::vector<double> clusterIDs = std::vector<double>();
+            clusterIDs.reserve(clusters->size());
+            
+            for(std::list<double>::iterator iterVals = clusters->begin(); iterVals != clusters->end(); ++iterVals)
+            {
+                clusterIDs.push_back(*iterVals);
+            }
+            
+            clusters->sort();
+            clusters->unique();
+            
+            std::cout << "There are " << clusters->size() << " clusters\n";
+            
+            std::vector<OGRPoint*> *inPts = new std::vector<OGRPoint*>();
+            rsgis::vec::RSGISOGRPointReader processFeature = rsgis::vec::RSGISOGRPointReader(inPts);
+            processVector = new rsgis::vec::RSGISProcessVector(&processFeature);
+            
+            std::cout << "Read Points from input Shapefile\n";
+            processVector->processVectorsNoOutput(inputSHPLayer, false);
+            delete processVector;
+            
+            std::vector<geos::geom::Polygon*> polys;
+            rsgis::geom::RSGISFitAlphaShapesPolygonToPoints fitPoly;
+            std::vector<OGRPoint*> *pts = NULL;
+            for(std::list<double>::iterator iterClusters = clusters->begin(); iterClusters != clusters->end(); ++iterClusters)
+            {
+                std::cout << "Processing Cluster " << *iterClusters;
+                pts = new std::vector<OGRPoint*>();
+                
+                for(size_t i = 0; i < inPts->size(); ++i)
+                {
+                    if(clusterIDs.at(i) == *iterClusters)
+                    {
+                        pts->push_back(inPts->at(i));
+                    }
+                }
+                std::cout << " has " << pts->size() << " points\n";
+                if(pts->size() > 4)
+                {
+                    geos::geom::Polygon *poly = fitPoly.fitPolygon(pts, alphaVal);
+                    if(poly != NULL)
+                    {
+                        polys.push_back(poly);
+                    }
+                }
+                else
+                {
+                    // envelope??
+                }
+                delete pts;
+            }
+            
+            rsgis::vec::RSGISVectorIO vecIO;
+            vecIO.exportGEOSPolygons2SHP(outputVec, force, &polys, spatialRef);
+            
+            delete inPts;
+            delete clusters;
+            
             delete rsgis::utils::RSGISGEOSFactoryGenerator::getInstance();
             OGRDataSource::DestroyDataSource(inputSHPDS);
         }
