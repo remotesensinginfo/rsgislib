@@ -39,8 +39,9 @@
 ############################################################################
 
 import sys
-import rsgislib
 import math
+from enum import Enum
+import rsgislib
 from rsgislib import rastergis
 
 haveGDALPy = True
@@ -67,6 +68,30 @@ try:
     import h5py
 except ImportError as h5Err:
     haveHDF5 = False
+    
+haveScipyStats = True
+try:
+    import scipy.stats
+except ImportError as scipystatsErr:
+    haveScipyStats = False
+    
+haveRIOSRat = True
+try:
+    from rios import rat
+except ImportError as riosRatErr:
+    haveRIOSRat = False
+
+
+class RSGISRATThresMeasure(Enum):
+    kurtosis = 1
+    skewness = 2
+    combined = 3
+    auto = 4
+    
+class RSGISRATThresDirection(Enum):
+    lower = 1
+    upper = 2
+    lowerupper = 3
 
 
 def populateImageStats(inputImage, clumpsFile, outascii=None, threshold=0.0, calcMin=False, calcMax=False, calcSum=False, calcMean=False, calcStDev=False, calcMedian=False, calcCount=False, calcArea=False, calcLength=False, calcWidth=False, calcLengthWidth=False):
@@ -299,6 +324,668 @@ Example::
     
     
     
+def findChangeClumpsHistSkewKurtTest(inputClumps, inClassCol, classOfInterest, changeVarCol, outChangeFeatCol, noDataVals=[], thresMeasure=RSGISRATThresMeasure.auto, exportPlot=None, showAllThreshPlot=False):
+    """
+    This function identifies potential change features from both sides of the histogram 
+    by slicing the histogram and finding an optimal skewness and kurtosis.
     
+    Where:
     
+    * inputClumps - input clumps file.
+    * inClassCol - The column specifiying the classes, one of which change will be found.
+    * classOfInterest - The class (as defined in inClassCol) on which changed is being found.
+    * changeVarCol - Variable to be used to find change. Expecting column name. Needs to be numeric
+    * outChangeFeatCol - the output column. Regions lower than lower threshold have value 1. Regions higher than upper threshold have value 2. No change had threshold 0.
+    * noDataVals - list of no data values to be ignored.
+    * thresMeasure - needs to be of type RSGISRATThresMeasure (default is auto)
+    * exportPlot - file name for exporting a histogram plot with thresholds annotated. No plot is create if None is passed (default is none).
+    * showAllThreshPlot - option when plotting to put all the thresholds on to the plot rather than just the one being used.
     
+    Return:
+    * list of lower [0] and upper [1] thresholds used to define the no change region.
+    
+    """
+    # Check numpy is available
+    if not haveNumpy:
+        raise Exception("The numpy module is required for this function could not be imported\n\t" + numErr)
+    # Check gdal is available
+    if not haveGDALPy:
+        raise Exception("The GDAL python bindings are required for this function could not be imported\n\t" + gdalErr)
+    # Check rios rat is available
+    if not haveRIOSRat:
+        raise Exception("The RIOS rat tools are required for this function could not be imported\n\t" + riosRatErr)
+    # Check scipy stats is available
+    if not haveScipyStats:
+        raise Exception("The scipy stats is required for this function could not be imported\n\t" + scipystatsErr)
+    if not exportPlot == None:
+        # Check matplotlib is available
+        if not haveMatPlotLib:
+            raise Exception("The matplotlib module is required for this function could not be imported\n\t" + pltErr)
+
+    ## Open the image file...
+    ratDataset = gdal.Open(inputClumps, gdal.GA_Update)
+
+    ## Read in columns
+    classVals = rat.readColumn(ratDataset, inClassCol)
+    vals = rat.readColumn(ratDataset, changeVarCol)
+    outChangeFeats = numpy.zeros_like(classVals)
+    
+    ID = numpy.arange(classVals.shape[0])
+    
+    ID = ID[classVals == classOfInterest]
+    if ID.shape[0] == 0:
+        rat.writeColumn(ratDataset, outChangeFeatCol, outChangeFeats)
+        return
+    vals = vals[classVals == classOfInterest]
+    
+    ID = ID[numpy.isfinite(vals)]
+    vals = vals[numpy.isfinite(vals)]
+    
+    for noDataVal in noDataVals:
+        ID = ID[vals != noDataVal]
+        vals = vals[vals != noDataVal]
+    
+    n = vals.shape[0]
+    lq = numpy.percentile(vals, 25)
+    uq = numpy.percentile(vals, 75)
+    iqr = uq - lq
+    binSize = 2 * iqr * n**(-1/3)
+    print("Bin Size = ", binSize)
+    numBins = int((numpy.max(vals) - numpy.min(vals))/binSize)+2
+    print("num of bins = ", numBins)
+    
+    hist, bin_edges = numpy.histogram(vals, bins=numBins)
+    
+    print(hist.shape)
+    print(bin_edges.shape)
+        
+    print("LQ = ", lq)
+    print("UQ = ", uq)
+    
+    lqNumBins = int((lq - bin_edges[0])/binSize)+1
+    uqNumBins = int((bin_edges[-1]-uq)/binSize)+1
+    
+    print("lqNumBins = ", lqNumBins)
+    print("uqNumBins = ", uqNumBins)
+    
+    kurtosisVals = numpy.zeros((lqNumBins,uqNumBins), dtype=numpy.float)
+    skewnessVals = numpy.zeros((lqNumBins,uqNumBins), dtype=numpy.float)
+    lowBins = numpy.zeros((lqNumBins,uqNumBins), dtype=numpy.int)
+    upBins = numpy.zeros((lqNumBins,uqNumBins), dtype=numpy.int)
+    
+    for lowBin in range(lqNumBins):
+        for upBin in range(uqNumBins):
+            #print("Bin [" + str(lowBin) + ", " + str(numBins-upBin) + "]")
+            histTmp = hist[lowBin:(numBins-upBin)]
+            #print(histTmp)
+            #print(histTmp.shape)
+            lowBins[lowBin,upBin] = lowBin
+            upBins[lowBin,upBin] = numBins-upBin
+            
+            kurtosisVals[lowBin,upBin] = scipy.stats.kurtosis(histTmp)
+            skewnessVals[lowBin,upBin] = scipy.stats.skew(histTmp)
+            
+    
+    #print(kurtosisVals)
+    #print(skewnessVals)
+    kurtosisValsAbs = numpy.absolute(kurtosisVals)
+    skewnessValsAbs = numpy.absolute(skewnessVals)
+    #print("Kurtosis Range: [" + str(numpy.min(kurtosisValsAbs)) + ", " + str(numpy.max(kurtosisValsAbs)) + "]") 
+    #print("Skewness Range: [" + str(numpy.min(skewnessValsAbs)) + ", " + str(numpy.max(skewnessValsAbs)) + "]") 
+    kurtosisValsNorm = (kurtosisValsAbs-numpy.min(kurtosisValsAbs)) / (numpy.max(kurtosisValsAbs)-numpy.min(kurtosisValsAbs))
+    skewnessValsNorm = (skewnessValsAbs-numpy.min(skewnessValsAbs)) / (numpy.max(skewnessValsAbs)-numpy.min(skewnessValsAbs))
+    
+    #print("Kurtosis Norm Range: [" + str(numpy.min(kurtosisValsNorm)) + ", " + str(numpy.max(kurtosisValsNorm)) + "]") 
+    #print("Skewness Norm Range: [" + str(numpy.min(skewnessValsNorm)) + ", " + str(numpy.max(skewnessValsNorm)) + "]") 
+    
+    combined = kurtosisValsNorm + skewnessValsNorm
+    #combined = kurtosisValsAbs + skewnessValsAbs
+    #print(combined)
+    
+    minKurt = numpy.unravel_index(numpy.argmin(kurtosisValsAbs, axis=None), kurtosisValsAbs.shape)
+    minSkew = numpy.unravel_index(numpy.argmin(skewnessValsAbs, axis=None), skewnessValsAbs.shape)
+    minComb = numpy.unravel_index(numpy.argmin(combined, axis=None), combined.shape)
+    
+    print("Kurtosis bin indexes: ", minKurt)
+    print("Skewness bin indexes: ", minSkew)
+    print("Combined bin indexes: ", minComb)
+    
+    lowBinKurt = minKurt[0]
+    lowerThresKurt = bin_edges[lowBinKurt] + (binSize/2)
+    upBinKurt = numBins-minKurt[1]
+    upperThresKurt = bin_edges[upBinKurt] + (binSize/2)
+    print("No Change Data Range (Kurtosis): [" + str(lowerThresKurt) + "," + str(upperThresKurt) + "]")
+    
+    lowBinSkew = minSkew[0]
+    lowerThresSkew = bin_edges[lowBinSkew] + (binSize/2)
+    upBinSkew = numBins-minSkew[1]
+    upperThresSkew = bin_edges[upBinSkew] + (binSize/2)
+    print("No Change Data Range (Skewness): [" + str(lowerThresSkew) + "," + str(upperThresSkew) + "]")
+        
+    lowBinComb = minComb[0]
+    lowerThresComb = bin_edges[lowBinComb] + (binSize/2)
+    upBinComb = numBins-minComb[1]
+    upperThresComb = bin_edges[upBinComb] + (binSize/2)
+    print("No Change Data Range (Combined): [" + str(lowerThresComb) + "," + str(upperThresComb) + "]")
+    
+    lowerThres = 0.0
+    upperThres = 0.0
+    if thresMeasure == RSGISRATThresMeasure.kurtosis:
+        lowerThres = lowerThresKurt
+        upperThres = upperThresKurt
+    elif thresMeasure == RSGISRATThresMeasure.skewness:
+        lowerThres = lowerThresSkew
+        upperThres = upperThresSkew
+    elif thresMeasure == RSGISRATThresMeasure.combined:
+        lowerThres = lowerThresComb
+        upperThres = upperThresComb
+    elif thresMeasure == RSGISRATThresMeasure.auto:
+        if (abs(lowerThresKurt-lowerThresSkew) > (uq-lq)) or (abs(upperThresKurt-upperThresSkew) > (uq-lq)):
+            lowerThres = lowerThresSkew
+            upperThres = upperThresSkew
+        else:
+            lowerThres = lowerThresComb
+            upperThres = upperThresComb
+        print("No Change Data Range (auto): [" + str(lowerThres) + "," + str(upperThres) + "]")
+    else:
+        raise Exception("Don't understand metric for threshold provided must be of type ThresMeasure")
+    
+
+    if not exportPlot == None:
+        center = (bin_edges[:-1] + bin_edges[1:]) / 2
+        plt.bar(center, hist, align='center', width=binSize)
+        if showAllThreshPlot:
+            plt.vlines(lowerThresKurt, 0, numpy.max(hist), color='y', linewidth=1, label='Kurtosis Lower')
+            plt.vlines(upperThresKurt, 0, numpy.max(hist), color='y', linewidth=1, label='Kurtosis Upper')
+            plt.vlines(lowerThresSkew, 0, numpy.max(hist), color='r', linewidth=1, label='Skewness Lower')
+            plt.vlines(upperThresSkew, 0, numpy.max(hist), color='r', linewidth=1, label='Skewness Upper')
+            plt.vlines(lowerThresComb, 0, numpy.max(hist), color='g', linewidth=1, label='Combined Lower')
+            plt.vlines(upperThresComb, 0, numpy.max(hist), color='g', linewidth=1, label='Combined Upper')
+        else:
+            plt.vlines(lowerThres, 0, numpy.max(hist), color='r', linewidth=1, label='Lower Threshold')
+            plt.vlines(upperThres, 0, numpy.max(hist), color='r', linewidth=1, label='Upper Threshold')
+        plt.grid(True)
+        plt.legend(loc=0)
+        plt.savefig(exportPlot)
+        plt.close()    
+    
+    ## Apply to RAT...
+    changeFeats = numpy.where(vals < lowerThres, 1, 0)
+    changeFeats = numpy.where(vals > upperThres, 2, changeFeats)
+    
+    outChangeFeats[ID] = changeFeats
+    rat.writeColumn(ratDataset, outChangeFeatCol, outChangeFeats)
+    
+    ratDataset = None
+    return [lowerThres, upperThres]
+    
+def findChangeClumpsHistSkewKurtTestLower(inputClumps, inClassCol, classOfInterest, changeVarCol, outChangeFeatCol, noDataVals=[], thresMeasure=RSGISRATThresMeasure.auto, exportPlot=None, showAllThreshPlot=False):
+    """
+    This function identifies potential change features from just the lower (left) side of the histogram 
+    by slicing the histogram and finding an optimal skewness and kurtosis.
+    
+    Where:
+    
+    * inputClumps - input clumps file.
+    * inClassCol - The column specifiying the classes, one of which change will be found.
+    * classOfInterest - The class (as defined in inClassCol) on which changed is being found.
+    * changeVarCol - Variable to be used to find change. Expecting column name. Needs to be numeric
+    * outChangeFeatCol - the output column. Regions lower than lower threshold have value 1. Regions higher than upper threshold have value 2. No change had threshold 0.
+    * noDataVals - list of no data values to be ignored.
+    * thresMeasure - needs to be of type RSGISRATThresMeasure (default is auto)
+    * exportPlot - file name for exporting a histogram plot with thresholds annotated. No plot is create if None is passed (default is none).
+    * showAllThreshPlot - option when plotting to put all the thresholds on to the plot rather than just the one being used.
+    
+    Return:
+    * list of lower [0] and upper [1] thresholds used to define the no change region.
+    
+    """
+    # Check numpy is available
+    if not haveNumpy:
+        raise Exception("The numpy module is required for this function could not be imported\n\t" + numErr)
+    # Check gdal is available
+    if not haveGDALPy:
+        raise Exception("The GDAL python bindings are required for this function could not be imported\n\t" + gdalErr)
+    # Check rios rat is available
+    if not haveRIOSRat:
+        raise Exception("The RIOS rat tools are required for this function could not be imported\n\t" + riosRatErr)
+    # Check scipy stats is available
+    if not haveScipyStats:
+        raise Exception("The scipy stats is required for this function could not be imported\n\t" + scipystatsErr)
+    if not exportPlot == None:
+        # Check matplotlib is available
+        if not haveMatPlotLib:
+            raise Exception("The matplotlib module is required for this function could not be imported\n\t" + pltErr)
+    ## Open the image file...
+    ratDataset = gdal.Open(inputClumps, gdal.GA_Update)
+
+    ## Read in columns
+    classVals = rat.readColumn(ratDataset, inClassCol)
+    vals = rat.readColumn(ratDataset, changeVarCol)
+    outChangeFeats = numpy.zeros_like(classVals)
+    
+    ID = numpy.arange(classVals.shape[0])
+    
+    ID = ID[classVals == classOfInterest]
+    if ID.shape[0] == 0:
+        rat.writeColumn(ratDataset, outChangeFeatCol, outChangeFeats)
+        return
+    vals = vals[classVals == classOfInterest]
+    
+    ID = ID[numpy.isfinite(vals)]
+    vals = vals[numpy.isfinite(vals)]
+    
+    for noDataVal in noDataVals:
+        ID = ID[vals != noDataVal]
+        vals = vals[vals != noDataVal]
+        
+    #print(ID)
+    #print(vals)
+    
+    n = vals.shape[0]
+    lq = numpy.percentile(vals, 25)
+    uq = numpy.percentile(vals, 75)
+    iqr = uq - lq
+    binSize = 2 * iqr * n**(-1/3)
+    print("Bin Size = ", binSize)
+    numBins = int((numpy.max(vals) - numpy.min(vals))/binSize)+2
+    print("num of bins = ", numBins)
+    
+    hist, bin_edges = numpy.histogram(vals, bins=numBins)
+    
+    print(hist.shape)
+    print(bin_edges.shape)
+        
+    print("LQ = ", lq)
+    print("UQ = ", uq)
+    
+    lqNumBins = int((lq - bin_edges[0])/binSize)+1
+    
+    print("lqNumBins = ", lqNumBins)
+    
+    kurtosisVals = numpy.zeros((lqNumBins), dtype=numpy.float)
+    skewnessVals = numpy.zeros((lqNumBins), dtype=numpy.float)
+    lowBins = numpy.zeros((lqNumBins), dtype=numpy.int)
+    
+    for lowBin in range(lqNumBins):
+        #print("Bin [" + str(lowBin) + ", " + str(numBins-upBin) + "]")
+        histTmp = hist[lowBin:-1]
+        #print(histTmp)
+        #print(histTmp.shape)
+        lowBins[lowBin] = lowBin
+        
+        kurtosisVals[lowBin] = scipy.stats.kurtosis(histTmp)
+        skewnessVals[lowBin] = scipy.stats.skew(histTmp)
+            
+    
+    #print(kurtosisVals)
+    #print(skewnessVals)
+    kurtosisValsAbs = numpy.absolute(kurtosisVals)
+    skewnessValsAbs = numpy.absolute(skewnessVals)
+    print("Kurtosis Range: [" + str(numpy.min(kurtosisValsAbs)) + ", " + str(numpy.max(kurtosisValsAbs)) + "]") 
+    print("Skewness Range: [" + str(numpy.min(skewnessValsAbs)) + ", " + str(numpy.max(skewnessValsAbs)) + "]") 
+    kurtosisValsNorm = (kurtosisValsAbs-numpy.min(kurtosisValsAbs)) / (numpy.max(kurtosisValsAbs)-numpy.min(kurtosisValsAbs))
+    skewnessValsNorm = (skewnessValsAbs-numpy.min(skewnessValsAbs)) / (numpy.max(skewnessValsAbs)-numpy.min(skewnessValsAbs))
+    
+    #print("Kurtosis Norm Range: [" + str(numpy.min(kurtosisValsNorm)) + ", " + str(numpy.max(kurtosisValsNorm)) + "]") 
+    #print("Skewness Norm Range: [" + str(numpy.min(skewnessValsNorm)) + ", " + str(numpy.max(skewnessValsNorm)) + "]") 
+    
+    combined = kurtosisValsNorm + skewnessValsNorm
+    #combined = kurtosisValsAbs + skewnessValsAbs
+    #print(combined)
+    
+    minKurt = numpy.argmin(kurtosisValsAbs)
+    minSkew = numpy.argmin(skewnessValsAbs)
+    minComb = numpy.argmin(combined)
+    
+    print("Kurtosis bin index: ", minKurt)
+    print("Skewness bin index: ", minSkew)
+    print("Combined bin index: ", minComb)
+    
+    lowBinKurt = minKurt
+    lowerThresKurt = bin_edges[lowBinKurt] + (binSize/2)
+    print("Lower Threshold (Kurtosis): " + str(lowerThresKurt))
+    
+    lowBinSkew = minSkew
+    lowerThresSkew = bin_edges[lowBinSkew] + (binSize/2)
+    print("Lower Threshold (Skewness): " + str(lowerThresSkew))
+        
+    lowBinComb = minComb
+    lowerThresComb = bin_edges[lowBinComb] + (binSize/2)
+    print("Lower Threshold (Combined): " + str(lowerThresComb))
+    
+    lowerThres = 0.0
+    upperThres = numpy.max(vals)
+    if thresMeasure == RSGISRATThresMeasure.kurtosis:
+        lowerThres = lowerThresKurt
+    elif thresMeasure == RSGISRATThresMeasure.skewness:
+        lowerThres = lowerThresSkew
+    elif thresMeasure == RSGISRATThresMeasure.combined:
+        lowerThres = lowerThresComb
+    elif thresMeasure == RSGISRATThresMeasure.auto:
+        if abs(lowerThresKurt-lowerThresSkew) > (uq-lq):
+            lowerThres = lowerThresSkew
+        else:
+            lowerThres = lowerThresComb        
+        print("Lower Threshold (auto): " + str(lowerThres))
+    else:
+        raise Exception("Don't understand metric for threshold provided must be of type ThresMeasure")
+    
+    if not exportPlot == None:
+        center = (bin_edges[:-1] + bin_edges[1:]) / 2
+        plt.bar(center, hist, align='center', width=binSize)
+        if showAllThreshPlot:
+            plt.vlines(lowerThresKurt, 0, numpy.max(hist), color='y', linewidth=1, label='Kurtosis Lower')
+            plt.vlines(lowerThresSkew, 0, numpy.max(hist), color='r', linewidth=1, label='Skewness Lower')
+            plt.vlines(lowerThresComb, 0, numpy.max(hist), color='g', linewidth=1, label='Combined Lower')
+        else:
+            plt.vlines(lowerThres, 0, numpy.max(hist), color='r', linewidth=1, label='Lower Threshold')
+        plt.grid(True)
+        plt.legend(loc=0)
+        plt.savefig(exportPlot)
+        plt.close()
+    
+    ## Apply to RAT...
+    changeFeats = numpy.where(vals < lowerThres, 1, 0)
+    
+    outChangeFeats[ID] = changeFeats
+    rat.writeColumn(ratDataset, outChangeFeatCol, outChangeFeats)
+    
+    ratDataset = None
+    return [lowerThres, upperThres]
+
+
+def findChangeClumpsHistSkewKurtTestUpper(inputClumps, inClassCol, classOfInterest, changeVarCol, outChangeFeatCol, noDataVals=[], thresMeasure=RSGISRATThresMeasure.auto, exportPlot=None, showAllThreshPlot=False):
+    """
+    This function identifies potential change features from just the upper (right) side of the histogram 
+    by slicing the histogram and finding an optimal skewness and kurtosis.
+    
+    Where:
+    
+    * inputClumps - input clumps file.
+    * inClassCol - The column specifiying the classes, one of which change will be found.
+    * classOfInterest - The class (as defined in inClassCol) on which changed is being found.
+    * changeVarCol - Variable to be used to find change. Expecting column name. Needs to be numeric
+    * outChangeFeatCol - the output column. Regions lower than lower threshold have value 1. Regions higher than upper threshold have value 2. No change had threshold 0.
+    * noDataVals - list of no data values to be ignored.
+    * thresMeasure - needs to be of type RSGISRATThresMeasure (default is auto)
+    * exportPlot - file name for exporting a histogram plot with thresholds annotated. No plot is create if None is passed (default is none).
+    * showAllThreshPlot - option when plotting to put all the thresholds on to the plot rather than just the one being used.
+    
+    Return:
+    * list of lower [0] and upper [1] thresholds used to define the no change region.
+    
+    """
+    # Check numpy is available
+    if not haveNumpy:
+        raise Exception("The numpy module is required for this function could not be imported\n\t" + numErr)
+    # Check gdal is available
+    if not haveGDALPy:
+        raise Exception("The GDAL python bindings are required for this function could not be imported\n\t" + gdalErr)
+    # Check rios rat is available
+    if not haveRIOSRat:
+        raise Exception("The RIOS rat tools are required for this function could not be imported\n\t" + riosRatErr)
+    # Check scipy stats is available
+    if not haveScipyStats:
+        raise Exception("The scipy stats is required for this function could not be imported\n\t" + scipystatsErr)
+    if not exportPlot == None:
+        # Check matplotlib is available
+        if not haveMatPlotLib:
+            raise Exception("The matplotlib module is required for this function could not be imported\n\t" + pltErr)
+    ## Open the image file...
+    ratDataset = gdal.Open(inputClumps, gdal.GA_Update)
+
+    ## Read in columns
+    classVals = rat.readColumn(ratDataset, inClassCol)
+    vals = rat.readColumn(ratDataset, changeVarCol)
+    outChangeFeats = numpy.zeros_like(classVals)
+    
+    ID = numpy.arange(classVals.shape[0])
+        
+    ID = ID[classVals == classOfInterest]
+    if ID.shape[0] == 0:
+        rat.writeColumn(ratDataset, outChangeFeatCol, outChangeFeats)
+        return
+    vals = vals[classVals == classOfInterest]
+    
+    ID = ID[numpy.isfinite(vals)]
+    vals = vals[numpy.isfinite(vals)]
+    
+    for noDataVal in noDataVals:
+        ID = ID[vals != noDataVal]
+        vals = vals[vals != noDataVal]
+        
+    #print(ID)
+    #print(vals)
+    
+    n = vals.shape[0]
+    lq = numpy.percentile(vals, 25)
+    uq = numpy.percentile(vals, 75)
+    iqr = uq - lq
+    binSize = 2 * iqr * n**(-1/3)
+    print("Bin Size = ", binSize)
+    numBins = int((numpy.max(vals) - numpy.min(vals))/binSize)+2
+    print("num of bins = ", numBins)
+    
+    hist, bin_edges = numpy.histogram(vals, bins=numBins)
+    
+    print(hist.shape)
+    print(bin_edges.shape)
+        
+    print("LQ = ", lq)
+    print("UQ = ", uq)
+    
+    uqNumBins = int((bin_edges[-1]-uq)/binSize)+1
+    
+    print("uqNumBins = ", uqNumBins)
+    
+    kurtosisVals = numpy.zeros((uqNumBins), dtype=numpy.float)
+    skewnessVals = numpy.zeros((uqNumBins), dtype=numpy.float)
+    upBins = numpy.zeros((uqNumBins), dtype=numpy.int)
+    
+    for upBin in range(uqNumBins):
+        #print("Bin [" + str(lowBin) + ", " + str(numBins-upBin) + "]")
+        histTmp = hist[0:(numBins-upBin)]
+        #print(histTmp)
+        #print(histTmp.shape)
+        upBins[upBin] = numBins-upBin
+        
+        kurtosisVals[upBin] = scipy.stats.kurtosis(histTmp)
+        skewnessVals[upBin] = scipy.stats.skew(histTmp)
+        
+    
+    #print(kurtosisVals)
+    #print(skewnessVals)
+    kurtosisValsAbs = numpy.absolute(kurtosisVals)
+    skewnessValsAbs = numpy.absolute(skewnessVals)
+    print("Kurtosis Range: [" + str(numpy.min(kurtosisValsAbs)) + ", " + str(numpy.max(kurtosisValsAbs)) + "]") 
+    print("Skewness Range: [" + str(numpy.min(skewnessValsAbs)) + ", " + str(numpy.max(skewnessValsAbs)) + "]") 
+    kurtosisValsNorm = (kurtosisValsAbs-numpy.min(kurtosisValsAbs)) / (numpy.max(kurtosisValsAbs)-numpy.min(kurtosisValsAbs))
+    skewnessValsNorm = (skewnessValsAbs-numpy.min(skewnessValsAbs)) / (numpy.max(skewnessValsAbs)-numpy.min(skewnessValsAbs))
+    
+    #print("Kurtosis Norm Range: [" + str(numpy.min(kurtosisValsNorm)) + ", " + str(numpy.max(kurtosisValsNorm)) + "]") 
+    #print("Skewness Norm Range: [" + str(numpy.min(skewnessValsNorm)) + ", " + str(numpy.max(skewnessValsNorm)) + "]") 
+    
+    combined = kurtosisValsNorm + skewnessValsNorm
+    #combined = kurtosisValsAbs + skewnessValsAbs
+    #print(combined)
+    
+    minKurt = numpy.argmin(kurtosisValsAbs)
+    minSkew = numpy.argmin(skewnessValsAbs)
+    minComb = numpy.argmin(combined)
+    
+    print("Kurtosis bin index: ", minKurt)
+    print("Skewness bin index: ", minSkew)
+    print("Combined bin index: ", minComb)
+    
+    upBinKurt = numBins-minKurt
+    upperThresKurt = bin_edges[upBinKurt] + (binSize/2)
+    print("Upper Threshold (Kurtosis): " + str(upperThresKurt))
+    
+    upBinSkew = numBins-minSkew
+    upperThresSkew = bin_edges[upBinSkew] + (binSize/2)
+    print("Upper Threshold (Skewness): " + str(upperThresSkew))
+        
+    upBinComb = numBins-minComb
+    upperThresComb = bin_edges[upBinComb] + (binSize/2)
+    print("Upper Threshold (Combined): " + str(upperThresComb))
+    
+    lowerThres = numpy.min(vals)
+    upperThres = 0.0
+    if thresMeasure == RSGISRATThresMeasure.kurtosis:
+        upperThres = upperThresKurt
+    elif thresMeasure == RSGISRATThresMeasure.skewness:
+        upperThres = upperThresSkew
+    elif thresMeasure == RSGISRATThresMeasure.combined:
+        upperThres = upperThresComb
+    elif thresMeasure == RSGISRATThresMeasure.auto:
+        if abs(upperThresKurt-upperThresSkew) > (uq-lq):
+            upperThres = upperThresSkew
+        else:
+            upperThres = upperThresComb
+        print("Upper Threshold (auto): " + str(upperThres))
+    else:
+        raise Exception("Don't understand metric for threshold provided must be of type ThresMeasure")
+    
+    if not exportPlot == None:
+        center = (bin_edges[:-1] + bin_edges[1:]) / 2
+        plt.bar(center, hist, align='center', width=binSize)
+        if showAllThreshPlot:
+            plt.vlines(upperThresKurt, 0, numpy.max(hist), color='y', linewidth=1, label='Kurtosis Upper')
+            plt.vlines(upperThresSkew, 0, numpy.max(hist), color='r', linewidth=1, label='Skewness Upper')
+            plt.vlines(upperThresComb, 0, numpy.max(hist), color='g', linewidth=1, label='Combined Upper')
+        else:
+            plt.vlines(upperThres, 0, numpy.max(hist), color='r', linewidth=1, label='Upper Threshold')
+        plt.grid(True)
+        plt.legend(loc=0)
+        plt.savefig(exportPlot)
+        plt.close()
+        
+    ## Apply to RAT...
+    changeFeats = numpy.where(vals > upperThres, 1, 0)
+    
+    outChangeFeats[ID] = changeFeats
+    rat.writeColumn(ratDataset, outChangeFeatCol, outChangeFeats)
+    
+    ratDataset = None
+    return [lowerThres, upperThres]
+
+
+class RSGISRATChangeVarInfo:
+    """
+    A class to store the change variable information required for some of the change functions.
+    """
+    def __init__(self, changeVarCol="", outChangeFeatCol="", noDataVals=[], thresMeasure=RSGISRATThresMeasure.auto, thresDirection=RSGISRATThresDirection.lower, exportPlot=None, showAllThreshPlot=False, lowerThreshold=0.0, upperThreshold=0.0):
+        self.changeVarCol = changeVarCol
+        self.outChangeFeatCol = outChangeFeatCol
+        self.noDataVals = noDataVals
+        self.thresMeasure = thresMeasure
+        self.thresDirection = thresDirection
+        self.exportPlot = exportPlot
+        self.showAllThreshPlot = showAllThreshPlot
+        self.lowerThreshold = lowerThreshold
+        self.upperThreshold = upperThreshold
+
+def findChangeClumpsHistSkewKurtTestVoteMultiVars(inputClumps, inClassCol, classOfInterest, outChangeFeatCol, vars=[]):
+    """
+    A function to call one of the findChangeClumpsHistSkewKurtTest functions for multiple 
+    variables and then combine together by voting to find change features.
+    
+    Where:
+    * inputClumps - input clumps file.
+    * inClassCol - The column specifiying the classes, one of which change will be found.
+    * classOfInterest - The class (as defined in inClassCol) on which changed is being found.
+    * outChangeFeatCol - the output column with the vote scores.
+    * vars - a list of RSGISRATChangeVarInfo objects used to specify the variables and function to be called.
+    
+    """
+    # Check numpy is available
+    if not haveNumpy:
+        raise Exception("The numpy module is required for this function could not be imported\n\t" + numErr)
+    # Check gdal is available
+    if not haveGDALPy:
+        raise Exception("The GDAL python bindings are required for this function could not be imported\n\t" + gdalErr)
+    # Check rios rat is available
+    if not haveRIOSRat:
+        raise Exception("The RIOS rat tools are required for this function could not be imported\n\t" + riosRatErr)
+    if len(vars) == 0:
+        raise Exception("Need to provide a list of variables with parameters...")
+    for var in vars:
+        print(var.changeVarCol)
+        if var.thresDirection == RSGISRATThresDirection.lower:
+            outThres = findChangeClumpsHistSkewKurtTestLower(inputClumps, inClassCol, classOfInterest, var.changeVarCol, var.outChangeFeatCol, var.noDataVals, var.thresMeasure, var.exportPlot, var.showAllThreshPlot)
+            var.lowerThreshold = outThres[0]
+            var.upperThreshold = outThres[1]
+        elif var.thresDirection == RSGISRATThresDirection.upper:
+            outThres = findChangeClumpsHistSkewKurtTestUpper(inputClumps, inClassCol, classOfInterest, var.changeVarCol, var.outChangeFeatCol, var.noDataVals, var.thresMeasure, var.exportPlot, var.showAllThreshPlot)
+            var.lowerThreshold = outThres[0]
+            var.upperThreshold = outThres[1]
+        elif var.thresDirection == RSGISRATThresDirection.lowerupper:
+            outThres = findChangeClumpsHistSkewKurtTest(inputClumps, inClassCol, classOfInterest, var.changeVarCol, var.outChangeFeatCol, var.noDataVals, var.thresMeasure, var.exportPlot, var.showAllThreshPlot)
+            var.lowerThreshold = outThres[0]
+            var.upperThreshold = outThres[1]
+        else:
+            raise Exception("Direction must be of type RSGISRATThresDirection and only lower, upper and lowerupper are supported")
+        
+    ratDataset = gdal.Open(inputClumps, gdal.GA_Update)
+    classVals = rat.readColumn(ratDataset, inClassCol)
+    changeVote = numpy.zeros_like(classVals, dtype=numpy.int)
+
+    for var in vars:
+        changeCol = rat.readColumn(ratDataset, var.outChangeFeatCol)
+        if var.thresDirection == RSGISRATThresDirection.lowerupper:
+            changeCol[changeCol == 2] = 1
+        changeVote = changeVote + changeCol
+    
+    rat.writeColumn(ratDataset, outChangeFeatCol, changeVote)
+    ratDataset = None
+
+def findClumpsWithinExistingThresholds(inputClumps, inClassCol, classOfInterest, outFeatsCol, vars=[]):
+    """
+    A function to use the thresholds stored in the RSGISRATChangeVarInfo objects (var) 
+    and populated from the findChangeClumpsHistSkewKurtTest functions to assess another class
+    creating a binary column as to whether a feature is within the threshold or now. Where multiple
+    variables (i.e., len(var) > 1) then variables are combined with an and operation.
+    
+    Where:
+    * inputClumps - input clumps file.
+    * inClassCol - The column specifiying the classes, one of which change will be found.
+    * classOfInterest - The class (as defined in inClassCol) on which changed is being found.
+    * outFeatsCol - the output binary column specifying whether a feature is within the thresholds.
+    * vars - a list of RSGISRATChangeVarInfo objects used to specify the variables and function to be called.
+    
+    """
+    # Check numpy is available
+    if not haveNumpy:
+        raise Exception("The numpy module is required for this function could not be imported\n\t" + numErr)
+    # Check gdal is available
+    if not haveGDALPy:
+        raise Exception("The GDAL python bindings are required for this function could not be imported\n\t" + gdalErr)
+    # Check rios rat is available
+    if not haveRIOSRat:
+        raise Exception("The RIOS rat tools are required for this function could not be imported\n\t" + riosRatErr)
+    if len(vars) == 0:
+        raise Exception("Need to provide a list of variables with parameters...")
+        
+    ## Open the image file...
+    ratDataset = gdal.Open(inputClumps, gdal.GA_Update)
+
+    ## Read in columns
+    classVals = rat.readColumn(ratDataset, inClassCol)
+    outFeats = numpy.zeros_like(classVals)
+    
+    first = True
+    for var in vars:
+        print(var.changeVarCol)
+        if first:
+            varVals = rat.readColumn(ratDataset, var.changeVarCol)
+            outFeats = numpy.where( (varVals > var.lowerThreshold) & (varVals < var.upperThreshold) & (classVals == classOfInterest), 1, outFeats)
+            first = False
+        else:
+            varVals = rat.readColumn(ratDataset, var.changeVarCol)
+            outFeats = numpy.where( (varVals > var.lowerThreshold) & (varVals < var.upperThreshold) & (classVals == classOfInterest), outFeats, 0)
+        
+    rat.writeColumn(ratDataset, outFeatsCol, outFeats)
+    ratDataset = None
+
+
