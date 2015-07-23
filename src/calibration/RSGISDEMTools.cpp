@@ -168,7 +168,7 @@ namespace rsgis{namespace calib{
             }
             else if((bandValues[0] >= 315) & (bandValues[0] <= 360))
             {
-                output[0] = 7;
+                output[0] = 8;
             }
             else
             {
