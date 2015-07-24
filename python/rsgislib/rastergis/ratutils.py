@@ -81,6 +81,14 @@ try:
 except ImportError as riosRatErr:
     haveRIOSRat = False
 
+haveSKLearnPCA = True
+try:
+    from sklearn.decomposition import PCA
+except ImportError as sklearnPCAErr:
+    haveSKLearnPCA = False
+
+
+
 
 class RSGISRATThresMeasure(Enum):
     kurtosis = 1
@@ -334,7 +342,7 @@ def findChangeClumpsHistSkewKurtTest(inputClumps, inClassCol, classOfInterest, c
     * inputClumps - input clumps file.
     * inClassCol - The column specifiying the classes, one of which change will be found.
     * classOfInterest - The class (as defined in inClassCol) on which changed is being found.
-    * changeVarCol - Variable to be used to find change. Expecting column name. Needs to be numeric
+    * changeVarCol - Variable(s) to be used to find change. Expecting column name. Needs to be numeric. If a list of column names is provided then they are combined using PCA and the first PC is used for the change process.
     * outChangeFeatCol - the output column. Regions lower than lower threshold have value 1. Regions higher than upper threshold have value 2. No change had threshold 0.
     * noDataVals - list of no data values to be ignored.
     * thresMeasure - needs to be of type RSGISRATThresMeasure (default is auto)
@@ -361,29 +369,59 @@ def findChangeClumpsHistSkewKurtTest(inputClumps, inClassCol, classOfInterest, c
         # Check matplotlib is available
         if not haveMatPlotLib:
             raise Exception("The matplotlib module is required for this function could not be imported\n\t" + pltErr)
+    if type(changeVarCol) is list:
+        if not haveSKLearnPCA:
+            raise Exception("The scikit learn library PCA module is required when a list of column variables is given\n\t" + sklearnPCAErr)
 
     ## Open the image file...
     ratDataset = gdal.Open(inputClumps, gdal.GA_Update)
 
     ## Read in columns
     classVals = rat.readColumn(ratDataset, inClassCol)
-    vals = rat.readColumn(ratDataset, changeVarCol)
     outChangeFeats = numpy.zeros_like(classVals)
-    
     ID = numpy.arange(classVals.shape[0])
     
-    ID = ID[classVals == classOfInterest]
-    if ID.shape[0] == 0:
-        rat.writeColumn(ratDataset, outChangeFeatCol, outChangeFeats)
-        return
-    vals = vals[classVals == classOfInterest]
+    vals = None
+    if type(changeVarCol) is list:
+        numVars = len(changeVarCol)
+        numRows = classVals.shape[0]
+        varVals = numpy.zeros((numVars,numRows), dtype=numpy.float)
+        i = 0
+        for varCol in changeVarCol:
+            colVals = rat.readColumn(ratDataset, varCol)
+            varVals[i] = colVals
+            i = i + 1
+        varVals = varVals.transpose()
+        
+        ID = ID[classVals == classOfInterest]
+        varVals = varVals[(classVals == classOfInterest)]
+        
+        ID = ID[numpy.isfinite(varVals).all(axis=1)]
+        varVals = varVals[numpy.isfinite(varVals).all(axis=1)]
+        
+        for noDataVal in noDataVals:
+            ID = ID[(varVals != noDataVal).all(axis=1)]
+            varVals = varVals[(varVals != noDataVal).all(axis=1)]
+        
+        pca = PCA(n_components=1)
+        fittedPCA = pca.fit(varVals)
     
-    ID = ID[numpy.isfinite(vals)]
-    vals = vals[numpy.isfinite(vals)]
+        vals = fittedPCA.transform(varVals)[:,0]
+    else:
+        vals = rat.readColumn(ratDataset, changeVarCol)        
     
-    for noDataVal in noDataVals:
-        ID = ID[vals != noDataVal]
-        vals = vals[vals != noDataVal]
+        ID = ID[classVals == classOfInterest]
+        if ID.shape[0] == 0:
+            rat.writeColumn(ratDataset, outChangeFeatCol, outChangeFeats)
+            return
+        vals = vals[classVals == classOfInterest]
+        
+        ID = ID[numpy.isfinite(vals)]
+        vals = vals[numpy.isfinite(vals)]
+        
+        for noDataVal in noDataVals:
+            ID = ID[vals != noDataVal]
+            vals = vals[vals != noDataVal]
     
     n = vals.shape[0]
     lq = numpy.percentile(vals, 25)
@@ -529,7 +567,7 @@ def findChangeClumpsHistSkewKurtTestLower(inputClumps, inClassCol, classOfIntere
     * inputClumps - input clumps file.
     * inClassCol - The column specifiying the classes, one of which change will be found.
     * classOfInterest - The class (as defined in inClassCol) on which changed is being found.
-    * changeVarCol - Variable to be used to find change. Expecting column name. Needs to be numeric
+    * changeVarCol - changeVarCol - Variable(s) to be used to find change. Expecting column name. Needs to be numeric. If a list of column names is provided then they are combined using PCA and the first PC is used for the change process.
     * outChangeFeatCol - the output column. Regions lower than lower threshold have value 1. Regions higher than upper threshold have value 2. No change had threshold 0.
     * noDataVals - list of no data values to be ignored.
     * thresMeasure - needs to be of type RSGISRATThresMeasure (default is auto)
@@ -556,28 +594,59 @@ def findChangeClumpsHistSkewKurtTestLower(inputClumps, inClassCol, classOfIntere
         # Check matplotlib is available
         if not haveMatPlotLib:
             raise Exception("The matplotlib module is required for this function could not be imported\n\t" + pltErr)
+    if type(changeVarCol) is list:
+        if not haveSKLearnPCA:
+            raise Exception("The scikit learn library PCA module is required when a list of column variables is given\n\t" + sklearnPCAErr)
     ## Open the image file...
     ratDataset = gdal.Open(inputClumps, gdal.GA_Update)
 
     ## Read in columns
     classVals = rat.readColumn(ratDataset, inClassCol)
-    vals = rat.readColumn(ratDataset, changeVarCol)
     outChangeFeats = numpy.zeros_like(classVals)
-    
     ID = numpy.arange(classVals.shape[0])
     
-    ID = ID[classVals == classOfInterest]
-    if ID.shape[0] == 0:
-        rat.writeColumn(ratDataset, outChangeFeatCol, outChangeFeats)
-        return
-    vals = vals[classVals == classOfInterest]
+    vals = None
+    if type(changeVarCol) is list:
+        numVars = len(changeVarCol)
+        numRows = classVals.shape[0]
+        varVals = numpy.zeros((numVars,numRows), dtype=numpy.float)
+        i = 0
+        for varCol in changeVarCol:
+            colVals = rat.readColumn(ratDataset, varCol)
+            varVals[i] = colVals
+            i = i + 1
+        varVals = varVals.transpose()
+        
+        ID = ID[classVals == classOfInterest]
+        varVals = varVals[(classVals == classOfInterest)]
+        
+        ID = ID[numpy.isfinite(varVals).all(axis=1)]
+        varVals = varVals[numpy.isfinite(varVals).all(axis=1)]
+        
+        for noDataVal in noDataVals:
+            ID = ID[(varVals != noDataVal).all(axis=1)]
+            varVals = varVals[(varVals != noDataVal).all(axis=1)]
+        
+        pca = PCA(n_components=1)
+        fittedPCA = pca.fit(varVals)
     
-    ID = ID[numpy.isfinite(vals)]
-    vals = vals[numpy.isfinite(vals)]
+        vals = fittedPCA.transform(varVals)[:,0]
+    else:
+        vals = rat.readColumn(ratDataset, changeVarCol)        
     
-    for noDataVal in noDataVals:
-        ID = ID[vals != noDataVal]
-        vals = vals[vals != noDataVal]
+        ID = ID[classVals == classOfInterest]
+        if ID.shape[0] == 0:
+            rat.writeColumn(ratDataset, outChangeFeatCol, outChangeFeats)
+            return
+        vals = vals[classVals == classOfInterest]
+        
+        ID = ID[numpy.isfinite(vals)]
+        vals = vals[numpy.isfinite(vals)]
+        
+        for noDataVal in noDataVals:
+            ID = ID[vals != noDataVal]
+            vals = vals[vals != noDataVal]
+
         
     #print(ID)
     #print(vals)
@@ -705,7 +774,7 @@ def findChangeClumpsHistSkewKurtTestUpper(inputClumps, inClassCol, classOfIntere
     * inputClumps - input clumps file.
     * inClassCol - The column specifiying the classes, one of which change will be found.
     * classOfInterest - The class (as defined in inClassCol) on which changed is being found.
-    * changeVarCol - Variable to be used to find change. Expecting column name. Needs to be numeric
+    * changeVarCol - changeVarCol - Variable(s) to be used to find change. Expecting column name. Needs to be numeric. If a list of column names is provided then they are combined using PCA and the first PC is used for the change process.
     * outChangeFeatCol - the output column. Regions lower than lower threshold have value 1. Regions higher than upper threshold have value 2. No change had threshold 0.
     * noDataVals - list of no data values to be ignored.
     * thresMeasure - needs to be of type RSGISRATThresMeasure (default is auto)
@@ -732,28 +801,58 @@ def findChangeClumpsHistSkewKurtTestUpper(inputClumps, inClassCol, classOfIntere
         # Check matplotlib is available
         if not haveMatPlotLib:
             raise Exception("The matplotlib module is required for this function could not be imported\n\t" + pltErr)
+    if type(changeVarCol) is list:
+        if not haveSKLearnPCA:
+            raise Exception("The scikit learn library PCA module is required when a list of column variables is given\n\t" + sklearnPCAErr)
     ## Open the image file...
     ratDataset = gdal.Open(inputClumps, gdal.GA_Update)
 
     ## Read in columns
     classVals = rat.readColumn(ratDataset, inClassCol)
-    vals = rat.readColumn(ratDataset, changeVarCol)
     outChangeFeats = numpy.zeros_like(classVals)
-    
     ID = numpy.arange(classVals.shape[0])
+    
+    vals = None
+    if type(changeVarCol) is list:
+        numVars = len(changeVarCol)
+        numRows = classVals.shape[0]
+        varVals = numpy.zeros((numVars,numRows), dtype=numpy.float)
+        i = 0
+        for varCol in changeVarCol:
+            colVals = rat.readColumn(ratDataset, varCol)
+            varVals[i] = colVals
+            i = i + 1
+        varVals = varVals.transpose()
         
-    ID = ID[classVals == classOfInterest]
-    if ID.shape[0] == 0:
-        rat.writeColumn(ratDataset, outChangeFeatCol, outChangeFeats)
-        return
-    vals = vals[classVals == classOfInterest]
+        ID = ID[classVals == classOfInterest]
+        varVals = varVals[(classVals == classOfInterest)]
+        
+        ID = ID[numpy.isfinite(varVals).all(axis=1)]
+        varVals = varVals[numpy.isfinite(varVals).all(axis=1)]
+        
+        for noDataVal in noDataVals:
+            ID = ID[(varVals != noDataVal).all(axis=1)]
+            varVals = varVals[(varVals != noDataVal).all(axis=1)]
+        
+        pca = PCA(n_components=1)
+        fittedPCA = pca.fit(varVals)
     
-    ID = ID[numpy.isfinite(vals)]
-    vals = vals[numpy.isfinite(vals)]
+        vals = fittedPCA.transform(varVals)[:,0]
+    else:
+        vals = rat.readColumn(ratDataset, changeVarCol)        
     
-    for noDataVal in noDataVals:
-        ID = ID[vals != noDataVal]
-        vals = vals[vals != noDataVal]
+        ID = ID[classVals == classOfInterest]
+        if ID.shape[0] == 0:
+            rat.writeColumn(ratDataset, outChangeFeatCol, outChangeFeats)
+            return
+        vals = vals[classVals == classOfInterest]
+        
+        ID = ID[numpy.isfinite(vals)]
+        vals = vals[numpy.isfinite(vals)]
+        
+        for noDataVal in noDataVals:
+            ID = ID[vals != noDataVal]
+            vals = vals[vals != noDataVal]
         
     #print(ID)
     #print(vals)
