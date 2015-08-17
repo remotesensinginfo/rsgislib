@@ -98,6 +98,58 @@ static PyObject *Classification_Colour3Bands(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
+static PyObject *Classification_GenRandomAccuracyPts(PyObject *self, PyObject *args)
+{
+    const char *pszInputImage, *pszOutputShp, *pszClassImgCol, *pszClassImgVecCol, *pszClassRefVecCol;
+    int numPts;
+    int force = false;
+    int seed = 10;
+    
+    if( !PyArg_ParseTuple(args, "sssssi|ii:generateRandomAccuracyPts", &pszInputImage, &pszOutputShp, &pszClassImgCol, &pszClassImgVecCol, &pszClassRefVecCol, &numPts, &seed, &force))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeGenerateRandomAccuracyPts(std::string(pszInputImage), std::string(pszOutputShp), std::string(pszClassImgCol), std::string(pszClassImgVecCol), std::string(pszClassRefVecCol), numPts, seed, force);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+static PyObject *Classification_GenStratifiedRandomAccuracyPts(PyObject *self, PyObject *args)
+{
+    const char *pszInputImage, *pszOutputShp, *pszClassImgCol, *pszClassImgVecCol, *pszClassRefVecCol;
+    int numPts;
+    int force = false;
+    int seed = 10;
+    
+    if( !PyArg_ParseTuple(args, "sssssi|ii:generateStratifiedRandomAccuracyPts", &pszInputImage, &pszOutputShp, &pszClassImgCol, &pszClassImgVecCol, &pszClassRefVecCol, &numPts, &seed, &force))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeGenerateStratifiedRandomAccuracyPts(std::string(pszInputImage), std::string(pszOutputShp), std::string(pszClassImgCol), std::string(pszClassImgVecCol), std::string(pszClassRefVecCol), numPts, seed, force);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+
+
 
 // Our list of functions in this module
 static PyMethodDef ClassificationMethods[] = {
@@ -122,6 +174,38 @@ static PyMethodDef ClassificationMethods[] = {
 "* inputImage is a string containing the name and path of the input file with attribute table.\n"
 "* outputImage is a string containing the name and path of the output file.\n"
 "* gdalformat is a string with the output image format for the GDAL driver.\n"},
+    
+{"generateRandomAccuracyPts", Classification_GenRandomAccuracyPts, METH_VARARGS,
+"classification.generateRandomAccuracyPts(inputImage, outputShp, classImgCol, classImgVecCol, classRefVecCol, numPts, seed, force)\n"
+"Generates a set of random points for accuracy assessment.\n"
+"\n"
+"Where:\n"
+"\n"
+"* inputImage is a string containing the name and path of the input image with attribute table.\n"
+"* outputShp is a string containing the name and path of the output shapefile.\n"
+"* classImgCol is a string speciyfing the name of the column in the image file containing the class names.\n"
+"* classImgVecCol is a string specifiying the output column in the shapefile for the classified class names.\n"
+"* classRefVecCol is a string specifiying an output column in the shapefile which can be used in the accuracy assessment for the reference data.\n"
+"* numPts is an int specifying the total number of points which should be created.\n"
+"* seed is an int specifying the seed for the random number generator. (Optional: Default 10)\n"
+"* force is a bool, specifying whether to force removal of the output vector if it exists. (Optional: Default False)\n"
+},
+
+{"generateStratifiedRandomAccuracyPts", Classification_GenStratifiedRandomAccuracyPts, METH_VARARGS,
+"classification.generateStratifiedRandomAccuracyPts(inputImage, outputShp, classImgCol, classImgVecCol, classRefVecCol, numPts, seed, force)\n"
+"Generates a set of stratified random points for accuracy assessment.\n"
+"\n"
+"Where:\n"
+"\n"
+"* inputImage is a string containing the name and path of the input image with attribute table.\n"
+"* outputShp is a string containing the name and path of the output shapefile.\n"
+"* classImgCol is a string speciyfing the name of the column in the image file containing the class names.\n"
+"* classImgVecCol is a string specifiying the output column in the shapefile for the classified class names.\n"
+"* classRefVecCol is a string specifiying an output column in the shapefile which can be used in the accuracy assessment for the reference data.\n"
+"* numPts is an int specifying the number of points for each class which should be created.\n"
+"* seed is an int specifying the seed for the random number generator. (Optional: Default 10)\n"
+"* force is a bool, specifying whether to force removal of the output vector if it exists. (Optional: Default False)\n"
+},
 
     {NULL}        /* Sentinel */
 };

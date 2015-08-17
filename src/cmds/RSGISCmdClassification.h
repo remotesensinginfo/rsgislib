@@ -39,6 +39,16 @@ namespace rsgis{ namespace cmds {
     /** A function to generate a 3 band colour image from the colour table */
     DllExport void executeGenerate3BandFromColourTable(std::string clumpsImage, std::string outputImage, std::string outImageFormat)throw(RSGISCmdException);
     
+    /** A function to generate random points which can be used to assess the accuracy of a map */
+    DllExport void executeGenerateRandomAccuracyPts(std::string classImage, std::string outputShp, std::string classImgCol, std::string classImgVecCol, std::string classRefVecCol, unsigned int numPts, unsigned int seed, bool force)throw(RSGISCmdException);
+    
+    /** A function to generate stratified random points which can be used to assess the accuracy of a map */
+    DllExport void executeGenerateStratifiedRandomAccuracyPts(std::string classImage, std::string outputShp, std::string classImgCol, std::string classImgVecCol, std::string classRefVecCol, unsigned int numPtsPerClass, unsigned int seed, bool force)throw(RSGISCmdException);
+    
+    /** A function to populate a set of points with the class information to assess the accuracy of a map */
+    DllExport void executePopClassInfoAccuracyPts(std::string classImage, std::string shpFile, std::string classImgCol, std::string classImgVecCol, std::string classRefVecCol)throw(RSGISCmdException);
+
+    
 }}
 #endif
 

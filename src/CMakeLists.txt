@@ -74,6 +74,7 @@ set(LIB_CLASSIFY_H
 	${RSGIS_SRC_CLASSIFY_DIR}/RSGISKMeanImageClassifier.h 
 	${RSGIS_SRC_CLASSIFY_DIR}/RSGISISODATAImageClassifier.h
 	${RSGIS_SRC_CLASSIFY_DIR}/RSGISRATClassificationUtils.h
+	${RSGIS_SRC_CLASSIFY_DIR}/RSGISGenAccuracyPoints.h
 	)
 	
 set(LIB_CLASSIFY_CPP
@@ -97,6 +98,8 @@ set(LIB_CLASSIFY_CPP
 	${RSGIS_SRC_CLASSIFY_DIR}/RSGISISODATAImageClassifier.h
 	${RSGIS_SRC_CLASSIFY_DIR}/RSGISRATClassificationUtils.cpp
 	${RSGIS_SRC_CLASSIFY_DIR}/RSGISRATClassificationUtils.h
+    ${RSGIS_SRC_CLASSIFY_DIR}/RSGISGenAccuracyPoints.cpp
+	${RSGIS_SRC_CLASSIFY_DIR}/RSGISGenAccuracyPoints.h
 	)
 ###############################################################################
 
@@ -416,7 +419,6 @@ set(LIB_IMG_H
 	${RSGIS_SRC_IMG_DIR}/RSGISRelabelPixelValuesFromLUT.h
 	${RSGIS_SRC_IMG_DIR}/RSGISPopWithStats.h
 	${RSGIS_SRC_IMG_DIR}/RSGISGenHistogram.h
-	${RSGIS_SRC_IMG_DIR}/RSGISGenAccuracyPoints.h
 	${RSGIS_SRC_IMG_DIR}/RSGISSampleImage.h
 	${RSGIS_SRC_IMG_DIR}/RSGISImageWindowStats.h
 	${RSGIS_SRC_IMG_DIR}/RSGISFitFunction2Pxls.h
@@ -552,8 +554,6 @@ set(LIB_IMG_CPP
 	${RSGIS_SRC_IMG_DIR}/RSGISPopWithStats.h
 	${RSGIS_SRC_IMG_DIR}/RSGISGenHistogram.cpp
 	${RSGIS_SRC_IMG_DIR}/RSGISGenHistogram.h
-	${RSGIS_SRC_IMG_DIR}/RSGISGenAccuracyPoints.cpp
-	${RSGIS_SRC_IMG_DIR}/RSGISGenAccuracyPoints.h
 	${RSGIS_SRC_IMG_DIR}/RSGISSampleImage.cpp
 	${RSGIS_SRC_IMG_DIR}/RSGISSampleImage.h
 	${RSGIS_SRC_IMG_DIR}/RSGISImageWindowStats.cpp

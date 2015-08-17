@@ -68,7 +68,7 @@
 #include "img/RSGISImageComposite.h"
 #include "img/RSGISRelabelPixelValuesFromLUT.h"
 #include "img/RSGISPopWithStats.h"
-#include "img/RSGISGenAccuracyPoints.h"
+//#include "img/RSGISGenAccuracyPoints.h"
 #include "img/RSGISSampleImage.h"
 
 
@@ -270,7 +270,7 @@ class DllExport RSGISExeImageUtils : public RSGISAlgorithmParameters
         string outFileExtension;
         unsigned int tileOverlap;
         bool demProvided;
-        AccPtsType accuracyPtsType;
+        //AccPtsType accuracyPtsType;
         unsigned int numPoints;
         unsigned int seed;
         bool noDataValDefined;

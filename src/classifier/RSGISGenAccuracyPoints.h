@@ -33,13 +33,16 @@
 
 #include "gdal_priv.h"
 #include "gdal_rat.h"
+#include "ogrsf_frmts.h"
 
 #include "common/RSGISImageException.h"
 #include "utils/RSGISTextUtils.h"
 
+#include "rastergis/RSGISRasterAttUtils.h"
+
 #include <boost/algorithm/string/trim_all.hpp>
 
-namespace rsgis{namespace img{
+namespace rsgis{namespace classifier{
 	
     enum AccPtsType
 	{
@@ -90,6 +93,11 @@ namespace rsgis{namespace img{
         RSGISGenAccuracyPoints();
         void generateRandomPoints(GDALDataset *inputImage, GDALDataset *inputDEM, bool demProvided, std::string outputFile, std::string classColName, unsigned int numPts, unsigned int seed) throw(rsgis::RSGISImageException);
         void generateStratifiedRandomPoints(GDALDataset *inputImage, GDALDataset *inputDEM, bool demProvided, std::string outputFile, std::string classColName, unsigned int numPts, unsigned int seed) throw(rsgis::RSGISImageException);
+        
+        void generateRandomPointsVecOut(GDALDataset *inputImage, OGRLayer *outputSHPLayer, std::string imgClassCol, std::string vecClassImgCol, std::string vecClassRefCol, unsigned int numPts, unsigned int seed) throw(rsgis::RSGISImageException);
+        void generateStratifiedRandomPointsVecOut(GDALDataset *inputImage, OGRLayer *outputSHPLayer, std::string imgClassCol, std::string vecClassImgCol, std::string vecClassRefCol, unsigned int numPts, unsigned int seed) throw(rsgis::RSGISImageException);
+
+        
         ~RSGISGenAccuracyPoints();
     protected:
         float findPixelVal(GDALDataset *image, unsigned int band, double eastings, double northings, double tlX, double tlY, double xRes, double yRes, unsigned int xSize, unsigned int ySize) throw(rsgis::RSGISImageException);
