@@ -22,7 +22,7 @@
 
 #include "RSGISGenAccuracyPoints.h"
 
-namespace rsgis{namespace img{
+namespace rsgis{namespace classifier{
 
     
     RSGISGenAccuracyPoints::RSGISGenAccuracyPoints()
@@ -467,6 +467,356 @@ namespace rsgis{namespace img{
             throw rsgis::RSGISImageException(e.what());
         }
     }
+    
+    
+    void RSGISGenAccuracyPoints::generateRandomPointsVecOut(GDALDataset *inputImage, OGRLayer *outputSHPLayer, std::string imgClassCol, std::string vecClassImgCol, std::string vecClassRefCol, unsigned int numPts, unsigned int seed) throw(rsgis::RSGISImageException)
+    {
+        try
+        {
+            // Get attribute table...
+            GDALRasterAttributeTable *attTable = inputImage->GetRasterBand(1)->GetDefaultRAT();
+            
+            if(attTable == NULL)
+            {
+                throw RSGISImageException("The image dataset does not have an attribute table.");
+            }
+            
+            rsgis::rastergis::RSGISRasterAttUtils ratUtils;
+            std::vector<std::string> *imgClassColVals = ratUtils.readStrColumnAsVec(attTable, imgClassCol);
+            
+            double tlX = 0;
+            double tlY = 0;
+            double xRes = 0;
+            double yRes = 0;
+            unsigned int imgSizeX = 0;
+            unsigned int imgSizeY = 0;
+            
+            // Get Transformation for Image
+            double *trans = new double[6];
+            inputImage->GetGeoTransform(trans);
+            tlX = trans[0];
+            tlY = trans[3];
+            xRes = trans[1];
+            yRes = trans[5];
+            if(yRes < 0)
+            {
+                yRes = yRes * (-1);
+            }
+            imgSizeX = inputImage->GetRasterXSize();
+            imgSizeY = inputImage->GetRasterYSize();
+            
+            delete[] trans;
+            
+            srand(seed);
+            
+            unsigned int xPxl = 0;
+            unsigned int yPxl = 0;
+            double eastings = 0;
+            double northings = 0;
+            std::string classVal = "";
+            long pxlVal = 0.0;
+            
+            RSGISAccPoint *tmpAccPt = NULL;
+            std::list<RSGISAccPoint*> *accPts = new std::list<RSGISAccPoint*>();
+            
+            while(accPts->size() < numPts)
+            {
+                xPxl = rand() % imgSizeX;
+                yPxl = rand() % imgSizeY;
+                
+                eastings = tlX + (((double)xPxl)*xRes);
+                northings = tlY - (((double)yPxl)*yRes);
+                
+                
+                try
+                {
+                    pxlVal = long(this->findPixelVal(inputImage, 1, eastings, northings, tlX, tlY, xRes, yRes, imgSizeX, imgSizeY));
+                    
+                    //std::cout << "Pxl Val = " << pxlVal << std::endl;
+                    
+                    if((pxlVal > 0) & (pxlVal < imgClassColVals->size()))
+                    {
+                        classVal = imgClassColVals->at(pxlVal);
+                        //std::cout << "Class Name = " << classVal << std::endl;
+                        
+                        tmpAccPt = new RSGISAccPoint();
+                        tmpAccPt->ptID = accPts->size()+1;
+                        tmpAccPt->eastings = eastings;
+                        tmpAccPt->northings = northings;
+                        tmpAccPt->elevation = 0.0;
+                        tmpAccPt->mapClassName = classVal;
+                        tmpAccPt->trueClassName = "";
+                        tmpAccPt->status = -1;
+                        tmpAccPt->comment = "";
+                        
+                        accPts->push_back(tmpAccPt);
+                    }
+                }
+                catch (rsgis::RSGISImageException &e)
+                {
+                    // Ignore as class not found...
+                }
+                catch (std::exception &e)
+                {
+                    throw rsgis::RSGISImageException(e.what());
+                }
+            }
+            
+            std::ofstream outFile;
+            
+            accPts->sort(compareMapClass);
+            
+            OGRFieldDefn imgClassField(vecClassImgCol.c_str(), OFTString);
+            imgClassField.SetWidth(255);
+            if( outputSHPLayer->CreateField( &imgClassField ) != OGRERR_NONE )
+            {
+                std::string message = std::string("Creating shapefile field \'") + vecClassImgCol + std::string("\' has failed");
+                throw rsgis::RSGISException(message);
+            }
+            
+            OGRFieldDefn refClassField(vecClassRefCol.c_str(), OFTString);
+            refClassField.SetWidth(255);
+            if( outputSHPLayer->CreateField( &refClassField ) != OGRERR_NONE )
+            {
+                std::string message = std::string("Creating shapefile field \'") + vecClassRefCol + std::string("\' has failed");
+                throw rsgis::RSGISException(message);
+            }
+            
+            OGRFeatureDefn *featDefn = outputSHPLayer->GetLayerDefn();
+            int imgClassColIdx = featDefn->GetFieldIndex(vecClassImgCol.c_str());
+            int refClassColIdx = featDefn->GetFieldIndex(vecClassRefCol.c_str());
+            
+            for(std::list<RSGISAccPoint*>::iterator iterPts = accPts->begin(); iterPts != accPts->end(); ++iterPts)
+            {
+                OGRFeature *poFeature = new OGRFeature(featDefn);
+                OGRPoint *pt = new OGRPoint((*iterPts)->eastings, (*iterPts)->northings, 0.0);
+                poFeature->SetGeometryDirectly(pt);
+                
+                poFeature->SetField(imgClassColIdx, (*iterPts)->mapClassName.c_str());
+                poFeature->SetField(refClassColIdx, (*iterPts)->trueClassName.c_str());
+                
+                outputSHPLayer->CreateFeature(poFeature);
+            }
+            
+        }
+        catch(rsgis::RSGISImageException &e)
+        {
+            throw e;
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw rsgis::RSGISImageException(e.what());
+        }
+    }
+    
+    
+    void RSGISGenAccuracyPoints::generateStratifiedRandomPointsVecOut(GDALDataset *inputImage, OGRLayer *outputSHPLayer, std::string imgClassCol, std::string vecClassImgCol, std::string vecClassRefCol, unsigned int numPts, unsigned int seed) throw(rsgis::RSGISImageException)
+    {
+        try
+        {
+            // Get attribute table...
+            GDALRasterAttributeTable *attTable = inputImage->GetRasterBand(1)->GetDefaultRAT();
+            
+            if(attTable == NULL)
+            {
+                throw RSGISImageException("The image dataset does not have an attribute table.");
+            }
+            
+            rsgis::rastergis::RSGISRasterAttUtils ratUtils;
+            std::vector<std::string> *imgClassColVals = ratUtils.readStrColumnAsVec(attTable, imgClassCol);
+            std::vector<int> *histogram = ratUtils.readIntColumnAsVec(attTable, "Histogram");
+            
+            std::list<std::string> *classNames = new std::list<std::string>();
+            bool foundClassName = false;
+            for(size_t i = 0; i < histogram->size(); ++i)
+            {
+                imgClassColVals->at(i) = boost::trim_all_copy(imgClassColVals->at(i));
+                if((histogram->at(i) > 0) & (imgClassColVals->at(i) != ""))
+                {
+                    if(classNames->empty())
+                    {
+                        classNames->push_back(imgClassColVals->at(i));
+                    }
+                    else
+                    {
+                        foundClassName = false;
+                        for(std::list<std::string>::iterator iterClass = classNames->begin(); iterClass != classNames->end(); ++iterClass)
+                        {
+                            if(*iterClass == imgClassColVals->at(i))
+                            {
+                                foundClassName = true;
+                                break;
+                            }
+                        }
+                        
+                        if(!foundClassName)
+                        {
+                            classNames->push_back(imgClassColVals->at(i));
+                        }
+                    }
+                }
+            }
+            classNames->sort(rsgis::utils::compareStringNoCase);
+            
+            std::vector<std::vector<RSGISAccPoint*> > *accClassPts = new std::vector<std::vector<RSGISAccPoint*> >();
+            std::map<std::string, size_t> classesLookUp;
+            
+            size_t idx = 0;
+            for(std::list<std::string>::iterator iterClasses = classNames->begin(); iterClasses != classNames->end(); ++iterClasses)
+            {
+                std::cout << "Class: \'" <<  *iterClasses << "\'" << std::endl;
+                accClassPts->push_back(std::vector<RSGISAccPoint*>());
+                classesLookUp.insert(std::pair<std::string, size_t>(*iterClasses, idx));
+                ++idx;
+            }
+            
+            double tlX = 0;
+            double tlY = 0;
+            double xRes = 0;
+            double yRes = 0;
+            unsigned int imgSizeX = 0;
+            unsigned int imgSizeY = 0;
+            
+            // Get Transformation for Image
+            double *trans = new double[6];
+            inputImage->GetGeoTransform(trans);
+            tlX = trans[0];
+            tlY = trans[3];
+            xRes = trans[1];
+            yRes = trans[5];
+            if(yRes < 0)
+            {
+                yRes = yRes * (-1);
+            }
+            imgSizeX = inputImage->GetRasterXSize();
+            imgSizeY = inputImage->GetRasterYSize();
+            
+            delete[] trans;
+            
+            srand(seed);
+            
+            unsigned int xPxl = 0;
+            unsigned int yPxl = 0;
+            double eastings = 0;
+            double northings = 0;
+            std::string classVal = "";
+            long pxlVal = 0.0;
+            
+            RSGISAccPoint *tmpAccPt = NULL;
+            std::map<std::string, size_t>::iterator iterMap;
+            
+            unsigned long totalNumPtsRequired = classNames->size() * numPts;
+            unsigned long ptsCount = 0;
+            
+            std::cout << "Number of points to be generated: " << totalNumPtsRequired << std::endl;
+            
+            while(ptsCount < totalNumPtsRequired)
+            {
+                std::cout << "Completed " << floor((((double)ptsCount)/((double)totalNumPtsRequired))*100) << " %\r" << std::flush;
+                
+                xPxl = rand() % imgSizeX;
+                yPxl = rand() % imgSizeY;
+                
+                eastings = tlX + (((double)xPxl)*xRes);
+                northings = tlY - (((double)yPxl)*yRes);
+                
+                try
+                {
+                    pxlVal = long(this->findPixelVal(inputImage, 1, eastings, northings, tlX, tlY, xRes, yRes, imgSizeX, imgSizeY));
+                    
+                    if((pxlVal > 0) & (pxlVal < imgClassColVals->size()))
+                    {
+                        classVal = imgClassColVals->at(pxlVal);
+                        
+                        iterMap = classesLookUp.find(classVal);
+                        
+                        if(iterMap == classesLookUp.end())
+                        {
+                            rsgis::RSGISImageException("Class name was not found!");
+                        }
+                        
+                        idx = iterMap->second;
+                        
+                        if(accClassPts->at(idx).size() < numPts)
+                        {
+                            tmpAccPt = new RSGISAccPoint();
+                            tmpAccPt->ptID = ptsCount+1;
+                            tmpAccPt->eastings = eastings;
+                            tmpAccPt->northings = northings;
+                            tmpAccPt->elevation = 0.0;
+                            tmpAccPt->mapClassName = classVal;
+                            tmpAccPt->trueClassName = "";
+                            tmpAccPt->status = -1;
+                            tmpAccPt->comment = "";
+                        
+                            accClassPts->at(idx).push_back(tmpAccPt);
+                            
+                            ++ptsCount;
+                        }
+                    }
+                }
+                catch (rsgis::RSGISImageException &e)
+                {
+                    // Ignore as class not found...
+                }
+                catch (std::exception &e)
+                {
+                    throw rsgis::RSGISImageException(e.what());
+                }
+            }
+            
+            std::ofstream outFile;
+            
+            OGRFieldDefn imgClassField(vecClassImgCol.c_str(), OFTString);
+            imgClassField.SetWidth(255);
+            if( outputSHPLayer->CreateField( &imgClassField ) != OGRERR_NONE )
+            {
+                std::string message = std::string("Creating shapefile field \'") + vecClassImgCol + std::string("\' has failed");
+                throw rsgis::RSGISException(message);
+            }
+            
+            OGRFieldDefn refClassField(vecClassRefCol.c_str(), OFTString);
+            refClassField.SetWidth(255);
+            if( outputSHPLayer->CreateField( &refClassField ) != OGRERR_NONE )
+            {
+                std::string message = std::string("Creating shapefile field \'") + vecClassRefCol + std::string("\' has failed");
+                throw rsgis::RSGISException(message);
+            }
+            
+            OGRFeatureDefn *featDefn = outputSHPLayer->GetLayerDefn();
+            int imgClassColIdx = featDefn->GetFieldIndex(vecClassImgCol.c_str());
+            int refClassColIdx = featDefn->GetFieldIndex(vecClassRefCol.c_str());
+            
+            for(std::vector<std::vector<RSGISAccPoint*> >::iterator iterPtsVecs = accClassPts->begin(); iterPtsVecs != accClassPts->end(); ++iterPtsVecs)
+            {
+                for(std::vector<RSGISAccPoint*>::iterator iterPts = (*iterPtsVecs).begin(); iterPts != (*iterPtsVecs).end(); ++iterPts)
+                {
+                    OGRFeature *poFeature = new OGRFeature(featDefn);
+                    OGRPoint *pt = new OGRPoint((*iterPts)->eastings, (*iterPts)->northings, 0.0);
+                    poFeature->SetGeometryDirectly(pt);
+                    
+                    poFeature->SetField(imgClassColIdx, (*iterPts)->mapClassName.c_str());
+                    poFeature->SetField(refClassColIdx, (*iterPts)->trueClassName.c_str());
+                    
+                    outputSHPLayer->CreateFeature(poFeature);
+                }
+            }
+            
+            delete classNames;
+            delete accClassPts;
+            
+        }
+        catch(rsgis::RSGISImageException &e)
+        {
+            throw e;
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw rsgis::RSGISImageException(e.what());
+        }
+    }
+
+    
     
     float RSGISGenAccuracyPoints::findPixelVal(GDALDataset *image, unsigned int band, double eastings, double northings, double tlX, double tlY, double xRes, double yRes, unsigned int xSize, unsigned int ySize) throw(rsgis::RSGISImageException)
     {
