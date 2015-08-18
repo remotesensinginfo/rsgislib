@@ -148,6 +148,38 @@ static PyObject *Classification_GenStratifiedRandomAccuracyPts(PyObject *self, P
     Py_RETURN_NONE;
 }
 
+static PyObject *Classification_PopClassInfoAccuracyPts(PyObject *self, PyObject *args)
+{
+    const char *pszInputImage, *pszInputShp, *pszClassImgCol, *pszClassImgVecCol;
+    PyObject *classRefVecColObj;
+    
+    if( !PyArg_ParseTuple(args, "ssss|O:popClassInfoAccuracyPts", &pszInputImage, &pszInputShp, &pszClassImgCol, &pszClassImgVecCol, &classRefVecColObj))
+    {
+        return NULL;
+    }
+    
+    bool addRefCol = false;
+    std::string pszClassRefVecCol = "";
+    
+    if(RSGISPY_CHECK_STRING(classRefVecColObj))
+    {
+        pszClassRefVecCol = RSGISPY_STRING_EXTRACT(classRefVecColObj);
+        addRefCol = true;
+    }
+    
+    try
+    {
+        rsgis::cmds::executePopClassInfoAccuracyPts(std::string(pszInputImage), std::string(pszInputShp), std::string(pszClassImgCol), std::string(pszClassImgVecCol), pszClassRefVecCol, addRefCol);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 
 
 
@@ -205,6 +237,19 @@ static PyMethodDef ClassificationMethods[] = {
 "* numPts is an int specifying the number of points for each class which should be created.\n"
 "* seed is an int specifying the seed for the random number generator. (Optional: Default 10)\n"
 "* force is a bool, specifying whether to force removal of the output vector if it exists. (Optional: Default False)\n"
+},
+    
+{"popClassInfoAccuracyPts", Classification_PopClassInfoAccuracyPts, METH_VARARGS,
+"classification.popClassInfoAccuracyPts(inputImage, inputShp, classImgCol, classImgVecCol, classRefVecCol)\n"
+"Generates a set of stratified random points for accuracy assessment.\n"
+"\n"
+"Where:\n"
+"\n"
+"* inputImage is a string containing the name and path of the input image with attribute table.\n"
+"* inputShp is a string containing the name and path of the input shapefile.\n"
+"* classImgCol is a string speciyfing the name of the column in the image file containing the class names.\n"
+"* classImgVecCol is a string specifiying the output column in the shapefile for the classified class names.\n"
+"* classRefVecCol is an optional string specifiying an output column in the shapefile which can be used in the accuracy assessment for the reference data.\n"
 },
 
     {NULL}        /* Sentinel */

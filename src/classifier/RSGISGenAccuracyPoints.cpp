@@ -567,7 +567,7 @@ namespace rsgis{namespace classifier{
             accPts->sort(compareMapClass);
             
             OGRFieldDefn imgClassField(vecClassImgCol.c_str(), OFTString);
-            imgClassField.SetWidth(255);
+            imgClassField.SetWidth(254);
             if( outputSHPLayer->CreateField( &imgClassField ) != OGRERR_NONE )
             {
                 std::string message = std::string("Creating shapefile field \'") + vecClassImgCol + std::string("\' has failed");
@@ -575,7 +575,7 @@ namespace rsgis{namespace classifier{
             }
             
             OGRFieldDefn refClassField(vecClassRefCol.c_str(), OFTString);
-            refClassField.SetWidth(255);
+            refClassField.SetWidth(254);
             if( outputSHPLayer->CreateField( &refClassField ) != OGRERR_NONE )
             {
                 std::string message = std::string("Creating shapefile field \'") + vecClassRefCol + std::string("\' has failed");
@@ -765,10 +765,8 @@ namespace rsgis{namespace classifier{
                 }
             }
             
-            std::ofstream outFile;
-            
             OGRFieldDefn imgClassField(vecClassImgCol.c_str(), OFTString);
-            imgClassField.SetWidth(255);
+            imgClassField.SetWidth(254);
             if( outputSHPLayer->CreateField( &imgClassField ) != OGRERR_NONE )
             {
                 std::string message = std::string("Creating shapefile field \'") + vecClassImgCol + std::string("\' has failed");
@@ -776,7 +774,7 @@ namespace rsgis{namespace classifier{
             }
             
             OGRFieldDefn refClassField(vecClassRefCol.c_str(), OFTString);
-            refClassField.SetWidth(255);
+            refClassField.SetWidth(254);
             if( outputSHPLayer->CreateField( &refClassField ) != OGRERR_NONE )
             {
                 std::string message = std::string("Creating shapefile field \'") + vecClassRefCol + std::string("\' has failed");
@@ -815,11 +813,188 @@ namespace rsgis{namespace classifier{
             throw rsgis::RSGISImageException(e.what());
         }
     }
-
+    
+    
+    void RSGISGenAccuracyPoints::popClassInfo2Vec(GDALDataset *inputImage, OGRLayer *inputVecLayer, std::string imgClassCol, std::string vecClassImgCol, std::string vecClassRefCol, bool addRefCol)throw(rsgis::RSGISImageException)
+    {
+        try
+        {
+            // Get attribute table...
+            GDALRasterAttributeTable *attTable = inputImage->GetRasterBand(1)->GetDefaultRAT();
+            
+            if(attTable == NULL)
+            {
+                throw RSGISImageException("The image dataset does not have an attribute table.");
+            }
+            
+            rsgis::rastergis::RSGISRasterAttUtils ratUtils;
+            std::vector<std::string> *imgClassColVals = ratUtils.readStrColumnAsVec(attTable, imgClassCol);
+            
+            double tlX = 0;
+            double tlY = 0;
+            double xRes = 0;
+            double yRes = 0;
+            unsigned int imgSizeX = 0;
+            unsigned int imgSizeY = 0;
+            
+            // Get Transformation for Image
+            double *trans = new double[6];
+            inputImage->GetGeoTransform(trans);
+            tlX = trans[0];
+            tlY = trans[3];
+            xRes = trans[1];
+            yRes = trans[5];
+            if(yRes < 0)
+            {
+                yRes = yRes * (-1);
+            }
+            imgSizeX = inputImage->GetRasterXSize();
+            imgSizeY = inputImage->GetRasterYSize();
+            
+            delete[] trans;
+            
+            double eastings = 0.0;
+            double northings = 0.0;
+            
+            //std::cout << "Adding col: " << vecClassImgCol << std::endl;
+            OGRFieldDefn imgClassField(vecClassImgCol.c_str(), OFTString);
+            imgClassField.SetWidth(254);
+            if( inputVecLayer->CreateField( &imgClassField, false ) != OGRERR_NONE )
+            {
+                std::string message = std::string("Creating shapefile field \'") + vecClassImgCol + std::string("\' has failed");
+                throw rsgis::RSGISException(message);
+            }
+            std::string vecClassImgField = std::string(imgClassField.GetNameRef());
+            //std::cout << "Added Image Class Field Name: " << vecClassImgField << std::endl;
+            
+            std::string vecClassRefField = "";
+            if(addRefCol)
+            {
+                //std::cout << "Adding col: " << vecClassRefCol << std::endl;
+                OGRFieldDefn refClassField(vecClassRefCol.c_str(), OFTString);
+                refClassField.SetWidth(254);
+                if( inputVecLayer->CreateField( &refClassField, false ) != OGRERR_NONE )
+                {
+                    std::string message = std::string("Creating shapefile field \'") + vecClassRefCol + std::string("\' has failed");
+                    throw rsgis::RSGISException(message);
+                }
+                vecClassRefField = std::string(refClassField.GetNameRef());
+                //std::cout << "Added Reference Class Field Name: " << vecClassRefField << std::endl;
+            }
+            
+            
+            
+            OGRFeatureDefn *featDefn = inputVecLayer->GetLayerDefn();
+            int imgClassColIdx = featDefn->GetFieldIndex(vecClassImgField.c_str());
+            int refClassColIdx = -1;
+            if(addRefCol)
+            {
+                refClassColIdx = featDefn->GetFieldIndex(vecClassRefField.c_str());
+            }
+            
+            int numFeatures = inputVecLayer->GetFeatureCount(TRUE);
+            
+            bool nullGeometry = false;
+            OGREnvelope *ogrEnv = NULL;
+            OGRGeometry *geometry = NULL;
+            std::string classVal = "";
+            std::string emptyStr = "";
+            long pxlVal = 0.0;
+            
+            int feedback = numFeatures/10;
+            int feedbackCounter = 0;
+            int i = 0;
+            
+            OGRFeature *featObj = NULL;
+            inputVecLayer->ResetReading();
+            std::cout << "Started. " << std::flush;
+            while( (featObj = inputVecLayer->GetNextFeature()) != NULL )
+            {
+                if((numFeatures > 10) && ((i % feedback) == 0) && feedbackCounter <= 100)
+                {
+                    std::cout << "." << feedbackCounter << "." << std::flush;
+                    
+                    feedbackCounter = feedbackCounter + 10;
+                }
+                
+                // Get Geometry.
+                nullGeometry = false;
+                geometry = featObj->GetGeometryRef();
+                if( geometry != NULL && wkbFlatten(geometry->getGeometryType()) == wkbPoint )
+                {
+                    OGRPoint *pt = (OGRPoint *) geometry;
+                    eastings = pt->getX();
+                    northings = pt->getY();
+                }
+                else if(geometry != NULL)
+                {
+                    ogrEnv = new OGREnvelope();
+                    geometry->getEnvelope(ogrEnv);
+                    eastings = ogrEnv->MinX + ((ogrEnv->MaxX - ogrEnv->MinX)/2);
+                    northings = ogrEnv->MinY + ((ogrEnv->MaxY - ogrEnv->MinY)/2);
+                }
+                else
+                {
+                    nullGeometry = true;
+                    std::cout << "WARNING: NULL Geometry Present within input file - IGNORED\n";
+                }
+                
+                //std::cout << "Pos: [" << eastings << ", " << northings << "]\n";
+                
+                if(!nullGeometry)
+                {
+                    pxlVal = long(this->findPixelVal(inputImage, 1, eastings, northings, tlX, tlY, xRes, yRes, imgSizeX, imgSizeY));
+                    //std::cout << "Pxl Val: " << pxlVal << std::endl;
+                    if((pxlVal > 0) & (pxlVal < imgClassColVals->size()))
+                    {
+                        classVal = imgClassColVals->at(pxlVal);
+                        //std::cout << "Class: " << classVal << std::endl;
+                        
+                        //std::cout << "Col " << imgClassColIdx << " = \'" << classVal << "\'\n";
+                        featObj->SetField(imgClassColIdx, classVal.c_str());
+                        if(addRefCol)
+                        {
+                            //std::cout << "Col " << refClassColIdx << " = \'" << emptyStr << "\'\n";
+                            featObj->SetField(refClassColIdx, emptyStr.c_str());
+                        }
+                        
+                    }
+                    else
+                    {
+                        featObj->SetField(imgClassColIdx, emptyStr.c_str());
+                        if(addRefCol)
+                        {
+                            featObj->SetField(refClassColIdx, emptyStr.c_str());
+                        }
+                    }
+                    
+                    if( inputVecLayer->SetFeature(featObj) != OGRERR_NONE )
+                    {
+                        throw rsgis::RSGISException("Failed to write feature to the shapefile.");
+                    }
+                }
+                
+                OGRFeature::DestroyFeature(featObj);
+                i++;
+            }
+            std::cout << ". Complete.\n";
+            
+        
+        }
+        catch(rsgis::RSGISImageException &e)
+        {
+            throw e;
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw rsgis::RSGISImageException(e.what());
+        }
+    }
     
     
     float RSGISGenAccuracyPoints::findPixelVal(GDALDataset *image, unsigned int band, double eastings, double northings, double tlX, double tlY, double xRes, double yRes, unsigned int xSize, unsigned int ySize) throw(rsgis::RSGISImageException)
     {
+        
         double diffX = eastings - tlX;
         double diffY = tlY - northings;
         
