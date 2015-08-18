@@ -96,7 +96,7 @@ namespace rsgis{namespace classifier{
         
         void generateRandomPointsVecOut(GDALDataset *inputImage, OGRLayer *outputSHPLayer, std::string imgClassCol, std::string vecClassImgCol, std::string vecClassRefCol, unsigned int numPts, unsigned int seed) throw(rsgis::RSGISImageException);
         void generateStratifiedRandomPointsVecOut(GDALDataset *inputImage, OGRLayer *outputSHPLayer, std::string imgClassCol, std::string vecClassImgCol, std::string vecClassRefCol, unsigned int numPts, unsigned int seed) throw(rsgis::RSGISImageException);
-
+        void popClassInfo2Vec(GDALDataset *inputImage, OGRLayer *outputSHPLayer, std::string imgClassCol, std::string vecClassImgCol, std::string vecClassRefCol, bool addRefCol)throw(rsgis::RSGISImageException);
         
         ~RSGISGenAccuracyPoints();
     protected:

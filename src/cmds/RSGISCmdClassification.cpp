@@ -289,11 +289,49 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void executePopClassInfoAccuracyPts(std::string classImage, std::string shpFile, std::string classImgCol, std::string classImgVecCol, std::string classRefVecCol)throw(RSGISCmdException)
+    void executePopClassInfoAccuracyPts(std::string classImage, std::string shpFile, std::string classImgCol, std::string classImgVecCol, std::string classRefVecCol, bool addRefCol)throw(RSGISCmdException)
     {
         try
         {
+            GDALAllRegister();
+            OGRRegisterAll();
             
+            GDALDataset *imgDataset = (GDALDataset *) GDALOpenShared(classImage.c_str(), GA_ReadOnly);
+            if(imgDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + classImage;
+                throw RSGISCmdException(message.c_str());
+            }
+            
+            rsgis::utils::RSGISFileUtils fileUtils;
+            rsgis::vec::RSGISVectorUtils vecUtils;
+            
+            shpFile = boost::filesystem::absolute(shpFile).string();
+            std::string SHPFileInLayer = vecUtils.getLayerName(shpFile);
+            
+            /////////////////////////////////////
+            //
+            // Open Input Shapfile.
+            //
+            /////////////////////////////////////
+            OGRDataSource *inputSHPDS = OGRSFDriverRegistrar::Open(shpFile.c_str(), true); // Read + Write
+            if(inputSHPDS == NULL)
+            {
+                std::string message = std::string("Could not open vector file ") + shpFile;
+                throw RSGISFileException(message.c_str());
+            }
+            OGRLayer *inputSHPLayer = inputSHPDS->GetLayerByName(SHPFileInLayer.c_str());
+            if(inputSHPLayer == NULL)
+            {
+                std::string message = std::string("Could not open vector layer ") + SHPFileInLayer;
+                throw RSGISFileException(message.c_str());
+            }
+            
+            rsgis::classifier::RSGISGenAccuracyPoints genAccPts;
+            genAccPts.popClassInfo2Vec(imgDataset, inputSHPLayer, classImgCol, classImgVecCol, classRefVecCol, addRefCol);
+            
+            GDALClose(imgDataset);
+            OGRDataSource::DestroyDataSource(inputSHPDS);
         }
         catch(rsgis::RSGISException &e)
         {
