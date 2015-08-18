@@ -75,6 +75,8 @@ namespace rsgis{ namespace cmds{
     DllExport void executeFitPolygonToPoints(std::string inputVec, std::string outputVec, double alphaVal, bool force) throw(RSGISCmdException);
     /** Function to create a set of polygons from a set of point which have been clustered */
     DllExport void executeFitPolygonsToPointClusters(std::string inputVec, std::string outputVec, std::string clusterField, double alphaVal, bool force) throw(RSGISCmdException);
+    /** Function to convert a set of lines into regularly spaced set of points */
+    DllExport void executeCreateLinesOfPoints(std::string inputLinesVec, std::string outputPtsVec, double step, bool force) throw(RSGISCmdException);
 }}
 
 

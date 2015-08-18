@@ -750,5 +750,34 @@ namespace rsgis{namespace vec{
         }
         return colNames;
     }
+    
+    
+    
+    std::vector<OGRPoint*>* RSGISVectorUtils::getRegularStepPoints(std::vector<OGRLineString*> *lines, double step) throw(RSGISVectorException)
+    {
+        std::vector<OGRPoint*> *pts = new std::vector<OGRPoint*>();
+        try
+        {
+            long numPts = 0;
+           	OGRPoint *pt = NULL;
+            for(std::vector<OGRLineString*>::iterator iterLines = lines->begin(); iterLines != lines->end(); ++iterLines)
+            {
+                (*iterLines)->segmentize(step);
+                numPts = (*iterLines)->getNumPoints();
+                for(long i = 0; i < numPts; ++i)
+                {
+                    pt = new OGRPoint();
+                    (*iterLines)->getPoint(i, pt);
+                    pts->push_back(pt);
+                }
+            }
+            
+        }
+        catch (RSGISVectorException &e)
+        {
+            throw e;
+        }
+        return pts;
+    }
 	
 }}

@@ -61,10 +61,7 @@ namespace rsgis{namespace vec{
 			void exportGEOSPolygons2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::Polygon*> *polys, std::vector<rsgis::utils::PlotPoly*> *polyDetails) throw(RSGISVectorOutputException);
 			void exportGEOSPolygons2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::Polygon*> *polys, std::vector<rsgis::utils::ImageFootPrintPoly*> *polyDetails) throw(RSGISVectorOutputException);
 			void exportGEOSPolygons2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::Polygon*> *polys, OGRSpatialReference* spatialRef) throw(RSGISVectorOutputException);
-
             void exportGEOSPolygons2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::Polygon*> *polys, OGRSpatialReference* spatialRef, std::vector<std::string> *outAtts, std::string attName) throw(RSGISVectorOutputException);
-
-            
 			void exportGEOSPolygons2SHP(std::string outputFile, bool deleteIfPresent, std::list<geos::geom::Polygon*> *polys, OGRSpatialReference* spatialRef) throw(RSGISVectorOutputException);
 			void exportGEOSPolygons2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::Polygon*> *polys, OGRSpatialReference* spatialRef, std::string attribute, std::string attributeVal) throw(RSGISVectorOutputException);
 			void exportGEOSCoordinates2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::Coordinate*> *coords) throw(RSGISVectorOutputException);
@@ -76,7 +73,8 @@ namespace rsgis{namespace vec{
             void exportGEOSMultiPolygonClusters2SHP(std::string outputFile, bool deleteIfPresent, std::list<geos::geom::Polygon*> **polygons, int numClusters, OGRSpatialReference* spatialRef) throw(RSGISVectorOutputException);
 			void exportGEOSPolygons2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::Polygon*> *polys, OGRSpatialReference* spatialRef, std::vector<std::string> *numericColsName, std::vector<std::string> *textColsName, std::vector<float> **numericColsData, std::vector<std::string> **textColsData) throw(RSGISVectorOutputException);
 			void exportPolygons2Layer(OGRLayer *outLayer, std::list<OGRPolygon*> *polys) throw(RSGISVectorOutputException);
-			~RSGISVectorIO();
+            void exportOGRPoints2SHP(std::string outputFile, bool deleteIfPresent, std::vector<OGRPoint*> *pts, OGRSpatialReference* spatialRef) throw(RSGISVectorOutputException);
+            ~RSGISVectorIO();
 		};
 }}
 

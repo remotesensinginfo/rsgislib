@@ -949,7 +949,10 @@ namespace rsgis{namespace classifier{
                     {
                         classVal = imgClassColVals->at(pxlVal);
                         //std::cout << "Class: " << classVal << std::endl;
-                        
+                        if(classVal == "")
+                        {
+                            classVal = "NA";
+                        }
                         //std::cout << "Col " << imgClassColIdx << " = \'" << classVal << "\'\n";
                         featObj->SetField(imgClassColIdx, classVal.c_str());
                         if(addRefCol)
@@ -961,7 +964,8 @@ namespace rsgis{namespace classifier{
                     }
                     else
                     {
-                        featObj->SetField(imgClassColIdx, emptyStr.c_str());
+                        classVal = "NA";
+                        featObj->SetField(imgClassColIdx, classVal.c_str());
                         if(addRefCol)
                         {
                             featObj->SetField(refClassColIdx, emptyStr.c_str());
