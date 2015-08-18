@@ -1856,6 +1856,92 @@ namespace rsgis{namespace vec{
 			throw RSGISVectorOutputException(e.what());
 		}
 	}
+    
+    void RSGISVectorIO::exportOGRPoints2SHP(std::string outputFile, bool deleteIfPresent, std::vector<OGRPoint*> *pts, OGRSpatialReference* spatialRef) throw(RSGISVectorOutputException)
+    {
+        try
+        {
+            OGRRegisterAll();
+            RSGISVectorUtils vecUtils;
+            rsgis::utils::RSGISFileUtils fileUtils;
+            
+            /////////////////////////////////////
+            //
+            // Check whether file already present.
+            //
+            /////////////////////////////////////
+            std::string SHPFileOutLayer = vecUtils.getLayerName(outputFile);
+            std::string outputDIR = fileUtils.getFileDirectoryPath(outputFile);
+            
+            if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
+            {
+                if(deleteIfPresent)
+                {
+                    vecUtils.deleteSHP(outputDIR, SHPFileOutLayer);
+                }
+                else
+                {
+                    throw RSGISException("Shapefile already exists, either delete or select force.");
+                }
+            }
+            
+            OGRSFDriver *shpFiledriver = NULL;
+            OGRDataSource *outputSHPDS = NULL;
+            OGRLayer *outputSHPLayer = NULL;
+            /////////////////////////////////////
+            //
+            // Create Output Shapfile.
+            //
+            /////////////////////////////////////
+            const char *pszDriverName = "ESRI Shapefile";
+            shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName );
+            if( shpFiledriver == NULL )
+            {
+                throw RSGISVectorOutputException("SHP driver not available.");
+            }
+            outputSHPDS = shpFiledriver->CreateDataSource(outputFile.c_str(), NULL);
+            if( outputSHPDS == NULL )
+            {
+                std::string message = std::string("Could not create vector file ") + outputFile;
+                throw RSGISVectorOutputException(message.c_str());
+            }
+            
+            outputSHPLayer = outputSHPDS->CreateLayer(SHPFileOutLayer.c_str(), spatialRef, wkbPoint, NULL );
+            if( outputSHPLayer == NULL )
+            {
+                std::string message = std::string("Could not create vector layer ") + SHPFileOutLayer;
+                throw RSGISVectorOutputException(message.c_str());
+            }
+            
+            OGRFeatureDefn *outputDefn = outputSHPLayer->GetLayerDefn();
+            OGRFeature *featureOutput = NULL;
+            
+            // Write Polygons to file
+            if(pts->size() > 0)
+            {
+                for(std::vector<OGRPoint*>::iterator iterPts = pts->begin(); iterPts != pts->end(); iterPts++)
+                {
+                    if((*iterPts) != NULL)
+                    {
+                        featureOutput = OGRFeature::CreateFeature(outputDefn);
+                        featureOutput->SetGeometryDirectly(*iterPts);
+                        
+                        if( outputSHPLayer->CreateFeature(featureOutput) != OGRERR_NONE )
+                        {
+                            throw RSGISVectorOutputException("Failed to write feature to the output shapefile.");
+                        }
+                        OGRFeature::DestroyFeature(featureOutput);
+                    }
+                }
+            }
+            OGRDataSource::DestroyDataSource(outputSHPDS);
+            delete pts;
+        }
+        catch(RSGISException &e)
+        {
+            throw RSGISVectorOutputException(e.what());
+        }
+    }
 	
 	
 	RSGISVectorIO::~RSGISVectorIO()

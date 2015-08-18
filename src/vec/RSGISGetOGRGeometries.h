@@ -75,6 +75,18 @@ namespace rsgis{namespace vec{
         std::vector<OGRPoint*> *points;
     };
     
+    class DllExport RSGISOGRLineReader : public RSGISProcessOGRFeature
+    {
+    public:
+        RSGISOGRLineReader(std::vector<OGRLineString*> *lines);
+        void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
+        void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
+        void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
+        ~RSGISOGRLineReader();
+    protected:
+        std::vector<OGRLineString*> *lines;
+    };
+    
     
 }}
 

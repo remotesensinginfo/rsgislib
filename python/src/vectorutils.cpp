@@ -561,6 +561,32 @@ static PyObject *VectorUtils_FitPolygons2PointClusters(PyObject *self, PyObject 
 }
 
 
+static PyObject *VectorUtils_CreateLinesOfPoints(PyObject *self, PyObject *args)
+{
+    const char *pszInputVector;
+    const char *pszOutputVector;
+    double step;
+    int force = false;
+    
+    if( !PyArg_ParseTuple(args, "ssd|i:createLinesOfPoints", &pszInputVector, &pszOutputVector, &step, &force))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeCreateLinesOfPoints(std::string(pszInputVector), std::string(pszOutputVector), step, force);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+
 
 
 // Our list of functions in this module
@@ -848,7 +874,18 @@ static PyMethodDef VectorUtilsMethods[] = {
 "\n"
 "\n"},
     
-    
+{"createLinesOfPoints", VectorUtils_CreateLinesOfPoints, METH_VARARGS,
+"vectorutils.createLinesOfPoints(inputVector, outputVector, step. force)\n"
+"A function to create a regularly spaced set of points following a set of lines.\n\n"
+"Where:\n"
+"\n"
+"* inputVector is a string containing the name of the input vector (must be lines)\n"
+"* outputVector is a string containing the name of the output vector (will be points)\n"
+"* step is a double specifying the distance between points along the line.\n"
+"* force is a bool, specifying whether to force removal of the output vector if it exists\n"
+"Example::\n"
+"\n"
+"\n"},
     
     {NULL}        /* Sentinel */
 };

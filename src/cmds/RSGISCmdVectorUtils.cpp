@@ -1965,5 +1965,69 @@ namespace rsgis{ namespace cmds {
         }
     }
             
+            
+    void executeCreateLinesOfPoints(std::string inputLinesVec, std::string outputPtsVec, double step, bool force) throw(RSGISCmdException)
+    {
+        try
+        {
+            // Convert to absolute path
+            inputLinesVec = boost::filesystem::absolute(inputLinesVec).string();
+            outputPtsVec = boost::filesystem::absolute(outputPtsVec).string();
+            
+            OGRRegisterAll();
+            
+            rsgis::vec::RSGISVectorUtils vecUtils;
+            
+            std::string SHPFileInLayer = vecUtils.getLayerName(inputLinesVec);
+            
+            /////////////////////////////////////
+            //
+            // Open Input Shapfile.
+            //
+            /////////////////////////////////////
+            OGRDataSource *inputSHPDS = OGRSFDriverRegistrar::Open(inputLinesVec.c_str(), FALSE);
+            if(inputSHPDS == NULL)
+            {
+                std::string message = std::string("Could not open vector file ") + inputLinesVec;
+                throw RSGISFileException(message.c_str());
+            }
+            OGRLayer *inputSHPLayer = inputSHPDS->GetLayerByName(SHPFileInLayer.c_str());
+            if(inputSHPLayer == NULL)
+            {
+                std::string message = std::string("Could not open vector layer ") + SHPFileInLayer;
+                throw RSGISFileException(message.c_str());
+            }
+            OGRSpatialReference* spatialRef = inputSHPLayer->GetSpatialRef();
+            
+
+            
+            // Read in Geometries...
+            std::cout << "Read in the geometries\n";
+            std::vector<OGRLineString*> *lines = new std::vector<OGRLineString*>();
+            rsgis::vec::RSGISOGRLineReader getOGRLines = rsgis::vec::RSGISOGRLineReader(lines);
+            rsgis::vec::RSGISProcessVector processVectorGetGeoms = rsgis::vec::RSGISProcessVector(&getOGRLines);
+            processVectorGetGeoms.processVectorsNoOutput(inputSHPLayer, false);
+            
+            std::vector<OGRPoint*> *pts = vecUtils.getRegularStepPoints(lines, step);
+            
+            rsgis::vec::RSGISVectorIO vecIO;
+            vecIO.exportOGRPoints2SHP(outputPtsVec, force, pts, spatialRef);
+            
+            OGRDataSource::DestroyDataSource(inputSHPDS);
+        }
+        catch(rsgis::RSGISVectorException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+            
 }}
             

@@ -191,4 +191,42 @@ namespace rsgis{namespace vec{
     }
 
     
+    RSGISOGRLineReader::RSGISOGRLineReader(std::vector<OGRLineString*> *lines)
+    {
+        this->lines = lines;
+    }
+    
+    void RSGISOGRLineReader::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+    {
+        throw RSGISVectorException("Not implemented..");
+    }
+    
+    void RSGISOGRLineReader::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+    {
+        OGRwkbGeometryType geometryType = feature->GetGeometryRef()->getGeometryType();
+        
+        if( geometryType == wkbLineString )
+        {
+            OGRLineString *line = (OGRLineString *) feature->GetGeometryRef()->clone();
+            lines->push_back(line);
+        }
+        else
+        {
+            std::string message = std::string("Unsupport data type: ") + std::string(feature->GetGeometryRef()->getGeometryName());
+            throw RSGISVectorException(message);
+        }
+    }
+    
+    void RSGISOGRLineReader::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+    {
+        // Nothing to do!
+    }
+    
+    RSGISOGRLineReader::~RSGISOGRLineReader()
+    {
+        
+    }
+    
+    
+    
 }}
