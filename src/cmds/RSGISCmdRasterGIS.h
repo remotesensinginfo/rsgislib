@@ -314,6 +314,17 @@ namespace rsgis{ namespace cmds {
     /** Function which populates the RAT with proportion of valid pixels within a clump */
     DllExport void executeCalcPropOfValidPixelsInClump(std::string inputImage, std::string clumpsImage, unsigned int ratBand, std::string outColumn, double noDataVal=0)throw(RSGISCmdException);
     
+    /** Function to calculate the 2D Jeffries Matusita distance between two classes. */
+    DllExport float executeCalc1DJMDistance(std::string clumpsImage, std::string varCol, float binWidth, std::string classColumn, std::string class1Val, std::string class2Val, unsigned int ratBand=1)throw(RSGISCmdException);
+    
+    /** Function to calculate the 3D Jeffries Matusita distance between two classes. */
+    DllExport float executeCalc2DJMDistance(std::string clumpsImage, std::string var1Col, std::string var2Col, float var1binWidth, float var2binWidth, std::string classColumn, std::string class1Val, std::string class2Val, unsigned int ratBand=1)throw(RSGISCmdException);
+    
+    /** Function to calculate the Bhattacharyya distance between two classes. */
+    DllExport float executeCalcBhattacharyyaDistance(std::string clumpsImage, std::string varCol, std::string classColumn, std::string class1Val, std::string class2Val, unsigned int ratBand=1)throw(RSGISCmdException);
+    
+    
+    
     
 }}
 

@@ -92,6 +92,7 @@ namespace rsgis{namespace math{
         bool calcStdDev;
         bool calcMedian;
         bool calcMode;
+        bool calcVariance;
         double min;
         double max;
         double mean;
@@ -99,6 +100,20 @@ namespace rsgis{namespace math{
         double stdDev;
         double median;
         double mode;
+        double variance;
+    };
+    
+    struct DllExport RSGIS2DHistBin
+    {
+        RSGIS2DHistBin(double binCentre1, double binCentre2, double freq)
+        {
+            this->binCentre1 = binCentre1;
+            this->binCentre2 = binCentre2;
+            this->freq = freq;
+        };
+        double binCentre1;
+        double binCentre2;
+        double freq;
     };
     
     inline bool comparePairsData(std::pair<size_t, double> firstVal, std::pair<size_t, double> secondVal)
@@ -138,6 +153,7 @@ namespace rsgis{namespace math{
             std::vector<std::pair<size_t, double> >* sampleUseHistogramMethod(std::vector<std::pair<size_t, double> > *inData, double minVal, double maxVal, double binWidth, float propOfPop) throw(RSGISMathException);
             std::vector<std::pair<size_t, double> >** calcHistogram(std::vector<std::pair<size_t, double> > *inData, double minVal, double maxVal, double binWidth, size_t *numBins) throw(RSGISMathException);
             std::vector<std::pair<double, double> >* calcHistogram(std::vector<double> *data, double minVal, double maxVal, double binWidth, bool norm) throw(RSGISMathException);
+            std::vector<std::vector<RSGIS2DHistBin>* >* calc2DHistogram(std::vector<double> *data1, double minVal1, double maxVal1, double binWidth1, std::vector<double> *data2, double minVal2, double maxVal2, double binWidth2, bool norm) throw(RSGISMathException);
 		};
 	
 }}

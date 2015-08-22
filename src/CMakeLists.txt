@@ -809,6 +809,7 @@ set(LIB_RASTERGIS_H
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISInputShapefileAttributes2RAT.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISRATKNN.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISRATFunctionFitting.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISRATStats.h
 	)
 	
 	
@@ -856,6 +857,8 @@ set(LIB_RASTERGIS_CPP
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISRATKNN.cpp
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISRATFunctionFitting.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISRATFunctionFitting.cpp
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISRATStats.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISRATStats.cpp
 	)
 	
 ###############################################################################

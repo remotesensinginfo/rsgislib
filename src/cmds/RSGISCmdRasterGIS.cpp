@@ -58,6 +58,7 @@
 #include "rastergis/RSGISRATKNN.h"
 #include "rastergis/RSGISRATFunctionFitting.h"
 #include "rastergis/RSGISDefineClumpsInTiles.h"
+#include "rastergis/RSGISRATStats.h"
 
 /*
 
@@ -1992,6 +1993,107 @@ namespace rsgis{ namespace cmds {
         {
             throw RSGISCmdException(e.what());
         }
+    }
+            
+            
+            
+    float executeCalc1DJMDistance(std::string clumpsImage, std::string varCol, float binWidth, std::string classColumn, std::string class1Val, std::string class2Val, unsigned int ratBand)throw(RSGISCmdException)
+    {
+        float dist = 0.0;
+        try
+        {
+            GDALAllRegister();
+            std::cout.precision(12);
+            
+            std::cout << "Opening Clumps Image: " << clumpsImage << std::endl;
+            GDALDataset *clumpsDataset = (GDALDataset *) GDALOpen(clumpsImage.c_str(), GA_Update);
+            if(clumpsDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + clumpsImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            rsgis::rastergis::RSGISRATStats calcRATStats;
+            dist = calcRATStats.calc1DJMDistance(clumpsDataset, varCol, binWidth, classColumn, class1Val, class2Val, ratBand);
+            
+            GDALClose(clumpsDataset);
+        }
+        catch(rsgis::RSGISAttributeTableException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        
+        return dist;
+    }
+
+    float executeCalc2DJMDistance(std::string clumpsImage, std::string var1Col, std::string var2Col, float var1binWidth, float var2binWidth, std::string classColumn, std::string class1Val, std::string class2Val, unsigned int ratBand)throw(RSGISCmdException)
+    {
+        float dist = 0.0;
+        try
+        {
+            GDALAllRegister();
+            std::cout.precision(12);
+            
+            std::cout << "Opening Clumps Image: " << clumpsImage << std::endl;
+            GDALDataset *clumpsDataset = (GDALDataset *) GDALOpen(clumpsImage.c_str(), GA_Update);
+            if(clumpsDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + clumpsImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            rsgis::rastergis::RSGISRATStats calcRATStats;
+            dist =  calcRATStats.calc2DJMDistance(clumpsDataset, var1Col, var2Col, var1binWidth, var2binWidth, classColumn, class1Val, class2Val, ratBand);
+
+            GDALClose(clumpsDataset);
+        }
+        catch(rsgis::RSGISAttributeTableException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        
+        return dist;
+    }
+
+    float executeCalcBhattacharyyaDistance(std::string clumpsImage, std::string varCol, std::string classColumn, std::string class1Val, std::string class2Val, unsigned int ratBand)throw(RSGISCmdException)
+    {
+        float dist = 0.0;
+        try
+        {
+            GDALAllRegister();
+            std::cout.precision(12);
+            
+            std::cout << "Opening Clumps Image: " << clumpsImage << std::endl;
+            GDALDataset *clumpsDataset = (GDALDataset *) GDALOpen(clumpsImage.c_str(), GA_Update);
+            if(clumpsDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + clumpsImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            rsgis::rastergis::RSGISRATStats calcRATStats;
+            dist = calcRATStats.calcBhattacharyyaDistance(clumpsDataset, varCol, classColumn, class1Val, class2Val, ratBand);
+            
+            GDALClose(clumpsDataset);
+        }
+        catch(rsgis::RSGISAttributeTableException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        
+        return dist;
     }
             
 }}
