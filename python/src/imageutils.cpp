@@ -1005,6 +1005,59 @@ static PyObject *ImageUtils_GenFiniteMask(PyObject *self, PyObject *args, PyObje
     Py_RETURN_NONE;
 }
 
+static PyObject *ImageUtils_CombineImages2Band(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    static char *kwlist[] = {"inimages", "outimage", "format", "datatype", "nodata"};
+    PyObject *pInputImages;
+    const char *pszOutputImage = "";
+    const char *pszGDALFormat = "";
+    int nDataType;
+    float noDataVal = 0.0;
+    
+    
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "Ossi|f:combineImages2Band", kwlist, &pInputImages, &pszOutputImage, &pszGDALFormat, &nDataType, &noDataVal))
+    {
+        return NULL;
+    }
+    
+    rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
+    
+    if( !PySequence_Check(pInputImages))
+    {
+        PyErr_SetString(GETSTATE(self)->error, "Input images must be a sequence");
+        return NULL;
+    }
+    
+    Py_ssize_t nImages = PySequence_Size(pInputImages);
+    std::vector<std::string> inputImages;
+    inputImages.reserve(nImages);
+    for( Py_ssize_t n = 0; n < nImages; n++ )
+    {
+        PyObject *o = PySequence_GetItem(pInputImages, n);
+        
+        if(!RSGISPY_CHECK_STRING(o))
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Input images must be strings");
+            Py_DECREF(o);
+            return NULL;
+        }
+        
+        inputImages.push_back(RSGISPY_STRING_EXTRACT(o));
+    }
+    
+    try
+    {
+        rsgis::cmds::executeCombineImagesSingleBandIgnoreNoData(inputImages, std::string(pszOutputImage), noDataVal, std::string(pszGDALFormat), type);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 // Our list of functions in this module
 static PyMethodDef ImageUtilsMethods[] = {
     {"stretchImage", ImageUtils_StretchImage, METH_VARARGS, 
@@ -1524,6 +1577,26 @@ static PyMethodDef ImageUtilsMethods[] = {
 "   inputImage = './injune_p142_casi_sub_utm.kea'\n"
 "   outputImage = './injune_p142_casi_sub_utm.kea'\n"
 "   imageutils.genFiniteMask(inputImage, outputImage, \'KEA\')\n"
+"\n"},
+   
+{"combineImages2Band", (PyCFunction)ImageUtils_CombineImages2Band, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.combineImages2Band(inimages=list, outimage=string, format=string, datatype=int, nodata=float)\n"
+"Combine images together into a single image band by excluding the no data value.\n"
+"\n"
+"* inimages is a list of strings containing the names and paths of the input image files\n"
+"* outimage is a string containing the name of the output file.\n"
+"* format is a string with the GDAL output file format.\n"
+"* datatype is an containing one of the values from rsgislib.TYPE_*\n"
+"* nodata is the no data value which will be ignored (Default is 0)"
+"\n"
+"\nExample::\n"
+"\n"
+"   from rsgislib import imageutils\n"
+"   inputImages = ['./forest.kea', './urban.kea', './water.kea']\n"
+"   outputImage = './classes.kea'\n"
+"   datatype = rsgislib.TYPE_8UINT"
+"   format = 'KEA'"
+"   imageutils.combineImages2Band(inputImages, outputImage, format, datatype, 0.0)\n"
 "\n"},
 
 

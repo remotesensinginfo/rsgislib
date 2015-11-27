@@ -36,7 +36,7 @@ from rsgislib import imageutils
 # Import the RSGISLib RasterGIS module
 from rsgislib import rastergis
 
-def rasterise2Image(inputVec, inputImage, outImage, gdalFormat="KEA", shpAtt=None, shpExt=False):
+def rasterise2Image(inputVec, inputImage, outImage, gdalFormat="KEA", burnVal=1, shpAtt=None, shpExt=False):
     """ A utillity to rasterise a shapefile into an image covering the same region and at the same resolution as the input image. 
 
 Where:
@@ -45,6 +45,7 @@ Where:
 * inputImage is a string specifying the input image defining the grid, pixel resolution and area for the rasterisation
 * outImage is a string specifying the output image for the rasterised shapefile
 * gdalFormat is the output image format (Default: KEA).
+* burnVal is the value for the output image pixels if no attribute is provided.
 * shpAtt is a string specifying the attribute to be rasterised, value of None creates a 
               binary mask and \"FID\" creates a temp shapefile with a "FID" column and rasterises that column.
 * shpExt is a boolean specifying that the output image should be cut to the same extent as the input shapefile (Default is False and therefore output image will be the same as the input).
@@ -56,7 +57,6 @@ Example::
     inputImage = 'injune_p142_casi_sub_utm.kea'
     outputImage = 'psu142_crowns.kea'  
     vectorutils.rasterise2Image(inputVector, inputImage, outputImage, 'KEA', 'FID')
-
 
     """
     try:
@@ -91,7 +91,7 @@ Example::
         # Run the algorithm.
         err = 0
         if shpAtt == None:
-            err = gdal.RasterizeLayer(outRasterDS, [1], inVectorLayer, burn_values=[1])
+            err = gdal.RasterizeLayer(outRasterDS, [1], inVectorLayer, burn_values=[burnVal])
         else:
             err = gdal.RasterizeLayer(outRasterDS, [1], inVectorLayer, options=["ATTRIBUTE="+shpAtt])
         if err != 0:
