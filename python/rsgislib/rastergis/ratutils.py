@@ -40,9 +40,13 @@
 
 import sys
 import math
+import os.path
+import shutil
 from enum import Enum
 import rsgislib
 from rsgislib import rastergis
+from rsgislib import vectorutils
+from rsgislib import imageutils
 
 haveGDALPy = True
 try:
@@ -78,6 +82,7 @@ except ImportError as scipystatsErr:
 haveRIOSRat = True
 try:
     from rios import rat
+    from rios import ratapplier
 except ImportError as riosRatErr:
     haveRIOSRat = False
 
@@ -1087,4 +1092,89 @@ def findClumpsWithinExistingThresholds(inputClumps, inClassCol, classOfInterest,
     rat.writeColumn(ratDataset, outFeatsCol, outFeats)
     ratDataset = None
 
+
+def _ratapplier_defClassNames(info, inputs, outputs, otherargs):
+    classNum = getattr(inputs.inrat, otherargs.classNumCol)
+    
+    classNames = numpy.empty_like(classNum, dtype=numpy.dtype('a255'))
+    classNames[...] = ''
+    
+    for key in otherargs.classNamesDict:
+        classNames = numpy.where((classNum == key), otherargs.classNamesDict[key], classNames)
+
+    setattr(outputs.outrat, otherargs.classNameCol, classNames)
+
+def defineClassNames(clumps, classNumCol, classNameCol, classNamesDict):
+    in_rats = ratapplier.RatAssociations()
+    out_rats = ratapplier.RatAssociations()
+                
+    in_rats.inrat = ratapplier.RatHandle(clumps)
+    out_rats.outrat = ratapplier.RatHandle(clumps)
+
+    otherargs = ratapplier.OtherArguments()
+    otherargs.classNumCol = classNumCol
+    otherargs.classNameCol = classNameCol
+    otherargs.classNamesDict = classNamesDict
+
+    ratapplier.apply(_ratapplier_defClassNames, in_rats, out_rats, otherargs)
+
+
+def populateClumpsWithClassTraining(clumpsImg, classesDict, tmpPath, classesIntCol, classesNameCol):
+    """
+    A function to populate a clumps file with training from a series of shapefiles (1 per class)
+    
+    Where:
+    * clumpsImg - input clumps file.
+    * classesDict - A dict structure with the class names as keys and the values the file paths to the shapefiles.
+    * tmpPath - File path (which needs to exist) where files can temporally be written.
+    * classesIntCol - Output column name for integer values representing each class.
+    * classesNameCol - Output column name for string class names.
+    
+    """
+    # Check numpy is available
+    if not haveNumpy:
+        raise Exception("The numpy module is required for this function could not be imported\n\t" + numErr)
+    # Check gdal is available
+    if not haveGDALPy:
+        raise Exception("The GDAL python bindings are required for this function could not be imported\n\t" + gdalErr)
+    # Check rios rat is available
+    if not haveRIOSRat:
+        raise Exception("The RIOS rat tools are required for this function could not be imported\n\t" + riosRatErr)
+    
+    createdDIR = False
+    if not os.path.isdir(tmpPath):
+        os.makedirs(tmpPath)
+        createdDIR = True
+    
+    rsPyUtils = rsgislib.RSGISPyUtils()
+    uid = rsPyUtils.uidGenerator(10)
+    
+    classLayerSeq = list()
+    tmpClassImgLayers = list()
+    classNamesDict = dict()
+    
+    count = 1
+    for key in classesDict:
+        className = key
+        classShpFile = classesDict[key]
+        classImgFile = os.path.join(tmpPath, className+"_"+uid+".kea")
+        classIntVal = count
+        vectorutils.rasterise2Image(classShpFile, clumpsImg, classImgFile, gdalFormat="KEA", burnVal=classIntVal)
+        tmpClassImgLayers.append(classImgFile)
+        classNamesDict[classIntVal] = className
+        count = count + 1
+    
+    combinedClassesImage = os.path.join(tmpPath, "CombinedClasses_" + uid + ".kea")
+    imageutils.combineImages2Band(tmpClassImgLayers, combinedClassesImage, 'KEA', rsgislib.TYPE_8UINT, 0.0)
+    
+    rastergis.populateRATWithMode(valsimage=combinedClassesImage, clumps=clumpsImg, outcolsname=classesIntCol, usenodata=False, nodataval=0, modeband=1, ratband=1)
+    defineClassNames(clumpsImg, classesIntCol, classesNameCol, classNamesDict)
+    
+    for file in tmpClassImgLayers:
+        rsPyUtils.deleteFileWithBasename(file)
+    rsPyUtils.deleteFileWithBasename(combinedClassesImage)
+    
+    if createdDIR:
+        shutil.rmtree(tmpPath)
+    
 

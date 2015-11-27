@@ -495,11 +495,13 @@ static PyObject *ImageCalc_Normalisation(PyObject *self, PyObject *args) {
     inputImages.reserve(nImages);
     outputImages.reserve(nImages);
 
-    for(int i = 0; i < nImages; ++i) {
+    for(int i = 0; i < nImages; ++i)
+    {
         PyObject *inImageObj = PySequence_GetItem(pInputImages, i);
         PyObject *outImageObj = PySequence_GetItem(pOutputImages, i);
 
-        if(!RSGISPY_CHECK_STRING(inImageObj) || !RSGISPY_CHECK_STRING(outImageObj)) {
+        if(!RSGISPY_CHECK_STRING(inImageObj) || !RSGISPY_CHECK_STRING(outImageObj))
+        {
             PyErr_SetString(GETSTATE(self)->error, "Input and output images must be strings");
             Py_DECREF(inImageObj);
             Py_DECREF(outImageObj);

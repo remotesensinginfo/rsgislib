@@ -83,6 +83,7 @@ import os
 import subprocess
 import fnmatch
 import time
+import uuid
 
 TYPE_UNDEFINED = 0
 TYPE_8INT = 1
@@ -276,6 +277,14 @@ class RSGISPyUtils (object):
             return TYPE_64FLOAT
         else:
             raise RSGISPyException("The data type '%s' is unknown / not supported."%(gdaltype))
+            
+    def uidGenerator(self, size=6):
+        """
+        A function which will generate a 'random' string of the specified lenght based on the UUID
+        """
+        randomStr = str(uuid.uuid4())
+        randomStr = randomStr.replace("-","")
+        return randomStr[0:size]
 
 class RSGISTime (object):
     """ Class to calculate run time for a function, format and print out (similar to for XML interface).

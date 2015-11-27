@@ -43,6 +43,7 @@
 #include "img/RSGISExtractImageValues.h"
 #include "img/RSGISImageComposite.h"
 #include "img/RSGISMaskImage.h"
+#include "img/RSGISAddBands.h"
 
 #include "vec/RSGISImageTileVector.h"
 #include "vec/RSGISVectorOutputException.h"
@@ -1408,7 +1409,53 @@ namespace rsgis{ namespace cmds {
             
             // Tidy up
             GDALClose(dataset);
-            GDALClose(dataset);
+        }
+        catch (RSGISImageException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (RSGISException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+            
+    void executeCombineImagesSingleBandIgnoreNoData(std::vector<std::string> inputImages, std::string outputImage, float noDataVal, std::string gdalFormat, RSGISLibDataType outDataType) throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            unsigned int numImages = inputImages.size();
+            GDALDataset **datasets = new GDALDataset*[numImages];
+            
+            for(unsigned int i = 0; i < numImages; ++i)
+            {
+                datasets[i] = (GDALDataset *) GDALOpen(inputImages.at(i).c_str(), GA_ReadOnly);
+                if(datasets[i] == NULL)
+                {
+                    std::string message = std::string("Could not open image ") + inputImages.at(i);
+                    throw RSGISImageException(message.c_str());
+                }
+            }
+            
+            rsgis::img::RSGISCombineImagesIgnoreNoData *combineImagesCalc = new rsgis::img::RSGISCombineImagesIgnoreNoData(noDataVal);
+            rsgis::img::RSGISCalcImage *calcImage = new rsgis::img::RSGISCalcImage(combineImagesCalc, "", true);
+            
+            calcImage->calcImage(datasets, numImages, outputImage, false, NULL, gdalFormat, RSGIS_to_GDAL_Type(outDataType));
+            
+            delete calcImage;
+            
+            
+            // Tidy up
+            for(unsigned int i = 0; i < numImages; ++i)
+            {
+                GDALClose(datasets[i]);
+            }
+            delete[] datasets;
         }
         catch (RSGISImageException& e)
         {
