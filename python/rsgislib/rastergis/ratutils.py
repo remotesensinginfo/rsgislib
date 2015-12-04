@@ -53,6 +53,14 @@ try:
     import osgeo.gdal as gdal
 except ImportError as gdalErr:
     haveGDALPy = False
+    
+    
+haveGDALOGRPy = True
+try:
+    from osgeo import ogr
+    from osgeo import osr
+except ImportError as gdalogrErr:
+    haveGDALOGRPy = False
 
 haveMatPlotLib = True
 try:
@@ -1177,4 +1185,93 @@ def populateClumpsWithClassTraining(clumpsImg, classesDict, tmpPath, classesIntC
     if createdDIR:
         shutil.rmtree(tmpPath)
     
+
+
+def createClumpsSHPBBOX(clumpsImg, minXCol, maxXCol, minYCol, maxYCol, outShpLyrName, roundInt=False):
+    """
+    A function to create a shapefile of polygons with the bboxs of the clumps defined using 
+    the minX, maxX, minY and maxY coordinates for the features.
+    
+    Where:
+    * clumpsImg - input clumps file.
+    * minXCol - the minX column in RAT.
+    * maxXCol - the maxX column in RAT.
+    * minYCol - the minY column in RAT.
+    * maxYCol - the maxY column in RAT.
+    * outShpLyrName - The output shapefile name (layer name do not include the .shp it will be appended).
+    * roundInt - Boolean specifying whether the coordinated should be rounded to integers (Default: False)
+    
+    """   
+    
+    # Check numpy is available
+    if not haveNumpy:
+        raise Exception("The numpy module is required for this function could not be imported\n\t" + numErr)
+    # Check gdal is available
+    if not haveGDALPy:
+        raise Exception("The GDAL python bindings are required for this function could not be imported\n\t" + gdalErr)
+    # Check rios rat is available
+    if not haveRIOSRat:
+        raise Exception("The RIOS rat tools are required for this function could not be imported\n\t" + riosRatErr)
+    # Check gdal ogr is available
+    if not haveGDALOGRPy:
+        raise Exception("The GDAL OGR python bindings are required for this function could not be imported\n\t" + gdalogrErr)
+    
+    ratDataset = gdal.Open(clumpsImg)
+
+    minXVals = rat.readColumn(ratDataset, minXCol)
+    maxXVals = rat.readColumn(ratDataset, maxXCol)
+    minYVals = rat.readColumn(ratDataset, minYCol)
+    maxYVals = rat.readColumn(ratDataset, maxYCol)
+
+    ## Remove First Row which is no data...    
+    dataMask = numpy.ones_like(minXVals, dtype=numpy.int16)
+    dataMask[0] = 0
+    minXVals = minXVals[dataMask == 1]
+    maxXVals = maxXVals[dataMask == 1]
+    minYVals = minYVals[dataMask == 1]
+    maxYVals = maxYVals[dataMask == 1]
+    
+    ## Remove any features which are all zero (i.e., polygon not present...
+    minXValsSub = minXVals[numpy.logical_not((minXVals == 0) & (maxXVals == 0) & (minYVals == 0) & (maxYVals == 0))]
+    maxXValsSub = maxXVals[numpy.logical_not((minXVals == 0) & (maxXVals == 0) & (minYVals == 0) & (maxYVals == 0))]
+    minYValsSub = minYVals[numpy.logical_not((minXVals == 0) & (maxXVals == 0) & (minYVals == 0) & (maxYVals == 0))]
+    maxYValsSub = maxYVals[numpy.logical_not((minXVals == 0) & (maxXVals == 0) & (minYVals == 0) & (maxYVals == 0))]
+
+    if roundInt:
+        minXValsSub = numpy.rint(minXValsSub)
+        maxXValsSub = numpy.rint(maxXValsSub)
+        minYValsSub = numpy.rint(minYValsSub)
+        maxYValsSub = numpy.rint(maxYValsSub)
+    
+    numFeats = minXValsSub.shape[0]
+    print("Num Feats: ", numFeats)
+    
+    driver = ogr.GetDriverByName("ESRI Shapefile")
+    if os.path.exists(outShpLyrName+".shp"):
+        driver.DeleteDataSource(outShpLyrName+".shp")
+    outDatasource = driver.CreateDataSource(outShpLyrName+ ".shp")
+    raster_srs = osr.SpatialReference()
+    raster_srs.ImportFromWkt(ratDataset.GetProjectionRef())
+    outLayer = outDatasource.CreateLayer(outShpLyrName, srs=raster_srs) #ratDataset.GetProjection()
+    
+    print("Create and Add Polygons...")
+    for i in range(numFeats):
+        wktStr = "POLYGON((" + str(minXValsSub[i]) + " " + str(maxYValsSub[i]) + ", " + str(maxXValsSub[i]) + " " + str(maxYValsSub[i]) + ", " + str(maxXValsSub[i]) + " " + str(minYValsSub[i]) + ", " + str(minXValsSub[i]) + " " + str(minYValsSub[i]) + ", " + str(minXValsSub[i]) + " " + str(maxYValsSub[i]) + "))"
+        #print(str(i) + ": " + wktStr)
+        poly = ogr.CreateGeometryFromWkt(wktStr)
+        feat = ogr.Feature( outLayer.GetLayerDefn())
+        feat.SetGeometry(poly)
+        if outLayer.CreateFeature(feat) != 0:
+            print(str(i) + ": " + wktStr)
+            print("Failed to create feature in shapefile.\n")
+            sys.exit( 1 )
+        feat.Destroy()
+        
+    outDatasource.Destroy()
+    ratDataset = None
+    print("Completed")
+
+
+
+
 

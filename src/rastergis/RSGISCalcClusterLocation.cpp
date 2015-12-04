@@ -203,6 +203,10 @@ namespace rsgis{namespace rastergis{
                 spatialLoc[i][1] = 0.0;
                 spatialLoc[i][2] = 0.0;
                 spatialLoc[i][3] = 0.0;
+                spatialLoc[i][4] = 0.0;
+                spatialLoc[i][5] = 0.0;
+                spatialLoc[i][6] = 0.0;
+                spatialLoc[i][7] = 0.0;
             }
             
             RSGISCalcClusterExtentCalcValue *calcLoc = new RSGISCalcClusterExtentCalcValue(spatialLoc, first, ratBand);
