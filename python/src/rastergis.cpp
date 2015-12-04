@@ -184,18 +184,18 @@ static PyObject *RasterGIS_SpatialLocation(PyObject *self, PyObject *args, PyObj
 
 static PyObject *RasterGIS_SpatialExtent(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    const char *inputImage, *minXCol, *maxXCol, *minYCol, *maxYCol;
+    const char *inputImage, *minXXCol, *minXYCol, *maxXXCol, *maxXYCol, *minYXCol, *minYYCol, *maxYXCol, *maxYYCol;
     unsigned int ratBand = 1;
-    static char *kwlist[] = {"clumps", "minX", "maxX", "minY", "maxY", "ratband", NULL};
+    static char *kwlist[] = {"clumps", "minXX", "minXY", "maxXX", "maxXY", "minYX", "minYY", "maxYX", "maxYY", "ratband", NULL};
     
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssss|I:spatialExtent", kwlist, &inputImage, &minXCol, &maxXCol, &minYCol, &maxYCol, &ratBand))
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssssssss|I:spatialExtent", kwlist, &inputImage, &minXXCol, &minXYCol, &maxXXCol, &maxXYCol, &minYXCol, &minYYCol, &maxYXCol, &maxYYCol, &ratBand))
     {
         return NULL;
     }
     
     try
     {
-        rsgis::cmds::executeSpatialLocationExtent(std::string(inputImage), ratBand, std::string(minXCol), std::string(maxXCol), std::string(minYCol), std::string(maxYCol));
+        rsgis::cmds::executeSpatialLocationExtent(std::string(inputImage), ratBand, std::string(minXXCol), std::string(minXYCol), std::string(maxXXCol), std::string(maxXYCol), std::string(minYXCol), std::string(minYYCol), std::string(maxYXCol), std::string(maxYYCol));
     }
     catch (rsgis::cmds::RSGISCmdException &e)
     {

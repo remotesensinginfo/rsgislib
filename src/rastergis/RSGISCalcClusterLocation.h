@@ -48,7 +48,7 @@ namespace rsgis{namespace rastergis{
     public:
         RSGISCalcClusterLocation();
         void populateAttWithClumpLocation(GDALDataset *dataset, unsigned int ratBand, std::string eastColumn, std::string northColumn) throw(rsgis::RSGISAttributeTableException);
-        void populateAttWithClumpLocationExtent(GDALDataset *dataset, unsigned int ratBand, std::string minXCol, std::string maxXCol, std::string minYCol, std::string maxYCol) throw(rsgis::RSGISAttributeTableException);
+        void populateAttWithClumpLocationExtent(GDALDataset *dataset, unsigned int ratBand, std::string minXColX, std::string minXColY, std::string maxXColX, std::string maxXColY, std::string minYColX, std::string minYColY, std::string maxYColX, std::string maxYColY) throw(rsgis::RSGISAttributeTableException);
         ~RSGISCalcClusterLocation();
     };
     

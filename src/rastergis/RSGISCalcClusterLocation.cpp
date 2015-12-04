@@ -156,7 +156,7 @@ namespace rsgis{namespace rastergis{
         }
     }
     
-    void RSGISCalcClusterLocation::populateAttWithClumpLocationExtent(GDALDataset *dataset, unsigned int ratBand, std::string minXCol, std::string maxXCol, std::string minYCol, std::string maxYCol) throw(rsgis::RSGISAttributeTableException)
+    void RSGISCalcClusterLocation::populateAttWithClumpLocationExtent(GDALDataset *dataset, unsigned int ratBand, std::string minXColX, std::string minXColY, std::string maxXColX, std::string maxXColY, std::string minYColX, std::string minYColY, std::string maxYColX, std::string maxYColY) throw(rsgis::RSGISAttributeTableException)
     {
         try
         {
@@ -184,17 +184,21 @@ namespace rsgis{namespace rastergis{
                 numRows = maxVal+1;
             }
             
-            int minXColIdx = attUtils.findColumnIndexOrCreate(attTable, minXCol, GFT_Real);
-            int maxXColIdx = attUtils.findColumnIndexOrCreate(attTable, maxXCol, GFT_Real);
-            int minYColIdx = attUtils.findColumnIndexOrCreate(attTable, minYCol, GFT_Real);
-            int maxYColIdx = attUtils.findColumnIndexOrCreate(attTable, maxYCol, GFT_Real);
+            int minXColXIdx = attUtils.findColumnIndexOrCreate(attTable, minXColX, GFT_Real);
+            int minXColYIdx = attUtils.findColumnIndexOrCreate(attTable, minXColY, GFT_Real);
+            int maxXColXIdx = attUtils.findColumnIndexOrCreate(attTable, maxXColX, GFT_Real);
+            int maxXColYIdx = attUtils.findColumnIndexOrCreate(attTable, maxXColY, GFT_Real);
+            int minYColXIdx = attUtils.findColumnIndexOrCreate(attTable, minYColX, GFT_Real);
+            int minYColYIdx = attUtils.findColumnIndexOrCreate(attTable, minYColY, GFT_Real);
+            int maxYColXIdx = attUtils.findColumnIndexOrCreate(attTable, maxYColX, GFT_Real);
+            int maxYColYIdx = attUtils.findColumnIndexOrCreate(attTable, maxYColY, GFT_Real);
             
             double **spatialLoc = new double*[numRows];
             bool *first = new bool[numRows];
             for(size_t i = 0; i < numRows; ++i)
             {
                 first[i] = true;
-                spatialLoc[i] = new double[4];
+                spatialLoc[i] = new double[8];
                 spatialLoc[i][0] = 0.0;
                 spatialLoc[i][1] = 0.0;
                 spatialLoc[i][2] = 0.0;
@@ -211,10 +215,14 @@ namespace rsgis{namespace rastergis{
             size_t rowsRemain = numRows - (numBlocks * RAT_BLOCK_LENGTH);
             
             rsgis::math::RSGISMathsUtils mathUtils;
-            double *dataMinXBlock = new double[RAT_BLOCK_LENGTH];
-            double *dataMaxXBlock = new double[RAT_BLOCK_LENGTH];
-            double *dataMinYBlock = new double[RAT_BLOCK_LENGTH];
-            double *dataMaxYBlock = new double[RAT_BLOCK_LENGTH];
+            double *dataMinXXBlock = new double[RAT_BLOCK_LENGTH];
+            double *dataMinXYBlock = new double[RAT_BLOCK_LENGTH];
+            double *dataMaxXXBlock = new double[RAT_BLOCK_LENGTH];
+            double *dataMaxXYBlock = new double[RAT_BLOCK_LENGTH];
+            double *dataMinYXBlock = new double[RAT_BLOCK_LENGTH];
+            double *dataMinYYBlock = new double[RAT_BLOCK_LENGTH];
+            double *dataMaxYXBlock = new double[RAT_BLOCK_LENGTH];
+            double *dataMaxYYBlock = new double[RAT_BLOCK_LENGTH];
             size_t startRow = 0;
             size_t rowID = 0;
             for(size_t i = 0; i < numBlocks; ++i)
@@ -222,16 +230,24 @@ namespace rsgis{namespace rastergis{
                 rowID = startRow;
                 for(size_t j = 0; j < RAT_BLOCK_LENGTH; ++j)
                 {
-                    dataMinXBlock[j] = spatialLoc[rowID][0];
-                    dataMaxXBlock[j] = spatialLoc[rowID][1];
-                    dataMinYBlock[j] = spatialLoc[rowID][2];
-                    dataMaxYBlock[j] = spatialLoc[rowID][3];
+                    dataMinXXBlock[j] = spatialLoc[rowID][0];
+                    dataMinXYBlock[j] = spatialLoc[rowID][1];
+                    dataMaxXXBlock[j] = spatialLoc[rowID][2];
+                    dataMaxXYBlock[j] = spatialLoc[rowID][3];
+                    dataMinYXBlock[j] = spatialLoc[rowID][4];
+                    dataMinYYBlock[j] = spatialLoc[rowID][5];
+                    dataMaxYXBlock[j] = spatialLoc[rowID][6];
+                    dataMaxYYBlock[j] = spatialLoc[rowID][7];
                     ++rowID;
                 }
-                attTable->ValuesIO(GF_Write, minXColIdx, startRow, RAT_BLOCK_LENGTH, dataMinXBlock);
-                attTable->ValuesIO(GF_Write, maxXColIdx, startRow, RAT_BLOCK_LENGTH, dataMaxXBlock);
-                attTable->ValuesIO(GF_Write, minYColIdx, startRow, RAT_BLOCK_LENGTH, dataMinYBlock);
-                attTable->ValuesIO(GF_Write, maxYColIdx, startRow, RAT_BLOCK_LENGTH, dataMaxYBlock);
+                attTable->ValuesIO(GF_Write, minXColXIdx, startRow, RAT_BLOCK_LENGTH, dataMinXXBlock);
+                attTable->ValuesIO(GF_Write, minXColYIdx, startRow, RAT_BLOCK_LENGTH, dataMinXYBlock);
+                attTable->ValuesIO(GF_Write, maxXColXIdx, startRow, RAT_BLOCK_LENGTH, dataMaxXXBlock);
+                attTable->ValuesIO(GF_Write, maxXColYIdx, startRow, RAT_BLOCK_LENGTH, dataMaxXYBlock);
+                attTable->ValuesIO(GF_Write, minYColXIdx, startRow, RAT_BLOCK_LENGTH, dataMinYXBlock);
+                attTable->ValuesIO(GF_Write, minYColYIdx, startRow, RAT_BLOCK_LENGTH, dataMinYYBlock);
+                attTable->ValuesIO(GF_Write, maxYColXIdx, startRow, RAT_BLOCK_LENGTH, dataMaxYXBlock);
+                attTable->ValuesIO(GF_Write, maxYColYIdx, startRow, RAT_BLOCK_LENGTH, dataMaxYYBlock);
                 
                 startRow += RAT_BLOCK_LENGTH;
             }
@@ -240,23 +256,34 @@ namespace rsgis{namespace rastergis{
                 rowID = startRow;
                 for(size_t j = 0; j < rowsRemain; ++j)
                 {
-                    dataMinXBlock[j] = spatialLoc[rowID][0];
-                    dataMaxXBlock[j] = spatialLoc[rowID][1];
-                    dataMinYBlock[j] = spatialLoc[rowID][2];
-                    dataMaxYBlock[j] = spatialLoc[rowID][3];
+                    dataMinXXBlock[j] = spatialLoc[rowID][0];
+                    dataMinXYBlock[j] = spatialLoc[rowID][1];
+                    dataMaxXXBlock[j] = spatialLoc[rowID][2];
+                    dataMaxXYBlock[j] = spatialLoc[rowID][3];
+                    dataMinYXBlock[j] = spatialLoc[rowID][4];
+                    dataMinYYBlock[j] = spatialLoc[rowID][5];
+                    dataMaxYXBlock[j] = spatialLoc[rowID][6];
+                    dataMaxYYBlock[j] = spatialLoc[rowID][7];
                     ++rowID;
                 }
-                attTable->ValuesIO(GF_Write, minXColIdx, startRow, rowsRemain, dataMinXBlock);
-                attTable->ValuesIO(GF_Write, maxXColIdx, startRow, rowsRemain, dataMaxXBlock);
-                attTable->ValuesIO(GF_Write, minYColIdx, startRow, rowsRemain, dataMinYBlock);
-                attTable->ValuesIO(GF_Write, maxYColIdx, startRow, rowsRemain, dataMaxYBlock);
-                
+                attTable->ValuesIO(GF_Write, minXColXIdx, startRow, rowsRemain, dataMinXXBlock);
+                attTable->ValuesIO(GF_Write, minXColYIdx, startRow, rowsRemain, dataMinXYBlock);
+                attTable->ValuesIO(GF_Write, maxXColXIdx, startRow, rowsRemain, dataMaxXXBlock);
+                attTable->ValuesIO(GF_Write, maxXColYIdx, startRow, rowsRemain, dataMaxXYBlock);
+                attTable->ValuesIO(GF_Write, minYColXIdx, startRow, rowsRemain, dataMinYXBlock);
+                attTable->ValuesIO(GF_Write, minYColYIdx, startRow, rowsRemain, dataMinYYBlock);
+                attTable->ValuesIO(GF_Write, maxYColXIdx, startRow, rowsRemain, dataMaxYXBlock);
+                attTable->ValuesIO(GF_Write, maxYColYIdx, startRow, rowsRemain, dataMaxYYBlock);
             }
             
-            delete[] dataMinXBlock;
-            delete[] dataMaxXBlock;
-            delete[] dataMinYBlock;
-            delete[] dataMaxYBlock;
+            delete[] dataMinXXBlock;
+            delete[] dataMinXYBlock;
+            delete[] dataMaxXXBlock;
+            delete[] dataMaxXYBlock;
+            delete[] dataMinYXBlock;
+            delete[] dataMinYYBlock;
+            delete[] dataMaxYXBlock;
+            delete[] dataMaxYYBlock;
             
             for(size_t i = 0; i < numRows; ++i)
             {
@@ -329,32 +356,40 @@ namespace rsgis{namespace rastergis{
             
             if(first[fid])
             {
-                spatialLoc[fid][0] = extent.getMinX();
-                spatialLoc[fid][1] = extent.getMaxX();
-                spatialLoc[fid][2] = extent.getMinY();
-                spatialLoc[fid][3] = extent.getMaxY();
+                spatialLoc[fid][0] = extent.getMinX(); // minX_X TLX
+                spatialLoc[fid][1] = extent.getMaxY(); // minX_Y TLY
+                spatialLoc[fid][2] = extent.getMaxX(); // maxX_X BRX
+                spatialLoc[fid][3] = extent.getMinY(); // maxX_Y BRX
+                spatialLoc[fid][4] = extent.getMinX(); // minY_X BLX
+                spatialLoc[fid][5] = extent.getMinY(); // minY_Y BLY
+                spatialLoc[fid][6] = extent.getMaxX(); // maxY_X TRX
+                spatialLoc[fid][7] = extent.getMaxY(); // maxY_Y TRY
                 first[fid] = false;
             }
             else
             {
                 if(extent.getMinX() < spatialLoc[fid][0])
                 {
-                    spatialLoc[fid][0] = extent.getMinX();
+                    spatialLoc[fid][0] = extent.getMinX(); // minX_X TLX
+                    spatialLoc[fid][1] = extent.getMaxY(); // minX_Y TLY
                 }
                 
-                if(extent.getMaxX() > spatialLoc[fid][1])
+                if(extent.getMaxX() > spatialLoc[fid][2])
                 {
-                    spatialLoc[fid][1] = extent.getMaxX();
+                    spatialLoc[fid][2] = extent.getMaxX(); // maxX_X BRX
+                    spatialLoc[fid][3] = extent.getMinY(); // maxX_Y BRX
                 }
                 
-                if(extent.getMinY() < spatialLoc[fid][2])
+                if(extent.getMinY() < spatialLoc[fid][5])
                 {
-                    spatialLoc[fid][2] = extent.getMinY();
+                    spatialLoc[fid][4] = extent.getMinX(); // minY_X BLX
+                    spatialLoc[fid][5] = extent.getMinY(); // minY_Y BLY
                 }
                 
-                if(extent.getMaxY() > spatialLoc[fid][3])
+                if(extent.getMaxY() > spatialLoc[fid][7])
                 {
-                    spatialLoc[fid][3] = extent.getMaxY();
+                    spatialLoc[fid][6] = extent.getMaxX(); // maxY_X TRX
+                    spatialLoc[fid][7] = extent.getMaxY(); // maxY_Y TRY
                 }
             }
         }
