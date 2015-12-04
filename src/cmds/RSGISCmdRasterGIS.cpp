@@ -207,7 +207,7 @@ namespace rsgis{ namespace cmds {
         }
     }
             
-    void executeSpatialLocationExtent(std::string inputImage, unsigned int ratBand, std::string minXCol, std::string maxXCol, std::string minYCol, std::string maxYCol)throw(RSGISCmdException)
+    void executeSpatialLocationExtent(std::string inputImage, unsigned int ratBand, std::string minXColX, std::string minXColY, std::string maxXColX, std::string maxXColY, std::string minYColX, std::string minYColY, std::string maxYColX, std::string maxYColY)throw(RSGISCmdException)
     {
         try
         {
@@ -221,7 +221,7 @@ namespace rsgis{ namespace cmds {
             }
             
             rsgis::rastergis::RSGISCalcClusterLocation calcLoc;
-            calcLoc.populateAttWithClumpLocationExtent(inputDataset, ratBand, minXCol, maxXCol, minYCol, maxYCol);
+            calcLoc.populateAttWithClumpLocationExtent(inputDataset, ratBand, minXColX, minXColY, maxXColX, maxXColY, minYColX, minYColY, maxYColX, maxYColY);
             
             GDALClose(inputDataset);
         }
