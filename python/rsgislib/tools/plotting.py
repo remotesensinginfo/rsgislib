@@ -210,7 +210,7 @@ plotting.plotImageComparison(inputImage1, inputImage2, 1, 1, outputPlotFile, img
             if img2Max is None:
                 img2Max = max
         
-        outBinSizeImg1, outBinSizeImg2, rSq = imagecalc.get2DImageHistogram(inputImage1, inputImage2, tmpOutFile, gdalFormat, img1Band, img2Band, numBins, img1Min, img1Max, img2Min, img2Max, img1Scale, img2Scale, img1Off, img2Off, normOutput)
+        outBinSizeImg1, outBinSizeImg2, rSq = imagecalc.get2DImageHistogram(inputImage2, inputImage1, tmpOutFile, gdalFormat, img1Band, img2Band, numBins, img1Min, img1Max, img2Min, img2Max, img1Scale, img2Scale, img1Off, img2Off, normOutput)
         print("Image1 Bin Size: ", outBinSizeImg1)
         print("Image2 Bin Size: ", outBinSizeImg2)
         print("rSq: ", rSq)
@@ -260,7 +260,76 @@ plotting.plotImageComparison(inputImage1, inputImage2, 1, 1, outputPlotFile, img
     except Exception as e:
         raise e
 
+def plotImageHistogram(inputImage, imgBand, outputPlotFile, numBins=100, imgMin=None, imgMax=None, normOutput=False, plotTitle='Histogram', xLabel='X Axis', colour='blue', edgecolour='black', linewidth=None):
+    """A function to plot the histogram of an image. 
+Where:
 
+* inputImage is a string with the path to the image.
+* imgBand is an int specifying the band in the image to be plotted.
+* outputPlotFile is a string specifying the output PDF for the plot.
+* numBins is an int specifying the number of bins within each axis of the histogram (default: 100)
+* imgMin is a double specifying the minimum value to be used in the histogram from the image. If value is None then taken from the image.
+* imgMax is a double specifying the maximum value to be used in the histogram from the image. If value is None then taken from the image.
+* normOutput is a boolean specifying whether the histogram should be normalised (Default: False).
+* plotTitle is a string specifying the title of the plot (Default: '2D Histogram').
+* xLabel is a string specifying the x axis label (Default: 'X Axis')
+* colour is the colour of the bars in the plot (see matplotlib documentation for how to specify, either keyword or RGB values (e.g., [1.0,0,0])
+* edgecolour is the colour of the edges of the bars
+* linewidth is the thickness of the edges of the bars in the plot.
+    
+Example::
+from rsgislib.tools import plotting
+
+plotting.plotImageHistogram("Baccini_Manaus_AGB_30.kea", 1, "BacciniHistogram.pdf", numBins=100, imgMin=0, imgMax=400, normOutput=True, plotTitle='Histogram of Baccini Biomass', xLabel='Baccini Biomass', color=[1.0,0.2,1.0], edgecolor='red', linewidth=0)
+    
+    """
+    try:
+        # Check gdal is available
+        if not haveGDALPy:
+            raise Exception("The GDAL python bindings required for this function could not be imported\n\t" + gdalErr)
+        # Check matplotlib is available
+        if not haveMatPlotLib:
+            raise Exception("The matplotlib module is required for this function could not be imported\n\t" + pltErr)
+        # Check matplotlib is available
+        if not haveNumpy:
+            raise Exception("The numpy module is required for this function could not be imported\n\t" + numErr)
+        
+        
+        if (imgMin is None) or (imgMax is None):
+            # Calculate image 1 stats
+            imgGDALDS = gdal.Open(inputImage, gdal.GA_ReadOnly)
+            imgGDALBand = imgGDALDS.GetRasterBand(imgBand)
+            min, max = imgGDALBand.ComputeRasterMinMax(False)
+            imgGDALDS = None
+            if imgMin is None:
+                imgMin = min
+            if imgMax is None:
+                imgMax = max
+
+        binWidth = (imgMax - imgMin) / numBins
+        print("Bin Size: ", binWidth)
+        
+        bins, hMin, hMax = imagecalc.getHistogram(inputImage, imgBand, binWidth, False, imgMin, imgMax)
+                
+        if normOutput:
+            sumBins = numpy.sum(bins)
+            bins = bins/sumBins
+        
+        numBins = len(bins)
+        xLocs = numpy.arange(numBins)
+        xLocs = (xLocs * binWidth) - (binWidth / 2)
+        
+        fig = plt.figure(figsize=(7, 7), dpi=80)
+        plt.bar(xLocs, bins, width=binWidth, color=colour, edgecolor=edgecolour, linewidth=linewidth)
+        plt.xlim(imgMin, imgMax)
+        
+        plt.title(plotTitle)
+        plt.xlabel(xLabel)
+        plt.ylabel('Freq.')
+        plt.savefig(outputPlotFile, format='PDF')
+                
+    except Exception as e:
+        raise e
 
 
 
