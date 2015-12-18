@@ -47,6 +47,7 @@ import rsgislib
 from rsgislib import rastergis
 from rsgislib import vectorutils
 from rsgislib import imageutils
+from rsgislib import segmentation
 
 haveGDALPy = True
 try:
@@ -1270,6 +1271,84 @@ def createClumpsSHPBBOX(clumpsImg, minXCol, maxXCol, minYCol, maxYCol, outShpLyr
     outDatasource.Destroy()
     ratDataset = None
     print("Completed")
+
+
+def identifySmallUnits(clumpsImg, classCol, tmpPath, outColName, smallClumpsThres):
+    """
+Identify small connected units within a classification. The threshold to define small
+is provided by the user in pixels. Note, the outColName and smallClumpsThres variables
+can be provided as lists to identify a number of thresholds of small units.
+
+* clumpsImg - string for the clumps image file containing input classification
+* classCol - string for the column name representing the classification as integer values
+* tmpPath - directory path for 
+* outColName
+* smallClumpsThres
+
+Example::
+from rsgislib.rastergis import ratutils
+
+clumpsImg = "LS2MSS_19750620_lat10lon6493_r67p250_rad_srefdem_30m_clumps.kea"
+tmpPath = "./tmp/"
+classCol = "OutClass"
+outColName = ["SmallUnits25", "SmallUnits50", "SmallUnits100"]
+smallClumpsThres = [25, 50, 100]
+rastergis.identifySmallUnits(clumpsImg, classCol, tmpPath, outColName, smallClumpsThres)
+
+    """
+    
+    # Check numpy is available
+    if not haveNumpy:
+        raise Exception("The numpy module is required for this function could not be imported\n\t" + numErr)
+    # Check gdal is available
+    if not haveGDALPy:
+        raise Exception("The GDAL python bindings are required for this function could not be imported\n\t" + gdalErr)
+    # Check rios rat is available
+    if not haveRIOSRat:
+        raise Exception("The RIOS rat tools are required for this function could not be imported\n\t" + riosRatErr)
+    
+    if len(outColName) is not len(smallClumpsThres):
+        print("The number of threshold values and output column names should be the same.")
+        sys.exit(-1)
+    
+    numThresholds = len(smallClumpsThres)
+        
+    createdDIR = False
+    if not os.path.isdir(tmpPath):
+        os.makedirs(tmpPath)
+        createdDIR = True
+        
+    
+    baseName = os.path.splitext(os.path.basename(clumpsImg))[0]
+    classMaskImg = os.path.join(tmpPath, baseName+"_TmpClassMask.kea")
+    classMaskClumps = os.path.join(tmpPath, baseName+"_TmpClassMaskClumps.kea")
+    smallClumpsMask = os.path.join(tmpPath, baseName+"_SmallClassClumps.kea")
+    
+    rastergis.exportCol2GDALImage(clumpsImg, classMaskImg, "KEA", rsgislib.TYPE_16UINT, classCol)
+    segmentation.clump(classMaskImg, classMaskClumps, "KEA", False, 0)
+    rastergis.populateStats(classMaskClumps, False, False)
+        
+    for i in range(numThresholds):
+        print("Processing thresold " + str(smallClumpsThres[i]) + " - " + outColName[i])
+        ratDataset = gdal.Open(classMaskClumps, gdal.GA_Update)
+        Histogram = rat.readColumn(ratDataset, "Histogram")
+        smallUnits = numpy.zeros_like(Histogram, dtype=numpy.int16)
+        smallUnits[Histogram < smallClumpsThres[i]] = 1
+        rat.writeColumn(ratDataset, "smallUnits", smallUnits)
+        ratDataset = None
+    
+        rastergis.exportCol2GDALImage(classMaskClumps, smallClumpsMask, "KEA", rsgislib.TYPE_8UINT, "smallUnits")
+    
+        bs = []
+        bs.append(rastergis.BandAttStats(band=1, maxField=outColName[i]))
+        rastergis.populateRATWithStats(smallClumpsMask, clumpsImg, bs)
+    
+    rsgisUtils = rsgislib.RSGISPyUtils()
+    rsgisUtils.deleteFileWithBasename(classMaskImg)
+    rsgisUtils.deleteFileWithBasename(classMaskClumps)
+    rsgisUtils.deleteFileWithBasename(smallClumpsMask)
+    if createdDIR:
+        shutil.rmtree(tmpPath)
 
 
 
