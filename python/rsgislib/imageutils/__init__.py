@@ -50,6 +50,18 @@ Example::
             raise Exception("Could not open the image band: ", band)
 
 
+def getRSGISLibDataType(inImgFile):
+    """
+    Returns the rsgislib datatype ENUM for a raster file
+    :param inImgFile: The file to get the datatype for
+    :return: The rsgislib datatype enum, e.g., rsgislib.TYPE_8INT
+    """
+    raster = gdal.Open(inImgFile, GA_ReadOnly)
+    band = raster.GetRasterBand(1)
+    gdal_dtype = gdal.GetDataTypeName(band.DataType)
+    rsgis_utils = rsgislib.RSGISPyUtils()
+    return rsgis_utils.getRSGISLibDataType(gdal_dtype)
+
 def resampleImage2Match(inRefImg, inProcessImg, outImg, format, interpMethod, datatype=None):
     """A utility function to resample an existing image to the projection
 and/or pixel size of another image.

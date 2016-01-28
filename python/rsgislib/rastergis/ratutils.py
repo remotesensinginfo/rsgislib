@@ -1134,7 +1134,7 @@ def populateClumpsWithClassTraining(clumpsImg, classesDict, tmpPath, classesIntC
     
     Where:
     * clumpsImg - input clumps file.
-    * classesDict - A dict structure with the class names as keys and the values the file paths to the shapefiles.
+    * classesDict - A dict structure with the class names as keys and the values are an array of two values [int class val, file path for shapefile].
     * tmpPath - File path (which needs to exist) where files can temporally be written.
     * classesIntCol - Output column name for integer values representing each class.
     * classesNameCol - Output column name for string class names.
@@ -1162,16 +1162,14 @@ def populateClumpsWithClassTraining(clumpsImg, classesDict, tmpPath, classesIntC
     tmpClassImgLayers = list()
     classNamesDict = dict()
     
-    count = 1
     for key in classesDict:
         className = key
-        classShpFile = classesDict[key]
+        classShpFile = classesDict[key][1]
         classImgFile = os.path.join(tmpPath, className+"_"+uid+".kea")
-        classIntVal = count
+        classIntVal = classesDict[key][0]
         vectorutils.rasterise2Image(classShpFile, clumpsImg, classImgFile, gdalFormat="KEA", burnVal=classIntVal)
         tmpClassImgLayers.append(classImgFile)
         classNamesDict[classIntVal] = className
-        count = count + 1
     
     combinedClassesImage = os.path.join(tmpPath, "CombinedClasses_" + uid + ".kea")
     imageutils.combineImages2Band(tmpClassImgLayers, combinedClassesImage, 'KEA', rsgislib.TYPE_8UINT, 0.0)
