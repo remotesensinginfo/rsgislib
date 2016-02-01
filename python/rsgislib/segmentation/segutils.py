@@ -47,8 +47,6 @@ import rsgislib.imagecalc
 import rsgislib.segmentation
 # Import the image rastergis module from rsgislib
 import rsgislib.rastergis
-# Import the module from rsgislib
-import rsgislib
 import os
 # Import the collections module
 import collections

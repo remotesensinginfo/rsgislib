@@ -278,16 +278,17 @@ static PyObject *ImageUtils_createImageMosaic(PyObject *self, PyObject *args)
 static PyObject *ImageUtils_IncludeImages(PyObject *self, PyObject *args)
 {
     const char *pszBaseImage;
-    int bandsDefined = false;
     PyObject *pInputImages; // List of input images
     PyObject *pInputBands = Py_None; // List of bands
+    PyObject *pSkipVal = Py_None;
 
     // Check parameters are present and of correct type
-    if( !PyArg_ParseTuple(args, "sO|O:includeImages", &pszBaseImage, &pInputImages, &pInputBands))
+    if( !PyArg_ParseTuple(args, "sO|OO:includeImages", &pszBaseImage, &pInputImages, &pInputBands, &pSkipVal))
         return NULL;
 
     // TODO: Look into this function - doesn't seem to catch when only a single image is provided.
-    if(!PySequence_Check(pInputImages)) {
+    if(!PySequence_Check(pInputImages))
+    {
         PyErr_SetString(GETSTATE(self)->error, "Second argument must be a list of images");
         return NULL;
     }
@@ -301,11 +302,12 @@ static PyObject *ImageUtils_IncludeImages(PyObject *self, PyObject *args)
         return NULL; 
     }
 
-    if(pInputBands == Py_None){bandsDefined = false;}
     // Extract bands to an array (if using)
+    bool bandsDefined = false;
     std::vector<int> imgBands;
-    if(bandsDefined)
+    if(pInputBands != Py_None)
     {
+        bandsDefined = true;
         Py_ssize_t nFields = PySequence_Size(pInputBands);
         
         for(int i = 0; i < nFields; ++i)
@@ -323,9 +325,25 @@ static PyObject *ImageUtils_IncludeImages(PyObject *self, PyObject *args)
             Py_DECREF(intObj);
         }
     }
+    
+    bool useSkipVal = false;
+    float skipVal = 0.0;
+    if(pSkipVal != Py_None)
+    {
+        useSkipVal = true;
+        if(!RSGISPY_CHECK_FLOAT(pSkipVal))
+        {
+            PyErr_SetString(GETSTATE(pInputBands)->error, "Skip value must be a float.");
+            Py_DECREF(pSkipVal);
+            return NULL;
+        }
+        
+        skipVal = RSGISPY_FLOAT_EXTRACT(pSkipVal);
+    }
+    
     try
     {
-        rsgis::cmds::executeImageInclude(inputImages, numImages, pszBaseImage, bandsDefined, imgBands);
+        rsgis::cmds::executeImageInclude(inputImages, numImages, pszBaseImage, bandsDefined, imgBands, skipVal, useSkipVal);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {

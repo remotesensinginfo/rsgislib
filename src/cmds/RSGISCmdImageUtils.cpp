@@ -445,7 +445,7 @@ namespace rsgis{ namespace cmds {
         return orderedImages;
     }
 
-    void executeImageInclude(std::string *inputImages, int numDS, std::string baseImage, bool bandsDefined, std::vector<int> bands) throw(RSGISCmdException)
+    void executeImageInclude(std::string *inputImages, int numDS, std::string baseImage, bool bandsDefined, std::vector<int> bands, float skipVal, bool useSkipVal) throw(RSGISCmdException)
     {
         try
         {
@@ -459,7 +459,14 @@ namespace rsgis{ namespace cmds {
             }
 
             rsgis::img::RSGISImageMosaic mosaic;
-            mosaic.includeDatasets(baseDS, inputImages, numDS, bands, bandsDefined);
+            if(useSkipVal)
+            {
+                mosaic.includeDatasetsSkipVals(baseDS, inputImages, numDS, bands, bandsDefined, skipVal);
+            }
+            else
+            {
+                mosaic.includeDatasets(baseDS, inputImages, numDS, bands, bandsDefined);
+            }
 
             GDALClose(baseDS);
             delete[] inputImages;
