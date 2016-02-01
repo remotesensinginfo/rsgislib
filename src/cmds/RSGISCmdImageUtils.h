@@ -72,7 +72,7 @@ namespace rsgis{ namespace cmds {
     DllExport void executeImageMosaic(std::string *inputImages, int numDS, std::string outputImage, float background, float skipVal, unsigned int skipBand, unsigned int overlapBehaviour, std::string format, RSGISLibDataType outDataType) throw(RSGISCmdException);
     
     /** A command to add images to an existing image*/
-    DllExport void executeImageInclude(std::string *inputImages, int numDS, std::string baseImage, bool bandsDefined, std::vector<int> bands) throw(RSGISCmdException);
+    DllExport void executeImageInclude(std::string *inputImages, int numDS, std::string baseImage, bool bandsDefined, std::vector<int> bands, float skipVal=0.0, bool useSkipVal=false) throw(RSGISCmdException);
     
     /** A command to order a set of input images based on the proportion of valid data within each of the scenes */
     DllExport std::vector<std::string> executeOrderImageUsingValidDataProp(std::vector<std::string> images, float noDataValue) throw(RSGISCmdException);
