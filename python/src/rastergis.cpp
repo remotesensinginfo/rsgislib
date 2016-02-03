@@ -2005,8 +2005,8 @@ static PyMethodDef RasterGISMethods[] = {
 "Copies a GDAL RAT from one image to another\n"
 "Where:\n"
 "\n"
-"* clumps is a string containing the name of the input file with RAT\n"
-"* outimage is a string containing the name of the output file to add the RAT to\n"
+"* clumps is a string containing the name and path for the image with RAT from which columns are to copied from.\n"
+"* outimage is a string containing the name of the file to which the columns are to be copied.\n"
 "* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated."
 "\n"
 "Example::\n"
@@ -2022,8 +2022,8 @@ static PyMethodDef RasterGISMethods[] = {
 "Copies GDAL RAT columns from one image to another\n"
 "Where:\n"
 "\n"
-"* clumps is a string containing the name of the input image file\n"
-"* outimage is a string containing the name of the input clump file\n"
+"* clumps is a string containing the name and path for the image with RAT from which columns are to copied from.\n"
+"* outimage is a string containing the name of the file to which the columns are to be copied.\n"
 "* fields is a sequence of strings containing the names of the fields to copy"
 "* copycolours is a bool specifying if the colour columns should be copied (default = True)"
 "* copyhist is a bool specifying if the histogram  should be copied (default = True)"
@@ -2070,7 +2070,7 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"},
     
 {"spatialExtent", (PyCFunction)RasterGIS_SpatialExtent, METH_VARARGS | METH_KEYWORDS,
-"rastergis.spatialExtent(clumps=string, minXX=string, minXY=string, maxXX=string, maxXY=string, minYX=string, minYX=string, maxYX=string, maxYX=string, ratband=int)\n"
+"rastergis.spatialExtent(clumps=string, minXX=string, minXY=string, maxXX=string, maxXY=string, minYX=string, minYY=string, maxYX=string, maxYY=string, ratband=int)\n"
 "Adds spatial extent for each clump to the attribute table\n"
 "Where:\n"
 "* inputImage is a string containing the name of the input image file\n"
