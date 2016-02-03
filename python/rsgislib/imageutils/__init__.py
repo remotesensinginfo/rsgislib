@@ -4,6 +4,7 @@ The imageutils module contains general utilities for applying to images.
 
 # import the C++ extension into this level
 from ._imageutils import *
+import rsgislib 
 
 haveGDALPy = True
 try:
@@ -56,9 +57,10 @@ def getRSGISLibDataType(inImgFile):
     :param inImgFile: The file to get the datatype for
     :return: The rsgislib datatype enum, e.g., rsgislib.TYPE_8INT
     """
-    raster = gdal.Open(inImgFile, GA_ReadOnly)
+    raster = gdal.Open(inImgFile, gdal.GA_ReadOnly)
     band = raster.GetRasterBand(1)
     gdal_dtype = gdal.GetDataTypeName(band.DataType)
+    raster = None
     rsgis_utils = rsgislib.RSGISPyUtils()
     return rsgis_utils.getRSGISLibDataType(gdal_dtype)
 

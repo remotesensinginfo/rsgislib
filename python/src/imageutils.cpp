@@ -1023,6 +1023,61 @@ static PyObject *ImageUtils_GenFiniteMask(PyObject *self, PyObject *args, PyObje
     Py_RETURN_NONE;
 }
 
+static PyObject *ImageUtils_GenValidMask(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    static char *kwlist[] = {"inimages", "outimage", "format", "nodata", NULL};
+    PyObject *pInputImages;
+    const char *pszOutputImage = "";
+    const char *pszGDALFormat = "";
+    float noDataVal = 0.0;
+    
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "Oss|f:genValidMask", kwlist, &pInputImages, &pszOutputImage, &pszGDALFormat, &noDataVal))
+    {
+        return NULL;
+    }
+    
+    std::vector<std::string> inputImages;
+    if(RSGISPY_CHECK_STRING(pInputImages))
+    {
+        inputImages.push_back(RSGISPY_STRING_EXTRACT(pInputImages));
+    }
+    else if(PySequence_Check(pInputImages))
+    {
+        Py_ssize_t nImages = PySequence_Size(pInputImages);
+        inputImages.reserve(nImages);
+        for( Py_ssize_t n = 0; n < nImages; n++ )
+        {
+            PyObject *o = PySequence_GetItem(pInputImages, n);
+            
+            if(!RSGISPY_CHECK_STRING(o))
+            {
+                PyErr_SetString(GETSTATE(self)->error, "Input images must be strings");
+                Py_DECREF(o);
+                return NULL;
+            }
+            
+            inputImages.push_back(RSGISPY_STRING_EXTRACT(o));
+        }
+    }
+    else
+    {
+        PyErr_SetString(GETSTATE(self)->error, "Input images must be a sequence or string");
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeValidImageMask(inputImages, std::string(pszOutputImage), std::string(pszGDALFormat), noDataVal);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 static PyObject *ImageUtils_CombineImages2Band(PyObject *self, PyObject *args, PyObject *keywds)
 {
     static char *kwlist[] = {"inimages", "outimage", "format", "datatype", "nodata"};
@@ -1583,7 +1638,7 @@ static PyMethodDef ImageUtilsMethods[] = {
     
 {"genFiniteMask", (PyCFunction)ImageUtils_GenFiniteMask, METH_VARARGS | METH_KEYWORDS,
 "rsgislib.imageutils.genFiniteMask(inimage=string, outimage=string, format=string)\n"
-"Calculate the image statistics and build image pyramids populating the image file.\n"
+"Generate a binary image mask defining the finite image regions.\n"
 "\n"
 "* inimage is a string containing the name of the input file\n"
 "* outimage is a string containing the name of the output file.\n"
@@ -1595,6 +1650,23 @@ static PyMethodDef ImageUtilsMethods[] = {
 "   inputImage = './injune_p142_casi_sub_utm.kea'\n"
 "   outputImage = './injune_p142_casi_sub_utm.kea'\n"
 "   imageutils.genFiniteMask(inputImage, outputImage, \'KEA\')\n"
+"\n"},
+    
+{"genValidMask", (PyCFunction)ImageUtils_GenValidMask, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.genValidMask(inimages=string|list, outimage=string, format=string, nodata=float)\n"
+"Generate a binary image mask defining the regions which are not 'no data'.\n"
+"\n"
+"* inimages can be either a string or a list containing the input file(s)\n"
+"* outimage is a string containing the name of the output file.\n"
+"* format is a string with the GDAL output file format.\n"
+"* nodata is a float defining the no data value (Optional and default is 0.0)\n"
+"\n"
+"\nExample::\n"
+"\n"
+"   from rsgislib import imageutils\n"
+"   inputImage = './injune_p142_casi_sub_utm.kea'\n"
+"   outputImage = './injune_p142_casi_sub_utm.kea'\n"
+"   imageutils.genValidMask(inputImage, outputImage, \'KEA\', 0.0)\n"
 "\n"},
    
 {"combineImages2Band", (PyCFunction)ImageUtils_CombineImages2Band, METH_VARARGS | METH_KEYWORDS,
