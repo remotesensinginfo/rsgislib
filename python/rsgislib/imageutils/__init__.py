@@ -6,11 +6,30 @@ The imageutils module contains general utilities for applying to images.
 from ._imageutils import *
 import rsgislib 
 
+import os.path
+import math
+
 haveGDALPy = True
 try:
     import osgeo.gdal as gdal
 except ImportError as gdalErr:
     haveGDALPy = False
+
+
+haveOGRPy = True
+try:
+    import osgeo.ogr as ogr
+except ImportError as ogrErr:
+    haveOGRPy = False
+
+haveOSRPy = True
+try:
+    import osgeo.osr as osr
+except ImportError as osrErr:
+    haveOSRPy = False
+
+
+
 
 def setBandNames(inputImage, bandNames):
     """A utility function to set band names.
@@ -80,7 +99,6 @@ Where:
     # Check gdal is available
     if not haveGDALPy:
         raise Exception("The GDAL python bindings required for this function could not be imported" + gdalErr)
-    import rsgislib
     
     dataset = gdal.Open(inProcessImg, gdal.GA_ReadOnly)
     numBands = dataset.RasterCount
@@ -126,12 +144,209 @@ Where:
     inFile = gdal.Open(inProcessImg, gdal.GA_ReadOnly)
     outFile = gdal.Open(outImg, gdal.GA_Update)
  
-    gdal.ReprojectImage(inFile, outFile, None, None, interpolationMethod)
+    gdal.ReprojectImage(inFile, outFile, None, None, interpolationMethod, 0.0, 0.0, gdal.TermProgress)
     
     inFile = None
     outFile = None
+
+def reprojectImage(inputImage, outputImage, outWKT, outFormat='KEA', interp='cubic', inWKT=None, noData=0.0, outPxlRes='image', snap2Grid=True):
+    """
+    This function provides a tool which uses the gdalwarp function to reproject an input 
+    image.
+    * inputImage - the input image name and path
+    * outputImage - the output image name and path
+    * outWKT - a WKT file representing the output projection
+    * outFormat - the output image file format (Default is KEA)
+    * interp - interpolation algorithm. Options are: near, bilinear, cubic, cubicspline, lanczos, average, mode. (Default is cubic)
+    * inWKT - if input image is not well defined this is the input image projection as a WKT file (Default is None, i.e., ignored)
+    * noData - float representing the not data value (Default is 0.0)
+    * outPxlRes three inputs can be provided 
+                1) 'image' where the output resolution will match the input (Default is image)
+                2) 'auto' where an output resolution maintaining the image size of the input image will be used
+                3) provide a floating point value for the image resolution (note. pixels will be sqaure) 
+    * snap2Grid is a boolean specifying whether the TL pixel should be snapped to a multiple of the pixel resolution (Default is True).
+    """
+    # Check gdal is available
+    if not haveGDALPy:
+        raise Exception("The GDAL python bindings required for this function could not be imported" + gdalErr)
+    if not haveOGRPy:
+        raise Exception("The OGR python bindings required for this function could not be imported" + ogrErr)
+    if not haveOSRPy:
+        raise Exception("The OSR python bindings required for this function could not be imported" + osrErr)
     
+    rsgisUtils = rsgislib.RSGISPyUtils()
     
+    eResampleAlg = gdal.GRA_CubicSpline
+    if interp == 'near':
+        eResampleAlg = gdal.GRA_NearestNeighbour
+    elif interp == 'bilinear':
+        eResampleAlg = gdal.GRA_Bilinear
+    elif interp == 'cubic':
+        eResampleAlg = gdal.GRA_Cubic
+    elif interp == 'cubicspline':
+        eResampleAlg = gdal.GRA_CubicSpline
+    elif interp == 'lanczos':
+        eResampleAlg = gdal.GRA_Lanczos
+    elif interp == 'average':
+        eResampleAlg = gdal.GRA_Average
+    elif interp == 'mode':
+        eResampleAlg = gdal.GRA_Mode
+    else:
+        raise Exception('The interpolation algorithm was not recogonised: \'' + interp + '\'')
+    
+    if not os.path.exists(inputImage):
+        raise Exception('The input image file does not exist: \'' + inputImage + '\'')
+    
+    inImgDS = gdal.Open(inputImage, gdal.GA_ReadOnly)
+    if inImgDS is None:
+        raise Exception('Could not open the Input Image: \'' + inputImage + '\'')    
+    
+    inImgProj = osr.SpatialReference()
+    if not inWKT is None:
+        if not os.path.exists(inWKT):
+            raise Exception('The input WKT file does not exist: \'' + inWKT + '\'')
+        inWKTStr = rsgisUtils.readTextFileNoNewLines(inWKT)
+        inImgProj.ImportFromWkt(inWKTStr)
+    else:
+        inImgProj.ImportFromWkt(inImgDS.GetProjectionRef())
+        
+    if not os.path.exists(outWKT):
+        raise Exception('The output WKT file does not exist: \'' + outWKT + '\'')
+    outImgProj = osr.SpatialReference()
+    outWKTStr = rsgisUtils.readTextFileNoNewLines(outWKT)
+    outImgProj.ImportFromWkt(outWKTStr)
+    
+    geoTransform = inImgDS.GetGeoTransform()
+    if geoTransform is None:
+        raise Exception('Could read the geotransform from the Input Image: \'' + inputImage + '\'')
+    
+    xPxlRes = geoTransform[1]
+    yPxlRes = geoTransform[5]
+    
+    inRes = xPxlRes
+    if math.fabs(yPxlRes) < math.fabs(xPxlRes):
+        inRes = math.fabs(yPxlRes)
+    
+    xSize = inImgDS.RasterXSize
+    ySize = inImgDS.RasterYSize
+    
+    tlXIn = geoTransform[0]
+    tlYIn = geoTransform[3]
+    
+    brXIn = tlXIn + (xSize * math.fabs(xPxlRes))
+    brYIn = tlYIn - (ySize * math.fabs(yPxlRes))
+    
+    trXIn = brXIn
+    trYIn = tlYIn
+    
+    blXIn = tlXIn
+    blYIn = trYIn
+    
+    #print("TL (IN): [" + str(tlXIn) + " , " + str(tlYIn) + "]")
+    #print("BR (IN): [" + str(brYIn) + " , " + str(brYIn) + "]")
+    
+    numBands = inImgDS.RasterCount
+    
+    inImgBand = inImgDS.GetRasterBand( 1 );
+    gdalDataType = gdal.GetDataTypeName(inImgBand.DataType)
+    rsgisDataType = rsgisUtils.getRSGISLibDataType(gdalDataType)
+    
+    tlPtWKT = 'POINT(%s %s)' % (tlXIn, tlYIn)
+    tlPt = ogr.CreateGeometryFromWkt(tlPtWKT)
+    tlPt.AssignSpatialReference(inImgProj)
+    tlPt.TransformTo(outImgProj)
+    tlXOut = tlPt.GetX()
+    tlYOut = tlPt.GetY()
+    
+    brPtWKT = 'POINT(%s %s)' % (brXIn, brYIn)
+    brPt = ogr.CreateGeometryFromWkt(brPtWKT)
+    brPt.AssignSpatialReference(inImgProj)
+    brPt.TransformTo(outImgProj)
+    brXOut = brPt.GetX()
+    brYOut = brPt.GetY()
+    
+    trPtWKT = 'POINT(%s %s)' % (trXIn, trYIn)
+    trPt = ogr.CreateGeometryFromWkt(trPtWKT)
+    trPt.AssignSpatialReference(inImgProj)
+    trPt.TransformTo(outImgProj)
+    trXOut = trPt.GetX()
+    trYOut = trPt.GetY()
+    
+    blPtWKT = 'POINT(%s %s)' % (blXIn, blYIn)
+    btPt = ogr.CreateGeometryFromWkt(blPtWKT)
+    btPt.AssignSpatialReference(inImgProj)
+    btPt.TransformTo(outImgProj)
+    blXOut = btPt.GetX()
+    blYOut = btPt.GetY()
+    
+    xValsOut = [tlXOut, brXOut, trXOut, blXOut]
+    yValsOut = [tlYOut, brYOut, trYOut, blYOut]
+    
+    xMax = max(xValsOut)
+    xMin = min(xValsOut)
+    
+    yMax = max(yValsOut)
+    yMin = min(yValsOut)
+        
+    outPxlRes = outPxlRes.strip()
+    outRes = 0.0
+    if outPxlRes.isnumeric():
+        outRes = math.fabs(float(outPxlRes))
+    elif outPxlRes == 'image':
+        outRes = inRes
+    elif outPxlRes == 'auto':
+        xOutRes = (brXOut - tlXOut) / xSize
+        yOutRes = (tlYOut - brYOut) / ySize
+        outRes = xOutRes
+        if yOutRes < xOutRes:
+            outRes = yOutRes
+    else: 
+        raise Exception('Was not able to defined the output resolution. Check Input: \'' + outPxlRes + '\'')
+    #print("Output Image has resolution of: " + str(outRes))
+    
+    outTLX = xMin
+    outTLY = yMax
+    outWidth = int(round((xMax - xMin) / outRes)) + 1
+    outHeight = int(round((yMax - yMin) / outRes)) + 1
+    
+    #print("TL (OUT): [" + str(tlXOut) + " , " + str(tlYOut) + "]")
+    #print("BR (OUT): [" + str(brXOut) + " , " + str(brYOut) + "]")
+    
+    if snap2Grid:
+    
+        xLeft = outTLX % outRes
+        yLeft = outTLY % outRes
+        
+        outTLX = (outTLX-xLeft) - (5 * outRes)
+        outTLY = ((outTLY-yLeft) + outRes) + (5 * outRes)
+    
+        #print("TL Leftover: [" + str(xLeft) + " x " + str(yLeft) + "]")
+        #print("TL (OUT DEF): [" + str(outTLX) + " , " + str(outTLY) + "]")
+        
+        outWidth = int(round((xMax - xMin) / outRes)) + 10
+        outHeight = int(round((yMax - yMin) / outRes)) + 10
+        
+    #print("Input Image Size: [" + str(xSize) + " x " + str(ySize) + "]")
+    #print("Output Image Size: [" + str(outWidth) + " x " + str(outHeight) + "]")
+    
+    #print("TL (OUT DEF): [" + str(outTLX) + " , " + str(outTLY) + "]")
+    
+    print('Creating blank image')
+    rsgislib.imageutils.createBlankImage(outputImage, numBands, outWidth, outHeight, outTLX, outTLY, outRes, noData, "", outWKTStr, outFormat, rsgisDataType)
+
+    outImgDS = gdal.Open(outputImage, gdal.GA_Update)
+    
+    for i in range(numBands):
+        outImgDS.GetRasterBand(i+1).SetNoDataValue(noData)
+    
+    print("Performing the reprojection")
+    gdal.ReprojectImage(inImgDS, outImgDS, None, None, eResampleAlg, 0.0, 0.0, gdal.TermProgress )  
+    
+    inImgDS = None
+    outImgDS = None    
+
+
+
 def subsetImgs2CommonExtent(inImagesDict, outShpEnv, imgFormat):
     """A command to subset a set of images to the same overlapped extent.
 

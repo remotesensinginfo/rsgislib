@@ -285,6 +285,21 @@ class RSGISPyUtils (object):
         randomStr = str(uuid.uuid4())
         randomStr = randomStr.replace("-","")
         return randomStr[0:size]
+        
+    def readTextFileNoNewLines(self, file):
+        """
+        Read a text file into a single string
+        removing new lines.
+        """
+        txtStr = ""
+        try:
+            dataFile = open(file, 'r')
+            for line in dataFile:
+                txtStr += line.strip()
+            dataFile.close()
+        except Exception as e:
+            raise e
+        return txtStr
 
 class RSGISTime (object):
     """ Class to calculate run time for a function, format and print out (similar to for XML interface).
