@@ -190,7 +190,8 @@ namespace rsgis{namespace rastergis{
             ratOutImgBand->SetMetadataItem("LAYER_TYPE", "thematic");
             
             RSGISPopulateWithImageStats popImageStats;
-            popImageStats.populateImageWithRasterGISStats(outClumpsDataset, false, true, true, 1);
+            popImageStats.populateImageWithRasterGISStats(outClumpsDataset, false, true, 1);
+            popImageStats.calcPyramids(outClumpsDataset);
             
             GDALClose(outClumpsDataset);
             

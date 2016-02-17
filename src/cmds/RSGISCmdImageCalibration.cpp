@@ -737,7 +737,7 @@ namespace rsgis{ namespace cmds {
             
             std::cout << "Adding colour table and histogram to image\n";
             rsgis::rastergis::RSGISPopulateWithImageStats popImageStats;
-            popImageStats.populateImageWithRasterGISStats(pass1DS, true, false, true, 1);
+            popImageStats.populateImageWithRasterGISStats(pass1DS, true, true, 1);
             
             std::cout << "Populating RAT with Thermal Stats\n";
             std::vector<rsgis::rastergis::RSGISBandAttPercentiles *> *bandPercentStats = new std::vector<rsgis::rastergis::RSGISBandAttPercentiles *>();
