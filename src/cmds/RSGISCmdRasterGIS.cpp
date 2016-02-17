@@ -86,10 +86,32 @@ namespace rsgis{ namespace cmds {
                 std::string message = std::string("Could not open image ") + clumpsImage;
                 throw rsgis::RSGISImageException(message.c_str());
             }
-            clumpsDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
-
             rsgis::rastergis::RSGISPopulateWithImageStats popImageStats;
-            popImageStats.populateImageWithRasterGISStats(clumpsDataset, addColourTable2Img, calcImgPyramids, ignoreZero, ratBand);
+            int numBands = clumpsDataset->GetRasterCount();
+
+            if(ratBand > numBands)
+            {
+                unsigned int band = 1;
+                for(unsigned int i = 0; i < numBands; ++i)
+                {
+                    band = i+1;
+                    std::cout << "Processing band " << band << std::endl;
+                    clumpsDataset->GetRasterBand(band)->SetMetadataItem("LAYER_TYPE", "thematic");
+                    
+                    popImageStats.populateImageWithRasterGISStats(clumpsDataset, addColourTable2Img, ignoreZero, band);
+                }
+            }
+            else
+            {
+                clumpsDataset->GetRasterBand(ratBand)->SetMetadataItem("LAYER_TYPE", "thematic");
+                
+                popImageStats.populateImageWithRasterGISStats(clumpsDataset, addColourTable2Img, ignoreZero, ratBand);
+            }
+                    
+            if(calcImgPyramids)
+            {
+                popImageStats.calcPyramids(clumpsDataset);
+            }
 
             GDALClose(clumpsDataset);
         }
