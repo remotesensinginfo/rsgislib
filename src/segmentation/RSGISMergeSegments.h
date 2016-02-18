@@ -51,6 +51,20 @@
 
 namespace rsgis{namespace segment{
     
+    struct rsgisClumpInfo
+    {
+        unsigned int clumpID;
+        std::vector<unsigned int> origClumpIDs;
+        double *meanVals;
+        double *sumVals;
+        double numPxls;
+        unsigned int numVals;
+        unsigned int selected;
+        bool merge;
+        rsgisClumpInfo *mergeTo;
+        std::list<rsgisClumpInfo*> neighbours;
+        bool removed;
+    };
     
     class DllExport RSGISMergeSegments
     {

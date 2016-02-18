@@ -109,7 +109,7 @@ def createMinDataTiles(inputImage, outshp, width, height, validDataThreshold, ma
     
     segmentation.generateRegularGrid(inputImage, tileClumpsImage, 'KEA', width, height, offset)
     rastergis.populateStats(tileClumpsImage, True, True)
-    
+
     if not maskIntersect == None:
         bs = []
         bs.append(rastergis.BandAttStats(band=1, maxField='Mask'))
@@ -127,7 +127,7 @@ def createMinDataTiles(inputImage, outshp, width, height, validDataThreshold, ma
         os.remove(tileClumpsImage)
         tileClumpsImage = tileClumpsImageDropClumps
     
-        
+         
     rastergis.populateRATWithPropValidPxls(inputImage, tileClumpsImage, "ValidPxls", 0.0)
     
     ratDS = gdal.Open(tileClumpsImage, gdal.GA_Update)
@@ -136,9 +136,9 @@ def createMinDataTiles(inputImage, outshp, width, height, validDataThreshold, ma
     Selected[ValidPxls < validDataThreshold] = 1
     rat.writeColumn(ratDS, "Selected", Selected)
     ratDS = None
-        
+    
     segmentation.mergeSegments2Neighbours(tileClumpsImage, inputImage, tileMergedClumpsImage, 'KEA', "Selected")
-       
+    
     tilesDS = gdal.Open(tileMergedClumpsImage, gdal.GA_ReadOnly)
     tilesDSBand = tilesDS.GetRasterBand(1)
     
@@ -162,8 +162,8 @@ def createMinDataTiles(inputImage, outshp, width, height, validDataThreshold, ma
     else:
         os.remove(tileClumpsImage)
         os.remove(tileMergedClumpsImage)
-
-def createTileMaskImages(inputImage, tileShp, outTilesImgBase, tmpdir='tilestemp'):
+    
+def createTileMaskImages(inputImage, tileShp, tilesNameBase, tilesMaskDIR, tmpdir='tilestemp'):
     """
     A function to create individual image masks from the tiles shapefile which can be
     individually used to mask (using rsgislib mask function) each tile from the inputimage.
@@ -180,8 +180,7 @@ def createTileMaskImages(inputImage, tileShp, outTilesImgBase, tmpdir='tilestemp
         os.makedirs(tmpdir)
         tmpPresent = False
     
-    inImgBaseName = os.path.basename(inputImage).split()[0]
-    shpTilesBase = os.path.join(tmpdir, inImgBaseName+'_tileshp')
+    shpTilesBase = os.path.join(tmpdir, tilesNameBase+'_tileshp')
     
     vectorutils.splitFeatures(tileShp, shpTilesBase, True)
 
@@ -189,7 +188,7 @@ def createTileMaskImages(inputImage, tileShp, outTilesImgBase, tmpdir='tilestemp
     shpFiles = glob.glob(shpTilesBase+"*.shp")
     idx = 1
     for shpFile in shpFiles:
-        imgTileFile = outTilesImgBase + str(idx) + '.kea'
+        imgTileFile = os.path.join(tilesMaskDIR, tilesNameBase + str(idx) + '.kea')
         print(imgTileFile)
         vectorutils.rasterise2Image(shpFile, inputImage, imgTileFile, 'KEA', shpAtt=None, shpExt=True)
         drv.DeleteDataSource(shpFile)
@@ -199,19 +198,18 @@ def createTileMaskImages(inputImage, tileShp, outTilesImgBase, tmpdir='tilestemp
         shutil.rmtree(tmpdir, ignore_errors=True)
 
 
-def createTilesFromMasks(inputImage, tileMasksBase, outTilesBase, datatype, gdalformat):
+def createTilesFromMasks(inputImage, tilesBase, tilesMetaDIR, tilesImgDIR, datatype, gdalformat):
     """
     A function to apply the image tile masks defined in createTileMaskImages to the input image to extract the individual tiles.
     * inputImage is the input image being tiled.
     * tileMasksBase is the base path for the tile masks. glob will be used to find them with '*.kea' added to the end.
     * outTilesBase is the base file name for the tiles.
     """
-    maskFiles = glob.glob(tileMasksBase+"*.kea")
+    maskFiles = glob.glob(os.path.join(tilesMetaDIR, tilesBase+"*.kea"))
 
     idx = 1
     for maskFile in maskFiles:
-        tileImage = outTilesBase + str(idx)+'.kea'
-        print(tileImage)
+        tileImage = os.path.join(tilesImgDIR, os.path.basename(maskFile))
+        #print(tileImage)
         imageutils.maskImage(inputImage, maskFile, tileImage, gdalformat, datatype, 0, 0)
         imageutils.popImageStats(tileImage,True,0.,True)
-        idx = idx + 1
