@@ -132,20 +132,23 @@ namespace rsgis{namespace segment{
             unsigned int hNumXPxls = numXPxls/2;
             unsigned int hNumYPxls = numYPxls/2;
             
-            unsigned int numFullCols = ((width-hNumXPxls)/numXPxls);
-            unsigned int extraColsPxls = (width-hNumXPxls) - (numFullCols * numXPxls);
-            unsigned int numCols = numFullCols + 1;
+            unsigned long widthOff = width - hNumXPxls;
+            unsigned long heightOff = height - hNumYPxls;
+            
+            unsigned int numFullCols = (widthOff/numXPxls);
+            unsigned int extraColsPxls = widthOff - (numFullCols * numXPxls);
+            unsigned int numCols = numFullCols + 1; // extra column for the first 'Half Tile'.
             if(extraColsPxls > 0)
             {
-                ++numCols;
+                numCols += 1;
             }
             
-            unsigned int numFullRows = ((height-hNumYPxls)/numYPxls);
-            unsigned int extraRowsPxls = (height-hNumYPxls) - (numFullRows * numYPxls);
-            unsigned int numRows = numFullRows + 1;
+            unsigned int numFullRows = (heightOff/numYPxls);
+            unsigned int extraRowsPxls = heightOff - (numFullRows * numYPxls);
+            unsigned int numRows = numFullRows + 1; // extra row for the first 'Half Tile'
             if(extraRowsPxls > 0)
             {
-                ++numRows;
+                numRows += 1;
             }
             
             unsigned int numTiles = numRows * numCols;
@@ -165,6 +168,7 @@ namespace rsgis{namespace segment{
             // First tile in row.
             startPxlXIdx = 0;
             endPxlXIdx = hNumXPxls;
+            
             this->writeImagePxlVal2Region(clumpsImage, tileID++, startPxlXIdx, endPxlXIdx, startPxlYIdx, endPxlYIdx);
             
             for(unsigned int j = 0; j < numFullCols; ++j)
@@ -173,6 +177,14 @@ namespace rsgis{namespace segment{
                 endPxlXIdx = startPxlXIdx + numXPxls;
                 this->writeImagePxlVal2Region(clumpsImage, tileID++, startPxlXIdx, endPxlXIdx, startPxlYIdx, endPxlYIdx);
             }
+            
+            if(extraColsPxls > 0)
+            {
+                startPxlXIdx = hNumXPxls + (numFullCols * numXPxls);
+                endPxlXIdx = startPxlXIdx + extraColsPxls;
+                this->writeImagePxlVal2Region(clumpsImage, tileID++, startPxlXIdx, endPxlXIdx, startPxlYIdx, endPxlYIdx);
+            }
+            
             
             for(unsigned int i = 0; i < numFullRows; ++i)
             {
