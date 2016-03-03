@@ -80,10 +80,7 @@ Methods of summerising data:
 """
 import os.path
 import os
-import subprocess
-import fnmatch
 import time
-import uuid
 
 TYPE_UNDEFINED = 0
 TYPE_8INT = 1
@@ -150,6 +147,7 @@ def getRSGISLibVersion():
 
     # Try calling rsgis-config to get minor version number
     try:
+        import subprocess
         out = subprocess.Popen('rsgis-config --version',shell=True,stdin=subprocess.PIPE, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
         (stdout, stderr) = out.communicate()
         versionStr = stdout.decode()
@@ -226,15 +224,12 @@ class RSGISPyUtils (object):
         Function to delete all the files which have a path
         and base name defined in the filePath attribute.
         """
-        fileDIR = os.path.split(filePath)[0]
-        fileName = os.path.split(filePath)[1]
-        
-        if os.path.isdir(fileDIR):
-            basename = os.path.splitext(fileName)[0]
-            for file in os.listdir(fileDIR):
-                if fnmatch.fnmatch(file, basename+str('.*')):
-                    print("Deleting file: " + str(os.path.join(fileDIR, file)))
-                    os.remove(os.path.join(fileDIR, file))
+        import glob
+        baseName = os.path.splitext(filePath)[0]
+        fileList = glob.glob(baseName+str('.*'))
+        for file in fileList:
+            print("Deleting file: " + str(file))
+            os.remove(file)
                 
     def deleteDIR(self, dirPath):
         """
@@ -280,8 +275,9 @@ class RSGISPyUtils (object):
             
     def uidGenerator(self, size=6):
         """
-        A function which will generate a 'random' string of the specified lenght based on the UUID
+        A function which will generate a 'random' string of the specified length based on the UUID
         """
+        import uuid
         randomStr = str(uuid.uuid4())
         randomStr = randomStr.replace("-","")
         return randomStr[0:size]
