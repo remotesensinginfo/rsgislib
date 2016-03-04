@@ -323,7 +323,8 @@ namespace rsgis{ namespace cmds {
     /** Function to calculate the Bhattacharyya distance between two classes. */
     DllExport float executeCalcBhattacharyyaDistance(std::string clumpsImage, std::string varCol, std::string classColumn, std::string class1Val, std::string class2Val, unsigned int ratBand=1)throw(RSGISCmdException);
     
-    
+    /** Function to export each clump to an individual image file */
+    DllExport void executeExportClumps2Images(std::string clumpsImage, std::string outImgBase, std::string imgFileExt, std::string imageFormat, RSGISLibDataType outDataType, unsigned int ratBand=1)throw(RSGISCmdException);
     
     
 }}
