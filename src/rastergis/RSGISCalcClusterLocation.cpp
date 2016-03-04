@@ -311,6 +311,129 @@ namespace rsgis{namespace rastergis{
         }
     }
     
+    void RSGISCalcClusterLocation::populateAttWithClumpPxlLocation(GDALDataset *dataset, unsigned int ratBand, std::string minXCol, std::string maxXCol, std::string minYCol, std::string maxYCol) throw(rsgis::RSGISAttributeTableException)
+    {
+        try
+        {
+            if(ratBand == 0)
+            {
+                throw rsgis::RSGISAttributeTableException("RAT Band must be greater than zero.");
+            }
+            if(ratBand > dataset->GetRasterCount())
+            {
+                throw rsgis::RSGISAttributeTableException("RAT Band is larger than the number of bands within the image.");
+            }
+            RSGISRasterAttUtils attUtils;
+            
+            GDALRasterAttributeTable *attTable = dataset->GetRasterBand(ratBand)->GetDefaultRAT();
+            
+            size_t numRows = attTable->GetRowCount();
+            
+            double maxVal = 0;
+            int nLastProgress = -1;
+            dataset->GetRasterBand(ratBand)->ComputeStatistics(false, NULL, &maxVal, NULL, NULL,  (GDALProgressFunc)RSGISRATStatsTextProgress, &nLastProgress);
+            
+            if(maxVal > numRows)
+            {
+                attTable->SetRowCount(maxVal+1);
+                numRows = maxVal+1;
+            }
+            
+            int minXIdx = attUtils.findColumnIndexOrCreate(attTable, minXCol, GFT_Real);
+            int maxXIdx = attUtils.findColumnIndexOrCreate(attTable, maxXCol, GFT_Real);
+            int minYIdx = attUtils.findColumnIndexOrCreate(attTable, minYCol, GFT_Real);
+            int maxYIdx = attUtils.findColumnIndexOrCreate(attTable, maxYCol, GFT_Real);
+            
+            unsigned long **pxlLoc = new unsigned long*[numRows];
+            bool *first = new bool[numRows];
+            for(size_t i = 0; i < numRows; ++i)
+            {
+                first[i] = true;
+                pxlLoc[i] = new unsigned long[4];
+                pxlLoc[i][0] = 0;
+                pxlLoc[i][1] = 0;
+                pxlLoc[i][2] = 0;
+                pxlLoc[i][3] = 0;
+            }
+            
+            RSGISCalcClusterPxlExtentCalcValue *calcLoc = new RSGISCalcClusterPxlExtentCalcValue(pxlLoc, first, ratBand);
+            rsgis::img::RSGISCalcImage calcImage(calcLoc);
+            calcImage.calcImagePosPxl(&dataset, 1, 0);
+            delete calcLoc;
+            
+            std::cout << "Writing data to output RAT\n";
+            size_t numBlocks = floor((double)numRows/(double)RAT_BLOCK_LENGTH);
+            size_t rowsRemain = numRows - (numBlocks * RAT_BLOCK_LENGTH);
+            
+            rsgis::math::RSGISMathsUtils mathUtils;
+            double *dataMinXBlock = new double[RAT_BLOCK_LENGTH];
+            double *dataMaxXBlock = new double[RAT_BLOCK_LENGTH];
+            double *dataMinYBlock = new double[RAT_BLOCK_LENGTH];
+            double *dataMaxYBlock = new double[RAT_BLOCK_LENGTH];
+            size_t startRow = 0;
+            size_t rowID = 0;
+            for(size_t i = 0; i < numBlocks; ++i)
+            {
+                rowID = startRow;
+                for(size_t j = 0; j < RAT_BLOCK_LENGTH; ++j)
+                {
+                    dataMinXBlock[j] = pxlLoc[rowID][0];
+                    dataMinYBlock[j] = pxlLoc[rowID][1];
+                    dataMaxXBlock[j] = pxlLoc[rowID][2];
+                    dataMaxYBlock[j] = pxlLoc[rowID][3];
+                    ++rowID;
+                }
+                attTable->ValuesIO(GF_Write, minXIdx, startRow, RAT_BLOCK_LENGTH, dataMinXBlock);
+                attTable->ValuesIO(GF_Write, minYIdx, startRow, RAT_BLOCK_LENGTH, dataMinYBlock);
+                attTable->ValuesIO(GF_Write, maxXIdx, startRow, RAT_BLOCK_LENGTH, dataMaxXBlock);
+                attTable->ValuesIO(GF_Write, maxYIdx, startRow, RAT_BLOCK_LENGTH, dataMaxYBlock);
+                
+                startRow += RAT_BLOCK_LENGTH;
+            }
+            if(rowsRemain > 0)
+            {
+                rowID = startRow;
+                for(size_t j = 0; j < rowsRemain; ++j)
+                {
+                    dataMinXBlock[j] = pxlLoc[rowID][0];
+                    dataMinYBlock[j] = pxlLoc[rowID][1];
+                    dataMaxXBlock[j] = pxlLoc[rowID][2];
+                    dataMaxYBlock[j] = pxlLoc[rowID][3];
+                    ++rowID;
+                }
+                attTable->ValuesIO(GF_Write, minXIdx, startRow, rowsRemain, dataMinXBlock);
+                attTable->ValuesIO(GF_Write, minYIdx, startRow, rowsRemain, dataMinYBlock);
+                attTable->ValuesIO(GF_Write, maxXIdx, startRow, rowsRemain, dataMaxXBlock);
+                attTable->ValuesIO(GF_Write, maxYIdx, startRow, rowsRemain, dataMaxYBlock);
+            }
+            
+            delete[] dataMinXBlock;
+            delete[] dataMinYBlock;
+            delete[] dataMaxXBlock;
+            delete[] dataMaxYBlock;
+            
+            for(size_t i = 0; i < numRows; ++i)
+            {
+                delete[] pxlLoc[i];
+            }
+            delete[] pxlLoc;
+            
+            dataset->GetRasterBand(ratBand)->SetMetadataItem("LAYER_TYPE", "thematic");
+        }
+        catch(RSGISAttributeTableException &e)
+        {
+            throw e;
+        }
+        catch(RSGISException &e)
+        {
+            throw RSGISAttributeTableException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISAttributeTableException(e.what());
+        }
+    }
+    
     RSGISCalcClusterLocation::~RSGISCalcClusterLocation()
     {
         
@@ -400,6 +523,58 @@ namespace rsgis{namespace rastergis{
     }
     
     RSGISCalcClusterExtentCalcValue::~RSGISCalcClusterExtentCalcValue()
+    {
+        
+    }
+    
+    
+    RSGISCalcClusterPxlExtentCalcValue::RSGISCalcClusterPxlExtentCalcValue(unsigned long **pxlLoc, bool *first, unsigned int ratBand): rsgis::img::RSGISCalcImageValue(0)
+    {
+        this->pxlLoc = pxlLoc;
+        this->first = first;
+        this->ratBand = ratBand;
+    }
+    
+    void RSGISCalcClusterPxlExtentCalcValue::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException)
+    {
+        if(intBandValues[ratBand-1] > 0)
+        {
+            size_t fid = boost::lexical_cast<size_t>(intBandValues[ratBand-1]);
+            
+            if(first[fid])
+            {
+                pxlLoc[fid][0] = extent.getMinX(); // minX
+                pxlLoc[fid][1] = extent.getMinY(); // minY
+                pxlLoc[fid][2] = extent.getMaxX(); // maxX
+                pxlLoc[fid][3] = extent.getMaxY(); // maxY
+                first[fid] = false;
+            }
+            else
+            {
+                if(extent.getMinX() < pxlLoc[fid][0])
+                {
+                    pxlLoc[fid][0] = extent.getMinX(); // minX
+                }
+                
+                if(extent.getMaxX() > pxlLoc[fid][2])
+                {
+                    pxlLoc[fid][2] = extent.getMaxX(); // maxX
+                }
+                
+                if(extent.getMinY() < pxlLoc[fid][1])
+                {
+                    pxlLoc[fid][1] = extent.getMinY(); // minY
+                }
+                
+                if(extent.getMaxY() > pxlLoc[fid][3])
+                {
+                    pxlLoc[fid][3] = extent.getMaxY(); // maxY
+                }
+            }
+        }
+    }
+    
+    RSGISCalcClusterPxlExtentCalcValue::~RSGISCalcClusterPxlExtentCalcValue()
     {
         
     }

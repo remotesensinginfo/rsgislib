@@ -1978,6 +1978,35 @@ static PyObject *RasterGIS_CalcBhattacharyyaDistance(PyObject *self, PyObject *a
     return outVal;
 }
 
+static PyObject *RasterGIS_ExportClumps2Images(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    const char *inputImage, *outputBaseName, *outFileExt, *imageFormat;
+    int dataType;
+    int ratBand = 1;
+    PyObject *pFields;
+    
+    static char *kwlist[] = {"clumps", "outimgbase", "outimgext", "gdalformat", "datatype", "ratband", NULL};
+    
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssssi|i:exportClumps2Images", kwlist, &inputImage, &outputBaseName, &outFileExt, &imageFormat, &dataType, &ratBand))
+    {
+        return NULL;
+    }
+    
+    rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType) dataType;
+    
+    try
+    {
+        rsgis::cmds::executeExportClumps2Images(std::string(inputImage), std::string(outputBaseName), std::string(outFileExt), std::string(imageFormat), type, ratBand);
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 
 static PyMethodDef RasterGISMethods[] = {
     {"populateStats", (PyCFunction)RasterGIS_PopulateStats, METH_VARARGS | METH_KEYWORDS,
@@ -2933,6 +2962,29 @@ static PyMethodDef RasterGISMethods[] = {
 "* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated in the clumps image.\n"
 "Return:\n"
 "* double for distance\n"
+"\n\n"},
+{"exportClumps2Images", (PyCFunction)RasterGIS_ExportClumps2Images, METH_VARARGS | METH_KEYWORDS,
+"rastergis.exportClumps2Images(clumps, outimgbase, outimgext, gdalformat, datatype, ratband=1)\n"
+"Exports each clump to a seperate raster which is the minimum extent for the clump.\n"
+"Where:\n"
+"\n"
+"* clumps is a string containing the name of the input image file with RAT\n"
+"* outimgbase is a string containing the base name of the output image file (C + FID will be added to identify files).\n"
+"* outimgext is a sting with the output file extension (e.g., kea) without the preceeding dot to be appended to the file name."
+"* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+"* datatype is an int containing one of the values from rsgislib.TYPE_*\n"
+"* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated."
+"\n"
+"Example::\n"
+"\n"
+"   import rsgislib\n"
+"   from rsgislib import rastergis\n"
+"   clumps='./DefineTiles.kea'\n"
+"   outimgbase='./Tiles/OutputImgTile_'\n"
+"   outimgext='kea'\n"
+"   gdalformat = 'KEA'\n"
+"   datatype = rsgislib.TYPE_32UINT\n"
+"   rastergis.exportClumps2Images(clumps, outimgbase, outimgext, gdalformat, datatype, ratband)\n"
 "\n\n"},
     
     {NULL}        /* Sentinel */

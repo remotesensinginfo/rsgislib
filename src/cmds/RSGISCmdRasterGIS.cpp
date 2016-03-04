@@ -59,6 +59,7 @@
 #include "rastergis/RSGISRATFunctionFitting.h"
 #include "rastergis/RSGISDefineClumpsInTiles.h"
 #include "rastergis/RSGISRATStats.h"
+#include "rastergis/RSGISExportClumps2Imgs.h"
 
 /*
 
@@ -2116,6 +2117,41 @@ namespace rsgis{ namespace cmds {
         }
         
         return dist;
+    }
+    
+    
+    void executeExportClumps2Images(std::string clumpsImage, std::string outImgBase, std::string imgFileExt, std::string imageFormat, RSGISLibDataType outDataType, unsigned int ratBand)throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            std::cout.precision(12);
+            
+            std::cout << "Opening Clumps Image: " << clumpsImage << std::endl;
+            GDALDataset *clumpsDataset = (GDALDataset *) GDALOpen(clumpsImage.c_str(), GA_Update);
+            if(clumpsDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + clumpsImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            rsgis::rastergis::RSGISCalcClusterLocation calcLoc;
+            calcLoc.populateAttWithClumpLocationExtent(clumpsDataset, ratBand, "MinXX", "MinXY", "MaxXX", "MaxXY", "MinYX", "MinYY", "MaxYX", "MaxYY");
+            calcLoc.populateAttWithClumpPxlLocation(clumpsDataset, ratBand, "MinXPxl", "MaxXPxl", "MinYPxl", "MaxYPxl");
+            
+            rsgis::rastergis::RSGISExportClumps2Images exportClumps;
+            exportClumps.exportClumps2Images(clumpsDataset, outImgBase, imgFileExt, imageFormat, RSGIS_to_GDAL_Type(outDataType), "MinXPxl", "MaxXPxl", "MinYPxl", "MaxYPxl", "MinXX", "MaxYY", ratBand);
+            
+            GDALClose(clumpsDataset);
+        }
+        catch(rsgis::RSGISAttributeTableException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
     }
             
 }}
