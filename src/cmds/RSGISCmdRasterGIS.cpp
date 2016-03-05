@@ -2120,7 +2120,7 @@ namespace rsgis{ namespace cmds {
     }
     
     
-    void executeExportClumps2Images(std::string clumpsImage, std::string outImgBase, std::string imgFileExt, std::string imageFormat, RSGISLibDataType outDataType, unsigned int ratBand)throw(RSGISCmdException)
+    void executeExportClumps2Images(std::string clumpsImage, std::string outImgBase, std::string imgFileExt, std::string imageFormat, bool binaryOut, unsigned int ratBand)throw(RSGISCmdException)
     {
         try
         {
@@ -2140,7 +2140,7 @@ namespace rsgis{ namespace cmds {
             calcLoc.populateAttWithClumpPxlLocation(clumpsDataset, ratBand, "MinXPxl", "MaxXPxl", "MinYPxl", "MaxYPxl");
             
             rsgis::rastergis::RSGISExportClumps2Images exportClumps;
-            exportClumps.exportClumps2Images(clumpsDataset, outImgBase, imgFileExt, imageFormat, RSGIS_to_GDAL_Type(outDataType), "MinXPxl", "MaxXPxl", "MinYPxl", "MaxYPxl", "MinXX", "MaxYY", ratBand);
+            exportClumps.exportClumps2Images(clumpsDataset, outImgBase, imgFileExt, imageFormat, binaryOut, "MinXPxl", "MaxXPxl", "MinYPxl", "MaxYPxl", "MinXX", "MaxYY", ratBand);
             
             GDALClose(clumpsDataset);
         }

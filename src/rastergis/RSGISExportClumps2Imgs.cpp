@@ -30,7 +30,7 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    void RSGISExportClumps2Images::exportClumps2Images(GDALDataset *clumpsDataset, std::string outImgBase, std::string imgFileExt, std::string imageFormat, GDALDataType gdalDataType, std::string minXPxl, std::string maxXPxl, std::string minYPxl, std::string maxYPxl, std::string tlX, std::string tlY, unsigned int ratBand)throw(rsgis::RSGISImageException)
+    void RSGISExportClumps2Images::exportClumps2Images(GDALDataset *clumpsDataset, std::string outImgBase, std::string imgFileExt, std::string imageFormat, bool binaryOut, std::string minXPxl, std::string maxXPxl, std::string minYPxl, std::string maxYPxl, std::string tlX, std::string tlY, unsigned int ratBand)throw(rsgis::RSGISImageException)
     {
         try
         {
@@ -73,7 +73,8 @@ namespace rsgis{namespace rastergis{
             GDALDataset *outClumpImg = NULL;
             GDALDataset **datasets = new GDALDataset*[2];
             datasets[0] = clumpsDataset;
-            RSGISCopyImageBand4ClumpExport valueCalc = RSGISCopyImageBand4ClumpExport(ratBand, 0);
+            RSGISPopulateWithImageStats addClrTab;
+            RSGISCopyImageBand4ClumpExport valueCalc = RSGISCopyImageBand4ClumpExport(ratBand, 0, binaryOut);
             rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(&valueCalc);
             rsgis::img::RSGISImageUtils imgUtils;
             rsgis::utils::RSGISTextUtils textUtils;
@@ -93,7 +94,7 @@ namespace rsgis{namespace rastergis{
                     outTransform[0] = tlXVals->at(i);
                     outTransform[3] = tlYVals->at(i);
                     
-                    outClumpImg = imgUtils.createBlankImage(outImgFileName, outTransform, xSize, ySize, 1, "", 0.0, imageFormat, gdalDataType);
+                    outClumpImg = imgUtils.createBlankImage(outImgFileName, outTransform, xSize, ySize, 1, "", 0.0, imageFormat, GDT_UInt32);
                     outClumpImg->SetProjection(clumpsDataset->GetProjectionRef());
                     GDALClose(outClumpImg);
                     
@@ -101,6 +102,7 @@ namespace rsgis{namespace rastergis{
                     outClumpImg = (GDALDataset *) GDALOpen(outImgFileName.c_str(), GA_Update);
                     datasets[1] = outClumpImg;
                     calcImage.calcImage(datasets, 2, 0, outClumpImg);
+                    addClrTab.populateImageWithRasterGISStats(outClumpImg, true, true, 1);
                     GDALClose(outClumpImg);
                     
                 }
@@ -134,10 +136,11 @@ namespace rsgis{namespace rastergis{
     
     
 
-    RSGISCopyImageBand4ClumpExport::RSGISCopyImageBand4ClumpExport(unsigned int band, size_t fid): rsgis::img::RSGISCalcImageValue(1)
+    RSGISCopyImageBand4ClumpExport::RSGISCopyImageBand4ClumpExport(unsigned int band, size_t fid, bool binOut): rsgis::img::RSGISCalcImageValue(1)
     {
         this->band = band;
         this->fid = fid;
+        this->binOut = binOut;
     }
     
     void RSGISCopyImageBand4ClumpExport::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(rsgis::img::RSGISImageCalcException)
@@ -149,7 +152,14 @@ namespace rsgis{namespace rastergis{
         
         if(intBandValues[(band-1)] == fid)
         {
-            output[0] = intBandValues[(band-1)];
+            if(binOut)
+            {
+                output[0] = 1.0;
+            }
+            else
+            {
+                output[0] = intBandValues[(band-1)];
+            }
         }
         else
         {

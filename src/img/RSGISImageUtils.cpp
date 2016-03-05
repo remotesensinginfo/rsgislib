@@ -164,7 +164,7 @@ namespace rsgis{namespace img{
 				
 				if(!((diffX > -0.0001) & (diffX < 0.0001)))
 				{
-					dsOffsets[i][0] = floor(diffX/pixelXRes);
+					dsOffsets[i][0] = floor((diffX/pixelXRes)+0.5);
 				}
 				else
 				{
@@ -173,7 +173,7 @@ namespace rsgis{namespace img{
 				
 				if(!((diffY > -0.0001) & (diffY < 0.0001)))
 				{
-					dsOffsets[i][1] = floor(diffY/pixelYResPos);
+					dsOffsets[i][1] = floor((diffY/pixelYResPos)+0.5);
 				}
 				else
 				{
@@ -357,7 +357,7 @@ namespace rsgis{namespace img{
 				
 				if(!((diffX > -0.0001) & (diffX < 0.0001)))
 				{
-					dsOffsets[i][0] = floor(diffX/pixelXRes);
+					dsOffsets[i][0] = floor((diffX/pixelXRes)+0.5);
 				}
 				else
 				{
@@ -366,7 +366,7 @@ namespace rsgis{namespace img{
 				
 				if(!((diffY > -0.0001) & (diffY < 0.0001)))
 				{
-					dsOffsets[i][1] = floor(diffY/pixelYResPos);
+					dsOffsets[i][1] = floor((diffY/pixelYResPos)+0.5);
 				}
 				else
 				{
@@ -568,7 +568,7 @@ namespace rsgis{namespace img{
 				
 				if(!((diffX > -0.0001) & (diffX < 0.0001)))
 				{
-					dsOffsets[i][0] = floor((diffX/pixelXRes));
+					dsOffsets[i][0] = floor((diffX/pixelXRes)+0.5);
 				}
 				else
 				{
@@ -577,7 +577,7 @@ namespace rsgis{namespace img{
 				
 				if(!((diffY > -0.0001) & (diffY < 0.0001)))
 				{
-					dsOffsets[i][1] = floor((diffY/pixelYResPos));
+					dsOffsets[i][1] = floor((diffY/pixelYResPos)+0.5);
 				}
 				else
 				{
@@ -781,7 +781,7 @@ namespace rsgis{namespace img{
 				
 				if(!((diffX > -0.0001) & (diffX < 0.0001)))
 				{
-					dsOffsets[i][0] = floor(diffX/pixelXRes);
+					dsOffsets[i][0] = floor((diffX/pixelXRes)+0.5);
 				}
 				else
 				{
@@ -790,7 +790,7 @@ namespace rsgis{namespace img{
 				
 				if(!((diffY > -0.0001) & (diffY < 0.0001)))
 				{
-					dsOffsets[i][1] = floor(diffY/pixelYResPos);
+					dsOffsets[i][1] = floor((diffY/pixelYResPos)+0.5);
 				}
 				else
 				{
