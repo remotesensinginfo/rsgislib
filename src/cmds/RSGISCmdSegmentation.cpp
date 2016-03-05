@@ -825,7 +825,7 @@ namespace rsgis{ namespace cmds {
         }
     }
             
-    void executeMergeSelectClumps2Neighbour(std::string inputImage, std::string clumpsImage, std::string outputImage, std::string imageFormat, std::string selectClumpsCol)throw(RSGISCmdException)
+    void executeMergeSelectClumps2Neighbour(std::string inputImage, std::string clumpsImage, std::string outputImage, std::string imageFormat, std::string selectClumpsCol, std::string noDataClumpsCol)throw(RSGISCmdException)
     {
         try
         {
@@ -846,7 +846,7 @@ namespace rsgis{ namespace cmds {
             
             std::cout << "Merge Clumps\n";
             rsgis::segment::RSGISMergeSegments mergeSegs;
-            mergeSegs.mergeSelectedClumps(clumpDataset, spectralDataset, selectClumpsCol);
+            mergeSegs.mergeSelectedClumps(clumpDataset, spectralDataset, selectClumpsCol, noDataClumpsCol);
             
             rsgis::rastergis::RSGISRasterAttUtils attUtils;
             GDALRasterAttributeTable *gdalATT = clumpDataset->GetRasterBand(1)->GetDefaultRAT();

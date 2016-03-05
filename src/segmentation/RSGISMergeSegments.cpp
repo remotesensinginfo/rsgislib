@@ -30,7 +30,7 @@ namespace rsgis{namespace segment{
         
     }
     
-    void RSGISMergeSegments::mergeSelectedClumps(GDALDataset *clumpsImage, GDALDataset *valsImageDS, std::string clumps2MergeCol)throw(rsgis::img::RSGISImageCalcException)
+    void RSGISMergeSegments::mergeSelectedClumps(GDALDataset *clumpsImage, GDALDataset *valsImageDS, std::string clumps2MergeCol, std::string noDataClumpsCol)throw(rsgis::img::RSGISImageCalcException)
     {
         try
         {
@@ -103,6 +103,7 @@ namespace rsgis{namespace segment{
             
             size_t tmpNumRows = 0;
             int *selectCol = attUtils.readIntColumn(rat, clumps2MergeCol, &tmpNumRows);
+            int *noDataCol = attUtils.readIntColumn(rat, noDataClumpsCol, &tmpNumRows);
             std::cout << "Read input column\n";
             
             double *numPxls = new double[numRows];
@@ -133,6 +134,10 @@ namespace rsgis{namespace segment{
             {
                 rsgisClumpInfo *clump = new rsgisClumpInfo();
                 clump->clumpID = i;
+                if(noDataCol[i] == 1)
+                {
+                    clump->clumpID = 0;
+                }
                 clump->origClumpIDs.push_back(i);
                 clump->merge = false;
                 clump->removed = false;
@@ -148,6 +153,7 @@ namespace rsgis{namespace segment{
                 clump->numPxls = sumVals[0][i] / meanVals[0][i];
                 clump->neighbours.clear();
                 clump->selected = selectCol[i];
+                clump->noDataRegion = noDataCol[i];
                 clumps.push_back(clump);
             }
             for(size_t i = 0; i < numRows; ++i)
@@ -182,9 +188,8 @@ namespace rsgis{namespace segment{
 
                         for(std::list<rsgisClumpInfo*>::iterator iterNeigh = cClump->neighbours.begin(); iterNeigh != cClump->neighbours.end(); ++iterNeigh)
                         {
-                            if(((*iterNeigh)->selected != 1) & (!(*iterNeigh)->removed))
+                            if(((*iterNeigh)->selected != 1) & (!(*iterNeigh)->removed) & ((*iterNeigh)->noDataRegion != 1))
                             {
-                                
                                 val = this->calcDist(cClump->meanVals, (*iterNeigh)->meanVals, numSpecBands);
                                 if(first)
                                 {
@@ -272,7 +277,6 @@ namespace rsgis{namespace segment{
                                 }
                             }
                             cClump->neighbours.clear();
-                            
                         }
                     }
                 }
@@ -314,6 +318,7 @@ namespace rsgis{namespace segment{
             delete[] sumVals;
             delete[] numPxls;
             delete[] selectCol;
+            delete[] noDataCol;
             delete[] clumpIDUp;
             
         }

@@ -215,10 +215,44 @@ class RSGISPyUtils (object):
         elif extension == '.pix':
             gdalStr = 'PCIDSK'
         else:
-            raise Exception('Type not recognised')
+            raise RSGISPyException('Type not recognised')
         
         return gdalStr
-
+    
+    def getRSGISLibDataTypeFromImg(self, inImg):
+        """
+        Returns the rsgislib datatype ENUM for a raster file
+        :param in_file: The file to get the datatype for
+        :return: The rsgislib datatype enum, e.g., rsgislib.TYPE_8INT
+        """
+        import osgeo.gdal as gdal
+        raster = gdal.Open(inImg, gdal.GA_ReadOnly)
+        if raster == None:
+            raise RSGISPyException('Could not open raster image: ' + inImg)
+        band = raster.GetRasterBand(1)
+        if band == None:
+            raise RSGISPyException('Could not open raster band 1 in image: ' + inImg)
+        gdal_dtype = gdal.GetDataTypeName(band.DataType)
+        raster = None
+        return self.getRSGISLibDataType(gdal_dtype)
+        
+    def getGDALDataTypeFromImg(self, inImg):
+        """
+        Returns the rsgislib datatype ENUM for a raster file
+        :param in_file: The file to get the datatype for
+        :return: The rsgislib datatype enum, e.g., rsgislib.TYPE_8INT
+        """
+        import osgeo.gdal as gdal
+        raster = gdal.Open(inImg, gdal.GA_ReadOnly)
+        if raster == None:
+            raise RSGISPyException('Could not open raster image: ' + inImg)
+        band = raster.GetRasterBand(1)
+        if band == None:
+            raise RSGISPyException('Could not open raster band 1 in image: ' + inImg)
+        gdal_dtype = gdal.GetDataTypeName(band.DataType)
+        raster = None
+        return gdal_dtype
+    
     def deleteFileWithBasename(self, filePath):
         """
         Function to delete all the files which have a path
@@ -271,7 +305,7 @@ class RSGISPyUtils (object):
         elif gdaltype == 'float64':
             return TYPE_64FLOAT
         else:
-            raise RSGISPyException("The data type '%s' is unknown / not supported."%(gdaltype))
+            raise RSGISPyException("The data type '" + str(gdaltype) + "' is unknown / not supported.")
             
     def uidGenerator(self, size=6):
         """
