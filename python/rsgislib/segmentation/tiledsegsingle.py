@@ -102,10 +102,12 @@ class RSGISTiledShepherdSegmentationSingleThread (object):
         
         return minKCenFile, minStchStatsFile
     
-    def performStage1Tiling(self, inputImage, tileShp, tilesRat, tilesBase, tilesMetaDIR, tilesImgDIR, width, height, validDataThreshold):
-        tilingutils.createMinDataTiles(inputImage, tileShp, tilesRat, width, height, validDataThreshold)
+    def performStage1Tiling(self, inputImage, tileShp, tilesRat, tilesBase, tilesMetaDIR, tilesImgDIR, tmpDIR, width, height, validDataThreshold):
+        tilingutils.createMinDataTiles(inputImage, tileShp, tilesRat, width, height, validDataThreshold, None, False, True, tmpDIR)
         tilingutils.createTileMaskImagesFromClumps(tilesRat, tilesBase, tilesMetaDIR, "KEA")
-        tilingutils.createTilesFromMasks(inputImage, tilesBase, tilesMetaDIR, tilesImgDIR, rsgislib.TYPE_16UINT, 'KEA')
+        rsgisUtils = rsgislib.RSGISPyUtils()
+        dataType = rsgisUtils.getRSGISLibDataTypeFromImg(inputImage)
+        tilingutils.createTilesFromMasks(inputImage, tilesBase, tilesMetaDIR, tilesImgDIR, dataType, 'KEA')
     
     def performStage1TilesSegmentation(self, tilesImgDIR, stage1TilesSegsDIR, tmpDIR, tilesBase, tileSegInfoJSON, strchStatsBase, kCentresBase, numClustersVal, minPxlsVal, distThresVal, bandsVal, samplingVal, kmMaxIterVal):
         imgTiles = glob.glob(os.path.join(tilesImgDIR, tilesBase+"*.kea"))
@@ -149,10 +151,12 @@ class RSGISTiledShepherdSegmentationSingleThread (object):
         imageutils.includeImages(bordersImage, tileBorders)
         rastergis.populateStats(bordersImage, True, True)
     
-    def performStage2Tiling(self, inputImage, tileShp, tilesRat, tilesBase, tilesMetaDIR, tilesImgDIR, width, height, validDataThreshold, bordersImage):
-        tilingutils.createMinDataTiles(inputImage, tileShp, tilesRat, width, height, validDataThreshold, bordersImage, True)
+    def performStage2Tiling(self, inputImage, tileShp, tilesRat, tilesBase, tilesMetaDIR, tilesImgDIR, tmpDIR, width, height, validDataThreshold, bordersImage):
+        tilingutils.createMinDataTiles(inputImage, tileShp, tilesRat, width, height, validDataThreshold, bordersImage, True, True, tmpDIR)
         tilingutils.createTileMaskImagesFromClumps(tilesRat, tilesBase, tilesMetaDIR, "KEA")
-        tilingutils.createTilesFromMasks(inputImage, tilesBase, tilesMetaDIR, tilesImgDIR, rsgislib.TYPE_16UINT, 'KEA')
+        rsgisUtils = rsgislib.RSGISPyUtils()
+        dataType = rsgisUtils.getRSGISLibDataTypeFromImg(inputImage)
+        tilingutils.createTilesFromMasks(inputImage, tilesBase, tilesMetaDIR, tilesImgDIR, dataType, 'KEA')
     
     
     def performStage2TilesSegmentation(self, tilesImgDIR, tilesMaskedDIR, tilesSegsDIR, tilesSegBordersDIR, tmpDIR, tilesBase, s1BordersImage, segStatsInfo, minPxlsVal, distThresVal, bandsVal):
@@ -191,7 +195,10 @@ class RSGISTiledShepherdSegmentationSingleThread (object):
         rastergis.populateStats(s3BordersClumps, True, True)
             
         rastergis.spatialExtent(s3BordersClumps, 'minXX', 'minXY', 'maxXX', 'maxXY', 'minYX', 'minYY', 'maxYX', 'maxYY')
-    
+        
+        rsgisUtils = rsgislib.RSGISPyUtils()
+        dataType = rsgisUtils.getRSGISLibDataTypeFromImg(inputImage)
+        
         ratDS = gdal.Open(s3BordersClumps, gdal.GA_Update)
         minX = rat.readColumn(ratDS, "minXX")
         maxX = rat.readColumn(ratDS, "maxXX")
@@ -201,9 +208,9 @@ class RSGISTiledShepherdSegmentationSingleThread (object):
             if i > 0:
                 subImage = os.path.join(subsetImgsDIR, subImgBaseName + str(i) + '.kea')
                 #print( "[" + str(minX[i]) + ", " + str(maxX[i]) + "][" + str(minY[i]) + ", " + str(maxY[i]) + "]" )
-                imageutils.subsetbbox(inputImage, subImage, 'KEA', rsgislib.TYPE_16UINT, minX[i], maxX[i], minY[i], maxY[i])
+                imageutils.subsetbbox(inputImage, subImage, 'KEA', dataType, minX[i], maxX[i], minY[i], maxY[i])
                 maskedFile = os.path.join(subsetImgsMaskedDIR, subImgBaseName + str(i) + '_masked.kea')
-                imageutils.maskImage(subImage, s2BordersImage, maskedFile, 'KEA', rsgislib.TYPE_16UINT, 0, 0)
+                imageutils.maskImage(subImage, s2BordersImage, maskedFile, 'KEA', dataType, 0, 0)
         ratDS = None
     
     def performStage3SubsetsSegmentation(self, subsetImgsMaskedDIR, subsetSegsDIR, tmpDIR, subImgBaseName, segStatsInfo, minPxlsVal, distThresVal, bandsVal):
@@ -288,7 +295,7 @@ Example::
         os.makedirs(stage1TilesMetaDIR)
     
     # Initial Tiling
-    tiledSegObj.performStage1Tiling(inputImage, stage1TileShp, stage1TileRAT, stage1TilesBase, stage1TilesMetaDIR, stage1TilesImgDIR, tileWidth, tileHeight, validDataThreshold)
+    tiledSegObj.performStage1Tiling(inputImage, stage1TileShp, stage1TileRAT, stage1TilesBase, stage1TilesMetaDIR, stage1TilesImgDIR, os.path.join(tmpDIR, 's1tilingtemp'), tileWidth, tileHeight, validDataThreshold)
     
     # Perform Segmentation
     tiledSegObj.performStage1TilesSegmentation(stage1TilesImgDIR, stage1TilesSegsDIR, tmpDIR, stage1TilesBase, tileSegInfo, strchStatsBase, kCentresBase, numClusters, minPxls, distThres, bands, sampling, kmMaxIter)
@@ -333,7 +340,7 @@ Example::
         os.makedirs(stage2TilesSegBordersDIR)
     
     # Perform offset tiling
-    tiledSegObj.performStage2Tiling(inputImage, stage2TileShp, stage2TileRAT, stage2TilesBase, stage2TilesMetaDIR, stage2TilesImgDIR, tileWidth, tileHeight, validDataThreshold, stage1BordersImage)
+    tiledSegObj.performStage2Tiling(inputImage, stage2TileShp, stage2TileRAT, stage2TilesBase, stage2TilesMetaDIR, stage2TilesImgDIR, os.path.join(tmpDIR, 's2tilingtemp'), tileWidth, tileHeight, validDataThreshold, stage1BordersImage)
     
     # Perform Segmentation of the Offset Tiles
     tiledSegObj.performStage2TilesSegmentation(stage2TilesImgDIR, stage2TilesImgMaskedDIR, stage2TilesSegsDIR, stage2TilesSegBordersDIR, tmpDIR, stage2TilesBase, stage1BordersImage, segStatsInfo, minPxls, distThres, bands)

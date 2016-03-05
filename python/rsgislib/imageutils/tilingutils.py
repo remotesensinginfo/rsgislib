@@ -103,7 +103,7 @@ def createMinDataTiles(inputImage, outshp, outclumpsFile, width, height, validDa
         os.makedirs(tmpdir)
         tmpPresent = False
     
-    inImgBaseName = os.path.basename(inputImage).split()[0]
+    inImgBaseName = os.path.splitext(os.path.basename(inputImage))[0]
     
     tileClumpsImage = os.path.join(tmpdir, inImgBaseName+'_tilesimg.kea')
     
@@ -133,17 +133,21 @@ def createMinDataTiles(inputImage, outshp, outclumpsFile, width, height, validDa
     ratDS = gdal.Open(tileClumpsImage, gdal.GA_Update)
     ValidPxls = rat.readColumn(ratDS, "ValidPxls")
     Selected = numpy.zeros_like(ValidPxls, dtype=int)
+    NoDataClumps = numpy.zeros_like(ValidPxls, dtype=int)
     Selected[ValidPxls < validDataThreshold] = 1
+    NoDataClumps[ValidPxls == 0] = 1
+    Selected[ValidPxls == 0] = 0
     rat.writeColumn(ratDS, "Selected", Selected)
+    rat.writeColumn(ratDS, "NoDataClumps", NoDataClumps)
     ratDS = None
-    
-    segmentation.mergeSegments2Neighbours(tileClumpsImage, inputImage, outclumpsFile, 'KEA', "Selected")
+
+    segmentation.mergeSegments2Neighbours(tileClumpsImage, inputImage, outclumpsFile, 'KEA', "Selected", "NoDataClumps")
     
     if not outshp is None:
         tilesDS = gdal.Open(outclumpsFile, gdal.GA_ReadOnly)
         tilesDSBand = tilesDS.GetRasterBand(1)
         
-        dst_layername = os.path.basename(outshp).split()[0]
+        dst_layername = os.path.splitext(os.path.basename(outshp))[0]
         #print(dst_layername)
         drv = ogr.GetDriverByName("ESRI Shapefile")
         
@@ -157,6 +161,7 @@ def createMinDataTiles(inputImage, outshp, outclumpsFile, width, height, validDa
         
         tilesDS = None
         dst_ds = None
+    
     
     if not tmpPresent:
         shutil.rmtree(tmpdir, ignore_errors=True)

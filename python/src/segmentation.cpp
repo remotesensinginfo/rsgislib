@@ -496,15 +496,15 @@ static PyObject *Segmentation_IncludeRegionsInClumps(PyObject *self, PyObject *a
 
 static PyObject *Segmentation_mergeSegments2Neighbours(PyObject *self, PyObject *args)
 {
-    const char *pszInputClumpsImage, *pszInputSpecImage, *pszOutputImage, *pszGDALFormat, *selectClumpsCol;
-    if( !PyArg_ParseTuple(args, "sssss:mergeSegments2Neighbours", &pszInputClumpsImage, &pszInputSpecImage, &pszOutputImage, &pszGDALFormat, &selectClumpsCol ))
+    const char *pszInputClumpsImage, *pszInputSpecImage, *pszOutputImage, *pszGDALFormat, *selectClumpsCol, *noDataClumpsCol;
+    if( !PyArg_ParseTuple(args, "ssssss:mergeSegments2Neighbours", &pszInputClumpsImage, &pszInputSpecImage, &pszOutputImage, &pszGDALFormat, &selectClumpsCol, &noDataClumpsCol))
     {
         return NULL;
     }
     
     try
     {
-        rsgis::cmds::executeMergeSelectClumps2Neighbour(std::string(pszInputSpecImage), std::string(pszInputClumpsImage), std::string(pszOutputImage), std::string(pszGDALFormat), std::string(selectClumpsCol));
+        rsgis::cmds::executeMergeSelectClumps2Neighbour(std::string(pszInputSpecImage), std::string(pszInputClumpsImage), std::string(pszOutputImage), std::string(pszGDALFormat), std::string(selectClumpsCol), std::string(noDataClumpsCol));
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -699,10 +699,9 @@ static PyMethodDef SegmentationMethods[] = {
 "* outputClumps is a string containing the name and path of the output clumps image\n"
 "* gdalFormat is a string defining the format of the output image.\n"
 "\n"},
-    
 {"mergeSegments2Neighbours", Segmentation_mergeSegments2Neighbours, METH_VARARGS,
-"segmentation.mergeSegments2Neighbours(clumpsImage, spectralImage, outputClumps, gdalFormat)\n"
-"A function to merge some selected clumps with the neighbours based on colour (spectral) distance.\n"
+"segmentation.mergeSegments2Neighbours(clumpsImage, spectralImage, outputClumps, gdalFormat, selectedClumpsCol, noDataClumpsCol)\n"
+"A function to merge some selected clumps with the neighbours based on colour (spectral) distance where clumps identified as no data are ignored.\n"
 "where:\n"
 "\n"
 "* clumpsImage is a string containing the filepath for the input clumps image.\n"
@@ -710,6 +709,7 @@ static PyMethodDef SegmentationMethods[] = {
 "* outputClumps is a string containing the name and path of the output clumps image\n"
 "* gdalFormat is a string defining the format of the output image.\n"
 "* selectClumpsCol is a string defining the binary column for defining the segments to be merged (1 == selected clumps).\n"
+"* noDataClumpsCol is a string defining the binary column for defining the segments to be ignored as no data (1 == no-data clumps).\n"
 "\n"},
     
 {"dropSelectedClumps", Segmentation_dropSelectedSegments, METH_VARARGS,

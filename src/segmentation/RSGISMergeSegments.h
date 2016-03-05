@@ -60,6 +60,7 @@ namespace rsgis{namespace segment{
         double numPxls;
         unsigned int numVals;
         unsigned int selected;
+        unsigned int noDataRegion;
         bool merge;
         rsgisClumpInfo *mergeTo;
         std::list<rsgisClumpInfo*> neighbours;
@@ -70,7 +71,7 @@ namespace rsgis{namespace segment{
     {
     public:
         RSGISMergeSegments();
-        void mergeSelectedClumps(GDALDataset *clumpsImage, GDALDataset *valsImageDS, std::string clumps2MergeCol)throw(rsgis::img::RSGISImageCalcException);
+        void mergeSelectedClumps(GDALDataset *clumpsImage, GDALDataset *valsImageDS, std::string clumps2MergeCol, std::string noDataClumpsCol)throw(rsgis::img::RSGISImageCalcException);
         ~RSGISMergeSegments();
     protected:
         double calcDist(double *valsRef, double *valsTest, int numVals)
