@@ -40,6 +40,7 @@
 #include "img/RSGISImageUtils.h"
 
 #include "rastergis/RSGISRasterAttUtils.h"
+#include "rastergis/RSGISCalcImageStatsAndPyramids.h"
 
 #include "utils/RSGISTextUtils.h"
 
@@ -53,7 +54,7 @@ namespace rsgis{namespace rastergis{
     {
     public:
         RSGISExportClumps2Images();
-        void exportClumps2Images(GDALDataset *clumpsDataset, std::string outImgBase, std::string imgFileExt, std::string imageFormat, GDALDataType gdalDataType, std::string minXPxl, std::string maxXPxl, std::string minYPxl, std::string maxYPxl, std::string tlX, std::string tlY, unsigned int ratBand=1)throw(rsgis::RSGISImageException);
+        void exportClumps2Images(GDALDataset *clumpsDataset, std::string outImgBase, std::string imgFileExt, std::string imageFormat, bool binaryOut, std::string minXPxl, std::string maxXPxl, std::string minYPxl, std::string maxYPxl, std::string tlX, std::string tlY, unsigned int ratBand=1)throw(rsgis::RSGISImageException);
         ~RSGISExportClumps2Images();
     };
     
@@ -61,7 +62,7 @@ namespace rsgis{namespace rastergis{
     class DllExport RSGISCopyImageBand4ClumpExport : public rsgis::img::RSGISCalcImageValue
     {
     public:
-        RSGISCopyImageBand4ClumpExport(unsigned int band, size_t fid);
+        RSGISCopyImageBand4ClumpExport(unsigned int band, size_t fid, bool binOut);
         void calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
         void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
         void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
@@ -77,6 +78,7 @@ namespace rsgis{namespace rastergis{
     protected:
         unsigned int band;
         size_t fid;
+        bool binOut;
     };
     
 }}

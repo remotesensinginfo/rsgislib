@@ -84,11 +84,12 @@ try:
 except ImportError as numpyErr:
     haveNumpy = False
 
-def createMinDataTiles(inputImage, outshp, width, height, validDataThreshold, maskIntersect=None, offset=False, force=True, tmpdir='tilestemp'):
+def createMinDataTiles(inputImage, outshp, outclumpsFile, width, height, validDataThreshold, maskIntersect=None, offset=False, force=True, tmpdir='tilestemp'):
     """
     A function to create a tiling for an input image where each tile has a minimum amount of valid data.
     * inputImage is a string for the image to be tiled
-    * outshp is a string for the output shapefile the tiling will be written to.
+    * outshp is a string for the output shapefile the tiling will be written to (if None a shapefile won't be outputted).
+    * outclumpsFile is a string for the output image file containing the tiling
     * width is an int for the width of the tiles
     * height is an int for the height of the tiles
     * validDataThreshold is a float (0-1) with the proportion of valid data needed within a tile.
@@ -105,7 +106,6 @@ def createMinDataTiles(inputImage, outshp, width, height, validDataThreshold, ma
     inImgBaseName = os.path.basename(inputImage).split()[0]
     
     tileClumpsImage = os.path.join(tmpdir, inImgBaseName+'_tilesimg.kea')
-    tileMergedClumpsImage = os.path.join(tmpdir, inImgBaseName+'_tilesmergeimg.kea')
     
     segmentation.generateRegularGrid(inputImage, tileClumpsImage, 'KEA', width, height, offset)
     rastergis.populateStats(tileClumpsImage, True, True)
@@ -137,39 +137,40 @@ def createMinDataTiles(inputImage, outshp, width, height, validDataThreshold, ma
     rat.writeColumn(ratDS, "Selected", Selected)
     ratDS = None
     
-    segmentation.mergeSegments2Neighbours(tileClumpsImage, inputImage, tileMergedClumpsImage, 'KEA', "Selected")
+    segmentation.mergeSegments2Neighbours(tileClumpsImage, inputImage, outclumpsFile, 'KEA', "Selected")
     
-    tilesDS = gdal.Open(tileMergedClumpsImage, gdal.GA_ReadOnly)
-    tilesDSBand = tilesDS.GetRasterBand(1)
-    
-    dst_layername = os.path.basename(outshp).split()[0]
-    print(dst_layername)
-    drv = ogr.GetDriverByName("ESRI Shapefile")
-    
-    if force and os.path.exists(outshp):
-        drv.DeleteDataSource(outshp)
-    
-    dst_ds = drv.CreateDataSource( outshp )
-    dst_layer = dst_ds.CreateLayer(dst_layername, srs = None )
-    
-    gdal.Polygonize( tilesDSBand, tilesDSBand, dst_layer, -1, [], callback=None )
-    
-    tilesDS = None
-    dst_ds = None
+    if not outshp is None:
+        tilesDS = gdal.Open(outclumpsFile, gdal.GA_ReadOnly)
+        tilesDSBand = tilesDS.GetRasterBand(1)
+        
+        dst_layername = os.path.basename(outshp).split()[0]
+        #print(dst_layername)
+        drv = ogr.GetDriverByName("ESRI Shapefile")
+        
+        if force and os.path.exists(outshp):
+            drv.DeleteDataSource(outshp)
+        
+        dst_ds = drv.CreateDataSource( outshp )
+        dst_layer = dst_ds.CreateLayer(dst_layername, srs = None )
+        
+        gdal.Polygonize( tilesDSBand, tilesDSBand, dst_layer, -1, [], callback=None )
+        
+        tilesDS = None
+        dst_ds = None
     
     if not tmpPresent:
         shutil.rmtree(tmpdir, ignore_errors=True)
     else:
         os.remove(tileClumpsImage)
-        os.remove(tileMergedClumpsImage)
     
-def createTileMaskImages(inputImage, tileShp, tilesNameBase, tilesMaskDIR, tmpdir='tilestemp'):
+def createTileMaskImagesFromShp(inputImage, tileShp, tilesNameBase, tilesMaskDIR, tmpdir='tilestemp', imgFormat='KEA'):
     """
     A function to create individual image masks from the tiles shapefile which can be
     individually used to mask (using rsgislib mask function) each tile from the inputimage.
     * inputImage is the input image being tiled.
     * tileShp is a shapefile containing the shapefile tiles.
-    * outTilesImgBase is the base file path for the tile masks
+    * tilesNameBase is the base file name for the tile masks
+    * tilesMaskDIR is the directory where the output images will be outputted
     * tmpdir is a string with a temporary directory for temp outputs to be stored (they will be deleted) 
              if tmpdir doesn't exist it will be created and then deleted during the processing. 
     """
@@ -189,13 +190,27 @@ def createTileMaskImages(inputImage, tileShp, tilesNameBase, tilesMaskDIR, tmpdi
     idx = 1
     for shpFile in shpFiles:
         imgTileFile = os.path.join(tilesMaskDIR, tilesNameBase + str(idx) + '.kea')
-        print(imgTileFile)
-        vectorutils.rasterise2Image(shpFile, inputImage, imgTileFile, 'KEA', shpAtt=None, shpExt=True)
+        #print(imgTileFile)
+        vectorutils.rasterise2Image(shpFile, inputImage, imgTileFile, imgFormat, shpAtt=None, shpExt=True)
         drv.DeleteDataSource(shpFile)
         idx = idx + 1
     
     if not tmpPresent:
         shutil.rmtree(tmpdir, ignore_errors=True)
+
+def createTileMaskImagesFromClumps(clumpsImage, tilesNameBase, tilesMaskDIR, imgFormat='KEA'):
+    """
+    A function to create individual image masks from the tiles shapefile which can be
+    individually used to mask (using rsgislib mask function) each tile from the inputimage.
+    * clumpsImage is an image file with RAT where each clump represented a tile region.
+    * tilesNameBase is the base file name for the tile masks
+    * tilesMaskDIR is the directory where the output images will be outputted
+    * imgFormat is the output image file format of the tile masks
+    """
+    outBaseImg = os.path.join(tilesMaskDIR, tilesNameBase)
+    rsgisUtils = rsgislib.RSGISPyUtils()
+    outImgExt = rsgisUtils.getFileExtension(imgFormat)[1:]
+    rastergis.exportClumps2Images(clumpsImage, outBaseImg, True, outImgExt, imgFormat, 1)
 
 
 def createTilesFromMasks(inputImage, tilesBase, tilesMetaDIR, tilesImgDIR, datatype, gdalformat):

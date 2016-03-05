@@ -1981,22 +1981,20 @@ static PyObject *RasterGIS_CalcBhattacharyyaDistance(PyObject *self, PyObject *a
 static PyObject *RasterGIS_ExportClumps2Images(PyObject *self, PyObject *args, PyObject *keywds)
 {
     const char *inputImage, *outputBaseName, *outFileExt, *imageFormat;
-    int dataType;
+    int binaryOut = false;
     int ratBand = 1;
     PyObject *pFields;
     
-    static char *kwlist[] = {"clumps", "outimgbase", "outimgext", "gdalformat", "datatype", "ratband", NULL};
+    static char *kwlist[] = {"clumps", "outimgbase", "binout", "outimgext", "gdalformat", "ratband", NULL};
     
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssssi|i:exportClumps2Images", kwlist, &inputImage, &outputBaseName, &outFileExt, &imageFormat, &dataType, &ratBand))
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssiss|i:exportClumps2Images", kwlist, &inputImage, &outputBaseName, &binaryOut, &outFileExt, &imageFormat, &ratBand))
     {
         return NULL;
     }
     
-    rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType) dataType;
-    
     try
     {
-        rsgis::cmds::executeExportClumps2Images(std::string(inputImage), std::string(outputBaseName), std::string(outFileExt), std::string(imageFormat), type, ratBand);
+        rsgis::cmds::executeExportClumps2Images(std::string(inputImage), std::string(outputBaseName), std::string(outFileExt), std::string(imageFormat), (bool)binaryOut, ratBand);
     }
     catch (rsgis::cmds::RSGISCmdException &e)
     {
@@ -2964,15 +2962,15 @@ static PyMethodDef RasterGISMethods[] = {
 "* double for distance\n"
 "\n\n"},
 {"exportClumps2Images", (PyCFunction)RasterGIS_ExportClumps2Images, METH_VARARGS | METH_KEYWORDS,
-"rastergis.exportClumps2Images(clumps, outimgbase, outimgext, gdalformat, datatype, ratband=1)\n"
+"rastergis.exportClumps2Images(clumps, outimgbase, binout, outimgext, gdalformat, ratband=1)\n"
 "Exports each clump to a seperate raster which is the minimum extent for the clump.\n"
 "Where:\n"
 "\n"
 "* clumps is a string containing the name of the input image file with RAT\n"
 "* outimgbase is a string containing the base name of the output image file (C + FID will be added to identify files).\n"
-"* outimgext is a sting with the output file extension (e.g., kea) without the preceeding dot to be appended to the file name."
+"* outimgext is a sting with the output file extension (e.g., kea) without the preceeding dot to be appended to the file name.\n"
+"* binout is a boolean specifying whether the output images should be binary or if the pixel value should be the FID of the clump.\n"
 "* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
-"* datatype is an int containing one of the values from rsgislib.TYPE_*\n"
 "* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated."
 "\n"
 "Example::\n"
@@ -2983,8 +2981,8 @@ static PyMethodDef RasterGISMethods[] = {
 "   outimgbase='./Tiles/OutputImgTile_'\n"
 "   outimgext='kea'\n"
 "   gdalformat = 'KEA'\n"
-"   datatype = rsgislib.TYPE_32UINT\n"
-"   rastergis.exportClumps2Images(clumps, outimgbase, outimgext, gdalformat, datatype, ratband)\n"
+"   binaryOut = False\n"
+"   rastergis.exportClumps2Images(clumps, outimgbase, binaryOut, outimgext, gdalformat, ratband)\n"
 "\n\n"},
     
     {NULL}        /* Sentinel */

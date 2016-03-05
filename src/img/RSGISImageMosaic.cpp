@@ -146,8 +146,8 @@ namespace rsgis{namespace img{
 				xDiff = imgTransform[0] - transformation[0];
 				yDiff = transformation[3] - imgTransform[3];
 
-				xStart = floor(xDiff/transformation[1]);
-				yStart = floor(yDiff/transformation[1]);
+				xStart = floor((xDiff/transformation[1])+0.5);
+				yStart = floor((yDiff/transformation[1])+0.5);
 
                 // Allocate memory
                 inputData = new float*[numberBands];
@@ -367,8 +367,8 @@ namespace rsgis{namespace img{
 				xDiff = imgTransform[0] - transformation[0];
 				yDiff = transformation[3] - imgTransform[3];
 
-				xStart = floor(xDiff/transformation[1]);
-				yStart = floor(yDiff/transformation[1]);
+				xStart = floor((xDiff/transformation[1])+0.5);
+				yStart = floor((yDiff/transformation[1])+0.5);
 
                 // Allocate memory
                 inputData = new float*[numberBands];
@@ -743,8 +743,8 @@ namespace rsgis{namespace img{
 				xDiff = imgTransform[0] - transformation[0];
 				yDiff = transformation[3] - imgTransform[3];
 
-				xStart = floor(xDiff/transformation[1]);
-				yStart = floor(yDiff/transformation[1]);
+				xStart = floor((xDiff/transformation[1])+0.5);
+				yStart = floor((yDiff/transformation[1])+0.5);
 
                 // Allocate memory
                 inputData = new float*[numberBands];
@@ -1160,8 +1160,8 @@ namespace rsgis{namespace img{
 				xDiff = imgTransform[0] - baseTransform[0];
 				yDiff = baseTransform[3] - imgTransform[3];
 
-				xStart = floor(xDiff/baseTransform[1]);
-				yStart = floor(yDiff/baseTransform[1]);
+				xStart = floor((xDiff/baseTransform[1])+0.5);
+				yStart = floor((yDiff/baseTransform[1])+0.5);
 				imgData = (float *) CPLMalloc(sizeof(float)*(tileXSize*yBlockSize));
 
                 int nYBlocks = tileYSize / yBlockSize;
@@ -1427,8 +1427,8 @@ namespace rsgis{namespace img{
                 xDiff = imgTransform[0] - baseTransform[0];
                 yDiff = baseTransform[3] - imgTransform[3];
                 
-                xStart = floor(xDiff/baseTransform[1]);
-                yStart = floor(yDiff/baseTransform[1]);
+                xStart = floor((xDiff/baseTransform[1])+0.5);
+                yStart = floor((yDiff/baseTransform[1])+0.5);
                 imgBaseData = (float *) CPLMalloc(sizeof(float)*(tileXSize*yBlockSize));
                 imgInData = (float *) CPLMalloc(sizeof(float)*(tileXSize*yBlockSize));
                 unsigned long numPxlsInBlock = tileXSize*yBlockSize;
