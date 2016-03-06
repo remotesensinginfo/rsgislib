@@ -63,7 +63,7 @@ namespace rsgis{namespace segment{
         std::cout << "Started" << std::flush;
         for(unsigned int i = 0; i < height; ++i)
         {
-            if((i % feedback) == 0)
+            if((feedback > 0) && (i % feedback) == 0)
             {
                 std::cout << "." << feedbackCounter << "." << std::flush;
                 feedbackCounter = feedbackCounter + 10;
