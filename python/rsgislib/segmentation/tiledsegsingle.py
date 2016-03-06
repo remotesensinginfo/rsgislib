@@ -190,7 +190,7 @@ class RSGISTiledShepherdSegmentationSingleThread (object):
         imageutils.createCopyImage(clumpsImage, s2BordersImage, 1, 0, 'KEA', rsgislib.TYPE_8UINT)
         imageutils.includeImages(s2BordersImage, tileBorders)
     
-    def createStage3ImageSubsets(self, inputImage, s2BordersImage, s3BordersClumps, subsetImgsDIR, subsetImgsMaskedDIR, subImgBaseName):
+    def createStage3ImageSubsets(self, inputImage, s2BordersImage, s3BordersClumps, subsetImgsDIR, subsetImgsMaskedDIR, subImgBaseName, minSize):
         segmentation.clump(s2BordersImage, s3BordersClumps, 'KEA', True, 0)
         rastergis.populateStats(s3BordersClumps, True, True)
             
@@ -204,13 +204,18 @@ class RSGISTiledShepherdSegmentationSingleThread (object):
         maxX = rat.readColumn(ratDS, "maxXX")
         minY = rat.readColumn(ratDS, "minYY")
         maxY = rat.readColumn(ratDS, "maxYY")
+        Histogram = rat.readColumn(ratDS, "Histogram")
         for i in range(minX.shape[0]):
             if i > 0:
                 subImage = os.path.join(subsetImgsDIR, subImgBaseName + str(i) + '.kea')
                 #print( "[" + str(minX[i]) + ", " + str(maxX[i]) + "][" + str(minY[i]) + ", " + str(maxY[i]) + "]" )
                 imageutils.subsetbbox(inputImage, subImage, 'KEA', dataType, minX[i], maxX[i], minY[i], maxY[i])
-                maskedFile = os.path.join(subsetImgsMaskedDIR, subImgBaseName + str(i) + '_masked.kea')
+                if Histogram[i] > minSize:
+                    maskedFile = os.path.join(subsetImgsMaskedDIR, subImgBaseName + str(i) + '_masked.kea')
+                else:
+                    maskedFile = os.path.join(subsetImgsMaskedDIR, subImgBaseName + str(i) + '_burn.kea')
                 imageutils.maskImage(subImage, s2BordersImage, maskedFile, 'KEA', dataType, 0, 0)
+                rastergis.populateStats(maskedFile, True, False)
         ratDS = None
     
     def performStage3SubsetsSegmentation(self, subsetImgsMaskedDIR, subsetSegsDIR, tmpDIR, subImgBaseName, segStatsInfo, minPxlsVal, distThresVal, bandsVal):
@@ -222,7 +227,11 @@ class RSGISTiledShepherdSegmentationSingleThread (object):
             segutils.runShepherdSegmentationPreCalcdStats(imgTile, clumpsFile, kMeansCentres, imgStretchStats, outputMeanImg=None, tmpath=os.path.join(tmpDIR, baseName+'_segstemp'), gdalformat='KEA', noStats=False, noStretch=False, noDelete=False, minPxls=minPxlsVal, distThres=distThresVal, bands=bandsVal, processInMem=False)        
     
     
-    def mergeStage3TilesToOutput(self, clumpsImage, subsetSegsDIR, subImgBaseName):
+    def mergeStage3TilesToOutput(self, clumpsImage, subsetSegsDIR, subsetImgsMaskedDIR, subImgBaseName):
+        burnTiles = glob.glob(os.path.join(subsetImgsMaskedDIR, subImgBaseName+"*_burn.kea"))
+        if len(burnTiles) > 0:
+            segmentation.mergeClumpImages(burnTiles, clumpsImage)
+        
         segTiles = glob.glob(os.path.join(subsetSegsDIR, subImgBaseName+"*_segs.kea"))
         segmentation.mergeClumpImages(segTiles, clumpsImage)
         rastergis.populateStats(clumpsImage, True, True)
@@ -262,9 +271,7 @@ Example::
     uidStr = rsgisUtils.uidGenerator()
     
     baseName = os.path.splitext(os.path.basename(inputImage))[0]+"_"+uidStr
-    
-    #print(baseName)
-    
+        
     tileSegInfo = os.path.join(tmpDIR, baseName+'_seginfo.json')
     segStatsDIR = os.path.join(tmpDIR, 'segStats_' + uidStr)
     strchStatsBase = os.path.join(segStatsDIR, baseName + '_stch')
@@ -371,13 +378,13 @@ Example::
         os.makedirs(stage3SubsetsSegsDIR)
     
     #Create the final boundary image subsets
-    tiledSegObj.createStage3ImageSubsets(inputImage, stage2BordersImage, stage3BordersClumps, stage3SubsetsDIR, stage3SubsetsMaskedDIR, stage3Base)
+    tiledSegObj.createStage3ImageSubsets(inputImage, stage2BordersImage, stage3BordersClumps, stage3SubsetsDIR, stage3SubsetsMaskedDIR, stage3Base, minPxls)
     
     # Perform Segmentation of the stage 3 regions
     tiledSegObj.performStage3SubsetsSegmentation(stage3SubsetsMaskedDIR, stage3SubsetsSegsDIR, tmpDIR, stage3Base, segStatsInfo, minPxls, distThres, bands)
     
     # Merge the stage 3 regions into the final clumps image
-    tiledSegObj.mergeStage3TilesToOutput(clumpsImage, stage3SubsetsSegsDIR, stage3Base)
+    tiledSegObj.mergeStage3TilesToOutput(clumpsImage, stage3SubsetsSegsDIR, stage3SubsetsMaskedDIR, stage3Base)
     
     shutil.rmtree(stage3SubsetsDIR)
     shutil.rmtree(stage3SubsetsMaskedDIR) 
@@ -396,3 +403,6 @@ Example::
     os.remove(tileSegInfo)
     if createdTmp:
         shutil.rmtree(tmpDIR)
+
+
+
