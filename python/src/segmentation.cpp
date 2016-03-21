@@ -88,11 +88,12 @@ static PyObject *Segmentation_eliminateSinglePixels(PyObject *self, PyObject *ar
 static PyObject *Segmentation_clump(PyObject *self, PyObject *args)
 {
     const char *pszInputImage, *pszOutputImage, *pszGDALFormat;
-    int processInMemory;    
+    int processInMemory = false;
     bool nodataprovided;
     float fnodata;
-    PyObject *pNoData; //could be none or a number
-    if( !PyArg_ParseTuple(args, "sssiO:clump", &pszInputImage, &pszOutputImage, &pszGDALFormat, &processInMemory, &pNoData))
+    int addRatPxlVals = false;
+    PyObject *pNoData = Py_None; //could be none or a number
+    if( !PyArg_ParseTuple(args, "sss|iOi:clump", &pszInputImage, &pszOutputImage, &pszGDALFormat, &processInMemory, &pNoData, &addRatPxlVals))
         return NULL;
     
     if( pNoData == Py_None )
@@ -118,7 +119,7 @@ static PyObject *Segmentation_clump(PyObject *self, PyObject *args)
     try
     {
         rsgis::cmds::executeClump(pszInputImage, pszOutputImage, pszGDALFormat, 
-                                processInMemory, nodataprovided, fnodata);
+                                processInMemory, nodataprovided, fnodata, addRatPxlVals);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -309,7 +310,8 @@ static PyObject *Segmentation_mergeClumpImages(PyObject *self, PyObject *args)
     const char *pszOutputImage;
     PyObject *pInputListObj;
     std::string inputImage;
-    if( !PyArg_ParseTuple(args, "Os:mergeClumpImages", &pInputListObj, &pszOutputImage))
+    int mergeRATs = false;
+    if( !PyArg_ParseTuple(args, "Os|i:mergeClumpImages", &pInputListObj, &pszOutputImage, &mergeRATs))
         return NULL;
 
     Py_ssize_t nInputImages = PyList_Size(pInputListObj);
@@ -339,9 +341,7 @@ static PyObject *Segmentation_mergeClumpImages(PyObject *self, PyObject *args)
     
     try
     {
-                        
-        rsgis::cmds::executeMergeClumpImages(inputImagePaths, pszOutputImage);
-
+        rsgis::cmds::executeMergeClumpImages(inputImagePaths, pszOutputImage, mergeRATs);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -536,6 +536,26 @@ static PyObject *Segmentation_dropSelectedSegments(PyObject *self, PyObject *arg
     Py_RETURN_NONE;
 }
 
+static PyObject *Segmentation_mergeEquivalentClumps(PyObject *self, PyObject *args)
+{
+    const char *pszInputClumpsImage, *pszOutputImage, *pszGDALFormat, *valClumpsCol;
+    if( !PyArg_ParseTuple(args, "ssss:mergeEquivClumps", &pszInputClumpsImage, &pszOutputImage, &pszGDALFormat, &valClumpsCol))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeMergeClumpsEquivalentVal(std::string(pszInputClumpsImage), std::string(pszOutputImage), std::string(pszGDALFormat), std::string(valClumpsCol));
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
 
 // Our list of functions in this module
 static PyMethodDef SegmentationMethods[] = {
@@ -566,7 +586,7 @@ static PyMethodDef SegmentationMethods[] = {
 "\n"},
 
     {"clump", Segmentation_clump, METH_VARARGS,
-"segmentation.clump(inputimage, outputimage, gdalformat, processinmemory, nodata)\n"
+"segmentation.clump(inputimage, outputimage, gdalformat, processinmemory, nodata, addPxlVal2Rat)\n"
 "clump\n"
 "where:\n"
 "\n"
@@ -575,6 +595,7 @@ static PyMethodDef SegmentationMethods[] = {
 "* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
 "* processinmemory is a bool specifying if processing should be carried out in memory (faster if sufficient RAM is available, set to False if unsure).\n"
 "* nodata is None or float\n"
+"* addPxlVal2Rat is a boolean specifying whether the pixel value (from inputimage) should be added as a RAT.\n"
 "\n"},
 
     {"rmSmallClumpsStepwise", Segmentation_RMSmallClumpsStepwise, METH_VARARGS,
@@ -631,12 +652,13 @@ static PyMethodDef SegmentationMethods[] = {
 "\n"},
 
     {"mergeClumpImages", Segmentation_mergeClumpImages, METH_VARARGS,
-"segmentation.mergeClumpImages(inputimagepaths, outputimage)\n"
+"segmentation.mergeClumpImages(inputimagepaths, outputimage, mergeRATs)\n"
 "Merge all clumps from tile segmentations into outputfile\n"
 "where:\n"
 "\n"
 " * inputimagepaths is a list of input image paths\n"
 " * outputimage is a string containing the name of the output file\n"
+" * mergeRATs is a boolean specifying with the image RATs are to merged (Default: false; Optional)\n"
 "\n"},
 
     {"findTileBordersMask", Segmentation_findTileBordersMask, METH_VARARGS,
@@ -711,7 +733,6 @@ static PyMethodDef SegmentationMethods[] = {
 "* selectClumpsCol is a string defining the binary column for defining the segments to be merged (1 == selected clumps).\n"
 "* noDataClumpsCol is a string defining the binary column for defining the segments to be ignored as no data (1 == no-data clumps).\n"
 "\n"},
-    
 {"dropSelectedClumps", Segmentation_dropSelectedSegments, METH_VARARGS,
 "segmentation.dropSelectedClumps(clumpsImage, outputClumps, gdalFormat)\n"
 "A function to drop the selected clumps from the segmentation.\n"
@@ -722,9 +743,18 @@ static PyMethodDef SegmentationMethods[] = {
 "* gdalFormat is a string defining the format of the output image.\n"
 "* selectClumpsCol is a string defining the binary column for defining the segments to be merged (1 == selected clumps).\n"
 "\n"},
+{"mergeEquivClumps", Segmentation_mergeEquivalentClumps, METH_VARARGS,
+"segmentation.mergeEquivClumps(clumpsImage, outputClumps, gdalFormat, valClumpsCol)\n"
+"A function to merge neighbouring clumps which have the same value - for example when merging across tile boundaries.\n"
+"where:\n"
+"\n"
+"* clumpsImage is a string containing the filepath for the input clumps image.\n"
+"* outputClumps is a string containing the name and path of the output clumps image\n"
+"* gdalFormat is a string defining the format of the output image.\n"
+"* valClumpsCol is a string defining the value used to define equivalence (typically it might be the original pixel values when clumping through tiling).\n"
+"\n"},
     
-    
-    
+   
 
     {NULL}        /* Sentinel */
 };

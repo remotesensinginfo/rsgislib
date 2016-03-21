@@ -135,7 +135,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void executeClump(std::string inputImage, std::string outputImage, std::string imageFormat, bool processInMemory, bool noDataValProvided, float noDataVal) throw(RSGISCmdException)
+    void executeClump(std::string inputImage, std::string outputImage, std::string imageFormat, bool processInMemory, bool noDataValProvided, float noDataVal, bool addRatPxlVals) throw(RSGISCmdException)
     {        
         try
         {
@@ -166,20 +166,63 @@ namespace rsgis{ namespace cmds {
                 resultDataset = imgUtils.createCopy(inDataset, 1, outputImage, imageFormat, GDT_UInt32, true, "");
             }
             
+            std::vector<unsigned int> *clumpPxlVals=NULL;
+            if(addRatPxlVals)
+            {
+                clumpPxlVals = new std::vector<unsigned int>();
+            }
+            
             std::cout << "Performing Clump\n";
             rsgis::segment::RSGISClumpPxls clumpImg;
-            clumpImg.performClump(catagoryDataset, resultDataset, noDataValProvided, noDataVal);
+            clumpImg.performClump(catagoryDataset, resultDataset, noDataValProvided, noDataVal, clumpPxlVals);
             
             if(processInMemory)
             {
                 std::cout << "Copying output to disk\n";
                 GDALDataset *outDataset = imgUtils.createCopy(inDataset, 1, outputImage, imageFormat, GDT_UInt32, true, "");
                 imgUtils.copyUIntGDALDataset(resultDataset, outDataset);
+                outDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
+                if(addRatPxlVals)
+                {
+                    rsgis::rastergis::RSGISPopulateWithImageStats popImageStats;
+                    popImageStats.populateImageWithRasterGISStats(outDataset, true, true, true, 1);
+                    
+                    GDALRasterAttributeTable *gdalRAT = outDataset->GetRasterBand(1)->GetDefaultRAT();
+                    size_t colLen = gdalRAT->GetRowCount();
+                    int *intDataVal = new int[colLen];
+                    rsgis::rastergis::RSGISRasterAttUtils ratUtils;
+                    intDataVal[0] = 0;
+                    for(size_t i = 1; i < colLen; ++i)
+                    {
+                        intDataVal[i] = clumpPxlVals->at(i-1);
+                    }
+                    ratUtils.writeIntColumn(gdalRAT, "PixelVal", intDataVal, colLen);
+                    delete[] intDataVal;
+                }
                 GDALClose(outDataset);
                 GDALClose(catagoryDataset);
             }
-            
-            resultDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
+            else
+            {
+                resultDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
+                if(addRatPxlVals)
+                {
+                    rsgis::rastergis::RSGISPopulateWithImageStats popImageStats;
+                    popImageStats.populateImageWithRasterGISStats(resultDataset, true, true, true, 1);
+                    
+                    GDALRasterAttributeTable *gdalRAT = resultDataset->GetRasterBand(1)->GetDefaultRAT();
+                    size_t colLen = gdalRAT->GetRowCount();
+                    int *intDataVal = new int[colLen];
+                    rsgis::rastergis::RSGISRasterAttUtils ratUtils;
+                    intDataVal[0] = 0;
+                    for(size_t i = 1; i < colLen; ++i)
+                    {
+                        intDataVal[i] = clumpPxlVals->at(i-1);
+                    }
+                    ratUtils.writeIntColumn(gdalRAT, "PixelVal", intDataVal, colLen);
+                    delete[] intDataVal;
+                }
+            }
             
             // Tidy up
             GDALClose(inDataset);
@@ -588,7 +631,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void executeMergeClumpImages(std::vector<std::string> inputImagePaths, std::string outputImage)throw(RSGISCmdException)
+    void executeMergeClumpImages(std::vector<std::string> inputImagePaths, std::string outputImage, bool mergeRATs)throw(RSGISCmdException)
     {
         try
         {
@@ -603,7 +646,7 @@ namespace rsgis{ namespace cmds {
             
             std::cout << "Running Merge\n";
             rsgis::segment::RSGISMergeSegmentationTiles mergeSegmentTiles;
-            mergeSegmentTiles.mergeClumpImages(outputDataset, inputImagePaths);
+            mergeSegmentTiles.mergeClumpImages(outputDataset, inputImagePaths, mergeRATs);
             
             outputDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
             
@@ -857,7 +900,7 @@ namespace rsgis{ namespace cmds {
             rsgis::rastergis::RSGISExportColumns2ImageCalcImage *calcImageVal = new rsgis::rastergis::RSGISExportColumns2ImageCalcImage(1, gdalATT, columnIndex);
             rsgis::img::RSGISCalcImage calcImage(calcImageVal);
             
-            calcImage.calcImage(&clumpDataset, 1, 0, outputImage, false, NULL, imageFormat, GDT_Int32);
+            calcImage.calcImage(&clumpDataset, 1, 0, outputImage, false, NULL, imageFormat, GDT_UInt32);
             delete calcImageVal;
             
             GDALDataset *outputClumpsDS = (GDALDataset *) GDALOpen(outputImage.c_str(), GA_Update);
@@ -904,6 +947,59 @@ namespace rsgis{ namespace cmds {
             dropSegs.dropSelectedClumps(clumpDataset, outputImage, selectClumpsCol, imageFormat, 1);
             
             GDALClose(clumpDataset);
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw rsgis::cmds::RSGISCmdException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw rsgis::cmds::RSGISCmdException(e.what());
+        }
+    }
+            
+    void executeMergeClumpsEquivalentVal(std::string clumpsImage, std::string outputImage, std::string imageFormat, std::string clumpsValCol)throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            GDALDataset *clumpDataset = (GDALDataset *) GDALOpen(clumpsImage.c_str(), GA_Update);
+            if(clumpDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + clumpsImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            std::cout << "Merge Clumps\n";
+            rsgis::segment::RSGISMergeSegments mergeSegs;
+            mergeSegs.mergeEquivlentClumpsInRAT(clumpDataset, clumpsValCol);
+            
+            rsgis::rastergis::RSGISRasterAttUtils attUtils;
+            GDALRasterAttributeTable *gdalATT = clumpDataset->GetRasterBand(1)->GetDefaultRAT();
+            
+            // Get column intex in RAT
+            unsigned int columnIndex = attUtils.findColumnIndex(gdalATT, "OutClumpIDs");
+            
+            rsgis::rastergis::RSGISExportColumns2ImageCalcImage *calcImageVal = new rsgis::rastergis::RSGISExportColumns2ImageCalcImage(1, gdalATT, columnIndex);
+            rsgis::img::RSGISCalcImage calcImage(calcImageVal);
+            
+            calcImage.calcImage(&clumpDataset, 1, 0, outputImage, false, NULL, imageFormat, GDT_UInt32);
+            delete calcImageVal;
+            
+            GDALDataset *outputClumpsDS = (GDALDataset *) GDALOpen(outputImage.c_str(), GA_Update);
+            if(outputClumpsDS == NULL)
+            {
+                std::string message = std::string("Could not open image ") + outputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            outputClumpsDS->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
+            
+            rsgis::rastergis::RSGISPopulateWithImageStats popImageStats;
+            popImageStats.populateImageWithRasterGISStats(outputClumpsDS, true, true, true, 1);
+
+            // Tidy up
+            GDALClose(clumpDataset);
+            GDALClose(outputClumpsDS);
         }
         catch (rsgis::RSGISException &e)
         {

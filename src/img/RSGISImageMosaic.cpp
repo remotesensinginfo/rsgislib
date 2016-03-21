@@ -1109,25 +1109,25 @@ namespace rsgis{namespace img{
 			std::cout << "imgExtentY = " << imgExtentY << std::endl;*/
 
 			// Check datasets fit within the base image.
-			if(transformation[0] <= baseTransform[0])
+			if(transformation[0] < baseTransform[0])
 			{
                 std::cerr << "transformation[0] = " << transformation[0] << std::endl;
                 std::cerr << "baseTransform[0] = " << baseTransform[0] << std::endl;
 				throw RSGISImageException("Images do not fit within the base image (Eastings Min)");
 			}
-			if(transformation[3] >= baseTransform[3])
+			if(transformation[3] > baseTransform[3])
 			{
                 std::cerr << "transformation[3] = " << transformation[3] << std::endl;
                 std::cerr << "baseTransform[3] = " << baseTransform[3] << std::endl;
 				throw RSGISImageException("Images do not fit within the base image (Northings Max)");
 			}
-			if(imgExtentX >= baseExtentX)
+			if(imgExtentX > baseExtentX)
 			{
                 std::cerr << "imgExtentX = " << imgExtentX << std::endl;
                 std::cerr << "baseExtentX = " << baseExtentX << std::endl;
 				throw RSGISImageException("Images do not fit within the base image (Eastings Max)");
 			}
-			if(imgExtentY <= baseExtentY)
+			if(imgExtentY < baseExtentY)
 			{
                 std::cerr << "imgExtentY = " << imgExtentY << std::endl;
                 std::cerr << "baseExtentY = " << baseExtentY << std::endl;
@@ -1383,25 +1383,25 @@ namespace rsgis{namespace img{
              std::cout << "imgExtentY = " << imgExtentY << std::endl;*/
             
             // Check datasets fit within the base image.
-            if(transformation[0] <= baseTransform[0])
+            if(transformation[0] < baseTransform[0])
             {
                 std::cerr << "transformation[0] = " << transformation[0] << std::endl;
                 std::cerr << "baseTransform[0] = " << baseTransform[0] << std::endl;
                 throw RSGISImageException("Images do not fit within the base image (Eastings Min)");
             }
-            if(transformation[3] >= baseTransform[3])
+            if(transformation[3] > baseTransform[3])
             {
                 std::cerr << "transformation[3] = " << transformation[3] << std::endl;
                 std::cerr << "baseTransform[3] = " << baseTransform[3] << std::endl;
                 throw RSGISImageException("Images do not fit within the base image (Northings Max)");
             }
-            if(imgExtentX >= baseExtentX)
+            if(imgExtentX > baseExtentX)
             {
                 std::cerr << "imgExtentX = " << imgExtentX << std::endl;
                 std::cerr << "baseExtentX = " << baseExtentX << std::endl;
                 throw RSGISImageException("Images do not fit within the base image (Eastings Max)");
             }
-            if(imgExtentY <= baseExtentY)
+            if(imgExtentY < baseExtentY)
             {
                 std::cerr << "imgExtentY = " << imgExtentY << std::endl;
                 std::cerr << "baseExtentY = " << baseExtentY << std::endl;

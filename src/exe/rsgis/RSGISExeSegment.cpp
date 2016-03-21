@@ -5129,7 +5129,7 @@ void RSGISExeSegment::runAlgorithm() throw(rsgis::RSGISException)
         
         try
         {
-            rsgis::cmds::executeMergeClumpImages(this->inputImagePaths, this->outputImage);
+            rsgis::cmds::executeMergeClumpImages(this->inputImagePaths, this->outputImage, false);
         }
         catch(rsgis::cmds::RSGISCmdException &e)
         {
