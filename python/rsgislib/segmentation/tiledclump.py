@@ -80,8 +80,11 @@ def performClumpingSingleThread(inputImage, clumpsImage, tmpDIR='tmp', width=200
         segmentation.clump(tile, clumpedTile, 'KEA', True, 0, True)
     
     clumpTiles = glob.glob(os.path.join(tilesClumpsDIR, '*_clumps.kea'))
+    print("Create Blank Image")
     imageutils.createCopyImage(inputImage, initMergedClumps, 1, 0, 'KEA', rsgislib.TYPE_32UINT)
+    print("Merge Tiles into Blank Image")
     segmentation.mergeClumpImages(clumpTiles, initMergedClumps, True)
+    print("Merge Tile Boundaries")
     segmentation.mergeEquivClumps(initMergedClumps, clumpsImage, imgFormat, 'PixelVal')
     
     shutil.rmtree(imgTilesDIR)
@@ -138,8 +141,11 @@ def performClumpingMultiProcess(inputImage, clumpsImage, tmpDIR='tmp', width=200
         p.map(clumpImgFunc, clumpImgsVals)
     
     clumpTiles = glob.glob(os.path.join(tilesClumpsDIR, '*_clumps.kea'))
+    print("Create Blank Image")
     imageutils.createCopyImage(inputImage, initMergedClumps, 1, 0, 'KEA', rsgislib.TYPE_32UINT)
+    print("Merge Tiles into Blank Image")
     segmentation.mergeClumpImages(clumpTiles, initMergedClumps, True)
+    print("Merge Tile Boundaries")
     segmentation.mergeEquivClumps(initMergedClumps, clumpsImage, imgFormat, 'PixelVal')
     
     shutil.rmtree(imgTilesDIR)
