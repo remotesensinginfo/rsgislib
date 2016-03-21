@@ -160,11 +160,13 @@ class RSGISTiledShepherdSegmentationSingleThread (object):
     
     
     def performStage2TilesSegmentation(self, tilesImgDIR, tilesMaskedDIR, tilesSegsDIR, tilesSegBordersDIR, tmpDIR, tilesBase, s1BordersImage, segStatsInfo, minPxlsVal, distThresVal, bandsVal):
+        rsgisUtils = rsgislib.RSGISPyUtils()
         imgTiles = glob.glob(os.path.join(tilesImgDIR, tilesBase+"*.kea"))
         for imgTile in imgTiles:
             baseName = os.path.splitext(os.path.basename(imgTile))[0]        
             maskedFile = os.path.join(tilesMaskedDIR, baseName + '_masked.kea')
-            imageutils.maskImage(imgTile, s1BordersImage, maskedFile, 'KEA', rsgislib.TYPE_16UINT, 0, 0)
+            dataType = rsgisUtils.getRSGISLibDataTypeFromImg(imgTile)
+            imageutils.maskImage(imgTile, s1BordersImage, maskedFile, 'KEA', dataType, 0, 0)
             
         imgTiles = glob.glob(os.path.join(tilesMaskedDIR, tilesBase+"*_masked.kea"))
         for imgTile in imgTiles:
@@ -359,7 +361,7 @@ Example::
     shutil.rmtree(stage2TilesMetaDIR)
     shutil.rmtree(stage2TilesImgMaskedDIR)
     shutil.rmtree(stage2TilesSegsDIR) 
-    shutil.rmtree(stage2TilesSegBordersDIR)    
+    shutil.rmtree(stage2TilesSegBordersDIR)
     ########################################################
     
     ######################## STAGE 3 #######################
