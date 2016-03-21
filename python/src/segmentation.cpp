@@ -187,8 +187,9 @@ static PyObject *Segmentation_unionOfClumps(PyObject *self, PyObject *args)
     float fnodata;
     PyObject *pNoData; //could be none or a number
     PyObject *pInputListObj;
-    if( !PyArg_ParseTuple(args, "ssOO:unionOfClumps", &pszOutputImage, &pszGDALFormat,
-                                &pInputListObj, &pNoData))
+    int addRatPxlVals = false;
+    if( !PyArg_ParseTuple(args, "ssOOi:unionOfClumps", &pszOutputImage, &pszGDALFormat,
+                                &pInputListObj, &pNoData, &addRatPxlVals))
         return NULL;
 
     if( pNoData == Py_None )
@@ -239,8 +240,7 @@ static PyObject *Segmentation_unionOfClumps(PyObject *self, PyObject *args)
     try
     {
                         
-        rsgis::cmds::executeUnionOfClumps(inputImagePaths, pszOutputImage, pszGDALFormat,
-                        nodataprovided, fnodata);
+        rsgis::cmds::executeUnionOfClumps(inputImagePaths, pszOutputImage, pszGDALFormat, nodataprovided, fnodata, addRatPxlVals);
 
     }
     catch(rsgis::cmds::RSGISCmdException &e)
@@ -538,15 +538,37 @@ static PyObject *Segmentation_dropSelectedSegments(PyObject *self, PyObject *arg
 
 static PyObject *Segmentation_mergeEquivalentClumps(PyObject *self, PyObject *args)
 {
-    const char *pszInputClumpsImage, *pszOutputImage, *pszGDALFormat, *valClumpsCol;
-    if( !PyArg_ParseTuple(args, "ssss:mergeEquivClumps", &pszInputClumpsImage, &pszOutputImage, &pszGDALFormat, &valClumpsCol))
+    const char *pszInputClumpsImage, *pszOutputImage, *pszGDALFormat;
+    PyObject *valClumpsCols;
+    if( !PyArg_ParseTuple(args, "sssO:mergeEquivClumps", &pszInputClumpsImage, &pszOutputImage, &pszGDALFormat, &valClumpsCols))
     {
         return NULL;
     }
     
+    Py_ssize_t nValCols = PyList_Size(valClumpsCols);
+    if( nValCols < 0)
+    {
+        PyErr_SetString(GETSTATE(self)->error, "last argument must be a list");
+        return NULL;
+    }
+    
+    std::vector<std::string> cols;
+    for(Py_ssize_t n = 0; n < nValCols; n++)
+    {
+        PyObject *strObj = PyList_GetItem(valClumpsCols, n);
+        if( !RSGISPY_CHECK_STRING(strObj) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "must pass a list of strings");
+            Py_DECREF(strObj);
+            return NULL;
+        }
+        std::string colName = RSGISPY_STRING_EXTRACT(strObj);
+        cols.push_back(colName);
+    }
+    
     try
     {
-        rsgis::cmds::executeMergeClumpsEquivalentVal(std::string(pszInputClumpsImage), std::string(pszOutputImage), std::string(pszGDALFormat), std::string(valClumpsCol));
+        rsgis::cmds::executeMergeClumpsEquivalentVal(std::string(pszInputClumpsImage), std::string(pszOutputImage), std::string(pszGDALFormat), cols);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -627,7 +649,7 @@ static PyMethodDef SegmentationMethods[] = {
 "\n"},
                                 
     {"unionOfClumps", Segmentation_unionOfClumps, METH_VARARGS,
-"segmentation.unionOfClumps(outputimage, gdalformat, inputimagepaths, nodata)\n"
+"segmentation.unionOfClumps(outputimage, gdalformat, inputimagepaths, nodata, addPxlVals2Rat)\n"
 "Union of clumps\n"
 "where:\n"
 "\n"
@@ -635,6 +657,7 @@ static PyMethodDef SegmentationMethods[] = {
 "* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
 "* inputimagepaths is a list of input image paths\n"
 "* nodata is None or float\n"
+"* addPxlVals2Rat is a boolean specifying whether the pixel values (from inputimagepaths) should be added as a RAT; column names have prefix 'ClumpVal_' with index starting at 1 for each variable."
 "\n"},
 
     {"mergeSegmentationTiles", Segmentation_mergeSegmentationTiles, METH_VARARGS,
@@ -744,14 +767,14 @@ static PyMethodDef SegmentationMethods[] = {
 "* selectClumpsCol is a string defining the binary column for defining the segments to be merged (1 == selected clumps).\n"
 "\n"},
 {"mergeEquivClumps", Segmentation_mergeEquivalentClumps, METH_VARARGS,
-"segmentation.mergeEquivClumps(clumpsImage, outputClumps, gdalFormat, valClumpsCol)\n"
+"segmentation.mergeEquivClumps(clumpsImage, outputClumps, gdalFormat, valClumpsCols)\n"
 "A function to merge neighbouring clumps which have the same value - for example when merging across tile boundaries.\n"
 "where:\n"
 "\n"
 "* clumpsImage is a string containing the filepath for the input clumps image.\n"
 "* outputClumps is a string containing the name and path of the output clumps image\n"
 "* gdalFormat is a string defining the format of the output image.\n"
-"* valClumpsCol is a string defining the value used to define equivalence (typically it might be the original pixel values when clumping through tiling).\n"
+"* valClumpsCol is a list of strings defining the value(s) used to define equivalence (typically it might be the original pixel values when clumping through tiling).\n"
 "\n"},
     
    
