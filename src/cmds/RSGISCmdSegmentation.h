@@ -66,7 +66,7 @@ namespace rsgis{ namespace cmds {
     DllExport void executeRandomColourClumps(std::string inputImage, std::string outputImage, std::string imageFormat, bool processInMemory, std::string importLUTFile, bool importLUT, std::string exportLUTFile, bool exportLUT)throw(RSGISCmdException);
     
     /** Function to run union of segmentations command */
-    DllExport void executeUnionOfClumps(std::vector<std::string> inputImagePaths, std::string outputImage, std::string imageFormat, bool noDataValProvided, float noDataVal)throw(RSGISCmdException);
+    DllExport void executeUnionOfClumps(std::vector<std::string> inputImagePaths, std::string outputImage, std::string imageFormat, bool noDataValProvided, float noDataVal, bool addRatPxlVals=true)throw(RSGISCmdException);
     
     /** Function to run merge segment tiles command */
     DllExport void executeMergeSegmentationTiles(std::string outputImage, std::string borderMaskImage, std::vector<std::string> inputImagePaths, unsigned int tileBoundary, unsigned int tileOverlap, unsigned int tileBody, std::string colsName)throw(RSGISCmdException);
@@ -96,7 +96,7 @@ namespace rsgis{ namespace cmds {
     DllExport void executeDropSelectedClumps(std::string clumpsImage, std::string outputImage, std::string imageFormat, std::string selectClumpsCol)throw(RSGISCmdException);
     
     /** Function merge clumps with same value */
-    DllExport void executeMergeClumpsEquivalentVal(std::string clumpsImage, std::string outputImage, std::string imageFormat, std::string clumpsValCol)throw(RSGISCmdException);
+    DllExport void executeMergeClumpsEquivalentVal(std::string clumpsImage, std::string outputImage, std::string imageFormat, std::vector<std::string> clumpsValCols)throw(RSGISCmdException);
     
 }}
 
