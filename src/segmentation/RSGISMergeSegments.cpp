@@ -582,7 +582,151 @@ namespace rsgis{namespace segment{
         }
     }
     */
+    
+    void RSGISMergeSegments::mergeEquivlentClumpsInRAT(GDALDataset *clumpsImage, std::string clumpsCol2Merge)throw(rsgis::img::RSGISImageCalcException)
+    {
+        try
+        {
+            std::cout << "Populate Neighbours\n";
+            rastergis::RSGISFindClumpNeighbours findNeighboursObj;
+            findNeighboursObj.findNeighboursKEAImageCalc(clumpsImage, 1);
+            std::cout << "Populated Neighbours\n";
+            
+            rastergis::RSGISRasterAttUtils attUtils;
+            
+            GDALRasterBand *clumpBand = clumpsImage->GetRasterBand(1);
+            GDALRasterAttributeTable *rat = clumpBand->GetDefaultRAT();
+            size_t numRows = rat->GetRowCount();
+            std::cout << "Number of clumps is " << numRows << "\n";
+            
+            std::vector<std::vector<size_t>* > *neighbours = attUtils.getRATNeighbours(clumpsImage, 1);
+            
+            if(numRows != neighbours->size())
+            {
+                for(std::vector<std::vector<size_t>* >::iterator iterNeigh = neighbours->begin(); iterNeigh != neighbours->end(); ++iterNeigh)
+                {
+                    delete *iterNeigh;
+                }
+                delete neighbours;
+                
+                throw rsgis::RSGISAttributeTableException("RAT size is different to the number of neighbours retrieved.");
+            }
+            
+            size_t tmpNumRows = 0;
+            int *clumps2MergeCol = attUtils.readIntColumn(rat, clumpsCol2Merge, &tmpNumRows);
+            
+            
+            std::vector<rsgisClumpMergeInfo*> clumps;
+            for(size_t i = 0; i < numRows; ++i)
+            {
+                rsgisClumpMergeInfo *clump = new rsgisClumpMergeInfo();
+                clump->clumpID = i;
+                clump->origClumpIDs.push_back(i);
+                clump->clumpVal = clumps2MergeCol[i];
+                clump->merge = false;
+                clump->mergeTo = NULL;
+                clump->neighbours.clear();
+                clumps.push_back(clump);
+            }
+            for(size_t i = 0; i < numRows; ++i)
+            {
+                for(size_t j = 0; j < neighbours->at(i)->size(); ++j)
+                {
+                    clumps.at(i)->neighbours.push_back(clumps.at(neighbours->at(i)->at(j)));
+                }
+            }
+            
+            std::cout << "Run Iterative Merge\n";
+            int feedback = numRows/10;
+            int feedbackCounter = 0;
+            std::cout << "Started" << std::flush;
+            rsgisClumpMergeInfo *cClump;
+            unsigned int outIdx = 0;
+            for(size_t i = 0; i < clumps.size(); ++i)
+            {
+                if((feedback != 0) && (i % feedback == 0))
+                {
+                    std::cout << "." << feedbackCounter << "." << std::flush;
+                    feedbackCounter = feedbackCounter + 10;
+                }
+                
+                cClump = clumps.at(i);
+                
+                if((!cClump->merge) && (cClump->neighbours.size() > 0))
+                {
+                    //std::cout << "Process clump " << cClump->clumpID << std::endl;
+                    cClump->clumpID = outIdx;
+                    for(std::list<rsgisClumpMergeInfo*>::iterator iterNeigh = cClump->neighbours.begin(); iterNeigh != cClump->neighbours.end(); ++iterNeigh)
+                    {
+                        if(!(*iterNeigh)->merge)
+                        {
+                            this->mergeClump2Neighbours(cClump, *iterNeigh, outIdx);
+                        }
+                    }
+                    ++outIdx;
+                }
+                else if(!cClump->merge)
+                {
+                    cClump->clumpID = outIdx;
+                    ++outIdx;
+                }
+            }
+            std::cout << " Complete.\n";
+            
+            int *clumpIDUp = new int[numRows];
+            for(size_t i = 0; i < clumps.size(); ++i)
+            {
+                cClump = clumps.at(i);
+                clumpIDUp[i] = cClump->clumpID;
+            }
+            attUtils.writeIntColumn(rat, "OutClumpIDs", clumpIDUp, numRows);
+            
+            for(size_t i = 0; i < clumps.size(); ++i)
+            {
+                cClump = clumps.at(i);
+                cClump->neighbours.clear();
+                delete cClump;
+            }
+            clumps.clear();
 
+            delete[] clumps2MergeCol;
+        }
+        catch(rsgis::img::RSGISImageCalcException &e)
+        {
+            throw e;
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+    }
+    
+    void RSGISMergeSegments::mergeClump2Neighbours(rsgisClumpMergeInfo *baseClump, rsgisClumpMergeInfo *testClump, unsigned int outIdx)
+    {
+        if(baseClump->clumpVal == testClump->clumpVal)
+        {
+            //std::cout << "\t Merge: " << testClump->clumpID << std::endl;
+            baseClump->origClumpIDs.push_back(testClump->clumpID);
+            testClump->merge = true;
+            testClump->mergeTo = baseClump;
+            testClump->clumpID = outIdx;
+            if(testClump->neighbours.size() > 0)
+            {
+                for(std::list<rsgisClumpMergeInfo*>::iterator iterNeigh = testClump->neighbours.begin(); iterNeigh != testClump->neighbours.end(); ++iterNeigh)
+                {
+                    if(!(*iterNeigh)->merge)
+                    {
+                        this->mergeClump2Neighbours(baseClump, *iterNeigh, outIdx);
+                    }
+                }
+            }
+        }
+    }
+    
     RSGISMergeSegments::~RSGISMergeSegments()
     {
         

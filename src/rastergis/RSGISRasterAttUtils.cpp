@@ -281,6 +281,280 @@ namespace rsgis{namespace rastergis{
         }
     }
 
+    
+    void RSGISRasterAttUtils::copyAttColumnsWithOff(GDALRasterAttributeTable *inRAT, GDALRasterAttributeTable *outRAT, std::vector<std::string> fields, unsigned int offset, bool ignoreFirstRow, bool copyColours, bool copyHist) throw(RSGISAttributeTableException)
+    {
+        if(inRAT == NULL)
+        {
+            rsgis::RSGISAttributeTableException("The input RAT is NULL.");
+        }
+        
+        if(outRAT == NULL)
+        {
+            rsgis::RSGISAttributeTableException("The output RAT is NULL.");
+        }
+        
+        std::cout << "Find field column indexes and create required columns.\n";
+        int *colInIdxs = new int[fields.size()];
+        int *colOutIdxs = new int[fields.size()];
+        for(size_t i = 0; i < fields.size(); ++i)
+        {
+            colInIdxs[i] = 0;
+            colOutIdxs[i] = 0;
+        }
+        
+        if(inRAT->GetRowCount() == 0)
+        {
+            rsgis::RSGISAttributeTableException("There are no columns in the input attribute table.");
+        }
+        
+        for(size_t j = 0; j < fields.size(); ++j)
+        {
+            colInIdxs[j] = findColumnIndex(inRAT, fields.at(j));
+        }
+        
+        for(size_t j = 0; j < fields.size(); ++j)
+        {
+            if(inRAT->GetTypeOfCol(colInIdxs[j]) == GFT_Integer)
+            {
+                colOutIdxs[j] = findColumnIndexOrCreate(outRAT, fields.at(j), GFT_Integer, inRAT->GetUsageOfCol(colInIdxs[j]));
+            }
+            else if(inRAT->GetTypeOfCol(colInIdxs[j]) == GFT_Real)
+            {
+                colOutIdxs[j] = findColumnIndexOrCreate(outRAT, fields.at(j), GFT_Real, inRAT->GetUsageOfCol(colInIdxs[j]));
+            }
+            else if(inRAT->GetTypeOfCol(colInIdxs[j]) == GFT_String)
+            {
+                colOutIdxs[j] = findColumnIndexOrCreate(outRAT, fields.at(j), GFT_String, inRAT->GetUsageOfCol(colInIdxs[j]));
+            }
+        }
+        
+        int inRedIdx = 0;
+        int inGreenIdx = 0;
+        int inBlueIdx = 0;
+        int inAlphaIdx = 0;
+        int inHistIndx = 0;
+        
+        int outRedIdx = 0;
+        int outGreenIdx = 0;
+        int outBlueIdx = 0;
+        int outAlphaIdx = 0;
+        int outHistIndx = 0;
+        
+        if(copyColours)
+        {
+            try
+            {
+                inRedIdx = findColumnIndex(inRAT,"Red");
+                inGreenIdx = findColumnIndex(inRAT,"Green");
+                inBlueIdx = findColumnIndex(inRAT,"Blue");
+                inAlphaIdx = findColumnIndex(inRAT,"Alpha");
+            }
+            catch (rsgis::RSGISAttributeTableException &e)
+            {
+                std::cerr << "No colour columns in input attribute table - skipping copying" << std::endl;
+                copyColours = false;
+            }
+            
+            // Get or create column indies for colour columns
+            outRedIdx = findColumnIndexOrCreate(outRAT, "Red", GFT_Integer, GFU_Red);
+            outGreenIdx = findColumnIndexOrCreate(outRAT, "Green", GFT_Integer, GFU_Green);
+            outBlueIdx = findColumnIndexOrCreate(outRAT, "Blue", GFT_Integer, GFU_Blue);
+            outAlphaIdx = findColumnIndexOrCreate(outRAT, "Alpha", GFT_Integer, GFU_Alpha);
+        }
+        
+        if(copyHist)
+        {
+            try
+            {
+                inHistIndx = findColumnIndex(inRAT,"Histogram");
+            }
+            catch (rsgis::RSGISAttributeTableException &e)
+            {
+                std::cerr << "No histogram column in input attribute table - skipping copying" << std::endl;
+                copyHist = false;
+            }
+            outHistIndx = findColumnIndexOrCreate(outRAT, "Histogram", GFT_Integer, GFU_PixelCount);
+        }
+        
+        std::cout << "Copying columns to the new attribute table\n";
+        // Allocate arrays to store blocks of data
+        int nRows = inRAT->GetRowCount();
+        if(ignoreFirstRow)
+        {
+            nRows = nRows - 1;
+        }
+        //std::cout << "nRows = " << nRows <<  std::endl;
+        /*
+        if(ignoreFirstRow)
+        {
+            outRAT->SetRowCount(offset+nRows+1);
+        }
+        else
+        {
+            outRAT->SetRowCount(offset+nRows);
+        }
+         */
+        outRAT->SetRowCount(offset+nRows);
+        
+        int *blockDataInt = new int[RAT_BLOCK_LENGTH];
+        double *blockDataReal = new double[RAT_BLOCK_LENGTH];
+        char **blockDataStr = new char*[RAT_BLOCK_LENGTH];
+        
+        // Iterate through blocks
+        int nBlocks = floor(((double) nRows) / ((double) RAT_BLOCK_LENGTH));
+        int remainRows = nRows - (nBlocks * RAT_BLOCK_LENGTH );
+        
+        //std::cout << "nBlocks = " << nBlocks << std::endl;
+        //std::cout << "remainRows = " << remainRows << std::endl;
+        
+        int feedback = nBlocks/10.0;
+        int feedbackCounter = 0;
+        
+        if(feedback != 0)
+        {
+            std::cout << "Started " << std::flush;
+        }
+        
+        int rowOffset = 0;
+        int rowOffsetOut = offset;
+        for(int i = 0; i < nBlocks; i++)
+        {
+            rowOffset =  RAT_BLOCK_LENGTH * i;
+            if(ignoreFirstRow)
+            {
+                rowOffset = rowOffset + 1;
+            }
+            rowOffsetOut = (RAT_BLOCK_LENGTH * i) + offset;
+            
+            //std::cout << "rowOffset = " << rowOffset << std::endl;
+            //std::cout << "rowOffsetOut = " << rowOffsetOut << std::endl;
+            
+            if((feedback != 0) && ((i % feedback) == 0))
+            {
+                std::cout << "." << feedbackCounter << "." << std::flush;
+                feedbackCounter = feedbackCounter + 10;
+            }
+            
+            for(size_t j = 0; j < fields.size(); ++j)
+            {
+                // For each column read a block of data from the input RAT and write to the output RAT
+                if(inRAT->GetTypeOfCol(colInIdxs[j]) == GFT_Integer)
+                {
+                    inRAT->ValuesIO(GF_Read, colInIdxs[j], rowOffset, RAT_BLOCK_LENGTH, blockDataInt);
+                    outRAT->ValuesIO(GF_Write, colOutIdxs[j], rowOffsetOut, RAT_BLOCK_LENGTH, blockDataInt);
+                }
+                else if(inRAT->GetTypeOfCol(colInIdxs[j]) == GFT_Real)
+                {
+                    inRAT->ValuesIO(GF_Read, colInIdxs[j], rowOffset, RAT_BLOCK_LENGTH, blockDataReal);
+                    outRAT->ValuesIO(GF_Write, colOutIdxs[j], rowOffsetOut, RAT_BLOCK_LENGTH, blockDataReal);
+                }
+                else if(inRAT->GetTypeOfCol(colInIdxs[j]) == GFT_String)
+                {
+                    inRAT->ValuesIO(GF_Read, colInIdxs[j], rowOffset, RAT_BLOCK_LENGTH, blockDataStr);
+                    outRAT->ValuesIO(GF_Write, colOutIdxs[j], rowOffsetOut, RAT_BLOCK_LENGTH, blockDataStr);
+                }
+                else
+                {
+                    throw rsgis::RSGISAttributeTableException("Column data type was not recognised.");
+                }
+            }
+            
+            if(copyColours)
+            {
+                // Red
+                inRAT->ValuesIO(GF_Read, inRedIdx, rowOffset, RAT_BLOCK_LENGTH, blockDataInt);
+                outRAT->ValuesIO(GF_Write, outRedIdx, rowOffsetOut, RAT_BLOCK_LENGTH, blockDataInt);
+                
+                // Green
+                inRAT->ValuesIO(GF_Read, inGreenIdx, rowOffset, RAT_BLOCK_LENGTH, blockDataInt);
+                outRAT->ValuesIO(GF_Write, outGreenIdx, rowOffsetOut, RAT_BLOCK_LENGTH, blockDataInt);
+                
+                // Blue
+                inRAT->ValuesIO(GF_Read, inBlueIdx, rowOffset, RAT_BLOCK_LENGTH, blockDataInt);
+                outRAT->ValuesIO(GF_Write, outBlueIdx, rowOffsetOut, RAT_BLOCK_LENGTH, blockDataInt);
+            }
+            if(copyHist)
+            {
+                inRAT->ValuesIO(GF_Read, inHistIndx, rowOffset, RAT_BLOCK_LENGTH, blockDataInt);
+                outRAT->ValuesIO(GF_Write, outHistIndx, rowOffsetOut, RAT_BLOCK_LENGTH, blockDataInt);
+            }
+            
+        }
+        if(remainRows > 0)
+        {
+            rowOffset =  RAT_BLOCK_LENGTH * nBlocks;
+            if(ignoreFirstRow)
+            {
+                rowOffset = rowOffset + 1;
+            }
+            rowOffsetOut = (RAT_BLOCK_LENGTH * nBlocks) + offset;
+            
+            //std::cout << "rowOffset = " << rowOffset << std::endl;
+            //std::cout << "rowOffsetOut = " << rowOffsetOut << std::endl;
+            
+            for(size_t j = 0; j < fields.size(); ++j)
+            {
+                // For each column read a block of data from the input RAT and write to the output RAT
+                if(inRAT->GetTypeOfCol(colInIdxs[j]) == GFT_Integer)
+                {
+                    inRAT->ValuesIO(GF_Read, colInIdxs[j], rowOffset, remainRows, blockDataInt);
+                    outRAT->ValuesIO(GF_Write, colOutIdxs[j], rowOffsetOut, remainRows, blockDataInt);
+                }
+                else if(inRAT->GetTypeOfCol(colInIdxs[j]) == GFT_Real)
+                {
+                    inRAT->ValuesIO(GF_Read, colInIdxs[j], rowOffset, remainRows, blockDataReal);
+                    outRAT->ValuesIO(GF_Write, colOutIdxs[j], rowOffsetOut, remainRows, blockDataReal);
+                }
+                else if(inRAT->GetTypeOfCol(colInIdxs[j]) == GFT_String)
+                {
+                    inRAT->ValuesIO(GF_Read, colInIdxs[j], rowOffset, remainRows, blockDataStr);
+                    outRAT->ValuesIO(GF_Write, colOutIdxs[j], rowOffsetOut, remainRows, blockDataStr);
+                }
+                else
+                {
+                    throw rsgis::RSGISAttributeTableException("Column data type was not recognised.");
+                }
+            }
+            
+            if(copyColours)
+            {
+                // Red
+                inRAT->ValuesIO(GF_Read, inRedIdx, rowOffset, remainRows, blockDataInt);
+                outRAT->ValuesIO(GF_Write, outRedIdx, rowOffsetOut, remainRows, blockDataInt);
+                
+                // Green
+                inRAT->ValuesIO(GF_Read, inGreenIdx, rowOffset, remainRows, blockDataInt);
+                outRAT->ValuesIO(GF_Write, outGreenIdx, rowOffsetOut, remainRows, blockDataInt);
+                
+                // Blue
+                inRAT->ValuesIO(GF_Read, inBlueIdx, rowOffset, remainRows, blockDataInt);
+                outRAT->ValuesIO(GF_Write, outBlueIdx, rowOffsetOut, remainRows, blockDataInt);
+            }
+            
+            if(copyHist)
+            {
+                inRAT->ValuesIO(GF_Read, inHistIndx, rowOffset, remainRows, blockDataInt);
+                outRAT->ValuesIO(GF_Write, outHistIndx, rowOffsetOut, remainRows, blockDataInt);
+            }
+            
+        }
+        if(feedback != 0)
+        {
+            std::cout << ".Completed\n";
+        }
+        else
+        {
+            std::cout << "Completed\n";
+        }
+
+        
+        // Tidy up
+        delete[] blockDataInt;
+        delete[] blockDataReal;
+        delete[] blockDataStr;
+    }
+    
     void RSGISRasterAttUtils::copyColourForCats(GDALDataset *catsImage, GDALDataset *classImage, std::string classField) throw(RSGISAttributeTableException)
     {
         try

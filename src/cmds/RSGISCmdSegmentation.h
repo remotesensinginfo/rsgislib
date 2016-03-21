@@ -51,7 +51,7 @@ namespace rsgis{ namespace cmds {
     DllExport void executeEliminateSinglePixels(std::string inputImage, std::string clumpsImage, std::string outputImage, std::string tempImage, std::string imageFormat, bool processInMemory, bool ignoreZeros)throw(RSGISCmdException);
     
     /** Function to run the clump command */
-    DllExport void executeClump(std::string inputImage, std::string outputImage, std::string imageFormat, bool processInMemory, bool noDataValProvided, float noDataVal)throw(RSGISCmdException);
+    DllExport void executeClump(std::string inputImage, std::string outputImage, std::string imageFormat, bool processInMemory, bool noDataValProvided, float noDataVal, bool addRatPxlVals=true)throw(RSGISCmdException);
 
     /** Function to run the iterative stepwise elimination command */
     DllExport void executeRMSmallClumpsStepwise(std::string inputImage, std::string clumpsImage, std::string outputImage, std::string imageFormat, bool stretchStatsAvail, std::string stretchStatsFile, bool storeMean, bool processInMemory, unsigned int minClumpSize, float specThreshold)throw(RSGISCmdException);
@@ -75,7 +75,7 @@ namespace rsgis{ namespace cmds {
     DllExport void executeFindTileBordersMask(std::vector<std::string> inputImagePaths, std::string borderMaskImage, unsigned int tileBoundary, unsigned int tileOverlap, unsigned int tileBody, std::string colsName)throw(RSGISCmdException);
 
     /** Function to run command to merge clump image */
-    DllExport void executeMergeClumpImages(std::vector<std::string> inputImagePaths, std::string outputImage)throw(RSGISCmdException);
+    DllExport void executeMergeClumpImages(std::vector<std::string> inputImagePaths, std::string outputImage, bool mergeRATs)throw(RSGISCmdException);
     
     /** Function to run command to merge clump image */
     DllExport void executeExtractBrightFeatures(std::string inputImage, std::string maskImage, std::string outputImage, std::string temp1Image, std::string temp2Image, std::string outputFormat, float initThres, float thresIncrement, float thresholdUpper, std::vector<rsgis::cmds::FeatureShapeDescription*> shapeFeatDescript)throw(RSGISCmdException);
@@ -95,6 +95,8 @@ namespace rsgis{ namespace cmds {
     /** Function to drop selected clumps from the segmentation */
     DllExport void executeDropSelectedClumps(std::string clumpsImage, std::string outputImage, std::string imageFormat, std::string selectClumpsCol)throw(RSGISCmdException);
     
+    /** Function merge clumps with same value */
+    DllExport void executeMergeClumpsEquivalentVal(std::string clumpsImage, std::string outputImage, std::string imageFormat, std::string clumpsValCol)throw(RSGISCmdException);
     
 }}
 

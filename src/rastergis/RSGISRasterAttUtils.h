@@ -126,6 +126,24 @@ namespace rsgis{namespace rastergis{
         unsigned int idx;
         GDALRATFieldType type;
         GDALRATFieldUsage usage;
+        
+        bool operator==(RSGISRATCol val) const
+        {
+            bool equal = true;
+            if(val.name != this->name)
+            {
+                equal = false;
+            }
+            else if (val.type != this->type)
+            {
+                equal = false;
+            }
+            else if (val.usage != this->usage)
+            {
+                equal = false;
+            }
+            return equal;
+        }
     };
     
     class DllExport RSGISRasterAttUtils
@@ -133,6 +151,7 @@ namespace rsgis{namespace rastergis{
     public:
         RSGISRasterAttUtils();
         void copyAttColumns(GDALDataset *inImage, GDALDataset *outImage, std::vector<std::string> fields,  bool copyColours=true, bool copyHist=true, int ratBand=1) throw(RSGISAttributeTableException);
+        void copyAttColumnsWithOff(GDALRasterAttributeTable *inRAT, GDALRasterAttributeTable *outRAT, std::vector<std::string> fields, unsigned int offset, bool ignoreFirstRow=true, bool copyColours=true, bool copyHist=true) throw(RSGISAttributeTableException);
         void copyColourForCats(GDALDataset *catsImage, GDALDataset *classImage, std::string classField) throw(RSGISAttributeTableException);
         void exportColumns2ASCII(GDALDataset *inImage, std::string outputFile, std::vector<std::string> fields, int ratBand=1) throw(RSGISAttributeTableException);
         void translateClasses(GDALDataset *inImage, std::string classInField, std::string classOutField, std::map<size_t, size_t> classPairs) throw(RSGISAttributeTableException);

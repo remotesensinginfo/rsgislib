@@ -30,7 +30,7 @@ namespace rsgis{namespace segment{
         
     }
         
-    void RSGISClumpPxls::performClump(GDALDataset *catagories, GDALDataset *clumps, bool noDataValProvided, unsigned int noDataVal) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISClumpPxls::performClump(GDALDataset *catagories, GDALDataset *clumps, bool noDataValProvided, unsigned int noDataVal, std::vector<unsigned int> *clumpPxlVals) throw(rsgis::img::RSGISImageCalcException)
     {
         if(catagories->GetRasterXSize() != clumps->GetRasterXSize())
         {
@@ -90,7 +90,12 @@ namespace rsgis{namespace segment{
                                 clumpSearchPxls.pop();
                             }
                         }
-                                                
+                        
+                        if(clumpPxlVals != NULL)
+                        {
+                            clumpPxlVals->push_back(catPxlVal);
+                        }
+                            
                         clumpPxls.push_back(rsgis::img::PxlLoc(j, i));
                         clumpSearchPxls.push(rsgis::img::PxlLoc(j, i));
                         clumpBand->RasterIO(GF_Write, j, i, 1, 1, &clumpIdx, 1, 1, GDT_UInt32, 0, 0);
@@ -178,6 +183,15 @@ namespace rsgis{namespace segment{
             }
         }
         std::cout << " Complete (Generated " << clumpIdx-1 << " clumps).\n";
+        if(clumpPxlVals != NULL)
+        {
+            if(clumpPxlVals->size() != (clumpIdx-1))
+            {
+                std::cout << "Number of clump pixel values: " << clumpPxlVals->size() << std::endl;
+                throw rsgis::img::RSGISImageCalcException("Number of clump pixel values in list is not equal to the number of clumps.");
+            }
+        }
+        
     }
     
     void RSGISClumpPxls::performClumpPosVals(GDALDataset *catagories, GDALDataset *clumps) throw(rsgis::img::RSGISImageCalcException)
