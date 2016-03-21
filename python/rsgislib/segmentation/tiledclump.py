@@ -43,6 +43,8 @@ import rsgislib
 from rsgislib import segmentation
 from rsgislib import imageutils
 
+################################ Clumping Functions ################################
+
 def performClumpingSingleThread(inputImage, clumpsImage, tmpDIR='tmp', width=2000, height=2000, imgFormat='KEA'):
     """
     Clump the input image using a tiled processing chain allowing large images to be clumped more quickly.
@@ -85,7 +87,7 @@ def performClumpingSingleThread(inputImage, clumpsImage, tmpDIR='tmp', width=200
     print("Merge Tiles into Blank Image")
     segmentation.mergeClumpImages(clumpTiles, initMergedClumps, True)
     print("Merge Tile Boundaries")
-    segmentation.mergeEquivClumps(initMergedClumps, clumpsImage, imgFormat, 'PixelVal')
+    segmentation.mergeEquivClumps(initMergedClumps, clumpsImage, imgFormat, ['PixelVal'])
     
     shutil.rmtree(imgTilesDIR)
     shutil.rmtree(tilesClumpsDIR)
@@ -146,16 +148,131 @@ def performClumpingMultiProcess(inputImage, clumpsImage, tmpDIR='tmp', width=200
     print("Merge Tiles into Blank Image")
     segmentation.mergeClumpImages(clumpTiles, initMergedClumps, True)
     print("Merge Tile Boundaries")
-    segmentation.mergeEquivClumps(initMergedClumps, clumpsImage, imgFormat, 'PixelVal')
+    segmentation.mergeEquivClumps(initMergedClumps, clumpsImage, imgFormat, ['PixelVal'])
     
     shutil.rmtree(imgTilesDIR)
     shutil.rmtree(tilesClumpsDIR)
     os.remove(initMergedClumps)
     if createdTmp:
         shutil.rmtree(tmpDIR)
+################################################################################################
+
+
+################################ Union Clumping Functions ################################
+
+def performUnionClumpingSingleThread(inputImage, refImg, clumpsImage, tmpDIR='tmp', width=2000, height=2000, imgFormat='KEA'):
+    """
+    Clump and union with the reference image the input image using a tiled processing chain allowing large images to be clumped more quickly.
+    * inputImage - the input image to be clumped.
+    * refImg - the reference image which the union is undertaken with (typically an existing classification)
+    * clumpsImage - the output clumped image.
+    * tmpDIR - the temporary directory where intermediate files will be written (default is 'tmp'). Directory will be created and deleted if does not exist.
+    * width - int for width of the image tiles used for processing (Default = 2000).
+    * height - int for height of the image tiles used for processing (Default = 2000).
+    * imgformat - string with the GDAL image format for the output image (Default = KEA). NOTE. KEA is used as intermediate format internally and therefore needs to be available.
+    """
+    createdTmp = False
+    if not os.path.exists(tmpDIR):
+        os.makedirs(tmpDIR)
+        createdTmp = True
     
+    rsgisUtils = rsgislib.RSGISPyUtils()
+    uidStr = rsgisUtils.uidGenerator()
+    dataType = rsgisUtils.getRSGISLibDataTypeFromImg(inputImage)
+    baseName = os.path.splitext(os.path.basename(inputImage))[0]+"_"+uidStr
+    imgTilesDIR = os.path.join(tmpDIR, "imgtiles_"+uidStr)
+    tilesClumpsDIR = os.path.join(tmpDIR, "imgclumpstiles_"+uidStr)
+    tilesImgBase = os.path.join(imgTilesDIR, baseName)
+    initMergedClumps = os.path.join(tmpDIR, "MergedInitClumps_"+uidStr+".kea")
+    if not os.path.exists(imgTilesDIR):
+        os.makedirs(imgTilesDIR)
+    if not os.path.exists(tilesClumpsDIR):
+        os.makedirs(tilesClumpsDIR)
+    
+    imageutils.createTiles(inputImage, tilesImgBase, width, height, 0, False, 'KEA', dataType, 'kea')
+    imageTiles = glob.glob(tilesImgBase+"*")
 
+    for tile in imageTiles:
+        tilBaseName = os.path.splitext(os.path.basename(tile))[0]
+        clumpedTile = os.path.join(tilesClumpsDIR, tilBaseName+'_clumps.kea')
+        segmentation.unionOfClumps(clumpedTile, 'KEA', [tile, refImg], 0, True)
+    
+    clumpTiles = glob.glob(os.path.join(tilesClumpsDIR, '*_clumps.kea'))
+    print("Create Blank Image")
+    imageutils.createCopyImage(inputImage, initMergedClumps, 1, 0, 'KEA', rsgislib.TYPE_32UINT)
+    print("Merge Tiles into Blank Image")
+    segmentation.mergeClumpImages(clumpTiles, initMergedClumps, True)
+    print("Merge Tile Boundaries")
+    segmentation.mergeEquivClumps(initMergedClumps, clumpsImage, imgFormat, ['ClumpVal_1', 'ClumpVal_2'])
+    
+    shutil.rmtree(imgTilesDIR)
+    shutil.rmtree(tilesClumpsDIR)
+    os.remove(initMergedClumps)
+    if createdTmp:
+        shutil.rmtree(tmpDIR)
 
+def unionClumpImgFunc(imgs):
+    """
+    Union Clump an image with values provides as an array for use within a multiprocessing Pool
+    """
+    segmentation.unionOfClumps(imgs[2], 'KEA', [imgs[0], imgs[1]], 0, True)
+    
+def performClumpingMultiProcess(inputImage, refImg, clumpsImage, tmpDIR='tmp', width=2000, height=2000, imgFormat='KEA', nCores=2):
+    """
+    Clump and union with the reference image the input image using a tiled processing chain allowing large images to be clumped more quickly.
+    * inputImage - the input image to be clumped.
+    * refImg - the reference image which the union is undertaken with (typically an existing classification)
+    * clumpsImage - the output clumped image.
+    * tmpDIR - the temporary directory where intermediate files will be written (default is 'tmp'). Directory will be created and deleted if does not exist.
+    * width - int for width of the image tiles used for processing (Default = 2000).
+    * height - int for height of the image tiles used for processing (Default = 2000).
+    * imgformat - string with the GDAL image format for the output image (Default = KEA). NOTE. KEA is used as intermediate format internally and therefore needs to be available.
+    * nCores - is an int specifying the number of cores to be used for clumping processing.
+    """
+    createdTmp = False
+    if not os.path.exists(tmpDIR):
+        os.makedirs(tmpDIR)
+        createdTmp = True
+    
+    rsgisUtils = rsgislib.RSGISPyUtils()
+    uidStr = rsgisUtils.uidGenerator()
+    dataType = rsgisUtils.getRSGISLibDataTypeFromImg(inputImage)
+    baseName = os.path.splitext(os.path.basename(inputImage))[0]+"_"+uidStr
+    imgTilesDIR = os.path.join(tmpDIR, "imgtiles_"+uidStr)
+    tilesClumpsDIR = os.path.join(tmpDIR, "imgclumpstiles_"+uidStr)
+    tilesImgBase = os.path.join(imgTilesDIR, baseName)
+    initMergedClumps = os.path.join(tmpDIR, "MergedInitClumps_"+uidStr+".kea")
+    if not os.path.exists(imgTilesDIR):
+        os.makedirs(imgTilesDIR)
+    if not os.path.exists(tilesClumpsDIR):
+        os.makedirs(tilesClumpsDIR)
+    
+    imageutils.createTiles(inputImage, tilesImgBase, width, height, 0, False, 'KEA', dataType, 'kea')
+    imageTiles = glob.glob(tilesImgBase+"*")
+    
+    clumpImgsVals = []
+    for tile in imageTiles:
+        tilBaseName = os.path.splitext(os.path.basename(tile))[0]
+        clumpedTile = os.path.join(tilesClumpsDIR, tilBaseName+'_clumps.kea')
+        clumpImgsVals.append([tile, refImg, clumpedTile])
+    
+    with Pool(nCores) as p:
+        p.map(unionClumpImgFunc, clumpImgsVals)
+    
+    clumpTiles = glob.glob(os.path.join(tilesClumpsDIR, '*_clumps.kea'))
+    print("Create Blank Image")
+    imageutils.createCopyImage(inputImage, initMergedClumps, 1, 0, 'KEA', rsgislib.TYPE_32UINT)
+    print("Merge Tiles into Blank Image")
+    segmentation.mergeClumpImages(clumpTiles, initMergedClumps, True)
+    print("Merge Tile Boundaries")
+    segmentation.mergeEquivClumps(initMergedClumps, clumpsImage, imgFormat, ['PixelVal'])
+    
+    shutil.rmtree(imgTilesDIR)
+    shutil.rmtree(tilesClumpsDIR)
+    os.remove(initMergedClumps)
+    if createdTmp:
+        shutil.rmtree(tmpDIR)
 
+################################################################################################
 
 

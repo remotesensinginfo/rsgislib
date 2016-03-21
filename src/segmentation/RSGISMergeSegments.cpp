@@ -583,7 +583,7 @@ namespace rsgis{namespace segment{
     }
     */
     
-    void RSGISMergeSegments::mergeEquivlentClumpsInRAT(GDALDataset *clumpsImage, std::string clumpsCol2Merge)throw(rsgis::img::RSGISImageCalcException)
+    void RSGISMergeSegments::mergeEquivlentClumpsInRAT(GDALDataset *clumpsImage, std::vector<std::string> clumpsCols2Merge)throw(rsgis::img::RSGISImageCalcException)
     {
         try
         {
@@ -612,8 +612,13 @@ namespace rsgis{namespace segment{
                 throw rsgis::RSGISAttributeTableException("RAT size is different to the number of neighbours retrieved.");
             }
             
+            size_t numCols = clumpsCols2Merge.size();
+            int **clumps2MergeCol = new int*[numCols];
             size_t tmpNumRows = 0;
-            int *clumps2MergeCol = attUtils.readIntColumn(rat, clumpsCol2Merge, &tmpNumRows);
+            for(size_t i = 0; i < numCols; ++i)
+            {
+                clumps2MergeCol[i] = attUtils.readIntColumn(rat, clumpsCols2Merge.at(i), &tmpNumRows);
+            }
             
             
             std::vector<rsgisClumpMergeInfo*> clumps;
@@ -622,7 +627,10 @@ namespace rsgis{namespace segment{
                 rsgisClumpMergeInfo *clump = new rsgisClumpMergeInfo();
                 clump->clumpID = i;
                 clump->origClumpIDs.push_back(i);
-                clump->clumpVal = clumps2MergeCol[i];
+                for(size_t j = 0; j < numCols; ++j)
+                {
+                    clump->clumpVal.push_back(clumps2MergeCol[j][i]);
+                }
                 clump->merge = false;
                 clump->mergeTo = NULL;
                 clump->neighbours.clear();
@@ -656,6 +664,7 @@ namespace rsgis{namespace segment{
                 {
                     //std::cout << "Process clump " << cClump->clumpID << std::endl;
                     cClump->clumpID = outIdx;
+                    cClump->merge = true;
                     for(std::list<rsgisClumpMergeInfo*>::iterator iterNeigh = cClump->neighbours.begin(); iterNeigh != cClump->neighbours.end(); ++iterNeigh)
                     {
                         if(!(*iterNeigh)->merge)
@@ -707,7 +716,17 @@ namespace rsgis{namespace segment{
     
     void RSGISMergeSegments::mergeClump2Neighbours(rsgisClumpMergeInfo *baseClump, rsgisClumpMergeInfo *testClump, unsigned int outIdx)
     {
-        if(baseClump->clumpVal == testClump->clumpVal)
+        unsigned int numVals = baseClump->clumpVal.size();
+        bool sameVal = true;
+        for(unsigned int i = 0; i < numVals; ++i)
+        {
+            if(baseClump->clumpVal.at(i) != testClump->clumpVal.at(i))
+            {
+                sameVal = false;
+                break;
+            }
+        }
+        if(sameVal)
         {
             //std::cout << "\t Merge: " << testClump->clumpID << std::endl;
             baseClump->origClumpIDs.push_back(testClump->clumpID);

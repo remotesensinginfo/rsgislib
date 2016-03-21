@@ -71,7 +71,7 @@ namespace rsgis{namespace segment{
     {
         unsigned int clumpID;
         std::vector<unsigned int> origClumpIDs;
-        long clumpVal;
+        std::vector<long> clumpVal;
         bool merge;
         rsgisClumpMergeInfo *mergeTo;
         std::list<rsgisClumpMergeInfo*> neighbours;
@@ -82,7 +82,7 @@ namespace rsgis{namespace segment{
     public:
         RSGISMergeSegments();
         void mergeSelectedClumps(GDALDataset *clumpsImage, GDALDataset *valsImageDS, std::string clumps2MergeCol, std::string noDataClumpsCol)throw(rsgis::img::RSGISImageCalcException);
-        void mergeEquivlentClumpsInRAT(GDALDataset *clumpsImage, std::string clumpsCol2Merge)throw(rsgis::img::RSGISImageCalcException);
+        void mergeEquivlentClumpsInRAT(GDALDataset *clumpsImage, std::vector<std::string> clumpsCols2Merge)throw(rsgis::img::RSGISImageCalcException);
         ~RSGISMergeSegments();
     protected:
         double calcDist(double *valsRef, double *valsTest, int numVals)

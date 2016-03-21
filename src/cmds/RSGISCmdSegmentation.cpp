@@ -522,7 +522,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void executeUnionOfClumps(std::vector<std::string> inputImagePaths, std::string outputImage, std::string imageFormat, bool noDataValProvided, float noDataVal)throw(RSGISCmdException)
+    void executeUnionOfClumps(std::vector<std::string> inputImagePaths, std::string outputImage, std::string imageFormat, bool noDataValProvided, float noDataVal, bool addRatPxlVals)throw(RSGISCmdException)
     {
         try
         {
@@ -541,7 +541,7 @@ namespace rsgis{ namespace cmds {
             }
             
             rsgis::segment::RSGISClumpPxls clumpPxls;
-            clumpPxls.performMultiBandClump(images, outputImage, imageFormat, noDataValProvided, noDataVal);
+            clumpPxls.performMultiBandClump(images, outputImage, imageFormat, noDataValProvided, noDataVal, addRatPxlVals);
             
             for(std::vector<GDALDataset*>::iterator iterImages = images->begin(); iterImages != images->end(); ++iterImages)
             {
@@ -958,7 +958,7 @@ namespace rsgis{ namespace cmds {
         }
     }
             
-    void executeMergeClumpsEquivalentVal(std::string clumpsImage, std::string outputImage, std::string imageFormat, std::string clumpsValCol)throw(RSGISCmdException)
+    void executeMergeClumpsEquivalentVal(std::string clumpsImage, std::string outputImage, std::string imageFormat, std::vector<std::string> clumpsValCols)throw(RSGISCmdException)
     {
         try
         {
@@ -972,7 +972,7 @@ namespace rsgis{ namespace cmds {
             
             std::cout << "Merge Clumps\n";
             rsgis::segment::RSGISMergeSegments mergeSegs;
-            mergeSegs.mergeEquivlentClumpsInRAT(clumpDataset, clumpsValCol);
+            mergeSegs.mergeEquivlentClumpsInRAT(clumpDataset, clumpsValCols);
             
             rsgis::rastergis::RSGISRasterAttUtils attUtils;
             GDALRasterAttributeTable *gdalATT = clumpDataset->GetRasterBand(1)->GetDefaultRAT();
