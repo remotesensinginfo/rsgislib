@@ -265,7 +265,7 @@ def performClumpingMultiProcess(inputImage, refImg, clumpsImage, tmpDIR='tmp', w
     print("Merge Tiles into Blank Image")
     segmentation.mergeClumpImages(clumpTiles, initMergedClumps, True)
     print("Merge Tile Boundaries")
-    segmentation.mergeEquivClumps(initMergedClumps, clumpsImage, imgFormat, ['PixelVal'])
+    segmentation.mergeEquivClumps(initMergedClumps, clumpsImage, imgFormat, ['ClumpVal_1', 'ClumpVal_2'])
     
     shutil.rmtree(imgTilesDIR)
     shutil.rmtree(tilesClumpsDIR)
