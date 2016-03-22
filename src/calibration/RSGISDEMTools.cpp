@@ -109,15 +109,19 @@ namespace rsgis{namespace calib{
             /* Flat area */
             aspect = std::numeric_limits<double>::signaling_NaN();
         }
-        
-        if (aspect < 0)
+        else if(aspect < 0)
         {
             aspect += 360.0;
         }
-        
-        if (aspect == 360.0)
+        else if(aspect == 360.0)
         {
             aspect = 0.0;
+        }
+        else if(aspect > 360)
+        {
+            double num = aspect / 360.0;
+            int num360s = floor(num);
+            aspect = aspect - (360 * num360s);
         }
         
         output[0] = aspect;
@@ -136,8 +140,19 @@ namespace rsgis{namespace calib{
 
     void RSGISRecodeAspect::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
     {
-        if(!boost::math::isnan(bandValues[0]))
+        if(boost::math::isnan(bandValues[0]))
         {
+            output[0] = 0;
+        }
+        else
+        {
+            if(bandValues[0] > 360)
+            {
+                double num = bandValues[0] / 360.0;
+                int num360s = floor(num);
+                bandValues[0] = bandValues[0] - (360 * num360s);
+            }
+            
             if((bandValues[0] >= 0) & (bandValues[0] < 45))
             {
                 output[0] = 1;
@@ -170,14 +185,15 @@ namespace rsgis{namespace calib{
             {
                 output[0] = 8;
             }
+            else if((bandValues[0] >= 360) & (bandValues[0] <= 405))
+            {
+                output[0] = 1;
+            }
             else
             {
+                std::cerr << "Input Aspect Value = " << bandValues[0] << std::endl;
                 throw rsgis::img::RSGISImageCalcException("The input image pixel values much be between 0 and 360 degrees.");
             }
-        }
-        else
-        {
-            output[0] = std::numeric_limits<float>::signaling_NaN();
         }
     }
     
