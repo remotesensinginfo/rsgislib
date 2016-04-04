@@ -61,6 +61,14 @@ except ImportError as sklearnRFErr:
     haveSKLearnRF = False
     raise Exception("The scikit-learn random forests tools are required for this module could not be imported\n\t" + sklearnRFErr)
 
+haveSKLearnKM = True
+try:
+    from sklearn.cluster import MiniBatchKMeans
+except ImportError as sklearnMBKMErr:
+    haveSKLearnKM = False
+    raise Exception("The scikit-learn Mini Batch KMeans tools are required for this module could not be imported\n\t" + sklearnMBKMErr)
+    
+
 def classifyWithinRAT(clumpsImg, classesIntCol, classesNameCol, variables, classifier=RandomForestClassifier(n_estimators=100, max_features=3, oob_score=True, n_jobs=-1), outColInt="OutClass", outColStr="OutClassName", roiCol=None, roiVal=1, classColours=None):
     """
 A function which will perform a classification within the RAT using a classifier from scikit-learn
@@ -198,6 +206,123 @@ classifyWithinRAT(clumpsImg, classesIntCol, classesNameCol, variables, classifie
             red   = numpy.where(outLabels == classID, colours[0], red)
             green = numpy.where(outLabels == classID, colours[1], green)
             blue  = numpy.where(outLabels == classID, colours[2], blue)
+    
+        rat.writeColumn(ratDataset, "Red", red)
+        rat.writeColumn(ratDataset, "Green", green)
+        rat.writeColumn(ratDataset, "Blue", blue)
+
+    ratDataset = None
+
+
+
+
+def clusterWithinRAT(clumpsImg, variables, clusterer=MiniBatchKMeans(n_clusters=8, init='k-means++', max_iter=100, batch_size=100), outColInt="OutCluster", roiCol=None, roiVal=1, clrClusters=True, clrSeed=10, addConnectivity=False):
+    """
+A function which will perform a clustering within the RAT using a clustering algorithm from scikit-learn
+
+* clumpsImg is the clumps image on which the classification is to be performed.
+* variables is an array of column names which are to be used for the clustering.
+* clusterer is an instance of a scikit-learn clusterer (e.g., MiniBatchKMeans which is Default; Note with 8 clusters).
+* outColInt is the output column name identifying the clusters (Default: 'OutCluster').
+* roiCol is a column name for a column which specifies the region to be clustered. If None ignored (Default: None).
+* roiVal is a int value used within the roiCol to select a region to be clustered (Default: 1).
+* clrClusters is a boolean specifying whether the colour table should be updated to correspond to the clusters (Default: True).
+* clrSeed is an integer seeding the random generator used to generate the colours (Default=10; if None provided system time used).
+* addConnectivity is a boolean which adds a kneighbors_graph to the clusterer (just an option for the AgglomerativeClustering algorithm)
+
+
+Example::
+    
+    from rsgislib.classification import classratutils
+    from sklearn.cluster import DBSCAN
+    
+    sklearnClusterer = DBSCAN(eps=1, min_samples=50)
+    classratutils.clusterWithinRAT('MangroveClumps.kea', ['MinX', 'MinY'], clusterer=sklearnClusterer, outColInt="OutCluster", roiCol=None, roiVal=1, clrClusters=True, clrSeed=10, addConnectivity=False)
+
+"""
+    # Check gdal is available
+    if not haveGDALPy:
+        raise Exception("The GDAL python bindings required for this function could not be imported\n\t" + gdalErr)
+    # Check numpy is available
+    if not haveNumpy:
+        raise Exception("The numpy module is required for this function could not be imported\n\t" + numErr)
+    # Check rios rat is available
+    if not haveRIOSRat:
+        raise Exception("The RIOS rat tools are required for this function could not be imported\n\t" + riosRatErr)
+    # Check scikit-learn RF is available
+    if not haveSKLearnKM:
+        raise Exception("The scikit-learn Mini Batch KMeans tools are required for this function could not be imported\n\t" + sklearnMBKMErr)
+        
+    ratDataset = gdal.Open(clumpsImg, gdal.GA_Update)
+    Histogram = rat.readColumn(ratDataset, 'Histogram')
+    numpyVars = []
+    for var in variables:
+        print("Reading " + var)
+        tmpArr = rat.readColumn(ratDataset, var)
+        numpyVars.append(tmpArr)
+        
+    roi = None
+    if not ((roiCol == None) or (roiCol == "")):
+        roi = rat.readColumn(ratDataset, roiCol)
+    
+    # Set up output array
+    outLabels = numpy.zeros_like(Histogram, dtype=numpy.int16)
+    ID = numpy.arange(outLabels.shape[0])
+    
+    xData = numpy.array(numpyVars)
+    xData = xData.transpose()
+    ID = ID[numpy.isfinite(xData).all(axis=1)]
+    if not roi is None:
+        roi = roi[numpy.isfinite(xData).all(axis=1)]
+    xData = xData[numpy.isfinite(xData).all(axis=1)]
+    
+    if not roi is None:
+        xData = xData[roi == roiVal]
+        ID = ID[roi == roiVal]    
+    
+    print("Input Data Size: {} x {}".format(xData.shape[0], xData.shape[1]))
+    
+    if addConnectivity:
+        from sklearn.neighbors import kneighbors_graph
+        inConnectivity = kneighbors_graph(xData, n_neighbors=10, include_self=False)
+        clusterer.set_params(**{'connectivity': inConnectivity})
+        
+    print('Fit Clusterer')
+    outClust = clusterer.fit_predict(xData)    
+    
+    minClusterID = numpy.min(outClust)
+    if minClusterID <= 0:
+        minOff = 1 - minClusterID
+        outClust = outClust + minOff
+    
+    outLabels[ID] = outClust
+    
+    print("Writing Columns")
+    rat.writeColumn(ratDataset, outColInt, outLabels)
+    
+    print("Create and Write Output Class Names")
+    clustersIDs = numpy.unique(outClust)
+      
+    if clrClusters:
+        random.seed(clrSeed)
+    
+        print("Set Colours")
+        red = rat.readColumn(ratDataset, "Red")
+        green = rat.readColumn(ratDataset, "Green")
+        blue = rat.readColumn(ratDataset, "Blue")
+        
+        # Set Background to black
+        red[...] = 0
+        green[...] = 0
+        blue[...] = 0
+        
+        # Set colours
+        for clusterID in clustersIDs:
+            print("Colouring cluster: " + str(clusterID))
+            
+            red   = numpy.where(outLabels == clusterID, random.randint(0,255), red)
+            green = numpy.where(outLabels == clusterID, random.randint(0,255), green)
+            blue  = numpy.where(outLabels == clusterID, random.randint(0,255), blue)
     
         rat.writeColumn(ratDataset, "Red", red)
         rat.writeColumn(ratDataset, "Green", green)

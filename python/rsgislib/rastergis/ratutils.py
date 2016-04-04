@@ -1221,6 +1221,8 @@ def createClumpsSHPBBOX(clumpsImg, minXCol, maxXCol, minYCol, maxYCol, outShpLyr
     maxXVals = rat.readColumn(ratDataset, maxXCol)
     minYVals = rat.readColumn(ratDataset, minYCol)
     maxYVals = rat.readColumn(ratDataset, maxYCol)
+    
+    fidVals = numpy.arange(minXCol.shape[0])
 
     ## Remove First Row which is no data...    
     dataMask = numpy.ones_like(minXVals, dtype=numpy.int16)
@@ -1229,12 +1231,14 @@ def createClumpsSHPBBOX(clumpsImg, minXCol, maxXCol, minYCol, maxYCol, outShpLyr
     maxXVals = maxXVals[dataMask == 1]
     minYVals = minYVals[dataMask == 1]
     maxYVals = maxYVals[dataMask == 1]
+    fidVals = fidVals[dataMask == 1]
     
     ## Remove any features which are all zero (i.e., polygon not present...
     minXValsSub = minXVals[numpy.logical_not((minXVals == 0) & (maxXVals == 0) & (minYVals == 0) & (maxYVals == 0))]
     maxXValsSub = maxXVals[numpy.logical_not((minXVals == 0) & (maxXVals == 0) & (minYVals == 0) & (maxYVals == 0))]
     minYValsSub = minYVals[numpy.logical_not((minXVals == 0) & (maxXVals == 0) & (minYVals == 0) & (maxYVals == 0))]
     maxYValsSub = maxYVals[numpy.logical_not((minXVals == 0) & (maxXVals == 0) & (minYVals == 0) & (maxYVals == 0))]
+    fidValsSub = fidVals[numpy.logical_not((minXVals == 0) & (maxXVals == 0) & (minYVals == 0) & (maxYVals == 0))]
 
     if roundInt:
         minXValsSub = numpy.rint(minXValsSub)
@@ -1251,7 +1255,11 @@ def createClumpsSHPBBOX(clumpsImg, minXCol, maxXCol, minYCol, maxYCol, outShpLyr
     outDatasource = driver.CreateDataSource(outShpLyrName+ ".shp")
     raster_srs = osr.SpatialReference()
     raster_srs.ImportFromWkt(ratDataset.GetProjectionRef())
-    outLayer = outDatasource.CreateLayer(outShpLyrName, srs=raster_srs) #ratDataset.GetProjection()
+    outLayer = outDatasource.CreateLayer(outShpLyrName, srs=raster_srs)
+    
+    fieldFIDDefn = ogr.FieldDefn('ID', ogr.OFTInteger) 
+    fieldFIDDefn.SetWidth(6) 
+    outLayer.CreateField(fieldFIDDefn)
     
     print("Create and Add Polygons...")
     for i in range(numFeats):
@@ -1260,6 +1268,7 @@ def createClumpsSHPBBOX(clumpsImg, minXCol, maxXCol, minYCol, maxYCol, outShpLyr
         poly = ogr.CreateGeometryFromWkt(wktStr)
         feat = ogr.Feature( outLayer.GetLayerDefn())
         feat.SetGeometry(poly)
+        feat.SetField("ID", fidValsSub[i])
         if outLayer.CreateFeature(feat) != 0:
             print(str(i) + ": " + wktStr)
             print("Failed to create feature in shapefile.\n")
