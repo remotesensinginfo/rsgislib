@@ -217,7 +217,7 @@ def unionClumpImgFunc(imgs):
     """
     segmentation.unionOfClumps(imgs[2], 'KEA', [imgs[0], imgs[1]], 0, True)
     
-def performClumpingMultiProcess(inputImage, refImg, clumpsImage, tmpDIR='tmp', width=2000, height=2000, imgFormat='KEA', nCores=2):
+def performUnionClumpingMultiProcess(inputImage, refImg, clumpsImage, tmpDIR='tmp', width=2000, height=2000, imgFormat='KEA', nCores=2):
     """
     Clump and union with the reference image the input image using a tiled processing chain allowing large images to be clumped more quickly.
     * inputImage - the input image to be clumped.

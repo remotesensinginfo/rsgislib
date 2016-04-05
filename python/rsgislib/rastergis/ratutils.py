@@ -1280,7 +1280,7 @@ def createClumpsSHPBBOX(clumpsImg, minXCol, maxXCol, minYCol, maxYCol, outShpLyr
     print("Completed")
 
 
-def identifySmallUnits(clumpsImg, classCol, tmpPath, outColName, smallClumpsThres):
+def identifySmallUnits(clumpsImg, classCol, tmpPath, outColName, smallClumpsThres, useTiledClump=False, nCores=2, tileWidth=4000, tileHeight=4000):
     """
 Identify small connected units within a classification. The threshold to define small
 is provided by the user in pixels. Note, the outColName and smallClumpsThres variables
@@ -1288,9 +1288,13 @@ can be provided as lists to identify a number of thresholds of small units.
 
 * clumpsImg - string for the clumps image file containing input classification
 * classCol - string for the column name representing the classification as integer values
-* tmpPath - directory path for 
-* outColName
-* smallClumpsThres
+* tmpPath - directory path where temporary layers are stored (if directory is created within the function it will be deleted once function is complete).
+* outColName - a list of output column names (i.e., one for each threshold)
+* smallClumpsThres - a list of thresholds for identifying small clumps.
+* useTiledClump - a boolean to specify whether the tiled clumping algorithm should be used (Default is False; select True for large datasets)
+* nCores - if the tiled version of the clumping algorithm is being used then there is an option to use multiple processing cores; specify the number to be used (Default is 2).
+* tileWidth - is the width of the image tile (in pixels) if tiled clumping is used.
+* tileHeight - is the height of the image tile (in pixels) if tiled clumping is used.
 
 Example::
 from rsgislib.rastergis import ratutils
@@ -1324,7 +1328,6 @@ rastergis.identifySmallUnits(clumpsImg, classCol, tmpPath, outColName, smallClum
     if not os.path.isdir(tmpPath):
         os.makedirs(tmpPath)
         createdDIR = True
-        
     
     baseName = os.path.splitext(os.path.basename(clumpsImg))[0]
     classMaskImg = os.path.join(tmpPath, baseName+"_TmpClassMask.kea")
@@ -1332,7 +1335,14 @@ rastergis.identifySmallUnits(clumpsImg, classCol, tmpPath, outColName, smallClum
     smallClumpsMask = os.path.join(tmpPath, baseName+"_SmallClassClumps.kea")
     
     rastergis.exportCol2GDALImage(clumpsImg, classMaskImg, "KEA", rsgislib.TYPE_16UINT, classCol)
-    segmentation.clump(classMaskImg, classMaskClumps, "KEA", False, 0)
+    if useTiledClump:
+        from rsgislib.segmentation import tiledclump
+        if nCores > 1:
+            tiledclump.performClumpingMultiProcess(classMaskImg, classMaskClumps, tmpDIR=os.path.join(tmpPath, baseName+'_ClumpTmp'), width=tileWidth, height=tileHeight, nCores=nCores)
+        else:
+            tiledclump.performClumpingSingleThread(classMaskImg, classMaskClumps, tmpDIR=os.path.join(tmpPath, baseName+'_ClumpTmp', width=tileWidth, height=tileHeight))
+    else:
+        segmentation.clump(classMaskImg, classMaskClumps, "KEA", False, 0)
     rastergis.populateStats(classMaskClumps, False, False)
         
     for i in range(numThresholds):
