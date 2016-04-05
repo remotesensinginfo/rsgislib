@@ -63,7 +63,7 @@ namespace rsgis{ namespace classifier{
     {
     public:
         RSGISCollapseSegmentsClassification();
-        void collapseClassification(GDALDataset *segments, std::string classNameCol, std::string outputImage, std::string imageFormat) throw(RSGISClassificationException);
+        void collapseClassification(GDALDataset *segments, std::string classNameCol, std::string classIntCol, bool useIntCol, std::string outputImage, std::string imageFormat) throw(RSGISClassificationException);
         ~RSGISCollapseSegmentsClassification();
     protected:
         std::map<std::string, RSGISClassInfo*>* findAllClassNames(const GDALRasterAttributeTable *inRAT, unsigned int classNameIdx, unsigned int redIdx, unsigned int greenIdx, unsigned int blueIdx, unsigned int alphaIdx) throw(RSGISClassificationException);
@@ -73,12 +73,13 @@ namespace rsgis{ namespace classifier{
     class DllExport RSGISFindAllClassNames : public rsgis::rastergis::RSGISRATCalcValue
     {
     public:
-        RSGISFindAllClassNames(std::map<std::string, RSGISClassInfo*> *classes);
+        RSGISFindAllClassNames(std::map<std::string, RSGISClassInfo*> *classes, bool useIntCol);
         void calcRATValue(size_t fid, double *inRealCols, unsigned int numInRealCols, int *inIntCols, unsigned int numInIntCols, std::string *inStringCols, unsigned int numInStringCols, double *outRealCols, unsigned int numOutRealCols, int *outIntCols, unsigned int numOutIntCols, std::string *outStringCols, unsigned int numOutStringCols) throw(RSGISAttributeTableException);
         ~RSGISFindAllClassNames();
     protected:
         std::map<std::string, RSGISClassInfo*> *classes;
         unsigned int idVal;
+        bool useIntCol;
     };
     
     

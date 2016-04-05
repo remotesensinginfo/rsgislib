@@ -33,7 +33,7 @@ namespace rsgis{ namespace classifier{
         
     }
     
-    void RSGISCollapseSegmentsClassification::collapseClassification(GDALDataset *segments, std::string classNameCol, std::string outputImage, std::string imageFormat) throw(RSGISClassificationException)
+    void RSGISCollapseSegmentsClassification::collapseClassification(GDALDataset *segments, std::string classNameCol, std::string classIntCol, bool useIntCol, std::string outputImage, std::string imageFormat) throw(RSGISClassificationException)
     {
         try
         {
@@ -52,6 +52,7 @@ namespace rsgis{ namespace classifier{
             unsigned int greenIdx = ratUtils.findColumnIndex(inRAT, "Green");
             unsigned int blueIdx = ratUtils.findColumnIndex(inRAT, "Blue");
             unsigned int alphaIdx = ratUtils.findColumnIndex(inRAT, "Alpha");
+            unsigned int classIntColIdx = 0;
             
             // Find Unique column names alone with colour
             std::cout << "Find the class names...\n";
@@ -59,7 +60,7 @@ namespace rsgis{ namespace classifier{
             
             std::map<std::string, RSGISClassInfo*> *classes = new std::map<std::string, RSGISClassInfo*>();
             
-            RSGISFindAllClassNames findClassNames = RSGISFindAllClassNames(classes);
+            RSGISFindAllClassNames findClassNames = RSGISFindAllClassNames(classes, useIntCol);
             rsgis::rastergis::RSGISRATCalc ratCalc = rsgis::rastergis::RSGISRATCalc(&findClassNames);
             std::vector<unsigned int> inRealColIdx;
             std::vector<unsigned int> inIntColIdx;
@@ -67,6 +68,11 @@ namespace rsgis{ namespace classifier{
             inIntColIdx.push_back(greenIdx);
             inIntColIdx.push_back(blueIdx);
             inIntColIdx.push_back(alphaIdx);
+            if(useIntCol)
+            {
+                classIntColIdx = ratUtils.findColumnIndex(inRAT, classIntCol);
+                inIntColIdx.push_back(classIntColIdx);
+            }
             std::vector<unsigned int> inStrColIdx;
             inStrColIdx.push_back(classNameIdx);
             std::vector<unsigned int> outRealColIdx;
@@ -76,10 +82,12 @@ namespace rsgis{ namespace classifier{
             
             
             
-            // Assign ID to each class 
+            // Assign ID to each class
+            bool first = true;
             size_t id = 1;
             for(std::map<std::string, RSGISClassInfo*>::iterator iterClasses = classes->begin(); iterClasses != classes->end(); ++iterClasses)
             {
+                /*
                 if(iterClasses->first == "")
                 {
                     iterClasses->second->classID = 0;
@@ -87,8 +95,18 @@ namespace rsgis{ namespace classifier{
                 else
                 {
                     iterClasses->second->classID = id++;
-                    std::cout << iterClasses->second->classID << ":\t " << iterClasses->second->classname << ": [" << iterClasses->second->red << "," << iterClasses->second->green << "," << iterClasses->second->blue << "]\n";
                 }
+                */
+                if(first)
+                {
+                    id = iterClasses->second->classID;
+                    first = false;
+                }
+                else if (iterClasses->second->classID > id)
+                {
+                    id = iterClasses->second->classID;
+                }
+                std::cout << iterClasses->second->classID << ":\t " << iterClasses->second->classname << ": [" << iterClasses->second->red << "," << iterClasses->second->green << "," << iterClasses->second->blue << "]\n";
             }
 
             // Create the new RAT.
@@ -159,10 +177,11 @@ namespace rsgis{ namespace classifier{
     }
     
     
-    RSGISFindAllClassNames::RSGISFindAllClassNames(std::map<std::string, RSGISClassInfo*> *classes)
+    RSGISFindAllClassNames::RSGISFindAllClassNames(std::map<std::string, RSGISClassInfo*> *classes, bool useIntCol)
     {
         this->classes = classes;
-        idVal = 0;
+        idVal = 1;
+        this->useIntCol = useIntCol;
     }
     
     void RSGISFindAllClassNames::calcRATValue(size_t fid, double *inRealCols, unsigned int numInRealCols, int *inIntCols, unsigned int numInIntCols, std::string *inStringCols, unsigned int numInStringCols, double *outRealCols, unsigned int numOutRealCols, int *outIntCols, unsigned int numOutIntCols, std::string *outStringCols, unsigned int numOutStringCols) throw(RSGISAttributeTableException)
@@ -173,7 +192,15 @@ namespace rsgis{ namespace classifier{
             {
                 if((classes->empty()) || (classes->count(inStringCols[0]) == 0))
                 {
-                    if(numInIntCols == 4)
+                    if((!useIntCol) & (numInIntCols != 4))
+                    {
+                        throw RSGISAttributeTableException("4 columns for RGBA need to be provided.");
+                    }
+                    else if((useIntCol) & (numInIntCols != 5))
+                    {
+                        throw RSGISAttributeTableException("5 columns for RGBA + classInt need to be provided.");
+                    }
+                    else
                     {
                         RSGISClassInfo *classInfo = new RSGISClassInfo();
                         classInfo->classname = inStringCols[0];
@@ -181,13 +208,16 @@ namespace rsgis{ namespace classifier{
                         classInfo->green = inIntCols[1];
                         classInfo->blue = inIntCols[2];
                         classInfo->alpha = inIntCols[3];
-                        classInfo->classID = idVal++;
+                        if(useIntCol)
+                        {
+                            classInfo->classID = inIntCols[4];
+                        }
+                        else
+                        {
+                            classInfo->classID = idVal++;
+                        }
                         //std::cout << "Adding class: " << inStringCols[0] << std::endl;
                         classes->insert(std::pair<std::string, RSGISClassInfo*>(inStringCols[0], classInfo));
-                    }
-                    else
-                    {
-                        throw RSGISAttributeTableException("4 columns for RGBA need to be provided.");
                     }
                 }
             }
@@ -241,20 +271,25 @@ namespace rsgis{ namespace classifier{
                 throw rsgis::img::RSGISImageCalcException("Row is not within the RAT.");
             }
             
-            std::string className = std::string(classColVals[intBandValues[0]]);
-            
-            
-            std::map<std::string, RSGISClassInfo*>::iterator iterClass = classes->find(className);
-            
-            if(iterClass != classes->end())
-            {
-                output[0] = iterClass->second->classID;
-            }
-            else
+            if(intBandValues[0] == 0)
             {
                 output[0] = 0;
             }
-            
+            else
+            {
+                std::string className = std::string(classColVals[intBandValues[0]]);
+                
+                std::map<std::string, RSGISClassInfo*>::iterator iterClass = classes->find(className);
+                
+                if(iterClass != classes->end())
+                {
+                    output[0] = iterClass->second->classID;
+                }
+                else
+                {
+                    output[0] = 0;
+                }
+            }
         }
         catch(rsgis::img::RSGISImageCalcException &e)
         {

@@ -47,7 +47,8 @@ static std::string *ExtractStringArrayFromSequence(PyObject *sequence, int *nEle
     for(int i = 0; i < nFields; ++i) {
         PyObject *stringObj = PySequence_GetItem(sequence, i);
 
-        if(!RSGISPY_CHECK_STRING(stringObj)) {
+        if(!RSGISPY_CHECK_STRING(stringObj))
+        {
             PyErr_SetString(GETSTATE(sequence)->error, "Fields must be strings");
             Py_DECREF(stringObj);
             return stringsArray;
@@ -63,12 +64,37 @@ static std::string *ExtractStringArrayFromSequence(PyObject *sequence, int *nEle
 static PyObject *Classification_CollapseClasses(PyObject *self, PyObject *args)
 {
     const char *pszInputImage, *pszOutputFile, *pszGDALFormat, *pszClassesColumn;
-    if( !PyArg_ParseTuple(args, "ssss:collapseClasses", &pszInputImage, &pszOutputFile, &pszGDALFormat, &pszClassesColumn))
+    PyObject *pClassIntCol = Py_None;
+    if( !PyArg_ParseTuple(args, "ssss|O:collapseClasses", &pszInputImage, &pszOutputFile, &pszGDALFormat, &pszClassesColumn, &pClassIntCol))
+    {
         return NULL;
-
+    }
+    
+    bool classIntColPresent = false;
+    std::string classIntColStr = "";
+    if( pClassIntCol == Py_None )
+    {
+        classIntColPresent = false;
+        classIntColStr = "";
+    }
+    else
+    {
+        // convert to a string
+        if(RSGISPY_CHECK_STRING(pClassIntCol))
+        {
+            classIntColPresent = true;
+            classIntColStr = RSGISPY_STRING_EXTRACT(pClassIntCol);
+        }
+        else
+        {
+            PyErr_SetString(GETSTATE(self)->error, "ClassIntCol name must be a string if provided.\n");
+            return NULL;
+        }
+    }
+    
     try
     {
-        rsgis::cmds::executeCollapseRAT2Class(std::string(pszInputImage), std::string(pszOutputFile), std::string(pszGDALFormat), std::string(pszClassesColumn));
+        rsgis::cmds::executeCollapseRAT2Class(std::string(pszInputImage), std::string(pszOutputFile), std::string(pszGDALFormat), std::string(pszClassesColumn), classIntColStr, classIntColPresent);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {

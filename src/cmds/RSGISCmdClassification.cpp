@@ -39,7 +39,7 @@
 
 namespace rsgis{ namespace cmds {
     
-    void executeCollapseRAT2Class(std::string clumpsImage, std::string outputImage, std::string outImageFormat, std::string classColumn)throw(RSGISCmdException)
+    void executeCollapseRAT2Class(std::string clumpsImage, std::string outputImage, std::string outImageFormat, std::string classColumn, std::string classIntCol, bool useIntCol)throw(RSGISCmdException)
     {
         try
         {
@@ -56,7 +56,7 @@ namespace rsgis{ namespace cmds {
             }
             
             rsgis::classifier::RSGISCollapseSegmentsClassification collapseSegments;
-            collapseSegments.collapseClassification(imageDataset, classColumn, outputImage, outImageFormat);
+            collapseSegments.collapseClassification(imageDataset, classColumn, classIntCol, useIntCol, outputImage, outImageFormat);
             
             // Tidy up
             GDALClose(imageDataset);
