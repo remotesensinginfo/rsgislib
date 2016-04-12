@@ -140,9 +140,11 @@ classifyWithinRAT(clumpsImg, classesIntCol, classesNameCol, variables, classifie
     
     trainingData = xData[numpy.isfinite(xData).all(axis=1)]
     classesInt = classesInt[numpy.isfinite(xData).all(axis=1)]
+    classesStr = classesStr[numpy.isfinite(xData).all(axis=1)]
     ID = ID[numpy.isfinite(xData).all(axis=1)]
     
     trainingData = trainingData[classesInt > 0]
+    classesStr = classesStr[classesInt > 0]
     classesInt = classesInt[classesInt > 0]
         
     print("Training data size: {} x {}".format(trainingData.shape[0], trainingData.shape[1]))
@@ -167,14 +169,16 @@ classifyWithinRAT(clumpsImg, classesIntCol, classesNameCol, variables, classifie
     rat.writeColumn(ratDataset, outColInt, outLabels)
     
     print("Create and Write Output Class Names")
-    classes = numpy.unique(classesInt)
     classNames = numpy.unique(classesStr)
+    classes = numpy.zeros_like(classNames, dtype=numpy.int16)
+    
   
     i = 0
     classNameIDs = dict()
     for className in classNames:
         classNameStr = str(className.decode())
         if not classNameStr is '':
+            classes[i] = classesInt[classesStr == className][0]
             classNameIDs[classNameStr] = classes[i]
             print("Class \'" + classNameStr + "\' has numerical " + str(classes[i]))  
             i = i + 1
@@ -210,7 +214,7 @@ classifyWithinRAT(clumpsImg, classesIntCol, classesNameCol, variables, classifie
         rat.writeColumn(ratDataset, "Red", red)
         rat.writeColumn(ratDataset, "Green", green)
         rat.writeColumn(ratDataset, "Blue", blue)
-
+    
     ratDataset = None
 
 

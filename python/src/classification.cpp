@@ -212,7 +212,7 @@ static PyObject *Classification_PopClassInfoAccuracyPts(PyObject *self, PyObject
 // Our list of functions in this module
 static PyMethodDef ClassificationMethods[] = {
 {"collapseClasses", Classification_CollapseClasses, METH_VARARGS,
-"classification.collapseClasses(inputimage, outputimage, gdalformat, classColumn)\n"
+"classification.collapseClasses(inputimage, outputimage, gdalformat, classColumn, classIntCol)\n"
 "Collapses an attribute table with a large number of classified clumps (segments) to\n"
 "a attribute table with a single row per class (i.e. a classification rather than segmentation.\n"
 "\n"
@@ -221,7 +221,8 @@ static PyMethodDef ClassificationMethods[] = {
 "* inputImage is a string containing the name and path of the input file with attribute table.\n"
 "* outputImage is a string containing the name and path of the output file.\n"
 "* gdalformat is a string with the output image format for the GDAL driver.\n"
-"* classColumn is a string with the name of the column with the class names\n"},
+"* classColumn is a string with the name of the column with the class names - internally this will be treated as a string column even if a numerical column is specified.\n"
+"* classIntCol is a sting specifying the name of a column with the integer class representation. This is an optional parameter but if specified then the int reprentation of the classes will be reserved."},
 
 {"colour3bands", Classification_Colour3Bands, METH_VARARGS,
 "classification.colour3bands(inputimage, outputimage, gdalformat)\n"

@@ -1140,15 +1140,6 @@ def populateClumpsWithClassTraining(clumpsImg, classesDict, tmpPath, classesIntC
     * classesNameCol - Output column name for string class names.
     
     """
-    # Check numpy is available
-    if not haveNumpy:
-        raise Exception("The numpy module is required for this function could not be imported\n\t" + numErr)
-    # Check gdal is available
-    if not haveGDALPy:
-        raise Exception("The GDAL python bindings are required for this function could not be imported\n\t" + gdalErr)
-    # Check rios rat is available
-    if not haveRIOSRat:
-        raise Exception("The RIOS rat tools are required for this function could not be imported\n\t" + riosRatErr)
     
     createdDIR = False
     if not os.path.isdir(tmpPath):
@@ -1174,7 +1165,7 @@ def populateClumpsWithClassTraining(clumpsImg, classesDict, tmpPath, classesIntC
     combinedClassesImage = os.path.join(tmpPath, "CombinedClasses_" + uid + ".kea")
     imageutils.combineImages2Band(tmpClassImgLayers, combinedClassesImage, 'KEA', rsgislib.TYPE_8UINT, 0.0)
     
-    rastergis.populateRATWithMode(valsimage=combinedClassesImage, clumps=clumpsImg, outcolsname=classesIntCol, usenodata=False, nodataval=0, modeband=1, ratband=1)
+    rastergis.populateRATWithMode(valsimage=combinedClassesImage, clumps=clumpsImg, outcolsname=classesIntCol, usenodata=False, nodataval=0, outnodata=False, modeband=1, ratband=1)
     defineClassNames(clumpsImg, classesIntCol, classesNameCol, classNamesDict)
     
     for file in tmpClassImgLayers:

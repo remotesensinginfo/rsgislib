@@ -458,12 +458,13 @@ static PyObject *RasterGIS_PopulateRATWithMode(PyObject *self, PyObject *args, P
     const char *clumpsImage, *inputImage, *outColsName;
     long noDataVal = 0;
     int useNoDataVal = false;
+    int outNoDataVal = true;
     unsigned int ratBand = 1;
     unsigned int modeBand = 1;
     
-    static char *kwlist[] = {"valsimage", "clumps", "outcolsname", "usenodata", "nodataval", "modeband", "ratband", NULL};
+    static char *kwlist[] = {"valsimage", "clumps", "outcolsname", "usenodata", "nodataval", "outnodata", "modeband", "ratband", NULL};
     
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sss|ilII:populateRATWithMode", kwlist, &inputImage, &clumpsImage, &outColsName, &useNoDataVal, &noDataVal, &modeBand, &ratBand))
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sss|iliII:populateRATWithMode", kwlist, &inputImage, &clumpsImage, &outColsName, &useNoDataVal, &noDataVal, &outNoDataVal, &modeBand, &ratBand))
     {
         return NULL;
     }
@@ -471,7 +472,8 @@ static PyObject *RasterGIS_PopulateRATWithMode(PyObject *self, PyObject *args, P
     try
     {
         bool useNoDataBool = (bool) useNoDataVal;
-        rsgis::cmds::executePopulateRATWithMode(std::string(inputImage), std::string(clumpsImage), std::string(outColsName), useNoDataBool, noDataVal, modeBand, ratBand);
+        bool outNoDataBool = (bool) outNoDataVal;
+        rsgis::cmds::executePopulateRATWithMode(std::string(inputImage), std::string(clumpsImage), std::string(outColsName), useNoDataBool, noDataVal, outNoDataBool, modeBand, ratBand);
     }
     catch (rsgis::cmds::RSGISCmdException &e)
     {
@@ -2200,7 +2202,7 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"},
     
 {"populateRATWithMode", (PyCFunction)RasterGIS_PopulateRATWithMode, METH_VARARGS | METH_KEYWORDS,
-    "rastergis.populateRATWithMode(valsimage=string, clumps=string, outcolsname=string, usenodata=boolean, nodataval=long, modeband=uint ratband=uint)\n"
+    "rastergis.populateRATWithMode(valsimage=string, clumps=string, outcolsname=string, usenodata=boolean, nodataval=long, outnodata=boolean, modeband=uint ratband=uint)\n"
     "Populates the attribute table with the mode of from a single band in the input image.\n"
     "Note this only makes sense if the input pixel values are integers.\n"
     "Where:\n"
@@ -2210,6 +2212,7 @@ static PyMethodDef RasterGISMethods[] = {
     "* outColsName is a string representing the name for the output column containing the mode.\n"
     "* usenodata is a boolean defining whether the no data value should be ignored (Optional, Default = False).\n"
     "* nodataval is a long defining the no data value to be used (Optional, Default = 0)\n"
+    "* outnodata is a boolean to specify that although the no data value should be used for the calculation it should not be outputted to the RAT as a output value unless there is no valid data within the clump. (Default = True)\n"
     "* modeband is an optional (default = 1) integer parameter specifying the image band for which the mode is to be calculated.\n"
     "* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated in the clumps image.\n"
     "\n"},

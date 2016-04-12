@@ -965,7 +965,7 @@ namespace rsgis{namespace rastergis{
         }
     }
     
-    void RSGISPopRATWithStats::populateRATWithModeStats(GDALDataset *inputClumps, GDALDataset *inputValsImage, std::string outColsName, bool useNoDataVal, long noDataVal, unsigned int modeBand, unsigned int ratBand)throw(RSGISAttributeTableException)
+    void RSGISPopRATWithStats::populateRATWithModeStats(GDALDataset *inputClumps, GDALDataset *inputValsImage, std::string outColsName, bool useNoDataVal, long noDataVal, bool outNoDataVal, unsigned int modeBand, unsigned int ratBand)throw(RSGISAttributeTableException)
     {
         try
         {
@@ -977,6 +977,7 @@ namespace rsgis{namespace rastergis{
             {
                 throw rsgis::RSGISAttributeTableException("RAT Band is larger than the number of bands within the image.");
             }
+            
             RSGISRasterAttUtils attUtils;
             GDALRasterAttributeTable *rat = inputClumps->GetRasterBand(ratBand)->GetDefaultRAT();
             size_t numRows = rat->GetRowCount();
@@ -988,7 +989,6 @@ namespace rsgis{namespace rastergis{
                 numRows = boost::lexical_cast<size_t>(maxClumpID);
                 rat->SetRowCount(numRows);
             }
-            
             
             unsigned int modeColIdx = attUtils.findColumnIndexOrCreate(rat, outColsName, GFT_Integer);
             
@@ -1048,6 +1048,8 @@ namespace rsgis{namespace rastergis{
             int *outVal = new int[numRows];
             long maxCount = 0;
             int maxCat = 0;
+            long maxCountSec = 0;
+            int maxCatSec = 0;
             for(size_t i = 0; i < numRows; ++i)
             {
                 //std::cout << i << ":\t[";
@@ -1057,11 +1059,26 @@ namespace rsgis{namespace rastergis{
                     {
                         maxCount = clumpHists[i][j];
                         maxCat = modeBinVals[j];
+                        maxCountSec = 0;
+                        maxCatSec = 0;
                     }
                     else if(clumpHists[i][j] > maxCount)
                     {
+                        maxCountSec = maxCount;
+                        maxCatSec = maxCat;
+                        
                         maxCount = clumpHists[i][j];
                         maxCat = modeBinVals[j];
+                    }
+                    else if(j == 1)
+                    {
+                        maxCountSec = clumpHists[i][j];
+                        maxCatSec = modeBinVals[j];
+                    }
+                    else if(clumpHists[i][j] > maxCatSec)
+                    {
+                        maxCountSec = clumpHists[i][j];
+                        maxCatSec = modeBinVals[j];
                     }
                     
                     /*
@@ -1073,10 +1090,39 @@ namespace rsgis{namespace rastergis{
                     {
                         std::cout << ", " << clumpHists[i][j];
                     }
-                     */
+                    */
                 }
-                outVal[i] = maxCat;
-                //std::cout << "] = " << outVal[i] << "\n";
+                //std::cout << "] " << std::endl;
+                //std::cout << "maxCat " << maxCat << std::endl;
+                //std::cout << "maxCatSec " << maxCatSec << std::endl;
+                
+                if(!useNoDataVal)
+                {
+                    if(!outNoDataVal)
+                    {
+                        if(maxCat != noDataVal)
+                        {
+                            outVal[i] = maxCat;
+                        }
+                        else if((maxCat == noDataVal) & (maxCountSec > 0))
+                        {
+                            outVal[i] = maxCatSec;
+                        }
+                        else
+                        {
+                            outVal[i] = noDataVal;
+                        }
+                    }
+                    else
+                    {
+                        outVal[i] = maxCat;
+                    }
+                }
+                else
+                {
+                    outVal[i] = maxCat;
+                }
+                //std::cout << "OutVal " << outVal[i] << "\n";
             }
             
             
