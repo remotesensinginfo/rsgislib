@@ -419,7 +419,7 @@ namespace rsgis{ namespace cmds {
         }
     }
             
-    void executePopulateRATWithMode(std::string inputImage, std::string clumpsImage, std::string outColsName, bool useNoDataVal, long noDataVal, unsigned int modeBand, unsigned int ratBand)throw(RSGISCmdException)
+    void executePopulateRATWithMode(std::string inputImage, std::string clumpsImage, std::string outColsName, bool useNoDataVal, long noDataVal, bool outNoDataVal, unsigned int modeBand, unsigned int ratBand)throw(RSGISCmdException)
     {
         try
         {
@@ -440,7 +440,7 @@ namespace rsgis{ namespace cmds {
             }
             
             rsgis::rastergis::RSGISPopRATWithStats popRATStats;
-            popRATStats.populateRATWithModeStats(clumpsDataset, inDataset, outColsName, useNoDataVal, noDataVal, modeBand, ratBand);
+            popRATStats.populateRATWithModeStats(clumpsDataset, inDataset, outColsName, useNoDataVal, noDataVal, outNoDataVal, modeBand, ratBand);
             
             clumpsDataset->GetRasterBand(ratBand)->SetMetadataItem("LAYER_TYPE", "thematic");
             
