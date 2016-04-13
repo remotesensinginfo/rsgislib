@@ -139,9 +139,10 @@ classifyWithinRAT(clumpsImg, classesIntCol, classesNameCol, variables, classifie
     for var in variables:
         print("Reading " + var)
         tmpArr = rat.readColumn(ratDataset, var)
-        # scaleVars=False, standariseVars=False
         if not preProcessor is None:
+            tmpArr = tmpArr.reshape(-1, 1)
             tmpArr = preProcessor.fit_transform(tmpArr)
+            tmpArr = tmpArr.reshape(-1)
         numpyVars.append(tmpArr)
     
     # Read in training classes
@@ -245,7 +246,7 @@ classifyWithinRAT(clumpsImg, classesIntCol, classesNameCol, variables, classifie
 
 
 
-def clusterWithinRAT(clumpsImg, variables, clusterer=MiniBatchKMeans(n_clusters=8, init='k-means++', max_iter=100, batch_size=100), outColInt="OutCluster", roiCol=None, roiVal=1, clrClusters=True, clrSeed=10, addConnectivity=False):
+def clusterWithinRAT(clumpsImg, variables, clusterer=MiniBatchKMeans(n_clusters=8, init='k-means++', max_iter=100, batch_size=100), outColInt="OutCluster", roiCol=None, roiVal=1, clrClusters=True, clrSeed=10, addConnectivity=False, preProcessor=None):
     """
 A function which will perform a clustering within the RAT using a clustering algorithm from scikit-learn
 
@@ -258,6 +259,7 @@ A function which will perform a clustering within the RAT using a clustering alg
 * clrClusters is a boolean specifying whether the colour table should be updated to correspond to the clusters (Default: True).
 * clrSeed is an integer seeding the random generator used to generate the colours (Default=10; if None provided system time used).
 * addConnectivity is a boolean which adds a kneighbors_graph to the clusterer (just an option for the AgglomerativeClustering algorithm)
+* preProcessor is a scikit-learn processors such as sklearn.preprocessing.MaxAbsScaler() which can rescale the input variables independently as read in (Define: None; i.e., not in use).
 
 
 Example::
@@ -267,6 +269,10 @@ Example::
     
     sklearnClusterer = DBSCAN(eps=1, min_samples=50)
     classratutils.clusterWithinRAT('MangroveClumps.kea', ['MinX', 'MinY'], clusterer=sklearnClusterer, outColInt="OutCluster", roiCol=None, roiVal=1, clrClusters=True, clrSeed=10, addConnectivity=False)
+    
+    # With pre-processor
+    from sklearn.preprocessing import MaxAbsScaler
+    classratutils.clusterWithinRAT('MangroveClumps.kea', ['MinX', 'MinY'], clusterer=sklearnClusterer, outColInt="OutCluster", roiCol=None, roiVal=1, clrClusters=True, clrSeed=10, addConnectivity=False, preProcessor=MaxAbsScaler())
 
 """
     # Check gdal is available
@@ -281,6 +287,9 @@ Example::
     # Check scikit-learn RF is available
     if not haveSKLearnKM:
         raise Exception("The scikit-learn Mini Batch KMeans tools are required for this function could not be imported\n\t" + sklearnMBKMErr)
+    # Check scikit-learn pre-processing is available
+    if not haveSKLearnPreProcess:
+        raise Exception("The scikit-learn pre-processing tools are required for this function could not be imported\n\t" + sklearnPreProcessErr)
         
     ratDataset = gdal.Open(clumpsImg, gdal.GA_Update)
     Histogram = rat.readColumn(ratDataset, 'Histogram')
@@ -288,6 +297,10 @@ Example::
     for var in variables:
         print("Reading " + var)
         tmpArr = rat.readColumn(ratDataset, var)
+        if not preProcessor is None:
+            tmpArr = tmpArr.reshape(-1, 1)
+            tmpArr = preProcessor.fit_transform(tmpArr)
+            tmpArr = tmpArr.reshape(-1)
         numpyVars.append(tmpArr)
         
     roi = None
