@@ -60,6 +60,20 @@ try:
 except ImportError as sklearnRFErr:
     haveSKLearnRF = False
     raise Exception("The scikit-learn random forests tools are required for this module could not be imported\n\t" + sklearnRFErr)
+    
+haveSKLearnGS = True
+try:
+    from sklearn.grid_search import GridSearchCV
+except ImportError as sklearnGSErr:
+    haveSKLearnRF = False
+    raise Exception("The scikit-learn grid search tools are required for this module could not be imported\n\t" + sklearnGSErr)
+
+haveSKLearnPreProcess = True
+try:
+    from sklearn.preprocessing import MaxAbsScaler
+except ImportError as sklearnPreProcessErr:
+    haveSKLearnPreProcess = False
+    raise Exception("The scikit-learn pre-processing modules not available.\n\t" + sklearnPreProcessErr)
 
 haveSKLearnKM = True
 try:
@@ -69,7 +83,7 @@ except ImportError as sklearnMBKMErr:
     raise Exception("The scikit-learn Mini Batch KMeans tools are required for this module could not be imported\n\t" + sklearnMBKMErr)
     
 
-def classifyWithinRAT(clumpsImg, classesIntCol, classesNameCol, variables, classifier=RandomForestClassifier(n_estimators=100, max_features=3, oob_score=True, n_jobs=-1), outColInt="OutClass", outColStr="OutClassName", roiCol=None, roiVal=1, classColours=None):
+def classifyWithinRAT(clumpsImg, classesIntCol, classesNameCol, variables, classifier=RandomForestClassifier(n_estimators=100, max_features=3, oob_score=True, n_jobs=-1), outColInt="OutClass", outColStr="OutClassName", roiCol=None, roiVal=1, classColours=None, preProcessor=None):
     """
 A function which will perform a classification within the RAT using a classifier from scikit-learn
 
@@ -83,6 +97,7 @@ A function which will perform a classification within the RAT using a classifier
 * roiCol is a column name for a column which specifies the region to be classified. If None ignored (Default: None)
 * roiVal is a int value used within the roiCol to select a region to be classified (Default: 1)
 * classColours is a python dict using the class name as the key along with arrays of length 3 specifying the RGB colours for the class.
+* preProcessor is a scikit-learn processors such as sklearn.preprocessing.MaxAbsScaler() which can rescale the input variables independently as read in (Define: None; i.e., not in use).
 
 
 Example::
@@ -98,6 +113,10 @@ classColours['NonForest'] = [200,200,200]
 variables = ['GreenAvg', 'RedAvg', 'NIR1Avg', 'NIR2Avg', 'NDVI']
 classifyWithinRAT(clumpsImg, classesIntCol, classesNameCol, variables, classifier=classifier, classColours=classColours)
 
+from sklearn.preprocessing import MaxAbsScaler
+
+# With pre-processor
+classifyWithinRAT(clumpsImg, classesIntCol, classesNameCol, variables, classifier=classifier, classColours=classColours, preProcessor=MaxAbsScaler())
 """
     # Check gdal is available
     if not haveGDALPy:
@@ -111,12 +130,18 @@ classifyWithinRAT(clumpsImg, classesIntCol, classesNameCol, variables, classifie
     # Check scikit-learn RF is available
     if not haveSKLearnRF:
         raise Exception("The scikit-learn random forests tools are required for this function could not be imported\n\t" + sklearnRFErr)
+    # Check scikit-learn pre-processing is available
+    if not haveSKLearnPreProcess:
+        raise Exception("The scikit-learn pre-processing tools are required for this function could not be imported\n\t" + sklearnPreProcessErr)
         
     ratDataset = gdal.Open(clumpsImg, gdal.GA_Update)
     numpyVars = []
     for var in variables:
         print("Reading " + var)
         tmpArr = rat.readColumn(ratDataset, var)
+        # scaleVars=False, standariseVars=False
+        if not preProcessor is None:
+            tmpArr = preProcessor.fit_transform(tmpArr)
         numpyVars.append(tmpArr)
     
     # Read in training classes
@@ -334,4 +359,93 @@ Example::
 
     ratDataset = None
 
+
+def findClassifierParameters(clumpsImg, classesIntCol, variables, preProcessor=None, gridSearch=GridSearchCV(RandomForestClassifier(), {})):
+    """
+Find the optimal parameters for a classifier using a grid search and return a classifier instance with those optimal parameters.
+
+* clumpsImg is the clumps image on which the classification is to be performed
+* classesIntCol is the column with the training data as int values
+* variables is an array of column names which are to be used for the classification
+* preProcessor is a scikit-learn processors such as sklearn.preprocessing.MaxAbsScaler() which can rescale the input variables independently as read in (Define: None; i.e., not in use).
+* gridSearch is an instance of GridSearchCV parameterised with a classifier and parameters to be searched.
+
+return::
+    Instance of the classifier with optimal parameters defined.
+
+example::
+
+from rsgislib.classification import classratutils
+from sklearn.svm import SVC
+from sklearn.grid_search import GridSearchCV
+from sklearn.preprocessing import MaxAbsScaler
+
+clumpsImg = "./LS8_20150621_lat10lon652_r67p233_clumps.kea"
+classesIntCol = 'ClassInt'
+
+classParameters = {'kernel':['linear', 'rbf',  'poly', 'sigmoid'], 'C':[1, 2, 3, 4, 5, 10, 100, 400, 500, 1e3, 5e3, 1e4, 5e4, 1e5], 'gamma':[0.0001, 0.0005, 0.001, 0.005, 0.01, 0.1, 'auto'], 'degree':[2, 3, 4, 5, 6, 7, 8], 'class_weight':['', 'balanced'], 'decision_function_shape':['ovo', 'ovr', None]}
+variables = ['BlueRefl', 'GreenRefl', 'RedRefl', 'NIRRefl', 'SWIR1Refl', 'SWIR2Refl']
+
+gSearch = GridSearchCV(SVC(), classParameters)
+classifier = classratutils.findClassifierParameters(clumpsImg, classesIntCol, variables, preProcessor=MaxAbsScaler(), gridSearch=gSearch)
+
+    """
+    # Check gdal is available
+    if not haveGDALPy:
+        raise Exception("The GDAL python bindings required for this function could not be imported\n\t" + gdalErr)
+    # Check numpy is available
+    if not haveNumpy:
+        raise Exception("The numpy module is required for this function could not be imported\n\t" + numErr)
+    # Check rios rat is available
+    if not haveRIOSRat:
+        raise Exception("The RIOS rat tools are required for this function could not be imported\n\t" + riosRatErr)
+    # Check scikit-learn pre-processing is available
+    if not haveSKLearnPreProcess:
+        raise Exception("The scikit-learn pre-processing tools are required for this function could not be imported\n\t" + sklearnPreProcessErr)
+    # Check scikit-learn Grid Search is available
+    if not haveSKLearnGS:
+        raise Exception("The scikit-learn grid search tools are required for this function could not be imported\n\t" + sklearnGSErr)
+        
+    ratDataset = gdal.Open(clumpsImg, gdal.GA_Update)
+    numpyVars = []
+    for var in variables:
+        print("Reading " + var)
+        tmpArr = rat.readColumn(ratDataset, var)
+        if not preProcessor is None:
+            tmpArr = tmpArr.reshape(-1, 1)
+            tmpArr = preProcessor.fit_transform(tmpArr)
+            tmpArr = tmpArr.reshape(-1)
+        numpyVars.append(tmpArr)
+    
+    # Read in training classes
+    classesInt = rat.readColumn(ratDataset, classesIntCol)
+        
+    xData = numpy.array(numpyVars)
+    xData = xData.transpose()
+    xData = numpy.where(numpy.isfinite(xData), xData,0)
+
+    print("Input data size: {} x {}".format(xData.shape[0], xData.shape[1]))
+    
+    trainingData = xData[numpy.isfinite(xData).all(axis=1)]
+    classesInt = classesInt[numpy.isfinite(xData).all(axis=1)]
+    
+    trainingData = trainingData[classesInt > 0]
+    classesInt = classesInt[classesInt > 0]
+        
+    print("Training data size: {} x {}".format(trainingData.shape[0], trainingData.shape[1]))
+    print("Training data IDs size: {}".format(classesInt.shape[0]))
+    
+    classIDs = numpy.unique(classesInt)
+    print(classIDs)
+    for id in classIDs:
+        print("Class {} has {} samples.".format(id, classesInt[classesInt==id].shape[0]))
+    
+    
+    gridSearch.fit(trainingData, classesInt)
+    if not gridSearch.refit:
+        raise Exception("Grid Search did no find a fit therefore failed...")
+    
+    print("Best score was {} and has parameters {}.".format(gridSearch.best_score_, gridSearch.best_params_))
+   
+    return gridSearch.best_estimator_
 
