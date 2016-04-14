@@ -10,6 +10,8 @@ Utilities
 
 .. autofunction:: rsgislib.rastergis.ratutils.populateImageStats
 .. autofunction:: rsgislib.rastergis.collapseRAT
+.. autofunction:: rsgislib.rastergis.ratutils.createClumpsSHPBBOX
+
 
 Attribute Segments
 -------------------
@@ -20,7 +22,6 @@ Attribute Segments
 .. autofunction:: rsgislib.rastergis.defineBorderClumps
 .. autofunction:: rsgislib.rastergis.defineClumpTilePositions
 .. autofunction:: rsgislib.rastergis.findBoundaryPixels
-.. autofunction:: rsgislib.rastergis.findChangeClumpsFromStdDev
 .. autofunction:: rsgislib.rastergis.findNeighbours
 .. autofunction:: rsgislib.rastergis.populateCategoryProportions
 .. autofunction:: rsgislib.rastergis.populateRATWithPercentiles
@@ -31,6 +32,7 @@ Attribute Segments
 .. autofunction:: rsgislib.rastergis.spatialLocation
 .. autofunction:: rsgislib.rastergis.strClassMajority
 .. autofunction:: rsgislib.rastergis.populateRATWithMode
+.. autofunction:: rsgislib.rastergis.ratutils.populateClumpsWithClassTraining
 
 Sampling
 --------
@@ -42,6 +44,8 @@ Classification
 .. autofunction:: rsgislib.rastergis.binaryClassification
 .. autofunction:: rsgislib.rastergis.regionGrowClass
 .. autofunction:: rsgislib.rastergis.regionGrowClassNeighCritera
+.. autofunction:: rsgislib.rastergis.identifySmallUnits
+
 
 Extrapolation
 -------------
@@ -53,6 +57,12 @@ Change Detection
 .. autofunction:: rsgislib.rastergis.findChangeClumpsFromStdDev
 .. autofunction:: rsgislib.rastergis.getGlobalClassStats
 .. autofunction:: rsgislib.rastergis.classSplitFitHistGausianMixtureModel
+.. autofunction:: rsgislib.rastergis.ratutils.calcPlotGaussianHistoModel
+.. autofunction:: rsgislib.rastergis.ratutils.findChangeClumpsHistSkewKurtTest
+.. autofunction:: rsgislib.rastergis.ratutils.findChangeClumpsHistSkewKurtTestLower
+.. autofunction:: rsgislib.rastergis.ratutils.findChangeClumpsHistSkewKurtTestUpper
+.. autofunction:: rsgislib.rastergis.ratutils.findChangeClumpsHistSkewKurtTestVoteMultiVars
+.. autofunction:: rsgislib.rastergis.ratutils.findClumpsWithinExistingThresholds
 
 Statistics
 ----------
