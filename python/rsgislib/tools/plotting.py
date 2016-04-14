@@ -164,13 +164,14 @@ Where:
 * interp is a string specifying the interpolation algorithm to be used (Default: 'nearest'). Available values are ‘none’, ‘nearest’, ‘bilinear’, ‘bicubic’, ‘spline16’, ‘spline36’, ‘hanning’, ‘hamming’, ‘hermite’, ‘kaiser’, ‘quadric’, ‘catrom’, ‘gaussian’, ‘bessel’, ‘mitchell’, ‘sinc’, ‘lanczos’.
     
 Example::
-from rsgislib.tools import plotting
 
-inputImage1 = 'LS5TM_20000613_lat10lon6217_r67p231_rad_sref_ndvi.kea'
-inputImage2 = 'LS5TM_20000613_lat10lon6217_r67p231_rad_ndvi.kea'
-outputPlotFile = 'ARCSI_RAD_SREF_NDVI.pdf'
-
-plotting.plotImageComparison(inputImage1, inputImage2, 1, 1, outputPlotFile, img1Min=-0.5, img1Max=1, img2Min=-0.5, img2Max=1, plotTitle='ARCSI SREF NDVI vs ARCSI RAD NDVI', xLabel='ARCSI SREF NDVI', yLabel='ARCSI RAD NDVI')
+    from rsgislib.tools import plotting
+    
+    inputImage1 = 'LS5TM_20000613_lat10lon6217_r67p231_rad_sref_ndvi.kea'
+    inputImage2 = 'LS5TM_20000613_lat10lon6217_r67p231_rad_ndvi.kea'
+    outputPlotFile = 'ARCSI_RAD_SREF_NDVI.pdf'
+    
+    plotting.plotImageComparison(inputImage1, inputImage2, 1, 1, outputPlotFile, img1Min=-0.5, img1Max=1, img2Min=-0.5, img2Max=1, plotTitle='ARCSI SREF NDVI vs ARCSI RAD NDVI', xLabel='ARCSI SREF NDVI', yLabel='ARCSI RAD NDVI')
     
     """
     try:
@@ -278,9 +279,10 @@ Where:
 * linewidth is the thickness of the edges of the bars in the plot.
     
 Example::
-from rsgislib.tools import plotting
 
-plotting.plotImageHistogram("Baccini_Manaus_AGB_30.kea", 1, "BacciniHistogram.pdf", numBins=100, imgMin=0, imgMax=400, normOutput=True, plotTitle='Histogram of Baccini Biomass', xLabel='Baccini Biomass', color=[1.0,0.2,1.0], edgecolor='red', linewidth=0)
+    from rsgislib.tools import plotting
+    
+    plotting.plotImageHistogram("Baccini_Manaus_AGB_30.kea", 1, "BacciniHistogram.pdf", numBins=100, imgMin=0, imgMax=400, normOutput=True, plotTitle='Histogram of Baccini Biomass', xLabel='Baccini Biomass', color=[1.0,0.2,1.0], edgecolor='red', linewidth=0)
     
     """
     try:
