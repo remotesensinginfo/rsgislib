@@ -59,7 +59,7 @@ try:
     from sklearn.ensemble import RandomForestClassifier
 except ImportError as sklearnRFErr:
     haveSKLearnRF = False
-    raise Exception("The scikit-learn random forests tools are required for this module could not be imported\n\t" + sklearnRFErr)
+    raise Exception("The scikit-learn random forests tools are required for this module could not be imported\n\t {}".format(sklearnRFErr))
     
 haveSKLearnGS = True
 try:
@@ -101,22 +101,24 @@ A function which will perform a classification within the RAT using a classifier
 
 
 Example::
-from sklearn.ensemble import ExtraTreesClassifier
-from rsgislib.classification import classratutils
 
-classifier = ExtraTreesClassifier(n_estimators=100, max_features=3, n_jobs=-1, verbose=0)
+    from sklearn.ensemble import ExtraTreesClassifier
+    from rsgislib.classification import classratutils
+    
+    classifier = ExtraTreesClassifier(n_estimators=100, max_features=3, n_jobs=-1, verbose=0)
+    
+    classColours = dict()
+    classColours['Forest'] = [0,138,0]
+    classColours['NonForest'] = [200,200,200]
+    
+    variables = ['GreenAvg', 'RedAvg', 'NIR1Avg', 'NIR2Avg', 'NDVI']
+    classifyWithinRAT(clumpsImg, classesIntCol, classesNameCol, variables, classifier=classifier, classColours=classColours)
+    
+    from sklearn.preprocessing import MaxAbsScaler
+    
+    # With pre-processor
+    classifyWithinRAT(clumpsImg, classesIntCol, classesNameCol, variables, classifier=classifier, classColours=classColours, preProcessor=MaxAbsScaler())
 
-classColours = dict()
-classColours['Forest'] = [0,138,0]
-classColours['NonForest'] = [200,200,200]
-
-variables = ['GreenAvg', 'RedAvg', 'NIR1Avg', 'NIR2Avg', 'NDVI']
-classifyWithinRAT(clumpsImg, classesIntCol, classesNameCol, variables, classifier=classifier, classColours=classColours)
-
-from sklearn.preprocessing import MaxAbsScaler
-
-# With pre-processor
-classifyWithinRAT(clumpsImg, classesIntCol, classesNameCol, variables, classifier=classifier, classColours=classColours, preProcessor=MaxAbsScaler())
 """
     # Check gdal is available
     if not haveGDALPy:
@@ -263,7 +265,7 @@ A function which will perform a clustering within the RAT using a clustering alg
 
 
 Example::
-    
+
     from rsgislib.classification import classratutils
     from sklearn.cluster import DBSCAN
     
@@ -383,26 +385,27 @@ Find the optimal parameters for a classifier using a grid search and return a cl
 * preProcessor is a scikit-learn processors such as sklearn.preprocessing.MaxAbsScaler() which can rescale the input variables independently as read in (Define: None; i.e., not in use).
 * gridSearch is an instance of GridSearchCV parameterised with a classifier and parameters to be searched.
 
-return::
-    Instance of the classifier with optimal parameters defined.
+return:
 
-example::
+* Instance of the classifier with optimal parameters defined.
 
-from rsgislib.classification import classratutils
-from sklearn.svm import SVC
-from sklearn.grid_search import GridSearchCV
-from sklearn.preprocessing import MaxAbsScaler
+Example::
 
-clumpsImg = "./LS8_20150621_lat10lon652_r67p233_clumps.kea"
-classesIntCol = 'ClassInt'
+    from rsgislib.classification import classratutils
+    from sklearn.svm import SVC
+    from sklearn.grid_search import GridSearchCV
+    from sklearn.preprocessing import MaxAbsScaler
+    
+    clumpsImg = "./LS8_20150621_lat10lon652_r67p233_clumps.kea"
+    classesIntCol = 'ClassInt'
+    
+    classParameters = {'kernel':['linear', 'rbf',  'poly', 'sigmoid'], 'C':[1, 2, 3, 4, 5, 10, 100, 400, 500, 1e3, 5e3, 1e4, 5e4, 1e5], 'gamma':[0.0001, 0.0005, 0.001, 0.005, 0.01, 0.1, 'auto'], 'degree':[2, 3, 4, 5, 6, 7, 8], 'class_weight':['', 'balanced'], 'decision_function_shape':['ovo', 'ovr', None]}
+    variables = ['BlueRefl', 'GreenRefl', 'RedRefl', 'NIRRefl', 'SWIR1Refl', 'SWIR2Refl']
+    
+    gSearch = GridSearchCV(SVC(), classParameters)
+    classifier = classratutils.findClassifierParameters(clumpsImg, classesIntCol, variables, preProcessor=MaxAbsScaler(), gridSearch=gSearch)
 
-classParameters = {'kernel':['linear', 'rbf',  'poly', 'sigmoid'], 'C':[1, 2, 3, 4, 5, 10, 100, 400, 500, 1e3, 5e3, 1e4, 5e4, 1e5], 'gamma':[0.0001, 0.0005, 0.001, 0.005, 0.01, 0.1, 'auto'], 'degree':[2, 3, 4, 5, 6, 7, 8], 'class_weight':['', 'balanced'], 'decision_function_shape':['ovo', 'ovr', None]}
-variables = ['BlueRefl', 'GreenRefl', 'RedRefl', 'NIRRefl', 'SWIR1Refl', 'SWIR2Refl']
-
-gSearch = GridSearchCV(SVC(), classParameters)
-classifier = classratutils.findClassifierParameters(clumpsImg, classesIntCol, variables, preProcessor=MaxAbsScaler(), gridSearch=gSearch)
-
-    """
+"""
     # Check gdal is available
     if not haveGDALPy:
         raise Exception("The GDAL python bindings required for this function could not be imported\n\t" + gdalErr)

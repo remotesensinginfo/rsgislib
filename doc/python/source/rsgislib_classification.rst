@@ -9,6 +9,10 @@ RSGISLib Classification Module
 Raster GIS
 -----------
 
+.. automodule:: rsgislib.classification.classratutils
+   :members:
+   :undoc-members:
+
 .. autofunction:: rsgislib.classification.collapseClasses
 .. autofunction:: rsgislib.classification.colour3bands
 
