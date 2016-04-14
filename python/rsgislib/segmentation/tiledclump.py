@@ -48,12 +48,14 @@ from rsgislib import imageutils
 def performClumpingSingleThread(inputImage, clumpsImage, tmpDIR='tmp', width=2000, height=2000, imgFormat='KEA'):
     """
     Clump the input image using a tiled processing chain allowing large images to be clumped more quickly.
+
     * inputImage - the input image to be clumped.
     * clumpsImage - the output clumped image.
     * tmpDIR - the temporary directory where intermediate files will be written (default is 'tmp'). Directory will be created and deleted if does not exist.
     * width - int for width of the image tiles used for processing (Default = 2000).
     * height - int for height of the image tiles used for processing (Default = 2000).
     * imgformat - string with the GDAL image format for the output image (Default = KEA). NOTE. KEA is used as intermediate format internally and therefore needs to be available.
+
     """
     createdTmp = False
     if not os.path.exists(tmpDIR):
@@ -104,6 +106,7 @@ def clumpImgFunc(imgs):
 def performClumpingMultiProcess(inputImage, clumpsImage, tmpDIR='tmp', width=2000, height=2000, imgFormat='KEA', nCores=2):
     """
     Clump the input image using a tiled processing chain allowing large images to be clumped more quickly.
+
     * inputImage - the input image to be clumped.
     * clumpsImage - the output clumped image.
     * tmpDIR - the temporary directory where intermediate files will be written (default is 'tmp'). Directory will be created and deleted if does not exist.
@@ -111,6 +114,7 @@ def performClumpingMultiProcess(inputImage, clumpsImage, tmpDIR='tmp', width=200
     * height - int for height of the image tiles used for processing (Default = 2000).
     * imgformat - string with the GDAL image format for the output image (Default = KEA). NOTE. KEA is used as intermediate format internally and therefore needs to be available.
     * nCores - is an int specifying the number of cores to be used for clumping processing.
+
     """
     createdTmp = False
     if not os.path.exists(tmpDIR):
@@ -163,6 +167,7 @@ def performClumpingMultiProcess(inputImage, clumpsImage, tmpDIR='tmp', width=200
 def performUnionClumpingSingleThread(inputImage, refImg, clumpsImage, tmpDIR='tmp', width=2000, height=2000, imgFormat='KEA'):
     """
     Clump and union with the reference image the input image using a tiled processing chain allowing large images to be clumped more quickly.
+
     * inputImage - the input image to be clumped.
     * refImg - the reference image which the union is undertaken with (typically an existing classification)
     * clumpsImage - the output clumped image.
@@ -170,6 +175,7 @@ def performUnionClumpingSingleThread(inputImage, refImg, clumpsImage, tmpDIR='tm
     * width - int for width of the image tiles used for processing (Default = 2000).
     * height - int for height of the image tiles used for processing (Default = 2000).
     * imgformat - string with the GDAL image format for the output image (Default = KEA). NOTE. KEA is used as intermediate format internally and therefore needs to be available.
+
     """
     createdTmp = False
     if not os.path.exists(tmpDIR):
@@ -220,6 +226,7 @@ def unionClumpImgFunc(imgs):
 def performUnionClumpingMultiProcess(inputImage, refImg, clumpsImage, tmpDIR='tmp', width=2000, height=2000, imgFormat='KEA', nCores=2):
     """
     Clump and union with the reference image the input image using a tiled processing chain allowing large images to be clumped more quickly.
+
     * inputImage - the input image to be clumped.
     * refImg - the reference image which the union is undertaken with (typically an existing classification)
     * clumpsImage - the output clumped image.
@@ -228,6 +235,7 @@ def performUnionClumpingMultiProcess(inputImage, refImg, clumpsImage, tmpDIR='tm
     * height - int for height of the image tiles used for processing (Default = 2000).
     * imgformat - string with the GDAL image format for the output image (Default = KEA). NOTE. KEA is used as intermediate format internally and therefore needs to be available.
     * nCores - is an int specifying the number of cores to be used for clumping processing.
+
     """
     createdTmp = False
     if not os.path.exists(tmpDIR):

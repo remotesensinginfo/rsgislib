@@ -39,8 +39,13 @@ Visualisation
 
 
 Tiles
-------
+-------
 .. autofunction:: rsgislib.segmentation.mergeSegmentationTiles
+.. autofunction:: rsgislib.segmentation.tiledsegsingle.performTiledSegmentation
+
+.. automodule:: rsgislib.segmentation.tiledclump
+   :members:
+   :undoc-members:
 
 Other
 -----
