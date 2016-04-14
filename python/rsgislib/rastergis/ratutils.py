@@ -364,6 +364,7 @@ def findChangeClumpsHistSkewKurtTest(inputClumps, inClassCol, classOfInterest, c
     * showAllThreshPlot - option when plotting to put all the thresholds on to the plot rather than just the one being used.
     
     Return:
+
     * list of lower [0] and upper [1] thresholds used to define the no change region.
     
     """
@@ -589,6 +590,7 @@ def findChangeClumpsHistSkewKurtTestLower(inputClumps, inClassCol, classOfIntere
     * showAllThreshPlot - option when plotting to put all the thresholds on to the plot rather than just the one being used.
     
     Return:
+
     * list of lower [0] and upper [1] thresholds used to define the no change region.
     
     """
@@ -796,6 +798,7 @@ def findChangeClumpsHistSkewKurtTestUpper(inputClumps, inClassCol, classOfIntere
     * showAllThreshPlot - option when plotting to put all the thresholds on to the plot rather than just the one being used.
     
     Return:
+
     * list of lower [0] and upper [1] thresholds used to define the no change region.
     
     """
@@ -1005,6 +1008,7 @@ def findChangeClumpsHistSkewKurtTestVoteMultiVars(inputClumps, inClassCol, class
     variables and then combine together by voting to find change features.
     
     Where:
+
     * inputClumps - input clumps file.
     * inClassCol - The column specifiying the classes, one of which change will be found.
     * classOfInterest - The class (as defined in inClassCol) on which changed is being found.
@@ -1061,6 +1065,7 @@ def findClumpsWithinExistingThresholds(inputClumps, inClassCol, classOfInterest,
     variables (i.e., len(var) > 1) then variables are combined with an and operation.
     
     Where:
+
     * inputClumps - input clumps file.
     * inClassCol - The column specifiying the classes, one of which change will be found.
     * classOfInterest - The class (as defined in inClassCol) on which changed is being found.
@@ -1133,6 +1138,7 @@ def populateClumpsWithClassTraining(clumpsImg, classesDict, tmpPath, classesIntC
     A function to populate a clumps file with training from a series of shapefiles (1 per class)
     
     Where:
+
     * clumpsImg - input clumps file.
     * classesDict - A dict structure with the class names as keys and the values are an array of two values [int class val, file path for shapefile].
     * tmpPath - File path (which needs to exist) where files can temporally be written.
@@ -1183,6 +1189,7 @@ def createClumpsSHPBBOX(clumpsImg, minXCol, maxXCol, minYCol, maxYCol, outShpLyr
     the minX, maxX, minY and maxY coordinates for the features.
     
     Where:
+
     * clumpsImg - input clumps file.
     * minXCol - the minX column in RAT.
     * maxXCol - the maxX column in RAT.
@@ -1288,14 +1295,15 @@ can be provided as lists to identify a number of thresholds of small units.
 * tileHeight - is the height of the image tile (in pixels) if tiled clumping is used.
 
 Example::
-from rsgislib.rastergis import ratutils
 
-clumpsImg = "LS2MSS_19750620_lat10lon6493_r67p250_rad_srefdem_30m_clumps.kea"
-tmpPath = "./tmp/"
-classCol = "OutClass"
-outColName = ["SmallUnits25", "SmallUnits50", "SmallUnits100"]
-smallClumpsThres = [25, 50, 100]
-rastergis.identifySmallUnits(clumpsImg, classCol, tmpPath, outColName, smallClumpsThres)
+    from rsgislib.rastergis import ratutils
+    
+    clumpsImg = "LS2MSS_19750620_lat10lon6493_r67p250_rad_srefdem_30m_clumps.kea"
+    tmpPath = "./tmp/"
+    classCol = "OutClass"
+    outColName = ["SmallUnits25", "SmallUnits50", "SmallUnits100"]
+    smallClumpsThres = [25, 50, 100]
+    rastergis.identifySmallUnits(clumpsImg, classCol, tmpPath, outColName, smallClumpsThres)
 
     """
     

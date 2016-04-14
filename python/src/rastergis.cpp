@@ -2084,6 +2084,7 @@ static PyMethodDef RasterGISMethods[] = {
 "rastergis.spatialLocation(clumps=string, eastings=string, northings=string, ratband=int)\n"
 "Adds spatial location columns to the attribute table\n"
 "Where:\n"
+"\n"
 "* inputImage is a string containing the name of the input image file\n"
 "* eastingsField is a string containing the name of the eastings field\n"
 "* northingsField is a string containing the name of the northings field\n"
