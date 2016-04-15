@@ -348,6 +348,7 @@ Example::
     clustersIDs = numpy.unique(outClust)
       
     if clrClusters:
+        import random
         random.seed(clrSeed)
     
         print("Set Colours")
