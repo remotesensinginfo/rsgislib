@@ -331,6 +331,23 @@ class RSGISPyUtils (object):
             raise e
         return txtStr
 
+    def readTextFile2List(self, file):
+        """
+        Read a text file into a list where each line 
+        is an element in the list.
+        """
+        outList = []
+        try:
+            dataFile = open(file, 'r')
+            for line in dataFile:
+                line = line.strip()
+                if line != "":
+                    outList.append(line)
+            dataFile.close()
+        except Exception as e:
+            raise e
+        return outList
+
 class RSGISTime (object):
     """ Class to calculate run time for a function, format and print out (similar to for XML interface).
 
