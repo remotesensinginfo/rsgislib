@@ -310,6 +310,67 @@ namespace rsgis{namespace utils{
         }
 		return outValue;
 	}
+    
+    
+    int RSGISTextUtils::strtoInt(std::string inValue)throw(RSGISTextException)
+    {
+        int outValue = 0;
+        try
+        {
+            outValue = boost::lexical_cast<int>(inValue);
+        }
+        catch(boost::bad_lexical_cast &e)
+        {
+            std::string message = std::string("Trying to convert \"") + inValue + std::string("\" - ") + std::string(e.what());
+            throw RSGISTextException(message);
+        }
+        return outValue;
+    }
+    
+    unsigned int RSGISTextUtils::strtoUInt(std::string inValue)throw(RSGISTextException)
+    {
+        unsigned int outValue = 0;
+        try
+        {
+            outValue = boost::lexical_cast<unsigned int>(inValue);
+        }
+        catch(boost::bad_lexical_cast &e)
+        {
+            std::string message = std::string("Trying to convert \"") + inValue + std::string("\" - ") + std::string(e.what());
+            throw RSGISTextException(message);
+        }
+        return outValue;
+    }
+    
+    long RSGISTextUtils::strtoLong(std::string inValue)throw(RSGISTextException)
+    {
+        long outValue = 0;
+        try
+        {
+            outValue = boost::lexical_cast<long>(inValue);
+        }
+        catch(boost::bad_lexical_cast &e)
+        {
+            std::string message = std::string("Trying to convert \"") + inValue + std::string("\" - ") + std::string(e.what());
+            throw RSGISTextException(message);
+        }
+        return outValue;
+    }
+    
+    unsigned long RSGISTextUtils::strtoULong(std::string inValue)throw(RSGISTextException)
+    {
+        unsigned long outValue = 0;
+        try
+        {
+            outValue = boost::lexical_cast<unsigned long>(inValue);
+        }
+        catch(boost::bad_lexical_cast &e)
+        {
+            std::string message = std::string("Trying to convert \"") + inValue + std::string("\" - ") + std::string(e.what());
+            throw RSGISTextException(message);
+        }
+        return outValue;
+    }
 	
 	uint_fast8_t RSGISTextUtils::strto8bitUInt(std::string inValue) throw(RSGISTextException)
 	{

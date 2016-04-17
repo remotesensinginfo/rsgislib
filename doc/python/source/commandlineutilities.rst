@@ -15,6 +15,9 @@ Processing
 * rsgislibattributerat.py - Attribute Raster Attribute Table
 * rsgislibzonalstats.py - Zonal statistics
 * rsgislibmosaic.py - Mosaic
+* rsgiscalcaccmatrix.py - Produce classification error matrix
+* rsgislibcalcindices.py - Easy tool for calculating image indicies
+
 
 Other
 -----

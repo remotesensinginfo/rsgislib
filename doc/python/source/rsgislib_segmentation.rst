@@ -8,6 +8,8 @@ RSGISLib Image Segmentation Module
 Utilities
 ---------
 .. autofunction:: rsgislib.segmentation.segutils.runShepherdSegmentation
+.. autofunction:: rsgislib.segmentation.tiledsegsingle.performTiledSegmentation
+.. autofunction:: rsgislib.segmentation.segutils.runShepherdSegmentationPreCalcdStats
 .. autofunction:: rsgislib.segmentation.segutils.runShepherdSegmentationTestMinObjSize
 .. autofunction:: rsgislib.segmentation.segutils.runShepherdSegmentationTestNumClumps
 
@@ -15,12 +17,15 @@ Utilities
 Clump
 ------
 .. autofunction:: rsgislib.segmentation.clump
+.. autofunction:: rsgislib.segmentation.tiledclump.performClumpingSingleThread
+.. autofunction:: rsgislib.segmentation.tiledclump.performClumpingMultiProcess
+.. autofunction:: rsgislib.segmentation.tiledclump.performUnionClumpingSingleThread
+.. autofunction:: rsgislib.segmentation.tiledclump.performUnionClumpingMultiProcess
 
 Label
 ------
 .. autofunction:: rsgislib.segmentation.labelPixelsFromClusterCentres
 .. autofunction:: rsgislib.segmentation.relabelClumps
-
 
 Elimination
 --------------
@@ -50,6 +55,13 @@ Tiles
 Other
 -----
 .. autofunction:: rsgislib.segmentation.generateRegularGrid
+.. autofunction:: rsgislib.segmentation.dropSelectedClumps
+.. autofunction:: rsgislib.segmentation.findTileBordersMask
+.. autofunction:: rsgislib.segmentation.includeRegionsInClumps
+.. autofunction:: rsgislib.segmentation.mergeClumpImages
+.. autofunction:: rsgislib.segmentation.mergeEquivClumps
+.. autofunction:: rsgislib.segmentation.mergeSegments2Neighbours
+
 
 * :ref:`genindex`
 * :ref:`modindex`

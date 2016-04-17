@@ -11,6 +11,7 @@ Utilities
 .. autofunction:: rsgislib.rastergis.ratutils.populateImageStats
 .. autofunction:: rsgislib.rastergis.collapseRAT
 .. autofunction:: rsgislib.rastergis.ratutils.createClumpsSHPBBOX
+.. autofunction:: rsgislib.rastergis.populateStats
 
 
 Attribute Segments
@@ -27,12 +28,13 @@ Attribute Segments
 .. autofunction:: rsgislib.rastergis.populateRATWithPercentiles
 .. autofunction:: rsgislib.rastergis.populateRATWithStats
 .. autofunction:: rsgislib.rastergis.populateRATWithMeanLitStats
-.. autofunction:: rsgislib.rastergis.populateStats
 .. autofunction:: rsgislib.rastergis.selectClumpsOnGrid
 .. autofunction:: rsgislib.rastergis.spatialLocation
+.. autofunction:: rsgislib.rastergis.spatialExtent
 .. autofunction:: rsgislib.rastergis.strClassMajority
 .. autofunction:: rsgislib.rastergis.populateRATWithMode
-.. autofunction:: rsgislib.rastergis.ratutils.populateClumpsWithClassTraining
+.. autofunction:: rsgislib.rastergis.populateRATWithPropValidPxls
+.. autofunction:: rsgislib.rastergis.ratutils.defineClassNames
 
 Sampling
 --------
@@ -44,7 +46,8 @@ Classification
 .. autofunction:: rsgislib.rastergis.binaryClassification
 .. autofunction:: rsgislib.rastergis.regionGrowClass
 .. autofunction:: rsgislib.rastergis.regionGrowClassNeighCritera
-.. autofunction:: rsgislib.rastergis.identifySmallUnits
+.. autofunction:: rsgislib.rastergis.ratutils.identifySmallUnits
+.. autofunction:: rsgislib.rastergis.ratutils.populateClumpsWithClassTraining
 
 
 Extrapolation
@@ -68,12 +71,16 @@ Statistics
 ----------
 .. autofunction:: rsgislib.rastergis.fitHistGausianMixtureModel
 .. autofunction:: rsgislib.rastergis.ratutils.calcPlotGaussianHistoModel
+.. autofunction:: rsgislib.rastergis.calc1DJMDistance
+.. autofunction:: rsgislib.rastergis.calc2DJMDistance
+.. autofunction:: rsgislib.rastergis.calcBhattacharyyaDistance
 
 Copy & Export
 ----------------
 .. autofunction:: rsgislib.rastergis.export2Ascii
 .. autofunction:: rsgislib.rastergis.exportCol2GDALImage
 .. autofunction:: rsgislib.rastergis.exportCols2GDALImage
+.. autofunction:: rsgislib.rastergis.exportClumps2Images
 .. autofunction:: rsgislib.rastergis.copyGDALATTColumns
 .. autofunction:: rsgislib.rastergis.copyRAT
 .. autofunction:: rsgislib.rastergis.interpolateClumpValues2Image
