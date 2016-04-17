@@ -72,10 +72,12 @@ Example::
 
 def getRSGISLibDataType(inImg):
     """
-    Returns the rsgislib datatype ENUM for a raster file
-    :param in_file: The file to get the datatype for
-    :return: The rsgislib datatype enum, e.g., rsgislib.TYPE_8INT
-    """
+Returns the rsgislib datatype ENUM for a raster file
+* inImg -- The file to get the datatype for
+
+return:: 
+    The rsgislib datatype enum, e.g., rsgislib.TYPE_8INT
+"""
     import osgeo.gdal as gdal
     raster = gdal.Open(in_file, GA_ReadOnly)
     band = raster.GetRasterBand(1)
@@ -86,10 +88,12 @@ def getRSGISLibDataType(inImg):
     
 def getGDALDataType(inImg):
     """
-    Returns the rsgislib datatype ENUM for a raster file
-    :param in_file: The file to get the datatype for
-    :return: The rsgislib datatype enum, e.g., rsgislib.TYPE_8INT
-    """
+Returns the rsgislib datatype ENUM for a raster file
+*  inImg -- The file to get the datatype for
+
+return::
+    The rsgislib datatype enum, e.g., rsgislib.TYPE_8INT
+"""
     import osgeo.gdal as gdal
     raster = gdal.Open(in_file, GA_ReadOnly)
     band = raster.GetRasterBand(1)

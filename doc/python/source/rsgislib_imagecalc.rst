@@ -39,8 +39,12 @@ Statistics
 .. autofunction:: rsgislib.imagecalc.bandPercentile
 .. autofunction:: rsgislib.imagecalc.covariance
 .. autofunction:: rsgislib.imagecalc.histogram
+.. autofunction:: rsgislib.imagecalc.getHistogram
+.. autofunction:: rsgislib.imagecalc.get2DImageHistogram
 .. autofunction:: rsgislib.imagecalc.correlation
 .. autofunction:: rsgislib.imagecalc.correlationWindow
+.. autofunction:: rsgislib.imagecalc.getImageBandModeInEnv
+.. autofunction:: rsgislib.imagecalc.getImageStatsInEnv
 
 
 Normalise

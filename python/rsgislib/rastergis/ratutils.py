@@ -779,7 +779,6 @@ def findChangeClumpsHistSkewKurtTestLower(inputClumps, inClassCol, classOfIntere
     ratDataset = None
     return [lowerThres, upperThres]
 
-
 def findChangeClumpsHistSkewKurtTestUpper(inputClumps, inClassCol, classOfInterest, changeVarCol, outChangeFeatCol, noDataVals=[], thresMeasure=RSGISRATThresMeasure.auto, exportPlot=None, showAllThreshPlot=False):
     """
     This function identifies potential change features from just the upper (right) side of the histogram 

@@ -6,9 +6,16 @@ RSGISLib Vector Utils Module
 Geometry
 ---------
 
+.. autofunction:: rsgislib.vectorutils.addFIDColumn
 .. autofunction:: rsgislib.vectorutils.buffervector
 .. autofunction:: rsgislib.vectorutils.generateConvexHullsGroups
-
+.. autofunction:: rsgislib.vectorutils.createLinesOfPoints
+.. autofunction:: rsgislib.vectorutils.fitPolygon2Points
+.. autofunction:: rsgislib.vectorutils.fitPolygons2PointClusters
+.. autofunction:: rsgislib.vectorutils.generateConvexHullsGroups
+.. autofunction:: rsgislib.vectorutils.polygoniseRaster
+.. autofunction:: rsgislib.vectorutils.printpolygeom
+.. autofunction:: rsgislib.vectorutils.splitFeatures
 
 Attributes
 -----------
@@ -18,6 +25,10 @@ Attributes
 .. autofunction:: rsgislib.vectorutils.findreplacetext
 .. autofunction:: rsgislib.vectorutils.calcarea
 .. autofunction:: rsgislib.vectorutils.populateGeomZField
+.. autofunction:: rsgislib.vectorutils.calcMaxDist2NearestGeom
+.. autofunction:: rsgislib.vectorutils.dist2NearestGeom
+.. autofunction:: rsgislib.vectorutils.spatialGraphClusterGeoms
+
 
 
 Management

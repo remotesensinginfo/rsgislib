@@ -144,7 +144,9 @@ namespace rsgis{namespace vec{
             
             double dist = 0.0;
             double minDist = 0.0;
+            int minFID = 0;
             bool first = true;
+            int geomCount = 0;
             for(std::vector<OGRGeometry*>::iterator iterGeoms = geoms->begin(); iterGeoms != geoms->end(); ++iterGeoms)
             {
                 if(!geom->Equals(*iterGeoms))
@@ -154,12 +156,15 @@ namespace rsgis{namespace vec{
                     {
                         minDist = dist;
                         first = false;
+                        minFID = geomCount;
                     }
                     else if(dist < minDist)
                     {
                         minDist = dist;
+                        minFID = geomCount;
                     }
                 }
+                geomCount = geomCount + 1;
             }
             
             if(firstGeom)
@@ -185,6 +190,14 @@ namespace rsgis{namespace vec{
         if( outputLayer->CreateField( &shpField ) != OGRERR_NONE )
         {
             std::string message = std::string("Creating shapefile field \'MinDist\' has failed");
+            throw RSGISVectorOutputException(message.c_str());
+        }
+        
+        OGRFieldDefn shpMFIDField("MinFID", OFTInteger);
+        shpMFIDField.SetWidth(5);
+        if( outputLayer->CreateField( &shpMFIDField ) != OGRERR_NONE )
+        {
+            std::string message = std::string("Creating shapefile field \'MinFID\' has failed");
             throw RSGISVectorOutputException(message.c_str());
         }
     }

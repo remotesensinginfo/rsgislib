@@ -36,6 +36,8 @@
 
 #include "geos/geom/Envelope.h"
 
+#include "utils/RSGISTextUtils.h"
+
 namespace rsgis{namespace vec{
 	
 	class DllExport RSGISVectorAttributeFindReplace : public RSGISProcessOGRFeature

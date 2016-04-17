@@ -16,6 +16,14 @@ Raster GIS
 .. autofunction:: rsgislib.classification.collapseClasses
 .. autofunction:: rsgislib.classification.colour3bands
 
+Accuracy Assessment
+----------------------------
+
+.. autofunction:: rsgislib.classification.generateRandomAccuracyPts
+.. autofunction:: rsgislib.classification.generateStratifiedRandomAccuracyPts
+.. autofunction:: rsgislib.classification.generateTransectAccuracyPts
+.. autofunction:: rsgislib.classification.popClassInfoAccuracyPts
+
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`

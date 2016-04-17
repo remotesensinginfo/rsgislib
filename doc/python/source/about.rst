@@ -35,6 +35,16 @@ For details of an open source system for Object-Based Image Analysis, using RSGI
 
 Daniel Clewley, Peter Bunting, James Shepherd, Sam Gillingham, Neil Flood, John Dymond, Richard Lucas, John Armston and Mahta Moghaddam. 2014. A Python-Based Open Source System for Geographic Object-Based Image Analysis (GEOBIA) Utilizing Raster Attribute Tables. Remote Sensing. Volume 6, Pages 6111-6135. http://www.mdpi.com/2072-4292/6/7/6111
 
+Bibtex::
+
+    @article{Clewley_etal_2014,
+    	Author = {Clewley, Daniel and Bunting, Peter and Shepherd, James and Gillingham, Sam and Flood, Neil and Dymond, John and Lucas, Richard M, and Armston, John and Moghaddam, Mahta},
+    	Title = {{A Python-Based Open Source System for Geographic Object-Based Image Analysis (GEOBIA) Utilizing Raster Attribute Tables}},
+    	Journal = {Remote Sensing},
+    	Pages = {6111--6135},
+    	Volume = {6},
+    	Year = {2014}}
+
 **How do I cite RSGISLib?**
 
 If you have used RSGISLib for published work then you should cite the following publication and / or the specific paper of the algorithm you used (if applicable). 

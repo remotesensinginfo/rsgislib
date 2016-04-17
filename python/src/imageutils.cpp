@@ -1202,17 +1202,17 @@ static PyMethodDef ImageUtilsMethods[] = {
 "\n"},
 
     {"maskImage", ImageUtils_maskImage, METH_VARARGS,
-"imageutils.maskImage(inputimage, imagemask, outputimage, gdalformat, datatype, outvalue, maskvalue)"
-"Mask image.\n"
+"imageutils.maskImage(inputimage, imagemask, outputimage, gdalformat, datatype, outvalue, maskvalue)\n"
+"This command will mask an input image using a single band mask image - commonly this is a binary image.\n"
 "Where:\n"
 "\n"
-"* inputImage is a string containing the name of the input file\n"
-"* imagemask is a string\n"
-"* outputimage is a string\n"
-"* gdalformat is a string\n"
-"* datatype is a rsgislib.TYPE_* value\n"
-"* outvalue is a float\n"
-"* maskvalue is a float\n"
+"* inputImage is a string containing the name and path of the input image file.\n"
+"* imagemask is a string containing the name and path of the mask image file.\n"
+"* outputimage is a string containing the name and path for the output image following application of the mask.\n"
+"* gdalformat is a string representing the output image file format (e.g., KEA, ENVI, GTIFF, HFA etc).\n"
+"* datatype is a rsgislib.TYPE_* value for the data type of the output image.\n"
+"* outvalue is a float representing the value written to the output image in place of the regions being masked.\n"
+"* maskvalue is a float representing the value within the mask image for the regions which are to be replaced with the outvalue.\n"
 "\n"},
 
     {"createTiles", ImageUtils_createTiles, METH_VARARGS,
@@ -1677,15 +1677,15 @@ static PyMethodDef ImageUtilsMethods[] = {
 "* outimage is a string containing the name of the output file.\n"
 "* format is a string with the GDAL output file format.\n"
 "* datatype is an containing one of the values from rsgislib.TYPE_*\n"
-"* nodata is the no data value which will be ignored (Default is 0)"
+"* nodata is the no data value which will be ignored (Default is 0)\n"
 "\n"
 "\nExample::\n"
 "\n"
 "   from rsgislib import imageutils\n"
 "   inputImages = ['./forest.kea', './urban.kea', './water.kea']\n"
 "   outputImage = './classes.kea'\n"
-"   datatype = rsgislib.TYPE_8UINT"
-"   format = 'KEA'"
+"   datatype = rsgislib.TYPE_8UINT\n"
+"   format = 'KEA'\n"
 "   imageutils.combineImages2Band(inputImages, outputImage, format, datatype, 0.0)\n"
 "\n"},
 
