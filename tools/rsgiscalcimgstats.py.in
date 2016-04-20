@@ -48,7 +48,7 @@ if __name__ == '__main__':
     parser.add_argument("-i", "--image", type=str, required=True, help='''The image on which stats and pyramids are to calculated.''')
     parser.add_argument("-t", "--thematic", action='store_true', default=False, help='''The image is thermatic, calc stats and pyramids accordingly.''')    
     parser.add_argument("-p", "--nopyramids", action='store_true', default=False, help='''Do not calculate image pyramids.''')
-    parser.add_argument("-n", "--nodata", type=float, required=False, default=0.0, help='''No data value for the input image for when calculating stats''')
+    parser.add_argument("-n", "--nodata", type=float, required=True, default=0.0, help='''No data value for the input image for when calculating stats''')
     parser.add_argument("-c", "--noclrtab", action='store_true', default=False, help='''Do not add a colour table (only for thematic images)''')    
 
     # Call the parser to parse the arguments.
