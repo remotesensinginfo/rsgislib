@@ -466,3 +466,68 @@ Example::
    
     return gridSearch.best_estimator_
 
+
+def balanceSampleTrainingRandom(clumpsImg, trainCol, outTrainCol, minNoSamples, maxNoSamples):
+    """
+A function to balance the number of training samples for classification so the number is above
+a minimum threshold (minNoSamples) and all equal to the class with the smallest number of samples
+unless that is above a set maximum (maxNoSamples).
+
+* clumpsImg is a string with the file path to the input image with RAT
+* trainCol is a string for the name of the input column specifying the training samples (zero is no data)
+* outTrainCol is a string with the name of the outputted training samples.
+* minNoSamples is an int specifying the minimum number of training samples for a class (if below threshold class is removed).
+* maxNoSamples is an int specifiying the maximum number of training samples per class.
+
+"""
+     # Check gdal is available
+    if not haveGDALPy:
+        raise Exception("The GDAL python bindings required for this function could not be imported\n\t" + gdalErr)
+    # Check numpy is available
+    if not haveNumpy:
+        raise Exception("The numpy module is required for this function could not be imported\n\t" + numErr)
+    # Check rios rat is available
+    if not haveRIOSRat:
+        raise Exception("The RIOS rat tools are required for this function could not be imported\n\t" + riosRatErr)
+    
+    ratDataset = gdal.Open(clumpsImg, gdal.GA_Update)
+    trainColVals = rat.readColumn(ratDataset, trainCol)
+    trainColOutVals = numpy.zeros_like(trainColVals)
+    
+    classIDs = numpy.unique(trainColVals)
+    classIDs = classIDs[classIDs != 0]
+    
+    numSampPerClass = []    
+    print("Number of input samples:")
+    for id in classIDs:
+        numVals = trainColVals[trainColVals==id].shape[0]
+        print("\tClass {} has {} samples.".format(id, numVals))
+        numSampPerClass.append(numVals)
+    
+    minNumSamples = 0
+    first = True
+    for i in range(len(numSampPerClass)):
+        if numSampPerClass[i] < minNoSamples:
+            trainColOutVals[trainColVals == classIDs[i]] = 0
+        else:
+            if first:
+                minNumSamples = numSampPerClass[i]
+                first = False
+            elif numSampPerClass[i] < minNumSamples:
+                minNumSamples = numSampPerClass[i]
+        
+    if minNumSamples > maxNoSamples:
+        minNumSamples = maxNoSamples
+    
+    print("Number of output samples:") 
+    for i in range(len(numSampPerClass)):
+        if numSampPerClass[i] >= minNoSamples:
+            indexes = numpy.where(trainColVals == classIDs[i])
+            sampleIdx = numpy.random.choice(indexes[0], minNumSamples, replace=False)
+            trainColOutVals[sampleIdx] = classIDs[i]
+        print("\tClass {} has {} samples.".format(classIDs[i], trainColOutVals[trainColOutVals==classIDs[i]].shape[0]))
+    
+    rat.writeColumn(ratDataset, outTrainCol, trainColOutVals)
+    
+    ratDataset = None
+
