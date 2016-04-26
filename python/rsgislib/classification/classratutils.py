@@ -247,6 +247,228 @@ Example::
 
 
 
+def _extractTrainDataFromRAT(info, inputs, outputs, otherargs):
+    """
+    This function is used internally within classifyWithinRATTiled using the RIOS ratapplier function
+    """
+    progress = round((info.startrow / info.rowCount)*100)
+    print("{} %".format(progress), end="\r")
+    
+    numpyVars = []
+    for var in otherargs.vars:
+        varVals = getattr(inputs.inrat, var)
+        numpyVars.append(varVals)
+    
+    xData = numpy.array(numpyVars)
+    xData = xData.transpose()
+    
+    classIntVals = getattr(inputs.inrat, otherargs.classIntCol)
+    trainingData = xData[classIntVals > 0]
+    
+    otherargs.trainData[otherargs.trainDataOff:otherargs.trainDataOff+trainingData.shape[0]] = trainingData
+    otherargs.trainDataOff += trainingData.shape[0]
+
+def _applyClassifier(info, inputs, outputs, otherargs):
+    """
+    This function is used internally within classifyWithinRATTiled using the RIOS ratapplier function
+    """
+    progress = round((info.startrow / info.rowCount)*100)
+    print("{} %".format(progress), end="\r")    
+    numpyVars = []
+    for var in otherargs.vars:
+        varVals = getattr(inputs.inrat, var)
+        numpyVars.append(varVals)
+    
+    xData = numpy.array(numpyVars)
+    xData = xData.transpose()
+    
+    ID = numpy.arange(xData.shape[0])
+    outClassIntVals = numpy.zeros(xData.shape[0], dtype=numpy.int16)
+    outClassNamesVals = numpy.empty(xData.shape[0], dtype=numpy.dtype('a255'))
+    outClassNamesVals[...] = ''
+    
+    ID = ID[numpy.isfinite(xData).all(axis=1)]
+    vData = xData[numpy.isfinite(xData).all(axis=1)]
+        
+    if not otherargs.roiCol is None:
+        roi = getattr(inputs.inrat, otherargs.roiCol)
+        roi = roi[numpy.isfinite(xData).all(axis=1)]
+        vData = vData[roi == otherargs.roiVal]
+        ID = ID[roi == otherargs.roiVal]
+        #print("ROI Subsetted data size: {} x {}".format(vData.shape[0], vData.shape[1]))
+        
+    predClass = classifier.predict(vData)
+    
+    outClassIntVals[ID] = predClass
+    setattr(outputs.outrat, otherargs.outColInt, outClassIntVals)
+    
+    for className in otherargs.classNameIDs:
+        classID = otherargs.classNameIDs[className]
+        outClassNamesVals[outClassIntVals==classID] = className
+    setattr(outputs.outrat, otherargs.outColStr, outClassNamesVals)
+    
+    if not otherargs.classColours is None:
+        red = getattr(inputs.inrat, "Red")
+        green = getattr(inputs.inrat, "Green")
+        blue = getattr(inputs.inrat, "Blue")
+        
+        # Set Background to black
+        red[...] = 0
+        green[...] = 0
+        blue[...] = 0
+        
+        # Set colours
+        for className in otherargs.classNameIDs:
+            #print("Colouring class " + className)
+            classID = otherargs.classNameIDs[className]
+            colours = otherargs.classColours[className]
+            
+            red   = numpy.where(outClassIntVals == classID, colours[0], red)
+            green = numpy.where(outClassIntVals == classID, colours[1], green)
+            blue  = numpy.where(outClassIntVals == classID, colours[2], blue)
+    
+        setattr(outputs.outrat, "Red", red)
+        setattr(outputs.outrat, "Green", green)
+        setattr(outputs.outrat, "Blue", blue)
+    
+    
+
+def classifyWithinRATTiled(clumpsImg, classesIntCol, classesNameCol, variables, classifier=RandomForestClassifier(n_estimators=100, max_features=3, oob_score=True, n_jobs=-1), outColInt="OutClass", outColStr="OutClassName", roiCol=None, roiVal=1, classColours=None, scaleVarsRange=False):
+    """
+A function which will perform a classification within the RAT using a classifier from scikit-learn using the rios ratapplier interface allowing very large RATs to be processed. 
+
+* clumpsImg is the clumps image on which the classification is to be performed
+* classesIntCol is the column with the training data as int values
+* classesNameCol is the column with the training data as string class names
+* variables is an array of column names which are to be used for the classification
+* classifier is an instance of a scikit-learn classifier (e.g., RandomForests which is Default)
+* outColInt is the output column name for the int class representation (Default: 'OutClass')
+* outColStr is the output column name for the class names column (Default: 'OutClassName')
+* roiCol is a column name for a column which specifies the region to be classified. If None ignored (Default: None)
+* roiVal is a int value used within the roiCol to select a region to be classified (Default: 1)
+* classColours is a python dict using the class name as the key along with arrays of length 3 specifying the RGB colours for the class.
+* scaleVarsRange will rescale each variable independently to a range of 0-1 (default: False).
+
+
+Example::
+
+    from sklearn.ensemble import ExtraTreesClassifier
+    from rsgislib.classification import classratutils
+    
+    classifier = ExtraTreesClassifier(n_estimators=100, max_features=3, n_jobs=-1, verbose=0)
+    
+    classColours = dict()
+    classColours['Forest'] = [0,138,0]
+    classColours['NonForest'] = [200,200,200]
+    
+    variables = ['GreenAvg', 'RedAvg', 'NIR1Avg', 'NIR2Avg', 'NDVI']
+    classifyWithinRATTiled(clumpsImg, classesIntCol, classesNameCol, variables, classifier=classifier, classColours=classColours)
+        
+    # With using range scaling.
+    classifyWithinRATTiled(clumpsImg, classesIntCol, classesNameCol, variables, classifier=classifier, classColours=classColours, scaleVarsRange=True)
+
+"""
+    # Check gdal is available
+    if not haveGDALPy:
+        raise Exception("The GDAL python bindings required for this function could not be imported\n\t" + gdalErr)
+    # Check numpy is available
+    if not haveNumpy:
+        raise Exception("The numpy module is required for this function could not be imported\n\t" + numErr)
+    # Check rios rat is available
+    if not haveRIOSRat:
+        raise Exception("The RIOS rat tools are required for this function could not be imported\n\t" + riosRatErr)
+    # Check scikit-learn RF is available
+    if not haveSKLearnRF:
+        raise Exception("The scikit-learn random forests tools are required for this function could not be imported\n\t" + sklearnRFErr)
+    # Check scikit-learn pre-processing is available
+    if not haveSKLearnPreProcess:
+        raise Exception("The scikit-learn pre-processing tools are required for this function could not be imported\n\t" + sklearnPreProcessErr)
+        
+    ratDataset = gdal.Open(clumpsImg, gdal.GA_Update)
+    
+    # Read in training classes
+    classesInt = rat.readColumn(ratDataset, classesIntCol)
+    classesStr = rat.readColumn(ratDataset, classesNameCol)
+    ratDataset = None
+    
+    validClassStr = classesStr[classesInt > 0]
+    validClassInt = classesInt[classesInt > 0]
+    
+    #print(validClassInt.shape)
+    classNames = numpy.unique(validClassStr)
+    classes = numpy.zeros_like(classNames, dtype=numpy.int16)
+    
+    i = 0
+    classNameIDs = dict()
+    for className in classNames:
+        classNameStr = str(className.decode())
+        if not classNameStr is '':
+            #print(validClassInt[validClassStr == className])
+            classes[i] = validClassInt[validClassStr == className][0]
+            classNameIDs[classNameStr] = classes[i]
+            #print("Class \'" + classNameStr + "\' has numerical " + str(classes[i]))  
+            i = i + 1    
+    
+    trainLen = validClassInt.shape[0]
+    numVars = len(variables)
+    
+    #print("Create numpy {} x {} array for training".format(trainLen, numVars))
+    
+    trainData = numpy.zeros((trainLen, numVars), numpy.float64)    
+    
+    in_rats = ratapplier.RatAssociations()
+    out_rats = ratapplier.RatAssociations()
+    in_rats.inrat = ratapplier.RatHandle(clumpsImg)
+
+    otherargs = ratapplier.OtherArguments()
+    otherargs.vars = variables
+    otherargs.classIntCol = classesIntCol
+    otherargs.trainData = trainData
+    otherargs.trainDataOff = 0
+    
+    print("Extract Training Data")
+    ratapplier.apply(_extractTrainDataFromRAT, in_rats, out_rats, otherargs=otherargs, controls=None)
+    print("100%")
+    
+    
+    validClassInt = validClassInt[numpy.isfinite(trainData).all(axis=1)]
+    validClassInt = validClassInt[numpy.isfinite(trainData).all(axis=1)]
+    trainData = trainData[numpy.isfinite(trainData).all(axis=1)]
+    
+    print("Training data size: {} x {}".format(trainData.shape[0], trainData.shape[1]))
+    
+    print('Training Classifier')
+    classifier.fit(trainData, validClassInt)
+    print("Completed")
+    
+    print('Calc Classifier Accuracy')
+    accVal = classifier.score(trainData, validClassInt)
+    print('Classifier Score = {}'.format(round(accVal*100, 2)))
+    
+    
+    print("Apply Classifier")
+    in_rats = ratapplier.RatAssociations()
+    out_rats = ratapplier.RatAssociations()
+    in_rats.inrat = ratapplier.RatHandle(clumpsImg)
+    out_rats.outrat = ratapplier.RatHandle(clumpsImg)
+    
+    otherargs = ratapplier.OtherArguments()
+    otherargs.vars = variables
+    otherargs.classifier = classifier
+    otherargs.outColInt = outColInt
+    otherargs.outColStr = outColStr
+    otherargs.roiCol = roiCol
+    otherargs.roiVal = roiVal
+    otherargs.classColours = classColours
+    otherargs.classNameIDs = classNameIDs
+    
+    
+    ratapplier.apply(_applyClassifier, in_rats, out_rats, otherargs=otherargs, controls=None)
+    print("100%")
+
+
+
+
 
 def clusterWithinRAT(clumpsImg, variables, clusterer=MiniBatchKMeans(n_clusters=8, init='k-means++', max_iter=100, batch_size=100), outColInt="OutCluster", roiCol=None, roiVal=1, clrClusters=True, clrSeed=10, addConnectivity=False, preProcessor=None):
     """
