@@ -40,8 +40,13 @@
 
 import sys
 import math
+import os
 import os.path
 import shutil
+import glob
+from multiprocessing import Pool
+import multiprocessing
+
 from enum import Enum
 import rsgislib
 from rsgislib import rastergis
@@ -1374,5 +1379,122 @@ Example::
 
 
 
+def _computeProximityArrArgsFunc(argVals):
+    """
+    This function is used internally within calcDist2Classes for the multiprocessing Pool
+    """
+    classImgDS = gdal.Open(argVals[0], gdal.GA_ReadOnly)
+    classImgBand = classImgDS.GetRasterBand(1)
+    imageutils.createCopyImage(argVals[0], argVals[1], 1, argVals[3], argVals[4], rsgislib.TYPE_32FLOAT)
+    distImgDS = gdal.Open(argVals[1], gdal.GA_Update)
+    distImgBand = distImgDS.GetRasterBand(1)
+    gdal.ComputeProximity(classImgBand, distImgBand, argVals[2], callback=gdal.TermProgress)
+    distImgBand = None
+    distImgDS = None
+    classImgBand = None
+    classImgDS = None
 
+
+
+def calcDist2Classes(clumpsImg, classCol, outImgBase, tmpDIR='./tmp', tileSize=2000, maxDist=1000, nCores=-1):
+    """
+    A function which will calculate proximity rasters for a set of classes defined within the RAT.
+    
+    * clumpsImg is a string specifying the input image with the associated RAT
+    * classCol is the column in the RAT which has the classification
+    * outImgBase is the base name of the output image - output files will be KEA files.
+    * tmpDIR is a directory to be used for storing the image tiles and other temporary files - if not directory does not exist it will be created and deleted on completion (Default: ./tmp).
+    * tileSize is an int specifying in pixels the size of the image tiles used for processing (Default: 2000)
+    * maxDist is the maximum distance in units of the geographic units of the projection of the input image (Default: 1000).
+    * nCores is the number of processing cores which are available to be used for this processing. If -1 all available cores will be used. (Default: -1)
+    """
+    tmpPresent = True
+    if not os.path.exists(tmpDIR):
+        print("WARNING: \'" + tmpDIR + "\' directory does not exist so creating it...")
+        os.makedirs(tmpDIR)
+        tmpPresent = False
+    
+    if nCores <= 0:
+        nCores = multiprocessing.cpu_count()
+    
+    rsgisUtils = rsgislib.RSGISPyUtils()
+    uid = rsgisUtils.uidGenerator()
+        
+    classesImg = os.path.join(tmpDIR, 'ClassImg_'+uid+'.kea')
+    rastergis.exportCol2GDALImage(clumpsImg, classesImg, 'KEA', rsgislib.TYPE_32UINT, classCol)
+    
+    ratDataset = gdal.Open(clumpsImg, gdal.GA_ReadOnly)
+    classColInt = rat.readColumn(ratDataset, classCol)
+    ratDataset = None
+
+    classIDs = numpy.unique(classColInt)
+    
+    xRes, yRes = rsgisUtils.getImageRes(classesImg)
+    
+    #print("Image Res {} x {}".format(xRes, yRes))
+    
+    xMaxDistPxl = math.ceil(maxDist/xRes)
+    yMaxDistPxl = math.ceil(maxDist/yRes)
+    
+    print("Max Dist Pxls X = {}, Y = {}".format(xMaxDistPxl, yMaxDistPxl))
+    
+    tileOverlap = xMaxDistPxl
+    if yMaxDistPxl > xMaxDistPxl:
+        tileOverlap = yMaxDistPxl
+    
+    classTilesDIR = os.path.join(tmpDIR, 'ClassTiles_'+uid)
+    classTilesDIRPresent = True
+    if not os.path.exists(classTilesDIR):
+        os.makedirs(classTilesDIR)
+        classTilesDIRPresent = False
+    
+    classesImgTileBase = os.path.join(classTilesDIR, 'ClassImgTile')
+    imageutils.createTiles(classesImg, classesImgTileBase, tileSize, tileSize, tileOverlap, 0, 'KEA', rsgislib.TYPE_32UINT, 'kea')
+    imgTileFiles = glob.glob(classesImgTileBase+'*.kea')
+    
+    distTilesDIR = os.path.join(tmpDIR, 'DistTiles_'+uid)
+    distTilesDIRPresent = True
+    if not os.path.exists(distTilesDIR):
+        os.makedirs(distTilesDIR)
+        distTilesDIRPresent = False
+    
+    proxOptionsBase = ['MAXDIST='+str(maxDist), 'DISTUNITS=GEO', 'NODATA=999999']
+    
+    for classID in classIDs:
+        print("Class {}".format(classID))
+        proxOptions = list(proxOptionsBase)
+        proxOptions.append('VALUES='+str(classID))
+
+        distTiles = []
+        distTileArgs = []
+        for classTileFile in imgTileFiles:
+            baseTileName = os.path.basename(classTileFile)
+            distTileFile = os.path.join(distTilesDIR, baseTileName)
+            tileArgs = [classTileFile, distTileFile, proxOptions, 999999, 'KEA']
+            distTiles.append(distTileFile)
+            distTileArgs.append(tileArgs)
+        
+        with Pool(nCores) as p:
+            p.map(_computeProximityArrArgsFunc, distTileArgs)
+                
+        distImage = outImgBase + '_' + str(classID) + '.kea'
+        # Mosaic Tiles
+        imageutils.createImageMosaic(distTiles, distImage, 999999, 999999, 1, 1, 'KEA', rsgislib.TYPE_32FLOAT)
+        imageutils.popImageStats(distImage, usenodataval=True, nodataval=999999, calcpyramids=True)
+        for imgFile in distTiles:
+            rsgisUtils.deleteFileWithBasename(imgFile)
+    
+    if not classTilesDIRPresent:
+        shutil.rmtree(classTilesDIR, ignore_errors=True)
+    else:
+        for classTileFile in imgTileFiles:
+            rsgisUtils.deleteFileWithBasename(classTileFile)
+    
+    if not distTilesDIRPresent:
+        shutil.rmtree(distTilesDIR, ignore_errors=True)
+    
+    if not tmpPresent:
+        shutil.rmtree(tmpDIR, ignore_errors=True)
+    else:
+        os.remove(classesImg)
 
