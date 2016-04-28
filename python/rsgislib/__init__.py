@@ -306,7 +306,40 @@ class RSGISPyUtils (object):
             return TYPE_64FLOAT
         else:
             raise RSGISPyException("The data type '" + str(gdaltype) + "' is unknown / not supported.")
-            
+    
+    def getImageRes(self, inImg):
+        """
+        A function to retrieve the image resolution.
+        return xRes, yRes
+        """
+        import osgeo.gdal as gdal
+        rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
+        if rasterDS == None:
+            raise RSGISPyException('Could not open raster image: ' + inImg)
+        
+        geotransform = rasterDS.GetGeoTransform()
+        xRes = geotransform[1]
+        yRes = geotransform[5]
+        if yRes < 0:
+            yRes = yRes * -1
+        raster = None
+        return xRes, yRes
+    
+    def getImageSize(self, inImg):
+        """
+        A function to retrieve the image size in pixels.
+        return xSize, ySize
+        """
+        import osgeo.gdal as gdal
+        rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
+        if rasterDS == None:
+            raise RSGISPyException('Could not open raster image: ' + inImg)
+        
+        xSize = rasterDS.RasterXSize
+        ySize = rasterDS.RasterYSize
+        raster = None
+        return xSize, ySize
+        
     def uidGenerator(self, size=6):
         """
         A function which will generate a 'random' string of the specified length based on the UUID
@@ -315,6 +348,10 @@ class RSGISPyUtils (object):
         randomStr = str(uuid.uuid4())
         randomStr = randomStr.replace("-","")
         return randomStr[0:size]
+        
+    def numProcessCores(self):
+        import multiprocessing
+        return multiprocessing.cpu_count()
         
     def readTextFileNoNewLines(self, file):
         """

@@ -83,7 +83,7 @@ except ImportError as sklearnMBKMErr:
     raise Exception("The scikit-learn Mini Batch KMeans tools are required for this module could not be imported\n\t" + sklearnMBKMErr)
     
 
-def classifyWithinRAT(clumpsImg, classesIntCol, classesNameCol, variables, classifier=RandomForestClassifier(n_estimators=100, max_features=3, oob_score=True, n_jobs=-1), outColInt="OutClass", outColStr="OutClassName", roiCol=None, roiVal=1, classColours=None, preProcessor=None):
+def classifyWithinRAT(clumpsImg, classesIntCol, classesNameCol, variables, classifier=RandomForestClassifier(n_estimators=100, max_features=3, oob_score=True, n_jobs=-1), outColInt="OutClass", outColStr="OutClassName", roiCol=None, roiVal=1, classColours=None, preProcessor=None, justFit=False):
     """
 A function which will perform a classification within the RAT using a classifier from scikit-learn
 
@@ -98,6 +98,7 @@ A function which will perform a classification within the RAT using a classifier
 * roiVal is a int value used within the roiCol to select a region to be classified (Default: 1)
 * classColours is a python dict using the class name as the key along with arrays of length 3 specifying the RGB colours for the class.
 * preProcessor is a scikit-learn processors such as sklearn.preprocessing.MaxAbsScaler() which can rescale the input variables independently as read in (Define: None; i.e., not in use).
+* justFit is a boolean specifying that the classifier should just be fitted to the data and not applied (Default: False; i.e., apply classification)
 
 
 Example::
@@ -180,68 +181,69 @@ Example::
     print('Training Classifier')
     classifier.fit(trainingData, classesInt)
     
-    print('Calc Accuracy',)
+    print('Calc Classifier Accuracy')
     accVal = classifier.score(trainingData, classesInt)
-    print(' = ', accVal)
+    print('Classifier Score = {}'.format(round(accVal*100, 2)))
     
-    if not roi is None:
-        xData = xData[roi == roiVal]
-        ID = ID[roi == roiVal]
-        print("ROI Subsetted data size: {} x {}".format(xData.shape[0], xData.shape[1]))
-    
-    predClass = classifier.predict(xData)
-    
-    outLabels[ID] = predClass
-    
-    print("Writing Columns")
-    rat.writeColumn(ratDataset, outColInt, outLabels)
-    
-    print("Create and Write Output Class Names")
-    classNames = numpy.unique(classesStr)
-    classes = numpy.zeros_like(classNames, dtype=numpy.int16)
-    
-  
-    i = 0
-    classNameIDs = dict()
-    for className in classNames:
-        classNameStr = str(className.decode())
-        if not classNameStr is '':
-            classes[i] = classesInt[classesStr == className][0]
-            classNameIDs[classNameStr] = classes[i]
-            print("Class \'" + classNameStr + "\' has numerical " + str(classes[i]))  
-            i = i + 1
-    
-    outClassNames[...] = ''
-    for className in classNameIDs:
-        classID = classNameIDs[className]
-        outClassNames[outLabels==classID] = className
-    
-    rat.writeColumn(ratDataset, outColStr, outClassNames)
-    
-    if not classColours is None:
-        print("Set Colours")
-        red = rat.readColumn(ratDataset, "Red")
-        green = rat.readColumn(ratDataset, "Green")
-        blue = rat.readColumn(ratDataset, "Blue")
+    if not justFit:
+        if not roi is None:
+            xData = xData[roi == roiVal]
+            ID = ID[roi == roiVal]
+            print("ROI Subsetted data size: {} x {}".format(xData.shape[0], xData.shape[1]))
         
-        # Set Background to black
-        red[...] = 0
-        green[...] = 0
-        blue[...] = 0
+        predClass = classifier.predict(xData)
         
-        # Set colours
+        outLabels[ID] = predClass
+        
+        print("Writing Columns")
+        rat.writeColumn(ratDataset, outColInt, outLabels)
+        
+        print("Create and Write Output Class Names")
+        classNames = numpy.unique(classesStr)
+        classes = numpy.zeros_like(classNames, dtype=numpy.int16)
+        
+      
+        i = 0
+        classNameIDs = dict()
+        for className in classNames:
+            classNameStr = str(className.decode())
+            if not classNameStr is '':
+                classes[i] = classesInt[classesStr == className][0]
+                classNameIDs[classNameStr] = classes[i]
+                print("Class \'" + classNameStr + "\' has numerical " + str(classes[i]))  
+                i = i + 1
+        
+        outClassNames[...] = ''
         for className in classNameIDs:
-            print("Colouring class " + className)
             classID = classNameIDs[className]
-            colours = classColours[className]
+            outClassNames[outLabels==classID] = className
+        
+        rat.writeColumn(ratDataset, outColStr, outClassNames)
+        
+        if not classColours is None:
+            print("Set Colours")
+            red = rat.readColumn(ratDataset, "Red")
+            green = rat.readColumn(ratDataset, "Green")
+            blue = rat.readColumn(ratDataset, "Blue")
             
-            red   = numpy.where(outLabels == classID, colours[0], red)
-            green = numpy.where(outLabels == classID, colours[1], green)
-            blue  = numpy.where(outLabels == classID, colours[2], blue)
-    
-        rat.writeColumn(ratDataset, "Red", red)
-        rat.writeColumn(ratDataset, "Green", green)
-        rat.writeColumn(ratDataset, "Blue", blue)
+            # Set Background to black
+            red[...] = 0
+            green[...] = 0
+            blue[...] = 0
+            
+            # Set colours
+            for className in classNameIDs:
+                print("Colouring class " + className)
+                classID = classNameIDs[className]
+                colours = classColours[className]
+                
+                red   = numpy.where(outLabels == classID, colours[0], red)
+                green = numpy.where(outLabels == classID, colours[1], green)
+                blue  = numpy.where(outLabels == classID, colours[2], blue)
+        
+            rat.writeColumn(ratDataset, "Red", red)
+            rat.writeColumn(ratDataset, "Green", green)
+            rat.writeColumn(ratDataset, "Blue", blue)
     
     ratDataset = None
 
@@ -333,7 +335,7 @@ def _applyClassifier(info, inputs, outputs, otherargs):
     
     
 
-def classifyWithinRATTiled(clumpsImg, classesIntCol, classesNameCol, variables, classifier=RandomForestClassifier(n_estimators=100, max_features=3, oob_score=True, n_jobs=-1), outColInt="OutClass", outColStr="OutClassName", roiCol=None, roiVal=1, classColours=None, scaleVarsRange=False):
+def classifyWithinRATTiled(clumpsImg, classesIntCol, classesNameCol, variables, classifier=RandomForestClassifier(n_estimators=100, max_features=3, oob_score=True, n_jobs=-1), outColInt="OutClass", outColStr="OutClassName", roiCol=None, roiVal=1, classColours=None, scaleVarsRange=False, justFit=False):
     """
 A function which will perform a classification within the RAT using a classifier from scikit-learn using the rios ratapplier interface allowing very large RATs to be processed. 
 
@@ -348,6 +350,7 @@ A function which will perform a classification within the RAT using a classifier
 * roiVal is a int value used within the roiCol to select a region to be classified (Default: 1)
 * classColours is a python dict using the class name as the key along with arrays of length 3 specifying the RGB colours for the class.
 * scaleVarsRange will rescale each variable independently to a range of 0-1 (default: False).
+* justFit is a boolean specifying that the classifier should just be fitted to the data and not applied (Default: False; i.e., apply classification)
 
 
 Example::
@@ -445,26 +448,26 @@ Example::
     accVal = classifier.score(trainData, validClassInt)
     print('Classifier Score = {}'.format(round(accVal*100, 2)))
     
-    
-    print("Apply Classifier")
-    in_rats = ratapplier.RatAssociations()
-    out_rats = ratapplier.RatAssociations()
-    in_rats.inrat = ratapplier.RatHandle(clumpsImg)
-    out_rats.outrat = ratapplier.RatHandle(clumpsImg)
-    
-    otherargs = ratapplier.OtherArguments()
-    otherargs.vars = variables
-    otherargs.classifier = classifier
-    otherargs.outColInt = outColInt
-    otherargs.outColStr = outColStr
-    otherargs.roiCol = roiCol
-    otherargs.roiVal = roiVal
-    otherargs.classColours = classColours
-    otherargs.classNameIDs = classNameIDs
-    
-    
-    ratapplier.apply(_applyClassifier, in_rats, out_rats, otherargs=otherargs, controls=None)
-    print("100%")
+    if not justFit:
+        print("Apply Classifier")
+        in_rats = ratapplier.RatAssociations()
+        out_rats = ratapplier.RatAssociations()
+        in_rats.inrat = ratapplier.RatHandle(clumpsImg)
+        out_rats.outrat = ratapplier.RatHandle(clumpsImg)
+        
+        otherargs = ratapplier.OtherArguments()
+        otherargs.vars = variables
+        otherargs.classifier = classifier
+        otherargs.outColInt = outColInt
+        otherargs.outColStr = outColStr
+        otherargs.roiCol = roiCol
+        otherargs.roiVal = roiVal
+        otherargs.classColours = classColours
+        otherargs.classNameIDs = classNameIDs
+        
+        
+        ratapplier.apply(_applyClassifier, in_rats, out_rats, otherargs=otherargs, controls=None)
+        print("100%")
 
 
 

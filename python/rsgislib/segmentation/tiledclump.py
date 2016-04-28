@@ -103,7 +103,7 @@ def clumpImgFunc(imgs):
     """
     segmentation.clump(imgs[0], imgs[1], 'KEA', True, 0, True)
     
-def performClumpingMultiProcess(inputImage, clumpsImage, tmpDIR='tmp', width=2000, height=2000, imgFormat='KEA', nCores=2):
+def performClumpingMultiProcess(inputImage, clumpsImage, tmpDIR='tmp', width=2000, height=2000, imgFormat='KEA', nCores=-1):
     """
     Clump the input image using a tiled processing chain allowing large images to be clumped more quickly.
 
@@ -120,6 +120,9 @@ def performClumpingMultiProcess(inputImage, clumpsImage, tmpDIR='tmp', width=200
     if not os.path.exists(tmpDIR):
         os.makedirs(tmpDIR)
         createdTmp = True
+    
+    if nCores <= 0:
+        nCores = multiprocessing.cpu_count()
     
     rsgisUtils = rsgislib.RSGISPyUtils()
     uidStr = rsgisUtils.uidGenerator()
@@ -223,7 +226,7 @@ def unionClumpImgFunc(imgs):
     """
     segmentation.unionOfClumps(imgs[2], 'KEA', [imgs[0], imgs[1]], 0, True)
     
-def performUnionClumpingMultiProcess(inputImage, refImg, clumpsImage, tmpDIR='tmp', width=2000, height=2000, imgFormat='KEA', nCores=2):
+def performUnionClumpingMultiProcess(inputImage, refImg, clumpsImage, tmpDIR='tmp', width=2000, height=2000, imgFormat='KEA', nCores=-1):
     """
     Clump and union with the reference image the input image using a tiled processing chain allowing large images to be clumped more quickly.
 
@@ -241,6 +244,9 @@ def performUnionClumpingMultiProcess(inputImage, refImg, clumpsImage, tmpDIR='tm
     if not os.path.exists(tmpDIR):
         os.makedirs(tmpDIR)
         createdTmp = True
+    
+    if nCores <= 0:
+        nCores = multiprocessing.cpu_count()
     
     rsgisUtils = rsgislib.RSGISPyUtils()
     uidStr = rsgisUtils.uidGenerator()
