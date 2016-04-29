@@ -12,7 +12,7 @@ Utilities
 .. autofunction:: rsgislib.rastergis.collapseRAT
 .. autofunction:: rsgislib.rastergis.ratutils.createClumpsSHPBBOX
 .. autofunction:: rsgislib.rastergis.populateStats
-
+.. autofunction:: rsgislib.rastergis.ratutils.calcDist2Classes
 
 Attribute Segments
 -------------------
