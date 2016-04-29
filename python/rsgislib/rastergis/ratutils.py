@@ -1396,7 +1396,7 @@ def _computeProximityArrArgsFunc(argVals):
 
 
 
-def calcDist2Classes(clumpsImg, classCol, outImgBase, tmpDIR='./tmp', tileSize=2000, maxDist=1000, nCores=-1):
+def calcDist2Classes(clumpsImg, classCol, outImgBase, tmpDIR='./tmp', tileSize=2000, maxDist=1000, nodata=1000, nCores=-1):
     """
     A function which will calculate proximity rasters for a set of classes defined within the RAT.
     
@@ -1406,6 +1406,7 @@ def calcDist2Classes(clumpsImg, classCol, outImgBase, tmpDIR='./tmp', tileSize=2
     * tmpDIR is a directory to be used for storing the image tiles and other temporary files - if not directory does not exist it will be created and deleted on completion (Default: ./tmp).
     * tileSize is an int specifying in pixels the size of the image tiles used for processing (Default: 2000)
     * maxDist is the maximum distance in units of the geographic units of the projection of the input image (Default: 1000).
+    * nodata is the value applied to the pixels outside of the maxDist threshold (Default: 1000; i.e., the same as maxDist).
     * nCores is the number of processing cores which are available to be used for this processing. If -1 all available cores will be used. (Default: -1)
     """
     tmpPresent = True
@@ -1458,7 +1459,7 @@ def calcDist2Classes(clumpsImg, classCol, outImgBase, tmpDIR='./tmp', tileSize=2
         os.makedirs(distTilesDIR)
         distTilesDIRPresent = False
     
-    proxOptionsBase = ['MAXDIST='+str(maxDist), 'DISTUNITS=GEO', 'NODATA=999999']
+    proxOptionsBase = ['MAXDIST='+str(maxDist), 'DISTUNITS=GEO', 'NODATA='+str(nodata)]
     
     for classID in classIDs:
         print("Class {}".format(classID))
@@ -1470,7 +1471,7 @@ def calcDist2Classes(clumpsImg, classCol, outImgBase, tmpDIR='./tmp', tileSize=2
         for classTileFile in imgTileFiles:
             baseTileName = os.path.basename(classTileFile)
             distTileFile = os.path.join(distTilesDIR, baseTileName)
-            tileArgs = [classTileFile, distTileFile, proxOptions, 999999, 'KEA']
+            tileArgs = [classTileFile, distTileFile, proxOptions, nodata, 'KEA']
             distTiles.append(distTileFile)
             distTileArgs.append(tileArgs)
         
@@ -1479,8 +1480,8 @@ def calcDist2Classes(clumpsImg, classCol, outImgBase, tmpDIR='./tmp', tileSize=2
                 
         distImage = outImgBase + '_' + str(classID) + '.kea'
         # Mosaic Tiles
-        imageutils.createImageMosaic(distTiles, distImage, 999999, 999999, 1, 1, 'KEA', rsgislib.TYPE_32FLOAT)
-        imageutils.popImageStats(distImage, usenodataval=True, nodataval=999999, calcpyramids=True)
+        imageutils.createImageMosaic(distTiles, distImage, nodata, nodata, 1, 1, 'KEA', rsgislib.TYPE_32FLOAT)
+        imageutils.popImageStats(distImage, usenodataval=True, nodataval=nodata, calcpyramids=True)
         for imgFile in distTiles:
             rsgisUtils.deleteFileWithBasename(imgFile)
     
