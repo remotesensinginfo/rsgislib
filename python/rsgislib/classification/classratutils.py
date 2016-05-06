@@ -435,7 +435,7 @@ Example::
     
     
     validClassInt = validClassInt[numpy.isfinite(trainData).all(axis=1)]
-    validClassInt = validClassInt[numpy.isfinite(trainData).all(axis=1)]
+    validClassStr = validClassStr[numpy.isfinite(trainData).all(axis=1)]
     trainData = trainData[numpy.isfinite(trainData).all(axis=1)]
     
     print("Training data size: {} x {}".format(trainData.shape[0], trainData.shape[1]))
