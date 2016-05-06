@@ -299,7 +299,7 @@ def _applyClassifier(info, inputs, outputs, otherargs):
         ID = ID[roi == otherargs.roiVal]
         #print("ROI Subsetted data size: {} x {}".format(vData.shape[0], vData.shape[1]))
         
-    predClass = classifier.predict(vData)
+    predClass = otherargs.classifier.predict(vData)
     
     outClassIntVals[ID] = predClass
     setattr(outputs.outrat, otherargs.outColInt, outClassIntVals)
