@@ -42,7 +42,6 @@
 #include "img/RSGISAddBands.h"
 #include "img/RSGISExtractImageValues.h"
 #include "img/RSGISImageComposite.h"
-#include "img/RSGISMaskImage.h"
 #include "img/RSGISAddBands.h"
 
 #include "vec/RSGISImageTileVector.h"
