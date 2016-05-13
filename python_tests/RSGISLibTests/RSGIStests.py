@@ -638,6 +638,16 @@ class RSGISTests:
         bandNames = ['446nm','530nm','549nm','569nm','598nm','633nm','680nm','696nm','714nm','732nm','741nm','752nm','800nm','838nm']
         imageutils.setBandNames(inputImage, bandNames)
 
+    def testGetRSGISLibDataType(self):
+        print("PYTHON TEST: getRSGISLibDataType")
+        inputImage = './Rasters/injune_p142_casi_sub_utm.kea'
+        imageutils.getRSGISLibDataType(inputImage)
+
+    def testGetGDALDataType(self):
+        print("PYTHON TEST: getGDALDataType")
+        inputImage = './Rasters/injune_p142_casi_sub_utm.kea'
+        imageutils.getGDALDataType(inputImage)
+
      # Zonal Stats
 
     def testPointValue2SHP(self):
@@ -956,6 +966,8 @@ if __name__ == '__main__':
         t.tryFuncAndCatch(t.testCreateCopyImage)
         t.tryFuncAndCatch(t.testStretchImage)
         t.tryFuncAndCatch(t.testSetBandNames)
+        t.tryFuncAndCatch(t.testGetRSGISLibDataType)
+        t.tryFuncAndCatch(t.testGetGDALDataType)
         
     if args.all or args.rastergis:
     
