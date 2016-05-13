@@ -322,7 +322,7 @@ class RSGISPyUtils (object):
         yRes = geotransform[5]
         if yRes < 0:
             yRes = yRes * -1
-        raster = None
+        rasterDS = None
         return xRes, yRes
     
     def getImageSize(self, inImg):
@@ -337,8 +337,22 @@ class RSGISPyUtils (object):
         
         xSize = rasterDS.RasterXSize
         ySize = rasterDS.RasterYSize
-        raster = None
+        rasterDS = None
         return xSize, ySize
+    
+    def getImageBandCount(self, inImg):
+        """
+        A function to retrieve the number of image bands in an image file.
+        return nBands
+        """
+        import osgeo.gdal as gdal
+        rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
+        if rasterDS == None:
+            raise RSGISPyException('Could not open raster image: ' + inImg)
+        
+        nBands = rasterDS.RasterCount
+        rasterDS = None
+        return nBands
         
     def uidGenerator(self, size=6):
         """
