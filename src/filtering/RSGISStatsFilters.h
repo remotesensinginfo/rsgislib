@@ -143,6 +143,46 @@ namespace rsgis{namespace filter{
 			virtual void exportAsImage(std::string filename) throw(RSGISImageFilterException);
 			~RSGISKuwaharaFilter();
 		};
+    
+    class DllExport RSGISMeanDiffFilter : public RSGISImageFilter
+    {
+    public:
+        RSGISMeanDiffFilter(int numberOutBands, int size, std::string filenameEnding);
+        virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException);
+        virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException);
+        virtual void exportAsImage(std::string filename) throw(RSGISImageFilterException);
+        ~RSGISMeanDiffFilter();
+    };
+    
+    class DllExport RSGISMeanDiffAbsFilter : public RSGISImageFilter
+    {
+    public:
+        RSGISMeanDiffAbsFilter(int numberOutBands, int size, std::string filenameEnding);
+        virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException);
+        virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException);
+        virtual void exportAsImage(std::string filename) throw(RSGISImageFilterException);
+        ~RSGISMeanDiffAbsFilter();
+    };
+    
+    class DllExport RSGISTotalDiffFilter : public RSGISImageFilter
+    {
+    public:
+        RSGISTotalDiffFilter(int numberOutBands, int size, std::string filenameEnding);
+        virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException);
+        virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException);
+        virtual void exportAsImage(std::string filename) throw(RSGISImageFilterException);
+        ~RSGISTotalDiffFilter();
+    };
+    
+    class DllExport RSGISTotalDiffAbsFilter : public RSGISImageFilter
+    {
+    public:
+        RSGISTotalDiffAbsFilter(int numberOutBands, int size, std::string filenameEnding);
+        virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException);
+        virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException);
+        virtual void exportAsImage(std::string filename) throw(RSGISImageFilterException);
+        ~RSGISTotalDiffAbsFilter();
+    };
 }}
 
 #endif

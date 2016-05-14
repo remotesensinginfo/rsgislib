@@ -35,8 +35,8 @@ Example::
     import rsgislib
     from rsgislib import imagefilter
     inputImage = 'jers1palsar_stack.kea'
-    clumpsFile = 'jers1palsar_stack_median3.kea'
-    imagefilter.applyMedianFilter(inputImage, clumpsFile, 3, "KEA", rsgislib.TYPE_32FLOAT)
+    outImgFile = 'jers1palsar_stack_median3.kea'
+    imagefilter.applyMedianFilter(inputImage, outImgFile, 3, "KEA", rsgislib.TYPE_32FLOAT)
 
     """
     outputImageBase, outExt = os.path.splitext(outputImage)
@@ -61,8 +61,8 @@ Example::
     import rsgislib
     from rsgislib import imagefilter
     inputImage = 'jers1palsar_stack.kea'
-    clumpsFile = 'jers1palsar_stack_mean3.kea'
-    imagefilter.applyMeanFilter(inputImage, clumpsFile, 3, "KEA", rsgislib.TYPE_32FLOAT)
+    outImgFile = 'jers1palsar_stack_mean3.kea'
+    imagefilter.applyMeanFilter(inputImage, outImgFile, 3, "KEA", rsgislib.TYPE_32FLOAT)
 
     """
     outputImageBase, outExt = os.path.splitext(outputImage)
@@ -87,8 +87,8 @@ Example::
     import rsgislib
     from rsgislib import imagefilter
     inputImage = 'jers1palsar_stack.kea'
-    clumpsFile = 'jers1palsar_stack_min3.kea'
-    imagefilter.applyMinFilter(inputImage, clumpsFile, 3, "KEA", rsgislib.TYPE_32FLOAT)
+    outImgFile = 'jers1palsar_stack_min3.kea'
+    imagefilter.applyMinFilter(inputImage, outImgFile, 3, "KEA", rsgislib.TYPE_32FLOAT)
 
     """
     outputImageBase, outExt = os.path.splitext(outputImage)
@@ -114,8 +114,8 @@ Example::
     import rsgislib
     from rsgislib import imagefilter
     inputImage = 'jers1palsar_stack.kea'
-    clumpsFile = 'jers1palsar_stack_max3.kea'
-    imagefilter.applyMaxFilter(inputImage, clumpsFile, 3, "KEA", rsgislib.TYPE_32FLOAT)
+    outImgFile = 'jers1palsar_stack_max3.kea'
+    imagefilter.applyMaxFilter(inputImage, outImgFile, 3, "KEA", rsgislib.TYPE_32FLOAT)
 
     """
     outputImageBase, outExt = os.path.splitext(outputImage)
@@ -141,8 +141,8 @@ Example::
     import rsgislib
     from rsgislib import imagefilter
     inputImage = 'jers1palsar_stack.kea'
-    clumpsFile = 'jers1palsar_stack_mode3.kea'
-    imagefilter.applyModeFilter(inputImage, clumpsFile, 3, "KEA", rsgislib.TYPE_32FLOAT)
+    outImgFile = 'jers1palsar_stack_mode3.kea'
+    imagefilter.applyModeFilter(inputImage, outImgFile, 3, "KEA", rsgislib.TYPE_32FLOAT)
 
     """
     outputImageBase, outExt = os.path.splitext(outputImage)
@@ -168,8 +168,8 @@ Example::
     import rsgislib
     from rsgislib import imagefilter
     inputImage = 'jers1palsar_stack.kea'
-    clumpsFile = 'jers1palsar_stack_stdev3.kea'
-    imagefilter.applyStdDevFilter(inputImage, clumpsFile, 3, "KEA", rsgislib.TYPE_32FLOAT)
+    outImgFile = 'jers1palsar_stack_stdev3.kea'
+    imagefilter.applyStdDevFilter(inputImage, outImgFile, 3, "KEA", rsgislib.TYPE_32FLOAT)
 
     """
     outputImageBase, outExt = os.path.splitext(outputImage)
@@ -196,8 +196,8 @@ Example::
     import rsgislib
     from rsgislib import imagefilter
     inputImage = 'jers1palsar_stack.kea'
-    clumpsFile = 'jers1palsar_stack_range3.kea'
-    imagefilter.applyRangeFilter(inputImage, clumpsFile, 3, "KEA", rsgislib.TYPE_32FLOAT)
+    outImgFile = 'jers1palsar_stack_range3.kea'
+    imagefilter.applyRangeFilter(inputImage, outImgFile, 3, "KEA", rsgislib.TYPE_32FLOAT)
 
     """
     outputImageBase, outExt = os.path.splitext(outputImage)
@@ -205,6 +205,118 @@ Example::
     filters = []
     filters.append(FilterParameters(filterType = 'Range', fileEnding = '', size=filterSize) )
     applyfilters(inputimage, outputImageBase, filters, gdalformat, outExt, datatype)       
+
+
+def applyMeanDiffFilter(inputimage, outputImage, filterSize, gdalformat, datatype):
+    """ Apply a mean difference filter to the specified input image.
+
+Where:
+
+* inputImage - string specifying the input image to be filtered.
+* outputImage - string specifying the output image file..
+* filterSize - int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
+* gdalformat - string specifying the output image format (e.g., KEA).
+* datatype - Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
+
+Example::
+
+    import rsgislib
+    from rsgislib import imagefilter
+    inputImage = 'jers1palsar_stack.kea'
+    outImgFile = 'jers1palsar_stack_meandiff3.kea'
+    imagefilter.applyMeanDiffFilter(inputImage, outImgFile, 3, "KEA", rsgislib.TYPE_32FLOAT)
+
+    """
+    outputImageBase, outExt = os.path.splitext(outputImage)
+    outExt = outExt.replace(".", "").strip()
+    filters = []
+    filters.append(FilterParameters(filterType = 'MeanDiff', fileEnding = '', size=filterSize) )
+    applyfilters(inputimage, outputImageBase, filters, gdalformat, outExt, datatype)
+
+
+def applyMeanDiffAbsFilter(inputimage, outputImage, filterSize, gdalformat, datatype):
+    """ Apply a mean absolute difference filter to the specified input image.
+
+Where:
+
+* inputImage - string specifying the input image to be filtered.
+* outputImage - string specifying the output image file..
+* filterSize - int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
+* gdalformat - string specifying the output image format (e.g., KEA).
+* datatype - Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
+
+Example::
+
+    import rsgislib
+    from rsgislib import imagefilter
+    inputImage = 'jers1palsar_stack.kea'
+    outImgFile = 'jers1palsar_stack_meandiffabs3.kea'
+    imagefilter.applyMeanDiffAbsFilter(inputImage, outImgFile, 3, "KEA", rsgislib.TYPE_32FLOAT)
+
+    """
+    outputImageBase, outExt = os.path.splitext(outputImage)
+    outExt = outExt.replace(".", "").strip()
+    filters = []
+    filters.append(FilterParameters(filterType = 'MeanDiffAbs', fileEnding = '', size=filterSize) )
+    applyfilters(inputimage, outputImageBase, filters, gdalformat, outExt, datatype)
+
+
+
+
+def applyTotalDiffFilter(inputimage, outputImage, filterSize, gdalformat, datatype):
+    """ Apply a total (i.e., sum) difference filter to the specified input image.
+
+Where:
+
+* inputImage - string specifying the input image to be filtered.
+* outputImage - string specifying the output image file..
+* filterSize - int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
+* gdalformat - string specifying the output image format (e.g., KEA).
+* datatype - Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
+
+Example::
+
+    import rsgislib
+    from rsgislib import imagefilter
+    inputImage = 'jers1palsar_stack.kea'
+    outImgFile = 'jers1palsar_stack_totaldiff3.kea'
+    imagefilter.applyTotalDiffFilter(inputImage, outImgFile, 3, "KEA", rsgislib.TYPE_32FLOAT)
+
+    """
+    outputImageBase, outExt = os.path.splitext(outputImage)
+    outExt = outExt.replace(".", "").strip()
+    filters = []
+    filters.append(FilterParameters(filterType = 'TotalDiff', fileEnding = '', size=filterSize) )
+    applyfilters(inputimage, outputImageBase, filters, gdalformat, outExt, datatype)
+
+
+def applyTotalDiffAbsFilter(inputimage, outputImage, filterSize, gdalformat, datatype):
+    """ Apply a total absolute difference filter to the specified input image.
+
+Where:
+
+* inputImage - string specifying the input image to be filtered.
+* outputImage - string specifying the output image file..
+* filterSize - int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
+* gdalformat - string specifying the output image format (e.g., KEA).
+* datatype - Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
+
+Example::
+
+    import rsgislib
+    from rsgislib import imagefilter
+    inputImage = 'jers1palsar_stack.kea'
+    outImgFile = 'jers1palsar_stack_totaldiffabs3.kea'
+    imagefilter.applyTotalDiffAbsFilter(inputImage, outImgFile, 3, "KEA", rsgislib.TYPE_32FLOAT)
+
+    """
+    outputImageBase, outExt = os.path.splitext(outputImage)
+    outExt = outExt.replace(".", "").strip()
+    filters = []
+    filters.append(FilterParameters(filterType = 'TotalDiffAbs', fileEnding = '', size=filterSize) )
+    applyfilters(inputimage, outputImageBase, filters, gdalformat, outExt, datatype)
+
+
 
 
 def applyCoeffOfVarFilter(inputimage, outputImage, filterSize, gdalformat, datatype):
@@ -223,8 +335,8 @@ Example::
     import rsgislib
     from rsgislib import imagefilter
     inputImage = 'jers1palsar_stack.kea'
-    clumpsFile = 'jers1palsar_stack_cofvar3.kea'
-    imagefilter.applyCoeffOfVarFilter(inputImage, clumpsFile, 3, "KEA", rsgislib.TYPE_32FLOAT)
+    outImgFile = 'jers1palsar_stack_cofvar3.kea'
+    imagefilter.applyCoeffOfVarFilter(inputImage, outImgFile, 3, "KEA", rsgislib.TYPE_32FLOAT)
 
     """
     outputImageBase, outExt = os.path.splitext(outputImage)
@@ -250,8 +362,8 @@ Example::
     import rsgislib
     from rsgislib import imagefilter
     inputImage = 'jers1palsar_stack.kea'
-    clumpsFile = 'jers1palsar_stack_total3.kea'
-    imagefilter.applyTotalFilter(inputImage, clumpsFile, 3, "KEA", rsgislib.TYPE_32FLOAT)
+    outImgFile = 'jers1palsar_stack_total3.kea'
+    imagefilter.applyTotalFilter(inputImage, outImgFile, 3, "KEA", rsgislib.TYPE_32FLOAT)
 
     """
     outputImageBase, outExt = os.path.splitext(outputImage)
@@ -276,8 +388,8 @@ Example::
     import rsgislib
     from rsgislib import imagefilter
     inputImage = 'jers1palsar_stack.kea'
-    clumpsFile = 'jers1palsar_stack_NormVar3.kea'
-    imagefilter.applyNormVarFilter(inputImage, clumpsFile, 3, "KEA", rsgislib.TYPE_32FLOAT)
+    outImgFile = 'jers1palsar_stack_NormVar3.kea'
+    imagefilter.applyNormVarFilter(inputImage, outImgFile, 3, "KEA", rsgislib.TYPE_32FLOAT)
 
     """
     outputImageBase, outExt = os.path.splitext(outputImage)
@@ -303,8 +415,8 @@ Example::
     import rsgislib
     from rsgislib import imagefilter
     inputImage = 'jers1palsar_stack.kea'
-    clumpsFile = 'jers1palsar_stack_NormVarSqrt3.kea'
-    imagefilter.applyNormVarSqrtFilter(inputImage, clumpsFile, 3, "KEA", rsgislib.TYPE_32FLOAT)
+    outImgFile = 'jers1palsar_stack_NormVarSqrt3.kea'
+    imagefilter.applyNormVarSqrtFilter(inputImage, outImgFile, 3, "KEA", rsgislib.TYPE_32FLOAT)
 
     """
     outputImageBase, outExt = os.path.splitext(outputImage)
@@ -332,8 +444,8 @@ Example::
     import rsgislib
     from rsgislib import imagefilter
     inputImage = 'jers1palsar_stack.kea'
-    clumpsFile = 'jers1palsar_stack_NormVarLn3.kea'
-    imagefilter.applyNormVarLnFilter(inputImage, clumpsFile, 3, "KEA", rsgislib.TYPE_32FLOAT)
+    outImgFile = 'jers1palsar_stack_NormVarLn3.kea'
+    imagefilter.applyNormVarLnFilter(inputImage, outImgFile, 3, "KEA", rsgislib.TYPE_32FLOAT)
 
     """
     outputImageBase, outExt = os.path.splitext(outputImage)
@@ -360,8 +472,8 @@ Example::
     import rsgislib
     from rsgislib import imagefilter
     inputImage = 'jers1palsar_stack.kea'
-    clumpsFile = 'jers1palsar_stack_NormVarLn3.kea'
-    imagefilter.applyTextureVarFilter(inputImage, clumpsFile, 3, "KEA", rsgislib.TYPE_32FLOAT)
+    outImgFile = 'jers1palsar_stack_NormVarLn3.kea'
+    imagefilter.applyTextureVarFilter(inputImage, outImgFile, 3, "KEA", rsgislib.TYPE_32FLOAT)
 
     """
     outputImageBase, outExt = os.path.splitext(outputImage)
@@ -388,8 +500,8 @@ Example::
     import rsgislib
     from rsgislib import imagefilter
     inputImage = 'jers1palsar_stack.kea'
-    clumpsFile = 'jers1palsar_stack_kuwa3.kea'
-    imagefilter.applyKuwaharaFilter(inputImage, clumpsFile, 3, "KEA", rsgislib.TYPE_32FLOAT)
+    outImgFile = 'jers1palsar_stack_kuwa3.kea'
+    imagefilter.applyKuwaharaFilter(inputImage, outImgFile, 3, "KEA", rsgislib.TYPE_32FLOAT)
 
     """
     outputImageBase, outExt = os.path.splitext(outputImage)
@@ -414,8 +526,8 @@ Example::
     import rsgislib
     from rsgislib import imagefilter
     inputImage = 'jers1palsar_stack.kea'
-    clumpsFile = 'jers1palsar_stack_sobel.kea'
-    imagefilter.applySobelFilter(inputImage, clumpsFile, "KEA", rsgislib.TYPE_32FLOAT)
+    outImgFile = 'jers1palsar_stack_sobel.kea'
+    imagefilter.applySobelFilter(inputImage, outImgFile, "KEA", rsgislib.TYPE_32FLOAT)
 
     """
     outputImageBase, outExt = os.path.splitext(outputImage)
@@ -439,8 +551,8 @@ Example::
     import rsgislib
     from rsgislib import imagefilter
     inputImage = 'jers1palsar_stack.kea'
-    clumpsFile = 'jers1palsar_stack_sobelx.kea'
-    imagefilter.applySobelXFilter(inputImage, clumpsFile, "KEA", rsgislib.TYPE_32FLOAT)
+    outImgFile = 'jers1palsar_stack_sobelx.kea'
+    imagefilter.applySobelXFilter(inputImage, outImgFile, "KEA", rsgislib.TYPE_32FLOAT)
 
     """
     outputImageBase, outExt = os.path.splitext(outputImage)
@@ -464,8 +576,8 @@ Example::
     import rsgislib
     from rsgislib import imagefilter
     inputImage = 'jers1palsar_stack.kea'
-    clumpsFile = 'jers1palsar_stack_sobely.kea'
-    imagefilter.applySobelYFilter(inputImage, clumpsFile, "KEA", rsgislib.TYPE_32FLOAT)
+    outImgFile = 'jers1palsar_stack_sobely.kea'
+    imagefilter.applySobelYFilter(inputImage, outImgFile, "KEA", rsgislib.TYPE_32FLOAT)
 
     """
     outputImageBase, outExt = os.path.splitext(outputImage)
@@ -490,8 +602,8 @@ Example::
     import rsgislib
     from rsgislib import imagefilter
     inputImage = 'jers1palsar_stack.kea'
-    clumpsFile = 'jers1palsar_stack_prewitt.kea'
-    imagefilter.applyPrewittFilter(inputImage, clumpsFile, "KEA", rsgislib.TYPE_32FLOAT)
+    outImgFile = 'jers1palsar_stack_prewitt.kea'
+    imagefilter.applyPrewittFilter(inputImage, outImgFile, "KEA", rsgislib.TYPE_32FLOAT)
 
     """
     outputImageBase, outExt = os.path.splitext(outputImage)
@@ -518,8 +630,8 @@ Example::
     import rsgislib
     from rsgislib import imagefilter
     inputImage = 'jers1palsar_stack.kea'
-    clumpsFile = 'jers1palsar_stack_prewitt.kea'
-    imagefilter.applyPrewittXFilter(inputImage, clumpsFile, "KEA", rsgislib.TYPE_32FLOAT)
+    outImgFile = 'jers1palsar_stack_prewitt.kea'
+    imagefilter.applyPrewittXFilter(inputImage, outImgFile, "KEA", rsgislib.TYPE_32FLOAT)
 
     """
     outputImageBase, outExt = os.path.splitext(outputImage)
@@ -546,8 +658,8 @@ Example::
     import rsgislib
     from rsgislib import imagefilter
     inputImage = 'jers1palsar_stack.kea'
-    clumpsFile = 'jers1palsar_stack_prewitt.kea'
-    imagefilter.applyPrewittYFilter(inputImage, clumpsFile, "KEA", rsgislib.TYPE_32FLOAT)
+    outImgFile = 'jers1palsar_stack_prewitt.kea'
+    imagefilter.applyPrewittYFilter(inputImage, outImgFile, "KEA", rsgislib.TYPE_32FLOAT)
 
     """
     outputImageBase, outExt = os.path.splitext(outputImage)
@@ -579,8 +691,8 @@ Example::
     import rsgislib
     from rsgislib import imagefilter
     inputImage = 'jers1palsar_stack.kea'
-    clumpsFile = 'jers1palsar_stack_gausmooth.kea'
-    imagefilter.applyGaussianSmoothFilter(inputImage, clumpsFile, 3, 1.0, 1.0. 0.0, "KEA", rsgislib.TYPE_32FLOAT)
+    outImgFile = 'jers1palsar_stack_gausmooth.kea'
+    imagefilter.applyGaussianSmoothFilter(inputImage, outImgFile, 3, 1.0, 1.0. 0.0, "KEA", rsgislib.TYPE_32FLOAT)
 
     """
     outputImageBase, outExt = os.path.splitext(outputImage)
@@ -607,8 +719,8 @@ Example::
     import rsgislib
     from rsgislib import imagefilter
     inputImage = 'jers1palsar_stack.kea'
-    clumpsFile = 'jers1palsar_stack_gau1st.kea'
-    imagefilter.applyGaussian1stDerivFilter(inputImage, clumpsFile, 3, 1.0, 1.0. 0.0, "KEA", rsgislib.TYPE_32FLOAT)
+    outImgFile = 'jers1palsar_stack_gau1st.kea'
+    imagefilter.applyGaussian1stDerivFilter(inputImage, outImgFile, 3, 1.0, 1.0. 0.0, "KEA", rsgislib.TYPE_32FLOAT)
 
     """
     outputImageBase, outExt = os.path.splitext(outputImage)
@@ -633,8 +745,8 @@ Example::
     import rsgislib
     from rsgislib import imagefilter
     inputImage = 'jers1palsar_stack.kea'
-    clumpsFile = 'jers1palsar_stack_gau1st.kea'
-    imagefilter.applyGaussian2ndDerivFilter(inputImage, clumpsFile, 3, 1.0, 1.0. 0.0, "KEA", rsgislib.TYPE_32FLOAT)
+    outImgFile = 'jers1palsar_stack_gau1st.kea'
+    imagefilter.applyGaussian2ndDerivFilter(inputImage, outImgFile, 3, 1.0, 1.0. 0.0, "KEA", rsgislib.TYPE_32FLOAT)
 
     """
     outputImageBase, outExt = os.path.splitext(outputImage)
@@ -660,8 +772,8 @@ Example::
     import rsgislib
     from rsgislib import imagefilter
     inputImage = 'jers1palsar_stack.kea'
-    clumpsFile = 'jers1palsar_stack_laplacian.kea'
-    imagefilter.applyLaplacianFilter(inputImage, clumpsFile, 3, 1.0, "KEA", rsgislib.TYPE_32FLOAT)
+    outImgFile = 'jers1palsar_stack_laplacian.kea'
+    imagefilter.applyLaplacianFilter(inputImage, outImgFile, 3, 1.0, "KEA", rsgislib.TYPE_32FLOAT)
 
     """
     outputImageBase, outExt = os.path.splitext(outputImage)
@@ -690,8 +802,8 @@ Example::
     import rsgislib
     from rsgislib import imagefilter
     inputImage = 'jers1palsar_stack.kea'
-    clumpsFile = 'jers1palsar_stack_lee.kea'
-    imagefilter.applyLaplacianFilter(inputImage, clumpsFile, 3, 3, "KEA", rsgislib.TYPE_32FLOAT)
+    outImgFile = 'jers1palsar_stack_lee.kea'
+    imagefilter.applyLaplacianFilter(inputImage, outImgFile, 3, 3, "KEA", rsgislib.TYPE_32FLOAT)
 
     """
     outputImageBase, outExt = os.path.splitext(outputImage)
