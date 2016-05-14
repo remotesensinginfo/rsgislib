@@ -668,6 +668,219 @@ namespace rsgis{namespace filter{
 	{
 
 	}
+    
+    
+    RSGISMeanDiffFilter::RSGISMeanDiffFilter(int numberOutBands, int size, std::string filenameEnding) : RSGISImageFilter(numberOutBands, size, filenameEnding)
+    {
+        
+    }
+    
+    void RSGISMeanDiffFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
+    {
+        if(this->size != winSize)
+        {
+            throw rsgis::img::RSGISImageCalcException("Window sizes are different");
+        }
+        
+        int midPt = (size-1)/2;
+        unsigned int nPxls = 0;
+        float valPxl = 0.0;
+        
+        for(int i = 0; i < numBands; i++)
+        {
+            nPxls = 0;
+            valPxl = dataBlock[i][midPt][midPt];
+            output[i] = 0.0;
+            
+            for(int j = 0; j < winSize; j++)
+            {
+                for(int k = 0; k < winSize; k++)
+                {
+                    if( !((j == midPt) & (k == midPt)) )
+                    {
+                        output[i] += dataBlock[i][j][k] - valPxl;
+                        ++nPxls;
+                    }
+                }
+            }
+            
+            output[i] = output[i]/nPxls;
+        }
+    }
+    
+    bool RSGISMeanDiffFilter::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
+    {
+        throw rsgis::img::RSGISImageCalcException("Not implemented yet");
+    }
+    
+    void RSGISMeanDiffFilter::exportAsImage(std::string filename) throw(RSGISImageFilterException)
+    {
+        std::cout << "No Image to output\n";
+    }
+    
+    RSGISMeanDiffFilter::~RSGISMeanDiffFilter()
+    {
+        
+    }
+    
+    
+    
+    
+    RSGISMeanDiffAbsFilter::RSGISMeanDiffAbsFilter(int numberOutBands, int size, std::string filenameEnding) : RSGISImageFilter(numberOutBands, size, filenameEnding)
+    {
+        
+    }
+    
+    void RSGISMeanDiffAbsFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
+    {
+        if(this->size != winSize)
+        {
+            throw rsgis::img::RSGISImageCalcException("Window sizes are different");
+        }
+        
+        int midPt = (size-1)/2;
+        unsigned int nPxls = 0;
+        float valPxl = 0.0;
+        
+        for(int i = 0; i < numBands; i++)
+        {
+            nPxls = 0;
+            valPxl = dataBlock[i][midPt][midPt];
+            output[i] = 0.0;
+            
+            for(int j = 0; j < winSize; j++)
+            {
+                for(int k = 0; k < winSize; k++)
+                {
+                    if( !((j == midPt) & (k == midPt)) )
+                    {
+                        output[i] += fabs(dataBlock[i][j][k] - valPxl);
+                        ++nPxls;
+                    }
+                }
+            }
+            
+            output[i] = output[i]/nPxls;
+        }
+    }
+    
+    bool RSGISMeanDiffAbsFilter::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
+    {
+        throw rsgis::img::RSGISImageCalcException("Not implemented yet");
+    }
+    
+    void RSGISMeanDiffAbsFilter::exportAsImage(std::string filename) throw(RSGISImageFilterException)
+    {
+        std::cout << "No Image to output\n";
+    }
+    
+    RSGISMeanDiffAbsFilter::~RSGISMeanDiffAbsFilter()
+    {
+        
+    }
+    
+    RSGISTotalDiffFilter::RSGISTotalDiffFilter(int numberOutBands, int size, std::string filenameEnding) : RSGISImageFilter(numberOutBands, size, filenameEnding)
+    {
+        
+    }
+    
+    void RSGISTotalDiffFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
+    {
+        if(this->size != winSize)
+        {
+            throw rsgis::img::RSGISImageCalcException("Window sizes are different");
+        }
+        
+        int midPt = (size-1)/2;
+        float valPxl = 0.0;
+        
+        for(int i = 0; i < numBands; i++)
+        {
+            valPxl = dataBlock[i][midPt][midPt];
+            output[i] = 0.0;
+            
+            for(int j = 0; j < winSize; j++)
+            {
+                for(int k = 0; k < winSize; k++)
+                {
+                    if( !((j == midPt) & (k == midPt)) )
+                    {
+                        output[i] += dataBlock[i][j][k] - valPxl;
+                    }
+                }
+            }
+            
+        }
+    }
+    
+    bool RSGISTotalDiffFilter::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
+    {
+        throw rsgis::img::RSGISImageCalcException("Not implemented yet");
+    }
+    
+    void RSGISTotalDiffFilter::exportAsImage(std::string filename) throw(RSGISImageFilterException)
+    {
+        std::cout << "No Image to output\n";
+    }
+    
+    RSGISTotalDiffFilter::~RSGISTotalDiffFilter()
+    {
+        
+    }
+    
+    
+    
+    RSGISTotalDiffAbsFilter::RSGISTotalDiffAbsFilter(int numberOutBands, int size, std::string filenameEnding) : RSGISImageFilter(numberOutBands, size, filenameEnding)
+    {
+        
+    }
+    
+    void RSGISTotalDiffAbsFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
+    {
+        if(this->size != winSize)
+        {
+            throw rsgis::img::RSGISImageCalcException("Window sizes are different");
+        }
+        
+        int midPt = (size-1)/2;
+        float valPxl = 0.0;
+        
+        for(int i = 0; i < numBands; i++)
+        {
+            valPxl = dataBlock[i][midPt][midPt];
+            output[i] = 0.0;
+            
+            for(int j = 0; j < winSize; j++)
+            {
+                for(int k = 0; k < winSize; k++)
+                {
+                    if( !((j == midPt) & (k == midPt)) )
+                    {
+                        output[i] += fabs(dataBlock[i][j][k] - valPxl);
+                    }
+                }
+            }
+            
+        }
+    }
+    
+    bool RSGISTotalDiffAbsFilter::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
+    {
+        throw rsgis::img::RSGISImageCalcException("Not implemented yet");
+    }
+    
+    void RSGISTotalDiffAbsFilter::exportAsImage(std::string filename) throw(RSGISImageFilterException)
+    {
+        std::cout << "No Image to output\n";
+    }
+    
+    RSGISTotalDiffAbsFilter::~RSGISTotalDiffAbsFilter()
+    {
+        
+    }
+    
+    
+    
 
 }}
 
