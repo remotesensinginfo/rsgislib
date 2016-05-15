@@ -5,6 +5,7 @@ RSGISLib Image Filter Module
 Tiled (Multi Processing Core) Filtering
 ---------------------------------------
 .. autofunction:: rsgislib.imagefilter.tiledfilter.performTiledImgFilter
+.. autofunction:: rsgislib.imagefilter.tiledfilter.performTiledImgMultiFilter
 .. autoclass:: rsgislib.imagefilter.tiledfilter.RSGISAbstractFilter
    :members:
 
