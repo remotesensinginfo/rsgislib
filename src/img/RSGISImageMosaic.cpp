@@ -1613,6 +1613,217 @@ namespace rsgis{namespace img{
         }
     }
     
+    void RSGISImageMosaic::includeDatasetsIgnoreOverlap(GDALDataset *baseImage, std::string *inputImages, int numDS, int numOverlapPxls) throw(RSGISImageException)
+    {
+        RSGISImageUtils imgUtils;
+        GDALDataset *dataset = NULL;
+        int width;
+        int height;
+        
+        double *transformation = new double[6];
+        double *imgTransform = new double[6];
+        double *baseTransform = new double[6];
+        int numberBands = 0;
+        int tileXSize = 0;
+        int tileYSize = 0;
+        double xDiff = 0;
+        double yDiff = 0;
+        int xStart = 0;
+        int yStart = 0;
+        std::string projection;
+        
+        GDALRasterBand *inputBand = NULL;
+        GDALRasterBand **outputBand = NULL;
+        float *imgData = NULL;
+        
+        try
+        {
+            numberBands = baseImage->GetRasterCount();
+            for(int i = 0; i < numDS; i++)
+            {
+                dataset = (GDALDataset *) GDALOpenShared(inputImages[i].c_str(), GA_ReadOnly);
+                if(dataset == NULL)
+                {
+                    std::string message = std::string("Could not open image ") + inputImages[i];
+                    throw RSGISImageException(message.c_str());
+                }
+                
+                if(dataset->GetRasterCount() != numberBands)
+                {
+                    throw RSGISImageBandException("All input images need to have the same number of bands.");
+                }
+                
+                
+                GDALClose(dataset);
+            }
+            
+            projection = std::string(baseImage->GetProjectionRef());
+            imgUtils.getImagesExtent(inputImages, numDS, &width, &height, transformation);
+            
+            baseImage->GetGeoTransform(baseTransform);
+            
+            double baseExtentX = baseTransform[0] + (baseImage->GetRasterXSize() * baseTransform[1]);
+            double baseExtentY = baseTransform[3] + (baseImage->GetRasterYSize() * baseTransform[5]);
+            double imgExtentX = transformation[0] + (width * transformation[1]);
+            double imgExtentY = transformation[3] + (height * transformation[5]);
+            
+            /*std::cout << "Transformation[0] = " << transformation[0] << std::endl;
+             std::cout << "Transformation[1] = " << transformation[1] << std::endl;
+             std::cout << "Transformation[2] = " << transformation[2] << std::endl;
+             std::cout << "Transformation[3] = " << transformation[3] << std::endl;
+             std::cout << "Transformation[4] = " << transformation[4] << std::endl;
+             std::cout << "Transformation[5] = " << transformation[5] << std::endl;
+             
+             std::cout << "baseTransform[0] = " << baseTransform[0] << std::endl;
+             std::cout << "baseTransform[1] = " << baseTransform[1] << std::endl;
+             std::cout << "baseTransform[2] = " << baseTransform[2] << std::endl;
+             std::cout << "baseTransform[3] = " << baseTransform[3] << std::endl;
+             std::cout << "baseTransform[4] = " << baseTransform[4] << std::endl;
+             std::cout << "baseTransform[5] = " << baseTransform[5] << std::endl;
+             
+             std::cout << "baseImage->GetRasterXSize() = " << baseImage->GetRasterXSize() << std::endl;
+             std::cout << "baseImage->GetRasterYSize() = " << baseImage->GetRasterYSize() << std::endl;
+             
+             std::cout << "Height = " << height << std::endl;
+             std::cout << "Width = " << width << std::endl;
+             
+             std::cout << "baseExtentX = " << baseExtentX << std::endl;
+             std::cout << "baseExtentY = " << baseExtentY << std::endl;
+             std::cout << "imgExtentX = " << imgExtentX << std::endl;
+             std::cout << "imgExtentY = " << imgExtentY << std::endl;*/
+            
+            // Check datasets fit within the base image.
+            if(transformation[0] < baseTransform[0])
+            {
+                std::cerr << "transformation[0] = " << transformation[0] << std::endl;
+                std::cerr << "baseTransform[0] = " << baseTransform[0] << std::endl;
+                throw RSGISImageException("Images do not fit within the base image (Eastings Min)");
+            }
+            if(transformation[3] > baseTransform[3])
+            {
+                std::cerr << "transformation[3] = " << transformation[3] << std::endl;
+                std::cerr << "baseTransform[3] = " << baseTransform[3] << std::endl;
+                throw RSGISImageException("Images do not fit within the base image (Northings Max)");
+            }
+            if(imgExtentX > baseExtentX)
+            {
+                std::cerr << "imgExtentX = " << imgExtentX << std::endl;
+                std::cerr << "baseExtentX = " << baseExtentX << std::endl;
+                throw RSGISImageException("Images do not fit within the base image (Eastings Max)");
+            }
+            if(imgExtentY < baseExtentY)
+            {
+                std::cerr << "imgExtentY = " << imgExtentY << std::endl;
+                std::cerr << "baseExtentY = " << baseExtentY << std::endl;
+                throw RSGISImageException("Images do not fit within the base image (Northings Min)");
+            }
+            
+            height = baseImage->GetRasterYSize();
+            width = baseImage->GetRasterXSize();
+            
+            outputBand = new GDALRasterBand*[numberBands];
+            for(int i = 0; i < numberBands; i++)
+            {
+                outputBand[i] = baseImage->GetRasterBand(i+1);
+            }
+            
+            int xBlockSize = 0;
+            int yBlockSize = 0;
+            outputBand[0]->GetBlockSize (&xBlockSize, &yBlockSize);
+            
+            std::cout << "Max. block size: " << yBlockSize << std::endl;
+            
+            std::cout << "Started (total " << numDS << ") ." << std::flush;
+            
+            for(int i = 0; i < numDS; i++)
+            {
+                std::cout << "." << i << "." << std::flush;
+                dataset = (GDALDataset *) GDALOpenShared(inputImages[i].c_str(), GA_ReadOnly);
+                if(dataset == NULL)
+                {
+                    std::string message = std::string("Could not open image ") + inputImages[i];
+                    throw RSGISImageException(message.c_str());
+                }
+                
+                dataset->GetGeoTransform(imgTransform);
+                tileXSize = dataset->GetRasterXSize();
+                tileYSize = dataset->GetRasterYSize();
+                
+                // Apply offset to image size.
+                tileXSize = tileXSize - (numOverlapPxls * 2);
+                tileYSize = tileYSize - (numOverlapPxls * 2);
+                
+                imgTransform[0] = imgTransform[0] + (numOverlapPxls * baseTransform[1]);
+                imgTransform[3] = imgTransform[3] - (numOverlapPxls * baseTransform[1]);
+                
+                xDiff = imgTransform[0] - baseTransform[0];
+                yDiff = baseTransform[3] - imgTransform[3];
+                
+                xStart = floor((xDiff/baseTransform[1])+0.5);
+                yStart = floor((yDiff/baseTransform[1])+0.5);
+                imgData = (float *) CPLMalloc(sizeof(float)*(tileXSize*yBlockSize));
+                
+                int nYBlocks = tileYSize / yBlockSize;
+                int remainRows = tileYSize - (nYBlocks * yBlockSize);
+                int rowOffset = 0;
+                
+                for(int i = 0; i < nYBlocks; i++)
+                {
+                    rowOffset = (yBlockSize * i);// + numOverlapPxls;
+                    
+                    for(int n = 1; n <= numberBands; n++)
+                    {
+                        inputBand = dataset->GetRasterBand(n);
+                        
+                        inputBand->RasterIO(GF_Read, numOverlapPxls, (rowOffset + numOverlapPxls), tileXSize, yBlockSize, imgData, tileXSize, yBlockSize, GDT_Float32, 0, 0);
+                        outputBand[n-1]->RasterIO(GF_Write, xStart, (yStart + rowOffset), tileXSize, yBlockSize, imgData, tileXSize, yBlockSize, GDT_Float32, 0, 0);
+                        
+                    }
+                }
+                if(remainRows > 0)
+                {
+                    rowOffset = (yBlockSize * nYBlocks);// + numOverlapPxls;
+                    
+                    for(int n = 1; n <= numberBands; n++)
+                    {
+                        inputBand = dataset->GetRasterBand(n);
+                        
+                        inputBand->RasterIO(GF_Read, numOverlapPxls, (rowOffset + numOverlapPxls), tileXSize, remainRows, imgData, tileXSize, remainRows, GDT_Float32, 0, 0);
+                        outputBand[n-1]->RasterIO(GF_Write, xStart, (yStart + rowOffset), tileXSize, remainRows, imgData, tileXSize, remainRows, GDT_Float32, 0, 0);
+                    }
+                }
+                CPLFree(imgData);
+                GDALClose(dataset);
+            }
+            std::cout << ".complete\n";
+        }
+        catch(RSGISImageBandException e)
+        {
+            if(imgData != NULL)
+            {
+                delete imgData;
+            }
+            if(transformation != NULL)
+            {
+                delete[] transformation;
+            }
+            if(imgTransform != NULL)
+            {
+                delete[] imgTransform;
+            }
+            throw e;
+        }
+        
+        if(transformation != NULL)
+        {
+            delete[] transformation;
+        }
+        if(imgTransform != NULL)
+        {
+            delete[] imgTransform;
+        }
+    }
+    
     void RSGISImageMosaic::orderInImagesValidData(std::vector<std::string> images, std::vector<std::string> *orderedImages, float noDataValue) throw(RSGISImageException)
     {
         try
