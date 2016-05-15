@@ -231,7 +231,7 @@ class RSGISMeanDiffAbsFilter(RSGISAbstractFilter):
         self.gdalformat = gdalformat
         self.dataType = dataType
     
-    def applyFilter(inputimage, outputImage, filterSize, gdalformat, datatype):
+    def applyFilter(self, inputimage, outputImage):
         """ Apply a mean absolute difference filter to the specified input image."""
         outputImageBase, outExt = os.path.splitext(outputImage)
         outExt = outExt.replace(".", "").strip()
@@ -282,7 +282,7 @@ class RSGISCoeffOfVarFilter(RSGISAbstractFilter):
         self.gdalformat = gdalformat
         self.dataType = dataType
 
-    def applyCoeffOfVarFilter(inputimage, outputImage):
+    def applyFilter(self, inputimage, outputImage):
         """ Apply a coefficient of variance filter to the specified input image."""
         outputImageBase, outExt = os.path.splitext(outputImage)
         outExt = outExt.replace(".", "").strip()
@@ -299,7 +299,7 @@ class RSGISTotalFilter(RSGISAbstractFilter):
         self.gdalformat = gdalformat
         self.dataType = dataType
 
-    def applyFilter(inputimage, outputImage):
+    def applyFilter(self, inputimage, outputImage):
         """ Apply a total filter to the specified input image."""
         outputImageBase, outExt = os.path.splitext(outputImage)
         outExt = outExt.replace(".", "").strip()
@@ -316,7 +316,7 @@ class RSGISNormVarFilter(RSGISAbstractFilter):
         self.gdalformat = gdalformat
         self.dataType = dataType
 
-    def applyNormVarFilter(inputimage, outputImage):
+    def applyFilter(self, inputimage, outputImage):
         """ Apply a normalised variance filter to the specified input image."""
         outputImageBase, outExt = os.path.splitext(outputImage)
         outExt = outExt.replace(".", "").strip()
@@ -333,7 +333,7 @@ class RSGISNormVarSqrtFilter(RSGISAbstractFilter):
         self.gdalformat = gdalformat
         self.dataType = dataType
 
-    def applyNormVarSqrtFilter(self, inputimage, outputImage):
+    def applyFilter(self, inputimage, outputImage):
         """ Apply a normalised variance square root filter to the specified input image."""
         outputImageBase, outExt = os.path.splitext(outputImage)
         outExt = outExt.replace(".", "").strip()
@@ -581,7 +581,7 @@ class RSGISLeeFilter(RSGISAbstractFilter):
         self.gdalformat = gdalformat
         self.dataType = dataType
  
-    def applyLeeFilter(self, inputimage, outputImage):
+    def applyFilter(self, inputimage, outputImage):
         """ Apply a Lee SAR filter to the specified input image."""
         outputImageBase, outExt = os.path.splitext(outputImage)
         outExt = outExt.replace(".", "").strip()
@@ -654,13 +654,13 @@ Example::
     tileOverlap = filterInst.getFilterHSize()
     
     imageutils.createTiles(inputImg, tilesImgBase, width, height, tileOverlap, False, 'KEA', rsgisUtils.getRSGISLibDataTypeFromImg(inputImg), 'kea')
-    imageTiles = glob.glob(tilesImgBase+"*.kea")
+    imageTiles = glob.glob(tilesImgBase+"*.kea")    
     
     filterImgsVals = []
     for tile in imageTiles:
         tileBaseName = os.path.splitext(os.path.basename(tile))[0]
         filterTile = os.path.join(tilesFilterDIR, tileBaseName+'_filter.kea')
-        filterImgsVals.append([tile, filterTile, filterInst])
+        filterImgsVals.append([tile, filterTile, filterInst])    
     
     with Pool(nCores) as p:
         p.map(_performFilteringFunc, filterImgsVals)
@@ -677,6 +677,105 @@ Example::
     shutil.rmtree(tilesFilterDIR)
     if createdTmp:
         shutil.rmtree(tmpDIR)
+        
+def performTiledImgMultiFilter(inputImg, outputImgs, filterInsts, dataType=None, imgFormat='KEA', tmpDIR='tmp', width=2000, height=2000, nCores=-1):
+    """
+This function will perform the filtering using multiple filters of an input image where the input image will be tiled and the tiles executed on multiple processing cores. This function is primarily of use for larger images or when using very large filter windows otherwise the over head of tiling and mosaicking are not worth it.
+
+* inputImg - is the file name and path for the input image file.
+* outputImgs - is a list of file names and paths for the output image files - Note, must be the same length as filterInsts.
+* filterInsts - is a list of filter instances of the classes available within rsgislib.imagefilter.tiledfilter  - Note, must be the same length as filterInsts.
+* datatype - is the output image data type (e.g., rsgislib.TYPE_32FLOAT; Default is None). If None then data type of input image is used.
+* imgformat - string with the GDAL image format for the output image (Default = KEA). NOTE. KEA is used as intermediate format internally and therefore needs to be available.
+* tmpDIR - the temporary directory where intermediate files will be written (default is 'tmp'). Directory will be created and deleted if does not exist.
+* width - int for width of the image tiles used for processing (Default = 2000).
+* height - int for height of the image tiles used for processing (Default = 2000).
+* nCores - is an int specifying the number of cores to be used for clumping processing.
+
+Example::
+
+    import rsgislib
+    from rsgislib.imagefilter import tiledfilter
+    from rsgislib import imageutils
     
+    inputImage = 'LandsatImg.kea'
+    outputImages = ['LandsatImgMedianFilter.kea', 'LandsatImgNormVarFilter.kea']
     
+    filters = [tiledfilter.RSGISMedianFilter(7, "KEA", rsgislib.TYPE_16UINT), tiledfilter.RSGISNormVarFilter(7, "KEA", rsgisUtils.getRSGISLibDataTypeFromImg(inputImage))]
+    tiledfilter.performTiledImgMultiFilter(inputImage, outputImages, filters, width=2000, height=2000)
+    imageutils.popImageStats(outputImage, usenodataval=False, nodataval=0, calcpyramids=True)
     
+    """
+    
+    if (len(outputImgs) != len(filterInsts)):
+        raise rsgislib.RSGISPyException('The same number of filters and output images need to be provided.')
+    
+    numFilters = len(outputImgs)
+    
+    rsgisUtils = rsgislib.RSGISPyUtils()
+    
+    createdTmp = False
+    if not os.path.exists(tmpDIR):
+        os.makedirs(tmpDIR)
+        createdTmp = True
+    
+    if nCores <= 0:
+        nCores = rsgisUtils.numProcessCores()
+        
+    uidStr = rsgisUtils.uidGenerator()
+    if dataType == None:
+        dataType = rsgisUtils.getRSGISLibDataTypeFromImg(inputImg)
+    
+    baseName = os.path.splitext(os.path.basename(inputImg))[0]+"_"+uidStr
+    
+    imgTilesDIR = os.path.join(tmpDIR, "imgTiles_"+uidStr)
+    tilesFilterDIR = os.path.join(tmpDIR, "imgFilterTiles_"+uidStr)
+    tilesImgBase = os.path.join(imgTilesDIR, baseName)
+
+    if not os.path.exists(imgTilesDIR):
+        os.makedirs(imgTilesDIR)
+    
+    first = True
+    tileOverlap = 0
+    
+    for filterInst in filterInsts:
+        tmpOverlap = filterInst.getFilterHSize()
+        if first:
+            tileOverlap = tmpOverlap
+            first = False
+        elif tmpOverlap > tileOverlap:
+            tileOverlap = tmpOverlap
+        
+    imageutils.createTiles(inputImg, tilesImgBase, width, height, tileOverlap, False, 'KEA', rsgisUtils.getRSGISLibDataTypeFromImg(inputImg), 'kea')
+    imageTiles = glob.glob(tilesImgBase+"*.kea")    
+    
+    for i in range(numFilters):
+        filterInst = filterInsts[i]
+        outputImg = outputImgs[i]
+        
+        if not os.path.exists(tilesFilterDIR):
+            os.makedirs(tilesFilterDIR)
+        
+        filterImgsVals = []
+        for tile in imageTiles:
+            tileBaseName = os.path.splitext(os.path.basename(tile))[0]
+            filterTile = os.path.join(tilesFilterDIR, tileBaseName+'_filter.kea')
+            filterImgsVals.append([tile, filterTile, filterInst])    
+        
+        with Pool(nCores) as p:
+            p.map(_performFilteringFunc, filterImgsVals)
+        
+        imgFilterTiles = glob.glob(os.path.join(tilesFilterDIR,"*_filter.kea"))
+        
+        numOutBands = rsgisUtils.getImageBandCount(inputImg)
+        
+        imageutils.createCopyImage(inputImg, outputImg, numOutBands, 0, imgFormat, dataType)
+        
+        imageutils.includeImagesWithOverlap(outputImg, imgFilterTiles, int(filterInst.getFilterHSize()))
+        
+        shutil.rmtree(tilesFilterDIR)
+        
+    shutil.rmtree(imgTilesDIR)
+    if createdTmp:
+        shutil.rmtree(tmpDIR)
+
