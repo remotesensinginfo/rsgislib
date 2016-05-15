@@ -354,6 +354,47 @@ static PyObject *ImageUtils_IncludeImages(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
+static PyObject *ImageUtils_IncludeImagesOverlap(PyObject *self, PyObject *args)
+{
+    const char *pszBaseImage;
+    PyObject *pInputImages; // List of input images
+    int pxlOverlap = 0;
+    
+    // Check parameters are present and of correct type
+    if( !PyArg_ParseTuple(args, "sOi:includeImagesWithOverlap", &pszBaseImage, &pInputImages, &pxlOverlap))
+    {
+        return NULL;
+    }
+    
+    // TODO: Look into this function - doesn't seem to catch when only a single image is provided.
+    if(!PySequence_Check(pInputImages))
+    {
+        PyErr_SetString(GETSTATE(self)->error, "Second argument must be a list of images");
+        return NULL;
+    }
+    
+    // Extract list of images to array of strings.
+    int numImages = 0;
+    std::string *inputImages = ExtractStringArrayFromSequence(pInputImages, &numImages);
+    if(numImages == 0)
+    {
+        PyErr_SetString(GETSTATE(self)->error, "No input images provided");
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeImageIncludeOverlap(inputImages, numImages, pszBaseImage, pxlOverlap);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 static PyObject *ImageUtils_PopImageStats(PyObject *self, PyObject *args, PyObject *keywds)
 {
     const char *pszInputImage;
@@ -1298,6 +1339,27 @@ static PyMethodDef ImageUtilsMethods[] = {
 "	imageutils.includeImages(baseImage, inputList)\n"
 "\n"},
  
+{"includeImagesWithOverlap", ImageUtils_IncludeImagesOverlap, METH_VARARGS,
+"imageutils.includeImagesWithOverlap(baseImage, inputImages, pxlOverlap)\n"
+"Create mosaic from list of input images where the input images have an overlap.\n"
+"\n"
+"* baseImage is a string containing the name of the input image to add image to\n"
+"* inputimagelist is a list of input images\n"
+"* inputBands is a subset of input bands to use (optional)\n"
+"\nExample::\n"
+"\n"
+"	import rsgislib\n"
+"	from rsgislib import imageutils\n"
+"	import glob\n"
+"   inputImg = 'LandsatImg.kea'\n"
+"   tilesImgBase = './tiles/LandsatTile'\n"
+"   outputImg = 'LandsatImgProcessed.kea'\n"
+"   imageutils.createTiles(inputImg, tilesImgBase, 1000, 1000, 10, False, 'KEA', rsgislib.TYPE_32FLOAT, 'kea')\n"
+"   # Do some processing on the tiles... \n"
+"   imageutils.createCopyImage(inputImg, outputImg, 6, 0, 'KEA', rsgislib.TYPE_32FLOAT)\n"
+"	inputList = glob.glob('./tiles/LandsatTile*.kea')\n"
+"	imageutils.includeImagesWithOverlap(outputImg, inputList, 10)\n"
+"\n"},
   
     {"popImageStats", (PyCFunction)ImageUtils_PopImageStats, METH_VARARGS | METH_KEYWORDS,
 "rsgislib.imageutils.popImageStats(image, usenodataval=True,nodataval=0, calcpyramids=True)\n"
