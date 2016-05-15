@@ -2,14 +2,11 @@ RSGISLib Image Filter Module
 =================================
 .. automodule:: rsgislib.imagefilter
 
-Tiled Filtering
----------------
+Tiled (Multi Processing Core) Filtering
+---------------------------------------
 .. autofunction:: rsgislib.imagefilter.tiledfilter.performTiledImgFilter
-
-Filter Banks
--------------
-.. autofunction:: rsgislib.imagefilter.applyfilters
-.. autofunction:: rsgislib.imagefilter.LeungMalikFilterBank
+.. autoclass:: rsgislib.imagefilter.tiledfilter.RSGISAbstractFilter
+   :members:
 
 Smoothing Filters
 -----------------
@@ -82,6 +79,10 @@ Statatics Filters
 .. autofunction:: rsgislib.imagefilter.applyTotalDiffAbsFilter
 .. autoclass:: rsgislib.imagefilter.tiledfilter.RSGISTotalDiffAbsFilter
 
+Filter Banks
+-------------
+.. autofunction:: rsgislib.imagefilter.applyfilters
+.. autofunction:: rsgislib.imagefilter.LeungMalikFilterBank
 
 * :ref:`genindex`
 * :ref:`modindex`

@@ -47,7 +47,12 @@ from abc import ABCMeta, abstractmethod
 
 class RSGISAbstractFilter:
     """
-    Abstract class for filter.
+    Abstract class for filter defining the interface to be used within the performTiledImgFilter function.
+    Must define:
+    
+    * self.filterSize - size of the image filter (must be an odd number)
+    * self.gdalformat - the output image file format
+    * self.dataType - the output image data type (e.g., rsgislib.TYPE_16UINT)
     """
     __metaclass__ = ABCMeta
     
@@ -57,17 +62,33 @@ class RSGISAbstractFilter:
         self.dataType = rsgislib.TYPE_32FLOAT
     
     @abstractmethod
-    def applyFilter(self, inputimage, outputImage): pass
+    def applyFilter(self, inputimage, outputImage): 
+        """
+        Abstract function through which the input image
+        is filtered to produce the output image.
+        
+        * inputimage - is the name and path of the input image.
+        * outputimage - is the name and path of the output image.
+        """
+        pass
+    
 
     def getFilterSize(self):
+        """
+        return the size of the image filter
+        """
         return self.filterSize
     
     def getFilterHSize(self):
+        """
+        return the hald size of the image filter (i.e., (filterSize-1)/2)
+        """
         hSize = (self.filterSize-1)/2
         return hSize
 
 
 class RSGISMedianFilter(RSGISAbstractFilter):
+    """ A class to apply a median filter """
     
     def __init__(self, filterSize, gdalformat, dataType):
         self.filterSize = filterSize
@@ -84,6 +105,7 @@ class RSGISMedianFilter(RSGISAbstractFilter):
 
 
 class RSGISMeanFilter(RSGISAbstractFilter):
+    """ A class to apply a mean filter """
     
     def __init__(self, filterSize, gdalformat, dataType):
         self.filterSize = filterSize
@@ -100,6 +122,7 @@ class RSGISMeanFilter(RSGISAbstractFilter):
 
 
 class RSGISMinFilter(RSGISAbstractFilter):
+    """ A class to apply a min filter """
 
     def __init__(self, filterSize, gdalformat, dataType):
         self.filterSize = filterSize
@@ -116,6 +139,7 @@ class RSGISMinFilter(RSGISAbstractFilter):
     
 
 class RSGISMaxFilter(RSGISAbstractFilter):
+    """ A class to apply a max filter """
 
     def __init__(self, filterSize, gdalformat, dataType):
         self.filterSize = filterSize
@@ -132,6 +156,7 @@ class RSGISMaxFilter(RSGISAbstractFilter):
 
 
 class RSGISModeFilter(RSGISAbstractFilter):
+    """ A class to apply a mode filter """
 
     def __init__(self, filterSize, gdalformat, dataType):
         self.filterSize = filterSize
@@ -148,6 +173,7 @@ class RSGISModeFilter(RSGISAbstractFilter):
 
     
 class RSGISStdDevFilter(RSGISAbstractFilter):
+    """ A class to apply a standard deviation filter """
 
     def __init__(self, filterSize, gdalformat, dataType):
         self.filterSize = filterSize
@@ -164,6 +190,7 @@ class RSGISStdDevFilter(RSGISAbstractFilter):
 
 
 class RSGISRangeFilter(RSGISAbstractFilter):
+    """ A class to apply a range filter """
 
     def __init__(self, filterSize, gdalformat, dataType):
         self.filterSize = filterSize
@@ -180,6 +207,7 @@ class RSGISRangeFilter(RSGISAbstractFilter):
     
 
 class RSGISMeanDiffFilter(RSGISAbstractFilter):
+    """ A class to apply a mean difference filter """
 
     def __init__(self, filterSize, gdalformat, dataType):
         self.filterSize = filterSize
@@ -196,6 +224,7 @@ class RSGISMeanDiffFilter(RSGISAbstractFilter):
 
 
 class RSGISMeanDiffAbsFilter(RSGISAbstractFilter):
+    """ A class to apply a mean absolute difference filter """
 
     def __init__(self, filterSize, gdalformat, dataType):
         self.filterSize = filterSize
@@ -212,6 +241,7 @@ class RSGISMeanDiffAbsFilter(RSGISAbstractFilter):
 
 
 class RSGISTotalDiffFilter(RSGISAbstractFilter):
+    """ A class to apply a total difference filter """
     
     def __init__(self, filterSize, gdalformat, dataType):
         self.filterSize = filterSize
@@ -228,6 +258,7 @@ class RSGISTotalDiffFilter(RSGISAbstractFilter):
 
 
 class RSGISTotalDiffAbsFilter(RSGISAbstractFilter):
+    """ A class to apply a total absolution difference filter """
 
     def __init__(self, filterSize, gdalformat, dataType):
         self.filterSize = filterSize
@@ -244,6 +275,7 @@ class RSGISTotalDiffAbsFilter(RSGISAbstractFilter):
 
 
 class RSGISCoeffOfVarFilter(RSGISAbstractFilter):
+    """ A class to apply a coefficient of variance filter """
 
     def __init__(self, filterSize, gdalformat, dataType):
         self.filterSize = filterSize
@@ -260,6 +292,7 @@ class RSGISCoeffOfVarFilter(RSGISAbstractFilter):
 
 
 class RSGISTotalFilter(RSGISAbstractFilter):
+    """ A class to apply a total filter """
     
     def __init__(self, filterSize, gdalformat, dataType):
         self.filterSize = filterSize
@@ -276,6 +309,7 @@ class RSGISTotalFilter(RSGISAbstractFilter):
 
 
 class RSGISNormVarFilter(RSGISAbstractFilter):
+    """ A class to apply a normalised variance filter """
 
     def __init__(self, filterSize, gdalformat, dataType):
         self.filterSize = filterSize
@@ -292,6 +326,7 @@ class RSGISNormVarFilter(RSGISAbstractFilter):
 
 
 class RSGISNormVarSqrtFilter(RSGISAbstractFilter):
+    """ A class to apply a normalised variance square root filter """
 
     def __init__(self, filterSize, gdalformat, dataType):
         self.filterSize = filterSize
@@ -308,6 +343,7 @@ class RSGISNormVarSqrtFilter(RSGISAbstractFilter):
 
 
 class RSGISNormVarLnFilter(RSGISAbstractFilter):
+    """ A class to apply a normalised variance log filter """
 
     def __init__(self, filterSize, gdalformat, dataType):
         self.filterSize = filterSize
@@ -324,6 +360,7 @@ class RSGISNormVarLnFilter(RSGISAbstractFilter):
 
 
 class RSGISTextureVarFilter(RSGISAbstractFilter):
+    """ A class to apply a texture variance filter """
 
     def __init__(self, filterSize, gdalformat, dataType):
         self.filterSize = filterSize
@@ -340,6 +377,7 @@ class RSGISTextureVarFilter(RSGISAbstractFilter):
 
 
 class RSGISKuwaharaFilter(RSGISAbstractFilter):
+    """ A class to apply a kuwahara filter """
 
     def __init__(self, filterSize, gdalformat, dataType):
         self.filterSize = filterSize
@@ -356,6 +394,7 @@ class RSGISKuwaharaFilter(RSGISAbstractFilter):
 
 
 class RSGISSobelFilter(RSGISAbstractFilter):
+    """ A class to apply a sobel filter """
 
     def __init__(self, gdalformat, dataType):
         self.filterSize = 3
@@ -372,6 +411,7 @@ class RSGISSobelFilter(RSGISAbstractFilter):
 
 
 class RSGISSobelXFilter(RSGISAbstractFilter):
+    """ A class to apply a sobel X filter """
 
     def __init__(self, gdalformat, dataType):
         self.filterSize = 3
@@ -388,6 +428,7 @@ class RSGISSobelXFilter(RSGISAbstractFilter):
 
 
 class RSGISSobelYFilter(RSGISAbstractFilter):
+    """ A class to apply a sobel Y filter """
 
     def __init__(self, gdalformat, dataType):
         self.filterSize = 3
@@ -404,6 +445,7 @@ class RSGISSobelYFilter(RSGISAbstractFilter):
 
 
 class RSGISPrewittFilter(RSGISAbstractFilter):
+    """ A class to apply a Prewitt filter """
 
     def __init__(self, gdalformat, dataType):
         self.filterSize = 3
@@ -420,6 +462,7 @@ class RSGISPrewittFilter(RSGISAbstractFilter):
     
   
 class RSGISPrewittXFilter(RSGISAbstractFilter):
+    """ A class to apply a Prewitt X filter """
 
     def __init__(self, gdalformat, dataType):
         self.filterSize = 3
@@ -436,6 +479,7 @@ class RSGISPrewittXFilter(RSGISAbstractFilter):
 
 
 class RSGISPrewittYFilter(RSGISAbstractFilter):
+    """ A class to apply a Prewitt Y filter """
 
     def __init__(self, gdalformat, dataType):
         self.filterSize = 3
@@ -452,6 +496,7 @@ class RSGISPrewittYFilter(RSGISAbstractFilter):
 
 
 class RSGISGaussianSmoothFilter(RSGISAbstractFilter):
+    """ A class to apply a Gaussian smoothing filter """
 
     def __init__(self, filterSize, stddevX, stddevY, filterAngle, gdalformat, datatype):
         self.filterSize = filterSize
@@ -471,6 +516,7 @@ class RSGISGaussianSmoothFilter(RSGISAbstractFilter):
     
 
 class RSGISGaussian1stDerivFilter(RSGISAbstractFilter):
+    """ A class to apply a Gaussian first derivative filter """
 
     def __init__(self, filterSize, stddevX, stddevY, filterAngle, gdalformat, datatype):
         self.filterSize = filterSize
@@ -490,6 +536,7 @@ class RSGISGaussian1stDerivFilter(RSGISAbstractFilter):
 
 
 class RSGISGaussian2ndDerivFilter(RSGISAbstractFilter):
+    """ A class to apply a Gaussian second derivative filter """
 
     def __init__(self, filterSize, stddevX, stddevY, filterAngle, gdalformat, datatype):
         self.filterSize = filterSize
@@ -508,6 +555,7 @@ class RSGISGaussian2ndDerivFilter(RSGISAbstractFilter):
         imagefilter.applyfilters(inputimage, outputImageBase, filters, self.gdalformat, outExt, self.dataType)
 
 class RSGISLaplacianFilter(RSGISAbstractFilter):
+    """ A class to apply a Laplacian filter """
 
     def __init__(self, filterSize, stddev, gdalformat, datatype):
         self.filterSize = filterSize
@@ -525,6 +573,7 @@ class RSGISLaplacianFilter(RSGISAbstractFilter):
     
     
 class RSGISLeeFilter(RSGISAbstractFilter):
+    """ A class to apply a SAR Lee filter """
 
     def __init__(self, filterSize, nLooks, gdalformat, datatype):
         self.filterSize = filterSize
@@ -550,30 +599,31 @@ def _performFilteringFunc(filterParams):
 
 def performTiledImgFilter(inputImg, outputImg, filterInst, dataType=None, imgFormat='KEA', tmpDIR='tmp', width=2000, height=2000, nCores=-1):
     """
-    This function will perform a filtering of an input image where the input image will be tiled and the tiles executed on multiple processing cores. This function is primarily of use for larger images or when using very large filter windows otherwise the over head of tiling and mosaicking are not worth it.
-    
-    * inputImg - is the file name and path for the input image file.
-    * outputImg - is the file name and path for the output image file.
-    * filterInst - is an instance of a filter class available within rsgislib.imagefilter.tiledfilter. 
-    * datatype - is the output image data type (e.g., rsgislib.TYPE_32FLOAT; Default is None). If None then data type of input image is used.
-    * imgformat - string with the GDAL image format for the output image (Default = KEA). NOTE. KEA is used as intermediate format internally and therefore needs to be available.
-    * tmpDIR - the temporary directory where intermediate files will be written (default is 'tmp'). Directory will be created and deleted if does not exist.
-    * width - int for width of the image tiles used for processing (Default = 2000).
-    * height - int for height of the image tiles used for processing (Default = 2000).
-    * nCores - is an int specifying the number of cores to be used for clumping processing.
-    
-    Example::
-    
+This function will perform a filtering of an input image where the input image will be tiled and the tiles executed on multiple processing cores. This function is primarily of use for larger images or when using very large filter windows otherwise the over head of tiling and mosaicking are not worth it.
+
+* inputImg - is the file name and path for the input image file.
+* outputImg - is the file name and path for the output image file.
+* filterInst - is an instance of a filter class available within rsgislib.imagefilter.tiledfilter. 
+* datatype - is the output image data type (e.g., rsgislib.TYPE_32FLOAT; Default is None). If None then data type of input image is used.
+* imgformat - string with the GDAL image format for the output image (Default = KEA). NOTE. KEA is used as intermediate format internally and therefore needs to be available.
+* tmpDIR - the temporary directory where intermediate files will be written (default is 'tmp'). Directory will be created and deleted if does not exist.
+* width - int for width of the image tiles used for processing (Default = 2000).
+* height - int for height of the image tiles used for processing (Default = 2000).
+* nCores - is an int specifying the number of cores to be used for clumping processing.
+
+Example::
+
     import rsgislib
     from rsgislib.imagefilter import tiledfilter
     from rsgislib import imageutils
     
     inputImage = 'LandsatImg.kea'
     outputImage = 'LandsatImgMedianFilter.kea'
-
+    
     medianFilter = tiledfilter.RSGISMedianFilter(7, "KEA", rsgislib.TYPE_16UINT)
     tiledfilter.performTiledImgFilter(inputImage, outputImage, medianFilter, width=2000, height=2000)
     imageutils.popImageStats(outputImage, usenodataval=False, nodataval=0, calcpyramids=True)
+    
     """
     rsgisUtils = rsgislib.RSGISPyUtils()
     
