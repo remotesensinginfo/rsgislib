@@ -12,13 +12,22 @@ Projection
 .. autofunction:: rsgislib.imageutils.copyProjFromImage
 .. autofunction:: rsgislib.imageutils.copySpatialAndProjFromImage
 .. autofunction:: rsgislib.imageutils.resampleImage2Match
+.. autofunction:: rsgislib.imageutils.reprojectImage
 
-Tile & Mosaic
---------------
+Mosaic
+----------
 
-.. autofunction:: rsgislib.imageutils.createTiles
 .. autofunction:: rsgislib.imageutils.createImageMosaic
 .. autofunction:: rsgislib.imageutils.includeImages
+.. autofunction:: rsgislib.imageutils.combineImages2Band
+
+Tile
+-------
+.. autofunction:: rsgislib.imageutils.createTiles
+.. autofunction:: rsgislib.imageutils.tilingutils.createMinDataTiles
+.. autofunction:: rsgislib.imageutils.tilingutils.createTileMaskImagesFromShp
+.. autofunction:: rsgislib.imageutils.tilingutils.createTileMaskImagesFromClumps
+.. autofunction:: rsgislib.imageutils.tilingutils.createTilesFromMasks
 
 Visualisation / Normalisation
 ------------------------------
@@ -35,8 +44,10 @@ Subset / Mask
 .. autofunction:: rsgislib.imageutils.subset2img
 .. autofunction:: rsgislib.imageutils.subset2polys
 .. autofunction:: rsgislib.imageutils.subsetImgs2CommonExtent
+.. autofunction:: rsgislib.imageutils.subsetbbox
 .. autofunction:: rsgislib.imageutils.buildImgSubDict
 .. autofunction:: rsgislib.imageutils.genFiniteMask
+.. autofunction:: rsgislib.imageutils.genValidMask
 
 Extract
 --------
@@ -49,6 +60,7 @@ Create
 
 .. autofunction:: rsgislib.imageutils.createBlankImage
 .. autofunction:: rsgislib.imageutils.createCopyImage
+.. autofunction:: rsgislib.imageutils.createCopyImageVecExtent
 
 Select / Stack bands
 ---------------------
@@ -64,6 +76,8 @@ Other
 .. autofunction:: rsgislib.imageutils.stackStats
 .. autofunction:: rsgislib.imageutils.orderImageUsingValidPxls
 .. autofunction:: rsgislib.imageutils.setBandNames
+.. autofunction:: rsgislib.imageutils.genSamplingGrid
+.. autofunction:: rsgislib.imageutils.getGDALDataType
 
 * :ref:`genindex`
 * :ref:`modindex`

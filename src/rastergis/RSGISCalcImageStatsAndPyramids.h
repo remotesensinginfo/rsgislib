@@ -50,6 +50,8 @@ namespace rsgis{namespace rastergis{
     public:
         RSGISPopulateWithImageStats();
         void populateImageWithRasterGISStats(GDALDataset *clumpsDataset, bool addColourTable, bool calcImagePyramids, bool ignoreZero, unsigned int ratBand) throw(rsgis::RSGISImageException);
+        void populateImageWithRasterGISStats(GDALDataset *clumpsDataset, bool addColourTable, bool ignoreZero, unsigned int ratBand) throw(rsgis::RSGISImageException);
+        void calcPyramids(GDALDataset *clumpsDataset) throw(rsgis::RSGISImageException);
         ~RSGISPopulateWithImageStats();
     };
     

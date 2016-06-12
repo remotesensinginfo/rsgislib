@@ -65,6 +65,7 @@ namespace rsgis{namespace geom{
 			void exportGEOSCoordinates2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::Coordinate*> *coords) throw(RSGISGeometryException);
 			void exportGEOSLineStrings2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::LineString*> *lines) throw(RSGISGeometryException);
 			void exportGEOSLineSegments2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::LineSegment*> *lines) throw(RSGISGeometryException);
+            void exportGEOSLineSegments2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::LineSegment*> *lines, std::vector<double> *vals) throw(RSGISGeometryException);
 			
 			~RSGISGeomTestExport();
 		};

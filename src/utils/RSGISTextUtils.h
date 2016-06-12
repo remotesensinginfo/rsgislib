@@ -80,6 +80,12 @@ namespace rsgis{namespace utils{
 			double strtodouble(std::string inValue)throw(RSGISTextException);
 			float strtofloat(std::string inValue)throw(RSGISTextException);
 			
+            int strtoInt(std::string inValue)throw(RSGISTextException);
+            unsigned int strtoUInt(std::string inValue)throw(RSGISTextException);
+            
+            long strtoLong(std::string inValue)throw(RSGISTextException);
+            unsigned long strtoULong(std::string inValue)throw(RSGISTextException);
+            
 			uint_fast8_t strto8bitUInt(std::string inValue)throw(RSGISTextException);
 			uint_fast16_t strto16bitUInt(std::string inValue)throw(RSGISTextException);
 			uint_fast32_t strto32bitUInt(std::string inValue)throw(RSGISTextException);

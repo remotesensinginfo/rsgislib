@@ -32,6 +32,8 @@
 
 #include "math/RSGISMathsUtils.h"
 
+#include "utils/RSGISGEOSFactoryGenerator.h"
+
 #include "geos/geom/Point.h"
 #include "geos/geom/Polygon.h"
 
@@ -51,6 +53,9 @@ namespace rsgis{namespace geom{
 			virtual geos::geom::Polygon* getPolygon();
 			virtual void getPoints(std::list<RSGIS2DPoint*> *pts);
 			virtual void getPoints(std::list<RSGIS2DPoint*> *pts, unsigned int classID);
+            virtual double distance(RSGIS2DPoint *pt);
+            virtual double distance(RSGISPolygon *poly);
+            virtual double distance(geos::geom::Coordinate *pt);
 			virtual ~RSGISPolygon();
 		protected:
 			geos::geom::Polygon *poly;

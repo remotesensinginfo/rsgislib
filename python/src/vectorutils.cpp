@@ -374,6 +374,221 @@ static PyObject *VectorUtils_SplitFeatures(PyObject *self, PyObject *args)
 }
 
 
+static PyObject *VectorUtils_ExportPxls2Pts(PyObject *self, PyObject *args)
+{
+    const char *pszInputImg, *pszOutputVector;
+    int force = false;
+    float maskVal = 0.0;
+    if( !PyArg_ParseTuple(args, "ssf|i:exportPxls2Pts", &pszInputImg, &pszOutputVector, &maskVal, &force))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeExportPxls2Pts(pszInputImg, pszOutputVector, force, maskVal);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+static PyObject *VectorUtils_Dist2NearestGeom(PyObject *self, PyObject *args)
+{
+    const char *pszInputVector, *pszOutputVector;
+    int force = false;
+    
+    if( !PyArg_ParseTuple(args, "ss|i:dist2NearestGeom", &pszInputVector, &pszOutputVector, &force))
+    {
+        return NULL;
+    }
+    
+    PyObject *outVal = PyTuple_New(1);
+    try
+    {
+        double dist = rsgis::cmds::executeCalcDist2NearestGeom(std::string(pszInputVector), std::string(pszOutputVector), force);
+        if(PyTuple_SetItem(outVal, 0, Py_BuildValue("d", dist)) == -1)
+        {
+            throw rsgis::cmds::RSGISCmdException("Failed to add \'distance\' value to the list...");
+        }
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    return outVal;
+}
+
+static PyObject *VectorUtils_CalcMaxDist2NearestGeom(PyObject *self, PyObject *args)
+{
+    const char *pszInputVector;
+    
+    if( !PyArg_ParseTuple(args, "s:calcMaxDist2NearestGeom", &pszInputVector))
+    {
+        return NULL;
+    }
+    
+    PyObject *outVal = PyTuple_New(1);
+    try
+    {
+        double dist = rsgis::cmds::executeCalcMaxDist2NearestGeom(std::string(pszInputVector));
+        if(PyTuple_SetItem(outVal, 0, Py_BuildValue("d", dist)) == -1)
+        {
+            throw rsgis::cmds::RSGISCmdException("Failed to add \'distance\' value to the list...");
+        }
+
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    return outVal;
+}
+
+static PyObject *VectorUtils_SpatialGraphClusterGeoms(PyObject *self, PyObject *args)
+{
+    const char *pszInputVector;
+    const char *pszOutputVector;
+    float sdEdgeLen = 0.0;
+    double maxEdgeLen = 0.0;
+    int force = false;
+    int useMinSpanTree = true;
+    PyObject *pszOutShpEdgesObj;
+    PyObject *pszOutH5EdgeLensObj;
+    
+    if( !PyArg_ParseTuple(args, "ssifd|iOO:spatialGraphClusterGeoms", &pszInputVector, &pszOutputVector, &useMinSpanTree, &sdEdgeLen, &maxEdgeLen, &force, &pszOutShpEdgesObj, &pszOutH5EdgeLensObj))
+    {
+        return NULL;
+    }
+    
+    std::string shpFileEdges="";
+    bool outShpEdges=false;
+    std::string h5EdgeLengths="";
+    bool outH5EdgeLens=false;
+    
+    if( ( pszOutShpEdgesObj == NULL ) || ( pszOutShpEdgesObj == Py_None ) || !RSGISPY_CHECK_STRING(pszOutShpEdgesObj) )
+    {
+        outShpEdges = false;
+    }
+    else
+    {
+        outShpEdges = true;
+        shpFileEdges = RSGISPY_STRING_EXTRACT(pszOutShpEdgesObj);
+    }
+    
+    if( ( pszOutH5EdgeLensObj == NULL ) || ( pszOutH5EdgeLensObj == Py_None ) || !RSGISPY_CHECK_STRING(pszOutH5EdgeLensObj) )
+    {
+        outH5EdgeLens = false;
+    }
+    else
+    {
+        outH5EdgeLens = true;
+        h5EdgeLengths = RSGISPY_STRING_EXTRACT(pszOutH5EdgeLensObj);
+    }
+    
+    try
+    {
+        rsgis::cmds::executeSpatialGraphClusterGeoms(std::string(pszInputVector), std::string(pszOutputVector), useMinSpanTree, sdEdgeLen, maxEdgeLen, force, shpFileEdges, outShpEdges, h5EdgeLengths, outH5EdgeLens);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+
+static PyObject *VectorUtils_FitPolygon2Points(PyObject *self, PyObject *args)
+{
+    const char *pszInputVector;
+    const char *pszOutputVector;
+    int force = false;
+    double alphaVal = -1.0;
+    
+    if( !PyArg_ParseTuple(args, "ss|di:fitPolygon2Points", &pszInputVector, &pszOutputVector, &alphaVal, &force))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeFitPolygonToPoints(std::string(pszInputVector), std::string(pszOutputVector), alphaVal, force);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+
+static PyObject *VectorUtils_FitPolygons2PointClusters(PyObject *self, PyObject *args)
+{
+    const char *pszInputVector;
+    const char *pszOutputVector;
+    const char *clustersField;
+    int force = false;
+    double alphaVal = -1.0;
+    
+    if( !PyArg_ParseTuple(args, "sss|di:fitPolygons2PointClusters", &pszInputVector, &pszOutputVector, &clustersField, &alphaVal, &force))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeFitPolygonsToPointClusters(std::string(pszInputVector), std::string(pszOutputVector), std::string(clustersField), alphaVal, force);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+
+static PyObject *VectorUtils_CreateLinesOfPoints(PyObject *self, PyObject *args)
+{
+    const char *pszInputVector;
+    const char *pszOutputVector;
+    double step;
+    int force = false;
+    
+    if( !PyArg_ParseTuple(args, "ssd|i:createLinesOfPoints", &pszInputVector, &pszOutputVector, &step, &force))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeCreateLinesOfPoints(std::string(pszInputVector), std::string(pszOutputVector), step, force);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+
+
+
 // Our list of functions in this module
 static PyMethodDef VectorUtilsMethods[] = {
     {"generateConvexHullsGroups", VectorUtils_GenerateConvexHullsGroups, METH_VARARGS, 
@@ -577,6 +792,99 @@ static PyMethodDef VectorUtilsMethods[] = {
 "   inputVector = './Vectors/injune_p142_psu_utm.shp'\n"
 "   outputVectorBase = './TestOutputs/injune_p142_psu_utm_'\n"
 "   vectorutils.splitFeatures(inputVector, outputVectorBase, True)\n"
+"\n"},
+
+{"exportPxls2Pts", VectorUtils_ExportPxls2Pts, METH_VARARGS,
+"vectorutils.exportPxls2Pts(inputimg, outputvector, maskVal, force)\n"
+"A command to export image pixel which a specific value to a shapefile as points.\n\n"
+"Where:\n"
+"\n"
+"* inputimg is a string containing the name of the input image\n"
+"* outputvector is a string containing the name of the output vector\n"
+"* maskVal is a float specifying the value of the image pixels to be exported\n"
+"* force is a bool, specifying whether to force removal of the output vector if it exists\n"
+"Example::\n"
+"\n"
+"\n"},
+    
+{"dist2NearestGeom", VectorUtils_Dist2NearestGeom, METH_VARARGS,
+"vectorutils.dist2NearestGeom(inputVector, outputVector, force)\n"
+"A command to calculate the distance from each geometry to its nearest neighbouring geometry.\n"
+"The function also returns the maximum minimum distance between the geometries.\n\n"
+"Where:\n"
+"\n"
+"* inputVector is a string containing the name of the input vector\n"
+"* outputVector is a string containing the name of the output vector\n"
+"* force is a bool, specifying whether to force removal of the output vector if it exists\n"
+"Example::\n"
+"\n"
+"\n"},
+    
+{"calcMaxDist2NearestGeom", VectorUtils_CalcMaxDist2NearestGeom, METH_VARARGS,
+"vectorutils.calcMaxDist2NearestGeom(inputVector)\n"
+"A command to calculate the maximum minimum distance between the geometries.\n\n"
+"Where:\n"
+"\n"
+"* inputVector is a string containing the name of the input vector\n"
+"Example::\n"
+"\n"
+"\n"},
+   
+{"spatialGraphClusterGeoms", VectorUtils_SpatialGraphClusterGeoms, METH_VARARGS,
+"vectorutils.spatialGraphClusterGeoms(inputVector, outputVector, useMinSpanTree, sdEdgeLen, maxEdgeLen, force, outShpEdges, outH5EdgeLens)\n"
+"A command to spatial cluster using a minimum spanning tree approach (Bunting et al 2010).\n\n"
+"Where:\n"
+"\n"
+"* inputVector is a string containing the name of the input vector\n"
+"* outputVector is a string containing the name of the output vector\n"
+"* useMinSpanTree is a boolean specifying whether a minimum spanning tree should be used rather than just a graph.\n"
+"* sdEdgeLen is a float\n"
+"* maxEdgeLen is a double"
+"* force is a bool, specifying whether to force removal of the output vector if it exists\n"
+"* outShpEdges is a string containing the path for an output vector to export minimum spanning tree edges as a shapefile.\n"
+"* outH5EdgeLens is a string containing the path for an output hdf5 file to export the minimum spanning tree edge lengths.\n"
+"Example::\n"
+"\n"
+"\n"},
+    
+{"fitPolygon2Points", VectorUtils_FitPolygon2Points, METH_VARARGS,
+"vectorutils.fitPolygon2Points(inputVector, outputVector, alphaVal. force)\n"
+"A command fit a polygon to the points inputted.\n\n"
+"Where:\n"
+"\n"
+"* inputVector is a string containing the name of the input vector (must be points)\n"
+"* outputVector is a string containing the name of the output vector\n"
+"* alphaVal is a double specifying the alpha value to use for the calculation (if negative optimal will be calculated; default)\n"
+"* force is a bool, specifying whether to force removal of the output vector if it exists\n"
+"Example::\n"
+"\n"
+"\n"},
+    
+{"fitPolygons2PointClusters", VectorUtils_FitPolygons2PointClusters, METH_VARARGS,
+"vectorutils.fitPolygons2PointClusters(inputVector, outputVector, clusterField, alphaVal. force)\n"
+"A command fit a polygon to the points inputted.\n\n"
+"Where:\n"
+"\n"
+"* inputVector is a string containing the name of the input vector (must be points)\n"
+"* outputVector is a string containing the name of the output vector\n"
+"* clusterField is a string specifying the column in the input shapefile which specifies the clusters\n"
+"* alphaVal is a double specifying the alpha value to use for the calculation (if negative optimal will be calculated; default)\n"
+"* force is a bool, specifying whether to force removal of the output vector if it exists\n"
+"Example::\n"
+"\n"
+"\n"},
+    
+{"createLinesOfPoints", VectorUtils_CreateLinesOfPoints, METH_VARARGS,
+"vectorutils.createLinesOfPoints(inputVector, outputVector, step. force)\n"
+"A function to create a regularly spaced set of points following a set of lines.\n\n"
+"Where:\n"
+"\n"
+"* inputVector is a string containing the name of the input vector (must be lines)\n"
+"* outputVector is a string containing the name of the output vector (will be points)\n"
+"* step is a double specifying the distance between points along the line.\n"
+"* force is a bool, specifying whether to force removal of the output vector if it exists\n"
+"Example::\n"
+"\n"
 "\n"},
     
     {NULL}        /* Sentinel */

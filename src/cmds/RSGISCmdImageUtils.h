@@ -72,7 +72,10 @@ namespace rsgis{ namespace cmds {
     DllExport void executeImageMosaic(std::string *inputImages, int numDS, std::string outputImage, float background, float skipVal, unsigned int skipBand, unsigned int overlapBehaviour, std::string format, RSGISLibDataType outDataType) throw(RSGISCmdException);
     
     /** A command to add images to an existing image*/
-    DllExport void executeImageInclude(std::string *inputImages, int numDS, std::string baseImage, bool bandsDefined, std::vector<int> bands) throw(RSGISCmdException);
+    DllExport void executeImageInclude(std::string *inputImages, int numDS, std::string baseImage, bool bandsDefined, std::vector<int> bands, float skipVal=0.0, bool useSkipVal=false) throw(RSGISCmdException);
+    
+    /** A command to add images to an existing image*/
+    DllExport void executeImageIncludeOverlap(std::string *inputImages, int numDS, std::string baseImage, int numOverlapPxls) throw(RSGISCmdException);
     
     /** A command to order a set of input images based on the proportion of valid data within each of the scenes */
     DllExport std::vector<std::string> executeOrderImageUsingValidDataProp(std::vector<std::string> images, float noDataValue) throw(RSGISCmdException);
@@ -127,6 +130,12 @@ namespace rsgis{ namespace cmds {
     
     /** A function to produce a binary image for regions with finite data values */
     DllExport void executeFiniteImageMask(std::string inputImage, std::string outputImage, std::string gdalFormat) throw(RSGISCmdException);
+        
+    /** A function to produce a binary image for valid regions within all the input images (i.e., not the no data value) */
+    DllExport void executeValidImageMask(std::vector<std::string> inputImages, std::string outputImage, std::string gdalFormat, float noDataVal=0.0) throw(RSGISCmdException);
+    
+    /** A function to combine images together into a single image band by excluding the no data value */
+    DllExport void executeCombineImagesSingleBandIgnoreNoData(std::vector<std::string> inputImages, std::string outputImage, float noDataVal, std::string gdalFormat, RSGISLibDataType outDataType) throw(RSGISCmdException);
 
 
     

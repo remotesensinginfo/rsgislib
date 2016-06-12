@@ -42,7 +42,7 @@
 #include "img/RSGISAddBands.h"
 #include "img/RSGISExtractImageValues.h"
 #include "img/RSGISImageComposite.h"
-#include "img/RSGISMaskImage.h"
+#include "img/RSGISAddBands.h"
 
 #include "vec/RSGISImageTileVector.h"
 #include "vec/RSGISVectorOutputException.h"
@@ -444,7 +444,7 @@ namespace rsgis{ namespace cmds {
         return orderedImages;
     }
 
-    void executeImageInclude(std::string *inputImages, int numDS, std::string baseImage, bool bandsDefined, std::vector<int> bands) throw(RSGISCmdException)
+    void executeImageInclude(std::string *inputImages, int numDS, std::string baseImage, bool bandsDefined, std::vector<int> bands, float skipVal, bool useSkipVal) throw(RSGISCmdException)
     {
         try
         {
@@ -458,8 +458,44 @@ namespace rsgis{ namespace cmds {
             }
 
             rsgis::img::RSGISImageMosaic mosaic;
-            mosaic.includeDatasets(baseDS, inputImages, numDS, bands, bandsDefined);
+            if(useSkipVal)
+            {
+                mosaic.includeDatasetsSkipVals(baseDS, inputImages, numDS, bands, bandsDefined, skipVal);
+            }
+            else
+            {
+                mosaic.includeDatasets(baseDS, inputImages, numDS, bands, bandsDefined);
+            }
 
+            GDALClose(baseDS);
+            delete[] inputImages;
+        }
+        catch (RSGISImageException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+            
+    void executeImageIncludeOverlap(std::string *inputImages, int numDS, std::string baseImage, int numOverlapPxls) throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            
+            GDALDataset *baseDS = (GDALDataset *) GDALOpenShared(baseImage.c_str(), GA_Update);
+            if(baseDS == NULL)
+            {
+                std::string message = std::string("Could not open image ") + baseImage;
+                throw RSGISImageException(message.c_str());
+            }
+            
+            rsgis::img::RSGISImageMosaic mosaic;
+            mosaic.includeDatasetsIgnoreOverlap(baseDS, inputImages, numDS, numOverlapPxls);
+            
             GDALClose(baseDS);
             delete[] inputImages;
         }
@@ -1408,7 +1444,103 @@ namespace rsgis{ namespace cmds {
             
             // Tidy up
             GDALClose(dataset);
-            GDALClose(dataset);
+        }
+        catch (RSGISImageException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (RSGISException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+            
+    void executeValidImageMask(std::vector<std::string> inputImages, std::string outputImage, std::string gdalFormat, float noDataVal) throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            unsigned int numImages = inputImages.size();
+            GDALDataset **datasets = new GDALDataset*[numImages];
+            for(unsigned int i = 0; i < numImages; ++i)
+            {
+                std::cout << i << ") " << inputImages.at(i) << std::endl;
+                datasets[i] = (GDALDataset *) GDALOpen(inputImages.at(i).c_str(), GA_ReadOnly);
+                if(datasets[i] == NULL)
+                {
+                    std::string message = std::string("Could not open image ") + inputImages.at(i);
+                    throw RSGISImageException(message.c_str());
+                }
+            }
+            
+            rsgis::img::RSGISMaskImage maskImg;
+            maskImg.genValidImgMask(datasets, numImages, outputImage, gdalFormat, noDataVal);
+            
+            GDALDataset *outDataset = (GDALDataset *) GDALOpen(outputImage.c_str(), GA_Update);
+            if(outDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + outputImage;
+                throw RSGISImageException(message.c_str());
+            }
+            outDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
+            
+            // Tidy up
+            for(unsigned int i = 0; i < numImages; ++i)
+            {
+                GDALClose(datasets[i]);
+            }
+            delete[] datasets;
+        }
+        catch (RSGISImageException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (RSGISException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+            
+    void executeCombineImagesSingleBandIgnoreNoData(std::vector<std::string> inputImages, std::string outputImage, float noDataVal, std::string gdalFormat, RSGISLibDataType outDataType) throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            unsigned int numImages = inputImages.size();
+            GDALDataset **datasets = new GDALDataset*[numImages];
+            
+            for(unsigned int i = 0; i < numImages; ++i)
+            {
+                datasets[i] = (GDALDataset *) GDALOpen(inputImages.at(i).c_str(), GA_ReadOnly);
+                if(datasets[i] == NULL)
+                {
+                    std::string message = std::string("Could not open image ") + inputImages.at(i);
+                    throw RSGISImageException(message.c_str());
+                }
+            }
+            
+            rsgis::img::RSGISCombineImagesIgnoreNoData *combineImagesCalc = new rsgis::img::RSGISCombineImagesIgnoreNoData(noDataVal);
+            rsgis::img::RSGISCalcImage *calcImage = new rsgis::img::RSGISCalcImage(combineImagesCalc, "", true);
+            
+            calcImage->calcImage(datasets, numImages, outputImage, false, NULL, gdalFormat, RSGIS_to_GDAL_Type(outDataType));
+            
+            delete calcImage;
+            
+            
+            // Tidy up
+            for(unsigned int i = 0; i < numImages; ++i)
+            {
+                GDALClose(datasets[i]);
+            }
+            delete[] datasets;
         }
         catch (RSGISImageException& e)
         {

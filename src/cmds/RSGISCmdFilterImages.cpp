@@ -220,6 +220,26 @@ namespace rsgis{ namespace cmds {
                     rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISTextureVar(0, (*iterFilter)->size, (*iterFilter)->fileEnding);
                     filterBank->addFilter(filter);
                 }
+                else if((*iterFilter)->type == "MeanDiff")
+                {
+                    rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISMeanDiffFilter(0, (*iterFilter)->size, (*iterFilter)->fileEnding);
+                    filterBank->addFilter(filter);
+                }
+                else if((*iterFilter)->type == "MeanDiffAbs")
+                {
+                    rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISMeanDiffAbsFilter(0, (*iterFilter)->size, (*iterFilter)->fileEnding);
+                    filterBank->addFilter(filter);
+                }
+                else if((*iterFilter)->type == "TotalDiff")
+                {
+                    rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISTotalDiffFilter(0, (*iterFilter)->size, (*iterFilter)->fileEnding);
+                    filterBank->addFilter(filter);
+                }
+                else if((*iterFilter)->type == "TotalDiffAbs")
+                {
+                    rsgis::filter::RSGISImageFilter *filter = new rsgis::filter::RSGISTotalDiffAbsFilter(0, (*iterFilter)->size, (*iterFilter)->fileEnding);
+                    filterBank->addFilter(filter);
+                }
                 else{std::cerr << "Filter not recognised - skipping" << std::endl;}
 
             }

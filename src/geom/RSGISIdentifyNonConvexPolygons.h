@@ -48,6 +48,9 @@ namespace rsgis{namespace geom{
 			virtual geos::geom::Polygon* retrievePolygon(std::list<geos::geom::Polygon*> *polygons) throw(RSGISGeometryException) = 0;
 			virtual ~RSGISIdentifyNonConvexPolygons(){};
 		};
+    
+
+    
 }}
 
 #endif

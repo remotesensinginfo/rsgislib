@@ -51,7 +51,7 @@ namespace rsgis{ namespace cmds {
     DllExport void executeEliminateSinglePixels(std::string inputImage, std::string clumpsImage, std::string outputImage, std::string tempImage, std::string imageFormat, bool processInMemory, bool ignoreZeros)throw(RSGISCmdException);
     
     /** Function to run the clump command */
-    DllExport void executeClump(std::string inputImage, std::string outputImage, std::string imageFormat, bool processInMemory, bool noDataValProvided, float noDataVal)throw(RSGISCmdException);
+    DllExport void executeClump(std::string inputImage, std::string outputImage, std::string imageFormat, bool processInMemory, bool noDataValProvided, float noDataVal, bool addRatPxlVals=true)throw(RSGISCmdException);
 
     /** Function to run the iterative stepwise elimination command */
     DllExport void executeRMSmallClumpsStepwise(std::string inputImage, std::string clumpsImage, std::string outputImage, std::string imageFormat, bool stretchStatsAvail, std::string stretchStatsFile, bool storeMean, bool processInMemory, unsigned int minClumpSize, float specThreshold)throw(RSGISCmdException);
@@ -66,7 +66,7 @@ namespace rsgis{ namespace cmds {
     DllExport void executeRandomColourClumps(std::string inputImage, std::string outputImage, std::string imageFormat, bool processInMemory, std::string importLUTFile, bool importLUT, std::string exportLUTFile, bool exportLUT)throw(RSGISCmdException);
     
     /** Function to run union of segmentations command */
-    DllExport void executeUnionOfClumps(std::vector<std::string> inputImagePaths, std::string outputImage, std::string imageFormat, bool noDataValProvided, float noDataVal)throw(RSGISCmdException);
+    DllExport void executeUnionOfClumps(std::vector<std::string> inputImagePaths, std::string outputImage, std::string imageFormat, bool noDataValProvided, float noDataVal, bool addRatPxlVals=true)throw(RSGISCmdException);
     
     /** Function to run merge segment tiles command */
     DllExport void executeMergeSegmentationTiles(std::string outputImage, std::string borderMaskImage, std::vector<std::string> inputImagePaths, unsigned int tileBoundary, unsigned int tileOverlap, unsigned int tileBody, std::string colsName)throw(RSGISCmdException);
@@ -75,7 +75,7 @@ namespace rsgis{ namespace cmds {
     DllExport void executeFindTileBordersMask(std::vector<std::string> inputImagePaths, std::string borderMaskImage, unsigned int tileBoundary, unsigned int tileOverlap, unsigned int tileBody, std::string colsName)throw(RSGISCmdException);
 
     /** Function to run command to merge clump image */
-    DllExport void executeMergeClumpImages(std::vector<std::string> inputImagePaths, std::string outputImage)throw(RSGISCmdException);
+    DllExport void executeMergeClumpImages(std::vector<std::string> inputImagePaths, std::string outputImage, bool mergeRATs)throw(RSGISCmdException);
     
     /** Function to run command to merge clump image */
     DllExport void executeExtractBrightFeatures(std::string inputImage, std::string maskImage, std::string outputImage, std::string temp1Image, std::string temp2Image, std::string outputFormat, float initThres, float thresIncrement, float thresholdUpper, std::vector<rsgis::cmds::FeatureShapeDescription*> shapeFeatDescript)throw(RSGISCmdException);
@@ -90,11 +90,13 @@ namespace rsgis{ namespace cmds {
     DllExport void executeIncludeClumpedRegion(std::string inputClumps, std::string inputRegion, std::string outputClumpImage, std::string imageFormat)throw(RSGISCmdException);
     
     /** Function to merge selected clumps to neighbour with closest values from input image */
-    DllExport void executeMergeSelectClumps2Neighbour(std::string inputImage, std::string clumpsImage, std::string outputImage, std::string imageFormat, std::string selectClumpsCol)throw(RSGISCmdException);
+    DllExport void executeMergeSelectClumps2Neighbour(std::string inputImage, std::string clumpsImage, std::string outputImage, std::string imageFormat, std::string selectClumpsCol, std::string noDataClumpsCol)throw(RSGISCmdException);
     
     /** Function to drop selected clumps from the segmentation */
     DllExport void executeDropSelectedClumps(std::string clumpsImage, std::string outputImage, std::string imageFormat, std::string selectClumpsCol)throw(RSGISCmdException);
     
+    /** Function merge clumps with same value */
+    DllExport void executeMergeClumpsEquivalentVal(std::string clumpsImage, std::string outputImage, std::string imageFormat, std::vector<std::string> clumpsValCols)throw(RSGISCmdException);
     
 }}
 

@@ -50,7 +50,7 @@ namespace rsgis{namespace segment{
         RSGISMergeSegmentationTiles();
         void createTileBorderClumpMask(GDALDataset *borderMaskDataset, std::vector<std::string> inputImagePaths, unsigned int tileBoundary, unsigned int tileOverlap, unsigned int tileBody, std::string colsName) throw(rsgis::img::RSGISImageCalcException);
         void mergeClumpBodies(GDALDataset *outputDataset, GDALDataset *borderMaskDataset, std::vector<std::string> inputImagePaths, unsigned int tileBoundary, unsigned int tileOverlap, unsigned int tileBody, std::string colsName) throw(rsgis::img::RSGISImageCalcException);
-        void mergeClumpImages(GDALDataset *outputDataset, std::vector<std::string> inputImagePaths) throw(rsgis::img::RSGISImageCalcException);
+        void mergeClumpImages(GDALDataset *outputDataset, std::vector<std::string> inputImagePaths, bool mergeRATs=false) throw(rsgis::img::RSGISImageCalcException);
         ~RSGISMergeSegmentationTiles();
     protected:
         size_t numberBodyClumps(GDALRasterAttributeTable *gdalATT, std::string outColName, std::string clumpPosColName, int tileBody, size_t clumpsOffset) throw(RSGISException);

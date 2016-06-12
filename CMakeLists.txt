@@ -26,7 +26,7 @@ set (PROJECT_TOOLS_DIR tools)
 set (PROJECT_XML_DIR xml_standards)
 
 # The version number.
-set (RSGISLIB_HG_COMMIT 1036)
+set (RSGISLIB_HG_COMMIT 1122)
 set (RSGISLIB_VERSION_MAJOR 2)
 set (RSGISLIB_VERSION_MINOR 3)
 set (RSGISLIB_VERSION "${RSGISLIB_VERSION_MAJOR}.${RSGISLIB_VERSION_MINOR}.${RSGISLIB_HG_COMMIT}")
@@ -178,7 +178,7 @@ set(KEA_LIB_PATH /usr/local/lib CACHE PATH "Library PATH for KEA")
 
 ###############################################################################
 # CMake settings
-cmake_minimum_required(VERSION 2.6.0)
+cmake_minimum_required(VERSION 2.8.9)
 
 IF(NOT CMAKE_BUILD_TYPE)
   #SET(CMAKE_BUILD_TYPE "DEBUG")
@@ -384,6 +384,8 @@ if (RSGISLIB_WITH_UTILTIES)
 	configure_file ( "${PROJECT_TOOLS_DIR}/rsgislibzonalstats.py.in" "${PROJECT_BINARY_DIR}/rsgislibzonalstats.py" )
 	configure_file ( "${PROJECT_TOOLS_DIR}/rsgislibmosaic.py.in" "${PROJECT_BINARY_DIR}/rsgislibmosaic.py" )
 	configure_file ( "${PROJECT_TOOLS_DIR}/rsgislibcalcindices.py.in" "${PROJECT_BINARY_DIR}/rsgislibcalcindices.py" )
+	configure_file ( "${PROJECT_TOOLS_DIR}/rsgiscalcaccmatrix.py.in" "${PROJECT_BINARY_DIR}/rsgiscalcaccmatrix.py" )
+	configure_file ( "${PROJECT_TOOLS_DIR}/rsgiscalcimgstats.py.in" "${PROJECT_BINARY_DIR}/rsgiscalcimgstats.py" )
 endif(RSGISLIB_WITH_UTILTIES)
 
 if (RSGISLIB_WITH_DOCUMENTS)
@@ -419,6 +421,8 @@ if (RSGISLIB_WITH_UTILTIES)
 	install (FILES "${PROJECT_BINARY_DIR}/rsgislibzonalstats.py" DESTINATION bin PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 	install (FILES "${PROJECT_BINARY_DIR}/rsgislibmosaic.py" DESTINATION bin PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 	install (FILES "${PROJECT_BINARY_DIR}/rsgislibcalcindices.py" DESTINATION bin PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+	install (FILES "${PROJECT_BINARY_DIR}/rsgiscalcaccmatrix.py" DESTINATION bin PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+	install (FILES "${PROJECT_BINARY_DIR}/rsgiscalcimgstats.py" DESTINATION bin PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 endif(RSGISLIB_WITH_UTILTIES)
 
 if (RSGISLIB_WITH_DOCUMENTS)

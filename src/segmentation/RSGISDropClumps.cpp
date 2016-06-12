@@ -78,7 +78,8 @@ namespace rsgis{namespace segment{
             outClumpsDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
             
             rsgis::rastergis::RSGISPopulateWithImageStats popImageStats;
-            popImageStats.populateImageWithRasterGISStats(outClumpsDataset, true, true, true, 1);
+            popImageStats.populateImageWithRasterGISStats(outClumpsDataset, true, true, 1);
+            popImageStats.calcPyramids(outClumpsDataset);
             
             GDALClose(outClumpsDataset);
         }

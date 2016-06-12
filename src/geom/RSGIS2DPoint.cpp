@@ -56,6 +56,18 @@ namespace rsgis{namespace geom{
 	{
 		return point;
 	}
+    
+    geos::geom::Coordinate RSGIS2DPoint::getCoordPoint()
+    {
+        return geos::geom::Coordinate(this->point->x, this->point->y);
+    }
+    
+    geos::geom::Point* RSGIS2DPoint::getAsGeosPoint()
+    {
+        geos::geom::GeometryFactory* geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+        geos::geom::Point *geosPt = geomFactory->createPoint(*point);
+        return geosPt;
+    }
 	
 	double RSGIS2DPoint::getX()
 	{
@@ -111,6 +123,30 @@ namespace rsgis{namespace geom{
 	{
 		return sqrt(((pt->x - point->x)*(pt->x - point->x))+((pt->y - point->y)*(pt->y - point->y)));
 	}
+    
+    bool RSGIS2DPoint::equals(RSGIS2DPoint *pt)
+    {
+        //std::cout << "[" << point->x << "," << point->y << "][" << pt->point->x << "," << pt->point->y << "]\n";
+        if((pt->point->x == point->x) && (pt->point->y == point->y))
+        {
+            //std::cout << "\t Are Equal\n";
+            return true;
+        }
+        //std::cout << "\t Are Not Equal\n";
+        return false;
+    }
+    
+    bool RSGIS2DPoint::equals(geos::geom::Coordinate *pt)
+    {
+        //std::cout << "[" << point->x << "," << point->y << "][" << pt->x << "," << pt->y << "]\n";
+        if((pt->x == point->x) && (pt->y == point->y))
+        {
+            //std::cout << "\t Are Equal\n";
+            return true;
+        }
+        //std::cout << "\t Are Not Equal\n";
+        return false;
+    }
 	
 	std::ostream& operator<<(std::ostream& ostr, const RSGIS2DPoint& pt)
 	{
@@ -126,7 +162,7 @@ namespace rsgis{namespace geom{
 	
 	bool RSGIS2DPoint::operator==(RSGIS2DPoint pt) const
 	{
-		if(pt.point->x == point->x && 
+		if(pt.point->x == point->x &&
 		   pt.point->y == point->y)
 		{
 			return true;
@@ -136,7 +172,7 @@ namespace rsgis{namespace geom{
 	
 	bool RSGIS2DPoint::operator!=(RSGIS2DPoint pt) const
 	{
-		if(pt.point->x != point->x && 
+		if(pt.point->x != point->x ||
 		   pt.point->y != point->y)
 		{
 			return true;
@@ -227,7 +263,7 @@ namespace rsgis{namespace geom{
 	
 	bool RSGIS2DPoint::operator==(RSGIS2DPoint *pt) const
 	{
-		if(pt->point->x == point->x && 
+		if(pt->point->x == point->x &&
 		   pt->point->y == point->y)
 		{
 			return true;
@@ -237,8 +273,7 @@ namespace rsgis{namespace geom{
 	
 	bool RSGIS2DPoint::operator!=(RSGIS2DPoint *pt) const
 	{
-		if(pt->point->x != point->x & 
-		   pt->point->y != point->y)
+		if((pt->point->x != point->x) || (pt->point->y != point->y))
 		{
 			return true;
 		}
