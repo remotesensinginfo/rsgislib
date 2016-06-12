@@ -459,7 +459,7 @@ namespace rsgis{ namespace cmds {
             // Open Input Shapfile.
             //
             /////////////////////////////////////
-            inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);  
+            inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_UPDATE, NULL, NULL, NULL);  
             if(inputSHPDS == NULL)
             {
                 std::string message = std::string("Could not open vector file ") + inputVector;
