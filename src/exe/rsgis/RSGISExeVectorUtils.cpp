@@ -4600,7 +4600,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				//
 				/////////////////////////////////////
 				const char *pszDriverName = "ESRI Shapefile";
-				shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
+				shpFiledriver = GetGDALDriverManager()->GetDriverByName(pszDriverName );
 				if( shpFiledriver == NULL )
 				{
 					throw RSGISVectorOutputException("SHP driver not available.");
@@ -4836,7 +4836,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				//
 				/////////////////////////////////////
 				const char *pszDriverName = "ESRI Shapefile";
-				shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
+				shpFiledriver = GetGDALDriverManager()->GetDriverByName(pszDriverName );
 				if( shpFiledriver == NULL )
 				{
 					throw RSGISVectorOutputException("SHP driver not available.");
@@ -4943,7 +4943,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				//
 				/////////////////////////////////////
 				const char *pszDriverName = "ESRI Shapefile";
-				shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
+				shpFiledriver = GetGDALDriverManager()->GetDriverByName(pszDriverName );
 				if( shpFiledriver == NULL )
 				{
 					throw RSGISVectorOutputException("SHP driver not available.");
@@ -5056,7 +5056,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				//
 				/////////////////////////////////////
 				const char *pszDriverName = "ESRI Shapefile";
-				shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
+				shpFiledriver = GetGDALDriverManager()->GetDriverByName(pszDriverName );
 				if( shpFiledriver == NULL )
 				{
 					throw RSGISVectorOutputException("SHP driver not available.");
@@ -5222,7 +5222,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				//
 				/////////////////////////////////////
 				const char *pszDriverName = "ESRI Shapefile";
-				shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
+				shpFiledriver = GetGDALDriverManager()->GetDriverByName(pszDriverName );
 				if( shpFiledriver == NULL )
 				{
 					throw RSGISVectorOutputException("SHP driver not available.");
@@ -5410,7 +5410,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				//
 				/////////////////////////////////////
 				const char *pszDriverName = "ESRI Shapefile";
-				shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
+				shpFiledriver = GetGDALDriverManager()->GetDriverByName(pszDriverName );
 				if( shpFiledriver == NULL )
 				{
 					throw RSGISVectorOutputException("SHP driver not available.");
@@ -7186,7 +7186,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				//
 				/////////////////////////////////////
 				const char *pszDriverName = "ESRI Shapefile";
-				shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
+				shpFiledriver = GetGDALDriverManager()->GetDriverByName(pszDriverName );
 				if( shpFiledriver == NULL )
 				{
 					throw RSGISVectorOutputException("SHP driver not available.");
@@ -7260,7 +7260,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			try
 			{
 				const char *pszDriverName = "ESRI Shapefile";
-				shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
+				shpFiledriver = GetGDALDriverManager()->GetDriverByName(pszDriverName );
 				if( shpFiledriver == NULL )
 				{
 					throw RSGISVectorOutputException("SHP driver not available.");
@@ -7436,7 +7436,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				//
 				/////////////////////////////////////
 				const char *pszDriverName = "ESRI Shapefile";
-				shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
+				shpFiledriver = GetGDALDriverManager()->GetDriverByName(pszDriverName );
 				if( shpFiledriver == NULL )
 				{
 					throw RSGISVectorOutputException("SHP driver not available.");
@@ -7527,7 +7527,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			OGRSpatialReference* inputSpatialRef = NULL;
 
 			const char *pszDriverName = "ESRI Shapefile";
-			shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
+			shpFiledriver = GetGDALDriverManager()->GetDriverByName(pszDriverName );
 			if( shpFiledriver == NULL )
 			{
 				throw RSGISVectorOutputException("SHP driver not available.");
@@ -7832,7 +7832,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 			OGRSpatialReference* inputSpatialRef = NULL;
 
 			const char *pszDriverName = "ESRI Shapefile";
-			shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
+			shpFiledriver = GetGDALDriverManager()->GetDriverByName(pszDriverName );
 			if( shpFiledriver == NULL )
 			{
 				throw RSGISVectorOutputException("SHP driver not available.");
@@ -8049,7 +8049,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				//
 				/////////////////////////////////////
 				const char *pszDriverName = "ESRI Shapefile";
-				shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
+				shpFiledriver = GetGDALDriverManager()->GetDriverByName(pszDriverName );
 				if( shpFiledriver == NULL )
 				{
 					throw RSGISVectorOutputException("SHP driver not available.");
@@ -8192,7 +8192,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 						//
 						/////////////////////////////////////
 						const char *pszDriverName = "ESRI Shapefile";
-						shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
+						shpFiledriver = GetGDALDriverManager()->GetDriverByName(pszDriverName );
 						if( shpFiledriver == NULL )
 						{
 							throw RSGISVectorOutputException("SHP driver not available.");
@@ -8318,7 +8318,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				//
 				/////////////////////////////////////
 				const char *pszDriverName = "ESRI Shapefile";
-				shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
+				shpFiledriver = GetGDALDriverManager()->GetDriverByName(pszDriverName );
 				if( shpFiledriver == NULL )
 				{
 					throw RSGISVectorOutputException("SHP driver not available.");
@@ -8433,7 +8433,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				//
 				/////////////////////////////////////
 				const char *pszDriverName = "ESRI Shapefile";
-				shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
+				shpFiledriver = GetGDALDriverManager()->GetDriverByName(pszDriverName );
 				if( shpFiledriver == NULL )
 				{
 					throw RSGISVectorOutputException("SHP driver not available.");
@@ -8546,7 +8546,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				//
 				/////////////////////////////////////
 				const char *pszDriverName = "ESRI Shapefile";
-				shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
+				shpFiledriver = GetGDALDriverManager()->GetDriverByName(pszDriverName );
 				if( shpFiledriver == NULL )
 				{
 					throw RSGISVectorOutputException("SHP driver not available.");
@@ -8977,7 +8977,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				//
 				/////////////////////////////////////
 				const char *pszDriverName = "ESRI Shapefile";
-				shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
+				shpFiledriver = GetGDALDriverManager()->GetDriverByName(pszDriverName );
 				if( shpFiledriver == NULL )
 				{
 					throw RSGISVectorOutputException("SHP driver not available.");
@@ -9102,7 +9102,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				//
 				/////////////////////////////////////
 				const char *pszDriverName = "ESRI Shapefile";
-				shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
+				shpFiledriver = GetGDALDriverManager()->GetDriverByName(pszDriverName );
 				if( shpFiledriver == NULL )
 				{
 					throw RSGISVectorOutputException("SHP driver not available.");
@@ -9303,7 +9303,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				//
 				/////////////////////////////////////
 				const char *pszDriverName = "ESRI Shapefile";
-				shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
+				shpFiledriver = GetGDALDriverManager()->GetDriverByName(pszDriverName );
 				if( shpFiledriver == NULL )
 				{
 					throw RSGISVectorOutputException("SHP driver not available.");
@@ -9456,7 +9456,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				//
 				/////////////////////////////////////
 				const char *pszDriverName = "ESRI Shapefile";
-				shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
+				shpFiledriver = GetGDALDriverManager()->GetDriverByName(pszDriverName );
 				if( shpFiledriver == NULL )
 				{
 					throw RSGISVectorOutputException("SHP driver not available.");
@@ -9581,7 +9581,7 @@ void RSGISExeVectorUtils::runAlgorithm() throw(RSGISException)
 				//
 				/////////////////////////////////////
 				const char *pszDriverName = "ESRI Shapefile";
-				shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
+				shpFiledriver = GetGDALDriverManager()->GetDriverByName(pszDriverName );
 				if( shpFiledriver == NULL )
 				{
 					throw RSGISVectorOutputException("SHP driver not available.");

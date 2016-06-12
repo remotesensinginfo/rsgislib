@@ -288,7 +288,7 @@ namespace rsgis{namespace geom{
 		//
 		/////////////////////////////////////
 		const char *pszDriverName = "ESRI Shapefile";
-		shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
+		shpFiledriver = GetGDALDriverManager()->GetDriverByName(pszDriverName );
 		if( shpFiledriver == NULL )
 		{
 			throw RSGISGeometryException("SHP driver not available.");
@@ -361,7 +361,7 @@ namespace rsgis{namespace geom{
 		//
 		/////////////////////////////////////
 		const char *pszDriverName = "ESRI Shapefile";
-		shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
+		shpFiledriver = GetGDALDriverManager()->GetDriverByName(pszDriverName );
 		if( shpFiledriver == NULL )
 		{
 			throw RSGISGeometryException("SHP driver not available.");
@@ -434,7 +434,7 @@ namespace rsgis{namespace geom{
 		//
 		/////////////////////////////////////
 		const char *pszDriverName = "ESRI Shapefile";
-		shpFiledriver =  GDALDriverManager().GetDriverByName(pszDriverName );
+		shpFiledriver =  GetGDALDriverManager()->GetDriverByName(pszDriverName );
 		if( shpFiledriver == NULL )
 		{
 			throw RSGISGeometryException("SHP driver not available.");
@@ -507,7 +507,7 @@ namespace rsgis{namespace geom{
 		//
 		/////////////////////////////////////
 		const char *pszDriverName = "ESRI Shapefile";
-		shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
+		shpFiledriver = GetGDALDriverManager()->GetDriverByName(pszDriverName );
 		if( shpFiledriver == NULL )
 		{
 			throw RSGISGeometryException("SHP driver not available.");
@@ -582,7 +582,7 @@ namespace rsgis{namespace geom{
 		//
 		/////////////////////////////////////
 		const char *pszDriverName = "ESRI Shapefile";
-		shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
+		shpFiledriver = GetGDALDriverManager()->GetDriverByName(pszDriverName );
 		if( shpFiledriver == NULL )
 		{
 			throw RSGISGeometryException("SHP driver not available.");
