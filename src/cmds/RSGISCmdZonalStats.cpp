@@ -135,7 +135,7 @@ namespace rsgis{ namespace cmds {
             if (!outputToText)
             {
                 const char *pszDriverName = "ESRI Shapefile";
-                shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
+                shpFiledriver = GetGDALDriverManager()->GetDriverByName(pszDriverName );
                 if( shpFiledriver == NULL )
                 {
                     throw RSGISException("SHP driver not available.");
@@ -416,7 +416,7 @@ namespace rsgis{ namespace cmds {
                 //
                 /////////////////////////////////////
                 const char *pszDriverName = "ESRI Shapefile";
-                shpFiledriver = GDALDriverManager().GetDriverByName(pszDriverName );
+                shpFiledriver = GetGDALDriverManager()->GetDriverByName(pszDriverName );
                 if( shpFiledriver == NULL )
                 {
                     throw RSGISException("SHP driver not available.");
