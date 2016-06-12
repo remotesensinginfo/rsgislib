@@ -159,10 +159,10 @@ namespace rsgis{ namespace cmds {
             
             /////////////////////////////////////
             //
-            // Open Input Shapfile.
+            // Open Input ShapfLinesVec.
             //
             /////////////////////////////////////
-            inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);
+            inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);  
             if(inputSHPDS == NULL)
             {
                 std::string message = std::string("Could not open vector file ") + inputVector;
@@ -1400,8 +1400,8 @@ namespace rsgis{ namespace cmds {
             outputVec = boost::filesystem::absolute(outputVec).string();
             std::string SHPFileOutLayer = vecUtils.getLayerName(outputVec);
             
-            OGRSFDriver *shpFiledriver = NULL;
-            OGRDataSource *outputSHPDS = NULL;
+            GDALDriver *shpFiledriver = NULL;
+            GDALDataset *outputSHPDS = NULL;
             OGRLayer *outputSHPLayer = NULL;
             OGRSpatialReference* ogrSpatialRef = NULL;
             
@@ -1429,12 +1429,12 @@ namespace rsgis{ namespace cmds {
             /////////////////////////////////////
             //std::cout << "Output Vector: " << outputVector << std::endl;
             const char *pszDriverName = "ESRI Shapefile";
-            shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName);
+            shpFiledriver = GetGDALDriverManager()->GetDriverByName(pszDriverName);
             if( shpFiledriver == NULL )
             {
                 throw rsgis::vec::RSGISVectorOutputException("SHP driver not available.");
             }
-            outputSHPDS = shpFiledriver->CreateDataSource(outputVec.c_str(), NULL);
+            outputSHPDS = shpFiledriver->Create(outputVec.c_str(), 0, 0, 0, GDT_Unknown, NULL);
             if( outputSHPDS == NULL )
             {
                 std::string message = std::string("Could not create vector file ") + outputVec;
@@ -1450,7 +1450,7 @@ namespace rsgis{ namespace cmds {
             rsgis::img::RSGISExtractPxlsAsPts exportPts;
             exportPts.exportPixelsAsPoints(imgDataset, outputSHPLayer, maskVal);
             
-            OGRDataSource::DestroyDataSource(outputSHPDS);
+            GDALClose(outputSHPDS);
             GDALClose(imgDataset);
         }
         catch(RSGISCmdException &e)
@@ -1503,7 +1503,8 @@ namespace rsgis{ namespace cmds {
             // Open Input Shapfile.
             //
             /////////////////////////////////////
-            OGRDataSource *inputSHPDS = OGRSFDriverRegistrar::Open(inputVec.c_str(), FALSE);
+            GDALDataset *inputSHPDS = NULL;
+            inputSHPDS = (GDALDataset*) GDALOpenEx(inputVec.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);  
             if(inputSHPDS == NULL)
             {
                 std::string message = std::string("Could not open vector file ") + inputVec;
@@ -1525,12 +1526,12 @@ namespace rsgis{ namespace cmds {
             /////////////////////////////////////
             //std::cout << "Output Vector: " << outputVector << std::endl;
             const char *pszDriverName = "ESRI Shapefile";
-            OGRSFDriver *shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName);
+            GDALDriver *shpFiledriver = GetGDALDriverManager()->GetDriverByName(pszDriverName);
             if( shpFiledriver == NULL )
             {
                 throw rsgis::vec::RSGISVectorOutputException("SHP driver not available.");
             }
-            OGRDataSource *outputSHPDS = shpFiledriver->CreateDataSource(outputVec.c_str(), NULL);
+            GDALDataset *outputSHPDS = shpFiledriver->Create(outputVec.c_str(), 0, 0, 0, GDT_Unknown, NULL);
             if( outputSHPDS == NULL )
             {
                 std::string message = std::string("Could not create vector file ") + outputVec;
@@ -1558,8 +1559,8 @@ namespace rsgis{ namespace cmds {
             
             maxMinDist = calcMinDist.getMaxMinDist();
             
-            OGRDataSource::DestroyDataSource(inputSHPDS);
-            OGRDataSource::DestroyDataSource(outputSHPDS);
+            GDALClose(inputSHPDS);
+            GDALClose(outputSHPDS);
         }
         catch(rsgis::RSGISVectorException &e)
         {
@@ -1598,7 +1599,8 @@ namespace rsgis{ namespace cmds {
             // Open Input Shapfile.
             //
             /////////////////////////////////////
-            OGRDataSource *inputSHPDS = OGRSFDriverRegistrar::Open(inputVec.c_str(), FALSE);
+            GDALDataset *inputSHPDS = NULL;
+            inputSHPDS = (GDALDataset*) GDALOpenEx(inputVec.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);  
             if(inputSHPDS == NULL)
             {
                 std::string message = std::string("Could not open vector file ") + inputVec;
@@ -1625,7 +1627,7 @@ namespace rsgis{ namespace cmds {
             processVector.processVectorsNoOutput(inputSHPLayer, false);
             maxMinDist = calcMinDist.getMaxMinDist();
             
-            OGRDataSource::DestroyDataSource(inputSHPDS);
+            GDALClose(inputSHPDS);
         }
         catch(rsgis::RSGISVectorException &e)
         {
@@ -1665,7 +1667,8 @@ namespace rsgis{ namespace cmds {
             // Open Input Shapfile.
             //
             /////////////////////////////////////
-            OGRDataSource *inputSHPDS = OGRSFDriverRegistrar::Open(inputVec.c_str(), FALSE);
+            GDALDataset *inputSHPDS = NULL;
+            inputSHPDS = (GDALDataset*) GDALOpenEx(inputVec.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);  
             if(inputSHPDS == NULL)
             {
                 std::string message = std::string("Could not open vector file ") + inputVec;
@@ -1745,7 +1748,7 @@ namespace rsgis{ namespace cmds {
             }
             
             delete rsgis::utils::RSGISGEOSFactoryGenerator::getInstance();
-            OGRDataSource::DestroyDataSource(inputSHPDS);
+            GDALClose(inputSHPDS);
         }
         catch(rsgis::RSGISVectorException &e)
         {
@@ -1782,7 +1785,8 @@ namespace rsgis{ namespace cmds {
             // Open Input Shapfile.
             //
             /////////////////////////////////////
-            OGRDataSource *inputSHPDS = OGRSFDriverRegistrar::Open(inputVec.c_str(), FALSE);
+            GDALDataset *inputSHPDS = NULL;
+            inputSHPDS = (GDALDataset*) GDALOpenEx(inputVec.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);  
             if(inputSHPDS == NULL)
             {
                 std::string message = std::string("Could not open vector file ") + inputVec;
@@ -1801,7 +1805,7 @@ namespace rsgis{ namespace cmds {
             if(wktGeomType != wkbPoint)
             {
                 throw rsgis::RSGISVectorException("Input shapefile must be of type points.");
-                OGRDataSource::DestroyDataSource(inputSHPDS);
+                GDALClose(inputSHPDS);
             }
             
             std::vector<OGRPoint*> *inPts = new std::vector<OGRPoint*>();
@@ -1823,7 +1827,7 @@ namespace rsgis{ namespace cmds {
             delete inPts;
         
             delete rsgis::utils::RSGISGEOSFactoryGenerator::getInstance();
-            OGRDataSource::DestroyDataSource(inputSHPDS);
+            GDALClose(inputSHPDS);
         }
         catch(rsgis::RSGISVectorException &e)
         {
@@ -1860,7 +1864,8 @@ namespace rsgis{ namespace cmds {
             // Open Input Shapfile.
             //
             /////////////////////////////////////
-            OGRDataSource *inputSHPDS = OGRSFDriverRegistrar::Open(inputVec.c_str(), FALSE);
+            GDALDataset *inputSHPDS = NULL;
+            inputSHPDS = (GDALDataset*) GDALOpenEx(inputVec.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);  
             if(inputSHPDS == NULL)
             {
                 std::string message = std::string("Could not open vector file ") + inputVec;
@@ -1879,7 +1884,7 @@ namespace rsgis{ namespace cmds {
             if(wktGeomType != wkbPoint)
             {
                 throw rsgis::RSGISVectorException("Input shapefile must be of type points.");
-                OGRDataSource::DestroyDataSource(inputSHPDS);
+                GDALClose(inputSHPDS);
             }
             
             std::list<double> *clusters = new std::list<double>();
@@ -1949,7 +1954,7 @@ namespace rsgis{ namespace cmds {
             delete clusters;
             
             delete rsgis::utils::RSGISGEOSFactoryGenerator::getInstance();
-            OGRDataSource::DestroyDataSource(inputSHPDS);
+            GDALClose(inputSHPDS);
         }
         catch(rsgis::RSGISVectorException &e)
         {
@@ -1985,7 +1990,9 @@ namespace rsgis{ namespace cmds {
             // Open Input Shapfile.
             //
             /////////////////////////////////////
-            OGRDataSource *inputSHPDS = OGRSFDriverRegistrar::Open(inputLinesVec.c_str(), FALSE);
+
+            GDALDataset *inputSHPDS = NULL;
+            inputSHPDS = (GDALDataset*) GDALOpenEx(inputLinesVec.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);  
             if(inputSHPDS == NULL)
             {
                 std::string message = std::string("Could not open vector file ") + inputLinesVec;
@@ -2013,7 +2020,7 @@ namespace rsgis{ namespace cmds {
             rsgis::vec::RSGISVectorIO vecIO;
             vecIO.exportOGRPoints2SHP(outputPtsVec, force, pts, spatialRef);
             
-            OGRDataSource::DestroyDataSource(inputSHPDS);
+            GDALClose(inputSHPDS);
         }
         catch(rsgis::RSGISVectorException &e)
         {
