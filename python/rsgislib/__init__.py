@@ -80,8 +80,6 @@ Methods of summerising data:
 """
 import os.path
 import os
-import subprocess
-import fnmatch
 import time
 
 TYPE_UNDEFINED = 0
@@ -149,6 +147,7 @@ def getRSGISLibVersion():
 
     # Try calling rsgis-config to get minor version number
     try:
+        import subprocess
         out = subprocess.Popen('rsgis-config --version',shell=True,stdin=subprocess.PIPE, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
         (stdout, stderr) = out.communicate()
         versionStr = stdout.decode()
@@ -216,24 +215,55 @@ class RSGISPyUtils (object):
         elif extension == '.pix':
             gdalStr = 'PCIDSK'
         else:
-            raise Exception('Type not recognised')
+            raise RSGISPyException('Type not recognised')
         
         return gdalStr
-
+    
+    def getRSGISLibDataTypeFromImg(self, inImg):
+        """
+        Returns the rsgislib datatype ENUM for a raster file
+        :param in_file: The file to get the datatype for
+        :return: The rsgislib datatype enum, e.g., rsgislib.TYPE_8INT
+        """
+        import osgeo.gdal as gdal
+        raster = gdal.Open(inImg, gdal.GA_ReadOnly)
+        if raster == None:
+            raise RSGISPyException('Could not open raster image: ' + inImg)
+        band = raster.GetRasterBand(1)
+        if band == None:
+            raise RSGISPyException('Could not open raster band 1 in image: ' + inImg)
+        gdal_dtype = gdal.GetDataTypeName(band.DataType)
+        raster = None
+        return self.getRSGISLibDataType(gdal_dtype)
+        
+    def getGDALDataTypeFromImg(self, inImg):
+        """
+        Returns the rsgislib datatype ENUM for a raster file
+        :param in_file: The file to get the datatype for
+        :return: The rsgislib datatype enum, e.g., rsgislib.TYPE_8INT
+        """
+        import osgeo.gdal as gdal
+        raster = gdal.Open(inImg, gdal.GA_ReadOnly)
+        if raster == None:
+            raise RSGISPyException('Could not open raster image: ' + inImg)
+        band = raster.GetRasterBand(1)
+        if band == None:
+            raise RSGISPyException('Could not open raster band 1 in image: ' + inImg)
+        gdal_dtype = gdal.GetDataTypeName(band.DataType)
+        raster = None
+        return gdal_dtype
+    
     def deleteFileWithBasename(self, filePath):
         """
         Function to delete all the files which have a path
         and base name defined in the filePath attribute.
         """
-        fileDIR = os.path.split(filePath)[0]
-        fileName = os.path.split(filePath)[1]
-        
-        if os.path.isdir(fileDIR):
-            basename = os.path.splitext(fileName)[0]
-            for file in os.listdir(fileDIR):
-                if fnmatch.fnmatch(file, basename+str('.*')):
-                    print("Deleting file: " + str(os.path.join(fileDIR, file)))
-                    os.remove(os.path.join(fileDIR, file))
+        import glob
+        baseName = os.path.splitext(filePath)[0]
+        fileList = glob.glob(baseName+str('.*'))
+        for file in fileList:
+            print("Deleting file: " + str(file))
+            os.remove(file)
                 
     def deleteDIR(self, dirPath):
         """
@@ -275,7 +305,99 @@ class RSGISPyUtils (object):
         elif gdaltype == 'float64':
             return TYPE_64FLOAT
         else:
-            raise RSGISPyException("The data type '%s' is unknown / not supported."%(gdaltype))
+            raise RSGISPyException("The data type '" + str(gdaltype) + "' is unknown / not supported.")
+    
+    def getImageRes(self, inImg):
+        """
+        A function to retrieve the image resolution.
+        return xRes, yRes
+        """
+        import osgeo.gdal as gdal
+        rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
+        if rasterDS == None:
+            raise RSGISPyException('Could not open raster image: ' + inImg)
+        
+        geotransform = rasterDS.GetGeoTransform()
+        xRes = geotransform[1]
+        yRes = geotransform[5]
+        if yRes < 0:
+            yRes = yRes * -1
+        rasterDS = None
+        return xRes, yRes
+    
+    def getImageSize(self, inImg):
+        """
+        A function to retrieve the image size in pixels.
+        return xSize, ySize
+        """
+        import osgeo.gdal as gdal
+        rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
+        if rasterDS == None:
+            raise RSGISPyException('Could not open raster image: ' + inImg)
+        
+        xSize = rasterDS.RasterXSize
+        ySize = rasterDS.RasterYSize
+        rasterDS = None
+        return xSize, ySize
+    
+    def getImageBandCount(self, inImg):
+        """
+        A function to retrieve the number of image bands in an image file.
+        return nBands
+        """
+        import osgeo.gdal as gdal
+        rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
+        if rasterDS == None:
+            raise RSGISPyException('Could not open raster image: ' + inImg)
+        
+        nBands = rasterDS.RasterCount
+        rasterDS = None
+        return nBands
+        
+    def uidGenerator(self, size=6):
+        """
+        A function which will generate a 'random' string of the specified length based on the UUID
+        """
+        import uuid
+        randomStr = str(uuid.uuid4())
+        randomStr = randomStr.replace("-","")
+        return randomStr[0:size]
+        
+    def numProcessCores(self):
+        import multiprocessing
+        return multiprocessing.cpu_count()
+        
+    def readTextFileNoNewLines(self, file):
+        """
+        Read a text file into a single string
+        removing new lines.
+        """
+        txtStr = ""
+        try:
+            dataFile = open(file, 'r')
+            for line in dataFile:
+                txtStr += line.strip()
+            dataFile.close()
+        except Exception as e:
+            raise e
+        return txtStr
+
+    def readTextFile2List(self, file):
+        """
+        Read a text file into a list where each line 
+        is an element in the list.
+        """
+        outList = []
+        try:
+            dataFile = open(file, 'r')
+            for line in dataFile:
+                line = line.strip()
+                if line != "":
+                    outList.append(line)
+            dataFile.close()
+        except Exception as e:
+            raise e
+        return outList
 
 class RSGISTime (object):
     """ Class to calculate run time for a function, format and print out (similar to for XML interface).

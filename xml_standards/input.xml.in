@@ -1054,6 +1054,19 @@
         <rsgis:estFastOptimiserParameters method="conjugateGradient" function="2DPoly" coefficientsHH="heightDensHH_Coeff.mtxt" coefficientsHV="heightDensHH_Coeff.mtxt" [coefficientsVV="heightDensVV_Coeff.mtxt"] covMatrixP="covMatrixP.mtxt" initialHeight="float" initialDensity="float" minHeight="float" maxHeight="float" minDensity="float" maxDensity="float" ittmax="int" />
     </rsgis:command>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
     <!-- TODO A command to -->
     <rsgis:command algor="postclassification" option="cluster" input="vector.shp" output="vector_out.shp" force="yes | no">
         <rsgis:clusterer algor="edgestddev | edgelength" length="float" stddev="float" maxedgelength="float" >

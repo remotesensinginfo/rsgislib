@@ -34,6 +34,30 @@ namespace rsgis{namespace rastergis{
     {
         try
         {
+            this->populateImageWithRasterGISStats(clumpsDataset, addColourTable, ignoreZero, ratBand);
+            if(calcImagePyramids)
+            {
+                this->calcPyramids(clumpsDataset);
+            }
+        }
+        catch(rsgis::RSGISImageException &e)
+        {
+            throw e;
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw rsgis::RSGISImageException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw rsgis::RSGISImageException(e.what());
+        }
+    }
+    
+    void RSGISPopulateWithImageStats::populateImageWithRasterGISStats(GDALDataset *clumpsDataset, bool addColourTable, bool ignoreZero, unsigned int ratBand) throw(rsgis::RSGISImageException)
+    {
+        try
+        {
             if(ratBand == 0)
             {
                 throw rsgis::RSGISAttributeTableException("RAT Band must be greater than zero.");
@@ -46,7 +70,11 @@ namespace rsgis{namespace rastergis{
             rsgis::utils::RSGISTextUtils txtUtils;
             RSGISRasterAttUtils attUtils;
             
+            
+            
             GDALRasterBand *band = clumpsDataset->GetRasterBand(ratBand);
+            
+            band->SetMetadataItem("LAYER_TYPE", "thematic");
             
             if(ignoreZero)
             {
@@ -58,204 +86,272 @@ namespace rsgis{namespace rastergis{
             
             std::cout << "Get Image Min and Max.\n";
             int nLastProgress = -1;
-            band->ComputeStatistics(false, &min, &max, NULL, NULL,  (GDALProgressFunc)RSGISRATStatsTextProgress, &nLastProgress);
-            
-            if(min < 0)
+
+            CPLErr returnVal = band->ComputeStatistics(false, &min, &max, NULL, NULL,  (GDALProgressFunc)RSGISRATStatsTextProgress, &nLastProgress);
+
+            if(returnVal == CE_Failure)
             {
-                throw rsgis::RSGISImageException("The minimum value is less than zero.");
-            }
-            
-            size_t maxHistVal = ceil(max)+1;
-            size_t *histo = new size_t[maxHistVal];
-            
-            for(size_t i = 0; i < maxHistVal; ++i)
-            {
-                histo[i] = 0;
-            }
-            
-            std::cout << "Get Image Histogram.\n";
-            RSGISGetClumpsHistogram *calcImgHisto = new RSGISGetClumpsHistogram(histo, maxHistVal);
-            rsgis::img::RSGISCalcImage calcImageStats(calcImgHisto);
-            calcImageStats.calcImage(&clumpsDataset, 1, 0);
-            delete calcImgHisto;
-            
-            if(ignoreZero)
-            {
-                histo[0] = 0.0;
-            }
-            
-            if(addColourTable)
-            {
-                std::cout << "Adding Histogram and Colour Table to image file\n";
+                band->SetMetadataItem("STATISTICS_HISTOBINFUNCTION", "direct");
+                band->SetMetadataItem("STATISTICS_HISTOMIN", "0");
+                band->SetMetadataItem("STATISTICS_HISTOMAX", "0");
+                band->SetMetadataItem("STATISTICS_HISTONUMBINS", "1");
+                
+                GDALRasterAttributeTable *attTable = band->GetDefaultRAT();
+                attTable->SetRowCount(1);
+                unsigned int histoColIdx = attUtils.findColumnIndexOrCreate(attTable, "Histogram", GFT_Real, GFU_PixelCount);
+                
+                unsigned int redColIdx = 0;
+                unsigned int greenColIdx = 0;
+                unsigned int blueColIdx = 0;
+                unsigned int alphaColIdx = 0;
+                if(addColourTable)
+                {
+                    redColIdx = attUtils.findColumnIndexOrCreate(attTable, "Red", GFT_Integer, GFU_Red);
+                    greenColIdx = attUtils.findColumnIndexOrCreate(attTable, "Green", GFT_Integer, GFU_Green);
+                    blueColIdx = attUtils.findColumnIndexOrCreate(attTable, "Blue", GFT_Integer, GFU_Blue);
+                    alphaColIdx = attUtils.findColumnIndexOrCreate(attTable, "Alpha", GFT_Integer, GFU_Alpha);
+                }
+                
+                double *dataBlock = new double[1];
+                dataBlock[0] = 0;
+                int *redBlock = NULL;
+                int *greenBlock = NULL;
+                int *blueBlock = NULL;
+                int *alphaBlock = NULL;
+                if(addColourTable)
+                {
+                    redBlock = new int[1];
+                    redBlock[0] = 0;
+                    greenBlock = new int[1];
+                    greenBlock[0] = 0;
+                    blueBlock = new int[1];
+                    blueBlock[0] = 0;
+                    alphaBlock = new int[1];
+                    alphaBlock[0] = 0;
+                }
+                
+                attTable->ValuesIO(GF_Write, histoColIdx, 0, 1, dataBlock);
+                if(addColourTable)
+                {
+                    attTable->ValuesIO(GF_Write, redColIdx, 0, 1, redBlock);
+                    attTable->ValuesIO(GF_Write, greenColIdx, 0, 1, greenBlock);
+                    attTable->ValuesIO(GF_Write, blueColIdx, 0, 1, blueBlock);
+                    attTable->ValuesIO(GF_Write, alphaColIdx, 0, 1, alphaBlock);
+                }
             }
             else
             {
-                std::cout << "Adding Histogram to image file\n";
-            }
-            
-            GDALRasterAttributeTable *attTable = band->GetDefaultRAT();
-            attTable->SetRowCount(maxHistVal);
-            
-            band->SetMetadataItem("STATISTICS_HISTOBINFUNCTION", "direct");
-            band->SetMetadataItem("STATISTICS_HISTOMIN", "0");
-            band->SetMetadataItem("STATISTICS_HISTOMAX", txtUtils.int64bittostring(maxHistVal).c_str());
-            band->SetMetadataItem("STATISTICS_HISTONUMBINS", txtUtils.int64bittostring(maxHistVal).c_str());
-            
-            unsigned int histoColIdx = attUtils.findColumnIndexOrCreate(attTable, "Histogram", GFT_Real, GFU_PixelCount);
-            
-            unsigned int redColIdx = 0;
-            unsigned int greenColIdx = 0;
-            unsigned int blueColIdx = 0;
-            unsigned int alphaColIdx = 0;
-            if(addColourTable)
-            {
-                redColIdx = attUtils.findColumnIndexOrCreate(attTable, "Red", GFT_Integer, GFU_Red);
-                greenColIdx = attUtils.findColumnIndexOrCreate(attTable, "Green", GFT_Integer, GFU_Green);
-                blueColIdx = attUtils.findColumnIndexOrCreate(attTable, "Blue", GFT_Integer, GFU_Blue);
-                alphaColIdx = attUtils.findColumnIndexOrCreate(attTable, "Alpha", GFT_Integer, GFU_Alpha);
-            }
-            
-            //std::string histoVals = "";
-            double *dataBlock = new double[RAT_BLOCK_LENGTH];
-            int *redBlock = NULL;
-            int *greenBlock = NULL;
-            int *blueBlock = NULL;
-            int *alphaBlock = NULL;
-            if(addColourTable)
-            {
-                redBlock = new int[RAT_BLOCK_LENGTH];
-                greenBlock = new int[RAT_BLOCK_LENGTH];
-                blueBlock = new int[RAT_BLOCK_LENGTH];
-                alphaBlock = new int[RAT_BLOCK_LENGTH];
-            }
-            size_t numBlocks = floor((double)maxHistVal/(double)RAT_BLOCK_LENGTH);
-            size_t rowsRemain = maxHistVal - (numBlocks * RAT_BLOCK_LENGTH);
-            size_t startRow = 0;
-            size_t rowID = 0;
-            srand(time(NULL));
-            for(size_t i = 0; i < numBlocks; ++i)
-            {
-                for(size_t j = 0; j < RAT_BLOCK_LENGTH; ++j)
+                if(min < 0)
                 {
-                    /*
-                    if(rowID == 0)
-                    {
-                        histoVals = txtUtils.int64bittostring(histo[rowID]);
-                    }
-                    else
-                    {
-                        histoVals += std::string("|") + txtUtils.int64bittostring(histo[rowID]);
-                    }
-                    */
-                    if(addColourTable)
-                    {
-                        if((rowID == 0) & ignoreZero)
-                        {
-                            redBlock[j] = 0;
-                            greenBlock[j] = 0;
-                            blueBlock[j] = 0;
-                            alphaBlock[j] = 255;
-                        }
-                        else
-                        {
-                            redBlock[j] = rand() % 255 + 1;
-                            greenBlock[j] = rand() % 255 + 1;
-                            blueBlock[j] = rand() % 255 + 1;
-                            alphaBlock[j] = 255;
-                        }
-                    }
-                    dataBlock[j] = histo[rowID];
-                    ++rowID;
-                }
-                attTable->ValuesIO(GF_Write, histoColIdx, startRow, RAT_BLOCK_LENGTH, dataBlock);
-                if(addColourTable)
-                {
-                    attTable->ValuesIO(GF_Write, redColIdx, startRow, RAT_BLOCK_LENGTH, redBlock);
-                    attTable->ValuesIO(GF_Write, greenColIdx, startRow, RAT_BLOCK_LENGTH, greenBlock);
-                    attTable->ValuesIO(GF_Write, blueColIdx, startRow, RAT_BLOCK_LENGTH, blueBlock);
-                    attTable->ValuesIO(GF_Write, alphaColIdx, startRow, RAT_BLOCK_LENGTH, alphaBlock);
+                    throw rsgis::RSGISImageException("The minimum value is less than zero.");
                 }
                 
-                startRow += RAT_BLOCK_LENGTH;
-            }
-            if(rowsRemain > 0)
-            {
-                for(size_t j = 0; j < rowsRemain; ++j)
+                size_t maxHistVal = ceil(max)+1;
+                size_t *histo = new size_t[maxHistVal];
+                
+                for(size_t i = 0; i < maxHistVal; ++i)
                 {
-                    /*
-                    if(rowID == 0)
-                    {
-                        histoVals = txtUtils.int64bittostring(histo[rowID]);
-                    }
-                    else
-                    {
-                        histoVals += std::string("|") + txtUtils.int64bittostring(histo[rowID]);
-                    }
-                     */
-                    if(addColourTable)
-                    {
-                        if((rowID == 0) & ignoreZero)
-                        {
-                            redBlock[j] = 0;
-                            greenBlock[j] = 0;
-                            blueBlock[j] = 0;
-                            alphaBlock[j] = 255;
-                        }
-                        else
-                        {
-                            redBlock[j] = rand() % 255 + 1;
-                            greenBlock[j] = rand() % 255 + 1;
-                            blueBlock[j] = rand() % 255 + 1;
-                            alphaBlock[j] = 255;
-                        }
-                    }
-                    dataBlock[j] = histo[rowID];
-                    ++rowID;
+                    histo[i] = 0;
                 }
-                attTable->ValuesIO(GF_Write, histoColIdx, startRow, rowsRemain, dataBlock);
+                
+                std::cout << "Get Image Histogram.\n";
+                RSGISGetClumpsHistogram *calcImgHisto = new RSGISGetClumpsHistogram(histo, maxHistVal);
+                rsgis::img::RSGISCalcImage calcImageStats(calcImgHisto);
+                calcImageStats.calcImage(&clumpsDataset, 1, 0);
+                delete calcImgHisto;
+                
+                if(ignoreZero)
+                {
+                    histo[0] = 0.0;
+                }
+                
                 if(addColourTable)
                 {
-                    attTable->ValuesIO(GF_Write, redColIdx, startRow, rowsRemain, redBlock);
-                    attTable->ValuesIO(GF_Write, greenColIdx, startRow, rowsRemain, greenBlock);
-                    attTable->ValuesIO(GF_Write, blueColIdx, startRow, rowsRemain, blueBlock);
-                    attTable->ValuesIO(GF_Write, alphaColIdx, startRow, rowsRemain, alphaBlock);
-                }
-            }
-            
-            //band->SetMetadataItem("STATISTICS_HISTOBINVALUES", histoVals.c_str());
-            
-            if(calcImagePyramids)
-            {
-                std::cout << "Calculating Image Pyramids.\n";
-                int nLevels[] = { 4, 8, 16, 32, 64, 128, 256, 512 };
-                int nOverviews = 0;
-                int mindim = 0;
-                const char *pszType = "NEAREST";
-                
-                /* first we work out how many overviews to build based on the size */
-                if(clumpsDataset->GetRasterXSize() < clumpsDataset->GetRasterYSize())
-                {
-                    mindim = clumpsDataset->GetRasterXSize();
+                    std::cout << "Adding Histogram and Colour Table to image file\n";
                 }
                 else
                 {
-                    mindim = clumpsDataset->GetRasterYSize();
+                    std::cout << "Adding Histogram to image file\n";
                 }
                 
-                nOverviews = 0;
-                for(int i = 0; i < 8; i++)
+                GDALRasterAttributeTable *attTable = band->GetDefaultRAT();
+                attTable->SetRowCount(maxHistVal);
+                
+                band->SetMetadataItem("STATISTICS_HISTOBINFUNCTION", "direct");
+                band->SetMetadataItem("STATISTICS_HISTOMIN", "0");
+                band->SetMetadataItem("STATISTICS_HISTOMAX", txtUtils.int64bittostring(maxHistVal).c_str());
+                band->SetMetadataItem("STATISTICS_HISTONUMBINS", txtUtils.int64bittostring(maxHistVal).c_str());
+                
+                unsigned int histoColIdx = attUtils.findColumnIndexOrCreate(attTable, "Histogram", GFT_Real, GFU_PixelCount);
+                
+                unsigned int redColIdx = 0;
+                unsigned int greenColIdx = 0;
+                unsigned int blueColIdx = 0;
+                unsigned int alphaColIdx = 0;
+                if(addColourTable)
                 {
-                    if( (mindim/nLevels[i]) > 33 )
+                    redColIdx = attUtils.findColumnIndexOrCreate(attTable, "Red", GFT_Integer, GFU_Red);
+                    greenColIdx = attUtils.findColumnIndexOrCreate(attTable, "Green", GFT_Integer, GFU_Green);
+                    blueColIdx = attUtils.findColumnIndexOrCreate(attTable, "Blue", GFT_Integer, GFU_Blue);
+                    alphaColIdx = attUtils.findColumnIndexOrCreate(attTable, "Alpha", GFT_Integer, GFU_Alpha);
+                }
+                
+                //std::string histoVals = "";
+                double *dataBlock = new double[RAT_BLOCK_LENGTH];
+                int *redBlock = NULL;
+                int *greenBlock = NULL;
+                int *blueBlock = NULL;
+                int *alphaBlock = NULL;
+                if(addColourTable)
+                {
+                    redBlock = new int[RAT_BLOCK_LENGTH];
+                    greenBlock = new int[RAT_BLOCK_LENGTH];
+                    blueBlock = new int[RAT_BLOCK_LENGTH];
+                    alphaBlock = new int[RAT_BLOCK_LENGTH];
+                }
+                size_t numBlocks = floor((double)maxHistVal/(double)RAT_BLOCK_LENGTH);
+                size_t rowsRemain = maxHistVal - (numBlocks * RAT_BLOCK_LENGTH);
+                size_t startRow = 0;
+                size_t rowID = 0;
+                srand(time(NULL));
+                for(size_t i = 0; i < numBlocks; ++i)
+                {
+                    for(size_t j = 0; j < RAT_BLOCK_LENGTH; ++j)
                     {
-                        ++nOverviews;
+                        /*
+                        if(rowID == 0)
+                        {
+                            histoVals = txtUtils.int64bittostring(histo[rowID]);
+                        }
+                        else
+                        {
+                            histoVals += std::string("|") + txtUtils.int64bittostring(histo[rowID]);
+                        }
+                        */
+                        if(addColourTable)
+                        {
+                            if((rowID == 0) & ignoreZero)
+                            {
+                                redBlock[j] = 0;
+                                greenBlock[j] = 0;
+                                blueBlock[j] = 0;
+                                alphaBlock[j] = 255;
+                            }
+                            else
+                            {
+                                redBlock[j] = rand() % 255 + 1;
+                                greenBlock[j] = rand() % 255 + 1;
+                                blueBlock[j] = rand() % 255 + 1;
+                                alphaBlock[j] = 255;
+                            }
+                        }
+                        dataBlock[j] = histo[rowID];
+                        ++rowID;
+                    }
+                    attTable->ValuesIO(GF_Write, histoColIdx, startRow, RAT_BLOCK_LENGTH, dataBlock);
+                    if(addColourTable)
+                    {
+                        attTable->ValuesIO(GF_Write, redColIdx, startRow, RAT_BLOCK_LENGTH, redBlock);
+                        attTable->ValuesIO(GF_Write, greenColIdx, startRow, RAT_BLOCK_LENGTH, greenBlock);
+                        attTable->ValuesIO(GF_Write, blueColIdx, startRow, RAT_BLOCK_LENGTH, blueBlock);
+                        attTable->ValuesIO(GF_Write, alphaColIdx, startRow, RAT_BLOCK_LENGTH, alphaBlock);
+                    }
+                    
+                    startRow += RAT_BLOCK_LENGTH;
+                }
+                if(rowsRemain > 0)
+                {
+                    for(size_t j = 0; j < rowsRemain; ++j)
+                    {
+                        /*
+                        if(rowID == 0)
+                        {
+                            histoVals = txtUtils.int64bittostring(histo[rowID]);
+                        }
+                        else
+                        {
+                            histoVals += std::string("|") + txtUtils.int64bittostring(histo[rowID]);
+                        }
+                         */
+                        if(addColourTable)
+                        {
+                            if((rowID == 0) & ignoreZero)
+                            {
+                                redBlock[j] = 0;
+                                greenBlock[j] = 0;
+                                blueBlock[j] = 0;
+                                alphaBlock[j] = 255;
+                            }
+                            else
+                            {
+                                redBlock[j] = rand() % 255 + 1;
+                                greenBlock[j] = rand() % 255 + 1;
+                                blueBlock[j] = rand() % 255 + 1;
+                                alphaBlock[j] = 255;
+                            }
+                        }
+                        dataBlock[j] = histo[rowID];
+                        ++rowID;
+                    }
+                    attTable->ValuesIO(GF_Write, histoColIdx, startRow, rowsRemain, dataBlock);
+                    if(addColourTable)
+                    {
+                        attTable->ValuesIO(GF_Write, redColIdx, startRow, rowsRemain, redBlock);
+                        attTable->ValuesIO(GF_Write, greenColIdx, startRow, rowsRemain, greenBlock);
+                        attTable->ValuesIO(GF_Write, blueColIdx, startRow, rowsRemain, blueBlock);
+                        attTable->ValuesIO(GF_Write, alphaColIdx, startRow, rowsRemain, alphaBlock);
                     }
                 }
-                
-                int nLastProgress = -1;
-                clumpsDataset->BuildOverviews(pszType, nOverviews, nLevels, 0, NULL,  (GDALProgressFunc)RSGISRATStatsTextProgress, &nLastProgress);
+                delete[] histo;
+            }
+
+            
+        }
+        catch(rsgis::RSGISImageException &e)
+        {
+            throw e;
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw rsgis::RSGISImageException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw rsgis::RSGISImageException(e.what());
+        }
+    }
+    
+    void RSGISPopulateWithImageStats::calcPyramids(GDALDataset *clumpsDataset) throw(rsgis::RSGISImageException)
+    {
+        try
+        {
+            std::cout << "Calculating Image Pyramids.\n";
+            int nLevels[] = { 4, 8, 16, 32, 64, 128, 256, 512 };
+            int nOverviews = 0;
+            int mindim = 0;
+            const char *pszType = "NEAREST";
+            
+            /* first we work out how many overviews to build based on the size */
+            if(clumpsDataset->GetRasterXSize() < clumpsDataset->GetRasterYSize())
+            {
+                mindim = clumpsDataset->GetRasterXSize();
+            }
+            else
+            {
+                mindim = clumpsDataset->GetRasterYSize();
             }
             
-            delete[] histo;
+            nOverviews = 0;
+            for(int i = 0; i < 8; i++)
+            {
+                if( (mindim/nLevels[i]) > 33 )
+                {
+                    ++nOverviews;
+                }
+            }
+            
+            int nLastProgress = -1;
+            clumpsDataset->BuildOverviews(pszType, nOverviews, nLevels, 0, NULL,  (GDALProgressFunc)RSGISRATStatsTextProgress, &nLastProgress);
         }
         catch(rsgis::RSGISImageException &e)
         {

@@ -495,11 +495,13 @@ static PyObject *ImageCalc_Normalisation(PyObject *self, PyObject *args) {
     inputImages.reserve(nImages);
     outputImages.reserve(nImages);
 
-    for(int i = 0; i < nImages; ++i) {
+    for(int i = 0; i < nImages; ++i)
+    {
         PyObject *inImageObj = PySequence_GetItem(pInputImages, i);
         PyObject *outImageObj = PySequence_GetItem(pOutputImages, i);
 
-        if(!RSGISPY_CHECK_STRING(inImageObj) || !RSGISPY_CHECK_STRING(outImageObj)) {
+        if(!RSGISPY_CHECK_STRING(inImageObj) || !RSGISPY_CHECK_STRING(outImageObj))
+        {
             PyErr_SetString(GETSTATE(self)->error, "Input and output images must be strings");
             Py_DECREF(inImageObj);
             Py_DECREF(outImageObj);
@@ -1753,7 +1755,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "\n\n"
 },
 
-/*    {"nnConSum1LinearSpecUnmix", ImageCalc_NnConSum1LinearSpecUnmix, METH_VARARGS,
+    {"nnConSum1LinearSpecUnmix", ImageCalc_NnConSum1LinearSpecUnmix, METH_VARARGS,
 "imagecalc.nnConSum1LinearSpecUnmix(inputImage, gdalformat, datatype, lsumWeight, outputFile, endmembersFile, lsumGain, lsumOffset)\n"
 "Performs a constrained linear spectral unmixing of the input image for a set of endmembers where the sum of the unmixing will be approximately 1 and non-negative.\n"
 "Endmember polygons are extracted using rsgislib.zonalstats.extractAvgEndMembers() where each polygon \n"
@@ -1767,7 +1769,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "  * endmembersFile is a string containing the names of the file containing the end members\n"
 "  * lsumGain is a float specifying a gain which can be applied to the output pixel values (outvalue = offset + (gain * value)). Optional, default = 1.\n"
 "  * lsumOffset is a float specifying an offset which can be applied to the output pixel values (outvalue = offset + (gain * value)). Optional, default = 0.\n"
-},*/
+},
 
     {"allBandsEqualTo", ImageCalc_AllBandsEqualTo, METH_VARARGS,
 "imagecalc.allBandsEqualTo(inputImage, imgValue, outputTrueVal, outputFalseVal, outputImage, gdalformat, datatype)\n"

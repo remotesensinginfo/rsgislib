@@ -184,18 +184,18 @@ static PyObject *RasterGIS_SpatialLocation(PyObject *self, PyObject *args, PyObj
 
 static PyObject *RasterGIS_SpatialExtent(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    const char *inputImage, *minXCol, *maxXCol, *minYCol, *maxYCol;
+    const char *inputImage, *minXXCol, *minXYCol, *maxXXCol, *maxXYCol, *minYXCol, *minYYCol, *maxYXCol, *maxYYCol;
     unsigned int ratBand = 1;
-    static char *kwlist[] = {"clumps", "minX", "maxX", "minY", "maxY", "ratband", NULL};
+    static char *kwlist[] = {"clumps", "minXX", "minXY", "maxXX", "maxXY", "minYX", "minYY", "maxYX", "maxYY", "ratband", NULL};
     
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssss|I:spatialExtent", kwlist, &inputImage, &minXCol, &maxXCol, &minYCol, &maxYCol, &ratBand))
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssssssss|I:spatialExtent", kwlist, &inputImage, &minXXCol, &minXYCol, &maxXXCol, &maxXYCol, &minYXCol, &minYYCol, &maxYXCol, &maxYYCol, &ratBand))
     {
         return NULL;
     }
     
     try
     {
-        rsgis::cmds::executeSpatialLocationExtent(std::string(inputImage), ratBand, std::string(minXCol), std::string(maxXCol), std::string(minYCol), std::string(maxYCol));
+        rsgis::cmds::executeSpatialLocationExtent(std::string(inputImage), ratBand, std::string(minXXCol), std::string(minXYCol), std::string(maxXXCol), std::string(maxXYCol), std::string(minYXCol), std::string(minYYCol), std::string(maxYXCol), std::string(maxYYCol));
     }
     catch (rsgis::cmds::RSGISCmdException &e)
     {
@@ -458,12 +458,13 @@ static PyObject *RasterGIS_PopulateRATWithMode(PyObject *self, PyObject *args, P
     const char *clumpsImage, *inputImage, *outColsName;
     long noDataVal = 0;
     int useNoDataVal = false;
+    int outNoDataVal = true;
     unsigned int ratBand = 1;
     unsigned int modeBand = 1;
     
-    static char *kwlist[] = {"valsimage", "clumps", "outcolsname", "usenodata", "nodataval", "modeband", "ratband", NULL};
+    static char *kwlist[] = {"valsimage", "clumps", "outcolsname", "usenodata", "nodataval", "outnodata", "modeband", "ratband", NULL};
     
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sss|ilII:populateRATWithMode", kwlist, &inputImage, &clumpsImage, &outColsName, &useNoDataVal, &noDataVal, &modeBand, &ratBand))
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sss|iliII:populateRATWithMode", kwlist, &inputImage, &clumpsImage, &outColsName, &useNoDataVal, &noDataVal, &outNoDataVal, &modeBand, &ratBand))
     {
         return NULL;
     }
@@ -471,7 +472,8 @@ static PyObject *RasterGIS_PopulateRATWithMode(PyObject *self, PyObject *args, P
     try
     {
         bool useNoDataBool = (bool) useNoDataVal;
-        rsgis::cmds::executePopulateRATWithMode(std::string(inputImage), std::string(clumpsImage), std::string(outColsName), useNoDataBool, noDataVal, modeBand, ratBand);
+        bool outNoDataBool = (bool) outNoDataVal;
+        rsgis::cmds::executePopulateRATWithMode(std::string(inputImage), std::string(clumpsImage), std::string(outColsName), useNoDataBool, noDataVal, outNoDataBool, modeBand, ratBand);
     }
     catch (rsgis::cmds::RSGISCmdException &e)
     {
@@ -1881,6 +1883,131 @@ static PyObject *RasterGIS_PopulateRATWithPropValidPxls(PyObject *self, PyObject
     Py_RETURN_NONE;
 }
 
+
+static PyObject *RasterGIS_Calc1DJMDistance(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    const char *clumpsImage, *varCol, *classCol, *class1Val, *class2Val;
+    float binWidth = 0;
+    unsigned int ratBand = 1;
+
+    static char *kwlist[] = {"clumps", "varcol", "binwidth", "classcol", "class1", "class2", "ratband", NULL};
+
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssfsss|I:calc1DJMDistance", kwlist, &clumpsImage, &varCol, &binWidth, &classCol, &class1Val, &class2Val, &ratBand))
+    {
+        return NULL;
+    }
+
+    PyObject *outVal = PyTuple_New(1);
+    try
+    {
+        double dist = rsgis::cmds::executeCalc1DJMDistance(std::string(clumpsImage), std::string(varCol), binWidth, std::string(classCol), std::string(class1Val), std::string(class2Val), ratBand);
+        
+        if(PyTuple_SetItem(outVal, 0, Py_BuildValue("d", dist)) == -1)
+        {
+            throw rsgis::cmds::RSGISCmdException("Failed to add \'dist\' value to the PyObject...");
+        }
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+
+    return outVal;
+}
+
+static PyObject *RasterGIS_Calc2DJMDistance(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    const char *clumpsImage, *var1Col, *var2Col, *classCol, *class1Val, *class2Val;
+    float var1BinWidth = 0;
+    float var2BinWidth = 0;
+    unsigned int ratBand = 1;
+    
+    static char *kwlist[] = {"clumps", "var1col", "var2col", "var1binwidth", "var2binwidth", "classcol", "class1", "class2", "ratband", NULL};
+    
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssffsss|I:calc2DJMDistance", kwlist, &clumpsImage, &var1Col, &var2Col, &var1BinWidth, &var2BinWidth, &classCol, &class1Val, &class2Val, &ratBand))
+    {
+        return NULL;
+    }
+    
+    PyObject *outVal = PyTuple_New(1);
+    try
+    {
+        double dist = rsgis::cmds::executeCalc2DJMDistance(std::string(clumpsImage), std::string(var1Col), std::string(var2Col), var1BinWidth, var2BinWidth, std::string(classCol), std::string(class1Val), std::string(class2Val), ratBand);
+        
+        if(PyTuple_SetItem(outVal, 0, Py_BuildValue("d", dist)) == -1)
+        {
+            throw rsgis::cmds::RSGISCmdException("Failed to add \'dist\' value to the PyObject...");
+        }
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+
+    return outVal;
+}
+
+static PyObject *RasterGIS_CalcBhattacharyyaDistance(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    const char *clumpsImage, *varCol, *classCol, *class1Val, *class2Val;
+    unsigned int ratBand = 1;
+    
+    static char *kwlist[] = {"clumps", "varcol", "classcol", "class1", "class2", "ratband", NULL};
+    
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssss|I:calcBhattacharyyaDistance", kwlist, &clumpsImage, &varCol, &classCol, &class1Val, &class2Val, &ratBand))
+    {
+        return NULL;
+    }
+    
+    PyObject *outVal = PyTuple_New(1);
+    try
+    {
+        double dist = rsgis::cmds::executeCalcBhattacharyyaDistance(std::string(clumpsImage), std::string(varCol), std::string(classCol), std::string(class1Val), std::string(class2Val), ratBand);
+        
+        if(PyTuple_SetItem(outVal, 0, Py_BuildValue("d", dist)) == -1)
+        {
+            throw rsgis::cmds::RSGISCmdException("Failed to add \'dist\' value to the PyObject...");
+        }
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    return outVal;
+}
+
+static PyObject *RasterGIS_ExportClumps2Images(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    const char *inputImage, *outputBaseName, *outFileExt, *imageFormat;
+    int binaryOut = false;
+    int ratBand = 1;
+    PyObject *pFields;
+    
+    static char *kwlist[] = {"clumps", "outimgbase", "binout", "outimgext", "gdalformat", "ratband", NULL};
+    
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssiss|i:exportClumps2Images", kwlist, &inputImage, &outputBaseName, &binaryOut, &outFileExt, &imageFormat, &ratBand))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeExportClumps2Images(std::string(inputImage), std::string(outputBaseName), std::string(outFileExt), std::string(imageFormat), (bool)binaryOut, ratBand);
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+
 static PyMethodDef RasterGISMethods[] = {
     {"populateStats", (PyCFunction)RasterGIS_PopulateStats, METH_VARARGS | METH_KEYWORDS,
 "rastergis.populateStats(clumps=string, addclrtab=boolean, calcpyramids=boolean, ignorezero=boolean, ratband=int)\n"
@@ -1907,8 +2034,8 @@ static PyMethodDef RasterGISMethods[] = {
 "Copies a GDAL RAT from one image to another\n"
 "Where:\n"
 "\n"
-"* clumps is a string containing the name of the input file with RAT\n"
-"* outimage is a string containing the name of the output file to add the RAT to\n"
+"* clumps is a string containing the name and path for the image with RAT from which columns are to copied from.\n"
+"* outimage is a string containing the name of the file to which the columns are to be copied.\n"
 "* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated."
 "\n"
 "Example::\n"
@@ -1924,8 +2051,8 @@ static PyMethodDef RasterGISMethods[] = {
 "Copies GDAL RAT columns from one image to another\n"
 "Where:\n"
 "\n"
-"* clumps is a string containing the name of the input image file\n"
-"* outimage is a string containing the name of the input clump file\n"
+"* clumps is a string containing the name and path for the image with RAT from which columns are to copied from.\n"
+"* outimage is a string containing the name of the file to which the columns are to be copied.\n"
 "* fields is a sequence of strings containing the names of the fields to copy"
 "* copycolours is a bool specifying if the colour columns should be copied (default = True)"
 "* copyhist is a bool specifying if the histogram  should be copied (default = True)"
@@ -1957,6 +2084,7 @@ static PyMethodDef RasterGISMethods[] = {
 "rastergis.spatialLocation(clumps=string, eastings=string, northings=string, ratband=int)\n"
 "Adds spatial location columns to the attribute table\n"
 "Where:\n"
+"\n"
 "* inputImage is a string containing the name of the input image file\n"
 "* eastingsField is a string containing the name of the eastings field\n"
 "* northingsField is a string containing the name of the northings field\n"
@@ -1972,25 +2100,33 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"},
     
 {"spatialExtent", (PyCFunction)RasterGIS_SpatialExtent, METH_VARARGS | METH_KEYWORDS,
-"rastergis.spatialExtent(clumps=string, minX=string, maxX=string, minY=string, maxY=string, ratband=int)\n"
+"rastergis.spatialExtent(clumps=string, minXX=string, minXY=string, maxXX=string, maxXY=string, minYX=string, minYY=string, maxYX=string, maxYY=string, ratband=int)\n"
 "Adds spatial extent for each clump to the attribute table\n"
 "Where:\n"
 "* inputImage is a string containing the name of the input image file\n"
-"* minX is a string containing the name of the min X field\n"
-"* maxX is a string containing the name of the max X field\n"
-"* minY is a string containing the name of the min Y field\n"
-"* maxY is a string containing the name of the max Y field\n"
+"* minXX is a string containing the name of the min X X field\n"
+"* minXY is a string containing the name of the min X Y field\n"
+"* maxXX is a string containing the name of the max X X field\n"
+"* maxXY is a string containing the name of the max X Y field\n"
+"* minYX is a string containing the name of the min Y X field\n"
+"* minYY is a string containing the name of the min Y Y field\n"
+"* maxYX is a string containing the name of the max Y X field\n"
+"* maxYY is a string containing the name of the max Y Y field\n"
 "* ratband is an integer containing the band number for the RAT (Optional, default = 1)\n"
 "\n"
 "Example::\n"
 "\n"
 "   from rsgislib import rastergis\n"
 "   image = 'injune_p142_casi_sub_utm_segs_spatloc_eucdist.kea'\n"
-"   minX = 'minX'\n"
-"   maxX = 'maxX'\n"
-"   minY = 'minY'\n"
-"   maxY = 'maxY'\n"
-"   rastergis.spatialLocation(image, minX, maxX, minY, maxY)\n"
+"   minX_X = 'minXX'\n"
+"   minX_Y = 'minXY'\n"
+"   maxX_X = 'maxXX'\n"
+"   maxX_Y = 'maxXY'\n"
+"   minY_X = 'minYX'\n"
+"   minY_Y = 'minYY'\n"
+"   maxY_X = 'maxYX'\n"
+"   maxY_Y = 'maxYY'\n"
+"   rastergis.spatialExtent(image, minX_X, minX_Y, maxX_X, maxX_Y, minY_X, minY_Y, maxY_X, maxY_Y)\n"
 "\n"},
 
     {"populateRATWithStats", (PyCFunction)RasterGIS_PopulateRATWithStats, METH_VARARGS | METH_KEYWORDS,
@@ -2067,7 +2203,7 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"},
     
 {"populateRATWithMode", (PyCFunction)RasterGIS_PopulateRATWithMode, METH_VARARGS | METH_KEYWORDS,
-    "rastergis.populateRATWithMode(valsimage=string, clumps=string, outcolsname=string, usenodata=boolean, nodataval=long, modeband=uint ratband=uint)\n"
+    "rastergis.populateRATWithMode(valsimage=string, clumps=string, outcolsname=string, usenodata=boolean, nodataval=long, outnodata=boolean, modeband=uint ratband=uint)\n"
     "Populates the attribute table with the mode of from a single band in the input image.\n"
     "Note this only makes sense if the input pixel values are integers.\n"
     "Where:\n"
@@ -2077,6 +2213,7 @@ static PyMethodDef RasterGISMethods[] = {
     "* outColsName is a string representing the name for the output column containing the mode.\n"
     "* usenodata is a boolean defining whether the no data value should be ignored (Optional, Default = False).\n"
     "* nodataval is a long defining the no data value to be used (Optional, Default = 0)\n"
+    "* outnodata is a boolean to specify that although the no data value should be used for the calculation it should not be outputted to the RAT as a output value unless there is no valid data within the clump. (Default = True)\n"
     "* modeband is an optional (default = 1) integer parameter specifying the image band for which the mode is to be calculated.\n"
     "* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated in the clumps image.\n"
     "\n"},
@@ -2772,16 +2909,85 @@ static PyMethodDef RasterGISMethods[] = {
 "    rastergis.classSplitFitHistGausianMixtureModel(clumps='FrenchGuiana_10_ALL_sl_HH_lee_UTM_mosaic_dB_segs.kea', outCol='MangroveSubClass', varCol='HVdB', binWidth=0.1, classColumn='Classes', classVal='Mangroves')\n"
 "\n\n"},
 {"populateRATWithPropValidPxls", (PyCFunction)RasterGIS_PopulateRATWithPropValidPxls, METH_VARARGS | METH_KEYWORDS,
-    "rastergis.populateRATWithPropValidPxls(valsimage=string, clumps=string, outcolsname=string, nodataval=float, ratband=uint)\n"
-    "Populates the attribute table with the proportion of valid pixels within the clump.\n"
-    "Where:\n"
-    "\n"
-    "* valsimage is a string containing the name of the input image file from which the valid pixels are to be identified\n"
-    "* clumpsImage is a string containing the name of the input clump file to which the proportion will be populated.\n"
-    "* outColsName is a string representing the name for the output column containing the proportion.\n"
-    "* nodataval is a float defining the no data value to be used.\n"
-    "* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated in the clumps image.\n"
-    "\n"},
+"rastergis.populateRATWithPropValidPxls(valsimage=string, clumps=string, outcolsname=string, nodataval=float, ratband=uint)\n"
+"Populates the attribute table with the proportion of valid pixels within the clump.\n"
+"Where:\n"
+"\n"
+"* valsimage is a string containing the name of the input image file from which the valid pixels are to be identified\n"
+"* clumpsImage is a string containing the name of the input clump file to which the proportion will be populated.\n"
+"* outColsName is a string representing the name for the output column containing the proportion.\n"
+"* nodataval is a float defining the no data value to be used.\n"
+"* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated in the clumps image.\n"
+"\n\n"},
+{"calc1DJMDistance", (PyCFunction)RasterGIS_Calc1DJMDistance, METH_VARARGS | METH_KEYWORDS,
+"rastergis.calc1DJMDistance(clumps=string, varcol=string, binwidth=float, classcol=string, class1=string, class2=string, ratband=uint)\n"
+"Calculate the Jeffries and Matusita distance for a single variable between two classes.\n"
+"Where:\n"
+"\n"
+"* clumps is a string containing the name of the input clump file\n"
+"* varcol is a string specifying the name of the variable column.\n"
+"* binwidth is a float specifying the bin width for the histogram.\n"
+"* classcol is a string specifying the column name with the class names.\n"
+"* class1 is a string specifying the first class.\n"
+"* class2 is a string specifying the second class.\n"
+"* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated in the clumps image.\n"
+"Return:\n"
+"* double for distance\n"
+"\n\n"},
+{"calc2DJMDistance", (PyCFunction)RasterGIS_Calc2DJMDistance, METH_VARARGS | METH_KEYWORDS,
+"rastergis.calc2DJMDistance(clumps=string, var1col=string, var2col=string, var1binWidth=float, var2binWidth=float, classcol=string, class1=string, class2=string, ratband=uint)\n"
+"Calculate the Jeffries and Matusita distance for two variables between two classes.\n"
+"Where:\n"
+"\n"
+"* clumps is a string containing the name of the input clump file\n"
+"* var1col is a string specifying the name of the first variable column.\n"
+"* var2col is a string specifying the name of the second variable column.\n"
+"* var1binwidth is a float specifying the bin width for the histogram for variable 1.\n"
+"* var2binwidth is a float specifying the bin width for the histogram for variable 2.\n"
+"* classcol is a string specifying the column name with the class names.\n"
+"* class1 is a string specifying the first class.\n"
+"* class2 is a string specifying the second class.\n"
+"* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated in the clumps image.\n"
+"Return:\n"
+"* double for distance\n"
+"\n\n"},
+{"calcBhattacharyyaDistance", (PyCFunction)RasterGIS_CalcBhattacharyyaDistance, METH_VARARGS | METH_KEYWORDS,
+"rastergis.calcBhattacharyyaDistance(clumps=string, varcol=string, classcol=string, class1=string, class2=string, ratband=uint)\n"
+"Calculate the Bhattacharyya distance for a single variable between two classes.\n"
+"Where:\n"
+"\n"
+"* clumps is a string containing the name of the input clump file\n"
+"* varcol is a string specifying the name of the variable column.\n"
+"* classcol is a string specifying the column name with the class names.\n"
+"* class1 is a string specifying the first class.\n"
+"* class2 is a string specifying the second class.\n"
+"* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated in the clumps image.\n"
+"Return:\n"
+"* double for distance\n"
+"\n\n"},
+{"exportClumps2Images", (PyCFunction)RasterGIS_ExportClumps2Images, METH_VARARGS | METH_KEYWORDS,
+"rastergis.exportClumps2Images(clumps, outimgbase, binout, outimgext, gdalformat, ratband=1)\n"
+"Exports each clump to a seperate raster which is the minimum extent for the clump.\n"
+"Where:\n"
+"\n"
+"* clumps is a string containing the name of the input image file with RAT\n"
+"* outimgbase is a string containing the base name of the output image file (C + FID will be added to identify files).\n"
+"* outimgext is a sting with the output file extension (e.g., kea) without the preceeding dot to be appended to the file name.\n"
+"* binout is a boolean specifying whether the output images should be binary or if the pixel value should be the FID of the clump.\n"
+"* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+"* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated."
+"\n"
+"Example::\n"
+"\n"
+"   import rsgislib\n"
+"   from rsgislib import rastergis\n"
+"   clumps='./DefineTiles.kea'\n"
+"   outimgbase='./Tiles/OutputImgTile_'\n"
+"   outimgext='kea'\n"
+"   gdalformat = 'KEA'\n"
+"   binaryOut = False\n"
+"   rastergis.exportClumps2Images(clumps, outimgbase, binaryOut, outimgext, gdalformat, ratband)\n"
+"\n\n"},
     
     {NULL}        /* Sentinel */
 };

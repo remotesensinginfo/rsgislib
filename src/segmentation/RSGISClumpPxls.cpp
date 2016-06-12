@@ -30,7 +30,7 @@ namespace rsgis{namespace segment{
         
     }
         
-    void RSGISClumpPxls::performClump(GDALDataset *catagories, GDALDataset *clumps, bool noDataValProvided, unsigned int noDataVal) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISClumpPxls::performClump(GDALDataset *catagories, GDALDataset *clumps, bool noDataValProvided, unsigned int noDataVal, std::vector<unsigned int> *clumpPxlVals) throw(rsgis::img::RSGISImageCalcException)
     {
         if(catagories->GetRasterXSize() != clumps->GetRasterXSize())
         {
@@ -63,7 +63,7 @@ namespace rsgis{namespace segment{
         std::cout << "Started" << std::flush;
         for(unsigned int i = 0; i < height; ++i)
         {
-            if((i % feedback) == 0)
+            if((feedback > 0) && (i % feedback) == 0)
             {
                 std::cout << "." << feedbackCounter << "." << std::flush;
                 feedbackCounter = feedbackCounter + 10;
@@ -90,7 +90,12 @@ namespace rsgis{namespace segment{
                                 clumpSearchPxls.pop();
                             }
                         }
-                                                
+                        
+                        if(clumpPxlVals != NULL)
+                        {
+                            clumpPxlVals->push_back(catPxlVal);
+                        }
+                            
                         clumpPxls.push_back(rsgis::img::PxlLoc(j, i));
                         clumpSearchPxls.push(rsgis::img::PxlLoc(j, i));
                         clumpBand->RasterIO(GF_Write, j, i, 1, 1, &clumpIdx, 1, 1, GDT_UInt32, 0, 0);
@@ -178,6 +183,15 @@ namespace rsgis{namespace segment{
             }
         }
         std::cout << " Complete (Generated " << clumpIdx-1 << " clumps).\n";
+        if(clumpPxlVals != NULL)
+        {
+            if(clumpPxlVals->size() != (clumpIdx-1))
+            {
+                std::cout << "Number of clump pixel values: " << clumpPxlVals->size() << std::endl;
+                throw rsgis::img::RSGISImageCalcException("Number of clump pixel values in list is not equal to the number of clumps.");
+            }
+        }
+        
     }
     
     void RSGISClumpPxls::performClumpPosVals(GDALDataset *catagories, GDALDataset *clumps) throw(rsgis::img::RSGISImageCalcException)
@@ -330,7 +344,7 @@ namespace rsgis{namespace segment{
         std::cout << " Complete (Generated " << clumpIdx-1 << " clumps).\n";
     }
     
-    void RSGISClumpPxls::performMultiBandClump(std::vector<GDALDataset*> *catagories, std::string clumpsOutputPath, std::string outFormat, bool noDataValProvided, unsigned int noDataVal) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISClumpPxls::performMultiBandClump(std::vector<GDALDataset*> *catagories, std::string clumpsOutputPath, std::string outFormat, bool noDataValProvided, unsigned int noDataVal, bool addRatPxlVals) throw(rsgis::img::RSGISImageCalcException)
     {
         try
         {
@@ -414,6 +428,7 @@ namespace rsgis{namespace segment{
             unsigned int *catCPxlVals = new unsigned int[numInBands];
             
             unsigned int uiPxlVal = 0;
+            std::vector<int*> outRATVals;
             
             int feedback = height/10;
             int feedbackCounter = 0;
@@ -439,6 +454,7 @@ namespace rsgis{namespace segment{
                         {
                             catBands[n]->RasterIO(GF_Read, bandOffsets[n][0]+j, bandOffsets[n][1]+i, 1, 1, &catPxlVals[n], 1, 1, GDT_UInt32, 0, 0);
                         }
+                        
                         if((!noDataValProvided) | (noDataValProvided & (!this->allValueEqual(catPxlVals, numInBands, noDataVal))))
                         {
                             // Make sure all lists are empty.
@@ -449,6 +465,16 @@ namespace rsgis{namespace segment{
                                 {
                                     clumpSearchPxls.pop();
                                 }
+                            }
+                            
+                            if(addRatPxlVals)
+                            {
+                                int *vals = new int[numInBands];
+                                for(unsigned int n = 0; n < numInBands; ++n)
+                                {
+                                    vals[n] = catPxlVals[n];
+                                }
+                                outRATVals.push_back(vals);
                             }
                             
                             clumpPxls.push_back(rsgis::img::PxlLoc(j, i));
@@ -560,6 +586,41 @@ namespace rsgis{namespace segment{
             std::cout << " Complete (Generated " << clumpIdx-1 << " clumps).\n";
             
             clumpBand->SetMetadataItem("LAYER_TYPE", "thematic");
+            if(addRatPxlVals)
+            {
+                GDALRasterAttributeTable *rat = clumpBand->GetDefaultRAT();
+                size_t numRows = rat->GetRowCount();
+                if((outRATVals.size()+1) > numRows)
+                {
+                    numRows = outRATVals.size()+1;
+                    rat->SetRowCount(numRows);
+                }
+                rastergis::RSGISRasterAttUtils attUtils;
+                utils::RSGISTextUtils txtUtils;
+                int *ratColVals = new int[numRows];
+                for(size_t i = 0; i < numInBands; ++i)
+                {
+                    for(size_t j = 0; j < numRows; ++j)
+                    {
+                        if(j == 0)
+                        {
+                            ratColVals[j] = 0;
+                        }
+                        else
+                        {
+                            ratColVals[j] = outRATVals.at(j-1)[i];
+                        }
+                    }
+                    attUtils.writeIntColumn(rat, "ClumpVal_"+txtUtils.sizettostring(i+1), ratColVals, numRows);
+                }
+                delete[] ratColVals;
+                
+                for(size_t i = 0; i < outRATVals.size(); ++i)
+                {
+                    delete[] outRATVals.at(i);
+                }
+            }
+            
             GDALClose(clumpsDS);
             
             delete[] catPxlVals;

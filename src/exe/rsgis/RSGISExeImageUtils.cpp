@@ -2995,7 +2995,8 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
 		{
 			char *charValue = XMLString::transcode(argElement->getAttribute(typeXMLStr));
             string typeString = string(charValue);
-			if(typeString == "random")
+			/*
+            if(typeString == "random")
             {
                 this->accuracyPtsType = rsgis_randompts;
             }
@@ -3007,6 +3008,7 @@ void RSGISExeImageUtils::retrieveParameters(DOMElement *argElement) throw(RSGISX
             {
                 throw RSGISXMLArgumentsException("The \'type\' attribute must be either \'random\' or \'stratified\'.");
             }
+             */
 			XMLString::release(&charValue);
 		}
 		else
@@ -5343,6 +5345,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
         }
         else if(option == RSGISExeImageUtils::genassesspoints)
         {
+            cout << "IMPLEMENTATION NOT WORKING IN XML - SEE PYTHON INTERFACE (under classification)\n";
             cout << "Generating random points for accuracy assessment.\n";
             cout << "Input File: " << this->inputImage << endl;
             cout << "Classification Column: " << this->classColumnName << endl;
@@ -5355,6 +5358,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
             {
                 cout << "A DEM was not provided therefore Elevations values will be 0.\n";
             }
+            /*
             if(accuracyPtsType == rsgis_randompts)
             {
                 cout << "Generating " << this->numPoints << " random points across the image.\n";
@@ -5364,7 +5368,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
                 cout << "Generating " << this->numPoints << " stratified random points per class.\n";
             }
             cout << "Random generator seed: " << this->seed << endl;
-
+            
             GDALAllRegister();
             GDALDataset *inDataset = NULL;
             GDALDataset *inDEMDataset = NULL;
@@ -5400,7 +5404,7 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
             GDALClose(inDataset);
             GDALClose(inDEMDataset);
             GDALDestroyDriverManager();
-
+             */
         }
         else if(option == RSGISExeImageUtils::uniquepxlclumps)
         {
@@ -6148,6 +6152,7 @@ void RSGISExeImageUtils::printParameters()
             {
                 cout << "A DEM was not provided therefore Elevations values will be 0.\n";
             }
+            /*
             if(accuracyPtsType == rsgis_randompts)
             {
                 cout << "Generating " << this->numPoints << " random points across the image.\n";
@@ -6156,6 +6161,7 @@ void RSGISExeImageUtils::printParameters()
             {
                 cout << "Generating " << this->numPoints << " stratified random points per class.\n";
             }
+             */
             cout << "Random generator seed: " << this->seed << endl;
         }
         else if(option == RSGISExeImageUtils::defineimgtiles)

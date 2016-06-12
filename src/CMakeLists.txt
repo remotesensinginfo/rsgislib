@@ -74,6 +74,7 @@ set(LIB_CLASSIFY_H
 	${RSGIS_SRC_CLASSIFY_DIR}/RSGISKMeanImageClassifier.h 
 	${RSGIS_SRC_CLASSIFY_DIR}/RSGISISODATAImageClassifier.h
 	${RSGIS_SRC_CLASSIFY_DIR}/RSGISRATClassificationUtils.h
+	${RSGIS_SRC_CLASSIFY_DIR}/RSGISGenAccuracyPoints.h
 	)
 	
 set(LIB_CLASSIFY_CPP
@@ -97,6 +98,8 @@ set(LIB_CLASSIFY_CPP
 	${RSGIS_SRC_CLASSIFY_DIR}/RSGISISODATAImageClassifier.h
 	${RSGIS_SRC_CLASSIFY_DIR}/RSGISRATClassificationUtils.cpp
 	${RSGIS_SRC_CLASSIFY_DIR}/RSGISRATClassificationUtils.h
+    ${RSGIS_SRC_CLASSIFY_DIR}/RSGISGenAccuracyPoints.cpp
+	${RSGIS_SRC_CLASSIFY_DIR}/RSGISGenAccuracyPoints.h
 	)
 ###############################################################################
 
@@ -313,6 +316,7 @@ set(LIB_GEOM_H
 	${RSGIS_SRC_GEOM_DIR}/RSGISMinSpanTreeClustererEdgeLenThreshold.h 
 	${RSGIS_SRC_GEOM_DIR}/RSGISMinSpanTreeClustererStdDevThreshold.h 
 	${RSGIS_SRC_GEOM_DIR}/RSGISIdentifyNonConvexPolygonsSnakes.h
+	${RSGIS_SRC_GEOM_DIR}/RSGISFitPolygon2Points.h
 	)
 	
 set(LIB_GEOM_CPP
@@ -345,6 +349,8 @@ set(LIB_GEOM_CPP
 	${RSGIS_SRC_GEOM_DIR}/RSGISMinSpanTreeClustererStdDevThreshold.h 
 	${RSGIS_SRC_GEOM_DIR}/RSGISIdentifyNonConvexPolygonsSnakes.cpp 
 	${RSGIS_SRC_GEOM_DIR}/RSGISIdentifyNonConvexPolygonsSnakes.h
+	${RSGIS_SRC_GEOM_DIR}/RSGISFitPolygon2Points.cpp
+	${RSGIS_SRC_GEOM_DIR}/RSGISFitPolygon2Points.h
 	)
 ###############################################################################
 
@@ -413,7 +419,6 @@ set(LIB_IMG_H
 	${RSGIS_SRC_IMG_DIR}/RSGISRelabelPixelValuesFromLUT.h
 	${RSGIS_SRC_IMG_DIR}/RSGISPopWithStats.h
 	${RSGIS_SRC_IMG_DIR}/RSGISGenHistogram.h
-	${RSGIS_SRC_IMG_DIR}/RSGISGenAccuracyPoints.h
 	${RSGIS_SRC_IMG_DIR}/RSGISSampleImage.h
 	${RSGIS_SRC_IMG_DIR}/RSGISImageWindowStats.h
 	${RSGIS_SRC_IMG_DIR}/RSGISFitFunction2Pxls.h
@@ -549,8 +554,6 @@ set(LIB_IMG_CPP
 	${RSGIS_SRC_IMG_DIR}/RSGISPopWithStats.h
 	${RSGIS_SRC_IMG_DIR}/RSGISGenHistogram.cpp
 	${RSGIS_SRC_IMG_DIR}/RSGISGenHistogram.h
-	${RSGIS_SRC_IMG_DIR}/RSGISGenAccuracyPoints.cpp
-	${RSGIS_SRC_IMG_DIR}/RSGISGenAccuracyPoints.h
 	${RSGIS_SRC_IMG_DIR}/RSGISSampleImage.cpp
 	${RSGIS_SRC_IMG_DIR}/RSGISSampleImage.h
 	${RSGIS_SRC_IMG_DIR}/RSGISImageWindowStats.cpp
@@ -806,6 +809,7 @@ set(LIB_RASTERGIS_H
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISInputShapefileAttributes2RAT.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISRATKNN.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISRATFunctionFitting.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISRATStats.h
 	)
 	
 	
@@ -822,6 +826,8 @@ set(LIB_RASTERGIS_CPP
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcClusterLocation.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISDefineClumpsInTiles.cpp
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISDefineClumpsInTiles.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISExportClumps2Imgs.cpp
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISExportClumps2Imgs.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindClumpNeighbours.cpp
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindClumpNeighbours.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindClumpCatagoryStats.cpp
@@ -853,6 +859,8 @@ set(LIB_RASTERGIS_CPP
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISRATKNN.cpp
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISRATFunctionFitting.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISRATFunctionFitting.cpp
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISRATStats.h
+	${RSGIS_SRC_RASTERGIS_DIR}/RSGISRATStats.cpp
 	)
 	
 ###############################################################################

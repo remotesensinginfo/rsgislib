@@ -63,10 +63,20 @@ namespace rsgis{ namespace cmds{
     DllExport void executeFindCommonImgExtent(std::vector<std::string> inputImages, std::string outputVector, bool force) throw(RSGISCmdException);
     /** Function to split the polygons within a shapefile into different shapefiles using an attribute  */
     DllExport void executeSplitFeatures(std::string inputVector, std::string outputVectorBase, bool force) throw(RSGISCmdException);
-    
-    
-    
-    
+    /** Function to export a binary image to points */
+    DllExport void executeExportPxls2Pts(std::string inputImage, std::string outputVec, bool force, float maskVal) throw(RSGISCmdException);
+    /** Function to calculate the distance to the nearest geometry */
+    DllExport double executeCalcDist2NearestGeom(std::string inputVec, std::string outputVec, bool force) throw(RSGISCmdException);
+    /** Function to calculate the distance to the nearest geometry */
+    DllExport double executeCalcMaxDist2NearestGeom(std::string inputVec) throw(RSGISCmdException);
+    /** Function spaitally cluster points using a graph */
+    DllExport void executeSpatialGraphClusterGeoms(std::string inputVec, std::string outputVec, bool useMinSpanTree, float edgeLenSDThres, double maxEdgeLen, bool force, std::string shpFileEdges="", bool outShpEdges=false, std::string h5EdgeLengths="", bool outH5EdgeLens=false) throw(RSGISCmdException);
+    /** Function to create a polygon from a set of points */
+    DllExport void executeFitPolygonToPoints(std::string inputVec, std::string outputVec, double alphaVal, bool force) throw(RSGISCmdException);
+    /** Function to create a set of polygons from a set of point which have been clustered */
+    DllExport void executeFitPolygonsToPointClusters(std::string inputVec, std::string outputVec, std::string clusterField, double alphaVal, bool force) throw(RSGISCmdException);
+    /** Function to convert a set of lines into regularly spaced set of points */
+    DllExport void executeCreateLinesOfPoints(std::string inputLinesVec, std::string outputPtsVec, double step, bool force) throw(RSGISCmdException);
 }}
 
 

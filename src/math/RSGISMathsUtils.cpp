@@ -641,18 +641,27 @@ namespace rsgis{namespace math{
                     stats->max = gsl_stats_max(&(*data)[0], 1, data->size());
                 }
                 
+                if(stats->calcMean)
+                {
+                    stats->mean = gsl_stats_mean (&(*data)[0], 1, data->size());
+                }
+                
                 if(stats->calcMean & stats->calcStdDev)
                 {
-                    stats->mean = gsl_stats_mean (&(*data)[0], 1, data->size());
                     stats->stdDev = gsl_stats_sd_m (&(*data)[0], 1, data->size(), stats->mean);
                 }
-                else if(stats->calcMean & !stats->calcStdDev)
-                {
-                    stats->mean = gsl_stats_mean (&(*data)[0], 1, data->size());
-                }
-                else if(!stats->calcMean & stats->calcStdDev)
+                else if(stats->calcStdDev)
                 {
                     stats->stdDev = gsl_stats_sd (&(*data)[0], 1, data->size());
+                }
+                
+                if(stats->calcMean & stats->calcVariance)
+                {
+                    stats->variance = gsl_stats_variance_m (&(*data)[0], 1, data->size(), stats->mean);
+                }
+                else if(stats->calcVariance)
+                {
+                    stats->variance = gsl_stats_variance (&(*data)[0], 1, data->size());
                 }
                 
                 if(stats->calcSum)
@@ -758,6 +767,7 @@ namespace rsgis{namespace math{
             stats->calcStdDev = false;
             stats->calcSum = false;
             stats->calcMedian = false;
+            stats->calcVariance = false;
             
             stats->min = 0;
             stats->max = 0;
@@ -765,6 +775,8 @@ namespace rsgis{namespace math{
             stats->stdDev = 0;
             stats->sum = 0;
             stats->median = 0;
+            stats->variance = 0;
+            stats->mode = 0;
         }
     }
     
@@ -778,6 +790,8 @@ namespace rsgis{namespace math{
             stats->stdDev = 0;
             stats->sum = 0;
             stats->median = 0;
+            stats->variance = 0;
+            stats->mode = 0;
         }
     }
     
@@ -1076,7 +1090,7 @@ namespace rsgis{namespace math{
         try
         {
             size_t numBins = static_cast<size_t>((maxVal - minVal)/binWidth)+1;
-            std::cout << "Number of Histogram Bins = " << numBins << std::endl;
+            //std::cout << "Number of Histogram Bins = " << numBins << std::endl;
             hist->reserve(numBins);
             
             double binCentre = minVal + (binWidth/2);
@@ -1087,6 +1101,7 @@ namespace rsgis{namespace math{
             }
             
             size_t idx = 0;
+            size_t validDataCount = 0;
             for(std::vector<double>::iterator iterData = data->begin(); iterData != data->end(); ++iterData)
             {
                 if(((*iterData) >= minVal) & ((*iterData) <= maxVal))
@@ -1094,6 +1109,7 @@ namespace rsgis{namespace math{
                     idx = static_cast<size_t>(((*iterData)-minVal)/binWidth);
                     //std::cout << "IDX = " << idx << std::endl;
                     hist->at(idx).second = hist->at(idx).second + 1;
+                    ++validDataCount;
                 }
             }
             
@@ -1101,7 +1117,88 @@ namespace rsgis{namespace math{
             {
                 for(size_t i = 0; i < numBins; ++i)
                 {
-                    hist->at(i).second = hist->at(i).second / data->size();
+                    hist->at(i).second = hist->at(i).second / validDataCount;
+                }
+            }
+        }
+        catch(RSGISMathException &e)
+        {
+            throw e;
+        }
+        catch(RSGISException &e)
+        {
+            throw RSGISMathException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISMathException(e.what());
+        }
+        return hist;
+    }
+    
+    
+    std::vector<std::vector<RSGIS2DHistBin>* >* RSGISMathsUtils::calc2DHistogram(std::vector<double> *data1, double minVal1, double maxVal1, double binWidth1, std::vector<double> *data2, double minVal2, double maxVal2, double binWidth2, bool norm) throw(RSGISMathException)
+    {
+        std::vector<std::vector<RSGIS2DHistBin>* > *hist = new std::vector<std::vector<RSGIS2DHistBin>* >();
+        try
+        {
+            if(data1->size() != data2->size())
+            {
+                throw RSGISMathException("The two input datasets are not the same size.");
+            }
+            size_t numDataVals = data1->size();
+            
+            size_t numBins1 = static_cast<size_t>((maxVal1 - minVal1)/binWidth1)+1;
+            //std::cout << "Number of Histogram Bins (1) = " << numBins1 << std::endl;
+            hist->reserve(numBins1);
+            
+            size_t numBins2 = static_cast<size_t>((maxVal2 - minVal2)/binWidth2)+1;
+            //std::cout << "Number of Histogram Bins (2) = " << numBins2 << std::endl;
+            
+            double binCentre1 = minVal1 + (binWidth1/2);
+            double binCentre2 = 0.0;
+            for(size_t i = 0; i < numBins1; ++i)
+            {
+                std::vector<RSGIS2DHistBin> *tmpHist = new std::vector<RSGIS2DHistBin>();
+                tmpHist->reserve(numBins2);
+                
+                binCentre2 = minVal2 + (binWidth2/2);
+                for(size_t j = 0; j < numBins2; ++j)
+                {
+                    tmpHist->push_back(RSGIS2DHistBin(binCentre1, binCentre2, 0.0));
+                    binCentre2 += binWidth2;
+                }
+                
+                hist->push_back(tmpHist);
+                binCentre1 += binWidth1;
+            }
+            
+            
+            size_t idx1 = 0;
+            size_t idx2 = 0;
+            size_t validDataCount = 0;
+            for(size_t i = 0; i < numDataVals; ++i)
+            {
+                if(((data1->at(i) >= minVal1) & (data1->at(i) <= maxVal1)) & ((data2->at(i) >= minVal2) & (data2->at(i) <= maxVal2)))
+                {
+                    idx1 = static_cast<size_t>((data1->at(i)-minVal1)/binWidth1);
+                    idx2 = static_cast<size_t>((data2->at(i)-minVal2)/binWidth2);
+                    //std::cout << "IDX = " << idx << std::endl;
+                    hist->at(idx1)->at(idx2).freq = hist->at(idx1)->at(idx2).freq + 1;
+                    ++validDataCount;
+                }
+            }
+            
+            
+            
+            if(norm)
+            {
+                for(size_t i = 0; i < numBins1; ++i)
+                {
+                    for(size_t j = 0; j < numBins2; ++j)
+                    {
+                        hist->at(i)->at(j).freq = hist->at(i)->at(j).freq / validDataCount;
+                    }
                 }
             }
         }

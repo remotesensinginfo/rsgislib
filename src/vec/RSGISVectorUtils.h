@@ -85,6 +85,7 @@ namespace rsgis{namespace vec{
 			OGRPolygon* moveOGRPolygon(OGRPolygon *poly, double shiftX, double shiftY, double shiftZ) throw(RSGISVectorException);
 			std::vector<std::string>* findUniqueVals(OGRLayer *layer, std::string attribute) throw(RSGISVectorException);
             std::vector<std::string>* getColumnNames(OGRLayer *layer) throw(RSGISVectorException);
+            std::vector<OGRPoint*>* getRegularStepPoints(std::vector<OGRLineString*> *lines, double step) throw(RSGISVectorException);
 		};
 
     

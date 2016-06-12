@@ -183,7 +183,7 @@ namespace rsgis{ namespace cmds {
     DllExport void executeSpatialLocation(std::string inputImage, unsigned int ratBand, std::string eastingsField, std::string northingsField)throw(RSGISCmdException);
     
     /** Function for adding the spatial extent for each clump as columns to the attribute table */
-    DllExport void executeSpatialLocationExtent(std::string inputImage, unsigned int ratBand, std::string minXCol, std::string maxXCol, std::string minYCol, std::string maxYCol)throw(RSGISCmdException);
+    DllExport void executeSpatialLocationExtent(std::string inputImage, unsigned int ratBand, std::string minXColX, std::string minXColY, std::string maxXColX, std::string maxXColY, std::string minYColX, std::string minYColY, std::string maxYColX, std::string maxYColY)throw(RSGISCmdException);
 
     /** Function for populating an attribute table from an image */
     DllExport void executePopulateRATWithStats(std::string inputImage, std::string clumpsImage, std::vector<rsgis::cmds::RSGISBandAttStatsCmds*> *bandStatsCmds, unsigned int ratBand)throw(RSGISCmdException);
@@ -195,7 +195,7 @@ namespace rsgis{ namespace cmds {
     DllExport void executePopulateCategoryProportions(std::string categoriesImage, std::string clumpsImage, std::string outColsName, std::string majorityColName, bool copyClassNames, std::string majClassNameField, std::string classNameField, unsigned int ratBandClumps, unsigned int ratBandCats)throw(RSGISCmdException);
 
     /** Function for populating the attribute table with the mode of intersecting catagories */
-    DllExport void executePopulateRATWithMode(std::string inputImage, std::string clumpsImage, std::string outColsName, bool useNoDataVal, long noDataVal, unsigned int modeBand, unsigned int ratBand)throw(RSGISCmdException);
+    DllExport void executePopulateRATWithMode(std::string inputImage, std::string clumpsImage, std::string outColsName, bool useNoDataVal, long noDataVal, bool outNoDataVal, unsigned int modeBand, unsigned int ratBand)throw(RSGISCmdException);
     
     /** Function for copying an attribute tables colour table to another table based on class column */
     //DllExport void executeCopyCategoriesColours(std::string categoriesImage, std::string clumpsImage, std::string classField)throw(RSGISCmdException);
@@ -313,6 +313,19 @@ namespace rsgis{ namespace cmds {
     
     /** Function which populates the RAT with proportion of valid pixels within a clump */
     DllExport void executeCalcPropOfValidPixelsInClump(std::string inputImage, std::string clumpsImage, unsigned int ratBand, std::string outColumn, double noDataVal=0)throw(RSGISCmdException);
+    
+    /** Function to calculate the 2D Jeffries Matusita distance between two classes. */
+    DllExport float executeCalc1DJMDistance(std::string clumpsImage, std::string varCol, float binWidth, std::string classColumn, std::string class1Val, std::string class2Val, unsigned int ratBand=1)throw(RSGISCmdException);
+    
+    /** Function to calculate the 3D Jeffries Matusita distance between two classes. */
+    DllExport float executeCalc2DJMDistance(std::string clumpsImage, std::string var1Col, std::string var2Col, float var1binWidth, float var2binWidth, std::string classColumn, std::string class1Val, std::string class2Val, unsigned int ratBand=1)throw(RSGISCmdException);
+    
+    /** Function to calculate the Bhattacharyya distance between two classes. */
+    DllExport float executeCalcBhattacharyyaDistance(std::string clumpsImage, std::string varCol, std::string classColumn, std::string class1Val, std::string class2Val, unsigned int ratBand=1)throw(RSGISCmdException);
+    
+    /** Function to export each clump to an individual image file */
+    DllExport void executeExportClumps2Images(std::string clumpsImage, std::string outImgBase, std::string imgFileExt, std::string imageFormat, bool binaryOut, unsigned int ratBand=1)throw(RSGISCmdException);
+    
     
 }}
 

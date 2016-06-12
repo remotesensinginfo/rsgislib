@@ -51,6 +51,24 @@ namespace rsgis{namespace vec{
     protected:
         std::vector<OGRGeometry*> *polys;
     };
+    
+    
+    class DllExport RSGISCalcMinDist2Geoms : public RSGISProcessOGRFeature
+    {
+    public:
+        RSGISCalcMinDist2Geoms(std::vector<OGRGeometry*> *geoms);
+        virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
+        virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
+        virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
+        double getMaxMinDist(){return this->maxMinDist;};
+        virtual ~RSGISCalcMinDist2Geoms();
+    protected:
+        std::vector<OGRGeometry*> *geoms;
+        bool firstGeom;
+        double maxMinDist;
+    };
+    
+    
 }}
 
 

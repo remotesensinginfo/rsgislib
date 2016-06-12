@@ -917,4 +917,36 @@ namespace rsgis{namespace img{
         
     }
     
+    
+    
+
+    RSGISCombineImagesIgnoreNoData::RSGISCombineImagesIgnoreNoData(float noDataVal):RSGISCalcImageValue(1)
+    {
+        this->noDataVal = noDataVal;
+    }
+    
+    void RSGISCombineImagesIgnoreNoData::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+    {
+        if(numOutBands != 1)
+        {
+            throw RSGISImageCalcException("Incorrect number of output Image bands (should be equal to 1).");
+        }
+        
+        output[0] = this->noDataVal;
+        
+        for(int i = 0; i < numBands; ++i)
+        {
+            if(bandValues[i] != this->noDataVal)
+            {
+                output[0] = bandValues[i];
+            }
+        }
+    }
+    
+    RSGISCombineImagesIgnoreNoData::~RSGISCombineImagesIgnoreNoData()
+    {
+        
+    }
+
+    
 }} // rsgis::img

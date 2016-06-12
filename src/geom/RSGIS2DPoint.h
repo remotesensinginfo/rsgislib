@@ -31,6 +31,8 @@
 
 #include "geos/geom/Coordinate.h"
 
+#include "utils/RSGISGEOSFactoryGenerator.h"
+
 namespace rsgis{namespace geom{
 	
 	class DllExport RSGIS2DPoint
@@ -41,6 +43,8 @@ namespace rsgis{namespace geom{
 			RSGIS2DPoint(geos::geom::Coordinate *pt, int classID);
 			virtual void setPoint(geos::geom::Coordinate *pt);
 			virtual const geos::geom::Coordinate* getPoint();
+            virtual geos::geom::Coordinate getCoordPoint();
+            virtual geos::geom::Point* getAsGeosPoint();
 			virtual double getX();
 			virtual double getY();
 			virtual double getZ();
@@ -52,6 +56,8 @@ namespace rsgis{namespace geom{
 			virtual unsigned int getClassID();
 			virtual double distance(RSGIS2DPoint *pt);
 			virtual double distance(geos::geom::Coordinate *pt);
+            virtual bool equals(RSGIS2DPoint *pt);
+            virtual bool equals(geos::geom::Coordinate *pt);
 			friend std::ostream& operator<<(std::ostream& ostr, const RSGIS2DPoint& pt);
             std::ostream& operator<<(std::ostream& ostr);
 			bool operator==(RSGIS2DPoint pt) const;

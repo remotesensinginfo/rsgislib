@@ -11,6 +11,7 @@ These functions make use of rsgislib functions and matplotlib to provide useful 
 
 .. autofunction:: rsgislib.tools.plotImageSpectra
 .. autofunction:: rsgislib.tools.plotImageComparison
+.. autofunction:: rsgislib.tools.plotImageHistogram
 
 Projection
 -----------

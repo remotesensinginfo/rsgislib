@@ -47,15 +47,16 @@ import rsgislib.imagecalc
 import rsgislib.segmentation
 # Import the image rastergis module from rsgislib
 import rsgislib.rastergis
-# Import the module from rsgislib
-import rsgislib
+# Import the python OS module
 import os
 # Import the collections module
 import collections
-import fnmatch
+#import the gdal module
 import osgeo.gdal as gdal
+# Import the python JSON module
+import json
 
-def runShepherdSegmentation(inputImg, outputClumps, outputMeanImg=None, tmpath='.', gdalformat='KEA', noStats=False, noStretch=False, noDelete=False, numClusters=60, minPxls=100, distThres=100, bands=None, sampling=100, kmMaxIter=200, processInMem=False): 
+def runShepherdSegmentation(inputImg, outputClumps, outputMeanImg=None, tmpath='.', gdalformat='KEA', noStats=False, noStretch=False, noDelete=False, numClusters=60, minPxls=100, distThres=100, bands=None, sampling=100, kmMaxIter=200, processInMem=False, saveProcessStats=False, imgStretchStats="", kMeansCentres="", imgStatsJSONFile=""): 
     """
 Utility function to call the segmentation algorithm of Shepherd et al. (2014).
 
@@ -68,7 +69,7 @@ Where:
 * gdalformat is a string containing the GDAL format for the output file (default = KEA).
 * noStats is a bool which specifies that no image statistics and pyramids should be built for the output images (default = False)/
 * noStretch is a bool which specifies that the input image bands should not be stretched (default = False).
-* noDelete is a book which specifies that the temporary images created during processing should not be deleted once processing has been completed (default = False).
+* noDelete is a bool which specifies that the temporary images created during processing should not be deleted once processing has been completed (default = False).
 * numClusters is an int which specifies the number of clusters within the KMeans clustering (default = 60).
 * minPxls is an int which specifies the minimum number pixels within a segments (default = 100).
 * distThres specifies the distance threshold for joining the segments (default = 100, set to large number to turn off this option).
@@ -76,6 +77,10 @@ Where:
 * sampling specify the subsampling of the image for the data used within the KMeans (default = 100; 1 == no subsampling).
 * kmMaxIter maximum iterations for KMeans.
 * processInMem where functions allow it perform processing in memory rather than on disk.
+* saveProcessStats is a bool which specifies that the image stretch stats and the kMeans centre stats should be saved along with a header.
+* imgStretchStats is a string providing the file name and path for the image stretch stats (Output).
+* kMeansCentres is a string providing the file name and path for the KMeans clusters centres (don't include file extension; .gmtxt will be added to the end) (Output).
+* imgStatsJSONFile is a string providing the name and path of a JSON file storing the image spatial extent and imgStretchStats and kMeansCentres file paths for use by other commands (Output).
 
 Example::
 
@@ -89,6 +94,11 @@ Example::
 
 
     """
+    
+    if saveProcessStats:
+        if (imgStretchStats=="") or (kMeansCentres=="") or (imgStatsJSONFile==""):
+            raise rsgislib.RSGISPyException("if image stretch and kmeans centres are to be saved then all file names (imgStretchStats, kMeansCentres, imgStatsJSONFile) need to be provided.")
+    
     rsgisUtils = rsgislib.RSGISPyUtils()
     
     basefile = os.path.basename(inputImg)
@@ -123,8 +133,9 @@ Example::
         strchFile = os.path.join(tmpath,basename+str("_stchdonly")+outFileExt)
         strchFileOffset = os.path.join(tmpath,basename+str("_stchdonlyOff")+outFileExt)
         strchMaskFile = os.path.join(tmpath,basename+str("_stchdmaskonly")+outFileExt)
+        
         print("Stretch Input Image")
-        rsgislib.imageutils.stretchImage(inputImgBands, strchFile, False, "", True, False, gdalformat, rsgislib.TYPE_8INT, rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
+        rsgislib.imageutils.stretchImage(inputImgBands, strchFile, saveProcessStats, imgStretchStats, True, False, gdalformat, rsgislib.TYPE_8INT, rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
         
         print("Add 1 to stretched file to ensure there are no all zeros (i.e., no data) regions created.")
         rsgislib.imagecalc.imageMath(strchFile, strchFileOffset, "b1+1", gdalformat, rsgislib.TYPE_8INT)
@@ -147,6 +158,8 @@ Example::
     # Perform KMEANS
     print("Performing KMeans.")
     outMatrixFile = os.path.join(tmpath,basename+str("_kmeansclusters"))
+    if saveProcessStats:
+        outMatrixFile = kMeansCentres
     rsgislib.imagecalc.kMeansClustering(segmentFile, outMatrixFile, numClusters, kmMaxIter, sampling, True, 0.0025, rsgislib.imagecalc.INITCLUSTER_DIAGONAL_FULL_ATTACH)
     
     # Apply KMEANS
@@ -184,10 +197,43 @@ Example::
         rsgislib.segmentation.meanImage(inputImg, outputClumps, outputMeanImg, gdalformat, input_datatype)
         if not noStats:
             rsgislib.imageutils.popImageStats(outputMeanImg, True, 0, True)
+    
+    
+    if saveProcessStats:
+        gdalDS = gdal.Open(inputImg, gdal.GA_ReadOnly)
+        geotransform = gdalDS.GetGeoTransform()
+        if not geotransform is None:
+            xTL = geotransform[0]
+            yTL = geotransform[3]
+            
+            xRes = geotransform[1]
+            yRes = geotransform[5]
+            
+            width = gdalDS.RasterXSize * xRes
+            if yRes < 0:
+                yRes = yRes * (-1)
+            height = gdalDS.RasterYSize * yRes
+            xBR = xTL + width
+            yBR = yTL - height
+            
+            xCen = xTL + (width/2)
+            yCen = yBR + (height/2)
         
+            sceneData = dict()
+            sceneData['KCENTRES'] = kMeansCentres+str(".gmtxt")
+            sceneData['STRETCHSTATS'] = imgStretchStats
+            sceneData['CENTRE_PT'] = {'X':xCen, 'Y':yCen}
+            sceneData['BBOX'] = {'XMIN':xTL, 'YMIN':yBR, 'XMAX':xBR, 'YMAX':yTL}
+            
+            with open(imgStatsJSONFile, 'w') as outfile:
+                json.dump(sceneData, outfile, sort_keys=True, indent=4, separators=(',', ': '), ensure_ascii=False)
+
+        gdalDS = None
+     
     if not noDelete:
         # Deleting extra files
-        rsgisUtils.deleteFileWithBasename(outMatrixFile+str(".gmtxt"))
+        if not saveProcessStats:
+            rsgisUtils.deleteFileWithBasename(outMatrixFile+str(".gmtxt"))
         rsgisUtils.deleteFileWithBasename(kMeansFileZones)
         rsgisUtils.deleteFileWithBasename(kMeansFileZonesNoSgls)
         rsgisUtils.deleteFileWithBasename(kMeansFileZonesNoSglsTmp)
@@ -200,7 +246,155 @@ Example::
         if createdDIR:
             shutil.rmtree(tmpath)
             
-            
+
+def runShepherdSegmentationPreCalcdStats(inputImg, outputClumps, kMeansCentres, imgStretchStats, outputMeanImg=None, tmpath='.', gdalformat='KEA', noStats=False, noStretch=False, noDelete=False, minPxls=100, distThres=100, bands=None, processInMem=False): 
+    """
+Utility function to call the segmentation algorithm of Shepherd et al. (2014) using pre-calculated stretch stats and KMeans cluster centres.
+
+Where:
+
+* inputImg is a string containing the name of the input file.
+* outputClumps is a string containing the name of the output clump file.
+* kMeansCentres is a string providing the file name and path for the KMeans clusters centres (Input)
+* imgStretchStats is a string providing the file name and path for the image stretch stats (Input - not required if noStretch=True)
+* outputMeanImg is the output mean image file (clumps attributed with pixel mean from input image) - pass 'None' to skip creating.
+* tmpath is a file path for intermediate files (default is current directory).
+* gdalformat is a string containing the GDAL format for the output file (default = KEA).
+* noStats is a bool which specifies that no image statistics and pyramids should be built for the output images (default = False)/
+* noStretch is a bool which specifies that the input image bands should not be stretched (default = False).
+* noDelete is a bool which specifies that the temporary images created during processing should not be deleted once processing has been completed (default = False).
+* minPxls is an int which specifies the minimum number pixels within a segments (default = 100).
+* distThres specifies the distance threshold for joining the segments (default = 100, set to large number to turn off this option).
+* bands is an array providing a subset of image bands to use (default is None to use all bands).
+* sampling specify the subsampling of the image for the data used within the KMeans (default = 100; 1 == no subsampling).
+* processInMem where functions allow it perform processing in memory rather than on disk.
+
+Example::
+
+    from rsgislib.segmentation import segutils
+    
+    inputImg = 'jers1palsar_stack.kea'
+    outputClumps = 'jers1palsar_stack_clumps_elim_final.kea'
+    outputMeanImg = 'jers1palsar_stack_clumps_elim_final_mean.kea'
+    kMeansCentres = 'jers1palsar_stack_kcentres.gmtxt'
+    imgStretchStats = 'jers1palsar_stack_stchstats.txt'
+    
+    segutils.runShepherdSegmentationPreCalcdStats(inputImg, outputClumps, kMeansCentres, imgStretchStats, outputMeanImg, minPxls=100)
+
+    """
+    
+    if not noStretch:
+        if (imgStretchStats=="") or (imgStretchStats==None):
+            raise rsgislib.RSGISPyException("A stretch stats file must be provided")
+    
+    rsgisUtils = rsgislib.RSGISPyUtils()
+    
+    basefile = os.path.basename(inputImg)
+    basename = os.path.splitext(basefile)[0]
+    
+    outFileExt = rsgisUtils.getFileExtension(gdalformat)
+    
+    createdDIR = False
+    if not os.path.isdir(tmpath):
+        os.makedirs(tmpath)
+        createdDIR = True
+
+    # Get data type of input image
+    gdalDS = gdal.Open(inputImg, gdal.GA_ReadOnly)
+    rsgisUtils = rsgislib.RSGISPyUtils()
+    input_datatype = rsgisUtils.getRSGISLibDataType(gdal.GetDataTypeName(gdalDS.GetRasterBand(1).DataType))
+    gdalDS = None
+        
+    # Select Image Bands if required
+    inputImgBands = inputImg
+    selectBands = False
+    if not bands == None:
+        print("Subsetting the image bands")
+        selectBands = True
+        inputImgBands = os.path.join(tmpath,basename+str("_bselect")+outFileExt)
+        rsgislib.imageutils.selectImageBands(inputImg, inputImgBands, gdalformat, input_datatype, bands)        
+    
+    # Stretch input data if required.
+    segmentFile = inputImgBands
+    if not noStretch:
+        segmentFile = os.path.join(tmpath,basename+str("_stchd")+outFileExt)
+        strchFile = os.path.join(tmpath,basename+str("_stchdonly")+outFileExt)
+        strchFileOffset = os.path.join(tmpath,basename+str("_stchdonlyOff")+outFileExt)
+        strchMaskFile = os.path.join(tmpath,basename+str("_stchdmaskonly")+outFileExt)
+        
+        print("Stretch Input Image")
+        rsgislib.imageutils.stretchImageWithStats(inputImgBands, strchFile, imgStretchStats, gdalformat, rsgislib.TYPE_8INT, rsgislib.imageutils.STRETCH_LINEARMINMAX, 2)
+        
+        print("Add 1 to stretched file to ensure there are no all zeros (i.e., no data) regions created.")
+        rsgislib.imagecalc.imageMath(strchFile, strchFileOffset, "b1+1", gdalformat, rsgislib.TYPE_8INT)
+        
+        print("Create Input Image Mask.")
+        ImgBand = collections.namedtuple('ImgBands', ['bandName', 'fileName', 'bandIndex'])
+        bandMathBands = list()
+        bandMathBands.append(ImgBand(bandName="b1", fileName=inputImgBands, bandIndex=1))
+        rsgislib.imagecalc.bandMath(strchMaskFile, "b1==0?1:0", gdalformat, rsgislib.TYPE_8INT, bandMathBands)
+        
+        print("Mask stretched Image.")
+        rsgislib.imageutils.maskImage(strchFileOffset, strchMaskFile, segmentFile, gdalformat, rsgislib.TYPE_8INT, 0, 1)
+        
+        if not noDelete:
+            # Deleting extra files
+            rsgisUtils.deleteFileWithBasename(strchFile)
+            rsgisUtils.deleteFileWithBasename(strchFileOffset)
+            rsgisUtils.deleteFileWithBasename(strchMaskFile)
+    
+    # Apply KMEANS
+    print("Apply KMeans to image.")
+    kMeansFileZones = os.path.join(tmpath,basename+str("_kmeans")+outFileExt)
+    rsgislib.segmentation.labelPixelsFromClusterCentres(segmentFile, kMeansFileZones, kMeansCentres, True, gdalformat)
+    
+    # Elimininate Single Pixels
+    print("Eliminate Single Pixels.")
+    kMeansFileZonesNoSgls = os.path.join(tmpath,basename+str("_kmeans_nosgl")+outFileExt)
+    kMeansFileZonesNoSglsTmp = os.path.join(tmpath,basename+str("_kmeans_nosglTMP")+outFileExt)
+    rsgislib.segmentation.eliminateSinglePixels(segmentFile, kMeansFileZones, kMeansFileZonesNoSgls, kMeansFileZonesNoSglsTmp, gdalformat, processInMem, True)
+    
+    # Clump
+    print("Perform clump.")
+    initClumpsFile = os.path.join(tmpath,basename+str("_clumps")+outFileExt)
+    rsgislib.segmentation.clump(kMeansFileZonesNoSgls, initClumpsFile, gdalformat, processInMem, 0)
+    
+    # Elimininate small clumps
+    print("Eliminate small pixels.")
+    elimClumpsFile = os.path.join(tmpath,basename+str("_clumps_elim")+outFileExt)
+    rsgislib.segmentation.rmSmallClumpsStepwise(segmentFile, initClumpsFile, elimClumpsFile, gdalformat, False, "", False, processInMem, minPxls, distThres)
+    
+    # Relabel clumps
+    print("Relabel clumps.")
+    rsgislib.segmentation.relabelClumps(elimClumpsFile, outputClumps, gdalformat, processInMem)
+    
+    # Populate with stats if required.
+    if not noStats:
+        print("Calculate image statistics and build pyramids.")
+        rsgislib.rastergis.populateStats(outputClumps, True, True)
+    
+    # Create mean image if required.
+    if not (outputMeanImg == None):
+        rsgislib.segmentation.meanImage(inputImg, outputClumps, outputMeanImg, gdalformat, input_datatype)
+        if not noStats:
+            rsgislib.imageutils.popImageStats(outputMeanImg, True, 0, True)
+     
+    if not noDelete:
+        # Deleting extra files
+        rsgisUtils.deleteFileWithBasename(kMeansFileZones)
+        rsgisUtils.deleteFileWithBasename(kMeansFileZonesNoSgls)
+        rsgisUtils.deleteFileWithBasename(kMeansFileZonesNoSglsTmp)
+        rsgisUtils.deleteFileWithBasename(initClumpsFile)
+        rsgisUtils.deleteFileWithBasename(elimClumpsFile)
+        if selectBands:
+            rsgisUtils.deleteFileWithBasename(inputImgBands)
+        if not noStretch:
+            rsgisUtils.deleteFileWithBasename(segmentFile)
+        if createdDIR:
+            shutil.rmtree(tmpath)
+
+
+
 def runShepherdSegmentationTestNumClumps(inputImg, outputClumpsBase, outStatsFile, outputMeanImgBase=None, tmpath='.', gdalformat='KEA', noStats=False, noStretch=False, noDelete=False, numClustersStart=10, numClustersStep=10, numOfClustersSteps=10, minPxls=10, distThres=1000000, bands=None, sampling=100, kmMaxIter=200, processInMem=False, minNormV=None, maxNormV=None, minNormMI=None, maxNormMI=None): 
     """
 Utility function to call the segmentation algorithm of Shepherd et al. (2014) and to test are range of 'k' within the kMeans.

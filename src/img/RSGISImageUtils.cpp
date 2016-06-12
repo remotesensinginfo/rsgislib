@@ -164,7 +164,7 @@ namespace rsgis{namespace img{
 				
 				if(!((diffX > -0.0001) & (diffX < 0.0001)))
 				{
-					dsOffsets[i][0] = floor(diffX/pixelXRes);
+					dsOffsets[i][0] = floor((diffX/pixelXRes)+0.5);
 				}
 				else
 				{
@@ -173,7 +173,7 @@ namespace rsgis{namespace img{
 				
 				if(!((diffY > -0.0001) & (diffY < 0.0001)))
 				{
-					dsOffsets[i][1] = floor(diffY/pixelYResPos);
+					dsOffsets[i][1] = floor((diffY/pixelYResPos)+0.5);
 				}
 				else
 				{
@@ -357,7 +357,7 @@ namespace rsgis{namespace img{
 				
 				if(!((diffX > -0.0001) & (diffX < 0.0001)))
 				{
-					dsOffsets[i][0] = floor(diffX/pixelXRes);
+					dsOffsets[i][0] = floor((diffX/pixelXRes)+0.5);
 				}
 				else
 				{
@@ -366,7 +366,7 @@ namespace rsgis{namespace img{
 				
 				if(!((diffY > -0.0001) & (diffY < 0.0001)))
 				{
-					dsOffsets[i][1] = floor(diffY/pixelYResPos);
+					dsOffsets[i][1] = floor((diffY/pixelYResPos)+0.5);
 				}
 				else
 				{
@@ -568,7 +568,7 @@ namespace rsgis{namespace img{
 				
 				if(!((diffX > -0.0001) & (diffX < 0.0001)))
 				{
-					dsOffsets[i][0] = floor((diffX/pixelXRes));
+					dsOffsets[i][0] = floor((diffX/pixelXRes)+0.5);
 				}
 				else
 				{
@@ -577,7 +577,7 @@ namespace rsgis{namespace img{
 				
 				if(!((diffY > -0.0001) & (diffY < 0.0001)))
 				{
-					dsOffsets[i][1] = floor((diffY/pixelYResPos));
+					dsOffsets[i][1] = floor((diffY/pixelYResPos)+0.5);
 				}
 				else
 				{
@@ -781,7 +781,7 @@ namespace rsgis{namespace img{
 				
 				if(!((diffX > -0.0001) & (diffX < 0.0001)))
 				{
-					dsOffsets[i][0] = floor(diffX/pixelXRes);
+					dsOffsets[i][0] = floor((diffX/pixelXRes)+0.5);
 				}
 				else
 				{
@@ -790,7 +790,7 @@ namespace rsgis{namespace img{
 				
 				if(!((diffY > -0.0001) & (diffY < 0.0001)))
 				{
-					dsOffsets[i][1] = floor(diffY/pixelYResPos);
+					dsOffsets[i][1] = floor((diffY/pixelYResPos)+0.5);
 				}
 				else
 				{
@@ -2444,87 +2444,7 @@ namespace rsgis{namespace img{
 			outputImage->SetGeoTransform(transformation);
 			outputImage->SetProjection(projection.c_str());
 			
-            int xBlockSize = 0;
-            int yBlockSize = 0;
-            
-            outputRasterBands = new GDALRasterBand*[numBands];
-			for(int i = 0; i < numBands; i++)
-			{
-				outputRasterBands[i] = outputImage->GetRasterBand(i+1);
-			}
-            outputRasterBands[0]->GetBlockSize(&xBlockSize, &yBlockSize);
-            
-            std::cout << "Max. block size: " << yBlockSize << std::endl;
-            
-            // Allocate memory
-			imgData = new float*[numBands];
-			for(int i = 0; i < numBands; i++)
-			{
-				imgData[i] = (float *) CPLMalloc(sizeof(float)*(xSize*yBlockSize));
-			}
-            
-            int nYBlocks = ySize / yBlockSize;
-            int remainRows = ySize - (nYBlocks * yBlockSize);
-            int rowOffset = 0;
-            
-            
-            int feedback = ySize/10;
-			int feedbackCounter = 0;
-			std::cout << "Started" << std::flush;
-			// Loop images to process data
-			for(int i = 0; i < nYBlocks; i++)
-			{
-                
-                // Set up block of data containing value to be written out
-                for(int m = 0; m < yBlockSize; ++m)
-                {
-                    if((feedback != 0) && ((((i*yBlockSize)+m) % feedback) == 0))
-                    {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
-                    }
-                    
-                    for(int j = 0; j < xSize; j++)
-                    {
-
-                        for(int n = 0; n < numBands; n++)
-                        {
-                            imgData[n][(m*xSize)+j] = value;
-                        }
-                    }
-                    
-                }
-				
-				for(int n = 0; n < numBands; n++)
-				{
-                    rowOffset = yBlockSize * i;
-					outputRasterBands[n]->RasterIO(GF_Write, 0, rowOffset, xSize, yBlockSize, imgData[n], xSize, yBlockSize, GDT_Float32, 0, 0);
-				}
-			}
-            
-            if(remainRows > 0)
-            {
-
-                for(int m = 0; m < remainRows; ++m)
-                {
-                    for(int j = 0; j < xSize; j++)
-                    {
-                        
-                        for(int n = 0; n < numBands; n++)
-                        {
-                            imgData[n][(m*xSize)+j] = value;
-                        }
-                    }
-                }
-				
-				for(int n = 0; n < numBands; n++)
-				{
-                    rowOffset = (yBlockSize * nYBlocks);
-					outputRasterBands[n]->RasterIO(GF_Write, 0, rowOffset, xSize, remainRows, imgData[n], xSize, remainRows, GDT_Float32, 0, 0);
-				}
-            }
-			std::cout << " Complete.\n";
-
+            this->assignValGDALDataset(outputImage, value);
 		}
 		catch(RSGISImageBandException e)
 		{
@@ -2642,88 +2562,7 @@ namespace rsgis{namespace img{
 			outputImage->SetGeoTransform(transformation);
 			outputImage->SetProjection(projection.c_str());
 			
-            int xBlockSize = 0;
-            int yBlockSize = 0;
-            
-            outputRasterBands = new GDALRasterBand*[numBands];
-			for(int i = 0; i < numBands; i++)
-			{
-				outputRasterBands[i] = outputImage->GetRasterBand(i+1);
-                outputRasterBands[i]->SetDescription(bandNames.at(i).c_str());
-			}
-            outputRasterBands[0]->GetBlockSize(&xBlockSize, &yBlockSize);
-            
-            std::cout << "Max. block size: " << yBlockSize << std::endl;
-            
-            // Allocate memory
-			imgData = new float*[numBands];
-			for(int i = 0; i < numBands; i++)
-			{
-				imgData[i] = (float *) CPLMalloc(sizeof(float)*(xSize*yBlockSize));
-			}
-            
-            int nYBlocks = ySize / yBlockSize;
-            int remainRows = ySize - (nYBlocks * yBlockSize);
-            int rowOffset = 0;
-            
-            
-            int feedback = ySize/10;
-			int feedbackCounter = 0;
-			std::cout << "Started" << std::flush;
-			// Loop images to process data
-			for(int i = 0; i < nYBlocks; i++)
-			{
-                
-                // Set up block of data containing value to be written out
-                for(int m = 0; m < yBlockSize; ++m)
-                {
-                    if((feedback != 0) && ((((i*yBlockSize)+m) % feedback) == 0))
-                    {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
-                    }
-                    
-                    for(int j = 0; j < xSize; j++)
-                    {
-                        
-                        for(int n = 0; n < numBands; n++)
-                        {
-                            imgData[n][(m*xSize)+j] = value;
-                        }
-                    }
-                    
-                }
-				
-				for(int n = 0; n < numBands; n++)
-				{
-                    rowOffset = yBlockSize * i;
-					outputRasterBands[n]->RasterIO(GF_Write, 0, rowOffset, xSize, yBlockSize, imgData[n], xSize, yBlockSize, GDT_Float32, 0, 0);
-				}
-			}
-            
-            if(remainRows > 0)
-            {
-                
-                for(int m = 0; m < remainRows; ++m)
-                {
-                    for(int j = 0; j < xSize; j++)
-                    {
-                        
-                        for(int n = 0; n < numBands; n++)
-                        {
-                            imgData[n][(m*xSize)+j] = value;
-                        }
-                    }
-                }
-				
-				for(int n = 0; n < numBands; n++)
-				{
-                    rowOffset = (yBlockSize * nYBlocks);
-					outputRasterBands[n]->RasterIO(GF_Write, 0, rowOffset, xSize, remainRows, imgData[n], xSize, remainRows, GDT_Float32, 0, 0);
-				}
-            }
-			std::cout << " Complete.\n";
-            
+            this->assignValGDALDataset(outputImage, value);
 		}
 		catch(RSGISImageBandException e)
 		{
@@ -2857,25 +2696,7 @@ namespace rsgis{namespace img{
 			outputImage->SetGeoTransform(transformation);
 			outputImage->SetProjection(projection.c_str());
 			
-			imgData = (float *) CPLMalloc(sizeof(float)*xSize);
-			for(int i = 0; i < xSize; i++)
-			{
-				imgData[i] = value;
-			}
-			
-			std::cout << "Created Image: \n";
-			std::cout << "xSize = " << xSize << std::endl;
-			std::cout << "ySize = " << ySize << std::endl;
-			
-			for(int n = 1; n <= numBands; n++)
-			{
-				std::cout << "Zeroing band " << n << " of " << numBands << std::endl;
-				imgBand = outputImage->GetRasterBand(n);
-				for(int i = 0; i < ySize; i++)
-				{
-					imgBand->RasterIO(GF_Write, 0, i, xSize, 1, imgData, xSize, 1, GDT_Float32, 0, 0);
-				}
-			}
+			this->assignValGDALDataset(outputImage, value);
 		}
 		catch(RSGISImageBandException e)
 		{
@@ -3979,30 +3800,59 @@ namespace rsgis{namespace img{
     {
         try
         {
-            unsigned long width = data->GetRasterXSize();
-            unsigned long height = data->GetRasterYSize();
+            unsigned long xSize = data->GetRasterXSize();
+            unsigned long ySize = data->GetRasterYSize();
             unsigned int numBands = data->GetRasterCount();
+            int xBlockSize = 0;
+            int yBlockSize = 0;
             
             GDALRasterBand **rasterBands = new GDALRasterBand*[numBands];
-            unsigned int *dataVals = new unsigned int[width];
+            for(int i = 0; i < numBands; i++)
+            {
+                rasterBands[i] = data->GetRasterBand(i+1);
+            }
+            rasterBands[0]->GetBlockSize(&xBlockSize, &yBlockSize);
             
-            for(unsigned int i = 0; i < width; ++i)
+            // Allocate memory
+            unsigned int *dataVals = new unsigned int[xSize*yBlockSize];
+            
+            for(unsigned int i = 0; i < (xSize*yBlockSize); ++i)
             {
                 dataVals[i] = 0;
             }
             
-            for(unsigned int n = 0; n < numBands; ++n)
-            {
-                rasterBands[n] = data->GetRasterBand(n+1);
-            }
+            int nYBlocks = ySize / yBlockSize;
+            int remainRows = ySize - (nYBlocks * yBlockSize);
+            int rowOffset = 0;
             
-            for(unsigned long y = 0; y < height; ++y)
+            int feedback = nYBlocks/10;
+            int feedbackCounter = 0;
+            std::cout << "Started" << std::flush;
+            // Loop images to process data
+            for(int i = 0; i < nYBlocks; i++)
             {
-                for(unsigned int n = 0; n < numBands; ++n)
+                if((feedback != 0) && (i % feedback == 0))
                 {
-                    rasterBands[n]->RasterIO(GF_Write, 0, y, width, 1, dataVals, width, 1, GDT_UInt32, 0, 0);
+                    std::cout << "." << feedbackCounter << "." << std::flush;
+                    feedbackCounter = feedbackCounter + 10;
+                }
+                
+                for(int n = 0; n < numBands; n++)
+                {
+                    rowOffset = yBlockSize * i;
+                    rasterBands[n]->RasterIO(GF_Write, 0, rowOffset, xSize, yBlockSize, dataVals, xSize, yBlockSize, GDT_UInt32, 0, 0);
                 }
             }
+            
+            if(remainRows > 0)
+            {
+                for(int n = 0; n < numBands; n++)
+                {
+                    rowOffset = (yBlockSize * nYBlocks);
+                    rasterBands[n]->RasterIO(GF_Write, 0, rowOffset, xSize, remainRows, dataVals, xSize, remainRows, GDT_UInt32, 0, 0);
+                }
+            }
+            std::cout << " Complete.\n";
             
             delete[] rasterBands;
             delete[] dataVals;
@@ -4017,30 +3867,59 @@ namespace rsgis{namespace img{
     {
         try
         {
-            unsigned long width = data->GetRasterXSize();
-            unsigned long height = data->GetRasterYSize();
+            unsigned long xSize = data->GetRasterXSize();
+            unsigned long ySize = data->GetRasterYSize();
             unsigned int numBands = data->GetRasterCount();
+            int xBlockSize = 0;
+            int yBlockSize = 0;
             
             GDALRasterBand **rasterBands = new GDALRasterBand*[numBands];
-            float *dataVals = new float[width];
+            for(int i = 0; i < numBands; i++)
+            {
+                rasterBands[i] = data->GetRasterBand(i+1);
+            }
+            rasterBands[0]->GetBlockSize(&xBlockSize, &yBlockSize);
             
-            for(unsigned int i = 0; i < width; ++i)
+            // Allocate memory
+            float *dataVals = new float[xSize*yBlockSize];
+            
+            for(unsigned int i = 0; i < (xSize*yBlockSize); ++i)
             {
                 dataVals[i] = 0;
             }
             
-            for(unsigned int n = 0; n < numBands; ++n)
-            {
-                rasterBands[n] = data->GetRasterBand(n+1);
-            }
+            int nYBlocks = ySize / yBlockSize;
+            int remainRows = ySize - (nYBlocks * yBlockSize);
+            int rowOffset = 0;
             
-            for(unsigned long y = 0; y < height; ++y)
+            int feedback = nYBlocks/10;
+            int feedbackCounter = 0;
+            std::cout << "Started" << std::flush;
+            // Loop images to process data
+            for(int i = 0; i < nYBlocks; i++)
             {
-                for(unsigned int n = 0; n < numBands; ++n)
+                if((feedback != 0) && (i % feedback == 0))
                 {
-                    rasterBands[n]->RasterIO(GF_Write, 0, y, width, 1, dataVals, width, 1, GDT_Float32, 0, 0);
+                    std::cout << "." << feedbackCounter << "." << std::flush;
+                    feedbackCounter = feedbackCounter + 10;
+                }
+                
+                for(int n = 0; n < numBands; n++)
+                {
+                    rowOffset = yBlockSize * i;
+                    rasterBands[n]->RasterIO(GF_Write, 0, rowOffset, xSize, yBlockSize, dataVals, xSize, yBlockSize, GDT_Float32, 0, 0);
                 }
             }
+            
+            if(remainRows > 0)
+            {
+                for(int n = 0; n < numBands; n++)
+                {
+                    rowOffset = (yBlockSize * nYBlocks);
+                    rasterBands[n]->RasterIO(GF_Write, 0, rowOffset, xSize, remainRows, dataVals, xSize, remainRows, GDT_Float32, 0, 0);
+                }
+            }
+            std::cout << " Complete.\n";
             
             delete[] rasterBands;
             delete[] dataVals;
@@ -4055,30 +3934,59 @@ namespace rsgis{namespace img{
     {
         try
         {
-            unsigned long width = data->GetRasterXSize();
-            unsigned long height = data->GetRasterYSize();
+            unsigned long xSize = data->GetRasterXSize();
+            unsigned long ySize = data->GetRasterYSize();
             unsigned int numBands = data->GetRasterCount();
+            int xBlockSize = 0;
+            int yBlockSize = 0;
             
             GDALRasterBand **rasterBands = new GDALRasterBand*[numBands];
-            int *dataVals = new int[width];
+            for(int i = 0; i < numBands; i++)
+            {
+                rasterBands[i] = data->GetRasterBand(i+1);
+            }
+            rasterBands[0]->GetBlockSize(&xBlockSize, &yBlockSize);
             
-            for(unsigned int i = 0; i < width; ++i)
+            // Allocate memory
+            int *dataVals = new int[xSize*yBlockSize];
+            
+            for(unsigned int i = 0; i < (xSize*yBlockSize); ++i)
             {
                 dataVals[i] = 0;
             }
             
-            for(unsigned int n = 0; n < numBands; ++n)
-            {
-                rasterBands[n] = data->GetRasterBand(n+1);
-            }
+            int nYBlocks = ySize / yBlockSize;
+            int remainRows = ySize - (nYBlocks * yBlockSize);
+            int rowOffset = 0;
             
-            for(unsigned long y = 0; y < height; ++y)
+            int feedback = nYBlocks/10;
+            int feedbackCounter = 0;
+            std::cout << "Started" << std::flush;
+            // Loop images to process data
+            for(int i = 0; i < nYBlocks; i++)
             {
-                for(unsigned int n = 0; n < numBands; ++n)
+                if((feedback != 0) && (i % feedback == 0))
                 {
-                    rasterBands[n]->RasterIO(GF_Write, 0, y, width, 1, dataVals, width, 1, GDT_Byte, 0, 0);
+                    std::cout << "." << feedbackCounter << "." << std::flush;
+                    feedbackCounter = feedbackCounter + 10;
+                }
+                
+                for(int n = 0; n < numBands; n++)
+                {
+                    rowOffset = yBlockSize * i;
+                    rasterBands[n]->RasterIO(GF_Write, 0, rowOffset, xSize, yBlockSize, dataVals, xSize, yBlockSize, GDT_Byte, 0, 0);
                 }
             }
+            
+            if(remainRows > 0)
+            {
+                for(int n = 0; n < numBands; n++)
+                {
+                    rowOffset = (yBlockSize * nYBlocks);
+                    rasterBands[n]->RasterIO(GF_Write, 0, rowOffset, xSize, remainRows, dataVals, xSize, remainRows, GDT_Byte, 0, 0);
+                }
+            }
+            std::cout << " Complete.\n";
             
             delete[] rasterBands;
             delete[] dataVals;
@@ -4093,37 +4001,56 @@ namespace rsgis{namespace img{
     {
         try
         {
-            unsigned long width = data->GetRasterXSize();
-            unsigned long height = data->GetRasterYSize();
+            unsigned long xSize = data->GetRasterXSize();
+            unsigned long ySize = data->GetRasterYSize();
             unsigned int numBands = data->GetRasterCount();
+            int xBlockSize = 0;
+            int yBlockSize = 0;
             
             GDALRasterBand **rasterBands = new GDALRasterBand*[numBands];
-            float *dataVals = new float[width];
+            for(int i = 0; i < numBands; i++)
+            {
+                rasterBands[i] = data->GetRasterBand(i+1);
+            }
+            rasterBands[0]->GetBlockSize(&xBlockSize, &yBlockSize);
             
-            for(unsigned int i = 0; i < width; ++i)
+            // Allocate memory
+            float *dataVals = (float *) CPLMalloc(sizeof(float)*(xSize*yBlockSize));
+            
+            for(unsigned int i = 0; i < (xSize*yBlockSize); ++i)
             {
                 dataVals[i] = value;
             }
             
-            for(unsigned int n = 0; n < numBands; ++n)
+            int nYBlocks = ySize / yBlockSize;
+            int remainRows = ySize - (nYBlocks * yBlockSize);
+            int rowOffset = 0;
+            
+            int feedback = nYBlocks/10;
+            int feedbackCounter = 0;
+            std::cout << "Started" << std::flush;
+            // Loop images to process data
+            for(int i = 0; i < nYBlocks; i++)
             {
-                rasterBands[n] = data->GetRasterBand(n+1);
+                if((feedback != 0) && (i % feedback == 0))
+                {
+                    std::cout << "." << feedbackCounter << "." << std::flush;
+                    feedbackCounter = feedbackCounter + 10;
+                }
+                
+                for(int n = 0; n < numBands; n++)
+                {
+                    rowOffset = yBlockSize * i;
+                    rasterBands[n]->RasterIO(GF_Write, 0, rowOffset, xSize, yBlockSize, dataVals, xSize, yBlockSize, GDT_Float32, 0, 0);
+                }
             }
             
-            int feedback = height/10;
-			int feedbackCounter = 0;
-			std::cout << "Started" << std::flush;
-            for(unsigned long y = 0; y < height; ++y)
+            if(remainRows > 0)
             {
-                if((y % feedback) == 0)
-				{
-					std::cout << "." << feedbackCounter << "." << std::flush;
-					feedbackCounter = feedbackCounter + 10;
-				}
-                
-                for(unsigned int n = 0; n < numBands; ++n)
+                for(int n = 0; n < numBands; n++)
                 {
-                    rasterBands[n]->RasterIO(GF_Write, 0, y, width, 1, dataVals, width, 1, GDT_Float32, 0, 0);
+                    rowOffset = (yBlockSize * nYBlocks);
+                    rasterBands[n]->RasterIO(GF_Write, 0, rowOffset, xSize, remainRows, dataVals, xSize, remainRows, GDT_Float32, 0, 0);
                 }
             }
             std::cout << " Complete.\n";

@@ -39,21 +39,32 @@ static struct ImageUtilsState _state;
 #endif
 
 // Helper function to extract python sequence to array of strings
-static std::string *ExtractStringArrayFromSequence(PyObject *sequence, int *nElements) {
+static std::string *ExtractStringArrayFromSequence(PyObject *sequence, int *nElements)
+{
     Py_ssize_t nFields = PySequence_Size(sequence);
     *nElements = nFields;
+    if(nFields == 0)
+    {
+        return NULL;
+    }
     std::string *stringsArray = new std::string[nFields];
 
-    for(int i = 0; i < nFields; ++i) {
+    for(int i = 0; i < nFields; ++i)
+    {
         PyObject *stringObj = PySequence_GetItem(sequence, i);
-
-        if(!RSGISPY_CHECK_STRING(stringObj)) {
+        
+        if(!RSGISPY_CHECK_STRING(stringObj))
+        {
+            std::cout << "Error: Sequence fields must be strings\n";
             PyErr_SetString(GETSTATE(sequence)->error, "Fields must be strings");
             Py_DECREF(stringObj);
-            return stringsArray;
+            delete[] stringsArray;
+            *nElements = 0;
+            return NULL;
         }
 
         stringsArray[i] = RSGISPY_STRING_EXTRACT(stringObj);
+        
         Py_DECREF(stringObj);
     }
 
@@ -70,9 +81,11 @@ static std::vector<std::string> ExtractStringVectorFromSequence(PyObject *sequen
     {
         PyObject *stringObj = PySequence_GetItem(sequence, i);
         
-        if(!RSGISPY_CHECK_STRING(stringObj)) {
+        if(!RSGISPY_CHECK_STRING(stringObj))
+        {
             PyErr_SetString(GETSTATE(sequence)->error, "Fields must be strings");
             Py_DECREF(stringObj);
+            *nElements = stringsArray.size();
             return stringsArray;
         }
         
@@ -265,16 +278,17 @@ static PyObject *ImageUtils_createImageMosaic(PyObject *self, PyObject *args)
 static PyObject *ImageUtils_IncludeImages(PyObject *self, PyObject *args)
 {
     const char *pszBaseImage;
-    int bandsDefined = false;
     PyObject *pInputImages; // List of input images
     PyObject *pInputBands = Py_None; // List of bands
+    PyObject *pSkipVal = Py_None;
 
     // Check parameters are present and of correct type
-    if( !PyArg_ParseTuple(args, "sO|O:includeImages", &pszBaseImage, &pInputImages, &pInputBands))
+    if( !PyArg_ParseTuple(args, "sO|OO:includeImages", &pszBaseImage, &pInputImages, &pInputBands, &pSkipVal))
         return NULL;
 
     // TODO: Look into this function - doesn't seem to catch when only a single image is provided.
-    if(!PySequence_Check(pInputImages)) {
+    if(!PySequence_Check(pInputImages))
+    {
         PyErr_SetString(GETSTATE(self)->error, "Second argument must be a list of images");
         return NULL;
     }
@@ -288,11 +302,12 @@ static PyObject *ImageUtils_IncludeImages(PyObject *self, PyObject *args)
         return NULL; 
     }
 
-    if(pInputBands == Py_None){bandsDefined = false;}
     // Extract bands to an array (if using)
+    bool bandsDefined = false;
     std::vector<int> imgBands;
-    if(bandsDefined)
+    if(pInputBands != Py_None)
     {
+        bandsDefined = true;
         Py_ssize_t nFields = PySequence_Size(pInputBands);
         
         for(int i = 0; i < nFields; ++i)
@@ -310,9 +325,25 @@ static PyObject *ImageUtils_IncludeImages(PyObject *self, PyObject *args)
             Py_DECREF(intObj);
         }
     }
+    
+    bool useSkipVal = false;
+    float skipVal = 0.0;
+    if(pSkipVal != Py_None)
+    {
+        useSkipVal = true;
+        if(!RSGISPY_CHECK_FLOAT(pSkipVal))
+        {
+            PyErr_SetString(GETSTATE(pInputBands)->error, "Skip value must be a float.");
+            Py_DECREF(pSkipVal);
+            return NULL;
+        }
+        
+        skipVal = RSGISPY_FLOAT_EXTRACT(pSkipVal);
+    }
+    
     try
     {
-        rsgis::cmds::executeImageInclude(inputImages, numImages, pszBaseImage, bandsDefined, imgBands);
+        rsgis::cmds::executeImageInclude(inputImages, numImages, pszBaseImage, bandsDefined, imgBands, skipVal, useSkipVal);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -320,6 +351,47 @@ static PyObject *ImageUtils_IncludeImages(PyObject *self, PyObject *args)
         return NULL;
     }
 
+    Py_RETURN_NONE;
+}
+
+static PyObject *ImageUtils_IncludeImagesOverlap(PyObject *self, PyObject *args)
+{
+    const char *pszBaseImage;
+    PyObject *pInputImages; // List of input images
+    int pxlOverlap = 0;
+    
+    // Check parameters are present and of correct type
+    if( !PyArg_ParseTuple(args, "sOi:includeImagesWithOverlap", &pszBaseImage, &pInputImages, &pxlOverlap))
+    {
+        return NULL;
+    }
+    
+    // TODO: Look into this function - doesn't seem to catch when only a single image is provided.
+    if(!PySequence_Check(pInputImages))
+    {
+        PyErr_SetString(GETSTATE(self)->error, "Second argument must be a list of images");
+        return NULL;
+    }
+    
+    // Extract list of images to array of strings.
+    int numImages = 0;
+    std::string *inputImages = ExtractStringArrayFromSequence(pInputImages, &numImages);
+    if(numImages == 0)
+    {
+        PyErr_SetString(GETSTATE(self)->error, "No input images provided");
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeImageIncludeOverlap(inputImages, numImages, pszBaseImage, pxlOverlap);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
     Py_RETURN_NONE;
 }
 
@@ -711,7 +783,9 @@ static PyObject *ImageUtils_StackImageBands(PyObject *self, PyObject *args)
     PyObject *pimageBandNames = NULL;
     
     if( !PyArg_ParseTuple(args, "OOsOfsi:stackImageBands", &pInputImages, &pimageBandNames, &pszOutputFile, &skipValueObj, &noDataValue, &pszGDALFormat, &nDataType))
+    {
         return NULL;
+    }
     
     bool skipPixels = false;
     float skipValue = 0.0;
@@ -724,7 +798,8 @@ static PyObject *ImageUtils_StackImageBands(PyObject *self, PyObject *args)
         }
     }
     
-    if(!PySequence_Check(pInputImages)) {
+    if(!PySequence_Check(pInputImages))
+    {
         PyErr_SetString(GETSTATE(self)->error, "First argument must be a sequence with a list of band names.");
         return NULL;
     }
@@ -989,6 +1064,114 @@ static PyObject *ImageUtils_GenFiniteMask(PyObject *self, PyObject *args, PyObje
     Py_RETURN_NONE;
 }
 
+static PyObject *ImageUtils_GenValidMask(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    static char *kwlist[] = {"inimages", "outimage", "format", "nodata", NULL};
+    PyObject *pInputImages;
+    const char *pszOutputImage = "";
+    const char *pszGDALFormat = "";
+    float noDataVal = 0.0;
+    
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "Oss|f:genValidMask", kwlist, &pInputImages, &pszOutputImage, &pszGDALFormat, &noDataVal))
+    {
+        return NULL;
+    }
+    
+    std::vector<std::string> inputImages;
+    if(RSGISPY_CHECK_STRING(pInputImages))
+    {
+        inputImages.push_back(RSGISPY_STRING_EXTRACT(pInputImages));
+    }
+    else if(PySequence_Check(pInputImages))
+    {
+        Py_ssize_t nImages = PySequence_Size(pInputImages);
+        inputImages.reserve(nImages);
+        for( Py_ssize_t n = 0; n < nImages; n++ )
+        {
+            PyObject *o = PySequence_GetItem(pInputImages, n);
+            
+            if(!RSGISPY_CHECK_STRING(o))
+            {
+                PyErr_SetString(GETSTATE(self)->error, "Input images must be strings");
+                Py_DECREF(o);
+                return NULL;
+            }
+            
+            inputImages.push_back(RSGISPY_STRING_EXTRACT(o));
+        }
+    }
+    else
+    {
+        PyErr_SetString(GETSTATE(self)->error, "Input images must be a sequence or string");
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeValidImageMask(inputImages, std::string(pszOutputImage), std::string(pszGDALFormat), noDataVal);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+static PyObject *ImageUtils_CombineImages2Band(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    static char *kwlist[] = {"inimages", "outimage", "format", "datatype", "nodata"};
+    PyObject *pInputImages;
+    const char *pszOutputImage = "";
+    const char *pszGDALFormat = "";
+    int nDataType;
+    float noDataVal = 0.0;
+    
+    
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "Ossi|f:combineImages2Band", kwlist, &pInputImages, &pszOutputImage, &pszGDALFormat, &nDataType, &noDataVal))
+    {
+        return NULL;
+    }
+    
+    rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
+    
+    if( !PySequence_Check(pInputImages))
+    {
+        PyErr_SetString(GETSTATE(self)->error, "Input images must be a sequence");
+        return NULL;
+    }
+    
+    Py_ssize_t nImages = PySequence_Size(pInputImages);
+    std::vector<std::string> inputImages;
+    inputImages.reserve(nImages);
+    for( Py_ssize_t n = 0; n < nImages; n++ )
+    {
+        PyObject *o = PySequence_GetItem(pInputImages, n);
+        
+        if(!RSGISPY_CHECK_STRING(o))
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Input images must be strings");
+            Py_DECREF(o);
+            return NULL;
+        }
+        
+        inputImages.push_back(RSGISPY_STRING_EXTRACT(o));
+    }
+    
+    try
+    {
+        rsgis::cmds::executeCombineImagesSingleBandIgnoreNoData(inputImages, std::string(pszOutputImage), noDataVal, std::string(pszGDALFormat), type);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 // Our list of functions in this module
 static PyMethodDef ImageUtilsMethods[] = {
     {"stretchImage", ImageUtils_StretchImage, METH_VARARGS, 
@@ -1060,17 +1243,17 @@ static PyMethodDef ImageUtilsMethods[] = {
 "\n"},
 
     {"maskImage", ImageUtils_maskImage, METH_VARARGS,
-"imageutils.maskImage(inputimage, imagemask, outputimage, gdalformat, datatype, outvalue, maskvalue)"
-"Mask image.\n"
+"imageutils.maskImage(inputimage, imagemask, outputimage, gdalformat, datatype, outvalue, maskvalue)\n"
+"This command will mask an input image using a single band mask image - commonly this is a binary image.\n"
 "Where:\n"
 "\n"
-"* inputImage is a string containing the name of the input file\n"
-"* imagemask is a string\n"
-"* outputimage is a string\n"
-"* gdalformat is a string\n"
-"* datatype is a rsgislib.TYPE_* value\n"
-"* outvalue is a float\n"
-"* maskvalue is a float\n"
+"* inputImage is a string containing the name and path of the input image file.\n"
+"* imagemask is a string containing the name and path of the mask image file.\n"
+"* outputimage is a string containing the name and path for the output image following application of the mask.\n"
+"* gdalformat is a string representing the output image file format (e.g., KEA, ENVI, GTIFF, HFA etc).\n"
+"* datatype is a rsgislib.TYPE_* value for the data type of the output image.\n"
+"* outvalue is a float representing the value written to the output image in place of the regions being masked.\n"
+"* maskvalue is a float representing the value within the mask image for the regions which are to be replaced with the outvalue.\n"
 "\n"},
 
     {"createTiles", ImageUtils_createTiles, METH_VARARGS,
@@ -1156,6 +1339,27 @@ static PyMethodDef ImageUtilsMethods[] = {
 "	imageutils.includeImages(baseImage, inputList)\n"
 "\n"},
  
+{"includeImagesWithOverlap", ImageUtils_IncludeImagesOverlap, METH_VARARGS,
+"imageutils.includeImagesWithOverlap(baseImage, inputImages, pxlOverlap)\n"
+"Create mosaic from list of input images where the input images have an overlap.\n"
+"\n"
+"* baseImage is a string containing the name of the input image to add image to\n"
+"* inputimagelist is a list of input images\n"
+"* inputBands is a subset of input bands to use (optional)\n"
+"\nExample::\n"
+"\n"
+"	import rsgislib\n"
+"	from rsgislib import imageutils\n"
+"	import glob\n"
+"   inputImg = 'LandsatImg.kea'\n"
+"   tilesImgBase = './tiles/LandsatTile'\n"
+"   outputImg = 'LandsatImgProcessed.kea'\n"
+"   imageutils.createTiles(inputImg, tilesImgBase, 1000, 1000, 10, False, 'KEA', rsgislib.TYPE_32FLOAT, 'kea')\n"
+"   # Do some processing on the tiles... \n"
+"   imageutils.createCopyImage(inputImg, outputImg, 6, 0, 'KEA', rsgislib.TYPE_32FLOAT)\n"
+"	inputList = glob.glob('./tiles/LandsatTile*.kea')\n"
+"	imageutils.includeImagesWithOverlap(outputImg, inputList, 10)\n"
+"\n"},
   
     {"popImageStats", (PyCFunction)ImageUtils_PopImageStats, METH_VARARGS | METH_KEYWORDS,
 "rsgislib.imageutils.popImageStats(image, usenodataval=True,nodataval=0, calcpyramids=True)\n"
@@ -1496,7 +1700,7 @@ static PyMethodDef ImageUtilsMethods[] = {
     
 {"genFiniteMask", (PyCFunction)ImageUtils_GenFiniteMask, METH_VARARGS | METH_KEYWORDS,
 "rsgislib.imageutils.genFiniteMask(inimage=string, outimage=string, format=string)\n"
-"Calculate the image statistics and build image pyramids populating the image file.\n"
+"Generate a binary image mask defining the finite image regions.\n"
 "\n"
 "* inimage is a string containing the name of the input file\n"
 "* outimage is a string containing the name of the output file.\n"
@@ -1508,6 +1712,43 @@ static PyMethodDef ImageUtilsMethods[] = {
 "   inputImage = './injune_p142_casi_sub_utm.kea'\n"
 "   outputImage = './injune_p142_casi_sub_utm.kea'\n"
 "   imageutils.genFiniteMask(inputImage, outputImage, \'KEA\')\n"
+"\n"},
+    
+{"genValidMask", (PyCFunction)ImageUtils_GenValidMask, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.genValidMask(inimages=string|list, outimage=string, format=string, nodata=float)\n"
+"Generate a binary image mask defining the regions which are not 'no data'.\n"
+"\n"
+"* inimages can be either a string or a list containing the input file(s)\n"
+"* outimage is a string containing the name of the output file.\n"
+"* format is a string with the GDAL output file format.\n"
+"* nodata is a float defining the no data value (Optional and default is 0.0)\n"
+"\n"
+"\nExample::\n"
+"\n"
+"   from rsgislib import imageutils\n"
+"   inputImage = './injune_p142_casi_sub_utm.kea'\n"
+"   outputImage = './injune_p142_casi_sub_utm.kea'\n"
+"   imageutils.genValidMask(inputImage, outputImage, \'KEA\', 0.0)\n"
+"\n"},
+   
+{"combineImages2Band", (PyCFunction)ImageUtils_CombineImages2Band, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.combineImages2Band(inimages=list, outimage=string, format=string, datatype=int, nodata=float)\n"
+"Combine images together into a single image band by excluding the no data value.\n"
+"\n"
+"* inimages is a list of strings containing the names and paths of the input image files\n"
+"* outimage is a string containing the name of the output file.\n"
+"* format is a string with the GDAL output file format.\n"
+"* datatype is an containing one of the values from rsgislib.TYPE_*\n"
+"* nodata is the no data value which will be ignored (Default is 0)\n"
+"\n"
+"\nExample::\n"
+"\n"
+"   from rsgislib import imageutils\n"
+"   inputImages = ['./forest.kea', './urban.kea', './water.kea']\n"
+"   outputImage = './classes.kea'\n"
+"   datatype = rsgislib.TYPE_8UINT\n"
+"   format = 'KEA'\n"
+"   imageutils.combineImages2Band(inputImages, outputImage, format, datatype, 0.0)\n"
 "\n"},
 
 

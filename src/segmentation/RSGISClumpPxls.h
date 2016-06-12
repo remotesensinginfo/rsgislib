@@ -36,15 +36,19 @@
 #include "img/RSGISCalcImageValue.h"
 #include "img/RSGISCalcImage.h"
 
+#include "rastergis/RSGISRasterAttUtils.h"
+
+#include "utils/RSGISTextUtils.h"
+
 namespace rsgis{namespace segment{
 
     class DllExport RSGISClumpPxls
     {
     public:
         RSGISClumpPxls();
-        void performClump(GDALDataset *catagories, GDALDataset *clumps, bool noDataValProvided, unsigned int noDataVal) throw(rsgis::img::RSGISImageCalcException);
+        void performClump(GDALDataset *catagories, GDALDataset *clumps, bool noDataValProvided, unsigned int noDataVal, std::vector<unsigned int> *clumpPxlVals=NULL) throw(rsgis::img::RSGISImageCalcException);
         void performClumpPosVals(GDALDataset *catagories, GDALDataset *clumps) throw(rsgis::img::RSGISImageCalcException);
-        void performMultiBandClump(std::vector<GDALDataset*> *catagories, std::string clumpsOutputPath, std::string outFormat, bool noDataValProvided, unsigned int noDataVal) throw(rsgis::img::RSGISImageCalcException);
+        void performMultiBandClump(std::vector<GDALDataset*> *catagories, std::string clumpsOutputPath, std::string outFormat, bool noDataValProvided, unsigned int noDataVal, bool addRatPxlVals=false) throw(rsgis::img::RSGISImageCalcException);
         ~RSGISClumpPxls();
     protected:
         inline bool allValueEqual(unsigned int *vals, unsigned int numVals, unsigned int equalVal);
