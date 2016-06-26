@@ -381,6 +381,7 @@ namespace rsgis{ namespace cmds {
         try
         {
             GDALAllRegister();
+            
             GDALDataset *inDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_Update);
             if(inDataset == NULL)
             {
