@@ -137,8 +137,9 @@ namespace rsgis{ namespace cmds {
     DllExport float executeImageBandModeEnv(std::string inputImage, float binWidth, unsigned int imgBand, bool noDataValueSpecified, float noDataVal, double latMin, double latMax, double longMin, double longMax)throw(RSGISCmdException);
     /** A function to calculate a 2D histogram comparison of two images */
     DllExport double executeImageComparison2dHisto(std::string inputImage1, std::string inputImage2, std::string outputImage, std::string gdalFormat, unsigned int img1Band, unsigned int img2Band, unsigned int numBins, double *binWidthImg1, double *binWidthImg2, double img1Min, double img1Max, double img2Min, double img2Max, double img1Scale=1.0, double img2Scale=1.0, double img1Off=0.0, double img2Off=0.0, bool normOutput=false) throw(RSGISCmdException);
-    
-    
+    /** A function to compute the probability of the pixel value from a masked region of the image occuring */
+    DllExport void executeCalcMaskImgPxlValProb(std::string inputImage, std::vector<unsigned int> inImgBandIdxs, std::string maskImage, int maskVal, std::string outputImage, std::string gdalFormat, std::vector<float> histBinWidths, bool calcHistBinWidth, bool useImgNoData) throw(RSGISCmdException);
+
 }}
 
 

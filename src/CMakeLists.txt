@@ -422,6 +422,7 @@ set(LIB_IMG_H
 	${RSGIS_SRC_IMG_DIR}/RSGISSampleImage.h
 	${RSGIS_SRC_IMG_DIR}/RSGISImageWindowStats.h
 	${RSGIS_SRC_IMG_DIR}/RSGISFitFunction2Pxls.h
+	${RSGIS_SRC_IMG_DIR}/RSGISCalcImgValProb.h
 	)
 	
 set(LIB_IMG_CPP
@@ -560,6 +561,8 @@ set(LIB_IMG_CPP
 	${RSGIS_SRC_IMG_DIR}/RSGISImageWindowStats.h
 	${RSGIS_SRC_IMG_DIR}/RSGISFitFunction2Pxls.cpp
 	${RSGIS_SRC_IMG_DIR}/RSGISFitFunction2Pxls.h
+	${RSGIS_SRC_IMG_DIR}/RSGISCalcImgValProb.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISCalcImgValProb.h
 	)
 ###############################################################################
 

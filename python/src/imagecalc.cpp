@@ -1305,7 +1305,82 @@ static PyObject *ImageCalc_Get2DImageHistogram(PyObject *self, PyObject *args)
     return outVal;
 }
 
-
+static PyObject *ImageCalc_CalcMaskImgPxlValProb(PyObject *self, PyObject *args)
+{
+    const char *pszInputImage, *pszMaskImage, *pszOutputImage, *pszGDALFormat;
+    int maskImgVal;
+    bool useImgNoData = true;
+    PyObject *inImgBandIdxsPyObj;
+    PyObject *histBinWidthsPyObj;
+    bool calcHistBinWidth = true;
+    
+    if(!PyArg_ParseTuple(args, "sOsiss|Oi:calcMaskImgPxlValProb", &pszInputImage, &inImgBandIdxsPyObj, &pszMaskImage, &maskImgVal, &pszOutputImage, &pszGDALFormat, &histBinWidthsPyObj, &useImgNoData))
+    {
+        return NULL;
+    }
+    
+    std::vector<float> histBinWidths;
+    if(histBinWidthsPyObj != NULL)
+    {
+        if( !PySequence_Check(histBinWidthsPyObj))
+        {
+            PyErr_SetString(GETSTATE(self)->error, "If provided histogram bin widths must be provided as a list.");
+            return NULL;
+        }
+        
+        Py_ssize_t nHistBins = PySequence_Size(histBinWidthsPyObj);
+        histBinWidths.reserve(nHistBins);
+        
+        for( Py_ssize_t n = 0; n < nHistBins; n++ )
+        {
+            PyObject *o = PySequence_GetItem(histBinWidthsPyObj, n);
+            histBinWidths.push_back(RSGISPY_FLOAT_EXTRACT(o));
+        }
+        calcHistBinWidth = false;
+    }
+    else
+    {
+        histBinWidths.clear();
+        calcHistBinWidth = true;
+    }
+    
+    std::vector<unsigned int> inImgBandIdxs;
+    if( !PySequence_Check(inImgBandIdxsPyObj))
+    {
+        PyErr_SetString(GETSTATE(self)->error, "Input image bands must be provided as a list.");
+        return NULL;
+    }
+    
+    Py_ssize_t nBandIdxs = PySequence_Size(inImgBandIdxsPyObj);
+    inImgBandIdxs.reserve(nBandIdxs);
+    
+    for( Py_ssize_t n = 0; n < nBandIdxs; n++ )
+    {
+        PyObject *o = PySequence_GetItem(inImgBandIdxsPyObj, n);
+        inImgBandIdxs.push_back(RSGISPY_INT_EXTRACT(o));
+    }
+    
+    if(!calcHistBinWidth)
+    {
+        if(inImgBandIdxs.size() != histBinWidths.size())
+        {
+            PyErr_SetString(GETSTATE(self)->error, "The number of bands specifed and the histogram bin widths must be the same.");
+            return NULL;
+        }
+    }
+    
+    try
+    {
+        rsgis::cmds::executeCalcMaskImgPxlValProb(std::string(pszInputImage), inImgBandIdxs, std::string(pszMaskImage), maskImgVal, std::string(pszOutputImage), std::string(pszGDALFormat), histBinWidths, calcHistBinWidth, useImgNoData);
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
 
 
 // Our list of functions in this module
@@ -1924,8 +1999,29 @@ static PyMethodDef ImageCalcMethods[] = {
     "returns:\n"
     "  * double with bin width of the axis of image 1.\n"
     "  * double with bin width of the axis of image 2.\n"
-    },
+},
 
+    
+{"calcMaskImgPxlValProb", ImageCalc_CalcMaskImgPxlValProb, METH_VARARGS,
+    "imagecalc.calcMaskImgPxlValProb(inputImage, inImgBands, maskImg, maskImgVal, outputImage, gdalFormat, histBinWidths, useImgNoData)\n"
+    "Calculates the probability of each image pixel value occuring as defined by the distrubution\n"
+    "of image pixel values within the masked region of the image."
+    "where:\n"
+    "  * inputImage is a string containing the name/path of the input image file.\n"
+    "  * inImgBands is a list containing the image bands for which the probability will be calculated \n"
+    "               (Note. number of output bands will equal number of bands specified here.\n"
+    "  * maskImg is a string containing the name/path of the input mask image file.\n"
+    "  * maskImgVal is an integer corresponding to the pixel value in the mask image defining mask used for this calculation.\n"
+    "  * outputImage is a string containing the name of the output image file.\n"
+    "  * gdalFormat is a string specifying output image format.\n"
+    "  * histBinWidths is list of floating point values for the width of the histogram bins used to calculate the probability (one value for each band specified) \n"
+    "                 (Note. larger bin widths will increase the difference between high and low probabilities) \n"
+    "                 This parameter is optional and if not specified or value is less than 0 then the bin width will\n"
+    "                 be estimated from the data.\n"
+    "  * useImgNoData is a boolean specifying whether (if specified) the no data value specified in the band header\n"
+    "                 should be excluded from the histogram (Optional and if not specfied defaults to True).\n"
+},
+    
     {NULL}        /* Sentinel */
 };
 
