@@ -39,7 +39,7 @@ static struct ImageUtilsState _state;
 #endif
 
 // Helper function to extract python sequence to array of strings
-static std::string *ExtractStringArrayFromSequence(PyObject *sequence, int *nElements)
+static std::string* ExtractStringArrayFromSequence(PyObject *sequence, int *nElements)
 {
     Py_ssize_t nFields = PySequence_Size(sequence);
     *nElements = nFields;
@@ -71,52 +71,45 @@ static std::string *ExtractStringArrayFromSequence(PyObject *sequence, int *nEle
     return stringsArray;
 }
 
-static std::vector<std::string> ExtractStringVectorFromSequence(PyObject *sequence, int *nElements) {
-    Py_ssize_t nFields = PySequence_Size(sequence);
-    *nElements = nFields;
-    std::vector<std::string> stringsArray;
-    stringsArray.reserve(*nElements);
+static std::vector<std::string> ExtractStringVectorFromSequence(PyObject *sequence)
+{
+    int numVals = 0;
+    std::string *stringsArray = ExtractStringArrayFromSequence(sequence, &numVals);
+    std::vector<std::string> stringsVec = std::vector<std::string>();
+    stringsVec.reserve(numVals);
     
-    for(int i = 0; i < nFields; ++i)
+    for(int i = 0; i < numVals; ++i)
     {
-        PyObject *stringObj = PySequence_GetItem(sequence, i);
-        
-        if(!RSGISPY_CHECK_STRING(stringObj))
-        {
-            PyErr_SetString(GETSTATE(sequence)->error, "Fields must be strings");
-            Py_DECREF(stringObj);
-            *nElements = stringsArray.size();
-            return stringsArray;
-        }
-        
-        stringsArray.push_back(RSGISPY_STRING_EXTRACT(stringObj));
-        Py_DECREF(stringObj);
+        stringsVec.push_back(stringsArray[i]);
     }
+    delete[] stringsArray;
     
-    return stringsArray;
+    return stringsVec;
 }
 
 // Helper function to extract python sequence to array of integers
-/*static int *ExtractIntArrayFromSequence(PyObject *sequence, int *nElements) {
+static std::vector<int> ExtractIntVectorFromSequence(PyObject *sequence)
+{
     Py_ssize_t nFields = PySequence_Size(sequence);
-    *nElements = nFields;
-    int *intArray = new int[nFields];
+    std::vector<int> intVals;
+    intVals.reserve(nFields);
 
-    for(int i = 0; i < nFields; ++i) {
+    for(int i = 0; i < nFields; ++i)
+    {
         PyObject *intObj = PySequence_GetItem(sequence, i);
 
-        if(!RSGISPY_CHECK_INT(intObj)) {
-            PyErr_SetString(GETSTATE(sequence)->error, "Fields must be integers");
+        if(!RSGISPY_CHECK_INT(intObj))
+        {
             Py_DECREF(intObj);
-            return intArray;
+            PyErr_SetString(GETSTATE(sequence)->error, "Fields must be integers");
         }
 
-        intArray[i] = RSGISPY_INT_EXTRACT(intObj);
+        intVals.push_back(RSGISPY_INT_EXTRACT(intObj));
         Py_DECREF(intObj);
     }
 
-    return intArray;
-}*/
+    return intVals;
+}
 
 static PyObject *ImageUtils_StretchImage(PyObject *self, PyObject *args)
 {
@@ -395,21 +388,98 @@ static PyObject *ImageUtils_IncludeImagesOverlap(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
+
+static PyObject *ImageUtils_CombineImageOverview(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    const char *pszBaseImage;
+    PyObject *pInputImages; // List of input images
+    PyObject *pyraScales = NULL;
+
+    static char *kwlist[] = {"base", "images", "pyscales", NULL};
+    
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sOO:combineImageOverviews", kwlist, &pszBaseImage, &pInputImages, &pyraScales))
+    {
+        return NULL;
+    }
+    
+    if(!PySequence_Check(pInputImages))
+    {
+        PyErr_SetString(GETSTATE(self)->error, "images argument must be a list strings for image paths.");
+        return NULL;
+    }
+    // Extract list of images to array of strings.
+    std::vector<std::string> inputImages = ExtractStringVectorFromSequence(pInputImages);
+    int numImages = inputImages.size();
+    std::cout << "Num Images: " << numImages << std::endl;
+    if(numImages == 0)
+    {
+        PyErr_SetString(GETSTATE(self)->error, "No input images provided");
+        return NULL;
+    }
+    
+    if(!PySequence_Check(pyraScales))
+    {
+        PyErr_SetString(GETSTATE(self)->error, "pyscales argument must be a list of integers.");
+        return NULL;
+    }
+    std::vector<int> pyraScaleVals = ExtractIntVectorFromSequence(pyraScales);
+    if(pyraScaleVals.size() < 2)
+    {
+        PyErr_SetString(GETSTATE(self)->error, "pyscales should have more than 1 values otherwise it doesn't make sense.");
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeImageIncludeOverviews(std::string(pszBaseImage), inputImages, pyraScaleVals);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 static PyObject *ImageUtils_PopImageStats(PyObject *self, PyObject *args, PyObject *keywds)
 {
     const char *pszInputImage;
     int useNoDataValue = true;
     int buildPyramids = true;
     float noDataValue = 0;
-    static char *kwlist[] = {"image", "usenodataval","nodataval", "calcpyramids", NULL};
+    PyObject *pyraScales = NULL;
+    static char *kwlist[] = {"image", "usenodataval","nodataval", "calcpyramids", "pyscales", NULL};
 
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "s|ifi:popImageStats", kwlist, &pszInputImage, 
-                    &useNoDataValue, &noDataValue, &buildPyramids))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "s|ifiO:popImageStats", kwlist, &pszInputImage,
+                    &useNoDataValue, &noDataValue, &buildPyramids, &pyraScales))
+    {
         return NULL;
+    }
+    
+    std::vector<int> pyraScaleVals;
+    if(pyraScales == NULL)
+    {
+        pyraScaleVals.clear();
+    }
+    else if(!PySequence_Check(pyraScales))
+    {
+        PyErr_SetString(GETSTATE(self)->error, "pyscales argument must be a list of integers.");
+        return NULL;
+    }
+    else
+    {
+        pyraScaleVals = ExtractIntVectorFromSequence(pyraScales);
+        if(pyraScaleVals.size() < 2)
+        {
+            PyErr_SetString(GETSTATE(self)->error, "if you use pyscales, it should have more than 1 values otherwise it doesn't make sense.");
+            return NULL;
+        }
+    }
     
     try
     {
-        rsgis::cmds::executePopulateImgStats(pszInputImage, useNoDataValue, noDataValue, buildPyramids);
+        rsgis::cmds::executePopulateImgStats(pszInputImage, useNoDataValue, noDataValue, buildPyramids, pyraScaleVals);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -972,8 +1042,8 @@ static PyObject *ImageUtils_OrderImagesUsingPropValidData(PyObject *self, PyObje
     }
     
     // Extract list of images to array of strings.
-    int numImages = 0;
-    std::vector<std::string> inputImages = ExtractStringVectorFromSequence(pInputImages, &numImages);
+    std::vector<std::string> inputImages = ExtractStringVectorFromSequence(pInputImages);
+    int numImages = inputImages.size();
     if(numImages == 0)
     {
         PyErr_SetString(GETSTATE(self)->error, "No input images provided");
@@ -1360,20 +1430,39 @@ static PyMethodDef ImageUtilsMethods[] = {
 "	inputList = glob.glob('./tiles/LandsatTile*.kea')\n"
 "	imageutils.includeImagesWithOverlap(outputImg, inputList, 10)\n"
 "\n"},
-  
+{"combineImageOverviews", (PyCFunction)ImageUtils_CombineImageOverview, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.combineImageOverviews(base=string, images=list, pyscales=list)\n"
+"A function to combine (mosaic) the image overviews (pyramids) from the list of input images and add\n"
+"them to the base image, enables pyramids to be created using a tiled processing chain for large images.\n"
+"Note. For small images use rsgislib.imageutils.popImageStats.\n"
+"\n"
+"* base is a string containing the name of the input image file the overviews will be added to\n"
+"* images is a list of input images that have the same number of bands and overviews and are within the extent of the base image.\n"
+"* pyscales is a list specifying the scales (levels) of the pyramids which will be defined in the base image\n"
+"           (Note. the input images need to have the same pyramids scales; use rsgislib.imageutils.popImageStats).\n"
+"\nExample::\n"
+"\n"
+"   from rsgislib import imageutils\n"
+"   baseImage = './TestOutputs/injune_p142_casi_sub_utm.kea'\n"
+"   imgTiles = ['./TestOutputs/injune_p142_casi_sub_utm_tile1.kea', './TestOutputs/injune_p142_casi_sub_utm_tile2.kea']\n"
+"   imageutils.combineImageOverviews(baseImage, imgTiles, [4,8,16,32,64,128])\n"
+"\n"},
     {"popImageStats", (PyCFunction)ImageUtils_PopImageStats, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imageutils.popImageStats(image, usenodataval=True,nodataval=0, calcpyramids=True)\n"
+"rsgislib.imageutils.popImageStats(image, usenodataval=True,nodataval=0, calcpyramids=True, pyscales=list)\n"
 "Calculate the image statistics and build image pyramids populating the image file.\n"
 "\n"
 "* image is a string containing the name of the input file\n"
 "* usenodataval is a boolean stating whether the no data value is to be used (default=True).\n"
 "* nodataval is a floating point value to be used as the no data value (default=0.0).\n"
 "* calcpyramids is a boolean stating whether image pyramids should be calculated (default=True).\n"
+"* pyscales is a list which allows the levels of the image pyramid to be specified. If not provided then levels automatically calculated.\n"
 "\nExample::\n"
 "\n"
 "   from rsgislib import imageutils\n"
 "   inputImage = './TestOutputs/injune_p142_casi_sub_utm.kea'\n"
 "   imageutils.popImageStats(inputImage,True,0.,True)\n"
+"   # OR Define the pyramids levels.\n"
+"   imageutils.popImageStats(inputImage,True,0.,True, [4,8,16,32,64,128])\n"
 "\n"},
     
     {"assignProj", (PyCFunction)ImageUtils_AssignProj, METH_VARARGS | METH_KEYWORDS,

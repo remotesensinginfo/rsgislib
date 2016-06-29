@@ -2288,6 +2288,178 @@ namespace rsgis{namespace img{
 		}
     }
     
+    void RSGISImageUtils::getImagesExtent(std::vector<std::string> inputImages, int *width, int *height, double *gdalTransform) throw(RSGISImageBandException)
+    {
+        int numDS = inputImages.size();
+        double **transformations = new double*[numDS];
+        int *xSize = new int[numDS];
+        int *ySize = new int[numDS];
+        GDALDataset *dataset = NULL;
+        for(int i = 0; i < numDS; i++)
+        {
+            dataset = (GDALDataset *) GDALOpenShared(inputImages.at(i).c_str(), GA_ReadOnly);
+            if(dataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImages.at(i);
+                throw RSGISImageException(message.c_str());
+            }
+            
+            transformations[i] = new double[6];
+            dataset->GetGeoTransform(transformations[i]);
+            xSize[i] = dataset->GetRasterXSize();
+            ySize[i] = dataset->GetRasterYSize();
+            
+            //std::cout << "TL [" << transformations[i][0] << "," << transformations[i][3] << "]\n";
+            //std::cout << "Res [" << transformations[i][1] << "," << transformations[i][5] << "]\n";
+            //std::cout << "Size: [" << xSize[i] << "," << ySize[i] << "]\n";
+            
+            GDALClose(dataset);
+        }
+        
+        double rotateX = 0;
+        double rotateY = 0;
+        double pixelXRes = 0;
+        double pixelYRes = 0;
+        double pixelYResPos = 0;
+        double minX = 0;
+        double maxX = 0;
+        double tmpMaxX = 0;
+        double minY = 0;
+        double tmpMinY = 0;
+        double maxY = 0;
+        std::string proj = "";
+        
+        try
+        {
+            for(int i = 0; i < numDS; i++)
+            {
+                dataset = (GDALDataset *) GDALOpenShared(inputImages.at(i).c_str(), GA_ReadOnly);
+                if(dataset == NULL)
+                {
+                    std::string message = std::string("Could not open image ") + inputImages.at(i);
+                    throw RSGISImageException(message.c_str());
+                }
+                
+                if(i == 0)
+                {
+                    pixelXRes = transformations[i][1];
+                    pixelYRes = transformations[i][5];
+                    
+                    rotateX = transformations[i][2];
+                    rotateY = transformations[i][4];
+                    
+                    if(pixelYRes < 0)
+                    {
+                        pixelYResPos = pixelYRes * (-1);
+                    }
+                    else
+                    {
+                        pixelYResPos = pixelYRes;
+                    }
+                    
+                    minX = transformations[i][0];
+                    maxY = transformations[i][3];
+                    
+                    maxX = minX + (xSize[i] * pixelXRes);
+                    minY = maxY - (ySize[i] * pixelYResPos);
+                    
+                    proj = std::string(dataset->GetProjectionRef()); // Get projection of first band in image
+                }
+                else
+                {
+                    if((this->closeResTest(pixelXRes, transformations[i][1]) == false) | (this->closeResTest(pixelYRes, transformations[i][5]) == false))
+                    {
+                        throw RSGISImageBandException("Not all image bands have the same resolution..");
+                    }
+                    
+                    if(std::string(dataset->GetProjectionRef()) != proj)
+                    {
+                        std::cout << "First: (" << i << ")" << proj << std::endl;
+                        std::cout << "Dataset: (" << i << ")" << std::string(dataset->GetProjectionRef()) << std::endl;
+                        throw RSGISImageBandException("Not all image bands have the same projection..");
+                    }
+                    
+                    
+                    if(transformations[i][2] != rotateX & transformations[i][4] != rotateY)
+                    {
+                        throw RSGISImageBandException("Not all image bands have the same rotation..");
+                    }
+                    
+                    if(transformations[i][0] < minX)
+                    {
+                        minX = transformations[i][0];
+                    }
+                    
+                    if(transformations[i][3] > maxY)
+                    {
+                        maxY = transformations[i][3];
+                    }
+                    
+                    tmpMaxX = transformations[i][0] + (xSize[i] * pixelXRes);
+                    tmpMinY = transformations[i][3] - (ySize[i] * pixelYResPos);
+                    
+                    if(tmpMaxX > maxX)
+                    {
+                        maxX = tmpMaxX;
+                    }
+                    
+                    if(tmpMinY < minY)
+                    {
+                        minY = tmpMinY;
+                    }
+                }
+                GDALClose(dataset);
+            }
+            
+            gdalTransform[0] = minX;
+            gdalTransform[1] = pixelXRes;
+            gdalTransform[2] = rotateX;
+            gdalTransform[3] = maxY;
+            gdalTransform[4] = rotateY;
+            gdalTransform[5] = pixelYRes;
+            
+            *width = floor(((maxX - minX)/pixelXRes)+0.5);
+            *height = floor(((maxY - minY)/pixelYResPos)+0.5);
+        }
+        catch(RSGISImageBandException& e)
+        {
+            if(transformations != NULL)
+            {
+                for(int i = 0; i < numDS; i++)
+                {
+                    delete[] transformations[i];
+                }
+                delete[] transformations;
+            }
+            if(xSize != NULL)
+            {
+                delete[] xSize;
+            }
+            if(ySize != NULL)
+            {
+                delete[] ySize;
+            }
+            throw e;
+        }
+        
+        if(transformations != NULL)
+        {
+            for(int i = 0; i < numDS; i++)
+            {
+                delete[] transformations[i];
+            }
+            delete[] transformations;
+        }
+        if(xSize != NULL)
+        {
+            delete[] xSize;
+        }
+        if(ySize != NULL)
+        {
+            delete[] ySize;
+        }
+    }
+    
     OGREnvelope* RSGISImageUtils::getSpatialExtent(GDALDataset *dataset) throw(RSGISImageBandException)
     {
         OGREnvelope *env = new OGREnvelope();

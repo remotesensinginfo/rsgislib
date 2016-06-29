@@ -147,6 +147,7 @@ namespace rsgis
                 void getImageOverlap(GDALDataset **datasets, int numDS, geos::geom::Envelope *env) throw(RSGISImageBandException);
 				void getImagesExtent(GDALDataset **datasets, int numDS, int *width, int *height, double *gdalTransform) throw(RSGISImageBandException);
                 void getImagesExtent(std::string *inputImages, int numDS, int *width, int *height, double *gdalTransform) throw(RSGISImageBandException);
+                void getImagesExtent(std::vector<std::string> inputImages, int *width, int *height, double *gdalTransform) throw(RSGISImageBandException);
                 OGREnvelope* getSpatialExtent(GDALDataset *dataset) throw(RSGISImageBandException);                
                 void exportImageToTextCol(GDALDataset *image, int band, std::string outputText)throw(RSGISImageBandException, RSGISOutputStreamException);
 				GDALDataset* createBlankImage(std::string imageFile, double *transformation, int xSize, int ySize, int numBands, std::string projection, float value, std::string gdalFormat="ENVI", GDALDataType imgDataType=GDT_Float32) throw(RSGISImageException, RSGISImageBandException);
