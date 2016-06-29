@@ -69,6 +69,40 @@ Example::
         else:
             raise Exception("Could not open the image band: ", band)
 
+def getBandNames(inputImage):
+    """A utility function to get band names.
+Where:
+
+* inImage is the input image
+
+Return: 
+    list of band names
+
+Example::
+
+    from rsgislib import imageutils
+
+    inputImage = 'injune_p142_casi_sub_utm.kea'
+    
+    bandNames = imageutils.getBandNames(inputImage)
+    
+
+"""
+    # Check gdal is available
+    if not haveGDALPy:
+        raise Exception("The GDAL python bindings required for this function could not be imported" + gdalErr)
+ 
+    dataset = gdal.Open(inputImage, gdal.GA_Update)
+    bandNames = list()
+    
+    for i in range(dataset.RasterCount):
+        imgBand = dataset.GetRasterBand(i+1)
+        # Check the image band is available
+        if not imgBand is None:
+            bandNames.append(imgBand.GetDescription())
+        else:
+            raise Exception("Could not open the image band: ", band)
+    return bandNames
 
 def getRSGISLibDataType(inImg):
     """
