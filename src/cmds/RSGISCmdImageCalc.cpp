@@ -51,7 +51,7 @@
 #include "img/RSGISApplyFunction.h"
 #include "img/RSGISLinearSpectralUnmixing.h"
 #include "img/RSGISGenHistogram.h"
-
+#include "img/RSGISCalcImgValProb.h"
 
 #include "math/RSGISVectors.h"
 #include "math/RSGISMatrices.h"
@@ -2696,6 +2696,54 @@ namespace rsgis{ namespace cmds {
         }
         
         return rSq;
+    }
+                
+    void executeCalcMaskImgPxlValProb(std::string inputImage, std::vector<unsigned int> inImgBandIdxs, std::string maskImage, int maskVal, std::string outputImage, std::string gdalFormat, std::vector<float> histBinWidths, bool calcHistBinWidth, bool useImgNoData) throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+
+            GDALDataset *inImgDS = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+            if(inImgDS == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            GDALDataset *inMaskDS = (GDALDataset *) GDALOpen(maskImage.c_str(), GA_ReadOnly);
+            if(inMaskDS == NULL)
+            {
+                std::string message = std::string("Could not open image ") + maskImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            unsigned int numImgBands = inImgDS->GetRasterCount();
+            for(std::vector<unsigned int>::iterator iterBandIdx = inImgBandIdxs.begin(); iterBandIdx != inImgBandIdxs.end(); ++iterBandIdx)
+            {
+                if(((*iterBandIdx) > numImgBands) | ((*iterBandIdx) == 0))
+                {
+                    GDALClose(inImgDS);
+                    GDALClose(inMaskDS);
+                    std::cerr << "Band value = " << (*iterBandIdx) << "\n";
+                    throw rsgis::RSGISImageException("Specified band is not in the input image; note band indexes start at 1.");
+                }
+            }
+            
+            rsgis::img::RSGISCalcImgValProb calcImgValProb;
+            calcImgValProb.calcMaskImgPxlValProb(inImgDS, inImgBandIdxs, inMaskDS, maskVal, outputImage, gdalFormat, histBinWidths, calcHistBinWidth, useImgNoData);
+            
+            GDALClose(inImgDS);
+            GDALClose(inMaskDS);
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
     }
                 
 }}
