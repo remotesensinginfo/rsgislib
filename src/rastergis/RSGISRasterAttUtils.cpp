@@ -2194,7 +2194,7 @@ namespace rsgis{namespace rastergis{
                     
                     if((keaImgIO == NULL) | (keaImgIO == 0))
                     {
-                        throw RSGISAttributeTableException("Could not get hold of the internal KEA Image IO Object - was ");
+                        throw RSGISAttributeTableException("Could not get hold of the internal KEA Image IO Object - is input image a KEA file?");
                     }
                 }
                 catch(RSGISAttributeTableException& e)
