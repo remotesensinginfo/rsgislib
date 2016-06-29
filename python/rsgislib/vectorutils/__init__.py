@@ -42,7 +42,8 @@ def rasterise2Image(inputVec, inputImage, outImage, gdalFormat="KEA", burnVal=1,
 Where:
 
 * inputVec is a string specifying the input vector (shapefile) file
-* inputImage is a string specifying the input image defining the grid, pixel resolution and area for the rasterisation
+* inputImage is a string specifying the input image defining the grid, pixel resolution and area for the rasterisation 
+             (if None and shpExt is False them assumes output image already exists and just uses it as is burning vector into it)
 * outImage is a string specifying the output image for the rasterised shapefile
 * gdalFormat is the output image format (Default: KEA).
 * burnVal is the value for the output image pixels if no attribute is provided.
@@ -69,10 +70,13 @@ Example::
         
         gdal.UseExceptions()
         
-        print("Creating output image")
         if shpExt:
+            print("Creating output image from shapefile extent")
             imageutils.createCopyImageVecExtent(inputImage, inputVec, outImage, 1, 0, gdalFormat, rsgislib.TYPE_32UINT)
+        elif inputImage == None:
+            print("Assuming output image is already created so just using.")
         else:
+            print("Creating output image using input image")
             imageutils.createCopyImage(inputImage, outImage, 1, 0, gdalFormat, rsgislib.TYPE_32UINT)
         
         if shpAtt == "FID":   
@@ -110,6 +114,7 @@ Example::
         print("Completed")
     except Exception as e:
         raise e
+
 
 
 def copyShapefile2RAT(inputVec, inputImage, outputImage):
