@@ -60,7 +60,7 @@ namespace rsgis{ namespace cmds {
     DllExport void executeCreateTiles(std::string inputImage, std::string outputImageBase, float width, float height, float tileOverlap, bool offsetTiling, std::string gdalFormat, RSGISLibDataType outDataType, std::string outFileExtension, std::vector<std::string> *outFileNames = NULL)throw(RSGISCmdException);
     
     /** A function to run the populate statistics command */
-    DllExport void executePopulateImgStats(std::string inputImage, bool useIgnoreVal, float nodataValue, bool calcImgPyramids)throw(RSGISCmdException);
+    DllExport void executePopulateImgStats(std::string inputImage, bool useIgnoreVal, float nodataValue, bool calcImgPyramids, std::vector<int> pyraScaleVals=std::vector<int>())throw(RSGISCmdException);
     
     /** A function to mosaic a set of input images
         Pixels with a value of 'skipValue' in band 'skipBand' are excluded (all bands).
@@ -76,6 +76,9 @@ namespace rsgis{ namespace cmds {
     
     /** A command to add images to an existing image*/
     DllExport void executeImageIncludeOverlap(std::string *inputImages, int numDS, std::string baseImage, int numOverlapPxls) throw(RSGISCmdException);
+    
+    /** A command to create overview images in the base image by mosaicking the overviews from the tiles/subsets images */
+    DllExport void executeImageIncludeOverviews(std::string baseImage, std::vector<std::string> inputImages, std::vector<int> pyraScaleVals) throw(RSGISCmdException);
     
     /** A command to order a set of input images based on the proportion of valid data within each of the scenes */
     DllExport std::vector<std::string> executeOrderImageUsingValidDataProp(std::vector<std::string> images, float noDataValue) throw(RSGISCmdException);

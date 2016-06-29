@@ -31,6 +31,8 @@
 #include <iostream>
 #include <string>
 
+#include "libkea/KEAImageIO.h"
+
 #include "img/RSGISImageCalcException.h"
 #include "img/RSGISCalcImageValue.h"
 #include "img/RSGISImageUtils.h"
@@ -73,7 +75,6 @@ namespace rsgis{namespace img{
         ~RSGISImageMosaic();
     };
     
-    
     class DllExport RSGISCountValidPixels : public RSGISCalcImageValue
     {
     public:
@@ -93,6 +94,14 @@ namespace rsgis{namespace img{
     protected:
         RSGISImageValidDataMetric *validPxlsObj;
         float noDataVal;
+    };
+    
+    class DllExport RSGISCombineImgTileOverview
+    {
+    public:
+        RSGISCombineImgTileOverview();
+        void combineKEAImgTileOverviews(GDALDataset *baseImg, std::vector<std::string> inputImages, std::vector<int> pyraScaleVals) throw(RSGISImageException);
+        ~RSGISCombineImgTileOverview();
     };
 }}
 

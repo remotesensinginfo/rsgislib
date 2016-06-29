@@ -1910,7 +1910,6 @@ namespace rsgis{namespace img{
 
 	}
 
-
     RSGISCountValidPixels::RSGISCountValidPixels(RSGISImageValidDataMetric *validPxlsObj, float noDataVal):RSGISCalcImageValue(0)
     {
         this->validPxlsObj = validPxlsObj;
@@ -1954,6 +1953,285 @@ namespace rsgis{namespace img{
     }
 
 
+    RSGISCombineImgTileOverview::RSGISCombineImgTileOverview()
+    {
+        
+    }
+    
+    void RSGISCombineImgTileOverview::combineKEAImgTileOverviews(GDALDataset *baseImg, std::vector<std::string> inputImages, std::vector<int> pyraScaleVals) throw(RSGISImageException)
+    {
+        try
+        {
+            RSGISImageUtils imgUtils;
+            int numberBands = baseImg->GetRasterCount();
+            int numOverviews = pyraScaleVals.size();
+            std::string projection;
+            GDALDataset *dataset = NULL;
+            
+            if( numOverviews == 0 )
+            {
+                throw RSGISImageException("There must be at least 1 overview.");
+            }
+            
+            for(std::vector<std::string>::iterator iterImgFile = inputImages.begin(); iterImgFile != inputImages.end(); ++iterImgFile)
+            {
+                //std::cout << "Checking: " << *iterImgFile << std::endl;
+                
+                dataset = (GDALDataset *) GDALOpenShared((*iterImgFile).c_str(), GA_ReadOnly);
+                if(dataset == NULL)
+                {
+                    std::string message = std::string("Could not open image ") + (*iterImgFile);
+                    throw RSGISImageException(message.c_str());
+                }
+                
+                if(dataset->GetRasterCount() != numberBands)
+                {
+                    throw RSGISImageBandException("All input images need to have the same number of bands.");
+                }
+                /*
+                for(int i = 0; i < numberBands; ++i)
+                {
+                    std::cout << "\tBand " << i+1 << ": " << dataset->GetRasterBand(i+1)->GetOverviewCount() << std::endl;
+                }
+                */
+                // Check the number of overviews is the same for all input images and number of levels specified.
+                for(int i = 0; i < numberBands; ++i)
+                {
+                    if(dataset->GetRasterBand(i+1)->GetOverviewCount() != numOverviews)
+                    {
+                        throw RSGISImageBandException("All input images and bands need to have the same number of overviews as list provided.");
+                    }
+                }
+                
+                GDALClose(dataset);
+            }
+            
+            int width;
+            int height;
+            double *transformation = new double[6];
+            double *baseTransform = new double[6];
+            
+            imgUtils.getImagesExtent(inputImages, &width, &height, transformation);
+            
+            baseImg->GetGeoTransform(baseTransform);
+            
+            double baseExtentX = baseTransform[0] + (baseImg->GetRasterXSize() * baseTransform[1]);
+            double baseExtentY = baseTransform[3] + (baseImg->GetRasterYSize() * baseTransform[5]);
+            double imgExtentX = transformation[0] + (width * transformation[1]);
+            double imgExtentY = transformation[3] + (height * transformation[5]);
+            
+            // Check datasets fit within the base image.
+            if(transformation[0] < baseTransform[0])
+            {
+                std::cerr << "transformation[0] = " << transformation[0] << std::endl;
+                std::cerr << "baseTransform[0] = " << baseTransform[0] << std::endl;
+                throw RSGISImageException("Images do not fit within the base image (Eastings Min)");
+            }
+            if(transformation[3] > baseTransform[3])
+            {
+                std::cerr << "transformation[3] = " << transformation[3] << std::endl;
+                std::cerr << "baseTransform[3] = " << baseTransform[3] << std::endl;
+                throw RSGISImageException("Images do not fit within the base image (Northings Max)");
+            }
+            if(imgExtentX > baseExtentX)
+            {
+                std::cerr << "imgExtentX = " << imgExtentX << std::endl;
+                std::cerr << "baseExtentX = " << baseExtentX << std::endl;
+                throw RSGISImageException("Images do not fit within the base image (Eastings Max)");
+            }
+            if(imgExtentY < baseExtentY)
+            {
+                std::cerr << "imgExtentY = " << imgExtentY << std::endl;
+                std::cerr << "baseExtentY = " << baseExtentY << std::endl;
+                throw RSGISImageException("Images do not fit within the base image (Northings Min)");
+            }
+            
+            double baseTLX = baseTransform[0];
+            double baseTLY = baseTransform[3];
+            long baseWidth = baseImg->GetRasterXSize();
+            long baseHeight = baseImg->GetRasterYSize();
+            double baseResX = baseTransform[1];
+            double baseResY = baseTransform[5];
+            if(baseResY < 0)
+            {
+                baseResY = baseResY * (-1);
+            }
+            long tileWidth = 0;
+            long tileHeight = 0;
+            long overWidth = 0;
+            long overHeight = 0;
+            long calcOverWidth = 0;
+            long calcOverHeight = 0;
+            
+            std::cout << "Base Image " << ": [" << baseWidth << ", " << baseHeight << "]\n";
+            unsigned long **overviewImgsSize = new unsigned long*[numOverviews];
+            for(int i = 0; i < numOverviews; ++i)
+            {
+                overviewImgsSize[i] = new unsigned long[2];
+                overviewImgsSize[i][0] = baseWidth/pyraScaleVals.at(i);
+                overviewImgsSize[i][1] = baseHeight/pyraScaleVals.at(i);
+                std::cout << "Overview " << i << " (Level: " << pyraScaleVals.at(i) << ") [" << overviewImgsSize[i][0] << ", " << overviewImgsSize[i][1] << "]\n";
+            }
+            
+            for(std::vector<std::string>::iterator iterImgFile = inputImages.begin(); iterImgFile != inputImages.end(); ++iterImgFile)
+            {
+                dataset = (GDALDataset *) GDALOpenShared((*iterImgFile).c_str(), GA_ReadOnly);
+                if(dataset == NULL)
+                {
+                    std::string message = std::string("Could not open image ") + (*iterImgFile);
+                    throw RSGISImageException(message.c_str());
+                }
+                GDALRasterBand *imgBand = dataset->GetRasterBand(1);
+                GDALRasterBand *gdalBandOver = NULL;
+                tileWidth = dataset->GetRasterXSize();
+                tileHeight = dataset->GetRasterYSize();
+                for(int i = 0; i < numOverviews; ++i)
+                {
+                    gdalBandOver = imgBand->GetOverview(i);
+                    overWidth = gdalBandOver->GetXSize();
+                    overHeight = gdalBandOver->GetYSize();
+                    
+                    calcOverWidth = tileWidth / pyraScaleVals.at(i);
+                    calcOverHeight = tileHeight / pyraScaleVals.at(i);
+                    
+                    if((overWidth != calcOverWidth) | (overHeight != calcOverHeight))
+                    {
+                        std::cout << "Image: " << *iterImgFile << std::endl;
+                        std::cout << "Image DIMS: " << ": [" << tileWidth << ", " << tileHeight << "]\n";
+                        std::cout << "Overview (Img) " << i << ": [" << overWidth << ", " << overHeight << "]\n";
+                        std::cout << "Overview (Cal) " << i << ": [" << calcOverWidth << ", " << calcOverHeight << "]\n\n";
+                        throw RSGISImageException("Overview is not the correct size for the specified levels.");
+                    }
+                }
+            }
+            
+            std::cout << "Inputs all seem correct, adding pyramids to base image\n";
+            
+            kealib::KEAImageIO *keaBaseImgIO;
+            void *internalData = baseImg->GetInternalHandle("");
+            if(internalData != NULL)
+            {
+                try
+                {
+                    keaBaseImgIO = static_cast<kealib::KEAImageIO*>(internalData);
+                    
+                    if((keaBaseImgIO == NULL) | (keaBaseImgIO == 0))
+                    {
+                        throw RSGISImageException("Could not get hold of the internal KEA Image IO Object - is input image a KEA file?");
+                    }
+                }
+                catch(RSGISImageException& e)
+                {
+                    throw e;
+                }
+            }
+            else
+            {
+                throw RSGISImageException("Internal data on GDAL Dataset was NULL - check input file is KEA.");
+            }
+            
+            float *data = NULL;
+            for(int j = 0; j < numOverviews; ++j)
+            {
+                data = new float[overviewImgsSize[j][0]*overviewImgsSize[j][1]];
+                for(long n = 0; n < (overviewImgsSize[j][0]*overviewImgsSize[j][1]); ++n)
+                {
+                    data[n] = 0.0;
+                }
+                for(int i = 0; i < numberBands; ++i)
+                {
+                    keaBaseImgIO->createOverview(i+1, j+1, overviewImgsSize[j][0], overviewImgsSize[j][1]);
+                    keaBaseImgIO->writeToOverview(i+1, j+1, data, 0, 0, overviewImgsSize[j][0], overviewImgsSize[j][1], overviewImgsSize[j][0], overviewImgsSize[j][1], kealib::KEADataType::kea_32float);
+                }
+                delete[] data;
+            }
+            
+            GDALRasterBand *imgBand = NULL;
+            GDALRasterBand *gdalBandOver = NULL;
+            double xDiff = 0.0;
+            double yDiff = 0.0;
+            long xDiffBasePxl = 0;
+            long yDiffBasePxl = 0;
+            long xDiffOvPxl = 0;
+            long yDiffOvPxl = 0;
+            double tileTLX = 0.0;
+            double tileTLY = 0.0;
+            for(std::vector<std::string>::iterator iterImgFile = inputImages.begin(); iterImgFile != inputImages.end(); ++iterImgFile)
+            {
+                std::cout << "Adding: " << *iterImgFile << std::endl;
+                dataset = (GDALDataset *) GDALOpenShared((*iterImgFile).c_str(), GA_ReadOnly);
+                if(dataset == NULL)
+                {
+                    std::string message = std::string("Could not open image ") + (*iterImgFile);
+                    throw RSGISImageException(message.c_str());
+                }
+
+                tileWidth = dataset->GetRasterXSize();
+                tileHeight = dataset->GetRasterYSize();
+                dataset->GetGeoTransform(transformation);
+                tileTLX = transformation[0];
+                tileTLY = transformation[3];
+
+                xDiff = tileTLX - baseTLX;
+                yDiff = baseTLY - tileTLY;
+                
+                std::cout << "Diff = [" << xDiff << ", " << yDiff << "]\n";
+                
+                xDiffBasePxl = floor((xDiff/baseResX)+0.5);
+                yDiffBasePxl = floor((yDiff/baseResY)+0.5);
+                
+                std::cout << "Base Pxl Diff = [" << xDiffBasePxl << ", " << yDiffBasePxl << "]\n";
+                
+                for(int i = 0; i < numOverviews; ++i)
+                {
+                    xDiffOvPxl = xDiffBasePxl / pyraScaleVals.at(i);
+                    yDiffOvPxl = yDiffBasePxl / pyraScaleVals.at(i);
+                    std::cout << "\tBase Overview Diff = [" << xDiffOvPxl << ", " << yDiffOvPxl << "]\n";
+                    
+                    overWidth = tileWidth / pyraScaleVals.at(i);
+                    overHeight = tileHeight / pyraScaleVals.at(i);
+                    
+                    data = new float[overWidth*overHeight];
+                    
+                    for(int j = 0; j < numberBands; ++j)
+                    {
+                        imgBand = dataset->GetRasterBand(j+1);
+                        gdalBandOver = imgBand->GetOverview(i);
+                        gdalBandOver->RasterIO(GF_Read, 0, 0, overWidth, overHeight, data, overWidth, overHeight, GDT_Float32, 0, 0);
+                        keaBaseImgIO->writeToOverview(j+1, i+1, data, xDiffOvPxl, yDiffOvPxl, overWidth, overHeight, overWidth, overHeight, kealib::KEADataType::kea_32float);
+                    }
+                    delete[] data;
+                }
+                
+            }
+            
+            delete[] transformation;
+            delete[] baseTransform;
+            for(int i = 0; i < numOverviews; ++i)
+            {
+                delete[] overviewImgsSize[i];
+            }
+            
+        }
+        catch(RSGISImageException& e)
+        {
+            throw e;
+        }
+        catch(RSGISException& e)
+        {
+            throw RSGISImageException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            throw RSGISImageException(e.what());
+        }
+    }
+    
+    RSGISCombineImgTileOverview::~RSGISCombineImgTileOverview()
+    {
+        
+    }
+    
 
 }}
 

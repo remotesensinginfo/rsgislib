@@ -29,7 +29,7 @@
 
 namespace rsgis { namespace img {
 
-    void RSGISPopWithStats::addpyramid( GDALDataset *handle )
+    void RSGISPopWithStats::addPyramid( GDALDataset *handle )
     {
         /* These are the levels Imagine seems to use */
 
@@ -66,6 +66,35 @@ namespace rsgis { namespace img {
         
         int nLastProgress = -1;
         handle->BuildOverviews( pszType, nOverviews, nLevels, 0, NULL,  (GDALProgressFunc)StatsTextProgress, &nLastProgress );
+    }
+    
+    void RSGISPopWithStats::addPyramid( GDALDataset *handle, std::vector<int> pyLevels )
+    {
+        /* These are the levels Imagine seems to use */
+        
+        /* The levels used depend on the size of the image */
+        int nOverviews = 0;
+        GDALRasterBand *hBand = NULL;
+        const char *pszType = "";
+        
+        
+        nOverviews = pyLevels.size();
+       
+        
+        /* Need to find out if we are thematic or continuous */
+        hBand = handle->GetRasterBand( 1 );
+        
+        if( strcmp( hBand->GetMetadataItem( "LAYER_TYPE", "" ), "athematic" ) == 0 )
+        {
+            pszType = "AVERAGE";
+        }
+        else
+        {
+            pszType = "NEAREST";
+        }
+        
+        int nLastProgress = -1;
+        handle->BuildOverviews( pszType, nOverviews, pyLevels.data(), 0, NULL,  (GDALProgressFunc)StatsTextProgress, &nLastProgress );
     }
 
     void RSGISPopWithStats::getRangeMean(float *pData,int size,float &min,float &max,float &mean, bool ignore, float ignoreVal)
@@ -331,7 +360,7 @@ namespace rsgis { namespace img {
         }
     }
 
-    void RSGISPopWithStats::calcPopStats( GDALDataset *hHandle, bool bIgnore, float fIgnoreVal, bool bPyramid ) throw(rsgis::RSGISImageException)
+    void RSGISPopWithStats::calcPopStats( GDALDataset *hHandle, bool bIgnore, float fIgnoreVal, bool bPyramid, std::vector<int> pyraScaleVals ) throw(rsgis::RSGISImageException)
     {
         int band;//, xsize, ysize, osize,nlevel;
         GDALRasterBand *hBand;
@@ -566,7 +595,14 @@ namespace rsgis { namespace img {
         if( bPyramid )
         {
             std::cout << "Building Pyramids:\n";
-            this->addpyramid(hHandle);
+            if(pyraScaleVals.size() == 0)
+            {
+                this->addPyramid(hHandle);
+            }
+            else
+            {
+                this->addPyramid(hHandle, pyraScaleVals);
+            }
         }
     }
     

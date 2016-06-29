@@ -116,12 +116,13 @@ namespace rsgis { namespace img {
     class DllExport RSGISPopWithStats
     {
     public:
-        void addpyramid( GDALDataset *handle );
+        void addPyramid( GDALDataset *handle );
+        void addPyramid( GDALDataset *handle, std::vector<int> pyLevels );
         void getRangeMean(float *pData,int size,float &min,float &max,float &mean, bool ignore, float ignoreVal);
         float getStdDev(float *pData, int size, float fmean, bool ignore, float ignoreVal);
         float* getSubSampledImage( GDALRasterBand *hBand, int nLevel, int *pnSize );
         void getHistogramIgnore( GDALRasterBand *pBand, double dfMin, double dfMax, int nBuckets, int *panHistogram, int bIncludeOutOfRange, bool bIgnore, float fIgnore );
-        void calcPopStats( GDALDataset *hHandle, bool bIgnore, float fIgnoreVal, bool bPyramid ) throw(rsgis::RSGISImageException);
+        void calcPopStats( GDALDataset *hHandle, bool bIgnore, float fIgnoreVal, bool bPyramid, std::vector<int> pyraScaleVals ) throw(rsgis::RSGISImageException);
     private:
         static const int HISTO_NBINS = 256;
         static const int MINOVERVIEWDIM = 33;
