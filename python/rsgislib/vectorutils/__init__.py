@@ -56,7 +56,7 @@ Example::
     inputVector = 'crowns.shp'
     inputImage = 'injune_p142_casi_sub_utm.kea'
     outputImage = 'psu142_crowns.kea'  
-    vectorutils.rasterise2Image(inputVector, inputImage, outputImage, 'KEA', 'FID')
+    vectorutils.rasterise2Image(inputVector, inputImage, outputImage, 'KEA', shpAtt='FID')
 
     """
     try:
@@ -90,7 +90,7 @@ Example::
         
         # Run the algorithm.
         err = 0
-        if shpAtt == None:
+        if shpAtt is None:
             err = gdal.RasterizeLayer(outRasterDS, [1], inVectorLayer, burn_values=[burnVal])
         else:
             err = gdal.RasterizeLayer(outRasterDS, [1], inVectorLayer, options=["ATTRIBUTE="+shpAtt])
@@ -133,7 +133,7 @@ Example::
 
 """
     try:
-        rasterise2Image(inputVec, inputImage, outputImage, "KEA", "FID")
+        rasterise2Image(inputVec, inputImage, outputImage, "KEA", shpAtt="FID")
         rsgislib.rastergis.importVecAtts(outputImage, inputVec, None)
     except Exception as e:
         raise e
