@@ -32,7 +32,7 @@ namespace rsgis{namespace vec{
 		this->processFeatures = processFeatures;
 	}
 	
-	void RSGISProcessVectorSQL::processVectors(OGRDataSource *inputDS, OGRLayer *outputLayer, bool copyData, bool outVertical, std::string sql) throw(RSGISVectorOutputException,RSGISVectorException)
+	void RSGISProcessVectorSQL::processVectors(GDALDataset *inputDS, OGRLayer *outputLayer, bool copyData, bool outVertical, std::string sql) throw(RSGISVectorOutputException,RSGISVectorException)
 	{
 		RSGISVectorUtils vecUtils;
 		
@@ -189,7 +189,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISProcessVectorSQL::processVectors(OGRDataSource *inputDS, bool outVertical, std::string sql) throw(RSGISVectorOutputException,RSGISVectorException)
+	void RSGISProcessVectorSQL::processVectors(GDALDataset *inputDS, bool outVertical, std::string sql) throw(RSGISVectorOutputException,RSGISVectorException)
 	{
 		RSGISVectorUtils vecUtils;
 		
@@ -322,7 +322,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISProcessVectorSQL::processVectorsNoOutput(OGRDataSource *inputDS, bool outVertical, std::string sql) throw(RSGISVectorOutputException,RSGISVectorException)
+	void RSGISProcessVectorSQL::processVectorsNoOutput(GDALDataset *inputDS, bool outVertical, std::string sql) throw(RSGISVectorOutputException,RSGISVectorException)
 	{
 		RSGISVectorUtils vecUtils;
 		

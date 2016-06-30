@@ -279,8 +279,8 @@ namespace rsgis{namespace geom{
 		}
 		
 		
-		OGRSFDriver *shpFiledriver = NULL;
-		OGRDataSource *outputSHPDS = NULL;
+		GDALDriver *shpFiledriver = NULL;
+		GDALDataset *outputSHPDS = NULL;
 		OGRLayer *outputSHPLayer = NULL;
 		/////////////////////////////////////
 		//
@@ -288,12 +288,12 @@ namespace rsgis{namespace geom{
 		//
 		/////////////////////////////////////
 		const char *pszDriverName = "ESRI Shapefile";
-		shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName );
+		shpFiledriver = GetGDALDriverManager()->GetDriverByName(pszDriverName );
 		if( shpFiledriver == NULL )
 		{
 			throw RSGISGeometryException("SHP driver not available.");
 		}
-		outputSHPDS = shpFiledriver->CreateDataSource(outputFile.c_str(), NULL);
+		outputSHPDS = shpFiledriver->Create(outputFile.c_str(), 0, 0, 0, GDT_Unknown, NULL );
 		if( outputSHPDS == NULL )
 		{
 			std::string message = std::string("Could not create vector file ") + outputFile;
@@ -323,7 +323,7 @@ namespace rsgis{namespace geom{
 			}
 			OGRFeature::DestroyFeature(featureOutput);
 		}
-		OGRDataSource::DestroyDataSource(outputSHPDS);
+		GDALClose(outputSHPDS);
 	}
 	
 	void RSGISGeomTestExport::exportGEOSPolygons2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::Polygon*> *polys) throw(RSGISGeometryException)
@@ -352,8 +352,8 @@ namespace rsgis{namespace geom{
 		}
 		
 		
-		OGRSFDriver *shpFiledriver = NULL;
-		OGRDataSource *outputSHPDS = NULL;
+		GDALDriver *shpFiledriver = NULL;
+		GDALDataset *outputSHPDS = NULL;
 		OGRLayer *outputSHPLayer = NULL;
 		/////////////////////////////////////
 		//
@@ -361,12 +361,12 @@ namespace rsgis{namespace geom{
 		//
 		/////////////////////////////////////
 		const char *pszDriverName = "ESRI Shapefile";
-		shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName );
+		shpFiledriver = GetGDALDriverManager()->GetDriverByName(pszDriverName );
 		if( shpFiledriver == NULL )
 		{
 			throw RSGISGeometryException("SHP driver not available.");
 		}
-		outputSHPDS = shpFiledriver->CreateDataSource(outputFile.c_str(), NULL);
+        outputSHPDS = shpFiledriver->Create(outputFile.c_str(), 0, 0, 0, GDT_Unknown, NULL );
 		if( outputSHPDS == NULL )
 		{
 			std::string message = std::string("Could not create vector file ") + outputFile;
@@ -396,7 +396,7 @@ namespace rsgis{namespace geom{
 			}
 			OGRFeature::DestroyFeature(featureOutput);
 		}
-		OGRDataSource::DestroyDataSource(outputSHPDS);
+		GDALClose(outputSHPDS);
 	}
 	
 	void RSGISGeomTestExport::exportGEOSCoordinates2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::Coordinate*> *coords) throw(RSGISGeometryException)
@@ -425,8 +425,8 @@ namespace rsgis{namespace geom{
 		}
 		
 		
-		OGRSFDriver *shpFiledriver = NULL;
-		OGRDataSource *outputSHPDS = NULL;
+		GDALDriver *shpFiledriver = NULL;
+		GDALDataset *outputSHPDS = NULL;
 		OGRLayer *outputSHPLayer = NULL;
 		/////////////////////////////////////
 		//
@@ -434,12 +434,12 @@ namespace rsgis{namespace geom{
 		//
 		/////////////////////////////////////
 		const char *pszDriverName = "ESRI Shapefile";
-		shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName );
+		shpFiledriver =  GetGDALDriverManager()->GetDriverByName(pszDriverName );
 		if( shpFiledriver == NULL )
 		{
 			throw RSGISGeometryException("SHP driver not available.");
 		}
-		outputSHPDS = shpFiledriver->CreateDataSource(outputFile.c_str(), NULL);
+		outputSHPDS = shpFiledriver->Create(outputFile.c_str(), 0, 0, 0, GDT_Unknown, NULL );
 		if( outputSHPDS == NULL )
 		{
 			std::string message = std::string("Could not create vector file ") + outputFile;
@@ -469,7 +469,7 @@ namespace rsgis{namespace geom{
 			}
 			OGRFeature::DestroyFeature(featureOutput);
 		}
-		OGRDataSource::DestroyDataSource(outputSHPDS);
+		GDALClose(outputSHPDS);
 	}
 	
 	void RSGISGeomTestExport::exportGEOSLineStrings2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::LineString*> *lines) throw(RSGISGeometryException)
@@ -498,8 +498,8 @@ namespace rsgis{namespace geom{
 		}
 		
 		
-		OGRSFDriver *shpFiledriver = NULL;
-		OGRDataSource *outputSHPDS = NULL;
+		GDALDriver *shpFiledriver = NULL;
+		GDALDataset *outputSHPDS = NULL;
 		OGRLayer *outputSHPLayer = NULL;
 		/////////////////////////////////////
 		//
@@ -507,12 +507,13 @@ namespace rsgis{namespace geom{
 		//
 		/////////////////////////////////////
 		const char *pszDriverName = "ESRI Shapefile";
-		shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName );
+		shpFiledriver = GetGDALDriverManager()->GetDriverByName(pszDriverName );
 		if( shpFiledriver == NULL )
 		{
 			throw RSGISGeometryException("SHP driver not available.");
 		}
-		outputSHPDS = shpFiledriver->CreateDataSource(outputFile.c_str(), NULL);
+		outputSHPDS = shpFiledriver->Create(outputFile.c_str(), 0, 0, 0, GDT_Unknown, NULL );
+        
 		if( outputSHPDS == NULL )
 		{
 			std::string message = std::string("Could not create vector file ") + outputFile;
@@ -543,7 +544,7 @@ namespace rsgis{namespace geom{
 			}
 			OGRFeature::DestroyFeature(featureOutput);
 		}
-		OGRDataSource::DestroyDataSource(outputSHPDS);
+		GDALClose(outputSHPDS);
 	}
 	
 	void RSGISGeomTestExport::exportGEOSLineSegments2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::LineSegment*> *lines) throw(RSGISGeometryException)
@@ -572,8 +573,8 @@ namespace rsgis{namespace geom{
 		}
 		
 		
-		OGRSFDriver *shpFiledriver = NULL;
-		OGRDataSource *outputSHPDS = NULL;
+		GDALDriver *shpFiledriver = NULL;
+		GDALDataset *outputSHPDS = NULL;
 		OGRLayer *outputSHPLayer = NULL;
 		/////////////////////////////////////
 		//
@@ -581,12 +582,12 @@ namespace rsgis{namespace geom{
 		//
 		/////////////////////////////////////
 		const char *pszDriverName = "ESRI Shapefile";
-		shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName );
+		shpFiledriver = GetGDALDriverManager()->GetDriverByName(pszDriverName );
 		if( shpFiledriver == NULL )
 		{
 			throw RSGISGeometryException("SHP driver not available.");
 		}
-		outputSHPDS = shpFiledriver->CreateDataSource(outputFile.c_str(), NULL);
+		outputSHPDS = shpFiledriver->Create(outputFile.c_str(), 0, 0, 0, GDT_Unknown, NULL );
 		if( outputSHPDS == NULL )
 		{
 			std::string message = std::string("Could not create vector file ") + outputFile;
@@ -617,7 +618,7 @@ namespace rsgis{namespace geom{
 			}
 			OGRFeature::DestroyFeature(featureOutput);
 		}
-		OGRDataSource::DestroyDataSource(outputSHPDS);
+		GDALClose(outputSHPDS);
 	}
     
     void RSGISGeomTestExport::exportGEOSLineSegments2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::LineSegment*> *lines, std::vector<double> *vals) throw(RSGISGeometryException)
@@ -651,8 +652,8 @@ namespace rsgis{namespace geom{
         }
         
         
-        OGRSFDriver *shpFiledriver = NULL;
-        OGRDataSource *outputSHPDS = NULL;
+        GDALDriver *shpFiledriver = NULL;
+        GDALDataset *outputSHPDS = NULL;
         OGRLayer *outputSHPLayer = NULL;
         /////////////////////////////////////
         //
@@ -660,12 +661,12 @@ namespace rsgis{namespace geom{
         //
         /////////////////////////////////////
         const char *pszDriverName = "ESRI Shapefile";
-        shpFiledriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(pszDriverName );
+        shpFiledriver = GetGDALDriverManager()->GetDriverByName(pszDriverName);
         if( shpFiledriver == NULL )
         {
             throw RSGISGeometryException("SHP driver not available.");
         }
-        outputSHPDS = shpFiledriver->CreateDataSource(outputFile.c_str(), NULL);
+        outputSHPDS = (GDALDataset*) shpFiledriver->Create(outputFile.c_str(), 0, 0, 0, GDT_Unknown, NULL );
         if( outputSHPDS == NULL )
         {
             std::string message = std::string("Could not create vector file ") + outputFile;
@@ -706,7 +707,7 @@ namespace rsgis{namespace geom{
             OGRFeature::DestroyFeature(featureOutput);
             ++i;
         }
-        OGRDataSource::DestroyDataSource(outputSHPDS);
+        GDALClose(outputSHPDS);
     }
 	
 	RSGISGeomTestExport::~RSGISGeomTestExport()

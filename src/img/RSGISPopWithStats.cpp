@@ -3,12 +3,9 @@
  *  RSGIS_LIB
  *
  *  Created by Pete Bunting on 26/04/2012.
- *  Copyright 2012 RSGISLib. All rights reserved.
+ *  Rewritten 26/06/2016
+ *  Copyright 2016 RSGISLib. All rights reserved.
  *  This file is part of RSGISLib.
- *
- *  This code is edited from code provided by 
- *  Sam Gillingham
- *
  * 
  *  RSGISLib is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -29,547 +26,444 @@
 
 namespace rsgis { namespace img {
 
-    void RSGISPopWithStats::addpyramid( GDALDataset *handle )
+    
+    void RSGISPopWithStats::calcPopStats( GDALDataset *imgDS, bool useNoDataVal, float noDataVal, bool calcPyramid, std::vector<int> decimatFactors ) throw(rsgis::RSGISImageException)
     {
-        /* These are the levels Imagine seems to use */
-
-        /* The levels used depend on the size of the image */
-        int nLevels[] = { 4, 8, 16, 32, 64, 128, 256, 512 };
-        int nOverviews = 0;
-        int mindim = 0;
-        GDALRasterBand *hBand = NULL;
-        const char *pszType = "";
-
-        /* first we work out how many overviews to build based on the size */
-        mindim = handle->GetRasterXSize() < handle->GetRasterYSize() ? handle->GetRasterXSize() : handle->GetRasterYSize();
-
-        nOverviews = 0;
-        for(int i = 0; i < 8; i++) 
+        rsgis::utils::RSGISTextUtils textUtils;
+        
+        int numBands = imgDS->GetRasterCount();
+        GDALRasterBand *band = NULL;
+        const char *layerType = imgDS->GetRasterBand( 1 )->GetMetadataItem( "LAYER_TYPE" );
+        if( layerType != NULL )
         {
-            if( (mindim/nLevels[i]) > MINOVERVIEWDIM )
+            std::string bandType = std::string(layerType);
+            if( bandType != "athematic" )
             {
-                ++nOverviews;
+                rsgis::RSGISImageException("Use rsgislib.rastergis.populateStats for thematic data.");
             }
         }
-
-        /* Need to find out if we are thematic or continuous */
-        hBand = handle->GetRasterBand( 1 );
-
-        if( strcmp( hBand->GetMetadataItem( "LAYER_TYPE", "" ), "athematic" ) == 0 )
+        
+        // Iteration 1 through image: Min, Max and Mean
+        double *minVal = new double[numBands];
+        double *maxVal = new double[numBands];
+        double *meanVal = new double[numBands];
+        unsigned long *nVals = new unsigned long[numBands];
+        
+        for(int i = 0; i < numBands; ++i)
         {
-            pszType = "AVERAGE";
-        }
-        else
-        {
-            pszType = "NEAREST";
+            minVal[i] = 0;
+            maxVal[i] = 0;
+            meanVal[i] = 0;
+            nVals[i] = 0;
         }
         
-        int nLastProgress = -1;
-        handle->BuildOverviews( pszType, nOverviews, nLevels, 0, NULL,  (GDALProgressFunc)StatsTextProgress, &nLastProgress );
-    }
-
-    void RSGISPopWithStats::getRangeMean(float *pData,int size,float &min,float &max,float &mean, bool ignore, float ignoreVal)
-    {
-        bool bFirst = true;
-        double dTot = 0;
-        int total_used = 0;
-        float val = 0.0;
-        for(int count = 0; count < size; count++)
-        {
-            val = pData[count];
-            if( !ignore || val != ignoreVal )
-            {
-                dTot += val;
-                total_used++;
-                if( bFirst )
-                {
-                    max = val;
-                    min = val;
-                    bFirst = false;
-                }
-                else
-                {
-                    if( val > max )
-                    {
-                        max = val;
-                    }
-                    else if( val < min )
-                    {
-                        min = val;
-                    }
-                }
-            }
-        }
-        mean = dTot / double(total_used);
-    }
-
-    float RSGISPopWithStats::getStdDev(float *pData, int size, float fmean, bool ignore, float ignoreVal)
-    {
-        double dVariance = 0;
-        double dTot = 0;
-        float val;
-        int total_used = 0;
-        for(int count = 0; count < size; count++)
-        {
-            val = pData[count];
-            if( !ignore || val != ignoreVal )
-            {
-                double diff = val - fmean;
-                dTot += diff;
-                dVariance += diff * diff;
-                total_used++;
-            }
-        }
-        if( total_used > 1 )
-        {
-            dVariance = (dVariance - dTot*dTot/total_used)/(total_used - 1);
-            return sqrt(dVariance);
-        }
-        else
-        {
-            return 0;
-        }
-    }
-      
-    float* RSGISPopWithStats::getSubSampledImage( GDALRasterBand *hBand, int nLevel, int *pnSize )
-    {
-        /*
-         * Our own "pyramid" layer code that does a nearest neighbour resample.
-         * Can't use the GDAL pyramid layers as they are generally AVERAGE
-         * and can't seem to trick GDAL into making them in a seperate 
-         * file for us using GDALRegenerateOverviews.
-         * Creates a single dimension array which must be free()ed by the caller.
-         */
-        int inxsize, inysize, outxsize, outysize, y;
-        float *pData;
-
-        inxsize = hBand->GetXSize();
-        inysize = hBand->GetYSize();
-
-        outxsize = inxsize / nLevel;
-        outysize = inysize / nLevel;
-
-        pData = (float*)malloc( outxsize * outysize * sizeof(float));
-        *pnSize = outxsize * outysize;
-
-        for( y = 0; y < outysize; y++ )
-        {
-            hBand->RasterIO( GF_Read, 0, y*nLevel, inxsize, 1, &pData[y*outxsize], outxsize, 1, GDT_Float32,0, 0 );
-        }
-
-        return pData;
-    }
-      
-    void RSGISPopWithStats::getHistogramIgnore( GDALRasterBand *pBand, double dfMin, double dfMax, int nBuckets, int *panHistogram, int bIncludeOutOfRange, bool bIgnore, float fIgnore)
-    {        
-        int nBlockXSize, nBlockYSize;
-        pBand->GetBlockSize( &nBlockXSize, &nBlockYSize );
-        int nBlocksPerRow = (pBand->GetXSize()+nBlockXSize-1) / nBlockXSize;
-        int nBlocksPerColumn = (pBand->GetYSize()+nBlockYSize-1) / nBlockYSize;
-
-        /* -------------------------------------------------------------------- */
-        /*      Figure out the ratio of blocks we will read to get an           */
-        /*      approximate value.                                              */
-        /* -------------------------------------------------------------------- */
-        int         nSampleRate;
-        double      dfScale;
-
-        nSampleRate = 1;
+        RSGISCalcImageMinMaxMean calcImageStats = RSGISCalcImageMinMaxMean(numBands, useNoDataVal, noDataVal, minVal, maxVal, meanVal, nVals);
+        RSGISCalcImage calcImg = RSGISCalcImage(&calcImageStats, "", true);
+        calcImg.calcImage(&imgDS, 1);
         
-        if(dfMin == 0)
+        for(int i = 0; i < numBands; ++i)
         {
-            dfScale = nBuckets / (dfMax + 1);
-        }
-        else
-        {
-            dfScale = nBuckets / (dfMax - dfMin);
-        }
-        
-        /* -------------------------------------------------------------------- */
-        /*      Read the blocks, and add to histogram.                          */
-        /* -------------------------------------------------------------------- */
-        memset( panHistogram, 0, sizeof(int) * nBuckets );
-        for(int iSampleBlock = 0; iSampleBlock < nBlocksPerRow * nBlocksPerColumn; iSampleBlock += nSampleRate )
-        {
-            double dfValue = 0.0, dfReal, dfImag;
-            int  iXBlock, iYBlock, nXCheck, nYCheck;
-            GDALRasterBlock *poBlock;
-
-            iYBlock = iSampleBlock / nBlocksPerRow;
-            iXBlock = iSampleBlock - nBlocksPerRow * iYBlock;
+            //std::cout << "Band " << (i+1) << std::endl;
+            //std::cout << "\tMax = " << maxVal[i] << std::endl;
+            //std::cout << "\tMin = " << minVal[i] << std::endl;
+            meanVal[i] = meanVal[i] / nVals[i];
+            //std::cout << "\tMean = " << meanVal[i] << std::endl;
+            //std::cout << "\nVals = " << nVals[i] << std::endl;
             
-            poBlock = pBand->GetLockedBlockRef( iXBlock, iYBlock );
-            if( poBlock == NULL )
-            {
-                return;
-            }
+            band = imgDS->GetRasterBand(i+1);
+            band->SetMetadataItem( "STATISTICS_MINIMUM", textUtils.doubletostring(minVal[i]).c_str(), NULL );
+            band->SetMetadataItem( "STATISTICS_MAXIMUM", textUtils.doubletostring(maxVal[i]).c_str(), NULL );
+            band->SetMetadataItem( "STATISTICS_MEAN", textUtils.doubletostring(meanVal[i]).c_str(), NULL );
             
-            if( (iXBlock+1) * nBlockXSize > pBand->GetXSize() )
+            if(useNoDataVal)
             {
-                nXCheck = pBand->GetXSize() - iXBlock * nBlockXSize;
+                band->SetMetadataItem( "STATISTICS_EXCLUDEDVALUES", textUtils.floattostring(noDataVal).c_str(), NULL );
+                band->SetNoDataValue(noDataVal);
             }
-            else
+        }
+        
+        // Iteration 2 through image: Std Dev + Histogram
+        unsigned int numHistBins = 256;
+        unsigned int **bandHist = new unsigned int*[numBands];
+        
+        std::string *histoType = new std::string[numBands];
+        double *histMin = new double[numBands];
+        double *histMax = new double[numBands];
+        double *histWidth = new double[numBands];
+        double range = 0.0;
+        
+        for(int i = 0; i < numBands; ++i)
+        {
+            GDALDataType dataType = imgDS->GetRasterBand( i+1 )->GetRasterDataType();
+            
+            histMin[i] = -0.5;
+            histMax[i] = 255.5;
+            histWidth[i] = 1.0;
+            histoType[i] = "direct";
+            
+            if( dataType == GDT_Byte )
             {
-                nXCheck = nBlockXSize;
+                histMin[i] = -0.5;
+                histMax[i] = 255.5;
+                histWidth[i] = 1.0;
+                histoType[i] = "direct";
             }
-
-            if( (iYBlock+1) * nBlockYSize > pBand->GetYSize() )
+            else if( (dataType == GDT_UInt16) | (dataType == GDT_Int16) | (dataType == GDT_UInt32) | (dataType == GDT_Int32))
             {
-                nYCheck = pBand->GetYSize() - iYBlock * nBlockYSize;
-            }
-            else
-            {
-                nYCheck = nBlockYSize;
-            }
-
-            /* this is a special case for a common situation */
-            if( poBlock->GetDataType() == GDT_Byte
-                && dfScale == 1.0 && (dfMin >= -0.5 && dfMin <= 0.5)
-                && nYCheck == nBlockYSize && nXCheck == nBlockXSize
-                && nBuckets == 256 )
-            {
-                int nPixels = nXCheck * nYCheck;
-                GByte  *pabyData = (GByte *) poBlock->GetDataRef();
-                GByte val;
+                range = maxVal[i] - minVal[i];
                 
-                for( int i = 0; i < nPixels; i++ )
+                if(range < 256)
                 {
-                    val = pabyData[i];
-                    if( !bIgnore || ( val != fIgnore ) )
-                    {
-                      panHistogram[val]++;
-                    }
-                }
-
-                poBlock->DropLock();
-                continue; /* to next sample block */
-            }
-
-            /* this isn't the fastest way to do this, but is easier for now */
-            for(int iY = 0; iY < nYCheck; iY++ )
-            {
-                for( int iX = 0; iX < nXCheck; iX++ )
-                {
-                    int iOffset = iX + iY * nBlockXSize;
-                    int nIndex;
-
-                    switch( poBlock->GetDataType() )
-                    {
-                      case GDT_Byte:
-                        dfValue = ((GByte *) poBlock->GetDataRef())[iOffset];
-                        break;
-                      case GDT_UInt16:
-                        dfValue = ((GUInt16 *) poBlock->GetDataRef())[iOffset];
-                        break;
-                      case GDT_Int16:
-                        dfValue = ((GInt16 *) poBlock->GetDataRef())[iOffset];
-                        break;
-                      case GDT_UInt32:
-                        dfValue = ((GUInt32 *) poBlock->GetDataRef())[iOffset];
-                        break;
-                      case GDT_Int32:
-                        dfValue = ((GInt32 *) poBlock->GetDataRef())[iOffset];
-                        break;
-                      case GDT_Float32:
-                        dfValue = ((float *) poBlock->GetDataRef())[iOffset];
-                        break;
-                      case GDT_Float64:
-                        dfValue = ((double *) poBlock->GetDataRef())[iOffset];
-                        break;
-                      case GDT_CInt16:
-                        dfReal = ((GInt16 *) poBlock->GetDataRef())[iOffset*2];
-                        dfImag = ((GInt16 *) poBlock->GetDataRef())[iOffset*2+1];
-                        dfValue = sqrt( dfReal * dfReal + dfImag * dfImag );
-                        break;
-                      case GDT_CInt32:
-                        dfReal = ((GInt32 *) poBlock->GetDataRef())[iOffset*2];
-                        dfImag = ((GInt32 *) poBlock->GetDataRef())[iOffset*2+1];
-                        dfValue = sqrt( dfReal * dfReal + dfImag * dfImag );
-                        break;
-                      case GDT_CFloat32:
-                        dfReal = ((float *) poBlock->GetDataRef())[iOffset*2];
-                        dfImag = ((float *) poBlock->GetDataRef())[iOffset*2+1];
-                        dfValue = sqrt( dfReal * dfReal + dfImag * dfImag );
-                        break;
-                      case GDT_CFloat64:
-                        dfReal = ((double *) poBlock->GetDataRef())[iOffset*2];
-                        dfImag = ((double *) poBlock->GetDataRef())[iOffset*2+1];
-                        dfValue = sqrt( dfReal * dfReal + dfImag * dfImag );
-                        break;
-                      default:
-                        CPLAssert( FALSE );
-                        return;
-                    }
-                    
-                    if( !bIgnore || ( dfValue != fIgnore ) )
-                    {
-                        nIndex = (int) floor((dfValue - dfMin) * dfScale);
-
-                        if( nIndex < 0 )
-                        {
-                            if( bIncludeOutOfRange )
-                            {
-                                panHistogram[0]++;
-                            }
-                        }
-                        else if( nIndex >= nBuckets )
-                        {
-                            if( bIncludeOutOfRange )
-                            {
-                                panHistogram[nBuckets-1]++;
-                            }
-                        }
-                        else
-                        {
-                            panHistogram[nIndex]++;
-                        }
-                    }
-                }
-
-            }
-            poBlock->DropLock();
-        }
-    }
-
-    void RSGISPopWithStats::calcPopStats( GDALDataset *hHandle, bool bIgnore, float fIgnoreVal, bool bPyramid ) throw(rsgis::RSGISImageException)
-    {
-        int band;//, xsize, ysize, osize,nlevel;
-        GDALRasterBand *hBand;
-        char szTemp[64];
-        std::string histoType;
-        std::string histoTypeDirect = "direct";
-        std::string histoTypeLinear = "linear";
-
-        /* we calculate a single overview to speed up the calculation of stats */
-
-        int nBands = hHandle->GetRasterCount();
-        for( band = 0; band < nBands; band++ )
-        {
-            std::cout << "Processing band " << band+1 << " of " << nBands << std::endl;
-            
-            hBand = hHandle->GetRasterBand( band + 1 );
-            
-            if(strcmp( hBand->GetMetadataItem( "LAYER_TYPE", "" ), "thematic" ) == 0)
-            {
-                throw rsgis::RSGISImageException("Use the rastergis function populateImageWithRasterGISStats (In python rsgislib.rastergis.populateStats) function for thermatic layers.");
-            }
-            
-            if( bIgnore )
-            {
-                hBand->SetNoDataValue( fIgnoreVal );
-                sprintf( szTemp, "%f", fIgnoreVal );
-                GDALSetMetadataItem( hBand, "STATISTICS_EXCLUDEDVALUES", szTemp, NULL );
-            }
-            
-            /* Find min, Max and mean */ 
-            double fmin=0, fmax=0, fMean=0, fStdDev=0;
-            int nLastProgress = -1;
-            hBand->ComputeStatistics(false, &fmin, &fmax, &fMean, &fStdDev,  (GDALProgressFunc)StatsTextProgress, &nLastProgress);
-
-            /* Write Statistics */
-            sprintf( szTemp, "%f", fmin );
-            hBand->SetMetadataItem( "STATISTICS_MINIMUM", szTemp, NULL );
-
-            sprintf( szTemp, "%f", fmax );
-            hBand->SetMetadataItem( "STATISTICS_MAXIMUM", szTemp, NULL );
-
-            sprintf( szTemp, "%f", fMean );
-            hBand->SetMetadataItem( "STATISTICS_MEAN", szTemp, NULL );
-
-            sprintf( szTemp, "%f", fStdDev );
-            hBand->SetMetadataItem( "STATISTICS_STDDEV", szTemp, NULL );
-
-            /* make sure that the histogram will work even if there */
-            /* is only one value in it                              */
-            fmin = fmin == fmax ? fmin - 1e-05 : fmin;
-
-            /* Calc the histogram */
-            int *pHisto;
-            int nHistBuckets;
-            float histmin = 0, histmax = 0, histminTmp = 0, histmaxTmp = 0;
-            if( hBand->GetRasterDataType() == GDT_Byte )
-            {
-                /* if it is 8 bit just do a histo on the lot so we don't get rounding errors */ 
-                nHistBuckets = 256;
-                histmin = 0;
-                histmax = 255;
-                histminTmp = -0.5;
-                histmaxTmp = 255.5;
-                sprintf( szTemp, "%f", fStdDev );
-                histoType = histoTypeDirect;
-            }
-            else if(strcmp( hBand->GetMetadataItem( "LAYER_TYPE", "" ), "thematic" ) == 0)
-            {
-                nHistBuckets = ceil(fmax)+1;
-                histmin = 0;
-                histmax = ceil(fmax);
-                histminTmp = -0.5;
-                histmaxTmp = histmax + 0.5;
-                histoType = histoTypeDirect;
-            }
-            else
-            {
-                int range = (ceil(fmax) - floor(fmin));
-                histmin = fmin;
-                histmax = fmax;
-                if(range <= HISTO_NBINS)
-                {
-                    nHistBuckets = range;
-                    histoType = histoTypeDirect;
-                    
-                    histminTmp = histmin - 0.5;
-                    histmaxTmp = histmax + 0.5;
+                    histMin[i] = minVal[i]-0.5;
+                    histMax[i] = minVal[i]+256;
+                    histWidth[i] = 1.0;
+                    histoType[i] = "direct";
                 }
                 else
                 {
-                    nHistBuckets = HISTO_NBINS;
-                    histoType = histoTypeLinear;
-                    histminTmp = histmin;
-                    histmaxTmp = histmax;
+                    histWidth[i] = range/256;
+                    histMin[i] = minVal[i] - (histWidth[i]/2);
+                    histMax[i] = maxVal[i] + (histWidth[i]/2);
+                    histoType[i] = "linear";
                 }
-            }
-            pHisto = (int*)calloc(nHistBuckets, sizeof(int));
-            if(bIgnore)
-            {
-                this->getHistogramIgnore(hBand, histminTmp, histmaxTmp, nHistBuckets, pHisto, false, bIgnore, fIgnoreVal);
             }
             else
             {
-                int nLastProgress = -1;
-                hBand->GetHistogram(histminTmp, histmaxTmp, nHistBuckets, pHisto, true, false,  (GDALProgressFunc)StatsTextProgress, &nLastProgress);
+                range = maxVal[i] - minVal[i];
+                histWidth[i] = range/256;
+                histMin[i] = minVal[i] - (histWidth[i]/2);
+                histMax[i] = maxVal[i] + (histWidth[i]/2);
+                histoType[i] = "linear";
             }
             
-            //int histoStrLen = nHistBuckets * 8;
-            //char *szHistoString = new char[histoStrLen];
-            //szHistoString[0] = '\0';
-
-            /* Mode is the bin with the highest count */
-            int maxcount = 0;
-            int maxbin = 0;
-            long totalvalues = 0;
-            for(int count = 0; count < nHistBuckets; count++)
+            //std::cout << "Hist Range [" << histMin[i] << ", " << histMax[i] << "] : " << histWidth[i] << "\n";
+        }
+        
+        double *stdDevVal = new double[numBands];
+        unsigned long *nVals2 = new unsigned long[numBands];
+        for(int i = 0; i < numBands; ++i)
+        {
+            stdDevVal[i] = 0;
+            nVals2[i] = 0;
+            bandHist[i] = new unsigned int[numHistBins];
+            for(unsigned int j = 0; j < numHistBins; ++j)
             {
-                if( pHisto[count] > maxcount )
+                bandHist[i][j] = 0;
+            }
+        }
+        RSGISCalcImageStdDevPopHist calcImageHistSD = RSGISCalcImageStdDevPopHist(numBands, useNoDataVal, noDataVal, minVal, maxVal, meanVal, stdDevVal, nVals2, histMin, histMax, histWidth, bandHist, numHistBins);
+        calcImg = RSGISCalcImage(&calcImageHistSD, "", true);
+        calcImg.calcImage(&imgDS, 1);
+        
+        
+        for(int i = 0; i < numBands; ++i)
+        {
+            //std::cout << "Band " << (i+1) << std::endl;
+            //std::cout << "\nVals2 = " << nVals2[i] << std::endl;
+            stdDevVal[i] = sqrt(stdDevVal[i] / nVals2[i]);
+            //std::cout << "\tStdDev = " << stdDevVal[i] << std::endl;
+            
+            band = imgDS->GetRasterBand(i+1);
+            band->SetMetadataItem( "STATISTICS_STDDEV", textUtils.doubletostring(stdDevVal[i]).c_str(), NULL );
+            
+            
+            band->SetMetadataItem( "STATISTICS_HISTOMIN", textUtils.doubletostring(minVal[i]).c_str(), NULL );
+            band->SetMetadataItem( "STATISTICS_HISTOMAX", textUtils.doubletostring(maxVal[i]).c_str(), NULL );
+            band->SetMetadataItem( "STATISTICS_HISTONUMBINS", "256", NULL );
+            band->SetMetadataItem( "STATISTICS_HISTOBINFUNCTION", histoType[i].c_str(), NULL );
+            
+            // Calc Mode and Median:
+            double modeVal = 0.0;
+            double medianVal = 0.0;
+            long pxlCount = 0;
+            bool foundMedian = false;
+            long medianPxl = nVals2[i]/2;
+            unsigned long modeBinFreq = 0;
+            std::string histBinsStr = "";
+            for(int j = 0; j < 256; ++j)
+            {
+                if(j == 0)
                 {
-                    maxcount = pHisto[count];
-                    maxbin = count;
+                    modeBinFreq = bandHist[i][j];
+                    modeVal = minVal[i] + (j * histWidth[i]);
                 }
-                totalvalues += pHisto[count];
-            }
-            float fMode = maxbin * ((histmax-histmin) / nHistBuckets);
-
-            if( ( hBand->GetRasterDataType( ) == GDT_Float32 ) || ( hBand->GetRasterDataType( ) == GDT_Float64 ) )
-            {
-                sprintf( szTemp, "%f", fMode );
-            }
-            else
-            {
-                sprintf( szTemp, "%f", floor(fMode+0.5) );
-            }  
-            GDALSetMetadataItem( hBand, "STATISTICS_MODE", szTemp, NULL );
-
-            int nWhichMedian = -1;
-            int nCumSum = 0;
-            for(int count = 0; count < nHistBuckets; count++)
-            {
-                /* we also estimate the median based on the histogram */
-                if(nWhichMedian == -1) 
+                else if(bandHist[i][j] >  modeBinFreq)
                 {
-                    /* then haven't found the median yet */
-                    nCumSum += pHisto[count];
-                    if(nCumSum > (totalvalues/2.0)) 
+                    modeBinFreq = bandHist[i][j];
+                    modeVal = minVal[i] + (j * histWidth[i]);
+                }
+                
+                if(j == 0)
+                {
+                    histBinsStr = histBinsStr + textUtils.uInt64bittostring(bandHist[i][j]);
+                }
+                else
+                {
+                    histBinsStr = histBinsStr + "|" + textUtils.uInt64bittostring(bandHist[i][j]);
+                }
+                
+                pxlCount = pxlCount + bandHist[i][j];
+                
+                if((pxlCount > medianPxl) & (!foundMedian))
+                {
+                    if( labs(pxlCount-medianPxl) > labs((pxlCount-bandHist[i][j])-medianPxl) )
                     {
-                        nWhichMedian = count;
+                        medianVal = minVal[i] + ((j-1) * histWidth[i]);
+                    }
+                    else
+                    {
+                        medianVal = minVal[i] + (j * histWidth[i]);
+                    }
+                    foundMedian = true;
+                }
+            }
+            
+            band->SetMetadataItem( "STATISTICS_MODE", textUtils.doubletostring(modeVal).c_str(), NULL );
+            band->SetMetadataItem( "STATISTICS_MEDIAN", textUtils.doubletostring(medianVal).c_str(), NULL );
+            band->SetMetadataItem( "STATISTICS_HISTOBINVALUES", histBinsStr.c_str(), NULL );
+            
+            GDALRasterAttributeTable *attTable = imgDS->GetRasterBand( i+1 )->GetDefaultRAT();
+            if(attTable == NULL)
+            {
+                attTable = new GDALDefaultRasterAttributeTable();
+            }
+            attTable->SetRowCount(256);
+            
+            unsigned int histoColIdx = this->findColumnIndexOrCreate(attTable, "Histogram", GFT_Real, GFU_PixelCount);
+            attTable->ValuesIO(GF_Write, histoColIdx, 0, 256, (int*) bandHist[i]);
+        }
+        
+        if(calcPyramid)
+        {
+            std::cout << "Calculating Image Pyramids.\n";
+            if(decimatFactors.size() == 0)
+            {
+                int minOverviewDim = 33;
+                
+                int minDim = imgDS->GetRasterXSize();
+                if(imgDS->GetRasterYSize() < minDim)
+                {
+                    minDim = imgDS->GetRasterYSize();
+                }
+                
+                int nLevels[] = { 4, 8, 16, 32, 64, 128, 256, 512 };
+                for(int i = 0; i < 8; i++)
+                {
+                    if( (minDim/nLevels[i]) > minOverviewDim )
+                    {
+                        decimatFactors.push_back(nLevels[i]);
                     }
                 }
-                //sprintf( szTemp, "%d|", pHisto[count] );
-                //strcat( szHistoString, szTemp );
-            }
-
-            float fMedian = nWhichMedian * ((histmax-histmin) / nHistBuckets);
-            if( nWhichMedian < nHistBuckets - 1 )
-            {
-                fMedian = ( fMedian + ((nWhichMedian+1) * ((histmax-histmin) / nHistBuckets)) ) / 2;
-            }
-
-            if( ( GDALGetRasterDataType( hBand ) == GDT_Float32 ) || 
-            ( GDALGetRasterDataType( hBand ) == GDT_Float64 ) )
-            {
-                sprintf( szTemp, "%f", fMedian );
-            }
-            else
-            {
-                sprintf( szTemp, "%f", floor(fMedian+0.5) );
-            }
-            GDALSetMetadataItem( hBand, "STATISTICS_MEDIAN", szTemp, NULL );
-
-            if( GDALGetRasterDataType( hBand ) == GDT_Byte )
-            {
-                sprintf( szTemp, "0" );
-            }
-            else
-            {
-                sprintf( szTemp, "%f", histmin );
-            }
-            GDALSetMetadataItem( hBand, "STATISTICS_HISTOMIN", szTemp, NULL );
-
-            if( GDALGetRasterDataType( hBand ) == GDT_Byte )
-            {
-                sprintf( szTemp, "255" );
-            }
-            else
-            {
-                sprintf( szTemp, "%f", histmax );
-            }
-            GDALSetMetadataItem( hBand, "STATISTICS_HISTOMAX", szTemp, NULL );
-
-            sprintf( szTemp, "%d", nHistBuckets );
-            GDALSetMetadataItem( hBand, "STATISTICS_HISTONUMBINS", szTemp, NULL );
-
-            //GDALSetMetadataItem( hBand, "STATISTICS_HISTOBINVALUES", szHistoString, NULL );
-            //delete[] szHistoString;
-
-            /* set histogram bin function the same as Imagine does
-            ie Linear for floats, and direct for integer types
-            This means Raster Attribute Dialog gets displayed
-            correctly in Imagine */
-            GDALSetMetadataItem( hBand, "STATISTICS_HISTOBINFUNCTION", histoType.c_str(), NULL );
-            
-            
-            // Write the histogram to the RAT
-            GDALRasterAttributeTable *attTable = hBand->GetDefaultRAT();
-            attTable->SetRowCount(nHistBuckets);
-            
-            int numColumns = attTable->GetColumnCount();
-            bool foundCol = false;
-            unsigned int histoColIdx = 0;
-            for(int i = 0; i < numColumns; ++i)
-            {
-                if(std::string(attTable->GetNameOfCol(i)) == "Histogram")
-                {
-                    foundCol = true;
-                    histoColIdx = i;
-                    break;
-                }
             }
             
-            if(!foundCol)
-            {
-                attTable->CreateColumn("Histogram", GFT_Real, GFU_PixelCount);
-                histoColIdx = numColumns;
-            }
-            
-            attTable->ValuesIO(GF_Write, histoColIdx, 0, nHistBuckets, pHisto);
-            
-            free( pHisto );
-        }
-        if( bPyramid )
-        {
-            std::cout << "Building Pyramids:\n";
-            this->addpyramid(hHandle);
+            this->addPyramids(imgDS, decimatFactors);
         }
     }
     
+    void RSGISPopWithStats::addPyramids(GDALDataset *imgDS, std::vector<int> decimatFactors) throw(rsgis::RSGISImageException)
+    {
+        int nOverviews = decimatFactors.size();
+        
+        int nLastProgress = -1;
+        imgDS->BuildOverviews("AVERAGE", nOverviews, decimatFactors.data(), 0, NULL,  (GDALProgressFunc)StatsTextProgress, &nLastProgress );
+    }
+    
+    unsigned int RSGISPopWithStats::findColumnIndexOrCreate(GDALRasterAttributeTable *gdalATT, std::string colName, GDALRATFieldType dType, GDALRATFieldUsage dUsage) throw(rsgis::RSGISImageException)
+    {
+        int numColumns = gdalATT->GetColumnCount();
+        bool foundCol = false;
+        unsigned int colIdx = 0;
+        for(int i = 0; i < numColumns; ++i)
+        {
+            if(std::string(gdalATT->GetNameOfCol(i)) == colName)
+            {
+                foundCol = true;
+                colIdx = i;
+                break;
+            }
+        }
+        
+        if(!foundCol)
+        {
+            gdalATT->CreateColumn(colName.c_str(), dType, dUsage);
+            colIdx = numColumns;
+        }
+        
+        return colIdx;
+    }
+    
+    
+    RSGISCalcImageMinMaxMean::RSGISCalcImageMinMaxMean(int numVals, bool useNoData, double noDataVal, double *minVal, double *maxVal, double *sumVal, unsigned long *nVals): RSGISCalcImageValue(0)
+    {
+        this->numVals = numVals;
+        this->useNoData = useNoData;
+        this->noDataVal = noDataVal;
+        this->minVal = minVal;
+        this->maxVal = maxVal;
+        this->sumVal = sumVal;
+        this->nVals = nVals;
+        
+        this->first = new bool[numVals];
+        for(int i = 0; i < numVals; ++i)
+        {
+            this->first[i] = true;
+        }
+        
+    }
+    
+    void RSGISCalcImageMinMaxMean::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+    {
+        if(numVals != numBands)
+        {
+            throw RSGISImageCalcException("Number of values and bands are difference; error somewhere.");
+        }
+        
+        for(int i = 0; i < numBands; ++i)
+        {
+            if(this->useNoData)
+            {
+                if(bandValues[i] != this->noDataVal)
+                {
+                    if(first[i])
+                    {
+                        this->minVal[i] = bandValues[i];
+                        this->maxVal[i] = bandValues[i];
+                        this->sumVal[i] = bandValues[i];
+                        ++this->nVals[i];
+                        first[i] = false;
+                    }
+                    else
+                    {
+                        if(bandValues[i] < this->minVal[i])
+                        {
+                            this->minVal[i] = bandValues[i];
+                        }
+                        else if(bandValues[i] > this->maxVal[i])
+                        {
+                            this->maxVal[i] = bandValues[i];
+                        }
+                        this->sumVal[i] += bandValues[i];
+                        ++this->nVals[i];
+                    }
+                }
+            }
+            else
+            {
+                if(first[i])
+                {
+                    this->minVal[i] = bandValues[i];
+                    this->maxVal[i] = bandValues[i];
+                    this->sumVal[i] = bandValues[i];
+                    ++this->nVals[i];
+                    first[i] = false;
+                }
+                else
+                {
+                    if(bandValues[i] < this->minVal[i])
+                    {
+                        this->minVal[i] = bandValues[i];
+                    }
+                    else if(bandValues[i] > this->maxVal[i])
+                    {
+                        this->maxVal[i] = bandValues[i];
+                    }
+                    this->sumVal[i] += bandValues[i];
+                    ++this->nVals[i];
+                }
+            }
+        }
+        
+    }
+    
+    RSGISCalcImageMinMaxMean::~RSGISCalcImageMinMaxMean()
+    {
+        
+    }
+    
+    
+    RSGISCalcImageStdDevPopHist::RSGISCalcImageStdDevPopHist(int numVals, bool useNoData, double noDataVal, double *minVal, double *maxVal, double *meanVal, double *sumVal, unsigned long *nVals, double *histMin, double *histMax, double *histWidth, unsigned int **bandHist, unsigned int numBins): RSGISCalcImageValue(0)
+    {
+        this->numVals = numVals;
+        this->useNoData = useNoData;
+        this->noDataVal = noDataVal;
+        this->minVal = minVal;
+        this->maxVal = maxVal;
+        this->meanVal = meanVal;
+        this->sumVal = sumVal;
+        this->nVals = nVals;
+        this->histMin = histMin;
+        this->histMax = histMax;
+        this->histWidth = histWidth;
+        this->bandHist = bandHist;
+        this->numBins = numBins;
+        
+        this->first = new bool[numVals];
+        for(int i = 0; i < numVals; ++i)
+        {
+            this->first[i] = true;
+        }
+        
+    }
+    
+    void RSGISCalcImageStdDevPopHist::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+    {
+        if(numVals != numBands)
+        {
+            throw RSGISImageCalcException("Number of values and bands are difference; error somewhere.");
+        }
+        
+        for(int i = 0; i < numBands; ++i)
+        {
+            if(this->useNoData)
+            {
+                if(bandValues[i] != this->noDataVal)
+                {
+                    if(first[i])
+                    {
+                        double diff = (bandValues[i] - this->meanVal[i]);
+                        this->sumVal[i] = this->sumVal[i] + (diff * diff);
+                        ++this->nVals[i];
+                        first[i] = false;
+                    }
+                    else
+                    {
+                        double diff = (bandValues[i] - this->meanVal[i]);
+                        this->sumVal[i] = this->sumVal[i] + (diff * diff);
+                        ++this->nVals[i];
+                    }
+                    
+                    unsigned int histIdx = floor(((bandValues[i] - this->minVal[i]) / this->histWidth[i])+0.5);
+                    if(histIdx >= this->numBins)
+                    {
+                        histIdx = (this->numBins-1);
+                    }
+                    ++bandHist[i][histIdx];
+                }
+            }
+            else
+            {
+                if(first[i])
+                {
+                    double diff = (bandValues[i] - this->meanVal[i]);
+                    this->sumVal[i] = this->sumVal[i] + (diff * diff);
+                    ++this->nVals[i];
+                    first[i] = false;
+                }
+                else
+                {
+                    double diff = (bandValues[i] - this->meanVal[i]);
+                    this->sumVal[i] = this->sumVal[i] + (diff * diff);
+                    ++this->nVals[i];
+                }
+            }
+        }
+        
+    }
+    
+    RSGISCalcImageStdDevPopHist::~RSGISCalcImageStdDevPopHist()
+    {
+        
+    }
     
 }}
  
