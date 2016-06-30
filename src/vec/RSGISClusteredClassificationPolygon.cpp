@@ -99,42 +99,42 @@ namespace rsgis{namespace vec{
 	void RSGISClusteredClassificationPolygon::createLayerDefinition(OGRLayer *outputSHPLayer)throw(RSGISVectorOutputException)
 	{
 		// Create class attribute column
-		OGRFieldDefn shpField1 = OGRFieldDefn( "ClustClass", OFTString );
+		OGRFieldDefn shpField1( "ClustClass", OFTString );
 		shpField1.SetWidth(100);
 		if( outputSHPLayer->CreateField( &shpField1 ) != OGRERR_NONE )
 		{
 			throw RSGISVectorOutputException("Creating shapefile field \"ClustClass\" has failed");
 		}
 		
-		OGRFieldDefn shpField2 = OGRFieldDefn( "Area", OFTReal );
+		OGRFieldDefn shpField2( "Area", OFTReal );
 		shpField2.SetPrecision(4);
 		if( outputSHPLayer->CreateField( &shpField2 ) != OGRERR_NONE )
 		{
 			throw RSGISVectorOutputException("Creating shapefile field \"Area\" has failed");
 		}
 		
-		OGRFieldDefn shpField3 = OGRFieldDefn( "PolysArea", OFTReal );
+		OGRFieldDefn shpField3( "PolysArea", OFTReal );
 		shpField3.SetPrecision(4);
 		if( outputSHPLayer->CreateField( &shpField3 ) != OGRERR_NONE )
 		{
 			throw RSGISVectorOutputException("Creating shapefile field \"PolysArea\" has failed");
 		}
 		
-		OGRFieldDefn shpField4 = OGRFieldDefn( "ProPolysAr", OFTReal );
+		OGRFieldDefn shpField4( "ProPolysAr", OFTReal );
 		shpField4.SetPrecision(4);
 		if( outputSHPLayer->CreateField( &shpField4 ) != OGRERR_NONE )
 		{
 			throw RSGISVectorOutputException("Creating shapefile field \"ProPolysAr\" has failed");
 		}
 		
-		OGRFieldDefn shpField5 = OGRFieldDefn( "ProTotalAr", OFTReal );
+		OGRFieldDefn shpField5( "ProTotalAr", OFTReal );
 		shpField5.SetPrecision(4);
 		if( outputSHPLayer->CreateField( &shpField5 ) != OGRERR_NONE )
 		{
 			throw RSGISVectorOutputException("Creating shapefile field \"ProTotalAr\" has failed");
 		}
 		
-		OGRFieldDefn shpField6 = OGRFieldDefn( "EdgeThres", OFTReal );
+		OGRFieldDefn shpField6( "EdgeThres", OFTReal );
 		shpField6.SetPrecision(4);
 		if( outputSHPLayer->CreateField( &shpField6 ) != OGRERR_NONE )
 		{
