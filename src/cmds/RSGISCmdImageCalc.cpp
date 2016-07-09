@@ -1551,7 +1551,7 @@ namespace rsgis{ namespace cmds {
         std::string SHPFileInLayer = vecUtils.getLayerName(inputVector);
 
         OGRSpatialReference* inputSpatialRef = NULL;
-        OGRDataSource *inputSHPDS = NULL;
+        GDALDataset *inputSHPDS = NULL;
         OGRLayer *inputSHPLayer = NULL;
         try
         {
@@ -1561,7 +1561,8 @@ namespace rsgis{ namespace cmds {
             // Open Input Shapfile.
             //
             /////////////////////////////////////
-            inputSHPDS = OGRSFDriverRegistrar::Open(inputVector.c_str(), FALSE);
+            inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);
+            
             if(inputSHPDS == NULL)
             {
                 std::string message = std::string("Could not open vector file ") + inputVector;
@@ -1612,7 +1613,7 @@ namespace rsgis{ namespace cmds {
             delete geomCollectionOrig;
             delete geomCollectionLines;
             delete ogrGeoms;
-            OGRDataSource::DestroyDataSource(inputSHPDS);
+            GDALClose(inputSHPDS);
             OGRCleanupAll();
             GDALClose(outImage);
         }
@@ -2033,7 +2034,7 @@ namespace rsgis{ namespace cmds {
 
         std::string SHPFileInLayer = vecUtils.getLayerName(inputVector);
 
-        OGRDataSource *inputSHPDS = NULL;
+        GDALDataset *inputSHPDS = NULL;
         OGRLayer *inputSHPLayer = NULL;
         try
         {
@@ -2051,7 +2052,7 @@ namespace rsgis{ namespace cmds {
             // Open Input Shapfile.
             //
             /////////////////////////////////////
-            inputSHPDS = OGRSFDriverRegistrar::Open(inputVector.c_str(), FALSE);
+            inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);
             if(inputSHPDS == NULL)
             {
                 std::string message = std::string("Could not open vector file ") + inputVector;
@@ -2095,7 +2096,7 @@ namespace rsgis{ namespace cmds {
             delete geomCollectionOrig;
             delete geomCollectionLines;
             delete ogrGeoms;
-            OGRDataSource::DestroyDataSource(inputSHPDS);
+            GDALClose(inputSHPDS);
             OGRCleanupAll();
             GDALClose(outImage);
             GDALClose(imgDataset);

@@ -6,10 +6,10 @@
  *  Copyright 2012 RSGISLib. All rights reserved.
  *  This file is part of RSGISLib.
  *
- *  This code is edited from code provided by
+ *  This code is edited from code provided by 
  *  Sam Gillingham
  *
- *
+ * 
  *  RSGISLib is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -192,7 +192,8 @@ namespace rsgis { namespace img {
         unsigned int **bandHist;
         unsigned int numBins;
     };
-    
-}}
 
+}}
+ 
 #endif
+
