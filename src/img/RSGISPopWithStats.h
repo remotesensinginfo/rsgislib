@@ -6,10 +6,10 @@
  *  Copyright 2012 RSGISLib. All rights reserved.
  *  This file is part of RSGISLib.
  *
- *  This code is edited from code provided by 
+ *  This code is edited from code provided by
  *  Sam Gillingham
  *
- * 
+ *
  *  RSGISLib is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -32,12 +32,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctime>
+#include <math.h>
 
 #include "gdal_priv.h"
 #include "gdal_rat.h"
 #include "cpl_string.h"
 
 #include "common/RSGISImageException.h"
+
+#include "img/RSGISImageCalcException.h"
+#include "img/RSGISCalcImageValue.h"
+#include "img/RSGISImageUtils.h"
+#include "img/RSGISCalcImage.h"
+
+#include "utils/RSGISTextUtils.h"
 
 namespace rsgis { namespace img {
     
@@ -112,22 +120,79 @@ namespace rsgis { namespace img {
         return true;
     };
     
-    
     class DllExport RSGISPopWithStats
     {
     public:
-        void addPyramid( GDALDataset *handle );
-        void addPyramid( GDALDataset *handle, std::vector<int> pyLevels );
-        void getRangeMean(float *pData,int size,float &min,float &max,float &mean, bool ignore, float ignoreVal);
-        float getStdDev(float *pData, int size, float fmean, bool ignore, float ignoreVal);
-        float* getSubSampledImage( GDALRasterBand *hBand, int nLevel, int *pnSize );
-        void getHistogramIgnore( GDALRasterBand *pBand, double dfMin, double dfMax, int nBuckets, int *panHistogram, int bIncludeOutOfRange, bool bIgnore, float fIgnore );
-        void calcPopStats( GDALDataset *hHandle, bool bIgnore, float fIgnoreVal, bool bPyramid, std::vector<int> pyraScaleVals ) throw(rsgis::RSGISImageException);
+        RSGISPopWithStats(){};
+        void calcPopStats( GDALDataset *imgDS, bool useNoDataVal, float noDataVal, bool calcPyramid, std::vector<int> decimatFactors=std::vector<int>()) throw(rsgis::RSGISImageException);
+        ~RSGISPopWithStats(){};
     private:
-        static const int HISTO_NBINS = 256;
-        static const int MINOVERVIEWDIM = 33;
+        void addPyramids(GDALDataset *imgDS, std::vector<int> decimatFactors) throw(rsgis::RSGISImageException);
+        unsigned int findColumnIndexOrCreate(GDALRasterAttributeTable *gdalATT, std::string colName, GDALRATFieldType dType, GDALRATFieldUsage dUsage=GFU_Generic) throw(rsgis::RSGISImageException);
     };
+    
+    
+    
+    
+    class DllExport RSGISCalcImageMinMaxMean : public RSGISCalcImageValue
+    {
+    public:
+        RSGISCalcImageMinMaxMean(int numVals, bool useNoData, double noDataVal, double *minVal, double *maxVal, double *sumVal, unsigned long *nVals);
+        void calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent)throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        ~RSGISCalcImageMinMaxMean();
+    protected:
+        bool *first;
+        int numVals;
+        bool useNoData;
+        double noDataVal;
+        double *minVal;
+        double *maxVal;
+        double *sumVal;
+        unsigned long *nVals;
+    };
+    
+    
+    class DllExport RSGISCalcImageStdDevPopHist : public RSGISCalcImageValue
+    {
+    public:
+        RSGISCalcImageStdDevPopHist(int numVals, bool useNoData, double noDataVal, double *minVal, double *maxVal, double *meanVal, double *sumVal, unsigned long *nVals, double *histMin, double *histMax, double *histWidth, unsigned int **bandHist, unsigned int numBins);
+        void calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent)throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        ~RSGISCalcImageStdDevPopHist();
+    protected:
+        bool *first;
+        int numVals;
+        bool useNoData;
+        double noDataVal;
+        double *minVal;
+        double *maxVal;
+        double *meanVal;
+        double *sumVal;
+        unsigned long *nVals;
+        double *histMin;
+        double *histMax;
+        double *histWidth;
+        unsigned int **bandHist;
+        unsigned int numBins;
+    };
+    
 }}
- 
-#endif
 
+#endif
