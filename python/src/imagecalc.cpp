@@ -1309,12 +1309,13 @@ static PyObject *ImageCalc_CalcMaskImgPxlValProb(PyObject *self, PyObject *args)
 {
     const char *pszInputImage, *pszMaskImage, *pszOutputImage, *pszGDALFormat;
     int maskImgVal;
-    bool useImgNoData = true;
+    int useImgNoData = true;
+    int rescaleProbs = true;
     PyObject *inImgBandIdxsPyObj;
     PyObject *histBinWidthsPyObj;
     bool calcHistBinWidth = true;
     
-    if(!PyArg_ParseTuple(args, "sOsiss|Oi:calcMaskImgPxlValProb", &pszInputImage, &inImgBandIdxsPyObj, &pszMaskImage, &maskImgVal, &pszOutputImage, &pszGDALFormat, &histBinWidthsPyObj, &useImgNoData))
+    if(!PyArg_ParseTuple(args, "sOsLss|Oii:calcMaskImgPxlValProb", &pszInputImage, &inImgBandIdxsPyObj, &pszMaskImage, &maskImgVal, &pszOutputImage, &pszGDALFormat, &histBinWidthsPyObj, &useImgNoData, &rescaleProbs))
     {
         return NULL;
     }
@@ -1371,7 +1372,7 @@ static PyObject *ImageCalc_CalcMaskImgPxlValProb(PyObject *self, PyObject *args)
     
     try
     {
-        rsgis::cmds::executeCalcMaskImgPxlValProb(std::string(pszInputImage), inImgBandIdxs, std::string(pszMaskImage), maskImgVal, std::string(pszOutputImage), std::string(pszGDALFormat), histBinWidths, calcHistBinWidth, useImgNoData);
+        rsgis::cmds::executeCalcMaskImgPxlValProb(std::string(pszInputImage), inImgBandIdxs, std::string(pszMaskImage), maskImgVal, std::string(pszOutputImage), std::string(pszGDALFormat), histBinWidths, calcHistBinWidth, useImgNoData, rescaleProbs);
     }
     catch (rsgis::cmds::RSGISCmdException &e)
     {
@@ -2003,7 +2004,7 @@ static PyMethodDef ImageCalcMethods[] = {
 
     
 {"calcMaskImgPxlValProb", ImageCalc_CalcMaskImgPxlValProb, METH_VARARGS,
-    "imagecalc.calcMaskImgPxlValProb(inputImage, inImgBands, maskImg, maskImgVal, outputImage, gdalFormat, histBinWidths, useImgNoData)\n"
+    "imagecalc.calcMaskImgPxlValProb(inputImage, inImgBands, maskImg, maskImgVal, outputImage, gdalFormat, histBinWidths, useImgNoData, rescaleProbs)\n"
     "Calculates the probability of each image pixel value occuring as defined by the distrubution\n"
     "of image pixel values within the masked region of the image."
     "where:\n"
@@ -2020,6 +2021,8 @@ static PyMethodDef ImageCalcMethods[] = {
     "                 be estimated from the data.\n"
     "  * useImgNoData is a boolean specifying whether (if specified) the no data value specified in the band header\n"
     "                 should be excluded from the histogram (Optional and if not specfied defaults to True).\n"
+    " * rescaleProbs is a boolean specifying whether the probabilities should be rescaled to a range of 0-1 as values\n"
+    "                can be very small when a number of variables are used. (Optional and if not specified the default is True)."
 },
     
     {NULL}        /* Sentinel */
