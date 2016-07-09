@@ -308,6 +308,40 @@ namespace rsgis{namespace img{
 		}
     }
     
+    void RSGISImageStatistics::calcImageStatisticsMask(GDALDataset *dataset, GDALDataset *imgMask, long maskVal, ImageStats **stats, double *noDataVals, bool useNoData, int numInputBands, bool stddev, bool onePassSD)throw(RSGISImageCalcException,RSGISImageBandException)
+    {
+        GDALDataset **datasets = new GDALDataset*[2];
+        datasets[0] = imgMask;
+        datasets[1] = dataset;
+
+        try
+        {
+            RSGISCalcImageStatisticsMaskStatsNoData calcImageStats = RSGISCalcImageStatisticsMaskStatsNoData(0, numInputBands, maskVal, noDataVals, useNoData, false, onePassSD);
+            RSGISCalcImage calcImg = RSGISCalcImage(&calcImageStats, "", true);
+            
+            if(stddev && onePassSD)
+            {
+                calcImageStats.calcStdDev();
+            }
+            calcImg.calcImage(datasets, 1, 1);
+            
+            if(stddev && !onePassSD)
+            {
+                calcImageStats.calcStdDev();
+                calcImg.calcImage(datasets, 1, 1);
+            }
+            calcImageStats.getImageStats(stats, numInputBands);
+            delete[] datasets;
+        }
+        catch(RSGISImageCalcException e)
+        {
+            throw e;
+        }
+        catch(RSGISImageBandException e)
+        {
+            throw e;
+        }
+    }
     
     
     
@@ -1045,6 +1079,183 @@ namespace rsgis{namespace img{
     {
         
     }
+    
+    
+    
+    
+    RSGISCalcImageStatisticsMaskStatsNoData::RSGISCalcImageStatisticsMaskStatsNoData(int numberOutBands, int numInputBands, long maskVal, double *noDataVals, bool useNoData, bool calcSD, bool onePassSD) : RSGISCalcImageValue(numberOutBands)
+    {
+        this->onePassSD = onePassSD;
+        this->calcSD = calcSD;
+        this->numInputBands = numInputBands;
+        this->calcMean = false;
+        this->mean = new double[numInputBands];
+        this->meanSum = new double[numInputBands];
+        this->sumSq = new double[numInputBands];
+        this->min = new double[numInputBands];
+        this->max = new double[numInputBands];
+        this->sumDiffZ = new double[numInputBands];
+        this->diffZ = 0;
+        this->n = new unsigned long[numInputBands];
+        this->firstMean = new bool[numInputBands];
+        this->firstSD = new bool[numInputBands];
+        for(int i = 0; i < numInputBands; ++i)
+        {
+            mean[i] = 0;
+            meanSum[i] = 0;
+            sumSq[i] = 0;
+            min[i] = 0;
+            max[i] = 0;
+            sumDiffZ[i] = 0;
+            n[i] = 0;
+            firstMean[i] = true;
+            firstSD[i] = true;
+        }
+        this->noDataVals = noDataVals;
+        this->maskVal = maskVal;
+        this->useNoData = useNoData;
+    }
+    
+    void RSGISCalcImageStatisticsMaskStatsNoData::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(RSGISImageCalcException)
+    {
+        if(numfloatVals != this->numInputBands)
+        {
+            throw RSGISImageCalcException("The number input bands needs to match the figure provided.");
+        }
+        
+        if(numIntVals != 1)
+        {
+            throw RSGISImageCalcException("The number of mask bands should be 1.");
+        }
+        
+        if(intBandValues[0] == maskVal)
+        {
+            if(!calcSD || (calcSD && onePassSD)) // If not calculating SD or calculating SD with a single pass calculate mean, min + max
+            {
+                calcMean = true;
+                for(int i = 0; i < numfloatVals; i++)
+                {
+                    if(!boost::math::isnan(floatBandValues[i]))
+                    {
+                        if(firstMean[i])
+                        {
+                            if((!useNoData) || (useNoData && (floatBandValues[i] != this->noDataVals[i])))
+                            {
+                                meanSum[i] = floatBandValues[i];
+                                min[i] = floatBandValues[i];
+                                max[i] = floatBandValues[i];
+                                ++n[i];
+                                firstMean[i] = false;
+                            }
+                        }
+                        else
+                        {
+                            if((!useNoData) || (useNoData && (floatBandValues[i] != this->noDataVals[i])))
+                            {
+                                meanSum[i] = meanSum[i] + floatBandValues[i];
+                                if(floatBandValues[i] < min[i])
+                                {
+                                    min[i] = floatBandValues[i];
+                                }
+                                if(floatBandValues[i] > max[i])
+                                {
+                                    max[i] = floatBandValues[i];
+                                }
+                                ++n[i];
+                            }
+                        }
+                        
+                        if(calcSD && onePassSD)
+                        {
+                            if((!useNoData) || (useNoData && (floatBandValues[i] != this->noDataVals[i])))
+                            {
+                                sumSq[i] = sumSq[i] + floatBandValues[i]*floatBandValues[i];
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if(!calcMean)
+                {
+                    throw RSGISImageCalcException("The standard deviation cannot be calculated before the mean.");
+                }
+                
+                for(int i = 0; i < numfloatVals; i++)
+                {
+                    if(firstSD[i])
+                    {
+                        if((!useNoData) || (useNoData && (floatBandValues[i] != this->noDataVals[i])))
+                        {
+                            mean[i] = meanSum[i]/n[i];
+                            diffZ = mean[i] - floatBandValues[i];
+                            sumDiffZ[i] = (diffZ * diffZ);
+                            firstSD[i] = false;
+                        }
+                    }
+                    else
+                    {
+                        if((!useNoData) || (useNoData && (floatBandValues[i] != this->noDataVals[i])))
+                        {
+                            diffZ = mean[i] - floatBandValues[i];
+                            sumDiffZ[i] = sumDiffZ[i] + (diffZ * diffZ);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    void RSGISCalcImageStatisticsMaskStatsNoData::getImageStats(ImageStats** inStats, int numInputBands) throw(RSGISImageCalcException)
+    {
+        if(this->numInputBands != numInputBands)
+        {
+            throw RSGISImageCalcException("The number of stats objects passed to the function need to the be same as those defined in the class");
+        }
+        
+        for(int i = 0; i < numInputBands; i++)
+        {
+            inStats[i]->mean = meanSum[i]/n[i];
+            inStats[i]->min = min[i];
+            inStats[i]->max = max[i];
+            inStats[i]->sum = meanSum[i];
+            if(calcSD)
+            {
+                if (onePassSD)
+                {
+                    double var = (sumSq[i] - ( (meanSum[i]*meanSum[i]) /n[i] ) )/ n[i];
+                    inStats[i]->stddev = sqrt(var);
+                }
+                else
+                {
+                    inStats[i]->stddev = sqrt(sumDiffZ[i]/n[i]);
+                }
+            }
+            else
+            {
+                inStats[i]->stddev = 0;
+            }
+        }
+    }
+    
+    void RSGISCalcImageStatisticsMaskStatsNoData::calcStdDev()
+    {
+        calcSD = true;
+    }
+    
+    RSGISCalcImageStatisticsMaskStatsNoData::~RSGISCalcImageStatisticsMaskStatsNoData()
+    {
+        delete[] mean;
+        delete[] meanSum;
+        delete[] min;
+        delete[] max;
+        delete[] sumDiffZ;
+        delete[] n;
+        delete[] firstMean;
+        delete[] firstSD;
+    }
+    
     
     
     

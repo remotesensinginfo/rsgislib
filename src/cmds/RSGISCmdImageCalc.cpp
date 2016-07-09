@@ -2698,7 +2698,7 @@ namespace rsgis{ namespace cmds {
         return rSq;
     }
                 
-    void executeCalcMaskImgPxlValProb(std::string inputImage, std::vector<unsigned int> inImgBandIdxs, std::string maskImage, int maskVal, std::string outputImage, std::string gdalFormat, std::vector<float> histBinWidths, bool calcHistBinWidth, bool useImgNoData) throw(RSGISCmdException)
+    void executeCalcMaskImgPxlValProb(std::string inputImage, std::vector<unsigned int> inImgBandIdxs, std::string maskImage, int maskVal, std::string outputImage, std::string gdalFormat, std::vector<float> histBinWidths, bool calcHistBinWidth, bool useImgNoData, bool rescaleProbs) throw(RSGISCmdException)
     {
         try
         {
@@ -2731,7 +2731,7 @@ namespace rsgis{ namespace cmds {
             }
             
             rsgis::img::RSGISCalcImgValProb calcImgValProb;
-            calcImgValProb.calcMaskImgPxlValProb(inImgDS, inImgBandIdxs, inMaskDS, maskVal, outputImage, gdalFormat, histBinWidths, calcHistBinWidth, useImgNoData);
+            calcImgValProb.calcMaskImgPxlValProb(inImgDS, inImgBandIdxs, inMaskDS, maskVal, outputImage, gdalFormat, histBinWidths, calcHistBinWidth, useImgNoData, rescaleProbs);
             
             GDALClose(inImgDS);
             GDALClose(inMaskDS);
