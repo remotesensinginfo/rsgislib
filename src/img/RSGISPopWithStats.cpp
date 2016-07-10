@@ -6,7 +6,7 @@
  *  Rewritten 26/06/2016
  *  Copyright 2016 RSGISLib. All rights reserved.
  *  This file is part of RSGISLib.
- *
+ * 
  *  RSGISLib is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -25,7 +25,7 @@
 #include "RSGISPopWithStats.h"
 
 namespace rsgis { namespace img {
-    
+
     
     void RSGISPopWithStats::calcPopStats( GDALDataset *imgDS, bool useNoDataVal, float noDataVal, bool calcPyramid, std::vector<int> decimatFactors ) throw(rsgis::RSGISImageException)
     {
@@ -466,5 +466,5 @@ namespace rsgis { namespace img {
     }
     
 }}
-
+ 
 

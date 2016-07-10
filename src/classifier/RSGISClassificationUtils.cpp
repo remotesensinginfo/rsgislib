@@ -161,7 +161,7 @@ namespace rsgis{ namespace classifier{
 		
 		std::string vectorLayerName = vecUtils.getLayerName(vector);
 		
-		OGRDataSource *inputSHPDS = NULL;
+		GDALDataset *inputSHPDS = NULL;
 		OGRLayer *inputSHPLayer = NULL;
 
 		try
@@ -171,7 +171,7 @@ namespace rsgis{ namespace classifier{
 			// Open Input Shapfile.
 			//
 			/////////////////////////////////////
-			inputSHPDS = OGRSFDriverRegistrar::Open(vector.c_str(), FALSE);
+			inputSHPDS = (GDALDataset*) GDALOpenEx(vector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL );
 			if(inputSHPDS == NULL)
 			{
 				std::string message = std::string("Could not open vector file ") + vector;
@@ -282,7 +282,7 @@ namespace rsgis{ namespace classifier{
 				matrixUtils.freeMatrix(specLib);
 			}
 			
-			OGRDataSource::DestroyDataSource(inputSHPDS);
+			GDALClose(inputSHPDS);
 			OGRCleanupAll();			
 		}
 		catch(RSGISClassificationException &e)
