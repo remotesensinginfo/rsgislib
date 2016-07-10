@@ -633,7 +633,7 @@ class RSGISTests:
         imageutils.stretchImage(inputImage, outputImage, False, "", True, False, gdalformat, dataType, imageutils.STRETCH_LINEARSTDDEV, 2)
 
     def testSetBandNames(self):
-        print("PYTHON TEST: popImageStats")
+        print("PYTHON TEST: setBandNames")
         inputImage = './TestOutputs/injune_p142_casi_sub_utm.kea'
         bandNames = ['446nm','530nm','549nm','569nm','598nm','633nm','680nm','696nm','714nm','732nm','741nm','752nm','800nm','838nm']
         imageutils.setBandNames(inputImage, bandNames)
