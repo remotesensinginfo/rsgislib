@@ -63,6 +63,43 @@ namespace rsgis{namespace calib{
         unsigned int swir2Idx;
         unsigned int therm1Idx;
         unsigned int therm2Idx;
+        unsigned int coastalSatIdx;
+        unsigned int blueSatIdx;
+        unsigned int greenSatIdx;
+        unsigned int redSatIdx;
+        unsigned int nirSatIdx;
+        unsigned int swir1SatIdx;
+        unsigned int swir2SatIdx;
+        unsigned int therm1SatIdx;
+        unsigned int therm2SatIdx;
+        bool coastal;
+        bool thermal2;
+        unsigned long *waterTempHist;
+        unsigned long numWaterBins;
+        double minTempWater;
+        double tempBinWidthWater;
+        unsigned long *landTempHist;
+        unsigned long numLandBins;
+        double minTempLand;
+        double tempBinWidthLand;
+    };
+    
+    
+    class DllExport RSGISLandsatFMaskExportPass1LandWaterCloudMasking : public rsgis::img::RSGISCalcImageValue
+    {
+    public:
+        RSGISLandsatFMaskExportPass1LandWaterCloudMasking()throw(rsgis::img::RSGISImageCalcException);
+        void calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException);
+        void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent)throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
+        void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
+        ~RSGISLandsatFMaskExportPass1LandWaterCloudMasking();
     };
     
     class DllExport RSGISLandsatFMaskPass2ClearSkyCloudProbCloudMasking : public rsgis::img::RSGISCalcImageValue
@@ -83,7 +120,7 @@ namespace rsgis{namespace calib{
     protected:
         unsigned int scaleFactor;
         unsigned int numLSBands;
-        unsigned int pass1Idx;
+        unsigned int landWaterIdx;
         unsigned int coastalIdx;
         unsigned int blueIdx;
         unsigned int greenIdx;
@@ -105,12 +142,15 @@ namespace rsgis{namespace calib{
         double water82ndThres;
         double land82ndThres;
         double land17thThres;
+        bool coastal;
+        bool thermal2;
+        unsigned int varProbIdx;
     };
     
     class DllExport RSGISLandsatFMaskPass2CloudMasking : public rsgis::img::RSGISCalcImageValue
     {
     public:
-        RSGISLandsatFMaskPass2CloudMasking(unsigned int scaleFactor, unsigned int numThermalBands, double water82ndThres, double land82ndThres, double land17thThres, double landCloudProb82ndThres)throw(rsgis::img::RSGISImageCalcException);
+        RSGISLandsatFMaskPass2CloudMasking(unsigned int scaleFactor, unsigned int numLSBands, double landCloudProbUpperThres, double waterCloudProbUpperThres)throw(rsgis::img::RSGISImageCalcException);
         void calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException);
         void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
         void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
@@ -125,7 +165,7 @@ namespace rsgis{namespace calib{
     protected:
         unsigned int scaleFactor;
         unsigned int numLSBands;
-        unsigned int pass1Idx;
+        unsigned int landWaterIdx;
         unsigned int coastalIdx;
         unsigned int blueIdx;
         unsigned int greenIdx;
@@ -135,19 +175,15 @@ namespace rsgis{namespace calib{
         unsigned int swir2Idx;
         unsigned int therm1Idx;
         unsigned int therm2Idx;
-        unsigned int coastalSatIdx;
-        unsigned int blueSatIdx;
-        unsigned int greenSatIdx;
-        unsigned int redSatIdx;
-        unsigned int nirSatIdx;
-        unsigned int swir1SatIdx;
-        unsigned int swir2SatIdx;
-        unsigned int therm1SatIdx;
-        unsigned int therm2SatIdx;
-        double water82ndThres;
-        double land82ndThres;
-        double land17thThres;
-        double landCloudProb82ndThres;
+        unsigned int pcpIdx;
+        unsigned int landCloudProbIdx;
+        unsigned int waterCloudProbIdx;
+        unsigned int waterTestIdx;
+        unsigned int snowTestIdx;
+        bool coastal;
+        bool thermal2;
+        double landCloudProbUpperThres;
+        double waterCloudProbUpperThres;
     };
     
     

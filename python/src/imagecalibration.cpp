@@ -1044,17 +1044,17 @@ static PyObject *ImageCalibration_landsatThermalRad2Brightness(PyObject *self, P
 
 static PyObject *ImageCalibration_applyLandsatTMCloudFMask(PyObject *self, PyObject *args)
 {
-    const char *pszInputTOAFile, *pszInputThermalFile, *pszInputSatFile, *pszOutputFile, *pszOutputPass1TmpFile, *pszOutputCloudProbTmpFile, *pszGDALFormat;
+    const char *pszInputTOAFile, *pszInputThermalFile, *pszInputSatFile, *pszOutputFile, *pszOutputPass1TmpFile, *pszOutLandWaterTmpImage, *pszOutputCloudProbTmpFile, *pszGDALFormat;
     float scaleFactor;
     
-    if( !PyArg_ParseTuple(args, "sssssssf:applyLandsatTMCloudFMask", &pszInputTOAFile, &pszInputThermalFile, &pszInputSatFile, &pszOutputFile, &pszOutputPass1TmpFile, &pszOutputCloudProbTmpFile, &pszGDALFormat, &scaleFactor))
+    if( !PyArg_ParseTuple(args, "ssssssssf:applyLandsatTMCloudFMask", &pszInputTOAFile, &pszInputThermalFile, &pszInputSatFile, &pszOutputFile, &pszOutputPass1TmpFile, &pszOutLandWaterTmpImage, &pszOutputCloudProbTmpFile, &pszGDALFormat, &scaleFactor))
     {
         return NULL;
     }
     
     try
     {
-        rsgis::cmds::executeLandsatTMCloudFMask(std::string(pszInputTOAFile), std::string(pszInputThermalFile), std::string(pszInputSatFile), std::string(pszOutputFile), std::string(pszOutputPass1TmpFile), std::string(pszOutputCloudProbTmpFile), std::string(pszGDALFormat), scaleFactor);
+        rsgis::cmds::executeLandsatTMCloudFMask(std::string(pszInputTOAFile), std::string(pszInputThermalFile), std::string(pszInputSatFile), std::string(pszOutputFile), std::string(pszOutputPass1TmpFile), std::string(pszOutLandWaterTmpImage), std::string(pszOutputCloudProbTmpFile), std::string(pszGDALFormat), scaleFactor);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
