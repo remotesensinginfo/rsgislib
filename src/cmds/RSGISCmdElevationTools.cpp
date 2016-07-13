@@ -24,6 +24,7 @@
 #include "RSGISCmdParent.h"
 
 #include "calibration/RSGISDEMTools.h"
+#include "calibration/RSGISHydroDEMFillSoilleGratin94.h"
 
 namespace rsgis{ namespace cmds {
     
@@ -378,6 +379,53 @@ namespace rsgis{ namespace cmds {
         }
     }
     
+    void executeDEMFillSoilleGratin1994(std::string inImage, std::string validDataImg, std::string outputImage, std::string outImageFormat)throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            
+            std::cout << "Open " << inImage << std::endl;
+            GDALDataset *inImgDS = (GDALDataset *) GDALOpen(inImage.c_str(), GA_ReadOnly);
+            if(inImgDS == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            std::cout << "Open " << validDataImg << std::endl;
+            GDALDataset *inValidImgDS = (GDALDataset *) GDALOpen(validDataImg.c_str(), GA_ReadOnly);
+            if(inValidImgDS == NULL)
+            {
+                std::string message = std::string("Could not open image ") + validDataImg;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            GDALDataType imgDT = inImgDS->GetRasterBand(1)->GetRasterDataType();
+            if((imgDT == GDT_Float32) | (imgDT == GDT_Float64) | (imgDT == GDT_Unknown) | (imgDT == GDT_CInt16) | (imgDT == GDT_CInt32) | (imgDT == GDT_CFloat32) | (imgDT == GDT_CFloat64))
+            {
+                throw rsgis::RSGISImageException("Input image must be of an integer data type.");
+            }
+            
+            rsgis::img::RSGISImageUtils imgUtils;
+            GDALDataset *outImgDS = imgUtils.createCopy(inImgDS, 1, outputImage, outImageFormat, imgDT);
+            outImgDS->GetRasterBand(1)->Fill(0.0);
+            
+            rsgis::calib::RSGISHydroDEMFillSoilleGratin94 fillDEMInst;
+            fillDEMInst.performSoilleGratin94Fill(inImgDS, inValidImgDS, outImgDS, true);
+            
+            GDALClose(inImgDS);
+            GDALClose(inValidImgDS);
+            GDALClose(outImgDS);
+        }
+        catch(rsgis::RSGISException e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
     
 }}
 

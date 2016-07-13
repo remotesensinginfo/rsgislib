@@ -1254,6 +1254,8 @@ static PyObject *ImageCalibration_spot5ToRadiance(PyObject *self, PyObject *args
 }
 
 
+
+
 // Our list of functions in this module
 static PyMethodDef ImageCalibrationMethods[] = {
 {"landsat2Radiance", ImageCalibration_landsat2Radiance, METH_VARARGS,

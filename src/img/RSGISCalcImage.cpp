@@ -8052,7 +8052,7 @@ namespace rsgis{namespace img{
 		GDALClose(outputImageDS);
 	}
     
-    void RSGISCalcImage::calcImageWindowData(GDALDataset **datasets, int numDS, GDALDataset *outputImageDS, int windowSize) throw(RSGISImageCalcException,RSGISImageBandException)
+    void RSGISCalcImage::calcImageWindowData(GDALDataset **datasets, int numDS, GDALDataset *outputImageDS, int windowSize, bool passPxlXY) throw(RSGISImageCalcException,RSGISImageBandException)
 	{
 		if(outputImageDS == NULL)
         {
@@ -8228,6 +8228,9 @@ namespace rsgis{namespace img{
             long dLinePxls = 0;
             int dWinX = 0;
             int dWinY = 0;
+            long xPxl = 0;
+            long yPxl = 0;
+            geos::geom::Envelope pxlPos;
             
             int feedback = height/10.0;
 			int feedbackCounter = 0;
@@ -8384,6 +8387,7 @@ namespace rsgis{namespace img{
                         cLinePxl = m*width;
                         //std::cout << "cLine: " << cLinePxl << std::endl;
                         
+                        xPxl = 0;
                         for(int j = 0; j < width; j++)
                         {
                             cPxl = cLinePxl+j;
@@ -8564,14 +8568,23 @@ namespace rsgis{namespace img{
                                 }
                             }
                             
-                            this->calc->calcImageValue(inDataBlock, numInBands, windowSize, outDataColumn);
+                            if(passPxlXY)
+                            {
+                                pxlPos.init(xPxl, xPxl, yPxl, yPxl);
+                                this->calc->calcImageValue(inDataBlock, numInBands, windowSize, outDataColumn, pxlPos);
+                            }
+                            else
+                            {
+                                this->calc->calcImageValue(inDataBlock, numInBands, windowSize, outDataColumn);
+                            }
                             
                             for(int n = 0; n < this->numOutBands; n++)
                             {
                                 outputData[n][cPxl] = outDataColumn[n];
                             }
+                            ++xPxl;
                         }
-                        
+                        ++yPxl;
                     }
                     
                     for(int n = 0; n < this->numOutBands; n++)
@@ -8622,6 +8635,7 @@ namespace rsgis{namespace img{
                         cLinePxl = m*width;
                         //std::cout << "cLine: " << cLinePxl << std::endl;
                         
+                        xPxl = 0;
                         for(int j = 0; j < width; j++)
                         {
                             cPxl = cLinePxl+j;
@@ -8802,13 +8816,23 @@ namespace rsgis{namespace img{
                                 }
                             }
                             
-                            this->calc->calcImageValue(inDataBlock, numInBands, windowSize, outDataColumn);
+                            if(passPxlXY)
+                            {
+                                pxlPos.init(xPxl, xPxl, yPxl, yPxl);
+                                this->calc->calcImageValue(inDataBlock, numInBands, windowSize, outDataColumn, pxlPos);
+                            }
+                            else
+                            {
+                                this->calc->calcImageValue(inDataBlock, numInBands, windowSize, outDataColumn);
+                            }
                             
                             for(int n = 0; n < this->numOutBands; n++)
                             {
                                 outputData[n][cPxl] = outDataColumn[n];
                             }
+                            ++xPxl;
                         }
+                        ++yPxl;
                     }
                     
                     for(int n = 0; n < this->numOutBands; n++)

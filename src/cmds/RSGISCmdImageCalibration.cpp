@@ -839,8 +839,28 @@ namespace rsgis{ namespace cmds {
             editImgCalc.calcImageWindowData(cloudMaskDS, 5);
             delete cloudMajFilter;
             
+            
+            int nirIdx = 4;
+            if(reflDataset->GetRasterCount() == 7)
+            {
+                nirIdx = 5;
+            }
+            bandPercentStats = new std::vector<rsgis::rastergis::RSGISBandAttPercentiles *>();
+            rsgis::rastergis::RSGISBandAttPercentiles *landNIRPercent = new rsgis::rastergis::RSGISBandAttPercentiles();
+            landNIRPercent->fieldName = "LowerNIRLandValue175";
+            landNIRPercent->percentile = 17.5;
+            bandPercentStats->push_back(landNIRPercent);
+            calcClumpStats.populateRATWithPercentileStats(landWaterClearSkyDS, reflDataset, nirIdx, bandPercentStats, 1, 200);
+            delete landNIRPercent;
+            delete bandPercentStats;
+            double landNIR175Val = ratUtils.readDoubleColumnVal(landWaterRAT, "LowerNIRLandValue175", 1);
+            
+            std::cout << "Land NIR 17.5% Percentile = " << landNIR175Val << std::endl;
+            
+            
+            
             popImageStats.populateImageWithRasterGISStats(cloudMaskDS, true, true, 1);
-
+            
             GDALClose(pass1DS);
             GDALClose(landWaterClearSkyDS);
             GDALClose(pass2DS);
