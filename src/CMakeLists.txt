@@ -43,6 +43,7 @@ set(LIB_CALIBRATION_H
 	${RSGIS_SRC_CALIBRATION_DIR}/RSGISStandardDN2RadianceCalibration.h
 	${RSGIS_SRC_CALIBRATION_DIR}/RSGISApplySubtractOffsets.h
 	${RSGIS_SRC_CALIBRATION_DIR}/RSGISCloudMasking.h
+	${RSGIS_SRC_CALIBRATION_DIR}/RSGISHydroDEMFillSoilleGratin94.h
 	)
 	
 set(LIB_CALIBRATION_CPP
@@ -58,6 +59,8 @@ set(LIB_CALIBRATION_CPP
 	${RSGIS_SRC_CALIBRATION_DIR}/RSGISApplySubtractOffsets.h
 	${RSGIS_SRC_CALIBRATION_DIR}/RSGISCloudMasking.cpp
 	${RSGIS_SRC_CALIBRATION_DIR}/RSGISCloudMasking.h
+	${RSGIS_SRC_CALIBRATION_DIR}/RSGISHydroDEMFillSoilleGratin94.cpp
+	${RSGIS_SRC_CALIBRATION_DIR}/RSGISHydroDEMFillSoilleGratin94.h
 	)
 ###############################################################################
 
