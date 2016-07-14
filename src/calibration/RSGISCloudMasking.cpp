@@ -717,7 +717,32 @@ namespace rsgis{namespace calib{
     }
     
   
-
+    void RSGISCalcImagePotentialCloudShadowsMask::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+    {
+        if(numBands != 3)
+        {
+            throw rsgis::img::RSGISImageCalcException("The number of image bands must be 3.");
+        }
+        
+        if(bandValues[0] == 1)
+        {
+            bandValues[1] = bandValues[1] / this->scaleFactor;
+            bandValues[2] = bandValues[2] / this->scaleFactor;
+            float diffVal = bandValues[2] - bandValues[1];
+            if(diffVal > 0.02)
+            {
+                output[0] = 1;
+            }
+            else
+            {
+                output[0] = 0;
+            }
+        }
+        else
+        {
+            output[0] = 0;
+        }
+    }
     
     
     

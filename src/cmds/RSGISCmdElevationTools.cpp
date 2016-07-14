@@ -408,7 +408,6 @@ namespace rsgis{ namespace cmds {
             
             rsgis::img::RSGISImageUtils imgUtils;
             GDALDataset *outImgDS = imgUtils.createCopy(inImgDS, 1, outputImage, outImageFormat, imgDT);
-            outImgDS->GetRasterBand(1)->Fill(0.0);
             
             rsgis::calib::RSGISHydroDEMFillSoilleGratin94 fillDEMInst;
             fillDEMInst.performSoilleGratin94Fill(inImgDS, inValidImgDS, outImgDS, true);

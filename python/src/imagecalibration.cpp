@@ -1044,17 +1044,17 @@ static PyObject *ImageCalibration_landsatThermalRad2Brightness(PyObject *self, P
 
 static PyObject *ImageCalibration_applyLandsatTMCloudFMask(PyObject *self, PyObject *args)
 {
-    const char *pszInputTOAFile, *pszInputThermalFile, *pszInputSatFile, *pszOutputFile, *pszOutputPass1TmpFile, *pszOutLandWaterTmpImage, *pszOutputCloudProbTmpFile, *pszGDALFormat;
+    const char *pszInputTOAFile, *pszInputThermalFile, *pszInputSatFile, *pszValidAreaImg, *pszOutputFile, *pszOutputPass1TmpFile, *pszOutLandWaterTmpImage, *pszOutputCloudProbTmpFile, *pszTmpNIRBandImg, *pszTmpNIRFillBandImg, *pszTmpPotentClouds, *pszGDALFormat;
     float scaleFactor;
     
-    if( !PyArg_ParseTuple(args, "ssssssssf:applyLandsatTMCloudFMask", &pszInputTOAFile, &pszInputThermalFile, &pszInputSatFile, &pszOutputFile, &pszOutputPass1TmpFile, &pszOutLandWaterTmpImage, &pszOutputCloudProbTmpFile, &pszGDALFormat, &scaleFactor))
+    if( !PyArg_ParseTuple(args, "ssssssssssssf:applyLandsatTMCloudFMask", &pszInputTOAFile, &pszInputThermalFile, &pszInputSatFile, &pszValidAreaImg, &pszOutputFile, &pszOutputPass1TmpFile, &pszOutLandWaterTmpImage, &pszOutputCloudProbTmpFile, &pszTmpNIRBandImg, &pszTmpNIRFillBandImg, &pszTmpPotentClouds, &pszGDALFormat, &scaleFactor))
     {
         return NULL;
     }
     
     try
     {
-        rsgis::cmds::executeLandsatTMCloudFMask(std::string(pszInputTOAFile), std::string(pszInputThermalFile), std::string(pszInputSatFile), std::string(pszOutputFile), std::string(pszOutputPass1TmpFile), std::string(pszOutLandWaterTmpImage), std::string(pszOutputCloudProbTmpFile), std::string(pszGDALFormat), scaleFactor);
+        rsgis::cmds::executeLandsatTMCloudFMask(std::string(pszInputTOAFile), std::string(pszInputThermalFile), std::string(pszInputSatFile), std::string(pszValidAreaImg), std::string(pszOutputFile), std::string(pszOutputPass1TmpFile), std::string(pszOutLandWaterTmpImage), std::string(pszOutputCloudProbTmpFile), std::string(pszTmpNIRBandImg), std::string(pszTmpNIRFillBandImg), std::string(pszTmpPotentClouds), std::string(pszGDALFormat), scaleFactor);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -1458,16 +1458,20 @@ static PyMethodDef ImageCalibrationMethods[] = {
     "\n"},
     
 {"applyLandsatTMCloudFMask", ImageCalibration_applyLandsatTMCloudFMask, METH_VARARGS,
-    "imagecalibration.applyLandsatTMCloudFMask(inputTOAImage, inputThermalImage, inputSaturateImage, outputImage, pass1OutputTmpImage, cloudProbOutputTmpImage, gdalFormat, scaleFactorIn)\n"
+    "imagecalibration.applyLandsatTMCloudFMask(inputTOAImage, inputThermalImage, inputSaturateImage, inValidAreaImage, outputImage, pass1OutputTmpImage, cloudProbOutputTmpImage, tmpNIRBandImg, tmpNIRFillBandImg, tmpPotentClouds, gdalFormat, scaleFactorIn)\n"
     "Converts at sensor radiance values to Top of Atmosphere Reflectance.\n"
     "Where:\n"
     "\n"
     "* inputTOAImage is a string containing the name of the input image TOA reflectance file\n"
     "* inputThermalImage is a string containing the name of the input image with at sensor temperature (in celsius)"
     "* inputSaturateImage is a string containing the name of the input image file mask for the saturated pixels per band (including thermal)\n"
+    "* inValidAreaImage is a string containing the name of a binary image specifying the valid area of the image data (1 is valid area)\n"
     "* outputImage is a string containing the name of the output image file\n"
     "* pass1OutputTmpImage is a string containing the name of an output tempoary image file for pass 1.\n"
     "* cloudProbOutputTmpImage is a string containing the name of an output tempoary image file for the land cloud probability.\n"
+    "* tmpNIRBandImg is a string with the name of a tmp image for the extracted NIR band.\n"
+    "* tmpNIRFillBandImg is a string with the name of a tmp image for the filled NIR band.\n"
+    "* tmpPotentClouds is a string with name of a tmp image which will indicate the potential cloud areas.\n"
     "* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
     "* scaleFactorIn is a float with the scale factor used to multiple the input image (reflectance and thermal) data.\n"
     "\n"},
