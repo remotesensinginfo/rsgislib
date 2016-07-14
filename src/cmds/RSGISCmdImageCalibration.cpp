@@ -28,12 +28,14 @@
 #include "calibration/RSGISApply6SCoefficients.h"
 #include "calibration/RSGISApplySubtractOffsets.h"
 #include "calibration/RSGISCloudMasking.h"
+#include "calibration/RSGISHydroDEMFillSoilleGratin94.h"
 
 #include "img/RSGISImageCalcException.h"
 #include "img/RSGISCalcImageValue.h"
 #include "img/RSGISCalcImage.h"
 #include "img/RSGISImageUtils.h"
 #include "img/RSGISCalcEditImage.h"
+#include "img/RSGISCopyImage.h"
 
 #include "rastergis/RSGISCalcImageStatsAndPyramids.h"
 #include "rastergis/RSGISPopRATWithStats.h"
@@ -679,7 +681,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void executeLandsatTMCloudFMask(std::string inputTOAImage, std::string inputThermalImage, std::string inputSaturateImage, std::string outputImage, std::string pass1TmpOutImage, std::string landWaterTmpOutImage, std::string cloudLandProbTmpOutImage, std::string gdalFormat, float scaleFactorIn) throw(RSGISCmdException)
+    void executeLandsatTMCloudFMask(std::string inputTOAImage, std::string inputThermalImage, std::string inputSaturateImage, std::string validImg, std::string outputImage, std::string pass1TmpOutImage, std::string landWaterTmpOutImage, std::string cloudLandProbTmpOutImage, std::string tmpNIRBandImg, std::string tmpNIRFillBandImg, std::string tmpPotentClouds, std::string gdalFormat, float scaleFactorIn) throw(RSGISCmdException)
     {
         GDALAllRegister();
         try
@@ -697,6 +699,14 @@ namespace rsgis{ namespace cmds {
                 throw RSGISImageException(message.c_str());
             }
             unsigned int numReflBands = reflDataset->GetRasterCount();
+            
+            
+            GDALDataType imgReflDT = reflDataset->GetRasterBand(1)->GetRasterDataType();
+            if((imgReflDT == GDT_Float32) | (imgReflDT == GDT_Float64) | (imgReflDT == GDT_Unknown) | (imgReflDT == GDT_CInt16) | (imgReflDT == GDT_CInt32) | (imgReflDT == GDT_CFloat32) | (imgReflDT == GDT_CFloat64))
+            {
+                throw rsgis::RSGISImageException("Input TOA image must be of an integer data type.");
+            }
+            
             
             std::cout << "Opening: " << inputThermalImage << std::endl;
             GDALDataset *thermDataset = (GDALDataset *) GDALOpen(inputThermalImage.c_str(), GA_ReadOnly);
@@ -716,6 +726,14 @@ namespace rsgis{ namespace cmds {
             }
             unsigned int numSaturateBands = saturateDataset->GetRasterCount();
             
+            std::cout << "Opening: " << validImg << std::endl;
+            GDALDataset *validAreaDataset = (GDALDataset *) GDALOpen(validImg.c_str(), GA_ReadOnly);
+            if(validAreaDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + validImg;
+                throw RSGISImageException(message.c_str());
+            }
+            
             if((numReflBands+numThermBands) != numSaturateBands)
             {
                 throw RSGISImageException("The number of saturation bands is not equal to the number of refl and thermal bands.");
@@ -723,7 +741,10 @@ namespace rsgis{ namespace cmds {
                 GDALClose(reflDataset);
                 GDALClose(thermDataset);
                 GDALClose(saturateDataset);
+                GDALClose(validAreaDataset);
             }
+            rsgis::rastergis::RSGISPopulateWithImageStats popImageStats;
+            
             std::cout << "Apply first pass FMask to classifiy initial clear sky regions...\n";
             rsgis::calib::RSGISLandsatFMaskPass1CloudMasking cloudMaskPass1 = rsgis::calib::RSGISLandsatFMaskPass1CloudMasking(scaleFactorIn, (numReflBands+numThermBands));
             rsgis::img::RSGISCalcImage *calcImage = new rsgis::img::RSGISCalcImage(&cloudMaskPass1, "", true);
@@ -743,7 +764,7 @@ namespace rsgis{ namespace cmds {
             calcImage = new rsgis::img::RSGISCalcImage(&exportLandWaterRegions, "", true);
             calcImage->calcImage(&pass1DS, 1, landWaterClearSkyDS);
             delete calcImage;
-            rsgis::rastergis::RSGISPopulateWithImageStats popImageStats;
+            
             popImageStats.populateImageWithRasterGISStats(landWaterClearSkyDS, true, true, 1);
             
             std::cout << "Populating RAT with Thermal Stats\n";
@@ -834,12 +855,11 @@ namespace rsgis{ namespace cmds {
             
             
             std::cout << "Apply cloud majority filter...\n";
-            rsgis::calib::RSGISCalcImageCloudMajorityFilter *cloudMajFilter = new rsgis::calib::RSGISCalcImageCloudMajorityFilter();
-            rsgis::img::RSGISCalcEditImage editImgCalc = rsgis::img::RSGISCalcEditImage(cloudMajFilter);
+            rsgis::calib::RSGISCalcImageCloudMajorityFilter cloudMajFilter = rsgis::calib::RSGISCalcImageCloudMajorityFilter();
+            rsgis::img::RSGISCalcEditImage editImgCalc = rsgis::img::RSGISCalcEditImage(&cloudMajFilter);
             editImgCalc.calcImageWindowData(cloudMaskDS, 5);
-            delete cloudMajFilter;
             
-            
+            std::cout << "Calculate Shadow Mask\n";
             int nirIdx = 4;
             if(reflDataset->GetRasterCount() == 7)
             {
@@ -857,17 +877,46 @@ namespace rsgis{ namespace cmds {
             
             std::cout << "Land NIR 17.5% Percentile = " << landNIR175Val << std::endl;
             
+            // Extract NIR band.
+            std::cout << "Extract NIR Band\n";
+            GDALDataset *nirBandDS = imgUtils.createCopy(reflDataset, 1, tmpNIRBandImg, gdalFormat, imgReflDT);
+            std::vector<unsigned int> bands;
+            bands.push_back(4);
+            rsgis::img::RSGISCopyImageBandSelect selImageBands = rsgis::img::RSGISCopyImageBandSelect(bands);
+            rsgis::img::RSGISCalcImage calcSelBandsImage = rsgis::img::RSGISCalcImage(&selImageBands);
+            calcSelBandsImage.calcImage(&reflDataset, 1, nirBandDS);
             
+            std::cout << "Fill NIR Band\n";
+            GDALDataset *nirBandFillDS = imgUtils.createCopy(reflDataset, 1, tmpNIRFillBandImg, gdalFormat, imgReflDT);
+            rsgis::calib::RSGISHydroDEMFillSoilleGratin94 fillDEMInst;
+            fillDEMInst.performSoilleGratin94Fill(nirBandDS, validAreaDataset, nirBandFillDS, false, landNIR175Val);
+     
+            //std::string validImg
+            //std::string tmpNIRBandImg, std::string tmpNIRFillBandImg, std::string tmpPotentClouds
+            std::cout << "Produce Potential Cloud Shadows Mask\n";
+            GDALDataset *potentCloudDS = imgUtils.createCopy(reflDataset, 1, tmpPotentClouds, gdalFormat, GDT_Int32);
+            rsgis::calib::RSGISCalcImagePotentialCloudShadowsMask imgCalcPotentShadows = rsgis::calib::RSGISCalcImagePotentialCloudShadowsMask(scaleFactorIn);
+            rsgis::img::RSGISCalcImage calcPotentShadowImage = rsgis::img::RSGISCalcImage(&imgCalcPotentShadows);
+            datasets = new GDALDataset*[3];
+            datasets[0] = validAreaDataset;
+            datasets[1] = nirBandDS;
+            datasets[2] = nirBandFillDS;
+            calcPotentShadowImage.calcImage(datasets, 3, potentCloudDS);
             
+            popImageStats.populateImageWithRasterGISStats(potentCloudDS, true, true, 1);
             popImageStats.populateImageWithRasterGISStats(cloudMaskDS, true, true, 1);
             
             GDALClose(pass1DS);
             GDALClose(landWaterClearSkyDS);
             GDALClose(pass2DS);
             GDALClose(cloudMaskDS);
+            GDALClose(nirBandDS);
+            GDALClose(nirBandFillDS);
+            GDALClose(potentCloudDS);
             GDALClose(reflDataset);
             GDALClose(thermDataset);
             GDALClose(saturateDataset);
+            GDALClose(validAreaDataset);
         }
         catch(RSGISException &e)
         {
