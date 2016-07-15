@@ -909,8 +909,8 @@ namespace rsgis{namespace calib{
             double xDash = 0.0;
             double yDash = 0.0;
             bool pxlOn = false;
-            size_t i = 16;
-            //for(size_t i = 1; i < numClumps; ++i)
+            //size_t i = 16;
+            for(size_t i = 1; i < numClumps; ++i)
             {
                 std::cout << "Processing clump " << i << " has " << cloudsRATHisto[i] << " pixels." << std::endl;
                 //editShadImg.reset();
@@ -918,7 +918,7 @@ namespace rsgis{namespace calib{
                 std::vector<std::pair<std::pair<double,double>,double> > *pxPts = new std::vector<std::pair<std::pair<double,double>,double> >();
                 pxPts->reserve(cloudsRATHisto[i]);
                 env->init(minX[i], maxX[i], minY[i], maxY[i]);
-                std::cout << "Clump BBOX [" << minX[i] << ", " << maxX[i] << "][" << minY[i] << ", " << maxY[i] << "]\n";
+                //std::cout << "Clump BBOX [" << minX[i] << ", " << maxX[i] << "][" << minY[i] << ", " << maxY[i] << "]\n";
                 getPxPts.exportPixelsAsPointsWithVal(cloudClumpsDS, (float)i, initCloudHeights, 2, pxPts, env);
                 
                 baseHeight = hBaseMin[i];
@@ -930,7 +930,7 @@ namespace rsgis{namespace calib{
                     pxlY = (*iterPts).first.second;
                     cloudHgt = (baseHeight+(*iterPts).second) * 1000; // Conver to metres.
                     
-                    std::cout << "\t[" << pxlX << ", " << pxlY << "] = " << cloudHgt << "\n";
+                    //std::cout << "\t[" << pxlX << ", " << pxlY << "] = " << cloudHgt << "\n";
                     
                     // calculation taken from python-fmask
                     d = cloudHgt * tan(sunZen);
@@ -940,7 +940,7 @@ namespace rsgis{namespace calib{
                     xDash = pxlX - d * sin(sunAz);
                     yDash = pxlY - d * cos(sunAz);
                     pxlOn = editShadImg.turnOnPxl(xDash, yDash);
-                    
+                    /*
                     std::cout << "\t[" << xDash << ", " << yDash << "]";
                     if(pxlOn)
                     {
@@ -950,7 +950,7 @@ namespace rsgis{namespace calib{
                     {
                         std::cout << "    OFF\n";
                     }
-                    
+                    */
                 }
                 
                 

@@ -2932,7 +2932,7 @@ namespace rsgis{namespace img{
                 {
                     //std::cout << i << " of " << height << std::endl;
                     
-                    if((i % feedback) == 0)
+                    if((feedback != 0) && ((i % feedback) == 0))
                     {
                         std::cout << "." << feedbackCounter << "." << std::flush;
                         feedbackCounter = feedbackCounter + 10;
@@ -5444,6 +5444,9 @@ namespace rsgis{namespace img{
             {
                 imgUtils.getImageOverlapCut2Env(datasets, numDS, dsOffsets, &width, &height, gdalTranslation, env);
             }
+            
+            //std::cout << "Width = " << width << std::endl;
+            //std::cout << "Height = " << height << std::endl;
 			
 			// Count number of image bands
 			for(int i = 0; i < numDS; i++)
@@ -5492,22 +5495,22 @@ namespace rsgis{namespace img{
 			// Loop images to process data
 			for(int i = 0; i < height; i++)
 			{
-				//std::cout << i << " of " << height << std::endl;
+                //std::cout << i << " of " << height << std::endl;
 				
-				if((i % feedback) == 0)
+				if((feedback != 0) && ((i % feedback) == 0))
 				{
-					std::cout << "." << feedbackCounter << "." << std::flush;
-					feedbackCounter = feedbackCounter + 10;
+                    std::cout << "." << feedbackCounter << "." << std::flush;
+                    feedbackCounter = feedbackCounter + 10;
 				}
 				
 				for(int n = 0; n < numInBands; n++)
 				{
 					inputRasterBands[n]->RasterIO(GF_Read, bandOffsets[n][0], (bandOffsets[n][1]+i), width, 1, inputData[n], width, 1, GDT_Float32, 0, 0);
 				}
-				
-				for(int j = 0; j < width; j++)
+
+                for(int j = 0; j < width; j++)
 				{
-					for(int n = 0; n < numInBands; n++)
+                    for(int n = 0; n < numInBands; n++)
 					{
 						inDataColumn[n] = inputData[n][j];
 					}
@@ -6292,7 +6295,7 @@ namespace rsgis{namespace img{
 			{
 				//std::cout << i << " of " << height << std::endl;
 				
-				if((i % feedback) == 0)
+				if((feedback != 0) && ((i % feedback) == 0))
 				{
 					std::cout << "." << feedbackCounter << "." << std::flush;
 					feedbackCounter = feedbackCounter + 10;
@@ -9712,7 +9715,7 @@ namespace rsgis{namespace img{
 			// Loop images to process data
 			for(int i = 0; i < height; i++)
 			{				
-				if((i % feedback) == 0)
+				if((feedback != 0) && ((i % feedback) == 0))
 				{
 					std::cout << "." << feedbackCounter << "." << std::flush;
 					feedbackCounter = feedbackCounter + 10;
@@ -10186,7 +10189,7 @@ namespace rsgis{namespace img{
 			}			// Loop images to process data
 			for(int i = 0; i < height; i++)
 			{				
-				if(((i % feedback) == 0) && (height > 100))
+				if((feedback != 0) && ((i % feedback) == 0))
 				{
 					std::cout << "." << feedbackCounter << "." << std::flush;
 					feedbackCounter = feedbackCounter + 10;
@@ -10693,7 +10696,7 @@ namespace rsgis{namespace img{
 			// Loop images to process data
 			for(int i = 0; i < height; i++)
 			{				
-				if(((i % feedback) == 0) && (height > 100))
+				if((feedback != 0) && ((i % feedback) == 0))
 				{
 					std::cout << "." << feedbackCounter << "." << std::flush;
 					feedbackCounter = feedbackCounter + 10;
@@ -11618,7 +11621,7 @@ namespace rsgis{namespace img{
 			// Loop images to process data
 			for(int i = 0; i < height; i++)
 			{				
-				if(((i % feedback) == 0) && (height > 100))
+				if((feedback != 0) && ((i % feedback) == 0))
 				{
 					std::cout << "." << feedbackCounter << "." << std::flush;
 					feedbackCounter = feedbackCounter + 10;
