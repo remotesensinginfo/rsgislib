@@ -3428,6 +3428,7 @@ namespace rsgis{namespace img{
         
         return imgVals;
     }
+    
 	
 	void RSGISImageUtils::copyImageRemoveSpatialReference(std::string inputImage, std::string outputImage)throw(RSGISImageException)
 	{
