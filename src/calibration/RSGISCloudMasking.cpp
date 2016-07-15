@@ -746,6 +746,374 @@ namespace rsgis{namespace calib{
     
     
     
+    
+    
+    void RSGISCalcCloudParams::calcCloudHeights(GDALDataset *thermal, GDALDataset *cloudClumpsDS, GDALDataset *initCloudHeights, double lowerLandThres, double upperLandThres, float scaleFactor)throw(rsgis::img::RSGISImageCalcException)
+    {
+        try
+        {
+            rsgis::rastergis::RSGISPopRATWithStats popRatStats;
+            
+            std::vector<rsgis::rastergis::RSGISBandAttStats *> bandStats = std::vector<rsgis::rastergis::RSGISBandAttStats *>();
+            rsgis::rastergis::RSGISBandAttStats *thermB1Stats = new rsgis::rastergis::RSGISBandAttStats();
+            thermB1Stats->init();
+            thermB1Stats->band = 1;
+            thermB1Stats->calcMin = true;
+            thermB1Stats->minField = "ThermalMin";
+            thermB1Stats->calcMax = true;
+            thermB1Stats->maxField = "ThermalMax";
+            bandStats.push_back(thermB1Stats);
+            popRatStats.populateRATWithBasicStats(cloudClumpsDS, thermal, &bandStats, 1);
+            bandStats.clear();
+            delete thermB1Stats;
+            
+            rsgis::rastergis::RSGISCalcClusterLocation calcLoc;
+            calcLoc.populateAttWithClumpLocationExtent(cloudClumpsDS, 1, "MinXX", "MinXY", "MaxXX", "MaxXY", "MinYX", "MinYY", "MaxXY", "MaxYY");
+            
+            GDALRasterAttributeTable *cloudsRAT = cloudClumpsDS->GetRasterBand(1)->GetDefaultRAT();
+            rsgis::rastergis::RSGISRasterAttUtils attUtils;
+            size_t numcloudsRATHistoRows = 0;
+            size_t tmpSize = 0;
+            int *cloudsRATHisto = attUtils.readIntColumn(cloudsRAT, "Histogram", &numcloudsRATHistoRows);
+            double *minBT = attUtils.readDoubleColumn(cloudsRAT, "ThermalMin", &tmpSize);
+            if(tmpSize != numcloudsRATHistoRows)
+            {
+                rsgis::img::RSGISImageCalcException("Strange error, columns in the RAT are different lengths!");
+            }
+            double *maxBT = attUtils.readDoubleColumn(cloudsRAT, "ThermalMax", &tmpSize);
+            if(tmpSize != numcloudsRATHistoRows)
+            {
+                rsgis::img::RSGISImageCalcException("Strange error, columns in the RAT are different lengths!");
+            }
+            
+            double *minX = attUtils.readDoubleColumn(cloudsRAT, "MinXX", &tmpSize);
+            double *maxX = attUtils.readDoubleColumn(cloudsRAT, "MaxXX", &tmpSize);
+            double *minY = attUtils.readDoubleColumn(cloudsRAT, "MinYY", &tmpSize);
+            double *maxY = attUtils.readDoubleColumn(cloudsRAT, "MaxYY", &tmpSize);
+            
+            double *cloudBase = new double[numcloudsRATHistoRows];
+            double *hBaseMin = new double[numcloudsRATHistoRows];
+            double *hBaseMax = new double[numcloudsRATHistoRows];
+            
+            geos::geom::Envelope *env = new geos::geom::Envelope();
+            
+            rsgis::img::RSGISImagePercentiles calcImgPercentiles;
+            
+            double pi = 3.141592653589793;
+            double r = 0.0;
+            double percentile = 0.0;
+            cloudBase[0] = 0.0;
+            for(size_t i = 1; i < numcloudsRATHistoRows; ++i)
+            {
+                r = sqrt(cloudsRATHisto[i] / (2 * pi));
+                //std::cout << "r = " << r << std::endl;
+                if(r > 8)
+                {
+                    percentile = ((r-8.0)*(r-8.0)) / (r*r);
+                    //std::cout << "\tPercentile = " << percentile << std::endl;
+                    env->init(minX[i], maxX[i], minY[i], maxY[i]);
+                    
+                    cloudBase[i] = calcImgPercentiles.getPercentile(thermal, 1, cloudClumpsDS, i, percentile, 0, true, env);
+                }
+                else
+                {
+                    cloudBase[i] = minBT[i];
+                }
+                //std::cout << "\t Value = " << cloudBase[i] << std::endl;
+                
+                
+                cloudBase[i] = cloudBase[i]/scaleFactor;
+                minBT[i] = minBT[i]/scaleFactor;
+                maxBT[i] = maxBT[i]/scaleFactor;
+                
+                hBaseMin[i] = (lowerLandThres - 4 - cloudBase[i])/9.8;
+                if(0.2 > hBaseMin[i])
+                {
+                    hBaseMin[i] = 0.2;
+                }
+                hBaseMax[i] = (maxBT[i] + 4 - cloudBase[i]);
+                if(12 < hBaseMax[i])
+                {
+                    hBaseMax[i] = 12;
+                }
+                
+            }
+            
+            cloudBase[0] = 0;
+            hBaseMin[0] = 0;
+            hBaseMax[0] = 0;
+            attUtils.writeRealColumn(cloudsRAT, "CloudBase", cloudBase, numcloudsRATHistoRows);
+            attUtils.writeRealColumn(cloudsRAT, "hBaseMin", hBaseMin, numcloudsRATHistoRows);
+            attUtils.writeRealColumn(cloudsRAT, "hBaseMax", hBaseMax, numcloudsRATHistoRows);
+            
+            rsgis::calib::RSGISCalcPxlCloudBaseAndTopHeight calcImgInitHeights = rsgis::calib::RSGISCalcPxlCloudBaseAndTopHeight(cloudBase, hBaseMin, numcloudsRATHistoRows, scaleFactor);
+            rsgis::img::RSGISCalcImage calcInitHeights = rsgis::img::RSGISCalcImage(&calcImgInitHeights);
+            GDALDataset **datasets = new GDALDataset*[2];
+            datasets[0] = cloudClumpsDS;
+            datasets[1] = thermal;
+            calcInitHeights.calcImage(datasets, 1, 1, initCloudHeights);
+            delete[] datasets;
+            
+            delete env;
+            delete[] cloudBase;
+            delete[] hBaseMin;
+            delete[] hBaseMax;
+            delete[] cloudsRATHisto;
+            delete[] minBT;
+            delete[] maxBT;
+            delete[] minX;
+            delete[] maxX;
+            delete[] minY;
+            delete[] maxY;
+        }
+        catch (rsgis::img::RSGISImageCalcException &e)
+        {
+            throw e;
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+        
+    }
+    
+    
+    void RSGISCalcCloudParams::projFitCloudShadow(GDALDataset *cloudClumpsDS, GDALDataset *initCloudHeights, GDALDataset *potentCloudShadowRegions, GDALDataset *cloudShadowTestRegionsDS, GDALDataset *cloudShadowRegionsDS, double sunAz, double sunZen, double senAz, double senZen)throw(rsgis::img::RSGISImageCalcException)
+    {
+        try
+        {
+            rsgis::rastergis::RSGISRasterAttUtils attUtils;
+            GDALRasterAttributeTable *cloudsRAT = cloudClumpsDS->GetRasterBand(1)->GetDefaultRAT();
+            size_t numClumps = 0;
+            int *cloudsRATHisto = attUtils.readIntColumn(cloudsRAT, "Histogram", &numClumps);
+            double *minX = attUtils.readDoubleColumn(cloudsRAT, "MinXX", &numClumps);
+            double *maxX = attUtils.readDoubleColumn(cloudsRAT, "MaxXX", &numClumps);
+            double *minY = attUtils.readDoubleColumn(cloudsRAT, "MinYY", &numClumps);
+            double *maxY = attUtils.readDoubleColumn(cloudsRAT, "MaxYY", &numClumps);
+            double *cloudBase = attUtils.readDoubleColumn(cloudsRAT, "CloudBase", &numClumps);
+            double *hBaseMin = attUtils.readDoubleColumn(cloudsRAT, "hBaseMin", &numClumps);
+            double *hBaseMax = attUtils.readDoubleColumn(cloudsRAT, "hBaseMax", &numClumps);
+            
+            RSGISEditCloudShadowImg editShadImg = RSGISEditCloudShadowImg(cloudShadowTestRegionsDS, 1);
+            rsgis::img::RSGISExtractPxlsAsPts getPxPts;
+            geos::geom::Envelope *env = new geos::geom::Envelope();
+            double baseHeight = 0.0;
+            double pxlX = 0.0;
+            double pxlY = 0.0;
+            double cloudHgt = 0.0;
+            double d = 0.0;
+            double xDash = 0.0;
+            double yDash = 0.0;
+            bool pxlOn = false;
+            size_t i = 16;
+            //for(size_t i = 1; i < numClumps; ++i)
+            {
+                std::cout << "Processing clump " << i << " has " << cloudsRATHisto[i] << " pixels." << std::endl;
+                //editShadImg.reset();
+                
+                std::vector<std::pair<std::pair<double,double>,double> > *pxPts = new std::vector<std::pair<std::pair<double,double>,double> >();
+                pxPts->reserve(cloudsRATHisto[i]);
+                env->init(minX[i], maxX[i], minY[i], maxY[i]);
+                std::cout << "Clump BBOX [" << minX[i] << ", " << maxX[i] << "][" << minY[i] << ", " << maxY[i] << "]\n";
+                getPxPts.exportPixelsAsPointsWithVal(cloudClumpsDS, (float)i, initCloudHeights, 2, pxPts, env);
+                
+                baseHeight = hBaseMin[i];
+
+                
+                for(std::vector<std::pair<std::pair<double,double>,double> >::iterator iterPts = pxPts->begin(); iterPts != pxPts->end(); ++iterPts)
+                {
+                    pxlX = (*iterPts).first.first;
+                    pxlY = (*iterPts).first.second;
+                    cloudHgt = (baseHeight+(*iterPts).second) * 1000; // Conver to metres.
+                    
+                    std::cout << "\t[" << pxlX << ", " << pxlY << "] = " << cloudHgt << "\n";
+                    
+                    // calculation taken from python-fmask
+                    d = cloudHgt * tan(sunZen);
+                    
+                    // (x', y') are coordinates of each voxel projected onto the plane of the cloud base,
+                    // for every voxel in the solid cloud
+                    xDash = pxlX - d * sin(sunAz);
+                    yDash = pxlY - d * cos(sunAz);
+                    pxlOn = editShadImg.turnOnPxl(xDash, yDash);
+                    
+                    std::cout << "\t[" << xDash << ", " << yDash << "]";
+                    if(pxlOn)
+                    {
+                        std::cout << "    ON\n";
+                    }
+                    else
+                    {
+                        std::cout << "    OFF\n";
+                    }
+                    
+                }
+                
+                
+                delete pxPts;
+            }
+            
+            
+            
+            
+            
+            
+            
+            delete env;
+            delete[] cloudBase;
+            delete[] hBaseMin;
+            delete[] hBaseMax;
+            delete[] minX;
+            delete[] maxX;
+            delete[] minY;
+            delete[] maxY;
+        }
+        catch (rsgis::img::RSGISImageCalcException &e)
+        {
+            throw e;
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+    }
+    
+    
+    RSGISEditCloudShadowImg::RSGISEditCloudShadowImg(GDALDataset *testImg, int band)
+    {
+        this->testImg = testImg;
+        this->testImgBand = this->testImg->GetRasterBand(band);
+        this->band = band;
+        double *trans = new double[6];
+        this->testImg->GetGeoTransform(trans);
+        
+        this->tlX = trans[0];
+        this->tlY = trans[3];
+        this->xRes = trans[1];
+        this->yRes = trans[5];
+        if(this->yRes < 0)
+        {
+            this->yRes = this->yRes * (-1);
+        }
+        delete[] trans;
+        
+        this->nXPxl = testImg->GetRasterXSize();
+        this->nYPxl = testImg->GetRasterYSize();
+        
+        this->brX = this->tlX + (this->nXPxl * this->xRes);
+        this->brY = this->tlY - (this->nYPxl * this->yRes);
+        
+        extent.init(0,0,0,0);
+    }
+    
+    bool RSGISEditCloudShadowImg::turnOnPxl(double x, double y)throw(rsgis::img::RSGISCalcImageValue)
+    {
+        //std::cout << "BBOX [" << this->tlX << ", " << this->brX << "][" << this->brY << ", " << this->tlY << "]\n";
+        //std::cout << "PT [" << x << ", " << y << "]\n";
+        bool rtnStat = true;
+        if((x < this->tlX) | (x > this->brX))
+        {
+            rtnStat = false;
+        }
+        if((y > this->tlY) | (y < this->brY))
+        {
+            rtnStat = false;
+        }
+        
+        if(rtnStat)
+        {
+            float outValue = 1.0;
+            double xPxlLocF = (x - this->tlX) / this->xRes;
+            double yPxlLocF = (this->tlY - y) / this->yRes;
+            
+            long xPxlLoc = floor(xPxlLocF + 0.5);
+            long yPxlLoc = floor(yPxlLocF + 0.5);
+            //std::cout << "[" << xPxlLoc << ", " << yPxlLoc << "]\n";
+
+            this->testImgBand->RasterIO(GF_Write, xPxlLoc, yPxlLoc, 1, 1, &outValue, 1, 1, GDT_Float32, 0, 0);
+            
+            extent.expandToInclude(x, y);
+        }
+        
+        return rtnStat;
+    }
+    
+    void RSGISEditCloudShadowImg::reset()throw(rsgis::img::RSGISCalcImageValue)
+    {
+        this->testImgBand->Fill(0.0);
+        extent.init(0,0,0,0);
+    }
+    
+    void RSGISEditCloudShadowImg::calcCorrelation(GDALDataset *potentCloudShadowRegions, GDALDataset *cloudClumpsDS, double &corr, unsigned int &numPxlOverlap)throw(rsgis::img::RSGISCalcImageValue)
+    {
+        
+    }
+    
+    RSGISEditCloudShadowImg::~RSGISEditCloudShadowImg()
+    {
+        
+    }
+
+    
+    
+    
+    void RSGISCalcPxlCloudBaseAndTopHeight::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(rsgis::img::RSGISImageCalcException)
+    {
+        if(numIntVals != 1)
+        {
+            rsgis::img::RSGISImageCalcException("The cloud clumps band must only have 1 band.");
+        }
+        float lapseRateWet = 6.5; // degrees/km
+        unsigned long fid = intBandValues[0];
+        if(fid > 0)
+        {
+            floatBandValues[0] = floatBandValues[0]/scaleFactor;
+            
+            if(fid < numClumps)
+            {
+                if(floatBandValues[0] > cloudBase[fid])
+                {
+                    output[0] = cloudBase[fid];
+                }
+                else
+                {
+                    output[0] = floatBandValues[0];
+                }
+                
+                if((output[0] - hBaseMin[fid]) == 0)
+                {
+                    output[1] = 0.0;
+                }
+                else
+                {
+                    output[1] = (cloudBase[fid] - output[0]) / lapseRateWet;
+                }
+                if(output[1] < 0)
+                {
+                    output[1] = output[1] * (-1);
+                }
+            }
+            else
+            {
+                rsgis::img::RSGISImageCalcException("FID is larger than the number of known clouds...");
+            }
+        }
+        else
+        {
+            output[0] = 0.0;
+            output[1] = 0.0;
+        }
+        
+    }
+    
 }}
 
 

@@ -69,6 +69,31 @@ namespace rsgis{namespace rastergis{
         std::string sumField;
         unsigned int sumFieldIdx;
         unsigned int sumLocalIdx;
+        
+        void init()
+        {
+            band = 0;
+            calcMin = false;
+            minField = "";
+            minFieldIdx = 0;
+            minLocalIdx = 0;
+            calcMax = false;
+            maxField = "";
+            maxFieldIdx = 0;
+            maxLocalIdx = 0;
+            calcMean = false;
+            meanField = "";
+            meanFieldIdx = 0;
+            meanLocalIdx = 0;
+            calcStdDev = false;
+            stdDevField = "";
+            stdDevFieldIdx = 0;
+            stdDevLocalIdx = 0;
+            calcSum = false;
+            sumField = "";
+            sumFieldIdx = 0;
+            sumLocalIdx = 0;
+        };
     };
     
     struct DllExport RSGISBandAttPercentiles

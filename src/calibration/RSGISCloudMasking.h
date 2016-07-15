@@ -30,10 +30,19 @@
 
 #include "gdal_priv.h"
 
+#include "geos/geom/Envelope.h"
+
 #include "common/RSGISException.h"
+
 #include "img/RSGISImageCalcException.h"
 #include "img/RSGISCalcImageValue.h"
 #include "img/RSGISCalcImage.h"
+#include "img/RSGISImageStatistics.h"
+#include "img/RSGISExtractImageValues.h"
+
+#include "rastergis/RSGISPopRATWithStats.h"
+#include "rastergis/RSGISRasterAttUtils.h"
+#include "rastergis/RSGISCalcClusterLocation.h"
 
 namespace rsgis{namespace calib{
     
@@ -223,7 +232,68 @@ namespace rsgis{namespace calib{
     protected:
         unsigned int scaleFactor;
     };
-
+    
+    class DllExport RSGISCalcCloudParams
+    {
+    public:
+        RSGISCalcCloudParams(){};
+        void calcCloudHeights(GDALDataset *thermal, GDALDataset *cloudClumpsDS, GDALDataset *initCloudHeights, double lowerLandThres, double upperLandThres, float scaleFactor)throw(rsgis::img::RSGISImageCalcException);
+        void projFitCloudShadow(GDALDataset *cloudClumpsDS, GDALDataset *initCloudHeights, GDALDataset *potentCloudShadowRegions, GDALDataset *cloudShadowTestRegionsDS, GDALDataset *cloudShadowRegionsDS, double sunAz, double sunZen, double senAz, double senZen)throw(rsgis::img::RSGISImageCalcException);
+        ~RSGISCalcCloudParams(){};
+    };
+    
+    class DllExport RSGISEditCloudShadowImg
+    {
+    public:
+        RSGISEditCloudShadowImg(GDALDataset *testImg, int band);
+        bool turnOnPxl(double x, double y)throw(rsgis::img::RSGISCalcImageValue);
+        void reset()throw(rsgis::img::RSGISCalcImageValue);
+        void calcCorrelation(GDALDataset *potentCloudShadowRegions, GDALDataset *cloudClumpsDS, double &corr, unsigned int &numPxlOverlap)throw(rsgis::img::RSGISCalcImageValue);
+        ~RSGISEditCloudShadowImg();
+    protected:
+        GDALDataset *testImg;
+        GDALRasterBand *testImgBand;
+        int band;
+        double tlX;
+        double tlY;
+        double brX;
+        double brY;
+        double xRes;
+        double yRes;
+        unsigned long nXPxl;
+        unsigned long nYPxl;
+        geos::geom::Envelope extent;
+    };
+    
+    
+    
+    class DllExport RSGISCalcPxlCloudBaseAndTopHeight : public rsgis::img::RSGISCalcImageValue
+    {
+    public:
+        RSGISCalcPxlCloudBaseAndTopHeight(double *cloudBase, double *hBaseMin, long numClumps, float scaleFactor):rsgis::img::RSGISCalcImageValue(2)
+        {
+            this->cloudBase = cloudBase;
+            this->hBaseMin = hBaseMin;
+            this->numClumps = numClumps;
+            this->scaleFactor = scaleFactor;
+        };
+        void calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
+        void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(rsgis::img::RSGISImageCalcException);
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent)throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
+        void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
+        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
+        ~RSGISCalcPxlCloudBaseAndTopHeight(){};
+    protected:
+        double *cloudBase;
+        double *hBaseMin;
+        long numClumps;
+        float scaleFactor;
+    };
     
 }}
 
