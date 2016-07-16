@@ -993,7 +993,7 @@ namespace rsgis{namespace rastergis{
             {
                 delete[] blockDataReal[i];
             }
-            delete blockDataReal;
+            delete[] blockDataReal;
 
             for(int i = 0; i < nStringCol; ++i)
             {

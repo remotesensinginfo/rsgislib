@@ -215,7 +215,7 @@ namespace rsgis{namespace calib{
         
         int nWidth = (maxXPxl - minXPxl)+1;
         int nHeight = (maxYPxl - minYPxl)+1;
-        int numPxls = nWidth * nHeight;
+        //int numPxls = nWidth * nHeight;
         
         //std::cout << "[" << nWidth << ", " << nHeight << "] = " << numPxls << std::endl;
         

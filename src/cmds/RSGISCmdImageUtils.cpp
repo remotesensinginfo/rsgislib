@@ -624,7 +624,7 @@ namespace rsgis{ namespace cmds {
             inDataset->SetGeoTransform(trans);
 
             GDALClose(inDataset);
-            delete trans;
+            delete[] trans;
         }
         catch (RSGISImageException& e)
         {

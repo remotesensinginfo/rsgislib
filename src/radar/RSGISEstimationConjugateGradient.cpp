@@ -2352,7 +2352,7 @@ namespace rsgis {namespace radar
 				}
 				error = error / (pow(gsl_vector_get(inSigma0dB, 0),2)+pow(gsl_vector_get(inSigma0dB, 1),2));
 
-				if((error < minError) | (abs(prevError - error) < 10e-10) | boost::math::isnan(error))
+				if((error < minError) | (fabs(prevError - error) < 10e-10) | boost::math::isnan(error))
 				{
 
 					for(int i = 0; i < nPar; i++)
@@ -2604,7 +2604,7 @@ namespace rsgis {namespace radar
 				//std::cout << "sigmaSq = " << sigmaSq << std::endl;
 				//error = sqrt(predictSq / sigmaSq); // Square Root [Sum(Predicted Squared) / Sum(Measured Squared)]
 
-				if((error < minError) | (abs(prevError - error) < 10e-10) | boost::math::isnan(error))
+				if((error < minError) | (fabs(prevError - error) < 10e-10) | boost::math::isnan(error))
 				{
 					for(int i = 0; i < nPar; i++)
 					{

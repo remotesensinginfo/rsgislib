@@ -112,8 +112,8 @@ namespace rsgis{namespace rastergis{
                         }
                     }
                     attOutTable->ValuesIO(GF_Write, colIdx, 0, outAttRowCount, colOutVal);
-                    delete colInVals;
-                    delete colOutVal;
+                    delete[] colInVals;
+                    delete[] colOutVal;
                 }
                 else if((*iterCols).type == GFT_Real)
                 {
@@ -142,8 +142,8 @@ namespace rsgis{namespace rastergis{
                         }
                     }
                     attOutTable->ValuesIO(GF_Write, colIdx, 0, outAttRowCount, colOutVal);
-                    delete colInVals;
-                    delete colOutVal;
+                    delete[] colInVals;
+                    delete[] colOutVal;
                 }
                 else if((*iterCols).type == GFT_String)
                 {
@@ -172,8 +172,8 @@ namespace rsgis{namespace rastergis{
                         }
                     }
                     ratUtils.writeStrColumn(attOutTable, (*iterCols).name, colOutVal, outAttRowCount);
-                    delete colInVals;
-                    delete colOutVal;
+                    delete[] colInVals;
+                    delete[] colOutVal;
                 }
                 else
                 {
