@@ -182,7 +182,7 @@ namespace rsgis{namespace img{
         rsgis::math::Matrix* getPercentilesForAllBands(GDALDataset* dataset, float percentile, float noDataVal, bool noDataDefined)throw(rsgis::RSGISImageException);
         double getPercentile(GDALDataset *dataset, unsigned int band, float percentile, float noDataVal, bool noDataDefined)throw(rsgis::RSGISImageException);
         double getPercentile(GDALDataset *dataset, unsigned int band, GDALDataset *maskDS, int maskVal, float percentile, float noDataVal, bool noDataDefined)throw(rsgis::RSGISImageException);
-        double getPercentile(GDALDataset *dataset, unsigned int band, GDALDataset *maskDS, int maskVal, float percentile, float noDataVal, bool noDataDefined, geos::geom::Envelope *env)throw(rsgis::RSGISImageException);
+        double getPercentile(GDALDataset *dataset, unsigned int band, GDALDataset *maskDS, int maskVal, float percentile, float noDataVal, bool noDataDefined, geos::geom::Envelope *env, bool quiet=false)throw(rsgis::RSGISImageException);
         ~RSGISImagePercentiles();
     };
     

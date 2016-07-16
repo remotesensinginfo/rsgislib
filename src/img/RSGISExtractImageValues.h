@@ -79,7 +79,7 @@ namespace rsgis{namespace img{
         RSGISExtractPxlsAsPts();
         void exportPixelsAsPoints(GDALDataset *image, OGRLayer *vecLayer, float maskVal) throw(RSGISImageException);
         void exportPixelsAsPoints(GDALDataset *image, float maskVal, std::vector<std::pair<double,double> > *pxPts, geos::geom::Envelope *env=NULL) throw(RSGISImageException);
-        void exportPixelsAsPointsWithVal(GDALDataset *image, float maskVal, GDALDataset *valImg, int valImgBand, std::vector<std::pair<std::pair<double,double>,double> > *pxPts, geos::geom::Envelope *env=NULL) throw(RSGISImageException);
+        void exportPixelsAsPointsWithVal(GDALDataset *image, float maskVal, GDALDataset *valImg, int valImgBand, std::vector<std::pair<std::pair<double,double>,double> > *pxPts, bool quiet=false, geos::geom::Envelope *env=NULL) throw(RSGISImageException);
         ~RSGISExtractPxlsAsPts();
     };
     

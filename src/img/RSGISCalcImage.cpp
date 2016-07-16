@@ -1495,7 +1495,7 @@ namespace rsgis{namespace img{
         }
     }
     
-    void RSGISCalcImage::calcImage(GDALDataset **datasets, int numIntDS, int numFloatDS) throw(RSGISImageCalcException,RSGISImageBandException)
+    void RSGISCalcImage::calcImage(GDALDataset **datasets, int numIntDS, int numFloatDS, geos::geom::Envelope *env, bool quiet) throw(RSGISImageCalcException,RSGISImageBandException)
     {
         GDALAllRegister();
 		RSGISImageUtils imgUtils;
@@ -1526,7 +1526,14 @@ namespace rsgis{namespace img{
 		try
 		{
 			// Find image overlap
-			imgUtils.getImageOverlap(datasets, numDS, dsOffsets, &width, &height, gdalTranslation, &xBlockSize, &yBlockSize);
+            if(env == NULL)
+            {
+                imgUtils.getImageOverlap(datasets, numDS, dsOffsets, &width, &height, gdalTranslation, &xBlockSize, &yBlockSize);
+            }
+			else
+            {
+                imgUtils.getImageOverlapCut2Env(datasets, numDS, dsOffsets, &width, &height, gdalTranslation, env, &xBlockSize, &yBlockSize);
+            }
             
             //std::cout << "height = " << height << std::endl;
             //std::cout << "Width = " << width << std::endl;
@@ -1603,7 +1610,10 @@ namespace rsgis{namespace img{
             
 			int feedback = height/10;
 			int feedbackCounter = 0;
-			std::cout << "Started " << std::flush;
+            if(!quiet)
+            {
+                std::cout << "Started " << std::flush;
+            }
 			// Loop images to process data
 			for(int i = 0; i < nYBlocks; i++)
 			{
@@ -1621,7 +1631,7 @@ namespace rsgis{namespace img{
                 
                 for(int m = 0; m < yBlockSize; ++m)
                 {
-                    if((feedback != 0) && ((((i*yBlockSize)+m) % feedback) == 0))
+                    if((!quiet) && (feedback != 0) && ((((i*yBlockSize)+m) % feedback) == 0))
                     {
                         std::cout << "." << feedbackCounter << "." << std::flush;
                         feedbackCounter = feedbackCounter + 10;
@@ -1662,7 +1672,7 @@ namespace rsgis{namespace img{
                 
                 for(int m = 0; m < remainRows; ++m)
                 {
-                    if((feedback != 0) && ((((nYBlocks*yBlockSize)+m) % feedback) == 0))
+                    if((!quiet) && (feedback != 0) && ((((nYBlocks*yBlockSize)+m) % feedback) == 0))
                     {
                         std::cout << "." << feedbackCounter << "." << std::flush;
                         feedbackCounter = feedbackCounter + 10;
@@ -1684,7 +1694,10 @@ namespace rsgis{namespace img{
                     }
                 }
             }
-			std::cout << " Complete.\n";
+            if(!quiet)
+            {
+                std::cout << " Complete.\n";
+            }
 		}
 		catch(RSGISImageCalcException& e)
 		{
@@ -3895,7 +3908,7 @@ namespace rsgis{namespace img{
 		}
     }
     
-    void RSGISCalcImage::calcImageInEnv(GDALDataset **datasets, int numDS, geos::geom::Envelope *env) throw(RSGISImageCalcException,RSGISImageBandException)
+    void RSGISCalcImage::calcImageInEnv(GDALDataset **datasets, int numDS, geos::geom::Envelope *env, bool quiet) throw(RSGISImageCalcException,RSGISImageBandException)
     {
         GDALAllRegister();
 		RSGISImageUtils imgUtils;
@@ -3960,7 +3973,10 @@ namespace rsgis{namespace img{
             
 			int feedback = height/10.0;
 			int feedbackCounter = 0;
-			std::cout << "Started " << std::flush;
+            if(!quiet)
+            {
+                std::cout << "Started " << std::flush;
+            }
 			// Loop images to process data
 			for(int i = 0; i < nYBlocks; i++)
 			{
@@ -3974,7 +3990,7 @@ namespace rsgis{namespace img{
                 
                 for(int m = 0; m < yBlockSize; ++m)
                 {
-                    if((feedback != 0) && (((i*yBlockSize)+m) % feedback) == 0)
+                    if((!quiet) && (feedback != 0) && (((i*yBlockSize)+m) % feedback) == 0)
                     {
                         std::cout << "." << feedbackCounter << "." << std::flush;
                         feedbackCounter = feedbackCounter + 10;
@@ -4004,7 +4020,7 @@ namespace rsgis{namespace img{
                 
                 for(int m = 0; m < remainRows; ++m)
                 {
-                    if((feedback != 0) && ((((nYBlocks*yBlockSize)+m) % feedback) == 0))
+                    if((!quiet) && (feedback != 0) && ((((nYBlocks*yBlockSize)+m) % feedback) == 0))
                     {
                         std::cout << "." << feedbackCounter << "." << std::flush;
                         feedbackCounter = feedbackCounter + 10;
@@ -4021,7 +4037,10 @@ namespace rsgis{namespace img{
                     }
                 }
             }
-			std::cout << " Complete.\n";
+            if(!quiet)
+            {
+                std::cout << " Complete.\n";
+            }
 		}
 		catch(RSGISImageCalcException& e)
 		{
@@ -4185,7 +4204,7 @@ namespace rsgis{namespace img{
 		}
     }
     
-    void RSGISCalcImage::calcImageInEnv(GDALDataset **datasets, int numIntDS, int numFloatDS, geos::geom::Envelope *env) throw(RSGISImageCalcException,RSGISImageBandException)
+    void RSGISCalcImage::calcImageInEnv(GDALDataset **datasets, int numIntDS, int numFloatDS, geos::geom::Envelope *env, bool quiet) throw(RSGISImageCalcException,RSGISImageBandException)
     {
         GDALAllRegister();
         RSGISImageUtils imgUtils;
@@ -4293,7 +4312,10 @@ namespace rsgis{namespace img{
             
             int feedback = height/10;
             int feedbackCounter = 0;
-            std::cout << "Started " << std::flush;
+            if(!quiet)
+            {
+                std::cout << "Started " << std::flush;
+            }
             // Loop images to process data
             for(int i = 0; i < nYBlocks; i++)
             {
@@ -4311,7 +4333,7 @@ namespace rsgis{namespace img{
                 
                 for(int m = 0; m < yBlockSize; ++m)
                 {
-                    if((feedback != 0) && ((((i*yBlockSize)+m) % feedback) == 0))
+                    if((!quiet) && (feedback != 0) && ((((i*yBlockSize)+m) % feedback) == 0))
                     {
                         std::cout << "." << feedbackCounter << "." << std::flush;
                         feedbackCounter = feedbackCounter + 10;
@@ -4352,7 +4374,7 @@ namespace rsgis{namespace img{
                 
                 for(int m = 0; m < remainRows; ++m)
                 {
-                    if((feedback != 0) && ((((nYBlocks*yBlockSize)+m) % feedback) == 0))
+                    if((!quiet) && (feedback != 0) && ((((nYBlocks*yBlockSize)+m) % feedback) == 0))
                     {
                         std::cout << "." << feedbackCounter << "." << std::flush;
                         feedbackCounter = feedbackCounter + 10;
@@ -4374,7 +4396,10 @@ namespace rsgis{namespace img{
                     }
                 }
             }
-            std::cout << " Complete.\n";
+            if(!quiet)
+            {
+                std::cout << " Complete.\n";
+            }
         }
         catch(RSGISImageCalcException& e)
         {
@@ -5407,7 +5432,7 @@ namespace rsgis{namespace img{
         }
     }
     
-    void RSGISCalcImage::calcImageExtent(GDALDataset **datasets, int numDS, geos::geom::Envelope *env) throw(RSGISImageCalcException,RSGISImageBandException)
+    void RSGISCalcImage::calcImageExtent(GDALDataset **datasets, int numDS, geos::geom::Envelope *env, bool quiet) throw(RSGISImageCalcException,RSGISImageBandException)
 	{
 		GDALAllRegister();
 		RSGISImageUtils imgUtils;
@@ -5491,13 +5516,16 @@ namespace rsgis{namespace img{
 			
 			int feedback = height/10;
 			int feedbackCounter = 0;
-			std::cout << "Started " << std::flush;
+            if(!quiet)
+            {
+                std::cout << "Started " << std::flush;
+            }
 			// Loop images to process data
 			for(int i = 0; i < height; i++)
 			{
                 //std::cout << i << " of " << height << std::endl;
 				
-				if((feedback != 0) && ((i % feedback) == 0))
+				if((!quiet) && (feedback != 0) && ((i % feedback) == 0))
 				{
                     std::cout << "." << feedbackCounter << "." << std::flush;
                     feedbackCounter = feedbackCounter + 10;
@@ -5524,7 +5552,10 @@ namespace rsgis{namespace img{
 				pxlTLY -= pxlHeight;
 				pxlTLX = gdalTranslation[0];
 			}
-			std::cout << " Complete.\n";
+            if(!quiet)
+            {
+                std::cout << " Complete.\n";
+            }
 		}
 		catch(RSGISImageCalcException& e)
 		{
