@@ -276,7 +276,7 @@ namespace rsgis {namespace radar{
                                 }
                             }
                         }
-                        if(abs(newEnergy - prevEnergy)  < 10e-10)
+                        if(fabs(newEnergy - prevEnergy)  < 10e-10)
                         {
                             for(unsigned int j = 0; j < this->nPar; j++)
                             {

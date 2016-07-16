@@ -250,7 +250,7 @@ namespace rsgis{namespace reg{
 			//double outBRX = outTLX + (outputImageDS->GetRasterXSize() * gdalTransformation[1]);
 			//double outBRY = outTLY + (outputImageDS->GetRasterYSize() * gdalTransformation[5]);
 
-			delete gdalTransformation;
+			delete[] gdalTransformation;
             
             unsigned int inWidth = inputImageDS->GetRasterXSize();
 			unsigned int inHeight = inputImageDS->GetRasterYSize();
@@ -410,7 +410,7 @@ namespace rsgis{namespace reg{
 			//double outBRX = outTLX + (outputImageDS->GetRasterXSize() * gdalTransformation[1]);
 			//double outBRY = outTLY + (outputImageDS->GetRasterYSize() * gdalTransformation[5]);
             
-			delete gdalTransformation;
+			delete[] gdalTransformation;
 			/*
              if(outTLX < inTLX)
              {

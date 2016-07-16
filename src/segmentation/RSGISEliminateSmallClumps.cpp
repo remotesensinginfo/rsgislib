@@ -1281,7 +1281,7 @@ namespace rsgis{namespace segment{
                 delete clumpTable[i];
             }
         }
-        delete clumpTable;
+        delete[] clumpTable;
         
         delete[] spectralBands;
         

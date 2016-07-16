@@ -553,7 +553,7 @@ namespace rsgis {namespace radar{
 									testPar[j] = currentParError[j];
 								}
 							}
-							if(abs(newEnergy - prevEnergy) < 1e-10)
+							if(fabs(newEnergy - prevEnergy) < 1e-10)
 							{
 								threash = startThreshold;
 								t = t / 2;
@@ -838,7 +838,7 @@ namespace rsgis {namespace radar{
 									testPar[j] = currentParError[j];
 								}
 							}
-							if(abs(newEnergy - prevEnergy) < 1e-10)
+							if(fabs(newEnergy - prevEnergy) < 1e-10)
 							{
 								threash = startThreshold;
 								t = 0;
@@ -1134,7 +1134,7 @@ namespace rsgis {namespace radar{
 									testPar[j] = currentParError[j];
 								}
 							}
-							if(abs(newEnergy - prevEnergy) < 1e-10)
+							if(fabs(newEnergy - prevEnergy) < 1e-10)
 							{
 								threash = startThreshold;
 								t = t / 2;
@@ -1463,7 +1463,7 @@ namespace rsgis {namespace radar{
 								}
 								
 							}
-							if(abs(newEnergy - prevEnergy) < 1e-8)
+							if(fabs(newEnergy - prevEnergy) < 1e-8)
 							{
 								threash = startThreshold;
 								t = t / 2;
@@ -1817,7 +1817,7 @@ namespace rsgis {namespace radar{
 								}
 								
 							}
-							if(abs(newEnergy - prevEnergy) < 1e-10)
+							if(fabs(newEnergy - prevEnergy) < 1e-10)
 							{
 								threash = startThreshold;
 								t = t / 2;

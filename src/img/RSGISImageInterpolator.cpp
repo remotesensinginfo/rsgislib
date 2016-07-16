@@ -66,11 +66,11 @@ namespace rsgis{namespace img{
 		
 		if(newPixels != NULL)
 		{
-			delete newPixels;
+			delete[] newPixels;
 		}
 		if(tmpPixels != NULL)
 		{
-			delete tmpPixels;
+			delete[] tmpPixels;
 		}
 		return pixelValue;
 	}
