@@ -188,7 +188,7 @@ namespace rsgis{namespace img{
         }
     }
     
-    void RSGISExtractPxlsAsPts::exportPixelsAsPointsWithVal(GDALDataset *image, float maskVal, GDALDataset *valImg, int valImgBand, std::vector<std::pair<std::pair<double,double>,double> > *pxPts, geos::geom::Envelope *env) throw(RSGISImageException)
+    void RSGISExtractPxlsAsPts::exportPixelsAsPointsWithVal(GDALDataset *image, float maskVal, GDALDataset *valImg, int valImgBand, std::vector<std::pair<std::pair<double,double>,double> > *pxPts, bool quiet, geos::geom::Envelope *env) throw(RSGISImageException)
     {
         try
         {
@@ -207,11 +207,11 @@ namespace rsgis{namespace img{
             RSGISCalcImage calcImg = RSGISCalcImage(&extractPxls, "", true);
             if(env == NULL)
             {
-                calcImg.calcImageExtent(datasets, 2);
+                calcImg.calcImageExtent(datasets, 2, NULL, quiet);
             }
             else
             {
-                calcImg.calcImageExtent(datasets, 2, env);
+                calcImg.calcImageExtent(datasets, 2, env, quiet);
             }
             delete[] datasets;
         }

@@ -813,7 +813,7 @@ namespace rsgis{namespace calib{
                     //std::cout << "\tPercentile = " << percentile << std::endl;
                     env->init(minX[i], maxX[i], minY[i], maxY[i]);
                     
-                    cloudBase[i] = calcImgPercentiles.getPercentile(thermal, 1, cloudClumpsDS, i, percentile, 0, true, env);
+                    cloudBase[i] = calcImgPercentiles.getPercentile(thermal, 1, cloudClumpsDS, i, percentile, 0, true, env, true);
                 }
                 else
                 {
@@ -899,6 +899,8 @@ namespace rsgis{namespace calib{
             double *hBaseMax = attUtils.readDoubleColumn(cloudsRAT, "hBaseMax", &numClumps);
             
             RSGISEditCloudShadowImg editShadImg = RSGISEditCloudShadowImg(cloudShadowTestRegionsDS, 1);
+            RSGISEditCloudShadowImg editFinalShadImg = RSGISEditCloudShadowImg(cloudShadowRegionsDS, 1);
+            editFinalShadImg.reset();
             rsgis::img::RSGISExtractPxlsAsPts getPxPts;
             geos::geom::Envelope *env = new geos::geom::Envelope();
             double baseHeight = 0.0;
@@ -909,28 +911,85 @@ namespace rsgis{namespace calib{
             double xDash = 0.0;
             double yDash = 0.0;
             bool pxlOn = false;
-            //size_t i = 16;
+            bool first = true;
+            double maxH = 0.0;
+            double maxProp = 0.0;
+            unsigned long maxOverlap = 0;
+            double cloudPropOverlap = 0.0;
+            unsigned long numPxlOverlap = 0;
+            bool calcdShadProp = true;
+            
+            //size_t i = 487;
             for(size_t i = 1; i < numClumps; ++i)
             {
                 std::cout << "Processing clump " << i << " has " << cloudsRATHisto[i] << " pixels." << std::endl;
-                //editShadImg.reset();
                 
                 std::vector<std::pair<std::pair<double,double>,double> > *pxPts = new std::vector<std::pair<std::pair<double,double>,double> >();
                 pxPts->reserve(cloudsRATHisto[i]);
                 env->init(minX[i], maxX[i], minY[i], maxY[i]);
                 //std::cout << "Clump BBOX [" << minX[i] << ", " << maxX[i] << "][" << minY[i] << ", " << maxY[i] << "]\n";
-                getPxPts.exportPixelsAsPointsWithVal(cloudClumpsDS, (float)i, initCloudHeights, 2, pxPts, env);
+                getPxPts.exportPixelsAsPointsWithVal(cloudClumpsDS, (float)i, initCloudHeights, 2, pxPts, true, env);
                 
-                baseHeight = hBaseMin[i];
-
                 
+                first = true;
+                //baseHeight = hBaseMin[i];
+                for(baseHeight=hBaseMin[i]; baseHeight < hBaseMax[i]; baseHeight+=0.25)
+                {
+                    std::cout << "\tTesting Height " << baseHeight << " km\n";
+                    editShadImg.reset();
+                    for(std::vector<std::pair<std::pair<double,double>,double> >::iterator iterPts = pxPts->begin(); iterPts != pxPts->end(); ++iterPts)
+                    {
+                        pxlX = (*iterPts).first.first;
+                        pxlY = (*iterPts).first.second;
+                        cloudHgt = (baseHeight+(*iterPts).second) * 1000; // Conver to metres.
+                        
+                        // calculation taken from python-fmask
+                        d = cloudHgt * tan(sunZen);
+                        
+                        // (x', y') are coordinates of each voxel projected onto the plane of the cloud base,
+                        // for every voxel in the solid cloud
+                        xDash = pxlX - d * sin(sunAz);
+                        yDash = pxlY - d * cos(sunAz);
+                        pxlOn = editShadImg.turnOnPxl(xDash, yDash);
+                    }
+                    // Calculate shadow fit.
+                    calcdShadProp = editShadImg.calcCorrelation(cloudClumpsDS, potentCloudShadowRegions, cloudShadowTestRegionsDS, &cloudPropOverlap, &numPxlOverlap);
+                    if(calcdShadProp)
+                    {
+                        //std::cout << "\tnOverlap Pixels = " << numPxlOverlap << " Proportion  = " << cloudPropOverlap << std::endl;
+                        if(first)
+                        {
+                            maxH = baseHeight;
+                            maxProp = cloudPropOverlap;
+                            maxOverlap = numPxlOverlap;
+                            first = false;
+                        }
+                        else if(cloudPropOverlap > maxProp)
+                        {
+                            maxH = baseHeight;
+                            maxProp = cloudPropOverlap;
+                            maxOverlap = numPxlOverlap;
+                        }
+                    }
+                    else
+                    {
+                        if(first)
+                        {
+                            maxH = baseHeight;
+                            maxProp = 0.0;
+                            maxOverlap = 0.0;
+                        }
+                        break;
+                    }
+                }
+                
+                // Add Shadow with most correspondance to Final Shadow Image.
+                std::cout << "Shadow best fit base height is " << maxH << std::endl;
                 for(std::vector<std::pair<std::pair<double,double>,double> >::iterator iterPts = pxPts->begin(); iterPts != pxPts->end(); ++iterPts)
                 {
                     pxlX = (*iterPts).first.first;
                     pxlY = (*iterPts).first.second;
-                    cloudHgt = (baseHeight+(*iterPts).second) * 1000; // Conver to metres.
-                    
-                    //std::cout << "\t[" << pxlX << ", " << pxlY << "] = " << cloudHgt << "\n";
+                    cloudHgt = (maxH+(*iterPts).second) * 1000; // Conver to metres.
                     
                     // calculation taken from python-fmask
                     d = cloudHgt * tan(sunZen);
@@ -939,22 +998,10 @@ namespace rsgis{namespace calib{
                     // for every voxel in the solid cloud
                     xDash = pxlX - d * sin(sunAz);
                     yDash = pxlY - d * cos(sunAz);
-                    pxlOn = editShadImg.turnOnPxl(xDash, yDash);
-                    /*
-                    std::cout << "\t[" << xDash << ", " << yDash << "]";
-                    if(pxlOn)
-                    {
-                        std::cout << "    ON\n";
-                    }
-                    else
-                    {
-                        std::cout << "    OFF\n";
-                    }
-                    */
+                    pxlOn = editFinalShadImg.turnOnPxl(xDash, yDash);
                 }
-                
-                
                 delete pxPts;
+                std::cout << std::endl;
             }
             
             
@@ -1012,9 +1059,13 @@ namespace rsgis{namespace calib{
         this->brY = this->tlY - (this->nYPxl * this->yRes);
         
         extent.init(0,0,0,0);
+        this->firstPts = true;
+        
+        this->calcCloudShadCorr = new RSGISCalcCloudShadowCorrespondance();
+        this->imgCalc = new rsgis::img::RSGISCalcImage(this->calcCloudShadCorr);
     }
     
-    bool RSGISEditCloudShadowImg::turnOnPxl(double x, double y)throw(rsgis::img::RSGISCalcImageValue)
+    bool RSGISEditCloudShadowImg::turnOnPxl(double x, double y)throw(rsgis::img::RSGISImageCalcException)
     {
         //std::cout << "BBOX [" << this->tlX << ", " << this->brX << "][" << this->brY << ", " << this->tlY << "]\n";
         //std::cout << "PT [" << x << ", " << y << "]\n";
@@ -1040,26 +1091,115 @@ namespace rsgis{namespace calib{
 
             this->testImgBand->RasterIO(GF_Write, xPxlLoc, yPxlLoc, 1, 1, &outValue, 1, 1, GDT_Float32, 0, 0);
             
-            extent.expandToInclude(x, y);
+            if(this->firstPts)
+            {
+                extent.init(x,x,y,y);
+                this->firstPts=false;
+            }
+            else
+            {
+                extent.expandToInclude(x, y);
+            }
         }
         
         return rtnStat;
     }
     
-    void RSGISEditCloudShadowImg::reset()throw(rsgis::img::RSGISCalcImageValue)
+    void RSGISEditCloudShadowImg::reset()throw(rsgis::img::RSGISImageCalcException)
     {
         this->testImgBand->Fill(0.0);
         extent.init(0,0,0,0);
+        this->firstPts = true;
     }
     
-    void RSGISEditCloudShadowImg::calcCorrelation(GDALDataset *potentCloudShadowRegions, GDALDataset *cloudClumpsDS, double &corr, unsigned int &numPxlOverlap)throw(rsgis::img::RSGISCalcImageValue)
+    bool RSGISEditCloudShadowImg::calcCorrelation(GDALDataset *cloudClumpsDS, GDALDataset *potentCloudShadowRegions, GDALDataset *cloudShadowTestRegionsDS, double *cloudPropOverlap, unsigned long *numPxlOverlap)throw(rsgis::img::RSGISImageCalcException)
     {
+        bool insideimg = true;
+        try
+        {
+            // Check envelope is within image (i.e., shadow hasn't been projected outside of the image extent)
+            //std::cout << "BBOX IMG [" << this->tlX << ", " << this->brX << "][" << this->brY << ", " << this->tlY << "]\n";
+            //std::cout << "BBOX ENV [" << extent.getMinX() << ", " << extent.getMaxX() << "][" << extent.getMinY() << ", " << extent.getMaxY() << "]\n";
+            
+            if((extent.getMinX() < this->tlX) | (extent.getMinX() > this->brX))
+            {
+                insideimg = false;
+            }
+            else if((extent.getMaxX() < this->tlX) | (extent.getMaxX() > this->brX))
+            {
+                insideimg = false;
+            }
+            else if((extent.getMinY() < this->brY) | (extent.getMinY() > this->tlY))
+            {
+                insideimg = false;
+            }
+            else if((extent.getMaxY() < this->brY) | (extent.getMaxY() > this->tlY))
+            {
+                insideimg = false;
+            }
+            else if(extent.getWidth() < (this->xRes*2))
+            {
+                insideimg = false;
+            }
+            else if(extent.getHeight() < (this->yRes*2))
+            {
+                insideimg = false;
+            }
+            
+            if(insideimg)
+            {
+                GDALDataset **datasets = new GDALDataset*[3];
+                datasets[0] = cloudClumpsDS;
+                datasets[1] = potentCloudShadowRegions;
+                datasets[2] = cloudShadowTestRegionsDS;
+                
+                this->calcCloudShadCorr->reset();
+                this->imgCalc->calcImage(datasets, 3, 0, &extent, true);
+                delete[] datasets;
+                
+                unsigned long nShadPxlsVal = 0;
+                this->calcCloudShadCorr->getNPxls(&nShadPxlsVal, numPxlOverlap);
+                
+                //std::cout << "nShadPxlsVal = " << nShadPxlsVal << std::endl;
+                //std::cout << "numPxlOverlap = " << *numPxlOverlap << std::endl;
+                
+                if(nShadPxlsVal == 0)
+                {
+                    (*cloudPropOverlap) = 0.0;
+                    *numPxlOverlap = 0;
+                    insideimg = false;
+                }
+                else
+                {
+                    (*cloudPropOverlap) = ((double)(*numPxlOverlap))/((double)nShadPxlsVal);
+                }
+            }
+            else
+            {
+                (*cloudPropOverlap) = 0.0;
+                *numPxlOverlap = 0;
+            }
+        }
+        catch (rsgis::img::RSGISImageCalcException &e)
+        {
+            throw e;
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
         
+        return insideimg;
     }
     
     RSGISEditCloudShadowImg::~RSGISEditCloudShadowImg()
     {
-        
+        delete this->imgCalc;
+        delete this->calcCloudShadCorr;
     }
 
     
@@ -1110,6 +1250,82 @@ namespace rsgis{namespace calib{
         {
             output[0] = 0.0;
             output[1] = 0.0;
+        }
+    }
+    
+    
+    RSGISCalcCloudShadowCorrespondance::RSGISCalcCloudShadowCorrespondance():rsgis::img::RSGISCalcImageValue(0)
+    {
+        nShadPxls = 0;
+        nShadPxlsInPotent = 0;
+    }
+    
+    
+    void RSGISCalcCloudShadowCorrespondance::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException)
+    {
+        if(numIntVals != 3)
+        {
+            throw rsgis::img::RSGISImageCalcException("Incorrection number of bands, expecting 3 integer bands.");
+        }
+        
+        if(intBandValues[0] == 0)
+        {
+            if(intBandValues[2] == 1)
+            {
+                ++nShadPxls;
+            
+                if(intBandValues[1] == 1)
+                {
+                    ++nShadPxlsInPotent;
+                }
+            }
+        }
+        /*
+        std::cout << "intBandValues[0] = " << intBandValues[0] << std::endl;
+        std::cout << "intBandValues[1] = " << intBandValues[1] << std::endl;
+        std::cout << "intBandValues[2] = " << intBandValues[2] << std::endl;
+        
+        std::cout << "nShadPxls = " << nShadPxls << std::endl;
+        std::cout << "nShadPxlsInPotent = " << nShadPxlsInPotent << std::endl << std::endl;
+        */
+    }
+    
+    void RSGISCalcCloudShadowCorrespondance::reset()
+    {
+        nShadPxls = 0;
+        nShadPxlsInPotent = 0;
+    }
+    
+    void RSGISCalcCloudShadowCorrespondance::getNPxls(unsigned long *nShadPxlsVal, unsigned long *nShadPxlsInPotentVal)
+    {
+        (*nShadPxlsVal) = this->nShadPxls;
+        (*nShadPxlsInPotentVal) = this->nShadPxlsInPotent;
+    }
+    
+    RSGISCalcCloudShadowCorrespondance::~RSGISCalcCloudShadowCorrespondance()
+    {
+        
+    }
+    
+    
+    void RSGISCalcCombineMasks::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(rsgis::img::RSGISImageCalcException)
+    {
+        if(numIntVals != 2)
+        {
+            throw rsgis::img::RSGISImageCalcException("Expecting 2 integer values.");
+        }
+        
+        if(intBandValues[0] == 1)
+        {
+            output[0] = 1;
+        }
+        else if(intBandValues[1] == 1)
+        {
+            output[0] = 2;
+        }
+        else
+        {
+            output[0] = 0;
         }
         
     }

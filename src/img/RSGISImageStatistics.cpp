@@ -988,7 +988,7 @@ namespace rsgis{namespace img{
         return percentileVal;
     }
     
-    double RSGISImagePercentiles::getPercentile(GDALDataset *dataset, unsigned int band, GDALDataset *maskDS, int maskVal, float percentile, float noDataVal, bool noDataDefined, geos::geom::Envelope *env)throw(rsgis::RSGISImageException)
+    double RSGISImagePercentiles::getPercentile(GDALDataset *dataset, unsigned int band, GDALDataset *maskDS, int maskVal, float percentile, float noDataVal, bool noDataDefined, geos::geom::Envelope *env, bool quiet)throw(rsgis::RSGISImageException)
     {
         double percentileVal = 0.0;
         try
@@ -1001,7 +1001,7 @@ namespace rsgis{namespace img{
             GDALDataset **datasets = new GDALDataset*[2];
             datasets[0] = maskDS;
             datasets[1] = dataset;
-            calcImg.calcImageInEnv(datasets, 1, 1, env);
+            calcImg.calcImageInEnv(datasets, 1, 1, env, quiet);
             
             std::sort(dataVals->begin(), dataVals->end());
             percentileVal = gsl_stats_quantile_from_sorted_data(&(*dataVals)[0], 1, dataVals->size(), percentile);
