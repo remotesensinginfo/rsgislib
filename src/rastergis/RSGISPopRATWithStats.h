@@ -164,7 +164,7 @@ namespace rsgis{namespace rastergis{
     class DllExport RSGISCalcClusterPxlValueHistograms : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
-		RSGISCalcClusterPxlValueHistograms(unsigned int **clumpHistData, double *binBounds, unsigned int numBins, unsigned int ratBand, unsigned int imgBand);
+		RSGISCalcClusterPxlValueHistograms(unsigned int **clumpHistData, double *binBounds, unsigned int numBins, unsigned int ratBand, unsigned int imgBand, double noDataVal, bool useNoDataVal);
 		void calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
 		void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
         void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException);
@@ -182,6 +182,8 @@ namespace rsgis{namespace rastergis{
         unsigned int numBins;
         unsigned int ratBand;
         unsigned int imgBand;
+        double noDataVal;
+        bool useNoDataVal;
 	};
     
     
