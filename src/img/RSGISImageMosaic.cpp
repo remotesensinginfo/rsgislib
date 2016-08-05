@@ -2141,7 +2141,7 @@ namespace rsgis{namespace img{
                 for(int i = 0; i < numberBands; ++i)
                 {
                     keaBaseImgIO->createOverview(i+1, j+1, overviewImgsSize[j][0], overviewImgsSize[j][1]);
-                    keaBaseImgIO->writeToOverview(i+1, j+1, data, 0, 0, overviewImgsSize[j][0], overviewImgsSize[j][1], overviewImgsSize[j][0], overviewImgsSize[j][1], kealib::KEADataType::kea_32float);
+                    keaBaseImgIO->writeToOverview(i+1, j+1, data, 0, 0, overviewImgsSize[j][0], overviewImgsSize[j][1], overviewImgsSize[j][0], overviewImgsSize[j][1], kealib::kea_32float);
                 }
                 delete[] data;
             }
@@ -2198,7 +2198,7 @@ namespace rsgis{namespace img{
                         imgBand = dataset->GetRasterBand(j+1);
                         gdalBandOver = imgBand->GetOverview(i);
                         gdalBandOver->RasterIO(GF_Read, 0, 0, overWidth, overHeight, data, overWidth, overHeight, GDT_Float32, 0, 0);
-                        keaBaseImgIO->writeToOverview(j+1, i+1, data, xDiffOvPxl, yDiffOvPxl, overWidth, overHeight, overWidth, overHeight, kealib::KEADataType::kea_32float);
+                        keaBaseImgIO->writeToOverview(j+1, i+1, data, xDiffOvPxl, yDiffOvPxl, overWidth, overHeight, overWidth, overHeight, kealib::kea_32float);
                     }
                     delete[] data;
                 }
