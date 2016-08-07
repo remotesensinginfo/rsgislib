@@ -1044,17 +1044,20 @@ static PyObject *ImageCalibration_landsatThermalRad2Brightness(PyObject *self, P
 
 static PyObject *ImageCalibration_applyLandsatTMCloudFMask(PyObject *self, PyObject *args)
 {
-    const char *pszInputTOAFile, *pszInputThermalFile, *pszInputSatFile, *pszOutputFile, *pszOutputPass1TmpFile, *pszOutputCloudProbTmpFile, *pszGDALFormat;
+    const char *pszInputTOAFile, *pszInputThermalFile, *pszInputSatFile, *pszValidAreaImg, *pszOutputFile, *pszTmpImgsBase, *pszTmpImgsFileExt, *pszGDALFormat;
+    float sunAz, sunZen, senAz, senZen = 0.0;
     float scaleFactor;
+    int rmTmpImages = true;
     
-    if( !PyArg_ParseTuple(args, "sssssssf:applyLandsatTMCloudFMask", &pszInputTOAFile, &pszInputThermalFile, &pszInputSatFile, &pszOutputFile, &pszOutputPass1TmpFile, &pszOutputCloudProbTmpFile, &pszGDALFormat, &scaleFactor))
+    
+    if( !PyArg_ParseTuple(args, "ssssssfffffss|i:applyLandsatTMCloudFMask", &pszInputTOAFile, &pszInputThermalFile, &pszInputSatFile, &pszValidAreaImg, &pszOutputFile, &pszGDALFormat, &sunAz, &sunZen, &senAz, &senZen, &scaleFactor, &pszTmpImgsBase, &pszTmpImgsFileExt, &rmTmpImages))
     {
         return NULL;
     }
     
     try
     {
-        rsgis::cmds::executeLandsatTMCloudFMask(std::string(pszInputTOAFile), std::string(pszInputThermalFile), std::string(pszInputSatFile), std::string(pszOutputFile), std::string(pszOutputPass1TmpFile), std::string(pszOutputCloudProbTmpFile), std::string(pszGDALFormat), scaleFactor);
+        rsgis::cmds::executeLandsatTMCloudFMask(std::string(pszInputTOAFile), std::string(pszInputThermalFile), std::string(pszInputSatFile), std::string(pszValidAreaImg), std::string(pszOutputFile), std::string(pszGDALFormat), sunAz, sunZen, senAz, senZen, scaleFactor, std::string(pszTmpImgsBase), std::string(pszTmpImgsFileExt), (bool)rmTmpImages);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -1252,6 +1255,8 @@ static PyObject *ImageCalibration_spot5ToRadiance(PyObject *self, PyObject *args
     
     Py_RETURN_NONE;
 }
+
+
 
 
 // Our list of functions in this module
@@ -1456,18 +1461,24 @@ static PyMethodDef ImageCalibrationMethods[] = {
     "\n"},
     
 {"applyLandsatTMCloudFMask", ImageCalibration_applyLandsatTMCloudFMask, METH_VARARGS,
-    "imagecalibration.applyLandsatTMCloudFMask(inputTOAImage, inputThermalImage, inputSaturateImage, outputImage, pass1OutputTmpImage, cloudProbOutputTmpImage, gdalFormat, scaleFactorIn)\n"
+    "imagecalibration.applyLandsatTMCloudFMask(inputTOAImage, inputThermalImage, inputSaturateImage, inValidAreaImage, outputImage, gdalFormat, sunAz, sunZen, senAz, senZen, scaleFactorIn, tmpImgsBase, tmpImgsFileExt, rmTmpImgs)\n"
     "Converts at sensor radiance values to Top of Atmosphere Reflectance.\n"
     "Where:\n"
     "\n"
     "* inputTOAImage is a string containing the name of the input image TOA reflectance file\n"
     "* inputThermalImage is a string containing the name of the input image with at sensor temperature (in celsius)"
     "* inputSaturateImage is a string containing the name of the input image file mask for the saturated pixels per band (including thermal)\n"
+    "* inValidAreaImage is a string containing the name of a binary image specifying the valid area of the image data (1 is valid area)\n"
     "* outputImage is a string containing the name of the output image file\n"
-    "* pass1OutputTmpImage is a string containing the name of an output tempoary image file for pass 1.\n"
-    "* cloudProbOutputTmpImage is a string containing the name of an output tempoary image file for the land cloud probability.\n"
     "* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+    "* sunAz is the solar azimuth of the input image\n"
+    "* sunZen is the solar azimuth of the input image\n"
+    "* senAz is the sensor azimuth of the input image\n"
+    "* senZen is the sensor azimuth of the input image\n"
     "* scaleFactorIn is a float with the scale factor used to multiple the input image (reflectance and thermal) data.\n"
+    "* tmpImgsBase is a string specifying a base path and name for the tmp images used for this processing\n"
+    "* tmpImgsFileExt is a string for the file extention of the output images (e.g., .kea)\n"
+    "* rmTmpImgs is a bool specifying whether the tmp images should be deleted at the end of the processing (Optional; Default = True)\n"
     "\n"},
     
 {"worldview2ToRadiance", ImageCalibration_worldview2ToRadiance, METH_VARARGS,

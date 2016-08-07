@@ -945,7 +945,7 @@ namespace rsgis{namespace geom{
 		double yMin = trans[3]-(imgHeight*resolution);
 		double yMax = trans[3];
 		this->env->init(xMin, xMax, yMin, yMax);
-		delete trans;
+		delete[] trans;
 		this->data = (float *) CPLMalloc(sizeof(float)*imgWidth);
 		imageBand = image->GetRasterBand(1);
 		this->alpha = alpha;

@@ -77,10 +77,6 @@ namespace rsgis{namespace calib{
                 //std::cout << "temp = " << temp << std::endl;
                 
                 output[i] = (temp - 273.15);
-                if(output[i] < 0.01)
-                {
-                    output[i] = 0.01;
-                }
                 output[i] = output[i] * this->scaleFactor;
             }
             else

@@ -3084,7 +3084,7 @@ namespace rsgis{namespace img{
 			}
 			delete inDatasets;
 			delete data;
-			delete gdalTranslation;
+			delete[] gdalTranslation;
 			
 		}
 		catch(RSGISImageException e)
@@ -3205,7 +3205,7 @@ namespace rsgis{namespace img{
 			}
 			delete inDatasets;
 			delete data;
-			delete gdalTranslation;
+			delete[] gdalTranslation;
 		}
 		catch(RSGISImageException e)
 		{
@@ -3428,6 +3428,7 @@ namespace rsgis{namespace img{
         
         return imgVals;
     }
+    
 	
 	void RSGISImageUtils::copyImageRemoveSpatialReference(std::string inputImage, std::string outputImage)throw(RSGISImageException)
 	{
@@ -4453,7 +4454,7 @@ namespace rsgis{namespace img{
         double maxY = transformations[3];
         
         double maxX = minX + (xSize * pixelXRes);
-        double minY = maxY - (ySize * abs(pixelYRes));
+        double minY = maxY - (ySize * fabs(pixelYRes));
         
         // Write out information 
         outKML << "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";

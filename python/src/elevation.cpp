@@ -233,6 +233,26 @@ static PyObject *Elevation_dtmAspectMedianFilter(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
+static PyObject *Elevation_fillDEMSoilleGratin1994(PyObject *self, PyObject *args)
+{
+    const char *pszInputDTMImage, *pszValidMaskImage, *pszOutputFile, *pszGDALFormat;
+
+    if( !PyArg_ParseTuple(args, "ssss:fillDEMSoilleGratin1994", &pszInputDTMImage, &pszValidMaskImage, &pszOutputFile, &pszGDALFormat))
+        return NULL;
+    
+    try
+    {
+        rsgis::cmds::executeDEMFillSoilleGratin1994(std::string(pszInputDTMImage), std::string(pszValidMaskImage), std::string(pszOutputFile), std::string(pszGDALFormat));
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 
 // Our list of functions in this module
 static PyMethodDef ElevationMethods[] = {
@@ -332,6 +352,19 @@ static PyMethodDef ElevationMethods[] = {
 "* winHSize is an integer for half the window size.\n"
 "* gdalformat is a string with the output image format for the GDAL driver.\n"},
 
+{"fillDEMSoilleGratin1994", Elevation_fillDEMSoilleGratin1994, METH_VARARGS,
+    "rsgislib.elevation.fillDEMSoilleGratin1994(inputDEMImage, validMaskImage, outputImage, gdalformat)\n"
+    "Filter the local minima in a DEM using the Soille and Gratin 1994 algorithm.\n\n"
+    "Soille, P., and Gratin, C. (1994). An efficient algorithm for drainage network\n"
+    "extraction on DEMs. J. Visual Communication and Image Representation. 5(2). 181-189.\n"
+    "\n"
+    "Where:\n"
+    "\n"
+    "* inputDEMImage is a string containing the name and path of the input DEM file.\n"
+    "* validMaskImage is a string containing the name and path to a binary image specifying the valid data region (1 == valid)\n"
+    "* outputImage is a string containing the name and path of the output file.\n"
+    "* gdalformat is a string with the output image format for the GDAL driver.\n"},
+    
     {NULL}        /* Sentinel */
 };
 

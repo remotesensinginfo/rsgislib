@@ -69,6 +69,31 @@ namespace rsgis{namespace rastergis{
         std::string sumField;
         unsigned int sumFieldIdx;
         unsigned int sumLocalIdx;
+        
+        void init()
+        {
+            band = 0;
+            calcMin = false;
+            minField = "";
+            minFieldIdx = 0;
+            minLocalIdx = 0;
+            calcMax = false;
+            maxField = "";
+            maxFieldIdx = 0;
+            maxLocalIdx = 0;
+            calcMean = false;
+            meanField = "";
+            meanFieldIdx = 0;
+            meanLocalIdx = 0;
+            calcStdDev = false;
+            stdDevField = "";
+            stdDevFieldIdx = 0;
+            stdDevLocalIdx = 0;
+            calcSum = false;
+            sumField = "";
+            sumFieldIdx = 0;
+            sumLocalIdx = 0;
+        };
     };
     
     struct DllExport RSGISBandAttPercentiles
@@ -139,7 +164,7 @@ namespace rsgis{namespace rastergis{
     class DllExport RSGISCalcClusterPxlValueHistograms : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
-		RSGISCalcClusterPxlValueHistograms(unsigned int **clumpHistData, double *binBounds, unsigned int numBins, unsigned int ratBand, unsigned int imgBand);
+		RSGISCalcClusterPxlValueHistograms(unsigned int **clumpHistData, double *binBounds, unsigned int numBins, unsigned int ratBand, unsigned int imgBand, double noDataVal, bool useNoDataVal);
 		void calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
 		void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
         void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException);
@@ -157,6 +182,8 @@ namespace rsgis{namespace rastergis{
         unsigned int numBins;
         unsigned int ratBand;
         unsigned int imgBand;
+        double noDataVal;
+        bool useNoDataVal;
 	};
     
     

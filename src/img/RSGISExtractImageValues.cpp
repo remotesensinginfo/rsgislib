@@ -116,7 +116,6 @@ namespace rsgis{namespace img{
         }
     }
     
-    
     RSGISExtractImageValuesWithMask::~RSGISExtractImageValuesWithMask()
     {
         
@@ -144,6 +143,77 @@ namespace rsgis{namespace img{
             calcImg.calcImageExtent(&image, 1);
             
             delete extractPxls;
+        }
+        catch (RSGISImageException &e)
+        {
+            throw e;
+        }
+        catch (RSGISException &e)
+        {
+            throw RSGISImageException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw RSGISImageException(e.what());
+        }
+    }
+    
+    void RSGISExtractPxlsAsPts::exportPixelsAsPoints(GDALDataset *image, float maskVal, std::vector<std::pair<double,double> > *pxPts, geos::geom::Envelope *env) throw(RSGISImageException)
+    {
+        try
+        {
+            RSGISExtractPxlsAsPts2VecImgCalc extractPxls = RSGISExtractPxlsAsPts2VecImgCalc(pxPts, maskVal);
+            RSGISCalcImage calcImg = RSGISCalcImage(&extractPxls, "", true);
+            if(env == NULL)
+            {
+                calcImg.calcImageExtent(&image, 1);
+            }
+            else
+            {
+                calcImg.calcImageExtent(&image, 1, env);
+            }
+            
+        }
+        catch (RSGISImageException &e)
+        {
+            throw e;
+        }
+        catch (RSGISException &e)
+        {
+            throw RSGISImageException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw RSGISImageException(e.what());
+        }
+    }
+    
+    void RSGISExtractPxlsAsPts::exportPixelsAsPointsWithVal(GDALDataset *image, float maskVal, GDALDataset *valImg, int valImgBand, std::vector<std::pair<std::pair<double,double>,double> > *pxPts, bool quiet, geos::geom::Envelope *env) throw(RSGISImageException)
+    {
+        try
+        {
+            if((valImgBand-1) >= valImg->GetRasterCount())
+            {
+                throw RSGISImageException("Specified value band is not in the image.");
+            }
+            
+            GDALDataset **datasets = new GDALDataset*[2];
+            datasets[0] = image;
+            datasets[1] = valImg;
+            
+            unsigned int bandIdx = image->GetRasterCount() + (valImgBand-1);
+            
+            RSGISExtractPxlsAsPts2VecWithValImgCalc extractPxls = RSGISExtractPxlsAsPts2VecWithValImgCalc(pxPts, maskVal, bandIdx);
+            RSGISCalcImage calcImg = RSGISCalcImage(&extractPxls, "", true);
+            if(env == NULL)
+            {
+                calcImg.calcImageExtent(datasets, 2, NULL, quiet);
+            }
+            else
+            {
+                calcImg.calcImageExtent(datasets, 2, env, quiet);
+            }
+            delete[] datasets;
         }
         catch (RSGISImageException &e)
         {
@@ -191,6 +261,52 @@ namespace rsgis{namespace img{
         
     }
 
+    
+
+    RSGISExtractPxlsAsPts2VecImgCalc::RSGISExtractPxlsAsPts2VecImgCalc(std::vector<std::pair<double,double> > *pxPts, float maskValue):RSGISCalcImageValue(0)
+    {
+        this->pxPts = pxPts;
+        this->maskValue = maskValue;
+    }
+    
+    void RSGISExtractPxlsAsPts2VecImgCalc::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException)
+    {
+        if(bandValues[0] == maskValue)
+        {
+            geos::geom::Coordinate centre;
+            extent.centre(centre);
+            pxPts->push_back(std::pair<double,double>(centre.x, centre.y));
+        }
+    }
+    
+    RSGISExtractPxlsAsPts2VecImgCalc::~RSGISExtractPxlsAsPts2VecImgCalc()
+    {
+        
+    }
+    
+    RSGISExtractPxlsAsPts2VecWithValImgCalc::RSGISExtractPxlsAsPts2VecWithValImgCalc(std::vector<std::pair<std::pair<double,double>,double> > *pxPts, float maskValue, int valIdx):RSGISCalcImageValue(0)
+    {
+        this->pxPts = pxPts;
+        this->maskValue = maskValue;
+        this->valIdx = valIdx;
+    }
+    
+    void RSGISExtractPxlsAsPts2VecWithValImgCalc::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException)
+    {
+        if(bandValues[0] == maskValue)
+        {
+            geos::geom::Coordinate centre;
+            extent.centre(centre);
+            pxPts->push_back(std::pair<std::pair<double,double>, double>(std::pair<double,double>(centre.x, centre.y), bandValues[valIdx]));
+        }
+    }
+    
+    RSGISExtractPxlsAsPts2VecWithValImgCalc::~RSGISExtractPxlsAsPts2VecWithValImgCalc()
+    {
+        
+    }
+
+    
     
     
 }}
