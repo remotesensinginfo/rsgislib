@@ -183,6 +183,8 @@ namespace rsgis
 			private:
                 double resDiffThresh; // Maximum difference between image resolutions (as a fraction).
 			};
+        
+        
 	}
 }
 

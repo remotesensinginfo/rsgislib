@@ -119,7 +119,7 @@ namespace rsgis { namespace img {
 			delete imgDataCounts;
 			
 			GDALClose(outImage);
-			delete transformation;
+			delete[] transformation;
 		}
 		catch (rsgis::RSGISFileException &e) 
 		{

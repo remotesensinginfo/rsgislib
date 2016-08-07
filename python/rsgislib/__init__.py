@@ -398,6 +398,20 @@ class RSGISPyUtils (object):
         except Exception as e:
             raise e
         return outList
+    
+    def writeList2File(self, dataList, outFile):
+        """
+        Write a list a text file, one line per item.
+        """
+        try:
+            f = open(outFile, 'w')
+            for item in dataList:
+               f.write(str(item)+'\n')
+            f.flush()
+            f.close()
+        except Exception as e:
+            raise e
+
 
 class RSGISTime (object):
     """ Class to calculate run time for a function, format and print out (similar to for XML interface).

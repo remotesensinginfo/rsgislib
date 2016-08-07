@@ -864,7 +864,7 @@ namespace rsgis{namespace math{
 		gsl_matrix_free (eigenVectorsGSL);
 	}
 	
-	void RSGISMatrices::exportAsImage(Matrix *matrix, std::string filepath) throw(RSGISMatricesException)
+	void RSGISMatrices::exportAsImage(Matrix *matrix, std::string filepath, std::string format) throw(RSGISMatricesException)
 	{
 		GDALAllRegister();
 		GDALDataset *outputImageDS = NULL;
@@ -875,10 +875,10 @@ namespace rsgis{namespace math{
 		try
 		{
 			// Create new Image
-			gdalDriver = GetGDALDriverManager()->GetDriverByName("ENVI");
+			gdalDriver = GetGDALDriverManager()->GetDriverByName(format.c_str());
 			if(gdalDriver == NULL)
 			{
-				throw RSGISMatricesException("Image output error: ENVI driver does not exists..");
+				throw RSGISMatricesException("Image output error: image driver does not exists..");
 			}
 			outputImageDS = gdalDriver->Create(filepath.c_str(), matrix->m, matrix->n, 1, GDT_Float32, gdalDriver->GetMetadata());
 			outputRasterBand = outputImageDS->GetRasterBand(1);
@@ -1101,6 +1101,53 @@ namespace rsgis{namespace math{
 		
 		return convertedMatrix;
 	}
+    
+    
+    void RSGISMatrices::makeCircularBinaryMatrix(Matrix *matrix) throw(RSGISMatricesException)
+    {
+        if(matrix->n != matrix->m)
+        {
+            throw RSGISMatricesException("Matrix must be square.");
+        }
+        if(matrix->n % 2 == 0)
+        {
+            throw RSGISMatricesException("Matrix size must be odd.");
+        }
+        
+        int index = 0;
+        int xCoord = ((matrix->n-1)/2)*(-1);
+        int yCoord = ((matrix->n-1)/2);
+        int radius = (matrix->n-1)/2;
+        float radiusSq = (radius+0.25) * (radius+0.25);
+        int distSq = 0;
+        
+        for(int i = 0; i < matrix->n; i++)  // Loop through rows
+        {
+            xCoord = ((matrix->n-1)/2)*(-1);
+            for(int j = 0; j < matrix->m; j++) // Loop through columns
+            {
+                distSq = (xCoord*xCoord) + (yCoord*yCoord);
+                if(distSq <= radiusSq)
+                {
+                    matrix->matrix[index++] = 1.0;
+                }
+                else
+                {
+                    matrix->matrix[index++] = 0.0;
+                }
+                /*
+                if(j != 0)
+                {
+                    std::cout << " ";
+                }
+                std::cout << "[" << xCoord << "," << yCoord << "]";
+                 */
+                ++xCoord;
+            }
+            //std::cout << std::endl;
+            --yCoord;
+        }
+    }
 	
 	RSGISMatrices::~RSGISMatrices()
 	{

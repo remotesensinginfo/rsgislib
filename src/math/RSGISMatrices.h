@@ -90,7 +90,7 @@ namespace rsgis{namespace math{
 			void saveGSLMatrix2GridTxt(gsl_matrix *gslMatrix, std::string filepath) throw(RSGISMatricesException,RSGISOutputStreamException);
 			void saveGSLMatrix2Txt(gsl_matrix *gslMatrix, std::string filepath) throw(RSGISMatricesException,RSGISOutputStreamException);
 			void saveGSLMatrix2CSV(gsl_matrix *gslMatrix, std::string filepath) throw(RSGISMatricesException,RSGISOutputStreamException);
-			void exportAsImage(Matrix *matrix, std::string filepath) throw(RSGISMatricesException);
+            void exportAsImage(Matrix *matrix, std::string filepath, std::string format="KEA") throw(RSGISMatricesException);
 			Matrix* readMatrixFromTxt(std::string filepath) throw(RSGISMatricesException,RSGISInputStreamException);
 			Matrix* readMatrixFromGridTxt(std::string filepath) throw(RSGISMatricesException,RSGISInputStreamException);
 			Matrix* readMatrixFromBinary(std::string filepath) throw(RSGISMatricesException,RSGISInputStreamException);
@@ -104,6 +104,7 @@ namespace rsgis{namespace math{
 			Matrix* duplicateMatrix(Matrix *matrix, int xDuplications, int yDuplications) throw(RSGISMatricesException);
 			gsl_matrix* convertRSGIS2GSLMatrix(Matrix *matrix) throw(RSGISMatricesException);
 			Matrix* convertGSL2RSGISMatrix(gsl_matrix *matrix) throw(RSGISMatricesException);
+            void makeCircularBinaryMatrix(Matrix *matrix) throw(RSGISMatricesException);
 			~RSGISMatrices();
 		};
 }}

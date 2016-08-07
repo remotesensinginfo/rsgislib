@@ -953,11 +953,103 @@ namespace rsgis{namespace img{
         return percentileVal;
     }
     
+    double RSGISImagePercentiles::getPercentile(GDALDataset *dataset, unsigned int band, GDALDataset *maskDS, int maskVal, float percentile, float noDataVal, bool noDataDefined)throw(rsgis::RSGISImageException)
+    {
+        double percentileVal = 0.0;
+        try
+        {
+            std::vector<double> *dataVals = new std::vector<double>();
+            
+            RSGISGetPixelBandValues calcGetBandVals = RSGISGetPixelBandValues(dataVals, band, maskVal, noDataVal, noDataDefined);
+            RSGISCalcImage calcImg = RSGISCalcImage(&calcGetBandVals, "", true);
+            
+            GDALDataset **datasets = new GDALDataset*[2];
+            datasets[0] = maskDS;
+            datasets[1] = dataset;
+            calcImg.calcImage(datasets, 1, 1);
+            
+            std::sort(dataVals->begin(), dataVals->end());
+            percentileVal = gsl_stats_quantile_from_sorted_data(&(*dataVals)[0], 1, dataVals->size(), percentile);
+            delete dataVals;
+        }
+        catch (rsgis::RSGISImageException &e)
+        {
+            throw e;
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw rsgis::RSGISImageException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw rsgis::RSGISImageException(e.what());
+        }
+        
+        return percentileVal;
+    }
+    
+    double RSGISImagePercentiles::getPercentile(GDALDataset *dataset, unsigned int band, GDALDataset *maskDS, int maskVal, float percentile, float noDataVal, bool noDataDefined, geos::geom::Envelope *env, bool quiet)throw(rsgis::RSGISImageException)
+    {
+        double percentileVal = 0.0;
+        try
+        {
+            std::vector<double> *dataVals = new std::vector<double>();
+            
+            RSGISGetPixelBandValues calcGetBandVals = RSGISGetPixelBandValues(dataVals, band, maskVal, noDataVal, noDataDefined);
+            RSGISCalcImage calcImg = RSGISCalcImage(&calcGetBandVals, "", true);
+            
+            GDALDataset **datasets = new GDALDataset*[2];
+            datasets[0] = maskDS;
+            datasets[1] = dataset;
+            calcImg.calcImageInEnv(datasets, 1, 1, env, quiet);
+            
+            std::sort(dataVals->begin(), dataVals->end());
+            percentileVal = gsl_stats_quantile_from_sorted_data(&(*dataVals)[0], 1, dataVals->size(), percentile);
+            delete dataVals;
+        }
+        catch (rsgis::RSGISImageException &e)
+        {
+            throw e;
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw rsgis::RSGISImageException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw rsgis::RSGISImageException(e.what());
+        }
+        
+        return percentileVal;
+    }
+    
     RSGISImagePercentiles::~RSGISImagePercentiles()
     {
         
     }
 	
+    
+    
+    void RSGISGetPixelBandValues::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(RSGISImageCalcException)
+    {
+        if(numIntVals != 1)
+        {
+            throw RSGISImageCalcException("Mask image should only have 1 band.");
+        }
+        
+        if(intBandValues[0] == this->maskVal)
+        {
+            if((this->noDataDefined) && (floatBandValues[band-1] != this->noDataVal))
+            {
+                this->dataVals->push_back(floatBandValues[band-1]);
+            }
+            else
+            {
+                this->dataVals->push_back(floatBandValues[band-1]);
+            }
+        }
+    }
+    
     
     
     

@@ -487,7 +487,10 @@ namespace rsgis{namespace rastergis{
                 }
             }
             
-            RSGISCalcClusterPxlValueHistograms *calcImgValHists = new RSGISCalcClusterPxlValueHistograms(clumpHistData, binBounds, numHistBins, ratBand, band);
+            int useNoDataVal = false;
+            double noDataVal = inputValsImage->GetRasterBand(band)->GetNoDataValue(&useNoDataVal);
+            
+            RSGISCalcClusterPxlValueHistograms *calcImgValHists = new RSGISCalcClusterPxlValueHistograms(clumpHistData, binBounds, numHistBins, ratBand, band, noDataVal, useNoDataVal);
             rsgis::img::RSGISCalcImage calcImageStats(calcImgValHists);
             calcImageStats.calcImage(datasets, 1, 1);
             delete calcImgValHists;
@@ -1363,13 +1366,15 @@ namespace rsgis{namespace rastergis{
     
     
     
-    RSGISCalcClusterPxlValueHistograms::RSGISCalcClusterPxlValueHistograms(unsigned int **clumpHistData, double *binBounds, unsigned int numBins, unsigned int ratBand, unsigned int imgBand): rsgis::img::RSGISCalcImageValue(0)
+    RSGISCalcClusterPxlValueHistograms::RSGISCalcClusterPxlValueHistograms(unsigned int **clumpHistData, double *binBounds, unsigned int numBins, unsigned int ratBand, unsigned int imgBand, double noDataVal, bool useNoDataVal): rsgis::img::RSGISCalcImageValue(0)
     {
         this->clumpHistData = clumpHistData;
         this->binBounds = binBounds;
         this->numBins = numBins;
         this->ratBand = ratBand;
         this->imgBand = imgBand;
+        this->noDataVal = noDataVal;
+        this->useNoDataVal = useNoDataVal;
     }
 
     void RSGISCalcClusterPxlValueHistograms::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException)
@@ -1379,36 +1384,45 @@ namespace rsgis{namespace rastergis{
             size_t fid = boost::lexical_cast<size_t>(intBandValues[ratBand-1]);
             if((boost::math::isfinite)(floatBandValues[imgBand-1]))
             {
-                unsigned int binIdx = 0;
-                bool foundBinIdx = false;
-                for(unsigned int i = 0; i < numBins; ++i)
+                bool useVal = true;
+                if(this->useNoDataVal && (this->noDataVal == floatBandValues[imgBand-1]))
                 {
-                    if((floatBandValues[imgBand-1] >= binBounds[i]) & (floatBandValues[imgBand-1] < binBounds[i+1]))
-                    {
-                        binIdx = i;
-                        foundBinIdx = true;
-                        break;
-                    }
-                    else if((i==numBins-1) & ((floatBandValues[imgBand-1] >= binBounds[i])))
-                    {
-                        binIdx = i;
-                        foundBinIdx = true;
-                        break;
-                    }
-                }
-                if(!foundBinIdx)
-                {
-                    std::cout << std::endl;
-                    for(unsigned int i = 0; i < numBins; ++i)
-                    {
-                        std::cout << "Bin [" << i << "] : " << binBounds[i] << " - " << binBounds[i+1] << std::endl;
-                    }
-                    
-                    std::cout << "The pixel value which has caused the problem is " << floatBandValues[imgBand-1] << std::endl;
-                    throw rsgis::img::RSGISImageCalcException("The image pixel value was not found within the histogram range specified - either too big or too small.");
+                    useVal = false;
                 }
                 
-                ++clumpHistData[fid][binIdx];
+                if(useVal)
+                {
+                    unsigned int binIdx = 0;
+                    bool foundBinIdx = false;
+                    for(unsigned int i = 0; i < numBins; ++i)
+                    {
+                        if((floatBandValues[imgBand-1] >= binBounds[i]) & (floatBandValues[imgBand-1] < binBounds[i+1]))
+                        {
+                            binIdx = i;
+                            foundBinIdx = true;
+                            break;
+                        }
+                        else if((i==numBins-1) & ((floatBandValues[imgBand-1] >= binBounds[i])))
+                        {
+                            binIdx = i;
+                            foundBinIdx = true;
+                            break;
+                        }
+                    }
+                    if(!foundBinIdx)
+                    {
+                        std::cout << std::endl;
+                        for(unsigned int i = 0; i < numBins; ++i)
+                        {
+                            std::cout << "Bin [" << i << "] : " << binBounds[i] << " - " << binBounds[i+1] << std::endl;
+                        }
+                        
+                        std::cout << "The pixel value which has caused the problem is " << floatBandValues[imgBand-1] << std::endl;
+                        throw rsgis::img::RSGISImageCalcException("The image pixel value was not found within the histogram range specified - either too big or too small.");
+                    }
+                    
+                    ++clumpHistData[fid][binIdx];
+                }
             }
         }
     }

@@ -430,7 +430,7 @@ namespace rsgis{namespace rastergis{
                                                             unsigned int numOutIntCols,
                                                             std::string *outStringCols, unsigned int numOutStringCols) throw(RSGISAttributeTableException)
     {
-        bool withinClass = false;
+        //bool withinClass = false;
 
         std::string className = inStringCols[0];
 

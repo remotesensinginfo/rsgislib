@@ -135,7 +135,7 @@ namespace rsgis{namespace rastergis{
                 {
                     if(useAbsDiff)
                     {
-                        diffClumpVals->push_back(abs(dataVals[i] - dataVals[*iterNeigh]));
+                        diffClumpVals->push_back(fabs(dataVals[i] - dataVals[*iterNeigh]));
                     }
                     else
                     {

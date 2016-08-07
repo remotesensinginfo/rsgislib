@@ -81,7 +81,7 @@ namespace rsgis{namespace reg{
             outputImage->GetRasterBand(2)->SetDescription("Y Shift");
             outputImage->GetRasterBand(3)->SetDescription("Metric Value");
             
-            delete gdalTranslation;
+            delete[] gdalTranslation;
         }
         catch (RSGISRegistrationException &e)
         {

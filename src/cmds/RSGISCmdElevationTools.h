@@ -58,6 +58,8 @@ namespace rsgis{ namespace cmds {
     /** A function to filter a DTM using a variable filter with respect to aspect */
     DllExport void executeDTMAspectMedianFilter(std::string demImage, std::string aspectImage, std::string outputImage, float aspectRange, int winHSize, std::string outImageFormat)throw(RSGISCmdException);
     
+    /** A function to fill a DEM using the Soille and Gratin 1994 algorthm */
+    DllExport void executeDEMFillSoilleGratin1994(std::string inImage, std::string validDataImg, std::string outputImage, std::string outImageFormat)throw(RSGISCmdException);
 }}
 
 
