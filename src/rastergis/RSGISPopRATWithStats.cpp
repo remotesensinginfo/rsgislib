@@ -1055,7 +1055,7 @@ namespace rsgis{namespace rastergis{
             int maxCatSec = 0;
             for(size_t i = 0; i < numRows; ++i)
             {
-                //std::cout << i << ":\t[";
+                ///std::cout << i << ":\t[";
                 for(unsigned int j = 0; j < modeRange; ++j)
                 {
                     if(j == 0)
@@ -1078,7 +1078,7 @@ namespace rsgis{namespace rastergis{
                         maxCountSec = clumpHists[i][j];
                         maxCatSec = modeBinVals[j];
                     }
-                    else if(clumpHists[i][j] > maxCatSec)
+                    else if(clumpHists[i][j] > maxCountSec)
                     {
                         maxCountSec = clumpHists[i][j];
                         maxCatSec = modeBinVals[j];
