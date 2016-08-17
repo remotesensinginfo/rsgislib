@@ -5,6 +5,12 @@ The imagecalc module contains functions for performing a number of calculating o
 # import the C++ extension into this level
 from ._imagecalc import *
 
+haveGDALPy = True
+try:
+    import osgeo.gdal as gdal
+except ImportError:
+    haveGDALPy = False
+ 
 # define our own classes
 class BandDefn(object):
     """
@@ -88,6 +94,7 @@ def calcDist2ImgVals(inputValsImg, outputDistImg, pxlVals, valsImgBand=1, outImg
     A function to calculate the distance to the nearest pixel value with one of the specified values.
 
     Where:
+
     * inputValsImg is a string specifying the input image file.
     * outputDistImg is a string specfiying the output image file.
     * pxlVals is a number of list of numbers specifying the features to which the distance from should be calculated.
@@ -96,16 +103,13 @@ def calcDist2ImgVals(inputValsImg, outputDistImg, pxlVals, valsImgBand=1, outImg
     * maxDist is a number specifying the maximum distance to be calculated, if None not max value is used (Default = None).
     * noDataVal is the no data value in the input image for which distance should not be calculated for (Default = None; None = no specified no data value).
     * unitGEO is a boolean specifying the output distance units. True = Geographic units (e.g., metres), False is in Pixels (Default = True).
+
     """
-    haveGDALPy = True
-    try:
-        import osgeo.gdal as gdal
-    except ImportError as gdalErr:
-        haveGDALPy = False
-    
+   
     # Check gdal is available
     if not haveGDALPy:
-        raise Exception("The GDAL python bindings are required for calcDist2ImgVals function could not be imported\n\t" + gdalErr)
+        raise ImportError("The GDAL python bindings are required for "
+                          "calcDist2ImgVals function could not be imported")
     
     import rsgislib.imageutils
     
@@ -115,9 +119,9 @@ def calcDist2ImgVals(inputValsImg, outputDistImg, pxlVals, valsImgBand=1, outImg
     
     proxOptions = []
     
-    if not maxDist is None:
+    if maxDist is not None:
         proxOptions.append('MAXDIST='+str(maxDist))
-    if not noDataVal is None:
+    if noDataVal is not None:
         proxOptions.append('NODATA='+str(noDataVal))
     if unitGEO:
         proxOptions.append('DISTUNITS=GEO')
