@@ -4127,7 +4127,7 @@ void RSGISExeZonalStats::runAlgorithm() throw(RSGISException)
 
 					// Get pixel size
 					this->offsetSize = transformations[1];
-					delete transformations;
+					delete[] transformations;
 				}
 
 				processFeature = new RSGISZonalLSSMeanVar(inputImageDS, attributeMeanList, numAttributes, pxlcount, windowSize, offsetSize, method);
