@@ -838,7 +838,7 @@ namespace rsgis{ namespace cmds {
             bandPercentStats = new std::vector<rsgis::rastergis::RSGISBandAttPercentiles *>();
             rsgis::rastergis::RSGISBandAttPercentiles *landCloudProbPercent = new rsgis::rastergis::RSGISBandAttPercentiles();
             landCloudProbPercent->fieldName = "UpperCloudLandThres";
-            landCloudProbPercent->percentile = 82.5;
+            landCloudProbPercent->percentile = 82.5; // THRESHOLD FOR DIFFERENCIATING LAND AND CLOUD
             bandPercentStats->push_back(landCloudProbPercent);
             calcClumpStats.populateRATWithPercentileStats(landWaterClearSkyDS, pass2DS, 6, bandPercentStats, 1, 200);
             delete landCloudProbPercent;
@@ -848,7 +848,7 @@ namespace rsgis{ namespace cmds {
             bandPercentStats = new std::vector<rsgis::rastergis::RSGISBandAttPercentiles *>();
             rsgis::rastergis::RSGISBandAttPercentiles *waterCloudProbPercent = new rsgis::rastergis::RSGISBandAttPercentiles();
             waterCloudProbPercent->fieldName = "UpperCloudWaterThres";
-            waterCloudProbPercent->percentile = 82.5;
+            waterCloudProbPercent->percentile = 82.5; // THRESHOLD FOR DIFFERENCIATING LAND AND WATER
             bandPercentStats->push_back(waterCloudProbPercent);
             calcClumpStats.populateRATWithPercentileStats(landWaterClearSkyDS, pass2DS, 3, bandPercentStats, 1, 200);
             delete waterCloudProbPercent;
@@ -888,7 +888,7 @@ namespace rsgis{ namespace cmds {
             popImageStats.populateImageWithRasterGISStats(cloudClumpsDS, true, true, true, 1);
             
             std::cout << "Remove small clouds\n";
-            float smallCloudThreshold = 32;
+            float smallCloudThreshold = 32; // THRESHOLD (IN PIXELS) FOR SMALL CLOUDS
             GDALRasterAttributeTable *cloudsRAT = cloudClumpsDS->GetRasterBand(1)->GetDefaultRAT();
             
             size_t numcloudsRATHistoRows = 0;
@@ -914,7 +914,7 @@ namespace rsgis{ namespace cmds {
             bandPercentStats = new std::vector<rsgis::rastergis::RSGISBandAttPercentiles *>();
             rsgis::rastergis::RSGISBandAttPercentiles *landNIRPercent = new rsgis::rastergis::RSGISBandAttPercentiles();
             landNIRPercent->fieldName = "LowerNIRLandValue175";
-            landNIRPercent->percentile = 17.5;
+            landNIRPercent->percentile = 17.5; // NIR LAND THRESHOLD 17.5 %
             bandPercentStats->push_back(landNIRPercent);
             calcClumpStats.populateRATWithPercentileStats(landWaterClearSkyDS, reflDataset, nirIdx, bandPercentStats, 1, 200);
             delete landNIRPercent;
@@ -1070,7 +1070,6 @@ namespace rsgis{ namespace cmds {
             delete[] blue;
             delete[] classNames;
             
-            
             GDALClose(pass1DS);
             GDALClose(landWaterClearSkyDS);
             GDALClose(pass2DS);
@@ -1118,7 +1117,6 @@ namespace rsgis{ namespace cmds {
                 poDriver->Delete(tmpFinalClouds.c_str());
                 poDriver->Delete(tmpFinalCloudsDialate.c_str());
             }
-            
             
         }
         catch(RSGISException &e)
