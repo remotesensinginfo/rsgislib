@@ -157,42 +157,23 @@ namespace rsgis{namespace calib{
             // Equation 1:
             double ndsi = (bandValues[greenIdx] - bandValues[swir1Idx]) / (bandValues[greenIdx] + bandValues[swir1Idx]);
             double ndvi = (bandValues[nirIdx] - bandValues[redIdx]) / (bandValues[nirIdx] + bandValues[redIdx]);
-            
-            //std::cout << "NDVI = " << ndvi << std::endl;
-            //std::cout << "NDSI = " << ndsi << std::endl;
-            
-            //std::cout << "Thermal = " << bandValues[therm1Idx]-(273.15 * this->scaleFactor) << std::endl;
-            //std::cout << "Thermal Threshold = " << 27 * this->scaleFactor << std::endl;
-            //std::cout << "SWIR2 = " << bandValues[swir2Idx] << std::endl;
-            
             bool basicTest = (bandValues[swir2Idx] > 0.03) & (bandValues[therm1Idx] < 27) & (ndvi < 0.8) & (ndsi < 0.8);
-            
-            
             
             
             // Equation 2:
             double meanVis = (bandValues[blueIdx] + bandValues[greenIdx] + bandValues[redIdx])/3.0;
-            //std::cout << "Mean Vis = " << meanVis << std::endl;
-            
             double whiteness = fabs((bandValues[blueIdx]-meanVis)/meanVis) + fabs((bandValues[greenIdx]-meanVis)/meanVis) + fabs((bandValues[redIdx]-meanVis)/meanVis);
             
             bool whitenessTest = whiteness < 0.7;
-            //std::cout << "Whiteness = " << ((bandValues[blueIdx]-meanVis)/meanVis + (bandValues[greenIdx]-meanVis)/meanVis + (bandValues[redIdx]-meanVis)/meanVis) << std::endl;
             
             // Equation 3 (HAZE):
-            //std::cout << "Blue  = " << bandValues[blueIdx] << " Red = " << bandValues[redIdx] << std::endl;
             bool hotTest = (bandValues[blueIdx] - 0.5 * bandValues[redIdx] - 0.08) > 0;
-            //std::cout << "Hot Test: " << (bandValues[blueIdx] - 0.5 * bandValues[redIdx] - 0.08) << std::endl;
-            
             
             // Equation 4:
             bool nirswirTest = (bandValues[nirIdx] / bandValues[swir1Idx]) > 0.75;
-            //std::cout << "nirswirTest: " << (bandValues[nirIdx] / bandValues[swir1Idx]) << std::endl;
-            
             
             // Equation 5:
             bool waterTest = ((ndvi < 0.01) & (bandValues[nirIdx] < 0.11)) | ((ndvi < 0.1) & (bandValues[nirIdx] < 0.05));
-            
             
             // Equation 6
             bool pcp = basicTest & whitenessTest & hotTest & hotTest;
@@ -252,7 +233,6 @@ namespace rsgis{namespace calib{
             
             // Equation 7:
             bool clearSkyLand = !pcp & !waterTest;
-            
             
             // Equation 15:
             double modNDSI = ndsi;
@@ -462,12 +442,9 @@ namespace rsgis{namespace calib{
             brightnessProb = brightnessProb / 0.11;
             double waterCloudProb = wTempProb * brightnessProb;
             
-            
-            
             double landTempProb = (land82ndThres + (4-bandValues[therm1Idx])) / (land82ndThres + (4 - (land17thThres - 4)));
             
             double landCloudProb = bandValues[varProbIdx] * landTempProb;
-            
             
             output[0] = wTempProb;
             output[1] = brightnessProb;
@@ -490,29 +467,6 @@ namespace rsgis{namespace calib{
     {
         
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     
     RSGISLandsatFMaskPass2CloudMasking::RSGISLandsatFMaskPass2CloudMasking(unsigned int scaleFactor, unsigned int numLSBands, double landCloudProbUpperThres, double waterCloudProbUpperThres) throw(rsgis::img::RSGISImageCalcException):rsgis::img::RSGISCalcImageValue(1)
@@ -806,11 +760,9 @@ namespace rsgis{namespace calib{
             for(size_t i = 1; i < numcloudsRATHistoRows; ++i)
             {
                 r = sqrt(cloudsRATHisto[i] / (2 * pi));
-                //std::cout << "r = " << r << std::endl;
                 if(r > 8)
                 {
                     percentile = ((r-8.0)*(r-8.0)) / (r*r);
-                    //std::cout << "\tPercentile = " << percentile << std::endl;
                     env->init(minX[i], maxX[i], minY[i], maxY[i]);
                     
                     cloudBase[i] = calcImgPercentiles.getPercentile(thermal, 1, cloudClumpsDS, i, percentile, 0, true, env, true);
@@ -819,8 +771,6 @@ namespace rsgis{namespace calib{
                 {
                     cloudBase[i] = minBT[i];
                 }
-                //std::cout << "\t Value = " << cloudBase[i] << std::endl;
-                
                 
                 cloudBase[i] = cloudBase[i]/scaleFactor;
                 minBT[i] = minBT[i]/scaleFactor;
@@ -919,7 +869,6 @@ namespace rsgis{namespace calib{
             unsigned long numPxlOverlap = 0;
             bool calcdShadProp = true;
             
-            //size_t i = 487;
             for(size_t i = 1; i < numClumps; ++i)
             {
                 std::cout << "Processing clump " << i << " has " << cloudsRATHisto[i] << " pixels." << std::endl;
@@ -1004,12 +953,6 @@ namespace rsgis{namespace calib{
                 std::cout << std::endl;
             }
             
-            
-            
-            
-            
-            
-            
             delete env;
             delete[] cloudBase;
             delete[] hBaseMin;
@@ -1067,8 +1010,6 @@ namespace rsgis{namespace calib{
     
     bool RSGISEditCloudShadowImg::turnOnPxl(double x, double y)throw(rsgis::img::RSGISImageCalcException)
     {
-        //std::cout << "BBOX [" << this->tlX << ", " << this->brX << "][" << this->brY << ", " << this->tlY << "]\n";
-        //std::cout << "PT [" << x << ", " << y << "]\n";
         bool rtnStat = true;
         if((x < this->tlX) | (x > this->brX))
         {
