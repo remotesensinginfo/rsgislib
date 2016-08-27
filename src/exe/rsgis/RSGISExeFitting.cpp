@@ -679,8 +679,8 @@ void RSGISExeFitting::runAlgorithm() throw(rsgis::RSGISException)
 				// Save out as plot file
 				RSGISExportForPlotting::getInstance()->export2DScatter(this->outfile, measured, predicted, numPts);
 				
-				delete measured;
-				delete predicted;
+				delete[] measured;
+				delete[] predicted;
 			}
 			catch(rsgis::RSGISException e)
 			{
@@ -779,8 +779,8 @@ void RSGISExeFitting::runAlgorithm() throw(rsgis::RSGISException)
 				// Save out as plot file
 				RSGISExportForPlotting::getInstance()->export2DScatter(this->outfile, measured, predicted, numPts);
 				
-				delete measured;
-				delete predicted;
+				delete[] measured;
+				delete[] predicted;
 			
 			}
 			catch(rsgis::RSGISException e)
