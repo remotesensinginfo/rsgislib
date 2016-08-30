@@ -49,6 +49,14 @@ namespace rsgis{namespace calib{
                 if(bandValues[i] != noDataVal)
                 {
                     output[i] = (bandValues[i] - bandValues[i+this->numImageBands]) + this->darkObjReflVal;
+                    
+                    if(nonNegative)
+                    {
+                        if(output[i] <= 0)
+                        {
+                            output[i] = 1.0;
+                        }
+                    }
                 }
                 else
                 {
@@ -58,13 +66,13 @@ namespace rsgis{namespace calib{
             else
             {
                 output[i] = (bandValues[i] - bandValues[i+this->numImageBands]) + this->darkObjReflVal;
-            }
-            
-            if(nonNegative)
-            {
-                if(output[i] < 0)
+                
+                if(nonNegative)
                 {
-                    output[i] = 1.0;
+                    if(output[i] <= 0)
+                    {
+                        output[i] = 1.0;
+                    }
                 }
             }
         }
@@ -96,6 +104,14 @@ namespace rsgis{namespace calib{
                 if(bandValues[i] != noDataVal)
                 {
                     output[i] = (bandValues[i] - this->offsetValues.at(i)) + this->darkObjReflVal;
+                    
+                    if(nonNegative)
+                    {
+                        if(output[i] <= 0)
+                        {
+                            output[i] = 1.0;
+                        }
+                    }
                 }
                 else
                 {
@@ -105,13 +121,13 @@ namespace rsgis{namespace calib{
             else
             {
                 output[i] = (bandValues[i] - bandValues[i+this->numImageBands]) + this->darkObjReflVal;
-            }
-            
-            if(nonNegative)
-            {
-                if(output[i] < 0)
+                
+                if(nonNegative)
                 {
-                    output[i] = 1.0;
+                    if(output[i] <= 0)
+                    {
+                        output[i] = 1.0;
+                    }
                 }
             }
         }
