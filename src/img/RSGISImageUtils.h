@@ -179,6 +179,7 @@ namespace rsgis
                 double getPixelValue(GDALDataset *image, unsigned int imgBand, double xLoc, double yLoc) throw(RSGISImageException);
                 void createImageGrid(GDALDataset *inData, unsigned int numXPxls, unsigned int numYPxls, bool offset) throw(RSGISImageException);
                 void populateImagePixelsInRange(GDALDataset *image, int minVal, int maxVal, bool singleLine) throw(RSGISImageException);
+                void setImageBandNames(GDALDataset *dataset, std::vector<std::string> bandNames, bool quiet=false) throw(RSGISImageException);
                 ~RSGISImageUtils();
 			private:
                 double resDiffThresh; // Maximum difference between image resolutions (as a fraction).

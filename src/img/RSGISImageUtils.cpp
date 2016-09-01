@@ -4701,6 +4701,34 @@ namespace rsgis{namespace img{
             throw e;
         }
     }
+    
+    
+    void RSGISImageUtils::setImageBandNames(GDALDataset *dataset, std::vector<std::string> bandNames, bool quiet) throw(RSGISImageException)
+    {
+        try
+        {
+            unsigned int numBands = dataset->GetRasterCount();
+            if(numBands != bandNames.size())
+            {
+                throw RSGISImageException("List of names must be the same length as the number of image bands.");
+            }
+
+            unsigned int bandN = 0;
+            for(unsigned int n = 0; n < numBands; ++n)
+            {
+                bandN = n + 1;
+                if(!quiet)
+                {
+                    std::cout << "Setting band " << bandN << " name as \'" << bandNames.at(n) << "\'\n";
+                }
+                dataset->GetRasterBand(bandN)->SetDescription(bandNames.at(n).c_str());
+            }
+        }
+        catch(RSGISImageException &e)
+        {
+            throw e;
+        }
+    }
 
 	RSGISImageUtils::~RSGISImageUtils()
 	{
