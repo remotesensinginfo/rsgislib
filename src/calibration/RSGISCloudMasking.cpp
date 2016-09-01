@@ -25,9 +25,11 @@
 
 namespace rsgis{namespace calib{
     
-    RSGISLandsatFMaskPass1CloudMasking::RSGISLandsatFMaskPass1CloudMasking(unsigned int scaleFactor, unsigned int numLSBands) throw(rsgis::img::RSGISImageCalcException):rsgis::img::RSGISCalcImageValue(15)
+    RSGISLandsatFMaskPass1CloudMasking::RSGISLandsatFMaskPass1CloudMasking(unsigned int scaleFactor, unsigned int numLSBands, double whitenessThreshold) throw(rsgis::img::RSGISImageCalcException):rsgis::img::RSGISCalcImageValue(16)
     {
         this->scaleFactor = scaleFactor;
+        this->whitenessThreshold = whitenessThreshold;
+        
         if(numLSBands == 9)
         {
             this->coastalIdx = 0;
@@ -154,32 +156,35 @@ namespace rsgis{namespace calib{
                 bandValues[therm2Idx] = bandValues[therm2Idx]/this->scaleFactor;
             }
             
-            // Equation 1:
+            // Equation 1 (Zhu and Woodcock 2012, RSE 118, pp83-94):
             double ndsi = (bandValues[greenIdx] - bandValues[swir1Idx]) / (bandValues[greenIdx] + bandValues[swir1Idx]);
             double ndvi = (bandValues[nirIdx] - bandValues[redIdx]) / (bandValues[nirIdx] + bandValues[redIdx]);
-            bool basicTest = (bandValues[swir2Idx] > 0.03) & (bandValues[therm1Idx] < 27) & (ndvi < 0.8) & (ndsi < 0.8);
+            bool basicTest = (bandValues[swir2Idx] > 0.03) & (bandValues[therm1Idx] < 27) & (ndvi < 0.8) & (ndsi < 0.8); // True are potential clouds.
             
             
-            // Equation 2:
+            // Equation 2 (Zhu and Woodcock 2012, RSE 118, pp83-94):
             double meanVis = (bandValues[blueIdx] + bandValues[greenIdx] + bandValues[redIdx])/3.0;
             double whiteness = fabs((bandValues[blueIdx]-meanVis)/meanVis) + fabs((bandValues[greenIdx]-meanVis)/meanVis) + fabs((bandValues[redIdx]-meanVis)/meanVis);
             
-            bool whitenessTest = whiteness < 0.7;
+            bool whitenessTest = whiteness < whitenessThreshold; // Whiteness threshold defined as 0.7 in the Zhu and Woodcock 2012, RSE 118, pp83-94 paper but is useful to be able to edit.
             
-            // Equation 3 (HAZE):
+            // Equation 3 (HAZE) (Zhu and Woodcock 2012, RSE 118, pp83-94):
             bool hotTest = (bandValues[blueIdx] - 0.5 * bandValues[redIdx] - 0.08) > 0;
             
-            // Equation 4:
+            // Equation 4 (Zhu and Woodcock 2012, RSE 118, pp83-94):
             bool nirswirTest = (bandValues[nirIdx] / bandValues[swir1Idx]) > 0.75;
             
-            // Equation 5:
+            // Equation 5 (Zhu and Woodcock 2012, RSE 118, pp83-94):
             bool waterTest = ((ndvi < 0.01) & (bandValues[nirIdx] < 0.11)) | ((ndvi < 0.1) & (bandValues[nirIdx] < 0.05));
             
-            // Equation 6
-            bool pcp = basicTest & whitenessTest & hotTest & hotTest;
+            // Equation 6 (Zhu and Woodcock 2012, RSE 118, pp83-94):
+            bool pcp = basicTest & whitenessTest & hotTest & nirswirTest;
             
-            // This is an extra saturation test added by DERM, and is not part of the Fmask algorithm.
-            // However, some cloud centres are saturated, and thus fail the whiteness and haze tests
+            ///////////////////////////////////////////////////////////////
+            // This is an extra saturation test added by DERM and copied
+            // from the python-fmask implementation, and is not part of the
+            // Fmask algorithm. However, some cloud centres are saturated,
+            // and thus fail the whiteness and haze tests
             bool saturatedPxl = false;
             if(coastal)
             {
@@ -230,11 +235,18 @@ namespace rsgis{namespace calib{
                 whitenessTest = true;
                 whiteness = 0.0;
             }
+            ///////////////////////////////////////////////////////////////
             
-            // Equation 7:
+            // Equation 7 (Zhu and Woodcock 2012, RSE 118, pp83-94):
+            bool clearSkyWater = waterTest & (bandValues[swir2Idx] < 0.03);
+            
+            // Equation 12 (Zhu and Woodcock 2012, RSE 118, pp83-94):
             bool clearSkyLand = !pcp & !waterTest;
             
-            // Equation 15:
+            // Equations 8 onwards require percentiles and are therefore in the next pass (see class RSGISLandsatFMaskPass2ClearSkyCloudProbCloudMasking)
+            
+            
+            // Equation 15 (Zhu and Woodcock 2012, RSE 118, pp83-94) - saving values to file rather than recalculating components later on:
             double modNDSI = ndsi;
             if(bandValues[greenSatIdx] == 1)
             {
@@ -256,7 +268,7 @@ namespace rsgis{namespace calib{
             }
             varProb = 1 - varProb;
             
-            // Equation 20:
+            // Equation 20 (Zhu and Woodcock 2012, RSE 118, pp83-94):
             bool snowTest = (ndsi > 0.15) & (bandValues[therm1Idx] < 3.8) & (bandValues[nirIdx] > 0.11) & (bandValues[greenIdx] > 0.1);
             
             output[0] = ndsi;
@@ -274,10 +286,11 @@ namespace rsgis{namespace calib{
             output[12] = modNDVI;
             output[13] = modNDSI;
             output[14] = whiteness;
+            output[15] = clearSkyWater;
         }
         else
         {
-            for(int i = 0; i < 15; ++i)
+            for(int i = 0; i < 16; ++i)
             {
                 output[i] = 0; // Outside of image
             }
@@ -292,22 +305,45 @@ namespace rsgis{namespace calib{
     
     RSGISLandsatFMaskExportPass1LandWaterCloudMasking::RSGISLandsatFMaskExportPass1LandWaterCloudMasking()throw(rsgis::img::RSGISImageCalcException):rsgis::img::RSGISCalcImageValue(1)
     {
-        
+        this->numValidPxls = 0.0;
+        this->numPCPPxls = 0.0;
     }
     
     void RSGISLandsatFMaskExportPass1LandWaterCloudMasking::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
     {
         output[0] = 0;
-        if(bandValues[9] == 1)
+        if(bandValues[10] == 1)
         {
             output[0] = 1; // land
         }
-        if(bandValues[7] == 1)
+        if(bandValues[16] == 1)
         {
             output[0] = 2; // water
         }
         
+        if(bandValues[0] == 1)
+        {
+            this->numValidPxls = this->numValidPxls + 1.0;
+        }
+        if(bandValues[9] == 1)
+        {
+            this->numPCPPxls = this->numPCPPxls + 1.0;
+        }
+        
     }
+    
+    double RSGISLandsatFMaskExportPass1LandWaterCloudMasking::propOfPCPPixels()
+    {
+        //std::cout << "this->numValidPxls = " << this->numValidPxls << std::endl;
+        //std::cout << "this->numPCPPxls = " << this->numPCPPxls << std::endl;
+        
+        double outPCPProp = 0.0;
+        if(this->numValidPxls > 0)
+        {
+            outPCPProp = this->numPCPPxls / this->numValidPxls;
+        }
+        return outPCPProp;
+    };
     
     RSGISLandsatFMaskExportPass1LandWaterCloudMasking::~RSGISLandsatFMaskExportPass1LandWaterCloudMasking()
     {
@@ -432,18 +468,24 @@ namespace rsgis{namespace calib{
                 bandValues[therm2Idx] = bandValues[therm2Idx]/this->scaleFactor;
             }
             
+            // Equation 9 (Zhu and Woodcock 2012, RSE 118, pp83-94):
             double wTempProb = (water82ndThres - bandValues[therm1Idx]) / 4;
             
+            // Equation 10 (Zhu and Woodcock 2012, RSE 118, pp83-94):
             double brightnessProb = bandValues[swir1Idx];
             if(brightnessProb > 0.11)
             {
                 brightnessProb = 0.11;
             }
             brightnessProb = brightnessProb / 0.11;
+            
+            // Equation 11 (Zhu and Woodcock 2012, RSE 118, pp83-94):
             double waterCloudProb = wTempProb * brightnessProb;
             
+            // Equation 14 (Zhu and Woodcock 2012, RSE 118, pp83-94):
             double landTempProb = (land82ndThres + (4-bandValues[therm1Idx])) / (land82ndThres + (4 - (land17thThres - 4)));
             
+            // Equation 16 (Zhu and Woodcock 2012, RSE 118, pp83-94):
             double landCloudProb = bandValues[varProbIdx] * landTempProb;
             
             output[0] = wTempProb;
@@ -469,13 +511,13 @@ namespace rsgis{namespace calib{
     }
     
     
-    RSGISLandsatFMaskPass2CloudMasking::RSGISLandsatFMaskPass2CloudMasking(unsigned int scaleFactor, unsigned int numLSBands, double landCloudProbUpperThres, double waterCloudProbUpperThres) throw(rsgis::img::RSGISImageCalcException):rsgis::img::RSGISCalcImageValue(1)
+    RSGISLandsatFMaskPass2CloudMasking::RSGISLandsatFMaskPass2CloudMasking(unsigned int scaleFactor, unsigned int numLSBands, double landCloudProbUpperThres, double waterCloudProbUpperThres, double lowerLandTempThres) throw(rsgis::img::RSGISImageCalcException):rsgis::img::RSGISCalcImageValue(1)
     {
         this->scaleFactor = scaleFactor;
         this->numLSBands = numLSBands;
         this->landCloudProbUpperThres = landCloudProbUpperThres;
         this->waterCloudProbUpperThres = waterCloudProbUpperThres;
-        
+        this->lowerLandTempThres = lowerLandTempThres;
         
         if(numLSBands == 7)
         {
@@ -496,8 +538,8 @@ namespace rsgis{namespace calib{
             this->pcpIdx = 16;
             this->waterTestIdx = 15;
             this->snowTestIdx = 18;
-            this->landCloudProbIdx = 28;
-            this->waterCloudProbIdx = 25;
+            this->landCloudProbIdx = 29;
+            this->waterCloudProbIdx = 26;
         }
         else if(numLSBands == 8)
         {
@@ -518,8 +560,8 @@ namespace rsgis{namespace calib{
             this->pcpIdx = 17;
             this->waterTestIdx = 16;
             this->snowTestIdx = 19;
-            this->landCloudProbIdx = 29;
-            this->waterCloudProbIdx = 26;
+            this->landCloudProbIdx = 30;
+            this->waterCloudProbIdx = 27;
         }
         else if(numLSBands == 9)
         {
@@ -540,8 +582,8 @@ namespace rsgis{namespace calib{
             this->pcpIdx = 18;
             this->waterTestIdx = 17;
             this->snowTestIdx = 19;
-            this->landCloudProbIdx = 30;
-            this->waterCloudProbIdx = 27;
+            this->landCloudProbIdx = 31;
+            this->waterCloudProbIdx = 28;
         }
         else
         {
@@ -596,6 +638,9 @@ namespace rsgis{namespace calib{
                 bandValues[therm2Idx] = bandValues[therm2Idx]/this->scaleFactor;
             }
             
+            
+            // Equation 18 (Zhu and Woodcock 2012, RSE 118, pp83-94):
+            
             if((bandValues[pcpIdx] == 1) & (bandValues[waterTestIdx] == 1) & (bandValues[waterCloudProbIdx] > waterCloudProbUpperThres))
             {
                 output[0] = 1;
@@ -604,7 +649,11 @@ namespace rsgis{namespace calib{
             {
                 output[0] = 1;
             }
-            else if(bandValues[therm1Idx] < -35)
+            else if((bandValues[waterTestIdx] == 0) & (bandValues[landCloudProbIdx] > 0.99))
+            {
+                output[0] = 1;
+            }
+            else if(bandValues[therm1Idx] < (this->lowerLandTempThres-35))
             {
                 output[0] = 1;
             }
@@ -1270,6 +1319,30 @@ namespace rsgis{namespace calib{
         }
         
     }
+    
+    
+    void RSGISExportMaskForOverPCPThreshold::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(rsgis::img::RSGISImageCalcException)
+    {
+        if(numIntVals != 1)
+        {
+            throw rsgis::img::RSGISImageCalcException("Expecting 1 integer values.");
+        }
+        
+        
+        if(intBandValues[0] == 1)
+        {
+            output[0] = 1;
+        }
+        else
+        {
+            output[0] = 0;
+        }
+    }
+
+    
+    
+    
+    
     
 }}
 

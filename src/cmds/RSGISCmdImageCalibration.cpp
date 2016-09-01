@@ -689,7 +689,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void executeLandsatTMCloudFMask(std::string inputTOAImage, std::string inputThermalImage, std::string inputSaturateImage, std::string validImg, std::string outputImage, std::string gdalFormat, double sunAz, double sunZen, double senAz, double senZen, float scaleFactorIn, std::string tmpImgsBase, std::string tmpImgFileExt, bool rmTmpImgs) throw(RSGISCmdException)
+    void executeLandsatTMCloudFMask(std::string inputTOAImage, std::string inputThermalImage, std::string inputSaturateImage, std::string validImg, std::string outputImage, std::string gdalFormat, double sunAz, double sunZen, double senAz, double senZen, float whitenessThreshold, float scaleFactorIn, std::string tmpImgsBase, std::string tmpImgFileExt, bool rmTmpImgs) throw(RSGISCmdException)
     {
         GDALAllRegister();
         try
@@ -772,350 +772,435 @@ namespace rsgis{ namespace cmds {
             rsgis::rastergis::RSGISRasterAttUtils attUtils;
 
             std::cout << "Apply first pass FMask to classifiy initial clear sky regions...\n";
-            rsgis::calib::RSGISLandsatFMaskPass1CloudMasking cloudMaskPass1 = rsgis::calib::RSGISLandsatFMaskPass1CloudMasking(scaleFactorIn, (numReflBands+numThermBands));
+            rsgis::calib::RSGISLandsatFMaskPass1CloudMasking cloudMaskPass1 = rsgis::calib::RSGISLandsatFMaskPass1CloudMasking(scaleFactorIn, (numReflBands+numThermBands), whitenessThreshold);
             rsgis::img::RSGISCalcImage *calcImage = new rsgis::img::RSGISCalcImage(&cloudMaskPass1, "", true);
             datasets = new GDALDataset*[3];
             datasets[0] = reflDataset;
             datasets[1] = thermDataset;
             datasets[2] = saturateDataset;
-            GDALDataset *pass1DS = imgUtils.createCopy(reflDataset, 15, pass1TmpOutImage, gdalFormat, GDT_Float32);
+            GDALDataset *pass1DS = imgUtils.createCopy(reflDataset, 16, pass1TmpOutImage, gdalFormat, GDT_Float32);
             calcImage->calcImage(datasets, 3, pass1DS);
             delete calcImage;
             delete[] datasets;
             
+            std::vector<std::string> bandNames;
+            bandNames.push_back("ndsi");
+            bandNames.push_back("ndvi");
+            bandNames.push_back("basicTest");
+            bandNames.push_back("meanVis");
+            bandNames.push_back("whitenessTest");
+            bandNames.push_back("hotTest");
+            bandNames.push_back("nirswirTest");
+            bandNames.push_back("waterTest");
+            bandNames.push_back("pcp");
+            bandNames.push_back("clearSkyLand");
+            bandNames.push_back("snowTest");
+            bandNames.push_back("varProb");
+            bandNames.push_back("modNDVI");
+            bandNames.push_back("modNDSI");
+            bandNames.push_back("whiteness");
+            bandNames.push_back("clearSkyWater");
+            imgUtils.setImageBandNames(pass1DS, bandNames, true);
             
-            std::cout << "Export Land and Water regions.\n";
+            
+            std::cout << "Export Land and Water regions and check PCP coverage.\n";
             GDALDataset *landWaterClearSkyDS = imgUtils.createCopy(reflDataset, 1, landWaterTmpOutImage, gdalFormat, GDT_UInt32);
             rsgis::calib::RSGISLandsatFMaskExportPass1LandWaterCloudMasking exportLandWaterRegions = rsgis::calib::RSGISLandsatFMaskExportPass1LandWaterCloudMasking();
-            calcImage = new rsgis::img::RSGISCalcImage(&exportLandWaterRegions, "", true);
-            calcImage->calcImage(&pass1DS, 1, landWaterClearSkyDS);
-            delete calcImage;
-            
-            popImageStats.populateImageWithRasterGISStats(landWaterClearSkyDS, true, true, 1);
-            
-            std::cout << "Populating RAT with Thermal Stats\n";
-            std::vector<rsgis::rastergis::RSGISBandAttPercentiles *> *bandPercentStats = new std::vector<rsgis::rastergis::RSGISBandAttPercentiles *>();
-            rsgis::rastergis::RSGISBandAttPercentiles *tempUpperPercent = new rsgis::rastergis::RSGISBandAttPercentiles();
-            tempUpperPercent->fieldName = "UpperTempThres";
-            tempUpperPercent->percentile = 82.5;
-            bandPercentStats->push_back(tempUpperPercent);
-            rsgis::rastergis::RSGISBandAttPercentiles *tempLowerPercent = new rsgis::rastergis::RSGISBandAttPercentiles();
-            tempLowerPercent->fieldName = "LowerTempThres";
-            tempLowerPercent->percentile = 17.5;
-            bandPercentStats->push_back(tempLowerPercent);
-            calcClumpStats.populateRATWithPercentileStats(landWaterClearSkyDS, thermDataset, 1, bandPercentStats, 1, 200);
-            delete tempUpperPercent;
-            delete tempLowerPercent;
-            delete bandPercentStats;
-            
-            std::cout << "Get Thresholds From the RAT\n";
-            const GDALRasterAttributeTable *landWaterRAT = landWaterClearSkyDS->GetRasterBand(1)->GetDefaultRAT();
-            double lowerWaterThres = ratUtils.readDoubleColumnVal(landWaterRAT, "LowerTempThres", 2)/scaleFactorIn;
-            double upperWaterThres = ratUtils.readDoubleColumnVal(landWaterRAT, "UpperTempThres", 2)/scaleFactorIn;
-            double lowerLandThres = ratUtils.readDoubleColumnVal(landWaterRAT, "LowerTempThres", 1)/scaleFactorIn;
-            double upperLandThres = ratUtils.readDoubleColumnVal(landWaterRAT, "UpperTempThres", 1)/scaleFactorIn;
-            
-            std::cout << "Lower Water Threshold = " << lowerWaterThres << std::endl;
-            std::cout << "Upper Water Threshold = " << upperWaterThres << std::endl;
-            
-            std::cout << "Lower Land Threshold = " << lowerLandThres << std::endl;
-            std::cout << "Upper Land Threshold = " << upperLandThres << std::endl;
-            
-            std::cout << "Calculate the cloud probability over the land area...\n";
-            rsgis::calib::RSGISLandsatFMaskPass2ClearSkyCloudProbCloudMasking cloudMaskPass2Part1 = rsgis::calib::RSGISLandsatFMaskPass2ClearSkyCloudProbCloudMasking(scaleFactorIn, (numReflBands+numThermBands), upperWaterThres, upperLandThres, lowerLandThres);
-            calcImage = new rsgis::img::RSGISCalcImage(&cloudMaskPass2Part1, "", true);
-            datasets = new GDALDataset*[4];
-            datasets[0] = landWaterClearSkyDS;
-            datasets[1] = reflDataset;
-            datasets[2] = thermDataset;
-            datasets[3] = pass1DS;
-            GDALDataset *pass2DS = imgUtils.createCopy(reflDataset, 6, cloudLandProbTmpOutImage, gdalFormat, GDT_Float32);
-            calcImage->calcImage(datasets, 4, pass2DS);
-            delete calcImage;
-            delete[] datasets;
-            
-            std::cout << "Calculate percentile probability thresholds for water and land...\n";
-            bandPercentStats = new std::vector<rsgis::rastergis::RSGISBandAttPercentiles *>();
-            rsgis::rastergis::RSGISBandAttPercentiles *landCloudProbPercent = new rsgis::rastergis::RSGISBandAttPercentiles();
-            landCloudProbPercent->fieldName = "UpperCloudLandThres";
-            landCloudProbPercent->percentile = 82.5; // THRESHOLD FOR DIFFERENCIATING LAND AND CLOUD
-            bandPercentStats->push_back(landCloudProbPercent);
-            calcClumpStats.populateRATWithPercentileStats(landWaterClearSkyDS, pass2DS, 6, bandPercentStats, 1, 200);
-            delete landCloudProbPercent;
-            delete bandPercentStats;
-            double landCloudProbUpperThres = ratUtils.readDoubleColumnVal(landWaterRAT, "UpperCloudLandThres", 1);
-            
-            bandPercentStats = new std::vector<rsgis::rastergis::RSGISBandAttPercentiles *>();
-            rsgis::rastergis::RSGISBandAttPercentiles *waterCloudProbPercent = new rsgis::rastergis::RSGISBandAttPercentiles();
-            waterCloudProbPercent->fieldName = "UpperCloudWaterThres";
-            waterCloudProbPercent->percentile = 82.5; // THRESHOLD FOR DIFFERENCIATING LAND AND WATER
-            bandPercentStats->push_back(waterCloudProbPercent);
-            calcClumpStats.populateRATWithPercentileStats(landWaterClearSkyDS, pass2DS, 3, bandPercentStats, 1, 200);
-            delete waterCloudProbPercent;
-            delete bandPercentStats;
-            double waterCloudProbUpperThres = ratUtils.readDoubleColumnVal(landWaterRAT, "UpperCloudWaterThres", 2);
-            
-            landCloudProbUpperThres = landCloudProbUpperThres + 0.2;
-            waterCloudProbUpperThres = 0.5;//waterCloudProbUpperThres + 0.2;
-            
-            std::cout << "Upper Land Cloud Prob Threshold = " << landCloudProbUpperThres << std::endl;
-            std::cout << "Upper Water Cloud Prob Threshold = " << waterCloudProbUpperThres << std::endl;
-
-            std::cout << "Apply second pass FMask to classify final clouds mask...\n";
-            rsgis::calib::RSGISLandsatFMaskPass2CloudMasking cloudMaskPass2Part2 = rsgis::calib::RSGISLandsatFMaskPass2CloudMasking(scaleFactorIn, (numReflBands+numThermBands), landCloudProbUpperThres, waterCloudProbUpperThres);
-            calcImage = new rsgis::img::RSGISCalcImage(&cloudMaskPass2Part2, "", true);
-            datasets = new GDALDataset*[5];
-            datasets[0] = landWaterClearSkyDS;
-            datasets[1] = reflDataset;
-            datasets[2] = thermDataset;
-            datasets[3] = pass1DS;
-            datasets[4] = pass2DS;
-            GDALDataset *cloudMaskDS = imgUtils.createCopy(reflDataset, 1, tmpCloudsExtent, gdalFormat, GDT_Int32);
-            calcImage->calcImage(datasets, 5, cloudMaskDS);
-            delete calcImage;
-            delete[] datasets;
-            
-            std::cout << "Apply cloud majority filter...\n";
-            rsgis::calib::RSGISCalcImageCloudMajorityFilter cloudMajFilter = rsgis::calib::RSGISCalcImageCloudMajorityFilter();
-            rsgis::img::RSGISCalcEditImage editImgCalc = rsgis::img::RSGISCalcEditImage(&cloudMajFilter);
-            editImgCalc.calcImageWindowData(cloudMaskDS, 5);
-            
-            
-            std::cout << "Get cloud objects\n";
-            GDALDataset *cloudClumpsDS = imgUtils.createCopy(reflDataset, 1, tmpCloudsClump, gdalFormat, GDT_UInt32);
-            rsgis::segment::RSGISClumpPxls clumpImg;
-            clumpImg.performClump(cloudMaskDS, cloudClumpsDS, true, 0.0, NULL);
-            popImageStats.populateImageWithRasterGISStats(cloudClumpsDS, true, true, true, 1);
-            
-            std::cout << "Remove small clouds\n";
-            float smallCloudThreshold = 32; // THRESHOLD (IN PIXELS) FOR SMALL CLOUDS
-            GDALRasterAttributeTable *cloudsRAT = cloudClumpsDS->GetRasterBand(1)->GetDefaultRAT();
-            
-            size_t numcloudsRATHistoRows = 0;
-            int *cloudsRATHisto = attUtils.readIntColumn(cloudsRAT, "Histogram", &numcloudsRATHistoRows);
-            GDALDataset *cloudClumpsRMSmallDS = imgUtils.createCopy(reflDataset, 1, tmpCloudsClumpRMSmall, gdalFormat, GDT_UInt32);
-            rsgis::segment::RSGISRemoveClumpsBelowThreshold rmClumpBelowSize = rsgis::segment::RSGISRemoveClumpsBelowThreshold(smallCloudThreshold, cloudsRATHisto, numcloudsRATHistoRows);
-            rsgis::img::RSGISCalcImage calcImgRmSmallClump = rsgis::img::RSGISCalcImage(&rmClumpBelowSize);
-            calcImgRmSmallClump.calcImage(&cloudClumpsDS, 1, 0, cloudClumpsRMSmallDS);
-            delete[] cloudsRATHisto;
-            
-            rsgis::segment::RSGISRelabelClumps relabelImg;
-            GDALDataset *cloudClumpsRMSmallReLblDS = imgUtils.createCopy(reflDataset, 1, tmpCloudsClumpRMSmallRelabel, gdalFormat, GDT_UInt32);
-            relabelImg.relabelClumpsCalcImg(cloudClumpsRMSmallDS, cloudClumpsRMSmallReLblDS);
-            popImageStats.populateImageWithRasterGISStats(cloudClumpsRMSmallReLblDS, true, true, 1);
-            
-            
-            std::cout << "Calculate Shadow Mask\n";
-            int nirIdx = 4;
-            if(reflDataset->GetRasterCount() == 7)
-            {
-                nirIdx = 5;
-            }
-            bandPercentStats = new std::vector<rsgis::rastergis::RSGISBandAttPercentiles *>();
-            rsgis::rastergis::RSGISBandAttPercentiles *landNIRPercent = new rsgis::rastergis::RSGISBandAttPercentiles();
-            landNIRPercent->fieldName = "LowerNIRLandValue175";
-            landNIRPercent->percentile = 17.5; // NIR LAND THRESHOLD 17.5 %
-            bandPercentStats->push_back(landNIRPercent);
-            calcClumpStats.populateRATWithPercentileStats(landWaterClearSkyDS, reflDataset, nirIdx, bandPercentStats, 1, 200);
-            delete landNIRPercent;
-            delete bandPercentStats;
-            double landNIR175Val = ratUtils.readDoubleColumnVal(landWaterRAT, "LowerNIRLandValue175", 1);
-            
-            std::cout << "Land NIR 17.5% Percentile = " << landNIR175Val << std::endl;
-            
-            // Extract NIR band.
-            std::cout << "Extract NIR Band\n";
-            GDALDataset *nirBandDS = imgUtils.createCopy(reflDataset, 1, tmpNIRBandImg, gdalFormat, imgReflDT);
-            std::vector<unsigned int> bands;
-            bands.push_back(4);
-            rsgis::img::RSGISCopyImageBandSelect selImageBands = rsgis::img::RSGISCopyImageBandSelect(bands);
-            rsgis::img::RSGISCalcImage calcSelBandsImage = rsgis::img::RSGISCalcImage(&selImageBands);
-            calcSelBandsImage.calcImage(&reflDataset, 1, nirBandDS);
-            
-            std::cout << "Fill NIR Band\n";
-            GDALDataset *nirBandFillDS = imgUtils.createCopy(reflDataset, 1, tmpNIRFillBandImg, gdalFormat, imgReflDT);
-            rsgis::calib::RSGISHydroDEMFillSoilleGratin94 fillDEMInst;
-            fillDEMInst.performSoilleGratin94Fill(nirBandDS, validAreaDataset, nirBandFillDS, false, landNIR175Val);
-     
-            std::cout << "Produce Potential Cloud Shadows Mask\n";
-            GDALDataset *potentCloudShadowDS = imgUtils.createCopy(reflDataset, 1, tmpPotentShadows, gdalFormat, GDT_Int32);
-            rsgis::calib::RSGISCalcImagePotentialCloudShadowsMask imgCalcPotentShadows = rsgis::calib::RSGISCalcImagePotentialCloudShadowsMask(scaleFactorIn);
-            rsgis::img::RSGISCalcImage calcPotentShadowImage = rsgis::img::RSGISCalcImage(&imgCalcPotentShadows);
-            datasets = new GDALDataset*[3];
-            datasets[0] = validAreaDataset;
-            datasets[1] = nirBandDS;
-            datasets[2] = nirBandFillDS;
-            calcPotentShadowImage.calcImage(datasets, 3, potentCloudShadowDS);
-            
-            popImageStats.populateImageWithRasterGISStats(potentCloudShadowDS, true, true, 1);
-            
-            /***************
-            double lowerLandThres = 11.4781;
-            double upperLandThres = 18.7472;
-            std::cout << "Opening: " << tmpCloudsClumpRMSmallRelabel << std::endl;
-            GDALDataset *cloudClumpsRMSmallReLblDS = (GDALDataset *) GDALOpen(tmpCloudsClumpRMSmallRelabel.c_str(), GA_Update);
-            if(cloudClumpsRMSmallReLblDS == NULL)
-            {
-                std::string message = std::string("Could not open image ") + tmpCloudsClumpRMSmallRelabel;
-                throw RSGISImageException(message.c_str());
-            }
-            
-            std::cout << "Opening: " << tmpPotentShadows << std::endl;
-            GDALDataset *potentCloudShadowDS = (GDALDataset *) GDALOpen(tmpPotentShadows.c_str(), GA_Update);
-            if(potentCloudShadowDS == NULL)
-            {
-                std::string message = std::string("Could not open image ") + tmpPotentShadows;
-                throw RSGISImageException(message.c_str());
-            }
-            ****************/
-            
-            popImageStats.populateImageWithRasterGISStats(cloudClumpsRMSmallReLblDS, true, true, 1);
-            GDALDataset *initCloudHeightsDS = imgUtils.createCopy(reflDataset, 2, tmpCloudsInitHeights, gdalFormat, GDT_Float32);
-            rsgis::calib::RSGISCalcCloudParams calcCloudParams;
-            calcCloudParams.calcCloudHeights(thermDataset, cloudClumpsRMSmallReLblDS, initCloudHeightsDS, lowerLandThres, upperLandThres, scaleFactorIn);
-            
-            GDALDataset *cloudShadowTestRegionsDS = imgUtils.createCopy(reflDataset, 1, tmpCloudsShadowTestRegions, gdalFormat, GDT_Byte);
-            GDALDataset *cloudShadowRegionsDS = imgUtils.createCopy(reflDataset, 1, tmpCloudsShadows, gdalFormat, GDT_Byte);
-            
-            calcCloudParams.projFitCloudShadow(cloudClumpsRMSmallReLblDS, initCloudHeightsDS, potentCloudShadowDS, cloudShadowTestRegionsDS, cloudShadowRegionsDS, sunAz, sunZen, senAz, senZen);
-            
-            
-            std::cout << "Apply cloud shadow majority filter...\n";
-            rsgis::calib::RSGISCalcImageCloudMajorityFilter cloudShadowMajFilter = rsgis::calib::RSGISCalcImageCloudMajorityFilter();
-            rsgis::img::RSGISCalcEditImage editImgCalcShadow = rsgis::img::RSGISCalcEditImage(&cloudShadowMajFilter);
-            editImgCalcShadow.calcImageWindowData(cloudShadowRegionsDS, 5);
-            
-            
-            
-            rsgis::math::RSGISMatrices matrixUtils;
-            
-            rsgis::math::Matrix *matrixMorphOperator = matrixUtils.createMatrix(15, 15);
-            matrixUtils.makeCircularBinaryMatrix(matrixMorphOperator);
-            
-            rsgis::filter::RSGISImageMorphologyDilate morphDialate;
-            morphDialate.dilateImage(&cloudShadowRegionsDS, tmpFinalShadowsDialate, matrixMorphOperator, gdalFormat, GDT_Byte);
-            GDALDataset *finalShadowsDialateDS = (GDALDataset *) GDALOpen(tmpFinalShadowsDialate.c_str(), GA_Update);
-            if(finalShadowsDialateDS == NULL)
-            {
-                std::string message = std::string("Could not open image ") + tmpFinalShadowsDialate;
-                throw RSGISImageException(message.c_str());
-            }
-            
-            GDALRasterAttributeTable *cloudsRATRelbl = cloudClumpsRMSmallReLblDS->GetRasterBand(1)->GetDefaultRAT();
-            numcloudsRATHistoRows = 0;
-            cloudsRATHisto = attUtils.readIntColumn(cloudsRATRelbl, "Histogram", &numcloudsRATHistoRows);
-            
-            for(size_t i = 0; i < numcloudsRATHistoRows; ++i)
-            {
-                cloudsRATHisto[i] = 1;
-            }
-            attUtils.writeIntColumn(cloudsRATRelbl, "CloudMask", cloudsRATHisto, numcloudsRATHistoRows);
-            delete[] cloudsRATHisto;
-            
-            unsigned int columnIndex = attUtils.findColumnIndex(cloudsRATRelbl, "CloudMask");
-            rsgis::rastergis::RSGISExportColumns2ImageCalcImage calcImageVal = rsgis::rastergis::RSGISExportColumns2ImageCalcImage(1, cloudsRATRelbl, columnIndex);
-            rsgis::img::RSGISCalcImage calcImageExportRATCol(&calcImageVal);
-            GDALDataset *finalCloudsDS = imgUtils.createCopy(reflDataset, 1, tmpFinalClouds, gdalFormat, GDT_Byte);
-            calcImageExportRATCol.calcImage(&cloudClumpsRMSmallReLblDS, 1, 0, finalCloudsDS);
-  
-            
-            morphDialate.dilateImage(&finalCloudsDS, tmpFinalCloudsDialate, matrixMorphOperator, gdalFormat, GDT_Byte);
-            GDALDataset *finalCloudsDialateDS = (GDALDataset *) GDALOpen(tmpFinalCloudsDialate.c_str(), GA_Update);
-            if(finalCloudsDialateDS == NULL)
-            {
-                std::string message = std::string("Could not open image ") + tmpFinalCloudsDialate;
-                throw RSGISImageException(message.c_str());
-            }
-            matrixUtils.freeMatrix(matrixMorphOperator);
-            
-            GDALDataset *finalResultDS = imgUtils.createCopy(reflDataset, 1, outputImage, gdalFormat, GDT_Byte);
             datasets = new GDALDataset*[2];
-            datasets[0] = finalCloudsDialateDS;
-            datasets[1] = finalShadowsDialateDS;
-            rsgis::calib::RSGISCalcCombineMasks calcCombineMask;
-            rsgis::img::RSGISCalcImage calcImgCombineMasks = rsgis::img::RSGISCalcImage(&calcCombineMask);
-            calcImgCombineMasks.calcImage(datasets, 2, 0, finalResultDS);
+            datasets[0] = validAreaDataset;
+            datasets[1] = pass1DS;
+            calcImage = new rsgis::img::RSGISCalcImage(&exportLandWaterRegions, "", true);
+            calcImage->calcImage(datasets, 2, landWaterClearSkyDS);
+            double propPCP = exportLandWaterRegions.propOfPCPPixels();
+            delete calcImage;
             delete[] datasets;
             
-            popImageStats.populateImageWithRasterGISStats(finalResultDS, true, true, 1);
+            std::cout << "Proportion of PCP coverage of the scene is " << propPCP << std::endl;
             
-            int *red = new int[3];
-            int *green = new int[3];
-            int *blue = new int[3];
-            std::string *classNames = new std::string[3];
-            
-            red[0] = 0;
-            green[0] = 0;
-            blue[0] = 0;
-            classNames[0] = "";
-            
-            red[1] = 0;
-            green[1] = 0;
-            blue[1] = 255;
-            classNames[1] = "Clouds";
-            
-            red[2] = 0;
-            green[2] = 255;
-            blue[2] = 255;
-            classNames[2] = "Shadows";
-            
-            GDALRasterAttributeTable *finalResultRAT = finalResultDS->GetRasterBand(1)->GetDefaultRAT();
-            attUtils.writeIntColumn(finalResultRAT, "Red", red, 3);
-            attUtils.writeIntColumn(finalResultRAT, "Green", green, 3);
-            attUtils.writeIntColumn(finalResultRAT, "Blue", blue, 3);
-            attUtils.writeStrColumn(finalResultRAT, "ClassName", classNames, 3);
-            
-            delete[] red;
-            delete[] green;
-            delete[] blue;
-            delete[] classNames;
-            
-            GDALClose(pass1DS);
-            GDALClose(landWaterClearSkyDS);
-            GDALClose(pass2DS);
-            GDALClose(nirBandDS);
-            GDALClose(nirBandFillDS);
-            GDALClose(potentCloudShadowDS);
-            GDALClose(cloudMaskDS);
-            GDALClose(cloudClumpsDS);
-            GDALClose(cloudClumpsRMSmallDS);
-            GDALClose(cloudClumpsRMSmallReLblDS);
-            GDALClose(initCloudHeightsDS);
-            GDALClose(cloudShadowTestRegionsDS);
-            GDALClose(cloudShadowRegionsDS);
-            GDALClose(finalShadowsDialateDS);
-            GDALClose(finalCloudsDS);
-            GDALClose(finalCloudsDialateDS);
-            GDALClose(finalResultDS);
-            GDALClose(reflDataset);
-            GDALClose(thermDataset);
-            GDALClose(saturateDataset);
-            GDALClose(validAreaDataset);
-            
-            if(rmTmpImgs)
+            if(propPCP < 0.95)
             {
-                GDALDriver *poDriver = GetGDALDriverManager()->GetDriverByName(gdalFormat.c_str());
-                if(poDriver == NULL)
+                popImageStats.populateImageWithRasterGISStats(landWaterClearSkyDS, true, true, 1);
+                
+                std::cout << "Populating RAT with Thermal Stats\n";
+                // Equation 8 and 13 calc percentiles (Zhu and Woodcock 2012, RSE 118, pp83-94):
+                std::vector<rsgis::rastergis::RSGISBandAttPercentiles *> *bandPercentStats = new std::vector<rsgis::rastergis::RSGISBandAttPercentiles *>();
+                rsgis::rastergis::RSGISBandAttPercentiles *tempUpperPercent = new rsgis::rastergis::RSGISBandAttPercentiles();
+                tempUpperPercent->fieldName = "UpperTempThres";
+                tempUpperPercent->percentile = 82.5;
+                bandPercentStats->push_back(tempUpperPercent);
+                rsgis::rastergis::RSGISBandAttPercentiles *tempLowerPercent = new rsgis::rastergis::RSGISBandAttPercentiles();
+                tempLowerPercent->fieldName = "LowerTempThres";
+                tempLowerPercent->percentile = 17.5;
+                bandPercentStats->push_back(tempLowerPercent);
+                calcClumpStats.populateRATWithPercentileStats(landWaterClearSkyDS, thermDataset, 1, bandPercentStats, 1, 200);
+                delete tempUpperPercent;
+                delete tempLowerPercent;
+                delete bandPercentStats;
+                
+                std::cout << "Get Thresholds From the RAT\n";
+                const GDALRasterAttributeTable *landWaterRAT = landWaterClearSkyDS->GetRasterBand(1)->GetDefaultRAT();
+                double lowerWaterThres = ratUtils.readDoubleColumnVal(landWaterRAT, "LowerTempThres", 2)/scaleFactorIn;
+                double upperWaterThres = ratUtils.readDoubleColumnVal(landWaterRAT, "UpperTempThres", 2)/scaleFactorIn;
+                double lowerLandThres = ratUtils.readDoubleColumnVal(landWaterRAT, "LowerTempThres", 1)/scaleFactorIn;
+                double upperLandThres = ratUtils.readDoubleColumnVal(landWaterRAT, "UpperTempThres", 1)/scaleFactorIn;
+                
+                std::cout << "Lower Water Threshold = " << lowerWaterThres << std::endl;
+                std::cout << "Upper Water Threshold = " << upperWaterThres << std::endl;
+                
+                std::cout << "Lower Land Threshold = " << lowerLandThres << std::endl;
+                std::cout << "Upper Land Threshold = " << upperLandThres << std::endl;
+                
+                std::cout << "Calculate the cloud probability over the land area...\n";
+                rsgis::calib::RSGISLandsatFMaskPass2ClearSkyCloudProbCloudMasking cloudMaskPass2Part1 = rsgis::calib::RSGISLandsatFMaskPass2ClearSkyCloudProbCloudMasking(scaleFactorIn, (numReflBands+numThermBands), upperWaterThres, upperLandThres, lowerLandThres);
+                calcImage = new rsgis::img::RSGISCalcImage(&cloudMaskPass2Part1, "", true);
+                datasets = new GDALDataset*[4];
+                datasets[0] = landWaterClearSkyDS;
+                datasets[1] = reflDataset;
+                datasets[2] = thermDataset;
+                datasets[3] = pass1DS;
+                GDALDataset *pass2DS = imgUtils.createCopy(reflDataset, 6, cloudLandProbTmpOutImage, gdalFormat, GDT_Float32);
+                calcImage->calcImage(datasets, 4, pass2DS);
+                delete calcImage;
+                delete[] datasets;
+                
+                bandNames = std::vector<std::string>();
+                bandNames.push_back("wTempProb");
+                bandNames.push_back("brightnessProb");
+                bandNames.push_back("waterCloudProb");
+                bandNames.push_back("landTempProb");
+                bandNames.push_back("varProb");
+                bandNames.push_back("landCloudProb");
+                imgUtils.setImageBandNames(pass2DS, bandNames, true);
+                
+                
+                // Equation 17 (Zhu and Woodcock 2012, RSE 118, pp83-94):
+                std::cout << "Calculate percentile probability thresholds for water and land...\n";
+                bandPercentStats = new std::vector<rsgis::rastergis::RSGISBandAttPercentiles *>();
+                rsgis::rastergis::RSGISBandAttPercentiles *landCloudProbPercent = new rsgis::rastergis::RSGISBandAttPercentiles();
+                landCloudProbPercent->fieldName = "UpperCloudLandThres";
+                landCloudProbPercent->percentile = 82.5; // THRESHOLD FOR DIFFERENCIATING LAND AND CLOUD
+                bandPercentStats->push_back(landCloudProbPercent);
+                calcClumpStats.populateRATWithPercentileStats(landWaterClearSkyDS, pass2DS, 6, bandPercentStats, 1, 200);
+                delete landCloudProbPercent;
+                delete bandPercentStats;
+                double landCloudProbUpperThres = ratUtils.readDoubleColumnVal(landWaterRAT, "UpperCloudLandThres", 1);
+                
+                // Equation 18 threshold of 0.5 used in Zhu and Woodcock 2012, RSE 118, pp83-94 changed in Zhu et al (2015) RSE 159 pp269-277 to be dynamic:
+                bandPercentStats = new std::vector<rsgis::rastergis::RSGISBandAttPercentiles *>();
+                rsgis::rastergis::RSGISBandAttPercentiles *waterCloudProbPercent = new rsgis::rastergis::RSGISBandAttPercentiles();
+                waterCloudProbPercent->fieldName = "UpperCloudWaterThres";
+                waterCloudProbPercent->percentile = 82.5; // THRESHOLD FOR DIFFERENCIATING LAND AND WATER
+                bandPercentStats->push_back(waterCloudProbPercent);
+                calcClumpStats.populateRATWithPercentileStats(landWaterClearSkyDS, pass2DS, 3, bandPercentStats, 1, 200);
+                delete waterCloudProbPercent;
+                delete bandPercentStats;
+                double waterCloudProbUpperThres = ratUtils.readDoubleColumnVal(landWaterRAT, "UpperCloudWaterThres", 2);
+                
+                landCloudProbUpperThres = landCloudProbUpperThres + 0.2;
+                waterCloudProbUpperThres = waterCloudProbUpperThres + 0.2;
+                if (waterCloudProbUpperThres > 0.5)
                 {
-                    throw RSGISImageException("Image driver is not available.");
+                    waterCloudProbUpperThres = 0.5;
                 }
                 
-                poDriver->Delete(pass1TmpOutImage.c_str());
-                poDriver->Delete(landWaterTmpOutImage.c_str());
-                poDriver->Delete(cloudLandProbTmpOutImage.c_str());
-                poDriver->Delete(tmpNIRBandImg.c_str());
-                poDriver->Delete(tmpNIRFillBandImg.c_str());
-                poDriver->Delete(tmpPotentShadows.c_str());
-                poDriver->Delete(tmpCloudsExtent.c_str());
-                poDriver->Delete(tmpCloudsClump.c_str());
-                poDriver->Delete(tmpCloudsClumpRMSmall.c_str());
-                poDriver->Delete(tmpCloudsClumpRMSmallRelabel.c_str());
-                poDriver->Delete(tmpCloudsInitHeights.c_str());
-                poDriver->Delete(tmpCloudsShadowTestRegions.c_str());
-                poDriver->Delete(tmpCloudsShadows.c_str());
-                poDriver->Delete(tmpFinalShadowsDialate.c_str());
-                poDriver->Delete(tmpFinalClouds.c_str());
-                poDriver->Delete(tmpFinalCloudsDialate.c_str());
+                std::cout << "Upper Land Cloud Prob Threshold = " << landCloudProbUpperThres << std::endl;
+                std::cout << "Upper Water Cloud Prob Threshold = " << waterCloudProbUpperThres << std::endl;
+
+                std::cout << "Apply second pass FMask to classify final clouds mask...\n";
+                rsgis::calib::RSGISLandsatFMaskPass2CloudMasking cloudMaskPass2Part2 = rsgis::calib::RSGISLandsatFMaskPass2CloudMasking(scaleFactorIn, (numReflBands+numThermBands), landCloudProbUpperThres, waterCloudProbUpperThres, lowerLandThres);
+                calcImage = new rsgis::img::RSGISCalcImage(&cloudMaskPass2Part2, "", true);
+                datasets = new GDALDataset*[5];
+                datasets[0] = landWaterClearSkyDS;
+                datasets[1] = reflDataset;
+                datasets[2] = thermDataset;
+                datasets[3] = pass1DS;
+                datasets[4] = pass2DS;
+                GDALDataset *cloudMaskDS = imgUtils.createCopy(reflDataset, 1, tmpCloudsExtent, gdalFormat, GDT_Int32);
+                calcImage->calcImage(datasets, 5, cloudMaskDS);
+                delete calcImage;
+                delete[] datasets;
+                
+                std::cout << "Apply cloud majority filter...\n";
+                rsgis::calib::RSGISCalcImageCloudMajorityFilter cloudMajFilter = rsgis::calib::RSGISCalcImageCloudMajorityFilter();
+                rsgis::img::RSGISCalcEditImage editImgCalc = rsgis::img::RSGISCalcEditImage(&cloudMajFilter);
+                editImgCalc.calcImageWindowData(cloudMaskDS, 5);
+                
+                
+                std::cout << "Get cloud objects\n";
+                GDALDataset *cloudClumpsDS = imgUtils.createCopy(reflDataset, 1, tmpCloudsClump, gdalFormat, GDT_UInt32);
+                rsgis::segment::RSGISClumpPxls clumpImg;
+                clumpImg.performClump(cloudMaskDS, cloudClumpsDS, true, 0.0, NULL);
+                popImageStats.populateImageWithRasterGISStats(cloudClumpsDS, true, true, true, 1);
+                
+                std::cout << "Remove small clouds\n";
+                float smallCloudThreshold = 32; // THRESHOLD (IN PIXELS) FOR SMALL CLOUDS
+                GDALRasterAttributeTable *cloudsRAT = cloudClumpsDS->GetRasterBand(1)->GetDefaultRAT();
+                
+                size_t numcloudsRATHistoRows = 0;
+                int *cloudsRATHisto = attUtils.readIntColumn(cloudsRAT, "Histogram", &numcloudsRATHistoRows);
+                GDALDataset *cloudClumpsRMSmallDS = imgUtils.createCopy(reflDataset, 1, tmpCloudsClumpRMSmall, gdalFormat, GDT_UInt32);
+                rsgis::segment::RSGISRemoveClumpsBelowThreshold rmClumpBelowSize = rsgis::segment::RSGISRemoveClumpsBelowThreshold(smallCloudThreshold, cloudsRATHisto, numcloudsRATHistoRows);
+                rsgis::img::RSGISCalcImage calcImgRmSmallClump = rsgis::img::RSGISCalcImage(&rmClumpBelowSize);
+                calcImgRmSmallClump.calcImage(&cloudClumpsDS, 1, 0, cloudClumpsRMSmallDS);
+                delete[] cloudsRATHisto;
+                
+                rsgis::segment::RSGISRelabelClumps relabelImg;
+                GDALDataset *cloudClumpsRMSmallReLblDS = imgUtils.createCopy(reflDataset, 1, tmpCloudsClumpRMSmallRelabel, gdalFormat, GDT_UInt32);
+                relabelImg.relabelClumpsCalcImg(cloudClumpsRMSmallDS, cloudClumpsRMSmallReLblDS);
+                popImageStats.populateImageWithRasterGISStats(cloudClumpsRMSmallReLblDS, true, true, 1);
+                
+                std::cout << "Calculate Shadow Mask\n";
+                int nirIdx = 4;
+                if(reflDataset->GetRasterCount() == 7)
+                {
+                    nirIdx = 5;
+                }
+                bandPercentStats = new std::vector<rsgis::rastergis::RSGISBandAttPercentiles *>();
+                rsgis::rastergis::RSGISBandAttPercentiles *landNIRPercent = new rsgis::rastergis::RSGISBandAttPercentiles();
+                landNIRPercent->fieldName = "LowerNIRLandValue175";
+                landNIRPercent->percentile = 17.5; // NIR LAND THRESHOLD 17.5 %
+                bandPercentStats->push_back(landNIRPercent);
+                calcClumpStats.populateRATWithPercentileStats(landWaterClearSkyDS, reflDataset, nirIdx, bandPercentStats, 1, 200);
+                delete landNIRPercent;
+                delete bandPercentStats;
+                double landNIR175Val = ratUtils.readDoubleColumnVal(landWaterRAT, "LowerNIRLandValue175", 1);
+                
+                std::cout << "Land NIR 17.5% Percentile = " << landNIR175Val << std::endl;
+                
+                // Extract NIR band.
+                std::cout << "Extract NIR Band\n";
+                GDALDataset *nirBandDS = imgUtils.createCopy(reflDataset, 1, tmpNIRBandImg, gdalFormat, imgReflDT);
+                std::vector<unsigned int> bands;
+                bands.push_back(4);
+                rsgis::img::RSGISCopyImageBandSelect selImageBands = rsgis::img::RSGISCopyImageBandSelect(bands);
+                rsgis::img::RSGISCalcImage calcSelBandsImage = rsgis::img::RSGISCalcImage(&selImageBands);
+                calcSelBandsImage.calcImage(&reflDataset, 1, nirBandDS);
+                
+                std::cout << "Fill NIR Band\n";
+                GDALDataset *nirBandFillDS = imgUtils.createCopy(reflDataset, 1, tmpNIRFillBandImg, gdalFormat, imgReflDT);
+                rsgis::calib::RSGISHydroDEMFillSoilleGratin94 fillDEMInst;
+                fillDEMInst.performSoilleGratin94Fill(nirBandDS, validAreaDataset, nirBandFillDS, false, landNIR175Val);
+         
+                std::cout << "Produce Potential Cloud Shadows Mask\n";
+                GDALDataset *potentCloudShadowDS = imgUtils.createCopy(reflDataset, 1, tmpPotentShadows, gdalFormat, GDT_Int32);
+                rsgis::calib::RSGISCalcImagePotentialCloudShadowsMask imgCalcPotentShadows = rsgis::calib::RSGISCalcImagePotentialCloudShadowsMask(scaleFactorIn);
+                rsgis::img::RSGISCalcImage calcPotentShadowImage = rsgis::img::RSGISCalcImage(&imgCalcPotentShadows);
+                datasets = new GDALDataset*[3];
+                datasets[0] = validAreaDataset;
+                datasets[1] = nirBandDS;
+                datasets[2] = nirBandFillDS;
+                calcPotentShadowImage.calcImage(datasets, 3, potentCloudShadowDS);
+                
+                popImageStats.populateImageWithRasterGISStats(potentCloudShadowDS, true, true, 1);
+                
+                popImageStats.populateImageWithRasterGISStats(cloudClumpsRMSmallReLblDS, true, true, 1);
+                GDALDataset *initCloudHeightsDS = imgUtils.createCopy(reflDataset, 2, tmpCloudsInitHeights, gdalFormat, GDT_Float32);
+                rsgis::calib::RSGISCalcCloudParams calcCloudParams;
+                calcCloudParams.calcCloudHeights(thermDataset, cloudClumpsRMSmallReLblDS, initCloudHeightsDS, lowerLandThres, upperLandThres, scaleFactorIn);
+                
+                GDALDataset *cloudShadowTestRegionsDS = imgUtils.createCopy(reflDataset, 1, tmpCloudsShadowTestRegions, gdalFormat, GDT_Byte);
+                GDALDataset *cloudShadowRegionsDS = imgUtils.createCopy(reflDataset, 1, tmpCloudsShadows, gdalFormat, GDT_Byte);
+                
+                calcCloudParams.projFitCloudShadow(cloudClumpsRMSmallReLblDS, initCloudHeightsDS, potentCloudShadowDS, cloudShadowTestRegionsDS, cloudShadowRegionsDS, sunAz, sunZen, senAz, senZen);
+                
+                
+                std::cout << "Apply cloud shadow majority filter...\n";
+                rsgis::calib::RSGISCalcImageCloudMajorityFilter cloudShadowMajFilter = rsgis::calib::RSGISCalcImageCloudMajorityFilter();
+                rsgis::img::RSGISCalcEditImage editImgCalcShadow = rsgis::img::RSGISCalcEditImage(&cloudShadowMajFilter);
+                editImgCalcShadow.calcImageWindowData(cloudShadowRegionsDS, 5);
+                 
+                rsgis::math::RSGISMatrices matrixUtils;
+                
+                rsgis::math::Matrix *matrixMorphOperator = matrixUtils.createMatrix(15, 15);
+                matrixUtils.makeCircularBinaryMatrix(matrixMorphOperator);
+                
+                rsgis::filter::RSGISImageMorphologyDilate morphDialate;
+                morphDialate.dilateImage(&cloudShadowRegionsDS, tmpFinalShadowsDialate, matrixMorphOperator, gdalFormat, GDT_Byte);
+                GDALDataset *finalShadowsDialateDS = (GDALDataset *) GDALOpen(tmpFinalShadowsDialate.c_str(), GA_Update);
+                if(finalShadowsDialateDS == NULL)
+                {
+                    std::string message = std::string("Could not open image ") + tmpFinalShadowsDialate;
+                    throw RSGISImageException(message.c_str());
+                }
+                
+                GDALRasterAttributeTable *cloudsRATRelbl = cloudClumpsRMSmallReLblDS->GetRasterBand(1)->GetDefaultRAT();
+                numcloudsRATHistoRows = 0;
+                cloudsRATHisto = attUtils.readIntColumn(cloudsRATRelbl, "Histogram", &numcloudsRATHistoRows);
+                
+                for(size_t i = 0; i < numcloudsRATHistoRows; ++i)
+                {
+                    cloudsRATHisto[i] = 1;
+                }
+                attUtils.writeIntColumn(cloudsRATRelbl, "CloudMask", cloudsRATHisto, numcloudsRATHistoRows);
+                delete[] cloudsRATHisto;
+                
+                unsigned int columnIndex = attUtils.findColumnIndex(cloudsRATRelbl, "CloudMask");
+                rsgis::rastergis::RSGISExportColumns2ImageCalcImage calcImageVal = rsgis::rastergis::RSGISExportColumns2ImageCalcImage(1, cloudsRATRelbl, columnIndex);
+                rsgis::img::RSGISCalcImage calcImageExportRATCol(&calcImageVal);
+                GDALDataset *finalCloudsDS = imgUtils.createCopy(reflDataset, 1, tmpFinalClouds, gdalFormat, GDT_Byte);
+                calcImageExportRATCol.calcImage(&cloudClumpsRMSmallReLblDS, 1, 0, finalCloudsDS);
+      
+                
+                morphDialate.dilateImage(&finalCloudsDS, tmpFinalCloudsDialate, matrixMorphOperator, gdalFormat, GDT_Byte);
+                GDALDataset *finalCloudsDialateDS = (GDALDataset *) GDALOpen(tmpFinalCloudsDialate.c_str(), GA_Update);
+                if(finalCloudsDialateDS == NULL)
+                {
+                    std::string message = std::string("Could not open image ") + tmpFinalCloudsDialate;
+                    throw RSGISImageException(message.c_str());
+                }
+                matrixUtils.freeMatrix(matrixMorphOperator);
+                
+                GDALDataset *finalResultDS = imgUtils.createCopy(reflDataset, 1, outputImage, gdalFormat, GDT_Byte);
+                datasets = new GDALDataset*[2];
+                datasets[0] = finalCloudsDialateDS;
+                datasets[1] = finalShadowsDialateDS;
+                rsgis::calib::RSGISCalcCombineMasks calcCombineMask;
+                rsgis::img::RSGISCalcImage calcImgCombineMasks = rsgis::img::RSGISCalcImage(&calcCombineMask);
+                calcImgCombineMasks.calcImage(datasets, 2, 0, finalResultDS);
+                delete[] datasets;
+                
+                popImageStats.populateImageWithRasterGISStats(finalResultDS, true, true, 1);
+                
+                int *red = new int[3];
+                int *green = new int[3];
+                int *blue = new int[3];
+                std::string *classNames = new std::string[3];
+                
+                red[0] = 0;
+                green[0] = 0;
+                blue[0] = 0;
+                classNames[0] = "";
+                
+                red[1] = 0;
+                green[1] = 0;
+                blue[1] = 255;
+                classNames[1] = "Clouds";
+                
+                red[2] = 0;
+                green[2] = 255;
+                blue[2] = 255;
+                classNames[2] = "Shadows";
+                
+                GDALRasterAttributeTable *finalResultRAT = finalResultDS->GetRasterBand(1)->GetDefaultRAT();
+                finalResultRAT->SetRowCount(3);
+                attUtils.writeIntColumn(finalResultRAT, "Red", red, 3);
+                attUtils.writeIntColumn(finalResultRAT, "Green", green, 3);
+                attUtils.writeIntColumn(finalResultRAT, "Blue", blue, 3);
+                attUtils.writeStrColumn(finalResultRAT, "ClassName", classNames, 3);
+                
+                delete[] red;
+                delete[] green;
+                delete[] blue;
+                delete[] classNames;
+                
+                GDALClose(pass1DS);
+                GDALClose(landWaterClearSkyDS);
+                GDALClose(pass2DS);
+                GDALClose(nirBandDS);
+                GDALClose(nirBandFillDS);
+                GDALClose(potentCloudShadowDS);
+                GDALClose(cloudMaskDS);
+                GDALClose(cloudClumpsDS);
+                GDALClose(cloudClumpsRMSmallDS);
+                GDALClose(cloudClumpsRMSmallReLblDS);
+                GDALClose(initCloudHeightsDS);
+                GDALClose(cloudShadowTestRegionsDS);
+                GDALClose(cloudShadowRegionsDS);
+                GDALClose(finalShadowsDialateDS);
+                GDALClose(finalCloudsDS);
+                GDALClose(finalCloudsDialateDS);
+                GDALClose(finalResultDS);
+                GDALClose(reflDataset);
+                GDALClose(thermDataset);
+                GDALClose(saturateDataset);
+                GDALClose(validAreaDataset);
+                
+                if(rmTmpImgs)
+                {
+                    GDALDriver *poDriver = GetGDALDriverManager()->GetDriverByName(gdalFormat.c_str());
+                    if(poDriver == NULL)
+                    {
+                        throw RSGISImageException("Image driver is not available.");
+                    }
+                    
+                    poDriver->Delete(pass1TmpOutImage.c_str());
+                    poDriver->Delete(landWaterTmpOutImage.c_str());
+                    poDriver->Delete(cloudLandProbTmpOutImage.c_str());
+                    poDriver->Delete(tmpNIRBandImg.c_str());
+                    poDriver->Delete(tmpNIRFillBandImg.c_str());
+                    poDriver->Delete(tmpPotentShadows.c_str());
+                    poDriver->Delete(tmpCloudsExtent.c_str());
+                    poDriver->Delete(tmpCloudsClump.c_str());
+                    poDriver->Delete(tmpCloudsClumpRMSmall.c_str());
+                    poDriver->Delete(tmpCloudsClumpRMSmallRelabel.c_str());
+                    poDriver->Delete(tmpCloudsInitHeights.c_str());
+                    poDriver->Delete(tmpCloudsShadowTestRegions.c_str());
+                    poDriver->Delete(tmpCloudsShadows.c_str());
+                    poDriver->Delete(tmpFinalShadowsDialate.c_str());
+                    poDriver->Delete(tmpFinalClouds.c_str());
+                    poDriver->Delete(tmpFinalCloudsDialate.c_str());
+                }
+            }
+            else
+            {
+                GDALDataset *finalResultDS = imgUtils.createCopy(reflDataset, 1, outputImage, gdalFormat, GDT_Byte);
+                rsgis::calib::RSGISExportMaskForOverPCPThreshold calcFinalMask;
+                rsgis::img::RSGISCalcImage calcImgProduceFinalMask = rsgis::img::RSGISCalcImage(&calcFinalMask);
+                calcImgProduceFinalMask.calcImage(&validAreaDataset, 1, 0, finalResultDS);
+                popImageStats.populateImageWithRasterGISStats(finalResultDS, true, true, 1);
+                
+                int *red = new int[3];
+                int *green = new int[3];
+                int *blue = new int[3];
+                std::string *classNames = new std::string[3];
+                
+                red[0] = 0;
+                green[0] = 0;
+                blue[0] = 0;
+                classNames[0] = "";
+                
+                red[1] = 0;
+                green[1] = 0;
+                blue[1] = 255;
+                classNames[1] = "Clouds";
+                
+                red[2] = 0;
+                green[2] = 255;
+                blue[2] = 255;
+                classNames[2] = "Shadows";
+                
+                GDALRasterAttributeTable *finalResultRAT = finalResultDS->GetRasterBand(1)->GetDefaultRAT();
+                finalResultRAT->SetRowCount(3);
+                attUtils.writeIntColumn(finalResultRAT, "Red", red, 3);
+                attUtils.writeIntColumn(finalResultRAT, "Green", green, 3);
+                attUtils.writeIntColumn(finalResultRAT, "Blue", blue, 3);
+                attUtils.writeStrColumn(finalResultRAT, "ClassName", classNames, 3);
+                
+                delete[] red;
+                delete[] green;
+                delete[] blue;
+                delete[] classNames;
+                
+                
+                GDALClose(pass1DS);
+                GDALClose(landWaterClearSkyDS);
+                GDALClose(reflDataset);
+                GDALClose(thermDataset);
+                GDALClose(saturateDataset);
+                GDALClose(validAreaDataset);
+                GDALClose(finalResultDS);
+                
+                if(rmTmpImgs)
+                {
+                    GDALDriver *poDriver = GetGDALDriverManager()->GetDriverByName(gdalFormat.c_str());
+                    if(poDriver == NULL)
+                    {
+                        throw RSGISImageException("Image driver is not available.");
+                    }
+                    
+                    poDriver->Delete(pass1TmpOutImage.c_str());
+                    poDriver->Delete(landWaterTmpOutImage.c_str());
+                }
             }
             
         }
