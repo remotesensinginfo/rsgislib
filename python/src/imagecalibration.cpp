@@ -1047,17 +1047,18 @@ static PyObject *ImageCalibration_applyLandsatTMCloudFMask(PyObject *self, PyObj
     const char *pszInputTOAFile, *pszInputThermalFile, *pszInputSatFile, *pszValidAreaImg, *pszOutputFile, *pszTmpImgsBase, *pszTmpImgsFileExt, *pszGDALFormat;
     float sunAz, sunZen, senAz, senZen = 0.0;
     float scaleFactor;
+    float whitenessThreshold = 0.7;
     int rmTmpImages = true;
     
     
-    if( !PyArg_ParseTuple(args, "ssssssfffffss|i:applyLandsatTMCloudFMask", &pszInputTOAFile, &pszInputThermalFile, &pszInputSatFile, &pszValidAreaImg, &pszOutputFile, &pszGDALFormat, &sunAz, &sunZen, &senAz, &senZen, &scaleFactor, &pszTmpImgsBase, &pszTmpImgsFileExt, &rmTmpImages))
+    if( !PyArg_ParseTuple(args, "ssssssfffffss|fi:applyLandsatTMCloudFMask", &pszInputTOAFile, &pszInputThermalFile, &pszInputSatFile, &pszValidAreaImg, &pszOutputFile, &pszGDALFormat, &sunAz, &sunZen, &senAz, &senZen, &scaleFactor, &pszTmpImgsBase, &pszTmpImgsFileExt, &whitenessThreshold, &rmTmpImages))
     {
         return NULL;
     }
     
     try
     {
-        rsgis::cmds::executeLandsatTMCloudFMask(std::string(pszInputTOAFile), std::string(pszInputThermalFile), std::string(pszInputSatFile), std::string(pszValidAreaImg), std::string(pszOutputFile), std::string(pszGDALFormat), sunAz, sunZen, senAz, senZen, scaleFactor, std::string(pszTmpImgsBase), std::string(pszTmpImgsFileExt), (bool)rmTmpImages);
+        rsgis::cmds::executeLandsatTMCloudFMask(std::string(pszInputTOAFile), std::string(pszInputThermalFile), std::string(pszInputSatFile), std::string(pszValidAreaImg), std::string(pszOutputFile), std::string(pszGDALFormat), sunAz, sunZen, senAz, senZen, whitenessThreshold, scaleFactor, std::string(pszTmpImgsBase), std::string(pszTmpImgsFileExt), (bool)rmTmpImages);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -1462,7 +1463,7 @@ static PyMethodDef ImageCalibrationMethods[] = {
     
 {"applyLandsatTMCloudFMask", ImageCalibration_applyLandsatTMCloudFMask, METH_VARARGS,
     "imagecalibration.applyLandsatTMCloudFMask(inputTOAImage, inputThermalImage, inputSaturateImage, inValidAreaImage, outputImage, gdalFormat, sunAz, sunZen, senAz, senZen, scaleFactorIn, tmpImgsBase, tmpImgsFileExt, rmTmpImgs)\n"
-    "Converts at sensor radiance values to Top of Atmosphere Reflectance.\n"
+    "Applies the FMASK (Zhu and Woodcock 2012, RSE 118, pp83-94) cloud masking algorithm to the input image returning an output image with the cloud (pixel value 1) and shadow (pixel value 2).\n"
     "Where:\n"
     "\n"
     "* inputTOAImage is a string containing the name of the input image TOA reflectance file\n"
@@ -1478,6 +1479,7 @@ static PyMethodDef ImageCalibrationMethods[] = {
     "* scaleFactorIn is a float with the scale factor used to multiple the input image (reflectance and thermal) data.\n"
     "* tmpImgsBase is a string specifying a base path and name for the tmp images used for this processing\n"
     "* tmpImgsFileExt is a string for the file extention of the output images (e.g., .kea)\n"
+    "* whitenessThreshold is a float specifying the whiteness threshold (default is 0.7; Equation 2), this parameter is optional.\n"
     "* rmTmpImgs is a bool specifying whether the tmp images should be deleted at the end of the processing (Optional; Default = True)\n"
     "\n"},
     

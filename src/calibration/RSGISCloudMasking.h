@@ -49,7 +49,7 @@ namespace rsgis{namespace calib{
 	class DllExport RSGISLandsatFMaskPass1CloudMasking : public rsgis::img::RSGISCalcImageValue
     {
     public:
-        RSGISLandsatFMaskPass1CloudMasking(unsigned int scaleFactor, unsigned int numLSBands)throw(rsgis::img::RSGISImageCalcException);
+        RSGISLandsatFMaskPass1CloudMasking(unsigned int scaleFactor, unsigned int numLSBands, double whitenessThreshold=0.7)throw(rsgis::img::RSGISImageCalcException);
         void calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException);
         void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
         void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
@@ -91,8 +91,8 @@ namespace rsgis{namespace calib{
         unsigned long numLandBins;
         double minTempLand;
         double tempBinWidthLand;
+        double whitenessThreshold;
     };
-    
     
     class DllExport RSGISLandsatFMaskExportPass1LandWaterCloudMasking : public rsgis::img::RSGISCalcImageValue
     {
@@ -108,7 +108,11 @@ namespace rsgis{namespace calib{
         void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
         void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
         bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
+        double propOfPCPPixels();
         ~RSGISLandsatFMaskExportPass1LandWaterCloudMasking();
+    protected:
+        double numPCPPxls;
+        double numValidPxls;
     };
     
     class DllExport RSGISLandsatFMaskPass2ClearSkyCloudProbCloudMasking : public rsgis::img::RSGISCalcImageValue
@@ -159,7 +163,7 @@ namespace rsgis{namespace calib{
     class DllExport RSGISLandsatFMaskPass2CloudMasking : public rsgis::img::RSGISCalcImageValue
     {
     public:
-        RSGISLandsatFMaskPass2CloudMasking(unsigned int scaleFactor, unsigned int numLSBands, double landCloudProbUpperThres, double waterCloudProbUpperThres)throw(rsgis::img::RSGISImageCalcException);
+        RSGISLandsatFMaskPass2CloudMasking(unsigned int scaleFactor, unsigned int numLSBands, double landCloudProbUpperThres, double waterCloudProbUpperThres, double lowerLandTempThres)throw(rsgis::img::RSGISImageCalcException);
         void calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException);
         void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
         void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
@@ -193,6 +197,7 @@ namespace rsgis{namespace calib{
         bool thermal2;
         double landCloudProbUpperThres;
         double waterCloudProbUpperThres;
+        double lowerLandTempThres;
     };
     
     
@@ -343,6 +348,23 @@ namespace rsgis{namespace calib{
         ~RSGISCalcCombineMasks(){};
     };
     
+    
+    class DllExport RSGISExportMaskForOverPCPThreshold : public rsgis::img::RSGISCalcImageValue
+    {
+    public:
+        RSGISExportMaskForOverPCPThreshold():rsgis::img::RSGISCalcImageValue(1){};
+        void calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
+        void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(rsgis::img::RSGISImageCalcException);
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent)throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
+        void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
+        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
+        ~RSGISExportMaskForOverPCPThreshold(){};
+    };
     
     
     
