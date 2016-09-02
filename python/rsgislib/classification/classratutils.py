@@ -35,6 +35,7 @@
 #
 ###########################################################################
 
+from __future__ import print_function
 haveGDALPy = True
 try:
     import osgeo.gdal as gdal
