@@ -102,9 +102,17 @@ namespace rsgis{namespace calib{
             long hcrt = minVal;
             long imgVal = 0;
             long img2Val = 0;
+            int feedback = numLevels/10.0;
+            int feedbackCounter = 0;
+            std::cout << "Started ." << std::flush;
             for(long n = 0; n < numLevels; ++n)
             {
-                std::cout << "Processing level " << n+1 << " of " << numLevels << std::endl;
+                if((feedback != 0) && ((n % feedback) == 0))
+                {
+                    std::cout << "." << feedbackCounter << "." << std::flush;
+                    feedbackCounter = feedbackCounter + 10;
+                }
+                //std::cout << "Processing level " << n+1 << " of " << numLevels << std::endl;
                 while(!this->qEmpty(hcrt))
                 {
                     pxl = this->qPopFront(hcrt);
@@ -114,7 +122,6 @@ namespace rsgis{namespace calib{
                     //outImgDS->GetRasterBand(1)->RasterIO(GF_Write, pxl.x, pxl.y, 1, 1, &val, 1, 1, GDT_Float32, 1, 1);
                     
                     // Get Neightbours
-                
                     std::list<Q2DPxl> *nPxls = this->getNeighbours(pxl, inValidImgDS->GetRasterBand(1));
                     for(std::list<Q2DPxl>::iterator iterNPxls = nPxls->begin(); iterNPxls != nPxls->end(); ++iterNPxls)
                     {
@@ -137,15 +144,13 @@ namespace rsgis{namespace calib{
                 
                 ++hcrt;
             }
-            std::cout << "Finished...\n";
+            std::cout << ". Complete.\n";
             
             for(long n = 0; n < numLevels; ++n)
             {
                 delete pxQ[n];
             }
-            delete[] pxQ;
-            
-            
+            delete[] pxQ;            
         }
         catch (rsgis::img::RSGISImageCalcException &e)
         {
