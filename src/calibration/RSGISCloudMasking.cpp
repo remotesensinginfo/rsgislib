@@ -927,7 +927,7 @@ namespace rsgis{namespace calib{
             
             int feedback = numClumps/10.0;
             int feedbackCounter = 0;
-            std::cout << "Iteratively finding optimal cloud height. This step may take a while; there are" << numClumps << " clumps\n";
+            std::cout << "Iteratively finding optimal cloud height. This step may take a while; there are " << numClumps << " clumps\n";
             std::cout << "Started ." << std::flush;
             for(size_t i = 1; i < numClumps; ++i)
             {
@@ -998,6 +998,7 @@ namespace rsgis{namespace calib{
                 }
                 
                 //std::cout << "Shadow best fit base height is " << maxH << std::endl;
+                bestFitBaseLine[i] = maxH;
                 
                 delete pxPts;
                 //std::cout << std::endl;
