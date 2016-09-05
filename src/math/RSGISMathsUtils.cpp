@@ -1286,6 +1286,8 @@ namespace rsgis{namespace math{
         unsigned int *hist = NULL;
         try
         {
+            *minVal = 0.0;
+            *maxVal = 0.0;
             bool first = true;
             size_t i = 0;
             if(ignoreFirstVal)
@@ -1322,7 +1324,6 @@ namespace rsgis{namespace math{
                 std::cout << "Max: " << (*maxVal) << " Min: " << (*minVal) << " Num of Bins: " << (*numBins) << std::endl;
                 throw RSGISMathException("Bin width is too large or not enough variation within the data to create a histogram.");
             }
-            std::cout << "Max: " << (*maxVal) << " Min: " << (*minVal) << " Num of Bins: " << (*numBins) << std::endl;
             
             hist = new unsigned int[(*numBins)];
             for(size_t i = 0; i < (*numBins); ++i)
