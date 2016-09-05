@@ -703,6 +703,8 @@ namespace rsgis{ namespace cmds {
             std::string cloudLandProbTmpOutImage = tmpImgsBase + "_cloudProb"+tmpImgFileExt;
             std::string tmpNIRBandImg = tmpImgsBase + "_nirband"+tmpImgFileExt;
             std::string tmpNIRFillBandImg = tmpImgsBase + "_nirbandfill"+tmpImgFileExt;
+            std::string tmpSWIRBandImg = tmpImgsBase + "_swirband"+tmpImgFileExt;
+            std::string tmpSWIRFillBandImg = tmpImgsBase + "_swirbandfill"+tmpImgFileExt;
             std::string tmpPotentShadows = tmpImgsBase + "_potentshadows"+tmpImgFileExt;
             std::string tmpCloudsExtent = tmpImgsBase + "_baseClouds"+tmpImgFileExt;
             std::string tmpCloudsClump = tmpImgsBase + "_baseCloudClumps"+tmpImgFileExt;
@@ -819,6 +821,7 @@ namespace rsgis{ namespace cmds {
             
             if(propPCP < 0.95)
             {
+                
                 popImageStats.populateImageWithRasterGISStats(landWaterClearSkyDS, true, true, 1);
                 
                 std::cout << "Populating RAT with Thermal Stats\n";
@@ -948,13 +951,14 @@ namespace rsgis{ namespace cmds {
                 GDALDataset *cloudClumpsRMSmallReLblDS = imgUtils.createCopy(reflDataset, 1, tmpCloudsClumpRMSmallRelabel, gdalFormat, GDT_UInt32);
                 relabelImg.relabelClumpsCalcImg(cloudClumpsRMSmallDS, cloudClumpsRMSmallReLblDS);
                 popImageStats.populateImageWithRasterGISStats(cloudClumpsRMSmallReLblDS, true, true, 1);
-                
+
                 std::cout << "Calculate Shadow Mask\n";
                 int nirIdx = 4;
                 if(reflDataset->GetRasterCount() == 7)
                 {
                     nirIdx = 5;
                 }
+                
                 bandPercentStats = new std::vector<rsgis::rastergis::RSGISBandAttPercentiles *>();
                 rsgis::rastergis::RSGISBandAttPercentiles *landNIRPercent = new rsgis::rastergis::RSGISBandAttPercentiles();
                 landNIRPercent->fieldName = "LowerNIRLandValue175";
@@ -964,14 +968,13 @@ namespace rsgis{ namespace cmds {
                 delete landNIRPercent;
                 delete bandPercentStats;
                 double landNIR175Val = ratUtils.readDoubleColumnVal(landWaterRAT, "LowerNIRLandValue175", 1);
-                
                 std::cout << "Land NIR 17.5% Percentile = " << landNIR175Val << std::endl;
                 
                 // Extract NIR band.
                 std::cout << "Extract NIR Band\n";
                 GDALDataset *nirBandDS = imgUtils.createCopy(reflDataset, 1, tmpNIRBandImg, gdalFormat, imgReflDT);
                 std::vector<unsigned int> bands;
-                bands.push_back(4);
+                bands.push_back(nirIdx);
                 rsgis::img::RSGISCopyImageBandSelect selImageBands = rsgis::img::RSGISCopyImageBandSelect(bands);
                 rsgis::img::RSGISCalcImage calcSelBandsImage = rsgis::img::RSGISCalcImage(&selImageBands);
                 calcSelBandsImage.calcImage(&reflDataset, 1, nirBandDS);
@@ -980,20 +983,55 @@ namespace rsgis{ namespace cmds {
                 GDALDataset *nirBandFillDS = imgUtils.createCopy(reflDataset, 1, tmpNIRFillBandImg, gdalFormat, imgReflDT);
                 rsgis::calib::RSGISHydroDEMFillSoilleGratin94 fillDEMInst;
                 fillDEMInst.performSoilleGratin94Fill(nirBandDS, validAreaDataset, nirBandFillDS, false, landNIR175Val);
-         
+                
+                ////////////////////////////////////// Perform fill with SWIR: Extra on paper which only uses the NIR.
+                int swirIdx = 5;
+                if(reflDataset->GetRasterCount() == 7)
+                {
+                    swirIdx = 6;
+                }
+                bandPercentStats = new std::vector<rsgis::rastergis::RSGISBandAttPercentiles *>();
+                rsgis::rastergis::RSGISBandAttPercentiles *landSWIRPercent = new rsgis::rastergis::RSGISBandAttPercentiles();
+                landSWIRPercent->fieldName = "LowerSWIRLandValue175";
+                landSWIRPercent->percentile = 17.5; // SWIR LAND THRESHOLD 17.5 %
+                bandPercentStats->push_back(landSWIRPercent);
+                calcClumpStats.populateRATWithPercentileStats(landWaterClearSkyDS, reflDataset, swirIdx, bandPercentStats, 1, 200);
+                delete landSWIRPercent;
+                delete bandPercentStats;
+                double landSWIR175Val = ratUtils.readDoubleColumnVal(landWaterRAT, "LowerSWIRLandValue175", 1);
+                std::cout << "Land SWIR 17.5% Percentile = " << landSWIR175Val << std::endl;
+                
+                // Extract SWIR band.
+                std::cout << "Extract SWIR Band\n";
+                GDALDataset *swirBandDS = imgUtils.createCopy(reflDataset, 1, tmpSWIRBandImg, gdalFormat, imgReflDT);
+                bands = std::vector<unsigned int>();
+                bands.push_back(swirIdx);
+                selImageBands = rsgis::img::RSGISCopyImageBandSelect(bands);
+                calcSelBandsImage = rsgis::img::RSGISCalcImage(&selImageBands);
+                calcSelBandsImage.calcImage(&reflDataset, 1, swirBandDS);
+                
+                std::cout << "Fill SWIR Band\n";
+                GDALDataset *swirBandFillDS = imgUtils.createCopy(reflDataset, 1, tmpSWIRFillBandImg, gdalFormat, imgReflDT);
+                fillDEMInst = rsgis::calib::RSGISHydroDEMFillSoilleGratin94();
+                fillDEMInst.performSoilleGratin94Fill(swirBandDS, validAreaDataset, swirBandFillDS, false, landSWIR175Val);
+                //////////////////////////////////////////////////////////////////////////////////////////////////
+                
+                // In addition to what is in the paper potential shadows have to be within the NIR and SWIR - helps to remove false positives.
                 std::cout << "Produce Potential Cloud Shadows Mask\n";
                 GDALDataset *potentCloudShadowDS = imgUtils.createCopy(reflDataset, 1, tmpPotentShadows, gdalFormat, GDT_Int32);
                 rsgis::calib::RSGISCalcImagePotentialCloudShadowsMask imgCalcPotentShadows = rsgis::calib::RSGISCalcImagePotentialCloudShadowsMask(scaleFactorIn);
                 rsgis::img::RSGISCalcImage calcPotentShadowImage = rsgis::img::RSGISCalcImage(&imgCalcPotentShadows);
-                datasets = new GDALDataset*[3];
+                datasets = new GDALDataset*[5];
                 datasets[0] = validAreaDataset;
                 datasets[1] = nirBandDS;
                 datasets[2] = nirBandFillDS;
-                calcPotentShadowImage.calcImage(datasets, 3, potentCloudShadowDS);
-                
+                datasets[3] = swirBandDS;
+                datasets[4] = swirBandFillDS;
+                calcPotentShadowImage.calcImage(datasets, 5, potentCloudShadowDS);
                 popImageStats.populateImageWithRasterGISStats(potentCloudShadowDS, true, true, 1);
+                delete[] datasets;
                 
-                popImageStats.populateImageWithRasterGISStats(cloudClumpsRMSmallReLblDS, true, true, 1);
+
                 GDALDataset *initCloudHeightsDS = imgUtils.createCopy(reflDataset, 2, tmpCloudsInitHeights, gdalFormat, GDT_Float32);
                 rsgis::calib::RSGISCalcCloudParams calcCloudParams;
                 calcCloudParams.calcCloudHeights(thermDataset, cloudClumpsRMSmallReLblDS, initCloudHeightsDS, lowerLandThres, upperLandThres, scaleFactorIn);
@@ -1114,6 +1152,8 @@ namespace rsgis{ namespace cmds {
                 GDALClose(thermDataset);
                 GDALClose(saturateDataset);
                 GDALClose(validAreaDataset);
+                GDALClose(swirBandFillDS);
+                GDALClose(swirBandDS);
                 
                 if(rmTmpImgs)
                 {
@@ -1139,6 +1179,8 @@ namespace rsgis{ namespace cmds {
                     poDriver->Delete(tmpFinalShadowsDialate.c_str());
                     poDriver->Delete(tmpFinalClouds.c_str());
                     poDriver->Delete(tmpFinalCloudsDialate.c_str());
+                    poDriver->Delete(tmpSWIRBandImg.c_str());
+                    poDriver->Delete(tmpSWIRFillBandImg.c_str());
                 }
             }
             else

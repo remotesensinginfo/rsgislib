@@ -880,6 +880,69 @@ namespace rsgis{namespace math{
         
         return percentVal;
     }
+    
+    double RSGISMathsUtils::calcPercentile(float percentile, double histMinVal, double binWidth, unsigned int numBins, unsigned int *hist) throw(RSGISMathException)
+    {
+        double percentVal = 0.0;
+        try
+        {
+            size_t numVals = 0;
+            for(unsigned int i = 0; i < numBins; ++i)
+            {
+                numVals += hist[i];
+            }
+            
+            percentile = percentile / 100;
+            unsigned int percentileValCount = floor(((double)numVals) * percentile);
+            
+            //std::cout << "Percentile " << percentile << " count " << percentileValCount << std::endl;
+            
+            if(percentileValCount == 0)
+            {
+                percentVal = histMinVal + binWidth/2;
+            }
+            else
+            {
+                size_t valCount = 0;
+                bool foundBin = false;
+                unsigned int binIdx = 0;
+                for(unsigned int i = 0; i < numBins; ++i)
+                {
+                    valCount += hist[i];
+                    if(valCount >= percentileValCount)
+                    {
+                        binIdx = i;
+                        foundBin = true;
+                        break;
+                    }
+                }
+                
+                if(!foundBin)
+                {
+                    throw RSGISMathException("Could not find percentile bin! Something I cannot explain has gone wrong!");
+                }
+                //std::cout << "histMinVal = " << histMinVal << std::endl;
+                //std::cout << "binIdx = " << binIdx << std::endl;
+                //std::cout << "binWidth = " << binWidth << std::endl;
+                percentVal = histMinVal + (binWidth * binIdx) + binWidth/2;
+            }
+            
+        }
+        catch(RSGISMathException &e)
+        {
+            throw e;
+        }
+        catch(RSGISException &e)
+        {
+            throw RSGISMathException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISMathException(e.what());
+        }
+        
+        return percentVal;
+    }
 
     double* RSGISMathsUtils::calcMeanVector(double **data, size_t n, size_t m, size_t sMIdx, size_t eMIdx) throw(RSGISMathException)
     {
@@ -1048,7 +1111,7 @@ namespace rsgis{namespace math{
         try
         {
             *numBins = static_cast<size_t>((maxVal - minVal)/binWidth)+1;
-            std::cout << "Number of Histogram Bins = " << *numBins << std::endl;
+            //std::cout << "Number of Histogram Bins = " << *numBins << std::endl;
             hist = new std::vector<std::pair<size_t, double> >*[*numBins];
             for(size_t i = 0; i < *numBins; ++i)
             {
@@ -1215,6 +1278,85 @@ namespace rsgis{namespace math{
             throw RSGISMathException(e.what());
         }
         return hist;
+    }
+    
+    
+    unsigned int* RSGISMathsUtils::calcHistogram(double *data, size_t numVals, double binWidth, double *minVal, double *maxVal, unsigned int *numBins, bool ignoreFirstVal) throw(RSGISMathException)
+    {
+        unsigned int *hist = NULL;
+        try
+        {
+            bool first = true;
+            size_t i = 0;
+            if(ignoreFirstVal)
+            {
+                i = 1;
+            }
+            for(; i < numVals; ++i)
+            {
+                if(first)
+                {
+                    *minVal = data[i];
+                    *maxVal = data[i];
+                    first = false;
+                }
+                else if(data[i] > (*maxVal))
+                {
+                    *maxVal = data[i];
+                }
+                else if(data[i] < (*minVal))
+                {
+                    *minVal = data[i];
+                }
+            }
+
+            if(((*maxVal) - (*minVal)) < (binWidth*2))
+            {
+                std::cout << "Max: " << (*maxVal) << " Min: " << (*minVal) << std::endl;
+                throw RSGISMathException("Bin width is too large or not enough variation within the data to create a histogram.");
+            }
+
+            (*numBins) = static_cast<size_t>(((*maxVal) - (*minVal))/binWidth)+1;
+            if((*numBins) < 2)
+            {
+                std::cout << "Max: " << (*maxVal) << " Min: " << (*minVal) << " Num of Bins: " << (*numBins) << std::endl;
+                throw RSGISMathException("Bin width is too large or not enough variation within the data to create a histogram.");
+            }
+            std::cout << "Max: " << (*maxVal) << " Min: " << (*minVal) << " Num of Bins: " << (*numBins) << std::endl;
+            
+            hist = new unsigned int[(*numBins)];
+            for(size_t i = 0; i < (*numBins); ++i)
+            {
+                hist[i] = 0;
+            }
+            
+            size_t idx = 0;
+            i = 0;
+            if(ignoreFirstVal)
+            {
+                i = 1;
+            }
+            for(; i < numVals; ++i)
+            {
+                idx = static_cast<size_t>((data[i] - (*minVal))/binWidth);
+                hist[idx] = hist[idx] + 1;
+            }
+
+        }
+        catch(RSGISMathException &e)
+        {
+            throw e;
+        }
+        catch(RSGISException &e)
+        {
+            throw RSGISMathException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISMathException(e.what());
+        }
+        return hist;
+   
     }
     
 }}

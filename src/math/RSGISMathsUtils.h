@@ -148,12 +148,15 @@ namespace rsgis{namespace math{
             void initStatsSummaryValues(RSGISStatsSummary *stats);
             bool angleWithinRange(float angle, float lower, float upper);
             double calcPercentile(float percentile, double *binBounds, double binWidth, unsigned int numBins, unsigned int *hist) throw(RSGISMathException);
+            double calcPercentile(float percentile, double histMinVal, double binWidth, unsigned int numBins, unsigned int *hist) throw(RSGISMathException);
             double* calcMeanVector(double **data, size_t n, size_t m, size_t sMIdx, size_t eMIdx) throw(RSGISMathException);
             double** calcCovarianceMatrix(double **data, double *meanVec, size_t n, size_t m, size_t sMIdx, size_t eMIdx) throw(RSGISMathException);
             std::vector<std::pair<size_t, double> >* sampleUseHistogramMethod(std::vector<std::pair<size_t, double> > *inData, double minVal, double maxVal, double binWidth, float propOfPop) throw(RSGISMathException);
             std::vector<std::pair<size_t, double> >** calcHistogram(std::vector<std::pair<size_t, double> > *inData, double minVal, double maxVal, double binWidth, size_t *numBins) throw(RSGISMathException);
             std::vector<std::pair<double, double> >* calcHistogram(std::vector<double> *data, double minVal, double maxVal, double binWidth, bool norm) throw(RSGISMathException);
             std::vector<std::vector<RSGIS2DHistBin>* >* calc2DHistogram(std::vector<double> *data1, double minVal1, double maxVal1, double binWidth1, std::vector<double> *data2, double minVal2, double maxVal2, double binWidth2, bool norm) throw(RSGISMathException);
+            
+            unsigned int* calcHistogram(double *data, size_t numVals, double binWidth, double *minVal, double *maxVal, unsigned int *numBins, bool ignoreFirstVal=false) throw(RSGISMathException);
 		};
 	
 }}
