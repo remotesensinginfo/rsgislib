@@ -722,7 +722,7 @@ namespace rsgis{namespace calib{
   
     void RSGISCalcImagePotentialCloudShadowsMask::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
     {
-        if(numBands != 3)
+        if(numBands != 5)
         {
             throw rsgis::img::RSGISImageCalcException("The number of image bands must be 3.");
         }
@@ -731,8 +731,13 @@ namespace rsgis{namespace calib{
         {
             bandValues[1] = bandValues[1] / this->scaleFactor;
             bandValues[2] = bandValues[2] / this->scaleFactor;
-            float diffVal = bandValues[2] - bandValues[1];
-            if(diffVal > 0.02)
+            float diffValNIR = bandValues[2] - bandValues[1];
+            
+            bandValues[3] = bandValues[3] / this->scaleFactor;
+            bandValues[4] = bandValues[4] / this->scaleFactor;
+            float diffValSWIR = bandValues[4] - bandValues[3];
+            
+            if((diffValNIR > 0.02) & (diffValSWIR > 0.02))
             {
                 output[0] = 1;
             }
@@ -917,10 +922,21 @@ namespace rsgis{namespace calib{
             double cloudPropOverlap = 0.0;
             unsigned long numPxlOverlap = 0;
             bool calcdShadProp = true;
+            double *bestFitBaseLine = new double[numClumps];
+            bestFitBaseLine[0] = 0.0;
             
+            int feedback = numClumps/10.0;
+            int feedbackCounter = 0;
+            std::cout << "Iteratively finding optimal cloud height. This step may take a while; there are" << numClumps << " clumps\n";
+            std::cout << "Started ." << std::flush;
             for(size_t i = 1; i < numClumps; ++i)
             {
-                std::cout << "Processing clump " << i << " has " << cloudsRATHisto[i] << " pixels." << std::endl;
+                if((feedback != 0) && ((i % feedback) == 0))
+                {
+                    std::cout << "." << feedbackCounter << "." << std::flush;
+                    feedbackCounter = feedbackCounter + 10;
+                }
+                //std::cout << "Processing clump " << i << " has " << cloudsRATHisto[i] << " pixels." << std::endl;
                 
                 std::vector<std::pair<std::pair<double,double>,double> > *pxPts = new std::vector<std::pair<std::pair<double,double>,double> >();
                 pxPts->reserve(cloudsRATHisto[i]);
@@ -933,13 +949,13 @@ namespace rsgis{namespace calib{
                 //baseHeight = hBaseMin[i];
                 for(baseHeight=hBaseMin[i]; baseHeight < hBaseMax[i]; baseHeight+=0.25)
                 {
-                    std::cout << "\tTesting Height " << baseHeight << " km\n";
+                    //std::cout << "\tTesting Height " << baseHeight << " km" << std::flush;
                     editShadImg.reset();
                     for(std::vector<std::pair<std::pair<double,double>,double> >::iterator iterPts = pxPts->begin(); iterPts != pxPts->end(); ++iterPts)
                     {
                         pxlX = (*iterPts).first.first;
                         pxlY = (*iterPts).first.second;
-                        cloudHgt = (baseHeight+(*iterPts).second) * 1000; // Conver to metres.
+                        cloudHgt = (baseHeight+(*iterPts).second) * 1000; // Convert to metres.
                         
                         // calculation taken from python-fmask
                         d = cloudHgt * tan(sunZen);
@@ -981,13 +997,65 @@ namespace rsgis{namespace calib{
                     }
                 }
                 
-                // Add Shadow with most correspondance to Final Shadow Image.
-                std::cout << "Shadow best fit base height is " << maxH << std::endl;
+                //std::cout << "Shadow best fit base height is " << maxH << std::endl;
+                
+                delete pxPts;
+                //std::cout << std::endl;
+            }
+            std::cout << ". Complete.\n";
+            attUtils.writeRealColumn(cloudsRAT, "FitBaseLine", bestFitBaseLine, numClumps);
+            rsgis::math::RSGISMathsUtils mathUtils;
+            
+            double histMinVal = 0.0;
+            double histMaxVal = 0.0;
+            unsigned int histNumBins = 0;
+            double histBinWidth = 0.1;
+            unsigned int *hist = mathUtils.calcHistogram(bestFitBaseLine, numClumps, histBinWidth, &histMinVal, &histMaxVal, &histNumBins, true);
+            double bestFitBaseLineLowQuat = mathUtils.calcPercentile(25, histMinVal, histBinWidth, histNumBins, hist);
+            double bestFitBaseLineMedian = mathUtils.calcPercentile(50, histMinVal, histBinWidth, histNumBins, hist);
+            double bestFitBaseLineUpQuat = mathUtils.calcPercentile(75, histMinVal, histBinWidth, histNumBins, hist);
+            delete [] hist;
+            //std::cout << "LQ = " << bestFitBaseLineLowQuat << std::endl;
+            //std::cout << "Med = " << bestFitBaseLineMedian << std::endl;
+            //std::cout << "UQ = " << bestFitBaseLineUpQuat << std::endl;
+            
+            for(size_t i = 1; i < numClumps; ++i)
+            {
+                if(bestFitBaseLine[i] < bestFitBaseLineLowQuat)
+                {
+                    bestFitBaseLine[i] = bestFitBaseLineMedian;
+                }
+                else if(bestFitBaseLine[i] > bestFitBaseLineUpQuat)
+                {
+                    bestFitBaseLine[i] = bestFitBaseLineMedian;
+                }
+            }
+            attUtils.writeRealColumn(cloudsRAT, "FitBaseLineEdit", bestFitBaseLine, numClumps);
+            
+            feedbackCounter = 0;
+            std::cout << "Producing cloud shadow mask using optimal heights:\n";
+            std::cout << "Started ." << std::flush;
+            // Add Shadow with most correspondance to Final Shadow Image.
+            for(size_t i = 1; i < numClumps; ++i)
+            {
+                if((feedback != 0) && ((i % feedback) == 0))
+                {
+                    std::cout << "." << feedbackCounter << "." << std::flush;
+                    feedbackCounter = feedbackCounter + 10;
+                }
+                //std::cout << "Processing clump " << i << " has " << cloudsRATHisto[i] << " pixels." << std::endl;
+                
+                std::vector<std::pair<std::pair<double,double>,double> > *pxPts = new std::vector<std::pair<std::pair<double,double>,double> >();
+                pxPts->reserve(cloudsRATHisto[i]);
+                env->init(minX[i], maxX[i], minY[i], maxY[i]);
+                //std::cout << "Clump BBOX [" << minX[i] << ", " << maxX[i] << "][" << minY[i] << ", " << maxY[i] << "]\n";
+                getPxPts.exportPixelsAsPointsWithVal(cloudClumpsDS, (float)i, initCloudHeights, 2, pxPts, true, env);
+                
                 for(std::vector<std::pair<std::pair<double,double>,double> >::iterator iterPts = pxPts->begin(); iterPts != pxPts->end(); ++iterPts)
                 {
                     pxlX = (*iterPts).first.first;
                     pxlY = (*iterPts).first.second;
-                    cloudHgt = (maxH+(*iterPts).second) * 1000; // Conver to metres.
+                    cloudHgt = (bestFitBaseLine[i]+(*iterPts).second) * 1000; // Conver to metres.
                     
                     // calculation taken from python-fmask
                     d = cloudHgt * tan(sunZen);
@@ -998,9 +1066,10 @@ namespace rsgis{namespace calib{
                     yDash = pxlY - d * cos(sunAz);
                     pxlOn = editFinalShadImg.turnOnPxl(xDash, yDash);
                 }
+                
                 delete pxPts;
-                std::cout << std::endl;
             }
+            std::cout << ". Complete.\n";
             
             delete env;
             delete[] cloudBase;

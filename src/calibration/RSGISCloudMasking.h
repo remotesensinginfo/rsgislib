@@ -44,6 +44,8 @@
 #include "rastergis/RSGISRasterAttUtils.h"
 #include "rastergis/RSGISCalcClusterLocation.h"
 
+#include "math/RSGISMathsUtils.h"
+
 namespace rsgis{namespace calib{
     
 	class DllExport RSGISLandsatFMaskPass1CloudMasking : public rsgis::img::RSGISCalcImageValue
