@@ -31,7 +31,7 @@ Surface Reflectance (DOS)
 
 .. autofunction:: rsgislib.imagecalibration.applySubtractOffsets
 .. autofunction:: rsgislib.imagecalibration.applySubtractSingleOffsets
-
+.. autofunction:: rsgislib.imagecalibration.performDOSCalc
 
 Cloud Masking
 --------------

@@ -103,7 +103,16 @@ def calcDist2ImgVals(inputValsImg, outputDistImg, pxlVals, valsImgBand=1, outImg
     * maxDist is a number specifying the maximum distance to be calculated, if None not max value is used (Default = None).
     * noDataVal is the no data value in the input image for which distance should not be calculated for (Default = None; None = no specified no data value).
     * unitGEO is a boolean specifying the output distance units. True = Geographic units (e.g., metres), False is in Pixels (Default = True).
-
+    
+    Example::
+    
+    import rsgislib.imagecalc
+    cloudsImg = 'LS5TM_20110701_lat52lon421_r24p204_clouds.kea'
+    dist2Clouds = 'LS5TM_20110701_lat52lon421_r24p204_distclouds.kea'
+    # Pixel value 1 == Clouds
+    # Pixel value 2 == Cloud Shadows
+    rsgislib.imagecalc.calcDist2ImgVals(cloudsImg, dist2Clouds, pxlVals=[1,2])
+    
     """
    
     # Check gdal is available
