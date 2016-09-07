@@ -24,6 +24,12 @@ A command to perform a dark object subtraction (DOS) on an input image.
 * darkObjPercentile - is the percentile of the input image used to define the dark object threshold, range is 0 - 1 (Default is 0.01; i.e., 1%).
 * copyBandNames - is a boolean specifying that the band names of the input image should be copied to the output image file (Default: True)
 * calcStatsPyd - is a boolean specifying that the image stats and pyramids should be calculated on the output image (Default: True)
+
+Example::
+
+import rsgislib.imagecalibration
+rsgislib.imagecalibration.performDOSCalc("LS5TM_20110701_lat52lon421_r24p204_rad_toa.kea", 'LS5TM_20110701_lat52lon421_r24p204_rad_toa_dos.kea")
+
 """
     import rsgislib
     import rsgislib.imagecalc
@@ -48,4 +54,5 @@ A command to perform a dark object subtraction (DOS) on an input image.
     
     if calcStatsPyd:
         rsgislib.imageutils.popImageStats(outputFile, usenodataval=True, nodataval=noDataVal, calcpyramids=True)
-    
+
+ 

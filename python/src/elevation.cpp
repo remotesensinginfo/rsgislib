@@ -353,17 +353,25 @@ static PyMethodDef ElevationMethods[] = {
 "* gdalformat is a string with the output image format for the GDAL driver.\n"},
 
 {"fillDEMSoilleGratin1994", Elevation_fillDEMSoilleGratin1994, METH_VARARGS,
-    "rsgislib.elevation.fillDEMSoilleGratin1994(inputDEMImage, validMaskImage, outputImage, gdalformat)\n"
-    "Filter the local minima in a DEM using the Soille and Gratin 1994 algorithm.\n\n"
-    "Soille, P., and Gratin, C. (1994). An efficient algorithm for drainage network\n"
-    "extraction on DEMs. J. Visual Communication and Image Representation. 5(2). 181-189.\n"
-    "\n"
-    "Where:\n"
-    "\n"
-    "* inputDEMImage is a string containing the name and path of the input DEM file.\n"
-    "* validMaskImage is a string containing the name and path to a binary image specifying the valid data region (1 == valid)\n"
-    "* outputImage is a string containing the name and path of the output file.\n"
-    "* gdalformat is a string with the output image format for the GDAL driver.\n"},
+"rsgislib.elevation.fillDEMSoilleGratin1994(inputDEMImage, validMaskImage, outputImage, gdalformat)\n"
+"Filter the local minima in a DEM using the Soille and Gratin 1994 algorithm.\n\n"
+"Soille, P., and Gratin, C. (1994). An efficient algorithm for drainage network\n"
+"extraction on DEMs. J. Visual Communication and Image Representation. 5(2). 181-189.\n"
+"\n"
+"Where:\n"
+"\n"
+"* inputDEMImage is a string containing the name and path of the input DEM file.\n"
+"* validMaskImage is a string containing the name and path to a binary image specifying the valid data region (1 == valid)\n"
+"* outputImage is a string containing the name and path of the output file.\n"
+"* gdalformat is a string with the output image format for the GDAL driver.\n"
+"Example::\n"
+"import rsgislib.elevation\n"
+"inputDEMImage = 'DEM.kea'\n"
+"validMaskImage = 'ValidRegionMask.kea'\n"
+"outFilledImage = 'DEM_filled.kea'\n"
+"rsgislib.elevation.fillDEMSoilleGratin1994(inputDEMImage, validMaskImage, outFilledImage, 'KEA')\n"
+"\n"
+},
     
     {NULL}        /* Sentinel */
 };
