@@ -74,8 +74,6 @@ namespace rsgis{namespace calib{
             {
                 double temp =  k2[i] / log((k1[i] / bandValues[i]) + 1.0);
                 
-                //std::cout << "temp = " << temp << std::endl;
-                
                 output[i] = (temp - 273.15);
                 output[i] = output[i] * this->scaleFactor;
             }

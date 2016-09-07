@@ -112,22 +112,17 @@ namespace rsgis{namespace calib{
                     std::cout << "." << feedbackCounter << "." << std::flush;
                     feedbackCounter = feedbackCounter + 10;
                 }
-                //std::cout << "Processing level " << n+1 << " of " << numLevels << std::endl;
                 while(!this->qEmpty(hcrt))
                 {
                     pxl = this->qPopFront(hcrt);
-                    //std::cout << "Pxl [" << pxl.x << ", " << pxl.y << "]" << std::endl;
-                    
-                    //float val = 1;
-                    //outImgDS->GetRasterBand(1)->RasterIO(GF_Write, pxl.x, pxl.y, 1, 1, &val, 1, 1, GDT_Float32, 1, 1);
-                    
+
                     // Get Neightbours
                     std::list<Q2DPxl> *nPxls = this->getNeighbours(pxl, inValidImgDS->GetRasterBand(1));
                     for(std::list<Q2DPxl>::iterator iterNPxls = nPxls->begin(); iterNPxls != nPxls->end(); ++iterNPxls)
                     {
                         imgVal = this->getPxlVal((*iterNPxls), inDEMImgDS->GetRasterBand(1));
                         img2Val = this->getPxlVal((*iterNPxls), outImgDS->GetRasterBand(1));
-                        //std::cout << "\tPxl [" << (*iterNPxls).x << ", " << (*iterNPxls).y << "] = [" << hcrt << ", " << imgVal << ", " << img2Val << "]\n";
+
                         if(img2Val == maxVal)
                         {
                             img2Val = this->rtnMax(hcrt, imgVal);
@@ -215,14 +210,9 @@ namespace rsgis{namespace calib{
         {
             maxYPxl = height;
         }
-        
-        //std::cout << "[" << minXPxl << ", " << maxXPxl << "][" << minYPxl << ", " << maxYPxl << "]\n";
-        
+
         int nWidth = (maxXPxl - minXPxl)+1;
         int nHeight = (maxYPxl - minYPxl)+1;
-        //int numPxls = nWidth * nHeight;
-        
-        //std::cout << "[" << nWidth << ", " << nHeight << "] = " << numPxls << std::endl;
         
         float dataVal = 0;
         long cPxlX = 0;
@@ -235,17 +225,12 @@ namespace rsgis{namespace calib{
                 if(!((cPxlX == pxl.x) & (cPxlY == pxl.y)))
                 {
                     inValidImg->RasterIO(GF_Read, cPxlX, cPxlY, 1, 1, &dataVal, 1, 1, GDT_Float32, 0, 0);
-                    //std::cout << "\t [" << cPxlX << ", " << cPxlY << "] = " << dataVal << std::endl;
+
                     if(dataVal == 1)
                     {
                         nPxls->push_back(Q2DPxl(cPxlX, cPxlY));
                     }
                 }
-                /*else
-                {
-                    inValidImg->RasterIO(GF_Read, cPxlX, cPxlY, 1, 1, &dataVal, 1, 1, GDT_Float32, 0, 0);
-                    std::cout << "\t **[" << cPxlX << ", " << cPxlY << "] = " << dataVal << std::endl;
-                }*/
                 ++cPxlX;
             }
             ++cPxlY;
@@ -293,7 +278,6 @@ namespace rsgis{namespace calib{
     
     void RSGISInitOutputImageSoilleGratin94::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException)
     {
-        //std::cout << "Pixel [" << extent.getMaxX() << ", " <<  extent.getMaxY() << "]" << std::endl;
         if(winSize != 3)
         {
             throw rsgis::img::RSGISImageCalcException("Window Size must be 3.");
@@ -334,9 +318,6 @@ namespace rsgis{namespace calib{
                 output[0] = noDataVal;
             }
         }
-        
-        
-        //output[0] = 0;
     }
     
     RSGISInitOutputImageSoilleGratin94::~RSGISInitOutputImageSoilleGratin94()

@@ -891,11 +891,9 @@ namespace rsgis{namespace math{
             {
                 numVals += hist[i];
             }
-            
+
             percentile = percentile / 100;
             unsigned int percentileValCount = floor(((double)numVals) * percentile);
-            
-            //std::cout << "Percentile " << percentile << " count " << percentileValCount << std::endl;
             
             if(percentileValCount == 0)
             {
@@ -921,9 +919,6 @@ namespace rsgis{namespace math{
                 {
                     throw RSGISMathException("Could not find percentile bin! Something I cannot explain has gone wrong!");
                 }
-                //std::cout << "histMinVal = " << histMinVal << std::endl;
-                //std::cout << "binIdx = " << binIdx << std::endl;
-                //std::cout << "binWidth = " << binWidth << std::endl;
                 percentVal = histMinVal + (binWidth * binIdx) + binWidth/2;
             }
             
@@ -1006,7 +1001,6 @@ namespace rsgis{namespace math{
             {
                 for(size_t a = sMIdx, b = 0; a < eMIdx; ++a, ++b)
                 {
-                    //std::cout << "Matrix [" << i << ", " << a << "] = ";
                     var1 = 0.0;
                     var2 = 0.0;
                     for(size_t k = 0; k < n; ++k)
@@ -1014,7 +1008,6 @@ namespace rsgis{namespace math{
                         covarMatrix[j][b] += ((data[k][i] - meanVec[j]) * (data[k][a] - meanVec[b]));
                     }
                     covarMatrix[j][b] /= (n-1);
-                    //std::cout << covarMatrix[j][b] << std::endl;
                 }
             }            
         }
@@ -1040,9 +1033,7 @@ namespace rsgis{namespace math{
         std::vector<std::pair<size_t, double> > *outData = new std::vector<std::pair<size_t, double> >();
         try
         {
-            //std::cout << "Range = " << (maxVal - minVal) << std::endl;
             size_t numBins = static_cast<size_t>((maxVal - minVal)/binWidth)+1;
-            std::cout << "Number of Histogram Bins = " << numBins << std::endl;
             std::list<std::pair<size_t, double> > **hist = new std::list<std::pair<size_t, double> >*[numBins];
 
             for(size_t i = 0; i < numBins; ++i)
@@ -1058,7 +1049,6 @@ namespace rsgis{namespace math{
                 if((val >= minVal) & (val <= maxVal))
                 {
                     idx = static_cast<size_t>((val-minVal)/binWidth);
-                    //std::cout << "IDX = " << idx << std::endl;
                     hist[idx]->push_back(*iterData);
                 }
             }
@@ -1069,9 +1059,6 @@ namespace rsgis{namespace math{
             size_t j = 0;
             for(size_t i = 0; i < numBins; ++i)
             {
-                //numVals = static_cast<size_t>(hist[i]->size()*propOfPop);
-                //std::cout << "BIN " << i << ": " << hist[i]->size() << " = " << hist[i]->size()*propOfPop << std::endl;
-
                 hist[i]->sort(comparePairsData);
                 nextVal = 0;
                 j = 0;
@@ -1111,7 +1098,6 @@ namespace rsgis{namespace math{
         try
         {
             *numBins = static_cast<size_t>((maxVal - minVal)/binWidth)+1;
-            //std::cout << "Number of Histogram Bins = " << *numBins << std::endl;
             hist = new std::vector<std::pair<size_t, double> >*[*numBins];
             for(size_t i = 0; i < *numBins; ++i)
             {
@@ -1126,7 +1112,6 @@ namespace rsgis{namespace math{
                 if((val >= minVal) & (val <= maxVal))
                 {
                     idx = static_cast<size_t>((val-minVal)/binWidth);
-                    //std::cout << "IDX = " << idx << std::endl;
                     hist[idx]->push_back(*iterData);
                 }
             }
@@ -1153,7 +1138,6 @@ namespace rsgis{namespace math{
         try
         {
             size_t numBins = static_cast<size_t>((maxVal - minVal)/binWidth)+1;
-            //std::cout << "Number of Histogram Bins = " << numBins << std::endl;
             hist->reserve(numBins);
             
             double binCentre = minVal + (binWidth/2);
@@ -1170,7 +1154,6 @@ namespace rsgis{namespace math{
                 if(((*iterData) >= minVal) & ((*iterData) <= maxVal))
                 {
                     idx = static_cast<size_t>(((*iterData)-minVal)/binWidth);
-                    //std::cout << "IDX = " << idx << std::endl;
                     hist->at(idx).second = hist->at(idx).second + 1;
                     ++validDataCount;
                 }
@@ -1212,11 +1195,8 @@ namespace rsgis{namespace math{
             size_t numDataVals = data1->size();
             
             size_t numBins1 = static_cast<size_t>((maxVal1 - minVal1)/binWidth1)+1;
-            //std::cout << "Number of Histogram Bins (1) = " << numBins1 << std::endl;
             hist->reserve(numBins1);
-            
             size_t numBins2 = static_cast<size_t>((maxVal2 - minVal2)/binWidth2)+1;
-            //std::cout << "Number of Histogram Bins (2) = " << numBins2 << std::endl;
             
             double binCentre1 = minVal1 + (binWidth1/2);
             double binCentre2 = 0.0;
