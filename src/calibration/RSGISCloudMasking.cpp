@@ -334,9 +334,6 @@ namespace rsgis{namespace calib{
     
     double RSGISLandsatFMaskExportPass1LandWaterCloudMasking::propOfPCPPixels()
     {
-        //std::cout << "this->numValidPxls = " << this->numValidPxls << std::endl;
-        //std::cout << "this->numPCPPxls = " << this->numPCPPxls << std::endl;
-        
         double outPCPProp = 0.0;
         if(this->numValidPxls > 0)
         {
@@ -936,20 +933,16 @@ namespace rsgis{namespace calib{
                     std::cout << "." << feedbackCounter << "." << std::flush;
                     feedbackCounter = feedbackCounter + 10;
                 }
-                //std::cout << "Processing clump " << i << " has " << cloudsRATHisto[i] << " pixels." << std::endl;
                 
                 std::vector<std::pair<std::pair<double,double>,double> > *pxPts = new std::vector<std::pair<std::pair<double,double>,double> >();
                 pxPts->reserve(cloudsRATHisto[i]);
                 env->init(minX[i], maxX[i], minY[i], maxY[i]);
-                //std::cout << "Clump BBOX [" << minX[i] << ", " << maxX[i] << "][" << minY[i] << ", " << maxY[i] << "]\n";
                 getPxPts.exportPixelsAsPointsWithVal(cloudClumpsDS, (float)i, initCloudHeights, 2, pxPts, true, env);
                 
                 
                 first = true;
-                //baseHeight = hBaseMin[i];
                 for(baseHeight=hBaseMin[i]; baseHeight < hBaseMax[i]; baseHeight+=0.25)
                 {
-                    //std::cout << "\tTesting Height " << baseHeight << " km" << std::flush;
                     editShadImg.reset();
                     for(std::vector<std::pair<std::pair<double,double>,double> >::iterator iterPts = pxPts->begin(); iterPts != pxPts->end(); ++iterPts)
                     {
@@ -970,7 +963,6 @@ namespace rsgis{namespace calib{
                     calcdShadProp = editShadImg.calcCorrelation(cloudClumpsDS, potentCloudShadowRegions, cloudShadowTestRegionsDS, &cloudPropOverlap, &numPxlOverlap);
                     if(calcdShadProp)
                     {
-                        //std::cout << "\tnOverlap Pixels = " << numPxlOverlap << " Proportion  = " << cloudPropOverlap << std::endl;
                         if(first)
                         {
                             maxH = baseHeight;
@@ -997,11 +989,10 @@ namespace rsgis{namespace calib{
                     }
                 }
                 
-                //std::cout << "Shadow best fit base height is " << maxH << std::endl;
+                // Shadow best fit base height is 'maxH'
                 bestFitBaseLine[i] = maxH;
                 
                 delete pxPts;
-                //std::cout << std::endl;
             }
             std::cout << ". Complete.\n";
             attUtils.writeRealColumn(cloudsRAT, "FitBaseLine", bestFitBaseLine, numClumps);
@@ -1016,9 +1007,6 @@ namespace rsgis{namespace calib{
             double bestFitBaseLineMedian = mathUtils.calcPercentile(50, histMinVal, histBinWidth, histNumBins, hist);
             double bestFitBaseLineUpQuat = mathUtils.calcPercentile(75, histMinVal, histBinWidth, histNumBins, hist);
             delete [] hist;
-            //std::cout << "LQ = " << bestFitBaseLineLowQuat << std::endl;
-            //std::cout << "Med = " << bestFitBaseLineMedian << std::endl;
-            //std::cout << "UQ = " << bestFitBaseLineUpQuat << std::endl;
             
             for(size_t i = 1; i < numClumps; ++i)
             {
@@ -1044,12 +1032,10 @@ namespace rsgis{namespace calib{
                     std::cout << "." << feedbackCounter << "." << std::flush;
                     feedbackCounter = feedbackCounter + 10;
                 }
-                //std::cout << "Processing clump " << i << " has " << cloudsRATHisto[i] << " pixels." << std::endl;
                 
                 std::vector<std::pair<std::pair<double,double>,double> > *pxPts = new std::vector<std::pair<std::pair<double,double>,double> >();
                 pxPts->reserve(cloudsRATHisto[i]);
                 env->init(minX[i], maxX[i], minY[i], maxY[i]);
-                //std::cout << "Clump BBOX [" << minX[i] << ", " << maxX[i] << "][" << minY[i] << ", " << maxY[i] << "]\n";
                 getPxPts.exportPixelsAsPointsWithVal(cloudClumpsDS, (float)i, initCloudHeights, 2, pxPts, true, env);
                 
                 for(std::vector<std::pair<std::pair<double,double>,double> >::iterator iterPts = pxPts->begin(); iterPts != pxPts->end(); ++iterPts)
@@ -1147,7 +1133,6 @@ namespace rsgis{namespace calib{
             
             long xPxlLoc = floor(xPxlLocF + 0.5);
             long yPxlLoc = floor(yPxlLocF + 0.5);
-            //std::cout << "[" << xPxlLoc << ", " << yPxlLoc << "]\n";
 
             this->testImgBand->RasterIO(GF_Write, xPxlLoc, yPxlLoc, 1, 1, &outValue, 1, 1, GDT_Float32, 0, 0);
             
@@ -1178,9 +1163,6 @@ namespace rsgis{namespace calib{
         try
         {
             // Check envelope is within image (i.e., shadow hasn't been projected outside of the image extent)
-            //std::cout << "BBOX IMG [" << this->tlX << ", " << this->brX << "][" << this->brY << ", " << this->tlY << "]\n";
-            //std::cout << "BBOX ENV [" << extent.getMinX() << ", " << extent.getMaxX() << "][" << extent.getMinY() << ", " << extent.getMaxY() << "]\n";
-            
             if((extent.getMinX() < this->tlX) | (extent.getMinX() > this->brX))
             {
                 insideimg = false;
@@ -1219,9 +1201,6 @@ namespace rsgis{namespace calib{
                 
                 unsigned long nShadPxlsVal = 0;
                 this->calcCloudShadCorr->getNPxls(&nShadPxlsVal, numPxlOverlap);
-                
-                //std::cout << "nShadPxlsVal = " << nShadPxlsVal << std::endl;
-                //std::cout << "numPxlOverlap = " << *numPxlOverlap << std::endl;
                 
                 if(nShadPxlsVal == 0)
                 {
@@ -1340,14 +1319,6 @@ namespace rsgis{namespace calib{
                 }
             }
         }
-        /*
-        std::cout << "intBandValues[0] = " << intBandValues[0] << std::endl;
-        std::cout << "intBandValues[1] = " << intBandValues[1] << std::endl;
-        std::cout << "intBandValues[2] = " << intBandValues[2] << std::endl;
-        
-        std::cout << "nShadPxls = " << nShadPxls << std::endl;
-        std::cout << "nShadPxlsInPotent = " << nShadPxlsInPotent << std::endl << std::endl;
-        */
     }
     
     void RSGISCalcCloudShadowCorrespondance::reset()

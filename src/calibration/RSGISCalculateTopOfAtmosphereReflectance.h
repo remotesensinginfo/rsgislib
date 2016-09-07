@@ -46,8 +46,6 @@ namespace rsgis{namespace calib{
             rsgis::RSGISException("Julian Day must be between 1 and 366.");
         }
         double radiansJulianDay = ((julianDay - 4)*0.9856)*(M_PI/180);
-        //cout << "radiansJulianDay = " << radiansJulianDay << endl;
-        //cout << "cos(radiansJulianDay) = " << cos(radiansJulianDay) << endl;
         double solarDist = 1 - 0.01672 * cos(radiansJulianDay);
         return solarDist;
     }

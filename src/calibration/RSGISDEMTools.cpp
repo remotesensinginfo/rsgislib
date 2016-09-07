@@ -386,19 +386,6 @@ namespace rsgis{namespace calib{
             
             rsgis::img::RSGISExtractImagePixelsOnLine extractPixels;
             std::vector<rsgis::img::ImagePixelValuePt*> *imagePxlPts = extractPixels.getImagePixelValues(inputImage, band, &pxlPt, (sunAzimuth * degreesToRadians), (sunZenith * degreesToRadians), maxElevHeight);
-            /*
-            std::cout << "Point, " << x << "," << y << "," << z << std::endl;
-            std::cout << "Sun, " << sunX << "," << sunY << "," << sunZ << std::endl;
-            std::cout << "Resolution, " << ewRes << "," << nsRes << std::endl;
-            
-            std::cout << imagePxlPts->size() << " extracted pixels\n";
-            
-            for(vector<ImagePixelValuePt*>::iterator iterPxls = imagePxlPts->begin(); iterPxls != imagePxlPts->end(); ++iterPxls)
-            {
-                std::cout << (*iterPxls)->pt->x << "," << (*iterPxls)->pt->y << "," << (*iterPxls)->pt->z << "," << (*iterPxls)->imgX << "," << (*iterPxls)->imgY << "," << (*iterPxls)->value << "\n";
-            }
-            std::cout << std::endl << std::endl;
-            */
             
             // Check whether pixel intersects with ray.
             for(std::vector<rsgis::img::ImagePixelValuePt*>::iterator iterPxls = imagePxlPts->begin(); iterPxls != imagePxlPts->end(); ++iterPxls)
@@ -510,20 +497,12 @@ namespace rsgis{namespace calib{
             double pB = sin(slope*degreesToRadians) * sin(aspect*degreesToRadians);
             double pC = cos(slope*degreesToRadians);
             
-            //std::cout << "Plane: " << pA << ", " << pB << ", " << pC << std::endl;
-            
             // UNIT VECTOR FOR INCIDENT RAY
             double rA = sin((sunZenith)*degreesToRadians) * cos(sunAzimuth*degreesToRadians);
             double rB = sin((sunZenith)*degreesToRadians) * sin(sunAzimuth*degreesToRadians);
             double rC = cos((sunZenith)*degreesToRadians);
             
-            //std::cout << "Ray: " << rA << ", " << rB << ", " << rC << std::endl;
-            
-            //std::cout << "output value (radians) = " << acos((pA*rA)+(pB*rB)+(pC*rC)) << std::endl;
-            
             outputValue = acos((pA*rA)+(pB*rB)+(pC*rC)) * radiansToDegrees;
-            
-            //std::cout << "output value = " << outputValue << std::endl << std::endl;
             
             if(boost::math::isnan(outputValue))
             {
@@ -617,20 +596,12 @@ namespace rsgis{namespace calib{
             double pB = sin(slope*degreesToRadians) * sin(aspect*degreesToRadians);
             double pC = cos(slope*degreesToRadians);
             
-            //std::cout << "Plane: " << pA << ", " << pB << ", " << pC << std::endl;
-            
             // UNIT VECTOR FOR EXITANCE RAY
             double rA = sin(viewZenith*degreesToRadians) * cos(viewAzimuth*degreesToRadians);
             double rB = sin(viewZenith*degreesToRadians) * sin(viewAzimuth*degreesToRadians);
             double rC = cos(viewZenith*degreesToRadians);
             
-            //std::cout << "Ray: " << rA << ", " << rB << ", " << rC << std::endl;
-            
-            //std::cout << "output value (radians) = " << acos((pA*rA)+(pB*rB)+(pC*rC)) << std::endl;
-            
             outputValue = acos((pA*rA)+(pB*rB)+(pC*rC)) * radiansToDegrees;
-            
-            //std::cout << "output value = " << incidenceAngle << std::endl << std::endl;
             
             if(boost::math::isnan(outputValue))
             {
@@ -727,9 +698,7 @@ namespace rsgis{namespace calib{
             double pA = sin(slope*degreesToRadians) * cos(aspect*degreesToRadians);
             double pB = sin(slope*degreesToRadians) * sin(aspect*degreesToRadians);
             double pC = cos(slope*degreesToRadians);
-            
-            //std::cout << "Plane: " << pA << ", " << pB << ", " << pC << std::endl;
-            
+                        
             // UNIT VECTOR FOR INCIDENT RAY
             double rA = sin((sunZenith)*degreesToRadians) * cos(sunAzimuth*degreesToRadians);
             double rB = sin((sunZenith)*degreesToRadians) * sin(sunAzimuth*degreesToRadians);

@@ -292,9 +292,7 @@ namespace rsgis{namespace calib{
                 throw rsgis::img::RSGISImageCalcException("Elevation value is not within the LUT.");
             }
             
-            //std::cout << "elevLUTIdx = " << elevLUTIdx << std::endl;
             elevLUTVal = lut->at(elevLUTIdx);
-            //std::cout << "elevLUTVal = " << elevLUTVal.elev << "(AOT LUT Size = " << elevLUTVal.aotLUT.size() << ")" << std::endl;
             
             LUT6SAOT aotLUTVal;
             unsigned int aotLUTIdx = 0;
@@ -313,9 +311,7 @@ namespace rsgis{namespace calib{
                     aotLUTIdx = i;
                 }
             }
-            
-            //std::cout << "aotLUTIdx = " << aotLUTIdx << std::endl;
-            
+                        
             if(aotLUTIdx >= elevLUTVal.aotLUT.size())
             {
                 std::cerr << "aotVal = " << aotVal << std::endl;

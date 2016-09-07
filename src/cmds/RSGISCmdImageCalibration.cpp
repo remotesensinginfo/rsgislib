@@ -1292,9 +1292,6 @@ namespace rsgis{ namespace cmds {
                 wv2RadGainOffsInternal[i].effBandWidth = (*iterBands).effBandWidth;
                 
                 outBandNames[i] = (*iterBands).bandName;
-                
-                //std::cout << "Band " << wv2RadGainOffsInternal[i].band << "(" << outBandNames[i] << "): Abs = " << wv2RadGainOffsInternal[i].absCalFact << " Bandwidth = " << wv2RadGainOffsInternal[i].effBandWidth << std::endl;
-                
                 ++i;
             }
             
@@ -1399,7 +1396,6 @@ namespace rsgis{ namespace cmds {
                 throw rsgis::RSGISImageException(message.c_str());
             }
 
-            
             if(dataset->GetRasterCount() != offsetValues.size())
             {
                 throw rsgis::RSGISImageException("The two input images need to have the same number of image bands.");
