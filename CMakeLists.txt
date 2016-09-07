@@ -26,7 +26,7 @@ set (PROJECT_TOOLS_DIR tools)
 set (PROJECT_XML_DIR xml_standards)
 
 # The version number.
-set (RSGISLIB_HG_COMMIT 1175)
+set (RSGISLIB_HG_COMMIT 1176)
 set (RSGISLIB_VERSION_MAJOR 3)
 set (RSGISLIB_VERSION_MINOR 0)
 set (RSGISLIB_VERSION "${RSGISLIB_VERSION_MAJOR}.${RSGISLIB_VERSION_MINOR}.${RSGISLIB_HG_COMMIT}")
@@ -255,6 +255,25 @@ else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${RSGISLIB_COMMON_CXX_FLAGS}")
   endif()
 endif(WIN32)
+
+if(APPLE)
+    # use, i.e. don't skip the full RPATH for the build tree
+    SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
+    
+    # when building, don't use the install RPATH already
+    # (but later on when installing)
+    SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
+    
+    # the RPATH to be used when installing
+    SET(CMAKE_INSTALL_RPATH "")
+    
+    # don't add the automatically determined parts of the RPATH
+    # which point to directories outside the build tree to the install RPATH
+    SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH FALSE)
+    
+    
+    SET(CMAKE_MACOSX_RPATH TRUE)
+endif(APPLE)
 
 if (APPLE)
   set(SO_EXT dylib)
