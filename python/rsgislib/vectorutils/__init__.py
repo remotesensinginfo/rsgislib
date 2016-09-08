@@ -211,3 +211,68 @@ Example::
     if not maskImg == None:
         gdalImgMaskData = None
 
+
+def writeVecColumn(vectorFile, vectorLayer, colName, colDataType, colData):
+    """
+    A function which will write a column to a vector file
+    Where:
+    * vectorFile - The file / path to the vector data 'file'.
+    * vectorLayer - The layer to which the data is to be added.
+    * colName - Name of the output column
+    * colDataType - ogr data type (e.g., ogr.OFTString, ogr.OFTInteger, ogr.OFTReal)
+    * colData - A list of the same length as the number of features in vector file.
+    
+    Example::
+    from rsgislib import vectorutils
+    import rsgislib
+    from osgeo import ogr
+    
+    rsgisUtils = rsgislib.RSGISPyUtils()
+    requiredScenes = rsgisUtils.readTextFile2List("GMW_JERS-1_ScenesRequired.txt")
+    requiredScenesShp = "JERS-1_Scenes_Requred_shp"
+    vectorutils.writeVecColumn(requiredScenesShp+'.shp', requiredScenesShp, 'ScnName', ogr.OFTString, requiredScenes)
+    """
+    ds = gdal.OpenEx(vectorFile, gdal.OF_UPDATE )
+    if ds is None:
+        print("Could not open '" + vectorFile + "'")
+        sys.exit( 1 )
+    
+    lyr = ds.GetLayerByName( vectorLayer )
+    
+    if lyr is None:
+        print("Could not find layer '" + vectorLayer + "'")
+        sys.exit( 1 )
+    
+    numFeats = lyr.GetFeatureCount()
+    
+    if not len(colData) == numFeats:
+        print("The number of features and size of the input data is not equal.")
+        print("Number of Features: " + str(numFeats))
+        print("Length of Data: " + str(len(colData)))
+        sys.exit( 1 )
+
+    colExists = False
+    lyrDefn = lyr.GetLayerDefn()
+    for i in range( lyrDefn.GetFieldCount() ):
+        if lyrDefn.GetFieldDefn(i).GetName() == colName:
+            colExists = True
+            break
+    
+    if not colExists:
+        field_defn = ogr.FieldDefn( colName, colDataType )
+        if lyr.CreateField ( field_defn ) != 0:
+            print("Creating '" + colName + "' field failed.\n")
+            sys.exit( 1 )
+
+    lyr.ResetReading()
+    i = 0
+    for feat in lyr:
+        feat.SetField(colName, colData[i] )
+        lyr.SetFeature(feat)
+        i = i + 1
+    lyr.SyncToDisk()
+    ds = None
+
+
+
+
