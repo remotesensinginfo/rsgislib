@@ -28,6 +28,7 @@ Attributes
 .. autofunction:: rsgislib.vectorutils.calcMaxDist2NearestGeom
 .. autofunction:: rsgislib.vectorutils.dist2NearestGeom
 .. autofunction:: rsgislib.vectorutils.spatialGraphClusterGeoms
+.. autofunction:: rsgislib.vectorutils.writeVecColumn
 
 
 
