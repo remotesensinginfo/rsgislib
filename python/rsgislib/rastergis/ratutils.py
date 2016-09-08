@@ -1226,14 +1226,13 @@ def createClumpsSHPBBOX(clumpsImg, minXCol, maxXCol, minYCol, maxYCol, outShpLyr
     
     fidVals = numpy.arange(maxYVals.shape[0])
 
-    ## Remove First Row which is no data...    
-    dataMask = numpy.ones_like(minXVals, dtype=numpy.int16)
-    dataMask[0] = 0
-    minXVals = minXVals[dataMask == 1]
-    maxXVals = maxXVals[dataMask == 1]
-    minYVals = minYVals[dataMask == 1]
-    maxYVals = maxYVals[dataMask == 1]
-    fidVals = fidVals[dataMask == 1]
+    ## Remove First Row which is no data...
+    if ignoreFirstRow:    
+        minXVals = numpy.delete(minXVals, (0), axis=0)
+        maxXVals = numpy.delete(maxXVals, (0), axis=0)
+        minYVals = numpy.delete(minYVals, (0), axis=0)
+        maxYVals = numpy.delete(maxYVals, (0), axis=0)
+        fidVals = numpy.delete(fidVals, (0), axis=0)
     
     ## Remove any features which are all zero (i.e., polygon not present...
     minXValsSub = minXVals[numpy.logical_not((minXVals == 0) & (maxXVals == 0) & (minYVals == 0) & (maxYVals == 0))]
@@ -1241,14 +1240,7 @@ def createClumpsSHPBBOX(clumpsImg, minXCol, maxXCol, minYCol, maxYCol, outShpLyr
     minYValsSub = minYVals[numpy.logical_not((minXVals == 0) & (maxXVals == 0) & (minYVals == 0) & (maxYVals == 0))]
     maxYValsSub = maxYVals[numpy.logical_not((minXVals == 0) & (maxXVals == 0) & (minYVals == 0) & (maxYVals == 0))]
     fidValsSub = fidVals[numpy.logical_not((minXVals == 0) & (maxXVals == 0) & (minYVals == 0) & (maxYVals == 0))]
-    
-    if ignoreFirstRow:
-        minXValsSub = numpy.delete(minXValsSub, (0), axis=0)
-        maxXValsSub = numpy.delete(maxXValsSub, (0), axis=0)
-        minYValsSub = numpy.delete(minYValsSub, (0), axis=0)
-        maxYValsSub = numpy.delete(maxYValsSub, (0), axis=0)
-        fidValsSub = numpy.delete(fidValsSub, (0), axis=0)
-    
+        
     if roundInt:
         minXValsSub = numpy.rint(minXValsSub)
         maxXValsSub = numpy.rint(maxXValsSub)
@@ -1276,7 +1268,7 @@ def createClumpsSHPBBOX(clumpsImg, minXCol, maxXCol, minYCol, maxYCol, outShpLyr
         #print(str(i) + ": " + wktStr)
         poly = ogr.CreateGeometryFromWkt(wktStr)
         feat = ogr.Feature( outLayer.GetLayerDefn())
-        #feat.SetField("ID", fidValsSub[i])
+        feat.SetField("ID", float(fidValsSub[i]))
         feat.SetGeometry(poly)
         if outLayer.CreateFeature(feat) != 0:
             print(str(i) + ": " + wktStr)
