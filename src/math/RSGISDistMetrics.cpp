@@ -107,7 +107,7 @@ namespace rsgis{namespace math{
             for(size_t i = 0; i < numVals; ++i)
             {
                 diff = vals1[i+sIdx1] - vals2[i+sIdx2];
-                diff = abs(diff);
+                diff = fabs(diff);
                 dist += diff;
             }
             
