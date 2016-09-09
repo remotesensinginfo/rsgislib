@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+	Description:
+		XML File for execution within RSGISLib
+		This file contains a template for the
+		RasterGIS binary logic opterators interface.
+		
+	Created by Pete Bunting on Thu Aug 19 16:33:36 2014.
+	Copyright (c) 2014 Pete Bunting. All rights reserved.
+-->
+
+<rsgis:ratlogicexps xmlns:rsgislib="http://www.rsgislib.org/xml/">
+	
+	<rsgis:expression operation="and" >
+		<!-- Two or more expressions -->
+	</rsgis:expression>
+	
+	<rsgis:expression operation="or" >
+		<!-- Two or more expressions -->
+	</rsgis:expression>
+	
+	<rsgis:expression operation="equal" >
+		<!-- Two or more expressions -->
+	</rsgis:expression>
+	
+	<rsgis:expression operation="not" >
+		<!-- One expression -->
+	</rsgis:expression>
+	
+	
+	<rsgis:expression operation="evaluate" operator="eq" column="string" threshold="double" />
+	
+	<rsgis:expression operation="evaluate" operator="noteq" column="string" threshold="double" />
+	
+	<rsgis:expression operation="evaluate" operator="gt" column="string" threshold="double" />
+	
+	<rsgis:expression operation="evaluate" operator="lt" column="string" threshold="double" />
+	
+	<rsgis:expression operation="evaluate" operator="gteq" column="string" threshold="double" />
+	
+	<rsgis:expression operation="evaluate" operator="lteq" column="string" threshold="double" />
+	
+	
+	<rsgis:expression operation="evaluate" operator="eq" column1="string" column2="string" />
+	
+	<rsgis:expression operation="evaluate" operator="noteq" column1="string" column2="string" />
+	
+	<rsgis:expression operation="evaluate" operator="gt" column1="string" column2="string" />
+	
+	<rsgis:expression operation="evaluate" operator="lt" column1="string" column2="string" />
+	
+	<rsgis:expression operation="evaluate" operator="gteq" column1="string" column2="string" />
+	
+	<rsgis:expression operation="evaluate" operator="lteq" column1="string" column2="string" />
+	
+	
+	<rsgis:expression operation="evaluate" operator="eq" column="string" />
+	
+	<rsgis:expression operation="evaluate" operator="noteq" column="string" />
+	
+	<rsgis:expression operation="evaluate" operator="gt" column="string"  />
+	
+	<rsgis:expression operation="evaluate" operator="lt" column="string" />
+	
+	<rsgis:expression operation="evaluate" operator="gteq" column="string" />
+	
+	<rsgis:expression operation="evaluate" operator="lteq" column="string" />
+	
+</rsgis:ratlogicexps>

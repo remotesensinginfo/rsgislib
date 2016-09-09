@@ -1,0 +1,1179 @@
+<rsgis:commands xmlns:rsgis="http://www.rsgislib.org/xml/">
+    <!-- Stacks all the image bands within a directory into a single image file -->
+    <rsgis:command algor="stackbands" option="dir" dir="input_DIR" output="outputimage" ext="file_extension" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" skipValue="float" nodata="float" createVRT="yes | no" />
+    <!-- Stacks all the image bands provided in list into a single image file -->
+    <rsgis:command algor="stackbands" option="imgs" output="outputimage" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" skipValue="float" nodata="float" createVRT="yes | no" replacebandnames="yes | no" >
+        <rsgis:image name="band(s) name" file="image1" />
+        <rsgis:image name="band(s) name" file="image2" />
+        <rsgis:image name="band(s) name" file="image3" />
+        <rsgis:image name="band(s) name" file="image4" />
+    </rsgis:command>
+
+
+
+
+
+    <!-- Deprecated - A command which produces the FFT image from an input image-->
+    <rsgis:command algor="fftutils" option="fftimage" image="image.env" output="image_out.env" band="1" />
+    <!-- Deprecated - A command which calculates the angle of the image features from an extracted mtxt file-->
+    <rsgis:command algor="fftutils" option="sizeangle" matrix="matrix.mtxt" />
+    <!-- Deprecated - A command which calculates the angle of the image features from image band-->
+    <rsgis:command algor="fftutils" option="sizeangle" image="image.env" band="1" />
+    <!-- Deprecated - A command which calculates the angle of the image features from an image representing the FFT-->
+    <rsgis:command algor="fftutils" option="sizeangle" fft="image.env" />
+    <!-- Deprecated - A command which calculates the image shift-->
+    <rsgis:command algor="fftutils" option="shiftfftw" image="image.env" output="image_out.env" />
+
+
+
+
+    <!-- Deprecated - A command to generate a image for testing algorithms. -->
+    <rsgis:command algor="testimages" option="rowmajornumbered" output="image_out.env" width="int" height="int" />
+
+
+
+
+    <!-- A command which calculates the eigenvectors for an input matrix -->
+    <rsgis:command algor="mathsutils" option="eigenvectors" matrix="matrix.mtxt" eigen="out_matrix.mtxt" />
+    <!-- A command which calculates the mean vector for an input matrix -->
+    <rsgis:command algor="mathsutils" option="meanvector" matrix="matrix.mtxt" mean="out_matrix.mtxt" />
+    <!-- A command which calculates the eigenvectors and mean vector for an input matrix -->
+    <rsgis:command algor="mathsutils" option="eigenmeanvector" matrix="matrix.mtxt" eigen="out_matrix.mtxt" mean="out_matrix.mtxt" />
+    <!-- A command which converts a matrix file (mtxt) to an ENVI image -->
+    <rsgis:command algor="mathsutils" option="matrix2image" matrix="matrix.mtxt" output="out_image.env" />
+    <!-- TODO -->
+    <rsgis:command algor="mathsutils" option="duplicatematrix" matrix="matrix.mtxt" output="out_matrix.mtxt" xdup="int" ydup="int" />
+
+
+
+
+
+
+
+    <!-- Fits a one dimensional polynomial equation, save coefficients out a 'mtxt' -->
+    <rsgis:command algor="fitting" option="oneDimensionalPolyfit" input="infile"
+        output="outfile" polyOrder="polyOrder" />
+    <!-- Tests the fit of a one dimensional polynomial equation and print r squared value, input and predicted values are saved in 'ptxt' format -->
+    <rsgis:command algor="fitting" option="oneDimensionalPolyTest" input="infile" inCoeff="inCoefficients" output="outname (name only no path or extension)" polyOrder="polyOrder" />
+     <!-- Fits a two dimensional polynomial equation, save coefficients out a 'mtxt' -->
+    <rsgis:command algor="fitting" option="twoDimensionalPolyfit" input="infile" output="outfile" polyOrder="polyOrder" numX="numX" numY="numY" />
+    <!-- Tests the fit of a two dimensional polynomial equation and print r squared value, input and predicted values are saved in 'ptxt' format -->
+    <rsgis:command algor="fitting" option="twoDimensionalPolyTest" input="infile" inCoeff="inCoefficients" output="outname (name only no path or extension)" polyOrder="polyOrder" />
+    <!-- Fits a three dimensional polynomial equation, save coefficients out a 'mtxt' -->
+    <rsgis:command algor="fitting" option="threeDimensionalPolyfit" input="infile" output="outfile" polyOrder="polyOrder" numX="numX" numY="numY" numZ="numZ" />
+    <!-- Tests the fit of a three dimensional polynomial equation and print r squared value, input and predicted values are saved in 'ptxt' format -->
+    <rsgis:command algor="fitting" option="threeDimensionalPolyTest" input="infile" inCoeff="inCoefficients" output="outname (name only no path or extension)" polyOrder="polyOrder" />
+
+
+
+
+
+
+
+
+    <!-- Deprecated: A command to undertake zonal stats to calculate the min, max, mean, std dev for a polygon -->
+    <rsgis:command algor="zonalstats" option="polygons2shp" image="image.env" vector="polys.shp" output="output.shp" mean="yes" max="yes" min="yes" stddev="yes" force="yes | no" />
+    <!-- Deprecated: A command to undertake zonal stats to calculate the min, max, mean, std dev for a rasterised polygon -->
+    <rsgis:command algor="zonalstats" option="rasterpolygons2shp" image="image.env" raster="polys.env" vector="polys.shp" output="output.shp" mean="yes" max="yes" min="yes" stddev="yes" />
+    <!-- Deprecated: A command to undertake zonal stats to calculate the min, max, mean, std dev for a rasterised polygon with the output written to a text file -->
+    <rsgis:command algor="zonalstats" option="rasterpolygons2txt" image="image.env" raster="polys.env" vector="polys.shp" output="output.txt" mean="yes" max="yes" min="yes" stddev="yes" />
+    <!-- A command to extract pixel values for all polygons in a shapefile and save to a text file for each polygon -->
+    <rsgis:command algor="zonalstats" option="pixelVals2txt" image="image.env" vector="polys.shp" output="output_base" attribute="classname" method="polyContainsPixel | polyContainsPixelCenter | polyOverlapsPixel | polyOverlapsOrContainsPixel | pixelContainsPoly | pixelContainsPolyCenter | adaptive | envelope" outTXT="mtxt | gtxt | csv" ignoreProjection="yes | no" />
+    <!-- TODO A command to generate a matrix file for each polygon with the out -->
+    <rsgis:command algor="zonalstats" option="variables2matrix" image="image.env" vector="polys.shp" output="output_base" attribute="classname" method="polyContainsPixel | polyContainsPixelCenter | polyOverlapsPixel | polyOverlapsOrContainsPixel | pixelContainsPoly | pixelContainsPolyCenter | adaptive | envelope" />
+    <!-- A command to extract all the pixel values falling within a polygon and save as a matrix -->
+    <rsgis:command algor="zonalstats" option="image2matrix" image="image.env" vector="polys.shp" output="output.mtxt" band="int" />
+    <!-- Deprecated TODO A command to -->
+    <rsgis:command algor="zonalstats" option="pixelcount" image="image.env" raster="polys.env" vector="polys.shp" output="output.shp" force="yes | no" pxlcount="yes | no" emptyset="yes | no">
+        <rsgis:attribute name="attribute_name" >
+            <rsgis:band band="int" threshold="float" />
+        </rsgis:attribute>
+        <rsgis:attribute name="attribute_name" >
+            <rsgis:band band="int" threshold="float" />
+            <rsgis:band band="int" threshold="float" />
+            <rsgis:band band="int" threshold="float" />
+        </rsgis:attribute>
+        <rsgis:attribute name="attribute_name" >
+            <rsgis:band band="int" threshold="float" />
+            <rsgis:band band="int" threshold="float" />
+        </rsgis:attribute>
+    </rsgis:command>
+        <!-- Calculates zonal statistics for image pixels, falling between minimum and maximum thresholds. Statistics are calculated for all bands in image using default names (b1, b2 etc.) or band names from image. -->
+    <rsgis:command algor="zonalstats" option="pixelstats" image="image.env"   vector="polys.shp" raster="polys.env" output="output.shp" method="polyContainsPixel | polyContainsPixelCenter | polyOverlapsPixel | polyOverlapsOrContainsPixel | pixelContainsPoly | pixelContainsPolyCenter | adaptive | envelope" force="yes | no" ignoreProjection="yes | no" copyAttributes="yes | no" pxlcount="yes | no" mean="yes | no " min="yes | no" max="yes | no " stddev="yes | no" mode="yes | no" sum="yes | no"  count="yes | no" minThreshold="float" maxThreshold="float" useBandNames="yes | no"/>
+    <!-- Calculates zonal statistics for image pixels, falling between minimum and maximum thresholds. Statistics may be calculated for selected bands with user specified names, statistics specified for each attribute override common statistics -->
+    <rsgis:command algor="zonalstats" option="pixelstats" image="image.env"   vector="polys.shp" raster="polys.env" output="output.shp" method="polyContainsPixel | polyContainsPixelCenter | polyOverlapsPixel | polyOverlapsOrContainsPixel | pixelContainsPoly | pixelContainsPolyCenter | adaptive | envelope" force="yes | no" ignoreProjection="yes | no" copyAttributes="yes | no" pxlcount="yes | no" mean="yes | no " min="yes | no" max="yes | no " stddev="yes | no" mode="yes | no" sum="yes | no"  count="yes | no" minThreshold="float" maxThreshold="float" >
+        <rsgis:attribute name="attribute_name" mean="yes | no " min="yes | no" max="yes | no " stddev="yes | no" mode="yes | no" sum="yes | no"   count="yes | no">
+            <rsgis:band band="int" minThreshold="float" maxThreshold="float" />
+        </rsgis:attribute>
+        <rsgis:attribute name="attribute_name" mean="yes | no " min="yes | no" max="yes | no " stddev="yes | no" mode="yes | no" sum="yes | no"   count="yes | no">
+            <rsgis:band band="int" minThreshold="float" maxThreshold="float" />
+        </rsgis:attribute>
+    </rsgis:command>
+        <!-- Calculates zonal statistics for image pixels, falling between minimum and maximum threasholds. Statistics are calculated for all bands in image using default names (b1, b2 etc.) or band names from image. Output saved to CSV -->
+    <rsgis:command algor="zonalstats" option="pixelstats" image="image.env"   vector="polys.shp" raster="polys.env" outputCSV="output.csv" useBandNames="yes | no" shortenBandNames="yes | no"   method="polyContainsPixel | polyContainsPixelCenter | polyOverlapsPixel | polyOverlapsOrContainsPixel | pixelContainsPoly | pixelContainsPolyCenter | adaptive | envelope" ignoreProjection="yes | no" pxlcount="yes | no" mean="yes | no " min="yes | no" max="yes | no " stddev="yes | no" mode="yes | no" sum="yes | no"  count="yes | no" minThreshold="float" maxThreshold="float" />
+    <!-- Calculates zonal statistics for image pixels, falling between minimum and maximum threasholds. Statistics may be calculated for selected bands with user specified names, statistics specified for each attribute override common statistics. Output saved to CSV -->
+    <rsgis:command algor="zonalstats" option="pixelstats" image="image.env"   vector="polys.shp" raster="polys.env" outputCSV="output.csv" method="polyContainsPixel | polyContainsPixelCenter | polyOverlapsPixel | polyOverlapsOrContainsPixel | pixelContainsPoly | pixelContainsPolyCenter | adaptive | envelope" ignoreProjection="yes | no" pxlcount="yes | no" mean="yes | no " min="yes | no" max="yes | no " stddev="yes | no" mode="yes | no" sum="yes | no"   count="yes | no" minThreshold="float" maxThreshold="float" >
+        <rsgis:attribute name="attribute_name" mean="yes | no " min="yes | no" max="yes | no " stddev="yes | no" mode="yes | no" sum="yes | no"   count="yes | no">
+            <rsgis:band band="int" minThreshold="float" maxThreshold="float" />
+        </rsgis:attribute>
+        <rsgis:attribute name="attribute_name" mean="yes | no " min="yes | no" max="yes | no " stddev="yes | no" mode="yes | no" sum="yes | no"   count="yes | no">
+            <rsgis:band band="int" minThreshold="float" maxThreshold="float" />
+        </rsgis:attribute>
+    </rsgis:command>
+    <!-- Calculates pixel mean-->
+    <rsgis:command algor="zonalstats" option="pixelmean" image="image.env" raster="polys.env" method="polyContainsPixel | polyContainsPixelCenter | polyOverlapsPixel | polyOverlapsOrContainsPixel | pixelContainsPoly | pixelContainsPolyCenter | adaptive | envelope" vector="polys.shp" output="output.shp" force="yes | no" pxlcount="yes | no" dB="yes | no">
+        <rsgis:attribute name="attribute_name" >
+            <rsgis:band band="int" minThreshold="float" maxThreshold="float" />
+        </rsgis:attribute>
+        <rsgis:attribute name="attribute_name" >
+            <rsgis:band band="int" minThreshold="float" maxThreshold="float" />
+        </rsgis:attribute>
+        <rsgis:attribute name="attribute_name" >
+            <rsgis:band band="int" minThreshold="float" maxThreshold="float" />
+        </rsgis:attribute>
+    </rsgis:command>
+    <!-- Calculates weighted mean based on percentage of pixel falling within polygon -->
+    <rsgis:command algor="zonalstats" option="pixelWeightedMean" image="image.env" vector="polys.shp" output="output.shp" force="yes | no" pxlcount="yes | no">
+        <rsgis:attribute name="attribute_name" >
+            <rsgis:band band="int" minThreshold="float" maxThreshold="float" />
+        </rsgis:attribute>
+        <rsgis:attribute name="attribute_name" >
+            <rsgis:band band="int" minThreshold="float" maxThreshold="float" />
+        </rsgis:attribute>
+        <rsgis:attribute name="attribute_name" >
+            <rsgis:band band="int" minThreshold="float" maxThreshold="float"/>
+        </rsgis:attribute>
+    </rsgis:command>
+    <!-- Calculates mean and variance on the mean for window around polygon -->
+    <rsgis:command algor="zonalstats" option="pixelmeanLSSVar" image="image.env" vector="polys.shp" method="polyContainsPixel | polyContainsPixelCenter | polyOverlapsPixel | polyOverlapsOrContainsPixel | pixelContainsPoly | pixelContainsPolyCenter | adaptive | envelope" output="output.shp" windowSize="int" offsetSize="float" force="yes | no" pxlcount="yes | no">
+        <rsgis:attribute name="attribute_name" >
+            <rsgis:band band="int" minThreshold="float" maxThreshold="float" />
+        </rsgis:attribute>
+        <rsgis:attribute name="attribute_name" >
+            <rsgis:band band="int" minThreshold="float" maxThreshold="float" />
+        </rsgis:attribute>
+        <rsgis:attribute name="attribute_name" >
+            <rsgis:band band="int" minThreshold="float" maxThreshold="float"/>
+        </rsgis:attribute>
+    </rsgis:command>
+    <!-- TODO -->
+    <rsgis:command algor="zonalstats" option="fuzzy" image="image.env" raster="polys.env" vector="polys.shp" classattribute="string" output="output.shp" force="yes | no" binsize="int" threshold="float" pxlcount="yes | no">
+        <rsgis:attribute name="attribute_name" class="string" >
+            <rsgis:band band="int" />
+        </rsgis:attribute>
+        <rsgis:attribute name="attribute_name" class="string" >
+            <rsgis:band band="int" />
+            <rsgis:band band="int" />
+            <rsgis:band band="int" />
+        </rsgis:attribute>
+        <rsgis:attribute name="attribute_name" class="string" >
+            <rsgis:band band="int" />
+            <rsgis:band band="int" />
+        </rsgis:attribute>
+        <rsgis:attribute name="attribute_name" threshold="float" class="string" >
+            <rsgis:band band="int" />
+            <rsgis:band band="int" />
+            <rsgis:band band="int" />
+            <rsgis:band band="int" />
+        </rsgis:attribute>
+    </rsgis:command>
+    <!-- TODO -->
+    <rsgis:command algor="zonalstats" option="powersetcount" image="image.env" raster="polys.env" vector="polys.shp" output="output.shp" force="yes | no" nTop="int">
+        <rsgis:attribute name="attribute_name" >
+            <rsgis:band band="int" threshold="float" />
+        </rsgis:attribute>
+        <rsgis:attribute name="attribute_name" >
+            <rsgis:band band="int" threshold="float" />
+            <rsgis:band band="int" threshold="float" />
+            <rsgis:band band="int" threshold="float" />
+        </rsgis:attribute>
+        <rsgis:attribute name="attribute_name" >
+            <rsgis:band band="int" threshold="float" />
+            <rsgis:band band="int" threshold="float" />
+        </rsgis:attribute>
+    </rsgis:command>
+    <!-- A command to find the value of a point from an image -->
+    <rsgis:command algor="zonalstats" option="pointvalue" image="image.env" vector="points.shp" output="output.shp" force="yes | no" useBandNames="yes | no"/>
+    <rsgis:command algor="zonalstats" option="pointvalue" image="image.env" vector="points.shp" outputCSV="output.csv" useBandNames="yes | no" shortenBandNames="yes | no" />
+    <!-- A command to extract the pixel values for regions to a matrix file as columns which can be used as endmembers for unmixing -->
+    <rsgis:command algor="zonalstats" option="endmembers" image="image.env" vector="polygons.shp" output="output.mtxt" method="polyContainsPixel | polyContainsPixelCenter | polyOverlapsPixel | polyOverlapsOrContainsPixel | pixelContainsPoly | pixelContainsPolyCenter | adaptive | envelope" />
+	<!-- A command to extract the all the pixel values for regions to a HDF5 file (1 column for each image band) -->
+    <rsgis:command algor="zonalstats" option="imagezone2hdf" image="image.env" vector="polygons.shp" output="output.hdf" method="polyContainsPixel | polyContainsPixelCenter | polyOverlapsPixel | polyOverlapsOrContainsPixel | pixelContainsPoly | pixelContainsPolyCenter | adaptive | envelope" ignoreProjection="yes | no" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- A command to undertake a nearest neighbour classification of the input image (using the matrices as the input training data) -->
+    <rsgis:command algor="classification" option="nn" image="image.env" output="image_out.env">
+        <rsgis:class name="1" id="1" matrix="matrix1.mtxt" />
+        <rsgis:class name="2" id="2" matrix="matrix2.mtxt" />
+        <rsgis:class name="3" id="3" matrix="matrix3.mtxt" />
+        <rsgis:class name="4" id="4" matrix="matrix4.mtxt" />
+        <rsgis:class name="5" id="5" matrix="matrix5.mtxt" />
+    </rsgis:command>
+    <!-- A command to undertake a classification of a ESRI shapefile using SQL statements on the geometry attributes -->
+    <rsgis:command algor="classification" option="vectorsql" vector="vector.shp" class="string" >
+        <rsgis:class name="string" sql="sql_statment" />
+        <rsgis:class name="string" sql="sql_statment" />
+        <rsgis:class name="string" sql="sql_statment" />
+        <rsgis:class name="string" sql="sql_statment" />
+        <rsgis:class name="string" sql="sql_statment" />
+    </rsgis:command>
+    <!-- A command to generate a rule image (which can be used for classification) based on the spectral angle between the image and reference spectra  -->
+    <rsgis:command algor="classification" option="samRule" image="image.env" ruleImage="ruleImage.env" specLib="specLib"/>
+    <!-- A command to generate a single classification using the sam rule image where the maximum value is identified and used to assign the final classification - where the maximum value is below the threshold no classification will be assigned -->
+    <rsgis:command algor="classification" option="samClassify" ruleImage="ruleImage.env" output="image_out.env" threshold="threshold"/>
+    <!-- A command to generate a rule image (which can be used for classification) based on the spectral correlation between the image and reference spectra  -->
+    <rsgis:command algor="classification" option="scmRule" image="image.env" ruleImage="ruleImage.env" specLib="specLib"/>
+    <!-- A command to generate a single classification using the scm rule image where the maximum value is identified and used to assign the final classification - where the maximum value is below the threshold no classification will be assigned -->
+    <rsgis:command algor="classification" option="scmClassify" ruleImage="ruleImage.env" output="image_out.env" threshold="threshold"/>
+    <!-- A command to generate a rule image (which can be used for classification) based on the cumulative area under the spectral curve / or vertical profile -->
+    <rsgis:command algor="classification" option="cumulativeAreaRule" image="image.env" output="image_out.env" imagebands="matrix.mtxt" specLib="specLib"/>
+    <!-- A command to generate a single classification using the rule image where the maximum value is identified and used to assign the final classification - where the maximum value is below the threshold no classification will be assigned -->
+    <rsgis:command algor="classification" option="cumulativeAreaClassify" ruleImage="ruleImage.env" output="image_out.env" threshold="float"/>
+    <!-- A command to undertake a K-Means classification of an image for a given number of classes (clusters) -->
+    <rsgis:command algor="classification" option="kmeans" image="string" output="string" numclusters="int" initalgor="random | kpp" maxiterations="int" clustermove="float" printinfo="yes | no" centres="centres.csv" />
+    <!-- A command to undertake a ISOData classification of an image for a given number of classes (clusters) -->
+    <rsgis:command algor="classification" option="isodata" image="string" output="string" numclusters="int" initalgor="random | kpp" maxiterations="int" clustermove="float" minnumbervals="int" mindistbetweencluster="float" maxstddev="float" propAvgDist="float" printinfo="yes | no"/>
+    <!-- A command to convert a shapefile's attributes to a spectral library (mtxt) -->
+    <rsgis:command algor="classification" option="createspeclib" vector="string" output="file.mtxt" group="yes | no" classattribute="string" valueattributes="string,string,string,string,...,string" />
+	<!-- A command to add a colour table to an image file - normally for visualisation of a classification. -->
+    <rsgis:command algor="classification" option="addcolourtable" image="input.kea" band="int" >
+		<rsgis:class value="int" r="int" g="int" b="int" a="int" />
+        <rsgis:class value="int" r="int" g="int" b="int" a="int" />
+		<rsgis:class value="int" r="int" g="int" b="int" a="int" />
+    </rsgis:command>
+	<!-- A command to run a majority filter to eliminate single pixels from with a classification  -->
+    <rsgis:command algor="classification" option="elimsinglepxls" image="image.kea" output="image.kea" connectivity="4 | 8" ignorezeros="yes | no" format="GDAL Format" />
+	<!-- A command to collapse a classified segmentation into a classified image -->
+    <rsgis:command algor="classification" option="collapseclasses" image="image.kea" output="image.kea" format="GDAL Format" classnames="column name" />
+	<!-- A command to create a 3 band image colour image from the attribute table -->
+    <rsgis:command algor="classification" option="colour3bands" image="image.kea" output="image.kea" format="GDAL Format" />
+
+
+
+
+
+
+
+
+
+    <!-- A command that will generate an RGB colour image based on thresholds applied to the input image - useful for generating quicklooks and visualisation of classification -->
+    <rsgis:command algor="imageutils" option="colourimage" image="image.env" output="image_out.env" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64">
+        <rsgis:colour name="class_name_1" id="int" band="int" lower="double" upper="double" red="int" green="int" blue="int" />
+        <rsgis:colour name="class_name_2" id="int" band="int" lower="double" upper="double" red="int" green="int" blue="int" />
+        <rsgis:colour name="class_name_3" id="int" band="int" lower="double" upper="double" red="int" green="int" blue="int" />
+    </rsgis:command>
+    <!-- A command that will generate an RGB colour image based on thresholds applied to each input image band, generating a new image for each input band - useful for generating quicklooks and visualisation of classification.-->
+    <rsgis:command algor="imageutils" option="colourimagebands" image="image.env" output="image_out_base">
+        <rsgis:colour name="class_name_1" id="int" lower="double" upper="double" red="int" green="int" blue="int" />
+        <rsgis:colour name="class_name_2" id="int" lower="double" upper="double" red="int" green="int" blue="int" />
+        <rsgis:colour name="class_name_3" id="int" lower="double" upper="double" red="int" green="int" blue="int" />
+    </rsgis:command>
+    <!-- A command to mosaic a set of input images to generate a single output image -->
+    <rsgis:command algor="imageutils" option="mosaic" output="image_out.env" nodata="float=0" skipValue="float (optional)" skipLowerThresh="float (optional)" skipUpperThresh="float (optional)"  proj="OSGB | NZ2000 | NZ1949 | IMAGE" setSkipBand="1" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" overlapBehaviour="min|max" >
+        <rsgis:image file="image1" />
+        <rsgis:image file="image2" />
+        <rsgis:image file="image3" />
+        <rsgis:image file="image4" />
+    </rsgis:command>
+    <!-- A command to mosaic a set of input images from a directory to generate a single output image -->
+    <rsgis:command algor="imageutils" option="mosaic" dir="directory" ext="file_extension" output="image_out.env" nodata="float=0" skipValue="float (optional)" skipLowerThresh="float (optional)" skipUpperThresh="float (optional)"  proj="OSGB | NZ2000 | NZ1949 | IMAGE" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" overlapBehaviour="min|max"/>
+    <!-- A command to include a set of input images into an existing image -->
+    <rsgis:command algor="imageutils" option="include" image="base_image.env" bands="b1,b2,b3,...,bn" >
+        <rsgis:image file="image1" />
+        <rsgis:image file="image2" />
+        <rsgis:image file="image3" />
+        <rsgis:image file="image4" />
+    </rsgis:command>
+    <!-- A command to include a set of input images from a directory into an existing image -->
+    <rsgis:command algor="imageutils" option="include" image="base_image.env" dir="directory" ext="file_extension" bands="b1,b2,b3,...,bn" />
+    <!-- A command to cut an image to an input shapefile where each polygon geometry will created a new output image representing the region within the polygon -->
+    <rsgis:command algor="imageutils" option="cut2polys" image="image.env" output="image_out_base" vector="vector.shp" outfilename="attribute" nodata="float" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64"/>
+    <!-- A command to mask the input image with a second 'mask' image -->
+    <rsgis:command algor="imageutils" option="mask" image="image.env" mask="mask.env" output="image_out.env" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" outputvalue="float" maskvalue="float" />
+    <!-- A command resample an input image to another resolution -->
+    <rsgis:command algor="imageutils" option="resample" image="image.env" output="image_out.env" scale="float" interpolation="Cubic | BilinearArea | BilinearPoint | NN | Triangular" />
+    <!-- TODO A command to create a multiband raster image, based on thematic rasters exported from Definiens. The values for each band are held in a csv file (exported with raster image from Definiens -->
+    <rsgis:command algor="imageutils" option="rasterisedefiniens" [inDIR="/input/directory/" outDIR="/output/directory"] [image="image.env" csv="input.csv" output="image_out.env"] proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
+    <!-- A command which prints (to the console) the proj4 string representing the projection of the inputted image -->
+    <rsgis:command algor="imageutils" option="printProj4" image="image.env" />
+    <!-- A command which prints (to the console) the WKT string representing the projection of the inputted image -->
+    <rsgis:command algor="imageutils" option="printWKT" image="image.env" />
+    <!-- A command extracts pixel values from two image bands and output them as 2D scatter ptxt file -->
+    <rsgis:command algor="imageutils" option="extract2dscatterptxt" image="image.env" band1="int" band2="int" output="string" />
+    <!-- A command extracts pixel values from two image bands (bands are numbered sequencially down the list of input files) and output them as 2D scatter ptxt file -->
+    <rsgis:command algor="imageutils" option="extract2dscatterptxt" band1="int" band2="int" output="string" >
+        <rsgis:image file="image1" />
+        <rsgis:image file="image2" />
+        <rsgis:image file="image3" />
+        <rsgis:image file="image4" />
+    </rsgis:command>
+    <!-- A command to smooth an spectral profiles of the input image pixels -->
+    <rsgis:command algor="imageutils" option="sgsmoothing" image="image.env" output="image_out.env" order="int" window="int" imagebands="vector.mtxt"/>
+    <!-- A command to generate a cumulativeAreaImage from a spectral curve (or profile) -->
+    <rsgis:command algor="imageutils" option="cumulativearea" image="image.env" output="image_out.env" imagebands="matrix.mtxt"/>
+    <!-- A command to generate new image with a default value -->
+    <rsgis:command algor="imageutils" option="createimage" output="image_out.env" numbands="int" width="int" height="int" resolution="float" eastings="double" northings="double" wktfile="string" value="float"/>
+    <!-- A command to apply an enhancement stretch an images pixel values to a range of 0 to 255 - normally used for visualisation -->
+    <rsgis:command algor="imageutils" option="stretch" image="image.env" output="image_out.env" [stats="filepath.txt"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" ignorezeros="yes | no" stretch="LinearMinMax | LinearPercent | LinearStdDev | Histogram | Exponential | Logarithmic | PowerLaw" percent="float - only LinearPercent" stddev="float - only LinearStdDev" onePassSD="yes | no" power="float - only PowerLaw"/>
+	<!-- A command to apply an enhancement stretch an images pixel values to a range of 0 to 255 - normally used for visualisation -->
+    <rsgis:command algor="imageutils" option="stretchwithstats" image="image.env" output="image_out.env" stats="filepath.txt" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" stretch="LinearMinMax | Histogram | Exponential | Logarithmic | PowerLaw" power="float - only PowerLaw"/>
+    <!-- A command to colour to generate a colour image, using the Hue of a HSV transformation, for a particular input image band -->
+    <rsgis:command algor="imageutils" option="huecolour" image="image.env" output="image_out.env" band="int" lowvalue="float" highvalue="float" background="float" />
+    <!-- A command to remove / define spatial reference to nothing and size set to pixel size -->
+    <rsgis:command algor="imageutils" option="removespatialref" image="image.env" output="image_out.env" />
+    <!-- A command to add noise to an image -->
+    <rsgis:command algor="imageutils" option="addnoise" type="randomNoise | percentGaussianNoise" scale="float" image="image.env" output="image_out.env"/>
+    <!-- A command to subset an image to the same extent as a shapefile -->
+    <rsgis:command algor="imageutils" option="subset" image="image.env" output="output_img.env" vector="vector.shp" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+	<!-- A command to subset an image to the same extent as another image -->
+    <rsgis:command algor="imageutils" option="subset2img" image="image.env" output="output_img.env" roi="roi.env" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+    <!-- A command to subset an image to polygons within shapefile -->
+    <rsgis:command algor="imageutils" option="subset2polys" image="image.env" output="image_out_base" vector="vector.shp" outfilename="attribute" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" extension="env | kea | tif | etc"/>
+    <!-- A command to pan sharpen an image, takes stack of multispectral image (resampled to pan resolution) and panchromatic image -->
+    <rsgis:command algor="imageutils" option="pansharpen" image="ms_pan_img.env" output="ps_image.env" />
+    <!-- A command to generate a set of slices from a multi-band image -->
+    <rsgis:command algor="imageutils" option="createslices" image="image.env" output="image_out_base" />
+    <!-- A command to generate tiles from an input image-->
+    <rsgis:command algor="imageutils" option="createtiles" image="image.env" output="image_out_base" width="int" height="int" overlap="int" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" [offset="yes|no"] [outTilesList="list.txt"]/>
+    <!-- A command to clump an image for a given pixel values -->
+    <rsgis:command algor="imageutils" option="clump" image="image.env" output="image_out.env" format="GDAL Format" inmemory="yes | no" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
+    <!-- A command to calculate summary stats for all all every N bands in a multiple band image -->
+    <rsgis:command algor="imageutils" option="stackStats" image="image.env" output="image_out.env" [numBands="int"] stats="mean | min | max | range" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+    <!-- A command to relabel image pixel using a look up table from a gmtxt matrix file (m=2 n=X) -->
+    <rsgis:command algor="imageutils" option="relabel" image="image.env" output="image_out.env" lut="matrix.gmtxt" format="GDAL Format" />
+    <!-- A command to assign and update an image to a specific projection -->
+    <rsgis:command algor="imageutils" option="assignproj" image="image.env" projwkt="txt.wkt" />
+    <!-- A command to populate an image with image statistics and image pyramids -->
+    <rsgis:command algor="imageutils" option="popimgstats" image="image.img" ignore="float" pyramids="yes | no" />
+    <!-- A command to create a new image from an existing image -->
+    <rsgis:command algor="imageutils" option="createcopy" image="image.img" output="image_out.env" numbands="int" pixelval="float" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+    <!-- A command to create a KML text file for an existing image -->
+    <rsgis:command algor="imageutils" option="createKMLFile" image="image.png" outKMLFile="string"/>
+	<!-- A command to assign and update an image with specific spatial location -->
+    <rsgis:command algor="imageutils" option="assignspatialinfo" image="image.env" [tlx="double"] [tly="double"] [resX="double"] [resY="double"] [rotX="double"] [rotY="double"] />
+	<!-- A command to define a band colour usage -->
+    <rsgis:command algor="imageutils" option="bandcolourusage" image="string" >
+        <rsgis:band band="int" usage="palette | greyscale | red | green | blue | alpha" />
+		<rsgis:band band="int" usage="palette | greyscale | red | green | blue | alpha" />
+		<rsgis:band band="int" usage="palette | greyscale | red | green | blue | alpha" />
+    </rsgis:command>
+	<!-- A command to generate random points for accuracy assessment, n is either the total number of points for random or the number of points stratified within each class -->
+    <rsgis:command algor="imageutils" option="genassesspoints" image="image.env" [dem="image.env"] output="file.dat" classcolumn="string" seed="int" type="random | stratified" n="int; total number for random or number within each class for stratified" />
+	<!-- A command to create an image where each pixel is a unique 'clump' -->
+    <rsgis:command algor="imageutils" option="uniquepxlclumps" image="image.env" output="image_out.env" [nodata="float"] format="GDAL Format"  />
+	<!-- A command to create a thematic image defining tiles for an image image -->
+    <rsgis:command algor="imageutils" option="defineimgtiles" image="image.env" output="image_out.env" tilesize="int" [nodata="float"] validpixelratio="float" format="GDAL Format"  />
+	<!-- A command to create individual mask images for each tile with an optional overlap defined -->
+	<rsgis:command algor="imageutils" option="gentilemasks" image="image.env" outputbase="image_out_path" format="GDAL Format" extension="string" [overlap="float" growoverlap="yes|no"] />
+	<!-- A command to extract and a region for the tile and apply a mask --> 
+	<rsgis:command algor="imageutils" option="cutouttile" image="image.env" tile="tile.env" output="image_out.env" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" nodataval="float" />
+	<!-- A command to extract a subsample of image data to a hdf5 file --> 
+	<rsgis:command algor="imageutils" option="subsampleimage" image="image.kea" output="data.hdf" nodata="float" subsample="int" />
+	<!-- A command to identify dark targets which can be used for a number of applications (e.g., radiometric correction) --> 
+	<rsgis:command algor="imageutils" option="darktargetmask" image="image.kea" output="data.hdf" nodata="float"  />
+	<!-- A command to copy the projection definition from one image to another --> 
+	<rsgis:command algor="imageutils" option="copyprojdef" image="image.kea" refimage="data.kea" />
+	<!-- A command to copy the projection definition and spatial information from one image to another --> 
+	<rsgis:command algor="imageutils" option="copyprojdefspatialinfo" image="image.kea" refimage="data.kea" />
+	<!-- A command to extract the all the pixel values for raster regions to a HDF5 file (1 column for each image band) -->
+    <rsgis:command algor="imageutils" option="imagerasterzone2hdf" image="image.env" mask="mask.env" output="output.hdf" maskvalue="float" />
+	<!-- A command to subset an image to a given set of the input image bands -->
+    <rsgis:command algor="imageutils" option="bandselect" image="string" output="string" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" >
+        <rsgis:band band="int" />
+		<rsgis:band band="int" />
+		<rsgis:band band="int" />
+    </rsgis:command>
+	
+	
+	
+	
+	
+
+
+
+    <!-- A command to normalise an input image to output image pixel values to a given range (the input minimum and maximum as derived from the image) -->
+    <rsgis:command algor="imagecalc" option="normalise" image="image.env" output="image_out.env" outmin="double" outmax="double" />
+    <!-- A command to normalise an input image to output image pixel values to a given range from the provided input minimum and maximum pixel values. -->
+    <rsgis:command algor="imagecalc" option="normalise" image="image.env" output="image_out.env" inmin="double" inmax="double" outmin="double" outmax="double" />
+    <!-- A command to normalise a directory of images to output image pixel values to a given range (the input minimum and maximum as derived from the image) -->
+    <rsgis:command algor="imagecalc" option="normalise" dir="directory" ext="file_extension" output="image_out_base" outmin="double" outmax="double" />
+    <!-- A command to normalise a directory of images to output image pixel values to a given range from the provided input minimum and maximum pixel values. -->
+    <rsgis:command algor="imagecalc" option="normalise" dir="directory" ext="file_extension" output="image_out_base" inmin="double" inmax="double" outmin="double" outmax="double" />
+    <!-- A command to calculate the correlation between two images -->
+    <rsgis:command algor="imagecalc" option="correlation" imageA="imageA.env" imageB="imageB.env" output="matrix.mtxt" />
+    <!-- A command to calculate the covariance between two images -->
+    <rsgis:command algor="imagecalc" option="covariance" imageA="imageA.env" imageB="imageB.env" output="matrix.mtxt" />
+    <!-- A command to calculate the covariance between two images -->
+    <rsgis:command algor="imagecalc" option="covariance" imageA="imageA.env" imageB="imageB.env" output="matrix.mtxt" meanA="matrixA.mtxt" meanB="matrixB.mtxt"/>
+    <!-- A command to calculate the RMSE between two images -->
+    <rsgis:command algor="imagecalc" option="calcRMSE" imageA="imageA.env" imageB="imageB.env" bandA="int=1" bandB="int=1" />
+    <!-- A command to calculate the mean vector of an image -->
+    <rsgis:command algor="imagecalc" option="meanvector" image="image.env" output="matrix.mtxt" />
+    <!-- A command to generate a PCA for an input image based on the provided eigenvectors -->
+    <rsgis:command algor="imagecalc" option="pca" image="image.env" output="image_out.env" eigenvectors="matrix.mtxt" components="int" />
+    <!-- A command to generate a standardised image using the mean vector provided -->
+    <rsgis:command algor="imagecalc" option="standardise" image="image.env" output="image_out.env" meanvector="matrix.mtxt" />
+    <!-- A command to undertake band maths operations (band math operations are defined using muparser). -->
+    <rsgis:command algor="imagecalc" option="bandmaths" output="image_out.env" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" expression="string" | expressionFile="string" >
+        <rsgis:variable name="string" image="image1" band="int" />
+        <rsgis:variable name="string" image="image2" band="int" />
+        <rsgis:variable name="string" image="image3" band="int" />
+    </rsgis:command>
+    <!-- A command to apply a single expression to each band of any image (in the expression the band needs to be referred to as 'b1') -->
+    <rsgis:command algor="imagecalc" option="imagemaths" image="image.env" output="image_out.env" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" expression="string" | expressionFile="string" >
+    <!-- A command to replace values within an image which are below a given value -->
+    <rsgis:command algor="imagecalc" option="replacevalueslessthan" image="image.env" output="image_out.env" threshold="float" value="float" />
+    <!-- A command to convert the a spectral curve such that it has a unit area (of value 1) -->
+    <rsgis:command algor="imagecalc" option="unitarea" image="image.env" output="image_out.env" imagebands="matrix.mtxt"/>
+    <!-- A command to calculate mean, min and max speed of movement and displacement-->
+    <rsgis:command algor="imagecalc" option="movementspeed" output="image_out.env" upper="float" lower="float" >
+        <rsgis:image image="image1" band="int" time="float" />
+        <rsgis:image image="image2" band="int" time="float" />
+        <rsgis:image image="image3" band="int" time="float" />
+    </rsgis:command>
+    <rsgis:command algor="imagecalc" option="countvalsincol" image="image.env" output="image_out.env" upper="float" lower="float" />
+    <!-- A command to calculate the distance from each pixel to nearest geometry -->
+    <rsgis:command algor="imagecalc" option="dist2geoms" vector="vector.shp" output="image_out.env" resolution="float" />
+	<!-- A command to calculate the distance from each pixel within the input image to nearest geometry -->
+    <rsgis:command algor="imagecalc" option="imgdist2geoms" image="image.env" vector="vector.shp" output="image_out.env" format="GDAL Format" />
+	<!-- A command to calculate the distance by growing from 0 pixel values, where all pixels to be calculated should have a value of -1 -->
+    <rsgis:command algor="imagecalc" option="imgcalcdist" image="image.env" output="image_out.env" format="GDAL Format" />
+    <!-- A command to calculate the statistics for the individual image bands -->
+    <rsgis:command algor="imagecalc" option="imagebandstats" image="image.env" output="outfile.txt" ignorezeros="yes | no" />
+    <!-- A command to calculate the statistics for the whole image across all bands -->
+    <rsgis:command algor="imagecalc" option="imagestats" image="image.env" output="outfile.txt" ignorezeros="yes | no" />
+    <!-- A command to undertake an unconstrained linear spectral unmixing of the input image for a set of endmembers -->
+    <rsgis:command algor="imagecalc" option="unconlinearspecunmix" image="image.env" output="image" endmembers="matrix.mtxt" [gain="float" offset="float" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64"] />
+    <!-- A command to undertake an exhaustive constrained linear spectral unmixing of the input image for a set of endmembers -->
+    <rsgis:command algor="imagecalc" option="exhconlinearspecunmix" image="image.env" output="image" endmembers="matrix.mtxt" step="float" [gain="float" offset="float" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64"] />
+	<!-- A command to undertake a partially constrained linear spectral unmixing of the input image for a set of endmembers where the sum of the unmixing will be approximately 1 -->
+    <rsgis:command algor="imagecalc" option="consum1linearspecunmix" image="image.env" output="image" endmembers="matrix.mtxt" weight="float" [gain="float" offset="float" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64"] />
+	<!-- A command to undertake a constrained linear spectral unmixing of the input image for a set of endmembers where the sum of the unmixing will be approximately 1 and non-negative -->
+    <rsgis:command algor="imagecalc" option="nnconsum1linearspecunmix" image="image.env" output="image" endmembers="matrix.mtxt" weight="float" [gain="float" offset="float" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64"] />
+    <!-- A command to calculate cluster centres for the image using K-Means clustering -->
+    <rsgis:command algor="imagecalc" option="kmeanscentres" image="image.env" output="matrix.gmtxt" numclusters="int" maxiterations="int" degreeofchange="float" subsample="int" initmethod="random | diagonal_range | diagonal_stddev | diagonal_range_attach | diagonal_stddev_attach | kpp" ignorezeros="yes | no" />
+    <!-- A command to calculate cluster centres for the image using ISOData clustering -->
+    <rsgis:command algor="imagecalc" option="isodatacentres" image="image.env" output="matrix.gmtxt" numclusters="int" minnumclusters="int" maxiterations="int" degreeofchange="float" subsample="int" initmethod="random | diagonal_range | diagonal_stddev | diagonal_range_attach | diagonal_stddev_attach | kpp" ignorezeros="yes | no" mindist="float" minnum="unsigned int" maxstddev="float" editstart="int" editend="int" />
+    <!-- A command to test whether all bands are equal to the same value - useful for creating images masks -->
+    <rsgis:command algor="imagecalc" option="allbandsequalto" image="image.env" output="image_out.env" format="GDAL Format" value="float" trueout="float" falseout="float" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+	<!-- A command to generate a histogram for a region of an image given a mask. If min and max values are not provided the image extremes will be calculated -->
+    <rsgis:command algor="imagecalc" option="histogram" image="image.env" output="image_out.txt" mask="mask.env" value="int" band="int" [min="float" max="float"] [width="float"] />
+	<!-- A command to calculate image band percentiles. -->
+    <rsgis:command algor="imagecalc" option="bandpercentile" image="image.env" output="image_out.mtxt" percentile="float 0-1" nodata="float" />
+	<!-- A command to calculate the Mahalanobis distance within a window - the centre pixel compared to the others within the window -->
+	<rsgis:command algor="imagecalc" option="mahalanobisdistwindow" image="image.env" output="image.env" window="int" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+	<!-- A command to calculate the Mahalanobis distance of a window to the whole image -->
+	<rsgis:command algor="imagecalc" option="mahalanobisdistimg2window" image="image.env" output="image.env" window="int" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+	<!-- A command to calculate statistics for each column of image bands for each pixel -->
+	<rsgis:command algor="imagecalc" option="calcpxlcolstats" image="image.env" output="image.env" min="yes|no" max="yes|no" mean="yes|no" median="yes|no" sum="yes|no" stddev="yes|no" [nodata="float"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+	<!-- A command to calculate a linear regression for each pixel column -->
+	<rsgis:command algor="imagecalc" option="pxlcolregression" image="image.env" output="image.env" bandvalues="file.txt" [nodata="float"] format="GDAL Format" />
+	<!-- A command to calculate correlation between two images using a moving window -->
+    <rsgis:command algor="imagecalc" option="correlationWindow" image="image.env" output="image.env" window="int" bandA="int (=1)" bandB="int (=2)" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+    <!-- A command to calculate the statistics for an individual image band within an envelope defined in Lat / Long -->
+    <rsgis:command algor="imagecalc" option="imagebandstatsenv" image="image.env" output="outfile.txt" [nodata="double"] band="int" latMin="double" latMax="double" longMin="double" longMax="double" />
+	
+	
+	
+	
+	
+	
+	
+
+    <!-- A command to calibrate image Landsat data from at sensor DNs to at sensor radiance (EQ: ((lmax-lmin)/(qcalmax-qcalmin)) * (DNs - qcalmin) + lmin) Eq is from landsat manual. -->
+    <rsgis:command algor="imagecalibration" option="landsatradcal" output="image_out.env" format="GDAL Format" >
+        <rsgis:band name="string" image="image1" band="int" [sensorband="string" | lmin="float" lmax="float" qcalmin="float" qcalmax="float"] />
+        <rsgis:band name="string" image="image2" band="int" [sensorband="string" | lmin="float" lmax="float" qcalmin="float" qcalmax="float"]/>
+        <rsgis:band name="string" image="image3" band="int" [sensorband="string" | lmin="float" lmax="float" qcalmin="float" qcalmax="float"]/>
+    </rsgis:command>
+	<rsgis:command algor="imagecalibration" option="landsatradcalmultiadd" output="image_out.env" format="GDAL Format" >
+        <rsgis:band name="string" image="image1" band="int" addval="float" multival="float" />
+        <rsgis:band name="string" image="image2" band="int" addval="float" multival="float" />
+        <rsgis:band name="string" image="image3" band="int" addval="float" multival="float" />
+    </rsgis:command>
+    <!-- A command to calibrate image SPOT data from at sensor DNs to at sensor radiance -->
+    <rsgis:command algor="imagecalibration" option="spotradcal" output="image_out.env" format="GDAL Format" >
+        <rsgis:band name="string" image="image1" band="int"gain="float" />
+        <rsgis:band name="string" image="image2" band="int"gain="float" />
+        <rsgis:band name="string" image="image3" band="int"gain="float" />
+    </rsgis:command>
+    <!-- A command to calibrate image Ikonos data from at sensor DNs to at sensor radiance -->
+    <rsgis:command algor="imagecalibration" option="ikonosradcal" output="image_out.env" format="GDAL Format" >
+        <rsgis:band name="string" image="image1" band="int" [sensorband="string" | calcoef="float" bandwidth="float" ] />
+        <rsgis:band name="string" image="image2" band="int" [sensorband="string" | calcoef="float" bandwidth="float" ] />
+        <rsgis:band name="string" image="image3" band="int" [sensorband="string" | calcoef="float" bandwidth="float" ] />
+    </rsgis:command>
+    <!-- A command to calibrate image ASTER data from at sensor DNs to at sensor radiance -->
+    <rsgis:command algor="imagecalibration" option="asterradcal" output="image_out.env" format="GDAL Format" >
+        <rsgis:band name="string" image="image1" band="int" [sensorband="string" | coefficient="float" ] />
+        <rsgis:band name="string" image="image2" band="int" [sensorband="string" | coefficient="float" ] />
+        <rsgis:band name="string" image="image3" band="int" [sensorband="string" | coefficient="float" ] />
+    </rsgis:command>
+    <!-- A command to calibrate image IRS data from at sensor DNs to at sensor radiance (EQ: ((lmax-lmin)/(qcalmax-qcalmin)) * (DNs - qcalmin) + lmin). -->
+    <rsgis:command algor="imagecalibration" option="irsradcal" output="image_out.env" format="GDAL Format" >
+        <rsgis:band name="string" image="image1" band="int" [sensorband="string" | lmin="float" lmax="float" qcalmin="float" qcalmax="float"] />
+        <rsgis:band name="string" image="image2" band="int" [sensorband="string" | lmin="float" lmax="float" qcalmin="float" qcalmax="float"]/>
+        <rsgis:band name="string" image="image3" band="int" [sensorband="string" | lmin="float" lmax="float" qcalmin="float" qcalmax="float"]/>
+    </rsgis:command>
+    <!-- A command to calibrate image Quickbird (16 bit) data from at sensor DNs to at sensor radiance -->
+    <rsgis:command algor="imagecalibration" option="quickbird16bitradcal" output="image_out.env" format="GDAL Format" >
+        <rsgis:band name="string" image="image1" band="int" [sensorband="string" | calfactor="float" bandintegrate="float" ] />
+        <rsgis:band name="string" image="image2" band="int" [sensorband="string" | calfactor="float" bandintegrate="float" ] />
+        <rsgis:band name="string" image="image3" band="int" [sensorband="string" | calfactor="float" bandintegrate="float" ] />
+    </rsgis:command>
+    <!-- A command to calibrate image Quickbird (8 bit) data from at sensor DNs to at sensor radiance -->
+    <rsgis:command algor="imagecalibration" option="quickbird8bitradcal" output="image_out.env" format="GDAL Format" >
+        <rsgis:band name="string" image="image1" band="int" [sensorband="string" | calfactor="float" bandintegrate="float" k="float" ] />
+        <rsgis:band name="string" image="image2" band="int" [sensorband="string" | calfactor="float" bandintegrate="float" k="float" ] />
+        <rsgis:band name="string" image="image3" band="int" [sensorband="string" | calfactor="float" bandintegrate="float" k="float" ] />
+    </rsgis:command>
+    <!-- A command to calibrate image WorldView2 data from at sensor DNs to at sensor radiance -->
+    <rsgis:command algor="imagecalibration" option="worldview2radcal" output="image_out.env" format="GDAL Format">
+        <rsgis:band name="string" image="image1" band="int" [sensorband="string" | calfactor="float" bandintegrate="float" ] />
+        <rsgis:band name="string" image="image2" band="int" [sensorband="string" | calfactor="float" bandintegrate="float" ] />
+        <rsgis:band name="string" image="image3" band="int" [sensorband="string" | calfactor="float" bandintegrate="float" ] />
+    </rsgis:command>
+    <!-- A command to convert from at sensor radiance to above atmosphere reflectance -->
+    <rsgis:command algor="imagecalibration" option="topatmosrefl" input="image_in.env" output="image_out.env" [julianday="int" | day="int" month="int" year="int"] [zenith="float" | elevation="float"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" scaleFactor="float" >
+        <rsgis:band [sensorband="string" | irradiance="float"] />
+        <rsgis:band [sensorband="string" | irradiance="float"] />
+        <rsgis:band [sensorband="string" | irradiance="float"] />
+    </rsgis:command>
+    <!-- A command to convert from at sensor radiance to surface reflectance using coefficients provided by 6S -->
+    <rsgis:command algor="imagecalibration" option="apply6sSingle" input="image_in.env" output="image_out.env" scaleFactor="float" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" [noData="float"] >
+        <rsgis:band band="int" ax="float" bx="float" cx="float" />
+        <rsgis:band band="int" ax="float" bx="float" cx="float" />
+        <rsgis:band band="int" ax="float" bx="float" cx="float" />
+    </rsgis:command>
+    <!-- -->
+    <rsgis:command algor="imagecalibration" option="apply6s" input="image_in.env" output="image_out.env" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" scaleFactor="float" inputDEM="in_dem.env">
+        <rsgis:band band="int" >
+              <rsgis:elevation elevationUpper="float" ax="float" bx="float" cx="float"  />
+              <rsgis:elevation elevationUpper="float" ax="float" bx="float" cx="float"  />
+        </rsgls:band>
+        <rsgis:band band="int" >
+              <rsgis:elevation elevationUpper="float" ax="float" bx="float" cx="float"  />
+              <rsgis:elevation elevationUpper="float" ax="float" bx="float" cx="float"  />
+        </rsgls:band>
+    </rsgis:command>
+
+
+
+
+
+    <!-- A command to calculate the slope of an elevation surface -->
+    <rsgis:command algor="elevation" option="slope" input="image.env" output="out_image.env" [band="int"] [outtype="radians|degrees"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+    <!-- A command to calculate the aspect of an elevation surface -->
+    <rsgis:command algor="elevation" option="aspect" input="image.env" output="out_image.env" [band="int"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+    <!-- A command to calculate the slope and aspect of an elevation surface -->
+    <rsgis:command algor="elevation" option="slopeaspect" input="image.env" output="out_image.env" [band="int"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+    <!-- A command to calculate the hillshade of an elevation surface -->
+    <rsgis:command algor="elevation" option="hillshade" input="image.env" output="out_image.env" azimuth="float" zenith="float" [band="int"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+    <!-- A command to calculate a mask for the regions of shadow from an elevation surface -->
+    <rsgis:command algor="elevation" option="shadowmask" input="image.env" output="out_image.env" azimuth="float" zenith="float" maxelevation="int" [band="int"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64"  />
+    <!-- A command to calculate the incidence angle from a elevation surface and sun position -->
+    <rsgis:command algor="elevation" option="incidenceangle" input="image.env" output="out_image.env" azimuth="float" zenith="float" [band="int"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+    <!-- A command to calculate the exitance angle from a elevation surface and viewer position -->
+    <rsgis:command algor="elevation" option="exitanceangle" input="image.env" output="out_image.env" azimuth="float" zenith="float" [band="int"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+    <!-- A command to calculate the incidence and exitance angles from a elevation surface and sun and viewer positions -->
+    <rsgis:command algor="elevation" option="incidenceexitanceangles" input="image.env" output="out_image.env" solarAzimuth="float" solarZenith="float" viewAzimuth="float" viewZenith="float" [band="int"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+	<!-- A command to fills the holes within a DEM, the input image should have the following bands: elevation, slope, aspect -->
+    <rsgis:command algor="elevation" option="fill" input="image.env" output="out_image.env" holesval="float" nodata="float" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+	<!-- A command to fills the holes within a DEM derived slope or aspect layer from another layer derived from another source (before filling) -->
+    <rsgis:command algor="elevation" option="infilldlayers" baseimage="image.env" infillimage="image.env" dem="dem.env" output="out_image.env" holesval="float" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+
+
+
+    <!-- A command to convert an input image band to a single column within a text file-->
+    <rsgis:command algor="imageconversion" option="asciicolumn" image="image.env" output="ascii_file.txt" band="int" />
+    <!-- A command to convert an image to any format which GDAL can write -->
+    <rsgis:command algor="imageconversion" option="format" image="image.env" output="image_out.xxx" format="GDAL_NAME" proj="wkt_path | IMAGE"/>
+    <!-- A command to convert a directory of images to any format which GDAL can write -->
+    <rsgis:command algor="imageconversion" option="format" dir="directory" ext="file_extension" output="image_out_base" format="GDAL_NAME" outend="output_file_ending"/>
+    <!-- A command to split image bands into individual images files of a given format support by GDAL. -->
+    <rsgis:command algor="imageconversion" option="splitbands" image="image.env" output="image_out_base" format="GDAL_NAME" />
+    <!-- A command to convert an image band to a matrix file -->
+    <rsgis:command algor="imageconversion" option="image2matrix" image="image.env" output="matrix_out.mtxt" band="int" />
+    <!-- A command to convert an XYZ ASCII file to an image -->
+    <rsgis:command algor="imageconversion" option="convertXYZ" input="image.env" output="image_out.env"  delimiter="char" projWKT="string" xyorder="xy | yx" resolution="float" />
+
+
+
+
+    <!-- A command to filter an input image using the range of implemented image filters (which form a filter bank) -->
+    <rsgis:command algor="imagefilter" option="filter" image="image.env" output="output_image_base" format="GDAL Format"  extension="string" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" >
+        <rsgis:filter size="int" type="GaussianSmooth" fileending="gausmooth" stddevX="float" stddevY="float" angle="int"/>
+        <rsgis:filter size="int" type="Gaussian1st" fileending="gau1st" stddevX="float" stddevY="float" angle="int"/>
+        <rsgis:filter size="int" type="Gaussian2nd" fileending="gau2nd" stddevX="float" stddevY="float" angle="int"/>
+        <rsgis:filter size="int" type="Laplacian" fileending="laplacian" stddev="float"/>
+        <rsgis:filter type="Sobel" fileending="sobel" option="x | y | xy"/>
+        <rsgis:filter type="Prewitt" fileending="prewitt" option="x | y | xy"/>
+        <rsgis:filter size="int" type="Mean" fileending="mean" />
+        <rsgis:filter size="int" type="Median" fileending="median" />
+        <rsgis:filter size="int" type="Mode" fileending="mode" />
+        <rsgis:filter size="int" type="Range" fileending="range" />
+        <rsgis:filter size="int" type="StdDev" fileending="stddev" />
+        <rsgis:filter size="int" type="CoeffOfVar" fileending="coeffofvar" />
+        <rsgis:filter size="int" type="Min" fileending="min" />
+        <rsgis:filter size="int" type="Max" fileending="max" />
+        <rsgis:filter size="int" type="Total" fileending="total" />
+        <rsgis:filter size="int" type="Kuwahara" fileending="kuwahara" />
+        <rsgis:filter size="int" type="Lee" fileending="lee" nLooks="int" />
+        <rsgis:filter size="5" type="NormVar" fileending="nvar" />
+        <rsgis:filter size="5" type="NormVarSqrt" fileending="nvarsqrt" />
+        <rsgis:filter size="5" type="NormVarLn" fileending="nvarln" />
+        <rsgis:filter size="5" type="NormLn" fileending="nln" />
+    </rsgis:command>
+    <!-- A command to filter an input image using a predefined filter band -->
+    <rsgis:command algor="imagefilter" option="filter" image="image.env" output="output_image_base" filterbank="LM" format="GDAL Format" extension="string" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+    <!-- A command to export each filter as an image for visualisation -->
+    <rsgis:command algor="imagefilter" option="exportfilterbank" output="output_image_base" format="GDAL Format" extension="string" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" >
+        <rsgis:filter size="int" type="GaussianSmooth" fileending="gausmooth" stddevX="float" stddevY="float" angle="int"/>
+        <rsgis:filter size="int" type="Gaussian1st" fileending="gau1st" stddevX="float" stddevY="float" angle="int"/>
+        <rsgis:filter size="int" type="Gaussian2nd" fileending="gau2nd" stddevX="float" stddevY="float" angle="int"/>
+        <rsgis:filter size="int" type="Laplacian" fileending="laplacian" stddev="float"/>
+        <rsgis:filter type="Sobel" fileending="sobel" option="x | y | xy"/>
+        <rsgis:filter type="Prewitt" fileending="prewitt" option="x | y | xy"/>
+        <rsgis:filter size="int" type="Mean" fileending="mean" />
+        <rsgis:filter size="int" type="Median" fileending="median" />
+        <rsgis:filter size="int" type="Mode" fileending="mode" />
+        <rsgis:filter size="int" type="Range" fileending="range" />
+        <rsgis:filter size="int" type="StdDev" fileending="stddev" />
+        <rsgis:filter size="int" type="Min" fileending="min" />
+        <rsgis:filter size="int" type="Max" fileending="max" />
+        <rsgis:filter size="int" type="Total" fileending="total" />
+        <rsgis:filter size="int" type="Kuwahara" fileending="kuwahara" />
+    </rsgis:command>
+    <!-- A command to export each filter (within a predefined bank) as an image for visualisation -->
+    <rsgis:command algor="imagefilter" option="exportfilterbank" output="output_image_base" filterbank="LM" format="GDAL Format" extension="string" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+
+
+
+
+
+
+
+
+    <!-- A command to apply a morphological dilation to an image -->
+    <rsgis:command algor="morphology" option="dilate" image="image.env" output="image_out.env" [operator="matrix.gmtxt" | elementsize="int"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+    <!-- A command to apply a morphological erosion to an image -->
+    <rsgis:command algor="morphology" option="erode" image="image.env" output="image_out.env" [operator="matrix.gmtxt" | elementsize="int"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+    <!-- A command to apply a morphological gradient to an image -->
+    <rsgis:command algor="morphology" option="gradient" image="image.env" output="image_out.env" [operator="matrix.gmtxt" | elementsize="int"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+    <!-- A command to apply a morphological dilation to all image bands to produce a single band output -->
+    <rsgis:command algor="morphology" option="dilateall" image="image.env" output="image_out.env" [operator="matrix.gmtxt" | elementsize="int"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+    <!-- A command to apply a morphological erosion to all image bands to produce a single band output -->
+    <rsgis:command algor="morphology" option="erodeall" image="image.env" output="image_out.env" [operator="matrix.gmtxt" | elementsize="int"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+    <!-- A command to apply a morphological gradient to all image bands to produce a single band output -->
+    <rsgis:command algor="morphology" option="gradientall" image="image.env" output="image_out.env" [operator="matrix.gmtxt" | elementsize="int"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+    <!-- A command to apply a filter to find local minima - used as input into a morphological watershed -->
+    <rsgis:command algor="morphology" option="localminima" image="image.env" output="image_out.env" [operator="matrix.gmtxt" | elementsize="int"] numbering="binary | sequential" allowequals="yes | no" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+    <!-- A command to apply a filter to find local minima using all image bands to produce a single band output - used as input into a morphological watershed -->
+    <rsgis:command algor="morphology" option="localminimaall" image="image.env" output="image_out.env" [operator="matrix.gmtxt" | elementsize="int"] numbering="binary | sequencial" allowequals="yes | no" format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+    <!-- A command to apply a morphological closing to an image (if temp image not provided processing will be done in memory) -->
+    <rsgis:command algor="morphology" option="closing" image="image.env" output="image_out.env" [temp="tmp_image.env"] [operator="matrix.gmtxt" | elementsize="int"] [iterations="int"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+    <!-- A command to apply a morphological opening to an image (if temp image not provided processing will be done in memory) -->
+    <rsgis:command algor="morphology" option="opening" image="image.env" output="image_out.env" [temp="tmp_image.env"] [operator="matrix.gmtxt" | elementsize="int"] [iterations="int"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+    <!-- A command to apply a morphological black top hat to an image (if temp image not provided processing will be done in memory) -->
+    <rsgis:command algor="morphology" option="blacktophat" image="image.env" output="image_out.env" [temp="tmp_image.env"] [operator="matrix.gmtxt" | elementsize="int"] [iterations="int"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+    <!-- A command to apply a morphological white top hat to an image (if temp image not provided processing will be done in memory) -->
+    <rsgis:command algor="morphology" option="whitetophat" image="image.env" output="image_out.env" [temp="tmp_image.env"] [operator="matrix.gmtxt" | elementsize="int"] [iterations="int"] format="GDAL Format" datatype="Byte | UInt16 | Int16 | UInt32 | Int32 | Float32 | Float64" />
+
+
+
+
+
+
+    <!-- A command to locally spectrally cluster/group the pixels into clumps -->
+    <rsgis:command algor="segmentation" option="specgrp" image="image.env" output="image_out.env" specthreshold="float" nodata="unsigned int" format="GDAL Format" inmemory="yes | no" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
+    <!-- A command to locally spectrally cluster/group the pixels into clumps where the distance metric is weighted by the stddev of the band -->
+    <rsgis:command algor="segmentation" option="specgrpweighted" image="image.env" output="image_out.env" specthreshold="float" nodata="unsigned int" format="GDAL Format" inmemory="yes | no" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
+    <!-- A command to generate a mean image from a spectral image and a clumped image -->
+    <rsgis:command algor="segmentation" option="meanimg" image="image.env" clumps="image.env" output="image_out.env" format="GDAL Format" inmemory="yes | no" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
+    <!-- A command to eliminate clumps smaller than a given size from the scene, small clump will be combined with their spectrally closest neighbouring clump unless over spectral distance threshold -->
+    <rsgis:command algor="segmentation" option="rmsmallclumps" image="image.env" clumps="image.env" output="image_out.env" minsize="int (in pxls)" maxspectraldist="float" format="GDAL Format" inmemory="yes | no" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
+    <!-- A command to eliminate clumps smaller than a given size from the scene, small clump will be combined with their spectrally closest neighbouring clump in a stepwise fashion unless over spectral distance threshold -->
+    <rsgis:command algor="segmentation" option="rmsmallclumpsstepwise" image="image.env" clumps="image.env" output="image_out.env" minsize="int (in pxls)" storemean="yes | no" maxspectraldist="float" [stretchstats="file.txt"] format="GDAL Format" inmemory="yes | no" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
+    <!-- A command to eliminate clumps smaller than a given size from the scene, small clump will be combined with their spectrally closest neighbouring clump in a stepwise fashion unless over spectral distance threshold -->
+    <rsgis:command algor="segmentation" option="stepwiseelimination" image="image.env" clumps="image.env" output="image_out.env" [stretchstats="file.txt"] [tmptable="table.att" [cachesize="unsigned int"]] outconsec="yes | no" minsize="int (in pxls)" maxspectraldist="float" format="GDAL Format" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
+    <!-- A command to clump a categorical image into clumps with unique IDs -->
+    <rsgis:command algor="segmentation" option="clump" image="image.env" output="image_out.env" nodata="unsigned int" format="GDAL Format" inmemory="yes | no" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
+    <!-- A command to colour clumps using random colours for visualisation -->
+    <rsgis:command algor="segmentation" option="randomcolourclumps" image="image.env" output="image_out.env" [importLUT="file.lut"] [exportLUT="file.lut"] format="GDAL Format" inmemory="yes | no" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
+    <!-- Generate an from a list of pixel locations generate a list of clump ids which will be the seeds for a region growing algorithm -->
+    <rsgis:command algor="segmentation" option="regiongrowingseedclumpids" image="clumpsimage.env" output="clumpids.txt" >
+        <rsgis:seed x="int" y="int" id="int" />
+        <rsgis:seed x="int" y="int" id="int" />
+        <rsgis:seed x="int" y="int" id="int" />
+        <rsgis:seed x="int" y="int" id="int" />
+        <rsgis:seed x="int" y="int" id="int" />
+        <rsgis:seed x="int" y="int" id="int" />
+    </rsgis:command>
+    <!-- A command to grow regions from seeds to there maximum extent using the clumps. -->
+    <rsgis:command algor="segmentation" option="growregionsusingclumps" image="image.env" clumps="image.env" output="image_out.env" seeds="seedsfile.txt" initthreshold="float" thresholdincrements="float" maxthreshold="float" maxiterations="int" format="GDAL Format" inmemory="yes | no" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
+    <!-- A command to identify seeds for region growing -->
+    <rsgis:command algor="segmentation" option="histogramseeds" image="image.env" clumps="image.env" output="image_out.env" format="GDAL Format" inmemory="yes | no" proj="OSGB | NZ2000 | NZ1949 | IMAGE" >
+        <rsgis:threshold band="int" threshold="float" />
+        <rsgis:threshold band="int" threshold="float" />
+        <rsgis:threshold band="int" threshold="float" />
+    </rsgis:command>
+    <!-- A command to identify seeds for region growing - output is a text file for input into growregionsusingclumps -->
+    <rsgis:command algor="segmentation" option="histogramseedstxt" image="image.env" clumps="image.env" output="seedsfile.txt" inmemory="yes | no"  >
+        <rsgis:threshold band="int" threshold="float" />
+        <rsgis:threshold band="int" threshold="float" />
+        <rsgis:threshold band="int" threshold="float" />
+    </rsgis:command>
+    <!-- A command which selects the clump within the clumps file which intersect with either the minimum or maximum mean clump -->
+    <rsgis:command algor="segmentation" option="selectclumps" image="image.env" clumps="image.env" largeclumps="image.env" output="image_out.env" type="max | min | mean | median | percentile75th | percentile95th" format="GDAL Format" inmemory="yes | no" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
+    <!-- A command which selects the clump within the clumps file which intersect with either the minimum or maximum mean clump with output to a text file.-->
+    <rsgis:command algor="segmentation" option="selectclumpstxt" image="image.env" clumps="image.env" largeclumps="image.env" output="seedsfile.txt" type="max | min | mean | median | percentile75th | percentile95th" format="GDAL Format" inmemory="yes | no" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
+    <!-- A command to remove small clumps from a segmentation -->
+    <rsgis:command algor="segmentation" option="mergesmallclumps" image="image.env" clumps="image.env" output="image_out.env" minsize="int (in pxls)" format="GDAL Format" inmemory="yes | no" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
+    <!-- A command to relabel clumps to ensure they are ordered consecutively -->
+    <rsgis:command algor="segmentation" option="relabelclumps" image="image.env" output="image_out.env" format="GDAL Format" inmemory="yes | no" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
+    <!-- A command which labels image pixels with the id of the nearest cluster centre -->
+    <rsgis:command algor="segmentation" option="labelsfromclusters" image="image.env" output="image_out.env" clusters="matrix.gmtxt" ignorezeros="yes | no" format="GDAL Format" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
+    <!-- A command which creates in image with a unique id for each pixel -->
+    <rsgis:command algor="segmentation" option="labelsfrompixels" image="image.env" output="image_out.env" ignorezeros="yes | no" format="GDAL Format" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
+    <!-- A command which iteratively removes single pixel labelled neighbours into spectrally closest large group -->
+    <rsgis:command algor="segmentation" option="elimsinglepxls" image="image.env" clumps="image.env" [temp="image.env"] output="image_out.env" ignorezeros="yes | no" format="GDAL Format" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
+    <!-- A command to grow regions from seeds up to a given distance in spectral space. -->
+    <rsgis:command algor="segmentation" option="growregionspixels" image="image.env" output="image_out.env" seeds="seedsfile.txt" threshold="float" format="GDAL Format" inmemory="yes | no" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
+    <!-- A command to grow regions from seeds to there maximum extent on a per pixel bases. -->
+    <rsgis:command algor="segmentation" option="growregionspixelsauto" image="image.env" output="image_out.env" seeds="seedsfile.txt" initthreshold="float" thresholdincrements="float" maxthreshold="float" maxiterations="int" format="GDAL Format" inmemory="yes | no" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
+    <!-- A command to find spectral categories using a defined subdivision and number of levels -->
+    <rsgis:command algor="segmentation" option="spectraldiv" image="image.env" output="image_out.env" subdivision="int" nodata="unsigned int" format="GDAL Format" proj="OSGB | NZ2000 | NZ1949 | IMAGE" />
+	<!-- A command to combine segmentations, creating a single segmentation -->
+    <rsgis:command algor="segmentation" option="unionsegments" output="image_out.kea" format="GDAL Format" nodata="unsigned int" >
+		<rsgis:image file="string" />
+        <rsgis:image file="string" />
+		<rsgis:image file="string" />
+    </rsgis:command>
+	<!-- A command to merge tiles of image clumps and border object mask into an existing image files where clumps are labelled as overlap, boundary or body clumps.-->
+	<rsgis:command algor="segmentation" option="mergeclumptiles" output="image.kea" bordermask="image.kea" colname="string" overlap="int" boundary="int" body="int" >
+		<rsgis:image clumps="string" />
+        <rsgis:image clumps="string" />
+		<rsgis:image clumps="string" />
+    </rsgis:command>
+	<!-- A command to create mask of the border clumps from the segmented tiles.-->
+	<rsgis:command algor="segmentation" option="findtilebordersmask" bordermask="image.kea" colname="string" overlap="int" boundary="int" body="int" >
+		<rsgis:image clumps="string" />
+        <rsgis:image clumps="string" />
+		<rsgis:image clumps="string" />
+    </rsgis:command>
+	<!-- A command to merge clump images (i.e., tile boundaries) into an exiting clump image.-->
+	<rsgis:command algor="segmentation" option="mergeclumpimages" output="image.kea"  >
+		<rsgis:image clumps="string" />
+        <rsgis:image clumps="string" />
+		<rsgis:image clumps="string" />
+    </rsgis:command>
+	<!-- A command to extract features from which are bright within the scene with a particular shape and size.-->
+	<rsgis:command algor="segmentation" option="extractbrightfeatures" image="image.kea" mask="image.kea" output="image.kea" format="GDAL Format" tmp1="image.kea" tmp2="image.kea" initthres="float" thresincrement="float" thresholdupper="float" >
+		<rsgis:description arealow="float" areahigh="float" lenwidthlow="float" lenwidthhigh="float" />
+        <rsgis:description arealow="float" areahigh="float" lenwidthlow="float" lenwidthhigh="float" />
+		<rsgis:description arealow="float" areahigh="float" lenwidthlow="float" lenwidthhigh="float" />
+    </rsgis:command>
+
+
+
+
+
+
+
+
+
+    <!-- A command to buffer a set of input polygons by a given amount -->
+    <rsgis:command algor="vectorutils" option="buffervector" vector="vector.shp" output="vector_out.shp" [buffer="float" | buffertxt="text file"] force="yes | no"/>
+    <!-- A command to remove all attributes from an inputted shapefile -->
+    <rsgis:command algor="vectorutils" option="removeattributes" vector="vector.shp" output="vector_out.shp" force="yes | no"/>
+    <!-- A command to to convert a set of geometries to circles -->
+    <rsgis:command algor="vectorutils" option="geom2circles" vector="vector.shp" output="vector_out.shp" areaattribute="string" radiusattribute="string" radius="float" resolution="float" force="yes | no"/>
+    <!-- A command to print the polygon geometries (to the console) of the inputted shapefile-->
+    <rsgis:command algor="vectorutils" option="printpolygeom" vector="vector.shp" />
+    <!-- A command to list the attributes within a shapefile -->
+    <rsgis:command algor="vectorutils" option="listattributes" vector="vector.shp" />
+    <!-- A command to undertake find and replace on a given attribute with the shapefile -->
+    <rsgis:command algor="vectorutils" option="findreplacetext" vector="vector.shp" attribute="name" find="find_text" replace="replace_text" />
+    <!-- A command to print the values of an attribute within a shapefile -->
+    <rsgis:command algor="vectorutils" option="printattribute" vector="vector.shp" attribute="name" />
+    <!-- TODO A command to -->
+    <rsgis:command algor="vectorutils" option="topattributes" vector="vector.shp" output="vector_out.shp" top="int" summary="aggregate | value" force="yes | no">
+        <rsgis:attribute name="string" />
+        <rsgis:attribute name="string" />
+        <rsgis:attribute name="string" />
+        <rsgis:attribute name="string" />
+    </rsgis:command>
+    <!-- A command to add the attributes listed to the vector file, generating a new vector file -->
+    <rsgis:command algor="vectorutils" option="addattributes" vector="vector.shp" output="vector_out.shp" force="yes | no">
+        <rsgis:attribute name="string" type="OFTInteger | OFTIntegerList | OFTReal | OFTRealList | OFTString | OFTStringList | OFTWideString | OFTWideStringList | OFTBinary | OFTDate | OFTTime | OFTDateTime"/>
+        <rsgis:attribute name="string" type="OFTInteger | OFTIntegerList | OFTReal | OFTRealList | OFTString | OFTStringList | OFTWideString | OFTWideStringList | OFTBinary | OFTDate | OFTTime | OFTDateTime"/>
+        <rsgis:attribute name="string" type="OFTInteger | OFTIntegerList | OFTReal | OFTRealList | OFTString | OFTStringList | OFTWideString | OFTWideStringList | OFTBinary | OFTDate | OFTTime | OFTDateTime"/>
+    </rsgis:command>
+    <!-- A command to copy a shapefile to a new file -->
+    <rsgis:command algor="vectorutils" option="copypolygons" vector="vector.shp" output="vector_out.shp" force="yes | no" />
+    <!-- A command to print the FIDs of a shapefile the console -->
+    <rsgis:command algor="vectorutils" option="printfids" vector="vector.shp" />
+    <!-- TODO A command to -->
+    <rsgis:command algor="vectorutils" option="countpxlsarea" vector="vector.shp" raster="raster_poly.env" output="vector_out.shp" force="yes | no" />
+    <!-- A command to comvert the input points geometry to a text file -->
+    <rsgis:command algor="vectorutils" option="points2ascii" vector="vector.shp" output="vector_out.txt" />
+    <!-- A command to rotate the input geometry around a given point -->
+    <rsgis:command algor="vectorutils" option="rotate" vector="vector.shp" output="vector_out.shp" force="yes | no" angle="degrees">
+        <rsgis:point x="double" y="double" z="double" />
+    </rsgis:command>
+    <!-- A command to calculate the area of the polygons with the shapefile and add as a new attribute -->
+    <rsgis:command algor="vectorutils" option="calcarea" vector="vector.shp" output="vector_out.shp" force="yes | no"/>
+    <!-- A command to split the features within the inputted shapefile into seperate shapefiles -->
+    <rsgis:command algor="vectorutils" option="splitfeatures" vector="vector.shp" dir="output_dir" force="yes | no"/>
+    <!-- TODO A command to -->
+    <rsgis:command algor="vectorutils" option="removepolyoverlaps" vector="vector.shp" output="vector_out.shp" force="yes | no" snap2grid="yes | no" tolerance="float" dissolve="float" />
+    <!-- TODO A command to -->
+    <rsgis:command algor="vectorutils" option="mergesmallpolysnear" vector="vector.shp" output="vector_out.shp" force="yes | no" area="float" resolution="float"/>
+    <!-- TODO A command to -->
+    <rsgis:command algor="vectorutils" option="mergesmallpolystouching" vector="vector.shp" output="vector_out.shp" force="yes | no" area="float" relborder="float"/>
+    <!-- TODO A command to -->
+    <rsgis:command algor="vectorutils" option="morphologicalclosing" vector="vector.shp" output="vector_out.shp" force="yes | no" buffer="float" curve="int" />
+    <!-- TODO A command to -->
+    <rsgis:command algor="vectorutils" option="morphologicalopening" vector="vector.shp" output="vector_out.shp" force="yes | no" buffer="float" curve="int" />
+    <!-- TODO A command to -->
+    <rsgis:command algor="vectorutils" option="morphologicalerosion" vector="vector.shp" output="vector_out.shp" force="yes | no" buffer="float" curve="int" />
+    <!-- TODO A command to -->
+    <rsgis:command algor="vectorutils" option="morphologicaldilation" vector="vector.shp" output="vector_out.shp" force="yes | no" buffer="float" curve="int" />
+    <!-- TODO A command to -->
+    <rsgis:command algor="vectorutils" option="convexoutline" vector="vector.shp" output="vector_out.shp" force="yes | no" />
+    <!-- TODO A command to -->
+    <rsgis:command algor="vectorutils" option="nonconvexoutlinesnakes" vector="vector.shp" output="vector_out.shp" force="yes | no" />
+    <!-- TODO A command to -->
+    <rsgis:command algor="vectorutils" option="nonconvexoutlinedelaunay" vector="vector.shp" output="vector_out.shp" force="yes | no" />
+    <!-- TODO A command to -->
+    <rsgis:command algor="vectorutils" option="nonconvexoutlinelineproj" vector="vector.shp" output="vector_out.shp" force="yes | no" resolution="float"/>
+    <!-- TODO A command to -->
+    <rsgis:command algor="vectorutils" option="mergetouchingpolys" vector="vector.shp" output="vector_out.shp" force="yes | no" />
+    <!-- TODO A command to -->
+    <rsgis:command algor="vectorutils" option="freqdist" output="output" dirlist="directory" ext="string" attribute="string"/>
+    <!-- TODO A command to -->
+    <rsgis:command algor="vectorutils" option="freqdist" output="output" attribute="string">
+        <rsgis:vector file="vector1" />
+        <rsgis:vector file="vector2" />
+        <rsgis:vector file="vector3" />
+        <rsgis:vector file="vector4" />
+    </rsgis:command>
+    <!-- A command to create a raster version of a polygon -->
+    <rsgis:command algor="vectorutils" option="rasterise" vector="vector.shp" output="image_out.env" resolution="float" attribute="string" image="inputImage.env (optional)" constval="float" method="polyContainsPixel | polyContainsPixelCenter | polyOverlapsPixel | pixelContainsPoly | pixelContainsPolyCenter | adaptive" />
+    <!-- A command to create a raster version of a polygon shapefile which is burnt into an existing raster -->
+    <rsgis:command algor="vectorutils" option="burnrasterise" image="inputImage.env" vector="vector.shp" attribute="string" method="polyContainsPixel | polyContainsPixelCenter | polyOverlapsPixel | pixelContainsPoly | pixelContainsPolyCenter | adaptive" />
+    <!-- A command to create polygons based on plot center, length width and orientation -->
+    <rsgis:command algor="vectorutils" option="polygonplots" input="input.csv" output="vector_out.shp" force="yes | no" />
+    <!-- A command to create a polygon showing image footprints from list of corner coordinates -->
+    <rsgis:command algor="vectorutils" option="polygonImageFootprints" input="input.csv" output="vector_out.shp" force="yes | no" />
+    <!-- TODO -->
+    <rsgis:command algor="vectorutils" option="polygonizempolys" vector="vector.shp" output="vector_out.shp" force="yes | no" >
+        <rsgis:polygonizer algor="lineproj | delaunay1 | convexhull | snakes" resolution="float" alpha="float" beta="float" gamma="float" delta="float" maxNumIterations="int"/>
+    </rsgis:command>
+    <!-- TODO -->
+    <rsgis:command algor="vectorutils" option="scatter2D" vector="vector.shp" output="output.ptxt" attribute1="string" attribute2="string"/>
+    <!-- A command to create a copy of input polygon, dropping polygons that don't conform to tests -->
+    <rsgis:command algor="vectorutils" option="copycheckpolys" vector="vector.shp" output="vector_out.shp" force="yes | no" />
+    <!-- A command to create a new polygon containing only polygons within cover vector. Loops through attributes and creates a new shapefile for each polygon in the cover vector -->
+    <rsgis:command algor="vectorutils" option="polygonsInPolygon" vector="vector.shp" coverVector="coverVector.shp" dir="output_dir" attributeName="string" force="yes | no" />
+    <!-- TODO -->
+    <rsgis:command algor="vectorutils" option="splitbyattribute" vector="vector.shp" output="vector_base" force="yes | no" attribute="name" />
+    <!-- TODO -->
+    <rsgis:command algor="vectorutils" option="removepolygonscontainedwithingeom" geometry="vector.shp" vector="vector.shp" output="vector_out.shp" force="yes | no"/>
+    <!-- TODO -->
+    <rsgis:command algor="vectorutils" option="removecontainedpolygons" vector="vector.shp" output="vector_out.shp" force="yes | no"/>
+    <!-- TODO -->
+    <rsgis:command algor="vectorutils" option="removecontainedpolygonsDIR" input="inputDIR" output="outputDIR" force="yes | no"/>
+    <!-- TODO -->
+    <rsgis:command algor="vectorutils" option="mergetouchingpolysDIR" input="inputDIR" output="outputDIR" force="yes | no" />
+    <!-- TODO -->
+    <rsgis:command algor="vectorutils" option="mergetouchingpolysDIR" input="inputDIR" output="outputDIR" force="yes | no" attribute="name" />
+    <!-- TODO -->
+    <rsgis:command algor="vectorutils" option="splitlargesmall" vector="vector.shp" outputlarge="vector_out.shp" outputsmall="vector_out.shp" force="yes | no" threshold="float" />
+    <!-- TODO -->
+    <rsgis:command algor="vectorutils" option="mergeshps" output="vector_out.shp" force="yes | no" dirlist="directory" ext="string" ignoreattributes="yes | no" />
+    <!-- TODO -->
+    <rsgis:command algor="vectorutils" option="mergeshps" output="vector_out.shp" force="yes | no" ignoreattributes="yes | no">
+        <rsgis:vector file="vector1" />
+        <rsgis:vector file="vector2" />
+        <rsgis:vector file="vector3" />
+        <rsgis:vector file="vector4" />
+    </rsgis:command>
+    <!-- TODO -->
+    <rsgis:command algor="vectorutils" option="fixpolyextboundary" vector="vector.shp" output="vector_out.shp" force="yes | no" />
+    <!-- TODO -->
+    <rsgis:command algor="vectorutils" option="removepolyholes" vector="vector.shp" output="vector_out.shp" force="yes | no" [threshold="float"] />
+    <!-- TODO -->
+    <rsgis:command algor="vectorutils" option="dropsmallpolys" vector="vector.shp" output="vector_out.shp" force="yes | no" threshold="float" />
+    <!-- TODO -->
+    <rsgis:command algor="vectorutils" option="extractlargestpoly" vector="vector.shp" output="vector_out.shp" force="yes | no" />
+    <!-- TODO -->
+    <rsgis:command algor="vectorutils" option="generatesinglepoly" vector="vector.shp" output="vector_out.shp" force="yes | no" >
+        <rsgis:polygonizer algor="lineproj | delaunay1 | convexhull | snakes" resolution="float" alpha="float" beta="float" gamma="float" delta="float" maxNumIterations="int"/>
+    </rsgis:command>
+        <!-- TODO -->
+    <rsgis:command algor="vectorutils" option="generategrid" output="vector_out.shp" force="yes | no" proj4="string" tlx="float" tly="float" xres="float" yres="float" width="float" height="float" />
+        <!-- TODO -->
+    <rsgis:command algor="vectorutils" option="generateimagegrid" input="string" output="vector_out.shp" force="yes | no" xres="float" yres="float" />
+    <!-- This command performs vector maths on an input shapefile -->
+    <rsgis:command algor="vectorutils" option="vectormaths" input="string" output="string" expression="string" | expressionFile="string" outHeading="string" force="yes | no">
+        <rsgis:variable name="string" fieldname="string"/>
+        <rsgis:variable name="string" fieldname="string"/>
+    </rsgis:command>
+    <!-- This command performs a select statement and exports it as a new file -->
+    <rsgis:command algor="vectorutils" option="select" input="string" output="string" expression="string" force="yes | no" />
+    <!-- This command calculated the mean minimum distance between the geometries within the input file [output as a text file is optional] -->
+    <rsgis:command algor="vectorutils" option="calcmeanmindist" input="string" [output="string"] />
+    <!-- A command to copy and assign layer to a specific projection -->
+    <rsgis:command algor="vectorutils" option="copyassignproj" vector="vector.shp" output="string" projwkt="txt.wkt" force="yes | no" />
+    <!-- A command to print the wkt projection string for a vector layer -->
+    <rsgis:command algor="vectorutils" option="printwkt" vector="vector.shp" />
+	<!-- A command to add a column with a feature id, starting at initial value -->
+	<rsgis:command algor="vectorutils" option="addfidcol" vector="vector.shp" output="string" init="unsigned int" force="yes | no" />
+	<!-- A command to calculate the minimum distance to each polygon for each point -->
+	<rsgis:command algor="vectorutils" option="mindist2polys" vector="vector.shp" polygons="vector.shp" output="string" force="yes | no" />
+	<!-- A command to produce convex hulls for groups of (X, Y, Attribute) point locations -->
+	<rsgis:command algor="vectorutils" option="convexhullgrps" input="points.csv" polygons="vector.shp" projwkt="txt.wkt" force="yes | no" eastingscol="int" northingscol="int" attributecol="int"/>
+
+
+
+
+
+    <!-- This command calculates biomass from a single band SAR image using a Bayesian approach, no priors are used. -->
+    <rsgis:command algor ="BayesianBiomass" option="noPrior"  deltatype="area | prob" input="input image" output = "output image"
+             coefAGT="coefAGT" coefBGT="coefBGT" coefALT="coefALT" coefBLT="coefBLT"
+             split="split" variance="variance" upperLimit="upperLimit" lowerLimit="lowerLimit" interval="interval (optional)" />
+      <!-- This command calculates biomass from a single band SAR image using a Bayesian approach. A normal distribution is used as a prior -->
+     <rsgis:command algor="BayesianBiomass" option="priorNorm"  deltatype="area | prob" input="input image" output = "output image"
+             coefAGT="coefAGT" coefBGT="coefBGT" coefALT="coefALT" coefBLT="coefBLT" meanB="meanB" stdevB="stdevB"
+             split="split" variance="variance" upperLimit="upperLimit" lowerLimit="lowerLimit" interval="interval (optional)" />
+     <!-- This command calculates biomass from a single band SAR image using a Bayesian approach. An exponential distribution is used as a prior -->
+     <rsgis:command algor ="BayesianBiomass" option="priorExp"  deltatype="area | prob" input="input image" output = "output image"
+             coefAGT="coefAGT" coefBGT="coefBGT" coefALT="coefALT" coefBLT="coefBLT" rateB="rateB"
+             split="split" variance="variance" upperLimit="upperLimit" lowerLimit="lowerLimit" interval="interval (optional)" />
+     <!-- This command calculates biomass from a single band SAR image using a Bayesian approach. A gamma distribution is used as a prior -->
+     <rsgis:command algor ="BayesianBiomass" option="priorGamma"  deltatype="area | prob" input="input image" output = "output image"
+             coefAGT="coefAGT" coefBGT="coefBGT" coefALT="coefALT" coefBLT="coefBLT" shapeB="shapeB" scaleB="scaleB"
+             split="split" variance="variance" upperLimit="upperLimit" lowerLimit="lowerLimit" interval="interval (optional)" />
+    <!-- This command calculates biomass from a single band SAR image (L-HH) using a Bayesian approach, no priors are used. Uses experimental coefficients for open forest  -->
+    <rsgis:command algor ="BayesianBiomass" option="noPriorOpenLHH" input="input image" output = "output image"/>
+    <!-- This command calculates biomass from a single band SAR image (L-HV) using a Bayesian approach, no priors are used. Uses experimental coefficients for open forest  -->
+    <rsgis:command algor ="BayesianBiomass" option="noPriorOpenLHV" input="input image" output = "output image"/>
+    <!-- This command calculates biomass from a single band SAR image (L-VV) using a Bayesian approach, no priors are used. Uses experimental coefficients for open forest  -->
+    <rsgis:command algor ="BayesianBiomass" option="noPriorOpenLVV" input="input image" output = "output image"/>
+    <!-- This command calculates biomass from a single band SAR image (P-HH) using a Bayesian approach, no priors are used. Uses experimental coefficients for open forest  -->
+    <rsgis:command algor ="BayesianBiomass" option="noPriorOpenPHH" input="input image" output = "output image"/>
+    <!-- This command calculates biomass from a single band SAR image (P-HV) using a Bayesian approach, no priors are used. Uses experimental coefficients for open forest  -->
+    <rsgis:command algor ="BayesianBiomass" option="noPriorOpenPHV" input="input image" output = "output image"/>
+    <!-- This command calculates biomass from a single band SAR image (P-VV) using a Bayesian approach, no priors are used. Uses experimental coefficients for open forest  -->
+    <rsgis:command algor ="BayesianBiomass" option="noPriorOpenPVV" input="input image" output = "output image"/>
+    <!-- This command calculates biomass from a single band SAR image (L-HH) using a Bayesian approach, no priors are used. Uses experimental coefficients for closed forest  -->
+    <rsgis:command algor ="BayesianBiomass" option="noPriorClosedLHH" input="input image" output = "output image"/>
+    <!-- This command calculates biomass from a single band SAR image (L-HV) using a Bayesian approach, no priors are used. Uses experimental coefficients for closed forest  -->
+    <rsgis:command algor ="BayesianBiomass" option="noPriorClosedLHV" input="input image" output = "output image"/>
+    <!-- This command calculates biomass from a single band SAR image (L-VV) using a Bayesian approach, no priors are used. Uses experimental coefficients for closed forest  -->
+    <rsgis:command algor ="BayesianBiomass" option="noPriorClosedLVV" input="input image" output = "output image"/>
+    <!-- This command calculates biomass from a single band SAR image (P-HH) using a Bayesian approach, no priors are used. Uses experimental coefficients for closed forest  -->
+    <rsgis:command algor ="BayesianBiomass" option="noPriorClosedPHH" input="input image" output = "output image"/>
+    <!-- This command calculates biomass from a single band SAR image (P-HV) using a Bayesian approach, no priors are used. Uses experimental coefficients for closed forest  -->
+    <rsgis:command algor ="BayesianBiomass" option="noPriorClosedPHV" input="input image" output = "output image"/>
+    <!-- This command calculates biomass from a single band SAR image (P-VV) using a Bayesian approach, no priors are used. Uses experimental coefficients for closed forest  -->
+    <rsgis:command algor ="BayesianBiomass" option="noPriorClosedPVV" input="input image" output = "output image"/>
+
+    <!-- This command calculates stem biomass from a polarimetric SAR image using the method of Saatchi et. al. 2007. A correction for incidence angle is used -->
+    <rsgis:command algor="SaatchiBiomass" option="stem" input="inputimage" output="outputimage"
+         a0="a0" a1="a1" a2="a2" b1="b1" b2="b2" c1="c1" c2="c2"/>
+    <!-- This command calculates crown biomass from a polarimetric SAR image using the method of Saatchi et. al. 2007. A correction for incidence angle is used -->
+    <rsgis:command algor="SaatchiBiomass" option="crown" input="inputimage" output="outputimage"
+         a0="a0" a1="a1" a2="a2" b1="b1" b2="b2" c1="c1" c2="c2"/>
+    <!-- This command calculates crown biomass from a dual-band polarimetric SAR image using the method of Saatchi et. al. 2007. A correction for incidence angle is used -->
+    <rsgis:command algor="SaatchiBiomass" option="crownPL" input="inputimage" output="outputimage"
+         a0="a0" a1="a1" a2="a2" b1="b1" b2="b2" c1="c1" c2="c2"/>
+    <!-- This command calculates stem biomass from a polarimetric SAR image using the method of Saatchi et. al. 2007. No correction for incidence angle is used -->
+    <rsgis:command algor="SaatchiBiomass" option="stemNIA" input="inputimage" output="outputimage"
+         a0="a0" a1="a1" a2="a2" b1="b1" b2="b2" c1="c1" c2="c2"/>
+    <!-- This command calculates crown biomass from a polarimetric SAR image using the method of Saatchi et. al. 2007. No correction for incidence angle is used -->
+    <rsgis:command algor="SaatchiBiomass" option="crownNIA" input="inputimage" output="outputimage"
+         a0="a0" a1="a1" a2="a2" b1="b1" b2="b2" c1="c1" c2="c2"/>
+    <!-- This command calculates crown biomass from a dual-band polarimetric SAR image using the method of Saatchi et. al. 2007. No correction for incidence angle is used -->
+    <rsgis:command algor="SaatchiBiomass" option="crownPLNIA" input="inputimage" output="outputimage"
+         a0="a0" a1="a1" a2="a2" b1="b1" b2="b2" c1="c1" c2="c2"/>
+    <!-- This command calculates stem biomass from a polarimetric SAR image (L-band) using the method of Saatchi et. al. 2007.
+        Uses experimental coefficients for open forest -->
+    <rsgis:command algor="SaatchiBiomass" option="openStemL" input="inputimage" output="outputimage "/>
+    <!-- This command calculates stem biomass from a polarimetric SAR image (P-band) using the method of Saatchi et. al. 2007.
+        Uses experimental coefficients for open forest -->
+    <rsgis:command algor="SaatchiBiomass" option="openStemP" input="inputimage" output="outputimage"/>
+    <!-- This command calculates crown biomass from a polarimetric SAR image (L-band) using the method of Saatchi et. al. 2007.
+        Uses experimental coefficients for open forest -->
+    <rsgis:command algor="SaatchiBiomass" option="openCrownL" input="inputimage" output="outputimage"/>
+    <!-- This command calculates crown biomass from a polarimetric SAR image (P-band) using the method of Saatchi et. al. 2007.
+        Uses experimental coefficients for open forest -->
+    <rsgis:command algor="SaatchiBiomass" option="openCrownP" input="inputimage" output="outputimage"/>
+    <!-- This command calculates crown biomass from a dual-band polarimetric SAR image (L and P-band) using the method of Saatchi et. al. 2007.
+        Uses experimental coefficients for open forest -->
+    <rsgis:command algor="SaatchiBiomass" option="openCrownPL" input="inputimage" output="outputimage"/>
+    <!-- This command calculates stem biomass from a polarimetric SAR image (L-band) using the method of Saatchi et. al. 2007.
+        Uses experimental coefficients for closed forest -->
+    <rsgis:command algor="SaatchiBiomass" option="closedStemL" input="inputimage" output="outputimage"/>
+    <!-- This command calculates stem biomass from a polarimetric SAR image (P-band) using the method of Saatchi et. al. 2007.
+        Uses experimental coefficients for closed forest -->
+    <rsgis:command algor="SaatchiBiomass" option="closedStemP" input="inputimage" output="outputimage"/>
+    <!-- This command calculates crown biomass from a polarimetric SAR image (L-band) using the method of Saatchi et. al. 2007.
+        Uses experimental coefficients for closed forest -->
+    <rsgis:command algor="SaatchiBiomass" option="closedCrownL" input="inputimage" output="outputimage"/>
+    <!-- This command calculates crown biomass from a polarimetric SAR image (P-band) using the method of Saatchi et. al. 2007.
+        Uses experimental coefficients for closed forest -->
+    <rsgis:command algor="SaatchiBiomass" option="closedCrownP" input="inputimage" output="outputimage"/>
+    <!-- This command calculates crown biomass from a dual-band polarimetric SAR image (L and P-band) using the method of Saatchi et. al. 2007.
+        Uses experimental coefficients for closed forest -->
+    <rsgis:command algor="SaatchiBiomass" option="closedCrownPL" input="inputimage" output="outputimage"/>
+
+    <!-- A command to estimate parameters from SAR data -->
+    <rsgis:command algor="estimation" option="dualPolMultiSpeciesClassification | fullPolMultiSpeciesClassification" parameters="heightDensity"
+    input="inputClassData.env" output="output.env" >
+    <rsgis:estClassParameters method="simulatedAnnealingAP" function="2DPoly" coefficientsHH="heightDensHH_Coeff.mtxt" coefficientsHV="heightDensHH_Coeff.mtxt" [coefficientsVV="heightDensVV_Coeff.mtxt"] covMatrixP="covMatrixP.mtxt" initialHeight="float" initialDensity="float" minHeight="float" maxHeight="float" minDensity="float" maxDensity="float" heightStep="float" densityStep="float" startTemp="int" ittmax="int" />
+    </rsgis:command>
+
+    <!-- A command to estimate parameters from SAR data using image objects -->
+    <rsgis:command algor="estimation" option="dualPolObject | fullPolObject" parameters="heightDensity" input="input.env" output="output.env" object="objects.shp" classField="ClassID" [raster="objects_raster.shp"] [outSHP="output.shp"] >
+        <rsgis:estSlowOptimiserParameters method="simulatedAnnealingAP" function="2DPoly" coefficientsHH="heightDensHH_Coeff.mtxt" coefficientsHV="heightDensHH_Coeff.mtxt" [coefficientsVV="heightDensVV_Coeff.mtxt"] covMatrixP="covMatrixP.mtxt" initialHeight="float" initialDensity="float" minHeight="float" maxHeight="float" minDensity="float" maxDensity="float" heightStep="float" densityStep="float" startTemp="int" ittmax="int" />
+        <rsgis:estFastOptimiserParameters method="conjugateGradient" function="2DPoly" coefficientsHH="heightDensHH_Coeff.mtxt" coefficientsHV="heightDensHH_Coeff.mtxt" [coefficientsVV="heightDensVV_Coeff.mtxt"] covMatrixP="covMatrixP.mtxt" initialHeight="float" initialDensity="float" minHeight="float" maxHeight="float" minDensity="float" maxDensity="float" ittmax="int" />
+    </rsgis:command>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- TODO A command to -->
+    <rsgis:command algor="postclassification" option="cluster" input="vector.shp" output="vector_out.shp" force="yes | no">
+        <rsgis:clusterer algor="edgestddev | edgelength" length="float" stddev="float" maxedgelength="float" >
+            <rsgis:edgelength classname="string" length="float" />
+        </rsgis:clusterer>
+    </rsgis:command>
+    <!-- TODO A command to -->
+    <rsgis:command algor="postclassification" option="clusterclass" input="vector.shp" class="string" output="vector_out.shp" force="yes | no">
+        <rsgis:clusterer algor="edgestddev | edgelength" length="float" stddev="float" maxedgelength="float" >
+            <rsgis:edgelength classname="string" length="float" />
+        </rsgis:clusterer>
+    </rsgis:command>
+    <!-- TODO A command to -->
+    <rsgis:command algor="postclassification" option="clusterpolygonize" input="vector.shp" output="vector_out.shp" force="yes | no">
+        <rsgis:clusterer algor="edgestddev | edgelength" length="float" stddev="float" maxedgelength="float" >
+            <rsgis:edgelength classname="string" length="float" />
+        </rsgis:clusterer>
+        <rsgis:polygonizer algor="lineproj | delaunay1 | delaunay2 | convexhull | multipoly | snakes | polys" resolution="float" alpha="float" beta="float" gamma="float" delta="float" maxNumIterations="int"/>
+    </rsgis:command>
+    <!-- TODO A command to -->
+    <rsgis:command algor="postclassification" option="clusterclasspolygonize" input="vector.shp" class="string" output="vector_out.shp" force="yes | no">
+        <rsgis:clusterer algor="edgestddev | edgelength" length="float" stddev="float" maxedgelength="float" >
+            <rsgis:edgelength classname="string" length="float" />
+        </rsgis:clusterer>
+        <rsgis:polygonizer algor="lineproj | delaunay1 | delaunay2 | convexhull | multipoly | snakes | polys" resolution="float" alpha="float" beta="float" gamma="float" delta="float" maxNumIterations="int"/>
+    </rsgis:command>
+    <!-- TODO A command to -->
+    <rsgis:command algor="postclassification" option="splitlargesmall" input="vector.shp" outputlarge="vector_out.shp" outputsmall="vector_out.shp" force="yes | no" largethreshold1="float" proppolyarea1="float" overlapthreshold="float" largethreshold2="float" proppolyarea2="float"  />
+    <!-- TODO A command to -->
+    <rsgis:command algor="postclassification" option="morphology" type="closing | opening | dilation | erosion" input="vector.shp" output="vector_out.shp" force="yes | no" buffer="float" />
+    <!-- TODO A command to -->
+    <rsgis:command algor="postclassification" option="mergelargepolygons" input="vector.shp" output="vector_out.shp" force="yes | no" largethreshold="float" intersectratio="float" />
+    <!-- TODO A command to -->
+    <rsgis:command algor="postclassification" option="removesmallwithinlarge" inputlarge="vector_large.shp" inputsmall="vector_small.shp" outputlarge="vector_out.shp" outputsmall="vector_out.shp" force="yes | no" overlapthreshold="float"/>
+    <!-- TODO A command to -->
+    <rsgis:command algor="postclassification" option="mergesmallandlarge" inputlarge="vector_large.shp" inputsmall="vector_small.shp" outputlarge="vector_out.shp" outputsmall="vector_out.shp" force="yes | no" largethreshold="float" intersectratio="float" overlapthreshold="float" />
+    <!-- TODO A command to -->
+    <rsgis:command algor="postclassification" option="clusterremainingsmall" inputlarge="vector_large.shp" inputsmall="vector_small.shp" output="vector_out.shp" force="yes | no" maxlength="float" >
+        <rsgis:polygonizer algor="lineproj | delaunay1 | convexhull | snakes" resolution="float" alpha="float" beta="float" gamma="float" delta="float" maxNumIterations="int"/>
+    </rsgis:command>
+    <!-- TODO A command to -->
+    <rsgis:command algor="postclassification" option="mergesmall2nearestlarge" inputlarge="vector_large.shp" inputsmall="vector_small.shp" output="vector_out.shp" force="yes | no" >
+        <rsgis:polygonizer algor="lineproj | delaunay1 | convexhull | snakes" resolution="float" alpha="float" beta="float" gamma="float" delta="float"  maxNumIterations="int"/>
+    </rsgis:command>
+    <!-- TODO A command to -->
+    <rsgis:command algor="postclassification" option="mergepolygons" cluster_polys="vector.shp" cluster_mpolys="vector.shp" cluster_orig="vector.shp" class="string"  output="vector_out.shp" force="yes | no" />
+    <!-- TODO A command to -->
+    <rsgis:command algor="postclassification" option="labelpolys" input="vector.shp" labels="vector.shp" classattribute="string"  output="vector_out.shp" force="yes | no" dominant="count | area" />
+
+
+
+
+
+
+
+
+
+
+    <!-- A command to create the plotter object with a defined output file for use within other commands-->
+    <rsgis:command algor="visualisation" option="setupplotter" outdir="string" />
+    <!-- A command to delete the plotter from memory after it has been finished with -->
+    <rsgis:command algor="visualisation" option="deleteplotter" />
+    <!-- A command to convert a ptxt 2d lines file into a shapefile -->
+    <rsgis:command algor="visualisation" option="line2dtoshpfile" input="file.ptxt" output="vector_out.shp" force="yes | no" />
+
+
+
+
+
+
+
+
+
+    <!-- A command to execute a command line utilities (e.g., mkdir) -->
+    <rsgis:command algor="commandline" option="execute" command="string" />
+
+
+
+
+
+     <!-- This command generates a voxel based transect (canopy only), for a list of input parameters and calculates FPC and canopy cover-->
+    <rsgis:command algor="transectModel" option="singleSpeciesCanopyRandomList | singleSpeciesCanopyPsudoRandomList" input="input file" output="output file" species="aHarpophylla" calculateFPC="yes | no" calculateCC="yes | no" nRuns="int (random only)" quadratSize="float (m)" [outPlotName="outPlotName"] outImage="outImage"] [outVector="outVector"] />
+
+
+
+
+
+
+
+    <!-- A command for automatically generating a set of ground control points between a pair of images - A basic algorithm with a single iteration and movement of gcps-->
+    <rsgis:command algor="registration" option="basic" reference="image" floating="image" output="gcps.txt" outputType="envi_img2img|envi_img2map|rsgis_img2map|rsgis_mapoffs" metric="euclidean|sqdiff|manhatten|correlation" pixelgap="int" window="int" search="int" threshold="float" stddevRef="float" stddevFloat="float" subpixelresolution="int"/>
+    <!-- A command for automatically generating a set of ground control points between a pair of images - An algorithm with a single layer of connected gcps which used IDW to shift neighbouring gcps within a distance threshold -->
+    <rsgis:command algor="registration" option="singlelayer" reference="image" floating="image" output="gcps.txt" outputType="envi_img2img|envi_img2map|rsgis_img2map|rsgis_mapoffs" metric="euclidean|sqdiff|manhatten|correlation" pixelgap="int" window="int" search="int" threshold="float" stddevRef="float" stddevFloat="float" subpixelresolution="int" distanceThreshold="float" maxiterations="int" movementThreshold="float" pSmoothness="float"/>
+    <!-- A command to warp an input image using a set of ground control points using a nearest neighbour algorithm -->
+    <rsgis:command algor="registration" option="nnwarp" gcps="string" image="string" output="string" projection="file.wkt" resolution="float" format="string" transform="yes | no" />
+    <!-- A command to warp an input image using a set of ground control points using a polynomial -->
+    <rsgis:command algor="registration" option="polywarp" gcps="string" image="string" output="string" projection="file.wkt" resolution="float" format="string" polyOrder="int" transform="yes | no" />
+    <!-- A command to warp an input image using a set of ground control points using a triangulation -->
+    <rsgis:command algor="registration" option="triangularwarp" gcps="string" image="string" output="string" projection="file.wkt" resolution="float" format="string" transform="yes | no" />
+    <!-- A command to add tie points as GCPs to GDAL dataset -->
+    <rsgis:command algor="registration" option="gcp2gdal" gcps="string"         image="image" [output="image" ] />
+	<!-- A command for doing a per pixel image matching where a 3 band image is outputted with the X Shift, Y Shift and Metric value -->
+	<rsgis:command algor="registration" option="pxlshift" reference="image" floating="image" output="image" format="string" metric="euclidean|sqdiff|manhatten|correlation" window="int" search="int" subpixelresolution="int"/>
+
+
+
+</rsgis:commands>
+
+
+

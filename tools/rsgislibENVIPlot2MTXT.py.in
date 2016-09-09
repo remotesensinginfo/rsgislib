@@ -1,0 +1,140 @@
+#! /usr/bin/env python
+
+############################################################################
+# Copyright (c) 2009 Dr. Peter Bunting, Aberystwyth University
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+#
+#
+# Purpose:  A class which will convert spectral curves or profiles 
+#           exported individually from an ENVI plot as an ASCII file
+#           to a mtxt matrix file.
+#
+# Author: Pete Bunting
+# Email: pete.bunting@aber.ac.uk
+# Date: 17/06/2010
+# Version: 1.0
+#
+# History:
+# Version 1.0 - Created.
+#
+#############################################################################
+
+import sys, string, os
+
+def stringTokenizer(line, delimiter):
+    tokens = list()
+    token = str()
+    for i in range(len(line)):
+        if line[i] == delimiter:
+            tokens.append(token)
+            token = str()
+        else:
+            token = token + line[i]
+    if token.strip() != '':
+        tokens.append(token)
+    return tokens
+
+class RSGISLibENVIPlot2MTXT (object):
+
+    def parseDataFile(self, dataFilePath):
+        data = list()
+        dataFile = open(dataFilePath, 'r')
+        lineCount = 0
+        for eachLine in dataFile:
+            if lineCount > 2:
+                tokens = stringTokenizer(eachLine.strip(), " ")
+                data.append(tokens[len(tokens)-1])
+            lineCount = lineCount + 1
+        dataFile.close()
+        
+        return data
+
+    def importASCIIPlots(self, inputFiles):
+        inputtedData = list()
+        for file in inputFiles:
+            inputtedData.append(self.parseDataFile(file))
+        #print inputtedData
+        return inputtedData
+    
+    def exportData(self, outputFilePath, dataLists):
+        lengthN = 0
+        first = True
+        for dataList in dataLists:
+            if first:
+                first = False
+                lengthN = len(dataList)
+            else:
+                if lengthN != len(dataList):
+                    print("ERROR: All input datasets need to be of the same length.")
+                    sys.exit(-1)
+        outFile = open(outputFilePath, 'w')
+        outFile.write("m=")
+        outFile.write(str(len(dataLists)))
+        outFile.write("\n")
+        outFile.write("n=")
+        outFile.write(str(lengthN))
+        outFile.write("\n")
+        first = True
+        for i in range(lengthN):
+            for dataList in dataLists:
+                if first:
+                	first = False
+                	outFile.write(str(dataList[i]))
+                else:
+                	outFile.write(',')
+                	outFile.write(str(dataList[i]))
+            #outFile.write('\n')
+        outFile.close()
+    
+    def run(self):
+        numArgs = len(sys.argv)
+        if numArgs > 2:
+            print("Start.")
+            outputFile = sys.argv[1].strip()
+            fileList = list()
+            count = 0
+            for item in sys.argv:
+                if count > 1:
+                    if os.path.exists(item):
+                        fileList.append(item.strip())
+                    else:
+                        print(str(item) + ' does not exist.')
+                        sys.exit(-1)
+                count = count + 1
+            inputtedData = self.importASCIIPlots(fileList)
+            self.exportData(outputFile, inputtedData)
+            print("Complete.")
+        else:
+            print("You need to provide at least two parameters\n")
+            self.help()
+    
+    def help(self):
+        print('rsgislibENVIPlot2MTXT.py script converts ENVI ASCII plot ')
+        print('to an matrix (mtxt) file for the @PACKAGE@ software library')
+        print('Usage: python rsgislibENVIPlot2MTXT.py <OUTPUT> <LIST OF INPUTS>')
+        print('\t<OUTPUT> - output mtxt (rsgislib matrix) file')
+        print('\t<INPUT> - list of plots exported from ENVI as ASCII (see user guide)')
+        print('\nThis script was distributed with @RSGISLIB_PACKAGE_STRING@')
+        print('Copyright (C) @RSGISLIB_COPYRIGHT_YEAR@ Peter Bunting and Daniel Clewley')
+        print('For support please email @RSGISLIB_PACKAGE_BUGREPORT@')
+
+
+if __name__ == '__main__':
+    obj = RSGISLibENVIPlot2MTXT()
+    obj.run()

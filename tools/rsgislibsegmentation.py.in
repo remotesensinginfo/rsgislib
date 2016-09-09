@@ -1,0 +1,121 @@
+#! /usr/bin/env python
+
+############################################################################
+#  RSGISLibSegmentation.py
+#
+#  Copyright 2013 RSGISLib.
+#
+#  RSGISLib: 'The remote sensing and GIS Software Library'
+#
+#  RSGISLib is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  RSGISLib is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with RSGISLib.  If not, see <http://www.gnu.org/licenses/>.
+#
+#
+# Purpose:  Execute the Shepherd et al segmentation algorithm.
+#
+# Author: Pete Bunting
+# Email: petebunting@mac.com
+# Date: 24/07/2013
+# Version: 1.1
+#
+# History:
+# Version 1.0 - Created.
+# Version 1.1 - Use centrally installed function rather than local.
+#
+############################################################################
+
+# Import the python Argument parser
+import argparse
+# Import the image segmentation utilites module from rsgislib
+import rsgislib.segmentation.segutils
+        
+if __name__ == '__main__':
+    """
+    The command line user interface to the RSGISLib Segmentation tool
+    """
+    parser = argparse.ArgumentParser(prog='rsgislibsegmentation.py',
+                                    description='''Run the Shepherd et al
+                                                   segmentation algorithm.''')
+
+    # Request the version number.
+    parser.add_argument('-v', '--version', action='version', version='%(prog)s Version 1.0')
+
+    # Define the argument for specifying the input image.
+    parser.add_argument("-i", "--input", type=str, help='''Specify the input image file.''', required=True)
+    
+    # Define the argument for specifying the output image.
+    parser.add_argument("-o", "--output", type=str, help='''Specify the output clump image file.''', required=True)
+    
+    # Define the argument for specifying the output image.
+    parser.add_argument("-m", "--outmeanimg", type=str, help='''Specify the output mean image file. If not specified a mean image is not created.''')
+    
+    # Define the argument for specifying the output image.
+    parser.add_argument("-t", "--tmpath", type=str, help='''Specify the file path for intermediate files.''', required=True)
+    
+    # Define the argument for specifying the output image.
+    parser.add_argument("-k", "--numclusters", type=int, help='''Specify the number of clusters within the KMeans clustering.''', required=True)
+    
+    # Define the argument for specifying the output image.
+    parser.add_argument("-n", "--minpxls", type=int, help='''Specify the minimum number pixels within a segments.''', required=True)
+    
+    # Define the argument for specifying the image subsampling.
+    parser.add_argument("-s", "--sampling", type=int, help='''Specify the subsampling of the image for the data used within the KMeans (1 == no subsampling; default is 100).''', default=100, required=False)
+    
+    # Define the argument for specifying the number of iterations for the KMeans.
+    parser.add_argument("--maxiter", type=int, help='''Specify the maximum number of iterations used for the KMeans (default is 200).''', default=200, required=False)
+    
+    # Define the argument for specifying the output image.
+    parser.add_argument("-d", "--distthres", type=float, help='''Specify the distance threshold for joining the segments (default is a very large value which turns off this option.).''', default=1000000, required=False)
+    
+    # Define the argment for specifying the selected image bands.
+    parser.add_argument('-b', '--band', metavar='N', type=int, nargs='+', help='An integer specifying the selected image bands.')
+    
+    # Define the argument for specifying the image subsampling.
+    #parser.add_argument("--nodata", type=float, help='''Specify a no data value for the input image (default is 0).''', default=0, required=False)
+    
+    # Define the argument for specifying the image file format.
+    parser.add_argument("-f", "--format", type=str, default="KEA",
+                        help='''Specify the image output format (GDAL name).''')
+                        
+    # Define the argument for specifying that statistics and pyramids should be built for 
+    # all output images.
+    parser.add_argument("--nostats", action='store_true', default=False, 
+                        help='''Specifies that no image statistics and
+                        pyramids should be build for the output images.''')
+                        
+    # Define the argument for specifying that the input image bands should not be stretched.
+    parser.add_argument("--nostretch", action='store_true', default=False, 
+                        help='''Specifies that the input image bands should not be 
+                                stretched.''')
+    
+    # Define the argument for specifying that the input image bands should not be stretched.
+    parser.add_argument("--nodelete", action='store_true', default=False, 
+                        help='''Specifies that the temporary images created during processing
+                        should not be deleted once processing has been completed.''')
+						
+    # Define the argument for specifying whether processing should be in memory or on disk.
+    parser.add_argument("--inmem", action='store_true', default=False, 
+                        help='''Specifies that processing should be undertaken in memory
+						rather than on disk, this provides some performance improvements
+						but also limits the size of the images which can be processed.''')
+    
+    # Call the parser to parse the arguments.
+    args = parser.parse_args()
+    
+    print('rsgislibsegmentation.py script executes the shepherd et al ')
+    print('segmentation algorithm as a command line utility.')
+    print('This script was distributed with @RSGISLIB_PACKAGE_STRING@')
+    print('Copyright (C) @RSGISLIB_COPYRIGHT_YEAR@ Peter Bunting and Daniel Clewley')
+    print('For support please email @RSGISLIB_PACKAGE_BUGREPORT@')
+    
+    rsgislib.segmentation.segutils.runShepherdSegmentation(args.input, args.output, args.outmeanimg, args.tmpath, args.format, args.nostats, args.nostretch, args.nodelete, args.numclusters, args.minpxls, args.distthres, args.band, args.sampling, args.maxiter, args.inmem)

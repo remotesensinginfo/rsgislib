@@ -1,0 +1,72 @@
+#!/usr/bin/env python
+
+#############################################
+# rsgislibattributerat.py
+#
+#  Copyright 2014 RSGISLib.
+#
+#  RSGISLib: 'The remote sensing and GIS Software Library'
+#
+#  RSGISLib is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  RSGISLib is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with RSGISLib.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Purpose:  Attribute RAT with statistics from image
+#
+# Author: Dan Clewley
+# Email: daniel.clewley@gmail.com
+# Date: 17/10/2013
+# Version: 1.0
+# 
+#############################################
+import sys, argparse
+
+try:
+    import rsgislib
+    import rsgislib.rastergis.ratutils
+except ImportError:
+    print("ERROR: Couldn't import RSGISLib python modules")
+    sys.exit()
+
+# Set up options
+parser = argparse.ArgumentParser()
+parser.add_argument("--inimage", type=str, help="Input image.", required=True)
+parser.add_argument("--inclumps", type=str, \
+    help="Input clumps file", required=True)
+parser.add_argument("--outascii", type=str, help="Output ASCII file (CSV) - optional", default=None)
+parser.add_argument("--min", dest='calcMin', default=False, action='store_true')
+parser.add_argument("--max", dest='calcMax', default=False, action='store_true')
+parser.add_argument("--mean", dest='calcMean', default=False, action='store_true')
+parser.add_argument("--stddev", dest='calcStDev', default=False, \
+    action='store_true')
+#parser.add_argument("--median", dest='calcMedian', default=False, action='store_true')
+parser.add_argument("--sum", dest='calcSum', default=False, action='store_true')
+#parser.add_argument("--count", dest='calcCount', default=False, action='store_true')
+#parser.add_argument("--area", dest='calcArea', default=False, action='store_true')
+#parser.add_argument("--length", dest='calcLength', default=False, action='store_true')
+#parser.add_argument("--width", dest='calcWidth', default=False, action='store_true')
+#parser.add_argument("--lengthwidth", dest='calcLengthWidth', default=False, action='store_true')
+parser.add_argument("--threshold", dest='threshold', type=float, default=0.0)
+
+args = parser.parse_args() 
+
+
+print('rsgislibattributerat.py script provides command line utility.')
+print('for populating statistics within a RAT from another image. ')
+print('This script was distributed with @RSGISLIB_PACKAGE_STRING@')
+print('Copyright (C) @RSGISLIB_COPYRIGHT_YEAR@ Peter Bunting and Daniel Clewley')
+print('For support please email @RSGISLIB_PACKAGE_BUGREPORT@')
+
+#rsgislib.rastergis.ratutils.populateImageStats(args.inimage, args.inclumps, args.outascii, args.threshold, args.calcMin, args.calcMax, args.calcSum, args.calcMean, args.calcStDev, args.calcMedian, args.calcCount, args.calcArea, args.calcLength, args.calcWidth, args.calcLengthWidth)
+rsgislib.rastergis.ratutils.populateImageStats(args.inimage, args.inclumps, args.outascii, args.threshold, args.calcMin, args.calcMax, args.calcSum, args.calcMean, args.calcStDev)
+
+
