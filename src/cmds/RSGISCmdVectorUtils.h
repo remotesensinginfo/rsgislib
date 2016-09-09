@@ -77,6 +77,8 @@ namespace rsgis{ namespace cmds{
     DllExport void executeFitPolygonsToPointClusters(std::string inputVec, std::string outputVec, std::string clusterField, double alphaVal, bool force) throw(RSGISCmdException);
     /** Function to convert a set of lines into regularly spaced set of points */
     DllExport void executeCreateLinesOfPoints(std::string inputLinesVec, std::string outputPtsVec, double step, bool force) throw(RSGISCmdException);
+    /** Function to adjust polygon boundaries using active contours */
+    DllExport void executeFitActiveContourBoundaries(std::string inputPolysVec, std::string outputPolysVec, std::string externalForceImg, double interAlpha, double interBeta, double interGamma, double minExtThres, bool force) throw(RSGISCmdException);
 }}
 
 
