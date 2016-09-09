@@ -586,7 +586,35 @@ static PyObject *VectorUtils_CreateLinesOfPoints(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-
+static PyObject *VectorUtils_FitActiveContourBoundaries(PyObject *self, PyObject *args)
+{
+    const char *pszInputVector;
+    const char *pszOutputVector;
+    const char *pszExterForceImg;
+    const char *clustersField;
+    int force = false;
+    double alphaVal;
+    double betaVal;
+    double gammaVal;
+    double minExtThresVal;
+    
+    if( !PyArg_ParseTuple(args, "sssdddd|i:fitActiveContourBoundaries", &pszInputVector, &pszOutputVector, &pszExterForceImg, &alphaVal, &betaVal, &gammaVal, &minExtThresVal, &force))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeFitActiveContourBoundaries(std::string(pszInputVector), std::string(pszOutputVector), std::string(pszExterForceImg), alphaVal, betaVal, gammaVal, minExtThresVal, bool(force));
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
 
 
 // Our list of functions in this module
@@ -886,6 +914,24 @@ static PyMethodDef VectorUtilsMethods[] = {
 "Example::\n"
 "\n"
 "\n"},
+
+{"fitActiveContourBoundaries", VectorUtils_FitActiveContourBoundaries, METH_VARARGS,
+"vectorutils.fitActiveContourBoundaries(inputVector, outputVector, exterForceImg, intAlphaVal, intBetaVal, intGammaVal, minExtThresVal, force)\n"
+"A command fit a polygon to the points inputted.\n\n"
+"Where:\n"
+"\n"
+"* inputVector is a string containing the name of the input vector (must be polygons)\n"
+"* outputVector is a string containing the name of the output vector\n"
+"* exterForceImg is a string containing the name and path for the image file representing the external energy for the active contours\n"
+"* intAlphaVal is a double specifying the alpha value for the active contour internal energy.\n"
+"* intBetaVal is a double specifying the beta value for the active contour internal energy.\n"
+"* intGammaVal is a double specifying the gamma value for the active contour internal energy.\n"
+"* minExtThresVal is a double specifying a hard boundary for the external energy which can't be crossed.\n"
+"* force is a bool, specifying whether to force removal of the output vector if it exists\n"
+"Example::\n"
+"\n"
+"\n"},
+    
     
     {NULL}        /* Sentinel */
 };

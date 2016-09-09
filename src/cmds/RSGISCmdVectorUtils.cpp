@@ -47,9 +47,11 @@
 #include "vec/RSGISCalcDistanceStats.h"
 #include "vec/RSGISPolygonReader.h"
 #include "vec/RSGISGetAttributeValues.h"
+#include "vec/RSGISFitActiveContour4Polys.h"
 
 #include "geom/RSGISFitPolygon2Points.h"
 #include "geom/RSGISMinSpanTreeClustererStdDevThreshold.h"
+
 
 #include "img/RSGISImageUtils.h"
 #include "img/RSGISExtractImageValues.h"
@@ -2021,6 +2023,113 @@ namespace rsgis{ namespace cmds {
             vecIO.exportOGRPoints2SHP(outputPtsVec, force, pts, spatialRef);
             
             GDALClose(inputSHPDS);
+        }
+        catch(rsgis::RSGISVectorException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+            
+            
+    void executeFitActiveContourBoundaries(std::string inputPolysVec, std::string outputPolysVec, std::string externalForceImg, double interAlpha, double interBeta, double interGamma, double minExtThres, bool force) throw(RSGISCmdException)
+    {
+        try
+        {
+            // Convert to absolute path
+            inputPolysVec = boost::filesystem::absolute(inputPolysVec).string();
+            outputPolysVec = boost::filesystem::absolute(outputPolysVec).string();
+            
+            OGRRegisterAll();
+            GDALAllRegister();
+            
+            rsgis::utils::RSGISFileUtils fileUtils;
+            rsgis::vec::RSGISVectorUtils vecUtils;
+            
+            std::string SHPFileInLayer = vecUtils.getLayerName(inputPolysVec);
+            std::string SHPFileOutLayer = vecUtils.getLayerName(outputPolysVec);
+            
+            std::string outputDIR = fileUtils.getFileDirectoryPath(outputPolysVec);
+            if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
+            {
+                if(force)
+                {
+                    vecUtils.deleteSHP(outputDIR, SHPFileOutLayer);
+                }
+                else
+                {
+                    throw RSGISException("Shapefile already exists, either delete or select force.");
+                }
+            }
+            
+            /////////////////////////////////////
+            //
+            // Open Input Shapfile.
+            //
+            /////////////////////////////////////
+            GDALDataset *inputSHPDS = NULL;
+            inputSHPDS = (GDALDataset*) GDALOpenEx(inputPolysVec.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);
+            if(inputSHPDS == NULL)
+            {
+                std::string message = std::string("Could not open vector file ") + inputPolysVec;
+                throw RSGISFileException(message.c_str());
+            }
+            OGRLayer *inputSHPLayer = inputSHPDS->GetLayerByName(SHPFileInLayer.c_str());
+            if(inputSHPLayer == NULL)
+            {
+                std::string message = std::string("Could not open vector layer ") + SHPFileInLayer;
+                throw RSGISFileException(message.c_str());
+            }
+            OGRSpatialReference* spatialRef = inputSHPLayer->GetSpatialRef();
+            OGRFeatureDefn *inFeatureDefn = inputSHPLayer->GetLayerDefn();
+            
+            /////////////////////////////////////
+            //
+            // Create Output Shapfile.
+            //
+            /////////////////////////////////////
+            //std::cout << "Output Vector: " << outputVector << std::endl;
+            const char *pszDriverName = "ESRI Shapefile";
+            GDALDriver *shpFiledriver = GetGDALDriverManager()->GetDriverByName(pszDriverName);
+            if( shpFiledriver == NULL )
+            {
+                throw rsgis::vec::RSGISVectorOutputException("SHP driver not available.");
+            }
+            GDALDataset *outputSHPDS = shpFiledriver->Create(outputPolysVec.c_str(), 0, 0, 0, GDT_Unknown, NULL);
+            if( outputSHPDS == NULL )
+            {
+                std::string message = std::string("Could not create vector file ") + outputPolysVec;
+                throw rsgis::vec::RSGISVectorOutputException(message.c_str());
+            }
+            OGRLayer *outputSHPLayer = outputSHPDS->CreateLayer(SHPFileOutLayer.c_str(), spatialRef, inFeatureDefn->GetGeomType(), NULL );
+            if( outputSHPLayer == NULL )
+            {
+                std::string message = std::string("Could not create vector layer ") + SHPFileOutLayer;
+                throw rsgis::vec::RSGISVectorOutputException(message.c_str());
+            }
+            
+            GDALDataset *extImgDS = (GDALDataset *) GDALOpen(externalForceImg.c_str(), GA_ReadOnly);
+            if(extImgDS == NULL)
+            {
+                std::string message = std::string("Could not open image ") + externalForceImg;
+                throw RSGISImageException(message.c_str());
+            }
+            
+            std::cout.precision(12);
+            
+            rsgis::vec::RSGISFitActiveContour2Geoms fitContours;
+            fitContours.fitActiveContours2Polys(inputSHPLayer, outputSHPLayer, extImgDS, interAlpha, interBeta, interGamma, minExtThres, force);
+            
+            GDALClose(inputSHPDS);
+            GDALClose(outputSHPDS);
+            GDALClose(extImgDS);
         }
         catch(rsgis::RSGISVectorException &e)
         {

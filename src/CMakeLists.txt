@@ -1101,6 +1101,8 @@ set(LIB_VEC_PROCESSING_CPP
 	${RSGIS_SRC_VEC_DIR}/RSGISVectorIO.h
 	${RSGIS_SRC_VEC_DIR}/RSGISVectorProcessing.cpp 
 	${RSGIS_SRC_VEC_DIR}/RSGISVectorProcessing.h 
+    ${RSGIS_SRC_VEC_DIR}/RSGISFitActiveContour4Polys.cpp
+	${RSGIS_SRC_VEC_DIR}/RSGISFitActiveContour4Polys.h
 )
 
 set(LIB_VEC_ZONALSTATS_CPP
@@ -1275,6 +1277,7 @@ set(LIB_VEC_H
 	${RSGIS_SRC_VEC_DIR}/RSGISGenerateConvexHullGroups.h
 	${RSGIS_SRC_VEC_DIR}/RSGISZonalImage2HDF.h
 	${RSGIS_SRC_VEC_DIR}/RSGISPopulateFeatsElev.h
+	${RSGIS_SRC_VEC_DIR}/RSGISFitActiveContour4Polys.h
 	)
 	
 	
