@@ -65,6 +65,13 @@ elevation_module = Extension(name='elevation._elevation',
                 include_dirs=['../src/cmds', '../src'],
                 library_dirs=['../src'],
                 libraries=['rsgis_cmds'])
+
+imagemorphology_module = Extension(name='imagemorphology._imagemorphology',
+                sources=['src/imagemorphology.cpp'],
+                include_dirs=['../src/cmds', '../src'],
+                library_dirs=['../src'],
+                libraries=['rsgis_cmds'])
+
                 
 
 
@@ -74,7 +81,7 @@ setup( name = 'RSGISLib',
         description = 'Python interface onto RSGISLib',
         author = 'Pete Bunting, Dan Clewley and Sam Gillingham',
         author_email = 'petebunting@mac.com, daniel.clewley@gmail.com, gillingham.sam@gmail.com',
-        packages = ['rsgislib', 'rsgislib.imagecalc', 'rsgislib.imageutils', 'rsgislib.segmentation', 'rsgislib.imagecalibration', 'rsgislib.rastergis', 'rsgislib.zonalstats', 'rsgislib.imageregistration', 'rsgislib.vectorutils', 'rsgislib.imagefilter', 'rsgislib.classification', 'rsgislib.elevation', 'rsgislib.tools'],
+        packages = ['rsgislib', 'rsgislib.imagecalc', 'rsgislib.imageutils', 'rsgislib.segmentation', 'rsgislib.imagecalibration', 'rsgislib.rastergis', 'rsgislib.zonalstats', 'rsgislib.imageregistration', 'rsgislib.vectorutils', 'rsgislib.imagefilter', 'rsgislib.classification', 'rsgislib.elevation', 'rsgislib.tools', 'rsgislib.imagemorphology'],
         ext_package = 'rsgislib',
-        ext_modules = [imagecalc_module, imageutils_module, segmentation_module, imagecalibration_module, rastergis_module, zonalstats_module, imageregistration_module, vectorutils_module, imagefilter_module, classification_module, elevation_module])
+        ext_modules = [imagecalc_module, imageutils_module, segmentation_module, imagecalibration_module, rastergis_module, zonalstats_module, imageregistration_module, vectorutils_module, imagefilter_module, classification_module, elevation_module, imagemorphology_module])
 

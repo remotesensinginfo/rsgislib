@@ -116,6 +116,7 @@ set(LIB_COMMANDS_H
     ${RSGIS_SRC_CMDS_DIR}/RSGISCmdFilterImages.h
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageCalc.h 
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageCalibration.h
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageMorphology.h
     ${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageRegistration.h
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageUtils.h 	
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdSegmentation.h 
@@ -139,6 +140,8 @@ set(LIB_COMMANDS_CPP
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageCalc.h 
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageCalibration.cpp 
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageCalibration.h
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageMorphology.cpp
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageMorphology.h
     ${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageRegistration.cpp
     ${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageRegistration.h
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageUtils.cpp	
