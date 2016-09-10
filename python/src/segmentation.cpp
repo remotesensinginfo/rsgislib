@@ -579,6 +579,78 @@ static PyObject *Segmentation_mergeEquivalentClumps(PyObject *self, PyObject *ar
     Py_RETURN_NONE;
 }
 
+
+static PyObject *Segmentation_PxlGrowRegions(PyObject *self, PyObject *args)
+{
+    const char *pszInputClumpsImage, *pszValsImage, *pszOutputImage, *pszGDALFormat, *pszMuParseCriteria;
+    PyObject *varNameBandPairsObj;
+    if( !PyArg_ParseTuple(args, "sssssO:pxlGrowRegions", &pszInputClumpsImage, &pszValsImage, &pszOutputImage, &pszGDALFormat, &pszMuParseCriteria, &varNameBandPairsObj))
+    {
+        return NULL;
+    }
+    
+    if( !PySequence_Check(varNameBandPairsObj))
+    {
+        PyErr_SetString(GETSTATE(self)->error, "varNameBandPairs argument must be a sequence");
+        return NULL;
+    }
+    
+    Py_ssize_t nValCols = PyList_Size(varNameBandPairsObj);
+    if( nValCols < 0)
+    {
+        PyErr_SetString(GETSTATE(self)->error, "last argument must be a list");
+        return NULL;
+    }
+    
+    std::vector<rsgis::cmds::VarImgBandPairs> varNameBandPairs;
+    for(Py_ssize_t n = 0; n < nValCols; n++)
+    {
+        PyObject *o = PySequence_GetItem(varNameBandPairsObj, n);
+        
+        PyObject *pVarName = PyObject_GetAttrString(o, "varName");
+        if( ( pVarName == NULL ) || ( pVarName == Py_None ) || !RSGISPY_CHECK_STRING(pVarName) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Could not find string attribute \'varName\'" );
+            Py_XDECREF(pVarName);
+            Py_DECREF(o);
+            return NULL;
+        }
+        
+        PyObject *pBandIndex = PyObject_GetAttrString(o, "bandIndex");
+        if( ( pBandIndex == NULL ) || ( pBandIndex == Py_None ) || !RSGISPY_CHECK_INT(pBandIndex) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Could not find integer attribute \'bandIndex\'" );
+            Py_DECREF(pVarName);
+            Py_XDECREF(pBandIndex);
+            Py_DECREF(o);
+            return NULL;
+        }
+        
+        rsgis::cmds::VarImgBandPairs varPair;
+        varPair.varName = RSGISPY_STRING_EXTRACT(pVarName);
+        varPair.imgBand = RSGISPY_INT_EXTRACT(pBandIndex);
+        varNameBandPairs.push_back(varPair);
+        
+        Py_DECREF(pVarName);
+        Py_XDECREF(pBandIndex);
+        Py_DECREF(o);
+    }
+    
+    try
+    {
+        rsgis::cmds::executePxlGrowRegions(std::string(pszInputClumpsImage), std::string(pszValsImage), std::string(pszOutputImage), std::string(pszGDALFormat), std::string(pszMuParseCriteria), varNameBandPairs);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+
+
 // Our list of functions in this module
 static PyMethodDef SegmentationMethods[] = {
     {"labelPixelsFromClusterCentres", Segmentation_labelPixelsFromClusterCentres, METH_VARARGS, 
@@ -776,6 +848,27 @@ static PyMethodDef SegmentationMethods[] = {
 "* gdalFormat is a string defining the format of the output image.\n"
 "* valClumpsCol is a list of strings defining the value(s) used to define equivalence (typically it might be the original pixel values when clumping through tiling).\n"
 "\n"},
+
+{"pxlGrowRegions", Segmentation_PxlGrowRegions, METH_VARARGS,
+"segmentation.pxlGrowRegions(clumpsImage, valsImage, outputImage, gdalFormat, muParseCriteria, varNameBandPairs)\n"
+"A function to merge neighbouring clumps which have the same value - for example when merging across tile boundaries.\n"
+"where:\n"
+"\n"
+"* clumpsImage is a string containing the filepath for the input clumps image.\n"
+"* valsImage is a string containing the file path for the values (criteria) image.\n"
+"* outputClumps is a string containing the name and path of the output clumps image\n"
+"* gdalFormat is a string defining the format of the output image.\n"
+"* muParseCriteria is a string with an muparser criteria (muparser; e.g., b1 < 20?1:0). Expression output must be 0 or 1 (1 for True).\n"
+"* varNameBandPairs is a list pairs specifying the variable name (in muparser expression) and the band number to which it refers in valsImage (note band numbers start a 1).\n"
+"Example::\n"
+"\n"
+"varBandPair = collections.namedtuple('VarBandPair', ['varName', 'bandIndex'])\n"
+"varBandPairSeq = list()\n"
+"varBandPairSeq.append(varBandPair(varName='b1', bandIndex=1))\n"
+"muParseCriteria = 'b1 > 1000?1:0'\n"
+"rsgislib.segmentation.pxlGrowRegions(tmpInitClearSkyRegionsFinal, tmpCloudsImgDist2CloudsNoData, tmpClearSkyRegionsGrow, 'KEA', muParseCriteria, varBandPairSeq)\n"
+"\n"},
+    
     
    
 

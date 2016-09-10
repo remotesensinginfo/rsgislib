@@ -42,6 +42,11 @@ namespace rsgis{ namespace cmds {
         double lenWidthUpper;
     };
     
+    struct DllExport VarImgBandPairs
+    {
+        std::string varName;
+        unsigned int imgBand;
+    };
     
     
     /** Function to run the label pixels from clusters centres command */
@@ -97,6 +102,10 @@ namespace rsgis{ namespace cmds {
     
     /** Function merge clumps with same value */
     DllExport void executeMergeClumpsEquivalentVal(std::string clumpsImage, std::string outputImage, std::string imageFormat, std::vector<std::string> clumpsValCols)throw(RSGISCmdException);
+    
+    /** Function to grow regions until some termination criteria are met */
+    DllExport void executePxlGrowRegions(std::string clumpsImage, std::string valsImage, std::string outputImage, std::string imageFormat, std::string muParseCriteria, std::vector<VarImgBandPairs> varNameBandPairs)throw(RSGISCmdException);
+    
     
 }}
 

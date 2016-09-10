@@ -43,6 +43,7 @@
 #include "segmentation/RSGISMergeSegments.h"
 #include "segmentation/RSGISCreateImageGrid.h"
 #include "segmentation/RSGISDropClumps.h"
+#include "segmentation/RSGISRegionGrowSegmentsPixels.h"
 
 #include "rastergis/RSGISRasterAttUtils.h"
 #include "rastergis/RSGISCalcImageStatsAndPyramids.h"
@@ -999,6 +1000,54 @@ namespace rsgis{ namespace cmds {
 
             // Tidy up
             GDALClose(clumpDataset);
+            GDALClose(outputClumpsDS);
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw rsgis::cmds::RSGISCmdException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw rsgis::cmds::RSGISCmdException(e.what());
+        }
+    }
+            
+            
+    DllExport void executePxlGrowRegions(std::string clumpsImage, std::string valsImage, std::string outputImage, std::string imageFormat, std::string muParseCriteria, std::vector<VarImgBandPairs> varNameBandPairs)throw(RSGISCmdException)
+    {
+        try
+        {
+            rsgis::img::RSGISImageUtils imgUtils;
+            GDALAllRegister();
+            GDALDataset *clumpDS = (GDALDataset *) GDALOpen(clumpsImage.c_str(), GA_ReadOnly);
+            if(clumpDS == NULL)
+            {
+                std::string message = std::string("Could not open image ") + clumpsImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            GDALDataset *imgValsDS = (GDALDataset *) GDALOpen(valsImage.c_str(), GA_ReadOnly);
+            if(imgValsDS == NULL)
+            {
+                std::string message = std::string("Could not open image ") + valsImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            GDALDataset *outputClumpsDS = imgUtils.createCopy(clumpDS, 1, outputImage, imageFormat, GDT_UInt32);
+            outputClumpsDS->GetRasterBand(1)->Fill(0.0);
+            
+            
+            throw rsgis::RSGISException("executePxlGrowRegions is not implemented yet; see code in RSGISRegionGrowSegmentsPixels.h");
+            
+            
+            
+            outputClumpsDS->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
+            rsgis::rastergis::RSGISPopulateWithImageStats popImageStats;
+            popImageStats.populateImageWithRasterGISStats(outputClumpsDS, true, true, true, 1);
+            
+            // Tidy up
+            GDALClose(clumpDS);
+            GDALClose(imgValsDS);
             GDALClose(outputClumpsDS);
         }
         catch (rsgis::RSGISException &e)
