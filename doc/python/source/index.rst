@@ -38,6 +38,7 @@ Python documentation
    rsgislib_elevation
    rsgislib_imagecalc
    rsgislib_imagefilter
+   rsgislib_imagemorphology
    rsgislib_imageregistration
    rsgislib_imageutils
    rsgislib_rastergis

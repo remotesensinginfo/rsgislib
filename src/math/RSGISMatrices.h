@@ -106,6 +106,23 @@ namespace rsgis{namespace math{
 			Matrix* convertGSL2RSGISMatrix(gsl_matrix *matrix) throw(RSGISMatricesException);
             void makeCircularBinaryMatrix(Matrix *matrix) throw(RSGISMatricesException);
 			~RSGISMatrices();
+        protected:
+            std::string getFileExt(std::string filepath)
+            {
+                int strSize = filepath.size();
+                int lastpt = 0;
+                for(int i = 0; i < strSize; i++)
+                {
+                    if(filepath.at(i) == '.')
+                    {
+                        lastpt = i;
+                    }
+                }
+                
+                std::string extension = filepath.substr(lastpt);
+                //cout << layerName << endl;
+                return extension;	
+            }
 		};
 }}
 

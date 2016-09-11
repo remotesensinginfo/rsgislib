@@ -46,6 +46,30 @@ static void FreePythonObjects(std::vector<PyObject*> toFree)
     }
 }
 
+static PyObject *ImageMorphology_CreateCircularOp(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    const char *pszOutputFile;
+    int morphOpSize;
+    
+    static char *kwlist[] = {"outputFile", "opSize", NULL};
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "si:createCircularOp", kwlist, &pszOutputFile, &morphOpSize))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeCreateCircularOperator(std::string(pszOutputFile), morphOpSize);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 static PyObject *ImageMorphology_ImageDilate(PyObject *self, PyObject *args, PyObject *keywds)
 {
     const char *pszInputImage, *pszOutputImage;
@@ -282,16 +306,17 @@ static PyObject *ImageMorphology_ImageOpening(PyObject *self, PyObject *args, Py
     int dataType;
     int useOperatorFile;
     int morphOpSize;
+    int numIterations=1;
     
-    static char *kwlist[] = {"inputImage", "outputImage", "tempImage", "morphOperator", "useOpFile", "opSize", "gdalFormat", "dataType", NULL};
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssssiisi:imageOpening", kwlist, &pszInputImage, &pszOutputImage, &pszTempImage, &pszMorphOperator, &useOperatorFile, &morphOpSize, &pszImageFormat, &dataType))
+    static char *kwlist[] = {"inputImage", "outputImage", "tempImage", "morphOperator", "useOpFile", "opSize", "gdalFormat", "dataType", "niters", NULL};
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssssiisi|i:imageOpening", kwlist, &pszInputImage, &pszOutputImage, &pszTempImage, &pszMorphOperator, &useOperatorFile, &morphOpSize, &pszImageFormat, &dataType, &numIterations))
     {
         return NULL;
     }
     
     try
     {
-        rsgis::cmds::executeImageOpening(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszTempImage), std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, std::string(pszImageFormat), (rsgis::RSGISLibDataType)dataType);
+        rsgis::cmds::executeImageOpening(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszTempImage), std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, numIterations, std::string(pszImageFormat), (rsgis::RSGISLibDataType)dataType);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -310,16 +335,17 @@ static PyObject *ImageMorphology_ImageClosing(PyObject *self, PyObject *args, Py
     int dataType;
     int useOperatorFile;
     int morphOpSize;
+    int numIterations=1;
     
-    static char *kwlist[] = {"inputImage", "outputImage", "tempImage", "morphOperator", "useOpFile", "opSize", "gdalFormat", "dataType", NULL};
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssssiisi:imageClosing", kwlist, &pszInputImage, &pszOutputImage, &pszTempImage, &pszMorphOperator, &useOperatorFile, &morphOpSize, &pszImageFormat, &dataType))
+    static char *kwlist[] = {"inputImage", "outputImage", "tempImage", "morphOperator", "useOpFile", "opSize", "gdalFormat", "dataType", "niters", NULL};
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssssiisi|i:imageClosing", kwlist, &pszInputImage, &pszOutputImage, &pszTempImage, &pszMorphOperator, &useOperatorFile, &morphOpSize, &pszImageFormat, &dataType, &numIterations))
     {
         return NULL;
     }
     
     try
     {
-        rsgis::cmds::executeImageClosing(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszTempImage), std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, std::string(pszImageFormat), (rsgis::RSGISLibDataType)dataType);
+        rsgis::cmds::executeImageClosing(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszTempImage), std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, numIterations, std::string(pszImageFormat), (rsgis::RSGISLibDataType)dataType);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -390,6 +416,20 @@ static PyObject *ImageMorphology_ImageWhiteTopHat(PyObject *self, PyObject *args
 
 // Our list of functions in this module
 static PyMethodDef ImageMorphologyMethods[] = {
+{"createCircularOp", (PyCFunction)ImageMorphology_CreateCircularOp, METH_VARARGS | METH_KEYWORDS,
+"imagemorphology.createCircularOp(outputFile=string, opSize=int)\n"
+"Performs an image morphology dilate operation. \n"
+"Where:\n"
+"\n"
+"* outputFile is a string specifying the name and path of the output matrix file.\n"
+"* opSize is a integer specifying the size of the operator.\n"
+"Example::\n"
+"import rsgislib.imagemorphology\n"
+"\n"
+"rsgislib.imagemorphology.createCircularOp(outputFile='CircularOp5.gmtxt', opSize=5)\n"
+"\n"},
+    
+    
 {"imageDilate", (PyCFunction)ImageMorphology_ImageDilate, METH_VARARGS | METH_KEYWORDS,
 "imagemorphology.imageDilate(inputImage=string, outputImage=string, morphOperator=string, useOpFile=boolean, opSize=int, gdalFormat=string, dataType=int)\n"
 "Performs an image morphology dilate operation. \n"
@@ -515,33 +555,35 @@ static PyMethodDef ImageMorphologyMethods[] = {
 "\n"},
 
 {"imageOpening", (PyCFunction)ImageMorphology_ImageOpening, METH_VARARGS | METH_KEYWORDS,
-"imagemorphology.imageOpening(inputImage=string, outputImage=string, tempImage=string, morphOperator=string, useOpFile=boolean, opSize=int, gdalFormat=string, dataType=int)\n"
+"imagemorphology.imageOpening(inputImage=string, outputImage=string, tempImage=string, morphOperator=string, useOpFile=boolean, opSize=int, gdalFormat=string, dataType=int, niters=int)\n"
 "Performs an image morphology opening operation. \n"
 "Where:\n"
 "\n"
 "* inputImage is a string specifying the name and path of the input file.\n"
 "* outputImage is a string specifying the name and path of the output file.\n"
-"* tempImage is a string specifying the name and path of a tempory file used for intermediate processing step(s).\n"
+"* tempImage is a string specifying the name and path of a tempory file used for intermediate processing step(s). If empty string ('') then an in memory image will be used.\n"
 "* morphOperator is a string with the name and path to a *.gmtxt file with a square binary matrix specifying the morphology operator\n"
 "* useOpFile is a boolean specifying whether the morphOperator file is present or whether a square operator (specified via opSize) should be used. (True = morphOperator, False = opSize)\n"
 "* opSize is a integer specifying the square operator size (only used if useOpFile is False)\n"
 "* gdalFormat is a string specifying the GDAL image format (e.g., KEA)\n"
 "* dataType is an int containing one of the values from rsgislib.TYPE_*\n"
+"* niters is an int for the number of iterations of the operators (Optional, default = 1)\n"
 "\n"},
 
 {"imageClosing", (PyCFunction)ImageMorphology_ImageClosing, METH_VARARGS | METH_KEYWORDS,
-"imagemorphology.imageClosing(inputImage=string, outputImage=string, tempImage=string, morphOperator=string, useOpFile=boolean, opSize=int, gdalFormat=string, dataType=int)\n"
+"imagemorphology.imageClosing(inputImage=string, outputImage=string, tempImage=string, morphOperator=string, useOpFile=boolean, opSize=int, gdalFormat=string, dataType=int, niters=int)\n"
 "Performs an image morphology closing operation. \n"
 "Where:\n"
 "\n"
 "* inputImage is a string specifying the name and path of the input file.\n"
 "* outputImage is a string specifying the name and path of the output file.\n"
-"* tempImage is a string specifying the name and path of a tempory file used for intermediate processing step(s).\n"
+"* tempImage is a string specifying the name and path of a tempory file used for intermediate processing step(s). If empty string ('') then an in memory image will be used.\n"
 "* morphOperator is a string with the name and path to a *.gmtxt file with a square binary matrix specifying the morphology operator\n"
 "* useOpFile is a boolean specifying whether the morphOperator file is present or whether a square operator (specified via opSize) should be used. (True = morphOperator, False = opSize)\n"
 "* opSize is a integer specifying the square operator size (only used if useOpFile is False)\n"
 "* gdalFormat is a string specifying the GDAL image format (e.g., KEA)\n"
 "* dataType is an int containing one of the values from rsgislib.TYPE_*\n"
+"* niters is an int for the number of iterations of the operators (Optional, default = 1)\n"
 "\n"},
 
 {"imageBlackTopHat", (PyCFunction)ImageMorphology_ImageBlackTopHat, METH_VARARGS | METH_KEYWORDS,

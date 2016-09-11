@@ -396,7 +396,13 @@ namespace rsgis{namespace math{
 	
 	void RSGISMatrices::saveMatrix2GridTxt(Matrix *matrix, std::string filepath) throw(RSGISMatricesException,RSGISOutputStreamException)
 	{
-		std::string outputFilename = filepath + std::string(".gmtxt");
+        std::string outputFilename = filepath;
+        std::string ext = getFileExt(filepath);
+        if(ext != ".gmtxt")
+        {
+            outputFilename = filepath + std::string(".gmtxt");
+        }
+        
 		std::ofstream outTxtFile;
 		outTxtFile.open(outputFilename.c_str(), std::ios::out | std::ios::trunc);
 		
@@ -434,7 +440,12 @@ namespace rsgis{namespace math{
 	
 	void RSGISMatrices::saveMatrix2CSV(Matrix *matrix, std::string filepath) throw(RSGISMatricesException,RSGISOutputStreamException)
 	{
-		std::string outputFilename = filepath + std::string(".csv");
+        std::string outputFilename = filepath;
+        std::string ext = getFileExt(filepath);
+        if(ext != ".csv")
+        {
+            outputFilename = filepath + std::string(".csv");
+        }
 		std::ofstream outTxtFile;
 		outTxtFile.open(outputFilename.c_str(), std::ios::out | std::ios::trunc);
 		
@@ -477,7 +488,12 @@ namespace rsgis{namespace math{
 	
 	void RSGISMatrices::saveMatrix2txt(Matrix *matrix, std::string filepath) throw(RSGISMatricesException,RSGISOutputStreamException)
 	{
-		std::string outputFilename = filepath + std::string(".mtxt");
+        std::string outputFilename = filepath;
+        std::string ext = getFileExt(filepath);
+        if(ext != ".mtxt")
+        {
+            outputFilename = filepath + std::string(".mtxt");
+        }
 		std::ofstream outTxtFile;
 		outTxtFile.open(outputFilename.c_str(), std::ios::out | std::ios::trunc);
 		
@@ -552,7 +568,12 @@ namespace rsgis{namespace math{
 	void RSGISMatrices::saveMatrix2Binary(Matrix *matrix, std::string filepath) throw(RSGISMatricesException,RSGISOutputStreamException)
 	{
 		std::ofstream matrixOutput;
-		std::string matrixFilepath = filepath + std::string(".mtx");
+        std::string matrixFilepath = filepath;
+        std::string ext = getFileExt(filepath);
+        if(ext != ".mtx")
+        {
+            matrixFilepath = filepath + std::string(".mtx");
+        }
 		matrixOutput.open(matrixFilepath.c_str(), std::ios::out | std::ios::trunc | std::ios::binary);
 		if(!matrixOutput.is_open())
 		{
