@@ -52,9 +52,9 @@ namespace rsgis{ namespace cmds {
     /** A function to perform a morphological operation to find local minima combining the results of the output bands into a single image band */
     DllExport void executeImageLocalMinimaCombinedOut(std::string inImage, std::string outImage, bool outputSequencial, bool allowEquals, std::string morphOperatorFile, bool useOperatorFile, unsigned int morphOpSize, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException);
     /** A function to perform a morphological opening on an image */
-    DllExport void executeImageOpening(std::string inImage, std::string outImage, std::string tmpImage, std::string morphOperatorFile, bool useOperatorFile, unsigned int morphOpSize, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException);
+    DllExport void executeImageOpening(std::string inImage, std::string outImage, std::string tmpImage, std::string morphOperatorFile, bool useOperatorFile, unsigned int morphOpSize, unsigned int numIterations, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException);
     /** A function to perform a morphological closing on an image */
-    DllExport void executeImageClosing(std::string inImage, std::string outImage, std::string tmpImage, std::string morphOperatorFile, bool useOperatorFile, unsigned int morphOpSize, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException);
+    DllExport void executeImageClosing(std::string inImage, std::string outImage, std::string tmpImage, std::string morphOperatorFile, bool useOperatorFile, unsigned int morphOpSize, unsigned int numIterations, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException);
     /** A function to perform a morphological black top hat on an image */
     DllExport void executeImageBlackTopHat(std::string inImage, std::string outImage, std::string tmpImage, std::string morphOperatorFile, bool useOperatorFile, unsigned int morphOpSize, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException);
     /** A function to perform a morphological white top hat on an image */

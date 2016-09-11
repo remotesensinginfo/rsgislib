@@ -47,7 +47,11 @@ namespace rsgis{ namespace cmds {
     {
         try
         {
-            
+            rsgis::math::RSGISMatrices matrixUtils;
+            rsgis::math::Matrix *matrixOperator = matrixUtils.createMatrix(morphOpSize, morphOpSize);
+            matrixUtils.makeCircularBinaryMatrix(matrixOperator);
+            matrixUtils.saveMatrix2GridTxt(matrixOperator, morphOperatorFile);
+            matrixUtils.freeMatrix(matrixOperator);
         }
         catch(RSGISCmdException &e)
         {
@@ -338,7 +342,41 @@ namespace rsgis{ namespace cmds {
     {
         try
         {
+            GDALAllRegister();
+            GDALDataset *dataset = (GDALDataset *) GDALOpen(inImage.c_str(), GA_ReadOnly);
+            if(dataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inImage;
+                throw RSGISImageException(message.c_str());
+            }
             
+            rsgis::math::RSGISMatrices matrixUtils;
+            rsgis::math::Matrix *matrixOperator = NULL;
+            if(useOperatorFile)
+            {
+                matrixOperator = matrixUtils.readMatrixFromGridTxt(morphOperatorFile);
+            }
+            else
+            {
+                matrixOperator = matrixUtils.createMatrix(morphOpSize, morphOpSize);
+                matrixUtils.setValues(matrixOperator, 1);
+            }
+            
+            rsgis::filter::RSGISImageMorphologyFindExtrema::RSGISMinimaOutputs minOutType = rsgis::filter::RSGISImageMorphologyFindExtrema::binary;
+            if(outputSequencial)
+            {
+                minOutType = rsgis::filter::RSGISImageMorphologyFindExtrema::sequential;
+            }
+            else
+            {
+                minOutType = rsgis::filter::RSGISImageMorphologyFindExtrema::binary;
+            }
+            
+            rsgis::filter::RSGISImageMorphologyFindExtrema morphObj;
+            morphObj.findMinima(&dataset, outImage, matrixOperator, minOutType, allowEquals, gdalFormat, RSGIS_to_GDAL_Type(outDataType));
+            
+            GDALClose(dataset);
+            matrixUtils.freeMatrix(matrixOperator);
         }
         catch(RSGISCmdException &e)
         {
@@ -359,7 +397,41 @@ namespace rsgis{ namespace cmds {
     {
         try
         {
+            GDALAllRegister();
+            GDALDataset *dataset = (GDALDataset *) GDALOpen(inImage.c_str(), GA_ReadOnly);
+            if(dataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inImage;
+                throw RSGISImageException(message.c_str());
+            }
             
+            rsgis::math::RSGISMatrices matrixUtils;
+            rsgis::math::Matrix *matrixOperator = NULL;
+            if(useOperatorFile)
+            {
+                matrixOperator = matrixUtils.readMatrixFromGridTxt(morphOperatorFile);
+            }
+            else
+            {
+                matrixOperator = matrixUtils.createMatrix(morphOpSize, morphOpSize);
+                matrixUtils.setValues(matrixOperator, 1);
+            }
+            
+            rsgis::filter::RSGISImageMorphologyFindExtrema::RSGISMinimaOutputs minOutType = rsgis::filter::RSGISImageMorphologyFindExtrema::binary;
+            if(outputSequencial)
+            {
+                minOutType = rsgis::filter::RSGISImageMorphologyFindExtrema::sequential;
+            }
+            else
+            {
+                minOutType = rsgis::filter::RSGISImageMorphologyFindExtrema::binary;
+            }
+            
+            rsgis::filter::RSGISImageMorphologyFindExtrema morphObj;
+            morphObj.findMinimaAll(&dataset, outImage, matrixOperator, minOutType, allowEquals, gdalFormat, RSGIS_to_GDAL_Type(outDataType));
+            
+            GDALClose(dataset);
+            matrixUtils.freeMatrix(matrixOperator);
         }
         catch(RSGISCmdException &e)
         {
@@ -376,11 +448,41 @@ namespace rsgis{ namespace cmds {
     }
     
     /** A function to perform a morphological opening on an image */
-    void executeImageOpening(std::string inImage, std::string outImage, std::string tmpImage, std::string morphOperatorFile, bool useOperatorFile, unsigned int morphOpSize, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException)
+    void executeImageOpening(std::string inImage, std::string outImage, std::string tmpImage, std::string morphOperatorFile, bool useOperatorFile, unsigned int morphOpSize, unsigned int numIterations, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException)
     {
         try
         {
+            GDALAllRegister();
+            GDALDataset *dataset = (GDALDataset *) GDALOpen(inImage.c_str(), GA_ReadOnly);
+            if(dataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inImage;
+                throw RSGISImageException(message.c_str());
+            }
             
+            rsgis::math::RSGISMatrices matrixUtils;
+            rsgis::math::Matrix *matrixOperator = NULL;
+            if(useOperatorFile)
+            {
+                matrixOperator = matrixUtils.readMatrixFromGridTxt(morphOperatorFile);
+            }
+            else
+            {
+                matrixOperator = matrixUtils.createMatrix(morphOpSize, morphOpSize);
+                matrixUtils.setValues(matrixOperator, 1);
+            }
+            
+            bool useMemory = false;
+            if(tmpImage == "")
+            {
+                useMemory = true;
+            }
+            
+            rsgis::filter::RSGISImageMorphologyOpening morphObj;
+            morphObj.performOpening(dataset, outImage, tmpImage, useMemory, matrixOperator, numIterations, gdalFormat, RSGIS_to_GDAL_Type(outDataType));
+            
+            GDALClose(dataset);
+            matrixUtils.freeMatrix(matrixOperator);
         }
         catch(RSGISCmdException &e)
         {
@@ -397,11 +499,41 @@ namespace rsgis{ namespace cmds {
     }
     
     /** A function to perform a morphological closing on an image */
-    void executeImageClosing(std::string inImage, std::string outImage, std::string tmpImage, std::string morphOperatorFile, bool useOperatorFile, unsigned int morphOpSize, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException)
+    void executeImageClosing(std::string inImage, std::string outImage, std::string tmpImage, std::string morphOperatorFile, bool useOperatorFile, unsigned int morphOpSize, unsigned int numIterations, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException)
     {
         try
         {
+            GDALAllRegister();
+            GDALDataset *dataset = (GDALDataset *) GDALOpen(inImage.c_str(), GA_ReadOnly);
+            if(dataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inImage;
+                throw RSGISImageException(message.c_str());
+            }
             
+            rsgis::math::RSGISMatrices matrixUtils;
+            rsgis::math::Matrix *matrixOperator = NULL;
+            if(useOperatorFile)
+            {
+                matrixOperator = matrixUtils.readMatrixFromGridTxt(morphOperatorFile);
+            }
+            else
+            {
+                matrixOperator = matrixUtils.createMatrix(morphOpSize, morphOpSize);
+                matrixUtils.setValues(matrixOperator, 1);
+            }
+            
+            bool useMemory = false;
+            if(tmpImage == "")
+            {
+                useMemory = true;
+            }
+            
+            rsgis::filter::RSGISImageMorphologyClosing morphObj;
+            morphObj.performClosing(dataset, outImage, tmpImage, useMemory, matrixOperator, numIterations, gdalFormat, RSGIS_to_GDAL_Type(outDataType));
+            
+            GDALClose(dataset);
+            matrixUtils.freeMatrix(matrixOperator);
         }
         catch(RSGISCmdException &e)
         {
@@ -422,7 +554,37 @@ namespace rsgis{ namespace cmds {
     {
         try
         {
+            GDALAllRegister();
+            GDALDataset *dataset = (GDALDataset *) GDALOpen(inImage.c_str(), GA_ReadOnly);
+            if(dataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inImage;
+                throw RSGISImageException(message.c_str());
+            }
             
+            rsgis::math::RSGISMatrices matrixUtils;
+            rsgis::math::Matrix *matrixOperator = NULL;
+            if(useOperatorFile)
+            {
+                matrixOperator = matrixUtils.readMatrixFromGridTxt(morphOperatorFile);
+            }
+            else
+            {
+                matrixOperator = matrixUtils.createMatrix(morphOpSize, morphOpSize);
+                matrixUtils.setValues(matrixOperator, 1);
+            }
+            
+            bool useMemory = false;
+            if(tmpImage == "")
+            {
+                useMemory = true;
+            }
+            
+            rsgis::filter::RSGISImageMorphologyTopHat morphObj;
+            morphObj.performBlackTopHat(dataset, outImage, tmpImage, useMemory, matrixOperator, gdalFormat, RSGIS_to_GDAL_Type(outDataType));
+            
+            GDALClose(dataset);
+            matrixUtils.freeMatrix(matrixOperator);
         }
         catch(RSGISCmdException &e)
         {
@@ -443,7 +605,37 @@ namespace rsgis{ namespace cmds {
     {
         try
         {
+            GDALAllRegister();
+            GDALDataset *dataset = (GDALDataset *) GDALOpen(inImage.c_str(), GA_ReadOnly);
+            if(dataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inImage;
+                throw RSGISImageException(message.c_str());
+            }
             
+            rsgis::math::RSGISMatrices matrixUtils;
+            rsgis::math::Matrix *matrixOperator = NULL;
+            if(useOperatorFile)
+            {
+                matrixOperator = matrixUtils.readMatrixFromGridTxt(morphOperatorFile);
+            }
+            else
+            {
+                matrixOperator = matrixUtils.createMatrix(morphOpSize, morphOpSize);
+                matrixUtils.setValues(matrixOperator, 1);
+            }
+            
+            bool useMemory = false;
+            if(tmpImage == "")
+            {
+                useMemory = true;
+            }
+            
+            rsgis::filter::RSGISImageMorphologyTopHat morphObj;
+            morphObj.performWhiteTopHat(dataset, outImage, tmpImage, useMemory, matrixOperator, gdalFormat, RSGIS_to_GDAL_Type(outDataType));
+            
+            GDALClose(dataset);
+            matrixUtils.freeMatrix(matrixOperator);
         }
         catch(RSGISCmdException &e)
         {
