@@ -37,7 +37,7 @@ Cloud Masking
 --------------
 
 .. autofunction:: rsgislib.imagecalibration.applyLandsatTMCloudFMask
-
+.. autofunction:: rsgislib.imagecalibration.calcClearSkyRegions
 
 Utilities
 ---------
