@@ -64,7 +64,7 @@ Given a cloud mask, identify the larger extent regions of useful clear-sky regio
 * validAreaImg - A mask of the image data area (1 = valid and 0 = not-valid; i.e., outside of the data area)
 * outputClearSkyMask - The output mask of the clear sky areas
 * outFormat - The output image format.
-* tmpPath - The path for temporay images produced during the processing to be stored (Default: './tmpClearSky').
+* tmpPath - The path for temporay images produced during the processing to be stored (Default: './tmpClearSky'; Note. all temp files are generated as KEA files).
 * deleteTmpFiles - Boolean as to whether the intermediate files should be deleted following processing (Default: True - delete files).
 * initClearSkyRegionDist - The distance in metres from a cloud/shadow object for the initial identification of clear sky regions (Default: 5000)
 * initClearSkyRegionMinSize - The minimum size (in pixels) of the initial clear sky regions (Default: 3000 pixels)
@@ -158,9 +158,7 @@ rsgislib.imagecalibration.calcClearSkyRegions(cloudsImg, validAreaImg, outputMas
     rsgislib.segmentation.rmSmallClumps(tmpClearSkyRegionsFullExtentSelectClumpsOpenClump, tmpClearSkyRegionsFullExtentSelectClumpsOpenClumpRMSmall, initClearSkyRegionMinSize, 'KEA')
     
     rsgislib.imagecalc.imageMath(tmpClearSkyRegionsFullExtentSelectClumpsOpenClumpRMSmall, outputClearSkyMask, "b1>0?1:0", outFormat, rsgislib.TYPE_8UINT)
-    
-    rsgislib.rastergis.populateStats(outputClearSkyMask, True, True)
-    
+        
     if deleteTmpFiles:
         rsgisUtils = rsgislib.RSGISPyUtils()
         rsgisUtils.deleteFileWithBasename(tmpCloudsImgDist2Clouds)
