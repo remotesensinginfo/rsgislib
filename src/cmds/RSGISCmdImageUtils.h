@@ -50,7 +50,7 @@ namespace rsgis{ namespace cmds {
     DllExport void executeStretchImageWithStats(std::string inputImage, std::string outputImage, std::string inStatsFile, std::string gdalFormat, RSGISLibDataType outDataType, RSGISStretches stretchType, float stretchParam)throw(RSGISCmdException);
     
     /** Function to run the mask image command */
-    DllExport void executeMaskImage(std::string inputImage, std::string imageMask, std::string outputImage, std::string gdalFormat, RSGISLibDataType outDataType, float outValue, float maskValue)throw(RSGISCmdException);
+    DllExport void executeMaskImage(std::string inputImage, std::string imageMask, std::string outputImage, std::string gdalFormat, RSGISLibDataType outDataType, float outValue, std::vector<float> maskValues)throw(RSGISCmdException);
     
     /** A function to split an image into image tiles.
         An overlap between tiles may be specified.

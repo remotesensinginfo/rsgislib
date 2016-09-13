@@ -40,7 +40,7 @@ namespace rsgis{namespace img{
 		{
 		public: 
 			RSGISMaskImage();
-			void maskImage(GDALDataset *dataset, GDALDataset *mask, std::string outputImage, std::string imageFormat, GDALDataType outDataType, double outputValue, double maskValue)throw(RSGISImageCalcException,RSGISImageBandException);
+			void maskImage(GDALDataset *dataset, GDALDataset *mask, std::string outputImage, std::string imageFormat, GDALDataType outDataType, double outputValue, std::vector<float> maskValues)throw(RSGISImageCalcException,RSGISImageBandException);
             void genFiniteImgMask(GDALDataset *dataset, std::string outputImage, std::string imageFormat)throw(RSGISImageCalcException,RSGISImageBandException);
             void genValidImgMask(GDALDataset **dataset, unsigned int numImages, std::string outputImage, std::string imageFormat, float noDataVal)throw(RSGISImageCalcException,RSGISImageBandException);
         };
@@ -48,7 +48,7 @@ namespace rsgis{namespace img{
 	class DllExport RSGISApplyImageMask : public RSGISCalcImageValue
 		{
 		public: 
-			RSGISApplyImageMask(int numberOutBands, double outputValue, double maskValue);
+			RSGISApplyImageMask(int numberOutBands, double outputValue, std::vector<float> maskValues);
 			void calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException);
             void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
             void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
@@ -62,7 +62,7 @@ namespace rsgis{namespace img{
 			~RSGISApplyImageMask();
 		protected:
 			double outputValue;
-            double maskValue;
+            std::vector<float> maskValues;
 		};
     
     class DllExport RSGISCreateFiniteImageMask : public RSGISCalcImageValue
