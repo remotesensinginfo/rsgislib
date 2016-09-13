@@ -166,15 +166,51 @@ static PyObject *ImageUtils_maskImage(PyObject *self, PyObject *args)
 {
     const char *pszInputImage, *pszImageMask, *pszOutputImage, *pszGDALFormat;
     int nDataType;
-    float outValue, maskValue;
-    if( !PyArg_ParseTuple(args, "ssssiff:maskImage", &pszInputImage, &pszImageMask, &pszOutputImage, 
-                                &pszGDALFormat, &nDataType, &outValue, &maskValue ))
+    float outValue;
+    PyObject *maskValueObj;
+    if( !PyArg_ParseTuple(args, "ssssifO:maskImage", &pszInputImage, &pszImageMask, &pszOutputImage,
+                                &pszGDALFormat, &nDataType, &outValue, &maskValueObj ))
+    {
         return NULL;
+    }
 
+    std::vector<float> maskValues;
+    if( !PySequence_Check(maskValueObj))
+    {
+        if(RSGISPY_CHECK_FLOAT(maskValueObj) || RSGISPY_CHECK_INT(maskValueObj))
+        {
+            float val = RSGISPY_FLOAT_EXTRACT(maskValueObj);
+            maskValues.push_back(val);
+        }
+        else
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Mask value must be numeric or a list of numeric.");
+            return NULL;
+        }
+    }
+    else
+    {
+        Py_ssize_t numMaskVals = PySequence_Size(maskValueObj);
+        for( Py_ssize_t n = 0; n < numMaskVals; n++ )
+        {
+            PyObject *o = PySequence_GetItem(maskValueObj, n);
+            if(RSGISPY_CHECK_FLOAT(o) || RSGISPY_CHECK_INT(o))
+            {
+                float val = RSGISPY_FLOAT_EXTRACT(o);
+                maskValues.push_back(val);
+            }
+            else
+            {
+                PyErr_SetString(GETSTATE(self)->error, "Mask value must be numeric or a list of numeric.");
+                return NULL;
+            }
+        }
+    }
+    
     try
     {
         rsgis::cmds::executeMaskImage(pszInputImage, pszImageMask, pszOutputImage, pszGDALFormat, 
-                            (rsgis::RSGISLibDataType)nDataType, outValue, maskValue);
+                            (rsgis::RSGISLibDataType)nDataType, outValue, maskValues);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -1323,7 +1359,18 @@ static PyMethodDef ImageUtilsMethods[] = {
 "* gdalformat is a string representing the output image file format (e.g., KEA, ENVI, GTIFF, HFA etc).\n"
 "* datatype is a rsgislib.TYPE_* value for the data type of the output image.\n"
 "* outvalue is a float representing the value written to the output image in place of the regions being masked.\n"
-"* maskvalue is a float representing the value within the mask image for the regions which are to be replaced with the outvalue.\n"
+"* maskvalue is a float or list of floats representing the value(s) within the mask image for the regions which are to be replaced with the outvalue.\n"
+"\n"
+"Example::\n"
+"import rsgislib\n"
+"from rsgislib import imageutils\n"
+"\n"
+"inImg = './LS5/Outputs/LS5TM_20110926_lat53lon511_r23p205_rad_toa.kea'\n"
+"imgMask = './LS5/Outputs/LS5TM_20110926_lat53lon511_r23p205_clouds.kea'\n"
+"outImg = './LS5/Outputs/LS5TM_20110926_lat53lon511_r23p205_rad_toa_mclds.kea'\n"
+"\n"
+"imageutils.maskImage(inImg, imgMask, outImg, 'KEA', rsgislib.TYPE_16UINT, 0, [1,2])\n"
+"imageutils.popImageStats(outImg, True, 0.0, True)\n"
 "\n"},
 
     {"createTiles", ImageUtils_createTiles, METH_VARARGS,

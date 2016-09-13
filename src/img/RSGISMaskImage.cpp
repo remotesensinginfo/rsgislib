@@ -29,7 +29,7 @@ namespace rsgis{namespace img{
 		
 	}
 	
-	void RSGISMaskImage::maskImage(GDALDataset *dataset, GDALDataset *mask, std::string outputImage, std::string imageFormat, GDALDataType outDataType, double outputValue, double maskValue)throw(RSGISImageCalcException,RSGISImageBandException)
+	void RSGISMaskImage::maskImage(GDALDataset *dataset, GDALDataset *mask, std::string outputImage, std::string imageFormat, GDALDataType outDataType, double outputValue, std::vector<float> maskValues)throw(RSGISImageCalcException,RSGISImageBandException)
 	{
 		GDALDataset **datasets = NULL;
 		try
@@ -39,7 +39,7 @@ namespace rsgis{namespace img{
 			datasets[0] = mask;
 			datasets[1] = dataset;
 			
-			RSGISApplyImageMask applyMask = RSGISApplyImageMask(dataset->GetRasterCount(), outputValue, maskValue);
+			RSGISApplyImageMask applyMask = RSGISApplyImageMask(dataset->GetRasterCount(), outputValue, maskValues);
 			RSGISCalcImage calcImg = RSGISCalcImage(&applyMask, "", true);
 			calcImg.calcImage(datasets, numDS, outputImage, false, NULL, imageFormat, outDataType);
 			
@@ -105,15 +105,25 @@ namespace rsgis{namespace img{
     }
     
 	
-	RSGISApplyImageMask::RSGISApplyImageMask(int numberOutBands, double outputValue, double maskValue) : RSGISCalcImageValue(numberOutBands)
+	RSGISApplyImageMask::RSGISApplyImageMask(int numberOutBands, double outputValue, std::vector<float> maskValues) : RSGISCalcImageValue(numberOutBands)
 	{
 		this->outputValue = outputValue;
-        this->maskValue = maskValue;
+        this->maskValues = maskValues;
 	}
 	
 	void RSGISApplyImageMask::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
 	{
-		if(bandValues[0] == maskValue)
+        bool foundMaskVal = false;
+        for(std::vector<float>::iterator iterVals = maskValues.begin(); iterVals != maskValues.end(); ++iterVals)
+        {
+            if(bandValues[0] == (*iterVals))
+            {
+                foundMaskVal = true;
+                break;
+            }
+        }
+        
+		if(foundMaskVal)
 		{
 			for(int i = 0; i < numOutBands; i++)
 			{

@@ -4132,7 +4132,10 @@ void RSGISExeImageUtils::runAlgorithm() throw(RSGISException)
 
 			try
             {
-                rsgis::cmds::executeMaskImage(this->inputImage, this->imageMask, this->outputImage, this->imageFormat, this->rsgisOutDataType, this->outValue, this->maskValue);
+                std::vector<float> values;
+                values.push_back(this->maskValue);
+                
+                rsgis::cmds::executeMaskImage(this->inputImage, this->imageMask, this->outputImage, this->imageFormat, this->rsgisOutDataType, this->outValue, values);
             }
             catch(rsgis::cmds::RSGISCmdException &e)
             {

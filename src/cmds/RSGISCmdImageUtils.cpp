@@ -164,7 +164,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeMaskImage(std::string inputImage, std::string imageMask, std::string outputImage, std::string gdalFormat, RSGISLibDataType outDataType, float outValue, float maskValue)throw(RSGISCmdException)
+    void executeMaskImage(std::string inputImage, std::string imageMask, std::string outputImage, std::string gdalFormat, RSGISLibDataType outDataType, float outValue, std::vector<float> maskValues)throw(RSGISCmdException)
     {
         try
         {
@@ -184,7 +184,7 @@ namespace rsgis{ namespace cmds {
             }
 
             rsgis::img::RSGISMaskImage maskImage =  rsgis::img::RSGISMaskImage();
-            maskImage.maskImage(dataset, mask, outputImage, gdalFormat, RSGIS_to_GDAL_Type(outDataType), outValue, maskValue);
+            maskImage.maskImage(dataset, mask, outputImage, gdalFormat, RSGIS_to_GDAL_Type(outDataType), outValue, maskValues);
 
             GDALClose(dataset);
             GDALClose(mask);
