@@ -45,6 +45,7 @@ Statistics
 .. autofunction:: rsgislib.imagecalc.correlationWindow
 .. autofunction:: rsgislib.imagecalc.getImageBandModeInEnv
 .. autofunction:: rsgislib.imagecalc.getImageStatsInEnv
+.. autofunction:: rsgislib.imagecalc.calcPropTrueExp
 
 
 Normalise

@@ -63,35 +63,72 @@ namespace rsgis{namespace img{
 		}
 	}
 
-	void RSGISBandMath::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
-	{
-		throw RSGISImageCalcException("No implemented");
-	}
-	
-	void RSGISBandMath::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException)
-	{
-		throw RSGISImageCalcException("Not Implemented");
-	}
-
-	void RSGISBandMath::calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) throw(RSGISImageCalcException)
-	{
-		throw RSGISImageCalcException("No implemented");
-	}
-
-	void RSGISBandMath::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException)
-	{
-		throw RSGISImageCalcException("No implemented");
-	}
-
-	bool RSGISBandMath::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException)
-	{
-		throw RSGISImageCalcException("No implemented");
-	}
-
 	RSGISBandMath::~RSGISBandMath()
 	{
-
+        delete[] inVals;
 	}
+    
+    
+    
+    
+    
+    RSGISCalcPropExpTruePxls::RSGISCalcPropExpTruePxls(VariableBands **variables, int numVariables, mu::Parser *muParser, bool useMask):RSGISCalcImageValue(0)
+    {
+        this->variables = variables;
+        this->numVariables = numVariables;
+        this->useMask = useMask;
+        
+        this->muParser = muParser;
+        this->inVals = new mu::value_type[numVariables];
+        for(int i = 0; i < numVariables; ++i)
+        {
+            muParser->DefineVar(_T(variables[i]->name.c_str()), &inVals[i]);
+        }
+        
+        this->truePxlCount = 0.0;
+        this->totalPxlCount = 0.0;
+    }
+
+    void RSGISCalcPropExpTruePxls::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+    {
+        try
+        {
+            if((!this->useMask) | (this->useMask & (bandValues[0] == 1)))
+            {
+                for(int i = 0; i < numVariables; ++i)
+                {
+                    inVals[i] = bandValues[variables[i]->band];
+                }
+                mu::value_type result = 0;
+                result = muParser->Eval();
+                
+                if(1 == floor(result))
+                {
+                    this->truePxlCount = this->truePxlCount + 1.0;
+                }
+                this->totalPxlCount = this->totalPxlCount + 1.0;
+            }
+            
+        }
+        catch (mu::ParserError &e)
+        {
+            std::string message = std::string("ERROR: ") + std::string(e.GetMsg()) + std::string(":\t \'") + std::string(e.GetExpr()) + std::string("\'");
+            throw RSGISImageCalcException(message);
+        }
+    }
+    
+    float RSGISCalcPropExpTruePxls::getPropPxlVal()
+    {
+        return this->truePxlCount / this->totalPxlCount;
+    }
+    
+    RSGISCalcPropExpTruePxls::~RSGISCalcPropExpTruePxls()
+    {
+        delete[] inVals;
+    }
+
+    
+    
     
 }}
 

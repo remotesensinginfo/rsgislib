@@ -1063,10 +1063,10 @@ static PyObject *ImageCalc_GetHistogram(PyObject *self, PyObject *args) {
     return outList;
 }
 
-static PyObject *ImageCalc_BandPercentile(PyObject *self, PyObject *args) {
+static PyObject *ImageCalc_BandPercentile(PyObject *self, PyObject *args)
+{
     const char *inputImage;
     float percentile;
-    int noDataValueSpecified;
     PyObject *noDataValueObj;
 
     if(!PyArg_ParseTuple(args, "sfO:bandPercentile", &inputImage, &percentile, &noDataValueObj))
@@ -1382,6 +1382,104 @@ static PyObject *ImageCalc_CalcMaskImgPxlValProb(PyObject *self, PyObject *args)
     
     Py_RETURN_NONE;
 }
+
+
+static PyObject *ImageCalc_CalcPropTrueExp(PyObject *self, PyObject *args)
+{
+    const char *pszExpression;
+    PyObject *pBandDefnObj;
+    PyObject *pInValidImageObj;
+    if( !PyArg_ParseTuple(args, "sO|O:calcPropTrueExp", &pszExpression, &pBandDefnObj, &pInValidImageObj))
+    {
+        return NULL;
+    }
+    
+    if( !PySequence_Check(pBandDefnObj))
+    {
+        PyErr_SetString(GETSTATE(self)->error, "band defs argument must be a sequence");
+        return NULL;
+    }
+    
+    Py_ssize_t nBandDefns = PySequence_Size(pBandDefnObj);
+    rsgis::cmds::VariableStruct *pRSGISStruct = new rsgis::cmds::VariableStruct[nBandDefns];
+    
+    for( Py_ssize_t n = 0; n < nBandDefns; n++ )
+    {
+        PyObject *o = PySequence_GetItem(pBandDefnObj, n);
+        
+        PyObject *pBandName = PyObject_GetAttrString(o, "bandName");
+        if( ( pBandName == NULL ) || ( pBandName == Py_None ) || !RSGISPY_CHECK_STRING(pBandName) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'bandName\'" );
+            Py_XDECREF(pBandName);
+            Py_DECREF(o);
+            delete[] pRSGISStruct;
+            return NULL;
+        }
+        
+        PyObject *pFileName = PyObject_GetAttrString(o, "fileName");
+        if( ( pFileName == NULL ) || ( pFileName == Py_None ) || !RSGISPY_CHECK_STRING(pFileName) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'fileName\'" );
+            Py_DECREF(pBandName);
+            Py_XDECREF(pFileName);
+            Py_DECREF(o);
+            delete[] pRSGISStruct;
+            return NULL;
+        }
+        
+        PyObject *pBandIndex = PyObject_GetAttrString(o, "bandIndex");
+        if( ( pBandIndex == NULL ) || ( pBandIndex == Py_None ) || !RSGISPY_CHECK_INT(pBandIndex) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "could not find integer attribute \'bandIndex\'" );
+            Py_DECREF(pBandName);
+            Py_DECREF(pFileName);
+            Py_XDECREF(pBandIndex);
+            Py_DECREF(o);
+            delete[] pRSGISStruct;
+            return NULL;
+        }
+        
+        pRSGISStruct[n].name = RSGISPY_STRING_EXTRACT(pBandName);
+        pRSGISStruct[n].image = RSGISPY_STRING_EXTRACT(pFileName);
+        pRSGISStruct[n].bandNum = RSGISPY_INT_EXTRACT(pBandIndex);
+        
+        Py_DECREF(pBandName);
+        Py_DECREF(pFileName);
+        Py_DECREF(pBandIndex);
+        Py_DECREF(o);
+    }
+    
+    bool useValidImg = false;
+    std::string inValidImage = "";
+    if(RSGISPY_CHECK_STRING(pInValidImageObj))
+    {
+        useValidImg = true;
+        inValidImage = RSGISPY_STRING_EXTRACT(pInValidImageObj);
+    }
+    
+    float prop = 0.0;
+    try
+    {
+        prop = rsgis::cmds::executeCalcPropTrueExp(pRSGISStruct, nBandDefns, std::string(pszExpression), inValidImage, useValidImg);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    delete[] pRSGISStruct;
+    
+    PyObject *outVal = Py_BuildValue("f", prop);
+    /*
+    if(PyTuple_SetItem(outVal, 0, Py_BuildValue("f", prop)) == -1)
+    {
+        throw rsgis::cmds::RSGISCmdException("Failed to add \'proportion\' value to the list...");
+    }
+    */
+    return outVal;
+}
+
 
 
 // Our list of functions in this module
@@ -1960,70 +2058,93 @@ static PyMethodDef ImageCalcMethods[] = {
 "\n"},
     
 {"getImageBandModeInEnv", ImageCalc_GetImageBandModeInEnv, METH_VARARGS,
-    "imagecalc.getImageBandModeInEnv(inputImage, imgBand, binWidth, noDataVal, latMin, latMax, longMin, longMax)\n"
-    "Calculates and returns the image mode for a region.\n"
-    "defined by the bounding box (latMin, latMax, longMin, longMax) which is specified\n"
-    "geographic latitude and longitude. The coordinates are converted to the projection\n"
-    "of the input image at runtime (if required) and therefore the image projection needs\n"
-    "to be correctly defined so please check this is the case and define it if necessary."
-    "where:\n"
-    "  * inputImage is a string containing the name of the input image file\n"
-    "  * imgBand is an unsigned int specifying the image band starting from 1.\n"
-    "  * binWidth is a float specifying the binWidth for the histogram generated to calculate the mode.\n"
-    "  * noDataVal is a float specifying a no data value, to be ignored in the calculation.\n"
-    "              If a value of \'None\' is provided then a no data value is not used.\n"
-    "  * latMin is a double specifying the minimum latitude of the BBOX\n"
-    "  * latMax is a double specifying the maximum latitude of the BBOX\n"
-    "  * longMin is a double specifying the minimum longitude of the BBOX\n"
-    "  * longMax is a double specifying the maximum longitude of the BBOX\n"
-    "returns:\n"
-    "  * float with image mode for the region within the BBOX.\n"
-},
-    
-{"get2DImageHistogram", ImageCalc_Get2DImageHistogram, METH_VARARGS,
-    "imagecalc.get2DImageHistogram(inputImage1, inputImage2, outputImage, gdalFormat, img1Band, img2Band, numBins, img1Min, img1Max, img2Min, img2Max, normOutput)\n"
-    "Calculates at 2D histogram between two bands of two input images"
-    "where:\n"
-    "  * inputImage1 is a string containing the name of the first input image file\n"
-    "  * inputImage2 is a string containing the name of the second input image file\n"
-    "  * outputImage is a string containing the name of the output image file containing the histogram.\n"
-    "  * gdalFormat is a string specifying output image format.\n"
-    "  * img1Band is an unsigned integer specifying the image band from image 1 to be used.\n"
-    "  * img2Band is an unsigned integer specifying the image band from image 2 to be used.\n"
-    "  * numBins is an unsigned integer specifying the number of bins to be used on each histogram axis\n"
-    "            (it'll produce a square histogram).\n"
-    "  * img1Min is a double specifying the minimum image value for image 1 to be used in the histogram.\n"
-    "  * img1Max is a double specifying the maximum image value for image 1 to be used in the histogram.\n"
-    "  * img2Min is a double specifying the minimum image value for image 2 to be used in the histogram.\n"
-    "  * img2Max is a double specifying the maximum image value for image 2 to be used in the histogram.\n"
-    "  * normOutput is a boolean specifying whether the output histogram should be normalised to unit volume.\n"
-    "returns:\n"
-    "  * double with bin width of the axis of image 1.\n"
-    "  * double with bin width of the axis of image 2.\n"
+"imagecalc.getImageBandModeInEnv(inputImage, imgBand, binWidth, noDataVal, latMin, latMax, longMin, longMax)\n"
+"Calculates and returns the image mode for a region.\n"
+"defined by the bounding box (latMin, latMax, longMin, longMax) which is specified\n"
+"geographic latitude and longitude. The coordinates are converted to the projection\n"
+"of the input image at runtime (if required) and therefore the image projection needs\n"
+"to be correctly defined so please check this is the case and define it if necessary."
+"where:\n"
+"  * inputImage is a string containing the name of the input image file\n"
+"  * imgBand is an unsigned int specifying the image band starting from 1.\n"
+"  * binWidth is a float specifying the binWidth for the histogram generated to calculate the mode.\n"
+"  * noDataVal is a float specifying a no data value, to be ignored in the calculation.\n"
+"              If a value of \'None\' is provided then a no data value is not used.\n"
+"  * latMin is a double specifying the minimum latitude of the BBOX\n"
+"  * latMax is a double specifying the maximum latitude of the BBOX\n"
+"  * longMin is a double specifying the minimum longitude of the BBOX\n"
+"  * longMax is a double specifying the maximum longitude of the BBOX\n"
+"returns:\n"
+"  * float with image mode for the region within the BBOX.\n"
 },
 
-    
-{"calcMaskImgPxlValProb", ImageCalc_CalcMaskImgPxlValProb, METH_VARARGS,
-    "imagecalc.calcMaskImgPxlValProb(inputImage, inImgBands, maskImg, maskImgVal, outputImage, gdalFormat, histBinWidths, useImgNoData, rescaleProbs)\n"
-    "Calculates the probability of each image pixel value occuring as defined by the distrubution\n"
-    "of image pixel values within the masked region of the image."
-    "where:\n"
-    "  * inputImage is a string containing the name/path of the input image file.\n"
-    "  * inImgBands is a list containing the image bands for which the probability will be calculated \n"
-    "               (Note. number of output bands will equal number of bands specified here.\n"
-    "  * maskImg is a string containing the name/path of the input mask image file.\n"
-    "  * maskImgVal is an integer corresponding to the pixel value in the mask image defining mask used for this calculation.\n"
-    "  * outputImage is a string containing the name of the output image file.\n"
-    "  * gdalFormat is a string specifying output image format.\n"
-    "  * histBinWidths is list of floating point values for the width of the histogram bins used to calculate the probability (one value for each band specified) \n"
-    "                 (Note. larger bin widths will increase the difference between high and low probabilities) \n"
-    "                 This parameter is optional and if not specified or value is less than 0 then the bin width will\n"
-    "                 be estimated from the data.\n"
-    "  * useImgNoData is a boolean specifying whether (if specified) the no data value specified in the band header\n"
-    "                 should be excluded from the histogram (Optional and if not specfied defaults to True).\n"
-    " * rescaleProbs is a boolean specifying whether the probabilities should be rescaled to a range of 0-1 as values\n"
-    "                can be very small when a number of variables are used. (Optional and if not specified the default is True)."
+{"get2DImageHistogram", ImageCalc_Get2DImageHistogram, METH_VARARGS,
+"imagecalc.get2DImageHistogram(inputImage1, inputImage2, outputImage, gdalFormat, img1Band, img2Band, numBins, img1Min, img1Max, img2Min, img2Max, normOutput)\n"
+"Calculates at 2D histogram between two bands of two input images"
+"where:\n"
+"  * inputImage1 is a string containing the name of the first input image file\n"
+"  * inputImage2 is a string containing the name of the second input image file\n"
+"  * outputImage is a string containing the name of the output image file containing the histogram.\n"
+"  * gdalFormat is a string specifying output image format.\n"
+"  * img1Band is an unsigned integer specifying the image band from image 1 to be used.\n"
+"  * img2Band is an unsigned integer specifying the image band from image 2 to be used.\n"
+"  * numBins is an unsigned integer specifying the number of bins to be used on each histogram axis\n"
+"            (it'll produce a square histogram).\n"
+"  * img1Min is a double specifying the minimum image value for image 1 to be used in the histogram.\n"
+"  * img1Max is a double specifying the maximum image value for image 1 to be used in the histogram.\n"
+"  * img2Min is a double specifying the minimum image value for image 2 to be used in the histogram.\n"
+"  * img2Max is a double specifying the maximum image value for image 2 to be used in the histogram.\n"
+"  * normOutput is a boolean specifying whether the output histogram should be normalised to unit volume.\n"
+"returns:\n"
+"  * double with bin width of the axis of image 1.\n"
+"  * double with bin width of the axis of image 2.\n"
 },
+
+
+{"calcMaskImgPxlValProb", ImageCalc_CalcMaskImgPxlValProb, METH_VARARGS,
+"imagecalc.calcMaskImgPxlValProb(inputImage, inImgBands, maskImg, maskImgVal, outputImage, gdalFormat, histBinWidths, useImgNoData, rescaleProbs)\n"
+"Calculates the probability of each image pixel value occuring as defined by the distrubution\n"
+"of image pixel values within the masked region of the image."
+"where:\n"
+"  * inputImage is a string containing the name/path of the input image file.\n"
+"  * inImgBands is a list containing the image bands for which the probability will be calculated \n"
+"               (Note. number of output bands will equal number of bands specified here.\n"
+"  * maskImg is a string containing the name/path of the input mask image file.\n"
+"  * maskImgVal is an integer corresponding to the pixel value in the mask image defining mask used for this calculation.\n"
+"  * outputImage is a string containing the name of the output image file.\n"
+"  * gdalFormat is a string specifying output image format.\n"
+"  * histBinWidths is list of floating point values for the width of the histogram bins used to calculate the probability (one value for each band specified) \n"
+"                 (Note. larger bin widths will increase the difference between high and low probabilities) \n"
+"                 This parameter is optional and if not specified or value is less than 0 then the bin width will\n"
+"                 be estimated from the data.\n"
+"  * useImgNoData is a boolean specifying whether (if specified) the no data value specified in the band header\n"
+"                 should be excluded from the histogram (Optional and if not specfied defaults to True).\n"
+" * rescaleProbs is a boolean specifying whether the probabilities should be rescaled to a range of 0-1 as values\n"
+"                can be very small when a number of variables are used. (Optional and if not specified the default is True)."
+},
+
+
+{"calcPropTrueExp", ImageCalc_CalcPropTrueExp, METH_VARARGS,
+"imagecalc.calcPropTrueExp(expression, bandDefnSeq, validImgMask)\n"
+"Calculates the proportion of the image where the expression is true. Optionally a mask defining the valid area \n"
+"can be used to restrict the area of the image used as the total number of pixels within the scene.\n"
+"where:\n"
+"  * expression is a string containing the expression to run over the images, uses muparser syntax. Must output a value of 1 to be true.\n"
+"  * bandDefnSeq is a sequence of rsgislib.imagecalc.BandDefn objects that define the inputs\n"
+"  * validImgMask is an optional string specifying a valid area image mask. If not specified then it won't be used.\n"
+"Returns:\n"
+"  * Returns a float value with the proportion\n"
+"Example::\n"
+"\n"
+"   from rsgislib import imagecalc\n"
+"   from rsgislib.imagecalc import BandDefn\n"
+"   expression = 'b1<20?1:b2>100?1:0'\n"
+"   bandDefns = []\n"
+"   bandDefns.append(BandDefn('b1', inFileName, 1))\n"
+"   bandDefns.append(BandDefn('b2', inFileName, 2))\n"
+"   prop = imagecalc.calcPropTrueExp(bandDefns, expression)\n"
+"   print(prop)\n"
+"\n"},
     
     {NULL}        /* Sentinel */
 };

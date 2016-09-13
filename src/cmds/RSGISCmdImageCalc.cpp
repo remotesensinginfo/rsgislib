@@ -2747,5 +2747,109 @@ namespace rsgis{ namespace cmds {
         }
     }
                 
+    float executeCalcPropTrueExp(VariableStruct *variables, unsigned int numVars, std::string mathsExpression, std::string inValidImage, bool useValidImg) throw(RSGISCmdException)
+    {
+        GDALAllRegister();
+        GDALDataset **datasets = NULL;
+        mu::Parser *muParser = new mu::Parser();
+        float propPxls = 0.0;
+        
+        try
+        {
+            int numImgs = numVars;
+            
+            if(useValidImg)
+            {
+                numImgs = numImgs + 1;
+            }
+            datasets = new GDALDataset*[numImgs];
+            
+            int imgNum = 0;
+            int numRasterBands = 0;
+            int totalNumRasterBands = 0;
+
+            if(useValidImg)
+            {
+                std::cout << inValidImage << std::endl;
+                datasets[0] = (GDALDataset *) GDALOpen(inValidImage.c_str(), GA_ReadOnly);
+                numRasterBands = datasets[0]->GetRasterCount();
+                totalNumRasterBands = numRasterBands;
+                imgNum = 1;
+            }
+            
+            rsgis::img::VariableBands **processVaribles = new rsgis::img::VariableBands*[numVars];
+
+            for(int i = 0; i < numVars; ++i)
+            {
+                std::cout << variables[i].image << std::endl;
+                datasets[imgNum] = (GDALDataset *) GDALOpen(variables[i].image.c_str(), GA_ReadOnly);
+                if(datasets[imgNum] == NULL)
+                {
+                    std::string message = std::string("Could not open image ") + variables[i].image;
+                    throw rsgis::RSGISImageException(message.c_str());
+                }
+                
+                numRasterBands = datasets[imgNum]->GetRasterCount();
+                
+                if((variables[i].bandNum < 0) | (variables[i].bandNum > numRasterBands))
+                {
+                    throw rsgis::RSGISImageException("You have specified a band which is not within the image");
+                }
+                
+                processVaribles[i] = new rsgis::img::VariableBands();
+                processVaribles[i]->name = variables[i].name;
+                processVaribles[i]->band = totalNumRasterBands + (variables[i].bandNum - 1);
+                
+                totalNumRasterBands += numRasterBands;
+                ++imgNum;
+            }
+            
+            mu::value_type *inVals = new mu::value_type[numVars];
+            for(int i = 0; i < numVars; ++i)
+            {
+                inVals[i] = 0;
+                muParser->DefineVar(_T(processVaribles[i]->name.c_str()), &inVals[i]);
+            }
+            
+            muParser->SetExpr(mathsExpression.c_str());
+            
+            rsgis::img::RSGISCalcPropExpTruePxls calcPropPxls = rsgis::img::RSGISCalcPropExpTruePxls(processVaribles, numVars, muParser, useValidImg);
+            
+            rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(&calcPropPxls, "", true);
+            calcImage.calcImage(datasets, numImgs);
+            
+            propPxls = calcPropPxls.getPropPxlVal();
+            
+            for(int i = 0; i < numVars; ++i)
+            {
+                GDALClose(datasets[i]);
+                delete processVaribles[i];
+            }
+            delete[] datasets;
+            delete[] processVaribles;
+            delete[] inVals;
+            delete muParser;
+        }
+        catch(rsgis::RSGISImageException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (mu::ParserError &e)
+        {
+            std::string message = std::string("ERROR: ") + std::string(e.GetMsg()) + std::string(":\t \'") + std::string(e.GetExpr()) + std::string("\'");
+            throw RSGISCmdException(message);
+        }
+        catch (std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        
+        return propPxls;
+    }
+                
 }}
 
