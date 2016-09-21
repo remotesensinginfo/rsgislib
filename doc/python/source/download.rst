@@ -27,19 +27,19 @@ Binary Downloads
 
 We make binary downloads available for Linux and OS X, built using Python 3, through conda. You can get conda through the Anaconda or Miniconda Python distribution. More details are available from http://conda.pydata.org
 
-To install RSGISLib use:
+The recomended way to install is though the conda environment we provide. On Linux run:
 
 .. code-block:: bash
 
-    conda install -c osgeo rsgislib
+    conda env create au-eoed/au-osgeo-lnx
+    source activate au-osgeo-lnx
 
-You then need to set the following environmental variables:
+And for OS X:
 
 .. code-block:: bash
 
-    export GDAL_DRIVER_PATH=~/anaconda3/lib/gdalplugins:$GDAL_DRIVER_PATH
-    export GDAL_DATA=~/anaconda3/share/gdal
+    conda env create au-eoed/au-osgeo-osx
+    source activate au-osgeo-osx
 
-Changing if you have not installed anaconda to the standard location (or used miniconda which installs to ‘miniconda3′).
 
 
