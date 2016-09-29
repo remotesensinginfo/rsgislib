@@ -803,7 +803,7 @@ Example::
     from rsgislib import imagefilter
     inputImage = 'jers1palsar_stack.kea'
     outImgFile = 'jers1palsar_stack_lee.kea'
-    imagefilter.applyLaplacianFilter(inputImage, outImgFile, 3, 3, "KEA", rsgislib.TYPE_32FLOAT)
+    imagefilter.applyLeeFilter(inputImage, outImgFile, 3, 3, "KEA", rsgislib.TYPE_32FLOAT)
 
     """
     outputImageBase, outExt = os.path.splitext(outputImage)
