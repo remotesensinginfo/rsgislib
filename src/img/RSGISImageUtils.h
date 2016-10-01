@@ -174,6 +174,7 @@ namespace rsgis
                 GDALDataset* createCopy(GDALDataset *inData, std::string outputFilePath, std::string outputFormat, GDALDataType eType, bool useImgProj=true, std::string proj="")throw(RSGISImageException);
                 GDALDataset* createCopy(GDALDataset *inData, unsigned int numBands, std::string outputFilePath, std::string outputFormat, GDALDataType eType, bool useImgProj=true, std::string proj="")throw(RSGISImageException);
                 GDALDataset* createCopy(GDALDataset *inData, unsigned int numBands, std::string outputFilePath, std::string outputFormat, GDALDataType eType, geos::geom::Envelope extent, bool useImgProj=true, std::string proj="")throw(RSGISImageException);
+                GDALDataset* createCopy(GDALDataset **datasets, int numDS, unsigned int numBands, std::string outputFilePath, std::string outputFormat, GDALDataType eType, bool useImgProj=true, std::string proj="")throw(RSGISImageException);
                 void createKMLText(std::string inputImage, std::string outKMLFile) throw(RSGISImageBandException);
                 bool closeResTest(double baseRes, double targetRes);
                 double getPixelValue(GDALDataset *image, unsigned int imgBand, double xLoc, double yLoc) throw(RSGISImageException);

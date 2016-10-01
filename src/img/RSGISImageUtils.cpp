@@ -4916,7 +4916,73 @@ namespace rsgis{namespace img{
         }
         return dataset;
     }
-
+    
+    GDALDataset* RSGISImageUtils::createCopy(GDALDataset **datasets, int numDS, unsigned int numBands, std::string outputFilePath, std::string outputFormat, GDALDataType eType, bool useImgProj, std::string proj)throw(RSGISImageException)
+    {
+        GDALDataset *dataset = NULL;
+        try
+        {
+            int **dsOffsets = new int*[numDS];
+            for(int i = 0; i < numDS; ++i)
+            {
+                dsOffsets[i] = new int[2];
+                dsOffsets[0] = 0;
+                dsOffsets[1] = 0;
+            }
+            int width = 0;
+            int height = 0;
+            double *gdalTranslation = new double[6];
+            this->getImageOverlap(datasets, numDS, dsOffsets, &width, &height, gdalTranslation);
+            for(int i = 0; i < numDS; ++i)
+            {
+                delete[] dsOffsets[i];
+            }
+            delete[] dsOffsets;
+            
+            GDALDriver *gdalDriver = NULL;
+            gdalDriver = GetGDALDriverManager()->GetDriverByName(outputFormat.c_str());
+            if(gdalDriver == NULL)
+            {
+                delete[] gdalTranslation;
+                std::string message = std::string("Driver for ") + outputFormat + std::string(" does not exist\n");
+                throw RSGISImageException(message.c_str());
+            }
+            GDALDataset *dataset = gdalDriver->Create(outputFilePath.c_str(), width, height, numBands, eType, NULL);
+            if(dataset == NULL)
+            {
+                delete[] gdalTranslation;
+                std::string message = std::string("Could not create GDALDataset.");
+                throw RSGISImageException(message);
+            }
+            
+            dataset->SetGeoTransform(gdalTranslation);
+            if(useImgProj)
+            {
+                dataset->SetProjection(datasets[0]->GetProjectionRef());
+            }
+            else
+            {
+                dataset->SetProjection(proj.c_str());
+            }
+            
+            delete[] gdalTranslation;
+        }
+        catch(RSGISImageException &e)
+        {
+            throw e;
+        }
+        catch(RSGISException &e)
+        {
+            throw RSGISImageException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISImageException(e.what());
+        }
+        
+        return dataset;
+    }
+    
     void RSGISImageUtils::createKMLText(std::string inputImage, std::string outKMLFile) throw(RSGISImageBandException)
     {
         
