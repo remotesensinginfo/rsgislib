@@ -181,6 +181,75 @@ namespace rsgis{namespace img{
 				}
 			}
 			
+            double tmpMinX = 0;
+            double tmpMaxY = 0;
+            tmpMaxX = 0;
+            tmpMinY = 0;
+            
+            double maxDiffX = 0;
+            double maxDiffY = 0;
+            bool foundXDiff = false;
+            bool foundYDiff = false;
+            
+            for(int i = 0; i < numDS; i++)
+            {
+                tmpMinX = transformations[i][0] + (dsOffsets[i][0] * pixelXRes);
+                tmpMaxY = transformations[i][3] - (dsOffsets[i][1] * pixelYResPos);
+                
+                tmpMaxX = tmpMinX + ((*width)*pixelXRes);
+                tmpMinY = tmpMaxY - ((*height)*pixelYResPos);
+                
+                //std::cout << "BBOX (" << i << ") [xMin, xMax, yMin, yMax]: [" << tmpMinX << ", " << tmpMaxX << ", " << tmpMinY << ", " << tmpMaxY << "]\n";
+                
+                if(tmpMaxX > maxX)
+                {
+                    diffX = (tmpMaxX - maxX);
+                    //std::cout << "Diff X = " << diffX << std::endl;
+                    if(!foundXDiff)
+                    {
+                        maxDiffX = diffX;
+                        foundXDiff = true;
+                    }
+                    else if(diffX > maxDiffX)
+                    {
+                        maxDiffX = diffX;
+                    }
+                }
+                
+                if(tmpMinY < minY)
+                {
+                    diffY = (minY - tmpMinY);
+                    //std::cout << "Diff Y = " << diffY << std::endl;
+                    if(!foundYDiff)
+                    {
+                        maxDiffY = diffY;
+                        foundYDiff = true;
+                    }
+                    else if(diffY > maxDiffY)
+                    {
+                        maxDiffY = diffY;
+                    }
+                }
+            }
+            
+            if(foundXDiff)
+            {
+                int nPxl = floor((maxDiffX/pixelXRes)+0.5);
+                if(nPxl > 0)
+                {
+                    (*width) = (*width) - nPxl;
+                }
+            }
+            
+            if(foundYDiff)
+            {
+                int nPxl = floor((maxDiffY/pixelYResPos)+0.5);
+                if(nPxl > 0)
+                {
+                    (*height) = (*height) - nPxl;
+                }
+            }
+            
 		}
 		catch(RSGISImageBandException& e)
 		{
@@ -374,6 +443,75 @@ namespace rsgis{namespace img{
 				}
 			}
 			
+            
+            double tmpMinX = 0;
+            double tmpMaxY = 0;
+            tmpMaxX = 0;
+            tmpMinY = 0;
+            
+            double maxDiffX = 0;
+            double maxDiffY = 0;
+            bool foundXDiff = false;
+            bool foundYDiff = false;
+            
+            for(int i = 0; i < numDS; i++)
+            {
+                tmpMinX = transformations[i][0] + (dsOffsets[i][0] * pixelXRes);
+                tmpMaxY = transformations[i][3] - (dsOffsets[i][1] * pixelYResPos);
+                
+                tmpMaxX = tmpMinX + ((*width)*pixelXRes);
+                tmpMinY = tmpMaxY - ((*height)*pixelYResPos);
+                
+                //std::cout << "BBOX (" << i << ") [xMin, xMax, yMin, yMax]: [" << tmpMinX << ", " << tmpMaxX << ", " << tmpMinY << ", " << tmpMaxY << "]\n";
+                
+                if(tmpMaxX > maxX)
+                {
+                    diffX = (tmpMaxX - maxX);
+                    //std::cout << "Diff X = " << diffX << std::endl;
+                    if(!foundXDiff)
+                    {
+                        maxDiffX = diffX;
+                        foundXDiff = true;
+                    }
+                    else if(diffX > maxDiffX)
+                    {
+                        maxDiffX = diffX;
+                    }
+                }
+                
+                if(tmpMinY < minY)
+                {
+                    diffY = (minY - tmpMinY);
+                    //std::cout << "Diff Y = " << diffY << std::endl;
+                    if(!foundYDiff)
+                    {
+                        maxDiffY = diffY;
+                        foundYDiff = true;
+                    }
+                    else if(diffY > maxDiffY)
+                    {
+                        maxDiffY = diffY;
+                    }
+                }
+            }
+            
+            if(foundXDiff)
+            {
+                int nPxl = floor((maxDiffX/pixelXRes)+0.5);
+                if(nPxl > 0)
+                {
+                    (*width) = (*width) - nPxl;
+                }
+            }
+            
+            if(foundYDiff)
+            {
+                int nPxl = floor((maxDiffY/pixelYResPos)+0.5);
+                if(nPxl > 0)
+                {
+                    (*height) = (*height) - nPxl;
+                }
+            }
 		}
 		catch(RSGISImageBandException& e)
 		{
@@ -416,6 +554,7 @@ namespace rsgis{namespace img{
     
     void RSGISImageUtils::getImageOverlap(GDALDataset **datasets, int numDS,  int **dsOffsets, int *width, int *height, double *gdalTransform, int *maxBlockX, int *maxBlockY) throw(RSGISImageBandException)
 	{
+        std::cout.precision(12);
 		double **transformations = new double*[numDS];
 		int *xSize = new int[numDS];
 		int *ySize = new int[numDS];
@@ -428,7 +567,8 @@ namespace rsgis{namespace img{
 			xSize[i] = datasets[i]->GetRasterXSize();
 			ySize[i] = datasets[i]->GetRasterYSize();
             datasets[i]->GetRasterBand(1)->GetBlockSize(&xBlockSize[i], &yBlockSize[i]);
-			//std::cout << "TL [" << transformations[i][0] << "," << transformations[i][3] << "]\n";
+            //std::cout << "TL [" << transformations[i][0] << "," << transformations[i][3] << "]\n";
+            //std::cout << "Size [" << xSize[i] << "," << ySize[i] << "]\n";
 		}
 		double rotateX = 0;
 		double rotateY = 0;
@@ -535,6 +675,8 @@ namespace rsgis{namespace img{
 				}
 			}
             
+            //std::cout << "BBOX [xMin, xMax, yMin, yMax]: [" << minX << ", " << maxX << ", " << minY << ", " << maxY << "]\n";
+            
 			if(maxX - minX <= 0)
 			{
 				throw RSGISImageBandException("Images do not overlap in the X axis");
@@ -588,6 +730,75 @@ namespace rsgis{namespace img{
                 //std::cout << "Offset Width (" << i << "):\t[" << dsOffsets[i][0]+*width << "]" << std::endl;
                 //std::cout << "Image Width (" << i << "):\t[" << datasets[i]->GetRasterXSize() << "]" << std::endl << std::endl;
 			}
+            
+            double tmpMinX = 0;
+            double tmpMaxY = 0;
+            tmpMaxX = 0;
+            tmpMinY = 0;
+            
+            double maxDiffX = 0;
+            double maxDiffY = 0;
+            bool foundXDiff = false;
+            bool foundYDiff = false;
+            
+            for(int i = 0; i < numDS; i++)
+            {
+                tmpMinX = transformations[i][0] + (dsOffsets[i][0] * pixelXRes);
+                tmpMaxY = transformations[i][3] - (dsOffsets[i][1] * pixelYResPos);
+                
+                tmpMaxX = tmpMinX + ((*width)*pixelXRes);
+                tmpMinY = tmpMaxY - ((*height)*pixelYResPos);
+                
+                //std::cout << "BBOX (" << i << ") [xMin, xMax, yMin, yMax]: [" << tmpMinX << ", " << tmpMaxX << ", " << tmpMinY << ", " << tmpMaxY << "]\n";
+                
+                if(tmpMaxX > maxX)
+                {
+                    diffX = (tmpMaxX - maxX);
+                    //std::cout << "Diff X = " << diffX << std::endl;
+                    if(!foundXDiff)
+                    {
+                        maxDiffX = diffX;
+                        foundXDiff = true;
+                    }
+                    else if(diffX > maxDiffX)
+                    {
+                        maxDiffX = diffX;
+                    }
+                }
+                
+                if(tmpMinY < minY)
+                {
+                    diffY = (minY - tmpMinY);
+                    //std::cout << "Diff Y = " << diffY << std::endl;
+                    if(!foundYDiff)
+                    {
+                        maxDiffY = diffY;
+                        foundYDiff = true;
+                    }
+                    else if(diffY > maxDiffY)
+                    {
+                        maxDiffY = diffY;
+                    }
+                }
+            }
+            
+            if(foundXDiff)
+            {
+                int nPxl = floor((maxDiffX/pixelXRes)+0.5);
+                if(nPxl > 0)
+                {
+                    (*width) = (*width) - nPxl;
+                }
+            }
+            
+            if(foundYDiff)
+            {
+                int nPxl = floor((maxDiffY/pixelYResPos)+0.5);
+                if(nPxl > 0)
+                {
+                    (*height) = (*height) - nPxl;
+                }
+            }
 			
 		}
 		catch(RSGISImageBandException& e)
@@ -797,6 +1008,75 @@ namespace rsgis{namespace img{
 					dsOffsets[i][1] = 0;
 				}
 			}
+            
+            double tmpMinX = 0;
+            double tmpMaxY = 0;
+            tmpMaxX = 0;
+            tmpMinY = 0;
+            
+            double maxDiffX = 0;
+            double maxDiffY = 0;
+            bool foundXDiff = false;
+            bool foundYDiff = false;
+            
+            for(int i = 0; i < numDS; i++)
+            {
+                tmpMinX = transformations[i][0] + (dsOffsets[i][0] * pixelXRes);
+                tmpMaxY = transformations[i][3] - (dsOffsets[i][1] * pixelYResPos);
+                
+                tmpMaxX = tmpMinX + ((*width)*pixelXRes);
+                tmpMinY = tmpMaxY - ((*height)*pixelYResPos);
+                
+                //std::cout << "BBOX (" << i << ") [xMin, xMax, yMin, yMax]: [" << tmpMinX << ", " << tmpMaxX << ", " << tmpMinY << ", " << tmpMaxY << "]\n";
+                
+                if(tmpMaxX > maxX)
+                {
+                    diffX = (tmpMaxX - maxX);
+                    //std::cout << "Diff X = " << diffX << std::endl;
+                    if(!foundXDiff)
+                    {
+                        maxDiffX = diffX;
+                        foundXDiff = true;
+                    }
+                    else if(diffX > maxDiffX)
+                    {
+                        maxDiffX = diffX;
+                    }
+                }
+                
+                if(tmpMinY < minY)
+                {
+                    diffY = (minY - tmpMinY);
+                    //std::cout << "Diff Y = " << diffY << std::endl;
+                    if(!foundYDiff)
+                    {
+                        maxDiffY = diffY;
+                        foundYDiff = true;
+                    }
+                    else if(diffY > maxDiffY)
+                    {
+                        maxDiffY = diffY;
+                    }
+                }
+            }
+            
+            if(foundXDiff)
+            {
+                int nPxl = floor((maxDiffX/pixelXRes)+0.5);
+                if(nPxl > 0)
+                {
+                    (*width) = (*width) - nPxl;
+                }
+            }
+            
+            if(foundYDiff)
+            {
+                int nPxl = floor((maxDiffY/pixelYResPos)+0.5);
+                if(nPxl > 0)
+                {
+                    (*height) = (*height) - nPxl;
+                }
+            }
 			
 		}
 		catch(RSGISImageBandException& e)
@@ -1104,9 +1384,82 @@ namespace rsgis{namespace img{
                             dsOffsets[i][1] = 0;
                         }
                     }
+                    
+                    
                 }
 			}
 			
+            double tmpMinX = 0;
+            double tmpMaxY = 0;
+            double tmpMaxX = 0;
+            double tmpMinY = 0;
+            double diffX = 0.0;
+            double diffY = 0.0;
+            
+            double maxDiffX = 0;
+            double maxDiffY = 0;
+            bool foundXDiff = false;
+            bool foundYDiff = false;
+            
+            for(int i = 0; i < numDS; i++)
+            {
+                tmpMinX = transformations[i][0] + (dsOffsets[i][0] * pixelXRes);
+                tmpMaxY = transformations[i][3] - (dsOffsets[i][1] * pixelYResPos);
+                
+                tmpMaxX = tmpMinX + ((*width)*pixelXRes);
+                tmpMinY = tmpMaxY - ((*height)*pixelYResPos);
+                
+                //std::cout << "BBOX (" << i << ") [xMin, xMax, yMin, yMax]: [" << tmpMinX << ", " << tmpMaxX << ", " << tmpMinY << ", " << tmpMaxY << "]\n";
+                
+                if(tmpMaxX > maxX)
+                {
+                    diffX = (tmpMaxX - maxX);
+                    //std::cout << "Diff X = " << diffX << std::endl;
+                    if(!foundXDiff)
+                    {
+                        maxDiffX = diffX;
+                        foundXDiff = true;
+                    }
+                    else if(diffX > maxDiffX)
+                    {
+                        maxDiffX = diffX;
+                    }
+                }
+                
+                if(tmpMinY < minY)
+                {
+                    diffY = (minY - tmpMinY);
+                    //std::cout << "Diff Y = " << diffY << std::endl;
+                    if(!foundYDiff)
+                    {
+                        maxDiffY = diffY;
+                        foundYDiff = true;
+                    }
+                    else if(diffY > maxDiffY)
+                    {
+                        maxDiffY = diffY;
+                    }
+                }
+            }
+            
+            if(foundXDiff)
+            {
+                int nPxl = floor((maxDiffX/pixelXRes)+0.5);
+                if(nPxl > 0)
+                {
+                    (*width) = (*width) - nPxl;
+                }
+            }
+            
+            if(foundYDiff)
+            {
+                int nPxl = floor((maxDiffY/pixelYResPos)+0.5);
+                if(nPxl > 0)
+                {
+                    (*height) = (*height) - nPxl;
+                }
+            }
+            
 		}
 		catch(RSGISImageBandException& e)
 		{
@@ -1338,6 +1691,75 @@ namespace rsgis{namespace img{
 					dsOffsets[i][1] = 0;
 				}
 			}
+            
+            double tmpMinX = 0;
+            double tmpMaxY = 0;
+            double tmpMaxX = 0;
+            double tmpMinY = 0;
+            
+            double maxDiffX = 0;
+            double maxDiffY = 0;
+            bool foundXDiff = false;
+            bool foundYDiff = false;
+            
+            for(int i = 0; i < numDS; i++)
+            {
+                tmpMinX = transformations[i][0] + (dsOffsets[i][0] * pixelXRes);
+                tmpMaxY = transformations[i][3] - (dsOffsets[i][1] * pixelYResPos);
+                
+                tmpMaxX = tmpMinX + ((*width)*pixelXRes);
+                tmpMinY = tmpMaxY - ((*height)*pixelYResPos);
+                
+                //std::cout << "BBOX (" << i << ") [xMin, xMax, yMin, yMax]: [" << tmpMinX << ", " << tmpMaxX << ", " << tmpMinY << ", " << tmpMaxY << "]\n";
+                
+                if(tmpMaxX > maxX)
+                {
+                    diffX = (tmpMaxX - maxX);
+                    //std::cout << "Diff X = " << diffX << std::endl;
+                    if(!foundXDiff)
+                    {
+                        maxDiffX = diffX;
+                        foundXDiff = true;
+                    }
+                    else if(diffX > maxDiffX)
+                    {
+                        maxDiffX = diffX;
+                    }
+                }
+                
+                if(tmpMinY < minY)
+                {
+                    diffY = (minY - tmpMinY);
+                    //std::cout << "Diff Y = " << diffY << std::endl;
+                    if(!foundYDiff)
+                    {
+                        maxDiffY = diffY;
+                        foundYDiff = true;
+                    }
+                    else if(diffY > maxDiffY)
+                    {
+                        maxDiffY = diffY;
+                    }
+                }
+            }
+            
+            if(foundXDiff)
+            {
+                int nPxl = floor((maxDiffX/pixelXRes)+0.5);
+                if(nPxl > 0)
+                {
+                    (*width) = (*width) - nPxl;
+                }
+            }
+            
+            if(foundYDiff)
+            {
+                int nPxl = floor((maxDiffY/pixelYResPos)+0.5);
+                if(nPxl > 0)
+                {
+                    (*height) = (*height) - nPxl;
+                }
+            }
 			
 		}
 		catch(RSGISImageBandException& e)
@@ -1585,6 +2007,75 @@ namespace rsgis{namespace img{
 				}
 			}
 			
+            double tmpMinX = 0;
+            double tmpMaxY = 0;
+            double tmpMaxX = 0;
+            double tmpMinY = 0;
+            
+            double maxDiffX = 0;
+            double maxDiffY = 0;
+            bool foundXDiff = false;
+            bool foundYDiff = false;
+            
+            for(int i = 0; i < numDS; i++)
+            {
+                tmpMinX = transformations[i][0] + (dsOffsets[i][0] * pixelXRes);
+                tmpMaxY = transformations[i][3] - (dsOffsets[i][1] * pixelYResPos);
+                
+                tmpMaxX = tmpMinX + ((*width)*pixelXRes);
+                tmpMinY = tmpMaxY - ((*height)*pixelYResPos);
+                
+                //std::cout << "BBOX (" << i << ") [xMin, xMax, yMin, yMax]: [" << tmpMinX << ", " << tmpMaxX << ", " << tmpMinY << ", " << tmpMaxY << "]\n";
+                
+                if(tmpMaxX > maxX)
+                {
+                    diffX = (tmpMaxX - maxX);
+                    //std::cout << "Diff X = " << diffX << std::endl;
+                    if(!foundXDiff)
+                    {
+                        maxDiffX = diffX;
+                        foundXDiff = true;
+                    }
+                    else if(diffX > maxDiffX)
+                    {
+                        maxDiffX = diffX;
+                    }
+                }
+                
+                if(tmpMinY < minY)
+                {
+                    diffY = (minY - tmpMinY);
+                    //std::cout << "Diff Y = " << diffY << std::endl;
+                    if(!foundYDiff)
+                    {
+                        maxDiffY = diffY;
+                        foundYDiff = true;
+                    }
+                    else if(diffY > maxDiffY)
+                    {
+                        maxDiffY = diffY;
+                    }
+                }
+            }
+            
+            if(foundXDiff)
+            {
+                int nPxl = floor((maxDiffX/pixelXRes)+0.5);
+                if(nPxl > 0)
+                {
+                    (*width) = (*width) - nPxl;
+                }
+            }
+            
+            if(foundYDiff)
+            {
+                int nPxl = floor((maxDiffY/pixelYResPos)+0.5);
+                if(nPxl > 0)
+                {
+                    (*height) = (*height) - nPxl;
+                }
+            }
+            
 		}
 		catch(RSGISImageBandException& e)
 		{
