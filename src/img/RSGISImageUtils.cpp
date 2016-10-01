@@ -29,7 +29,7 @@ namespace rsgis{namespace img{
 		 this->resDiffThresh = resDiffThresh;
 	}
 	
-	void RSGISImageUtils::getImageOverlap(GDALDataset **datasets, int numDS,  int **dsOffsets, int *width, int *height, double *gdalTransform) throw(RSGISImageBandException)
+	void RSGISImageUtils::getImageOverlap(GDALDataset **datasets, int numDS, int **dsOffsets, int *width, int *height, double *gdalTransform) throw(RSGISImageBandException)
 	{
 		double **transformations = new double*[numDS];
 		int *xSize = new int[numDS];
@@ -133,8 +133,8 @@ namespace rsgis{namespace img{
 					}
 				}
 			}
-            
-			if(maxX - minX <= 0)
+
+            if(maxX - minX <= 0)
 			{
 				throw RSGISImageBandException("Images do not overlap in the X axis");
 			}
@@ -156,19 +156,18 @@ namespace rsgis{namespace img{
 			
 			double diffX = 0;
 			double diffY = 0;
-			
 			for(int i = 0; i < numDS; i++)
 			{
 				diffX = minX - transformations[i][0];
 				diffY = transformations[i][3] - maxY;
-				
-				if(!((diffX > -0.0001) & (diffX < 0.0001)))
+
+                if(!((diffX > -0.0001) & (diffX < 0.0001)))
 				{
-					dsOffsets[i][0] = floor((diffX/pixelXRes)+0.5);
+                    dsOffsets[i][0] = floor((diffX/pixelXRes)+0.5);
 				}
 				else
 				{
-					dsOffsets[i][0] = 0;
+                    dsOffsets[i][0] = 0;
 				}
 				
 				if(!((diffY > -0.0001) & (diffY < 0.0001)))
@@ -199,12 +198,10 @@ namespace rsgis{namespace img{
                 tmpMaxX = tmpMinX + ((*width)*pixelXRes);
                 tmpMinY = tmpMaxY - ((*height)*pixelYResPos);
                 
-                //std::cout << "BBOX (" << i << ") [xMin, xMax, yMin, yMax]: [" << tmpMinX << ", " << tmpMaxX << ", " << tmpMinY << ", " << tmpMaxY << "]\n";
-                
                 if(tmpMaxX > maxX)
                 {
                     diffX = (tmpMaxX - maxX);
-                    //std::cout << "Diff X = " << diffX << std::endl;
+
                     if(!foundXDiff)
                     {
                         maxDiffX = diffX;
@@ -219,7 +216,7 @@ namespace rsgis{namespace img{
                 if(tmpMinY < minY)
                 {
                     diffY = (minY - tmpMinY);
-                    //std::cout << "Diff Y = " << diffY << std::endl;
+
                     if(!foundYDiff)
                     {
                         maxDiffY = diffY;
@@ -4923,11 +4920,9 @@ namespace rsgis{namespace img{
         try
         {
             int **dsOffsets = new int*[numDS];
-            for(int i = 0; i < numDS; ++i)
+            for(int i = 0; i < numDS; i++)
             {
                 dsOffsets[i] = new int[2];
-                dsOffsets[0] = 0;
-                dsOffsets[1] = 0;
             }
             int width = 0;
             int height = 0;
@@ -4947,7 +4942,7 @@ namespace rsgis{namespace img{
                 std::string message = std::string("Driver for ") + outputFormat + std::string(" does not exist\n");
                 throw RSGISImageException(message.c_str());
             }
-            GDALDataset *dataset = gdalDriver->Create(outputFilePath.c_str(), width, height, numBands, eType, NULL);
+            dataset = gdalDriver->Create(outputFilePath.c_str(), width, height, numBands, eType, NULL);
             if(dataset == NULL)
             {
                 delete[] gdalTranslation;
@@ -4964,7 +4959,6 @@ namespace rsgis{namespace img{
             {
                 dataset->SetProjection(proj.c_str());
             }
-            
             delete[] gdalTranslation;
         }
         catch(RSGISImageException &e)
