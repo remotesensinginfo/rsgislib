@@ -2367,7 +2367,7 @@ namespace rsgis{namespace rastergis{
         return ratCols;
     }
     
-    std::vector<RSGISRATCol>* RSGISRasterAttUtils::getVectorColumns(OGRLayer *layer) throw(RSGISAttributeTableException)
+    std::vector<RSGISRATCol>* RSGISRasterAttUtils::getVectorColumns(OGRLayer *layer, bool ignoreErr) throw(RSGISAttributeTableException)
     {
         std::vector<RSGISRATCol> *colNames = new std::vector<RSGISRATCol>();
         try
@@ -2396,8 +2396,15 @@ namespace rsgis{namespace rastergis{
                 }
                 else
                 {
-                    std::cerr << ratCol.name << " could not be translated to RAT\n";
-                    throw RSGISAttributeTableException("Data type could not be transferred to RAT.");
+                    std::cerr << ratCol.name << " data type could not be translated to a RAT data type.\n";
+                    if(ignoreErr)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        throw RSGISAttributeTableException("Data type could not be transferred to RAT.");
+                    }
                 }
                 
                 colNames->push_back(ratCol);
