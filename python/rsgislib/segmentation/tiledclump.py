@@ -38,6 +38,7 @@ import os.path
 import os
 import shutil
 from multiprocessing import Pool
+import multiprocessing
 
 import rsgislib
 from rsgislib import segmentation
