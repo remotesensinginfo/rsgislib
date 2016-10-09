@@ -67,7 +67,7 @@ namespace rsgis{namespace rastergis{
             }
             
             std::vector<RSGISRATCol> ratColInfo;
-            std::vector<RSGISRATCol> *colsInfo = ratUtils.getVectorColumns(vecLayer);
+            std::vector<RSGISRATCol> *colsInfo = ratUtils.getVectorColumns(vecLayer, true);
             for(std::vector<std::string>::iterator iterColNames = colNames->begin(); iterColNames != colNames->end(); ++iterColNames)
             {
                 bool foundCol = false;

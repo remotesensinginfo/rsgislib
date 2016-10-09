@@ -174,7 +174,7 @@ namespace rsgis{namespace rastergis{
         void writeIntColumn(GDALRasterAttributeTable *attTable, std::string colName, int *intDataVal, size_t colLen) throw(RSGISAttributeTableException);
         void writeRealColumn(GDALRasterAttributeTable *attTable, std::string colName, double *realDataVal, size_t colLen) throw(RSGISAttributeTableException);
         std::vector<RSGISRATCol>* getRatColumnsList(GDALRasterAttributeTable *gdalATT) throw(RSGISAttributeTableException);
-        std::vector<RSGISRATCol>* getVectorColumns(OGRLayer *layer) throw(RSGISAttributeTableException);
+        std::vector<RSGISRATCol>* getVectorColumns(OGRLayer *layer, bool ignoreErr=false) throw(RSGISAttributeTableException);
         ~RSGISRasterAttUtils();
     };
 	
