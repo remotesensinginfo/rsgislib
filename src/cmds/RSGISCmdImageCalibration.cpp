@@ -781,7 +781,7 @@ namespace rsgis{ namespace cmds {
             datasets[0] = reflDataset;
             datasets[1] = thermDataset;
             datasets[2] = saturateDataset;
-            GDALDataset *pass1DS = imgUtils.createCopy(validAreaDataset, 16, pass1TmpOutImage, gdalFormat, GDT_Float32);//imgUtils.createCopy(datasets, 3, 16, pass1TmpOutImage, gdalFormat, GDT_Float32);
+            GDALDataset *pass1DS = imgUtils.createCopy(datasets, 3, 16, pass1TmpOutImage, gdalFormat, GDT_Float32);
             calcImage->calcImage(datasets, 3, pass1DS);
             delete calcImage;
             delete[] datasets;
@@ -807,7 +807,7 @@ namespace rsgis{ namespace cmds {
             
             
             std::cout << "Export Land and Water regions and check PCP coverage.\n";
-            GDALDataset *landWaterClearSkyDS = imgUtils.createCopy(validAreaDataset, 1, landWaterTmpOutImage, gdalFormat, GDT_UInt32);
+            GDALDataset *landWaterClearSkyDS = imgUtils.createCopy(pass1DS, 1, landWaterTmpOutImage, gdalFormat, GDT_UInt32);
             rsgis::calib::RSGISLandsatFMaskExportPass1LandWaterCloudMasking exportLandWaterRegions = rsgis::calib::RSGISLandsatFMaskExportPass1LandWaterCloudMasking();
             datasets = new GDALDataset*[2];
             datasets[0] = validAreaDataset;
@@ -862,7 +862,7 @@ namespace rsgis{ namespace cmds {
                 datasets[1] = reflDataset;
                 datasets[2] = thermDataset;
                 datasets[3] = pass1DS;
-                GDALDataset *pass2DS = imgUtils.createCopy(validAreaDataset, 6, cloudLandProbTmpOutImage, gdalFormat, GDT_Float32);
+                GDALDataset *pass2DS = imgUtils.createCopy(pass1DS, 6, cloudLandProbTmpOutImage, gdalFormat, GDT_Float32);
                 calcImage->calcImage(datasets, 4, pass2DS);
                 delete calcImage;
                 delete[] datasets;
@@ -919,7 +919,7 @@ namespace rsgis{ namespace cmds {
                 datasets[2] = thermDataset;
                 datasets[3] = pass1DS;
                 datasets[4] = pass2DS;
-                GDALDataset *cloudMaskDS = imgUtils.createCopy(validAreaDataset, 1, tmpCloudsExtent, gdalFormat, GDT_Int32);
+                GDALDataset *cloudMaskDS = imgUtils.createCopy(pass1DS, 1, tmpCloudsExtent, gdalFormat, GDT_Int32);
                 calcImage->calcImage(datasets, 5, cloudMaskDS);
                 delete calcImage;
                 delete[] datasets;
@@ -931,7 +931,7 @@ namespace rsgis{ namespace cmds {
                 
                 
                 std::cout << "Get cloud objects\n";
-                GDALDataset *cloudClumpsDS = imgUtils.createCopy(validAreaDataset, 1, tmpCloudsClump, gdalFormat, GDT_UInt32);
+                GDALDataset *cloudClumpsDS = imgUtils.createCopy(pass1DS, 1, tmpCloudsClump, gdalFormat, GDT_UInt32);
                 rsgis::segment::RSGISClumpPxls clumpImg;
                 clumpImg.performClump(cloudMaskDS, cloudClumpsDS, true, 0.0, NULL);
                 popImageStats.populateImageWithRasterGISStats(cloudClumpsDS, true, true, true, 1);
@@ -942,14 +942,14 @@ namespace rsgis{ namespace cmds {
                 
                 size_t numcloudsRATHistoRows = 0;
                 int *cloudsRATHisto = attUtils.readIntColumn(cloudsRAT, "Histogram", &numcloudsRATHistoRows);
-                GDALDataset *cloudClumpsRMSmallDS = imgUtils.createCopy(validAreaDataset, 1, tmpCloudsClumpRMSmall, gdalFormat, GDT_UInt32);
+                GDALDataset *cloudClumpsRMSmallDS = imgUtils.createCopy(pass1DS, 1, tmpCloudsClumpRMSmall, gdalFormat, GDT_UInt32);
                 rsgis::segment::RSGISRemoveClumpsBelowThreshold rmClumpBelowSize = rsgis::segment::RSGISRemoveClumpsBelowThreshold(smallCloudThreshold, cloudsRATHisto, numcloudsRATHistoRows);
                 rsgis::img::RSGISCalcImage calcImgRmSmallClump = rsgis::img::RSGISCalcImage(&rmClumpBelowSize);
                 calcImgRmSmallClump.calcImage(&cloudClumpsDS, 1, 0, cloudClumpsRMSmallDS);
                 delete[] cloudsRATHisto;
                 
                 rsgis::segment::RSGISRelabelClumps relabelImg;
-                GDALDataset *cloudClumpsRMSmallReLblDS = imgUtils.createCopy(validAreaDataset, 1, tmpCloudsClumpRMSmallRelabel, gdalFormat, GDT_UInt32);
+                GDALDataset *cloudClumpsRMSmallReLblDS = imgUtils.createCopy(pass1DS, 1, tmpCloudsClumpRMSmallRelabel, gdalFormat, GDT_UInt32);
                 relabelImg.relabelClumpsCalcImg(cloudClumpsRMSmallDS, cloudClumpsRMSmallReLblDS);
                 popImageStats.populateImageWithRasterGISStats(cloudClumpsRMSmallReLblDS, true, true, 1);
 
@@ -973,18 +973,22 @@ namespace rsgis{ namespace cmds {
                 
                 // Extract NIR band.
                 std::cout << "Extract NIR Band\n";
-                GDALDataset *nirBandDS = imgUtils.createCopy(reflDataset, 1, tmpNIRBandImg, gdalFormat, imgReflDT);
+                GDALDataset *nirBandDS = imgUtils.createCopy(validAreaDataset, 1, tmpNIRBandImg, gdalFormat, imgReflDT);
                 std::vector<unsigned int> bands;
                 bands.push_back(nirIdx);
                 rsgis::img::RSGISCopyImageBandSelect selImageBands = rsgis::img::RSGISCopyImageBandSelect(bands);
                 rsgis::img::RSGISCalcImage calcSelBandsImage = rsgis::img::RSGISCalcImage(&selImageBands);
-                calcSelBandsImage.calcImage(&reflDataset, 1, nirBandDS);
+                datasets = new GDALDataset*[2];
+                datasets[0] = reflDataset;
+                datasets[1] = validAreaDataset;
+                calcSelBandsImage.calcImage(datasets, 2, nirBandDS);
+                delete[] datasets;
                 
                 std::cout << "Fill NIR Band\n";
-                GDALDataset *nirBandFillDS = imgUtils.createCopy(validAreaDataset, 1, tmpNIRFillBandImg, gdalFormat, imgReflDT);
+                GDALDataset *nirBandFillDS = imgUtils.createCopy(reflDataset, 1, tmpNIRFillBandImg, gdalFormat, imgReflDT);
                 rsgis::calib::RSGISHydroDEMFillSoilleGratin94 fillDEMInst;
                 fillDEMInst.performSoilleGratin94Fill(nirBandDS, validAreaDataset, nirBandFillDS, false, landNIR175Val);
-                
+      
                 ////////////////////////////////////// Perform fill with SWIR: Extra on paper which only uses the NIR.
                 int swirIdx = 5;
                 if(reflDataset->GetRasterCount() == 7)
@@ -1004,15 +1008,19 @@ namespace rsgis{ namespace cmds {
                 
                 // Extract SWIR band.
                 std::cout << "Extract SWIR Band\n";
-                GDALDataset *swirBandDS = imgUtils.createCopy(reflDataset, 1, tmpSWIRBandImg, gdalFormat, imgReflDT);
+                GDALDataset *swirBandDS = imgUtils.createCopy(validAreaDataset, 1, tmpSWIRBandImg, gdalFormat, imgReflDT);
                 bands = std::vector<unsigned int>();
                 bands.push_back(swirIdx);
                 selImageBands = rsgis::img::RSGISCopyImageBandSelect(bands);
                 calcSelBandsImage = rsgis::img::RSGISCalcImage(&selImageBands);
-                calcSelBandsImage.calcImage(&reflDataset, 1, swirBandDS);
+                datasets = new GDALDataset*[2];
+                datasets[0] = reflDataset;
+                datasets[1] = validAreaDataset;
+                calcSelBandsImage.calcImage(datasets, 2, swirBandDS);
+                delete[] datasets;
                 
                 std::cout << "Fill SWIR Band\n";
-                GDALDataset *swirBandFillDS = imgUtils.createCopy(validAreaDataset, 1, tmpSWIRFillBandImg, gdalFormat, imgReflDT);
+                GDALDataset *swirBandFillDS = imgUtils.createCopy(reflDataset, 1, tmpSWIRFillBandImg, gdalFormat, imgReflDT);
                 fillDEMInst = rsgis::calib::RSGISHydroDEMFillSoilleGratin94();
                 fillDEMInst.performSoilleGratin94Fill(swirBandDS, validAreaDataset, swirBandFillDS, false, landSWIR175Val);
                 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1033,12 +1041,12 @@ namespace rsgis{ namespace cmds {
                 delete[] datasets;
                 
 
-                GDALDataset *initCloudHeightsDS = imgUtils.createCopy(validAreaDataset, 2, tmpCloudsInitHeights, gdalFormat, GDT_Float32);
+                GDALDataset *initCloudHeightsDS = imgUtils.createCopy(pass1DS, 2, tmpCloudsInitHeights, gdalFormat, GDT_Float32);
                 rsgis::calib::RSGISCalcCloudParams calcCloudParams;
                 calcCloudParams.calcCloudHeights(thermDataset, cloudClumpsRMSmallReLblDS, initCloudHeightsDS, lowerLandThres, upperLandThres, scaleFactorIn);
                 
-                GDALDataset *cloudShadowTestRegionsDS = imgUtils.createCopy(validAreaDataset, 1, tmpCloudsShadowTestRegions, gdalFormat, GDT_Byte);
-                GDALDataset *cloudShadowRegionsDS = imgUtils.createCopy(validAreaDataset, 1, tmpCloudsShadows, gdalFormat, GDT_Byte);
+                GDALDataset *cloudShadowTestRegionsDS = imgUtils.createCopy(pass1DS, 1, tmpCloudsShadowTestRegions, gdalFormat, GDT_Byte);
+                GDALDataset *cloudShadowRegionsDS = imgUtils.createCopy(pass1DS, 1, tmpCloudsShadows, gdalFormat, GDT_Byte);
                 
                 calcCloudParams.projFitCloudShadow(cloudClumpsRMSmallReLblDS, initCloudHeightsDS, potentCloudShadowDS, cloudShadowTestRegionsDS, cloudShadowRegionsDS, sunAz, sunZen, senAz, senZen);
                 
@@ -1076,7 +1084,7 @@ namespace rsgis{ namespace cmds {
                 unsigned int columnIndex = attUtils.findColumnIndex(cloudsRATRelbl, "CloudMask");
                 rsgis::rastergis::RSGISExportColumns2ImageCalcImage calcImageVal = rsgis::rastergis::RSGISExportColumns2ImageCalcImage(1, cloudsRATRelbl, columnIndex);
                 rsgis::img::RSGISCalcImage calcImageExportRATCol(&calcImageVal);
-                GDALDataset *finalCloudsDS = imgUtils.createCopy(validAreaDataset, 1, tmpFinalClouds, gdalFormat, GDT_Byte);
+                GDALDataset *finalCloudsDS = imgUtils.createCopy(pass1DS, 1, tmpFinalClouds, gdalFormat, GDT_Byte);
                 calcImageExportRATCol.calcImage(&cloudClumpsRMSmallReLblDS, 1, 0, finalCloudsDS);
       
                 
@@ -1089,7 +1097,7 @@ namespace rsgis{ namespace cmds {
                 }
                 matrixUtils.freeMatrix(matrixMorphOperator);
                 
-                GDALDataset *finalResultDS = imgUtils.createCopy(validAreaDataset, 1, outputImage, gdalFormat, GDT_Byte);
+                GDALDataset *finalResultDS = imgUtils.createCopy(pass1DS, 1, outputImage, gdalFormat, GDT_Byte);
                 datasets = new GDALDataset*[2];
                 datasets[0] = finalCloudsDialateDS;
                 datasets[1] = finalShadowsDialateDS;
