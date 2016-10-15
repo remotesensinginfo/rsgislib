@@ -40,6 +40,19 @@ namespace rsgis{namespace calib{
                 rsgis::img::RSGISImageCalcException("The image to be filled should only have 1 image band.");
             }
             
+            
+            GDALDataset **datasets = new GDALDataset*[3];
+            datasets[0] = inDEMImgDS;
+            datasets[1] = inValidImgDS;
+            datasets[2] = outImgDS;
+            
+            rsgis::img::RSGISImageUtils imgUtils;
+            if(!imgUtils.doImageSpatAndExtMatch(datasets, 3))
+            {
+                rsgis::img::RSGISImageCalcException("The images provided do not all have the same size and/or spaital header. The input image (e.g., DEM) and valid area image must be excatly the same.");
+            }
+            delete[] datasets;
+            
             rsgis::img::ImageStats *stats = new rsgis::img::ImageStats();
             
             int useNoData = false;
@@ -77,7 +90,7 @@ namespace rsgis{namespace calib{
            
             numLevels = (maxVal - minVal)+1;
             
-            std::cout << "Range [" << minVal << ", " << maxVal << "] = " << numLevels << std::endl;
+            std::cout << "Range of Values [" << minVal << ", " << maxVal << "] Needs " << numLevels << " Levels." << std::endl;
             
             if(!useNoData)
             {
@@ -104,6 +117,7 @@ namespace rsgis{namespace calib{
             long img2Val = 0;
             int feedback = numLevels/10.0;
             int feedbackCounter = 0;
+            std::cout << "Perform Fill:\n";
             std::cout << "Started ." << std::flush;
             for(long n = 0; n < numLevels; ++n)
             {
@@ -202,13 +216,13 @@ namespace rsgis{namespace calib{
         {
             minYPxl = 0;
         }
-        if(maxXPxl > width)
+        if(maxXPxl >= width)
         {
-            maxXPxl = width;
+            maxXPxl = width-1;
         }
-        if(maxYPxl > height)
+        if(maxYPxl >= height)
         {
-            maxYPxl = height;
+            maxYPxl = height-1;
         }
 
         int nWidth = (maxXPxl - minXPxl)+1;
