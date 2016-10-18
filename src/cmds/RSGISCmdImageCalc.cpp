@@ -2851,5 +2851,109 @@ namespace rsgis{ namespace cmds {
         return propPxls;
     }
                 
+    void calcMultiImgBandsStats(std::vector<std::string> inputImages, std::string outputImage, RSGISCmdsSummariseStats summaryStats, std::string gdalFormat, RSGISLibDataType outDataType, bool useNoData, float noDataVal) throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            int numBands = 0;
+            bool firstImg = true;
+            int numImgs = inputImages.size();
+            GDALDataset **datasets = new GDALDataset*[numImgs];
+            
+            for(int i = 0; i < numImgs; ++i)
+            {
+                std::cout << "Opening " << inputImages.at(i) << std::endl;
+                datasets[i] = (GDALDataset *) GDALOpen(inputImages.at(i).c_str(), GA_ReadOnly);
+                if(datasets[i] == NULL)
+                {
+                    std::string message = std::string("Could not open image ") + inputImages.at(i);
+                    throw rsgis::RSGISImageException(message.c_str());
+                }
+                
+                if(firstImg)
+                {
+                    numBands = datasets[i]->GetRasterCount();
+                    firstImg = false;
+                }
+                else if(numBands != datasets[i]->GetRasterCount())
+                {
+                    std::cout << "Number of bands of first image: " << numBands << std::endl;
+                    std::cout << "Number of bands of input image: " << datasets[i]->GetRasterCount() << std::endl;
+                    
+                    // Close open datasets before exit.
+                    for(int j = 0; j < (i+1); ++j)
+                    {
+                        GDALClose(datasets[j]);
+                    }
+                    
+                    throw rsgis::RSGISImageException("All input images must have the same number of image bands.");
+                }
+            }
+            
+            rsgis::math::rsgissummarytype sumType = rsgis::math::sumtype_mean;
+            if(summaryStats == rsgis::cmds::rsgiscmds_stat_mean)
+            {
+               sumType = rsgis::math::sumtype_mean;
+            }
+            else if(summaryStats == rsgis::cmds::rsgiscmds_stat_min)
+            {
+                sumType = rsgis::math::sumtype_min;
+            }
+            else if(summaryStats == rsgis::cmds::rsgiscmds_stat_max)
+            {
+                sumType = rsgis::math::sumtype_max;
+            }
+            else if(summaryStats == rsgis::cmds::rsgiscmds_stat_median)
+            {
+                sumType = rsgis::math::sumtype_median;
+            }
+            else if(summaryStats == rsgis::cmds::rsgiscmds_stat_range)
+            {
+                sumType = rsgis::math::sumtype_range;
+            }
+            else if(summaryStats == rsgis::cmds::rsgiscmds_stat_stddev)
+            {
+                sumType = rsgis::math::sumtype_stddev;
+            }
+            else if(summaryStats == rsgis::cmds::rsgiscmds_stat_sum)
+            {
+                sumType = rsgis::math::sumtype_sum;
+            }
+            else if(summaryStats == rsgis::cmds::rsgiscmds_stat_mode)
+            {
+                sumType = rsgis::math::sumtype_mode;
+            }
+            else
+            {
+                throw RSGISCmdException("The summary type specified is unknown.");
+            }
+            
+            rsgis::img::RSGISCalcMultiImageStatSummaries calcMultiImgStats = rsgis::img::RSGISCalcMultiImageStatSummaries(numBands, sumType, numImgs, numBands, noDataVal, useNoData);
+            
+            rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(&calcMultiImgStats, "", true);
+            calcImage.calcImage(datasets, numImgs, outputImage, false, NULL, gdalFormat, RSGIS_to_GDAL_Type(outDataType));
+            
+            for(int i = 0; i < numImgs; ++i)
+            {
+                GDALClose(datasets[i]);
+            }
+            delete[] datasets;
+            
+        }
+        catch(rsgis::RSGISImageException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+                
 }}
 

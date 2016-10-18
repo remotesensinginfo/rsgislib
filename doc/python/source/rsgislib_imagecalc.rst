@@ -46,6 +46,7 @@ Statistics
 .. autofunction:: rsgislib.imagecalc.getImageBandModeInEnv
 .. autofunction:: rsgislib.imagecalc.getImageStatsInEnv
 .. autofunction:: rsgislib.imagecalc.calcPropTrueExp
+.. autofunction:: rsgislib.imagecalc.calcMultiImgBandStats
 
 
 Normalise
@@ -64,6 +65,7 @@ Geometry
 .. autofunction:: rsgislib.imagecalc.mahalanobisDist2ImgFilter
 .. autofunction:: rsgislib.imagecalc.imageCalcDistance
 .. autofunction:: rsgislib.imagecalc.calcDist2ImgVals
+.. autofunction:: rsgislib.imagecalc.calcDist2ImgValsTiled
 
 Image Indices
 -------------

@@ -671,7 +671,8 @@ static PyObject *ImageCalc_UnitArea(PyObject *self, PyObject *args) {
     Py_RETURN_NONE;
 }
 
-static PyObject *ImageCalc_MovementSpeed(PyObject *self, PyObject *args) {
+static PyObject *ImageCalc_MovementSpeed(PyObject *self, PyObject *args)
+{
     // declare variables
     PyObject *inImagesObj, *imageBandsObj, *imageTimesObj;
     const char *outputImage;
@@ -1482,6 +1483,105 @@ static PyObject *ImageCalc_CalcPropTrueExp(PyObject *self, PyObject *args)
 
 
 
+static PyObject *ImageCalc_calcMultiImgBandStats(PyObject *self, PyObject *args)
+{
+    PyObject *inImagesObj;
+    const char *outputImage;
+    int sumStat;
+    const char *gdalFormat;
+    int datatype;
+    float noDataVal = 0;
+    int useNoDataVal = false;
+    
+    if(!PyArg_ParseTuple(args, "Osisi|if:calcMultiImgBandStats", &inImagesObj, &outputImage, &sumStat, &gdalFormat, &datatype, &noDataVal, &useNoDataVal))
+    {
+        return NULL;
+    }
+    
+    if( !PySequence_Check(inImagesObj) )
+    {
+        PyErr_SetString(GETSTATE(self)->error, "first three arguments must be sequences");
+        return NULL;
+    }
+    
+    Py_ssize_t nImages = PySequence_Size(inImagesObj);
+    
+    std::vector<std::string> inputImages;
+    inputImages.reserve(nImages);
+
+    for(int i = 0; i < nImages; ++i)
+    {
+        PyObject *inImageObj = PySequence_GetItem(inImagesObj, i);
+        
+        if(!RSGISPY_CHECK_STRING(inImageObj))
+        {
+            Py_DECREF(inImageObj);
+            PyErr_SetString(GETSTATE(self)->error, "Input images must be strings");
+            return NULL;
+        }
+        
+        inputImages.push_back(RSGISPY_STRING_EXTRACT(inImageObj));
+        
+        Py_DECREF(inImageObj);
+    }
+    
+    rsgis::cmds::RSGISCmdsSummariseStats summaryStats = rsgis::cmds::rsgiscmds_stat_none;
+    if(sumStat == 1)
+    {
+        summaryStats = rsgis::cmds::rsgiscmds_stat_mode;
+    }
+    else if(sumStat == 2)
+    {
+        summaryStats = rsgis::cmds::rsgiscmds_stat_mean;
+    }
+    else if(sumStat == 3)
+    {
+        summaryStats = rsgis::cmds::rsgiscmds_stat_median;
+    }
+    else if(sumStat == 4)
+    {
+        summaryStats = rsgis::cmds::rsgiscmds_stat_min;
+    }
+    else if(sumStat == 5)
+    {
+        summaryStats = rsgis::cmds::rsgiscmds_stat_max;
+    }
+    else if(sumStat == 6)
+    {
+        summaryStats = rsgis::cmds::rsgiscmds_stat_stddev;
+    } // Value 7 (count) not used here.
+    else if(sumStat == 8)
+    {
+        summaryStats = rsgis::cmds::rsgiscmds_stat_range;
+    }
+    else if(sumStat == 9)
+    {
+        summaryStats = rsgis::cmds::rsgiscmds_stat_sum;
+    }
+    else
+    {
+        PyErr_SetString(GETSTATE(self)->error, "Do not recognise the summary statistic option.");
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::calcMultiImgBandsStats(inputImages, std::string(outputImage), summaryStats, std::string(gdalFormat), (rsgis::RSGISLibDataType)datatype, (bool)useNoDataVal, noDataVal);
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+
+
+
+
+
 // Our list of functions in this module
 static PyMethodDef ImageCalcMethods[] = {
     {"bandMath", ImageCalc_BandMath, METH_VARARGS,
@@ -2145,6 +2245,29 @@ static PyMethodDef ImageCalcMethods[] = {
 "   prop = imagecalc.calcPropTrueExp(bandDefns, expression)\n"
 "   print(prop)\n"
 "\n"},
+    
+    
+    
+{"calcMultiImgBandStats", ImageCalc_calcMultiImgBandStats, METH_VARARGS,
+"imagecalc.calcMultiImgBandStats(inputImages, outputImage, summaryStatOption, gdalFormat, datatype, noDataVal, useNoDataVal)\n"
+"Calculates the summary statistic (rsgislib.SUMTYPE_*) across multiple images on a per band basis\n."
+"For example, if rsgislib.SUMTYPE_MIN is selected then for all the images the minimum value for band 1 (across all the images) and then band 2 etc.\n"
+"will be outputted as a new image with the same number of bands as the inputs (Note. all the input images must have the same number of bands).\n"
+"where:\n"
+"  * inputImages is a list of input images (note. all inputs must have the same number of image bands).\n"
+"  * outputImage is a string with the name and path of the output image.\n"
+"  * summaryStatOption is of type rsgislib.SUMTYPE_* and specifies which summary statistic is used to sumamrise the images.\n"
+"  * gdalFormat is a string specifying the output image format (e.g., KEA).\n"
+"  * datatype is an containing one of the values from rsgislib.TYPE_*\n"
+"  * noDataVal float with the value of the no data value, the same value for all the input images (Optional)\n"
+"  * useNoDataVal is a boolean specifying whether the no data value should be used (Optional, default False)\n"
+
+"Example::\n"
+"\n"
+
+"\n"},
+    
+    
     
     {NULL}        /* Sentinel */
 };

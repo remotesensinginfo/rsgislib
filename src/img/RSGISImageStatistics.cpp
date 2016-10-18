@@ -1351,4 +1351,157 @@ namespace rsgis{namespace img{
     
     
     
+    
+    
+    
+    RSGISCalcMultiImageStatSummaries::RSGISCalcMultiImageStatSummaries(unsigned int numOutBands, rsgis::math::rsgissummarytype sumType, unsigned int numInImgs, unsigned int numInImgBands, float noDataValue, bool useNoDataValue): RSGISCalcImageValue(numOutBands)
+    {
+        this->sumType = sumType;
+        this->numInImgs = numInImgs;
+        this->numInImgBands = numInImgBands;
+        this->noDataValue = noDataValue;
+        this->useNoDataValue = useNoDataValue;
+        
+        this->mathUtils = new rsgis::math::RSGISMathsUtils();
+        this->statsSumObj = new rsgis::math::RSGISStatsSummary();
+        this->mathUtils->initStatsSummary(statsSumObj);
+        
+        if(sumType == rsgis::math::sumtype_mean)
+        {
+            statsSumObj->calcMean = true;
+        }
+        else if(sumType == rsgis::math::sumtype_max)
+        {
+            statsSumObj->calcMax = true;
+        }
+        else if(sumType == rsgis::math::sumtype_min)
+        {
+            statsSumObj->calcMin = true;
+        }
+        else if(sumType == rsgis::math::sumtype_stddev)
+        {
+            statsSumObj->calcStdDev = true;
+        }
+        else if(sumType == rsgis::math::sumtype_median)
+        {
+            statsSumObj->calcMedian = true;
+        }
+        else if(sumType == rsgis::math::sumtype_mode)
+        {
+            statsSumObj->calcMode = true;
+        }
+        else if(sumType == rsgis::math::sumtype_sum)
+        {
+            statsSumObj->calcSum = true;
+        }
+        else if(sumType == rsgis::math::sumtype_range)
+        {
+            statsSumObj->calcMin = true;
+            statsSumObj->calcMax = true;
+        }
+        else
+        {
+            throw RSGISImageCalcException("Did not recognise the summary type.");
+        }
+        
+        this->data = new std::vector<double>();
+        
+        
+        this->totNumInBands = numInImgBands * numInImgs;
+    }
+    
+    void RSGISCalcMultiImageStatSummaries::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+    {
+        if(numBands != totNumInBands)
+        {
+            throw RSGISImageCalcException("Number of input image bands does not match the number expected.");
+        }
+        
+        this->mathUtils->initStatsSummaryValues(statsSumObj);
+        unsigned int idx = 0;
+        
+        for(int i = 0; i < this->numInImgBands; ++i)
+        {
+            data->clear();
+            for(int n = 0; n < this->numInImgs; ++n)
+            {
+                idx = (n * this->numInImgBands) + i;
+                if(idx >= numBands)
+                {
+                    throw RSGISImageCalcException("Something has gone really wrong, calculated index is more than the number of image layers.");
+                }
+                
+                if(this->useNoDataValue)
+                {
+                    if(bandValues[idx] != noDataValue)
+                    {
+                        data->push_back(bandValues[idx]);
+                    }
+                }
+                else
+                {
+                    data->push_back(bandValues[idx]);
+                }
+            }
+            if(data->size() > 1)
+            {
+                this->mathUtils->generateStats(data, statsSumObj);
+                if(sumType == rsgis::math::sumtype_mean)
+                {
+                    output[i] = statsSumObj->mean;
+                }
+                else if(sumType == rsgis::math::sumtype_max)
+                {
+                    output[i] = statsSumObj->max;
+                }
+                else if(sumType == rsgis::math::sumtype_min)
+                {
+                    output[i] = statsSumObj->min;
+                }
+                else if(sumType == rsgis::math::sumtype_stddev)
+                {
+                    output[i] = statsSumObj->stdDev;
+                }
+                else if(sumType == rsgis::math::sumtype_median)
+                {
+                    output[i] = statsSumObj->median;
+                }
+                else if(sumType == rsgis::math::sumtype_mode)
+                {
+                    output[i] = statsSumObj->mode;
+                }
+                else if(sumType == rsgis::math::sumtype_sum)
+                {
+                    output[i] = statsSumObj->sum;
+                }
+                else if(sumType == rsgis::math::sumtype_range)
+                {
+                    output[i] = statsSumObj->max - statsSumObj->min;
+                }
+            }
+            else if(data->size() == 1)
+            {
+                output[i] = data->at(0);
+            }
+            else
+            {
+                output[i] = 0.0;
+            }
+        }
+        
+    }
+
+    RSGISCalcMultiImageStatSummaries::~RSGISCalcMultiImageStatSummaries()
+    {
+        delete this->mathUtils;
+        delete this->statsSumObj;
+        delete this->data;
+    }
+    
+    
+    
+    
+    
+    
+    
 }}

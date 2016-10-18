@@ -54,7 +54,9 @@ namespace rsgis{namespace math{
 		sumtype_value,
 		sumtype_histogram,
         sumtype_median,
-        sumtype_mode
+        sumtype_mode,
+        sumtype_sum,
+        sumtype_range
 	};
     
     enum rsgiscomparetype
