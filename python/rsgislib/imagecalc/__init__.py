@@ -301,7 +301,7 @@ def calcDist2ImgValsTiled(inputValsImg, outputDistImg, pxlVals, valsImgBand=1, m
         p.map(_computeProximityArrArgsFunc, distTileArgs)
             
     # Mosaic Tiles
-    imageutils.createImageMosaic(distTiles, outputDistImg, 0, noDataVal, 1, 1, 'KEA', rsgislib.TYPE_32FLOAT)
+    imageutils.createImageMosaic(distTiles, outputDistImg, 0, 0, 1, 1, 'KEA', rsgislib.TYPE_32FLOAT)
     imageutils.popImageStats(outputDistImg, usenodataval=True, nodataval=0, calcpyramids=True)
     
     for imgFile in distTiles:
