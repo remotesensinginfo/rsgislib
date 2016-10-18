@@ -76,6 +76,8 @@ Methods of summerising data:
     * SUMTYPE_MAX = 5
     * SUMTYPE_STDDEV = 6
     * SUMTYPE_COUNT = 7
+    * SUMTYPE_RANGE = 8
+    * SUMTYPE_SUM = 9
 
 """
 import os.path
@@ -110,6 +112,9 @@ SUMTYPE_MIN = 4
 SUMTYPE_MAX = 5
 SUMTYPE_STDDEV = 6
 SUMTYPE_COUNT = 7
+SUMTYPE_RANGE = 8
+SUMTYPE_SUM = 9
+
 
 METHOD_SAMPLES = 0      # as calculated by ML
 METHOD_AREA = 1         # priors set by the relative area

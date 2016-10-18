@@ -60,6 +60,19 @@ namespace rsgis{ namespace cmds {
         rsgis_init_diagonal_stddev_attach,
         rsgis_init_kpp
     };
+    
+    enum RSGISCmdsSummariseStats
+    {
+        rsgiscmds_stat_none,
+        rsgiscmds_stat_min,
+        rsgiscmds_stat_max,
+        rsgiscmds_stat_mean,
+        rsgiscmds_stat_median,
+        rsgiscmds_stat_range,
+        rsgiscmds_stat_stddev,
+        rsgiscmds_stat_sum,
+        rsgiscmds_stat_mode
+    };
 
     /** Function to run the band maths tools */
     DllExport void executeBandMaths(VariableStruct *variables, unsigned int numVars, std::string outputImage, std::string mathsExpression, std::string gdalFormat, RSGISLibDataType outDataType, bool useExpAsbandName)throw(RSGISCmdException);
@@ -141,8 +154,8 @@ namespace rsgis{ namespace cmds {
     DllExport void executeCalcMaskImgPxlValProb(std::string inputImage, std::vector<unsigned int> inImgBandIdxs, std::string maskImage, int maskVal, std::string outputImage, std::string gdalFormat, std::vector<float> histBinWidths, bool calcHistBinWidth, bool useImgNoData, bool rescaleProbs) throw(RSGISCmdException);
     /** A function to compute the proportion of true outputs from the expression across the image and optionally within the binary mask */
     DllExport float executeCalcPropTrueExp(VariableStruct *variables, unsigned int numVars, std::string mathsExpression, std::string inValidImage, bool useValidImg) throw(RSGISCmdException);
-
-
+    /** A function to calculate statistic (e.g., min) across a number of images */
+    DllExport void calcMultiImgBandsStats(std::vector<std::string> inputImages, std::string outputImage, RSGISCmdsSummariseStats summaryStats, std::string gdalFormat, RSGISLibDataType outDataType, bool useNoData, float noDataVal) throw(RSGISCmdException);
 }}
 
 
