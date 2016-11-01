@@ -1439,12 +1439,13 @@ static PyMethodDef ImageUtilsMethods[] = {
 "\n"},
  
     {"includeImages", ImageUtils_IncludeImages, METH_VARARGS,
-"imageutils.includeImages(baseImage, inputImages, inputBands=None)\n"  
+"imageutils.includeImages(baseImage, inputImages, inputBands=None, skipVal=None)\n"
 "Create mosaic from list of input images.\n"
 "\n"
 "* baseImage is a string containing the name of the input image to add image to\n"
 "* inputimagelist is a list of input images\n"
 "* inputBands is a subset of input bands to use (optional)\n"
+"* skipVal is a float specifying a value which should be ignored and not copied into the new image (optional). To use you must also provided a list of subset image bands.
 "\nExample::\n"
 "\n"
 "	import rsgislib\n"
