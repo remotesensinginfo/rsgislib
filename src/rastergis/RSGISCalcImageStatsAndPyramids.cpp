@@ -81,15 +81,15 @@ namespace rsgis{namespace rastergis{
                 band->SetNoDataValue(0.0);
             }
             
-            double max = 0;
-            double min = 0;
-            
+            long max = 0;
+            long min = 0;
             std::cout << "Get Image Min and Max.\n";
-            int nLastProgress = -1;
-
-            CPLErr returnVal = band->ComputeStatistics(false, &min, &max, NULL, NULL,  (GDALProgressFunc)RSGISRATStatsTextProgress, &nLastProgress);
-
-            if(returnVal == CE_Failure)
+            RSGISCalcImgMinMax calcMinMac = RSGISCalcImgMinMax(&min, &max, ratBand-1);
+            rsgis::img::RSGISCalcImage calcImageMinMax(&calcMinMac);
+            calcImageMinMax.calcImage(&clumpsDataset, 1, 0);
+            
+            
+            if((min == 0) & (max == 0))
             {
                 band->SetMetadataItem("STATISTICS_HISTOBINFUNCTION", "direct");
                 band->SetMetadataItem("STATISTICS_HISTOMIN", "0");
@@ -146,7 +146,7 @@ namespace rsgis{namespace rastergis{
                     throw rsgis::RSGISImageException("The minimum value is less than zero.");
                 }
                 
-                size_t maxHistVal = ceil(max)+1;
+                size_t maxHistVal = max+1;
                 size_t *histo = new size_t[maxHistVal];
                 
                 for(size_t i = 0; i < maxHistVal; ++i)
@@ -155,10 +155,9 @@ namespace rsgis{namespace rastergis{
                 }
                 
                 std::cout << "Get Image Histogram.\n";
-                RSGISGetClumpsHistogram *calcImgHisto = new RSGISGetClumpsHistogram(histo, maxHistVal);
-                rsgis::img::RSGISCalcImage calcImageStats(calcImgHisto);
+                RSGISGetClumpsHistogram calcImgHisto = RSGISGetClumpsHistogram(histo, maxHistVal, (ratBand-1));
+                rsgis::img::RSGISCalcImage calcImageStats(&calcImgHisto);
                 calcImageStats.calcImage(&clumpsDataset, 1, 0);
-                delete calcImgHisto;
                 
                 if(ignoreZero)
                 {
@@ -196,7 +195,6 @@ namespace rsgis{namespace rastergis{
                     alphaColIdx = attUtils.findColumnIndexOrCreate(attTable, "Alpha", GFT_Integer, GFU_Alpha);
                 }
                 
-                //std::string histoVals = "";
                 double *dataBlock = new double[RAT_BLOCK_LENGTH];
                 int *redBlock = NULL;
                 int *greenBlock = NULL;
@@ -218,16 +216,6 @@ namespace rsgis{namespace rastergis{
                 {
                     for(size_t j = 0; j < RAT_BLOCK_LENGTH; ++j)
                     {
-                        /*
-                        if(rowID == 0)
-                        {
-                            histoVals = txtUtils.int64bittostring(histo[rowID]);
-                        }
-                        else
-                        {
-                            histoVals += std::string("|") + txtUtils.int64bittostring(histo[rowID]);
-                        }
-                        */
                         if(addColourTable)
                         {
                             if((rowID == 0) & ignoreZero)
@@ -263,16 +251,6 @@ namespace rsgis{namespace rastergis{
                 {
                     for(size_t j = 0; j < rowsRemain; ++j)
                     {
-                        /*
-                        if(rowID == 0)
-                        {
-                            histoVals = txtUtils.int64bittostring(histo[rowID]);
-                        }
-                        else
-                        {
-                            histoVals += std::string("|") + txtUtils.int64bittostring(histo[rowID]);
-                        }
-                         */
                         if(addColourTable)
                         {
                             if((rowID == 0) & ignoreZero)
@@ -373,21 +351,67 @@ namespace rsgis{namespace rastergis{
     }
     
     
-    RSGISGetClumpsHistogram::RSGISGetClumpsHistogram(size_t *histogram, size_t maxVal):rsgis::img::RSGISCalcImageValue(0)
+    RSGISGetClumpsHistogram::RSGISGetClumpsHistogram(size_t *histogram, size_t maxVal, unsigned int band):rsgis::img::RSGISCalcImageValue(0)
     {
         this->histogram = histogram;
         this->maxVal = maxVal;
+        this->band = band;
     }
 
     void RSGISGetClumpsHistogram::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException)
     {
-        if((intBandValues[0] >= 0) & (intBandValues[0] < maxVal))
+        if(numIntVals <= band)
         {
-            ++histogram[intBandValues[0]];
+            throw rsgis::img::RSGISImageCalcException("Band is not in the input image...");
+        }
+        
+        if((intBandValues[band] >= 0) & (intBandValues[band] < maxVal))
+        {
+            ++histogram[intBandValues[band]];
         }
     }
     
     RSGISGetClumpsHistogram::~RSGISGetClumpsHistogram()
+    {
+        
+    }
+    
+    RSGISCalcImgMinMax::RSGISCalcImgMinMax(long *minVal, long *maxVal, unsigned int band):rsgis::img::RSGISCalcImageValue(0)
+    {
+        this->minVal = minVal;
+        this->maxVal = maxVal;
+        this->band = band;
+        first = true;
+    }
+    
+    void RSGISCalcImgMinMax::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException)
+    {
+        if(numIntVals <= band)
+        {
+            throw rsgis::img::RSGISImageCalcException("Band is not in the input image...");
+        }
+        
+        
+        if(first)
+        {
+            *minVal = intBandValues[band];
+            *maxVal = intBandValues[band];
+            first = false;
+        }
+        else
+        {
+            if(intBandValues[band] < *minVal)
+            {
+                *minVal = intBandValues[band];
+            }
+            else if(intBandValues[band] > *maxVal)
+            {
+                *maxVal = intBandValues[band];
+            }
+        }
+    }
+    
+    RSGISCalcImgMinMax::~RSGISCalcImgMinMax()
     {
         
     }
