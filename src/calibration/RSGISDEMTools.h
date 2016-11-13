@@ -171,7 +171,7 @@ namespace rsgis{namespace calib{
     class DllExport RSGISCalcShadowBinaryMask : public rsgis::img::RSGISCalcImageValue
 	{
 	public: 
-		RSGISCalcShadowBinaryMask(int numberOutBands, GDALDataset *inputImage, unsigned int band, float ewRes, float nsRes, float sunZenith, float sunAzimuth, float maxElevHeight);
+		RSGISCalcShadowBinaryMask(int numberOutBands, GDALDataset *inputImage, unsigned int band, float ewRes, float nsRes, float sunZenith, float sunAzimuth, float maxElevHeight, double noDataVal);
 		void calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
 		void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException) {throw rsgis::img::RSGISImageCalcException("No implemented");};
         void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
@@ -194,6 +194,7 @@ namespace rsgis{namespace calib{
         double demHeight;
         float maxElevHeight;
         GDALDataset *inputImage;
+        double noDataVal;
 	};
     
     class DllExport RSGISCalcRayIncidentAngle : public rsgis::img::RSGISCalcImageValue
