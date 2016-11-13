@@ -338,7 +338,7 @@ namespace rsgis{namespace calib{
     
     
     
-    RSGISCalcShadowBinaryMask::RSGISCalcShadowBinaryMask(int numberOutBands, GDALDataset *inputImage, unsigned int band, float ewRes, float nsRes, float sunZenith, float sunAzimuth, float maxElevHeight) : rsgis::img::RSGISCalcImageValue(numberOutBands)
+    RSGISCalcShadowBinaryMask::RSGISCalcShadowBinaryMask(int numberOutBands, GDALDataset *inputImage, unsigned int band, float ewRes, float nsRes, float sunZenith, float sunAzimuth, float maxElevHeight, double noDataVal) : rsgis::img::RSGISCalcImageValue(numberOutBands)
     {
         this->band = band;
         this->ewRes = ewRes;
@@ -353,6 +353,8 @@ namespace rsgis{namespace calib{
         
         this->sunRange = sqrt((demWidth * demWidth) + (demHeight * demHeight))*2;
         
+        this->noDataVal = noDataVal;
+        
     }
 		
     void RSGISCalcShadowBinaryMask::calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException)
@@ -361,51 +363,58 @@ namespace rsgis{namespace calib{
         
         try 
         {
-            const double degreesToRadians = M_PI / 180.0;
-            
-            // Location of active point.
-            double x = extent.getMinX() + (extent.getMaxX() - extent.getMinX())/2;
-            double y = extent.getMinY() + (extent.getMaxY() - extent.getMinY())/2;
-            double z = bandValues[band-1];
-            
-            // Location of the sun.
-            double sunX = x + (sunRange * sin(sunZenith * degreesToRadians) * cos(sunAzimuth * degreesToRadians));
-            double sunY = y + (sunRange * sin(sunZenith * degreesToRadians) * sin(sunAzimuth * degreesToRadians));
-            double sunZ = z + (sunRange * cos(sunZenith * degreesToRadians));
-            
-            // Create Ray Line
-            geos::geom::Coordinate pxlPt;
-            pxlPt.x = x;
-            pxlPt.y = y;
-            pxlPt.z = z;
-            
-            geos::geom::Coordinate sunPt;
-            sunPt.x = sunX;
-            sunPt.y = sunY;
-            sunPt.z = sunZ;
-            
-            rsgis::img::RSGISExtractImagePixelsOnLine extractPixels;
-            std::vector<rsgis::img::ImagePixelValuePt*> *imagePxlPts = extractPixels.getImagePixelValues(inputImage, band, &pxlPt, (sunAzimuth * degreesToRadians), (sunZenith * degreesToRadians), maxElevHeight);
-            
-            // Check whether pixel intersects with ray.
-            for(std::vector<rsgis::img::ImagePixelValuePt*>::iterator iterPxls = imagePxlPts->begin(); iterPxls != imagePxlPts->end(); ++iterPxls)
+            if( bandValues[0] != noDataVal)
             {
-                if((*iterPxls)->pt->z < (*iterPxls)->value)
+                const double degreesToRadians = M_PI / 180.0;
+                
+                // Location of active point.
+                double x = extent.getMinX() + (extent.getMaxX() - extent.getMinX())/2;
+                double y = extent.getMinY() + (extent.getMaxY() - extent.getMinY())/2;
+                double z = bandValues[band-1];
+                
+                // Location of the sun.
+                double sunX = x + (sunRange * sin(sunZenith * degreesToRadians) * cos(sunAzimuth * degreesToRadians));
+                double sunY = y + (sunRange * sin(sunZenith * degreesToRadians) * sin(sunAzimuth * degreesToRadians));
+                double sunZ = z + (sunRange * cos(sunZenith * degreesToRadians));
+                
+                // Create Ray Line
+                geos::geom::Coordinate pxlPt;
+                pxlPt.x = x;
+                pxlPt.y = y;
+                pxlPt.z = z;
+                
+                geos::geom::Coordinate sunPt;
+                sunPt.x = sunX;
+                sunPt.y = sunY;
+                sunPt.z = sunZ;
+                
+                rsgis::img::RSGISExtractImagePixelsOnLine extractPixels;
+                std::vector<rsgis::img::ImagePixelValuePt*> *imagePxlPts = extractPixels.getImagePixelValues(inputImage, band, &pxlPt, (sunAzimuth * degreesToRadians), (sunZenith * degreesToRadians), maxElevHeight);
+                
+                // Check whether pixel intersects with ray.
+                for(std::vector<rsgis::img::ImagePixelValuePt*>::iterator iterPxls = imagePxlPts->begin(); iterPxls != imagePxlPts->end(); ++iterPxls)
                 {
-                    outputValue = 1;
-                    break;
+                    if((*iterPxls)->pt->z < (*iterPxls)->value)
+                    {
+                        outputValue = 1;
+                        break;
+                    }
                 }
+                
+                // Clean up memory..
+                for(std::vector<rsgis::img::ImagePixelValuePt*>::iterator iterPxls = imagePxlPts->begin(); iterPxls != imagePxlPts->end(); )
+                {
+                    delete (*iterPxls)->pt;
+                    delete (*iterPxls);
+                    iterPxls = imagePxlPts->erase(iterPxls);
+                }
+                delete imagePxlPts;
             }
-            
-            // Clean up memory..
-            for(std::vector<rsgis::img::ImagePixelValuePt*>::iterator iterPxls = imagePxlPts->begin(); iterPxls != imagePxlPts->end(); )
+            else
             {
-                delete (*iterPxls)->pt;
-                delete (*iterPxls);
-                iterPxls = imagePxlPts->erase(iterPxls);
+                outputValue = 0;
             }
-            delete imagePxlPts;
-        } 
+        }
         catch (rsgis::img::RSGISImageCalcException &e) 
         {
             throw e;

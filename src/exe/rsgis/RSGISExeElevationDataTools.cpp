@@ -1143,7 +1143,7 @@ void RSGISExeElevationDataTools::runAlgorithm() throw(rsgis::RSGISException)
                 
                 delete[] transformation;
                 
-				calcMaskShadow = new rsgis::calib::RSGISCalcShadowBinaryMask(1, datasets[0], imageBand-1, imageEWRes, imageNSRes, solarZenith, solarAzimuth, maxElevHeight);
+				calcMaskShadow = new rsgis::calib::RSGISCalcShadowBinaryMask(1, datasets[0], imageBand-1, imageEWRes, imageNSRes, solarZenith, solarAzimuth, maxElevHeight, 0.0);
 				
 				calcImage = new rsgis::img::RSGISCalcImage(calcMaskShadow, "", true);
 				calcImage->calcImageExtent(datasets, 1, outputImage, this->imageFormat);
