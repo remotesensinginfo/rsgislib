@@ -148,6 +148,11 @@ namespace rsgis{ namespace cmds {
     
     /** Function to apply DOS offsets (per band) to the input image */
     DllExport void executeApplySubtractSingleOffsets(std::string inputImage, std::string outputImage, std::vector<double> offsetValues, bool nonNegative, std::string gdalFormat, rsgis::RSGISLibDataType rsgisOutDataType, float noDataVal, bool useNoDataVal, float darkObjReflVal) throw(RSGISCmdException);
+    
+    /** Function to calculate the view angle across the swath of a nadir input image */
+    DllExport void executeCalcNadirImageViewAngle(std::string imgFootprint, std::string outViewAngleImg, std::string gdalFormat, double sateAltitude, std::string minXXCol, std::string minXYCol, std::string maxXXCol, std::string maxXYCol, std::string minYXCol, std::string minYYCol, std::string maxYXCol, std::string maxYYCol) throw(RSGISCmdException);
+    
+    
 
     
 }}

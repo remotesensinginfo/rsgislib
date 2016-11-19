@@ -29,6 +29,7 @@
 #include "calibration/RSGISApplySubtractOffsets.h"
 #include "calibration/RSGISCloudMasking.h"
 #include "calibration/RSGISHydroDEMFillSoilleGratin94.h"
+#include "calibration/RSGISImgCalibUtils.h"
 
 #include "img/RSGISImageCalcException.h"
 #include "img/RSGISCalcImageValue.h"
@@ -1431,7 +1432,36 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
+    
                 
+    void executeCalcNadirImageViewAngle(std::string imgFootprint, std::string outViewAngleImg, std::string gdalFormat, double sateAltitude, std::string minXXCol, std::string minXYCol, std::string maxXXCol, std::string maxXYCol, std::string minYXCol, std::string minYYCol, std::string maxYXCol, std::string maxYYCol) throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            
+            std::cout << "Open input image: \'" << imgFootprint << "\'" << std::endl;
+            GDALDataset *dataset = (GDALDataset *) GDALOpen(imgFootprint.c_str(), GA_ReadOnly);
+            if(dataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + imgFootprint;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            rsgis::calib::RSGISImgCalibUtils calibUtils;
+            calibUtils.calcNadirImgViewAngle(dataset, outViewAngleImg, gdalFormat, sateAltitude, minXXCol, minXYCol, maxXXCol, maxXYCol, minYXCol, minYYCol, maxYXCol, maxYYCol);
+            
+            GDALClose(dataset);
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
     
 }}
 

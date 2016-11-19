@@ -944,7 +944,6 @@ static PyObject *ImageCalibration_saturatedPixelsMask(PyObject *self, PyObject *
     Py_RETURN_NONE;
 }
 
-
 static PyObject *ImageCalibration_landsatThermalRad2Brightness(PyObject *self, PyObject *args)
 {
     const char *pszInputFile, *pszOutputFile, *pszGDALFormat;
@@ -1040,7 +1039,6 @@ static PyObject *ImageCalibration_landsatThermalRad2Brightness(PyObject *self, P
     
     Py_RETURN_NONE;
 }
-
 
 static PyObject *ImageCalibration_applyLandsatTMCloudFMask(PyObject *self, PyObject *args)
 {
@@ -1257,7 +1255,29 @@ static PyObject *ImageCalibration_spot5ToRadiance(PyObject *self, PyObject *args
     Py_RETURN_NONE;
 }
 
-
+static PyObject *ImageCalibration_calcNadirImgViewAngle(PyObject *self, PyObject *args)
+{
+    const char *pszImgFootprint, *pszOutViewAngleImg, *pszGDALFormat;
+    float sateAltitude = 0.0;
+    const char *pszMinXXCol, *pszMinXYCol, *pszMaxXXCol, *pszMaxXYCol, *pszMinYXCol, *pszMinYYCol, *pszMaxYXCol, *pszMaxYYCol;
+    
+    if( !PyArg_ParseTuple(args, "sssfssssssss:calcNadirImgViewAngle", &pszImgFootprint, &pszOutViewAngleImg, &pszGDALFormat, &sateAltitude, &pszMinXXCol, &pszMinXYCol, &pszMaxXXCol, &pszMaxXYCol, &pszMinYXCol, &pszMinYYCol, &pszMaxYXCol, &pszMaxYYCol))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeCalcNadirImageViewAngle(std::string(pszImgFootprint), std::string(pszOutViewAngleImg), std::string(pszGDALFormat), sateAltitude, std::string(pszMinXXCol), std::string(pszMinXYCol), std::string(pszMaxXXCol), std::string(pszMaxXYCol), std::string(pszMinYXCol), std::string(pszMinYYCol), std::string(pszMaxYXCol), std::string(pszMaxYYCol));
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
 
 
 // Our list of functions in this module
@@ -1536,6 +1556,25 @@ static PyMethodDef ImageCalibrationMethods[] = {
     "   * bias - PHYSICAL_BIAS value from SPOT5 XML header.\n"
     "\n"},
 
+{"calcNadirImgViewAngle", ImageCalibration_calcNadirImgViewAngle, METH_VARARGS,
+"imagecalibration.calcNadirImgViewAngle(inImgFootprint, outViewAngleImg, gdalFormat, sateAltitude, minXXCol, minXYCol, maxXXCol, maxXYCol, minYXCol, minYYCol, maxYXCol, maxYYCol)\n"
+"Calculate the sensor view angle for each pixel for a nadir sensor. Need to provide the satellite altitude in metres, for Landsat this is 705000.0. \n"
+"Where:\n"
+"\n"
+"* inImgFootprint is a string containing the name/path of the input file. This file needs to be to have a RAT with only one clump with pixel value 1.\n"
+"* outViewAngleImg is a string for the name/path of the output file.\n"
+"* gdalFormat is a string for the GDAL format\n"
+"* sateAltitude is a float in metres for the satellite altitude.\n"
+"* minXXCol is a string for the minXX column in the RAT.\n"
+"* minXYCol is a string for the minXY column in the RAT.\n"
+"* maxXXCol is a string for the maxXX column in the RAT.\n"
+"* maxXYCol is a string for the maxXY column in the RAT.\n"
+"* minYXCol is a string for the minYX column in the RAT.\n"
+"* minYYCol is a string for the minYY column in the RAT.\n"
+"* maxYXCol is a string for the maxYX column in the RAT.\n"
+"* maxYYCol is a string for the maxYY column in the RAT.\n"
+"\n"},
+    
     {NULL}        /* Sentinel */
 };
 
