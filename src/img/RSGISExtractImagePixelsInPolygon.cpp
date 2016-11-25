@@ -30,7 +30,7 @@ namespace rsgis
 	{
         RSGISExtractImagePixelsOnLine::RSGISExtractImagePixelsOnLine()
         {
-            
+
         }
         
         std::vector<ImagePixelValuePt*>* RSGISExtractImagePixelsOnLine::getImagePixelValues(GDALDataset *image, unsigned int imageBand, geos::geom::Coordinate *pt1, float azimuthRad, float zenithRad, float rayElevThreshold) throw(RSGISImageCalcException)
@@ -47,20 +47,13 @@ namespace rsgis
                 double yMax = transform[3];
                 double yMin = transform[3] + image->GetRasterYSize()*transform[5];
                 
-                //std::cout << "TL: [" << xMin << "," << yMax << "]\n";
-                //std::cout << "BR: [" << xMax << "," << yMin << "]\n";
-                
                 if(transform[5] < 0)
                 {
                     transform[5] *= -1;
                 }
                 
-                //std::cout << "Pt: [" << pt1->x << "," << pt1->y << "]\n";
-                                
                 double xDiff = (pt1->x - xMin)/transform[1];
                 double yDiff = (yMax - pt1->y)/transform[5];
-                
-                //std::cout << "Diff: [" << xDiff << "," << yDiff << "]\n";
                 
                 boost::uint_fast32_t xPxl = 0;
                 boost::uint_fast32_t yPxl = 0;
@@ -85,20 +78,20 @@ namespace rsgis
                 {
                     throw RSGISImageCalcException(e.what());
                 }
+                
+                double stepRange = transform[1];
+                if(transform[5] < stepRange)
+                {
+                    stepRange = transform[5];
+                }
 
-                //std::cout << "Pixel: [" << xPxl << "," << yPxl << "]\n";
+                double xStep = (stepRange * sin(zenithRad) * cos(azimuthRad));
+                double yStep = (stepRange * sin(zenithRad) * sin(azimuthRad));
+                double zStep = (stepRange * cos(zenithRad));
                 
-                double stepRange = sqrt((transform[1]*transform[1])+(transform[5]*transform[5]));
-                double xStep = (stepRange * sin(zenithRad) * cos(azimuthRad))/3;
-                double yStep = (stepRange * sin(zenithRad) * sin(azimuthRad))/3;
-                double zStep = (stepRange * cos(zenithRad))/3;
-                
-                //double dx = pt2->x - pt1->x;
-                //double dy = pt2->y - pt1->y;
-                
-                //std::cout << "dx,dy: [" << dx << "," << dy << "]\n";
-                
-                //std::cout << "Step: [" << xStep << "," << yStep << "," << zStep << "]\n";
+                xStep = xStep/3;
+                yStep = yStep/3;
+                zStep = zStep/3;
                 
                 double xVal = pt1->x;
                 double yVal = pt1->y;
@@ -111,8 +104,6 @@ namespace rsgis
                     yVal += yStep;
                     zVal += zStep;
                     
-                    //std::cout << "Val: [" << xVal << "," << yVal << "]\n";
-                                        
                     // Reached edge of image?
                     if(xVal < xMin)
                     {
@@ -139,8 +130,6 @@ namespace rsgis
                     xDiff = (xVal - xMin)/transform[1];
                     yDiff = (yMax - yVal)/transform[5];
                     
-                    //std::cout << "Diff: [" << xDiff << "," << yDiff << "]\n";
-                    
                     try
                     {
                         xPxl = boost::numeric_cast<boost::uint_fast32_t>(xDiff);
@@ -158,7 +147,6 @@ namespace rsgis
                     {
                         throw RSGISImageCalcException(e.what());
                     }
-                    //std::cout << "Pixel: [" << xPxl << "," << yPxl << "]\n";
                     
                     if(!complete)
                     {
@@ -181,10 +169,10 @@ namespace rsgis
                     
                     if(zVal > rayElevThreshold)
                     {
+                        complete = true;
                         break;
                     }
                 }
-                
                 delete[] transform;
                 
                 this->populateWithImageValues(image, imageBand, pxlValues);                
@@ -238,7 +226,7 @@ namespace rsgis
         
         RSGISExtractImagePixelsOnLine::~RSGISExtractImagePixelsOnLine()
         {
-            
+
         }
         
     }

@@ -37,6 +37,7 @@
 #include "common/RSGISOutputStreamException.h"
 
 #include "utils/RSGISGEOSFactoryGenerator.h"
+#include "utils/RSGISExportForPlottingIncremental.h"
 
 #include "img/RSGISImageBandException.h"
 #include "img/RSGISImageUtils.h"

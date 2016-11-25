@@ -43,6 +43,7 @@
 #include "img/RSGISExtractImagePixelsInPolygon.h"
 
 #include "utils/RSGISGEOSFactoryGenerator.h"
+#include "utils/RSGISExportForPlottingIncremental.h"
 
 #include "math/RSGISMathsUtils.h"
 
@@ -57,6 +58,7 @@
 #endif
 
 namespace rsgis{namespace calib{
+    
     
     
     /***
@@ -178,9 +180,9 @@ namespace rsgis{namespace calib{
         void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
 		void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent)throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
         void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException) {throw rsgis::img::RSGISImageCalcException("No implemented");};
-		void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent)throw(rsgis::img::RSGISImageCalcException);
+		void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent)throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
 		void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException) {throw rsgis::img::RSGISImageCalcException("No implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException);
 		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException) {throw rsgis::img::RSGISImageCalcException("No implemented");};
 		~RSGISCalcShadowBinaryMask();
     private:
@@ -195,6 +197,9 @@ namespace rsgis{namespace calib{
         float maxElevHeight;
         GDALDataset *inputImage;
         double noDataVal;
+        double degreesToRadians;
+        double radiansToDegrees;
+        rsgis::img::RSGISExtractImagePixelsOnLine *extractPixels;
 	};
     
     class DllExport RSGISCalcRayIncidentAngle : public rsgis::img::RSGISCalcImageValue
