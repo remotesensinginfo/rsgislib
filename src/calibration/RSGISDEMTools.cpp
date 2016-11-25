@@ -26,7 +26,7 @@
 
 namespace rsgis{namespace calib{
     
-
+    
     RSGISCalcSlope::RSGISCalcSlope(int numberOutBands, unsigned int band, float ewRes, float nsRes, int outType) : rsgis::img::RSGISCalcImageValue(numberOutBands)
     {
         this->band = band;
@@ -281,6 +281,13 @@ namespace rsgis{namespace calib{
         this->nsRes = nsRes;
         this->sunZenith = sunZenith;
         this->sunAzimuth = sunAzimuth;
+        
+        this->sunAzimuth = 360 - this->sunAzimuth;
+        this->sunAzimuth = this->sunAzimuth + 90;
+        if(this->sunAzimuth > 360)
+        {
+            this->sunAzimuth = this->sunAzimuth - 360;
+        }
     }
     
     void RSGISCalcHillShade::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
@@ -311,10 +318,12 @@ namespace rsgis{namespace calib{
         aspect = atan2(dy,dx);
         
         // shade value
+        double sunZenRad = sunZenith * degreesToRadians;
+        double sunAzRad = sunAzimuth * degreesToRadians;
                 
-        double cang = (sin(sunZenith * degreesToRadians) -
-                cos(sunZenith * degreesToRadians) * sqrt(xx_plus_yy) *
-                sin(aspect - (sunAzimuth-M_PI/2 * degreesToRadians))) /
+        double cang = (sin(sunZenRad) -
+                cos(sunZenRad) * sqrt(xx_plus_yy) *
+                sin(aspect - (sunAzRad-M_PI/2))) /
                 sqrt(1 + 1 * xx_plus_yy);
         
         if (cang <= 0.0)
@@ -354,80 +363,149 @@ namespace rsgis{namespace calib{
         this->sunRange = sqrt((demWidth * demWidth) + (demHeight * demHeight))*2;
         
         this->noDataVal = noDataVal;
-        
+        this->degreesToRadians = M_PI / 180.0;
+        this->radiansToDegrees = 180.0 / M_PI;
+
+        extractPixels = new rsgis::img::RSGISExtractImagePixelsOnLine();
     }
 		
-    void RSGISCalcShadowBinaryMask::calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCalcShadowBinaryMask::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException)
     {
-        float outputValue = 0;
         
-        try 
+        if(winSize != 3)
         {
-            if( bandValues[0] != noDataVal)
+            throw rsgis::img::RSGISImageCalcException("Window size must be equal to 3 for the calculate of slope.");
+        }
+        
+        if(!(this->band <= numBands))
+        {
+            throw rsgis::img::RSGISImageCalcException("Specified image band is not within the image.");
+        }
+        
+        output[0] = 0;
+        try
+        {   bool flatGround = false;
+            bool pxlAwayFromSun = false;
+            
+            if( dataBlock[band-1][1][1] != this->noDataVal)
             {
-                const double degreesToRadians = M_PI / 180.0;
+                double dx, dy, slopeRad = 0.0;
+                dx = ((dataBlock[band-1][0][0] + dataBlock[band-1][1][0] + dataBlock[band-1][1][0] + dataBlock[band-1][2][0]) -
+                      (dataBlock[band-1][0][2] + dataBlock[band-1][1][2] + dataBlock[band-1][1][2] + dataBlock[band-1][2][2]))/ewRes;
+                dy = ((dataBlock[band-1][2][0] + dataBlock[band-1][2][1] + dataBlock[band-1][2][1] + dataBlock[band-1][2][2]) -
+                      (dataBlock[band-1][0][0] + dataBlock[band-1][0][1] + dataBlock[band-1][0][1] + dataBlock[band-1][0][2]))/nsRes;
+                slopeRad = atan(sqrt((dx * dx) + (dy * dy))/8);
                 
-                // Location of active point.
-                double x = extent.getMinX() + (extent.getMaxX() - extent.getMinX())/2;
-                double y = extent.getMinY() + (extent.getMaxY() - extent.getMinY())/2;
-                double z = bandValues[band-1];
+                double dxAspect, dyAspect, aspect;
+                dxAspect = ((dataBlock[band-1][0][2] + dataBlock[band-1][1][2] + dataBlock[band-1][1][2] + dataBlock[band-1][2][2]) -
+                            (dataBlock[band-1][0][0] + dataBlock[band-1][1][0] + dataBlock[band-1][1][0] + dataBlock[band-1][2][0]))/ewRes;
+                dyAspect = ((dataBlock[band-1][2][0] + dataBlock[band-1][2][1] + dataBlock[band-1][2][1] + dataBlock[band-1][2][2]) -
+                            (dataBlock[band-1][0][0] + dataBlock[band-1][0][1] + dataBlock[band-1][0][1] + dataBlock[band-1][0][2]))/nsRes;
+                aspect = atan2(-dxAspect, dyAspect)*radiansToDegrees;
                 
-                // Location of the sun.
-                double sunX = x + (sunRange * sin(sunZenith * degreesToRadians) * cos(sunAzimuth * degreesToRadians));
-                double sunY = y + (sunRange * sin(sunZenith * degreesToRadians) * sin(sunAzimuth * degreesToRadians));
-                double sunZ = z + (sunRange * cos(sunZenith * degreesToRadians));
-                
-                // Create Ray Line
-                geos::geom::Coordinate pxlPt;
-                pxlPt.x = x;
-                pxlPt.y = y;
-                pxlPt.z = z;
-                
-                geos::geom::Coordinate sunPt;
-                sunPt.x = sunX;
-                sunPt.y = sunY;
-                sunPt.z = sunZ;
-                
-                rsgis::img::RSGISExtractImagePixelsOnLine extractPixels;
-                std::vector<rsgis::img::ImagePixelValuePt*> *imagePxlPts = extractPixels.getImagePixelValues(inputImage, band, &pxlPt, (sunAzimuth * degreesToRadians), (sunZenith * degreesToRadians), maxElevHeight);
-                
-                // Check whether pixel intersects with ray.
-                for(std::vector<rsgis::img::ImagePixelValuePt*>::iterator iterPxls = imagePxlPts->begin(); iterPxls != imagePxlPts->end(); ++iterPxls)
+                if (dxAspect == 0 && dyAspect == 0)
                 {
-                    if((*iterPxls)->pt->z < (*iterPxls)->value)
+                    // Flat area
+                    aspect = std::numeric_limits<double>::signaling_NaN();
+                    flatGround = true;
+                }
+                if(!flatGround)
+                {
+                    if (aspect < 0)
                     {
-                        outputValue = 1;
-                        break;
+                        aspect += 360.0;
+                    }
+                    if (aspect == 360.0)
+                    {
+                        aspect = 0.0;
+                    }
+                    aspect = aspect * degreesToRadians;
+                    
+                    
+                    double sunZenRad = sunZenith * degreesToRadians;
+                    double sunAzRad = sunAzimuth * degreesToRadians;
+                    
+                    double ic = (cos(sunZenRad) * cos(slopeRad)) + (sin(sunZenRad) * sin(slopeRad) * cos((sunAzRad) - aspect));
+                    //output[0] = ic;
+                    if(ic < 0)
+                    {
+                        pxlAwayFromSun = true;
                     }
                 }
                 
-                // Clean up memory..
-                for(std::vector<rsgis::img::ImagePixelValuePt*>::iterator iterPxls = imagePxlPts->begin(); iterPxls != imagePxlPts->end(); )
+                if(pxlAwayFromSun)
                 {
-                    delete (*iterPxls)->pt;
-                    delete (*iterPxls);
-                    iterPxls = imagePxlPts->erase(iterPxls);
+                    output[0] = 1;
                 }
-                delete imagePxlPts;
+                else
+                {
+                    // do ray tracing...
+                    // Location of active point.
+                    double x = extent.getMinX() + (extent.getMaxX() - extent.getMinX())/2;
+                    double y = extent.getMinY() + (extent.getMaxY() - extent.getMinY())/2;
+                    double z = dataBlock[band-1][1][1];
+                    
+                    
+                    double sunAzTrans = 360-this->sunAzimuth;
+                    sunAzTrans = sunAzTrans + 90;
+                    if(sunAzTrans > 360)
+                    {
+                        sunAzTrans = sunAzTrans-360;
+                    }
+                    
+                    double sunZenRad = sunZenith * degreesToRadians;
+                    double sunAzRad = sunAzTrans * degreesToRadians;
+                    
+                    // Location of the sun.
+                    //double sunX = x + (sunRange * sin(sunZenRad) * cos(sunAzRad));
+                    //double sunY = y + (sunRange * sin(sunZenRad) * sin(sunAzRad));
+                    //double sunZ = z + (sunRange * cos(sunZenRad));
+                    
+                    
+                    // Create Ray Line
+                    geos::geom::Coordinate pxlPt;
+                    pxlPt.x = x;
+                    pxlPt.y = y;
+                    pxlPt.z = z;
+                    
+                    
+                    std::vector<rsgis::img::ImagePixelValuePt*> *imagePxlPts = extractPixels->getImagePixelValues(inputImage, band, &pxlPt, sunAzRad, sunZenRad, maxElevHeight);
+                    
+                    // Check whether pixel intersects with ray.
+                    for(std::vector<rsgis::img::ImagePixelValuePt*>::iterator iterPxls = imagePxlPts->begin(); iterPxls != imagePxlPts->end(); ++iterPxls)
+                    {
+                        if((*iterPxls)->pt->z < (*iterPxls)->value)
+                        {
+                            output[0] = 1;
+                            break;
+                        }
+                    }
+                    
+                    // Clean up memory..
+                    for(std::vector<rsgis::img::ImagePixelValuePt*>::iterator iterPxls = imagePxlPts->begin(); iterPxls != imagePxlPts->end(); )
+                    {
+                        delete (*iterPxls)->pt;
+                        delete (*iterPxls);
+                        iterPxls = imagePxlPts->erase(iterPxls);
+                    }
+                    delete imagePxlPts;
+                }
+                
             }
             else
             {
-                outputValue = 0;
+                output[0] = 0;
             }
         }
         catch (rsgis::img::RSGISImageCalcException &e) 
         {
             throw e;
         }
-        
-        //if shadow then outputValue == 1;
-        
-        output[0] = outputValue;
     }
     
     RSGISCalcShadowBinaryMask::~RSGISCalcShadowBinaryMask()
     {
-        
+        delete extractPixels;
     }
     
     
@@ -463,7 +541,7 @@ namespace rsgis{namespace calib{
             
             const double radiansToDegrees = 180.0 / M_PI;
             
-            double dxSlope, dySlope, slopeRad, slope;
+            double dxSlope, dySlope, slopeRad;
             
             dxSlope = ((dataBlock[band][0][0] + dataBlock[band][1][0] + dataBlock[band][1][0] + dataBlock[band][2][0]) - 
                        (dataBlock[band][0][2] + dataBlock[band][1][2] + dataBlock[band][1][2] + dataBlock[band][2][2]))/ewRes;
@@ -473,7 +551,6 @@ namespace rsgis{namespace calib{
             
             slopeRad = atan(sqrt((dxSlope * dxSlope) + (dySlope * dySlope))/8);
             
-            slope = (slopeRad * radiansToDegrees);
             
             double dxAspect, dyAspect, aspect;
             
@@ -500,16 +577,25 @@ namespace rsgis{namespace calib{
             {
                 aspect = 0.0;
             }
+            double aspectRad = aspect*degreesToRadians;
             
             // UNIT VECTOR FOR SURFACE
-            double pA = sin(slope*degreesToRadians) * cos(aspect*degreesToRadians);
-            double pB = sin(slope*degreesToRadians) * sin(aspect*degreesToRadians);
-            double pC = cos(slope*degreesToRadians);
+            double pA = sin(slopeRad) * cos(aspectRad);
+            double pB = sin(slopeRad) * sin(aspectRad);
+            double pC = cos(slopeRad);
+            
+            double sunAzTrans = this->sunAzimuth + 180;
+            if(sunAzTrans > 360)
+            {
+                sunAzTrans = sunAzTrans - 360;
+            }
+            double sunZenRad = sunZenith * degreesToRadians;
+            double sunAzRad = sunAzTrans * degreesToRadians;
             
             // UNIT VECTOR FOR INCIDENT RAY
-            double rA = sin((sunZenith)*degreesToRadians) * cos(sunAzimuth*degreesToRadians);
-            double rB = sin((sunZenith)*degreesToRadians) * sin(sunAzimuth*degreesToRadians);
-            double rC = cos((sunZenith)*degreesToRadians);
+            double rA = sin(sunZenRad) * cos(sunAzRad);
+            double rB = sin(sunZenRad) * sin(sunAzRad);
+            double rC = cos(sunZenRad);
             
             outputValue = acos((pA*rA)+(pB*rB)+(pC*rC)) * radiansToDegrees;
             
@@ -703,15 +789,20 @@ namespace rsgis{namespace calib{
                 aspect = 0.0;
             }
             
+            double aspectRad = aspect*degreesToRadians;
+            
             // UNIT VECTOR FOR SURFACE
-            double pA = sin(slope*degreesToRadians) * cos(aspect*degreesToRadians);
-            double pB = sin(slope*degreesToRadians) * sin(aspect*degreesToRadians);
-            double pC = cos(slope*degreesToRadians);
-                        
+            double pA = sin(slopeRad) * cos(aspectRad);
+            double pB = sin(slopeRad) * sin(aspectRad);
+            double pC = cos(slopeRad);
+            
+            double sunZenRad = sunZenith * degreesToRadians;
+            double sunAzRad = sunAzimuth * degreesToRadians;
+            
             // UNIT VECTOR FOR INCIDENT RAY
-            double rA = sin((sunZenith)*degreesToRadians) * cos(sunAzimuth*degreesToRadians);
-            double rB = sin((sunZenith)*degreesToRadians) * sin(sunAzimuth*degreesToRadians);
-            double rC = cos((sunZenith)*degreesToRadians);
+            double rA = sin(sunZenRad) * cos(sunAzRad);
+            double rB = sin(sunZenRad) * sin(sunAzRad);
+            double rC = cos(sunZenRad);
             
             incidenceAngle = acos((pA*rA)+(pB*rB)+(pC*rC)) * radiansToDegrees;
             

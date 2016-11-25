@@ -236,14 +236,11 @@ namespace rsgis{ namespace cmds {
             double demNoDataVal = dataset->GetRasterBand(1)->GetNoDataValue();
             std::cout << "No Data Value = " << demNoDataVal << std::endl;
             
-            solarZenith = 90 - solarZenith;
-            solarAzimuth = solarAzimuth - 180;
-            
             rsgis::calib::RSGISCalcShadowBinaryMask *calcShadowMask = new rsgis::calib::RSGISCalcShadowBinaryMask(1, dataset, 1, imageEWRes, imageNSRes, solarZenith, solarAzimuth, maxHeight, demNoDataVal);
             
             rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(calcShadowMask, "", true);
             
-            calcImage.calcImageExtent(&dataset, 1, outputImage, outImageFormat, GDT_Byte);
+            calcImage.calcImageWindowDataExtent(&dataset, 1, outputImage, 3, outImageFormat, GDT_Byte);
             
             GDALClose(dataset);
             delete calcShadowMask;
