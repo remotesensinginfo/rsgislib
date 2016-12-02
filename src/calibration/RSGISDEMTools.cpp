@@ -519,6 +519,12 @@ namespace rsgis{namespace calib{
         this->nsRes = nsRes;
         this->sunZenith = sunZenith;
         this->sunAzimuth = sunAzimuth;
+        
+        this->sunAzimuth = this->sunAzimuth - 180;
+        if(this->sunAzimuth < 0)
+        {
+            this->sunAzimuth = this->sunAzimuth + 360;
+        }        
     }
 		
     void RSGISCalcRayIncidentAngle::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
@@ -526,6 +532,7 @@ namespace rsgis{namespace calib{
         float outputValue = 0;
         
         const double degreesToRadians = M_PI / 180.0;
+        const double radiansToDegrees = 180.0 / M_PI;
         
         try 
         {
@@ -538,8 +545,6 @@ namespace rsgis{namespace calib{
             {
                 throw rsgis::img::RSGISImageCalcException("Specified image band is not within the image.");
             }
-            
-            const double radiansToDegrees = 180.0 / M_PI;
             
             double dxSlope, dySlope, slopeRad;
             
@@ -648,7 +653,7 @@ namespace rsgis{namespace calib{
             
             const double radiansToDegrees = 180.0 / M_PI;
             
-            double dxSlope, dySlope, slopeRad, slope;
+            double dxSlope, dySlope, slopeRad = 0.0;
             
             dxSlope = ((dataBlock[band][0][0] + dataBlock[band][1][0] + dataBlock[band][1][0] + dataBlock[band][2][0]) - 
                        (dataBlock[band][0][2] + dataBlock[band][1][2] + dataBlock[band][1][2] + dataBlock[band][2][2]))/ewRes;
@@ -658,9 +663,7 @@ namespace rsgis{namespace calib{
             
             slopeRad = atan(sqrt((dxSlope * dxSlope) + (dySlope * dySlope))/8);
             
-            slope = (slopeRad * radiansToDegrees);
-            
-            double dxAspect, dyAspect, aspect;
+            double dxAspect, dyAspect, aspect, aspectRad = 0.0;
             
             dxAspect = ((dataBlock[band][0][2] + dataBlock[band][1][2] + dataBlock[band][1][2] + dataBlock[band][2][2]) - 
                         (dataBlock[band][0][0] + dataBlock[band][1][0] + dataBlock[band][1][0] + dataBlock[band][2][0]))/ewRes;
@@ -673,7 +676,7 @@ namespace rsgis{namespace calib{
             if (dxAspect == 0 && dyAspect == 0)
             {
                 /* Flat area */
-                aspect = std::numeric_limits<double>::signaling_NaN();
+                aspect = 0;
             }
             
             if (aspect < 0)
@@ -685,15 +688,23 @@ namespace rsgis{namespace calib{
             {
                 aspect = 0.0;
             }
+            aspectRad = aspect * degreesToRadians;
             
             // UNIT VECTOR FOR SURFACE
-            double pA = sin(slope*degreesToRadians) * cos(aspect*degreesToRadians);
-            double pB = sin(slope*degreesToRadians) * sin(aspect*degreesToRadians);
-            double pC = cos(slope*degreesToRadians);
+            double pA = sin(slopeRad) * cos(aspectRad);
+            double pB = sin(slopeRad) * sin(aspectRad);
+            double pC = cos(slopeRad);
+            
+            double viewAzTrans = 360-this->viewAzimuth;
+            viewAzTrans = viewAzTrans + 90;
+            if(viewAzTrans > 360)
+            {
+                viewAzTrans = viewAzTrans-360;
+            }
             
             // UNIT VECTOR FOR EXITANCE RAY
-            double rA = sin(viewZenith*degreesToRadians) * cos(viewAzimuth*degreesToRadians);
-            double rB = sin(viewZenith*degreesToRadians) * sin(viewAzimuth*degreesToRadians);
+            double rA = sin(viewZenith*degreesToRadians) * cos(viewAzTrans*degreesToRadians);
+            double rB = sin(viewZenith*degreesToRadians) * sin(viewAzTrans*degreesToRadians);
             double rC = cos(viewZenith*degreesToRadians);
             
             outputValue = acos((pA*rA)+(pB*rB)+(pC*rC)) * radiansToDegrees;

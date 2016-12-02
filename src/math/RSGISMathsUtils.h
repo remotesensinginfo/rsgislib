@@ -1,5 +1,5 @@
 /*
- *  RSGISMathUtils.h
+ *  RSGISMathsUtils.h
  *  RSGIS_LIB
  *
  *  Created by Pete Bunting on 22/10/2008.

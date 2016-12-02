@@ -1284,9 +1284,9 @@ static PyObject *ImageCalibration_calcNadirImgViewAngle(PyObject *self, PyObject
 static PyObject *ImageCalibration_CalcIrradianceElevLUT(PyObject *self, PyObject *args)
 {
     const char *pszInputDataMaskImg, *pszInputDEMFile, *pszInputIncidenceAngleImg, *pszInputSlopeImg, *pszSrefInputImage, *pszShadowMaskImg, *pszOutputFile, *pszGDALFormat;
-    float solarZenith;
+    float solarZenith, reflScaleFactor = 0.0;
     PyObject *pLUTObj;
-    if( !PyArg_ParseTuple(args, "ssssssssfO:calcIrradianceImageElevLUT", &pszInputDataMaskImg, &pszInputDEMFile, &pszInputIncidenceAngleImg, &pszInputSlopeImg, &pszSrefInputImage, &pszShadowMaskImg, &pszOutputFile, &pszGDALFormat, &solarZenith, &pLUTObj))
+    if( !PyArg_ParseTuple(args, "ssssssssffO:calcIrradianceImageElevLUT", &pszInputDataMaskImg, &pszInputDEMFile, &pszInputIncidenceAngleImg, &pszInputSlopeImg, &pszSrefInputImage, &pszShadowMaskImg, &pszOutputFile, &pszGDALFormat, &solarZenith, &reflScaleFactor, &pLUTObj))
     {
         return NULL;
     }
@@ -1331,6 +1331,9 @@ static PyObject *ImageCalibration_CalcIrradianceElevLUT(PyObject *self, PyObject
         lutVal.directIrr = new float[lutVal.numValues];
         lutVal.diffuseIrr = new float[lutVal.numValues];
         lutVal.envIrr = new float[lutVal.numValues];
+        lutVal.aX = new float[lutVal.numValues];
+        lutVal.bX = new float[lutVal.numValues];
+        lutVal.cX = new float[lutVal.numValues];
         
         for( Py_ssize_t m = 0; m < nBandValDefns; ++m )
         {
@@ -1381,11 +1384,15 @@ static PyObject *ImageCalibration_CalcIrradianceElevLUT(PyObject *self, PyObject
             lutVal.directIrr[m] = RSGISPY_FLOAT_EXTRACT(pDirIrr);
             lutVal.diffuseIrr[m] = RSGISPY_FLOAT_EXTRACT(pDifIrr);
             lutVal.envIrr[m] = RSGISPY_FLOAT_EXTRACT(pEnvIrr);
+            lutVal.aX[m] = 0.0;
+            lutVal.bX[m] = 0.0;
+            lutVal.cX[m] = 0.0;
             
             Py_DECREF(pBand);
             Py_DECREF(pDirIrr);
             Py_DECREF(pDifIrr);
             Py_DECREF(pEnvIrr);
+            
             Py_DECREF(o);
         }
         Py_DECREF(pBandValuesObj);
@@ -1397,7 +1404,7 @@ static PyObject *ImageCalibration_CalcIrradianceElevLUT(PyObject *self, PyObject
     
     try
     {
-        rsgis::cmds::executeCalcIrradianceElevLUT(std::string(pszInputDataMaskImg), std::string(pszInputDEMFile), std::string(pszInputIncidenceAngleImg), std::string(pszInputSlopeImg), std::string(pszShadowMaskImg), std::string(pszSrefInputImage), std::string(pszOutputFile), std::string(pszGDALFormat), solarZenith, elevLUT);
+        rsgis::cmds::executeCalcIrradianceElevLUT(std::string(pszInputDataMaskImg), std::string(pszInputDEMFile), std::string(pszInputIncidenceAngleImg), std::string(pszInputSlopeImg), std::string(pszShadowMaskImg), std::string(pszSrefInputImage), std::string(pszOutputFile), std::string(pszGDALFormat), solarZenith, reflScaleFactor, elevLUT);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -1411,6 +1418,9 @@ static PyObject *ImageCalibration_CalcIrradianceElevLUT(PyObject *self, PyObject
         delete[] (*iterLUT).directIrr;
         delete[] (*iterLUT).diffuseIrr;
         delete[] (*iterLUT).envIrr;
+        delete[] (*iterLUT).aX;
+        delete[] (*iterLUT).bX;
+        delete[] (*iterLUT).cX;
     }
     delete elevLUT;
     
@@ -1720,7 +1730,7 @@ static PyMethodDef ImageCalibrationMethods[] = {
 "\n"},
 
 {"calcIrradianceImageElevLUT", ImageCalibration_CalcIrradianceElevLUT, METH_VARARGS,
-"imagecalibration.calcIrradianceImageElevLUT(inputDataMaskImg, inputDEMFile, inputIncidenceAngleImg, inputSlopeImg, srefInputImage, shadowMaskImg, outputFile, GDALFormat, solarZenith, lutElev)\n"
+"imagecalibration.calcIrradianceImageElevLUT(inputDataMaskImg, inputDEMFile, inputIncidenceAngleImg, inputSlopeImg, srefInputImage, shadowMaskImg, outputFile, GDALFormat, solarZenith, reflScaleFactor, lutElev)\n"
 "Calculate the incoming irradiance (Direct, Diffuse and Total) for sloped surfaces (Eq 1. Shepherd and Dymond 2010).\n"
 "Where:\n"
 "\n"
@@ -1733,6 +1743,7 @@ static PyMethodDef ImageCalibrationMethods[] = {
 "* outputFile is a string containing the name of the output image file\n"
 "* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
 "* solarZenith is a float with the solar zenith for the whole scene.\n"
+"* reflScaleFactor is a float with the scale factor to convert the SREF image to a range of 0-1\n"
 "* lutElev is a sequence of objects with the following named fields - note these are expected to be in elevation order (low to high).\n"
 "Requires:\n"
 "\n"

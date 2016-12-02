@@ -159,7 +159,7 @@ namespace rsgis{ namespace cmds {
     DllExport void executeCalcNadirImageViewAngle(std::string imgFootprint, std::string outViewAngleImg, std::string gdalFormat, double sateAltitude, std::string minXXCol, std::string minXYCol, std::string maxXXCol, std::string maxXYCol, std::string minYXCol, std::string minYYCol, std::string maxYXCol, std::string maxYYCol) throw(RSGISCmdException);
     
     /** Function to calculate the total, direct and diffuse irradiance using a LUT from 6S */
-    DllExport void executeCalcIrradianceElevLUT(std::string inputDataMaskImg, std::string inputDEMImg, std::string inputIncidenceAngleImg, std::string inputSlopeImg, std::string shadowMaskImg, std::string srefInputImage, std::string outputImg, std::string gdalFormat, float solarZenith, std::vector<Cmds6SElevationLUT> *lut) throw(RSGISCmdException);
+    DllExport void executeCalcIrradianceElevLUT(std::string inputDataMaskImg, std::string inputDEMImg, std::string inputIncidenceAngleImg, std::string inputSlopeImg, std::string shadowMaskImg, std::string srefInputImage, std::string outputImg, std::string gdalFormat, float solarZenith, float reflScaleFactor, std::vector<Cmds6SElevationLUT> *lut) throw(RSGISCmdException);
     
 
     

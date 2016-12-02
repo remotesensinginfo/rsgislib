@@ -45,6 +45,7 @@
 #include "segmentation/RSGISEliminateSmallClumps.h"
 
 #include "math/RSGISMatrices.h"
+#include "math/RSGISMathsUtils.h"
 
 #include "rastergis/RSGISCalcImageStatsAndPyramids.h"
 #include "rastergis/RSGISPopRATWithStats.h"
@@ -1462,12 +1463,12 @@ namespace rsgis{ namespace cmds {
         }
     }
                 
-    void executeCalcIrradianceElevLUT(std::string inputDataMaskImg, std::string inputDEMImg, std::string inputIncidenceAngleImg, std::string inputSlopeImg, std::string shadowMaskImg, std::string srefInputImage, std::string outputImg, std::string gdalFormat, float solarZenith, std::vector<Cmds6SElevationLUT> *lut) throw(RSGISCmdException)
+    void executeCalcIrradianceElevLUT(std::string inputDataMaskImg, std::string inputDEMImg, std::string inputIncidenceAngleImg, std::string inputSlopeImg, std::string shadowMaskImg, std::string srefInputImage, std::string outputImg, std::string gdalFormat, float solarZenith, float reflScaleFactor, std::vector<Cmds6SElevationLUT> *lut) throw(RSGISCmdException)
     {
         try
         {
             GDALAllRegister();
-            GDALDataset **datasets = new GDALDataset*[4];
+            GDALDataset **datasets = new GDALDataset*[5];
             datasets[0] = (GDALDataset *) GDALOpen(inputDataMaskImg.c_str(), GA_ReadOnly);
             if(datasets[0] == NULL)
             {
@@ -1496,6 +1497,13 @@ namespace rsgis{ namespace cmds {
                 throw rsgis::RSGISImageException(message.c_str());
             }
             
+            datasets[4] = (GDALDataset *) GDALOpen(shadowMaskImg.c_str(), GA_ReadOnly);
+            if(datasets[4] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + shadowMaskImg;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
             GDALDataset *srefImgDS = (GDALDataset *) GDALOpen(srefInputImage.c_str(), GA_ReadOnly);
             if(srefImgDS == NULL)
             {
@@ -1511,7 +1519,7 @@ namespace rsgis{ namespace cmds {
             {
                 rsgis::calib::LUT6SElevation lutVal = rsgis::calib::LUT6SElevation();
                 std::cout << "Elevation: " << (*iterLUT).elev << std::endl;
-                
+
                 lutVal.numValues = (*iterLUT).numValues;
                 lutVal.elev = (*iterLUT).elev;
                 lutVal.imageBands = new unsigned int[lutVal.numValues];
@@ -1521,7 +1529,6 @@ namespace rsgis{ namespace cmds {
                 lutVal.directIrr = new float[lutVal.numValues];
                 lutVal.diffuseIrr = new float[lutVal.numValues];
                 lutVal.envIrr = new float[lutVal.numValues];
-                
                 
                 for(unsigned int i = 0; i < (*iterLUT).numValues; ++i)
                 {
@@ -1549,6 +1556,7 @@ namespace rsgis{ namespace cmds {
             }
             // Calculate the mean SREF for each band within mask area.
             rsgis::img::ImageStats **srefBandStats = new rsgis::img::ImageStats*[numRasterReflBands];
+            double *srefNoDataVals = new double[numRasterReflBands];
             for(unsigned int i = 0; i < numRasterReflBands; ++i)
             {
                 srefBandStats[i] = new rsgis::img::ImageStats();
@@ -1557,26 +1565,39 @@ namespace rsgis{ namespace cmds {
                 srefBandStats[i]->min = 0.0;
                 srefBandStats[i]->stddev = 0.0;
                 srefBandStats[i]->sum = 0.0;
+                srefNoDataVals[i] = 0.0;
             }
             
             rsgis::img::RSGISImageStatistics calcSREFMean;
-            calcSREFMean.calcImageStatisticsMask(srefImgDS, datasets[0], 1, srefBandStats, 0, true, numRasterReflBands, false);
-            
+            calcSREFMean.calcImageStatisticsMask(srefImgDS, datasets[0], 1, srefBandStats, srefNoDataVals, true, numRasterReflBands, false);
             double *srefMean = new double[numRasterReflBands];
             for(unsigned int i = 0; i < numRasterReflBands; ++i)
             {
-                srefMean[i] = srefBandStats[i]->mean;
+                srefMean[i] = srefBandStats[i]->mean/reflScaleFactor;
                 delete srefBandStats[i];
                 std::cout << "Mean B" << i+1 << ": " << srefMean[i] << std::endl;
             }
             delete[] srefBandStats;
+            delete[] srefNoDataVals;
             
             // Number of output bands:
-            int numOutBands = numRasterReflBands * 3;
+            int numOutBands = numRasterReflBands * 4;
+            rsgis::math::RSGISMathsUtils mathUtils;
+            std::string *bandNames = new std::string[numOutBands];
+            for(unsigned int i = 0; i < numRasterReflBands; ++i)
+            {
+                bandNames[i*4] = "B" + mathUtils.uinttostring(i+1) + "_Direct";
+                bandNames[(i*4)+1] = "B" + mathUtils.uinttostring(i+1) + "_Diffuse";
+                bandNames[(i*4)+2] = "B" + mathUtils.uinttostring(i+1) + "_Env";
+                bandNames[(i*4)+3] = "B" + mathUtils.uinttostring(i+1) + "_Total";
+            }
 
             // Calculate Irradiance Image...
+            rsgis::calib::RSGISCalcSolarIrradianceElevLUTParam calcSolarIrr = rsgis::calib::RSGISCalcSolarIrradianceElevLUTParam(numOutBands, rsgisLUT, srefMean, numRasterReflBands, solarZenith);
+            rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(&calcSolarIrr, "", true);
+            calcImage.calcImage(datasets, 5, outputImg, true, bandNames, gdalFormat, GDT_Float32);
             
-            
+            delete[] bandNames;
             delete[] srefMean;
             for(std::vector<rsgis::calib::LUT6SElevation>::iterator iterLUT = rsgisLUT->begin(); iterLUT != rsgisLUT->end(); ++iterLUT)
             {
