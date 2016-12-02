@@ -37,6 +37,7 @@
 #include "img/RSGISImageUtils.h"
 #include "img/RSGISCalcEditImage.h"
 #include "img/RSGISCopyImage.h"
+#include "img/RSGISImageStatistics.h"
 
 #include "filtering/RSGISMorphologyDilate.h"
 
@@ -1265,8 +1266,6 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-    
-                
                 
     void executeConvertWorldView2ToRadiance(std::string inputImage, std::string outputImage, std::string gdalFormat, std::vector<CmdsWorldView2RadianceGainsOffsets> wv2RadGainOffs)throw(RSGISCmdException)
     {
@@ -1462,7 +1461,152 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-    
+                
+    void executeCalcIrradianceElevLUT(std::string inputDataMaskImg, std::string inputDEMImg, std::string inputIncidenceAngleImg, std::string inputSlopeImg, std::string shadowMaskImg, std::string srefInputImage, std::string outputImg, std::string gdalFormat, float solarZenith, std::vector<Cmds6SElevationLUT> *lut) throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            GDALDataset **datasets = new GDALDataset*[4];
+            datasets[0] = (GDALDataset *) GDALOpen(inputDataMaskImg.c_str(), GA_ReadOnly);
+            if(datasets[0] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputDataMaskImg;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            datasets[1] = (GDALDataset *) GDALOpen(inputDEMImg.c_str(), GA_ReadOnly);
+            if(datasets[1] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputDEMImg;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            datasets[2] = (GDALDataset *) GDALOpen(inputIncidenceAngleImg.c_str(), GA_ReadOnly);
+            if(datasets[2] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputIncidenceAngleImg;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            datasets[3] = (GDALDataset *) GDALOpen(inputSlopeImg.c_str(), GA_ReadOnly);
+            if(datasets[3] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputSlopeImg;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            GDALDataset *srefImgDS = (GDALDataset *) GDALOpen(srefInputImage.c_str(), GA_ReadOnly);
+            if(srefImgDS == NULL)
+            {
+                std::string message = std::string("Could not open image ") + srefInputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            int numRasterReflBands = srefImgDS->GetRasterCount();
+            
+            std::vector<rsgis::calib::LUT6SElevation> *rsgisLUT = new std::vector<rsgis::calib::LUT6SElevation>();
+            
+            for(std::vector<Cmds6SElevationLUT>::iterator iterLUT = lut->begin(); iterLUT != lut->end(); ++iterLUT)
+            {
+                rsgis::calib::LUT6SElevation lutVal = rsgis::calib::LUT6SElevation();
+                std::cout << "Elevation: " << (*iterLUT).elev << std::endl;
+                
+                lutVal.numValues = (*iterLUT).numValues;
+                lutVal.elev = (*iterLUT).elev;
+                lutVal.imageBands = new unsigned int[lutVal.numValues];
+                lutVal.aX = new float[lutVal.numValues];
+                lutVal.bX = new float[lutVal.numValues];
+                lutVal.cX = new float[lutVal.numValues];
+                lutVal.directIrr = new float[lutVal.numValues];
+                lutVal.diffuseIrr = new float[lutVal.numValues];
+                lutVal.envIrr = new float[lutVal.numValues];
+                
+                
+                for(unsigned int i = 0; i < (*iterLUT).numValues; ++i)
+                {
+                    if((*iterLUT).imageBands[i] > numRasterReflBands)
+                    {
+                        GDALClose(datasets[0]);
+                        GDALClose(datasets[1]);
+                        GDALClose(datasets[2]);
+                        GDALClose(datasets[3]);
+                        delete[] datasets;
+                        GDALClose(srefImgDS);
+                        throw rsgis::RSGISException("The number of input image bands is not equal to the number coefficients provided.");
+                    }
+                    lutVal.imageBands[i] = (*iterLUT).imageBands[i];
+                    lutVal.aX[i] = (*iterLUT).aX[i];
+                    lutVal.bX[i] = (*iterLUT).bX[i];
+                    lutVal.cX[i] = (*iterLUT).cX[i];
+                    lutVal.directIrr[i] = (*iterLUT).directIrr[i];
+                    lutVal.diffuseIrr[i] = (*iterLUT).diffuseIrr[i];
+                    lutVal.envIrr[i] = (*iterLUT).envIrr[i];
+                    std::cout << "\tBand " << lutVal.imageBands[i] << ": Direct = " << lutVal.directIrr[i] << " Diffuse = " << lutVal.diffuseIrr[i] << " Env = " << lutVal.envIrr[i] << std::endl;
+                }
+                
+                rsgisLUT->push_back(lutVal);
+            }
+            // Calculate the mean SREF for each band within mask area.
+            rsgis::img::ImageStats **srefBandStats = new rsgis::img::ImageStats*[numRasterReflBands];
+            for(unsigned int i = 0; i < numRasterReflBands; ++i)
+            {
+                srefBandStats[i] = new rsgis::img::ImageStats();
+                srefBandStats[i]->mean = 0.0;
+                srefBandStats[i]->max = 0.0;
+                srefBandStats[i]->min = 0.0;
+                srefBandStats[i]->stddev = 0.0;
+                srefBandStats[i]->sum = 0.0;
+            }
+            
+            rsgis::img::RSGISImageStatistics calcSREFMean;
+            calcSREFMean.calcImageStatisticsMask(srefImgDS, datasets[0], 1, srefBandStats, 0, true, numRasterReflBands, false);
+            
+            double *srefMean = new double[numRasterReflBands];
+            for(unsigned int i = 0; i < numRasterReflBands; ++i)
+            {
+                srefMean[i] = srefBandStats[i]->mean;
+                delete srefBandStats[i];
+                std::cout << "Mean B" << i+1 << ": " << srefMean[i] << std::endl;
+            }
+            delete[] srefBandStats;
+            
+            // Number of output bands:
+            int numOutBands = numRasterReflBands * 3;
+
+            // Calculate Irradiance Image...
+            
+            
+            delete[] srefMean;
+            for(std::vector<rsgis::calib::LUT6SElevation>::iterator iterLUT = rsgisLUT->begin(); iterLUT != rsgisLUT->end(); ++iterLUT)
+            {
+                delete[] (*iterLUT).imageBands;
+                delete[] (*iterLUT).aX;
+                delete[] (*iterLUT).bX;
+                delete[] (*iterLUT).cX;
+                delete[] (*iterLUT).directIrr;
+                delete[] (*iterLUT).diffuseIrr;
+                delete[] (*iterLUT).envIrr;
+            }
+            delete rsgisLUT;
+            
+            GDALClose(datasets[0]);
+            GDALClose(datasets[1]);
+            GDALClose(datasets[2]);
+            GDALClose(datasets[3]);
+            delete[] datasets;
+            GDALClose(srefImgDS);
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+                
 }}
 
 

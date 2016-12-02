@@ -1280,6 +1280,150 @@ static PyObject *ImageCalibration_calcNadirImgViewAngle(PyObject *self, PyObject
 }
 
 
+
+static PyObject *ImageCalibration_CalcIrradianceElevLUT(PyObject *self, PyObject *args)
+{
+    const char *pszInputDataMaskImg, *pszInputDEMFile, *pszInputIncidenceAngleImg, *pszInputSlopeImg, *pszSrefInputImage, *pszShadowMaskImg, *pszOutputFile, *pszGDALFormat;
+    float solarZenith;
+    PyObject *pLUTObj;
+    if( !PyArg_ParseTuple(args, "ssssssssfO:calcIrradianceImageElevLUT", &pszInputDataMaskImg, &pszInputDEMFile, &pszInputIncidenceAngleImg, &pszInputSlopeImg, &pszSrefInputImage, &pszShadowMaskImg, &pszOutputFile, &pszGDALFormat, &solarZenith, &pLUTObj))
+    {
+        return NULL;
+    }
+    
+    if( !PySequence_Check(pLUTObj))
+    {
+        PyErr_SetString(GETSTATE(self)->error, "Last argument must be a sequence");
+        return NULL;
+    }
+    
+    Py_ssize_t nLUTDefns = PySequence_Size(pLUTObj);
+    
+    std::vector<rsgis::cmds::Cmds6SElevationLUT> *elevLUT = new std::vector<rsgis::cmds::Cmds6SElevationLUT>();
+    
+    for( Py_ssize_t n = 0; n < nLUTDefns; ++n )
+    {
+        PyObject *pLUTValuesObj = PySequence_GetItem(pLUTObj, n);
+        rsgis::cmds::Cmds6SElevationLUT lutVal = rsgis::cmds::Cmds6SElevationLUT();
+        
+        PyObject *pElev = PyObject_GetAttrString(pLUTValuesObj, "Elev");
+        if( ( pElev == NULL ) || ( pElev == Py_None ) || !RSGISPY_CHECK_FLOAT(pElev) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'Elev\' for the LUT (make sure it is a float!)" );
+            Py_XDECREF(pElev);
+            Py_DECREF(pLUTValuesObj);
+            return NULL;
+        }
+        lutVal.elev = RSGISPY_FLOAT_EXTRACT(pElev);
+        Py_DECREF(pElev);
+        
+        PyObject *pBandValuesObj = PyObject_GetAttrString(pLUTValuesObj, "Coeffs");
+        
+        if( !PySequence_Check(pBandValuesObj))
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Each element in the LUT have a sequence \'Coeffs\' be a sequence.");
+            return NULL;
+        }
+        Py_ssize_t nBandValDefns = PySequence_Size(pBandValuesObj);
+        
+        lutVal.numValues = nBandValDefns;
+        lutVal.imageBands = new unsigned int[lutVal.numValues];
+        lutVal.directIrr = new float[lutVal.numValues];
+        lutVal.diffuseIrr = new float[lutVal.numValues];
+        lutVal.envIrr = new float[lutVal.numValues];
+        
+        for( Py_ssize_t m = 0; m < nBandValDefns; ++m )
+        {
+            PyObject *o = PySequence_GetItem(pBandValuesObj, m);
+            PyObject *pBand = PyObject_GetAttrString(o, "band");
+            if( ( pBand == NULL ) || ( pBand == Py_None ) || !RSGISPY_CHECK_INT(pBand) )
+            {
+                PyErr_SetString(GETSTATE(self)->error, "Could not find int attribute \'band\'" );
+                Py_XDECREF(pBand);
+                Py_DECREF(o);
+                return NULL;
+            }
+            
+            PyObject *pDirIrr = PyObject_GetAttrString(o, "DirIrr");
+            if( ( pDirIrr == NULL ) || ( pDirIrr == Py_None ) || !RSGISPY_CHECK_FLOAT(pDirIrr) )
+            {
+                PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'DirIrr\'" );
+                Py_XDECREF(pBand);
+                Py_XDECREF(pDirIrr);
+                Py_DECREF(o);
+                return NULL;
+            }
+            
+            PyObject *pDifIrr = PyObject_GetAttrString(o, "DifIrr");
+            if( ( pDifIrr == NULL ) || ( pDifIrr == Py_None ) || !RSGISPY_CHECK_FLOAT(pDifIrr) )
+            {
+                PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'DifIrr\'" );
+                Py_XDECREF(pBand);
+                Py_XDECREF(pDirIrr);
+                Py_XDECREF(pDifIrr);
+                Py_DECREF(o);
+                return NULL;
+            }
+            
+            PyObject *pEnvIrr = PyObject_GetAttrString(o, "EnvIrr");
+            if( ( pEnvIrr == NULL ) || ( pEnvIrr == Py_None ) || !RSGISPY_CHECK_FLOAT(pEnvIrr) )
+            {
+                PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'EnvIrr\'" );
+                Py_XDECREF(pBand);
+                Py_XDECREF(pDirIrr);
+                Py_XDECREF(pDifIrr);
+                Py_XDECREF(pEnvIrr);
+                Py_DECREF(o);
+                return NULL;
+            }
+            
+            lutVal.imageBands[m] = RSGISPY_INT_EXTRACT(pBand);
+            lutVal.directIrr[m] = RSGISPY_FLOAT_EXTRACT(pDirIrr);
+            lutVal.diffuseIrr[m] = RSGISPY_FLOAT_EXTRACT(pDifIrr);
+            lutVal.envIrr[m] = RSGISPY_FLOAT_EXTRACT(pEnvIrr);
+            
+            Py_DECREF(pBand);
+            Py_DECREF(pDirIrr);
+            Py_DECREF(pDifIrr);
+            Py_DECREF(pEnvIrr);
+            Py_DECREF(o);
+        }
+        Py_DECREF(pBandValuesObj);
+        
+        elevLUT->push_back(lutVal);
+        
+        Py_DECREF(pLUTValuesObj);
+    }
+    
+    try
+    {
+        rsgis::cmds::executeCalcIrradianceElevLUT(std::string(pszInputDataMaskImg), std::string(pszInputDEMFile), std::string(pszInputIncidenceAngleImg), std::string(pszInputSlopeImg), std::string(pszShadowMaskImg), std::string(pszSrefInputImage), std::string(pszOutputFile), std::string(pszGDALFormat), solarZenith, elevLUT);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    for(std::vector<rsgis::cmds::Cmds6SElevationLUT>::iterator iterLUT = elevLUT->begin(); iterLUT != elevLUT->end(); ++iterLUT)
+    {
+        delete[] (*iterLUT).imageBands;
+        delete[] (*iterLUT).directIrr;
+        delete[] (*iterLUT).diffuseIrr;
+        delete[] (*iterLUT).envIrr;
+    }
+    delete elevLUT;
+    
+    Py_RETURN_NONE;
+}
+
+
+
+
+
+
+
+
 // Our list of functions in this module
 static PyMethodDef ImageCalibrationMethods[] = {
 {"landsat2Radiance", ImageCalibration_landsat2Radiance, METH_VARARGS,
@@ -1573,6 +1717,33 @@ static PyMethodDef ImageCalibrationMethods[] = {
 "* minYYCol is a string for the minYY column in the RAT.\n"
 "* maxYXCol is a string for the maxYX column in the RAT.\n"
 "* maxYYCol is a string for the maxYY column in the RAT.\n"
+"\n"},
+
+{"calcIrradianceImageElevLUT", ImageCalibration_CalcIrradianceElevLUT, METH_VARARGS,
+"imagecalibration.calcIrradianceImageElevLUT(inputDataMaskImg, inputDEMFile, inputIncidenceAngleImg, inputSlopeImg, srefInputImage, shadowMaskImg, outputFile, GDALFormat, solarZenith, lutElev)\n"
+"Calculate the incoming irradiance (Direct, Diffuse and Total) for sloped surfaces (Eq 1. Shepherd and Dymond 2010).\n"
+"Where:\n"
+"\n"
+"* inputDataMaskImg is a string containing the name and path to a binary mask specifying the region to be calculated (1 = True)\n"
+"* inputDEMFile is a string containing the name of the input DEM image file.\n"
+"* inputIncidenceAngleImg is a string containing the name and path to a file with the incidence angle for each pixel.\n"
+"* inputSlopeImg is a string containing the name and path to a file with the slope in degrees for each pixel.\n"
+"* srefInputImage is a surface reflectance image with the same number of bands for measurements are provided for in the LUT\n"
+"* shadowMaskImg is a binary mask image for the areas of the image in direct shadow (pixel value 1) and therefore don't recieve any direct irradiance.\n"
+"* outputFile is a string containing the name of the output image file\n"
+"* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+"* solarZenith is a float with the solar zenith for the whole scene.\n"
+"* lutElev is a sequence of objects with the following named fields - note these are expected to be in elevation order (low to high).\n"
+"Requires:\n"
+"\n"
+"    * \'Elev\' - The elevation for the element in the LUT (in metres).\n"
+"    * \'BandVals\' - The sequence of solar irradiance values for the bands in the SREF image.\n"
+"\n"
+"    \'BandVals\' Requires a sequence with the following:\n"
+"        * \'band\' - An integer specifying the image band in the input file (band numbers start at 1).\n"
+"        * \'DirIrr\' - A float for the direct irradiance for this band and elevation (i.e., as provided by 6S).\n"
+"        * \'DifIrr\' - A float for the diffuse irradiance for this band and elevation (i.e., as provided by 6S).\n"
+"        * \'EnvIrr\' - A float for the environment irradiance for this band and elevation (i.e., as provided by 6S).\n"
 "\n"},
     
     {NULL}        /* Sentinel */
