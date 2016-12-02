@@ -1256,7 +1256,6 @@ namespace rsgis{namespace img{
                                 ++n[i];
                             }
                         }
-                        
                         if(calcSD && onePassSD)
                         {
                             if((!useNoData) || (useNoData && (floatBandValues[i] != this->noDataVals[i])))

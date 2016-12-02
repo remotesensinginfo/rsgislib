@@ -445,6 +445,105 @@ namespace rsgis{namespace calib{
         
     }
 
+    
+    
+    RSGISCalcSolarIrradianceElevLUTParam::RSGISCalcSolarIrradianceElevLUTParam(unsigned int numOutBands, std::vector<LUT6SElevation> *lut, double *meanSREFVec, unsigned int numSREFBands, float solarZenith):rsgis::img::RSGISCalcImageValue(numOutBands)
+    {
+        this->lut = lut;
+        this->meanSREFVec = meanSREFVec;
+        this->numSREFBands = numSREFBands;
+        this->solarZenith = solarZenith;
+    }
+    
+    void RSGISCalcSolarIrradianceElevLUTParam::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+    {
+        /*
+         * bandValues[0] - valid data mask
+         * bandValues[1] - DEM
+         * bandValues[2] - Incident Angle
+         * bandValues[3] - Slope
+         * bandValues[4] - Shadow Mask
+         */
+        if(bandValues[0] == 1)
+        {
+            const double degreesToRadians = M_PI / 180.0;
+            rsgis::calib::LUT6SElevation tmpElevPt;
+            bool first = true;
+            float nrElevDist = 0.0;
+            float dist = 0.0;
+            for(std::vector<LUT6SElevation>::iterator iterLUT = lut->begin(); iterLUT != lut->end(); ++iterLUT)
+            {
+                dist = ((*iterLUT).elev - bandValues[1])*((*iterLUT).elev - bandValues[1]);
+                if(first)
+                {
+                    tmpElevPt = (*iterLUT);
+                    nrElevDist = dist;
+                    first = false;
+                }
+                else if(dist < nrElevDist)
+                {
+                    tmpElevPt = (*iterLUT);
+                    nrElevDist = dist;
+                }
+            }
+            
+            float shadMask = 1;
+            if(bandValues[4] == 1)
+            {
+                shadMask = 0;
+            }
+            
+            double incAngRad = bandValues[2] * degreesToRadians;
+            double solarZenRad = solarZenith * degreesToRadians;
+            double incAngRatio = 0.0;
+            double slopeRad = bandValues[3] * degreesToRadians;
+            double vD = (1 + cos(slopeRad))/2;
+            double vT = (1 - cos(slopeRad))/2;
+            double totalIrr = 0.0;
+            
+            int dirIrrIdx = 0;
+            int difIrrIdx = 0;
+            int envIrrIdx = 0;
+            int totIrrIdx = 0;
+            for(int n = 0; n < numSREFBands; ++n)
+            {
+                dirIrrIdx = n * 4;
+                difIrrIdx = (n * 4)+1;
+                envIrrIdx = (n * 4)+2;
+                totIrrIdx = (n * 4)+3;
+                
+                // Direct
+                incAngRatio = cos(incAngRad)/cos(solarZenRad);
+                output[dirIrrIdx] = shadMask * tmpElevPt.directIrr[n] * incAngRatio;
+                
+                // Diffuse
+                output[difIrrIdx] = tmpElevPt.diffuseIrr[n] * vD;
+                
+                // Environment
+                totalIrr = tmpElevPt.directIrr[n] + tmpElevPt.diffuseIrr[n] + tmpElevPt.envIrr[n];
+                output[envIrrIdx] = totalIrr * vT * meanSREFVec[n];
+                
+                // Total
+                output[totIrrIdx] = output[dirIrrIdx] + output[difIrrIdx] + output[envIrrIdx];
+            }
+        }
+        else
+        {
+            for(int n = 0; n < numOutBands; ++n)
+            {
+                output[n] = 0.0;
+            }
+        }
+    }
+    
+    RSGISCalcSolarIrradianceElevLUTParam::~RSGISCalcSolarIrradianceElevLUTParam()
+    {
+        
+    }
+    
+    
+    
+    
 }}
 
 
