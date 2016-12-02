@@ -47,6 +47,9 @@ namespace rsgis{namespace calib{
         float *aX;
         float *bX;
         float *cX;
+        float *directIrr;
+        float *diffuseIrr;
+        float *envIrr;
         unsigned int numValues;
     };
     
@@ -57,6 +60,9 @@ namespace rsgis{namespace calib{
         float *aX;
         float *bX;
         float *cX;
+        float *directIrr;
+        float *diffuseIrr;
+        float *envIrr;
         unsigned int numValues;
     };
     

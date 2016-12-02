@@ -295,7 +295,7 @@ namespace rsgis{ namespace cmds {
     }
 
     
-    void executeCalcLocalExitanceAngle(std::string demImage, std::string outputImage, float azimuth, float zenith, std::string outImageFormat)throw(RSGISCmdException)
+    void executeCalcLocalExitanceAngle(std::string demImage, std::string outputImage, float viewAzimuth, float viewZenith, std::string outImageFormat)throw(RSGISCmdException)
     {
         try
         {
@@ -322,7 +322,7 @@ namespace rsgis{ namespace cmds {
             
             delete[] transformation;
             
-            rsgis::calib::RSGISCalcRayExitanceAngle *calcExitAngle = new rsgis::calib::RSGISCalcRayExitanceAngle(1, 0, imageEWRes, imageNSRes, zenith, azimuth);
+            rsgis::calib::RSGISCalcRayExitanceAngle *calcExitAngle = new rsgis::calib::RSGISCalcRayExitanceAngle(1, 0, imageEWRes, imageNSRes, viewZenith, viewAzimuth);
             
             rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(calcExitAngle, "", true);
             calcImage.calcImageWindowData(&dataset, 1, outputImage, 3, outImageFormat, GDT_Float32);
@@ -424,6 +424,10 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
+            
+            
+
+            
     
 }}
 
