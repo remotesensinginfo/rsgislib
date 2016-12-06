@@ -161,7 +161,9 @@ namespace rsgis{ namespace cmds {
     /** Function to calculate the total, direct and diffuse irradiance using a LUT from 6S */
     DllExport void executeCalcIrradianceElevLUT(std::string inputDataMaskImg, std::string inputDEMImg, std::string inputIncidenceAngleImg, std::string inputSlopeImg, std::string shadowMaskImg, std::string srefInputImage, std::string outputImg, std::string gdalFormat, float solarZenith, float reflScaleFactor, std::vector<Cmds6SElevationLUT> *lut) throw(RSGISCmdException);
     
-
+    /** Function to calculate standardised reflectance taking into account topography */
+    DllExport void executeCalcStandardisedReflectanceSD2010(std::string inputDataMaskImg, std::string srefInputImage, std::string inputSolarIrradiance, std::string inputIncidenceAngleImg, std::string inputExitanceAngleImg, std::string outputImg, std::string gdalFormat, float brdfBeta, float outIncidenceAngle, float outExitanceAngle, float reflScaleFactor) throw(RSGISCmdException);
+    
     
 }}
 

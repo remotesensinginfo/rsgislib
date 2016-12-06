@@ -460,7 +460,7 @@ namespace rsgis{namespace calib{
         /*
          * bandValues[0] - valid data mask
          * bandValues[1] - DEM
-         * bandValues[2] - Incident Angle
+         * bandValues[2] - Incidence Angle
          * bandValues[3] - Slope
          * bandValues[4] - Shadow Mask
          */
@@ -542,6 +542,93 @@ namespace rsgis{namespace calib{
     }
     
     
+    
+    
+    
+    
+    
+    
+    RSGISCalcStandardisedReflectanceSD2010::RSGISCalcStandardisedReflectanceSD2010(unsigned int numOutBands, unsigned int numSREFBands, float brdfBeta, float outIncidenceAngle, float outExitanceAngle, float reflScaleFactor):rsgis::img::RSGISCalcImageValue(numOutBands)
+    {
+        this->numSREFBands = numSREFBands;
+        this->brdfBeta = brdfBeta;
+        this->outIncidenceAngle = outIncidenceAngle;
+        this->outExitanceAngle = outExitanceAngle;
+        this->reflScaleFactor = reflScaleFactor;
+    }
+    
+    void RSGISCalcStandardisedReflectanceSD2010::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+    {
+        /*
+         * bandValues[0] - valid data mask
+         * bandValues[1] - Incidence Angle
+         * bandValues[2] - Excidance Angle
+         * bandValues[XXX] - SREF
+         * bandValues[XXX] - Irradiance (4 x SREF bands)
+         *                 * Direct
+         *                 * Diffuse
+         *                 * Environment
+         *                 * Total
+         */
+        
+        if(numOutBands != numSREFBands)
+        {
+            throw rsgis::img::RSGISImageCalcException("The number of output bands must be equal to the number of SREF bands.");
+        }
+        
+        if(bandValues[0] == 1)
+        {
+            const double degreesToRadians = M_PI / 180.0;
+            this->outIncidenceAngle = this->outIncidenceAngle * degreesToRadians;
+            this->outExitanceAngle = this->outExitanceAngle * degreesToRadians;
+            
+            double inIncAngleRad = bandValues[1] * degreesToRadians;
+            double inExitAngleRad = bandValues[2] * degreesToRadians;
+            
+            double gamma = (cos(inIncAngleRad) + cos(inExitAngleRad)) / (cos(this->outIncidenceAngle) + cos(this->outExitanceAngle));
+            
+            
+            unsigned int srefBandIdx = 0;
+            unsigned int irrDirBandIdx = 0;
+            unsigned int irrDifandIdx = 0;
+            unsigned int irrTotalBandIdx = 0;
+            double LVal = 0.0;
+            for(unsigned int i = 0; i < this->numSREFBands; ++i)
+            {
+                srefBandIdx = 3 + i;
+                irrDirBandIdx = (3 + this->numSREFBands) + (i*4);
+                irrDifandIdx = (3 + this->numSREFBands) + (i*4) + 1;
+                irrTotalBandIdx = (3 + this->numSREFBands) + (i*4) + 3;
+                
+                LVal = (bandValues[srefBandIdx] / this->reflScaleFactor) * bandValues[irrTotalBandIdx];
+                
+                output[i] = (LVal * M_PI) / ((bandValues[irrDirBandIdx] * gamma) + (bandValues[irrDifandIdx] * this->brdfBeta));
+                
+                output[i] = output[i] * reflScaleFactor;
+                if(reflScaleFactor > 99)
+                {
+                    if(output[i] < 1)
+                    {
+                        output[i] = 1;
+                    }
+                }
+            }
+            
+        }
+        else
+        {
+            for(int n = 0; n < numOutBands; ++n)
+            {
+                output[n] = 0.0;
+            }
+        }
+    }
+    
+    RSGISCalcStandardisedReflectanceSD2010::~RSGISCalcStandardisedReflectanceSD2010()
+    {
+        
+    }
+
     
     
 }}

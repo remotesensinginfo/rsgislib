@@ -519,12 +519,6 @@ namespace rsgis{namespace calib{
         this->nsRes = nsRes;
         this->sunZenith = sunZenith;
         this->sunAzimuth = sunAzimuth;
-        
-        this->sunAzimuth = this->sunAzimuth - 180;
-        if(this->sunAzimuth < 0)
-        {
-            this->sunAzimuth = this->sunAzimuth + 360;
-        }        
     }
 		
     void RSGISCalcRayIncidentAngle::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
@@ -588,14 +582,9 @@ namespace rsgis{namespace calib{
             double pA = sin(slopeRad) * cos(aspectRad);
             double pB = sin(slopeRad) * sin(aspectRad);
             double pC = cos(slopeRad);
-            
-            double sunAzTrans = this->sunAzimuth + 180;
-            if(sunAzTrans > 360)
-            {
-                sunAzTrans = sunAzTrans - 360;
-            }
+
             double sunZenRad = sunZenith * degreesToRadians;
-            double sunAzRad = sunAzTrans * degreesToRadians;
+            double sunAzRad = sunAzimuth * degreesToRadians;
             
             // UNIT VECTOR FOR INCIDENT RAY
             double rA = sin(sunZenRad) * cos(sunAzRad);
@@ -695,17 +684,13 @@ namespace rsgis{namespace calib{
             double pB = sin(slopeRad) * sin(aspectRad);
             double pC = cos(slopeRad);
             
-            double viewAzTrans = 360-this->viewAzimuth;
-            viewAzTrans = viewAzTrans + 90;
-            if(viewAzTrans > 360)
-            {
-                viewAzTrans = viewAzTrans-360;
-            }
+            double viewZenRad = viewZenith * degreesToRadians;
+            double viewAzRad = viewAzimuth * degreesToRadians;
             
             // UNIT VECTOR FOR EXITANCE RAY
-            double rA = sin(viewZenith*degreesToRadians) * cos(viewAzTrans*degreesToRadians);
-            double rB = sin(viewZenith*degreesToRadians) * sin(viewAzTrans*degreesToRadians);
-            double rC = cos(viewZenith*degreesToRadians);
+            double rA = sin(viewZenRad) * cos(viewAzRad);
+            double rB = sin(viewZenRad) * sin(viewAzRad);
+            double rC = cos(viewZenRad);
             
             outputValue = acos((pA*rA)+(pB*rB)+(pC*rC)) * radiansToDegrees;
             

@@ -1615,8 +1615,76 @@ namespace rsgis{ namespace cmds {
             GDALClose(datasets[1]);
             GDALClose(datasets[2]);
             GDALClose(datasets[3]);
+            GDALClose(datasets[4]);
             delete[] datasets;
             GDALClose(srefImgDS);
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+                
+    void executeCalcStandardisedReflectanceSD2010(std::string inputDataMaskImg, std::string srefInputImage, std::string inputSolarIrradiance, std::string inputIncidenceAngleImg, std::string inputExitanceAngleImg, std::string outputImg, std::string gdalFormat, float brdfBeta, float outIncidenceAngle, float outExitanceAngle, float reflScaleFactor) throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            GDALDataset **datasets = new GDALDataset*[5];
+            datasets[0] = (GDALDataset *) GDALOpen(inputDataMaskImg.c_str(), GA_ReadOnly);
+            if(datasets[0] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputDataMaskImg;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            datasets[1] = (GDALDataset *) GDALOpen(inputIncidenceAngleImg.c_str(), GA_ReadOnly);
+            if(datasets[1] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputIncidenceAngleImg;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            datasets[2] = (GDALDataset *) GDALOpen(inputExitanceAngleImg.c_str(), GA_ReadOnly);
+            if(datasets[2] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputExitanceAngleImg;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            datasets[3] = (GDALDataset *) GDALOpen(srefInputImage.c_str(), GA_ReadOnly);
+            if(datasets[3] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + srefInputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            datasets[4] = (GDALDataset *) GDALOpen(inputSolarIrradiance.c_str(), GA_ReadOnly);
+            if(datasets[4] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputSolarIrradiance;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            
+            
+            int numRasterReflBands = datasets[3]->GetRasterCount();
+            
+            // Calculate standardised Reflectance Image...
+            rsgis::calib::RSGISCalcStandardisedReflectanceSD2010 calcStdRefl = rsgis::calib::RSGISCalcStandardisedReflectanceSD2010(numRasterReflBands, numRasterReflBands, brdfBeta, outIncidenceAngle, outExitanceAngle, reflScaleFactor);
+            rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(&calcStdRefl, "", true);
+            calcImage.calcImage(datasets, 5, outputImg, false, NULL, gdalFormat, GDT_UInt16);
+                        
+            GDALClose(datasets[0]);
+            GDALClose(datasets[1]);
+            GDALClose(datasets[2]);
+            GDALClose(datasets[3]);
+            GDALClose(datasets[4]);
+            delete[] datasets;
         }
         catch(rsgis::RSGISException &e)
         {
