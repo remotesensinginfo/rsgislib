@@ -25,6 +25,8 @@ Surface Reflectance (6S)
 .. autofunction:: rsgislib.imagecalibration.apply6SCoeffSingleParam
 .. autofunction:: rsgislib.imagecalibration.apply6SCoeffElevAOTLUTParam
 .. autofunction:: rsgislib.imagecalibration.apply6SCoeffElevLUTParam
+.. autofunction:: rsgislib.imagecalibration.calcStandardisedReflectanceSD2010
+
 
 Surface Reflectance (DOS)
 -------------------------
@@ -32,6 +34,12 @@ Surface Reflectance (DOS)
 .. autofunction:: rsgislib.imagecalibration.applySubtractOffsets
 .. autofunction:: rsgislib.imagecalibration.applySubtractSingleOffsets
 .. autofunction:: rsgislib.imagecalibration.performDOSCalc
+
+Irradiance
+-----------
+
+.. autofunction:: rsgislib.imagecalibration.calcIrradianceImageElevLUT
+
 
 Cloud Masking
 --------------
