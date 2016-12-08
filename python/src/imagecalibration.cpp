@@ -1793,10 +1793,10 @@ static PyMethodDef ImageCalibrationMethods[] = {
 "* inputExitanceAngleImg is a string containing the name and path to a file with the existance angle for each pixel.\n"
 "* outputFile is a string containing the name of the output image file\n"
 "* gdalFormat is a string containing the GDAL format for the output file - eg 'KEA'\n"
-"* reflScaleFactor is a float with the scale factor to convert the SREF image to a range of 0-1\n"
+"* reflScaleFactor is a float with the scale factor to convert the SREF image to a range of 0-1 (e.g., 1000)\n"
 "* brdfBeta is the beta parameters in equation 8 in Shepherd and Dymond (2010) for solar elevations between 50 - 70 degrees a value of 1 can be used.\n"
-"* outIncidenceAngle is the incidence angle to which the output image is standardised to.\n"
-"* outExitanceAngle is the exitance angle to which the output image is standardised to.\n"
+"* outIncidenceAngle is the incidence angle to which the output image is standardised to (Recommend: 0).\n"
+"* outExitanceAngle is the exitance angle to which the output image is standardised to (Recommend: 0).\n"
 "\n"},
 
     
