@@ -579,13 +579,13 @@ namespace rsgis{namespace calib{
         if(bandValues[0] == 1)
         {
             const double degreesToRadians = M_PI / 180.0;
-            this->outIncidenceAngle = this->outIncidenceAngle * degreesToRadians;
-            this->outExitanceAngle = this->outExitanceAngle * degreesToRadians;
+            double outIncidenceAngleRad = this->outIncidenceAngle * degreesToRadians;
+            double outExitanceAngleRad = this->outExitanceAngle * degreesToRadians;
             
             double inIncAngleRad = bandValues[1] * degreesToRadians;
             double inExitAngleRad = bandValues[2] * degreesToRadians;
             
-            double gamma = (cos(inIncAngleRad) + cos(inExitAngleRad)) / (cos(this->outIncidenceAngle) + cos(this->outExitanceAngle));
+            double gamma = (cos(inIncAngleRad) + cos(inExitAngleRad)) / (cos(outIncidenceAngleRad) + cos(outExitanceAngleRad));
             
             
             unsigned int srefBandIdx = 0;
@@ -601,17 +601,18 @@ namespace rsgis{namespace calib{
                 irrTotalBandIdx = (3 + this->numSREFBands) + (i*4) + 3;
                 
                 LVal = (bandValues[srefBandIdx] / this->reflScaleFactor) * bandValues[irrTotalBandIdx];
-                
-                output[i] = (LVal * M_PI) / ((bandValues[irrDirBandIdx] * gamma) + (bandValues[irrDifandIdx] * this->brdfBeta));
+                // I am not multipling by Pi (Eq 8) as I have not divided by Pui (Eq 4).
+                output[i] = (LVal) / ((bandValues[irrDirBandIdx] * gamma) + (bandValues[irrDifandIdx] * this->brdfBeta));
                 
                 output[i] = output[i] * reflScaleFactor;
-                if(reflScaleFactor > 99)
+                if(reflScaleFactor > 99) // i.e., At least 100 so outputting as a percentage.
                 {
                     if(output[i] < 1)
                     {
                         output[i] = 1;
                     }
                 }
+                
             }
             
         }
