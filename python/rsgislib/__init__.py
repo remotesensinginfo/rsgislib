@@ -83,6 +83,7 @@ Methods of summerising data:
 import os.path
 import os
 import time
+import datetime
 
 TYPE_UNDEFINED = 0
 TYPE_8INT = 1
@@ -442,32 +443,38 @@ class RSGISTime (object):
         if printStartTime:
             print(time.strftime('Start Time: %H:%M:%S, %a %b %m %Y.'))
 
-
-    def end(self,reportDiff = True):
-        """ End timer and optionally print difference."""
+    def end(self,reportDiff = True, preceedStr="", postStr=""):
+        """ 
+        End timer and optionally print difference.
+        If preceedStr or postStr have a value then they will be used instead
+        of the generic wording around the time. 
+        
+        preceedStr + time + postStr
+        """
         self.endTime = time.time()
         if reportDiff:
-            self.calcDiff()
+            self.calcDiff(preceedStr, postStr)
 
-    def calcDiff(self):
+    def calcDiff(self, preceedStr="", postStr=""):
         """ Calculate time difference, format and print. """
         timeDiff = self.endTime - self.startTime
-
+        
+        useCustomMss = False
+        if (len(preceedStr) > 0) or (len(postStr) > 0):
+            useCustomMss = True
+        
         if timeDiff <= 1:
-            print("Algorithm Completed in less than a second.")
-        elif timeDiff > 3600:
-            timeDiff = timeDiff/3600.;
-            timeDiffStr = str(round(timeDiff,2))
-            print('''Algorithm Completed in %s hours.'''%(timeDiffStr))
-        elif timeDiff > 60:
-            timeDiff = timeDiff/60.;
-            timeDiffStr = str(round(timeDiff,2))
-            print('''Algorithm Completed in %s minutes.'''%(timeDiffStr))
+            if useCustomMss:
+                outStr = preceedStr + str("in less than a second") + postStr
+                print(outStr)
+            else:
+                print("Algorithm Completed in less than a second.")
         else:
-            timeDiffStr = str(round(timeDiff,2))
-            print('''Algorithm Completed in %s seconds.'''%(timeDiffStr))
+            timeObj = datetime.datetime.utcfromtimestamp(timeDiff)
+            timeDiffStr = timeObj.strftime('%H:%M:%S')
+            if useCustomMss:
+                print(preceedStr + timeDiffStr + postStr)
+            else:
+                print('Algorithm Completed in %s.'%(timeDiffStr))
         
-        
-
-
 
