@@ -68,6 +68,95 @@ namespace rsgis{namespace img{
         }
     }
     
+    void RSGISSampleImage::randomSampleImageMask(GDALDataset *inputImage, unsigned int imgBand, GDALDataset *outputImage, std::vector<int> maskVals, unsigned long numSamples)throw(RSGISImageException)
+    {
+        try
+        {
+            RSGISImageUtils imgUtils;
+            unsigned int imgPxlXSize = inputImage->GetRasterXSize()-1;
+            unsigned int imgPxlYSize = inputImage->GetRasterYSize()-1;
+            unsigned int maxVal = imgPxlXSize;
+            if(imgPxlYSize > maxVal)
+            {
+                maxVal = imgPxlYSize;
+            }
+            bool foundAllSamples = false;
+            
+            unsigned int *maskValCounts = new unsigned int[maskVals.size()];
+            for(int i = 0; i < maskVals.size(); ++i)
+            {
+                maskValCounts[i] = 0;
+            }
+            
+            boost::mt19937 rng (NULL);
+            
+            boost::uniform_int<> pxlRange( 0, maxVal );
+            
+            boost::variate_generator< boost::mt19937, boost::uniform_int<> > pxlGen(rng, pxlRange);
+            
+            unsigned int xPxl = 0;
+            unsigned int yPxl = 0;
+            
+            double pxlVal = 0.0;
+            
+            while(!foundAllSamples)
+            {
+                xPxl = pxlGen();
+                while(xPxl >= imgPxlXSize)
+                {
+                    xPxl = pxlGen();
+                }
+                
+                yPxl = pxlGen();
+                while(yPxl >= imgPxlYSize)
+                {
+                    yPxl = pxlGen();
+                }
+                                
+                pxlVal = imgUtils.getPixelValue(inputImage, imgBand, xPxl, yPxl);
+                
+                for(int i = 0; i < maskVals.size(); ++i)
+                {
+                    if(maskVals.at(i) == pxlVal)
+                    {
+                        if(maskValCounts[i] <= numSamples)
+                        {
+                            imgUtils.setPixelValue(outputImage, imgBand, xPxl, yPxl, pxlVal);
+                            maskValCounts[i] += 1;
+                        }
+                        break;
+                    }
+                }
+                
+                foundAllSamples = true;
+                for(int i = 0; i < maskVals.size(); ++i)
+                {
+                    if(maskValCounts[i] <= numSamples)
+                    {
+                        foundAllSamples = false;
+                        break;
+                    }
+                }
+            }
+        }
+        catch (RSGISImageCalcException &e)
+        {
+            throw RSGISImageException(e.what());
+        }
+        catch (RSGISImageException &e)
+        {
+            throw e;
+        }
+        catch (RSGISException &e)
+        {
+            throw RSGISImageException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw RSGISImageException(e.what());
+        }
+    }
+    
     RSGISSampleImage::~RSGISSampleImage()
     {
         

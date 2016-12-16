@@ -28,7 +28,16 @@ try:
 except ImportError as osrErr:
     haveOSRPy = False
 
-
+# define our own classes
+class ImageBandInfo(object):
+    """
+    Create a list of these objects to pass to the extractZoneImageBandValues2HDF function
+    * fileName - is the input image file name and path.
+    * bands - is a list of image bands within the fileName to be used for processing (band numbers start at 1).
+    """
+    def __init__(self, fileName=None, bands=None):
+        self.fileName = fileName
+        self.bands = bands
 
 
 def setBandNames(inputImage, bandNames):

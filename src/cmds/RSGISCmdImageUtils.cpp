@@ -43,6 +43,7 @@
 #include "img/RSGISExtractImageValues.h"
 #include "img/RSGISImageComposite.h"
 #include "img/RSGISAddBands.h"
+#include "img/RSGISSampleImage.h"
 
 #include "vec/RSGISImageTileVector.h"
 #include "vec/RSGISVectorOutputException.h"
@@ -808,7 +809,28 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-
+    
+            
+    void executeImageBandRasterZone2HDF(std::vector<std::pair<std::string, std::vector<unsigned int> > > imageFiles, std::string maskImage, std::string outputHDF, float maskVal)throw(RSGISCmdException)
+    {
+        try
+        {
+            rsgis::img::RSGISExtractImageValues extractVals;
+            extractVals.extractImgBandDataWithinMask2HDF(imageFiles, maskImage, outputHDF, maskVal);
+        }
+        catch (RSGISImageException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (RSGISException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
 
     void executeSubsetImageBands(std::string inputImage, std::string outputImage, std::vector<unsigned int> bands, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException)
     {
@@ -1570,6 +1592,50 @@ namespace rsgis{ namespace cmds {
                 GDALClose(datasets[i]);
             }
             delete[] datasets;
+        }
+        catch (RSGISImageException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (RSGISException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+            
+            
+            
+    void executePerformRandomPxlSample(std::string inputImage, std::string outputImage, std::string gdalFormat, std::vector<int> maskVals, unsigned long numSamples) throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+
+            GDALDataset *inputImgDS = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+            if(inputImgDS == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw RSGISImageException(message.c_str());
+            }
+            if(inputImgDS->GetRasterCount() != 1)
+            {
+                throw RSGISImageException("The input image must only have one image band.");
+            }
+            
+            GDALDataType outDSDataType = inputImgDS->GetRasterBand(1)->GetRasterDataType();
+            
+            rsgis::img::RSGISImageUtils imgUtils;
+            GDALDataset *outImgDS =  imgUtils.createCopy(inputImgDS, 1, outputImage, gdalFormat, outDSDataType);
+            
+            rsgis::img::RSGISSampleImage sampleImg;
+            sampleImg.randomSampleImageMask(inputImgDS, 1, outImgDS, maskVals, numSamples);
+            
+            GDALClose(inputImgDS);
+            GDALClose(outImgDS);
         }
         catch (RSGISImageException& e)
         {

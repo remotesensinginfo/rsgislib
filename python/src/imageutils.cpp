@@ -719,11 +719,103 @@ static PyObject *ImageUtils_ExtractZoneImageValues2HDF(PyObject *self, PyObject 
     float maskValue = 0;
     
     if( !PyArg_ParseTuple(args, "sssf:extractZoneImageValues2HDF", &pszInputImage, &pszInputMaskImage, &pszOutputFile, &maskValue))
+    {
         return NULL;
+    }
     
     try
     {
         rsgis::cmds::executeImageRasterZone2HDF(std::string(pszInputImage), std::string(pszInputMaskImage), std::string(pszOutputFile), maskValue);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+static PyObject *ImageUtils_ExtractZoneImageBandValues2HDF(PyObject *self, PyObject *args)
+{
+    PyObject *inputImageFileInfoObj;
+    const char *pszInputMaskImage;
+    const char *pszOutputFile;
+    float maskValue = 0;
+    
+    if( !PyArg_ParseTuple(args, "Ossf:extractZoneImageBandValues2HDF", &inputImageFileInfoObj, &pszInputMaskImage, &pszOutputFile, &maskValue))
+    {
+        return NULL;
+    }
+    
+    if( !PySequence_Check(inputImageFileInfoObj))
+    {
+        PyErr_SetString(GETSTATE(self)->error, "First argument (imageFileInfo) must be a sequence");
+        return NULL;
+    }
+    
+    Py_ssize_t nFileInfo = PySequence_Size(inputImageFileInfoObj);
+    std::vector<std::pair<std::string, std::vector<unsigned int> > > imageFilesInfo;
+    imageFilesInfo.reserve(nFileInfo);
+    std::string tmpFileName = "";
+    
+    for( Py_ssize_t n = 0; n < nFileInfo; n++ )
+    {
+        PyObject *o = PySequence_GetItem(inputImageFileInfoObj, n);
+        
+        PyObject *pFileName = PyObject_GetAttrString(o, "fileName");
+        if( ( pFileName == NULL ) || ( pFileName == Py_None ) || !RSGISPY_CHECK_STRING(pFileName) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Could not find string attribute \'fileName\'" );
+            Py_XDECREF(pFileName);
+            Py_DECREF(o);
+            return NULL;
+        }
+        
+        PyObject *pBands = PyObject_GetAttrString(o, "bands");
+        if( ( pBands == NULL ) || ( pBands == Py_None ) || !PySequence_Check(pBands) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Could not find sequence attribute \'bands\'" );
+            Py_DECREF(pFileName);
+            Py_XDECREF(pBands);
+            Py_DECREF(o);
+            return NULL;
+        }
+        
+        Py_ssize_t nBands = PySequence_Size(pBands);
+        if(nBands == 0)
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Sequence attribute \'bands\' is empty." );
+            Py_DECREF(pFileName);
+            Py_DECREF(pBands);
+            Py_DECREF(o);
+            return NULL;
+        }
+        std::vector<unsigned int> bandsVec = std::vector<unsigned int>();
+        bandsVec.reserve(nBands);
+        for( Py_ssize_t i = 0; i < nBands; i++ )
+        {
+            PyObject *bO = PySequence_GetItem(pBands, i);
+            if( ( bO == NULL ) || ( bO == Py_None ) || !RSGISPY_CHECK_INT(bO) )
+            {
+                PyErr_SetString(GETSTATE(self)->error, "Element of 'bands' list was not an integer." );
+                Py_XDECREF(bO);
+                
+                Py_DECREF(pFileName);
+                Py_DECREF(pBands);
+                Py_DECREF(o);
+                return NULL;
+            }
+            bandsVec.push_back(RSGISPY_INT_EXTRACT(bO));
+        }
+        
+        tmpFileName = std::string(RSGISPY_STRING_EXTRACT(pFileName));
+        imageFilesInfo.push_back(std::pair<std::string, std::vector<unsigned int> >(tmpFileName, bandsVec));
+    }
+    
+    try
+    {
+        rsgis::cmds::executeImageBandRasterZone2HDF(imageFilesInfo, std::string(pszInputMaskImage), std::string(pszOutputFile), maskValue);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -940,8 +1032,6 @@ static PyObject *ImageUtils_StackImageBands(PyObject *self, PyObject *args)
             replaceBandNames = true;
         }
     }
-    
-    
     
     try
     {
@@ -1278,6 +1368,69 @@ static PyObject *ImageUtils_CombineImages2Band(PyObject *self, PyObject *args, P
     Py_RETURN_NONE;
 }
 
+
+
+static PyObject *ImageUtils_PerformRandomPxlSample(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    static char *kwlist[] = {"inputImage", "outputImage", "gdalformat", "maskvals", "numSamples"};
+    const char *pszInputImage = "";
+    const char *pszOutputImage = "";
+    const char *pszGDALFormat = "";
+    PyObject *maskValsObj;
+    unsigned int numSamples = 0;
+    
+    
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssOI:performRandomPxlSampleInMask", kwlist, &pszInputImage, &pszOutputImage, &pszGDALFormat, &maskValsObj, &numSamples))
+    {
+        return NULL;
+    }
+    
+    std::vector<int> maskVals;
+    
+    if(!PySequence_Check(maskValsObj))
+    {
+        if(RSGISPY_CHECK_INT(maskValsObj))
+        {
+            maskVals.push_back(RSGISPY_INT_EXTRACT(maskValsObj));
+        }
+        else
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Mask value was not a sequence but a single value, however that value was not an integer.");
+            return NULL;
+        }
+    }
+    else
+    {
+        Py_ssize_t nMaskVals = PySequence_Size(maskValsObj);
+        for( Py_ssize_t n = 0; n < nMaskVals; n++ )
+        {
+            PyObject *o = PySequence_GetItem(maskValsObj, n);
+            if(RSGISPY_CHECK_INT(o))
+            {
+                maskVals.push_back(RSGISPY_INT_EXTRACT(o));
+            }
+            else
+            {
+                Py_DECREF(o);
+                PyErr_SetString(GETSTATE(self)->error, "Mask value was not a sequence but a single value, however that value was not an integer.");
+                return NULL;
+            }
+        }
+    }
+    
+    try
+    {
+        rsgis::cmds::executePerformRandomPxlSample(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszGDALFormat), maskVals, numSamples);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 // Our list of functions in this module
 static PyMethodDef ImageUtilsMethods[] = {
     {"stretchImage", ImageUtils_StretchImage, METH_VARARGS, 
@@ -1583,6 +1736,24 @@ static PyMethodDef ImageUtilsMethods[] = {
 "* outputHDF is a string containing the name and path of the output HDF5 file\n"
 "* maskValue is a float containing the value of the pixel within the mask for which values are to be extracted\n"
 "\n"},
+    
+{"extractZoneImageBandValues2HDF", ImageUtils_ExtractZoneImageBandValues2HDF, METH_VARARGS,
+"rsgislib.imageutils.extractZoneImageBandValues2HDF(inputImageInfo, imageMask, outputHDF, maskValue)\n"
+"Extract the all the pixel values for raster regions to a HDF5 file (1 column for each image band).\n"
+"Multiple input rasters can be provided and the bands extracted selected."
+"\n"
+"* inputImageInfo is a list of rsgislib::imageutils::ImageBandInfo objects with the file names and list of image bands within that file to be extracted.\n"
+"* imageMask is a string containing the name and path of the input image mask file; the mask file must have only 1 image band.\n"
+"* outputHDF is a string containing the name and path of the output HDF5 file\n"
+"* maskValue is a float containing the value of the pixel within the mask for which values are to be extracted\n"
+"\n"
+"Example::\n"
+"import rsgislib.imageutils\n"
+"fileInfo = []\n"
+"fileInfo.append(rsgislib.imageutils.ImageBandInfo('InputImg1.kea', [1,3,4]))\n"
+"fileInfo.append(rsgislib.imageutils.ImageBandInfo('InputImg2.kea', [2]))\n"
+"rsgislib.imageutils.extractZoneImageBandValues2HDF(fileInfo, 'ClassMask.kea', 'ForestRefl.h5', 1.0)\n"
+"\n"},
 
     {"selectImageBands", ImageUtils_SelectImageBands, METH_VARARGS,
 "rsgislib.imageutils.selectImageBands(inputImage, outputImage, gdalformat, datatype, bands)\n"
@@ -1887,7 +2058,17 @@ static PyMethodDef ImageUtilsMethods[] = {
 "   format = 'KEA'\n"
 "   imageutils.combineImages2Band(inputImages, outputImage, format, datatype, 0.0)\n"
 "\n"},
-
+    
+{"performRandomPxlSampleInMask", (PyCFunction)ImageUtils_PerformRandomPxlSample, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.performRandomPxlSampleInMask(inputImage=string, outputImage=string, gdalformat=string, maskvals=int|list, numSamples=unsigned int)\n"
+"Randomly sample with a mask (e.g., classification). The same number of samples will be identified within each mask value listed by maskvals.\n"
+"\n"
+"* inputImage is a string for the input image mask - mask is typically whole values within regions (e.g., classifications).\n"
+"* outputImage is a string with the name and path of the output image. Output is the mask pixel values.\n"
+"* gdalformat is a string with the GDAL output file format.\n"
+"* maskvals can either be a single integer value or a list of values. If a list of values is specified then the total number of points identified (numSamples x n-maskVals).\n"
+"* numSamples is the number of samples to be created within each region.\n"
+"\n"},
 
     {NULL}        /* Sentinel */
 };

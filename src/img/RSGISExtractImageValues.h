@@ -47,6 +47,7 @@ namespace rsgis{namespace img{
     public:
         RSGISExtractImageValues();
         void extractDataWithinMask2HDF(GDALDataset *mask, GDALDataset *image, std::string outHDFFile, float maskValue) throw(RSGISImageException);
+        void extractImgBandDataWithinMask2HDF(std::vector<std::pair<std::string, std::vector<unsigned int> > > imageFiles, std::string maskImage, std::string outHDFFile, float maskValue) throw(RSGISImageException);
         ~RSGISExtractImageValues();
     };
     
@@ -72,6 +73,30 @@ namespace rsgis{namespace img{
 	};
     
     
+    class DllExport RSGISExtractImageBandValuesWithMask : public RSGISCalcImageValue
+    {
+    public:
+        RSGISExtractImageBandValuesWithMask(std::vector<float*> *pxlVals, std::vector<unsigned int> imgBands, float maskValue);
+        void calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException) {throw RSGISImageCalcException("No implemented");};
+        void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent)throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException) {throw RSGISImageCalcException("No implemented");};
+        void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) throw(RSGISImageCalcException) {throw RSGISImageCalcException("No implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException) {throw RSGISImageCalcException("No implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException) {throw RSGISImageCalcException("No implemented");};
+        ~RSGISExtractImageBandValuesWithMask();
+    private:
+        std::vector<float*> *pxlVals;
+        std::vector<unsigned int> imgBands;
+        unsigned int numOutVals;
+        float maskValue;
+    };
+    
+
+
     
     class DllExport RSGISExtractPxlsAsPts
     {

@@ -150,10 +150,7 @@ namespace rsgis
                 void getImagesExtent(std::vector<std::string> inputImages, int *width, int *height, double *gdalTransform) throw(RSGISImageBandException);
                 void getImagePixelOverlaps(GDALDataset **datasets, int numDS, int **dsOffsets, unsigned int *width, unsigned int *height) throw(RSGISImageBandException);
                 OGREnvelope* getSpatialExtent(GDALDataset *dataset) throw(RSGISImageBandException);
-                
                 bool doImageSpatAndExtMatch(GDALDataset **datasets, int numDS) throw(RSGISImageBandException);
-                
-                
                 void exportImageToTextCol(GDALDataset *image, int band, std::string outputText)throw(RSGISImageBandException, RSGISOutputStreamException);
 				GDALDataset* createBlankImage(std::string imageFile, double *transformation, int xSize, int ySize, int numBands, std::string projection, float value, std::string gdalFormat="ENVI", GDALDataType imgDataType=GDT_Float32) throw(RSGISImageException, RSGISImageBandException);
                 GDALDataset* createBlankImage(std::string imageFile, double *transformation, int xSize, int ySize, int numBands, std::string projection, float value, std::vector<std::string> bandNames, std::string gdalFormat="ENVI", GDALDataType imgDataType=GDT_Float32) throw(RSGISImageException, RSGISImageBandException);
@@ -183,6 +180,8 @@ namespace rsgis
                 void createKMLText(std::string inputImage, std::string outKMLFile) throw(RSGISImageBandException);
                 bool closeResTest(double baseRes, double targetRes);
                 double getPixelValue(GDALDataset *image, unsigned int imgBand, double xLoc, double yLoc) throw(RSGISImageException);
+                double getPixelValue(GDALDataset *image, unsigned int imgBand, unsigned int xPxl, unsigned int yPxl) throw(RSGISImageException);
+                void setPixelValue(GDALDataset *image, unsigned int imgBand, unsigned int xPxl, unsigned int yPxl, double val) throw(RSGISImageException);
                 void createImageGrid(GDALDataset *inData, unsigned int numXPxls, unsigned int numYPxls, bool offset) throw(RSGISImageException);
                 void populateImagePixelsInRange(GDALDataset *image, int minVal, int maxVal, bool singleLine) throw(RSGISImageException);
                 void setImageBandNames(GDALDataset *dataset, std::vector<std::string> bandNames, bool quiet=false) throw(RSGISImageException);

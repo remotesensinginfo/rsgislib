@@ -100,6 +100,12 @@ namespace rsgis{ namespace cmds {
     
     /** A function to extract image values to a HDF file */
     DllExport void executeImageRasterZone2HDF(std::string imageFile, std::string maskImage, std::string outputHDF, float maskVal)throw(RSGISCmdException);
+    
+    /** A function to extract image band values to a HDF file */
+    DllExport void executeImageBandRasterZone2HDF(std::string imageFile, std::string maskImage, std::string outputHDF, float maskVal, std::vector<unsigned int> bands)throw(RSGISCmdException);
+    
+    /** A function to extract image band values to a HDF file */
+    DllExport void executeImageBandRasterZone2HDF(std::vector<std::pair<std::string, std::vector<unsigned int> > > imageFiles, std::string maskImage, std::string outputHDF, float maskVal)throw(RSGISCmdException);
 
     /** A function to subset an image to the bounding box of a polygon */
     DllExport void executeSubset(std::string inputImage, std::string inputVector, std::string outputImage, std::string imageFormat, RSGISLibDataType outDataType) throw(RSGISCmdException);
@@ -139,7 +145,10 @@ namespace rsgis{ namespace cmds {
     
     /** A function to combine images together into a single image band by excluding the no data value */
     DllExport void executeCombineImagesSingleBandIgnoreNoData(std::vector<std::string> inputImages, std::string outputImage, float noDataVal, std::string gdalFormat, RSGISLibDataType outDataType) throw(RSGISCmdException);
-
+    
+    /** A function to create a random sample of points within a mask */
+    DllExport void executePerformRandomPxlSample(std::string inputImage, std::string outputImage, std::string gdalFormat, std::vector<int> maskVals, unsigned long numSamples) throw(RSGISCmdException);
+    
 
     
 }}
