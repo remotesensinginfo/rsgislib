@@ -5489,6 +5489,74 @@ namespace rsgis{namespace img{
         return outVal;
     }
     
+    double RSGISImageUtils::getPixelValue(GDALDataset *image, unsigned int imgBand, unsigned int xPxl, unsigned int yPxl) throw(RSGISImageException)
+    {
+        double outVal = 0.0;
+        try
+        {
+            unsigned int numImgBands = image->GetRasterCount();
+            
+            if(imgBand > numImgBands)
+            {
+                throw RSGISImageException("The band specified is not within the image.");
+            }
+            
+            if((xPxl < image->GetRasterXSize()) && (yPxl < image->GetRasterYSize()))
+            {
+                GDALRasterBand *gdalBand = image->GetRasterBand(imgBand);
+                double *pxlValue = (double *) CPLMalloc(sizeof(double));
+                gdalBand->RasterIO(GF_Read, xPxl, yPxl, 1, 1, pxlValue, 1, 1, GDT_Float64, 0, 0);
+                outVal = pxlValue[0];
+                delete pxlValue;
+            }
+            else
+            {
+                throw RSGISImageException("Point not within image file provided\n");
+            }
+        }
+        catch(RSGISImageException &e)
+        {
+            throw e;
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISImageException(e.what());
+        }
+        
+        return outVal;
+    }
+    
+    void RSGISImageUtils::setPixelValue(GDALDataset *image, unsigned int imgBand, unsigned int xPxl, unsigned int yPxl, double val) throw(RSGISImageException)
+    {
+        try
+        {
+            unsigned int numImgBands = image->GetRasterCount();
+            
+            if(imgBand > numImgBands)
+            {
+                throw RSGISImageException("The band specified is not within the image.");
+            }
+            
+            if((xPxl < image->GetRasterXSize()) && (yPxl < image->GetRasterYSize()))
+            {
+                GDALRasterBand *gdalBand = image->GetRasterBand(imgBand);
+                gdalBand->RasterIO(GF_Write, xPxl, yPxl, 1, 1, &val, 1, 1, GDT_Float64, 0, 0);
+            }
+            else
+            {
+                throw RSGISImageException("Point not within image file provided\n");
+            }
+        }
+        catch(RSGISImageException &e)
+        {
+            throw e;
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISImageException(e.what());
+        }
+    }
+    
     void RSGISImageUtils::createImageGrid(GDALDataset *inData, unsigned int numXPxls, unsigned int numYPxls, bool offset) throw(RSGISImageException)
     {
         //std::cerr << "WARNING: RSGISImageUtils::createImageGrid shouldn't be used; use rsgis::segment::RSGISCreateImageGrid\n";

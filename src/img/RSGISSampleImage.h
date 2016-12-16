@@ -26,6 +26,9 @@
 #include <iostream>
 #include <fstream>
 
+#include "boost/random.hpp"
+#include "boost/generator_iterator.hpp"
+
 #include "img/RSGISImageCalcException.h"
 #include "img/RSGISCalcImage.h"
 #include "img/RSGISCalcImageValue.h"
@@ -44,6 +47,7 @@ namespace rsgis{namespace img{
     public:
         RSGISSampleImage();
         void subSampleImage(GDALDataset *inputImage, std::string outputFile, unsigned int sample, float noData, bool useNoData)throw(RSGISImageException);
+        void randomSampleImageMask(GDALDataset *inputImage, unsigned int imgBand, GDALDataset *outputImage, std::vector<int> maskVals, unsigned long numSamples)throw(RSGISImageException);
         ~RSGISSampleImage();
     };
     

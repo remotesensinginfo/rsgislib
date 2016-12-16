@@ -90,6 +90,104 @@ namespace rsgis{namespace img{
         }
     }
     
+    void RSGISExtractImageValues::extractImgBandDataWithinMask2HDF(std::vector<std::pair<std::string, std::vector<unsigned int> > > imageFiles, std::string maskImage, std::string outHDFFile, float maskValue) throw(RSGISImageException)
+    {
+        try
+        {
+            GDALAllRegister();
+            if(imageFiles.size() == 0)
+            {
+                throw RSGISImageException("There were no images provided.");
+            }
+            
+            GDALDataset **datasets = new GDALDataset*[imageFiles.size()+1];
+            
+            
+            
+            datasets[0] = (GDALDataset *) GDALOpen(maskImage.c_str(), GA_ReadOnly);
+            if(datasets[0] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + maskImage;
+                throw RSGISImageException(message.c_str());
+            }
+            
+            if(datasets[0]->GetRasterCount() != 1)
+            {
+                throw RSGISImageException("Image mask must only have 1 image band.");
+            }
+            
+            std::vector<unsigned int> imgBands;
+            unsigned int cImgBandCount = datasets[0]->GetRasterCount();
+            for(unsigned int i = 0; i < imageFiles.size(); ++i)
+            {
+                datasets[i+1] = (GDALDataset *) GDALOpen(imageFiles.at(i).first.c_str(), GA_ReadOnly);
+                if(datasets[i+1] == NULL)
+                {
+                    std::string message = std::string("Could not open image ") + imageFiles.at(i).first.c_str();
+                    throw RSGISImageException(message.c_str());
+                }
+                
+                for(std::vector<unsigned int>::iterator iterBands = imageFiles.at(i).second.begin(); iterBands != imageFiles.at(i).second.end(); ++iterBands)
+                {
+                    if(((*iterBands) < 1) || ((*iterBands) > datasets[i+1]->GetRasterCount()))
+                    {
+                        std::cout << "Error for band number in \'" << imageFiles.at(i).first << "\': " << datasets[i+1]->GetRasterCount() << "\n";
+                        throw RSGISImageException("Band numbers start at 1 and equal or less than the number of bands within the image file.");
+                    }
+                    imgBands.push_back(cImgBandCount+((*iterBands)-1));
+                }
+                cImgBandCount += datasets[i+1]->GetRasterCount();
+            }
+            
+            std::vector<float*> *pxlVals = new std::vector<float*>();
+            unsigned int numOutImgBands = imgBands.size();
+            
+            RSGISExtractImageBandValuesWithMask extractData = RSGISExtractImageBandValuesWithMask(pxlVals, imgBands, maskValue);
+            RSGISCalcImage calcImg = RSGISCalcImage(&extractData, "", true);
+            calcImg.calcImage(datasets, imageFiles.size()+1);
+            
+            
+            for(unsigned int i = 0; i < (imageFiles.size()+1); ++i)
+            {
+                GDALClose(datasets[i]);
+            }
+            delete[] datasets;
+            
+            rsgis::utils::RSGISExportColumnData2HDF exportCols2HDF;
+            exportCols2HDF.createFile(outHDFFile, numOutImgBands, std::string("Pixels Extracted"), H5::PredType::IEEE_F32LE);
+            float *row = new float[numOutImgBands];
+            for(unsigned int j = 0; j < pxlVals->size(); ++j)
+            {
+                for(unsigned int i = 0; i < numOutImgBands; ++i)
+                {
+                    row[i] = pxlVals->at(j)[i];
+                }
+                exportCols2HDF.addDataRow(row, H5::PredType::NATIVE_FLOAT);
+            }
+            exportCols2HDF.close();
+            delete[] row;
+            
+            for(std::vector<float*>::iterator iterVals = pxlVals->begin(); iterVals != pxlVals->end(); ++iterVals)
+            {
+                delete[] *iterVals;
+            }
+            delete pxlVals;
+            
+        }
+        catch (RSGISImageException &e)
+        {
+            throw e;
+        }
+        catch (RSGISException &e)
+        {
+            throw RSGISImageException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw RSGISImageException(e.what());
+        }
+    }
+    
     RSGISExtractImageValues::~RSGISExtractImageValues()
     {
         
@@ -117,6 +215,38 @@ namespace rsgis{namespace img{
     }
     
     RSGISExtractImageValuesWithMask::~RSGISExtractImageValuesWithMask()
+    {
+        
+    }
+    
+    
+    
+    
+    
+    
+    
+    RSGISExtractImageBandValuesWithMask::RSGISExtractImageBandValuesWithMask(std::vector<float*> *pxlVals, std::vector<unsigned int> imgBands, float maskValue): RSGISCalcImageValue(0)
+    {
+        this->pxlVals = pxlVals;
+        this->imgBands = imgBands;
+        this->maskValue = maskValue;
+        this->numOutVals = this->imgBands.size();
+    }
+    
+    void RSGISExtractImageBandValuesWithMask::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+    {
+        if(bandValues[0] == maskValue)
+        {
+            float *data = new float[numOutVals];
+            for(unsigned i = 0; i < numOutVals; ++i)
+            {
+                data[i] = bandValues[imgBands.at(i)];
+            }
+            pxlVals->push_back(data);
+        }
+    }
+    
+    RSGISExtractImageBandValuesWithMask::~RSGISExtractImageBandValuesWithMask()
     {
         
     }
