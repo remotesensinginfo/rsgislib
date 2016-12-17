@@ -59,8 +59,8 @@ except ImportError as riosErr:
 
 haveSKLearn = True
 try:
+    from sklearn.model_selection import GridSearchCV
     from sklearn.ensemble import RandomForestClassifier
-    from sklearn.grid_search import GridSearchCV
 except ImportError as sklearnErr:
     haveSKLearn = False
     raise Exception("The scikit-learn tools are required for this module could not be imported\n\t {}".format(sklearnErr))

@@ -64,7 +64,7 @@ except ImportError as sklearnRFErr:
     
 haveSKLearnGS = True
 try:
-    from sklearn.grid_search import GridSearchCV
+    from sklearn.model_selection import GridSearchCV
 except ImportError as sklearnGSErr:
     haveSKLearnRF = False
     raise Exception("The scikit-learn grid search tools are required for this module could not be imported\n\t" + sklearnGSErr)
@@ -620,7 +620,7 @@ Example::
 
     from rsgislib.classification import classratutils
     from sklearn.svm import SVC
-    from sklearn.grid_search import GridSearchCV
+    from sklearn.model_selection import GridSearchCV
     from sklearn.preprocessing import MaxAbsScaler
     
     clumpsImg = "./LS8_20150621_lat10lon652_r67p233_clumps.kea"
