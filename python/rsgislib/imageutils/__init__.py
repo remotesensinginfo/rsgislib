@@ -35,8 +35,9 @@ class ImageBandInfo(object):
     * fileName - is the input image file name and path.
     * bands - is a list of image bands within the fileName to be used for processing (band numbers start at 1).
     """
-    def __init__(self, fileName=None, bands=None):
+    def __init__(self, fileName=None, name=None, bands=None):
         self.fileName = fileName
+        self.name = name
         self.bands = bands
 
 
