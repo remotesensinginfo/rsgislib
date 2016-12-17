@@ -66,7 +66,7 @@ except ImportError as sklearnErr:
     raise Exception("The scikit-learn tools are required for this module could not be imported\n\t {}".format(sklearnErr))
 
 
-class classInfoObj(object):
+class ClassInfoObj(object):
     def __init__(self, id=None, fileH5=None, red=None, green=None, blue=None):
         self.id = id
         self.fileH5 = fileH5
