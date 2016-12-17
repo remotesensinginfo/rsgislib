@@ -1,12 +1,70 @@
-import h5py
+#! /usr/bin/env python
+
+############################################################################
+#  classimgutils.py
+#
+#  Copyright 2016 RSGISLib.
+#
+#  RSGISLib: 'The remote sensing and GIS Software Library'
+#
+#  RSGISLib is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  RSGISLib is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with RSGISLib.  If not, see <http://www.gnu.org/licenses/>.
+#
+#
+# Purpose:  Provide a set of utilities which combine commands to create
+#           useful extra functionality and make it more easily available
+#           to be reused.
+#
+# Author: Pete Bunting
+# Email: petebunting@mac.com
+# Date: 17/12/2016
+# Version: 1.0
+#
+# History:
+# Version 1.0 - Created.
+#
+###########################################################################
+
+from __future__ import print_function
+
 import numpy
 import numpy.random
-from rios import applier
-from rios import cuiprogress
-from sklearn.model_selection import GridSearchCV
-from sklearn.ensemble import RandomForestClassifier
+
 import rsgislib.rastergis
 import rsgislib
+
+haveH5PY = True
+try:
+    import h5py
+except ImportError as h5pyErr:
+    haveH5PY = False
+
+haveRIOS = True
+try:
+    from rios import applier
+    from rios import cuiprogress
+except ImportError as riosErr:
+    haveRIOS = False
+    raise Exception("The RIOS tools are required for this module could not be imported\n\t {}".format(riosErr))
+
+haveSKLearn = True
+try:
+    from sklearn.ensemble import RandomForestClassifier
+    from sklearn.grid_search import GridSearchCV
+except ImportError as sklearnErr:
+    haveSKLearn = False
+    raise Exception("The scikit-learn tools are required for this module could not be imported\n\t {}".format(sklearnErr))
+
 
 class classInfoObj(object):
     def __init__(self, id=None, fileH5=None, red=None, green=None, blue=None):
@@ -19,6 +77,10 @@ class classInfoObj(object):
 def findClassifierParametersAndTrain(classTrainInfo, paramSearchSampNum=0, gridSearch=GridSearchCV(RandomForestClassifier(), {})):
     """
     """
+    # Check h5py is available
+    if not haveH5PY:
+        raise Exception("The h5pt module is required for this function could not be imported\n\t" + h5pyErr)
+    
     if len(classTrainInfo) < 2:
         rsgislib.RSGISPyException("Need at least 2 classes to be worth running findClassifierParametersAndTrain function.")
     
@@ -84,6 +146,10 @@ def findClassifierParametersAndTrain(classTrainInfo, paramSearchSampNum=0, gridS
 def trainClassifier(classTrainInfo, skClassifier):
     """
     """
+     # Check h5py is available
+    if not haveH5PY:
+        raise Exception("The h5pt module is required for this function could not be imported\n\t" + h5pyErr)
+    
     if len(classTrainInfo) < 2:
         rsgislib.RSGISPyException("Need at least 2 classes to be worth running trainClassifier function.")
     
