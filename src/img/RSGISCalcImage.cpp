@@ -3499,9 +3499,8 @@ namespace rsgis{namespace img{
 		{
 			// Find image overlap
             imgUtils.getImageOverlapCut2Env(datasets, numDS, dsOffsets, &width, &height, gdalTranslation, env, &xBlockSize, &yBlockSize);
-			//imgUtils.getImageOverlap(datasets, numDS, dsOffsets, &width, &height, gdalTranslation, &xBlockSize, &yBlockSize);
-            
-			// Count number of image bands
+
+            // Count number of image bands
 			for(int i = 0; i < numDS; i++)
 			{
 				numInBands += datasets[i]->GetRasterCount();
@@ -3543,7 +3542,6 @@ namespace rsgis{namespace img{
 					bandOffsets[counter] = new int[2];
 					bandOffsets[counter][0] = dsOffsets[i][0];
 					bandOffsets[counter][1] = dsOffsets[i][1];
-					//std::cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
 					counter++;
 				}
 			}
@@ -3566,7 +3564,6 @@ namespace rsgis{namespace img{
             {
                 yBlockSize = outYBlockSize;
             }
-            //std::cout << "Max. block size: " << yBlockSize << std::endl;
             
 			// Allocate memory
 			inputData = new float*[numInBands];
