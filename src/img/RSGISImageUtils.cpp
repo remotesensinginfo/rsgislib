@@ -459,12 +459,9 @@ namespace rsgis{namespace img{
                 tmpMaxX = tmpMinX + ((*width)*pixelXRes);
                 tmpMinY = tmpMaxY - ((*height)*pixelYResPos);
                 
-                //std::cout << "BBOX (" << i << ") [xMin, xMax, yMin, yMax]: [" << tmpMinX << ", " << tmpMaxX << ", " << tmpMinY << ", " << tmpMaxY << "]\n";
-                
                 if(tmpMaxX > maxX)
                 {
                     diffX = (tmpMaxX - maxX);
-                    //std::cout << "Diff X = " << diffX << std::endl;
                     if(!foundXDiff)
                     {
                         maxDiffX = diffX;
@@ -479,7 +476,6 @@ namespace rsgis{namespace img{
                 if(tmpMinY < minY)
                 {
                     diffY = (minY - tmpMinY);
-                    //std::cout << "Diff Y = " << diffY << std::endl;
                     if(!foundYDiff)
                     {
                         maxDiffY = diffY;
@@ -564,8 +560,6 @@ namespace rsgis{namespace img{
 			xSize[i] = datasets[i]->GetRasterXSize();
 			ySize[i] = datasets[i]->GetRasterYSize();
             datasets[i]->GetRasterBand(1)->GetBlockSize(&xBlockSize[i], &yBlockSize[i]);
-            //std::cout << "TL [" << transformations[i][0] << "," << transformations[i][3] << "]\n";
-            //std::cout << "Size [" << xSize[i] << "," << ySize[i] << "]\n";
 		}
 		double rotateX = 0;
 		double rotateY = 0;
@@ -672,8 +666,6 @@ namespace rsgis{namespace img{
 				}
 			}
             
-            //std::cout << "BBOX [xMin, xMax, yMin, yMax]: [" << minX << ", " << maxX << ", " << minY << ", " << maxY << "]\n";
-            
 			if(maxX - minX <= 0)
 			{
 				throw RSGISImageBandException("Images do not overlap in the X axis");
@@ -693,9 +685,6 @@ namespace rsgis{namespace img{
             
 			*width = floor(((maxX - minX)/pixelXRes)+0.5);
 			*height = floor(((maxY - minY)/pixelYResPos)+0.5);
-            
-            //std::cout << "Out Width: " << *width << std::endl;
-            //std::cout << "Out Height: " << *height << std::endl;
 			
 			double diffX = 0;
 			double diffY = 0;
@@ -722,10 +711,6 @@ namespace rsgis{namespace img{
 				{
 					dsOffsets[i][1] = 0;
 				}
-                
-                //std::cout << "Offset (" << i << "):\t[" << dsOffsets[i][0] << ", " << dsOffsets[i][1] << "]" << std::endl;
-                //std::cout << "Offset Width (" << i << "):\t[" << dsOffsets[i][0]+*width << "]" << std::endl;
-                //std::cout << "Image Width (" << i << "):\t[" << datasets[i]->GetRasterXSize() << "]" << std::endl << std::endl;
 			}
             
             double tmpMinX = 0;
@@ -746,12 +731,9 @@ namespace rsgis{namespace img{
                 tmpMaxX = tmpMinX + ((*width)*pixelXRes);
                 tmpMinY = tmpMaxY - ((*height)*pixelYResPos);
                 
-                //std::cout << "BBOX (" << i << ") [xMin, xMax, yMin, yMax]: [" << tmpMinX << ", " << tmpMaxX << ", " << tmpMinY << ", " << tmpMaxY << "]\n";
-                
                 if(tmpMaxX > maxX)
                 {
                     diffX = (tmpMaxX - maxX);
-                    //std::cout << "Diff X = " << diffX << std::endl;
                     if(!foundXDiff)
                     {
                         maxDiffX = diffX;
@@ -766,7 +748,6 @@ namespace rsgis{namespace img{
                 if(tmpMinY < minY)
                 {
                     diffY = (minY - tmpMinY);
-                    //std::cout << "Diff Y = " << diffY << std::endl;
                     if(!foundYDiff)
                     {
                         maxDiffY = diffY;
@@ -852,7 +833,6 @@ namespace rsgis{namespace img{
 			xSize[i] = datasets->at(i)->GetRasterXSize();
 			ySize[i] = datasets->at(i)->GetRasterYSize();
             datasets->at(i)->GetRasterBand(1)->GetBlockSize(&xBlockSize[i], &yBlockSize[i]);
-			//std::cout << "TL [" << transformations[i][0] << "," << transformations[i][3] << "]\n";
 		}
 		double rotateX = 0;
 		double rotateY = 0;
@@ -1024,12 +1004,9 @@ namespace rsgis{namespace img{
                 tmpMaxX = tmpMinX + ((*width)*pixelXRes);
                 tmpMinY = tmpMaxY - ((*height)*pixelYResPos);
                 
-                //std::cout << "BBOX (" << i << ") [xMin, xMax, yMin, yMax]: [" << tmpMinX << ", " << tmpMaxX << ", " << tmpMinY << ", " << tmpMaxY << "]\n";
-                
                 if(tmpMaxX > maxX)
                 {
                     diffX = (tmpMaxX - maxX);
-                    //std::cout << "Diff X = " << diffX << std::endl;
                     if(!foundXDiff)
                     {
                         maxDiffX = diffX;
@@ -1044,7 +1021,6 @@ namespace rsgis{namespace img{
                 if(tmpMinY < minY)
                 {
                     diffY = (minY - tmpMinY);
-                    //std::cout << "Diff Y = " << diffY << std::endl;
                     if(!foundYDiff)
                     {
                         maxDiffY = diffY;
@@ -1126,8 +1102,6 @@ namespace rsgis{namespace img{
 			datasets[i]->GetGeoTransform(transformations[i]);
 			xSize[i] = datasets[i]->GetRasterXSize();
 			ySize[i] = datasets[i]->GetRasterYSize();
-			
-			//std::cout << "TL [" << transformations[i][0] << "," << transformations[i][3] << "]\n";
 		}
 		double rotateX = 0;
 		double rotateY = 0;
@@ -1185,8 +1159,6 @@ namespace rsgis{namespace img{
 					
 					if(std::string(datasets[i]->GetProjectionRef()) != std::string(proj))
 					{
-						//std::cout << "Band 1 Projection = " << proj << std::endl;
-						//std::cout << "Band " << i <<  " Projection = " << datasets[i]->GetProjectionRef()<< std::endl;
 						throw RSGISImageBandException("Not all image bands have the same projection..");
 					}
 					
@@ -1219,12 +1191,7 @@ namespace rsgis{namespace img{
 					}
 				}
 			}
-			/*
-			std::cout << "MinX = " << minX << std::endl;
-			std::cout << "MaxX = " << maxX << std::endl;
-			std::cout << "MinY = " << minY << std::endl;
-			std::cout << "MaxY = " << maxY << std::endl;
-			*/
+
 			if(maxX - minX <= 0)
 			{
 				std::cout << "MinX = " << minX << std::endl;
@@ -1239,7 +1206,6 @@ namespace rsgis{namespace img{
 				throw RSGISImageBandException("Images do not overlap in the Y axis");
 			}
 			
-            //std::cout << "Image Area: [" << minX << ", " << minY << ", " << maxX << ", " << maxY << "]\n";
             
 			// Check if OK to process.
 			// Changed from throwing exception (left old code) - Dan
@@ -1305,26 +1271,26 @@ namespace rsgis{namespace img{
 				
 				for(int i = 0; i < numDS; i++)
 				{
-					diffX = minX - transformations[i][0];
-					diffY = transformations[i][3] - maxY;
-					
-					if(diffX != 0)
-					{
-						dsOffsets[i][0] = floor(diffX/pixelXRes);
-					}
-					else
-					{
-						dsOffsets[i][0] = 0;
-					}
-					
-					if(diffY != 0)
-					{
-						dsOffsets[i][1] = floor(diffY/pixelYResPos);
-					}
-					else
-					{
-						dsOffsets[i][1] = 0;
-					}
+                    diffX = minX - transformations[i][0];
+                    diffY = transformations[i][3] - maxY;
+                    
+                    if(!((diffX > -0.0001) & (diffX < 0.0001)))
+                    {
+                        dsOffsets[i][0] = floor((diffX/pixelXRes)+0.5);
+                    }
+                    else
+                    {
+                        dsOffsets[i][0] = 0;
+                    }
+                    
+                    if(!((diffY > -0.0001) & (diffY < 0.0001)))
+                    {
+                        dsOffsets[i][1] = floor((diffY/pixelYResPos)+0.5);
+                    }
+                    else
+                    {
+                        dsOffsets[i][1] = 0;
+                    }
 				}
 			}
             /* Commented out else statement, this was added to fix problem with cut2poly but caused problems with zonal stats commands
@@ -1363,18 +1329,18 @@ namespace rsgis{namespace img{
                         diffX = minX - transformations[i][0];
                         diffY = transformations[i][3] - maxY;
                         
-                        if(diffX != 0)
+                        if(!((diffX > -0.0001) & (diffX < 0.0001)))
                         {
-                            dsOffsets[i][0] = ceil(diffX/pixelXRes);
+                            dsOffsets[i][0] = floor((diffX/pixelXRes)+0.5);
                         }
                         else
                         {
                             dsOffsets[i][0] = 0;
                         }
                         
-                        if(diffY != 0)
+                        if(!((diffY > -0.0001) & (diffY < 0.0001)))
                         {
-                            dsOffsets[i][1] = ceil(diffY/pixelYResPos);
+                            dsOffsets[i][1] = floor((diffY/pixelYResPos)+0.5);
                         }
                         else
                         {
@@ -1406,12 +1372,9 @@ namespace rsgis{namespace img{
                 tmpMaxX = tmpMinX + ((*width)*pixelXRes);
                 tmpMinY = tmpMaxY - ((*height)*pixelYResPos);
                 
-                //std::cout << "BBOX (" << i << ") [xMin, xMax, yMin, yMax]: [" << tmpMinX << ", " << tmpMaxX << ", " << tmpMinY << ", " << tmpMaxY << "]\n";
-                
                 if(tmpMaxX > maxX)
                 {
                     diffX = (tmpMaxX - maxX);
-                    //std::cout << "Diff X = " << diffX << std::endl;
                     if(!foundXDiff)
                     {
                         maxDiffX = diffX;
@@ -1426,7 +1389,6 @@ namespace rsgis{namespace img{
                 if(tmpMinY < minY)
                 {
                     diffY = (minY - tmpMinY);
-                    //std::cout << "Diff Y = " << diffY << std::endl;
                     if(!foundYDiff)
                     {
                         maxDiffY = diffY;
@@ -1508,8 +1470,6 @@ namespace rsgis{namespace img{
 			datasets[i]->GetGeoTransform(transformations[i]);
 			xSize[i] = datasets[i]->GetRasterXSize();
 			ySize[i] = datasets[i]->GetRasterYSize();
-			
-			//std::cout << "TL [" << transformations[i][0] << "," << transformations[i][3] << "]\n";
 		}
 		double rotateX = 0;
 		double rotateY = 0;
@@ -1567,8 +1527,6 @@ namespace rsgis{namespace img{
 					
 					if(std::string(datasets[i]->GetProjectionRef()) != std::string(proj))
 					{
-						//std::cout << "Band 1 Projection = " << proj << std::endl;
-						//std::cout << "Band " << i <<  " Projection = " << datasets[i]->GetProjectionRef()<< std::endl;
 						throw RSGISImageBandException("Not all image bands have the same projection..");
 					}
 					
@@ -1667,26 +1625,26 @@ namespace rsgis{namespace img{
 			
 			for(int i = 0; i < numDS; i++)
 			{
-				diffX = minX - transformations[i][0];
-				diffY = transformations[i][3] - maxY;
-				
-				if(diffX != 0)
-				{
-					dsOffsets[i][0] = floor(diffX/pixelXRes);
-				}
-				else
-				{
-					dsOffsets[i][0] = 0;
-				}
-				
-				if(diffY != 0)
-				{
-					dsOffsets[i][1] = floor(diffY/pixelYResPos);
-				}
-				else
-				{
-					dsOffsets[i][1] = 0;
-				}
+                diffX = minX - transformations[i][0];
+                diffY = transformations[i][3] - maxY;
+                
+                if(!((diffX > -0.0001) & (diffX < 0.0001)))
+                {
+                    dsOffsets[i][0] = floor((diffX/pixelXRes)+0.5);
+                }
+                else
+                {
+                    dsOffsets[i][0] = 0;
+                }
+                
+                if(!((diffY > -0.0001) & (diffY < 0.0001)))
+                {
+                    dsOffsets[i][1] = floor((diffY/pixelYResPos)+0.5);
+                }
+                else
+                {
+                    dsOffsets[i][1] = 0;
+                }
 			}
             
             double tmpMinX = 0;
@@ -1707,12 +1665,9 @@ namespace rsgis{namespace img{
                 tmpMaxX = tmpMinX + ((*width)*pixelXRes);
                 tmpMinY = tmpMaxY - ((*height)*pixelYResPos);
                 
-                //std::cout << "BBOX (" << i << ") [xMin, xMax, yMin, yMax]: [" << tmpMinX << ", " << tmpMaxX << ", " << tmpMinY << ", " << tmpMaxY << "]\n";
-                
                 if(tmpMaxX > maxX)
                 {
                     diffX = (tmpMaxX - maxX);
-                    //std::cout << "Diff X = " << diffX << std::endl;
                     if(!foundXDiff)
                     {
                         maxDiffX = diffX;
@@ -1727,7 +1682,6 @@ namespace rsgis{namespace img{
                 if(tmpMinY < minY)
                 {
                     diffY = (minY - tmpMinY);
-                    //std::cout << "Diff Y = " << diffY << std::endl;
                     if(!foundYDiff)
                     {
                         maxDiffY = diffY;
@@ -1812,7 +1766,6 @@ namespace rsgis{namespace img{
 			xSize[i] = datasets[i]->GetRasterXSize();
 			ySize[i] = datasets[i]->GetRasterYSize();
 			datasets[i]->GetRasterBand(1)->GetBlockSize(&xBlockSize[i], &yBlockSize[i]);
-			//std::cout << "TL [" << transformations[i][0] << "," << transformations[i][3] << "]\n";
 		}
 		double rotateX = 0;
 		double rotateY = 0;
@@ -1985,29 +1938,29 @@ namespace rsgis{namespace img{
 				diffX = minX - transformations[i][0];
 				diffY = transformations[i][3] - maxY;
 				
-				if(diffX != 0)
-				{
-					dsOffsets[i][0] = floor(diffX/pixelXRes);
-				}
-				else
-				{
-					dsOffsets[i][0] = 0;
-				}
-				
-				if(diffY != 0)
-				{
-					dsOffsets[i][1] = floor(diffY/pixelYResPos);
-				}
-				else
-				{
-					dsOffsets[i][1] = 0;
-				}
+                if(!((diffX > -0.0001) & (diffX < 0.0001)))
+                {
+                    dsOffsets[i][0] = floor((diffX/pixelXRes)+0.5);
+                }
+                else
+                {
+                    dsOffsets[i][0] = 0;
+                }
+                
+                if(!((diffY > -0.0001) & (diffY < 0.0001)))
+                {
+                    dsOffsets[i][1] = floor((diffY/pixelYResPos)+0.5);
+                }
+                else
+                {
+                    dsOffsets[i][1] = 0;
+                }
 			}
 			
             double tmpMinX = 0;
             double tmpMaxY = 0;
-            double tmpMaxX = 0;
-            double tmpMinY = 0;
+            tmpMaxX = 0;
+            tmpMinY = 0;
             
             double maxDiffX = 0;
             double maxDiffY = 0;
@@ -2022,12 +1975,9 @@ namespace rsgis{namespace img{
                 tmpMaxX = tmpMinX + ((*width)*pixelXRes);
                 tmpMinY = tmpMaxY - ((*height)*pixelYResPos);
                 
-                //std::cout << "BBOX (" << i << ") [xMin, xMax, yMin, yMax]: [" << tmpMinX << ", " << tmpMaxX << ", " << tmpMinY << ", " << tmpMaxY << "]\n";
-                
                 if(tmpMaxX > maxX)
                 {
                     diffX = (tmpMaxX - maxX);
-                    //std::cout << "Diff X = " << diffX << std::endl;
                     if(!foundXDiff)
                     {
                         maxDiffX = diffX;
@@ -2042,7 +1992,6 @@ namespace rsgis{namespace img{
                 if(tmpMinY < minY)
                 {
                     diffY = (minY - tmpMinY);
-                    //std::cout << "Diff Y = " << diffY << std::endl;
                     if(!foundYDiff)
                     {
                         maxDiffY = diffY;
@@ -2072,7 +2021,6 @@ namespace rsgis{namespace img{
                     (*height) = (*height) - nPxl;
                 }
             }
-            
 		}
 		catch(RSGISImageBandException& e)
 		{
@@ -2127,8 +2075,6 @@ namespace rsgis{namespace img{
 			datasets[i]->GetGeoTransform(transformations[i]);
 			xSize[i] = datasets[i]->GetRasterXSize();
 			ySize[i] = datasets[i]->GetRasterYSize();
-			//std::cout << "TL [" << transformations[i][0] << "," << transformations[i][3] << "]\n";
-            //std::cout << "Res [" << transformations[i][1] << "," << transformations[i][5] << "]\n";
 		}
 		double rotateX = 0;
 		double rotateY = 0;
@@ -2308,8 +2254,6 @@ namespace rsgis{namespace img{
             datasets[i]->GetGeoTransform(transformations[i]);
             xSize[i] = datasets[i]->GetRasterXSize();
             ySize[i] = datasets[i]->GetRasterYSize();
-            //std::cout << "TL [" << transformations[i][0] << "," << transformations[i][3] << "]\n";
-            //std::cout << "Res [" << transformations[i][1] << "," << transformations[i][5] << "]\n";
         }
         double rotateX = 0;
         double rotateY = 0;
@@ -2347,9 +2291,6 @@ namespace rsgis{namespace img{
                     proj = datasets[i]->GetProjectionRef(); // Get projection of first band in image
                     
                     first = false;
-                    
-                    //std::cout << "X: [" << minX << "," << maxX << "]\n";
-                    //std::cout << "Y: [" << minY << "," << maxY << "]\n\n";
                 }
                 else
                 {
@@ -2390,13 +2331,6 @@ namespace rsgis{namespace img{
                     {
                         minY = tmpMinY;
                     }
-                    
-                    
-                    //std::cout << "X: [" << transformations[i][0] << "," << tmpMaxX << "]\n";
-                    //std::cout << "Y: [" << tmpMinY << "," << maxY << "]\n";
-                    
-                    //std::cout << "X Overlap: [" << minX << "," << maxX << "]\n";
-                    //std::cout << "Y Overlap: [" << minY << "," << maxY << "]\n\n";
                 }
             }
             
@@ -2464,9 +2398,6 @@ namespace rsgis{namespace img{
 			datasets[i]->GetGeoTransform(transformations[i]);
 			xSize[i] = datasets[i]->GetRasterXSize();
 			ySize[i] = datasets[i]->GetRasterYSize();
-			//std::cout << "TL [" << transformations[i][0] << "," << transformations[i][3] << "]\n";
-            //std::cout << "Res [" << transformations[i][1] << "," << transformations[i][5] << "]\n";
-			//std::cout << "Size: [" << xSize[i] << "," << ySize[i] << "]\n";
 		}
 		double rotateX = 0;
 		double rotateY = 0;
@@ -2624,10 +2555,6 @@ namespace rsgis{namespace img{
 			dataset->GetGeoTransform(transformations[i]);
 			xSize[i] = dataset->GetRasterXSize();
 			ySize[i] = dataset->GetRasterYSize();
-            
-            //std::cout << "TL [" << transformations[i][0] << "," << transformations[i][3] << "]\n";
-            //std::cout << "Res [" << transformations[i][1] << "," << transformations[i][5] << "]\n";
-			//std::cout << "Size: [" << xSize[i] << "," << ySize[i] << "]\n";
 			
             GDALClose(dataset);
 		}
@@ -2797,10 +2724,6 @@ namespace rsgis{namespace img{
             xSize[i] = dataset->GetRasterXSize();
             ySize[i] = dataset->GetRasterYSize();
             
-            //std::cout << "TL [" << transformations[i][0] << "," << transformations[i][3] << "]\n";
-            //std::cout << "Res [" << transformations[i][1] << "," << transformations[i][5] << "]\n";
-            //std::cout << "Size: [" << xSize[i] << "," << ySize[i] << "]\n";
-            
             GDALClose(dataset);
         }
         
@@ -2963,8 +2886,6 @@ namespace rsgis{namespace img{
             xSize[i] = datasets[i]->GetRasterXSize();
             ySize[i] = datasets[i]->GetRasterYSize();
             datasets[i]->GetRasterBand(1)->GetBlockSize(&xBlockSize[i], &yBlockSize[i]);
-            //std::cout << "TL [" << transformations[i][0] << "," << transformations[i][3] << "]\n";
-            //std::cout << "Size [" << xSize[i] << "," << ySize[i] << "]\n";
         }
         double rotateX = 0;
         double rotateY = 0;
@@ -3060,8 +2981,6 @@ namespace rsgis{namespace img{
                 }
             }
             
-            //std::cout << "BBOX [xMin, xMax, yMin, yMax]: [" << minX << ", " << maxX << ", " << minY << ", " << maxY << "]\n";
-            
             if(maxX - minX <= 0)
             {
                 throw RSGISImageBandException("Images do not overlap in the X axis");
@@ -3082,9 +3001,6 @@ namespace rsgis{namespace img{
             
             *width = floor(((maxX - minX)/pixelXRes)+0.5);
             *height = floor(((maxY - minY)/pixelYResPos)+0.5);
-            
-            //std::cout << "Out Width: " << *width << std::endl;
-            //std::cout << "Out Height: " << *height << std::endl;
             
             double diffX = 0;
             double diffY = 0;
@@ -3111,10 +3027,6 @@ namespace rsgis{namespace img{
                 {
                     dsOffsets[i][1] = 0;
                 }
-                
-                //std::cout << "Offset (" << i << "):\t[" << dsOffsets[i][0] << ", " << dsOffsets[i][1] << "]" << std::endl;
-                //std::cout << "Offset Width (" << i << "):\t[" << dsOffsets[i][0]+*width << "]" << std::endl;
-                //std::cout << "Image Width (" << i << "):\t[" << datasets[i]->GetRasterXSize() << "]" << std::endl << std::endl;
             }
             
             double tmpMinX = 0;
@@ -3135,12 +3047,9 @@ namespace rsgis{namespace img{
                 tmpMaxX = tmpMinX + ((*width)*pixelXRes);
                 tmpMinY = tmpMaxY - ((*height)*pixelYResPos);
                 
-                //std::cout << "BBOX (" << i << ") [xMin, xMax, yMin, yMax]: [" << tmpMinX << ", " << tmpMaxX << ", " << tmpMinY << ", " << tmpMaxY << "]\n";
-                
                 if(tmpMaxX > maxX)
                 {
                     diffX = (tmpMaxX - maxX);
-                    //std::cout << "Diff X = " << diffX << std::endl;
                     if(!foundXDiff)
                     {
                         maxDiffX = diffX;
@@ -3155,7 +3064,6 @@ namespace rsgis{namespace img{
                 if(tmpMinY < minY)
                 {
                     diffY = (minY - tmpMinY);
-                    //std::cout << "Diff Y = " << diffY << std::endl;
                     if(!foundYDiff)
                     {
                         maxDiffY = diffY;
