@@ -40,6 +40,8 @@ from __future__ import print_function
 import numpy
 import numpy.random
 
+from osgeo import gdal
+
 import rsgislib.rastergis
 import rsgislib
 
@@ -53,6 +55,7 @@ haveRIOS = True
 try:
     from rios import applier
     from rios import cuiprogress
+    from rios import rat
 except ImportError as riosErr:
     haveRIOS = False
     raise Exception("The RIOS tools are required for this module could not be imported\n\t {}".format(riosErr))
@@ -241,4 +244,26 @@ def applyClassifer(classTrainInfo, skClassifier, imgMask, imgMaskVal, imgFileInf
     applier.apply(_applySKClassifier, infiles, outfiles, otherargs, controls=aControls)
     print("Completed")
     rsgislib.rastergis.populateStats(clumps=outputImg, addclrtab=True, calcpyramids=True, ignorezero=True)
+    
+    ratDataset = gdal.Open(outputImg, gdal.GA_Update)
+    red = rat.readColumn(ratDataset, 'Red')
+    green = rat.readColumn(ratDataset, 'Green')
+    blue = rat.readColumn(ratDataset, 'Blue')
+    ClassName = numpy.empty_like(red, dtype=numpy.dtype('a255'))
+    
+    for classKey in classTrainInfo:  
+        print("Apply Colour to class \'" + classKey + "\'")
+        red[classTrainInfo[classKey].id] = classTrainInfo[classKey].red
+        green[classTrainInfo[classKey].id] = classTrainInfo[classKey].green
+        blue[classTrainInfo[classKey].id] = classTrainInfo[classKey].blue
+        ClassName[classTrainInfo[classKey].id] = classKey
+    
+    rat.writeColumn(ratDataset, "Red", red)
+    rat.writeColumn(ratDataset, "Green", green)
+    rat.writeColumn(ratDataset, "Blue", blue)
+    rat.writeColumn(ratDataset, "ClassName", ClassName)
+
+    ratDataset = None
+    
+    
 
