@@ -312,6 +312,25 @@ def performPerPxlMLClassShpTrain(imageBandInfo=[], classInfo=dict(), outputImg='
     * tmpPath is a tempory file path which can be used during processing.
     * skClassifier is an instance of a scikit-learn classifier appropriately parameterised. If None then the gridSearch object must not be None.
     * gridSearch is an instance of a scikit-learn sklearn.model_selection.GridSearchCV object with the classifier and parameter search space specified. (If None then skClassifier will be used; if both not None then skClassifier will be used in preference to gridSearch)
+    
+    Example::
+    
+    from rsgislib.classification import classimgutils
+    from rsgislib import imageutils
+
+    from sklearn.ensemble import ExtraTreesClassifier
+    from sklearn.model_selection import GridSearchCV
+    
+    
+    imageBandInfo=[imageutils.ImageBandInfo('./LS2MSS_19750620_lat10lon6493_r67p250_rad_srefdem_30m.kea', 'Landsat', [1,2,3,4])]
+    classInfo=dict()
+    classInfo['Forest'] = classimgutils.ClassInfoObj(id=1, fileH5='./ForestRegions.shp', red=0, green=255, blue=0)
+    classInfo['Non-Forest'] = classimgutils.ClassInfoObj(id=2, fileH5='./NonForestRegions.shp', red=100, green=100, blue=100)
+    
+    
+    skClassifier=ExtraTreesClassifier(n_estimators=20)
+    classimgutils.performPerPxlMLClassShpTrain(imageBandInfo, classInfo, outputImg='classImg.kea', gdalFormat='KEA', tmpPath='./tmp', skClassifier=skClassifier)
+    
     """
     if not haveH5PY:
         raise Exception("The h5py module is required for this function could not be imported\n\t" + h5pyErr)
