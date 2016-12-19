@@ -5,6 +5,13 @@ RSGISLib Classification Module
    :members:
    :undoc-members:
 
+Image Pixel Classification
+---------------------------
+
+.. automodule:: rsgislib.classification.classimgutils
+   :members:
+   :undoc-members:
+
 
 Raster GIS
 -----------
