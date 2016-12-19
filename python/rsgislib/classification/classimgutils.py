@@ -45,6 +45,13 @@ from osgeo import gdal
 import rsgislib.rastergis
 import rsgislib
 
+import os
+import os.path
+import shutil
+
+from sklearn.model_selection import GridSearchCV
+from sklearn.ensemble import RandomForestClassifier
+
 haveH5PY = True
 try:
     import h5py
@@ -58,23 +65,6 @@ try:
     from rios import rat
 except ImportError as riosErr:
     haveRIOS = False
-    raise Exception("The RIOS tools are required for this module could not be imported\n\t {}".format(riosErr))
-
-haveSKLearn = True
-try:
-    from sklearn.model_selection import GridSearchCV
-    from sklearn.ensemble import RandomForestClassifier
-except ImportError as sklearnErr:
-    haveSKLearn = False
-    raise Exception("The scikit-learn tools are required for this module could not be imported\n\t {}".format(sklearnErr))
-
-"""
-This module contains a set of functions which can be used to perform a per-pixel image classification 
-using the scikit-learn machine learning modules. 
-
-
-
-"""
 
 
 
@@ -107,7 +97,7 @@ def findClassifierParametersAndTrain(classTrainInfo, paramSearchSampNum=0, gridS
     """
     # Check h5py is available
     if not haveH5PY:
-        raise Exception("The h5pt module is required for this function could not be imported\n\t" + h5pyErr)
+        raise Exception("The h5py module is required for this function could not be imported\n\t" + h5pyErr)
     
     if len(classTrainInfo) < 2:
         rsgislib.RSGISPyException("Need at least 2 classes to be worth running findClassifierParametersAndTrain function.")
@@ -180,7 +170,7 @@ def trainClassifier(classTrainInfo, skClassifier):
     """
      # Check h5py is available
     if not haveH5PY:
-        raise Exception("The h5pt module is required for this function could not be imported\n\t" + h5pyErr)
+        raise Exception("The h5py module is required for this function could not be imported\n\t" + h5pyErr)
     
     if len(classTrainInfo) < 2:
         rsgislib.RSGISPyException("Need at least 2 classes to be worth running trainClassifier function.")
@@ -260,7 +250,9 @@ def applyClassifer(classTrainInfo, skClassifier, imgMask, imgMaskVal, imgFileInf
     * gdalFormat - is the output image format - all GDAL supported formats are supported. 
     * classClrNames - default is True and therefore a colour table will the colours specified in classTrainInfo and a ClassName column (from imgFileInfo) will be added to the output file.
     """
-    rsgisUtils = rsgislib.RSGISPyUtils()
+    if not haveRIOS:
+        raise Exception("The rios module is required for this function could not be imported\n\t" + riosErr)
+    
     infiles = applier.FilenameAssociations()
     infiles.imageMask = imgMask
     numClassVars = 0
@@ -308,4 +300,77 @@ def applyClassifer(classTrainInfo, skClassifier, imgMask, imgMaskVal, imgFileInf
         ratDataset = None
     
     
+def performPerPxlMLClassShpTrain(imageBandInfo=[], classInfo=dict(), outputImg='classImg.kea', gdalFormat='KEA', tmpPath='./tmp', skClassifier=ExtraTreesClassifier(), gridSearch=None, paramSearchSampNum=1000):
+    """
+    A function which performs a per-pixel based classification of a scene using a machine learning classifier from the scikit-learn
+    library where a single polygon shapefile per class is required to represent the training data. 
+    
+    * imageBandInfo is a list of rsgislib.imageutils.ImageBandInfo objects specifying the images which should be used.
+    * classInfo is a dict of rsgislib.classification.classimgutils.ClassInfoObj objects where the key is the class name. The fileH5 field is used to define the file path to the shapefile with the training data.
+    * outputImg is the name and path to the output image file.
+    * gdalFormat is the output image file format (e.g., KEA). 
+    * tmpPath is a tempory file path which can be used during processing.
+    * skClassifier is an instance of a scikit-learn classifier appropriately parameterised. If None then the gridSearch object must not be None.
+    * gridSearch is an instance of a scikit-learn sklearn.model_selection.GridSearchCV object with the classifier and parameter search space specified. (If None then skClassifier will be used; if both not None then skClassifier will be used in preference to gridSearch)
+    """
+    if not haveH5PY:
+        raise Exception("The h5py module is required for this function could not be imported\n\t" + h5pyErr)
+    if not haveRIOS:
+        raise Exception("The rios module is required for this function could not be imported\n\t" + riosErr)
+    
+    if (skClassifier is None) and (gridSearch is None):
+        raise rsgislib.RSGISPyException("Both skClassifier and gridSearch cannot be None. You must provide an instance of one of them.")
+    
+    # Define base name
+    rsgisUtils = rsgislib.RSGISPyUtils()
+    baseName = "PerPxlClass_" + rsgisUtils.uidGenerator()
+    
+    # Create tmp path.
+    tmpPresent = True
+    if not os.path.exists(tmpPath):
+        os.makedirs(tmpPath)
+        tmpPresent = False
+
+    # Create unique tempory directory
+    baseNameTmpDir = os.path.join(tmpPath, baseName)
+    os.makedirs(baseNameTmpDir)
+    
+    # Create valid data mask.
+    validMasks = []
+    for imgInfo in imageBandInfo:
+        tmpBaseName = os.path.splitext(os.path.basename(imgInfo.fileName))[0]
+        vdmskFile = os.path.join(baseNameTmpDir, tmpBaseName+'_vmsk.kea')
+        noDataVal = rsgisUtils.getImageNoDataValue(imgInfo.fileName)
+        rsgislib.imageutils.genValidMask(inimages=imgInfo.fileName, outimage=vdmskFile, format='KEA', nodata=noDataVal)
+        validMasks.append(vdmskFile)
+    
+    vdmskFile = os.path.join(baseNameTmpDir, baseName+'_vmsk.kea')
+    if len(validMasks) > 1:
+        rsgislib.imageutils.genValidMask(inimages=validMasks, outimage=vdmskFile, format='KEA', nodata=0.0)
+    else:
+        vdmskFile = validMasks[0]
+    
+    # Rasterise shapefiles to be used as training.
+    rasterTrain = dict()
+    for cName in classInfo:
+        shpFile = classInfo[cName].fileH5
+        tmpBaseName = os.path.splitext(os.path.basename(shpFile))[0]
+        tmpFile = os.path.join(baseNameTmpDir, tmpBaseName+'_rasterzone.kea')
+        rsgislib.vectorutils.rasterise2Image(shpFile, vdmskFile, tmpFile, gdalFormat='KEA', burnVal=classInfo[cName].id, shpExt=False)
+        rasterTrain[cName] = tmpFile
+        tmpFileH5 = os.path.join(baseNameTmpDir, tmpBaseName+'_pxlVals.h5')
+        rsgislib.imageutils.extractZoneImageBandValues2HDF(imageBandInfo, rasterTrain[cName], tmpFileH5, classInfo[cName].id)
+        classInfo[cName].fileH5 = tmpFileH5
+    
+    if skClassifier is not None:
+        trainClassifier(classInfo, skClassifier)
+    else:
+        skClassifier = findClassifierParametersAndTrain(classInfo, paramSearchSampNum=0, gridSearch=gridSearch)
+        
+    applyClassifer(classInfo, skClassifier, vdmskFile, 1, imageBandInfo, outputImg, gdalFormat, classClrNames=True)
+    
+    # Clean up tempory files.
+    shutil.rmtree(baseNameTmpDir, ignore_errors=True)
+    if not tmpPresent:
+        shutil.rmtree(tmpPath, ignore_errors=True)
 
