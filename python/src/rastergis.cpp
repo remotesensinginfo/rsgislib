@@ -2203,7 +2203,7 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"},
     
 {"populateRATWithMode", (PyCFunction)RasterGIS_PopulateRATWithMode, METH_VARARGS | METH_KEYWORDS,
-    "rastergis.populateRATWithMode(valsimage=string, clumps=string, outcolsname=string, usenodata=boolean, nodataval=long, outnodata=boolean, modeband=uint ratband=uint)\n"
+    "rastergis.populateRATWithMode(valsimage=string, clumps=string, outcolsname=string, usenodata=boolean, nodataval=long, outnodata=boolean, modeband=uint, ratband=uint)\n"
     "Populates the attribute table with the mode of from a single band in the input image.\n"
     "Note this only makes sense if the input pixel values are integers.\n"
     "Where:\n"
