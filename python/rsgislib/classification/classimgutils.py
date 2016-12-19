@@ -300,7 +300,7 @@ def applyClassifer(classTrainInfo, skClassifier, imgMask, imgMaskVal, imgFileInf
         ratDataset = None
     
     
-def performPerPxlMLClassShpTrain(imageBandInfo=[], classInfo=dict(), outputImg='classImg.kea', gdalFormat='KEA', tmpPath='./tmp', skClassifier=ExtraTreesClassifier(), gridSearch=None, paramSearchSampNum=1000):
+def performPerPxlMLClassShpTrain(imageBandInfo=[], classInfo=dict(), outputImg='classImg.kea', gdalFormat='KEA', tmpPath='./tmp', skClassifier=RandomForestClassifier(), gridSearch=None, paramSearchSampNum=100):
     """
     A function which performs a per-pixel based classification of a scene using a machine learning classifier from the scikit-learn
     library where a single polygon shapefile per class is required to represent the training data. 
