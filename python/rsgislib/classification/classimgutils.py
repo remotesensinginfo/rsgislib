@@ -68,9 +68,28 @@ except ImportError as sklearnErr:
     haveSKLearn = False
     raise Exception("The scikit-learn tools are required for this module could not be imported\n\t {}".format(sklearnErr))
 
+"""
+This module contains a set of functions which can be used to perform a per-pixel image classification 
+using the scikit-learn machine learning modules. 
+
+
+
+"""
+
+
 
 class ClassInfoObj(object):
+    """
+    This is a class to store the information associated within the classification.
+    """
     def __init__(self, id=None, fileH5=None, red=None, green=None, blue=None):
+        """
+        * id - Output pixel value for this class
+        * fileH5 - hdf5 file (from rsgislib.imageutils.extractZoneImageBandValues2HDF) with the training data for the class
+        * red - Red colour for visualisation (0-255)
+        * green - Green colour for visualisation (0-255)
+        * blue - Blue colour for visualisation (0-255)
+        """
         self.id = id
         self.fileH5 = fileH5
         self.red = red
@@ -79,6 +98,12 @@ class ClassInfoObj(object):
 
 def findClassifierParametersAndTrain(classTrainInfo, paramSearchSampNum=0, gridSearch=GridSearchCV(RandomForestClassifier(), {})):
     """
+    A function to find the optimal parameters for classification using a Grid Search (http://scikit-learn.org/stable/modules/grid_search.html). 
+    The returned classifier instance will be trained using the input data.
+    
+    * classTrainInfo - list of ClassInfoObj objects which will be used to train the classifier.
+    * paramSearchSampNum - the number of samples that will be randomly sampled from the training data for each class for applying the grid search (tend to use a small data sample as can take a long time). A value of 500 would use 500 samples per class.
+    * gridSearch - is an instance of the sklearn.model_selection.GridSearchCV with an instance of the choosen classifier and parameters to be searched.
     """
     # Check h5py is available
     if not haveH5PY:
@@ -148,6 +173,10 @@ def findClassifierParametersAndTrain(classTrainInfo, paramSearchSampNum=0, gridS
 
 def trainClassifier(classTrainInfo, skClassifier):
     """
+    This function trains the classifier. 
+    
+    * classTrainInfo - list of ClassInfoObj objects which will be used to train the classifier.
+    * skClassifier - an instance of a parameterised scikit-learn classifier (http://scikit-learn.org/stable/supervised_learning.html)
     """
      # Check h5py is available
     if not haveH5PY:
@@ -218,7 +247,19 @@ def _applySKClassifier(info, inputs, outputs, otherargs):
     outputs.outimage = outClassVals
     
     
-def applyClassifer(classTrainInfo, skClassifier, imgMask, imgMaskVal, imgFileInfo, outputImg, gdalFormat):
+def applyClassifer(classTrainInfo, skClassifier, imgMask, imgMaskVal, imgFileInfo, outputImg, gdalFormat, classClrNames=True):
+    """
+    This function uses a trained classifier and applies it to the provided input image.
+    
+    * classTrainInfo - list of ClassInfoObj objects which will be used to train the classifier (i.e., trainClassifier()), provide pixel value id and RGB class values.
+    * skClassifier - a trained instance of a scikit-learn classifier (e.g., use trainClassifier or findClassifierParametersAndTrain)
+    * imgMask - is an image file providing a mask to specify where should be classified. Simplest mask is all the valid data regions (rsgislib.imageutils.genValidMask)
+    * imgMaskVal - the pixel value within the imgMask to limit the region to which the classification is applied. Can be used to create a heirachical classification.
+    * imgFileInfo - a list of rsgislib.imageutils.ImageBandInfo objects (also used within rsgislib.imageutils.extractZoneImageBandValues2HDF) to identify which images and bands are to be used for the classification so it adheres to the training data. 
+    * outputImg - output image file with the classification. Note. by default a colour table and class names column is added to the image. If an error is produced use HFA or KEA formats.
+    * gdalFormat - is the output image format - all GDAL supported formats are supported. 
+    * classClrNames - default is True and therefore a colour table will the colours specified in classTrainInfo and a ClassName column (from imgFileInfo) will be added to the output file.
+    """
     rsgisUtils = rsgislib.RSGISPyUtils()
     infiles = applier.FilenameAssociations()
     infiles.imageMask = imgMask
@@ -245,25 +286,26 @@ def applyClassifer(classTrainInfo, skClassifier, imgMask, imgMaskVal, imgFileInf
     print("Completed")
     rsgislib.rastergis.populateStats(clumps=outputImg, addclrtab=True, calcpyramids=True, ignorezero=True)
     
-    ratDataset = gdal.Open(outputImg, gdal.GA_Update)
-    red = rat.readColumn(ratDataset, 'Red')
-    green = rat.readColumn(ratDataset, 'Green')
-    blue = rat.readColumn(ratDataset, 'Blue')
-    ClassName = numpy.empty_like(red, dtype=numpy.dtype('a255'))
-    
-    for classKey in classTrainInfo:  
-        print("Apply Colour to class \'" + classKey + "\'")
-        red[classTrainInfo[classKey].id] = classTrainInfo[classKey].red
-        green[classTrainInfo[classKey].id] = classTrainInfo[classKey].green
-        blue[classTrainInfo[classKey].id] = classTrainInfo[classKey].blue
-        ClassName[classTrainInfo[classKey].id] = classKey
-    
-    rat.writeColumn(ratDataset, "Red", red)
-    rat.writeColumn(ratDataset, "Green", green)
-    rat.writeColumn(ratDataset, "Blue", blue)
-    rat.writeColumn(ratDataset, "ClassName", ClassName)
+    if classClrNames:
+        ratDataset = gdal.Open(outputImg, gdal.GA_Update)
+        red = rat.readColumn(ratDataset, 'Red')
+        green = rat.readColumn(ratDataset, 'Green')
+        blue = rat.readColumn(ratDataset, 'Blue')
+        ClassName = numpy.empty_like(red, dtype=numpy.dtype('a255'))
+        
+        for classKey in classTrainInfo:  
+            print("Apply Colour to class \'" + classKey + "\'")
+            red[classTrainInfo[classKey].id] = classTrainInfo[classKey].red
+            green[classTrainInfo[classKey].id] = classTrainInfo[classKey].green
+            blue[classTrainInfo[classKey].id] = classTrainInfo[classKey].blue
+            ClassName[classTrainInfo[classKey].id] = classKey
+        
+        rat.writeColumn(ratDataset, "Red", red)
+        rat.writeColumn(ratDataset, "Green", green)
+        rat.writeColumn(ratDataset, "Blue", blue)
+        rat.writeColumn(ratDataset, "ClassName", ClassName)
 
-    ratDataset = None
+        ratDataset = None
     
     
 
