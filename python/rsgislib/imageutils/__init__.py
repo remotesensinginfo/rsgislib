@@ -9,12 +9,13 @@ import rsgislib
 import os.path
 import math
 
+import numpy
+
 haveGDALPy = True
 try:
     import osgeo.gdal as gdal
 except ImportError as gdalErr:
     haveGDALPy = False
-
 
 haveOGRPy = True
 try:
@@ -27,6 +28,13 @@ try:
     import osgeo.osr as osr
 except ImportError as osrErr:
     haveOSRPy = False
+
+haveRIOS = True
+try:
+    from rios import applier
+    from rios import cuiprogress
+except ImportError as riosErr:
+    haveRIOS = False
 
 # define our own classes
 class ImageBandInfo(object):
@@ -525,4 +533,45 @@ Example::
         inImagesDict.append({'IN':image, 'OUT':outImg, 'TYPE':datatype})
 
     return inImagesDict
+
+
+
+def _getXYPxlLocs(info, inputs, outputs, otherargs):
+    """
+    This is an internal rios function 
+    """
+    xBlock, yBlock = info.getBlockCoordArrays()
+    outputs.outimage = numpy.stack((xBlock,yBlock))
+
+
+def calcPixelLocations(inputImg, outputImg, gdalFormat):
+    """
+    Function which produces a 2 band output image with the X and Y 
+    locations of the image pixels.
+    
+    * inputImg - the input reference image
+    * outputImg - the output image file name and path (will be same dimensions as the input)
+    * gdalFormat - the GDAL image file format of the output image file.
+    """
+    if not haveGDALPy:
+        raise Exception("The GDAL python bindings required for this function could not be imported\n\t" + gdalogrErr)
+
+    if not haveRIOS:
+        raise Exception("The RIOS module required for this function could not be imported\n\t" + riosErr)
+
+    infiles = applier.FilenameAssociations()
+    infiles.image1 = inputImg
+    outfiles = applier.FilenameAssociations()
+    outfiles.outimage = outputImg
+    otherargs = applier.OtherInputs()
+    aControls = applier.ApplierControls()
+    aControls.progress = cuiprogress.CUIProgressBar()
+    aControls.drivername = gdalFormat
+    aControls.omitPyramids = True
+    aControls.calcStats = False
+
+    applier.apply(_getXYPxlLocs, infiles, outfiles, otherargs, controls=aControls)
+
+
+
 
