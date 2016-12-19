@@ -360,6 +360,19 @@ class RSGISPyUtils (object):
         rasterDS = None
         return nBands
         
+    def getImageNoDataValue(self, inImg):
+        """
+        A function to retrieve the no data value for the image (from band 1).
+        """
+        import osgeo.gdal as gdal
+        rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
+        if rasterDS == None:
+            raise RSGISPyException('Could not open raster image: ' + inImg)
+        
+        noDataVal = rasterDS.GetRasterBand(1).GetNoDataValue()
+        rasterDS = None
+        return noDataVal
+        
     def uidGenerator(self, size=6):
         """
         A function which will generate a 'random' string of the specified length based on the UUID
