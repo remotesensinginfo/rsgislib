@@ -63,12 +63,7 @@ namespace rsgis { namespace img {
         
         for(int i = 0; i < numBands; ++i)
         {
-            //std::cout << "Band " << (i+1) << std::endl;
-            //std::cout << "\tMax = " << maxVal[i] << std::endl;
-            //std::cout << "\tMin = " << minVal[i] << std::endl;
             meanVal[i] = meanVal[i] / nVals[i];
-            //std::cout << "\tMean = " << meanVal[i] << std::endl;
-            //std::cout << "\nVals = " << nVals[i] << std::endl;
             
             band = imgDS->GetRasterBand(i+1);
             band->SetMetadataItem( "STATISTICS_MINIMUM", textUtils.doubletostring(minVal[i]).c_str(), NULL );
@@ -135,8 +130,6 @@ namespace rsgis { namespace img {
                 histMax[i] = maxVal[i] + (histWidth[i]/2);
                 histoType[i] = "linear";
             }
-            
-            //std::cout << "Hist Range [" << histMin[i] << ", " << histMax[i] << "] : " << histWidth[i] << "\n";
         }
         
         double *stdDevVal = new double[numBands];
@@ -158,15 +151,10 @@ namespace rsgis { namespace img {
         
         for(int i = 0; i < numBands; ++i)
         {
-            //std::cout << "Band " << (i+1) << std::endl;
-            //std::cout << "\nVals2 = " << nVals2[i] << std::endl;
             stdDevVal[i] = sqrt(stdDevVal[i] / nVals2[i]);
-            //std::cout << "\tStdDev = " << stdDevVal[i] << std::endl;
             
             band = imgDS->GetRasterBand(i+1);
             band->SetMetadataItem( "STATISTICS_STDDEV", textUtils.doubletostring(stdDevVal[i]).c_str(), NULL );
-            
-            
             band->SetMetadataItem( "STATISTICS_HISTOMIN", textUtils.doubletostring(minVal[i]).c_str(), NULL );
             band->SetMetadataItem( "STATISTICS_HISTOMAX", textUtils.doubletostring(maxVal[i]).c_str(), NULL );
             band->SetMetadataItem( "STATISTICS_HISTONUMBINS", "256", NULL );
@@ -457,7 +445,6 @@ namespace rsgis { namespace img {
                 }
             }
         }
-        
     }
     
     RSGISCalcImageStdDevPopHist::~RSGISCalcImageStdDevPopHist()
