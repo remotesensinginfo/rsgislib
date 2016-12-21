@@ -36,6 +36,8 @@
 #include "img/RSGISCalcImageValue.h"
 #include "img/RSGISCalcImage.h"
 
+#include "rastergis/RSGISRasterAttUtils.h"
+
 namespace rsgis{namespace segment{
     
     class DllExport RSGISGenMeanSegImage

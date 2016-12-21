@@ -424,12 +424,13 @@ namespace rsgis{namespace segment{
             {
                 throw rsgis::img::RSGISImageCalcException("The number of bands is not the same");
             }
-            
-            GDALRasterBand *clumpsBand = clumps->GetRasterBand(1);
+            rsgis::rastergis::RSGISRasterAttUtils ratUtils;
             
             std::cout << "Finding maximum image value\n";
-            double maxVal = 0;
-            clumpsBand->GetStatistics(false, true, NULL, &maxVal, NULL, NULL);
+            long maxVal = 0;
+            long minVal = 0;
+            ratUtils.getImageBandMinMax(clumps, 1, &minVal, &maxVal);
+            
             unsigned int maxClumpIdx = boost::lexical_cast<unsigned long>(maxVal);
             
             unsigned int numSpecBands = spectral->GetRasterCount();

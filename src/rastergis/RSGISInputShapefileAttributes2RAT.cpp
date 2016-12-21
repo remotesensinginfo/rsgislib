@@ -48,9 +48,11 @@ namespace rsgis{namespace rastergis{
             
             GDALRasterAttributeTable *rat = clumpsImage->GetRasterBand(ratBand)->GetDefaultRAT();
             size_t numRows = rat->GetRowCount();
-            double maxClumpID = 0.0;
-            int nLastProgress = -1;
-            clumpsImage->GetRasterBand(ratBand)->ComputeStatistics(false, NULL, &maxClumpID, NULL, NULL,  (GDALProgressFunc)RSGISRATStatsTextProgress, &nLastProgress);
+            
+            long minClumpID = 0;
+            long maxClumpID = 0;
+            ratUtils.getImageBandMinMax(clumpsImage, ratBand, &minClumpID, &maxClumpID);
+            
             if(maxClumpID > numRows)
             {
                 numRows = boost::lexical_cast<size_t>(maxClumpID);

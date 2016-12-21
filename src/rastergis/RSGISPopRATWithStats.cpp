@@ -46,9 +46,11 @@ namespace rsgis{namespace rastergis{
             RSGISRasterAttUtils attUtils;
             GDALRasterAttributeTable *rat = inputClumps->GetRasterBand(ratBand)->GetDefaultRAT();
             size_t numRows = rat->GetRowCount();
-            double maxClumpID = 0.0;
-            int nLastProgress = -1;
-            inputClumps->GetRasterBand(ratBand)->ComputeStatistics(false, NULL, &maxClumpID, NULL, NULL,  (GDALProgressFunc)RSGISRATStatsTextProgress, &nLastProgress);
+
+            long minClumpID = 0;
+            long maxClumpID = 0;
+            attUtils.getImageBandMinMax(inputClumps, ratBand, &minClumpID, &maxClumpID);
+            
             if(maxClumpID > numRows)
             {
                 numRows = boost::lexical_cast<size_t>(maxClumpID);
@@ -440,17 +442,20 @@ namespace rsgis{namespace rastergis{
             RSGISRasterAttUtils attUtils;
             GDALRasterAttributeTable *rat = inputClumps->GetRasterBand(ratBand)->GetDefaultRAT();
             size_t numRows = rat->GetRowCount();
-            double maxClumpID = 0.0;
-            int nLastProgress = -1;
-            inputClumps->GetRasterBand(ratBand)->ComputeStatistics(false, NULL, &maxClumpID, NULL, NULL,  (GDALProgressFunc)RSGISRATStatsTextProgress, &nLastProgress);
+            
+            long minClumpID = 0;
+            long maxClumpID = 0;
+            attUtils.getImageBandMinMax(inputClumps, ratBand, &minClumpID, &maxClumpID);
+            
             if(maxClumpID > numRows)
             {
                 numRows = boost::lexical_cast<size_t>(maxClumpID);
                 rat->SetRowCount(numRows);
             }
+
             double imageValMin = 0.0;
             double imageValMax = 0.0;
-            nLastProgress = -1;
+            int nLastProgress = -1;
             inputValsImage->GetRasterBand(band)->ComputeStatistics(false, &imageValMin, &imageValMax, NULL, NULL,  (GDALProgressFunc)RSGISRATStatsTextProgress, &nLastProgress);
             
             std::cout << "Image Min = " << imageValMin << " Image Max = " << imageValMax << std::endl;
@@ -589,9 +594,11 @@ namespace rsgis{namespace rastergis{
             RSGISRasterAttUtils attUtils;
             GDALRasterAttributeTable *rat = inputClumps->GetRasterBand(ratBand)->GetDefaultRAT();
             size_t numRows = rat->GetRowCount();
-            double maxClumpID = 0.0;
-            int nLastProgress = -1;
-            inputClumps->GetRasterBand(ratBand)->ComputeStatistics(false, NULL, &maxClumpID, NULL, NULL,  (GDALProgressFunc)RSGISRATStatsTextProgress, &nLastProgress);
+            
+            long minClumpID = 0;
+            long maxClumpID = 0;
+            attUtils.getImageBandMinMax(inputClumps, ratBand, &minClumpID, &maxClumpID);
+            
             if(maxClumpID > numRows)
             {
                 numRows = boost::lexical_cast<size_t>(maxClumpID);
@@ -984,9 +991,11 @@ namespace rsgis{namespace rastergis{
             RSGISRasterAttUtils attUtils;
             GDALRasterAttributeTable *rat = inputClumps->GetRasterBand(ratBand)->GetDefaultRAT();
             size_t numRows = rat->GetRowCount();
-            double maxClumpID = 0.0;
-            int nLastProgress = -1;
-            inputClumps->GetRasterBand(ratBand)->ComputeStatistics(false, NULL, &maxClumpID, NULL, NULL,  (GDALProgressFunc)RSGISRATStatsTextProgress, &nLastProgress);
+            
+            long minClumpID = 0;
+            long maxClumpID = 0;
+            attUtils.getImageBandMinMax(inputClumps, ratBand, &minClumpID, &maxClumpID);
+            
             if(maxClumpID > numRows)
             {
                 numRows = boost::lexical_cast<size_t>(maxClumpID);
@@ -1171,9 +1180,11 @@ namespace rsgis{namespace rastergis{
             RSGISRasterAttUtils attUtils;
             GDALRasterAttributeTable *rat = inputClumps->GetRasterBand(ratBand)->GetDefaultRAT();
             size_t numRows = rat->GetRowCount();
-            double maxClumpID = 0.0;
-            int nLastProgress = -1;
-            inputClumps->GetRasterBand(ratBand)->ComputeStatistics(false, NULL, &maxClumpID, NULL, NULL,  (GDALProgressFunc)RSGISRATStatsTextProgress, &nLastProgress);
+            
+            long minClumpID = 0;
+            long maxClumpID = 0;
+            attUtils.getImageBandMinMax(inputClumps, ratBand, &minClumpID, &maxClumpID);
+            
             if(maxClumpID > numRows)
             {
                 numRows = boost::lexical_cast<size_t>(maxClumpID);

@@ -47,9 +47,9 @@ namespace rsgis{namespace rastergis{
             
             size_t numRows = attTable->GetRowCount();
             
-            double maxVal = 0;
-            int nLastProgress = -1;
-            dataset->GetRasterBand(ratBand)->ComputeStatistics(false, NULL, &maxVal, NULL, NULL,  (GDALProgressFunc)RSGISRATStatsTextProgress, &nLastProgress);
+            long minVal = 0;
+            long maxVal = 0;
+            attUtils.getImageBandMinMax(dataset, 1, &minVal, &maxVal);
             
             if(maxVal > numRows)
             {                
@@ -174,9 +174,9 @@ namespace rsgis{namespace rastergis{
             
             size_t numRows = attTable->GetRowCount();
             
-            double maxVal = 0;
-            int nLastProgress = -1;
-            dataset->GetRasterBand(ratBand)->ComputeStatistics(false, NULL, &maxVal, NULL, NULL,  (GDALProgressFunc)RSGISRATStatsTextProgress, &nLastProgress);
+            long minVal = 0;
+            long maxVal = 0;
+            attUtils.getImageBandMinMax(dataset, 1, &minVal, &maxVal);
             
             if(maxVal > numRows)
             {
@@ -329,9 +329,9 @@ namespace rsgis{namespace rastergis{
             
             size_t numRows = attTable->GetRowCount();
             
-            double maxVal = 0;
-            int nLastProgress = -1;
-            dataset->GetRasterBand(ratBand)->ComputeStatistics(false, NULL, &maxVal, NULL, NULL,  (GDALProgressFunc)RSGISRATStatsTextProgress, &nLastProgress);
+            long minVal = 0;
+            long maxVal = 0;
+            attUtils.getImageBandMinMax(dataset, 1, &minVal, &maxVal);
             
             if(maxVal > numRows)
             {
