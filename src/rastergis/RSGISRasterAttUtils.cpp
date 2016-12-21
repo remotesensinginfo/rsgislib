@@ -2597,11 +2597,75 @@ namespace rsgis{namespace rastergis{
             throw RSGISAttributeTableException(e.what());
         }
     }
+    
+    void RSGISRasterAttUtils::getImageBandMinMax(GDALDataset *inImage, int band, long *minVal, long *maxVal) throw(RSGISAttributeTableException)
+    {
+        try
+        {
+            RSGISCalcImgMinMax calcMinMac = RSGISCalcImgMinMax(minVal, maxVal, band-1);
+            rsgis::img::RSGISCalcImage calcImageMinMax(&calcMinMac);
+            calcImageMinMax.calcImage(&inImage, 1, 0);
+        }
+        catch(RSGISException &e)
+        {
+            throw RSGISAttributeTableException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISAttributeTableException(e.what());
+        }
+    }
 
     RSGISRasterAttUtils::~RSGISRasterAttUtils()
     {
 
     }
+    
+    
+    
+    
+    
+    RSGISCalcImgMinMax::RSGISCalcImgMinMax(long *minVal, long *maxVal, unsigned int band):rsgis::img::RSGISCalcImageValue(0)
+    {
+        this->minVal = minVal;
+        this->maxVal = maxVal;
+        this->band = band;
+        first = true;
+    }
+    
+    void RSGISCalcImgMinMax::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException)
+    {
+        if(numIntVals <= band)
+        {
+            throw rsgis::img::RSGISImageCalcException("Band is not in the input image...");
+        }
+        
+        
+        if(first)
+        {
+            *minVal = intBandValues[band];
+            *maxVal = intBandValues[band];
+            first = false;
+        }
+        else
+        {
+            if(intBandValues[band] < *minVal)
+            {
+                *minVal = intBandValues[band];
+            }
+            else if(intBandValues[band] > *maxVal)
+            {
+                *maxVal = intBandValues[band];
+            }
+        }
+    }
+    
+    RSGISCalcImgMinMax::~RSGISCalcImgMinMax()
+    {
+        
+    }
+    
+    
 
 }}
 

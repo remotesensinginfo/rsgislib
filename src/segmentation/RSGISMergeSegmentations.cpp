@@ -33,9 +33,10 @@ namespace rsgis{namespace segment{
     {
         try
         {
-            double maxClumpID = 0.0;
-            int nLastProgress = -1;
-            clumpsImage->GetRasterBand(1)->ComputeStatistics(false, NULL, &maxClumpID, NULL, NULL,  (GDALProgressFunc)RSGISSegStatsTextProgress, &nLastProgress);
+            rsgis::rastergis::RSGISRasterAttUtils ratUtils;
+            long maxClumpID = 0;
+            long minClumpID = 0;
+            ratUtils.getImageBandMinMax(clumpsImage, 1, &minClumpID, &maxClumpID);
             
             GDALDataset **datasets = new GDALDataset*[2];
             datasets[0] = clumpsImage;

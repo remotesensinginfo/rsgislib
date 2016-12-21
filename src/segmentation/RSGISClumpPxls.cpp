@@ -810,11 +810,12 @@ namespace rsgis{namespace segment{
                 throw rsgis::img::RSGISImageCalcException("Heights are not the same");
             }
             
-            GDALRasterBand *catagoryBand = catagories->GetRasterBand(1);
-            
             std::cout << "Finding maximum image value\n";
-            double maxVal = 0;
-            catagoryBand->GetStatistics(false, true, NULL, &maxVal, NULL, NULL);
+            rsgis::rastergis::RSGISRasterAttUtils ratUtils;
+            long minVal = 0;
+            long maxVal = 0;
+            ratUtils.getImageBandMinMax(catagories, 1, &minVal, &maxVal);
+            
             unsigned long maxClumpIdx = boost::lexical_cast<unsigned long>(maxVal)+1;
             
             unsigned long *clumpIdxLookUp = new unsigned long[maxClumpIdx];

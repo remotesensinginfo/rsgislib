@@ -33,6 +33,8 @@ namespace rsgis{namespace rastergis{
     {
         try
         {
+            RSGISRasterAttUtils attUtils;
+            
             // Get Attribute table
             GDALRasterAttributeTable *attTable = clumpsDataset->GetRasterBand(1)->GetDefaultRAT();
             
@@ -43,8 +45,9 @@ namespace rsgis{namespace rastergis{
             }
 
             // Make sure it is long enough and extend if required.
-            double maxVal = 0;
-            clumpsDataset->GetRasterBand(1)->GetStatistics(false, true, NULL, &maxVal, NULL, NULL);
+            long maxVal = 0;
+            long minVal = 0;
+            attUtils.getImageBandMinMax(clumpsDataset, 1, &minVal, &maxVal);
             
             if(maxVal > numRows)
             {
@@ -70,8 +73,6 @@ namespace rsgis{namespace rastergis{
             delete calcImgValStats;         
 
             delete[] datasets;
-            
-            RSGISRasterAttUtils attUtils;
             
             int *colVals = new int[numRows];
             for(size_t i = 1; i < numRows; ++i)
@@ -122,6 +123,8 @@ namespace rsgis{namespace rastergis{
     {
         try
         {
+            RSGISRasterAttUtils attUtils;
+            
             // Get Attribute table
             GDALRasterAttributeTable *attTable = clumpsDataset->GetRasterBand(1)->GetDefaultRAT();
             
@@ -132,8 +135,9 @@ namespace rsgis{namespace rastergis{
             }
 
             // Make sure it is long enough and extend if required.
-            double maxVal = 0;
-            clumpsDataset->GetRasterBand(1)->GetStatistics(false, true, NULL, &maxVal, NULL, NULL);
+            long maxVal = 0;
+            long minVal = 0;
+            attUtils.getImageBandMinMax(clumpsDataset, 1, &minVal, &maxVal);
             
             if(maxVal > numRows)
             {
@@ -159,8 +163,6 @@ namespace rsgis{namespace rastergis{
             delete calcImgValStats;
             
             delete[] datasets;
-            
-            RSGISRasterAttUtils attUtils;
             
             // read existing column values
             size_t currentNumRows = 0;
@@ -206,6 +208,8 @@ namespace rsgis{namespace rastergis{
 
     void RSGISDefineClumpsInTiles::defineBorderSegments(GDALDataset *clumpsDataset, std::string outColName) throw(RSGISImageException, RSGISAttributeTableException)
     {
+        RSGISRasterAttUtils attUtils;
+        
         // Get Attribute table
         GDALRasterAttributeTable *attTable = clumpsDataset->GetRasterBand(1)->GetDefaultRAT();
         
@@ -216,8 +220,9 @@ namespace rsgis{namespace rastergis{
         }
         
         // Make sure it is long enough and extend if required.
-        double maxVal = 0;
-        clumpsDataset->GetRasterBand(1)->GetStatistics(false, true, NULL, &maxVal, NULL, NULL);
+        long maxVal = 0;
+        long minVal = 0;
+        attUtils.getImageBandMinMax(clumpsDataset, 1, &minVal, &maxVal);
         
         if(maxVal > numRows)
         {
@@ -236,7 +241,7 @@ namespace rsgis{namespace rastergis{
         calcImageStats.calcImageBorderPixels(clumpsDataset, true);
         delete findImageBorders;
         
-        RSGISRasterAttUtils attUtils;
+        
         attUtils.writeIntColumn(attTable, outColName, borderMask, numRows);
         
         delete[] borderMask;

@@ -39,8 +39,9 @@ namespace rsgis{namespace rastergis{
             // Make sure it is long enough and extend if required.
             int numRows = attTable->GetRowCount();
             
-            double maxVal = 0;
-            clumpImage->GetRasterBand(1)->GetStatistics(false, true, NULL, &maxVal, NULL, NULL);
+            long maxVal = 0;
+            long minVal = 0;
+            attUtils.getImageBandMinMax(clumpImage, 1, &minVal, &maxVal);
             
             if(maxVal > numRows)
             {
@@ -101,8 +102,9 @@ namespace rsgis{namespace rastergis{
             // Make sure it is long enough and extend if required.
             int numRows = attTable->GetRowCount();
             
-            double maxVal = 0;
-            clumpImage->GetRasterBand(1)->GetStatistics(false, true, NULL, &maxVal, NULL, NULL);
+            long maxVal = 0;
+            long minVal = 0;
+            attUtils.getImageBandMinMax(clumpImage, 1, &minVal, &maxVal);
             
             if(maxVal > numRows)
             {
