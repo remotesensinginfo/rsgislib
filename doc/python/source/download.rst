@@ -42,4 +42,17 @@ And for OS X:
     source activate au-osgeo-osx
 
 
+If you just want RSGISLib without the extras in the pre-packaged environments above then you can also install using the following commands:
+
+.. code-block:: bash
+
+    conda install -c conda-forge -c rios rsgislib
+    
+It is recommended that you also install the following packages:
+
+.. code-block:: bash
+
+    conda install -c conda-forge -c rios scikit-learn rios tuiview h5py
+
+
 
