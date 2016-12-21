@@ -201,171 +201,563 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeCreateTiles(std::string inputImage, std::string outputImageBase, float width, float height, float tileOverlap, bool offsetTiling, std::string gdalFormat, RSGISLibDataType outDataType, std::string outFileExtension, std::vector<std::string> *outFileNames)throw(RSGISCmdException)
+    void executeCreateTiles(std::string inputImage, std::string outputImageBase, unsigned int width, unsigned int height, unsigned int tileOverlap, bool offsetTiling, std::string gdalFormat, RSGISLibDataType outDataType, std::string outFileExtension, std::vector<std::string> *outFileNames)throw(RSGISCmdException)
     {
+        std::cout.precision(12);
         GDALAllRegister();
-        OGRRegisterAll();
-
-        GDALDataset **dataset = NULL;
-
-        rsgis::img::RSGISImageUtils imgUtils;
-        rsgis::img::RSGISCopyImage *copyImage = NULL;
-        rsgis::img::RSGISCalcImage *calcImage = NULL;
-
-        int numImageBands = 0;
-        std::string outputFilePath;
-
+        
         try
         {
+            rsgis::img::RSGISImageUtils imgUtils;
             // Open Image
-            dataset = new GDALDataset*[1];
-            //cout << inputImage << endl;
-            dataset[0] = (GDALDataset *) GDALOpenShared(inputImage.c_str(), GA_ReadOnly);
-            if(dataset[0] == NULL)
+            GDALDataset *dataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+            if(dataset == NULL)
             {
                 std::string message = std::string("Could not open image ") + inputImage;
                 throw RSGISCmdException(message.c_str());
             }
-            numImageBands = dataset[0]->GetRasterCount();
-            std::cout << "Raster Band Count = " << numImageBands << std::endl;
-
+            
             // Set up envlopes for image tiles
             std::vector<geos::geom::Envelope*> *tileEnvelopes = new std::vector<geos::geom::Envelope*>;
-
-            int numDS = 1;
+            
+            int numImageBands = dataset->GetRasterCount();
+            unsigned int imgSizeX = dataset->GetRasterXSize();
+            unsigned int imgSizeY = dataset->GetRasterYSize();
+            
             double *gdalTransform = new double[6];
-            int **dsOffsets = new int*[numDS];
-            for(int i = 0; i < numDS; i++)
+            dataset->GetGeoTransform( gdalTransform );
+            double pxlXRes = gdalTransform[1];
+            double pxlYRes = gdalTransform[5];
+            if(pxlYRes < 0)
             {
-                dsOffsets[i] = new int[2];
+                pxlYRes = pxlYRes * (-1);
             }
-            int imgHeight = 0;
-            int imgWidth = 0;
-
-            imgUtils.getImageOverlap(dataset, numDS, dsOffsets, &imgWidth, &imgHeight, gdalTransform);
-
-            double pixelXRes = gdalTransform[1];
-            double pixelYRes = gdalTransform[5];
-            double absPixelYRes = pixelYRes;
-            if(absPixelYRes < 0){absPixelYRes = -1.0*absPixelYRes;}
-
-            // Get absolute minimum and maximum values from image
-            double imageMinX = gdalTransform[0];
-            double imageMaxY = gdalTransform[3];
-            double imageMaxX = imageMinX + (imgWidth * pixelXRes);
-            double imageMinY = imageMaxY + (imgHeight * pixelYRes);
-
-            // Get minimum and maximum images to use for tile grid
-            double minX = imageMinX;
-            double maxX = imageMaxX;
-            double minY = imageMinY;
-            double maxY = imageMaxY;
-
+            double imgTLX = gdalTransform[0];
+            double imgTLY = gdalTransform[3];
+            delete[] gdalTransform;
+            
             if(offsetTiling)
             {
-                minX -= (width * pixelXRes)/2;
-                maxX += (width * pixelXRes)/2;
-                if((height * pixelYRes) > 0)
+                unsigned int xOff = width/2;
+                unsigned int yOff = height/2;
+                float numXTilesFlt = float(imgSizeX-xOff) / float(width);
+                float numYTilesFlt = float(imgSizeY-yOff) / float(height);
+                
+                unsigned int numXTiles = floor(numXTilesFlt);
+                unsigned int numYTiles = floor(numYTilesFlt);
+                unsigned int remainPxlX = imgSizeX - (numXTiles * width);
+                unsigned int remainPxlY = imgSizeY - (numYTiles * height);
+                
+                unsigned int numTiles = 0;
+                long cTileX = 0;
+                long cTileY = 0;
+                
+                long tileXMin = 0;
+                long tileXMax = 0;
+                long tileYMin = 0;
+                long tileYMax = 0;
+                
+                double tileTLX = 0.0;
+                double tileTLY = 0.0;
+                double tileBRX = 0.0;
+                double tileBRY = 0.0;
+                if(yOff > 0)
                 {
-                    minY -= (height * pixelYRes)/2;
-                    maxY += (height * pixelYRes)/2;
-                }
-                else
-                {
-                    minY += (height * pixelYRes)/2;
-                    maxY -= (height * pixelYRes)/2;
-                }
-
-            }
-
-            double tileWidthMapUnits = width * pixelXRes;
-            double tileHeightMapUnits = height*pixelYRes;
-            if(tileHeightMapUnits < 0){tileHeightMapUnits = tileHeightMapUnits*-1;}  // Make tile height positive (makes things simpler)
-            double tileXOverlapMapUnits = tileOverlap * pixelXRes;
-            double tileYOverlapMapUnits = tileOverlap * absPixelYRes;
-
-            double xStart = 0;
-            double yStart = 0;
-            double yEnd = 0;
-            double xEnd = 0;
-            double xStartOverlap = 0;
-            double yStartOverlap = 0;
-            double xEndOverlap = 0;
-            double yEndOverlap = 0;
-
-            std::cout << "Tile Width: " << width << " pixels (" <<  tileWidthMapUnits << " map units)" << std::endl;
-            std::cout << "Tile Height: " << height << " pixels (" <<  tileHeightMapUnits << " map units)" << std::endl;
-            std::cout << "Tile Overlap: " << tileOverlap << " pixels (" <<  tileXOverlapMapUnits << " map units)" << std::endl;
-            if(offsetTiling)
-            {
-                std::cout << "Tiling is offset by half a tile.\n";
-            }
-
-            // Start at top left corner and work down (minX, maxY)
-            for(xStart = minX; xStart < maxX; xStart+=tileWidthMapUnits)
-            {
-                xEnd = xStart + tileWidthMapUnits;
-                xStartOverlap = xStart - tileXOverlapMapUnits;
-                xEndOverlap = xEnd + tileXOverlapMapUnits;
-
-                if(xStartOverlap < imageMinX) // Check tile will fit within image
-                {
-                    xStartOverlap = imageMinX;
-                }
-                if(xEndOverlap > imageMaxX) // Check tile will fit within image
-                {
-                    xEndOverlap = imageMaxX;
-                }
-
-                if((xEndOverlap > imageMinX) && (xStartOverlap < xEndOverlap)) // Check x extent is within image (min and max), don't run if not
-                {
-                    for(yStart = maxY; yStart > minY; yStart-=tileHeightMapUnits)
+                    cTileX = 0;
+                    if(xOff > 0)
                     {
-                        yEnd = yStart - tileHeightMapUnits;
-
-                        yStartOverlap = yStart + tileYOverlapMapUnits;
-                        yEndOverlap = yEnd - tileYOverlapMapUnits;
-
-                        if(yStartOverlap > imageMaxY) // Check tile will fit within image
+                        tileXMin = cTileX - tileOverlap;
+                        tileXMax = cTileX + xOff + tileOverlap;
+                        tileYMin = cTileY - tileOverlap;
+                        tileYMax = cTileY + yOff + tileOverlap;
+                        
+                        if(tileXMin < 0)
                         {
-                            yStartOverlap = imageMaxY+(0.5*absPixelYRes);
+                            tileXMin = 0;
                         }
-                        if(yEndOverlap < imageMinY) // Check tile will fit within image
+                        if(tileXMax > imgSizeX)
                         {
-                            yEndOverlap = imageMinY+(0.5*absPixelYRes);
+                            tileXMax = imgSizeX;
                         }
-                        if((yStartOverlap > imageMinY) && (yStartOverlap > yEndOverlap)) // Check y extent is within image (min and max), don't run if not
+                        if(tileYMin < 0)
                         {
-                            tileEnvelopes->push_back(new geos::geom::Envelope(xStartOverlap, xEndOverlap, yStartOverlap, yEndOverlap));
+                            tileYMin = 0;
                         }
+                        if(tileYMax > imgSizeY)
+                        {
+                            tileYMax = imgSizeY;
+                        }
+                        
+                        tileTLX = imgTLX + (tileXMin*pxlXRes);
+                        tileTLY = imgTLY - (tileYMax*pxlYRes);
+                        tileBRX = imgTLX + (tileXMax*pxlXRes);
+                        tileBRY = imgTLY - (tileYMin*pxlYRes);
+                        tileEnvelopes->push_back(new geos::geom::Envelope(tileTLX, tileBRX, tileTLY, tileBRY));
+                        
+                        cTileX += xOff;
+                        ++numTiles;
+                    }
+                    for(unsigned int j = 0; j < numXTiles; ++j)
+                    {
+                        tileXMin = cTileX - tileOverlap;
+                        tileXMax = cTileX + width + tileOverlap;
+                        tileYMin = cTileY - tileOverlap;
+                        tileYMax = cTileY + yOff + tileOverlap;
+                        
+                        if(tileXMin < 0)
+                        {
+                            tileXMin = 0;
+                        }
+                        if(tileXMax > imgSizeX)
+                        {
+                            tileXMax = imgSizeX;
+                        }
+                        if(tileYMin < 0)
+                        {
+                            tileYMin = 0;
+                        }
+                        if(tileYMax > imgSizeY)
+                        {
+                            tileYMax = imgSizeY;
+                        }
+                        
+                        tileTLX = imgTLX + (tileXMin*pxlXRes);
+                        tileTLY = imgTLY - (tileYMax*pxlYRes);
+                        tileBRX = imgTLX + (tileXMax*pxlXRes);
+                        tileBRY = imgTLY - (tileYMin*pxlYRes);
+                        tileEnvelopes->push_back(new geos::geom::Envelope(tileTLX, tileBRX, tileTLY, tileBRY));
+                        
+                        cTileX += width;
+                        ++numTiles;
+                    }
+                    if(remainPxlX > 0)
+                    {
+                        tileXMin = cTileX - tileOverlap;
+                        tileXMax = cTileX + remainPxlX + tileOverlap;
+                        tileYMin = cTileY - tileOverlap;
+                        tileYMax = cTileY + yOff + tileOverlap;
+                        
+                        if(tileXMin < 0)
+                        {
+                            tileXMin = 0;
+                        }
+                        if(tileXMax > imgSizeX)
+                        {
+                            tileXMax = imgSizeX;
+                        }
+                        if(tileYMin < 0)
+                        {
+                            tileYMin = 0;
+                        }
+                        if(tileYMax > imgSizeY)
+                        {
+                            tileYMax = imgSizeY;
+                        }
+                        
+                        tileTLX = imgTLX + (tileXMin*pxlXRes);
+                        tileTLY = imgTLY - (tileYMax*pxlYRes);
+                        tileBRX = imgTLX + (tileXMax*pxlXRes);
+                        tileBRY = imgTLY - (tileYMin*pxlYRes);
+                        tileEnvelopes->push_back(new geos::geom::Envelope(tileTLX, tileBRX, tileTLY, tileBRY));
+                        
+                        ++numTiles;
+                    }
+                    cTileY += yOff;
+                }
+                for(unsigned int i = 0; i < numYTiles; ++i)
+                {
+                    cTileX = 0;
+                    if(xOff > 0)
+                    {
+                        tileXMin = cTileX - tileOverlap;
+                        tileXMax = cTileX + xOff + tileOverlap;
+                        tileYMin = cTileY - tileOverlap;
+                        tileYMax = cTileY + height + tileOverlap;
+                        
+                        if(tileXMin < 0)
+                        {
+                            tileXMin = 0;
+                        }
+                        if(tileXMax > imgSizeX)
+                        {
+                            tileXMax = imgSizeX;
+                        }
+                        if(tileYMin < 0)
+                        {
+                            tileYMin = 0;
+                        }
+                        if(tileYMax > imgSizeY)
+                        {
+                            tileYMax = imgSizeY;
+                        }
+                        
+                        tileTLX = imgTLX + (tileXMin*pxlXRes);
+                        tileTLY = imgTLY - (tileYMax*pxlYRes);
+                        tileBRX = imgTLX + (tileXMax*pxlXRes);
+                        tileBRY = imgTLY - (tileYMin*pxlYRes);
+                        tileEnvelopes->push_back(new geos::geom::Envelope(tileTLX, tileBRX, tileTLY, tileBRY));
+                        
+                        cTileX += xOff;
+                        ++numTiles;
+                    }
+                    for(unsigned int j = 0; j < numXTiles; ++j)
+                    {
+                        tileXMin = cTileX - tileOverlap;
+                        tileXMax = cTileX + width + tileOverlap;
+                        tileYMin = cTileY - tileOverlap;
+                        tileYMax = cTileY + height + tileOverlap;
+                        
+                        if(tileXMin < 0)
+                        {
+                            tileXMin = 0;
+                        }
+                        if(tileXMax > imgSizeX)
+                        {
+                            tileXMax = imgSizeX;
+                        }
+                        if(tileYMin < 0)
+                        {
+                            tileYMin = 0;
+                        }
+                        if(tileYMax > imgSizeY)
+                        {
+                            tileYMax = imgSizeY;
+                        }
+                        
+                        tileTLX = imgTLX + (tileXMin*pxlXRes);
+                        tileTLY = imgTLY - (tileYMax*pxlYRes);
+                        tileBRX = imgTLX + (tileXMax*pxlXRes);
+                        tileBRY = imgTLY - (tileYMin*pxlYRes);
+                        tileEnvelopes->push_back(new geos::geom::Envelope(tileTLX, tileBRX, tileTLY, tileBRY));
+                        
+                        cTileX += width;
+                        ++numTiles;
+                    }
+                    if(remainPxlX > 0)
+                    {
+                        tileXMin = cTileX - tileOverlap;
+                        tileXMax = cTileX + remainPxlX + tileOverlap;
+                        tileYMin = cTileY - tileOverlap;
+                        tileYMax = cTileY + height + tileOverlap;
+                        
+                        if(tileXMin < 0)
+                        {
+                            tileXMin = 0;
+                        }
+                        if(tileXMax > imgSizeX)
+                        {
+                            tileXMax = imgSizeX;
+                        }
+                        if(tileYMin < 0)
+                        {
+                            tileYMin = 0;
+                        }
+                        if(tileYMax > imgSizeY)
+                        {
+                            tileYMax = imgSizeY;
+                        }
+                        
+                        tileTLX = imgTLX + (tileXMin*pxlXRes);
+                        tileTLY = imgTLY - (tileYMax*pxlYRes);
+                        tileBRX = imgTLX + (tileXMax*pxlXRes);
+                        tileBRY = imgTLY - (tileYMin*pxlYRes);
+                        tileEnvelopes->push_back(new geos::geom::Envelope(tileTLX, tileBRX, tileTLY, tileBRY));
+                        
+                        ++numTiles;
+                    }
+                    cTileY += height;
+                }
+                if(remainPxlY > 0)
+                {
+                    cTileX = 0;
+                    if(xOff > 0)
+                    {
+                        tileXMin = cTileX - tileOverlap;
+                        tileXMax = cTileX + xOff + tileOverlap;
+                        tileYMin = cTileY - tileOverlap;
+                        tileYMax = cTileY + remainPxlY + tileOverlap;
+                        
+                        if(tileXMin < 0)
+                        {
+                            tileXMin = 0;
+                        }
+                        if(tileXMax > imgSizeX)
+                        {
+                            tileXMax = imgSizeX;
+                        }
+                        if(tileYMin < 0)
+                        {
+                            tileYMin = 0;
+                        }
+                        if(tileYMax > imgSizeY)
+                        {
+                            tileYMax = imgSizeY;
+                        }
+                        
+                        tileTLX = imgTLX + (tileXMin*pxlXRes);
+                        tileTLY = imgTLY - (tileYMax*pxlYRes);
+                        tileBRX = imgTLX + (tileXMax*pxlXRes);
+                        tileBRY = imgTLY - (tileYMin*pxlYRes);
+                        tileEnvelopes->push_back(new geos::geom::Envelope(tileTLX, tileBRX, tileTLY, tileBRY));
+                        
+                        cTileX += xOff;
+                        ++numTiles;
+                    }
+                    for(unsigned int j = 0; j < numXTiles; ++j)
+                    {
+                        tileXMin = cTileX - tileOverlap;
+                        tileXMax = cTileX + width + tileOverlap;
+                        tileYMin = cTileY - tileOverlap;
+                        tileYMax = cTileY + remainPxlY + tileOverlap;
+                        
+                        if(tileXMin < 0)
+                        {
+                            tileXMin = 0;
+                        }
+                        if(tileXMax > imgSizeX)
+                        {
+                            tileXMax = imgSizeX;
+                        }
+                        if(tileYMin < 0)
+                        {
+                            tileYMin = 0;
+                        }
+                        if(tileYMax > imgSizeY)
+                        {
+                            tileYMax = imgSizeY;
+                        }
+                        
+                        tileTLX = imgTLX + (tileXMin*pxlXRes);
+                        tileTLY = imgTLY - (tileYMax*pxlYRes);
+                        tileBRX = imgTLX + (tileXMax*pxlXRes);
+                        tileBRY = imgTLY - (tileYMin*pxlYRes);
+                        tileEnvelopes->push_back(new geos::geom::Envelope(tileTLX, tileBRX, tileTLY, tileBRY));
+                        
+                        cTileX += width;
+                        ++numTiles;
+                    }
+                    if(remainPxlX > 0)
+                    {
+                        tileXMin = cTileX - tileOverlap;
+                        tileXMax = cTileX + remainPxlX + tileOverlap;
+                        tileYMin = cTileY - tileOverlap;
+                        tileYMax = cTileY + remainPxlY + tileOverlap;
+                        
+                        if(tileXMin < 0)
+                        {
+                            tileXMin = 0;
+                        }
+                        if(tileXMax > imgSizeX)
+                        {
+                            tileXMax = imgSizeX;
+                        }
+                        if(tileYMin < 0)
+                        {
+                            tileYMin = 0;
+                        }
+                        if(tileYMax > imgSizeY)
+                        {
+                            tileYMax = imgSizeY;
+                        }
+                        
+                        tileTLX = imgTLX + (tileXMin*pxlXRes);
+                        tileTLY = imgTLY - (tileYMax*pxlYRes);
+                        tileBRX = imgTLX + (tileXMax*pxlXRes);
+                        tileBRY = imgTLY - (tileYMin*pxlYRes);
+                        tileEnvelopes->push_back(new geos::geom::Envelope(tileTLX, tileBRX, tileTLY, tileBRY));
+                        
+                        ++numTiles;
                     }
                 }
             }
-
-            copyImage = new rsgis::img::RSGISCopyImage(numImageBands);
-            calcImage = new rsgis::img::RSGISCalcImage(copyImage, "", true);
-
+            else
+            {
+                float numXTilesFlt = float(imgSizeX) / float(width);
+                float numYTilesFlt = float(imgSizeY) / float(height);
+                
+                unsigned int numXTiles = floor(numXTilesFlt);
+                unsigned int numYTiles = floor(numYTilesFlt);
+                unsigned int remainPxlX = imgSizeX - (numXTiles * width);
+                unsigned int remainPxlY = imgSizeY - (numYTiles * height);
+                
+                unsigned int numTiles = 0;
+                long cTileX = 0;
+                long cTileY = 0;
+                
+                long tileXMin = 0;
+                long tileXMax = 0;
+                long tileYMin = 0;
+                long tileYMax = 0;
+                
+                double tileTLX = 0.0;
+                double tileTLY = 0.0;
+                double tileBRX = 0.0;
+                double tileBRY = 0.0;
+                
+                for(unsigned int i = 0; i < numYTiles; ++i)
+                {
+                    cTileX = 0;
+                    for(unsigned int j = 0; j < numXTiles; ++j)
+                    {
+                        tileXMin = cTileX - tileOverlap;
+                        tileXMax = cTileX + width + tileOverlap;
+                        tileYMin = cTileY - tileOverlap;
+                        tileYMax = cTileY + height + tileOverlap;
+                        
+                        if(tileXMin < 0)
+                        {
+                            tileXMin = 0;
+                        }
+                        if(tileXMax > imgSizeX)
+                        {
+                            tileXMax = imgSizeX;
+                        }
+                        if(tileYMin < 0)
+                        {
+                            tileYMin = 0;
+                        }
+                        if(tileYMax > imgSizeY)
+                        {
+                            tileYMax = imgSizeY;
+                        }
+                        
+                        tileTLX = imgTLX + (tileXMin*pxlXRes);
+                        tileTLY = imgTLY - (tileYMax*pxlYRes);
+                        tileBRX = imgTLX + (tileXMax*pxlXRes);
+                        tileBRY = imgTLY - (tileYMin*pxlYRes);
+                        tileEnvelopes->push_back(new geos::geom::Envelope(tileTLX, tileBRX, tileTLY, tileBRY));
+                        
+                        cTileX += width;
+                        ++numTiles;
+                    }
+                    if(remainPxlX > 0)
+                    {
+                        tileXMin = cTileX - tileOverlap;
+                        tileXMax = cTileX + remainPxlX + tileOverlap;
+                        tileYMin = cTileY - tileOverlap;
+                        tileYMax = cTileY + height + tileOverlap;
+                        
+                        if(tileXMin < 0)
+                        {
+                            tileXMin = 0;
+                        }
+                        if(tileXMax > imgSizeX)
+                        {
+                            tileXMax = imgSizeX;
+                        }
+                        if(tileYMin < 0)
+                        {
+                            tileYMin = 0;
+                        }
+                        if(tileYMax > imgSizeY)
+                        {
+                            tileYMax = imgSizeY;
+                        }
+                        
+                        tileTLX = imgTLX + (tileXMin*pxlXRes);
+                        tileTLY = imgTLY - (tileYMax*pxlYRes);
+                        tileBRX = imgTLX + (tileXMax*pxlXRes);
+                        tileBRY = imgTLY - (tileYMin*pxlYRes);
+                        tileEnvelopes->push_back(new geos::geom::Envelope(tileTLX, tileBRX, tileTLY, tileBRY));
+                        
+                        ++numTiles;
+                    }
+                    cTileY += height;
+                }
+                if(remainPxlY > 0)
+                {
+                    cTileX = 0;
+                    for(unsigned int j = 0; j < numXTiles; ++j)
+                    {
+                        tileXMin = cTileX - tileOverlap;
+                        tileXMax = cTileX + width + tileOverlap;
+                        tileYMin = cTileY - tileOverlap;
+                        tileYMax = cTileY + remainPxlY + tileOverlap;
+                        
+                        if(tileXMin < 0)
+                        {
+                            tileXMin = 0;
+                        }
+                        if(tileXMax > imgSizeX)
+                        {
+                            tileXMax = imgSizeX;
+                        }
+                        if(tileYMin < 0)
+                        {
+                            tileYMin = 0;
+                        }
+                        if(tileYMax > imgSizeY)
+                        {
+                            tileYMax = imgSizeY;
+                        }
+                        
+                        tileTLX = imgTLX + (tileXMin*pxlXRes);
+                        tileTLY = imgTLY - (tileYMax*pxlYRes);
+                        tileBRX = imgTLX + (tileXMax*pxlXRes);
+                        tileBRY = imgTLY - (tileYMin*pxlYRes);
+                        tileEnvelopes->push_back(new geos::geom::Envelope(tileTLX, tileBRX, tileTLY, tileBRY));
+                        
+                        cTileX += width;
+                        ++numTiles;
+                    }
+                    if(remainPxlX > 0)
+                    {
+                        tileXMin = cTileX - tileOverlap;
+                        tileXMax = cTileX + remainPxlX + tileOverlap;
+                        tileYMin = cTileY - tileOverlap;
+                        tileYMax = cTileY + remainPxlY + tileOverlap;
+                        
+                        if(tileXMin < 0)
+                        {
+                            tileXMin = 0;
+                        }
+                        if(tileXMax > imgSizeX)
+                        {
+                            tileXMax = imgSizeX;
+                        }
+                        if(tileYMin < 0)
+                        {
+                            tileYMin = 0;
+                        }
+                        if(tileYMax > imgSizeY)
+                        {
+                            tileYMax = imgSizeY;
+                        }
+                        
+                        tileTLX = imgTLX + (tileXMin*pxlXRes);
+                        tileTLY = imgTLY - (tileYMax*pxlYRes);
+                        tileBRX = imgTLX + (tileXMax*pxlXRes);
+                        tileBRY = imgTLY - (tileYMin*pxlYRes);
+                        tileEnvelopes->push_back(new geos::geom::Envelope(tileTLX, tileBRX, tileTLY, tileBRY));
+                        
+                        ++numTiles;
+                    }
+                }
+            }
+            
+            rsgis::img::RSGISCopyImage copyImage = rsgis::img::RSGISCopyImage(numImageBands);
+            rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(&copyImage, "", true);
+            
+            std::string outputFilePath = "";
             for(unsigned int i = 0; i < tileEnvelopes->size(); ++i)
             {
                 std::cout << "Tile " << i+1 << "/" << tileEnvelopes->size() << std::endl;
                 outputFilePath = outputImageBase + "_tile" + boost::lexical_cast<std::string>(i) + "." + outFileExtension;
                 try
                 {
-                    calcImage->calcImageInEnv(dataset, 1, outputFilePath, tileEnvelopes->at(i), false, NULL, gdalFormat, RSGIS_to_GDAL_Type(outDataType));
-                    // Save out file name to vector
-                    if(outFileNames != NULL){outFileNames->push_back(outputFilePath);}
+                    calcImage.calcImageInEnv(&dataset, 1, outputFilePath, tileEnvelopes->at(i), false, NULL, gdalFormat, RSGIS_to_GDAL_Type(outDataType));
+
+                    if(outFileNames != NULL)
+                    {
+                        outFileNames->push_back(outputFilePath);
+                    }
                 }
                 catch (rsgis::img::RSGISImageBandException e)
                 {
                     throw RSGISCmdException(e.what());
                 }
             }
-
-            GDALClose(dataset[0]);
-            delete[] dataset;
-            //GDALDestroyDriverManager();
-            delete calcImage;
-            delete copyImage;
+            GDALClose(dataset);
         }
         catch(rsgis::RSGISException& e)
         {
@@ -395,7 +787,6 @@ namespace rsgis{ namespace cmds {
 
 
             GDALClose(inDataset);
-            //GDALDestroyDriverManager();
         }
         catch(rsgis::RSGISException& e)
         {

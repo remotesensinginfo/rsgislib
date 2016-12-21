@@ -57,7 +57,7 @@ namespace rsgis{ namespace cmds {
         Optionally the tiles may be offset from the image boundries by half a pixel, useful for creating two overlapping lots of tiles.
         The filenames for each tile are passed back as a vector.
      */
-    DllExport void executeCreateTiles(std::string inputImage, std::string outputImageBase, float width, float height, float tileOverlap, bool offsetTiling, std::string gdalFormat, RSGISLibDataType outDataType, std::string outFileExtension, std::vector<std::string> *outFileNames = NULL)throw(RSGISCmdException);
+    DllExport void executeCreateTiles(std::string inputImage, std::string outputImageBase, unsigned int width, unsigned int height, unsigned int tileOverlap, bool offsetTiling, std::string gdalFormat, RSGISLibDataType outDataType, std::string outFileExtension, std::vector<std::string> *outFileNames = NULL)throw(RSGISCmdException);
     
     /** A function to run the populate statistics command */
     DllExport void executePopulateImgStats(std::string inputImage, bool useIgnoreVal, float nodataValue, bool calcImgPyramids, std::vector<int> pyraScaleVals=std::vector<int>())throw(RSGISCmdException);
