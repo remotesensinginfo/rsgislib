@@ -26,8 +26,8 @@ A command to perform a dark object subtraction (DOS) on an input image.
 
 Example::
 
-import rsgislib.imagecalibration
-rsgislib.imagecalibration.performDOSCalc("LS5TM_20110701_lat52lon421_r24p204_rad_toa.kea", 'LS5TM_20110701_lat52lon421_r24p204_rad_toa_dos.kea")
+    import rsgislib.imagecalibration
+    rsgislib.imagecalibration.performDOSCalc("LS5TM_20110701_lat52lon421_r24p204_rad_toa.kea", 'LS5TM_20110701_lat52lon421_r24p204_rad_toa_dos.kea")
 
 """
     import rsgislib
@@ -73,12 +73,12 @@ Given a cloud mask, identify the larger extent regions of useful clear-sky regio
 
 Example::
 
-import rsgislib.imagecalibration
-cloudsImg = "./Outputs/LS8_20160605_lat52lon261_r24p203_clouds.kea"
-validAreaImg = "./Outputs/LS8_20160605_lat52lon261_r24p203_valid.kea"
-outputMask = "./Outputs/LS8_20160605_lat52lon261_r24p203_openskyvalid.kea"
-tmpPath = "./temp"
-rsgislib.imagecalibration.calcClearSkyRegions(cloudsImg, validAreaImg, outputMask, 'KEA', tmpPath)
+    import rsgislib.imagecalibration
+    cloudsImg = "./Outputs/LS8_20160605_lat52lon261_r24p203_clouds.kea"
+    validAreaImg = "./Outputs/LS8_20160605_lat52lon261_r24p203_valid.kea"
+    outputMask = "./Outputs/LS8_20160605_lat52lon261_r24p203_openskyvalid.kea"
+    tmpPath = "./temp"
+    rsgislib.imagecalibration.calcClearSkyRegions(cloudsImg, validAreaImg, outputMask, 'KEA', tmpPath)
 
 """
     
