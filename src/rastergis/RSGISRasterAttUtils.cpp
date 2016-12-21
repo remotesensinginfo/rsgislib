@@ -2602,6 +2602,7 @@ namespace rsgis{namespace rastergis{
     {
         try
         {
+            std::cout << "Find Image Min Max\n";
             RSGISCalcImgMinMax calcMinMac = RSGISCalcImgMinMax(minVal, maxVal, band-1);
             rsgis::img::RSGISCalcImage calcImageMinMax(&calcMinMac);
             calcImageMinMax.calcImage(&inImage, 1, 0);
@@ -2635,12 +2636,6 @@ namespace rsgis{namespace rastergis{
     
     void RSGISCalcImgMinMax::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException)
     {
-        if(numIntVals <= band)
-        {
-            throw rsgis::img::RSGISImageCalcException("Band is not in the input image...");
-        }
-        
-        
         if(first)
         {
             *minVal = intBandValues[band];
