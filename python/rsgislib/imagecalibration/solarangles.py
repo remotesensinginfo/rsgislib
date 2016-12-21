@@ -81,6 +81,7 @@ def getSolarIrrConventionSolarAzimuthFromUSGS(solarAz):
               |
               S (180)
 
+    
     """
     solarAzOut = solarAz
     if solarAz < 0:
@@ -103,6 +104,7 @@ def getSolarIrrConventionSolarAzimuthFromTrad(solarAz):
      W (270)-----E (90) 
               |
               S (180)    
+
     """
     solarAzOut = 0.0
     if solarAz > 0:

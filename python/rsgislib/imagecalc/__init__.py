@@ -44,7 +44,8 @@ class StatsSummary:
 
 
 def calcNDVI(image, rBand, nBand, outImage, stats=True, gdalFormat='KEA'):
-    """ Helper function to calculate NDVI 
+    """ 
+Helper function to calculate NDVI 
     
 Where:
 
@@ -65,7 +66,8 @@ Where:
         imageutils.popImageStats(outImage,False,0.,True)
 
 def calcWBI(image, bBand, nBand, outImage, stats=True, gdalFormat='KEA'):
-    """ Helper function to calculate WBI 
+    """ 
+Helper function to calculate WBI 
     
 Where:
 
@@ -89,21 +91,21 @@ Where:
 
 def calcDist2ImgVals(inputValsImg, outputDistImg, pxlVals, valsImgBand=1, outImgFormat='KEA', maxDist=None, noDataVal=None, unitGEO=True):
     """ 
-    A function to calculate the distance to the nearest pixel value with one of the specified values.
+A function to calculate the distance to the nearest pixel value with one of the specified values.
 
-    Where:
+Where:
 
-    * inputValsImg is a string specifying the input image file.
-    * outputDistImg is a string specfiying the output image file.
-    * pxlVals is a number of list of numbers specifying the features to which the distance from should be calculated.
-    * valsImgBand is an integer specifying the image band of the input image to be used (Default = 1).
-    * outImgFormat is a string specifying the output image format (Default = KEA)
-    * maxDist is a number specifying the maximum distance to be calculated, if None not max value is used (Default = None).
-    * noDataVal is the no data value in the input image for which distance should not be calculated for (Default = None; None = no specified no data value).
-    * unitGEO is a boolean specifying the output distance units. True = Geographic units (e.g., metres), False is in Pixels (Default = True).
-    
-    Example::
-    
+* inputValsImg is a string specifying the input image file.
+* outputDistImg is a string specfiying the output image file.
+* pxlVals is a number of list of numbers specifying the features to which the distance from should be calculated.
+* valsImgBand is an integer specifying the image band of the input image to be used (Default = 1).
+* outImgFormat is a string specifying the output image format (Default = KEA)
+* maxDist is a number specifying the maximum distance to be calculated, if None not max value is used (Default = None).
+* noDataVal is the no data value in the input image for which distance should not be calculated for (Default = None; None = no specified no data value).
+* unitGEO is a boolean specifying the output distance units. True = Geographic units (e.g., metres), False is in Pixels (Default = True).
+
+Example::
+
     import rsgislib.imagecalc
     cloudsImg = 'LS5TM_20110701_lat52lon421_r24p204_clouds.kea'
     dist2Clouds = 'LS5TM_20110701_lat52lon421_r24p204_distclouds.kea'
@@ -111,7 +113,7 @@ def calcDist2ImgVals(inputValsImg, outputDistImg, pxlVals, valsImgBand=1, outImg
     # Pixel value 2 == Cloud Shadows
     rsgislib.imagecalc.calcDist2ImgVals(cloudsImg, dist2Clouds, pxlVals=[1,2])
     
-    """
+"""
     # Check gdal is available
     if not haveGDALPy:
         raise ImportError("The GDAL python bindings are required for "
@@ -163,8 +165,8 @@ def calcDist2ImgVals(inputValsImg, outputDistImg, pxlVals, valsImgBand=1, outImg
 
 def _computeProximityArrArgsFunc(argVals):
     """
-    This function is used internally within calcDist2Classes for the multiprocessing Pool
-    """
+This function is used internally within calcDist2Classes for the multiprocessing Pool
+"""
     classImgDS = gdal.Open(argVals[0], gdal.GA_ReadOnly)
     classImgBand = classImgDS.GetRasterBand(1)
     imageutils.createCopyImage(argVals[0], argVals[1], 1, argVals[3], argVals[4], rsgislib.TYPE_32FLOAT)
@@ -180,31 +182,32 @@ def _computeProximityArrArgsFunc(argVals):
 
 def calcDist2ImgValsTiled(inputValsImg, outputDistImg, pxlVals, valsImgBand=1, maxDist=1000, noDataVal=1000, outImgFormat='KEA', unitGEO=True, tmpDIR='./tmp', tileSize=2000,  nCores=-1):
     """ 
-    A function to calculate the distance to the nearest pixel value with one of the specified values.
+A function to calculate the distance to the nearest pixel value with one of the specified values.
 
-    Where:
+Where:
 
-    * inputValsImg is a string specifying the input image file.
-    * outputDistImg is a string specfiying the output image file.
-    * pxlVals is a number of list of numbers specifying the features to which the distance from should be calculated.
-    * valsImgBand is an integer specifying the image band of the input image to be used (Default = 1).
-    * outImgFormat is a string specifying the output image format (Default = KEA)
-    * maxDist is a number specifying the maximum distance to be calculated, if None not max value is used (Default = None).
-    * noDataVal is the no data value in the input image for which distance should not be calculated for (Default = None; None = no specified no data value).
-    * unitGEO is a boolean specifying the output distance units. True = Geographic units (e.g., metres), False is in Pixels (Default = True).
-    * tmpDIR is a directory to be used for storing the image tiles and other temporary files - if not directory does not exist it will be created and deleted on completion (Default: ./tmp).
-    * tileSize is an int specifying in pixels the size of the image tiles used for processing (Default: 2000)
-    * nCores is the number of processing cores which are available to be used for this processing. If -1 all available cores will be used. (Default: -1)
-    Example::
-    
+* inputValsImg is a string specifying the input image file.
+* outputDistImg is a string specfiying the output image file.
+* pxlVals is a number of list of numbers specifying the features to which the distance from should be calculated.
+* valsImgBand is an integer specifying the image band of the input image to be used (Default = 1).
+* outImgFormat is a string specifying the output image format (Default = KEA)
+* maxDist is a number specifying the maximum distance to be calculated, if None not max value is used (Default = None).
+* noDataVal is the no data value in the input image for which distance should not be calculated for (Default = None; None = no specified no data value).
+* unitGEO is a boolean specifying the output distance units. True = Geographic units (e.g., metres), False is in Pixels (Default = True).
+* tmpDIR is a directory to be used for storing the image tiles and other temporary files - if not directory does not exist it will be created and deleted on completion (Default: ./tmp).
+* tileSize is an int specifying in pixels the size of the image tiles used for processing (Default: 2000)
+* nCores is the number of processing cores which are available to be used for this processing. If -1 all available cores will be used. (Default: -1)
+
+Example::
+
     import rsgislib.imagecalc
     cloudsImg = 'LS5TM_20110701_lat52lon421_r24p204_clouds.kea'
     dist2Clouds = 'LS5TM_20110701_lat52lon421_r24p204_distclouds.kea'
     # Pixel value 1 == Clouds
     # Pixel value 2 == Cloud Shadows
     rsgislib.imagecalc.calcDist2ImgValsTiled(cloudsImg, dist2Clouds, pxlVals=[1,2])
-    
-    """
+
+"""
     
     # Check gdal is available
     if not haveGDALPy:

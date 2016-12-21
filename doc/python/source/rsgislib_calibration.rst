@@ -51,7 +51,10 @@ Utilities
 ---------
 
 .. autofunction:: rsgislib.imagecalibration.saturatedPixelsMask
-
+.. autofunction:: rsgislib.imagecalibration.calcNadirImgViewAngle
+.. autofunction:: rsgislib.imagecalibration.solarangles.getSolarIrrConventionSolarAzimuthFromUSGS
+.. autofunction:: rsgislib.imagecalibration.solarangles.getSolarIrrConventionSolarAzimuthFromTrad
+.. autofunction:: rsgislib.imagecalibration.solarangles.calcSolarAzimuthZenith
 
 * :ref:`genindex`
 * :ref:`modindex`

@@ -107,9 +107,7 @@ Example::
     from rsgislib import imageutils
 
     inputImage = 'injune_p142_casi_sub_utm.kea'
-    
     bandNames = imageutils.getBandNames(inputImage)
-    
 
 """
     # Check gdal is available
@@ -233,20 +231,22 @@ Where:
 
 def reprojectImage(inputImage, outputImage, outWKT, outFormat='KEA', interp='cubic', inWKT=None, noData=0.0, outPxlRes='image', snap2Grid=True):
     """
-    This function provides a tool which uses the gdalwarp function to reproject an input 
-    image.
-    * inputImage - the input image name and path
-    * outputImage - the output image name and path
-    * outWKT - a WKT file representing the output projection
-    * outFormat - the output image file format (Default is KEA)
-    * interp - interpolation algorithm. Options are: near, bilinear, cubic, cubicspline, lanczos, average, mode. (Default is cubic)
-    * inWKT - if input image is not well defined this is the input image projection as a WKT file (Default is None, i.e., ignored)
-    * noData - float representing the not data value (Default is 0.0)
-    * outPxlRes three inputs can be provided 
-                1) 'image' where the output resolution will match the input (Default is image)
-                2) 'auto' where an output resolution maintaining the image size of the input image will be used
-                3) provide a floating point value for the image resolution (note. pixels will be sqaure) 
-    * snap2Grid is a boolean specifying whether the TL pixel should be snapped to a multiple of the pixel resolution (Default is True).
+This function provides a tool which uses the gdalwarp function to reproject an input 
+image.
+Where:
+
+* inputImage - the input image name and path
+* outputImage - the output image name and path
+* outWKT - a WKT file representing the output projection
+* outFormat - the output image file format (Default is KEA)
+* interp - interpolation algorithm. Options are: near, bilinear, cubic, cubicspline, lanczos, average, mode. (Default is cubic)
+* inWKT - if input image is not well defined this is the input image projection as a WKT file (Default is None, i.e., ignored)
+* noData - float representing the not data value (Default is 0.0)
+* outPxlRes three inputs can be provided 
+            1) 'image' where the output resolution will match the input (Default is image)
+            2) 'auto' where an output resolution maintaining the image size of the input image will be used
+            3) provide a floating point value for the image resolution (note. pixels will be sqaure) 
+* snap2Grid is a boolean specifying whether the TL pixel should be snapped to a multiple of the pixel resolution (Default is True).
     """
     # Check gdal is available
     if not haveGDALPy:
@@ -384,15 +384,11 @@ def reprojectImage(inputImage, outputImage, outWKT, outFormat='KEA', interp='cub
             outRes = yOutRes
     else: 
         raise Exception('Was not able to defined the output resolution. Check Input: \'' + outPxlRes + '\'')
-    #print("Output Image has resolution of: " + str(outRes))
     
     outTLX = xMin
     outTLY = yMax
     outWidth = int(round((xMax - xMin) / outRes)) + 1
     outHeight = int(round((yMax - yMin) / outRes)) + 1
-    
-    #print("TL (OUT): [" + str(tlXOut) + " , " + str(tlYOut) + "]")
-    #print("BR (OUT): [" + str(brXOut) + " , " + str(brYOut) + "]")
     
     if snap2Grid:
     
@@ -401,17 +397,9 @@ def reprojectImage(inputImage, outputImage, outWKT, outFormat='KEA', interp='cub
         
         outTLX = (outTLX-xLeft) - (5 * outRes)
         outTLY = ((outTLY-yLeft) + outRes) + (5 * outRes)
-    
-        #print("TL Leftover: [" + str(xLeft) + " x " + str(yLeft) + "]")
-        #print("TL (OUT DEF): [" + str(outTLX) + " , " + str(outTLY) + "]")
         
         outWidth = int(round((xMax - xMin) / outRes)) + 10
         outHeight = int(round((yMax - yMin) / outRes)) + 10
-        
-    #print("Input Image Size: [" + str(xSize) + " x " + str(ySize) + "]")
-    #print("Output Image Size: [" + str(outWidth) + " x " + str(outHeight) + "]")
-    
-    #print("TL (OUT DEF): [" + str(outTLX) + " , " + str(outTLY) + "]")
     
     print('Creating blank image')
     rsgislib.imageutils.createBlankImage(outputImage, numBands, outWidth, outHeight, outTLX, outTLY, outRes, noData, "", outWKTStr, outFormat, rsgisDataType)
@@ -430,7 +418,8 @@ def reprojectImage(inputImage, outputImage, outWKT, outFormat='KEA', interp='cub
 
 
 def subsetImgs2CommonExtent(inImagesDict, outShpEnv, imgFormat):
-    """A command to subset a set of images to the same overlapped extent.
+    """
+A command to subset a set of images to the same overlapped extent.
 
 Where:
 
@@ -469,7 +458,7 @@ Example::
     
 def buildImgSubDict(globFindImgsStr, outDir, suffix, ext):
     """
-    Automate building the dictionary of image to be used within the 
+Automate building the dictionary of image to be used within the 
 subsetImgs2CommonExtent(inImagesDict, outShpEnv, imgFormat) function.
 
 Where:
@@ -552,13 +541,13 @@ def _getXYPxlLocs(info, inputs, outputs, otherargs):
 
 def calcPixelLocations(inputImg, outputImg, gdalFormat):
     """
-    Function which produces a 2 band output image with the X and Y 
-    locations of the image pixels.
-    
-    * inputImg - the input reference image
-    * outputImg - the output image file name and path (will be same dimensions as the input)
-    * gdalFormat - the GDAL image file format of the output image file.
-    """
+Function which produces a 2 band output image with the X and Y 
+locations of the image pixels.
+
+* inputImg - the input reference image
+* outputImg - the output image file name and path (will be same dimensions as the input)
+* gdalFormat - the GDAL image file format of the output image file.
+"""
     if not haveGDALPy:
         raise Exception("The GDAL python bindings required for this function could not be imported\n\t" + gdalogrErr)
 

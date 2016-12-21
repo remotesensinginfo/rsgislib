@@ -423,10 +423,12 @@ static PyMethodDef ImageMorphologyMethods[] = {
 "\n"
 "* outputFile is a string specifying the name and path of the output matrix file.\n"
 "* opSize is a integer specifying the size of the operator.\n"
-"Example::\n"
-"import rsgislib.imagemorphology\n"
 "\n"
-"rsgislib.imagemorphology.createCircularOp(outputFile='CircularOp5.gmtxt', opSize=5)\n"
+"Example::\n"
+"\n"
+"   import rsgislib.imagemorphology\n"
+"   \n"
+"   rsgislib.imagemorphology.createCircularOp(outputFile='CircularOp5.gmtxt', opSize=5)\n"
 "\n"},
     
     
@@ -442,14 +444,16 @@ static PyMethodDef ImageMorphologyMethods[] = {
 "* opSize is a integer specifying the square operator size (only used if useOpFile is False)\n"
 "* gdalFormat is a string specifying the GDAL image format (e.g., KEA)\n"
 "* dataType is an int containing one of the values from rsgislib.TYPE_*\n"
+"\n"
 "Example::\n"
-"import rsgislib\n"
-"import rsgislib.imagemorphology\n"
 "\n"
-"inImg = 'clumpsImage.kea'\n"
-"outImg = 'clumpsImage_Dilate.kea'\n"
-"\n"
-"rsgislib.imagemorphology.imageDilate(inputImage=inImg, outputImage=outImg, morphOperator="", useOpFile=False, opSize=5, gdalFormat='KEA', dataType=rsgislib.TYPE_32UINT)\n"
+"   import rsgislib\n"
+"   import rsgislib.imagemorphology\n"
+"   \n"
+"   inImg = 'clumpsImage.kea'\n"
+"   outImg = 'clumpsImage_Dilate.kea'\n"
+"   \n"
+"   rsgislib.imagemorphology.imageDilate(inputImage=inImg, outputImage=outImg, morphOperator="", useOpFile=False, opSize=5, gdalFormat='KEA', dataType=rsgislib.TYPE_32UINT)\n"
 "\n"},
     
 {"imageErode", (PyCFunction)ImageMorphology_ImageErode, METH_VARARGS | METH_KEYWORDS,

@@ -71,6 +71,12 @@ except ImportError as riosErr:
 class ClassInfoObj(object):
     """
     This is a class to store the information associated within the classification.
+    
+    * id - Output pixel value for this class
+    * fileH5 - hdf5 file (from rsgislib.imageutils.extractZoneImageBandValues2HDF) with the training data for the class
+    * red - Red colour for visualisation (0-255)
+    * green - Green colour for visualisation (0-255)
+    * blue - Blue colour for visualisation (0-255)
     """
     def __init__(self, id=None, fileH5=None, red=None, green=None, blue=None):
         """
@@ -88,12 +94,12 @@ class ClassInfoObj(object):
 
 def findClassifierParametersAndTrain(classTrainInfo, paramSearchSampNum=0, gridSearch=GridSearchCV(RandomForestClassifier(), {})):
     """
-    A function to find the optimal parameters for classification using a Grid Search (http://scikit-learn.org/stable/modules/grid_search.html). 
-    The returned classifier instance will be trained using the input data.
-    
-    * classTrainInfo - list of ClassInfoObj objects which will be used to train the classifier.
-    * paramSearchSampNum - the number of samples that will be randomly sampled from the training data for each class for applying the grid search (tend to use a small data sample as can take a long time). A value of 500 would use 500 samples per class.
-    * gridSearch - is an instance of the sklearn.model_selection.GridSearchCV with an instance of the choosen classifier and parameters to be searched.
+A function to find the optimal parameters for classification using a Grid Search (http://scikit-learn.org/stable/modules/grid_search.html). 
+The returned classifier instance will be trained using the input data.
+
+* classTrainInfo - list of ClassInfoObj objects which will be used to train the classifier.
+* paramSearchSampNum - the number of samples that will be randomly sampled from the training data for each class for applying the grid search (tend to use a small data sample as can take a long time). A value of 500 would use 500 samples per class.
+* gridSearch - is an instance of the sklearn.model_selection.GridSearchCV with an instance of the choosen classifier and parameters to be searched.
     """
     # Check h5py is available
     if not haveH5PY:
@@ -163,10 +169,10 @@ def findClassifierParametersAndTrain(classTrainInfo, paramSearchSampNum=0, gridS
 
 def trainClassifier(classTrainInfo, skClassifier):
     """
-    This function trains the classifier. 
-    
-    * classTrainInfo - list of ClassInfoObj objects which will be used to train the classifier.
-    * skClassifier - an instance of a parameterised scikit-learn classifier (http://scikit-learn.org/stable/supervised_learning.html)
+This function trains the classifier. 
+
+* classTrainInfo - list of ClassInfoObj objects which will be used to train the classifier.
+* skClassifier - an instance of a parameterised scikit-learn classifier (http://scikit-learn.org/stable/supervised_learning.html)
     """
      # Check h5py is available
     if not haveH5PY:
@@ -214,7 +220,7 @@ def trainClassifier(classTrainInfo, skClassifier):
 # RIOS function to apply classifer
 def _applySKClassifier(info, inputs, outputs, otherargs):
     """
-    Internal function for rios applier. Used within applyClassifer.
+Internal function for rios applier. Used within applyClassifer.
     """
     outClassVals = numpy.zeros_like(inputs.imageMask, dtype=numpy.uint32)
     if numpy.any(inputs.imageMask == otherargs.mskVal):
@@ -239,16 +245,17 @@ def _applySKClassifier(info, inputs, outputs, otherargs):
     
 def applyClassifer(classTrainInfo, skClassifier, imgMask, imgMaskVal, imgFileInfo, outputImg, gdalFormat, classClrNames=True):
     """
-    This function uses a trained classifier and applies it to the provided input image.
-    
-    * classTrainInfo - dict (where the key is the class name) of ClassInfoObj objects which will be used to train the classifier (i.e., trainClassifier()), provide pixel value id and RGB class values.
-    * skClassifier - a trained instance of a scikit-learn classifier (e.g., use trainClassifier or findClassifierParametersAndTrain)
-    * imgMask - is an image file providing a mask to specify where should be classified. Simplest mask is all the valid data regions (rsgislib.imageutils.genValidMask)
-    * imgMaskVal - the pixel value within the imgMask to limit the region to which the classification is applied. Can be used to create a heirachical classification.
-    * imgFileInfo - a list of rsgislib.imageutils.ImageBandInfo objects (also used within rsgislib.imageutils.extractZoneImageBandValues2HDF) to identify which images and bands are to be used for the classification so it adheres to the training data. 
-    * outputImg - output image file with the classification. Note. by default a colour table and class names column is added to the image. If an error is produced use HFA or KEA formats.
-    * gdalFormat - is the output image format - all GDAL supported formats are supported. 
-    * classClrNames - default is True and therefore a colour table will the colours specified in classTrainInfo and a ClassName column (from imgFileInfo) will be added to the output file.
+This function uses a trained classifier and applies it to the provided input image.
+
+* classTrainInfo - dict (where the key is the class name) of ClassInfoObj objects which will be used to train the classifier (i.e., trainClassifier()), provide pixel value id and RGB class values.
+* skClassifier - a trained instance of a scikit-learn classifier (e.g., use trainClassifier or findClassifierParametersAndTrain)
+* imgMask - is an image file providing a mask to specify where should be classified. Simplest mask is all the valid data regions (rsgislib.imageutils.genValidMask)
+* imgMaskVal - the pixel value within the imgMask to limit the region to which the classification is applied. Can be used to create a heirachical classification.
+* imgFileInfo - a list of rsgislib.imageutils.ImageBandInfo objects (also used within rsgislib.imageutils.extractZoneImageBandValues2HDF) to identify which images and bands are to be used for the classification so it adheres to the training data. 
+* outputImg - output image file with the classification. Note. by default a colour table and class names column is added to the image. If an error is produced use HFA or KEA formats.
+* gdalFormat - is the output image format - all GDAL supported formats are supported. 
+* classClrNames - default is True and therefore a colour table will the colours specified in classTrainInfo and a ClassName column (from imgFileInfo) will be added to the output file.
+
     """
     if not haveRIOS:
         raise Exception("The rios module is required for this function could not be imported\n\t" + riosErr)
@@ -302,25 +309,24 @@ def applyClassifer(classTrainInfo, skClassifier, imgMask, imgMaskVal, imgFileInf
     
 def performPerPxlMLClassShpTrain(imageBandInfo=[], classInfo=dict(), outputImg='classImg.kea', gdalFormat='KEA', tmpPath='./tmp', skClassifier=RandomForestClassifier(), gridSearch=None, paramSearchSampNum=100):
     """
-    A function which performs a per-pixel based classification of a scene using a machine learning classifier from the scikit-learn
-    library where a single polygon shapefile per class is required to represent the training data. 
-    
-    * imageBandInfo is a list of rsgislib.imageutils.ImageBandInfo objects specifying the images which should be used.
-    * classInfo is a dict of rsgislib.classification.classimgutils.ClassInfoObj objects where the key is the class name. The fileH5 field is used to define the file path to the shapefile with the training data.
-    * outputImg is the name and path to the output image file.
-    * gdalFormat is the output image file format (e.g., KEA). 
-    * tmpPath is a tempory file path which can be used during processing.
-    * skClassifier is an instance of a scikit-learn classifier appropriately parameterised. If None then the gridSearch object must not be None.
-    * gridSearch is an instance of a scikit-learn sklearn.model_selection.GridSearchCV object with the classifier and parameter search space specified. (If None then skClassifier will be used; if both not None then skClassifier will be used in preference to gridSearch)
-    
-    Example::
+A function which performs a per-pixel based classification of a scene using a machine learning classifier from the scikit-learn
+library where a single polygon shapefile per class is required to represent the training data. 
+
+* imageBandInfo is a list of rsgislib.imageutils.ImageBandInfo objects specifying the images which should be used.
+* classInfo is a dict of rsgislib.classification.classimgutils.ClassInfoObj objects where the key is the class name. The fileH5 field is used to define the file path to the shapefile with the training data.
+* outputImg is the name and path to the output image file.
+* gdalFormat is the output image file format (e.g., KEA). 
+* tmpPath is a tempory file path which can be used during processing.
+* skClassifier is an instance of a scikit-learn classifier appropriately parameterised. If None then the gridSearch object must not be None.
+* gridSearch is an instance of a scikit-learn sklearn.model_selection.GridSearchCV object with the classifier and parameter search space specified. (If None then skClassifier will be used; if both not None then skClassifier will be used in preference to gridSearch)
+
+Example::
     
     from rsgislib.classification import classimgutils
     from rsgislib import imageutils
 
     from sklearn.ensemble import ExtraTreesClassifier
     from sklearn.model_selection import GridSearchCV
-    
     
     imageBandInfo=[imageutils.ImageBandInfo('./LS2MSS_19750620_lat10lon6493_r67p250_rad_srefdem_30m.kea', 'Landsat', [1,2,3,4])]
     classInfo=dict()
@@ -331,7 +337,7 @@ def performPerPxlMLClassShpTrain(imageBandInfo=[], classInfo=dict(), outputImg='
     skClassifier=ExtraTreesClassifier(n_estimators=20)
     classimgutils.performPerPxlMLClassShpTrain(imageBandInfo, classInfo, outputImg='classImg.kea', gdalFormat='KEA', tmpPath='./tmp', skClassifier=skClassifier)
     
-    """
+"""
     if not haveH5PY:
         raise Exception("The h5py module is required for this function could not be imported\n\t" + h5pyErr)
     if not haveRIOS:
