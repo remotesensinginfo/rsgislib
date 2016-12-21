@@ -2602,7 +2602,6 @@ namespace rsgis{namespace rastergis{
     {
         try
         {
-            std::cout << "Find Image Min Max\n";
             RSGISCalcImgMinMax calcMinMac = RSGISCalcImgMinMax(minVal, maxVal, band-1);
             rsgis::img::RSGISCalcImage calcImageMinMax(&calcMinMac);
             calcImageMinMax.calcImage(&inImage, 1, 0);
