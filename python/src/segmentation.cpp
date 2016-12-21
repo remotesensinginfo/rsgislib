@@ -334,9 +334,7 @@ static PyObject *Segmentation_mergeClumpImages(PyObject *self, PyObject *args)
             return NULL;
         }
         inputImage = RSGISPY_STRING_EXTRACT(strObj);
-        inputImagePaths.push_back(inputImage);      
-        //Py_DECREF(strObj);
-    
+        inputImagePaths.push_back(inputImage);
     }    
     
     try
