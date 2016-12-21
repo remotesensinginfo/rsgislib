@@ -199,7 +199,9 @@ namespace rsgis{namespace segment{
                 
                 numRows = attTable->GetRowCount();
                 
-                attUtils.getImageBandMinMax(outputDataset, 1, &minVal, &maxVal);
+                maxVal = 0;
+                minVal = 0;
+                attUtils.getImageBandMinMax(inImage, 1, &minVal, &maxVal);
                 
                 if(maxVal > numRows)
                 {
