@@ -195,10 +195,6 @@ namespace rsgis { namespace img {
 				onePercentUpper = (stats[i]->max - stats[i]->mean)/50;
 				onePercentLower = (stats[i]->mean - stats[i]->min)/50;
 				
-				//std::cout << "Band " << i << " 1 % = " << onePercent << std::endl;
-				//std::cout << "Band " << i << " 1 % U = " << onePercentUpper << std::endl;
-				//std::cout << "Band " << i << " 1 % L = " << onePercentLower << std::endl;
-				
 				imageMin[i] = stats[i]->min + (onePercentLower * percent);
 				imageMax[i] = stats[i]->max - (onePercentUpper * percent);
 				outMax[i] = 255;

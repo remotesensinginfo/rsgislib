@@ -1009,10 +1009,6 @@ namespace rsgis{ namespace cmds {
                 trans[4] = yRot;
             }
 
-            //std::cout << "TL: [" << trans[0] << "," << trans[3] << "]" << std::endl;
-            //std::cout << "RES: [" << trans[1] << "," << trans[5] << "]" << std::endl;
-            //std::cout << "ROT: [" << trans[2] << "," << trans[4] << "]" << std::endl;
-
             inDataset->SetGeoTransform(trans);
 
             GDALClose(inDataset);

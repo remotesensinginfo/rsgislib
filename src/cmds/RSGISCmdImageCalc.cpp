@@ -2002,16 +2002,11 @@ namespace rsgis{ namespace cmds {
 
             rsgis::math::Matrix *bandPercentiles = calcPercentiles.getPercentilesForAllBands(imageDataset, percentile, noDataValue, noDataValueSpecified);
             
-            //std::cout << "m = " << bandPercentiles->m << std::endl;
-            //std::cout << "n = " << bandPercentiles->n << std::endl;
-            
             for(unsigned int i = 0; i < bandPercentiles->n; ++i)
             {
                 outVals.push_back(bandPercentiles->matrix[i]);
             }
             
-            //matrixUtils.printMatrix(bandPercentiles);
-            //matrixUtils.saveMatrix2GridTxt(bandPercentiles, outputFile);
             matrixUtils.freeMatrix(bandPercentiles);
 
             GDALClose(imageDataset);
@@ -2170,8 +2165,6 @@ namespace rsgis{ namespace cmds {
             }
             
             unsigned int numImageBands = dataset->GetRasterCount();
-            //std::cout << "Num Image Bands = " << numImageBands << std::endl;
-            //std::cout << "Image Band = " << imgBand << std::endl;
             if(imgBand > numImageBands)
             {
                 throw rsgis::RSGISException("Specified image band is not within the input image.");
@@ -2306,8 +2299,6 @@ namespace rsgis{ namespace cmds {
             }
             
             unsigned int numImageBands = dataset->GetRasterCount();
-            //std::cout << "Num Image Bands = " << numImageBands << std::endl;
-            //std::cout << "Image Band = " << imgBand << std::endl;
             if(imgBand > numImageBands)
             {
                 throw rsgis::RSGISException("Specified image band is not within the input image.");
@@ -2358,12 +2349,7 @@ namespace rsgis{ namespace cmds {
                 {
                     throw rsgis::RSGISException("Coordinate System Transformation failed (Max).");
                 }
-                /*
-                std::cout << "Min X: " << xMinLongCon << std::endl;
-                std::cout << "Max X: " << xMaxLongCon << std::endl;
-                std::cout << "Min Y: " << yMinLatCon << std::endl;
-                std::cout << "Max Y: " << yMaxLatCon << std::endl;
-                */
+                
                 if(xMinLongCon > xMaxLongCon)
                 {
                     minX = xMaxLongCon;
@@ -2386,12 +2372,7 @@ namespace rsgis{ namespace cmds {
                     maxY = yMaxLatCon;
                 }
             }
-            /*
-            std::cout << "Min X: " << minX << std::endl;
-            std::cout << "Max X: " << maxX << std::endl;
-            std::cout << "Min Y: " << minY << std::endl;
-            std::cout << "Max Y: " << maxY << std::endl;
-            */
+            
             double xRange = maxX - minX;
             double yRange = maxY - minY;
             
@@ -2408,11 +2389,8 @@ namespace rsgis{ namespace cmds {
             
             if((xPixRes > xRange) & (yPixRes > yRange))
             {
-                //std::cout << "Image is area less than pixel area\n";
                 double xCentre = minX + (xRange/2);
                 double yCentre = minY + (yRange/2);
-                
-                //std::cout << "Point: [" << xCentre << ", " << yCentre << "]\n";
                 
                 rsgis::img::RSGISImageUtils imageUtils;
                 outputModeVal = imageUtils.getPixelValue(dataset, imgBand, xCentre, yCentre);
@@ -2433,30 +2411,18 @@ namespace rsgis{ namespace cmds {
                 rsgis::img::RSGISImageStatistics calcImgStats;
                 calcImgStats.calcImageStatistics(&dataset, 1, imgStats, numImageBands, true, noDataValueSpecified, noDataVal, false, minX, maxX, minY, maxY);
                 
-                //std::cout << "imgStats[imgBand-1]->max = " << imgStats[imgBand-1]->max << std::endl;
-                //std::cout << "imgStats[imgBand-1]->min = " << imgStats[imgBand-1]->min << std::endl;
-                
                 float imgRange = imgStats[imgBand-1]->max - imgStats[imgBand-1]->min;
                 unsigned int numBins = ceil(imgRange / binWidth) + 1;
                 unsigned int *binCounts = new unsigned int[numBins];
                 float *binRanges = new float[numBins+1];
                 float minVal = (imgStats[imgBand-1]->min) - 0.5;
-                /*
-                std::cout << "imgRange = " << imgRange << std::endl;
-                std::cout << "binWidth = " << binWidth << std::endl;
-                std::cout << "ceil(imgRange / binWidth) = " << ceil(imgRange / binWidth) << std::endl;
-                std::cout << "numBins = " << numBins << std::endl;
-                std::cout << "minVal = " << minVal << std::endl;
-                */
                 
                 for(unsigned int i = 0; i < numBins; ++i)
                 {
                     binCounts[i] = 0;
                     binRanges[i] = minVal + (binWidth * i);
-                    //std::cout << "binRanges[" << i << "] = " << binRanges[i] << std::endl;
                 }
                 binRanges[numBins] = minVal + (binWidth * numBins);
-                //std::cout << "binRanges[" << numBins << "] = " << binRanges[numBins] << std::endl;
                 
                 calcImgStats.calcImageHistogram(&dataset, 1, imgBand, numBins, binRanges, binCounts, noDataValueSpecified, noDataVal, minX, maxX, minY, maxY);
                 
@@ -2565,9 +2531,6 @@ namespace rsgis{ namespace cmds {
             img1BandIdx = img1Band - 1;
             img2BandIdx = (numImg1RasterBands + img2Band) - 1;
             
-            //std::cout << "Image 1 Band Index (Band " << img1Band << ") = " << img1BandIdx << std::endl;
-            //std::cout << "Image 2 Band Index (Band " << img2Band << ") = " << img2BandIdx << std::endl;
-            
             double img1Range = (img1Off+(img1Max*img1Scale)) - (img1Off+(img1Min*img1Scale));
             double img2Range = (img1Off+(img2Max*img2Scale)) - (img1Off+(img2Min*img1Scale));
             
@@ -2593,11 +2556,9 @@ namespace rsgis{ namespace cmds {
                 else
                 {
                     img1Bins[i] = img1Bins[i-1] + (*binWidthImg1);
-                    //std::cout << "Image 1 Bin " << i << "[" << img1Bins[i-1] << ", " << img1Bins[i] << "]\n";
                 }
             }
             img1Bins[numBins] = img1Bins[numBins-1] + (*binWidthImg1);
-            //std::cout << "Image 1 Bin " << numBins << "[" << img1Bins[numBins-1] << ", " << img1Bins[numBins] << "]\n";
             
             double *img2Bins = new double[numBins+1];
             for(unsigned int i = 0; i < numBins; ++i)
@@ -2609,11 +2570,9 @@ namespace rsgis{ namespace cmds {
                 else
                 {
                     img2Bins[i] = img2Bins[i-1] + (*binWidthImg2);
-                    //std::cout << "Image 2 Bin " << i << "[" << img1Bins[i-1] << ", " << img1Bins[i] << "]\n";
                 }
             }
             img2Bins[numBins] = img2Bins[numBins-1] + (*binWidthImg2);
-            //std::cout << "Image 2 Bin " << numBins << "[" << img1Bins[numBins-1] << ", " << img1Bins[numBins] << "]\n";
             
             rsgis::img::RSGISGenHistogram genHist;
             genHist.gen2DHistogram(imgDatasets, 2, img1BandIdx, img2BandIdx, histgramMatrix, numBins, img1Bins, img2Bins, img1Scale, img2Scale, img1Off, img2Off, &rSq);
@@ -2664,7 +2623,6 @@ namespace rsgis{ namespace cmds {
             GDALRasterBand *outImgGDALBand = outImgDS->GetRasterBand(1);
             for(unsigned int i = 0; i < numBins; ++i)
             {
-                //histgramMatrix[(numBins-1)-i] - reverse y axis.
                 outImgGDALBand->RasterIO(GF_Write, 0, i, numBins, 1, histgramMatrix[i], numBins, 1, GDT_Float64, 0, 0);
             }
             

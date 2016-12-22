@@ -655,8 +655,6 @@ namespace rsgis {namespace radar
 					double density = gsl_vector_get(outPar, 1);
 					double error = gsl_vector_get(outPar, 2);
 
-					//std::cout << "Canopy depth = " << cDepth << std::endl;
-
 					// Set parameters to limits of equation
 					if(cDepth > 3)
 					{
@@ -680,11 +678,9 @@ namespace rsgis {namespace radar
 					/*double aCoeff = 0.724416488101816;
 					double bCoeff = -0.025097647604632307;
 					height =  (2 * ( exp(log(cDepth) / aCoeff) + bCoeff )) * 100;*/
-					//std::cout << "Canopy depth = " << cDepth << " Height = " << height << std::endl;
-					double tMass = allometric.calculateTotalBiomassHeight(height, species);
-					double biomass = ((tMass*(density*10000)))/1000000;
 
-					//std::cout << "canopy depth = " << cDepth << " height = " << height << std::endl;
+                    double tMass = allometric.calculateTotalBiomassHeight(height, species);
+					double biomass = ((tMass*(density*10000)))/1000000;
 
 					// Write out
 					output[0] = cDepth;
@@ -907,9 +903,6 @@ namespace rsgis {namespace radar
 
 			double sigmaHHTrunkGround = sigmaTrunkGround[0];
 			double sigmaHVTrunkGround = sigmaTrunkGround[1];
-
-
-			//std::cout << "Total HH = " << bandValues[1] << " Trunk-ground HH = " << sigmaHHTrunkGround << std::endl;
 
 			/************************
 			 * SET INPUT PARAMETERS *
@@ -1478,10 +1471,6 @@ namespace rsgis {namespace radar
 			double dCovInv2 = 1;
 			gsl_matrix_set(invCovMatrixD, 0, 0, dCovInv1); // Set diagonal elements of the matrix
 			gsl_matrix_set(invCovMatrixD, 1, 1, dCovInv2);
-
-			//std::cout << "Cov Matrix P = ";
-			//matrixUtils.printGSLMatrix(covMatrixP);
-
 			/***********************************/
 
 			if(bandValues[0] > this->nonForestThreshold) // Mask
@@ -2470,11 +2459,8 @@ namespace rsgis {namespace radar
 				}
 				if(parameters == heightDensity) // Retrieve stem diameter and density
 				{
-					//std::cout << "initial height = " << gsl_vector_get(initialPar, 0) << ", initial density = " << gsl_vector_get(initialPar, 1) << std::endl;
-					//std::cout << "Starting optimisation...";
 					estOptimiser->modifyAPriori(initialPar);
 					estOptimiser->minimise(inSigma0dB, initialPar, outPar);
-					//std::cout << "..finished optimisation" << std::endl;
 
 					double height = gsl_vector_get(outPar, 0);
 					double density = gsl_vector_get(outPar, 1);
@@ -2990,7 +2976,6 @@ namespace rsgis {namespace radar
 			{
 				output[0] = hhFunction->calcFunction(bandValues[0], bandValues[1]);
 				output[1] = hvFunction->calcFunction(bandValues[0], bandValues[1]);
-				//std::cout << "height = " << bandValues[0] << ", density = " << bandValues[1] << ". HH = " << output[0] << ", HV = " << output[1] << std::endl;
 			}
 			else
 			{

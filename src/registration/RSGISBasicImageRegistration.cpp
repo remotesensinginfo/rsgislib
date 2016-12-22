@@ -80,9 +80,7 @@ namespace rsgis{namespace reg{
 		double currentNorthings = startNorthings;
 		
 		TiePoint *tmpTiePt = NULL;
-		
-		//std::cout << "Start offset = [" << startXOff << "," << startYOff << "]" << std::endl;
-		
+				
 		for(unsigned int i = 0; i < numYPts; ++i)
 		{
 			currentEastings = startEastings;
@@ -146,11 +144,7 @@ namespace rsgis{namespace reg{
 				feedbackVal += 10;
 			}
 			
-			//std::cout << "Finding location of tie point " << counter << std::endl;
-            //std::cout << "Initial: " << (*iterTiePts)->xShift << "," << (*iterTiePts)->yShift << std::endl;
-			this->findTiePointLocation(*iterTiePts, windowSize, searchArea, metric, metricThreshold, subPixelResolution, &xShift, &yShift);
-            //std::cout << "Final: " << (*iterTiePts)->xShift << "," << (*iterTiePts)->yShift << std::endl;
-            
+			this->findTiePointLocation(*iterTiePts, windowSize, searchArea, metric, metricThreshold, subPixelResolution, &xShift, &yShift);            
 			++counter;
 		}
 		std::cout << ". Complete\n";

@@ -52,8 +52,6 @@ namespace rsgis
 	RSGISException::~RSGISException() throw()
 	{
 		// do nothing
-		//cout << "delete msgs: " << msgs << endl;
-		//delete[] msgs;
 	}
 
 }

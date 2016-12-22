@@ -131,12 +131,7 @@ namespace rsgis{namespace geom{
 				std::cout << ".." << feedbackCounter << ".." << std::flush;
 				feedbackCounter = feedbackCounter + 10;
 			}
-			//std::cout << "Adding " << i << std::endl;
-			//string filename = string("triangles_before_") + mathsUtils.inttostring(i);
-			//this->plotTriangulationAsEdges(filename);
 			this->addVertex(*iterData);
-			//filename = string("triangles_after_") + mathsUtils.inttostring(i);
-			//this->plotTriangulationAsEdges(filename);
 			++i;
 		}
 		std::cout << " Complete.\n";
@@ -402,7 +397,6 @@ namespace rsgis{namespace geom{
 				}
 				else
 				{
-					//std::cout << "finding location in list to add point\n";
 					angleBaseListPt = geomUtils.calcAngle(pt, tmpPt);
 					ptAdded = false;
 					for(iterPTS = pts->begin(); iterPTS != pts->end(); iterPTS++)

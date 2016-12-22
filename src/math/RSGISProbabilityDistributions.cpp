@@ -29,8 +29,6 @@ namespace rsgis { namespace math{
 		this->shape = shape;
 		this->scale = scale;
 		this->gammaShape = gsl_sf_gamma(shape);
-		//cout << "shape =" << shape << endl;
-		//cout << "Gamma Shape =" << gammaShape << endl;
 		this->invShpSclGammaShp = 1 / (pow(scale, shape));
 		
 	}

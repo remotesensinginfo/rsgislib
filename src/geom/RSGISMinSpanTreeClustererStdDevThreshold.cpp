@@ -341,9 +341,6 @@ namespace rsgis{namespace geom{
                         targetV = boost::target(*edgeIter, *cg);
                         sourceV = boost::source(*edgeIter, *cg);
                         
-                        //std::cout << "Target = " << targetV << std::endl;
-                        //std::cout << "Source = " << sourceV << std::endl;
-                        
                         lines->push_back(new geos::geom::LineSegment(data->at(sourceV)->getCoordPoint(), data->at(targetV)->getCoordPoint()));
                         weights->push_back(boost::get(weight, *edgeIter));
                     }

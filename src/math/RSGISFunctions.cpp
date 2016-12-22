@@ -236,9 +236,7 @@ namespace rsgis{namespace math{
 		double diffA = dataA - functionA->calcFunction(valueX, valueY);
 		double diffB = dataB - functionB->calcFunction(valueX, valueY);
 		double diffC = dataC - functionC->calcFunction(valueX, valueY);
-		
-		//std::cout << diffA << ", " << diffB << ", " << diffC << std::endl;
-		
+				
 		return pow(diffA, 2) + pow(diffB, 2) + pow(diffC, 2);
 	}
 	RSGISFunction2Var3DataLeastSquares::~RSGISFunction2Var3DataLeastSquares()
@@ -287,7 +285,6 @@ namespace rsgis{namespace math{
 		double diffD = vectorUtils.dotProductVectorVectorGSL(tempA, deltaD);
 		
 		// || X - Xap || ^2 
-		//std::cout << "\tdiffX1 = " << diffX1 << " diffX2 = " << diffX2 << std::endl;
 		double diffX = 0;
 		if (useAP) 
 		{
@@ -301,9 +298,6 @@ namespace rsgis{namespace math{
 			
 			diffX = vectorUtils.dotProductVectorVectorGSL(tempA, deltaX);
 		}
-		
-		//std::cout << "\tdiffD = " << diffD << std::endl;
-		//std::cout << "\tdiffX = " << diffX << std::endl;
 		
 		return (diffD + diffX) / 2;
 	}
@@ -722,7 +716,6 @@ namespace rsgis{namespace math{
 			}
 			xPow = pow(valueX, x); // dielectric^n;
 			aCoeffPowX = aCoeffPowX + (bcoeffPowY * xPow);
-			//std::cout << "HH - b_" << x << " = " << bcoeffPowY << std::endl;
 		}
 		outVal = aCoeffPowX;
         
@@ -780,7 +773,6 @@ namespace rsgis{namespace math{
 			aCoeffPowXdX = aCoeffPowXdX + (bcoeffPowY * dxPow);
 			aCoeffPowXdY = aCoeffPowXdY + (bcoeffPowYdY * xPow);
 			aCoeffPowXdZ = aCoeffPowXdZ + (bcoeffPowYdZ * xPow);
-			//std::cout << "HH - b_" << x << " = " << bcoeffPowY << std::endl;
 		}
 		outValdX = aCoeffPowXdX;
 		
@@ -838,7 +830,6 @@ namespace rsgis{namespace math{
 			aCoeffPowXdX = aCoeffPowXdX + (bcoeffPowY * dxPow);
 			aCoeffPowXdY = aCoeffPowXdY + (bcoeffPowYdY * xPow);
 			aCoeffPowXdZ = aCoeffPowXdZ + (bcoeffPowYdZ * xPow);
-			//std::cout << "HH - b_" << x << " = " << bcoeffPowY << std::endl;
 		}
 		outValdY = aCoeffPowXdY;
 		return outValdY;
@@ -895,7 +886,6 @@ namespace rsgis{namespace math{
 			aCoeffPowXdX = aCoeffPowXdX + (bcoeffPowY * dxPow);
 			aCoeffPowXdY = aCoeffPowXdY + (bcoeffPowYdY * xPow);
 			aCoeffPowXdZ = aCoeffPowXdZ + (bcoeffPowYdZ * xPow);
-			//std::cout << "HH - b_" << x << " = " << bcoeffPowY << std::endl;
 		}
 		outValdZ = aCoeffPowXdZ;
 		return outValdZ;
@@ -971,7 +961,6 @@ namespace rsgis{namespace math{
                 }
                 xPow = pow(values->at(0), x); // dielectric^n;
                 aCoeffPowX = aCoeffPowX + (bcoeffPowY * xPow);
-                //std::cout << "HH - b_" << x << " = " << bcoeffPowY << std::endl;
             }
             outVal = aCoeffPowX;
         }

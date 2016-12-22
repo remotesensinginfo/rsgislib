@@ -1226,7 +1226,6 @@ namespace rsgis{namespace math{
                 {
                     idx1 = static_cast<size_t>((data1->at(i)-minVal1)/binWidth1);
                     idx2 = static_cast<size_t>((data2->at(i)-minVal2)/binWidth2);
-                    //std::cout << "IDX = " << idx << std::endl;
                     hist->at(idx1)->at(idx2).freq = hist->at(idx1)->at(idx2).freq + 1;
                     ++validDataCount;
                 }

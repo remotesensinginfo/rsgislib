@@ -310,9 +310,7 @@ namespace rsgis{namespace math{
 		{
 			throw RSGISMatricesException("Multipication required the number of columns to match the number of rows.");
 		}
-		//std::cout << "Creating new matrix\n";
-		//std::cout << "matrix2->n = " << matrix2->n << std::endl;
-		//std::cout << "matrix1->m = " << matrix1->m << std::endl;
+        
 		Matrix *newMatrix = this->createMatrix(matrix2->n, matrix1->m);
 		
 		double value = 0;
@@ -328,8 +326,8 @@ namespace rsgis{namespace math{
 				{
 					row = (i * matrix1->n) + n;
 					col = (n * matrix2->n) + j;
-					//cout << "row = " << row << " col = " << col << std::endl;
-					value += matrix1->matrix[row] * matrix2->matrix[col];
+
+                    value += matrix1->matrix[row] * matrix2->matrix[col];
 				}
 				newMatrix->matrix[index] = value;
 				index++;
@@ -343,10 +341,7 @@ namespace rsgis{namespace math{
 	void RSGISMatrices::productMatrixVectorGSL(gsl_matrix *inMatrix, gsl_vector *inVector, gsl_vector *outVector) throw(RSGISMatricesException)
 	{
 		/// Calculates the product of a gsl_matrix and a gsl_vector, returns a gsl_vector
-		//std::cout << "calculating product.." << std::endl;
-		//this->printGSLMatrix(inMatrix);
-		//std::cout << "vec size = " <<inVector->size << std::endl;
-		//std::cout << "mat size = " << inMatrix->size2 << std::endl;
+        
 		if(inMatrix->size2 != inVector->size) // Check sizes
 		{
 			std::cout << "Input vector has less elements than number of matrix colums" << std::endl;
@@ -362,8 +357,8 @@ namespace rsgis{namespace math{
 				double velement = gsl_vector_get(inVector, j);
 				mvsum = mvsum + (melement * velement);
 			}
-			//std::cout << "mvsum = " << mvsum << std::endl; 
-			gsl_vector_set(outVector, i, mvsum);
+
+            gsl_vector_set(outVector, i, mvsum);
 		
 		}
 	}
@@ -1156,16 +1151,9 @@ namespace rsgis{namespace math{
                 {
                     matrix->matrix[index++] = 0.0;
                 }
-                /*
-                if(j != 0)
-                {
-                    std::cout << " ";
-                }
-                std::cout << "[" << xCoord << "," << yCoord << "]";
-                 */
                 ++xCoord;
             }
-            //std::cout << std::endl;
+
             --yCoord;
         }
     }

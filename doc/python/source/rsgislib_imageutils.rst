@@ -53,6 +53,8 @@ Extract
 --------
 
 .. autofunction:: rsgislib.imageutils.extractZoneImageValues2HDF
+.. autofunction:: rsgislib.imageutils.extractZoneImageBandValues2HDF
+.. autofunction:: rsgislib.imageutils.performRandomPxlSampleInMask
 
 
 Create

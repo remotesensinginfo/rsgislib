@@ -40,9 +40,7 @@ namespace rsgis{namespace vec{
 	
 	void RSGISClassificationPolygonReader::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
-		//cout << "FID: " << fid << endl;
 		// Set up the Species Polygon object and add to Delunay triangulation.
-		
 		
 		OGRwkbGeometryType geometryType = feature->GetGeometryRef()->getGeometryType();
 			
@@ -71,8 +69,8 @@ namespace rsgis{namespace vec{
 			
             rsgis::geom::RSGISGeometry geomUtils;
 			OGRMultiPolygon *mPolygon = (OGRMultiPolygon *) feature->GetGeometryRef();
-			//cout << polygon->exportToGML() << endl;
-			geos::geom::MultiPolygon *mGEOSPolygon = vecUtils->convertOGRMultiPolygonGEOSMultiPolygon(mPolygon);
+
+            geos::geom::MultiPolygon *mGEOSPolygon = vecUtils->convertOGRMultiPolygonGEOSMultiPolygon(mPolygon);
 			std::vector<geos::geom::Polygon*> *polys = new std::vector<geos::geom::Polygon*>();
 			geomUtils.retrievePolygons(mGEOSPolygon, polys);
 			std::vector<geos::geom::Polygon*>::iterator iterPolys = polys->begin();

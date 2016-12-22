@@ -179,7 +179,6 @@ namespace rsgis{namespace rastergis{
                                 if(exp->evaluate())
                                 {
                                     classColValsTmp[*iterNeigh] = classVal;
-                                    //std::cout << "Change Feat [" << *iterNeigh << "] = " << classColValsTmp[*iterNeigh] << std::endl;
                                     changeFound = true;
                                     ++numChangeFeats;
                                 }
@@ -197,9 +196,7 @@ namespace rsgis{namespace rastergis{
                 {
                     if(classColValsTmp[i] == classVal)
                     {
-                        //std::cout << i << ") " << classColVals[i] << " ---- " << classColValsTmp[i] << std::endl;
                         classColVals[i] = classColValsTmp[i];
-                        //std::cout << "CHANGED - " << ++changeCountTmp << std::endl;
                     }
                     classColValsTmp[i] = "";
                 }
@@ -403,9 +400,6 @@ namespace rsgis{namespace rastergis{
                         feedbackCounter = feedbackCounter + 10;
                     }
                     
-                    //std::cout << "Processing row " << i << std::endl;
-                    //std::cout << "Class Value = " << classVal << " Row class = " << classColVals[i] << std::endl;
-                    
                     if(classColVals[i] == classVal)
                     {
                         // Check the neighbours...
@@ -417,13 +411,10 @@ namespace rsgis{namespace rastergis{
                                 // ALSO NEEDS TO MEET THE SECOND CRITERIA COMPARING CURRENT OBJECT TO NEIGHBOUR...
                                 for(std::vector<rsgis::rastergis::RSGISColumnLogicIdxs*>::iterator iterColIdx = colIdxesNeighExp->begin(); iterColIdx != colIdxesNeighExp->end(); ++iterColIdx)
                                 {
-                                    //std::cout << "Feature: " << (*iterColIdx)->column1Name << std::endl;
                                     if(((*iterColIdx)->singleCol) & (!(*iterColIdx)->thresholdVal))
                                     {
                                         (*iterColIdx)->col1Val = ratCols->at((*iterColIdx)->col1Idx)[*iterNeigh];
                                         (*iterColIdx)->col2Val = ratCols->at((*iterColIdx)->col1Idx)[i];
-                                        //std::cout << "\tCurrent Obj Val (" << i << ") = " << (*iterColIdx)->col1Val << std::endl;
-                                        //std::cout << "\tNeighbour Obj Val (" << *iterNeigh << ") = " << (*iterColIdx)->col2Val << std::endl;
                                     }
                                     else
                                     {
@@ -433,7 +424,6 @@ namespace rsgis{namespace rastergis{
                                 
                                 if(expNeigh->evaluate())
                                 {
-                                    //std::cout << "FOUND NEIGHBOUR TO EVALUATE\n";
                                     // Check if condition is met, if met then 'grow' and set change flag...
                                     for(std::vector<rsgis::rastergis::RSGISColumnLogicIdxs*>::iterator iterColIdx = colIdxesCritExp->begin(); iterColIdx != colIdxesCritExp->end(); ++iterColIdx)
                                     {
@@ -451,7 +441,6 @@ namespace rsgis{namespace rastergis{
                                     if(expCrit->evaluate())
                                     {
                                         classColValsTmp[*iterNeigh] = classVal;
-                                        //std::cout << "Change Feat [" << *iterNeigh << "] = " << classColValsTmp[*iterNeigh] << std::endl;
                                         changeFound = true;
                                         ++numChangeFeats;
                                     }
@@ -470,9 +459,7 @@ namespace rsgis{namespace rastergis{
                 {
                     if(classColValsTmp[i] == classVal)
                     {
-                        //std::cout << i << ") " << classColVals[i] << " ---- " << classColValsTmp[i] << std::endl;
                         classColVals[i] = classColValsTmp[i];
-                        //std::cout << "CHANGED - " << ++changeCountTmp << std::endl;
                     }
                     classColValsTmp[i] = "";
                 }

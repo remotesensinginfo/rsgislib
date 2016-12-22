@@ -124,15 +124,11 @@ namespace rsgis{namespace img{
                         }
                     }
                     
-                    //std::cout << "x = " << x << std::endl;
-                    //int numBands, float *dataCol, float **rowAbove, float **rowBelow, float *left, float *right
                     if(this->calc->calcValue(true, numBands, dataColumn, rowAbove, rowBelow, leftPxl, rightPxl))
                     {
-                        //std::cout << "CHANGE!!\n";
                         change = true;
                         ++numChanges;
                     }
-                    //std::cout << std::endl;
                     
                     for(unsigned int n = 0; n < numBands; ++n)
                     {

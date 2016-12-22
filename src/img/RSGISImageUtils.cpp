@@ -40,7 +40,6 @@ namespace rsgis{namespace img{
 			datasets[i]->GetGeoTransform(transformations[i]);
 			xSize[i] = datasets[i]->GetRasterXSize();
 			ySize[i] = datasets[i]->GetRasterYSize();
-			//std::cout << "TL [" << transformations[i][0] << "," << transformations[i][3] << "]\n";
 		}
 		double rotateX = 0;
 		double rotateY = 0;
@@ -299,7 +298,6 @@ namespace rsgis{namespace img{
 			datasets->at(i)->GetGeoTransform(transformations[i]);
 			xSize[i] = datasets->at(i)->GetRasterXSize();
 			ySize[i] = datasets->at(i)->GetRasterYSize();
-			//std::cout << "TL [" << transformations[i][0] << "," << transformations[i][3] << "]\n";
 		}
 		double rotateX = 0;
 		double rotateY = 0;
@@ -1213,38 +1211,22 @@ namespace rsgis{namespace img{
 			
 			if(minX > env->getMinX())
 			{
-				//std::cout.precision(10);
-				//std::cout << "Envelope does not fit within the image overlap (MinX)" << std::endl;
 				process = false;
-				//std::cout << "Image Min X = " << minX << " Envelope Min X = " << env->getMinX() << std::endl;
-				//throw RSGISImageBandException("Envelope does not fit within the image overlap (MinX)");
 			}
 			
 			if(minY > env->getMinY())
 			{
-				//std::cout.precision(10);
-				//std::cout << "Envelope does not fit within the image overlap (MinY)" << std::endl;
 				process = false;
-				//std::cout << "Image Min Y = " << minY << " Envelope Min Y = " << env->getMinY() << std::endl;
-				//throw RSGISImageBandException("Envelope does not fit within the image overlap (MinY)");
 			}
 			
 			if(maxX < env->getMaxX())
 			{
-				//std::cout.precision(10);
-				//std::cout << "Envelope does not fit within the image overlap (MaxX)" << std::endl;
 				process = false;
-				//std::cout << "Image Max X = " << maxX << " Envelope Max X = " << env->getMaxX() << std::endl;
-				//throw RSGISImageBandException("Envelope does not fit within the image overlap (MaxX)");
 			}
 			
 			if(maxY < env->getMaxY())
 			{
-				//std::cout.precision(10);
-				//std::cout << "Envelope does not fit within the image overlap (MaxY)" << std::endl;
 				process = false;
-				//std::cout << "Image Max Y = " << maxY << " Envelope Max Y = " << env->getMaxY() << std::endl;
-				//throw RSGISImageBandException("Envelope does not fit within the image overlap (MaxY)");
 			}
 			
 			if(process)
@@ -1826,8 +1808,6 @@ namespace rsgis{namespace img{
 					
 					if(std::string(datasets[i]->GetProjectionRef()) != std::string(proj))
 					{
-						//std::cout << "Band 1 Projection = " << proj << std::endl;
-						//std::cout << "Band " << i <<  " Projection = " << datasets[i]->GetProjectionRef()<< std::endl;
 						throw RSGISImageBandException("Not all image bands have the same projection..");
 					}
 					
@@ -4067,12 +4047,6 @@ namespace rsgis{namespace img{
 	
 	float** RSGISImageUtils::getImageDataBlock(GDALDataset *dataset, int *dsOffsets, unsigned int width, unsigned int height, unsigned int *numVals)
 	{
-		//std::cout << "Reading data block\n";
-		
-		//std::cout << "width = " << width << std::endl;
-		//std::cout << "height = " << height << std::endl;
-		//std::cout << "Offset = [" << dsOffsets[0] << "," << dsOffsets[1] << "]\n";
-		
 		unsigned int numImageBands = dataset->GetRasterCount();
 		*numVals = width*height;
 		
@@ -4110,9 +4084,7 @@ namespace rsgis{namespace img{
 		}
 		delete[] imgData;
 		delete[]rasterBands;
-		
-		//std::cout << "Read data block\n";
-		
+				
 		return outVals;
 	}
     
@@ -5105,44 +5077,24 @@ namespace rsgis{namespace img{
                 throw RSGISImageException("Extent needs to be within the image extent.");
             }
             
-            //std::cout << "IMG: [" << imgMinX << ", " << imgMaxX << "][" << imgMinY << ", " << imgMaxY << "]\n";
-            //std::cout << "VEC: [" << extent.getMinX() << ", " << extent.getMaxX() << "][" << extent.getMinY() << ", " << extent.getMaxY() << "]\n";
-            
             // Find Min X
             double xMinDiff = extent.getMinX() - imgMinX;
             unsigned int numPxls2ExtXMin = floor(xMinDiff/xPxlSize);
             outImgMinX = imgMinX + (numPxls2ExtXMin * xPxlSize);
-            
-            //std::cout << "outImgMinX = " << outImgMinX << std::endl;
             
             // Find Max Y
             double yMaxDiff = imgMaxY - extent.getMaxY();
             unsigned int numPxls2ExtYMax = floor(yMaxDiff/yPxlSize);
             outImgMaxY = imgMaxY - (numPxls2ExtYMax * yPxlSize);
             
-            //std::cout << "outImgMaxY = " << outImgMaxY << std::endl;
-            
             // Find Max X and width
             double xMaxDiff = extent.getMaxX() - outImgMinX;
             outImgWidth = ceil(xMaxDiff/xPxlSize);
-            //outImgMaxX = outImgMinX + (outImgWidth * xPxlSize);
-            
-            //std::cout << "outImgMaxX = " << outImgMaxX << std::endl;
-            //std::cout << "outImgWidth = " << outImgWidth << std::endl;
             
             // Find Min Y and height
             double yMinDiff = outImgMaxY - extent.getMinY();
             outImgHeight = ceil(yMinDiff/yPxlSize);
-            //outImgMinY = outImgMaxY - (outImgHeight * yPxlSize);
             
-            //std::cout << "outImgMaxX = " << outImgMaxX << std::endl;
-            //std::cout << "outImgWidth = " << outImgWidth << std::endl;
-            
-            //std::cout << "outImgMinY = " << outImgMinY << std::endl;
-            //std::cout << "outImgHeight = " << outImgHeight << std::endl;
-            
-            //std::cout << "OUT: [" << outImgMinX << ", " << outImgMaxX << "][" << outImgMinY << ", " << outImgMaxY << "]\n";
-            //std::cout << "IMG DIMS [" << outImgWidth << ", " << outImgHeight << "]\n";
             gdalTranslation[0] = outImgMinX;
             gdalTranslation[3] = outImgMaxY;
             

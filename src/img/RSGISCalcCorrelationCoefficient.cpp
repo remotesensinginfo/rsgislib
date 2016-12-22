@@ -72,27 +72,14 @@ namespace rsgis{namespace img{
 	
 	double* RSGISCalcCC::getOutputValues()  throw(RSGISImageCalcException)
 	{
-		/*std::cout << "n = " << n << std::endl;
-		std::cout << "a = " << a << std::endl;
-		std::cout << "b = " << b << std::endl;
-		std::cout << "ab = " << ab << std::endl;
-		std::cout << "aSQ = " << aSQ << std::endl;
-		std::cout << "bSQ = " << bSQ << std::endl;
-		*/
 		double partA = n * ab;
 		double partB = a * b;
 		double topline = partA - partB;
-		
-		//std::cout << "topline = " << topline << std::endl;
-		
+				
 		double partC = (n * aSQ) - (a * a);
 		double partD = (n * bSQ) - (b * b);
 		double bottomline = sqrt(partC * partD);
-		
-		//std::cout << "bottomline = " << bottomline << std::endl;
-		
-		//std::cout << "CC = " << topline/bottomline << std::endl;
-		
+        
 		this->outputValues[0] = topline/bottomline;
 		return this->outputValues;
 	}

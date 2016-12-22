@@ -89,7 +89,6 @@ namespace rsgis
                 // Loop images to process data
                 for(int i = 0; i < height; i++)
                 {
-                    //std::cout << i << " of " << height << std::endl;
                     if((i % feedback) == 0)
                     {
                         std::cout << ".." << feedbackCounter << ".." << std::flush;
@@ -271,8 +270,6 @@ namespace rsgis
                 // Loop images to process data
                 for(int i = 0; i < nYBlocks; i++)
                 {
-                    //std::cout << i << " of " << nYBlocks << std::endl;
-                    
                     for(int n = 0; n < numBands; n++)
                     {
                         rowOffset = (yBlockSize * i);
@@ -515,9 +512,6 @@ namespace rsgis
                 }
                 int windowMid = floor(((float)windowSize)/2.0); // Starting at 0!! NOT 1 otherwise would be ceil.
                 
-                //std::cout << "Window Size: " << windowSize << std::endl;
-                //std::cout << "Window Mid: " << windowMid << std::endl;
-                
                 numBands = dataset->GetRasterCount();
                 width = dataset->GetRasterXSize();
                 height = dataset->GetRasterYSize();
@@ -531,16 +525,11 @@ namespace rsgis
                 
                 rasterBands[0]->GetBlockSize (&xBlockSize, &yBlockSize);
                 
-                //std::cout << "Max. block size: " << yBlockSize << std::endl;
-                
                 int numOfLines = yBlockSize;
                 if(yBlockSize < windowSize)
                 {
                     numOfLines = ceil(((float)windowSize)/((float)yBlockSize))*yBlockSize;
                 }
-                //std::cout << "Number of Lines: " << numOfLines << std::endl;
-                
-                //std::cout << "numInBands = " << numInBands << std::endl;
                 
                 // Allocate memory
                 numPxlsInBlock = width*numOfLines;
@@ -592,11 +581,8 @@ namespace rsgis
                 outDataColumn = new double[numBands];
                 
                 
-                //std::cout << "height: " << height << std::endl;
                 int nYBlocks = floor(((double)height) / ((double)numOfLines));
-                //std::cout << "nYBlocks: " << nYBlocks << std::endl;
                 int remainRows = height - (nYBlocks * numOfLines);
-                //std::cout << "remainRows: " << remainRows << std::endl;
                 int rowOffset = 0;
                 unsigned int line = 0;
                 long cLinePxl = 0;
@@ -613,7 +599,6 @@ namespace rsgis
                 {
                     for(int i = 0; i < nYBlocks; i++)
                     {
-                        //std::cout << "i: " << i << std::endl;
                         if(i == 0)
                         {
                             // Set Upper Block with Zeros.
@@ -629,11 +614,6 @@ namespace rsgis
                             for(int n = 0; n < numBands; n++)
                             {
                                 rowOffset = (numOfLines * i);
-                                //std::cout << "rowOffset: " << rowOffset << std::endl;
-                                //std::cout << "bandOffsets["<<n<<"][0]: " << bandOffsets[n][0] << std::endl;
-                                //std::cout << "width: " << width << std::endl;
-                                //std::cout << "numOfLines: " << numOfLines << std::endl;
-                                
                                 rasterBands[n]->RasterIO(GF_Read, 0, rowOffset, width, numOfLines, inputDataMain[n], width, numOfLines, GDT_Float32, 0, 0);
                             }
                             // Read Lower Block
@@ -644,10 +624,6 @@ namespace rsgis
                                     if(remainRows > 0)
                                     {
                                         rowOffset = (numOfLines * (i+1));
-                                        //std::cout << "rowOffset: " << rowOffset << std::endl;
-                                        //std::cout << "bandOffsets["<<n<<"][0]: " << bandOffsets[n][0] << std::endl;
-                                        //std::cout << "width: " << width << std::endl;
-                                        //std::cout << "remainRows = " << remainRows << std::endl;
                                         rasterBands[n]->RasterIO(GF_Read, 0, rowOffset, width, remainRows, inputDataLower[n], width, remainRows, GDT_Float32, 0, 0);
                                         for(int k = (remainRows*width); k < numPxlsInBlock; k++)
                                         {
@@ -665,10 +641,6 @@ namespace rsgis
                                 else
                                 {
                                     rowOffset = (numOfLines * (i+1));
-                                    //std::cout << "rowOffset: " << rowOffset << std::endl;
-                                    //std::cout << "bandOffsets["<<n<<"][0]: " << bandOffsets[n][0] << std::endl;
-                                    //std::cout << "width: " << width << std::endl;
-                                    //std::cout << "remainRows = " << remainRows << std::endl;
                                     rasterBands[n]->RasterIO(GF_Read, 0, rowOffset, width, numOfLines, inputDataLower[n], width, numOfLines, GDT_Float32, 0, 0);
                                 }
                             }
@@ -739,11 +711,6 @@ namespace rsgis
                             for(int n = 0; n < numBands; n++)
                             {
                                 rowOffset = (numOfLines * (i+1));
-                                //std::cout << "rowOffset: " << rowOffset << std::endl;
-                                //std::cout << "bandOffsets["<<n<<"][0]: " << bandOffsets[n][0] << std::endl;
-                                //std::cout << "width: " << width << std::endl;
-                                //std::cout << "numOfLines: " << numOfLines << std::endl;
-                                
                                 rasterBands[n]->RasterIO(GF_Read, 0, rowOffset, width, numOfLines, inputDataLower[n], width, numOfLines, GDT_Float32, 0, 0);
                             }
                         }
@@ -751,7 +718,6 @@ namespace rsgis
                         for(int m = 0; m < numOfLines; ++m)
                         {
                             line = (i*numOfLines)+m;
-                            //std::cout << "line = " << line << std::endl;
                             if((feedback != 0) && (line % feedback) == 0)
                             {
                                 std::cout << "." << feedbackCounter << "." << std::flush;
@@ -759,19 +725,16 @@ namespace rsgis
                             }
                             
                             cLinePxl = m*width;
-                            //std::cout << "cLine: " << cLinePxl << std::endl;
                             
                             for(int j = 0; j < width; j++)
                             {
                                 cPxl = cLinePxl+j;
                                 if(m < windowMid)
                                 {
-                                    //std::cout << "Need Upper\n";
                                     for(int y = 0; y < windowSize; y++)
                                     {
                                         dWinY = y-windowMid;
                                         dLinePxls = dWinY * width;
-                                        //std::cout << y << " Y  = " << dLinePxls << " Width = " << width << " (cPxl + dLinePxls) = " << (cPxl + dLinePxls) << " numPxlsInBlock = " << numPxlsInBlock << " (numPxlsInBlock+(cPxl+dLinePxls)) = " << (numPxlsInBlock+(cPxl+dLinePxls)) << std::endl;
                                         
                                         if((cPxl + dLinePxls) < 0)
                                         {
@@ -835,12 +798,10 @@ namespace rsgis
                                 }
                                 else if(m > ((numOfLines-1)-windowMid))
                                 {
-                                    //std::cout << "Need Lower\n";
                                     for(int y = 0; y < windowSize; y++)
                                     {
                                         dWinY = y-windowMid;
                                         dLinePxls = dWinY * width;
-                                        //std::cout << "j = " << j << " y = " << y << ": " << dLinePxls << " Width = " << width << " (cPxl + dLinePxls) = " << (cPxl + dLinePxls) << " numPxlsInBlock = " << numPxlsInBlock << " ((cPxl+dLinePxls)-numPxlsInBlock) = " << ((cPxl+dLinePxls)-numPxlsInBlock) << std::endl;
                                         
                                         if((cPxl + dLinePxls) >= numPxlsInBlock)
                                         {
@@ -904,13 +865,10 @@ namespace rsgis
                                 }
                                 else
                                 {
-                                    //std::cout << "Within block\n";
-                                    
                                     for(int y = 0; y < windowSize; y++)
                                     {
                                         dWinY = y-windowMid;
                                         dLinePxls = dWinY * width;
-                                        //std::cout << y << " Y  = " << dLinePxls << " Width = " << width << std::endl;
                                         
                                         for(int x = 0; x < windowSize; x++)
                                         {
@@ -989,7 +947,7 @@ namespace rsgis
                         for(int m = 0; m < remainRows; ++m)
                         {
                             line = (nYBlocks*numOfLines)+m;
-                            //std::cout << "line = " << line << std::endl;
+
                             if((feedback != 0) && (line % feedback) == 0)
                             {
                                 std::cout << "." << feedbackCounter << "." << std::flush;
@@ -997,19 +955,16 @@ namespace rsgis
                             }
                             
                             cLinePxl = m*width;
-                            //std::cout << "cLine: " << cLinePxl << std::endl;
                             
                             for(int j = 0; j < width; j++)
                             {
                                 cPxl = cLinePxl+j;
                                 if(m < windowMid)
                                 {
-                                    //std::cout << "Need Upper\n";
                                     for(int y = 0; y < windowSize; y++)
                                     {
                                         dWinY = y-windowMid;
                                         dLinePxls = dWinY * width;
-                                        //std::cout << y << " Y  = " << dLinePxls << " Width = " << width << " (cPxl + dLinePxls) = " << (cPxl + dLinePxls) << " numPxlsInBlock = " << numPxlsInBlock << " (numPxlsInBlock+(cPxl+dLinePxls)) = " << (numPxlsInBlock+(cPxl+dLinePxls)) << std::endl;
                                         
                                         if((cPxl + dLinePxls) < 0)
                                         {
@@ -1073,12 +1028,10 @@ namespace rsgis
                                 }
                                 else if(m > ((numOfLines-1)-windowMid))
                                 {
-                                    //std::cout << "Need Lower\n";
                                     for(int y = 0; y < windowSize; y++)
                                     {
                                         dWinY = y-windowMid;
                                         dLinePxls = dWinY * width;
-                                        //std::cout << "j = " << j << " y = " << y << ": " << dLinePxls << " Width = " << width << " (cPxl + dLinePxls) = " << (cPxl + dLinePxls) << " numPxlsInBlock = " << numPxlsInBlock << " ((cPxl+dLinePxls)-numPxlsInBlock) = " << ((cPxl+dLinePxls)-numPxlsInBlock) << std::endl;
                                         
                                         if((cPxl + dLinePxls) >= numPxlsInBlock)
                                         {
@@ -1142,13 +1095,10 @@ namespace rsgis
                                 }
                                 else
                                 {
-                                    //std::cout << "Within block\n";
-                                    
                                     for(int y = 0; y < windowSize; y++)
                                     {
                                         dWinY = y-windowMid;
                                         dLinePxls = dWinY * width;
-                                        //std::cout << y << " Y  = " << dLinePxls << " Width = " << width << std::endl;
                                         
                                         for(int x = 0; x < windowSize; x++)
                                         {

@@ -57,26 +57,10 @@ namespace rsgis{namespace vec{
 			
 			std::cout << "There are " << numFeatures << " to process\n";
 			
-			//unsigned long feedback = numFeatures/10;
-			//unsigned long feedbackCounter = 0;
-			//unsigned long i = 0;
-			//std::cout << "Started" << std::flush;
-			
 			input->ResetReading();
 			while( (inFeature = input->GetNextFeature()) != NULL )
 			{
-				// Feedback counter (prints progress to screen)
-				/*if((numFeatures >= 10) && ((i % feedback) == 0))
-				{
-					std::cout << ".." << feedbackCounter << ".." << std::flush;
-					feedbackCounter = feedbackCounter + 10;
-				}
-				++i;
-				*/
-				
 				fid = inFeature->GetFID();
-				
-				//std::cout << "FID = " << fid << std::endl;
 				
 				// Get Geometry.
 				polyOK = false;

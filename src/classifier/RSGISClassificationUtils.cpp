@@ -81,8 +81,8 @@ namespace rsgis{ namespace classifier{
 			
 			// Get the Root element
 			rootClassificationElement = doc->getDocumentElement();
-			//std::cout << "Root Element: " << XMLString::transcode(rootClassificationElement->getTagName()) << std::endl;
-			if(!xercesc::XMLString::equals(rootClassificationElement->getTagName(), xercesc::XMLString::transcode("classification")))
+
+            if(!xercesc::XMLString::equals(rootClassificationElement->getTagName(), xercesc::XMLString::transcode("classification")))
 			{
 				throw RSGISClassificationException("Incorrect root element; Root element should be \"classification\"");
 			}
@@ -96,7 +96,6 @@ namespace rsgis{ namespace classifier{
 			
 			classNodesList = classesElement->getElementsByTagName(xercesc::XMLString::transcode("class"));
 			*numClasses = classNodesList->getLength();
-			//std::cout << "There are " << *numClasses << "class nodes." << std::endl;
 			
 			classData = new ClassData*[*numClasses];
 			for(int i = 0; i < *numClasses; i++)
@@ -104,14 +103,14 @@ namespace rsgis{ namespace classifier{
 				classData[i] = new ClassData();
 				classElement = static_cast<xercesc::DOMElement*>(classNodesList->item(i));
 				className = classElement->getAttribute(xercesc::XMLString::transcode("name"));
-				//std::cout << "Found class with name " << XMLString::transcode(className) << std::endl;
-				classData[i]->className = std::string(xercesc::XMLString::transcode(className));
+
+                classData[i]->className = std::string(xercesc::XMLString::transcode(className));
 				classID = classElement->getAttribute(xercesc::XMLString::transcode("id"));
-				//std::cout << "Found class with id " << XMLString::transcode(classID) << std::endl;
-				classData[i]->classID = mathsUtils.strtoint(xercesc::XMLString::transcode(classID));
+
+                classData[i]->classID = mathsUtils.strtoint(xercesc::XMLString::transcode(classID));
 				classMatrix = classElement->getAttribute(xercesc::XMLString::transcode("matrix"));
-				//std::cout << "Found class with matrix " << XMLString::transcode(classMatrix) << std::endl;
-				classData[i]->data = matrixUtils.readMatrixFromTxt(std::string((xercesc::XMLString::transcode(classMatrix))));
+
+                classData[i]->data = matrixUtils.readMatrixFromTxt(std::string((xercesc::XMLString::transcode(classMatrix))));
 			}
 				
 			parser->release();

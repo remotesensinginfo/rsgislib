@@ -122,7 +122,6 @@ namespace rsgis{namespace vec{
 				double varSum = 0;
 				for (int j = 0; j < numOffsets; j++) // Loop through averages at each polygon offset
 				{
-					//std::cout << "Centre average = " << averages[i] << " surrounding averge = " << offsetAverages[j][i] << std::endl;
 					varSum = varSum + pow(offsetAverages[j][i] - tempAverage[i],2); // (xi - x')^2
 				}
 				outputVar[i] = varSum / numOffsets;

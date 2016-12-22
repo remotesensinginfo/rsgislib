@@ -1064,7 +1064,6 @@ namespace rsgis{namespace rastergis{
             int maxCatSec = 0;
             for(size_t i = 0; i < numRows; ++i)
             {
-                ///std::cout << i << ":\t[";
                 for(unsigned int j = 0; j < modeRange; ++j)
                 {
                     if(j == 0)
@@ -1092,21 +1091,7 @@ namespace rsgis{namespace rastergis{
                         maxCountSec = clumpHists[i][j];
                         maxCatSec = modeBinVals[j];
                     }
-                    
-                    /*
-                    if(j == 0)
-                    {
-                        std::cout << clumpHists[i][j];
-                    }
-                    else
-                    {
-                        std::cout << ", " << clumpHists[i][j];
-                    }
-                    */
                 }
-                //std::cout << "] " << std::endl;
-                //std::cout << "maxCat " << maxCat << std::endl;
-                //std::cout << "maxCatSec " << maxCatSec << std::endl;
                 
                 if(!useNoDataVal)
                 {
@@ -1134,7 +1119,6 @@ namespace rsgis{namespace rastergis{
                 {
                     outVal[i] = maxCat;
                 }
-                //std::cout << "OutVal " << outVal[i] << "\n";
             }
             
             
@@ -1219,7 +1203,6 @@ namespace rsgis{namespace rastergis{
                 {
                     outVal[i] = 0.0;
                 }
-                //std::cout << i << ": " << outVal[i] << std::endl;
             }
             
             std::cout << "Writing Stats to RAT\n";
@@ -1667,15 +1650,12 @@ namespace rsgis{namespace rastergis{
             }
             else
             {
-                //std::cout << "FID = " << fid << std::endl;
                 bool found = false;
                 for(unsigned int i = 0; i < numBins; ++i)
                 {
-                    //std::cout << "\t[" << imgVal << " =? " << modeBinVals[i] << "]\n";
                     if(imgVal == modeBinVals[i])
                     {
                         ++clumpHists[fid][i];
-                        //std::cout << "FOUND\t Count = " << clumpHists[fid][i] << std::endl;
                         found = true;
                         break;
                     }

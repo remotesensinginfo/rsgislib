@@ -90,7 +90,6 @@ namespace rsgis{namespace vec{
 		else if( geometryType == wkbPoint )
 		{
 			OGRPoint *point = (OGRPoint *) inFeature->GetGeometryRef();
-			//std::cout << "Point: " << point->exportToGML() << std::endl;
 			xCentre = point->getX();
 			yCentre = point->getY();
 		}	
@@ -167,7 +166,6 @@ namespace rsgis{namespace vec{
 		try 
 		{
 			geos::geom::Polygon *geosPolygon = geomUtils->createCircle(xCentre, yCentre, radiusValue, this->resolution);
-			//std::cout << "Circle: " << geosPolygon->toText() << std::endl;
 			OGRPolygon *ogrPolygon = vecUtils->convertGEOSPolygon2OGRPolygon(geosPolygon);
 			outFeature->SetGeometry(ogrPolygon);
 		}

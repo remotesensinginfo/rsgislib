@@ -92,8 +92,8 @@ namespace rsgis
 				{
 					tmpStr = tmpStr.substr(1);
 				}
-				//cout << "Adding tmpStr '" << tmpStr << "' tmpStr has a size " << tmpStr.size() << endl;
-				arguments[argNum-1]->value[valNum++] = tmpStr;
+
+                arguments[argNum-1]->value[valNum++] = tmpStr;
 			}
 		}
 	}

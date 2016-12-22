@@ -114,7 +114,6 @@ namespace rsgis{namespace utils{
 		}
 		else
 		{
-			//std::cout << "ROI file open\n";
 			std::string strLine;
 			std::string word;
 			int lineCounter = 0;
@@ -132,14 +131,11 @@ namespace rsgis{namespace utils{
 				if(textUtils.lineStart(strLine, ';'))
 				{
 					// Header
-					//std::cout << lineCounter << ") " << strLine << std::endl;
-					
 					if(lineCounter == 0)
 					{
 						textUtils.tokenizeString(strLine, ' ', tokens, true);
 						for(unsigned int i = 0; i < tokens->size(); i++)
 						{
-							//std::cout << i << ") " << tokens->at(i) << std::endl;
 							if(tokens->at(1) == std::string("ENVI") &
 							   tokens->at(2) == std::string("Output") &
 							   tokens->at(3) == std::string("of") &
@@ -158,7 +154,6 @@ namespace rsgis{namespace utils{
 					{
 						textUtils.tokenizeString(strLine, ':', tokens, true);
 						numrois = strtol(tokens->at(1).c_str(), NULL, 10);
-						//std::cout << "Number of ROI\'s = " << numrois << std::endl;
 						rois = new enviroi[numrois];
 						roicount = 0;
 						tokens->clear();
@@ -168,21 +163,16 @@ namespace rsgis{namespace utils{
 					{
 						if(lineCounter == headingsLine)
 						{
-							//std::cout << "Headings: " << strLine << std::endl;
 							textUtils.tokenizeString(strLine, ' ', tokens, true);
-							//std::cout << "Number tokens = " << tokens->size() << std::endl;
 							int varDiff = 0;
 							std::string b1 = std::string("B1");
 							for(unsigned int i = 0; i < tokens->size(); i++)
 							{
-								//std::cout << i << ") \'" << tokens->at(i) << "\'" << std::endl;
 								if(std::string(tokens->at(i)) == b1)
 								{
 									varDiff = i;
 								}
 							}
-							//std::cout << "varDiff = " << varDiff << std::endl;
-							//std::cout << "numVaribles (using varDiff) = " << tokens->size() - varDiff << std::endl;
 							numVariables = tokens->size() - varDiff;
 							
 							if(varDiff == 4)
@@ -198,7 +188,6 @@ namespace rsgis{namespace utils{
 							{
 								std::cout << "ROI " << rois[i].name << " has " << rois[i].samples << " samples\n";
 								rois[i].data = matrixUtils.createMatrix(numVariables, rois[i].samples);
-								//matrixUtils.printMatrix(rois[i].data);
 							}
 							tokens->clear();
 							roicount = 0;
@@ -208,7 +197,6 @@ namespace rsgis{namespace utils{
 							textUtils.tokenizeString(strLine, ':', tokens, true);
 							for(unsigned int i = 0; i < tokens->size(); i++)
 							{
-								//std::cout << i << ") \'" << tokens->at(i) << "\'" << std::endl;
 								if(tokens->at(i) == std::string("; ROI name"))
 								{
 									rois[roicount].name = tokens->at(i+1);
@@ -237,16 +225,11 @@ namespace rsgis{namespace utils{
 				else
 				{
 					// DATA
-					//std::cout << "dataStart = " << dataStart << std::endl;
-					//std::cout << lineCounter << ") " << strLine << std::endl;
-					//std::cout << sampleCount << "] ROI: " << roicount << std::endl;
 					variable = 0;
 					textUtils.tokenizeString(strLine, ' ', tokens, true);
-					//std::cout << "Found " << tokens->size() << " tokens\n";
 					for(unsigned int i = dataStart; i < tokens->size(); i++)
 					{
 						rois[roicount].data->matrix[dataindex++] = strtod(tokens->at(i).c_str(), NULL);
-						//std::cout << variable << ") " << tokens->at(i) << std::endl;
 						variable++;
 					}
 					tokens->clear();

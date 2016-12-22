@@ -87,7 +87,6 @@ namespace rsgis{namespace img{
                 
             for(int i = 0; i < numBands; ++i)
             {
-                //std::cout << "Band " << i+1 << ":\t[" << stats[i]->min << ", " << stats[i]->max << "] : " << stats[i]->mean << std::endl;
                 delete stats[i];
             }
             delete[] stats;
@@ -261,7 +260,6 @@ namespace rsgis{namespace img{
                         tDIMS = tDIMS * this->numBins[i];
                     }
                 }
-                //std::cout << "idx = " << idx << std::endl;
                 if(idx < totalNumBins)
                 {
                     hist[idx] = hist[idx] + 1;
@@ -327,7 +325,6 @@ namespace rsgis{namespace img{
                     tDIMS = tDIMS * this->numBins[i];
                 }
             }
-            //std::cout << "idx = " << idx << std::endl;
             if(idx < totalNumBins)
             {
                 output[0] = hist[idx];

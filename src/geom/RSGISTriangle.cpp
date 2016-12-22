@@ -325,7 +325,6 @@ namespace rsgis{namespace geom{
 		
 		if(p1 == tmp)
 		{
-			//cout << "p1 == a\n";
 			this->a = p1;
 			if(p2->getX() > p3->getX())
 			{
@@ -340,7 +339,6 @@ namespace rsgis{namespace geom{
 		}
 		else if(p2 == tmp)
 		{
-			//cout << "p2 == a\n";
 			this->a = p2;
 			if(p1->getX() > p3->getX())
 			{
@@ -356,7 +354,6 @@ namespace rsgis{namespace geom{
 		}
 		else
 		{
-			//cout << "p3 == a\n";
 			this->a = p3;
 			if(p1->getX() > p2->getX())
 			{
@@ -375,9 +372,6 @@ namespace rsgis{namespace geom{
 	
 	RSGISTriangle::~RSGISTriangle()
 	{
-		//delete a; 
-		//delete b;
-		//delete c;
 		delete bbox;
 		delete circle;
 	}

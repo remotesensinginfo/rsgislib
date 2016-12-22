@@ -200,8 +200,7 @@ namespace rsgis{namespace rastergis{
                         {
                             throw RSGISAttributeTableException("The number of available string columns has already been reached...");
                         }
-                        //std::cout << "strFieldIdx = " << strFieldIdx << std::endl;
-                        //std::cout << "feat->GetFieldAsString((*iterCols).name.c_str()) = " << feat->GetFieldAsString((*iterCols).name.c_str()) << std::endl;
+                        
                         outStringCols[strFieldIdx++] = std::string(feat->GetFieldAsString((*iterCols).name.c_str()));
                     }
                     else

@@ -353,8 +353,6 @@ namespace rsgis{namespace classifier{
             {
                 std::cout << "Completed " << floor((((double)ptsCount)/((double)totalNumPtsRequired))*100) << " %\r" << std::flush;
                 
-                //std::cout << "ptsCount = " << ptsCount << std::endl;
-                
                 xPxl = rand() % imgSizeX;
                 yPxl = rand() % imgSizeY;
                                 
@@ -532,12 +530,9 @@ namespace rsgis{namespace classifier{
                 {
                     pxlVal = long(this->findPixelVal(inputImage, 1, eastings, northings, tlX, tlY, xRes, yRes, imgSizeX, imgSizeY));
                     
-                    //std::cout << "Pxl Val = " << pxlVal << std::endl;
-                    
                     if((pxlVal > 0) & (pxlVal < imgClassColVals->size()))
                     {
                         classVal = imgClassColVals->at(pxlVal);
-                        //std::cout << "Class Name = " << classVal << std::endl;
                         
                         tmpAccPt = new RSGISAccPoint();
                         tmpAccPt->ptID = accPts->size()+1;
@@ -856,7 +851,6 @@ namespace rsgis{namespace classifier{
             double eastings = 0.0;
             double northings = 0.0;
             
-            //std::cout << "Adding col: " << vecClassImgCol << std::endl;
             OGRFieldDefn imgClassField(vecClassImgCol.c_str(), OFTString);
             imgClassField.SetWidth(254);
             if( inputVecLayer->CreateField( &imgClassField, false ) != OGRERR_NONE )
@@ -865,12 +859,10 @@ namespace rsgis{namespace classifier{
                 throw rsgis::RSGISException(message);
             }
             std::string vecClassImgField = std::string(imgClassField.GetNameRef());
-            //std::cout << "Added Image Class Field Name: " << vecClassImgField << std::endl;
             
             std::string vecClassRefField = "";
             if(addRefCol)
             {
-                //std::cout << "Adding col: " << vecClassRefCol << std::endl;
                 OGRFieldDefn refClassField(vecClassRefCol.c_str(), OFTString);
                 refClassField.SetWidth(254);
                 if( inputVecLayer->CreateField( &refClassField, false ) != OGRERR_NONE )
@@ -879,7 +871,6 @@ namespace rsgis{namespace classifier{
                     throw rsgis::RSGISException(message);
                 }
                 vecClassRefField = std::string(refClassField.GetNameRef());
-                //std::cout << "Added Reference Class Field Name: " << vecClassRefField << std::endl;
             }
             
             
@@ -939,25 +930,20 @@ namespace rsgis{namespace classifier{
                     std::cout << "WARNING: NULL Geometry Present within input file - IGNORED\n";
                 }
                 
-                //std::cout << "Pos: [" << eastings << ", " << northings << "]\n";
-                
                 if(!nullGeometry)
                 {
                     pxlVal = long(this->findPixelVal(inputImage, 1, eastings, northings, tlX, tlY, xRes, yRes, imgSizeX, imgSizeY));
-                    //std::cout << "Pxl Val: " << pxlVal << std::endl;
                     if((pxlVal > 0) & (pxlVal < imgClassColVals->size()))
                     {
                         classVal = imgClassColVals->at(pxlVal);
-                        //std::cout << "Class: " << classVal << std::endl;
                         if(classVal == "")
                         {
                             classVal = "NA";
                         }
-                        //std::cout << "Col " << imgClassColIdx << " = \'" << classVal << "\'\n";
+
                         featObj->SetField(imgClassColIdx, classVal.c_str());
                         if(addRefCol)
                         {
-                            //std::cout << "Col " << refClassColIdx << " = \'" << emptyStr << "\'\n";
                             featObj->SetField(refClassColIdx, emptyStr.c_str());
                         }
                         

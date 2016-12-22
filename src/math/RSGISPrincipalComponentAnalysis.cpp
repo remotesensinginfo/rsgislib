@@ -122,34 +122,18 @@ namespace rsgis{namespace math{
 		RSGISMultivariantStats mvarStats;
 		RSGISMatrices matrixUtils;
 		
-		//matrixUtils.printMatrix(this->inputData);
+        this->meanVec = mvarStats.findMeanVector(inputData);
 		
-		//cout << "Mean Vector:\n";
-		this->meanVec = mvarStats.findMeanVector(inputData);
-		//matrixUtils.printMatrix(meanVec);
-		
-		//cout << "Standardised Input Data:\n";
 		this->stdInputData = mvarStats.standardiseMatrix(inputData, meanVec);
-		//matrixUtils.printMatrix(stdInputData);
 		
-		//cout << "Standardised Mean Vector:\n";
 		this->stdMeanVec = mvarStats.findMeanVector(stdInputData);
-		//matrixUtils.printMatrix(stdInputData);
 		
-		//cout << "Covariance Matrix: \n";
 		this->covariance = mvarStats.calcCovarianceMatrix(stdInputData, stdMeanVec);
-		//matrixUtils.printMatrix(covariance);
 		
-		//cout << "EigenValues: \n";
 		this->eigenvalues = matrixUtils.createMatrix(1, covariance->m);
 		
-		//cout << "EigenVectors: \n";
 		this->eigenvectors = matrixUtils.createMatrix(covariance->n, covariance->m);
-		matrixUtils.calcEigenVectorValue(covariance, eigenvalues, eigenvectors);
-		
-		//matrixUtils.printMatrix(eigenvalues);
-		
-		//matrixUtils.printMatrix(eigenvectors);
+		matrixUtils.calcEigenVectorValue(covariance, eigenvalues, eigenvectors);		
 	}
 }}
 

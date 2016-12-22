@@ -148,7 +148,6 @@ namespace rsgis{namespace img{
 			// Loop images to process data
 			for(int i = 0; i < height; i++)
 			{
-				//std::cout << i << " of " << height << std::endl;
 				if((i % feedback) == 0)
 				{
 					std::cout << ".." << feedbackCounter << ".." << std::flush;
@@ -326,7 +325,6 @@ namespace rsgis{namespace img{
 			// Loop images to process data
 			for(int i = 0; i < height; i++)
 			{
-				//std::cout << i << " of " << height << std::endl;
 				if((i % feedback) == 0)
 				{
 					std::cout << ".." << feedbackCounter << ".." << std::flush;
@@ -553,8 +551,6 @@ namespace rsgis{namespace img{
 	
 	void RSGISCalcImageSingle::calcImageWithinPolygon(GDALDataset **datasets, int numDS, double *outputValue, geos::geom::Envelope *env, geos::geom::Polygon *poly, bool output, pixelInPolyOption pixelPolyOption) throw(RSGISImageCalcException,RSGISImageBandException)
 	{
-        std::cout.precision(12);
-        //std::cout << "calcImageWithinPolygon [" << env->getMinX() << "," << env->getMinY() << "," << env->getMaxX() << "," << env->getMaxY() << "]\n";
 		GDALAllRegister();
 		RSGISImageUtils imgUtils;
 		double *gdalTranslation = NULL;
@@ -608,7 +604,6 @@ namespace rsgis{namespace img{
 			
 			if ((env->getWidth() < pxlWidth) | (env->getHeight() < pxlHeight))
 			{
-				//std::cout << "BUFFERING\n";
 				buffer = true;
 				bufferedEnvelope = new geos::geom::Envelope(env->getMinX() - pxlWidth / 2, env->getMaxX() + pxlWidth / 2, env->getMinY() - pxlHeight / 2, env->getMaxY() + pxlHeight / 2);
 			}
@@ -624,8 +619,6 @@ namespace rsgis{namespace img{
 			{
 				imgUtils.getImageOverlap(datasets, numDS, dsOffsets, &width, &height, gdalTranslation, env);
 			}
-			
-            //std::cout << "Overlapped region has size [" << width << ", " << height << "]\n";
             
 			pxlTLX = gdalTranslation[0];
 			pxlTLY = gdalTranslation[3];
@@ -672,7 +665,6 @@ namespace rsgis{namespace img{
 			// Loop images to process data
 			for(int i = 0; i < height; i++)
 			{
-                //std::cout << "i = " << i << std::endl;
 				if (height > 100)
 				{
 					if((i % feedback) == 0)
@@ -709,22 +701,10 @@ namespace rsgis{namespace img{
 					
 					if (pixelPolyOption == polyContainsPixelCenter) 
 					{
-						//std::cout << "Point: " << pt->toString() << std::endl;
-						//std::cout << "Polygon: " << poly->toString() << std::endl;
-						
 						if(poly->contains(pt)) // If polygon contains pixel center
 						{
-							//std::cout << "INSIDE\n";
-							//std::cout.precision(10);
-							//std::cout << "Data Value = " << inDataColumnA[0] << std::endl;
 							this->valueCalc->calcImageValue(inDataColumnA, 1, numInBands, poly, pt);
 						}
-						//else
-						//{
-						//	std::cout << "OUTSIDE\n";
-						//}
-						
-						//std::cout << std::endl;
 
 					}
 					else if (pixelPolyOption == pixelAreaInPoly) 
@@ -749,12 +729,6 @@ namespace rsgis{namespace img{
 						
 						intersectionGeom = pixelGeosPoly->intersection(poly);
 						double intersectionArea = intersectionGeom->getArea()  / pixelGeosPoly->getArea();
-						/*std::cout << "Points in Poly = " << poly->getNumPoints() << std::endl;
-						std::cout << "Intersct Type = " << intersectionGeom->getGeometryType() << std::endl;
-						std::cout << "Intersct Dim = " << intersectionGeom->getDimension() << std::endl;
-						std::cout << "Diff Area = " << intersectionGeom->getArea() << std::endl;
-						std::cout << "Percent of Pixel Area = " <<  intersectionGeom->getArea()  / pixelGeosPoly->getArea() << std::endl;
-						std::cout << "//////////////////////////////" << std::endl;*/
 						
 						if(intersectionArea > 0)
 						{
@@ -783,9 +757,7 @@ namespace rsgis{namespace img{
 						
 						pixelPoly = new OGRPolygon();
 						pixelPoly->addRingDirectly(ring);
-						
-						//std::cout << "Pixel (x,y) = " << pxlTLX << ", " << pxlTLY << std::endl;
-						
+												
 						//Convert GEOS Polygon to OGR Polygon
 						ogrPoly = new OGRPolygon();
 						const geos::geom::LineString *line = poly->getExteriorRing();
@@ -797,8 +769,6 @@ namespace rsgis{namespace img{
 						{
 							coord = coords->getAt(i);
 							ogrRing->addPoint(coord.x, coord.y, coord.z);
-							
-							//std::cout << "Poly (x,y) = " << coord.x << ", " << coord.y << std::endl;
 						}
 						ogrPoly->addRing(ogrRing);
 						ogrGeom = (OGRGeometry *) ogrPoly;
@@ -830,17 +800,13 @@ namespace rsgis{namespace img{
 			if(output)
 			{	
 				double *tempOutVal;
-			    //tempOutVal = new double[valueCalc->getNumberOfOutValues()];
 				tempOutVal = valueCalc->getOutputValues();
 				
 				for(int i = 0; i < valueCalc->getNumberOfOutValues(); i++)
 				{
-					//outputValue[i] = valueCalc->getOutputValues()[i];
 					outputValue[i] = tempOutVal[i];
 				}
-				
-				//delete[] tempOutVal;
-			}			
+			}
 		}
 		catch(RSGISImageCalcException& e)
 		{
@@ -1044,7 +1010,6 @@ namespace rsgis{namespace img{
 				tmpOutput = valueCalc->getOutputValues();
 				for(int i = 0; i < valueCalc->getNumberOfOutValues(); i++)
 				{
-					//std::cout << "tmpOutput[" << i << "] = " << tmpOutput[i] ;
 					outputValue[i] = tmpOutput[i];
 				}
 			}			

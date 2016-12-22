@@ -94,7 +94,6 @@ namespace rsgis{namespace segment{
             
             for(unsigned int j = 0; j < width; ++j)
             {
-                //std::cout << "Processing Pixel [" << j << "," << i << "]\n";
                 // Get pixel value from clump image for (j,i)
                 if(!pxlMask[i][j])
                 {
@@ -125,9 +124,6 @@ namespace rsgis{namespace segment{
                     {
                         rsgis::img::PxlLoc pxl = clumpSearchPxls.front();
                         clumpSearchPxls.pop();
-                        
-                        //std::cout << "\tSearch Size = " << clumpSearchPxls.size() << std::endl;
-                        //std::cout << "\t\tProcessing [" << pxl.xPos << "," << pxl.yPos << "]\n";
                         
                         // Above
                         if((((long)pxl.yPos)-1 >= 0) && (!pxlMask[pxl.yPos-1][pxl.xPos]))
@@ -212,7 +208,6 @@ namespace rsgis{namespace segment{
                     }
                     
                     // Calc Mean Values;
-                    //std::cout << "Clump " << clumpIdx << " has clumpPxls.size() = " << clumpPxls.size() << std::endl;
                     for(size_t n = 0; n < clumpPxls.size(); ++n)
                     {
                         for(unsigned int b = 0; b < numSpecBands; ++b)
@@ -535,17 +530,14 @@ namespace rsgis{namespace segment{
         }
         catch(boost::numeric::negative_overflow& e)
         {
-            //std::cout << "bandValues[0] = " << bandValues[0] << std::endl;
             throw rsgis::img::RSGISImageCalcException(e.what());
         }
         catch(boost::numeric::positive_overflow& e)
         {
-            //std::cout << "bandValues[0] = " << bandValues[0] << std::endl;
             throw rsgis::img::RSGISImageCalcException(e.what());
         }
         catch(boost::numeric::bad_numeric_cast& e)
         {
-            //std::cout << "bandValues[0] = " << bandValues[0] << std::endl;
             throw rsgis::img::RSGISImageCalcException(e.what());
         }
         catch(rsgis::img::RSGISImageCalcException &e)
@@ -599,17 +591,14 @@ namespace rsgis{namespace segment{
         }
         catch(boost::numeric::negative_overflow& e)
         {
-            //std::cout << "bandValues[0] = " << bandValues[0] << std::endl;
             throw rsgis::img::RSGISImageCalcException(e.what());
         }
         catch(boost::numeric::positive_overflow& e)
         {
-            //std::cout << "bandValues[0] = " << bandValues[0] << std::endl;
             throw rsgis::img::RSGISImageCalcException(e.what());
         }
         catch(boost::numeric::bad_numeric_cast& e)
         {
-            //std::cout << "bandValues[0] = " << bandValues[0] << std::endl;
             throw rsgis::img::RSGISImageCalcException(e.what());
         }
         catch(rsgis::img::RSGISImageCalcException &e)

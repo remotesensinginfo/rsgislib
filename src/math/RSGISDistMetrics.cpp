@@ -191,9 +191,6 @@ namespace rsgis{namespace math{
                 dist += gsl_vector_get(this->diffVals, i) * gsl_vector_get(this->tmpVec, i);
             }
             dist = sqrt(dist);
-            //std::cout << "MAH DIST = " << dist << std::endl;
-            
-            //throw RSGISMathException("RSGISCalcMahalanobisDistMetric is not implemented!");
         }
         catch (RSGISMathException &e)
         {

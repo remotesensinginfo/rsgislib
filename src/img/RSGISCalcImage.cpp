@@ -107,7 +107,6 @@ namespace rsgis{namespace img{
 					bandOffsets[counter] = new int[2];
 					bandOffsets[counter][0] = dsOffsets[i][0];
 					bandOffsets[counter][1] = dsOffsets[i][1];
-					//std::cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
 					counter++;
 				}
 			}
@@ -130,7 +129,6 @@ namespace rsgis{namespace img{
             {
                 yBlockSize = outYBlockSize;
             }
-            //std::cout << "Max. block size: " << yBlockSize << std::endl;
             
 			// Allocate memory
 			inputData = new float*[numInBands];
@@ -157,8 +155,6 @@ namespace rsgis{namespace img{
 			// Loop images to process data
 			for(int i = 0; i < nYBlocks; i++)
 			{
-				//std::cout << i << " of " << nYBlocks << std::endl;
-                
 				for(int n = 0; n < numInBands; n++)
 				{
                     rowOffset = bandOffsets[n][1] + (yBlockSize * i);
@@ -536,7 +532,6 @@ namespace rsgis{namespace img{
 					bandOffsets[counter] = new int[2];
 					bandOffsets[counter][0] = dsOffsets[i][0];
 					bandOffsets[counter][1] = dsOffsets[i][1];
-					//std::cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
 					counter++;
 				}
 			}
@@ -555,7 +550,6 @@ namespace rsgis{namespace img{
             {
                 yBlockSize = outYBlockSize;
             }
-            //std::cout << "Max. block size: " << yBlockSize << std::endl;
             
 			// Allocate memory
 			inputData = new float*[numInBands];
@@ -582,8 +576,6 @@ namespace rsgis{namespace img{
 			// Loop images to process data
 			for(int i = 0; i < nYBlocks; i++)
 			{
-				//std::cout << i << " of " << nYBlocks << std::endl;
-                
 				for(int n = 0; n < numInBands; n++)
 				{
                     rowOffset = bandOffsets[n][1] + (yBlockSize * i);
@@ -931,11 +923,7 @@ namespace rsgis{namespace img{
 		{
 			// Find image overlap
 			imgUtils.getImageOverlap(datasets, numDS, dsOffsets, &width, &height, gdalTranslation, &xBlockSize, &yBlockSize);
-            
-            //std::cout << "height = " << height << std::endl;
-            //std::cout << "Width = " << width << std::endl;
-            
-            //std::cout << "Max. block size: " << yBlockSize << std::endl;
+
             
 			// Count number of image bands
 			for(int i = 0; i < numIntDS; i++)
@@ -946,9 +934,6 @@ namespace rsgis{namespace img{
 			{
 				numFloatBands += datasets[i]->GetRasterCount();
 			}
-            
-            //std::cout << "Number of Int Bands: " << numIntBands << std::endl;
-            //std::cout << "Number of Float Bands: " << numFloatBands << std::endl;
 			
             // Create new Image
 			gdalDriver = GetGDALDriverManager()->GetDriverByName(gdalFormat.c_str());
@@ -990,7 +975,6 @@ namespace rsgis{namespace img{
 					bandIntOffsets[counter] = new int[2];
 					bandIntOffsets[counter][0] = dsOffsets[i][0];
 					bandIntOffsets[counter][1] = dsOffsets[i][1];
-					//std::cout << counter << ") dataset " << i << " (int) band " << j << " offset [" << bandIntOffsets[counter][0] << "," << bandIntOffsets[counter][1] << "]\n";
 					counter++;
 				}
 			}
@@ -1004,7 +988,6 @@ namespace rsgis{namespace img{
 					bandFloatOffsets[counter] = new int[2];
 					bandFloatOffsets[counter][0] = dsOffsets[i][0];
 					bandFloatOffsets[counter][1] = dsOffsets[i][1];
-					//std::cout << counter << ") dataset " << i << " (float) band " << j << " offset [" << bandFloatOffsets[counter][0] << "," << bandFloatOffsets[counter][1] << "]\n";
 					counter++;
 				}
 			}
@@ -1060,8 +1043,6 @@ namespace rsgis{namespace img{
 			// Loop images to process data
 			for(int i = 0; i < nYBlocks; i++)
 			{
-				//std::cout << i << " of " << nYBlocks << std::endl;
-                
 				for(int n = 0; n < numIntBands; n++)
 				{
                     rowOffset = bandIntOffsets[n][1] + (yBlockSize * i);
@@ -1535,11 +1516,6 @@ namespace rsgis{namespace img{
                 imgUtils.getImageOverlapCut2Env(datasets, numDS, dsOffsets, &width, &height, gdalTranslation, env, &xBlockSize, &yBlockSize);
             }
             
-            //std::cout << "height = " << height << std::endl;
-            //std::cout << "Width = " << width << std::endl;
-            
-            //std::cout << "Max. block size: " << yBlockSize << std::endl;
-            
 			// Count number of image bands
 			for(int i = 0; i < numIntDS; i++)
 			{
@@ -1549,9 +1525,6 @@ namespace rsgis{namespace img{
 			{
 				numFloatBands += datasets[i]->GetRasterCount();
 			}
-            
-            //std::cout << "Number of Int Bands: " << numIntBands << std::endl;
-            //std::cout << "Number of Float Bands: " << numFloatBands << std::endl;
 			
 			// Get Image Input Bands
 			bandIntOffsets = new int*[numIntBands];
@@ -1569,7 +1542,6 @@ namespace rsgis{namespace img{
 					bandIntOffsets[counter] = new int[2];
 					bandIntOffsets[counter][0] = dsOffsets[i][0];
 					bandIntOffsets[counter][1] = dsOffsets[i][1];
-					//std::cout << counter << ") dataset " << i << " (int) band " << j << " offset [" << bandIntOffsets[counter][0] << "," << bandIntOffsets[counter][1] << "]\n";
 					counter++;
 				}
 			}
@@ -1583,7 +1555,6 @@ namespace rsgis{namespace img{
 					bandFloatOffsets[counter] = new int[2];
 					bandFloatOffsets[counter][0] = dsOffsets[i][0];
 					bandFloatOffsets[counter][1] = dsOffsets[i][1];
-					//std::cout << counter << ") dataset " << i << " (float) band " << j << " offset [" << bandFloatOffsets[counter][0] << "," << bandFloatOffsets[counter][1] << "]\n";
 					counter++;
 				}
 			}
@@ -2025,9 +1996,6 @@ namespace rsgis{namespace img{
 			{
 				numFloatBands += datasets[i]->GetRasterCount();
 			}
-            
-            //std::cout << "Number of Int Bands: " << numIntBands << std::endl;
-            //std::cout << "Number of Float Bands: " << numFloatBands << std::endl;
 			
             // Get Image Input Bands
 			bandIntOffsets = new int*[numIntBands];
@@ -2045,7 +2013,6 @@ namespace rsgis{namespace img{
 					bandIntOffsets[counter] = new int[2];
 					bandIntOffsets[counter][0] = dsOffsets[i][0];
 					bandIntOffsets[counter][1] = dsOffsets[i][1];
-					//std::cout << counter << ") dataset " << i << " (int) band " << j << " offset [" << bandIntOffsets[counter][0] << "," << bandIntOffsets[counter][1] << "]\n";
 					counter++;
 				}
 			}
@@ -2059,7 +2026,6 @@ namespace rsgis{namespace img{
 					bandFloatOffsets[counter] = new int[2];
 					bandFloatOffsets[counter][0] = dsOffsets[i][0];
 					bandFloatOffsets[counter][1] = dsOffsets[i][1];
-					//std::cout << counter << ") dataset " << i << " (float) band " << j << " offset [" << bandFloatOffsets[counter][0] << "," << bandFloatOffsets[counter][1] << "]\n";
 					counter++;
 				}
 			}
@@ -2112,8 +2078,6 @@ namespace rsgis{namespace img{
 			// Loop images to process data
 			for(int i = 0; i < nYBlocks; i++)
 			{
-				//std::cout << i << " of " << nYBlocks << std::endl;
-                
 				for(int n = 0; n < numIntBands; n++)
 				{
                     rowOffset = bandIntOffsets[n][1] + (yBlockSize * i);
@@ -2572,11 +2536,6 @@ namespace rsgis{namespace img{
 			// Find image overlap
 			imgUtils.getImageOverlap(datasets, numDS, dsOffsets, &width, &height, gdalTranslation, &xBlockSize, &yBlockSize);
             
-            //std::cout << "height = " << height << std::endl;
-            //std::cout << "Width = " << width << std::endl;
-            
-            //std::cout << "Max. block size: " << yBlockSize << std::endl;
-            
 			// Count number of image bands
 			for(int i = 0; i < numDS; i++)
 			{
@@ -2595,7 +2554,6 @@ namespace rsgis{namespace img{
 					bandOffsets[counter] = new int[2];
 					bandOffsets[counter][0] = dsOffsets[i][0];
 					bandOffsets[counter][1] = dsOffsets[i][1];
-					//std::cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
 					counter++;
 				}
 			}
@@ -2608,7 +2566,6 @@ namespace rsgis{namespace img{
 			}
 			inDataColumn = new float[numInBands];
             
-            
             int nYBlocks = height / yBlockSize;
             int remainRows = height - (nYBlocks * yBlockSize);
             int rowOffset = 0;
@@ -2619,8 +2576,6 @@ namespace rsgis{namespace img{
 			// Loop images to process data
 			for(int i = 0; i < nYBlocks; i++)
 			{
-				//std::cout << i << " of " << nYBlocks << std::endl;
-                
 				for(int n = 0; n < numInBands; n++)
 				{
                     rowOffset = bandOffsets[n][1] + (yBlockSize * i);
@@ -2635,7 +2590,6 @@ namespace rsgis{namespace img{
                         feedbackCounter = feedbackCounter + 10;
                     }
                     
-                    
                     for(int j = 0; j < width; j++)
                     {
                         for(int n = 0; n < numInBands; n++)
@@ -2644,7 +2598,6 @@ namespace rsgis{namespace img{
                         }
                         
                         this->calc->calcImageValue(inDataColumn, numInBands);
-                        
                     }
                 }
 			}
@@ -2673,7 +2626,6 @@ namespace rsgis{namespace img{
                         }
                         
                         this->calc->calcImageValue(inDataColumn, numInBands);
-                        
                     }
                 }
             }
@@ -2914,7 +2866,6 @@ namespace rsgis{namespace img{
                         bandOffsets[counter] = new int[2];
                         bandOffsets[counter][0] = dsOffsets[i][0];
                         bandOffsets[counter][1] = dsOffsets[i][1];
-                        //std::cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
                         counter++;
                     }
                 }
@@ -2943,8 +2894,6 @@ namespace rsgis{namespace img{
                 // Loop images to process data
                 for(int i = 0; i < height; i++)
                 {
-                    //std::cout << i << " of " << height << std::endl;
-                    
                     if((feedback != 0) && ((i % feedback) == 0))
                     {
                         std::cout << "." << feedbackCounter << "." << std::flush;
@@ -3087,386 +3036,7 @@ namespace rsgis{namespace img{
 		}
 
 	}
-    
-    /*
-    void RSGISCalcImage::calcImageInEnv(GDALDataset **datasets, int numDS, std::string outputImage, geos::geom::Envelope *env, bool setOutNames, std::string *bandNames, std::string gdalFormat, GDALDataType gdalDataType) throw(RSGISImageCalcException,RSGISImageBandException)
-	{
-		GDALAllRegister();
-		RSGISImageUtils imgUtils;
-		double *gdalTranslation = new double[6];
-		int **dsOffsets = new int*[numDS];
-		for(int i = 0; i < numDS; i++)
-		{
-			dsOffsets[i] = new int[2];
-		}
-		int **bandOffsets = NULL;
-		int height = 0;
-		int width = 0;
-		int numInBands = 0;
-		
-		float **inputData = NULL;
-		float **outputData = NULL;
-		float *inDataColumn = NULL;
-		float *outDataColumn = NULL;
-		
-		GDALDataset *outputImageDS = NULL;
-		GDALRasterBand **inputRasterBands = NULL;
-		GDALRasterBand **outputRasterBands = NULL;
-		GDALDriver *gdalDriver = NULL;
-		
-		try
-		{
-			// Find image overlap
-			imgUtils.getImageOverlapCut2Env(datasets, numDS, dsOffsets, &width, &height, gdalTranslation, env);
-            
-			// Count number of image bands
-			for(int i = 0; i < numDS; i++)
-			{
-				numInBands += datasets[i]->GetRasterCount();
-			}
-            
-			// Create new Image
-			gdalDriver = GetGDALDriverManager()->GetDriverByName(gdalFormat.c_str());
-			if(gdalDriver == NULL)
-			{
-				throw RSGISImageBandException("ENVI driver does not exists..");
-			}
-			std::cout << "New image width = " << width << " height = " << height << " bands = " << this->numOutBands << std::endl;
 
-			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, NULL);
-			
-			if(outputImageDS == NULL)
-			{
-				throw RSGISImageBandException("Output image could not be created. Check filepath.");
-			}
-			outputImageDS->SetGeoTransform(gdalTranslation);
-			if(useImageProj)
-			{
-				outputImageDS->SetProjection(datasets[0]->GetProjectionRef());
-			}
-			else
-			{
-				outputImageDS->SetProjection(proj.c_str());
-			}
-            
-			// Get Image Input Bands
-			bandOffsets = new int*[numInBands];
-			inputRasterBands = new GDALRasterBand*[numInBands];
-			int counter = 0;
-			for(int i = 0; i < numDS; i++)
-			{
-				for(int j = 0; j < datasets[i]->GetRasterCount(); j++)
-				{
-					inputRasterBands[counter] = datasets[i]->GetRasterBand(j+1);
-					bandOffsets[counter] = new int[2];
-					bandOffsets[counter][0] = dsOffsets[i][0];
-					bandOffsets[counter][1] = dsOffsets[i][1];
-					//std::cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
-					counter++;
-				}
-			}
-            
-			//Get Image Output Bands
-			outputRasterBands = new GDALRasterBand*[this->numOutBands];
-			for(int i = 0; i < this->numOutBands; i++)
-			{
-				outputRasterBands[i] = outputImageDS->GetRasterBand(i+1);
-				if (setOutNames) // Set output band names
-				{
-					outputRasterBands[i]->SetDescription(bandNames[i].c_str());
-				}
-			}
-            
-			// Allocate memory
-			inputData = new float*[numInBands];
-			for(int i = 0; i < numInBands; i++)
-			{
-				inputData[i] = (float *) CPLMalloc(sizeof(float)*width);
-			}
-			inDataColumn = new float[numInBands];
-            
-			outputData = new float*[this->numOutBands];
-			for(int i = 0; i < this->numOutBands; i++)
-			{
-				outputData[i] = (float *) CPLMalloc(sizeof(float)*width);
-			}
-			outDataColumn = new float[this->numOutBands];
-            
-			int feedback = height/10;
-			int feedbackCounter = 0;
-			std::cout << "Started " << std::flush;
-			// Loop images to process data
-			for(int i = 0; i < height; i++)
-			{
-				//std::cout << i << " of " << height << std::endl;
-				
-				if((i % feedback) == 0)
-				{
-					std::cout << "." << feedbackCounter << "." << std::flush;
-					feedbackCounter = feedbackCounter + 10;
-				}
-				
-				for(int n = 0; n < numInBands; n++)
-				{
-					inputRasterBands[n]->RasterIO(GF_Read, bandOffsets[n][0], (bandOffsets[n][1]+i), width, 1, inputData[n], width, 1, GDT_Float32, 0, 0);
-				}
-				
-				for(int j = 0; j < width; j++)
-				{
-					for(int n = 0; n < numInBands; n++)
-					{
-						inDataColumn[n] = inputData[n][j];
-					}
-					
-					this->calc->calcImageValue(inDataColumn, numInBands, outDataColumn);
-					
-					for(int n = 0; n < this->numOutBands; n++)
-					{
-						outputData[n][j] = outDataColumn[n];
-					}
-					
-				}
-				
-				for(int n = 0; n < this->numOutBands; n++)
-				{
-					outputRasterBands[n]->RasterIO(GF_Write, 0, i, width, 1, outputData[n], width, 1, GDT_Float32, 0, 0);
-				}
-			}
-			std::cout << " Complete.\n";
-		}
-		catch(RSGISImageCalcException& e)
-		{
-			//GDALClose(outputImageDS);
-			
-			if(gdalTranslation != NULL)
-			{
-				delete[] gdalTranslation;
-			}
-			
-			if(dsOffsets != NULL)
-			{
-				for(int i = 0; i < numDS; i++)
-				{
-					if(dsOffsets[i] != NULL)
-					{
-						delete[] dsOffsets[i];
-					}
-				} 
-				delete[] dsOffsets;
-			}
-			
-			if(bandOffsets != NULL)
-			{
-				for(int i = 0; i < numInBands; i++)
-				{
-					if(bandOffsets[i] != NULL)
-					{
-						delete[] bandOffsets[i];
-					}
-				}
-				delete[] bandOffsets;
-			}			
-			
-			if(inputData != NULL)
-			{
-				for(int i = 0; i < numInBands; i++)
-				{
-					if(inputData[i] != NULL)
-					{
-						delete[] inputData[i];
-					}
-				}
-				delete[] inputData;
-			}
-			
-			if(outputData != NULL)
-			{
-				for(int i = 0; i < this->numOutBands; i++)
-				{
-					if(outputData[i] != NULL)
-					{
-						delete[] outputData[i];
-					}
-				}
-				delete[] outputData;
-			}
-			
-			if(inDataColumn != NULL)
-			{
-				delete[] inDataColumn;
-			}
-			
-			if(outDataColumn != NULL)
-			{
-				delete[] outDataColumn;
-			}
-			
-			if(inputRasterBands != NULL)
-			{
-				delete[] inputRasterBands;
-			}
-			
-			if(outputRasterBands != NULL)
-			{
-				delete[] outputRasterBands;
-			}
-			throw e;
-		}
-		catch(RSGISImageBandException& e)
-		{
-			//GDALClose(outputImageDS);
-			
-			if(gdalTranslation != NULL)
-			{
-				delete[] gdalTranslation;
-			}
-			
-			if(dsOffsets != NULL)
-			{
-				for(int i = 0; i < numDS; i++)
-				{
-					if(dsOffsets[i] != NULL)
-					{
-						delete[] dsOffsets[i];
-					}
-				} 
-				delete[] dsOffsets;
-			}
-			
-			if(bandOffsets != NULL)
-			{
-				for(int i = 0; i < numInBands; i++)
-				{
-					if(bandOffsets[i] != NULL)
-					{
-						delete[] bandOffsets[i];
-					}
-				}
-				delete[] bandOffsets;
-			}			
-			
-			if(inputData != NULL)
-			{
-				for(int i = 0; i < numInBands; i++)
-				{
-					if(inputData[i] != NULL)
-					{
-						delete[] inputData[i];
-					}
-				}
-				delete[] inputData;
-			}
-			
-			if(outputData != NULL)
-			{
-				for(int i = 0; i < this->numOutBands; i++)
-				{
-					if(outputData[i] != NULL)
-					{
-						delete[] outputData[i];
-					}
-				}
-				delete[] outputData;
-			}
-			
-			if(inDataColumn != NULL)
-			{
-				delete[] inDataColumn;
-			}
-			
-			if(outDataColumn != NULL)
-			{
-				delete[] outDataColumn;
-			}
-			
-			if(inputRasterBands != NULL)
-			{
-				delete[] inputRasterBands;
-			}
-			
-			if(outputRasterBands != NULL)
-			{
-				delete[] outputRasterBands;
-			}
-			throw e;
-		}
-		
-		GDALClose(outputImageDS);
-		
-		if(gdalTranslation != NULL)
-		{
-			delete[] gdalTranslation;
-		}
-		
-		if(dsOffsets != NULL)
-		{
-			for(int i = 0; i < numDS; i++)
-			{
-				if(dsOffsets[i] != NULL)
-				{
-					delete[] dsOffsets[i];
-				}
-			} 
-			delete[] dsOffsets;
-		}
-		
-		if(bandOffsets != NULL)
-		{
-			for(int i = 0; i < numInBands; i++)
-			{
-				if(bandOffsets[i] != NULL)
-				{
-					delete[] bandOffsets[i];
-				}
-			}
-			delete[] bandOffsets;
-		}
-		
-		if(inputData != NULL)
-		{
-			for(int i = 0; i < numInBands; i++)
-			{
-				if(inputData[i] != NULL)
-				{
-					CPLFree(inputData[i]);
-				}
-			}
-			delete[] inputData;
-		}
-		
-		if(outputData != NULL)
-		{
-			for(int i = 0; i < this->numOutBands; i++)
-			{
-				if(outputData[i] != NULL)
-				{
-					CPLFree(outputData[i]);
-				}
-			}
-			delete[] outputData;
-		}
-		
-		if(inDataColumn != NULL)
-		{
-			delete[] inDataColumn;
-		}
-		
-		if(outDataColumn != NULL)
-		{
-			delete[] outDataColumn;
-		}
-		
-		if(inputRasterBands != NULL)
-		{
-			delete[] inputRasterBands;
-		}
-		
-		if(outputRasterBands != NULL)
-		{
-			delete[] outputRasterBands;
-		}
-	}
-	*/
     
     void RSGISCalcImage::calcImageInEnv(GDALDataset **datasets, int numDS, std::string outputImage, geos::geom::Envelope *env, bool setOutNames, std::string *bandNames, std::string gdalFormat, GDALDataType gdalDataType) throw(RSGISImageCalcException,RSGISImageBandException)
     {
@@ -3590,8 +3160,6 @@ namespace rsgis{namespace img{
 			// Loop images to process data
 			for(int i = 0; i < nYBlocks; i++)
 			{
-				//std::cout << i << " of " << nYBlocks << std::endl;
-                
 				for(int n = 0; n < numInBands; n++)
 				{
                     rowOffset = bandOffsets[n][1] + (yBlockSize * i);
@@ -3951,7 +3519,6 @@ namespace rsgis{namespace img{
 					bandOffsets[counter] = new int[2];
 					bandOffsets[counter][0] = dsOffsets[i][0];
 					bandOffsets[counter][1] = dsOffsets[i][1];
-					//std::cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
 					counter++;
 				}
 			}
@@ -3977,8 +3544,6 @@ namespace rsgis{namespace img{
 			// Loop images to process data
 			for(int i = 0; i < nYBlocks; i++)
 			{
-				//std::cout << i << " of " << nYBlocks << std::endl;
-                
 				for(int n = 0; n < numInBands; n++)
 				{
                     rowOffset = bandOffsets[n][1] + (yBlockSize * i);
@@ -4234,11 +3799,6 @@ namespace rsgis{namespace img{
             // Find image overlap
             imgUtils.getImageOverlapCut2Env(datasets, numDS, dsOffsets, &width, &height, gdalTranslation, env, &xBlockSize, &yBlockSize);
             
-            //std::cout << "height = " << height << std::endl;
-            //std::cout << "Width = " << width << std::endl;
-            
-            //std::cout << "Max. block size: " << yBlockSize << std::endl;
-            
             // Count number of image bands
             for(int i = 0; i < numIntDS; i++)
             {
@@ -4248,9 +3808,6 @@ namespace rsgis{namespace img{
             {
                 numFloatBands += datasets[i]->GetRasterCount();
             }
-            
-            //std::cout << "Number of Int Bands: " << numIntBands << std::endl;
-            //std::cout << "Number of Float Bands: " << numFloatBands << std::endl;
             
             // Get Image Input Bands
             bandIntOffsets = new int*[numIntBands];
@@ -4268,7 +3825,6 @@ namespace rsgis{namespace img{
                     bandIntOffsets[counter] = new int[2];
                     bandIntOffsets[counter][0] = dsOffsets[i][0];
                     bandIntOffsets[counter][1] = dsOffsets[i][1];
-                    //std::cout << counter << ") dataset " << i << " (int) band " << j << " offset [" << bandIntOffsets[counter][0] << "," << bandIntOffsets[counter][1] << "]\n";
                     counter++;
                 }
             }
@@ -4282,7 +3838,6 @@ namespace rsgis{namespace img{
                     bandFloatOffsets[counter] = new int[2];
                     bandFloatOffsets[counter][0] = dsOffsets[i][0];
                     bandFloatOffsets[counter][1] = dsOffsets[i][1];
-                    //std::cout << counter << ") dataset " << i << " (float) band " << j << " offset [" << bandFloatOffsets[counter][0] << "," << bandFloatOffsets[counter][1] << "]\n";
                     counter++;
                 }
             }
@@ -4688,8 +4243,6 @@ namespace rsgis{namespace img{
 			// Find image overlap
 			imgUtils.getImageOverlap(datasets, numDS, dsOffsets, &width, &height, gdalTranslation, &xBlockSize, &yBlockSize);
             
-            //std::cout << "Max. block size: " << yBlockSize << std::endl;
-            
 			// Count number of image bands
 			for(int i = 0; i < numDS; i++)
 			{
@@ -4708,7 +4261,6 @@ namespace rsgis{namespace img{
 					bandOffsets[counter] = new int[2];
 					bandOffsets[counter][0] = dsOffsets[i][0];
 					bandOffsets[counter][1] = dsOffsets[i][1];
-					//std::cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
 					counter++;
 				}
 			}
@@ -4720,7 +4272,6 @@ namespace rsgis{namespace img{
 				inputData[i] = (float *) CPLMalloc(sizeof(float)*width*yBlockSize);
 			}
 			inDataColumn = new float[numInBands];
-            
             
             int nYBlocks = height / yBlockSize;
             int remainRows = height - (nYBlocks * yBlockSize);
@@ -4735,8 +4286,6 @@ namespace rsgis{namespace img{
 			// Loop images to process data
 			for(int i = 0; i < nYBlocks; i++)
 			{
-				//std::cout << i << " of " << nYBlocks << std::endl;
-                
 				for(int n = 0; n < numInBands; n++)
 				{
                     rowOffset = bandOffsets[n][1] + (yBlockSize * i);
@@ -4994,11 +4543,6 @@ namespace rsgis{namespace img{
             // Find image overlap
             imgUtils.getImageOverlap(datasets, numDS, dsOffsets, &width, &height, gdalTranslation, &xBlockSize, &yBlockSize);
             
-            //std::cout << "height = " << height << std::endl;
-            //std::cout << "Width = " << width << std::endl;
-            
-            //std::cout << "Max. block size: " << yBlockSize << std::endl;
-            
             // Count number of image bands
             for(int i = 0; i < numIntDS; i++)
             {
@@ -5008,9 +4552,6 @@ namespace rsgis{namespace img{
             {
                 numFloatBands += datasets[i]->GetRasterCount();
             }
-            
-            //std::cout << "Number of Int Bands: " << numIntBands << std::endl;
-            //std::cout << "Number of Float Bands: " << numFloatBands << std::endl;
             
             // Get Image Input Bands
             bandIntOffsets = new int*[numIntBands];
@@ -5028,7 +4569,6 @@ namespace rsgis{namespace img{
                     bandIntOffsets[counter] = new int[2];
                     bandIntOffsets[counter][0] = dsOffsets[i][0];
                     bandIntOffsets[counter][1] = dsOffsets[i][1];
-                    //std::cout << counter << ") dataset " << i << " (int) band " << j << " offset [" << bandIntOffsets[counter][0] << "," << bandIntOffsets[counter][1] << "]\n";
                     counter++;
                 }
             }
@@ -5042,7 +4582,6 @@ namespace rsgis{namespace img{
                     bandFloatOffsets[counter] = new int[2];
                     bandFloatOffsets[counter][0] = dsOffsets[i][0];
                     bandFloatOffsets[counter][1] = dsOffsets[i][1];
-                    //std::cout << counter << ") dataset " << i << " (float) band " << j << " offset [" << bandFloatOffsets[counter][0] << "," << bandFloatOffsets[counter][1] << "]\n";
                     counter++;
                 }
             }
@@ -5073,8 +4612,6 @@ namespace rsgis{namespace img{
             // Loop images to process data
             for(int i = 0; i < nYBlocks; i++)
             {
-                //std::cout << i << " of " << nYBlocks << std::endl;
-                
                 for(int n = 0; n < numIntBands; n++)
                 {
                     rowOffset = bandIntOffsets[n][1] + (yBlockSize * i);
@@ -5109,7 +4646,6 @@ namespace rsgis{namespace img{
                         }
                         
                         extent.init(xPxl, xPxl, yPxl, yPxl);
-                        //std::cout << "[" << xPxl << "," << yPxl << "]\n";
                         
                         this->calc->calcImageValue(inDataIntColumn, numIntBands, inDataFloatColumn, numFloatBands, extent);
                         
@@ -5156,7 +4692,6 @@ namespace rsgis{namespace img{
                         }
                         
                         extent.init(xPxl, xPxl, yPxl, yPxl);
-                        //std::cout << "[" << xPxl << "," << yPxl << "]\n";
                         
                         this->calc->calcImageValue(inDataIntColumn, numIntBands, inDataFloatColumn, numFloatBands, extent);
                         xPxl += 1;
@@ -5466,9 +5001,6 @@ namespace rsgis{namespace img{
             {
                 imgUtils.getImageOverlapCut2Env(datasets, numDS, dsOffsets, &width, &height, gdalTranslation, env);
             }
-            
-            //std::cout << "Width = " << width << std::endl;
-            //std::cout << "Height = " << height << std::endl;
 			
 			// Count number of image bands
 			for(int i = 0; i < numDS; i++)
@@ -5498,7 +5030,6 @@ namespace rsgis{namespace img{
 					bandOffsets[counter] = new int[2];
 					bandOffsets[counter][0] = dsOffsets[i][0];
 					bandOffsets[counter][1] = dsOffsets[i][1];
-					//std::cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
 					counter++;
 				}
 			}
@@ -5520,8 +5051,6 @@ namespace rsgis{namespace img{
 			// Loop images to process data
 			for(int i = 0; i < height; i++)
 			{
-                //std::cout << i << " of " << height << std::endl;
-				
 				if((!quiet) && (feedback != 0) && ((i % feedback) == 0))
 				{
                     std::cout << "." << feedbackCounter << "." << std::flush;
@@ -5767,11 +5296,6 @@ namespace rsgis{namespace img{
                 pxlHeight *= (-1);
             }
             
-            //std::cout << "height = " << height << std::endl;
-            //std::cout << "Width = " << width << std::endl;
-            
-            //std::cout << "Max. block size: " << yBlockSize << std::endl;
-            
 			// Count number of image bands
 			for(int i = 0; i < numIntDS; i++)
 			{
@@ -5781,9 +5305,6 @@ namespace rsgis{namespace img{
 			{
 				numFloatBands += datasets[i]->GetRasterCount();
 			}
-            
-            //std::cout << "Number of Int Bands: " << numIntBands << std::endl;
-            //std::cout << "Number of Float Bands: " << numFloatBands << std::endl;
 			
 			// Get Image Input Bands
 			bandIntOffsets = new int*[numIntBands];
@@ -5801,7 +5322,6 @@ namespace rsgis{namespace img{
 					bandIntOffsets[counter] = new int[2];
 					bandIntOffsets[counter][0] = dsOffsets[i][0];
 					bandIntOffsets[counter][1] = dsOffsets[i][1];
-					//std::cout << counter << ") dataset " << i << " (int) band " << j << " offset [" << bandIntOffsets[counter][0] << "," << bandIntOffsets[counter][1] << "]\n";
 					counter++;
 				}
 			}
@@ -5815,7 +5335,6 @@ namespace rsgis{namespace img{
 					bandFloatOffsets[counter] = new int[2];
 					bandFloatOffsets[counter][0] = dsOffsets[i][0];
 					bandFloatOffsets[counter][1] = dsOffsets[i][1];
-					//std::cout << counter << ") dataset " << i << " (float) band " << j << " offset [" << bandFloatOffsets[counter][0] << "," << bandFloatOffsets[counter][1] << "]\n";
 					counter++;
 				}
 			}
@@ -5847,8 +5366,6 @@ namespace rsgis{namespace img{
 			// Loop images to process data
 			for(int i = 0; i < nYBlocks; i++)
 			{
-				//std::cout << i << " of " << nYBlocks << std::endl;
-                
 				for(int n = 0; n < numIntBands; n++)
 				{
                     rowOffset = bandIntOffsets[n][1] + (yBlockSize * i);
@@ -6248,7 +5765,6 @@ namespace rsgis{namespace img{
 			{
 				throw RSGISImageBandException(gdalFormat + std::string(" driver does not exists.."));
 			}
-			//std::cout << "New image width = " << width << " height = " << height << std::endl;
 
 			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, NULL);
 			
@@ -6288,7 +5804,6 @@ namespace rsgis{namespace img{
 					bandOffsets[counter] = new int[2];
 					bandOffsets[counter][0] = dsOffsets[i][0];
 					bandOffsets[counter][1] = dsOffsets[i][1];
-					//std::cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
 					counter++;
 				}
 			}
@@ -6321,8 +5836,6 @@ namespace rsgis{namespace img{
 			// Loop images to process data
 			for(int i = 0; i < height; i++)
 			{
-				//std::cout << i << " of " << height << std::endl;
-				
 				if((feedback != 0) && ((i % feedback) == 0))
 				{
 					std::cout << "." << feedbackCounter << "." << std::flush;
@@ -6630,10 +6143,7 @@ namespace rsgis{namespace img{
 			}
 			int windowMid = floor(((float)windowSize)/2.0); // Starting at 0!! NOT 1 otherwise would be ceil.
 			
-            //std::cout << "Window Size: " << windowSize << std::endl;
-            //std::cout << "Window Mid: " << windowMid << std::endl;
-            
-			// Find image overlap
+            // Find image overlap
             imgUtils.getImageOverlap(datasets, numDS, dsOffsets, &width, &height, gdalTranslation, &xBlockSize, &yBlockSize);
 			
 			// Count number of image bands
@@ -6654,22 +6164,15 @@ namespace rsgis{namespace img{
 					bandOffsets[counter] = new int[2];
 					bandOffsets[counter][0] = dsOffsets[i][0];
 					bandOffsets[counter][1] = dsOffsets[i][1];
-					//std::cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
 					counter++;
 				}
 			}
-			
-            
-            //std::cout << "Max. block size: " << yBlockSize << std::endl;
             
             int numOfLines = yBlockSize;
             if(yBlockSize < windowSize)
             {
                 numOfLines = ceil(((float)windowSize)/((float)yBlockSize))*yBlockSize;
             }
-            //std::cout << "Number of Lines: " << numOfLines << std::endl;
-            
-            //std::cout << "numInBands = " << numInBands << std::endl;
             
 			// Allocate memory
             numPxlsInBlock = width*numOfLines;
@@ -6715,11 +6218,8 @@ namespace rsgis{namespace img{
 			
 			outDataColumn = new double[this->numOutBands];
             
-            //std::cout << "height: " << height << std::endl;
             int nYBlocks = floor(((double)height) / ((double)numOfLines));
-            //std::cout << "nYBlocks: " << nYBlocks << std::endl;
             int remainRows = height - (nYBlocks * numOfLines);
-            //std::cout << "remainRows: " << remainRows << std::endl;
             int rowOffset = 0;
             unsigned int line = 0;
             long cLinePxl = 0;
@@ -6736,7 +6236,6 @@ namespace rsgis{namespace img{
             {
                 for(int i = 0; i < nYBlocks; i++)
                 {
-                    //std::cout << "i: " << i << std::endl;
                     if(i == 0)
                     {
                         // Set Upper Block with Zeros.
@@ -6752,11 +6251,6 @@ namespace rsgis{namespace img{
                         for(int n = 0; n < numInBands; n++)
                         {
                             rowOffset = bandOffsets[n][1] + (numOfLines * i);
-                            //std::cout << "rowOffset: " << rowOffset << std::endl;
-                            //std::cout << "bandOffsets["<<n<<"][0]: " << bandOffsets[n][0] << std::endl;
-                            //std::cout << "width: " << width << std::endl;
-                            //std::cout << "numOfLines: " << numOfLines << std::endl;
-                            
                             inputRasterBands[n]->RasterIO(GF_Read, bandOffsets[n][0], rowOffset, width, numOfLines, inputDataMain[n], width, numOfLines, GDT_Float32, 0, 0);
                         }
                         // Read Lower Block
@@ -6767,10 +6261,6 @@ namespace rsgis{namespace img{
                                 if(remainRows > 0)
                                 {
                                     rowOffset = bandOffsets[n][1] + (numOfLines * (i+1));
-                                    //std::cout << "rowOffset: " << rowOffset << std::endl;
-                                    //std::cout << "bandOffsets["<<n<<"][0]: " << bandOffsets[n][0] << std::endl;
-                                    //std::cout << "width: " << width << std::endl;
-                                    //std::cout << "remainRows = " << remainRows << std::endl;
                                     inputRasterBands[n]->RasterIO(GF_Read, bandOffsets[n][0], rowOffset, width, remainRows, inputDataLower[n], width, remainRows, GDT_Float32, 0, 0);
                                     for(int k = (remainRows*width); k < numPxlsInBlock; k++)
                                     {
@@ -6788,10 +6278,6 @@ namespace rsgis{namespace img{
                             else
                             {
                                 rowOffset = bandOffsets[n][1] + (numOfLines * (i+1));
-                                //std::cout << "rowOffset: " << rowOffset << std::endl;
-                                //std::cout << "bandOffsets["<<n<<"][0]: " << bandOffsets[n][0] << std::endl;
-                                //std::cout << "width: " << width << std::endl;
-                                //std::cout << "remainRows = " << remainRows << std::endl;
                                 inputRasterBands[n]->RasterIO(GF_Read, bandOffsets[n][0], rowOffset, width, numOfLines, inputDataLower[n], width, numOfLines, GDT_Float32, 0, 0);
                             }
                         }
@@ -6861,11 +6347,6 @@ namespace rsgis{namespace img{
                         for(int n = 0; n < numInBands; n++)
                         {
                             rowOffset = bandOffsets[n][1] + (numOfLines * (i+1));
-                            //std::cout << "rowOffset: " << rowOffset << std::endl;
-                            //std::cout << "bandOffsets["<<n<<"][0]: " << bandOffsets[n][0] << std::endl;
-                            //std::cout << "width: " << width << std::endl;
-                            //std::cout << "numOfLines: " << numOfLines << std::endl;
-                            
                             inputRasterBands[n]->RasterIO(GF_Read, bandOffsets[n][0], rowOffset, width, numOfLines, inputDataLower[n], width, numOfLines, GDT_Float32, 0, 0);
                         }
                     }
@@ -6873,7 +6354,6 @@ namespace rsgis{namespace img{
                     for(int m = 0; m < numOfLines; ++m)
                     {
                         line = (i*numOfLines)+m;
-                        //std::cout << "line = " << line << std::endl;
                         if((feedback != 0) && (line % feedback) == 0)
                         {
                             std::cout << "." << feedbackCounter << "." << std::flush;
@@ -6881,19 +6361,16 @@ namespace rsgis{namespace img{
                         }
                         
                         cLinePxl = m*width;
-                        //std::cout << "cLine: " << cLinePxl << std::endl;
                         
                         for(int j = 0; j < width; j++)
                         {
                             cPxl = cLinePxl+j;
                             if(m < windowMid)
                             {
-                                //std::cout << "Need Upper\n";
                                 for(int y = 0; y < windowSize; y++)
                                 {
                                     dWinY = y-windowMid;
                                     dLinePxls = dWinY * width;
-                                    //std::cout << y << " Y  = " << dLinePxls << " Width = " << width << " (cPxl + dLinePxls) = " << (cPxl + dLinePxls) << " numPxlsInBlock = " << numPxlsInBlock << " (numPxlsInBlock+(cPxl+dLinePxls)) = " << (numPxlsInBlock+(cPxl+dLinePxls)) << std::endl;
                                     
                                     if((cPxl + dLinePxls) < 0)
                                     {
@@ -6957,12 +6434,10 @@ namespace rsgis{namespace img{
                             }
                             else if(m > ((numOfLines-1)-windowMid))
                             {
-                                //std::cout << "Need Lower\n";
                                 for(int y = 0; y < windowSize; y++)
                                 {
                                     dWinY = y-windowMid;
                                     dLinePxls = dWinY * width;
-                                    //std::cout << "j = " << j << " y = " << y << ": " << dLinePxls << " Width = " << width << " (cPxl + dLinePxls) = " << (cPxl + dLinePxls) << " numPxlsInBlock = " << numPxlsInBlock << " ((cPxl+dLinePxls)-numPxlsInBlock) = " << ((cPxl+dLinePxls)-numPxlsInBlock) << std::endl;
                                     
                                     if((cPxl + dLinePxls) >= numPxlsInBlock)
                                     {
@@ -7026,13 +6501,10 @@ namespace rsgis{namespace img{
                             }
                             else
                             {
-                                //std::cout << "Within block\n";
-                                
                                 for(int y = 0; y < windowSize; y++)
                                 {
                                     dWinY = y-windowMid;
                                     dLinePxls = dWinY * width;
-                                    //std::cout << y << " Y  = " << dLinePxls << " Width = " << width << std::endl;
                                     
                                     for(int x = 0; x < windowSize; x++)
                                     {
@@ -7101,7 +6573,7 @@ namespace rsgis{namespace img{
                     for(int m = 0; m < remainRows; ++m)
                     {
                         line = (nYBlocks*numOfLines)+m;
-                        //std::cout << "line = " << line << std::endl;
+
                         if((feedback != 0) && (line % feedback) == 0)
                         {
                             std::cout << "." << feedbackCounter << "." << std::flush;
@@ -7109,19 +6581,16 @@ namespace rsgis{namespace img{
                         }
                         
                         cLinePxl = m*width;
-                        //std::cout << "cLine: " << cLinePxl << std::endl;
                         
                         for(int j = 0; j < width; j++)
                         {
                             cPxl = cLinePxl+j;
                             if(m < windowMid)
                             {
-                                //std::cout << "Need Upper\n";
                                 for(int y = 0; y < windowSize; y++)
                                 {
                                     dWinY = y-windowMid;
                                     dLinePxls = dWinY * width;
-                                    //std::cout << y << " Y  = " << dLinePxls << " Width = " << width << " (cPxl + dLinePxls) = " << (cPxl + dLinePxls) << " numPxlsInBlock = " << numPxlsInBlock << " (numPxlsInBlock+(cPxl+dLinePxls)) = " << (numPxlsInBlock+(cPxl+dLinePxls)) << std::endl;
                                     
                                     if((cPxl + dLinePxls) < 0)
                                     {
@@ -7185,12 +6654,10 @@ namespace rsgis{namespace img{
                             }
                             else if(m > ((numOfLines-1)-windowMid))
                             {
-                                //std::cout << "Need Lower\n";
                                 for(int y = 0; y < windowSize; y++)
                                 {
                                     dWinY = y-windowMid;
                                     dLinePxls = dWinY * width;
-                                    //std::cout << "j = " << j << " y = " << y << ": " << dLinePxls << " Width = " << width << " (cPxl + dLinePxls) = " << (cPxl + dLinePxls) << " numPxlsInBlock = " << numPxlsInBlock << " ((cPxl+dLinePxls)-numPxlsInBlock) = " << ((cPxl+dLinePxls)-numPxlsInBlock) << std::endl;
                                     
                                     if((cPxl + dLinePxls) >= numPxlsInBlock)
                                     {
@@ -7254,13 +6721,10 @@ namespace rsgis{namespace img{
                             }
                             else
                             {
-                                //std::cout << "Within block\n";
-                                
                                 for(int y = 0; y < windowSize; y++)
                                 {
                                     dWinY = y-windowMid;
                                     dLinePxls = dWinY * width;
-                                    //std::cout << y << " Y  = " << dLinePxls << " Width = " << width << std::endl;
                                     
                                     for(int x = 0; x < windowSize; x++)
                                     {
@@ -7560,9 +7024,6 @@ namespace rsgis{namespace img{
 				throw RSGISImageCalcException("Window size needs to be 3 or greater and an odd number.");
 			}
 			int windowMid = floor(((float)windowSize)/2.0); // Starting at 0!! NOT 1 otherwise would be ceil.
-			
-            //std::cout << "Window Size: " << windowSize << std::endl;
-            //std::cout << "Window Mid: " << windowMid << std::endl;
             
 			// Find image overlap
             imgUtils.getImageOverlap(datasets, numDS, dsOffsets, &width, &height, gdalTranslation, &xBlockSize, &yBlockSize);
@@ -7579,7 +7040,6 @@ namespace rsgis{namespace img{
 			{
 				throw RSGISImageBandException("Driver does not exists..");
 			}
-			//std::cout << "New image width = " << width << " height = " << height << std::endl;
             
 			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, NULL);
 			
@@ -7609,7 +7069,6 @@ namespace rsgis{namespace img{
 					bandOffsets[counter] = new int[2];
 					bandOffsets[counter][0] = dsOffsets[i][0];
 					bandOffsets[counter][1] = dsOffsets[i][1];
-					//std::cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
 					counter++;
 				}
 			}
@@ -7629,16 +7088,12 @@ namespace rsgis{namespace img{
             {
                 yBlockSize = outYBlockSize;
             }
-            //std::cout << "Max. block size: " << yBlockSize << std::endl;
-			            
+            
             int numOfLines = yBlockSize;
             if(yBlockSize < windowSize)
             {
                 numOfLines = ceil(((float)windowSize)/((float)yBlockSize))*yBlockSize;
             }
-            //std::cout << "Number of Lines: " << numOfLines << std::endl;
-            
-            //std::cout << "numInBands = " << numInBands << std::endl;
             
 			// Allocate memory
             numPxlsInBlock = width*numOfLines;
@@ -7689,12 +7144,8 @@ namespace rsgis{namespace img{
 			}
 			outDataColumn = new double[this->numOutBands];
 			
-
-            //std::cout << "height: " << height << std::endl;
             int nYBlocks = floor(((double)height) / ((double)numOfLines));
-            //std::cout << "nYBlocks: " << nYBlocks << std::endl;
             int remainRows = height - (nYBlocks * numOfLines);
-            //std::cout << "remainRows: " << remainRows << std::endl;
             int rowOffset = 0;
             unsigned int line = 0;
             long cLinePxl = 0;
@@ -7726,11 +7177,6 @@ namespace rsgis{namespace img{
                         for(int n = 0; n < numInBands; n++)
                         {
                             rowOffset = bandOffsets[n][1] + (numOfLines * i);
-                            //std::cout << "rowOffset: " << rowOffset << std::endl;
-                            //std::cout << "bandOffsets["<<n<<"][0]: " << bandOffsets[n][0] << std::endl;
-                            //std::cout << "width: " << width << std::endl;
-                            //std::cout << "numOfLines: " << numOfLines << std::endl;
-                            
                             inputRasterBands[n]->RasterIO(GF_Read, bandOffsets[n][0], rowOffset, width, numOfLines, inputDataMain[n], width, numOfLines, GDT_Float32, 0, 0);
                         }
                         // Read Lower Block
@@ -7741,10 +7187,6 @@ namespace rsgis{namespace img{
                                 if(remainRows > 0)
                                 {
                                     rowOffset = bandOffsets[n][1] + (numOfLines * (i+1));
-                                    //std::cout << "rowOffset: " << rowOffset << std::endl;
-                                    //std::cout << "bandOffsets["<<n<<"][0]: " << bandOffsets[n][0] << std::endl;
-                                    //std::cout << "width: " << width << std::endl;
-                                    //std::cout << "remainRows = " << remainRows << std::endl;
                                     inputRasterBands[n]->RasterIO(GF_Read, bandOffsets[n][0], rowOffset, width, remainRows, inputDataLower[n], width, remainRows, GDT_Float32, 0, 0);
                                     for(int k = (remainRows*width); k < numPxlsInBlock; k++)
                                     {
@@ -7762,10 +7204,6 @@ namespace rsgis{namespace img{
                             else
                             {
                                 rowOffset = bandOffsets[n][1] + (numOfLines * (i+1));
-                                //std::cout << "rowOffset: " << rowOffset << std::endl;
-                                //std::cout << "bandOffsets["<<n<<"][0]: " << bandOffsets[n][0] << std::endl;
-                                //std::cout << "width: " << width << std::endl;
-                                //std::cout << "remainRows = " << remainRows << std::endl;
                                 inputRasterBands[n]->RasterIO(GF_Read, bandOffsets[n][0], rowOffset, width, numOfLines, inputDataLower[n], width, numOfLines, GDT_Float32, 0, 0);
                             }
                         }
@@ -7835,11 +7273,6 @@ namespace rsgis{namespace img{
                         for(int n = 0; n < numInBands; n++)
                         {
                             rowOffset = bandOffsets[n][1] + (numOfLines * (i+1));
-                            //std::cout << "rowOffset: " << rowOffset << std::endl;
-                            //std::cout << "bandOffsets["<<n<<"][0]: " << bandOffsets[n][0] << std::endl;
-                            //std::cout << "width: " << width << std::endl;
-                            //std::cout << "numOfLines: " << numOfLines << std::endl;
-                            
                             inputRasterBands[n]->RasterIO(GF_Read, bandOffsets[n][0], rowOffset, width, numOfLines, inputDataLower[n], width, numOfLines, GDT_Float32, 0, 0);
                         }
                     }
@@ -7847,7 +7280,6 @@ namespace rsgis{namespace img{
                     for(int m = 0; m < numOfLines; ++m)
                     {
                         line = (i*numOfLines)+m;
-                        //std::cout << "line = " << line << std::endl;
                         if((feedback != 0) && (line % feedback) == 0)
                         {
                             std::cout << "." << feedbackCounter << "." << std::flush;
@@ -7855,19 +7287,16 @@ namespace rsgis{namespace img{
                         }
                         
                         cLinePxl = m*width;
-                        //std::cout << "cLine: " << cLinePxl << std::endl;
                         
                         for(int j = 0; j < width; j++)
                         {
                             cPxl = cLinePxl+j;
                             if(m < windowMid)
                             {
-                                //std::cout << "Need Upper\n";
                                 for(int y = 0; y < windowSize; y++)
                                 {
                                     dWinY = y-windowMid;
                                     dLinePxls = dWinY * width;
-                                    //std::cout << y << " Y  = " << dLinePxls << " Width = " << width << " (cPxl + dLinePxls) = " << (cPxl + dLinePxls) << " numPxlsInBlock = " << numPxlsInBlock << " (numPxlsInBlock+(cPxl+dLinePxls)) = " << (numPxlsInBlock+(cPxl+dLinePxls)) << std::endl;
                                     
                                     if((cPxl + dLinePxls) < 0)
                                     {
@@ -7931,12 +7360,10 @@ namespace rsgis{namespace img{
                             }
                             else if(m > ((numOfLines-1)-windowMid))
                             {
-                                //std::cout << "Need Lower\n";
                                 for(int y = 0; y < windowSize; y++)
                                 {
                                     dWinY = y-windowMid;
                                     dLinePxls = dWinY * width;
-                                    //std::cout << "j = " << j << " y = " << y << ": " << dLinePxls << " Width = " << width << " (cPxl + dLinePxls) = " << (cPxl + dLinePxls) << " numPxlsInBlock = " << numPxlsInBlock << " ((cPxl+dLinePxls)-numPxlsInBlock) = " << ((cPxl+dLinePxls)-numPxlsInBlock) << std::endl;
                                     
                                     if((cPxl + dLinePxls) >= numPxlsInBlock)
                                     {
@@ -8000,13 +7427,10 @@ namespace rsgis{namespace img{
                             }
                             else
                             {
-                                //std::cout << "Within block\n";
-                                
                                 for(int y = 0; y < windowSize; y++)
                                 {
                                     dWinY = y-windowMid;
                                     dLinePxls = dWinY * width;
-                                    //std::cout << y << " Y  = " << dLinePxls << " Width = " << width << std::endl;
                                     
                                     for(int x = 0; x < windowSize; x++)
                                     {
@@ -8069,10 +7493,8 @@ namespace rsgis{namespace img{
                     {
                         for(int k = 0; k < numPxlsInBlock; k++)
                         {
-                            //std::cout << inputDataLower[n][k] << " ";
                             inputDataMain[n][k] = inputDataLower[n][k];
                         }
-                        //std::cout << std::endl;
                     }
                     
                     // Read Lower Block
@@ -8087,7 +7509,6 @@ namespace rsgis{namespace img{
                     for(int m = 0; m < remainRows; ++m)
                     {
                         line = (nYBlocks*numOfLines)+m;
-                        //std::cout << "line = " << line << std::endl;
                         if((feedback != 0) && (line % feedback) == 0)
                         {
                             std::cout << "." << feedbackCounter << "." << std::flush;
@@ -8095,19 +7516,16 @@ namespace rsgis{namespace img{
                         }
                         
                         cLinePxl = m*width;
-                        //std::cout << "cLine: " << cLinePxl << std::endl;
                         
                         for(int j = 0; j < width; j++)
                         {
                             cPxl = cLinePxl+j;
                             if(m < windowMid)
                             {
-                                //std::cout << "Need Upper\n";
                                 for(int y = 0; y < windowSize; y++)
                                 {
                                     dWinY = y-windowMid;
                                     dLinePxls = dWinY * width;
-                                    //std::cout << y << " Y  = " << dLinePxls << " Width = " << width << " (cPxl + dLinePxls) = " << (cPxl + dLinePxls) << " numPxlsInBlock = " << numPxlsInBlock << " (numPxlsInBlock+(cPxl+dLinePxls)) = " << (numPxlsInBlock+(cPxl+dLinePxls)) << std::endl;
                                     
                                     if((cPxl + dLinePxls) < 0)
                                     {
@@ -8171,12 +7589,10 @@ namespace rsgis{namespace img{
                             }
                             else if(m > ((numOfLines-1)-windowMid))
                             {
-                                //std::cout << "Need Lower\n";
                                 for(int y = 0; y < windowSize; y++)
                                 {
                                     dWinY = y-windowMid;
                                     dLinePxls = dWinY * width;
-                                    //std::cout << "j = " << j << " y = " << y << ": " << dLinePxls << " Width = " << width << " (cPxl + dLinePxls) = " << (cPxl + dLinePxls) << " numPxlsInBlock = " << numPxlsInBlock << " ((cPxl+dLinePxls)-numPxlsInBlock) = " << ((cPxl+dLinePxls)-numPxlsInBlock) << std::endl;
                                     
                                     if((cPxl + dLinePxls) >= numPxlsInBlock)
                                     {
@@ -8240,13 +7656,10 @@ namespace rsgis{namespace img{
                             }
                             else
                             {
-                                //std::cout << "Within block\n";
-                                
                                 for(int y = 0; y < windowSize; y++)
                                 {
                                     dWinY = y-windowMid;
                                     dLinePxls = dWinY * width;
-                                    //std::cout << y << " Y  = " << dLinePxls << " Width = " << width << std::endl;
                                     
                                     for(int x = 0; x < windowSize; x++)
                                     {
@@ -8587,9 +8000,6 @@ namespace rsgis{namespace img{
 				throw RSGISImageCalcException("Window size needs to be 3 or greater and an odd number.");
 			}
 			int windowMid = floor(((float)windowSize)/2.0); // Starting at 0!! NOT 1 otherwise would be ceil.
-			
-            //std::cout << "Window Size: " << windowSize << std::endl;
-            //std::cout << "Window Mid: " << windowMid << std::endl;
             
 			// Find image overlap
             imgUtils.getImageOverlap(datasets, numDS, dsOffsets, &width, &height, gdalTranslation, &xBlockSize, &yBlockSize);
@@ -8627,7 +8037,6 @@ namespace rsgis{namespace img{
 					bandOffsets[counter] = new int[2];
 					bandOffsets[counter][0] = dsOffsets[i][0];
 					bandOffsets[counter][1] = dsOffsets[i][1];
-					//std::cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
 					counter++;
 				}
 			}
@@ -8647,16 +8056,12 @@ namespace rsgis{namespace img{
             {
                 yBlockSize = outYBlockSize;
             }
-            //std::cout << "Max. block size: " << yBlockSize << std::endl;
             
             int numOfLines = yBlockSize;
             if(yBlockSize < windowSize)
             {
                 numOfLines = ceil(((float)windowSize)/((float)yBlockSize))*yBlockSize;
             }
-            //std::cout << "Number of Lines: " << numOfLines << std::endl;
-            
-            //std::cout << "numInBands = " << numInBands << std::endl;
             
 			// Allocate memory
             numPxlsInBlock = width*numOfLines;
@@ -8708,11 +8113,8 @@ namespace rsgis{namespace img{
 			outDataColumn = new double[this->numOutBands];
 			
             
-            //std::cout << "height: " << height << std::endl;
             int nYBlocks = floor(((double)height) / ((double)numOfLines));
-            //std::cout << "nYBlocks: " << nYBlocks << std::endl;
             int remainRows = height - (nYBlocks * numOfLines);
-            //std::cout << "remainRows: " << remainRows << std::endl;
             int rowOffset = 0;
             unsigned int line = 0;
             long cLinePxl = 0;
@@ -8732,7 +8134,6 @@ namespace rsgis{namespace img{
             {
                 for(int i = 0; i < nYBlocks; i++)
                 {
-                    //std::cout << "i: " << i << std::endl;
                     if(i == 0)
                     {
                         // Set Upper Block with Zeros.
@@ -8748,11 +8149,6 @@ namespace rsgis{namespace img{
                         for(int n = 0; n < numInBands; n++)
                         {
                             rowOffset = bandOffsets[n][1] + (numOfLines * i);
-                            //std::cout << "rowOffset: " << rowOffset << std::endl;
-                            //std::cout << "bandOffsets["<<n<<"][0]: " << bandOffsets[n][0] << std::endl;
-                            //std::cout << "width: " << width << std::endl;
-                            //std::cout << "numOfLines: " << numOfLines << std::endl;
-                            
                             inputRasterBands[n]->RasterIO(GF_Read, bandOffsets[n][0], rowOffset, width, numOfLines, inputDataMain[n], width, numOfLines, GDT_Float32, 0, 0);
                         }
                         // Read Lower Block
@@ -8763,10 +8159,6 @@ namespace rsgis{namespace img{
                                 if(remainRows > 0)
                                 {
                                     rowOffset = bandOffsets[n][1] + (numOfLines * (i+1));
-                                    //std::cout << "rowOffset: " << rowOffset << std::endl;
-                                    //std::cout << "bandOffsets["<<n<<"][0]: " << bandOffsets[n][0] << std::endl;
-                                    //std::cout << "width: " << width << std::endl;
-                                    //std::cout << "remainRows = " << remainRows << std::endl;
                                     inputRasterBands[n]->RasterIO(GF_Read, bandOffsets[n][0], rowOffset, width, remainRows, inputDataLower[n], width, remainRows, GDT_Float32, 0, 0);
                                     for(int k = (remainRows*width); k < numPxlsInBlock; k++)
                                     {
@@ -8784,10 +8176,6 @@ namespace rsgis{namespace img{
                             else
                             {
                                 rowOffset = bandOffsets[n][1] + (numOfLines * (i+1));
-                                //std::cout << "rowOffset: " << rowOffset << std::endl;
-                                //std::cout << "bandOffsets["<<n<<"][0]: " << bandOffsets[n][0] << std::endl;
-                                //std::cout << "width: " << width << std::endl;
-                                //std::cout << "remainRows = " << remainRows << std::endl;
                                 inputRasterBands[n]->RasterIO(GF_Read, bandOffsets[n][0], rowOffset, width, numOfLines, inputDataLower[n], width, numOfLines, GDT_Float32, 0, 0);
                             }
                         }
@@ -8857,11 +8245,6 @@ namespace rsgis{namespace img{
                         for(int n = 0; n < numInBands; n++)
                         {
                             rowOffset = bandOffsets[n][1] + (numOfLines * (i+1));
-                            //std::cout << "rowOffset: " << rowOffset << std::endl;
-                            //std::cout << "bandOffsets["<<n<<"][0]: " << bandOffsets[n][0] << std::endl;
-                            //std::cout << "width: " << width << std::endl;
-                            //std::cout << "numOfLines: " << numOfLines << std::endl;
-                            
                             inputRasterBands[n]->RasterIO(GF_Read, bandOffsets[n][0], rowOffset, width, numOfLines, inputDataLower[n], width, numOfLines, GDT_Float32, 0, 0);
                         }
                     }
@@ -8869,7 +8252,6 @@ namespace rsgis{namespace img{
                     for(int m = 0; m < numOfLines; ++m)
                     {
                         line = (i*numOfLines)+m;
-                        //std::cout << "line = " << line << std::endl;
                         if((feedback != 0) && (line % feedback) == 0)
                         {
                             std::cout << "." << feedbackCounter << "." << std::flush;
@@ -8877,7 +8259,6 @@ namespace rsgis{namespace img{
                         }
                         
                         cLinePxl = m*width;
-                        //std::cout << "cLine: " << cLinePxl << std::endl;
                         
                         xPxl = 0;
                         for(int j = 0; j < width; j++)
@@ -8885,12 +8266,10 @@ namespace rsgis{namespace img{
                             cPxl = cLinePxl+j;
                             if(m < windowMid)
                             {
-                                //std::cout << "Need Upper\n";
                                 for(int y = 0; y < windowSize; y++)
                                 {
                                     dWinY = y-windowMid;
                                     dLinePxls = dWinY * width;
-                                    //std::cout << y << " Y  = " << dLinePxls << " Width = " << width << " (cPxl + dLinePxls) = " << (cPxl + dLinePxls) << " numPxlsInBlock = " << numPxlsInBlock << " (numPxlsInBlock+(cPxl+dLinePxls)) = " << (numPxlsInBlock+(cPxl+dLinePxls)) << std::endl;
                                     
                                     if((cPxl + dLinePxls) < 0)
                                     {
@@ -8954,12 +8333,10 @@ namespace rsgis{namespace img{
                             }
                             else if(m > ((numOfLines-1)-windowMid))
                             {
-                                //std::cout << "Need Lower\n";
                                 for(int y = 0; y < windowSize; y++)
                                 {
                                     dWinY = y-windowMid;
                                     dLinePxls = dWinY * width;
-                                    //std::cout << "j = " << j << " y = " << y << ": " << dLinePxls << " Width = " << width << " (cPxl + dLinePxls) = " << (cPxl + dLinePxls) << " numPxlsInBlock = " << numPxlsInBlock << " ((cPxl+dLinePxls)-numPxlsInBlock) = " << ((cPxl+dLinePxls)-numPxlsInBlock) << std::endl;
                                     
                                     if((cPxl + dLinePxls) >= numPxlsInBlock)
                                     {
@@ -9023,13 +8400,10 @@ namespace rsgis{namespace img{
                             }
                             else
                             {
-                                //std::cout << "Within block\n";
-                                
                                 for(int y = 0; y < windowSize; y++)
                                 {
                                     dWinY = y-windowMid;
                                     dLinePxls = dWinY * width;
-                                    //std::cout << y << " Y  = " << dLinePxls << " Width = " << width << std::endl;
                                     
                                     for(int x = 0; x < windowSize; x++)
                                     {
@@ -9117,7 +8491,7 @@ namespace rsgis{namespace img{
                     for(int m = 0; m < remainRows; ++m)
                     {
                         line = (nYBlocks*numOfLines)+m;
-                        //std::cout << "line = " << line << std::endl;
+
                         if((feedback != 0) && (line % feedback) == 0)
                         {
                             std::cout << "." << feedbackCounter << "." << std::flush;
@@ -9125,7 +8499,6 @@ namespace rsgis{namespace img{
                         }
                         
                         cLinePxl = m*width;
-                        //std::cout << "cLine: " << cLinePxl << std::endl;
                         
                         xPxl = 0;
                         for(int j = 0; j < width; j++)
@@ -9133,12 +8506,10 @@ namespace rsgis{namespace img{
                             cPxl = cLinePxl+j;
                             if(m < windowMid)
                             {
-                                //std::cout << "Need Upper\n";
                                 for(int y = 0; y < windowSize; y++)
                                 {
                                     dWinY = y-windowMid;
                                     dLinePxls = dWinY * width;
-                                    //std::cout << y << " Y  = " << dLinePxls << " Width = " << width << " (cPxl + dLinePxls) = " << (cPxl + dLinePxls) << " numPxlsInBlock = " << numPxlsInBlock << " (numPxlsInBlock+(cPxl+dLinePxls)) = " << (numPxlsInBlock+(cPxl+dLinePxls)) << std::endl;
                                     
                                     if((cPxl + dLinePxls) < 0)
                                     {
@@ -9202,12 +8573,10 @@ namespace rsgis{namespace img{
                             }
                             else if(m > ((numOfLines-1)-windowMid))
                             {
-                                //std::cout << "Need Lower\n";
                                 for(int y = 0; y < windowSize; y++)
                                 {
                                     dWinY = y-windowMid;
                                     dLinePxls = dWinY * width;
-                                    //std::cout << "j = " << j << " y = " << y << ": " << dLinePxls << " Width = " << width << " (cPxl + dLinePxls) = " << (cPxl + dLinePxls) << " numPxlsInBlock = " << numPxlsInBlock << " ((cPxl+dLinePxls)-numPxlsInBlock) = " << ((cPxl+dLinePxls)-numPxlsInBlock) << std::endl;
                                     
                                     if((cPxl + dLinePxls) >= numPxlsInBlock)
                                     {
@@ -9271,13 +8640,10 @@ namespace rsgis{namespace img{
                             }
                             else
                             {
-                                //std::cout << "Within block\n";
-                                
                                 for(int y = 0; y < windowSize; y++)
                                 {
                                     dWinY = y-windowMid;
                                     dLinePxls = dWinY * width;
-                                    //std::cout << y << " Y  = " << dLinePxls << " Width = " << width << std::endl;
                                     
                                     for(int x = 0; x < windowSize; x++)
                                     {
@@ -9338,8 +8704,6 @@ namespace rsgis{namespace img{
             {
                 
             }
-            
-            
             std::cout << " Complete.\n";
 		}
 		catch(RSGISImageCalcException& e)
@@ -9626,9 +8990,6 @@ namespace rsgis{namespace img{
             }
             int windowMid = floor(((float)windowSize)/2.0); // Starting at 0!! NOT 1 otherwise would be ceil.
             
-            //std::cout << "Window Size: " << windowSize << std::endl;
-            //std::cout << "Window Mid: " << windowMid << std::endl;
-            
             // Find image overlap
             imgUtils.getImageOverlap(datasets, numDS, dsOffsets, &width, &height, gdalTranslation, &xBlockSize, &yBlockSize);
             
@@ -9644,7 +9005,6 @@ namespace rsgis{namespace img{
             {
                 throw RSGISImageBandException("Driver does not exists..");
             }
-            //std::cout << "New image width = " << width << " height = " << height << std::endl;
             
             outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, NULL);
             
@@ -9674,7 +9034,6 @@ namespace rsgis{namespace img{
                     bandOffsets[counter] = new int[2];
                     bandOffsets[counter][0] = dsOffsets[i][0];
                     bandOffsets[counter][1] = dsOffsets[i][1];
-                    //std::cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
                     counter++;
                 }
             }
@@ -9694,7 +9053,6 @@ namespace rsgis{namespace img{
             {
                 yBlockSize = outYBlockSize;
             }
-            //std::cout << "Max. block size: " << yBlockSize << std::endl;
             
             int numOfLines = yBlockSize;
             if(yBlockSize < windowSize)
@@ -9752,11 +9110,8 @@ namespace rsgis{namespace img{
             outDataColumn = new double[this->numOutBands];
             
             
-            //std::cout << "height: " << height << std::endl;
             int nYBlocks = floor(((double)height) / ((double)numOfLines));
-            //std::cout << "nYBlocks: " << nYBlocks << std::endl;
             int remainRows = height - (nYBlocks * numOfLines);
-            //std::cout << "remainRows: " << remainRows << std::endl;
             int rowOffset = 0;
             unsigned int line = 0;
             long cLinePxl = 0;
@@ -9788,7 +9143,6 @@ namespace rsgis{namespace img{
             {
                 for(int i = 0; i < nYBlocks; i++)
                 {
-                    //std::cout << "i: " << i << std::endl;
                     if(i == 0)
                     {
                         // Set Upper Block with Zeros.
@@ -9804,11 +9158,6 @@ namespace rsgis{namespace img{
                         for(int n = 0; n < numInBands; n++)
                         {
                             rowOffset = bandOffsets[n][1] + (numOfLines * i);
-                            //std::cout << "rowOffset: " << rowOffset << std::endl;
-                            //std::cout << "bandOffsets["<<n<<"][0]: " << bandOffsets[n][0] << std::endl;
-                            //std::cout << "width: " << width << std::endl;
-                            //std::cout << "numOfLines: " << numOfLines << std::endl;
-                            
                             inputRasterBands[n]->RasterIO(GF_Read, bandOffsets[n][0], rowOffset, width, numOfLines, inputDataMain[n], width, numOfLines, GDT_Float32, 0, 0);
                         }
                         // Read Lower Block
@@ -9819,10 +9168,6 @@ namespace rsgis{namespace img{
                                 if(remainRows > 0)
                                 {
                                     rowOffset = bandOffsets[n][1] + (numOfLines * (i+1));
-                                    //std::cout << "rowOffset: " << rowOffset << std::endl;
-                                    //std::cout << "bandOffsets["<<n<<"][0]: " << bandOffsets[n][0] << std::endl;
-                                    //std::cout << "width: " << width << std::endl;
-                                    //std::cout << "remainRows = " << remainRows << std::endl;
                                     inputRasterBands[n]->RasterIO(GF_Read, bandOffsets[n][0], rowOffset, width, remainRows, inputDataLower[n], width, remainRows, GDT_Float32, 0, 0);
                                     for(int k = (remainRows*width); k < numPxlsInBlock; k++)
                                     {
@@ -9840,10 +9185,6 @@ namespace rsgis{namespace img{
                             else
                             {
                                 rowOffset = bandOffsets[n][1] + (numOfLines * (i+1));
-                                //std::cout << "rowOffset: " << rowOffset << std::endl;
-                                //std::cout << "bandOffsets["<<n<<"][0]: " << bandOffsets[n][0] << std::endl;
-                                //std::cout << "width: " << width << std::endl;
-                                //std::cout << "remainRows = " << remainRows << std::endl;
                                 inputRasterBands[n]->RasterIO(GF_Read, bandOffsets[n][0], rowOffset, width, numOfLines, inputDataLower[n], width, numOfLines, GDT_Float32, 0, 0);
                             }
                         }
@@ -9913,11 +9254,6 @@ namespace rsgis{namespace img{
                         for(int n = 0; n < numInBands; n++)
                         {
                             rowOffset = bandOffsets[n][1] + (numOfLines * (i+1));
-                            //std::cout << "rowOffset: " << rowOffset << std::endl;
-                            //std::cout << "bandOffsets["<<n<<"][0]: " << bandOffsets[n][0] << std::endl;
-                            //std::cout << "width: " << width << std::endl;
-                            //std::cout << "numOfLines: " << numOfLines << std::endl;
-                            
                             inputRasterBands[n]->RasterIO(GF_Read, bandOffsets[n][0], rowOffset, width, numOfLines, inputDataLower[n], width, numOfLines, GDT_Float32, 0, 0);
                         }
                     }
@@ -9925,7 +9261,6 @@ namespace rsgis{namespace img{
                     for(int m = 0; m < numOfLines; ++m)
                     {
                         line = (i*numOfLines)+m;
-                        //std::cout << "line = " << line << std::endl;
                         if((feedback != 0) && (line % feedback) == 0)
                         {
                             std::cout << "." << feedbackCounter << "." << std::flush;
@@ -9933,7 +9268,6 @@ namespace rsgis{namespace img{
                         }
                         
                         cLinePxl = m*width;
-                        //std::cout << "cLine: " << cLinePxl << std::endl;
                         
                         pxlTLX = gdalTranslation[0];
                         for(int j = 0; j < width; j++)
@@ -9941,12 +9275,10 @@ namespace rsgis{namespace img{
                             cPxl = cLinePxl+j;
                             if(m < windowMid)
                             {
-                                //std::cout << "Need Upper\n";
                                 for(int y = 0; y < windowSize; y++)
                                 {
                                     dWinY = y-windowMid;
                                     dLinePxls = dWinY * width;
-                                    //std::cout << y << " Y  = " << dLinePxls << " Width = " << width << " (cPxl + dLinePxls) = " << (cPxl + dLinePxls) << " numPxlsInBlock = " << numPxlsInBlock << " (numPxlsInBlock+(cPxl+dLinePxls)) = " << (numPxlsInBlock+(cPxl+dLinePxls)) << std::endl;
                                     
                                     if((cPxl + dLinePxls) < 0)
                                     {
@@ -10010,12 +9342,10 @@ namespace rsgis{namespace img{
                             }
                             else if(m > ((numOfLines-1)-windowMid))
                             {
-                                //std::cout << "Need Lower\n";
                                 for(int y = 0; y < windowSize; y++)
                                 {
                                     dWinY = y-windowMid;
                                     dLinePxls = dWinY * width;
-                                    //std::cout << "j = " << j << " y = " << y << ": " << dLinePxls << " Width = " << width << " (cPxl + dLinePxls) = " << (cPxl + dLinePxls) << " numPxlsInBlock = " << numPxlsInBlock << " ((cPxl+dLinePxls)-numPxlsInBlock) = " << ((cPxl+dLinePxls)-numPxlsInBlock) << std::endl;
                                     
                                     if((cPxl + dLinePxls) >= numPxlsInBlock)
                                     {
@@ -10079,13 +9409,10 @@ namespace rsgis{namespace img{
                             }
                             else
                             {
-                                //std::cout << "Within block\n";
-                                
                                 for(int y = 0; y < windowSize; y++)
                                 {
                                     dWinY = y-windowMid;
                                     dLinePxls = dWinY * width;
-                                    //std::cout << y << " Y  = " << dLinePxls << " Width = " << width << std::endl;
                                     
                                     for(int x = 0; x < windowSize; x++)
                                     {
@@ -10115,7 +9442,6 @@ namespace rsgis{namespace img{
                                     }
                                 }
                             }
-                            
 
                             pxlExt.init(pxlTLX, (pxlTLX+pxlWidth), pxlTLY, (pxlTLY-pxlHeight));
                             this->calc->calcImageValue(inDataBlock, numInBands, windowSize, outDataColumn, pxlExt);
@@ -10167,7 +9493,6 @@ namespace rsgis{namespace img{
                     for(int m = 0; m < remainRows; ++m)
                     {
                         line = (nYBlocks*numOfLines)+m;
-                        //std::cout << "line = " << line << std::endl;
                         if((feedback != 0) && (line % feedback) == 0)
                         {
                             std::cout << "." << feedbackCounter << "." << std::flush;
@@ -10175,7 +9500,6 @@ namespace rsgis{namespace img{
                         }
                         
                         cLinePxl = m*width;
-                        //std::cout << "cLine: " << cLinePxl << std::endl;
                         
                         pxlTLX = gdalTranslation[0];
                         for(int j = 0; j < width; j++)
@@ -10183,12 +9507,10 @@ namespace rsgis{namespace img{
                             cPxl = cLinePxl+j;
                             if(m < windowMid)
                             {
-                                //std::cout << "Need Upper\n";
                                 for(int y = 0; y < windowSize; y++)
                                 {
                                     dWinY = y-windowMid;
                                     dLinePxls = dWinY * width;
-                                    //std::cout << y << " Y  = " << dLinePxls << " Width = " << width << " (cPxl + dLinePxls) = " << (cPxl + dLinePxls) << " numPxlsInBlock = " << numPxlsInBlock << " (numPxlsInBlock+(cPxl+dLinePxls)) = " << (numPxlsInBlock+(cPxl+dLinePxls)) << std::endl;
                                     
                                     if((cPxl + dLinePxls) < 0)
                                     {
@@ -10252,12 +9574,10 @@ namespace rsgis{namespace img{
                             }
                             else if(m > ((numOfLines-1)-windowMid))
                             {
-                                //std::cout << "Need Lower\n";
                                 for(int y = 0; y < windowSize; y++)
                                 {
                                     dWinY = y-windowMid;
                                     dLinePxls = dWinY * width;
-                                    //std::cout << "j = " << j << " y = " << y << ": " << dLinePxls << " Width = " << width << " (cPxl + dLinePxls) = " << (cPxl + dLinePxls) << " numPxlsInBlock = " << numPxlsInBlock << " ((cPxl+dLinePxls)-numPxlsInBlock) = " << ((cPxl+dLinePxls)-numPxlsInBlock) << std::endl;
                                     
                                     if((cPxl + dLinePxls) >= numPxlsInBlock)
                                     {
@@ -10321,13 +9641,10 @@ namespace rsgis{namespace img{
                             }
                             else
                             {
-                                //std::cout << "Within block\n";
-                                
                                 for(int y = 0; y < windowSize; y++)
                                 {
                                     dWinY = y-windowMid;
                                     dLinePxls = dWinY * width;
-                                    //std::cout << y << " Y  = " << dLinePxls << " Width = " << width << std::endl;
                                     
                                     for(int x = 0; x < windowSize; x++)
                                     {
@@ -10382,8 +9699,6 @@ namespace rsgis{namespace img{
             {
                 
             }
-            
-            
             std::cout << " Complete.\n";
         }
         catch(RSGISImageCalcException& e)
@@ -10678,7 +9993,6 @@ namespace rsgis{namespace img{
 			{
 				throw RSGISImageBandException("ENVI driver does not exists..");
 			}
-			//std::cout << "New image width = " << width << " height = " << height << std::endl;
 
 			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, NULL);
 			
@@ -10713,7 +10027,6 @@ namespace rsgis{namespace img{
 					bandOffsets[counter] = new int[2];
 					bandOffsets[counter][0] = dsOffsets[i][0];
 					bandOffsets[counter][1] = dsOffsets[i][1];
-					//std::cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
 					counter++;
 				}
 			}
@@ -10741,12 +10054,16 @@ namespace rsgis{namespace img{
 			outDataColumn = new double[this->numOutBands];
 			
 			int feedback = height/10;
-			if (feedback == 0) {feedback = 1;} // Set feedback to 1
+			if (feedback == 0)
+            {
+                feedback = 1; // Set feedback to 1
+            }
 			int feedbackCounter = 0;
 			if(height > 100)
 			{
 				std::cout << "Started " << std::flush;
-			}			// Loop images to process data
+			}
+            // Loop images to process data
 			for(int i = 0; i < height; i++)
 			{				
 				if((feedback != 0) && ((i % feedback) == 0))
@@ -10908,8 +10225,6 @@ namespace rsgis{namespace img{
 		}
 		catch(RSGISImageCalcException& e)
 		{
-			//GDALClose(outputImageDS);
-			
 			if(gdalTranslation != NULL)
 			{
 				delete[] gdalTranslation;
@@ -10986,8 +10301,6 @@ namespace rsgis{namespace img{
 		}
 		catch(RSGISImageBandException& e)
 		{
-			//GDALClose(outputImageDS);
-			
 			if(gdalTranslation != NULL)
 			{
 				delete[] gdalTranslation;
@@ -11214,7 +10527,6 @@ namespace rsgis{namespace img{
 					bandOffsets[counter] = new int[2];
 					bandOffsets[counter][0] = dsOffsets[i][0];
 					bandOffsets[counter][1] = dsOffsets[i][1];
-					//std::cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
 					counter++;
 				}
 			}
@@ -11227,7 +10539,6 @@ namespace rsgis{namespace img{
 				bandOffsets[counter] = new int[2];
 				bandOffsets[counter][0] = dsOffsets[numDS-1][0];
 				bandOffsets[counter][1] = dsOffsets[numDS-1][1];
-				//std::cout << counter << ") dataset " << numDS-1 << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
 				counter++;
 			}
 			
@@ -11417,8 +10728,6 @@ namespace rsgis{namespace img{
 				std::cout << "Complete\r" << std::flush;
 				std::cout << "\r                                                                                                                            \r" << std::flush;
 			}
-			//std::cout << "Done the main bit, starting to tidy up!" << std::endl;
-			
 		}
 		catch(RSGISImageCalcException& e)
 		{
@@ -11706,7 +11015,6 @@ namespace rsgis{namespace img{
 			
 			if ((env->getWidth() < pxlWidth) | (env->getHeight() < pxlHeight))
 			{
-				//std::cout << "BUFFERING\n";
 				buffer = true;
 				bufferedEnvelope = new geos::geom::Envelope(env->getMinX() - pxlWidth / 2, env->getMaxX() + pxlWidth / 2, env->getMinY() - pxlHeight / 2, env->getMaxY() + pxlHeight / 2);
 			}
@@ -11752,7 +11060,6 @@ namespace rsgis{namespace img{
 					bandOffsets[counter] = new int[2];
 					bandOffsets[counter][0] = dsOffsets[i][0];
 					bandOffsets[counter][1] = dsOffsets[i][1];
-					//std::cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
 					counter++;
 				}
 			}
@@ -11876,13 +11183,9 @@ namespace rsgis{namespace img{
 				pxlTLY -= pxlHeight;
 				pxlTLX = gdalTranslation[0];
 			}
-			//std::cout << "Done the main bit, starting to tidy up!" << std::endl;
-			
 		}
 		catch(RSGISImageCalcException& e)
 		{
-			//GDALClose(outputImageDS);
-			
 			if(gdalTranslation != NULL)
 			{
 				delete[] gdalTranslation;
@@ -11938,8 +11241,6 @@ namespace rsgis{namespace img{
 		}
 		catch(RSGISImageBandException& e)
 		{
-			//GDALClose(outputImageDS);
-			
 			if(gdalTranslation != NULL)
 			{
 				delete[] gdalTranslation;
@@ -12069,7 +11370,6 @@ namespace rsgis{namespace img{
 		int height = 0;
 		int width = 0;
 		int numInBands = 0;
-		//int numOutBands = 0;
 		
 		float **inputMask = NULL;
 		float **inputData = NULL;
@@ -12123,7 +11423,6 @@ namespace rsgis{namespace img{
 			bandOffsets[counter] = new int[2];
 			bandOffsets[counter][0] = dsOffsets[0][0];
 			bandOffsets[counter][1] = dsOffsets[0][1];
-			//std::cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
 			counter++;
 			
 			// Get Image Input Bands
@@ -12136,7 +11435,6 @@ namespace rsgis{namespace img{
 					inputRasterBands[j] = datasets[i]->GetRasterBand(j+1);
 					bandOffsets[counter][0] = dsOffsets[i][0];
 					bandOffsets[counter][1] = dsOffsets[i][1];
-					//std::cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
 					counter++;
 				}
 			}
@@ -12149,7 +11447,6 @@ namespace rsgis{namespace img{
 				outputRasterBands[j] = datasets[numDS-1]->GetRasterBand(j+1);
 				bandOffsets[counter][0] = dsOffsets[numDS-1][0];
 				bandOffsets[counter][1] = dsOffsets[numDS-1][1];
-				//std::cout << counter << ") dataset " << numDS-1 << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
 				counter++;
 			}
 			
@@ -12240,13 +11537,9 @@ namespace rsgis{namespace img{
 				std::cout << "Complete" << std::flush;
 				std::cout << "\r                                                                                                                            \r" << std::flush;
 			}
-			//std::cout << "Done the main bit, starting to tidy up!" << std::endl;
-			
 		}
 		catch(RSGISImageCalcException& e)
 		{
-			//GDALClose(outputImageDS);
-			
 			if(gdalTranslation != NULL)
 			{
 				delete[] gdalTranslation;
@@ -12334,8 +11627,6 @@ namespace rsgis{namespace img{
 		}
 		catch(RSGISImageBandException& e)
 		{
-			//GDALClose(outputImageDS);
-			
 			if(gdalTranslation != NULL)
 			{
 				delete[] gdalTranslation;
@@ -12535,7 +11826,6 @@ namespace rsgis{namespace img{
                         gdalBands[b]->RasterIO(GF_Read, x, 0, 1, 1, &pxlFloatVals[b], 1, 1, GDT_Float32, 0, 0);
                     }
                 }
-                //std::cout << "[" << x << ", " << 0 << "]" << std::endl;
                 this->calc->calcImageValue(pxlIntVals, numIntVals, pxlFloatVals, numfloatVals);
                 
                 // Bottom
@@ -12551,7 +11841,6 @@ namespace rsgis{namespace img{
                         gdalBands[b]->RasterIO(GF_Read, x, (imgHeight-1), 1, 1, &pxlFloatVals[b], 1, 1, GDT_Float32, 0, 0);
                     }
                 }
-                //std::cout << "[" << x << ", " << (imgHeight-1) << "]" << std::endl;
                 this->calc->calcImageValue(pxlIntVals, numIntVals, pxlFloatVals, numfloatVals);
             }
             
@@ -12571,7 +11860,6 @@ namespace rsgis{namespace img{
                         gdalBands[b]->RasterIO(GF_Read, 0, y, 1, 1, &pxlFloatVals[b], 1, 1, GDT_Float32, 0, 0);
                     }
                 }
-                //std::cout << "[" << 0 << ", " << y << "]" << std::endl;
                 this->calc->calcImageValue(pxlIntVals, numIntVals, pxlFloatVals, numfloatVals);
                 
                 // Right
@@ -12586,7 +11874,6 @@ namespace rsgis{namespace img{
                         gdalBands[b]->RasterIO(GF_Read, (imgWidth-1), y, 1, 1, &pxlFloatVals[b], 1, 1, GDT_Float32, 0, 0);
                     }
                 }
-                //std::cout << "[" << (imgWidth-1) << ", " << 0 << "]" << std::endl;
                 this->calc->calcImageValue(pxlIntVals, numIntVals, pxlFloatVals, numfloatVals);
             }
             

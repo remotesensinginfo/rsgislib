@@ -196,19 +196,8 @@ namespace rsgis{namespace img{
                 {
                     for(unsigned int i = 0; i < numBands; ++i)
                     {
-                        /*
-                        if(i == 0)
-                        {
-                            std::cout << bandValues[i];
-                        }
-                        else
-                        {
-                            std::cout << "," << bandValues[i];
-                        }
-                        */
                         this->dataRow[i] = bandValues[i];
                     }
-                    //std::cout << std::endl;
                     dataExport->addDataRow(dataRow, H5::PredType::NATIVE_FLOAT);
                     currentPxl = 1;
                 }

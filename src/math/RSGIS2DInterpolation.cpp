@@ -76,7 +76,7 @@ namespace rsgis {namespace math{
                         }
                     }
                 }
-                //std::cout << "knn->size() = " << knn->size() << std::endl;
+
                 if(knn->size() < k)
                 {
                     knn->push_back(std::pair<double,RSGISInterpolatorDataPoint>(dist, *iterPts));
@@ -105,7 +105,7 @@ namespace rsgis {namespace math{
             {
                 throw RSGISInterpolationException("Not enough data points, need at least 3.");
             }
-            //std::cout << "pts->size() = " << pts->size() << std::endl;
+
             
             // Check that the points are not on a line
             double meanX = 0;
@@ -117,8 +117,6 @@ namespace rsgis {namespace math{
             }
             meanX = meanX / pts->size();
             meanY = meanY / pts->size();
-            //std::cout << "meanX = " << meanX << std::endl;
-            //std::cout << "meanY = " << meanY << std::endl;
             
             double varX = 0;
             double varY = 0;
@@ -130,9 +128,6 @@ namespace rsgis {namespace math{
             
             varX = fabs(varX / pts->size());
             varY = fabs(varY / pts->size());
-            
-            //std::cout << "varX = " << varX << std::endl;
-            //std::cout << "varY = " << varX << std::endl;
             
             if((varX < 4) | (varY < 4))
             {
@@ -426,7 +421,6 @@ namespace rsgis {namespace math{
         try
         {
             outVal = (a * eastings) + (b * northings) + c;
-            //std::cout << "Out Value [" << eastings << ", " << northings << "] = " << outVal << std::endl;
         }
         catch(std::exception &e)
         {

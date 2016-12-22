@@ -146,9 +146,7 @@ namespace rsgis{namespace reg{
                     tiePt->metricVal = std::numeric_limits<double>::signaling_NaN();
                     
                     this->findTiePointLocation(tiePt, windowSize, searchArea, metric, subPixelResolution, &xShiftPxl, &yShiftPxl);
-                    
-                    //std::cout << "Shift [" << tiePt->xShift << "," << tiePt->yShift << "] = " << tiePt->metricVal << std::endl;
-                    
+                                        
                     xShift[j] = tiePt->xShift;
                     yShift[j] = tiePt->yShift;
                     metricVal[j] = tiePt->metricVal;

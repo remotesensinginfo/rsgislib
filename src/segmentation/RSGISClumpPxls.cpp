@@ -71,7 +71,6 @@ namespace rsgis{namespace segment{
             
             for(unsigned int j = 0; j < width; ++j)
             {
-                //std::cout << "Processing Pixel [" << j << "," << i << "]\n";
                 // Get pixel value from clump image for (j,i)
                 clumpBand->RasterIO(GF_Read, j, i, 1, 1, &uiPxlVal, 1, 1, GDT_UInt32, 0, 0);
                 
@@ -106,9 +105,6 @@ namespace rsgis{namespace segment{
                         {
                             rsgis::img::PxlLoc pxl = clumpSearchPxls.front();
                             clumpSearchPxls.pop();
-                            
-                            //std::cout << "\tSearch Size = " << clumpSearchPxls.size() << std::endl;
-                            //std::cout << "\t\tProcessing [" << pxl.xPos << "," << pxl.yPos << "]\n";
                             
                             // Above
                             if(((long)pxl.yPos)-1 >= 0)
@@ -235,7 +231,6 @@ namespace rsgis{namespace segment{
             
             for(unsigned int j = 0; j < width; ++j)
             {
-                //std::cout << "Processing Pixel [" << j << "," << i << "]\n";
                 // Get pixel value from clump image for (j,i)
                 clumpBand->RasterIO(GF_Read, j, i, 1, 1, &uiPxlVal, 1, 1, GDT_UInt32, 0, 0);
                 
@@ -265,9 +260,6 @@ namespace rsgis{namespace segment{
                         {
                             rsgis::img::PxlLoc pxl = clumpSearchPxls.front();
                             clumpSearchPxls.pop();
-                            
-                            //std::cout << "\tSearch Size = " << clumpSearchPxls.size() << std::endl;
-                            //std::cout << "\t\tProcessing [" << pxl.xPos << "," << pxl.yPos << "]\n";
                             
                             // Above
                             if(((long)pxl.yPos)-1 >= 0)
@@ -412,7 +404,6 @@ namespace rsgis{namespace segment{
 					bandOffsets[counter] = new int[2];
 					bandOffsets[counter][0] = dsOffsets[i][0];
 					bandOffsets[counter][1] = dsOffsets[i][1];
-					//std::cout << counter << ") dataset " << i << " band " << j << " offset [" << bandOffsets[counter][0] << "," << bandOffsets[counter][1] << "]\n";
 					counter++;
 				}
 			}
@@ -443,7 +434,6 @@ namespace rsgis{namespace segment{
                 
                 for(unsigned int j = 0; j < width; ++j)
                 {
-                    //std::cout << "Processing Pixel [" << j << "," << i << "]\n";
                     // Get pixel value from clump image for (j,i)
                     clumpBand->RasterIO(GF_Read, j, i, 1, 1, &uiPxlVal, 1, 1, GDT_UInt32, 0, 0);
                     
@@ -488,17 +478,12 @@ namespace rsgis{namespace segment{
                                 rsgis::img::PxlLoc pxl = clumpSearchPxls.front();
                                 clumpSearchPxls.pop();
                                 
-                                //std::cout << "\tSearch Size = " << clumpSearchPxls.size() << std::endl;
-                                //std::cout << "\t\tProcessing [" << pxl.xPos << "," << pxl.yPos << "]\n";
-                                
                                 // Above
                                 if(((long)pxl.yPos)-1 >= 0)
                                 {
                                     clumpBand->RasterIO(GF_Read, pxl.xPos, pxl.yPos-1, 1, 1, &uiPxlVal, 1, 1, GDT_UInt32, 0, 0);
                                     if(uiPxlVal == 0)
                                     {
-                                        //catagoryBand->RasterIO(GF_Read, pxl.xPos, pxl.yPos-1, 1, 1, &catCPxlVal, 1, 1, GDT_UInt32, 0, 0);
-                                        
                                         for(unsigned int n = 0; n < numInBands; ++n)
                                         {
                                             catBands[n]->RasterIO(GF_Read, bandOffsets[n][0]+pxl.xPos, bandOffsets[n][1]+(pxl.yPos-1), 1, 1, &catCPxlVals[n], 1, 1, GDT_UInt32, 0, 0);
@@ -518,8 +503,6 @@ namespace rsgis{namespace segment{
                                     clumpBand->RasterIO(GF_Read, pxl.xPos, pxl.yPos+1, 1, 1, &uiPxlVal, 1, 1, GDT_UInt32, 0, 0);
                                     if(uiPxlVal == 0)
                                     {
-                                        //catagoryBand->RasterIO(GF_Read, pxl.xPos, pxl.yPos+1, 1, 1, &catCPxlVal, 1, 1, GDT_UInt32, 0, 0);
-                                        
                                         for(unsigned int n = 0; n < numInBands; ++n)
                                         {
                                             catBands[n]->RasterIO(GF_Read, bandOffsets[n][0]+pxl.xPos, bandOffsets[n][1]+(pxl.yPos+1), 1, 1, &catCPxlVals[n], 1, 1, GDT_UInt32, 0, 0);
@@ -540,8 +523,6 @@ namespace rsgis{namespace segment{
                                     clumpBand->RasterIO(GF_Read, pxl.xPos-1, pxl.yPos, 1, 1, &uiPxlVal, 1, 1, GDT_UInt32, 0, 0);
                                     if(uiPxlVal == 0)
                                     {
-                                        //catagoryBand->RasterIO(GF_Read, pxl.xPos-1, pxl.yPos, 1, 1, &catCPxlVal, 1, 1, GDT_UInt32, 0, 0);
-                                        
                                         for(unsigned int n = 0; n < numInBands; ++n)
                                         {
                                             catBands[n]->RasterIO(GF_Read, bandOffsets[n][0]+(pxl.xPos-1), bandOffsets[n][1]+pxl.yPos, 1, 1, &catCPxlVals[n], 1, 1, GDT_UInt32, 0, 0);
@@ -561,8 +542,6 @@ namespace rsgis{namespace segment{
                                     clumpBand->RasterIO(GF_Read, pxl.xPos+1, pxl.yPos, 1, 1, &uiPxlVal, 1, 1, GDT_UInt32, 0, 0);
                                     if(uiPxlVal == 0)
                                     {
-                                        //catagoryBand->RasterIO(GF_Read, pxl.xPos+1, pxl.yPos, 1, 1, &catCPxlVal, 1, 1, GDT_UInt32, 0, 0);
-                                        
                                         for(unsigned int n = 0; n < numInBands; ++n)
                                         {
                                             catBands[n]->RasterIO(GF_Read, bandOffsets[n][0]+(pxl.xPos+1), bandOffsets[n][1]+pxl.yPos, 1, 1, &catCPxlVals[n], 1, 1, GDT_UInt32, 0, 0);
@@ -873,8 +852,6 @@ namespace rsgis{namespace segment{
     {
         try
         {
-            //std::cout << "intBandValues[0] = " << intBandValues[0] << std::endl;
-            
             if((intBandValues[0] > 0) & (intBandValues[0] < numVals))
             {
                 size_t fid = boost::lexical_cast<size_t>(intBandValues[0]);
@@ -887,17 +864,14 @@ namespace rsgis{namespace segment{
         }
         catch(boost::numeric::negative_overflow& e)
         {
-            //std::cout << "bandValues[0] = " << bandValues[0] << std::endl;
             throw rsgis::img::RSGISImageCalcException(e.what());
         }
         catch(boost::numeric::positive_overflow& e)
         {
-            //std::cout << "bandValues[0] = " << bandValues[0] << std::endl;
             throw rsgis::img::RSGISImageCalcException(e.what());
         }
         catch(boost::numeric::bad_numeric_cast& e)
         {
-            //std::cout << "bandValues[0] = " << bandValues[0] << std::endl;
             throw rsgis::img::RSGISImageCalcException(e.what());
         }
         catch(rsgis::img::RSGISImageCalcException &e)
@@ -944,17 +918,14 @@ namespace rsgis{namespace segment{
         }
         catch(boost::numeric::negative_overflow& e)
         {
-            //std::cout << "bandValues[0] = " << bandValues[0] << std::endl;
             throw rsgis::img::RSGISImageCalcException(e.what());
         }
         catch(boost::numeric::positive_overflow& e)
         {
-            //std::cout << "bandValues[0] = " << bandValues[0] << std::endl;
             throw rsgis::img::RSGISImageCalcException(e.what());
         }
         catch(boost::numeric::bad_numeric_cast& e)
         {
-            //std::cout << "bandValues[0] = " << bandValues[0] << std::endl;
             throw rsgis::img::RSGISImageCalcException(e.what());
         }
         catch(rsgis::img::RSGISImageCalcException &e)

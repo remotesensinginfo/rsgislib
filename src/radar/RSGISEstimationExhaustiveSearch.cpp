@@ -46,8 +46,6 @@ namespace rsgis {namespace radar{
 		currentError = + std::numeric_limits<double>::infinity();//+INFINITY;
 		
 		rsgis::math::RSGISMathTwoVariableFunction *leastSquares;
-		//std::cout << "*********************************************************" << std::endl;
-		//std::cout << "HH = " <<  gsl_vector_get(inData, 0) << " HV = " <<  gsl_vector_get(inData, 1) << std::endl;
 		
 		leastSquares = new rsgis::math::RSGISFunction2Var2DataLeastSquares(functionHH, functionHV, gsl_vector_get(inData, 0), gsl_vector_get(inData, 1)); 
 		
@@ -58,9 +56,8 @@ namespace rsgis {namespace radar{
 			while(d < minMaxIntervalB[1]) 
 			{
 				currentError =  leastSquares->calcFunction(h, d);
-				//std::cout << "Predict HH " << functionHH->calcFunction(h, d) << " Predict HV " << functionHV->calcFunction(h, d) << std::endl;
-				//std::cout << "current Error = " << currentError << std::endl;
-				if (currentError < bestParError[2])
+
+                if (currentError < bestParError[2])
 				{
 					bestParError[0] = h;
 					bestParError[1] = d;
@@ -75,9 +72,7 @@ namespace rsgis {namespace radar{
 		{
 			gsl_vector_set(outParError, j, bestParError[j]);
 		}
-			
-		//std::cout << "*********************************************************" << std::endl;		
-		
+        
 		// Tidy
 		delete[] bestParError;
 		delete leastSquares;
@@ -223,8 +218,6 @@ namespace rsgis {namespace radar{
 			{
 				currentError =  leastSquares->calcFunction(h, d);
 				
-				//std::cout << "Predict HH " << functionHH->calcFunction(h, d) << " Predict HV " << functionHV->calcFunction(h, d) << std::endl;
-				//std::cout << "current Error = " << currentError << std::endl;
 				if (currentError < bestParError[2])
 				{
 					bestParError[0] = h;
@@ -240,10 +233,8 @@ namespace rsgis {namespace radar{
 		{
 			gsl_vector_set(outParError, j, bestParError[j]);
 		}
-		
-		//std::cout << "*********************************************************" << std::endl;		
-		
-		// Tidy
+
+        // Tidy
 		delete[] bestParError;
 		delete leastSquares;
 		

@@ -61,6 +61,7 @@ Other
 .. autofunction:: rsgislib.segmentation.mergeClumpImages
 .. autofunction:: rsgislib.segmentation.mergeEquivClumps
 .. autofunction:: rsgislib.segmentation.mergeSegments2Neighbours
+.. autofunction:: rsgislib.segmentation.pxlGrowRegions
 
 
 * :ref:`genindex`
