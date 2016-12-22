@@ -858,6 +858,7 @@ static PyMethodDef SegmentationMethods[] = {
 "* gdalFormat is a string defining the format of the output image.\n"
 "* muParseCriteria is a string with an muparser criteria (muparser; e.g., b1 < 20?1:0). Expression output must be 0 or 1 (1 for True).\n"
 "* varNameBandPairs is a list pairs specifying the variable name (in muparser expression) and the band number to which it refers in valsImage (note band numbers start a 1).\n"
+"\n"
 "Example::\n"
 "\n"
 "varBandPair = collections.namedtuple('VarBandPair', ['varName', 'bandIndex'])\n"

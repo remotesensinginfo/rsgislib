@@ -619,7 +619,8 @@ static PyObject *VectorUtils_FitActiveContourBoundaries(PyObject *self, PyObject
 
 // Our list of functions in this module
 static PyMethodDef VectorUtilsMethods[] = {
-    {"generateConvexHullsGroups", VectorUtils_GenerateConvexHullsGroups, METH_VARARGS, 
+
+{"generateConvexHullsGroups", VectorUtils_GenerateConvexHullsGroups, METH_VARARGS,
 "vectorutils.generateConvexHullsGroups(inputfile, outputvector, outVecProj, force, eastingsColIdx, northingsColIdx, attributeColIdx)\n"
 "A command to produce convex hulls for groups of (X, Y, Attribute) point locations.\n\n"
 "Where:\n"
@@ -633,7 +634,7 @@ static PyMethodDef VectorUtilsMethods[] = {
 "* attributeColIdx an integer specifying the attribute column in the input text file \n"
 "\n"},
 
-    {"removeattributes", VectorUtils_RemoveAttributes, METH_VARARGS, 
+{"removeattributes", VectorUtils_RemoveAttributes, METH_VARARGS, 
 "vectorutils.removeattributes(inputvector, outputvector, force)\n"
 "A command to copy the geometry, dropping attributes.\n\n"
 "Where:\n"
@@ -641,6 +642,7 @@ static PyMethodDef VectorUtilsMethods[] = {
 "* inputvector is a string containing the name of the input vector\n"
 "* outputvector is a string containing the name of the output vector\n"
 "* force is a bool, specifying whether to force removal of the output vector if it exists\n"
+"\n"
 "Example::\n"
 "\n"
 "   from rsgislib import vectorutils\n"
@@ -649,7 +651,7 @@ static PyMethodDef VectorUtilsMethods[] = {
 "   vectorutils.removeattributes(inputVector, outputVector, True)\n"
 "\n"},
 
-    {"buffervector", VectorUtils_BufferVector, METH_VARARGS, 
+{"buffervector", VectorUtils_BufferVector, METH_VARARGS, 
 "vectorutils.buffervector(inputvector, outputvector, bufferDist, force)\n"
 "A command to buffer a vector by a specified distance.\n\n"
 "Where:\n"
@@ -658,6 +660,7 @@ static PyMethodDef VectorUtilsMethods[] = {
 "* outputvector is a string containing the name of the output vector\n"
 "* bufferDist is a float specifying the distance of the buffer, in map units.\n"
 "* force is a bool, specifying whether to force removal of the output vector if it exists\n"
+"\n"
 "Example::\n"
 "\n"
 "   from rsgislib import vectorutils\n"
@@ -667,12 +670,13 @@ static PyMethodDef VectorUtilsMethods[] = {
 "   vectorutils.buffervector(inputVector, outputVector, bufferDist, True)\n"
 "\n"},
 
-    {"printpolygeom", VectorUtils_PrintPolyGeom, METH_VARARGS, 
+{"printpolygeom", VectorUtils_PrintPolyGeom, METH_VARARGS, 
 "vectorutils.printpolygeom(inputvector)\n"
 "A command to print the polygon geometries (to the console) of the inputted shapefile\n"
 "Where:\n"
 "\n"
 "* inputvector is a string containing the name of the input vector\n"
+"\n"
 "Example::\n"
 "\n"
 "   from rsgislib import vectorutils\n"
@@ -680,7 +684,7 @@ static PyMethodDef VectorUtilsMethods[] = {
 "   vectorutils.printpolygeom(inputVector)\n"
 "\n"},
 
-    {"findreplacetext", VectorUtils_FindReplaceText, METH_VARARGS, 
+{"findreplacetext", VectorUtils_FindReplaceText, METH_VARARGS,
 "vectorutils.findreplacetext(inputvector, attribute, find, replace)\n"
 "A command to undertake find and replace on a given attribute with the shapefile\n"
 "Where:\n"
@@ -689,6 +693,7 @@ static PyMethodDef VectorUtilsMethods[] = {
 "* attribute is a string containing the name of field in the attribute table.\n"
 "* find is a string to find.\n"
 "* replace is a string to replace 'find'.\n"
+"\n"
 "Example::\n"
 "\n"
 "   from rsgislib import vectorutils\n"
@@ -699,7 +704,7 @@ static PyMethodDef VectorUtilsMethods[] = {
 "   vectorutils.findreplacetext(inputVector, attribute, find, replace)\n"
 "\n"},
 
-    {"calcarea", VectorUtils_CalcArea, METH_VARARGS, 
+{"calcarea", VectorUtils_CalcArea, METH_VARARGS, 
 "vectorutils.calcarea(inputvector, outputvector, force)\n"
 "A command to add the area of each polygon to the attribute table, area in the same units \n"
 "as the input dataset (likely m^2 or degrees^2).\n\n"
@@ -708,6 +713,7 @@ static PyMethodDef VectorUtilsMethods[] = {
 "* inputvector is a string containing the name of the input vector\n"
 "* outputvector is a string containing the name of the output vector\n"
 "* force is a bool, specifying whether to force removal of the output vector if it exists\n"
+"\n"
 "Example::\n"
 "\n"
 "   from rsgislib import vectorutils\n"
@@ -716,7 +722,7 @@ static PyMethodDef VectorUtilsMethods[] = {
 "   vectorutils.calcarea(inputVector, outputVector, True)\n"
 "\n"},
 
-    {"polygonsInPolygon", VectorUtils_PolygonsInPolygon, METH_VARARGS, 
+{"polygonsInPolygon", VectorUtils_PolygonsInPolygon, METH_VARARGS, 
 "vectorutils.polygonsInPolygon(inputvector, inputcovervector, outputDIR, attributeName, force)\n"
 "A command to create a new polygon containing only polygons within cover vector. \n"
 "Loops through attributes and creates a new shapefile for each polygon in the cover vector.\n\n"
@@ -726,6 +732,7 @@ static PyMethodDef VectorUtilsMethods[] = {
 "* inputcovervector is a string containing the name of the cover vector vector\n"
 "* outputDIR is a string containing the name of the output directory\n"
 "* force is a bool, specifying whether to force removal of the output vector if it exists\n"
+"\n"
 "Example::\n"
 "\n"
 "   from rsgislib import vectorutils\n"
@@ -735,29 +742,30 @@ static PyMethodDef VectorUtilsMethods[] = {
 "   attribute = 'PSU'\n"
 "   vectorutils.polygonsInPolygon(inputVector, coverVector, outDIR, attribute, True)\n"
 "\n"},
-    
+
 {"populateGeomZField", VectorUtils_PopulateGeomZField, METH_VARARGS,
-    "vectorutils.populateGeomZField(InputVector, InputImage, imgBand, OutputVector, force)\n"
-    "A command to populate the z field within the vector file making it a 3D vector rather \n"
-    "than just a 2d file.\n\n"
-    "Where:\n"
-    "\n"
-    "* InputVector is a string containing the name of the input vector\n"
-    "* InputImage is a string containing the name of the image (DEM) image\n"
-    "* imgBand is an unsigned int specifying the image band in the image file to be used (note image bands indexes start at 1)\n"
-    "* OutputVector is a string containing the name of the output vector file\n"
-    "* force is a bool, specifying whether to force removal of the output vector if it exists\n"
-    "\n"
-    "Example::\n"
-    "\n"
-    "    import rsgislib.vectorutils\n"
-    "    inputVector = './Polys2D.shp'\n"
-    "    inputImage = './SRTM_90m.kea'\n"
-    "    imgBand = 1\n"
-    "    outputVector = './Polys3D.shp'\n"
-    "    force = True\n"
-    "    rsgislib.vectorutils.populateGeomZField(inputVector, inputImage, imgBand, outputVector, force)\n"
-    "\n"},
+"vectorutils.populateGeomZField(InputVector, InputImage, imgBand, OutputVector, force)\n"
+"A command to populate the z field within the vector file making it a 3D vector rather \n"
+"than just a 2d file.\n\n"
+"Where:\n"
+"\n"
+"* InputVector is a string containing the name of the input vector\n"
+"* InputImage is a string containing the name of the image (DEM) image\n"
+"* imgBand is an unsigned int specifying the image band in the image file to be used (note image bands indexes start at 1)\n"
+"* OutputVector is a string containing the name of the output vector file\n"
+"* force is a bool, specifying whether to force removal of the output vector if it exists\n"
+"\n"
+"Example::\n"
+"\n"
+"    import rsgislib.vectorutils\n"
+"    inputVector = './Polys2D.shp'\n"
+"    inputImage = './SRTM_90m.kea'\n"
+"    imgBand = 1\n"
+"    outputVector = './Polys3D.shp'\n"
+"    force = True\n"
+"    rsgislib.vectorutils.populateGeomZField(inputVector, inputImage, imgBand, outputVector, force)\n"
+"\n"},
+
 {"vectorMaths", VectorUtils_VectorMaths, METH_VARARGS,
 "vectorutils.vectorMaths(inputVector, outputVector, outputColName, expression, variables, force)\n"
 "A command to calculate a number column from data in existing columns.\n\n"
@@ -787,7 +795,7 @@ static PyMethodDef VectorUtilsMethods[] = {
 "   outputVector = './TestOutputs/injune_p142_psu_utm_fid.shp'\n"
 "   vectorutils.addFIDColumn(inputVector, outputVector, True)\n"
 "\n"},
-    
+
 {"findCommonImgExtent", VectorUtils_FindCommonImgExtent, METH_VARARGS,
 "vectorutils.findCommonImgExtent(inputImages, outputvector, force)\n"
 "A command to create a shapefile representing the region of common extent\n"
@@ -797,6 +805,7 @@ static PyMethodDef VectorUtilsMethods[] = {
 "* inputImages is a list of strings containing the names of the input image files\n"
 "* outputvector is a string containing the name of the output vector\n"
 "* force is a bool, specifying whether to force removal of the output vector if it exists\n"
+"\n"
 "Example::\n"
 "\n"
 "   from rsgislib import vectorutils\n"
@@ -804,7 +813,7 @@ static PyMethodDef VectorUtilsMethods[] = {
 "   outputVector = 'imgSubExtent.shp'\n"
 "   vectorutils.findCommonImgExtent(inputImages, outputVector, True)\n"
 "\n"},
-    
+
 {"splitFeatures", VectorUtils_SplitFeatures, METH_VARARGS,
 "vectorutils.splitFeatures(inputvector, outputvectorbase, force)\n"
 "A command to split features into seperate shapefiles.\n\n"
@@ -831,10 +840,8 @@ static PyMethodDef VectorUtilsMethods[] = {
 "* outputvector is a string containing the name of the output vector\n"
 "* maskVal is a float specifying the value of the image pixels to be exported\n"
 "* force is a bool, specifying whether to force removal of the output vector if it exists\n"
-"Example::\n"
-"\n"
 "\n"},
-    
+
 {"dist2NearestGeom", VectorUtils_Dist2NearestGeom, METH_VARARGS,
 "vectorutils.dist2NearestGeom(inputVector, outputVector, force)\n"
 "A command to calculate the distance from each geometry to its nearest neighbouring geometry.\n"
@@ -844,20 +851,16 @@ static PyMethodDef VectorUtilsMethods[] = {
 "* inputVector is a string containing the name of the input vector\n"
 "* outputVector is a string containing the name of the output vector\n"
 "* force is a bool, specifying whether to force removal of the output vector if it exists\n"
-"Example::\n"
-"\n"
 "\n"},
-    
+
 {"calcMaxDist2NearestGeom", VectorUtils_CalcMaxDist2NearestGeom, METH_VARARGS,
 "vectorutils.calcMaxDist2NearestGeom(inputVector)\n"
 "A command to calculate the maximum minimum distance between the geometries.\n\n"
 "Where:\n"
 "\n"
 "* inputVector is a string containing the name of the input vector\n"
-"Example::\n"
-"\n"
 "\n"},
-   
+
 {"spatialGraphClusterGeoms", VectorUtils_SpatialGraphClusterGeoms, METH_VARARGS,
 "vectorutils.spatialGraphClusterGeoms(inputVector, outputVector, useMinSpanTree, sdEdgeLen, maxEdgeLen, force, outShpEdges, outH5EdgeLens)\n"
 "A command to spatial cluster using a minimum spanning tree approach (Bunting et al 2010).\n\n"
@@ -867,14 +870,12 @@ static PyMethodDef VectorUtilsMethods[] = {
 "* outputVector is a string containing the name of the output vector\n"
 "* useMinSpanTree is a boolean specifying whether a minimum spanning tree should be used rather than just a graph.\n"
 "* sdEdgeLen is a float\n"
-"* maxEdgeLen is a double"
+"* maxEdgeLen is a double\n"
 "* force is a bool, specifying whether to force removal of the output vector if it exists\n"
 "* outShpEdges is a string containing the path for an output vector to export minimum spanning tree edges as a shapefile.\n"
 "* outH5EdgeLens is a string containing the path for an output hdf5 file to export the minimum spanning tree edge lengths.\n"
-"Example::\n"
-"\n"
 "\n"},
-    
+
 {"fitPolygon2Points", VectorUtils_FitPolygon2Points, METH_VARARGS,
 "vectorutils.fitPolygon2Points(inputVector, outputVector, alphaVal. force)\n"
 "A command fit a polygon to the points inputted.\n\n"
@@ -884,10 +885,8 @@ static PyMethodDef VectorUtilsMethods[] = {
 "* outputVector is a string containing the name of the output vector\n"
 "* alphaVal is a double specifying the alpha value to use for the calculation (if negative optimal will be calculated; default)\n"
 "* force is a bool, specifying whether to force removal of the output vector if it exists\n"
-"Example::\n"
-"\n"
 "\n"},
-    
+
 {"fitPolygons2PointClusters", VectorUtils_FitPolygons2PointClusters, METH_VARARGS,
 "vectorutils.fitPolygons2PointClusters(inputVector, outputVector, clusterField, alphaVal. force)\n"
 "A command fit a polygon to the points inputted.\n\n"
@@ -898,10 +897,8 @@ static PyMethodDef VectorUtilsMethods[] = {
 "* clusterField is a string specifying the column in the input shapefile which specifies the clusters\n"
 "* alphaVal is a double specifying the alpha value to use for the calculation (if negative optimal will be calculated; default)\n"
 "* force is a bool, specifying whether to force removal of the output vector if it exists\n"
-"Example::\n"
-"\n"
 "\n"},
-    
+
 {"createLinesOfPoints", VectorUtils_CreateLinesOfPoints, METH_VARARGS,
 "vectorutils.createLinesOfPoints(inputVector, outputVector, step. force)\n"
 "A function to create a regularly spaced set of points following a set of lines.\n\n"
@@ -912,7 +909,6 @@ static PyMethodDef VectorUtilsMethods[] = {
 "* step is a double specifying the distance between points along the line.\n"
 "* force is a bool, specifying whether to force removal of the output vector if it exists\n"
 "Example::\n"
-"\n"
 "\n"},
 
 {"fitActiveContourBoundaries", VectorUtils_FitActiveContourBoundaries, METH_VARARGS,
@@ -929,7 +925,6 @@ static PyMethodDef VectorUtilsMethods[] = {
 "* minExtThresVal is a double specifying a hard boundary for the external energy which can't be crossed.\n"
 "* force is a bool, specifying whether to force removal of the output vector if it exists\n"
 "Example::\n"
-"\n"
 "\n"},
     
     

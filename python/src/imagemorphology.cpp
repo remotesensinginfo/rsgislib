@@ -419,6 +419,7 @@ static PyMethodDef ImageMorphologyMethods[] = {
 {"createCircularOp", (PyCFunction)ImageMorphology_CreateCircularOp, METH_VARARGS | METH_KEYWORDS,
 "imagemorphology.createCircularOp(outputFile=string, opSize=int)\n"
 "Performs an image morphology dilate operation. \n"
+"\n"
 "Where:\n"
 "\n"
 "* outputFile is a string specifying the name and path of the output matrix file.\n"
@@ -435,6 +436,7 @@ static PyMethodDef ImageMorphologyMethods[] = {
 {"imageDilate", (PyCFunction)ImageMorphology_ImageDilate, METH_VARARGS | METH_KEYWORDS,
 "imagemorphology.imageDilate(inputImage=string, outputImage=string, morphOperator=string, useOpFile=boolean, opSize=int, gdalFormat=string, dataType=int)\n"
 "Performs an image morphology dilate operation. \n"
+"\n"
 "Where:\n"
 "\n"
 "* inputImage is a string specifying the name and path of the input file.\n"
@@ -459,6 +461,7 @@ static PyMethodDef ImageMorphologyMethods[] = {
 {"imageErode", (PyCFunction)ImageMorphology_ImageErode, METH_VARARGS | METH_KEYWORDS,
 "imagemorphology.imageErode(inputImage=string, outputImage=string, morphOperator=string, useOpFile=boolean, opSize=int, gdalFormat=string, dataType=int)\n"
 "Performs an image morphology erode operation. \n"
+"\n"
 "Where:\n"
 "\n"
 "* inputImage is a string specifying the name and path of the input file.\n"
@@ -473,6 +476,7 @@ static PyMethodDef ImageMorphologyMethods[] = {
 {"imageGradiant", (PyCFunction)ImageMorphology_ImageGradiant, METH_VARARGS | METH_KEYWORDS,
 "imagemorphology.imageGradiant(inputImage=string, outputImage=string, morphOperator=string, useOpFile=boolean, opSize=int, gdalFormat=string, dataType=int)\n"
 "Performs an image morphology gradiant operation. \n"
+"\n"
 "Where:\n"
 "\n"
 "* inputImage is a string specifying the name and path of the input file.\n"
@@ -487,6 +491,7 @@ static PyMethodDef ImageMorphologyMethods[] = {
 {"imageDilateCombinedOut", (PyCFunction)ImageMorphology_ImageDilateCombinedOut, METH_VARARGS | METH_KEYWORDS,
 "imagemorphology.imageDilateCombinedOut(inputImage=string, outputImage=string, morphOperator=string, useOpFile=boolean, opSize=int, gdalFormat=string, dataType=int)\n"
 "Performs an image morphology dilate operation, where the outputs will be combined into a single image. \n"
+"\n"
 "Where:\n"
 "\n"
 "* inputImage is a string specifying the name and path of the input file.\n"
@@ -501,6 +506,7 @@ static PyMethodDef ImageMorphologyMethods[] = {
 {"imageErodeCombinedOut", (PyCFunction)ImageMorphology_ImageErodeCombinedOut, METH_VARARGS | METH_KEYWORDS,
 "imagemorphology.imageErodeCombinedOut(inputImage=string, outputImage=string, morphOperator=string, useOpFile=boolean, opSize=int, gdalFormat=string, dataType=int)\n"
 "Performs an image morphology erode operation, where the outputs will be combined into a single image. \n"
+"\n"
 "Where:\n"
 "\n"
 "* inputImage is a string specifying the name and path of the input file.\n"
@@ -515,6 +521,7 @@ static PyMethodDef ImageMorphologyMethods[] = {
 {"imageGradiantCombinedOut", (PyCFunction)ImageMorphology_ImageGradiantCombinedOut, METH_VARARGS | METH_KEYWORDS,
 "imagemorphology.imageGradiantCombinedOut(inputImage=string, outputImage=string, morphOperator=string, useOpFile=boolean, opSize=int, gdalFormat=string, dataType=int)\n"
 "Performs an image morphology gradiant operation, where the outputs will be combined into a single image. \n"
+"\n"
 "Where:\n"
 "\n"
 "* inputImage is a string specifying the name and path of the input file.\n"
@@ -529,6 +536,7 @@ static PyMethodDef ImageMorphologyMethods[] = {
 {"imageLocalMinima", (PyCFunction)ImageMorphology_ImageLocalMinima, METH_VARARGS | METH_KEYWORDS,
 "imagemorphology.imageLocalMinima(inputImage=string, outputImage=string, sequencialOut=boolean, allowEqual=boolean, morphOperator=string, useOpFile=boolean, opSize=int, gdalFormat=string, dataType=int)\n"
 "Uses image morphology to find local minima. \n"
+"\n"
 "Where:\n"
 "\n"
 "* inputImage is a string specifying the name and path of the input file.\n"
@@ -545,6 +553,7 @@ static PyMethodDef ImageMorphologyMethods[] = {
 {"imageLocalMinimaCombinedOut", (PyCFunction)ImageMorphology_ImageLocalMinimaCombinedOut, METH_VARARGS | METH_KEYWORDS,
 "imagemorphology.imageLocalMinimaCombinedOut(inputImage=string, outputImage=string, sequencialOut=boolean, allowEqual=boolean, morphOperator=string, useOpFile=boolean, opSize=int, gdalFormat=string, dataType=int)\n"
 "Uses image morphology to find local minima, where the outputs will be combined into a single image.\n"
+"\n"
 "Where:\n"
 "\n"
 "* inputImage is a string specifying the name and path of the input file.\n"
@@ -561,6 +570,7 @@ static PyMethodDef ImageMorphologyMethods[] = {
 {"imageOpening", (PyCFunction)ImageMorphology_ImageOpening, METH_VARARGS | METH_KEYWORDS,
 "imagemorphology.imageOpening(inputImage=string, outputImage=string, tempImage=string, morphOperator=string, useOpFile=boolean, opSize=int, gdalFormat=string, dataType=int, niters=int)\n"
 "Performs an image morphology opening operation. \n"
+"\n"
 "Where:\n"
 "\n"
 "* inputImage is a string specifying the name and path of the input file.\n"
@@ -577,6 +587,7 @@ static PyMethodDef ImageMorphologyMethods[] = {
 {"imageClosing", (PyCFunction)ImageMorphology_ImageClosing, METH_VARARGS | METH_KEYWORDS,
 "imagemorphology.imageClosing(inputImage=string, outputImage=string, tempImage=string, morphOperator=string, useOpFile=boolean, opSize=int, gdalFormat=string, dataType=int, niters=int)\n"
 "Performs an image morphology closing operation. \n"
+"\n"
 "Where:\n"
 "\n"
 "* inputImage is a string specifying the name and path of the input file.\n"
@@ -593,6 +604,7 @@ static PyMethodDef ImageMorphologyMethods[] = {
 {"imageBlackTopHat", (PyCFunction)ImageMorphology_ImageBlackTopHat, METH_VARARGS | METH_KEYWORDS,
 "imagemorphology.imageBlackTopHat(inputImage=string, outputImage=string, tempImage=string, morphOperator=string, useOpFile=boolean, opSize=int, gdalFormat=string, dataType=int)\n"
 "Performs an image morphology black top hat operation. \n"
+"\n"
 "Where:\n"
 "\n"
 "* inputImage is a string specifying the name and path of the input file.\n"
@@ -608,6 +620,7 @@ static PyMethodDef ImageMorphologyMethods[] = {
 {"imageWhiteTopHat", (PyCFunction)ImageMorphology_ImageWhiteTopHat, METH_VARARGS | METH_KEYWORDS,
 "imagemorphology.imageWhiteTopHat(inputImage=string, outputImage=string, tempImage=string, morphOperator=string, useOpFile=boolean, opSize=int, gdalFormat=string, dataType=int)\n"
 "Performs an image morphology white top hat operation. \n"
+"\n"
 "Where:\n"
 "\n"
 "* inputImage is a string specifying the name and path of the input file.\n"
