@@ -87,6 +87,9 @@ except ImportError as numpyErr:
 def createMinDataTiles(inputImage, outshp, outclumpsFile, width, height, validDataThreshold, maskIntersect=None, offset=False, force=True, tmpdir='tilestemp'):
     """
 A function to create a tiling for an input image where each tile has a minimum amount of valid data.
+
+Where:
+
 * inputImage is a string for the image to be tiled
 * outshp is a string for the output shapefile the tiling will be written to (if None a shapefile won't be outputted).
 * outclumpsFile is a string for the output image file containing the tiling
@@ -95,7 +98,7 @@ A function to create a tiling for an input image where each tile has a minimum a
 * validDataThreshold is a float (0-1) with the proportion of valid data needed within a tile.
 * force is a boolean (default True) to delete the output shapefile if it already exists.
 * tmpdir is a string with a temporary directory for temp outputs to be stored (they will be deleted) 
-         * if tmpdir doesn't exist it will be created and then deleted during the processing.
+    * if tmpdir doesn't exist it will be created and then deleted during the processing.
 """
     tmpPresent = True
     if not os.path.exists(tmpdir):
@@ -173,6 +176,8 @@ def createTileMaskImagesFromShp(inputImage, tileShp, tilesNameBase, tilesMaskDIR
 A function to create individual image masks from the tiles shapefile which can be
 individually used to mask (using rsgislib mask function) each tile from the inputimage.
 
+Where:
+
 * inputImage is the input image being tiled.
 * tileShp is a shapefile containing the shapefile tiles.
 * tilesNameBase is the base file name for the tile masks
@@ -209,6 +214,8 @@ def createTileMaskImagesFromClumps(clumpsImage, tilesNameBase, tilesMaskDIR, img
 A function to create individual image masks from the tiles shapefile which can be
 individually used to mask (using rsgislib mask function) each tile from the inputimage.
 
+Where:
+
 * clumpsImage is an image file with RAT where each clump represented a tile region.
 * tilesNameBase is the base file name for the tile masks
 * tilesMaskDIR is the directory where the output images will be outputted
@@ -223,6 +230,8 @@ individually used to mask (using rsgislib mask function) each tile from the inpu
 def createTilesFromMasks(inputImage, tilesBase, tilesMetaDIR, tilesImgDIR, datatype, gdalformat):
     """
 A function to apply the image tile masks defined in createTileMaskImages to the input image to extract the individual tiles.
+
+Where:
 
 * inputImage is the input image being tiled.
 * tileMasksBase is the base path for the tile masks. glob will be used to find them with '*.kea' added to the end.

@@ -122,8 +122,8 @@ class RSGISRATThresDirection(Enum):
 
 
 def populateImageStats(inputImage, clumpsFile, outascii=None, threshold=0.0, calcMin=False, calcMax=False, calcSum=False, calcMean=False, calcStDev=False, calcMedian=False, calcCount=False, calcArea=False, calcLength=False, calcWidth=False, calcLengthWidth=False):
-    
-    """ Attribute RAT with statistics from from all bands in an input image.
+    """ 
+Attribute RAT with statistics from from all bands in an input image.
 
 Where:
 
@@ -353,25 +353,25 @@ Example::
     
 def findChangeClumpsHistSkewKurtTest(inputClumps, inClassCol, classOfInterest, changeVarCol, outChangeFeatCol, noDataVals=[], thresMeasure=RSGISRATThresMeasure.auto, exportPlot=None, showAllThreshPlot=False):
     """
-    This function identifies potential change features from both sides of the histogram 
-    by slicing the histogram and finding an optimal skewness and kurtosis.
-    
-    Where:
-    
-    * inputClumps - input clumps file.
-    * inClassCol - The column specifiying the classes, one of which change will be found.
-    * classOfInterest - The class (as defined in inClassCol) on which changed is being found.
-    * changeVarCol - Variable(s) to be used to find change. Expecting column name. Needs to be numeric. If a list of column names is provided then they are combined using PCA and the first PC is used for the change process.
-    * outChangeFeatCol - the output column. Regions lower than lower threshold have value 1. Regions higher than upper threshold have value 2. No change had threshold 0.
-    * noDataVals - list of no data values to be ignored.
-    * thresMeasure - needs to be of type RSGISRATThresMeasure (default is auto)
-    * exportPlot - file name for exporting a histogram plot with thresholds annotated. No plot is create if None is passed (default is none).
-    * showAllThreshPlot - option when plotting to put all the thresholds on to the plot rather than just the one being used.
-    
-    Return:
+This function identifies potential change features from both sides of the histogram 
+by slicing the histogram and finding an optimal skewness and kurtosis.
 
-    * list of lower [0] and upper [1] thresholds used to define the no change region.
-    
+Where:
+
+* inputClumps - input clumps file.
+* inClassCol - The column specifiying the classes, one of which change will be found.
+* classOfInterest - The class (as defined in inClassCol) on which changed is being found.
+* changeVarCol - Variable(s) to be used to find change. Expecting column name. Needs to be numeric. If a list of column names is provided then they are combined using PCA and the first PC is used for the change process.
+* outChangeFeatCol - the output column. Regions lower than lower threshold have value 1. Regions higher than upper threshold have value 2. No change had threshold 0.
+* noDataVals - list of no data values to be ignored.
+* thresMeasure - needs to be of type RSGISRATThresMeasure (default is auto)
+* exportPlot - file name for exporting a histogram plot with thresholds annotated. No plot is create if None is passed (default is none).
+* showAllThreshPlot - option when plotting to put all the thresholds on to the plot rather than just the one being used.
+
+Return:
+
+* list of lower [0] and upper [1] thresholds used to define the no change region.
+
     """
     # Check numpy is available
     if not haveNumpy:
@@ -579,24 +579,24 @@ def findChangeClumpsHistSkewKurtTest(inputClumps, inClassCol, classOfInterest, c
     
 def findChangeClumpsHistSkewKurtTestLower(inputClumps, inClassCol, classOfInterest, changeVarCol, outChangeFeatCol, noDataVals=[], thresMeasure=RSGISRATThresMeasure.auto, exportPlot=None, showAllThreshPlot=False):
     """
-    This function identifies potential change features from just the lower (left) side of the histogram 
-    by slicing the histogram and finding an optimal skewness and kurtosis.
-    
-    Where:
-    
-    * inputClumps - input clumps file.
-    * inClassCol - The column specifiying the classes, one of which change will be found.
-    * classOfInterest - The class (as defined in inClassCol) on which changed is being found.
-    * changeVarCol - changeVarCol - Variable(s) to be used to find change. Expecting column name. Needs to be numeric. If a list of column names is provided then they are combined using PCA and the first PC is used for the change process.
-    * outChangeFeatCol - the output column. Regions lower than lower threshold have value 1. Regions higher than upper threshold have value 2. No change had threshold 0.
-    * noDataVals - list of no data values to be ignored.
-    * thresMeasure - needs to be of type RSGISRATThresMeasure (default is auto)
-    * exportPlot - file name for exporting a histogram plot with thresholds annotated. No plot is create if None is passed (default is none).
-    * showAllThreshPlot - option when plotting to put all the thresholds on to the plot rather than just the one being used.
-    
-    Return:
+This function identifies potential change features from just the lower (left) side of the histogram 
+by slicing the histogram and finding an optimal skewness and kurtosis.
 
-    * list of lower [0] and upper [1] thresholds used to define the no change region.
+Where:
+
+* inputClumps - input clumps file.
+* inClassCol - The column specifiying the classes, one of which change will be found.
+* classOfInterest - The class (as defined in inClassCol) on which changed is being found.
+* changeVarCol - changeVarCol - Variable(s) to be used to find change. Expecting column name. Needs to be numeric. If a list of column names is provided then they are combined using PCA and the first PC is used for the change process.
+* outChangeFeatCol - the output column. Regions lower than lower threshold have value 1. Regions higher than upper threshold have value 2. No change had threshold 0.
+* noDataVals - list of no data values to be ignored.
+* thresMeasure - needs to be of type RSGISRATThresMeasure (default is auto)
+* exportPlot - file name for exporting a histogram plot with thresholds annotated. No plot is create if None is passed (default is none).
+* showAllThreshPlot - option when plotting to put all the thresholds on to the plot rather than just the one being used.
+
+Return:
+
+* list of lower [0] and upper [1] thresholds used to define the no change region.
     
     """
     # Check numpy is available
@@ -786,25 +786,25 @@ def findChangeClumpsHistSkewKurtTestLower(inputClumps, inClassCol, classOfIntere
 
 def findChangeClumpsHistSkewKurtTestUpper(inputClumps, inClassCol, classOfInterest, changeVarCol, outChangeFeatCol, noDataVals=[], thresMeasure=RSGISRATThresMeasure.auto, exportPlot=None, showAllThreshPlot=False):
     """
-    This function identifies potential change features from just the upper (right) side of the histogram 
-    by slicing the histogram and finding an optimal skewness and kurtosis.
-    
-    Where:
-    
-    * inputClumps - input clumps file.
-    * inClassCol - The column specifiying the classes, one of which change will be found.
-    * classOfInterest - The class (as defined in inClassCol) on which changed is being found.
-    * changeVarCol - changeVarCol - Variable(s) to be used to find change. Expecting column name. Needs to be numeric. If a list of column names is provided then they are combined using PCA and the first PC is used for the change process.
-    * outChangeFeatCol - the output column. Regions lower than lower threshold have value 1. Regions higher than upper threshold have value 2. No change had threshold 0.
-    * noDataVals - list of no data values to be ignored.
-    * thresMeasure - needs to be of type RSGISRATThresMeasure (default is auto)
-    * exportPlot - file name for exporting a histogram plot with thresholds annotated. No plot is create if None is passed (default is none).
-    * showAllThreshPlot - option when plotting to put all the thresholds on to the plot rather than just the one being used.
-    
-    Return:
+This function identifies potential change features from just the upper (right) side of the histogram 
+by slicing the histogram and finding an optimal skewness and kurtosis.
 
-    * list of lower [0] and upper [1] thresholds used to define the no change region.
-    
+Where:
+
+* inputClumps - input clumps file.
+* inClassCol - The column specifiying the classes, one of which change will be found.
+* classOfInterest - The class (as defined in inClassCol) on which changed is being found.
+* changeVarCol - changeVarCol - Variable(s) to be used to find change. Expecting column name. Needs to be numeric. If a list of column names is provided then they are combined using PCA and the first PC is used for the change process.
+* outChangeFeatCol - the output column. Regions lower than lower threshold have value 1. Regions higher than upper threshold have value 2. No change had threshold 0.
+* noDataVals - list of no data values to be ignored.
+* thresMeasure - needs to be of type RSGISRATThresMeasure (default is auto)
+* exportPlot - file name for exporting a histogram plot with thresholds annotated. No plot is create if None is passed (default is none).
+* showAllThreshPlot - option when plotting to put all the thresholds on to the plot rather than just the one being used.
+
+Return:
+
+* list of lower [0] and upper [1] thresholds used to define the no change region.
+
     """
     # Check numpy is available
     if not haveNumpy:
@@ -1008,17 +1008,17 @@ class RSGISRATChangeVarInfo:
 
 def findChangeClumpsHistSkewKurtTestVoteMultiVars(inputClumps, inClassCol, classOfInterest, outChangeFeatCol, vars=[]):
     """
-    A function to call one of the findChangeClumpsHistSkewKurtTest functions for multiple 
-    variables and then combine together by voting to find change features.
-    
-    Where:
+A function to call one of the findChangeClumpsHistSkewKurtTest functions for multiple 
+variables and then combine together by voting to find change features.
 
-    * inputClumps - input clumps file.
-    * inClassCol - The column specifiying the classes, one of which change will be found.
-    * classOfInterest - The class (as defined in inClassCol) on which changed is being found.
-    * outChangeFeatCol - the output column with the vote scores.
-    * vars - a list of RSGISRATChangeVarInfo objects used to specify the variables and function to be called.
-    
+Where:
+
+* inputClumps - input clumps file.
+* inClassCol - The column specifiying the classes, one of which change will be found.
+* classOfInterest - The class (as defined in inClassCol) on which changed is being found.
+* outChangeFeatCol - the output column with the vote scores.
+* vars - a list of RSGISRATChangeVarInfo objects used to specify the variables and function to be called.
+
     """
     # Check numpy is available
     if not haveNumpy:
@@ -1063,19 +1063,19 @@ def findChangeClumpsHistSkewKurtTestVoteMultiVars(inputClumps, inClassCol, class
 
 def findClumpsWithinExistingThresholds(inputClumps, inClassCol, classOfInterest, outFeatsCol, vars=[]):
     """
-    A function to use the thresholds stored in the RSGISRATChangeVarInfo objects (var) 
-    and populated from the findChangeClumpsHistSkewKurtTest functions to assess another class
-    creating a binary column as to whether a feature is within the threshold or now. Where multiple
-    variables (i.e., len(var) > 1) then variables are combined with an and operation.
-    
-    Where:
+A function to use the thresholds stored in the RSGISRATChangeVarInfo objects (var) 
+and populated from the findChangeClumpsHistSkewKurtTest functions to assess another class
+creating a binary column as to whether a feature is within the threshold or now. Where multiple
+variables (i.e., len(var) > 1) then variables are combined with an and operation.
 
-    * inputClumps - input clumps file.
-    * inClassCol - The column specifiying the classes, one of which change will be found.
-    * classOfInterest - The class (as defined in inClassCol) on which changed is being found.
-    * outFeatsCol - the output binary column specifying whether a feature is within the thresholds.
-    * vars - a list of RSGISRATChangeVarInfo objects used to specify the variables and function to be called.
-    
+Where:
+
+* inputClumps - input clumps file.
+* inClassCol - The column specifiying the classes, one of which change will be found.
+* classOfInterest - The class (as defined in inClassCol) on which changed is being found.
+* outFeatsCol - the output binary column specifying whether a feature is within the thresholds.
+* vars - a list of RSGISRATChangeVarInfo objects used to specify the variables and function to be called.
+
     """
     # Check numpy is available
     if not haveNumpy:
@@ -1139,16 +1139,16 @@ def defineClassNames(clumps, classNumCol, classNameCol, classNamesDict):
 
 def populateClumpsWithClassTraining(clumpsImg, classesDict, tmpPath, classesIntCol, classesNameCol):
     """
-    A function to populate a clumps file with training from a series of shapefiles (1 per class)
-    
-    Where:
+A function to populate a clumps file with training from a series of shapefiles (1 per class)
 
-    * clumpsImg - input clumps file.
-    * classesDict - A dict structure with the class names as keys and the values are an array of two values [int class val, file path for shapefile].
-    * tmpPath - File path (which needs to exist) where files can temporally be written.
-    * classesIntCol - Output column name for integer values representing each class.
-    * classesNameCol - Output column name for string class names.
-    
+Where:
+
+* clumpsImg - input clumps file.
+* classesDict - A dict structure with the class names as keys and the values are an array of two values [int class val, file path for shapefile].
+* tmpPath - File path (which needs to exist) where files can temporally be written.
+* classesIntCol - Output column name for integer values representing each class.
+* classesNameCol - Output column name for string class names.
+
     """
     
     createdDIR = False
@@ -1189,19 +1189,19 @@ def populateClumpsWithClassTraining(clumpsImg, classesDict, tmpPath, classesIntC
 
 def createClumpsSHPBBOX(clumpsImg, minXCol, maxXCol, minYCol, maxYCol, outShpLyrName, roundInt=False, ignoreFirstRow=False):
     """
-    A function to create a shapefile of polygons with the bboxs of the clumps defined using 
-    the minX, maxX, minY and maxY coordinates for the features.
-    
-    Where:
+A function to create a shapefile of polygons with the bboxs of the clumps defined using 
+the minX, maxX, minY and maxY coordinates for the features.
 
-    * clumpsImg - input clumps file.
-    * minXCol - the minX column in RAT.
-    * maxXCol - the maxX column in RAT.
-    * minYCol - the minY column in RAT.
-    * maxYCol - the maxY column in RAT.
-    * outShpLyrName - The output shapefile name (layer name do not include the .shp it will be appended).
-    * roundInt - Boolean specifying whether the coordinated should be rounded to integers (Default: False)
-    
+Where:
+
+* clumpsImg - input clumps file.
+* minXCol - the minX column in RAT.
+* maxXCol - the maxX column in RAT.
+* minYCol - the minY column in RAT.
+* maxYCol - the maxY column in RAT.
+* outShpLyrName - The output shapefile name (layer name do not include the .shp it will be appended).
+* roundInt - Boolean specifying whether the coordinated should be rounded to integers (Default: False)
+
     """   
     
     # Check numpy is available

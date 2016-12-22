@@ -775,7 +775,7 @@ static PyMethodDef VectorUtilsMethods[] = {
 "* outputVector is a string containing the name of the output vector file\n"
 "* outputColName is a string containing the name of the output column\n"
 "* expression is a string containing the muparser expression to be calculated.\n"
-"* variables is a list defining the names of the variables used within the expression\n and defining which columns they are in the inputVector.\n The must be a list and contain two fields \'name\' and \'fieldName\'.\n"
+"* variables is a list defining the names of the variables used within the expression and defining which columns they are in the inputVector. The must be a list and contain two fields \'name\' and \'fieldName\'.\n"
 "* force is a bool, specifying whether to force removal of the output vector if it exists\n"
 "\n"},
 
@@ -833,7 +833,7 @@ static PyMethodDef VectorUtilsMethods[] = {
 
 {"exportPxls2Pts", VectorUtils_ExportPxls2Pts, METH_VARARGS,
 "vectorutils.exportPxls2Pts(inputimg, outputvector, maskVal, force)\n"
-"A command to export image pixel which a specific value to a shapefile as points.\n\n"
+"A command to export image pixel which have a specific value to a shapefile as points.\n\n"
 "Where:\n"
 "\n"
 "* inputimg is a string containing the name of the input image\n"
@@ -908,7 +908,6 @@ static PyMethodDef VectorUtilsMethods[] = {
 "* outputVector is a string containing the name of the output vector (will be points)\n"
 "* step is a double specifying the distance between points along the line.\n"
 "* force is a bool, specifying whether to force removal of the output vector if it exists\n"
-"Example::\n"
 "\n"},
 
 {"fitActiveContourBoundaries", VectorUtils_FitActiveContourBoundaries, METH_VARARGS,
@@ -924,7 +923,6 @@ static PyMethodDef VectorUtilsMethods[] = {
 "* intGammaVal is a double specifying the gamma value for the active contour internal energy.\n"
 "* minExtThresVal is a double specifying a hard boundary for the external energy which can't be crossed.\n"
 "* force is a bool, specifying whether to force removal of the output vector if it exists\n"
-"Example::\n"
 "\n"},
     
     

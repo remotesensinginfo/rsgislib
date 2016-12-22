@@ -37,19 +37,19 @@ from rsgislib import imageutils
 from rsgislib import rastergis
 
 def rasterise2Image(inputVec, inputImage, outImage, gdalFormat="KEA", burnVal=1, shpAtt=None, shpExt=False):
-    """ A utillity to rasterise a shapefile into an image covering the same region and at the same resolution as the input image. 
+    """ 
+A utillity to rasterise a shapefile into an image covering the same region and at the same resolution as the input image. 
 
 Where:
 
 * inputVec is a string specifying the input vector (shapefile) file
-* inputImage is a string specifying the input image defining the grid, pixel resolution and area for the rasterisation 
-             (if None and shpExt is False them assumes output image already exists and just uses it as is burning vector into it)
+* inputImage is a string specifying the input image defining the grid, pixel resolution and area for the rasterisation (if None and shpExt is False them assumes output image already exists and just uses it as is burning vector into it)
 * outImage is a string specifying the output image for the rasterised shapefile
 * gdalFormat is the output image format (Default: KEA).
 * burnVal is the value for the output image pixels if no attribute is provided.
-* shpAtt is a string specifying the attribute to be rasterised, value of None creates a 
-              binary mask and \"FID\" creates a temp shapefile with a "FID" column and rasterises that column.
+* shpAtt is a string specifying the attribute to be rasterised, value of None creates a binary mask and \"FID\" creates a temp shapefile with a "FID" column and rasterises that column.
 * shpExt is a boolean specifying that the output image should be cut to the same extent as the input shapefile (Default is False and therefore output image will be the same as the input).
+
 Example::
 
     from rsgislib import vectorutils
@@ -59,7 +59,7 @@ Example::
     outputImage = 'psu142_crowns.kea'  
     vectorutils.rasterise2Image(inputVector, inputImage, outputImage, 'KEA', shpAtt='FID')
 
-    """
+"""
     try:
         # Check gdal is available
         if not haveGDALPy:
@@ -118,7 +118,8 @@ Example::
 
 
 def copyShapefile2RAT(inputVec, inputImage, outputImage):
-    """ A utillity to create raster copy of a shapefile. The output image is a KEA file and the attribute table has the attributes from the shapefile. 
+    """ 
+A utillity to create raster copy of a shapefile. The output image is a KEA file and the attribute table has the attributes from the shapefile. 
     
 Where:
 
@@ -145,7 +146,8 @@ Example::
 
 
 def polygoniseRaster(inputImg, outShp, imgBandNo=1, maskImg=None, imgMaskBandNo=1 ):
-    """ A utillity to polygonise a raster to a ESRI Shapefile. 
+    """ 
+A utillity to polygonise a raster to a ESRI Shapefile. 
     
 Where:
 
@@ -224,6 +226,7 @@ Where:
 * colData - A list of the same length as the number of features in vector file.
 
 Example::
+
     from rsgislib import vectorutils
     import rsgislib
     from osgeo import ogr
@@ -232,7 +235,8 @@ Example::
     requiredScenes = rsgisUtils.readTextFile2List("GMW_JERS-1_ScenesRequired.txt")
     requiredScenesShp = "JERS-1_Scenes_Requred_shp"
     vectorutils.writeVecColumn(requiredScenesShp+'.shp', requiredScenesShp, 'ScnName', ogr.OFTString, requiredScenes)
-    """
+
+"""
     ds = gdal.OpenEx(vectorFile, gdal.OF_UPDATE )
     if ds is None:
         print("Could not open '" + vectorFile + "'")
