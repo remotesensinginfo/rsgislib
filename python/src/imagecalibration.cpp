@@ -1497,6 +1497,7 @@ static PyMethodDef ImageCalibrationMethods[] = {
 {"radiance2TOARefl", ImageCalibration_Radiance2TOARefl, METH_VARARGS,
 "imagecalibration.radiance2TOARefl(inputFile, outputFile, gdalFormat, datatype, scaleFactor, julianDay, solarZenith, solarIrradianceVals)\n"
 "Converts at sensor radiance values to Top of Atmosphere Reflectance.\n"
+"\n"
 "Where:\n"
 "\n"
 "* inputFile is a string containing the name of the input image file\n"
@@ -1514,6 +1515,7 @@ static PyMethodDef ImageCalibrationMethods[] = {
 {"apply6SCoeffSingleParam", ImageCalibration_Apply6SCoefficentsSingleParam, METH_VARARGS,
 "imagecalibration.apply6SCoeffSingleParam(inputFile, outputFile, gdalFormat, datatype, scaleFactor, noDataValue, useNoDataValue, bandCoeffs)\n"
 "Converts at sensor radiance values to surface reflectance by applying coefficients from the 6S model for each band (aX, bX, cX).\n"
+"\n"
 "Where:\n"
 "\n"
 "* inputFile is a string containing the name of the input image file\n"
@@ -1533,6 +1535,7 @@ static PyMethodDef ImageCalibrationMethods[] = {
 {"apply6SCoeffElevLUTParam", ImageCalibration_Apply6SCoefficentsElevLUTParam, METH_VARARGS,
 "imagecalibration.apply6SCoeffElevLUTParam(inputRadFile, inputDEMFile, outputFile, gdalFormat, datatype, scaleFactor, noDataValue, useNoDataValue, lutElev)\n"
 "Converts at sensor radiance values to surface reflectance by applying coefficients from the 6S model for each band (aX, bX, cX), where the coefficients can be varied for surface elevation.\n"
+"\n"
 "Where:\n"
 "\n"
 "* inputRadFile is a string containing the name of the input Radiance image file\n"
@@ -1555,6 +1558,7 @@ static PyMethodDef ImageCalibrationMethods[] = {
 {"apply6SCoeffElevAOTLUTParam", ImageCalibration_Apply6SCoefficentsElevAOTLUTParam, METH_VARARGS,
 "imagecalibration.apply6SCoeffElevLUTParam(inputRadFile, inputDEMFile, inputAOTImage, outputFile, gdalFormat, datatype, scaleFactor, noDataValue, useNoDataValue, lutElevAOT)\n"
 "Converts at sensor radiance values to surface reflectance by applying coefficients from the 6S model for each band (aX, bX, cX), where the coefficients can be varied for surface elevation.\n"
+"\n"
 "Where:\n"
 "\n"
 "* inputRadFile is a string containing the name of the input Radiance image file\n"
@@ -1579,6 +1583,7 @@ static PyMethodDef ImageCalibrationMethods[] = {
 {"applySubtractSingleOffsets", ImageCalibration_ApplySubtractSingleOffsets, METH_VARARGS,
 "imagecalibration.applySubtractSingleOffsets(inputFile, outputFile, gdalformat, datatype, nonNegative, useNoDataVal, noDataVal, darkObjReflVal, offsetsList)\n"
 "This function performs a dark obejct subtraction (DOS) using a set of defined offsets for retriving surface reflectance.\n"
+"\n"
 "Where:\n"
 "\n"
 "* inputFile is a string containing the name of the input image file\n"
@@ -1595,6 +1600,7 @@ static PyMethodDef ImageCalibrationMethods[] = {
 {"applySubtractOffsets", ImageCalibration_ApplySubtractOffsets, METH_VARARGS,
 "imagecalibration.applySubtractOffsets(inputFile, inputOffsetsFile, outputFile, gdalformat, datatype, nonNegative, useNoDataVal, noDataVal, darkObjReflVal)\n"
 "This function performs a dark obejct subtraction (DOS) using a set of defined offsets for retriving surface reflectance.\n"
+"\n"
 "Where:\n"
 "\n"
 "* inputFile is a string containing the name of the input image file\n"
@@ -1611,6 +1617,7 @@ static PyMethodDef ImageCalibrationMethods[] = {
 {"saturatedPixelsMask", ImageCalibration_saturatedPixelsMask, METH_VARARGS,
 "imagecalibration.saturatedPixelsMask(outputImage, gdalformat, bandDefnSeq)\n"
 "Creates a mask of the saturated image pixels on a per band basis.\n"
+"\n"
 "Where:\n"
 "\n"
 "* outputImage is a string containing the name of the output file\n"
@@ -1643,6 +1650,7 @@ static PyMethodDef ImageCalibrationMethods[] = {
 {"applyLandsatTMCloudFMask", ImageCalibration_applyLandsatTMCloudFMask, METH_VARARGS,
 "imagecalibration.applyLandsatTMCloudFMask(inputTOAImage, inputThermalImage, inputSaturateImage, inValidAreaImage, outputImage, gdalFormat, sunAz, sunZen, senAz, senZen, scaleFactorIn, tmpImgsBase, tmpImgsFileExt, rmTmpImgs)\n"
 "Applies the FMASK (Zhu and Woodcock 2012, RSE 118, pp83-94) cloud masking algorithm to the input image returning an output image with the cloud (pixel value 1) and shadow (pixel value 2).\n"
+"\n"
 "Where:\n"
 "\n"
 "* inputTOAImage is a string containing the name of the input image TOA reflectance file\n"
@@ -1684,6 +1692,7 @@ static PyMethodDef ImageCalibrationMethods[] = {
 {"worldview2ToRadiance", ImageCalibration_worldview2ToRadiance, METH_VARARGS,
 "imagecalibration.worldview2ToRadiance(inputImage, outputImage, gdalformat, bandDefnSeq)\n"
 "Converts WorldView2 DN values to at sensor radiance.\n"
+"\n"
 "Where:\n"
 "\n"
 "* inputImage is a string containing the name of the input file\n"
@@ -1699,6 +1708,7 @@ static PyMethodDef ImageCalibrationMethods[] = {
 {"spot5ToRadiance", ImageCalibration_spot5ToRadiance, METH_VARARGS,
 "imagecalibration.spot5ToRadiance(inputImage, outputImage, gdalformat, bandDefnSeq)\n"
 "Converts WorldView2 DN values to at sensor radiance.\n"
+"\n"
 "Where:\n"
 "\n"
 "* inputImage is a string containing the name of the input file\n"
@@ -1714,6 +1724,7 @@ static PyMethodDef ImageCalibrationMethods[] = {
 {"calcNadirImgViewAngle", ImageCalibration_calcNadirImgViewAngle, METH_VARARGS,
 "imagecalibration.calcNadirImgViewAngle(inImgFootprint, outViewAngleImg, gdalFormat, sateAltitude, minXXCol, minXYCol, maxXXCol, maxXYCol, minYXCol, minYYCol, maxYXCol, maxYYCol)\n"
 "Calculate the sensor view angle for each pixel for a nadir sensor. Need to provide the satellite altitude in metres, for Landsat this is 705000.0. \n"
+"\n"
 "Where:\n"
 "\n"
 "* inImgFootprint is a string containing the name/path of the input file. This file needs to be to have a RAT with only one clump with pixel value 1.\n"
@@ -1733,6 +1744,7 @@ static PyMethodDef ImageCalibrationMethods[] = {
 {"calcIrradianceImageElevLUT", ImageCalibration_CalcIrradianceElevLUT, METH_VARARGS,
 "imagecalibration.calcIrradianceImageElevLUT(inputDataMaskImg, inputDEMFile, inputIncidenceAngleImg, inputSlopeImg, srefInputImage, shadowMaskImg, outputFile, gdalFormat, solarZenith, reflScaleFactor, lutElev)\n"
 "Calculate the incoming irradiance (Direct, Diffuse, Environment and Total) for sloped surfaces (Eq 1. Shepherd and Dymond 2010).\n"
+"\n"
 "Where:\n"
 "\n"
 "* inputDataMaskImg is a string containing the name and path to a binary mask specifying the region to be calculated (1 = True)\n"
@@ -1757,6 +1769,7 @@ static PyMethodDef ImageCalibrationMethods[] = {
 {"calcStandardisedReflectanceSD2010", ImageCalibration_CalcStandardisedReflectanceSD2010, METH_VARARGS,
 "imagecalibration.calcStandardisedReflectanceSD2010(inputDataMaskImg, srefInputImage, inputSolarIrradiance, inputIncidenceAngleImg, inputExitanceAngleImg, outputFile, gdalFormat, reflScaleFactor, brdfBeta, outIncidenceAngle, outExitanceAngle)\n"
 "Calculate standardised reflectance, with respect to solar and view angles, as defined by Shepherd and Dymond (2010)\n"
+"\n"
 "Where:\n"
 "\n"
 "* inputDataMaskImg is a string containing the name and path to a binary mask specifying the region to be calculated (1 = True)\n"

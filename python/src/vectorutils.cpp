@@ -672,7 +672,7 @@ static PyMethodDef VectorUtilsMethods[] = {
 
 {"printpolygeom", VectorUtils_PrintPolyGeom, METH_VARARGS, 
 "vectorutils.printpolygeom(inputvector)\n"
-"A command to print the polygon geometries (to the console) of the inputted shapefile\n"
+"A command to print the polygon geometries (to the console) of the inputted shapefile\n\n"
 "Where:\n"
 "\n"
 "* inputvector is a string containing the name of the input vector\n"
@@ -686,7 +686,7 @@ static PyMethodDef VectorUtilsMethods[] = {
 
 {"findreplacetext", VectorUtils_FindReplaceText, METH_VARARGS,
 "vectorutils.findreplacetext(inputvector, attribute, find, replace)\n"
-"A command to undertake find and replace on a given attribute with the shapefile\n"
+"A command to undertake find and replace on a given attribute with the shapefile\n\n"
 "Where:\n"
 "\n"
 "* inputvector is a string containing the name of the input vector.\n"

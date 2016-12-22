@@ -219,6 +219,7 @@ def writeVecColumn(vectorFile, vectorLayer, colName, colDataType, colData):
 A function which will write a column to a vector file
 
 Where:
+
 * vectorFile - The file / path to the vector data 'file'.
 * vectorLayer - The layer to which the data is to be added.
 * colName - Name of the output column
