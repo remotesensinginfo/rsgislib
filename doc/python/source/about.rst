@@ -66,7 +66,7 @@ Bibtex::
 
 No, RSGISLib is not being developed as a substitute for ArcMap / QGIS or ENVI. As stated above, RSGISLib is mainly developed to support our research, because of this there is a lot of advanced functionality in RSGISLib that is unavailable in other packages. Although RSGISLib works well on the desktop, it scales well to a High Performance Computing (HPC) environment, which is an area many of the previously mentioned software aren't focusing on.
 
-For visualising data it is recommended RSGISLib is used in combination with TuiView, an open source cross-platform viewer available to download from `here <https://bitbucket.org/chchrsc/tuiview>`_.
+For visualising data it is recommended RSGISLib is used in combination with TuiView, an open source cross-platform viewer available to download from `tuiview.org <http://tuiview.org>`_.
 
 **Is this free software?**
 
@@ -74,7 +74,7 @@ Yes, this software is provided freely under a GPL3 license. The software is free
 
 **Where can I get help with RSGISLib?**
 
-The RSGISLib documentation, which contains tutorials for selected functions is available to download from `here <https://bitbucket.org/petebunting/rsgislib-documentation/>`_, documentation for the Python bindings is available on this website.
+The RSGISLib documentation, which contains tutorials for selected functions is available to download from `bitbucket.org/petebunting/rsgislib-documentation <https://bitbucket.org/petebunting/rsgislib-documentation/>`_, documentation for the Python bindings is available on this website.
 
 Help is available for RSGISLib through emailing our mailing list: rsgislib-support@googlegroups.com
 
@@ -82,7 +82,7 @@ The archive is available to view at `groups.google.com <https://groups.google.co
  
 **Do you offer training on RSGISLib?**
 
-RSGISLib is taught as part of the Masters course at Aberystwyth University. The notes for the Python course, which include a chapter using RSGISLib for object based classification are available `here <https://bitbucket.org/petebunting/python-tutorial-for-spatial-data-processing>`_. We gave a training course at the 20th JAXA Kyoto & Carbon initiative meeting on object based classification, the notes are available to download from `Sourceforge <https://sourceforge.net/projects/rsgislib/files/Training/JAXA_GMW_RSGISLibCourse.zip>`_.
+RSGISLib is taught as part of the Masters course at Aberystwyth University. The notes for the Python course, which include a chapter using RSGISLib for object based classification are available `bitbucket.org/petebunting/python-tutorial-for-spatial-data-processing <https://bitbucket.org/petebunting/python-tutorial-for-spatial-data-processing>`_. We gave a training course at the 20th JAXA Kyoto & Carbon initiative meeting on object based classification, the notes are available to download from `Sourceforge <https://sourceforge.net/projects/rsgislib/files/Training/JAXA_GMW_RSGISLibCourse.zip>`_.
 
 We also write a blog (`spectraldifferences <http://spectraldifferences.wordpress.com/>`_) which contains some tutorials on using RSGISLib as well as other open source software we're involved with.
 

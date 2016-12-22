@@ -2288,12 +2288,10 @@ static PyMethodDef RasterGISMethods[] = {
 "* clumps is a string containing the name of the input file\n"
 "* field is a string containing the name of the input class field (class can be a string or integer).\n"
 "* classcolours is dict mapping int class ids to an object having the following attributes:\n"
-"\n"
 "   * red: int defining the red colour component (0 - 255)\n"
 "   * green: int defining the green colour component (0 - 255)\n"
 "   * blue: int defining the bluecolour component (0 - 255)\n"
 "   * alpha: int defining the alpha colour component (0 - 255)\n"
-"\n"
 "* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated."
 "\n"
 "Example::\n"
@@ -2328,7 +2326,6 @@ static PyMethodDef RasterGISMethods[] = {
     {"strClassMajority", (PyCFunction)RasterGIS_StrClassMajority, METH_VARARGS | METH_KEYWORDS,
 "rastergis.strClassMajority(baseclumps, infoclumps, baseclasscol, infoclasscol, ignorezero=True, baseratband=1, inforatband=1)\n"
 "Finds the majority for class (string - field) from a set of small objects to large objects\n"
-
 "Where:\n"
 "\n"
 "* baseSegment is a the base clumps file, to be attribured.\n"
@@ -2338,7 +2335,8 @@ static PyMethodDef RasterGISMethods[] = {
 "* ignoreZero is a boolean specifying if zeros should be ignored in input layer. If set to false values of 0 will be included when calculating the class majority, otherwise the majority calculation will only consider objects with a value greater than 0.\n"
 "* baseratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated in the base clumps.\n"
 "* inforatband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated in the info clumps.\n"
-"\nExample::\n"
+"\n"
+"Example::\n"
 "\n"
 "	from rsgislib import rastergis\n"
 "	clumps='./TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_popstats.kea'\n"
@@ -2525,13 +2523,12 @@ static PyMethodDef RasterGISMethods[] = {
 "* change is a string providing the output name of the change field\n"
 "* attributes is a sequence of strings containing the columns to use when detecting change.\n"
 "* classChangeFields is a sequence of python objects having the following attributes:\n"
-"\n"
 "   * name - The class name in which change is going to be search for\n"
 "   * outName - An integer to uniquely identify the clumps identify as change\n"
 "   * threshold - The number of standard deviations away from the mean above which segments are identified as change.\n"
-"\n"
 "* ratBand is an int containing band for which the neighbours are to be calculated for (Optional, Default = 1)\n"
-"\nExample::\n"
+"\n"
+"Example::\n"
 "\n"
 "   import collections\n"
 "   from rsgislib import rastergis\n"
@@ -2552,11 +2549,10 @@ static PyMethodDef RasterGISMethods[] = {
 "* classfield is a string providing the name of the column containing classes.\n"
 "* attributes is a sequence of strings containing the columns to use when detecting change.\n"
 "* classChangeFields is a sequence of python objects having the following attributes:\n"
-"\n"
 "   * name - The class name in which change is going to be search for\n"
-"\n"
 "* ratBand is an int containing band for which the neighbours are to be calculated for (Optional, Default = 1)\n"
-"\nExample::\n"
+"\n"
+"Example::\n"
 "\n"
 "   import collections"
 "   from rsgislib import rastergis\n"
@@ -2569,37 +2565,37 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"},
 
 {"selectClumpsOnGrid", RasterGIS_SelectClumpsOnGrid, METH_VARARGS,
-    "rsgislib.rastergis.selectClumpsOnGrid(clumpsImage, inSelectField, outSelectField, eastingsCol, northingsCol, metricField, methodStr, rows, cols)\n"
-    "Selects a segment within a regular grid pattern across the scene. The clump is selected based on the minimum, maximum or closest to the mean.\n"
-    "Where:\n"
-    "\n"
-    "* clumpsImage is a string containing the name of the input clump file\n"
-    "* inSelectField is a string which defines the column name where a value of 1 defines the clumps which will be included in the analysis.\n"
-    "* outSelectField is a string which defines the column name where a value of 1 defines the clumps selected by the analysis.\n"
-    "* eastingsCol is a string which defines a column with a eastings for each clump.\n"
-    "* northingsCol is a string which defines a column with a northings for each clump.\n"
-    "* metricField is a string which defines a column with a value for each clump which will be used for the distance, min, or max anaylsis.\n"
-    "* methodStr is a string which defines whether the minimum, maximum or mean method of selecting a clump will be used (values can be either min, max or mean).\n"
-    "* rows is an unsigned integer which defines the number of rows within which a clump will be selected.\n"
-    "* cols is an unsigned integer which defines the number of columns within which a clump will be selected.\n"
-    "\n"},
-    
+"rsgislib.rastergis.selectClumpsOnGrid(clumpsImage, inSelectField, outSelectField, eastingsCol, northingsCol, metricField, methodStr, rows, cols)\n"
+"Selects a segment within a regular grid pattern across the scene. The clump is selected based on the minimum, maximum or closest to the mean.\n"
+"Where:\n"
+"\n"
+"* clumpsImage is a string containing the name of the input clump file\n"
+"* inSelectField is a string which defines the column name where a value of 1 defines the clumps which will be included in the analysis.\n"
+"* outSelectField is a string which defines the column name where a value of 1 defines the clumps selected by the analysis.\n"
+"* eastingsCol is a string which defines a column with a eastings for each clump.\n"
+"* northingsCol is a string which defines a column with a northings for each clump.\n"
+"* metricField is a string which defines a column with a value for each clump which will be used for the distance, min, or max anaylsis.\n"
+"* methodStr is a string which defines whether the minimum, maximum or mean method of selecting a clump will be used (values can be either min, max or mean).\n"
+"* rows is an unsigned integer which defines the number of rows within which a clump will be selected.\n"
+"* cols is an unsigned integer which defines the number of columns within which a clump will be selected.\n"
+"\n"},
+
 {"interpolateClumpValues2Image", RasterGIS_InterpolateClumpValues2Img, METH_VARARGS,
-    "rsgislib.rastergis.interpolateClumpValues2Image(clumpsImage, selectField, eastingsField, northingsField, methodStr, valueField, outputFile, gdalformat, gdaltype, ratBand)\n"
-    "Interpolates values from clumps to the whole image of pixels.\n"
-    "Where:\n"
-    "\n"
-    "* clumpsImage is a string containing the name of the input clump file\n"
-    "* selectField is a string which defines the column name where a value of 1 defines the clumps which will be included in the analysis.\n"
-    "* eastingsField is a string which defines a column with a eastings for each clump.\n"
-    "* northingsField is a string which defines a column with a northings for each clump.\n"
-    "* methodStr is a string which defines a column with a value for each clump which will be used for the distance, nearestneighbour or naturalneighbour or naturalnearestneighbour or knearestneighbour or idwall anaylsis.\n"
-    "* valueField is a string which defines a column containing the values to be interpolated creating the new image.\n"
-    "* outputFile is a string for the path to the output image file.\n"
-    "* gdalformat is string defining the GDAL format of the output image.\n"
-    "* datatype is an containing one of the values from rsgislib.TYPE_*\n"
-    "* ratBand is the image band with which the RAT is associated."
-    "\n"},
+"rsgislib.rastergis.interpolateClumpValues2Image(clumpsImage, selectField, eastingsField, northingsField, methodStr, valueField, outputFile, gdalformat, gdaltype, ratBand)\n"
+"Interpolates values from clumps to the whole image of pixels.\n"
+"Where:\n"
+"\n"
+"* clumpsImage is a string containing the name of the input clump file\n"
+"* selectField is a string which defines the column name where a value of 1 defines the clumps which will be included in the analysis.\n"
+"* eastingsField is a string which defines a column with a eastings for each clump.\n"
+"* northingsField is a string which defines a column with a northings for each clump.\n"
+"* methodStr is a string which defines a column with a value for each clump which will be used for the distance, nearestneighbour or naturalneighbour or naturalnearestneighbour or knearestneighbour or idwall anaylsis.\n"
+"* valueField is a string which defines a column containing the values to be interpolated creating the new image.\n"
+"* outputFile is a string for the path to the output image file.\n"
+"* gdalformat is string defining the GDAL format of the output image.\n"
+"* datatype is an containing one of the values from rsgislib.TYPE_*\n"
+"* ratBand is the image band with which the RAT is associated."
+"\n"},
     
 
 {"calcRelDiffNeighStats", RasterGIS_CalcRelDiffNeighbourStats, METH_VARARGS,
@@ -2610,16 +2606,15 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"
 "* clumpsImage is a string containing the name of the input clump file\n"
 "* fieldstats has the following fields\n"
-"\n"
 "      * field: string defining the field in the RAT to compare to.\n"
 "      * minField: string defining the name of the field for min value\n"
 "      * maxField: string defining the name of the field for max value\n"
 "      * sumField: string defining the name of the field for sum value\n"
 "      * meanField: string defining the name of the field for mean value\n"
 "      * stdDevField: string defining the name of the field for standard deviation value\n"
-"\n"
 "* ratBand is the image band with which the RAT is associated.\n"
-"\nExample::\n"
+"\n"
+"Example::\n"
 "\n"
 "    import rsgislib.rastergis\n"
 "    inputImage = './RapidEye_20130625_lat53lon389_tid3063312_oid167771_rad_toa_segs_neigh.kea'\n"
@@ -2639,7 +2634,8 @@ static PyMethodDef RasterGISMethods[] = {
 "* xmlBlock is a string with a block of XML which is to be parsed for the logical expression.\n"
 "* outColumn is a string with the name out of the output column.\n"
 "* ratBand is an (optional; default 1) integer with the image band with which the RAT is associated.\n"
-"\nExample::\n"
+"\n"
+"Example::\n"
 "\n"
 "    #!/usr/bin/env python\n"
 "\n"
@@ -2674,7 +2670,8 @@ static PyMethodDef RasterGISMethods[] = {
 "* classVal is a string with the name of the class to be grown\n"
 "* maxNumIter is the maximum number of iterations to used for the growth (optional; default is -1, i.e., no max number of iterations\n"
 "* ratBand is an (optional; default 1) integer with the image band with which the RAT is associated.\n"
-"\nExample::\n"
+"\n"
+"Example::\n"
 "\n"
 "    from rsgislib import rastergis\n"
 "    import xml.etree.cElementTree as ET\n"
@@ -2726,13 +2723,12 @@ static PyMethodDef RasterGISMethods[] = {
 "* meanLitCol is a string specifying the column to be used for the 'mean' for each object in the mean-lit calculation\n"
 "* pxlCountCol is a string specifying the output column in the RAT where the count for the number of pixels within each clump used for the stats is outputted.\n"
 "* bandstats is a sequence of rsgislib.rastergis.BandAttStats objects that have attributes in line with rsgis.cmds.RSGISBandAttStatsCmds\n"
-"\n"
-"      * band: int defining the image band to process\n"
-"      * minField: string defining the name of the field for min value\n"
-"      * maxField: string defining the name of the field for max value\n"
-"      * sumField: string defining the name of the field for sum value\n"
-"      * meanField: string defining the name of the field for mean value\n"
-"      * stdDevField: string defining the name of the field for standard deviation value\n"
+"    * band: int defining the image band to process\n"
+"    * minField: string defining the name of the field for min value\n"
+"    * maxField: string defining the name of the field for max value\n"
+"    * sumField: string defining the name of the field for sum value\n"
+"    * meanField: string defining the name of the field for mean value\n"
+"    * stdDevField: string defining the name of the field for standard deviation value\n"
 "* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated.\n"
 "\n"
 "Example::\n"
@@ -2795,7 +2791,8 @@ static PyMethodDef RasterGISMethods[] = {
 "* classVal is a string with the name of the class to be grown\n"
 "* maxNumIter is the maximum number of iterations to used for the growth (optional; default is -1, i.e., no max number of iterations\n"
 "* ratBand is an (optional; default 1) integer with the image band with which the RAT is associated.\n"
-"\nExample::\n"
+"\n"
+"Example::\n"
 "\n"
 "    from rsgislib import rastergis\n"
 "    import xml.etree.cElementTree as ET\n"
@@ -2840,7 +2837,9 @@ static PyMethodDef RasterGISMethods[] = {
 "* summeriseKNN specifies how the extrapolation value is calculated (rsgislib.SUMTYPE_MODE, rsgislib.SUMTYPE_MEAN, rsgislib.SUMTYPE_MEDIAN, rsgislib.SUMTYPE_MIN, rsgislib.SUMTYPE_MAX, rsgislib.SUMTYPE_STDDEV; Default: rsgislib.SUMTYPE_MEDIAN). Mode is used for classification.\n"
 "* distThres is a maximum distance threshold over which features will not be included within the \'k\'.\n"
 "* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated.\n"
-"\nExample::\n\n"
+"\n"
+"Example::\n"
+"\n"
 "    from rsgislib import rastergis\n"
 "    from rsgislib import imageutils\n"
 "    import rsgislib\n"
@@ -2853,7 +2852,8 @@ static PyMethodDef RasterGISMethods[] = {
 "    forestHeightImg='./LS5TM_20110428_forest95Height.kea'\n"
 "    rastergis.exportCol2GDALImage(forestClumpsImg, forestHeightImg, 'KEA', rsgislib.TYPE_32FLOAT, 'HP95Pred')\n"
 "    imageutils.popImageStats(forestHeightImg,True,0.,True)\n"
-"\n\n"},
+"\n"},
+    
 {"histoSampling", (PyCFunction)RasterGIS_HistoSampling, METH_VARARGS | METH_KEYWORDS,
 "rsgislib.rastergis.histoSampling(clumps=string, varCol=string, outSelectCol=string, propOfSample=float, binWidth=float, classColumn=string, classVal=string, ratband=int)\n"
 "This function performs a histogram based sampling of the RAT for a specific column.\n"
@@ -2868,11 +2868,14 @@ static PyMethodDef RasterGISMethods[] = {
 "* classColumn is a string specifying a field within which classes have been defined. This can be used to only apply the sampling to a thematic subset of the RAT. If set as None then this is ignored. (Default = None)\n"
 "* classVal is a string specifying the class it will be limited to.\n"
 "* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated.\n"
-"\nExample::\n\n"
-"    from rsgislib import rastergis\n"
 "\n"
+"Example::\n"
+"\n"
+"    from rsgislib import rastergis\n"
+"    \n"
 "    rastergis.histoSampling(clumps='N00E103_10_grid_knn.kea', varCol='HH', outSelectCol='HHSampling', propOfSample=0.25, binWidth=0.01, classColumn='Class', classVal='2')\n"
-"\n\n"},
+"\n"},
+    
 {"fitHistGausianMixtureModel", (PyCFunction)RasterGIS_FitHistGausianMixtureModel, METH_VARARGS | METH_KEYWORDS,
 "rsgislib.rastergis.fitHistGausianMixtureModel(clumps=string, outH5File=string, outHistFile=string, varCol=string, binWidth=float, classColumn=string, classVal=string, ratband=int)\n"
 "This function fits a Gaussian mixture model to the histogram for a variable in the RAT. \n"
@@ -2886,11 +2889,14 @@ static PyMethodDef RasterGISMethods[] = {
 "* classColumn is a string specifying a field within which classes have been defined.\n"
 "* classVal is a string specifying the class it will be limited to.\n"
 "* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated.\n"
-"\nExample::\n\n"
+"\n"
+"Example::\n"
+"\n"
 "    from rsgislib import rastergis\n"
 "\n"
 "    rastergis.fitHistGausianMixtureModel(clumps='FrenchGuiana_10_ALL_sl_HH_lee_UTM_mosaic_dB_segs.kea', outH5File='gaufit.h5', outHistFile='histfile.h5', varCol='HVdB', binWidth=0.1, classColumn='Classes', classVal='Mangrove')\n"
-"\n\n"},
+"\n"},
+
 {"classSplitFitHistGausianMixtureModel", (PyCFunction)RasterGIS_ClassSplitFitHistGausianMixtureModel, METH_VARARGS | METH_KEYWORDS,
 "rsgislib.rastergis.classSplitFitHistGausianMixtureModel(clumps=string, outCol=string, varCol=string, binWidth=float, classColumn=string, classVal=string, ratband=int)\n"
 "This function fits a Gaussian mixture model to the histogram for a variable in the RAT and uses it to split the class into a series of subclasses.\n"
@@ -2903,11 +2909,14 @@ static PyMethodDef RasterGISMethods[] = {
 "* classColumn is a string specifying a field within which classes have been defined.\n"
 "* classVal is a string specifying the class it will be limited to.\n"
 "* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated.\n"
-"\nExample::\n\n"
+"\n"
+"Example::\n"
+"\n"
 "    from rsgislib import rastergis\n"
 "\n"
 "    rastergis.classSplitFitHistGausianMixtureModel(clumps='FrenchGuiana_10_ALL_sl_HH_lee_UTM_mosaic_dB_segs.kea', outCol='MangroveSubClass', varCol='HVdB', binWidth=0.1, classColumn='Classes', classVal='Mangroves')\n"
-"\n\n"},
+"\n"},
+    
 {"populateRATWithPropValidPxls", (PyCFunction)RasterGIS_PopulateRATWithPropValidPxls, METH_VARARGS | METH_KEYWORDS,
 "rastergis.populateRATWithPropValidPxls(valsimage=string, clumps=string, outcolsname=string, nodataval=float, ratband=uint)\n"
 "Populates the attribute table with the proportion of valid pixels within the clump.\n"
@@ -2918,7 +2927,8 @@ static PyMethodDef RasterGISMethods[] = {
 "* outColsName is a string representing the name for the output column containing the proportion.\n"
 "* nodataval is a float defining the no data value to be used.\n"
 "* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated in the clumps image.\n"
-"\n\n"},
+"\n"},
+    
 {"calc1DJMDistance", (PyCFunction)RasterGIS_Calc1DJMDistance, METH_VARARGS | METH_KEYWORDS,
 "rastergis.calc1DJMDistance(clumps=string, varcol=string, binwidth=float, classcol=string, class1=string, class2=string, ratband=uint)\n"
 "Calculate the Jeffries and Matusita distance for a single variable between two classes.\n"
@@ -2931,9 +2941,12 @@ static PyMethodDef RasterGISMethods[] = {
 "* class1 is a string specifying the first class.\n"
 "* class2 is a string specifying the second class.\n"
 "* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated in the clumps image.\n"
+"\n"
 "Return:\n"
+"\n"
 "* double for distance\n"
-"\n\n"},
+"\n"},
+    
 {"calc2DJMDistance", (PyCFunction)RasterGIS_Calc2DJMDistance, METH_VARARGS | METH_KEYWORDS,
 "rastergis.calc2DJMDistance(clumps=string, var1col=string, var2col=string, var1binWidth=float, var2binWidth=float, classcol=string, class1=string, class2=string, ratband=uint)\n"
 "Calculate the Jeffries and Matusita distance for two variables between two classes.\n"
@@ -2948,9 +2961,12 @@ static PyMethodDef RasterGISMethods[] = {
 "* class1 is a string specifying the first class.\n"
 "* class2 is a string specifying the second class.\n"
 "* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated in the clumps image.\n"
+"\n"
 "Return:\n"
+"\n"
 "* double for distance\n"
-"\n\n"},
+"\n"},
+    
 {"calcBhattacharyyaDistance", (PyCFunction)RasterGIS_CalcBhattacharyyaDistance, METH_VARARGS | METH_KEYWORDS,
 "rastergis.calcBhattacharyyaDistance(clumps=string, varcol=string, classcol=string, class1=string, class2=string, ratband=uint)\n"
 "Calculate the Bhattacharyya distance for a single variable between two classes.\n"
@@ -2962,9 +2978,11 @@ static PyMethodDef RasterGISMethods[] = {
 "* class1 is a string specifying the first class.\n"
 "* class2 is a string specifying the second class.\n"
 "* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated in the clumps image.\n"
+"\n"
 "Return:\n"
+"\n"
 "* double for distance\n"
-"\n\n"},
+"\n"},
 {"exportClumps2Images", (PyCFunction)RasterGIS_ExportClumps2Images, METH_VARARGS | METH_KEYWORDS,
 "rastergis.exportClumps2Images(clumps, outimgbase, binout, outimgext, gdalformat, ratband=1)\n"
 "Exports each clump to a seperate raster which is the minimum extent for the clump.\n"
@@ -2987,7 +3005,7 @@ static PyMethodDef RasterGISMethods[] = {
 "   gdalformat = 'KEA'\n"
 "   binaryOut = False\n"
 "   rastergis.exportClumps2Images(clumps, outimgbase, binaryOut, outimgext, gdalformat, ratband)\n"
-"\n\n"},
+"\n"},
     
     {NULL}        /* Sentinel */
 };

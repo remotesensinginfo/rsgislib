@@ -1596,6 +1596,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "* datatype is an containing one of the values from rsgislib.TYPE_*\n"
 "* bandDefnSeq is a sequence of rsgislib.imagecalc.BandDefn objects that define the inputs\n"
 "* useExpAsbandName is an optional bool specifying whether the band name should be the expression (Default = False).\n"
+"\n"
 "Example::\n"
 "\n"
 "   import rsgislib\n"
@@ -1623,6 +1624,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
 "* datatype is an containing one of the values from rsgislib.TYPE_*\n"
 "* useExpAsbandName is an optional bool specifying whether the band name should be the expression (Default = False).\n"
+"\n"
 "Example::\n"
 "\n"
 "   import rsgislib\n"
@@ -1703,6 +1705,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "* windowSize is an int defining the size of the window to be used\n"
 "* gdalFormat is a string containing the GDAL format for the output file - eg 'KEA'\n"
 "* gdalDataType is an int containing one of the values from rsgislib.TYPE_*\n"
+"\n"
 },
 
 {"mahalanobisDist2ImgFilter", ImageCalc_MahalanobisDist2ImgFilter, METH_VARARGS,
@@ -1716,6 +1719,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "* windowSize is an int defining the size of the window to be used\n"
 "* gdalFormat is a string containing the GDAL format for the output file - eg 'KEA'\n"
 "* gdalDataType is an int containing one of the values from rsgislib.TYPE_*\n"
+"\n"
 },
 
 {"imageCalcDistance", ImageCalc_ImageCalcDistance, METH_VARARGS,
@@ -1727,6 +1731,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "* inputImage is a string containing the name of the input file\n"
 "* outputImage is a string containing the name of the output file\n"
 "* gdalFormat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+"\n"
 },
 
 {"imagePixelColumnSummary", ImageCalc_ImagePixelColumnSummary, METH_VARARGS,
@@ -1738,7 +1743,6 @@ static PyMethodDef ImageCalcMethods[] = {
 "* inputImage is a string containing the name of the input file\n"
 "* outputImage is a string containing the name of the output file\n"
 "* summaryStats is an rsgislib.imagecalc.StatsSummary object that has attributes matching rsgis.cmds.RSGISCmdStatsSummary\n"
-" Requires:\n"
 "   *  calcMin: boolean defining if the min value should be calculated\n"
 "   *  calcMax: boolean defining if the max value should be calculated\n"
 "   *  calcSum: boolean defining if the sum value should be calculated\n"
@@ -1751,11 +1755,11 @@ static PyMethodDef ImageCalcMethods[] = {
 "   *  sum: float defining the sum value to use\n"
 "   *  stdDev: float defining the standard deviation value to use\n"
 "   *  median: float defining the median value to use\n"
-"\n"
 "* gdalFormat is a string containing the GDAL format for the output file - eg 'KEA'\n"
 "* gdalDataType is an int containing one of the values from rsgislib.TYPE_*\n"
 "* noDataValue is a float specifying what value is used to signify no data\n"
 "* useNoDataValue is a boolean specifying whether the noDataValue should be used\n"
+"\n"
 },
 
 {"imagePixelLinearFit", ImageCalc_ImagePixelLinearFit, METH_VARARGS,
@@ -1801,6 +1805,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "* inMax is a float specifying the TODO\n"
 "* outMin is a float specifying the TODO\n"
 "* outMax is a float specifying the TODO\n"
+"\n"
 },
 
 {"correlation", (PyCFunction)ImageCalc_Correlation, METH_VARARGS | METH_KEYWORDS,
@@ -1812,9 +1817,12 @@ static PyMethodDef ImageCalcMethods[] = {
 "* inputImageA is a string containing the name of the first input image file\n"
 "* inputImageB is a string containing the name of the second input image file\n"
 "* outputMatrix is a string containing the basename of the output matrix (optional)\n"
-"\nReturns:\n"
+"\n"
+"Returns:\n"
+"\n"
 "* Correlation matrix (tuple of tuples)"
-"\nExample::\n"
+"\n"
+"Example::\n"
 "\n"
 "   from rsgislib import imagecalc\n"
 "   inImageA = 'imageA.kea'\n"
@@ -1835,6 +1843,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "* inputMatrixB is a string containing the name of the second input matrix file\n"
 "* shouldCalcMean is a boolean defining whether the mean should be calculated TODO: check\n"
 "* outputMatrix is a string containing the name of the output matrix\n"
+"\n"
 },
 
 {"meanVector", ImageCalc_MeanVector, METH_VARARGS,
@@ -1845,6 +1854,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "\n"
 "* inputImage is a string containing the name of the input image file\n"
 "* outputMatrix is a string containing the name of the output matrix\n"
+"\n"
 },
 
 
@@ -1858,6 +1868,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "* inputImage is a string containing the name of the input image file\n"
 "* outputImage is a string containing the name of the output image file\n"
 "* numComponents is an int containing number of components to use for PCA\n"
+"\n"
 },
 
 {"standardise", ImageCalc_Standardise, METH_VARARGS,
@@ -1869,6 +1880,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "* meanVector is a string containing the name of the file containing the mean vector TODO: check\n"
 "* inputImage is a string containing the name of the input image file\n"
 "* outputImage is a string containing the name of the output image file\n"
+"\n"
 },
 
 {"replaceValuesLessThan", ImageCalc_ReplaceValuesLessThan, METH_VARARGS,
@@ -1881,6 +1893,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "* outputImage is a string containing the name of the output image file\n"
 "* threshold is a float containing the threshold to use\n"
 "* value is a float containing the value below which replacement will occur\n"
+"\n"
 },
 
 {"unitArea", ImageCalc_UnitArea, METH_VARARGS,
@@ -1892,6 +1905,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "* inputImage is a string containing the name of the input image file\n"
 "* outputImage is a string containing the name of the output image file\n"
 "* inputMatrixFile is a string containing the name of the input matrix file TODO: check\n"
+"\n"
 },
 
 {"movementSpeed", ImageCalc_MovementSpeed, METH_VARARGS,
@@ -1906,6 +1920,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "* upper is a float TODO: expand\n"
 "* lower is a float TODO: expand\n"
 "* outputImage is a string defining the output image file name\n"
+"\n"
 },
 
 {"countValsInCols", ImageCalc_CountValsInCols, METH_VARARGS,
@@ -1918,6 +1933,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "* upper is a float containing the upper limit of values to count\n"
 "* lower is a float containing the lower limit of values to count\n"
 "* outputImage is a string containing the name of the output image file\n"
+"\n"
 },
 
 {"calculateRMSE", ImageCalc_CalculateRMSE, METH_VARARGS,
@@ -1930,6 +1946,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "* inputBandA is an integer defining which band should be processed from inputImageA\n"
 "* inputImageB is a string containing the name of the second input image file\n"
 "* inputBandB is an integer defining which band should be processed from inputImageB\n"
+"\n"
 },
 
 {"dist2Geoms", ImageCalc_Dist2Geoms, METH_VARARGS,
@@ -1941,6 +1958,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "* inputVector is a string defining the geometry TODO: Check this and find out about input image\n"
 "* imageResolution is a float defining the resolution of which to process the image\n"
 "* outputImage is a string containing the name of the file for the output image\n"
+"\n"
 },
 
 {"imageBandStats", ImageCalc_ImageBandStats, METH_VARARGS,
@@ -1952,6 +1970,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "* inputImage is a string containing the name of the input image file\n"
 "* outputFile is a string containing the name of the output file\n"
 "* ignoreZeros is a boolean defining whether zeros are ignored in the statistic calculation\n"
+"\n"
 },
 
 {"imageStats", ImageCalc_ImageStats, METH_VARARGS,
@@ -1963,6 +1982,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "* inputImage is a string containing the name of the input image file\n"
 "* outputFile is a string containing the name of the output file\n"
 "* ignoreZeros is a boolean defining whether zeros are ignored in the statistic calculation\n"
+"\n"
 },
 
 {"unconLinearSpecUnmix", ImageCalc_UnconLinearSpecUnmix, METH_VARARGS,
@@ -1999,7 +2019,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "\n"
 "    endmembersFile = \"./endmembers.mtxt\"\n"
 "    rsgislib.imagecalc.unconLinearSpecUnmix(imageLSImage, \"KEA\", rsgislib.TYPE_32FLOAT, unmixedImage, endmembersFile, lsumGain, lsumOffset)\n"
-"\n\n"
+"\n"
 },
 
 {"exhconLinearSpecUnmix", ImageCalc_ExhconLinearSpecUnmix, METH_VARARGS,
@@ -2038,7 +2058,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "    endmembersFile = \"./endmembers.mtxt\"\n"
 "    stepResolution = 0.1\n"
 "    rsgislib.imagecalc.exhconLinearSpecUnmix(imageLSImage, \"KEA\", rsgislib.TYPE_32FLOAT, unmixedImage, endmembersFile, stepResolution, lsumGain, lsumOffset)\n"
-"\n\n"
+"\n"
 },
 
 {"conSum1LinearSpecUnmix", ImageCalc_ConSum1LinearSpecUnmix, METH_VARARGS,
@@ -2077,7 +2097,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "\n"
 "    endmembersFile = \"./endmembers.mtxt\"\n"
 "    rsgislib.imagecalc.conSum1LinearSpecUnmix(imageLSImage, \"KEA\", rsgislib.TYPE_32FLOAT, lsumWeight, unmixedImage, endmembersFile, lsumGain, lsumOffset)\n"
-"\n\n"
+"\n"
 },
 
 {"nnConSum1LinearSpecUnmix", ImageCalc_NnConSum1LinearSpecUnmix, METH_VARARGS,
@@ -2096,6 +2116,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "* endmembersFile is a string containing the names of the file containing the end members\n"
 "* lsumGain is a float specifying a gain which can be applied to the output pixel values (outvalue = offset + (gain * value)). Optional, default = 1.\n"
 "* lsumOffset is a float specifying an offset which can be applied to the output pixel values (outvalue = offset + (gain * value)). Optional, default = 0.\n"
+"\n"
 },
 
 {"allBandsEqualTo", ImageCalc_AllBandsEqualTo, METH_VARARGS,
@@ -2111,6 +2132,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "* outputImage is a string containing the name of the output image file\n"
 "* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
 "* datatype is an containing one of the values from rsgislib.TYPE_*\n"
+"\n"
 },
 
 {"histogram", ImageCalc_Histogram, METH_VARARGS,
@@ -2127,6 +2149,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "* calcInMinMax is a boolean specifying whether inMin and inMax should be calculated\n"
 "* inMin is a float for the minimum image value to be included in the histogram\n"
 "* inMax is a floatf or the maximum image value to be included in the histogram\n"
+"\n"
 },
     
 {"getHistogram", ImageCalc_GetHistogram, METH_VARARGS,
@@ -2141,8 +2164,11 @@ static PyMethodDef ImageCalcMethods[] = {
 "* calcInMinMax is a boolean specifying whether inMin and inMax should be calculated\n"
 "* inMin is a float for the minimum image value to be included in the histogram\n"
 "* inMax is a floatf or the maximum image value to be included in the histogram\n"
+"\n"
 "returns:\n"
+"\n"
 "* returns a list"
+"\n"
 },
 
 {"bandPercentile", ImageCalc_BandPercentile, METH_VARARGS,
@@ -2154,6 +2180,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "* inputImage is a string containing the name of the input image file\n"
 "* percentile is a float between 0 -- 1 specifying the percentile to be calculated.\n"
 "* noDataValue is a float specifying the value used to represent no data (used None when no value is to be specified).\n"
+"\n"
 },
 
 {"imageDist2Geoms", ImageCalc_ImageDist2Geoms, METH_VARARGS,
@@ -2166,6 +2193,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "* inputVector is a string containing the name of the input vector file containing the geometry TODO: check this\n"
 "* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
 "* outputImage is a string containing the name of the output image file\n"
+"\n"
 },
 
 {"correlationWindow", ImageCalc_CorrelationWindow, METH_VARARGS,
@@ -2181,6 +2209,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "* bandB is an int providing the second band to use.\n"
 "* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
 "* datatype is an containing one of the values from rsgislib.TYPE_*\n"
+"\n"
 "Example::\n"
 "\n"
 "   image = path + 'injune_p142_casi_sub_utm.kea'\n"
@@ -2211,7 +2240,9 @@ static PyMethodDef ImageCalcMethods[] = {
 "* latMax is a double specifying the maximum latitude of the BBOX\n"
 "* longMin is a double specifying the minimum longitude of the BBOX\n"
 "* longMax is a double specifying the maximum longitude of the BBOX\n"
-"returns:\n"
+"\n"
+"Returns:\n"
+"\n"
 "* list with 5 values (min, max, mean, stddev, sum)\n"
 "Example::\n"
 "\n"
@@ -2243,8 +2274,11 @@ static PyMethodDef ImageCalcMethods[] = {
 "* latMax is a double specifying the maximum latitude of the BBOX\n"
 "* longMin is a double specifying the minimum longitude of the BBOX\n"
 "* longMax is a double specifying the maximum longitude of the BBOX\n"
-"returns:\n"
+"\n"
+"Returns:\n"
+"\n"
 "* float with image mode for the region within the BBOX.\n"
+"\n"
 },
 
 {"get2DImageHistogram", ImageCalc_Get2DImageHistogram, METH_VARARGS,
@@ -2266,9 +2300,12 @@ static PyMethodDef ImageCalcMethods[] = {
 "* img2Min is a double specifying the minimum image value for image 2 to be used in the histogram.\n"
 "* img2Max is a double specifying the maximum image value for image 2 to be used in the histogram.\n"
 "* normOutput is a boolean specifying whether the output histogram should be normalised to unit volume.\n"
-"returns:\n"
+"\n"
+"Returns:\n"
+"\n"
 "* double with bin width of the axis of image 1.\n"
 "* double with bin width of the axis of image 2.\n"
+"\n"
 },
 
 
@@ -2294,6 +2331,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "               should be excluded from the histogram (Optional and if not specfied defaults to True).\n"
 "* rescaleProbs is a boolean specifying whether the probabilities should be rescaled to a range of 0-1 as values\n"
 "              can be very small when a number of variables are used. (Optional and if not specified the default is True)."
+"\n"
 },
 
 
@@ -2307,7 +2345,9 @@ static PyMethodDef ImageCalcMethods[] = {
 "* expression is a string containing the expression to run over the images, uses muparser syntax. Must output a value of 1 to be true.\n"
 "* bandDefnSeq is a sequence of rsgislib.imagecalc.BandDefn objects that define the inputs\n"
 "* validImgMask is an optional string specifying a valid area image mask. If not specified then it won't be used.\n"
+"\n"
 "Returns:\n"
+"\n"
 "* Returns a float value with the proportion\n"
 "Example::\n"
 "\n"
@@ -2329,22 +2369,16 @@ static PyMethodDef ImageCalcMethods[] = {
 "\n"
 "Where:\n"
 "\n"
-"  * inputImages is a list of input images (note. all inputs must have the same number of image bands).\n"
-"  * outputImage is a string with the name and path of the output image.\n"
-"  * summaryStatOption is of type rsgislib.SUMTYPE_* and specifies which summary statistic is used to sumamrise the images.\n"
-"  * gdalFormat is a string specifying the output image format (e.g., KEA).\n"
-"  * datatype is an containing one of the values from rsgislib.TYPE_*\n"
-"  * noDataVal float with the value of the no data value, the same value for all the input images (Optional)\n"
-"  * useNoDataVal is a boolean specifying whether the no data value should be used (Optional, default False)\n"
-
-"Example::\n"
-"\n"
-
+"* inputImages is a list of input images (note. all inputs must have the same number of image bands).\n"
+"* outputImage is a string with the name and path of the output image.\n"
+"* summaryStatOption is of type rsgislib.SUMTYPE_* and specifies which summary statistic is used to sumamrise the images.\n"
+"* gdalFormat is a string specifying the output image format (e.g., KEA).\n"
+"* datatype is an containing one of the values from rsgislib.TYPE_*\n"
+"* noDataVal float with the value of the no data value, the same value for all the input images (Optional)\n"
+"* useNoDataVal is a boolean specifying whether the no data value should be used (Optional, default False)\n"
 "\n"},
     
-    
-    
-    {NULL}        /* Sentinel */
+{NULL}        /* Sentinel */
 };
 
 #if PY_MAJOR_VERSION >= 3
