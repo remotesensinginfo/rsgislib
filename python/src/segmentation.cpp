@@ -654,7 +654,8 @@ static PyMethodDef SegmentationMethods[] = {
     {"labelPixelsFromClusterCentres", Segmentation_labelPixelsFromClusterCentres, METH_VARARGS, 
 "segmentation.labelPixelsFromClusterCentres(inputimage, outputimage, clustercenters, ignorezeros, gdalformat)\n"
 "Labels image pixels with the ID of the nearest cluster centre.\n"
-"where:\n"
+"\n"
+"Where:\n"
 "\n"
 "* inputimage is a string containing the name of the input file\n"
 "* outputimage is a string containing the name of the output file\n"
@@ -666,7 +667,8 @@ static PyMethodDef SegmentationMethods[] = {
     {"eliminateSinglePixels", Segmentation_eliminateSinglePixels, METH_VARARGS, 
 "segmentation.eliminateSinglePixels(inputimage, clumpsimage, outputimage, tempfile, gdalformat, processinmemory, ignorezeros)\n"
 "Eliminates single pixels\n"
-"where:\n"
+"\n"
+"Where:\n"
 "\n"
 "* inputimage is a string containing the name of the input file\n"
 "* clumpsimage is a string containing the name of the clump file\n"
@@ -679,8 +681,9 @@ static PyMethodDef SegmentationMethods[] = {
 
     {"clump", Segmentation_clump, METH_VARARGS,
 "segmentation.clump(inputimage, outputimage, gdalformat, processinmemory, nodata, addPxlVal2Rat)\n"
-"clump\n"
-"where:\n"
+"A function which clumps an input image (of int pixel data type) to identify connected independent sets of pixels.\n"
+"\n"
+"Where:\n"
 "\n"
 "* inputimage is a string containing the name of the input file\n"
 "* outputimage is a string containing the name of the output file\n"
@@ -693,7 +696,8 @@ static PyMethodDef SegmentationMethods[] = {
     {"rmSmallClumpsStepwise", Segmentation_RMSmallClumpsStepwise, METH_VARARGS,
 "segmentation.rmSmallClumpsStepwise(inputimage, clumpsimage, outputimage, gdalformat, stretchstatsavail, stretchstatsfile, storemean, processinmemory, minclumpsize, specThreshold)\n"
 "eliminate clumps smaller than a given size from the scene, small clumps will be combined with their spectrally closest neighbouring  clump in a stepwise fashion unless over spectral distance threshold\n"
-"where:\n"
+"\n"
+"Where:\n"
 "\n"
 "* inputimage is a string containing the name of the input file\n"
 "* clumpsimage is a string containing the name of the clump file\n"
@@ -710,7 +714,8 @@ static PyMethodDef SegmentationMethods[] = {
     {"relabelClumps", Segmentation_relabelClumps, METH_VARARGS,
 "segmentation.relabelClumps(inputimage, outputimage, gdalformat, processinmemory)\n"
 "Relabel clumps\n"
-"where:\n"
+"\n"
+"Where:\n"
 "\n"
 "* inputimage is a string containing the name of the input file\n"
 "* outputimage is a string containing the name of the output file\n"
@@ -721,7 +726,8 @@ static PyMethodDef SegmentationMethods[] = {
     {"unionOfClumps", Segmentation_unionOfClumps, METH_VARARGS,
 "segmentation.unionOfClumps(outputimage, gdalformat, inputimagepaths, nodata, addPxlVals2Rat)\n"
 "The function takes the union of clumps images - combining them so all lines from all clumps are preserved in the new outputted clumps image.\n"
-"where:\n"
+"\n"
+"Where:\n"
 "\n"
 "* outputimage is a string containing the name of the output file\n"
 "* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
@@ -733,7 +739,8 @@ static PyMethodDef SegmentationMethods[] = {
     {"mergeSegmentationTiles", Segmentation_mergeSegmentationTiles, METH_VARARGS,
 "segmentation.mergeSegmentationTiles(outputimage, bordermaskimage, tileboundary, tileoverlap, tilebody, colsname, inputimagepaths)\n"
 "Merge body clumps from tile segmentations into outputfile\n"
-"where:\n"
+"\n"
+"Where:\n"
 "\n"
 " * outputimage is a string containing the name of the output file\n"
 " * bordermaskimage is a string containing the name of the border mask file\n"
@@ -747,7 +754,8 @@ static PyMethodDef SegmentationMethods[] = {
     {"mergeClumpImages", Segmentation_mergeClumpImages, METH_VARARGS,
 "segmentation.mergeClumpImages(inputimagepaths, outputimage, mergeRATs)\n"
 "Merge all clumps from tile segmentations into outputfile\n"
-"where:\n"
+"\n"
+"Where:\n"
 "\n"
 " * inputimagepaths is a list of input image paths\n"
 " * outputimage is a string containing the name of the output file\n"
@@ -757,7 +765,8 @@ static PyMethodDef SegmentationMethods[] = {
     {"findTileBordersMask", Segmentation_findTileBordersMask, METH_VARARGS,
 "segmentation.findTileBordersMask(bordermaskimage, tileboundary, tileoverlap, tilebody, colsname, inputimagepaths)\n"
 "Mask tile borders\n"
-"where:\n"
+"\n"
+"Where:\n"
 "\n"
 " * bordermaskimage is a string containing the name of the border mask file\n"
 " * tileboundary is an unsigned integer containing the tile boundary pixel value\n"
@@ -770,7 +779,8 @@ static PyMethodDef SegmentationMethods[] = {
     {"rmSmallClumps", Segmentation_rmSmallClumps, METH_VARARGS,
 "segmentation.rmSmallClumps(clumpsImage, outputImage, threshold, gdalformat)\n"
 "A function to remove small clumps and set them with a value of 0 (i.e., no data) \n"
-"where:\n"
+"\n"
+"Where:\n"
 "\n"
 "* clumpsImage is a string containing the name of the input clumps file - note a column called \'Histogram\'.\n"
 "* outputImage is a string containing the name of the output clumps file\n"
@@ -781,7 +791,8 @@ static PyMethodDef SegmentationMethods[] = {
     {"meanImage", Segmentation_meanImage, METH_VARARGS,
 "segmentation.meanImage(inputImage, inputClumps, outputImage, gdalformat, datatype)\n"
 "A function to generate an image where with the mean value for each clump. Primarily for visualisation and evaluating segmentation.\n"
-"where:\n"
+"\n"
+"Where:\n"
 "\n"
 "* inputImage is a string containing the name of the input image file from which the mean is taken.\n"
 "* inputClumps is a string containing the name of the input clumps file\n"
@@ -793,7 +804,8 @@ static PyMethodDef SegmentationMethods[] = {
 {"generateRegularGrid", Segmentation_GenerateRegularGrid, METH_VARARGS,
 "segmentation.generateRegularGrid(inputImage, outputClumps, gdalformat, numXPxls, numYPxls, offset)\n"
 "A function to generate an image where with the mean value for each clump. Primarily for visualisation and evaluating segmentation.\n"
-"where:\n"
+"\n"
+"Where:\n"
 "\n"
 "* inputImage is a string containing the name of the input image file specifying the dimensions of the output image.\n"
 "* outputClumps is a string containing the name and path of the output clumps image\n"
@@ -807,7 +819,8 @@ static PyMethodDef SegmentationMethods[] = {
 "segmentation.includeRegionsInClumps(clumpsImage, regionsImage, outputClumps, gdalFormat)\n"
 "A function to include a set of clumped regions within an existing clumps (i.e., segmentation) image.\n"
 "NOTE. You should run the relabelClumps function on the output of this command before using further.\n"
-"where:\n"
+"\n"
+"Where:\n"
 "\n"
 "* clumpsImage is a string containing the filepath for the input clumps image.\n"
 "* regionsImage is a string containing the filepath for the input regions image.\n"
@@ -817,7 +830,8 @@ static PyMethodDef SegmentationMethods[] = {
 {"mergeSegments2Neighbours", Segmentation_mergeSegments2Neighbours, METH_VARARGS,
 "segmentation.mergeSegments2Neighbours(clumpsImage, spectralImage, outputClumps, gdalFormat, selectedClumpsCol, noDataClumpsCol)\n"
 "A function to merge some selected clumps with the neighbours based on colour (spectral) distance where clumps identified as no data are ignored.\n"
-"where:\n"
+"\n"
+"Where:\n"
 "\n"
 "* clumpsImage is a string containing the filepath for the input clumps image.\n"
 "* spectralImage is a string containing the filepath for the input image used to define 'distance'.\n"
@@ -829,7 +843,8 @@ static PyMethodDef SegmentationMethods[] = {
 {"dropSelectedClumps", Segmentation_dropSelectedSegments, METH_VARARGS,
 "segmentation.dropSelectedClumps(clumpsImage, outputClumps, gdalFormat)\n"
 "A function to drop the selected clumps from the segmentation.\n"
-"where:\n"
+"\n"
+"Where:\n"
 "\n"
 "* clumpsImage is a string containing the filepath for the input clumps image.\n"
 "* outputClumps is a string containing the name and path of the output clumps image\n"
@@ -839,7 +854,8 @@ static PyMethodDef SegmentationMethods[] = {
 {"mergeEquivClumps", Segmentation_mergeEquivalentClumps, METH_VARARGS,
 "segmentation.mergeEquivClumps(clumpsImage, outputClumps, gdalFormat, valClumpsCols)\n"
 "A function to merge neighbouring clumps which have the same value - for example when merging across tile boundaries.\n"
-"where:\n"
+"\n"
+"Where:\n"
 "\n"
 "* clumpsImage is a string containing the filepath for the input clumps image.\n"
 "* outputClumps is a string containing the name and path of the output clumps image\n"
@@ -850,7 +866,8 @@ static PyMethodDef SegmentationMethods[] = {
 {"pxlGrowRegions", Segmentation_PxlGrowRegions, METH_VARARGS,
 "segmentation.pxlGrowRegions(clumpsImage, valsImage, outputImage, gdalFormat, muParseCriteria, varNameBandPairs)\n"
 "A function to merge neighbouring clumps which have the same value - for example when merging across tile boundaries.\n"
-"where:\n"
+"\n"
+"Where:\n"
 "\n"
 "* clumpsImage is a string containing the filepath for the input clumps image.\n"
 "* valsImage is a string containing the file path for the values (criteria) image.\n"

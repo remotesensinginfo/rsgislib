@@ -249,6 +249,7 @@ static PyMethodDef ImageFilterMethods[] = {
     {"applyfilters", ImageFilter_Filter, METH_VARARGS, 
 "imagefilter.applyfilters(inputimage, outputImageBase, filterparameters, gdalformat, outExt, datatype)\n"
 "Filters images\n"
+"\n"
 "Where:\n"
 "\n"
 "* inputimage is a string containing the name of the input image\n"
