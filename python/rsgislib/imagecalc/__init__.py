@@ -16,9 +16,8 @@ from rsgislib import imageutils
 # define our own classes
 class BandDefn(object):
     """
-    Create a list of these objects to pass to the bandMath function
-    as the 'bands' parameter.
-    """
+Create a list of these objects to pass to the bandMath function as the 'bands' parameter.
+"""
     def __init__(self, bandName=None, fileName=None, bandIndex=None):
         self.bandName = bandName
         self.fileName = fileName
@@ -26,7 +25,9 @@ class BandDefn(object):
 
 
 class StatsSummary:
-    """ This is passed to the imagePixelColumnSummary function """
+    """ 
+This is passed to the imagePixelColumnSummary function 
+"""
     def __init__(self, min=0.0, max=0.0, sum=0.0, median=0.0, stdDev=0.0, mean=0.0,
                  calcMin=False, calcMax=False, calcSum=False, calcMean=False, calcStdDev=False, calcMedian=False):
         self.min = min

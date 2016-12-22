@@ -720,14 +720,14 @@ static PyMethodDef SegmentationMethods[] = {
                                 
     {"unionOfClumps", Segmentation_unionOfClumps, METH_VARARGS,
 "segmentation.unionOfClumps(outputimage, gdalformat, inputimagepaths, nodata, addPxlVals2Rat)\n"
-"Union of clumps\n"
+"The function takes the union of clumps images - combining them so all lines from all clumps are preserved in the new outputted clumps image.\n"
 "where:\n"
 "\n"
 "* outputimage is a string containing the name of the output file\n"
 "* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
 "* inputimagepaths is a list of input image paths\n"
 "* nodata is None or float\n"
-"* addPxlVals2Rat is a boolean specifying whether the pixel values (from inputimagepaths) should be added as a RAT; column names have prefix 'ClumpVal_' with index starting at 1 for each variable."
+"* addPxlVals2Rat is a boolean specifying whether the pixel values (from inputimagepaths) should be added as a RAT; column names have prefix 'ClumpVal_' with index starting at 1 for each variable.\n"
 "\n"},
 
     {"mergeSegmentationTiles", Segmentation_mergeSegmentationTiles, METH_VARARGS,
@@ -861,11 +861,11 @@ static PyMethodDef SegmentationMethods[] = {
 "\n"
 "Example::\n"
 "\n"
-"varBandPair = collections.namedtuple('VarBandPair', ['varName', 'bandIndex'])\n"
-"varBandPairSeq = list()\n"
-"varBandPairSeq.append(varBandPair(varName='b1', bandIndex=1))\n"
-"muParseCriteria = 'b1 > 1000?1:0'\n"
-"rsgislib.segmentation.pxlGrowRegions(tmpInitClearSkyRegionsFinal, tmpCloudsImgDist2CloudsNoData, tmpClearSkyRegionsGrow, 'KEA', muParseCriteria, varBandPairSeq)\n"
+"    varBandPair = collections.namedtuple('VarBandPair', ['varName', 'bandIndex'])\n"
+"    varBandPairSeq = list()\n"
+"    varBandPairSeq.append(varBandPair(varName='b1', bandIndex=1))\n"
+"    muParseCriteria = 'b1 > 1000?1:0'\n"
+"    rsgislib.segmentation.pxlGrowRegions(tmpInitClearSkyRegionsFinal, tmpCloudsImgDist2CloudsNoData, tmpClearSkyRegionsGrow, 'KEA', muParseCriteria, varBandPairSeq)\n"
 "\n"},
     
     

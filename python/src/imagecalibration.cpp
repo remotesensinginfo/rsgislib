@@ -1625,10 +1625,11 @@ static PyMethodDef ImageCalibrationMethods[] = {
 {"landsatThermalRad2Brightness", ImageCalibration_landsatThermalRad2Brightness, METH_VARARGS,
 "imagecalibration.landsatThermalRad2Brightness(inputImage, outputImage, gdalformat, datatype, scaleFactor, bandDefnSeq)\n"
 "Converts Landsat TM thermal radiation to degrees celsius for at sensor temperature.\n"
+"\n"
 "Where:\n"
 "\n"
 "* inputImage is a string containing the name of the input file path.\n"
-"outputImage is a string containing the name of the output file path.\n"
+"* outputImage is a string containing the name of the output file path.\n"
 "* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
 "* datatype is an containing one of the values from rsgislib.TYPE_*\n"
 "* scaleFactor is a float which can be used to scale the output pixel values (e.g., multiple by 1000), set as 1 for no scaling.\n"

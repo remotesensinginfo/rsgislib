@@ -9,6 +9,8 @@ Band & Image Maths
 
 .. autofunction:: rsgislib.imagecalc.bandMath
 .. autofunction:: rsgislib.imagecalc.imageMath
+.. autofunction:: rsgislib.imagecalc.allBandsEqualTo
+.. autofunction:: rsgislib.imagecalc.replaceValuesLessThan
 
 Clustering
 -----------
@@ -76,11 +78,9 @@ Image Indices
 Other
 ------
 
-.. autofunction:: rsgislib.imagecalc.allBandsEqualTo
 .. autofunction:: rsgislib.imagecalc.countValsInCols
 .. autofunction:: rsgislib.imagecalc.imagePixelColumnSummary
 .. autofunction:: rsgislib.imagecalc.movementSpeed
-.. autofunction:: rsgislib.imagecalc.replaceValuesLessThan
 .. autofunction:: rsgislib.imagecalc.unitArea
 
 

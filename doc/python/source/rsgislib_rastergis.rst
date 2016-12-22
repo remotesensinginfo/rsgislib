@@ -8,10 +8,10 @@ RSGISLib Raster GIS Module
 Utilities
 ---------
 
+.. autofunction:: rsgislib.rastergis.populateStats
 .. autofunction:: rsgislib.rastergis.ratutils.populateImageStats
 .. autofunction:: rsgislib.rastergis.collapseRAT
 .. autofunction:: rsgislib.rastergis.ratutils.createClumpsSHPBBOX
-.. autofunction:: rsgislib.rastergis.populateStats
 .. autofunction:: rsgislib.rastergis.ratutils.calcDist2Classes
 
 Attribute Segments
@@ -89,6 +89,17 @@ Copy & Export
 Colour Tables
 ---------------
 .. autofunction:: rsgislib.rastergis.colourClasses
+
+Data Structures / Enums
+-----------------------
+
+.. autofunction:: rsgislib.rastergis.BandAttStats
+.. autofunction:: rsgislib.rastergis.FieldAttStats
+.. autofunction:: rsgislib.rastergis.BandAttPercentiles
+.. autofunction:: rsgislib.rastergis.ShapeIndex
+.. autofunction:: rsgislib.rastergis.ratutils.RSGISRATChangeVarInfo
+.. autofunction:: rsgislib.rastergis.ratutils.RSGISRATThresMeasure
+.. autofunction:: rsgislib.rastergis.ratutils.RSGISRATThresDirection
 
 
 * :ref:`genindex`

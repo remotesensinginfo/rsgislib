@@ -4,6 +4,12 @@ RSGISLib Image Utilities Module
 .. automodule:: rsgislib.imageutils
    :undoc-members:
 
+Image Stats and Pyramids
+------------------------
+.. autofunction:: rsgislib.imageutils.popImageStats
+.. autofunction:: rsgislib.imageutils.combineImageOverviews
+
+
 Projection
 -----------
 
@@ -19,6 +25,7 @@ Mosaic
 
 .. autofunction:: rsgislib.imageutils.createImageMosaic
 .. autofunction:: rsgislib.imageutils.includeImages
+.. autofunction:: rsgislib.imageutils.includeImagesWithOverlap
 .. autofunction:: rsgislib.imageutils.combineImages2Band
 
 Tile
@@ -52,6 +59,7 @@ Subset / Mask
 Extract
 --------
 
+.. autofunction:: rsgislib.imageutils.ImageBandInfo
 .. autofunction:: rsgislib.imageutils.extractZoneImageValues2HDF
 .. autofunction:: rsgislib.imageutils.extractZoneImageBandValues2HDF
 .. autofunction:: rsgislib.imageutils.performRandomPxlSampleInMask
@@ -71,15 +79,27 @@ Select / Stack bands
 .. autofunction:: rsgislib.imageutils.stackImageBands
 
 
+Band Names
+----------
+
+.. autofunction:: rsgislib.imageutils.setBandNames
+.. autofunction:: rsgislib.imageutils.getBandNames
+
+
+Image Data Types
+----------------
+.. autofunction:: rsgislib.imageutils.getGDALDataType
+.. autofunction:: rsgislib.imageutils.getRSGISLibDataType
+
+
 Other
 ------
 
-.. autofunction:: rsgislib.imageutils.popImageStats
 .. autofunction:: rsgislib.imageutils.stackStats
 .. autofunction:: rsgislib.imageutils.orderImageUsingValidPxls
-.. autofunction:: rsgislib.imageutils.setBandNames
 .. autofunction:: rsgislib.imageutils.genSamplingGrid
-.. autofunction:: rsgislib.imageutils.getGDALDataType
+.. autofunction:: rsgislib.imageutils.calcPixelLocations
+
 
 * :ref:`genindex`
 * :ref:`modindex`
