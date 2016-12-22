@@ -411,7 +411,6 @@ namespace rsgis{namespace rastergis{
             stats1->calcMean = true;
             stats1->calcVariance = true;
             mathUtils.generateStats(valsClass1, stats1);
-            //std::cout << "Stats 1: Mean = " << stats1->mean << " Variance = " << stats1->variance << std::endl;
             
             
             rsgis::math::RSGISStatsSummary *stats2 = new rsgis::math::RSGISStatsSummary();
@@ -419,7 +418,6 @@ namespace rsgis{namespace rastergis{
             stats2->calcMean = true;
             stats2->calcVariance = true;
             mathUtils.generateStats(valsClass2, stats2);
-            //std::cout << "Stats 2: Mean = " << stats2->mean << " Variance = " << stats2->variance << std::endl;
             
             // https://en.wikipedia.org/wiki/Bhattacharyya_distance
             

@@ -265,9 +265,7 @@ namespace rsgis{namespace calib{
             unsigned int elevLUTIdx = 0;
             float dist = 0.0;
             float minDist = 0.0;
-            
-            //std::cout << "LUT Size = " << lut->size() << std::endl;
-            
+                        
             for(unsigned int i = 0; i < lut->size(); ++i)
             {
                 dist = (lut->at(i).elev - elevVal) * (lut->at(i).elev - elevVal);

@@ -71,8 +71,6 @@ namespace rsgis{namespace vec{
 				
 				if(!nullGeometry)
 				{
-                    //std::cout << "Env: [" << env->getMinX() << ", " << env->getMaxX() << "][" << env->getMinY() << ", " << env->getMaxY() << "]\n";
-                    
 					extractZonalValues->processFeature(inFeature, polygon, env, fid);
 
 					delete env;
@@ -125,7 +123,6 @@ namespace rsgis{namespace vec{
     
     void RSGISExtractPixelValues::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException)
     {
-        //std::cout << "pxlVals->size() = " << pxlVals->size() << std::endl;
         float *data = new float[numBands];
         for(unsigned i = 0; i < numBands; ++i)
         {

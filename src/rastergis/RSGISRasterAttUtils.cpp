@@ -267,9 +267,6 @@ namespace rsgis{namespace rastergis{
             if(feedback != 0){std::cout << ".Completed\n";}
             else{std::cout << "Completed\n";}
 
-            //std::cout << "Adding RAT to output file.\n";
-            //outImage->GetRasterBand(ratBand)->SetDefaultRAT(gdalAttOut);
-
             // Tidy up
             delete[] blockDataInt;
             delete[] blockDataReal;
@@ -384,17 +381,7 @@ namespace rsgis{namespace rastergis{
         {
             nRows = nRows - 1;
         }
-        //std::cout << "nRows = " << nRows <<  std::endl;
-        /*
-        if(ignoreFirstRow)
-        {
-            outRAT->SetRowCount(offset+nRows+1);
-        }
-        else
-        {
-            outRAT->SetRowCount(offset+nRows);
-        }
-         */
+        
         outRAT->SetRowCount(offset+nRows);
         
         int *blockDataInt = new int[RAT_BLOCK_LENGTH];
@@ -404,9 +391,6 @@ namespace rsgis{namespace rastergis{
         // Iterate through blocks
         int nBlocks = floor(((double) nRows) / ((double) RAT_BLOCK_LENGTH));
         int remainRows = nRows - (nBlocks * RAT_BLOCK_LENGTH );
-        
-        //std::cout << "nBlocks = " << nBlocks << std::endl;
-        //std::cout << "remainRows = " << remainRows << std::endl;
         
         int feedback = nBlocks/10.0;
         int feedbackCounter = 0;
@@ -426,9 +410,6 @@ namespace rsgis{namespace rastergis{
                 rowOffset = rowOffset + 1;
             }
             rowOffsetOut = (RAT_BLOCK_LENGTH * i) + offset;
-            
-            //std::cout << "rowOffset = " << rowOffset << std::endl;
-            //std::cout << "rowOffsetOut = " << rowOffsetOut << std::endl;
             
             if((feedback != 0) && ((i % feedback) == 0))
             {
@@ -489,9 +470,6 @@ namespace rsgis{namespace rastergis{
                 rowOffset = rowOffset + 1;
             }
             rowOffsetOut = (RAT_BLOCK_LENGTH * nBlocks) + offset;
-            
-            //std::cout << "rowOffset = " << rowOffset << std::endl;
-            //std::cout << "rowOffsetOut = " << rowOffsetOut << std::endl;
             
             for(size_t j = 0; j < fields.size(); ++j)
             {

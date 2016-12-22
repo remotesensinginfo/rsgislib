@@ -806,9 +806,6 @@ namespace rsgis{namespace img{
             double xRes = gdalTransform[1];
             double yRes = gdalTransform[5];
             
-            //std::cout << "Resolution: [" << xRes << ", " << yRes << "]\n";
-            //std::cout << "TL: [" << tlX << ", " << tlY << "]\n";
-            
             double cX = 0.0;
             double cY = 0.0;
             
@@ -827,11 +824,9 @@ namespace rsgis{namespace img{
                         feedbackCounter = feedbackCounter + 10;
                     }
                     cX = tlX;
-                    //std::cout << "cY = " << cY << std::endl;
                     for(int j = 0; j < width; ++j)
                     {
                         imgData[(m*width)+j] = interpolator->getValue(cX, cY);
-                        //std::cout << "[" << cX << "," << cY << "] = " << imgData[(m*width)+j] << std::endl;
                         cX += xRes;
                     }
                     cY += yRes;
@@ -854,7 +849,6 @@ namespace rsgis{namespace img{
                     for(int j = 0; j < width; ++j)
                     {
                         imgData[(m*width)+j] = interpolator->getValue(cX, cY);
-                        //std::cout << "[" << cX << "," << cY << "] = " << imgData[(m*width)+j] << std::endl;
                         cX += xRes;
                     }
                     cY += yRes;

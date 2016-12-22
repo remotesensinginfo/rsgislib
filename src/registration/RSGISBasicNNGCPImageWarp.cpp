@@ -139,10 +139,6 @@ namespace rsgis{namespace reg{
                 }			
             }
             
-            //std::cout.precision(12);
-            //std::cout << "Pixel : [" << eastings << "," << northings << "]\n";
-            //std::cout << "Closest: [" << closestGCP->eastings << "," << closestGCP->northings << "] = [" << closestGCP->imgX << "," << closestGCP->imgY << "]\n";
-            
             double xDistance = closestGCP->eastings() - eastings;
             double yDistance = closestGCP->northings() - northings;
             
@@ -151,9 +147,6 @@ namespace rsgis{namespace reg{
             
             *x = floor((closestGCP->imgX()-pxlDistX)+0.5);
             *y = floor((closestGCP->imgY()+pxlDistY)+0.5);
-            
-            //*x = floor((closestGCP->imgX)+0.5);
-            //*y = floor((closestGCP->imgY)+0.5);
         }
         else 
         {

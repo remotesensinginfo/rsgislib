@@ -32,7 +32,6 @@ namespace rsgis{namespace geom{
 	
 	std::string RSGISGeomTestExport::getLayerName(std::string filepath)
 	{
-		//std::cout << filepath << std::endl;
 		int strSize = filepath.size();
 		int lastSlash = 0;
 		for(int i = 0; i < strSize; i++)
@@ -43,7 +42,6 @@ namespace rsgis{namespace geom{
 			}
 		}
 		std::string filename = filepath.substr(lastSlash+1);
-		//std::cout << filename << std::endl;
 		
 		strSize = filename.size();
 		int lastpt = 0;
@@ -56,8 +54,7 @@ namespace rsgis{namespace geom{
 		}
 		
 		std::string layerName = filename.substr(0, lastpt);
-		//std::cout << layerName << std::endl;
-		return layerName;		
+		return layerName;
 	}
 	
 	OGRLineString* RSGISGeomTestExport::convertGEOSLineSegment2OGRLineString(geos::geom::LineSegment *line)
@@ -90,8 +87,8 @@ namespace rsgis{namespace geom{
 		const geos::geom::CoordinateSequence *coords = line->getCoordinatesRO();
 		int numCoords = coords->getSize();
 		geos::geom::Coordinate coord;
-		//std::cout << "numCoords = " << numCoords << std::endl;
-		for(int i = 0; i < numCoords; i++)
+
+        for(int i = 0; i < numCoords; i++)
 		{
 			coord = coords->getAt(i);
 			ring->addPoint(coord.x, coord.y, coord.z);
@@ -534,7 +531,6 @@ namespace rsgis{namespace geom{
         std::vector<geos::geom::LineString*>::iterator iterlines;
 		for(iterlines = lines->begin(); iterlines != lines->end(); iterlines++)
 		{
-			//std::cout << "GML: " << (*iterlines)->tostd::string() << std::endl;
 			featureOutput = OGRFeature::CreateFeature(outputDefn);
 			featureOutput->SetGeometryDirectly(this->convertGEOSLineString2OGRLineString((*iterlines)));
 			
@@ -608,7 +604,6 @@ namespace rsgis{namespace geom{
         std::vector<geos::geom::LineSegment*>::iterator iterlines;
 		for(iterlines = lines->begin(); iterlines != lines->end(); iterlines++)
 		{
-			//std::cout << "GML: " << (*iterlines)->tostd::string() << std::endl;
 			featureOutput = OGRFeature::CreateFeature(outputDefn);
 			featureOutput->SetGeometryDirectly(this->convertGEOSLineSegment2OGRLineString((*iterlines)));
 			
@@ -695,7 +690,6 @@ namespace rsgis{namespace geom{
         unsigned int i = 0;
         for(iterlines = lines->begin(); iterlines != lines->end(); iterlines++)
         {
-            //std::cout << "GML: " << (*iterlines)->tostd::string() << std::endl;
             featureOutput = OGRFeature::CreateFeature(outputDefn);
             featureOutput->SetField(outputDefn->GetFieldIndex("value"), vals->at(i));
             featureOutput->SetGeometryDirectly(this->convertGEOSLineSegment2OGRLineString((*iterlines)));

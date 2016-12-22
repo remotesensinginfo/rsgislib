@@ -69,8 +69,8 @@ namespace rsgis{namespace vec{
 			
 			rsgis::geom::RSGISGeometry geomUtils;
 			OGRMultiPolygon *mPolygon = (OGRMultiPolygon *) feature->GetGeometryRef();
-			//cout << polygon->exportToGML() << endl;
-			geos::geom::MultiPolygon *mGEOSPolygon = vecUtils->convertOGRMultiPolygonGEOSMultiPolygon(mPolygon);
+
+            geos::geom::MultiPolygon *mGEOSPolygon = vecUtils->convertOGRMultiPolygonGEOSMultiPolygon(mPolygon);
             std::vector<geos::geom::Polygon*> *polys = new std::vector<geos::geom::Polygon*>();
 			geomUtils.retrievePolygons(mGEOSPolygon, polys);
             std::vector<geos::geom::Polygon*>::iterator iterPolys = polys->begin();

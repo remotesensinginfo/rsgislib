@@ -54,9 +54,7 @@ namespace rsgis{namespace math{
 		std::cout << "Executing FFTW...\n";
 		fftw_execute(plan_f);
 		std::cout << "Finished FFTW...\n";
-		
-		//std::cout << "DC = " << sqrt((out[0][0] * out[0][0]) + (out[0][1] * out[0][1])) << std::endl;
-				
+						
 		for(int i = 0; i < inputSize; i++)
 		{
 			outputMatrixReal->matrix[i] = sqrt((out[i][0] * out[i][0]) + (out[i][1] * out[i][1]));

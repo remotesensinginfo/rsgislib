@@ -134,7 +134,6 @@ namespace rsgis{namespace vec{
 			found = false;
 			for(int j = 0; j < attributes[i]->numBands; j++)
 			{
-				//std::cout << "Number of bands = " << numBands << std::endl;
 				if((attributes[i]->bands[j] > numBands) | (attributes[i]->bands[j] < 0))
 				{
 					throw rsgis::img:: RSGISImageCalcException("The band attributes do not match the image.");
@@ -616,7 +615,6 @@ namespace rsgis{namespace vec{
 			first = true;
 			for(int j = 0; j < attributes[i]->numBands; j++) // Loop through bands
 			{
-				//std::cout << "Number of bands = " << numBands << std::endl;
 				if((attributes[i]->bands[j] > numBands) | (attributes[i]->bands[j] < 0))
 				{
 					throw rsgis::img:: RSGISImageCalcException("The band attributes do not match the image.");

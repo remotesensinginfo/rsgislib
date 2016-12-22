@@ -301,7 +301,6 @@ namespace rsgis{namespace rastergis{
     {
         if(numIntVals == 1)
         {
-            //std::cout << "FID = " << intBandValues[0] << std::endl;
             if((intBandValues[0] > 0) & (intBandValues[0] < numRows))
             {
                 this->borderMask[intBandValues[0]] = 1;

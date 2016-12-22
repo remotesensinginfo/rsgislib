@@ -280,13 +280,11 @@ namespace rsgis{namespace rastergis{
             
             imgCalc.calcImageWindowData(&clumpImage, 1, 3);
             
-            //std::cout << "Adding Field\n";
             if(!keaAtt->hasField("NumNeighbours"))
             {
                 keaAtt->addAttIntField("NumNeighbours", 0, "");
             }
             size_t numNeighboursIdx = keaAtt->getFieldIndex("NumNeighbours");
-            //std::cout << "Added field\n";
             
             keaAtt->setNeighbours(0, neighbours->size(), neighbours);
             
@@ -304,8 +302,6 @@ namespace rsgis{namespace rastergis{
                 delete *iterClumps;
             }
             delete neighbours;
-            
-            //keaImgIO->setAttributeTable(keaAtt, 1);
         }
         catch (rsgis::img::RSGISImageCalcException &e)
         {

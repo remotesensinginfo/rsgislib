@@ -98,10 +98,7 @@ namespace rsgis{namespace vec{
 			
 			numClasses = classNames->size();
 			std::cout << "Vector file contains " << numClasses << " classes:\n";
-			/*for(int i = 0; i < numClasses; i++)
-			{
-				std::cout << i << ") " << classNames->at(i) << std::endl;
-			}*/
+	
 			
 			// Count the number of pixels within each polygon
 			std::cout << "Count the number of pixels within each polygon\n";
@@ -109,18 +106,10 @@ namespace rsgis{namespace vec{
 			calcImageValue = new rsgis::img::RSGISCalcImageSingle(polyPxlCount);
 			for(int i = 0; i < numFeatures; i++)
 			{
-                //std::cout << i << std::endl;
 				polyPxlCount->reset();
 				calcImageValue->calcImageWithinPolygon(image, numImgs, numPxls, data[i]->getBBox(), data[i]->getPolygon(), true, method);
 				data[i]->setNumPixels(ceil(numPxls[0]));
 			}
-			
-			/*
-			 for(int i = 0; i < numFeatures; i++)
-			 {
-				 std::cout << "Polygon " << i << " of class " << data[i]->getClassName() << " has " << data[i]->getNumPixels()  << " pixels" << std::endl;
-				 std::cout << "Envelope: [" << data[i]->getBBox()->getMinX() << "," << data[i]->getBBox()->getMaxX() << "][" << data[i]->getBBox()->getMinY() << "," << data[i]->getBBox()->getMaxY() << "]\n";
-			 }*/
 			
 			// Create a matrix for each polygon
 			std::cout << "Populate the matrices of each polygon.\n";
@@ -128,25 +117,12 @@ namespace rsgis{namespace vec{
 			{
 				polyMatrix = new rsgis::img::RSGISPopulateMatrix(numVariables, data[i]->getNumPixels());
 				calcPolyMatrix = new rsgis::img::RSGISCalcImageSingle(polyMatrix);
-				//std::cout << "Feature " << i << std::endl;
-				//std::cout << "Populate matrix\n";
 				calcPolyMatrix->calcImageWithinPolygon(image, numImgs, numPxls, data[i]->getBBox(), data[i]->getPolygon(), false, rsgis::img::polyContainsPixelCenter);
-				//std::cout << "Get Matrix\n";
 				matrix = dynamic_cast<rsgis::img::RSGISPopulateMatrix*>(polyMatrix)->getMatrix();
-				//std::cout << "set matrix to polygon\n";
 				data[i]->setPixelValues(matrix);
-				//std::cout << "Delete\n";
 				delete polyMatrix;
 				delete calcPolyMatrix;
 			}
-			
-			/*
-			 for(int i = 0; i < numFeatures; i++)
-			 {
-				std::cout << "Polygon " << i << " of class " << data[i]->getClassName() << " has " << data[i]->getNumPixels()  << " pixels" << std::endl;
-				matrixUtils.printMatrix(data[i]->getPixelValues());
-			 }*/
-			
 			
 			classVars = new ClassVariables*[numClasses];
 			
@@ -193,12 +169,6 @@ namespace rsgis{namespace vec{
 					}
 				}
 			}
-			
-			/*for(int i = 0; i < numClasses; i++)
-			 {
-			 std::cout << i << ") " << classVars[i]->name << " has a total number of pixels = " << classVars[i]->numPxls << std::endl;
-			 matrixUtils.printMatrix(classVars[i]->matrix);
-			 }*/
 		}
 		catch(RSGISVectorException e)
 		{
@@ -431,14 +401,6 @@ namespace rsgis{namespace vec{
 				delete polyMatrix;
 				delete calcPolyMatrix;
 			}
-			
-			/*
-			for(int i = 0; i < numFeatures; i++)
-			{
-				std::cout << "Polygon " << i << std::endl;
-				matrixUtils.printMatrix(matrices[i]);
-			}*/
-			
 		}
 		catch(RSGISVectorException e)
 		{

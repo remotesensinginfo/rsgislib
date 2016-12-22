@@ -667,9 +667,7 @@ void RSGISExeFitting::runAlgorithm() throw(rsgis::RSGISException)
 				
 				double *measured = new double[numPts];
 				double *predicted = new double[numPts];
-				
-				//cout << "numPts = " << numPts << endl;
-				
+								
 				for(int i = 0; i < numPts; i++)
 				{
 					measured[i] = gsl_matrix_get(measuredVPredicted, i, 0);
@@ -767,9 +765,7 @@ void RSGISExeFitting::runAlgorithm() throw(rsgis::RSGISException)
 				
 				double *measured = new double[numPts];
 				double *predicted = new double[numPts];
-				
-				//cout << "numPts = " << numPts << endl;
-				
+								
 				for(int i = 0; i < numPts; i++)
 				{
 					measured[i] = gsl_matrix_get(measuredVPredicted, i, 0);

@@ -180,9 +180,6 @@ namespace rsgis{namespace vec{
             {
                 inGeomRing->getPoint(i, point);
                 
-                //std::cout << "POINT: [" << point->getX() << ", " << point->getY() << "]" << std::endl;
-                //std::cout << "IMAGE [XMIN, XMAX][YMIN, YMAX]: [" << imageExtent->getMinX() << ", " << imageExtent->getMaxX() << "][" << imageExtent->getMinY() << ", " << imageExtent->getMaxY() << "]" << std::endl;
-                
                 if((point->getX() >= imageExtent->getMinX()) &&
                    (point->getX() <= imageExtent->getMaxX()) &&
                    (point->getY() >= imageExtent->getMinY()) &&
@@ -195,15 +192,8 @@ namespace rsgis{namespace vec{
                     int yPxl = static_cast<int> (yDiff/imgRes);
                     
                     double *values = this->getPixelColumns(xPxl, yPxl);
-                    
-                    //std::cout << "Setting Z = " << values[this->band] << std::endl;
-                    
                     point->setZ(values[this->band]);
-                    
                     delete[] values;
-                    
-                    //std::cout << "POINT: [" << point->getX() << ", " << point->getY() << ", " << point->getZ() << "]" << std::endl;
-                    
                     outGeomRing->setPoint(i, point);
                 }
                 else

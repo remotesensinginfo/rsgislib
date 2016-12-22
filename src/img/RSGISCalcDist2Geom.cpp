@@ -50,9 +50,6 @@ namespace rsgis{namespace img{
             {
                 bandValues[0] = pt.Distance(geomCollection);
             }
-            
-            //std::cout << "Dist = " << bandValues[0] << std::endl;
-            
         } 
         catch (std::exception &e) 
         {

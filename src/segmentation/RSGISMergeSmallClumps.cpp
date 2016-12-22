@@ -199,19 +199,6 @@ namespace rsgis{namespace segment{
                 firstNeighbourTested = true;
                 for(std::list<unsigned long>::iterator iterClumps = neighbours.begin(); iterClumps != neighbours.end(); ++iterClumps)
                 {
-                    /*for(unsigned int b = 0; b < numSpecBands; ++b)
-                    {
-                        if(b == 0)
-                        {
-                            distance = (cClump->meanVals[b] - clumpTable->at((*iterClumps)-1)->meanVals[b])*(cClump->meanVals[b] - clumpTable->at((*iterClumps)-1)->meanVals[b]);
-                        }
-                        else
-                        {
-                            distance += (cClump->meanVals[b] - clumpTable->at((*iterClumps)-1)->meanVals[b])*(cClump->meanVals[b] - clumpTable->at((*iterClumps)-1)->meanVals[b]);
-                        }
-                    }
-                    distance = sqrt(distance);
-                    */
                     if(firstNeighbourTested)
                     {
                         closestNeighbour = *iterClumps;
@@ -224,8 +211,6 @@ namespace rsgis{namespace segment{
                         closestNeighbourDist = clumpTable->at((*iterClumps)-1)->pxls->size();
                     }
                 }
-                
-                //std::cout << "For " << cClump->clumpID << "(size = " << cClump->pxls->size() << ") the closest neighbour is " << closestNeighbour << " with distance " << closestNeighbourDist << endl;
                 
                 // Perform Merge
                 if(!firstNeighbourTested)

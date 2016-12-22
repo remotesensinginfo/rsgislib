@@ -83,7 +83,6 @@ namespace rsgis{namespace vec{
 				else 
 				{
 					nullGeometry = true;
-					//std::cout << fid << ": Geometry was either the incorrect type or NULL." << std::endl;
 				}
 				
 				if(!nullGeometry && (polygon->get_Area() > threshold))

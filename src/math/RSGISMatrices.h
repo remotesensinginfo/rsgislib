@@ -120,7 +120,6 @@ namespace rsgis{namespace math{
                 }
                 
                 std::string extension = filepath.substr(lastpt);
-                //cout << layerName << endl;
                 return extension;	
             }
 		};

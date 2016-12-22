@@ -64,7 +64,6 @@ namespace rsgis{namespace vec{
 			}
 			outTxtFile << std::endl;
 			outTxtFile.flush();
-			//cout << "FID = " << fid << endl;
 		}
 		else
 		{

@@ -186,16 +186,9 @@ namespace rsgis{namespace reg{
 				xIdx = 0;
 				for(int xShift = xShiftStart; xShift <= xShiftEnd; ++xShift)
 				{
-					//std::cout << "Shift = [" << xShift << "," << yShift << "]\n";
-					//std::cout << "Shift = [" << (((float)xShift)+tiePt->xShift) << "," << (((float)yShift)+tiePt->yShift) << "]\n";
-					try 
+					try
 					{
 						this->getImageOverlapWithFloatShift((((float)xShift)+tiePt->xShift), (((float)yShift)+tiePt->yShift), dsOffsets, &overlapWidth, &overlapHeight, overlapTransform, env, &remainderX, &remainderY);
-
-						//std::cout << "Overlap Width = " << overlapWidth << std::endl;
-						//std::cout << "Overlap Height = " << overlapHeight << std::endl;
-						//std::cout << "Reference Offset = [" << dsOffsets[0][0] << "," << dsOffsets[0][1] << "]\n";
-						//std::cout << "Floating Offset = [" << dsOffsets[1][0] << "," << dsOffsets[1][1] << "]\n";
 						
 						if((overlapWidth > 0) & (overlapHeight > 0))
 						{
@@ -214,7 +207,6 @@ namespace rsgis{namespace reg{
 							
 							imageSimilarity[yIdx][xIdx] = metricVal;
 							
-							//std::cout << "Metric = " << metricVal << std::endl;
 							if(!((boost::math::isnan)(metricVal)))
 							{
 								if(first)
@@ -271,40 +263,17 @@ namespace rsgis{namespace reg{
 				++yIdx;
 			}
 			
-			//std::cout << "Initial shift[" << tiePt->xShift << "," << tiePt->yShift << "] Move tie points with shift [" << currentShiftX << "," << currentShiftY << "] with value " << currentMetricVal << std::endl;
-			/*
-			for(unsigned int i = 0; i < numSearchPoints; ++i)
-			{
-				for(unsigned int j = 0; j < numSearchPoints; ++j)
-				{
-					if(j == 0)
-					{
-						std::cout << imageSimilarity[i][j];
-					}
-					else 
-					{
-						std::cout << "," << imageSimilarity[i][j];
-					}
-				}
-				std::cout << std::endl;
-			}
-			 */
-			
 			float subPixelXShift = 0;
 			float subPixelYShift = 0;
 			float subPixelXMetric = currentMetricVal;
 			float subPixelYMetric = currentMetricVal;
 			
 			rsgis::math::RSGISPolyFit polyFit;
-			
-			//std::cout << "Current Index = [" << currentXIdx << "," << currentYIdx << "]\n";
-						
+									
 			// Find subpixel component
 			if(searchArea == 1)
 			{
 				// 2nd Order Poly
-				//std::cout << "Finding 2nd order subpixel component\n";
-				
 				// Find subpixel X
 				if((currentXIdx != 0) & (currentXIdx != (numSearchPoints-1)))
 				{
@@ -345,11 +314,9 @@ namespace rsgis{namespace reg{
 			}
 			else
 			{
-				//std::cout << "Finding 4th order subpixel component\n";
 				// 4th Order Poly
 				if((currentXIdx > 1) & (currentXIdx < (numSearchPoints-2)))
 				{
-					//std::cout << "for X\n";
 					gsl_matrix *inputDataMatrix = gsl_matrix_alloc(5,2);
 					gsl_matrix_set (inputDataMatrix, 0, 0, -2);
 					gsl_matrix_set (inputDataMatrix, 0, 1, imageSimilarity[currentYIdx][currentXIdx-2]);
@@ -373,7 +340,6 @@ namespace rsgis{namespace reg{
 				
 				if((currentYIdx > 1) & (currentYIdx < (numSearchPoints-2)))
 				{
-					//std::cout << "for Y\n";
 					gsl_matrix *inputDataMatrix = gsl_matrix_alloc(5,2);
 					gsl_matrix_set (inputDataMatrix, 0, 0, -2);
 					gsl_matrix_set (inputDataMatrix, 0, 1, imageSimilarity[currentYIdx-2][currentXIdx]);
@@ -397,12 +363,7 @@ namespace rsgis{namespace reg{
 				
 			}
 			
-			//std::cout << "Sub pixel component = [" << subPixelXShift << "," << subPixelYShift << "]\n";
-			//std::cout << "Extrema values = [" << subPixelXMetric << "," << subPixelYMetric << "]\n";
-			
 			currentMetricVal = (subPixelXMetric + subPixelYMetric)/2;
-            
-            //std::cout << currentRemainderX << ", " << currentRemainderY << std::endl;
             
             // Calculate final shift, adding on offsets due to rounding in image overlap calculation
             float finalXShift = (((float)currentShiftX) + subPixelXShift) + currentRemainderX;
@@ -519,16 +480,9 @@ namespace rsgis{namespace reg{
 				xIdx = 0;
 				for(int xShift = xShiftStart; xShift <= xShiftEnd; ++xShift)
 				{
-					//std::cout << "Shift = [" << xShift << "," << yShift << "]\n";
-					//std::cout << "Shift = [" << (((float)xShift)+tiePt->xShift) << "," << (((float)yShift)+tiePt->yShift) << "]\n";
 					try
 					{
 						this->getImageOverlapWithFloatShift((((float)xShift)+tiePt->xShift), (((float)yShift)+tiePt->yShift), dsOffsets, &overlapWidth, &overlapHeight, overlapTransform, env, &remainderX, &remainderY);
-						
-						//std::cout << "Overlap Width = " << overlapWidth << std::endl;
-						//std::cout << "Overlap Height = " << overlapHeight << std::endl;
-						//std::cout << "Reference Offset = [" << dsOffsets[0][0] << "," << dsOffsets[0][1] << "]\n";
-						//std::cout << "Floating Offset = [" << dsOffsets[1][0] << "," << dsOffsets[1][1] << "]\n";
 						
 						if((overlapWidth > 0) & (overlapHeight > 0))
 						{
@@ -547,7 +501,6 @@ namespace rsgis{namespace reg{
 							
 							imageSimilarity[yIdx][xIdx] = metricVal;
 							
-							//std::cout << "Metric = " << metricVal << std::endl;
 							if(!((boost::math::isnan)(metricVal)))
 							{
 								if(first)
@@ -604,40 +557,17 @@ namespace rsgis{namespace reg{
 				++yIdx;
 			}
 			
-			//std::cout << "Initial shift[" << tiePt->xShift << "," << tiePt->yShift << "] Move tie points with shift [" << currentShiftX << "," << currentShiftY << "] with value " << currentMetricVal << std::endl;
-			/*
-             for(unsigned int i = 0; i < numSearchPoints; ++i)
-             {
-             for(unsigned int j = 0; j < numSearchPoints; ++j)
-             {
-             if(j == 0)
-             {
-             std::cout << imageSimilarity[i][j];
-             }
-             else
-             {
-             std::cout << "," << imageSimilarity[i][j];
-             }
-             }
-             std::cout << std::endl;
-             }
-			 */
-			
 			float subPixelXShift = 0;
 			float subPixelYShift = 0;
 			float subPixelXMetric = currentMetricVal;
 			float subPixelYMetric = currentMetricVal;
 			
 			rsgis::math::RSGISPolyFit polyFit;
-			
-			//std::cout << "Current Index = [" << currentXIdx << "," << currentYIdx << "]\n";
             
 			// Find subpixel component
 			if(searchArea == 1)
 			{
 				// 2nd Order Poly
-				//std::cout << "Finding 2nd order subpixel component\n";
-				
 				// Find subpixel X
 				if((currentXIdx != 0) & (currentXIdx != (numSearchPoints-1)))
 				{
@@ -678,11 +608,9 @@ namespace rsgis{namespace reg{
 			}
 			else
 			{
-				//std::cout << "Finding 4th order subpixel component\n";
 				// 4th Order Poly
 				if((currentXIdx > 1) & (currentXIdx < (numSearchPoints-2)))
 				{
-					//std::cout << "for X\n";
 					gsl_matrix *inputDataMatrix = gsl_matrix_alloc(5,2);
 					gsl_matrix_set (inputDataMatrix, 0, 0, -2);
 					gsl_matrix_set (inputDataMatrix, 0, 1, imageSimilarity[currentYIdx][currentXIdx-2]);
@@ -706,7 +634,6 @@ namespace rsgis{namespace reg{
 				
 				if((currentYIdx > 1) & (currentYIdx < (numSearchPoints-2)))
 				{
-					//std::cout << "for Y\n";
 					gsl_matrix *inputDataMatrix = gsl_matrix_alloc(5,2);
 					gsl_matrix_set (inputDataMatrix, 0, 0, -2);
 					gsl_matrix_set (inputDataMatrix, 0, 1, imageSimilarity[currentYIdx-2][currentXIdx]);
@@ -729,9 +656,6 @@ namespace rsgis{namespace reg{
 				}
 				
 			}
-			
-			//std::cout << "Sub pixel component = [" << subPixelXShift << "," << subPixelYShift << "]\n";
-			//std::cout << "Extrema values = [" << subPixelXMetric << "," << subPixelYMetric << "]\n";
 			
 			currentMetricVal = (subPixelXMetric + subPixelYMetric)/2;
 			
@@ -767,14 +691,10 @@ namespace rsgis{namespace reg{
 	float RSGISImageRegistration::findExtreme(bool findMin, gsl_vector *coefficients, unsigned int order, float minRange, float maxRange, unsigned int resolution, float *extremeVal)
 	{
 		double division = ((float)1)/((float)resolution);
-		
-		//std::cout << "Division = " << division << std::endl;
-		
+				
 		float range = maxRange - minRange;
 		unsigned int numTests = ceil(range/division);
-		
-		//std::cout << "Num test = " << numTests << std::endl;
-		
+				
 		double xValue = 0;
 		double yPredicted = 0;
 		
@@ -870,7 +790,6 @@ namespace rsgis{namespace reg{
                         extremeX = xValue;
                         extremeY = yPredicted;
                     }
-                    //std::cout << xValue << " = " << yPredicted << std::endl;
                 }
             }
         }
@@ -904,7 +823,6 @@ namespace rsgis{namespace reg{
 				extremeX = xValue;
 				extremeY = yPredicted;
 			}
-			//std::cout << xValue << " = " << yPredicted << std::endl;
 		}
         }
 		*extremeVal = extremeY;
@@ -927,7 +845,6 @@ namespace rsgis{namespace reg{
 			datasets[i]->GetGeoTransform(transformations[i]);
 			xSize[i] = datasets[i]->GetRasterXSize();
 			ySize[i] = datasets[i]->GetRasterYSize();
-			//std::cout << "TL [" << transformations[i][0] << "," << transformations[i][3] << "]\n";
 		}
 		double rotateX = 0;
 		double rotateY = 0;
@@ -1346,9 +1263,7 @@ namespace rsgis{namespace reg{
 				
 				refStdDev = this->calcStdDev(refDataBlock, numRefDataVals, overlap->numRefBands);
 				floatStdDev = this->calcStdDev(floatDataBlock, numFloatDataVals, overlap->numRefBands);
-				
-				//std::cout << "Std Dev = [" << refStdDev << "," << floatStdDev << "]\n";
-				
+								
 				if((refStdDev < stdDevRefThreshold) | (floatStdDev < stdDevFloatThreshold))
 				{
 					delete *iterTiePts;

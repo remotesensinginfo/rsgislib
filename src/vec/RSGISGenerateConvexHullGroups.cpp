@@ -155,7 +155,6 @@ namespace rsgis{namespace vec{
             
             for(std::vector<std::pair<std::string,std::vector<geos::geom::Coordinate>* >* >::iterator iterGrps = coordGrps->begin(); iterGrps != coordGrps->end(); ++iterGrps)
             {
-                //std::cout << "Number of Coords = " << (*iterGrps)->second->size() << std::endl;
                 if((*iterGrps)->second->size() < 3)
                 {
                     poly = geomUtils.findBoundingBox((*iterGrps)->second);

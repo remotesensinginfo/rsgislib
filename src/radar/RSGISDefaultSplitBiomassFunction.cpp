@@ -63,7 +63,6 @@ namespace rsgis{namespace radar{
 			gamma = (log10(value) - coefAGT ) / coefBGT;
 		}
 		
-		//std::cout << "Biomass = " << value << " Backscatter = " << gamma << std::endl;
 		return gamma;
 	}
 	

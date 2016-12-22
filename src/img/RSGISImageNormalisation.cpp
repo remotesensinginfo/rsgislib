@@ -124,7 +124,6 @@ namespace rsgis{namespace img{
 		double outDiff = 0;
 		for(int i = 0; i < numBands; i++)
 		{
-			//std::cout << "band " << i << " imageValue = " << bandValues[i] << " ImageMin = " << imageMin[i] << " ImageMax = " << imageMax[i] << " OutMin = " << outMin[i] << " OutMax = " << outMax[i] << std::endl;
 			if(bandValues[i] < imageMin[i])
 			{
 				output[i] = outMin[i];

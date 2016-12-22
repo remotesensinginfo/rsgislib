@@ -1169,7 +1169,6 @@ namespace rsgis{namespace segment{
         {
             dist = sqrt(dist/numBands);
         }
-        //std::cout << dist << std::endl;
         return dist;
     }
         
@@ -1452,7 +1451,6 @@ namespace rsgis{namespace segment{
         {
             dist = sqrt(dist/numBands);
         }
-        //std::cout << dist << std::endl;
         return dist;
     }
     

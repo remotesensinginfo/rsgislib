@@ -228,12 +228,9 @@ namespace rsgis{ namespace cmds {
             if(!useJulianDay)
             {
                 julianDay = rsgis::calib::rsgisGetJulianDay(day, month, year);
-                //std::cout << "Julian Day = " << julianDay << std::endl;
             }
             
             solarDistance = rsgis::calib::rsgisCalcSolarDistance(julianDay);
-            //std::cout << "Solar Dist = " << solarDistance << std::endl;
-            //std::cout << "Solar Zenith = " << solarZenith << std::endl;
             
             calcTopAtmosRefl = new rsgis::calib::RSGISCalculateTopOfAtmosphereReflectance(numRasterBands, solarIrradiance, solarDistance, solarZenith, scaleFactor);
             

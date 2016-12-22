@@ -76,7 +76,6 @@ namespace rsgis{namespace vec{
 					while( (queryFeature = resultsSet->GetNextFeature()) != NULL )
 					{
 						fid = queryFeature->GetFID();
-						//std::cout << "\nUpdating " << fid;
 						classification[fid] = rules[i]->name;
 						OGRFeature::DestroyFeature(queryFeature);
 					}
@@ -112,9 +111,7 @@ namespace rsgis{namespace vec{
 			}
 			
 			fid = feature->GetFID();
-			
-			//std::cout << "Updating " << fid << " with classname " << classification[fid] << std::endl;
-			
+						
 			feature->SetField(fieldIdx, classification[fid].c_str());
 			if( inputLayer->SetFeature(feature) != OGRERR_NONE )
 			{

@@ -31,9 +31,7 @@ namespace rsgis{ namespace classifier{
 	
 	int RSGISNearestNeighbourClassifier::getClassID(float *variables, int numVars) throw(RSGISClassificationException)
 	{
-		//cout << "int RSGISNearestNeighbourClassifier::getClassID(float *variables, int numVars) throw(RSGISClassificationException)\n";
 		ClassData *classToReturn = this->findClass(variables, numVars);
-		//cout << "returning class " << classToReturn->className << endl;
 		return classToReturn->classID;
 	}
 	
@@ -45,13 +43,11 @@ namespace rsgis{ namespace classifier{
 	
 	ClassData* RSGISNearestNeighbourClassifier::findClass(float *variables, int numVars) throw(RSGISClassificationException)
 	{
-		//cout << "ClassData* RSGISNearestNeighbourClassifier::findClass(float *variables, int numVars) throw(RSGISClassificationException)\n";
 		double distance = 0;
 		double minDistance = 0;
 		ClassData *minDistData = NULL;
 		for(int i = 0; i < this->numClasses; i++)
 		{
-			//cout << " findClass minDistance = " << minDistance << endl;
 			if(i == 0)
 			{
 				minDistance = this->findClosestPointInClass(trainingData[i], variables, numVars);
@@ -72,7 +68,6 @@ namespace rsgis{ namespace classifier{
 	
 	double RSGISNearestNeighbourClassifier::findClosestPointInClass(ClassData *data, float *variables, int numVars) throw(RSGISClassificationException)
 	{
-		//cout << "double RSGISNearestNeighbourClassifier::findClosestPointInClass(ClassData *data, float *variables, int numVars) throw(RSGISClassificationException)\n";
 		double minDistance = 0;
 		double distance = 0;
 		int matrixIndex = 0;

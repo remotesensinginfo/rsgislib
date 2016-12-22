@@ -214,15 +214,16 @@ Example::
 
 def writeVecColumn(vectorFile, vectorLayer, colName, colDataType, colData):
     """
-    A function which will write a column to a vector file
-    Where:
-    * vectorFile - The file / path to the vector data 'file'.
-    * vectorLayer - The layer to which the data is to be added.
-    * colName - Name of the output column
-    * colDataType - ogr data type (e.g., ogr.OFTString, ogr.OFTInteger, ogr.OFTReal)
-    * colData - A list of the same length as the number of features in vector file.
-    
-    Example::
+A function which will write a column to a vector file
+
+Where:
+* vectorFile - The file / path to the vector data 'file'.
+* vectorLayer - The layer to which the data is to be added.
+* colName - Name of the output column
+* colDataType - ogr data type (e.g., ogr.OFTString, ogr.OFTInteger, ogr.OFTReal)
+* colData - A list of the same length as the number of features in vector file.
+
+Example::
     from rsgislib import vectorutils
     import rsgislib
     from osgeo import ogr

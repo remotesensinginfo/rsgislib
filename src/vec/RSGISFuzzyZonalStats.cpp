@@ -417,7 +417,6 @@ namespace rsgis{namespace vec{
 				throw rsgis::img::RSGISImageCalcException("Attribute index not within range.");
 			}
 			
-			//std::cout << attributes[i]->name << ": [" << attributes[i]->index+1 << "] ";
 			outputValues[attributes[i]->index+1] = this->calcHistogramCentre(histograms[attributes[i]->index]);
 			if(hard)
 			{
@@ -457,15 +456,12 @@ namespace rsgis{namespace vec{
 		float *normHist = new float[numBins];
 		float value = 0;
 
-		//std::cout << "Histogram: ";
 		for(int i = 0; i < numBins; i++)
 		{
 			binValue[i] = value;
 			normHist[i] = ((float)histogram[i])/numPxls;
-			//std::cout << normHist[i] << " ";
 			value = value + 0.1;
 		}
-		//std::cout << std::endl;
 		
 		float min = 0;
 		float minValue = 0;
@@ -487,19 +483,17 @@ namespace rsgis{namespace vec{
 				if(binValue[j] <= stepValue)
 				{
 					distance = (stepValue - binValue[j]);
-					//std::cout << "Lower: " << binValue[j] << ", " << stepValue << " Distance = " << distance << std::endl;
 					lowerWeight += distance * normHist[j];
 				}
 				else
 				{
 					distance = (binValue[j] - stepValue);
-					//std::cout << "Upper: " << binValue[j] << ", " << stepValue << " Distance = " << distance << std::endl;
 					upperWeight += distance * normHist[j];
 				}
 			}
 			balance = (lowerWeight - upperWeight) * (lowerWeight - upperWeight);
-			//std::cout << stepValue << ":\t" << balance << std::endl;
-			if( i == 0)
+
+            if( i == 0)
 			{
 				min = balance;
 				minValue = stepValue;
@@ -517,9 +511,7 @@ namespace rsgis{namespace vec{
 		
 		delete[] binValue;
 		delete[] normHist;
-		
-		//std::cout << " - MIN VALUE = " << minValue << std::endl;
-		
+				
 		return minValue;
 	}
 	

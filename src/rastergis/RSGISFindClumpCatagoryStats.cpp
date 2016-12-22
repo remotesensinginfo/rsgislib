@@ -95,12 +95,6 @@ namespace rsgis{namespace rastergis{
             size_t maxCat = boost::lexical_cast<size_t>(maxVal);
             size_t numCatVals = (maxCat - minCat)+1;
             
-            /*
-            std::cout << "minCat = " << minCat << std::endl;
-            std::cout << "maxCat = " << maxCat << std::endl;
-            std::cout << "numCatVals = " << numCatVals << std::endl;
-            */
-            
             size_t *catsCount = new size_t[numCatVals];
             for(size_t i = 0; i < numCatVals; ++i)
             {
@@ -120,7 +114,6 @@ namespace rsgis{namespace rastergis{
             std::map<size_t,CategoryField> *cats = new std::map<size_t,CategoryField>();
             for(size_t i = 0; i < numCatVals; ++i)
             {
-                //std::cout << i << " = " << catsCount[i] << std::endl;
                 if(catsCount[i] > 0)
                 {
                     CategoryField catField;
@@ -230,9 +223,8 @@ namespace rsgis{namespace rastergis{
                     {
                         if(histDataBlock[j] > 0)
                         {
-                            //std::cout << "catStats[" << rowID << "][" << (*iterCats).second.localIdx << "] = " << catStats[rowID][(*iterCats).second.localIdx] << std::endl;
                             dataBlock[j] = ((double)catStats[rowID][(*iterCats).second.localIdx]) / ((double)histDataBlock[j]);
-                            //std::cout << j << " = " << ((double)catStats[rowID][(*iterCats).second.localIdx]) << "/" << ((double)histDataBlock[j]) << " = " << dataBlock[j] << std::endl;
+
                             if(majBlockFirst[j])
                             {
                                 if(dataBlock[j] > 0)
@@ -292,9 +284,8 @@ namespace rsgis{namespace rastergis{
                     {
                         if(histDataBlock[j] > 0)
                         {
-                            //std::cout << "catStats[" << rowID << "][" << (*iterCats).second.localIdx << "] = " << catStats[rowID][(*iterCats).second.localIdx] << std::endl;
                             dataBlock[j] = ((double)catStats[rowID][(*iterCats).second.localIdx]) / ((double)histDataBlock[j]);
-                            //std::cout << j << " = " << ((double)catStats[rowID][(*iterCats).second.localIdx]) << "/" << ((double)histDataBlock[j]) << " = " << dataBlock[j] << std::endl;
+
                             if(majBlockFirst[j])
                             {
                                 if(dataBlock[j] > 0)
@@ -424,9 +415,6 @@ namespace rsgis{namespace rastergis{
             size_t cat = boost::lexical_cast<size_t>(intBandValues[ratCatsBand]);
             size_t localIdx = 0;
             
-            //std::cout << "CAT = " << cat << std::endl;
-            //std::cout << "FID = " << fid << std::endl;
-            
             std::map<size_t,CategoryField>::iterator iterCats = cats->find(cat);
             if(iterCats == cats->end())
             {
@@ -435,13 +423,9 @@ namespace rsgis{namespace rastergis{
                 throw rsgis::img::RSGISImageCalcException("Could not find the catergory.");
             }
             
-            //std::cout << "Local Cat = " << (*iterCats).first << " Cat = " << (*iterCats).second.category << std::endl;
-            
             localIdx = (*iterCats).second.localIdx;
             
             ++this->catStats[fid][localIdx];
-            
-            //std::cout << "local Idx = " << localIdx << " = " << this->catStats[fid][localIdx] << std::endl;
         }
     }
     

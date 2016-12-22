@@ -232,9 +232,7 @@ namespace rsgis{namespace vec{
 		
 		std::vector<rsgis::utils::PlotPoly*>::iterator iterPolyDetails;
 		for(iterPolyDetails = polyDetails->begin(); iterPolyDetails != polyDetails->end(); ++iterPolyDetails)
-		{
-			//std::cout << parse.formatedString(*iterPolyDetails) << std::endl;
-			
+		{			
 			radOrien = mathUtils.degreesToRadians((*iterPolyDetails)->orientation);
 			radOrienP90 = mathUtils.degreesToRadians(((*iterPolyDetails)->orientation + 90));
 			radOrienM90 = mathUtils.degreesToRadians(((*iterPolyDetails)->orientation - 90));

@@ -636,8 +636,7 @@ namespace rsgis{namespace geom{
 						for(iterPolys = polys->begin(); iterPolys != polys->end(); )
 						{
 							area = (*iterPolys)->getArea();
-							//std::cout << "Polygon has area " << area << " which is " << area/totalarea << " of the total area " << totalarea << std::endl;
-							delete *iterPolys;
+                            delete *iterPolys;
 							polys->erase(iterPolys);
 						}
 						delete polys;

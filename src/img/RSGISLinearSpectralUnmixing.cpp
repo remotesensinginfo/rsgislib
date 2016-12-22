@@ -538,7 +538,6 @@ namespace rsgis{namespace img{
                         if((em1Val+em2Val) < threshold)
                         {
                             distVal = this->calcDistance2MeasuredSpectra(em1Val, em2Val, normBandVals, numBands);
-                            //std::cout << "[" << em1Val << "," << em2Val << "] = " << (em1Val+em2Val) << " Deviation = " << distVal << std::endl;
                             
                             if(first)
                             {
@@ -558,12 +557,10 @@ namespace rsgis{namespace img{
                     }
                     em1Val += this->stepRes;
                 }
-                //std::cout << std::endl;
             }
             
             if(!first)
             {
-                //std::cout << "Min Error = " << minError << std::endl;
                 output[0] = offset + (minEM1Val * gain);
                 output[1] = offset + (minEM2Val * gain);
                 output[2] = offset + (minError * gain);
@@ -606,7 +603,6 @@ namespace rsgis{namespace img{
                             if((em1Val+em2Val+em3Val) < threshold)
                             {
                                 distVal = this->calcDistance2MeasuredSpectra(em1Val, em2Val, em3Val, normBandVals, numBands);
-                                //std::cout << "[" << em1Val << "," << em2Val << "," << em3Val << "] = " << (em1Val+em2Val+em3Val) << " Deviation = " << distVal << std::endl;
                                 
                                 if(first)
                                 {
@@ -630,12 +626,10 @@ namespace rsgis{namespace img{
                     }
                     em1Val += this->stepRes;
                 }
-                //std::cout << std::endl;
             }
             
             if(!first)
             {
-                //std::cout << "Min Error = " << minError << std::endl;
                 output[0] = offset + (minEM1Val * gain);
                 output[1] = offset + (minEM2Val * gain);
                 output[2] = offset + (minEM3Val * gain);
@@ -663,7 +657,6 @@ namespace rsgis{namespace img{
         for(unsigned int i = 0; i < numBands; ++i)
         {
             genSpectra[i] = (gsl_matrix_get(endmembers, i, 0) * em1Val) + (gsl_matrix_get(endmembers, i, 1) * em2Val) + (gsl_matrix_get(endmembers, i, 2) * em3Val);
-            //std::cout << i << ": " <<  genSpectra[i] << std::endl;
         }
         
         float errorVal = 0;
@@ -671,8 +664,6 @@ namespace rsgis{namespace img{
         {
             errorVal += ((genSpectra[i] - normSpectra[i])*(genSpectra[i] - normSpectra[i]));
         }
-        
-        //std::cout << "errorVal = " << errorVal << std::endl;
         
         delete[] genSpectra;
         
@@ -687,7 +678,6 @@ namespace rsgis{namespace img{
         for(unsigned int i = 0; i < numBands; ++i)
         {
             genSpectra[i] = (gsl_matrix_get(endmembers, i, 0) * em1Val) + (gsl_matrix_get(endmembers, i, 1) * em2Val);
-            //std::cout << i << ": " <<  genSpectra[i] << std::endl;
         }
         
         float errorVal = 0;
@@ -695,9 +685,7 @@ namespace rsgis{namespace img{
         {
             errorVal += ((genSpectra[i] - normSpectra[i])*(genSpectra[i] - normSpectra[i]));
         }
-        
-        //std::cout << "errorVal = " << errorVal << std::endl;
-        
+                
         delete[] genSpectra;
         
         errorVal = sqrt(errorVal/numBands);

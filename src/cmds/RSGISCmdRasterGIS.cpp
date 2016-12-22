@@ -1245,10 +1245,6 @@ namespace rsgis{ namespace cmds {
             // Calculate change
             ratCalc->calcRATValues(ratCalcVal->attTable, inRealColIdx, inIntColIdx, inStrColIdx, outRealColIdx, outIntColIdx, outStrColIdx);
 
-            //std::cout << "Writing attributes\n";
-            // Set attribute table
-            //clumpsDataset->GetRasterBand(ratBand)->SetDefaultRAT(ratCalcVal->attTable);
-
             // Close GDAL Dataset
             GDALClose(clumpsDataset);
 

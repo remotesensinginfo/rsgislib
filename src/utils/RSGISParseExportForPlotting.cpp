@@ -189,7 +189,6 @@ namespace rsgis{namespace utils{
 				}
 				else
 				{
-					//std::cout << strLine << std::endl;
 					textUtils.tokenizeString(strLine, ',', tokens, true);
 					if(tokens->size() != 4)
 					{
@@ -244,7 +243,6 @@ namespace rsgis{namespace utils{
 				}
 				else
 				{
-					//std::cout << strLine << std::endl;
 					textUtils.tokenizeString(strLine, ',', tokens, true);
 					if(tokens->size() != 6)
 					{

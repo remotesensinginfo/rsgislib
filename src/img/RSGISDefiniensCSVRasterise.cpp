@@ -290,7 +290,6 @@ namespace rsgis{namespace img{
 			bool first = true;
 			std::string strLine;
 			
-			//std::cout.precision(11);
 			while(!csvFile.eof())
 			{
 				getline(csvFile, strLine, '\n');

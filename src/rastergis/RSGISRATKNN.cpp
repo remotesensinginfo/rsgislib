@@ -173,13 +173,10 @@ namespace rsgis{namespace rastergis{
             }
             else if(distKNN == rsgis::math::rsgis_mahalanobis)
             {
-                //std::cout << "Calculating Mean Vector\n";
                 double *meanVec = mathUtils.calcMeanVector(trainData, numTrainFeats, numFloatVals, 1, numFloatVals);
-                //std::cout << "Calculating CoVariance Matrix\n";
                 double **covarMatrix = mathUtils.calcCovarianceMatrix(trainData, meanVec, numTrainFeats, numFloatVals, 1, numFloatVals);
                 size_t numVals = numFloatVals - 1;
                 delete[] meanVec;
-                //std::cout << "Finished CoVariance Matrix\n";
                 calcDist = new rsgis::math::RSGISCalcMahalanobisDistMetric(covarMatrix, numVals);
                 calcDist->init();
             }
@@ -333,7 +330,6 @@ namespace rsgis{namespace rastergis{
             throw RSGISAttributeTableException("The number of real number columns is not the same size as the array; which ones to copy?");
         }
         
-        //std::cout << "Processing Row " << fid << std::endl;
         try
         {
             bool performKNN = true;
@@ -423,7 +419,7 @@ namespace rsgis{namespace rastergis{
             for(size_t i = 0; i < this->n; ++i)
             {
                 dist = this->calcDist->calcDist(this->trainData[i], 1, m, featVals, 1, m);
-                //std::cout << "\tDistance = " << dist << std::endl;
+
                 if(dist < this->distThreshold)
                 {
                     if(kVals->empty())
@@ -447,13 +443,6 @@ namespace rsgis{namespace rastergis{
                     }
                 }
             }
-            /*
-            int i = 0;
-            for(std::list<std::pair<double, double*> >::iterator iterFeat = kVals->begin(); iterFeat != kVals->end(); ++iterFeat)
-            {
-                std::cout << "\t" << i++ << ": " << (*iterFeat).first << ":\t" << (*iterFeat).second[0] << std::endl;
-            }
-            */
         }
         catch (RSGISAttributeTableException &e)
         {

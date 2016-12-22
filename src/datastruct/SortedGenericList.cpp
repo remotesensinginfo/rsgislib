@@ -178,13 +178,10 @@ namespace rsgis{ namespace datastruct{
 	template <typename T>
 	void SortedGenericList<T>::clearListDelete()
 	{
-		//std::cout << "size  = " << size << std::endl;
 		for(int i = 0; i < size; i++)
 		{
-			//std::cout << "list[" << i << "] = " << *list[i] << std::endl;
 			if(list[i] != NULL)
 			{
-				//std::cout << "deleting\n";
 				delete list[i];
 			}
 		}
@@ -380,7 +377,6 @@ namespace rsgis{ namespace datastruct{
 			{
 				if(*data == *list[min])
 				{
-					//std::cout << "EQUAL found - [" << *list[min] << "]\n";
 					*location = min;
 					continueLoop = false;
 					break;

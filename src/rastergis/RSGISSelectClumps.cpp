@@ -53,9 +53,6 @@ namespace rsgis{namespace rastergis{
             double imgWidth = imgExtent->MaxX - imgExtent->MinX;
             double imgHeight = imgExtent->MaxY - imgExtent->MinY;
             
-            //std::cout << "Image Width = " << imgWidth << std::endl;
-            //std::cout << "Image Height = " << imgHeight << std::endl;
-            
             double tileWidth = imgWidth / ((double)cols);
             double tileHeight = imgHeight / ((double)rows);
             
@@ -411,14 +408,6 @@ namespace rsgis{namespace rastergis{
             unsigned int varColIdx = ratUtils.findColumnIndex(gdalRAT, varCol);
             unsigned int classNamesColIdx = 0;
             
-            //std::vector<double> *colFloatVals = ratUtils.readDoubleColumnAsVec(gdalRAT, varCol);
-            /*for(std::vector<double>::iterator iterData = colFloatVals->begin(); iterData != colFloatVals->end(); ++iterData)
-            {
-                std::cout << *iterData << std::endl;
-            }*/
-            //size_t numClumps = colFloatVals->size();
-            //std::cout << "Number of Values = " << numClumps << std::endl;
-            
             double minVal = 0.0;
             double maxVal = 0.0;
             size_t numVals = 0;
@@ -447,8 +436,6 @@ namespace rsgis{namespace rastergis{
             RSGISCalcGenVecPairs genVecPairs = RSGISCalcGenVecPairs(classRestrict, classVal, dataPairs);
             RSGISRATCalc ratGenVecPairs = RSGISRATCalc(&genVecPairs);
             ratGenVecPairs.calcRATValues(gdalRAT, inRealColIdx, inIntColIdx, inStrColIdx, outRealColIdx, outIntColIdx, outStrColIdx);
-            
-            //std::cout << "Bin Width = " << binWidth << std::endl;
             
             std::vector<std::pair<size_t, double> > *selClumps = mathUtils.sampleUseHistogramMethod(dataPairs, minVal, maxVal, binWidth, propOfSample);
             delete dataPairs;
@@ -715,22 +702,10 @@ namespace rsgis{namespace rastergis{
             
             for(unsigned int j = 0; j < outGauParams.size(); ++j)
             {
-                //std::cout << j << ":\t";
                 for(unsigned int i = 0; i < hist->size(); ++i)
                 {
-                    /*
-                    if(i==0)
-                    {
-                        std::cout << outGaussians[j][i];
-                    }
-                    else
-                    {
-                        std::cout << "," << outGaussians[j][i];
-                    }
-                     */
                     outGMM[i] += outGaussians[j][i];
                 }
-                //std::cout << std::endl;
             }
             
             double maxGauVal = 0.0;
@@ -765,38 +740,6 @@ namespace rsgis{namespace rastergis{
                 }
             }
             
-            /*
-            std::cout << "Class Split:\t";
-            for(unsigned int i = 0; i < hist->size(); ++i)
-            {
-                if(i==0)
-                {
-                    std::cout << outGMMClass[i];
-                }
-                else
-                {
-                    std::cout << ", " << outGMMClass[i];
-                }
-            }
-            std::cout << std::endl;
-            */
-            
-            /*
-            std::cout << "Hist:\t";
-            for(unsigned int i = 0; i < hist->size(); ++i)
-            {
-                if(i==0)
-                {
-                    std::cout << outGMM[i];
-                }
-                else
-                {
-                    std::cout << "," << outGMM[i];
-                }
-            }
-            std::cout << std::endl;
-            */
-            
             unsigned int subClassesColIdx = ratUtils.findColumnIndexOrCreate(gdalRAT, outCol, GFT_Integer);
             
             int *dataPtClass = new int[ratLen];
@@ -807,7 +750,6 @@ namespace rsgis{namespace rastergis{
             
             for(unsigned int i = 0; i < hist->size(); ++i)
             {
-                //std::vector<std::pair<size_t, double> > **pairsHist
                 for(std::vector<std::pair<size_t, double> >::iterator iterHistBin = pairsHist[i]->begin(); iterHistBin != pairsHist[i]->end(); ++iterHistBin)
                 {
                     dataPtClass[(*iterHistBin).first] = outGMMClass[i];

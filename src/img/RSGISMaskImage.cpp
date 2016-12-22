@@ -189,11 +189,9 @@ namespace rsgis{namespace img{
         bool validData = true;
         for(int i = 0; i < numBands; ++i)
         {
-            //std::cout << i << ") " << bandValues[i] << std::endl;
             if(bandValues[i] == noDataVal)
             {
                 validData = false;
-                //std::cout << "\tInvalid Pixel\n";
             }
         }
         

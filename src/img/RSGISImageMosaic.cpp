@@ -162,8 +162,6 @@ namespace rsgis{namespace img{
 
                 for(int i = 0; i < nYBlocks; i++)
                 {
-                    //std::cout << i << " of " << nYBlocks << std::endl;
-
                     for(int n = 0; n < numberBands; n++)
                     {
                         rowOffset = yBlockSize * i;
@@ -1438,7 +1436,6 @@ namespace rsgis{namespace img{
                 dataset->GetGeoTransform(imgTransform);
                 tileXSize = dataset->GetRasterXSize();
                 tileYSize = dataset->GetRasterYSize();
-                //std::cout << "Image Size [" << tileXSize << "," << tileYSize << "]\n";
                 
                 xDiff = imgTransform[0] - baseTransform[0];
                 yDiff = baseTransform[3] - imgTransform[3];
@@ -1455,7 +1452,6 @@ namespace rsgis{namespace img{
                 
                 for(int j = 0; j < nYBlocks; j++)
                 {
-                    //std::cout << "j = " << j << std::endl;
                     rowOffset = yBlockSize * j;
                     if(bandsDefined)
                     {
@@ -1974,9 +1970,7 @@ namespace rsgis{namespace img{
             }
             
             for(std::vector<std::string>::iterator iterImgFile = inputImages.begin(); iterImgFile != inputImages.end(); ++iterImgFile)
-            {
-                //std::cout << "Checking: " << *iterImgFile << std::endl;
-                
+            {                
                 dataset = (GDALDataset *) GDALOpenShared((*iterImgFile).c_str(), GA_ReadOnly);
                 if(dataset == NULL)
                 {
@@ -1988,12 +1982,7 @@ namespace rsgis{namespace img{
                 {
                     throw RSGISImageBandException("All input images need to have the same number of bands.");
                 }
-                /*
-                for(int i = 0; i < numberBands; ++i)
-                {
-                    std::cout << "\tBand " << i+1 << ": " << dataset->GetRasterBand(i+1)->GetOverviewCount() << std::endl;
-                }
-                */
+  
                 // Check the number of overviews is the same for all input images and number of levels specified.
                 for(int i = 0; i < numberBands; ++i)
                 {

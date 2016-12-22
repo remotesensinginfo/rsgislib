@@ -216,7 +216,6 @@ namespace rsgis{ namespace classifier{
                         {
                             classInfo->classID = idVal++;
                         }
-                        //std::cout << "Adding class: " << inStringCols[0] << std::endl;
                         classes->insert(std::pair<std::string, RSGISClassInfo*>(inStringCols[0], classInfo));
                     }
                 }
@@ -325,7 +324,6 @@ namespace rsgis{ namespace classifier{
             int val = boost::lexical_cast<int>(bandValues[0]);
             
             const GDALColorEntry *clr = clrTab->GetColorEntry(val);
-            //std::cout << "Pixel Value: " << val << "[" << clr->c1 << "," << clr->c2 << "," << clr->c3 << "]\n";
             
             if(clr != NULL)
             {

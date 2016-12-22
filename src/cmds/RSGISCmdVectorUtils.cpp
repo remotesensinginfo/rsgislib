@@ -1150,7 +1150,6 @@ namespace rsgis{ namespace cmds {
             // Open Input Shapfile.
             //
             /////////////////////////////////////
-            //std::cout << "Input Vector: " << inputVector << std::endl;
             inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);
             if(inputSHPDS == NULL)
             {
@@ -1171,7 +1170,6 @@ namespace rsgis{ namespace cmds {
             // Create Output Shapfile.
             //
             /////////////////////////////////////
-            //std::cout << "Output Vector: " << outputVector << std::endl;
             const char *pszDriverName = "ESRI Shapefile";
             shpFiledriver =  GetGDALDriverManager()->GetDriverByName(pszDriverName);
             if( shpFiledriver == NULL )
@@ -1276,7 +1274,6 @@ namespace rsgis{ namespace cmds {
             // Create Output Shapfile.
             //
             /////////////////////////////////////
-            //std::cout << "Output Vector: " << outputVector << std::endl;
             const char *pszDriverName = "ESRI Shapefile";
             shpFiledriver =  GetGDALDriverManager()->GetDriverByName(pszDriverName);
             if( shpFiledriver == NULL )
@@ -1429,7 +1426,6 @@ namespace rsgis{ namespace cmds {
             // Create Output Shapfile.
             //
             /////////////////////////////////////
-            //std::cout << "Output Vector: " << outputVector << std::endl;
             const char *pszDriverName = "ESRI Shapefile";
             shpFiledriver = GetGDALDriverManager()->GetDriverByName(pszDriverName);
             if( shpFiledriver == NULL )
@@ -1526,7 +1522,6 @@ namespace rsgis{ namespace cmds {
             // Create Output Shapfile.
             //
             /////////////////////////////////////
-            //std::cout << "Output Vector: " << outputVector << std::endl;
             const char *pszDriverName = "ESRI Shapefile";
             GDALDriver *shpFiledriver = GetGDALDriverManager()->GetDriverByName(pszDriverName);
             if( shpFiledriver == NULL )
@@ -2095,7 +2090,6 @@ namespace rsgis{ namespace cmds {
             // Create Output Shapfile.
             //
             /////////////////////////////////////
-            //std::cout << "Output Vector: " << outputVector << std::endl;
             const char *pszDriverName = "ESRI Shapefile";
             GDALDriver *shpFiledriver = GetGDALDriverManager()->GetDriverByName(pszDriverName);
             if( shpFiledriver == NULL )

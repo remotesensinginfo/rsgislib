@@ -214,8 +214,6 @@ namespace rsgis{namespace segment{
                     }
                 }
                 
-                //std::cout << "For " << cClump->clumpID << "(size = " << cClump->pxls->size() << ") the closest neighbour is " << closestNeighbour << " with distance " << closestNeighbourDist << std::endl;
-                
                 // Perform Merge
                 if(!firstNeighbourTested)
                 {
@@ -497,9 +495,7 @@ namespace rsgis{namespace segment{
                             }
                             closestNeighbourDist = sqrt(distance);
                         }
-                        
-                        //std::cout << "For " << cClump->clumpID << "(size = " << cClump->pxls->size() << ") the closest neighbour is " << closestNeighbour << " with distance " << closestNeighbourDist << std::endl;
-                        
+                                                
                         if(closestNeighbourDist < specThreshold)
                         {
                             // PUT INTO LOOK UP TABLE TO BE APPLIED AFTERWARDS.

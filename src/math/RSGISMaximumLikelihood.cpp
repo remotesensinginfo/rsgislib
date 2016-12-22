@@ -74,7 +74,6 @@ namespace rsgis {namespace math{
         {
             for(i=0; i<ml->nclasses; i++)
             {
-                //std::cout << "ml->classes[" << i << "]: " << ml->classes[i] << std::endl;
                 if(ml->classes[i] != i+1)
                 {
                     std::string msg = std::string("compute_ml: for ") + NumberToString(ml->nclasses) + "-class classification classes must be 1,...," +

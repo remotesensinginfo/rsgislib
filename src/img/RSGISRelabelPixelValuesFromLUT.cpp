@@ -38,8 +38,6 @@ namespace rsgis { namespace img {
             rsgis::math::RSGISMatrices matrixUtils;
             gsl_matrix *lut = matrixUtils.readGSLMatrixFromGridTxt(matrixLUTFile);
             
-            //cout << "LUT: " << lut->size1 << ", " << lut->size2 << endl;
-            
 			RSGISCalcImageValue *calcImageValue = new RSGISRelabelPixelValuesFromLUTCalcVal(inData->GetRasterCount(), lut);            
             RSGISCalcImage calcImage = RSGISCalcImage(calcImageValue, "", true);
             
@@ -82,7 +80,6 @@ namespace rsgis { namespace img {
             found = false;
             for(int j = 0; j < lut->size1; ++j)
             {
-                //cout << j << ": " << gsl_matrix_get(lut, j, 0) << " = " << gsl_matrix_get(lut, j, 1) << endl;
                 if(gsl_matrix_get(lut, j, 0) == bandValues[i])
                 {
                     output[i] = gsl_matrix_get(lut, j, 1);

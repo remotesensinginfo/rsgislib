@@ -97,7 +97,6 @@ namespace rsgis{namespace vec{
                     
                     for(unsigned int j = 0; j < numImageBands; ++j)
                     {
-                        //std::cout << "Idx = " << (j*numFeatures)+featureCount << " = " << sumVals[j] << " from " << countVals << " pixels." << std::endl;
                         endMembers->matrix[(j*numFeatures)+featureCount] = sumVals[j]/countVals;
                         sumVals[j] = 0;
                     }
@@ -179,9 +178,7 @@ namespace rsgis{namespace vec{
         
         for(int i = 0; i < numBands; ++i)
         {
-            //std::cout << "\t Value (" << i+1 << "): " << bandValues[i] << std::endl;
             sumVals[i] = sumVals[i] + bandValues[i];
-            //std::cout << "\tSum (" << i+1 << "): " << sumVals[i] << std::endl;
         }
         ++(*countVals);
     }

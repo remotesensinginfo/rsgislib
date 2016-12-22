@@ -618,9 +618,7 @@ namespace rsgis{ namespace classifier{
 				minClusterCentre = *iterCentres;
 			}
 		}
-		
-		//std::cout << "Pixel assocaited with cluster " << minClusterCentre->classID << std::endl;
-		
+				
 		// add to sum for next centre
 		for(iterCentres = newClusterCentres->begin(); iterCentres != newClusterCentres->end(); ++iterCentres)
 		{
@@ -733,9 +731,7 @@ namespace rsgis{ namespace classifier{
 				minClusterCentre = *iterCentres;
 			}
 		}
-		
-		//std::cout << "Pixel assocaited with cluster " << minClusterCentre->classID << std::endl;
-		
+				
 		// add to sum for next centre
 		for(int i = 0; i < numBands; ++i)
 		{

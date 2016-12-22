@@ -100,8 +100,7 @@ namespace rsgis{namespace vec{
 		{
 			ring->getPoint(i, point);
 			geos::geom::Coordinate coord = geos::geom::Coordinate(point->getX(), point->getY(), point->getZ());
-            //std::cout << "pt: [" << point->getX() << ", " << point->getY() << ", " << point->getZ() << "]" << std::endl;
-			coords->push_back(coord);
+            coords->push_back(coord);
 		}
 		
 		geos::geom::CoordinateArraySequence *coordSeq = new geos::geom::CoordinateArraySequence(coords);
@@ -176,9 +175,7 @@ namespace rsgis{namespace vec{
 	}
 	
 	OGRPolygon* RSGISVectorUtils::convertGEOSPolygon2OGRPolygon(geos::geom::Polygon *poly)
-	{
-		//std::cout << "Poly area = " << poly->getArea() << std::endl;
-		
+	{		
 		OGRPolygon *ogrPoly = new OGRPolygon();
 		
 		// Add outer ring!

@@ -291,9 +291,7 @@ namespace rsgis{namespace vec{
 				}
 				
 				if(!nullGeometry)
-				{
-					//std::cout << " FID = " << fid << " " << env->toString() << std::endl ;
-					
+				{					
 					processFeatures->processFeature(inFeature, env, fid);
 					
 					delete env;

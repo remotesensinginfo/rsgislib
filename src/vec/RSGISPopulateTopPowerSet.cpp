@@ -54,8 +54,6 @@ namespace rsgis{namespace vec{
 		
 		try
 		{
-			//std::cout << "fid: " << fid << ": \n";
-			
 			for(int j = 0; j < nTop; j++)
 			{
 				name = "Top_" + mathUtils.inttostring(j+1);
@@ -70,10 +68,6 @@ namespace rsgis{namespace vec{
 				}
 			}
 			
-			//std::cout << "numTopValues = " << numTopValues << std::endl;
-
-			
-			
 			if(numTopValues > 0)
 			{
 				
@@ -82,7 +76,6 @@ namespace rsgis{namespace vec{
 				{
 					name = "Top_" + mathUtils.inttostring(j+1);
 					topAttributes[j] = std::string(inFeature->GetFieldAsString(featureDefn->GetFieldIndex(name.c_str())));
-					//std::cout << "Attribute " << j+1 << ": " << topAttributes[j] << " = " << std::string(inFeature->GetFieldAsString(featureDefn->GetFieldIndex(topAttributes[j].c_str()))) << std::endl;
 					
 				}
 				

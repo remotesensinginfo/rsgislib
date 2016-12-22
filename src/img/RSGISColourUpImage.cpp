@@ -157,13 +157,13 @@ namespace rsgis{ namespace img{
 			
 			// Get the Root element
 			rootClassificationElement = doc->getDocumentElement();
-			//cout << "Root Element: " << xercesc::XMLString::transcode(rootClassificationElement->getTagName()) << endl;
-			if(!xercesc::XMLString::equals(rootClassificationElement->getTagName(), xercesc::XMLString::transcode("slices")))
+
+            if(!xercesc::XMLString::equals(rootClassificationElement->getTagName(), xercesc::XMLString::transcode("slices")))
 			{
 				throw RSGISParseColourException("Incorrect root element; Root element should be \"slices\"");
 			}
-			//cout << ""
-			numBands = mathsUtils.strtoint(xercesc::XMLString::transcode(rootClassificationElement->getAttribute(xercesc::XMLString::transcode("inputbands"))));
+
+            numBands = mathsUtils.strtoint(xercesc::XMLString::transcode(rootClassificationElement->getAttribute(xercesc::XMLString::transcode("inputbands"))));
 			
 			classesNode = rootClassificationElement->getElementsByTagName(xercesc::XMLString::transcode("classes"));
 			if(classesNode->getLength() != 1)
@@ -174,8 +174,7 @@ namespace rsgis{ namespace img{
 			
 			classNodesList = classesElement->getElementsByTagName(xercesc::XMLString::transcode("class"));
 			*numClasses = classNodesList->getLength();
-			//cout << "There are " << *numClasses << " class nodes." << endl;
-			
+
 			classData = new ClassColour*[*numClasses];
 			for(int i = 0; i < *numClasses; i++)
 			{

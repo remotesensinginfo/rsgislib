@@ -340,9 +340,7 @@ namespace rsgis{namespace math{
 	{
 		Vector *rsgisVector;
 		gsl_vector *gslVector;
-		//std::cout << "reading" << std::endl;
 		rsgisVector = this->readVectorFromTxt(filepath);
-		//std::cout << "read" << std::endl;
 		gslVector = this->convertRSGIS2GSLVector(rsgisVector);
 		this->freeVector(rsgisVector);
 		return gslVector;
@@ -369,7 +367,6 @@ namespace rsgis{namespace math{
 			double velement = inVector->vector[index++];
 			gsl_vector_set(convertedVector,j,velement);
 		}
-		//std::cout << std::endl;
 		
 		return convertedVector;
 	}

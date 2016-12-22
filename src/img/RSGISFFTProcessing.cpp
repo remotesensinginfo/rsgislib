@@ -66,8 +66,6 @@ namespace rsgis{namespace img{
 				maxCircleRadius = halfHeight;
 			}
 			
-			//matrixUtils.printMatrix(magnitude);
-			//std::cout << "DC = " << dc << " value = " << magnitude->matrix[dc] << std::endl;
 			std::cout << "Centre Point [" << halfWidth << "," << halfHeight << "](" << ((halfHeight) * magnitude->m)+halfWidth << ") = " << magnitude->matrix[((halfHeight) * magnitude->m)+halfWidth] << std::endl;
 			
 			if(startCircle > endCircle)
@@ -108,7 +106,6 @@ namespace rsgis{namespace img{
 			
 			for(int i = 0; i < length; i++)
 			{
-				//std::cout << "[column,row]: [" << column << "," << row << "]" << std::endl;
 				bboxes[i] = geomUtils.createPolygon(leftX, topY, rightX, bottomY);
 				
 				leftX = leftX + step;
@@ -126,9 +123,7 @@ namespace rsgis{namespace img{
 				}
 			}
 			*numPolys = length;
-			
-			//std::cout << "DC Polygon = " << bboxes[dc]->toString() << std::endl;
-			
+						
 			
 			
 			int maxCircle = 0;

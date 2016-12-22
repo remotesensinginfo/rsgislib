@@ -34,8 +34,6 @@ namespace rsgis{namespace reg{
         // Check if new dataset should be created
         if (outFileName != "")
         {
-            //std::cout << "Creating new image: " << outFileName << std::endl;
-
             this->copyImageWithoutSpatialRef(inFileName, outFileName, gdalFormat, gdalDataType);
             
             gcpImage = outFileName;
@@ -136,13 +134,8 @@ namespace rsgis{namespace reg{
         
 		for(iterGCPs = gcps->begin(); iterGCPs != gcps->end(); ++iterGCPs)
 		{
-            //std::cout << gcpNum << std::endl;
-            
             gdalGCPList[gcpNum].pszId = new char[64];
             gdalGCPList[gcpNum].pszInfo = new char[64];
-            
-            //gdalGCPList[gcpNum].pszId = boost::lexical_cast<char*>(gcpNum);
-            //gdalGCPList[gcpNum].pszInfo = boost::lexical_cast<char*>(gcpInfo);
             gdalGCPList[gcpNum].dfGCPPixel = (*iterGCPs)->imgX()-1;  // Pixel X
             gdalGCPList[gcpNum].dfGCPLine = (*iterGCPs)->imgY()-1;   // Pixel Y
             gdalGCPList[gcpNum].dfGCPX = (*iterGCPs)->eastings();  // Easting
@@ -183,7 +176,6 @@ namespace rsgis{namespace reg{
 			{
 				throw RSGISImageWarpException("Requested GDAL driver does not exists..");
 			}
-			//std::cout << "New image width = " << width << " height = " << height << " bands = " <<numInBands << std::endl;
 			
 			outputImageDS = gdalDriver->Create(outFileName.c_str(), width, height,numInBands, gdalDataType, NULL);
 			
@@ -214,9 +206,7 @@ namespace rsgis{namespace reg{
             int xBlockSize = 0;
             int yBlockSize = 0;
             outputRasterBands[0]->GetBlockSize (&xBlockSize, &yBlockSize);
-            
-            //std::cout << "Max. block size: " << yBlockSize << std::endl;
-            
+                        
 			// Allocate memory
 			inputData = new float*[numInBands];
 			for(int i = 0; i < numInBands; i++)

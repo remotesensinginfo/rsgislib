@@ -42,28 +42,6 @@ namespace rsgis{namespace img{
             distVals->clear();
             distVals->reserve(numPxls);
             
-            /*
-            std::cout << "\n\nCentre Pixel = ";
-            for(int n = 0; n < numBands; ++n)
-            {
-                std::cout << dataBlock[n][cPt][cPt] << " ";
-            }
-            std::cout << std::endl;
-            
-            std::cout << "\nWindow = \n";
-            for(int n = 0; n < numBands; ++n)
-            {
-                std::cout << "\tBand = " << n << "\n";
-                for(unsigned int i = 0; i < winSize; ++i)
-                {
-                    for(unsigned int j = 0; j < winSize; ++j)
-                    {
-                        std::cout << dataBlock[n][i][j] << " ";
-                    }
-                    std::cout << std::endl;
-                }
-            }
-            */
             rsgis::math::RSGISMatrices matrixUtils;
             
             rsgis::math::Matrix *covarianceMatrix = matrixUtils.createMatrix(numBands, numBands);
@@ -92,9 +70,6 @@ namespace rsgis{namespace img{
                 }
             }
             
-            //std::cout << "Covariance Matrix:\n";
-            //matrixUtils.printMatrix(covarianceMatrix);
-            
             size_t numVals = covarianceMatrix->m;
             
             gsl_matrix *coVarGSL = matrixUtils.convertRSGIS2GSLMatrix(covarianceMatrix);
@@ -103,7 +78,7 @@ namespace rsgis{namespace img{
             gsl_permutation *p = gsl_permutation_alloc(covarianceMatrix->m);
             int signum = 0;
             gsl_linalg_LU_decomp(coVarGSL, p, &signum);
-            //std::cout << "signum = " << signum << std::endl;
+
             int status = gsl_linalg_LU_invert (coVarGSL, p, invCovarianceMatrix);
             if(status)
             {
@@ -115,9 +90,6 @@ namespace rsgis{namespace img{
             }
             else
             {
-                //std::cout << "Inverse Covariance Matrix:\n";
-                //matrixUtils.printGSLMatrix(invCovarianceMatrix);
-                
                 gsl_vector *dVals = gsl_vector_alloc(numVals);
                 gsl_vector *outVec = gsl_vector_alloc(numVals);
                 
@@ -132,13 +104,8 @@ namespace rsgis{namespace img{
                             {
                                 gsl_vector_set(dVals, n, (dataBlock[n][i][j] - dataBlock[n][cPt][cPt]));
                             }
-                            //std::cout << "\nVector D:\n";
-                            //vecUtils.printGSLVector(dVals);
                             
                             gsl_blas_dgemv(CblasNoTrans, 1.0, invCovarianceMatrix, dVals, 0.0, outVec );
-                            
-                            //std::cout << "Mah Out Vec:\n";
-                            //vecUtils.printGSLVector(outVec);
                             
                             dist = 0;
                             for(int n = 0; n < numBands; ++n)
@@ -222,13 +189,8 @@ namespace rsgis{namespace img{
                 {
                     gsl_vector_set(dVals, n, (dataBlock[n][i][j] - varMeans->vector[n]));
                 }
-                //std::cout << "\nVector D:\n";
-                //vecUtils.printGSLVector(dVals);
                 
                 gsl_blas_dgemv(CblasNoTrans, 1.0, invCovarianceMatrix, dVals, 0.0, outVec );
-                
-                //std::cout << "Mah Out Vec:\n";
-                //vecUtils.printGSLVector(outVec);
                 
                 dist = 0;
                 for(int n = 0; n < numBands; ++n)

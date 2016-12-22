@@ -47,6 +47,7 @@ Statistics
 .. autofunction:: rsgislib.imagecalc.getImageStatsInEnv
 .. autofunction:: rsgislib.imagecalc.calcPropTrueExp
 .. autofunction:: rsgislib.imagecalc.calcMultiImgBandStats
+.. autofunction:: rsgislib.imagecalc.calcMaskImgPxlValProb
 
 
 Normalise

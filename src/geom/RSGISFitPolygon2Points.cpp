@@ -56,10 +56,6 @@ namespace rsgis{namespace geom{
             std::cout << "Export Segments\n";
             std::vector<K::Segment_2> segments;
             std::cout.precision(15);
-            //OGRLinearRing *ogrRing = new OGRLinearRing();
-            //bool first = true;
-            //double firstX = 0.0;
-            //double firstY = 0.0;
             std::vector<geos::geom::LineSegment *> *lines = new std::vector<geos::geom::LineSegment *>();
             for(Alpha_shape_edges_iterator it =  A.alpha_shape_edges_begin(); it != A.alpha_shape_edges_end(); ++it)
             {
@@ -71,12 +67,8 @@ namespace rsgis{namespace geom{
                 if(edgeType == Alpha_shape_2::REGULAR)
                 {
                     lines->push_back(new geos::geom::LineSegment(geos::geom::Coordinate(ptSource.x(), ptSource.y()), geos::geom::Coordinate(ptTarget.x(), ptTarget.y())));
-                    //std::cout << "Line Regular: [" << ptSource.x() << ", " << ptSource.y() << "][" << ptTarget.x() << ", " << ptTarget.y() << "]\n";
                 }
-                //else if(edgeType == Alpha_shape_2::INTERIOR)
-                //{
-                //    std::cout << "Line Interior: [" << ptSource.x() << ", " << ptSource.y() << "][" << ptTarget.x() << ", " << ptTarget.y() << "]\n";
-                //}
+    
             }
             
             poly = this->extractPolygonFromEdges(lines);
@@ -128,7 +120,6 @@ namespace rsgis{namespace geom{
                     feedbackCounter = feedbackCounter + 10;
                 }
                 
-                //std::cout << "\nCreated vertex A and B\n";
                 foundA = false;
                 vertexA = new RSGIS2DPoint(new geos::geom::Coordinate((*iterLines)->p0.x, (*iterLines)->p0.y));
                 foundB = false;
@@ -136,12 +127,10 @@ namespace rsgis{namespace geom{
                 
                 if(!ptVerts.empty())
                 {
-                    //std::cout << "Vertex List is not empty and therefore checking for vertex in list.\n";
                     for(std::vector<RSGIS2DPoint*>::iterator iterPts = ptVerts.begin(); iterPts != ptVerts.end(); ++iterPts)
                     {
                         if((!foundA) && ((*iterPts)->equals(vertexA)))
                         {
-                            //std::cout << "FOUND A\n";
                             delete vertexA;
                             vertexA = *iterPts;
                             foundA = true;
@@ -149,7 +138,6 @@ namespace rsgis{namespace geom{
                         
                         if((!foundB) && ((*iterPts)->equals(vertexB)))
                         {
-                            //std::cout << "FOUND B\n";
                             delete vertexB;
                             vertexB = *iterPts;
                             foundB = true;
@@ -157,27 +145,21 @@ namespace rsgis{namespace geom{
                         
                         if(foundA & foundB)
                         {
-                            //std::cout << "Found Both; breaking out of loop\n";
                             break;
                         }
                     }
-                    //std::cout << "Checked vertexes\n";
                 }
                 
                 if(!foundA)
                 {
-                    //std::cout << "Not found to adding A\n";
                     vertexA->setIndex(ptVerts.size());
                     ptVerts.push_back(vertexA);
-                    //std::cout << "Added\n";
                 }
                 
                 if(!foundB)
                 {
-                    //std::cout << "Not found to adding B\n";
                     vertexB->setIndex(ptVerts.size());
                     ptVerts.push_back(vertexB);
-                    //std::cout << "Added\n";
                 }
                 
                 ++count;
@@ -209,8 +191,6 @@ namespace rsgis{namespace geom{
                     std::cout << "." << feedbackCounter << "." << std::flush;
                     feedbackCounter = feedbackCounter + 10;
                 }
-                
-                //std::cout << "Line : [" << (*iterLines)->p0.x << ", " << (*iterLines)->p0.y << "][" << (*iterLines)->p1.x << ", " << (*iterLines)->p1.y << "]\n";
                 
                 coordA = geos::geom::Coordinate((*iterLines)->p0.x, (*iterLines)->p0.y);
                 coordB = geos::geom::Coordinate((*iterLines)->p1.x, (*iterLines)->p1.y);
@@ -250,24 +230,16 @@ namespace rsgis{namespace geom{
                     throw RSGISGeometryException("Could not find vertex B in list");
                 }
                 
-                //std::cout << "test edges\n";
                 edgePresent = false;
-                //std::cout << "Create Vertex A: " << vertexA->getIndex() << std::endl;
                 vA = boost::vertex(vertexA->getIndex(), edgesGraph);
-                //std::cout << "Create Vertex B: " << vertexB->getIndex() << std::endl;;
                 vB = boost::vertex(vertexB->getIndex(), edgesGraph);
-                //std::cout << "check edge\n";
                 boost::tie(eDescript, edgePresent) = boost::edge(vA, vB, edgesGraph);
-                //std::cout << "edge check\n";
                 
                 if(!edgePresent)
                 {
-                    //std::cout << "Edge not present so adding\n";
                     boost::add_edge(vertexA->getIndex(), vertexB->getIndex(), vertexA->distance(vertexB), edgesGraph);
                     ++numEdgesAdded;
                 }
-                
-                //std::cout << "Finished edge " << count << std::endl;
                 
                 ++count;
             }
@@ -304,7 +276,6 @@ namespace rsgis{namespace geom{
             // iterate using numbers ++i etc...
             for(size_t i = 0; i < ptVerts.size(); ++i)
             {
-                //std::cout << "Vertex " << i << " is in component " << component.at(i) << std::endl;
                 ptVerts.at(i)->setClassID(component.at(i));
                 if(compIdxs[component.at(i)] == -1)
                 {
@@ -316,14 +287,6 @@ namespace rsgis{namespace geom{
                 }
             }
             
-            /*
-            for(size_t i = 0; i < num_comp; ++i)
-            {
-                std::cout << "Graph Component: " << i << " has " << compNumGt2Edges[i] << " change features." << std::endl;
-                
-            }
-            */
-            
             bool skip = false;
             std::vector<geos::geom::CoordinateSequence*> *loops = new std::vector<geos::geom::CoordinateSequence*>();
             boost::graph_traits<EdgesGraph>::adjacency_iterator vi, vi_end;
@@ -331,7 +294,6 @@ namespace rsgis{namespace geom{
             {
                 if(compNumGt2Edges[i] == 0)
                 {
-                    //std::cout << "Graph Component: " << i << std::endl;
                     vertexDescr startV = boost::vertex(compIdxs[i], edgesGraph);
                     std::vector<int> mark(ptVerts.size(), 0);
                     mark.at(startV) = 1;
@@ -342,7 +304,6 @@ namespace rsgis{namespace geom{
                     {
                         if(mark.at(*vi) == 0)
                         {
-                            //std::cout << "\t" << *vi << std::endl;
                             mark.at(*vi) = 1;
                             compCoords.at(i)->add(ptVerts.at(*vi)->getCoordPoint(), true);
                             this->createCoordSequence(&edgesGraph, *vi, &mark, &ptVerts, compCoords.at(i), loops);
@@ -367,14 +328,11 @@ namespace rsgis{namespace geom{
                     {
                         if((component.at(j) == i) && (edgesGraph.m_vertices.at(j).m_out_edges.size() == 4))
                         {
-                            //std::cout << "Found vertex " << j << " which has 4 edges\n";
                             compIdxs[i] = j;
                             break;
                         }
                     }
-                    //std::cout << "Start vertex index is " << compIdxs[i] << ". It has 4 edges." << std::endl;
                     
-                    //std::cout << "Graph Component: " << i << std::endl;
                     vertexDescr startV = boost::vertex(compIdxs[i], edgesGraph);
                     std::vector<int> mark(ptVerts.size(), 0);
                     mark.at(startV) = 1;
@@ -383,7 +341,6 @@ namespace rsgis{namespace geom{
                     
                     for(tie(vi,vi_end) = boost::adjacent_vertices(startV, edgesGraph); vi != vi_end; ++vi)
                     {
-                        //std::cout << "\t" << *vi << " Mark: " << mark.at(*vi) << std::endl;
                         if(mark.at(*vi) == 0)
                         {
                             mark.at(*vi) = 1;
@@ -394,7 +351,6 @@ namespace rsgis{namespace geom{
                             compCoords.at(i) = new geos::geom::CoordinateArraySequence();
                             compCoords.at(i)->add(ptVerts.at(startV)->getCoordPoint(), true);
                         }
-                        //std::cout << "\tFinished " << *vi << std::endl;
                     }
                     
                     
@@ -413,7 +369,6 @@ namespace rsgis{namespace geom{
                     skip = true;
                     //throw RSGISGeometryException("The number of component edges with more than 2 edges is greater than 1 - an implementation for this has not yet been done...");
                 }
-                //std::cout << "\n\n";
             }
             
             if(!skip)
@@ -446,8 +401,6 @@ namespace rsgis{namespace geom{
                     
                     std::cout << "Component " << maxIdx << " is the polygon boundary the rest are holes\n";
                     
-                    //createLinearRing(CoordinateSequence *newCoords)
-                    //createPolygon (LinearRing *shell, std::vector< Geometry * > *holes)
                     geos::geom::LinearRing *ring = NULL;
                     std::vector<geos::geom::Geometry*> *holes = new std::vector<geos::geom::Geometry*>();
                     for(size_t i = 0; i < compCoords.size(); ++i)
@@ -473,7 +426,6 @@ namespace rsgis{namespace geom{
                     poly = geomFactory->createPolygon(ring, holes);
                 }
             }
-            
             
             // Clean Up...
             for(std::vector<RSGIS2DPoint*>::iterator iterVerts = ptVerts.begin(); iterVerts != ptVerts.end(); ++iterVerts)
@@ -502,66 +454,11 @@ namespace rsgis{namespace geom{
             {
                 if(mark->at(*vi) == 0)
                 {
-                    //std::cout << "\t" << *vi << std::endl;
                     mark->at(*vi) = 1;
                     coords->add(ptVerts->at(*vi)->getCoordPoint(), true);
                     this->createCoordSequence(edgesGraph, *vi, mark, ptVerts, coords, loops);
                     break; // Test to process just the first vertex (if there is more than one...)
                 }
-                /*
-                else if(edgesGraph->m_vertices.at(*vi).m_out_edges.size() == 4) // number of edges on vertex is == 4...
-                {
-                    std::cout << "Vertex Out Edges (N = " << edgesGraph->m_vertices.at(*vi).m_out_edges.size() << "): \n";
-                    vertexDescr nextV;
-                    bool foundNext = false;
-                    boost::graph_traits<EdgesGraph>::adjacency_iterator vi2, vi_end2;
-                    for(tie(vi2, vi_end2) = boost::adjacent_vertices(*vi2, *edgesGraph); vi2 != vi_end2; ++vi2)
-                    {
-                        std::cout << "\t" << *vi2 << " Mark = " << mark->at(*vi2) << std::endl;
-                        if(mark->at(*vi2) == 0)
-                        {
-                            nextV = *vi2;
-                            foundNext = true;
-                            break;
-                        }
-                    }
-                    
-                    if(foundNext)
-                    {
-                        geos::geom::Coordinate refCoord = ptVerts->at(*vi)->getCoordPoint();
-                        geos::geom::Coordinate testCoord;
-                        
-                        bool rewound2Current = false;
-                        geos::geom::CoordinateSequence *tmpCoords = new geos::geom::CoordinateArraySequence();
-                        tmpCoords->add(refCoord, true);
-                        for(long i = (coords->size()-1); i >= 0; --i)
-                        {
-                            testCoord = coords->getAt(i);
-                            if(testCoord != refCoord)
-                            {
-                                tmpCoords->add(testCoord, true);
-                                coords->deleteAt(i);
-                            }
-                            else
-                            {
-                                rewound2Current = true;
-                                break;
-                            }
-                        }
-                        tmpCoords->add(refCoord, true);
-                        
-                        if(rewound2Current)
-                        {
-                            loops->push_back(tmpCoords);
-                            this->createCoordSequence(edgesGraph, nextV, mark, ptVerts, coords, loops);
-                        }
-                    }
-                    //else
-                    //{
-                    //    throw RSGISGeometryException("Something has gone wrong when building polygon when unwinding due to vertex being referened more than twice in a single ring.");
-                    //}
-                }
-                 */
             }
         }
         catch (RSGISGeometryException &e)

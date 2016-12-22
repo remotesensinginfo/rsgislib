@@ -16,6 +16,7 @@ Geometry
 .. autofunction:: rsgislib.vectorutils.polygoniseRaster
 .. autofunction:: rsgislib.vectorutils.printpolygeom
 .. autofunction:: rsgislib.vectorutils.splitFeatures
+.. autofunction:: rsgislib.vectorutils.fitActiveContourBoundaries
 
 Attributes
 -----------

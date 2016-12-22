@@ -219,15 +219,6 @@ namespace rsgis{namespace vec{
 					pxlValue = feature->GetFieldAsDouble(fieldIdx);
 				}
 				
-				//std::cout << "Pixel Value = " << pxlValue << std::endl;
-				
-				/*std::cout << "Image Size = " << envImage->getWidth() << " x " << envImage->getHeight() << std::endl;
-				std::cout << "Polygon Envelope Size = " << env->getWidth() << " x " << env->getHeight() << std::endl;
-				
-				std::cout << "Image X = " << envImage->getMinX() << " Image Y = " << envImage->getMinY() << std::endl;
-				std::cout << "Polygon X = " << env->getMinX() << " Polygon Y = " << env->getMinY() << std::endl;*/
-				
-				
 				if(envImage->contains(env))
 				{
 					int pixelRasterisedCount = this->editPixels(image, pxlValue, env, geometry);
@@ -238,7 +229,6 @@ namespace rsgis{namespace vec{
 				}
 				else
 				{
-					//std::cout << "NOT INSIDE IMAGE\n";
 					notRasterized++;
 				}
 				
@@ -384,8 +374,6 @@ namespace rsgis{namespace vec{
 				width = (int)((env->getWidth()/resolution)+0.5);
 				height = (int)((env->getHeight()/resolution)+0.5);
 			}
-
-			//std::cout << "Start: [" << startXPxl << "," << startYPxl << "]\t Width = " << width << " Height = " << height << std::endl;
 			
 			GDALRasterBand *imageBand = image->GetRasterBand(1);
 			float *inData = (float *) CPLMalloc(sizeof(float)*width);
@@ -462,9 +450,7 @@ namespace rsgis{namespace vec{
 						
 						delete poly;
 					}
-					
-					//std::cout << std::endl;
-									
+														
 					pxlXMin += resolution;
 					pxlXMax += resolution;
 				}

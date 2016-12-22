@@ -86,8 +86,6 @@ namespace rsgis{ namespace utils{
 							throw RSGISTextException(message);
 						}
 						tokens->clear();
-						
-						//cout << this->formatedstd::string(poly) << endl;
 					}
 					// ELSE IGNORE AS EITHER BLANK LINE OR COMMENT
 				}

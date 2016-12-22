@@ -126,25 +126,19 @@ namespace rsgis{namespace geom{
     
     bool RSGIS2DPoint::equals(RSGIS2DPoint *pt)
     {
-        //std::cout << "[" << point->x << "," << point->y << "][" << pt->point->x << "," << pt->point->y << "]\n";
         if((pt->point->x == point->x) && (pt->point->y == point->y))
         {
-            //std::cout << "\t Are Equal\n";
             return true;
         }
-        //std::cout << "\t Are Not Equal\n";
         return false;
     }
     
     bool RSGIS2DPoint::equals(geos::geom::Coordinate *pt)
     {
-        //std::cout << "[" << point->x << "," << point->y << "][" << pt->x << "," << pt->y << "]\n";
         if((pt->x == point->x) && (pt->y == point->y))
         {
-            //std::cout << "\t Are Equal\n";
             return true;
         }
-        //std::cout << "\t Are Not Equal\n";
         return false;
     }
 	
