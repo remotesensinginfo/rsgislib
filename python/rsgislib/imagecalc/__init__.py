@@ -90,7 +90,7 @@ Where:
 
 
 
-def calcDist2ImgVals(inputValsImg, outputDistImg, pxlVals, valsImgBand=1, outImgFormat='KEA', maxDist=None, noDataVal=None, unitGEO=True):
+def calcDist2ImgVals(inputValsImg, outputDistImg, pxlVals, valsImgBand=1, gdalFormat='KEA', maxDist=None, noDataVal=None, unitGEO=True):
     """ 
 A function to calculate the distance to the nearest pixel value with one of the specified values.
 
@@ -100,7 +100,7 @@ Where:
 * outputDistImg is a string specfiying the output image file.
 * pxlVals is a number of list of numbers specifying the features to which the distance from should be calculated.
 * valsImgBand is an integer specifying the image band of the input image to be used (Default = 1).
-* outImgFormat is a string specifying the output image format (Default = KEA)
+* gdalFormat is a string specifying the output image format (Default = KEA)
 * maxDist is a number specifying the maximum distance to be calculated, if None not max value is used (Default = None).
 * noDataVal is the no data value in the input image for which distance should not be calculated for (Default = None; None = no specified no data value).
 * unitGEO is a boolean specifying the output distance units. True = Geographic units (e.g., metres), False is in Pixels (Default = True).
@@ -149,7 +149,7 @@ Example::
         
     valsImgDS = gdal.Open(inputValsImg, gdal.GA_ReadOnly)
     valsImgBand = valsImgDS.GetRasterBand(valsImgBand)
-    rsgislib.imageutils.createCopyImage(inputValsImg, outputDistImg, 1, 0.0, outImgFormat, rsgislib.TYPE_32FLOAT)
+    rsgislib.imageutils.createCopyImage(inputValsImg, outputDistImg, 1, 0.0, gdalFormat, rsgislib.TYPE_32FLOAT)
     distImgDS = gdal.Open(outputDistImg, gdal.GA_Update)
     distImgBand = distImgDS.GetRasterBand(1)
     gdal.ComputeProximity(valsImgBand, distImgBand, proxOptions, callback=gdal.TermProgress)
@@ -181,7 +181,7 @@ This function is used internally within calcDist2Classes for the multiprocessing
 
 
 
-def calcDist2ImgValsTiled(inputValsImg, outputDistImg, pxlVals, valsImgBand=1, maxDist=1000, noDataVal=1000, outImgFormat='KEA', unitGEO=True, tmpDIR='./tmp', tileSize=2000,  nCores=-1):
+def calcDist2ImgValsTiled(inputValsImg, outputDistImg, pxlVals, valsImgBand=1, maxDist=1000, noDataVal=1000, gdalFormat='KEA', unitGEO=True, tmpDIR='./tmp', tileSize=2000,  nCores=-1):
     """ 
 A function to calculate the distance to the nearest pixel value with one of the specified values.
 
@@ -191,7 +191,7 @@ Where:
 * outputDistImg is a string specfiying the output image file.
 * pxlVals is a number of list of numbers specifying the features to which the distance from should be calculated.
 * valsImgBand is an integer specifying the image band of the input image to be used (Default = 1).
-* outImgFormat is a string specifying the output image format (Default = KEA)
+* gdalFormat is a string specifying the output image format (Default = KEA)
 * maxDist is a number specifying the maximum distance to be calculated, if None not max value is used (Default = None).
 * noDataVal is the no data value in the input image for which distance should not be calculated for (Default = None; None = no specified no data value).
 * unitGEO is a boolean specifying the output distance units. True = Geographic units (e.g., metres), False is in Pixels (Default = True).
@@ -305,7 +305,7 @@ Example::
         p.map(_computeProximityArrArgsFunc, distTileArgs)
             
     # Mosaic Tiles
-    imageutils.createImageMosaic(distTiles, outputDistImg, 0, 0, 1, 1, 'KEA', rsgislib.TYPE_32FLOAT)
+    imageutils.createImageMosaic(distTiles, outputDistImg, 0, 0, 1, 1, gdalFormat, rsgislib.TYPE_32FLOAT)
     imageutils.popImageStats(outputDistImg, usenodataval=True, nodataval=0, calcpyramids=True)
     
     for imgFile in distTiles:
