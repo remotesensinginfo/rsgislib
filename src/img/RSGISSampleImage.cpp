@@ -200,23 +200,30 @@ namespace rsgis{namespace img{
             {
                 foundSamples = false;
                 samplesCount = 0;
-                
-                for(unsigned long j = 0; j < numSamples; ++j)
+                if(!maskPxlLocs[i].empty())
                 {
-                    pxlIdx = pxlGen();
-                    while(pxlIdx >= maskPxlLocs[i].size())
+                    for(unsigned long j = 0; j < numSamples; ++j)
                     {
                         pxlIdx = pxlGen();
+                        while(pxlIdx >= maskPxlLocs[i].size())
+                        {
+                            pxlIdx = pxlGen();
+                        }
+                        
+                        xPxl = maskPxlLocs[i].at(pxlIdx).first;
+                        yPxl = maskPxlLocs[i].at(pxlIdx).second;
+                        
+                        imgUtils.setPixelValue(outputImage, imgBand, xPxl, yPxl, maskVals.at(i));
                     }
-                    
-                    xPxl = maskPxlLocs[i].at(pxlIdx).first;
-                    yPxl = maskPxlLocs[i].at(pxlIdx).second;
-                    
-                    imgUtils.setPixelValue(outputImage, imgBand, xPxl, yPxl, maskVals.at(i));
+                }
+                else
+                {
+                    std::cerr << "No samples with mask value " << maskVals.at(i) << std::endl;
+                    delete[] maskPxlLocs;
+                    throw RSGISImageException("There weren't any pixels within the mask");
                 }
             }
             delete[] maskPxlLocs;
-            
         }
         catch (RSGISImageCalcException &e)
         {
