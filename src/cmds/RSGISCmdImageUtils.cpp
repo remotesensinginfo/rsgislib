@@ -2018,8 +2018,55 @@ namespace rsgis{ namespace cmds {
             rsgis::img::RSGISImageUtils imgUtils;
             GDALDataset *outImgDS =  imgUtils.createCopy(inputImgDS, 1, outputImage, gdalFormat, outDSDataType);
             
+            std::cout << "Performing sampling - this can take some time if there are very few pixels of a given value.\n";
+            std::cout << "\t If it is slow consider using rsgislib.imageutils.performRandomPxlSampleInMaskLowPxlCount.\n";
             rsgis::img::RSGISSampleImage sampleImg;
             sampleImg.randomSampleImageMask(inputImgDS, 1, outImgDS, maskVals, numSamples);
+            std::cout << "Completed Sampling.\n";
+            
+            GDALClose(inputImgDS);
+            GDALClose(outImgDS);
+        }
+        catch (RSGISImageException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (RSGISException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+                
+    void executePerformRandomPxlSampleSmallPxlCount(std::string inputImage, std::string outputImage, std::string gdalFormat, std::vector<int> maskVals, unsigned long numSamples) throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            
+            GDALDataset *inputImgDS = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+            if(inputImgDS == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw RSGISImageException(message.c_str());
+            }
+            if(inputImgDS->GetRasterCount() != 1)
+            {
+                throw RSGISImageException("The input image must only have one image band.");
+            }
+            
+            GDALDataType outDSDataType = inputImgDS->GetRasterBand(1)->GetRasterDataType();
+            
+            rsgis::img::RSGISImageUtils imgUtils;
+            GDALDataset *outImgDS =  imgUtils.createCopy(inputImgDS, 1, outputImage, gdalFormat, outDSDataType);
+            
+            std::cout << "Performing sampling.\n";
+            rsgis::img::RSGISSampleImage sampleImg;
+            sampleImg.randomSampleImageMaskSmallPxlCount(inputImgDS, 1, outImgDS, maskVals, numSamples);
+            std::cout << "Completed Sampling.\n";
             
             GDALClose(inputImgDS);
             GDALClose(outImgDS);
