@@ -1426,6 +1426,67 @@ static PyObject *ImageUtils_PerformRandomPxlSample(PyObject *self, PyObject *arg
     Py_RETURN_NONE;
 }
 
+static PyObject *ImageUtils_PerformRandomPxlSampleSmallPxlCount(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    static char *kwlist[] = {"inputImage", "outputImage", "gdalformat", "maskvals", "numSamples"};
+    const char *pszInputImage = "";
+    const char *pszOutputImage = "";
+    const char *pszGDALFormat = "";
+    PyObject *maskValsObj;
+    unsigned int numSamples = 0;
+    
+    
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssOI:performRandomPxlSampleInMaskLowPxlCount", kwlist, &pszInputImage, &pszOutputImage, &pszGDALFormat, &maskValsObj, &numSamples))
+    {
+        return NULL;
+    }
+    
+    std::vector<int> maskVals;
+    
+    if(!PySequence_Check(maskValsObj))
+    {
+        if(RSGISPY_CHECK_INT(maskValsObj))
+        {
+            maskVals.push_back(RSGISPY_INT_EXTRACT(maskValsObj));
+        }
+        else
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Mask value was not a sequence but a single value, however that value was not an integer.");
+            return NULL;
+        }
+    }
+    else
+    {
+        Py_ssize_t nMaskVals = PySequence_Size(maskValsObj);
+        for( Py_ssize_t n = 0; n < nMaskVals; n++ )
+        {
+            PyObject *o = PySequence_GetItem(maskValsObj, n);
+            if(RSGISPY_CHECK_INT(o))
+            {
+                maskVals.push_back(RSGISPY_INT_EXTRACT(o));
+            }
+            else
+            {
+                Py_DECREF(o);
+                PyErr_SetString(GETSTATE(self)->error, "Mask value was not a sequence but a single value, however that value was not an integer.");
+                return NULL;
+            }
+        }
+    }
+    
+    try
+    {
+        rsgis::cmds::executePerformRandomPxlSampleSmallPxlCount(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszGDALFormat), maskVals, numSamples);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 // Our list of functions in this module
 static PyMethodDef ImageUtilsMethods[] = {
     {"stretchImage", ImageUtils_StretchImage, METH_VARARGS, 
@@ -2129,6 +2190,21 @@ For example, can be used to produce monthly composite images from a stack with i
 {"performRandomPxlSampleInMask", (PyCFunction)ImageUtils_PerformRandomPxlSample, METH_VARARGS | METH_KEYWORDS,
 "rsgislib.imageutils.performRandomPxlSampleInMask(inputImage=string, outputImage=string, gdalformat=string, maskvals=int|list, numSamples=unsigned int)\n"
 "Randomly sample with a mask (e.g., classification). The same number of samples will be identified within each mask value listed by maskvals.\n"
+"\n"
+"Where:\n"
+"\n"
+"* inputImage is a string for the input image mask - mask is typically whole values within regions (e.g., classifications).\n"
+"* outputImage is a string with the name and path of the output image. Output is the mask pixel values.\n"
+"* gdalformat is a string with the GDAL output file format.\n"
+"* maskvals can either be a single integer value or a list of values. If a list of values is specified then the total number of points identified (numSamples x n-maskVals).\n"
+"* numSamples is the number of samples to be created within each region.\n"
+"\n"},
+    
+{"performRandomPxlSampleInMaskLowPxlCount", (PyCFunction)ImageUtils_PerformRandomPxlSampleSmallPxlCount, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.performRandomPxlSampleInMaskLowPxlCount(inputImage=string, outputImage=string, gdalformat=string, maskvals=int|list, numSamples=unsigned int)\n"
+"Randomly sample with a mask (e.g., classification). The same number of samples will be identified within each mask value listed by maskvals.\n"
+"This function produces a similar result to rsgislib.imageutils.performRandomPxlSampleInMask but is more efficient for classes where only a small number of\n"
+"pixels have that value. However, this function uses much more memory.\n"
 "\n"
 "Where:\n"
 "\n"
