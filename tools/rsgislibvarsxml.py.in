@@ -1,0 +1,105 @@
+#! /usr/bin/env python
+
+############################################################################
+# Copyright (c) 2012 Dr. Peter Bunting
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+#
+#
+# Purpose:  A class to generate XML for the RSGISLib library based
+#           on a supplied template.
+# Author: Pete Bunting
+# Email: petebunting@mac.com
+# Date: 02/04/2012
+# Version: 1.0
+#
+# History:
+# Version 1.0 - Created.
+#
+#############################################################################
+
+import os.path
+import sys
+from time import strftime
+import optparse
+
+class RSGISLibXMLVariables (object):
+
+    def readInputTemplate(self, inputFile):
+        xmloutline = str()
+        inputXMLFile = open(inputFile, 'r')
+        for eachLine in inputXMLFile:
+            xmloutline = xmloutline + eachLine
+        return xmloutline
+
+    def constructXMLFile(self, variables, xmloutline, outputfile):
+        outputXMLFile = open(outputfile, 'w')
+
+        xmloutlineWithVarValues = xmloutline
+        count = 1
+        for var in variables:
+            var = var.strip()
+            symbolReplace = str("$VAR") + str(count)
+            print("Replacing: ", symbolReplace, " with ", var)
+            xmloutlineWithVarValues = xmloutlineWithVarValues.replace(symbolReplace, var, xmloutlineWithVarValues.count(symbolReplace))
+            count = count + 1
+
+        outputXMLFile.write(xmloutlineWithVarValues)
+
+        outputXMLFile.flush()
+        outputXMLFile.close()
+
+    def run(self, cmdargs):
+        print('rsgislibcmdxml.py script generates the XML commands for the ')
+        print('@PACKAGE@ software library from a user defined template.')
+        print('This script was distributed with @RSGISLIB_PACKAGE_STRING@')
+        print('Copyright (C) @RSGISLIB_COPYRIGHT_YEAR@ Peter Bunting and Daniel Clewley')
+        print('For support please email @RSGISLIB_PACKAGE_BUGREPORT@')
+
+        inTemplateStr = self.readInputTemplate(cmdargs.inputxml)
+        self.constructXMLFile(cmdargs.variables, inTemplateStr, cmdargs.outputxml.strip())
+        print('Commands written to single XML file')
+        print('If complete run using:\n rsgisexe -x ' + cmdargs.outputxml.strip())
+        
+
+# Command arguments
+class CmdArgs:
+  def __init__(self):
+    p = optparse.OptionParser()
+    p.add_option("-i","--input", dest="inputxml", default=None, help="Input XML template")
+    p.add_option("-o","--output", dest="outputxml", default=None, help="Output XML file")
+    p.add_option("-v","--variable", action="append", dest="variables", default=None, help="Input varibles to be replaced using $VARx for variables in order (e.g., $VAR1, $VAR2 ... $VARn).")
+
+    (options, args) = p.parse_args()
+    self.__dict__.update(options.__dict__)
+
+    if self.inputxml is None:
+        p.print_help()
+        print("Input xml file must be set.")
+        sys.exit()
+
+    if self.outputxml is None:
+        p.print_help()
+        print("Output xml filename must be set.")
+        sys.exit()
+
+if __name__ == '__main__':
+    cmdargs = CmdArgs()
+    obj = RSGISLibXMLVariables()
+    obj.run(cmdargs)
+

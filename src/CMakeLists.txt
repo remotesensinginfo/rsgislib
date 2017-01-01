@@ -18,6 +18,7 @@ set(RSGIS_SRC_SEGMENTATION_DIR segmentation)
 set(RSGIS_SRC_UTILS_DIR utils)
 set(RSGIS_SRC_VEC_DIR vec)
 set(RSGIS_SRC_CMDS_DIR cmds)
+set(RSGIS_SRC_EXE_DIR exe/rsgis)
 ###############################################################################
 
 ###############################################################################
@@ -1288,10 +1289,69 @@ set(LIB_VEC_H
 	
 ###############################################################################
 
+###############################################################################
+# Files within the RSGISLib executable.
+set(EXE_RSGISEXE_CPP
+	${RSGIS_SRC_EXE_DIR}/RSGISExeClassification.cpp 
+	${RSGIS_SRC_EXE_DIR}/RSGISExeClassification.h 
+	${RSGIS_SRC_EXE_DIR}/RSGISExeCommandLine.cpp 
+	${RSGIS_SRC_EXE_DIR}/RSGISExeCommandLine.h 
+	${RSGIS_SRC_EXE_DIR}/RSGISExeCreateTestImages.cpp 
+	${RSGIS_SRC_EXE_DIR}/RSGISExeCreateTestImages.h 
+	${RSGIS_SRC_EXE_DIR}/RSGISExeEstimationAlgorithm.cpp 
+	${RSGIS_SRC_EXE_DIR}/RSGISExeEstimationAlgorithm.h 
+	${RSGIS_SRC_EXE_DIR}/RSGISExeFFTUtils.cpp 
+	${RSGIS_SRC_EXE_DIR}/RSGISExeFFTUtils.h 
+	${RSGIS_SRC_EXE_DIR}/RSGISExeFilterImages.cpp 
+	${RSGIS_SRC_EXE_DIR}/RSGISExeFilterImages.h 
+	${RSGIS_SRC_EXE_DIR}/RSGISExeFitting.cpp 
+	${RSGIS_SRC_EXE_DIR}/RSGISExeFitting.h 
+	${RSGIS_SRC_EXE_DIR}/RSGISExeImageCalculation.cpp 
+	${RSGIS_SRC_EXE_DIR}/RSGISExeImageCalculation.h 
+	${RSGIS_SRC_EXE_DIR}/RSGISExeImageConversion.cpp 
+	${RSGIS_SRC_EXE_DIR}/RSGISExeImageConversion.h 
+	${RSGIS_SRC_EXE_DIR}/RSGISExeImageUtils.cpp 
+	${RSGIS_SRC_EXE_DIR}/RSGISExeImageUtils.h 
+	${RSGIS_SRC_EXE_DIR}/RSGISExeMathsUtilities.cpp 
+	${RSGIS_SRC_EXE_DIR}/RSGISExeMathsUtilities.h 
+	${RSGIS_SRC_EXE_DIR}/RSGISExePostClassification.cpp 
+	${RSGIS_SRC_EXE_DIR}/RSGISExePostClassification.h 
+	${RSGIS_SRC_EXE_DIR}/RSGISExeRadarUtils.cpp 
+	${RSGIS_SRC_EXE_DIR}/RSGISExeRadarUtils.h 
+	${RSGIS_SRC_EXE_DIR}/RSGISExeSARBayesianBiomass.cpp 
+	${RSGIS_SRC_EXE_DIR}/RSGISExeSARBayesianBiomass.h 
+	${RSGIS_SRC_EXE_DIR}/RSGISExeSARSaatchiBiomass.cpp 
+	${RSGIS_SRC_EXE_DIR}/RSGISExeSARSaatchiBiomass.h 
+	${RSGIS_SRC_EXE_DIR}/RSGISExeSegment.cpp 
+	${RSGIS_SRC_EXE_DIR}/RSGISExeSegment.h 
+	${RSGIS_SRC_EXE_DIR}/RSGISExeStackBands.cpp 
+	${RSGIS_SRC_EXE_DIR}/RSGISExeStackBands.h 
+	${RSGIS_SRC_EXE_DIR}/RSGISExeTransectModel.cpp 
+	${RSGIS_SRC_EXE_DIR}/RSGISExeTransectModel.h 
+	${RSGIS_SRC_EXE_DIR}/RSGISExeVectorUtils.cpp 
+	${RSGIS_SRC_EXE_DIR}/RSGISExeVectorUtils.h 
+	${RSGIS_SRC_EXE_DIR}/RSGISExeVisualisation.cpp 
+	${RSGIS_SRC_EXE_DIR}/RSGISExeVisualisation.h 
+	${RSGIS_SRC_EXE_DIR}/RSGISExeZonalStats.cpp 
+	${RSGIS_SRC_EXE_DIR}/RSGISExeZonalStats.h 
+	${RSGIS_SRC_EXE_DIR}/RSGISExeImageRegistration.cpp 
+	${RSGIS_SRC_EXE_DIR}/RSGISExeImageRegistration.h 
+	${RSGIS_SRC_EXE_DIR}/RSGISExeImageCalibration.cpp 
+	${RSGIS_SRC_EXE_DIR}/RSGISExeImageCalibration.h 
+	${RSGIS_SRC_EXE_DIR}/RSGISExeElevationDataTools.cpp
+	${RSGIS_SRC_EXE_DIR}/RSGISExeElevationDataTools.h 
+	${RSGIS_SRC_EXE_DIR}/RSGISExeImageMorphology.cpp
+	${RSGIS_SRC_EXE_DIR}/RSGISExeImageMorphology.h
+	${RSGIS_SRC_EXE_DIR}/main.cpp
+	)
+
+###############################################################################
+
 
 ###############################################################################
 # Group source files for IDE source explorers
 source_group("CMake Files" FILES CMakeLists.txt)
+source_group("RSGISEXE" FILES ${EXE_RSGISEXE_CPP} )
 source_group("cmpfit" FILES ${LIB_CMPFIT_CPP})
 source_group("Calibration" FILES ${LIB_CALIBRATION_CPP})
 source_group("Classify" FILES ${LIB_CLASSIFY_CPP})
@@ -1471,6 +1531,13 @@ PROPERTIES
 
 ###############################################################################
 
+###############################################################################
+# Build executables
+#if (RSGISLIB_WITH_RSGISEXE)
+	add_executable(rsgisexe ${EXE_RSGISEXE_CPP})
+	target_link_libraries (rsgisexe ${RSGISLIB_COMMONS_LIB_NAME} ${RSGISLIB_DATASTRUCT_LIB_NAME} ${RSGISLIB_MATHS_LIB_NAME} ${RSGISLIB_UTILS_LIB_NAME} ${RSGISLIB_GEOM_LIB_NAME} ${RSGISLIB_IMG_LIB_NAME} ${RSGISLIB_REGISTRATION_LIB_NAME} ${RSGISLIB_CALIBRATION_LIB_NAME} ${RSGISLIB_FILTERING_LIB_NAME} ${RSGISLIB_RASTERGIS_LIB_NAME} ${RSGISLIB_SEGMENTATION_LIB_NAME} ${RSGISLIB_VECTOR_LIB_NAME} ${RSGISLIB_MODELING_LIB_NAME} ${RSGISLIB_RADAR_LIB_NAME} ${RSGISLIB_CLASSIFY_LIB_NAME} ${RSGISLIB_CMDSINTERFACE_LIB_NAME} ${BOOST_LIBRARIES} ${GDAL_LIBRARIES} ${GEOS_LIBRARIES} ${GSL_LIBRARIES} ${MUPARSER_LIBRARIES} ${XERCESC_LIBRARIES}  ${CGAL_LIBRARIES} ${GMP_LIBRARIES} ${MPFR_LIBRARIES} ${KEA_LIBRARIES} ${BOOST_LIBRARIES})
+#endif(RSGISLIB_WITH_RSGISEXE)
+###############################################################################
 
 ###############################################################################
 # Installation 
@@ -1490,6 +1557,8 @@ install (TARGETS ${RSGISLIB_MODELING_LIB_NAME} DESTINATION lib)
 install (TARGETS ${RSGISLIB_RADAR_LIB_NAME} DESTINATION lib)
 install (TARGETS ${RSGISLIB_CLASSIFY_LIB_NAME} DESTINATION lib)
 install (TARGETS ${RSGISLIB_CMDSINTERFACE_LIB_NAME} DESTINATION lib)
+
+install (TARGETS rsgisexe DESTINATION bin)
 
 install (FILES ${LIB_CALIBRATION_H} DESTINATION include/rsgis/calibration)
 install (FILES ${LIB_CLASSIFY_H} DESTINATION include/rsgis/classifier)

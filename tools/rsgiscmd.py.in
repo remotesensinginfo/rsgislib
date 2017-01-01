@@ -1,0 +1,199 @@
+#!/usr/bin/env python
+
+############################################################################
+# Copyright (c) 2012 Dan Clewley, Aberystwyth University
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+#
+#
+# Purpose:  A python script to generate XML files for use within RSGISLib from
+#           command line options
+# Author: Dan Clewley
+# Email: daniel.clewley@gmail.com
+# Date: 15/02/2012
+# Version: 1.0
+#
+# History:
+# Version 1.0 - Created.
+# Version 1.1 - Updated to parse XML command list and print in format for
+#               rsgiscmd
+# Version 1.2 - Updated to use object oriented design
+#############################################################################
+
+import sys, re, os
+import tempfile as tempfile
+
+class RSGISXMLInputFile2CMD(object):
+
+    def getCommands(self, algorithm):
+        ''' Convert RSGISLib XML commands list to list of commands for rsgiscmd '''
+    
+        xmlFile = open("@CMAKE_INSTALL_PREFIX@/doc/RSGISLib_XML_Listing.xml",'r')
+        
+        xmlstring = ""
+        
+        singleLineCommand = False
+        
+        for line in xmlFile:
+            if line.find("<!--") < 0:
+                xmlstring = xmlstring + line
+        
+        xmlstring = re.sub("\n","",xmlstring)
+        xmlstring = re.sub('<rsgis:commands xmlns:rsgis="http://www.rsgislib.org/xml/">',"",xmlstring)
+        xmlstring = re.sub("/>","",xmlstring)
+        xmlstring = re.sub("\[","",xmlstring)
+        xmlstring = re.sub("\]","",xmlstring)
+        xmlstring = re.sub("<rsgis:command",";",xmlstring)
+        xmlstring = re.sub('="','$',xmlstring)
+        xmlstring = re.sub('"','$',xmlstring)
+        xmlstringCommand = xmlstring.split(';',xmlstring.count(';'))
+        outCommands = ''
+        selectedOutCommands = ''
+        for line in xmlstringCommand:
+            commandString = ''
+            xmlCommandOptions = line.split('$',line.count('$'))
+            i = 0
+            while i < (len(xmlCommandOptions)-1):
+                if(xmlCommandOptions[i].find("<rsgis:")) > 0:
+                    i = len(xmlCommandOptions)
+                    commandString = ''
+                else:
+                    commandString = commandString + ' --' + xmlCommandOptions[i].strip()+ ' ' + xmlCommandOptions[i+1].strip()
+                    i = i + 2
+            if commandString != '':
+                outCommands = outCommands + commandString + '\n'
+                if commandString.find('--algor ' + algorithm + ' ') > 0:
+                    selectedOutCommands = selectedOutCommands + commandString + '\n'
+        
+        return selectedOutCommands, outCommands
+    
+    def getAvailableCommands(self):
+        os.system('rsgisexe -l')
+
+class RSGIS2CMD(object):
+    
+    def help(self):
+        helpText = '''rsgiscmd - Generates and runs an XML file within RSGISLib, using command line options.
+Usage:
+    rsgiscmd --xml '<rsgis:command XMLOPTIONS />'
+or
+    rsgiscmd --xmlvariable xmlparameter
+eg:
+    rsgiscmd --algor imagecalc --option apply2VarFunction --input INPUT_IMAGE.env 
+        --output OUTPUT_IMAGE.env --function 2DPoly --coefficients COEFFICIENTS
+
+To get a list of available algorithms, use:
+    rsgiscmd -l
+
+To get available options for selected algorithm use:
+    rsgiscmd -h algorithm
+or to see options for all algorithms use:
+    rsgiscmd -h all
+
+Note: not all algorithms are availabe using rsgiscmd. To see
+all available commands in RSGISLib using the main XML interface
+run:
+    rsgislibxmllist
+or open:
+    @CMAKE_INSTALL_PREFIX@/doc/RSGISLib_XML_Listing.xml
+
+This script was distributed with @RSGISLIB_PACKAGE_STRING@.
+Copyright (C) @RSGISLIB_COPYRIGHT_YEAR@ Peter Bunting and Daniel Clewley
+
+For support please email @RSGISLIB_PACKAGE_BUGREPORT@.
+'''
+        print(helpText)
+
+    def createAndRunXML(self):
+        incommand = ''
+        rsgiscmd = ''
+        
+        first = True
+        
+        # Check for XML
+        if len(sys.argv) == 3 and sys.argv[1] == '--xml':
+            rsgiscmd = sys.argv[2]
+        
+        else:
+            for par in sys.argv:
+                if first: # don't include first option
+                    first = False
+                else:
+                    incommand = incommand + ';' + str(par) # Seperate commands with a semi-colon
+                    
+            optionParList = incommand.split('--', incommand.count('--'))
+            rsgiscmd = '<rsgis:command '
+            for optionPar in optionParList:
+                command = optionPar.split(';',optionPar.count(';'))
+                if command[0] != '':
+                    rsgiscmd = rsgiscmd + command[0] + '="' + command[1] + '" '
+            rsgiscmd = rsgiscmd + ' />'
+        
+        (osHandle, outXMLName) = tempfile.mkstemp(suffix='.xml')
+        outFile = open(outXMLName, 'w')
+        outLine = '''<rsgis:commands xmlns:rsgis=\"http://www.rsgislib.org/xml/\">
+            %s
+        </rsgis:commands>
+        '''%rsgiscmd
+        
+        outFile.write(outLine)
+        outFile.close()
+        os.system('rsgisexe -x ' + outXMLName)
+        os.remove(outXMLName)
+        
+if __name__ == '__main__':
+    xml2cmd = RSGISXMLInputFile2CMD()
+    rsgiscmd = RSGIS2CMD()
+
+    if len(sys.argv) == 1: 
+        rsgiscmd.help()
+        exit()
+    
+    elif (len(sys.argv) == 2):
+        if(sys.argv[1] == '--help' or sys.argv[1] == '-h'):
+            rsgiscmd.help()
+            exit()
+        elif(sys.argv[1] == '-l'):
+            xml2cmd.getAvailableCommands()
+            exit()
+    
+    elif (len(sys.argv) >= 3):
+        if(sys.argv[1] == '--help' or sys.argv[1] == '-h'):
+            algorithm = sys.argv[2].strip()
+            (selectedOutCommands, allOutCommands) = xml2cmd.getCommands(algorithm)
+            
+            if algorithm == 'all':
+                if allOutCommands != '':
+                    print(allOutCommands)
+                else:
+                    rsgiscmd.help()
+            
+            elif selectedOutCommands != '':
+                print(selectedOutCommands)
+            else:
+                rsgiscmd.help()
+            exit()
+        
+        elif(sys.argv[1] == '-l'):
+            xml2cmd.getAvailableCommands()
+            exit()
+        
+        else:
+            rsgiscmd.createAndRunXML()
+
+
