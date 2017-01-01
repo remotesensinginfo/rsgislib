@@ -24,13 +24,13 @@
 #ifndef RSGISFileUtils_H
 #define RSGISFileUtils_H
 
-#include <dirent.h>
-#include <errno.h>
 #include <vector>
 #include <list>
 #include <iostream>
 #include <string>
-#include <sys/stat.h>
+
+#include <boost/filesystem.hpp>
+
 #include "common/RSGISFileException.h"
 
 namespace rsgis{namespace utils{
