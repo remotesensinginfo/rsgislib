@@ -25,291 +25,283 @@
 
 namespace rsgis{namespace utils{
 
-RSGISFileUtils::RSGISFileUtils()
-{
-	
-}
+    RSGISFileUtils::RSGISFileUtils()
+    {
+        
+    }
 
-	void RSGISFileUtils::getDIRList(std::string dir, std::list<std::string> *files) throw(RSGISFileException)
-	{
-		DIR *dp;
-		struct dirent *dirp;
-		if((dp  = opendir(dir.c_str())) == NULL) 
-		{
-			std::string message = std::string("Could not open ") + dir;
-			throw RSGISFileException(message);
-		}
-		
-		while ((dirp = readdir(dp)) != NULL) 
-		{
-			files->push_back(std::string(dirp->d_name));
-		}
-		closedir(dp);
-	}
-	
-	void RSGISFileUtils::getDIRList(std::string dir, std::vector<std::string> *files) throw(RSGISFileException)
-	{
-		DIR *dp;
-		struct dirent *dirp;
-		if((dp  = opendir(dir.c_str())) == NULL) 
-		{
-			std::string message = std::string("Could not open ") + dir;
-			throw RSGISFileException(message);
-		}
-		
-		while ((dirp = readdir(dp)) != NULL) 
-		{
-			files->push_back(std::string(dirp->d_name));
-		}
-		closedir(dp);
-	}
-	
-	void RSGISFileUtils::getDIRList(std::string dir, std::string ext, std::list<std::string> *files, bool withpath) throw(RSGISFileException)
-	{
-		DIR *dp;
-		struct dirent *dirp;
-		if((dp  = opendir(dir.c_str())) == NULL) 
-		{
-			std::string message = std::string("Could not open ") + dir;
-			throw RSGISFileException(message);
-		}
-		
-		std::string filename = "";
-		
-		while ((dirp = readdir(dp)) != NULL) 
-		{
-			filename = std::string(dirp->d_name);
-			if(this->getExtension(filename) == ext)
-			{
-				if(withpath)
-				{
-					filename = dir + filename;
-				}
-				files->push_back(filename);
-			}
-		}
-		closedir(dp);		
-	}
-	
-	void RSGISFileUtils::getDIRList(std::string dir, std::string ext, std::vector<std::string> *files, bool withpath) throw(RSGISFileException)
-	{
-		DIR *dp;
-		struct dirent *dirp;
-		if((dp  = opendir(dir.c_str())) == NULL) 
-		{
-			std::string message = std::string("Could not open ") + dir;
-			throw RSGISFileException(message);
-		}
-		
-		std::string filename = "";
-		
-		while ((dirp = readdir(dp)) != NULL) 
-		{
-			filename = std::string(dirp->d_name);
-			if(this->getExtension(filename) == ext)
-			{
-				if(withpath)
-				{
-					filename = dir + filename;
-				}
-				files->push_back(filename);
-			}
-		}
-		closedir(dp);		
-	}
-	
-	std::string* RSGISFileUtils::getDIRList(std::string dir, std::string ext, int *numFiles, bool withpath) throw(RSGISFileException)
-	{
-		std::vector<std::string> *files = new std::vector<std::string>();
-		DIR *dp;
-		struct dirent *dirp;
-		if((dp  = opendir(dir.c_str())) == NULL) 
-		{
-			std::string message = std::string("Could not open ") + dir;
-			throw RSGISFileException(message);
-		}
-		
-		std::string filename = "";
-		
-		while ((dirp = readdir(dp)) != NULL) 
-		{
-			filename = std::string(dirp->d_name);
-			if(this->getExtension(filename) == ext)
-			{
-				if(withpath)
-				{
-					filename = dir + filename;
-				}
-				files->push_back(filename);
-			}
-		}
-		closedir(dp);
-		
-		*numFiles = files->size();
-		std::string *outputFiles = new std::string[*numFiles];
-		for(int i = 0; i < *numFiles; i++)
-		{
-			outputFiles[i] = dir + files->at(i);
-		}
-		delete files;
-		
-		return outputFiles;
-	}
-	
-	std::string* RSGISFileUtils::getFilesInDIRWithName(std::string dir, std::string name, int *numFiles) throw(RSGISFileException)
-	{
-		std::vector<std::string> *files = new std::vector<std::string>();
-		DIR *dp;
-		struct dirent *dirp;
-		if((dp  = opendir(dir.c_str())) == NULL) 
-		{
-			std::string message = std::string("Could not open ") + dir;
-			throw RSGISFileException(message);
-		}
-		
-		std::string filename = "";
-		
-		while ((dirp = readdir(dp)) != NULL) 
-		{
-			filename = std::string(dirp->d_name);
-			//cout << "Filename (" << name << "): " << filename << " (" << this->getFileNameNoExtension(filename) << ")"<< endl;
-			if(this->getFileNameNoExtension(filename) == name)
-			{
-				files->push_back(filename);
-			}
-		}
-		closedir(dp);
-		
-		*numFiles = files->size();
-		std::string *outputFiles = new std::string[*numFiles];
-		for(int i = 0; i < *numFiles; i++)
-		{
-			outputFiles[i] = dir + files->at(i);
-		}
-		delete files;
-		
-		return outputFiles;
-	}
-	
-	std::string RSGISFileUtils::getFileName(std::string filepath)
-	{
-		//cout << filepath << endl;
-		int strSize = filepath.size();
-		int lastSlash = 0;
-		for(int i = 0; i < strSize; i++)
-		{
-			if(filepath.at(i) == '/')
-			{
-				lastSlash = i + 1;
-			}
-		}
-		std::string filename = filepath.substr(lastSlash);
-		//cout << filename << endl;
-		return filename;	
-	}
-	
-	std::string RSGISFileUtils::getFileNameNoExtension(std::string filepath)
-	{
-		//cout << filepath << endl;
-		int strSize = filepath.size();
-		int lastSlash = 0;
-		for(int i = 0; i < strSize; i++)
-		{
-			if(filepath.at(i) == '/')
-			{
-				lastSlash = i + 1;
-			}
-		}
-		std::string filename = filepath.substr(lastSlash);
-		//cout << filename << endl;
-		
-		strSize = filename.size();
-		int lastpt = 0;
-		for(int i = 0; i < strSize; i++)
-		{
-			if(filename.at(i) == '.')
-			{
-				lastpt = i;
-			}
-		}
-		
-		std::string layerName = filename.substr(0, lastpt);
-		//cout << layerName << endl;
-		return layerName;	
-	}
-	
-	std::string RSGISFileUtils::removeExtension(std::string filepath)
-	{
-		int strSize = filepath.size();
-		int lastpt = 0;
-		for(int i = 0; i < strSize; i++)
-		{
-			if(filepath.at(i) == '.')
-			{
-				lastpt = i;
-			}
-		}
-		
-		std::string layerName = filepath.substr(0, lastpt);
-		//cout << layerName << endl;
-		return layerName;	
-	}
-	
-	std::string RSGISFileUtils::getExtension(std::string filepath)
-	{
-		int strSize = filepath.size();
-		int lastpt = 0;
-		for(int i = 0; i < strSize; i++)
-		{
-			if(filepath.at(i) == '.')
-			{
-				lastpt = i;
-			}
-		}
-		
-		std::string extension = filepath.substr(lastpt);
-		//cout << layerName << endl;
-		return extension;	
-	}
-	
-	std::string RSGISFileUtils::getFileDirectoryPath(std::string filepath)
-	{
-		int strSize = filepath.size();
-		int lastSlash = 0;
-		for(int i = 0; i < strSize; i++)
-		{
-			if(filepath.at(i) == '/')
-			{
-				lastSlash = i + 1;
-			}
-		}
-		std::string path = filepath.substr(0, lastSlash);
-		//cout << path << endl;
-		return path;	
-	}
-	
-	bool RSGISFileUtils::checkFilePresent(std::string file)
-	{
-		struct stat stFileInfo; 
-		bool blnReturn; 
-		int intStat; 
-		
-		intStat = stat(file.c_str(), &stFileInfo); 
-		if(intStat == 0) 
-		{  
-			blnReturn = true; 
-		} 
-		else 
-		{ 
-			blnReturn = false; 
-		}
-		
-		return blnReturn; 
-	}
+    void RSGISFileUtils::getDIRList(std::string dir, std::list<std::string> *files) throw(RSGISFileException)
+    {
+        boost::filesystem::path inDIR(dir);
+        try
+        {
+            if(boost::filesystem::exists(inDIR))
+            {
+                if (boost::filesystem::is_directory(inDIR))
+                {
+                    for (boost::filesystem::directory_entry& x : boost::filesystem::directory_iterator(inDIR))
+                    {
+                        files->push_back(x.path().string());
+                    }
+                }
+                else
+                {
+                    throw RSGISFileException("Input path is not a directory.");
+                }
+            }
+            else
+            {
+                throw RSGISFileException("Input path does not exist.");
+            }
+        }
+        catch (const boost::filesystem::filesystem_error& e)
+        {
+            throw RSGISFileException(e.what());
+        }
+    }
 
-RSGISFileUtils::~RSGISFileUtils()
-{
-	
-}
+    void RSGISFileUtils::getDIRList(std::string dir, std::vector<std::string> *files) throw(RSGISFileException)
+    {
+        boost::filesystem::path inDIR(dir);
+        try
+        {
+            if(boost::filesystem::exists(inDIR))
+            {
+                if (boost::filesystem::is_directory(inDIR))
+                {
+                    for (boost::filesystem::directory_entry& x : boost::filesystem::directory_iterator(inDIR))
+                    {
+                        files->push_back(x.path().string());
+                    }
+                }
+                else
+                {
+                    throw RSGISFileException("Input path is not a directory.");
+                }
+            }
+            else
+            {
+                throw RSGISFileException("Input path does not exist.");
+            }
+        }
+        catch (const boost::filesystem::filesystem_error& e)
+        {
+            throw RSGISFileException(e.what());
+        }
+    }
+
+    void RSGISFileUtils::getDIRList(std::string dir, std::string ext, std::list<std::string> *files, bool withpath) throw(RSGISFileException)
+    {
+        boost::filesystem::path tmpPath;
+        boost::filesystem::path inDIR(dir);
+        try
+        {
+            if(boost::filesystem::exists(inDIR))
+            {
+                if (boost::filesystem::is_directory(inDIR))
+                {
+                    for (boost::filesystem::directory_entry& x : boost::filesystem::directory_iterator(inDIR))
+                    {
+                        tmpPath = x.path();
+                        if(tmpPath.extension().string() == ext)
+                        {
+                            if(withpath)
+                            {
+                                files->push_back(tmpPath.string());
+                            }
+                            else
+                            {
+                                files->push_back(tmpPath.filename().string());
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    throw RSGISFileException("Input path is not a directory.");
+                }
+            }
+            else
+            {
+                throw RSGISFileException("Input path does not exist.");
+            }
+        }
+        catch (const boost::filesystem::filesystem_error& e)
+        {
+            throw RSGISFileException(e.what());
+        }
+    }
+
+    void RSGISFileUtils::getDIRList(std::string dir, std::string ext, std::vector<std::string> *files, bool withpath) throw(RSGISFileException)
+    {
+        boost::filesystem::path tmpPath;
+        boost::filesystem::path inDIR(dir);
+        try
+        {
+            if(boost::filesystem::exists(inDIR))
+            {
+                if (boost::filesystem::is_directory(inDIR))
+                {
+                    for (boost::filesystem::directory_entry& x : boost::filesystem::directory_iterator(inDIR))
+                    {
+                        tmpPath = x.path();
+                        if(tmpPath.extension().string() == ext)
+                        {
+                            if(withpath)
+                            {
+                                files->push_back(tmpPath.string());
+                            }
+                            else
+                            {
+                                files->push_back(tmpPath.filename().string());
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    throw RSGISFileException("Input path is not a directory.");
+                }
+            }
+            else
+            {
+                throw RSGISFileException("Input path does not exist.");
+            }
+        }
+        catch (const boost::filesystem::filesystem_error& e)
+        {
+            throw RSGISFileException(e.what());
+        }
+    }
+
+    std::string* RSGISFileUtils::getDIRList(std::string dir, std::string ext, int *numFiles, bool withpath) throw(RSGISFileException)
+    {
+        std::vector<std::string> files;
+        boost::filesystem::path tmpPath;
+        boost::filesystem::path inDIR(dir);
+        try
+        {
+            if(boost::filesystem::exists(inDIR))
+            {
+                if (boost::filesystem::is_directory(inDIR))
+                {
+                    for (boost::filesystem::directory_entry& x : boost::filesystem::directory_iterator(inDIR))
+                    {
+                        tmpPath = x.path();
+                        if(tmpPath.extension().string() == ext)
+                        {
+                            if(withpath)
+                            {
+                                files.push_back(tmpPath.string());
+                            }
+                            else
+                            {
+                                files.push_back(tmpPath.filename().string());
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    throw RSGISFileException("Input path is not a directory.");
+                }
+            }
+            else
+            {
+                throw RSGISFileException("Input path does not exist.");
+            }
+        }
+        catch (const boost::filesystem::filesystem_error& e)
+        {
+            throw RSGISFileException(e.what());
+        }
+        
+        *numFiles = files.size();
+        std::string *outFiles = new std::string[*numFiles];
+        for(int i = 0; i < *numFiles; i++)
+        {
+            outFiles[i] = files.at(i);
+        }
+        return outFiles;
+    }
+
+    std::string* RSGISFileUtils::getFilesInDIRWithName(std::string dir, std::string name, int *numFiles) throw(RSGISFileException)
+    {
+        std::vector<std::string> files;
+        boost::filesystem::path tmpPath;
+        boost::filesystem::path inDIR(dir);
+        try
+        {
+            if(boost::filesystem::exists(inDIR))
+            {
+                if (boost::filesystem::is_directory(inDIR))
+                {
+                    for (boost::filesystem::directory_entry& x : boost::filesystem::directory_iterator(inDIR))
+                    {
+                        tmpPath = x.path();
+                        if(tmpPath.filename().replace_extension().string() == name)
+                        {
+                            files.push_back(tmpPath.string());
+                        }
+                    }
+                }
+                else
+                {
+                    throw RSGISFileException("Input path is not a directory.");
+                }
+            }
+            else
+            {
+                throw RSGISFileException("Input path does not exist.");
+            }
+        }
+        catch (const boost::filesystem::filesystem_error& e)
+        {
+            throw RSGISFileException(e.what());
+        }
+        
+        *numFiles = files.size();
+        std::string *outFiles = new std::string[*numFiles];
+        for(int i = 0; i < *numFiles; i++)
+        {
+            outFiles[i] = files.at(i);
+        }
+        return outFiles;
+    }
+
+    std::string RSGISFileUtils::getFileName(std::string filepath)
+    {
+        return boost::filesystem::path(filepath).filename().string();
+    }
+
+    std::string RSGISFileUtils::getFileNameNoExtension(std::string filepath)
+    {
+        return boost::filesystem::path(filepath).filename().replace_extension().string();
+    }
+
+    std::string RSGISFileUtils::removeExtension(std::string filepath)
+    {
+        return boost::filesystem::path(filepath).replace_extension().string();
+    }
+
+    std::string RSGISFileUtils::getExtension(std::string filepath)
+    {
+        return boost::filesystem::path(filepath).extension().string();
+    }
+
+    std::string RSGISFileUtils::getFileDirectoryPath(std::string filepath)
+    {
+        return boost::filesystem::path(filepath).parent_path().string();
+    }
+
+    bool RSGISFileUtils::checkFilePresent(std::string file)
+    {
+        return boost::filesystem::exists(boost::filesystem::path(file));
+    }
+
+    RSGISFileUtils::~RSGISFileUtils()
+    {
+        
+    }
 	
 }} //rsgis::utils
