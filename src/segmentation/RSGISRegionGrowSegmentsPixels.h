@@ -37,7 +37,6 @@
 
 #include "img/RSGISImageCalcException.h"
 #include "img/RSGISImageUtils.h"
-//#include "rastergis/RSGISHierarchicalClumps.h"
 
 #include "gdal_priv.h"
 #include "ogrsf_frmts.h"
