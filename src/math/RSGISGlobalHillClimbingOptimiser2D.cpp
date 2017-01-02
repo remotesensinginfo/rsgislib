@@ -616,20 +616,16 @@ namespace rsgis{namespace math{
 					}
 					else
 					{
-						//cout << "Distance = " << (*iterCoords)->distance(*coord) << endl;
 						distance = (*iterCoords)->distance(*coord);
 						if((distance < 0.5) & (outCoords->size() > 3))
 						{
-							//cout << "Removed Coordinate\n";
 							outCoords->erase(iterCoords);
 						}
 						else if(distance > 3)
 						{
-							//cout << "Add Coordinate\n";
 							float tmpDist = distance/2;
 							tmpCoord = new geos::geom::Coordinate();
 							this->findPointOnLine(coord, (*iterCoords), tmpDist, tmpCoord);
-							//cout << "tmpCoord= [" << tmpCoord->x << "," << tmpCoord->y << "]\n";
 							iterCoords = outCoords->insert(iterCoords,tmpCoord);
 						}
 						else 
@@ -705,7 +701,6 @@ namespace rsgis{namespace math{
 				
 				change = false;
 				nodeCount = 0;
-				//cout << "Iterate Through coords" << endl;
 				
 				for(iterCoords = outCoords->begin(); iterCoords != outCoords->end(); ++iterCoords)
 				{
@@ -878,7 +873,6 @@ namespace rsgis{namespace math{
 					++nodeCount;
 				}
 				
-				//cout << "Node Count = " << nodeCount << endl << endl;
 				// Iterate through the coordinate and remove pts which are too
 				// close to one another and introduce new points where gaps are 
 				// too large.
@@ -895,20 +889,16 @@ namespace rsgis{namespace math{
 					}
 					else
 					{
-						//cout << "Distance = " << (*iterCoords)->distance(*coord) << endl;
 						distance = (*iterCoords)->distance(*coord);
 						if((distance < 0.5) & (outCoords->size() > 3))
 						{
-							//cout << "Removed Coordinate\n";
 							outCoords->erase(iterCoords);
 						}
 						else if(distance > 3)
 						{
-							//cout << "Add Coordinate\n";
 							float tmpDist = distance/2;
 							tmpCoord = new geos::geom::Coordinate();
 							this->findPointOnLine(coord, (*iterCoords), tmpDist, tmpCoord);
-							//cout << "tmpCoord= [" << tmpCoord->x << "," << tmpCoord->y << "]\n";
 							iterCoords = outCoords->insert(iterCoords,tmpCoord);
 						}
 						else 
@@ -925,17 +915,7 @@ namespace rsgis{namespace math{
 				
 				++numIteration;
 			}
-			
             std::cout << " Complete\n";
-			
-			/*
-			cout << endl;
-			for(iterCoords = outCoords->begin(); iterCoords != outCoords->end(); ++iterCoords)
-			{
-				cout << (*iterCoords)->x << ";" << (*iterCoords)->y << "\n";
-			}
-			cout << endl;
-			*/
 			
 			delete minBoundary;
 			delete coord;	
@@ -963,12 +943,6 @@ namespace rsgis{namespace math{
 			double y1 = distance * sin(theta);
 			double x1 = distance * cos(theta);
 			
-			//cout << "dx = " << dx << endl;
-			//cout << "dy = " << dy << endl;
-			 
-			//cout << "x1 = " << x1 << endl;
-			//cout << "y1 = " << y1 << endl;
-			
 			if((dx >= 0) & (dy > 0))
 			{
 				p3->x = p1->x + x1;
@@ -991,10 +965,6 @@ namespace rsgis{namespace math{
 			}
 		}
 		p3->z = 0;
-		
-		//cout << "P1= [" << p1->x << "," << p1->y << "]\n";
-		//cout << "P2= [" << p2->x << "," << p2->y << "]\n";
-		//cout << "P3= [" << p3->x << "," << p3->y << "]\n";
 	}
 	
 	RSGISGlobalHillClimbingOptimiser2DVaryNumPts::~RSGISGlobalHillClimbingOptimiser2DVaryNumPts()

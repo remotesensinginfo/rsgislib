@@ -121,12 +121,7 @@ namespace rsgis{namespace vec{
 	
 	RSGISZonalCountStats::~RSGISZonalCountStats()
 	{
-		/*for(int i = 0; i < numAttributes; i++)
-		{
-			delete attributes[i];
-		}*/
-		//delete[] attributes;
-		delete[] data;
+        delete[] data;
 		
 		delete calcImage;
 		delete calcValue;

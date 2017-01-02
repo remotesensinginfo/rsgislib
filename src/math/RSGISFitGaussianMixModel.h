@@ -75,12 +75,6 @@ namespace rsgis{namespace math{
             for(int j = 0; j < numPeaks; ++j)
             {
                 idx = (j * 3) + 1;
-                /*cout << "noise: " << p[0] << endl;
-                 cout << "Peak " << j << endl;
-                 cout << "Amplitude: " << p[idx] << endl;
-                 cout << "xVal (offset): " << p[idx+1] << endl;
-                 cout << "width: " << p[idx+2] << endl << endl;*/
-                
                 predVal += (p[idx] * exp((-1.0)*
                                          (
                                           pow(modelData->xVal[i] - p[idx+1], 2)
@@ -89,10 +83,7 @@ namespace rsgis{namespace math{
                                           )));
             }
             predVal += p[0];
-            //cout << "PredVal = " << predVal << endl;
-            //cout << "pulse->intensity[" << i << "] = " << pulse->intensity[i] << endl;
             deviates[i] = (modelData->amplitude[i] - predVal) / modelData->error[i];
-            //cout << "PredVal - pulse->amplitude[" << i << "] = " << deviates[i] << endl;
         }
         
         return 0;

@@ -45,9 +45,7 @@ namespace rsgis{namespace filter{
 		int y = halfSizeFloor * (-1);
 		
 		filter->size = size;
-		
-		//double sumFilter = 0;
-		
+				
 		filter->filter = new float*[size];
 		for(int i = 0; i < size; i++)
 		{
@@ -56,19 +54,10 @@ namespace rsgis{namespace filter{
 			for(int j = 0; j < size; j++)
 			{
 				filter->filter[i][j] = calcFilter->calcFilterValue(x, y);
-				//sumFilter += filter->filter[i][j];
 				x++;
 			}
 			y++;
 		}
-		/*
-		for(int i = 0; i < size; i++)
-		{
-			for(int j = 0; j < size; j++)
-			{
-				filter->filter[i][j] = filter->filter[i][j] / sumFilter;
-			}
-		}*/
 		
 		return filter;
 	}

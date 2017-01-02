@@ -193,29 +193,9 @@ namespace rsgis{namespace rastergis{
             }
             delete stats2Calc;
             
-            //unsigned int i = 0;
-            //bool first = true;
             for(std::vector<std::vector<size_t>* >::iterator iterNeigh = neighbours->begin(); iterNeigh != neighbours->end(); ++iterNeigh)
             {
                 delete *iterNeigh;
-                /*std::cout << i << ":\t" << std::flush;
-                first = true;
-                for(std::vector<size_t>::iterator iterIds = (*iterNeigh)->begin(); iterIds != (*iterNeigh)->end(); ++iterIds)
-                {
-                    if(first)
-                    {
-                        std::cout << (*iterIds) << std::flush;
-                        first = false;
-                    }
-                    else
-                    {
-                        std::cout << ", " << (*iterIds) << std::flush;
-                    }
-                }
-                
-                std::cout << std::endl;
-                ++i;
-                 */
             }
             delete neighbours;
             

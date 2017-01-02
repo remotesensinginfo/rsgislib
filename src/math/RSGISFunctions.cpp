@@ -271,7 +271,6 @@ namespace rsgis{namespace math{
 		
 		RSGISMatrices matrixUtils;
 		RSGISVectors vectorUtils;
-		//matrixUtils.printGSLMatrix(this->invCovMatrixP);
 		
 		// || f(X) - d0 || ^2
 		double diffD1 = dataA - functionA->calcFunction(valueX, valueY);
@@ -445,19 +444,6 @@ namespace rsgis{namespace math{
 			
 			diffX = vectorUtils.dotProductVectorVectorGSL(tempA, deltaX);
 		}
-
-		/*if (diffX < 0)
-		{
-			std::cout << "Negative AP!" << std::endl;
-			std::cout << "tempA: ";
-			vectorUtils.printGSLVector(tempA);
-			std::cout << "deltaX:";
-			vectorUtils.printGSLVector(deltaX);
-		}
-		if (diffD < 0) 
-		{
-			std::cout << "Negative D!" << std::endl;
-		}*/
 			
 		return (diffD + diffX) / 2;
 		
@@ -607,10 +593,6 @@ namespace rsgis{namespace math{
 			outVal = outVal + acoeffXPow;
 		}
 		
-		/*if ((valueX < 0) || (valueY < 0)) 
-		{
-			outVal = 0;
-		}*/
 		return outVal;
 	}
 	double RSGISFunction2DPoly::dX(double valueX, double valueY) throw(RSGISMathException)
@@ -636,11 +618,6 @@ namespace rsgis{namespace math{
 
 		}
 		
-		/*if ((valueX < 0)) 
-		{
-			outValdX = valueX;
-		}*/
-		
 		return outValdX;
 	}
 	double RSGISFunction2DPoly::dY(double valueX, double valueY) throw(RSGISMathException)
@@ -664,11 +641,6 @@ namespace rsgis{namespace math{
 			outValdY = xPow * aCoeffF;  // d(f_nl)/ dy (partial derivative with respect to density)
 			
 		}
-		
-		/*if ((valueY < 0)) 
-		{
-			outValdY = valueY;
-		}*/
 		
 		return outValdY;
 	}

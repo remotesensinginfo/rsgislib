@@ -89,13 +89,7 @@ namespace rsgis{ namespace cmds {
             
             std::cout << "Reading colour table\n";
             GDALColorTable *clrTab = imageDataset[0]->GetRasterBand(1)->GetColorTable();
-            /*
-             for(int i = 0; i < clrTab->GetColorEntryCount(); ++i)
-             {
-             const GDALColorEntry *clr = clrTab->GetColorEntry(i);
-             std::cout << i << ": [" <<  clr->c1 << "," << clr->c2 << "," << clr->c3 << "]\n";
-             }
-             */
+
             std::string *bandNames = new std::string[3];
             bandNames[0] = "Red";
             bandNames[1] = "Green";

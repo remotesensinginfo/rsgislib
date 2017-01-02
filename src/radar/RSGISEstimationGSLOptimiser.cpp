@@ -129,21 +129,10 @@ namespace rsgis { namespace radar {
 		
 		gsl_multimin_fdfminimizer_set(s, &minFunction, predictParams, 0.01, 0.1);
 		
-		//cout << "Starting minimisation" << endl;
 		for(unsigned int i = 0; i < ittMax; i++)
 		{
-			
-			//cout << "height = " << gsl_vector_get(s->x, 0) << " density = " << gsl_vector_get(s->x, 1) << endl;
-			
 			status = gsl_multimin_fdfminimizer_iterate(s);
-			/*if (status == GSL_SUCCESS)
-			{
-				cout << "SUCCESS!!!" << endl;
-				cout << "height = " << gsl_vector_get(s->x, 0) << " density = " << gsl_vector_get(s->x, 1) << endl;
-				return 1;
-			}*/
 			status = gsl_multimin_test_gradient(s->gradient, 1e-3);
-			
 		}
 		
 		gsl_vector_set(outParError, 0, gsl_vector_get(s->x, 0));
@@ -164,8 +153,6 @@ namespace rsgis { namespace radar {
 	
 	RSGISEstimationGSLOptimiserNoGradient::RSGISEstimationGSLOptimiserNoGradient()
 	{
-		//this->functionHH = functionHH;
-		//this->functionHV = functionHV;
 		
 	}
 	int RSGISEstimationGSLOptimiserNoGradient::minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError)
@@ -204,15 +191,10 @@ namespace rsgis { namespace radar {
 		
 		gsl_multimin_fminimizer_set(s, &minFunction, initialPar, stepSize);
 		
-		//cout << "Starting minimisation" << endl;
 		for(unsigned int i = 0; i < ittMax; i++)
 		{
-			
-			//cout << "height = " << gsl_vector_get(s->x, 0) << " density = " << gsl_vector_get(s->x, 1) << endl;
 			status = gsl_multimin_fminimizer_iterate(s);
-			
 		}
-		//cout << "height = " << gsl_vector_get(s->x, 0) << " density = " << gsl_vector_get(s->x, 1) << endl;
 		gsl_vector_set(outParError, 0, gsl_vector_get(s->x, 0));
 		gsl_vector_set(outParError, 1, gsl_vector_get(s->x, 1));
 		gsl_vector_set(outParError, 2, gsl_multimin_fminimizer_minimum(s)); // Error

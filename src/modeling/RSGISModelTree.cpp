@@ -228,7 +228,6 @@ namespace rsgis { namespace modeling{
 				
 				// SET START POINT OF BRANCH SECTION
 				transect->setValue(branchX, branchY, branchZ, 1);
-				//cout << "Setting branch start at: (" << branchX << ", " << branchY << ", " << branchZ << ")" << endl;
 				
 				/* GROW OUT BRANCHES
 				 * If the branch radius is less than one voxel this will not run
@@ -457,32 +456,7 @@ namespace rsgis { namespace modeling{
 			startY = smallBranchPosHDistro->calcRand() + centerY;
 			startZ = smallBranchPosVDistro->calcRand() + centerZ;
 			
-			// GENERATE ORIENTATION ANGLE FOR EACH BRANCH
-			// Branches always grown away from center of the tree
-			/*smallBranchTheta = smallBranchThetaDistro->calcRand();
-			if(startX < centerX)
-			{
-				if (startY < centerY) 
-				{
-					smallBranchPhi = ((smallBranchPhiDistro->calcRand() + 180)/180)*pi;
-				}
-				else 
-				{
-					smallBranchPhi = ((smallBranchPhiDistro->calcRand() + 90)/180)*pi;
-				}
-			}
-			else if(startX > centerX)
-			{
-				if (startY < centerY) 
-				{
-					smallBranchPhi = ((smallBranchPhiDistro->calcRand() + 270)/180)*pi;
-				}
-				else 
-				{
-					smallBranchPhi = ((smallBranchPhiDistro->calcRand())/180)*pi;
-				}
-			}*/
-			
+			// GENERATE ORIENTATION ANGLE FOR EACH BRANCH			
 			smallBranchTheta = (smallBranchThetaDistro->calcRand() / 180) * pi;
 			smallBranchPhi = (smallBranchPhiDistro->calcRand()/180)*pi;
 			
@@ -516,7 +490,6 @@ namespace rsgis { namespace modeling{
 				
 				// SET START POINT OF BRANCH SECTION
 				transect->setValue(branchX, branchY, branchZ, 1);
-				//cout << "Setting branch start at: (" << branchX << ", " << branchY << ", " << branchZ << ")" << endl;
 				
 				/* GROW OUT BRANCHES
 				 * If the branch radius is less than one voxel this will not run

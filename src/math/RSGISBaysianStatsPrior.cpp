@@ -68,16 +68,13 @@ namespace rsgis{namespace math{
 			outputValues[0] = intergrat->calcMaxValue(); // Maximum likelyhood value
 			outputValues[1] = intergrat->calcValue4ProportionArea(lowerLimit); // Calculate lower limit
 			outputValues[2] = intergrat->calcValue4ProportionArea(upperLimit); // Calculate Upper limit
-			//cout << "Maximum Likelyhood Biomass = " << outputValues[0] << " Lower Val = " << outputValues[1] << " Upper Val = " << outputValues[2] << endl;
 			
 		}
-		
 		else if(this->deltatype == prob)
 		{
 			outputValues[0] = intergrat->calcMaxValue(); // Maximum likelyhood value
 			intergrat->getUpperLowerValues(outputValues[1], outputValues[2], lowerLimit);
 		}
-		
 		else
 		{
 			throw RSGISBaysianStatsException("Unknown delta type. Valid types are area and prob");

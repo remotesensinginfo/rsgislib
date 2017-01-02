@@ -113,7 +113,6 @@ namespace rsgis{namespace img{
 		
 		int numInBandsDSA = 0;
 		
-		//double **matrix = NULL;
 		double *outputValue = new double[calcImageSingleValue->getNumberOfOutValues()];
 		
 		rsgis::math::Matrix *outputMatrix = new rsgis::math::Matrix();
@@ -131,10 +130,8 @@ namespace rsgis{namespace img{
 			outputMatrix->matrix = new double[(outputMatrix->m * outputMatrix->n)];
 			
 			int counter = 0;
-			//matrix = new double*[numInBandsDSA];
 			for(int i = 0; i < numInBandsDSA; i++)
 			{
-				//calcImageSingleValue->setBandA(i);
 				calcImageSingleValue->reset();
 				this->calcImage->calcImage(datasetsA, numDS, outputValue, i);
 				outputMatrix->matrix[counter++] = outputValue[0];
@@ -149,13 +146,6 @@ namespace rsgis{namespace img{
 				}
 				std::cout << std::endl;
 			}
-			
-			/*
-			matrixUtils.saveMatrix2txt(outputMatrix, outputFile);
-			matrixUtils.saveMatrix2GridTxt(outputMatrix, outputFile);
-			matrixUtils.saveMatrix2Binary(outputMatrix, outputFile);
-			 */
-			
 		}
 		catch(RSGISImageCalcException e)
 		{

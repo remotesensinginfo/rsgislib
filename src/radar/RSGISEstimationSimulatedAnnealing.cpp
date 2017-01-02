@@ -180,7 +180,6 @@ namespace rsgis {namespace radar{
                 for (unsigned int j = 0; j < this->nPar; j++)
                 {
                     stepSize[j] = initialStepSize[j];
-                    //currentParError->at(j) = bestParError->at(j);
                 }
             }
 
@@ -195,7 +194,6 @@ namespace rsgis {namespace radar{
                 {
                     bool withinLimits = true;
                     // Loop through parameters
-                    //cout << "~~~~~~~~~~~~" << endl;
                     for(unsigned int j = 0; j < this->nPar; j++)
                     {
                         withinLimits = true;
@@ -260,7 +258,6 @@ namespace rsgis {namespace radar{
                                     return 1;
                                 }
                             }
-
                         }
                         else // If new energy is lower, accept based on Boltzman probability
                         {
@@ -326,7 +323,6 @@ namespace rsgis {namespace radar{
         delete bestParError;
         delete[] accepted;
         delete[] stepSize;
-        //cout << "..nItt = " << numItt << "..";
 
         // Exit
         return 0;
@@ -334,7 +330,6 @@ namespace rsgis {namespace radar{
     }
     double RSGISEstimationSimulatedAnnealingWithAP::calcLeastSquares(std::vector<double> *values)
     {
-
         /** L(X) = 1/2 { || f(X) - d0 || ^2 + || X - Xap || ^2 } */
 
         rsgis::math::RSGISMatrices matrixUtils;
@@ -347,7 +342,6 @@ namespace rsgis {namespace radar{
         // || f(X) - d0 || ^2
         for(unsigned int i = 0; i < this->allFunctions->size(); ++i)
         {
-            //cout << "Channel " << i << ", inData = " << gsl_vector_get(this->inputData, i) << ", outData = " <<  allFunctions->at(i)->calcFunction(values) << endl;
             dataDiff = gsl_vector_get(this->inputData, i) - this->allFunctions->at(i)->calcFunction(values);
             gsl_vector_set(this->deltaD, i, dataDiff);
         }

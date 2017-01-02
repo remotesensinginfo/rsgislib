@@ -33,13 +33,6 @@ namespace rsgis{namespace img{
         {
             if(dataCol[n] != 0)
             {
-                /*
-                cout << "dataCol[n] = " << dataCol[n] << endl;
-                cout << "\tleft[n] = " << left[n] << endl;
-                cout << "\trowAbove[n][1] = " << rowAbove[n][1] << endl;
-                cout << "\tright[n] = " << right[n] << endl;
-                cout << "\trowBelow[n][1] = " << rowBelow[n][1] << endl;
-                */
                 if((left[n] == 0) & (rowAbove[n][1] == 0) & (right[n] == 0) & (rowBelow[n][1] == 0))
                 {
                     if(firstIter)

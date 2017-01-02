@@ -39,16 +39,11 @@ namespace rsgis{namespace math{
 	double RSGISBaysianIntergrateFunctionNoPrior::calcFunction(double predictVal) throw(RSGISMathException)
 	{
 		double fVal = function->calcFunction(predictVal);
-		//value = -8;
-		//cout << "Biomass = " << predictVal;
-		//cout << "value = " << value << " fVal = " << fVal;
 		double diff = value - fVal;
 		double diffsq = diff * diff;
 		double var2 = 2 * (variance * variance);
 		double diffvar = diffsq / var2;
 		double probAB = exp ((-1)* diffvar);
-		//cout << "Biomass = " << predictVal;
-		//cout << " probAB = " << probAB << endl;
 		return probAB;
 	}
 }}

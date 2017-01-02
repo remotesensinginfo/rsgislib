@@ -76,7 +76,6 @@ namespace rsgis{namespace vec{
 					throw RSGISVectorException("Unsupport data type.");
 				}
 				counter++;
-				//std::cout << "Outputted " << counter << " of " << numFeatures << " features\n";
 				OGRFeature::DestroyFeature( feature );
 			}
 			std::cout << " Complete.\n";
@@ -144,8 +143,6 @@ namespace rsgis{namespace vec{
 					}
 					counter++;
 				}
-				
-				//std::cout << "Outputted " << counter << " of " << numFeatures << " features\n";
 				OGRFeature::DestroyFeature( feature );
 			}
 			std::cout << " Complete.\n";
@@ -206,7 +203,6 @@ namespace rsgis{namespace vec{
 				OGRFeature::DestroyFeature(featureOutput);
 				
 				counter++;
-				//std::cout << "Outputted " << counter << " of " << numFeatures << " features\n";
 			}
 			std::cout << " Complete.\n";
 		}
@@ -260,7 +256,6 @@ namespace rsgis{namespace vec{
 				OGRFeature::DestroyFeature(featureOutput);
 				
 				counter++;
-				//std::cout << "Outputted " << counter << " of " << numFeatures << " features\n";
 			}
 			std::cout << " Complete.\n";
 		}
@@ -311,7 +306,6 @@ namespace rsgis{namespace vec{
 					throw RSGISVectorOutputException("Failed to write feature to the output shapefile.");
 				}
 				OGRFeature::DestroyFeature(featureOutput);
-				//std::cout << "Outputted " << i << " of " << data->size() << " features\n";
 			}
 			std::cout << " Complete.\n";
 		}

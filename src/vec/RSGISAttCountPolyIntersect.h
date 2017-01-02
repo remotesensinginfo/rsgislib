@@ -38,7 +38,6 @@
 #include "img/RSGISCalcImageValue.h"
 #include "img/RSGISPixelInPoly.h"
 
-//#include "rastergis/RSGISAttributeTable.h"
 #include "common/RSGISAttributeTableException.h"
 
 #include "geos/geom/Envelope.h"

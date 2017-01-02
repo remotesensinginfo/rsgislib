@@ -144,8 +144,6 @@ namespace rsgis{namespace reg{
             pY = pY + (gsl_vector_get(aY, offset+1) * pow((*iterGCPs)->northings(), this->polyOrder));
             
             sqSum = sqSum + (pow((*iterGCPs)->imgX() - pX ,2) + pow((*iterGCPs)->imgY() - pY ,2));
-            
-            //std::cout <<  << ", " << pX << ", " << (*iterGCPs)->imgY() << ", " << pY << std::endl;
         }
     
         double sqMean = sqSum / double(gcps->size());
@@ -216,9 +214,7 @@ namespace rsgis{namespace reg{
 		
 		double geoWidth = maxEastings - minEastings;
 		double geoHeight = maxNorthings - minNorthings;
-        
-        //std::cout << "geoWidth = " << geoWidth << ", geoHeight = " << geoHeight << std::endl;
-		
+        		
 		if((geoWidth <= 0) | (geoHeight <= 0))
 		{
 			throw RSGISImageWarpException("Either the output image width or height are <= 0.");
@@ -260,8 +256,6 @@ namespace rsgis{namespace reg{
         pY = pY + (gsl_vector_get(aY, offset) * pow(eastings, this->polyOrder));
         pY = pY + (gsl_vector_get(aY, offset+1) * pow(northings, this->polyOrder));
     
-		//*x = floor(pX+0.5);
-		//*y = floor(pY+0.5);
         *x = ceil(pX);
 		*y = ceil(pY);
 	}

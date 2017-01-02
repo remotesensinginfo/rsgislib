@@ -216,12 +216,7 @@ namespace rsgis{ namespace img{
 		{
 			throw e;
 		}
-		
-	/*	for(int i = 0; i < *numClasses; i++)
-		{
-			cout << "Class: " << classData[i]->className << " has ID: " << classData[i]->classID << endl;
-		}
-		*/
+
 		return classData;
 	}
 	

@@ -35,11 +35,7 @@ namespace rsgis{namespace math{
 		{
 		public:
 			RSGISFFTWUtils();
-            /*
-			Matrix* computeFFTW(Matrix *inputData);
-			void fftwShift(fftw_complex *in, fftw_complex *out, int width, int height);
-			void fftwShift(Matrix *in, Matrix *out);
-             */
+
 			~RSGISFFTWUtils();
 		};
 }}

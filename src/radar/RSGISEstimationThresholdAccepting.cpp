@@ -36,15 +36,7 @@ namespace rsgis {namespace radar{
 																							 unsigned int runsThreshold,
 																							 double cooling,
 																							 unsigned int maxItt)
-	{
-		/*
-		 this->startThreshold = 1000000;
-		 this->runsStep = 10; // Number of runs at each step size
-		 this->runsThreshold = 20; // Number of times step is changed at each threasherature
-		 this->cooling = 0.85; // Cooling factor
-		 this->minEnergy = minEnergy; // Set the target energy
-		 this->maxItt = 100000; // Maximum number of itterations*/
-		
+	{		
 		this->startThreshold = startThreshold;
 		this->runsStep = runsStep; // Number of runs at each step size
 		this->runsThreshold = runsThreshold; // Number of times step is changed at each threasherature
@@ -154,33 +146,8 @@ namespace rsgis {namespace radar{
 					// Loop through parameters
 					for(unsigned int j = 0; j < nPar; j++)
 					{
-						
 						// Select new vector
 						stepRand = (gsl_rng_uniform(randgsl)*2.0) - 1.0;
-						
-						/* TEST USING GRADIENT INFO */
-						/*double diffA = functionHH->calcFunction(currentParError[0], currentParError[1]) - gsl_vector_get(inData, 0);
-						 double diffB = functionHV->calcFunction(currentParError[0], currentParError[1]) - gsl_vector_get(inData, 1);
-						 
-						 if (j == 0) 
-						 {
-						 stepRand = (diffA * functionHH->dX(currentParError[0], currentParError[1])) + (diffB * functionHV->dX(currentParError[0], currentParError[1]));
-						 //cout << "Test height = " << currentParError[j] + (stepRand * stepSize[j]) << ", stepRand = " << stepRand << endl;
-						 }
-						 else if (j == 1) 
-						 {
-						 stepRand = (diffA * functionHH->dY(currentParError[0], currentParError[1])) + (diffB * functionHV->dY(currentParError[0], currentParError[1]));
-						 //cout << "Test density = " << currentParError[j] + (stepRand * stepSize[j]) << ", stepRand = " << stepRand << endl;
-						 }
-						 
-						 if (stepRand > 0)
-						 {
-						 stepRand = 1;
-						 }
-						 else
-						 {
-						 stepRand = -1;
-						 }*/
 						
 						testPar[j] = currentParError[j] + (stepRand * stepSize[j]);
 						
@@ -188,12 +155,6 @@ namespace rsgis {namespace radar{
 						{
 							// Calculate energy
 							newEnergy = leastSquares->calcFunction(testPar[0], testPar[1]);
-							
-							//cout << "Predict HH " << functionHH->calcFunction(testPar[0], testPar[1]) << endl;
-							
-							//cout << "newEnergy = " << newEnergy << " old energy = " << currentParError[nPar] << endl;
-							
-							//cout << "testPar = " << testPar[j] << " currentParError = " << currentParError[j] << endl;
 							
 							if(newEnergy < currentParError[nPar]) // If new energy is lower accept
 							{
@@ -212,7 +173,6 @@ namespace rsgis {namespace radar{
 									
 									if (bestParError[nPar] < minEnergy) // If new energy is less than threashold return.
 									{
-										//cout << "itterations = " << numItt << endl;
 										// Calculate normalised error (differnt to least squares difference)
 										double error = 0.0;
 										error = pow((gsl_vector_get(inData, 0) - functionHH->calcFunction(bestParError[0], bestParError[1])),2); // Predicted - Measured data (HH)
@@ -281,8 +241,6 @@ namespace rsgis {namespace radar{
 					}
 					
 				}
-				
-				//cout << "step size = " << stepSize[0] << " " << stepSize[1] << endl;
 			}
 		}
 		
@@ -334,13 +292,6 @@ namespace rsgis {namespace radar{
 																										 gsl_matrix *invCovMatrixD,
 																										 gsl_vector *aPrioriPar)
 	{
-		/*
-		 this->startThreshold = 1000000;
-		 this->runsStep = 10; // Number of runs at each step size
-		 this->runsThreshold = 20; // Number of times step is changed at each threasherature
-		 this->cooling = 0.85; // Cooling factor
-		 this->minEnergy = minEnergy; // Set the target energy
-		 this->maxItt = 100000; // Maximum number of itterations*/
 		rsgis::math::RSGISMatrices matrixUtils;
 		
 		this->startThreshold = startThreshold;
@@ -378,10 +329,6 @@ namespace rsgis {namespace radar{
 	{
 		
 		// Open text file to write errors to
-		/*ofstream outTxtFile;
-		 outTxtFile.open("/Users/danclewley/Documents/Research/PhD/Inversion/ALOS/PLR/SAIttTest/SAIttTest.csv");
-		 outTxtFile << "itt,bestHErr,bestDErr,CurrHErr,CurrDErr,lsDiff" << endl;*/
-		
 		rsgis::math::RSGISVectors vectorUtils;
 		rsgis::math::RSGISMatrices matrixUtils;
 		
@@ -474,26 +421,8 @@ namespace rsgis {namespace radar{
 						{
 							// Calculate energy
 							newEnergy = leastSquares->calcFunction(testPar[0], testPar[1]);
-							
-							// Calculate rel error (Test)
-							/*double realCDepth = 1.2474;
-							 double realDensity = 0.505;
-							 
-							 double bestcDepthError = sqrt(pow((realCDepth - bestParError[0]),2)) / realCDepth; 
-							 double bestdensError = sqrt(pow((realDensity - bestParError[1]),2)) / realDensity;
-							 
-							 double currentcDepthError = sqrt(pow((realCDepth - currentParError[0]),2)) / realCDepth; 
-							 double currentdensError = sqrt(pow((realDensity - currentParError[1]),2)) / realDensity;
-							 
-							 outTxtFile << numItt << "," << bestcDepthError << "," << bestdensError << "," << currentcDepthError << "," << currentdensError << "," << bestParError[nPar] << endl;*/
-							
-							//cout << numItt << "," << newEnergy << endl;
-							
-							
-							//cout << "newEnergy = " << newEnergy << " old energy = " << currentParError[nPar] << endl;
-							
-							//cout << "testPar = " << testPar[j] << " currentParError = " << currentParError[j] << endl;
-							double prevEnergy = currentParError[nPar];
+
+                            double prevEnergy = currentParError[nPar];
 							if(newEnergy < currentParError[nPar]) // If new energy is lower accept
 							{
 								currentParError[j] = testPar[j];
@@ -511,7 +440,6 @@ namespace rsgis {namespace radar{
 									
 									if (bestParError[nPar] < minEnergy) // If new energy is less than threashold return.
 									{
-										//cout << "itterations = " << numItt << endl;
 										// Calculate normalised error (differnt to least squares difference)
 										double error = 0.0;
 										error = pow((gsl_vector_get(inData, 0) - functionHH->calcFunction(bestParError[0], bestParError[1])),2); // Predicted - Measured data (HH)
@@ -585,8 +513,6 @@ namespace rsgis {namespace radar{
 					}
 					
 				}
-				
-				//cout << "step size = " << stepSize[0] << " " << stepSize[1] << endl;
 			}
 		}
 		
@@ -638,14 +564,6 @@ namespace rsgis {namespace radar{
 																							 double cooling,
 																							 unsigned int maxItt)
 	{
-		/*
-		 this->startThreshold = 1000000;
-		 this->runsStep = 10; // Number of runs at each step size
-		 this->runsThreshold = 20; // Number of times step is changed at each threasherature
-		 this->cooling = 0.85; // Cooling factor
-		 this->minEnergy = minEnergy; // Set the target energy
-		 this->maxItt = 100000; // Maximum number of itterations*/
-		
 		this->startThreshold = startThreshold;
 		this->runsStep = runsStep; // Number of runs at each step size
 		this->runsThreshold = runsThreshold; // Number of times step is changed at each threasherature
@@ -769,13 +687,8 @@ namespace rsgis {namespace radar{
 						{
 							// Calculate energy
 							newEnergy = leastSquares->calcFunction(testPar[0], testPar[1]);
-							
-							//cout << "Predict HH " << functionHH->calcFunction(testPar[0], testPar[1]) << endl;
-							
-							//cout << "newEnergy = " << newEnergy << " old energy = " << currentParError[nPar] << endl;
-							
-							//cout << "testPar = " << testPar[j] << " currentParError = " << currentParError[j] << endl;
-							double prevEnergy = currentParError[nPar];
+
+                            double prevEnergy = currentParError[nPar];
 							if(newEnergy < currentParError[nPar]) // If new energy is lower accept
 							{
 								currentParError[j] = testPar[j];
@@ -793,7 +706,6 @@ namespace rsgis {namespace radar{
 									
 									if (bestParError[nPar] < minEnergy) // If new energy is less than threashold return.
 									{
-										//cout << "itterations = " << numItt << endl;
 										// Calculate normalised error (differnt to least squares difference)
 										double error = 0.0;
 										error = pow((gsl_vector_get(inData, 0) - functionHH->calcFunction(bestParError[0], bestParError[1])),2); // Predicted - Measured data (HH)
@@ -870,8 +782,6 @@ namespace rsgis {namespace radar{
 					}
 					
 				}
-				
-				//cout << "step size = " << stepSize[0] << " " << stepSize[1] << endl;
 			}
 		}
 		
@@ -927,13 +837,6 @@ namespace rsgis {namespace radar{
 																										 gsl_matrix *invCovMatrixD,
 																										 gsl_vector *aPrioriPar)
 	{
-		/*
-		 this->startThreshold = 1000000;
-		 this->runsStep = 10; // Number of runs at each step size
-		 this->runsThreshold = 20; // Number of times step is changed at each threasherature
-		 this->cooling = 0.85; // Cooling factor
-		 this->minEnergy = minEnergy; // Set the target energy
-		 this->maxItt = 100000; // Maximum number of itterations*/
 		rsgis::math::RSGISMatrices matrixUtils;
 		
 		this->startThreshold = startThreshold;
@@ -1064,11 +967,6 @@ namespace rsgis {namespace radar{
 							// Calculate energy
 							newEnergy = leastSquares->calcFunction(testPar[0], testPar[1]);
 							
-							//cout << "Predict HH " << functionHH->calcFunction(testPar[0], testPar[1]) << endl;
-							
-							//cout << "newEnergy = " << newEnergy << " old energy = " << currentParError[nPar] << endl;
-							
-							//cout << "testPar = " << testPar[j] << " currentParError = " << currentParError[j] << endl;
 							double prevEnergy = currentParError[nPar];
 							if(newEnergy < currentParError[nPar]) // If new energy is lower accept
 							{
@@ -1087,8 +985,6 @@ namespace rsgis {namespace radar{
 									
 									if (bestParError[nPar] < minEnergy) // If new energy is less than threashold return.
 									{
-										//cout << "itterations = " << numItt << endl;
-										
 										// Calculate normalised error (differnt to least squares difference)
 										double error = 0.0;
 										error = pow((gsl_vector_get(inData, 0) - functionHH->calcFunction(bestParError[0], bestParError[1])),2); // Predicted - Measured data (HH)
@@ -1166,8 +1062,6 @@ namespace rsgis {namespace radar{
 					}
 					
 				}
-				
-				//cout << "step size = " << stepSize[0] << " " << stepSize[1] << endl;
 			}
 		}
 		
@@ -1225,14 +1119,6 @@ namespace rsgis {namespace radar{
 																										 gsl_matrix *invCovMatrixD,
 																										 gsl_vector *aPrioriPar)
 	{
-		/*
-		 this->startThreshold = 1000000;
-		 this->runsStep = 10; // Number of runs at each step size
-		 this->runsThreshold = 20; // Number of times step is changed at each threasherature
-		 this->cooling = 0.85; // Cooling factor
-		 this->minEnergy = minEnergy; // Set the target energy
-		 this->maxItt = 100000; // Maximum number of itterations*/
-		
 		this->startThreshold = startThreshold;
 		this->runsStep = runsStep; // Number of runs at each step size
 		this->runsThreshold = runsThreshold; // Number of times step is changed at each threasherature
@@ -1272,11 +1158,6 @@ namespace rsgis {namespace radar{
 	}
 	int RSGISEstimationThresholdAccepting3Var3DataWithAP::minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError)
 	{
-		// Open text file to write errors to
-		/*ofstream outTxtFile;
-		 outTxtFile.open("/Users/danclewley/Documents/Research/PhD/Inversion/AIRSAR/PBX/WithDielectric/SensitivityAnalysis/SAConvTests/SAIttTest.csv");
-		 outTxtFile << "itt,bestHErr,CurrHErr,bestDErr,CurrDErr,bestEpsErr,CurrEpsErr" << endl;*/
-		
 		rsgis::math::RSGISVectors vectorUtils;
 		rsgis::math::RSGISMatrices matrixUtils;
 		
@@ -1370,28 +1251,10 @@ namespace rsgis {namespace radar{
 						stepRand = (gsl_rng_uniform(randgsl)*2.0) - 1.0;
 						testPar[j] = currentParError[j] + (stepRand * stepSize[j]);
 						
-						//cout << j <<") current Par: " << currentParError[0] << ", " << currentParError[1] << ", " << currentParError[2] << endl;
-						//cout << j <<") test Par: " << testPar[0] << ", " << testPar[1] << ", " << testPar[2] << endl;
-						
 						if ((testPar[j] > lowerLimit[j]) && (testPar[j] < upperLimit[j]))
 						{
 							// Calculate energy
 							newEnergy = leastSquares->calcFunction(testPar[0], testPar[1], testPar[2]);
-							
-							// Calculate rel error (Test)
-							/*double realHeight = 10;
-							 double realDensity = 0.02;
-							 double realDielectric = 50;
-							 
-							 double bestHeightError = sqrt(pow((realHeight - bestParError[0]),2)) / realHeight; 
-							 double bestdensError = sqrt(pow((realDensity - bestParError[1]),2)) / realDensity;
-							 double bestDielectricError = sqrt(pow((realDielectric - bestParError[2]),2)) / realDielectric; 
-							 
-							 double currentHeightError = sqrt(pow((realHeight - currentParError[0]),2)) / realHeight; 
-							 double currentdensError = sqrt(pow((realDensity - currentParError[1]),2)) / realDensity;
-							 double currentDielectricError = sqrt(pow((realDielectric - currentParError[2]),2)) / realDielectric; 
-							 
-							 outTxtFile << numItt << "," << bestHeightError << "," << currentHeightError << "," << bestdensError << "," << currentdensError << "," << bestDielectricError << "," << currentDielectricError << endl;*/
 							
 							double prevEnergy = currentParError[nPar];
 							if(newEnergy < currentParError[nPar]) // If new energy is lower accept
@@ -1411,12 +1274,6 @@ namespace rsgis {namespace radar{
 									
 									if (bestParError[nPar] < minEnergy) // If new energy is less than threashold return.
 									{
-										/*cout << "itterations = " << numItt << endl;
-										 
-										 cout << "minEnergy = " << minEnergy << ", best Energy = " << bestParError[nPar] << endl;
-										 
-										 cout << "HH = " << gsl_vector_get(inData, 0) << " estHH = " << functionHH->calcFunction(bestParError[0], bestParError[1], bestParError[2]) << endl;*/
-										
 										// Calculate normalised error (differnt to least squares difference)
 										double error = 0.0;
 										error = pow((gsl_vector_get(inData, 0) - functionHH->calcFunction(bestParError[0], bestParError[1], bestParError[2])),2); // Predicted - Measured data (HH)
@@ -1495,8 +1352,6 @@ namespace rsgis {namespace radar{
 					}
 					
 				}
-				
-				//cout << "step size = " << stepSize[0] << " " << stepSize[1] << endl;
 			}
 		}
 		
@@ -1525,8 +1380,6 @@ namespace rsgis {namespace radar{
 		delete[] upperLimit;
 		delete[] minStepSize;
 		delete leastSquares;
-		
-		//cout << "..nItt = " << numItt << "..";
 		
 		// Exit
 		return 0;
@@ -1557,14 +1410,6 @@ namespace rsgis {namespace radar{
 																										 gsl_matrix *invCovMatrixD,
 																										 gsl_vector *aPrioriPar)
 	{
-		/*
-		 this->startThreshold = 1000000;
-		 this->runsStep = 10; // Number of runs at each step size
-		 this->runsThreshold = 20; // Number of times step is changed at each threasherature
-		 this->cooling = 0.85; // Cooling factor
-		 this->minEnergy = minEnergy; // Set the target energy
-		 this->maxItt = 100000; // Maximum number of itterations*/
-		
 		this->startThreshold = startThreshold;
 		this->runsStep = runsStep; // Number of runs at each step size
 		this->runsThreshold = runsThreshold; // Number of times step is changed at each threasherature
@@ -1605,15 +1450,6 @@ namespace rsgis {namespace radar{
 	}
 	int RSGISEstimationThresholdAccepting3Var4DataWithAP::minimise(gsl_vector *inData, gsl_vector *initialPar, gsl_vector *outParError)
 	{
-		// Open text file to write errors to
-		/*ofstream outTxtFile;
-		 outTxtFile.open("/Users/danclewley/Documents/Research/PhD/Inversion/AIRSAR/PBX/WithDielectric/SensitivityAnalysis/SAConvTests/SAIttTest_coeff.csv");
-		 outTxtFile << "itt,bestHErr,CurrHErr,bestDErr,CurrDErr,bestEpsErr,CurrEpsErr" << endl;*/
-		
-		/*ofstream outTxtFile;
-		 outTxtFile.open("/Users/danclewley/Documents/Research/PhD/Inversion/AIRSAR/PBX/WithDielectric/SensitivityAnalysis/SAConvTests/SAPath.csv");
-		 outTxtFile << "itt,height,dens,dielectric,lSq" << endl;*/
-		
 		rsgis::math::RSGISVectors vectorUtils;
 		rsgis::math::RSGISMatrices matrixUtils;
 		
@@ -1661,18 +1497,6 @@ namespace rsgis {namespace radar{
 		rsgis::math::RSGISFunction3Var4DataPreconditionedLeastSquares *leastSquares;
 		leastSquares = new rsgis::math::RSGISFunction3Var4DataPreconditionedLeastSquares(this->function1, this->function2, this->function3, this->function4, gsl_vector_get(inData, 0), gsl_vector_get(inData, 1), gsl_vector_get(inData, 2), gsl_vector_get(inData, 3), gsl_vector_get(this->aPrioriPar, 0), gsl_vector_get(this->aPrioriPar, 1), gsl_vector_get(this->aPrioriPar, 2), this->invCovMatrixP, this->invCovMatrixD);
 		
-		/*for(double height = minMaxIntervalA[0]; height < minMaxIntervalA[1]; height = height + minMaxIntervalA[2])
-		 {
-		 
-		 for(double dens = minMaxIntervalB[0]; dens < minMaxIntervalB[1]; dens = dens + minMaxIntervalB[2])
-		 {
-		 cout << height << "," << dens << "," << leastSquares->calcFunction(height, dens, 40) << endl;
-		 }
-		 
-		 }*/
-		
-		
-		
 		/* Set maximum number of threasherature runs
 		 Divide by runsStep * runsThreshold * nPar so threasherature will be reduced in maximum number of itterations
 		 */
@@ -1697,12 +1521,6 @@ namespace rsgis {namespace radar{
 					stepSize[j] = initialStepSize[j] / 2;
 				}
 				
-				// Reset current parameters 
-				/*for (unsigned int j = 0; j < nPar; j++) 
-				 {
-				 double upperVal = upperLimit[j] - lowerLimit[j];
-				 currentParError[j] =  (gsl_rng_uniform(randgsl)*upperVal) + lowerLimit[j];
-				 }*/
 				threash = pow(this->cooling,double(t)) * startThreshold;
 				
 			}
@@ -1723,32 +1541,12 @@ namespace rsgis {namespace radar{
 						stepRand = (gsl_rng_uniform(randgsl)*2.0) - 1.0;
 						testPar[j] = currentParError[j] + (stepRand * stepSize[j]);
 						
-						//cout << j <<") current Par: " << currentParError[0] << ", " << currentParError[1] << ", " << currentParError[2] << endl;
-						//cout << j <<") test Par: " << testPar[0] << ", " << testPar[1] << ", " << testPar[2] << endl;
-						
 						if ((testPar[j] > lowerLimit[j]) && (testPar[j] < upperLimit[j]))
 						{
 							// Calculate energy
 							newEnergy = leastSquares->calcFunction(testPar[0], testPar[1], testPar[2]);
-							
-							//cout << "Energy = " << newEnergy << endl;
-							
-							// Calculate rel error (Test)
-							/*double realHeight = 4.7067;
-							 double realDensity = 0.03;
-							 double realDielectric = 40;
-							 
-							 double bestHeightError = sqrt(pow((realHeight - bestParError[0]),2)) / realHeight; 
-							 double bestdensError = sqrt(pow((realDensity - bestParError[1]),2)) / realDensity;
-							 double bestDielectricError = sqrt(pow((realDielectric - bestParError[2]),2)) / realDielectric; 
-							 
-							 double currentHeightError = sqrt(pow((realHeight - currentParError[0]),2)) / realHeight; 
-							 double currentdensError = sqrt(pow((realDensity - currentParError[1]),2)) / realDensity;
-							 double currentDielectricError = sqrt(pow((realDielectric - currentParError[2]),2)) / realDielectric; 
-							 
-							 outTxtFile << numItt << "," << bestHeightError << "," << currentHeightError << "," << bestdensError << "," << currentdensError << "," << bestDielectricError << "," << currentDielectricError << endl;*/
-							
-							double prevEnergy = currentParError[nPar];
+
+                            double prevEnergy = currentParError[nPar];
 							if(newEnergy < currentParError[nPar]) // If new energy is lower accept
 							{
 								currentParError[j] = testPar[j];
@@ -1758,7 +1556,6 @@ namespace rsgis {namespace radar{
 								
 								if(currentParError[nPar] < bestParError[nPar]) // If new energy is less than best, update best.
 								{
-									//outTxtFile << numItt << "," << testPar[0] << "," << testPar[1] << "," << testPar[2] << "," << newEnergy << endl;
 									for(unsigned int par = 0; par < nPar; par++)
 									{
 										bestParError[par] = currentParError[par];
@@ -1767,8 +1564,6 @@ namespace rsgis {namespace radar{
 									
 									if (bestParError[nPar] < minEnergy) // If new energy is less than threashold return.
 									{
-										//cout << "itterations = " << numItt << endl;
-										
 										// Calculate normalised error (differnt to least squares difference)
 										double error = 0.0;
 										error = pow((gsl_vector_get(inData, 0) - function1->calcFunction(bestParError[0], bestParError[1], bestParError[2])),2); // Predicted - Measured data (1)
@@ -1799,9 +1594,7 @@ namespace rsgis {namespace radar{
 										// Exit
 										return 1;
 									}
-									
 								}
-								
 							}
 							else // If new energy is lower, accept based on Boltzman probability
 							{
@@ -1852,8 +1645,6 @@ namespace rsgis {namespace radar{
 					}
 					
 				}
-				
-				//cout << "step size = " << stepSize[0] << " " << stepSize[1] << endl;
 			}
 		}
 		
@@ -1883,9 +1674,7 @@ namespace rsgis {namespace radar{
 		delete[] upperLimit;
 		delete[] minStepSize;
 		delete leastSquares;
-		
-		//cout << "..nItt = " << numItt << "..";
-		
+				
 		// Exit
 		return 0;
 		
