@@ -80,9 +80,7 @@ namespace rsgis{namespace math{
 		{
 			lowBoundY = function->calcFunction(lowBoundX);
 			upperBoundY = function->calcFunction(upperBoundX);
-			
-			//cout << i << ") lowBoundY (" << lowBoundX << ") = " << lowBoundY << " upperBoundY (" << upperBoundX << ")= " << upperBoundY << endl;
-			
+						
 			if(first)
 			{
 				segmentY[i] = lowBoundY;
@@ -93,9 +91,6 @@ namespace rsgis{namespace math{
 			{
 				segmentY[i+1] = upperBoundY;
 			}
-			
-			//cout << "x = " << lowBoundX << " y = " << lowBoundY << endl;
-			//cout << "x = " << upperBoundX << " y = " << upperBoundY << endl;
 			
 			bl.x = lowBoundX;
 			bl.y = 0;
@@ -110,9 +105,7 @@ namespace rsgis{namespace math{
 			areaSum += segmentAreas[i];
 			lowBoundX += division;
 			upperBoundX += division;
-			
 		}
-		
 		
 		if(total)
 		{
@@ -185,9 +178,7 @@ namespace rsgis{namespace math{
 			sum += segmentAreas[i];
 			diffPrev = diffCurrent;
 			diffCurrent = area - sum;
-			
-			//cout << "sum = " << sum << " diffPrev = " << diffPrev << " diffCurrent = " << diffCurrent << endl;
-			
+						
 			if(diffCurrent < 0)
 			{
 				index = i-1;
@@ -222,7 +213,6 @@ namespace rsgis{namespace math{
 		int maxSegment = 0;
 		for(int i = 0; i < numSegments; i++)
 		{
-			//cout << i << ") segmentAreas[i] = " << segmentAreas[i] << endl;
 			if(first)
 			{
 				maxSegment = i;
@@ -236,7 +226,6 @@ namespace rsgis{namespace math{
 				}
 			}
 		}
-		//cout << "maxSegment = " << maxSegment << endl;
 		return (areaMin + (maxSegment * division));
 	}
 	
@@ -264,9 +253,7 @@ namespace rsgis{namespace math{
 				}
 			}
 		}
-		
-		
-		
+				
 		double threshold = segmentY[maxIndex]*prob;
 		
 		double diffLower = 0;
@@ -281,18 +268,8 @@ namespace rsgis{namespace math{
 		bool firstLower = true;
 		bool firstUpper = true;
 		
-		/*cout << "Index: ";
 		for(int i = 0; i < (numSegments+1); i++)
 		{
-			cout << i << " ";
-		}
-		cout << endl;
-		
-		cout << "SegmentY: " << flush;*/
-		for(int i = 0; i < (numSegments+1); i++)
-		{
-			//cout << segmentY[i] << " " << flush;
-			
 			if(i < maxIndex)
 			{
 				if(firstLower)
@@ -335,17 +312,6 @@ namespace rsgis{namespace math{
 			}
 		}
 		
-		/*cout << endl;
-		s
-		cout << "Maximum Likilyhood index = " << maxIndex << endl;
-		cout << "Lower Index = " << lowerIndex << endl;
-		cout << "Upper Index = " << upperIndex << endl;
-		
-		cout << "Max Value = " << segmentY[maxIndex] << endl;
-		cout << "Threshold = " << threshold << endl;
-		cout << "Lower Value = " << segmentY[lowerIndex] << endl;
-		cout << "Upper Value = " << segmentY[upperIndex] << endl;
-		*/
 		if(lowerIndex == 0)
 		{
 			lower = 0;

@@ -36,7 +36,6 @@ namespace rsgis{namespace math{
 		RSGISVectors vectorUtils;
 		RSGISMatrices matrixUtils;
 		
-		//cout << "A:" << endl;
 		matrixUtils.printGSLMatrix(inA);
 		gsl_matrix *outV;
         gsl_vector *outS;
@@ -46,15 +45,6 @@ namespace rsgis{namespace math{
 		
 		svdCompute = gsl_linalg_SV_decomp(inA, outV, outS, out_work);
 		
-		// Uncomment to print output matices 
-		
-		/*cout << "U:" << endl;
-		matrixUtils.printGSLMatrix(inA);
-		cout << "V:" << endl;
-		matrixUtils.printGSLMatrix(outV);
-		cout << "S:" << endl;
-		vectorUtils.printGSLVector(outS);*/
-        
         gsl_matrix_free(outV);
 		gsl_vector_free(outS);
 	}
@@ -73,19 +63,6 @@ namespace rsgis{namespace math{
 		gsl_vector *out_work = gsl_vector_alloc (matrix->m);
 		
 		svdCompute = gsl_linalg_SV_decomp(inA, outV, outS, out_work);
-		
-		// Uncomment to print output matices 
-		/*cout << "GSL matrix U is :" << inA->size1 << " x " << inA->size2 << endl;
-		
-		RSGISVectors vectorUtils;
-		cout << "U:" << endl;
-		matrixUtils.printGSLMatrix(inA);
-		cout << "V:" << endl;
-		matrixUtils.printGSLMatrix(outV);
-		cout << "S:" << endl;
-		vectorUtils.printGSLVector(outS);
-		
-		cout << "GSL matrix U is :" << inA->size1 << " x " << inA->size2 << endl;*/
         
         gsl_matrix_free(outV);
 		gsl_vector_free(outS);
@@ -99,7 +76,6 @@ namespace rsgis{namespace math{
 		 for a linear equation. The number of coefficients are determined by the output
 		 gsl_vector outX.
 		 */ 
-		//cout << "Starting lin solve.." << endl;
         gsl_matrix *outV;
         gsl_vector *outS;
         outV = gsl_matrix_alloc (inA->size2, inA->size2);

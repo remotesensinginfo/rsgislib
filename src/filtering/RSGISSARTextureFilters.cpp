@@ -66,22 +66,15 @@ namespace rsgis{namespace filter{
                 // Check there were at least three data values
                 if(numVal > 3)
                 {
-
-                    /*std::cout << "Num Vals = " << numVal << std::endl;
-                    std::cout << "iSum = " << iMean << std::endl;
-                    std::cout << "iSqSum = " << iSqMean << std::endl;*/
-
                     iMean = iMean / numVal;
                     iMeanSq = iMean*iMean;
                     iSqMean = iSqMean / numVal;
-                    /*
-                    std::cout << "iMean = " << iMean << std::endl;
-                    std::cout << "iMeanSq = " << iMeanSq << std::endl;
-                    std::cout << "iSqMean = " << iSqMean << std::endl;
-                    */
                     outI = (iSqMean / iMeanSq) - 1;
                 }
-                else{outI = 0;}
+                else
+                {
+                    outI = 0;
+                }
             }
             output[i] = outI;
         }

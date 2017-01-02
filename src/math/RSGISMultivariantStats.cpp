@@ -126,25 +126,14 @@ namespace rsgis{namespace math{
 		double part1 = 0;
 		double part2 = 0;
 		
-		//cout << "meanVector->matrix[var1] = " << meanVector->matrix[var1] << endl;
-		//cout << "meanVector->matrix[var2] = " << meanVector->matrix[var2] << endl;
-		
 		for(int i = 0; i < inputData->m; i++)
 		{
 			var1Index = (i*inputData->n) + var1;
 			var2Index = (i*inputData->n) + var2;
-			
-			//cout << "inputData->matrix[var1Index] = " << inputData->matrix[var1Index] << endl;
-			//cout << "inputData->matrix[var2Index] = " << inputData->matrix[var2Index] << endl;
-			
 			part1 = inputData->matrix[var1Index]-meanVector->matrix[var1];
 			part2 = inputData->matrix[var2Index]-meanVector->matrix[var2];
-			//cout << "Part 1 = " << part1 << endl;
-			//cout << "Part 2 = " << part2 << endl;
 			value = part1*part2;
-			//cout << "Value = " << value << endl;
  			sum += value;
-			//cout << "Sum = " << sum << endl;
 		}
 		return (sum/(inputData->m-1));
 	}
@@ -169,9 +158,7 @@ namespace rsgis{namespace math{
 				for(int j = 0; j < inputData->n; j++)
 				{
 					index = (i * inputData->n)+j;
-					//cout << "Finding covariance for " << i << " : " << j << endl;
 					covar = this->calcCovariance(inputData, i, j, meanVector);
-					//cout << "Covariance = " << covar << endl << endl;
 					covariance->matrix[index] = covar;
 				}
 			}

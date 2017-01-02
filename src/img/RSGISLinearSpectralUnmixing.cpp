@@ -190,55 +190,7 @@ namespace rsgis{namespace img{
                 gsl_matrix_free(endmembersIn);
                 throw RSGISImageCalcException("The number of endmember samples should be less than the number of input image bands.");
             }
-            
-            /*
-            gsl_matrix *endmembers = gsl_matrix_alloc (endmembersIn->size1+1, endmembersIn->size2);
-            for(unsigned int i = 0; i < endmembersIn->size1; ++i)
-            {
-                for(unsigned int j = 0; j < endmembersIn->size2; ++j)
-                {
-                    gsl_matrix_set(endmembers, i, j, gsl_matrix_get(endmembersIn, i, j));
-                }
-            }
-            
-            for(unsigned int j = 0; j < endmembersIn->size2; ++j)
-            {
-                gsl_matrix_set(endmembers, endmembersIn->size1, j, weight);
-            }
-            matrixUtils.printGSLMatrix(endmembers);
-            std::cout << std::endl;
-            
-            
-            gsl_matrix *V = gsl_matrix_alloc (endmembers->size2, endmembers->size2);
-            gsl_vector *S = gsl_vector_alloc(endmembers->size2);
-            gsl_vector *work = gsl_vector_alloc(endmembers->size2);
-            int outVal = gsl_linalg_SV_decomp(endmembers, V, S, work);
-            std::cout << "outVal = " << outVal << std::endl;
-            matrixUtils.printGSLMatrix(endmembers);
-            
-            gsl_vector *b = gsl_vector_alloc(endmembers->size1);
-            
-            float e1 = 0.2;
-            float e2 = 0.7;
-            float e3 = 0.1;
-            gsl_vector_set(b, 0, ((49.34*e1)+(78.95*e2)+(13.43*e3)));
-            gsl_vector_set(b, 1, ((32.67*e1)+(111.47*e2)+(10.39*e3)));
-            gsl_vector_set(b, 2, ((579.42*e1)+(206.47*e2)+(33.65*e3)));
-            gsl_vector_set(b, 3, ((206.63*e1)+(213.85*e2)+(18.61*e3)));
-            gsl_vector_set(b, 4, weight);
-            
-            std::cout << "B = \n";
-            vecUtils.printGSLVector(b);
-            
-            
-            gsl_vector *x = gsl_vector_alloc(endmembers->size2);
-            
-            outVal = gsl_linalg_SV_solve(endmembers, V, S, b, x);
-            std::cout << "outVal = " << outVal << std::endl;
-             
-            vecUtils.printGSLVector(x);
-            */
-                        
+                                    
             int m = endmembersIn->size1+1;
             int n = endmembersIn->size2;
             

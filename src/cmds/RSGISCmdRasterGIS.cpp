@@ -61,17 +61,6 @@
 #include "rastergis/RSGISRATStats.h"
 #include "rastergis/RSGISExportClumps2Imgs.h"
 
-/*
-
-#include "rastergis/RSGISCalcEucDistanceInAttTable.h"
-#include "rastergis/RSGISFindTopNWithinDist.h"
-#include "rastergis/RSGISFindClosestSpecSpatialFeats.h"
-#include "rastergis/RSGISKNNATTMajorityClassifier.h"
-#include "rastergis/RSGISMaxLikelihoodRATClassification.h"
-#include "rastergis/RSGISClassMask.h"
-#include "rastergis/RSGISCalcClumpShapeParameters.h"
-*/
-
 
 namespace rsgis{ namespace cmds {
 

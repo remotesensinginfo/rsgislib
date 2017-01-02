@@ -543,11 +543,7 @@ namespace rsgis{namespace math{
 	void RSGISMatrices::saveGSLMatrix2GridTxt(gsl_matrix *gslMatrix, std::string filepath) throw(RSGISMatricesException,RSGISOutputStreamException)
 	{
 		Matrix *rsgisMatrix;
-		//cout << "gsl matrix" << std::endl;
-		//this->printGSLMatrix(gslMatrix);
 		rsgisMatrix = this->convertGSL2RSGISMatrix(gslMatrix);
-		//cout << "converted matrix" << std::endl;
-		//this->printMatrix(rsgisMatrix);
 		this->saveMatrix2GridTxt(rsgisMatrix, filepath);
 		this->freeMatrix(rsgisMatrix);
 	}
@@ -711,7 +707,6 @@ namespace rsgis{namespace math{
 						word = strLine.substr(2);
 						number = strtol(word.c_str(), NULL, 10);
 						matrix->m = number;
-						//cout << "columns = " << number << std::endl;
 					}
 					else if(lineCounter == 1)
 					{
@@ -719,7 +714,6 @@ namespace rsgis{namespace math{
 						word = strLine.substr(2);
 						number = strtol(word.c_str(), NULL, 10);
 						matrix->n = number;
-						//cout << "rows = " << number << std::endl;
 					}
 					else 
 					{
@@ -867,12 +861,10 @@ namespace rsgis{namespace math{
 			eigenvalues->matrix[i] = gsl_vector_get(eigenValuesGSL, i);
 			
 			evec_i = gsl_matrix_column(eigenVectorsGSL, i);
-			//printf ("eigenvector = \n");
 			for(int j = 0; j < eigenvectors->n; j++)
 			{
 				index = (j*matrix->n)+i;
 				eigenvectors->matrix[index] = gsl_vector_get(&evec_i.vector, j);
-				//cout << gsl_vector_get(&evec_i.vector, j) << std::endl;
 			}
 		}
 		
@@ -987,7 +979,6 @@ namespace rsgis{namespace math{
         {
             for(int j = 0; j < matrix->n; ++j)
             {
-                //cout << matrix->matrix[(j*matrix->m)+i] << " / " << normalisingVals[i] << " = " << matrix->matrix[(j*matrix->m)+i]/normalisingVals[i] << std::endl;
                 outMatrix->matrix[(j*matrix->m)+i] = matrix->matrix[(j*matrix->m)+i]/normalisingVals[i];
             }            
         }
@@ -1054,8 +1045,6 @@ namespace rsgis{namespace math{
 			
 			for(int i = 0; i < length; i++)
 			{
-				//cout << "[" << column << "," << row << "]: " << xDupCount <<  " out = " << outCounter << " in = " << inCounter << std::endl;
-				
 				outMatrix->matrix[outCounter++] = matrix->matrix[inCounter++];
 				
 				column++;
@@ -1103,9 +1092,7 @@ namespace rsgis{namespace math{
 		/// Converts RSGIS matrix to a GSL matrix
 		Matrix *convertedMatrix = this->createMatrix(matrix->size1, matrix->size2);		
 		int index = 0;
-		//cout << "rows = " << matrix->size1 << std::endl;
-		//cout << "colums = " << matrix->size2 << std::endl;
-
+        
 		for(unsigned int i = 0; i < matrix->size1; i++) // Loop through rows
 		{
 			for(unsigned int j = 0; j < matrix->size2; j++) // Loop through columns

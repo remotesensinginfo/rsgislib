@@ -58,13 +58,6 @@ namespace rsgis{namespace rastergis{
             
             std::vector<std::pair<double, double> > *hist = mathUtils.calcHistogram(data, minVal, maxVal, binWidth, true);
             
-            /*
-            for(std::vector<std::pair<double, double> >::iterator iterHist = hist->begin(); iterHist != hist->end(); ++iterHist)
-            {
-                std::cout << (*iterHist).first << ":\t" << (*iterHist).second << std::endl;
-            }
-            */
-            
             rsgis::math::RSGISFitGaussianMixModel fitGausModel;
             double ampVar = 0.01;
             double peakThres = 0.005;

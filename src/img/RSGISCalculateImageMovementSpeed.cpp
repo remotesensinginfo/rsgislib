@@ -64,7 +64,6 @@ namespace rsgis{namespace img{
                 movement = displacement/time;
             }
 			
-			//cout << "[" << displacement << ", " << time << ", " << movement << "]" << endl;
 			output[idx] = displacement;
             output[idx+1] = movement;
 			

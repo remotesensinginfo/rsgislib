@@ -237,8 +237,6 @@ namespace rsgis{namespace img{
 		}
 		catch(RSGISImageCalcException& e)
 		{
-			//GDALClose(outputImageDS);
-			
 			if(gdalTranslation != NULL)
 			{
 				delete[] gdalTranslation;
@@ -315,8 +313,6 @@ namespace rsgis{namespace img{
 		}
 		catch(RSGISImageBandException& e)
 		{
-			//GDALClose(outputImageDS);
-			
 			if(gdalTranslation != NULL)
 			{
 				delete[] gdalTranslation;
@@ -2973,8 +2969,6 @@ namespace rsgis{namespace img{
 		}
 		catch(RSGISImageCalcException& e)
 		{
-			//GDALClose(outputImageDS);
-			
 			if(gdalTranslation != NULL)
 			{
 				delete[] gdalTranslation;
@@ -2996,8 +2990,6 @@ namespace rsgis{namespace img{
 		}
 		catch(RSGISImageBandException& e)
 		{
-			//GDALClose(outputImageDS);
-			
 			if(gdalTranslation != NULL)
 			{
 				delete[] gdalTranslation;
@@ -3242,8 +3234,6 @@ namespace rsgis{namespace img{
 		}
 		catch(RSGISImageCalcException& e)
 		{
-			//GDALClose(outputImageDS);
-			
 			if(gdalTranslation != NULL)
 			{
 				delete[] gdalTranslation;
@@ -3320,8 +3310,6 @@ namespace rsgis{namespace img{
 		}
 		catch(RSGISImageBandException& e)
 		{
-			//GDALClose(outputImageDS);
-			
 			if(gdalTranslation != NULL)
 			{
 				delete[] gdalTranslation;
@@ -10731,8 +10719,6 @@ namespace rsgis{namespace img{
 		}
 		catch(RSGISImageCalcException& e)
 		{
-			//GDALClose(outputImageDS);
-			
 			if(gdalTranslation != NULL)
 			{
 				delete[] gdalTranslation;
@@ -10809,8 +10795,6 @@ namespace rsgis{namespace img{
 		}
 		catch(RSGISImageBandException& e)
 		{
-			//GDALClose(outputImageDS);
-			
 			if(gdalTranslation != NULL)
 			{
 				delete[] gdalTranslation;

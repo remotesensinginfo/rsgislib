@@ -159,25 +159,6 @@ namespace rsgis{namespace rastergis{
             delete calcCatClumpCounts;
             delete[] datasets;
             
-            /*
-            for(size_t i = 0; i < numRows; ++i)
-            {
-                std::cout << i << ": ";
-                for(unsigned int j = 0; j < numCatVals; ++j)
-                {
-                    if(j == 0)
-                    {
-                        std::cout << catStats[i][j];
-                    }
-                    else
-                    {
-                        std::cout << ", " << catStats[i][j];
-                    }
-                }
-                std::cout << std::endl;
-            }
-            */
-            
             std::cout << "Writing Majority Values to Output RAT\n";
             size_t numBlocks = floor((double)numRows/(double)RAT_BLOCK_LENGTH);
             size_t rowsRemain = numRows - (numBlocks * RAT_BLOCK_LENGTH);

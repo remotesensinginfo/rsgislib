@@ -103,17 +103,14 @@ namespace rsgis{namespace img {
 
 			if (polyArea > (pixelArea * factor))
 			{
-				//cout << "Check pixel contains poly" << endl;
 				returnVal = pixel->Contains(poly);
 			}
 			else if (polyArea < (pixelArea / factor))
 			{
-				//cout << "Check poly contains pixel" << endl;
 				returnVal = pixel->Within(poly);
 			}
 			else
 			{
-				//cout << "Check pixel contains poly center" << endl;
 				this->polyOGRPoly = (OGRPolygon*) poly->clone();
 				OGRPoint *centerPoint = NULL;
 				centerPoint = new OGRPoint(0,0);

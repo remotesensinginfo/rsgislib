@@ -398,12 +398,7 @@ namespace rsgis{namespace img{
                 allBandsZero = false;
             }
 		}
-        /*
-        if(foundNan)
-        {
-            std::cout << "******** FOUND NAN ********\n";
-        }
-		*/
+        
         if(!foundNan)
         {
             if(!(ignoreZeros & allBandsZero))
@@ -488,13 +483,6 @@ namespace rsgis{namespace img{
                 }
             }
         }
-        /*
-        for(int i = 0; i < numBands; i++)
-        {
-            std::cout << "Stats band " << i+1 << ": (Value: " << bandValues[i] << ") [Mean = " << meanSum[i] << "] [Min = " << min[i] << "] [Max = " << max[i] << "] [n = " << n[i] << "] [sumSq = " << sumSq[i] << "]\n";
-        }
-        std::cout << std::endl;
-         */
 	}
 	
 	void RSGISCalcImageStatistics::getImageStats(ImageStats** inStats, int numInputBands) throw(RSGISImageCalcException)

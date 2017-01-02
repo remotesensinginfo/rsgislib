@@ -89,11 +89,7 @@ namespace rsgis{namespace img{
 			{
 				numInBandsDSB += datasetsB[i]->GetRasterCount();
 			}
-			
-			/*if(numInBandsDSA != numInBandsDSB)
-			{
-				throw RSGISImageCalcException("The two image sets do not have the same number of bands.");
-			}*/
+
 			numInBands = numInBandsDSA;
 			
 			// Get Image Input Bands

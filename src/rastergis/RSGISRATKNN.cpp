@@ -108,30 +108,6 @@ namespace rsgis{namespace rastergis{
             extractVals.resetCounter();
             ratCalc.calcRATValues(gdalAtt, inRealColIdx, inIntColIdx, inStrColIdx, outRealColIdx, outIntColIdx, outStrColIdx);
             
-            /* Print training Data
-            std::cout << "Training Data: [Extrap Val] = [Field Values]\n";
-            for(size_t i = 0; i < numTrainFeats; ++i)
-            {
-                std::cout << i << "\t";
-                for(size_t j = 0; j < numFloatVals; ++j)
-                {
-                    if(j == 0)
-                    {
-                        std::cout << "[" << trainData[i][j] << "] = [";
-                    }
-                    else if(j == 1)
-                    {
-                        std::cout << trainData[i][j];
-                    }
-                    else
-                    {
-                        std::cout << ", " << trainData[i][j];
-                    }
-                }
-                std::cout << "]\n";
-            }
-            */
-            
             rsgis::math::RSGISMathsUtils mathUtils;
             rsgis::math::RSGISStatsSummary *mathSumStats = new rsgis::math::RSGISStatsSummary();
             mathUtils.initStatsSummary(mathSumStats);

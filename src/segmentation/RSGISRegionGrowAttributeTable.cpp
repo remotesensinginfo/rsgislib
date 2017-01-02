@@ -60,14 +60,12 @@ namespace rsgis{namespace segment{
                 {
                     for(std::list<unsigned int>::iterator iterClumpIdxs = connectClumps->begin(); iterClumpIdxs != connectClumps->end(); ++iterClumpIdxs)
                     {
-                        //cout << "Testing clump " << *iterClumpIdxs << " to see whether it meets critria\n";
                         feat = attTable->getFeature((*iterClumpIdxs));
                         if(feat->intFields->at(classFieldIdx) != classAttVal)
                         {
                             if(attTable->applyIfStatementsToFeature(feat, statements))
                             {
                                 change = true;
-                                //cout << "\tChanged\n";
                             }
                         }
                     }

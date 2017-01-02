@@ -658,12 +658,6 @@ namespace rsgis{namespace calib{
             {
                 output[0] = 0;
             }
-            
-            /*if(bandValues[snowTestIdx] == 1)
-            {
-                output[0] = 3;
-            }*/
-            
         }
         else
         {

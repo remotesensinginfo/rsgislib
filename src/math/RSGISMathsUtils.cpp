@@ -514,7 +514,6 @@ namespace rsgis{namespace math{
 			first = true;
 			for(int j = 0; j < inData->n; ++j)
 			{
-				//cout << inData->matrix[(j*inData->m)+i] << ", ";
 				if(first)
 				{
 					currentArea = widths->matrix[(i*2)+1] * inData->matrix[(j*inData->m)+i];

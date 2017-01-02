@@ -123,31 +123,6 @@ namespace rsgis{ namespace classifier{
 		calcImage->calcImage(datasets, numDatasets);
 		sumSqDist = calcDist2Centres->getSumSqDistance();
 		
-		/*
-		for(unsigned int i = 0; i < numClusters; ++i)
-		{
-			// Calc Sum D(x)^2
-			sumSqDist = 0;
-			calcDist2Centres->setClusterCentres(clusterCentres, numClusters);
-			calcImage->calcImage(datasets, numDatasets);
-			sumSqDist = calcDist2Centres->getSumSqDistance();
-			calcDist2Centres->reset();
-		}
-		 */
-		
-		// Print init cluster centres
-		/*
-		for(unsigned int i = 0; i < numClusters; ++i)
-		{
-			std::cout << "Cluster " << i << ": ";
-			for(unsigned int j = 0; j < numImageBands; ++j)
-			{
-				std::cout << clusterCentres[i]->data->vector[j] << ", ";
-			}
-			std::cout << std::endl;
-		}
-		 */
-		
 		// Free stats from memory
 		for(unsigned int i = 0; i < numImageBands; ++i)
 		{

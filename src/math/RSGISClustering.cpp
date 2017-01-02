@@ -224,18 +224,13 @@ namespace rsgis {namespace math{
                 }
             }
             
-            //cout << "Using Sample: " << sampleIndex;
-            
             std::vector<float> sample = input->at(sampleIndex);
             
-            //cout << "\tCentre: [";
             for(unsigned int j = 0; j < numFeatures; ++j)
             {
-                //cout << sample[j] << ",";
                 cCentre.centre.push_back(sample[j]);
                 cCentre.stdDev.push_back(0);
-            } 
-            //cout << endl;
+            }
             
             clusterCentres->push_back(cCentre);
         }
@@ -315,13 +310,6 @@ namespace rsgis {namespace math{
             {
                 betweenStdDevMinAndMin = true;
             }
-            
-            //cout << "Feature " << i << ": \n";
-            //cout << "\tMin = " << min[i] << endl;
-            //cout << "\tMax = " << max[i] << endl;
-            //cout << "\tMean = " << mean[i] << endl;
-            //cout << "\t+2StdDev = " << p2StdDev[i] << endl;
-            //cout << "\t-2StdDev = " << m2StdDev[i] << endl;
         }
         
         unsigned int extras = 0;
@@ -443,21 +431,7 @@ namespace rsgis {namespace math{
                 }
                 
                 this->assign2ClosestDataPoint(&cCentre, input, numFeatures, clusterCentres);
-                /*
-                cout << "cCentre " << i << ": [";
-                for(unsigned int j = 0; j < numFeatures; ++j)
-                {
-                    if(j == 0)
-                    {
-                        cout << cCentre.centre[j];
-                    }
-                    else
-                    {
-                        cout << ", " << cCentre.centre[j];
-                    }
-                }
-                cout << "]\n";
-                */
+                
                 clusterCentres->push_back(cCentre);
             }
             
@@ -506,13 +480,6 @@ namespace rsgis {namespace math{
             {
                 betweenStdDevMinAndMin = true;
             }
-            
-            //cout << "Feature " << i << ": \n";
-            //cout << "\tMin = " << min[i] << endl;
-            //cout << "\tMax = " << max[i] << endl;
-            //cout << "\tMean = " << mean[i] << endl;
-            //cout << "\t+2StdDev = " << p2StdDev[i] << endl;
-            //cout << "\t-2StdDev = " << m2StdDev[i] << endl;
         }
         
         unsigned int extras = 0;
@@ -649,8 +616,6 @@ namespace rsgis {namespace math{
                 }
             }
             
-            //cout << "minDist = " << minDist << "(clusterID = " << clusterID << ")" << endl;
-            
             ++clusterCentres->at(clusterID).numPxl;
             clusterData->push_back(std::pair< unsigned int, std::vector<float> >(clusterID, *iterInData));
         }
@@ -723,10 +688,9 @@ namespace rsgis {namespace math{
                 clusterCentres->at((*iterData).first).centre[i] += (*iterData).second[i];
             }
         }
-        //unsigned int count = 0;
+
         for(std::vector< RSGISClusterCentre >::iterator iterClusters = clusterCentres->begin(); iterClusters != clusterCentres->end(); )
         {
-            //cout << count++ << ":\t(*iterClusters).numPxl = " << (*iterClusters).numPxl << endl;
             if((*iterClusters).numPxl == 0)
             {
                 iterClusters = clusterCentres->erase(iterClusters);
@@ -763,21 +727,6 @@ namespace rsgis {namespace math{
     
     void RSGISClusterer::assign2ClosestDataPoint(RSGISClusterCentre *cc, std::vector< std::vector<float> > *input, unsigned int numFeatures, std::vector< RSGISClusterCentre > *used)throw(RSGISClustererException)
     {
-        /*
-        cout << "\nInit Centre: [";
-        for(unsigned int i = 0; i < numFeatures; ++i)
-        {
-            if( i == 0 )
-            {
-                cout << cc->centre[i];
-            }
-            else
-            {
-                cout << ", " << cc->centre[i];
-            }
-        }
-        cout << "]\n";
-        */
         bool first = true;
         bool alreadyUsed = 0;
         double minDist = 0;
@@ -867,8 +816,6 @@ namespace rsgis {namespace math{
                     }
                     
                 }
-                
-                //cout << "Min Distance: " << minDist << endl;
             }
             
             if(first)
@@ -952,31 +899,6 @@ namespace rsgis {namespace math{
                 throw RSGISClustererException("Cluster initaliser was now recognised.");
             }
             
-            /*
-            cout << endl;
-            unsigned int clusterID = 1;
-            bool first = true;
-            for(std::vector< RSGISClusterCentre >::iterator iterClusters = clusterCentres->begin(); iterClusters != clusterCentres->end(); ++iterClusters)
-            {
-                cout << "Cluster " << clusterID++ << endl;
-                first = true;
-                for(std::vector<float>::iterator iterCentres = (*iterClusters).centre.begin(); iterCentres != (*iterClusters).centre.end(); ++iterCentres)
-                {
-                    if(first)
-                    {
-                        cout << (*iterCentres);
-                        first = false;
-                    }
-                    else
-                    {
-                        cout << ", " << (*iterCentres);
-                    }
-                }
-               cout << " : " << (*iterClusters).numPxl << endl;
-            }
-            cout << endl;
-             */
-            
             delete[] minVals;
             delete[] maxVals;
             
@@ -999,39 +921,13 @@ namespace rsgis {namespace math{
                 amountOfChange = ((float)nChange)/clusterData->size();
                 
                 std::cout << "Iteration " << nIter << " has change " << amountOfChange*100 << " % of data clump IDs (" << clusterCentres->size() << " clusters).\n";
-                /*
-                cout << endl;
-                clusterID = 1;
-                first = true;
-                for(std::vector< RSGISClusterCentre >::iterator iterClusters = clusterCentres->begin(); iterClusters != clusterCentres->end(); ++iterClusters)
-                {
-                    cout << "Cluster " << clusterID++ << endl;
-                    first = true;
-                    for(std::vector<float>::iterator iterCentres = (*iterClusters).centre.begin(); iterCentres != (*iterClusters).centre.end(); ++iterCentres)
-                    {
-                        if(first)
-                        {
-                            cout << (*iterCentres);
-                            first = false;
-                        }
-                        else
-                        {
-                            cout << ", " << (*iterCentres);
-                        }
-                    }
-                    cout << " : " << (*iterClusters).numPxl << endl;
-                }
-                cout << endl;
-                 */
                 
                 if((nIter < maxNumIterations) & (amountOfChange > degreeOfChange))
                 {
                     contProcess = true;
                 }
                 ++nIter;
-            }
-            
-            
+            }            
         } 
         catch (RSGISClustererException &e) 
         {
@@ -1176,7 +1072,6 @@ namespace rsgis {namespace math{
                 if((*iterClusters).numPxl < this->minNumFeatures)
                 {
                     iterClusters = clusterCentres->erase(iterClusters);
-                    //cout << "Removing a cluster (Min Number)\n";
                 }
                 else
                 {
@@ -1203,7 +1098,6 @@ namespace rsgis {namespace math{
                             {
                                 removed = true;
                                 iterClusters = clusterCentres->erase(iterClusters);
-                                //cout << "Removing a cluster (Distance)\n";
                                 break;
                             }
                         }
@@ -1229,8 +1123,6 @@ namespace rsgis {namespace math{
             }
             meanStdDev = meanStdDev/(*iterClusters).stdDev.size();
             
-            //cout << "meanStdDev = " << meanStdDev << endl;
-            
             if((meanStdDev > this->maxStdDev) && ((*iterClusters).numPxl > (this->minNumFeatures*2)))
             {
                 RSGISClusterCentre cCentre;
@@ -1244,7 +1136,6 @@ namespace rsgis {namespace math{
                     cCentre.stdDev.push_back(0);
                 }
                 newClusters.push_back(cCentre);
-                //cout << "Adding cluster\n";
             }
         }
         

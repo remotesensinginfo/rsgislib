@@ -58,14 +58,7 @@ namespace rsgis{namespace vec{
 		vector->ResetReading();
 		while( (polyFeature = vector->GetNextFeature()) != NULL )
 		{
-			/*if(numFeatures < 20)
-			 {
-			 std::cout << "Calculation of stats for " << counter << " of " << numFeatures << " have been completed\n";
-			 }
-			 else if(counter % feedback == 0)
-			 {*/
 			std::cout << "Calculation of stats for " << counter << " of " << numFeatures << " have been completed\n";
-			//}
 			polyGeometry = polyFeature->GetGeometryRef();
 			if( polyGeometry != NULL && wkbFlatten(polyGeometry->getGeometryType()) == wkbPolygon )
 			{
@@ -303,24 +296,11 @@ namespace rsgis{namespace vec{
 			calcImg->calcImage(datasets, numDS);
 			for(int i = 0; i < numFeatures; i++)
 			{
-				//std::cout << i << ",";
 				for(int j = 0; j < numAttributes; j++)
 				{
 					featureStats[i][j].mean = featureStats[i][j].meanSum/featureStats[i][j].n;
-					//std::cout << featureStats[i][j].mean << ",";
 				}
-				//std::cout << std::endl;
 			}
-			/*std::cout << "Calc stats part 2\n";
-			 rasterZonalCalc->setStdDev(true);
-			 calcImg->calcImage(datasets, numDS);
-			 for(int i = 0; i < numFeatures; i++)
-			 {
-			 for(int j = 0; j < numAttributes; j++)
-			 {
-			 featureStats[i][j].stddev = sqrt(featureStats[i][j].sumDiff/featureStats[i][j].n);
-			 }
-			 }*/
 			delete[] datasets;
 			this->outputData2Text(outputTxt, toCalc, featureStats, numFeatures, numAttributes);
 		}
@@ -524,11 +504,6 @@ namespace rsgis{namespace vec{
 				polygon = (OGRPolygon *) geometry;
 				featureOutput->SetGeometry(polygon);
 			}
-			/*else if( geometry != NULL && wkbFlatten(geometry->getGeometryType()) == wkbMultiPolygon )
-			 {
-			 mPolygon = (OGRMultiPolygon *) geometry;
-			 featureOutput->SetGeometry(mPolygon);
-			 }*/
 			
 			////////////////////////////////////////////
 			//
@@ -556,37 +531,31 @@ namespace rsgis{namespace vec{
 			
 			for(int i = 0; i < numBands; i++)
 			{
-				//std::cout << "band " << i << " stats = [" << stats[counter][i].mean << ", " << stats[counter][i].max << ", " << stats[counter][i].min << ", " << stats[counter][i].stddev << "]" << "\n";
 				if(toCalc[i][0])
 				{
 					char colname[8];
 					sprintf(colname, "mean_%d", i);
 					featureOutput->SetField(outputDefn->GetFieldIndex(colname), stats[counter][i].mean);
-					//std::cout << "column index " << colname << " = " << outputDefn->GetFieldIndex(colname) << std::endl;
 				}
 				if(toCalc[i][1])
 				{
 					char colname[7];
 					sprintf(colname, "max_%d", i);
 					featureOutput->SetField(outputDefn->GetFieldIndex(colname), stats[counter][i].max);
-					//std::cout << "column index " << colname << " = " << outputDefn->GetFieldIndex(colname) << std::endl;
 				}
 				if(toCalc[i][2])
 				{
 					char colname[7];
 					sprintf(colname, "min_%d", i);
 					featureOutput->SetField(outputDefn->GetFieldIndex(colname), stats[counter][i].min);
-					//std::cout << "column index " << colname << " = " << outputDefn->GetFieldIndex(colname) << std::endl;
 				}
 				if(toCalc[i][3])
 				{
 					char colname[10];
 					sprintf(colname, "stddev_%d", i);
 					featureOutput->SetField(outputDefn->GetFieldIndex(colname), stats[counter][i].stddev);
-					//std::cout << "column index " << colname << " = " << outputDefn->GetFieldIndex(colname) << std::endl;
 				}
 			}
-			//std::cout << std::endl;
 			
 			if( outputSHPLayer->CreateFeature(featureOutput) != OGRERR_NONE )
 			{
@@ -635,7 +604,6 @@ namespace rsgis{namespace vec{
 		try
 		{
 			envelope = polygon->getBBox();
-			//std::cout << "Env: " << envelope->toString() << std::endl;
 			
 			transformation = new double[6];
 			image->GetGeoTransform(transformation);
@@ -668,9 +636,6 @@ namespace rsgis{namespace vec{
 			endYPxl = polyTLPxlY + polyHeightPxl;
 			
 			imgData = (float *) CPLMalloc(sizeof(float)*imgXSize);
-			
-			//std::cout << "[" << polyTLPxlY << "," << endYPxl << "]" << std::endl;
-			//std::cout << "[" << polyTLPxlX << "," << endXPxl << "]" << std::endl;
 			
 			coord = new geos::geom::Coordinate(0, 0, 0);
 			
@@ -724,10 +689,6 @@ namespace rsgis{namespace vec{
 				polygon->setMax(maxPxl, n);
 				polygon->setMin(minPxl, n);
 				
-				//std::cout << "Mean = " << polygon->getMean()[n] << std::endl;
-				//std::cout << "Max = " << polygon->getMax()[n] << std::endl;
-				//std::cout << "Min = " << polygon->getMin()[n] << std::endl;
-				
 				if(polygon->calcStdDev(n))
 				{
 					for(int i = polyTLPxlY; i <= endYPxl; i++)
@@ -747,7 +708,6 @@ namespace rsgis{namespace vec{
 					}
 					
 					polygon->setStdDev(sqrt(meanDiffSqSum/numPxls), n);
-					//std::cout << "Std Dev = " << polygon->getStdDev()[n] << std::endl;
 				}
 				else
 				{
@@ -882,7 +842,6 @@ namespace rsgis{namespace vec{
 				
 				for(int i = polyTLPxlY; i <= endYPxl; i++)
 				{
-					//std::cout << "i = " << i << std::endl;
 					imageBand->RasterIO(GF_Read, 0, i, imgXSize, 1, imgData, imgXSize, 1, GDT_Float32, 0, 0);
 					for(int j = polyTLPxlX; j <=endXPxl; j++)
 					{
@@ -921,25 +880,7 @@ namespace rsgis{namespace vec{
 				std::cout << "Max = " << stats[n].max << std::endl;
 				std::cout << "Min = " << stats[n].min << std::endl;
 				
-				/*for(int i = polyTLPxlY; i <= endYPxl; i++)
-				 {
-				 imageBand->RasterIO(GF_Read, 0, i, imgXSize, 1, imgData, imgXSize, 1, GDT_Float32, 0, 0);
-				 for(int j = polyTLPxlX; j <=endXPxl; j++)
-				 {
-				 tmpPoint->setX(imgTLX + (j * imgRes) + imgResHalf);
-				 tmpPoint->setY(imgTLY - (i * imgRes) - imgResHalf);
-				 
-				 if(polygon->Contains(tmpPoint))
-				 {
-				 meanDiff = stats[i].mean - imgData[j];
-				 meanDiffSqSum = meanDiffSqSum + (meanDiff * meanDiff);
-				 }
-				 
-				 }
-				 }
-				 stats[n].stddev = sqrt(meanDiffSqSum/numPxls);
-				 std::cout << "Std Dev = " << stats[n].stddev << std::endl;*/
-				stats[n].stddev = 0;
+                stats[n].stddev = 0;
 			}
 			
 		}
@@ -1213,9 +1154,7 @@ namespace rsgis{namespace vec{
 				std::string attMde = attributes[i]->name + std::string("Mde");
                 std::string attSum = attributes[i]->name + std::string("Sum");
 				std::string attPix = attributes[i]->name + std::string("Pix");
-				
-				//std::cout << "mean = " << this->data[3] << " count = " << this->data[5] << std::endl;
-				
+								
 				int offset = (7 * i) + 1; // Offset by total number of stats + 1 for count
 				
 				if (attributes[i]->outMin) 
@@ -1518,7 +1457,6 @@ namespace rsgis{namespace vec{
 			
 			for(int j = 0; j < attributes[i]->numBands; j++)
 			{
-				//std::cout << "Number of bands = " << numBands << std::endl;
 				if((attributes[i]->bands[j] > numBands) | (attributes[i]->bands[j] < 0))
 				{
 					throw rsgis::img::RSGISImageCalcException("The band attributes do not match the image.");
@@ -1620,8 +1558,6 @@ namespace rsgis{namespace vec{
 			outputValues[offset+6] = values[i]->size();
 			outputValues[offset+5] = sum;
             
-			//std::cout << "values[i]->size() " << values[i]->size() << std::endl;
-			
 			// Calculate mean
 			if((sum != 0) && (values[i]->size() != 0))
 			{
@@ -1782,9 +1718,7 @@ namespace rsgis{namespace vec{
 				std::string attMde = attributes[i]->name + std::string("Mde");
                 std::string attSum = attributes[i]->name + std::string("Sum");
 				std::string attPix = attributes[i]->name + std::string("Pix");
-				
-				//std::cout << "mean = " << this->data[3] << " count = " << this->data[6] << " mode = " << this->data[5] << std::endl;
-				
+								
 				int offset = (7 * i) + 1; // Offset by total number of stats + 1 for count
 				          
 				if (attributes[i]->outMin) 
@@ -2102,7 +2036,6 @@ namespace rsgis{namespace vec{
 			
 			for(int j = 0; j < attributes[i]->numBands; j++)
 			{
-				//std::cout << "Number of bands = " << numBands << std::endl;
 				if((attributes[i]->bands[j] > numBands) | (attributes[i]->bands[j] < 0))
 				{
 					throw rsgis::img::RSGISImageCalcException("The band attributes do not match the image.");
@@ -2203,9 +2136,7 @@ namespace rsgis{namespace vec{
 			outputValues[offset+1] = maxVal;
 			outputValues[offset+6] = values[i]->size();
 			outputValues[offset+5] = sum;
-            
-			//std::cout << "values[i]->size() " << values[i]->size() << std::endl;
-			
+            			
 			// Calculate mean
 			if((sum != 0) && (values[i]->size() != 0))
 			{

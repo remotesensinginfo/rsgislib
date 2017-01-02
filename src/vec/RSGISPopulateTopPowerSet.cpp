@@ -93,32 +93,8 @@ namespace rsgis{namespace vec{
 					numPowerSetAttributes = value - 1;
 				}
 				powerSetAttributes = new CountAttributes*[numPowerSetAttributes];
-				
-				//std::cout << "Number of Power Set Attributes = " << numPowerSetAttributes << std::endl;
-				
-				//std::cout << "identifying powerset\n";
+								
 				this->identifyPowerSet(attributes, numAttributes, topAttributes, numTopValues, powerSetAttributes, numPowerSetAttributes);
-				//std::cout << "identified powerset\n";
-				
-				/*
-				for(int j = 0; j < numPowerSetAttributes; j++)
-				{
-					std::cout << j << ": " << std::flush;
-					std::cout << powerSetAttributes[j]->name << ": [";
-					for(int k = 0; k < powerSetAttributes[j]->numBands; k++)
-					{
-						if(k == 0)
-						{
-							std::cout << powerSetAttributes[j]->bands[k] << "(" << powerSetAttributes[j]->thresholds[k] << ")";
-						}
-						else
-						{
-							std::cout << " " << powerSetAttributes[j]->bands[k] << "(" << powerSetAttributes[j]->thresholds[k] << ")";
-						}
-					}
-					std::cout << "]\n";
-				}
-				*/
 				
 				dataSize = numPowerSetAttributes + 2; // 0 Pxl Count // 1 Empty Set // 2 ..  n Attribute data
 				data = new double[dataSize];
@@ -126,20 +102,14 @@ namespace rsgis{namespace vec{
 				calcValue = new RSGISCalcZonalCountFromRasterPolygon(dataSize, powerSetAttributes, numPowerSetAttributes);
 				calcImage = new rsgis::img::RSGISCalcImageSingle(calcValue);
 				
-				// Calculate Stats HERE!!
-				//calcValue->reset();
 				calcImage->calcImageWithinRasterPolygon(datasets, 2, data, env, fid, true);
-				
-				//std::cout << "Number of Pixels = " << data[0] << std::endl;
-				
+								
 				int count = 1;
 				for(int j = 0; j < numPowerSetAttributes; j++)
 				{
 					name = "PS_" + mathUtils.inttostring(count) + "_Desc";
 					outFeature->SetField(outFeatureDefn->GetFieldIndex(name.c_str()), powerSetAttributes[j]->name.c_str());
-					
-					//std::cout << "name = " << name << " output: " << powerSetAttributes[j]->name.c_str() << " = " << data[j+2] << std::endl;
-					
+										
 					name = "PS_" + mathUtils.inttostring(count) + "_Sum";
 					outFeature->SetField(outFeatureDefn->GetFieldIndex(name.c_str()), data[j+2]);
 					
@@ -148,9 +118,7 @@ namespace rsgis{namespace vec{
 				
 				name = "PS_" + mathUtils.inttostring(count) + "_Desc";
 				outFeature->SetField(outFeatureDefn->GetFieldIndex(name.c_str()), "Empty");
-				
-				//std::cout << "name = " << name << " output: Empty = " << data[1] << std::endl;
-				
+								
 				name = "PS_" + mathUtils.inttostring(count) + "_Sum";
 				outFeature->SetField(outFeatureDefn->GetFieldIndex(name.c_str()), (data[1]));
 				
@@ -166,12 +134,9 @@ namespace rsgis{namespace vec{
 					delete powerSetAttributes[i];
 				}
 				delete[] powerSetAttributes;
-				//std::cout << std::endl;
 			}
 			else
 			{
-				//std::cout << "No Top attributes.. continuing...\n";
-				
 				//ELSE PROVIDE PIXEL COUNT AS EMPTY SET....
 				
 				dataSize = 1; // 0 Pxl Count
@@ -184,9 +149,7 @@ namespace rsgis{namespace vec{
 				
 				name = "PS_1_Desc";
 				outFeature->SetField(outFeatureDefn->GetFieldIndex(name.c_str()), "Empty");
-				
-				//std::cout << "name = " << name << " output: " << powerSetAttributes[j]->name.c_str() << " = " << data[j+2] << std::endl;
-				
+								
 				name = "PS_1_Sum";
 				outFeature->SetField(outFeatureDefn->GetFieldIndex(name.c_str()), data[0]);
 				
@@ -295,9 +258,7 @@ namespace rsgis{namespace vec{
 			}
 			
 			topAttributes = new CountAttributes*[numTop];
-			
-			//std::cout << "number of sets = " << numSets << std::endl;
-			
+						
 			if(numSets != numPSAttributes)
 			{
 				throw rsgis::math::RSGISMathException("Inconsistance in the number of sets defined.");

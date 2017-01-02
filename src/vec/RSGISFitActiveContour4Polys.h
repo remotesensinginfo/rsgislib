@@ -107,28 +107,6 @@ namespace rsgis{namespace vec{
         double calcPointStiffnesss(RSGISACCoordFit *p1, RSGISACCoordFit *p2, RSGISACCoordFit *stiffPt) throw(RSGISVectorException);
     };
     
-    /*
-    
-    class DllExport RSGISFitActiveContourOptimiseFunc : public rsgis::math::RSGISGlobalOptimisationFunction
-    {
-    public:
-        RSGISFitActiveContourOptimiseFunc(GDALDataset *extImg, double alpha, double beta, double gamma);
-        double calcValue(std::vector<geos::geom::Coordinate*> *coords) throw(rsgis::math::RSGISOptimisationException);
-        ~RSGISFitActiveContourOptimiseFunc();
-    protected:
-        GDALRasterBand *extImgBand;
-        int imgWidth;
-        int imgHeight;
-        double imgRes;
-        double xMin;
-        double xMax;
-        double yMin;
-        double yMax;
-        double alpha;
-        double beta;
-        double gamma;
-    };
-    */
 }}
 
 #endif

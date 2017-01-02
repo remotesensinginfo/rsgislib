@@ -77,10 +77,6 @@ namespace rsgis{namespace img{
 				delete calcImageStats;
 			}
 			
-			/*for(int i = 0; i < numBands; i++)
-			{
-				std::cout << "Band " << i << " imageMax = " << imageMax[i] << " imageMin = " << imageMin[i] << " outMax = " << outMax[i] << " outMin = " << outMin[i] << std::endl;
-			}*/
 			normImage = new RSGISNormaliseImage(numBands, imageMax, imageMin, outMax, outMin); //??? creates what we are to do with the calc image?
 			calcImg = new RSGISCalcImage(normImage, "", true);
 			calcImg->calcImage(datasets, 1, outputImage);

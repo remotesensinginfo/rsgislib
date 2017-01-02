@@ -1047,7 +1047,6 @@ namespace rsgis { namespace img {
 	
 	double RSGISExponentStretchFunction::calcFunction(double value) throw(rsgis::math::RSGISMathException)
 	{
-		//std::cout << value << " = " << exp(value) << std::endl;
 		float outVal = exp(value);
 		if((boost::math::isinf)(outVal))
 		{

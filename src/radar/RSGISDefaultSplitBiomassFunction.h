@@ -38,7 +38,7 @@ namespace rsgis
 		class DllExport RSGISDefaultSplitBiomassFunction : public rsgis::math::RSGISMathFunction
 			{
 				
-				/*
+				/**
 				 * The function implemented is:
 				 * \f$ 
 				 *		\gamma^0 = \begin{array}{l c l}

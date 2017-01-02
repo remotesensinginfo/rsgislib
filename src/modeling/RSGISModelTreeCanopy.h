@@ -38,7 +38,7 @@
 namespace rsgis { namespace modeling{
     
 	/// Class to create tree canopy
-	/*
+	/**
 	 * Class to create a tree canopy based on statistical distrobutions and tree parameters<br>
 	 * similar to those required by the radar backscatter model of Durden et al (1989)<br>
 	 * Parametamerers are input in the form of a vectors, and a number of RSGISProbDisros:<br>

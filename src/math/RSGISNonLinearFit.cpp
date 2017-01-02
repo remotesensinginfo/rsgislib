@@ -215,8 +215,7 @@ namespace rsgis {namespace math{
 							else // If new energy is lower, accept based on Boltzman probability
 							{
 								boltzmanProb = exp((-1*(newEnergy - currentCoeffError[nCoeff]))/temp);
-								//cout << "boltzmanProb = " << boltzmanProb << endl;
-								if (boltzmanProb > gsl_rng_uniform(randgsl)) 
+								if (boltzmanProb > gsl_rng_uniform(randgsl))
 								{
 									currentCoeffError[j] = testCoeff[j];
 									currentCoeffError[nCoeff] = newEnergy;
@@ -371,7 +370,6 @@ namespace rsgis {namespace math{
 							else // If new energy is lower, accept based on Boltzman probability
 							{
 								boltzmanProb = exp((-1*(newEnergy - currentCoeffError[nCoeff]))/temp);
-								//cout << "boltzmanProb = " << boltzmanProb << endl;
 								if (boltzmanProb > gsl_rng_uniform(randgsl)) 
 								{
 									currentCoeffError[j] = testCoeff[j];

@@ -57,16 +57,6 @@ namespace rsgis{namespace img{
 			double inputXResolution = transformation[1];
 			double inputYResolution = transformation[5];
 			
-			/*if(inputXResolution < 0)
-			{
-				inputXResolution = inputXResolution * (-1);
-			}
-			
-			if(inputYResolution < 0)
-			{
-				inputYResolution = inputYResolution * (-1);
-			}*/
-			
 			double xScale = inputXResolution/outputXResolution;
 			double yScale = inputYResolution/outputYResolution;
 			

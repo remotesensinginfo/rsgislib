@@ -86,9 +86,7 @@ namespace rsgis{namespace reg{
 		
 		TiePoint *tmpTiePt = NULL;
 		std::list<TiePoint*> *tmpTiePts = new std::list<TiePoint*>();
-		
-		//std::cout << "Start offset = [" << startXOff << "," << startYOff << "]" << std::endl;
-		
+				
 		for(unsigned int i = 0; i < numYPts; ++i)
 		{
 			currentEastings = startEastings;
@@ -191,12 +189,7 @@ namespace rsgis{namespace reg{
 					std::cout << "." << feedbackVal << "." << std::flush;
 					feedbackVal += 10;
 				}
-				
-				//std::cout << "Finding location of tie point " << counter << std::endl;
-                
-                //std::cout << "Initial: " << (*iterTiePts)->tiePt->xShift << "," << (*iterTiePts)->tiePt->yShift << std::endl;
                 totalMovement += this->findTiePointLocation((*iterTiePts)->tiePt, windowSize, searchArea, metric, metricThreshold, subPixelResolution, &xShift, &yShift);
-                //std::cout << "Final: " << (*iterTiePts)->tiePt->xShift << "," << (*iterTiePts)->tiePt->yShift << std::endl;
 
                 for(iterNrTiePts = (*iterTiePts)->nrTiePts->begin(); iterNrTiePts != (*iterTiePts)->nrTiePts->end(); ++iterNrTiePts)
                 {
@@ -213,10 +206,8 @@ namespace rsgis{namespace reg{
 					xShiftDiff = xShift - (*iterNrTiePts)->xShift;
 					yShiftDiff = yShift - (*iterNrTiePts)->yShift;
 					
-					//std::cout << "Before = [" << (*iterNrTiePts)->xShift << "," << (*iterNrTiePts)->yShift << "]\n";
 					(*iterNrTiePts)->xShift += invDist*xShiftDiff;
 					(*iterNrTiePts)->yShift += invDist*yShiftDiff;
-					//std::cout << "After = [" << (*iterNrTiePts)->xShift << "," << (*iterNrTiePts)->yShift << "]\n\n";
 				}
 				++counter;
 			}

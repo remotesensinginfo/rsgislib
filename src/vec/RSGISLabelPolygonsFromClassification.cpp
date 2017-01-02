@@ -40,7 +40,6 @@ namespace rsgis{namespace vec{
 		
 		if( geometryType == wkbPolygon )
 		{
-			//cout << "Starting polygon " << fid << endl;
 			OGRPolygon *ogrPolygon = (OGRPolygon *) inFeature->GetGeometryRef()->clone();
 			geos::geom::Polygon *poly = vecUtils.convertOGRPolygon2GEOSPolygon(ogrPolygon);
 			
@@ -57,7 +56,6 @@ namespace rsgis{namespace vec{
 			{
 				if(poly->intersects(labelsClassData[i]->getPolygon()))
 				{
-					//cout << "Intersects with polygon of class " << labelsClassData[i]->getClassName() << " with area " << labelsClassData[i]->getPolygon()->getArea() << endl;
 					if(first)
 					{
 						speciesNames.push_back(labelsClassData[i]->getClassName());
@@ -101,15 +99,7 @@ namespace rsgis{namespace vec{
 			double areaThreshold = totalArea * 0.66;
 			
 			delete poly;
-			
-			/*count = 0;
-			for(iterSpecies = speciesNames.begin(); iterSpecies != speciesNames.end(); ++iterSpecies)
-			{
-				cout << "There are " << speciesCount[count] << " " << *iterSpecies << " with area " << speciesArea[count] << endl;
-				++count;
-			}*/
-			
-			
+	
 			int firstCount = -1;
 			int secondCount = -1;
 			int thirdCount = -1;
@@ -179,41 +169,8 @@ namespace rsgis{namespace vec{
 
 				++count;
 			}
-						
-			/*
-			cout << "Top by Area: ";
-			if(firstArea != -1)
-			{
-				cout << speciesNames[firstArea];
-			}
-			if(secondArea != -1)
-			{
-				cout << speciesNames[secondArea];
-			}
-			if(thirdArea != -1)
-			{
-				cout << speciesNames[thirdArea];
-			}
-			cout << endl;
-			
-			cout << "Top by Count: ";
-			if(firstCount != -1)
-			{
-				cout << speciesNames[firstCount];
-			}
-			if(secondCount != -1)
-			{
-				cout << speciesNames[secondCount];
-			}
-			if(thirdCount != -1)
-			{
-				cout << speciesNames[thirdCount];
-			}
-			cout << endl;
-			
-			cout << endl;
-			*/
-			double areaRunTotal = 0;
+
+            double areaRunTotal = 0;
 			if(dominant == rsgis::vec::speciesCount)
 			{
 				std::string domSPStr = "";
@@ -273,8 +230,8 @@ namespace rsgis{namespace vec{
 					outFeature->SetField(outFeatureDefn->GetFieldIndex("CDOMSP1"), speciesCount[firstArea]);
 					outFeature->SetField(outFeatureDefn->GetFieldIndex("ADOMSP1"), speciesArea[firstArea]);
 				}
-				//cout << "firstArea = " << firstArea << endl;
-				areaRunTotal = speciesArea[firstArea];
+
+                areaRunTotal = speciesArea[firstArea];
 				if(secondArea != -1)
 				{
 					if(areaRunTotal < areaThreshold)

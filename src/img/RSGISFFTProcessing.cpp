@@ -128,31 +128,10 @@ namespace rsgis{namespace img{
 			
 			int maxCircle = 0;
 			double maxValue = 0;
-			//bool first = true;
-			//SortedGenericList<double> *values = NULL;
 			for(int i = 0; i < numCircles; i++)
 			{
 				std::cout << "Circle " << i << ":" << std::endl;
-				/*
-				values = geomUtils.findValuesOnEdge(magnitude, bboxes, circles[i]);
-				std::cout << "max: " << *values->peekTop() << std::endl;
-				std::cout << "min: " << *values->peekBottom() << std::endl;
-				
-				if(first)
-				{
-					maxCircle = i;
-					maxValue = *values->peekTop();
-					first = false;
-				}
-				else if(*values->peekTop() > maxValue)
-				{
-					maxCircle = i;
-					maxValue = *values->peekTop();
-				}
-				
-				delete values;
-				*/
-			}
+            }
 			
 			distFromCentre = startCircle + maxCircle;
 			distPixels = ((float)distFromCentre)/2;
