@@ -170,14 +170,7 @@ set(LIB_COMMON_H
 	${RSGIS_SRC_COMMON_DIR}/RSGISOutputStreamException.h 
 	${RSGIS_SRC_COMMON_DIR}/RSGISInputStreamException.h 
 	${RSGIS_SRC_COMMON_DIR}/RSGISVectorException.h 
-	${RSGIS_SRC_COMMON_DIR}/RSGISCommandLineException.h 
-	${RSGIS_SRC_COMMON_DIR}/RSGISXMLArgumentsException.h 
-	${RSGIS_SRC_COMMON_DIR}/RSGISLiDARException.h 
 	${RSGIS_SRC_COMMON_DIR}/RSGISRegistrationException.h 
-	${RSGIS_SRC_COMMON_DIR}/RSGISCommandLineParser.h 
-	${RSGIS_SRC_COMMON_DIR}/RSGISAlgorithmParameters.h 
-	${RSGIS_SRC_COMMON_DIR}/RSGISAlgorParamsFactory.h 
-	${RSGIS_SRC_COMMON_DIR}/RSGISParseXMLArguments.h
 	${RSGIS_SRC_COMMON_DIR}/RSGISAttributeTableException.h
 	${RSGIS_SRC_COMMON_DIR}/rsgis-config.h
 	)
@@ -198,22 +191,8 @@ set(LIB_COMMON_CPP
 	${RSGIS_SRC_COMMON_DIR}/RSGISInputStreamException.h 
 	${RSGIS_SRC_COMMON_DIR}/RSGISVectorException.cpp 
 	${RSGIS_SRC_COMMON_DIR}/RSGISVectorException.h 
-	${RSGIS_SRC_COMMON_DIR}/RSGISCommandLineException.cpp 
-	${RSGIS_SRC_COMMON_DIR}/RSGISCommandLineException.h 
-	${RSGIS_SRC_COMMON_DIR}/RSGISXMLArgumentsException.cpp 
-	${RSGIS_SRC_COMMON_DIR}/RSGISXMLArgumentsException.h 
-	${RSGIS_SRC_COMMON_DIR}/RSGISLiDARException.cpp 
-	${RSGIS_SRC_COMMON_DIR}/RSGISLiDARException.h 
 	${RSGIS_SRC_COMMON_DIR}/RSGISRegistrationException.cpp 
 	${RSGIS_SRC_COMMON_DIR}/RSGISRegistrationException.h 
-	${RSGIS_SRC_COMMON_DIR}/RSGISCommandLineParser.cpp 
-	${RSGIS_SRC_COMMON_DIR}/RSGISCommandLineParser.h 
-	${RSGIS_SRC_COMMON_DIR}/RSGISAlgorithmParameters.cpp 
-	${RSGIS_SRC_COMMON_DIR}/RSGISAlgorithmParameters.h 
-	${RSGIS_SRC_COMMON_DIR}/RSGISAlgorParamsFactory.cpp 
-	${RSGIS_SRC_COMMON_DIR}/RSGISAlgorParamsFactory.h 
-	${RSGIS_SRC_COMMON_DIR}/RSGISParseXMLArguments.cpp 
-	${RSGIS_SRC_COMMON_DIR}/RSGISParseXMLArguments.h
 	${RSGIS_SRC_COMMON_DIR}/RSGISAttributeTableException.cpp
 	${RSGIS_SRC_COMMON_DIR}/RSGISAttributeTableException.h
 	${RSGIS_SRC_COMMON_DIR}/rsgis-config.h

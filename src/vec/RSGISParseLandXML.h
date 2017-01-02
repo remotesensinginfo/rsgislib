@@ -48,12 +48,9 @@
 
 #include <boost/tokenizer.hpp>
 
-#include "common/RSGISAlgorithmParameters.h"
-#include "common/RSGISXMLArgumentsException.h"
-#include "common/RSGISInputStreamException.h"
-#include "common/RSGISAlgorParamsFactory.h"
-#include "common/RSGISXMLArgumentsException.h"
 #include "math/RSGISMathsUtils.h"
+
+#include "common/RSGISVectorException.h"
 
 namespace rsgis { namespace vec {
 
@@ -61,7 +58,7 @@ namespace rsgis { namespace vec {
 		{
 		public:
 			RSGISParseLandXML();
-			void getLandXMLLine(std::string xmlFile, std::vector<geos::geom::LineSegment*> *outLines); 
+			void getLandXMLLine(std::string xmlFile, std::vector<geos::geom::LineSegment*> *outLines) throw(RSGISVectorException);
 			~RSGISParseLandXML();
 		protected:
             std::string xmlFile;
