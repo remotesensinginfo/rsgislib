@@ -159,7 +159,7 @@ def getRSGISLibVersion():
         versionStr = stdout.decode()
         versionStr = versionStr.split('\n')[0]
     except Exception:
-        versionStr = '2.2'
+        versionStr = 'NA'
     return(versionStr)
 
 __version__ = getRSGISLibVersion()
