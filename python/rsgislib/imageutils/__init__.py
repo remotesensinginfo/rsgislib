@@ -11,23 +11,9 @@ import math
 
 import numpy
 
-haveGDALPy = True
-try:
-    import osgeo.gdal as gdal
-except ImportError as gdalErr:
-    haveGDALPy = False
-
-haveOGRPy = True
-try:
-    import osgeo.ogr as ogr
-except ImportError as ogrErr:
-    haveOGRPy = False
-
-haveOSRPy = True
-try:
-    import osgeo.osr as osr
-except ImportError as osrErr:
-    haveOSRPy = False
+import osgeo.gdal as gdal
+import osgeo.ogr as ogr
+import osgeo.osr as osr
 
 haveRIOS = True
 try:
@@ -72,12 +58,6 @@ Example::
     imageutils.setBandNames(inputImage, bandNames)
     
 """
-    # Check gdal is available
-    if not haveGDALPy:
-        raise Exception("The GDAL python bindings required for this function could not be imported" + gdalErr)
-
-    print('Set band names.')
- 
     dataset = gdal.Open(inputImage, gdal.GA_Update)
     
     for i in range(len(bandNames)):
@@ -112,10 +92,6 @@ Example::
     bandNames = imageutils.getBandNames(inputImage)
 
 """
-    # Check gdal is available
-    if not haveGDALPy:
-        raise Exception("The GDAL python bindings required for this function could not be imported" + gdalErr)
- 
     dataset = gdal.Open(inputImage, gdal.GA_Update)
     bandNames = list()
     
@@ -139,8 +115,9 @@ return::
     The rsgislib datatype enum, e.g., rsgislib.TYPE_8INT
 
 """
-    from osgeo import gdal
     raster = gdal.Open(inImg, gdal.GA_ReadOnly)
+    if raster == None:
+        raise Exception("Could not open the inImg.")
     band = raster.GetRasterBand(1)
     gdal_dtype = gdal.GetDataTypeName(band.DataType)
     raster = None
@@ -158,15 +135,88 @@ return::
 
     The rsgislib datatype enum, e.g., rsgislib.TYPE_8INT
 """
-    from osgeo import gdal
     raster = gdal.Open(inImg, gdal.GA_ReadOnly)
+    if raster == None:
+        raise Exception("Could not open the inImg.")
     band = raster.GetRasterBand(1)
     gdal_dtype = gdal.GetDataTypeName(band.DataType)
     raster = None
     return gdal_dtype
 
+def setImgThematic(imageFile):
+    """
+Set all image bands to be thematic. 
+
+* imageFile - The file for which the bands are to be set as thematic
+
+"""
+    ds = gdal.Open(imageFile, gdal.GA_Update)
+    if ds == None:
+        raise Exception("Could not open the imageFile.")
+    for bandnum in range(ds.RasterCount):
+        band = ds.GetRasterBand(bandnum + 1)
+        band.SetMetadataItem('LAYER_TYPE', 'thematic')
+    ds = None
 
 
+def hasGCPs(inImg):
+    """
+Test whether the input image has GCPs - returns boolean
+
+* inImg - input image file
+
+Return: 
+
+* boolean True - has GCPs; False - does not have GCPs
+"""
+    raster = gdal.Open(inImg, gdal.GA_ReadOnly)
+    if raster == None:
+        raise Exception("Could not open the inImg.")
+    numGCPs = raster.GetGCPCount()
+    hasGCPs = False
+    if numGCPs > 0:
+        hasGCPs = True
+    raster = None
+    return hasGCPs
+
+def copyGCPs(srcImg, destImg):
+    """
+Copy the GCPs from the srcImg to the destImg
+
+* srcImg - Raster layer with GCPs
+* destImg - Raster layer to which GCPs will be added
+    
+"""
+    srcDS = gdal.Open(srcImg, gdal.GA_ReadOnly)
+    if srcDS == None:
+        raise Exception("Could not open the srcImg.")
+    destDS = gdal.Open(destImg, gdal.GA_Update)
+    if destDS == None:
+        raise Exception("Could not open the destImg.")
+        srcDS = None
+
+    numGCPs = srcDS.GetGCPCount()
+    if numGCPs > 0:
+        gcpProj = srcDS.GetGCPProjection()
+        gcpList = srcDS.GetGCPs()
+        destDS.SetGCPs(gcpList, gcpProj)
+
+    srcDS = None
+    destDS = None
+
+def getWKTProjFromImage(inImg):
+    """
+A function which returns the WKT string representing the projection of the input image.
+
+* inImg - input image from which WKT string will be read.
+
+"""
+    rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
+    if rasterDS == None:
+        raise Exception('Could not open raster image: \'' + inImg+ '\'')
+    projStr = rasterDS.GetProjection()
+    rasterDS = None
+    return projStr
 
 def resampleImage2Match(inRefImg, inProcessImg, outImg, gdalFormat, interpMethod, datatype=None):
     """
@@ -181,12 +231,10 @@ Where:
 * interpMethod is the interpolation method used to resample the image [bilinear, lanczos, cubicspline, nearestneighbour, cubic, average, mode]
 * datatype is the rsgislib datatype of the output image (if none then it will be the same as the input file).
 
-"""
-    # Check gdal is available
-    if not haveGDALPy:
-        raise Exception("The GDAL python bindings required for this function could not be imported" + gdalErr)
-    
+"""   
     dataset = gdal.Open(inProcessImg, gdal.GA_ReadOnly)
+    if dataset == None:
+        raise Exception("Could not open the inProcessImg.")
     numBands = dataset.RasterCount
     gdalDType = dataset.GetRasterBand(1).DataType
     dataset = None
@@ -256,15 +304,7 @@ Where:
             2) 'auto' where an output resolution maintaining the image size of the input image will be used
             3) provide a floating point value for the image resolution (note. pixels will be sqaure) 
 * snap2Grid is a boolean specifying whether the TL pixel should be snapped to a multiple of the pixel resolution (Default is True).
-    """
-    # Check gdal is available
-    if not haveGDALPy:
-        raise Exception("The GDAL python bindings required for this function could not be imported" + gdalErr)
-    if not haveOGRPy:
-        raise Exception("The OGR python bindings required for this function could not be imported" + ogrErr)
-    if not haveOSRPy:
-        raise Exception("The OSR python bindings required for this function could not be imported" + osrErr)
-    
+    """    
     rsgisUtils = rsgislib.RSGISPyUtils()
     
     eResampleAlg = gdal.GRA_CubicSpline
@@ -446,10 +486,6 @@ Example::
     imageutils.subsetImgs2CommonExtent(inImagesDict, outputVector, 'KEA')
     
 """
-    # Check gdal is available
-    if not haveGDALPy:
-        raise Exception("The GDAL python bindings required for this function could not be imported: " + gdalErr)
-    import rsgislib
     import rsgislib.vectorutils
     
     inImages = []
@@ -487,26 +523,16 @@ Example::
     imageutils.subsetImgs2CommonExtent(inImagesDict, outputVector, 'KEA')
 
 """
-    # Check is glob is available.
-    try:
-        import glob
-    except ImportError as globErr:
-        raise Exception("The glob module could not be imported: " + globErr)
-    # Check gdal is available
-    if not haveGDALPy:
-        raise Exception("The GDAL python bindings required for this function could not be imported: " + gdalErr)
-    import rsgislib
+    import glob
     import os.path
         
     inImagesDict = []
     
     inputImages = glob.glob(globFindImgsStr)
-    #print(inputImages)
     if len(inputImages) == 0:
         raise Exception("No images were found using \'" + globFindImgsStr + "\'")
     
     for image in inputImages:
-        #print(image)
         dataset = gdal.Open(image, gdal.GA_ReadOnly)
         gdalDType = dataset.GetRasterBand(1).DataType
         dataset = None
@@ -529,10 +555,7 @@ Example::
             raise Exception("Data type of the input file was not recognised or known.")
             
         imgBase = os.path.splitext(os.path.basename(image))[0]
-        #print(imgBase)
         outImg = os.path.join(outDir, (imgBase+suffix+ext))
-        #print(outImg)
-        #print('\n')
         inImagesDict.append({'IN':image, 'OUT':outImg, 'TYPE':datatype})
 
     return inImagesDict
@@ -559,9 +582,6 @@ Where:
 * gdalFormat - the GDAL image file format of the output image file.
 
 """
-    if not haveGDALPy:
-        raise Exception("The GDAL python bindings required for this function could not be imported\n\t" + gdalogrErr)
-
     if not haveRIOS:
         raise Exception("The RIOS module required for this function could not be imported\n\t" + riosErr)
 
