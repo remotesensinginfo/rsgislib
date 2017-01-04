@@ -5,27 +5,11 @@ The vector utils module performs geometry / attribute table operations on vector
 # import the C++ extension into this level
 from ._vectorutils import *
 
-haveGDALPy = True
-try:
-    import osgeo.gdal as gdal
-except ImportError as gdalErr:
-    haveGDALPy = False
-    
-haveOGRPy = True
-try:
-    import osgeo.ogr as ogr
-except ImportError as ogrErr:
-    haveOGRPy = False
-
-
-haveOSRPy = True
-try:
-    import osgeo.osr as osr
-except ImportError as osrErr:
-    haveOSRPy = False
-
-
 import os.path
+
+import osgeo.gdal as gdal
+import osgeo.osr as osr
+import osgeo.ogr as ogr
 
 # Import the RSGISLib module
 import rsgislib
@@ -61,13 +45,6 @@ Example::
 
 """
     try:
-        # Check gdal is available
-        if not haveGDALPy:
-            raise Exception("The GDAL python bindings required for this function could not be imported\n\t" + gdalErr)
-        # Check ogr is available
-        if not haveOGRPy:
-            raise Exception("The OGR python bindings required for this function could not be imported\n\t" + ogrErr)
-        
         gdal.UseExceptions()
         
         if shpExt:
@@ -168,16 +145,6 @@ Example::
     vectorutils.copyShapefile2RAT(inputVector, inputImage, outputImage)
 
 """
-    # Check gdal is available
-    if not haveGDALPy:
-        raise Exception("The GDAL python bindings required for this function could not be imported\n\t" + gdalErr)
-    # Check ogr is available
-    if not haveOGRPy:
-        raise Exception("The OGR python bindings required for this function could not be imported\n\t" + ogrErr)    
-    # Check osr is available
-    if not haveOSRPy:
-        raise Exception("The OSR python bindings required for this function could not be imported\n\t" + osrErr)
-    
     gdal.UseExceptions()
     
     gdalImgData = gdal.Open(inputImg)
