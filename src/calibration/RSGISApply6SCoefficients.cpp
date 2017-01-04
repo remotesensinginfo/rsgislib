@@ -162,7 +162,6 @@ namespace rsgis{namespace calib{
             unsigned int lutIdx = 0;
             
             LUT6SElevation lutVal2;
-            float minDist2 = 0.0;
             unsigned int lutIdx2 = 0;
             
             for(unsigned int i = 0; i < lut->size(); ++i)
@@ -172,21 +171,36 @@ namespace rsgis{namespace calib{
                 {
                     minDist = dist;
                     lutIdx = i;
-                    minDist2 = dist;
-                    lutIdx2 = i;
                 }
                 else if(dist < minDist)
                 {
-                    minDist2 = minDist;
-                    lutIdx2 = lutIdx;
                     minDist = dist;
                     lutIdx = i;
                 }
             }
             
+            if(lutIdx == 0)
+            {
+                lutIdx2 = 1;
+            }
+            else if(lutIdx == (lut->size()-1))
+            {
+                lutIdx2 = lutIdx-1;
+            }
+            else
+            {
+                if((elevVal - lut->at(lutIdx).elev) < 0)
+                {
+                    lutIdx2 = lutIdx-1;
+                }
+                else
+                {
+                    lutIdx2 = lutIdx+1;
+                }
+            }
+            
             lutVal = lut->at(lutIdx);
             lutVal2 = lut->at(lutIdx2);
-            
             
             double tmpVal = 0;
             double reflVal1 = 0.0;
@@ -196,9 +210,9 @@ namespace rsgis{namespace calib{
             float elevLUTDiff1 = fabs(elevVal - lutVal.elev);
             float elevLUTDiff2 = fabs(elevVal - lutVal2.elev);
             
-            float elevProp1 = elevLUTDiff1/elevLUTDiff;
-            float elevProp2 = elevLUTDiff2/elevLUTDiff;
-            
+            float elevProp1 = 1-(elevLUTDiff1/elevLUTDiff);
+            float elevProp2 = 1-(elevLUTDiff2/elevLUTDiff);
+
             for(unsigned int i = 0; i < lutVal.numValues; ++i)
             {
                 if(lutVal.imageBands[i] > numBands)
@@ -491,24 +505,32 @@ namespace rsgis{namespace calib{
         {
             const double degreesToRadians = M_PI / 180.0;
             rsgis::calib::LUT6SElevation tmpElevPt;
-            bool first = true;
-            float nrElevDist = 0.0;
+            rsgis::calib::LUT6SElevation tmpElevPt2;
+            //bool first = true;
+            //float nrElevDist = 0.0;
             float dist = 0.0;
-            for(std::vector<LUT6SElevation>::iterator iterLUT = lut->begin(); iterLUT != lut->end(); ++iterLUT)
+            double elevVal = bandValues[1];
+            
+            
+            float minDist = 0.0;
+            unsigned int lutIdx = 0;
+            unsigned int lutIdx2 = 0;
+            
+            for(unsigned int i = 0; i < lut->size(); ++i)
             {
-                dist = ((*iterLUT).elev - bandValues[1])*((*iterLUT).elev - bandValues[1]);
-                if(first)
+                dist = (lut->at(i).elev - elevVal) * (lut->at(i).elev - elevVal);
+                if(i == 0)
                 {
-                    tmpElevPt = (*iterLUT);
-                    nrElevDist = dist;
-                    first = false;
+                    minDist = dist;
+                    lutIdx = i;
                 }
-                else if(dist < nrElevDist)
+                else if(dist < minDist)
                 {
-                    tmpElevPt = (*iterLUT);
-                    nrElevDist = dist;
+                    minDist = dist;
+                    lutIdx = i;
                 }
             }
+
             
             float shadMask = 1;
             if(bandValues[4] == 1)
@@ -524,6 +546,45 @@ namespace rsgis{namespace calib{
             double vT = (1 - cos(slopeRad))/2;
             double totalIrr = 0.0;
             
+            if(lutIdx == 0)
+            {
+                lutIdx2 = 1;
+            }
+            else if(lutIdx == (lut->size()-1))
+            {
+                lutIdx2 = lutIdx-1;
+            }
+            else
+            {
+                if((elevVal - lut->at(lutIdx).elev) < 0)
+                {
+                    lutIdx2 = lutIdx-1;
+                }
+                else
+                {
+                    lutIdx2 = lutIdx+1;
+                }
+            }
+            
+            tmpElevPt = lut->at(lutIdx);
+            tmpElevPt2 = lut->at(lutIdx2);
+            
+            double dirIrrVal1 = 0.0;
+            double dirIrrVal2 = 0.0;
+            
+            double difIrrVal1 = 0.0;
+            double difIrrVal2 = 0.0;
+            
+            double totIrrVal1 = 0.0;
+            double totIrrVal2 = 0.0;
+            
+            float elevLUTDiff = fabs(tmpElevPt.elev - tmpElevPt2.elev);
+            float elevLUTDiff1 = fabs(elevVal - tmpElevPt.elev);
+            float elevLUTDiff2 = fabs(elevVal - tmpElevPt2.elev);
+            
+            float elevProp1 = 1-(elevLUTDiff1/elevLUTDiff);
+            float elevProp2 = 1-(elevLUTDiff2/elevLUTDiff);
+            
             int dirIrrIdx = 0;
             int difIrrIdx = 0;
             int envIrrIdx = 0;
@@ -537,13 +598,19 @@ namespace rsgis{namespace calib{
                 
                 // Direct
                 incAngRatio = cos(incAngRad)/cos(solarZenRad);
-                output[dirIrrIdx] = shadMask * tmpElevPt.directIrr[n] * incAngRatio;
+                dirIrrVal1 = shadMask * tmpElevPt.directIrr[n] * incAngRatio;
+                dirIrrVal2 = shadMask * tmpElevPt2.directIrr[n] * incAngRatio;
+                output[dirIrrIdx] = (dirIrrVal1*elevProp1)+(dirIrrVal2*elevProp2);
                 
                 // Diffuse
-                output[difIrrIdx] = tmpElevPt.diffuseIrr[n] * vD;
+                difIrrVal1 = tmpElevPt.diffuseIrr[n] * vD;
+                difIrrVal2 = tmpElevPt2.diffuseIrr[n] * vD;
+                output[difIrrIdx] = (difIrrVal1*elevProp1)+(difIrrVal2*elevProp2);
                 
                 // Environment
-                totalIrr = tmpElevPt.directIrr[n] + tmpElevPt.diffuseIrr[n] + tmpElevPt.envIrr[n];
+                totIrrVal1 = tmpElevPt.directIrr[n] + tmpElevPt.diffuseIrr[n] + tmpElevPt.envIrr[n];
+                totIrrVal2 = tmpElevPt2.directIrr[n] + tmpElevPt2.diffuseIrr[n] + tmpElevPt2.envIrr[n];
+                totalIrr = (totIrrVal1*elevProp1)+(totIrrVal2*elevProp2);
                 output[envIrrIdx] = totalIrr * vT * meanSREFVec[n];
                 
                 // Total
