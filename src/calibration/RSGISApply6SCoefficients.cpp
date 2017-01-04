@@ -126,7 +126,6 @@ namespace rsgis{namespace calib{
             throw rsgis::img::RSGISImageCalcException("The number of input image bands needs to be equal to the number of output image bands.");
         }
         
-        double tmpVal = 0;
         float elevVal = bandValues[0];
 		
         bool nodata = true;
@@ -162,6 +161,10 @@ namespace rsgis{namespace calib{
             float minDist = 0.0;
             unsigned int lutIdx = 0;
             
+            LUT6SElevation lutVal2;
+            float minDist2 = 0.0;
+            unsigned int lutIdx2 = 0;
+            
             for(unsigned int i = 0; i < lut->size(); ++i)
             {
                 dist = (lut->at(i).elev - elevVal) * (lut->at(i).elev - elevVal);
@@ -169,15 +172,32 @@ namespace rsgis{namespace calib{
                 {
                     minDist = dist;
                     lutIdx = i;
+                    minDist2 = dist;
+                    lutIdx2 = i;
                 }
                 else if(dist < minDist)
                 {
+                    minDist2 = minDist;
+                    lutIdx2 = lutIdx;
                     minDist = dist;
                     lutIdx = i;
                 }
             }
             
             lutVal = lut->at(lutIdx);
+            lutVal2 = lut->at(lutIdx2);
+            
+            
+            double tmpVal = 0;
+            double reflVal1 = 0.0;
+            double reflVal2 = 0.0;
+            
+            float elevLUTDiff = fabs(lutVal.elev - lutVal2.elev);
+            float elevLUTDiff1 = fabs(elevVal - lutVal.elev);
+            float elevLUTDiff2 = fabs(elevVal - lutVal2.elev);
+            
+            float elevProp1 = elevLUTDiff1/elevLUTDiff;
+            float elevProp2 = elevLUTDiff2/elevLUTDiff;
             
             for(unsigned int i = 0; i < lutVal.numValues; ++i)
             {
@@ -188,7 +208,12 @@ namespace rsgis{namespace calib{
                 }
                 
                 tmpVal=lutVal.aX[i]*bandValues[lutVal.imageBands[i]]-lutVal.bX[i];
-                output[i] = (tmpVal/(1.0+lutVal.cX[i]*tmpVal))*this->scaleFactor;
+                reflVal1 = (tmpVal/(1.0+lutVal.cX[i]*tmpVal))*this->scaleFactor;
+                
+                tmpVal=lutVal2.aX[i]*bandValues[lutVal2.imageBands[i]]-lutVal2.bX[i];
+                reflVal2 = (tmpVal/(1.0+lutVal2.cX[i]*tmpVal))*this->scaleFactor;
+                
+                output[i] = (reflVal1*elevProp1) + (reflVal2*elevProp2);
                 
                 if(this->useNoDataVal & (this->noDataVal == 0.0))
                 {
@@ -331,7 +356,7 @@ namespace rsgis{namespace calib{
                 
                 tmpVal=aotLUTVal.aX[i]*bandValues[aotLUTVal.imageBands[i]]-aotLUTVal.bX[i];
                 output[i] = (tmpVal/(1.0+aotLUTVal.cX[i]*tmpVal))*this->scaleFactor;
-                
+
                 if(this->useNoDataVal & (this->noDataVal == 0.0))
                 {
                     if(output[i] < 1)
