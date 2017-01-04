@@ -242,14 +242,12 @@ class RSGISPyUtils (object):
         
     def getGDALDataTypeFromImg(self, inImg):
         """
-        Returns the rsgislib datatype ENUM for a raster file
-        :param in_file: The file to get the datatype for
-        :return: The rsgislib datatype enum, e.g., rsgislib.TYPE_8INT
+        Returns the GDAL datatype ENUM (e.g., GDT_Float32) for the inputted raster file
         """
         import osgeo.gdal as gdal
         raster = gdal.Open(inImg, gdal.GA_ReadOnly)
         if raster == None:
-            raise RSGISPyException('Could not open raster image: \'' + inImg+ '\''))
+            raise RSGISPyException('Could not open raster image: \'' + inImg+ '\'')
         band = raster.GetRasterBand(1)
         if band == None:
             raise RSGISPyException('Could not open raster band 1 in image: \'' + inImg+ '\'')
