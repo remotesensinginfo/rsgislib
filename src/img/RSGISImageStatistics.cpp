@@ -1483,6 +1483,33 @@ namespace rsgis{namespace img{
     
     
     
+
+    RSGISCalcImageDifference::RSGISCalcImageDifference(unsigned int numOutBands):RSGISCalcImageValue(numOutBands)
+    {
+        
+    }
+    
+    void RSGISCalcImageDifference::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+    {
+        if((numBands/2) != this->numOutBands)
+        {
+            throw RSGISImageCalcException("The number of image bands must be twice the number of output bands.");
+        }
+        
+        for(int i = 0; i < this->numOutBands; ++i)
+        {
+            output[i] = bandValues[i] - bandValues[i+this->numOutBands];
+        }
+        
+    }
+    
+    RSGISCalcImageDifference::~RSGISCalcImageDifference()
+    {
+        
+    }
+    
+    
+    
     
     
     

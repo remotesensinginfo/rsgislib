@@ -50,6 +50,7 @@ Statistics
 .. autofunction:: rsgislib.imagecalc.calcPropTrueExp
 .. autofunction:: rsgislib.imagecalc.calcMultiImgBandStats
 .. autofunction:: rsgislib.imagecalc.calcMaskImgPxlValProb
+.. autofunction:: rsgislib.imagecalc.calcImageDifference
 
 
 Normalise

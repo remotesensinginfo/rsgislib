@@ -2913,5 +2913,60 @@ namespace rsgis{ namespace cmds {
         }
     }
                 
+                
+    void calcImageDifference(std::string inputImage1, std::string inputImage2, std::string outputImage, std::string gdalFormat, RSGISLibDataType outDataType) throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            GDALDataset **datasets = new GDALDataset*[2];
+            
+            std::cout << "Opening " << inputImage1 << std::endl;
+            datasets[0] = (GDALDataset *) GDALOpen(inputImage1.c_str(), GA_ReadOnly);
+            if(datasets[0] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage1;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            std::cout << "Opening " << inputImage2 << std::endl;
+            datasets[1] = (GDALDataset *) GDALOpen(inputImage2.c_str(), GA_ReadOnly);
+            if(datasets[1] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage2;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            if(datasets[0]->GetRasterCount() != datasets[1]->GetRasterCount())
+            {
+                GDALClose(datasets[0]);
+                GDALClose(datasets[1]);
+                delete[] datasets;
+                throw rsgis::RSGISImageException("Images do not have the same number of image bands.");
+            }
+            int numBands = datasets[0]->GetRasterCount();
+
+            rsgis::img::RSGISCalcImageDifference calcImgDiff = rsgis::img::RSGISCalcImageDifference(numBands);
+            rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(&calcImgDiff, "", true);
+            calcImage.calcImage(datasets, 2, outputImage, false, NULL, gdalFormat, RSGIS_to_GDAL_Type(outDataType));
+            
+            GDALClose(datasets[0]);
+            GDALClose(datasets[1]);
+            delete[] datasets;
+        }
+        catch(rsgis::RSGISImageException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+                
 }}
 
