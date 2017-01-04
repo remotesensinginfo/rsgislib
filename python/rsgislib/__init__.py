@@ -232,7 +232,7 @@ class RSGISPyUtils (object):
         import osgeo.gdal as gdal
         raster = gdal.Open(inImg, gdal.GA_ReadOnly)
         if raster == None:
-            raise RSGISPyException('Could not open raster image: ' \'' + inImg+ '\'')
+            raise RSGISPyException('Could not open raster image: \'' + inImg+ '\'')
         band = raster.GetRasterBand(1)
         if band == None:
             raise RSGISPyException('Could not open raster band 1 in image: \'' + inImg+ '\'')
