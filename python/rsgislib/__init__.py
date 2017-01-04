@@ -227,17 +227,15 @@ class RSGISPyUtils (object):
     
     def getRSGISLibDataTypeFromImg(self, inImg):
         """
-        Returns the rsgislib datatype ENUM for a raster file
-        :param in_file: The file to get the datatype for
-        :return: The rsgislib datatype enum, e.g., rsgislib.TYPE_8INT
+        Returns the rsgislib datatype ENUM (e.g., rsgislib.TYPE_8INT) for the inputted raster file
         """
         import osgeo.gdal as gdal
         raster = gdal.Open(inImg, gdal.GA_ReadOnly)
         if raster == None:
-            raise RSGISPyException('Could not open raster image: ' + inImg)
+            raise RSGISPyException('Could not open raster image: ' \'' + inImg+ '\'')
         band = raster.GetRasterBand(1)
         if band == None:
-            raise RSGISPyException('Could not open raster band 1 in image: ' + inImg)
+            raise RSGISPyException('Could not open raster band 1 in image: \'' + inImg+ '\'')
         gdal_dtype = gdal.GetDataTypeName(band.DataType)
         raster = None
         return self.getRSGISLibDataType(gdal_dtype)
@@ -251,10 +249,10 @@ class RSGISPyUtils (object):
         import osgeo.gdal as gdal
         raster = gdal.Open(inImg, gdal.GA_ReadOnly)
         if raster == None:
-            raise RSGISPyException('Could not open raster image: ' + inImg)
+            raise RSGISPyException('Could not open raster image: \'' + inImg+ '\''))
         band = raster.GetRasterBand(1)
         if band == None:
-            raise RSGISPyException('Could not open raster band 1 in image: ' + inImg)
+            raise RSGISPyException('Could not open raster band 1 in image: \'' + inImg+ '\'')
         gdal_dtype = gdal.GetDataTypeName(band.DataType)
         raster = None
         return gdal_dtype
@@ -321,7 +319,7 @@ class RSGISPyUtils (object):
         import osgeo.gdal as gdal
         rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
         if rasterDS == None:
-            raise RSGISPyException('Could not open raster image: ' + inImg)
+            raise RSGISPyException('Could not open raster image: \'' + inImg+ '\'')
         
         geotransform = rasterDS.GetGeoTransform()
         xRes = geotransform[1]
@@ -339,7 +337,7 @@ class RSGISPyUtils (object):
         import osgeo.gdal as gdal
         rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
         if rasterDS == None:
-            raise RSGISPyException('Could not open raster image: ' + inImg)
+            raise RSGISPyException('Could not open raster image: \'' + inImg+ '\'')
         
         xSize = rasterDS.RasterXSize
         ySize = rasterDS.RasterYSize
@@ -354,25 +352,37 @@ class RSGISPyUtils (object):
         import osgeo.gdal as gdal
         rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
         if rasterDS == None:
-            raise RSGISPyException('Could not open raster image: ' + inImg)
+            raise RSGISPyException('Could not open raster image: \'' + inImg+ '\'')
         
         nBands = rasterDS.RasterCount
         rasterDS = None
         return nBands
         
-    def getImageNoDataValue(self, inImg):
+    def getImageNoDataValue(self, inImg, band=1):
         """
-        A function to retrieve the no data value for the image (from band 1).
+        A function to retrieve the no data value for the image (from band; default 1).
         """
         import osgeo.gdal as gdal
         rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
         if rasterDS == None:
-            raise RSGISPyException('Could not open raster image: ' + inImg)
+            raise RSGISPyException('Could not open raster image: \'' + inImg+ '\'')
         
-        noDataVal = rasterDS.GetRasterBand(1).GetNoDataValue()
+        noDataVal = rasterDS.GetRasterBand(band).GetNoDataValue()
         rasterDS = None
         return noDataVal
-        
+    
+    def getWKTProjFromImage(self, inImg):
+        """
+        A function which returns the WKT string representing the projection of the input image.
+        """
+        import osgeo.gdal as gdal
+        rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
+        if rasterDS == None:
+            raise RSGISPyException('Could not open raster image: \'' + inImg+ '\'')
+        projStr = rasterDS.GetProjection()
+        rasterDS = None
+        return projStr
+    
     def uidGenerator(self, size=6):
         """
         A function which will generate a 'random' string of the specified length based on the UUID
@@ -381,8 +391,35 @@ class RSGISPyUtils (object):
         randomStr = str(uuid.uuid4())
         randomStr = randomStr.replace("-","")
         return randomStr[0:size]
-        
+    
+    def isNumber(self, strVal):
+        """
+        A function which tests whether the input string contains a number of not.
+        """
+        try:
+            float(strVal) # for int, long and float
+        except ValueError:
+            try:
+                complex(strVal) # for complex
+            except ValueError:
+                return False
+        return True
+    
+    def getEnvironmentVariable(self, var):
+        """
+        A function to get an environmental variable, if variable is not present returns None.
+        """
+        outVar = None
+        try:
+            outVar = os.environ[var]
+        except Exception:
+            outVar = None
+        return outVar
+    
     def numProcessCores(self):
+        """
+        A functions which returns the number of processing cores available on the machine
+        """
         import multiprocessing
         return multiprocessing.cpu_count()
         
