@@ -217,11 +217,12 @@ if(WIN32)
             add_definitions(-D_SCL_SECURE_NO_WARNINGS)
         endif()
         
+        # Set to /W2 - way too many warnings otherwise
         if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
-            string(REGEX REPLACE "/W[0-4]" "/W4"
+            string(REGEX REPLACE "/W[0-4]" "/W2"
                    CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
         else()
-            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W2")
         endif()
 
         # Generate dot-user file with user-specific settings for Visual Studio project
@@ -230,6 +231,21 @@ if(WIN32)
         mark_as_advanced(MSVC_ENVIRONMENT_PATH)
         set(VCPROJ_USER_ENVIRONMENT_PATH_DEBUG "${ENVIRONMENT_PATH}")
         mark_as_advanced(VCPROJ_USER_ENVIRONMENT_PATH_DEBUG)
+        
+        # Use cmake's MSVC_VERSION to work out the name of the Boost/CGAL DLL's 
+        # to use (they use a different numbering scheme
+        set(MSVC_STRING_1500 "vc90")
+        set(MSVC_STRING_1600 "vc100")
+        set(MSVC_STRING_1700 "vc110")
+        set(MSVC_STRING_1800 "vc120")
+        set(MSVC_STRING_1900 "vc140")
+        set(MSVC_STRING ${MSVC_STRING_${MSVC_VERSION}})
+        message(STATUS "Using MSVC String " ${MSVC_STRING})
+        
+        # get GSL functions
+        add_definitions(-DGSL_DLL)
+        # HDF5 functions/classes
+        add_definitions(-DH5_BUILT_AS_DYNAMIC_LIB)
         
     endif()
 
@@ -288,9 +304,9 @@ endif(APPLE)
 include_directories(${BOOST_INCLUDE_DIR})
 if (MSVC)
     # Under Windows, the boost libs are strangely named - use glob to find them
-    file(GLOB BOOST_FS_LIB ${BOOST_LIB_PATH}/libboost_filesystem*.lib )
-    file(GLOB BOOST_SYS_LIB ${BOOST_LIB_PATH}/libboost_system*.lib )
-    message(STATUS "Found boost libraries" ${BOOST_FS_LIB} ${BOOST_SYS_LIB})
+    file(GLOB BOOST_FS_LIB ${BOOST_LIB_PATH}/libboost_filesystem-${MSVC_STRING}-*.lib )
+    file(GLOB BOOST_SYS_LIB ${BOOST_LIB_PATH}/libboost_system-${MSVC_STRING}-*.lib )
+    message(STATUS "Found boost libraries " ${BOOST_FS_LIB} ${BOOST_SYS_LIB})
     set(BOOST_LIBRARIES -LIBPATH:${BOOST_LIB_PATH} ${BOOST_FS_LIB} ${BOOST_SYS_LIB})
 else()
     set(BOOST_LIBRARIES -L${BOOST_LIB_PATH} -lboost_filesystem -lboost_system)
@@ -342,7 +358,7 @@ endif(MSVC)
 
 include_directories(${CGAL_INCLUDE_DIR})
 if (MSVC)
-    file(GLOB CGAL_LIB_NAME ${BOOST_LIB_PATH}/CGAL-vc*.lib )
+    file(GLOB CGAL_LIB_NAME ${BOOST_LIB_PATH}/CGAL-${MSVC_STRING}-*.lib )
     message(STATUS "Using CGAL lib " ${CGAL_LIB_NAME})
     set(CGAL_LIBRARIES -LIBPATH:${CGAL_LIB_PATH} ${CGAL_LIB_NAME})
 else()
