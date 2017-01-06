@@ -40,6 +40,18 @@
 
 #include <boost/math/special_functions/fpclassify.hpp>
 
+// mark all exported classes/functions with DllExport to have
+// them exported by Visual Studio
+#ifdef _MSC_VER
+    #ifdef rsgis_maths_EXPORTS
+        #define DllExport   __declspec( dllexport )
+    #else
+        #define DllExport   __declspec( dllimport )
+    #endif
+#else
+    #define DllExport
+#endif
+
 namespace rsgis{namespace math{
 	/// Utilities for RSGIS and GSL matrices
     

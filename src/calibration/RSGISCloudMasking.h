@@ -46,6 +46,18 @@
 
 #include "math/RSGISMathsUtils.h"
 
+// mark all exported classes/functions with DllExport to have
+// them exported by Visual Studio
+#ifdef _MSC_VER
+    #ifdef rsgis_calib_EXPORTS
+        #define DllExport   __declspec( dllexport )
+    #else
+        #define DllExport   __declspec( dllimport )
+    #endif
+#else
+    #define DllExport
+#endif
+
 namespace rsgis{namespace calib{
     
 	class DllExport RSGISLandsatFMaskPass1CloudMasking : public rsgis::img::RSGISCalcImageValue

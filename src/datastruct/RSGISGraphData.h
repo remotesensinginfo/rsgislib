@@ -20,10 +20,22 @@
 using namespace std;
 using namespace geos::geom;
 
+// mark all exported classes/functions with DllExport to have
+// them exported by Visual Studio
+#ifdef _MSC_VER
+    #ifdef rsgis_datastruct_EXPORTS
+        #define DllExport   __declspec( dllexport )
+    #else
+        #define DllExport   __declspec( dllimport )
+    #endif
+#else
+    #define DllExport
+#endif
+
 namespace rsgis{namespace datastruct{
 	
 	class RSGISGraphVertex;
-	class RSGISGraphEdge
+	class DllExport RSGISGraphEdge
 	{
 	public:
 		RSGISGraphEdge();
@@ -47,7 +59,7 @@ namespace rsgis{namespace datastruct{
 		bool marked;
 	};
 	
-	class RSGISGraphVertex
+	class DllExport RSGISGraphVertex
 		{
 		public:
 			RSGISGraphVertex(int id);
@@ -78,7 +90,7 @@ namespace rsgis{namespace datastruct{
 			list<RSGISGraphEdge*> *edges;
 		};
 	
-	class RSGISSpatialGraphVertex : public RSGISGraphVertex
+	class DllExport RSGISSpatialGraphVertex : public RSGISGraphVertex
 	{
 	public:
 		RSGISSpatialGraphVertex(int id) : RSGISGraphVertex(id){};

@@ -49,6 +49,18 @@
 #include "utils/RSGISAllometricEquations.h"
 #include "utils/RSGISAllometricSpecies.h"
 
+// mark all exported classes/functions with DllExport to have
+// them exported by Visual Studio
+#ifdef _MSC_VER
+    #ifdef rsgis_radar_EXPORTS
+        #define DllExport   __declspec( dllexport )
+    #else
+        #define DllExport   __declspec( dllimport )
+    #endif
+#else
+    #define DllExport
+#endif
+
 namespace rsgis 
 {
 	namespace radar

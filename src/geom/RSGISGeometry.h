@@ -55,6 +55,18 @@
 #include "geos/simplify/DouglasPeuckerSimplifier.h"
 #include "geos/simplify/TopologyPreservingSimplifier.h"
 
+// mark all exported classes/functions with DllExport to have
+// them exported by Visual Studio
+#ifdef _MSC_VER
+    #ifdef rsgis_geom_EXPORTS
+        #define DllExport   __declspec( dllexport )
+    #else
+        #define DllExport   __declspec( dllimport )
+    #endif
+#else
+    #define DllExport
+#endif
+
 namespace rsgis{namespace geom{
 
 	struct SortCoordinates : std::binary_function< geos::geom::Coordinate, geos::geom::Coordinate, bool >

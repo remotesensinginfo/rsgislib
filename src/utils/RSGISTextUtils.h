@@ -35,6 +35,18 @@
 #include <boost/cstdint.hpp>
 #include <boost/algorithm/string/trim.hpp>
 
+// mark all exported classes/functions with DllExport to have
+// them exported by Visual Studio
+#ifdef _MSC_VER
+    #ifdef rsgis_utils_EXPORTS
+        #define DllExport   __declspec( dllexport )
+    #else
+        #define DllExport   __declspec( dllimport )
+    #endif
+#else
+    #define DllExport
+#endif
+
 namespace rsgis{namespace utils{
 
     inline bool compareStringNoCase(std::string first, std::string second)
