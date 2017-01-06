@@ -28,9 +28,21 @@ using namespace std;
 using namespace geos::geom;
 using namespace rsgis::utils;
 
+// mark all exported classes/functions with DllExport to have
+// them exported by Visual Studio
+#ifdef _MSC_VER
+    #ifdef rsgis_datastruct_EXPORTS
+        #define DllExport   __declspec( dllexport )
+    #else
+        #define DllExport   __declspec( dllimport )
+    #endif
+#else
+    #define DllExport
+#endif
+
 namespace rsgis{namespace datastruct{	
 	
-	class RSGISClusteringGraph
+	class DllExport RSGISClusteringGraph
 		{
 		public:
 			RSGISClusteringGraph();
@@ -56,7 +68,7 @@ namespace rsgis{namespace datastruct{
 			int idcounter;
 		};
 	
-	class RSGISSpatialClusteringGraph : public RSGISClusteringGraph
+	class DllExport RSGISSpatialClusteringGraph : public RSGISClusteringGraph
 	{
 	public: 
 		RSGISSpatialClusteringGraph(RSGISAbstractOutlinePolygon *outlineGenerator);

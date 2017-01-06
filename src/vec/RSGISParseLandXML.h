@@ -52,6 +52,18 @@
 
 #include "common/RSGISVectorException.h"
 
+// mark all exported classes/functions with DllExport to have
+// them exported by Visual Studio
+#ifdef _MSC_VER
+    #ifdef rsgis_vec_EXPORTS
+        #define DllExport   __declspec( dllexport )
+    #else
+        #define DllExport   __declspec( dllimport )
+    #endif
+#else
+    #define DllExport
+#endif
+
 namespace rsgis { namespace vec {
 
 	class DllExport RSGISParseLandXML
