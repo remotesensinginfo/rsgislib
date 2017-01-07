@@ -172,6 +172,8 @@ set(MPFR_LIB_PATH /usr/local/lib CACHE PATH "Library PATH for MPFR")
 set(KEA_INCLUDE_DIR /usr/local/include CACHE PATH "Include PATH for KEA")
 set(KEA_LIB_PATH /usr/local/lib CACHE PATH "Library PATH for KEA")
 
+set(PYTHON_EXE "PYTHON_EXE-NOTFOUND" CACHE PATH "Path to Python to use for bindings. If not given the Python on PATH is used")
+
 ###############################################################################
 
 ###############################################################################
@@ -318,7 +320,11 @@ else()
     set(BOOST_LIBRARIES -L${BOOST_LIB_PATH} -lboost_filesystem -lboost_system)
 endif(MSVC)
 
-FIND_PROGRAM(PYTHON_EXE python ENV PATH)
+IF(PYTHON_EXE STREQUAL "PYTHON_EXE-NOTFOUND")
+  MESSAGE(STATUS "Finding Python using PATH")
+  FIND_PROGRAM(PYTHON_EXE python ENV PATH)
+ENDIF()
+  
 IF(PYTHON_EXE STREQUAL "PYTHON_EXE-NOTFOUND")
   MESSAGE(STATUS "Python not found. Python bindings disabled")
   SET(BUILD_PYTHON_BINDINGS OFF)
