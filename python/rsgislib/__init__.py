@@ -227,7 +227,8 @@ class RSGISPyUtils (object):
     
     def getRSGISLibDataTypeFromImg(self, inImg):
         """
-        Returns the rsgislib datatype ENUM (e.g., rsgislib.TYPE_8INT) for the inputted raster file
+        Returns the rsgislib datatype ENUM (e.g., rsgislib.TYPE_8INT) 
+        for the inputted raster file
         """
         import osgeo.gdal as gdal
         raster = gdal.Open(inImg, gdal.GA_ReadOnly)
@@ -341,6 +342,34 @@ class RSGISPyUtils (object):
         ySize = rasterDS.RasterYSize
         rasterDS = None
         return xSize, ySize
+        
+    def getImageBBOX(self, inImg):
+        """
+        A function to retrieve the bounding box in the spatial 
+        coordinates of the image.
+        return [TLX, BRX, TLY, BRY]
+        """
+        import osgeo.gdal as gdal
+        rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
+        if rasterDS == None:
+            raise RSGISPyException('Could not open raster image: \'' + inImg+ '\'')
+        
+        xSize = rasterDS.RasterXSize
+        ySize = rasterDS.RasterYSize
+        
+        geotransform = rasterDS.GetGeoTransform()
+        tlX = geotransform[0]
+        tlY = geotransform[3]
+        xRes = geotransform[1]
+        yRes = geotransform[5]
+        if yRes < 0:
+            yRes = yRes * -1
+        rasterDS = None
+        
+        brX = tlX + (xRes * xSize)
+        brY = tlY + (yRes * ySize)
+        
+        return [tlX, brX, tlY, brY]
     
     def getImageBandCount(self, inImg):
         """
@@ -358,7 +387,8 @@ class RSGISPyUtils (object):
         
     def getImageNoDataValue(self, inImg, band=1):
         """
-        A function to retrieve the no data value for the image (from band; default 1).
+        A function to retrieve the no data value for the image 
+        (from band; default 1).
         """
         import osgeo.gdal as gdal
         rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
@@ -371,7 +401,8 @@ class RSGISPyUtils (object):
     
     def getWKTProjFromImage(self, inImg):
         """
-        A function which returns the WKT string representing the projection of the input image.
+        A function which returns the WKT string representing the projection 
+        of the input image.
         """
         import osgeo.gdal as gdal
         rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
@@ -380,6 +411,49 @@ class RSGISPyUtils (object):
         projStr = rasterDS.GetProjection()
         rasterDS = None
         return projStr
+    
+    def getImageFiles(self, inImg):
+        """
+        A function which returns a list of the files associated (e.g., header etc.) 
+        with the input image file.
+        """
+        import osgeo.gdal as gdal
+        imgDS = gdal.Open(inImg)
+        fileList = imgDS.GetFileList()
+        imgDS = None
+        return fileList
+    
+    def getUTMZone(self, inImg):
+        """
+        A function which returns a string with the UTM (XXN | XXS) zone of the input image 
+        but only if it is projected within the UTM projection/coordinate system.
+        """
+        from osgeo import osr
+        import osgeo.gdal as gdal
+        rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
+        if rasterDS == None:
+            raise RSGISPyException('Could not open raster image: \'' + inImg+ '\'')
+        projStr = rasterDS.GetProjection()
+        rasterDS = None
+    
+        spatRef = osr.SpatialReference()
+        spatRef.ImportFromWkt(projStr)
+        utmZone = None
+        if spatRef.IsProjected():
+            projName = spatRef.GetAttrValue('projcs')
+            zone = spatRef.GetUTMZone()
+            if zone != 0:
+                if zone < 0:
+                    utmZone = str(zone*(-1))
+                    if len(utmZone) == 1:
+                        utmZone = '0' + utmZone
+                    utmZone = utmZone+'S'
+                else:
+                    utmZone = str(zone)
+                    if len(utmZone) == 1:
+                        utmZone = '0' + utmZone
+                    utmZone = utmZone+'N'
+        return utmZone
     
     def uidGenerator(self, size=6):
         """
