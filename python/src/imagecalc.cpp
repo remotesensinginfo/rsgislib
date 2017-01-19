@@ -1482,7 +1482,7 @@ static PyObject *ImageCalc_calcMultiImgBandStats(PyObject *self, PyObject *args)
     float noDataVal = 0;
     int useNoDataVal = false;
     
-    if(!PyArg_ParseTuple(args, "Osisi|if:calcMultiImgBandStats", &inImagesObj, &outputImage, &sumStat, &gdalFormat, &datatype, &noDataVal, &useNoDataVal))
+    if(!PyArg_ParseTuple(args, "Osisi|fi:calcMultiImgBandStats", &inImagesObj, &outputImage, &sumStat, &gdalFormat, &datatype, &noDataVal, &useNoDataVal))
     {
         return NULL;
     }
