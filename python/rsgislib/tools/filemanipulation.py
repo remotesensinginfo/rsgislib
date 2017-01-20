@@ -9,6 +9,7 @@ import glob
 import os.path
 import os
 import shutil
+import subprocess 
 
 def sortImgsUTM2DIRs(inputImgsDIR, fileSearchStr, outBaseDIR):
     """
@@ -35,3 +36,60 @@ def sortImgsUTM2DIRs(inputImgsDIR, fileSearchStr, outBaseDIR):
                 print('Moving: ' + tmpFile)
                 outFile = os.path.join(outDIR, os.path.basename(tmpFile))
                 shutil.move(tmpFile, outFile)
+
+
+
+def createKMZImg(inputImg, outputFile, bands):
+    """
+    A function to convert an input image to a KML/KMZ file, where the input image
+    is stretched and bands sub-selected / ordered as required for visualisation.
+    
+    Where:
+    
+    * inputImg - input image file (any format that gdal supports)
+    * outputFile - output image file (extension kmz for KMZ output / kml for KML output)
+    * bands - a string (comma seperated) with the bands to be selected. (e.g., '1', '1,2,3', '5,6,4')
+    
+    """
+    import rsgislib.imageutils
+    
+    bandLst = bands.split(',')
+    multiBand = False
+    if len(bandLst) == 3:
+        multiBand = True
+    elif len(bandLst) == 1:
+        multiBand = False
+    else:
+        print(bandLst)
+        raise rsgislib.RSGISPyException('You need to either provide 1 or 3 bands.')
+    rsgisUtils = rsgislib.RSGISPyUtils()
+    nImgBands = rsgisUtils.getImageBandCount(inputImg)
+    
+    tmpDIR = os.path.join(os.path.dirname(inputImg), rsgisUtils.uidGenerator())
+    os.makedirs(tmpDIR)
+    baseName = os.path.splitext(os.path.basename(inputImg))[0]
+    
+    selImgBandsImg = ''
+    if (nImgBands == 1) and (not multiBand):
+        selImgBandsImg = inputImg
+    elif (nImgBands == 3) and (multiBand) and (bandLst[0] == '1') and (bandLst[1] == '2') and (bandLst[2] == '3'):
+        selImgBandsImg = inputImg
+    else:
+        sBands = []
+        for strBand in bandLst:
+            sBands.append(int(strBand))
+        selImgBandsImg = os.path.join(tmpDIR, baseName+'sband.kea')
+        rsgislib.imageutils.selectImageBands(inputImg, selImgBandsImg, 'KEA', rsgisUtils.getRSGISLibDataTypeFromImg(inputImg), sBands)
+    
+    stretchImg = os.path.join(tmpDIR, baseName+'stretch.kea')
+    rsgislib.imageutils.stretchImage(selImgBandsImg, stretchImg, False, '', True, False, 'KEA', rsgislib.TYPE_8UINT, rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
+    
+    cmd = 'gdal_translate -of KMLSUPEROVERLAY ' + stretchImg + ' ' + outputFile
+    print(cmd)
+    try:
+        subprocess.call(cmd, shell=True)
+    except OSError as e:
+       raise rsgislib.RSGISPyException('Could not execute command: ' + cmd)
+        
+    shutil.rmtree(tmpDIR)
+
