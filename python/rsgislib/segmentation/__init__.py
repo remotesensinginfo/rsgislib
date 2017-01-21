@@ -43,7 +43,7 @@ def UnionOfClumps(outputimage, gdalformat, inputimagepaths, nodata):
     Deprecated: is now 'unionOfClumps' (note starts with lower case 'u')
     """
     warnings.warn("'UnionOfClumps' has been renamed to 'unionOfClumps' (starts with lower case 'u'), please update your code.", Warning, stacklevel=2)
-    unionOfClumps(outputimage, gdalformat, inputimagepaths, nodata)
+    unionOfClumps(outputimage, gdalformat, inputimagepaths, nodata, False)
 
 
 def RMSmallClumpsStepwise(inputimage, clumpsimage, outputimage, gdalformat, stretchstatsavail, stretchstatsfile, storemean, processinmemory, minclumpsize, specThreshold):
