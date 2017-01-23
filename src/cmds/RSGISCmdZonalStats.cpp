@@ -178,10 +178,6 @@ namespace rsgis{ namespace cmds {
 
             GDALClose(inputImageDS);
             GDALClose(inputSHPDS);
-
-            //OGRCleanupAll();
-            //GDALDestroyDriverManager();
-
         }
         catch(RSGISException& e)
         {
@@ -478,9 +474,6 @@ namespace rsgis{ namespace cmds {
 
             delete processVector;
             delete processFeature;
-
-            //OGRCleanupAll();
-            //GDALDestroyDriverManager();
         }
         catch(RSGISException& e)
         {
@@ -586,9 +579,6 @@ namespace rsgis{ namespace cmds {
             std::cout << "Image closed OK" << std::endl;
             GDALClose(inputSHPDS); // Close inputshape
             std::cout << "Shapefile closed OK" << std::endl;
-
-            //OGRCleanupAll();
-            //GDALDestroyDriverManager();
         }
         catch(rsgis::RSGISException& e)
         {

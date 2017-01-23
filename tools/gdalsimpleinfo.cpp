@@ -68,7 +68,6 @@ int main(int argc, char **argv)
             }
             
             GDALClose(dataset);
-            GDALDestroyDriverManager();
 		}
 		else
 		{

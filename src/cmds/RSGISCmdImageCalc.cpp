@@ -152,7 +152,6 @@ namespace rsgis{ namespace cmds {
             {
                 delete[] outBandName;
             }
-            //GDALDestroyDriverManager();
         }
         catch(rsgis::RSGISImageException &e)
         {
@@ -222,7 +221,6 @@ namespace rsgis{ namespace cmds {
             delete muParser;
             delete imageMaths;
             delete calcImage;
-            //GDALDestroyDriverManager();
         }
         catch(rsgis::RSGISImageException &e)
         {
@@ -299,7 +297,6 @@ namespace rsgis{ namespace cmds {
             imgClustering.findKMeansCentres(dataset, outputMatrixFile, numClusters, maxNumIterations, subSample, ignoreZeros, degreeOfChange, initMethod);
 
             GDALClose(dataset);
-            GDALDestroyDriverManager();
         }
         catch(rsgis::RSGISException &e)
         {
@@ -354,7 +351,6 @@ namespace rsgis{ namespace cmds {
             imgClustering.findISODataCentres(dataset, outputMatrixFile, numClusters, maxNumIterations, subSample, ignoreZeros, degreeOfChange, initMethod, minDistBetweenClusters, minNumFeatures, maxStdDev, minNumClusters, startIteration, endIteration);
 
             GDALClose(dataset);
-            GDALDestroyDriverManager();
         }
         catch(rsgis::RSGISException &e)
         {
@@ -393,7 +389,6 @@ namespace rsgis{ namespace cmds {
 
             GDALClose(datasets[0]);
             delete[] datasets;
-            GDALDestroyDriverManager();
         }
         catch(rsgis::RSGISException &e)
         {
@@ -489,7 +484,6 @@ namespace rsgis{ namespace cmds {
 
             GDALClose(datasets[0]);
             delete[] datasets;
-            GDALDestroyDriverManager();
         }
         catch(rsgis::RSGISException &e)
         {
@@ -1614,7 +1608,6 @@ namespace rsgis{ namespace cmds {
             delete geomCollectionLines;
             delete ogrGeoms;
             GDALClose(inputSHPDS);
-            OGRCleanupAll();
             GDALClose(outImage);
         }
         catch (rsgis::RSGISException e)
@@ -2092,7 +2085,6 @@ namespace rsgis{ namespace cmds {
             delete geomCollectionLines;
             delete ogrGeoms;
             GDALClose(inputSHPDS);
-            OGRCleanupAll();
             GDALClose(outImage);
             GDALClose(imgDataset);
         }
@@ -2137,7 +2129,6 @@ namespace rsgis{ namespace cmds {
             
             GDALClose(datasets[0]);
             delete[] datasets;
-            GDALDestroyDriverManager();
         }
         catch(rsgis::RSGISException &e)
         {

@@ -203,9 +203,6 @@ namespace rsgis{ namespace cmds {
             
             delete processVector;
             delete processFeature;
-            
-            //OGRCleanupAll();
-            
         }
         catch(rsgis::RSGISVectorException &e)
         {
@@ -318,8 +315,6 @@ namespace rsgis{ namespace cmds {
             
             delete processVector;
             delete processGeom;
-            
-            //OGRCleanupAll();
         }
         catch(rsgis::RSGISVectorException &e)
         {
@@ -442,9 +437,6 @@ namespace rsgis{ namespace cmds {
             GDALClose(inputSHPDS);
             delete processVector;
             delete processFeature;
-            
-            //OGRCleanupAll();
-            
         }
         catch(rsgis::RSGISVectorException &e)
         {
@@ -558,8 +550,6 @@ namespace rsgis{ namespace cmds {
             
             delete processVector;
             delete processFeature;
-            
-            //OGRCleanupAll();
         }
         catch(rsgis::RSGISVectorException &e)
         {
@@ -734,7 +724,6 @@ namespace rsgis{ namespace cmds {
                 catch (RSGISVectorException &e)
                 {
                     GDALClose(outputSHPDS);
-                    //OGRCleanupAll();
                     throw e;
                 }
                 // If no polygons in cover polygons, delete shapefile (will be empty)
@@ -750,8 +739,6 @@ namespace rsgis{ namespace cmds {
                 
                 
             }
-            
-            //OGRCleanupAll();
         }
         catch(rsgis::RSGISVectorException &e)
         {

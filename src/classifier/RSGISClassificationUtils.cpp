@@ -277,7 +277,6 @@ namespace rsgis{ namespace classifier{
 			}
 			
 			GDALClose(inputSHPDS);
-			OGRCleanupAll();			
 		}
 		catch(RSGISClassificationException &e)
 		{
