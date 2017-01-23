@@ -911,8 +911,8 @@ namespace rsgis{namespace geom{
 	
 	RSGISIdentifyNonConvexPolygonsSnakes::~RSGISIdentifyNonConvexPolygonsSnakes()
 	{
-		GDALDestroyDriverManager();
-	}
+
+    }
 	
 	/***
 	 * 

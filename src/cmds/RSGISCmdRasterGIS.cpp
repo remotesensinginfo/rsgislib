@@ -473,7 +473,6 @@ namespace rsgis{ namespace cmds {
 
             GDALClose(clumpsDataset);
             GDALClose(catsDataset);
-            //GDALDestroyDriverManager();
         }
         catch(rsgis::RSGISException &e)
         {
@@ -516,7 +515,6 @@ namespace rsgis{ namespace cmds {
             delete[] bandNames;
 
             GDALClose(inputDataset);
-            //GDALDestroyDriverManager();
         }
         catch(rsgis::RSGISException &e)
         {

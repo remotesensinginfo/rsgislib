@@ -101,7 +101,6 @@ namespace rsgis{ namespace cmds {
             }
 
             GDALClose(inDataset);
-            //GDALDestroyDriverManager();
         }
         catch(RSGISException& e)
         {
@@ -153,7 +152,6 @@ namespace rsgis{ namespace cmds {
             }
 
             GDALClose(inDataset);
-            //GDALDestroyDriverManager();
         }
         catch(RSGISException& e)
         {
@@ -189,7 +187,6 @@ namespace rsgis{ namespace cmds {
 
             GDALClose(dataset);
             GDALClose(mask);
-            //GDALDestroyDriverManager();
         }
         catch(RSGISException& e)
         {
@@ -1322,8 +1319,6 @@ namespace rsgis{ namespace cmds {
             GDALClose(dataset[0]);
             delete[] dataset;
             GDALClose(inputVecDS);
-            OGRCleanupAll();
-            //GDALDestroyDriverManager();
             delete calcImage;
             delete copyImage;
         }
@@ -1489,8 +1484,6 @@ namespace rsgis{ namespace cmds {
             GDALClose(dataset[0]);
             delete[] dataset;
             GDALClose(inputVecDS);
-            OGRCleanupAll();
-            //GDALDestroyDriverManager();
             delete calcImage;
             delete copyImage;
         }
@@ -1562,7 +1555,6 @@ namespace rsgis{ namespace cmds {
             delete[] dataset;
             GDALClose(roiDataset);
 
-            //GDALDestroyDriverManager();
             delete calcImage;
             delete copyImage;
         }
