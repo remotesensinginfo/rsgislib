@@ -158,7 +158,7 @@ namespace rsgis{namespace img{
     }
     
     
-    void RSGISSampleImage::randomSampleImageMaskSmallPxlCount(GDALDataset *inputImage, unsigned int imgBand, GDALDataset *outputImage, std::vector<int> maskVals, unsigned long numSamples)throw(RSGISImageException)
+    void RSGISSampleImage::randomSampleImageMaskSmallPxlCount(GDALDataset *inputImage, unsigned int imgBand, GDALDataset *outputImage, std::vector<int> maskVals, unsigned long numSamples, int rndSeed)throw(RSGISImageException)
     {
         try
         {
@@ -186,7 +186,7 @@ namespace rsgis{namespace img{
             
             std::cout << "Max Number of Pixels within a class is " << maxNPxls << std::endl;
 
-            boost::mt19937 rng (NULL);
+            boost::mt19937 rng (rndSeed);
             boost::uniform_int<> pxlRange( 0, maxNPxls );
             boost::variate_generator< boost::mt19937, boost::uniform_int<> > pxlGen(rng, pxlRange);
             

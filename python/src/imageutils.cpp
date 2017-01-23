@@ -1428,15 +1428,15 @@ static PyObject *ImageUtils_PerformRandomPxlSample(PyObject *self, PyObject *arg
 
 static PyObject *ImageUtils_PerformRandomPxlSampleSmallPxlCount(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    static char *kwlist[] = {"inputImage", "outputImage", "gdalformat", "maskvals", "numSamples"};
+    static char *kwlist[] = {"inputImage", "outputImage", "gdalformat", "maskvals", "numSamples", "rndSeed"};
     const char *pszInputImage = "";
     const char *pszOutputImage = "";
     const char *pszGDALFormat = "";
     PyObject *maskValsObj;
     unsigned int numSamples = 0;
+    int rndSeed = 0;
     
-    
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssOI:performRandomPxlSampleInMaskLowPxlCount", kwlist, &pszInputImage, &pszOutputImage, &pszGDALFormat, &maskValsObj, &numSamples))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssOI|i:performRandomPxlSampleInMaskLowPxlCount", kwlist, &pszInputImage, &pszOutputImage, &pszGDALFormat, &maskValsObj, &numSamples, &rndSeed))
     {
         return NULL;
     }
@@ -1476,7 +1476,7 @@ static PyObject *ImageUtils_PerformRandomPxlSampleSmallPxlCount(PyObject *self, 
     
     try
     {
-        rsgis::cmds::executePerformRandomPxlSampleSmallPxlCount(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszGDALFormat), maskVals, numSamples);
+        rsgis::cmds::executePerformRandomPxlSampleSmallPxlCount(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszGDALFormat), maskVals, numSamples, rndSeed);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -2201,7 +2201,7 @@ For example, can be used to produce monthly composite images from a stack with i
 "\n"},
     
 {"performRandomPxlSampleInMaskLowPxlCount", (PyCFunction)ImageUtils_PerformRandomPxlSampleSmallPxlCount, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imageutils.performRandomPxlSampleInMaskLowPxlCount(inputImage=string, outputImage=string, gdalformat=string, maskvals=int|list, numSamples=unsigned int)\n"
+"rsgislib.imageutils.performRandomPxlSampleInMaskLowPxlCount(inputImage=string, outputImage=string, gdalformat=string, maskvals=int|list, numSamples=unsigned int, rndSeed=int)\n"
 "Randomly sample with a mask (e.g., classification). The same number of samples will be identified within each mask value listed by maskvals.\n"
 "This function produces a similar result to rsgislib.imageutils.performRandomPxlSampleInMask but is more efficient for classes where only a small number of\n"
 "pixels have that value. However, this function uses much more memory.\n"
@@ -2213,6 +2213,7 @@ For example, can be used to produce monthly composite images from a stack with i
 "* gdalformat is a string with the GDAL output file format.\n"
 "* maskvals can either be a single integer value or a list of values. If a list of values is specified then the total number of points identified (numSamples x n-maskVals).\n"
 "* numSamples is the number of samples to be created within each region.\n"
+"* rndSeed is a an integer providing a seed for the random number generator. Please not that if this number is the same then the same random set of points will be generated.\n"
 "\n"},
 
     {NULL}        /* Sentinel */
