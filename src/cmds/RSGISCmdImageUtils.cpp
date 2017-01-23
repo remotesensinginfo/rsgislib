@@ -2033,7 +2033,7 @@ namespace rsgis{ namespace cmds {
         }
     }
                 
-    void executePerformRandomPxlSampleSmallPxlCount(std::string inputImage, std::string outputImage, std::string gdalFormat, std::vector<int> maskVals, unsigned long numSamples) throw(RSGISCmdException)
+    void executePerformRandomPxlSampleSmallPxlCount(std::string inputImage, std::string outputImage, std::string gdalFormat, std::vector<int> maskVals, unsigned long numSamples, int rndSeed) throw(RSGISCmdException)
     {
         try
         {
@@ -2057,7 +2057,7 @@ namespace rsgis{ namespace cmds {
             
             std::cout << "Performing sampling.\n";
             rsgis::img::RSGISSampleImage sampleImg;
-            sampleImg.randomSampleImageMaskSmallPxlCount(inputImgDS, 1, outImgDS, maskVals, numSamples);
+            sampleImg.randomSampleImageMaskSmallPxlCount(inputImgDS, 1, outImgDS, maskVals, numSamples, rndSeed);
             std::cout << "Completed Sampling.\n";
             
             GDALClose(inputImgDS);
