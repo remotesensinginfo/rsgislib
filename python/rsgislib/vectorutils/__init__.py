@@ -6,6 +6,9 @@ The vector utils module performs geometry / attribute table operations on vector
 from ._vectorutils import *
 
 import os.path
+import os
+import shutil
+import subprocess
 
 import osgeo.gdal as gdal
 import osgeo.osr as osr
@@ -247,5 +250,86 @@ Example::
     ds = None
 
 
+def extractImageFootprint(inputImg, outVec, tmpDIR='./tmp', rePrjTo=None):
+    """
+A function to extract an image footprint as a vector.
 
+* inputImg - the input image file for which the footprint will be extracted.
+* outVec - output shapefile path and name.
+* tmpDIR - temp directory which will be used during processing. It will be created and deleted once processing complete.
+* rePrjTo - optional command 
+"""
+    rsgisUtils = rsgislib.RSGISPyUtils()
+    
+    uidStr = rsgisUtils.uidGenerator()
+    
+    createdTmp = False
+    if not os.path.exists(tmpDIR):
+        os.makedirs(tmpDIR)
+        createdTmp = True
+    
+    inImgBase = os.path.splitext(os.path.basename(inputImg))[0]
+    
+    validOutImg = os.path.join(tmpDIR, inImgBase+'_'+uidStr+'_validimg.kea')
+    inImgNoData = rsgisUtils.getImageNoDataValue(inputImg)
+    rsgislib.imageutils.genValidMask(inimages=inputImg, outimage=validOutImg, format='KEA', nodata=inImgNoData)
+    
+    outVecTmpFile = outVec
+    if not (rePrjTo is None):
+        outVecTmpFile = os.path.join(tmpDIR, inImgBase+'_'+uidStr+'_initVecOut.shp')
+    
+    rsgislib.vectorutils.polygoniseRaster(validOutImg, outVecTmpFile, imgBandNo=1, maskImg=validOutImg, imgMaskBandNo=1)    
+    fileName = [os.path.basename(inputImg)]
+    vecLayerName = os.path.splitext(os.path.basename(outVecTmpFile))[0]
+    rsgislib.vectorutils.writeVecColumn(outVecTmpFile, vecLayerName, 'FileName', ogr.OFTString, fileName)
+    
+    if not (rePrjTo is None):
+        if os.path.exists(outVec):
+            driver = ogr.GetDriverByName('ESRI Shapefile')
+            driver.DeleteDataSource(outVec)
+    
+        cmd = 'ogr2ogr -f "ESRI Shapefile" -t_srs ' + rePrjTo + ' ' + outVec + ' ' + outVecTmpFile
+        print(cmd)
+        try:
+            subprocess.call(cmd, shell=True)
+        except OSError as e:
+            raise Exception('Could not re-projection shapefile: ' + cmd)
+    
+    if createdTmp:
+        shutil.rmtree(tmpDIR)
+    else:
+        if not (rePrjTo is None):
+            driver = ogr.GetDriverByName('ESRI Shapefile')
+            driver.DeleteDataSource(outVecTmpFile)
+
+
+
+def mergeShapefiles(inFileList, outVecFile):
+    """
+Function which will merge a list of shapefiles into an single shapefile using ogr2ogr.
+
+Where:
+
+* inFileList - is a list of input files.
+* outVecFile - is the output shapefile
+"""
+    if os.path.exists(outVecFile):
+        driver = ogr.GetDriverByName('ESRI Shapefile')
+        driver.DeleteDataSource(outVecFile)
+    first = True
+    for inFile in inFileList:
+        print("Processing: " + inFile)
+        if first:
+            cmd = 'ogr2ogr -f "ESRI Shapefile"  ' + outVecFile + ' ' + inFile
+            try:
+                subprocess.call(cmd, shell=True)
+            except OSError as e:
+                raise Exception('Error running ogr2ogr: ' + cmd)
+            first = False
+        else:
+            cmd = 'ogr2ogr -update -append -f "ESRI Shapefile" ' + outVecFile + ' ' + inFile
+            try:
+                subprocess.call(cmd, shell=True)
+            except OSError as e:
+                raise Exception('Error running ogr2ogr: ' + cmd)
 
