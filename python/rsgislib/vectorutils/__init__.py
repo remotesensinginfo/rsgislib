@@ -278,9 +278,22 @@ A function to extract an image footprint as a vector.
     if not (rePrjTo is None):
         outVecTmpFile = os.path.join(tmpDIR, inImgBase+'_'+uidStr+'_initVecOut.shp')
     
-    rsgislib.vectorutils.polygoniseRaster(validOutImg, outVecTmpFile, imgBandNo=1, maskImg=validOutImg, imgMaskBandNo=1)    
-    fileName = [os.path.basename(inputImg)]
+    rsgislib.vectorutils.polygoniseRaster(validOutImg, outVecTmpFile, imgBandNo=1, maskImg=validOutImg, imgMaskBandNo=1)
     vecLayerName = os.path.splitext(os.path.basename(outVecTmpFile))[0]
+    ds = gdal.OpenEx(outVecTmpFile, gdal.OF_READONLY )
+    if ds is None:
+        raise Exception("Could not open '" + vectorFile + "'")
+    
+    lyr = ds.GetLayerByName( vecLayerName )
+    if lyr is None:
+        raise Exception("Could not find layer '" + vecLayerName + "'")
+    numFeats = lyr.GetFeatureCount()
+    lyr = None
+    ds = None
+    
+    fileName = []
+    for i in range(numFeats):
+        fileName.append(os.path.basename(inputImg))
     rsgislib.vectorutils.writeVecColumn(outVecTmpFile, vecLayerName, 'FileName', ogr.OFTString, fileName)
     
     if not (rePrjTo is None):
