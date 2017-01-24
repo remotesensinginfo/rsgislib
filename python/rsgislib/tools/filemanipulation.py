@@ -28,7 +28,7 @@ def sortImgsUTM2DIRs(inputImgsDIR, fileSearchStr, outBaseDIR):
     for imgFile in inFiles:
         utmZone = rsgisUtils.getUTMZone(imgFile)
         if utmZone is not None:
-            outDIR = os.path.join(outBaseDIR, utmZone)
+            outDIR = os.path.join(outBaseDIR, 'utm'+utmZone)
             if not os.path.exists(outDIR):
                 os.makedirs(outDIR)
             imgFileList = rsgisUtils.getImageFiles(imgFile)
