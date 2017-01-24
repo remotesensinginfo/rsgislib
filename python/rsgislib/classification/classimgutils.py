@@ -479,7 +479,7 @@ def _applyClassification(inParams):
     for trainSamples in trainSamplesInfo:
         rsgislib.imageutils.performRandomPxlSampleInMaskLowPxlCount(inputImage=trainSamples.maskImg, outputImage=os.path.join(cTmpDIR, trainSamples.outSampImgFile), gdalformat=gdalFormat, maskvals=[trainSamples.maskPxlVal], numSamples=trainSamples.numSamps, rndSeed=rndSeed)
         rsgislib.imageutils.extractZoneImageBandValues2HDF(imgFileInfo, os.path.join(cTmpDIR, trainSamples.outSampImgFile), os.path.join(cTmpDIR, trainSamples.samplesH5File), trainSamples.maskPxlVal)
-        classTrainInfo[trainSamples.className] = classimgutils.ClassInfoObj(id=trainSamples.classID, fileH5=os.path.join(cTmpDIR, trainSamples.samplesH5File), red=trainSamples.red, green=trainSamples.green, blue=trainSamples.blue)
+        classTrainInfo[trainSamples.className] = ClassInfoObj(id=trainSamples.classID, fileH5=os.path.join(cTmpDIR, trainSamples.samplesH5File), red=trainSamples.red, green=trainSamples.green, blue=trainSamples.blue)
     
     trainClassifier(classTrainInfo, skClassifier)
     applyClassifer(classTrainInfo, skClassifier, classAreaMask, classMaskPxlVal, imgFileInfo, tmpClassImgOut, gdalFormat)
