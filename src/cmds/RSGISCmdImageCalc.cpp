@@ -2959,5 +2959,44 @@ namespace rsgis{ namespace cmds {
         }
     }
                 
+    std::pair<double,double> getImageBandMinMax(std::string inputImage, unsigned int imgBand, bool useNoData, float noDataVal) throw(RSGISCmdException)
+    {
+        std::pair<double,double> outVals;
+        try
+        {
+            GDALAllRegister();
+            
+            GDALDataset *inImgDS = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+            if(inImgDS == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            rsgis::img::ImageStats *bandStats = new rsgis::img::ImageStats();
+            rsgis::img::RSGISImageStatistics calcStats;
+            calcStats.calcImageBandStatistics(inImgDS, imgBand, bandStats, false, useNoData, noDataVal, false);
+            
+            outVals.first = bandStats->min;
+            outVals.second = bandStats->max;
+            
+            delete bandStats;
+            GDALClose(inImgDS);
+        }
+        catch(rsgis::RSGISImageException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        
+        return outVals;
+    }
+                
 }}
 

@@ -171,6 +171,8 @@ namespace rsgis{ namespace cmds {
     DllExport void calcMultiImgBandsStats(std::vector<std::string> inputImages, std::string outputImage, RSGISCmdsSummariseStats summaryStats, std::string gdalFormat, RSGISLibDataType outDataType, bool useNoData, float noDataVal) throw(RSGISCmdException);
     /** A function to calculate the difference between two images */
     DllExport void calcImageDifference(std::string inputImage1, std::string inputImage2, std::string outputImage, std::string gdalFormat, RSGISLibDataType outDataType) throw(RSGISCmdException);
+    /** A function to get the min and max image values from the input image band specified */
+    DllExport std::pair<double,double> getImageBandMinMax(std::string inputImage, unsigned int imgBand, bool useNoData=false, float noDataVal=0.0) throw(RSGISCmdException);
 }}
 
 
