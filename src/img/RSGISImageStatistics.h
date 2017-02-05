@@ -78,6 +78,7 @@ namespace rsgis{namespace img{
         void calcImageStatistics(GDALDataset **datasets, int numDS, ImageStats **stats, int numInputBands, bool stddev, bool noDataSpecified, float noDataVal, bool onePassSD, double xMin, double xMax, double yMin, double yMax)throw(RSGISImageCalcException,RSGISImageBandException);
         void calcImageHistogram(GDALDataset **datasets, int numDS, unsigned int imgBand, unsigned int numBins, float *binRanges, unsigned int *binCounts, bool noDataSpecified, float noDataVal, double xMin, double xMax, double yMin, double yMax)throw(RSGISImageCalcException,RSGISImageBandException);
         void calcImageStatisticsMask(GDALDataset *dataset, GDALDataset *imgMask, long maskVal, ImageStats **stats, double *noDataVals, bool useNoData, int numInputBands, bool stddev, bool onePassSD=false)throw(RSGISImageCalcException,RSGISImageBandException);
+        void calcImageBandStatistics(GDALDataset *dataset, int imgBand, ImageStats *stats, bool stddev, bool useNoData=false, float noDataVal=0.0, bool onePassSD=false)throw(RSGISImageCalcException,RSGISImageBandException);
     };
 	
 	

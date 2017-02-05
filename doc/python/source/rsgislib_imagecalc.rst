@@ -32,6 +32,7 @@ Spectral Unmixing
 Statistics
 -----------
 
+.. autofunction:: rsgislib.imagecalc.getImageBandMinMax
 .. autofunction:: rsgislib.imagecalc.imageStats
 .. autofunction:: rsgislib.imagecalc.imageBandStats
 .. autofunction:: rsgislib.imagecalc.meanVector

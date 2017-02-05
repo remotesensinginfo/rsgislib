@@ -1591,6 +1591,41 @@ static PyObject *ImageCalc_CalcImageDifference(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
+static PyObject *ImageCalc_GetImageBandMinMax(PyObject *self, PyObject *args)
+{
+    const char *inputImage;
+    int imgBand;
+    int useNoDataVal = false;
+    float noDataVal = 0.0;
+    
+    if(!PyArg_ParseTuple(args, "si|if:getImageBandMinMax", &inputImage, &imgBand, &useNoDataVal, &noDataVal))
+    {
+        return NULL;
+    }
+    
+    PyObject *outList = PyTuple_New(2);
+    try
+    {
+        std::pair<double,double> outVals = rsgis::cmds::getImageBandMinMax(std::string(inputImage), imgBand, (bool)useNoDataVal, noDataVal);
+        
+        if(PyTuple_SetItem(outList, 0, Py_BuildValue("d", outVals.first)) == -1)
+        {
+            throw rsgis::cmds::RSGISCmdException("Failed to add min value to output tuple...");
+        }
+        if(PyTuple_SetItem(outList, 1, Py_BuildValue("d", outVals.second)) == -1)
+        {
+            throw rsgis::cmds::RSGISCmdException("Failed to add max value to output tuple...");
+        }
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    return outList;
+}
+
 
 
 // Our list of functions in this module
@@ -2416,6 +2451,33 @@ static PyMethodDef ImageCalcMethods[] = {
 "   imageutils.popImageStats(outputImage, usenodataval=False, nodataval=0, calcpyramids=True)\n"
 "   \n"
 "\n"},
+    
+{"getImageBandMinMax", ImageCalc_GetImageBandMinMax, METH_VARARGS,
+"imagecalc.getImageBandMinMax(inputImage, imageBand, useNoDataVal, noDataVal)\n"
+"Calculate and reutrn the maximum and minimum values of the input image.\n"
+"\n"
+"Where:\n"
+"\n"
+"* inputImage is a string containing the name of the input file\n"
+"* imageBand is an int specifying the image band\n"
+"* useNoDataVal is a boolean specifying whether the no data value should be used (Optional, default is False)\n"
+"* noDataVal is a string containing the GDAL format for the output file - eg 'KEA'\n"
+
+"\n"
+"Example::\n"
+"\n"
+"   import rsgislib\n"
+"   from rsgislib import imagecalc\n"
+"   \n"
+"   inputImage = 'LS8_20131111_lat29lon8717_r40p140_vmsk_rad_srefdem.kea'\n"
+"   imgBand = 1\n"
+"   \n"
+"   minMaxVals = imagecalc.getImageBandMinMax(inputImage, imgBand)\n"
+"   print('MIN: ', minMaxVals[0])\n"
+"   print('MAX: ', minMaxVals[1])\n"
+"   \n"
+"\n"},
+    
     
 {NULL}        /* Sentinel */
 };
