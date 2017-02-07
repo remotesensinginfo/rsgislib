@@ -53,7 +53,7 @@ Example::
         if shpExt:
             print("Creating output image from shapefile extent")
             imageutils.createCopyImageVecExtent(inputImage, inputVec, outImage, 1, 0, gdalFormat, rsgislib.TYPE_32UINT)
-        elif inputImage == None:
+        elif inputImage is None:
             print("Assuming output image is already created so just using.")
         else:
             print("Creating output image using input image")
@@ -157,7 +157,7 @@ Example::
     
     gdalImgMaskData = None
     imgMaskBand = None
-    if not maskImg == None:
+    if maskImg is not None:
         print("Using mask")
         gdalImgMaskData = gdal.Open(maskImg)
         imgMaskBand = gdalImgData.GetRasterBand(imgMaskBandNo)
@@ -180,7 +180,7 @@ Example::
     print("Completed")
     outDatasource.Destroy()
     gdalImgData = None
-    if not maskImg == None:
+    if maskImg is not None:
         gdalImgMaskData = None
 
 
