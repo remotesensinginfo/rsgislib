@@ -598,6 +598,53 @@ Where:
 
     applier.apply(_getXYPxlLocs, infiles, outfiles, otherargs, controls=aControls)
 
-
+def mergeExtractedHDF5Data(h5Files, outH5File):
+    """
+    A function to merge a list of HDF files (e.g., from rsgislib.imageutils.extractZoneImageBandValues2HDF)
+    with the same number of variables (i.e., columns) into a single file. For example, if class training
+    regions have been sourced from multiple images. 
+    
+    * h5Files - a list of input files. 
+    * outH5File - the output file.
+    
+    Example::
+    
+    inTrainSamples = ['MSS_CloudTrain1.h5', 'MSS_CloudTrain2.h5', 'MSS_CloudTrain3.h5']
+    cloudTrainSamples = 'LandsatMSS_CloudTrainingSamples.h5'
+    rsgislib.imageutils.mergeExtractedHDF5Data(inTrainSamples, cloudTrainSamples)
+    """
+    import h5py
+    
+    first = True
+    numVars = 0
+    numVals = 0
+    for h5File in h5Files:
+        fH5 = h5py.File(h5File)
+        dataShp = fH5['DATA/DATA'].shape
+        if first:
+            numVars = dataShp[1]
+            first = False
+        elif numVars is not dataShp[1]:
+            raise rsgislib.RSGISPyException("The number of variables within the inputted HDF5 files was not the same.")
+        numVals += dataShp[0]
+        fH5.close()
+    
+    dataArr = numpy.zeros([numVals, numVars], dtype=float)
+    
+    rowInit = 0
+    for h5File in h5Files:
+        fH5 = h5py.File(h5File)
+        numRows = fH5['DATA/DATA'].shape[0]
+        dataArr[rowInit:(rowInit+numRows)] = fH5['DATA/DATA']
+        rowInit += numRows
+        fH5.close()
+    
+    fH5Out = h5py.File(outH5File,'w')
+    dataGrp = fH5Out.create_group("DATA")
+    metaGrp = fH5Out.create_group("META-DATA")
+    dataGrp.create_dataset('DATA', data=dataArr, chunks=True, compression="gzip", shuffle=True)
+    describDS = metaGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
+    describDS[0] = 'Merged'.encode()
+    fH5Out.close()
 
 
