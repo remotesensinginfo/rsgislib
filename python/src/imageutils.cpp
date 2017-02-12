@@ -1843,8 +1843,8 @@ static PyMethodDef ImageUtilsMethods[] = {
 "\n"
 "   import rsgislib.imageutils\n"
 "   fileInfo = []\n"
-"   fileInfo.append(rsgislib.imageutils.ImageBandInfo('InputImg1.kea', [1,3,4]))\n"
-"   fileInfo.append(rsgislib.imageutils.ImageBandInfo('InputImg2.kea', [2]))\n"
+"   fileInfo.append(rsgislib.imageutils.ImageBandInfo('InputImg1.kea', 'Image1', [1,3,4]))\n"
+"   fileInfo.append(rsgislib.imageutils.ImageBandInfo('InputImg2.kea', 'Image2', [2]))\n"
 "   rsgislib.imageutils.extractZoneImageBandValues2HDF(fileInfo, 'ClassMask.kea', 'ForestRefl.h5', 1.0)\n"
 "\n"},
 

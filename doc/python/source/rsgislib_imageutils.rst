@@ -63,6 +63,7 @@ Extract
 .. autofunction:: rsgislib.imageutils.ImageBandInfo
 .. autofunction:: rsgislib.imageutils.extractZoneImageValues2HDF
 .. autofunction:: rsgislib.imageutils.extractZoneImageBandValues2HDF
+.. autofunction:: rsgislib.imageutils.mergeExtractedHDF5Data
 .. autofunction:: rsgislib.imageutils.performRandomPxlSampleInMask
 .. autofunction:: rsgislib.imageutils.performRandomPxlSampleInMaskLowPxlCount
 

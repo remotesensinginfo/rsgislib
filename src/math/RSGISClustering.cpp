@@ -429,9 +429,8 @@ namespace rsgis {namespace math{
                     cCentre.centre.push_back(value);
                     cCentre.stdDev.push_back(0);
                 }
-                
+
                 this->assign2ClosestDataPoint(&cCentre, input, numFeatures, clusterCentres);
-                
                 clusterCentres->push_back(cCentre);
             }
             
@@ -577,7 +576,7 @@ namespace rsgis {namespace math{
         
     std::vector< RSGISClusterCentre >* RSGISClusterer::initializeClusterCentresKPP(std::vector< std::vector<float> > *input, unsigned int numFeatures, float *min, float *max, unsigned int numClusters)throw(RSGISClustererException)
     {
-        throw RSGISClustererException("initializeClusterCentresDiagonal is not implemented.");
+        throw RSGISClustererException("initializeClusterCentresKPP is not implemented.");
         return NULL;
     }
         
