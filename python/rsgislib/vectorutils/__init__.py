@@ -333,14 +333,14 @@ Where:
     for inFile in inFileList:
         print("Processing: " + inFile)
         if first:
-            cmd = 'ogr2ogr -f "ESRI Shapefile"  ' + outVecFile + ' ' + inFile
+            cmd = 'ogr2ogr -f "ESRI Shapefile"  "' + outVecFile + '" "' + inFile + '"'
             try:
                 subprocess.call(cmd, shell=True)
             except OSError as e:
                 raise Exception('Error running ogr2ogr: ' + cmd)
             first = False
         else:
-            cmd = 'ogr2ogr -update -append -f "ESRI Shapefile" ' + outVecFile + ' ' + inFile
+            cmd = 'ogr2ogr -update -append -f "ESRI Shapefile" "' + outVecFile + '" "' + inFile + '"'
             try:
                 subprocess.call(cmd, shell=True)
             except OSError as e:
