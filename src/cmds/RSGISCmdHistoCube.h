@@ -47,7 +47,7 @@
 namespace rsgis{ namespace cmds {
     
     /** Create an empty histocube file ready to be populated */
-    DllExport void executeCreateEmptyHistoCube(std::string histCubeFile)throw(RSGISCmdException);
+    DllExport void executeCreateEmptyHistoCube(std::string histCubeFile, unsigned long numFeats)throw(RSGISCmdException);
     
     
     

@@ -79,21 +79,22 @@ namespace rsgis {namespace histocube{
     
     static const std::string HC_DATASETNAME_DATA( "/DATA" );
     static const std::string HC_DATASETNAME_METADATA( "/METADATA" );
-    
+    static const std::string HC_NUM_OF_FEATS( "/METADATA/NUM_OF_FEATS" );
     
     class DllExport RSGISHistoCubeFile
     {
     public:
         RSGISHistoCubeFile();
         virtual void openFile(std::string filePath, bool rwAccess, int mdcElmts=HC_MDC_NELMTS, hsize_t rdccNElmts=HC_RDCC_NELMTS, hsize_t rdccNBytes=HC_RDCC_NBYTES, double rdccW0=HC_RDCC_W0, hsize_t sieveBuf=HC_SIEVE_BUF, hsize_t metaBlockSize=HC_META_BLOCKSIZE) throw(rsgis::RSGISHistoCubeException);
-        virtual void createNewFile(std::string filePath, int mdcElmts=HC_MDC_NELMTS, hsize_t rdccNElmts=HC_RDCC_NELMTS, hsize_t rdccNBytes=HC_RDCC_NBYTES, double rdccW0=HC_RDCC_W0, hsize_t sieveBuf=HC_SIEVE_BUF, hsize_t metaBlockSize=HC_META_BLOCKSIZE) throw(rsgis::RSGISHistoCubeException);
-        virtual void createDataset(std::string name, unsigned int lowRange, unsigned int upRange, int scale, int offset) throw(rsgis::RSGISHistoCubeException);
+        virtual void createNewFile(std::string filePath, unsigned long numFeats, int mdcElmts=HC_MDC_NELMTS, hsize_t rdccNElmts=HC_RDCC_NELMTS, hsize_t rdccNBytes=HC_RDCC_NBYTES, double rdccW0=HC_RDCC_W0, hsize_t sieveBuf=HC_SIEVE_BUF, hsize_t metaBlockSize=HC_META_BLOCKSIZE) throw(rsgis::RSGISHistoCubeException);
+        virtual void createDataset(std::string name, std::vector<int> bins, float scale, float offset) throw(rsgis::RSGISHistoCubeException);
         virtual void closeFile() throw(rsgis::RSGISHistoCubeException);
         virtual ~RSGISHistoCubeFile();
     protected:
         bool fileOpen;
         bool rwAccess;
         H5::H5File *hcH5File;
+        unsigned long numOfFeats;
     };
     
     
