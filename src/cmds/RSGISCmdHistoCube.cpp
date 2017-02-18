@@ -34,6 +34,23 @@ namespace rsgis{ namespace cmds {
         {
             rsgis::histocube::RSGISHistoCubeFile histoCubeFileObj = rsgis::histocube::RSGISHistoCubeFile();
             histoCubeFileObj.createNewFile(histCubeFile, numFeats);
+            
+            
+            std::vector<int> bins = std::vector<int>();
+            for(int i = 0; i <= 100; ++i)
+            {
+                bins.push_back(i);
+            }
+            /*
+            float scale = 1;
+            float offset = 0;
+            bool hasTime = true;
+            bool hasDate = true;
+            boost::posix_time::ptime *layerDateTime = new boost::posix_time::ptime(boost::posix_time::time_from_string("2002-01-20 23:59:59.000"));
+            
+            histoCubeFileObj.createDataset("LS_RED", bins, scale, offset, hasTime, hasDate, layerDateTime);
+            */
+            
             histoCubeFileObj.closeFile();
         }
         catch(rsgis::RSGISHistoCubeException &e)

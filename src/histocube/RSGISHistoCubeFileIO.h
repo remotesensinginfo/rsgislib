@@ -63,6 +63,8 @@
 #include "common/RSGISHistoCubeException.h"
 
 #include "H5Cpp.h"
+#include "boost/date_time/gregorian/gregorian.hpp"
+#include "boost/date_time/posix_time/posix_time.hpp"
 
 namespace rsgis {namespace histocube{
     
@@ -81,13 +83,33 @@ namespace rsgis {namespace histocube{
     static const std::string HC_DATASETNAME_METADATA( "/METADATA" );
     static const std::string HC_NUM_OF_FEATS( "/METADATA/NUM_OF_FEATS" );
     
+    static const std::string HC_CUBELAYER_ATT_ORDER( "ORDER" );
+    static const std::string HC_CUBELAYER_ATT_SCALE( "SCALE" );
+    static const std::string HC_CUBELAYER_ATT_OFFSET( "OFFSET" );
+    static const std::string HC_CUBELAYER_ATT_BINS( "BINS" );
+    static const std::string HC_CUBELAYER_ATT_HAS_TIME( "HAS_TIME" );
+    static const std::string HC_CUBELAYER_ATT_HAS_DATE( "HAS_DATE" );
+    static const std::string HC_CUBELAYER_ATT_DATE_TIME( "DATE_TIME" );
+    
+    struct DllExport RSGISHistCubeLayerMeta
+    {
+        std::string name;
+        float scale;
+        float offset;
+        unsigned int order;
+        std::vector<int> bins;
+        bool hasDate;
+        bool hasTime;
+        boost::posix_time::ptime layerDateTime;
+    };
+    
     class DllExport RSGISHistoCubeFile
     {
     public:
         RSGISHistoCubeFile();
         virtual void openFile(std::string filePath, bool rwAccess, int mdcElmts=HC_MDC_NELMTS, hsize_t rdccNElmts=HC_RDCC_NELMTS, hsize_t rdccNBytes=HC_RDCC_NBYTES, double rdccW0=HC_RDCC_W0, hsize_t sieveBuf=HC_SIEVE_BUF, hsize_t metaBlockSize=HC_META_BLOCKSIZE) throw(rsgis::RSGISHistoCubeException);
         virtual void createNewFile(std::string filePath, unsigned long numFeats, int mdcElmts=HC_MDC_NELMTS, hsize_t rdccNElmts=HC_RDCC_NELMTS, hsize_t rdccNBytes=HC_RDCC_NBYTES, double rdccW0=HC_RDCC_W0, hsize_t sieveBuf=HC_SIEVE_BUF, hsize_t metaBlockSize=HC_META_BLOCKSIZE) throw(rsgis::RSGISHistoCubeException);
-        virtual void createDataset(std::string name, std::vector<int> bins, float scale, float offset) throw(rsgis::RSGISHistoCubeException);
+        virtual void createDataset(std::string name, std::vector<int> bins, float scale=1, float offset=0, bool hasTime=false, bool hasDate=false, boost::posix_time::ptime *layerDateTime=NULL, int deflate=HC_DEFLATE) throw(rsgis::RSGISHistoCubeException);
         virtual void closeFile() throw(rsgis::RSGISHistoCubeException);
         virtual ~RSGISHistoCubeFile();
     protected:
@@ -95,6 +117,7 @@ namespace rsgis {namespace histocube{
         bool rwAccess;
         H5::H5File *hcH5File;
         unsigned long numOfFeats;
+        std::vector<RSGISHistCubeLayerMeta*> *cubeLayers;
     };
     
     
