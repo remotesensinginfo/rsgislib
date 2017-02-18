@@ -65,17 +65,18 @@ static std::string *ExtractStringArrayFromSequence(PyObject *sequence, int *nEle
 static PyObject *HistoCube_CreateEmptyHistCube(PyObject *self, PyObject *args, PyObject *keywds)
 {
     const char *pszCubeFile;
+    unsigned long numOfFeats = 0;
 
-    static char *kwlist[] = {"filename", NULL};
+    static char *kwlist[] = {"filename", "numOfFeats", NULL};
     
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "s:createEmptyHistoCube", kwlist, &pszCubeFile))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sk:createEmptyHistoCube", kwlist, &pszCubeFile, &numOfFeats))
     {
         return NULL;
     }
     
     try
     {
-        rsgis::cmds::executeCreateEmptyHistoCube(std::string(pszCubeFile));
+        rsgis::cmds::executeCreateEmptyHistoCube(std::string(pszCubeFile), numOfFeats);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -93,17 +94,18 @@ static PyObject *HistoCube_CreateEmptyHistCube(PyObject *self, PyObject *args, P
 // Our list of functions in this module
 static PyMethodDef HistoCubeMethods[] = {
 {"createEmptyHistoCube", (PyCFunction)HistoCube_CreateEmptyHistCube, METH_VARARGS | METH_KEYWORDS,
-"histocube.createEmptyHistoCube(filename=string)\n"
+"histocube.createEmptyHistoCube(filename=string, numOfFeats=unsigned long)\n"
 "Create an empty histogram cube file ready for populating.\n"
 "\n"
 "Where:\n"
 "\n"
 "* filename - is the file path and name for the histogram cube file.\n"
+"* numOfFeats - is the number of features within the cube - this is defined globally within the file.\n"
 "\n"
 "Example::\n"
 "\n"
 "import rsgislib.histocube\n"
-"rsgislib.histocube.createEmptyHistoCube('HistoCubeTest.hcf')\n"
+"rsgislib.histocube.createEmptyHistoCube('HistoCubeTest.hcf', 10000)\n"
 "\n"
 },
 

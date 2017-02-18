@@ -34,6 +34,7 @@ namespace rsgis {namespace histocube{
         fileOpen = false;
         rwAccess = false;
         H5::Exception::dontPrint();
+        this->numOfFeats = 0;
     }
     
     void RSGISHistoCubeFile::openFile(std::string filePath, bool fileRWAccess, int mdcElmts, hsize_t rdccNElmts, hsize_t rdccNBytes, double rdccW0, hsize_t sieveBuf, hsize_t metaBlockSize)throw(rsgis::RSGISHistoCubeException)
@@ -58,8 +59,62 @@ namespace rsgis {namespace histocube{
                 fileOpen = true;
             }
             
-            // Read metadata into file object.
+            // Check file is the correct type
+            H5std_string strFileTypeReadVal("");
+            H5::StrType strType(H5::PredType::C_S1, H5T_VARIABLE);
+            try
+            {
+                H5::Attribute fileTypeAttribute = hcH5File->openAttribute(HC_FILE_ATT_FILETYPE);
+                fileTypeAttribute.read(strType, &strFileTypeReadVal);
+                fileTypeAttribute.close();
+            }
+            catch ( H5::Exception &e)
+            {
+                throw rsgis::RSGISHistoCubeException("Could not read the file type attribute.");
+            }
+            std::string inFileType = std::string(strFileTypeReadVal.c_str());
+            if(inFileType != "RSGISLibHistoCube")
+            {
+                throw rsgis::RSGISHistoCubeException("Input file is not of type 'RSGISLibHistoCube'.");
+            }
             
+            // Check Version Number
+            H5std_string strVersionReadVal("");
+            try
+            {
+                H5::Attribute fileVersionAttribute = hcH5File->openAttribute(HC_FILE_ATT_VERSION);
+                fileVersionAttribute.read(strType, &strVersionReadVal);
+                fileVersionAttribute.close();
+            }
+            catch ( H5::Exception &e)
+            {
+                throw rsgis::RSGISHistoCubeException("Could not read the file type attribute.");
+            }
+            std::string inFileVersion = std::string(strVersionReadVal.c_str());
+            if(inFileVersion != "1.0")
+            {
+                throw rsgis::RSGISHistoCubeException("Input file is not a reconsigned version.");
+            }
+            
+            // Read metadata from file object.
+            try
+            {
+                // Read the number of features.
+                unsigned long numFeatSize[1];
+                hsize_t dimsValue[1];
+                dimsValue[0] = 1;
+                H5::DataSpace valueDataSpace(1, dimsValue);
+                H5::DataSet datasetAttSize = hcH5File->openDataSet( HC_NUM_OF_FEATS );
+                datasetAttSize.read(numFeatSize, H5::PredType::NATIVE_ULONG, valueDataSpace);
+                datasetAttSize.close();
+                valueDataSpace.close();
+                
+                this->numOfFeats = numFeatSize[0];
+            }
+            catch (H5::Exception &e)
+            {
+                throw rsgis::RSGISHistoCubeException("The dataset for the number of features within the file is not present.");
+            }
         }
         catch( H5::FileIException &e )
         {
@@ -88,7 +143,7 @@ namespace rsgis {namespace histocube{
 
     }
     
-    void RSGISHistoCubeFile::createNewFile(std::string filePath, int mdcElmts, hsize_t rdccNElmts, hsize_t rdccNBytes, double rdccW0, hsize_t sieveBuf, hsize_t metaBlockSize) throw(rsgis::RSGISHistoCubeException)
+    void RSGISHistoCubeFile::createNewFile(std::string filePath, unsigned long numFeats, int mdcElmts, hsize_t rdccNElmts, hsize_t rdccNBytes, double rdccW0, hsize_t sieveBuf, hsize_t metaBlockSize) throw(rsgis::RSGISHistoCubeException)
     {
         try
         {
@@ -117,6 +172,16 @@ namespace rsgis {namespace histocube{
             
             hcH5File->createGroup( HC_DATASETNAME_DATA );
             hcH5File->createGroup( HC_DATASETNAME_METADATA );
+            
+            unsigned long numFeatsObj[] = { numFeats };
+            hsize_t numFeatsSize[] = { 1 };
+            H5::DataSpace numFeatsDataSpace(1, numFeatsSize);
+            H5::DataSet cubeNumFeatsDataset = hcH5File->createDataSet(HC_NUM_OF_FEATS, H5::PredType::STD_U64LE, numFeatsDataSpace);
+            cubeNumFeatsDataset.write( numFeatsObj, H5::PredType::NATIVE_ULONG );
+            cubeNumFeatsDataset.close();
+            numFeatsDataSpace.close();
+            
+            this->numOfFeats = numFeats;
         }
         catch( H5::FileIException &e )
         {
@@ -144,9 +209,48 @@ namespace rsgis {namespace histocube{
         }
     }
     
-    void RSGISHistoCubeFile::createDataset(std::string name, unsigned int lowRange, unsigned int upRange, int scale, int offset) throw(rsgis::RSGISHistoCubeException)
+    void RSGISHistoCubeFile::createDataset(std::string name, std::vector<int> bins, float scale, float offset) throw(rsgis::RSGISHistoCubeException)
     {
-        
+        try
+        {
+            if(!this->fileOpen)
+            {
+                throw rsgis::RSGISHistoCubeException("HCF file is not open.");
+            }
+            
+            if(!this->rwAccess)
+            {
+                throw rsgis::RSGISHistoCubeException("HCF file has been openned in read only mode.");
+            }
+            
+            
+            
+            
+        }
+        catch( H5::FileIException &e )
+        {
+            throw rsgis::RSGISHistoCubeException(e.getCDetailMsg());
+        }
+        catch( H5::DataSetIException &e )
+        {
+            throw rsgis::RSGISHistoCubeException(e.getCDetailMsg());
+        }
+        catch( H5::DataSpaceIException &e )
+        {
+            throw rsgis::RSGISHistoCubeException(e.getCDetailMsg());
+        }
+        catch( H5::DataTypeIException &e )
+        {
+            throw rsgis::RSGISHistoCubeException(e.getCDetailMsg());
+        }
+        catch ( rsgis::RSGISHistoCubeException &e)
+        {
+            throw e;
+        }
+        catch ( std::exception &e)
+        {
+            throw rsgis::RSGISHistoCubeException(e.what());
+        }
     }
     
     void RSGISHistoCubeFile::closeFile() throw(rsgis::RSGISHistoCubeException)

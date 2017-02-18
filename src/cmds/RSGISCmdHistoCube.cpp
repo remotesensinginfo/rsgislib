@@ -28,12 +28,12 @@
 
 namespace rsgis{ namespace cmds {
     
-    void executeCreateEmptyHistoCube(std::string histCubeFile)throw(RSGISCmdException)
+    void executeCreateEmptyHistoCube(std::string histCubeFile, unsigned long numFeats)throw(RSGISCmdException)
     {
         try
         {
             rsgis::histocube::RSGISHistoCubeFile histoCubeFileObj = rsgis::histocube::RSGISHistoCubeFile();
-            histoCubeFileObj.createNewFile(histCubeFile);
+            histoCubeFileObj.createNewFile(histCubeFile, numFeats);
             histoCubeFileObj.closeFile();
         }
         catch(rsgis::RSGISHistoCubeException &e)
