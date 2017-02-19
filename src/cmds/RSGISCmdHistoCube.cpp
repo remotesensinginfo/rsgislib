@@ -34,6 +34,9 @@ namespace rsgis{ namespace cmds {
         {
             rsgis::histocube::RSGISHistoCubeFile histoCubeFileObj = rsgis::histocube::RSGISHistoCubeFile();
             histoCubeFileObj.createNewFile(histCubeFile, numFeats);
+            histoCubeFileObj.closeFile();
+            /*
+            
             
             
             std::vector<int> bins = std::vector<int>();
@@ -51,11 +54,24 @@ namespace rsgis{ namespace cmds {
             histoCubeFileObj.createDataset("LS_GREEN", bins, scale, offset, false, false, NULL);
             histoCubeFileObj.createDataset("LS_BLUE", bins, scale, offset, false, false, NULL);
             histoCubeFileObj.closeFile();
+            */
             
+            /*
+            rsgis::histocube::RSGISHistoCubeFile histoCubeFileObj2 = rsgis::histocube::RSGISHistoCubeFile();
+            histoCubeFileObj2.openFile(histCubeFile, true);
             
-            //rsgis::histocube::RSGISHistoCubeFile histoCubeFileObj2 = rsgis::histocube::RSGISHistoCubeFile();
-            //histoCubeFileObj2.openFile(histCubeFile, false);
-            //histoCubeFileObj2.closeFile();
+            unsigned int *data = new unsigned int[101];
+            
+            histoCubeFileObj2.getHistoRow("LS_RED", 4, data, 101);
+            
+            data[1] = 1;
+            data[4] = 4;
+            data[8] = 8;
+            
+            histoCubeFileObj2.setHistoRow("LS_RED", 4, data, 101);
+            
+            histoCubeFileObj2.closeFile();
+            */
         }
         catch(rsgis::RSGISHistoCubeException &e)
         {
