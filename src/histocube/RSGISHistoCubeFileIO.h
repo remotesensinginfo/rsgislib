@@ -76,20 +76,21 @@ namespace rsgis {namespace histocube{
     static const hsize_t  HC_META_BLOCKSIZE( 2048 ); // 2048
     static const unsigned int HC_DEFLATE( 1 ); // 1
     
-    static const std::string HC_FILE_ATT_FILETYPE( "FILETYPE" );
-    static const std::string HC_FILE_ATT_VERSION( "VERSION" );
+    static const std::string HC_FILE_FILETYPE( "FILETYPE" );
+    static const std::string HC_FILE_VERSION( "VERSION" );
     
     static const std::string HC_DATASETNAME_DATA( "/DATA" );
     static const std::string HC_DATASETNAME_METADATA( "/METADATA" );
     static const std::string HC_NUM_OF_FEATS( "/METADATA/NUM_OF_FEATS" );
     
-    static const std::string HC_CUBELAYER_ATT_ORDER( "ORDER" );
-    static const std::string HC_CUBELAYER_ATT_SCALE( "SCALE" );
-    static const std::string HC_CUBELAYER_ATT_OFFSET( "OFFSET" );
-    static const std::string HC_CUBELAYER_ATT_BINS( "BINS" );
-    static const std::string HC_CUBELAYER_ATT_HAS_TIME( "HAS_TIME" );
-    static const std::string HC_CUBELAYER_ATT_HAS_DATE( "HAS_DATE" );
-    static const std::string HC_CUBELAYER_ATT_DATE_TIME( "DATE_TIME" );
+    static const std::string HC_CUBELAYER_ORDER( "ORDER" );
+    static const std::string HC_CUBELAYER_SCALE( "SCALE" );
+    static const std::string HC_CUBELAYER_OFFSET( "OFFSET" );
+    static const std::string HC_CUBELAYER_BINS( "BINS" );
+    static const std::string HC_CUBELAYER_NUMBINS( "NUMBINS" );
+    static const std::string HC_CUBELAYER_HAS_TIME( "HAS_TIME" );
+    static const std::string HC_CUBELAYER_HAS_DATE( "HAS_DATE" );
+    static const std::string HC_CUBELAYER_DATE_TIME( "DATE_TIME" );
     
     struct DllExport RSGISHistCubeLayerMeta
     {
