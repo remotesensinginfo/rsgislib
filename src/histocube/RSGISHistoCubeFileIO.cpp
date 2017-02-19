@@ -21,10 +21,7 @@
  *
  */
 
-
-
 #include "RSGISHistoCubeFileIO.h"
-
 
 namespace rsgis {namespace histocube{
     
@@ -65,8 +62,8 @@ namespace rsgis {namespace histocube{
             H5::StrType strType(H5::PredType::C_S1, H5T_VARIABLE);
             try
             {
-                H5::Attribute fileTypeAttribute = hcH5File->openAttribute(HC_FILE_ATT_FILETYPE);
-                fileTypeAttribute.read(strType, &strFileTypeReadVal);
+                H5::Attribute fileTypeAttribute = hcH5File->openAttribute(HC_FILE_FILETYPE);
+                fileTypeAttribute.read(strType, strFileTypeReadVal);
                 fileTypeAttribute.close();
             }
             catch ( H5::Exception &e)
@@ -83,8 +80,8 @@ namespace rsgis {namespace histocube{
             H5std_string strVersionReadVal("");
             try
             {
-                H5::Attribute fileVersionAttribute = hcH5File->openAttribute(HC_FILE_ATT_VERSION);
-                fileVersionAttribute.read(strType, &strVersionReadVal);
+                H5::Attribute fileVersionAttribute = hcH5File->openAttribute(HC_FILE_VERSION);
+                fileVersionAttribute.read(strType, strVersionReadVal);
                 fileVersionAttribute.close();
             }
             catch ( H5::Exception &e)
@@ -116,6 +113,89 @@ namespace rsgis {namespace histocube{
             {
                 throw rsgis::RSGISHistoCubeException("The dataset for the number of features within the file is not present.");
             }
+            
+            try
+            {
+                // Read the dataset meta-data into memory
+                H5::Group dataGroup = hcH5File->openGroup(HC_DATASETNAME_DATA);
+                
+                int numGrpObjs = dataGroup.getNumObjs();
+                for(int i = 0; i < numGrpObjs; ++i)
+                {
+                    H5std_string objName = dataGroup.getObjnameByIdx(i);
+                    if(dataGroup.childObjType(objName) == H5O_type_t::H5O_TYPE_DATASET)
+                    {
+                        H5::DataSet cubeLayerDataset = hcH5File->openDataSet(HC_DATASETNAME_DATA+"/"+objName);
+                        
+                        RSGISHistCubeLayerMeta *layerMeta = new RSGISHistCubeLayerMeta();
+                        layerMeta->name = std::string(objName.c_str());
+                        
+                        H5::Attribute orderAttribute = cubeLayerDataset.openAttribute(HC_CUBELAYER_ORDER);
+                        orderAttribute.read(H5::PredType::NATIVE_UINT, &layerMeta->order);
+                        orderAttribute.close();
+                        
+                        H5::Attribute scaleAttribute = cubeLayerDataset.openAttribute(HC_CUBELAYER_SCALE);
+                        scaleAttribute.read(H5::PredType::NATIVE_FLOAT, &layerMeta->scale);
+                        scaleAttribute.close();
+                        
+                        H5::Attribute offsetAttribute = cubeLayerDataset.openAttribute(HC_CUBELAYER_OFFSET);
+                        offsetAttribute.read(H5::PredType::NATIVE_FLOAT, &layerMeta->offset);
+                        offsetAttribute.close();
+                        
+                        int tmpInt = 0;
+                        H5::Attribute hasDateAttribute = cubeLayerDataset.openAttribute(HC_CUBELAYER_HAS_DATE);
+                        hasDateAttribute.read(H5::PredType::NATIVE_INT, &tmpInt);
+                        hasDateAttribute.close();
+                        layerMeta->hasDate = (bool) tmpInt;
+                        
+                        H5::Attribute hasTimeAttribute = cubeLayerDataset.openAttribute(HC_CUBELAYER_HAS_TIME);
+                        hasTimeAttribute.read(H5::PredType::NATIVE_INT, &tmpInt);
+                        hasTimeAttribute.close();
+                        layerMeta->hasTime = (bool) tmpInt;
+                        
+                        H5std_string strDateTimeReadVal("");
+                        H5::Attribute dateTimeAttribute = cubeLayerDataset.openAttribute(HC_CUBELAYER_DATE_TIME);
+                        dateTimeAttribute.read(strType, strDateTimeReadVal);
+                        dateTimeAttribute.close();
+                        std::string dateTimeStr = std::string(strDateTimeReadVal.c_str());
+                        if((dateTimeStr == "") | (dateTimeStr == "not-a-date-time"))
+                        {
+                            layerMeta->layerDateTime = boost::posix_time::ptime();
+                        }
+                        else
+                        {
+                            layerMeta->layerDateTime = boost::posix_time::from_iso_string(dateTimeStr);
+                        }
+                        
+                        unsigned int numBins = 0;
+                        H5::Attribute numBinsAttribute = cubeLayerDataset.openAttribute(HC_CUBELAYER_NUMBINS);
+                        numBinsAttribute.read(H5::PredType::NATIVE_UINT, &numBins);
+                        numBinsAttribute.close();
+                        
+                        int *binVals = new int[numBins];
+                        H5::Attribute binsAttribute = cubeLayerDataset.openAttribute(HC_CUBELAYER_BINS);
+                        binsAttribute.read(H5::PredType::NATIVE_INT, binVals);
+                        binsAttribute.close();
+                        
+                        std::vector<int> bins;
+                        for(int i = 0; i < numBins; ++i)
+                        {
+                            bins.push_back(binVals[i]);
+                        }
+                        delete[] binVals;
+                        layerMeta->bins = bins;
+                        
+                        cubeLayerDataset.close();
+                    }
+                }
+                
+            
+            }
+            catch (H5::Exception &e)
+            {
+                throw rsgis::RSGISHistoCubeException("The dataset for the number of features within the file is not present.");
+            }
+            
         }
         catch( H5::FileIException &e )
         {
@@ -161,12 +241,12 @@ namespace rsgis {namespace histocube{
             //////////// CREATE GLOBAL HEADER ////////////////
             H5::StrType strType(H5::PredType::C_S1, H5T_VARIABLE);
             H5::DataSpace attSpace(H5S_SCALAR);
-            H5::Attribute fileTypeAtt = hcH5File->createAttribute( HC_FILE_ATT_FILETYPE, strType, attSpace);
+            H5::Attribute fileTypeAtt = hcH5File->createAttribute( HC_FILE_FILETYPE, strType, attSpace);
             const H5std_string strFileTypeVal ("RSGISLibHistoCube");
             fileTypeAtt.write(strType, strFileTypeVal);
             fileTypeAtt.close();
             
-            H5::Attribute fileVersionAtt = hcH5File->createAttribute( HC_FILE_ATT_VERSION, strType, attSpace);
+            H5::Attribute fileVersionAtt = hcH5File->createAttribute( HC_FILE_VERSION, strType, attSpace);
             const H5std_string strVersionVal ("1.0");
             fileVersionAtt.write(strType, strVersionVal);
             fileVersionAtt.close();
@@ -266,7 +346,7 @@ namespace rsgis {namespace histocube{
                 layerMeta->layerDateTime = boost::posix_time::ptime(*layerDateTime);
             }
             
-            int numBins = bins.size();
+            unsigned int numBins = bins.size();
             std::string datasetName = "/DATA/"+name;
             
             
@@ -283,35 +363,38 @@ namespace rsgis {namespace histocube{
             H5::DataSet cubeLayerDataSet = hcH5File->createDataSet(datasetName, H5::PredType::STD_U32LE, cubeLayerDataSpace, initParamsCubeLayer);
             
             H5::DataSpace attrScalarDataSpace = H5::DataSpace(H5S_SCALAR);
-            H5::Attribute scaleAttribute = cubeLayerDataSet.createAttribute(HC_CUBELAYER_ATT_SCALE, H5::PredType::IEEE_F32LE, attrScalarDataSpace);
+            H5::Attribute scaleAttribute = cubeLayerDataSet.createAttribute(HC_CUBELAYER_SCALE, H5::PredType::IEEE_F32LE, attrScalarDataSpace);
             scaleAttribute.write(H5::PredType::NATIVE_FLOAT, &layerMeta->scale);
             scaleAttribute.close();
             
-            H5::Attribute offsetAttribute = cubeLayerDataSet.createAttribute(HC_CUBELAYER_ATT_OFFSET, H5::PredType::IEEE_F32LE, attrScalarDataSpace);
+            H5::Attribute offsetAttribute = cubeLayerDataSet.createAttribute(HC_CUBELAYER_OFFSET, H5::PredType::IEEE_F32LE, attrScalarDataSpace);
             offsetAttribute.write(H5::PredType::NATIVE_FLOAT, &layerMeta->offset);
             offsetAttribute.close();
             
-            H5::Attribute orderAttribute = cubeLayerDataSet.createAttribute(HC_CUBELAYER_ATT_ORDER, H5::PredType::STD_U8LE, attrScalarDataSpace);
+            H5::Attribute orderAttribute = cubeLayerDataSet.createAttribute(HC_CUBELAYER_ORDER, H5::PredType::STD_U8LE, attrScalarDataSpace);
             orderAttribute.write(H5::PredType::NATIVE_UINT, &layerMeta->order);
             orderAttribute.close();
             
-            H5::Attribute hasDateAttribute = cubeLayerDataSet.createAttribute(HC_CUBELAYER_ATT_HAS_DATE, H5::PredType::STD_U8LE, attrScalarDataSpace);
+            H5::Attribute numBinsAttribute = cubeLayerDataSet.createAttribute(HC_CUBELAYER_NUMBINS, H5::PredType::STD_U32LE, attrScalarDataSpace);
+            numBinsAttribute.write(H5::PredType::NATIVE_UINT, &numBins);
+            numBinsAttribute.close();
+            
+            H5::Attribute hasDateAttribute = cubeLayerDataSet.createAttribute(HC_CUBELAYER_HAS_DATE, H5::PredType::STD_U8LE, attrScalarDataSpace);
             int hasDateInt = hasDate;
             hasDateAttribute.write(H5::PredType::NATIVE_INT, &hasDateInt);
             hasDateAttribute.close();
             
-            H5::Attribute hasTimeAttribute = cubeLayerDataSet.createAttribute(HC_CUBELAYER_ATT_HAS_TIME, H5::PredType::STD_U8LE, attrScalarDataSpace);
+            H5::Attribute hasTimeAttribute = cubeLayerDataSet.createAttribute(HC_CUBELAYER_HAS_TIME, H5::PredType::STD_U8LE, attrScalarDataSpace);
             int hasTimeInt = hasTime;
             hasTimeAttribute.write(H5::PredType::NATIVE_INT, &hasTimeInt);
             hasTimeAttribute.close();
             
             H5::StrType strType(H5::PredType::C_S1, H5T_VARIABLE);
-            H5::Attribute datetimeAttribute = cubeLayerDataSet.createAttribute(HC_CUBELAYER_ATT_DATE_TIME, strType, attrScalarDataSpace);
+            H5::Attribute datetimeAttribute = cubeLayerDataSet.createAttribute(HC_CUBELAYER_DATE_TIME, strType, attrScalarDataSpace);
             H5std_string strValDateTime(boost::posix_time::to_iso_string(layerMeta->layerDateTime));
             datetimeAttribute.write(strType, strValDateTime);
             datetimeAttribute.close();
             attrScalarDataSpace.close();
-            
             
             int *binVals = new int[numBins];
             for(int i = 0; i < numBins; ++i)
@@ -321,7 +404,7 @@ namespace rsgis {namespace histocube{
             
             hsize_t binsDims[] = { numBins };
             H5::DataSpace attrBinsDataSpace = H5::DataSpace(1, binsDims);
-            H5::Attribute binsAttribute = cubeLayerDataSet.createAttribute(HC_CUBELAYER_ATT_BINS, H5::PredType::STD_I32LE, attrBinsDataSpace);
+            H5::Attribute binsAttribute = cubeLayerDataSet.createAttribute(HC_CUBELAYER_BINS, H5::PredType::STD_I32LE, attrBinsDataSpace);
             binsAttribute.write(H5::PredType::NATIVE_INT, binVals);
             binsAttribute.close();
             attrBinsDataSpace.close();
@@ -331,8 +414,6 @@ namespace rsgis {namespace histocube{
             cubeLayerDataSpace.close();
             
             cubeLayers->push_back(layerMeta);
-            
-        
         }
         catch( H5::AttributeIException &e )
         {

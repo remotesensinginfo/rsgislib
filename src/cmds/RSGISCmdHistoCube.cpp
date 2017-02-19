@@ -41,17 +41,21 @@ namespace rsgis{ namespace cmds {
             {
                 bins.push_back(i);
             }
-            /*
+        
             float scale = 1;
             float offset = 0;
             bool hasTime = true;
             bool hasDate = true;
             boost::posix_time::ptime *layerDateTime = new boost::posix_time::ptime(boost::posix_time::time_from_string("2002-01-20 23:59:59.000"));
-            
             histoCubeFileObj.createDataset("LS_RED", bins, scale, offset, hasTime, hasDate, layerDateTime);
-            */
-            
+            histoCubeFileObj.createDataset("LS_GREEN", bins, scale, offset, false, false, NULL);
+            histoCubeFileObj.createDataset("LS_BLUE", bins, scale, offset, false, false, NULL);
             histoCubeFileObj.closeFile();
+            
+            
+            //rsgis::histocube::RSGISHistoCubeFile histoCubeFileObj2 = rsgis::histocube::RSGISHistoCubeFile();
+            //histoCubeFileObj2.openFile(histCubeFile, false);
+            //histoCubeFileObj2.closeFile();
         }
         catch(rsgis::RSGISHistoCubeException &e)
         {
