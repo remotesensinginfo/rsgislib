@@ -53,7 +53,7 @@ namespace rsgis{ namespace cmds {
     DllExport void executeCreateHistoCubeLayer(std::string histCubeFile, std::string layerName, int lowBin, int upBin, float scale, float offset, bool hasDateTime, std::string dataTime)throw(RSGISCmdException);
     
     /** A function to populate a single histogram layer from multiple input files */
-    DllExport void executePopulateSingleHistoCubeLayer(std::string histCubeFile, std::string layerName, std::string clumpsImg, std::string valsImg, unsigned int imgBand)throw(RSGISCmdException);
+    DllExport void executePopulateSingleHistoCubeLayer(std::string histCubeFile, std::string layerName, std::string clumpsImg, std::string valsImg, unsigned int imgBand, bool inMem)throw(RSGISCmdException);
     
 }}
 
