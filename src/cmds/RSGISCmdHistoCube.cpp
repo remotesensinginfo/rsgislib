@@ -80,7 +80,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void executePopulateSingleHistoCubeLayer(std::string histCubeFile, std::string layerName, std::string clumpsImg, std::string valsImg, unsigned int imgBand)throw(RSGISCmdException)
+    void executePopulateSingleHistoCubeLayer(std::string histCubeFile, std::string layerName, std::string clumpsImg, std::string valsImg, unsigned int imgBand, bool inMem)throw(RSGISCmdException)
     {
         GDALAllRegister();
         
@@ -143,12 +143,29 @@ namespace rsgis{ namespace cmds {
             }
             
             unsigned int bandIdx = imgBand-1;
-                        
-            unsigned int maxRow = histoCubeFileObj.getNumFeatures();
+            unsigned int maxRow = histoCubeFileObj.getNumFeatures()-1;
             
-            rsgis::histocube::RSGISPopHistoCubeLayerFromImgBand popCubeLyr = rsgis::histocube::RSGISPopHistoCubeLayerFromImgBand(&histoCubeFileObj, layerName, bandIdx, maxRow, cubeLayer->scale, cubeLayer->offset, cubeLayer->bins);
-            rsgis::img::RSGISCalcImage calcImgPopCube = rsgis::img::RSGISCalcImage(&popCubeLyr);
-            calcImgPopCube.calcImage(datasets, 1, 1);
+            
+            if(inMem)
+            {
+                unsigned int nBins = cubeLayer->bins.size();
+                unsigned long dataArrLen = (maxRow*nBins)+nBins;
+                unsigned int *dataArr = new unsigned int[dataArrLen];
+                histoCubeFileObj.getHistoRows(layerName, 0, maxRow, dataArr, dataArrLen);
+                
+                rsgis::histocube::RSGISPopHistoCubeLayerFromImgBandInMem popCubeLyrMem = rsgis::histocube::RSGISPopHistoCubeLayerFromImgBandInMem(dataArr, dataArrLen, bandIdx, maxRow, cubeLayer->scale, cubeLayer->offset, cubeLayer->bins);
+                rsgis::img::RSGISCalcImage calcImgPopCubeMem = rsgis::img::RSGISCalcImage(&popCubeLyrMem);
+                calcImgPopCubeMem.calcImage(datasets, 1, 1);
+                
+                histoCubeFileObj.setHistoRows(layerName, 0, maxRow, dataArr, dataArrLen);
+                delete[] dataArr;
+            }
+            else
+            {
+                rsgis::histocube::RSGISPopHistoCubeLayerFromImgBand popCubeLyr = rsgis::histocube::RSGISPopHistoCubeLayerFromImgBand(&histoCubeFileObj, layerName, bandIdx, maxRow, cubeLayer->scale, cubeLayer->offset, cubeLayer->bins);
+                rsgis::img::RSGISCalcImage calcImgPopCube = rsgis::img::RSGISCalcImage(&popCubeLyr);
+                calcImgPopCube.calcImage(datasets, 1, 1);
+            }
             histoCubeFileObj.closeFile();
             GDALClose(datasets[0]);
             GDALClose(datasets[1]);

@@ -657,10 +657,10 @@ namespace rsgis {namespace histocube{
                 throw rsgis::RSGISHistoCubeException("Row is not within the cube layer.");
             }
             
-            if(dataLen < cubeLayerDIMS[1])
+            if((dataLen % cubeLayerDIMS[1]) != 0)
             {
                 std::cerr << "dataLen = " << dataLen << " Num Bins. = " << cubeLayerDIMS[1] << std::endl;
-                throw rsgis::RSGISHistoCubeException("Data layer is smaller than the number of bins.");
+                throw rsgis::RSGISHistoCubeException("Data layer is not a full number of rows.");
             }
             
             // Set up dataspace for the 'data' array to read the data into
@@ -672,7 +672,7 @@ namespace rsgis {namespace histocube{
             // Select part of the file to read.
             hsize_t cubeLayerOffset[2];
             cubeLayerOffset[0] = sRow;
-            cubeLayerOffset[1] = eRow;
+            cubeLayerOffset[1] = 0;
             
             hsize_t dataInDims[2];
             dataInDims[0] = nRows;
@@ -754,10 +754,10 @@ namespace rsgis {namespace histocube{
                 throw rsgis::RSGISHistoCubeException("Row is not within the cube layer.");
             }
             
-            if(dataLen < cubeLayerDIMS[1])
+            if((dataLen % cubeLayerDIMS[1]) != 0)
             {
                 std::cerr << "dataLen = " << dataLen << " Num Bins. = " << cubeLayerDIMS[1] << std::endl;
-                throw rsgis::RSGISHistoCubeException("Data layer is smaller than the number of bins.");
+                throw rsgis::RSGISHistoCubeException("Data layer is not a full number of rows.");
             }
             
             // Set up dataspace for the 'data' array to read the data into
@@ -769,7 +769,7 @@ namespace rsgis {namespace histocube{
             // Select part of the file to read.
             hsize_t cubeLayerOffset[2];
             cubeLayerOffset[0] = sRow;
-            cubeLayerOffset[1] = eRow;
+            cubeLayerOffset[1] = 0;
             
             hsize_t dataInDims[2];
             dataInDims[0] = nRows;

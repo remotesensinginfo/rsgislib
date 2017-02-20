@@ -127,17 +127,18 @@ static PyObject *HistoCube_PopulateHistoCubeLayer(PyObject *self, PyObject *args
     const char *pszClumpsImg;
     const char *pszValsImg;
     unsigned int imgBand;
+    int inMem = true;
     
-    static char *kwlist[] = {"filename", "layerName", "clumpsImg", "valsImg", "band", NULL};
+    static char *kwlist[] = {"filename", "layerName", "clumpsImg", "valsImg", "band", "inMem", NULL};
     
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssI:populateHistoCubeLayer", kwlist, &pszCubeFile, &pszLayerName, &pszClumpsImg, &pszValsImg, &imgBand))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssI|i:populateHistoCubeLayer", kwlist, &pszCubeFile, &pszLayerName, &pszClumpsImg, &pszValsImg, &imgBand, &inMem))
     {
         return NULL;
     }
     
     try
     {
-        rsgis::cmds::executePopulateSingleHistoCubeLayer(std::string(pszCubeFile), std::string(pszLayerName), std::string(pszClumpsImg), std::string(pszValsImg), imgBand);
+        rsgis::cmds::executePopulateSingleHistoCubeLayer(std::string(pszCubeFile), std::string(pszLayerName), std::string(pszClumpsImg), std::string(pszValsImg), imgBand, (bool)inMem);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -196,7 +197,7 @@ static PyMethodDef HistoCubeMethods[] = {
 },
 
 {"populateHistoCubeLayer", (PyCFunction)HistoCube_PopulateHistoCubeLayer, METH_VARARGS | METH_KEYWORDS,
-"histocube.populateHistoCubeLayer(filename=string, layerName=string, clumpsImg=string, valsImg=string, band=int)\n"
+"histocube.populateHistoCubeLayer(filename=string, layerName=string, clumpsImg=string, valsImg=string, band=int, inMem=bool)\n"
 "Populate the histogram layer with information from an image band.\n"
 "Note, data from this band is 'added' to any existing data already within the histogram(s).\n"
 "\n"
@@ -207,16 +208,29 @@ static PyMethodDef HistoCubeMethods[] = {
 "* clumpsImg - is a clumps image that specifies which histogram cube row pixels in with values image are associated (note resolution must be the same as the values image).\n"
 "* valsImg - is the image with the values which are populated into the histogram cube.\n"
 "* band - is the band number (note band numbers start at 1)\n"
+"* inMem - is a boolean specifying whether the data array should be kept in memory; much faster in memory. (Optional, default is True)\n"
 "\n"
 "Example::\n"
 "\n"
 "import rsgislib.histocube\n"
+"import rsgislib.imagecalc\n"
+"import math\n"
+"import rsgislib\n"
+"\n"
+"clumpsImg = 'WV2_525N040W_20110727_TOARefl_clumps_final.kea'\n"
+"minVal, maxVal = rsgislib.imagecalc.getImageBandMinMax(clumpsImg, 1, False, 0)\n"
 "\n"
 "hcFile = 'HistoCubeTest.hcf'\n"
-"rsgislib.histocube.createEmptyHistoCube(hcFile, 1000)\n"
+"rsgislib.histocube.createEmptyHistoCube(hcFile, math.ceil(maxVal)+1)\n"
 "\n"
-"layerName = 'LyrName'\n"
-"rsgislib.histocube.createHistoCubeLayer(hcFile, layerName=layerName, lowBin=0, upBin=100)\n"
+"layerName = 'SceneCount'\n"
+"rsgislib.histocube.createHistoCubeLayer(hcFile, layerName=layerName, lowBin=0, upBin=256)\n"
+"\n"
+"timer = rsgislib.RSGISTime()\n"
+"timer.start(True)\n"
+"valsImg = 'WV2_525N040W_20110727_TOARefl_b762_stch.kea'\n"
+"rsgislib.histocube.populateHistoCubeLayer(hcFile, layerName=layerName, clumpsImg=clumpsImg, valsImg=valsImg, band=1)\n"
+"timer.end()\n"
 "\n"
 },
 

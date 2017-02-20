@@ -48,7 +48,7 @@ namespace rsgis {namespace histocube{
             {
                 unsigned int row = intBandValues[0];
                 float bandVal = (floatBandValues[bandIdx] * scale) + offset;
-                int bandValInt = ceil(bandVal + 0.5);
+                int bandValInt = floor(bandVal + 0.5);
                 long idx = this->hcUtils.getBinsIndex(bandValInt, this->bins);
                 
                 if((idx >= 0) | (idx < this->dataArrLen))
@@ -68,6 +68,68 @@ namespace rsgis {namespace histocube{
     RSGISPopHistoCubeLayerFromImgBand::~RSGISPopHistoCubeLayerFromImgBand()
     {
         delete[] this->dataArr;
+    }
+    
+    
+    
+    RSGISPopHistoCubeLayerFromImgBandInMem::RSGISPopHistoCubeLayerFromImgBandInMem(unsigned int *dataArr, unsigned long dataArrLen, unsigned int bandIdx, unsigned int maxRow, float scale, float offset, std::vector<int> bins) throw(rsgis::RSGISHistoCubeException) : rsgis::img::RSGISCalcImageValue(0)
+    {
+        this->dataArrLen = dataArrLen;
+        this->rowLen = bins.size();
+        if((this->dataArrLen % this->rowLen) != 0)
+        {
+            rsgis::RSGISHistoCubeException("The data array did not a multiple of the number of bins.");
+        }
+        
+        if((this->dataArrLen / this->rowLen) != maxRow)
+        {
+            rsgis::RSGISHistoCubeException("The data array is not the same length as the number of rows.");
+        }
+        
+        this->dataArr = dataArr;
+        this->layerName = layerName;
+        this->bandIdx = bandIdx;
+        this->maxRow = maxRow;
+        this->scale = scale;
+        this->offset = offset;
+        this->bins = bins;
+        this->hcUtils = RSGISHistoCubeUtils();
+    }
+    
+    void RSGISPopHistoCubeLayerFromImgBandInMem::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException)
+    {
+        try
+        {
+            if((intBandValues[0] >= 0) & (intBandValues[0] <= maxRow))
+            {
+                unsigned int row = intBandValues[0];
+                float bandVal = (floatBandValues[bandIdx] * scale) + offset;
+                int bandValInt = floor(bandVal + 0.5);
+                long binIdx = this->hcUtils.getBinsIndex(bandValInt, this->bins);
+                
+                if((binIdx >= 0) | (binIdx < this->rowLen))
+                {
+                    if(row == 0)
+                    {
+                        this->dataArr[binIdx] = this->dataArr[binIdx] + 1;
+                    }
+                    else
+                    {
+                        unsigned long arrBinIdx = (row * this->rowLen) + binIdx;
+                        this->dataArr[arrBinIdx] = this->dataArr[arrBinIdx] + 1;
+                    }
+                }
+            }
+        }
+        catch(rsgis::img::RSGISImageCalcException &e)
+        {
+            throw e;
+        }
+    }
+    
+    RSGISPopHistoCubeLayerFromImgBandInMem::~RSGISPopHistoCubeLayerFromImgBandInMem()
+    {
+
     }
     
     
