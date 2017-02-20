@@ -143,14 +143,8 @@ namespace rsgis{ namespace cmds {
             }
             
             unsigned int bandIdx = imgBand-1;
-            
-            rsgis::img::ImageStats bandStats;
-            rsgis::img::RSGISImageStatistics calcStats;
-            calcStats.calcImageBandStatistics(datasets[0], 1, &bandStats, false, false, 0, false);
-            
-            unsigned int maxRow = ceil(bandStats.max);
-            
-            std::cout << "maxRow = " << maxRow << std::endl;
+                        
+            unsigned int maxRow = histoCubeFileObj.getNumFeatures();
             
             rsgis::histocube::RSGISPopHistoCubeLayerFromImgBand popCubeLyr = rsgis::histocube::RSGISPopHistoCubeLayerFromImgBand(&histoCubeFileObj, layerName, bandIdx, maxRow, cubeLayer->scale, cubeLayer->offset, cubeLayer->bins);
             rsgis::img::RSGISCalcImage calcImgPopCube = rsgis::img::RSGISCalcImage(&popCubeLyr);

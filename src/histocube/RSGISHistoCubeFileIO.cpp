@@ -818,6 +818,11 @@ namespace rsgis {namespace histocube{
         return this->cubeLayers;
     }
     
+    unsigned long RSGISHistoCubeFile::getNumFeatures()
+    {
+        return this->numOfFeats;
+    }
+    
     void RSGISHistoCubeFile::closeFile() throw(rsgis::RSGISHistoCubeException)
     {
         this->hcH5File->close();

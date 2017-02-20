@@ -54,7 +54,7 @@ namespace rsgis {namespace histocube{
                 if((idx >= 0) | (idx < this->dataArrLen))
                 {
                     this->hcFile->getHistoRow(this->layerName, row, this->dataArr, this->dataArrLen);
-                    ++this->dataArr[idx];
+                    this->dataArr[idx] = this->dataArr[idx] + 1;
                     this->hcFile->setHistoRow(this->layerName, row, this->dataArr, this->dataArrLen);
                 }
             }
