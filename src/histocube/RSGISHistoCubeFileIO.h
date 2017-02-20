@@ -116,6 +116,7 @@ namespace rsgis {namespace histocube{
         virtual void getHistoRows(std::string name, unsigned int sRow, unsigned int eRow, unsigned int *data, unsigned int dataLen) throw(rsgis::RSGISHistoCubeException);
         virtual void setHistoRows(std::string name, unsigned int sRow, unsigned int eRow, unsigned int *data, unsigned int dataLen) throw(rsgis::RSGISHistoCubeException);
         virtual std::vector<RSGISHistCubeLayerMeta*>* getCubeLayersList();
+        virtual unsigned long getNumFeatures();
         virtual void closeFile() throw(rsgis::RSGISHistoCubeException);
         virtual ~RSGISHistoCubeFile();
     protected:
