@@ -123,7 +123,7 @@ namespace rsgis {namespace histocube{
                 for(int i = 0; i < numGrpObjs; ++i)
                 {
                     H5std_string objName = dataGroup.getObjnameByIdx(i);
-                    if(dataGroup.childObjType(objName) == H5O_type_t::H5O_TYPE_DATASET)
+                    if(dataGroup.childObjType(objName) == H5O_TYPE_DATASET)
                     {
                         H5::DataSet cubeLayerDataset = hcH5File->openDataSet(HC_DATASETNAME_DATA+"/"+objName);
                         
