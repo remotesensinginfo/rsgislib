@@ -88,7 +88,65 @@ static PyObject *HistoCube_CreateEmptyHistCube(PyObject *self, PyObject *args, P
 }
 
 
+static PyObject *HistoCube_CreateHistoCubeLayer(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    const char *pszCubeFile;
+    const char *pszLayerName;
+    const char *pszDataTime = "";
+    int lowBin;
+    int upBin;
+    float scale = 1;
+    float offset = 0;
+    int hasDateTimeInt = false;
+    
+    
+    static char *kwlist[] = {"filename", "layerName", "lowBin", "upBin", "scale", "offset", "hasDateTime", "dataTime", NULL};
+    
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssii|ffis:createHistoCubeLayer", kwlist, &pszCubeFile, &pszLayerName, &lowBin, &upBin, &scale, &offset, &hasDateTimeInt, &pszDataTime))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeCreateHistoCubeLayer(std::string(pszCubeFile), std::string(pszLayerName), lowBin, upBin, scale, offset, (bool)hasDateTimeInt, std::string(pszDataTime));
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
 
+static PyObject *HistoCube_PopulateHistoCubeLayer(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    const char *pszCubeFile;
+    const char *pszLayerName;
+    const char *pszClumpsImg;
+    const char *pszValsImg;
+    unsigned int imgBand;
+    
+    static char *kwlist[] = {"filename", "layerName", "clumpsImg", "valsImg", "band", NULL};
+    
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssI:populateHistoCubeLayer", kwlist, &pszCubeFile, &pszLayerName, &pszClumpsImg, &pszValsImg, &imgBand))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executePopulateSingleHistoCubeLayer(std::string(pszCubeFile), std::string(pszLayerName), std::string(pszClumpsImg), std::string(pszValsImg), imgBand);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
 
 
 // Our list of functions in this module
@@ -106,6 +164,59 @@ static PyMethodDef HistoCubeMethods[] = {
 "\n"
 "import rsgislib.histocube\n"
 "rsgislib.histocube.createEmptyHistoCube('HistoCubeTest.hcf', 10000)\n"
+"\n"
+},
+    
+{"createHistoCubeLayer", (PyCFunction)HistoCube_CreateHistoCubeLayer, METH_VARARGS | METH_KEYWORDS,
+"histocube.createHistoCubeLayer(filename=string, layerName=string, lowBin=int, upBin=int, scale=float, offset=float, hasDateTime=boolean, dataTime=string)\n"
+"Create an empty histogram cube layer, with all zero'd.\n"
+"The histogram is made up of integer bins and with a scale and offset to define the bin sizes.\n"
+"\n"
+"Where:\n"
+"\n"
+"* filename - is the file path and name for the histogram cube file.\n"
+"* layerName - is the name of the layer to be created.\n"
+"* lowBin - is the lower limit of the histogram bins created (Can be negative).\n"
+"* upBin - is the upper limit of the histogram bins created.\n"
+"* scale - is the scale parameter used to scale/offset the input data (Optional: default = 1)\n"
+"* offset - is the offset parameter used to scale/offset the input data (Optional: default = 0) \n"
+"* hasDateTime - is a boolean parameter specifying whether the layer has a date/time associated with it (Optional: default = False).\n"
+"* dataTime - is an ISO string representing the date and time associated with the layer.\n"
+"\n"
+"Example::\n"
+"\n"
+"import rsgislib.histocube\n"
+"\n"
+"hcFile = 'HistoCubeTest.hcf'\n"
+"rsgislib.histocube.createEmptyHistoCube(hcFile, 1000)\n"
+"\n"
+"layerName = 'LyrName'\n"
+"rsgislib.histocube.createHistoCubeLayer(hcFile, layerName=layerName, lowBin=0, upBin=100)\n"
+"\n"
+},
+
+{"populateHistoCubeLayer", (PyCFunction)HistoCube_PopulateHistoCubeLayer, METH_VARARGS | METH_KEYWORDS,
+"histocube.populateHistoCubeLayer(filename=string, layerName=string, clumpsImg=string, valsImg=string, band=int)\n"
+"Populate the histogram layer with information from an image band.\n"
+"Note, data from this band is 'added' to any existing data already within the histogram(s).\n"
+"\n"
+"Where:\n"
+"\n"
+"* filename - is the file path and name for the histogram cube file.\n"
+"* layerName - is the name of the layer to be created.\n"
+"* clumpsImg - is a clumps image that specifies which histogram cube row pixels in with values image are associated (note resolution must be the same as the values image).\n"
+"* valsImg - is the image with the values which are populated into the histogram cube.\n"
+"* band - is the band number (note band numbers start at 1)\n"
+"\n"
+"Example::\n"
+"\n"
+"import rsgislib.histocube\n"
+"\n"
+"hcFile = 'HistoCubeTest.hcf'\n"
+"rsgislib.histocube.createEmptyHistoCube(hcFile, 1000)\n"
+"\n"
+"layerName = 'LyrName'\n"
+"rsgislib.histocube.createHistoCubeLayer(hcFile, layerName=layerName, lowBin=0, upBin=100)\n"
 "\n"
 },
 

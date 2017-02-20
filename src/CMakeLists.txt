@@ -1275,11 +1275,16 @@ set(LIB_VEC_H
 set(LIB_HISTOCUBE_CPP
 	${RSGIS_SRC_HISTOCUBE_DIR}/RSGISHistoCubeFileIO.cpp
 	${RSGIS_SRC_HISTOCUBE_DIR}/RSGISHistoCubeFileIO.h
+	${RSGIS_SRC_HISTOCUBE_DIR}/RSGISHistoCubeUtils.cpp
+	${RSGIS_SRC_HISTOCUBE_DIR}/RSGISHistoCubeUtils.h
+	${RSGIS_SRC_HISTOCUBE_DIR}/RSGISPopulateHistoCube.cpp
+	${RSGIS_SRC_HISTOCUBE_DIR}/RSGISPopulateHistoCube.h
 )
-
 
 set(LIB_HISTOCUBE_H
 	${RSGIS_SRC_HISTOCUBE_DIR}/RSGISHistoCubeFileIO.h
+	${RSGIS_SRC_HISTOCUBE_DIR}/RSGISHistoCubeUtils.h
+	${RSGIS_SRC_HISTOCUBE_DIR}/RSGISPopulateHistoCube.h
 	)
 ###############################################################################
 

@@ -113,6 +113,8 @@ namespace rsgis {namespace histocube{
         virtual void createDataset(std::string name, std::vector<int> bins, float scale=1, float offset=0, bool hasTime=false, bool hasDate=false, boost::posix_time::ptime *layerDateTime=NULL, int deflate=HC_DEFLATE) throw(rsgis::RSGISHistoCubeException);
         virtual void getHistoRow(std::string name, unsigned int row, unsigned int *data, unsigned int dataLen) throw(rsgis::RSGISHistoCubeException);
         virtual void setHistoRow(std::string name, unsigned int row, unsigned int *data, unsigned int dataLen) throw(rsgis::RSGISHistoCubeException);
+        virtual void getHistoRows(std::string name, unsigned int sRow, unsigned int eRow, unsigned int *data, unsigned int dataLen) throw(rsgis::RSGISHistoCubeException);
+        virtual void setHistoRows(std::string name, unsigned int sRow, unsigned int eRow, unsigned int *data, unsigned int dataLen) throw(rsgis::RSGISHistoCubeException);
         virtual std::vector<RSGISHistCubeLayerMeta*>* getCubeLayersList();
         virtual void closeFile() throw(rsgis::RSGISHistoCubeException);
         virtual ~RSGISHistoCubeFile();
