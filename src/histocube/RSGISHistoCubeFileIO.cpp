@@ -30,7 +30,7 @@ namespace rsgis {namespace histocube{
     {
         fileOpen = false;
         rwAccess = false;
-        //H5::Exception::dontPrint();
+        H5::Exception::dontPrint();
         this->numOfFeats = 0;
         cubeLayers = new std::vector<RSGISHistCubeLayerMeta*>();
     }
@@ -184,6 +184,8 @@ namespace rsgis {namespace histocube{
                         }
                         delete[] binVals;
                         layerMeta->bins = bins;
+                        
+                        cubeLayers->push_back(layerMeta);
                         
                         cubeLayerDataset.close();
                     }
@@ -466,9 +468,6 @@ namespace rsgis {namespace histocube{
                 throw rsgis::RSGISHistoCubeException("Cube Layer has the wrong dimensions.");
             }
             
-            std::cout << "nCLDIMS = " << nCLDIMS << std::endl;
-            std::cout << "[" << cubeLayerDIMS[0] << ", " << cubeLayerDIMS[1] << "]" << std::endl;
-            
             if(row >= cubeLayerDIMS[0])
             {
                 std::cerr << "ROW = " << row << " Max. = " << cubeLayerDIMS[0] << std::endl;
@@ -560,9 +559,6 @@ namespace rsgis {namespace histocube{
                 throw rsgis::RSGISHistoCubeException("Cube Layer has the wrong dimensions.");
             }
             
-            std::cout << "nCLDIMS = " << nCLDIMS << std::endl;
-            std::cout << "[" << cubeLayerDIMS[0] << ", " << cubeLayerDIMS[1] << "]" << std::endl;
-            
             if(row >= cubeLayerDIMS[0])
             {
                 std::cerr << "ROW = " << row << " Max. = " << cubeLayerDIMS[0] << std::endl;
@@ -628,6 +624,195 @@ namespace rsgis {namespace histocube{
         }
     }
     
+    void RSGISHistoCubeFile::getHistoRows(std::string name, unsigned int sRow, unsigned int eRow, unsigned int *data, unsigned int dataLen) throw(rsgis::RSGISHistoCubeException)
+    {
+        if(!this->fileOpen)
+        {
+            throw rsgis::RSGISHistoCubeException("File was not open.");
+        }
+        
+        try
+        {
+            if(sRow >= eRow)
+            {
+                throw rsgis::RSGISHistoCubeException("The start row must be before the end row.");
+            }
+            unsigned int nRows = eRow - sRow;
+            
+            std::string cubeLayerName = HC_DATASETNAME_DATA + "/" + name;
+            H5::DataSet cubeLayerDataset = hcH5File->openDataSet( cubeLayerName );
+            H5::DataSpace cubeLayerDataspace = cubeLayerDataset.getSpace();
+            
+            hsize_t *cubeLayerDIMS = new hsize_t[2];
+            int nCLDIMS = cubeLayerDataspace.getSimpleExtentDims(cubeLayerDIMS);
+            
+            if(nCLDIMS != 2)
+            {
+                throw rsgis::RSGISHistoCubeException("Cube Layer has the wrong dimensions.");
+            }
+            
+            if(eRow >= cubeLayerDIMS[0])
+            {
+                std::cerr << "ROW = " << eRow << " Max. = " << cubeLayerDIMS[0] << std::endl;
+                throw rsgis::RSGISHistoCubeException("Row is not within the cube layer.");
+            }
+            
+            if(dataLen < cubeLayerDIMS[1])
+            {
+                std::cerr << "dataLen = " << dataLen << " Num Bins. = " << cubeLayerDIMS[1] << std::endl;
+                throw rsgis::RSGISHistoCubeException("Data layer is smaller than the number of bins.");
+            }
+            
+            // Set up dataspace for the 'data' array to read the data into
+            hsize_t dataDims[2];
+            dataDims[0] = nRows;
+            dataDims[1] = cubeLayerDIMS[1];
+            H5::DataSpace readCubeLayerDataspace = H5::DataSpace(2, dataDims);
+            
+            // Select part of the file to read.
+            hsize_t cubeLayerOffset[2];
+            cubeLayerOffset[0] = sRow;
+            cubeLayerOffset[1] = eRow;
+            
+            hsize_t dataInDims[2];
+            dataInDims[0] = nRows;
+            dataInDims[1] = cubeLayerDIMS[1];
+            cubeLayerDataspace.selectHyperslab(H5S_SELECT_SET, dataInDims, cubeLayerOffset);
+            
+            // Read from file.
+            cubeLayerDataset.read(data, H5::PredType::NATIVE_UINT, readCubeLayerDataspace, cubeLayerDataspace);
+            
+            readCubeLayerDataspace.close();
+            cubeLayerDataspace.close();
+            cubeLayerDataset.close();
+        }
+        catch( H5::AttributeIException &e )
+        {
+            throw rsgis::RSGISHistoCubeException(e.getCDetailMsg());
+        }
+        catch( H5::FileIException &e )
+        {
+            throw rsgis::RSGISHistoCubeException(e.getCDetailMsg());
+        }
+        catch( H5::DataSetIException &e )
+        {
+            throw rsgis::RSGISHistoCubeException(e.getCDetailMsg());
+        }
+        catch( H5::DataSpaceIException &e )
+        {
+            throw rsgis::RSGISHistoCubeException(e.getCDetailMsg());
+        }
+        catch( H5::DataTypeIException &e )
+        {
+            throw rsgis::RSGISHistoCubeException(e.getCDetailMsg());
+        }
+        catch ( rsgis::RSGISHistoCubeException &e)
+        {
+            throw e;
+        }
+        catch ( std::exception &e)
+        {
+            throw rsgis::RSGISHistoCubeException(e.what());
+        }
+    }
+    
+    void RSGISHistoCubeFile::setHistoRows(std::string name, unsigned int sRow, unsigned int eRow, unsigned int *data, unsigned int dataLen) throw(rsgis::RSGISHistoCubeException)
+    {
+        if(!this->fileOpen)
+        {
+            throw rsgis::RSGISHistoCubeException("File was not open.");
+        }
+        
+        if(!this->rwAccess)
+        {
+            throw rsgis::RSGISHistoCubeException("HCF file was not opened in Read/Write mode.");
+        }
+        
+        try
+        {
+            if(sRow >= eRow)
+            {
+                throw rsgis::RSGISHistoCubeException("The start row must be before the end row.");
+            }
+            unsigned int nRows = eRow - sRow;
+            
+            std::string cubeLayerName = HC_DATASETNAME_DATA + "/" + name;
+            H5::DataSet cubeLayerDataset = hcH5File->openDataSet( cubeLayerName );
+            H5::DataSpace cubeLayerDataspace = cubeLayerDataset.getSpace();
+            
+            hsize_t *cubeLayerDIMS = new hsize_t[2];
+            int nCLDIMS = cubeLayerDataspace.getSimpleExtentDims(cubeLayerDIMS);
+            
+            if(nCLDIMS != 2)
+            {
+                throw rsgis::RSGISHistoCubeException("Cube Layer has the wrong dimensions.");
+            }
+            
+            if(eRow >= cubeLayerDIMS[0])
+            {
+                std::cerr << "ROW = " << eRow << " Max. = " << cubeLayerDIMS[0] << std::endl;
+                throw rsgis::RSGISHistoCubeException("Row is not within the cube layer.");
+            }
+            
+            if(dataLen < cubeLayerDIMS[1])
+            {
+                std::cerr << "dataLen = " << dataLen << " Num Bins. = " << cubeLayerDIMS[1] << std::endl;
+                throw rsgis::RSGISHistoCubeException("Data layer is smaller than the number of bins.");
+            }
+            
+            // Set up dataspace for the 'data' array to read the data into
+            hsize_t dataDims[2];
+            dataDims[0] = nRows;
+            dataDims[1] = cubeLayerDIMS[1];
+            H5::DataSpace writeCubeLayerDataspace = H5::DataSpace(2, dataDims);
+            
+            // Select part of the file to read.
+            hsize_t cubeLayerOffset[2];
+            cubeLayerOffset[0] = sRow;
+            cubeLayerOffset[1] = eRow;
+            
+            hsize_t dataInDims[2];
+            dataInDims[0] = nRows;
+            dataInDims[1] = cubeLayerDIMS[1];
+            cubeLayerDataspace.selectHyperslab(H5S_SELECT_SET, dataInDims, cubeLayerOffset);
+            
+            // Write from file.
+            cubeLayerDataset.write(data, H5::PredType::NATIVE_UINT, writeCubeLayerDataspace, cubeLayerDataspace);
+            
+            writeCubeLayerDataspace.close();
+            cubeLayerDataspace.close();
+            cubeLayerDataset.close();
+        }
+        catch( H5::AttributeIException &e )
+        {
+            throw rsgis::RSGISHistoCubeException(e.getCDetailMsg());
+        }
+        catch( H5::FileIException &e )
+        {
+            throw rsgis::RSGISHistoCubeException(e.getCDetailMsg());
+        }
+        catch( H5::DataSetIException &e )
+        {
+            throw rsgis::RSGISHistoCubeException(e.getCDetailMsg());
+        }
+        catch( H5::DataSpaceIException &e )
+        {
+            throw rsgis::RSGISHistoCubeException(e.getCDetailMsg());
+        }
+        catch( H5::DataTypeIException &e )
+        {
+            throw rsgis::RSGISHistoCubeException(e.getCDetailMsg());
+        }
+        catch ( rsgis::RSGISHistoCubeException &e)
+        {
+            throw e;
+        }
+        catch ( std::exception &e)
+        {
+            throw rsgis::RSGISHistoCubeException(e.what());
+        }
+    }
+    
     std::vector<RSGISHistCubeLayerMeta*>* RSGISHistoCubeFile::getCubeLayersList()
     {
         return this->cubeLayers;
@@ -643,16 +828,16 @@ namespace rsgis {namespace histocube{
     
     RSGISHistoCubeFile::~RSGISHistoCubeFile()
     {
-        if(this->fileOpen)
-        {
-            this->closeFile();
-        }
-        
         for(std::vector<RSGISHistCubeLayerMeta*>::iterator iterLayers; iterLayers != cubeLayers->end(); ++iterLayers)
         {
             delete (*iterLayers);
         }
         delete cubeLayers;
+        
+        if(this->fileOpen)
+        {
+            this->closeFile();
+        }
     }
     
     

@@ -25,6 +25,10 @@
 
 #include "common/RSGISHistoCubeException.h"
 #include "histocube/RSGISHistoCubeFileIO.h"
+#include "histocube/RSGISPopulateHistoCube.h"
+
+#include "img/RSGISCalcImage.h"
+#include "img/RSGISImageStatistics.h"
 
 namespace rsgis{ namespace cmds {
     
@@ -35,43 +39,130 @@ namespace rsgis{ namespace cmds {
             rsgis::histocube::RSGISHistoCubeFile histoCubeFileObj = rsgis::histocube::RSGISHistoCubeFile();
             histoCubeFileObj.createNewFile(histCubeFile, numFeats);
             histoCubeFileObj.closeFile();
-            /*
+        }
+        catch(rsgis::RSGISHistoCubeException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+    
+    void executeCreateHistoCubeLayer(std::string histCubeFile, std::string layerName, int lowBin, int upBin, float scale, float offset, bool hasDateTime, std::string dataTime)throw(RSGISCmdException)
+    {
+        try
+        {
+            if(lowBin >= upBin)
+            {
+                rsgis::RSGISHistoCubeException("The upper bin must be greater than the lower bin.");
+            }
             
-            
+            rsgis::histocube::RSGISHistoCubeFile histoCubeFileObj = rsgis::histocube::RSGISHistoCubeFile();
+            histoCubeFileObj.openFile(histCubeFile, true);
             
             std::vector<int> bins = std::vector<int>();
-            for(int i = 0; i <= 100; ++i)
+            for(int i = lowBin; i <= upBin; ++i)
             {
                 bins.push_back(i);
             }
-        
-            float scale = 1;
-            float offset = 0;
-            bool hasTime = true;
-            bool hasDate = true;
-            boost::posix_time::ptime *layerDateTime = new boost::posix_time::ptime(boost::posix_time::time_from_string("2002-01-20 23:59:59.000"));
-            histoCubeFileObj.createDataset("LS_RED", bins, scale, offset, hasTime, hasDate, layerDateTime);
-            histoCubeFileObj.createDataset("LS_GREEN", bins, scale, offset, false, false, NULL);
-            histoCubeFileObj.createDataset("LS_BLUE", bins, scale, offset, false, false, NULL);
+            
+            boost::posix_time::ptime *layerDateTime = NULL;
+            
+            if(hasDateTime)
+            {
+                layerDateTime = new boost::posix_time::ptime(boost::posix_time::time_from_string(dataTime));
+            }
+            
+            histoCubeFileObj.createDataset(layerName, bins, scale, offset, hasDateTime, hasDateTime, layerDateTime);
             histoCubeFileObj.closeFile();
-            */
+        }
+        catch(rsgis::RSGISHistoCubeException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+    
+    void executePopulateSingleHistoCubeLayer(std::string histCubeFile, std::string layerName, std::string clumpsImg, std::string valsImg, unsigned int imgBand)throw(RSGISCmdException)
+    {
+        GDALAllRegister();
+        
+        try
+        {
+            if(imgBand == 0)
+            {
+                throw rsgis::RSGISImageException("The band specified is not within the values image.");
+            }
             
-            /*
-            rsgis::histocube::RSGISHistoCubeFile histoCubeFileObj2 = rsgis::histocube::RSGISHistoCubeFile();
-            histoCubeFileObj2.openFile(histCubeFile, true);
+            rsgis::histocube::RSGISHistoCubeFile histoCubeFileObj = rsgis::histocube::RSGISHistoCubeFile();
+            histoCubeFileObj.openFile(histCubeFile, true);
             
-            unsigned int *data = new unsigned int[101];
+            std::vector<rsgis::histocube::RSGISHistCubeLayerMeta*> *cubeLayers = histoCubeFileObj.getCubeLayersList();
+            rsgis::histocube::RSGISHistCubeLayerMeta *cubeLayer = NULL;
+            bool found = false;
+            for(std::vector<rsgis::histocube::RSGISHistCubeLayerMeta*>::iterator iterLayers = cubeLayers->begin(); iterLayers != cubeLayers->end(); ++iterLayers)
+            {
+                if((*iterLayers)->name == layerName)
+                {
+                    cubeLayer = (*iterLayers);
+                    found = true;
+                    break;
+                }
+            }
             
-            histoCubeFileObj2.getHistoRow("LS_RED", 4, data, 101);
+            if(!found)
+            {
+                throw rsgis::RSGISHistoCubeException("Column was not found within the histogram cube.");
+            }
             
-            data[1] = 1;
-            data[4] = 4;
-            data[8] = 8;
+            GDALDataset **datasets = new GDALDataset*[2];
             
-            histoCubeFileObj2.setHistoRow("LS_RED", 4, data, 101);
+            datasets[0] = (GDALDataset *) GDALOpen(clumpsImg.c_str(), GA_ReadOnly);
+            if(datasets[0] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + clumpsImg;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
             
-            histoCubeFileObj2.closeFile();
-            */
+            if(datasets[0]->GetRasterCount() != 1)
+            {
+                GDALClose(datasets[0]);
+                delete[] datasets;
+                throw rsgis::RSGISImageException("The clumps image must only have 1 image band.");
+            }
+            
+            datasets[1] = (GDALDataset *) GDALOpen(valsImg.c_str(), GA_ReadOnly);
+            if(datasets[1] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + valsImg;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            if(imgBand > datasets[1]->GetRasterCount())
+            {
+                GDALClose(datasets[1]);
+                delete[] datasets;
+                throw rsgis::RSGISImageException("The band specified is not within the values image.");
+            }
+            
+            unsigned int bandIdx = imgBand-1;
+            
+            rsgis::img::ImageStats bandStats;
+            rsgis::img::RSGISImageStatistics calcStats;
+            calcStats.calcImageBandStatistics(datasets[0], 1, &bandStats, false, false, 0, false);
+            
+            unsigned int maxRow = ceil(bandStats.max);
+            
+            std::cout << "maxRow = " << maxRow << std::endl;
+            
+            rsgis::histocube::RSGISPopHistoCubeLayerFromImgBand popCubeLyr = rsgis::histocube::RSGISPopHistoCubeLayerFromImgBand(&histoCubeFileObj, layerName, bandIdx, maxRow, cubeLayer->scale, cubeLayer->offset, cubeLayer->bins);
+            rsgis::img::RSGISCalcImage calcImgPopCube = rsgis::img::RSGISCalcImage(&popCubeLyr);
+            calcImgPopCube.calcImage(datasets, 1, 1);
+            histoCubeFileObj.closeFile();
+            GDALClose(datasets[0]);
+            GDALClose(datasets[1]);
+            delete[] datasets;
+        }
+        catch(rsgis::RSGISImageException &e)
+        {
+            throw RSGISCmdException(e.what());
         }
         catch(rsgis::RSGISHistoCubeException &e)
         {
