@@ -38,7 +38,7 @@ namespace rsgis{namespace reg{
 	{
 		std::cout << "Initialising the registration process\n"; 
 		this->initRegistration();
-		std::cout << "Execunting the registration\n";
+		std::cout << "Executing the registration\n";
 		this->executeRegistration();
 		std::cout << "Finalising the registration\n";
 		this->finaliseRegistration();
