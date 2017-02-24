@@ -833,9 +833,12 @@ namespace rsgis {namespace histocube{
     
     RSGISHistoCubeFile::~RSGISHistoCubeFile()
     {
-        for(std::vector<RSGISHistCubeLayerMeta*>::iterator iterLayers; iterLayers != cubeLayers->end(); ++iterLayers)
+        if(!cubeLayers->empty())
         {
-            delete (*iterLayers);
+            for(std::vector<RSGISHistCubeLayerMeta*>::iterator iterLayers = cubeLayers->begin(); iterLayers != cubeLayers->end(); ++iterLayers)
+            {
+                delete (*iterLayers);
+            }
         }
         delete cubeLayers;
         
