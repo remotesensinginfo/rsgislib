@@ -105,6 +105,7 @@ Other
 .. autofunction:: rsgislib.imageutils.hasGCPs
 .. autofunction:: rsgislib.imageutils.copyGCPs
 .. autofunction:: rsgislib.imageutils.setImgThematic
+.. autofunction:: rsgislib.imageutils.doImagesOverlap
 
 
 * :ref:`genindex`

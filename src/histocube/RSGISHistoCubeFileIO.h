@@ -89,8 +89,7 @@ namespace rsgis {namespace histocube{
     static const std::string HC_CUBELAYER_OFFSET( "OFFSET" );
     static const std::string HC_CUBELAYER_BINS( "BINS" );
     static const std::string HC_CUBELAYER_NUMBINS( "NUMBINS" );
-    static const std::string HC_CUBELAYER_HAS_TIME( "HAS_TIME" );
-    static const std::string HC_CUBELAYER_HAS_DATE( "HAS_DATE" );
+    static const std::string HC_CUBELAYER_HAS_DATE_TIME( "HAS_DATE_TIME" );
     static const std::string HC_CUBELAYER_DATE_TIME( "DATE_TIME" );
     
     struct DllExport RSGISHistCubeLayerMeta
@@ -100,8 +99,7 @@ namespace rsgis {namespace histocube{
         float offset;
         unsigned int order;
         std::vector<int> bins;
-        bool hasDate;
-        bool hasTime;
+        bool hasDateTime;
         boost::posix_time::ptime layerDateTime;
     };
     
@@ -111,7 +109,7 @@ namespace rsgis {namespace histocube{
         RSGISHistoCubeFile();
         virtual void openFile(std::string filePath, bool rwAccess, int mdcElmts=HC_MDC_NELMTS, hsize_t rdccNElmts=HC_RDCC_NELMTS, hsize_t rdccNBytes=HC_RDCC_NBYTES, double rdccW0=HC_RDCC_W0, hsize_t sieveBuf=HC_SIEVE_BUF, hsize_t metaBlockSize=HC_META_BLOCKSIZE) throw(rsgis::RSGISHistoCubeException);
         virtual void createNewFile(std::string filePath, unsigned long numFeats, int mdcElmts=HC_MDC_NELMTS, hsize_t rdccNElmts=HC_RDCC_NELMTS, hsize_t rdccNBytes=HC_RDCC_NBYTES, double rdccW0=HC_RDCC_W0, hsize_t sieveBuf=HC_SIEVE_BUF, hsize_t metaBlockSize=HC_META_BLOCKSIZE) throw(rsgis::RSGISHistoCubeException);
-        virtual void createDataset(std::string name, std::vector<int> bins, float scale=1, float offset=0, bool hasTime=false, bool hasDate=false, boost::posix_time::ptime *layerDateTime=NULL, int deflate=HC_DEFLATE) throw(rsgis::RSGISHistoCubeException);
+        virtual void createDataset(std::string name, std::vector<int> bins, float scale=1, float offset=0, bool hasDateTime=false, boost::posix_time::ptime *layerDateTime=NULL, int deflate=HC_DEFLATE) throw(rsgis::RSGISHistoCubeException);
         virtual void getHistoRow(std::string name, unsigned int row, unsigned int *data, unsigned int dataLen) throw(rsgis::RSGISHistoCubeException);
         virtual void setHistoRow(std::string name, unsigned int row, unsigned int *data, unsigned int dataLen) throw(rsgis::RSGISHistoCubeException);
         virtual void getHistoRows(std::string name, unsigned int sRow, unsigned int eRow, unsigned int *data, unsigned int dataLen) throw(rsgis::RSGISHistoCubeException);
