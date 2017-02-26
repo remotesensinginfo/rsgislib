@@ -143,15 +143,10 @@ namespace rsgis {namespace histocube{
                         offsetAttribute.close();
                         
                         int tmpInt = 0;
-                        H5::Attribute hasDateAttribute = cubeLayerDataset.openAttribute(HC_CUBELAYER_HAS_DATE);
+                        H5::Attribute hasDateAttribute = cubeLayerDataset.openAttribute(HC_CUBELAYER_HAS_DATE_TIME);
                         hasDateAttribute.read(H5::PredType::NATIVE_INT, &tmpInt);
                         hasDateAttribute.close();
-                        layerMeta->hasDate = (bool) tmpInt;
-                        
-                        H5::Attribute hasTimeAttribute = cubeLayerDataset.openAttribute(HC_CUBELAYER_HAS_TIME);
-                        hasTimeAttribute.read(H5::PredType::NATIVE_INT, &tmpInt);
-                        hasTimeAttribute.close();
-                        layerMeta->hasTime = (bool) tmpInt;
+                        layerMeta->hasDateTime = (bool) tmpInt;
                         
                         H5std_string strDateTimeReadVal("");
                         H5::Attribute dateTimeAttribute = cubeLayerDataset.openAttribute(HC_CUBELAYER_DATE_TIME);
@@ -292,7 +287,7 @@ namespace rsgis {namespace histocube{
         }
     }
     
-    void RSGISHistoCubeFile::createDataset(std::string name, std::vector<int> bins, float scale, float offset, bool hasTime, bool hasDate, boost::posix_time::ptime *layerDateTime, int deflate) throw(rsgis::RSGISHistoCubeException)
+    void RSGISHistoCubeFile::createDataset(std::string name, std::vector<int> bins, float scale, float offset, bool hasDateTime, boost::posix_time::ptime *layerDateTime, int deflate) throw(rsgis::RSGISHistoCubeException)
     {
         try
         {
@@ -306,7 +301,7 @@ namespace rsgis {namespace histocube{
                 throw rsgis::RSGISHistoCubeException("HCF file was not opened in Read/Write mode.");
             }
             
-            if(hasTime | hasDate)
+            if(hasDateTime)
             {
                 if(layerDateTime == NULL)
                 {
@@ -315,7 +310,7 @@ namespace rsgis {namespace histocube{
             }
             
             bool dupName = false;
-            for(std::vector<RSGISHistCubeLayerMeta*>::iterator iterLayers; iterLayers != cubeLayers->end(); ++iterLayers)
+            for(std::vector<RSGISHistCubeLayerMeta*>::iterator iterLayers = cubeLayers->begin(); iterLayers != cubeLayers->end(); ++iterLayers)
             {
                 if((*iterLayers)->name == name)
                 {
@@ -336,10 +331,9 @@ namespace rsgis {namespace histocube{
             layerMeta->offset = offset;
             layerMeta->bins = bins;
             layerMeta->order = cubeLayers->size()+1;
-            layerMeta->hasDate = hasDate;
-            layerMeta->hasTime = hasTime;
+            layerMeta->hasDateTime = hasDateTime;
             
-            if( (!hasTime) & (!hasTime))
+            if(!hasDateTime)
             {
                 layerMeta->layerDateTime = boost::posix_time::ptime();
             }
@@ -352,11 +346,11 @@ namespace rsgis {namespace histocube{
             std::string datasetName = "/DATA/"+name;
             
             
-            hsize_t dimsDataChunkSize[] = { 1, numBins };
+            //hsize_t dimsDataChunkSize[] = { 1, numBins };
             H5::DSetCreatPropList initParamsCubeLayer;
-            initParamsCubeLayer.setChunk(2, dimsDataChunkSize);
-            initParamsCubeLayer.setShuffle();
-            initParamsCubeLayer.setDeflate(deflate);
+            //initParamsCubeLayer.setChunk(2, dimsDataChunkSize);
+            //initParamsCubeLayer.setShuffle();
+            //initParamsCubeLayer.setDeflate(deflate);
             int initFillVal = 0;
             initParamsCubeLayer.setFillValue( H5::PredType::NATIVE_INT, &initFillVal);
             
@@ -381,15 +375,10 @@ namespace rsgis {namespace histocube{
             numBinsAttribute.write(H5::PredType::NATIVE_UINT, &numBins);
             numBinsAttribute.close();
             
-            H5::Attribute hasDateAttribute = cubeLayerDataSet.createAttribute(HC_CUBELAYER_HAS_DATE, H5::PredType::STD_U8LE, attrScalarDataSpace);
-            int hasDateInt = hasDate;
-            hasDateAttribute.write(H5::PredType::NATIVE_INT, &hasDateInt);
+            H5::Attribute hasDateAttribute = cubeLayerDataSet.createAttribute(HC_CUBELAYER_HAS_DATE_TIME, H5::PredType::STD_U8LE, attrScalarDataSpace);
+            int hasDateTimeInt = hasDateTime;
+            hasDateAttribute.write(H5::PredType::NATIVE_INT, &hasDateTimeInt);
             hasDateAttribute.close();
-            
-            H5::Attribute hasTimeAttribute = cubeLayerDataSet.createAttribute(HC_CUBELAYER_HAS_TIME, H5::PredType::STD_U8LE, attrScalarDataSpace);
-            int hasTimeInt = hasTime;
-            hasTimeAttribute.write(H5::PredType::NATIVE_INT, &hasTimeInt);
-            hasTimeAttribute.close();
             
             H5::StrType strType(H5::PredType::C_S1, H5T_VARIABLE);
             H5::Attribute datetimeAttribute = cubeLayerDataSet.createAttribute(HC_CUBELAYER_DATE_TIME, strType, attrScalarDataSpace);

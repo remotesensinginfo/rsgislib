@@ -54,7 +54,6 @@ namespace rsgis{ namespace cmds {
             {
                 rsgis::RSGISHistoCubeException("The upper bin must be greater than the lower bin.");
             }
-            
             rsgis::histocube::RSGISHistoCubeFile histoCubeFileObj = rsgis::histocube::RSGISHistoCubeFile();
             histoCubeFileObj.openFile(histCubeFile, true);
             
@@ -65,13 +64,12 @@ namespace rsgis{ namespace cmds {
             }
             
             boost::posix_time::ptime *layerDateTime = NULL;
-            
             if(hasDateTime)
             {
                 layerDateTime = new boost::posix_time::ptime(boost::posix_time::time_from_string(dataTime));
             }
             
-            histoCubeFileObj.createDataset(layerName, bins, scale, offset, hasDateTime, hasDateTime, layerDateTime);
+            histoCubeFileObj.createDataset(layerName, bins, scale, offset, hasDateTime, layerDateTime);
             histoCubeFileObj.closeFile();
         }
         catch(rsgis::RSGISHistoCubeException &e)
@@ -158,6 +156,37 @@ namespace rsgis{ namespace cmds {
                 calcImgPopCubeMem.calcImage(datasets, 1, 1);
                 
                 histoCubeFileObj.setHistoRows(layerName, 0, maxRow, dataArr, dataArrLen);
+                /*
+                int nWriteRows = 100000;
+                int nWriteOps = floor(((float)maxRow)/((float)nWriteRows));
+                int remain = maxRow - (nWriteOps * nWriteRows);
+                std::cout << "Number of Write Operations: " << nWriteOps << std::endl;
+                std::cout << "remain = " << remain << std::endl;
+                if(nWriteOps == 0)
+                {
+                    histoCubeFileObj.setHistoRows(layerName, 0, maxRow, dataArr, dataArrLen);
+                }
+                else
+                {
+                    unsigned int sIdx = 0;
+                    unsigned int eIdx = nWriteRows-1;
+                    for(int i = 0; i < nWriteOps; ++i)
+                    {
+                        std::cout << "Writing: " << sIdx << " - " << eIdx << std::endl;
+                        histoCubeFileObj.setHistoRows(layerName, sIdx, eIdx, dataArr, nWriteRows);
+                        sIdx = sIdx + nWriteRows;
+                        eIdx = eIdx + nWriteRows;
+                    }
+                    if(remain > 0)
+                    {
+                        sIdx = nWriteOps * nWriteRows;
+                        eIdx = maxRow;
+                        std::cout << "Writing Remain" << sIdx << " - " << eIdx << std::endl;
+                        histoCubeFileObj.setHistoRows(layerName, sIdx, eIdx, dataArr, remain);
+                    }
+                    std::cout << "Finished\n";
+                }
+                */
                 delete[] dataArr;
             }
             else

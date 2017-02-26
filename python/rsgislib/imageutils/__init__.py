@@ -648,3 +648,78 @@ def mergeExtractedHDF5Data(h5Files, outH5File):
     fH5Out.close()
 
 
+def doImagesOverlap(image1, image2):
+    """
+Function to test whether two images overlap with one another.
+
+* image1 - path to first image
+* image2 - path to second image
+
+Returns:
+
+Boolean specifying whether they overlap or not.
+
+Example::
+
+import rsgislib.imageutils
+img = "/Users/pete/Temp/LandsatStatsImgs/MSS/ClearSkyMsks/LS1MSS_19720823_lat52lon114_r24p218_osgb_clearsky.tif"
+tile = "/Users/pete/Temp/LandsatStatsImgs/MSS/RefImages/LandsatWalesRegion_60m_tile8.kea"
+
+overlap = rsgislib.imageutils.doImagesOverlap(tile, img)
+print("Images Overlap: " + str(overlap))
+"""
+    overlap = True
+    
+    img1DS = gdal.Open(image1, gdal.GA_ReadOnly)
+    if img1DS is None:
+        raise rsgislib.RSGISPyException('Could not open image: ' + image1)
+        
+    img2DS = gdal.Open(image2, gdal.GA_ReadOnly)
+    if img2DS is None:
+        raise rsgislib.RSGISPyException('Could not open image: ' + image2)
+
+    img1GeoTransform = img1DS.GetGeoTransform()
+    if img1GeoTransform is None:
+        img1DS = None
+        img2DS = None
+        raise rsgislib.RSGISPyException('Could not get geotransform: ' + image1)
+        
+    img2GeoTransform = img2DS.GetGeoTransform()
+    if img2GeoTransform is None:
+        img1DS = None
+        img2DS = None
+        raise rsgislib.RSGISPyException('Could not get geotransform: ' + image2)
+    
+    img1TLX = img1GeoTransform[0]
+    img1TLY = img1GeoTransform[3]
+    
+    img1BRX = img1GeoTransform[0] + (img1DS.RasterXSize * img1GeoTransform[1])
+    img1BRY = img1GeoTransform[3] + (img1DS.RasterYSize * img1GeoTransform[5])
+        
+    img2TLX = img2GeoTransform[0]
+    img2TLY = img2GeoTransform[3]
+    
+    img2BRX = img2GeoTransform[0] + (img2DS.RasterXSize * img2GeoTransform[1])
+    img2BRY = img2GeoTransform[3] + (img2DS.RasterYSize * img2GeoTransform[5])
+        
+    xMin = img1TLX
+    xMax = img1BRX
+    yMin = img1BRY
+    yMax = img1TLY
+    
+    if img2TLX > xMin:
+        xMin = img2TLX
+    if img2BRX < xMax:
+        xMax = img2BRX
+    if img2BRY > yMin:
+        yMin = img2BRY
+    if img2TLY < yMax:
+        yMax = img2TLY
+        
+    if xMax - xMin <= 0:
+        overlap = False
+    elif yMax - yMin <= 0:
+        overlap = False
+    
+    return overlap
+
