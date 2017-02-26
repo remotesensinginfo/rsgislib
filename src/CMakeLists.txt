@@ -1279,12 +1279,15 @@ set(LIB_HISTOCUBE_CPP
 	${RSGIS_SRC_HISTOCUBE_DIR}/RSGISHistoCubeUtils.h
 	${RSGIS_SRC_HISTOCUBE_DIR}/RSGISPopulateHistoCube.cpp
 	${RSGIS_SRC_HISTOCUBE_DIR}/RSGISPopulateHistoCube.h
+	${RSGIS_SRC_HISTOCUBE_DIR}/RSGISExportHistoCube2Img.cpp
+	${RSGIS_SRC_HISTOCUBE_DIR}/RSGISExportHistoCube2Img.h
 )
 
 set(LIB_HISTOCUBE_H
 	${RSGIS_SRC_HISTOCUBE_DIR}/RSGISHistoCubeFileIO.h
 	${RSGIS_SRC_HISTOCUBE_DIR}/RSGISHistoCubeUtils.h
 	${RSGIS_SRC_HISTOCUBE_DIR}/RSGISPopulateHistoCube.h
+	${RSGIS_SRC_HISTOCUBE_DIR}/RSGISExportHistoCube2Img.h
 	)
 ###############################################################################
 

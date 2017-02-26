@@ -55,6 +55,9 @@ namespace rsgis{ namespace cmds {
     /** A function to populate a single histogram layer from multiple input files */
     DllExport void executePopulateSingleHistoCubeLayer(std::string histCubeFile, std::string layerName, std::string clumpsImg, std::string valsImg, unsigned int imgBand, bool inMem)throw(RSGISCmdException);
     
+    /** A function to export histogram columns as a multi-band image dataset */
+    DllExport void executeExportHistBins2Img(std::string histCubeFile, std::string layerName, std::string clumpsImg, std::string outputImg, std::string gdalFormat, std::vector<unsigned int> exportBins) throw(RSGISCmdException);
+    
 }}
 
 
