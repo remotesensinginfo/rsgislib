@@ -26,6 +26,7 @@
 #include "common/RSGISHistoCubeException.h"
 #include "histocube/RSGISHistoCubeFileIO.h"
 #include "histocube/RSGISPopulateHistoCube.h"
+#include "histocube/RSGISExportHistoCube2Img.h"
 
 #include "img/RSGISCalcImage.h"
 #include "img/RSGISImageStatistics.h"
@@ -81,7 +82,6 @@ namespace rsgis{ namespace cmds {
     void executePopulateSingleHistoCubeLayer(std::string histCubeFile, std::string layerName, std::string clumpsImg, std::string valsImg, unsigned int imgBand, bool inMem)throw(RSGISCmdException)
     {
         GDALAllRegister();
-        
         try
         {
             if(imgBand == 0)
@@ -180,6 +180,7 @@ namespace rsgis{ namespace cmds {
     
     DllExport void executeExportHistBins2Img(std::string histCubeFile, std::string layerName, std::string clumpsImg, std::string outputImg, std::string gdalFormat, std::vector<unsigned int> exportBins) throw(RSGISCmdException)
     {
+        GDALAllRegister();
         try
         {
             rsgis::histocube::RSGISHistoCubeFile histoCubeFileObj = rsgis::histocube::RSGISHistoCubeFile();
@@ -222,12 +223,11 @@ namespace rsgis{ namespace cmds {
             unsigned int *dataArr = new unsigned int[dataArrLen];
             histoCubeFileObj.getHistoRows(layerName, 0, maxRow, dataArr, dataArrLen);
             
-            
-            
+            rsgis::histocube::RSGISExportBins2ImgBands expBins2Img = rsgis::histocube::RSGISExportBins2ImgBands(exportBins.size(), dataArr, dataArrLen, nBins, exportBins);
+            rsgis::img::RSGISCalcImage calcImg = rsgis::img::RSGISCalcImage(&expBins2Img);
+            calcImg.calcImage(&dataset, 1, 0, outputImg, false, NULL, gdalFormat, GDT_UInt32);
             
             delete[] dataArr;
-            
-            
             GDALClose(dataset);
         }
         catch(rsgis::RSGISImageException &e)

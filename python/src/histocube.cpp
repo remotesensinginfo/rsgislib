@@ -187,10 +187,9 @@ static PyObject *HistoCube_ExportHistoBins2ImgBands(PyObject *self, PyObject *ar
         exportBins.push_back(RSGISPY_UINT_EXTRACT(o));
     }
     
-    
     try
     {
-        rsgis::cmds::executeExportHistBins2Img(std::string(pszCubeFile), std::string(pszLayerName), std::string(pszClumpsImg), std::string(pszClumpsImg), std::string(pszGDALFormat), exportBins);
+        rsgis::cmds::executeExportHistBins2Img(std::string(pszCubeFile), std::string(pszLayerName), std::string(pszClumpsImg), std::string(pszOutputImg), std::string(pszGDALFormat), exportBins);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -283,6 +282,28 @@ static PyMethodDef HistoCubeMethods[] = {
 "valsImg = 'WV2_525N040W_20110727_TOARefl_b762_stch.kea'\n"
 "rsgislib.histocube.populateHistoCubeLayer(hcFile, layerName=layerName, clumpsImg=clumpsImg, valsImg=valsImg, band=1)\n"
 "timer.end()\n"
+"\n"
+},
+
+{"exportHistoBins2ImgBands", (PyCFunction)HistoCube_ExportHistoBins2ImgBands, METH_VARARGS | METH_KEYWORDS,
+"histocube.exportHistoBins2ImgBands(filename=string, layerName=string, clumpsImg=string, outputImg=string, gdalformat=string, binidxs=list)\n"
+"Export bins from the histogram cube to an output image.\n"
+"\n"
+"Where:\n"
+"\n"
+"* filename - is the file path and name for the histogram cube file.\n"
+"* layerName - is the name of the layer to be created.\n"
+"* clumpsImg - is a clumps image that specifies which histogram cube row pixels in with values image are associated (note resolution must be the same as the values image).\n"
+"* outputImg - is the file path to the output image.\n"
+"* gdalformat - is the format of the output image (e.g., KEA)\n"
+"* binidxs - is list of indexed (start 0) within the histogram to export.\n"
+"\n"
+"Example::\n"
+"\n"
+"hcTileFile='./HistoCube/LandsatWalesRegion_60m_tile7.hcf'\n"
+"tile='./RefImages/LandsatWalesRegion_60m_tile7.kea'\n"
+"outputImg='./FreqImgs/LandsatWalesRegion_60m_tile7.kea'\n"
+"rsgislib.histocube.exportHistoBins2ImgBands(filename=hcTileFile, layerName='OverallPxlCount', clumpsImg=tile, outputImg=outputImg, gdalformat='KEA', binidxs=[0,1])\n"
 "\n"
 },
 
