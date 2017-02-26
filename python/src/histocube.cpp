@@ -149,6 +149,58 @@ static PyObject *HistoCube_PopulateHistoCubeLayer(PyObject *self, PyObject *args
     Py_RETURN_NONE;
 }
 
+static PyObject *HistoCube_ExportHistoBins2ImgBands(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    const char *pszCubeFile;
+    const char *pszLayerName;
+    const char *pszClumpsImg;
+    const char *pszOutputImg;
+    const char *pszGDALFormat;
+    PyObject *binIdxsObj;
+    
+    static char *kwlist[] = {"filename", "layerName", "clumpsImg", "outputImg", "gdalformat", "binidxs", NULL};
+    
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssssO:exportHistoBins2ImgBands", kwlist, &pszCubeFile, &pszLayerName, &pszClumpsImg, &pszOutputImg, &pszGDALFormat, &binIdxsObj))
+    {
+        return NULL;
+    }
+    
+    std::vector<unsigned int> exportBins;
+    
+    if( !PySequence_Check(binIdxsObj))
+    {
+        PyErr_SetString(GETSTATE(self)->error, "binidxs argument must be a sequence");
+        return NULL;
+    }
+    Py_ssize_t nBinIdxs = PySequence_Size(binIdxsObj);
+    exportBins.reserve(nBinIdxs);
+    
+    for( Py_ssize_t n = 0; n < nBinIdxs; n++ )
+    {
+        PyObject *o = PySequence_GetItem(binIdxsObj, n);
+        if( ( o == NULL ) || ( o == Py_None ) || !RSGISPY_CHECK_INT(o) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "value in binidxs was not an int." );
+            Py_DECREF(o);
+            return NULL;
+        }
+        exportBins.push_back(RSGISPY_UINT_EXTRACT(o));
+    }
+    
+    
+    try
+    {
+        rsgis::cmds::executeExportHistBins2Img(std::string(pszCubeFile), std::string(pszLayerName), std::string(pszClumpsImg), std::string(pszClumpsImg), std::string(pszGDALFormat), exportBins);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 
 // Our list of functions in this module
 static PyMethodDef HistoCubeMethods[] = {

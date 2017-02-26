@@ -143,7 +143,6 @@ namespace rsgis{ namespace cmds {
             unsigned int bandIdx = imgBand-1;
             unsigned int maxRow = histoCubeFileObj.getNumFeatures()-1;
             
-            
             if(inMem)
             {
                 unsigned int nBins = cubeLayer->bins.size();
@@ -156,37 +155,6 @@ namespace rsgis{ namespace cmds {
                 calcImgPopCubeMem.calcImage(datasets, 1, 1);
                 
                 histoCubeFileObj.setHistoRows(layerName, 0, maxRow, dataArr, dataArrLen);
-                /*
-                int nWriteRows = 100000;
-                int nWriteOps = floor(((float)maxRow)/((float)nWriteRows));
-                int remain = maxRow - (nWriteOps * nWriteRows);
-                std::cout << "Number of Write Operations: " << nWriteOps << std::endl;
-                std::cout << "remain = " << remain << std::endl;
-                if(nWriteOps == 0)
-                {
-                    histoCubeFileObj.setHistoRows(layerName, 0, maxRow, dataArr, dataArrLen);
-                }
-                else
-                {
-                    unsigned int sIdx = 0;
-                    unsigned int eIdx = nWriteRows-1;
-                    for(int i = 0; i < nWriteOps; ++i)
-                    {
-                        std::cout << "Writing: " << sIdx << " - " << eIdx << std::endl;
-                        histoCubeFileObj.setHistoRows(layerName, sIdx, eIdx, dataArr, nWriteRows);
-                        sIdx = sIdx + nWriteRows;
-                        eIdx = eIdx + nWriteRows;
-                    }
-                    if(remain > 0)
-                    {
-                        sIdx = nWriteOps * nWriteRows;
-                        eIdx = maxRow;
-                        std::cout << "Writing Remain" << sIdx << " - " << eIdx << std::endl;
-                        histoCubeFileObj.setHistoRows(layerName, sIdx, eIdx, dataArr, remain);
-                    }
-                    std::cout << "Finished\n";
-                }
-                */
                 delete[] dataArr;
             }
             else
@@ -199,6 +167,68 @@ namespace rsgis{ namespace cmds {
             GDALClose(datasets[0]);
             GDALClose(datasets[1]);
             delete[] datasets;
+        }
+        catch(rsgis::RSGISImageException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(rsgis::RSGISHistoCubeException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+    
+    DllExport void executeExportHistBins2Img(std::string histCubeFile, std::string layerName, std::string clumpsImg, std::string outputImg, std::string gdalFormat, std::vector<unsigned int> exportBins) throw(RSGISCmdException)
+    {
+        try
+        {
+            rsgis::histocube::RSGISHistoCubeFile histoCubeFileObj = rsgis::histocube::RSGISHistoCubeFile();
+            histoCubeFileObj.openFile(histCubeFile, true);
+            
+            std::vector<rsgis::histocube::RSGISHistCubeLayerMeta*> *cubeLayers = histoCubeFileObj.getCubeLayersList();
+            rsgis::histocube::RSGISHistCubeLayerMeta *cubeLayer = NULL;
+            bool found = false;
+            for(std::vector<rsgis::histocube::RSGISHistCubeLayerMeta*>::iterator iterLayers = cubeLayers->begin(); iterLayers != cubeLayers->end(); ++iterLayers)
+            {
+                if((*iterLayers)->name == layerName)
+                {
+                    cubeLayer = (*iterLayers);
+                    found = true;
+                    break;
+                }
+            }
+            
+            if(!found)
+            {
+                throw rsgis::RSGISHistoCubeException("Column was not found within the histogram cube.");
+            }
+            
+            GDALDataset *dataset = (GDALDataset *) GDALOpen(clumpsImg.c_str(), GA_ReadOnly);
+            if(dataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + clumpsImg;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            if(dataset->GetRasterCount() != 1)
+            {
+                GDALClose(dataset);
+                throw rsgis::RSGISImageException("The clumps image must only have 1 image band.");
+            }
+            
+            unsigned int maxRow = histoCubeFileObj.getNumFeatures()-1;
+            unsigned int nBins = cubeLayer->bins.size();
+            unsigned long dataArrLen = (maxRow*nBins)+nBins;
+            unsigned int *dataArr = new unsigned int[dataArrLen];
+            histoCubeFileObj.getHistoRows(layerName, 0, maxRow, dataArr, dataArrLen);
+            
+            
+            
+            
+            delete[] dataArr;
+            
+            
+            GDALClose(dataset);
         }
         catch(rsgis::RSGISImageException &e)
         {
