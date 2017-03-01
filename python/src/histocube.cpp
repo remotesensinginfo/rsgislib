@@ -200,11 +200,52 @@ static PyObject *HistoCube_ExportHistoBins2ImgBands(PyObject *self, PyObject *ar
     Py_RETURN_NONE;
 }
 
+static PyObject *HistoCube_GetLayersNames(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    const char *pszCubeFile;
+    
+    static char *kwlist[] = {"filename", NULL};
+    
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "s:getLayerNames", kwlist, &pszCubeFile))
+    {
+        return NULL;
+    }
+    
+    std::vector<std::string> lyrNames;
+    try
+    {
+        lyrNames = rsgis::cmds::executeExportHistBins2Img(std::string(pszCubeFile));
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    
+    PyObject *pyLyrNames = PyList_New(lyrNames.size());
+    unsigned int idx = 0;
+    for(std::vector<std::string>::iterator iterLyrs = lyrNames.begin(); iterLyrs != lyrNames.end(); ++iterLyrs)
+    {
+        PyObject* name = RSGISPY_CREATE_STRING((*iterLyrs).c_str());
+        if(PyList_SetItem(pyLyrNames, idx, name) != 0)
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Could not add name to list to be returned - report as bug.");
+            return NULL;
+        }
+        idx = idx + 1;
+    }
+    
+    return pyLyrNames;
+}
+
+
+
 
 // Our list of functions in this module
 static PyMethodDef HistoCubeMethods[] = {
 {"createEmptyHistoCube", (PyCFunction)HistoCube_CreateEmptyHistCube, METH_VARARGS | METH_KEYWORDS,
-"histocube.createEmptyHistoCube(filename=string, numOfFeats=unsigned long)\n"
+"rsgislib.histocube.createEmptyHistoCube(filename=string, numOfFeats=unsigned long)\n"
 "Create an empty histogram cube file ready for populating.\n"
 "\n"
 "Where:\n"
@@ -220,7 +261,7 @@ static PyMethodDef HistoCubeMethods[] = {
 },
     
 {"createHistoCubeLayer", (PyCFunction)HistoCube_CreateHistoCubeLayer, METH_VARARGS | METH_KEYWORDS,
-"histocube.createHistoCubeLayer(filename=string, layerName=string, lowBin=int, upBin=int, scale=float, offset=float, hasDateTime=boolean, dataTime=string)\n"
+"rsgislib.histocube.createHistoCubeLayer(filename=string, layerName=string, lowBin=int, upBin=int, scale=float, offset=float, hasDateTime=boolean, dataTime=string)\n"
 "Create an empty histogram cube layer, with all zero'd.\n"
 "The histogram is made up of integer bins and with a scale and offset to define the bin sizes.\n"
 "\n"
@@ -248,7 +289,7 @@ static PyMethodDef HistoCubeMethods[] = {
 },
 
 {"populateHistoCubeLayer", (PyCFunction)HistoCube_PopulateHistoCubeLayer, METH_VARARGS | METH_KEYWORDS,
-"histocube.populateHistoCubeLayer(filename=string, layerName=string, clumpsImg=string, valsImg=string, band=int, inMem=bool)\n"
+"rsgislib.histocube.populateHistoCubeLayer(filename=string, layerName=string, clumpsImg=string, valsImg=string, band=int, inMem=bool)\n"
 "Populate the histogram layer with information from an image band.\n"
 "Note, data from this band is 'added' to any existing data already within the histogram(s).\n"
 "\n"
@@ -286,7 +327,7 @@ static PyMethodDef HistoCubeMethods[] = {
 },
 
 {"exportHistoBins2ImgBands", (PyCFunction)HistoCube_ExportHistoBins2ImgBands, METH_VARARGS | METH_KEYWORDS,
-"histocube.exportHistoBins2ImgBands(filename=string, layerName=string, clumpsImg=string, outputImg=string, gdalformat=string, binidxs=list)\n"
+"rsgislib.histocube.exportHistoBins2ImgBands(filename=string, layerName=string, clumpsImg=string, outputImg=string, gdalformat=string, binidxs=list)\n"
 "Export bins from the histogram cube to an output image.\n"
 "\n"
 "Where:\n"
@@ -300,6 +341,8 @@ static PyMethodDef HistoCubeMethods[] = {
 "\n"
 "Example::\n"
 "\n"
+"import rsgislib.histocube\n"
+"\n"
 "hcTileFile='./HistoCube/LandsatWalesRegion_60m_tile7.hcf'\n"
 "tile='./RefImages/LandsatWalesRegion_60m_tile7.kea'\n"
 "outputImg='./FreqImgs/LandsatWalesRegion_60m_tile7.kea'\n"
@@ -307,6 +350,27 @@ static PyMethodDef HistoCubeMethods[] = {
 "\n"
 },
 
+{"getLayerNames", (PyCFunction)HistoCube_GetLayersNames, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.histocube.getLayerNames(filename=string)\n"
+"Get a list of the layer names within the histocube file..\n"
+"\n"
+"Where:\n"
+"\n"
+"* filename - is the file path and name for the histogram cube file.\n"
+"\n"
+"Returns:\n"
+"List of layer names of string type.\n"
+"\n"
+"Example::\n"
+"\n"
+"import rsgislib.histocube\n"
+"\n"
+"hcTileFile='./HistoCube/LandsatWalesRegion_60m_tile7.hcf'\n"
+"lyrNames = rsgislib.histocube.getLayerNames(filename=hcTileFile)\n"
+"\n"
+},
+
+    
 {NULL}        /* Sentinel */
 };
 

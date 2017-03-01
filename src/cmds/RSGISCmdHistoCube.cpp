@@ -240,6 +240,29 @@ namespace rsgis{ namespace cmds {
         }
     }
     
+    DllExport std::vector<std::string> executeExportHistBins2Img(std::string histCubeFile)throw(RSGISCmdException)
+    {
+        std::vector<std::string> lyrNames;
+        try
+        {
+            rsgis::histocube::RSGISHistoCubeFile histoCubeFileObj = rsgis::histocube::RSGISHistoCubeFile();
+            histoCubeFileObj.openFile(histCubeFile, true);
+            
+            std::vector<rsgis::histocube::RSGISHistCubeLayerMeta*> *cubeLayers = histoCubeFileObj.getCubeLayersList();
+            for(std::vector<rsgis::histocube::RSGISHistCubeLayerMeta*>::iterator iterLayers = cubeLayers->begin(); iterLayers != cubeLayers->end(); ++iterLayers)
+            {
+                lyrNames.push_back((*iterLayers)->name);
+            }
+            
+            histoCubeFileObj.closeFile();
+        }
+        catch(rsgis::RSGISHistoCubeException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        return lyrNames;
+    }
+    
 }}
 
 
