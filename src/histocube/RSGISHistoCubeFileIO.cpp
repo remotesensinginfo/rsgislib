@@ -287,7 +287,7 @@ namespace rsgis {namespace histocube{
         }
     }
     
-    void RSGISHistoCubeFile::createDataset(std::string name, std::vector<int> bins, float scale, float offset, bool hasDateTime, boost::posix_time::ptime *layerDateTime, int deflate) throw(rsgis::RSGISHistoCubeException)
+    void RSGISHistoCubeFile::createDataset(std::string name, std::vector<int> bins, float scale, float offset, bool hasDateTime, boost::posix_time::ptime *layerDateTime, unsigned int chunkSize, int deflate) throw(rsgis::RSGISHistoCubeException)
     {
         try
         {
@@ -346,11 +346,11 @@ namespace rsgis {namespace histocube{
             std::string datasetName = "/DATA/"+name;
             
             
-            //hsize_t dimsDataChunkSize[] = { 1, numBins };
+            hsize_t dimsDataChunkSize[] = { chunkSize, numBins };
             H5::DSetCreatPropList initParamsCubeLayer;
-            //initParamsCubeLayer.setChunk(2, dimsDataChunkSize);
-            //initParamsCubeLayer.setShuffle();
-            //initParamsCubeLayer.setDeflate(deflate);
+            initParamsCubeLayer.setChunk(2, dimsDataChunkSize);
+            initParamsCubeLayer.setShuffle();
+            initParamsCubeLayer.setDeflate(deflate);
             int initFillVal = 0;
             initParamsCubeLayer.setFillValue( H5::PredType::NATIVE_INT, &initFillVal);
             

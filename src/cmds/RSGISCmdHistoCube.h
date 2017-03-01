@@ -58,6 +58,9 @@ namespace rsgis{ namespace cmds {
     /** A function to export histogram columns as a multi-band image dataset */
     DllExport void executeExportHistBins2Img(std::string histCubeFile, std::string layerName, std::string clumpsImg, std::string outputImg, std::string gdalFormat, std::vector<unsigned int> exportBins) throw(RSGISCmdException);
     
+    /** A function to get a list of all the datasets layers within a histocube file*/
+    DllExport std::vector<std::string> executeExportHistBins2Img(std::string histCubeFile)throw(RSGISCmdException);
+    
 }}
 
 
