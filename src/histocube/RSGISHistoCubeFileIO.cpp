@@ -345,8 +345,13 @@ namespace rsgis {namespace histocube{
             unsigned int numBins = bins.size();
             std::string datasetName = "/DATA/"+name;
             
+            int fileChuckSize = chunkSize;
+            if(this->numOfFeats < chunkSize)
+            {
+                fileChuckSize = this->numOfFeats;
+            }
             
-            hsize_t dimsDataChunkSize[] = { chunkSize, numBins };
+            hsize_t dimsDataChunkSize[] = { fileChuckSize, numBins };
             H5::DSetCreatPropList initParamsCubeLayer;
             initParamsCubeLayer.setChunk(2, dimsDataChunkSize);
             initParamsCubeLayer.setShuffle();
