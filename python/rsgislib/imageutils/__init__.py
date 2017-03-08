@@ -723,3 +723,45 @@ print("Images Overlap: " + str(overlap))
     
     return overlap
 
+
+
+def _popPxlsRanVals(info, inputs, outputs, otherargs):
+    """
+    This is an internal rios function for generateRandomPxlValsImg()
+    """
+    outputs.outimage = numpy.random.random_integers(otherargs.lowVal, high=otherargs.upVal, size=inputs.inImg.shape)
+    outputs.outimage = outputs.outimage.astype(numpy.int32, copy=False)
+
+def generateRandomPxlValsImg(inputImg, outputImg, gdalFormat, lowVal, upVal):
+    """
+Function which produces a 1 band image with random values between lowVal and upVal.
+
+Where:
+
+* inputImg - the input reference image
+* outputImg - the output image file name and path (will be same dimensions as the input)
+* gdalFormat - the GDAL image file format of the output image file.
+* lowVal - lower value
+* upVal - upper value 
+
+"""
+    if not haveRIOS:
+        raise Exception("The RIOS module required for this function could not be imported\n\t" + riosErr)
+
+    infiles = applier.FilenameAssociations()
+    infiles.inImg = inputImg
+    outfiles = applier.FilenameAssociations()
+    outfiles.outimage = outputImg
+    otherargs = applier.OtherInputs()
+    otherargs.lowVal = lowVal
+    otherargs.upVal = upVal
+    aControls = applier.ApplierControls()
+    aControls.progress = cuiprogress.CUIProgressBar()
+    aControls.drivername = gdalFormat
+    aControls.omitPyramids = True
+    aControls.calcStats = False
+    
+    applier.apply(_popPxlsRanVals, infiles, outfiles, otherargs, controls=aControls)
+
+
+
