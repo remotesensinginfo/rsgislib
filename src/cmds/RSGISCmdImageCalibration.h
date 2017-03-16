@@ -144,6 +144,9 @@ namespace rsgis{ namespace cmds {
     /** Function to convert radiance into TOA reflectance */
     DllExport void executeConvertRadiance2TOARefl(std::string inputImage, std::string outputImage, std::string gdalFormat, rsgis::RSGISLibDataType rsgisOutDataType, float scaleFactor, unsigned int julianDay, bool useJulianDay, unsigned int year, unsigned int month, unsigned int day, float solarZenith, float *solarIrradiance, unsigned int numBands) throw(RSGISCmdException);
     
+    /** Function to convert TOA reflectance to radiance */
+    DllExport void executeConvertTOARefl2Radiance(std::vector<std::string> inputImages, std::string outputImage, std::string gdalFormat, rsgis::RSGISLibDataType rsgisOutDataType, float scaleFactor, float solarDistance, float solarZenith, float *solarIrradiance, unsigned int numBands) throw(RSGISCmdException);
+    
     /** Function to convert radiance into surface reflectance using a single parameterisation of 6S */
     DllExport void executeRad2SREFSingle6sParams(std::string inputImage, std::string outputImage, std::string gdalFormat, rsgis::RSGISLibDataType rsgisOutDataType, float scaleFactor, unsigned int *imageBands, float *aX, float *bX, float *cX, int numValues, float noDataVal, bool useNoDataVal)throw(RSGISCmdException);
     
@@ -177,6 +180,11 @@ namespace rsgis{ namespace cmds {
     /** Function to calculate standardised reflectance taking into account topography */
     DllExport void executeCalcStandardisedReflectanceSD2010(std::string inputDataMaskImg, std::string srefInputImage, std::string inputSolarIrradiance, std::string inputIncidenceAngleImg, std::string inputExitanceAngleImg, std::string outputImg, std::string gdalFormat, float brdfBeta, float outIncidenceAngle, float outExitanceAngle, float reflScaleFactor) throw(RSGISCmdException);
     
+    /** Function to calculate the julian day for a year, month, day */
+    DllExport unsigned int executeGetJulianDay(unsigned int year, unsigned int month, unsigned int day) throw(RSGISCmdException);
+    
+    /** Function to calculate the Earth / Sun distance for a julian day */
+    DllExport float executeGetEarthSunDistance(unsigned int julianDay) throw(RSGISCmdException);
     
 }}
 

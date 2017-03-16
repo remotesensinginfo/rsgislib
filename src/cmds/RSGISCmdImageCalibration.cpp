@@ -199,49 +199,35 @@ namespace rsgis{ namespace cmds {
     void executeConvertRadiance2TOARefl(std::string inputImage, std::string outputImage, std::string gdalFormat, rsgis::RSGISLibDataType rsgisOutDataType, float scaleFactor, unsigned int julianDay, bool useJulianDay, unsigned int year, unsigned int month, unsigned int day, float solarZenith, float *solarIrradiance, unsigned int numBands) throw(RSGISCmdException)
     {
         GDALAllRegister();
-        GDALDataset **datasets = NULL;
-        rsgis::calib::RSGISCalculateTopOfAtmosphereReflectance *calcTopAtmosRefl = NULL;
-        rsgis::img::RSGISCalcImage *calcImage = NULL;
-        
         try
         {
-            datasets = new GDALDataset*[1];
-            
             std::cout << "Open " << inputImage << std::endl;
-            datasets[0] = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
-            if(datasets[0] == NULL)
+            GDALDataset *dataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+            if(dataset == NULL)
             {
                 std::string message = std::string("Could not open image ") + inputImage;
                 throw rsgis::RSGISImageException(message.c_str());
             }
             
-            unsigned int numRasterBands = datasets[0]->GetRasterCount();
+            unsigned int numRasterBands = dataset->GetRasterCount();
             if(numBands != numRasterBands)
             {
-                GDALClose(datasets[0]);
-                delete[] datasets;
+                GDALClose(dataset);
                 throw rsgis::RSGISException("The number of input image bands and solar irradiance values are different.");
             }
             
             double solarDistance = 0;
-            
             if(!useJulianDay)
             {
                 julianDay = rsgis::calib::rsgisGetJulianDay(day, month, year);
             }
-            
             solarDistance = rsgis::calib::rsgisCalcSolarDistance(julianDay);
             
-            calcTopAtmosRefl = new rsgis::calib::RSGISCalculateTopOfAtmosphereReflectance(numRasterBands, solarIrradiance, solarDistance, solarZenith, scaleFactor);
+            rsgis::calib::RSGISCalculateTopOfAtmosphereReflectance calcTopAtmosRefl = rsgis::calib::RSGISCalculateTopOfAtmosphereReflectance(numRasterBands, solarIrradiance, solarDistance, solarZenith, scaleFactor);
+            rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(&calcTopAtmosRefl, "", true);
+            calcImage.calcImage(&dataset, 1, outputImage, false, NULL, gdalFormat, RSGIS_to_GDAL_Type(rsgisOutDataType));
             
-            calcImage = new rsgis::img::RSGISCalcImage(calcTopAtmosRefl, "", true);
-            calcImage->calcImage(datasets, 1, outputImage, false, NULL, gdalFormat, RSGIS_to_GDAL_Type(rsgisOutDataType));
-            
-            GDALClose(datasets[0]);
-            delete[] datasets;
-            
-            delete calcTopAtmosRefl;
-            delete calcImage;
+            GDALClose(dataset);
         }
         catch(RSGISException &e)
         {
@@ -252,7 +238,85 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-    
+                
+    void executeConvertTOARefl2Radiance(std::vector<std::string> inputImages, std::string outputImage, std::string gdalFormat, rsgis::RSGISLibDataType rsgisOutDataType, float scaleFactor, float solarDistance, float solarZenith, float *solarIrradiance, unsigned int numBands) throw(RSGISCmdException)
+    {
+        GDALAllRegister();
+        try
+        {
+            if(inputImages.size() == 1)
+            {
+                std::string inputImage = inputImages.at(1);
+                std::cout << "Open " << inputImage << std::endl;
+                GDALDataset *dataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+                if(dataset == NULL)
+                {
+                    std::string message = std::string("Could not open image ") + inputImage;
+                    throw rsgis::RSGISImageException(message.c_str());
+                }
+                
+                unsigned int numRasterBands = dataset->GetRasterCount();
+                if(numBands != numRasterBands)
+                {
+                    GDALClose(dataset);
+                    throw rsgis::RSGISException("The number of input image bands and solar irradiance values are different.");
+                }
+                
+                rsgis::calib::RSGISCalculateRadianceFromTOAReflectance calcRadFromTOARefl = rsgis::calib::RSGISCalculateRadianceFromTOAReflectance(numRasterBands, solarIrradiance, solarDistance, solarZenith, scaleFactor);
+                rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(&calcRadFromTOARefl, "", true);
+                calcImage.calcImage(&dataset, 1, outputImage, false, NULL, gdalFormat, RSGIS_to_GDAL_Type(rsgisOutDataType));
+                
+                GDALClose(dataset);
+            }
+            else if(inputImages.size() > 1)
+            {
+                if(inputImages.size() != numBands)
+                {
+                    throw RSGISException("There must be either a single multi-band image or the number of ESUN values must equal the number of input images.");
+                }
+                
+                unsigned int nImgsBands = inputImages.size();
+                GDALDataset **datasets = new GDALDataset*[nImgsBands];
+                for(unsigned int i = 0; i < nImgsBands; ++i)
+                {
+                    datasets[i] = (GDALDataset *) GDALOpen(inputImages.at(i).c_str(), GA_ReadOnly);
+                    
+                    if(datasets[i] == NULL)
+                    {
+                        std::string message = std::string("Could not open image ") + inputImages.at(i);
+                        throw rsgis::RSGISImageException(message.c_str());
+                    }
+                    
+                    if(datasets[i]->GetRasterCount() != 1)
+                    {
+                        throw RSGISException("Each input image can only have a single image band unless only a single image is provided.");
+                    }
+                }
+                
+                rsgis::calib::RSGISCalculateTopOfAtmosphereReflectance calcTopAtmosRefl = rsgis::calib::RSGISCalculateTopOfAtmosphereReflectance(nImgsBands, solarIrradiance, solarDistance, solarZenith, scaleFactor);
+                rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(&calcTopAtmosRefl, "", true);
+                calcImage.calcImage(datasets, nImgsBands, outputImage, false, NULL, gdalFormat, RSGIS_to_GDAL_Type(rsgisOutDataType));
+                for(unsigned int i = 0; i < nImgsBands; ++i)
+                {
+                    GDALClose(datasets[i]);
+                }
+                delete[] datasets;
+            }
+            else
+            {
+                throw RSGISException("No input images where provided.");
+            }
+        }
+        catch(RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+                
     void executeRad2SREFSingle6sParams(std::string inputImage, std::string outputImage, std::string gdalFormat, rsgis::RSGISLibDataType rsgisOutDataType, float scaleFactor, unsigned int *imageBands, float *aX, float *bX, float *cX, int numValues, float noDataVal, bool useNoDataVal)throw(RSGISCmdException)
     {
         try
@@ -1667,8 +1731,6 @@ namespace rsgis{ namespace cmds {
                 throw rsgis::RSGISImageException(message.c_str());
             }
             
-            
-            
             int numRasterReflBands = datasets[3]->GetRasterCount();
             
             // Calculate standardised Reflectance Image...
@@ -1691,6 +1753,42 @@ namespace rsgis{ namespace cmds {
         {
             throw RSGISCmdException(e.what());
         }
+    }
+                
+    unsigned int executeGetJulianDay(unsigned int year, unsigned int month, unsigned int day) throw(RSGISCmdException)
+    {
+        unsigned int julianDay = 0;
+        try
+        {
+            julianDay = rsgis::calib::rsgisGetJulianDay(day, month, year);
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        return julianDay;
+    }
+                
+    float executeGetEarthSunDistance(unsigned int julianDay) throw(RSGISCmdException)
+    {
+        float dist = 0.0;
+        try
+        {
+            dist = rsgis::calib::rsgisCalcSolarDistance(julianDay);
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        return dist;
     }
                 
 }}

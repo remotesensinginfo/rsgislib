@@ -90,5 +90,39 @@ namespace rsgis{namespace calib{
     {
         
     }
+    
+    
+    
+    
+    
+    RSGISCalculateRadianceFromTOAReflectance::RSGISCalculateRadianceFromTOAReflectance(int numberOutBands, float *solarIrradiance, double distance, float solarZenith, float scaleFactor):rsgis::img::RSGISCalcImageValue(numberOutBands)
+    {
+        this->solarIrradiance = solarIrradiance;
+        this->distance = distance;
+        this->solarZenith = solarZenith;
+        this->scaleFactor = scaleFactor;
+        this->distSq = distance * distance;
+    }
+    
+    void RSGISCalculateRadianceFromTOAReflectance::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+    {
+        if(numBands != this->numOutBands)
+        {
+            throw rsgis::img::RSGISImageCalcException("The number of input and output image bands needs to be the same.");
+        }
+        
+        for(int i = 0; i < this->numOutBands; ++i)
+        {
+            output[i] = ((bandValues[i]/scaleFactor) * solarIrradiance[i] * cos(solarZenith)) / (M_PI * distSq);
+        }
+    }
+    
+    RSGISCalculateRadianceFromTOAReflectance::~RSGISCalculateRadianceFromTOAReflectance()
+    {
+        
+    }
+    
+    
+    
 }}
 
