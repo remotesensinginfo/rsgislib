@@ -31,7 +31,11 @@
 #include "img/RSGISCalcImage.h"
 #include "img/RSGISImageStatistics.h"
 
+#include "math/RSGISMathsUtils.h"
+
 namespace rsgis{ namespace cmds {
+    
+    
     
     void executeCreateEmptyHistoCube(std::string histCubeFile, unsigned long numFeats)throw(RSGISCmdException)
     {
@@ -178,7 +182,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    DllExport void executeExportHistBins2Img(std::string histCubeFile, std::string layerName, std::string clumpsImg, std::string outputImg, std::string gdalFormat, std::vector<unsigned int> exportBins) throw(RSGISCmdException)
+    void executeExportHistBins2Img(std::string histCubeFile, std::string layerName, std::string clumpsImg, std::string outputImg, std::string gdalFormat, std::vector<unsigned int> exportBins) throw(RSGISCmdException)
     {
         GDALAllRegister();
         try
@@ -240,7 +244,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    DllExport std::vector<std::string> executeExportHistBins2Img(std::string histCubeFile)throw(RSGISCmdException)
+    std::vector<std::string> executeExportHistBins2Img(std::string histCubeFile)throw(RSGISCmdException)
     {
         std::vector<std::string> lyrNames;
         try
@@ -263,6 +267,117 @@ namespace rsgis{ namespace cmds {
         return lyrNames;
     }
     
+    void executeExportHistStats2Img(std::string histCubeFile, std::string layerName, std::string clumpsImg, std::string outputImg, std::string gdalFormat, RSGISLibDataType outDataType, std::vector<RSGISCmdsHistSummariseStats> exportStats) throw(RSGISCmdException)
+    {
+        GDALAllRegister();
+        try
+        {
+            if(exportStats.empty())
+            {
+                throw rsgis::RSGISHistoCubeException("No summary stats where provided");
+            }
+            
+            std::vector<rsgis::math::rsgissummarytype> rsgisExportStats;
+            for(std::vector<RSGISCmdsHistSummariseStats>::iterator iterStats = exportStats.begin(); iterStats != exportStats.end(); ++iterStats)
+            {
+                if((*iterStats) == rsgiscmds_hstat_min)
+                {
+                    rsgisExportStats.push_back(rsgis::math::sumtype_min);
+                }
+                else if((*iterStats) == rsgiscmds_hstat_max)
+                {
+                    rsgisExportStats.push_back(rsgis::math::sumtype_max);
+                }
+                else if((*iterStats) == rsgiscmds_hstat_mean)
+                {
+                    rsgisExportStats.push_back(rsgis::math::sumtype_mean);
+                }
+                else if((*iterStats) == rsgiscmds_hstat_stddev)
+                {
+                    rsgisExportStats.push_back(rsgis::math::sumtype_stddev);
+                }
+                else if((*iterStats) == rsgiscmds_hstat_median)
+                {
+                    rsgisExportStats.push_back(rsgis::math::sumtype_median);
+                }
+                else if((*iterStats) == rsgiscmds_hstat_range)
+                {
+                    rsgisExportStats.push_back(rsgis::math::sumtype_range);
+                }
+                else if((*iterStats) == rsgiscmds_hstat_mode)
+                {
+                    rsgisExportStats.push_back(rsgis::math::sumtype_mode);
+                }
+                else if((*iterStats) == rsgiscmds_hstat_sum)
+                {
+                    rsgisExportStats.push_back(rsgis::math::sumtype_sum);
+                }
+                else
+                {
+                    throw rsgis::RSGISHistoCubeException("Summary static was not recognised.");
+                }
+            }
+            
+            rsgis::histocube::RSGISHistoCubeFile histoCubeFileObj = rsgis::histocube::RSGISHistoCubeFile();
+            histoCubeFileObj.openFile(histCubeFile, true);
+            
+            std::vector<rsgis::histocube::RSGISHistCubeLayerMeta*> *cubeLayers = histoCubeFileObj.getCubeLayersList();
+            rsgis::histocube::RSGISHistCubeLayerMeta *cubeLayer = NULL;
+            bool found = false;
+            for(std::vector<rsgis::histocube::RSGISHistCubeLayerMeta*>::iterator iterLayers = cubeLayers->begin(); iterLayers != cubeLayers->end(); ++iterLayers)
+            {
+                if((*iterLayers)->name == layerName)
+                {
+                    cubeLayer = (*iterLayers);
+                    found = true;
+                    break;
+                }
+            }
+            
+            if(!found)
+            {
+                throw rsgis::RSGISHistoCubeException("Column was not found within the histogram cube.");
+            }
+            
+            GDALDataset *dataset = (GDALDataset *) GDALOpen(clumpsImg.c_str(), GA_ReadOnly);
+            if(dataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + clumpsImg;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            if(dataset->GetRasterCount() != 1)
+            {
+                GDALClose(dataset);
+                throw rsgis::RSGISImageException("The clumps image must only have 1 image band.");
+            }
+            
+            unsigned int maxRow = histoCubeFileObj.getNumFeatures()-1;
+            unsigned int nBins = cubeLayer->bins.size();
+            unsigned long dataArrLen = (maxRow*nBins)+nBins;
+            unsigned int *dataArr = new unsigned int[dataArrLen];
+            histoCubeFileObj.getHistoRows(layerName, 0, maxRow, dataArr, dataArrLen);
+            
+            std::cout << "Scale = " << cubeLayer->scale << std::endl;
+            std::cout << "Offset = " << cubeLayer->offset << std::endl;
+            
+            rsgis::histocube::RSGISExportHistSummaryStats2ImgBands expHistSums2Img = rsgis::histocube::RSGISExportHistSummaryStats2ImgBands(rsgisExportStats.size(), dataArr, dataArrLen, nBins, cubeLayer->scale, cubeLayer->offset, rsgisExportStats);
+            rsgis::img::RSGISCalcImage calcImg = rsgis::img::RSGISCalcImage(&expHistSums2Img);
+            calcImg.calcImage(&dataset, 1, 0, outputImg, false, NULL, gdalFormat, RSGIS_to_GDAL_Type(outDataType));
+            
+            delete[] dataArr;
+            GDALClose(dataset);
+        }
+        catch(rsgis::RSGISImageException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(rsgis::RSGISHistoCubeException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+
 }}
 
 
