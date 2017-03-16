@@ -239,7 +239,61 @@ static PyObject *HistoCube_GetLayersNames(PyObject *self, PyObject *args, PyObje
     return pyLyrNames;
 }
 
-
+static PyObject *HistoCube_ExportHistoStats2ImgBands(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    const char *pszCubeFile;
+    const char *pszLayerName;
+    const char *pszClumpsImg;
+    const char *pszOutputImg;
+    const char *pszGDALFormat;
+    int nDataType;
+    PyObject *binSumStatsObj;
+    
+    static char *kwlist[] = {"filename", "layerName", "clumpsImg", "outputImg", "gdalformat", "datatype", "binstats", NULL};
+    
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssssiO:exportHistoStats2ImgBands", kwlist, &pszCubeFile, &pszLayerName, &pszClumpsImg, &pszOutputImg, &pszGDALFormat, &nDataType, &binSumStatsObj))
+    {
+        return NULL;
+    }
+    
+    std::vector<rsgis::cmds::RSGISCmdsHistSummariseStats> exportSumStats;
+    
+    if( !PySequence_Check(binSumStatsObj))
+    {
+        PyErr_SetString(GETSTATE(self)->error, "binstats argument must be a sequence");
+        return NULL;
+    }
+    Py_ssize_t nBinSumStats = PySequence_Size(binSumStatsObj);
+    exportSumStats.reserve(nBinSumStats);
+    rsgis::cmds::RSGISCmdsHistSummariseStats sumVal = rsgis::cmds::rsgiscmds_hstat_none;
+    for( Py_ssize_t n = 0; n < nBinSumStats; n++ )
+    {
+        PyObject *o = PySequence_GetItem(binSumStatsObj, n);
+        if( ( o == NULL ) || ( o == Py_None ) || !RSGISPY_CHECK_INT(o) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "value in binstats was not an int." );
+            Py_DECREF(o);
+            return NULL;
+        }
+        sumVal = (rsgis::cmds::RSGISCmdsHistSummariseStats)RSGISPY_INT_EXTRACT(o);
+        exportSumStats.push_back(sumVal);
+    }
+    
+    // we made these values the same so should work
+    rsgis::RSGISLibDataType dType = (rsgis::RSGISLibDataType)nDataType;
+    
+    try
+    {
+        rsgis::cmds::executeExportHistStats2Img(std::string(pszCubeFile), std::string(pszLayerName), std::string(pszClumpsImg), std::string(pszOutputImg), std::string(pszGDALFormat), dType, exportSumStats);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
 
 
 // Our list of functions in this module
@@ -367,6 +421,33 @@ static PyMethodDef HistoCubeMethods[] = {
 "\n"
 "hcTileFile='./HistoCube/LandsatWalesRegion_60m_tile7.hcf'\n"
 "lyrNames = rsgislib.histocube.getLayerNames(filename=hcTileFile)\n"
+"\n"
+},
+    
+{"exportHistoStats2ImgBands", (PyCFunction)HistoCube_ExportHistoStats2ImgBands, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.histocube.exportHistoStats2ImgBands(filename=string, layerName=string, clumpsImg=string, outputImg=string, gdalformat=string, datatype=int, binstats=list)\n"
+"Export summary statistics (e.g., median, mean, mode, min, max etc.) from the histogram cube to an output image.\n"
+"\n"
+"Where:\n"
+"\n"
+"* filename - is the file path and name for the histogram cube file.\n"
+"* layerName - is the name of the layer to be created.\n"
+"* clumpsImg - is a clumps image that specifies which histogram cube row pixels in with values image are associated (note resolution must be the same as the values image).\n"
+"* outputImg - is the file path to the output image.\n"
+"* gdalformat - is the format of the output image (e.g., KEA)\n"
+"* datatype - specifies one of the values from rsgislib.TYPE_*\n"
+"* binstats - is list of summary statistics which will be calculated for each histogram and exported (Must be of type: rsgislib.histocube.SUMTYPE_HC_*).\n"
+"\n"
+"Example::\n"
+"\n"
+"import rsgislib\n"
+"import rsgislib.histocube\n"
+"\n"
+"hcTileFile='./HistoCube/LandsatWalesRegion_60m_tile7.hcf'\n"
+"tile='./RefImages/LandsatWalesRegion_60m_tile7.kea'\n"
+"outputImg='./StatsImgs/LandsatWalesRegion_60m_tile7.kea'\n"
+"binstats=[rsgislib.histocube.SUMTYPE_HC_MEDIAN, rsgislib.histocube.SUMTYPE_HC_MEAN]\n"
+"rsgislib.histocube.exportHistoStats2ImgBands(filename=hcTileFile, layerName='OverallPxlCount', clumpsImg=tile, outputImg=outputImg, gdalformat='KEA', datatype=rsgislib.TYPE_32FLOAT binstats=binstats)\n"
 "\n"
 },
 

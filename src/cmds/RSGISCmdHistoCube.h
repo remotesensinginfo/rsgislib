@@ -46,6 +46,19 @@
 
 namespace rsgis{ namespace cmds {
     
+    enum RSGISCmdsHistSummariseStats
+    {
+        rsgiscmds_hstat_none = 0,
+        rsgiscmds_hstat_min = 1,
+        rsgiscmds_hstat_max = 2,
+        rsgiscmds_hstat_mean = 3,
+        rsgiscmds_hstat_median = 4,
+        rsgiscmds_hstat_range = 5,
+        rsgiscmds_hstat_stddev = 6,
+        rsgiscmds_hstat_sum = 7,
+        rsgiscmds_hstat_mode = 8
+    };
+    
     /** A function to create an empty histocube file ready to be populated */
     DllExport void executeCreateEmptyHistoCube(std::string histCubeFile, unsigned long numFeats)throw(RSGISCmdException);
     
@@ -61,6 +74,9 @@ namespace rsgis{ namespace cmds {
     /** A function to get a list of all the datasets layers within a histocube file*/
     DllExport std::vector<std::string> executeExportHistBins2Img(std::string histCubeFile)throw(RSGISCmdException);
     
+    /** A function to export statistics from each histogram to an output image */
+    DllExport void executeExportHistStats2Img(std::string histCubeFile, std::string layerName, std::string clumpsImg, std::string outputImg, std::string gdalFormat, RSGISLibDataType outDataType, std::vector<RSGISCmdsHistSummariseStats> exportStats) throw(RSGISCmdException);
+
 }}
 
 
