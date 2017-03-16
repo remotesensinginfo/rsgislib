@@ -53,7 +53,7 @@ namespace rsgis { namespace img {
 		 
 		 Padwick, C., Deskevich, M., Pacifici, F., Smallwood, S. 2010. WorldView-2 Pan-Sharpening. ASPRS 2010 Annual Conference, San Diego, California (2010) pp. 26-30.
 		 
-		 Takes array of image bands, where the panchromatic band is the last band in the image and attay of statistics of the form:
+		 Takes array of image bands, where the panchromatic band is the last band in the image and array of statistics of the form:
 		 meanMS
 		 meanPAN
 		 sdMS
