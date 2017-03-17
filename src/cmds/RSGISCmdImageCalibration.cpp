@@ -293,7 +293,7 @@ namespace rsgis{ namespace cmds {
                     }
                 }
                 
-                rsgis::calib::RSGISCalculateTopOfAtmosphereReflectance calcTopAtmosRefl = rsgis::calib::RSGISCalculateTopOfAtmosphereReflectance(nImgsBands, solarIrradiance, solarDistance, solarZenith, scaleFactor);
+                rsgis::calib::RSGISCalculateRadianceFromTOAReflectance calcTopAtmosRefl = rsgis::calib::RSGISCalculateRadianceFromTOAReflectance(nImgsBands, solarIrradiance, solarDistance, solarZenith, scaleFactor);
                 rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(&calcTopAtmosRefl, "", true);
                 calcImage.calcImage(datasets, nImgsBands, outputImage, false, NULL, gdalFormat, RSGIS_to_GDAL_Type(rsgisOutDataType));
                 for(unsigned int i = 0; i < nImgsBands; ++i)
