@@ -417,6 +417,7 @@ set(LIB_IMG_H
 	${RSGIS_SRC_IMG_DIR}/RSGISImageWindowStats.h
 	${RSGIS_SRC_IMG_DIR}/RSGISFitFunction2Pxls.h
 	${RSGIS_SRC_IMG_DIR}/RSGISCalcImgValProb.h
+	${RSGIS_SRC_IMG_DIR}/RSGISApplyGainOffset2Img.h
 	)
 	
 set(LIB_IMG_CPP
@@ -557,6 +558,8 @@ set(LIB_IMG_CPP
 	${RSGIS_SRC_IMG_DIR}/RSGISFitFunction2Pxls.h
 	${RSGIS_SRC_IMG_DIR}/RSGISCalcImgValProb.cpp
 	${RSGIS_SRC_IMG_DIR}/RSGISCalcImgValProb.h
+	${RSGIS_SRC_IMG_DIR}/RSGISApplyGainOffset2Img.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISApplyGainOffset2Img.h
 	)
 ###############################################################################
 

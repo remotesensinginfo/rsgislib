@@ -52,6 +52,7 @@
 #include "img/RSGISLinearSpectralUnmixing.h"
 #include "img/RSGISGenHistogram.h"
 #include "img/RSGISCalcImgValProb.h"
+#include "img/RSGISApplyGainOffset2Img.h"
 
 #include "math/RSGISVectors.h"
 #include "math/RSGISMatrices.h"
@@ -2996,6 +2997,52 @@ namespace rsgis{ namespace cmds {
         }
         
         return outVals;
+    }
+                
+    void executeRescaleImages(std::vector<std::string> inputImgs, std::string outputImg, std::string gdalFormat, RSGISLibDataType outDataType, float cNoDataVal, float cOffset, float cGain, float nNoDataVal, float nOffset, float nGain) throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            
+            unsigned int nImgs = inputImgs.size();
+            unsigned int numBands = 0;
+            GDALDataset **datasets = new GDALDataset*[nImgs];
+            for(unsigned int i = 0; i < nImgs; ++i)
+            {
+                datasets[i] = (GDALDataset *) GDALOpen(inputImgs.at(i).c_str(), GA_ReadOnly);
+                if(datasets[i] == NULL)
+                {
+                    std::string message = std::string("Could not open image ") + inputImgs.at(i);
+                    throw rsgis::RSGISImageException(message.c_str());
+                }
+                
+                numBands = numBands + datasets[i]->GetRasterCount();
+            }
+            
+            
+            rsgis::img::RSGISRescaleImageData calcImgReScale = rsgis::img::RSGISRescaleImageData(numBands, cNoDataVal, cOffset, cGain, nNoDataVal, nOffset, nGain);
+            rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(&calcImgReScale, "", true);
+            calcImage.calcImage(datasets, nImgs, outputImg, false, NULL, gdalFormat, RSGIS_to_GDAL_Type(outDataType));
+            
+            for(unsigned int i = 0; i < nImgs; ++i)
+            {
+                GDALClose(datasets[i]);
+            }
+            delete[] datasets;
+        }
+        catch(rsgis::RSGISImageException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
     }
                 
 }}

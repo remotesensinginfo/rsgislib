@@ -1626,6 +1626,62 @@ static PyObject *ImageCalc_GetImageBandMinMax(PyObject *self, PyObject *args)
     return outList;
 }
 
+static PyObject *ImageCalc_CalcImageRescale(PyObject *self, PyObject *args)
+{
+    PyObject *pInputImgsObj;
+    const char *outputImage, *gdalFormat;
+    int datatype;
+    float cNoDataVal, cOffset, cGain, nNoDataVal, nOffset, nGain = 0.0;
+    
+    if(!PyArg_ParseTuple(args, "Ossiffffff:calcImageRescale", &pInputImgsObj, &outputImage, &gdalFormat, &datatype, &cNoDataVal, &cOffset, &cGain, &nNoDataVal, &nOffset, &nGain))
+    {
+        return NULL;
+    }
+    
+    std::vector<std::string> inputImgs;
+    if(PySequence_Check(pInputImgsObj))
+    {
+        Py_ssize_t nInputImgs = PySequence_Size(pInputImgsObj);
+        for( Py_ssize_t n = 0; n < nInputImgs; n++ )
+        {
+            PyObject *strObj = PySequence_GetItem(pInputImgsObj, n);
+            if(RSGISPY_CHECK_STRING(strObj))
+            {
+                inputImgs.push_back(RSGISPY_STRING_EXTRACT(strObj));
+            }
+            else
+            {
+                PyErr_SetString(GETSTATE(self)->error, "Input images sequence must contain a list of strings");
+                return NULL;
+            }
+        }
+    }
+    else
+    {
+        if(RSGISPY_CHECK_STRING(pInputImgsObj))
+        {
+            inputImgs.push_back(RSGISPY_STRING_EXTRACT(pInputImgsObj));
+        }
+        else
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Input images parameter must be either a single string or a sequence of strings");
+            return NULL;
+        }
+    }
+    
+    try
+    {
+        rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)datatype;
+        rsgis::cmds::executeRescaleImages(inputImgs, std::string(outputImage), std::string(gdalFormat), type, cNoDataVal, cOffset, cGain, nNoDataVal, nOffset, nGain);
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
 
 
 // Our list of functions in this module
@@ -2462,7 +2518,6 @@ static PyMethodDef ImageCalcMethods[] = {
 "* imageBand is an int specifying the image band\n"
 "* useNoDataVal is a boolean specifying whether the no data value should be used (Optional, default is False)\n"
 "* noDataVal is a string containing the GDAL format for the output file - eg 'KEA'\n"
-
 "\n"
 "Example::\n"
 "\n"
@@ -2478,6 +2533,26 @@ static PyMethodDef ImageCalcMethods[] = {
 "   \n"
 "\n"},
     
+{"calcImageRescale", ImageCalc_CalcImageRescale, METH_VARARGS,
+"imagecalc.calcImageRescale(inputImgs, outputImage, gdalFormat, datatype, cNoDataVal, cOffset, cGain, nNoDataVal, nOffset, nGain)\n"
+"A function which can take either a list of images or a single image to produce a single stacked output image.\n"
+"The image values are rescaled applying the input (current; c) gain and offset and then applying the new (n) gain"
+" and offset to the output image. Note, the nodata image value is also defined and can be changed. \n"
+"For reference gain/offset are applied as: ImgVal = (gain * DN) + offset\n"
+"\n"
+"Where:\n"
+"\n"
+"* inputImgs can be either a single input image file or a list of images to be stacked.\n"
+"* outputImage is the output image file.\n"
+"* gdalFormat output raster format (e.g., KEA)\n"
+"* datatype is an containing one of the values from rsgislib.TYPE_*\n"
+"* cNoDataVal is a float for the current (existing) no-data value for the imagery (note, all input images have the same no-data value).\n"
+"* cOffset is a float for the current offset value.\n"
+"* cGain is a float for the current gain value.\n"
+"* nNoDataVal is a float for the new no-data value for the imagery (note, all input images have the same no-data value).\n"
+"* nOffset is a float for the new offset value.\n"
+"* nGain is a float for the new gain value.\n"
+"\n"},
     
 {NULL}        /* Sentinel */
 };
