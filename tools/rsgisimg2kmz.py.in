@@ -48,5 +48,5 @@ parser.add_argument("-f", "--finite", action='store_true', default=False, help='
 # Call the parser to parse the arguments.
 args = parser.parse_args()
 
-rsgislib.tools.createKMZImg(args.input, args.output, args.bands, args.proj, args.finite)
+rsgislib.tools.createKMZImg(args.input, args.output, args.bands, args.noproj, args.finite)
 
