@@ -42,12 +42,11 @@ parser = argparse.ArgumentParser(prog='rsgisimg2kmz.py', description='''Create a
 parser.add_argument("-i", "--input", type=str, required=True, help='Input image.')
 parser.add_argument("-o", "--output", type=str, required=True, help='Output KMZ.')
 parser.add_argument("-b", "--bands", type=str, required=True, help='Comma seperated set of bands. Either single or r,g,b.')
+parser.add_argument("-n", "--noproj", action='store_false', default=True, help='Do not re-project the image to lat/long.')
+parser.add_argument("-f", "--finite", action='store_true', default=False, help='Apply a finite mask to the input image before stretching.')
 
 # Call the parser to parse the arguments.
 args = parser.parse_args()
 
-rsgislib.tools.createKMZImg(args.input, args.output, args.bands)
-
-
-
+rsgislib.tools.createKMZImg(args.input, args.output, args.bands, args.proj, args.finite)
 
