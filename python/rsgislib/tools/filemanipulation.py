@@ -39,7 +39,7 @@ def sortImgsUTM2DIRs(inputImgsDIR, fileSearchStr, outBaseDIR):
 
 
 
-def createKMZImg(inputImg, outputFile, bands):
+def createKMZImg(inputImg, outputFile, bands, reprojLatLong=True, finiteMsk=False):
     """
     A function to convert an input image to a KML/KMZ file, where the input image
     is stretched and bands sub-selected / ordered as required for visualisation.
@@ -49,6 +49,8 @@ def createKMZImg(inputImg, outputFile, bands):
     * inputImg - input image file (any format that gdal supports)
     * outputFile - output image file (extension kmz for KMZ output / kml for KML output)
     * bands - a string (comma seperated) with the bands to be selected. (e.g., '1', '1,2,3', '5,6,4')
+    * reprojLatLong - specify whether the image should be explicitly reprojected to WGS84 Lat/Long before transformation to KML.
+    * finiteMsk - specify whether the image data should be masked so all values are finite before stretching.
     
     """
     import rsgislib.imageutils
@@ -78,13 +80,28 @@ def createKMZImg(inputImg, outputFile, bands):
         sBands = []
         for strBand in bandLst:
             sBands.append(int(strBand))
-        selImgBandsImg = os.path.join(tmpDIR, baseName+'sband.kea')
+        selImgBandsImg = os.path.join(tmpDIR, baseName+'_sband.kea')
         rsgislib.imageutils.selectImageBands(inputImg, selImgBandsImg, 'KEA', rsgisUtils.getRSGISLibDataTypeFromImg(inputImg), sBands)
     
-    stretchImg = os.path.join(tmpDIR, baseName+'stretch.kea')
-    rsgislib.imageutils.stretchImage(selImgBandsImg, stretchImg, False, '', True, False, 'KEA', rsgislib.TYPE_8UINT, rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
+    img2Stch = selImgBandsImg
+    if finiteMsk:
+        finiteMskImg = os.path.join(tmpDIR, baseName+'_FiniteMsk.kea')
+        rsgislib.imageutils.genFiniteMask(selImgBandsImg, finiteMskImg, 'KEA')
+        img2Stch = os.path.join(tmpDIR, baseName+'_Msk2FiniteRegions.kea')
+        rsgislib.imageutils.maskImage(selImgBandsImg, finiteMskImg, img2Stch, 'KEA', rsgisUtils.getRSGISLibDataTypeFromImg(inputImg), 0, 0)
     
-    cmd = 'gdal_translate -of KMLSUPEROVERLAY ' + stretchImg + ' ' + outputFile
+    stretchImg = os.path.join(tmpDIR, baseName+'_stretch.kea')
+    rsgislib.imageutils.stretchImage(img2Stch, stretchImg, False, '', True, False, 'KEA', rsgislib.TYPE_8UINT, rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
+    
+    gdalInFile = stretchImg
+    if reprojLatLong:
+        latLongImg = os.path.join(tmpDIR, baseName+'_latlong.kea')
+        outWKT = os.path.join(tmpDIR, baseName+'_latlong.wkt')
+        rsgisUtils.writeList2File(['GEOGCS["WGS_1984",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.2572235630016],TOWGS84[0,0,0,0,0,0,0]],PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433],AUTHORITY["EPSG","4326"]]'], outWKT)
+        rsgislib.imageutils.reprojectImage(stretchImg, latLongImg, outWKT, gdalFormat='KEA', interp='cubic', inWKT=None, noData=0.0, outPxlRes='auto', snap2Grid=True)
+        gdalInFile = latLongImg
+    
+    cmd = 'gdal_translate -of KMLSUPEROVERLAY ' + gdalInFile + ' ' + outputFile
     print(cmd)
     try:
         subprocess.call(cmd, shell=True)
