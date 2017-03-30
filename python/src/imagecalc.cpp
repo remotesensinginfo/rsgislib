@@ -1689,6 +1689,7 @@ static PyMethodDef ImageCalcMethods[] = {
     {"bandMath", ImageCalc_BandMath, METH_VARARGS,
 "imagecalc.bandMath(outputImage, expression, gdalformat, datatype, bandDefnSeq, useExpAsbandName)\n"
 "Performs band math calculation.\n"
+"The syntax for the expression is from the muparser library ('http://muparser.beltoforion.de <http://muparser.beltoforion.de>`): `see here <http://beltoforion.de/article.php?a=muparser&hl=en&p=features&s=idPageTop>`\n.
 "\n"
 "Where:\n"
 "\n"
@@ -1712,11 +1713,17 @@ static PyMethodDef ImageCalcMethods[] = {
 "   bandDefns.append(BandDefn('b1', inFileName, 1))\n"
 "   bandDefns.append(BandDefn('b2', inFileName, 2))\n"
 "   imagecalc.bandMath(outputImage, expression, gdalformat, datatype, bandDefns)\n"
+"\n"
+"   ################## If Statement Example #########################\n"
+"   import rsgislib\n"
+"   from rsgislib import imagecalc\n"
+"   imagecalc.imageMath(in.kea, out.kea, ‘(b1==1) || (b1==2) || (b1==3)?0:1', 'KEA', rsgislib.TYPE_8UINT)\n"
 "\n"},
 
 {"imageMath", ImageCalc_ImageMath, METH_VARARGS,
 "imagecalc.imageMath(inputImage, outputImage, expression, gdalformat, datatype, useExpAsbandName)\n"
 "Performs image math calculation.\n"
+"The syntax for the expression is from the muparser library ('http://muparser.beltoforion.de <http://muparser.beltoforion.de>`): `see here <http://beltoforion.de/article.php?a=muparser&hl=en&p=features&s=idPageTop>`\n.
 "\n"
 "Where:\n"
 "\n"
