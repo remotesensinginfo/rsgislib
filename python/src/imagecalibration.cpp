@@ -938,7 +938,7 @@ static PyObject *ImageCalibration_ApplySubtractSingleOffsets(PyObject *self, PyO
     Py_RETURN_NONE;
 }
 
-static PyObject *ImageCalibration_saturatedPixelsMask(PyObject *self, PyObject *args)
+static PyObject *ImageCalibration_SaturatedPixelsMask(PyObject *self, PyObject *args)
 {
     const char *pszOutputFile, *pszGDALFormat;
     PyObject *pBandDefnObj;
@@ -1582,8 +1582,6 @@ static PyObject *ImageCalibration_CalcSolarDistance(PyObject *self, PyObject *ar
     return Py_BuildValue("f", solarDistance);
 }
 
-
-
 // Our list of functions in this module
 static PyMethodDef ImageCalibrationMethods[] = {
 {"landsat2Radiance", ImageCalibration_landsat2Radiance, METH_VARARGS,
@@ -1757,7 +1755,7 @@ static PyMethodDef ImageCalibrationMethods[] = {
 "* darkObjReflVal is a float specifying the minimum value within the reflectance value used for the dark targets used for the subtraction"
 "\n"},
 
-{"saturatedPixelsMask", ImageCalibration_saturatedPixelsMask, METH_VARARGS,
+{"saturatedPixelsMask", ImageCalibration_SaturatedPixelsMask, METH_VARARGS,
 "imagecalibration.saturatedPixelsMask(outputImage, gdalformat, bandDefnSeq)\n"
 "Creates a mask of the saturated image pixels on a per band basis.\n"
 "\n"

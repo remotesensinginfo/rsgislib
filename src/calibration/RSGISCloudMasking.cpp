@@ -1385,11 +1385,6 @@ namespace rsgis{namespace calib{
             output[0] = 0;
         }
     }
-
-    
-    
-    
-    
     
 }}
 

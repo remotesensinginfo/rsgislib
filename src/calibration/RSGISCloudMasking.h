@@ -380,9 +380,7 @@ namespace rsgis{namespace calib{
         bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
         ~RSGISExportMaskForOverPCPThreshold(){};
     };
-    
-    
-    
+        
 }}
 
 #endif
