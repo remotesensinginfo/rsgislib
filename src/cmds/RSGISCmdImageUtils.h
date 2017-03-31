@@ -164,9 +164,7 @@ namespace rsgis{ namespace cmds {
     
     /** A function to create a random sample of points within a mask - for regions with smaller number of pixels within large image */
     DllExport void executePerformRandomPxlSampleSmallPxlCount(std::string inputImage, std::string outputImage, std::string gdalFormat, std::vector<int> maskVals, unsigned long numSamples, int rndSeed) throw(RSGISCmdException);
-    
-
-    
+        
 }}
 
 

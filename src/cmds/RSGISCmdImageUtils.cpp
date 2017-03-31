@@ -2076,7 +2076,6 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-            
-    
+        
 }}
 
