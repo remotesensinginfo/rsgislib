@@ -832,7 +832,8 @@ static PyObject *ImageUtils_SelectImageBands(PyObject *self, PyObject *args)
     if( !PyArg_ParseTuple(args, "sssiO:selectImageBands", &pszInputImage, &pszOutputFile, &pszGDALFormat, &nDataType, &pImageBands))
         return NULL;
     
-    if(!PySequence_Check(pImageBands)) {
+    if(!PySequence_Check(pImageBands))
+    {
         PyErr_SetString(GETSTATE(self)->error, "Last argument must be a sequence of image bands (int)");
         return NULL;
     }
