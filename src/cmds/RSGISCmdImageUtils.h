@@ -164,7 +164,9 @@ namespace rsgis{ namespace cmds {
     
     /** A function to create a random sample of points within a mask - for regions with smaller number of pixels within large image */
     DllExport void executePerformRandomPxlSampleSmallPxlCount(std::string inputImage, std::string outputImage, std::string gdalFormat, std::vector<int> maskVals, unsigned long numSamples, int rndSeed) throw(RSGISCmdException);
-        
+    
+    /** A function to perform a pan-sharpening using a Hyperspherical Colour Space technique */
+    DllExport void executePerformHCSPanSharpen(std::string inputImage, std::string outputImage, std::string gdalFormat, RSGISLibDataType outDataType, unsigned int winSize=7, bool useNaiveMethod=false) throw(RSGISCmdException);
 }}
 
 
