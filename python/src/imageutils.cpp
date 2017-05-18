@@ -1232,7 +1232,7 @@ static PyObject *ImageUtils_GenSamplingGrid(PyObject *self, PyObject *args)
 
 static PyObject *ImageUtils_GenFiniteMask(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    static char *kwlist[] = {"inimage", "outimage", "format"};
+    static char *kwlist[] = {"inimage", "outimage", "gdalformat"};
     const char *pszInputImage = "";
     const char *pszOutputImage = "";
     const char *pszGDALFormat = "";
@@ -1258,7 +1258,7 @@ static PyObject *ImageUtils_GenFiniteMask(PyObject *self, PyObject *args, PyObje
 
 static PyObject *ImageUtils_GenValidMask(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    static char *kwlist[] = {"inimages", "outimage", "format", "nodata", NULL};
+    static char *kwlist[] = {"inimages", "outimage", "gdalformat", "nodata", NULL};
     PyObject *pInputImages;
     const char *pszOutputImage = "";
     const char *pszGDALFormat = "";
@@ -1313,7 +1313,7 @@ static PyObject *ImageUtils_GenValidMask(PyObject *self, PyObject *args, PyObjec
 
 static PyObject *ImageUtils_CombineImages2Band(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    static char *kwlist[] = {"inimages", "outimage", "format", "datatype", "nodata"};
+    static char *kwlist[] = {"inimages", "outimage", "gdalformat", "datatype", "nodata"};
     PyObject *pInputImages;
     const char *pszOutputImage = "";
     const char *pszGDALFormat = "";
@@ -1487,6 +1487,41 @@ static PyObject *ImageUtils_PerformRandomPxlSampleSmallPxlCount(PyObject *self, 
     
     Py_RETURN_NONE;
 }
+
+
+
+static PyObject *ImageUtils_PanSharpenHCS(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    static char *kwlist[] = {"inimage", "outimage", "gdalformat", "datatype", "winsize", "useNaiveMethod", NULL};
+    const char *pszInputImage = "";
+    const char *pszOutputImage = "";
+    const char *pszGDALFormat = "";
+    int nDataType;
+    unsigned int winSize = 7;
+    int useNaiveMethInt = false;
+    
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssi|Ii:panSharpenHCS", kwlist, &pszInputImage, &pszOutputImage, &pszGDALFormat, &nDataType, &winSize, &useNaiveMethInt))
+    {
+        return NULL;
+    }
+    
+    rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
+    
+    try
+    {
+        bool useNaiveMeth = (bool)useNaiveMethInt;
+        rsgis::cmds::executePerformHCSPanSharpen(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszGDALFormat), type, winSize, useNaiveMeth);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+
 
 // Our list of functions in this module
 static PyMethodDef ImageUtilsMethods[] = {
@@ -2130,14 +2165,14 @@ For example, can be used to produce monthly composite images from a stack with i
 "\n"},
 
 {"genFiniteMask", (PyCFunction)ImageUtils_GenFiniteMask, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imageutils.genFiniteMask(inimage=string, outimage=string, format=string)\n"
+"rsgislib.imageutils.genFiniteMask(inimage=string, outimage=string, gdalformat=string)\n"
 "Generate a binary image mask defining the finite image regions.\n"
 "\n"
 "Where:\n"
 "\n"
 "* inimage is a string containing the name of the input file\n"
 "* outimage is a string containing the name of the output file.\n"
-"* format is a string with the GDAL output file format.\n"
+"* gdalformat is a string with the GDAL output file format.\n"
 "\n"
 "\nExample::\n"
 "\n"
@@ -2148,14 +2183,14 @@ For example, can be used to produce monthly composite images from a stack with i
 "\n"},
     
 {"genValidMask", (PyCFunction)ImageUtils_GenValidMask, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imageutils.genValidMask(inimages=string|list, outimage=string, format=string, nodata=float)\n"
+"rsgislib.imageutils.genValidMask(inimages=string|list, outimage=string, gdalformat=string, nodata=float)\n"
 "Generate a binary image mask defining the regions which are not 'no data'.\n"
 "\n"
 "Where:\n"
 "\n"
 "* inimages can be either a string or a list containing the input file(s)\n"
 "* outimage is a string containing the name of the output file.\n"
-"* format is a string with the GDAL output file format.\n"
+"* gdalformat is a string with the GDAL output file format.\n"
 "* nodata is a float defining the no data value (Optional and default is 0.0)\n"
 "\n"
 "\nExample::\n"
@@ -2167,14 +2202,14 @@ For example, can be used to produce monthly composite images from a stack with i
 "\n"},
    
 {"combineImages2Band", (PyCFunction)ImageUtils_CombineImages2Band, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imageutils.combineImages2Band(inimages=list, outimage=string, format=string, datatype=int, nodata=float)\n"
+"rsgislib.imageutils.combineImages2Band(inimages=list, outimage=string, gdalformat=string, datatype=int, nodata=float)\n"
 "Combine images together into a single image band by excluding the no data value.\n"
 "\n"
 "Where:\n"
 "\n"
 "* inimages is a list of strings containing the names and paths of the input image files\n"
 "* outimage is a string containing the name of the output file.\n"
-"* format is a string with the GDAL output file format.\n"
+"* gdalformat is a string with the GDAL output file format.\n"
 "* datatype is an containing one of the values from rsgislib.TYPE_*\n"
 "* nodata is the no data value which will be ignored (Default is 0)\n"
 "\n"
@@ -2215,6 +2250,22 @@ For example, can be used to produce monthly composite images from a stack with i
 "* maskvals can either be a single integer value or a list of values. If a list of values is specified then the total number of points identified (numSamples x n-maskVals).\n"
 "* numSamples is the number of samples to be created within each region.\n"
 "* rndSeed is a an integer providing a seed for the random number generator. Please not that if this number is the same then the same random set of points will be generated.\n"
+"\n"},
+    
+{"panSharpenHCS", (PyCFunction)ImageUtils_PanSharpenHCS, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.panSharpenHCS(inimage=string, outimage=string, gdalformat=string, datatype=int, winsize=unsigned int, useNaiveMethod=boolean)\n"
+"A function which performs a Hyperspherical Colour Space (HSC) Pan Sharpening of an input image.\n"
+"Padwick, C., Deskevich, M., Pacifici, F., Smallwood, S. 2010. WorldView-2 Pan-Sharpening.\n"
+"ASPRS 2010 Annual Conference, San Diego, California (2010) pp. 26-30.\n"
+"\n"
+"Where:\n"
+"\n"
+"* inputImage is a string for the input file, where the single panchromatic band must be the last in the stack.\n"
+"* outputImage is a string with the name and path of the output image.\n"
+"* gdalformat is a string with the GDAL output file format.\n"
+"* datatype is an containing one of the values from rsgislib.TYPE_*\n"
+"* winsize is an optional integer, which must be an odd number, specifying the window size used for the analysis (Default = 7; Only used if useNaiveMethod=False).\n"
+"* useNaiveMethod is an optional boolean option to specify whether the naive or smart method should be used - False=Smart (Default), True=Naive Method.\n"
 "\n"},
 
     {NULL}        /* Sentinel */

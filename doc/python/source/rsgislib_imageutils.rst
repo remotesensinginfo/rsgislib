@@ -81,6 +81,11 @@ Select / Stack bands
 .. autofunction:: rsgislib.imageutils.selectImageBands
 .. autofunction:: rsgislib.imageutils.stackImageBands
 
+Sharpen Image Bands
+-------------------
+
+.. autofunction:: rsgislib.imageutils.panSharpenHCS
+
 
 Band Names
 ----------

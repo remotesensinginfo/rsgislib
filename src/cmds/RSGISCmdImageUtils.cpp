@@ -44,6 +44,7 @@
 #include "img/RSGISImageComposite.h"
 #include "img/RSGISAddBands.h"
 #include "img/RSGISSampleImage.h"
+#include "img/RSGISPanSharpen.h"
 
 #include "vec/RSGISImageTileVector.h"
 #include "vec/RSGISVectorOutputException.h"
@@ -2076,6 +2077,71 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-        
+                
+                
+                
+    void executePerformHCSPanSharpen(std::string inputImage, std::string outputImage, std::string gdalFormat, RSGISLibDataType outDataType, unsigned int winSize, bool useNaiveMethod) throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            GDALDataset *dataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+            if(dataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw RSGISImageException(message.c_str());
+            }
+            
+            int numRasterBands = dataset->GetRasterCount();
+            
+            // Calculate statistics
+            float *imageStats = new float[4];  // Set up an array to hold image stats
+            
+            std::cout << "Calculating image mean.." << std::endl;
+            rsgis::img::RSGISHCSPanSharpenCalcMeanStats panMean = rsgis::img::RSGISHCSPanSharpenCalcMeanStats(numRasterBands, imageStats);
+            rsgis::img::RSGISCalcImage calcImageMean = rsgis::img::RSGISCalcImage(&panMean, "", true);
+            calcImageMean.calcImage(&dataset, 1);
+            panMean.returnStats();
+            
+            std::cout << "Calculating image standard deviation.." << std::endl;
+            rsgis::img::RSGISHCSPanSharpenCalcSDStats panSD = rsgis::img::RSGISHCSPanSharpenCalcSDStats(numRasterBands, imageStats);
+            rsgis::img::RSGISCalcImage calcImageSD = rsgis::img::RSGISCalcImage(&panSD, "", true);
+            calcImageSD.calcImage(&dataset, 1);
+            panSD.returnStats();
+
+            
+            std::cout << "Pan sharpening.." << std::endl;
+            rsgis::img::RSGISHCSPanSharpen panSharpen = rsgis::img::RSGISHCSPanSharpen(numRasterBands - 1, imageStats);
+            rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(&panSharpen, "", true);
+            if(useNaiveMethod)
+            {
+                // naive mode
+                calcImage.calcImage(&dataset, 1, outputImage);
+            }
+            else
+            {
+                // smart mode
+                calcImage.calcImageWindowData(&dataset, 1, outputImage, winSize);
+            }
+            
+            // Tidy up
+            GDALClose(dataset);
+            delete[] imageStats;
+            
+        }
+        catch (RSGISImageException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (RSGISException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+
 }}
 
