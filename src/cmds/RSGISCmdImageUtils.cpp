@@ -2116,12 +2116,12 @@ namespace rsgis{ namespace cmds {
             if(useNaiveMethod)
             {
                 // naive mode
-                calcImage.calcImage(&dataset, 1, outputImage);
+                calcImage.calcImage(&dataset, 1, outputImage, false, NULL, gdalFormat, RSGIS_to_GDAL_Type(outDataType));
             }
             else
             {
                 // smart mode
-                calcImage.calcImageWindowData(&dataset, 1, outputImage, winSize);
+                calcImage.calcImageWindowData(&dataset, 1, outputImage, winSize, gdalFormat, RSGIS_to_GDAL_Type(outDataType));
             }
             
             // Tidy up
