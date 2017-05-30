@@ -45,12 +45,15 @@
 #include "img/RSGISAddBands.h"
 #include "img/RSGISSampleImage.h"
 #include "img/RSGISPanSharpen.h"
+#include "img/RSGISSharpenLowResImagery.h"
 
 #include "vec/RSGISImageTileVector.h"
 #include "vec/RSGISVectorOutputException.h"
 #include "vec/RSGISVectorIO.h"
 #include "vec/RSGISVectorUtils.h"
 #include "vec/RSGISPolygonData.h"
+
+#include "utils/RSGISTextUtils.h"
 
 namespace rsgis{ namespace cmds {
 
@@ -2142,6 +2145,167 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
+                
+    void executeSharpenLowResImgBands(std::string inputImage, std::string outputImage, std::vector<RSGISInitSharpenBandInfo> bandInfo, unsigned int winSize, int noDataVal, std::string gdalFormat, RSGISLibDataType outDataType) throw(RSGISCmdException)
+    {
+        try
+        {
+            rsgis::utils::RSGISTextUtils textUtils;
+            
+            GDALAllRegister();
+            GDALDataset *dataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+            if(dataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw RSGISImageException(message.c_str());
+            }
+            
+            int numRasterBands = dataset->GetRasterCount();
+            
+            rsgis::img::RSGISSharpenBandInfo *rsgisBandInfo = new rsgis::img::RSGISSharpenBandInfo[numRasterBands];
+            bool *bandFound = new bool[numRasterBands];
+            for(unsigned int i = 0; i < numRasterBands; ++i)
+            {
+                rsgisBandInfo[i].band = i+1;
+                rsgisBandInfo[i].bandName = "";
+                rsgisBandInfo[i].status = rsgis::img::rsgis_sharp_band_ignore;
+                bandFound[i] = false;
+            }
+            
+            unsigned int lowResCount = 0;
+            unsigned int highResCount = 0;
+            
+            unsigned int idx = 0;
+            for(std::vector<RSGISInitSharpenBandInfo>::iterator iterBands = bandInfo.begin(); iterBands != bandInfo.end(); ++iterBands)
+            {
+                if( ((*iterBands).band < 1) | ((*iterBands).band > numRasterBands))
+                {
+                    GDALClose(dataset);
+                    delete[] rsgisBandInfo;
+                    delete[] bandFound;
+                    std::string message = std::string("The band specified (") + textUtils.uInttostring((*iterBands).band) + std::string(") is not within the image file; note band indexing starts at 1.");
+                    throw RSGISImageException(message.c_str());
+                }
+                idx = ((*iterBands).band-1);
+                if(!bandFound[idx])
+                {
+                    rsgisBandInfo[idx].band = (*iterBands).band;
+                    rsgisBandInfo[idx].status = (rsgis::img::RSGISSharpenBandStatus) (*iterBands).status;
+                    rsgisBandInfo[idx].bandName = (*iterBands).bandName;
+                    bandFound[idx] = true;
+                    
+                    if(rsgisBandInfo[idx].status == rsgis::img::rsgis_sharp_band_lowres)
+                    {
+                        ++lowResCount;
+                    }
+                    else if(rsgisBandInfo[idx].status == rsgis::img::rsgis_sharp_band_highres)
+                    {
+                        ++highResCount;
+                    }
+                }
+                else
+                {
+                    GDALClose(dataset);
+                    delete[] rsgisBandInfo;
+                    delete[] bandFound;
+                    std::string message = std::string("The band specified (") + textUtils.uInttostring((*iterBands).band) + std::string(") is duplicated within the band info list.");
+                    throw RSGISImageException(message.c_str());
+                }
+            }
+            
+            for(unsigned int i = 0; i < numRasterBands; ++i)
+            {
+                if(!bandFound[i])
+                {
+                    std::string message = std::string("Band info has not specified been specified for band ") + textUtils.uInttostring(rsgisBandInfo[i].band) + std::string(" - info must be specified for all image bands in the input image (note, bands can be ignored).");
+                    GDALClose(dataset);
+                    delete[] rsgisBandInfo;
+                    delete[] bandFound;
+                    throw RSGISImageException(message.c_str());
+                }
+            }
+            
+            if(lowResCount == 0)
+            {
+                GDALClose(dataset);
+                delete[] rsgisBandInfo;
+                delete[] bandFound;
+                throw RSGISImageException("There must be at least 1 low resolution image band specified.");
+            }
+            else if(highResCount == 0)
+            {
+                GDALClose(dataset);
+                delete[] rsgisBandInfo;
+                delete[] bandFound;
+                throw RSGISImageException("There must be at least 1 high resolution image band specified.");
+            }
+            
+            // Calculate the image min and max values
+            rsgis::img::ImageStats **imgStats = new rsgis::img::ImageStats*[numRasterBands];
+            for(unsigned int i = 0; i < numRasterBands; ++i)
+            {
+                imgStats[i] = new rsgis::img::ImageStats();
+                imgStats[i]->min = 0.0;
+                imgStats[i]->max = 0.0;
+                imgStats[i]->mean = 0.0;
+                imgStats[i]->stddev = 0.0;
+            }
+            rsgis::img::RSGISImageStatistics imgStatsObj;
+            imgStatsObj.calcImageStatistics(&dataset, 1, imgStats, numRasterBands, false, true, false);
+            
+            double *imgMinVal = new double[numRasterBands];
+            double *imgMaxVal = new double[numRasterBands];
+            for(unsigned int i = 0; i < numRasterBands; ++i)
+            {
+                imgMinVal[i] = imgStats[i]->min;
+                imgMaxVal[i] = imgStats[i]->max;
+                delete imgStats[i];
+                std::cout << "Band " << (i+1) << " Min: " << imgMinVal[i] << " Max: " << imgMaxVal[i] << std::endl;
+            }
+            delete[] imgStats;
+            
+            // Perform image band sharpening.
+            rsgis::img::RSGISSharpenLowResBands sharpenImg = rsgis::img::RSGISSharpenLowResBands(numRasterBands, rsgisBandInfo, numRasterBands, lowResCount, highResCount, winSize, noDataVal, imgMinVal, imgMaxVal);
+            rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(&sharpenImg, "", true);
+            calcImage.calcImageWindowData(&dataset, 1, outputImage, winSize, gdalFormat, RSGIS_to_GDAL_Type(outDataType));
+            
+            // Define the output image bands names.
+            GDALDataset *outDataset = (GDALDataset *) GDALOpen(outputImage.c_str(), GA_Update);
+            if(outDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + outputImage;
+                throw RSGISImageException(message.c_str());
+            }
+            std::vector<std::string> bandNames;
+            for(unsigned int i = 0; i < numRasterBands; ++i)
+            {
+                bandNames.push_back(rsgisBandInfo[i].bandName);
+            }
+            rsgis::img::RSGISImageUtils imgUtils;
+            imgUtils.setImageBandNames(outDataset, bandNames);
+            GDALClose(outDataset);
+            
+            // Tidy up
+            GDALClose(dataset);
+            delete[] rsgisBandInfo;
+            delete[] bandFound;
+            delete[] imgMinVal;
+            delete[] imgMaxVal;
+        }
+        catch (RSGISImageException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (RSGISException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+
 
 }}
 

@@ -56,6 +56,20 @@ namespace rsgis{ namespace cmds {
         powerLaw
     };
     
+    enum RSGISInitSharpenBandStatus
+    {
+        rsgis_init_ignore = 0,
+        rsgis_init_lowres = 1,
+        rsgis_init_highres = 2
+    };
+    
+    struct DllExport RSGISInitSharpenBandInfo
+    {
+        unsigned int band;
+        RSGISInitSharpenBandStatus status;
+        std::string bandName;
+    };
+    
     /** Function to run the stretch image command */
     DllExport void executeStretchImage(std::string inputImage, std::string outputImage, bool saveOutStats, std::string outStatsFile, bool ignoreZeros, bool onePassSD, std::string gdalFormat, RSGISLibDataType outDataType, RSGISStretches stretchType, float stretchParam)throw(RSGISCmdException);
     
@@ -167,6 +181,9 @@ namespace rsgis{ namespace cmds {
     
     /** A function to perform a pan-sharpening using a Hyperspherical Colour Space technique */
     DllExport void executePerformHCSPanSharpen(std::string inputImage, std::string outputImage, std::string gdalFormat, RSGISLibDataType outDataType, unsigned int winSize=7, bool useNaiveMethod=false) throw(RSGISCmdException);
+    
+    /** A function to sharpen nn resampled lower resolution image bands using high native resolution image bands in the same stack */
+    DllExport void executeSharpenLowResImgBands(std::string inputImage, std::string outputImage, std::vector<RSGISInitSharpenBandInfo> bandInfo, unsigned int winSize, int noDataVal, std::string gdalFormat, RSGISLibDataType outDataType) throw(RSGISCmdException);
 }}
 
 

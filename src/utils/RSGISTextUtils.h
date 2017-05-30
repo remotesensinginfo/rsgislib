@@ -123,6 +123,11 @@ namespace rsgis{namespace utils{
 			std::string int32bittostring(int_fast32_t number)throw(RSGISTextException);
 			std::string int64bittostring(int_fast64_t number)throw(RSGISTextException);
             std::string sizettostring(size_t number)throw(RSGISTextException);
+            
+            std::string inttostring(int number)throw(RSGISTextException);
+            std::string uInttostring(unsigned int number)throw(RSGISTextException);
+            std::string longtostring(long number)throw(RSGISTextException);
+            std::string uLongtostring(unsigned long number)throw(RSGISTextException);
 			
 			~RSGISTextUtils();
 		};

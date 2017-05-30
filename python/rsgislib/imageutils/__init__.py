@@ -39,6 +39,26 @@ Create a list of these objects to pass to the extractZoneImageBandValues2HDF fun
         self.fileName = fileName
         self.name = name
         self.bands = bands
+        
+# define our own classes
+class SharpBandInfo(object):
+    """
+Create a list of these objects to pass to the sharpenLowResBands function
+* band - is the band number (band numbering starts at 1).
+* status - needs to be either rsgislib.SHARP_RES_IGNORE, rsgislib.SHARP_RES_LOW or rsgislib.SHARP_RES_HIGH
+           lowres bands will be sharpened using the highres bands and ignored bands 
+           will just be copied into the output image.
+* name - is a name associated with this image band - doesn't really matter what you put in here. 
+"""
+    def __init__(self, band=None, status=None, name=None):
+        """
+        * band - is the band number (band numbering starts at 1).
+        * status - needs to be either 'ignore', 'lowres' or 'highres' - lowres bands will be sharpened using the highres bands and ignored bands will just be copied into the output image.
+        * name - is a name associated with this image band - doesn't really matter what you put in here. 
+        """
+        self.band = band
+        self.status = status
+        self.name = name
 
 
 def setBandNames(inputImage, bandNames):

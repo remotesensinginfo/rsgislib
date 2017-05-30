@@ -1335,7 +1335,134 @@ namespace rsgis{namespace math{
             throw RSGISMathException(e.what());
         }
         return hist;
-   
+    }
+    
+    RSGISLinearFitVals* RSGISMathsUtils::performLinearFit(double *xData, double *yData, size_t nVals) throw(RSGISMathException)
+    {
+        RSGISLinearFitVals *fitVals = new RSGISLinearFitVals();
+        try
+        {
+            double sumy = 0;
+            double sumx = 0;
+            double sumxsqr = 0;
+            double sumxy = 0;
+            double N = nVals*nVals;
+            double ybar = 0;
+            double sumyest = 0;
+            double sumyact = 0;
+            
+            for(size_t i = 0; i < nVals; ++i)
+            {
+                sumx    += xData[i];
+                sumxsqr += xData[i]*xData[i];
+                sumy    += yData[i];
+                sumxy   += xData[i]*yData[i];
+            }
+            
+            fitVals->pvar = N*sumxsqr - sumx*sumx;
+            
+            fitVals->intercept = (sumy*sumxsqr - sumx*sumxy)/fitVals->pvar;
+            fitVals->slope     = (N*sumxy - sumx*sumy)/fitVals->pvar;
+            
+            ybar = sumy/N;
+            
+            for(size_t i = 0; i < nVals; ++i)
+            {
+                sumyest += (fitVals->slope*xData[i] + fitVals->intercept - ybar)*(fitVals->slope*xData[i] + fitVals->intercept - ybar);
+                sumyact += (yData[i] - ybar)*(yData[i] - ybar);
+            }
+            
+            fitVals->coeff = sqrt(sumyest/sumyact);
+        }
+        catch(RSGISMathException &e)
+        {
+            delete fitVals;
+            throw e;
+        }
+        catch(RSGISException &e)
+        {
+            delete fitVals;
+            throw RSGISMathException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            delete fitVals;
+            throw RSGISMathException(e.what());
+        }
+        return fitVals;
+    }
+    
+    void RSGISMathsUtils::performLinearFit(double *xData, double *yData, size_t nVals, RSGISLinearFitVals *fitVals) throw(RSGISMathException)
+    {
+        try
+        {
+            double sumy = 0;
+            double sumx = 0;
+            double sumxsqr = 0;
+            double sumxy = 0;
+            double N = nVals*nVals;
+            double ybar = 0;
+            double sumyest = 0;
+            double sumyact = 0;
+            
+            for(size_t i = 0; i < nVals; ++i)
+            {
+                sumx    += xData[i];
+                sumxsqr += xData[i]*xData[i];
+                sumy    += yData[i];
+                sumxy   += xData[i]*yData[i];
+            }
+            
+            fitVals->pvar = N*sumxsqr - sumx*sumx;
+            
+            fitVals->intercept = (sumy*sumxsqr - sumx*sumxy)/fitVals->pvar;
+            fitVals->slope     = (N*sumxy - sumx*sumy)/fitVals->pvar;
+            
+            ybar = sumy/N;
+            
+            for(size_t i = 0; i < nVals; ++i)
+            {
+                sumyest += (fitVals->slope*xData[i] + fitVals->intercept - ybar)*(fitVals->slope*xData[i] + fitVals->intercept - ybar);
+                sumyact += (yData[i] - ybar)*(yData[i] - ybar);
+            }
+            
+            fitVals->coeff = sqrt(sumyest/sumyact);
+        }
+        catch(RSGISMathException &e)
+        {
+            throw e;
+        }
+        catch(RSGISException &e)
+        {
+            throw RSGISMathException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISMathException(e.what());
+        }
+    }
+    
+    double RSGISMathsUtils::predFromLinearFit(double val, RSGISLinearFitVals *fitVals, double minAccVal, double maxAccVal) throw(RSGISMathException)
+    {
+        double outVal = 0.0;
+        
+        if(val == 0)
+        {
+            return 0.0;
+        }
+        
+        outVal = fitVals->slope*val + fitVals->intercept;
+        
+        if(outVal < minAccVal)
+        {
+            return minAccVal;
+        }
+        if(outVal > maxAccVal)
+        {
+            return maxAccVal;
+        }
+        
+        return outVal;
     }
     
 }}

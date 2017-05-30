@@ -660,6 +660,63 @@ namespace rsgis{namespace utils{
         }
 		return outValue;
     }
+    
+    
+    std::string RSGISTextUtils::inttostring(int number)throw(RSGISTextException)
+    {
+        std::string outValue = "";
+        try
+        {
+            outValue = boost::lexical_cast<std::string>(number);
+        }
+        catch(boost::bad_lexical_cast &e)
+        {
+            throw RSGISTextException(e.what());
+        }
+        return outValue;
+    }
+    
+    std::string RSGISTextUtils::uInttostring(unsigned int number)throw(RSGISTextException)
+    {
+        std::string outValue = "";
+        try
+        {
+            outValue = boost::lexical_cast<std::string>(number);
+        }
+        catch(boost::bad_lexical_cast &e)
+        {
+            throw RSGISTextException(e.what());
+        }
+        return outValue;
+    }
+    
+    std::string RSGISTextUtils::longtostring(long number)throw(RSGISTextException)
+    {
+        std::string outValue = "";
+        try
+        {
+            outValue = boost::lexical_cast<std::string>(number);
+        }
+        catch(boost::bad_lexical_cast &e)
+        {
+            throw RSGISTextException(e.what());
+        }
+        return outValue;
+    }
+    
+    std::string RSGISTextUtils::uLongtostring(unsigned long number)throw(RSGISTextException)
+    {
+        std::string outValue = "";
+        try
+        {
+            outValue = boost::lexical_cast<std::string>(number);
+        }
+        catch(boost::bad_lexical_cast &e)
+        {
+            throw RSGISTextException(e.what());
+        }
+        return outValue;
+    }
 		
 	RSGISTextUtils::~RSGISTextUtils()
 	{

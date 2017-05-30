@@ -24,6 +24,18 @@
 #ifndef RSGISSharpenLowResImagery_H
 #define RSGISSharpenLowResImagery_H
 
+#include <string>
+#include <iostream>
+
+#include "common/RSGISException.h"
+#include "common/RSGISImageException.h"
+#include "img/RSGISImageCalcException.h"
+
+#include "img/RSGISCalcImage.h"
+#include "img/RSGISCalcImageValue.h"
+
+#include "math/RSGISMathsUtils.h"
+
 // mark all exported classes/functions with DllExport to have
 // them exported by Visual Studio
 #undef DllExport
@@ -40,6 +52,55 @@
 
 namespace rsgis { namespace img {
 
+    enum RSGISSharpenBandStatus
+    {
+        rsgis_sharp_band_ignore = 0,
+        rsgis_sharp_band_lowres = 1,
+        rsgis_sharp_band_highres = 2
+    };
+    
+    struct DllExport RSGISSharpenBandInfo
+    {
+        unsigned int band;
+        RSGISSharpenBandStatus status;
+        std::string bandName;
+    };
+    
+    class DllExport RSGISSharpenLowResBands : public RSGISCalcImageValue
+    {
+    public:
+        RSGISSharpenLowResBands(int numberOutBands, RSGISSharpenBandInfo *bandInfo, unsigned int nBandInfo, unsigned int nLowResBands, unsigned int nHighResBands, unsigned int defWinSize, int noDataVal, double *imgMinVal, double *imgMaxVal);
+        void calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+        void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent)throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");}
+        void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException);
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+        ~RSGISSharpenLowResBands();
+    private:
+        rsgis::math::RSGISMathsUtils mathUtils;
+        RSGISSharpenBandInfo *bandInfo;
+        unsigned int nBandInfo;
+        unsigned int nLowResBands;
+        unsigned int nHighResBands;
+        unsigned int defWinSize;
+        unsigned int nWinPxls;
+        unsigned int winHSize;
+        double **lowResPxlVals;
+        double **highResPxlVals;
+        int noDataVal;
+        double *imgMinVal;
+        double *imgMaxVal;
+        unsigned int *lowResBandIdxs;
+        unsigned int *highResBandIdxs;
+        rsgis::math::RSGISLinearFitVals **linFits;
+    };
+    
+    
 
 }}
 

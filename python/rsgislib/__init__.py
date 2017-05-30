@@ -78,6 +78,11 @@ Methods of summerising data:
     * SUMTYPE_COUNT = 7
     * SUMTYPE_RANGE = 8
     * SUMTYPE_SUM = 9
+    
+Constants specifying how bands should be treated when sharpening (see rsgislib.imageutils)
+    * SHARP_RES_IGNORE = 0
+    * SHARP_RES_LOW = 1
+    * SHARP_RES_HIGH = 2
 
 """
 import os.path
@@ -116,7 +121,6 @@ SUMTYPE_COUNT = 7
 SUMTYPE_RANGE = 8
 SUMTYPE_SUM = 9
 
-
 METHOD_SAMPLES = 0      # as calculated by ML
 METHOD_AREA = 1         # priors set by the relative area
 METHOD_EQUAL = 2        # priors all equal
@@ -147,6 +151,10 @@ INITCLUSTER_DIAGONAL_STDDEV = 2
 INITCLUSTER_DIAGONAL_FULL_ATTACH = 3
 INITCLUSTER_DIAGONAL_STDDEV_ATTACH = 4
 INITCLUSTER_KPP = 5
+
+SHARP_RES_IGNORE = 0
+SHARP_RES_LOW = 1
+SHARP_RES_HIGH = 2
 
 def getRSGISLibVersion():
     """ Calls rsgis-config to get the version number. """

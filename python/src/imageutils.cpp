@@ -1522,6 +1522,119 @@ static PyObject *ImageUtils_PanSharpenHCS(PyObject *self, PyObject *args, PyObje
 }
 
 
+static PyObject *ImageUtils_SharpenLowResImageBands(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    static char *kwlist[] = {"inimage", "outimage", "bandinfo", "winsize", "nodata", "gdalformat", "datatype", NULL};
+    const char *pszInputImage = "";
+    const char *pszOutputImage = "";
+    PyObject *bandInfoPyObj;
+    const char *pszGDALFormat = "";
+    int nDataType;
+    unsigned int winSize;
+    int nodata;
+    
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssOIisi:sharpenLowResBands", kwlist, &pszInputImage, &pszOutputImage, &bandInfoPyObj, &winSize, &nodata, &pszGDALFormat, &nDataType))
+    {
+        return NULL;
+    }
+    
+    rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
+    
+    
+    
+    if( !PySequence_Check(bandInfoPyObj))
+    {
+        PyErr_SetString(GETSTATE(self)->error, "last argument must be a sequence");
+        return NULL;
+    }
+    
+    Py_ssize_t nBandDefns = PySequence_Size(bandInfoPyObj);
+    
+    std::vector<rsgis::cmds::RSGISInitSharpenBandInfo> bandInfo;
+    bandInfo.reserve(nBandDefns);
+    
+    for( Py_ssize_t n = 0; n < nBandDefns; n++ )
+    {
+        PyObject *o = PySequence_GetItem(bandInfoPyObj, n);
+        
+        PyObject *pBand = PyObject_GetAttrString(o, "band");
+        if( ( pBand == NULL ) || ( pBand == Py_None ) || !RSGISPY_CHECK_INT(pBand) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "could not find int attribute \'band\'" );
+            Py_DECREF(pBand);
+            Py_DECREF(o);
+            return NULL;
+        }
+        
+        PyObject *pStatus = PyObject_GetAttrString(o, "status");
+        if( ( pStatus == NULL ) || ( pStatus == Py_None ) || !RSGISPY_CHECK_INT(pStatus) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "could not find int attribute \'status\'" );
+            Py_DECREF(pStatus);
+            Py_DECREF(pBand);
+            Py_DECREF(o);
+            return NULL;
+        }
+        
+        PyObject *pName = PyObject_GetAttrString(o, "name");
+        if( ( pName == NULL ) || ( pName == Py_None ) || !RSGISPY_CHECK_STRING(pName) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'name\'" );
+            Py_DECREF(pName);
+            Py_DECREF(pStatus);
+            Py_DECREF(pBand);
+            Py_DECREF(o);
+            return NULL;
+        }
+        
+        rsgis::cmds::RSGISInitSharpenBandInfo sharpInfo = rsgis::cmds::RSGISInitSharpenBandInfo();
+        sharpInfo.band = RSGISPY_INT_EXTRACT(pBand);
+        sharpInfo.bandName = RSGISPY_STRING_EXTRACT(pName);
+        int statusInt = RSGISPY_INT_EXTRACT(pStatus);
+        if(statusInt == 0)
+        {
+            sharpInfo.status = rsgis::cmds::rsgis_init_ignore;
+        }
+        else if(statusInt == 1)
+        {
+            sharpInfo.status = rsgis::cmds::rsgis_init_lowres;
+        }
+        else if(statusInt == 2)
+        {
+            sharpInfo.status = rsgis::cmds::rsgis_init_highres;
+        }
+        else
+        {
+            PyErr_SetString(GETSTATE(self)->error, "\'status\' must have a value SHARP_RES_IGNORE, SHARP_RES_LOW or SHARP_RES_HIGH." );
+            Py_DECREF(pName);
+            Py_DECREF(pStatus);
+            Py_DECREF(pBand);
+            Py_DECREF(o);
+            return NULL;
+        }
+        bandInfo.push_back(sharpInfo);
+        
+        Py_DECREF(pName);
+        Py_DECREF(pStatus);
+        Py_DECREF(pBand);
+        Py_DECREF(o);
+    }
+    
+    try
+    {
+        rsgis::cmds::executeSharpenLowResImgBands(std::string(pszInputImage), std::string(pszOutputImage), bandInfo, winSize, nodata, std::string(pszGDALFormat), type);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+
+
 
 // Our list of functions in this module
 static PyMethodDef ImageUtilsMethods[] = {
@@ -2266,6 +2379,60 @@ For example, can be used to produce monthly composite images from a stack with i
 "* datatype is an containing one of the values from rsgislib.TYPE_*\n"
 "* winsize is an optional integer, which must be an odd number, specifying the window size used for the analysis (Default = 7; Only used if useNaiveMethod=False).\n"
 "* useNaiveMethod is an optional boolean option to specify whether the naive or smart method should be used - False=Smart (Default), True=Naive Method.\n"
+"\n"
+"\nExample::\n"
+"\n"
+"    import rsgislib\n"
+"    import rsgislib.imageutils\n"
+"\n"
+"    rsgislib.imageutils.resampleImage2Match('./14SEP03025718-P2AS-054000253010_01_P001.TIF', './14SEP03025718-M2AS-054000253010_01_P001.TIF',\n"
+"                                        './14SEP03025718-M2AS-054000253010_01_P001_resample.kea', 'KEA', 'nearestneighbour', rsgislib.TYPE_16UINT)\n"
+"\n"
+"    rsgislib.imageutils.stackImageBands(['14SEP03025718-M2AS-054000253010_01_P001_resample.kea', '14SEP03025718-P2AS-054000253010_01_P001.TIF'],\n"
+"                                         None, 'StackPanImg.kea', 0.0, 0.0, 'KEA', rsgislib.TYPE_16UINT)\n"
+"\n"
+"    rsgislib.imageutils.panSharpenHCS(inimage='StackPanImg.kea', outimage='StackPanImgSharp.kea', gdalformat='KEA', datatype=rsgislib.TYPE_16UINT)\n"
+"\n"
+"    rsgislib.imageutils.popImageStats('StackPanImgSharp.kea', usenodataval=True, nodataval=0, calcpyramids=True)\n"
+"\n"
+"\n"},
+    
+{"sharpenLowResBands", (PyCFunction)ImageUtils_SharpenLowResImageBands, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.sharpenLowResBands(inimage=string, outimage=string, bandinfo=list, winsize=unsigned int, nodata=int, gdalformat=string, datatype=int)\n"
+"A function which performs band sharpening using local linear fitting (orignal method proposed by Shepherd and Dymond).\n"
+"\n"
+"Where:\n"
+"\n"
+"* inputImage is a string for the input file where the high resolution input image bands have been resampled \n"
+"             (recommend nearest neighbour) to the same resolution has the higher resolution bands\n"
+"* outputImage is a string with the name and path of the output image.\n"
+"* bandinfo is a list of the input image bands (type: rsgislib.imageutils.SharpBandInfo) specifying the band number, name and status.\n"
+"           the status is either rsgislib.SHARP_RES_IGNORE, rsgislib.SHARP_RES_LOW or rsgislib.SHARP_RES_HIGH\n"
+"* winsize is an integer, which must be an odd number, specifying the window size (in pixels) used for the analysis (Default = 7). \n"
+"          Recommend that the window size values fits at least 9 low resolution image pixels. \n"
+"          For example, if the high resolution image is 10 m and the low 20 m then a 7 x 7 window\n"
+"          will include 12.25 low resolution pixels.\n"
+"* nodata is an integer specifying the no data value for the scene\n"
+"* gdalformat is a string with the GDAL output file format.\n"
+"* datatype is an containing one of the values from rsgislib.TYPE_*\n"
+"\n"
+"\nExample::\n"
+"\n"
+"    import rsgislib\n"
+"    import rsgislib.imageutils\n"
+"\n"
+"    bandInfo = []\n"
+"    bandInfo.append(SharpBandInfo(band=1, status=rsgislib.SHARP_RES_LOW, name='Blue'))\n"
+"    bandInfo.append(SharpBandInfo(band=2, status=rsgislib.SHARP_RES_LOW, name='Green'))\n"
+"    bandInfo.append(SharpBandInfo(band=3, status=rsgislib.SHARP_RES_LOW, name='Red'))\n"
+"    bandInfo.append(SharpBandInfo(band=4, status=rsgislib.SHARP_RES_LOW, name='NIR'))\n"
+"    bandInfo.append(SharpBandInfo(band=5, status=rsgislib.SHARP_RES_HIGH, name='PAN'))\n"
+"\n"
+"    rsgislib.imageutils.sharpenLowResBands(inputImg='./wv2/wv2_20140903_panstack.kea',\n"
+"                                           outputImg='./wv2/wv2_20140903_panstack_sharp.kea',\n"
+"                                           bandInfo=bandInfo, winSize=7, nodata=0,\n"
+"                                           gdalformat='KEA', datatype=rsgislib.UINT16)\n"
+"\n"
 "\n"},
 
     {NULL}        /* Sentinel */
