@@ -32,7 +32,6 @@ namespace rsgis { namespace img {
         this->nLowResBands = nLowResBands;
         this->nHighResBands = nHighResBands;
         this->defWinSize = defWinSize;
-        this->winHSize = (defWinSize-1)/2;
         this->noDataVal = noDataVal;
         this->imgMinVal = imgMinVal;
         this->imgMaxVal = imgMaxVal;
@@ -85,11 +84,12 @@ namespace rsgis { namespace img {
         {
             throw RSGISImageCalcException("The number of input bands and the number of band info objects must be the same.");
         }
+        unsigned int winHSize = (winSize-1)/2;
         
         bool isNoData = true;
         for(unsigned int i = 0; i < numBands; ++i)
         {
-            if((int(dataBlock[i][this->winHSize][this->winHSize])) != this->noDataVal)
+            if((int(dataBlock[i][winHSize][winHSize])) != this->noDataVal)
             {
                 isNoData = false;
             }
@@ -104,15 +104,15 @@ namespace rsgis { namespace img {
             {
                 if(this->bandInfo[i].status == rsgis_sharp_band_ignore)
                 {
-                    output[i] = dataBlock[i][this->winHSize][this->winHSize];
+                    output[i] = dataBlock[i][winHSize][winHSize];
                 }
                 else if(this->bandInfo[i].status == rsgis_sharp_band_highres)
                 {
-                    output[i] = dataBlock[i][this->winHSize][this->winHSize];
+                    output[i] = dataBlock[i][winHSize][winHSize];
                     idx = 0;
-                    for(unsigned int n = 0; n < this->defWinSize; ++n)
+                    for(unsigned int n = 0; n < winSize; ++n)
                     {
-                        for(unsigned int m = 0; m < this->defWinSize; ++m)
+                        for(unsigned int m = 0; m < winSize; ++m)
                         {
                             this->highResPxlVals[hBIdx][idx] = dataBlock[i][n][m];
                             ++idx;
@@ -123,9 +123,9 @@ namespace rsgis { namespace img {
                 else if(this->bandInfo[i].status == rsgis_sharp_band_lowres)
                 {
                     idx = 0;
-                    for(unsigned int n = 0; n < this->defWinSize; ++n)
+                    for(unsigned int n = 0; n < winSize; ++n)
                     {
-                        for(unsigned int m = 0; m < this->defWinSize; ++m)
+                        for(unsigned int m = 0; m < winSize; ++m)
                         {
                             this->lowResPxlVals[lBIdx][idx] = dataBlock[i][n][m];
                             ++idx;
@@ -154,7 +154,7 @@ namespace rsgis { namespace img {
                     linFits[j]->pvar = 0.0;
                     linFits[j]->slope = 0.0;
                     
-                    this->mathUtils.performLinearFit(this->lowResPxlVals[i], this->highResPxlVals[j], this->nWinPxls, this->linFits[j]);
+                    this->mathUtils.performLinearFit(this->highResPxlVals[j], this->lowResPxlVals[i], this->nWinPxls, this->noDataVal, this->linFits[j]);
                     if(first)
                     {
                         first = false;
@@ -170,11 +170,11 @@ namespace rsgis { namespace img {
                 
                 if( (!first) & (maxCoeff > 0.5))
                 {
-                    output[i] = this->mathUtils.predFromLinearFit(dataBlock[this->lowResBandIdxs[i]][this->winHSize][this->winHSize], this->linFits[maxHRIdx], this->imgMinVal[this->lowResBandIdxs[i]], this->imgMaxVal[this->lowResBandIdxs[i]]);
+                    output[this->lowResBandIdxs[i]] = this->mathUtils.predFromLinearFit(dataBlock[this->highResBandIdxs[maxHRIdx]][winHSize][winHSize], this->linFits[maxHRIdx], this->imgMinVal[this->lowResBandIdxs[i]], this->imgMaxVal[this->lowResBandIdxs[i]]);
                 }
                 else
                 {
-                    output[i] = dataBlock[this->lowResBandIdxs[this->lowResBandIdxs[i]]][this->winHSize][this->winHSize];
+                    output[this->lowResBandIdxs[i]] = dataBlock[this->lowResBandIdxs[i]][winHSize][winHSize];
                 }
             }
         }

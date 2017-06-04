@@ -179,8 +179,8 @@ namespace rsgis{namespace math{
             std::vector<std::pair<double, double> >* calcHistogram(std::vector<double> *data, double minVal, double maxVal, double binWidth, bool norm) throw(RSGISMathException);
             std::vector<std::vector<RSGIS2DHistBin>* >* calc2DHistogram(std::vector<double> *data1, double minVal1, double maxVal1, double binWidth1, std::vector<double> *data2, double minVal2, double maxVal2, double binWidth2, bool norm) throw(RSGISMathException);
             unsigned int* calcHistogram(double *data, size_t numVals, double binWidth, double *minVal, double *maxVal, unsigned int *numBins, bool ignoreFirstVal=false) throw(RSGISMathException);
-            RSGISLinearFitVals* performLinearFit(double *xData, double *yData, size_t nVals) throw(RSGISMathException);
-            void performLinearFit(double *xData, double *yData, size_t nVals, RSGISLinearFitVals *fitVals) throw(RSGISMathException);
+            RSGISLinearFitVals* performLinearFit(double *xData, double *yData, size_t nVals, double noDataVal) throw(RSGISMathException);
+            void performLinearFit(double *xData, double *yData, size_t nVals, double noDataVal, RSGISLinearFitVals *fitVals) throw(RSGISMathException);
             double predFromLinearFit(double val, RSGISLinearFitVals *fitVals, double minAccVal, double maxAccVal) throw(RSGISMathException);
 		};
 	

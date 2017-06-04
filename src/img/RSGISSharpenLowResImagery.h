@@ -89,7 +89,6 @@ namespace rsgis { namespace img {
         unsigned int nHighResBands;
         unsigned int defWinSize;
         unsigned int nWinPxls;
-        unsigned int winHSize;
         double **lowResPxlVals;
         double **highResPxlVals;
         int noDataVal;

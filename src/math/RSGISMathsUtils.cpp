@@ -1337,7 +1337,7 @@ namespace rsgis{namespace math{
         return hist;
     }
     
-    RSGISLinearFitVals* RSGISMathsUtils::performLinearFit(double *xData, double *yData, size_t nVals) throw(RSGISMathException)
+    RSGISLinearFitVals* RSGISMathsUtils::performLinearFit(double *xData, double *yData, size_t nVals, double noDataVal) throw(RSGISMathException)
     {
         RSGISLinearFitVals *fitVals = new RSGISLinearFitVals();
         try
@@ -1346,17 +1346,30 @@ namespace rsgis{namespace math{
             double sumx = 0;
             double sumxsqr = 0;
             double sumxy = 0;
-            double N = nVals*nVals;
+            double N = 0;
             double ybar = 0;
             double sumyest = 0;
             double sumyact = 0;
             
             for(size_t i = 0; i < nVals; ++i)
             {
-                sumx    += xData[i];
-                sumxsqr += xData[i]*xData[i];
-                sumy    += yData[i];
-                sumxy   += xData[i]*yData[i];
+                if(!((xData[i] == noDataVal) | (yData[i] == noDataVal)))
+                {
+                    sumx    += xData[i];
+                    sumxsqr += xData[i]*xData[i];
+                    sumy    += yData[i];
+                    sumxy   += xData[i]*yData[i];
+                    ++N;
+                }
+            }
+            
+            if(N < 3)
+            {
+                fitVals->pvar = 0.0;
+                fitVals->intercept = 0.0;
+                fitVals->slope = 0.0;
+                fitVals->coeff = 0.0;
+                return fitVals;
             }
             
             fitVals->pvar = N*sumxsqr - sumx*sumx;
@@ -1368,11 +1381,18 @@ namespace rsgis{namespace math{
             
             for(size_t i = 0; i < nVals; ++i)
             {
-                sumyest += (fitVals->slope*xData[i] + fitVals->intercept - ybar)*(fitVals->slope*xData[i] + fitVals->intercept - ybar);
-                sumyact += (yData[i] - ybar)*(yData[i] - ybar);
+                if(!((xData[i] == noDataVal) | (yData[i] == noDataVal)))
+                {
+                    sumyest += (fitVals->slope*xData[i] + fitVals->intercept - ybar)*(fitVals->slope*xData[i] + fitVals->intercept - ybar);
+                    sumyact += (yData[i] - ybar)*(yData[i] - ybar);
+                }
             }
             
             fitVals->coeff = sqrt(sumyest/sumyact);
+            if(boost::math::isnan(fitVals->coeff))
+            {
+                fitVals->coeff = 0.0;
+            }
         }
         catch(RSGISMathException &e)
         {
@@ -1392,7 +1412,7 @@ namespace rsgis{namespace math{
         return fitVals;
     }
     
-    void RSGISMathsUtils::performLinearFit(double *xData, double *yData, size_t nVals, RSGISLinearFitVals *fitVals) throw(RSGISMathException)
+    void RSGISMathsUtils::performLinearFit(double *xData, double *yData, size_t nVals, double noDataVal, RSGISLinearFitVals *fitVals) throw(RSGISMathException)
     {
         try
         {
@@ -1400,17 +1420,30 @@ namespace rsgis{namespace math{
             double sumx = 0;
             double sumxsqr = 0;
             double sumxy = 0;
-            double N = nVals*nVals;
+            double N = 0;
             double ybar = 0;
             double sumyest = 0;
             double sumyact = 0;
             
             for(size_t i = 0; i < nVals; ++i)
             {
-                sumx    += xData[i];
-                sumxsqr += xData[i]*xData[i];
-                sumy    += yData[i];
-                sumxy   += xData[i]*yData[i];
+                if(!((xData[i] == noDataVal) | (yData[i] == noDataVal)))
+                {
+                    sumx    += xData[i];
+                    sumxsqr += xData[i]*xData[i];
+                    sumy    += yData[i];
+                    sumxy   += xData[i]*yData[i];
+                    ++N;
+                }
+            }
+            
+            if(N < 3)
+            {
+                fitVals->pvar = 0.0;
+                fitVals->intercept = 0.0;
+                fitVals->slope = 0.0;
+                fitVals->coeff = 0.0;
+                return;
             }
             
             fitVals->pvar = N*sumxsqr - sumx*sumx;
@@ -1422,11 +1455,18 @@ namespace rsgis{namespace math{
             
             for(size_t i = 0; i < nVals; ++i)
             {
-                sumyest += (fitVals->slope*xData[i] + fitVals->intercept - ybar)*(fitVals->slope*xData[i] + fitVals->intercept - ybar);
-                sumyact += (yData[i] - ybar)*(yData[i] - ybar);
+                if(!((xData[i] == noDataVal) | (yData[i] == noDataVal)))
+                {
+                    sumyest += (fitVals->slope*xData[i] + fitVals->intercept - ybar)*(fitVals->slope*xData[i] + fitVals->intercept - ybar);
+                    sumyact += (yData[i] - ybar)*(yData[i] - ybar);
+                }
             }
             
             fitVals->coeff = sqrt(sumyest/sumyact);
+            if(boost::math::isnan(fitVals->coeff))
+            {
+                fitVals->coeff = 0.0;
+            }
         }
         catch(RSGISMathException &e)
         {

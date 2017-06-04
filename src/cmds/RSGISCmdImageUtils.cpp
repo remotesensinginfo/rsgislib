@@ -2240,6 +2240,7 @@ namespace rsgis{ namespace cmds {
                 throw RSGISImageException("There must be at least 1 high resolution image band specified.");
             }
             
+            std::cout << "Calculate the input image min and max image values per band.\n";
             // Calculate the image min and max values
             rsgis::img::ImageStats **imgStats = new rsgis::img::ImageStats*[numRasterBands];
             for(unsigned int i = 0; i < numRasterBands; ++i)
@@ -2265,6 +2266,7 @@ namespace rsgis{ namespace cmds {
             delete[] imgStats;
             
             // Perform image band sharpening.
+            std::cout << "Perform image band sharpening.\n";
             rsgis::img::RSGISSharpenLowResBands sharpenImg = rsgis::img::RSGISSharpenLowResBands(numRasterBands, rsgisBandInfo, numRasterBands, lowResCount, highResCount, winSize, noDataVal, imgMinVal, imgMaxVal);
             rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(&sharpenImg, "", true);
             calcImage.calcImageWindowData(&dataset, 1, outputImage, winSize, gdalFormat, RSGIS_to_GDAL_Type(outDataType));
@@ -2282,7 +2284,7 @@ namespace rsgis{ namespace cmds {
                 bandNames.push_back(rsgisBandInfo[i].bandName);
             }
             rsgis::img::RSGISImageUtils imgUtils;
-            imgUtils.setImageBandNames(outDataset, bandNames);
+            imgUtils.setImageBandNames(outDataset, bandNames, true);
             GDALClose(outDataset);
             
             // Tidy up

@@ -85,6 +85,8 @@ Sharpen Image Bands
 -------------------
 
 .. autofunction:: rsgislib.imageutils.panSharpenHCS
+.. autofunction:: rsgislib.imageutils.SharpBandInfo
+.. autofunction:: rsgislib.imageutils.sharpenLowResBands
 
 
 Band Names
