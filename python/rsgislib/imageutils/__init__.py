@@ -61,12 +61,13 @@ Create a list of these objects to pass to the sharpenLowResBands function
         self.name = name
 
 
-def setBandNames(inputImage, bandNames):
+def setBandNames(inputImage, bandNames, feedback=False):
     """A utility function to set band names.
 Where:
 
 * inImage is the input image
 * bandNames is a list of band names
+* feedback is a boolean specifying whether feedback will be printed to the console (True= Printed / False (default) Not Printed)
 
 Example::
 
@@ -87,7 +88,8 @@ Example::
         imgBand = dataset.GetRasterBand(band)
         # Check the image band is available
         if not imgBand is None:
-            print('Setting Band {0} to "{1}"'.format(band, bandName))
+            if feedback:
+                print('Setting Band {0} to "{1}"'.format(band, bandName))
             imgBand.SetDescription(bandName)
         else:
             raise Exception("Could not open the image band: ", band)
