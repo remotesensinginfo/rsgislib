@@ -81,14 +81,17 @@ class ClassInfoObj(object):
     * red - Red colour for visualisation (0-255)
     * green - Green colour for visualisation (0-255)
     * blue - Blue colour for visualisation (0-255)
+
     """
     def __init__(self, id=None, fileH5=None, red=None, green=None, blue=None):
         """
+
         * id - Output pixel value for this class
         * fileH5 - hdf5 file (from rsgislib.imageutils.extractZoneImageBandValues2HDF) with the training data for the class
         * red - Red colour for visualisation (0-255)
         * green - Green colour for visualisation (0-255)
         * blue - Blue colour for visualisation (0-255)
+        
         """
         self.id = id
         self.fileH5 = fileH5
@@ -112,9 +115,11 @@ class SamplesInfoObj(object):
     * red - for visualisation red value.
     * green - for visualisation green value.
     * blue - for visualisation blue value.
+
     """
     def __init__(self, className=None, classID=None, maskImg=None, maskPxlVal=None, outSampImgFile=None, numSamps=None, samplesH5File=None, red=None, green=None, blue=None):
         """
+
         * className - The name of the class
         * classID - Is the classification numeric ID (i.e., output pixel value)
         * maskImg - The input image mask from which samples are taken
@@ -125,6 +130,7 @@ class SamplesInfoObj(object):
         * red - for visualisation red value.
         * green - for visualisation green value.
         * blue - for visualisation blue value.
+
         """
         self.className = className
         self.classID = classID
@@ -148,6 +154,7 @@ The returned classifier instance will be trained using the input data.
 * classTrainInfo - list of ClassInfoObj objects which will be used to train the classifier.
 * paramSearchSampNum - the number of samples that will be randomly sampled from the training data for each class for applying the grid search (tend to use a small data sample as can take a long time). A value of 500 would use 500 samples per class.
 * gridSearch - is an instance of the sklearn.model_selection.GridSearchCV with an instance of the choosen classifier and parameters to be searched.
+
     """
     # Check h5py is available
     if not haveH5PY:
@@ -221,6 +228,7 @@ This function trains the classifier.
 
 * classTrainInfo - list of ClassInfoObj objects which will be used to train the classifier.
 * skClassifier - an instance of a parameterised scikit-learn classifier (http://scikit-learn.org/stable/supervised_learning.html)
+
     """
      # Check h5py is available
     if not haveH5PY:
@@ -385,7 +393,7 @@ Example::
     skClassifier=ExtraTreesClassifier(n_estimators=20)
     classimgutils.performPerPxlMLClassShpTrain(imageBandInfo, classInfo, outputImg='classImg.kea', gdalFormat='KEA', tmpPath='./tmp', skClassifier=skClassifier)
     
-"""
+    """
     if not haveH5PY:
         raise Exception("The h5py module is required for this function could not be imported\n\t" + h5pyErr)
     if not haveRIOS:
@@ -488,25 +496,25 @@ def _applyClassification(inParams):
 
 def performVotingClassification(skClassifiers, trainSamplesInfo, imgFileInfo, classAreaMask, classMaskPxlVal, tmpDIR, tmpImgBase, outClassImg, gdalFormat='KEA', numCores=-1):
     """
-    A function which will perform a number of classification creating a combined classification by a simple vote. 
-    The classifier parameters can be differed as a list of classifiers is provided (the length of the list is equal 
-    to the number of votes), where the training data is resampled for each classifier. The analysis can be performed
-    using multiple processing cores.
-    
-    Where:
-    
-    * skClassifiers a list of classifiers (from scikit-learn), the number of classifiers defined will be equal to the number of votes.
-    * trainSamplesInfo - a list of rsgislib.classification.classimgutils.SamplesInfoObj objects used to parameters the classifer and extract training data.
-    * imgFileInfo - a list of rsgislib.imageutils.ImageBandInfo objects (also used within rsgislib.imageutils.extractZoneImageBandValues2HDF) to identify which images and bands are to be used for the classification so it adheres to the training data. 
-    * classAreaMask - a mask image which is used to specified the areas of the scene which are to be classified.
-    * classMaskPxlVal - is the pixel value within the classAreaMask image for the areas of the image which are to be classified.
-    * tmpDIR - a temporary file location which will be created and removed during processing.
-    * tmpImgBase - the same name of files written to the tmpDIR
-    * outClassImg - the final output image file.
-    * gdalFormat - the output file format for outClassImg
-    * numCores - is the number of processing cores to be used for the analysis (if -1 then all cores on the machine will be used).
-    
-    Example::
+A function which will perform a number of classification creating a combined classification by a simple vote. 
+The classifier parameters can be differed as a list of classifiers is provided (the length of the list is equal 
+to the number of votes), where the training data is resampled for each classifier. The analysis can be performed
+using multiple processing cores.
+
+Where:
+
+* skClassifiers a list of classifiers (from scikit-learn), the number of classifiers defined will be equal to the number of votes.
+* trainSamplesInfo - a list of rsgislib.classification.classimgutils.SamplesInfoObj objects used to parameters the classifer and extract training data.
+* imgFileInfo - a list of rsgislib.imageutils.ImageBandInfo objects (also used within rsgislib.imageutils.extractZoneImageBandValues2HDF) to identify which images and bands are to be used for the classification so it adheres to the training data. 
+* classAreaMask - a mask image which is used to specified the areas of the scene which are to be classified.
+* classMaskPxlVal - is the pixel value within the classAreaMask image for the areas of the image which are to be classified.
+* tmpDIR - a temporary file location which will be created and removed during processing.
+* tmpImgBase - the same name of files written to the tmpDIR
+* outClassImg - the final output image file.
+* gdalFormat - the output file format for outClassImg
+* numCores - is the number of processing cores to be used for the analysis (if -1 then all cores on the machine will be used).
+
+Example::
     
     classVoteTemp = os.path.join(imgTmp, 'ClassVoteTemp')
     
@@ -531,6 +539,8 @@ def performVotingClassification(skClassifiers, trainSamplesInfo, imgFileInfo, cl
     
     mangroveRegionClassImg = MangroveRegionClass.kea
     classimgutils.performVotingClassification(skClassifiers, trainSamplesInfo, imgFileInfo, classWithinMask, 1, classVoteTemp, 'ClassImgSample', mangroveRegionClassImg, gdalFormat='KEA', numCores=-1)
+    
+
     """
     rsgisUtils = rsgislib.RSGISPyUtils()
     

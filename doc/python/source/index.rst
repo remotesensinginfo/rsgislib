@@ -54,6 +54,6 @@ Python documentation
 * :ref:`modindex`
 * :ref:`search`
 
-.. codeauthor:: Dr Peter Bunting <pfb@aber.ac.uk> and Daniel Clewely <daniel.clewley@gmail.com>
+.. codeauthor:: Dr Peter Bunting <pfb@aber.ac.uk> and Daniel Clewely <dac@pml.ac.uk>
 
 
