@@ -50,7 +50,6 @@ namespace rsgis{namespace vec{
 		{
             rsgis::geom::RSGISGeometry geomUtils;
 			OGRMultiPolygon *mPolygon = (OGRMultiPolygon *) feature->GetGeometryRef();
-			//cout << polygon->exportToGML() << endl;
 			geos::geom::MultiPolygon *mGEOSPolygon = vecUtils->convertOGRMultiPolygonGEOSMultiPolygon(mPolygon);
 			geomUtils.retrievePolygons(mGEOSPolygon, polygons);
 		} 

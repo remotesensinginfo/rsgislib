@@ -152,12 +152,7 @@ namespace rsgis{namespace math{
         gsl_linalg_LU_invert (coVarGSL, p, this->invCovarianceMatrix);
         gsl_permutation_free(p);
         gsl_matrix_free(coVarGSL);
-        
-        /*
-        rsgis::math::RSGISMatrices matrixUtils;
-        std::cout << "Inverse Covariance Matrix:\n";
-        matrixUtils.printGSLMatrix(invCovarianceMatrix);
-        */
+
         this->diffVals = gsl_vector_alloc(this->n);
         this->tmpVec = gsl_vector_alloc(this->n);
         

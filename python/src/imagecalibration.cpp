@@ -344,6 +344,93 @@ static PyObject *ImageCalibration_Radiance2TOARefl(PyObject *self, PyObject *arg
     Py_RETURN_NONE;
 }
 
+static PyObject *ImageCalibration_TOARefl2Radiance(PyObject *self, PyObject *args)
+{
+    const char *pszOutputFile, *pszGDALFormat;
+    int nDataType;
+    float scaleFactor, solarZenith, solarDistance;
+    PyObject *pSolarIrrObj;
+    PyObject *pInputImgsObj;
+    if( !PyArg_ParseTuple(args, "OssifffO:toaRefl2Radiance", &pInputImgsObj, &pszOutputFile, &pszGDALFormat, &nDataType, &scaleFactor, &solarDistance, &solarZenith, &pSolarIrrObj))
+    {
+        return NULL;
+    }
+    
+    // Get input image files
+    std::vector<std::string> inputImgFiles = std::vector<std::string>();
+    if(PySequence_Check(pInputImgsObj))
+    {
+        Py_ssize_t nInputImgs = PySequence_Size(pInputImgsObj);
+        for( Py_ssize_t n = 0; n < nInputImgs; n++ )
+        {
+            PyObject *strObj = PySequence_GetItem(pInputImgsObj, n);
+            if(RSGISPY_CHECK_STRING(strObj))
+            {
+                inputImgFiles.push_back(RSGISPY_STRING_EXTRACT(strObj));
+            }
+            else
+            {
+                PyErr_SetString(GETSTATE(self)->error, "Input images sequence must contain a list of strings");
+                return NULL;
+            }
+        }
+    }
+    else
+    {
+        if(RSGISPY_CHECK_STRING(pInputImgsObj))
+        {
+            inputImgFiles.push_back(RSGISPY_STRING_EXTRACT(pInputImgsObj));
+        }
+        else
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Input images parameter must be either a single string or a sequence of strings");
+            return NULL;
+        }
+    }
+    
+    if( !PySequence_Check(pSolarIrrObj))
+    {
+        PyErr_SetString(GETSTATE(self)->error, "Last argument must be a sequence");
+        return NULL;
+    }
+    
+    Py_ssize_t nSolarIrrDefns = PySequence_Size(pSolarIrrObj);
+    unsigned int numSolarIrrVals = nSolarIrrDefns;
+    float *solarIrradiance = new float[numSolarIrrVals];
+    
+    for( Py_ssize_t n = 0; n < nSolarIrrDefns; n++ )
+    {
+        PyObject *o = PySequence_GetItem(pSolarIrrObj, n);
+        
+        PyObject *pIrradiance = PyObject_GetAttrString(o, "irradiance");
+        if( ( pIrradiance == NULL ) || ( pIrradiance == Py_None ) || !RSGISPY_CHECK_FLOAT(pIrradiance) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'irradiance\'" );
+            Py_XDECREF(pIrradiance);
+            Py_DECREF(o);
+            return NULL;
+        }
+        
+        solarIrradiance[n] = RSGISPY_FLOAT_EXTRACT(pIrradiance);
+        
+        Py_DECREF(pIrradiance);
+        Py_DECREF(o);
+    }
+    
+    try
+    {
+        rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
+        rsgis::cmds::executeConvertTOARefl2Radiance(inputImgFiles, pszOutputFile, pszGDALFormat, type, scaleFactor, solarDistance, (solarZenith*(M_PI/180)), solarIrradiance, numSolarIrrVals);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 static PyObject *ImageCalibration_Apply6SCoefficentsSingleParam(PyObject *self, PyObject *args)
 {
     const char *pszInputFile, *pszOutputFile, *pszGDALFormat;
@@ -851,7 +938,7 @@ static PyObject *ImageCalibration_ApplySubtractSingleOffsets(PyObject *self, PyO
     Py_RETURN_NONE;
 }
 
-static PyObject *ImageCalibration_saturatedPixelsMask(PyObject *self, PyObject *args)
+static PyObject *ImageCalibration_SaturatedPixelsMask(PyObject *self, PyObject *args)
 {
     const char *pszOutputFile, *pszGDALFormat;
     PyObject *pBandDefnObj;
@@ -1279,8 +1366,6 @@ static PyObject *ImageCalibration_calcNadirImgViewAngle(PyObject *self, PyObject
     Py_RETURN_NONE;
 }
 
-
-
 static PyObject *ImageCalibration_CalcIrradianceElevLUT(PyObject *self, PyObject *args)
 {
     const char *pszInputDataMaskImg, *pszInputDEMFile, *pszInputIncidenceAngleImg, *pszInputSlopeImg, *pszSrefInputImage, *pszShadowMaskImg, *pszOutputFile, *pszGDALFormat;
@@ -1427,8 +1512,6 @@ static PyObject *ImageCalibration_CalcIrradianceElevLUT(PyObject *self, PyObject
     Py_RETURN_NONE;
 }
 
-
-
 static PyObject *ImageCalibration_CalcStandardisedReflectanceSD2010(PyObject *self, PyObject *args)
 {
     const char *pszInputDataMaskImg, *pszSrefInputImage, *pszInputSolarIrradiance, *pszInputIncidenceAngleImg, *pszInputExitanceAngleImg, *pszOutputFile, *pszGDALFormat;
@@ -1455,8 +1538,49 @@ static PyObject *ImageCalibration_CalcStandardisedReflectanceSD2010(PyObject *se
     Py_RETURN_NONE;
 }
 
+static PyObject *ImageCalibration_GetJulianDay(PyObject *self, PyObject *args)
+{
+    unsigned int year, month, day;
+    if( !PyArg_ParseTuple(args, "III:getJulianDay", &year, &month, &day))
+    {
+        return NULL;
+    }
+    
+    unsigned int julianDay = 0;
+    try
+    {
+        julianDay = rsgis::cmds::executeGetJulianDay(year, month, day);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    return Py_BuildValue("I", julianDay);
+}
 
-
+static PyObject *ImageCalibration_CalcSolarDistance(PyObject *self, PyObject *args)
+{
+    unsigned int julianDay;
+    if( !PyArg_ParseTuple(args, "I:calcSolarDistance", &julianDay))
+    {
+        return NULL;
+    }
+    
+    float solarDistance = 0;
+    try
+    {
+        solarDistance = rsgis::cmds::executeGetEarthSunDistance(julianDay);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    return Py_BuildValue("f", solarDistance);
+}
 
 // Our list of functions in this module
 static PyMethodDef ImageCalibrationMethods[] = {
@@ -1495,7 +1619,7 @@ static PyMethodDef ImageCalibrationMethods[] = {
 "\n"},
 
 {"radiance2TOARefl", ImageCalibration_Radiance2TOARefl, METH_VARARGS,
-"imagecalibration.radiance2TOARefl(inputFile, outputFile, gdalFormat, datatype, scaleFactor, julianDay, solarZenith, solarIrradianceVals)\n"
+"imagecalibration.radiance2TOARefl(inputFile, outputFile, gdalFormat, datatype, scaleFactor, year, month, day, solarZenith, solarIrradianceVals)\n"
 "Converts at sensor radiance values to Top of Atmosphere Reflectance.\n"
 "\n"
 "Where:\n"
@@ -1510,6 +1634,23 @@ static PyMethodDef ImageCalibrationMethods[] = {
 "* day is an int with the day of the sensor acquisition.\n"
 "* solarZenith is a a float with the solar zenith in degrees at the time of the acquisition (note 90-solarElevation = solarZenith).\n"
 "* solarIrradianceVals is a sequence of floats each with the name \'irradiance\' which is in order of the bands in the input image.\n"
+"\n"},
+
+{"toaRefl2Radiance", ImageCalibration_TOARefl2Radiance, METH_VARARGS,
+"imagecalibration.toaRefl2Radiance(inputFiles, outputFile, gdalFormat, datatype, scaleFactor, solarDistance, solarZenith, solarIrradianceVals)\n"
+"Converts at sensor (Top of Atmosphere; TOA) reflectance values to at sensor radiance.\n"
+"This is the inverse of imagecalibration.radiance2TOARefl().\n"
+"\n"
+"Where:\n"
+"\n"
+"* inputFiles can be either a single input image file with the same number of bands as the list of ESUN values or a list of single band images (same number of as the number of ESUN values).\n"
+"* outputFile is a string containing the name of the output image file\n"
+"* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+"* datatype is an containing one of the values from rsgislib.TYPE_*\n"
+"* scaleFactor is a float which can be used to scale the output pixel values (e.g., multiple by 1000), set as 1 if not wanted.\n"
+"* solarDistance is a float specifying the solar-earth distance (see imagecalibration.calcSolarDistance).\n"
+"* solarZenith is a a float with the solar zenith in degrees at the time of the acquisition (note 90-solarElevation = solarZenith).\n"
+"* solarIrradianceVals is a sequence of floats each with the name \'irradiance\' (ESUN) which is in order of the bands in the input image.\n"
 "\n"},
 
 {"apply6SCoeffSingleParam", ImageCalibration_Apply6SCoefficentsSingleParam, METH_VARARGS,
@@ -1614,7 +1755,7 @@ static PyMethodDef ImageCalibrationMethods[] = {
 "* darkObjReflVal is a float specifying the minimum value within the reflectance value used for the dark targets used for the subtraction"
 "\n"},
 
-{"saturatedPixelsMask", ImageCalibration_saturatedPixelsMask, METH_VARARGS,
+{"saturatedPixelsMask", ImageCalibration_SaturatedPixelsMask, METH_VARARGS,
 "imagecalibration.saturatedPixelsMask(outputImage, gdalformat, bandDefnSeq)\n"
 "Creates a mask of the saturated image pixels on a per band basis.\n"
 "\n"
@@ -1784,7 +1925,34 @@ static PyMethodDef ImageCalibrationMethods[] = {
 "* outIncidenceAngle is the incidence angle to which the output image is standardised to (Recommend: 0).\n"
 "* outExitanceAngle is the exitance angle to which the output image is standardised to (Recommend: 0).\n"
 "\n"},
-
+    
+{"getJulianDay", ImageCalibration_GetJulianDay, METH_VARARGS,
+"imagecalibration.getJulianDay(year, month, day)\n"
+"Calculates the julian day for the input date.\n"
+"\n"
+"Where:\n"
+"\n"
+"* year is an int with the year of the sensor acquisition.\n"
+"* month is an int with the month of the sensor acquisition.\n"
+"* day is an int with the day of the sensor acquisition.\n"
+"\n"
+"Returns:\n"
+"\n"
+"julianDay - float\n"
+"\n"},
+    
+{"calcSolarDistance", ImageCalibration_CalcSolarDistance, METH_VARARGS,
+"imagecalibration.calcSolarDistance(julianDay)\n"
+"Calculates the earth-solar distance from the given julian day.\n"
+"\n"
+"Where:\n"
+"\n"
+"* julianDay is an int with the julian day of the sensor acquisition.\n"
+"\n"
+"Returns:\n"
+"\n"
+"solarDistance - float\n"
+"\n"},
     
     {NULL}        /* Sentinel */
 };

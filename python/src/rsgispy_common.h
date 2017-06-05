@@ -84,6 +84,15 @@ inline long RSGISPY_INT_EXTRACT(PyObject *o)
 #endif
 }
 
+inline long RSGISPY_UINT_EXTRACT(PyObject *o)
+{
+#if PY_MAJOR_VERSION >= 3
+    return PyLong_AsUnsignedLong(o);
+#else
+    return PyInt_AsLong(o);
+#endif
+}
+
 inline long RSGISPY_CHECK_FLOAT(PyObject *o)
 {
 #if PY_MAJOR_VERSION >= 3

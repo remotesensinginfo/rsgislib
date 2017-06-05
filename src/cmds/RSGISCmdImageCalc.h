@@ -31,6 +31,19 @@
 #include "RSGISCmdException.h"
 #include "RSGISCmdCommon.h"
 
+// mark all exported classes/functions with DllExport to have
+// them exported by Visual Studio
+#undef DllExport
+#ifdef _MSC_VER
+    #ifdef rsgis_cmds_EXPORTS
+        #define DllExport   __declspec( dllexport )
+    #else
+        #define DllExport   __declspec( dllimport )
+    #endif
+#else
+    #define DllExport
+#endif
+
 namespace rsgis{ namespace cmds {
 
     struct DllExport VariableStruct
@@ -156,6 +169,12 @@ namespace rsgis{ namespace cmds {
     DllExport float executeCalcPropTrueExp(VariableStruct *variables, unsigned int numVars, std::string mathsExpression, std::string inValidImage, bool useValidImg) throw(RSGISCmdException);
     /** A function to calculate statistic (e.g., min) across a number of images */
     DllExport void calcMultiImgBandsStats(std::vector<std::string> inputImages, std::string outputImage, RSGISCmdsSummariseStats summaryStats, std::string gdalFormat, RSGISLibDataType outDataType, bool useNoData, float noDataVal) throw(RSGISCmdException);
+    /** A function to calculate the difference between two images */
+    DllExport void calcImageDifference(std::string inputImage1, std::string inputImage2, std::string outputImage, std::string gdalFormat, RSGISLibDataType outDataType) throw(RSGISCmdException);
+    /** A function to get the min and max image values from the input image band specified */
+    DllExport std::pair<double,double> getImageBandMinMax(std::string inputImage, unsigned int imgBand, bool useNoData=false, float noDataVal=0.0) throw(RSGISCmdException);
+    /** A function to rescale an input image(s) to use a new scale and offset */
+    DllExport void executeRescaleImages(std::vector<std::string> inputImgs, std::string outputImg, std::string gdalFormat, RSGISLibDataType outDataType, float cNoDataVal, float cOffset, float cGain, float nNoDataVal, float nOffset, float nGain) throw(RSGISCmdException);
 }}
 
 

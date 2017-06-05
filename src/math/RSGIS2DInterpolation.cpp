@@ -255,12 +255,6 @@ namespace rsgis {namespace math{
             try
             {
                 std::list<std::pair<double,RSGISInterpolatorDataPoint> > *knn = this->findKNN(eastings, northings);
-                /*for(std::list<std::pair<double,RSGISInterpolatorDataPoint> >::iterator iterK = knn->begin(); iterK != knn->end(); ++iterK)
-                {
-                    std::cout << (*iterK).first << ":\t" << (*iterK).second.value << " [" << (*iterK).second.x << "," << (*iterK).second.y << "]\n";
-                }
-                std::cout << std::endl;
-                 */
                 if(knn->size() != this->k)
                 {
                     std::cout << "this->k = " << this->k << std::endl;

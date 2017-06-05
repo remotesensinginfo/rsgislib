@@ -50,6 +50,19 @@
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
 
+// mark all exported classes/functions with DllExport to have
+// them exported by Visual Studio
+#undef DllExport
+#ifdef _MSC_VER
+    #ifdef rsgis_registration_EXPORTS
+        #define DllExport   __declspec( dllexport )
+    #else
+        #define DllExport   __declspec( dllimport )
+    #endif
+#else
+    #define DllExport
+#endif
+
 namespace rsgis{namespace reg{
     
 	class DllExport RSGISImageRegistration

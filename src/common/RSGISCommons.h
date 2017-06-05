@@ -30,14 +30,6 @@
 #include <iostream>
 #include <string>
 
-// mark all exported classes/functions with DllExport to have
-// them exported by Visual Studio
-#ifdef _WIN32
-    #define DllExport   __declspec( dllexport )
-#else
-    #define DllExport
-#endif
-
 namespace rsgis
 {
     enum RSGISLibDataType

@@ -87,11 +87,11 @@ namespace rsgis{namespace calib{
         {
             throw rsgis::img::RSGISImageCalcException("RSGISCalcNadirViewAngle: Must have only one input image band.");
         }
-        output[0] = 99999;
+        output[0] = 1000;
         int pxlVal = boost::lexical_cast<int>(bandValues[0]);
         if(pxlVal == 0)
         {
-            output[0] = 99999;
+            output[0] = 1000;
         }
         else
         {

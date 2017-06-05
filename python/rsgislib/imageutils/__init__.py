@@ -11,23 +11,9 @@ import math
 
 import numpy
 
-haveGDALPy = True
-try:
-    import osgeo.gdal as gdal
-except ImportError as gdalErr:
-    haveGDALPy = False
-
-haveOGRPy = True
-try:
-    import osgeo.ogr as ogr
-except ImportError as ogrErr:
-    haveOGRPy = False
-
-haveOSRPy = True
-try:
-    import osgeo.osr as osr
-except ImportError as osrErr:
-    haveOSRPy = False
+import osgeo.gdal as gdal
+import osgeo.ogr as ogr
+import osgeo.osr as osr
 
 haveRIOS = True
 try:
@@ -53,14 +39,36 @@ Create a list of these objects to pass to the extractZoneImageBandValues2HDF fun
         self.fileName = fileName
         self.name = name
         self.bands = bands
+        
+# define our own classes
+class SharpBandInfo(object):
+    """
+Create a list of these objects to pass to the sharpenLowResBands function.
+
+* band - is the band number (band numbering starts at 1).
+* status - needs to be either rsgislib.SHARP_RES_IGNORE, rsgislib.SHARP_RES_LOW or rsgislib.SHARP_RES_HIGH
+           lowres bands will be sharpened using the highres bands and ignored bands 
+           will just be copied into the output image.
+* name - is a name associated with this image band - doesn't really matter what you put in here. 
+"""
+    def __init__(self, band=None, status=None, name=None):
+        """
+        * band - is the band number (band numbering starts at 1).
+        * status - needs to be either 'ignore', 'lowres' or 'highres' - lowres bands will be sharpened using the highres bands and ignored bands will just be copied into the output image.
+        * name - is a name associated with this image band - doesn't really matter what you put in here. 
+        """
+        self.band = band
+        self.status = status
+        self.name = name
 
 
-def setBandNames(inputImage, bandNames):
+def setBandNames(inputImage, bandNames, feedback=False):
     """A utility function to set band names.
 Where:
 
 * inImage is the input image
 * bandNames is a list of band names
+* feedback is a boolean specifying whether feedback will be printed to the console (True= Printed / False (default) Not Printed)
 
 Example::
 
@@ -72,12 +80,6 @@ Example::
     imageutils.setBandNames(inputImage, bandNames)
     
 """
-    # Check gdal is available
-    if not haveGDALPy:
-        raise Exception("The GDAL python bindings required for this function could not be imported" + gdalErr)
-
-    print('Set band names.')
- 
     dataset = gdal.Open(inputImage, gdal.GA_Update)
     
     for i in range(len(bandNames)):
@@ -87,7 +89,8 @@ Example::
         imgBand = dataset.GetRasterBand(band)
         # Check the image band is available
         if not imgBand is None:
-            print('Setting Band {0} to "{1}"'.format(band, bandName))
+            if feedback:
+                print('Setting Band {0} to "{1}"'.format(band, bandName))
             imgBand.SetDescription(bandName)
         else:
             raise Exception("Could not open the image band: ", band)
@@ -112,10 +115,6 @@ Example::
     bandNames = imageutils.getBandNames(inputImage)
 
 """
-    # Check gdal is available
-    if not haveGDALPy:
-        raise Exception("The GDAL python bindings required for this function could not be imported" + gdalErr)
- 
     dataset = gdal.Open(inputImage, gdal.GA_Update)
     bandNames = list()
     
@@ -139,8 +138,9 @@ return::
     The rsgislib datatype enum, e.g., rsgislib.TYPE_8INT
 
 """
-    from osgeo import gdal
     raster = gdal.Open(inImg, gdal.GA_ReadOnly)
+    if raster == None:
+        raise Exception("Could not open the inImg.")
     band = raster.GetRasterBand(1)
     gdal_dtype = gdal.GetDataTypeName(band.DataType)
     raster = None
@@ -158,15 +158,88 @@ return::
 
     The rsgislib datatype enum, e.g., rsgislib.TYPE_8INT
 """
-    from osgeo import gdal
     raster = gdal.Open(inImg, gdal.GA_ReadOnly)
+    if raster == None:
+        raise Exception("Could not open the inImg.")
     band = raster.GetRasterBand(1)
     gdal_dtype = gdal.GetDataTypeName(band.DataType)
     raster = None
     return gdal_dtype
 
+def setImgThematic(imageFile):
+    """
+Set all image bands to be thematic. 
+
+* imageFile - The file for which the bands are to be set as thematic
+
+"""
+    ds = gdal.Open(imageFile, gdal.GA_Update)
+    if ds == None:
+        raise Exception("Could not open the imageFile.")
+    for bandnum in range(ds.RasterCount):
+        band = ds.GetRasterBand(bandnum + 1)
+        band.SetMetadataItem('LAYER_TYPE', 'thematic')
+    ds = None
 
 
+def hasGCPs(inImg):
+    """
+Test whether the input image has GCPs - returns boolean
+
+* inImg - input image file
+
+Return: 
+
+* boolean True - has GCPs; False - does not have GCPs
+"""
+    raster = gdal.Open(inImg, gdal.GA_ReadOnly)
+    if raster == None:
+        raise Exception("Could not open the inImg.")
+    numGCPs = raster.GetGCPCount()
+    hasGCPs = False
+    if numGCPs > 0:
+        hasGCPs = True
+    raster = None
+    return hasGCPs
+
+def copyGCPs(srcImg, destImg):
+    """
+Copy the GCPs from the srcImg to the destImg
+
+* srcImg - Raster layer with GCPs
+* destImg - Raster layer to which GCPs will be added
+    
+"""
+    srcDS = gdal.Open(srcImg, gdal.GA_ReadOnly)
+    if srcDS == None:
+        raise Exception("Could not open the srcImg.")
+    destDS = gdal.Open(destImg, gdal.GA_Update)
+    if destDS == None:
+        raise Exception("Could not open the destImg.")
+        srcDS = None
+
+    numGCPs = srcDS.GetGCPCount()
+    if numGCPs > 0:
+        gcpProj = srcDS.GetGCPProjection()
+        gcpList = srcDS.GetGCPs()
+        destDS.SetGCPs(gcpList, gcpProj)
+
+    srcDS = None
+    destDS = None
+
+def getWKTProjFromImage(inImg):
+    """
+A function which returns the WKT string representing the projection of the input image.
+
+* inImg - input image from which WKT string will be read.
+
+"""
+    rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
+    if rasterDS == None:
+        raise Exception('Could not open raster image: \'' + inImg+ '\'')
+    projStr = rasterDS.GetProjection()
+    rasterDS = None
+    return projStr
 
 def resampleImage2Match(inRefImg, inProcessImg, outImg, gdalFormat, interpMethod, datatype=None):
     """
@@ -181,12 +254,10 @@ Where:
 * interpMethod is the interpolation method used to resample the image [bilinear, lanczos, cubicspline, nearestneighbour, cubic, average, mode]
 * datatype is the rsgislib datatype of the output image (if none then it will be the same as the input file).
 
-"""
-    # Check gdal is available
-    if not haveGDALPy:
-        raise Exception("The GDAL python bindings required for this function could not be imported" + gdalErr)
-    
+"""   
     dataset = gdal.Open(inProcessImg, gdal.GA_ReadOnly)
+    if dataset == None:
+        raise Exception("Could not open the inProcessImg.")
     numBands = dataset.RasterCount
     gdalDType = dataset.GetRasterBand(1).DataType
     dataset = None
@@ -256,15 +327,7 @@ Where:
             2) 'auto' where an output resolution maintaining the image size of the input image will be used
             3) provide a floating point value for the image resolution (note. pixels will be sqaure) 
 * snap2Grid is a boolean specifying whether the TL pixel should be snapped to a multiple of the pixel resolution (Default is True).
-    """
-    # Check gdal is available
-    if not haveGDALPy:
-        raise Exception("The GDAL python bindings required for this function could not be imported" + gdalErr)
-    if not haveOGRPy:
-        raise Exception("The OGR python bindings required for this function could not be imported" + ogrErr)
-    if not haveOSRPy:
-        raise Exception("The OSR python bindings required for this function could not be imported" + osrErr)
-    
+    """    
     rsgisUtils = rsgislib.RSGISPyUtils()
     
     eResampleAlg = gdal.GRA_CubicSpline
@@ -446,10 +509,6 @@ Example::
     imageutils.subsetImgs2CommonExtent(inImagesDict, outputVector, 'KEA')
     
 """
-    # Check gdal is available
-    if not haveGDALPy:
-        raise Exception("The GDAL python bindings required for this function could not be imported: " + gdalErr)
-    import rsgislib
     import rsgislib.vectorutils
     
     inImages = []
@@ -487,26 +546,16 @@ Example::
     imageutils.subsetImgs2CommonExtent(inImagesDict, outputVector, 'KEA')
 
 """
-    # Check is glob is available.
-    try:
-        import glob
-    except ImportError as globErr:
-        raise Exception("The glob module could not be imported: " + globErr)
-    # Check gdal is available
-    if not haveGDALPy:
-        raise Exception("The GDAL python bindings required for this function could not be imported: " + gdalErr)
-    import rsgislib
+    import glob
     import os.path
         
     inImagesDict = []
     
     inputImages = glob.glob(globFindImgsStr)
-    #print(inputImages)
     if len(inputImages) == 0:
         raise Exception("No images were found using \'" + globFindImgsStr + "\'")
     
     for image in inputImages:
-        #print(image)
         dataset = gdal.Open(image, gdal.GA_ReadOnly)
         gdalDType = dataset.GetRasterBand(1).DataType
         dataset = None
@@ -529,10 +578,7 @@ Example::
             raise Exception("Data type of the input file was not recognised or known.")
             
         imgBase = os.path.splitext(os.path.basename(image))[0]
-        #print(imgBase)
         outImg = os.path.join(outDir, (imgBase+suffix+ext))
-        #print(outImg)
-        #print('\n')
         inImagesDict.append({'IN':image, 'OUT':outImg, 'TYPE':datatype})
 
     return inImagesDict
@@ -559,9 +605,6 @@ Where:
 * gdalFormat - the GDAL image file format of the output image file.
 
 """
-    if not haveGDALPy:
-        raise Exception("The GDAL python bindings required for this function could not be imported\n\t" + gdalogrErr)
-
     if not haveRIOS:
         raise Exception("The RIOS module required for this function could not be imported\n\t" + riosErr)
 
@@ -578,6 +621,170 @@ Where:
 
     applier.apply(_getXYPxlLocs, infiles, outfiles, otherargs, controls=aControls)
 
+def mergeExtractedHDF5Data(h5Files, outH5File):
+    """
+A function to merge a list of HDF files (e.g., from rsgislib.imageutils.extractZoneImageBandValues2HDF)
+with the same number of variables (i.e., columns) into a single file. For example, if class training
+regions have been sourced from multiple images. 
+
+* h5Files - a list of input files. 
+* outH5File - the output file.
+
+Example::
+
+inTrainSamples = ['MSS_CloudTrain1.h5', 'MSS_CloudTrain2.h5', 'MSS_CloudTrain3.h5']
+cloudTrainSamples = 'LandsatMSS_CloudTrainingSamples.h5'
+rsgislib.imageutils.mergeExtractedHDF5Data(inTrainSamples, cloudTrainSamples)
+"""
+    import h5py
+    
+    first = True
+    numVars = 0
+    numVals = 0
+    for h5File in h5Files:
+        fH5 = h5py.File(h5File)
+        dataShp = fH5['DATA/DATA'].shape
+        if first:
+            numVars = dataShp[1]
+            first = False
+        elif numVars is not dataShp[1]:
+            raise rsgislib.RSGISPyException("The number of variables within the inputted HDF5 files was not the same.")
+        numVals += dataShp[0]
+        fH5.close()
+    
+    dataArr = numpy.zeros([numVals, numVars], dtype=float)
+    
+    rowInit = 0
+    for h5File in h5Files:
+        fH5 = h5py.File(h5File)
+        numRows = fH5['DATA/DATA'].shape[0]
+        dataArr[rowInit:(rowInit+numRows)] = fH5['DATA/DATA']
+        rowInit += numRows
+        fH5.close()
+    
+    fH5Out = h5py.File(outH5File,'w')
+    dataGrp = fH5Out.create_group("DATA")
+    metaGrp = fH5Out.create_group("META-DATA")
+    dataGrp.create_dataset('DATA', data=dataArr, chunks=True, compression="gzip", shuffle=True)
+    describDS = metaGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
+    describDS[0] = 'Merged'.encode()
+    fH5Out.close()
+
+
+def doImagesOverlap(image1, image2):
+    """
+Function to test whether two images overlap with one another.
+
+* image1 - path to first image
+* image2 - path to second image
+
+Returns:
+
+Boolean specifying whether they overlap or not.
+
+Example::
+
+import rsgislib.imageutils
+img = "/Users/pete/Temp/LandsatStatsImgs/MSS/ClearSkyMsks/LS1MSS_19720823_lat52lon114_r24p218_osgb_clearsky.tif"
+tile = "/Users/pete/Temp/LandsatStatsImgs/MSS/RefImages/LandsatWalesRegion_60m_tile8.kea"
+
+overlap = rsgislib.imageutils.doImagesOverlap(tile, img)
+print("Images Overlap: " + str(overlap))
+"""
+    overlap = True
+    
+    img1DS = gdal.Open(image1, gdal.GA_ReadOnly)
+    if img1DS is None:
+        raise rsgislib.RSGISPyException('Could not open image: ' + image1)
+        
+    img2DS = gdal.Open(image2, gdal.GA_ReadOnly)
+    if img2DS is None:
+        raise rsgislib.RSGISPyException('Could not open image: ' + image2)
+
+    img1GeoTransform = img1DS.GetGeoTransform()
+    if img1GeoTransform is None:
+        img1DS = None
+        img2DS = None
+        raise rsgislib.RSGISPyException('Could not get geotransform: ' + image1)
+        
+    img2GeoTransform = img2DS.GetGeoTransform()
+    if img2GeoTransform is None:
+        img1DS = None
+        img2DS = None
+        raise rsgislib.RSGISPyException('Could not get geotransform: ' + image2)
+    
+    img1TLX = img1GeoTransform[0]
+    img1TLY = img1GeoTransform[3]
+    
+    img1BRX = img1GeoTransform[0] + (img1DS.RasterXSize * img1GeoTransform[1])
+    img1BRY = img1GeoTransform[3] + (img1DS.RasterYSize * img1GeoTransform[5])
+        
+    img2TLX = img2GeoTransform[0]
+    img2TLY = img2GeoTransform[3]
+    
+    img2BRX = img2GeoTransform[0] + (img2DS.RasterXSize * img2GeoTransform[1])
+    img2BRY = img2GeoTransform[3] + (img2DS.RasterYSize * img2GeoTransform[5])
+        
+    xMin = img1TLX
+    xMax = img1BRX
+    yMin = img1BRY
+    yMax = img1TLY
+    
+    if img2TLX > xMin:
+        xMin = img2TLX
+    if img2BRX < xMax:
+        xMax = img2BRX
+    if img2BRY > yMin:
+        yMin = img2BRY
+    if img2TLY < yMax:
+        yMax = img2TLY
+        
+    if xMax - xMin <= 0:
+        overlap = False
+    elif yMax - yMin <= 0:
+        overlap = False
+    
+    return overlap
+
+
+
+def _popPxlsRanVals(info, inputs, outputs, otherargs):
+    """
+    This is an internal rios function for generateRandomPxlValsImg()
+    """
+    outputs.outimage = numpy.random.random_integers(otherargs.lowVal, high=otherargs.upVal, size=inputs.inImg.shape)
+    outputs.outimage = outputs.outimage.astype(numpy.int32, copy=False)
+
+def generateRandomPxlValsImg(inputImg, outputImg, gdalFormat, lowVal, upVal):
+    """
+Function which produces a 1 band image with random values between lowVal and upVal.
+
+Where:
+
+* inputImg - the input reference image
+* outputImg - the output image file name and path (will be same dimensions as the input)
+* gdalFormat - the GDAL image file format of the output image file.
+* lowVal - lower value
+* upVal - upper value 
+
+"""
+    if not haveRIOS:
+        raise Exception("The RIOS module required for this function could not be imported\n\t" + riosErr)
+
+    infiles = applier.FilenameAssociations()
+    infiles.inImg = inputImg
+    outfiles = applier.FilenameAssociations()
+    outfiles.outimage = outputImg
+    otherargs = applier.OtherInputs()
+    otherargs.lowVal = lowVal
+    otherargs.upVal = upVal
+    aControls = applier.ApplierControls()
+    aControls.progress = cuiprogress.CUIProgressBar()
+    aControls.drivername = gdalFormat
+    aControls.omitPyramids = True
+    aControls.calcStats = False
+    
+    applier.apply(_popPxlsRanVals, infiles, outfiles, otherargs, controls=aControls)
 
 
 

@@ -87,16 +87,6 @@ namespace rsgis{ namespace classifier{
             size_t id = 1;
             for(std::map<std::string, RSGISClassInfo*>::iterator iterClasses = classes->begin(); iterClasses != classes->end(); ++iterClasses)
             {
-                /*
-                if(iterClasses->first == "")
-                {
-                    iterClasses->second->classID = 0;
-                }
-                else
-                {
-                    iterClasses->second->classID = id++;
-                }
-                */
                 if(first)
                 {
                     id = iterClasses->second->classID;

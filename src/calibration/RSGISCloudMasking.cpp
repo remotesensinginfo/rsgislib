@@ -658,12 +658,6 @@ namespace rsgis{namespace calib{
             {
                 output[0] = 0;
             }
-            
-            /*if(bandValues[snowTestIdx] == 1)
-            {
-                output[0] = 3;
-            }*/
-            
         }
         else
         {
@@ -1002,21 +996,33 @@ namespace rsgis{namespace calib{
             double histMaxVal = 0.0;
             unsigned int histNumBins = 0;
             double histBinWidth = 0.1;
-            unsigned int *hist = mathUtils.calcHistogram(bestFitBaseLine, numClumps, histBinWidth, &histMinVal, &histMaxVal, &histNumBins, true);
-            double bestFitBaseLineLowQuat = mathUtils.calcPercentile(25, histMinVal, histBinWidth, histNumBins, hist);
-            double bestFitBaseLineMedian = mathUtils.calcPercentile(50, histMinVal, histBinWidth, histNumBins, hist);
-            double bestFitBaseLineUpQuat = mathUtils.calcPercentile(75, histMinVal, histBinWidth, histNumBins, hist);
-            delete [] hist;
-            
-            for(size_t i = 1; i < numClumps; ++i)
+            unsigned int *hist = NULL;
+            bool gotHist = true;
+            try
             {
-                if(bestFitBaseLine[i] < bestFitBaseLineLowQuat)
+                hist = mathUtils.calcHistogram(bestFitBaseLine, numClumps, histBinWidth, &histMinVal, &histMaxVal, &histNumBins, true);
+            }
+            catch(rsgis::math::RSGISMathException &e)
+            {
+                gotHist = false;
+            }
+            if(gotHist)
+            {
+                double bestFitBaseLineLowQuat = mathUtils.calcPercentile(25, histMinVal, histBinWidth, histNumBins, hist);
+                double bestFitBaseLineMedian = mathUtils.calcPercentile(50, histMinVal, histBinWidth, histNumBins, hist);
+                double bestFitBaseLineUpQuat = mathUtils.calcPercentile(75, histMinVal, histBinWidth, histNumBins, hist);
+                delete [] hist;
+                
+                for(size_t i = 1; i < numClumps; ++i)
                 {
-                    bestFitBaseLine[i] = bestFitBaseLineMedian;
-                }
-                else if(bestFitBaseLine[i] > bestFitBaseLineUpQuat)
-                {
-                    bestFitBaseLine[i] = bestFitBaseLineMedian;
+                    if(bestFitBaseLine[i] < bestFitBaseLineLowQuat)
+                    {
+                        bestFitBaseLine[i] = bestFitBaseLineMedian;
+                    }
+                    else if(bestFitBaseLine[i] > bestFitBaseLineUpQuat)
+                    {
+                        bestFitBaseLine[i] = bestFitBaseLineMedian;
+                    }
                 }
             }
             attUtils.writeRealColumn(cloudsRAT, "FitBaseLineEdit", bestFitBaseLine, numClumps);
@@ -1379,11 +1385,6 @@ namespace rsgis{namespace calib{
             output[0] = 0;
         }
     }
-
-    
-    
-    
-    
     
 }}
 

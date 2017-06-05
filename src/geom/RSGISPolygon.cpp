@@ -39,9 +39,7 @@ namespace rsgis{namespace geom{
 		this->poly = poly;
 		this->point = new geos::geom::Coordinate();
 		this->poly->getCentroid(*this->point);
-		//std::cout << "Centroid = [" << this->point->x << "," << this->point->y << "]" << std::endl;
-		
-		
+				
 		if(boost::math::isnan(this->point->x) | boost::math::isnan(this->point->y))
 		{
 			if(boost::math::isnan(this->point->x))
@@ -114,7 +112,6 @@ namespace rsgis{namespace geom{
         double dist = 0.0;
         if (typeid(*pt) == typeid(RSGISPolygon))
         {
-            //std::cout << "\t Is a polygon:\n";
             RSGISPolygon *poly = dynamic_cast<RSGISPolygon*>(pt);
             dist = poly->getPolygon()->distance(this->getPolygon());
         }
@@ -124,7 +121,7 @@ namespace rsgis{namespace geom{
             dist = this->getPolygon()->distance(geosPt);
             delete geosPt;
         }
-        //std::cout << "RSGISPolygon::distance(RSGIS2DPoint *pt) dist = " << dist << std::endl;
+
         return dist;
     }
     

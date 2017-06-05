@@ -874,7 +874,7 @@ class RSGISTests:
         inputimagepaths = [clumps1,clumps2]
         gdalFormat = 'KEA'
         
-        segmentation.unionOfClumps(outputimage, gdalFormat, inputimagepaths, 0)
+        segmentation.unionOfClumps(outputimage, gdalFormat, inputimagepaths, 0, False)
 
     def testRunShepherdSegmentation(self):
         inputImage = './Rasters/injune_p142_casi_sub_utm.kea'

@@ -44,55 +44,32 @@ namespace rsgis{namespace vec{
 	void RSGISGeometryRotateAroundFixedPoint::processGeometry(OGRPoint *point) throw(RSGISVectorException)
 	{
         rsgis::math::RSGISMathsUtils mathUtils;
-		std::cout.precision(10);
-		//std::cout << "point called\n";
 		
 		double normPtx = point->getX() - fixedPt->x;
 		double normPty = point->getY() - fixedPt->y;
-		//std::cout << "NormPTx: " << normPtx << std::endl;
-		//std::cout << "NormPTy: " << normPty << std::endl;
 				
 		if(normPtx != 0 | normPty != 0)
 		{
 			double distanceX = normPtx * normPtx;
 			double distanceY = normPty * normPty;
-			
-			//std::cout << "distanceX: " << distanceX << std::endl;
-			//std::cout << "distanceY: " << distanceY << std::endl;
-			
 			double radius = sqrt((distanceX + distanceY));
-			//std::cout << "radius = " << radius << std::endl;
-			
 			double inAngle = acos(normPtx/radius);
-			//std::cout << "inAngle = " << mathUtils.radiansToDegrees(inAngle) << std::endl;
 			
 			if(normPty < 0) 
 			{
 				inAngle = (M_PI*2) - inAngle;
 			}
-			
-			//std::cout << "inAngle = " << mathUtils.radiansToDegrees(inAngle) << std::endl;
-			
 			double outAngle = inAngle + angle;
-			//std::cout << "Output Angle: " << outAngle << std::endl;
 			
 			double circleX = radius * cos(outAngle);
 			double circleY = radius * sin(outAngle);
-			
-			//std::cout << mathUtils.radiansToDegrees(outAngle) << "," << circleX << "," << circleY << "\n";
-			
+						
 			double outX = fixedPt->x + circleX;
 			double outY = fixedPt->y + circleY;
-			//std::cout << outX << "," << outY << "\n";
 
 			point->setX(outX);
 			point->setY(outY);
 		}
-		/*else
-		{
-			std::cout << "No change\n";
-			std::cout << "output: [" << point->getX() << "," << point->getY() << "]\n";
-		}*/
 	}
 	
 	void RSGISGeometryRotateAroundFixedPoint::processGeometry(OGRLineString *line) throw(RSGISVectorException)

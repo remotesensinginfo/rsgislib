@@ -208,28 +208,17 @@ namespace rsgis{namespace utils{
 	{
 		RSGISFileUtils fileUtils;
         rsgis::math::RSGISMathsUtils mathsUtils;
-		//cout << "Parsing filename: " << filename << endl;
 		this->path = fileUtils.getFileDirectoryPath(filename);
-		//cout << "Path: " << this->path << endl;
 		this->extension = fileUtils.getExtension(filename);
-		//cout << "Extension: \'" << this->extension << "\'" << endl;
 		std::string filenameNoExtension = fileUtils.getFileNameNoExtension(filename);
-		//cout << "File Name no extension: " << filenameNoExtension << endl;
 		std::string versionStr = fileUtils.getExtension(filenameNoExtension);
-		//cout << "Version (std::string): " << versionStr << endl;
 		std::string versionNumStr = versionStr.substr(2);
-		//cout << "Version Number Only (as std::string): \'" << versionNumStr << "\'" << endl;
 		this->version = mathsUtils.strtoint(versionNumStr);
-		//cout << "Version: " << this->version << endl;
 		std::string filenameNoVersion = fileUtils.getFileNameNoExtension(filenameNoExtension);
 		std::string tileStr = fileUtils.getExtension(filenameNoVersion);
-		//cout << "Tile (std::string): " << tileStr << endl;
 		this->tileNumStr = tileStr.substr(5);
-		//cout << "Tile Number Only (as std::string): \'" << tileNumStr << "\'" << endl;
 		this->tile = mathsUtils.strtoint(tileNumStr);
-		//cout << "tile: " << this->tile << endl;
 		this->start = fileUtils.getFileNameNoExtension(filenameNoVersion);
-		//cout << "Start: " << this->start << endl;
 	}
 	
 	RSGISDefiniensWorkspaceFileName::~RSGISDefiniensWorkspaceFileName()

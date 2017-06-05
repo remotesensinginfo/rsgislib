@@ -106,7 +106,7 @@ namespace rsgis{namespace calib{
                 
         if (dx == 0 && dy == 0)
         {
-            /* Flat area */
+            // Flat area
             aspect = std::numeric_limits<double>::signaling_NaN();
         }
         else if(aspect < 0)
@@ -249,7 +249,7 @@ namespace rsgis{namespace calib{
         
         if (dxAspect == 0 && dyAspect == 0)
         {
-            /* Flat area */
+            // Flat area
             aspect = std::numeric_limits<double>::signaling_NaN();
         }
         
@@ -563,7 +563,7 @@ namespace rsgis{namespace calib{
             
             if (dxAspect == 0 && dyAspect == 0)
             {
-                /* Flat area */
+                // Flat area
                 aspect = std::numeric_limits<double>::signaling_NaN();
             }
             
@@ -664,7 +664,7 @@ namespace rsgis{namespace calib{
             
             if (dxAspect == 0 && dyAspect == 0)
             {
-                /* Flat area */
+                // Flat area
                 aspect = 0;
             }
             
@@ -771,7 +771,7 @@ namespace rsgis{namespace calib{
             
             if (dxAspect == 0 && dyAspect == 0)
             {
-                /* Flat area */
+                // Flat area 
                 aspect = std::numeric_limits<double>::signaling_NaN();
             }
             

@@ -30,6 +30,19 @@
 #include "common/RSGISCommons.h"
 #include "RSGISCmdException.h"
 
+// mark all exported classes/functions with DllExport to have
+// them exported by Visual Studio
+#undef DllExport
+#ifdef _MSC_VER
+    #ifdef rsgis_cmds_EXPORTS
+        #define DllExport   __declspec( dllexport )
+    #else
+        #define DllExport   __declspec( dllimport )
+    #endif
+#else
+    #define DllExport
+#endif
+
 namespace rsgis{ namespace cmds {
     
     enum RSGISStretches
@@ -41,6 +54,20 @@ namespace rsgis{ namespace cmds {
         exponential,
         logarithmic,
         powerLaw
+    };
+    
+    enum RSGISInitSharpenBandStatus
+    {
+        rsgis_init_ignore = 0,
+        rsgis_init_lowres = 1,
+        rsgis_init_highres = 2
+    };
+    
+    struct DllExport RSGISInitSharpenBandInfo
+    {
+        unsigned int band;
+        RSGISInitSharpenBandStatus status;
+        std::string bandName;
     };
     
     /** Function to run the stretch image command */
@@ -149,8 +176,14 @@ namespace rsgis{ namespace cmds {
     /** A function to create a random sample of points within a mask */
     DllExport void executePerformRandomPxlSample(std::string inputImage, std::string outputImage, std::string gdalFormat, std::vector<int> maskVals, unsigned long numSamples) throw(RSGISCmdException);
     
-
+    /** A function to create a random sample of points within a mask - for regions with smaller number of pixels within large image */
+    DllExport void executePerformRandomPxlSampleSmallPxlCount(std::string inputImage, std::string outputImage, std::string gdalFormat, std::vector<int> maskVals, unsigned long numSamples, int rndSeed) throw(RSGISCmdException);
     
+    /** A function to perform a pan-sharpening using a Hyperspherical Colour Space technique */
+    DllExport void executePerformHCSPanSharpen(std::string inputImage, std::string outputImage, std::string gdalFormat, RSGISLibDataType outDataType, unsigned int winSize=7, bool useNaiveMethod=false) throw(RSGISCmdException);
+    
+    /** A function to sharpen nn resampled lower resolution image bands using high native resolution image bands in the same stack */
+    DllExport void executeSharpenLowResImgBands(std::string inputImage, std::string outputImage, std::vector<RSGISInitSharpenBandInfo> bandInfo, unsigned int winSize, int noDataVal, std::string gdalFormat, RSGISLibDataType outDataType) throw(RSGISCmdException);
 }}
 
 

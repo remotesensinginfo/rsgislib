@@ -14,11 +14,24 @@
 
 using namespace std;
 
+// mark all exported classes/functions with DllExport to have
+// them exported by Visual Studio
+#undef DllExport
+#ifdef _MSC_VER
+    #ifdef rsgis_datastruct_EXPORTS
+        #define DllExport   __declspec( dllexport )
+    #else
+        #define DllExport   __declspec( dllimport )
+    #endif
+#else
+    #define DllExport
+#endif
+
 namespace rsgis 
 {
 	namespace datastruct
 	{
-		class RSGISGraphException : public RSGISException
+		class DllExport RSGISGraphException : public RSGISException
 			{
 			public:
 				RSGISGraphException();

@@ -112,17 +112,6 @@ namespace rsgis{namespace segment{
                 throw rsgis::img::RSGISImageCalcException("The number of categories generated is not what was expected.");
             }
             
-            /*
-            for(unsigned int c = 0; c < numCats; ++c)
-            {
-                std::cout << "Category " << c+1 << ":\n";
-                for(unsigned int n = 0; n < numBands; ++n)
-                {
-                    std::cout << "\tB" << n+1 << ": " << catThresholds[n]->at(c).first << " - " << catThresholds[n]->at(c).second << "\n";
-                }
-            }
-            */
-            
             std::cout << "Applying to output image\n";
             this->assignToCategory(inData, outImageDataset, catThresholds, numBands, numCats, noDataVal, noDataValProvided);
             

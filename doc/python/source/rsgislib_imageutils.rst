@@ -19,6 +19,7 @@ Projection
 .. autofunction:: rsgislib.imageutils.copySpatialAndProjFromImage
 .. autofunction:: rsgislib.imageutils.resampleImage2Match
 .. autofunction:: rsgislib.imageutils.reprojectImage
+.. autofunction:: rsgislib.imageutils.getWKTProjFromImage
 
 Mosaic
 ----------
@@ -62,7 +63,9 @@ Extract
 .. autofunction:: rsgislib.imageutils.ImageBandInfo
 .. autofunction:: rsgislib.imageutils.extractZoneImageValues2HDF
 .. autofunction:: rsgislib.imageutils.extractZoneImageBandValues2HDF
+.. autofunction:: rsgislib.imageutils.mergeExtractedHDF5Data
 .. autofunction:: rsgislib.imageutils.performRandomPxlSampleInMask
+.. autofunction:: rsgislib.imageutils.performRandomPxlSampleInMaskLowPxlCount
 
 
 Create
@@ -77,6 +80,13 @@ Select / Stack bands
 
 .. autofunction:: rsgislib.imageutils.selectImageBands
 .. autofunction:: rsgislib.imageutils.stackImageBands
+
+Sharpen Image Bands
+-------------------
+
+.. autofunction:: rsgislib.imageutils.panSharpenHCS
+.. autofunction:: rsgislib.imageutils.SharpBandInfo
+.. autofunction:: rsgislib.imageutils.sharpenLowResBands
 
 
 Band Names
@@ -99,6 +109,10 @@ Other
 .. autofunction:: rsgislib.imageutils.orderImageUsingValidPxls
 .. autofunction:: rsgislib.imageutils.genSamplingGrid
 .. autofunction:: rsgislib.imageutils.calcPixelLocations
+.. autofunction:: rsgislib.imageutils.hasGCPs
+.. autofunction:: rsgislib.imageutils.copyGCPs
+.. autofunction:: rsgislib.imageutils.setImgThematic
+.. autofunction:: rsgislib.imageutils.doImagesOverlap
 
 
 * :ref:`genindex`

@@ -41,7 +41,6 @@ namespace rsgis{namespace vec{
 	
 	void RSGISIntValuePolygonReader::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
 	{
-		//cout << "FID: " << fid << endl;
 		// Set up the Species Polygon object and add to Delunay triangulation.
 		
 		
@@ -72,7 +71,6 @@ namespace rsgis{namespace vec{
 			
             rsgis::geom::RSGISGeometry geomUtils;
 			OGRMultiPolygon *mPolygon = (OGRMultiPolygon *) feature->GetGeometryRef();
-			//cout << polygon->exportToGML() << endl;
 			geos::geom::MultiPolygon *mGEOSPolygon = vecUtils->convertOGRMultiPolygonGEOSMultiPolygon(mPolygon);
             std::vector<geos::geom::Polygon*> *polys = new std::vector<geos::geom::Polygon*>();
 			geomUtils.retrievePolygons(mGEOSPolygon, polys);

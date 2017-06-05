@@ -498,7 +498,7 @@ class RSGISPrewittYFilter(RSGISAbstractFilter):
 class RSGISGaussianSmoothFilter(RSGISAbstractFilter):
     """ A class to apply a Gaussian smoothing filter """
 
-    def __init__(self, filterSize, stddevX, stddevY, filterAngle, gdalformat, datatype):
+    def __init__(self, filterSize, stddevX, stddevY, filterAngle, gdalformat, dataType):
         self.filterSize = filterSize
         self.stddevX = stddevX
         self.stddevY = stddevY
@@ -518,7 +518,7 @@ class RSGISGaussianSmoothFilter(RSGISAbstractFilter):
 class RSGISGaussian1stDerivFilter(RSGISAbstractFilter):
     """ A class to apply a Gaussian first derivative filter """
 
-    def __init__(self, filterSize, stddevX, stddevY, filterAngle, gdalformat, datatype):
+    def __init__(self, filterSize, stddevX, stddevY, filterAngle, gdalformat, dataType):
         self.filterSize = filterSize
         self.stddevX = stddevX
         self.stddevY = stddevY
@@ -538,7 +538,7 @@ class RSGISGaussian1stDerivFilter(RSGISAbstractFilter):
 class RSGISGaussian2ndDerivFilter(RSGISAbstractFilter):
     """ A class to apply a Gaussian second derivative filter """
 
-    def __init__(self, filterSize, stddevX, stddevY, filterAngle, gdalformat, datatype):
+    def __init__(self, filterSize, stddevX, stddevY, filterAngle, gdalformat, dataType):
         self.filterSize = filterSize
         self.stddevX = stddevX
         self.stddevY = stddevY
@@ -557,7 +557,7 @@ class RSGISGaussian2ndDerivFilter(RSGISAbstractFilter):
 class RSGISLaplacianFilter(RSGISAbstractFilter):
     """ A class to apply a Laplacian filter """
 
-    def __init__(self, filterSize, stddev, gdalformat, datatype):
+    def __init__(self, filterSize, stddev, gdalformat, dataType):
         self.filterSize = filterSize
         self.stddev = stddev
         self.gdalformat = gdalformat
@@ -575,7 +575,7 @@ class RSGISLaplacianFilter(RSGISAbstractFilter):
 class RSGISLeeFilter(RSGISAbstractFilter):
     """ A class to apply a SAR Lee filter """
 
-    def __init__(self, filterSize, nLooks, gdalformat, datatype):
+    def __init__(self, filterSize, nLooks, gdalformat, dataType):
         self.filterSize = filterSize
         self.nLooks = nLooks
         self.gdalformat = gdalformat
@@ -653,7 +653,7 @@ Example::
     
     tileOverlap = filterInst.getFilterHSize()
     
-    imageutils.createTiles(inputImg, tilesImgBase, width, height, tileOverlap, False, 'KEA', rsgisUtils.getRSGISLibDataTypeFromImg(inputImg), 'kea')
+    imageutils.createTiles(inputImg, tilesImgBase, int(width), int(height), int(tileOverlap), False, 'KEA', rsgisUtils.getRSGISLibDataTypeFromImg(inputImg), 'kea')
     imageTiles = glob.glob(tilesImgBase+"*.kea")    
     
     filterImgsVals = []

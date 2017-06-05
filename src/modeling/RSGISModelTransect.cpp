@@ -84,17 +84,10 @@ namespace rsgis{ namespace modeling  {
 					 */
 					int xOffset = treePosXDistro->calcRand();
 					int yOffset = treePosYDistro->calcRand();
-					
-					//cout << "xOffset = " << xOffset << endl;
-					
-					//unsigned int centerX = (t * subQuadSize) + (subQuadSize / 2) + xOffset;
-					//unsigned int centerY = (i * quadratSizeVox) + (quadratSizeVox / 2) + yOffset;
-					
+										
 					unsigned int centerX = (i * quadratSizeVox) + (quadratSizeVox / 2) + xOffset;
 					unsigned int centerY = (j * quadratSizeVox) + ((subQuadSize * t) / 2) + yOffset;
-					
-					//cout << "Tree Position = (" << centerX << ", " << centerY << ")" << endl;
-					
+										
 					if (centerX >= transectWidth) 
 					{
 						centerX = (i * quadratSizeVox) + (quadratSizeVox / 2);

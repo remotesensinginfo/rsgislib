@@ -37,78 +37,27 @@
 
 #include "img/RSGISImageCalcException.h"
 #include "img/RSGISImageUtils.h"
-//#include "rastergis/RSGISHierarchicalClumps.h"
 
 #include "gdal_priv.h"
 #include "ogrsf_frmts.h"
 #include "ogr_api.h"
 
+// mark all exported classes/functions with DllExport to have
+// them exported by Visual Studio
+#undef DllExport
+#ifdef _MSC_VER
+    #ifdef rsgis_segmentation_EXPORTS
+        #define DllExport   __declspec( dllexport )
+    #else
+        #define DllExport   __declspec( dllimport )
+    #endif
+#else
+    #define DllExport
+#endif
+
 namespace rsgis{namespace segment{
-/*
-    struct DllExport RSGISRegionGrowPxlSeeds
-    {
-        RSGISRegionGrowPxlSeeds()
-        {
-            
-        }
-        RSGISRegionGrowPxlSeeds(unsigned long fid, unsigned int xPxl, unsigned int yPxl)
-        {
-            this->fid = fid;
-            this->xPxl = xPxl;
-            this->yPxl = yPxl;
-        }
-        unsigned long fid;
-        unsigned int xPxl;
-        unsigned int yPxl;
-    };
+
     
-    
-    class DllExport RSGISRegionGrowSegmentsPixels
-    {
-    public:
-        RSGISRegionGrowSegmentsPixels(GDALDataset *inRefl, GDALDataset *outDataset)throw(rsgis::RSGISImageException);
-        void performRegionGrowing(std::vector<RSGISRegionGrowPxlSeeds> *seeds, float threshold)throw(rsgis::img::RSGISImageCalcException);
-        void performRegionGrowing(std::vector<RSGISRegionGrowPxlSeeds> *seeds, float initThreshold, float thresholdIncrements, float maxThreshold, unsigned int maxIterations)throw(rsgis::img::RSGISImageCalcException);
-        void growSeed(RSGISRegionGrowPxlSeeds *seed, float threshold)throw(rsgis::img::RSGISImageCalcException);
-        void growSeed(RSGISRegionGrowPxlSeeds *seed, float initThreshold, float thresholdIncrements, float maxThreshold, unsigned int maxNumPixels)throw(rsgis::img::RSGISImageCalcException);
-        static std::vector<RSGISRegionGrowPxlSeeds>* parseSeedsText(std::string inFile) throw(rsgis::utils::RSGISTextException);
-        ~RSGISRegionGrowSegmentsPixels();
-    private:
-        double eucDistance(float *vals1, float *vals2, unsigned int numVals)
-        {
-            double sqSum = 0;
-            for(unsigned int i = 0; i < numVals; ++i)
-            {
-                sqSum += (vals1[i] - vals2[i])*(vals1[i] - vals2[i]);
-            }
-            
-            return sqrt(sqSum)/numVals;
-        }
-        GDALDataset *inRefl;
-        GDALDataset *outDataset;
-        unsigned int width;
-        unsigned int height;
-        unsigned int numSpecBands;
-        
-        GDALRasterBand **spectralBands;
-        GDALRasterBand *outBand;
-        float *specPxlSumVals;
-        float *specPxlMeanVals;
-        unsigned int numPxls;
-        float *specCPxlVals;
-        
-        bool **mask;
-    };
-    
-    
-    class DllExport RSGISFindRegionGrowingSeeds
-    {
-    public:
-        RSGISFindRegionGrowingSeeds();
-        std::vector<RSGISRegionGrowPxlSeeds>* findSeeds(GDALDataset *inRefl, GDALDataset *clumps, std::vector<rsgis::rastergis::RSGISSubClumps*> *regions)throw(rsgis::img::RSGISImageCalcException);
-        ~RSGISFindRegionGrowingSeeds();
-    };
-    */
 }}
 
 #endif

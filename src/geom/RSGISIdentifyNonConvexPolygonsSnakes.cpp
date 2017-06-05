@@ -120,18 +120,13 @@ namespace rsgis{namespace geom{
 			std::cout << "Retrieve Polygons from image pixels\n";
 			std::vector<geos::geom::Polygon*> *pxlPolys = new std::vector<geos::geom::Polygon*>();
 			this->populatePixelPolygons(imageDist, resolution*2, pxlPolys);
-			
-			//RSGISGeomTestExport exportGeom;
-			//exportGeom.exportGEOSPolygons2SHP("/Users/pete/Temp/pixelpolys.shp", true, pxlPolys);
-			
+						
 			std::cout << "Merge touching Polygons.\n";
 			geomUtils.mergeTouchingPolygonsWithIndex(pxlPolys);
-			//exportGeom.exportGEOSPolygons2SHP("/Users/pete/Temp/pixelpoly_merged.shp", true, pxlPolys);
 			
 			int bufferIterations = 0;
 			while(pxlPolys->size() > 1)
 			{
-                //std::cout << "Buffering " << bufferIterations << " pxlPolys->size() = " << pxlPolys->size() << std::endl;
 				geomUtils.performMorphologicalOperation(pxlPolys, dilation, resolution, 6);
 				geomUtils.mergeTouchingPolygonsForce(pxlPolys);
 				++bufferIterations;
@@ -140,7 +135,6 @@ namespace rsgis{namespace geom{
 					break;
 				}
 			}
-			//exportGeom.exportGEOSPolygons2SHP("/Users/pete/Temp/pixelpoly_merged_single.shp", true, pxlPolys);
             
 			geos::geom::Envelope *imgBoundary = new geos::geom::Envelope();
 			int imgWidth = imageDist->GetRasterXSize();
@@ -847,8 +841,6 @@ namespace rsgis{namespace geom{
 			// Loop images to process data
 			for(int i = 0; i < height; i++)
 			{
-				//std::cout << i << " of " << height << std::endl;
-				
 				if((i % feedback) == 0)
 				{
 					std::cout << ".." << feedbackCounter << ".." << std::flush;
@@ -919,9 +911,8 @@ namespace rsgis{namespace geom{
 	
 	RSGISIdentifyNonConvexPolygonsSnakes::~RSGISIdentifyNonConvexPolygonsSnakes()
 	{
-		//GDALDestroyDriver(gdalDriver);
-		GDALDestroyDriverManager();
-	}
+
+    }
 	
 	/***
 	 * 
@@ -1023,7 +1014,6 @@ namespace rsgis{namespace geom{
 			externalEnergy += (data[x] * gamma);
 			
 			currentNextDist = sqrt(((next->x - (*iterCoords)->x)*(next->x - (*iterCoords)->x)) + (((next)->y - (*iterCoords)->y)*((next)->y - (*iterCoords)->y)));
-			// alpha * sq(abs(V+1 - V))
 			currentNextElas = alpha * (currentNextDist * currentNextDist);
 			
 			current2->x = (*iterCoords)->x * 2;
@@ -1032,24 +1022,15 @@ namespace rsgis{namespace geom{
 			currentNextStiffX = next->x - current2->x + prev->x;
 			currentNextStiffY = next->y - current2->y + prev->y;
 			currentNextStiffPart = sqrt((currentNextStiffX * currentNextStiffX) + (currentNextStiffY * currentNextStiffY));
-			// beta * sq(abs(V+1 - 2V + V-1))
 			currentNextStiff = beta * (currentNextStiffPart * currentNextStiffPart);
 			
 			internalEnergy += (currentNextElas + currentNextStiff);
 						
 			++nodeCount;
 		}
-		
-		//internalEnergy = internalEnergy/nodeCount;
-		//externalEnergy = externalEnergy/nodeCount;
-		
 		delete current2;
 		
 		energyValue = externalEnergy + internalEnergy;
-		
-		//std::cout << "external Energy = " << externalEnergy << std::endl;
-		//std::cout << "internal Energy = " << internalEnergy << std::endl;
-		//std::cout << "Total Energy = " << energyValue << std::endl;
 		
 		return energyValue;
 	}
@@ -1172,7 +1153,6 @@ namespace rsgis{namespace geom{
 			externalEnergy += (data[x] * gamma);
 			
 			currentNextDist = sqrt(((next->x - (*iterCoords)->x)*(next->x - (*iterCoords)->x)) + (((next)->y - (*iterCoords)->y)*((next)->y - (*iterCoords)->y)));
-			// alpha * sq(abs(V+1 - V))
 			currentNextElas = alpha * (currentNextDist * currentNextDist);
 			
 			current2->x = (*iterCoords)->x * 2;
@@ -1181,14 +1161,8 @@ namespace rsgis{namespace geom{
 			currentNextStiffX = next->x - current2->x + prev->x;
 			currentNextStiffY = next->y - current2->y + prev->y;
 			currentNextStiffPart = sqrt((currentNextStiffX * currentNextStiffX) + (currentNextStiffY * currentNextStiffY));
-			// beta * sq(abs(V+1 - 2V + V-1))
 			currentNextStiff = beta * (currentNextStiffPart * currentNextStiffPart);
-			
 			currentNextDist2Line = delta * ((*iterLines)->distancePerpendicular(*(*iterCoords)));
-			//std::cout << "((*iterLines)->distance(*(*iterCoords))) = " << ((*iterLines)->distance(*(*iterCoords))) << std::endl;
-			//std::cout << "Coords: " << (*(*iterCoords)) << std::endl;
-			//std::cout << "Line: " << (*(*iterLines)) << std::endl;
-			//std::cout << "currentNextDist2Line = " << currentNextDist2Line << std::endl;
 			
 			internalEnergy += (currentNextElas + currentNextStiff + currentNextDist2Line);
 			
@@ -1196,16 +1170,8 @@ namespace rsgis{namespace geom{
 			++iterLines;
 		}
 		delete current2;
-		
-		//internalEnergy = internalEnergy/nodeCount;
-		//externalEnergy = externalEnergy/nodeCount;
-		
 		energyValue = externalEnergy + internalEnergy;
-		
-		//std::cout << "external Energy = " << externalEnergy << std::endl;
-		//std::cout << "internal Energy = " << internalEnergy << std::endl;
-		//std::cout << "Total Energy = " << energyValue << std::endl;
-		
+				
 		return energyValue;
 	}
 	

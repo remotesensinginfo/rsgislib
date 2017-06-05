@@ -23,7 +23,7 @@ RSGISLib contains a number of algorithms for processing and analysing remote sen
 * Zonal statistics
 * General raster and vector processing
 
-For storing and processing laser scanning data the Sorted Pulse Data Library (SPDLib) is available to download from http://www.spdlib.org/
+For storing and processing laser scanning data the Sorted Pulse Data Library (SPDLib) is available to download from 'http://www.spdlib.org/ <http://www.spdlib.org/>'
 
 To date RSGISLib been used as part of a number of publications and theses, for more details see:
 

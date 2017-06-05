@@ -46,7 +46,7 @@ This is passed to the imagePixelColumnSummary function
 
 def calcNDVI(image, rBand, nBand, outImage, stats=True, gdalFormat='KEA'):
     """ 
-Helper function to calculate NDVI 
+Helper function to calculate NDVI, note the output no data value is -999.
     
 Where:
 
@@ -58,17 +58,17 @@ Where:
 * gdalFormat is a string specifing the output image file format (Default: KEA)
     
 """
-    expression = '(nir-red)/(nir+red)'
+    expression = '(nir+red)!=0?(nir-red)/(nir+red):-999'
     bandDefns = []
     bandDefns.append(BandDefn('red', image, rBand))
     bandDefns.append(BandDefn('nir', image, nBand))
     bandMath(outImage, expression, gdalFormat, rsgislib.TYPE_32FLOAT, bandDefns)
     if stats:
-        imageutils.popImageStats(outImage,False,0.,True)
+        imageutils.popImageStats(outImage,False,-999.,True)
 
 def calcWBI(image, bBand, nBand, outImage, stats=True, gdalFormat='KEA'):
     """ 
-Helper function to calculate WBI 
+Helper function to calculate WBI, note the output no data value is -999.
     
 Where:
 
@@ -80,14 +80,13 @@ Where:
 * gdalFormat is a string specifing the output image file format (Default: KEA)
     
 """
-    expression = 'blue/nir'
+    expression = 'nir!=0?blue/nir:-999'
     bandDefns = []
     bandDefns.append(BandDefn('blue', image, bBand))
     bandDefns.append(BandDefn('nir', image, nBand))
     bandMath(outImage, expression, gdalFormat, rsgislib.TYPE_32FLOAT, bandDefns)
     if stats:
-        imageutils.popImageStats(outImage,False,0.,True)
-
+        imageutils.popImageStats(outImage,False,-999.,True)
 
 
 def calcDist2ImgVals(inputValsImg, outputDistImg, pxlVals, valsImgBand=1, gdalFormat='KEA', maxDist=None, noDataVal=None, unitGEO=True):

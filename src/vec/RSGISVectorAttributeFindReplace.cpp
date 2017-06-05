@@ -52,39 +52,28 @@ namespace rsgis{namespace vec{
         
         rsgis::utils::RSGISTextUtils textUtils = rsgis::utils::RSGISTextUtils();
         
-        //std::cout << "fieldType = " << fieldType << std::endl;
-        
         if(fieldType == OFTInteger)
         {
-            //std::cout << "Integer\n";
             int findInt = textUtils.strtoInt(find);
             int replaceInt = textUtils.strtoInt(replace);
             
-            //std::cout << "Test to see if \'" << feature->GetFieldAsInteger(fieldIdx) << "\' is equal to \'" << findInt << "\' if replace with \'" << replaceInt << "\'\n";
-            
             if(feature->GetFieldAsInteger(fieldIdx) == findInt)
             {
-                //std::cout << "Replacing \'" << findInt << "\' with \'" << replaceInt << "\'\n";
                 feature->SetField(fieldIdx, replaceInt);
             }
         }
         else if(fieldType == OFTReal)
         {
-            //std::cout << "Float\n";
             double findFloat = textUtils.strtofloat(find);
             double replaceFloat = textUtils.strtofloat(replace);
             
-            //std::cout << "Test to see if \'" << feature->GetFieldAsInteger(fieldIdx) << "\' is equal to \'" << findFloat << "\' if replace with \'" << replaceFloat << "\'\n";
-            
             if(feature->GetFieldAsDouble(fieldIdx) == findFloat)
             {
-                //std::cout << "Replacing \'" << findFloat << "\' with \'" << replaceFloat << "\'\n";
                 feature->SetField(fieldIdx, replaceFloat);
             }
         }
         else
         {
-            //std::cout << "Other / String\n";
             if(std::string(feature->GetFieldAsString(fieldIdx)) == find)
             {
                 feature->SetField(fieldIdx, replace.c_str());

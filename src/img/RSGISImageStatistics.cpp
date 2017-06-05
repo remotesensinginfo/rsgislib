@@ -343,6 +343,66 @@ namespace rsgis{namespace img{
         }
     }
     
+    void RSGISImageStatistics::calcImageBandStatistics(GDALDataset *dataset, int imgBand, ImageStats *stats, bool stddev, bool useNoData, float noDataVal, bool onePassSD)throw(RSGISImageCalcException,RSGISImageBandException)
+    {
+        try
+        {
+            int numBands = dataset->GetRasterCount();
+            
+            if((imgBand < 1) | (imgBand > numBands))
+            {
+                throw RSGISImageBandException("The specified image band is not within the image.");
+            }
+            
+            RSGISCalcImageStatisticsNoData calcImageStats = RSGISCalcImageStatisticsNoData(numBands, false, NULL, useNoData, noDataVal, onePassSD);
+            RSGISCalcImage calcImg = RSGISCalcImage(&calcImageStats, "", true);
+            
+            if(stddev && onePassSD)
+            {
+                calcImageStats.calcStdDev();
+            }
+            
+            calcImg.calcImage(&dataset, 1);
+            
+            if(stddev && !onePassSD)
+            {
+                calcImageStats.calcStdDev();
+                calcImg.calcImage(&dataset, 1);
+            }
+            
+            ImageStats **bandStats = new ImageStats*[numBands];
+            for(int i = 0; i < numBands; ++i)
+            {
+                bandStats[i] = new ImageStats();
+                bandStats[i]->mean = 0;
+                bandStats[i]->max = 0;
+                bandStats[i]->min = 0;
+                bandStats[i]->stddev = 0;
+                bandStats[i]->sum = 0;
+            }
+            calcImageStats.getImageStats(bandStats, numBands);
+            
+            stats->mean = bandStats[imgBand-1]->mean;
+            stats->max = bandStats[imgBand-1]->max;
+            stats->min = bandStats[imgBand-1]->min;
+            stats->stddev = bandStats[imgBand-1]->stddev;
+            stats->sum = bandStats[imgBand-1]->sum;
+            
+            for(int i = 0; i < numBands; ++i)
+            {
+                delete bandStats[i];
+            }
+            delete[] bandStats;
+        }
+        catch(RSGISImageCalcException e)
+        {
+            throw e;
+        }
+        catch(RSGISImageBandException e)
+        {
+            throw e;
+        }
+    }
     
     
 	RSGISCalcImageStatistics::RSGISCalcImageStatistics(int numberOutBands, int numInputBands, bool calcSD, rsgis::math::RSGISMathFunction *func, bool ignoreZeros, bool onePassSD) : RSGISCalcImageValue(numberOutBands)
@@ -398,12 +458,7 @@ namespace rsgis{namespace img{
                 allBandsZero = false;
             }
 		}
-        /*
-        if(foundNan)
-        {
-            std::cout << "******** FOUND NAN ********\n";
-        }
-		*/
+        
         if(!foundNan)
         {
             if(!(ignoreZeros & allBandsZero))
@@ -488,13 +543,6 @@ namespace rsgis{namespace img{
                 }
             }
         }
-        /*
-        for(int i = 0; i < numBands; i++)
-        {
-            std::cout << "Stats band " << i+1 << ": (Value: " << bandValues[i] << ") [Mean = " << meanSum[i] << "] [Min = " << min[i] << "] [Max = " << max[i] << "] [n = " << n[i] << "] [sumSq = " << sumSq[i] << "]\n";
-        }
-        std::cout << std::endl;
-         */
 	}
 	
 	void RSGISCalcImageStatistics::getImageStats(ImageStats** inStats, int numInputBands) throw(RSGISImageCalcException)
@@ -1492,6 +1540,33 @@ namespace rsgis{namespace img{
         delete this->data;
     }
     
+    
+    
+    
+
+    RSGISCalcImageDifference::RSGISCalcImageDifference(unsigned int numOutBands):RSGISCalcImageValue(numOutBands)
+    {
+        
+    }
+    
+    void RSGISCalcImageDifference::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+    {
+        if((numBands/2) != this->numOutBands)
+        {
+            throw RSGISImageCalcException("The number of image bands must be twice the number of output bands.");
+        }
+        
+        for(int i = 0; i < this->numOutBands; ++i)
+        {
+            output[i] = bandValues[i] - bandValues[i+this->numOutBands];
+        }
+        
+    }
+    
+    RSGISCalcImageDifference::~RSGISCalcImageDifference()
+    {
+        
+    }
     
     
     

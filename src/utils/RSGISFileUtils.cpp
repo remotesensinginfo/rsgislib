@@ -39,9 +39,10 @@ namespace rsgis{namespace utils{
             {
                 if (boost::filesystem::is_directory(inDIR))
                 {
-                    for (boost::filesystem::directory_entry& x : boost::filesystem::directory_iterator(inDIR))
+                    boost::filesystem::directory_iterator endDirIter;
+                    for(boost::filesystem::directory_iterator x(inDIR); x != endDirIter; ++x)
                     {
-                        files->push_back(x.path().string());
+                        files->push_back((*x).path().string());
                     }
                 }
                 else
@@ -69,9 +70,10 @@ namespace rsgis{namespace utils{
             {
                 if (boost::filesystem::is_directory(inDIR))
                 {
-                    for (boost::filesystem::directory_entry& x : boost::filesystem::directory_iterator(inDIR))
+                    boost::filesystem::directory_iterator endDirIter;
+                    for(boost::filesystem::directory_iterator x(inDIR); x != endDirIter; ++x)
                     {
-                        files->push_back(x.path().string());
+                        files->push_back((*x).path().string());
                     }
                 }
                 else
@@ -100,9 +102,10 @@ namespace rsgis{namespace utils{
             {
                 if (boost::filesystem::is_directory(inDIR))
                 {
-                    for (boost::filesystem::directory_entry& x : boost::filesystem::directory_iterator(inDIR))
+                    boost::filesystem::directory_iterator endDirIter;
+                    for(boost::filesystem::directory_iterator x(inDIR); x != endDirIter; ++x)
                     {
-                        tmpPath = x.path();
+                        tmpPath = (*x).path();
                         if(tmpPath.extension().string() == ext)
                         {
                             if(withpath)
@@ -142,9 +145,10 @@ namespace rsgis{namespace utils{
             {
                 if (boost::filesystem::is_directory(inDIR))
                 {
-                    for (boost::filesystem::directory_entry& x : boost::filesystem::directory_iterator(inDIR))
+                    boost::filesystem::directory_iterator endDirIter;
+                    for(boost::filesystem::directory_iterator x(inDIR); x != endDirIter; ++x)
                     {
-                        tmpPath = x.path();
+                        tmpPath = (*x).path();
                         if(tmpPath.extension().string() == ext)
                         {
                             if(withpath)
@@ -185,9 +189,10 @@ namespace rsgis{namespace utils{
             {
                 if (boost::filesystem::is_directory(inDIR))
                 {
-                    for (boost::filesystem::directory_entry& x : boost::filesystem::directory_iterator(inDIR))
+                    boost::filesystem::directory_iterator endDirIter;
+                    for(boost::filesystem::directory_iterator x(inDIR); x != endDirIter; ++x)
                     {
-                        tmpPath = x.path();
+                        tmpPath = (*x).path();
                         if(tmpPath.extension().string() == ext)
                         {
                             if(withpath)
@@ -236,9 +241,10 @@ namespace rsgis{namespace utils{
             {
                 if (boost::filesystem::is_directory(inDIR))
                 {
-                    for (boost::filesystem::directory_entry& x : boost::filesystem::directory_iterator(inDIR))
+                    boost::filesystem::directory_iterator endDirIter;
+                    for(boost::filesystem::directory_iterator x(inDIR); x != endDirIter; ++x)
                     {
-                        tmpPath = x.path();
+                        tmpPath = (*x).path();
                         if(tmpPath.filename().replace_extension().string() == name)
                         {
                             files.push_back(tmpPath.string());

@@ -107,11 +107,6 @@ namespace rsgis { namespace img {
             RSGISCalcImage calcImage = RSGISCalcImage(genHists);
             calcImage.calcImage(&dataset, 1);
             
-            /*for(unsigned int i = 0; i < (*nBins); ++i)
-            {
-                std::cout << i << "(" << binRanges[i] << " - " << binRanges[i+1] << ") = " << bins[i] << std::endl;
-            }*/
-            
             delete[] binRanges;
             delete genHists;
         }

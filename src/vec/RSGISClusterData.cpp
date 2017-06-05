@@ -92,114 +92,17 @@ namespace rsgis{namespace vec{
 	
 	void RSGISClusterData::readAttribtues(OGRFeature *feature, OGRFeatureDefn *featDefn)
 	{
-		/*RSGISMathsUtils mathUtils;
 		
-		// Read the class attribute
-		OGRFieldDefn *fieldDef = NULL;
-		std::string columnName = "";
-		int fieldCount = featDefn->GetFieldCount();
-		for(int i = 0; i < fieldCount; i++)
-		{
-			fieldDef = feature->GetFieldDefnRef(i);
-			columnName = fieldDef->GetNameRef();
-			if(columnName == "ClustClass")
-			{
-				this->clusterClass = std::string(feature->GetFieldAsString(i));
-			}
-			else if(columnName == "Area")
-			{
-				this->area = mathUtils.strtofloat(std::string(feature->GetFieldAsString(i)));
-			}
-			else if(columnName == "PolysArea")
-			{
-				this->polysArea = mathUtils.strtofloat(std::string(feature->GetFieldAsString(i)));
-			}
-			else if(columnName == "ProPolysAr")
-			{
-				this->proPolysArea = mathUtils.strtofloat(std::string(feature->GetFieldAsString(i)));
-			}
-			else if(columnName == "ProTotalAr")
-			{
-				this->proTotalArea = mathUtils.strtofloat(std::string(feature->GetFieldAsString(i)));
-			}
-			else if(columnName == "EdgeThres")
-			{
-				this->edgeThreshold = mathUtils.strtofloat(std::string(feature->GetFieldAsString(i)));
-			}
-		}
-		 */
 	}
 	
 	void RSGISClusterData::createLayerDefinition(OGRLayer *outputSHPLayer)throw(RSGISVectorOutputException)
 	{
-		/*
-		// Create class attribute column
-		OGRFieldDefn shpField1 = OGRFieldDefn( "ClustClass", OFTString );
-		shpField1.SetWidth(100);
-		if( outputSHPLayer->CreateField( &shpField1 ) != OGRERR_NONE )
-		{
-			throw RSGISVectorOutputException("Creating shapefile field \"ClustClass\" has failed");
-		}
 		
-		OGRFieldDefn shpField2 = OGRFieldDefn( "Area", OFTReal );
-		shpField2.SetPrecision(4);
-		if( outputSHPLayer->CreateField( &shpField2 ) != OGRERR_NONE )
-		{
-			throw RSGISVectorOutputException("Creating shapefile field \"Area\" has failed");
-		}
-		
-		OGRFieldDefn shpField3 = OGRFieldDefn( "PolysArea", OFTReal );
-		shpField3.SetPrecision(4);
-		if( outputSHPLayer->CreateField( &shpField3 ) != OGRERR_NONE )
-		{
-			throw RSGISVectorOutputException("Creating shapefile field \"PolysArea\" has failed");
-		}
-		
-		OGRFieldDefn shpField4 = OGRFieldDefn( "ProPolysAr", OFTReal );
-		shpField4.SetPrecision(4);
-		if( outputSHPLayer->CreateField( &shpField4 ) != OGRERR_NONE )
-		{
-			throw RSGISVectorOutputException("Creating shapefile field \"ProPolysAr\" has failed");
-		}
-		
-		OGRFieldDefn shpField5 = OGRFieldDefn( "ProTotalAr", OFTReal );
-		shpField5.SetPrecision(4);
-		if( outputSHPLayer->CreateField( &shpField5 ) != OGRERR_NONE )
-		{
-			throw RSGISVectorOutputException("Creating shapefile field \"ProTotalAr\" has failed");
-		}
-		
-		OGRFieldDefn shpField6 = OGRFieldDefn( "EdgeThres", OFTReal );
-		shpField6.SetPrecision(4);
-		if( outputSHPLayer->CreateField( &shpField6 ) != OGRERR_NONE )
-		{
-			throw RSGISVectorOutputException("Creating shapefile field \"EdgeThreshold\" has failed");
-		}
-		 */
 	}
 	
 	void RSGISClusterData::populateFeature(OGRFeature *feature, OGRFeatureDefn *featDefn)
 	{
-		/*
-		RSGISVectorUtils vecUtils;
 		
-		if(polygonType)
-		{
-			feature->SetGeometryDirectly(vecUtils.convertGEOSPolygon2OGRPolygon(polygonGeom));
-		}
-		else
-		{
-			feature->SetGeometryDirectly(vecUtils.convertGEOSMultiPolygon2OGRMultiPolygon(multiPolygonGeom));
-		}
-		
-		// Set class
-		feature->SetField(featDefn->GetFieldIndex("ClustClass"), clusterClass.c_str());
-		feature->SetField(featDefn->GetFieldIndex("Area"), area);
-		feature->SetField(featDefn->GetFieldIndex("PolysArea"), polysArea);
-		feature->SetField(featDefn->GetFieldIndex("ProPolysAr"), proPolysArea);
-		feature->SetField(featDefn->GetFieldIndex("ProTotalAr"), proTotalArea);
-		feature->SetField(featDefn->GetFieldIndex("EdgeThres"), edgeThreshold);
-		 */
 	}
 
 	float RSGISClusterData::getArea()

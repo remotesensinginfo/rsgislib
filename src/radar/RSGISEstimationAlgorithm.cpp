@@ -675,9 +675,6 @@ namespace rsgis {namespace radar
 
 					// Calculate Biomass (currenly hardcoded using Scanlan's equations for Brigalow)
 					height = cDepth * 200; // convert to cm
-					/*double aCoeff = 0.724416488101816;
-					double bCoeff = -0.025097647604632307;
-					height =  (2 * ( exp(log(cDepth) / aCoeff) + bCoeff )) * 100;*/
 
                     double tMass = allometric.calculateTotalBiomassHeight(height, species);
 					double biomass = ((tMass*(density*10000)))/1000000;
@@ -722,9 +719,6 @@ namespace rsgis {namespace radar
 					}
 					// Calculate Biomass (currenly hardcoded using Scanlan's equations for Brigalow)
 					height = cDepth * 200; // convert to cm
-					/*double aCoeff = 0.724416488101816;
-					 double bCoeff = -0.025097647604632307;
-					 height =  (2 * ( exp(log(cDepth) / aCoeff) + bCoeff )) * 100;*/
 					double tMass = allometric.calculateTotalBiomassHeight(height, species);
 					double biomass = ((tMass*(density*10000)))/1000000;
 
@@ -994,10 +988,7 @@ namespace rsgis {namespace radar
 					{
 						diameter = 10.2;
 					}
-					/*else if(diameter < 1.38)
-					{
-						diameter = 0;
-					}*/
+                    
 					if(density > 2)
 					{
 						density = 2;
@@ -1509,12 +1500,9 @@ namespace rsgis {namespace radar
 					{
 						density = 0;
 					}
+                    
 					// Calculate Biomass
-					/*double aCoeff = 0.7423556483693436;
-					double bCoeff = -0.045283922501927636;
-					double cCoeff = 0.6;
-					height =  (exp(log(cDepth)/aCoeff) + bCoeff) / cCoeff;*/
-					height = cDepth / 0.3295;
+                    height = cDepth / 0.3295;
 					double heightcm = height * 100;
 					double tMass = allometric.calculateTotalBiomassHeight(heightcm, species);
 					double biomass = ((tMass*(density*10000)))/1000000;
@@ -1539,14 +1527,6 @@ namespace rsgis {namespace radar
 					double density = gsl_vector_get(outPar, 1);
 					double error = gsl_vector_get(outPar, 2);
 					// Set parameters to limits of equation
-					/*if(cDepth > 3)
-					{
-						cDepth = 3;
-					}
-					else if(cDepth < 0.25)
-					{
-						cDepth = 0;
-					}*/
 					if(density > 2)
 					{
 						density = 2;
@@ -1556,10 +1536,6 @@ namespace rsgis {namespace radar
 						density = 0;
 					}
 					// Calculate Biomass
-					/*double aCoeff = 0.7423556483693436;
-					 double bCoeff = -0.045283922501927636;
-					 double cCoeff = 0.6;
-					 height =  (exp(log(cDepth)/aCoeff) + bCoeff) / cCoeff;*/
 					height = cDepth / 0.3295;
 					double heightcm = height * 100;
 					double tMass = allometric.calculateTotalBiomassHeight(heightcm, species);
@@ -1567,7 +1543,6 @@ namespace rsgis {namespace radar
 
 					// Write out
 					output[0] = cDepth;
-					//output[0] = height;
 					output[1] = density;
 					output[2] = biomass;
 					output[3] = error;
@@ -2351,10 +2326,6 @@ namespace rsgis {namespace radar
 					}
 
 					// Calculate Biomass
-					/*double aCoeff = 0.7423556483693436;
-					double bCoeff = -0.045283922501927636;
-					double cCoeff = 0.6;*/
-					//height =  (exp(log(cDepth)/aCoeff) - bCoeff) / cCoeff;
 					height = cDepth / 0.3295;
 					double heightcm = height * 100;
 					double tMass = allometric.calculateTotalBiomassHeight(heightcm, species);
@@ -2362,7 +2333,6 @@ namespace rsgis {namespace radar
 
 					// Write out
 					output[0] = cDepth;
-					//output[0] = height;
 					output[1] = density;
 					output[2] = biomass;
 					output[3] = error;
@@ -2786,17 +2756,12 @@ namespace rsgis {namespace radar
 						density = 0;
 					}
 					// Calculate Biomass
-					/*double aCoeff = 0.7423556483693436;
-					 double bCoeff = -0.045283922501927636;
-					 double cCoeff = 0.6;*/
-					//height =  (exp(log(cDepth)/aCoeff) - bCoeff) / cCoeff;
 					height = cDepth / 0.3295;
 					double heightcm = height * 100;
 					double tMass = allometric.calculateTotalBiomassHeight(heightcm, species);
 					double biomass = ((tMass*(density*10000)))/1000000;
 
 					// Write out
-					//output[0] = cDepth;
 					output[0] = height;
 					output[1] = density;
 					output[2] = biomass;

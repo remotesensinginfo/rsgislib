@@ -157,6 +157,92 @@ namespace rsgis{namespace img{
         }
     }
     
+    
+    void RSGISSampleImage::randomSampleImageMaskSmallPxlCount(GDALDataset *inputImage, unsigned int imgBand, GDALDataset *outputImage, std::vector<int> maskVals, unsigned long numSamples, int rndSeed)throw(RSGISImageException)
+    {
+        try
+        {
+            RSGISImageUtils imgUtils;
+            
+            unsigned int numMskVals = maskVals.size();
+            std::vector<std::pair<long, long> > *maskPxlLocs = new std::vector<std::pair<long, long> >[numMskVals];
+            
+            RSGISGetPxlLocAsVec getPxlLoc = RSGISGetPxlLocAsVec(maskVals, maskPxlLocs, imgBand);
+            RSGISCalcImage calcImg = RSGISCalcImage(&getPxlLoc, "", true);
+            calcImg.calcImagePosPxl(&inputImage, 1, 0);
+            
+            unsigned int maxNPxls = 0;
+            for(int i = 0; i < maskVals.size(); ++i)
+            {
+                if(i == 0)
+                {
+                    maxNPxls = maskPxlLocs[i].size();
+                }
+                else if(maskPxlLocs[i].size() > maxNPxls)
+                {
+                    maxNPxls = maskPxlLocs[i].size();
+                }
+            }
+            
+            std::cout << "Max Number of Pixels within a class is " << maxNPxls << std::endl;
+
+            boost::mt19937 rng (rndSeed);
+            boost::uniform_int<> pxlRange( 0, maxNPxls );
+            boost::variate_generator< boost::mt19937, boost::uniform_int<> > pxlGen(rng, pxlRange);
+            
+            unsigned int xPxl = 0;
+            unsigned int yPxl = 0;
+            
+            unsigned int pxlIdx = 0;
+            bool foundSamples = false;
+            unsigned int samplesCount = 0;
+            for(unsigned int i = 0; i < maskVals.size(); ++i)
+            {
+                foundSamples = false;
+                samplesCount = 0;
+                if(!maskPxlLocs[i].empty())
+                {
+                    for(unsigned long j = 0; j < numSamples; ++j)
+                    {
+                        pxlIdx = pxlGen();
+                        while(pxlIdx >= maskPxlLocs[i].size())
+                        {
+                            pxlIdx = pxlGen();
+                        }
+                        
+                        xPxl = maskPxlLocs[i].at(pxlIdx).first;
+                        yPxl = maskPxlLocs[i].at(pxlIdx).second;
+                        
+                        imgUtils.setPixelValue(outputImage, imgBand, xPxl, yPxl, maskVals.at(i));
+                    }
+                }
+                else
+                {
+                    std::cerr << "No samples with mask value " << maskVals.at(i) << std::endl;
+                    delete[] maskPxlLocs;
+                    throw RSGISImageException("There weren't any pixels within the mask");
+                }
+            }
+            delete[] maskPxlLocs;
+        }
+        catch (RSGISImageCalcException &e)
+        {
+            throw RSGISImageException(e.what());
+        }
+        catch (RSGISImageException &e)
+        {
+            throw e;
+        }
+        catch (RSGISException &e)
+        {
+            throw RSGISImageException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw RSGISImageException(e.what());
+        }
+    }
+    
     RSGISSampleImage::~RSGISSampleImage()
     {
         
@@ -231,6 +317,37 @@ namespace rsgis{namespace img{
     {
         
     }
+    
+    
+    
+    
+    RSGISGetPxlLocAsVec::RSGISGetPxlLocAsVec(std::vector<int> maskVals, std::vector<std::pair<long, long> > *maskPxlLocs, unsigned int imgBand):RSGISCalcImageValue(0)
+    {
+        this->maskVals = maskVals;
+        this->maskPxlLocs = maskPxlLocs;
+        this->imgBand = imgBand;
+    }
+    
+    void RSGISGetPxlLocAsVec::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent)throw(rsgis::img::RSGISImageCalcException)
+    {
+        for(size_t i = 0; i < maskVals.size(); ++i)
+        {
+            if(intBandValues[imgBand-1] == maskVals.at(i))
+            {
+                maskPxlLocs[i].push_back(std::pair<double, double>(extent.getMinX(), extent.getMinY()));
+                break;
+            }
+        }
+        
+    }
+    
+    RSGISGetPxlLocAsVec::~RSGISGetPxlLocAsVec()
+    {
+        
+    }
+    
+    
+    
     
     
 }}

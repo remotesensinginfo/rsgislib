@@ -120,7 +120,6 @@ namespace rsgis{ namespace cmds {
             
             GDALClose(inRefDataset);
             GDALClose(inFloatDataset);
-            GDALDestroyDriverManager();
         }
         catch(RSGISException& e)
         {
@@ -212,7 +211,6 @@ namespace rsgis{ namespace cmds {
             
             GDALClose(inRefDataset);
             GDALClose(inFloatDataset);
-            GDALDestroyDriverManager();
         }
         catch(RSGISException& e)
         {
@@ -250,8 +248,6 @@ namespace rsgis{ namespace cmds {
                 warp->performWarp();
             }
             delete warp;
-            
-            GDALDestroyDriverManager();
         }
         catch(RSGISException& e)
         {
@@ -289,8 +285,6 @@ namespace rsgis{ namespace cmds {
                 warp->performWarp();
             }
             delete warp;
-            
-            GDALDestroyDriverManager();
         }
         catch(RSGISException& e)
         {
@@ -329,8 +323,6 @@ namespace rsgis{ namespace cmds {
                 warp->performWarp();
             }
             delete warp;
-            
-            GDALDestroyDriverManager();
         }
         catch(RSGISException& e)
         {
