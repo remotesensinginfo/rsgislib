@@ -143,11 +143,6 @@ namespace rsgis{ namespace classifier{
 			throw e;
 		}
 		
-		/*for(int i = 0; i < *numClasses; i++)
-		{
-			std::cout << "Class: " << classData[i]->className << " has ID: " << classData[i]->classID << std::endl;
-		}*/
-		
 		return classData;
 	}
 	
@@ -282,7 +277,6 @@ namespace rsgis{ namespace classifier{
 			}
 			
 			GDALClose(inputSHPDS);
-			OGRCleanupAll();			
 		}
 		catch(RSGISClassificationException &e)
 		{

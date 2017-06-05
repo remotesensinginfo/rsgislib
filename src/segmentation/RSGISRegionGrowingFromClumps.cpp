@@ -283,8 +283,6 @@ namespace rsgis{namespace segment{
                     {
                         percentInAreaInc = (((double)cRegion->pxls->size()) - ((double)pRegion->pxls->size()))/((double)cRegion->pxls->size());
                         
-                        //std::cout << "percentInAreaInc = " << percentInAreaInc << std::endl;
-                        
                         if(percentInAreaInc > 0.9)
                         {
                             delete[] cRegion->meanVals;
@@ -1375,7 +1373,7 @@ namespace rsgis{namespace segment{
                 {
                     std::sort(allValsVec.begin(), allValsVec.end());
                     float percentileVal = gsl_stats_quantile_from_sorted_data(&allValsVec[0], 1, allValsVec.size(), 0.75);
-                    //std::cout << "percentileVal = " << percentileVal << std::endl;
+
                     first = true;
                     for(std::list<unsigned long>::iterator iterClump = largeClumpTab->at(i)->begin(); iterClump != largeClumpTab->at(i)->end(); ++iterClump)
                     {
@@ -1392,7 +1390,7 @@ namespace rsgis{namespace segment{
                         }
                         meanVal = meanVal / numSpecBands;
                         distVal = sqrt((meanVal - percentileVal)*(meanVal - percentileVal));
-                        //std::cout << "\t" << *iterClump << " has mean value " << meanVal << " Percentile Value = " << percentileVal << std::endl;
+
                         if(first)
                         {
                             tmpMeanVal = distVal;
@@ -1410,7 +1408,7 @@ namespace rsgis{namespace segment{
                 {
                     std::sort(allValsVec.begin(), allValsVec.end());
                     float percentileVal = gsl_stats_quantile_from_sorted_data(&allValsVec[0], 1, allValsVec.size(), 0.95);
-                    //std::cout << "percentileVal = " << percentileVal << std::endl;
+
                     first = true;
                     for(std::list<unsigned long>::iterator iterClump = largeClumpTab->at(i)->begin(); iterClump != largeClumpTab->at(i)->end(); ++iterClump)
                     {
@@ -1427,7 +1425,7 @@ namespace rsgis{namespace segment{
                         }
                         meanVal = meanVal / numSpecBands;
                         distVal = sqrt((meanVal - percentileVal)*(meanVal - percentileVal));
-                        //std::cout << "\t" << *iterClump << " has mean value " << meanVal << " Percentile Value = " << percentileVal << std::endl;
+
                         if(first)
                         {
                             tmpMeanVal = distVal;
@@ -1442,7 +1440,6 @@ namespace rsgis{namespace segment{
                     }
                 }
                 
-                //std::cout << "sClump = " << sClump << std::endl;
                 outClumps.push_back(sClump);
             }
         }
@@ -1783,7 +1780,7 @@ namespace rsgis{namespace segment{
                 {
                     std::sort(allValsVec.begin(), allValsVec.end());
                     float percentileVal = gsl_stats_quantile_from_sorted_data(&allValsVec[0], 1, allValsVec.size(), 0.75);
-                    //std::cout << "percentileVal = " << percentileVal << std::endl;
+
                     first = true;
                     for(std::list<unsigned long>::iterator iterClump = largeClumpTab->at(i)->begin(); iterClump != largeClumpTab->at(i)->end(); ++iterClump)
                     {
@@ -1800,7 +1797,7 @@ namespace rsgis{namespace segment{
                         }
                         meanVal = meanVal / numSpecBands;
                         distVal = sqrt((meanVal - percentileVal)*(meanVal - percentileVal));
-                        //std::cout << "\t" << *iterClump << " has mean value " << meanVal << " Percentile Value = " << percentileVal << std::endl;
+
                         if(first)
                         {
                             tmpMeanVal = distVal;
@@ -1818,7 +1815,7 @@ namespace rsgis{namespace segment{
                 {
                     std::sort(allValsVec.begin(), allValsVec.end());
                     float percentileVal = gsl_stats_quantile_from_sorted_data(&allValsVec[0], 1, allValsVec.size(), 0.95);
-                    //std::cout << "percentileVal = " << percentileVal << std::endl;
+
                     first = true;
                     for(std::list<unsigned long>::iterator iterClump = largeClumpTab->at(i)->begin(); iterClump != largeClumpTab->at(i)->end(); ++iterClump)
                     {
@@ -1835,7 +1832,7 @@ namespace rsgis{namespace segment{
                         }
                         meanVal = meanVal / numSpecBands;
                         distVal = sqrt((meanVal - percentileVal)*(meanVal - percentileVal));
-                        //std::cout << "\t" << *iterClump << " has mean value " << meanVal << " Percentile Value = " << percentileVal << std::endl;
+
                         if(first)
                         {
                             tmpMeanVal = distVal;
@@ -1850,7 +1847,6 @@ namespace rsgis{namespace segment{
                     }
                 }
                 
-                //std::cout << "sClump = " << sClump << std::endl;
                 outClumps.push_back(sClump);
             }
         }

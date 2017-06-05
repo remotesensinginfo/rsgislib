@@ -46,6 +46,19 @@
 
 #include "math/RSGISMathsUtils.h"
 
+// mark all exported classes/functions with DllExport to have
+// them exported by Visual Studio
+#undef DllExport
+#ifdef _MSC_VER
+    #ifdef rsgis_calib_EXPORTS
+        #define DllExport   __declspec( dllexport )
+    #else
+        #define DllExport   __declspec( dllimport )
+    #endif
+#else
+    #define DllExport
+#endif
+
 namespace rsgis{namespace calib{
     
 	class DllExport RSGISLandsatFMaskPass1CloudMasking : public rsgis::img::RSGISCalcImageValue
@@ -367,9 +380,7 @@ namespace rsgis{namespace calib{
         bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
         ~RSGISExportMaskForOverPCPThreshold(){};
     };
-    
-    
-    
+        
 }}
 
 #endif

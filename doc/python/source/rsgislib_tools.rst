@@ -19,6 +19,11 @@ Projection
 .. autofunction:: rsgislib.tools.degrees_to_metres
 .. autofunction:: rsgislib.tools.metres_to_degrees
 
+File Manipulation
+-----------------
+
+.. autofunction:: rsgislib.tools.sortImgsUTM2DIRs
+
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`

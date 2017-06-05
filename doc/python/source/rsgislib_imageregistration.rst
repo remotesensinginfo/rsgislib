@@ -18,6 +18,7 @@ Warping
 .. autofunction:: rsgislib.imageregistration.triangularwarp
 .. autofunction:: rsgislib.imageregistration.polywarp
 .. autofunction:: rsgislib.imageregistration.applyOffset2Image
+.. autofunction:: rsgislib.imageregistration.warpUseGCPsWithGDAL
 
 Other
 ------

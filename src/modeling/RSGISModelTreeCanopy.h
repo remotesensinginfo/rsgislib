@@ -35,10 +35,23 @@
 #include "geom/RSGISGeometry.h"
 #include "vec/RSGISVectorIO.h"
 
+// mark all exported classes/functions with DllExport to have
+// them exported by Visual Studio
+#undef DllExport
+#ifdef _MSC_VER
+    #ifdef rsgis_modeling_EXPORTS
+        #define DllExport   __declspec( dllexport )
+    #else
+        #define DllExport   __declspec( dllimport )
+    #endif
+#else
+    #define DllExport
+#endif
+
 namespace rsgis { namespace modeling{
     
 	/// Class to create tree canopy
-	/*
+	/**
 	 * Class to create a tree canopy based on statistical distrobutions and tree parameters<br>
 	 * similar to those required by the radar backscatter model of Durden et al (1989)<br>
 	 * Parametamerers are input in the form of a vectors, and a number of RSGISProbDisros:<br>

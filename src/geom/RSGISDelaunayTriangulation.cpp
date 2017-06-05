@@ -179,13 +179,7 @@ namespace rsgis{namespace geom{
 			{
 				std::list<RSGIS2DPoint*> *pts = this->getPtsClockwise(tmpTriangles, pt);
 				std::list<RSGIS2DPoint*>::iterator iterPTS;
-				/*
-				std::cout << "PT: " << *pt << std::endl;
-				for(iterPTS = pts->begin(); iterPTS != pts->end(); ++iterPTS)
-				{
-					std::cout << **iterPTS << std::endl;
-				}
-				*/
+
 				bool first = true;
 				RSGIS2DPoint *tmpPt = NULL;
 				for(iterPTS = pts->begin(); iterPTS != pts->end(); ++iterPTS)

@@ -95,15 +95,8 @@ namespace rsgis{namespace vec{
                 std::vector<RSGISACCoordFit> *coords = new std::vector<RSGISACCoordFit>();
                 for(int i = 0; i < numPts; ++i)
                 {
-                    //std::cout << "\t pt " << i << ": [" << polyRing->getX(i) << ", " << polyRing->getY(i) << "]" << std::endl;
                     coords->push_back(RSGISACCoordFit(polyRing->getX(i), polyRing->getY(i)));
                 }
-                
-                /*
-                RSGISFitActiveContourOptimiseFunc optimiseFunc = RSGISFitActiveContourOptimiseFunc(this->externalForceImg, interAlpha, interBeta, interGamma);
-                rsgis::math::RSGISGlobalHillClimbingOptimiser2DVaryNumPts optimise = rsgis::math::RSGISGlobalHillClimbingOptimiser2DVaryNumPts(&optimiseFunc, false, 10);
-                std::vector<geos::geom::Coordinate*> *newCoords = optimise.optimise4Neighbor(&coords, 50, &polyBoundary);
-                */
                 
                 RSGISFitActiveContour2Coords fitcontour;
                 fitcontour.fitActiveCountour(coords, externalForceImg, interAlpha, interBeta, extGamma, minExtThres, 100, 0.1);
@@ -119,30 +112,6 @@ namespace rsgis{namespace vec{
                 
                 ogrRing->closeRings();
                 ogrNewPoly->addRingDirectly(ogrRing);
-                /*
-                int numOfHoles = polygon->getNumInteriorRings();
-                std::cout << "Number of holes : " << numOfHoles << std::endl;
-                if(numOfHoles > 0)
-                {
-                    // Process holes as seperate polygon
-                    for(int i = 0; i < numOfHoles; ++i)
-                    {
-                        OGRLinearRing *hole = polygon->getInteriorRing(i);
-                        OGRPolygon *ogrTmpPoly = new OGRPolygon();
-                        ogrTmpPoly->addRingDirectly((OGRLinearRing*)hole->clone());
-                        OGRPolygon *ogrTmpPoly2 = this->processGeometry((OGRGeometry*)ogrTmpPoly);
-                        if(ogrNewPoly->Contains(ogrTmpPoly2))
-                        {
-                            ogrNewPoly->addRingDirectly((OGRCurve*)ogrTmpPoly2->getExteriorRing());
-                        }
-                        else
-                        {
-                            delete ogrTmpPoly2;
-                        }
-                        delete ogrTmpPoly;
-                    }
-                }
-                 */
             }
             else
             {
@@ -294,19 +263,12 @@ namespace rsgis{namespace vec{
                 currentNextDist = this->calcDist(&next, &(*iterCoords));
                 currentPrevDist = this->calcDist(&prev, &(*iterCoords));
                 elasEnergy = interAlpha * ((currentNextDist + currentPrevDist)/2);
-                //std::cout << "Elastic Energy: " << elasEnergy << std::endl;
-                
                 stiffEnergy = interBeta * this->calcPointStiffnesss(&prev, &next, &(*iterCoords));
-                //std::cout << "Stiffness Energy: " << stiffEnergy << std::endl;
                 
                 (*iterCoords).intEnergy = elasEnergy + stiffEnergy;
                 internalEnergy += (*iterCoords).intEnergy;
             }
-            
-            //std:: cout << "Internal Energy: " << internalEnergy << std::endl;
-            //std:: cout << "External Energy: " << externalEnergy << std::endl;
             totalEnergy = internalEnergy + externalEnergy;
-            
             
             std::cout << "Started " << std::flush;
             double tmpInternalEnergy = 0.0;
@@ -402,7 +364,6 @@ namespace rsgis{namespace vec{
                     first = true;
                     for(int i = 0; i < 8; ++i)
                     {
-                        //std::cout << " i  = " << i << std::endl;
                         if(i == 0)
                         {
                             coord1.x = (*iterCoords).x - step;
@@ -470,11 +431,7 @@ namespace rsgis{namespace vec{
                                 extImgBand->RasterIO(GF_Read, xPxl, yPxl, 1, 1, &dataVal, 1, 1, GDT_Float32, 0, 0);
                                 cCExt = (dataVal * extGamma);
                                 
-                                //std::cout << "\tExternal Energy = " << cCExt << "(" << (*iterCoords).extEnergy << ")\n";
-                                
                                 this->calcUpdateInternalEnergies(interAlpha, interBeta, &coord1, &next, &prev, &next1, &prev1, &cCInt, &cNInt, &cPInt);
-                                
-                                //std::cout << "\tInternal Energy = " << cCInt << "(" << (*iterCoords).intEnergy << ")\n";
                                 
                                 tmpTotalEnergy = (tmpExternalEnergy + cCExt) + (tmpInternalEnergy + cCInt + cNInt + cPInt);
                             }
@@ -487,7 +444,6 @@ namespace rsgis{namespace vec{
                         {
                             tmpTotalEnergy = -1;
                         }
-                        //std::cout << "\tTmp Total Energy: " << tmpTotalEnergy << "(" << totalEnergy << ")" << std::endl;
                         
                         if(tmpTotalEnergy != -1)
                         {
@@ -570,9 +526,6 @@ namespace rsgis{namespace vec{
                 
                 propChange = (double)numChangePts / (double)coords->size();
                 
-                //std::cout << "Proportion of Change = " << propChange << std::endl;
-                
-                
                 // Check the coordinates are not too close and that the gaps are not too big.
                 for(std::vector<RSGISACCoordFit>::iterator iterCoords = coords->begin(); iterCoords != coords->end(); )
                 {
@@ -628,25 +581,19 @@ namespace rsgis{namespace vec{
         double dist1 = this->calcDist(c, next);
         double dist2 = this->calcDist(c, prev);
         double elasEnergy = interAlpha * ((dist1 + dist2)/2);
-        //std::cout << "Elastic Energy: " << elasEnergy << std::endl;
         double stiffEnergy = interBeta * this->calcPointStiffnesss(prev, next, c);
-        //std::cout << "Stiffness Energy: " << stiffEnergy << std::endl;
         *cCInt = elasEnergy + stiffEnergy;
         
         dist1 = this->calcDist(next, next1);
         dist2 = this->calcDist(next, c);
         elasEnergy = interAlpha * ((dist1 + dist2)/2);
-        //std::cout << "Elastic Energy: " << elasEnergy << std::endl;
         stiffEnergy = interBeta * this->calcPointStiffnesss(c, next1, next);
-        //std::cout << "Stiffness Energy: " << stiffEnergy << std::endl;
         *cNInt = elasEnergy + stiffEnergy;
         
         dist1 = this->calcDist(prev, prev1);
         dist2 = this->calcDist(prev, c);
         elasEnergy = interAlpha * ((dist1 + dist2)/2);
-        //std::cout << "Elastic Energy: " << elasEnergy << std::endl;
         stiffEnergy = interBeta * this->calcPointStiffnesss(prev1, c, prev);
-        //std::cout << "Stiffness Energy: " << stiffEnergy << std::endl;
         *cPInt = elasEnergy + stiffEnergy;
     }
     
@@ -740,152 +687,6 @@ namespace rsgis{namespace vec{
     {
         
     }
-    
-    
-    
-    
-    
-    /*
-    
-    
-    RSGISFitActiveContourOptimiseFunc::RSGISFitActiveContourOptimiseFunc(GDALDataset *extImg, double alpha, double beta, double gamma)
-    {
-        this->extImgBand = extImg->GetRasterBand(1);
-        this->imgWidth = extImgBand->GetXSize();
-        this->imgHeight = extImgBand->GetYSize();
-        
-        double *trans = new double[6];
-        extImg->GetGeoTransform(trans);
-        this->imgRes = trans[1];
-        
-        xMin = trans[0];
-        xMax = trans[0]+(imgWidth*imgRes);
-        yMin = trans[3]-(imgHeight*imgRes);
-        yMax = trans[3];
-        delete[] trans;
-        
-        this->alpha = alpha;
-        this->beta = beta;
-        this->gamma = gamma;
-    }
-    
-    double RSGISFitActiveContourOptimiseFunc::calcValue(std::vector<geos::geom::Coordinate*> *coords) throw(rsgis::math::RSGISOptimisationException)
-    {
-        double energyValue = 0;
-        double internalEnergy = 0;
-        double externalEnergy = 0;
-        double elasEnergy = 0;
-        double currentNextDist = 0;
-        double currentPrevDist = 0;
-        double stiffEnergy = 0;
-        double currentNextStiffX = 0;
-        double currentNextStiffY = 0;
-        double currentNextStiffPart = 0;
-        
-        int y = 0;
-        int x = 0;
-        
-        int nodeCount = 0;
-        
-        float dataVal = 0;
-        
-        geos::geom::Coordinate *prev;
-        geos::geom::Coordinate *next;
-        geos::geom::Coordinate *current2 = new geos::geom::Coordinate();
-        
-        std::vector<geos::geom::Coordinate*>::iterator iterCoords;
-        for(iterCoords = coords->begin(); iterCoords != coords->end(); ++iterCoords)
-        {
-            
-            if(iterCoords == coords->begin())
-            {
-                next = (*(iterCoords+1));
-                prev = coords->back();
-            }
-            else if(*iterCoords == coords->back())
-            {
-                next = coords->front();
-                prev = (*(iterCoords-1));
-            }
-            else
-            {
-                next = (*(iterCoords+1));
-                prev = (*(iterCoords-1));
-            }
-            
-            y = floor((yMax - (*iterCoords)->y)/imgRes)+0.5;
-            x = floor(((*iterCoords)->x - xMin)/imgRes)+0.5;
-            
-            if((y < 0) | (y >= imgHeight))
-            {
-                std::cout << "Image Height: " << imgHeight << std::endl;
-                std::cout << "Image Width: " << imgWidth << std::endl;
-                std::cout << "XY = [" << x << ", " << y << std::endl;
-                throw rsgis::math::RSGISOptimisationException("Y Does not fit within the image");
-            }
-            
-            if((x < 0) | (x >= imgWidth))
-            {
-                std::cout << "Image Height: " << imgHeight << std::endl;
-                std::cout << "Image Width: " << imgWidth << std::endl;
-                std::cout << "XY = [" << x << ", " << y << std::endl;
-                throw rsgis::math::RSGISOptimisationException("X Does not fit within the image");
-            }
-            
-            this->extImgBand->RasterIO(GF_Read, x, y, 1, 1, &dataVal, 1, 1, GDT_Float32, 0, 0);
-            externalEnergy += (dataVal * gamma);
-
-            currentNextDist = sqrt(((next->x - (*iterCoords)->x)*(next->x - (*iterCoords)->x)) + (((next)->y - (*iterCoords)->y)*((next)->y - (*iterCoords)->y)));
-            currentPrevDist = sqrt(((prev->x - (*iterCoords)->x)*(prev->x - (*iterCoords)->x)) + (((prev)->y - (*iterCoords)->y)*((prev)->y - (*iterCoords)->y)));
-            
-            std::cout << "Dist to Next: " << currentNextDist << std::endl;
-            std::cout << "Dist to Next: " << currentPrevDist << std::endl;
-            
-            // alpha * sq(abs(V+1 - V))
-            elasEnergy = alpha * (currentNextDist + currentPrevDist);
-            
-            std::cout << "Elastic Energy: " << elasEnergy << std::endl;
-            
-            current2->x = (*iterCoords)->x * 2;
-            current2->y = (*iterCoords)->y * 2;
-            
-            currentNextStiffX = next->x - current2->x + prev->x;
-            currentNextStiffY = next->y - current2->y + prev->y;
-            currentNextStiffPart = sqrt((currentNextStiffX * currentNextStiffX) + (currentNextStiffY * currentNextStiffY));
-            // beta * sq(abs(V+1 - 2V + V-1))
-            stiffEnergy = beta * (currentNextStiffPart * currentNextStiffPart);
-            std::cout << "Stiffness Energy: " << stiffEnergy << std::endl;
-            
-            internalEnergy += (elasEnergy + stiffEnergy);
-            
-            ++nodeCount;
-        }
-        
-        //internalEnergy = internalEnergy/nodeCount;
-        //externalEnergy = externalEnergy/nodeCount;
-        
-        delete current2;
-        
-        energyValue = externalEnergy + internalEnergy;
-        
-        //std::cout << "external Energy = " << externalEnergy << std::endl;
-        //std::cout << "internal Energy = " << internalEnergy << std::endl;
-        //std::cout << "Total Energy = " << energyValue << std::endl;
-        
-        return energyValue;
-    }
-    
-    RSGISFitActiveContourOptimiseFunc::~RSGISFitActiveContourOptimiseFunc()
-    {
-        
-    }
-    
-    */
-    
-    
-    
-    
-    
     
 }}
 

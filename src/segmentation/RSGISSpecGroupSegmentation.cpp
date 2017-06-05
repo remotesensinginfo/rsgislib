@@ -79,7 +79,6 @@ namespace rsgis{namespace segment{
             
             for(unsigned int j = 0; j < width; ++j)
             {
-                //std::cout << "Processing Pixel [" << j << "," << i << "]\n";
                 // Get pixel value from clump image for (j,i)
                 clumpBand->RasterIO(GF_Read, j, i, 1, 1, &uiPxlVal, 1, 1, GDT_UInt32, 0, 0);
                 
@@ -119,9 +118,6 @@ namespace rsgis{namespace segment{
                         {
                             rsgis::img::PxlLoc pxl = clumpSearchPxls.front();
                             clumpSearchPxls.pop();
-                            
-                            //std::cout << "\tSearch Size = " << clumpSearchPxls.size() << std::endl;
-                            //std::cout << "\t\tProcessing [" << pxl.xPos << "," << pxl.yPos << "]\n";
                             
                             // Above
                             if(((long)pxl.yPos)-1 >= 0)
@@ -302,7 +298,6 @@ namespace rsgis{namespace segment{
             
             for(unsigned int j = 0; j < width; ++j)
             {
-                //std::cout << "Processing Pixel [" << j << "," << i << "]\n";
                 // Get pixel value from clump image for (j,i)
                 clumpBand->RasterIO(GF_Read, j, i, 1, 1, &uiPxlVal, 1, 1, GDT_UInt32, 0, 0);
                 
@@ -334,10 +329,7 @@ namespace rsgis{namespace segment{
                     {
                         rsgis::img::PxlLoc pxl = clumpSearchPxls.front();
                         clumpSearchPxls.pop();
-                        
-                        //std::cout << "\tSearch Size = " << clumpSearchPxls.size() << std::endl;
-                        //std::cout << "\t\tProcessing [" << pxl.xPos << "," << pxl.yPos << "]\n";
-                        
+
                         // Above
                         if(((long)pxl.yPos)-1 >= 0)
                         {
@@ -555,7 +547,6 @@ namespace rsgis{namespace segment{
             
             for(unsigned int j = 0; j < width; ++j)
             {
-                //std::cout << "Processing Pixel [" << j << "," << i << "]\n";
                 // Get pixel value from clump image for (j,i)
                 clumpBand->RasterIO(GF_Read, j, i, 1, 1, &uiPxlVal, 1, 1, GDT_UInt32, 0, 0);
                 
@@ -595,9 +586,6 @@ namespace rsgis{namespace segment{
                         {
                             rsgis::img::PxlLoc pxl = clumpSearchPxls.front();
                             clumpSearchPxls.pop();
-                            
-                            //std::cout << "\tSearch Size = " << clumpSearchPxls.size() << std::endl;
-                            //std::cout << "\t\tProcessing [" << pxl.xPos << "," << pxl.yPos << "]\n";
                             
                             // Above
                             if(((long)pxl.yPos)-1 >= 0)
@@ -751,9 +739,6 @@ namespace rsgis{namespace segment{
         {
             sqSum += (((vals1[i] - vals2[i])*(vals1[i] - vals2[i]))/stddev[i]);
         }
-        
-        //std::cout << "Distance = " << sqrt(sqSum) << std::endl;
-        
         return sqrt(sqSum)/numVals;
     }
     

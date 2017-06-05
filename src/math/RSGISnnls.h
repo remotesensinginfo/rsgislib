@@ -17,6 +17,19 @@
 #define nnls_max(a,b) ((a) >= (b) ? (a) : (b))
 #define nnls_abs(x) ((x) >= 0 ? (x) : -(x))
 
+// mark all exported classes/functions with DllExport to have
+// them exported by Visual Studio
+#undef DllExport
+#ifdef _MSC_VER
+    #ifdef rsgis_maths_EXPORTS
+        #define DllExport   __declspec( dllexport )
+    #else
+        #define DllExport   __declspec( dllimport )
+    #endif
+#else
+    #define DllExport
+#endif
+
 namespace rsgis{namespace math{
         
     class DllExport RSGISNNLS

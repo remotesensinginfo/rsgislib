@@ -35,6 +35,19 @@
 #include <boost/cstdint.hpp>
 #include <boost/algorithm/string/trim.hpp>
 
+// mark all exported classes/functions with DllExport to have
+// them exported by Visual Studio
+#undef DllExport
+#ifdef _MSC_VER
+    #ifdef rsgis_utils_EXPORTS
+        #define DllExport   __declspec( dllexport )
+    #else
+        #define DllExport   __declspec( dllimport )
+    #endif
+#else
+    #define DllExport
+#endif
+
 namespace rsgis{namespace utils{
 
     inline bool compareStringNoCase(std::string first, std::string second)
@@ -110,6 +123,11 @@ namespace rsgis{namespace utils{
 			std::string int32bittostring(int_fast32_t number)throw(RSGISTextException);
 			std::string int64bittostring(int_fast64_t number)throw(RSGISTextException);
             std::string sizettostring(size_t number)throw(RSGISTextException);
+            
+            std::string inttostring(int number)throw(RSGISTextException);
+            std::string uInttostring(unsigned int number)throw(RSGISTextException);
+            std::string longtostring(long number)throw(RSGISTextException);
+            std::string uLongtostring(unsigned long number)throw(RSGISTextException);
 			
 			~RSGISTextUtils();
 		};

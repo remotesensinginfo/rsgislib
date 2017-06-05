@@ -29,17 +29,26 @@
 #include "RSGISMatrices.h"
 #include "RSGISMatricesException.h"
 
+// mark all exported classes/functions with DllExport to have
+// them exported by Visual Studio
+#undef DllExport
+#ifdef _MSC_VER
+    #ifdef rsgis_maths_EXPORTS
+        #define DllExport   __declspec( dllexport )
+    #else
+        #define DllExport   __declspec( dllimport )
+    #endif
+#else
+    #define DllExport
+#endif
+
 namespace rsgis{namespace math{
 	    
 	class DllExport RSGISFFTWUtils
 		{
 		public:
 			RSGISFFTWUtils();
-            /*
-			Matrix* computeFFTW(Matrix *inputData);
-			void fftwShift(fftw_complex *in, fftw_complex *out, int width, int height);
-			void fftwShift(Matrix *in, Matrix *out);
-             */
+
 			~RSGISFFTWUtils();
 		};
 }}

@@ -49,23 +49,6 @@ namespace rsgis{namespace vec{
 		{
 			inFeatureDefn = inputLayer->GetLayerDefn();
 			
-		/*	if(newFirst)
-			{
-				this->processFeatures->createOutputLayerDefinition(outputLayer, inFeatureDefn);
-				if(copyData)
-				{
-					this->copyFeatureDefn(outputLayer, inFeatureDefn);
-				}
-			}
-			else
-			{
-				if(copyData)
-				{
-					this->copyFeatureDefn(outputLayer, inFeatureDefn);
-				}
-				this->processFeatures->createOutputLayerDefinition(outputLayer, inFeatureDefn);
-			}*/
-			
 			if(copyData)
 			{
 				this->copyFeatureDefn(outputLayer, inFeatureDefn);

@@ -200,8 +200,6 @@ namespace rsgis{namespace radar{
 				{
 					inData[i] = inData[i] / pixelVals[i]->size();
 				}
-
-				//std::cout << "inData[" << i << "] = " << inData[i] << std::endl;
 			}
 
 			invValuesObj->calcImageValue(inData, this->numBands, outData);
@@ -209,13 +207,10 @@ namespace rsgis{namespace radar{
 			// Get averages for each band.
 			gsl_vector *localPar;
 			localPar = gsl_vector_alloc(this->numOutputPar);
-			//std::cout << "Estimated parameters:" << std::endl;
 			for(unsigned int i = 0; i < this->numOutputPar; i++)
 			{
 				gsl_vector_set(localPar, i, outData[i]);
-                //std::cout << gsl_vector_get(localPar, i) << ",";
 			}
-            //std::cout << std::endl;
 
 			// SAVE PARAMETERS TO OUTPUT SHAPEFILE
 			OGRFeatureDefn *outFeatureDefn = outFeature->GetDefnRef();

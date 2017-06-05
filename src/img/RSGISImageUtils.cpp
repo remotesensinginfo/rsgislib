@@ -3544,7 +3544,6 @@ namespace rsgis{namespace img{
 	{
 		GDALAllRegister();
 		GDALDriver *poDriver = NULL;
-		GDALRasterBand *imgBand = NULL;
 		GDALDataset *outputImage = NULL;
 		
 		float *imgData = NULL;

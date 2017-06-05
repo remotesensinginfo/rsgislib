@@ -95,8 +95,7 @@ namespace rsgis{namespace filter{
 					sortedList.push_back(dataBlock[i][j][k]);
 				}
 			}
-			//sortedList->printAsc();
-			//std::cout << "Median = " << *sortedList->getAt(median) << std::endl;
+            
             std::sort(sortedList.begin(), sortedList.end());
 			output[i] = sortedList[median];
 			sortedList.clear();
@@ -628,8 +627,6 @@ namespace rsgis{namespace filter{
 			first = true;
 			for(int n = 0; n < 4; n++)
 			{
-				//std::cout << "Variance[" << n << "] = " << variance[n] << std::endl;
-				//std::cout << "Mean[" << n << "] = " << mean[n] << std::endl;
 				if(first)
 				{
 					minValue = variance[n];
@@ -645,8 +642,6 @@ namespace rsgis{namespace filter{
 					}
 				}
 			}
-
-			//std::cout << "Ouput Mean = " << mean[minIndex] << std::endl;
 			output[i] = mean[minIndex];
 		}
 

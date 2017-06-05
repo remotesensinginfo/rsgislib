@@ -1,10 +1,10 @@
 /*
- *  RSGISCommandLineException.h
+ *  RSGISHistoCubeException.h
  *  RSGIS_LIB
  *
- *  Created by Pete Bunting on 28/04/2008.
- *  Copyright 2008 RSGISLib.
- * 
+ *  Created by Pete Bunting on 17/02/2017.
+ *  Copyright 2017 RSGISLib.
+ *
  *  RSGISLib is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -20,21 +20,33 @@
  *
  */
 
-#ifndef RSGISCommandLineException_H
-#define RSGISCommandLineException_H
+#ifndef RSGISHistoCubeException_H
+#define RSGISHistoCubeException_H
 
 #include "RSGISException.h"
 
+// mark all exported classes/functions with DllExport to have
+// them exported by Visual Studio
+#undef DllExport
+#ifdef _MSC_VER
+#ifdef rsgis_commons_EXPORTS
+#define DllExport   __declspec( dllexport )
+#else
+#define DllExport   __declspec( dllimport )
+#endif
+#else
+#define DllExport
+#endif
+
 namespace rsgis
-{    
-	class DllExport RSGISCommandLineException : public RSGISException
-		{
-		public:
-			RSGISCommandLineException();
-			RSGISCommandLineException(const char* message);
-			RSGISCommandLineException(std::string message);
-		};
+{
+    class DllExport RSGISHistoCubeException : public RSGISException
+    {
+    public:
+        RSGISHistoCubeException();
+        RSGISHistoCubeException(const char* message);
+        RSGISHistoCubeException(std::string message);
+    };
 }
 
 #endif
-

@@ -46,14 +46,8 @@ namespace rsgis { namespace modeling {
 		{
 			canopyArea = canopyArea + canopyPoly->at(i)->getArea();
 		}
-		
-		//cout << "canopyArea = " << canopyArea << endl;
-		//cout << "Transect Area = " << transectArea << endl;
-		
 		canopyCover = (canopyArea / transectArea) * 100;
-		
-		//cout << "canopy Cover = " << canopyCover << endl;
-				
+						
 		return canopyCover;
 	}
 	void RSGISCalcCanopyCover::exportCanopyPoly(std::string outFile)

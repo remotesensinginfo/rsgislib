@@ -78,19 +78,6 @@ namespace rsgis{ namespace cmds {
             
             coordGrps = genConvexGrps.getCoordinateGroups(inputFile, eastingsColIdx, northingsColIdx, attributeColIdx);
             
-            /*
-             for(std::vector<std::pair<std::string,std::vector<geos::geom::Coordinate>* >* >::iterator iterGrps = coordGrps->begin(); iterGrps != coordGrps->end(); ++iterGrps)
-             {
-             std::cout << (*iterGrps)->first << std::endl;
-             std::cout << "\t";
-             for(std::vector<geos::geom::Coordinate>::iterator iterCoords = (*iterGrps)->second->begin(); iterCoords != (*iterGrps)->second->end(); ++iterCoords)
-             {
-             std::cout << "[" << (*iterCoords).x << "," << (*iterCoords).y << "]";
-             }
-             std::cout << std::endl;
-             }
-             */
-            
             std::cout << "Creating Polygons\n";
             genConvexGrps.createPolygonsAsShapefile(coordGrps, outputVector, wktProj, force);
             
@@ -216,9 +203,6 @@ namespace rsgis{ namespace cmds {
             
             delete processVector;
             delete processFeature;
-            
-            //OGRCleanupAll();
-            
         }
         catch(rsgis::RSGISVectorException &e)
         {
@@ -331,8 +315,6 @@ namespace rsgis{ namespace cmds {
             
             delete processVector;
             delete processGeom;
-            
-            //OGRCleanupAll();
         }
         catch(rsgis::RSGISVectorException &e)
         {
@@ -393,45 +375,8 @@ namespace rsgis{ namespace cmds {
             
             delete processVector;
             delete processFeature;
-
             
-            /*
-            numFeatures = inputSHPLayer->GetFeatureCount(true);
-            
-            std::cout << "Shapefile has " << numFeatures << " features\n";
-            vecIO = new rsgis::vec::RSGISVectorIO();
-            polygons = new rsgis::vec::RSGISPolygonData*[numFeatures];
-            for(int i = 0; i < numFeatures; i++)
-            {
-                polygons[i] = new rsgis::vec::RSGISEmptyPolygon();
-            }
-            vecIO->readPolygons(inputSHPLayer, polygons, numFeatures);
-            
-            std::cout.precision(8);
-            
-            for(int i = 0; i < numFeatures; i++)
-            {
-                std::cout << "Polygon " << i << ":\t" << polygons[i]->getGeometry()->toString() << std::endl;
-            }
-            
-            if(vecIO != NULL)
-            {
-                delete vecIO;
-            }
-            if(polygons != NULL)
-            {
-                for(int i = 0; i < numFeatures; i++)
-                {
-                    delete polygons[i];
-                }
-                delete polygons;
-            }
-             */
-            
-            GDALClose(inputSHPDS);
-            
-            //OGRCleanupAll();
-            
+            GDALClose(inputSHPDS);            
         }
         catch(rsgis::RSGISVectorException &e)
         {
@@ -492,9 +437,6 @@ namespace rsgis{ namespace cmds {
             GDALClose(inputSHPDS);
             delete processVector;
             delete processFeature;
-            
-            //OGRCleanupAll();
-            
         }
         catch(rsgis::RSGISVectorException &e)
         {
@@ -608,8 +550,6 @@ namespace rsgis{ namespace cmds {
             
             delete processVector;
             delete processFeature;
-            
-            //OGRCleanupAll();
         }
         catch(rsgis::RSGISVectorException &e)
         {
@@ -784,7 +724,6 @@ namespace rsgis{ namespace cmds {
                 catch (RSGISVectorException &e)
                 {
                     GDALClose(outputSHPDS);
-                    //OGRCleanupAll();
                     throw e;
                 }
                 // If no polygons in cover polygons, delete shapefile (will be empty)
@@ -800,8 +739,6 @@ namespace rsgis{ namespace cmds {
                 
                 
             }
-            
-            //OGRCleanupAll();
         }
         catch(rsgis::RSGISVectorException &e)
         {

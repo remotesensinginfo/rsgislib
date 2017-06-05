@@ -56,7 +56,7 @@ namespace rsgis{namespace radar{
 		
 		for(int i = 1; i < numBands; i++)
 		{
-			output[i-1] = 10*log10(bandValues[i]/cos(angle));//-(pi/4));
+			output[i-1] = 10*log10(bandValues[i]/cos(angle));
 		}
 	}
 	

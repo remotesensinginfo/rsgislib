@@ -1,10 +1,10 @@
 /*
- *  RSGISXMLArgumentsException.h
+ *  RSGISHistoCubeException.cpp
  *  RSGIS_LIB
  *
- *  Created by Pete Bunting on 03/12/2008.
- *  Copyright 2008 RSGISLib.
- * 
+ *  Created by Pete Bunting on 17/02/2017.
+ *  Copyright 2017 RSGISLib.
+ *
  *  RSGISLib is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -20,21 +20,24 @@
  *
  */
 
-#ifndef RSGISXMLArgumentsException_H
-#define RSGISXMLArgumentsException_H
+#include "RSGISHistoCubeException.h"
 
-#include "RSGISException.h"
-
-namespace rsgis 
-{    
-	class DllExport RSGISXMLArgumentsException : public RSGISException
-		{
-		public:
-			RSGISXMLArgumentsException();
-			RSGISXMLArgumentsException(const char* message);
-			RSGISXMLArgumentsException(std::string message);
-		};
+namespace rsgis
+{
+    
+    RSGISHistoCubeException::RSGISHistoCubeException() : RSGISException("RSGISHistoCubeException has been created..")
+    {
+        
+    }
+    
+    RSGISHistoCubeException::RSGISHistoCubeException(const char* message) : RSGISException(message)
+    {
+        
+    }
+    
+    RSGISHistoCubeException::RSGISHistoCubeException(std::string message) : RSGISException(message)
+    {
+        
+    }
+    
 }
-
-#endif
-

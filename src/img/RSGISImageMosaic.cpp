@@ -250,7 +250,6 @@ namespace rsgis{namespace img{
 			delete[] imgTransform;
 		}
 		GDALClose(outputDataset);
-        //GDALDestroyDriverManager();
 	}
 
 	void RSGISImageMosaic::mosaicSkipVals(std::string *inputImages, int numDS, std::string outputImage, float background, float skipVal, bool projFromImage, std::string proj, unsigned int skipBand, unsigned int overlapBehaviour, std::string format, GDALDataType imgDataType) throw(RSGISImageException)
@@ -627,7 +626,6 @@ namespace rsgis{namespace img{
 			delete[] imgTransform;
 		}
 		GDALClose(outputDataset);
-        //GDALDestroyDriverManager();
 	}
 
 	void RSGISImageMosaic::mosaicSkipThresh(std::string *inputImages, int numDS, std::string outputImage, float background, float skipLowerThresh, float skipUpperThresh, bool projFromImage, std::string proj, unsigned int threshBand, unsigned int overlapBehaviour, std::string format, GDALDataType imgDataType) throw(RSGISImageException)
@@ -1003,7 +1001,6 @@ namespace rsgis{namespace img{
 			delete[] imgTransform;
 		}
 		GDALClose(outputDataset);
-        //GDALDestroyDriverManager();
 	}
 
 	void RSGISImageMosaic::includeDatasets(GDALDataset *baseImage, std::string *inputImages, int numDS, std::vector<int> bands, bool bandsDefined) throw(RSGISImageException)
@@ -1080,31 +1077,6 @@ namespace rsgis{namespace img{
 			double baseExtentY = baseTransform[3] + (baseImage->GetRasterYSize() * baseTransform[5]);
 			double imgExtentX = transformation[0] + (width * transformation[1]);
 			double imgExtentY = transformation[3] + (height * transformation[5]);
-
-			/*std::cout << "Transformation[0] = " << transformation[0] << std::endl;
-			std::cout << "Transformation[1] = " << transformation[1] << std::endl;
-			std::cout << "Transformation[2] = " << transformation[2] << std::endl;
-			std::cout << "Transformation[3] = " << transformation[3] << std::endl;
-			std::cout << "Transformation[4] = " << transformation[4] << std::endl;
-			std::cout << "Transformation[5] = " << transformation[5] << std::endl;
-
-			std::cout << "baseTransform[0] = " << baseTransform[0] << std::endl;
-			std::cout << "baseTransform[1] = " << baseTransform[1] << std::endl;
-			std::cout << "baseTransform[2] = " << baseTransform[2] << std::endl;
-			std::cout << "baseTransform[3] = " << baseTransform[3] << std::endl;
-			std::cout << "baseTransform[4] = " << baseTransform[4] << std::endl;
-			std::cout << "baseTransform[5] = " << baseTransform[5] << std::endl;
-
-			std::cout << "baseImage->GetRasterXSize() = " << baseImage->GetRasterXSize() << std::endl;
-			std::cout << "baseImage->GetRasterYSize() = " << baseImage->GetRasterYSize() << std::endl;
-
-			std::cout << "Height = " << height << std::endl;
-			std::cout << "Width = " << width << std::endl;
-
-			std::cout << "baseExtentX = " << baseExtentX << std::endl;
-			std::cout << "baseExtentY = " << baseExtentY << std::endl;
-			std::cout << "imgExtentX = " << imgExtentX << std::endl;
-			std::cout << "imgExtentY = " << imgExtentY << std::endl;*/
 
 			// Check datasets fit within the base image.
 			if(transformation[0] < baseTransform[0])
@@ -1354,31 +1326,6 @@ namespace rsgis{namespace img{
             double baseExtentY = baseTransform[3] + (baseImage->GetRasterYSize() * baseTransform[5]);
             double imgExtentX = transformation[0] + (width * transformation[1]);
             double imgExtentY = transformation[3] + (height * transformation[5]);
-            
-            /*std::cout << "Transformation[0] = " << transformation[0] << std::endl;
-             std::cout << "Transformation[1] = " << transformation[1] << std::endl;
-             std::cout << "Transformation[2] = " << transformation[2] << std::endl;
-             std::cout << "Transformation[3] = " << transformation[3] << std::endl;
-             std::cout << "Transformation[4] = " << transformation[4] << std::endl;
-             std::cout << "Transformation[5] = " << transformation[5] << std::endl;
-             
-             std::cout << "baseTransform[0] = " << baseTransform[0] << std::endl;
-             std::cout << "baseTransform[1] = " << baseTransform[1] << std::endl;
-             std::cout << "baseTransform[2] = " << baseTransform[2] << std::endl;
-             std::cout << "baseTransform[3] = " << baseTransform[3] << std::endl;
-             std::cout << "baseTransform[4] = " << baseTransform[4] << std::endl;
-             std::cout << "baseTransform[5] = " << baseTransform[5] << std::endl;
-             
-             std::cout << "baseImage->GetRasterXSize() = " << baseImage->GetRasterXSize() << std::endl;
-             std::cout << "baseImage->GetRasterYSize() = " << baseImage->GetRasterYSize() << std::endl;
-             
-             std::cout << "height = " << height << std::endl;
-             std::cout << "Width = " << width << std::endl;
-             
-             std::cout << "baseExtentX = " << baseExtentX << std::endl;
-             std::cout << "baseExtentY = " << baseExtentY << std::endl;
-             std::cout << "imgExtentX = " << imgExtentX << std::endl;
-             std::cout << "imgExtentY = " << imgExtentY << std::endl;*/
             
             // Check datasets fit within the base image.
             if(transformation[0] < baseTransform[0])
@@ -1662,32 +1609,7 @@ namespace rsgis{namespace img{
             double baseExtentY = baseTransform[3] + (baseImage->GetRasterYSize() * baseTransform[5]);
             double imgExtentX = transformation[0] + (width * transformation[1]);
             double imgExtentY = transformation[3] + (height * transformation[5]);
-            
-            /*std::cout << "Transformation[0] = " << transformation[0] << std::endl;
-             std::cout << "Transformation[1] = " << transformation[1] << std::endl;
-             std::cout << "Transformation[2] = " << transformation[2] << std::endl;
-             std::cout << "Transformation[3] = " << transformation[3] << std::endl;
-             std::cout << "Transformation[4] = " << transformation[4] << std::endl;
-             std::cout << "Transformation[5] = " << transformation[5] << std::endl;
-             
-             std::cout << "baseTransform[0] = " << baseTransform[0] << std::endl;
-             std::cout << "baseTransform[1] = " << baseTransform[1] << std::endl;
-             std::cout << "baseTransform[2] = " << baseTransform[2] << std::endl;
-             std::cout << "baseTransform[3] = " << baseTransform[3] << std::endl;
-             std::cout << "baseTransform[4] = " << baseTransform[4] << std::endl;
-             std::cout << "baseTransform[5] = " << baseTransform[5] << std::endl;
-             
-             std::cout << "baseImage->GetRasterXSize() = " << baseImage->GetRasterXSize() << std::endl;
-             std::cout << "baseImage->GetRasterYSize() = " << baseImage->GetRasterYSize() << std::endl;
-             
-             std::cout << "Height = " << height << std::endl;
-             std::cout << "Width = " << width << std::endl;
-             
-             std::cout << "baseExtentX = " << baseExtentX << std::endl;
-             std::cout << "baseExtentY = " << baseExtentY << std::endl;
-             std::cout << "imgExtentX = " << imgExtentX << std::endl;
-             std::cout << "imgExtentY = " << imgExtentY << std::endl;*/
-            
+                        
             // Check datasets fit within the base image.
             if(transformation[0] < baseTransform[0])
             {

@@ -119,20 +119,6 @@ namespace rsgis{ namespace modeling  {
 	}
 	void RSGISTransect::setValue(unsigned int xCord, unsigned int yCord, unsigned int zCord, char transectVal)
 	{
-		// Set array value - throws exception if values outside array are reffernced
-		/*if(xCord > transectWidth)
-		{
-			throw RSGISModelingException("Width greater than transect max!");
-		}
-		if(yCord > transectLength)
-		{
-			throw RSGISModelingException("Length greater than transect max!");
-		}
-		if(zCord > transectHeight)
-		{
-			throw RSGISModelingException("Height greater than transect max!");
-		}*/
-		
 		// Only sets value if within transect, ignore is outside.
 		
 		if((xCord > 0) & (yCord > 0) & (zCord > 0))

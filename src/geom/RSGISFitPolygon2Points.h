@@ -52,6 +52,19 @@
 #include <boost/graph/kruskal_min_spanning_tree.hpp>
 #include <boost/graph/connected_components.hpp>
 
+// mark all exported classes/functions with DllExport to have
+// them exported by Visual Studio
+#undef DllExport
+#ifdef _MSC_VER
+    #ifdef rsgis_geom_EXPORTS
+        #define DllExport   __declspec( dllexport )
+    #else
+        #define DllExport   __declspec( dllimport )
+    #endif
+#else
+    #define DllExport
+#endif
+
 namespace rsgis{namespace geom{
 
     typedef CGAL::Exact_predicates_inexact_constructions_kernel K;

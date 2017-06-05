@@ -249,13 +249,6 @@ namespace rsgis{namespace segment{
             unsigned int blockWidth = endX - startX;
             unsigned int blockHeight = endY - startY;
             unsigned int blockSize = blockWidth * blockHeight;
-            
-            /*
-            std::cout << "[" << startX << ", " << endX << "][" << startY << ", " << endY << "] = " << pxlVal << "\n";
-            std::cout << "Block Width = " << blockWidth << std::endl;
-            std::cout << "Block Height = " << blockHeight << std::endl;
-            std::cout << "Block Size = " << blockSize << std::endl;
-            */
             unsigned int *block = new unsigned int[blockSize];
             for(unsigned int i = 0; i < blockSize; ++i)
             {

@@ -966,9 +966,12 @@ static PyObject *ImageCalc_AllBandsEqualTo(PyObject *self, PyObject *args) {
 
     rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)datatype;
 
-    try {
+    try
+    {
         rsgis::cmds::executeAllBandsEqualTo(inputImage, imgValue, outputTrueVal, outputFalseVal, outputImage, imageFormat, type);
-    } catch (rsgis::cmds::RSGISCmdException &e) {
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
         PyErr_SetString(GETSTATE(self)->error, e.what());
         return NULL;
     }
@@ -1007,7 +1010,6 @@ static PyObject *ImageCalc_GetHistogram(PyObject *self, PyObject *args) {
     
     PyObject *binsList = NULL;
     PyObject *outList = PyTuple_New(3);
-    //PyObject *val = Py_BuildValue("I", 42);
     try
     {
         unsigned int nBins = 0;
@@ -1015,14 +1017,8 @@ static PyObject *ImageCalc_GetHistogram(PyObject *self, PyObject *args) {
         double inMaxVal = inMax;
         unsigned int *bins = rsgis::cmds::executeGetHistogram(inputImage, imgBand, binWidth, &nBins, calcInMinMax, &inMinVal, &inMaxVal);
         
-        //std::cout << "nBins = " << nBins << std::endl;
-        
-        //std::cout << "inMinVal = " << inMinVal << std::endl;
-        //std::cout << "inMaxVal = " << inMaxVal << std::endl;
-        
         Py_ssize_t listLen = nBins;
         
-        //std::cout << "listLen = " << listLen << std::endl;
         
         binsList = PyTuple_New(listLen);
         if(binsList == NULL)
@@ -1033,7 +1029,6 @@ static PyObject *ImageCalc_GetHistogram(PyObject *self, PyObject *args) {
         
         for(unsigned int i = 0; i < nBins; ++i)
         {
-            //std::cout << i << " = " << bins[i] << std::endl;
             if(PyTuple_SetItem(binsList, i, Py_BuildValue("I", bins[i])) == -1)
             {
                 throw rsgis::cmds::RSGISCmdException("Failed to add a value to the list...");
@@ -1472,12 +1467,6 @@ static PyObject *ImageCalc_CalcPropTrueExp(PyObject *self, PyObject *args)
     delete[] pRSGISStruct;
     
     PyObject *outVal = Py_BuildValue("f", prop);
-    /*
-    if(PyTuple_SetItem(outVal, 0, Py_BuildValue("f", prop)) == -1)
-    {
-        throw rsgis::cmds::RSGISCmdException("Failed to add \'proportion\' value to the list...");
-    }
-    */
     return outVal;
 }
 
@@ -1493,7 +1482,7 @@ static PyObject *ImageCalc_calcMultiImgBandStats(PyObject *self, PyObject *args)
     float noDataVal = 0;
     int useNoDataVal = false;
     
-    if(!PyArg_ParseTuple(args, "Osisi|if:calcMultiImgBandStats", &inImagesObj, &outputImage, &sumStat, &gdalFormat, &datatype, &noDataVal, &useNoDataVal))
+    if(!PyArg_ParseTuple(args, "Osisi|fi:calcMultiImgBandStats", &inImagesObj, &outputImage, &sumStat, &gdalFormat, &datatype, &noDataVal, &useNoDataVal))
     {
         return NULL;
     }
@@ -1578,8 +1567,121 @@ static PyObject *ImageCalc_calcMultiImgBandStats(PyObject *self, PyObject *args)
 }
 
 
+static PyObject *ImageCalc_CalcImageDifference(PyObject *self, PyObject *args)
+{
+    const char *inputImage1, *inputImage2, *outputImage, *gdalFormat;
+    int datatype;
+    
+    if(!PyArg_ParseTuple(args, "ssssi:calcImageDifference", &inputImage1, &inputImage2, &outputImage, &gdalFormat, &datatype))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)datatype;
+        rsgis::cmds::calcImageDifference(std::string(inputImage1), std::string(inputImage2), std::string(outputImage), std::string(gdalFormat), type);
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
 
+static PyObject *ImageCalc_GetImageBandMinMax(PyObject *self, PyObject *args)
+{
+    const char *inputImage;
+    int imgBand;
+    int useNoDataVal = false;
+    float noDataVal = 0.0;
+    
+    if(!PyArg_ParseTuple(args, "si|if:getImageBandMinMax", &inputImage, &imgBand, &useNoDataVal, &noDataVal))
+    {
+        return NULL;
+    }
+    
+    PyObject *outList = PyTuple_New(2);
+    try
+    {
+        std::pair<double,double> outVals = rsgis::cmds::getImageBandMinMax(std::string(inputImage), imgBand, (bool)useNoDataVal, noDataVal);
+        
+        if(PyTuple_SetItem(outList, 0, Py_BuildValue("d", outVals.first)) == -1)
+        {
+            throw rsgis::cmds::RSGISCmdException("Failed to add min value to output tuple...");
+        }
+        if(PyTuple_SetItem(outList, 1, Py_BuildValue("d", outVals.second)) == -1)
+        {
+            throw rsgis::cmds::RSGISCmdException("Failed to add max value to output tuple...");
+        }
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    return outList;
+}
 
+static PyObject *ImageCalc_CalcImageRescale(PyObject *self, PyObject *args)
+{
+    PyObject *pInputImgsObj;
+    const char *outputImage, *gdalFormat;
+    int datatype;
+    float cNoDataVal, cOffset, cGain, nNoDataVal, nOffset, nGain = 0.0;
+    
+    if(!PyArg_ParseTuple(args, "Ossiffffff:calcImageRescale", &pInputImgsObj, &outputImage, &gdalFormat, &datatype, &cNoDataVal, &cOffset, &cGain, &nNoDataVal, &nOffset, &nGain))
+    {
+        return NULL;
+    }
+    
+    std::vector<std::string> inputImgs;
+    if(PySequence_Check(pInputImgsObj))
+    {
+        Py_ssize_t nInputImgs = PySequence_Size(pInputImgsObj);
+        for( Py_ssize_t n = 0; n < nInputImgs; n++ )
+        {
+            PyObject *strObj = PySequence_GetItem(pInputImgsObj, n);
+            if(RSGISPY_CHECK_STRING(strObj))
+            {
+                inputImgs.push_back(RSGISPY_STRING_EXTRACT(strObj));
+            }
+            else
+            {
+                PyErr_SetString(GETSTATE(self)->error, "Input images sequence must contain a list of strings");
+                return NULL;
+            }
+        }
+    }
+    else
+    {
+        if(RSGISPY_CHECK_STRING(pInputImgsObj))
+        {
+            inputImgs.push_back(RSGISPY_STRING_EXTRACT(pInputImgsObj));
+        }
+        else
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Input images parameter must be either a single string or a sequence of strings");
+            return NULL;
+        }
+    }
+    
+    try
+    {
+        rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)datatype;
+        rsgis::cmds::executeRescaleImages(inputImgs, std::string(outputImage), std::string(gdalFormat), type, cNoDataVal, cOffset, cGain, nNoDataVal, nOffset, nGain);
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
 
 
 // Our list of functions in this module
@@ -1587,6 +1689,7 @@ static PyMethodDef ImageCalcMethods[] = {
     {"bandMath", ImageCalc_BandMath, METH_VARARGS,
 "imagecalc.bandMath(outputImage, expression, gdalformat, datatype, bandDefnSeq, useExpAsbandName)\n"
 "Performs band math calculation.\n"
+"The syntax for the expression is from the muparser library ('http://muparser.beltoforion.de <http://muparser.beltoforion.de>`): `see here <http://beltoforion.de/article.php?a=muparser&hl=en&p=features&s=idPageTop>`\n."
 "\n"
 "Where:\n"
 "\n"
@@ -1610,11 +1713,17 @@ static PyMethodDef ImageCalcMethods[] = {
 "   bandDefns.append(BandDefn('b1', inFileName, 1))\n"
 "   bandDefns.append(BandDefn('b2', inFileName, 2))\n"
 "   imagecalc.bandMath(outputImage, expression, gdalformat, datatype, bandDefns)\n"
+"\n"
+"   ################## If Statement Example #########################\n"
+"   import rsgislib\n"
+"   from rsgislib import imagecalc\n"
+"   imagecalc.imageMath(in.kea, out.kea, ‘(b1==1) || (b1==2) || (b1==3)?0:1', 'KEA', rsgislib.TYPE_8UINT)\n"
 "\n"},
 
 {"imageMath", ImageCalc_ImageMath, METH_VARARGS,
 "imagecalc.imageMath(inputImage, outputImage, expression, gdalformat, datatype, useExpAsbandName)\n"
 "Performs image math calculation.\n"
+"The syntax for the expression is from the muparser library ('http://muparser.beltoforion.de <http://muparser.beltoforion.de>`): `see here <http://beltoforion.de/article.php?a=muparser&hl=en&p=features&s=idPageTop>`\n."
 "\n"
 "Where:\n"
 "\n"
@@ -2377,6 +2486,79 @@ static PyMethodDef ImageCalcMethods[] = {
 "* datatype is an containing one of the values from rsgislib.TYPE_*\n"
 "* noDataVal float with the value of the no data value, the same value for all the input images (Optional)\n"
 "* useNoDataVal is a boolean specifying whether the no data value should be used (Optional, default False)\n"
+"\n"},
+
+{"calcImageDifference", ImageCalc_CalcImageDifference, METH_VARARGS,
+"imagecalc.calcImageDifference(inputImage1, inputImage2, outputImage, gdalformat, datatype)\n"
+"Calculate the difference between two images (Image1 - Image2). Note the two images must have the same number of image bands.\n"
+"\n"
+"Where:\n"
+"\n"
+"* inputImage1 is a string containing the name of the first input file\n"
+"* inputImage2 is a string containing the name of the second input file\n"
+"* outputImage is a string containing the name of the output file\n"
+"* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+"* datatype is an containing one of the values from rsgislib.TYPE_*\n"
+"\n"
+"Example::\n"
+"\n"
+"   import rsgislib\n"
+"   from rsgislib import imagecalc\n"
+"   from rsgislib import imageutils\n"
+"   \n"
+"   inputImage1 = 'output_orig/LS8_20131111_lat29lon8717_r40p140_vmsk_rad_srefdem.kea'\n"
+"   inputImage2 = 'output_lutinterp/LS8_20131111_lat29lon8717_r40p140_vmsk_rad_srefdem.kea'\n"
+"   outputImage = 'LS8_20131111_lat29lon8717_r40p140_srefdemDiff.kea'\n"
+"   \n"
+"   imagecalc.calcImageDifference(inputImage1, inputImage2, outputImage, 'KEA', rsgislib.TYPE_32FLOAT)\n"
+"   imageutils.popImageStats(outputImage, usenodataval=False, nodataval=0, calcpyramids=True)\n"
+"   \n"
+"\n"},
+    
+{"getImageBandMinMax", ImageCalc_GetImageBandMinMax, METH_VARARGS,
+"imagecalc.getImageBandMinMax(inputImage, imageBand, useNoDataVal, noDataVal)\n"
+"Calculate and reutrn the maximum and minimum values of the input image.\n"
+"\n"
+"Where:\n"
+"\n"
+"* inputImage is a string containing the name of the input file\n"
+"* imageBand is an int specifying the image band\n"
+"* useNoDataVal is a boolean specifying whether the no data value should be used (Optional, default is False)\n"
+"* noDataVal is a string containing the GDAL format for the output file - eg 'KEA'\n"
+"\n"
+"Example::\n"
+"\n"
+"   import rsgislib\n"
+"   from rsgislib import imagecalc\n"
+"   \n"
+"   inputImage = 'LS8_20131111_lat29lon8717_r40p140_vmsk_rad_srefdem.kea'\n"
+"   imgBand = 1\n"
+"   \n"
+"   minMaxVals = imagecalc.getImageBandMinMax(inputImage, imgBand)\n"
+"   print('MIN: ', minMaxVals[0])\n"
+"   print('MAX: ', minMaxVals[1])\n"
+"   \n"
+"\n"},
+    
+{"calcImageRescale", ImageCalc_CalcImageRescale, METH_VARARGS,
+"imagecalc.calcImageRescale(inputImgs, outputImage, gdalFormat, datatype, cNoDataVal, cOffset, cGain, nNoDataVal, nOffset, nGain)\n"
+"A function which can take either a list of images or a single image to produce a single stacked output image.\n"
+"The image values are rescaled applying the input (current; c) gain and offset and then applying the new (n) gain"
+" and offset to the output image. Note, the nodata image value is also defined and can be changed. \n"
+"For reference gain/offset are applied as: ImgVal = (gain * DN) + offset\n"
+"\n"
+"Where:\n"
+"\n"
+"* inputImgs can be either a single input image file or a list of images to be stacked.\n"
+"* outputImage is the output image file.\n"
+"* gdalFormat output raster format (e.g., KEA)\n"
+"* datatype is an containing one of the values from rsgislib.TYPE_*\n"
+"* cNoDataVal is a float for the current (existing) no-data value for the imagery (note, all input images have the same no-data value).\n"
+"* cOffset is a float for the current offset value.\n"
+"* cGain is a float for the current gain value.\n"
+"* nNoDataVal is a float for the new no-data value for the imagery (note, all input images have the same no-data value).\n"
+"* nOffset is a float for the new offset value.\n"
+"* nGain is a float for the new gain value.\n"
 "\n"},
     
 {NULL}        /* Sentinel */

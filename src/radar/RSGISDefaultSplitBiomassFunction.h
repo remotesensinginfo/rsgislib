@@ -29,6 +29,19 @@
 
 #include "math/RSGISMathFunction.h"
 
+// mark all exported classes/functions with DllExport to have
+// them exported by Visual Studio
+#undef DllExport
+#ifdef _MSC_VER
+    #ifdef rsgis_radar_EXPORTS
+        #define DllExport   __declspec( dllexport )
+    #else
+        #define DllExport   __declspec( dllimport )
+    #endif
+#else
+    #define DllExport
+#endif
+
 namespace rsgis
 {
 	namespace radar
@@ -38,7 +51,7 @@ namespace rsgis
 		class DllExport RSGISDefaultSplitBiomassFunction : public rsgis::math::RSGISMathFunction
 			{
 				
-				/*
+				/**
 				 * The function implemented is:
 				 * \f$ 
 				 *		\gamma^0 = \begin{array}{l c l}

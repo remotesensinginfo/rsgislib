@@ -4,6 +4,7 @@
 These utilities allow for a more 'intelligent tiling process to be carried out:
 
 Example::
+
     import rsgislib
     from rsgislib.imageutils import tilingutils
     
@@ -18,6 +19,7 @@ Example::
     tilingutils.createMinDataTiles(inputImage, tileShp, width, height, validDataThreshold)
     tilingutils.createTileMaskImages(inputImage, tileShp, outTilesMaskBase)
     tilingutils.createTilesFromMasks(inputImage, outTilesMaskBase, outTilesImgBase, rsgislib.TYPE_16UINT, 'KEA')
+
 """
 ############################################################################
 #  tilingutils.py

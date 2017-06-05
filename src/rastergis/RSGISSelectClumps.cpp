@@ -150,15 +150,8 @@ namespace rsgis{namespace rastergis{
                 outIntColIdx.clear();
                 outStrColIdx.clear();
                 ratCalc.calcRATValues(gdalRAT, inRealColIdx, inIntColIdx, inStrColIdx, outRealColIdx, outIntColIdx, outStrColIdx);
-                delete selectDistVal;
+                delete[] selectDistVal;
             }
-            /*
-            for(unsigned int i = 0; i < numTiles; ++i)
-            {
-                std::cout << "Tile Size: " << tileIdxs[i]->size() << std::endl;
-                std::cout << "\tTile " << i << " = " << selectVal[i] << " index " << selectIdx[i] << std::endl;
-            }
-            */
             
             std::cout << "Writing to the output column\n";
             RSGISWriteSelectedClumpsColumn outSelectedClumps = RSGISWriteSelectedClumpsColumn(selectIdx, numTiles);

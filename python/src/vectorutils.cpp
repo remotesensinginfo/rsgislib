@@ -877,7 +877,7 @@ static PyMethodDef VectorUtilsMethods[] = {
 "\n"},
 
 {"fitPolygon2Points", VectorUtils_FitPolygon2Points, METH_VARARGS,
-"vectorutils.fitPolygon2Points(inputVector, outputVector, alphaVal. force)\n"
+"vectorutils.fitPolygon2Points(inputVector, outputVector, alphaVal, force)\n"
 "A command fit a polygon to the points inputted.\n\n"
 "Where:\n"
 "\n"
@@ -888,7 +888,7 @@ static PyMethodDef VectorUtilsMethods[] = {
 "\n"},
 
 {"fitPolygons2PointClusters", VectorUtils_FitPolygons2PointClusters, METH_VARARGS,
-"vectorutils.fitPolygons2PointClusters(inputVector, outputVector, clusterField, alphaVal. force)\n"
+"vectorutils.fitPolygons2PointClusters(inputVector, outputVector, clusterField, alphaVal, force)\n"
 "A command fit a polygon to the points inputted.\n\n"
 "Where:\n"
 "\n"
@@ -900,7 +900,7 @@ static PyMethodDef VectorUtilsMethods[] = {
 "\n"},
 
 {"createLinesOfPoints", VectorUtils_CreateLinesOfPoints, METH_VARARGS,
-"vectorutils.createLinesOfPoints(inputVector, outputVector, step. force)\n"
+"vectorutils.createLinesOfPoints(inputVector, outputVector, step, force)\n"
 "A function to create a regularly spaced set of points following a set of lines.\n\n"
 "Where:\n"
 "\n"

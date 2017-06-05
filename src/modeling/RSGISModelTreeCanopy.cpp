@@ -173,16 +173,9 @@ namespace rsgis { namespace modeling{
 					startY = centerY;
 					rY = 0;
 				}
-				/*if (branchZ >= maxZ)
-				{
-					branchZ = centerZ; // If branches go over maximum height start again
-					startZ = centerZ;  // halfway up transect
-					rZ = 0;
-				}*/
 				
 				// SET START POINT OF BRANCH SECTION
 				transect->setValue(branchX, branchY, branchZ, 1);
-				//cout << "Setting branch start at: (" << branchX << ", " << branchY << ", " << branchZ << ")" << endl;
 				
 				/* GROW OUT BRANCHES
 				 * If the branch radius is less than one voxel this will not run
@@ -352,15 +345,11 @@ namespace rsgis { namespace modeling{
 		unsigned int largeBranchDensityInt = int(largeBranchDensity + 0.5);
 		unsigned int leafDensityInt = int(leafDensity + 0.5);
 		
-		
 		unsigned int maxX = transect->getWidth();
 		unsigned int maxY = transect->getLenth();
-		
-		//cout << "leafDensityInt = " << leafDensityInt << ", smallBranchDensityInt = " << smallBranchDensityInt << endl;
- 		
+		 		
 		if (largeBranchDensityInt < 2) // If less than two large braches distribute branches randomly
 		{
-			
 			/********************************
 			 * ADD LARGE BRANCHES TO CANOPY *
 			 ********************************/
@@ -432,28 +421,6 @@ namespace rsgis { namespace modeling{
 				// Branches always grown away from center of the tree
 				smallBranchTheta = (smallBranchThetaDistro->calcRand() / 180) * pi;
 				smallBranchPhi = (smallBranchPhiDistro->calcRand()/180)*pi;
-				/*if(startX < centerX)
-				 {
-				 if (startY < centerY) 
-				 {
-				 smallBranchPhi = ((smallBranchPhiDistro->calcRand() + 180)/180)*pi;
-				 }
-				 else 
-				 {
-				 smallBranchPhi = ((smallBranchPhiDistro->calcRand() + 90)/180)*pi;
-				 }
-				 }
-				 else if(startX > centerX)
-				 {
-				 if (startY < centerY) 
-				 {
-				 smallBranchPhi = ((smallBranchPhiDistro->calcRand() + 270)/180)*pi;
-				 }
-				 else 
-				 {
-				 smallBranchPhi = ((smallBranchPhiDistro->calcRand())/180)*pi;
-				 }
-				 }*/
 				
 				// ADD SECTIONS TO BRANCH
 				rX = 0; rY = 0; rZ = 0;
@@ -477,16 +444,9 @@ namespace rsgis { namespace modeling{
 						startY = centerY;
 						rY = 0;
 					}
-					/*if (branchZ >= maxZ)
-					 {
-					 branchZ = centerZ; // If branches go over maximum height start again
-					 startZ = centerZ;  // halfway up transect
-					 rZ = 0;
-					 }*/
 					
 					// SET START POINT OF BRANCH SECTION
 					transect->setValue(branchX, branchY, branchZ, 1);
-					//cout << "Setting branch start at: (" << branchX << ", " << branchY << ", " << branchZ << ")" << endl;
 					
 					/* GROW OUT BRANCHES
 					 * If the branch radius is less than one voxel this will not run
@@ -585,9 +545,7 @@ namespace rsgis { namespace modeling{
 				// GENERATE ORIENTATION ANGLE FOR EACH BRANCH
 				largeBranchTheta = (largeBranchThetaDistro->calcRand() / 180) * pi; // Angle in incidence plane varies between 0 - 90
 				largeBranchPhi = ((largeBranchPhiDistro->calcRand())/180)*pi;
-				
-				//cout << "large branch Theta = " << largeBranchTheta * (180 / pi) << endl; 
-				
+								
 				// ADD SECTIONS TO BRANCH
 				rX = 0; rY = 0; rZ = 0;
 				rItt = 0;
@@ -629,13 +587,6 @@ namespace rsgis { namespace modeling{
 				/********************************
 				 * ADD SMALL BRANCHES TO CANOPY *
 				 ********************************/
-				
-				/*unsigned int centerZ = int(maxZ / 2); // Vertical start point for canopy at middle of transect
-				
-				int largeBranchX = branchX;
-				int largeBranchY = branchY;
-				int largeBranchZ = branchZ;*/
-				
 				for(unsigned int i = 0; i < smallBranchDensityInt / largeBranchDensityInt; i++)
 				{
 					// GENERATE START POINT FOR EACH BRANCH
@@ -643,10 +594,7 @@ namespace rsgis { namespace modeling{
 					startX = centerX + (smallBranchPos * cos(largeBranchPhi) * sin(largeBranchTheta) + 0.5);
 					startY = centerY + (smallBranchPos * sin(largeBranchPhi) * sin(largeBranchTheta) + 0.5);
 					startZ = (smallBranchPos * cos(largeBranchTheta) + 0.5);
-					
-					//cout << "smallBranchPos = " << smallBranchPos << endl;
-					//cout << "Branch start = (" << startX << ", " << startY << ", " << startZ << ")" << endl;
-					
+										
 					// GENERATE ORIENTATION ANGLE FOR EACH BRANCH
 					// Branches always grown away from center of the tree
 					smallBranchTheta = (smallBranchThetaDistro->calcRand() / 180)*pi;
@@ -673,16 +621,9 @@ namespace rsgis { namespace modeling{
 							startY = centerY;
 							rY = 0;
 						}
-						/*if (branchZ >= maxZ)
-						 {
-						 branchZ = centerZ; // If branches go over maximum height start again
-						 startZ = centerZ;  // halfway up transect
-						 rZ = 0;
-						 }*/
 						
 						// SET START POINT OF BRANCH SECTION
 						transect->setValue(branchX, branchY, branchZ, 1);
-						//cout << "Setting branch start at: (" << branchX << ", " << branchY << ", " << branchZ << ")" << endl;
 						
 						/* GROW OUT BRANCHES
 						 * If the branch radius is less than one voxel this will not run

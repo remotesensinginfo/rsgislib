@@ -35,25 +35,15 @@
 #
 ############################################################################
 
-
-haveGDALOGRPy = True
-try:
-    from osgeo import ogr
-    from osgeo import osr
-except ImportError:
-    haveGDALOGRPy = False
+from osgeo import ogr
+from osgeo import osr
+import numpy
 
 havePysolar = True
 try:
     import Pysolar
 except ImportError:
     havePysolar = False
-
-haveNumpy = True
-try:
-    import numpy
-except ImportError:
-    haveNumpy = False
 
 haveRIOS = True
 try:
@@ -67,22 +57,21 @@ import datetime
 
 def getSolarIrrConventionSolarAzimuthFromUSGS(solarAz):
     """
-    IN: USGS Convertion:
-              N (0)
-              |
-     W (-90)-----E (90) 
-              |
-       (-180) S (180)
-    
-    OUT: Solar Irradiance Convertion:
-              N (0)
-              |
-     W (270)-----E (90) 
-              |
-              S (180)
+IN: USGS Convertion:
+          N (0)
+          |
+ W (-90)-----E (90) 
+          |
+   (-180) S (180)
 
-    
-    """
+OUT: Solar Irradiance Convertion:
+          N (0)
+          |
+ W (270)-----E (90) 
+          |
+          S (180)
+
+"""
     solarAzOut = solarAz
     if solarAz < 0:
         solarAzOut = 360 + solarAz
@@ -91,21 +80,21 @@ def getSolarIrrConventionSolarAzimuthFromUSGS(solarAz):
     
 def getSolarIrrConventionSolarAzimuthFromTrad(solarAz):
     """
-    IN: Traditional Convertion:
-       (-180) N (180)
-              |
-     W (-90)-----E (90) 
-              |
-              S (0)
-    
-    OUT: Solar Irradiance Convertion:
-              N (0)
-              |
-     W (270)-----E (90) 
-              |
-              S (180)    
+IN: Traditional Convertion:
+   (-180) N (180)
+          |
+ W (-90)-----E (90) 
+          |
+          S (0)
 
-    """
+OUT: Solar Irradiance Convertion:
+          N (0)
+          |
+ W (270)-----E (90) 
+          |
+          S (180)    
+
+"""
     solarAzOut = 0.0
     if solarAz > 0:
         solarAzOut = 180 - solarAz
@@ -115,6 +104,10 @@ def getSolarIrrConventionSolarAzimuthFromTrad(solarAz):
     
 
 def _calcSolarAzimuthZenith(info, inputs, outputs, otherargs):
+    """
+Internal functions used within calcSolarAzimuthZenith() - don't call independently.
+
+"""
     xBlock, yBlock = info.getBlockCoordArrays()
 
     inProj = osr.SpatialReference()
@@ -145,21 +138,14 @@ def _calcSolarAzimuthZenith(info, inputs, outputs, otherargs):
 
 def calcSolarAzimuthZenith(inputImg, inImgDateTime, outputImg, gdalFormat):
     """
-    Function which calculate a solar azimuth (band 1) and zenith (band 2) image.
+Function which calculate a solar azimuth (band 1) and zenith (band 2) image.
 
-    """
-    if not haveGDALOGRPy:
-        raise Exception("The GDAL OGR/OSR python bindings required for this function could not be imported.")
-
+"""
     if not havePysolar:
         raise Exception("The PySolar module required for this function could not be imported.")
 
     if not haveRIOS:
         raise Exception("The RIOS module required for this function could not be imported.")
-
-    if not haveNumpy:
-        raise Exception("The numpy module required for this function could not be imported.")
-
 
     infiles = applier.FilenameAssociations()
     infiles.image1 = inputImg

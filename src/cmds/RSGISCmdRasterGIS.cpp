@@ -61,17 +61,6 @@
 #include "rastergis/RSGISRATStats.h"
 #include "rastergis/RSGISExportClumps2Imgs.h"
 
-/*
-
-#include "rastergis/RSGISCalcEucDistanceInAttTable.h"
-#include "rastergis/RSGISFindTopNWithinDist.h"
-#include "rastergis/RSGISFindClosestSpecSpatialFeats.h"
-#include "rastergis/RSGISKNNATTMajorityClassifier.h"
-#include "rastergis/RSGISMaxLikelihoodRATClassification.h"
-#include "rastergis/RSGISClassMask.h"
-#include "rastergis/RSGISCalcClumpShapeParameters.h"
-*/
-
 
 namespace rsgis{ namespace cmds {
 
@@ -484,7 +473,6 @@ namespace rsgis{ namespace cmds {
 
             GDALClose(clumpsDataset);
             GDALClose(catsDataset);
-            //GDALDestroyDriverManager();
         }
         catch(rsgis::RSGISException &e)
         {
@@ -527,7 +515,6 @@ namespace rsgis{ namespace cmds {
             delete[] bandNames;
 
             GDALClose(inputDataset);
-            //GDALDestroyDriverManager();
         }
         catch(rsgis::RSGISException &e)
         {
