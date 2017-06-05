@@ -43,7 +43,8 @@ Create a list of these objects to pass to the extractZoneImageBandValues2HDF fun
 # define our own classes
 class SharpBandInfo(object):
     """
-Create a list of these objects to pass to the sharpenLowResBands function
+Create a list of these objects to pass to the sharpenLowResBands function.
+
 * band - is the band number (band numbering starts at 1).
 * status - needs to be either rsgislib.SHARP_RES_IGNORE, rsgislib.SHARP_RES_LOW or rsgislib.SHARP_RES_HIGH
            lowres bands will be sharpened using the highres bands and ignored bands 
@@ -622,19 +623,19 @@ Where:
 
 def mergeExtractedHDF5Data(h5Files, outH5File):
     """
-    A function to merge a list of HDF files (e.g., from rsgislib.imageutils.extractZoneImageBandValues2HDF)
-    with the same number of variables (i.e., columns) into a single file. For example, if class training
-    regions have been sourced from multiple images. 
-    
-    * h5Files - a list of input files. 
-    * outH5File - the output file.
-    
-    Example::
-    
-    inTrainSamples = ['MSS_CloudTrain1.h5', 'MSS_CloudTrain2.h5', 'MSS_CloudTrain3.h5']
-    cloudTrainSamples = 'LandsatMSS_CloudTrainingSamples.h5'
-    rsgislib.imageutils.mergeExtractedHDF5Data(inTrainSamples, cloudTrainSamples)
-    """
+A function to merge a list of HDF files (e.g., from rsgislib.imageutils.extractZoneImageBandValues2HDF)
+with the same number of variables (i.e., columns) into a single file. For example, if class training
+regions have been sourced from multiple images. 
+
+* h5Files - a list of input files. 
+* outH5File - the output file.
+
+Example::
+
+inTrainSamples = ['MSS_CloudTrain1.h5', 'MSS_CloudTrain2.h5', 'MSS_CloudTrain3.h5']
+cloudTrainSamples = 'LandsatMSS_CloudTrainingSamples.h5'
+rsgislib.imageutils.mergeExtractedHDF5Data(inTrainSamples, cloudTrainSamples)
+"""
     import h5py
     
     first = True
