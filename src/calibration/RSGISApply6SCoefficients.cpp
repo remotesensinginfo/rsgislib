@@ -111,12 +111,28 @@ namespace rsgis{namespace calib{
         
     }
     
-    RSGISApply6SCoefficientsElevLUTParam::RSGISApply6SCoefficientsElevLUTParam(unsigned int numOutBands, std::vector<LUT6SElevation> *lut, float noDataVal, bool useNoDataVal, float scaleFactor):rsgis::img::RSGISCalcImageValue(numOutBands)
+    RSGISApply6SCoefficientsElevLUTParam::RSGISApply6SCoefficientsElevLUTParam(unsigned int numOutBands, std::vector<LUT6SElevation> *lut, float demNoDataVal, float noDataVal, bool useNoDataVal, float scaleFactor):rsgis::img::RSGISCalcImageValue(numOutBands)
     {
 		this->lut = lut;
         this->scaleFactor = scaleFactor;
+        this->demNoDataVal = demNoDataVal;
         this->noDataVal = noDataVal;
         this->useNoDataVal = useNoDataVal;
+        
+        double minElev = 0;
+        for(unsigned int i = 0; i < lut->size(); ++i)
+        {
+            if(i == 0)
+            {
+                minElev = lut->at(i).elev;
+                minElevCoeffs = lut->at(i);
+            }
+            else if(lut->at(i).elev < minElev)
+            {
+                minElev = lut->at(i).elev;
+                minElevCoeffs = lut->at(i);
+            }
+        }
     }
     
     void RSGISApply6SCoefficientsElevLUTParam::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
@@ -127,6 +143,10 @@ namespace rsgis{namespace calib{
         }
         
         float elevVal = bandValues[0];
+        if(elevVal == demNoDataVal)
+        {
+            elevVal = minElevCoeffs.elev;
+        }
 		
         bool nodata = true;
         if(this->useNoDataVal)

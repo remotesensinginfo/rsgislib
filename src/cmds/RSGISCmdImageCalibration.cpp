@@ -380,6 +380,16 @@ namespace rsgis{ namespace cmds {
                 throw rsgis::RSGISImageException(message.c_str());
             }
             
+            double demNoDataVal = 0.0;
+            int demNoDataValAvail = false;
+            demNoDataVal = datasets[0]->GetRasterBand(1)->GetNoDataValue(&demNoDataValAvail);
+            if(!demNoDataValAvail)
+            {
+                GDALClose(datasets[0]);
+                delete[] datasets;
+                throw rsgis::RSGISException("The DEM image file does not have a no data value defined. ");
+            }
+            
             std::cout << "Open Radiance image: \'" << inputRadImage << "\'" << std::endl;
             datasets[1] = (GDALDataset *) GDALOpen(inputRadImage.c_str(), GA_ReadOnly);
             if(datasets[1] == NULL)
@@ -425,8 +435,7 @@ namespace rsgis{ namespace cmds {
             }
             
             std::cout << "Apply Coefficients to input image...\n";
-
-            rsgis::calib::RSGISApply6SCoefficientsElevLUTParam *apply6SCoefficients = new rsgis::calib::RSGISApply6SCoefficientsElevLUTParam(numRasterBands, rsgisLUT, noDataVal, useNoDataVal, scaleFactor);
+            rsgis::calib::RSGISApply6SCoefficientsElevLUTParam *apply6SCoefficients = new rsgis::calib::RSGISApply6SCoefficientsElevLUTParam(numRasterBands, rsgisLUT, demNoDataVal, noDataVal, useNoDataVal, scaleFactor);
             
             rsgis::img::RSGISCalcImage *calcImage = new rsgis::img::RSGISCalcImage(apply6SCoefficients, "", true);
             calcImage->calcImage(datasets, 2, outputImage, false, NULL, gdalFormat, RSGIS_to_GDAL_Type(rsgisOutDataType));
