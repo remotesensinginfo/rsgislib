@@ -272,7 +272,7 @@ A function to extract an image footprint as a vector.
     
     validOutImg = os.path.join(tmpDIR, inImgBase+'_'+uidStr+'_validimg.kea')
     inImgNoData = rsgisUtils.getImageNoDataValue(inputImg)
-    rsgislib.imageutils.genValidMask(inimages=inputImg, outimage=validOutImg, format='KEA', nodata=inImgNoData)
+    rsgislib.imageutils.genValidMask(inimages=inputImg, outimage=validOutImg, gdalFormat='KEA', nodata=inImgNoData)
     
     outVecTmpFile = outVec
     if not (rePrjTo is None):
