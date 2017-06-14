@@ -23,7 +23,7 @@ from rsgislib import imageutils
 # Import the RSGISLib RasterGIS module
 from rsgislib import rastergis
 
-def rasterise2Image(inputVec, inputImage, outImage, gdalFormat="KEA", burnVal=1, shpAtt=None, shpExt=False):
+def rasterise2Image(inputVec, inputImage, outImage, gdalformat="KEA", burnVal=1, shpAtt=None, shpExt=False):
     """ 
 A utillity to rasterise a shapefile into an image covering the same region and at the same resolution as the input image. 
 
