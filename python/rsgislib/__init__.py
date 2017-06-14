@@ -295,7 +295,7 @@ class RSGISPyUtils (object):
             RSGISLib data type int.
         """
         gdaltype = gdaltype.lower()
-        if gdaltype == 'byte' or gdaltype == 'int8':
+        if gdaltype == 'int8':
             return TYPE_8INT
         elif gdaltype == 'int16':
             return TYPE_16INT
@@ -303,7 +303,7 @@ class RSGISPyUtils (object):
             return TYPE_32INT
         elif gdaltype == 'int64':
             return TYPE_64INT
-        elif gdaltype == 'uint8':
+        elif gdaltype == 'byte' or gdaltype == 'uint8':
             return TYPE_8UINT
         elif gdaltype == 'uint16':
             return TYPE_16UINT
