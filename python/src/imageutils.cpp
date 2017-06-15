@@ -523,7 +523,7 @@ static PyObject *ImageUtils_PopImageStats(PyObject *self, PyObject *args, PyObje
 
 static PyObject *ImageUtils_AssignProj(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    static char *kwlist[] = {"inimage", "wktString", "wktFile"};
+    static char *kwlist[] = {"inimage", "wktString", "wktFile", NULL};
     const char *pszInputImage;
     std::string pszInputProj = "";
     std::string pszInputProjFile = "";
@@ -1232,7 +1232,7 @@ static PyObject *ImageUtils_GenSamplingGrid(PyObject *self, PyObject *args)
 
 static PyObject *ImageUtils_GenFiniteMask(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    static char *kwlist[] = {"inimage", "outimage", "gdalformat"};
+    static char *kwlist[] = {"inimage", "outimage", "gdalformat", NULL};
     const char *pszInputImage = "";
     const char *pszOutputImage = "";
     const char *pszGDALFormat = "";
@@ -1313,7 +1313,7 @@ static PyObject *ImageUtils_GenValidMask(PyObject *self, PyObject *args, PyObjec
 
 static PyObject *ImageUtils_CombineImages2Band(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    static char *kwlist[] = {"inimages", "outimage", "gdalformat", "datatype", "nodata"};
+    static char *kwlist[] = {"inimages", "outimage", "gdalformat", "datatype", "nodata", NULL};
     PyObject *pInputImages;
     const char *pszOutputImage = "";
     const char *pszGDALFormat = "";
@@ -1368,7 +1368,7 @@ static PyObject *ImageUtils_CombineImages2Band(PyObject *self, PyObject *args, P
 
 static PyObject *ImageUtils_PerformRandomPxlSample(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    static char *kwlist[] = {"inputImage", "outputImage", "gdalformat", "maskvals", "numSamples"};
+    static char *kwlist[] = {"inputImage", "outputImage", "gdalformat", "maskvals", "numSamples", NULL};
     const char *pszInputImage = "";
     const char *pszOutputImage = "";
     const char *pszGDALFormat = "";
@@ -1429,7 +1429,7 @@ static PyObject *ImageUtils_PerformRandomPxlSample(PyObject *self, PyObject *arg
 
 static PyObject *ImageUtils_PerformRandomPxlSampleSmallPxlCount(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    static char *kwlist[] = {"inputImage", "outputImage", "gdalformat", "maskvals", "numSamples", "rndSeed"};
+    static char *kwlist[] = {"inputImage", "outputImage", "gdalformat", "maskvals", "numSamples", "rndSeed", NULL};
     const char *pszInputImage = "";
     const char *pszOutputImage = "";
     const char *pszGDALFormat = "";
