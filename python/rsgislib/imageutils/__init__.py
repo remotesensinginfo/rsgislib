@@ -241,7 +241,7 @@ A function which returns the WKT string representing the projection of the input
     rasterDS = None
     return projStr
 
-def resampleImage2Match(inRefImg, inProcessImg, outImg, gdalFormat, interpMethod, datatype=None):
+def resampleImage2Match(inRefImg, inProcessImg, outImg, gdalformat, interpMethod, datatype=None):
     """
 A utility function to resample an existing image to the projection and/or pixel size of another image.
 
@@ -250,7 +250,7 @@ Where:
 * inRefImg is the input reference image to which the processing image is to resampled to.
 * inProcessImg is the image which is to be resampled.
 * outImg is the output image file.
-* gdalFormat is the gdal format for the output image.
+* gdalformat is the gdal format for the output image.
 * interpMethod is the interpolation method used to resample the image [bilinear, lanczos, cubicspline, nearestneighbour, cubic, average, mode]
 * datatype is the rsgislib datatype of the output image (if none then it will be the same as the input file).
 
@@ -296,7 +296,7 @@ Where:
     else:
         raise Exception("Interpolation method was not recognised or known.")
     
-    rsgislib.imageutils.createCopyImage(inRefImg, outImg, numBands, 0, gdalFormat, datatype)
+    rsgislib.imageutils.createCopyImage(inRefImg, outImg, numBands, 0, gdalformat, datatype)
 
     inFile = gdal.Open(inProcessImg, gdal.GA_ReadOnly)
     outFile = gdal.Open(outImg, gdal.GA_Update)
@@ -309,7 +309,7 @@ Where:
 
 
 
-def reprojectImage(inputImage, outputImage, outWKT, gdalFormat='KEA', interp='cubic', inWKT=None, noData=0.0, outPxlRes='image', snap2Grid=True):
+def reprojectImage(inputImage, outputImage, outWKT, gdalformat='KEA', interp='cubic', inWKT=None, noData=0.0, outPxlRes='image', snap2Grid=True):
     """
 This function provides a tool which uses the gdalwarp function to reproject an input image.
 
@@ -318,7 +318,7 @@ Where:
 * inputImage - the input image name and path
 * outputImage - the output image name and path
 * outWKT - a WKT file representing the output projection
-* gdalFormat - the output image file format (Default is KEA)
+* gdalformat - the output image file format (Default is KEA)
 * interp - interpolation algorithm. Options are: near, bilinear, cubic, cubicspline, lanczos, average, mode. (Default is cubic)
 * inWKT - if input image is not well defined this is the input image projection as a WKT file (Default is None, i.e., ignored)
 * noData - float representing the not data value (Default is 0.0)
@@ -471,7 +471,7 @@ Where:
         outHeight = int(round((yMax - yMin) / outRes)) + 10
     
     print('Creating blank image')
-    rsgislib.imageutils.createBlankImage(outputImage, numBands, outWidth, outHeight, outTLX, outTLY, outRes, noData, "", outWKTStr, gdalFormat, rsgisDataType)
+    rsgislib.imageutils.createBlankImage(outputImage, numBands, outWidth, outHeight, outTLX, outTLY, outRes, noData, "", outWKTStr, gdalformat, rsgisDataType)
 
     outImgDS = gdal.Open(outputImage, gdal.GA_Update)
     
@@ -486,7 +486,7 @@ Where:
 
 
 
-def subsetImgs2CommonExtent(inImagesDict, outShpEnv, gdalFormat):
+def subsetImgs2CommonExtent(inImagesDict, outShpEnv, gdalformat):
     """
 A command to subset a set of images to the same overlapped extent.
 
@@ -494,7 +494,7 @@ Where:
 
 * inImagesDict is a list of dictionaries containing values for IN (input image) OUT (output image) and TYPE (data type for output)
 * outShpEnv is a file path for the output shapefile representing the overlap extent.
-* gdalFormat is the gdal format of the output images.
+* gdalformat is the gdal format of the output images.
 
 Example::
     
@@ -518,7 +518,7 @@ Example::
     rsgislib.vectorutils.findCommonImgExtent(inImages, outShpEnv, True)
     
     for inImgDict in inImagesDict:
-        rsgislib.imageutils.subset(inImgDict['IN'], outShpEnv, inImgDict['OUT'], gdalFormat, inImgDict['TYPE'])
+        rsgislib.imageutils.subset(inImgDict['IN'], outShpEnv, inImgDict['OUT'], gdalformat, inImgDict['TYPE'])
     
 
 
@@ -594,7 +594,7 @@ def _getXYPxlLocs(info, inputs, outputs, otherargs):
 
 
 
-def calcPixelLocations(inputImg, outputImg, gdalFormat):
+def calcPixelLocations(inputImg, outputImg, gdalformat):
     """
 Function which produces a 2 band output image with the X and Y locations of the image pixels.
 
@@ -602,7 +602,7 @@ Where:
 
 * inputImg - the input reference image
 * outputImg - the output image file name and path (will be same dimensions as the input)
-* gdalFormat - the GDAL image file format of the output image file.
+* gdalformat - the GDAL image file format of the output image file.
 
 """
     if not haveRIOS:
@@ -615,7 +615,7 @@ Where:
     otherargs = applier.OtherInputs()
     aControls = applier.ApplierControls()
     aControls.progress = cuiprogress.CUIProgressBar()
-    aControls.drivername = gdalFormat
+    aControls.drivername = gdalformat
     aControls.omitPyramids = True
     aControls.calcStats = False
 
@@ -755,7 +755,7 @@ def _popPxlsRanVals(info, inputs, outputs, otherargs):
     outputs.outimage = numpy.random.random_integers(otherargs.lowVal, high=otherargs.upVal, size=inputs.inImg.shape)
     outputs.outimage = outputs.outimage.astype(numpy.int32, copy=False)
 
-def generateRandomPxlValsImg(inputImg, outputImg, gdalFormat, lowVal, upVal):
+def generateRandomPxlValsImg(inputImg, outputImg, gdalformat, lowVal, upVal):
     """
 Function which produces a 1 band image with random values between lowVal and upVal.
 
@@ -763,7 +763,7 @@ Where:
 
 * inputImg - the input reference image
 * outputImg - the output image file name and path (will be same dimensions as the input)
-* gdalFormat - the GDAL image file format of the output image file.
+* gdalformat - the GDAL image file format of the output image file.
 * lowVal - lower value
 * upVal - upper value 
 
@@ -780,7 +780,7 @@ Where:
     otherargs.upVal = upVal
     aControls = applier.ApplierControls()
     aControls.progress = cuiprogress.CUIProgressBar()
-    aControls.drivername = gdalFormat
+    aControls.drivername = gdalformat
     aControls.omitPyramids = True
     aControls.calcStats = False
     

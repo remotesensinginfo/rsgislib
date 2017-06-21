@@ -36,99 +36,74 @@ from rsgislib import imageutils
 import argparse
 import fnmatch
 
-def getRSGISLibDataType(gdaltype):
-    gdaltype = gdaltype.lower()
-    if gdaltype == 'byte' or gdaltype == 'int8':
-        return rsgislib.TYPE_8INT
-    elif gdaltype == 'int16':
-        return rsgislib.TYPE_16INT
-    elif gdaltype == 'int32':
-        return rsgislib.TYPE_32INT
-    elif gdaltype == 'int64':
-        return rsgislib.TYPE_64INT
-    elif gdaltype == 'uint8':
-        return rsgislib.TYPE_8UINT
-    elif gdaltype == 'uint16':
-        return rsgislib.TYPE_16UINT
-    elif gdaltype == 'uint32':
-        return rsgislib.TYPE_32UINT
-    elif gdaltype == 'uint64':
-        return rsgislib.TYPE_64UINT
-    elif gdaltype == 'float32':
-        return rsgislib.TYPE_32FLOAT
-    elif gdaltype == 'float64':
-        return rsgislib.TYPE_64FLOAT
-     
-def getGDALFormat(fileName):
-    """ Get GDAL format, based on filename """
-    gdalStr = ''
-    extension = os.path.splitext(fileName)[-1] 
-    if extension == '.env':
-        gdalStr = 'ENVI'
-    elif extension == '.kea':
-        gdalStr = 'KEA'
-    elif extension == '.tif':
-        gdalStr = 'GTiff'
-    elif extension == '.img':
-        gdalStr = 'HFA'
-    else:
-        raise Exception('Type not recognised')
-    
-    return gdalStr
-
+"""
 # Print help
-print('rsgislibmosaic.py script provides command line utility.')
-print('for recursively finding files and mosaicking.  ')
+print('rsgislibmosaic.py script provides command line utility for')
+print('mosaicking image files, including recursively finding files')
+print('within an input directory.')
 print('This script was distributed with @RSGISLIB_PACKAGE_STRING@')
 print('Copyright (C) @RSGISLIB_COPYRIGHT_YEAR@ Peter Bunting and Daniel Clewley')
 print('For support please email @RSGISLIB_PACKAGE_BUGREPORT@\n')
+"""
 
 # Get input parameters
 parser = argparse.ArgumentParser()
-parser.add_argument("-i", "--indir", type=str, required=True, help="Input directory to recursively search")
-parser.add_argument("-s", "--search", type=str, required=True, help="Search string, e.g., '*kea', must be in quotes.")
+parser.add_argument("--inputimages", type=str, nargs='+', required=False, help="Provide a list of images to be mosaicked rather than search info.")
+parser.add_argument("-i", "--indir", type=str, required=False, help="Input directory to recursively search")
+parser.add_argument("-s", "--search", type=str, required=False, help="Search string, e.g., '*kea', must be in quotes.")
 parser.add_argument("-o", "--outmosaic", type=str, required=True, help="Output mosaic file")
 parser.add_argument("-l",'--outlist',type=str, default=None,help="Output text file with list of files in mosaic (optional)")
-parser.add_argument("-ot",'--datatype',type=str, default='Float32',help="Data type")
+parser.add_argument("-ot",'--datatype',choices=['int8', 'int16', 'int32', 'int64', 'uint8', 'byte', 'uint16', 'uint32', 'uint64', 'float32', 'float64'], default='float32',help="Data type")
 parser.add_argument("--backgroundval", type=float, default=0,help="Background Value (default 0)")
 parser.add_argument("--skipval", type=float, default=0,help="Value to be skipped (nodata values) in the input images (default 0)")
 parser.add_argument("--skipband", type=int, default=1,help="Band to check for skip val (default 1)")
 parser.add_argument("--minpix", action='store_true', default=False, help="Use minimum pixel in overlap areas (default, use last image in)")
-parser.add_argument("--maxpix", action='store_true',default=False, help="Use maximum pixel in overlap areas (default, use last image in)")
-parser.add_argument("--nostats", action='store_true',default=False, help="Don't calculate statistics and pyramids for mosaic (default is to calculate)")
+parser.add_argument("--maxpix", action='store_true', default=False, help="Use maximum pixel in overlap areas (default, use last image in)")
+parser.add_argument("--nostats", action='store_true', default=False, help="Don't calculate statistics and pyramids for mosaic (default is to calculate)")
 args = parser.parse_args()    
 
+rsgisUtils = rsgislib.RSGISPyUtils()
+
+search4InImgs = True
+if args.inputimages != None:
+    if len(args.inputimages) > 0:
+        search4InImgs = False
+
+
+if search4InImgs and ((args.indir == "") or (args.search == "")):
+    print('ERROR: Either a list of input images (--inputimages) or a search path (--indir) and string (--search) did to be given.')
+    sys.exit()
+
+
 overlapBehaviour = 0
-
-if args.minpix:
-    print("Taking minimum pixel value in band {} for overlapping areas.\n".format(args.skipband))
-    overlapBehaviour = 1
-
-elif args.maxpix:
-    print("Taking maximum pixel value in band {} for overlapping areas.\n".format(args.skipband))
-    overlapBehaviour = 2
-
-else:
-    print("Using values of last image for overlapping areas.\n")
-
 if args.minpix and args.maxpix:
     print("ERROR: Either '--minpix' or '--maxpix' expected (not both)")
     sys.exit()
+elif args.minpix:
+    print("Taking minimum pixel value in band {} for overlapping areas.".format(args.skipband))
+    overlapBehaviour = 1
+elif args.maxpix:
+    print("Taking maximum pixel value in band {} for overlapping areas.".format(args.skipband))
+    overlapBehaviour = 2
+else:
+    print("Using values of last image for overlapping areas.")
 
 # Get output extension from input file
-outFormat=getGDALFormat(args.outmosaic)
+outFormat = rsgisUtils.getGDALFormatFromExt(args.outmosaic)
 
-# Recursively find all files in the input directory using specified search string
-fileList = []
-
-# Walk through directory
-for dName, sdName, fList in os.walk(args.indir):
-    for fileName in fList:
-        if fnmatch.fnmatch(fileName, args.search): # Match search string
-            fileList.append(os.path.join(dName, fileName))
+if search4InImgs:
+    # Recursively find all files in the input directory using specified search string
+    fileList = []
+    
+    # Walk through directory
+    for dName, sdName, fList in os.walk(args.indir):
+        for fileName in fList:
+            if fnmatch.fnmatch(fileName, args.search): # Match search string
+                fileList.append(os.path.join(dName, fileName))
+else:
+    fileList = args.inputimages
 
 fileCount=len(fileList)
-
 if fileCount == 0:
     print('ERROR: No files found')
     sys.exit()
@@ -137,22 +112,18 @@ else:
 
 # Save list of files
 if args.outlist is not None:
-    outFile = open(args.outlist,'w')
-    for fileName in fileList:
-        outFile.write(fileName + '\n')
-    outFile.close()
+    rsgisUtils.writeList2File(fileList, args.outlist)
 
 print('Creating mosaic...')
 t = rsgislib.RSGISTime()
 t.start(True)
-imageutils.createImageMosaic(fileList, args.outmosaic, args.backgroundval, args.skipval, args.skipband, overlapBehaviour, outFormat, getRSGISLibDataType(args.datatype))
+imageutils.createImageMosaic(fileList, args.outmosaic, args.backgroundval, args.skipval, args.skipband, overlapBehaviour, outFormat, rsgisUtils.getRSGISLibDataType(args.datatype))
 t.end()
 
 if not args.nostats:
-    # Create pyramids
     print('\nCalculating stats and pyramids...')
     t.start(True)
-    imageutils.popImageStats(args.outmosaic,True,0.,True)
+    imageutils.popImageStats(args.outmosaic, True, args.backgroundval, True)
     t.end()
-    print('Finished')
+print('rsgismosaic.py - Finished')
     

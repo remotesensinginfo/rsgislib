@@ -116,7 +116,7 @@ namespace rsgis{namespace calib{
     class DllExport RSGISApply6SCoefficientsElevLUTParam : public rsgis::img::RSGISCalcImageValue
     {
     public:
-        RSGISApply6SCoefficientsElevLUTParam(unsigned int numOutBands, std::vector<LUT6SElevation> *lut, float noDataVal = 0.0, bool useNoDataVal=false, float scaleFactor = 1.0);
+        RSGISApply6SCoefficientsElevLUTParam(unsigned int numOutBands, std::vector<LUT6SElevation> *lut, float demNoDataVal, float noDataVal = 0.0, bool useNoDataVal=false, float scaleFactor = 1.0);
         void calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException);
         void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implmented.");};
         void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
@@ -130,7 +130,9 @@ namespace rsgis{namespace calib{
         ~RSGISApply6SCoefficientsElevLUTParam();
     protected:
         std::vector<LUT6SElevation> *lut;
+        LUT6SElevation minElevCoeffs;
         float scaleFactor;
+        float demNoDataVal;
         float noDataVal;
         bool useNoDataVal;
     };
