@@ -1041,9 +1041,14 @@ if __name__ == '__main__':
     t.removeTestFiles()
 
     print("%s TESTS COMPLETED - %s FAILURES LISTED BELOW:"%(t.numTests, len(t.failures)))
+    returnCode = 0 # success state
     if(len(t.failures)):
+        returnCode = 1 # error state so calling script can easily check
         for failure in t.failures:
             print("FAIL: %s"%failure)
+
+    # return whether all tests succeeded or not
+    sys.exit(returnCode)
 
     
 

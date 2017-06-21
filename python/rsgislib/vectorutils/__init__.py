@@ -23,7 +23,7 @@ from rsgislib import imageutils
 # Import the RSGISLib RasterGIS module
 from rsgislib import rastergis
 
-def rasterise2Image(inputVec, inputImage, outImage, gdalFormat="KEA", burnVal=1, shpAtt=None, shpExt=False):
+def rasterise2Image(inputVec, inputImage, outImage, gdalformat="KEA", burnVal=1, shpAtt=None, shpExt=False):
     """ 
 A utillity to rasterise a shapefile into an image covering the same region and at the same resolution as the input image. 
 
@@ -32,7 +32,7 @@ Where:
 * inputVec is a string specifying the input vector (shapefile) file
 * inputImage is a string specifying the input image defining the grid, pixel resolution and area for the rasterisation (if None and shpExt is False them assumes output image already exists and just uses it as is burning vector into it)
 * outImage is a string specifying the output image for the rasterised shapefile
-* gdalFormat is the output image format (Default: KEA).
+* gdalformat is the output image format (Default: KEA).
 * burnVal is the value for the output image pixels if no attribute is provided.
 * shpAtt is a string specifying the attribute to be rasterised, value of None creates a binary mask and \"FID\" creates a temp shapefile with a "FID" column and rasterises that column.
 * shpExt is a boolean specifying that the output image should be cut to the same extent as the input shapefile (Default is False and therefore output image will be the same as the input).
@@ -52,12 +52,12 @@ Example::
         
         if shpExt:
             print("Creating output image from shapefile extent")
-            imageutils.createCopyImageVecExtent(inputImage, inputVec, outImage, 1, 0, gdalFormat, rsgislib.TYPE_32UINT)
+            imageutils.createCopyImageVecExtent(inputImage, inputVec, outImage, 1, 0, gdalformat, rsgislib.TYPE_32UINT)
         elif inputImage is None:
             print("Assuming output image is already created so just using.")
         else:
             print("Creating output image using input image")
-            imageutils.createCopyImage(inputImage, outImage, 1, 0, gdalFormat, rsgislib.TYPE_32UINT)
+            imageutils.createCopyImage(inputImage, outImage, 1, 0, gdalformat, rsgislib.TYPE_32UINT)
         
         if shpAtt == "FID":   
             tmpVector = os.path.splitext(inputVec)[0] + "_tmpFIDFile.shp"
@@ -272,7 +272,7 @@ A function to extract an image footprint as a vector.
     
     validOutImg = os.path.join(tmpDIR, inImgBase+'_'+uidStr+'_validimg.kea')
     inImgNoData = rsgisUtils.getImageNoDataValue(inputImg)
-    rsgislib.imageutils.genValidMask(inimages=inputImg, outimage=validOutImg, format='KEA', nodata=inImgNoData)
+    rsgislib.imageutils.genValidMask(inimages=inputImg, outimage=validOutImg, gdalformat='KEA', nodata=inImgNoData)
     
     outVecTmpFile = outVec
     if not (rePrjTo is None):
