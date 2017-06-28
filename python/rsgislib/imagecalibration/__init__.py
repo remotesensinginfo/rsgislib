@@ -10,6 +10,52 @@ More details on ARCSI are avaialble from http://rsgislib.org/arcsi
 from ._imagecalibration import *
 
 
+class ElevLUTFeat(object):
+    """
+Create a list of these objects to pass to the rsgislib.imagecalibration.apply6SCoeffElevLUTParam
+* Elev - is the elevation value.
+* Coeffs - is the 6S coeffients as a Band6S object. 
+"""
+    def __init__(self, Elev=None, Coeffs=None):
+        """
+        * Elev - is the elevation value.
+        * Coeffs - is the 6S coeffients as a Band6S object. 
+        """
+        self.Elev = Elev
+        self.Coeffs = Coeffs
+
+
+class AOTLUTFeat(object):
+    """
+Create a list of these objects to pass to the rsgislib.imagecalibration.apply6SCoeffElevAOTLUTParam
+* AOT - is the AOT value.
+* Coeffs - is the 6S coeffients as a Band6S object. 
+"""
+    def __init__(self, AOT=None, Coeffs=None):
+        """
+        * AOT - is the AOT value.
+        * Coeffs - is the 6S coeffients as a Band6S object. 
+        """
+        self.AOT = AOT
+        self.Coeffs = Coeffs
+        
+class Band6SCoeff(object):
+    """
+Create a list of these objects to provide the Coeffs for ElevLUTFeat and AOTLUTFeat
+"""
+    def __init__(self, band=None, aX=None, bX=None, cX=None, DirIrr=None, DifIrr=None, EnvIrr=None):
+        """
+        """
+        self.band = band
+        self.aX = aX
+        self.bX = bX
+        self.cX = cX
+        self.DirIrr = DirIrr
+        self.DifIrr = DifIrr
+        self.EnvIrr = EnvIrr
+        
+
+
 def performDOSCalc(inputFile, outputFile, gdalFormat='KEA', nonNegative=True, noDataVal=0, darkObjReflVal=0, darkObjPercentile=0.01, copyBandNames=True, calcStatsPyd=True):
     """
 A command to perform a dark object subtraction (DOS) on an input image.
