@@ -33,13 +33,21 @@ namespace rsgis{ namespace cmds {
         try
         {
             GDALAllRegister();
-            
             std::cout << "Open " << demImage << std::endl;
             GDALDataset *dataset = (GDALDataset *) GDALOpen(demImage.c_str(), GA_ReadOnly);
             if(dataset == NULL)
             {
                 std::string message = std::string("Could not open image ") + demImage;
                 throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            double demNoDataVal = 0.0;
+            int demNoDataValAvail = false;
+            demNoDataVal = dataset->GetRasterBand(1)->GetNoDataValue(&demNoDataValAvail);
+            if(!demNoDataValAvail)
+            {
+                GDALClose(dataset);
+                throw rsgis::RSGISException("The DEM image file does not have a no data value defined. ");
             }
             
             double *transformation = new double[6];
@@ -55,7 +63,7 @@ namespace rsgis{ namespace cmds {
             
             delete[] transformation;
             
-            rsgis::calib::RSGISCalcSlope *calcSlope = new rsgis::calib::RSGISCalcSlope(1, 0, imageEWRes, imageNSRes, outAngleUnit);
+            rsgis::calib::RSGISCalcSlope *calcSlope = new rsgis::calib::RSGISCalcSlope(1, 0, imageEWRes, imageNSRes, outAngleUnit, demNoDataVal);
             
             rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(calcSlope, "", true);
             calcImage.calcImageWindowData(&dataset, 1, outputImage, 3, outImageFormat, GDT_Float32);
@@ -85,6 +93,15 @@ namespace rsgis{ namespace cmds {
                 throw rsgis::RSGISImageException(message.c_str());
             }
             
+            double demNoDataVal = 0.0;
+            int demNoDataValAvail = false;
+            demNoDataVal = dataset->GetRasterBand(1)->GetNoDataValue(&demNoDataValAvail);
+            if(!demNoDataValAvail)
+            {
+                GDALClose(dataset);
+                throw rsgis::RSGISException("The DEM image file does not have a no data value defined. ");
+            }
+            
             double *transformation = new double[6];
             dataset->GetGeoTransform(transformation);
             
@@ -98,7 +115,7 @@ namespace rsgis{ namespace cmds {
             
             delete[] transformation;
             
-            rsgis::calib::RSGISCalcAspect *calcAspect = new rsgis::calib::RSGISCalcAspect(1, 0, imageEWRes, imageNSRes);
+            rsgis::calib::RSGISCalcAspect *calcAspect = new rsgis::calib::RSGISCalcAspect(1, 0, imageEWRes, imageNSRes, demNoDataVal);
             
             rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(calcAspect, "", true);
             calcImage.calcImageWindowData(&dataset, 1, outputImage, 3, outImageFormat, GDT_Float32);
@@ -167,6 +184,15 @@ namespace rsgis{ namespace cmds {
                 throw rsgis::RSGISImageException(message.c_str());
             }
             
+            double demNoDataVal = 0.0;
+            int demNoDataValAvail = false;
+            demNoDataVal = dataset->GetRasterBand(1)->GetNoDataValue(&demNoDataValAvail);
+            if(!demNoDataValAvail)
+            {
+                GDALClose(dataset);
+                throw rsgis::RSGISException("The DEM image file does not have a no data value defined. ");
+            }
+            
             double *transformation = new double[6];
             dataset->GetGeoTransform(transformation);
             
@@ -180,7 +206,7 @@ namespace rsgis{ namespace cmds {
             
             delete[] transformation;
             
-            rsgis::calib::RSGISCalcHillShade *calcHillshade = new rsgis::calib::RSGISCalcHillShade(1, 0, imageEWRes, imageNSRes, solarZenith, solarAzimuth);
+            rsgis::calib::RSGISCalcHillShade *calcHillshade = new rsgis::calib::RSGISCalcHillShade(1, 0, imageEWRes, imageNSRes, solarZenith, solarAzimuth, demNoDataVal);
             
             rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(calcHillshade, "", true);
             calcImage.calcImageWindowData(&dataset, 1, outputImage, 3, outImageFormat, GDT_Byte);
@@ -220,6 +246,15 @@ namespace rsgis{ namespace cmds {
                 throw rsgis::RSGISImageException(message.c_str());
             }
             
+            double demNoDataVal = 0.0;
+            int demNoDataValAvail = false;
+            demNoDataVal = dataset->GetRasterBand(1)->GetNoDataValue(&demNoDataValAvail);
+            if(!demNoDataValAvail)
+            {
+                GDALClose(dataset);
+                throw rsgis::RSGISException("The DEM image file does not have a no data value defined. ");
+            }
+            
             double *transformation = new double[6];
             dataset->GetGeoTransform(transformation);
             
@@ -233,10 +268,7 @@ namespace rsgis{ namespace cmds {
             
             delete[] transformation;
             
-            double demNoDataVal = dataset->GetRasterBand(1)->GetNoDataValue();
-            std::cout << "No Data Value = " << demNoDataVal << std::endl;
-            
-            rsgis::calib::RSGISCalcShadowBinaryMask *calcShadowMask = new rsgis::calib::RSGISCalcShadowBinaryMask(1, dataset, 1, imageEWRes, imageNSRes, solarZenith, solarAzimuth, maxHeight, demNoDataVal);
+            rsgis::calib::RSGISCalcShadowBinaryMask *calcShadowMask = new rsgis::calib::RSGISCalcShadowBinaryMask(1, dataset, 0, imageEWRes, imageNSRes, solarZenith, solarAzimuth, maxHeight, demNoDataVal);
             
             rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(calcShadowMask, "", true);
             
@@ -266,6 +298,15 @@ namespace rsgis{ namespace cmds {
                 throw rsgis::RSGISImageException(message.c_str());
             }
             
+            double demNoDataVal = 0.0;
+            int demNoDataValAvail = false;
+            demNoDataVal = dataset->GetRasterBand(1)->GetNoDataValue(&demNoDataValAvail);
+            if(!demNoDataValAvail)
+            {
+                GDALClose(dataset);
+                throw rsgis::RSGISException("The DEM image file does not have a no data value defined. ");
+            }
+            
             double *transformation = new double[6];
             dataset->GetGeoTransform(transformation);
             
@@ -279,7 +320,7 @@ namespace rsgis{ namespace cmds {
             
             delete[] transformation;
             
-            rsgis::calib::RSGISCalcRayIncidentAngle *calcIncidAngle = new rsgis::calib::RSGISCalcRayIncidentAngle(1, 0, imageEWRes, imageNSRes, solarZenith, solarAzimuth);
+            rsgis::calib::RSGISCalcRayIncidentAngle *calcIncidAngle = new rsgis::calib::RSGISCalcRayIncidentAngle(1, 0, imageEWRes, imageNSRes, solarZenith, solarAzimuth, demNoDataVal);
             
             rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(calcIncidAngle, "", true);
             calcImage.calcImageWindowData(&dataset, 1, outputImage, 3, outImageFormat, GDT_Float32);
@@ -309,6 +350,15 @@ namespace rsgis{ namespace cmds {
                 throw rsgis::RSGISImageException(message.c_str());
             }
             
+            double demNoDataVal = 0.0;
+            int demNoDataValAvail = false;
+            demNoDataVal = dataset->GetRasterBand(1)->GetNoDataValue(&demNoDataValAvail);
+            if(!demNoDataValAvail)
+            {
+                GDALClose(dataset);
+                throw rsgis::RSGISException("The DEM image file does not have a no data value defined. ");
+            }
+            
             double *transformation = new double[6];
             dataset->GetGeoTransform(transformation);
             
@@ -322,7 +372,7 @@ namespace rsgis{ namespace cmds {
             
             delete[] transformation;
             
-            rsgis::calib::RSGISCalcRayExitanceAngle *calcExitAngle = new rsgis::calib::RSGISCalcRayExitanceAngle(1, 0, imageEWRes, imageNSRes, viewZenith, viewAzimuth);
+            rsgis::calib::RSGISCalcRayExitanceAngle *calcExitAngle = new rsgis::calib::RSGISCalcRayExitanceAngle(1, 0, imageEWRes, imageNSRes, viewZenith, viewAzimuth, demNoDataVal);
             
             rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(calcExitAngle, "", true);
             calcImage.calcImageWindowData(&dataset, 1, outputImage, 3, outImageFormat, GDT_Float32);
@@ -351,6 +401,17 @@ namespace rsgis{ namespace cmds {
                 std::string message = std::string("Could not open image ") + demImage;
                 throw rsgis::RSGISImageException(message.c_str());
             }
+            
+            double demNoDataVal = 0.0;
+            int demNoDataValAvail = false;
+            demNoDataVal = datasets[0]->GetRasterBand(1)->GetNoDataValue(&demNoDataValAvail);
+            if(!demNoDataValAvail)
+            {
+                GDALClose(datasets[0]);
+                delete[] datasets;
+                throw rsgis::RSGISException("The DEM image file does not have a no data value defined. ");
+            }
+            
             std::cout << "Open " << aspectImage << std::endl;
             datasets[1] = (GDALDataset *) GDALOpen(aspectImage.c_str(), GA_ReadOnly);
             if(datasets[1] == NULL)
@@ -361,7 +422,7 @@ namespace rsgis{ namespace cmds {
             
             int winSize = (winHSize * 2) + 1;
             
-            rsgis::calib::RSGISFilterDTMWithAspectMedianFilter *dtmFilter = new rsgis::calib::RSGISFilterDTMWithAspectMedianFilter(aspectRange);
+            rsgis::calib::RSGISFilterDTMWithAspectMedianFilter *dtmFilter = new rsgis::calib::RSGISFilterDTMWithAspectMedianFilter(aspectRange, demNoDataVal);
             
             rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(dtmFilter, "", true);
             calcImage.calcImageWindowData(datasets, 2, outputImage, winSize, outImageFormat, GDT_Float32);
