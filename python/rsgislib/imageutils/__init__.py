@@ -241,7 +241,7 @@ A function which returns the WKT string representing the projection of the input
     rasterDS = None
     return projStr
 
-def resampleImage2Match(inRefImg, inProcessImg, outImg, gdalformat, interpMethod, datatype=None):
+def resampleImage2Match(inRefImg, inProcessImg, outImg, gdalformat, interpMethod, datatype=None, noDataVal=None, multicore=False):
     """
 A utility function to resample an existing image to the projection and/or pixel size of another image.
 
@@ -253,14 +253,15 @@ Where:
 * gdalformat is the gdal format for the output image.
 * interpMethod is the interpolation method used to resample the image [bilinear, lanczos, cubicspline, nearestneighbour, cubic, average, mode]
 * datatype is the rsgislib datatype of the output image (if none then it will be the same as the input file).
+* multicore - use multiple processing cores (Default = False)
 
 """   
-    dataset = gdal.Open(inProcessImg, gdal.GA_ReadOnly)
-    if dataset == None:
-        raise Exception("Could not open the inProcessImg.")
-    numBands = dataset.RasterCount
-    gdalDType = dataset.GetRasterBand(1).DataType
-    dataset = None
+    rsgisUtils = rsgislib.RSGISPyUtils()
+    numBands = rsgisUtils.getImageBandCount(inProcessImg)
+    if noDataVal == None:
+        noDataVal = rsgisUtils.getImageNoDataValue(inProcessImg)
+    gdalDType = rsgisUtils.getRSGISLibDataTypeFromImg(inProcessImg)
+    
     if datatype == None:
         if gdalDType == gdal.GDT_Byte:
             datatype = rsgislib.TYPE_8UINT
@@ -296,12 +297,30 @@ Where:
     else:
         raise Exception("Interpolation method was not recognised or known.")
     
-    rsgislib.imageutils.createCopyImage(inRefImg, outImg, numBands, 0, gdalformat, datatype)
+    backVal = 0.0
+    haveNoData = False
+    if noDataVal != None:
+        backVal = float(noDataVal)
+        haveNoData = True
+    
+    rsgislib.imageutils.createCopyImage(inRefImg, outImg, numBands, backVal, gdalformat, datatype)
 
     inFile = gdal.Open(inProcessImg, gdal.GA_ReadOnly)
     outFile = gdal.Open(outImg, gdal.GA_Update)
- 
-    gdal.ReprojectImage(inFile, outFile, None, None, interpolationMethod, 0.0, 0.0, gdal.TermProgress)
+
+    wrpOpts = []
+    if multicore:
+        if haveNoData:
+            wrpOpts = gdal.WarpOptions(resampleAlg=interpolationMethod, srcNodata=noDataVal, dstNodata=noDataVal, multithread=True, callback=gdal.TermProgress)    
+        else:
+            wrpOpts = gdal.WarpOptions(resampleAlg=interpolationMethod, multithread=True, callback=gdal.TermProgress)
+    else:
+        if haveNoData:
+            wrpOpts = gdal.WarpOptions(resampleAlg=interpolationMethod, srcNodata=noDataVal, dstNodata=noDataVal, multithread=False, callback=gdal.TermProgress)    
+        else:
+            wrpOpts = gdal.WarpOptions(resampleAlg=interpolationMethod, multithread=False, callback=gdal.TermProgress)
+    
+    gdal.Warp(outFile, inFile, options=wrpOpts)
     
     inFile = None
     outFile = None
@@ -309,7 +328,7 @@ Where:
 
 
 
-def reprojectImage(inputImage, outputImage, outWKT, gdalformat='KEA', interp='cubic', inWKT=None, noData=0.0, outPxlRes='image', snap2Grid=True):
+def reprojectImage(inputImage, outputImage, outWKT, gdalformat='KEA', interp='cubic', inWKT=None, noData=0.0, outPxlRes='image', snap2Grid=True, multicore=False):
     """
 This function provides a tool which uses the gdalwarp function to reproject an input image.
 
@@ -327,6 +346,7 @@ Where:
             2) 'auto' where an output resolution maintaining the image size of the input image will be used
             3) provide a floating point value for the image resolution (note. pixels will be sqaure) 
 * snap2Grid is a boolean specifying whether the TL pixel should be snapped to a multiple of the pixel resolution (Default is True).
+* nCores - the number of processing cores available for processing (-1 is all cores: Default=-1)
     """    
     rsgisUtils = rsgislib.RSGISPyUtils()
     
@@ -479,7 +499,24 @@ Where:
         outImgDS.GetRasterBand(i+1).SetNoDataValue(noData)
     
     print("Performing the reprojection")
-    gdal.ReprojectImage(inImgDS, outImgDS, None, None, eResampleAlg, 0.0, 0.0, gdal.TermProgress )  
+    
+    wrpOpts = []
+    if multicore:
+        wrpOpts = gdal.WarpOptions(resampleAlg=eResampleAlg, srcNodata=noData, dstNodata=noData, multithread=True, callback=gdal.TermProgress)
+    else:
+        wrpOpts = gdal.WarpOptions(resampleAlg=eResampleAlg, srcNodata=noData, dstNodata=noData, multithread=False, callback=gdal.TermProgress)    
+
+    gdal.Warp(outImgDS, inImgDS, options=wrpOpts)
+    
+    
+    """
+    warpOptions=[]
+    if nCores < 1:
+        warpOptions.append("NUM_THREADS=ALL_CPUS")
+    else:
+        warpOptions.append("NUM_THREADS="+str(nCores))
+    gdal.ReprojectImage(inImgDS, outImgDS, None, None, eResampleAlg, 0.0, 0.0, gdal.TermProgress, options=warpOptions)
+    """
     
     inImgDS = None
     outImgDS = None    
