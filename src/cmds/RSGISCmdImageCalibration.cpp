@@ -1849,6 +1849,10 @@ namespace rsgis{ namespace cmds {
             std::string tmpDarkFillBandImg = tmpImgsBase + "_darkbandfill"+tmpImgFileExt;
             std::string tmpPotentShadows = tmpImgsBase + "_potentshadows"+tmpImgFileExt;
             std::string tmpClumpClouds = tmpImgsBase + "_cloudclumps"+tmpImgFileExt;
+            std::string tmpFinalShadowsDialate = tmpImgsBase + "_finalShadowsDialate"+tmpImgFileExt;
+            std::string tmpCloudsShadowTestRegions = tmpImgsBase + "_testShadowRegions"+tmpImgFileExt;
+            std::string tmpCloudsShadows = tmpImgsBase + "_shadowRegions"+tmpImgFileExt;
+            std::string tmpCloudsInitHeights = tmpImgsBase + "_baseCloudInitHeights"+tmpImgFileExt;
             
             GDALDataset *tmpClumpCloudsDS = imgUtils.createCopy(cloudMskDataset, 1, tmpClumpClouds, gdalFormat, GDT_UInt32, true, "");
             
@@ -1881,7 +1885,6 @@ namespace rsgis{ namespace cmds {
             rsgis::calib::RSGISHydroDEMFillSoilleGratin94 fillDEMInst;
             fillDEMInst.performSoilleGratin94Fill(darkBandDS, validDataset, darkBandFillDS, false, darkImgBand175PercentVal);
             
-            
             std::cout << "Produce Potential Cloud Shadows Mask\n";
             GDALDataset *potentCloudShadowDS = imgUtils.createCopy(validDataset, 1, tmpPotentShadows, gdalFormat, GDT_Int32);
             rsgis::calib::RSGISCalcImagePotentialCloudShadowsMaskSingleInput imgCalcPotentShadows = rsgis::calib::RSGISCalcImagePotentialCloudShadowsMaskSingleInput(scaleFactorIn);
@@ -1894,12 +1897,8 @@ namespace rsgis{ namespace cmds {
             popImageStats.populateImageWithRasterGISStats(potentCloudShadowDS, true, true, 1);
             delete[] datasets;
             
-            std::string tmpCloudsInitHeights = tmpImgsBase + "_baseCloudInitHeights"+tmpImgFileExt;
             GDALDataset *initCloudHeightsDS = imgUtils.createCopy(validDataset, 2, tmpCloudsInitHeights, gdalFormat, GDT_Float32);
             imgUtils.assignValGDALDataset(initCloudHeightsDS, 0.0);
-            
-            std::string tmpCloudsShadowTestRegions = tmpImgsBase + "_testShadowRegions"+tmpImgFileExt;
-            std::string tmpCloudsShadows = tmpImgsBase + "_shadowRegions"+tmpImgFileExt;
             
             GDALDataset *cloudShadowTestRegionsDS = imgUtils.createCopy(validDataset, 1, tmpCloudsShadowTestRegions, gdalFormat, GDT_Byte);
             GDALDataset *cloudShadowRegionsDS = imgUtils.createCopy(validDataset, 1, tmpCloudsShadows, gdalFormat, GDT_Byte);
@@ -1909,7 +1908,6 @@ namespace rsgis{ namespace cmds {
             calcCloudParams.projFitCloudShadow(tmpClumpCloudsDS, initCloudHeightsDS, potentCloudShadowDS, cloudShadowTestRegionsDS, cloudShadowRegionsDS, sunAz, sunZen, senAz, senZen);
 
             std::cout << "Apply cloud shadow majority filter...\n";
-            std::string tmpFinalShadowsDialate = tmpImgsBase + "_finalShadowsDialate"+tmpImgFileExt;
             rsgis::calib::RSGISCalcImageCloudMajorityFilter cloudShadowMajFilter = rsgis::calib::RSGISCalcImageCloudMajorityFilter();
             rsgis::img::RSGISCalcEditImage editImgCalcShadow = rsgis::img::RSGISCalcEditImage(&cloudShadowMajFilter);
             editImgCalcShadow.calcImageWindowData(cloudShadowRegionsDS, 5);
@@ -1927,6 +1925,24 @@ namespace rsgis{ namespace cmds {
             GDALClose(cloudShadowTestRegionsDS);
             GDALClose(cloudShadowRegionsDS);
             GDALClose(tmpClumpCloudsDS);
+            
+            if(rmTmpImgs)
+            {
+                GDALDriver *poDriver = GetGDALDriverManager()->GetDriverByName(gdalFormat.c_str());
+                if(poDriver == NULL)
+                {
+                    throw RSGISImageException("Image driver is not available.");
+                }
+                
+                poDriver->Delete(tmpDarkBandImg.c_str());
+                poDriver->Delete(tmpDarkFillBandImg.c_str());
+                poDriver->Delete(tmpPotentShadows.c_str());
+                poDriver->Delete(tmpClumpClouds.c_str());
+                poDriver->Delete(tmpFinalShadowsDialate.c_str());
+                poDriver->Delete(tmpCloudsShadowTestRegions.c_str());
+                poDriver->Delete(tmpCloudsShadows.c_str());
+                poDriver->Delete(tmpCloudsInitHeights.c_str());
+            }
         }
         catch(rsgis::RSGISException &e)
         {
