@@ -1582,6 +1582,35 @@ static PyObject *ImageCalibration_CalcSolarDistance(PyObject *self, PyObject *ar
     return Py_BuildValue("f", solarDistance);
 }
 
+
+static PyObject *ImageCalibration_calcCloudShadowMask(PyObject *self, PyObject *args)
+{
+    const char *pszInputReflFile, *pszInputCloudMaskFile, *pszValidAreaImg, *pszOutputFile, *pszTmpImgsBase, *pszTmpImgsFileExt, *pszGDALFormat;
+    float sunAz, sunZen, senAz, senZen = 0.0;
+    float scaleFactor;
+    int darkImgBand;
+    int rmTmpImages = true;
+    
+    
+    if( !PyArg_ParseTuple(args, "ssssisfssffff|i:calcCloudShadowMask", &pszInputCloudMaskFile, &pszInputReflFile, &pszValidAreaImg, &pszOutputFile, &darkImgBand, &pszGDALFormat, &scaleFactor, &pszTmpImgsBase, &pszTmpImgsFileExt, &sunAz, &sunZen, &senAz, &senZen, &rmTmpImages))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        bool rmTmpImgs = (bool)rmTmpImages;
+        rsgis::cmds::executePerformCloudShadowMasking(std::string(pszInputCloudMaskFile), std::string(pszInputReflFile), std::string(pszValidAreaImg), darkImgBand, std::string(pszOutputFile), std::string(pszGDALFormat), scaleFactor, std::string(pszTmpImgsBase), std::string(pszTmpImgsFileExt), rmTmpImgs, sunAz, sunZen, senAz, senZen);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 // Our list of functions in this module
 static PyMethodDef ImageCalibrationMethods[] = {
 {"landsat2Radiance", ImageCalibration_landsat2Radiance, METH_VARARGS,
@@ -1953,6 +1982,33 @@ static PyMethodDef ImageCalibrationMethods[] = {
 "\n"
 "solarDistance - float\n"
 "\n"},
+
+    
+{"calcCloudShadowMask", ImageCalibration_calcCloudShadowMask, METH_VARARGS,
+"imagecalibration.calcCloudShadowMask(inputCloudMask, inputReflImage, inValidAreaImage, outputImage, darkImgBand, gdalFormat, scaleFactor, tmpImgsBase, tmpImgsFileExt, sunAz, sunZen, senAz, senZen, rmTmpImgs)\n"
+"Calculate a cloud shadow mask from an inputted cloud mask.\n"
+"Where:\n"
+"\n"
+"* inputCloudMask is a string containing the name of the input cloud mask\n"
+"* inputTOAImage is a string containing the name of the input image TOA reflectance file\n"
+"* inValidAreaImage is a string containing the name of a binary image specifying the valid area of the image data (1 is valid area)\n"
+"* outputImage is a string containing the name of the output image file\n"
+"* darkImgBand is an integer specifying the image band from the reflectance image which is to used to find the shadows (the NIR is often recommended).\n"
+"* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+"* scaleFactor is a float with the scale factor used to multiple the input image reflectance data.\n"
+"* tmpImgsBase is a string specifying a base path and name for the tmp images used for this processing\n"
+"* tmpImgsFileExt is a string for the file extention of the output images (e.g., .kea)\n"
+"* sunAz is the solar azimuth of the input image\n"
+"* sunZen is the solar azimuth of the input image\n"
+"* senAz is the sensor azimuth of the input image\n"
+"* senZen is the sensor azimuth of the input image\n"
+"* rmTmpImgs is a bool specifying whether the tmp images should be deleted at the end of the processing (Optional; Default = True)\n"
+"\n"
+"Example::\n"
+"\n"
+"   rsgislib.imagecalibration\n"
+"\n"
+},
     
     {NULL}        /* Sentinel */
 };

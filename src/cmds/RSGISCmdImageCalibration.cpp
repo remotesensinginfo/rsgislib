@@ -1799,6 +1799,145 @@ namespace rsgis{ namespace cmds {
         }
         return dist;
     }
+                
+                
+    void executePerformCloudShadowMasking(std::string cloudMsk, std::string inputImage, std::string validAreaImage, unsigned int darkFillBand, std::string outputImg, std::string gdalFormat, float scaleFactorIn, std::string tmpImgsBase, std::string tmpImgFileExt, bool rmTmpImgs, double sunAz, double sunZen, double senAz, double senZen) throw(RSGISCmdException)
+    {
+        GDALAllRegister();
+        try
+        {
+            std::cout.precision(12);
+            rsgis::img::RSGISImageUtils imgUtils;
+            rsgis::rastergis::RSGISPopulateWithImageStats popImageStats;
+            
+            std::cout << "Opening: " << inputImage << std::endl;
+            GDALDataset *reflDataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+            if(reflDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw RSGISImageException(message.c_str());
+            }
+            unsigned int numReflBands = reflDataset->GetRasterCount();
+            
+            GDALDataType imgReflDT = reflDataset->GetRasterBand(1)->GetRasterDataType();
+            
+            std::cout << "Opening: " << validAreaImage << std::endl;
+            GDALDataset *validDataset = (GDALDataset *) GDALOpen(validAreaImage.c_str(), GA_ReadOnly);
+            if(validDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + validAreaImage;
+                throw RSGISImageException(message.c_str());
+            }
+            
+            std::cout << "Opening: " << cloudMsk << std::endl;
+            GDALDataset *cloudMskDataset = (GDALDataset *) GDALOpen(cloudMsk.c_str(), GA_ReadOnly);
+            if(validDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + cloudMsk;
+                throw RSGISImageException(message.c_str());
+            }
+            
+            GDALDataset **datasets = NULL;
+            
+            if((darkFillBand == 0) & (darkFillBand > numReflBands))
+            {
+                throw RSGISImageException("Band specified is not within the image.");
+            }
+            
+            std::cout << "Calculate Shadow Mask\n";
+            std::string tmpDarkBandImg = tmpImgsBase + "_darkband"+tmpImgFileExt;
+            std::string tmpDarkFillBandImg = tmpImgsBase + "_darkbandfill"+tmpImgFileExt;
+            std::string tmpPotentShadows = tmpImgsBase + "_potentshadows"+tmpImgFileExt;
+            std::string tmpClumpClouds = tmpImgsBase + "_cloudclumps"+tmpImgFileExt;
+            
+            GDALDataset *tmpClumpCloudsDS = imgUtils.createCopy(cloudMskDataset, 1, tmpClumpClouds, gdalFormat, GDT_UInt32, true, "");
+            
+            rsgis::segment::RSGISClumpPxls clumpImg;
+            clumpImg.performClump(cloudMskDataset, tmpClumpCloudsDS, true, 0.0, NULL);
+            popImageStats.populateImageWithRasterGISStats(tmpClumpCloudsDS, true, true, 1);
+            
+            rsgis::img::RSGISImagePercentiles calcPercentiles;
+            rsgis::math::Matrix *bandPercentiles = calcPercentiles.getPercentilesForAllBands(reflDataset, .175, 0.0, true);
+            
+            double darkImgBand175PercentVal = bandPercentiles->matrix[darkFillBand-1];
+            
+            std::cout << "Dark 17.5% Value: " << darkImgBand175PercentVal << std::endl;
+            
+            // Extract Dark band.
+            std::cout << "Extract Dark Band\n";
+            GDALDataset *darkBandDS = imgUtils.createCopy(validDataset, 1, tmpDarkBandImg, gdalFormat, imgReflDT);
+            std::vector<unsigned int> bands;
+            bands.push_back(darkFillBand);
+            rsgis::img::RSGISCopyImageBandSelect selImageBands = rsgis::img::RSGISCopyImageBandSelect(bands);
+            rsgis::img::RSGISCalcImage calcSelBandsImage = rsgis::img::RSGISCalcImage(&selImageBands);
+            datasets = new GDALDataset*[2];
+            datasets[0] = reflDataset;
+            datasets[1] = validDataset;
+            calcSelBandsImage.calcImage(datasets, 2, darkBandDS);
+            delete[] datasets;
+            
+            std::cout << "Fill Dark Band\n";
+            GDALDataset *darkBandFillDS = imgUtils.createCopy(reflDataset, 1, tmpDarkFillBandImg, gdalFormat, imgReflDT);
+            rsgis::calib::RSGISHydroDEMFillSoilleGratin94 fillDEMInst;
+            fillDEMInst.performSoilleGratin94Fill(darkBandDS, validDataset, darkBandFillDS, false, darkImgBand175PercentVal);
+            
+            
+            std::cout << "Produce Potential Cloud Shadows Mask\n";
+            GDALDataset *potentCloudShadowDS = imgUtils.createCopy(validDataset, 1, tmpPotentShadows, gdalFormat, GDT_Int32);
+            rsgis::calib::RSGISCalcImagePotentialCloudShadowsMaskSingleInput imgCalcPotentShadows = rsgis::calib::RSGISCalcImagePotentialCloudShadowsMaskSingleInput(scaleFactorIn);
+            rsgis::img::RSGISCalcImage calcPotentShadowImage = rsgis::img::RSGISCalcImage(&imgCalcPotentShadows);
+            datasets = new GDALDataset*[3];
+            datasets[0] = validDataset;
+            datasets[1] = darkBandDS;
+            datasets[2] = darkBandFillDS;
+            calcPotentShadowImage.calcImage(datasets, 3, potentCloudShadowDS);
+            popImageStats.populateImageWithRasterGISStats(potentCloudShadowDS, true, true, 1);
+            delete[] datasets;
+            
+            std::string tmpCloudsInitHeights = tmpImgsBase + "_baseCloudInitHeights"+tmpImgFileExt;
+            GDALDataset *initCloudHeightsDS = imgUtils.createCopy(validDataset, 2, tmpCloudsInitHeights, gdalFormat, GDT_Float32);
+            imgUtils.assignValGDALDataset(initCloudHeightsDS, 0.0);
+            
+            std::string tmpCloudsShadowTestRegions = tmpImgsBase + "_testShadowRegions"+tmpImgFileExt;
+            std::string tmpCloudsShadows = tmpImgsBase + "_shadowRegions"+tmpImgFileExt;
+            
+            GDALDataset *cloudShadowTestRegionsDS = imgUtils.createCopy(validDataset, 1, tmpCloudsShadowTestRegions, gdalFormat, GDT_Byte);
+            GDALDataset *cloudShadowRegionsDS = imgUtils.createCopy(validDataset, 1, tmpCloudsShadows, gdalFormat, GDT_Byte);
+            
+            rsgis::calib::RSGISCalcCloudParams calcCloudParams;
+            calcCloudParams.calcCloudHeightsNoThermal(tmpClumpCloudsDS, initCloudHeightsDS);
+            calcCloudParams.projFitCloudShadow(tmpClumpCloudsDS, initCloudHeightsDS, potentCloudShadowDS, cloudShadowTestRegionsDS, cloudShadowRegionsDS, sunAz, sunZen, senAz, senZen);
+
+            std::cout << "Apply cloud shadow majority filter...\n";
+            std::string tmpFinalShadowsDialate = tmpImgsBase + "_finalShadowsDialate"+tmpImgFileExt;
+            rsgis::calib::RSGISCalcImageCloudMajorityFilter cloudShadowMajFilter = rsgis::calib::RSGISCalcImageCloudMajorityFilter();
+            rsgis::img::RSGISCalcEditImage editImgCalcShadow = rsgis::img::RSGISCalcEditImage(&cloudShadowMajFilter);
+            editImgCalcShadow.calcImageWindowData(cloudShadowRegionsDS, 5);
+            
+            rsgis::math::RSGISMatrices matrixUtils;
+            rsgis::math::Matrix *matrixMorphOperator = matrixUtils.createMatrix(15, 15);
+            matrixUtils.makeCircularBinaryMatrix(matrixMorphOperator);
+            rsgis::filter::RSGISImageMorphologyDilate morphDialate;
+            morphDialate.dilateImage(&cloudShadowRegionsDS, outputImg, matrixMorphOperator, gdalFormat, GDT_Byte);
+            
+            GDALClose(darkBandDS);
+            GDALClose(darkBandFillDS);
+            GDALClose(potentCloudShadowDS);
+            GDALClose(initCloudHeightsDS);
+            GDALClose(cloudShadowTestRegionsDS);
+            GDALClose(cloudShadowRegionsDS);
+            GDALClose(tmpClumpCloudsDS);
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+
     
 }}
 
