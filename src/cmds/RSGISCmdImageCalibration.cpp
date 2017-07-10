@@ -1849,7 +1849,6 @@ namespace rsgis{ namespace cmds {
             std::string tmpDarkFillBandImg = tmpImgsBase + "_darkbandfill"+tmpImgFileExt;
             std::string tmpPotentShadows = tmpImgsBase + "_potentshadows"+tmpImgFileExt;
             std::string tmpClumpClouds = tmpImgsBase + "_cloudclumps"+tmpImgFileExt;
-            std::string tmpFinalShadowsDialate = tmpImgsBase + "_finalShadowsDialate"+tmpImgFileExt;
             std::string tmpCloudsShadowTestRegions = tmpImgsBase + "_testShadowRegions"+tmpImgFileExt;
             std::string tmpCloudsShadows = tmpImgsBase + "_shadowRegions"+tmpImgFileExt;
             std::string tmpCloudsInitHeights = tmpImgsBase + "_baseCloudInitHeights"+tmpImgFileExt;
@@ -1938,7 +1937,6 @@ namespace rsgis{ namespace cmds {
                 poDriver->Delete(tmpDarkFillBandImg.c_str());
                 poDriver->Delete(tmpPotentShadows.c_str());
                 poDriver->Delete(tmpClumpClouds.c_str());
-                poDriver->Delete(tmpFinalShadowsDialate.c_str());
                 poDriver->Delete(tmpCloudsShadowTestRegions.c_str());
                 poDriver->Delete(tmpCloudsShadows.c_str());
                 poDriver->Delete(tmpCloudsInitHeights.c_str());
