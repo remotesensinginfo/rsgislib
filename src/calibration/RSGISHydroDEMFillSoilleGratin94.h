@@ -96,6 +96,7 @@ namespace rsgis{namespace calib{
         long getPxlVal(Q2DPxl pxl, GDALRasterBand *imgData)throw(rsgis::img::RSGISImageCalcException);
         void setPxlVal(Q2DPxl pxl, long val, GDALRasterBand *imgData)throw(rsgis::img::RSGISImageCalcException);
         long rtnMax(long val1, long val2);
+        void getImagesEdgesToInitFill(GDALRasterBand *imgData, double borderVal, std::list<Q2DPxl> *pxQ)throw(rsgis::img::RSGISImageCalcException);
         std::list<Q2DPxl> **pxQ;
         long minVal;
         long maxVal;
