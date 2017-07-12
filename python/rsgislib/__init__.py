@@ -289,6 +289,16 @@ class RSGISPyUtils (object):
                 os.rmdir(os.path.join(root, name))
         os.rmdir(dirPath)
         print("Deleted " + dirPath)
+        
+    def renameGDALLayer(self, cFileName, oFileName):
+        """
+        Rename all the files associated with a GDAL layer.
+        """
+        import osgeo.gdal as gdal
+        layerDS = gdal.Open(cFileName, gdal.GA_ReadOnly)
+        gdalDriver = layerDS.GetDriver()
+        layerDS = None
+        gdalDriver.Rename(oFileName, cFileName)
 
     def getRSGISLibDataType(self, gdaltype):
         """ Convert from GDAL data type string to 
@@ -462,6 +472,44 @@ class RSGISPyUtils (object):
                         utmZone = '0' + utmZone
                     utmZone = utmZone+'N'
         return utmZone
+    
+    def getEPSGCode(self, gdalLayer):
+        """
+        Using GDAL to return the EPSG code for the input layer.
+        """
+        epsgCode = None
+        try:
+            from osgeo import osr
+            import osgeo.gdal as gdal
+            layerDS = gdal.Open(gdalLayer, gdal.GA_ReadOnly)
+            if layerDS == None:
+                raise RSGISPyException('Could not open raster image: \'' + gdalLayer+ '\'')
+            projStr = layerDS.GetProjection()
+            layerDS = None
+            
+            spatRef = osr.SpatialReference()
+            spatRef.ImportFromWkt(projStr)            
+            spatRef.AutoIdentifyEPSG()
+            epsgCode = spatRef.GetAuthorityCode(None)
+        except Exception:
+            epsgCode = None
+        return epsgCode
+        
+    def doGDALLayersHaveSameProj(self, layer1, layer2):
+        """
+        A function which tests whether two gdal compatiable layers are in the same
+        projection/coordinate system. This is done using the GDAL SpatialReference
+        function AutoIdentifyEPSG. If the identified EPSG codes are different then 
+        False is returned otherwise True.
+        """
+        layer1EPSG = self.getEPSGCode(layer1)
+        layer2EPSG = self.getEPSGCode(layer2)
+        
+        sameESPG = False
+        if layer1EPSG == layer2EPSG:
+            sameESPG = True
+        
+        return sameESPG
     
     def uidGenerator(self, size=6):
         """
