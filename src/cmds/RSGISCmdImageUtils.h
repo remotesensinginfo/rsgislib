@@ -184,6 +184,10 @@ namespace rsgis{ namespace cmds {
     
     /** A function to sharpen nn resampled lower resolution image bands using high native resolution image bands in the same stack */
     DllExport void executeSharpenLowResImgBands(std::string inputImage, std::string outputImage, std::vector<RSGISInitSharpenBandInfo> bandInfo, unsigned int winSize, int noDataVal, std::string gdalFormat, RSGISLibDataType outDataType) throw(RSGISCmdException);
+    
+    /** A function to create a composite image where the pixel with the high NDVI is outputted. */
+    DllExport void executeCreateMaxNDVICompsiteImage(std::vector<std::string> inputImages, std::string outputImage, unsigned int redBand, unsigned int nirBand, std::string gdalFormat, RSGISLibDataType outDataType) throw(RSGISCmdException);
+    
 }}
 
 
