@@ -84,5 +84,67 @@ void RSGISImageComposite::calcImageValue(float *bandValues, int numBands, double
     }    
 }
     
+    RSGISMaxNDVIImageComposite::RSGISMaxNDVIImageComposite(int numberOutBands, unsigned int redBand, unsigned int nirBand, unsigned int numInImgs) : RSGISCalcImageValue(numberOutBands)
+    {
+        this->redBand = redBand-1;
+        this->nirBand = nirBand-1;
+        this->numInImgs = numInImgs;
+    }
+    
+    void RSGISMaxNDVIImageComposite::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+    {
+        bool noData = true;
+        for(int i = 0; i < numBands; ++i)
+        {
+            if(bandValues[i] != 0.0)
+            {
+                noData = false;
+            }
+        }
+        
+        if(noData)
+        {
+            for(int i = 0; i < this->getNumOutBands(); ++i)
+            {
+                output[i] = 0.0;
+            }
+        }
+        else
+        {
+            int nImgBands = this->getNumOutBands();
+            float maxNDVI = 0.0;
+            int maxImgIdx = 0;
+            
+            float ndviVal = 0.0;
+            bool first = true;
+            for(int i = 0; i < numInImgs; ++i)
+            {
+                if((bandValues[(nImgBands*i)+this->nirBand] != 0) & (bandValues[(nImgBands*i)+this->redBand] != 0))
+                {
+                    ndviVal = (bandValues[(nImgBands*i)+this->nirBand]-bandValues[(nImgBands*i)+this->redBand])/(bandValues[(nImgBands*i)+this->nirBand]+bandValues[(nImgBands*i)+this->redBand]);
+                    if(first)
+                    {
+                        maxNDVI = ndviVal;
+                        maxImgIdx = i;
+                        first = true;
+                    }
+                    else if(ndviVal > maxNDVI)
+                    {
+                        maxNDVI = ndviVal;
+                        maxImgIdx = i;
+                    }
+                }
+            }
+            
+            int outImgBandIdx = maxImgIdx * this->getNumOutBands();
+            for(int i = 0; i < this->getNumOutBands(); ++i)
+            {
+                output[i] = bandValues[outImgBandIdx++];
+            }
+            
+        }
+        
+    }
+    
 }}
 
