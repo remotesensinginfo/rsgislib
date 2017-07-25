@@ -305,10 +305,10 @@ namespace rsgis { namespace img {
             {
                 throw RSGISImageCalcException("Must be at least 2 bands.");
             }
-            
+
             float img1Val = this->img1Off + (bandValues[img1BandIdx]*this->img1Scale);
             float img2Val = this->img2Off + (bandValues[img2BandIdx]*this->img2Scale);
-            
+  
             bool foundBinImg1 = false;
             unsigned int img1Bin = 0;
             
@@ -321,7 +321,6 @@ namespace rsgis { namespace img {
                     break;
                 }
             }
-            
             
             if(foundBinImg1)
             {
