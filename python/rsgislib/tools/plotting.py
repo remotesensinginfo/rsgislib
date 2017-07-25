@@ -211,7 +211,8 @@ Example::
             if img2Max is None:
                 img2Max = max
         
-        outBinSizeImg1, outBinSizeImg2, rSq = imagecalc.get2DImageHistogram(inputImage2, inputImage1, tmpOutFile, gdalFormat, img1Band, img2Band, numBins, img1Min, img1Max, img2Min, img2Max, img1Scale, img2Scale, img1Off, img2Off, normOutput)
+        # Images are flipped so axis' come out correctly.
+        outBinSizeImg1, outBinSizeImg2, rSq = imagecalc.get2DImageHistogram(inputImage2, inputImage1, tmpOutFile, gdalFormat, img2Band, img1Band, numBins, img2Min, img2Max, img1Min, img1Max, img2Scale, img1Scale, img2Off, img1Off, normOutput)
         print("Image1 Bin Size: ", outBinSizeImg1)
         print("Image2 Bin Size: ", outBinSizeImg2)
         print("rSq: ", rSq)
