@@ -83,8 +83,9 @@ namespace rsgis{namespace vec{
     
     
     
-    RSGISCalcMinDist2Geoms::RSGISCalcMinDist2Geoms(std::vector<OGRGeometry*> *geoms)
+    RSGISCalcMinDist2Geoms::RSGISCalcMinDist2Geoms(std::string outColName, std::vector<OGRGeometry*> *geoms)
     {
+        this->outColName = outColName;
         this->geoms = geoms;
         this->firstGeom = true;
         this->maxMinDist = 0.0;
@@ -127,7 +128,7 @@ namespace rsgis{namespace vec{
                 maxMinDist = minDist;
             }
                 
-            outFeature->SetField(outFeatureDefn->GetFieldIndex("MinDist"), minDist);
+            outFeature->SetField(outFeatureDefn->GetFieldIndex(outColName.c_str()), minDist);
             
         }
         catch (RSGISVectorException &e)
@@ -185,7 +186,7 @@ namespace rsgis{namespace vec{
     
     void RSGISCalcMinDist2Geoms::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
     {
-        OGRFieldDefn shpField("MinDist", OFTReal);
+        OGRFieldDefn shpField(outColName.c_str(), OFTReal);
         shpField.SetPrecision(10);
         if( outputLayer->CreateField( &shpField ) != OGRERR_NONE )
         {
@@ -203,6 +204,200 @@ namespace rsgis{namespace vec{
     }
     
     RSGISCalcMinDist2Geoms::~RSGISCalcMinDist2Geoms()
+    {
+        
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    RSGISCalcMinDist2GeomsUseIdx::RSGISCalcMinDist2GeomsUseIdx(std::string outColName, geos::index::SpatialIndex *geomIdx, double maxSearchDist)
+    {
+        this->outColName = outColName;
+        this->geomIdx = geomIdx;
+        this->maxSearchDist = maxSearchDist;
+        this->firstGeom = true;
+        this->maxMinDist = 0.0;
+    }
+    
+    void RSGISCalcMinDist2GeomsUseIdx::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+    {
+        try
+        {
+            OGRGeometry *inGeom = inFeature->GetGeometryRef();
+            OGRFeatureDefn *outFeatureDefn = outFeature->GetDefnRef();
+            
+            env->expandBy(this->maxSearchDist);
+            std::vector<void*> geomResults;
+            this->geomIdx->query(env, geomResults);
+            
+            double dist = 0.0;
+            double minDist = 0.0;
+            int minFID = 0;
+            bool first = true;
+            RSGISGEOSGeomFID *geomObj;
+            OGREnvelope *envOGRTmp = new OGREnvelope();
+            geos::geom::Envelope *tmpEnv = new geos::geom::Envelope();
+            for(std::vector<void*>::iterator iterGeoms = geomResults.begin(); iterGeoms != geomResults.end(); ++iterGeoms)
+            {
+                geomObj = (RSGISGEOSGeomFID*) (*iterGeoms);
+                geomObj->geom->getEnvelope(envOGRTmp);
+                tmpEnv->init(envOGRTmp->MinX, envOGRTmp->MaxX, envOGRTmp->MinY, envOGRTmp->MaxY);
+                if(!inGeom->Equals(geomObj->geom))
+                {
+                    dist = inGeom->Distance(geomObj->geom);
+                    if(first)
+                    {
+                        minDist = dist;
+                        minFID = geomObj->fid;
+                        first = false;
+                    }
+                    else if(dist < minDist)
+                    {
+                        minDist = dist;
+                        minFID = geomObj->fid;
+                    }
+                }
+            }
+            delete envOGRTmp;
+            delete tmpEnv;
+            
+            if(first)
+            {
+                minDist = maxSearchDist;
+                minFID = -1;
+            }
+            
+            if(firstGeom)
+            {
+                maxMinDist = minDist;
+                firstGeom = false;
+            }
+            else if(minDist > maxMinDist)
+            {
+                maxMinDist = minDist;
+            }
+            
+            outFeature->SetField(outFeatureDefn->GetFieldIndex(outColName.c_str()), minDist);
+            outFeature->SetField(outFeatureDefn->GetFieldIndex("MinFID"), minFID);
+            
+        }
+        catch (RSGISVectorException &e)
+        {
+            throw e;
+        }
+    }
+    
+    void RSGISCalcMinDist2GeomsUseIdx::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+    {
+        try
+        {
+            OGRGeometry *inGeom = feature->GetGeometryRef();
+            OGRFeatureDefn *outFeatureDefn = feature->GetDefnRef();
+            
+            env->expandBy(this->maxSearchDist);
+            std::vector<void*> geomResults;
+            this->geomIdx->query(env, geomResults);
+            
+            double dist = 0.0;
+            double minDist = 0.0;
+            int minFID = 0;
+            bool first = true;
+            RSGISGEOSGeomFID *geomObj;
+            OGREnvelope *envOGRTmp = new OGREnvelope();
+            geos::geom::Envelope *tmpEnv = new geos::geom::Envelope();
+            for(std::vector<void*>::iterator iterGeoms = geomResults.begin(); iterGeoms != geomResults.end(); ++iterGeoms)
+            {
+                geomObj = (RSGISGEOSGeomFID*) (*iterGeoms);
+                geomObj->geom->getEnvelope(envOGRTmp);
+                tmpEnv->init(envOGRTmp->MinX, envOGRTmp->MaxX, envOGRTmp->MinY, envOGRTmp->MaxY);
+                if(!inGeom->Equals(geomObj->geom))
+                {
+                    dist = inGeom->Distance(geomObj->geom);
+                    if(first)
+                    {
+                        minDist = dist;
+                        minFID = geomObj->fid;
+                        first = false;
+                    }
+                    else if(dist < minDist)
+                    {
+                        minDist = dist;
+                        minFID = geomObj->fid;
+                    }
+                }
+            }
+            delete envOGRTmp;
+            delete tmpEnv;
+            
+            if(first)
+            {
+                minDist = maxSearchDist;
+                minFID = -1;
+            }
+            
+            if(firstGeom)
+            {
+                maxMinDist = minDist;
+                firstGeom = false;
+            }
+            else if(minDist > maxMinDist)
+            {
+                maxMinDist = minDist;
+            }
+            
+            feature->SetField(outFeatureDefn->GetFieldIndex(outColName.c_str()), minDist);
+            feature->SetField(outFeatureDefn->GetFieldIndex("MinFID"), minFID);
+        }
+        catch (RSGISVectorException &e)
+        {
+            throw e;
+        }
+    }
+    
+    void RSGISCalcMinDist2GeomsUseIdx::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+    {
+        OGRFieldDefn shpField(outColName.c_str(), OFTReal);
+        shpField.SetPrecision(10);
+        if( outputLayer->CreateField( &shpField ) != OGRERR_NONE )
+        {
+            std::string message = std::string("Creating shapefile field \'MinDist\' has failed");
+            throw RSGISVectorOutputException(message.c_str());
+        }
+        
+        OGRFieldDefn shpMFIDField("MinFID", OFTInteger);
+        shpMFIDField.SetWidth(5);
+        if( outputLayer->CreateField( &shpMFIDField ) != OGRERR_NONE )
+        {
+            std::string message = std::string("Creating shapefile field \'MinFID\' has failed");
+            throw RSGISVectorOutputException(message.c_str());
+        }
+    }
+    
+    RSGISCalcMinDist2GeomsUseIdx::~RSGISCalcMinDist2GeomsUseIdx()
     {
         
     }

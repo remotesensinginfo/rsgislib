@@ -61,6 +61,46 @@ namespace rsgis{namespace vec{
 
 	}
     
+    
+    RSGISOGRPolygonReader2Index::RSGISOGRPolygonReader2Index(geos::index::SpatialIndex *polysIdx)
+    {
+        this->polysIdx = polysIdx;
+    }
+    
+    void RSGISOGRPolygonReader2Index::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+    {
+        throw RSGISVectorException("Not implemented..");
+    }
+    
+    void RSGISOGRPolygonReader2Index::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+    {
+        OGRwkbGeometryType geometryType = feature->GetGeometryRef()->getGeometryType();
+        
+        if( geometryType == wkbPolygon )
+        {
+            RSGISGEOSGeomFID *geomObj = new RSGISGEOSGeomFID();
+            geomObj->geom = feature->GetGeometryRef()->clone();
+            geomObj->env = env;
+            geomObj->fid = fid;
+            this->polysIdx->insert(env, geomObj);
+        }
+        else
+        {
+            std::string message = std::string("Unsupport data type: ") + std::string(feature->GetGeometryRef()->getGeometryName());
+            throw RSGISVectorException(message);
+        }
+    }
+    
+    void RSGISOGRPolygonReader2Index::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+    {
+        // Nothing to do!
+    }
+    
+    RSGISOGRPolygonReader2Index::~RSGISOGRPolygonReader2Index()
+    {
+        
+    }
+    
 }}
 
 

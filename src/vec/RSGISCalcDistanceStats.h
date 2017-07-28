@@ -33,10 +33,12 @@
 
 #include "vec/RSGISVectorOutputException.h"
 #include "vec/RSGISProcessOGRFeature.h"
+#include "vec/RSGISVectorUtils.h"
 
 #include "math/RSGISMathsUtils.h"
 
 #include "geos/geom/Envelope.h"
+#include "geos/index/strtree/STRtree.h"
 
 // mark all exported classes/functions with DllExport to have
 // them exported by Visual Studio
@@ -69,16 +71,35 @@ namespace rsgis{namespace vec{
     class DllExport RSGISCalcMinDist2Geoms : public RSGISProcessOGRFeature
     {
     public:
-        RSGISCalcMinDist2Geoms(std::vector<OGRGeometry*> *geoms);
+        RSGISCalcMinDist2Geoms(std::string outColName, std::vector<OGRGeometry*> *geoms);
         virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
         virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
         virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
         double getMaxMinDist(){return this->maxMinDist;};
         virtual ~RSGISCalcMinDist2Geoms();
     protected:
+        std::string outColName;
         std::vector<OGRGeometry*> *geoms;
         bool firstGeom;
         double maxMinDist;
+    };
+    
+    
+    class DllExport RSGISCalcMinDist2GeomsUseIdx : public RSGISProcessOGRFeature
+    {
+    public:
+        RSGISCalcMinDist2GeomsUseIdx(std::string outColName, geos::index::SpatialIndex *geomIdx, double maxSearchDist);
+        virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
+        virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
+        virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
+        double getMaxMinDist(){return this->maxMinDist;};
+        virtual ~RSGISCalcMinDist2GeomsUseIdx();
+    protected:
+        std::string outColName;
+        geos::index::SpatialIndex *geomIdx;
+        bool firstGeom;
+        double maxMinDist;
+        double maxSearchDist;
     };
     
     
