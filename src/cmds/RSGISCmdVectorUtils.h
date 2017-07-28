@@ -79,9 +79,11 @@ namespace rsgis{ namespace cmds{
     /** Function to export a binary image to points */
     DllExport void executeExportPxls2Pts(std::string inputImage, std::string outputVec, bool force, float maskVal) throw(RSGISCmdException);
     /** Function to calculate the distance to the nearest geometry */
-    DllExport double executeCalcDist2NearestGeom(std::string inputVec, std::string outputVec, bool force) throw(RSGISCmdException);
+    DllExport double executeCalcDist2NearestGeom(std::string inputVec, std::string outputVec, std::string outColName, bool force, bool useIdx=false, double idxMaxSearch=10) throw(RSGISCmdException);
     /** Function to calculate the distance to the nearest geometry */
     DllExport double executeCalcMaxDist2NearestGeom(std::string inputVec) throw(RSGISCmdException);
+    /** Function to calculate the distance to the nearest geometry */
+    DllExport double executeCalcDist2NearestGeom(std::string inputVec, std::string inDist2Vec, std::string outputVec, std::string outColName, bool force, bool useIdx=false, double idxMaxSearch=10) throw(RSGISCmdException);
     /** Function spaitally cluster points using a graph */
     DllExport void executeSpatialGraphClusterGeoms(std::string inputVec, std::string outputVec, bool useMinSpanTree, float edgeLenSDThres, double maxEdgeLen, bool force, std::string shpFileEdges="", bool outShpEdges=false, std::string h5EdgeLengths="", bool outH5EdgeLens=false) throw(RSGISCmdException);
     /** Function to create a polygon from a set of points */

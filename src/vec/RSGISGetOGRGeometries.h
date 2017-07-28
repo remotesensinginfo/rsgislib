@@ -36,6 +36,8 @@
 #include "vec/RSGISProcessOGRFeature.h"
 #include "vec/RSGISVectorUtils.h"
 
+#include "geos/index/SpatialIndex.h"
+
 // mark all exported classes/functions with DllExport to have
 // them exported by Visual Studio
 #undef DllExport
@@ -62,6 +64,23 @@ namespace rsgis{namespace vec{
 	protected:
         std::vector<OGRGeometry*> *geometries;
 	};
+    
+    
+    
+    class DllExport RSGISGetOGRGeometriesInIdx : public RSGISProcessOGRFeature
+    {
+    public:
+        RSGISGetOGRGeometriesInIdx(geos::index::SpatialIndex *geomIdx);
+        virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
+        virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
+        virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
+        virtual ~RSGISGetOGRGeometriesInIdx();
+    protected:
+        geos::index::SpatialIndex *geomIdx;
+    };
+    
+    
+    
     
     
     class DllExport RSGISPrintGeometryToConsole : public RSGISProcessOGRFeature
