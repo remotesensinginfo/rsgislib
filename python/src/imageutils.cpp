@@ -2476,7 +2476,7 @@ For example, can be used to produce monthly composite images from a stack with i
 "\n"
 "    imageutils.sharpenLowResBands(inimage='./wv2/wv2_20140903_panstack.kea',\n"
 "                                  outimage='./wv2/wv2_20140903_panstack_sharp.kea',\n"
-"                                  bandinfo=bandInfo, winSize=7, nodata=0,\n"
+"                                  bandinfo=bandInfo, winsize=7, nodata=0,\n"
 "                                  gdalformat='KEA', datatype=rsgislib.TYPE_UINT16)\n"
 "\n"
 "\n"},
