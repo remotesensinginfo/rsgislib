@@ -1364,8 +1364,6 @@ static PyObject *ImageUtils_CombineImages2Band(PyObject *self, PyObject *args, P
     Py_RETURN_NONE;
 }
 
-
-
 static PyObject *ImageUtils_PerformRandomPxlSample(PyObject *self, PyObject *args, PyObject *keywds)
 {
     static char *kwlist[] = {"inputImage", "outputImage", "gdalformat", "maskvals", "numSamples", NULL};
@@ -1488,8 +1486,6 @@ static PyObject *ImageUtils_PerformRandomPxlSampleSmallPxlCount(PyObject *self, 
     Py_RETURN_NONE;
 }
 
-
-
 static PyObject *ImageUtils_PanSharpenHCS(PyObject *self, PyObject *args, PyObject *keywds)
 {
     static char *kwlist[] = {"inimage", "outimage", "gdalformat", "datatype", "winsize", "useNaiveMethod", NULL};
@@ -1520,7 +1516,6 @@ static PyObject *ImageUtils_PanSharpenHCS(PyObject *self, PyObject *args, PyObje
     
     Py_RETURN_NONE;
 }
-
 
 static PyObject *ImageUtils_SharpenLowResImageBands(PyObject *self, PyObject *args, PyObject *keywds)
 {
@@ -1633,7 +1628,58 @@ static PyObject *ImageUtils_SharpenLowResImageBands(PyObject *self, PyObject *ar
     Py_RETURN_NONE;
 }
 
-
+static PyObject *ImageUtils_CreateMaxNDVICompositeImg(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    static char *kwlist[] = {"inimages", "outimage", "redband", "nirband", "gdalformat", "datatype", NULL};
+    PyObject *pInputImages;
+    const char *pszOutputImage = "";
+    const char *pszGDALFormat = "";
+    int nDataType;
+    unsigned int redBand = 0;
+    unsigned int nirBand = 0;
+    
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "OsIIsi:createMaxNDVICompositeImg", kwlist, &pInputImages, &pszOutputImage, &redBand, &nirBand, &pszGDALFormat, &nDataType))
+    {
+        return NULL;
+    }
+    
+    rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
+    
+    if( !PySequence_Check(pInputImages))
+    {
+        PyErr_SetString(GETSTATE(self)->error, "Input images must be a sequence");
+        return NULL;
+    }
+    
+    Py_ssize_t nImages = PySequence_Size(pInputImages);
+    std::vector<std::string> inputImages;
+    inputImages.reserve(nImages);
+    for( Py_ssize_t n = 0; n < nImages; n++ )
+    {
+        PyObject *o = PySequence_GetItem(pInputImages, n);
+        
+        if(!RSGISPY_CHECK_STRING(o))
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Input images must be strings");
+            Py_DECREF(o);
+            return NULL;
+        }
+        
+        inputImages.push_back(RSGISPY_STRING_EXTRACT(o));
+    }
+    
+    try
+    {
+        rsgis::cmds::executeCreateMaxNDVICompsiteImage(inputImages, std::string(pszOutputImage), redBand, nirBand, std::string(pszGDALFormat), type);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
 
 
 // Our list of functions in this module
@@ -2403,9 +2449,9 @@ For example, can be used to produce monthly composite images from a stack with i
 "\n"
 "Where:\n"
 "\n"
-"* inputImage is a string for the input file where the high resolution input image bands have been resampled \n"
+"* inimage is a string for the input file where the high resolution input image bands have been resampled \n"
 "             (recommend nearest neighbour) to the same resolution has the higher resolution bands\n"
-"* outputImage is a string with the name and path of the output image.\n"
+"* outimage is a string with the name and path of the output image.\n"
 "* bandinfo is a list of the input image bands (type: rsgislib.imageutils.SharpBandInfo) specifying the band number, name and status.\n"
 "           the status is either rsgislib.SHARP_RES_IGNORE, rsgislib.SHARP_RES_LOW or rsgislib.SHARP_RES_HIGH\n"
 "* winsize is an integer, which must be an odd number, specifying the window size (in pixels) used for the analysis (Default = 7). \n"
@@ -2419,19 +2465,50 @@ For example, can be used to produce monthly composite images from a stack with i
 "\nExample::\n"
 "\n"
 "    import rsgislib\n"
-"    import rsgislib.imageutils\n"
+"    from rsgislib import imageutils\n"
 "\n"
 "    bandInfo = []\n"
-"    bandInfo.append(SharpBandInfo(band=1, status=rsgislib.SHARP_RES_LOW, name='Blue'))\n"
-"    bandInfo.append(SharpBandInfo(band=2, status=rsgislib.SHARP_RES_LOW, name='Green'))\n"
-"    bandInfo.append(SharpBandInfo(band=3, status=rsgislib.SHARP_RES_LOW, name='Red'))\n"
-"    bandInfo.append(SharpBandInfo(band=4, status=rsgislib.SHARP_RES_LOW, name='NIR'))\n"
-"    bandInfo.append(SharpBandInfo(band=5, status=rsgislib.SHARP_RES_HIGH, name='PAN'))\n"
+"    bandInfo.append(imageutils.SharpBandInfo(band=1, status=rsgislib.SHARP_RES_LOW, name='Blue'))\n"
+"    bandInfo.append(imageutils.SharpBandInfo(band=2, status=rsgislib.SHARP_RES_LOW, name='Green'))\n"
+"    bandInfo.append(imageutils.SharpBandInfo(band=3, status=rsgislib.SHARP_RES_LOW, name='Red'))\n"
+"    bandInfo.append(imageutils.SharpBandInfo(band=4, status=rsgislib.SHARP_RES_LOW, name='NIR'))\n"
+"    bandInfo.append(imageutils.SharpBandInfo(band=5, status=rsgislib.SHARP_RES_HIGH, name='PAN'))\n"
 "\n"
-"    rsgislib.imageutils.sharpenLowResBands(inputImg='./wv2/wv2_20140903_panstack.kea',\n"
-"                                           outputImg='./wv2/wv2_20140903_panstack_sharp.kea',\n"
-"                                           bandInfo=bandInfo, winSize=7, nodata=0,\n"
-"                                           gdalformat='KEA', datatype=rsgislib.UINT16)\n"
+"    imageutils.sharpenLowResBands(inimage='./wv2/wv2_20140903_panstack.kea',\n"
+"                                  outimage='./wv2/wv2_20140903_panstack_sharp.kea',\n"
+"                                  bandinfo=bandInfo, winsize=7, nodata=0,\n"
+"                                  gdalformat='KEA', datatype=rsgislib.TYPE_UINT16)\n"
+"\n"
+"\n"},
+
+{"createMaxNDVICompositeImg", (PyCFunction)ImageUtils_CreateMaxNDVICompositeImg, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.createMaxNDVICompositeImg(inimages=list, outimage=string, redband=int, nirband=int, gdalformat=string, datatype=int)\n"
+"A function which creates a composite image where the pixel values from the image with the maximum NDVI is selected.\n"
+"\n"
+"Where:\n"
+"\n"
+"* inimages is a list of input images, each image must have the same number of bands in the same order.\n"
+"* outputImage is a string with the name and path of the output image.\n"
+"* redband is the image band number for the red band (note. band numbers start at 1).\n"
+"* nirband is the image band number for the nir band (note. band numbers start at 1).\n"
+"* gdalformat is a string with the GDAL output file format.\n"
+"* datatype is an containing one of the values from rsgislib.TYPE_*\n"
+"\n"
+"\nExample::\n"
+"\n"
+"    import rsgislib\n"
+"    import rsgislib.imageutils\n"
+"\n"
+"    inputImgs = ['LS5/Outputs/LS5TM_20100127_lat0lon11772_r60p116_vmsk_mclds_clearsky_topshad_rad_srefdem_stdsref.kea',\n"
+"                 'LS5/Outputs/LS5TM_20100212_lat0lon11772_r60p116_vmsk_mclds_clearsky_topshad_rad_srefdem_stdsref.kea',\n"
+"                 'LS5/Outputs/LS5TM_20100503_lat0lon11773_r60p116_vmsk_mclds_clearsky_topshad_rad_srefdem_stdsref.kea',\n"
+"                 'LS5/Outputs/LS5TM_20100519_lat0lon11773_r60p116_vmsk_mclds_clearsky_topshad_rad_srefdem_stdsref.kea',\n"
+"                 'LS7/Outputs/LS7_20100612_lat0lon11773_r60p116_msk_vmsk_mclds_clearsky_topshad_rad_srefdem_stdsref.kea']\n"
+"\n"
+"    outputImg = 'LS5TM_r60p116_vmsk_mclds_clearsky_topshad_rad_srefdem_stdsref.kea'\n"
+"\n"
+"    rsgislib.imageutils.createMaxNDVICompositeImg(inputImgs, outputImg, redband=3, nirband=4, gdalformat='KEA', datatype=rsgislib.TYPE_16UINT)\n"
+"    rsgislib.imageutils.popImageStats(outputImg, usenodataval=True, nodataval=0, calcpyramids=True)\n"
 "\n"
 "\n"},
 

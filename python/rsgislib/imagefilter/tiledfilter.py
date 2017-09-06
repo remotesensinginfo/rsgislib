@@ -42,6 +42,7 @@ import glob
 import os.path
 import os
 import shutil
+import math
 from multiprocessing import Pool
 from abc import ABCMeta, abstractmethod
 
@@ -651,7 +652,7 @@ Example::
     if not os.path.exists(tilesFilterDIR):
         os.makedirs(tilesFilterDIR)
     
-    tileOverlap = filterInst.getFilterHSize()
+    tileOverlap = math.ceil(filterInst.getFilterHSize())
     
     imageutils.createTiles(inputImg, tilesImgBase, int(width), int(height), int(tileOverlap), False, 'KEA', rsgisUtils.getRSGISLibDataTypeFromImg(inputImg), 'kea')
     imageTiles = glob.glob(tilesImgBase+"*.kea")    
@@ -739,14 +740,14 @@ Example::
     tileOverlap = 0
     
     for filterInst in filterInsts:
-        tmpOverlap = filterInst.getFilterHSize()
+        tmpOverlap = math.ceil(filterInst.getFilterHSize())
         if first:
             tileOverlap = tmpOverlap
             first = False
         elif tmpOverlap > tileOverlap:
             tileOverlap = tmpOverlap
         
-    imageutils.createTiles(inputImg, tilesImgBase, width, height, tileOverlap, False, 'KEA', rsgisUtils.getRSGISLibDataTypeFromImg(inputImg), 'kea')
+    imageutils.createTiles(inputImg, tilesImgBase, int(width), int(height), int(tileOverlap), False, 'KEA', rsgisUtils.getRSGISLibDataTypeFromImg(inputImg), 'kea')
     imageTiles = glob.glob(tilesImgBase+"*.kea")    
     
     for i in range(numFilters):

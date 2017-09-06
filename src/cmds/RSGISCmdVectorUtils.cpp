@@ -62,6 +62,8 @@
 
 #include "geos/geom/Coordinate.h"
 #include "geos/geom/Polygon.h"
+#include "geos/index/strtree/STRtree.h"
+#include "geos/index/quadtree/Quadtree.h"
 
 namespace rsgis{ namespace cmds {
     
@@ -1402,7 +1404,7 @@ namespace rsgis{ namespace cmds {
         }
     }
             
-    double executeCalcDist2NearestGeom(std::string inputVec, std::string outputVec, bool force) throw(RSGISCmdException)
+    double executeCalcDist2NearestGeom(std::string inputVec, std::string outputVec, std::string outColName, bool force, bool useIdx, double idxMaxSearch) throw(RSGISCmdException)
     {
         double maxMinDist = 0.0;
         try
@@ -1477,21 +1479,41 @@ namespace rsgis{ namespace cmds {
                 std::string message = std::string("Could not create vector layer ") + SHPFileOutLayer;
                 throw rsgis::vec::RSGISVectorOutputException(message.c_str());
             }
-
-            // Read in Geometries...
-            std::cout << "Read in the geometries\n";
-            std::vector<OGRGeometry*> *ogrGeoms = new std::vector<OGRGeometry*>();
-            rsgis::vec::RSGISGetOGRGeometries getOGRGeoms = rsgis::vec::RSGISGetOGRGeometries(ogrGeoms);
-            rsgis::vec::RSGISProcessVector processVectorGetGeoms = rsgis::vec::RSGISProcessVector(&getOGRGeoms);
-            processVectorGetGeoms.processVectorsNoOutput(inputSHPLayer, false);
             
-            // Iterate through features and calc dist...
-            std::cout << "Calculate Distances\n";
-            rsgis::vec::RSGISCalcMinDist2Geoms calcMinDist = rsgis::vec::RSGISCalcMinDist2Geoms(ogrGeoms);
-            rsgis::vec::RSGISProcessVector processVector = rsgis::vec::RSGISProcessVector(&calcMinDist);
-            processVector.processVectors(inputSHPLayer, outputSHPLayer, false, false, false);
-            
-            maxMinDist = calcMinDist.getMaxMinDist();
+            if(useIdx)
+            {
+                // Read in Geometries...
+                std::cout << "Read in the geometries\n";
+                geos::index::quadtree::Quadtree *geomsIdx = new geos::index::quadtree::Quadtree();
+                rsgis::vec::RSGISGetOGRGeometriesInIdx getOGRGeoms = rsgis::vec::RSGISGetOGRGeometriesInIdx(geomsIdx);
+                rsgis::vec::RSGISProcessVector processVectorGetGeoms = rsgis::vec::RSGISProcessVector(&getOGRGeoms);
+                processVectorGetGeoms.processVectorsNoOutput(inputSHPLayer, false);
+                
+                // Iterate through features and calc dist...
+                std::cout << "Calculate Distances\n";
+                rsgis::vec::RSGISCalcMinDist2GeomsUseIdx calcMinDist = rsgis::vec::RSGISCalcMinDist2GeomsUseIdx(outColName, geomsIdx, idxMaxSearch);
+                rsgis::vec::RSGISProcessVector processVector = rsgis::vec::RSGISProcessVector(&calcMinDist);
+                processVector.processVectors(inputSHPLayer, outputSHPLayer, true, false, false);
+                
+                maxMinDist = calcMinDist.getMaxMinDist();
+            }
+            else
+            {
+                // Read in Geometries...
+                std::cout << "Read in the geometries\n";
+                std::vector<OGRGeometry*> *ogrGeoms = new std::vector<OGRGeometry*>();
+                rsgis::vec::RSGISGetOGRGeometries getOGRGeoms = rsgis::vec::RSGISGetOGRGeometries(ogrGeoms);
+                rsgis::vec::RSGISProcessVector processVectorGetGeoms = rsgis::vec::RSGISProcessVector(&getOGRGeoms);
+                processVectorGetGeoms.processVectorsNoOutput(inputSHPLayer, false);
+                
+                // Iterate through features and calc dist...
+                std::cout << "Calculate Distances\n";
+                rsgis::vec::RSGISCalcMinDist2Geoms calcMinDist = rsgis::vec::RSGISCalcMinDist2Geoms(outColName, ogrGeoms);
+                rsgis::vec::RSGISProcessVector processVector = rsgis::vec::RSGISProcessVector(&calcMinDist);
+                processVector.processVectors(inputSHPLayer, outputSHPLayer, true, false, false);
+                
+                maxMinDist = calcMinDist.getMaxMinDist();
+            }
             
             GDALClose(inputSHPDS);
             GDALClose(outputSHPDS);
@@ -1556,7 +1578,7 @@ namespace rsgis{ namespace cmds {
             
             // Iterate through features and calc dist...
             std::cout << "Calculate Distances\n";
-            rsgis::vec::RSGISCalcMinDist2Geoms calcMinDist = rsgis::vec::RSGISCalcMinDist2Geoms(ogrGeoms);
+            rsgis::vec::RSGISCalcMinDist2Geoms calcMinDist = rsgis::vec::RSGISCalcMinDist2Geoms("MinDist", ogrGeoms);
             rsgis::vec::RSGISProcessVector processVector = rsgis::vec::RSGISProcessVector(&calcMinDist);
             processVector.processVectorsNoOutput(inputSHPLayer, false);
             maxMinDist = calcMinDist.getMaxMinDist();
@@ -1579,7 +1601,151 @@ namespace rsgis{ namespace cmds {
         return maxMinDist;
     }
             
+    double executeCalcDist2NearestGeom(std::string inputVec, std::string inDist2Vec, std::string outputVec, std::string outColName, bool force, bool useIdx, double idxMaxSearch) throw(RSGISCmdException)
+    {
+        double maxMinDist = 0.0;
+        try
+        {
+            // Convert to absolute path
+            inputVec = boost::filesystem::absolute(inputVec).string();
+            inDist2Vec = boost::filesystem::absolute(inDist2Vec).string();
+            outputVec = boost::filesystem::absolute(outputVec).string();
             
+            OGRRegisterAll();
+            
+            rsgis::utils::RSGISFileUtils fileUtils;
+            rsgis::vec::RSGISVectorUtils vecUtils;
+            
+            std::string SHPFileInLayer = vecUtils.getLayerName(inputVec);
+            std::string SHPFileInDistLayer = vecUtils.getLayerName(inDist2Vec);
+            std::string SHPFileOutLayer = vecUtils.getLayerName(outputVec);
+            
+            std::string outputDIR = fileUtils.getFileDirectoryPath(outputVec);
+            
+            if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
+            {
+                if(force)
+                {
+                    vecUtils.deleteSHP(outputDIR, SHPFileOutLayer);
+                }
+                else
+                {
+                    throw RSGISException("Shapefile already exists, either delete or select force.");
+                }
+            }
+            
+            /////////////////////////////////////
+            //
+            // Open Input Shapfile.
+            //
+            /////////////////////////////////////
+            GDALDataset *inputSHPDS = NULL;
+            inputSHPDS = (GDALDataset*) GDALOpenEx(inputVec.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);
+            if(inputSHPDS == NULL)
+            {
+                std::string message = std::string("Could not open vector file ") + inputVec;
+                throw RSGISFileException(message.c_str());
+            }
+            OGRLayer *inputSHPLayer = inputSHPDS->GetLayerByName(SHPFileInLayer.c_str());
+            if(inputSHPLayer == NULL)
+            {
+                std::string message = std::string("Could not open vector layer ") + SHPFileInLayer;
+                throw RSGISFileException(message.c_str());
+            }
+            OGRSpatialReference* inputSpatialRef = inputSHPLayer->GetSpatialRef();
+            OGRFeatureDefn *inFeatureDefn = inputSHPLayer->GetLayerDefn();
+            
+            GDALDataset *inDistToSHPDS = NULL;
+            inDistToSHPDS = (GDALDataset*) GDALOpenEx(inDist2Vec.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);
+            if(inDistToSHPDS == NULL)
+            {
+                std::string message = std::string("Could not open vector file ") + inDist2Vec;
+                throw RSGISFileException(message.c_str());
+            }
+            OGRLayer *inDistToSHPLayer = inDistToSHPDS->GetLayerByName(SHPFileInDistLayer.c_str());
+            if(inDistToSHPLayer == NULL)
+            {
+                std::string message = std::string("Could not open vector layer ") + SHPFileInDistLayer;
+                throw RSGISFileException(message.c_str());
+            }
+            
+            /////////////////////////////////////
+            //
+            // Create Output Shapfile.
+            //
+            /////////////////////////////////////
+            const char *pszDriverName = "ESRI Shapefile";
+            GDALDriver *shpFiledriver = GetGDALDriverManager()->GetDriverByName(pszDriverName);
+            if( shpFiledriver == NULL )
+            {
+                throw rsgis::vec::RSGISVectorOutputException("SHP driver not available.");
+            }
+            GDALDataset *outputSHPDS = shpFiledriver->Create(outputVec.c_str(), 0, 0, 0, GDT_Unknown, NULL);
+            if( outputSHPDS == NULL )
+            {
+                std::string message = std::string("Could not create vector file ") + outputVec;
+                throw rsgis::vec::RSGISVectorOutputException(message.c_str());
+            }
+            OGRLayer *outputSHPLayer = outputSHPDS->CreateLayer(SHPFileOutLayer.c_str(), inputSpatialRef, inFeatureDefn->GetGeomType(), NULL );
+            if( outputSHPLayer == NULL )
+            {
+                std::string message = std::string("Could not create vector layer ") + SHPFileOutLayer;
+                throw rsgis::vec::RSGISVectorOutputException(message.c_str());
+            }
+            
+            if(useIdx)
+            {
+                // Read in Geometries...
+                std::cout << "Read in the geometries\n";
+                geos::index::quadtree::Quadtree *geomsIdx = new geos::index::quadtree::Quadtree();
+                rsgis::vec::RSGISGetOGRGeometriesInIdx getOGRGeoms = rsgis::vec::RSGISGetOGRGeometriesInIdx(geomsIdx);
+                rsgis::vec::RSGISProcessVector processVectorGetGeoms = rsgis::vec::RSGISProcessVector(&getOGRGeoms);
+                processVectorGetGeoms.processVectorsNoOutput(inDistToSHPLayer, false);
+                
+                // Iterate through features and calc dist...
+                std::cout << "Calculate Distances\n";
+                rsgis::vec::RSGISCalcMinDist2GeomsUseIdx calcMinDist = rsgis::vec::RSGISCalcMinDist2GeomsUseIdx(outColName, geomsIdx, idxMaxSearch);
+                rsgis::vec::RSGISProcessVector processVector = rsgis::vec::RSGISProcessVector(&calcMinDist);
+                processVector.processVectors(inputSHPLayer, outputSHPLayer, true, false, false);
+                
+                maxMinDist = calcMinDist.getMaxMinDist();
+            }
+            else
+            {
+                // Read in Geometries...
+                std::cout << "Read in the geometries\n";
+                std::vector<OGRGeometry*> *ogrGeoms = new std::vector<OGRGeometry*>();
+                rsgis::vec::RSGISGetOGRGeometries getOGRGeoms = rsgis::vec::RSGISGetOGRGeometries(ogrGeoms);
+                rsgis::vec::RSGISProcessVector processVectorGetGeoms = rsgis::vec::RSGISProcessVector(&getOGRGeoms);
+                processVectorGetGeoms.processVectorsNoOutput(inDistToSHPLayer, false);
+                
+                // Iterate through features and calc dist...
+                std::cout << "Calculate Distances\n";
+                rsgis::vec::RSGISCalcMinDist2Geoms calcMinDist = rsgis::vec::RSGISCalcMinDist2Geoms(outColName, ogrGeoms);
+                rsgis::vec::RSGISProcessVector processVector = rsgis::vec::RSGISProcessVector(&calcMinDist);
+                processVector.processVectors(inputSHPLayer, outputSHPLayer, true, false, false);
+                
+                maxMinDist = calcMinDist.getMaxMinDist();
+            }
+            
+            GDALClose(inputSHPDS);
+            GDALClose(outputSHPDS);
+        }
+        catch(rsgis::RSGISVectorException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        
+        return maxMinDist;
+    }
             
     void executeSpatialGraphClusterGeoms(std::string inputVec, std::string outputVec, bool useMinSpanTree, float edgeLenSDThres, double maxEdgeLen, bool force, std::string shpFileEdges, bool outShpEdges, std::string h5EdgeLengths, bool outH5EdgeLens) throw(RSGISCmdException)
     {

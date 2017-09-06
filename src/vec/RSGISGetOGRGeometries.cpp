@@ -50,6 +50,49 @@ namespace rsgis{namespace vec{
     {
         
     }
+
+    
+    
+    
+    
+    RSGISGetOGRGeometriesInIdx::RSGISGetOGRGeometriesInIdx(geos::index::SpatialIndex *geomIdx):RSGISProcessOGRFeature()
+    {
+        this->geomIdx = geomIdx;
+    }
+    
+    void RSGISGetOGRGeometriesInIdx::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+    {
+        throw RSGISVectorException("Not implemented..");
+    }
+    
+    void RSGISGetOGRGeometriesInIdx::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+    {
+        RSGISGEOSGeomFID *geomObj = new RSGISGEOSGeomFID();
+        geomObj->geom = feature->GetGeometryRef()->clone();
+        geomObj->env = env;
+        geomObj->fid = fid;
+        this->geomIdx->insert(env, geomObj);
+    }
+    
+    void RSGISGetOGRGeometriesInIdx::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+    {
+        // Do nothing...
+    }
+    
+    RSGISGetOGRGeometriesInIdx::~RSGISGetOGRGeometriesInIdx()
+    {
+        
+    }
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     RSGISPrintGeometryToConsole::RSGISPrintGeometryToConsole():RSGISProcessOGRFeature()

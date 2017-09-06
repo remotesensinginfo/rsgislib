@@ -399,10 +399,12 @@ static PyObject *VectorUtils_ExportPxls2Pts(PyObject *self, PyObject *args)
 
 static PyObject *VectorUtils_Dist2NearestGeom(PyObject *self, PyObject *args)
 {
-    const char *pszInputVector, *pszOutputVector;
-    int force = false;
+    const char *pszInputVector, *pszOutputVector, *pszOutColName;
+    int forceInt = false;
+    int useIdxInt = false;
+    double maxSearchDist = 100;
     
-    if( !PyArg_ParseTuple(args, "ss|i:dist2NearestGeom", &pszInputVector, &pszOutputVector, &force))
+    if( !PyArg_ParseTuple(args, "sss|iid:dist2NearestGeom", &pszInputVector, &pszOutputVector, &pszOutColName, &forceInt, &useIdxInt, &maxSearchDist))
     {
         return NULL;
     }
@@ -410,7 +412,41 @@ static PyObject *VectorUtils_Dist2NearestGeom(PyObject *self, PyObject *args)
     PyObject *outVal = PyTuple_New(1);
     try
     {
-        double dist = rsgis::cmds::executeCalcDist2NearestGeom(std::string(pszInputVector), std::string(pszOutputVector), force);
+        bool force = (bool) forceInt;
+        bool useIdx = (bool) useIdxInt;
+        double dist = rsgis::cmds::executeCalcDist2NearestGeom(std::string(pszInputVector), std::string(pszOutputVector), std::string(pszOutColName), force, useIdx, maxSearchDist);
+        if(PyTuple_SetItem(outVal, 0, Py_BuildValue("d", dist)) == -1)
+        {
+            throw rsgis::cmds::RSGISCmdException("Failed to add \'distance\' value to the list...");
+        }
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    return outVal;
+}
+
+static PyObject *VectorUtils_Dist2NearestSecGeomSet(PyObject *self, PyObject *args)
+{
+    const char *pszInputVector, *pszInDistToVector, *pszOutputVector, *pszOutColName;
+    int forceInt = false;
+    int useIdxInt = false;
+    double maxSearchDist = 100;
+    
+    if( !PyArg_ParseTuple(args, "ssss|iid:dist2NearestSecGeomSet", &pszInputVector, &pszInDistToVector, &pszOutputVector, &pszOutColName, &forceInt, &useIdxInt, &maxSearchDist))
+    {
+        return NULL;
+    }
+    
+    PyObject *outVal = PyTuple_New(1);
+    try
+    {
+        bool force = (bool) forceInt;
+        bool useIdx = (bool) useIdxInt;
+        double dist = rsgis::cmds::executeCalcDist2NearestGeom(std::string(pszInputVector), std::string(pszInDistToVector), std::string(pszOutputVector), std::string(pszOutColName), force, useIdx, maxSearchDist);
         if(PyTuple_SetItem(outVal, 0, Py_BuildValue("d", dist)) == -1)
         {
             throw rsgis::cmds::RSGISCmdException("Failed to add \'distance\' value to the list...");
@@ -843,14 +879,32 @@ static PyMethodDef VectorUtilsMethods[] = {
 "\n"},
 
 {"dist2NearestGeom", VectorUtils_Dist2NearestGeom, METH_VARARGS,
-"vectorutils.dist2NearestGeom(inputVector, outputVector, force)\n"
+"vectorutils.dist2NearestGeom(inputVector, outputVector, minDistCol, force, useIdx, maxSearchDist)\n"
 "A command to calculate the distance from each geometry to its nearest neighbouring geometry.\n"
 "The function also returns the maximum minimum distance between the geometries.\n\n"
 "Where:\n"
 "\n"
 "* inputVector is a string containing the name of the input vector\n"
 "* outputVector is a string containing the name of the output vector\n"
+"* minDistCol is a string with the name of the output column name\n"
 "* force is a bool, specifying whether to force removal of the output vector if it exists\n"
+"* useIdx is a bool, specifying whether a spatial index and max search limit should be used\n"
+"* maxSearchDist is a float, with maximum search distance from each feature - only used within a spatial index.\n"
+"\n"},
+    
+{"dist2NearestSecGeomSet", VectorUtils_Dist2NearestSecGeomSet, METH_VARARGS,
+"vectorutils.dist2NearestSecGeomSet(inputVector, inDistToVector, outputVector, minDistCol, force, useIdx, maxSearchDist)\n"
+"A command to calculate the distance from each geometry to its nearest neighbouring geometry.\n"
+"The function also returns the maximum minimum distance between the geometries.\n\n"
+"Where:\n"
+"\n"
+"* inputVector is a string containing the name of the input vector\n"
+"* inDistToVector is a string containing the name of the input vector for which the distance to features from the input vector will be calculated.\n"
+"* outputVector is a string containing the name of the output vector\n"
+"* minDistCol is a string with the name of the output column name\n"
+"* force is a bool, specifying whether to force removal of the output vector if it exists\n"
+"* useIdx is a bool, specifying whether a spatial index and max search limit should be used\n"
+"* maxSearchDist is a float, with maximum search distance from each feature - only used within a spatial index.\n"
 "\n"},
 
 {"calcMaxDist2NearestGeom", VectorUtils_CalcMaxDist2NearestGeom, METH_VARARGS,
