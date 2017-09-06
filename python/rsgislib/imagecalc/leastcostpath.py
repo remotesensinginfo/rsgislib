@@ -43,7 +43,7 @@ import numpy
 
 
 
-def coord2pixelOffset(rasterfn, x, y):
+def _coord2pixelOffset(rasterfn, x, y):
     raster = gdal.Open(rasterfn)
     geotransform = raster.GetGeoTransform()
     originX = geotransform[0]
@@ -54,16 +54,16 @@ def coord2pixelOffset(rasterfn, x, y):
     yOffset = int((y - originY)/pixelHeight)
     return xOffset,yOffset
 
-def createPath(CostSurfaceImg, costSurfaceArray, startCoord, stopCoord):
+def _createPath(CostSurfaceImg, costSurfaceArray, startCoord, stopCoord):
 
     # coordinates to array index
     startCoordX = startCoord[0]
     startCoordY = startCoord[1]
-    startIndexX,startIndexY = coord2pixelOffset(CostSurfaceImg, startCoordX,startCoordY)
+    startIndexX,startIndexY = _coord2pixelOffset(CostSurfaceImg, startCoordX,startCoordY)
 
     stopCoordX = stopCoord[0]
     stopCoordY = stopCoord[1]
-    stopIndexX,stopIndexY = coord2pixelOffset(CostSurfaceImg, stopCoordX,stopCoordY)
+    stopIndexX,stopIndexY = _coord2pixelOffset(CostSurfaceImg, stopCoordX,stopCoordY)
 
     # create path
     indices, weight = skimage.graph.route_through_array(costSurfaceArray, (startIndexY,startIndexX), (stopIndexY,stopIndexX), geometric=True, fully_connected=True)
@@ -72,7 +72,7 @@ def createPath(CostSurfaceImg, costSurfaceArray, startCoord, stopCoord):
     path[indices[0], indices[1]] = 1
     return path
 
-def array2raster(newRasterfn, rasterfn, array, outFormat):
+def _array2raster(newRasterfn, rasterfn, array, outFormat):
     raster = gdal.Open(rasterfn)
     geotransform = raster.GetGeoTransform()
     originX = geotransform[0]
@@ -94,16 +94,29 @@ def array2raster(newRasterfn, rasterfn, array, outFormat):
     outRaster = None
     raster = None
 
-def performLeastCostPathCalc(CostSurfaceImg, outputPathImg, startCoord, stopCoord, outFormat="KEA", costImgBand=1):
+def performLeastCostPathCalc(costSurfaceImg, outputPathImg, startCoord, stopCoord, gdalformat="KEA", costImgBand=1):
+    """
+    Calculates least cost path for a raster surface from start coord to stop coord:
+
+    Version of code from: https://pcjericks.github.io/py-gdalogr-cookbook/raster_layers.html#create-least-cost-path
+
+        * costSurfaceImg - Input image to calculate cost path from
+        * outputPathImg - Output image
+        * startCoord - Start coordinate
+        * stopCoord - End coordinate
+        * gdalformat - GDAL format (default=KEA)
+        * costImgBand - Band in input image to use for cost analysis (default=1)
+
+    """
     # Read gdal raster as array.
-    gdalRasterDS = gdal.Open(CostSurfaceImg)
+    gdalRasterDS = gdal.Open(costSurfaceImg)
     costSurfaceArray = gdalRasterDS.GetRasterBand(costImgBand).ReadAsArray()
     
     # Creates path array
-    pathArray = createPath(CostSurfaceImg, costSurfaceArray, startCoord, stopCoord)
+    pathArray = _createPath(CostSurfaceImg, costSurfaceArray, startCoord, stopCoord)
 
     # Converts path array to raster
-    array2raster(outputPathImg, CostSurfaceImg, pathArray, outFormat)
+    _array2raster(outputPathImg, CostSurfaceImg, pathArray, gdalformat)
 
 
 

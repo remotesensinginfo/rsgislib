@@ -18,6 +18,8 @@ Attribute Segments
 -------------------
 
 .. autofunction:: rsgislib.rastergis.calcBorderLength
+.. autofunction:: rsgislib.rastergis.ratutils.calcDistBetweenClumps
+.. autofunction:: rsgislib.rastergis.ratutils.calcDistToLargeClumps
 .. autofunction:: rsgislib.rastergis.calcRelBorder
 .. autofunction:: rsgislib.rastergis.calcRelDiffNeighStats
 .. autofunction:: rsgislib.rastergis.defineBorderClumps

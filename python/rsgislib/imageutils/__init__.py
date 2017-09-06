@@ -507,17 +507,7 @@ Where:
         wrpOpts = gdal.WarpOptions(resampleAlg=eResampleAlg, srcNodata=noData, dstNodata=noData, multithread=False, callback=gdal.TermProgress)    
 
     gdal.Warp(outImgDS, inImgDS, options=wrpOpts)
-    
-    
-    """
-    warpOptions=[]
-    if nCores < 1:
-        warpOptions.append("NUM_THREADS=ALL_CPUS")
-    else:
-        warpOptions.append("NUM_THREADS="+str(nCores))
-    gdal.ReprojectImage(inImgDS, outImgDS, None, None, eResampleAlg, 0.0, 0.0, gdal.TermProgress, options=warpOptions)
-    """
-    
+
     inImgDS = None
     outImgDS = None    
 
