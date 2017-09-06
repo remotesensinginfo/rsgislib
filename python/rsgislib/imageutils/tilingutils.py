@@ -102,6 +102,7 @@ Where:
 * tmpdir is a string with a temporary directory for temp outputs to be stored (they will be deleted) 
     * if tmpdir doesn't exist it will be created and then deleted during the processing.
 * inImgNoDataVal is a float for providing the input image no data value (Default: 0.0)
+
 """
     tmpPresent = True
     if not os.path.exists(tmpdir):

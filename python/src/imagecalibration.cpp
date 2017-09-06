@@ -2004,10 +2004,6 @@ static PyMethodDef ImageCalibrationMethods[] = {
 "* senZen is the sensor azimuth of the input image\n"
 "* rmTmpImgs is a bool specifying whether the tmp images should be deleted at the end of the processing (Optional; Default = True)\n"
 "\n"
-"Example::\n"
-"\n"
-"   rsgislib.imagecalibration\n"
-"\n"
 },
     
     {NULL}        /* Sentinel */

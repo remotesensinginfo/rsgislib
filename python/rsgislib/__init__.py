@@ -477,10 +477,10 @@ class RSGISPyUtils (object):
         """
         Using GDAL to return the EPSG code for the input layer.
         """
+        from osgeo import osr
+        import osgeo.gdal as gdal
         epsgCode = None
         try:
-            from osgeo import osr
-            import osgeo.gdal as gdal
             layerDS = gdal.Open(gdalLayer, gdal.GA_ReadOnly)
             if layerDS == None:
                 raise RSGISPyException('Could not open raster image: \'' + gdalLayer+ '\'')
