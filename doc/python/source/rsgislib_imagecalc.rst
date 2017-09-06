@@ -84,6 +84,7 @@ Other
 .. autofunction:: rsgislib.imagecalc.imagePixelColumnSummary
 .. autofunction:: rsgislib.imagecalc.movementSpeed
 .. autofunction:: rsgislib.imagecalc.unitArea
+.. autofunction:: rsgislib.imagecalc.leastcostpath.performLeastCostPathCalc
 
 
 * :ref:`genindex`

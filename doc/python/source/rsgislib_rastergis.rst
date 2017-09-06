@@ -39,6 +39,7 @@ Attribute Segments
 Sampling
 --------
 .. autofunction:: rsgislib.rastergis.histoSampling
+.. autofunction:: rsgislib.rastergis.ratutils.takeRandomSample
 
 Classification
 --------------
