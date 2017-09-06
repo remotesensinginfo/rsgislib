@@ -65,6 +65,14 @@
 
 namespace rsgis{namespace vec{
     
+    struct RSGISGEOSGeomFID
+    {
+        OGRGeometry *geom;
+        geos::geom::Envelope *env;
+        unsigned long fid;
+    };
+    
+    
 	class DllExport RSGISVectorUtils
 		{
 		public:

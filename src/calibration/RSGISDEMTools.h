@@ -81,7 +81,7 @@ namespace rsgis{namespace calib{
 	class DllExport RSGISCalcSlope: public rsgis::img::RSGISCalcImageValue
 	{
 	public: 
-		RSGISCalcSlope(int numberOutBands, unsigned int band, float ewRes, float nsRes, int outType);
+		RSGISCalcSlope(int numberOutBands, unsigned int band, float ewRes, float nsRes, int outType, double noDataVal);
 		void calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException) {throw rsgis::img::RSGISImageCalcException("No implemented");};
 		void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException) {throw rsgis::img::RSGISImageCalcException("No implemented");};
         void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
@@ -98,12 +98,13 @@ namespace rsgis{namespace calib{
         float ewRes;
         float nsRes;
         int outType;
+        double noDataVal;
 	};
     
     class DllExport RSGISCalcAspect : public rsgis::img::RSGISCalcImageValue
 	{
 	public: 
-		RSGISCalcAspect(int numberOutBands, unsigned int band, float ewRes, float nsRes);
+		RSGISCalcAspect(int numberOutBands, unsigned int band, float ewRes, float nsRes, double noDataVal);
 		void calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException) {throw rsgis::img::RSGISImageCalcException("No implemented");};
 		void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException) {throw rsgis::img::RSGISImageCalcException("No implemented");};
         void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
@@ -119,6 +120,7 @@ namespace rsgis{namespace calib{
         unsigned int band;
         float ewRes;
         float nsRes;
+        double noDataVal;
 	};
     
     class DllExport RSGISRecodeAspect : public rsgis::img::RSGISCalcImageValue
@@ -141,7 +143,7 @@ namespace rsgis{namespace calib{
     class DllExport RSGISCalcSlopeAspect : public rsgis::img::RSGISCalcImageValue
 	{
 	public: 
-		RSGISCalcSlopeAspect(int numberOutBands, unsigned int band, float ewRes, float nsRes);
+		RSGISCalcSlopeAspect(int numberOutBands, unsigned int band, float ewRes, float nsRes, double noDataVal);
 		void calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException) {throw rsgis::img::RSGISImageCalcException("No implemented");};
 		void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException) {throw rsgis::img::RSGISImageCalcException("No implemented");};
         void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
@@ -157,13 +159,14 @@ namespace rsgis{namespace calib{
         unsigned int band;
         float ewRes;
         float nsRes;
+        double noDataVal;
 	};
     
     
 	class DllExport RSGISCalcHillShade : public rsgis::img::RSGISCalcImageValue
 	{
 	public: 
-		RSGISCalcHillShade(int numberOutBands, unsigned int band, float ewRes, float nsRes, float sunZenith, float sunAzimuth);
+		RSGISCalcHillShade(int numberOutBands, unsigned int band, float ewRes, float nsRes, float sunZenith, float sunAzimuth, double noDataVal);
 		void calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException) {throw rsgis::img::RSGISImageCalcException("No implemented");};
 		void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException) {throw rsgis::img::RSGISImageCalcException("No implemented");};
         void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
@@ -181,6 +184,7 @@ namespace rsgis{namespace calib{
         float nsRes;
         float sunZenith;
         float sunAzimuth;
+        double noDataVal;
 	};
     
     class DllExport RSGISCalcShadowBinaryMask : public rsgis::img::RSGISCalcImageValue
@@ -218,7 +222,7 @@ namespace rsgis{namespace calib{
     class DllExport RSGISCalcRayIncidentAngle : public rsgis::img::RSGISCalcImageValue
 	{
 	public: 
-		RSGISCalcRayIncidentAngle(int numberOutBands, unsigned int band, float ewRes, float nsRes, float sunZenith, float sunAzimuth);
+		RSGISCalcRayIncidentAngle(int numberOutBands, unsigned int band, float ewRes, float nsRes, float sunZenith, float sunAzimuth, double noDataVal);
 		void calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException) {throw rsgis::img::RSGISImageCalcException("No implemented");};
 		void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException) {throw rsgis::img::RSGISImageCalcException("No implemented");};
         void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
@@ -236,12 +240,13 @@ namespace rsgis{namespace calib{
         float nsRes;
         float sunZenith;
         float sunAzimuth;
+        double noDataVal;
 	};
     
     class DllExport RSGISCalcRayExitanceAngle : public rsgis::img::RSGISCalcImageValue
 	{
 	public: 
-		RSGISCalcRayExitanceAngle(int numberOutBands, unsigned int band, float ewRes, float nsRes, float viewZenith, float viewAzimuth);
+		RSGISCalcRayExitanceAngle(int numberOutBands, unsigned int band, float ewRes, float nsRes, float viewZenith, float viewAzimuth, double noDataVal);
 		void calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException) {throw rsgis::img::RSGISImageCalcException("No implemented");};
 		void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException) {throw rsgis::img::RSGISImageCalcException("No implemented");};
         void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
@@ -259,12 +264,13 @@ namespace rsgis{namespace calib{
         float nsRes;
         float viewZenith;
         float viewAzimuth;
+        double noDataVal;
 	};
     
     class DllExport RSGISCalcRayIncidentAndExitanceAngles : public rsgis::img::RSGISCalcImageValue
 	{
 	public: 
-		RSGISCalcRayIncidentAndExitanceAngles(int numberOutBands, unsigned int band, float ewRes, float nsRes, float sunZenith, float sunAzimuth, float viewZenith, float viewAzimuth);
+		RSGISCalcRayIncidentAndExitanceAngles(int numberOutBands, unsigned int band, float ewRes, float nsRes, float sunZenith, float sunAzimuth, float viewZenith, float viewAzimuth, double noDataVal);
 		void calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException) {throw rsgis::img::RSGISImageCalcException("No implemented");};
 		void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException) {throw rsgis::img::RSGISImageCalcException("No implemented");};
         void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
@@ -284,6 +290,7 @@ namespace rsgis{namespace calib{
         float sunAzimuth;
         float viewZenith;
         float viewAzimuth;
+        double noDataVal;
 	};
     
     
@@ -336,7 +343,7 @@ namespace rsgis{namespace calib{
     class DllExport RSGISFilterDTMWithAspectMedianFilter : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
-		RSGISFilterDTMWithAspectMedianFilter(float aspectRange);
+		RSGISFilterDTMWithAspectMedianFilter(float aspectRange, double noDataVal);
 		void calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException) {throw rsgis::img::RSGISImageCalcException("No implemented");};
 		void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException) {throw rsgis::img::RSGISImageCalcException("No implemented");};
         void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
@@ -350,6 +357,7 @@ namespace rsgis{namespace calib{
         ~RSGISFilterDTMWithAspectMedianFilter();
     private:
         float aspectRange;
+        double noDataVal;
 	};
 
     

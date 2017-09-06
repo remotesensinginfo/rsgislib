@@ -60,7 +60,6 @@ try:
 except ImportError as gdalErr:
     haveGDALPy = False
     
-    
 haveGDALOGRPy = True
 try:
     from osgeo import ogr
@@ -105,8 +104,6 @@ try:
     from sklearn.decomposition import PCA
 except ImportError as sklearnPCAErr:
     haveSKLearnPCA = False
-
-
 
 
 class RSGISRATThresMeasure(Enum):
@@ -1490,4 +1487,129 @@ def calcDist2Classes(clumpsImg, classCol, outImgBase, tmpDIR='./tmp', tileSize=2
         shutil.rmtree(tmpDIR, ignore_errors=True)
     else:
         os.remove(classesImg)
+
+def calcDistBetweenClumps(clumpsImg, outColName, tmpDIR='./tmp', useIdx=False, maxDistThres=10):
+    """
+Calculate the distance between all clumps
+
+* clumpsImg - image clumps for which the distance will be calculated.
+* outColName - output column within the clumps image.
+* tmpDIR - directory out tempory files will be outputted to.
+* useIdx - use a spatial index when calculating the distance between clumps (needed for large number of clumps).
+* maxDistThres - if using an index than an upper limit on the distance between clumps can be defined.
+
+"""
+    tmpPresent = True
+    if not os.path.exists(tmpDIR):
+        os.makedirs(tmpDIR)
+        tmpPresent = False 
+    
+    rsgisUtils = rsgislib.RSGISPyUtils()
+    
+    baseName = os.path.splitext(os.path.basename(clumpsImg))[0]+'_'+rsgisUtils.uidGenerator()
+    
+    polysShp = os.path.join(tmpDIR, baseName+'_shp.shp')
+    vectorutils.polygoniseRaster(clumpsImg, polysShp, imgBandNo=1, maskImg=clumpsImg, imgMaskBandNo=1)
+    
+    print('Calculating Distance - can take some time. Try using index and decreasing max distance threshold.')
+    t = rsgislib.RSGISTime()
+    t.start(True)
+    polysShpGeomDist = os.path.join(tmpDIR, baseName+'_dist_shp.shp')
+    vectorutils.dist2NearestGeom(polysShp, polysShpGeomDist, outColName, True, useIdx, maxDistThres)
+    t.end()
+    
+    rastergis.importVecAtts(clumpsImg, polysShpGeomDist, [outColName])
+    
+    if not tmpPresent:
+        shutil.rmtree(tmpDIR, ignore_errors=True)
+
+
+
+def calcDistToLargeClumps(clumpsImg, outColName, sizeThres, tmpDIR='./tmp', useIdx=False, maxDistThres=10):
+    """
+Calculate the distance from each small clump to a large clump. Split defined by the threshold provided.
+
+* clumpsImg - image clumps for which the distance will be calculated.
+* outColName - output column within the clumps image.
+* sizeThres - is a threshold to seperate the sets of large and small clumps.
+* tmpDIR - directory out tempory files will be outputted to.
+* useIdx - use a spatial index when calculating the distance between clumps (needed for large number of clumps).
+* maxDistThres - if using an index than an upper limit on the distance between clumps can be defined.
+
+"""
+    tmpPresent = True
+    if not os.path.exists(tmpDIR):
+        os.makedirs(tmpDIR)
+        tmpPresent = False 
+    
+    rsgisUtils = rsgislib.RSGISPyUtils()
+    uidStr = rsgisUtils.uidGenerator()
+    
+    baseName = os.path.splitext(os.path.basename(clumpsImg))[0]+'_'+uidStr
+    
+    ratDataset = gdal.Open(clumpsImg, gdal.GA_Update)
+    Histogram = rat.readColumn(ratDataset, "Histogram")
+    smallUnits = numpy.zeros_like(Histogram, dtype=numpy.int16)
+    smallUnits[Histogram < sizeThres] = 1
+    rat.writeColumn(ratDataset, "smallUnits", smallUnits)
+    
+    ID = numpy.arange(Histogram.shape[0])
+    
+    smUnitIDs = ID[smallUnits == 1]
+    smUnitIDs = smUnitIDs[smUnitIDs>0]    
+    lrgUnitIDs = ID[smallUnits == 0]
+    lrgUnitIDs = lrgUnitIDs[lrgUnitIDs>0]
+    
+    print("There are {} small clumps.".format(smUnitIDs.shape[0]))
+    print("There are {} large clumps.".format(lrgUnitIDs.shape[0]))
+    
+    smUnitFIDs = numpy.arange(smUnitIDs.shape[0])
+    lrgUnitFIDs = numpy.arange(lrgUnitIDs.shape[0])
+    
+    smUnitClumpIDs = numpy.zeros_like(Histogram, dtype=numpy.int16)
+    smUnitClumpIDs[smUnitIDs] = smUnitFIDs
+    lrgUnitClumpIDs = numpy.zeros_like(Histogram, dtype=numpy.int16)
+    lrgUnitClumpIDs[lrgUnitIDs] = lrgUnitFIDs
+    
+    rat.writeColumn(ratDataset, "SmUnits", smUnitClumpIDs)
+    rat.writeColumn(ratDataset, "LrgUnits", lrgUnitClumpIDs)
+    rat.writeColumn(ratDataset, "smallUnitsBin", smallUnits)    
+    
+    smClumpsImg = os.path.join(tmpDIR, baseName+'_smclumps.kea')
+    rastergis.exportCol2GDALImage(clumpsImg, smClumpsImg, 'KEA', rsgislib.TYPE_32UINT, 'SmUnits')
+    rastergis.populateStats(clumps=smClumpsImg, addclrtab=True, calcpyramids=True, ignorezero=True)
+    
+    lrgClumpsImg = os.path.join(tmpDIR, baseName+'_lrgclumps.kea')
+    rastergis.exportCol2GDALImage(clumpsImg, lrgClumpsImg, 'KEA', rsgislib.TYPE_32UINT, 'LrgUnits')
+    rastergis.populateStats(clumps=lrgClumpsImg, addclrtab=True, calcpyramids=True, ignorezero=True)
+    
+    smPolysShp = os.path.join(tmpDIR, baseName+'_smClumps_shp.shp')
+    rsgislib.vectorutils.polygoniseRaster(smClumpsImg, smPolysShp, imgBandNo=1, maskImg=smClumpsImg, imgMaskBandNo=1)
+    
+    lgrPolysShp = os.path.join(tmpDIR, baseName+'_lgrClumps_shp.shp')
+    rsgislib.vectorutils.polygoniseRaster(lrgClumpsImg, lgrPolysShp, imgBandNo=1, maskImg=lrgClumpsImg, imgMaskBandNo=1)
+    
+    print('Calculating Distance - can take some time. Try using index and decreasing max distance threshold.')
+    t = rsgislib.RSGISTime()
+    t.start(True)
+    smPolysDistShp = os.path.join(tmpDIR, baseName+'_smClumps_dist_shp.shp')
+    rsgislib.vectorutils.dist2NearestSecGeomSet(smPolysShp, lgrPolysShp, smPolysDistShp, outColName, True, useIdx, maxDistThres)
+    t.end()
+    rsgislib.rastergis.importVecAtts(smClumpsImg, smPolysDistShp, [outColName])
+    
+    smClumpsRATDataset = gdal.Open(smClumpsImg, gdal.GA_Update)
+    minDistCol = rat.readColumn(smClumpsRATDataset, outColName)
+        
+    minDistSmlClumpsArr = numpy.zeros_like(Histogram, dtype=numpy.float32)
+    minDistSmlClumpsArr[smUnitIDs] = minDistCol
+    
+    rat.writeColumn(ratDataset, outColName, minDistSmlClumpsArr)
+    
+    smClumpsRATDataset = None
+    ratDataset = None
+    
+    if not tmpPresent:
+        shutil.rmtree(tmpDIR, ignore_errors=True)
+
+
 

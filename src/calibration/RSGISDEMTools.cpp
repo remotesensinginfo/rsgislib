@@ -27,12 +27,13 @@
 namespace rsgis{namespace calib{
     
     
-    RSGISCalcSlope::RSGISCalcSlope(int numberOutBands, unsigned int band, float ewRes, float nsRes, int outType) : rsgis::img::RSGISCalcImageValue(numberOutBands)
+    RSGISCalcSlope::RSGISCalcSlope(int numberOutBands, unsigned int band, float ewRes, float nsRes, int outType, double noDataVal) : rsgis::img::RSGISCalcImageValue(numberOutBands)
     {
         this->band = band;
         this->ewRes = ewRes;
         this->nsRes = nsRes;
         this->outType = outType;
+        this->noDataVal = noDataVal;
     }
     void RSGISCalcSlope::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
     {
@@ -45,26 +46,66 @@ namespace rsgis{namespace calib{
         {
             throw rsgis::img::RSGISImageCalcException("Specified image band is not within the image.");
         }
-
-        const double radiansToDegrees = 180.0 / M_PI;
-
-        double dx, dy, slopeRad;
         
-        dx = ((dataBlock[band][0][0] + dataBlock[band][1][0] + dataBlock[band][1][0] + dataBlock[band][2][0]) - 
-              (dataBlock[band][0][2] + dataBlock[band][1][2] + dataBlock[band][1][2] + dataBlock[band][2][2]))/ewRes;
-        
-        dy = ((dataBlock[band][2][0] + dataBlock[band][2][1] + dataBlock[band][2][1] + dataBlock[band][2][2]) - 
-              (dataBlock[band][0][0] + dataBlock[band][0][1] + dataBlock[band][0][1] + dataBlock[band][0][2]))/nsRes;
-
-        slopeRad = atan(sqrt((dx * dx) + (dy * dy))/8);
-
-        if(outType == 0)
+        bool hasNoDataVal = false;
+        double sumVals = 0.0;
+        int nVals = 0;
+        for(int i = 0; i < winSize; ++i)
         {
-            output[0] = (slopeRad * radiansToDegrees);
+            for(int j = 0; j < winSize; ++j)
+            {
+                if(dataBlock[band][i][j] == noDataVal)
+                {
+                    hasNoDataVal = true;
+                }
+                else
+                {
+                    sumVals += dataBlock[band][i][j];
+                    ++nVals;
+                }
+            }
+        }
+        if(hasNoDataVal && (nVals>1))
+        {
+            double meanVal = sumVals / nVals;
+            for(int i = 0; i < winSize; ++i)
+            {
+                for(int j = 0; j < winSize; ++j)
+                {
+                    if(dataBlock[band][i][j] == noDataVal)
+                    {
+                        dataBlock[band][i][j] = meanVal;
+                    }
+                }
+            }
+        }
+        
+        if(nVals > 1)
+        {
+            const double radiansToDegrees = 180.0 / M_PI;
+
+            double dx, dy, slopeRad;
+            
+            dx = ((dataBlock[band][0][0] + dataBlock[band][1][0] + dataBlock[band][1][0] + dataBlock[band][2][0]) - 
+                  (dataBlock[band][0][2] + dataBlock[band][1][2] + dataBlock[band][1][2] + dataBlock[band][2][2]))/ewRes;
+            
+            dy = ((dataBlock[band][2][0] + dataBlock[band][2][1] + dataBlock[band][2][1] + dataBlock[band][2][2]) - 
+                  (dataBlock[band][0][0] + dataBlock[band][0][1] + dataBlock[band][0][1] + dataBlock[band][0][2]))/nsRes;
+
+            slopeRad = atan(sqrt((dx * dx) + (dy * dy))/8);
+
+            if(outType == 0)
+            {
+                output[0] = (slopeRad * radiansToDegrees);
+            }
+            else
+            {
+                output[0] = slopeRad;
+            }
         }
         else
         {
-            output[0] = slopeRad;
+            output[0] = 0.0;
         }
     }
     
@@ -73,11 +114,12 @@ namespace rsgis{namespace calib{
         
     }
 
-    RSGISCalcAspect::RSGISCalcAspect(int numberOutBands, unsigned int band, float ewRes, float nsRes) : rsgis::img::RSGISCalcImageValue(numberOutBands)
+    RSGISCalcAspect::RSGISCalcAspect(int numberOutBands, unsigned int band, float ewRes, float nsRes, double noDataVal) : rsgis::img::RSGISCalcImageValue(numberOutBands)
     {
         this->band = band;
         this->ewRes = ewRes;
         this->nsRes = nsRes;
+        this->noDataVal = noDataVal;
     }
 		
     void RSGISCalcAspect::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
@@ -94,37 +136,78 @@ namespace rsgis{namespace calib{
         
         const double radiansToDegrees = 180.0 / M_PI;
         
-        double dx, dy, aspect;
-        
-        dx = ((dataBlock[band][0][2] + dataBlock[band][1][2] + dataBlock[band][1][2] + dataBlock[band][2][2]) - 
-              (dataBlock[band][0][0] + dataBlock[band][1][0] + dataBlock[band][1][0] + dataBlock[band][2][0]))/ewRes;
-        
-        dy = ((dataBlock[band][2][0] + dataBlock[band][2][1] + dataBlock[band][2][1] + dataBlock[band][2][2]) - 
-              (dataBlock[band][0][0] + dataBlock[band][0][1] + dataBlock[band][0][1] + dataBlock[band][0][2]))/nsRes;
-        
-        aspect = atan2(-dx, dy)*radiansToDegrees;
-                
-        if (dx == 0 && dy == 0)
+        bool hasNoDataVal = false;
+        double sumVals = 0.0;
+        int nVals = 0;
+        for(int i = 0; i < winSize; ++i)
         {
-            // Flat area
-            aspect = std::numeric_limits<double>::signaling_NaN();
+            for(int j = 0; j < winSize; ++j)
+            {
+                if(dataBlock[band][i][j] == noDataVal)
+                {
+                    hasNoDataVal = true;
+                }
+                else
+                {
+                    sumVals += dataBlock[band][i][j];
+                    ++nVals;
+                }
+            }
         }
-        else if(aspect < 0)
+        if(hasNoDataVal && (nVals>1))
         {
-            aspect += 360.0;
-        }
-        else if(aspect == 360.0)
-        {
-            aspect = 0.0;
-        }
-        else if(aspect > 360)
-        {
-            double num = aspect / 360.0;
-            int num360s = floor(num);
-            aspect = aspect - (360 * num360s);
+            double meanVal = sumVals / nVals;
+            for(int i = 0; i < winSize; ++i)
+            {
+                for(int j = 0; j < winSize; ++j)
+                {
+                    if(dataBlock[band][i][j] == noDataVal)
+                    {
+                        dataBlock[band][i][j] = meanVal;
+                    }
+                }
+            }
         }
         
-        output[0] = aspect;
+        if(nVals > 1)
+        {
+            double dx, dy, aspect;
+            
+            dx = ((dataBlock[band][0][2] + dataBlock[band][1][2] + dataBlock[band][1][2] + dataBlock[band][2][2]) - 
+                  (dataBlock[band][0][0] + dataBlock[band][1][0] + dataBlock[band][1][0] + dataBlock[band][2][0]))/ewRes;
+            
+            dy = ((dataBlock[band][2][0] + dataBlock[band][2][1] + dataBlock[band][2][1] + dataBlock[band][2][2]) - 
+                  (dataBlock[band][0][0] + dataBlock[band][0][1] + dataBlock[band][0][1] + dataBlock[band][0][2]))/nsRes;
+            
+            aspect = atan2(-dx, dy)*radiansToDegrees;
+                    
+            if (dx == 0 && dy == 0)
+            {
+                // Flat area
+                aspect = std::numeric_limits<double>::signaling_NaN();
+            }
+            else if(aspect < 0)
+            {
+                aspect += 360.0;
+            }
+            else if(aspect == 360.0)
+            {
+                aspect = 0.0;
+            }
+            else if(aspect > 360)
+            {
+                double num = aspect / 360.0;
+                int num360s = floor(num);
+                aspect = aspect - (360 * num360s);
+            }
+            
+            output[0] = aspect;
+        }
+        else
+        {
+            // Input was no data region.
+            output[0] = std::numeric_limits<double>::signaling_NaN();
+        }
     }
 
     RSGISCalcAspect::~RSGISCalcAspect()
@@ -205,11 +288,12 @@ namespace rsgis{namespace calib{
     
     
 
-    RSGISCalcSlopeAspect::RSGISCalcSlopeAspect(int numberOutBands, unsigned int band, float ewRes, float nsRes) : rsgis::img::RSGISCalcImageValue(numberOutBands)
+    RSGISCalcSlopeAspect::RSGISCalcSlopeAspect(int numberOutBands, unsigned int band, float ewRes, float nsRes, double noDataVal) : rsgis::img::RSGISCalcImageValue(numberOutBands)
     {
         this->band = band;
         this->ewRes = ewRes;
         this->nsRes = nsRes;
+        this->noDataVal = noDataVal;
     }
     void RSGISCalcSlopeAspect::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
     {
@@ -223,47 +307,93 @@ namespace rsgis{namespace calib{
             throw rsgis::img::RSGISImageCalcException("Specified image band is not within the image.");
         }
         
-        const double radiansToDegrees = 180.0 / M_PI;
-        
-        double dxSlope, dySlope, slopeRad;
-        
-        dxSlope = ((dataBlock[band][0][0] + dataBlock[band][1][0] + dataBlock[band][1][0] + dataBlock[band][2][0]) - 
-              (dataBlock[band][0][2] + dataBlock[band][1][2] + dataBlock[band][1][2] + dataBlock[band][2][2]))/ewRes;
-        
-        dySlope = ((dataBlock[band][2][0] + dataBlock[band][2][1] + dataBlock[band][2][1] + dataBlock[band][2][2]) - 
-              (dataBlock[band][0][0] + dataBlock[band][0][1] + dataBlock[band][0][1] + dataBlock[band][0][2]))/nsRes;
-        
-        slopeRad = atan(sqrt((dxSlope * dxSlope) + (dySlope * dySlope))/8);
-        
-        output[0] = (slopeRad * radiansToDegrees);
-        
-        double dxAspect, dyAspect, aspect;
-        
-        dxAspect = ((dataBlock[band][0][2] + dataBlock[band][1][2] + dataBlock[band][1][2] + dataBlock[band][2][2]) - 
-              (dataBlock[band][0][0] + dataBlock[band][1][0] + dataBlock[band][1][0] + dataBlock[band][2][0]))/ewRes;
-        
-        dyAspect = ((dataBlock[band][2][0] + dataBlock[band][2][1] + dataBlock[band][2][1] + dataBlock[band][2][2]) - 
-              (dataBlock[band][0][0] + dataBlock[band][0][1] + dataBlock[band][0][1] + dataBlock[band][0][2]))/nsRes;
-        
-        aspect = atan2(-dxAspect, dyAspect)*radiansToDegrees;
-        
-        if (dxAspect == 0 && dyAspect == 0)
+        bool hasNoDataVal = false;
+        double sumVals = 0.0;
+        int nVals = 0;
+        for(int i = 0; i < winSize; ++i)
         {
-            // Flat area
-            aspect = std::numeric_limits<double>::signaling_NaN();
+            for(int j = 0; j < winSize; ++j)
+            {
+                if(dataBlock[band][i][j] == noDataVal)
+                {
+                    hasNoDataVal = true;
+                }
+                else
+                {
+                    sumVals += dataBlock[band][i][j];
+                    ++nVals;
+                }
+            }
+        }
+        if(hasNoDataVal && (nVals>1))
+        {
+            double meanVal = sumVals / nVals;
+            for(int i = 0; i < winSize; ++i)
+            {
+                for(int j = 0; j < winSize; ++j)
+                {
+                    if(dataBlock[band][i][j] == noDataVal)
+                    {
+                        dataBlock[band][i][j] = meanVal;
+                    }
+                }
+            }
         }
         
-        if (aspect < 0)
+        if(nVals > 1)
         {
-            aspect += 360.0;
+            const double radiansToDegrees = 180.0 / M_PI;
+            
+            double dxSlope, dySlope, slopeRad;
+            
+            dxSlope = ((dataBlock[band][0][0] + dataBlock[band][1][0] + dataBlock[band][1][0] + dataBlock[band][2][0]) -
+                       (dataBlock[band][0][2] + dataBlock[band][1][2] + dataBlock[band][1][2] + dataBlock[band][2][2]))/ewRes;
+            
+            dySlope = ((dataBlock[band][2][0] + dataBlock[band][2][1] + dataBlock[band][2][1] + dataBlock[band][2][2]) -
+                       (dataBlock[band][0][0] + dataBlock[band][0][1] + dataBlock[band][0][1] + dataBlock[band][0][2]))/nsRes;
+            
+            slopeRad = atan(sqrt((dxSlope * dxSlope) + (dySlope * dySlope))/8);
+            
+            output[0] = (slopeRad * radiansToDegrees);
+            
+            double dxAspect, dyAspect, aspect;
+            
+            dxAspect = ((dataBlock[band][0][2] + dataBlock[band][1][2] + dataBlock[band][1][2] + dataBlock[band][2][2]) -
+                        (dataBlock[band][0][0] + dataBlock[band][1][0] + dataBlock[band][1][0] + dataBlock[band][2][0]))/ewRes;
+            
+            dyAspect = ((dataBlock[band][2][0] + dataBlock[band][2][1] + dataBlock[band][2][1] + dataBlock[band][2][2]) -
+                        (dataBlock[band][0][0] + dataBlock[band][0][1] + dataBlock[band][0][1] + dataBlock[band][0][2]))/nsRes;
+            
+            aspect = atan2(-dxAspect, dyAspect)*radiansToDegrees;
+            
+            if (dxAspect == 0 && dyAspect == 0)
+            {
+                // Flat area
+                aspect = std::numeric_limits<double>::signaling_NaN();
+            }
+            else if(aspect < 0)
+            {
+                aspect += 360.0;
+            }
+            else if(aspect == 360.0)
+            {
+                aspect = 0.0;
+            }
+            else if(aspect > 360)
+            {
+                double num = aspect / 360.0;
+                int num360s = floor(num);
+                aspect = aspect - (360 * num360s);
+            }
+
+            output[1] = aspect;
         }
-        
-        if (aspect == 360.0)
+        else
         {
-            aspect = 0.0;
+            output[0] = 0;
+            output[1] = std::numeric_limits<double>::signaling_NaN();
         }
-        
-        output[1] = aspect;
+            
     }
     
     RSGISCalcSlopeAspect::~RSGISCalcSlopeAspect()
@@ -274,7 +404,7 @@ namespace rsgis{namespace calib{
     
     
     
-    RSGISCalcHillShade::RSGISCalcHillShade(int numberOutBands, unsigned int band, float ewRes, float nsRes, float sunZenith, float sunAzimuth) : rsgis::img::RSGISCalcImageValue(numberOutBands)
+    RSGISCalcHillShade::RSGISCalcHillShade(int numberOutBands, unsigned int band, float ewRes, float nsRes, float sunZenith, float sunAzimuth, double noDataVal) : rsgis::img::RSGISCalcImageValue(numberOutBands)
     {
         this->band = band;
         this->ewRes = ewRes;
@@ -288,6 +418,7 @@ namespace rsgis{namespace calib{
         {
             this->sunAzimuth = this->sunAzimuth - 360;
         }
+        this->noDataVal = noDataVal;
     }
     
     void RSGISCalcHillShade::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
@@ -302,40 +433,80 @@ namespace rsgis{namespace calib{
             throw rsgis::img::RSGISImageCalcException("Specified image band is not within the image.");
         }
         
-        const double degreesToRadians = M_PI / 180.0;
-        
-        double dx, dy, aspect;
-        
-        dx = ((dataBlock[band][0][2] + dataBlock[band][1][2] + dataBlock[band][1][2] + dataBlock[band][2][2])-
-                (dataBlock[band][0][0] + dataBlock[band][1][0] + dataBlock[band][1][0] + dataBlock[band][2][0]))/(ewRes*8);
-        
-        dy = ((dataBlock[band][0][0] + dataBlock[band][0][1] + dataBlock[band][0][1] + dataBlock[band][0][2])-
-              (dataBlock[band][2][0] + dataBlock[band][2][1] + dataBlock[band][2][1] + dataBlock[band][2][2]))/(nsRes*8);       
-        
-        double xx_plus_yy = dx * dx + dy * dy;
-        
-        // aspect...
-        aspect = atan2(dy,dx);
-        
-        // shade value
-        double sunZenRad = sunZenith * degreesToRadians;
-        double sunAzRad = sunAzimuth * degreesToRadians;
-                
-        double cang = (sin(sunZenRad) -
-                cos(sunZenRad) * sqrt(xx_plus_yy) *
-                sin(aspect - (sunAzRad-M_PI/2))) /
-                sqrt(1 + 1 * xx_plus_yy);
-        
-        if (cang <= 0.0)
+        bool hasNoDataVal = false;
+        double sumVals = 0.0;
+        int nVals = 0;
+        for(int i = 0; i < winSize; ++i)
         {
-            cang = 1.0;
+            for(int j = 0; j < winSize; ++j)
+            {
+                if(dataBlock[band][i][j] == noDataVal)
+                {
+                    hasNoDataVal = true;
+                }
+                else
+                {
+                    sumVals += dataBlock[band][i][j];
+                    ++nVals;
+                }
+            }
+        }
+        if(hasNoDataVal && (nVals>1))
+        {
+            double meanVal = sumVals / nVals;
+            for(int i = 0; i < winSize; ++i)
+            {
+                for(int j = 0; j < winSize; ++j)
+                {
+                    if(dataBlock[band][i][j] == noDataVal)
+                    {
+                        dataBlock[band][i][j] = meanVal;
+                    }
+                }
+            }
+        }
+        
+        if(nVals > 1)
+        {
+            const double degreesToRadians = M_PI / 180.0;
+            
+            double dx, dy, aspect;
+            
+            dx = ((dataBlock[band][0][2] + dataBlock[band][1][2] + dataBlock[band][1][2] + dataBlock[band][2][2])-
+                    (dataBlock[band][0][0] + dataBlock[band][1][0] + dataBlock[band][1][0] + dataBlock[band][2][0]))/(ewRes*8);
+            
+            dy = ((dataBlock[band][0][0] + dataBlock[band][0][1] + dataBlock[band][0][1] + dataBlock[band][0][2])-
+                  (dataBlock[band][2][0] + dataBlock[band][2][1] + dataBlock[band][2][1] + dataBlock[band][2][2]))/(nsRes*8);       
+            
+            double xx_plus_yy = dx * dx + dy * dy;
+            
+            // aspect...
+            aspect = atan2(dy,dx);
+            
+            // shade value
+            double sunZenRad = sunZenith * degreesToRadians;
+            double sunAzRad = sunAzimuth * degreesToRadians;
+                    
+            double cang = (sin(sunZenRad) -
+                    cos(sunZenRad) * sqrt(xx_plus_yy) *
+                    sin(aspect - (sunAzRad-M_PI/2))) /
+                    sqrt(1 + 1 * xx_plus_yy);
+            
+            if (cang <= 0.0)
+            {
+                cang = 1.0;
+            }
+            else
+            {
+                cang = 1.0 + (254.0 * cang);
+            }
+            
+            output[0] = cang;
         }
         else
         {
-            cang = 1.0 + (254.0 * cang);
+            output[0] = 1.0;
         }
-        
-        output[0] = cang;
     }
     
     RSGISCalcHillShade::~RSGISCalcHillShade()
@@ -384,44 +555,107 @@ namespace rsgis{namespace calib{
         
         output[0] = 0;
         try
-        {   bool flatGround = false;
-            bool pxlAwayFromSun = false;
-            
-            if( dataBlock[band-1][1][1] != this->noDataVal)
+        {
+            if( dataBlock[band][1][1] != this->noDataVal)
             {
-                double dx, dy, slopeRad = 0.0;
-                dx = ((dataBlock[band-1][0][0] + dataBlock[band-1][1][0] + dataBlock[band-1][1][0] + dataBlock[band-1][2][0]) -
-                      (dataBlock[band-1][0][2] + dataBlock[band-1][1][2] + dataBlock[band-1][1][2] + dataBlock[band-1][2][2]))/ewRes;
-                dy = ((dataBlock[band-1][2][0] + dataBlock[band-1][2][1] + dataBlock[band-1][2][1] + dataBlock[band-1][2][2]) -
-                      (dataBlock[band-1][0][0] + dataBlock[band-1][0][1] + dataBlock[band-1][0][1] + dataBlock[band-1][0][2]))/nsRes;
-                slopeRad = atan(sqrt((dx * dx) + (dy * dy))/8);
+                bool flatGround = false;
+                bool pxlAwayFromSun = false;
                 
-                double dxAspect, dyAspect, aspect;
-                dxAspect = ((dataBlock[band-1][0][2] + dataBlock[band-1][1][2] + dataBlock[band-1][1][2] + dataBlock[band-1][2][2]) -
-                            (dataBlock[band-1][0][0] + dataBlock[band-1][1][0] + dataBlock[band-1][1][0] + dataBlock[band-1][2][0]))/ewRes;
-                dyAspect = ((dataBlock[band-1][2][0] + dataBlock[band-1][2][1] + dataBlock[band-1][2][1] + dataBlock[band-1][2][2]) -
-                            (dataBlock[band-1][0][0] + dataBlock[band-1][0][1] + dataBlock[band-1][0][1] + dataBlock[band-1][0][2]))/nsRes;
-                aspect = atan2(-dxAspect, dyAspect)*radiansToDegrees;
+                double aspect = 0.0;
+                double slopeRad = 0.0;
                 
-                if (dxAspect == 0 && dyAspect == 0)
+                bool hasNoDataVal = false;
+                double sumVals = 0.0;
+                int nVals = 0;
+                for(int i = 0; i < winSize; ++i)
                 {
-                    // Flat area
-                    aspect = std::numeric_limits<double>::signaling_NaN();
-                    flatGround = true;
+                    for(int j = 0; j < winSize; ++j)
+                    {
+                        if(dataBlock[band][i][j] == noDataVal)
+                        {
+                            hasNoDataVal = true;
+                        }
+                        else
+                        {
+                            sumVals += dataBlock[band][i][j];
+                            ++nVals;
+                        }
+                    }
                 }
-                if(!flatGround)
+                if(hasNoDataVal && (nVals>1))
                 {
-                    if (aspect < 0)
+                    double meanVal = sumVals / nVals;
+                    for(int i = 0; i < winSize; ++i)
+                    {
+                        for(int j = 0; j < winSize; ++j)
+                        {
+                            if(dataBlock[band][i][j] == noDataVal)
+                            {
+                                dataBlock[band][i][j] = meanVal;
+                            }
+                        }
+                    }
+                }
+                
+                if(nVals > 1)
+                {
+                    const double radiansToDegrees = 180.0 / M_PI;
+                    
+                    double dxSlope, dySlope = 0.0;
+                    
+                    dxSlope = ((dataBlock[band][0][0] + dataBlock[band][1][0] + dataBlock[band][1][0] + dataBlock[band][2][0]) -
+                               (dataBlock[band][0][2] + dataBlock[band][1][2] + dataBlock[band][1][2] + dataBlock[band][2][2]))/ewRes;
+                    
+                    dySlope = ((dataBlock[band][2][0] + dataBlock[band][2][1] + dataBlock[band][2][1] + dataBlock[band][2][2]) -
+                               (dataBlock[band][0][0] + dataBlock[band][0][1] + dataBlock[band][0][1] + dataBlock[band][0][2]))/nsRes;
+                    
+                    slopeRad = atan(sqrt((dxSlope * dxSlope) + (dySlope * dySlope))/8);
+                    
+                    
+                    double dxAspect, dyAspect = 0.0;
+                    
+                    dxAspect = ((dataBlock[band][0][2] + dataBlock[band][1][2] + dataBlock[band][1][2] + dataBlock[band][2][2]) -
+                                (dataBlock[band][0][0] + dataBlock[band][1][0] + dataBlock[band][1][0] + dataBlock[band][2][0]))/ewRes;
+                    
+                    dyAspect = ((dataBlock[band][2][0] + dataBlock[band][2][1] + dataBlock[band][2][1] + dataBlock[band][2][2]) -
+                                (dataBlock[band][0][0] + dataBlock[band][0][1] + dataBlock[band][0][1] + dataBlock[band][0][2]))/nsRes;
+                    
+                    aspect = atan2(-dxAspect, dyAspect)*radiansToDegrees;
+                    
+                    if (dxAspect == 0 && dyAspect == 0)
+                    {
+                        // Flat area
+                        aspect = std::numeric_limits<double>::signaling_NaN();
+                        flatGround = true;
+                    }
+                    else if(aspect < 0)
                     {
                         aspect += 360.0;
                     }
-                    if (aspect == 360.0)
+                    else if(aspect == 360.0)
                     {
                         aspect = 0.0;
                     }
+                    else if(aspect > 360)
+                    {
+                        double num = aspect / 360.0;
+                        int num360s = floor(num);
+                        aspect = aspect - (360 * num360s);
+                    }
+                    
                     aspect = aspect * degreesToRadians;
-                    
-                    
+                }
+                else
+                {
+                    slopeRad = 0;
+                    // No Data - call it flat ground...
+                    aspect = std::numeric_limits<double>::signaling_NaN();
+                    flatGround = true;
+                }
+                
+                
+                if(!flatGround)
+                {
                     double sunZenRad = sunZenith * degreesToRadians;
                     double sunAzRad = sunAzimuth * degreesToRadians;
                     
@@ -431,66 +665,69 @@ namespace rsgis{namespace calib{
                     {
                         pxlAwayFromSun = true;
                     }
-                }
-                
-                if(pxlAwayFromSun)
-                {
-                    output[0] = 1;
+                    
+                    if(pxlAwayFromSun)
+                    {
+                        output[0] = 1;
+                    }
+                    else
+                    {
+                        // do ray tracing...
+                        // Location of active point.
+                        double x = extent.getMinX() + (extent.getMaxX() - extent.getMinX())/2;
+                        double y = extent.getMinY() + (extent.getMaxY() - extent.getMinY())/2;
+                        double z = dataBlock[band][1][1];
+                        
+                        
+                        double sunAzTrans = 360-this->sunAzimuth;
+                        sunAzTrans = sunAzTrans + 90;
+                        if(sunAzTrans > 360)
+                        {
+                            sunAzTrans = sunAzTrans-360;
+                        }
+                        
+                        double sunZenRad = sunZenith * degreesToRadians;
+                        double sunAzRad = sunAzTrans * degreesToRadians;
+                        
+                        // Location of the sun.
+                        //double sunX = x + (sunRange * sin(sunZenRad) * cos(sunAzRad));
+                        //double sunY = y + (sunRange * sin(sunZenRad) * sin(sunAzRad));
+                        //double sunZ = z + (sunRange * cos(sunZenRad));
+                        
+                        
+                        // Create Ray Line
+                        geos::geom::Coordinate pxlPt;
+                        pxlPt.x = x;
+                        pxlPt.y = y;
+                        pxlPt.z = z;
+                        
+                        
+                        std::vector<rsgis::img::ImagePixelValuePt*> *imagePxlPts = extractPixels->getImagePixelValues(inputImage, band+1, &pxlPt, sunAzRad, sunZenRad, maxElevHeight);
+                        
+                        // Check whether pixel intersects with ray.
+                        for(std::vector<rsgis::img::ImagePixelValuePt*>::iterator iterPxls = imagePxlPts->begin(); iterPxls != imagePxlPts->end(); ++iterPxls)
+                        {
+                            if((*iterPxls)->pt->z < (*iterPxls)->value)
+                            {
+                                output[0] = 1;
+                                break;
+                            }
+                        }
+                        
+                        // Clean up memory..
+                        for(std::vector<rsgis::img::ImagePixelValuePt*>::iterator iterPxls = imagePxlPts->begin(); iterPxls != imagePxlPts->end(); )
+                        {
+                            delete (*iterPxls)->pt;
+                            delete (*iterPxls);
+                            iterPxls = imagePxlPts->erase(iterPxls);
+                        }
+                        delete imagePxlPts;
+                    }
                 }
                 else
                 {
-                    // do ray tracing...
-                    // Location of active point.
-                    double x = extent.getMinX() + (extent.getMaxX() - extent.getMinX())/2;
-                    double y = extent.getMinY() + (extent.getMaxY() - extent.getMinY())/2;
-                    double z = dataBlock[band-1][1][1];
-                    
-                    
-                    double sunAzTrans = 360-this->sunAzimuth;
-                    sunAzTrans = sunAzTrans + 90;
-                    if(sunAzTrans > 360)
-                    {
-                        sunAzTrans = sunAzTrans-360;
-                    }
-                    
-                    double sunZenRad = sunZenith * degreesToRadians;
-                    double sunAzRad = sunAzTrans * degreesToRadians;
-                    
-                    // Location of the sun.
-                    //double sunX = x + (sunRange * sin(sunZenRad) * cos(sunAzRad));
-                    //double sunY = y + (sunRange * sin(sunZenRad) * sin(sunAzRad));
-                    //double sunZ = z + (sunRange * cos(sunZenRad));
-                    
-                    
-                    // Create Ray Line
-                    geos::geom::Coordinate pxlPt;
-                    pxlPt.x = x;
-                    pxlPt.y = y;
-                    pxlPt.z = z;
-                    
-                    
-                    std::vector<rsgis::img::ImagePixelValuePt*> *imagePxlPts = extractPixels->getImagePixelValues(inputImage, band, &pxlPt, sunAzRad, sunZenRad, maxElevHeight);
-                    
-                    // Check whether pixel intersects with ray.
-                    for(std::vector<rsgis::img::ImagePixelValuePt*>::iterator iterPxls = imagePxlPts->begin(); iterPxls != imagePxlPts->end(); ++iterPxls)
-                    {
-                        if((*iterPxls)->pt->z < (*iterPxls)->value)
-                        {
-                            output[0] = 1;
-                            break;
-                        }
-                    }
-                    
-                    // Clean up memory..
-                    for(std::vector<rsgis::img::ImagePixelValuePt*>::iterator iterPxls = imagePxlPts->begin(); iterPxls != imagePxlPts->end(); )
-                    {
-                        delete (*iterPxls)->pt;
-                        delete (*iterPxls);
-                        iterPxls = imagePxlPts->erase(iterPxls);
-                    }
-                    delete imagePxlPts;
+                    output[0] = 0;
                 }
-                
             }
             else
             {
@@ -512,13 +749,14 @@ namespace rsgis{namespace calib{
     
     
 
-    RSGISCalcRayIncidentAngle::RSGISCalcRayIncidentAngle(int numberOutBands, unsigned int band, float ewRes, float nsRes, float sunZenith, float sunAzimuth) : rsgis::img::RSGISCalcImageValue(numberOutBands)
+    RSGISCalcRayIncidentAngle::RSGISCalcRayIncidentAngle(int numberOutBands, unsigned int band, float ewRes, float nsRes, float sunZenith, float sunAzimuth, double noDataVal) : rsgis::img::RSGISCalcImageValue(numberOutBands)
     {
         this->band = band;
         this->ewRes = ewRes;
         this->nsRes = nsRes;
         this->sunZenith = sunZenith;
         this->sunAzimuth = sunAzimuth;
+        this->noDataVal = noDataVal;
     }
 		
     void RSGISCalcRayIncidentAngle::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
@@ -540,64 +778,104 @@ namespace rsgis{namespace calib{
                 throw rsgis::img::RSGISImageCalcException("Specified image band is not within the image.");
             }
             
-            double dxSlope, dySlope, slopeRad;
-            
-            dxSlope = ((dataBlock[band][0][0] + dataBlock[band][1][0] + dataBlock[band][1][0] + dataBlock[band][2][0]) - 
-                       (dataBlock[band][0][2] + dataBlock[band][1][2] + dataBlock[band][1][2] + dataBlock[band][2][2]))/ewRes;
-            
-            dySlope = ((dataBlock[band][2][0] + dataBlock[band][2][1] + dataBlock[band][2][1] + dataBlock[band][2][2]) - 
-                       (dataBlock[band][0][0] + dataBlock[band][0][1] + dataBlock[band][0][1] + dataBlock[band][0][2]))/nsRes;
-            
-            slopeRad = atan(sqrt((dxSlope * dxSlope) + (dySlope * dySlope))/8);
-            
-            
-            double dxAspect, dyAspect, aspect;
-            
-            dxAspect = ((dataBlock[band][0][2] + dataBlock[band][1][2] + dataBlock[band][1][2] + dataBlock[band][2][2]) - 
-                        (dataBlock[band][0][0] + dataBlock[band][1][0] + dataBlock[band][1][0] + dataBlock[band][2][0]))/ewRes;
-            
-            dyAspect = ((dataBlock[band][2][0] + dataBlock[band][2][1] + dataBlock[band][2][1] + dataBlock[band][2][2]) - 
-                        (dataBlock[band][0][0] + dataBlock[band][0][1] + dataBlock[band][0][1] + dataBlock[band][0][2]))/nsRes;
-            
-            aspect = atan2(-dxAspect, dyAspect)*radiansToDegrees;
-            
-            if (dxAspect == 0 && dyAspect == 0)
+            bool hasNoDataVal = false;
+            double sumVals = 0.0;
+            int nVals = 0;
+            for(int i = 0; i < winSize; ++i)
             {
-                // Flat area
-                aspect = std::numeric_limits<double>::signaling_NaN();
+                for(int j = 0; j < winSize; ++j)
+                {
+                    if(dataBlock[band][i][j] == noDataVal)
+                    {
+                        hasNoDataVal = true;
+                    }
+                    else
+                    {
+                        sumVals += dataBlock[band][i][j];
+                        ++nVals;
+                    }
+                }
+            }
+            if(hasNoDataVal && (nVals>1))
+            {
+                double meanVal = sumVals / nVals;
+                for(int i = 0; i < winSize; ++i)
+                {
+                    for(int j = 0; j < winSize; ++j)
+                    {
+                        if(dataBlock[band][i][j] == noDataVal)
+                        {
+                            dataBlock[band][i][j] = meanVal;
+                        }
+                    }
+                }
             }
             
-            if (aspect < 0)
+            if(nVals > 1)
             {
-                aspect += 360.0;
-            }
-            
-            if (aspect == 360.0)
-            {
-                aspect = 0.0;
-            }
-            double aspectRad = aspect*degreesToRadians;
-            
-            // UNIT VECTOR FOR SURFACE
-            double pA = sin(slopeRad) * cos(aspectRad);
-            double pB = sin(slopeRad) * sin(aspectRad);
-            double pC = cos(slopeRad);
+                double dxSlope, dySlope, slopeRad;
+                
+                dxSlope = ((dataBlock[band][0][0] + dataBlock[band][1][0] + dataBlock[band][1][0] + dataBlock[band][2][0]) - 
+                           (dataBlock[band][0][2] + dataBlock[band][1][2] + dataBlock[band][1][2] + dataBlock[band][2][2]))/ewRes;
+                
+                dySlope = ((dataBlock[band][2][0] + dataBlock[band][2][1] + dataBlock[band][2][1] + dataBlock[band][2][2]) - 
+                           (dataBlock[band][0][0] + dataBlock[band][0][1] + dataBlock[band][0][1] + dataBlock[band][0][2]))/nsRes;
+                
+                slopeRad = atan(sqrt((dxSlope * dxSlope) + (dySlope * dySlope))/8);
+                
+                
+                double dxAspect, dyAspect, aspect;
+                
+                dxAspect = ((dataBlock[band][0][2] + dataBlock[band][1][2] + dataBlock[band][1][2] + dataBlock[band][2][2]) - 
+                            (dataBlock[band][0][0] + dataBlock[band][1][0] + dataBlock[band][1][0] + dataBlock[band][2][0]))/ewRes;
+                
+                dyAspect = ((dataBlock[band][2][0] + dataBlock[band][2][1] + dataBlock[band][2][1] + dataBlock[band][2][2]) - 
+                            (dataBlock[band][0][0] + dataBlock[band][0][1] + dataBlock[band][0][1] + dataBlock[band][0][2]))/nsRes;
+                
+                aspect = atan2(-dxAspect, dyAspect)*radiansToDegrees;
+                
+                if (dxAspect == 0 && dyAspect == 0)
+                {
+                    // Flat area
+                    aspect = std::numeric_limits<double>::signaling_NaN();
+                }
+                
+                if (aspect < 0)
+                {
+                    aspect += 360.0;
+                }
+                
+                if (aspect == 360.0)
+                {
+                    aspect = 0.0;
+                }
+                double aspectRad = aspect*degreesToRadians;
+                
+                // UNIT VECTOR FOR SURFACE
+                double pA = sin(slopeRad) * cos(aspectRad);
+                double pB = sin(slopeRad) * sin(aspectRad);
+                double pC = cos(slopeRad);
 
-            double sunZenRad = sunZenith * degreesToRadians;
-            double sunAzRad = sunAzimuth * degreesToRadians;
-            
-            // UNIT VECTOR FOR INCIDENT RAY
-            double rA = sin(sunZenRad) * cos(sunAzRad);
-            double rB = sin(sunZenRad) * sin(sunAzRad);
-            double rC = cos(sunZenRad);
-            
-            outputValue = acos((pA*rA)+(pB*rB)+(pC*rC)) * radiansToDegrees;
-            
-            if(boost::math::isnan(outputValue))
+                double sunZenRad = sunZenith * degreesToRadians;
+                double sunAzRad = sunAzimuth * degreesToRadians;
+                
+                // UNIT VECTOR FOR INCIDENT RAY
+                double rA = sin(sunZenRad) * cos(sunAzRad);
+                double rB = sin(sunZenRad) * sin(sunAzRad);
+                double rC = cos(sunZenRad);
+                
+                outputValue = acos((pA*rA)+(pB*rB)+(pC*rC)) * radiansToDegrees;
+                
+                if(boost::math::isnan(outputValue))
+                {
+                    outputValue = sunZenith;
+                }
+            }
+            else
             {
                 outputValue = sunZenith;
             }
-        } 
+        }
         catch (rsgis::img::RSGISImageCalcException &e) 
         {
             throw e;
@@ -613,13 +891,14 @@ namespace rsgis{namespace calib{
     
     
     
-    RSGISCalcRayExitanceAngle::RSGISCalcRayExitanceAngle(int numberOutBands, unsigned int band, float ewRes, float nsRes, float viewZenith, float viewAzimuth) : rsgis::img::RSGISCalcImageValue(numberOutBands)
+    RSGISCalcRayExitanceAngle::RSGISCalcRayExitanceAngle(int numberOutBands, unsigned int band, float ewRes, float nsRes, float viewZenith, float viewAzimuth, double noDataVal) : rsgis::img::RSGISCalcImageValue(numberOutBands)
     {
         this->band = band;
         this->ewRes = ewRes;
         this->nsRes = nsRes;
         this->viewZenith = viewZenith;
         this->viewAzimuth = viewAzimuth;
+        this->noDataVal = noDataVal;
     }
 		
     void RSGISCalcRayExitanceAngle::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
@@ -640,65 +919,105 @@ namespace rsgis{namespace calib{
                 throw rsgis::img::RSGISImageCalcException("Specified image band is not within the image.");
             }
             
-            const double radiansToDegrees = 180.0 / M_PI;
-            
-            double dxSlope, dySlope, slopeRad = 0.0;
-            
-            dxSlope = ((dataBlock[band][0][0] + dataBlock[band][1][0] + dataBlock[band][1][0] + dataBlock[band][2][0]) - 
-                       (dataBlock[band][0][2] + dataBlock[band][1][2] + dataBlock[band][1][2] + dataBlock[band][2][2]))/ewRes;
-            
-            dySlope = ((dataBlock[band][2][0] + dataBlock[band][2][1] + dataBlock[band][2][1] + dataBlock[band][2][2]) - 
-                       (dataBlock[band][0][0] + dataBlock[band][0][1] + dataBlock[band][0][1] + dataBlock[band][0][2]))/nsRes;
-            
-            slopeRad = atan(sqrt((dxSlope * dxSlope) + (dySlope * dySlope))/8);
-            
-            double dxAspect, dyAspect, aspect, aspectRad = 0.0;
-            
-            dxAspect = ((dataBlock[band][0][2] + dataBlock[band][1][2] + dataBlock[band][1][2] + dataBlock[band][2][2]) - 
-                        (dataBlock[band][0][0] + dataBlock[band][1][0] + dataBlock[band][1][0] + dataBlock[band][2][0]))/ewRes;
-            
-            dyAspect = ((dataBlock[band][2][0] + dataBlock[band][2][1] + dataBlock[band][2][1] + dataBlock[band][2][2]) - 
-                        (dataBlock[band][0][0] + dataBlock[band][0][1] + dataBlock[band][0][1] + dataBlock[band][0][2]))/nsRes;
-            
-            aspect = atan2(-dxAspect, dyAspect)*radiansToDegrees;
-            
-            if (dxAspect == 0 && dyAspect == 0)
+            bool hasNoDataVal = false;
+            double sumVals = 0.0;
+            int nVals = 0;
+            for(int i = 0; i < winSize; ++i)
             {
-                // Flat area
-                aspect = 0;
+                for(int j = 0; j < winSize; ++j)
+                {
+                    if(dataBlock[band][i][j] == noDataVal)
+                    {
+                        hasNoDataVal = true;
+                    }
+                    else
+                    {
+                        sumVals += dataBlock[band][i][j];
+                        ++nVals;
+                    }
+                }
+            }
+            if(hasNoDataVal && (nVals>1))
+            {
+                double meanVal = sumVals / nVals;
+                for(int i = 0; i < winSize; ++i)
+                {
+                    for(int j = 0; j < winSize; ++j)
+                    {
+                        if(dataBlock[band][i][j] == noDataVal)
+                        {
+                            dataBlock[band][i][j] = meanVal;
+                        }
+                    }
+                }
             }
             
-            if (aspect < 0)
+            if(nVals > 1)
             {
-                aspect += 360.0;
+                const double radiansToDegrees = 180.0 / M_PI;
+                
+                double dxSlope, dySlope, slopeRad = 0.0;
+                
+                dxSlope = ((dataBlock[band][0][0] + dataBlock[band][1][0] + dataBlock[band][1][0] + dataBlock[band][2][0]) - 
+                           (dataBlock[band][0][2] + dataBlock[band][1][2] + dataBlock[band][1][2] + dataBlock[band][2][2]))/ewRes;
+                
+                dySlope = ((dataBlock[band][2][0] + dataBlock[band][2][1] + dataBlock[band][2][1] + dataBlock[band][2][2]) - 
+                           (dataBlock[band][0][0] + dataBlock[band][0][1] + dataBlock[band][0][1] + dataBlock[band][0][2]))/nsRes;
+                
+                slopeRad = atan(sqrt((dxSlope * dxSlope) + (dySlope * dySlope))/8);
+                
+                double dxAspect, dyAspect, aspect, aspectRad = 0.0;
+                
+                dxAspect = ((dataBlock[band][0][2] + dataBlock[band][1][2] + dataBlock[band][1][2] + dataBlock[band][2][2]) - 
+                            (dataBlock[band][0][0] + dataBlock[band][1][0] + dataBlock[band][1][0] + dataBlock[band][2][0]))/ewRes;
+                
+                dyAspect = ((dataBlock[band][2][0] + dataBlock[band][2][1] + dataBlock[band][2][1] + dataBlock[band][2][2]) - 
+                            (dataBlock[band][0][0] + dataBlock[band][0][1] + dataBlock[band][0][1] + dataBlock[band][0][2]))/nsRes;
+                
+                aspect = atan2(-dxAspect, dyAspect)*radiansToDegrees;
+                
+                if (dxAspect == 0 && dyAspect == 0)
+                {
+                    // Flat area
+                    aspect = 0;
+                }
+                
+                if (aspect < 0)
+                {
+                    aspect += 360.0;
+                }
+                
+                if (aspect == 360.0)
+                {
+                    aspect = 0.0;
+                }
+                aspectRad = aspect * degreesToRadians;
+                
+                // UNIT VECTOR FOR SURFACE
+                double pA = sin(slopeRad) * cos(aspectRad);
+                double pB = sin(slopeRad) * sin(aspectRad);
+                double pC = cos(slopeRad);
+                
+                double viewZenRad = viewZenith * degreesToRadians;
+                double viewAzRad = viewAzimuth * degreesToRadians;
+                
+                // UNIT VECTOR FOR EXITANCE RAY
+                double rA = sin(viewZenRad) * cos(viewAzRad);
+                double rB = sin(viewZenRad) * sin(viewAzRad);
+                double rC = cos(viewZenRad);
+                
+                outputValue = acos((pA*rA)+(pB*rB)+(pC*rC)) * radiansToDegrees;
+                
+                if(boost::math::isnan(outputValue))
+                {
+                    outputValue = 0;
+                }
             }
-            
-            if (aspect == 360.0)
-            {
-                aspect = 0.0;
-            }
-            aspectRad = aspect * degreesToRadians;
-            
-            // UNIT VECTOR FOR SURFACE
-            double pA = sin(slopeRad) * cos(aspectRad);
-            double pB = sin(slopeRad) * sin(aspectRad);
-            double pC = cos(slopeRad);
-            
-            double viewZenRad = viewZenith * degreesToRadians;
-            double viewAzRad = viewAzimuth * degreesToRadians;
-            
-            // UNIT VECTOR FOR EXITANCE RAY
-            double rA = sin(viewZenRad) * cos(viewAzRad);
-            double rB = sin(viewZenRad) * sin(viewAzRad);
-            double rC = cos(viewZenRad);
-            
-            outputValue = acos((pA*rA)+(pB*rB)+(pC*rC)) * radiansToDegrees;
-            
-            if(boost::math::isnan(outputValue))
+            else
             {
                 outputValue = 0;
             }
-        } 
+        }
         catch (rsgis::img::RSGISImageCalcException &e) 
         {
             throw e;
@@ -715,7 +1034,7 @@ namespace rsgis{namespace calib{
     
     
     
-    RSGISCalcRayIncidentAndExitanceAngles::RSGISCalcRayIncidentAndExitanceAngles(int numberOutBands, unsigned int band, float ewRes, float nsRes, float sunZenith, float sunAzimuth, float viewZenith, float viewAzimuth) : rsgis::img::RSGISCalcImageValue(numberOutBands)
+    RSGISCalcRayIncidentAndExitanceAngles::RSGISCalcRayIncidentAndExitanceAngles(int numberOutBands, unsigned int band, float ewRes, float nsRes, float sunZenith, float sunAzimuth, float viewZenith, float viewAzimuth, double noDataVal) : rsgis::img::RSGISCalcImageValue(numberOutBands)
     {
         this->band = band;
         this->ewRes = ewRes;
@@ -724,6 +1043,7 @@ namespace rsgis{namespace calib{
         this->sunAzimuth = sunAzimuth;
         this->viewZenith = viewZenith;
         this->viewAzimuth = viewAzimuth;
+        this->noDataVal = noDataVal;
     }
 		
     void RSGISCalcRayIncidentAndExitanceAngles::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
@@ -745,80 +1065,122 @@ namespace rsgis{namespace calib{
                 throw rsgis::img::RSGISImageCalcException("Specified image band is not within the image.");
             }
             
-            const double radiansToDegrees = 180.0 / M_PI;
-            
-            double dxSlope, dySlope, slopeRad, slope;
-            
-            dxSlope = ((dataBlock[band][0][0] + dataBlock[band][1][0] + dataBlock[band][1][0] + dataBlock[band][2][0]) - 
-                       (dataBlock[band][0][2] + dataBlock[band][1][2] + dataBlock[band][1][2] + dataBlock[band][2][2]))/ewRes;
-            
-            dySlope = ((dataBlock[band][2][0] + dataBlock[band][2][1] + dataBlock[band][2][1] + dataBlock[band][2][2]) - 
-                       (dataBlock[band][0][0] + dataBlock[band][0][1] + dataBlock[band][0][1] + dataBlock[band][0][2]))/nsRes;
-            
-            slopeRad = atan(sqrt((dxSlope * dxSlope) + (dySlope * dySlope))/8);
-            
-            slope = (slopeRad * radiansToDegrees);
-            
-            double dxAspect, dyAspect, aspect;
-            
-            dxAspect = ((dataBlock[band][0][2] + dataBlock[band][1][2] + dataBlock[band][1][2] + dataBlock[band][2][2]) - 
-                        (dataBlock[band][0][0] + dataBlock[band][1][0] + dataBlock[band][1][0] + dataBlock[band][2][0]))/ewRes;
-            
-            dyAspect = ((dataBlock[band][2][0] + dataBlock[band][2][1] + dataBlock[band][2][1] + dataBlock[band][2][2]) - 
-                        (dataBlock[band][0][0] + dataBlock[band][0][1] + dataBlock[band][0][1] + dataBlock[band][0][2]))/nsRes;
-            
-            aspect = atan2(-dxAspect, dyAspect)*radiansToDegrees;
-            
-            if (dxAspect == 0 && dyAspect == 0)
+            bool hasNoDataVal = false;
+            double sumVals = 0.0;
+            int nVals = 0;
+            for(int i = 0; i < winSize; ++i)
             {
-                // Flat area 
-                aspect = std::numeric_limits<double>::signaling_NaN();
+                for(int j = 0; j < winSize; ++j)
+                {
+                    if(dataBlock[band][i][j] == noDataVal)
+                    {
+                        hasNoDataVal = true;
+                    }
+                    else
+                    {
+                        sumVals += dataBlock[band][i][j];
+                        ++nVals;
+                    }
+                }
+            }
+            if(hasNoDataVal && (nVals>1))
+            {
+                double meanVal = sumVals / nVals;
+                for(int i = 0; i < winSize; ++i)
+                {
+                    for(int j = 0; j < winSize; ++j)
+                    {
+                        if(dataBlock[band][i][j] == noDataVal)
+                        {
+                            dataBlock[band][i][j] = meanVal;
+                        }
+                    }
+                }
             }
             
-            if (aspect < 0)
+            if(nVals > 1)
             {
-                aspect += 360.0;
+            
+                const double radiansToDegrees = 180.0 / M_PI;
+                
+                double dxSlope, dySlope, slopeRad, slope;
+                
+                dxSlope = ((dataBlock[band][0][0] + dataBlock[band][1][0] + dataBlock[band][1][0] + dataBlock[band][2][0]) - 
+                           (dataBlock[band][0][2] + dataBlock[band][1][2] + dataBlock[band][1][2] + dataBlock[band][2][2]))/ewRes;
+                
+                dySlope = ((dataBlock[band][2][0] + dataBlock[band][2][1] + dataBlock[band][2][1] + dataBlock[band][2][2]) - 
+                           (dataBlock[band][0][0] + dataBlock[band][0][1] + dataBlock[band][0][1] + dataBlock[band][0][2]))/nsRes;
+                
+                slopeRad = atan(sqrt((dxSlope * dxSlope) + (dySlope * dySlope))/8);
+                
+                slope = (slopeRad * radiansToDegrees);
+                
+                double dxAspect, dyAspect, aspect;
+                
+                dxAspect = ((dataBlock[band][0][2] + dataBlock[band][1][2] + dataBlock[band][1][2] + dataBlock[band][2][2]) - 
+                            (dataBlock[band][0][0] + dataBlock[band][1][0] + dataBlock[band][1][0] + dataBlock[band][2][0]))/ewRes;
+                
+                dyAspect = ((dataBlock[band][2][0] + dataBlock[band][2][1] + dataBlock[band][2][1] + dataBlock[band][2][2]) - 
+                            (dataBlock[band][0][0] + dataBlock[band][0][1] + dataBlock[band][0][1] + dataBlock[band][0][2]))/nsRes;
+                
+                aspect = atan2(-dxAspect, dyAspect)*radiansToDegrees;
+                
+                if (dxAspect == 0 && dyAspect == 0)
+                {
+                    // Flat area 
+                    aspect = std::numeric_limits<double>::signaling_NaN();
+                }
+                
+                if (aspect < 0)
+                {
+                    aspect += 360.0;
+                }
+                
+                if (aspect == 360.0)
+                {
+                    aspect = 0.0;
+                }
+                
+                double aspectRad = aspect*degreesToRadians;
+                
+                // UNIT VECTOR FOR SURFACE
+                double pA = sin(slopeRad) * cos(aspectRad);
+                double pB = sin(slopeRad) * sin(aspectRad);
+                double pC = cos(slopeRad);
+                
+                double sunZenRad = sunZenith * degreesToRadians;
+                double sunAzRad = sunAzimuth * degreesToRadians;
+                
+                // UNIT VECTOR FOR INCIDENT RAY
+                double rA = sin(sunZenRad) * cos(sunAzRad);
+                double rB = sin(sunZenRad) * sin(sunAzRad);
+                double rC = cos(sunZenRad);
+                
+                incidenceAngle = acos((pA*rA)+(pB*rB)+(pC*rC)) * radiansToDegrees;
+                
+                if(boost::math::isnan(incidenceAngle))
+                {
+                    incidenceAngle = sunZenith;
+                }
+                
+                // UNIT VECTOR FOR EXITANCE RAY
+                rA = sin(viewZenith*degreesToRadians) * cos(viewAzimuth*degreesToRadians);
+                rB = sin(viewZenith*degreesToRadians) * sin(viewAzimuth*degreesToRadians);
+                rC = cos(viewZenith*degreesToRadians);
+                
+                existanceAngle = acos((pA*rA)+(pB*rB)+(pC*rC)) * radiansToDegrees;
+                
+                if(boost::math::isnan(existanceAngle))
+                {
+                    existanceAngle = 0;
+                }
             }
-            
-            if (aspect == 360.0)
-            {
-                aspect = 0.0;
-            }
-            
-            double aspectRad = aspect*degreesToRadians;
-            
-            // UNIT VECTOR FOR SURFACE
-            double pA = sin(slopeRad) * cos(aspectRad);
-            double pB = sin(slopeRad) * sin(aspectRad);
-            double pC = cos(slopeRad);
-            
-            double sunZenRad = sunZenith * degreesToRadians;
-            double sunAzRad = sunAzimuth * degreesToRadians;
-            
-            // UNIT VECTOR FOR INCIDENT RAY
-            double rA = sin(sunZenRad) * cos(sunAzRad);
-            double rB = sin(sunZenRad) * sin(sunAzRad);
-            double rC = cos(sunZenRad);
-            
-            incidenceAngle = acos((pA*rA)+(pB*rB)+(pC*rC)) * radiansToDegrees;
-            
-            if(boost::math::isnan(incidenceAngle))
+            else
             {
                 incidenceAngle = sunZenith;
-            }
-            
-            // UNIT VECTOR FOR EXITANCE RAY
-            rA = sin(viewZenith*degreesToRadians) * cos(viewAzimuth*degreesToRadians);
-            rB = sin(viewZenith*degreesToRadians) * sin(viewAzimuth*degreesToRadians);
-            rC = cos(viewZenith*degreesToRadians);
-            
-            existanceAngle = acos((pA*rA)+(pB*rB)+(pC*rC)) * radiansToDegrees;
-            
-            if(boost::math::isnan(existanceAngle))
-            {
                 existanceAngle = 0;
-            }            
-        } 
+            }
+        }
         catch (rsgis::img::RSGISImageCalcException &e) 
         {
             throw e;
@@ -930,9 +1292,10 @@ namespace rsgis{namespace calib{
     
     
     
-    RSGISFilterDTMWithAspectMedianFilter::RSGISFilterDTMWithAspectMedianFilter(float aspectRange) : rsgis::img::RSGISCalcImageValue(1)
+    RSGISFilterDTMWithAspectMedianFilter::RSGISFilterDTMWithAspectMedianFilter(float aspectRange, double noDataVal) : rsgis::img::RSGISCalcImageValue(1)
     {
         this->aspectRange = aspectRange;
+        this->noDataVal = noDataVal;
     }
     
     void RSGISFilterDTMWithAspectMedianFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
@@ -962,7 +1325,7 @@ namespace rsgis{namespace calib{
             {
                 if(mathUtils.angleWithinRange(dataBlock[1][i][j], lowerAspThres, upperAspThres))
                 {
-                    if(!boost::math::isnan(dataBlock[0][i][j]))
+                    if(!boost::math::isnan(dataBlock[0][i][j]) && (dataBlock[0][i][j] != noDataVal))
                     {
                         vals.push_back(dataBlock[0][i][j]);
                     }
@@ -982,7 +1345,7 @@ namespace rsgis{namespace calib{
             {
                 for(unsigned int j = 0; j < winSize; ++j)
                 {
-                    if(!boost::math::isnan(dataBlock[0][i][j]))
+                    if(!boost::math::isnan(dataBlock[0][i][j]) && (dataBlock[0][i][j] != noDataVal))
                     {
                         vals.push_back(dataBlock[0][i][j]);
                     }

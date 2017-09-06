@@ -186,6 +186,9 @@ namespace rsgis{ namespace cmds {
     /** Function to calculate the Earth / Sun distance for a julian day */
     DllExport float executeGetEarthSunDistance(unsigned int julianDay) throw(RSGISCmdException);
     
+    /** Function to identify cloud shadows */
+    DllExport void executePerformCloudShadowMasking(std::string cloudMsk, std::string inputImage, std::string validAreaImage, unsigned int darkFillBand, std::string outputImg, std::string gdalFormat, float scaleFactorIn, std::string tmpImgsBase, std::string tmpImgFileExt, bool rmTmpImgs, double sunAz, double sunZen, double senAz, double senZen) throw(RSGISCmdException);
+    
 }}
 
 

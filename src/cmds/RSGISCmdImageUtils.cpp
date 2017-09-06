@@ -2307,7 +2307,72 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-
+    
+    void executeCreateMaxNDVICompsiteImage(std::vector<std::string> inputImages, std::string outputImage, unsigned int redBand, unsigned int nirBand, std::string gdalFormat, RSGISLibDataType outDataType) throw(RSGISCmdException)
+    {
+        try
+        {
+            if(inputImages.size() < 2)
+            {
+                throw RSGISImageException("Input images list must have at least 2 images.");
+            }
+            
+            GDALAllRegister();
+            GDALDataset **datasets = new GDALDataset*[inputImages.size()];
+            int imgIdx = 0;
+            unsigned int numImgBands = 0;
+            bool first = true;
+            for(std::vector<std::string>::iterator iterImgs = inputImages.begin(); iterImgs != inputImages.end(); ++iterImgs)
+            {
+                std::cout << "Openning: " << (*iterImgs) << std::endl;
+                datasets[imgIdx] = (GDALDataset *) GDALOpen((*iterImgs).c_str(), GA_ReadOnly);
+                if(datasets[imgIdx] == NULL)
+                {
+                    std::string message = std::string("Could not open image ") + (*iterImgs);
+                    throw RSGISImageException(message.c_str());
+                }
+                if(first)
+                {
+                    numImgBands = datasets[imgIdx]->GetRasterCount();
+                    first = false;
+                }
+                else if(numImgBands != datasets[imgIdx]->GetRasterCount())
+                {
+                    for(int i = 0; i <= imgIdx; ++i)
+                    {
+                        GDALClose(datasets[i]);
+                    }
+                    delete[] datasets;
+                    throw RSGISImageException("Input images have different number of image bands.");
+                }
+                ++imgIdx;
+            }
+            
+            rsgis::img::RSGISMaxNDVIImageComposite imgCompPxlCalc = rsgis::img::RSGISMaxNDVIImageComposite(numImgBands, redBand, nirBand, inputImages.size());
+            
+            rsgis::img::RSGISCalcImage calcImg = rsgis::img::RSGISCalcImage(&imgCompPxlCalc, "", true);
+            calcImg.calcImage(datasets, inputImages.size(), outputImage, false, NULL, gdalFormat, RSGIS_to_GDAL_Type(outDataType));
+            
+            // Tidy up
+            for(int i = 0; i < inputImages.size(); ++i)
+            {
+                GDALClose(datasets[i]);
+            }
+            delete[] datasets;
+        }
+        catch (RSGISImageException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (RSGISException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
 
 }}
 

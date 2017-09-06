@@ -715,7 +715,7 @@ namespace rsgis{namespace calib{
     {
         if(numBands != 5)
         {
-            throw rsgis::img::RSGISImageCalcException("The number of image bands must be 3.");
+            throw rsgis::img::RSGISImageCalcException("The number of image bands must be 5.");
         }
         
         if(bandValues[0] == 1)
@@ -729,6 +729,36 @@ namespace rsgis{namespace calib{
             float diffValSWIR = bandValues[4] - bandValues[3];
             
             if((diffValNIR > 0.02) & (diffValSWIR > 0.02))
+            {
+                output[0] = 1;
+            }
+            else
+            {
+                output[0] = 0;
+            }
+        }
+        else
+        {
+            output[0] = 0;
+        }
+    }
+    
+    
+    
+    void RSGISCalcImagePotentialCloudShadowsMaskSingleInput::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+    {
+        if(numBands != 3)
+        {
+            throw rsgis::img::RSGISImageCalcException("The number of image bands must be 3.");
+        }
+        
+        if(bandValues[0] == 1)
+        {
+            bandValues[1] = bandValues[1] / this->scaleFactor;
+            bandValues[2] = bandValues[2] / this->scaleFactor;
+            float diffVal = bandValues[2] - bandValues[1];
+            
+            if(diffVal > 0.02)
             {
                 output[0] = 1;
             }
@@ -874,6 +904,58 @@ namespace rsgis{namespace calib{
             throw rsgis::img::RSGISImageCalcException(e.what());
         }
         
+    }
+    
+    void RSGISCalcCloudParams::calcCloudHeightsNoThermal(GDALDataset *cloudClumpsDS, GDALDataset *initCloudHeightsDS)throw(rsgis::img::RSGISImageCalcException)
+    {
+        try
+        {
+            rsgis::rastergis::RSGISCalcClusterLocation calcLoc;
+            calcLoc.populateAttWithClumpLocationExtent(cloudClumpsDS, 1, "MinXX", "MinXY", "MaxXX", "MaxXY", "MinYX", "MinYY", "MaxXY", "MaxYY");
+            
+            GDALRasterAttributeTable *cloudsRAT = cloudClumpsDS->GetRasterBand(1)->GetDefaultRAT();
+            rsgis::rastergis::RSGISRasterAttUtils attUtils;
+            size_t numcloudsRATHistoRows = 0;
+            int *cloudsRATHisto = attUtils.readIntColumn(cloudsRAT, "Histogram", &numcloudsRATHistoRows);
+            
+            double *cloudBase = new double[numcloudsRATHistoRows];
+            double *hBaseMin = new double[numcloudsRATHistoRows];
+            double *hBaseMax = new double[numcloudsRATHistoRows];
+            
+            for(size_t i = 1; i < numcloudsRATHistoRows; ++i)
+            {
+                cloudBase[i] = 8.0;
+                hBaseMin[i] = 0.2;
+                hBaseMax[i] = 12.0;
+            }
+            cloudBase[0] = 0.0;
+            hBaseMin[0] = 0.0;
+            hBaseMax[0] = 0.0;
+            attUtils.writeRealColumn(cloudsRAT, "CloudBase", cloudBase, numcloudsRATHistoRows);
+            attUtils.writeRealColumn(cloudsRAT, "hBaseMin", hBaseMin, numcloudsRATHistoRows);
+            attUtils.writeRealColumn(cloudsRAT, "hBaseMax", hBaseMax, numcloudsRATHistoRows);
+            
+            rsgis::calib::RSGISCalcPxlCloudBaseAndTopHeightNoThermal calcImgInitHeights = rsgis::calib::RSGISCalcPxlCloudBaseAndTopHeightNoThermal(cloudBase, hBaseMin, numcloudsRATHistoRows);
+            rsgis::img::RSGISCalcImage calcInitHeights = rsgis::img::RSGISCalcImage(&calcImgInitHeights);
+            calcInitHeights.calcImage(&cloudClumpsDS, 1, 0, initCloudHeightsDS);
+            
+            delete[] cloudBase;
+            delete[] hBaseMin;
+            delete[] hBaseMax;
+            delete[] cloudsRATHisto;
+        }
+        catch (rsgis::img::RSGISImageCalcException &e)
+        {
+            throw e;
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
     }
     
     
@@ -1139,18 +1221,25 @@ namespace rsgis{namespace calib{
             
             long xPxlLoc = floor(xPxlLocF + 0.5);
             long yPxlLoc = floor(yPxlLocF + 0.5);
-
-            this->testImgBand->RasterIO(GF_Write, xPxlLoc, yPxlLoc, 1, 1, &outValue, 1, 1, GDT_Float32, 0, 0);
             
-            if(this->firstPts)
+            if( (xPxlLoc >= 0) & (xPxlLoc < this->nXPxl) & (yPxlLoc >= 0) & (yPxlLoc < this->nYPxl) )
             {
-                extent.init(x,x,y,y);
-                this->firstPts=false;
+                this->testImgBand->RasterIO(GF_Write, xPxlLoc, yPxlLoc, 1, 1, &outValue, 1, 1, GDT_Float32, 0, 0);
+                if(this->firstPts)
+                {
+                    extent.init(x,x,y,y);
+                    this->firstPts=false;
+                }
+                else
+                {
+                    extent.expandToInclude(x, y);
+                }
             }
             else
             {
-                extent.expandToInclude(x, y);
+                rtnStat = false;
             }
+            
         }
         
         return rtnStat;
@@ -1290,6 +1379,26 @@ namespace rsgis{namespace calib{
             {
                 rsgis::img::RSGISImageCalcException("FID is larger than the number of known clouds...");
             }
+        }
+        else
+        {
+            output[0] = 0.0;
+            output[1] = 0.0;
+        }
+    }
+    
+    
+    void RSGISCalcPxlCloudBaseAndTopHeightNoThermal::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(rsgis::img::RSGISImageCalcException)
+    {
+        if(numIntVals != 1)
+        {
+            rsgis::img::RSGISImageCalcException("The cloud clumps band must only have 1 band.");
+        }
+        unsigned long fid = intBandValues[0];
+        if((fid > 0) & (fid <= numClumps))
+        {
+            output[0] = hBaseMin[fid];
+            output[1] = 0.0;
         }
         else
         {

@@ -111,6 +111,12 @@ namespace rsgis{namespace calib{
             rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(&initOutImg);
             calcImage.calcImageWindowData(&inValidImgDS, 1, outImgDS, 3, true);
             
+            if(pxQ[0]->size() == 0)
+            {
+                this->getImagesEdgesToInitFill(outImgDS->GetRasterBand(1), borderVal, pxQ[0]);
+                //throw rsgis::img::RSGISImageCalcException("The were no edge pixels with the valid mask.");
+            }
+            
             Q2DPxl pxl;
             long hcrt = minVal;
             long imgVal = 0;
@@ -126,6 +132,7 @@ namespace rsgis{namespace calib{
                     std::cout << "." << feedbackCounter << "." << std::flush;
                     feedbackCounter = feedbackCounter + 10;
                 }
+
                 while(!this->qEmpty(hcrt))
                 {
                     pxl = this->qPopFront(hcrt);
@@ -274,6 +281,58 @@ namespace rsgis{namespace calib{
             outVal = val2;
         }
         return outVal;
+    }
+    
+    void RSGISHydroDEMFillSoilleGratin94::getImagesEdgesToInitFill(GDALRasterBand *imgData, double borderVal, std::list<Q2DPxl> *pxQ)throw(rsgis::img::RSGISImageCalcException)
+    {
+        try
+        {
+            unsigned int xSize = imgData->GetXSize();
+            unsigned int ySize = imgData->GetYSize();
+            
+            //std::cout << "[" << xSize << ", " << ySize << "]\n";
+            
+            for(unsigned int x = 0; x < xSize; ++x)
+            {
+                Q2DPxl q2Pxl = Q2DPxl(x, 0);
+                this->setPxlVal(q2Pxl, borderVal, imgData);
+                pxQ->push_back(q2Pxl);
+            }
+            
+            for(unsigned int x = 0; x < xSize; ++x)
+            {
+                Q2DPxl q2Pxl = Q2DPxl(x, (ySize-1));
+                this->setPxlVal(q2Pxl, borderVal, imgData);
+                pxQ->push_back(q2Pxl);
+            }
+            
+            for(unsigned int y = 0; y < ySize; ++y)
+            {
+                Q2DPxl q2Pxl = Q2DPxl(0, y);
+                this->setPxlVal(q2Pxl, borderVal, imgData);
+                pxQ->push_back(q2Pxl);
+            }
+            
+            for(unsigned int y = 0; y < ySize; ++y)
+            {
+                Q2DPxl q2Pxl = Q2DPxl((xSize-1), y);
+                this->setPxlVal(q2Pxl, borderVal, imgData);
+                pxQ->push_back(q2Pxl);
+            }
+
+        }
+        catch (rsgis::img::RSGISImageCalcException &e)
+        {
+            throw e;
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
     }
     
     RSGISHydroDEMFillSoilleGratin94::~RSGISHydroDEMFillSoilleGratin94()
