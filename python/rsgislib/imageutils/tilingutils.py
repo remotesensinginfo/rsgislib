@@ -86,7 +86,7 @@ try:
 except ImportError as numpyErr:
     haveNumpy = False
 
-def createMinDataTiles(inputImage, outshp, outclumpsFile, width, height, validDataThreshold, maskIntersect=None, offset=False, force=True, tmpdir='tilestemp'):
+def createMinDataTiles(inputImage, outshp, outclumpsFile, width, height, validDataThreshold, maskIntersect=None, offset=False, force=True, tmpdir='tilestemp', inImgNoDataVal=0.0):
     """
 A function to create a tiling for an input image where each tile has a minimum amount of valid data.
 
@@ -101,17 +101,18 @@ Where:
 * force is a boolean (default True) to delete the output shapefile if it already exists.
 * tmpdir is a string with a temporary directory for temp outputs to be stored (they will be deleted) 
     * if tmpdir doesn't exist it will be created and then deleted during the processing.
+* inImgNoDataVal is a float for providing the input image no data value (Default: 0.0)
 """
     tmpPresent = True
     if not os.path.exists(tmpdir):
         print("WARNING: tmpdir directory does not exist so creating it...")
         os.makedirs(tmpdir)
         tmpPresent = False
-    
+        
     inImgBaseName = os.path.splitext(os.path.basename(inputImage))[0]
     
     tileClumpsImage = os.path.join(tmpdir, inImgBaseName+'_tilesimg.kea')
-    
+        
     segmentation.generateRegularGrid(inputImage, tileClumpsImage, 'KEA', width, height, offset)
     rastergis.populateStats(tileClumpsImage, True, True)
 
@@ -122,7 +123,7 @@ Where:
         ratDS = gdal.Open(tileClumpsImage, gdal.GA_Update)
         MaskField = rat.readColumn(ratDS, "Mask")
         Selected = numpy.zeros_like(MaskField, dtype=int)
-        Selected[MaskField == 0] = 1
+        Selected[MaskField == inImgNoDataVal] = 1
         rat.writeColumn(ratDS, "Selected", Selected)
         ratDS = None
         
@@ -133,7 +134,7 @@ Where:
         tileClumpsImage = tileClumpsImageDropClumps
     
          
-    rastergis.populateRATWithPropValidPxls(inputImage, tileClumpsImage, "ValidPxls", 0.0)
+    rastergis.populateRATWithPropValidPxls(inputImage, tileClumpsImage, "ValidPxls", inImgNoDataVal)
     
     ratDS = gdal.Open(tileClumpsImage, gdal.GA_Update)
     ValidPxls = rat.readColumn(ratDS, "ValidPxls")
@@ -167,11 +168,11 @@ Where:
         tilesDS = None
         dst_ds = None
     
-    
     if not tmpPresent:
         shutil.rmtree(tmpdir, ignore_errors=True)
     else:
         os.remove(tileClumpsImage)
+
     
 def createTileMaskImagesFromShp(inputImage, tileShp, tilesNameBase, tilesMaskDIR, tmpdir='tilestemp', imgFormat='KEA'):
     """
