@@ -1613,3 +1613,51 @@ Calculate the distance from each small clump to a large clump. Split defined by 
 
 
 
+def takeRandomSample(clumpsImg, inColName, inColVal, outColName, sampleRatio, seed=0):
+    """
+A function to take a random sample of an input column.
+
+* clumpsImg - clumps image.
+* inColName - input column name.
+* inColVal - numeric value for which the random sample is to be taken for.
+* outColName - output column where value of 1 is selected within the random sample and 0 is not selected.
+* sampleRatio - the size of the sample (0 - 1.0; i.e., 10% = 0.1) to be taken of the number of rows within input value.
+* seed - is the seed for the random number generation (optional; default is 0).
+
+"""
+    if (sampleRatio <= 0) or (sampleRatio >= 1):
+        raise rsgislib.RSGISPyException("Input sample ratio must be between 0 and 1.")
+    
+    # Define the seed for the random number generation.
+    numpy.random.seed(seed)
+    
+    # READ COL FROM RAT:
+    ratDataset = gdal.Open(clumpsImg, gdal.GA_Update)
+    inColVals = rat.readColumn(ratDataset, inColName)
+    
+    # Create an array for the original array indexes.
+    ID = numpy.arange(inColVals.shape[0])
+    
+    # Cut array and array indexes to be only bins with a value of 1 (i.e., there is lidar data here).
+    ID = ID[inColVals==inColVal]
+    
+    # Sample of the subsetted input array where it equals inColVal.
+    numOfSamples = int(ID.shape[0]*sampleRatio)
+    IDSamples = numpy.arange(ID.shape[0])
+    IDSampPerms = numpy.random.permutation(IDSamples)
+    IDSampPermsSelect = IDSampPerms[0:numOfSamples]
+    
+    # Find the array indexes for the whole input array (i.e., the whole RAT).
+    outArryIdxsSel = ID[IDSampPermsSelect]
+    
+    # Create output columns for writing to RAT
+    outColVals = numpy.zeros_like(inColVals)
+    
+    # Populate columns where those selected have value 1.
+    outColVals[outArryIdxsSel] = 1
+    
+    # WRITE COL TO RAT:
+    rat.writeColumn(ratDataset, outColName, outColVals)
+    ratDataset = None
+
+
