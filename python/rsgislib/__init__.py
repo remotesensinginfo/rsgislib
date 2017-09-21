@@ -390,6 +390,15 @@ class RSGISPyUtils (object):
         return [tlX, brX, tlY, brY]
         
     def reprojPoint(self, inProjOSRObj, outProjOSRObj, x, y):
+        """
+        Reproject a point from 'inProjOSRObj' to 'outProjOSRObj' where they are gdal
+        osgeo.osr.SpatialReference objects. 
+        
+        Returns x, y. (note if returning long, lat you might need to invert)
+        """
+        import osgeo.gdal as gdal
+        import osgeo.ogr as ogr
+        import osgeo.osr as osr
         wktPt = 'POINT(%s %s)' % (x, y)
         point = ogr.CreateGeometryFromWkt(wktPt)
         point.AssignSpatialReference(inProjOSRObj)
