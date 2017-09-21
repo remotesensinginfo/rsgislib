@@ -1165,7 +1165,7 @@ Where:
         classShpFile = classesDict[key][1]
         classImgFile = os.path.join(tmpPath, className+"_"+uid+".kea")
         classIntVal = classesDict[key][0]
-        vectorutils.rasterise2Image(classShpFile, clumpsImg, classImgFile, gdalFormat="KEA", burnVal=classIntVal)
+        vectorutils.rasterise2Image(classShpFile, clumpsImg, classImgFile, gdalformat="KEA", burnVal=classIntVal)
         tmpClassImgLayers.append(classImgFile)
         classNamesDict[classIntVal] = className
     
