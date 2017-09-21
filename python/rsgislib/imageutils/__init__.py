@@ -701,6 +701,7 @@ rsgislib.imageutils.mergeExtractedHDF5Data(inTrainSamples, cloudTrainSamples)
 def doImagesOverlap(image1, image2):
     """
 Function to test whether two images overlap with one another.
+If the images have a difference projection/coordinate system then corners 
 
 * image1 - path to first image
 * image2 - path to second image
@@ -719,6 +720,11 @@ overlap = rsgislib.imageutils.doImagesOverlap(tile, img)
 print("Images Overlap: " + str(overlap))
 """
     overlap = True
+    
+    projSame = False
+    rsgisUtils = rsgislib.RSGISPyUtils()
+    if rsgisUtils.doGDALLayersHaveSameProj(image1, image2):
+        projSame = True
     
     img1DS = gdal.Open(image1, gdal.GA_ReadOnly)
     if img1DS is None:
@@ -745,12 +751,26 @@ print("Images Overlap: " + str(overlap))
     
     img1BRX = img1GeoTransform[0] + (img1DS.RasterXSize * img1GeoTransform[1])
     img1BRY = img1GeoTransform[3] + (img1DS.RasterYSize * img1GeoTransform[5])
-        
-    img2TLX = img2GeoTransform[0]
-    img2TLY = img2GeoTransform[3]
     
-    img2BRX = img2GeoTransform[0] + (img2DS.RasterXSize * img2GeoTransform[1])
-    img2BRY = img2GeoTransform[3] + (img2DS.RasterYSize * img2GeoTransform[5])
+    if projSame:
+        img2TLX = img2GeoTransform[0]
+        img2TLY = img2GeoTransform[3]
+        
+        img2BRX = img2GeoTransform[0] + (img2DS.RasterXSize * img2GeoTransform[1])
+        img2BRY = img2GeoTransform[3] + (img2DS.RasterYSize * img2GeoTransform[5])
+    else:
+        inProj = osr.SpatialReference()
+        inProj.ImportFromEPSG(int(rsgisUtils.getEPSGCode(image2)))
+        
+        outProj = osr.SpatialReference()
+        outProj.ImportFromEPSG(int(rsgisUtils.getEPSGCode(image1)))
+        
+        if int(rsgisUtils.getEPSGCode(image1)) == 4326:
+            img2TLY, img2TLX = rsgisUtils.reprojPoint(inProj, outProj, img2GeoTransform[0], img2GeoTransform[3])
+            img2BRY, img2BRX = rsgisUtils.reprojPoint(inProj, outProj, (img2GeoTransform[0] + (img2DS.RasterXSize * img2GeoTransform[1])), (img2GeoTransform[3] + (img2DS.RasterYSize * img2GeoTransform[5])))
+        else:
+            img2TLX, img2TLY = rsgisUtils.reprojPoint(inProj, outProj, img2GeoTransform[0], img2GeoTransform[3])
+            img2BRX, img2BRY = rsgisUtils.reprojPoint(inProj, outProj, (img2GeoTransform[0] + (img2DS.RasterXSize * img2GeoTransform[1])), (img2GeoTransform[3] + (img2DS.RasterYSize * img2GeoTransform[5]))) 
         
     xMin = img1TLX
     xMax = img1BRX

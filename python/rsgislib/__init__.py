@@ -388,6 +388,15 @@ class RSGISPyUtils (object):
         brY = tlY + (yRes * ySize)
         
         return [tlX, brX, tlY, brY]
+        
+    def reprojPoint(self, inProjOSRObj, outProjOSRObj, x, y):
+        wktPt = 'POINT(%s %s)' % (x, y)
+        point = ogr.CreateGeometryFromWkt(wktPt)
+        point.AssignSpatialReference(inProjOSRObj)
+        point.TransformTo(outProjOSRObj)
+        outX = point.GetY()
+        outY = point.GetX()
+        return outX, outY
     
     def getImageBandCount(self, inImg):
         """
