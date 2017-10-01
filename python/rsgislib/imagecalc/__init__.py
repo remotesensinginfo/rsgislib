@@ -46,7 +46,7 @@ This is passed to the imagePixelColumnSummary function
 
 def calcNDVI(image, rBand, nBand, outImage, stats=True, gdalFormat='KEA'):
     """ 
-Helper function to calculate NDVI, note the output no data value is -999.
+Helper function to calculate NDVI ((NIR-RED)/(NIR+RED)), note the output no data value is -999.
     
 Where:
 
@@ -66,9 +66,10 @@ Where:
     if stats:
         imageutils.popImageStats(outImage,False,-999.,True)
 
+
 def calcWBI(image, bBand, nBand, outImage, stats=True, gdalFormat='KEA'):
     """ 
-Helper function to calculate WBI, note the output no data value is -999.
+Helper function to calculate WBI (Blue/NIR), note the output no data value is -999.
     
 Where:
 
@@ -87,6 +88,114 @@ Where:
     bandMath(outImage, expression, gdalFormat, rsgislib.TYPE_32FLOAT, bandDefns)
     if stats:
         imageutils.popImageStats(outImage,False,-999.,True)
+
+
+def calcNDWI(image, nBand, sBand, outImage, stats=True, gdalFormat='KEA'):
+    """ 
+Helper function to calculate NDWI ((NIR-SWIR)/(NIR+SWIR)), note the output no data value is -999.
+
+See: Xu, H. (2006). Modification of normalised difference water index (NDWI) to enhance open water 
+                    features in remotely sensed imagery. International Journal of Remote Sensing, 
+                    27(14), 3025–3033. http://doi.org/10.1080/01431160600589179
+    
+Where:
+
+* image is a string specifying the input image file.
+* nBand is an int specifying the nir band in the input image (band indexing starts at 1)
+* sBand is an int specifying the swir band (e.g., Landsat TM Band 5) in the input image (band indexing starts at 1)
+* outImage is a string specifying the output image file.
+* stats is a boolean specifying whether pyramids and stats should be calculated (Default: True)
+* gdalFormat is a string specifing the output image file format (Default: KEA)
+    
+"""
+    expression = '(nir+swir)!=0?(nir-swir)/(nir+swir):-999'
+    bandDefns = []
+    bandDefns.append(BandDefn('swir', image, sBand))
+    bandDefns.append(BandDefn('nir', image, nBand))
+    bandMath(outImage, expression, gdalFormat, rsgislib.TYPE_32FLOAT, bandDefns)
+    if stats:
+        imageutils.popImageStats(outImage,False,-999.,True)
+
+
+
+def calcGNDWI(image, gBand, nBand, outImage, stats=True, gdalFormat='KEA'):
+    """ 
+Helper function to calculate NDWI ((GREEN-NIR)/(GREEN+NIR)), note the output no data value is -999.
+
+See: Xu, H. (2006). Modification of normalised difference water index (NDWI) to enhance open water 
+                    features in remotely sensed imagery. International Journal of Remote Sensing, 
+                    27(14), 3025–3033. http://doi.org/10.1080/01431160600589179
+
+Where:
+
+* image is a string specifying the input image file.
+* gBand is an int specifying the green band in the input image (band indexing starts at 1)
+* nBand is an int specifying the nir band in the input image (band indexing starts at 1)
+* outImage is a string specifying the output image file.
+* stats is a boolean specifying whether pyramids and stats should be calculated (Default: True)
+* gdalFormat is a string specifing the output image file format (Default: KEA)
+    
+"""
+    expression = '(green+nir)!=0?(green-nir)/(green+nir):-999'
+    bandDefns = []
+    bandDefns.append(BandDefn('green', image, gBand))
+    bandDefns.append(BandDefn('nir', image, nBand))
+    bandMath(outImage, expression, gdalFormat, rsgislib.TYPE_32FLOAT, bandDefns)
+    if stats:
+        imageutils.popImageStats(outImage,False,-999.,True)
+
+
+def calcGMNDWI(image, gBand, sBand, outImage, stats=True, gdalFormat='KEA'):
+    """ 
+Helper function to calculate NDWI ((GREEN-SWIR)/(GREEN+SWIR)), note the output no data value is -999.
+
+See: Xu, H. (2006). Modification of normalised difference water index (NDWI) to enhance open water 
+                    features in remotely sensed imagery. International Journal of Remote Sensing, 
+                    27(14), 3025–3033. http://doi.org/10.1080/01431160600589179
+
+Where:
+
+* image is a string specifying the input image file.
+* gBand is an int specifying the green band in the input image (band indexing starts at 1)
+* sBand is an int specifying the swir band (e.g., Landsat TM Band 5) in the input image (band indexing starts at 1)
+* outImage is a string specifying the output image file.
+* stats is a boolean specifying whether pyramids and stats should be calculated (Default: True)
+* gdalFormat is a string specifing the output image file format (Default: KEA)
+    
+"""
+    expression = '(green+swir)!=0?(green-swir)/(green+swir):-999'
+    bandDefns = []
+    bandDefns.append(BandDefn('green', image, gBand))
+    bandDefns.append(BandDefn('swir', image, sBand))
+    bandMath(outImage, expression, gdalFormat, rsgislib.TYPE_32FLOAT, bandDefns)
+    if stats:
+        imageutils.popImageStats(outImage,False,-999.,True)
+
+       
+def calcWhiteness(image, bBand, gBand, rBand, outImage, stats=True, gdalFormat='KEA'):
+    """ 
+Helper function to calculate whiteness ((GREEN-NIR)/(GREEN+NIR)), note the output no data value is -999.
+    
+Where:
+
+* image is a string specifying the input image file.
+* bBand is an int specifying the blue band in the input image (band indexing starts at 1)
+* gBand is an int specifying the green band in the input image (band indexing starts at 1)
+* rBand is an int specifying the red band in the input image (band indexing starts at 1)
+* outImage is a string specifying the output image file.
+* stats is a boolean specifying whether pyramids and stats should be calculated (Default: True)
+* gdalFormat is a string specifing the output image file format (Default: KEA)
+    
+"""
+    expression = '(blue+green+red)!=0?(abs(blue-((blue+green+red)/3)) + abs(green-((blue+green+red)/3)) + abs(red-((blue+green+red)/3)))/((blue+green+red)/3):-999'
+    bandDefns = []
+    bandDefns.append(BandDefn('blue', image, bBand))
+    bandDefns.append(BandDefn('green', image, gBand))
+    bandDefns.append(BandDefn('red', image, rBand))
+    bandMath(outImage, expression, gdalFormat, rsgislib.TYPE_32FLOAT, bandDefns)
+    if stats:
+        imageutils.popImageStats(outImage,False,-999.,True)
+
 
 
 def calcDist2ImgVals(inputValsImg, outputDistImg, pxlVals, valsImgBand=1, gdalFormat='KEA', maxDist=None, noDataVal=None, unitGEO=True):

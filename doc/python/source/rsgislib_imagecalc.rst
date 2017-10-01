@@ -76,6 +76,10 @@ Image Indices
 -------------
 .. autofunction:: rsgislib.imagecalc.calcNDVI
 .. autofunction:: rsgislib.imagecalc.calcWBI
+.. autofunction:: rsgislib.imagecalc.calcNDWI
+.. autofunction:: rsgislib.imagecalc.calcGNDWI
+.. autofunction:: rsgislib.imagecalc.calcGMNDWI
+.. autofunction:: rsgislib.imagecalc.calcWhiteness
 
 Other
 ------
