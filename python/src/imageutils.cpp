@@ -1739,8 +1739,8 @@ static PyObject *ImageUtils_CreateRefImageCompositeImg(PyObject *self, PyObject 
 // Our list of functions in this module
 static PyMethodDef ImageUtilsMethods[] = {
     {"stretchImage", ImageUtils_StretchImage, METH_VARARGS, 
-"imageutils.stretchImage(inputimage, outputimage, saveoutstats, outstatsfile, ignorezeros, onepasssd, gdalformat, datatype, stretchtype, stretchparam)\n"
-"Stretches (scales) pixel values from 0 - 255, normally for display although also used for normalisation.\n"
+"rsgislib.imageutils.stretchImage(inputimage, outputimage, saveoutstats, outstatsfile, ignorezeros, onepasssd, gdalformat, datatype, stretchtype, stretchparam)\n"
+"Stretches (scales) pixel values to a range of 0 - 255, normally for display although also used for normalisation.\n"
 "\n"
 "Where:\n"
 "\n"
@@ -1773,8 +1773,8 @@ static PyMethodDef ImageUtilsMethods[] = {
 "\n"},
 
     {"stretchImageWithStats", ImageUtils_StretchImageWithStats, METH_VARARGS, 
-"imageutils.stretchImageWithStats(inputimage, outputimage, instatsfile, gdalformat, outtype, stretchtype, stretchparam)\n"
-"Stretches (scales) pixel values from 0 - 255, normally for display although also used for normalisation. Users pre-calculated statistics.\n"
+"rsgislib.imageutils.stretchImageWithStats(inputimage, outputimage, instatsfile, gdalformat, outtype, stretchtype, stretchparam)\n"
+"Stretches (scales) pixel values to a range of 0 - 255, normally for display although also used for normalisation. Uses pre-calculated statistics.\n"
 "\n"
 "Where:\n"
 "\n"
@@ -1807,7 +1807,7 @@ static PyMethodDef ImageUtilsMethods[] = {
 "\n"},
 
 {"maskImage", ImageUtils_maskImage, METH_VARARGS,
-"imageutils.maskImage(inputimage, imagemask, outputimage, gdalformat, datatype, outvalue, maskvalue)\n"
+"rsgislib.imageutils.maskImage(inputimage, imagemask, outputimage, gdalformat, datatype, outvalue, maskvalue)\n"
 "This command will mask an input image using a single band mask image - commonly this is a binary image.\n"
 "\n"
 "Where:\n"
@@ -1834,7 +1834,7 @@ static PyMethodDef ImageUtilsMethods[] = {
 "\n"},
 
     {"createTiles", ImageUtils_createTiles, METH_VARARGS,
-"imageutils.createTiles(inputimage, baseimage, width, height, overlap, offsettiling, gdalformat, datatype, ext)\n"     
+"rsgislib.imageutils.createTiles(inputimage, baseimage, width, height, overlap, offsettiling, gdalformat, datatype, ext)\n"
 "Create tiles from a larger image, useful for splitting a large image into multiple smaller ones for processing.\n"
 "\n"
 "Where\n"
@@ -1870,7 +1870,7 @@ static PyMethodDef ImageUtilsMethods[] = {
 "\n"},
     
     {"createImageMosaic", ImageUtils_createImageMosaic, METH_VARARGS,
-"imageutils.createImageMosaic(inputimagelist, outputimage, backgroundVal, skipVal, skipBand, overlapBehaviour, gdalformat, type)\n"  
+"rsgislib.imageutils.createImageMosaic(inputimagelist, outputimage, backgroundVal, skipVal, skipBand, overlapBehaviour, gdalformat, type)\n"
 "Create mosaic from list of input images.\n"
 "\n"
 "Where\n"
@@ -1906,7 +1906,7 @@ static PyMethodDef ImageUtilsMethods[] = {
 "\n"},
  
     {"includeImages", ImageUtils_IncludeImages, METH_VARARGS,
-"imageutils.includeImages(baseImage, inputImages, inputBands=None, skipVal=None)\n"
+"rsgislib.imageutils.includeImages(baseImage, inputImages, inputBands=None, skipVal=None)\n"
 "Create mosaic from list of input images.\n"
 "\n"
 "Where:\n"
@@ -1928,7 +1928,7 @@ static PyMethodDef ImageUtilsMethods[] = {
 "\n"},
  
 {"includeImagesWithOverlap", ImageUtils_IncludeImagesOverlap, METH_VARARGS,
-"imageutils.includeImagesWithOverlap(baseImage, inputImages, pxlOverlap)\n"
+"rsgislib.imageutils.includeImagesWithOverlap(baseImage, inputImages, pxlOverlap)\n"
 "Create mosaic from list of input images where the input images have an overlap.\n"
 "\n"
 "Where:\n"
@@ -2118,7 +2118,7 @@ static PyMethodDef ImageUtilsMethods[] = {
 "\n"},
 
     {"subset", ImageUtils_Subset, METH_VARARGS,
-"imageutils.subset(inputimage, inputvector, outputimage, gdalformat, datatype)\n"
+"rsgislib.imageutils.subset(inputimage, inputvector, outputimage, gdalformat, datatype)\n"
 "Subset an image to the bounding box of a vector.\n"
 "\n"
 "Where:\n"
@@ -2142,7 +2142,7 @@ static PyMethodDef ImageUtilsMethods[] = {
 "\n"},
     
 {"subsetbbox", ImageUtils_SubsetBBox, METH_VARARGS,
-"imageutils.subsetbbox(inputimage, outputimage, gdalformat, datatype, xMin, xMax, yMin, yMax)\n"
+"rsgislib.imageutils.subsetbbox(inputimage, outputimage, gdalformat, datatype, xMin, xMax, yMin, yMax)\n"
 "Subset an image to the bounding box of a vector.\n"
 "\n"
 "Where:\n"
@@ -2172,7 +2172,7 @@ static PyMethodDef ImageUtilsMethods[] = {
 "\n"},
 
     {"subset2polys", ImageUtils_Subset2Polys, METH_VARARGS,
-"imageutils.subset(inputimage, inputvector, attribute, baseimage, gdalformat, datatype, ext)\n"
+"rsgislib.imageutils.subset(inputimage, inputvector, attribute, baseimage, gdalformat, datatype, ext)\n"
 "Subset an image to the bounding box of a each polygon in an input vector.\n"
 "Useful for splitting an image into tiles of unequal sizes.\n"
 "\n"
@@ -2205,7 +2205,7 @@ static PyMethodDef ImageUtilsMethods[] = {
 "\n"},
 
     {"subset2img", ImageUtils_Subset2Img, METH_VARARGS,
-"imageutils.subset2img(inputimage, inputROIimage, outputimage, gdalformat, type)\n"
+"rsgislib.imageutils.subset2img(inputimage, inputROIimage, outputimage, gdalformat, type)\n"
 "Subset an image to the bounding box of an image.\n"
 "\n"
 "Where:\n"
@@ -2230,7 +2230,7 @@ static PyMethodDef ImageUtilsMethods[] = {
     
     
 {"stackImageBands", ImageUtils_StackImageBands, METH_VARARGS,
-"imageutils.stackImageBands(inputImages, imageBandNames, outputImage, skipValue, noDataValue, gdalformat, type)\n"
+"rsgislib.imageutils.stackImageBands(inputImages, imageBandNames, outputImage, skipValue, noDataValue, gdalformat, type)\n"
 "Create a single image from list of input images through band stacking.\n"
 "\n"
 "Where:\n"
@@ -2256,7 +2256,7 @@ static PyMethodDef ImageUtilsMethods[] = {
 "\n"},
     
 {"createBlankImage", ImageUtils_CreateBlankImage, METH_VARARGS,
-"imageutils.createBlankImage(outputImage, numBands, width, height, tlX, tlY, res, pxlVal, wktFile, wktString, gdalformat, gdaltype)\n"
+"rsgislib.imageutils.createBlankImage(outputImage, numBands, width, height, tlX, tlY, res, pxlVal, wktFile, wktString, gdalformat, gdaltype)\n"
 "Create a new blank image with the parameters specified.\n"
 "\n"
 "Where:\n"
@@ -2276,7 +2276,7 @@ static PyMethodDef ImageUtilsMethods[] = {
 "\n"},
 
 {"createCopyImage", ImageUtils_CreateCopyImage, METH_VARARGS,
-"imageutils.createCopyImage(inputImage, outputImage, numBands, pxlVal, gdalformat, datatype)\n"
+"rsgislib.imageutils.createCopyImage(inputImage, outputImage, numBands, pxlVal, gdalformat, datatype)\n"
 "Create a new blank image with the parameters specified.\n"
 "\n"
 "Where:\n"
@@ -2298,7 +2298,7 @@ static PyMethodDef ImageUtilsMethods[] = {
 "\n"},
 
 {"createCopyImageVecExtent", ImageUtils_CreateCopyImageVecExtent, METH_VARARGS,
-"imageutils.createCopyImageVecExtent(inputImage, shpFile, outputImage, numBands, pxlVal, gdalformat, datatype)\n"
+"rsgislib.imageutils.createCopyImageVecExtent(inputImage, shpFile, outputImage, numBands, pxlVal, gdalformat, datatype)\n"
 "Create a new blank image with the parameters specified but with the extent of the inputted shapefile.\n"
 "\n"
 "Where:\n"
@@ -2322,7 +2322,7 @@ static PyMethodDef ImageUtilsMethods[] = {
 "\n"},
 
 {"stackStats", ImageUtils_StackStats, METH_VARARGS,
-"imageutils.stackStats(inputImage, outputImage, numBands, stat, gdalformat, datatype)\n"
+"rsgislib.imageutils.stackStats(inputImage, outputImage, numBands, stat, gdalformat, datatype)\n"
 "Calculate statistics for every pixel in a stack of image. If all bands are used a single band image is produced with the specified statistics.\n"
 "If a number of bands are specified statistics are taken over every n bands to provide an image with B / n bands (where B is the number of input bands. \
 For example, can be used to produce monthly composite images from a stack with images from every day.\n"
@@ -2348,7 +2348,7 @@ For example, can be used to produce monthly composite images from a stack with i
 "\n"},
 
 {"orderImageUsingValidPxls", ImageUtils_OrderImagesUsingPropValidData, METH_VARARGS,
-"imageutils.orderImageUsingValidPxls(inputImages, noDataVal)\n"
+"rsgislib.imageutils.orderImageUsingValidPxls(inputImages, noDataVal)\n"
 "Order the list of input images based on the their proportion of valid image pixels.\n"
 "The primary use of this function is expected to be order (rank) images ahead of mosaicing.\n"
 "\n"
@@ -2363,7 +2363,7 @@ For example, can be used to produce monthly composite images from a stack with i
 "\n"},
 
 {"genSamplingGrid", ImageUtils_GenSamplingGrid, METH_VARARGS,
-"imageutils.genSamplingGrid(InputImage, OutputImage, gdalformat, pxlRes, minVal, maxVal, singleLine)\n"
+"rsgislib.imageutils.genSamplingGrid(InputImage, OutputImage, gdalformat, pxlRes, minVal, maxVal, singleLine)\n"
 "Generate a regular sampling grid.\n"
 "\n"
 "Where:\n"
