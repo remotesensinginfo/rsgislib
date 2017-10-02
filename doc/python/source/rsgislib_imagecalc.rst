@@ -52,6 +52,7 @@ Statistics
 .. autofunction:: rsgislib.imagecalc.calcMultiImgBandStats
 .. autofunction:: rsgislib.imagecalc.calcMaskImgPxlValProb
 .. autofunction:: rsgislib.imagecalc.calcImageDifference
+.. autofunction:: rsgislib.imagecalc.getImgIdxForStat
 
 
 Normalise

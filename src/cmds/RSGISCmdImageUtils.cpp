@@ -2373,6 +2373,89 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
+                
+    void executeCreateRefImgCompsiteImage(std::vector<std::string> inputImages, std::string outputImage, std::string refImage, std::string gdalFormat, RSGISLibDataType outDataType, float outNoDataVal) throw(RSGISCmdException)
+    {
+        try
+        {
+            if(inputImages.size() < 2)
+            {
+                throw RSGISImageException("Input images list must have at least 2 images.");
+            }
+            
+            GDALAllRegister();
+            unsigned int totNumImgs = inputImages.size()+1;
+            GDALDataset **datasets = new GDALDataset*[totNumImgs];
+            int imgIdx = 0;
+            
+            std::cout << "Openning: " << (refImage) << std::endl;
+            datasets[imgIdx] = (GDALDataset *) GDALOpen((refImage).c_str(), GA_ReadOnly);
+            if(datasets[imgIdx] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + (refImage);
+                throw RSGISImageException(message.c_str());
+            }
+            if(datasets[imgIdx]->GetRasterCount() != 1)
+            {
+                GDALClose(datasets[imgIdx]);
+                delete[] datasets;
+                throw RSGISImageException("The reference image inputted has more than one image band.");
+            }
+            imgIdx = imgIdx + 1;
+            
+            unsigned int numImgBands = 0;
+            bool first = true;
+            for(std::vector<std::string>::iterator iterImgs = inputImages.begin(); iterImgs != inputImages.end(); ++iterImgs)
+            {
+                std::cout << "Openning: " << (*iterImgs) << std::endl;
+                datasets[imgIdx] = (GDALDataset *) GDALOpen((*iterImgs).c_str(), GA_ReadOnly);
+                if(datasets[imgIdx] == NULL)
+                {
+                    std::string message = std::string("Could not open image ") + (*iterImgs);
+                    throw RSGISImageException(message.c_str());
+                }
+                if(first)
+                {
+                    numImgBands = datasets[imgIdx]->GetRasterCount();
+                    first = false;
+                }
+                else if(numImgBands != datasets[imgIdx]->GetRasterCount())
+                {
+                    for(int i = 0; i <= imgIdx; ++i)
+                    {
+                        GDALClose(datasets[i]);
+                    }
+                    delete[] datasets;
+                    throw RSGISImageException("Input images have different number of image bands.");
+                }
+                ++imgIdx;
+            }
+            
+            rsgis::img::RSGISRefImgImageComposite imgCompPxlCalc = rsgis::img::RSGISRefImgImageComposite(numImgBands, inputImages.size(), outNoDataVal);
+            
+            rsgis::img::RSGISCalcImage calcImg = rsgis::img::RSGISCalcImage(&imgCompPxlCalc, "", true);
+            calcImg.calcImage(datasets, 1, inputImages.size(), outputImage, false, NULL, gdalFormat, RSGIS_to_GDAL_Type(outDataType));
+            
+            // Tidy up
+            for(int i = 0; i < totNumImgs; ++i)
+            {
+                GDALClose(datasets[i]);
+            }
+            delete[] datasets;
+        }
+        catch (RSGISImageException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (RSGISException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
 
 }}
 

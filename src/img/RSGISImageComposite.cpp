@@ -146,5 +146,44 @@ void RSGISImageComposite::calcImageValue(float *bandValues, int numBands, double
         
     }
     
+    
+    RSGISRefImgImageComposite::RSGISRefImgImageComposite(int numberOutBands, unsigned int numInImgs, float outNoDataVal) : RSGISCalcImageValue(numberOutBands)
+    {
+        this->numInImgs = numInImgs;
+        this->outNoDataVal = outNoDataVal;
+    }
+    
+    void RSGISRefImgImageComposite::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(RSGISImageCalcException)
+    {
+        if(intBandValues[0] == 0)
+        {
+            for(int i = 0; i < this->getNumOutBands(); ++i)
+            {
+                output[i] = this->outNoDataVal;
+            }
+        }
+        else if(intBandValues[0] > 0)
+        {
+            if((intBandValues[0]-1) < this->numInImgs)
+            {
+                int outImgBandIdx = (intBandValues[0]-1) * this->getNumOutBands();
+                for(int i = 0; i < this->getNumOutBands(); ++i)
+                {
+                    output[i] = floatBandValues[outImgBandIdx++];
+                }
+            }
+            else
+            {
+                std::cerr << "Reference pixel = " << intBandValues[0] << std::endl;
+                throw RSGISImageCalcException("Reference image is not within the stack.");
+            }
+        }
+        else
+        {
+            std::cerr << "Reference pixel = " << intBandValues[0] << std::endl;
+            throw RSGISImageCalcException("Reference pixel values cannot be negative");
+        }
+    }
+    
 }}
 

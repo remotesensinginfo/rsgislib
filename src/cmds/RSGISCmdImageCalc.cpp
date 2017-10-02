@@ -3045,5 +3045,78 @@ namespace rsgis{ namespace cmds {
         }
     }
                 
+    void executeGetImgIdxForStat(std::vector<std::string> inputImgs, std::string outputImg, std::string gdalFormat, float noDataVal, RSGISCmdsSummariseStats sumStat) throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            
+            rsgis::math::rsgissummarytype sumType = rsgis::math::sumtype_mean;
+            if(sumStat == rsgis::cmds::rsgiscmds_stat_min)
+            {
+                sumType = rsgis::math::sumtype_min;
+            }
+            else if(sumStat == rsgis::cmds::rsgiscmds_stat_max)
+            {
+                sumType = rsgis::math::sumtype_max;
+            }
+            else if(sumStat == rsgis::cmds::rsgiscmds_stat_median)
+            {
+                sumType = rsgis::math::sumtype_median;
+            }
+            else
+            {
+                throw RSGISCmdException("The summary type specified is unknown; note only min, max and median are supported.");
+            }
+            
+            unsigned int nImgs = inputImgs.size();
+            unsigned int numBands = 0;
+            GDALDataset **datasets = new GDALDataset*[nImgs];
+            for(unsigned int i = 0; i < nImgs; ++i)
+            {
+                datasets[i] = (GDALDataset *) GDALOpen(inputImgs.at(i).c_str(), GA_ReadOnly);
+                if(datasets[i] == NULL)
+                {
+                    std::string message = std::string("Could not open image ") + inputImgs.at(i);
+                    throw rsgis::RSGISImageException(message.c_str());
+                }
+                if(datasets[i]->GetRasterCount() != 1)
+                {
+                    for(int n = 0; n <= i; ++n)
+                    {
+                        GDALClose(datasets[n]);
+                    }
+                    delete[] datasets;
+                    throw RSGISImageException("All input images must only have 1 image band.");
+                }
+                numBands = numBands + datasets[i]->GetRasterCount();
+            }
+            
+            
+            rsgis::img::RSGISCalcImgStackIdxForStat calcImgStatIdxs = rsgis::img::RSGISCalcImgStackIdxForStat(noDataVal, sumType);
+            rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(&calcImgStatIdxs, "", true);
+            calcImage.calcImage(datasets, nImgs, outputImg, false, NULL, gdalFormat, GDT_UInt16);
+            
+            for(unsigned int i = 0; i < nImgs; ++i)
+            {
+                GDALClose(datasets[i]);
+            }
+            delete[] datasets;
+        }
+        catch(rsgis::RSGISImageException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+                
+                
 }}
 

@@ -175,6 +175,8 @@ namespace rsgis{ namespace cmds {
     DllExport std::pair<double,double> getImageBandMinMax(std::string inputImage, unsigned int imgBand, bool useNoData=false, float noDataVal=0.0) throw(RSGISCmdException);
     /** A function to rescale an input image(s) to use a new scale and offset */
     DllExport void executeRescaleImages(std::vector<std::string> inputImgs, std::string outputImg, std::string gdalFormat, RSGISLibDataType outDataType, float cNoDataVal, float cOffset, float cGain, float nNoDataVal, float nOffset, float nGain) throw(RSGISCmdException);
+    /** A function to get the index of an input list of images for a particular stat (e.g., min, max, median) */
+    DllExport void executeGetImgIdxForStat(std::vector<std::string> inputImgs, std::string outputImg, std::string gdalFormat, float noDataVal, RSGISCmdsSummariseStats sumStat) throw(RSGISCmdException);
 }}
 
 
