@@ -451,7 +451,6 @@ static PyMethodDef HistoCubeMethods[] = {
 "\n"
 },
 
-    
 {NULL}        /* Sentinel */
 };
 

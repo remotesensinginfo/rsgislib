@@ -1681,6 +1681,60 @@ static PyObject *ImageUtils_CreateMaxNDVICompositeImg(PyObject *self, PyObject *
     Py_RETURN_NONE;
 }
 
+static PyObject *ImageUtils_CreateRefImageCompositeImg(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    static char *kwlist[] = {"inimages", "outimage", "refimg", "gdalformat", "datatype", "outnodata", NULL};
+    PyObject *pInputImages;
+    const char *pszOutputImage = "";
+    const char *pszRefImage = "";
+    const char *pszGDALFormat = "";
+    int nDataType;
+    float outNoData = 0.0;
+    
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "Osssif:createRefImgCompositeImg", kwlist, &pInputImages, &pszOutputImage, &pszRefImage, &pszGDALFormat, &nDataType, &outNoData))
+    {
+        return NULL;
+    }
+    
+    rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
+    
+    if( !PySequence_Check(pInputImages))
+    {
+        PyErr_SetString(GETSTATE(self)->error, "Input images must be a sequence");
+        return NULL;
+    }
+    
+    Py_ssize_t nImages = PySequence_Size(pInputImages);
+    std::vector<std::string> inputImages;
+    inputImages.reserve(nImages);
+    for( Py_ssize_t n = 0; n < nImages; n++ )
+    {
+        PyObject *o = PySequence_GetItem(pInputImages, n);
+        
+        if(!RSGISPY_CHECK_STRING(o))
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Input images must be strings");
+            Py_DECREF(o);
+            return NULL;
+        }
+        
+        inputImages.push_back(RSGISPY_STRING_EXTRACT(o));
+    }
+    
+    try
+    {
+        rsgis::cmds::executeCreateRefImgCompsiteImage(inputImages, std::string(pszOutputImage), std::string(pszRefImage), std::string(pszGDALFormat), type, outNoData);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+
 
 // Our list of functions in this module
 static PyMethodDef ImageUtilsMethods[] = {
@@ -2509,6 +2563,61 @@ For example, can be used to produce monthly composite images from a stack with i
 "\n"
 "    rsgislib.imageutils.createMaxNDVICompositeImg(inputImgs, outputImg, redband=3, nirband=4, gdalformat='KEA', datatype=rsgislib.TYPE_16UINT)\n"
 "    rsgislib.imageutils.popImageStats(outputImg, usenodataval=True, nodataval=0, calcpyramids=True)\n"
+"\n"
+"\n"},
+    
+{"createRefImgCompositeImg", (PyCFunction)ImageUtils_CreateRefImageCompositeImg, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.createRefImgCompositeImg(inimages=list, outimage=string, refimg=string, gdalformat=string, datatype=int, outnodata=float)\n"
+"A function which creates a composite image where the pixel values going into the output image by the\n"
+"reference image. The reference image can be created using the rsgislib.imagecalc.getImgIdxForStat function.\n"
+"\n"
+"Where:\n"
+"\n"
+"* inimages is a list of input images, each image must have the same number of bands in the same order.\n"
+"* outputImage is a string with the name and path of the output image.\n"
+"* refimg is an image which specifies index of the image in inimages for which output pixel will be derived. Indexes start at 1, where 0 is no data.\n"
+"* gdalformat is a string with the GDAL output file format.\n"
+"* datatype is an containing one of the values from rsgislib.TYPE_*\n"
+"* outnodata is the value which will be given to no data pixels in the output image."
+"\n"
+"Example::\n"
+"\n"
+"    import rsgislib\n"
+"    import rsgislib.imagecalc\n"
+"    import rsgislib.imageutils\n"
+"    import rsgislib.rastergis\n"
+"\n"
+"    import glob\n"
+"    import os.path\n"
+"\n"
+"    # Get List of input images:\n"
+"    inImages = glob.glob('./Outputs/*stdsref.kea')\n"
+"\n"
+"    # Generate Comp Ref layers:\n"
+"    refLyrsLst = []\n"
+"    refLayerPath = './CompRefLyrs/'\n"
+"    idx = 1\n"
+"    for img in inImages:\n"
+"        print('In Image ('+str(idx) + '):\t' + img)\n"
+"        baseImgName = os.path.splitext(os.path.basename(img))[0]\n"
+"        refLyrImg = os.path.join(refLayerPath, baseImgName+'_ndvi.kea')\n"
+"        rsgislib.imagecalc.calcNDVI(img, 3, 4, refLyrImg)\n"
+"        refLyrsLst.append(refLyrImg)\n"
+"        idx = idx + 1\n"
+"\n"
+"    # Create REF Image\n"
+"    pxlRefImg = 'LS5TM_19851990CompRefImg_lat7lon3896_r65p166_vmsk_mclds_topshad_rad_srefdem_stdsref.kea'\n"
+"    rsgislib.imagecalc.getImgIdxForStat(refLyrsLst, pxlRefImg, 'KEA', -999, rsgislib.SUMTYPE_MAX)\n"
+"\n"
+"    # Pop Ref Image with stats\n"
+"    rsgislib.rastergis.populateStats(pxlRefImg, True, True, True)\n"
+"\n"
+"    # Create Composite Image\n"
+"    outCompImg = 'LS5TM_19851990CompRefImgMAX_lat7lon3896_r65p166_vmsk_mclds_topshad_rad_srefdem_stdsref.kea'\n"
+"    rsgislib.imageutils.createRefImgCompositeImg(inImages, outCompImg, pxlRefImg, 'KEA', rsgislib.TYPE_16UINT, 0.0)\n"
+"\n"
+"    # Calc Stats\n"
+"    rsgislib.imageutils.popImageStats(outCompImg, usenodataval=True, nodataval=0, calcpyramids=True)\n"
 "\n"
 "\n"},
 

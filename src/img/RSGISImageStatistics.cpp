@@ -1568,9 +1568,123 @@ namespace rsgis{namespace img{
         
     }
     
+    RSGISCalcImgStackIdxForStat::RSGISCalcImgStackIdxForStat(float noDataVal, rsgis::math::rsgissummarytype sumStat):RSGISCalcImageValue(1)
+    {
+        this->noDataVal = noDataVal;
+        this->sumStat = sumStat;
+        
+        if(this->sumStat == rsgis::math::sumtype_median)
+        {
+            this->mathUtils = new rsgis::math::RSGISMathsUtils();
+            this->statsSumObj = new rsgis::math::RSGISStatsSummary();
+            this->mathUtils->initStatsSummary(statsSumObj);
+            this->data = new std::vector<double>();
+            this->statsSumObj->calcMedian = true;
+        }
+        
+    }
+
+    void RSGISCalcImgStackIdxForStat::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+    {
+        output[0] = 0.0; // Zero is output no data value.
+        if(this->sumStat == rsgis::math::sumtype_min)
+        {
+            int minIdx = 0;
+            float minVal = 0;
+            bool first = true;
+            for(int i = 0; i < numBands; ++i)
+            {
+                if(bandValues[i] != this->noDataVal)
+                {
+                    if(first)
+                    {
+                        minIdx = i;
+                        minVal = bandValues[i];
+                        first = false;
+                    }
+                    else if(bandValues[i] < minVal)
+                    {
+                        minIdx = i;
+                        minVal = bandValues[i];
+                    }
+                }
+            }
+            if(!first)
+            {
+                output[0] = minIdx+1; // Note, array indexes start at 0 while output indexes start as 1.
+            }
+        }
+        else if(this->sumStat == rsgis::math::sumtype_max)
+        {
+            int maxIdx = 0;
+            float maxVal = 0;
+            bool first = true;
+            for(int i = 0; i < numBands; ++i)
+            {
+                if(bandValues[i] != this->noDataVal)
+                {
+                    if(first)
+                    {
+                        maxIdx = i;
+                        maxVal = bandValues[i];
+                        first = false;
+                    }
+                    else if(bandValues[i] > maxVal)
+                    {
+                        maxIdx = i;
+                        maxVal = bandValues[i];
+                    }
+                }
+            }
+            if(!first)
+            {
+                output[0] = maxIdx+1; // Note, array indexes start at 0 while output indexes start as 1.
+            }
+        }
+        else if(this->sumStat == rsgis::math::sumtype_median)
+        {
+            this->mathUtils->initStatsSummaryValues(this->statsSumObj);
+            data->clear();
+            for(int i = 0; i < numBands; ++i)
+            {
+                if(bandValues[i] != this->noDataVal)
+                {
+                    data->push_back(bandValues[i]);
+                }
+            }
+            this->mathUtils->generateStats(data, statsSumObj);
+            
+            bool foundIdx = false;
+            unsigned int idx = 0;
+            for(int i = 0; i < numBands; ++i)
+            {
+                if((bandValues[i] != this->noDataVal) && (bandValues[i] == statsSumObj->median))
+                {
+                    foundIdx = true;
+                    idx = i;
+                    break;
+                }
+            }
+            
+            if(foundIdx)
+            {
+                output[0] = idx+1; // Note, array indexes start at 0 while output indexes start as 1.
+            }
+        }
+        else
+        {
+            throw RSGISImageCalcException("The summary type specified is unknown; note only min, max and median are supported.");
+        }
+    }
     
-    
-    
-    
+    RSGISCalcImgStackIdxForStat::~RSGISCalcImgStackIdxForStat()
+    {
+        if(this->sumStat == rsgis::math::sumtype_median)
+        {
+            delete this->mathUtils;
+            delete this->statsSumObj;
+            delete this->data;
+        }
+    }
     
 }}

@@ -25,6 +25,7 @@ Mosaic
 ----------
 
 .. autofunction:: rsgislib.imageutils.createImageMosaic
+.. autofunction:: rsgislib.imageutils.createRefImgCompositeImg
 .. autofunction:: rsgislib.imageutils.createMaxNDVICompositeImg
 .. autofunction:: rsgislib.imageutils.includeImages
 .. autofunction:: rsgislib.imageutils.includeImagesWithOverlap
