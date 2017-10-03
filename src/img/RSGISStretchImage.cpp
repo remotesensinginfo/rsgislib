@@ -25,16 +25,20 @@
 
 namespace rsgis { namespace img {
 
-	RSGISStretchImage::RSGISStretchImage(GDALDataset *inputImage, std::string outputImage,  bool outStats, std::string outStatsFile, bool ignoreZeros, bool onePassSD, std::string imageFormat, GDALDataType outDataType): inputImage(NULL), outputImage(""), ignoreZeros(true)
+	RSGISStretchImage::RSGISStretchImage(GDALDataset *inputImage, std::string outputImage,  bool outStats, std::string outStatsFile, bool onePassSD, std::string imageFormat, GDALDataType outDataType, float outMinVal, float outMaxVal, bool useNoData, double inNoData, double outNoData)
 	{
 		this->inputImage = inputImage;
 		this->outputImage = outputImage;
         this->outStats = outStats;
         this->outStatsFile = outStatsFile;
-        this->ignoreZeros = ignoreZeros;
         this->onePassSD = onePassSD;
         this->imageFormat = imageFormat;
         this->outDataType = outDataType;
+        this->outMinVal = outMinVal;
+        this->outMaxVal = outMaxVal;
+        this->useNoData = useNoData;
+        this->inNoData = inNoData;
+        this->outNoData = outNoData;
 	}
 	
 	void RSGISStretchImage::executeLinearMinMaxStretch() throw(RSGISImageCalcException)
@@ -66,7 +70,7 @@ namespace rsgis { namespace img {
 			}
 			calcImageStats = new RSGISImageStatistics();
             
-			calcImageStats->calcImageStatistics(datasets, 1, stats, numBands, false, ignoreZeros, onePassSD);
+			calcImageStats->calcImageStatistics(datasets, 1, stats, numBands, false, this->useNoData, this->inNoData, onePassSD);
 			
             std::ofstream outTxtFile;
             if(this->outStats)
@@ -84,8 +88,8 @@ namespace rsgis { namespace img {
 			{
 				imageMin[i] = stats[i]->min;
 				imageMax[i] = stats[i]->max;
-				outMax[i] = 255;
-				outMin[i] = 0;
+				outMax[i] = this->outMaxVal;
+				outMin[i] = this->outMinVal;
                 
                 if(this->outStats)
                 {
@@ -105,8 +109,8 @@ namespace rsgis { namespace img {
 			}
 			delete[] stats;
 			delete calcImageStats;
-			
-			linearStretchImage = new RSGISLinearStretchImage(numBands, imageMax, imageMin, outMax, outMin);
+
+			linearStretchImage = new RSGISLinearStretchImage(numBands, imageMax, imageMin, outMax, outMin, this->useNoData, this->inNoData, this->outNoData);
 			calcImg = new RSGISCalcImage(linearStretchImage, "", true);
 			calcImg->calcImage(datasets, 1, outputImage, false, NULL, imageFormat, outDataType);
 			
@@ -170,7 +174,7 @@ namespace rsgis { namespace img {
 				stats[i] = new ImageStats();
 			}
 			calcImageStats = new RSGISImageStatistics();
-			calcImageStats->calcImageStatistics(datasets, 1, stats, numBands, false, ignoreZeros, onePassSD);
+			calcImageStats->calcImageStatistics(datasets, 1, stats, numBands, false, this->useNoData, this->inNoData, onePassSD);
 			
 			double onePercent = 0;
 			double onePercentUpper = 0;
@@ -197,8 +201,8 @@ namespace rsgis { namespace img {
 				
 				imageMin[i] = stats[i]->min + (onePercentLower * percent);
 				imageMax[i] = stats[i]->max - (onePercentUpper * percent);
-				outMax[i] = 255;
-				outMin[i] = 0;
+				outMax[i] = this->outMaxVal;
+				outMin[i] = this->outMinVal;
                 
                 if(this->outStats)
                 {
@@ -219,7 +223,7 @@ namespace rsgis { namespace img {
 			delete[] stats;
 			delete calcImageStats;
 			
-			linearStretchImage = new RSGISLinearStretchImage(numBands, imageMax, imageMin, outMax, outMin);
+			linearStretchImage = new RSGISLinearStretchImage(numBands, imageMax, imageMin, outMax, outMin, this->useNoData, this->inNoData, this->outNoData);
 			calcImg = new RSGISCalcImage(linearStretchImage, "", true);
 			calcImg->calcImage(datasets, 1, outputImage, false, NULL, imageFormat, outDataType);
 			
@@ -284,7 +288,7 @@ namespace rsgis { namespace img {
 				stats[i] = new ImageStats();
 			}
 			calcImageStats = new RSGISImageStatistics();
-			calcImageStats->calcImageStatistics(datasets, 1, stats, numBands, true, ignoreZeros, onePassSD);
+			calcImageStats->calcImageStatistics(datasets, 1, stats, numBands, true, this->useNoData, this->inNoData, onePassSD);
 			
             std::ofstream outTxtFile;
             if(this->outStats)
@@ -314,8 +318,8 @@ namespace rsgis { namespace img {
                 
                 std::cout << "Band[" << i+1 << "] Min = " << stats[i]->min << " Mean = " << stats[i]->mean << " (Std Dev = " << stats[i]->stddev << ") max = " << stats[i]->max << std::endl;
                 
-				outMax[i] = 255;
-				outMin[i] = 0;
+				outMax[i] = this->outMaxVal;
+				outMin[i] = this->outMinVal;
                 
                 if(this->outStats)
                 {
@@ -336,7 +340,7 @@ namespace rsgis { namespace img {
 			delete[] stats;
 			delete calcImageStats;
 			
-			linearStretchImage = new RSGISLinearStretchImage(numBands, imageMax, imageMin, outMax, outMin);
+			linearStretchImage = new RSGISLinearStretchImage(numBands, imageMax, imageMin, outMax, outMin, this->useNoData, this->inNoData, this->outNoData);
 			calcImg = new RSGISCalcImage(linearStretchImage, "", true);
 			calcImg->calcImage(datasets, 1, outputImage, false, NULL, imageFormat, outDataType);
 			
@@ -408,7 +412,7 @@ namespace rsgis { namespace img {
 				stats[i] = new ImageStats();
 			}
 			calcImageStats = new RSGISImageStatistics();
-			calcImageStats->calcImageStatistics(datasets, 1, stats, numBands, true, function, ignoreZeros, onePassSD);
+			calcImageStats->calcImageStatistics(datasets, 1, stats, numBands, true, function, this->useNoData, this->inNoData, onePassSD);
 			
             std::ofstream outTxtFile;
             if(this->outStats)
@@ -434,8 +438,8 @@ namespace rsgis { namespace img {
                 {
                     imageMax[i] = stats[i]->max;
                 }
-				outMax[i] = 255;
-				outMin[i] = 0;
+				outMax[i] = this->outMaxVal;
+				outMin[i] = this->outMinVal;
                 
                 if(this->outStats)
                 {
@@ -456,7 +460,7 @@ namespace rsgis { namespace img {
 			delete[] stats;
 			delete calcImageStats;
 			
-			stretchImage = new RSGISFuncLinearStretchImage(numBands, imageMax, imageMin, outMax, outMin, function);
+			stretchImage = new RSGISFuncLinearStretchImage(numBands, imageMax, imageMin, outMax, outMin, this->useNoData, this->inNoData, this->outNoData, function);
 			calcImg = new RSGISCalcImage(stretchImage, "", true);
 			calcImg->calcImage(datasets, 1, outputImage, false, NULL, imageFormat, outDataType);
 			
@@ -524,7 +528,7 @@ namespace rsgis { namespace img {
 				stats[i] = new ImageStats();
 			}
 			calcImageStats = new RSGISImageStatistics();
-			calcImageStats->calcImageStatistics(datasets, 1, stats, numBands, true, function, ignoreZeros, onePassSD);
+			calcImageStats->calcImageStatistics(datasets, 1, stats, numBands, true, function, this->useNoData, this->inNoData, onePassSD);
 			
             std::ofstream outTxtFile;
             if(this->outStats)
@@ -550,8 +554,8 @@ namespace rsgis { namespace img {
                 {
                     imageMax[i] = stats[i]->max;
                 }
-				outMax[i] = 255;
-				outMin[i] = 0;
+				outMax[i] = this->outMaxVal;
+				outMin[i] = this->outMinVal;
                 
                 if(this->outStats)
                 {
@@ -572,7 +576,7 @@ namespace rsgis { namespace img {
 			delete[] stats;
 			delete calcImageStats;
 			
-			stretchImage = new RSGISFuncLinearStretchImage(numBands, imageMax, imageMin, outMax, outMin, function);
+			stretchImage = new RSGISFuncLinearStretchImage(numBands, imageMax, imageMin, outMax, outMin, this->useNoData, this->inNoData, this->outNoData, function);
 			calcImg = new RSGISCalcImage(stretchImage, "", true);
 			calcImg->calcImage(datasets, 1, outputImage, false, NULL, imageFormat, outDataType);
 			
@@ -640,7 +644,7 @@ namespace rsgis { namespace img {
 				stats[i] = new ImageStats();
 			}
 			calcImageStats = new RSGISImageStatistics();
-			calcImageStats->calcImageStatistics(datasets, 1, stats, numBands, true, function, ignoreZeros, onePassSD);
+			calcImageStats->calcImageStatistics(datasets, 1, stats, numBands, true, function, this->useNoData, this->inNoData, onePassSD);
 			
             std::ofstream outTxtFile;
             if(this->outStats)
@@ -666,8 +670,8 @@ namespace rsgis { namespace img {
                 {
                     imageMax[i] = stats[i]->max;
                 }
-				outMax[i] = 255;
-				outMin[i] = 0;
+				outMax[i] = this->outMaxVal;
+				outMin[i] = this->outMinVal;
 			}
             
             if(this->outStats)
@@ -683,7 +687,7 @@ namespace rsgis { namespace img {
 			delete[] stats;
 			delete calcImageStats;
 			
-			stretchImage = new RSGISFuncLinearStretchImage(numBands, imageMax, imageMin, outMax, outMin, function);
+			stretchImage = new RSGISFuncLinearStretchImage(numBands, imageMax, imageMin, outMax, outMin, this->useNoData, this->inNoData, this->outNoData, function);
 			calcImg = new RSGISCalcImage(stretchImage, "", true);
 			calcImg->calcImage(datasets, 1, outputImage, false, NULL, imageFormat, outDataType);
 			
@@ -730,13 +734,18 @@ namespace rsgis { namespace img {
     
     
     
-    RSGISStretchImageWithStats::RSGISStretchImageWithStats(GDALDataset *inputImage, std::string outputImage, std::string inStatsFile, std::string imageFormat, GDALDataType outDataType): inputImage(NULL), outputImage("")
+    RSGISStretchImageWithStats::RSGISStretchImageWithStats(GDALDataset *inputImage, std::string outputImage, std::string inStatsFile, std::string imageFormat, GDALDataType outDataType, float outMinVal, float outMaxVal, bool useNoData, double inNoData, double outNoData)
 	{
 		this->inputImage = inputImage;
 		this->outputImage = outputImage;
         this->inStatsFile = inStatsFile;
         this->imageFormat = imageFormat;
         this->outDataType = outDataType;
+        this->outMinVal = outMinVal;
+        this->outMaxVal = outMaxVal;
+        this->useNoData = useNoData;
+        this->inNoData = inNoData;
+        this->outNoData = outNoData;
 	}
 	
 	void RSGISStretchImageWithStats::executeLinearMinMaxStretch() throw(RSGISImageCalcException)
@@ -765,15 +774,15 @@ namespace rsgis { namespace img {
 			{
 				imageMin[i] = stats->at(i).origMin;
 				imageMax[i] = stats->at(i).origMax;
-				outMax[i] = stats->at(i).imgMax;
-				outMin[i] = stats->at(i).imgMin;
+				outMax[i] = this->outMaxVal;
+				outMin[i] = this->outMinVal;
                 
                 std::cout << "Band[" << i+1 << "] Image Min = " << imageMin[i] << " Image Max = " << imageMax[i] << " Output Min = " << outMin[i] << " Output Max = " << outMax[i] << std::endl;
 			}
             
 			delete stats;
 			
-			linearStretchImage = new RSGISLinearStretchImage(numBands, imageMax, imageMin, outMax, outMin);
+			linearStretchImage = new RSGISLinearStretchImage(numBands, imageMax, imageMin, outMax, outMin, this->useNoData, this->inNoData, this->outNoData);
 			calcImg = new RSGISCalcImage(linearStretchImage, "", true);
 			calcImg->calcImage(datasets, 1, outputImage, false, NULL, imageFormat, outDataType);
 			
@@ -843,15 +852,15 @@ namespace rsgis { namespace img {
 			{
 				imageMin[i] = stats->at(i).origMin;
 				imageMax[i] = stats->at(i).origMax;
-				outMax[i] = stats->at(i).imgMax;
-				outMin[i] = stats->at(i).imgMin;
+				outMax[i] = this->outMaxVal;
+				outMin[i] = this->outMinVal;
                 
                 std::cout << "Band[" << i+1 << "] Image Min = " << imageMin[i] << " Image Max = " << imageMax[i] << " Output Min = " << outMin[i] << " Output Max = " << outMax[i] << std::endl;
 			}
             
 			delete stats;
 			
-			stretchImage = new RSGISFuncLinearStretchImage(numBands, imageMax, imageMin, outMax, outMin, function);
+			stretchImage = new RSGISFuncLinearStretchImage(numBands, imageMax, imageMin, outMax, outMin, this->useNoData, this->inNoData, this->outNoData, function);
 			calcImg = new RSGISCalcImage(stretchImage, "", true);
 			calcImg->calcImage(datasets, 1, outputImage, false, NULL, imageFormat, outDataType);
 			
@@ -917,15 +926,15 @@ namespace rsgis { namespace img {
 			{
 				imageMin[i] = stats->at(i).origMin;
 				imageMax[i] = stats->at(i).origMax;
-				outMax[i] = stats->at(i).imgMax;
-				outMin[i] = stats->at(i).imgMin;
+				outMax[i] = this->outMaxVal;
+				outMin[i] = this->outMinVal;
                 
                 std::cout << "Band[" << i+1 << "] Image Min = " << imageMin[i] << " Image Max = " << imageMax[i] << " Output Min = " << outMin[i] << " Output Max = " << outMax[i] << std::endl;
 			}
             
 			delete stats;
 			
-			stretchImage = new RSGISFuncLinearStretchImage(numBands, imageMax, imageMin, outMax, outMin, function);
+			stretchImage = new RSGISFuncLinearStretchImage(numBands, imageMax, imageMin, outMax, outMin, this->useNoData, this->inNoData, this->outNoData, function);
 			calcImg = new RSGISCalcImage(stretchImage, "", true);
 			calcImg->calcImage(datasets, 1, outputImage, false, NULL, imageFormat, outDataType);
 			
@@ -991,15 +1000,15 @@ namespace rsgis { namespace img {
 			{
 				imageMin[i] = stats->at(i).origMin;
 				imageMax[i] = stats->at(i).origMax;
-				outMax[i] = stats->at(i).imgMax;
-				outMin[i] = stats->at(i).imgMin;
+				outMax[i] = this->outMaxVal;
+				outMin[i] = this->outMinVal;
                 
                 std::cout << "Band[" << i+1 << "] Image Min = " << imageMin[i] << " Image Max = " << imageMax[i] << " Output Min = " << outMin[i] << " Output Max = " << outMax[i] << std::endl;
 			}
             
 			delete stats;
 			
-			stretchImage = new RSGISFuncLinearStretchImage(numBands, imageMax, imageMin, outMax, outMin, function);
+			stretchImage = new RSGISFuncLinearStretchImage(numBands, imageMax, imageMin, outMax, outMin,  this->useNoData, this->inNoData, this->outNoData, function);
 			calcImg = new RSGISCalcImage(stretchImage, "", true);
 			calcImg->calcImage(datasets, 1, outputImage, false, NULL, imageFormat, outDataType);
 			
@@ -1071,12 +1080,15 @@ namespace rsgis { namespace img {
 	}
 	
 	
-	RSGISLinearStretchImage::RSGISLinearStretchImage(int numberOutBands, double *imageMaxIn, double *imageMinIn, double *outMaxIn, double *outMinIn) : RSGISCalcImageValue(numberOutBands)
+	RSGISLinearStretchImage::RSGISLinearStretchImage(int numberOutBands, double *imageMaxIn, double *imageMinIn, double *outMaxIn, double *outMinIn, bool useNoData, double inNoData, double outNoData) : RSGISCalcImageValue(numberOutBands)
 	{
 		this->imageMax = imageMaxIn;
 		this->imageMin = imageMinIn;
 		this->outMax = outMaxIn;
 		this->outMin = outMinIn;
+        this->useNoData = useNoData;
+        this->inNoData = inNoData;
+        this->outNoData = outNoData;
 	}
 	
 	void RSGISLinearStretchImage::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
@@ -1086,10 +1098,21 @@ namespace rsgis { namespace img {
 		double outDiff = 0;
 		for(int i = 0; i < numBands; i++)
 		{
-			if((boost::math::isnan)(bandValues[i]))
+			if(boost::math::isnan(bandValues[i]))
 			{
-				output[i] = outMin[i];
+                if(this->useNoData)
+                {
+                    output[i] = this->outNoData;
+                }
+                else
+                {
+                    output[i] = outMin[i];
+                }
 			}
+            else if(this->outNoData && (bandValues[i] == this->inNoData))
+            {
+                output[i] = this->outNoData;
+            }
 			else if(bandValues[i] < imageMin[i])
 			{
 				output[i] = outMin[i];
@@ -1115,12 +1138,15 @@ namespace rsgis { namespace img {
 
 	
 	
-	RSGISFuncLinearStretchImage::RSGISFuncLinearStretchImage(int numberOutBands, double *imageMaxIn, double *imageMinIn, double *outMaxIn, double *outMinIn, rsgis::math::RSGISMathFunction *func) : RSGISCalcImageValue(numberOutBands)
+	RSGISFuncLinearStretchImage::RSGISFuncLinearStretchImage(int numberOutBands, double *imageMaxIn, double *imageMinIn, double *outMaxIn, double *outMinIn, bool useNoData, double inNoData, double outNoData, rsgis::math::RSGISMathFunction *func) : RSGISCalcImageValue(numberOutBands)
 	{
 		this->imageMax = imageMaxIn;
 		this->imageMin = imageMinIn;
 		this->outMax = outMaxIn;
 		this->outMin = outMinIn;
+        this->useNoData = useNoData;
+        this->inNoData = inNoData;
+        this->outNoData = outNoData;
 		this->func = func;
 	}
 	
@@ -1128,9 +1154,12 @@ namespace rsgis { namespace img {
 	{
 		for(int i = 0; i < numBands; i++)
 		{
-			if(!(boost::math::isnan)(bandValues[i]))
+			if(!boost::math::isnan(bandValues[i]))
 			{
-				bandValues[i] = func->calcFunction(bandValues[i]);
+                if(!this->useNoData || (bandValues[i] != this->inNoData))
+                {
+                    bandValues[i] = func->calcFunction(bandValues[i]);
+                }
 			}
 		}
 		
@@ -1140,10 +1169,21 @@ namespace rsgis { namespace img {
 		double outDiff = 0;
 		for(int i = 0; i < numBands; i++)
 		{
-			if((boost::math::isnan)(bandValues[i]))
+			if(boost::math::isnan(bandValues[i]))
 			{
-				output[i] = outMin[i];
+                if(this->useNoData)
+                {
+                    output[i] = this->outNoData;
+                }
+                else
+                {
+                    output[i] = outMin[i];
+                }
 			}
+            else if(this->outNoData && (bandValues[i] == this->inNoData))
+            {
+                output[i] = this->outNoData;
+            }
 			else if(bandValues[i] < imageMin[i])
 			{
 				output[i] = outMin[i];

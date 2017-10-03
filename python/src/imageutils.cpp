@@ -111,22 +111,22 @@ static std::vector<int> ExtractIntVectorFromSequence(PyObject *sequence)
     return intVals;
 }
 
-static PyObject *ImageUtils_StretchImage(PyObject *self, PyObject *args)
+static PyObject *ImageUtils_StretchImage(PyObject *self, PyObject *args, PyObject *keywds)
 {
+    static char *kwlist[] = {"inputimage", "outputimage", "saveoutstats", "outstatsfile", "ignorezeros", "onepasssd", "gdalformat", "datatype", "stretchtype", "stretchparam", NULL};
     const char *pszInputImage, *pszOutputFile, *pszGDALFormat, *pszOutStatsFile;
     int saveOutStats, ignoreZeros, onePassSD;
     int nOutDataType, nStretchType;
-    float fStretchParam = 2;
-    if( !PyArg_ParseTuple(args, "ssisiisii|f:stretchImage", &pszInputImage, &pszOutputFile, &saveOutStats, 
-                                &pszOutStatsFile, &ignoreZeros, &onePassSD, &pszGDALFormat, &nOutDataType, &nStretchType,
-                                &fStretchParam))
+    float fStretchParam = 2.0;
+    
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssisiisii|f:stretchImage", kwlist, &pszInputImage, &pszOutputFile, &saveOutStats, &pszOutStatsFile, &ignoreZeros, &onePassSD, &pszGDALFormat, &nOutDataType, &nStretchType, &fStretchParam))
+    {
         return NULL;
+    }
 
     try
     {
-        rsgis::cmds::executeStretchImage(pszInputImage, pszOutputFile, saveOutStats, pszOutStatsFile, ignoreZeros,
-                    onePassSD, pszGDALFormat, (rsgis::RSGISLibDataType)nOutDataType, 
-                    (rsgis::cmds::RSGISStretches)nStretchType, fStretchParam);
+        rsgis::cmds::executeStretchImage(pszInputImage, pszOutputFile, saveOutStats, pszOutStatsFile, ignoreZeros, onePassSD, pszGDALFormat, (rsgis::RSGISLibDataType)nOutDataType, (rsgis::cmds::RSGISStretches)nStretchType, fStretchParam);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -137,21 +137,22 @@ static PyObject *ImageUtils_StretchImage(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-static PyObject *ImageUtils_StretchImageWithStats(PyObject *self, PyObject *args)
+static PyObject *ImageUtils_StretchImageWithStats(PyObject *self, PyObject *args, PyObject *keywds)
 {
+    static char *kwlist[] = {"inputimage", "outputimage", "instatsfile", "gdalformat", "datatype", "stretchtype", "stretchparam", NULL};
+    
     const char *pszInputImage, *pszOutputFile, *pszGDALFormat, *pszInStatsFile;
     int nOutDataType, nStretchType;
     float fStretchParam = 2.0;
-    if( !PyArg_ParseTuple(args, "ssssii|f:stretchImageWithStats", &pszInputImage, &pszOutputFile, 
-                                &pszInStatsFile, &pszGDALFormat, &nOutDataType, &nStretchType,
-                                &fStretchParam))
+    
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssii|f:stretchImageWithStats", kwlist, &pszInputImage, &pszOutputFile, &pszInStatsFile, &pszGDALFormat, &nOutDataType, &nStretchType, &fStretchParam))
+    {
         return NULL;
+    }
 
     try
     {
-        rsgis::cmds::executeStretchImageWithStats(pszInputImage, pszOutputFile, pszInStatsFile,
-                    pszGDALFormat, (rsgis::RSGISLibDataType)nOutDataType, 
-                    (rsgis::cmds::RSGISStretches)nStretchType, fStretchParam);
+        rsgis::cmds::executeStretchImageWithStats(pszInputImage, pszOutputFile, pszInStatsFile, pszGDALFormat, (rsgis::RSGISLibDataType)nOutDataType, (rsgis::cmds::RSGISStretches)nStretchType, fStretchParam);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -159,6 +160,35 @@ static PyObject *ImageUtils_StretchImageWithStats(PyObject *self, PyObject *args
         return NULL;
     }
 
+    Py_RETURN_NONE;
+}
+
+static PyObject *ImageUtils_NormaliseImagePxlVals(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    static char *kwlist[] = {"inputimage", "outputimage", "gdalformat", "datatype", "innodataval", "outnodataval", "outmin", "outmax", "stretchtype", "stretchparam", NULL};
+    const char *pszInputImage, *pszOutputFile, *pszGDALFormat;
+    int nOutDataType, nStretchType;
+    float fStretchParam = 2.0;
+    float inNoDataVal = 0;
+    float outNoDataVal = -1;
+    float outMinVal = 0;
+    float outMaxVal = 1;
+    
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssiffffi|f:normaliseImagePxlVals", kwlist, &pszInputImage, &pszOutputFile, &pszGDALFormat, &nOutDataType, &inNoDataVal, &outNoDataVal, &outMinVal, &outMaxVal, &nStretchType, &fStretchParam))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeNormaliseImgPxlVals(std::string(pszInputImage), std::string(pszOutputFile), std::string(pszGDALFormat), (rsgis::RSGISLibDataType)nOutDataType, inNoDataVal, outNoDataVal, outMinVal, outMaxVal, (rsgis::cmds::RSGISStretches)nStretchType, fStretchParam);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
     Py_RETURN_NONE;
 }
 
@@ -168,8 +198,7 @@ static PyObject *ImageUtils_maskImage(PyObject *self, PyObject *args)
     int nDataType;
     float outValue;
     PyObject *maskValueObj;
-    if( !PyArg_ParseTuple(args, "ssssifO:maskImage", &pszInputImage, &pszImageMask, &pszOutputImage,
-                                &pszGDALFormat, &nDataType, &outValue, &maskValueObj ))
+    if( !PyArg_ParseTuple(args, "ssssifO:maskImage", &pszInputImage, &pszImageMask, &pszOutputImage, &pszGDALFormat, &nDataType, &outValue, &maskValueObj ))
     {
         return NULL;
     }
@@ -209,8 +238,7 @@ static PyObject *ImageUtils_maskImage(PyObject *self, PyObject *args)
     
     try
     {
-        rsgis::cmds::executeMaskImage(pszInputImage, pszImageMask, pszOutputImage, pszGDALFormat, 
-                            (rsgis::RSGISLibDataType)nDataType, outValue, maskValues);
+        rsgis::cmds::executeMaskImage(pszInputImage, pszImageMask, pszOutputImage, pszGDALFormat, (rsgis::RSGISLibDataType)nDataType, outValue, maskValues);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -1738,9 +1766,9 @@ static PyObject *ImageUtils_CreateRefImageCompositeImg(PyObject *self, PyObject 
 
 // Our list of functions in this module
 static PyMethodDef ImageUtilsMethods[] = {
-    {"stretchImage", ImageUtils_StretchImage, METH_VARARGS, 
+{"stretchImage", (PyCFunction)ImageUtils_StretchImage, METH_VARARGS | METH_KEYWORDS,
 "rsgislib.imageutils.stretchImage(inputimage, outputimage, saveoutstats, outstatsfile, ignorezeros, onepasssd, gdalformat, datatype, stretchtype, stretchparam)\n"
-"Stretches (scales) pixel values to a range of 0 - 255, normally for display although also used for normalisation.\n"
+"Stretches (scales) pixel values to a range of 0 - 255, which is typically for visualisation but the function can also be used for normalisation.\n"
 "\n"
 "Where:\n"
 "\n"
@@ -1772,9 +1800,10 @@ static PyMethodDef ImageUtilsMethods[] = {
 "   imageutils.stretchImage(inputImage, outputImage, False, '', True, False, gdalformat, datatype, imageutils.STRETCH_LINEARSTDDEV, 2)\n"
 "\n"},
 
-    {"stretchImageWithStats", ImageUtils_StretchImageWithStats, METH_VARARGS, 
-"rsgislib.imageutils.stretchImageWithStats(inputimage, outputimage, instatsfile, gdalformat, outtype, stretchtype, stretchparam)\n"
-"Stretches (scales) pixel values to a range of 0 - 255, normally for display although also used for normalisation. Uses pre-calculated statistics.\n"
+{"stretchImageWithStats", (PyCFunction)ImageUtils_StretchImageWithStats, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.stretchImageWithStats(inputimage, outputimage, instatsfile, gdalformat, datatype, stretchtype, stretchparam)\n"
+"Stretches (scales) pixel values to a range of 0 - 255, which is typically for visualisation but the function can also be used for normalisation.\n"
+"This function uses pre-calculated statistics - normally from rsgislib.imageutils.stretchImage.\n"
 "\n"
 "Where:\n"
 "\n"
@@ -1802,8 +1831,53 @@ static PyMethodDef ImageUtilsMethods[] = {
 "   inputImageStats = './Rasters/injune_p142_casi_sub_utm_stats.txt'\n"
 "   outputImage = './TestOutputs/injune_p142_casi_sub_utm_2sd.kea'\n"
 "   gdalformat = 'KEA'\n"
-"   datatype = rsgislib.TYPE_8INT\n"
+"   datatype = rsgislib.TYPE_8UINT\n"
 "   imageutils.stretchImageWithStats(inputImage, outputImage, inputImageStats, True, False, gdalformat, datatype, imageutils.STRETCH_LINEARSTDDEV, 2)\n"
+"\n"
+"\n"},
+
+{"normaliseImagePxlVals", (PyCFunction)ImageUtils_NormaliseImagePxlVals, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.normaliseImagePxlVals(inputimage=string, outputimage=string, gdalformat=string, datatype=rsgislib.TYPE_*, innodataval=float, outnodataval=float, outmin=float, outmax=float, stretchtype=imageutils.STRETCH_*, stretchparam=float)\n"
+"Normalises the image pixel values to a range of outmin to outmax (default 0-1) where the no data value is specified by the user.\n"
+"This function is largely similar to rsgislib.imageutils.stretchImage but deals with no data values correctly and intended\n"
+"for data processing normalisation rather than visualisation.\n"
+"\n"
+"Where:\n"
+"\n"
+"* inputImage is a string containing the name of the input file\n"
+"* outputImage is a string containing the name of the output file\n"
+"* gdalformat is a string providing the output gdalformat of the tiles (e.g., KEA).\n"
+"* datatype is a rsgislib.TYPE_* value providing the output data type.\n"
+"* innodataval is a float with the input image no data value. (Default = 0)\n"
+"* outnodataval is a float with the no data value used within the output image. (Default = -1)\n"
+"* outmin is a float which specifies the output minimum pixel value (Default = 0)\n"
+"* outmax is a float which specifies the output maximum pixel value (Default = 1)\n"
+"* stretchtype is a STRETCH_* value providing the type of stretch, options are:\n"
+"   * imageutils.STRETCH_LINEARMINMAX - Stretches between min and max.\n"
+"   * imageutils.STRETCH_LINEARPERCENT - Stretches between percentage of image range. Parameter defines percent.\n"
+"   * imageutils.STRETCH_LINEARSTDDEV - Stretches between mean - sd to mean + sd. Parameter defines number of standard deviations.\n"
+"   * imageutils.STRETCH_EXPONENTIAL - Exponential stretch between mean - 2*sd to mean + 2*sd. No parameter.\n"
+"   * imageutils.STRETCH_LOGARITHMIC - Logarithmic stretch between mean - 2*sd to mean + 2*sd. No parameter.\n"
+"   * imageutils.STRETCH_POWERLAW - Power law stretch between mean - 2*sd to mean + 2*sd. Parameter defines power.\n"
+"* stretchparam is a float, providing the input parameter to the stretch (if required; Default=2.0).\n"
+"\n"
+"Example::\n"
+"\n"
+"    import rsgislib\n"
+"    import rsgislib.imageutils\n"
+"\n"
+"    inImg = './LS5TM_19851990Comp_lat7lon3896_r65p166_stdsref.kea'\n"
+"
+"    outImg = 'LS5TM_19851990Comp_lat7lon3896_r65p166_stdsref_NORM_0-255.kea'\n"
+"    rsgislib.imageutils.normaliseImagePxlVals(inImg, outImg, 'KEA', rsgislib.TYPE_8UINT, innodataval=0, outnodataval=0, outmin=0, outmax=255,\n"
+"                                              stretchtype=rsgislib.imageutils.STRETCH_LINEARSTDDEV, stretchparam=2)\n"
+"    rsgislib.imageutils.popImageStats(outImg, usenodataval=True, nodataval=0, calcpyramids=True)\n"
+"\n"
+"    outImg = 'LS5TM_19851990Comp_lat7lon3896_r65p166_stdsref_NORM_0-1.kea'\n"
+"    rsgislib.imageutils.normaliseImagePxlVals(inImg, outImg, 'KEA', rsgislib.TYPE_32FLOAT, innodataval=0, outnodataval=0, outmin=0, outmax=1,\n"
+"                                              stretchtype=rsgislib.imageutils.STRETCH_LINEARSTDDEV, stretchparam=2)\n"
+"    rsgislib.imageutils.popImageStats(outImg, usenodataval=True, nodataval=0, calcpyramids=True)\n"
+"\n"
 "\n"},
 
 {"maskImage", ImageUtils_maskImage, METH_VARARGS,
@@ -1833,7 +1907,7 @@ static PyMethodDef ImageUtilsMethods[] = {
 "   imageutils.popImageStats(outImg, True, 0.0, True)\n"
 "\n"},
 
-    {"createTiles", ImageUtils_createTiles, METH_VARARGS,
+{"createTiles", ImageUtils_createTiles, METH_VARARGS,
 "rsgislib.imageutils.createTiles(inputimage, baseimage, width, height, overlap, offsettiling, gdalformat, datatype, ext)\n"
 "Create tiles from a larger image, useful for splitting a large image into multiple smaller ones for processing.\n"
 "\n"
@@ -1869,7 +1943,7 @@ static PyMethodDef ImageUtilsMethods[] = {
 "   tiles = imageutils.createTiles(inputImage, outBase, width, height, overlap, offsettiling, gdalformat, datatype, ext)\n"
 "\n"},
     
-    {"createImageMosaic", ImageUtils_createImageMosaic, METH_VARARGS,
+{"createImageMosaic", ImageUtils_createImageMosaic, METH_VARARGS,
 "rsgislib.imageutils.createImageMosaic(inputimagelist, outputimage, backgroundVal, skipVal, skipBand, overlapBehaviour, gdalformat, type)\n"
 "Create mosaic from list of input images.\n"
 "\n"

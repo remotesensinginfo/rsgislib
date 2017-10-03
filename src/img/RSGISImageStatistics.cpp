@@ -29,13 +29,13 @@ namespace rsgis{namespace img{
 		
 	}
 	
-	void RSGISImageStatistics::calcImageStatistics(GDALDataset **datasets, int numDS, ImageStats **stats, int numInputBands, bool stddev, bool ignoreZeros, bool onePassSD)throw(RSGISImageCalcException,RSGISImageBandException)
+	void RSGISImageStatistics::calcImageStatistics(GDALDataset **datasets, int numDS, ImageStats **stats, int numInputBands, bool stddev, bool useNoData, float noDataVal, bool onePassSD)throw(RSGISImageCalcException,RSGISImageBandException)
 	{
 		RSGISCalcImageStatistics *calcImageStats = NULL;
 		RSGISCalcImage *calcImg = NULL;
 		try
 		{
-			calcImageStats = new RSGISCalcImageStatistics(0, numInputBands, false, NULL, ignoreZeros, onePassSD);
+			calcImageStats = new RSGISCalcImageStatistics(0, numInputBands, false, NULL, useNoData, noDataVal, onePassSD);
 			calcImg = new RSGISCalcImage(calcImageStats, "", true);
 			
             if(stddev && onePassSD){calcImageStats->calcStdDev();}
@@ -85,13 +85,13 @@ namespace rsgis{namespace img{
 		}
 	}
 	
-	void RSGISImageStatistics::calcImageStatistics(GDALDataset **datasets, int numDS, ImageStats **stats, int numInputBands, bool stddev, rsgis::math::RSGISMathFunction *func, bool ignoreZeros, bool onePassSD)throw(RSGISImageCalcException,RSGISImageBandException)
+	void RSGISImageStatistics::calcImageStatistics(GDALDataset **datasets, int numDS, ImageStats **stats, int numInputBands, bool stddev, rsgis::math::RSGISMathFunction *func, bool useNoData, float noDataVal, bool onePassSD)throw(RSGISImageCalcException,RSGISImageBandException)
 	{
 		RSGISCalcImageStatistics *calcImageStats = NULL;
 		RSGISCalcImage *calcImg = NULL;
 		try
 		{
-			calcImageStats = new RSGISCalcImageStatistics(0, numInputBands, false, func, ignoreZeros);
+			calcImageStats = new RSGISCalcImageStatistics(0, numInputBands, false, func, useNoData, noDataVal);
 			calcImg = new RSGISCalcImage(calcImageStats, "", true);
             if(stddev && onePassSD){calcImageStats->calcStdDev();}
             
@@ -140,13 +140,13 @@ namespace rsgis{namespace img{
 		}
 	}
     
-    void RSGISImageStatistics::calcImageStatistics(GDALDataset **datasets, int numDS, ImageStats *stats, bool stddev, bool ignoreZeros, bool onePassSD)throw(RSGISImageCalcException,RSGISImageBandException)
+    void RSGISImageStatistics::calcImageStatistics(GDALDataset **datasets, int numDS, ImageStats *stats, bool stddev, bool useNoData, float noDataVal, bool onePassSD)throw(RSGISImageCalcException,RSGISImageBandException)
 	{
 		RSGISCalcImageStatisticsAllBands *calcImageStats = NULL;
 		RSGISCalcImage *calcImg = NULL;
 		try
 		{
-			calcImageStats = new RSGISCalcImageStatisticsAllBands(0, false, NULL, ignoreZeros);
+			calcImageStats = new RSGISCalcImageStatisticsAllBands(0, false, NULL, useNoData, noDataVal);
 			calcImg = new RSGISCalcImage(calcImageStats, "", true);
             if(stddev && onePassSD){calcImageStats->calcStdDev();}
             
@@ -405,9 +405,10 @@ namespace rsgis{namespace img{
     }
     
     
-	RSGISCalcImageStatistics::RSGISCalcImageStatistics(int numberOutBands, int numInputBands, bool calcSD, rsgis::math::RSGISMathFunction *func, bool ignoreZeros, bool onePassSD) : RSGISCalcImageValue(numberOutBands)
+	RSGISCalcImageStatistics::RSGISCalcImageStatistics(int numberOutBands, int numInputBands, bool calcSD, rsgis::math::RSGISMathFunction *func, bool useNoData, float noDataVal, bool onePassSD) : RSGISCalcImageValue(numberOutBands)
 	{
-        this->ignoreZeros = ignoreZeros;
+        this->useNoData = useNoData;
+        this->noDataVal = noDataVal;
         this->onePassSD = onePassSD;
 		this->calcSD = calcSD;
 		this->numInputBands = numInputBands;
@@ -445,7 +446,7 @@ namespace rsgis{namespace img{
 		}
 		
 		bool foundNan = false;
-        bool allBandsZero = true;
+        bool allBandsNoData = true;
 		
 		for(int i = 0; i < numBands; i++)
 		{
@@ -453,15 +454,15 @@ namespace rsgis{namespace img{
 			{
 				foundNan = true;
 			}
-            if(bandValues[i] != 0)
+            if(bandValues[i] != this->noDataVal)
             {
-                allBandsZero = false;
+                allBandsNoData = false;
             }
 		}
         
         if(!foundNan)
         {
-            if(!(ignoreZeros & allBandsZero))
+            if(!(this->useNoData & allBandsNoData))
             {
                 if(func != NULL)
                 {
@@ -479,7 +480,7 @@ namespace rsgis{namespace img{
                     {
                         if(firstMean[i])
                         {
-                            if(!(ignoreZeros & (bandValues[i] == 0)))
+                            if(!(this->useNoData & (bandValues[i] == this->noDataVal)))
                             {
                                 meanSum[i] = bandValues[i];
                                 min[i] = bandValues[i];
@@ -490,7 +491,7 @@ namespace rsgis{namespace img{
                         }
                         else
                         {
-                            if(!(ignoreZeros & (bandValues[i] == 0)))
+                            if(!(this->useNoData & (bandValues[i] == this->noDataVal)))
                             {
                                 meanSum[i] = meanSum[i] + bandValues[i];
                                 if(bandValues[i] < min[i])
@@ -523,7 +524,7 @@ namespace rsgis{namespace img{
                     {
                         if(firstSD[i])
                         {
-                            if(!(ignoreZeros & (bandValues[i] == 0)))
+                            if(!(this->useNoData & (bandValues[i] == this->noDataVal)))
                             {
                                 mean[i] = meanSum[i]/n[i];
                                 diffZ = mean[i] - bandValues[i];
@@ -533,7 +534,7 @@ namespace rsgis{namespace img{
                         }
                         else
                         {
-                            if(!(ignoreZeros & (bandValues[i] == 0)))
+                            if(!(this->useNoData & (bandValues[i] == this->noDataVal)))
                             {
                                 diffZ = mean[i] - bandValues[i];
                                 sumDiffZ[i] = sumDiffZ[i] + (diffZ * diffZ);
@@ -793,9 +794,10 @@ namespace rsgis{namespace img{
     
     
     
-    RSGISCalcImageStatisticsAllBands::RSGISCalcImageStatisticsAllBands(int numberOutBands, bool calcSD, rsgis::math::RSGISMathFunction *func, bool ignoreZeros) : RSGISCalcImageValue(numberOutBands)
+    RSGISCalcImageStatisticsAllBands::RSGISCalcImageStatisticsAllBands(int numberOutBands, bool calcSD, rsgis::math::RSGISMathFunction *func, bool useNoData, float noDataVal) : RSGISCalcImageValue(numberOutBands)
 	{
-        this->ignoreZeros = ignoreZeros;
+        this->useNoData = useNoData;
+        this->noDataVal = noDataVal;
 		this->calcSD = calcSD;
 		this->calcMean = false;
 		this->mean = 0;
@@ -814,7 +816,7 @@ namespace rsgis{namespace img{
 	{
 		
 		bool foundNan = false;
-        bool allBandsZero = true;
+        bool allBandsNoData = true;
 		
 		for(int i = 0; i < numBands; i++)
 		{
@@ -822,15 +824,15 @@ namespace rsgis{namespace img{
 			{
 				foundNan = true;
 			}
-            if(bandValues[i] != 0)
+            if(bandValues[i] != this->noDataVal)
             {
-                allBandsZero = false;
+                allBandsNoData = false;
             }
 		}
 		
         if(!foundNan)
         {
-            if(!(ignoreZeros & allBandsZero))
+            if(!(this->useNoData & allBandsNoData))
             {
                 if(func != NULL)
                 {
@@ -852,7 +854,7 @@ namespace rsgis{namespace img{
                     {
                         if(firstSD)
                         {
-                            if(!(ignoreZeros & (bandValues[i] == 0)))
+                            if(!(this->useNoData & (bandValues[i] == this->noDataVal)))
                             {
                                 mean = meanSum/n;
                                 diffZ = mean - bandValues[i];
@@ -862,7 +864,7 @@ namespace rsgis{namespace img{
                         }
                         else
                         {
-                            if(!(ignoreZeros & (bandValues[i] == 0)))
+                            if(!(this->useNoData & (bandValues[i] == this->noDataVal)))
                             {
                                 diffZ = mean - bandValues[i];
                                 sumDiffZ = sumDiffZ + (diffZ * diffZ);
@@ -878,7 +880,7 @@ namespace rsgis{namespace img{
                     {
                         if(firstMean)
                         {
-                            if(!(ignoreZeros & (bandValues[i] == 0)))
+                            if(!(this->useNoData & (bandValues[i] == this->noDataVal)))
                             {
                                 meanSum = bandValues[i];
                                 min = bandValues[i];
@@ -889,7 +891,7 @@ namespace rsgis{namespace img{
                         }
                         else
                         {
-                            if(!(ignoreZeros & (bandValues[i] == 0)))
+                            if(!(this->useNoData & (bandValues[i] == this->noDataVal)))
                             {
                                 meanSum = meanSum + bandValues[i];
                                 if(bandValues[i] < min)

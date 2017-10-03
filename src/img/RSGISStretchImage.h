@@ -63,26 +63,30 @@ namespace rsgis { namespace img {
     struct DllExport BandSpecThresholdStats
     {
         BandSpecThresholdStats(){};
-        BandSpecThresholdStats(size_t band, float imgMin, float imgMax, float origMin, float origMax)
+        BandSpecThresholdStats(size_t band, float imgMin, float imgMax, float origMin, float origMax, float inNoDataVal=0, float outNoDataVal=0)
         {
             this->band = band;
             this->imgMin = imgMin;
             this->imgMax = imgMax;
             this->origMin = origMin;
             this->origMax = origMax;
+            this->inNoDataVal = inNoDataVal;
+            this->outNoDataVal = outNoDataVal;
         }
         size_t band;
         float imgMin;
         float imgMax;
         float origMin;
         float origMax;
+        float inNoDataVal;
+        float outNoDataVal;
     };
     
 
 	class DllExport RSGISStretchImage
 	{
 	public:
-		RSGISStretchImage(GDALDataset *inputImage, std::string outputImage, bool outStats, std::string outStatsFile, bool ignoreZeros, bool onePassSD, std::string imageFormat, GDALDataType outDataType);
+		RSGISStretchImage(GDALDataset *inputImage, std::string outputImage, bool outStats, std::string outStatsFile, bool onePassSD, std::string imageFormat, GDALDataType outDataType, float outMinVal, float outMaxVal, bool useNoData, double inNoData, double outNoData);
 		void executeLinearMinMaxStretch() throw(RSGISImageCalcException);
 		void executeLinearPercentStretch(float percent) throw(RSGISImageCalcException);
 		void executeLinearStdDevStretch(float stddev) throw(RSGISImageCalcException);
@@ -156,16 +160,20 @@ namespace rsgis { namespace img {
         std::string outputImage;
         bool outStats;
         std::string outStatsFile;
-        bool ignoreZeros;
         bool onePassSD;
         std::string imageFormat;
         GDALDataType outDataType;
+        float outMinVal;
+        float outMaxVal;
+        bool useNoData;
+        double inNoData;
+        double outNoData;
 	};
     
     class DllExport RSGISStretchImageWithStats
 	{
 	public:
-		RSGISStretchImageWithStats(GDALDataset *inputImage, std::string outputImage, std::string inStatsFile, std::string imageFormat, GDALDataType outDataType);
+		RSGISStretchImageWithStats(GDALDataset *inputImage, std::string outputImage, std::string inStatsFile, std::string imageFormat, GDALDataType outDataType, float outMinVal, float outMaxVal, bool useNoData, double inNoData, double outNoData);
 		void executeLinearMinMaxStretch() throw(RSGISImageCalcException);
 		void executeHistogramStretch() throw(RSGISImageCalcException);
 		void executeExponentialStretch() throw(RSGISImageCalcException);
@@ -238,6 +246,11 @@ namespace rsgis { namespace img {
         std::string inStatsFile;
         std::string imageFormat;
         GDALDataType outDataType;
+        float outMinVal;
+        float outMaxVal;
+        bool useNoData;
+        double inNoData;
+        double outNoData;
 	};
 
 	class DllExport RSGISExponentStretchFunction : public rsgis::math::RSGISMathFunction
@@ -280,7 +293,7 @@ namespace rsgis { namespace img {
 	class DllExport RSGISLinearStretchImage : public RSGISCalcImageValue
 	{
 	public:
-		RSGISLinearStretchImage(int numberOutBands, double *imageMaxIn, double *imageMinIn, double *outMaxIn, double *outMinIn);
+		RSGISLinearStretchImage(int numberOutBands, double *imageMaxIn, double *imageMinIn, double *outMaxIn, double *outMinIn, bool useNoData, double inNoData, double outNoData);
 		void calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException);
 		void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
         void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
@@ -297,13 +310,16 @@ namespace rsgis { namespace img {
 		double *imageMin;
 		double *outMax;
 		double *outMin;
+        bool useNoData;
+        double inNoData;
+        double outNoData;
 	};
 
 
 	class DllExport RSGISFuncLinearStretchImage : public RSGISCalcImageValue
 	{
 	public:
-		RSGISFuncLinearStretchImage(int numberOutBands, double *imageMaxIn, double *imageMinIn, double *outMaxIn, double *outMinIn, rsgis::math::RSGISMathFunction *func);
+		RSGISFuncLinearStretchImage(int numberOutBands, double *imageMaxIn, double *imageMinIn, double *outMaxIn, double *outMinIn, bool useNoData, double inNoData, double outNoData, rsgis::math::RSGISMathFunction *func);
 		void calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException);
 		void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
         void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
@@ -320,6 +336,9 @@ namespace rsgis { namespace img {
 		double *imageMin;
 		double *outMax;
 		double *outMin;
+        bool useNoData;
+        double inNoData;
+        double outNoData;
 		rsgis::math::RSGISMathFunction *func;
 	};
 
