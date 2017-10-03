@@ -72,9 +72,9 @@ namespace rsgis{namespace img{
     {
     public: 
         RSGISImageStatistics();
-        void calcImageStatistics(GDALDataset **datasets, int numDS, ImageStats **stats, int numInputBands, bool stddev, bool ignoreZeros=false, bool onePassSD=false)throw(RSGISImageCalcException,RSGISImageBandException);
-        void calcImageStatistics(GDALDataset **datasets, int numDS, ImageStats **stats, int numInputBands, bool stddev, rsgis::math::RSGISMathFunction *func, bool ignoreZeros=false, bool onePassSD=false)throw(RSGISImageCalcException,RSGISImageBandException);
-        void calcImageStatistics(GDALDataset **datasets, int numDS, ImageStats *stats, bool stddev, bool ignoreZeros=false, bool onePassSD=false)throw(RSGISImageCalcException,RSGISImageBandException);
+        void calcImageStatistics(GDALDataset **datasets, int numDS, ImageStats **stats, int numInputBands, bool stddev, bool useNoData=false, float noDataVal=0.0, bool onePassSD=false)throw(RSGISImageCalcException,RSGISImageBandException);
+        void calcImageStatistics(GDALDataset **datasets, int numDS, ImageStats **stats, int numInputBands, bool stddev, rsgis::math::RSGISMathFunction *func, bool useNoData=false, float noDataVal=0.0, bool onePassSD=false)throw(RSGISImageCalcException,RSGISImageBandException);
+        void calcImageStatistics(GDALDataset **datasets, int numDS, ImageStats *stats, bool stddev, bool useNoData=false, float noDataVal=0.0, bool onePassSD=false)throw(RSGISImageCalcException,RSGISImageBandException);
         void calcImageStatistics(GDALDataset **datasets, int numDS, ImageStats **stats, int numInputBands, bool stddev, bool noDataSpecified, float noDataVal, bool onePassSD, double xMin, double xMax, double yMin, double yMax)throw(RSGISImageCalcException,RSGISImageBandException);
         void calcImageHistogram(GDALDataset **datasets, int numDS, unsigned int imgBand, unsigned int numBins, float *binRanges, unsigned int *binCounts, bool noDataSpecified, float noDataVal, double xMin, double xMax, double yMin, double yMax)throw(RSGISImageCalcException,RSGISImageBandException);
         void calcImageStatisticsMask(GDALDataset *dataset, GDALDataset *imgMask, long maskVal, ImageStats **stats, double *noDataVals, bool useNoData, int numInputBands, bool stddev, bool onePassSD=false)throw(RSGISImageCalcException,RSGISImageBandException);
@@ -85,7 +85,7 @@ namespace rsgis{namespace img{
 	class DllExport RSGISCalcImageStatistics : public RSGISCalcImageValue
     {
     public: 
-        RSGISCalcImageStatistics(int numberOutBands, int numInputBands, bool calcSD, rsgis::math::RSGISMathFunction *func, bool ignoreZeros, bool onePassSD = false);
+        RSGISCalcImageStatistics(int numberOutBands, int numInputBands, bool calcSD, rsgis::math::RSGISMathFunction *func, bool useNoData=false, float noDataVal=0.0, bool onePassSD = false);
         void calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
         void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
         void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
@@ -100,7 +100,8 @@ namespace rsgis{namespace img{
         void calcStdDev();
         ~RSGISCalcImageStatistics();
     protected:
-        bool ignoreZeros;
+        bool useNoData;
+        float noDataVal;
         bool onePassSD;
         bool calcSD;
         int numInputBands;
@@ -158,7 +159,7 @@ namespace rsgis{namespace img{
     class DllExport RSGISCalcImageStatisticsAllBands : public RSGISCalcImageValue
     {
     public: 
-        RSGISCalcImageStatisticsAllBands(int numberOutBands, bool calcSD, rsgis::math::RSGISMathFunction *func, bool ignoreZeros);
+        RSGISCalcImageStatisticsAllBands(int numberOutBands, bool calcSD, rsgis::math::RSGISMathFunction *func, bool useNoData=false, float noDataVal=0.0);
         void calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
         void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException);
         void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
@@ -173,7 +174,8 @@ namespace rsgis{namespace img{
         void calcStdDev();
         ~RSGISCalcImageStatisticsAllBands();
     protected:
-        bool ignoreZeros;
+        bool useNoData;
+        float noDataVal;
         bool calcSD;
         bool firstMean;
         bool firstSD;

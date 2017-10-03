@@ -75,12 +75,15 @@ Geometry
 
 Image Indices
 -------------
-.. autofunction:: rsgislib.imagecalc.calcNDVI
-.. autofunction:: rsgislib.imagecalc.calcWBI
-.. autofunction:: rsgislib.imagecalc.calcNDWI
-.. autofunction:: rsgislib.imagecalc.calcGNDWI
-.. autofunction:: rsgislib.imagecalc.calcGMNDWI
-.. autofunction:: rsgislib.imagecalc.calcWhiteness
+.. autofunction:: rsgislib.imagecalc.calcindices.calcNDVI
+.. autofunction:: rsgislib.imagecalc.calcindices.calcWBI
+.. autofunction:: rsgislib.imagecalc.calcindices.calcNDWI
+.. autofunction:: rsgislib.imagecalc.calcindices.calcGNDWI
+.. autofunction:: rsgislib.imagecalc.calcindices.calcGMNDWI
+.. autofunction:: rsgislib.imagecalc.calcindices.calcWhiteness
+.. autofunction:: rsgislib.imagecalc.calcindices.calcBrightness
+.. autofunction:: rsgislib.imagecalc.calcindices.calcBrightnessScaled
+.. autofunction:: rsgislib.imagecalc.calcindices.calcCTVI
 
 Other
 ------

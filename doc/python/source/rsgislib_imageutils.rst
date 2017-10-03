@@ -44,7 +44,7 @@ Visualisation / Normalisation
 
 .. autofunction:: rsgislib.imageutils.stretchImage
 .. autofunction:: rsgislib.imageutils.stretchImageWithStats
-
+.. autofunction:: rsgislib.imageutils.normaliseImagePxlVals
 
 Subset / Mask
 --------------

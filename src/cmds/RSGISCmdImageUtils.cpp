@@ -69,8 +69,18 @@ namespace rsgis{ namespace cmds {
                 std::string message = std::string("Could not open image ") + inputImage;
                 throw RSGISImageException(message.c_str());
             }
+            
+            bool useNoData = false;
+            double inNoData = 0.0;
+            double outNoData = 0.0;
+            if(ignoreZeros)
+            {
+                useNoData = true;
+                inNoData = 0.0;
+                outNoData = 0.0;
+            }
 
-            rsgis::img::RSGISStretchImage stretchImg = rsgis::img::RSGISStretchImage(inDataset, outputImage, saveOutStats, outStatsFile, ignoreZeros, onePassSD, gdalFormat, RSGIS_to_GDAL_Type(outDataType));
+            rsgis::img::RSGISStretchImage stretchImg = rsgis::img::RSGISStretchImage(inDataset, outputImage, saveOutStats, outStatsFile, onePassSD, gdalFormat, RSGIS_to_GDAL_Type(outDataType), 0, 255, useNoData, inNoData, outNoData);
             if(stretchType == linearMinMax)
             {
                 stretchImg.executeLinearMinMaxStretch();
@@ -129,7 +139,7 @@ namespace rsgis{ namespace cmds {
                 throw RSGISImageException(message.c_str());
             }
 
-            rsgis::img::RSGISStretchImageWithStats stretchImg = rsgis::img::RSGISStretchImageWithStats(inDataset, outputImage, inStatsFile, gdalFormat, RSGIS_to_GDAL_Type(outDataType));
+            rsgis::img::RSGISStretchImageWithStats stretchImg = rsgis::img::RSGISStretchImageWithStats(inDataset, outputImage, inStatsFile, gdalFormat, RSGIS_to_GDAL_Type(outDataType), 0, 255, false, 0.0, 0.0);
             if(stretchType == linearMinMax)
             {
                 stretchImg.executeLinearMinMaxStretch();
@@ -152,9 +162,68 @@ namespace rsgis{ namespace cmds {
             }
             else
             {
-                throw RSGISException("Stretch is not recognised.");
+                throw RSGISException("Stretch is not recognised - when the stats are specified in a text file on all stretches are available (or make sense) as the stats file contains all the info.");
             }
 
+            GDALClose(inDataset);
+        }
+        catch(RSGISException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+    
+    void executeNormaliseImgPxlVals(std::string inputImage, std::string outputImage, std::string gdalFormat, RSGISLibDataType outDataType, float inNoDataVal, float outNoDataVal, float outMinVal, float outMaxVal, RSGISStretches stretchType, float stretchParam)throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            
+            GDALDataset *inDataset = (GDALDataset *) GDALOpenShared(inputImage.c_str(), GA_ReadOnly);
+            if(inDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw RSGISImageException(message.c_str());
+            }
+            
+            rsgis::img::RSGISStretchImage stretchImg = rsgis::img::RSGISStretchImage(inDataset, outputImage, false, "", false, gdalFormat, RSGIS_to_GDAL_Type(outDataType), outMinVal, outMaxVal, true, inNoDataVal, outNoDataVal);
+            if(stretchType == linearMinMax)
+            {
+                stretchImg.executeLinearMinMaxStretch();
+            }
+            else if(stretchType == linearPercent)
+            {
+                stretchImg.executeLinearPercentStretch(stretchParam);
+            }
+            else if(stretchType == linearStdDev)
+            {
+                stretchImg.executeLinearStdDevStretch(stretchParam);
+            }
+            else if(stretchType == histogram)
+            {
+                stretchImg.executeHistogramStretch();
+            }
+            else if(stretchType == exponential)
+            {
+                stretchImg.executeExponentialStretch();
+            }
+            else if(stretchType == logarithmic)
+            {
+                stretchImg.executeLogrithmicStretch();
+            }
+            else if(stretchType == powerLaw)
+            {
+                stretchImg.executePowerLawStretch(stretchParam);
+            }
+            else
+            {
+                throw RSGISException("Stretch is not recognised.");
+            }
+            
             GDALClose(inDataset);
         }
         catch(RSGISException& e)
