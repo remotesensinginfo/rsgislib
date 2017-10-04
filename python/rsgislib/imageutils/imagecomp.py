@@ -46,7 +46,20 @@ import shutil
 import osgeo.gdal
 import rios.rat
 
-def createMaxNDVIComposite(inImgsPattern, rBand, nBand, tmpPath, outRefImg, outCompImg):
+def createMaxNDVIComposite(inImgsPattern, rBand, nBand, outRefImg, outCompImg, tmpPath='./tmp', gdalFormat='KEA', dataType=None):
+    """
+Create an image composite from multiple input images where the pixel brought through into the composite is the one with
+the maximum NDVI.
+
+* inImgsPattern - is a pattern (ready for glob.glob(inImgsPattern)) so needs an * within the pattern to find the input image files.
+* rBand - is the image band within the input images (same for all) for the red band - note band indexing starts at 1.
+* nBand - is the image band within the input images (same for all) for the nir band - note band indexing starts at 1.
+* outRefImg - is the output reference image which details which input image is forming the output image pixel value (Note. this file will always be a KEA file as RAT is used).
+* outCompImg - is the output composite image for which gdalFormat and dataType define the format and data type.
+* tmpPath - is a temp path for intemediate files, if this path doesn't exist is will be created and deleted at runtime.
+* gdalFormat - is the output file format of the outCompImg, any GDAL compatable format is OK (Defaut is KEA).
+* dataType - is the data type of the output image (outCompImg). If None is provided then the data type of the first input image will be used (Default None). 
+    """
     rsgisUtils = rsgislib.RSGISPyUtils()
     uidStr = rsgisUtils.uidGenerator()
     
@@ -65,6 +78,9 @@ def createMaxNDVIComposite(inImgsPattern, rBand, nBand, tmpPath, outRefImg, outC
         if not os.path.exists(refLayersPath):
             os.makedirs(refLayersPath)
             refImgTmpPresent = False
+        
+        if dataType is None:
+            rsgisUtils.getRSGISLibDataTypeFromImg(inImages[0])
         
         numInLyrs = len(inImages)
         
@@ -111,7 +127,7 @@ def createMaxNDVIComposite(inImgsPattern, rBand, nBand, tmpPath, outRefImg, outC
         ratDataset = None
         
         # Create Composite Image
-        rsgislib.imageutils.createRefImgCompositeImg(inImages, outCompImg, outRefImg, 'KEA', rsgislib.TYPE_16UINT, 0.0)
+        rsgislib.imageutils.createRefImgCompositeImg(inImages, outCompImg, outRefImg, gdalFormat, dataType, 0.0)
         # Calc Stats
         rsgislib.imageutils.popImageStats(outCompImg, usenodataval=True, nodataval=0, calcpyramids=True)
     
