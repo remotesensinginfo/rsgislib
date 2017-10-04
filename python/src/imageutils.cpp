@@ -1867,7 +1867,7 @@ static PyMethodDef ImageUtilsMethods[] = {
 "    import rsgislib.imageutils\n"
 "\n"
 "    inImg = './LS5TM_19851990Comp_lat7lon3896_r65p166_stdsref.kea'\n"
-"
+"\n"
 "    outImg = 'LS5TM_19851990Comp_lat7lon3896_r65p166_stdsref_NORM_0-255.kea'\n"
 "    rsgislib.imageutils.normaliseImagePxlVals(inImg, outImg, 'KEA', rsgislib.TYPE_8UINT, innodataval=0, outnodataval=0, outmin=0, outmax=255,\n"
 "                                              stretchtype=rsgislib.imageutils.STRETCH_LINEARSTDDEV, stretchparam=2)\n"

@@ -21,12 +21,12 @@ Projection
 .. autofunction:: rsgislib.imageutils.reprojectImage
 .. autofunction:: rsgislib.imageutils.getWKTProjFromImage
 
-Mosaic
-----------
+Mosaic and Composite
+----------------------
 
 .. autofunction:: rsgislib.imageutils.createImageMosaic
 .. autofunction:: rsgislib.imageutils.createRefImgCompositeImg
-.. autofunction:: rsgislib.imageutils.createMaxNDVICompositeImg
+.. autofunction:: rsgislib.imageutils.imagecomp.createMaxNDVIComposite
 .. autofunction:: rsgislib.imageutils.includeImages
 .. autofunction:: rsgislib.imageutils.includeImagesWithOverlap
 .. autofunction:: rsgislib.imageutils.combineImages2Band
