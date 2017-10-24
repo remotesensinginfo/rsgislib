@@ -46,7 +46,7 @@ import shutil
 import osgeo.gdal
 import rios.rat
 
-def createMaxNDVIComposite(inImgsPattern, rBand, nBand, outRefImg, outCompImg, tmpPath='./tmp', gdalFormat='KEA', dataType=None):
+def createMaxNDVIComposite(inImgsPattern, rBand, nBand, outRefImg, outCompImg, tmpPath='./tmp', gdalFormat='KEA', dataType=None, calcStats=True):
     """
 Create an image composite from multiple input images where the pixel brought through into the composite is the one with
 the maximum NDVI.
@@ -59,6 +59,7 @@ the maximum NDVI.
 * tmpPath - is a temp path for intemediate files, if this path doesn't exist is will be created and deleted at runtime.
 * gdalFormat - is the output file format of the outCompImg, any GDAL compatable format is OK (Defaut is KEA).
 * dataType - is the data type of the output image (outCompImg). If None is provided then the data type of the first input image will be used (Default None). 
+* calcStats calculate image statics and pyramids (Default=True)
     """
     rsgisUtils = rsgislib.RSGISPyUtils()
     uidStr = rsgisUtils.uidGenerator()
@@ -108,28 +109,32 @@ the maximum NDVI.
             rsgislib.imagecalc.calcindices.calcNDVI(img, 3, 4, refLyrImg, False)
             refLyrsLst.append(refLyrImg)
             idx = idx + 1
+        imgLyrs[0] = ""
     
         # Create REF Image
         rsgislib.imagecalc.getImgIdxForStat(refLyrsLst, outRefImg, 'KEA', -999, rsgislib.SUMTYPE_MAX)
-        # Pop Ref Image with stats
-        rsgislib.rastergis.populateStats(outRefImg, True, True, True)
-        
-        # Open the clumps dataset as a gdal dataset
-        ratDataset = osgeo.gdal.Open(outRefImg, osgeo.gdal.GA_Update)
-        
-        # Write colours to RAT
-        rios.rat.writeColumn(ratDataset, "Red", red)
-        rios.rat.writeColumn(ratDataset, "Green", green)
-        rios.rat.writeColumn(ratDataset, "Blue", blue)
-        rios.rat.writeColumn(ratDataset, "Alpha", alpha)
-        rios.rat.writeColumn(ratDataset, "Image", imgLyrs)
-        
-        ratDataset = None
+        if calcStats:
+            # Pop Ref Image with stats
+            rsgislib.rastergis.populateStats(outRefImg, True, True, True)
+            
+            # Open the clumps dataset as a gdal dataset
+            ratDataset = osgeo.gdal.Open(outRefImg, osgeo.gdal.GA_Update)
+            
+            # Write colours to RAT
+            rios.rat.writeColumn(ratDataset, "Red", red)
+            rios.rat.writeColumn(ratDataset, "Green", green)
+            rios.rat.writeColumn(ratDataset, "Blue", blue)
+            rios.rat.writeColumn(ratDataset, "Alpha", alpha)
+            rios.rat.writeColumn(ratDataset, "Image", imgLyrs)
+            
+            ratDataset = None
         
         # Create Composite Image
         rsgislib.imageutils.createRefImgCompositeImg(inImages, outCompImg, outRefImg, gdalFormat, dataType, 0.0)
-        # Calc Stats
-        rsgislib.imageutils.popImageStats(outCompImg, usenodataval=True, nodataval=0, calcpyramids=True)
+        
+        if calcStats:
+            # Calc Stats
+            rsgislib.imageutils.popImageStats(outCompImg, usenodataval=True, nodataval=0, calcpyramids=True)
     
         if not refImgTmpPresent:
             shutil.rmtree(refLayersPath, ignore_errors=True)
