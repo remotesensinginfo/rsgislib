@@ -1847,7 +1847,6 @@ namespace rsgis{ namespace cmds {
                 throw RSGISFileException("Can only export point or polygon shapefiles...");
             }
             
-            delete rsgis::utils::RSGISGEOSFactoryGenerator::getInstance();
             GDALClose(inputSHPDS);
         }
         catch(rsgis::RSGISVectorException &e)
@@ -1926,7 +1925,6 @@ namespace rsgis{ namespace cmds {
 
             delete inPts;
         
-            delete rsgis::utils::RSGISGEOSFactoryGenerator::getInstance();
             GDALClose(inputSHPDS);
         }
         catch(rsgis::RSGISVectorException &e)
@@ -2053,7 +2051,6 @@ namespace rsgis{ namespace cmds {
             delete inPts;
             delete clusters;
             
-            delete rsgis::utils::RSGISGEOSFactoryGenerator::getInstance();
             GDALClose(inputSHPDS);
         }
         catch(rsgis::RSGISVectorException &e)

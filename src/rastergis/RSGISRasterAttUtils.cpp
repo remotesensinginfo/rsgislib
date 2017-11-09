@@ -118,7 +118,6 @@ namespace rsgis{namespace rastergis{
                 }
                 catch (rsgis::RSGISAttributeTableException &e)
                 {
-                    std::cerr << "No colour columns in input attribute table - skipping copying" << std::endl;
                     copyColours = false;
                 }
 
@@ -137,7 +136,6 @@ namespace rsgis{namespace rastergis{
                 }
                 catch (rsgis::RSGISAttributeTableException &e)
                 {
-                    std::cerr << "No histogram column in input attribute table - skipping copying" << std::endl;
                     copyHist = false;
                 }
                 outHistIndx = findColumnIndexOrCreate(gdalAttOut, "Histogram", GFT_Integer, GFU_PixelCount);

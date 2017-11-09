@@ -133,7 +133,7 @@ namespace rsgis{namespace geom{
     
     double RSGISPolygon::distance(geos::geom::Coordinate *pt)
     {
-        geos::geom::GeometryFactory* geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+        const geos::geom::GeometryFactory* geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
         geos::geom::Point *geosPt = geomFactory->createPoint(*point);
         double dist = this->getPolygon()->distance(geosPt);
         delete geosPt;

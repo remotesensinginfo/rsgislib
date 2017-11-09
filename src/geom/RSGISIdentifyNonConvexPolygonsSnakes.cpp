@@ -104,7 +104,7 @@ namespace rsgis{namespace geom{
 		GDALDataset *imageDist = NULL;
 		try
 		{
-			geos::geom::GeometryFactory * geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+			const geos::geom::GeometryFactory * geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
 			geos::geom::GeometryCollection  *geom = this->createGeomCollection(polygons);
 			
 			if(gdalDriver == NULL)
@@ -313,7 +313,7 @@ namespace rsgis{namespace geom{
 		GDALDataset *imageDist = NULL;
 		try
 		{
-			geos::geom::GeometryFactory * geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+			const geos::geom::GeometryFactory * geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
 			geos::geom::GeometryCollection  *geom = this->createGeomCollection(polygons);
 			
 			if(gdalDriver == NULL)
@@ -585,7 +585,7 @@ namespace rsgis{namespace geom{
 			float *inData = (float *) CPLMalloc(sizeof(float)*imgWidth);
 			float *outData = (float *) CPLMalloc(sizeof(float)*imgWidth);
 			
-			geos::geom::GeometryFactory * geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+			const geos::geom::GeometryFactory * geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
 			
 			geos::geom::Coordinate coord;
 			geos::geom::Point *pt = NULL;
@@ -673,7 +673,7 @@ namespace rsgis{namespace geom{
 			GDALRasterBand *imageBand = image->GetRasterBand(1);
 			float *outData = (float *) CPLMalloc(sizeof(float)*imgWidth);
 			
-			geos::geom::GeometryFactory * geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+			const geos::geom::GeometryFactory * geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
 			
 			geos::geom::Coordinate coord;
 			geos::geom::Point *pt = NULL;
@@ -760,7 +760,7 @@ namespace rsgis{namespace geom{
 				geoms->push_back((*iterPolys)->getBoundary());
 			}
 			
-			geos::geom::GeometryFactory * geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+			const geos::geom::GeometryFactory * geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
 			geom = geomFactory->createGeometryCollection(geoms);
 		}
 		catch(RSGISGeometryException &e)
@@ -783,7 +783,7 @@ namespace rsgis{namespace geom{
 				geoms->push_back((*iterPolys)->getBoundary());
 			}
 			
-			geos::geom::GeometryFactory * geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+			const geos::geom::GeometryFactory * geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
 			geom = geomFactory->createGeometryCollection (geoms);
 		}
 		catch(RSGISGeometryException &e)
@@ -902,7 +902,7 @@ namespace rsgis{namespace geom{
 		
 		geos::geom::CoordinateArraySequence *coordSeq = new geos::geom::CoordinateArraySequence(coords);
 		
-		geos::geom::GeometryFactory * geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+		const geos::geom::GeometryFactory * geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
 		geos::geom::LinearRing *linearRingShell = new geos::geom::LinearRing(coordSeq, geosGeomFactory);
 		geos::geom::Polygon *polygonGeom = geosGeomFactory->createPolygon(linearRingShell, NULL);
 		

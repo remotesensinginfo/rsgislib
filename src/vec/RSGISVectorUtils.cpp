@@ -66,11 +66,10 @@ namespace rsgis{namespace vec{
 		}
 		
 		geos::geom::CoordinateArraySequence *coordSeq = new geos::geom::CoordinateArraySequence(coords);
-		geos::geom::GeometryFactory* geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+		const geos::geom::GeometryFactory* geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
 		geos::geom::LineString *lineString = geosGeomFactory->createLineString(coordSeq);
 		
 		delete point;
-		delete geosGeomFactory;
 		return lineString;
 		
 	}
@@ -105,7 +104,7 @@ namespace rsgis{namespace vec{
 		
 		geos::geom::CoordinateArraySequence *coordSeq = new geos::geom::CoordinateArraySequence(coords);
 		
-		geos::geom::GeometryFactory* geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+		const geos::geom::GeometryFactory* geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
 		geos::geom::LinearRing *linearRingShell = new geos::geom::LinearRing(coordSeq, geosGeomFactory);
 
 		delete point;
@@ -129,7 +128,7 @@ namespace rsgis{namespace vec{
 	geos::geom::Polygon* RSGISVectorUtils::convertOGRPolygon2GEOSPolygon(OGRPolygon *poly)
 	{
 		/// Converts OGR Polygon into a GEOS Polygon
-		geos::geom::GeometryFactory* geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+		const geos::geom::GeometryFactory* geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
 		OGRLinearRing *exteriorRing = poly->getExteriorRing();
 		geos::geom::LinearRing *linearRingShell = this->convertOGRLinearRing2GEOSLinearRing(exteriorRing);
 		
@@ -146,7 +145,7 @@ namespace rsgis{namespace vec{
 	
 	geos::geom::MultiPolygon* RSGISVectorUtils::convertOGRMultiPolygonGEOSMultiPolygon(OGRMultiPolygon *mPoly)
 	{
-		geos::geom::GeometryFactory* geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+		const geos::geom::GeometryFactory* geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
 		
 		OGRGeometry *tmpGeom = NULL;
 		OGRPolygon *tmpPolygon = NULL;
@@ -168,7 +167,7 @@ namespace rsgis{namespace vec{
 	
 	geos::geom::Point* RSGISVectorUtils::convertOGRPoint2GEOSPoint(OGRPoint *point)
 	{
-		geos::geom::GeometryFactory* geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+		const geos::geom::GeometryFactory* geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
 		geos::geom::Coordinate *coord = new geos::geom::Coordinate(point->getX(), point->getY(), point->getZ());
 		
 		return geosGeomFactory->createPoint(*coord);
@@ -233,7 +232,7 @@ namespace rsgis{namespace vec{
 	
 	geos::geom::MultiPolygon* RSGISVectorUtils::convertGEOSPolygons2GEOSMultiPolygon(std::vector<geos::geom::Polygon*> *polys)
 	{
-		geos::geom::GeometryFactory* geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+		const geos::geom::GeometryFactory* geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
 		
 		std::vector<geos::geom::Geometry*> *geoms = new std::vector<geos::geom::Geometry*>();
 		std::vector<geos::geom::Polygon*>::iterator iterPolys;
@@ -307,7 +306,7 @@ namespace rsgis{namespace vec{
 	
 	geos::geom::Point* RSGISVectorUtils::createPoint(geos::geom::Coordinate *coord)
 	{
-		geos::geom::GeometryFactory* geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+		const geos::geom::GeometryFactory* geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
 		return geosGeomFactory->createPoint(*coord);
 	}
 	
@@ -434,7 +433,7 @@ namespace rsgis{namespace vec{
 				geoms->push_back((*iterPolys)->clone());
 			}
 			
-			geos::geom::GeometryFactory* geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+			const geos::geom::GeometryFactory* geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
 			geom = geosGeomFactory->createGeometryCollection(geoms);
 		}
 		catch(RSGISVectorException &e)
@@ -447,7 +446,7 @@ namespace rsgis{namespace vec{
 	
 	geos::geom::Polygon* RSGISVectorUtils::createPolygon(double tlX, double tlY, double brX, double brY) throw(RSGISVectorException)
 	{
-		geos::geom::GeometryFactory* geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+		const geos::geom::GeometryFactory* geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
 		
 		std::vector<geos::geom::Coordinate> *coords = new std::vector<geos::geom::Coordinate>();
 		coords->push_back(geos::geom::Coordinate(tlX, tlY, 0));

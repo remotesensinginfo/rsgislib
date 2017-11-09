@@ -266,8 +266,7 @@ namespace rsgis{namespace vec{
 			float *inData = (float *) CPLMalloc(sizeof(float)*imgWidth);
 			float *outData = (float *) CPLMalloc(sizeof(float)*imgWidth);
 			
-			geos::geom::PrecisionModel *pm = new geos::geom::PrecisionModel();
-			geos::geom::GeometryFactory *geomFactory = new geos::geom::GeometryFactory(pm);
+            const geos::geom::GeometryFactory *geomFactory = geos::geom::GeometryFactory::getDefaultInstance();
 			
 			geos::geom::Coordinate coord;
 			geos::geom::Point *pt = NULL;
@@ -331,10 +330,7 @@ namespace rsgis{namespace vec{
 			}
 			
 			delete[] inData;
-			delete[] outData;
-			
-			delete geomFactory;
-			delete pm;
+			delete[] outData;			
 		}
 		catch(RSGISImageException &e)
 		{

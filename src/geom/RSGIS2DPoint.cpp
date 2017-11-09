@@ -64,7 +64,7 @@ namespace rsgis{namespace geom{
     
     geos::geom::Point* RSGIS2DPoint::getAsGeosPoint()
     {
-        geos::geom::GeometryFactory* geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+        const geos::geom::GeometryFactory* geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
         geos::geom::Point *geosPt = geomFactory->createPoint(*point);
         return geosPt;
     }

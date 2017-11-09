@@ -52,15 +52,13 @@ namespace rsgis{namespace utils{
 		{
 		public: 
 			static RSGISGEOSFactoryGenerator* getInstance();
-			geos::geom::GeometryFactory* getFactory();
-			geos::geom::PrecisionModel* getPrecision();
+			const geos::geom::GeometryFactory* getFactory();
 			~RSGISGEOSFactoryGenerator();
 		private:
 			RSGISGEOSFactoryGenerator();
 			RSGISGEOSFactoryGenerator(const RSGISGEOSFactoryGenerator&){};
 			RSGISGEOSFactoryGenerator& operator=(const RSGISGEOSFactoryGenerator&){return *instance;};
-			geos::geom::GeometryFactory *geomFactory;
-			geos::geom::PrecisionModel *pm;
+			const geos::geom::GeometryFactory *geomFactory;
 			static RSGISGEOSFactoryGenerator *instance;
 		};
 }}

@@ -287,8 +287,7 @@ namespace rsgis{namespace geom{
 		coords->add(geos::geom::Coordinate(c->getX(), c->getY(), c->getZ()));
 		coords->add(geos::geom::Coordinate(a->getX(), a->getY(), a->getZ()));
 		
-		geos::geom::PrecisionModel *pm = new geos::geom::PrecisionModel();
-		geos::geom::GeometryFactory *geomFac = new geos::geom::GeometryFactory(pm);
+        const geos::geom::GeometryFactory *geomFac = geos::geom::GeometryFactory::getDefaultInstance();
 		geos::geom::LinearRing *lr = geomFac->createLinearRing(coords);
 		
 		geos::geom::Polygon *polyTri = geomFac->createPolygon(lr, NULL);
