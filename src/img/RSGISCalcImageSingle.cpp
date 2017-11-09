@@ -550,6 +550,7 @@ namespace rsgis{namespace img{
 		GDALAllRegister();
 		RSGISImageUtils imgUtils;
 		double *gdalTranslation = NULL;
+        const geos::geom::GeometryFactory *geomFactory = geos::geom::GeometryFactory::getDefaultInstance();
 		
 		int **dsOffsets = NULL;		
 		int **bandOffsetsA = NULL;
@@ -681,12 +682,12 @@ namespace rsgis{namespace img{
 						inDataColumnA[n] = inputDataA[n][j];
 					}
 					geos::geom::Coordinate pxlCentre;
-					geos::geom::GeometryFactory geomFactory;
+                    const geos::geom::GeometryFactory *geomFactory = geos::geom::GeometryFactory::getDefaultInstance();
 					geos::geom::Point *pt = NULL;
 					
 					extent.init(pxlTLX, (pxlTLX+pxlWidth), pxlTLY, (pxlTLY-pxlHeight));
 					extent.centre(pxlCentre);
-					pt = geomFactory.createPoint(pxlCentre);
+					pt = geomFactory->createPoint(pxlCentre);
 					
 					/* It was previously hardcoded to use 'polyContainsPixelCenter'
 					 calculated here.
@@ -710,9 +711,6 @@ namespace rsgis{namespace img{
 						geos::geom::Polygon *pixelGeosPoly = NULL;
 						geos::geom::Geometry *intersectionGeom;
 						
-						geos::geom::PrecisionModel *pm = new geos::geom::PrecisionModel();
-						geos::geom::GeometryFactory *geomFactory = new geos::geom::GeometryFactory(pm);
-						
 						coords = new geos::geom::CoordinateArraySequence();
 						coords->add(geos::geom::Coordinate(pxlTLX, pxlTLY, 0));
 						coords->add(geos::geom::Coordinate(pxlTLX + pxlWidth, pxlTLY, 0));
@@ -721,7 +719,6 @@ namespace rsgis{namespace img{
 						coords->add(geos::geom::Coordinate(pxlTLX, pxlTLY, 0));
 						ring = geomFactory->createLinearRing(coords);
 						pixelGeosPoly = geomFactory->createPolygon(ring, NULL);
-						
 						
 						intersectionGeom = pixelGeosPoly->intersection(poly);
 						double intersectionArea = intersectionGeom->getArea()  / pixelGeosPoly->getArea();

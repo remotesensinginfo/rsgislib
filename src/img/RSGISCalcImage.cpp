@@ -9958,7 +9958,7 @@ namespace rsgis{namespace img{
 		GDALDriver *gdalDriver = NULL;
 		geos::geom::Envelope extent;
 		geos::geom::Coordinate pxlCentre;
-		geos::geom::GeometryFactory geomFactory;
+		const geos::geom::GeometryFactory *geomFactory = geos::geom::GeometryFactory::getDefaultInstance();
 		double pxlTLX = 0;
 		double pxlTLY = 0;
 		double pxlWidth = 0;
@@ -10073,12 +10073,11 @@ namespace rsgis{namespace img{
 					}
 					
                     geos::geom::Coordinate pxlCentre;
-					geos::geom::GeometryFactory geomFactory;
 					geos::geom::Point *pt = NULL;
 					
 					extent.init(pxlTLX, (pxlTLX+pxlWidth), pxlTLY, (pxlTLY-pxlHeight));
 					extent.centre(pxlCentre);
-					pt = geomFactory.createPoint(pxlCentre);
+					pt = geomFactory->createPoint(pxlCentre);
 					
 					if (pixelPolyOption == polyContainsPixelCenter) 
 					{
@@ -10102,9 +10101,6 @@ namespace rsgis{namespace img{
 						geos::geom::LinearRing *ring = NULL;
 						geos::geom::Polygon *pixelGeosPoly = NULL;
 						geos::geom::Geometry *intersectionGeom;
-						
-						geos::geom::PrecisionModel *pm = new geos::geom::PrecisionModel();
-						geos::geom::GeometryFactory *geomFactory = new geos::geom::GeometryFactory(pm);
 						
 						coords = new geos::geom::CoordinateArraySequence();
 						coords->add(geos::geom::Coordinate(pxlTLX, pxlTLY, 0));
@@ -10473,7 +10469,7 @@ namespace rsgis{namespace img{
 		GDALRasterBand **outputRasterBands = NULL;
 		geos::geom::Envelope extent;
 		geos::geom::Coordinate pxlCentre;
-		geos::geom::GeometryFactory geomFactory;
+		const geos::geom::GeometryFactory *geomFactory = geos::geom::GeometryFactory::getDefaultInstance();
 		double pxlTLX = 0;
 		double pxlTLY = 0;
 		double pxlWidth = 0;
@@ -10579,12 +10575,11 @@ namespace rsgis{namespace img{
 					}
 					
 					geos::geom::Coordinate pxlCentre;
-					geos::geom::GeometryFactory geomFactory;
 					geos::geom::Point *pt = NULL;
 					
 					extent.init(pxlTLX, (pxlTLX+pxlWidth), pxlTLY, (pxlTLY-pxlHeight));
 					extent.centre(pxlCentre);
-					pt = geomFactory.createPoint(pxlCentre);
+					pt = geomFactory->createPoint(pxlCentre);
 					
 					if (pixelPolyOption == polyContainsPixelCenter) 
 					{
@@ -10607,9 +10602,6 @@ namespace rsgis{namespace img{
 						geos::geom::LinearRing *ring = NULL;
 						geos::geom::Polygon *pixelGeosPoly = NULL;
 						geos::geom::Geometry *intersectionGeom;
-						
-						geos::geom::PrecisionModel *pm = new geos::geom::PrecisionModel();
-						geos::geom::GeometryFactory *geomFactory = new geos::geom::GeometryFactory(pm);
 						
 						coords = new geos::geom::CoordinateArraySequence();
 						coords->add(geos::geom::Coordinate(pxlTLX, pxlTLY, 0));
@@ -10966,7 +10958,7 @@ namespace rsgis{namespace img{
 		GDALRasterBand **inputRasterBands = NULL;
 		geos::geom::Envelope extent;
 		geos::geom::Coordinate pxlCentre;
-		geos::geom::GeometryFactory geomFactory;
+		const geos::geom::GeometryFactory *geomFactory = geos::geom::GeometryFactory::getDefaultInstance();
 		double pxlTLX = 0;
 		double pxlTLY = 0;
 		double pxlWidth = 0;
@@ -11072,12 +11064,11 @@ namespace rsgis{namespace img{
 					}
 					
 					geos::geom::Coordinate pxlCentre;
-					geos::geom::GeometryFactory geomFactory;
 					geos::geom::Point *pt = NULL;
 					
 					extent.init(pxlTLX, (pxlTLX+pxlWidth), pxlTLY, (pxlTLY-pxlHeight));
 					extent.centre(pxlCentre);
-					pt = geomFactory.createPoint(pxlCentre);
+					pt = geomFactory->createPoint(pxlCentre);
 					
 					if (pixelPolyOption == polyContainsPixelCenter) 
 					{
@@ -11092,9 +11083,6 @@ namespace rsgis{namespace img{
 						geos::geom::LinearRing *ring = NULL;
 						geos::geom::Polygon *pixelGeosPoly = NULL;
 						geos::geom::Geometry *intersectionGeom;
-						
-						geos::geom::PrecisionModel *pm = new geos::geom::PrecisionModel();
-						geos::geom::GeometryFactory *geomFactory = new geos::geom::GeometryFactory(pm);
 						
 						coords = new geos::geom::CoordinateArraySequence();
 						coords->add(geos::geom::Coordinate(pxlTLX, pxlTLY, 0));
@@ -11367,7 +11355,6 @@ namespace rsgis{namespace img{
 
 		geos::geom::Envelope extent;
 		geos::geom::Coordinate pxlCentre;
-		geos::geom::GeometryFactory geomFactory;
 		double pxlTLX = 0;
 		double pxlTLY = 0;
 		double pxlWidth = 0;
