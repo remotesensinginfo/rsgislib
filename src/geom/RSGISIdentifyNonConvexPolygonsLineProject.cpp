@@ -201,7 +201,7 @@ namespace rsgis{namespace geom{
 			std::vector<geos::geom::Coordinate*> *coordsPolys = this->identifyIrregularBoundaryCoordinatesLineProj(newlines, convexhull);
 			
 			// Create the polygon representing the new boundary
-			geos::geom::GeometryFactory* geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+			const geos::geom::GeometryFactory* geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
 			
 			geos::geom::CoordinateArraySequence *coordSeq = new geos::geom::CoordinateArraySequence();
 			std::vector<geos::geom::Coordinate*>::iterator iterCoords;

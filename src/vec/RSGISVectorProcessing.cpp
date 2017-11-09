@@ -222,7 +222,7 @@ namespace rsgis{namespace vec{
 		double topCentreX = 0;
 		double topCentreY = 0;
 		
-        geos::geom::GeometryFactory *geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+        const geos::geom::GeometryFactory *geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
 		
 		geos::geom::LinearRing *ring = NULL;
 		
@@ -274,15 +274,13 @@ namespace rsgis{namespace vec{
 			polys->erase(iterPolys);
 		}
 		delete polys;
-		
-		delete rsgis::utils::RSGISGEOSFactoryGenerator::getInstance();
 	}
 	
 	void RSGISVectorProcessing::createImageFootprintPolygons(std::vector<rsgis::utils::ImageFootPrintPoly*> *polyDetails, std::string output, bool force) throw(RSGISVectorException)
 	{
         rsgis::math::RSGISMathsUtils mathUtils;
 		
-		geos::geom::GeometryFactory *geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+		const geos::geom::GeometryFactory *geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
 		
 		geos::geom::LinearRing *ring = NULL;
 		
@@ -317,13 +315,11 @@ namespace rsgis{namespace vec{
 			polys->erase(iterPolys);
 		}
 		delete polys;
-		
-		delete rsgis::utils::RSGISGEOSFactoryGenerator::getInstance();
 	}
 	
 	void RSGISVectorProcessing::createGrid(std::string outputShapefile, OGRSpatialReference* spatialRef, bool deleteIfPresent, double xTLStart, double yTLStart, double resolutionX, double resolutionY, double width, double height) throw(RSGISVectorException)
 	{
-		geos::geom::GeometryFactory* geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+		const geos::geom::GeometryFactory* geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
         std::vector<geos::geom::Polygon*> *polys = new std::vector<geos::geom::Polygon*>();
 		
 		unsigned int numXCells = width/resolutionX;
@@ -372,9 +368,6 @@ namespace rsgis{namespace vec{
 			polys->erase(iterPolys);
 		}
 		delete polys;
-		
-		
-		delete rsgis::utils::RSGISGEOSFactoryGenerator::getInstance();
 	}
     
     float RSGISVectorProcessing::calcMeanMinDistance(std::vector<OGRGeometry*> *geometries) throw(RSGISVectorException)

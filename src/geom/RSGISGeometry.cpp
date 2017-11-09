@@ -147,7 +147,7 @@ namespace rsgis{namespace geom{
 	
 	geos::geom::Polygon* RSGISGeometry::createCircle(float a, float b, float r, float resolution)throw(RSGISGeometryException)
 	{
-		geos::geom::GeometryFactory* geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+		const geos::geom::GeometryFactory* geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
 		
 		float c = 2 * M_PI * r;
 		int numPts = floor((c/resolution)+0.5);
@@ -189,7 +189,7 @@ namespace rsgis{namespace geom{
 	
 	geos::geom::Polygon* RSGISGeometry::createPolygon(float xTL, float yTL, float xBR, float yBR)
 	{
-		geos::geom::GeometryFactory* geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+		const geos::geom::GeometryFactory* geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
 		
 		geos::geom::CoordinateArraySequence *coordSeq = new geos::geom::CoordinateArraySequence();
 		coordSeq->add(geos::geom::Coordinate(xTL, yTL, 0));
@@ -474,7 +474,7 @@ namespace rsgis{namespace geom{
 	
 	geos::geom::MultiPolygon* RSGISGeometry::createMultiPolygon(const std::vector<geos::geom::Geometry*> *polygons)
 	{
-		geos::geom::GeometryFactory* geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+		const geos::geom::GeometryFactory* geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
 		return geomFactory->createMultiPolygon(*polygons);
 	}
 	
@@ -647,7 +647,7 @@ namespace rsgis{namespace geom{
                 
                 coordSeq->add(upperEdge->front(), true);
                 
-                geos::geom::GeometryFactory* geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+                const geos::geom::GeometryFactory* geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
                 geos::geom::LinearRing *polyRing = new geos::geom::LinearRing(coordSeq, geomFactory);
                 poly = geomFactory->createPolygon(polyRing, NULL);
                 
@@ -739,7 +739,7 @@ namespace rsgis{namespace geom{
             coordSeq->add(geos::geom::Coordinate(xMin, yMin), true);
             coordSeq->add(geos::geom::Coordinate(xMin, yMax), true);
             
-            geos::geom::GeometryFactory* geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+            const geos::geom::GeometryFactory* geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
             geos::geom::LinearRing *polyRing = new geos::geom::LinearRing(coordSeq, geomFactory);
             poly = geomFactory->createPolygon(polyRing, NULL);
         }
@@ -2128,7 +2128,7 @@ namespace rsgis{namespace geom{
 	
 	geos::geom::Polygon* RSGISGeometry::createHole(const geos::geom::Polygon *poly, const geos::geom::Polygon *hole) throw(RSGISGeometryException)
 	{
-		geos::geom::GeometryFactory* geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+		const geos::geom::GeometryFactory* geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
 		
 		geos::geom::CoordinateSequence *polyCoords = poly->getExteriorRing()->getCoordinates();
 		geos::geom::LinearRing *shell = geomFactory->createLinearRing(polyCoords);
@@ -2201,7 +2201,7 @@ namespace rsgis{namespace geom{
 			delete polyLines;
 			delete intersectLines;
 			
-			geos::geom::GeometryFactory* geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+			const geos::geom::GeometryFactory* geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
 			geos::geom::CoordinateArraySequenceFactory coordSeqFactory;
 
 			geos::geom::CoordinateSequence *outerShellCoords = coordSeqFactory.create(newPolyCoords);
@@ -2318,7 +2318,7 @@ namespace rsgis{namespace geom{
 			coord = newPolyCoords->getAt(0);
 			newPolyCoords->add(geos::geom::Coordinate(coord.x, coord.y, coord.z), false);
 			
-			geos::geom::GeometryFactory* geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+			const geos::geom::GeometryFactory* geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
 			
 			if(newPolyCoords->size() <= 3)
 			{
@@ -4273,7 +4273,7 @@ namespace rsgis{namespace geom{
 			}
 			delete inCoords;
 			
-			geos::geom::GeometryFactory* geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+			const geos::geom::GeometryFactory* geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
 			geos::geom::LinearRing *ring = geomFactory->createLinearRing(coords);
 			outPoly = geomFactory->createPolygon(ring, NULL);
 		}
@@ -4451,7 +4451,7 @@ namespace rsgis{namespace geom{
 	
 	geos::geom::Polygon* RSGISGeometry::removeHoles(geos::geom::Polygon* poly)
 	{
-		geos::geom::GeometryFactory* geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+		const geos::geom::GeometryFactory* geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
 		const geos::geom::LineString *exteriorRing = poly->getExteriorRing();			
 		geos::geom::CoordinateSequence *coordSeq = exteriorRing->getCoordinates();
 		geos::geom::LinearRing *linearRingShell = new geos::geom::LinearRing(coordSeq, geosGeomFactory);
@@ -4561,7 +4561,7 @@ namespace rsgis{namespace geom{
             polyAsGeoms->push_back(*iterPoly);
         }
         
-        geos::geom::GeometryFactory* geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+        const geos::geom::GeometryFactory* geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
         geos::geom::MultiPolygon* mPoly = geosGeomFactory->createMultiPolygon(polyAsGeoms);
         
         geos::simplify::DouglasPeuckerSimplifier simplifier(mPoly);
@@ -4599,7 +4599,7 @@ namespace rsgis{namespace geom{
 			coord = newPolyCoords->getAt(0);
 			newPolyCoords->add(geos::geom::Coordinate(coord.x, coord.y, coord.z), false);
 			
-			geos::geom::GeometryFactory* geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+			const geos::geom::GeometryFactory* geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
 			
 			geos::geom::LinearRing *shellRing = geomFactory->createLinearRing(newPolyCoords);
 			

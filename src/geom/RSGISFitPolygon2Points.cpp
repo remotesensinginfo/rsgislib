@@ -373,7 +373,7 @@ namespace rsgis{namespace geom{
             
             if(!skip)
             {
-                geos::geom::GeometryFactory *geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
+                const geos::geom::GeometryFactory *geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
                 if( compCoords.size() > 1)
                 {
                     int maxIdx = -1;
