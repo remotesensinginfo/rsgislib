@@ -109,6 +109,7 @@ namespace rsgis{namespace classifier{
         
         void generateRandomPointsVecOut(GDALDataset *inputImage, OGRLayer *outputSHPLayer, std::string imgClassCol, std::string vecClassImgCol, std::string vecClassRefCol, unsigned int numPts, unsigned int seed) throw(rsgis::RSGISImageException);
         void generateStratifiedRandomPointsVecOut(GDALDataset *inputImage, OGRLayer *outputSHPLayer, std::string imgClassCol, std::string vecClassImgCol, std::string vecClassRefCol, unsigned int numPts, unsigned int seed) throw(rsgis::RSGISImageException);
+        void generateStratifiedRandomPointsVecOutUsePxlLst(GDALDataset *inputImage, OGRLayer *outputSHPLayer, std::string imgClassCol, std::string vecClassImgCol, std::string vecClassRefCol, unsigned int numPts, unsigned int seed) throw(rsgis::RSGISImageException);
         void popClassInfo2Vec(GDALDataset *inputImage, OGRLayer *outputSHPLayer, std::string imgClassCol, std::string vecClassImgCol, std::string vecClassRefCol, bool addRefCol)throw(rsgis::RSGISImageException);
         
         ~RSGISGenAccuracyPoints();
@@ -116,6 +117,26 @@ namespace rsgis{namespace classifier{
         float findPixelVal(GDALDataset *image, unsigned int band, double eastings, double northings, double tlX, double tlY, double xRes, double yRes, unsigned int xSize, unsigned int ySize) throw(rsgis::RSGISImageException);
         std::string findClassVal(GDALDataset *image, unsigned int band, GDALRasterAttributeTable *attTable, unsigned int classNameColIdx, unsigned int xPxl, unsigned int yPxl) throw(rsgis::RSGISImageException);
         std::list<std::string>* findUniqueClasses(GDALRasterAttributeTable *attTable, unsigned int classNameColIdx, int histoColIdx) throw(rsgis::RSGISImageException);
+    };
+    
+    class DllExport RSGISExtractClassPxllocs : public rsgis::img::RSGISCalcImageValue
+    {
+    public:
+        RSGISExtractClassPxllocs(std::vector<std::pair<double, double> > **classPxlLst, unsigned long numClasses);
+        void calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent)throw(rsgis::img::RSGISImageCalcException);
+        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
+        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        ~RSGISExtractClassPxllocs();
+    private:
+        std::vector<std::pair<double, double> > **classPxlLst;
+        unsigned long numClasses;
     };
 		
 }}

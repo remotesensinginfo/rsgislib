@@ -199,7 +199,7 @@ namespace rsgis{ namespace cmds {
     }
 
     
-    void executeGenerateStratifiedRandomAccuracyPts(std::string classImage, std::string outputShp, std::string classImgCol, std::string classImgVecCol, std::string classRefVecCol, unsigned int numPtsPerClass, unsigned int seed, bool force)throw(RSGISCmdException)
+    void executeGenerateStratifiedRandomAccuracyPts(std::string classImage, std::string outputShp, std::string classImgCol, std::string classImgVecCol, std::string classRefVecCol, unsigned int numPtsPerClass, unsigned int seed, bool force, bool usePxlLst)throw(RSGISCmdException)
     {
         try
         {
@@ -266,7 +266,14 @@ namespace rsgis{ namespace cmds {
             }
             
             rsgis::classifier::RSGISGenAccuracyPoints genAccPts;
-            genAccPts.generateStratifiedRandomPointsVecOut(imgDataset, outputSHPLayer, classImgCol, classImgVecCol, classRefVecCol, numPtsPerClass, seed);
+            if(!usePxlLst)
+            {
+                genAccPts.generateStratifiedRandomPointsVecOut(imgDataset, outputSHPLayer, classImgCol, classImgVecCol, classRefVecCol, numPtsPerClass, seed);
+            }
+            else
+            {
+                genAccPts.generateStratifiedRandomPointsVecOutUsePxlLst(imgDataset, outputSHPLayer, classImgCol, classImgVecCol, classRefVecCol, numPtsPerClass, seed);
+            }
             
             GDALClose(imgDataset);
             GDALClose(outputSHPDS);

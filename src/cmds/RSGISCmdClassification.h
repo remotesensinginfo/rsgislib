@@ -56,7 +56,7 @@ namespace rsgis{ namespace cmds {
     DllExport void executeGenerateRandomAccuracyPts(std::string classImage, std::string outputShp, std::string classImgCol, std::string classImgVecCol, std::string classRefVecCol, unsigned int numPts, unsigned int seed, bool force)throw(RSGISCmdException);
     
     /** A function to generate stratified random points which can be used to assess the accuracy of a map */
-    DllExport void executeGenerateStratifiedRandomAccuracyPts(std::string classImage, std::string outputShp, std::string classImgCol, std::string classImgVecCol, std::string classRefVecCol, unsigned int numPtsPerClass, unsigned int seed, bool force)throw(RSGISCmdException);
+    DllExport void executeGenerateStratifiedRandomAccuracyPts(std::string classImage, std::string outputShp, std::string classImgCol, std::string classImgVecCol, std::string classRefVecCol, unsigned int numPtsPerClass, unsigned int seed, bool force, bool usePxlLst)throw(RSGISCmdException);
     
     /** A function to populate a set of points with the class information to assess the accuracy of a map */
     DllExport void executePopClassInfoAccuracyPts(std::string classImage, std::string shpFile, std::string classImgCol, std::string classImgVecCol, std::string classRefVecCol="", bool addRefCol=false)throw(RSGISCmdException);
