@@ -155,15 +155,16 @@ static PyObject *Classification_GenStratifiedRandomAccuracyPts(PyObject *self, P
     int numPts;
     int force = false;
     int seed = 10;
+    int usePxlLst = false;
     
-    if( !PyArg_ParseTuple(args, "sssssi|ii:generateStratifiedRandomAccuracyPts", &pszInputImage, &pszOutputShp, &pszClassImgCol, &pszClassImgVecCol, &pszClassRefVecCol, &numPts, &seed, &force))
+    if( !PyArg_ParseTuple(args, "sssssi|iii:generateStratifiedRandomAccuracyPts", &pszInputImage, &pszOutputShp, &pszClassImgCol, &pszClassImgVecCol, &pszClassRefVecCol, &numPts, &seed, &force, &usePxlLst))
     {
         return NULL;
     }
     
     try
     {
-        rsgis::cmds::executeGenerateStratifiedRandomAccuracyPts(std::string(pszInputImage), std::string(pszOutputShp), std::string(pszClassImgCol), std::string(pszClassImgVecCol), std::string(pszClassRefVecCol), numPts, seed, force);
+        rsgis::cmds::executeGenerateStratifiedRandomAccuracyPts(std::string(pszInputImage), std::string(pszOutputShp), std::string(pszClassImgCol), std::string(pszClassImgVecCol), std::string(pszClassRefVecCol), numPts, seed, force, usePxlLst);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -251,7 +252,7 @@ static PyMethodDef ClassificationMethods[] = {
 },
 
 {"generateStratifiedRandomAccuracyPts", Classification_GenStratifiedRandomAccuracyPts, METH_VARARGS,
-"classification.generateStratifiedRandomAccuracyPts(inputImage, outputShp, classImgCol, classImgVecCol, classRefVecCol, numPts, seed, force)\n"
+"classification.generateStratifiedRandomAccuracyPts(inputImage, outputShp, classImgCol, classImgVecCol, classRefVecCol, numPts, seed, force, usePxlLst)\n"
 "Generates a set of stratified random points for accuracy assessment.\n"
 "\n"
 "Where:\n"
@@ -264,6 +265,7 @@ static PyMethodDef ClassificationMethods[] = {
 "* numPts is an int specifying the number of points for each class which should be created.\n"
 "* seed is an int specifying the seed for the random number generator. (Optional: Default 10)\n"
 "* force is a bool, specifying whether to force removal of the output vector if it exists. (Optional: Default False)\n"
+"* usePxlLst is a bool, if there are only a small number of pixels then creating a list of all the pixel locations will speed up processing. (Optional: Default False)\n"
 },
     
 {"popClassInfoAccuracyPts", Classification_PopClassInfoAccuracyPts, METH_VARARGS,
