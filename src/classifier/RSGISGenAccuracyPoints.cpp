@@ -872,6 +872,15 @@ namespace rsgis{namespace classifier{
             calcImg.calcImageExtent(&inputImage, 1, 0);
             delete exClassPxlLocs;
             
+            bool **usedPxl = new bool*[numClasses];
+            for(unsigned long i = 0; i < numClasses; ++i)
+            {
+                usedPxl[i] = new bool[classPxlLst[i]->size()];
+                for(unsigned long j = 0; j < classPxlLst[i]->size(); ++j)
+                {
+                    usedPxl[i][j] = false;
+                }
+            }
             
             OGRFieldDefn imgClassField(vecClassImgCol.c_str(), OFTString);
             imgClassField.SetWidth(254);
@@ -893,14 +902,48 @@ namespace rsgis{namespace classifier{
             int imgClassColIdx = featDefn->GetFieldIndex(vecClassImgCol.c_str());
             int refClassColIdx = featDefn->GetFieldIndex(vecClassRefCol.c_str());
             unsigned long pxlIdx = 0;
+            bool foundPxl = false;
+            unsigned long findPxlIterCount = 0;
+            unsigned long checkPt = 0;
+            bool usedAllPxls = false;
             for(unsigned long i = 0; i < numClasses; ++i)
             {
                 std::cout << "Processing Class \"" << classNames->at(i) << "\"\n";
                 srand(seed);
+                checkPt = classPxlLst[i]->size();
                 for(unsigned long j = 0; j < numPts; ++j)
                 {
-                    
-                    pxlIdx = rand() % classPxlLst[i]->size();
+                    foundPxl = false;
+                    while(!foundPxl)
+                    {
+                        pxlIdx = rand() % classPxlLst[i]->size();
+                        if(!usedPxl[i][pxlIdx])
+                        {
+                            foundPxl = true;
+                            usedPxl[i][pxlIdx] = true;
+                        }
+                        else if(findPxlIterCount > checkPt)
+                        {
+                            usedAllPxls = true;
+                            for(unsigned long n = 0; n < classPxlLst[i]->size(); ++n)
+                            {
+                                if(!usedPxl[i][n])
+                                {
+                                    usedAllPxls = false;
+                                    break;
+                                }
+                            }
+                            
+                            if(usedAllPxls)
+                            {
+                                rsgis::utils::RSGISTextUtils txtUtils;
+                                throw rsgis::RSGISImageException("All pixels (n="+txtUtils.sizettostring(classPxlLst[i]->size())+") for class \""+classNames->at(i)+"\" have been sampled within the image");
+                            }
+                            checkPt = checkPt + classPxlLst[i]->size();
+                        }
+                        
+                        ++findPxlIterCount;
+                    }
                     
                     OGRFeature *poFeature = new OGRFeature(featDefn);
                     OGRPoint *pt = new OGRPoint(classPxlLst[i]->at(pxlIdx).first, classPxlLst[i]->at(pxlIdx).second, 0.0);
