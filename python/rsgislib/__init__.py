@@ -434,7 +434,25 @@ class RSGISPyUtils (object):
         noDataVal = rasterDS.GetRasterBand(band).GetNoDataValue()
         rasterDS = None
         return noDataVal
-    
+
+    def setImageNoDataValue(self, inImg, band=None):
+        """
+        A function to set the no data value for an image.
+        If band is not specified sets value for all bands.
+        """
+        import osgeo.gdal as gdal
+        rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
+        if rasterDS is None:
+            raise RSGISPyException('Could not open raster image: \'' + inImg+ '\'')
+
+        if band is not None:
+            rasterDS.GetRasterBand(band).SetNoDataValue()
+        else:
+            for band in range(rasterDS.RasterCount):
+                rasterDS.GetRasterBand(band+1).SetNoDataValue()
+
+        rasterDS = None
+
     def getWKTProjFromImage(self, inImg):
         """
         A function which returns the WKT string representing the projection 
