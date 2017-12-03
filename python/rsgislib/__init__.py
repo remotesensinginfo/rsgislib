@@ -435,21 +435,21 @@ class RSGISPyUtils (object):
         rasterDS = None
         return noDataVal
 
-    def setImageNoDataValue(self, inImg, band=None):
+    def setImageNoDataValue(self, inImg, noDataValue, band=None):
         """
         A function to set the no data value for an image.
         If band is not specified sets value for all bands.
         """
         import osgeo.gdal as gdal
-        rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
+        rasterDS = gdal.Open(inImg, gdal.GA_Update)
         if rasterDS is None:
-            raise RSGISPyException('Could not open raster image: \'' + inImg+ '\'')
+            raise RSGISPyException('Could not open raster image: \'' + inImg + '\'')
 
         if band is not None:
-            rasterDS.GetRasterBand(band).SetNoDataValue()
+            rasterDS.GetRasterBand(band).SetNoDataValue(noDataValue)
         else:
-            for band in range(rasterDS.RasterCount):
-                rasterDS.GetRasterBand(band+1).SetNoDataValue()
+            for b in range(rasterDS.RasterCount):
+                rasterDS.GetRasterBand(b+1).SetNoDataValue(noDataValue)
 
         rasterDS = None
 
