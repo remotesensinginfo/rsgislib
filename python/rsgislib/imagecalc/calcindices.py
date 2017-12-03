@@ -58,6 +58,8 @@ Where:
     bandDefns.append(rsgislib.imagecalc.BandDefn('red', image, rBand))
     bandDefns.append(rsgislib.imagecalc.BandDefn('nir', image, nBand))
     rsgislib.imagecalc.bandMath(outImage, expression, gdalFormat, rsgislib.TYPE_32FLOAT, bandDefns)
+    # Set no data value
+    rsgislib.RSGISPyUtils().setImageNoDataValue(outImage, -999)
     if stats:
         rsgislib.imageutils.popImageStats(outImage,False,-999.,True)
 
@@ -81,6 +83,8 @@ Where:
     bandDefns.append(rsgislib.imagecalc.BandDefn('blue', image, bBand))
     bandDefns.append(rsgislib.imagecalc.BandDefn('nir', image, nBand))
     rsgislib.imagecalc.bandMath(outImage, expression, gdalFormat, rsgislib.TYPE_32FLOAT, bandDefns)
+    # Set no data value
+    rsgislib.RSGISPyUtils().setImageNoDataValue(outImage, -999)
     if stats:
         rsgislib.imageutils.popImageStats(outImage,False,-999.,True)
 
@@ -108,6 +112,8 @@ Where:
     bandDefns.append(rsgislib.imagecalc.BandDefn('swir', image, sBand))
     bandDefns.append(rsgislib.imagecalc.BandDefn('nir', image, nBand))
     rsgislib.imagecalc.bandMath(outImage, expression, gdalFormat, rsgislib.TYPE_32FLOAT, bandDefns)
+    # Set no data value
+    rsgislib.RSGISPyUtils().setImageNoDataValue(outImage, -999)
     if stats:
         rsgislib.imageutils.popImageStats(outImage,False,-999.,True)
 
@@ -136,6 +142,8 @@ Where:
     bandDefns.append(rsgislib.imagecalc.BandDefn('green', image, gBand))
     bandDefns.append(rsgislib.imagecalc.BandDefn('nir', image, nBand))
     rsgislib.imagecalc.bandMath(outImage, expression, gdalFormat, rsgislib.TYPE_32FLOAT, bandDefns)
+    # Set no data value
+    rsgislib.RSGISPyUtils().setImageNoDataValue(outImage, -999)
     if stats:
         rsgislib.imageutils.popImageStats(outImage,False,-999.,True)
 
@@ -163,6 +171,8 @@ Where:
     bandDefns.append(rsgislib.imagecalc.BandDefn('green', image, gBand))
     bandDefns.append(rsgislib.imagecalc.BandDefn('swir', image, sBand))
     rsgislib.imagecalc.bandMath(outImage, expression, gdalFormat, rsgislib.TYPE_32FLOAT, bandDefns)
+    # Set no data value
+    rsgislib.RSGISPyUtils().setImageNoDataValue(outImage, -999)
     if stats:
         rsgislib.imageutils.popImageStats(outImage,False,-999.,True)
 
@@ -188,6 +198,8 @@ Where:
     bandDefns.append(rsgislib.imagecalc.BandDefn('green', image, gBand))
     bandDefns.append(rsgislib.imagecalc.BandDefn('red', image, rBand))
     rsgislib.imagecalc.bandMath(outImage, expression, gdalFormat, rsgislib.TYPE_32FLOAT, bandDefns)
+    # Set no data value
+    rsgislib.RSGISPyUtils().setImageNoDataValue(outImage, -999)
     if stats:
         rsgislib.imageutils.popImageStats(outImage,False,-999.,True)
 
@@ -213,6 +225,8 @@ Where:
     bandDefns.append(rsgislib.imagecalc.BandDefn('green', image, gBand))
     bandDefns.append(rsgislib.imagecalc.BandDefn('red', image, rBand))
     rsgislib.imagecalc.bandMath(outImage, expression, gdalFormat, rsgislib.TYPE_32FLOAT, bandDefns)
+    # Set no data value
+    rsgislib.RSGISPyUtils().setImageNoDataValue(outImage, -999)
     if stats:
         rsgislib.imageutils.popImageStats(outImage,False,-999.,True)
         
@@ -243,6 +257,8 @@ Where:
     rsgislib.imagecalc.bandMath(tmpImg, expression, gdalFormat, rsgislib.TYPE_32FLOAT, bandDefns)
     rsgislib.imageutils.normaliseImagePxlVals(inputimage=tmpImg, outputimage=outImage, gdalformat=gdalFormat, datatype=rsgislib.TYPE_32FLOAT, innodataval=-999, outnodataval=-999, outmin=0, outmax=1, stretchtype=rsgislib.imageutils.STRETCH_LINEARSTDDEV, stretchparam=2)
     rsgisUtils.deleteFileWithBasename(tmpImg)
+    # Set no data value
+    rsgisUtils.setImageNoDataValue(outImage, -999)
     if stats:
         rsgislib.imageutils.popImageStats(outImage,False,-999.,True)
 
@@ -267,6 +283,8 @@ Where:
     bandDefns.append(rsgislib.imagecalc.BandDefn('blue', image, bBand))
     bandDefns.append(rsgislib.imagecalc.BandDefn('nir', image, nBand))
     rsgislib.imagecalc.bandMath(outImage, expression, gdalFormat, rsgislib.TYPE_32FLOAT, bandDefns)
+    # Set no data value
+    rsgislib.RSGISPyUtils().setImageNoDataValue(outImage, -999)
     if stats:
         rsgislib.imageutils.popImageStats(outImage,False,-999.,True)
         
