@@ -280,3 +280,29 @@ Example::
     if not tmpPresent:
         shutil.rmtree(tmpDIR, ignore_errors=True)
 
+
+def countPxlsOfVal(inputImg, vals=[0]):
+    """
+Function which counts the number of pixels of a set of values returning a list in the same order as the list of values provided.
+
+Where:
+
+* inputImg - the input image
+* vals - is a list of pixel values to be counted
+
+"""
+    if len(vals) == 0:
+        raise Exception('At least 1 value should be provided within the vals input varable.')
+    numVals = len(vals)
+    outVals = numpy.zeros(numVals,dtype=numpy.int64)
+    
+    from rios.imagereader import ImageReader
+
+    reader = ImageReader(inputImg) 
+    for (info, block) in reader:     
+        for idx in range(numVals):
+            outVals[idx] = outVals[idx] + (block == vals[idx]).sum()
+
+    return outVals
+
+

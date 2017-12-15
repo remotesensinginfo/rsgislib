@@ -698,13 +698,14 @@ rsgislib.imageutils.mergeExtractedHDF5Data(inTrainSamples, cloudTrainSamples)
     fH5Out.close()
 
 
-def doImagesOverlap(image1, image2):
+def doImagesOverlap(image1, image2, overThres=0.0):
     """
 Function to test whether two images overlap with one another.
 If the images have a difference projection/coordinate system then corners 
 
 * image1 - path to first image
 * image2 - path to second image
+* overThres - the amount of overlap required to return true (e.g., at least 1 pixel)
 
 Returns:
 
@@ -786,9 +787,9 @@ print("Images Overlap: " + str(overlap))
     if img2TLY < yMax:
         yMax = img2TLY
         
-    if xMax - xMin <= 0:
+    if xMax - xMin <= overThres:
         overlap = False
-    elif yMax - yMin <= 0:
+    elif yMax - yMin <= overThres:
         overlap = False
     
     return overlap
