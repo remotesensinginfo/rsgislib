@@ -2152,9 +2152,34 @@ namespace rsgis{namespace img{
     
     void RSGISIncludeSingleImgCalcImgVal::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
     {
-        if(numOutBands != (numBands*2))
+        if(this->numOutBands != (numBands*2))
         {
             throw RSGISImageCalcException("The number of bands does not fit the number specified.");
+        }
+        
+        bool foundNoData = false;
+        if(this->useNoData)
+        {
+            for(int i = 0; i < this->numOutBands; ++i)
+            {
+                if(bandValues[i+this->numOutBands] == noDataVal)
+                {
+                    foundNoData = true;
+                    break;
+                }
+            }
+        }
+        
+        for(int i = 0; i < this->numOutBands; ++i)
+        {
+            if(foundNoData)
+            {
+                output[i] = bandValues[i+this->numOutBands];
+            }
+            else
+            {
+                output[i] = bandValues[i];
+            }
         }
     }
     
