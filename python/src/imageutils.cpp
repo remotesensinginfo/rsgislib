@@ -453,7 +453,7 @@ static PyObject *ImageUtils_IncludeImagesIndImgIntersect(PyObject *self, PyObjec
     PyObject *pInputImages; // List of input images
     
     // Check parameters are present and of correct type
-    if( !PyArg_ParseTuple(args, "sOi:includeImagesIndImgIntersect", &pszBaseImage, &pInputImages))
+    if( !PyArg_ParseTuple(args, "sO:includeImagesIndImgIntersect", &pszBaseImage, &pInputImages))
     {
         return NULL;
     }
