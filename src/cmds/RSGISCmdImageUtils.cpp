@@ -942,8 +942,8 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-            
-    void executeImageIncludeOverviews(std::string baseImage, std::vector<std::string> inputImages, std::vector<int> pyraScaleVals) throw(RSGISCmdException)
+                
+    void executeImageIncludeOverlap(std::string *inputImages, int numDS, std::string baseImage, int numOverlapPxls) throw(RSGISCmdException)
     {
         try
         {
@@ -956,10 +956,11 @@ namespace rsgis{ namespace cmds {
                 throw RSGISImageException(message.c_str());
             }
             
-            rsgis::img::RSGISCombineImgTileOverview combineOverviews;
-            combineOverviews.combineKEAImgTileOverviews(baseDS, inputImages, pyraScaleVals);
+            rsgis::img::RSGISImageMosaic mosaic;
+            mosaic.includeDatasetsIgnoreOverlap(baseDS, inputImages, numDS, numOverlapPxls);
             
             GDALClose(baseDS);
+            delete[] inputImages;
         }
         catch (RSGISImageException& e)
         {
@@ -970,7 +971,7 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-            
+    
     void executeImageIncludeIndImgIntersect(std::string *inputImages, int numDS, std::string baseImage) throw(RSGISCmdException)
     {
         try
@@ -1012,6 +1013,34 @@ namespace rsgis{ namespace cmds {
             
             GDALClose(baseDS);
             delete[] inputImages;
+        }
+        catch (RSGISImageException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+    
+    void executeImageIncludeOverviews(std::string baseImage, std::vector<std::string> inputImages, std::vector<int> pyraScaleVals) throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            
+            GDALDataset *baseDS = (GDALDataset *) GDALOpenShared(baseImage.c_str(), GA_Update);
+            if(baseDS == NULL)
+            {
+                std::string message = std::string("Could not open image ") + baseImage;
+                throw RSGISImageException(message.c_str());
+            }
+            
+            rsgis::img::RSGISCombineImgTileOverview combineOverviews;
+            combineOverviews.combineKEAImgTileOverviews(baseDS, inputImages, pyraScaleVals);
+            
+            GDALClose(baseDS);
         }
         catch (RSGISImageException& e)
         {
