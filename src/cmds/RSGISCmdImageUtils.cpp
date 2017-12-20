@@ -971,7 +971,7 @@ namespace rsgis{ namespace cmds {
         }
     }
             
-    void executeImageIncludeOverlap(std::string *inputImages, int numDS, std::string baseImage, int numOverlapPxls) throw(RSGISCmdException)
+    void executeImageIncludeIndImgIntersect(std::string *inputImages, int numDS, std::string baseImage) throw(RSGISCmdException)
     {
         try
         {
@@ -983,9 +983,32 @@ namespace rsgis{ namespace cmds {
                 std::string message = std::string("Could not open image ") + baseImage;
                 throw RSGISImageException(message.c_str());
             }
+            int numBaseBands = baseDS->GetRasterCount();
             
-            rsgis::img::RSGISImageMosaic mosaic;
-            mosaic.includeDatasetsIgnoreOverlap(baseDS, inputImages, numDS, numOverlapPxls);
+            int useNoDataValInt = false;
+            double noDataVal = baseDS->GetRasterBand(1)->GetNoDataValue(&useNoDataValInt);
+            bool useNoDataVal = (bool)useNoDataValInt;
+            
+            GDALDataset **datasets = new GDALDataset*[2];
+            rsgis::img::RSGISIncludeSingleImgCalcImgVal *addImg2Base = new rsgis::img::RSGISIncludeSingleImgCalcImgVal(numBaseBands, useNoDataVal, noDataVal);
+            rsgis::img::RSGISCalcImage *calcImg = new rsgis::img::RSGISCalcImage(addImg2Base);
+            for(int i = 0; i < numDS; ++i)
+            {
+                GDALDataset *inImg = (GDALDataset *) GDALOpenShared(inputImages[i].c_str(), GA_ReadOnly);
+                datasets[0] = baseDS;
+                datasets[1] = inImg;
+                
+                useNoDataValInt = false;
+                noDataVal = inImg->GetRasterBand(1)->GetNoDataValue(&useNoDataValInt);
+                useNoDataVal = (bool)useNoDataValInt;
+                
+                addImg2Base->setNoDataValue(useNoDataVal, noDataVal);
+                calcImg->calcImage(datasets, 2, baseDS);
+                GDALClose(inImg);
+            }
+            delete addImg2Base;
+            delete calcImg;
+            delete[] datasets;
             
             GDALClose(baseDS);
             delete[] inputImages;

@@ -104,8 +104,11 @@ namespace rsgis{ namespace cmds {
     /** A command to add images to an existing image*/
     DllExport void executeImageInclude(std::string *inputImages, int numDS, std::string baseImage, bool bandsDefined, std::vector<int> bands, float skipVal=0.0, bool useSkipVal=false) throw(RSGISCmdException);
     
-    /** A command to add images to an existing image*/
+    /** A command to add images to an existing image ignoring the overlaps*/
     DllExport void executeImageIncludeOverlap(std::string *inputImages, int numDS, std::string baseImage, int numOverlapPxls) throw(RSGISCmdException);
+    
+    /** A command to add images to an existing image where the input images can over areas outside of the base image*/
+    DllExport void executeImageIncludeIndImgIntersect(std::string *inputImages, int numDS, std::string baseImage) throw(RSGISCmdException);
     
     /** A command to create overview images in the base image by mosaicking the overviews from the tiles/subsets images */
     DllExport void executeImageIncludeOverviews(std::string baseImage, std::vector<std::string> inputImages, std::vector<int> pyraScaleVals) throw(RSGISCmdException);
