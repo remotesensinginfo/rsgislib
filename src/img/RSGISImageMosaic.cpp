@@ -2143,6 +2143,26 @@ namespace rsgis{namespace img{
         
     }
     
+    
+    RSGISIncludeSingleImgCalcImgVal::RSGISIncludeSingleImgCalcImgVal(int numBands, bool useNoData, float noDataVal):RSGISCalcImageValue(numBands)
+    {
+        this->useNoData = useNoData;
+        this->noDataVal = noDataVal;
+    }
+    
+    void RSGISIncludeSingleImgCalcImgVal::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+    {
+        if(numOutBands != (numBands*2))
+        {
+            throw RSGISImageCalcException("The number of bands does not fit the number specified.");
+        }
+    }
+    
+    RSGISIncludeSingleImgCalcImgVal::~RSGISIncludeSingleImgCalcImgVal()
+    {
+        
+    }
+    
 
 }}
 

@@ -447,6 +447,46 @@ static PyObject *ImageUtils_IncludeImagesOverlap(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
+static PyObject *ImageUtils_IncludeImagesIndImgIntersect(PyObject *self, PyObject *args)
+{
+    const char *pszBaseImage;
+    PyObject *pInputImages; // List of input images
+    
+    // Check parameters are present and of correct type
+    if( !PyArg_ParseTuple(args, "sOi:includeImagesIndImgIntersect", &pszBaseImage, &pInputImages))
+    {
+        return NULL;
+    }
+    
+    // TODO: Look into this function - doesn't seem to catch when only a single image is provided.
+    if(!PySequence_Check(pInputImages))
+    {
+        PyErr_SetString(GETSTATE(self)->error, "Second argument must be a list of images");
+        return NULL;
+    }
+    
+    // Extract list of images to array of strings.
+    int numImages = 0;
+    std::string *inputImages = ExtractStringArrayFromSequence(pInputImages, &numImages);
+    if(numImages == 0)
+    {
+        PyErr_SetString(GETSTATE(self)->error, "No input images provided");
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeImageIncludeIndImgIntersect(inputImages, numImages, pszBaseImage);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 
 static PyObject *ImageUtils_CombineImageOverview(PyObject *self, PyObject *args, PyObject *keywds)
 {
@@ -2026,6 +2066,26 @@ static PyMethodDef ImageUtilsMethods[] = {
 "	imageutils.includeImagesWithOverlap(outputImg, inputList, 10)\n"
 "\n"},
 
+{"includeImagesIndImgIntersect", ImageUtils_IncludeImagesIndImgIntersect, METH_VARARGS,
+"rsgislib.imageutils.includeImagesIndImgIntersect(baseImage, inputImages)\n"
+"Create mosaic from list of input images written to the base image. The no data value will be honered and values over written.\n"
+"\n"
+"Where:\n"
+"\n"
+"* baseImage is a string containing the name of the input image to add image to\n"
+"* inputimagelist is a list of input images\n"
+"\n"
+"Example::\n"
+"\n"
+"    import rsgislib\n"
+"    from rsgislib import imageutils\n"
+"    import glob\n"
+"    # Search for all files with the extension 'kea'\n"
+"    baseImage = './TestOutputs/injune_p142_casi_sub_utm_mosaic.kea'\n"
+"    inputList = glob.glob('./TestOutputs/Tiles/*.kea')\n"
+"    imageutils.includeImagesIndImgIntersect(baseImage, inputList)\n"
+"\n"},
+    
 {"combineImageOverviews", (PyCFunction)ImageUtils_CombineImageOverview, METH_VARARGS | METH_KEYWORDS,
 "rsgislib.imageutils.combineImageOverviews(base=string, images=list, pyscales=list)\n"
 "A function to combine (mosaic) the image overviews (pyramids) from the list of input images and add\n"
