@@ -67,6 +67,7 @@ namespace rsgis
 				RSGISCalcImage(RSGISCalcImageValue *valueCalc, std::string proj="", bool useImageProj=true);
 				void calcImage(GDALDataset **datasets, int numDS, std::string outputImage, bool setOutNames = false, std::string *bandNames = NULL, std::string gdalFormat="KEA", GDALDataType gdalDataType=GDT_Float32) throw(RSGISImageCalcException,RSGISImageBandException);
 				void calcImage(GDALDataset **datasets, int numDS, GDALDataset *outputImageDS) throw(RSGISImageCalcException,RSGISImageBandException);
+                void calcImagePartialOutput(GDALDataset **datasets, int numDS, GDALDataset *outputImageDS) throw(RSGISImageCalcException,RSGISImageBandException);
 				void calcImage(GDALDataset **datasets, int numDS) throw(RSGISImageCalcException,RSGISImageBandException);
                 void calcImage(GDALDataset **datasets, int numIntDS, int numFloatDS, std::string outputImage, bool setOutNames = false, std::string *bandNames = NULL, std::string gdalFormat="KEA", GDALDataType gdalDataType=GDT_Float32) throw(RSGISImageCalcException,RSGISImageBandException);
                 void calcImage(GDALDataset **datasets, int numIntDS, int numFloatDS, geos::geom::Envelope *env=NULL, bool quiet=false) throw(RSGISImageCalcException,RSGISImageBandException);
