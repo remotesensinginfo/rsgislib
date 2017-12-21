@@ -5264,14 +5264,33 @@ namespace rsgis{namespace img{
     	 * - A two sided test is used rather than the absolute value to prevent
     	 * 	 overflows.
     	 */
+        
+        if((baseRes < 0) & (targetRes > 0))
+        {
+            return false;
+        }
+        if((baseRes > 0) & (targetRes < 0))
+        {
+            return false;
+        }
 
     	bool closeRes = true;
     	double resDiff = baseRes - targetRes;
     	double resDiffVal = this->resDiffThresh * baseRes;
 
-    	if((resDiff > 0) && (resDiff > resDiffVal)){closeRes = false;}
-    	else if((resDiff < 0) && (resDiff > -1.*resDiffVal)){closeRes = false;}
-
+        if(resDiff < 0)
+        {
+            resDiff = resDiff * (-1.0);
+        }
+        if(resDiffVal < 0)
+        {
+            resDiffVal = resDiffVal * (-1.0);
+        }
+        
+    	if((resDiff > 0) && (resDiff > resDiffVal))
+        {
+            closeRes = false;
+        }
     	return closeRes;
     }
     

@@ -1004,7 +1004,7 @@ namespace rsgis{ namespace cmds {
                 useNoDataVal = (bool)useNoDataValInt;
                 
                 addImg2Base->setNoDataValue(useNoDataVal, noDataVal);
-                calcImg->calcImage(datasets, 2, baseDS);
+                calcImg->calcImagePartialOutput(datasets, 2, baseDS);
                 GDALClose(inImg);
             }
             delete addImg2Base;
