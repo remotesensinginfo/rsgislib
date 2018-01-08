@@ -208,6 +208,8 @@ Example::
     vectorutils.writeVecColumn(requiredScenesShp+'.shp', requiredScenesShp, 'ScnName', ogr.OFTString, requiredScenes)
 
 """
+    gdal.UseExceptions()
+    
     ds = gdal.OpenEx(vectorFile, gdal.OF_UPDATE )
     if ds is None:
         print("Could not open '" + vectorFile + "'")
@@ -259,6 +261,8 @@ A function to extract an image footprint as a vector.
 * tmpDIR - temp directory which will be used during processing. It will be created and deleted once processing complete.
 * rePrjTo - optional command 
 """
+    gdal.UseExceptions()
+
     rsgisUtils = rsgislib.RSGISPyUtils()
     
     uidStr = rsgisUtils.uidGenerator()
@@ -346,3 +350,104 @@ Where:
             except OSError as e:
                 raise Exception('Error running ogr2ogr: ' + cmd)
 
+def mergeVectors2SQLiteDB(inFileList, outDBFile, lyrName, exists):
+    """
+Function which will merge a list of vector files into an single output SQLite database using ogr2ogr.
+
+Where:
+
+* inFileList - is a list of input files.
+* outDBFile - is the output SQLite database (*.sqlite)
+* lyrName - is the layer name in the output database (i.e., you can merge layers into single layer or write a number of layers to the same database).
+* exists - boolean which specifies whether the database file exists or not.
+"""
+    first = True
+    for inFile in inFileList:
+        print("Processing: " + inFile)
+        if first:
+            if not exists:
+                cmd = 'ogr2ogr -f "SQLite" -lco COMPRESS_GEOM=YES -lco SPATIAL_INDEX=YES -nln '+lyrName+' "' + outDBFile + '" "' + inFile + '"'
+                try:
+                    subprocess.call(cmd, shell=True)
+                except OSError as e:
+                    raise Exception('Error running ogr2ogr: ' + cmd)
+            else:
+                cmd = 'ogr2ogr -update -f "SQLite" -lco COMPRESS_GEOM=YES -lco SPATIAL_INDEX=YES -nln '+lyrName+' "' + outDBFile + '" "' + inFile + '"'
+                try:
+                    subprocess.call(cmd, shell=True)
+                except OSError as e:
+                    raise Exception('Error running ogr2ogr: ' + cmd)
+            first = False
+        else:
+            cmd = 'ogr2ogr -update -append -f "SQLite" -nln '+lyrName+' "' + outDBFile + '" "' + inFile + '"'
+            try:
+                subprocess.call(cmd, shell=True)
+            except OSError as e:
+                raise Exception('Error running ogr2ogr: ' + cmd)
+
+
+def createPolySHP4LstBBOXs(csvFile, outSHP, espgCode, minXCol=0, maxXCol=1, minYCol=2, maxYCol=3, ignoreRows=0, force=False):
+    """
+This function takes a CSV file of bounding boxes (1 per line) and creates a polygon shapefile.
+    
+* csvFile - input CSV file.
+* outSHP - output ESRI shapefile
+* espgCode - ESPG code specifying the projection of the data (4326 is WSG84 Lat/Long).
+* minXCol - The index (starting at 0) for the column within the CSV file for the minimum X coordinate.
+* maxXCol - The index (starting at 0) for the column within the CSV file for the maximum X coordinate.
+* minYCol - The index (starting at 0) for the column within the CSV file for the minimum Y coordinate.
+* maxYCol - The index (starting at 0) for the column within the CSV file for the maximum Y coordinate.
+* ignoreRows - The number of rows to ignore from the start of the CSV file (i.e., column headings)
+* force - If the output file already exists delete it before proceeding.
+"""
+    try:
+        if os.path.exists(outSHP):
+            if force:
+                driver = ogr.GetDriverByName('ESRI Shapefile')
+                driver.DeleteDataSource(outSHP)
+            else:
+                raise Exception("Output file already exists")
+        # Create the output Driver
+        outDriver = ogr.GetDriverByName('ESRI Shapefile')
+        # create the spatial reference, WGS84
+        srs = osr.SpatialReference()
+        srs.ImportFromEPSG(int(espgCode))
+        # Create the output Shapefile
+        outDataSource = outDriver.CreateDataSource(outSHP)
+        outLayer = outDataSource.CreateLayer(os.path.splitext(os.path.basename(outSHP))[0], srs, geom_type=ogr.wkbPolygon )
+        # Get the output Layer's Feature Definition
+        featureDefn = outLayer.GetLayerDefn()
+    
+        dataFile = open(csvFile, 'r')
+        rowCount = 0
+        for line in dataFile:
+            if rowCount >= ignoreRows:
+                line = line.strip()
+                if line != "":
+                    comps = line.split(',')
+                    # Get values from CSV file.
+                    minX = float(comps[minXCol])
+                    maxX = float(comps[maxXCol])
+                    minY = float(comps[minYCol])
+                    maxY = float(comps[maxYCol])
+                    # Create Linear Ring
+                    ring = ogr.Geometry(ogr.wkbLinearRing)
+                    ring.AddPoint(minX, maxY)
+                    ring.AddPoint(maxX, maxY)
+                    ring.AddPoint(maxX, minY)
+                    ring.AddPoint(minX, minY)
+                    ring.AddPoint(minX, maxY)
+                    # Create polygon.
+                    poly = ogr.Geometry(ogr.wkbPolygon)
+                    poly.AddGeometry(ring)
+                    # Add to output shapefile.
+                    outFeature = ogr.Feature(featureDefn)
+                    outFeature.SetGeometry(poly)
+                    outLayer.CreateFeature(outFeature)
+                    outFeature = None
+            rowCount = rowCount + 1
+        dataFile.close()
+        outDataSource = None
+    except Exception as e:
+        raise e
+        
