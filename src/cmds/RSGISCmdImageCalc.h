@@ -84,7 +84,8 @@ namespace rsgis{ namespace cmds {
         rsgiscmds_stat_range,
         rsgiscmds_stat_stddev,
         rsgiscmds_stat_sum,
-        rsgiscmds_stat_mode
+        rsgiscmds_stat_mode,
+        rsgiscmds_stat_count
     };
 
     /** Function to run the band maths tools */
@@ -177,6 +178,9 @@ namespace rsgis{ namespace cmds {
     DllExport void executeRescaleImages(std::vector<std::string> inputImgs, std::string outputImg, std::string gdalFormat, RSGISLibDataType outDataType, float cNoDataVal, float cOffset, float cGain, float nNoDataVal, float nOffset, float nGain) throw(RSGISCmdException);
     /** A function to get the index of an input list of images for a particular stat (e.g., min, max, median) */
     DllExport void executeGetImgIdxForStat(std::vector<std::string> inputImgs, std::string outputImg, std::string gdalFormat, float noDataVal, RSGISCmdsSummariseStats sumStat) throw(RSGISCmdException);
+    /** A function to derieve summary stats for the high resolution image pixels for regions defined by the low resolution image pixels */
+    DllExport void executeGetWithinPxlImgStatSummaries(std::string refImg, std::string statsImg, unsigned int statsImgBand, std::string outImg, std::string gdalFormat, RSGISLibDataType outDataType, bool useNoData, std::vector<RSGISCmdsSummariseStats> cmdSumStats, unsigned int xIOGrid, unsigned int yIOGrid) throw(RSGISCmdException);
+    
 }}
 
 

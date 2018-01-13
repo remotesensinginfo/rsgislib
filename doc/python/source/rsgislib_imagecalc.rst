@@ -54,6 +54,7 @@ Statistics
 .. autofunction:: rsgislib.imagecalc.calcImageDifference
 .. autofunction:: rsgislib.imagecalc.getImgIdxForStat
 .. autofunction:: rsgislib.imagecalc.countPxlsOfVal
+.. autofunction:: rsgislib.imagecalc.getImgSumStatsInPxl
 
 
 Normalise

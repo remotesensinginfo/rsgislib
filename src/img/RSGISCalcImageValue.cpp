@@ -43,6 +43,27 @@ namespace rsgis{namespace img{
 	{
 		
 	}
+    
+    
+    RSGISCalcValuesFromMultiResInputs::RSGISCalcValuesFromMultiResInputs(int numberOutBands)
+    {
+        this->numOutBands = numberOutBands;
+    }
+    
+    int RSGISCalcValuesFromMultiResInputs::getNumOutBands()
+    {
+        return numOutBands;
+    }
+    
+    void RSGISCalcValuesFromMultiResInputs::setNumOutBands(int bands)
+    {
+        numOutBands = bands;
+    }
+    
+    RSGISCalcValuesFromMultiResInputs::~RSGISCalcValuesFromMultiResInputs()
+    {
+        
+    }
 
 	
 }} //rsgis::img

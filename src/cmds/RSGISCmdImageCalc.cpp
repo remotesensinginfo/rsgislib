@@ -53,6 +53,7 @@
 #include "img/RSGISGenHistogram.h"
 #include "img/RSGISCalcImgValProb.h"
 #include "img/RSGISApplyGainOffset2Img.h"
+#include "img/RSGISImgSummaryStatsFromMultiResImgs.h"
 
 #include "math/RSGISVectors.h"
 #include "math/RSGISMatrices.h"
@@ -3116,7 +3117,92 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
+    
                 
+    void executeGetWithinPxlImgStatSummaries(std::string refImg, std::string statsImg, unsigned int statsImgBand, std::string outImg, std::string gdalFormat, RSGISLibDataType outDataType, bool useNoData, std::vector<RSGISCmdsSummariseStats> cmdSumStats, unsigned int xIOGrid, unsigned int yIOGrid) throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            
+            std::vector<rsgis::math::rsgissummarytype> sumStats;
+            for(std::vector<RSGISCmdsSummariseStats>::iterator iterSum = cmdSumStats.begin(); iterSum != cmdSumStats.end(); ++iterSum)
+            {
+                if((*iterSum) == rsgis::cmds::rsgiscmds_stat_min)
+                {
+                    sumStats.push_back(rsgis::math::sumtype_min);
+                }
+                else if((*iterSum) == rsgis::cmds::rsgiscmds_stat_max)
+                {
+                    sumStats.push_back(rsgis::math::sumtype_max);
+                }
+                else if((*iterSum) == rsgis::cmds::rsgiscmds_stat_mean)
+                {
+                    sumStats.push_back(rsgis::math::sumtype_mean);
+                }
+                else if((*iterSum) == rsgis::cmds::rsgiscmds_stat_median)
+                {
+                    sumStats.push_back(rsgis::math::sumtype_median);
+                }
+                else if((*iterSum) == rsgis::cmds::rsgiscmds_stat_range)
+                {
+                    sumStats.push_back(rsgis::math::sumtype_range);
+                }
+                else if((*iterSum) == rsgis::cmds::rsgiscmds_stat_stddev)
+                {
+                    sumStats.push_back(rsgis::math::sumtype_stddev);
+                }
+                else if((*iterSum) == rsgis::cmds::rsgiscmds_stat_sum)
+                {
+                    sumStats.push_back(rsgis::math::sumtype_sum);
+                }
+                else if((*iterSum) == rsgis::cmds::rsgiscmds_stat_mode)
+                {
+                    sumStats.push_back(rsgis::math::sumtype_mode);
+                }
+                else if((*iterSum) == rsgis::cmds::rsgiscmds_stat_count)
+                {
+                    sumStats.push_back(rsgis::math::sumtype_count);
+                }
+                else
+                {
+                    throw RSGISCmdException("The summary type specified is unknown.");
+                }
+            }
+            
+            GDALDataset *refDataset = (GDALDataset *) GDALOpen(refImg.c_str(), GA_ReadOnly);
+            if(refDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + refImg;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            GDALDataset *statsDataset = (GDALDataset *) GDALOpen(statsImg.c_str(), GA_ReadOnly);
+            if(statsDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + statsImg;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            rsgis::img::RSGISImgSummaryStatsFromMultiResImgs calcMultiResStats;
+            calcMultiResStats.calcSummaryStats4LowResPxlsFromHighResImg(refDataset, statsDataset, statsImgBand, outImg, gdalFormat, RSGIS_to_GDAL_Type(outDataType), useNoData, sumStats, xIOGrid, yIOGrid);
+            
+            GDALClose(refDataset);
+            GDALClose(statsDataset);
+        }
+        catch(rsgis::RSGISImageException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
                 
 }}
 
