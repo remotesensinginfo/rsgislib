@@ -12277,14 +12277,499 @@ namespace rsgis{namespace img{
         {
             throw RSGISImageCalcException(e.what());
         }
-        
-        
     }
     
 	RSGISCalcImage::~RSGISCalcImage()
 	{
 		
 	}
+    
+    
+    
+    RSGISCalcImageMultiImgRes::RSGISCalcImageMultiImgRes(RSGISCalcValuesFromMultiResInputs *valueCalcSum)
+    {
+        this->valueCalcSum = valueCalcSum;
+    }
+    
+    void RSGISCalcImageMultiImgRes::calcImageHighResForLowRegions(GDALDataset *refDataset, GDALDataset *statsDataset, unsigned int statsImgBand, std::string outputImage, std::string gdalFormat, GDALDataType gdalDataType, bool useNoDataVal, unsigned int xIOGrid, unsigned int yIOGrid, bool setOutNames, std::string *bandNames) throw(RSGISImageException)
+    {
+        try
+        {
+            if( (statsImgBand == 0) || (statsImgBand > statsDataset->GetRasterCount()) )
+            {
+                throw RSGISImageException("The image band specified for the stats image is not within the image. Don't forget, band numbering starts at 1.");
+            }
+            
+            double *refImgTrans = new double[6];
+            refDataset->GetGeoTransform(refImgTrans);
+            double *statsImgTrans = new double[6];
+            statsDataset->GetGeoTransform(statsImgTrans);
+            
+            // Check stats image has a resolution which is a multiple of the ref image resolution.
+            if(refImgTrans[1] <= statsImgTrans[1])
+            {
+                throw RSGISImageException("Reference image is less than or equal resolution to stats image in X axis.");
+            }
+            else if(fmod(refImgTrans[1], statsImgTrans[1]) != 0)
+            {
+                throw RSGISImageException("Stats image resolution is not a multiple  less than or equal resolution to stats image in X axis.");
+            }
+            double xRefRes = refImgTrans[1];
+            double xStatsRes = statsImgTrans[1];
+            unsigned int nXPxls = ceil(xRefRes/xStatsRes);
+            
+            refImgTrans[5] = std::fabs(refImgTrans[5]);
+            statsImgTrans[5] = std::fabs(statsImgTrans[5]);
+            
+            if(refImgTrans[5] <= statsImgTrans[5])
+            {
+                throw RSGISImageException("Reference image is less than or equal resolution to stats image in Y axis.");
+            }
+            else if(fmod(refImgTrans[5], statsImgTrans[5]) != 0)
+            {
+                throw RSGISImageException("Stats image resolution is not a multiple  less than or equal resolution to stats image in Y axis.");
+            }
+            double yRefRes = refImgTrans[5];
+            double yStatsRes = statsImgTrans[5];
+            unsigned int nYPxls = ceil(yRefRes/yStatsRes);
+            
+            std::cout << "There are " << nXPxls << " by " << nYPxls << " pixels within a single reference pixel\n";
+            
+            // Check rotation
+            if(refImgTrans[2] != statsImgTrans[2])
+            {
+                throw RSGISImageException("X rotation is not equilvent between the two images.");
+            }
+            
+            if(refImgTrans[4] != statsImgTrans[4])
+            {
+                throw RSGISImageException("Y rotation is not equilvent between the two images.");
+            }
+            
+            // Get image size in pixels.
+            unsigned int refImgXPxls = refDataset->GetRasterXSize();
+            unsigned int refImgYPxls = refDataset->GetRasterYSize();
+            
+            unsigned int statsImgXPxls = statsDataset->GetRasterXSize();
+            unsigned int statsImgYPxls = statsDataset->GetRasterYSize();
+            
+            // Get image bounds.
+            double refImgXMin = refImgTrans[0];
+            double refImgXMax = refImgTrans[0] + (xRefRes * refImgXPxls);
+            double refImgYMin = refImgTrans[3] - (yRefRes * refImgYPxls);
+            double refImgYMax = refImgTrans[3];
+            
+            double statsImgXMin = statsImgTrans[0];
+            double statsImgXMax = statsImgTrans[0] + (xStatsRes * statsImgXPxls);
+            double statsImgYMin = statsImgTrans[3] - (yStatsRes * statsImgYPxls);
+            double statsImgYMax = statsImgTrans[3];
+            
+            // Check whether images overlap.
+            if((refImgXMin > statsImgXMax) | (statsImgXMin > refImgXMax))
+            {
+                throw RSGISImageException("Images do not overlap in the X axis.");
+            }
+            
+            if((refImgYMin > statsImgYMax) | (statsImgYMin > refImgYMax))
+            {
+                throw RSGISImageException("Images do not overlap in the Y axis.");
+            }
+            
+            // Find overlap starting points and pixel widths.
+            double xMinOverlap = refImgXMin;
+            double xMaxOverlap = refImgXMax;
+            double yMinOverlap = refImgYMin;
+            double yMaxOverlap = refImgYMax;
+            
+            if(statsImgXMin > xMinOverlap)
+            {
+                double diff = ceil((statsImgXMin - xMinOverlap)/xRefRes)*xRefRes;
+                xMinOverlap = xMinOverlap + diff;
+            }
+            
+            if(statsImgXMax < xMaxOverlap)
+            {
+                double diff = ceil((xMaxOverlap - statsImgXMax)/xRefRes)*xRefRes;
+                xMaxOverlap = xMaxOverlap - diff;
+            }
+            
+            if(statsImgYMin > yMinOverlap)
+            {
+                double diff = ceil((statsImgYMin - yMinOverlap)/yRefRes)*yRefRes;
+                yMinOverlap = yMinOverlap + diff;
+            }
+            
+            if(statsImgYMax < yMaxOverlap)
+            {
+                double diff = ceil((yMaxOverlap - statsImgYMax)/yRefRes)*yRefRes;
+                yMaxOverlap = yMaxOverlap - diff;
+            }
+            
+            long refPxlWidth = floor((xMaxOverlap - xMinOverlap)/xRefRes);
+            long refPxlHeight = floor((yMaxOverlap - yMinOverlap)/yRefRes);
+            
+            // Define the number of blocks in the X and Y needed to tranverse the image.
+            long nXBlocks = refPxlWidth / xIOGrid;
+            long remainCols = refPxlWidth - (nXBlocks * xIOGrid);
+            long remainColsStats = (remainCols * nXPxls);
+            
+            long nYBlocks = refPxlHeight / yIOGrid;
+            long remainRows = refPxlHeight - (nYBlocks * yIOGrid);
+            long remainRowsStats = (remainRows * nYPxls);
+            
+            // Get Input Stats image band.
+            GDALRasterBand *statsBand = statsDataset->GetRasterBand(statsImgBand);
+            double noDataVal = 0.0;
+            if(useNoDataVal)
+            {
+                noDataVal = statsBand->GetNoDataValue();
+            }
+            
+            // Create the output image file
+            int numOutImgBands = this->valueCalcSum->getNumOutBands();
+            GDALDriver *gdalDriver = GetGDALDriverManager()->GetDriverByName(gdalFormat.c_str());
+            if(gdalDriver == NULL)
+            {
+                throw RSGISImageException("Requested GDAL driver does not exists..");
+            }
+            std::cout << "New image width = " << refPxlWidth << " height = " << refPxlHeight << " bands = " << numOutImgBands << std::endl;
+            
+            GDALDataset *outputImageDS = gdalDriver->Create(outputImage.c_str(), refPxlWidth, refPxlHeight, numOutImgBands, gdalDataType, NULL);
+            
+            if(outputImageDS == NULL)
+            {
+                throw RSGISImageException("Output image could not be created. Check filepath.");
+            }
+            double *outImgTrans = new double[6];
+            outImgTrans[0] = xMinOverlap;
+            outImgTrans[1] = refImgTrans[1];
+            outImgTrans[2] = refImgTrans[2];
+            outImgTrans[3] = yMaxOverlap;
+            outImgTrans[4] = refImgTrans[4];
+            if(refImgTrans[5] > 0)
+            {
+                refImgTrans[5] = refImgTrans[5]*(-1);
+            }
+            outImgTrans[5] = refImgTrans[5];
+            outputImageDS->SetGeoTransform(outImgTrans);
+            outputImageDS->SetProjection(refDataset->GetProjectionRef());
+            
+            // Block width in stats image pixels
+            long xIOGridStats = nXPxls * xIOGrid;
+            long yIOGridStats = nYPxls * yIOGrid;
+            long nStatsPixelsInRefPxl = nXPxls * nYPxls;
+            
+            // Create Data Arrays and open output bands
+            unsigned long numRefPxlsInBlock = xIOGrid * yIOGrid;
+            double **refDataArrOuts = new double*[numOutImgBands];
+            GDALRasterBand **outBands = new GDALRasterBand*[numOutImgBands];
+            for(unsigned int i = 0; i < numOutImgBands; ++i)
+            {
+                outBands[i] = outputImageDS->GetRasterBand(i+1);
+                refDataArrOuts[i] = (double *) CPLMalloc(sizeof(double)*numRefPxlsInBlock);
+            }
+            
+            unsigned long numStatsPxlsInBlock = xIOGridStats * yIOGridStats;
+            float *statsDataArr = (float *) CPLMalloc(sizeof(float)*numStatsPxlsInBlock);
+            
+            float *statsPxlsInRefPxl = new float[nStatsPixelsInRefPxl];
+            double *outImgBandVals = new double[numOutImgBands];
+            
+            // Sort out stats for user feedback
+            long nBlocks = nXBlocks * nYBlocks;
+            if(remainCols > 0)
+            {
+                nBlocks += nYBlocks;
+            }
+            if(remainRows > 0)
+            {
+                nBlocks += nXBlocks;
+                if(remainCols > 0)
+                {
+                    nBlocks += 1;
+                }
+            }
+            
+            int rowOffsetRef = 0;
+            int colOffsetRef = 0;
+            int rowOffsetStats = 0;
+            int colOffsetStats = 0;
+            
+            int ib_rowOffStats = 0;
+            int ib_colOffStats = 0;
+            
+            long feedback = nBlocks/10;
+            long blockCounter = 0;
+            int feedbackCounter = 0;
+            std::cout << "Started " << std::flush;
+            for(long i = 0; i < nYBlocks; i++)
+            {
+                colOffsetStats = 0;
+                colOffsetRef = 0;
+                for(long j = 0; j < nXBlocks; j++)
+                {
+                    if((feedback != 0) && ((blockCounter % feedback) == 0))
+                    {
+                        std::cout << "." << feedbackCounter << "." << std::flush;
+                        feedbackCounter = feedbackCounter + 10;
+                    }
+                    
+                    // Read Block
+                    if(statsBand->RasterIO(GF_Read, colOffsetStats, rowOffsetStats, xIOGridStats, yIOGridStats, statsDataArr, xIOGridStats, yIOGridStats, GDT_Float32, 0, 0))
+                    {
+                        throw RSGISImageException("Failed to read image data from stats band.");
+                    }
+                    
+                    // Process Block
+                    ib_rowOffStats = 0;
+                    ib_colOffStats = 0;
+                    for(int n = 0; n < yIOGrid; ++n)
+                    {
+                        ib_colOffStats = 0;
+                        for(int m = 0; m < xIOGrid; ++m)
+                        {
+                            for(int y = 0; y < nYPxls; ++y)
+                            {
+                                for(int x = 0; x < nXPxls; ++x)
+                                {
+                                    statsPxlsInRefPxl[(y*nYPxls)+x] = statsDataArr[(ib_colOffStats+x)+(ib_rowOffStats+(yIOGridStats*y))];
+                                }
+                            }
+                            
+                            valueCalcSum->calcImageValue(statsPxlsInRefPxl, nStatsPixelsInRefPxl, useNoDataVal, noDataVal, outImgBandVals);
+                            for(unsigned int b = 0; b < numOutImgBands; ++b)
+                            {
+                                refDataArrOuts[b][((n*xIOGrid)+m)] = outImgBandVals[b];
+                            }
+                            ib_colOffStats += nXPxls;
+                        }
+                        ib_rowOffStats += (nYPxls * (xIOGrid * nXPxls));
+                    }
+                    
+                    // Write Block
+                    for(unsigned int n = 0; n < numOutImgBands; ++n)
+                    {
+                        if(outBands[n]->RasterIO(GF_Write, colOffsetRef, rowOffsetRef, xIOGrid, yIOGrid, refDataArrOuts[n], xIOGrid, yIOGrid, GDT_Float64, 0, 0))
+                        {
+                            throw RSGISImageException("Failed to write image data to output image.");
+                        }
+                    }
+                    
+                    ++blockCounter;
+                    colOffsetStats += xIOGridStats;
+                    colOffsetRef += xIOGrid;
+                }
+                
+                if(remainCols > 0)
+                {
+                    if((feedback != 0) && ((blockCounter % feedback) == 0))
+                    {
+                        std::cout << "." << feedbackCounter << "." << std::flush;
+                        feedbackCounter = feedbackCounter + 10;
+                    }
+                    
+                    // Read Block
+                    if(statsBand->RasterIO(GF_Read, colOffsetStats, rowOffsetStats, remainColsStats, yIOGridStats, statsDataArr, remainColsStats, yIOGridStats, GDT_Float32, 0, 0))
+                    {
+                        throw RSGISImageException("Failed to read image data from stats band.");
+                    }
+                    
+                    // Process Block
+                    ib_rowOffStats = 0;
+                    ib_colOffStats = 0;
+                    for(int n = 0; n < yIOGrid; ++n)
+                    {
+                        ib_colOffStats = 0;
+                        for(int m = 0; m < remainCols; ++m)
+                        {
+                            for(int y = 0; y < nYPxls; ++y)
+                            {
+                                for(int x = 0; x < nXPxls; ++x)
+                                {
+                                    statsPxlsInRefPxl[(y*nYPxls)+x] = statsDataArr[(ib_colOffStats+x)+(ib_rowOffStats+(yIOGridStats*y))];
+                                }
+                            }
+                            
+                            valueCalcSum->calcImageValue(statsPxlsInRefPxl, nStatsPixelsInRefPxl, useNoDataVal, noDataVal, outImgBandVals);
+                            for(unsigned int b = 0; b < numOutImgBands; ++b)
+                            {
+                                refDataArrOuts[b][((n*remainCols)+m)] = outImgBandVals[b];
+                            }
+                            ib_colOffStats += nXPxls;
+                        }
+                        ib_rowOffStats += (nYPxls * (remainCols * nXPxls));
+                    }
+                    
+                    // Write Block
+                    for(unsigned int n = 0; n < numOutImgBands; ++n)
+                    {
+                        if(outBands[n]->RasterIO(GF_Write, colOffsetRef, rowOffsetRef, remainCols, yIOGrid, refDataArrOuts[n], remainCols, yIOGrid, GDT_Float64, 0, 0))
+                        {
+                            throw RSGISImageException("Failed to write image data to output image.");
+                        }
+                    }
+                    
+                    ++blockCounter;
+                    colOffsetStats += remainColsStats;
+                    colOffsetRef += remainCols;
+                }
+                
+                rowOffsetStats += yIOGridStats;
+                rowOffsetRef += yIOGrid;
+            }
+            
+            if(remainRows > 0)
+            {
+                colOffsetStats = 0;
+                colOffsetRef = 0;
+                for(long j = 0; j < nXBlocks; j++)
+                {
+                    if((feedback != 0) && ((blockCounter % feedback) == 0))
+                    {
+                        std::cout << "." << feedbackCounter << "." << std::flush;
+                        feedbackCounter = feedbackCounter + 10;
+                    }
+                    
+                    // Read Block
+                    if(statsBand->RasterIO(GF_Read, colOffsetStats, rowOffsetStats, xIOGridStats, remainRowsStats, statsDataArr, xIOGridStats, remainRowsStats, GDT_Float32, 0, 0))
+                    {
+                        throw RSGISImageException("Failed to read image data from stats band.");
+                    }
+                    
+                    // Process Block
+                    ib_rowOffStats = 0;
+                    ib_colOffStats = 0;
+                    for(int n = 0; n < remainRows; ++n)
+                    {
+                        ib_colOffStats = 0;
+                        for(int m = 0; m < xIOGrid; ++m)
+                        {
+                            for(int y = 0; y < nYPxls; ++y)
+                            {
+                                for(int x = 0; x < nXPxls; ++x)
+                                {
+                                    statsPxlsInRefPxl[(y*nYPxls)+x] = statsDataArr[(ib_colOffStats+x)+(ib_rowOffStats+((remainRows*nYPxls)*y))];
+                                }
+                            }
+                            
+                            valueCalcSum->calcImageValue(statsPxlsInRefPxl, nStatsPixelsInRefPxl, useNoDataVal, noDataVal, outImgBandVals);
+                            for(unsigned int b = 0; b < numOutImgBands; ++b)
+                            {
+                                refDataArrOuts[b][((n*xIOGrid)+m)] = outImgBandVals[b];
+                            }
+                            ib_colOffStats += nXPxls;
+                        }
+                        ib_rowOffStats += (nYPxls * (xIOGrid * nXPxls));
+                    }
+                    
+                    // Write Block
+                    for(unsigned int n = 0; n < numOutImgBands; ++n)
+                    {
+                        if(outBands[n]->RasterIO(GF_Write, colOffsetRef, rowOffsetRef, xIOGrid, remainRows, refDataArrOuts[n], xIOGrid, remainRows, GDT_Float64, 0, 0))
+                        {
+                            throw RSGISImageException("Failed to write image data to output image.");
+                        }
+                    }
+                    
+                    ++blockCounter;
+                    colOffsetStats += xIOGridStats;
+                    colOffsetRef += xIOGrid;
+                }
+                
+                if(remainCols > 0)
+                {
+                    if((feedback != 0) && ((blockCounter % feedback) == 0))
+                    {
+                        std::cout << "." << feedbackCounter << "." << std::flush;
+                        feedbackCounter = feedbackCounter + 10;
+                    }
+                    
+                    // Read Block
+                    if(statsBand->RasterIO(GF_Read, colOffsetStats, rowOffsetStats, remainColsStats, remainRowsStats, statsDataArr, remainColsStats, remainRowsStats, GDT_Float32, 0, 0))
+                    {
+                        throw RSGISImageException("Failed to read image data from stats band.");
+                    }
+                    
+                    // Process Block
+                    ib_rowOffStats = 0;
+                    ib_colOffStats = 0;
+                    for(int n = 0; n < remainRows; ++n)
+                    {
+                        ib_colOffStats = 0;
+                        for(int m = 0; m < remainCols; ++m)
+                        {
+                            for(int y = 0; y < nYPxls; ++y)
+                            {
+                                for(int x = 0; x < nXPxls; ++x)
+                                {
+                                    statsPxlsInRefPxl[(y*nYPxls)+x] = statsDataArr[(ib_colOffStats+x)+(ib_rowOffStats+((remainRows*nYPxls)*y))];
+                                }
+                            }
+                            
+                            valueCalcSum->calcImageValue(statsPxlsInRefPxl, nStatsPixelsInRefPxl, useNoDataVal, noDataVal, outImgBandVals);
+                            for(unsigned int b = 0; b < numOutImgBands; ++b)
+                            {
+                                refDataArrOuts[b][((n*remainCols)+m)] = outImgBandVals[b];
+                            }
+                            ib_colOffStats += nXPxls;
+                        }
+                        ib_rowOffStats += (nYPxls * (remainCols * nXPxls));
+                    }
+                    
+                    // Write Block
+                    for(unsigned int n = 0; n < numOutImgBands; ++n)
+                    {
+                        if(outBands[n]->RasterIO(GF_Write, colOffsetRef, rowOffsetRef, remainCols, remainRows, refDataArrOuts[n], remainCols, remainRows, GDT_Float64, 0, 0))
+                        {
+                            throw RSGISImageException("Failed to write image data to output image.");
+                        }
+                    }
+                    
+                    ++blockCounter;
+                    colOffsetStats += remainColsStats;
+                    colOffsetRef += remainCols;
+                }
+                rowOffsetStats += remainRowsStats;
+                rowOffsetRef += remainRows;
+            }
+            std::cout << " Complete.\n";
+            
+            GDALClose(outputImageDS);
+            
+            for(unsigned int i = 0; i < numOutImgBands; ++i)
+            {
+                delete[] refDataArrOuts[i];
+            }
+            delete[] refDataArrOuts;
+            delete[] outBands;
+            delete[] statsDataArr;
+            delete[] statsPxlsInRefPxl;
+            delete[] outImgBandVals;
+            
+            delete[] refImgTrans;
+            delete[] statsImgTrans;
+            delete[] outImgTrans;
+        }
+        catch (RSGISImageException &e)
+        {
+            throw e;
+        }
+        catch (RSGISException &e)
+        {
+            throw RSGISImageException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw RSGISImageException(e.what());
+        }
+    }
+    
+    RSGISCalcImageMultiImgRes::~RSGISCalcImageMultiImgRes()
+    {
+        
+    }
+
+    
 	
 }} //rsgis::img
 

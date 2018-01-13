@@ -1753,6 +1753,113 @@ static PyObject *ImageCalc_GetImgIdxForStat(PyObject *self, PyObject *args, PyOb
     Py_RETURN_NONE;
 }
 
+
+
+static PyObject *ImageCalc_GetImgSumStatsInPxl(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    static char *kwlist[] = {"refimage", "statsimage", "outimage", "gdalformat", "datatype", "sumstats", "statsimageband", "usenodata", "iogridx", "iogridy", NULL};
+    const char *pInputRefImage;
+    const char *pInputStatsImage;
+    const char *pszOutputImage = "";
+    const char *pszGDALFormat = "";
+    int useImgDataVal = true;
+    unsigned int statsImgBand = 1;
+    unsigned int xIOGrid = 16;
+    unsigned int yIOGrid = 16;
+    PyObject *sumStatsInLst;
+    int datatype;
+    
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssiO|IiII:getImgSumStatsInPxl", kwlist, &pInputRefImage, &pInputStatsImage, &pszOutputImage, &pszGDALFormat, &datatype, &sumStatsInLst, &statsImgBand, &useImgDataVal, &xIOGrid, &yIOGrid))
+    {
+        return NULL;
+    }
+    
+    if( !PySequence_Check(sumStatsInLst))
+    {
+        PyErr_SetString(GETSTATE(self)->error, "Summary stats must be a sequence");
+        return NULL;
+    }
+    
+    Py_ssize_t nSumStats = PySequence_Size(sumStatsInLst);
+    std::vector<rsgis::cmds::RSGISCmdsSummariseStats> cmdSumStats;
+    cmdSumStats.reserve(nSumStats);
+    int statType;
+    for( Py_ssize_t n = 0; n < nSumStats; n++ )
+    {
+        PyObject *o = PySequence_GetItem(sumStatsInLst, n);
+        
+        if(!RSGISPY_CHECK_INT(o))
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Input summary is expecting an int representation, use provided consts (e.g., rsgislib.SUMTYPE_MEAN)");
+            Py_DECREF(o);
+            return NULL;
+        }
+        
+        statType = RSGISPY_INT_EXTRACT(o);
+        
+        if(statType == 4)
+        {
+            cmdSumStats.push_back(rsgis::cmds::rsgiscmds_stat_min);
+        }
+        else if(statType == 5)
+        {
+            cmdSumStats.push_back(rsgis::cmds::rsgiscmds_stat_max);
+        }
+        else if(statType == 2)
+        {
+            cmdSumStats.push_back(rsgis::cmds::rsgiscmds_stat_mean);
+        }
+        else if(statType == 3)
+        {
+            cmdSumStats.push_back(rsgis::cmds::rsgiscmds_stat_median);
+        }
+        else if(statType == 8)
+        {
+            cmdSumStats.push_back(rsgis::cmds::rsgiscmds_stat_range);
+        }
+        else if(statType == 6)
+        {
+            cmdSumStats.push_back(rsgis::cmds::rsgiscmds_stat_stddev);
+        }
+        else if(statType == 9)
+        {
+            cmdSumStats.push_back(rsgis::cmds::rsgiscmds_stat_sum);
+        }
+        else if(statType == 1)
+        {
+            cmdSumStats.push_back(rsgis::cmds::rsgiscmds_stat_mode);
+        }
+        else if(statType == 7)
+        {
+            cmdSumStats.push_back(rsgis::cmds::rsgiscmds_stat_count);
+        }
+        else
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Do not recognise the summary statistic option.");
+            return NULL;
+        }
+    }
+    
+    try
+    {
+        bool useNoData = (bool) useImgDataVal;
+        rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)datatype;
+        rsgis::cmds::executeGetWithinPxlImgStatSummaries(std::string(pInputRefImage), std::string(pInputStatsImage), statsImgBand, std::string(pszOutputImage), std::string(pszGDALFormat), type, useNoData, cmdSumStats, xIOGrid, yIOGrid);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+
+
+
+
+
 // Our list of functions in this module
 static PyMethodDef ImageCalcMethods[] = {
     {"bandMath", ImageCalc_BandMath, METH_VARARGS,
@@ -2685,8 +2792,37 @@ static PyMethodDef ImageCalcMethods[] = {
 "\n"
 "\n"},
     
+{"getImgSumStatsInPxl", (PyCFunction)ImageCalc_GetImgSumStatsInPxl, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imagecalc.getImgSumStatsInPxl(refimage=string, statsimage=string, outimage=string, gdalformat=string, datatype=int, sumstats=list, statsimageband=int, usenodata=bool, iogridx=int, iogridy=int)\n"
+"A function which calculates a summary of the pixel values from the high resolution statsimage for\n"
+"the regions defined by the pixels in the lower resolution refimage. This is similar to zonal stats.\n"
+"Please note that the statsimage needs to have a pixel size which is a multiple of the refimage pixel size.\n"
+"For example, is the ref image has a resolution of 10 m the statsimage can have a resolution of 1 or 2 m \n"
+"but not 3 m for this function to work.\n"
+"\n"
+"Where:\n"
+"\n"
+"* refimage is a string specifying the name and path for the reference image. Note, this is only used to define the\n"
+"           summary areas and output image extent.\n"
+"* statsimage is a string specifying the name and path to the higher resolution image which will be summarised.\n"
+"* outimage is a string specifying the output image file name and path.\n"
+"* gdalformat is a string with the GDAL output file format.\n"
+"* datatype is an containing one of the values from rsgislib.TYPE_*\n"
+"* sumstats is a list of the type rsgislib.SUMTYPE* and specifies the summary is calculated.\n"
+"           Each summary statastic is saved as a different image band."
+"* statsimageband is an integer specifying the image band in the stats image to be used for the analysis. (Default: 1)\n"
+"* usenodata is a boolean specifying whether the image band no data value should be used. (Default: True)\n"
+"* iogridx and iogridy are integers which control the image processing block size. The unit is pixels in the refimage. (Default: 16)\n"
+"                      where the pixel resolution between the two images is closer together these values can be increased but \n"
+"                      but where the statsimage pixel size is much smaller than the ref image reducing this will reduce the memory\n"
+"                      footprint significantly.\n"
+"\n"
+"\n"},
+    
 {NULL}        /* Sentinel */
 };
+
+
 
 #if PY_MAJOR_VERSION >= 3
 

@@ -97,6 +97,19 @@ namespace rsgis
 				std::string proj;
 				bool useImageProj;
 			};
+        
+        
+        class DllExport RSGISCalcImageMultiImgRes
+        {
+        public:
+            RSGISCalcImageMultiImgRes(RSGISCalcValuesFromMultiResInputs *valueCalcSum);
+            void calcImageHighResForLowRegions(GDALDataset *refDataset, GDALDataset *statsDataset, unsigned int statsImgBand, std::string outputImage, std::string gdalFormat="KEA", GDALDataType gdalDataType=GDT_Float32, bool useNoDataVal=true, unsigned int xIOGrid=16, unsigned int yIOGrid=16, bool setOutNames = false, std::string *bandNames = NULL) throw(RSGISImageException);
+            virtual ~RSGISCalcImageMultiImgRes();
+        protected:
+            RSGISCalcValuesFromMultiResInputs *valueCalcSum;
+        };
+        
+        
 	}
 }
 

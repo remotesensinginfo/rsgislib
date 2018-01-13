@@ -42,35 +42,49 @@
     #define DllExport
 #endif
 
-namespace rsgis 
-{
-	namespace img
-	{
-		class DllExport RSGISCalcImageValue
-			{
-			public:
-				RSGISCalcImageValue(int numberOutBands);
-				virtual void calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException) = 0;
-				virtual void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException) = 0;
-                virtual void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(RSGISImageCalcException) = 0;
-                virtual void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(RSGISImageCalcException) = 0;
-                virtual void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent) throw(RSGISImageCalcException) = 0;
-				virtual void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException) = 0;
-				virtual void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) throw(RSGISImageCalcException) = 0;
-				virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException) = 0;
-                /**
-                 * Extent only refers to the central window.
-                 */
-                virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) throw(RSGISImageCalcException) = 0;
-				virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException) = 0;
-				virtual int getNumOutBands();
-				virtual void setNumOutBands(int bands);
-				virtual ~RSGISCalcImageValue();
-			protected:
-				int numOutBands;
-			};
-	}
-}
+namespace rsgis{namespace img{
+
+    class DllExport RSGISCalcImageValue
+    {
+        public:
+            RSGISCalcImageValue(int numberOutBands);
+            virtual void calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException) = 0;
+            virtual void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException) = 0;
+            virtual void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(RSGISImageCalcException) = 0;
+            virtual void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(RSGISImageCalcException) = 0;
+            virtual void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent) throw(RSGISImageCalcException) = 0;
+            virtual void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException) = 0;
+            virtual void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) throw(RSGISImageCalcException) = 0;
+            virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException) = 0;
+            /**
+             * Extent only refers to the central window.
+             */
+            virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) throw(RSGISImageCalcException) = 0;
+            virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException) = 0;
+            virtual int getNumOutBands();
+            virtual void setNumOutBands(int bands);
+            virtual ~RSGISCalcImageValue();
+        protected:
+            int numOutBands;
+    };
+    
+    
+    
+    class DllExport RSGISCalcValuesFromMultiResInputs
+    {
+    public:
+        RSGISCalcValuesFromMultiResInputs(int numberOutBands);
+        virtual void calcImageValue(float *bandValues, int numInVals, bool useNoData, float noDataVal, double *output) throw(RSGISImageCalcException) = 0;
+        virtual int getNumOutBands();
+        virtual void setNumOutBands(int bands);
+        virtual ~RSGISCalcValuesFromMultiResInputs();
+    protected:
+        int numOutBands;
+    };
+    
+    
+    
+}}
 
 #endif
 
