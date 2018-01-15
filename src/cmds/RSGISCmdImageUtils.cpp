@@ -2030,6 +2030,7 @@ namespace rsgis{ namespace cmds {
                 throw RSGISImageException(message.c_str());
             }
             outDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
+            GDALClose(outDataset);
             
             // Tidy up
             GDALClose(dataset);
