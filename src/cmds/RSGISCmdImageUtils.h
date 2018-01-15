@@ -161,6 +161,9 @@ namespace rsgis{ namespace cmds {
     /** A function to create a new blank image using an exising image as a base. */
     DllExport void executeCreateCopyBlankImage(std::string inputImage, std::string outputImage, unsigned int numBands, float pxlVal, std::string gdalFormat, RSGISLibDataType outDataType) throw(RSGISCmdException);
     
+    /** A function to create a new blank image using an exising image as a base. */
+    DllExport void executeCreateCopyBlankImage(std::string inputImage, std::string outputImage, unsigned int numBands, double xMin, double xMax, double yMin, double yMax, double resX, double resY, float pxlVal, std::string gdalFormat, RSGISLibDataType outDataType) throw(RSGISCmdException);
+    
     /** A function to create a new blank image using an exising image as a base but cutting to extent of shapefile. */
     DllExport void executeCreateCopyBlankImageVecExtent(std::string inputImage, std::string inputVector, std::string outputImage, unsigned int numBands, float pxlVal, std::string gdalFormat, RSGISLibDataType outDataType) throw(RSGISCmdException);
     

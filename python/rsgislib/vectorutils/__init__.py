@@ -450,4 +450,131 @@ This function takes a CSV file of bounding boxes (1 per line) and creates a poly
         outDataSource = None
     except Exception as e:
         raise e
+
+
+
+def getVecLayerExtent(inVec, layerName=None, computeIfExp=True):
+    """
+* inVec - is a string with the input vector file name and path.
+* layerName - is the layer for which extent is to be calculated (Default: None)
+*             if None assume there is only one layer and that will be read.
+* computeIfExp - is a boolean which specifies whether the layer extent 
+                 should be calculated (rather than estimated from header)
+                 even if that operation is computationally expensive.
+
+return:: boundary box is returned (MinX, MaxX, MinY, MaxY)
+
+"""
+    # Get a Layer's Extent
+    inDataSource = gdal.OpenEx(inVec, gdal.OF_VECTOR )
+    if layerName is not None:
+        inLayer = inDataSource.GetLayer(layerName)
+    else:
+        inLayer = inDataSource.GetLayer()
+    extent = inLayer.GetExtent(computeIfExp)
+    return extent
+
+def getProjWKTFromVec(inVec):
+    """
+* inVec - is a string with the input vector file name and path.
+
+return:: WKT representation of projection
+
+"""
+    # Get shapefile projection as WKT
+    dataset = gdal.OpenEx(inVec, gdal.OF_VECTOR )
+    layer = dataset.GetLayer()
+    spatialRef = layer.GetSpatialRef()
+    return spatialRef.ExportToWkt()
+
+
+def reProjVectorLayer(inputVec, outputSHP, outProjWKT, outDriverName="ESRI Shapefile", outLyrName=None, inLyrName=None, inProjWKT=None, force=False):
+    """
+A function which reprojects a vector layer. 
+    
+* inputVec is a string with name and path to input shapefile.
+* outputSHP is a string with name and path to output shapefile.
+* outProjWKT is a string with the WKT string for the output shapefile.
+* outDriverName is the output vector file format. Default is ESRI Shapefile.
+* outLyrName is a string for the output layer name. If None then ignored and 
+             assume there is just a single layer in the vector and layer name
+             is the same as the file name.
+* inLyrName is a string for the input layer name. If None then ignored and 
+            assume there is just a single layer in the vector.
+* inProjWKT is a string with the WKT string for the input shapefile 
+            (Optional; taken from input file if not specified).
+
+"""
+    ## This code has been editted from https://pcjericks.github.io/py-gdalogr-cookbook/projection.html#reproject-a-layer
+    ## Updated for GDAL 2.0
         
+    # get the input layer
+    inDataSet = gdal.OpenEx(inputVec, gdal.OF_VECTOR )
+    if inDataSet is None:
+        raise("Failed to open input shapefile\n") 
+    if inLyrName is None:   
+        inLayer = inDataSet.GetLayer()
+    else:
+        inLayer = inDataSet.GetLayer(inLyrName)
+    
+    # input SpatialReference
+    inSpatialRef = osr.SpatialReference()
+    if inProjWKT is not None:
+        inSpatialRef.ImportFromWkt(inProjWKT)
+    else:
+        inSpatialRef = inLayer.GetSpatialRef()
+    
+    # output SpatialReference
+    outSpatialRef = osr.SpatialReference()
+    outSpatialRef.ImportFromWkt(outProjWKT)
+    
+    # create the CoordinateTransformation
+    coordTrans = osr.CoordinateTransformation(inSpatialRef, outSpatialRef)
+    
+    # Create shapefile driver
+    driver = gdal.GetDriverByName( "ESRI Shapefile" )
+    
+    # create the output layer
+    if os.path.exists(outputSHP):
+        if force:
+            driver.DeleteDataSource(outputSHP)
+        else:
+            raise Exception('Output shapefile already exists - stopping.')
+    outDataSet = driver.Create(outputSHP, 0, 0, 0, gdal.GDT_Unknown )
+    
+    if outLyrName is None:
+        outLyrName = os.path.splitext(os.path.basename(outputSHP))[0]
+    outLayer = outDataSet.CreateLayer(outLyrName, outSpatialRef, inLayer.GetGeomType() )
+    
+    # add fields
+    inLayerDefn = inLayer.GetLayerDefn()
+    for i in range(0, inLayerDefn.GetFieldCount()):
+        fieldDefn = inLayerDefn.GetFieldDefn(i)
+        outLayer.CreateField(fieldDefn)
+    
+    # get the output layer's feature definition
+    outLayerDefn = outLayer.GetLayerDefn()
+    
+    # loop through the input features
+    inFeature = inLayer.GetNextFeature()
+    while inFeature:
+        # get the input geometry
+        geom = inFeature.GetGeometryRef()
+        # reproject the geometry
+        geom.Transform(coordTrans)
+        # create a new feature
+        outFeature = ogr.Feature(outLayerDefn)
+        # set the geometry and attribute
+        outFeature.SetGeometry(geom)
+        for i in range(0, outLayerDefn.GetFieldCount()):
+            outFeature.SetField(outLayerDefn.GetFieldDefn(i).GetNameRef(), inFeature.GetField(i))
+        # add the feature to the shapefile
+        outLayer.CreateFeature(outFeature)
+        # dereference the features and get the next input feature
+        outFeature = None
+        inFeature = inLayer.GetNextFeature()
+    
+    # Save and close the shapefiles
+    inDataSet = None
+    outDataSet = None
+

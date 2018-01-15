@@ -14,6 +14,7 @@ Geometry
 .. autofunction:: rsgislib.vectorutils.generateConvexHullsGroups
 .. autofunction:: rsgislib.vectorutils.splitFeatures
 .. autofunction:: rsgislib.vectorutils.fitActiveContourBoundaries
+.. autofunction:: rsgislib.vectorutils.reProjVectorLayer
 
 
 Create Vectors
@@ -53,6 +54,8 @@ Image Information
 Utilities
 ---------
 .. autofunction:: rsgislib.vectorutils.printpolygeom
+.. autofunction:: rsgislib.vectorutils.getVecLayerExtent
+.. autofunction:: rsgislib.vectorutils.getProjWKTFromVec
 
 * :ref:`genindex`
 * :ref:`modindex`

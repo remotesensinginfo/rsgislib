@@ -389,6 +389,78 @@ class RSGISPyUtils (object):
         
         return [tlX, brX, tlY, brY]
         
+    def getVecLayerExtent(self, inVec, layerName=None, computeIfExp=True):
+        """
+        * inVec - is a string with the input vector file name and path.
+        * layerName - is the layer for which extent is to be calculated (Default: None)
+        *             if None assume there is only one layer and that will be read.
+        * computeIfExp - is a boolean which specifies whether the layer extent 
+                         should be calculated (rather than estimated from header)
+                         even if that operation is computationally expensive.
+        
+        return:: boundary box is returned (MinX, MaxX, MinY, MaxY)
+        
+        """
+        from osgeo import gdal
+        inDataSource = gdal.OpenEx(inVec, gdal.OF_VECTOR )
+        if layerName is not None:
+            inLayer = inDataSource.GetLayer(layerName)
+        else:
+            inLayer = inDataSource.GetLayer()
+        extent = inLayer.GetExtent(computeIfExp)
+        return extent
+        
+        
+    def findCommonExtentOnGrid(self, baseExtent, baseGrid, otherExtent, fullContain=True):
+        """
+        A function which calculates the common extent between two extents but defines output on 
+        grid with defined resolutions. Useful for finding common extent on a particular image grid.
+        
+        * baseExtent is a bbox (xMin, xMax, yMin, yMax) providing the base for the grid on which output will be defined.
+        * baseGrid the size of the (square) grid on which output will be defined.
+        * otherExtent is a bbox (xMin, xMax, yMin, yMax) to be intersected with the baseExtent.
+        * fullContain is a boolean. True: moving output onto grid will increase size of bbox (i.e., intersection fully contained)
+                                    False: move output onto grid will decrease size of bbox (i.e., bbox fully contained within intesection)
+        
+        return:: bbox (xMin, xMax, yMin, yMax)
+        """
+        import math
+        
+        xMinOverlap = baseExtent[0]
+        xMaxOverlap = baseExtent[1]
+        yMinOverlap = baseExtent[2]
+        yMaxOverlap = baseExtent[3]
+        
+        if otherExtent[0] > xMinOverlap:
+            if fullContain:
+                diff = math.floor((otherExtent[0] - xMinOverlap)/baseGrid)*baseGrid
+            else:   
+                diff = math.ceil((otherExtent[0] - xMinOverlap)/baseGrid)*baseGrid
+            xMinOverlap = xMinOverlap + diff
+        
+        if otherExtent[1] < xMaxOverlap:
+            if fullContain:
+                diff = math.floor((xMaxOverlap - otherExtent[1])/baseGrid)*baseGrid
+            else:
+                diff = math.ceil((xMaxOverlap - otherExtent[1])/baseGrid)*baseGrid
+            xMaxOverlap = xMaxOverlap - diff
+        
+        if otherExtent[2] > yMinOverlap:
+            if fullContain:
+                diff = math.floor((otherExtent[2] - yMinOverlap)/baseGrid)*baseGrid
+            else:
+                diff = math.ceil((otherExtent[2] - yMinOverlap)/baseGrid)*baseGrid
+            yMinOverlap = yMinOverlap + diff
+        
+        if otherExtent[3] < yMaxOverlap:
+            if fullContain:
+                diff = math.floor((yMaxOverlap - otherExtent[3])/baseGrid)*baseGrid
+            else:
+                diff = math.ceil((yMaxOverlap - otherExtent[3])/baseGrid)*baseGrid
+            yMaxOverlap = yMaxOverlap - diff
+    
+        return [xMinOverlap, xMaxOverlap, yMinOverlap, yMaxOverlap]
+        
     def reprojPoint(self, inProjOSRObj, outProjOSRObj, x, y):
         """
         Reproject a point from 'inProjOSRObj' to 'outProjOSRObj' where they are gdal
@@ -546,6 +618,51 @@ class RSGISPyUtils (object):
             sameESPG = True
         
         return sameESPG
+        
+    def getProjWKTFromVec(self, inVec):
+        """
+        A function which gets the WKT projection from the inputted vector file.
+        
+        * inVec - is a string with the input vector file name and path.
+        
+        return:: WKT representation of projection
+        """
+        from osgeo import gdal
+        dataset = gdal.OpenEx(inVec, gdal.OF_VECTOR )
+        layer = dataset.GetLayer()
+        spatialRef = layer.GetSpatialRef()
+        return spatialRef.ExportToWkt()
+        
+    def getEPSGCodeFromWKT(self, wktString):
+        """
+        Using GDAL to return the EPSG code for inputted WKT string.
+        """
+        from osgeo import osr
+        epsgCode = None
+        try:        
+            spatRef = osr.SpatialReference()
+            spatRef.ImportFromWkt(wktString)            
+            spatRef.AutoIdentifyEPSG()
+            epsgCode = spatRef.GetAuthorityCode(None)
+        except Exception:
+            epsgCode = None
+        return epsgCode
+        
+    def getWKTFromEPSGCode(self, epsgCode):
+        """
+        Using GDAL to return the WKT string for inputted EPSG Code.
+        
+        * epsgCode integer variable of the epsg code.
+        """
+        from osgeo import osr
+        wktString = None
+        try:        
+            spatRef = osr.SpatialReference()
+            spatRef.ImportFromEPSG(epsgCode)            
+            wktString = spatRef.ExportToWkt()
+        except Exception:
+            wktString = None
+        return wktString
     
     def uidGenerator(self, size=6):
         """
