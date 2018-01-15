@@ -1158,6 +1158,32 @@ static PyObject *ImageUtils_CreateCopyImage(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
+static PyObject *ImageUtils_CreateCopyImageDefExtent(PyObject *self, PyObject *args)
+{
+    const char *pszInputImage, *pszOutputImage, *pszGDALFormat;
+    int nOutDataType;
+    unsigned int numBands;
+    float pxlVal = 0;
+    double xMin, xMax, yMin, yMax, xRes, yRes = 0.0;
+    
+    if( !PyArg_ParseTuple(args, "ssIddddddfsi:createCopyImageDefExtent", &pszInputImage, &pszOutputImage, &numBands, &xMin, &xMax, &yMin, &yMax, &xRes, &yRes, &pxlVal, &pszGDALFormat, &nOutDataType))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeCreateCopyBlankImage(std::string(pszInputImage), std::string(pszOutputImage), numBands, xMin, xMax, yMin, yMax, xRes, yRes, pxlVal, std::string(pszGDALFormat), (rsgis::RSGISLibDataType)nOutDataType);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 static PyObject *ImageUtils_CreateCopyImageVecExtent(PyObject *self, PyObject *args)
 {
     const char *pszInputImage, *pszOutputImage, *pszExtentShp, *pszGDALFormat;
@@ -2429,6 +2455,26 @@ static PyMethodDef ImageUtilsMethods[] = {
 "   gdalformat = 'KEA'\n"
 "   datatype = rsgislib.TYPE_32FLOAT\n"
 "   imageutils.createCopyImage(inputImage, outputImage, 1, 3, gdalformat, datatype)\n"
+"\n"},
+    
+{"createCopyImageDefExtent", ImageUtils_CreateCopyImageDefExtent, METH_VARARGS,
+"rsgislib.imageutils.createCopyImageDefExtent(inputImage, outputImage, numBands, xMin, xMax, yMin, yMax, xRes, yRes, pxlVal, gdalformat, datatype)\n"
+"Create a new blank image with the parameters specified.\n"
+"\n"
+"Where:\n"
+"\n"
+"* inputImage is a string containing the name and path for the input image, which is to be copied.\n"
+"* outputImage is a string containing the name and path for the outputted image.\n"
+"* numBands is an integer specifying the number of image bands in the output image.\n"
+"* xMin is a double specifying the X minimum coordinate of the output image.\n"
+"* xMax is a double specifying the X maximum coordinate of the output image.\n"
+"* yMin is a double specifying the Y minimum coordinate of the output image.\n"
+"* yMax is a double specifying the Y maximum coordinate of the output image.\n"
+"* xRes is a double specifying the X resolution of the output image.\n"
+"* yRes is a double specifying the Y resolution of the output image.\n"
+"* pxlVal is a float specifying the pixel value of the output image.\n"
+"* gdalformat is a string providing the gdalformat of the output image (e.g., KEA).\n"
+"* datatype is a rsgislib.TYPE_* value providing the data type of the output image.\n"
 "\n"},
 
 {"createCopyImageVecExtent", ImageUtils_CreateCopyImageVecExtent, METH_VARARGS,

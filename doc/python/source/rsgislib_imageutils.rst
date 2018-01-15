@@ -75,6 +75,7 @@ Create
 
 .. autofunction:: rsgislib.imageutils.createBlankImage
 .. autofunction:: rsgislib.imageutils.createCopyImage
+.. autofunction:: rsgislib.imageutils.createCopyImageDefExtent
 .. autofunction:: rsgislib.imageutils.createCopyImageVecExtent
 
 Select / Stack bands

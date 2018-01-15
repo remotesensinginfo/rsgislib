@@ -5131,6 +5131,71 @@ namespace rsgis{namespace img{
         return dataset;
     }
     
+    
+    GDALDataset* RSGISImageUtils::createCopy(GDALDataset *inData, unsigned int numBands, std::string outputFilePath, std::string outputFormat, GDALDataType eType, double xMin, double xMax, double yMin, double yMax, double xRes, double yRes, bool useImgProj, std::string proj)throw(RSGISImageException)
+    {
+        GDALDataset *dataset = NULL;
+        try
+        {
+            if(yRes > 0)
+            {
+                yRes = yRes * (-1);
+            }
+            
+            // Find Max X and width
+            double xDiff = xMax - xMin;
+            unsigned long outImgWidth = abs(ceil(xDiff/xRes));
+            
+            // Find Min Y and height
+            double yDiff = yMax - yMin;
+            unsigned long outImgHeight = abs(ceil(yDiff/yRes));
+            
+            double *gdalTranslation = new double[6];
+            inData->GetGeoTransform(gdalTranslation);
+            
+            // Define the TL
+            gdalTranslation[0] = xMin;
+            gdalTranslation[3] = yMax;
+            
+            // Define the pixel size:
+            gdalTranslation[1] = xRes;
+            gdalTranslation[5] = yRes;
+            
+            GDALDriver *gdalDriver = GetGDALDriverManager()->GetDriverByName(outputFormat.c_str());
+            if(gdalDriver == NULL)
+            {
+                delete[] gdalTranslation;
+                std::string message = std::string("Driver for ") + outputFormat + std::string(" does not exist\n");
+                throw RSGISImageException(message.c_str());
+            }
+                        
+            dataset = gdalDriver->Create(outputFilePath.c_str(), outImgWidth, outImgHeight, numBands, eType, NULL);
+            if(dataset == NULL)
+            {
+                delete[] gdalTranslation;
+                std::string message = std::string("Could not create GDALDataset.");
+                throw RSGISImageException(message);
+            }
+            
+            dataset->SetGeoTransform(gdalTranslation);
+            if(useImgProj)
+            {
+                dataset->SetProjection(inData->GetProjectionRef());
+            }
+            else
+            {
+                dataset->SetProjection(proj.c_str());
+            }
+            delete[] gdalTranslation;
+        }
+        catch(RSGISImageException &e)
+        {
+            throw e;
+        }
+        return dataset;
+    }
+    
+    
     GDALDataset* RSGISImageUtils::createCopy(GDALDataset **datasets, int numDS, unsigned int numBands, std::string outputFilePath, std::string outputFormat, GDALDataType eType, bool useImgProj, std::string proj)throw(RSGISImageException)
     {
         GDALDataset *dataset = NULL;
