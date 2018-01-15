@@ -560,16 +560,17 @@ A function which reprojects a vector layer.
     while inFeature:
         # get the input geometry
         geom = inFeature.GetGeometryRef()
-        # reproject the geometry
-        geom.Transform(coordTrans)
-        # create a new feature
-        outFeature = ogr.Feature(outLayerDefn)
-        # set the geometry and attribute
-        outFeature.SetGeometry(geom)
-        for i in range(0, outLayerDefn.GetFieldCount()):
-            outFeature.SetField(outLayerDefn.GetFieldDefn(i).GetNameRef(), inFeature.GetField(i))
-        # add the feature to the shapefile
-        outLayer.CreateFeature(outFeature)
+        if geom is not None:
+            # reproject the geometry
+            geom.Transform(coordTrans)
+            # create a new feature
+            outFeature = ogr.Feature(outLayerDefn)
+            # set the geometry and attribute
+            outFeature.SetGeometry(geom)
+            for i in range(0, outLayerDefn.GetFieldCount()):
+                outFeature.SetField(outLayerDefn.GetFieldDefn(i).GetNameRef(), inFeature.GetField(i))
+            # add the feature to the shapefile
+            outLayer.CreateFeature(outFeature)
         # dereference the features and get the next input feature
         outFeature = None
         inFeature = inLayer.GetNextFeature()
