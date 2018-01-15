@@ -2077,6 +2077,7 @@ namespace rsgis{ namespace cmds {
             }
             outDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
             
+            GDALClose(outDataset);
             // Tidy up
             for(unsigned int i = 0; i < numImages; ++i)
             {
