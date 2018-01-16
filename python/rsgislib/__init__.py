@@ -365,7 +365,7 @@ class RSGISPyUtils (object):
         """
         A function to retrieve the bounding box in the spatial 
         coordinates of the image.
-        return [TLX, BRX, TLY, BRY]
+        return (MinX, MaxX, MinY, MaxY)
         """
         import osgeo.gdal as gdal
         rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
@@ -387,7 +387,7 @@ class RSGISPyUtils (object):
         brX = tlX + (xRes * xSize)
         brY = tlY + (yRes * ySize)
         
-        return [tlX, brX, tlY, brY]
+        return [tlX, brX, brY, tlY]
         
     def getVecLayerExtent(self, inVec, layerName=None, computeIfExp=True):
         """
@@ -447,16 +447,16 @@ class RSGISPyUtils (object):
         
         if otherExtent[2] > yMinOverlap:
             if fullContain:
-                diff = math.floor((otherExtent[2] - yMinOverlap)/baseGrid)*baseGrid
+                diff = math.floor(abs(otherExtent[2] - yMinOverlap)/baseGrid)*baseGrid
             else:
-                diff = math.ceil((otherExtent[2] - yMinOverlap)/baseGrid)*baseGrid
+                diff = math.ceil(abs(otherExtent[2] - yMinOverlap)/baseGrid)*baseGrid
             yMinOverlap = yMinOverlap + diff
         
         if otherExtent[3] < yMaxOverlap:
             if fullContain:
-                diff = math.floor((yMaxOverlap - otherExtent[3])/baseGrid)*baseGrid
+                diff = math.floor(abs(yMaxOverlap - otherExtent[3])/baseGrid)*baseGrid
             else:
-                diff = math.ceil((yMaxOverlap - otherExtent[3])/baseGrid)*baseGrid
+                diff = math.ceil(abs(yMaxOverlap - otherExtent[3])/baseGrid)*baseGrid
             yMaxOverlap = yMaxOverlap - diff
     
         return [xMinOverlap, xMaxOverlap, yMinOverlap, yMaxOverlap]

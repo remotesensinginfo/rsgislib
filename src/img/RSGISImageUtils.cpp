@@ -5142,11 +5142,11 @@ namespace rsgis{namespace img{
                 yRes = yRes * (-1);
             }
             
-            // Find Max X and width
+            // Find width
             double xDiff = xMax - xMin;
             unsigned long outImgWidth = abs(ceil(xDiff/xRes));
-            
-            // Find Min Y and height
+                        
+            // Find height
             double yDiff = yMax - yMin;
             unsigned long outImgHeight = abs(ceil(yDiff/yRes));
             
