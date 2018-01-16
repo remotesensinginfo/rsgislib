@@ -460,7 +460,43 @@ class RSGISPyUtils (object):
             yMaxOverlap = yMaxOverlap - diff
     
         return [xMinOverlap, xMaxOverlap, yMinOverlap, yMaxOverlap]
+    
+    def findExtentOnGrid(self, baseExtent, baseGrid, fullContain=True):
+        """
+        A function which calculates the extent but defined on a grid with defined resolution. 
+        Useful for finding extent on a particular image grid.
         
+        * baseExtent is a bbox (xMin, xMax, yMin, yMax) providing the base for the grid on which output will be defined.
+        * baseGrid the size of the (square) grid on which output will be defined.
+        * fullContain is a boolean. True: moving output onto grid will increase size of bbox (i.e., intersection fully contained)
+                                    False: move output onto grid will decrease size of bbox (i.e., bbox fully contained within intesection)
+        
+        return:: bbox (xMin, xMax, yMin, yMax)
+        """
+        import math
+        
+        xMin = baseExtent[0]
+        xMax = baseExtent[1]
+        yMin = baseExtent[2]
+        yMax = baseExtent[3]
+        
+        diffX = xMax - xMin
+        diffY = abs(yMax - yMin)
+        
+        nPxlX = 0.0
+        nPxlY = 0.0
+        if fullContain:
+            nPxlX = math.ceil(diffX/baseGrid)
+            nPxlY = math.ceil(diffY/baseGrid)
+        else:
+            nPxlX = math.floor(diffX/baseGrid)
+            nPxlY = math.floor(diffY/baseGrid)
+        
+        xMaxOut = xMin + (nPxlX * baseGrid)
+        yMinOut = yMax - (nPxlY * baseGrid)
+    
+        return [xMin, xMaxOut, yMinOut, yMax]
+    
     def reprojPoint(self, inProjOSRObj, outProjOSRObj, x, y):
         """
         Reproject a point from 'inProjOSRObj' to 'outProjOSRObj' where they are gdal
