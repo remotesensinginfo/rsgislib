@@ -260,9 +260,24 @@ class RSGISPyUtils (object):
         band = raster.GetRasterBand(1)
         if band == None:
             raise RSGISPyException('Could not open raster band 1 in image: \'' + inImg+ '\'')
-        gdal_dtype = gdal.GetDataTypeName(band.DataType)
+        gdal_dtype = band.DataType
         raster = None
         return gdal_dtype
+        
+    def getGDALDataTypeNameFromImg(self, inImg):
+        """
+        Returns the GDAL datatype ENUM (e.g., GDT_Float32) for the inputted raster file
+        """
+        import osgeo.gdal as gdal
+        raster = gdal.Open(inImg, gdal.GA_ReadOnly)
+        if raster == None:
+            raise RSGISPyException('Could not open raster image: \'' + inImg+ '\'')
+        band = raster.GetRasterBand(1)
+        if band == None:
+            raise RSGISPyException('Could not open raster band 1 in image: \'' + inImg+ '\'')
+        dtypeName = gdal.GetDataTypeName(band.DataType)
+        raster = None
+        return dtypeName
     
     def deleteFileWithBasename(self, filePath):
         """
@@ -301,7 +316,7 @@ class RSGISPyUtils (object):
         gdalDriver.Rename(oFileName, cFileName)
 
     def getRSGISLibDataType(self, gdaltype):
-        """ Convert from GDAL data type string to 
+        """ Convert from GDAL data name type string to 
             RSGISLib data type int.
         """
         gdaltype = gdaltype.lower()

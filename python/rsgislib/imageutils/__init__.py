@@ -255,30 +255,15 @@ Where:
 * datatype is the rsgislib datatype of the output image (if none then it will be the same as the input file).
 * multicore - use multiple processing cores (Default = False)
 
-"""   
+""" 
     rsgisUtils = rsgislib.RSGISPyUtils()
     numBands = rsgisUtils.getImageBandCount(inProcessImg)
     if noDataVal == None:
         noDataVal = rsgisUtils.getImageNoDataValue(inProcessImg)
-    gdalDType = rsgisUtils.getRSGISLibDataTypeFromImg(inProcessImg)
     
     if datatype == None:
-        if gdalDType == gdal.GDT_Byte:
-            datatype = rsgislib.TYPE_8UINT
-        elif gdalDType == gdal.GDT_Int16:
-            datatype = rsgislib.TYPE_16INT
-        elif gdalDType == gdal.GDT_Int32:
-            datatype = rsgislib.TYPE_32INT
-        elif gdalDType == gdal.GDT_UInt16:
-            datatype = rsgislib.TYPE_16UINT
-        elif gdalDType == gdal.GDT_UInt32:
-            datatype = rsgislib.TYPE_32UINT         
-        elif gdalDType == gdal.GDT_Float32:
-            datatype = rsgislib.TYPE_32FLOAT
-        elif gdalDType == gdal.GDT_Float64:
-            datatype = rsgislib.TYPE_64FLOAT
-        else:
-            raise Exception("Data type of the input file was not recognised or known.")
+        datatype = rsgisUtils.getRSGISLibDataTypeFromImg(inProcessImg)
+        
     interpolationMethod = gdal.GRA_NearestNeighbour
     if interpMethod == 'bilinear':
         interpolationMethod = gdal.GRA_Bilinear 

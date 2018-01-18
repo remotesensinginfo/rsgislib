@@ -65,8 +65,6 @@ namespace rsgis{namespace img{
     
     void RSGISCalcHighResImgSummaryStats::calcImageValue(float *bandValues, int numInVals, bool useNoData, float noDataVal, double *output) throw(RSGISImageCalcException)
     {
-        //std::cout << "HERE - RSGISCalcHighResImgSummaryStats::calcImageValue\n";
-        
         if(this->sumStats.size() != this->getNumOutBands())
         {
             throw RSGISImageCalcException("The number of output image bands and summary stats is not equal.");
