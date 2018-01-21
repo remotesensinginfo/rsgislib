@@ -14,13 +14,15 @@ Geometry
 .. autofunction:: rsgislib.vectorutils.generateConvexHullsGroups
 .. autofunction:: rsgislib.vectorutils.splitFeatures
 .. autofunction:: rsgislib.vectorutils.fitActiveContourBoundaries
-.. autofunction:: rsgislib.vectorutils.reProjVectorLayer
+.. autofunction:: rsgislib.vectorutils.polygonsInPolygon
 
 
 Create Vectors
 ---------------
 .. autofunction:: rsgislib.vectorutils.polygoniseRaster
 .. autofunction:: rsgislib.vectorutils.exportPxls2Pts
+.. autofunction:: rsgislib.vectorutils.createPolySHP4LstBBOXs
+.. autofunction:: rsgislib.vectorutils.extractImageFootprint
 
 
 Attributes
@@ -34,10 +36,13 @@ Attributes
 .. autofunction:: rsgislib.vectorutils.dist2NearestGeom
 .. autofunction:: rsgislib.vectorutils.spatialGraphClusterGeoms
 .. autofunction:: rsgislib.vectorutils.writeVecColumn
+.. autofunction:: rsgislib.vectorutils.readVecColumn
 
 Management
 -----------
-.. autofunction:: rsgislib.vectorutils.polygonsInPolygon
+.. autofunction:: rsgislib.vectorutils.reProjVectorLayer
+.. autofunction:: rsgislib.vectorutils.mergeShapefiles
+.. autofunction:: rsgislib.vectorutils.mergeVectors2SQLiteDB
 
 
 Rasterisation
