@@ -200,7 +200,7 @@ Example::
 
     from rsgislib import vectorutils
     import rsgislib
-    from osgeo import ogr
+    import osgeo.ogr as ogr
     
     rsgisUtils = rsgislib.RSGISPyUtils()
     requiredScenes = rsgisUtils.readTextFile2List("GMW_JERS-1_ScenesRequired.txt")
@@ -212,22 +212,19 @@ Example::
     
     ds = gdal.OpenEx(vectorFile, gdal.OF_UPDATE )
     if ds is None:
-        print("Could not open '" + vectorFile + "'")
-        sys.exit( 1 )
+        raise Exception("Could not open '" + vectorFile + "'")
     
     lyr = ds.GetLayerByName( vectorLayer )
     
     if lyr is None:
-        print("Could not find layer '" + vectorLayer + "'")
-        sys.exit( 1 )
+        raise Exception("Could not find layer '" + vectorLayer + "'")
     
     numFeats = lyr.GetFeatureCount()
     
     if not len(colData) == numFeats:
-        print("The number of features and size of the input data is not equal.")
         print("Number of Features: " + str(numFeats))
         print("Length of Data: " + str(len(colData)))
-        sys.exit( 1 )
+        raise Exception( "The number of features and size of the input data is not equal." )
 
     colExists = False
     lyrDefn = lyr.GetLayerDefn()
@@ -239,8 +236,7 @@ Example::
     if not colExists:
         field_defn = ogr.FieldDefn( colName, colDataType )
         if lyr.CreateField ( field_defn ) != 0:
-            print("Creating '" + colName + "' field failed.\n")
-            sys.exit( 1 )
+            raise Exception("Creating '" + colName + "' field failed.\n")
 
     lyr.ResetReading()
     i = 0
@@ -250,6 +246,60 @@ Example::
         i = i + 1
     lyr.SyncToDisk()
     ds = None
+
+
+def readVecColumn(vectorFile, vectorLayer, colName):
+    """
+A function which will reads a column from a vector file
+
+Where:
+
+* vectorFile - The file / path to the vector data 'file'.
+* vectorLayer - The layer to which the data is to be read from.
+* colName - Name of the input column
+
+Example::
+
+    from rsgislib import vectorutils
+    import rsgislib
+    
+    rsgisUtils = rsgislib.RSGISPyUtils()
+    requiredScenes = rsgisUtils.readTextFile2List("GMW_JERS-1_ScenesRequired.txt")
+    requiredScenesShp = "JERS-1_Scenes_Requred_shp"
+    vectorutils.writeVecColumn(requiredScenesShp+'.shp', requiredScenesShp, 'ScnName', ogr.OFTString, requiredScenes)
+
+"""
+    gdal.UseExceptions()
+    
+    ds = gdal.OpenEx(vectorFile, gdal.OF_UPDATE )
+    if ds is None:
+        raise Exception("Could not open '" + vectorFile + "'")
+    
+    lyr = ds.GetLayerByName( vectorLayer )
+    
+    if lyr is None:
+        raise Exception("Could not find layer '" + vectorLayer + "'")
+    
+
+    colExists = False
+    lyrDefn = lyr.GetLayerDefn()
+    for i in range( lyrDefn.GetFieldCount() ):
+        if lyrDefn.GetFieldDefn(i).GetName() == colName:
+            colExists = True
+            break
+    
+    if not colExists:
+        raise Exception("The specified column does not exist in the input layer.")
+    
+    outVal = list()
+    lyr.ResetReading()
+    for feat in lyr:
+        outVal.append(feat.GetField(colName))
+
+    lyr.SyncToDisk()
+    ds = None
+    
+    return outVal
 
 
 def extractImageFootprint(inputImg, outVec, tmpDIR='./tmp', rePrjTo=None):
