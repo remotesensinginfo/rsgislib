@@ -7,12 +7,12 @@ Documentation for the Python bindings are available through this website or the 
 RSGISLib Introduction Training
 ------------------------------
 
-We have provided a training course demonstrating the basics of RSGISLib getting you started into using this Python module. Provided with datasets you can download the full package (worksheet, presentation slides, scripts and datasets) from our `SourceForge Project Page <https://sourceforge.net/projects/rsgislib/files/Training/RSGISLibIntroTrainingJan2017.tar.gz>`_
+We have provided a training course demonstrating the basics of RSGISLib getting you started into using this Python module. Provided with datasets you can download the full package (worksheet, presentation slides, scripts and datasets) from our `SourceForge Project Page <https://sourceforge.net/projects/rsgislib/files/Training/RSGISLibIntroTrainingJan2018.tar.gz>`_
 
-    * `Worksheet PDF (RSGISLib_IntroTraining_Jan2017.pdf) <http://www.rsgislib.org/docs/RSGISLib_IntroTraining_Jan2017.pdf>`_
+    * `Worksheet PDF (RSGISLib_IntroTraining_Jan2018.pdf) <http://www.rsgislib.org/docs/RSGISLib_IntroTraining_Jan2018.pdf>`_
     * `Presentation PDF (pbunting_rsgislib_introtraining.pdf) <http://www.rsgislib.org/docs/pbunting_rsgislib_introtraining.pdf>`_
 
-
+These were updated in January 2018.
 
 JAXA K&C 20 Global Mangrove Watch Workshop
 -------------------------------------------
