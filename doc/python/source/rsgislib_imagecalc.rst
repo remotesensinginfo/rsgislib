@@ -38,6 +38,8 @@ Statistics
 .. autofunction:: rsgislib.imagecalc.meanVector
 .. autofunction:: rsgislib.imagecalc.imagePixelLinearFit
 .. autofunction:: rsgislib.imagecalc.pca
+.. autofunction:: rsgislib.imagecalc.getPCAEigenVector
+.. autofunction:: rsgislib.imagecalc.performImagePCA
 .. autofunction:: rsgislib.imagecalc.calculateRMSE
 .. autofunction:: rsgislib.imagecalc.bandPercentile
 .. autofunction:: rsgislib.imagecalc.covariance

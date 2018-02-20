@@ -448,9 +448,12 @@ static PyObject *ImageCalc_ImagePixelColumnSummary(PyObject *self, PyObject *arg
 
     rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)datatype;
 
-    try {
+    try
+    {
         rsgis::cmds::executeImagePixelColumnSummary(inputImage, outputImage, summary, gdalFormat, type, noDataValue, useNoDataValue);
-    } catch (rsgis::cmds::RSGISCmdException &e) {
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
         PyErr_SetString(GETSTATE(self)->error, e.what());
         return NULL;
     }
@@ -605,16 +608,25 @@ static PyObject *ImageCalc_MeanVector(PyObject *self, PyObject *args) {
     Py_RETURN_NONE;
 }
 
-static PyObject *ImageCalc_PCA(PyObject *self, PyObject *args) {
+static PyObject *ImageCalc_PCA(PyObject *self, PyObject *args)
+{
     const char *eigenVectors, *inputImage, *outputImage;
     unsigned int numComponents;
+    const char *gdalFormat;
+    int datatype;
 
-    if(!PyArg_ParseTuple(args, "sssI:pca", &inputImage, &eigenVectors, &outputImage, &numComponents))
+    if(!PyArg_ParseTuple(args, "sssIsi:pca", &inputImage, &eigenVectors, &outputImage, &numComponents, &gdalFormat, &datatype))
+    {
         return NULL;
-
-    try {
-        rsgis::cmds::executePCA(eigenVectors, inputImage, outputImage, numComponents);
-    } catch (rsgis::cmds::RSGISCmdException &e) {
+    }
+    
+    try
+    {
+        rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)datatype;
+        rsgis::cmds::executePCA(std::string(inputImage), std::string(eigenVectors), std::string(outputImage), numComponents, std::string(gdalFormat), type);
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
         PyErr_SetString(GETSTATE(self)->error, e.what());
         return NULL;
     }
@@ -2142,17 +2154,30 @@ static PyMethodDef ImageCalcMethods[] = {
 "\n"
 },
 
-
 {"pca", ImageCalc_PCA, METH_VARARGS,
-"rsgislib.imagecalc.pca(eigenVectors, inputImage, outputImage, numComponents)\n"
-"Performs a principal components analysis of an image\n"
+"rsgislib.imagecalc.pca(inputImage, eigenVectors, outputImage, numComponents, gdalFormat, dataType)\n"
+"Performs a principal components analysis of an image using a defined set of eigenvectors.\n"
+"The eigenvectors can be calculated using the rsgislib.imagecalc.getPCAEigenVector function.\n"
 "\n"
 "Where:\n"
 "\n"
-"* eigenVectors is a string containing the name of the file of eigen vectors for the PCA\n"
 "* inputImage is a string containing the name of the input image file\n"
+"* eigenVectors is a string containing the name of the file of eigen vectors for the PCA\n"
 "* outputImage is a string containing the name of the output image file\n"
 "* numComponents is an int containing number of components to use for PCA\n"
+"* gdalFormat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+"* dataType is an int containing one of the values from rsgislib.TYPE_*\n"
+"\n"
+"Example::\n"
+"\n"
+"import rsgislib.imageutils\n"
+"rsgislib.imagecalc\n"
+"inputImg = 'Input.kea'\n"
+"eigenVecFile = 'EigenVec.mtxt'\n"
+"outputImg = './Output.kea'\n"
+"eigenVec, varExplain = rsgislib.imagecalc.getPCAEigenVector(inputImg, 1000, None, eigenVecFile)\n"
+"rsgislib.imagecalc.pca(inputImg, eigenVecFile, outputImg, varExplain.shape[0], 'KEA', rsgislib.TYPE_32FLOAT)\n"
+"rsgislib.imageutils.popImageStats(outputImg, usenodataval, nodataval, True)\n"
 "\n"
 },
 

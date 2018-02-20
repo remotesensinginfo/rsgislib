@@ -68,6 +68,7 @@ Extract
 .. autofunction:: rsgislib.imageutils.mergeExtractedHDF5Data
 .. autofunction:: rsgislib.imageutils.performRandomPxlSampleInMask
 .. autofunction:: rsgislib.imageutils.performRandomPxlSampleInMaskLowPxlCount
+.. autofunction:: rsgislib.imageutils.extractImgPxlSample
 
 
 Create

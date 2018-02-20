@@ -1061,7 +1061,7 @@ namespace rsgis{ namespace cmds {
 
     }
 
-    void executePCA(std::string eigenvectors, std::string inputImage, std::string outputImage, int numComponents)throw(RSGISCmdException)
+    void executePCA(std::string inputImage, std::string eigenvectors, std::string outputImage, int numComponents, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException)
     {
         GDALAllRegister();
         GDALDataset **datasets = NULL;
@@ -1085,12 +1085,18 @@ namespace rsgis{ namespace cmds {
                 std::string message = std::string("Could not open image ") + inputImage;
                 throw rsgis::RSGISImageException(message.c_str());
             }
+            
+            if(numComponents > eigenvectorsMatrix->n)
+            {
+                throw RSGISException("Number of component must be smaller or equal than the number image bands in the input image.");
+            }
 
             applyPCA = new rsgis::img::RSGISApplyEigenvectors(numComponents, eigenvectorsMatrix);
             calcImage = new rsgis::img::RSGISCalcImage(applyPCA, "", true);
-            calcImage->calcImage(datasets, 1, outputImage);
+            calcImage->calcImage(datasets, 1, outputImage, false, NULL, gdalFormat, RSGIS_to_GDAL_Type(outDataType));
 
-            if(datasets[0] != NULL) {
+            if(datasets[0] != NULL)
+            {
                 GDALClose(datasets[0]);
             }
 
