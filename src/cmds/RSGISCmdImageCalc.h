@@ -115,7 +115,7 @@ namespace rsgis{ namespace cmds {
     /** Function to calculate the mean vector of an image */
     DllExport void executeMeanVector(std::string inputImage, std::string outputMatrix)throw(RSGISCmdException);
     /** Function to perform principal components analysis of an image */
-    DllExport void executePCA(std::string eigenvectors, std::string inputImage, std::string outputImage, int numComponents)throw(RSGISCmdException);
+    DllExport void executePCA(std::string inputImage, std::string eigenvectors, std::string outputImage, int numComponents, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException);
     /** Function to generate a standardised image using the mean vector provided */
     DllExport void executeStandardise(std::string meanvectorStr, std::string inputImage, std::string outputImage)throw(RSGISCmdException);
     /** Function to replace values less then given, using a threshold */

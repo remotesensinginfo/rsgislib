@@ -820,4 +820,49 @@ Where:
     applier.apply(_popPxlsRanVals, infiles, outfiles, otherargs, controls=aControls)
 
 
+def extractImgPxlSample(inputImg, pxlNSample, noData=None):
+    """
+A function which extracts a random sample of pixels from the 
+input image file to a number array.
+
+* inputImg - the image from which the random sample will be taken.
+* pxlNSample - the sample to be taken (e.g., a value of 100 will sample every 100th, valid (if noData specified), pixel)
+* noData - provide a no data value which is to be ignored during processing. If None then ignored (Default: None)
+
+return:: outputs a numpy array (n sampled values, n bands)
+
+""" 
+    # Import the RIOS image reader
+    from rios.imagereader import ImageReader
+    
+    first = True
+    reader = ImageReader(inputImg, windowxsize=200, windowysize=200)
+    print('Started .0.', end='', flush=True)
+    outCount = 10
+    for (info, block) in reader:
+        if info.getPercent() > outCount:
+            print('.'+str(int(outCount))+'.', end='', flush=True)
+            outCount = outCount + 10
+                
+        blkShape = block.shape
+        blkBands = block.reshape((blkShape[0], (blkShape[1]*blkShape[2])))
+        
+        blkBandsTrans = numpy.transpose(blkBands)
+        
+        if noData is not None:
+            blkBandsTrans = blkBandsTrans[(blkBandsTrans!=noData).all(axis=1)]
+        
+        if blkBandsTrans.shape[0] > 0:
+            nSamp = int((blkBandsTrans.shape[0])/pxlNSample)
+            nSampRange = numpy.arange(0, nSamp, 1)*pxlNSample
+            blkBandsTransSamp = blkBandsTrans[nSampRange]
+            
+            if first:
+                outArr = blkBandsTransSamp
+                first = False
+            else:
+                outArr = numpy.concatenate((outArr, blkBandsTransSamp), axis=0)
+    print('. Completed')
+    return outArr
+
 

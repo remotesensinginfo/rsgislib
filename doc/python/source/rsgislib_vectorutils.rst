@@ -60,6 +60,7 @@ Utilities
 ---------
 .. autofunction:: rsgislib.vectorutils.printpolygeom
 .. autofunction:: rsgislib.vectorutils.getVecLayerExtent
+.. autofunction:: rsgislib.vectorutils.getVecFeatCount
 .. autofunction:: rsgislib.vectorutils.getProjWKTFromVec
 
 * :ref:`genindex`

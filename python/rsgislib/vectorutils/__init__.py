@@ -369,6 +369,28 @@ A function to extract an image footprint as a vector.
             driver = ogr.GetDriverByName('ESRI Shapefile')
             driver.DeleteDataSource(outVecTmpFile)
 
+def getVecFeatCount(inVec, layerName=None, computeCount=True):
+    """
+Get a count of the number of features in the vector layers.
+
+* inVec - is a string with the input vector file name and path.
+* layerName - is the layer for which extent is to be calculated (Default: None)
+*             if None assume there is only one layer and that will be read.
+* computeCount - is a boolean which specifies whether the layer extent 
+                 should be calculated (rather than estimated from header)
+                 even if that operation is computationally expensive.
+
+return:: nfeats
+
+"""
+    from osgeo import gdal
+    inDataSource = gdal.OpenEx(inVec, gdal.OF_VECTOR )
+    if layerName is not None:
+        inLayer = inDataSource.GetLayer(layerName)
+    else:
+        inLayer = inDataSource.GetLayer()
+    nFeats = inLayer.GetFeatureCount(computeCount)
+    return nFeats
 
 
 def mergeShapefiles(inFileList, outVecFile):
@@ -385,20 +407,22 @@ Where:
         driver.DeleteDataSource(outVecFile)
     first = True
     for inFile in inFileList:
-        print("Processing: " + inFile)
-        if first:
-            cmd = 'ogr2ogr -f "ESRI Shapefile"  "' + outVecFile + '" "' + inFile + '"'
-            try:
-                subprocess.call(cmd, shell=True)
-            except OSError as e:
-                raise Exception('Error running ogr2ogr: ' + cmd)
-            first = False
-        else:
-            cmd = 'ogr2ogr -update -append -f "ESRI Shapefile" "' + outVecFile + '" "' + inFile + '"'
-            try:
-                subprocess.call(cmd, shell=True)
-            except OSError as e:
-                raise Exception('Error running ogr2ogr: ' + cmd)
+        nFeat = getVecFeatCount(inFile)
+        print("Processing: " + inFile + " has " + str(nFeat) + " features.")
+        if nFeat > 0:
+            if first:
+                cmd = 'ogr2ogr -f "ESRI Shapefile"  "' + outVecFile + '" "' + inFile + '"'
+                try:
+                    subprocess.call(cmd, shell=True)
+                except OSError as e:
+                    raise Exception('Error running ogr2ogr: ' + cmd)
+                first = False
+            else:
+                cmd = 'ogr2ogr -update -append -f "ESRI Shapefile" "' + outVecFile + '" "' + inFile + '"'
+                try:
+                    subprocess.call(cmd, shell=True)
+                except OSError as e:
+                    raise Exception('Error running ogr2ogr: ' + cmd)
 
 def mergeVectors2SQLiteDB(inFileList, outDBFile, lyrName, exists):
     """
@@ -413,27 +437,29 @@ Where:
 """
     first = True
     for inFile in inFileList:
-        print("Processing: " + inFile)
-        if first:
-            if not exists:
-                cmd = 'ogr2ogr -f "SQLite" -lco COMPRESS_GEOM=YES -lco SPATIAL_INDEX=YES -nln '+lyrName+' "' + outDBFile + '" "' + inFile + '"'
-                try:
-                    subprocess.call(cmd, shell=True)
-                except OSError as e:
-                    raise Exception('Error running ogr2ogr: ' + cmd)
+        nFeat = getVecFeatCount(inFile)
+        print("Processing: " + inFile + " has " + str(nFeat) + " features.")
+        if nFeat > 0:
+            if first:
+                if not exists:
+                    cmd = 'ogr2ogr -f "SQLite" -lco COMPRESS_GEOM=YES -lco SPATIAL_INDEX=YES -nln '+lyrName+' "' + outDBFile + '" "' + inFile + '"'
+                    try:
+                        subprocess.call(cmd, shell=True)
+                    except OSError as e:
+                        raise Exception('Error running ogr2ogr: ' + cmd)
+                else:
+                    cmd = 'ogr2ogr -update -f "SQLite" -lco COMPRESS_GEOM=YES -lco SPATIAL_INDEX=YES -nln '+lyrName+' "' + outDBFile + '" "' + inFile + '"'
+                    try:
+                        subprocess.call(cmd, shell=True)
+                    except OSError as e:
+                        raise Exception('Error running ogr2ogr: ' + cmd)
+                first = False
             else:
-                cmd = 'ogr2ogr -update -f "SQLite" -lco COMPRESS_GEOM=YES -lco SPATIAL_INDEX=YES -nln '+lyrName+' "' + outDBFile + '" "' + inFile + '"'
+                cmd = 'ogr2ogr -update -append -f "SQLite" -nln '+lyrName+' "' + outDBFile + '" "' + inFile + '"'
                 try:
                     subprocess.call(cmd, shell=True)
                 except OSError as e:
                     raise Exception('Error running ogr2ogr: ' + cmd)
-            first = False
-        else:
-            cmd = 'ogr2ogr -update -append -f "SQLite" -nln '+lyrName+' "' + outDBFile + '" "' + inFile + '"'
-            try:
-                subprocess.call(cmd, shell=True)
-            except OSError as e:
-                raise Exception('Error running ogr2ogr: ' + cmd)
 
 
 def createPolySHP4LstBBOXs(csvFile, outSHP, espgCode, minXCol=0, maxXCol=1, minYCol=2, maxYCol=3, ignoreRows=0, force=False):
@@ -628,4 +654,6 @@ A function which reprojects a vector layer.
     # Save and close the shapefiles
     inDataSet = None
     outDataSet = None
+
+
 

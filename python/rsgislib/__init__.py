@@ -406,6 +406,8 @@ class RSGISPyUtils (object):
         
     def getVecLayerExtent(self, inVec, layerName=None, computeIfExp=True):
         """
+        Get the extent of the vector layer.
+        
         * inVec - is a string with the input vector file name and path.
         * layerName - is the layer for which extent is to be calculated (Default: None)
         *             if None assume there is only one layer and that will be read.
@@ -424,6 +426,29 @@ class RSGISPyUtils (object):
             inLayer = inDataSource.GetLayer()
         extent = inLayer.GetExtent(computeIfExp)
         return extent
+        
+    def getVecFeatCount(self, inVec, layerName=None, computeCount=True):
+        """
+        Get a count of the number of features in the vector layers.
+        
+        * inVec - is a string with the input vector file name and path.
+        * layerName - is the layer for which extent is to be calculated (Default: None)
+        *             if None assume there is only one layer and that will be read.
+        * computeCount - is a boolean which specifies whether the layer extent 
+                         should be calculated (rather than estimated from header)
+                         even if that operation is computationally expensive.
+        
+        return:: nfeats
+        
+        """
+        from osgeo import gdal
+        inDataSource = gdal.OpenEx(inVec, gdal.OF_VECTOR )
+        if layerName is not None:
+            inLayer = inDataSource.GetLayer(layerName)
+        else:
+            inLayer = inDataSource.GetLayer()
+        nFeats = inLayer.GetFeatureCount(computeCount)
+        return nFeats
         
         
     def findCommonExtentOnGrid(self, baseExtent, baseGrid, otherExtent, fullContain=True):

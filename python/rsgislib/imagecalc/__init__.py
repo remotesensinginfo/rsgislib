@@ -112,11 +112,6 @@ Example::
     distImgDS = None
     classImgBand = None
     classImgDS = None
-    
-
-
-
-
 
 
 def _computeProximityArrArgsFunc(argVals):
@@ -305,4 +300,91 @@ Where:
 
     return outVals
 
+
+def getPCAEigenVector(inputImg, pxlNSample, noData=None, outMatrixFile=None):
+    """
+A function which takes a sample from an input image and uses it to 
+generate eigenvector for a PCA. Note. this can be used as input to rsgislib.imagecalc.pca
+
+Where::
+
+* inputImg - the image from which the random sample will be taken.
+* pxlNSample - the sample to be taken (e.g., a value of 100 will sample every 100th pixel)
+* noData - provide a no data value which is to be ignored during processing. If None then ignored (Default: None)
+* outMatrixFile - path and name for the output rsgislib matrix file. If None file is not created (Default: None)
+
+returns::
+
+* array with the eigenvector
+* array with the ratio of the explained variance
+
+""" 
+    from sklearn.decomposition import PCA
+    import rsgislib.imageutils
+    
+    # Read input data from image file.
+    X = rsgislib.imageutils.extractImgPxlSample(inputImg, pxlNSample, noData)
+    
+    print(str(X.shape[0]) + ' values were extracted from the input image.')
+    
+    pca = PCA()
+    pca.fit(X)
+    
+    if outMatrixFile is not None:
+        f = open(outMatrixFile, 'w')
+        f.write('m='+str(pca.components_.shape[0])+'\n')
+        f.write('n='+str(pca.components_.shape[1])+'\n')
+        first = True
+        for val in pca.components_.flatten():
+            if first:
+                f.write(str(val))
+                first = False
+            else:
+                f.write(','+str(val))
+        f.write('\n\n')
+        f.flush()
+        f.close()
+    
+    pcaComp = 1
+    print("Prop. of variance explained:")
+    for val in pca.explained_variance_ratio_:
+        print('\t PCA Component ' + str(pcaComp) + ' = ' + str(round(val, 4)))
+        pcaComp = pcaComp + 1
+
+    return pca.components_, pca.explained_variance_ratio_
+
+
+def performImagePCA(inputImg, outputImg, eigenVecFile, nComponents=None, pxlNSample=100, gdalformat='KEA', datatype=rsgislib.TYPE_32UINT, noData=None, calcStats=True):
+    """
+A function which performs a PCA on the input image.
+
+Where::
+
+* inputImg - the image from which the random sample will be taken.
+* outputImg - the output image transformed using the calculated PCA
+* eigenVecFile - path and name for the output rsgislib matrix file containing the eigenvector for the PCA.
+* nComponents - the number of PCA compoents outputted. A value of None is all components (Default: None)
+* pxlNSample - the sample to be taken (e.g., a value of 100 will sample every 100th pixel) (Default: 100)
+* gdalformat - the output gdal supported file format (Default KEA)
+* datatype - the output data type of the input image (Default: rsgislib.TYPE_32UINT)
+* noData - provide a no data value which is to be ignored during processing. If None then ignored (Default: None)
+* calcStats - Boolean specifying whether pyramids and statistics should be calculated for the output image. (Default: True)
+
+"""
+    import rsgislib.imageutils
+    eigenVec, varExplain = rsgislib.imagecalc.getPCAEigenVector(inputImg, pxlNSample, noData, eigenVecFile)
+    outNComp = varExplain.shape[0]
+    if nComponents is not None:
+        if nComponents > varExplain.shape[0]:
+            raise Exception("You cannot output more components than the number of input image bands.")
+        outNComp = nComponents
+    
+    rsgislib.imagecalc.pca(inputImg, eigenVecFile, outputImg, outNComp, gdalformat, datatype)
+    if calcStats:
+        usenodataval=False
+        nodataval=0
+        if noData is not None:
+            usenodataval=True
+            nodataval=noData
+        rsgislib.imageutils.popImageStats(outputImg, usenodataval, nodataval, True)
 
