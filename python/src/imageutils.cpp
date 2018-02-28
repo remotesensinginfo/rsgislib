@@ -2371,7 +2371,7 @@ static PyMethodDef ImageUtilsMethods[] = {
 "Where:\n"
 "\n"
 "* inputimage is a string providing the name of the input file.\n"
-"* inputvector is a string providing the image which the 'inputimage' is to be clipped to. \n"
+"* inputROIimage is a string providing the image which the 'inputimage' is to be clipped to. \n"
 "* outputimage is a string providing the output image. \n"
 "* gdalformat is a string providing the gdalformat of the output image (e.g., KEA).\n"
 "* datatype is a rsgislib.TYPE_* value providing the data type of the output image.\n"
@@ -2381,11 +2381,11 @@ static PyMethodDef ImageUtilsMethods[] = {
 "   import rsgislib\n"
 "   from rsgislib import imageutils\n"
 "   inputImage = './Rasters/injune_p142_casi_sub_utm.kea'\n"
-"   inputVector = './Vectors/injune_p142_plot_location_utm.shp'\n"
+"   inputROIimage = './Vectors/injune_p142_roi.kea'\n"
 "   outputImage = './TestOutputs/injune_p142_casi_sub_utm_subset.kea'\n"
 "   gdalformat = 'KEA'\n"
 "   gdaltype = rsgislib.TYPE_32FLOAT\n"
-"   imageutils.subset(inputImage, inputVector, outputImage, gdalformat, datatype)\n"
+"   imageutils.subset2img(inputImage, inputROIimage, outputImage, gdalformat, datatype)\n"
 "\n"},
     
     

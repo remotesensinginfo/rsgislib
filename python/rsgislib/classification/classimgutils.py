@@ -203,6 +203,9 @@ The returned classifier instance will be trained using the input data.
         dataArrSamp = dataArr
         classArrSamp = classArr
     
+    if not preProcessor is None:
+        dataArrSamp = reProcessor.fit_transform(dataArrSamp)
+    
     print("Training data size: {} x {}".format(dataArr.shape[0], dataArr.shape[1]))
     print("Training Sample data size: {} x {}".format(dataArrSamp.shape[0], dataArrSamp.shape[1]))
     
