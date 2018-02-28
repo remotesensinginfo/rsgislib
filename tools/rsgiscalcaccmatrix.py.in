@@ -122,7 +122,7 @@ def exportToTex(outFile, errMatrix, producerAcc, userAcc, overallAcc, kappa, uni
     outputFile.write('\\usepackage[table]{xcolor}\n')
     outputFile.write('\\begin{document}\n')
     # Create the latex table
-    outputFile.write('\\begin{table}[htdp]\n')
+    outputFile.write('\\begin{table}[htbp]\n')
     caption = str("\\caption{Error Matrix. Overall Accuracy: ") + str(round(overallAcc,2)) + str("\% Kappa: ") + str(round((kappa),3)) +  str("}\n")
     outputFile.write(caption)
     outputFile.write('\\begin{center}\n')
