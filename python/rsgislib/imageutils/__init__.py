@@ -822,7 +822,7 @@ Where:
 
 def extractImgPxlSample(inputImg, pxlNSample, noData=None):
     """
-A function which extracts a random sample of pixels from the 
+A function which extracts a sample of pixels from the 
 input image file to a number array.
 
 * inputImg - the image from which the random sample will be taken.
