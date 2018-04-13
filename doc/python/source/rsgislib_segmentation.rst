@@ -52,6 +52,12 @@ Tiles
    :members:
    :undoc-members:
 
+scikit-image
+------------
+.. automodule:: rsgislib.segmentation.skimgseg
+   :members:
+   :undoc-members:
+
 Other
 -----
 .. autofunction:: rsgislib.segmentation.generateRegularGrid
