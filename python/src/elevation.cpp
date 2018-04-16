@@ -253,6 +253,27 @@ static PyObject *Elevation_fillDEMSoilleGratin1994(PyObject *self, PyObject *arg
     Py_RETURN_NONE;
 }
 
+static PyObject *Elevation_planeFitDetreadDEM(PyObject *self, PyObject *args)
+{
+    const char *pszInputDEMImage, *pszOutputFile, *pszGDALFormat;
+    int winSize;
+    
+    if( !PyArg_ParseTuple(args, "sssi:planeFitDetreatDEM", &pszInputDEMImage, &pszOutputFile, &pszGDALFormat, &winSize))
+        return NULL;
+    
+    try
+    {
+        rsgis::cmds::executePlaneFitDetreadDEM(std::string(pszInputDEMImage), std::string(pszOutputFile), std::string(pszGDALFormat), winSize);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 
 // Our list of functions in this module
 static PyMethodDef ElevationMethods[] = {
@@ -372,6 +393,28 @@ static PyMethodDef ElevationMethods[] = {
 "   validMaskImage = 'ValidRegionMask.kea'\n"
 "   outFilledImage = 'DEM_filled.kea'\n"
 "   rsgislib.elevation.fillDEMSoilleGratin1994(inputDEMImage, validMaskImage, outFilledImage, 'KEA')\n"
+"\n"
+},
+    
+{"planeFitDetreatDEM", Elevation_planeFitDetreadDEM, METH_VARARGS,
+"rsgislib.elevation.planeFitDetreatDEM(inputDEMImage, outputImage, gdalformat, winSize)\n"
+"Filter the local minima in a DEM using the Soille and Gratin 1994 algorithm.\n\n"
+"Soille, P., and Gratin, C. (1994). An efficient algorithm for drainage network\n"
+"extraction on DEMs. J. Visual Communication and Image Representation. 5(2). 181-189.\n"
+"\n"
+"Where:\n"
+"\n"
+"* inputDEMImage is a string containing the name and path of the input DEM file.\n"
+"* outputImage is a string containing the name and path of the output file.\n"
+"* gdalformat is a string with the output image format for the GDAL driver.\n"
+"* winSize is an integer with the window size within which the plane is fitted.\n"
+"\n"
+"Example::\n"
+"\n"
+"   import rsgislib.elevation\n"
+"   inputDEMImage = 'DEM.kea'\n"
+"   outDEMImage = 'DEM_Detread.kea'\n"
+"   rsgislib.elevation.planeFitDetreatDEM(inputDEMImage, outDEMImage, 'KEA', 11)\n"
 "\n"
 },
     
