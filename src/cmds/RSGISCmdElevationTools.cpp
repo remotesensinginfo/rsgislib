@@ -485,10 +485,46 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
+    
+    void executePlaneFitDetreadDEM(std::string demImage, std::string outputImage, std::string outImageFormat, int winSize)throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
             
+            std::cout << "Open " << demImage << std::endl;
+            GDALDataset *inImgDS = (GDALDataset *) GDALOpen(demImage.c_str(), GA_ReadOnly);
+            if(inImgDS == NULL)
+            {
+                std::string message = std::string("Could not open image ") + demImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
             
-
+            double demNoDataVal = 0.0;
+            int demNoDataValAvail = false;
+            demNoDataVal = inImgDS->GetRasterBand(1)->GetNoDataValue(&demNoDataValAvail);
+            if(!demNoDataValAvail)
+            {
+                GDALClose(inImgDS);
+                throw rsgis::RSGISException("The DEM image file does not have a no data value defined. ");
+            }
             
+            rsgis::calib::RSGISDetreadDEMUsingPlaneFit *detreadDEM = new rsgis::calib::RSGISDetreadDEMUsingPlaneFit(demNoDataVal, winSize);
+            rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(detreadDEM, "", true);
+            calcImage.calcImageWindowData(&inImgDS, 1, outputImage, winSize, outImageFormat, GDT_Float32);
+            delete detreadDEM;
+            
+            GDALClose(inImgDS);
+        }
+        catch(rsgis::RSGISException e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
     
 }}
 

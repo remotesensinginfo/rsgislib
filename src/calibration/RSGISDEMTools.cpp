@@ -1375,7 +1375,63 @@ namespace rsgis{namespace calib{
     
     
     
+    RSGISDetreadDEMUsingPlaneFit::RSGISDetreadDEMUsingPlaneFit(double noDataVal, int winSize) : rsgis::img::RSGISCalcImageValue(1)
+    {
+        this->noDataVal = noDataVal;
+        this->mathUtils = new rsgis::math::RSGISMathsUtils();
+        this->xVals = new double[winSize*winSize];
+        this->yVals = new double[winSize*winSize];
+        this->zVals = new double[winSize*winSize];
+        this->nVals = 0;
+    }
     
+    void RSGISDetreadDEMUsingPlaneFit::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
+    {
+        int midPoint = floor(((float)winSize)/2.0);
+        
+        for(unsigned int i = 0; i < (winSize*winSize); ++i)
+        {
+            this->xVals[i] = 0;
+            this->yVals[i] = 0;
+            this->zVals[i] = 0;
+        }
+        
+        this->nVals = 0;
+        for(unsigned int i = 0; i < winSize; ++i)
+        {
+            for(unsigned int j = 0; j < winSize; ++j)
+            {
+                if(!boost::math::isnan(dataBlock[0][i][j]) && (dataBlock[0][i][j] != noDataVal))
+                {
+                    this->xVals[this->nVals] = j-midPoint;
+                    this->yVals[this->nVals] = i-midPoint;
+                    this->zVals[this->nVals] = dataBlock[0][i][j];
+                    this->nVals = this->nVals + 1;
+                }
+            }
+        }
+        if(this->nVals > 0)
+        {
+            double a = 0.0;
+            double b = 0.0;
+            double c = 0.0;
+            mathUtils->fitPlane(this->xVals, this->yVals, this->zVals, this->nVals, &a, &b, &c);
+            output[0] = c;
+        }
+        else
+        {
+            output[0] = 0;
+        }
+        
+    }
+    
+    RSGISDetreadDEMUsingPlaneFit::~RSGISDetreadDEMUsingPlaneFit()
+    {
+        delete this->mathUtils;
+        delete[] this->xVals;
+        delete[] this->yVals;
+        delete[] this->zVals;
+    }
     
 	
 }}

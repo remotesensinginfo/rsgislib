@@ -18,6 +18,7 @@ Flitering
 
 .. autofunction:: rsgislib.elevation.dtmAspectMedianFilter
 .. autofunction:: rsgislib.elevation.fillDEMSoilleGratin1994
+.. autofunction:: rsgislib.elevation.planeFitDetreatDEM
 
 Masking
 --------

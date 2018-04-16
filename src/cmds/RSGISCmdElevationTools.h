@@ -56,10 +56,8 @@ namespace rsgis{ namespace cmds {
     DllExport void executeCalcSlope(std::string demImage, std::string outputImage, RSGISAngleMeasure outAngleUnit, std::string outImageFormat)throw(RSGISCmdException);
     /** A function to generate an aspect layer */
     DllExport void executeCalcAspect(std::string demImage, std::string outputImage, std::string outImageFormat)throw(RSGISCmdException);
-    
     /** A function to categorise an aspect layer */
     DllExport void executeCatagoriseAspect(std::string aspectImage, std::string outputImage, std::string outImageFormat)throw(RSGISCmdException);
-    
     /** A function to generate a hillshade layer */
     DllExport void executeCalcHillshade(std::string demImage, std::string outputImage, float solarAzimuth, float solarZenith, std::string outImageFormat)throw(RSGISCmdException);
     /** A function to generate a shadow mask layer */
@@ -70,9 +68,10 @@ namespace rsgis{ namespace cmds {
     DllExport void executeCalcLocalExitanceAngle(std::string demImage, std::string outputImage, float viewAzimuth, float viewZenith, std::string outImageFormat)throw(RSGISCmdException);
     /** A function to filter a DTM using a variable filter with respect to aspect */
     DllExport void executeDTMAspectMedianFilter(std::string demImage, std::string aspectImage, std::string outputImage, float aspectRange, int winHSize, std::string outImageFormat)throw(RSGISCmdException);
-    
     /** A function to fill a DEM using the Soille and Gratin 1994 algorthm */
     DllExport void executeDEMFillSoilleGratin1994(std::string inImage, std::string validDataImg, std::string outputImage, std::string outImageFormat)throw(RSGISCmdException);
+    /** A function which detreads an elevation model using local plane fitting */
+    DllExport void executePlaneFitDetreadDEM(std::string demImage, std::string outputImage, std::string outImageFormat, int winSize)throw(RSGISCmdException);
 }}
 
 
