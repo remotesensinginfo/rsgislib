@@ -1,7 +1,8 @@
 """
 The imageutils module contains general utilities for applying to images.
 """
-
+# Maintain print function backwards compatibility with python 2
+from __future__ import print_function
 # import the C++ extension into this level
 from ._imageutils import *
 import rsgislib 
