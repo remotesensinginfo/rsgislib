@@ -11,7 +11,7 @@ try:
 except ImportError:
     haveGDALPy = False
 import rsgislib
-
+import numpy
 
 # define our own classes
 class BandDefn(object):
