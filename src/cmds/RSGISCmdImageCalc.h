@@ -92,6 +92,8 @@ namespace rsgis{ namespace cmds {
     DllExport void executeBandMaths(VariableStruct *variables, unsigned int numVars, std::string outputImage, std::string mathsExpression, std::string gdalFormat, RSGISLibDataType outDataType, bool useExpAsbandName)throw(RSGISCmdException);
     /** Function to run the image maths tools */
     DllExport void executeImageMaths(std::string inputImage, std::string outputImage, std::string mathsExpression, std::string imageFormat, RSGISLibDataType outDataType, bool useExpAsbandName)throw(RSGISCmdException);
+    /** Function to run the image band maths tools */
+    DllExport void executeImageBandMaths(std::string inputImage, std::string outputImage, std::string mathsExpression, std::string imageFormat, RSGISLibDataType outDataType, bool useExpAsbandName)throw(RSGISCmdException);
     /** Function to run the KMeans tool */
     DllExport void executeKMeansClustering(std::string inputImage, std::string outputMatrixFile, unsigned int numClusters, unsigned int maxNumIterations, unsigned int subSample, bool ignoreZeros, float degreeOfChange, RSGISInitClustererMethods initClusterMethod)throw(RSGISCmdException);
     /** Function to run the KMeans tool */

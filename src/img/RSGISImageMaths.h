@@ -71,6 +71,28 @@ namespace rsgis{namespace img{
         mu::value_type inVal;
 	};
     
+    class DllExport RSGISImageBandMaths : public RSGISCalcImageValue
+    {
+    public:
+        RSGISImageBandMaths(mu::Parser *muParser, int numBandVars, std::vector<std::string> bNames);
+        void calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException);
+        void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent)throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+        void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+        ~RSGISImageBandMaths();
+    private:
+        mu::Parser *muParser;
+        int numBandVars;
+        mu::value_type *inVals;
+        std::vector<std::string> bNames;
+    };
+    
     class DllExport RSGISAllBandsEqualTo : public RSGISCalcImageValue
 	{
 	public: 

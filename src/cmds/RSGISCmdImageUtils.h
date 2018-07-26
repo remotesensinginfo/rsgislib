@@ -70,6 +70,15 @@ namespace rsgis{ namespace cmds {
         std::string bandName;
     };
     
+    struct DllExport RSGISCmdCompositeInfo
+    {
+        unsigned int year;
+        unsigned int day;
+        std::string compImg;
+        std::string imgRef;
+        bool outRef;
+    };
+    
     /** Function to run the stretch image command */
     DllExport void executeStretchImage(std::string inputImage, std::string outputImage, bool saveOutStats, std::string outStatsFile, bool ignoreZeros, bool onePassSD, std::string gdalFormat, RSGISLibDataType outDataType, RSGISStretches stretchType, float stretchParam)throw(RSGISCmdException);
     
@@ -199,6 +208,9 @@ namespace rsgis{ namespace cmds {
     
     /** A function to create a composite image where the pixel defined in the reference image is outputted - note the order of the input images needs to correspond with the indexes in the reference image. */
     DllExport void executeCreateRefImgCompsiteImage(std::vector<std::string> inputImages, std::string outputImage, std::string refImage, std::string gdalFormat, RSGISLibDataType outDataType, float outNoDataVal) throw(RSGISCmdException);
+    
+    /** A function to use the composite reference images to identify regions which need filling and creates a new reference image for each composite as to where the fill should come from. */
+    DllExport void executeGenTimeseriesFillCompositeImg(std::vector<RSGISCmdCompositeInfo> inCompInfo, std::string validMaskImage, std::string outFillRefImg, std::string outCompImg, std::string outCompRefImg, std::string gdalFormat, RSGISLibDataType outDataType) throw(RSGISCmdException);
     
 }}
 

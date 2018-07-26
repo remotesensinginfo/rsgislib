@@ -27,6 +27,8 @@ Mosaic and Composite
 .. autofunction:: rsgislib.imageutils.createImageMosaic
 .. autofunction:: rsgislib.imageutils.createRefImgCompositeImg
 .. autofunction:: rsgislib.imageutils.imagecomp.createMaxNDVIComposite
+.. autofunction:: rsgislib.imageutils.imagecomp.createMaxNDVINDWICompositeLandsat
+.. autofunction:: rsgislib.imageutils.genTimeseriesFillCompositeImg
 .. autofunction:: rsgislib.imageutils.includeImages
 .. autofunction:: rsgislib.imageutils.includeImagesWithOverlap
 .. autofunction:: rsgislib.imageutils.combineImages2Band

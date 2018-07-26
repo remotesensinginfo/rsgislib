@@ -242,6 +242,83 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
+                
+                
+    void executeImageBandMaths(std::string inputImage, std::string outputImage, std::string mathsExpression, std::string imageFormat, RSGISLibDataType outDataType, bool useExpAsbandName)throw(RSGISCmdException)
+    {
+        GDALAllRegister();
+        GDALDataset **datasets = NULL;
+        rsgis::img::RSGISImageBandMaths *imageMaths = NULL;
+        rsgis::img::RSGISCalcImage *calcImage = NULL;
+        mu::Parser *muParser = new mu::Parser();
+        rsgis::math::RSGISMathsUtils mathUtils;
+        
+        try
+        {
+            std::string *outBandName = NULL;
+            if(useExpAsbandName)
+            {
+                outBandName  = new std::string[1];
+                outBandName[0] = mathsExpression;
+            }
+            
+            datasets = new GDALDataset*[1];
+            
+            datasets[0] = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+            if(datasets[0] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            int numRasterBands = datasets[0]->GetRasterCount();
+            
+            std::vector<std::string> bNames;
+            mu::value_type *inVals = new mu::value_type[numRasterBands];
+            for(int i = 0; i < numRasterBands; ++i)
+            {
+                inVals[i] = 0;
+                std::string bandNameStr = "b" + mathUtils.inttostring(i+1);
+                bNames.push_back(bandNameStr);
+                muParser->DefineVar(_T(bandNameStr.c_str()), &inVals[i]);
+            }
+            muParser->SetExpr(mathsExpression.c_str());
+            
+            imageMaths = new rsgis::img::RSGISImageBandMaths(muParser, numRasterBands, bNames);
+            
+            calcImage = new rsgis::img::RSGISCalcImage(imageMaths, "", true);
+            calcImage->calcImage(datasets, 1, outputImage, useExpAsbandName, outBandName, imageFormat, RSGIS_to_GDAL_Type(outDataType));
+            
+            GDALClose(datasets[0]);
+            delete[] datasets;
+            
+            if(useExpAsbandName)
+            {
+                delete[] outBandName;
+            }
+            
+            delete muParser;
+            delete imageMaths;
+            delete calcImage;
+        }
+        catch(rsgis::RSGISImageException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (mu::ParserError &e)
+        {
+            std::string message = std::string("ERROR: ") + std::string(e.GetMsg()) + std::string(":\t \'") + std::string(e.GetExpr()) + std::string("\'");
+            throw RSGISCmdException(message);
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
 
     void executeKMeansClustering(std::string inputImage, std::string outputMatrixFile, unsigned int numClusters, unsigned int maxNumIterations, unsigned int subSample, bool ignoreZeros, float degreeOfChange, RSGISInitClustererMethods initClusterMethod)throw(RSGISCmdException)
     {

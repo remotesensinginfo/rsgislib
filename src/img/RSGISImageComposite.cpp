@@ -185,5 +185,124 @@ void RSGISImageComposite::calcImageValue(float *bandValues, int numBands, double
         }
     }
     
+    
+    
+    
+    RSGISTimeseriesFillRefImgImageComposite::RSGISTimeseriesFillRefImgImageComposite(std::vector<rsgis::img::RSGISCompositeInfo*> compInfoVec) : RSGISCalcImageValue(1)
+    {
+        this->compInfoVec = compInfoVec;
+        int fillBandIdx = 1;
+        for(std::vector<rsgis::img::RSGISCompositeInfo*>::iterator iterInfo = compInfoVec.begin(); iterInfo != compInfoVec.end(); ++iterInfo)
+        {
+            if((*iterInfo)->outRef)
+            {
+                break;
+            }
+            ++fillBandIdx;
+        }
+        
+        if(fillBandIdx != 1)
+        {
+            std::cout << "this->fillBandIdx = " << fillBandIdx << std::endl;
+            throw RSGISImageCalcException("The image being filled should be the first in the list");
+        }
+        maxRefPxlVal = 0;
+    }
+
+    void RSGISTimeseriesFillRefImgImageComposite::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(RSGISImageCalcException)
+    {
+        if(numIntVals != (compInfoVec.size()+1))
+        {
+            throw RSGISImageCalcException("The number of inputted int bands is not equal to the number of dates+1 (for validation image)");
+        }
+        output[0] = 0;
+        
+        if((intBandValues[0] == 1) & (intBandValues[1] == 0))
+        {
+            for(unsigned int i = 2; i < numIntVals; ++i)
+            {
+                if(intBandValues[i] > 0)
+                {
+                    output[0] = i;
+                    compInfoVec.at(i-1)->usedInComp = true;
+                    compInfoVec.at(i-1)->pxlRefContrib2Fill.insert(intBandValues[i]);
+                    break;
+                }
+            }
+        }
+        
+        if(intBandValues[1] > maxRefPxlVal)
+        {
+            maxRefPxlVal = intBandValues[1];
+        }
+    }
+    
+    
+    
+    
+    RSGISTimeseriesFillImgImageComposite::RSGISTimeseriesFillImgImageComposite(std::vector<rsgis::img::RSGISCompositeInfo*> compInfoVec, unsigned int *imgIdxLUT, unsigned int nLUT, unsigned int nBands) : RSGISCalcImageValue(nBands)
+    {
+        this->compInfoVec = compInfoVec;
+        this->imgIdxLUT = imgIdxLUT;
+        this->nLUT = nLUT;
+        int fillBandIdx = 1;
+        for(std::vector<rsgis::img::RSGISCompositeInfo*>::iterator iterInfo = compInfoVec.begin(); iterInfo != compInfoVec.end(); ++iterInfo)
+        {
+            if((*iterInfo)->outRef)
+            {
+                break;
+            }
+            ++fillBandIdx;
+        }
+        
+        if(fillBandIdx != 1)
+        {
+            std::cout << "this->fillBandIdx = " << fillBandIdx << std::endl;
+            throw RSGISImageCalcException("The image being filled should be the first in the list");
+        }
+    }
+    
+    void RSGISTimeseriesFillImgImageComposite::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(RSGISImageCalcException)
+    {
+        if(numIntVals != 1)
+        {
+            throw RSGISImageCalcException("There should only be a single integer band.");
+        }
+        if((numfloatVals % this->getNumOutBands()) != 0)
+        {
+            throw RSGISImageCalcException("The number of float bands should be divisable by the number of output bands");
+        }
+        
+        if(intBandValues[0] > 0)
+        {
+            unsigned int imgIdx = 0;
+            imgIdx = this->imgIdxLUT[(intBandValues[0])];
+            //std::cout << "this->imgIdxLUT["<<intBandValues[0]<<"] = " << this->imgIdxLUT[intBandValues[0]] << std::endl;
+            if((imgIdx >= this->nLUT))
+            {
+                throw RSGISImageCalcException("LUT has incorrect valid.");
+            }
+            if(imgIdx > 0)
+            {
+                imgIdx = imgIdx - 1;
+            }
+            
+            int offset = (this->getNumOutBands() * imgIdx);
+            
+            //std::cout << "offset = " << offset << std::endl;
+            for(unsigned int i = 0; i < this->getNumOutBands(); ++i)
+            {
+                output[i] = floatBandValues[offset+i];
+            }
+        }
+        else
+        {
+            for(unsigned int i = 0; i < this->getNumOutBands(); ++i)
+            {
+                output[i] = floatBandValues[i];
+            }
+        }
+    }
+    
 }}
 

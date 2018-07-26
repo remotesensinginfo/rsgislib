@@ -64,6 +64,50 @@ namespace rsgis{namespace img{
 	{
 		
 	}
+        
+    RSGISImageBandMaths::RSGISImageBandMaths(mu::Parser *muParser, int numBandVars, std::vector<std::string> bNames) : RSGISCalcImageValue(1)
+    {
+        this->numBandVars = numBandVars;
+        this->muParser = muParser;
+        this->bNames = bNames;
+        if(bNames.size() != numBandVars)
+        {
+            throw RSGISImageException("The number of variable band names must be the same as the number of image bands.");
+        }
+        this->inVals = new mu::value_type[numBandVars];
+        for(int i = 0; i < numBandVars; ++i)
+        {
+            muParser->DefineVar(_T(bNames.at(i).c_str()), &inVals[i]);
+        }
+        
+    }
+    
+    void RSGISImageBandMaths::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+    {
+        try
+        {
+            for(int i = 0; i < numBands; ++i)
+            {
+                inVals[i] = bandValues[i];
+            }
+            mu::value_type result = 0;
+            result = muParser->Eval();
+            output[0] = result;
+        }
+        catch (mu::ParserError &e)
+        {
+            std::string message = std::string("ERROR: ") + std::string(e.GetMsg()) + std::string(":\t \'") + std::string(e.GetExpr()) + std::string("\'");
+            throw RSGISImageCalcException(message);
+        }
+    }
+    
+    RSGISImageBandMaths::~RSGISImageBandMaths()
+    {
+        
+    }
+    
+    
+    
     
     
     RSGISAllBandsEqualTo::RSGISAllBandsEqualTo(int numberOutBands, float value, float outTrueVal, float outFalseVal) : RSGISCalcImageValue(numberOutBands)

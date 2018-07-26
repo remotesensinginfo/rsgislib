@@ -564,13 +564,13 @@ return:: WKT representation of projection
     return spatialRef.ExportToWkt()
 
 
-def reProjVectorLayer(inputVec, outputSHP, outProjWKT, outDriverName="ESRI Shapefile", outLyrName=None, inLyrName=None, inProjWKT=None, force=False):
+def reProjVectorLayer(inputVec, outputVec, outProjWKT, outDriverName='ESRI Shapefile', outLyrName=None, inLyrName=None, inProjWKT=None, force=False):
     """
 A function which reprojects a vector layer. 
     
-* inputVec is a string with name and path to input shapefile.
-* outputSHP is a string with name and path to output shapefile.
-* outProjWKT is a string with the WKT string for the output shapefile.
+* inputVec is a string with name and path to input vector file.
+* outputVec is a string with name and path to output vector file.
+* outProjWKT is a string with the WKT string for the output vector file.
 * outDriverName is the output vector file format. Default is ESRI Shapefile.
 * outLyrName is a string for the output layer name. If None then ignored and 
              assume there is just a single layer in the vector and layer name
@@ -608,18 +608,23 @@ A function which reprojects a vector layer.
     coordTrans = osr.CoordinateTransformation(inSpatialRef, outSpatialRef)
     
     # Create shapefile driver
-    driver = gdal.GetDriverByName( "ESRI Shapefile" )
+    driver = gdal.GetDriverByName( outDriverName )
     
     # create the output layer
-    if os.path.exists(outputSHP):
-        if force:
-            driver.DeleteDataSource(outputSHP)
+    if os.path.exists(outputVec):
+        if (outDriverName == 'ESRI Shapefile'):
+            if force:
+                driver.DeleteDataSource(outputVec)
+            else:
+                raise Exception('Output shapefile already exists - stopping.')
+            outDataSet = driver.Create(outputVec, 0, 0, 0, gdal.GDT_Unknown )
         else:
-            raise Exception('Output shapefile already exists - stopping.')
-    outDataSet = driver.Create(outputSHP, 0, 0, 0, gdal.GDT_Unknown )
+            outDataSet = gdal.OpenEx(outputVec, gdal.OF_UPDATE )
+    else:
+        outDataSet = driver.Create(outputVec, 0, 0, 0, gdal.GDT_Unknown )
     
     if outLyrName is None:
-        outLyrName = os.path.splitext(os.path.basename(outputSHP))[0]
+        outLyrName = os.path.splitext(os.path.basename(outputVec))[0]
     outLayer = outDataSet.CreateLayer(outLyrName, outSpatialRef, inLayer.GetGeomType() )
     
     # add fields
