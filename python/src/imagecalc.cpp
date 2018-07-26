@@ -133,7 +133,7 @@ static PyObject *ImageCalc_ImageMath(PyObject *self, PyObject *args)
     {
         return NULL;
     }
-
+    
     try
     {
         rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
@@ -145,7 +145,32 @@ static PyObject *ImageCalc_ImageMath(PyObject *self, PyObject *args)
         PyErr_SetString(GETSTATE(self)->error, e.what());
         return NULL;
     }
+    
+    Py_RETURN_NONE;
+}
 
+static PyObject *ImageCalc_ImageBandMath(PyObject *self, PyObject *args)
+{
+    const char *pszInputImage, *pszOutputFile, *pszExpression, *pszGDALFormat;
+    int nDataType;
+    int bExpBandName = 0;
+    if( !PyArg_ParseTuple(args, "ssssi|i:imageBandMath", &pszInputImage, &pszOutputFile, &pszExpression, &pszGDALFormat, &nDataType, &bExpBandName))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
+        bool useExpAsbandName = (bool)bExpBandName;
+        rsgis::cmds::executeImageBandMaths(pszInputImage, pszOutputFile, pszExpression, pszGDALFormat, type, useExpAsbandName);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
     Py_RETURN_NONE;
 }
 
@@ -1905,12 +1930,17 @@ static PyMethodDef ImageCalcMethods[] = {
 "   ################## If Statement Example #########################\n"
 "   import rsgislib\n"
 "   from rsgislib import imagecalc\n"
-"   imagecalc.imageMath(in.kea, out.kea, ‘(b1==1) || (b1==2) || (b1==3)?0:1', 'KEA', rsgislib.TYPE_8UINT)\n"
+"   bandDefns = []\n"
+"   bandDefns.append(BandDefn('b1', inFileName, 1))\n"
+"   bandDefns.append(BandDefn('b2', inFileName, 2))\n"
+"   bandDefns.append(BandDefn('b3', inFileName, 3))\n"
+"   imagecalc.bandMath('out.kea', ‘(b1==1) || (b2==1) || (b3==1)?1:0', 'KEA', rsgislib.TYPE_8UINT, bandDefns)\n"
 "\n"},
 
 {"imageMath", ImageCalc_ImageMath, METH_VARARGS,
 "rsgislib.imagecalc.imageMath(inputImage, outputImage, expression, gdalformat, datatype, useExpAsbandName)\n"
-"Performs image math calculation.\n"
+"Performs image math calculations. Produces an output image file with the same number of bands as the input image.\n"
+"This function applies the same calculation to each image band (i.e., b1 is the only variable).\n"
 "The syntax for the expression is from the muparser library ('http://muparser.beltoforion.de <http://muparser.beltoforion.de>`): `see here <http://beltoforion.de/article.php?a=muparser&hl=en&p=features&s=idPageTop>`\n."
 "\n"
 "Where:\n"
@@ -1931,6 +1961,37 @@ static PyMethodDef ImageCalcMethods[] = {
 "   datatype = rsgislib.TYPE_32UINT\n"
 "   expression = 'b1*1000'\n"
 "   imagecalc.imageMath(inFileName, outputImage, expression, gdalformat, datatype)\n"
+"\n"},
+    
+{"imageBandMath", ImageCalc_ImageBandMath, METH_VARARGS,
+"rsgislib.imagecalc.imageBandMath(inputImage, outputImage, expression, gdalformat, datatype, useExpAsbandName)\n"
+"Performs image band math calculations. Produces a single output file with a single image band.\n"
+"The image bands can be referred to individually using b1, b2 ... bn. where n is the number of image bands, starting at 1.\n"
+"The syntax for the expression is from the muparser library ('http://muparser.beltoforion.de <http://muparser.beltoforion.de>`): `see here <http://beltoforion.de/article.php?a=muparser&hl=en&p=features&s=idPageTop>`\n."
+"\n"
+"Where:\n"
+"\n"
+"* inimage is a string containing the name of the input file\n"
+"* outputImage is a string containing the name of the output file\n"
+"* expression is a string containing the expression to run over the images, uses myparser syntax.\n"
+"* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+"* datatype is an containing one of the values from rsgislib.TYPE_*\n"
+"* useExpAsbandName is an optional bool specifying whether the band name should be the expression (Default = False).\n"
+"\n"
+"Example::\n"
+"\n"
+"   import rsgislib\n"
+"   from rsgislib import imagecalc\n"
+"   outputImage = path + 'TestOutputs/PSU142_vismean.kea'\n"
+"   gdalformat = 'KEA'\n"
+"   datatype = rsgislib.TYPE_32UINT\n"
+"   expression = '(b1+b2+b3+b4)/4'\n"
+"   imagecalc.imageBandMath(inFileName, outputImage, expression, gdalformat, datatype)\n"
+"\n"
+"   ################## If Statement Example #########################\n"
+"   import rsgislib\n"
+"   from rsgislib import imagecalc\n"
+"   imagecalc.imageBandMath('in.kea', 'out.kea', '(b1==1) || (b2==1) || (b3==1)?1:0', 'KEA', rsgislib.TYPE_8UINT)\n"
 "\n"},
 
 {"kMeansClustering", ImageCalc_KMeansClustering, METH_VARARGS,

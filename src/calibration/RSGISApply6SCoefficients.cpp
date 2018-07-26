@@ -101,6 +101,10 @@ namespace rsgis{namespace calib{
                         output[i] = output[i] + 1.0;
                     }
                 }
+                if(output[i] > this->scaleFactor)
+                {
+                    output[i] = this->scaleFactor;
+                }
             }
         }
         
@@ -278,6 +282,10 @@ namespace rsgis{namespace calib{
                         output[i] = output[i] + 1.0;
                     }
                 }
+                if(output[i] > this->scaleFactor)
+                {
+                    output[i] = this->scaleFactor;
+                }
             }
         }
         
@@ -419,6 +427,10 @@ namespace rsgis{namespace calib{
                     {
                         output[i] = output[i] + 1.0;
                     }
+                }
+                if(output[i] > this->scaleFactor)
+                {
+                    output[i] = this->scaleFactor;
                 }
             }
         }

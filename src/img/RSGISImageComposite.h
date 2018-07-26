@@ -21,6 +21,7 @@
  *
  */
 
+#include <math.h>
 
 #include "common/RSGISException.h"
 #include "common/RSGISImageException.h"
@@ -52,8 +53,84 @@ namespace rsgis { namespace img {
         compositeMin,
         compositeMax,
         compositeRange
-        
     };
+    
+    struct DllExport RSGISCompositeInfo
+    {
+        unsigned int year;
+        unsigned int day;
+        std::string compImg;
+        std::string imgRef;
+        bool outRef;
+        double dist;
+        bool usedInComp;
+        std::set<long> pxlRefContrib2Fill;
+    };
+    
+    inline bool compare_CompositeInfoDates (const RSGISCompositeInfo& first, const RSGISCompositeInfo& second)
+    {
+        bool returnVal = true;
+        if(first.year > second.year)
+        {
+            returnVal = false;
+        }
+        else if((first.year == second.year) && (first.day > second.day))
+        {
+            returnVal = false;
+        }
+        
+        return returnVal;
+    }
+    
+    inline bool compare_CompositeInfoDist (const RSGISCompositeInfo& first, const RSGISCompositeInfo& second)
+    {
+        return (first.dist < second.dist);
+    }
+    
+    inline double calcAbsDateDistCompositeInfo (const RSGISCompositeInfo& first, const RSGISCompositeInfo& second)
+    {
+        double dist = 0.0;
+        if(first.year == second.year)
+        {
+            if(first.day > second.day)
+            {
+                dist = first.day - second.day;
+            }
+            else
+            {
+                dist = second.day - first.day;
+            }
+        }
+        else if(first.year < second.year)
+        {
+            int nYear = second.year - first.year;
+            if(nYear > 1)
+            {
+                int nDays2EndYear = 366-first.day;
+                dist = nDays2EndYear + second.day + (366*(nYear-1));
+            }
+            else
+            {
+                int nDays2EndYear = 366-first.day;
+                dist = nDays2EndYear + second.day;
+            }
+        }
+        else
+        {
+            int nYear = first.year - second.year;
+            if(nYear > 1)
+            {
+                int nDays2EndYear = 366-second.day;
+                dist = nDays2EndYear + first.day + (366*(nYear-1));
+            }
+            else
+            {
+                int nDays2EndYear = 366-second.day;
+                dist = nDays2EndYear + first.day;
+            }
+        }
+        return dist;
+    }
     
 	class DllExport RSGISImageComposite : public RSGISCalcImageValue
 	{
@@ -122,7 +199,47 @@ namespace rsgis { namespace img {
     };
     
     
+    class DllExport RSGISTimeseriesFillRefImgImageComposite : public RSGISCalcImageValue
+    {
+    public:
+        RSGISTimeseriesFillRefImgImageComposite(std::vector<rsgis::img::RSGISCompositeInfo*> compInfoVec);
+        void calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(RSGISImageCalcException);
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent)throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");}
+        void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+        long getMaxRefPxlVal(){return maxRefPxlVal;};
+        ~RSGISTimeseriesFillRefImgImageComposite(){};
+    private:
+        std::vector<rsgis::img::RSGISCompositeInfo*> compInfoVec;
+        long maxRefPxlVal;
+    };
     
+    class DllExport RSGISTimeseriesFillImgImageComposite : public RSGISCalcImageValue
+    {
+    public:
+        RSGISTimeseriesFillImgImageComposite(std::vector<rsgis::img::RSGISCompositeInfo*> compInfoVec, unsigned int *imgIdxLUT, unsigned int nLUT, unsigned int nBands);
+        void calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(RSGISImageCalcException);
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent)throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");}
+        void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+        ~RSGISTimeseriesFillImgImageComposite(){};
+    private:
+        std::vector<rsgis::img::RSGISCompositeInfo*> compInfoVec;
+        unsigned int *imgIdxLUT;
+        unsigned int nLUT;
+    };
     
     
 }}

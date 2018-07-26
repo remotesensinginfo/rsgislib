@@ -62,6 +62,33 @@ Create a list of these objects to pass to the sharpenLowResBands function.
         self.status = status
         self.name = name
 
+# Define Class for time series fill
+class RSGISTimeseriesFillInfo(object):
+    """
+Create a list of these objects to pass to the fillTimeSeriesGaps function
+* year - year the composite represents.
+* day - the (nominal) day within the year the composite represents (a value of zero and day will not be used)
+* compImg - The input compsite image which has been generated.
+* imgRef -  The reference layer (e.g., from createMaxNDVIComposite or createMaxNDVINDWICompositeLandsat) with zero for no data regions
+* outRef - A boolean variable specify which layer a fill reference layer is to be produced.
+"""
+    def __init__(self, year=1900, day=0, compImg=None, imgRef=None, outRef=False):
+        """
+        * year - year the composite represents.
+        * day - the (nominal) day within the year the composite represents (a value of zero and day will not be used)
+        * compImg - The input compsite image which has been generated.
+        * imgRef -  The reference layer (e.g., from createMaxNDVIComposite or createMaxNDVINDWICompositeLandsat) with zero for no data regions
+        * outRef - A boolean variable specify which layer a fill reference layer is to be produced.
+        """
+        self.year = year
+        self.day = day
+        self.compImg = compImg
+        self.imgRef = imgRef
+        self.outRef = outRef
+    
+    def __repr__(self):
+        return repr((self.year, self.day, self.compImg, self.imgRef, self.outRef))
+
 
 def setBandNames(inputImage, bandNames, feedback=False):
     """A utility function to set band names.

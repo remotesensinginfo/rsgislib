@@ -9,6 +9,7 @@ Band & Image Maths
 
 .. autofunction:: rsgislib.imagecalc.bandMath
 .. autofunction:: rsgislib.imagecalc.imageMath
+.. autofunction:: rsgislib.imagecalc.imageBandMath
 .. autofunction:: rsgislib.imagecalc.allBandsEqualTo
 .. autofunction:: rsgislib.imagecalc.replaceValuesLessThan
 

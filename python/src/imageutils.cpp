@@ -1828,6 +1828,113 @@ static PyObject *ImageUtils_CreateRefImageCompositeImg(PyObject *self, PyObject 
     Py_RETURN_NONE;
 }
 
+static PyObject *ImageUtils_GenTimeseriesFillCompositeImg(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    static char *kwlist[] = {"compInfo", "validMask", "outRefFillImg", "outCompImg", "outCompRefImg", "gdalformat", "datatype", NULL};
+    PyObject *pCompInfo;
+    const char *pszValidMaskImage = "";
+    const char *pszOutRefFillImage = "";
+    const char *pszOutCompImage = "";
+    const char *pszOutCompRefImage = "";
+    const char *pszGDALFormat = "";
+    int nDataType;
+    
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "Osssssi:genTimeseriesFillCompositeImg", kwlist, &pCompInfo, &pszValidMaskImage, &pszOutRefFillImage, &pszOutCompImage, &pszOutCompRefImage, &pszGDALFormat, &nDataType))
+    {
+        return NULL;
+    }
+    
+    if( !PySequence_Check(pCompInfo))
+    {
+        PyErr_SetString(GETSTATE(self)->error, "Composite Info object must be a sequence");
+        return NULL;
+    }
+    
+    Py_ssize_t nImages = PySequence_Size(pCompInfo);
+    std::vector<rsgis::cmds::RSGISCmdCompositeInfo> inCompInfo;
+    inCompInfo.reserve(nImages);
+    for( Py_ssize_t n = 0; n < nImages; n++ )
+    {
+        PyObject *o = PySequence_GetItem(pCompInfo, n);
+        
+        PyObject *pYear = PyObject_GetAttrString(o, "year");
+        if( ( pYear == NULL ) || ( pYear == Py_None ) || !RSGISPY_CHECK_INT(pYear) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "could not find int attribute \'year\'" );
+            Py_DECREF(pYear);
+            Py_DECREF(o);
+            return NULL;
+        }
+        
+        PyObject *pDay = PyObject_GetAttrString(o, "day");
+        if( ( pDay == NULL ) || ( pDay == Py_None ) || !RSGISPY_CHECK_INT(pDay) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "could not find int attribute \'day\'" );
+            Py_DECREF(pYear);
+            Py_DECREF(pDay);
+            Py_DECREF(o);
+            return NULL;
+        }
+        
+        PyObject *pCompImg = PyObject_GetAttrString(o, "compImg");
+        if( ( pCompImg == NULL ) || ( pCompImg == Py_None ) || !RSGISPY_CHECK_STRING(pCompImg) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'compImg\'" );
+            Py_DECREF(pYear);
+            Py_DECREF(pDay);
+            Py_DECREF(pCompImg);
+            Py_DECREF(o);
+            return NULL;
+        }
+        
+        PyObject *pImgRef = PyObject_GetAttrString(o, "imgRef");
+        if( ( pImgRef == NULL ) || ( pImgRef == Py_None ) || !RSGISPY_CHECK_STRING(pImgRef) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'imgRef\'" );
+            Py_DECREF(pYear);
+            Py_DECREF(pDay);
+            Py_DECREF(pCompImg);
+            Py_DECREF(pImgRef);
+            Py_DECREF(o);
+            return NULL;
+        }
+        
+        PyObject *pOutRef = PyObject_GetAttrString(o, "outRef");
+        if( ( pOutRef == NULL ) || ( pOutRef == Py_None ) || !RSGISPY_CHECK_INT(pOutRef) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'outRef\'" );
+            Py_DECREF(pYear);
+            Py_DECREF(pDay);
+            Py_DECREF(pCompImg);
+            Py_DECREF(pImgRef);
+            Py_DECREF(pOutRef);
+            Py_DECREF(o);
+            return NULL;
+        }
+        
+        rsgis::cmds::RSGISCmdCompositeInfo compInfoObj = rsgis::cmds::RSGISCmdCompositeInfo();
+        compInfoObj.year = RSGISPY_INT_EXTRACT(pYear);
+        compInfoObj.day = RSGISPY_INT_EXTRACT(pDay);
+        compInfoObj.compImg = RSGISPY_STRING_EXTRACT(pCompImg);
+        compInfoObj.imgRef = RSGISPY_STRING_EXTRACT(pImgRef);
+        compInfoObj.outRef = (bool)RSGISPY_INT_EXTRACT(pOutRef);
+        
+        inCompInfo.push_back(compInfoObj);
+    }
+    
+    try
+    {
+        rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
+        rsgis::cmds::executeGenTimeseriesFillCompositeImg(inCompInfo, std::string(pszValidMaskImage), std::string(pszOutRefFillImage), std::string(pszOutCompImage), std::string(pszOutCompRefImage), std::string(pszGDALFormat), type);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
 
 
 // Our list of functions in this module
@@ -2757,7 +2864,7 @@ For example, can be used to produce monthly composite images from a stack with i
 "* outputImage is a string with the name and path of the output image.\n"
 "* refimg is an image which specifies index of the image in inimages for which output pixel will be derived. Indexes start at 1, where 0 is no data.\n"
 "* gdalformat is a string with the GDAL output file format.\n"
-"* datatype is an containing one of the values from rsgislib.TYPE_*\n"
+"* datatype is an integer containing one of the values from rsgislib.TYPE_*\n"
 "* outnodata is the value which will be given to no data pixels in the output image."
 "\n"
 "Example::\n"
@@ -2800,9 +2907,28 @@ For example, can be used to produce monthly composite images from a stack with i
 "    rsgislib.imageutils.popImageStats(outCompImg, usenodataval=True, nodataval=0, calcpyramids=True)\n"
 "\n"
 "\n"},
-
+    
+    
+{"genTimeseriesFillCompositeImg", (PyCFunction)ImageUtils_GenTimeseriesFillCompositeImg, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.genTimeseriesFillCompositeImg(compInfo=list, validMask=string, outRefFillImg=string, outCompImg=string, gdalformat=string, datatype=int)\n"
+"A function which aids the creation of timeseries composites. This function uses reference images to identify\n"
+"which pixels should be used to in-fill composite gaps.\n"
+"\n"
+"Where:\n"
+"\n"
+"* compInfo is a list of rsgislib.imageutils.RSGISTimeseriesFillInfo objects\n"
+"* validMask is a string with the name and path to an image specifying the valid area within which the compsites are being generated.\n"
+"* outRefFillImg \n"
+"* outCompImg \n"
+"* outCompRefImg \n"
+"* gdalformat is a string with the GDAL outCompImg file format.\n"
+"* datatype is an integer containing one of the values from rsgislib.TYPE_*, used for outCompImg\n"
+"\n"
+"\n"},
+    
     {NULL}        /* Sentinel */
 };
+
 
 
 #if PY_MAJOR_VERSION >= 3
