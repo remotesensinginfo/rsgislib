@@ -54,6 +54,7 @@
 #include "img/RSGISCalcImgValProb.h"
 #include "img/RSGISApplyGainOffset2Img.h"
 #include "img/RSGISImgSummaryStatsFromMultiResImgs.h"
+#include "img/RSGISCalcImageLocalMin.h"
 
 #include "math/RSGISVectors.h"
 #include "math/RSGISMatrices.h"
@@ -3272,6 +3273,41 @@ namespace rsgis{ namespace cmds {
             
             GDALClose(refDataset);
             GDALClose(statsDataset);
+        }
+        catch(rsgis::RSGISImageException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+                
+    void executeIdentifyMinPxlValueInWin(std::string inputImg, std::string outputImg, std::string outputRefImg, std::vector<unsigned int> bands, unsigned int winSize, std::string gdalFormat, float noDataValue, bool useNoDataValue) throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            
+            GDALDataset *dataset = (GDALDataset *) GDALOpen(inputImg.c_str(), GA_ReadOnly);
+            if(dataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImg;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            GDALDataType gdalDataType = dataset->GetRasterBand(1)->GetRasterDataType();
+            
+            rsgis::img::RSGISCalcLocalMinInWin calcLclWinMin = rsgis::img::RSGISCalcLocalMinInWin(bands, noDataValue, useNoDataValue);
+            rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(&calcLclWinMin, "", true);
+            calcImage.calcImageWindowData(&dataset, 1, outputImg, outputRefImg, winSize, gdalFormat, gdalDataType);
+            
+            GDALClose(dataset);
         }
         catch(rsgis::RSGISImageException &e)
         {

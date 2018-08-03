@@ -1895,6 +1895,71 @@ static PyObject *ImageCalc_GetImgSumStatsInPxl(PyObject *self, PyObject *args, P
 
 
 
+static PyObject *ImageCalc_IdentifyMinPxlValueInWin(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    static char *kwlist[] = {"inputimg", "outimage", "outrefimg", "bands", "winsize", "gdalformat", "nodataval", "usenodata", NULL};
+    const char *pInputImage = "";
+    const char *pszOutputRefImage = "";
+    const char *pszOutputImage = "";
+    const char *pszGDALFormat = "";
+    unsigned int winSize = 3;
+    PyObject *bandsLstObj;
+    int useNoDataValue;
+    float noDataValue;
+    
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssOIsfi:identifyMinPxlValueInWin", kwlist, &pInputImage, &pszOutputImage, &pszOutputRefImage, &bandsLstObj, &winSize, &pszGDALFormat, &noDataValue, &useNoDataValue))
+    {
+        return NULL;
+    }
+    
+    if( !PySequence_Check(bandsLstObj))
+    {
+        PyErr_SetString(GETSTATE(self)->error, "Bands list must be a sequence");
+        return NULL;
+    }
+    
+    Py_ssize_t nBands = PySequence_Size(bandsLstObj);
+    std::vector<unsigned int> bandsVec;
+    bandsVec.reserve(nBands);
+    int bandVal = 0;
+    for( Py_ssize_t n = 0; n < nBands; ++n)
+    {
+        PyObject *o = PySequence_GetItem(bandsLstObj, n);
+        
+        if(!RSGISPY_CHECK_INT(o))
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Band value must be an integer.");
+            Py_DECREF(o);
+            return NULL;
+        }
+        
+        bandVal = RSGISPY_INT_EXTRACT(o);
+        if(bandVal < 1)
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Band value must be an integer with a minimum value of 1 (i.e., band indexing starts at 1).");
+            Py_DECREF(o);
+            return NULL;
+        }
+        bandsVec.push_back(bandVal);
+    }
+    
+    try
+    {
+        bool useNoData = (bool) useNoDataValue;
+        rsgis::cmds::executeIdentifyMinPxlValueInWin(std::string(pInputImage), std::string(pszOutputImage), std::string(pszOutputRefImage), bandsVec, winSize, std::string(pszGDALFormat), noDataValue, useNoData);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+
+
+
 
 
 // Our list of functions in this module
@@ -2905,10 +2970,25 @@ static PyMethodDef ImageCalcMethods[] = {
 "\n"
 "\n"},
     
+{"identifyMinPxlValueInWin", (PyCFunction)ImageCalc_IdentifyMinPxlValueInWin, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imagecalc.identifyMinPxlValueInWin(inputimg=string, outimage=string, outrefimg=string, bands=list, winsize=int, gdalformat=string, nodataval=float, usenodata=boolean)\n"
+"A function to identify the minimum \n"
+"\n"
+"Where:\n"
+"\n"
+"* inputimg is a string specifying input image file.\n"
+"* outimage is a string specifying image with the minimum pixel value.\n"
+"* outrefimg is a string specifying the output file for the reference image - i.e., the band index.\n"
+"* bands is a list of image bands (indexing starts at 1).\n"
+"* winsize is an integer specifying the window size (must be an odd number).\n"
+"* gdalformat is a string with the GDAL output file format.\n"
+"* nodataval is a float specifying the no data value.\n"
+"* usenodata is a boolean specifiying whether to use the no data value.\n"
+"\n"
+"\n"},
+    
 {NULL}        /* Sentinel */
 };
-
-
 
 #if PY_MAJOR_VERSION >= 3
 

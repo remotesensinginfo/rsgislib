@@ -38,11 +38,7 @@ namespace rsgis{namespace img{
 	{
 		numOutBands = bands;
 	}
-	
-	RSGISCalcImageValue::~RSGISCalcImageValue()
-	{
-		
-	}
+
     
     
     RSGISCalcValuesFromMultiResInputs::RSGISCalcValuesFromMultiResInputs(int numberOutBands)

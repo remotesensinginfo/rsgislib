@@ -420,6 +420,7 @@ set(LIB_IMG_H
 	${RSGIS_SRC_IMG_DIR}/RSGISApplyGainOffset2Img.h
 	${RSGIS_SRC_IMG_DIR}/RSGISSharpenLowResImagery.h
 	${RSGIS_SRC_IMG_DIR}/RSGISImgSummaryStatsFromMultiResImgs.h
+	${RSGIS_SRC_IMG_DIR}/RSGISCalcImageLocalMin.h
 	)
 	
 set(LIB_IMG_CPP
@@ -566,6 +567,8 @@ set(LIB_IMG_CPP
 	${RSGIS_SRC_IMG_DIR}/RSGISSharpenLowResImagery.h
 	${RSGIS_SRC_IMG_DIR}/RSGISImgSummaryStatsFromMultiResImgs.cpp
 	${RSGIS_SRC_IMG_DIR}/RSGISImgSummaryStatsFromMultiResImgs.h
+	${RSGIS_SRC_IMG_DIR}/RSGISCalcImageLocalMin.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISCalcImageLocalMin.h
 	)
 ###############################################################################
 
