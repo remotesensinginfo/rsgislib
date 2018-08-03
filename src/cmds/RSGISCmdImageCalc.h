@@ -182,7 +182,8 @@ namespace rsgis{ namespace cmds {
     DllExport void executeGetImgIdxForStat(std::vector<std::string> inputImgs, std::string outputImg, std::string gdalFormat, float noDataVal, RSGISCmdsSummariseStats sumStat) throw(RSGISCmdException);
     /** A function to derieve summary stats for the high resolution image pixels for regions defined by the low resolution image pixels */
     DllExport void executeGetWithinPxlImgStatSummaries(std::string refImg, std::string statsImg, unsigned int statsImgBand, std::string outImg, std::string gdalFormat, RSGISLibDataType outDataType, bool useNoData, std::vector<RSGISCmdsSummariseStats> cmdSumStats, unsigned int xIOGrid, unsigned int yIOGrid) throw(RSGISCmdException);
-    
+    /** A function to identify the image band within the  minimum pixel value from a set of image bands */
+    DllExport void executeIdentifyMinPxlValueInWin(std::string inputImg, std::string outputImg, std::string outputRefImg, std::vector<unsigned int> bands, unsigned int winSize, std::string gdalFormat, float noDataValue, bool useNoDataValue) throw(RSGISCmdException);
 }}
 
 
