@@ -212,6 +212,9 @@ namespace rsgis{ namespace cmds {
     /** A function to use the composite reference images to identify regions which need filling and creates a new reference image for each composite as to where the fill should come from. */
     DllExport void executeGenTimeseriesFillCompositeImg(std::vector<RSGISCmdCompositeInfo> inCompInfo, std::string validMaskImage, std::string outFillRefImg, std::string outCompImg, std::string outCompRefImg, std::string gdalFormat, RSGISLibDataType outDataType) throw(RSGISCmdException);
     
+    /** A function to combine multiple image bands into a single band using a reference image. */
+    DllExport void executeExportSingleMergedImgBand(std::string inputImage, std::string inputRefImage, std::string outputImage, std::string gdalFormat, RSGISLibDataType outDataType) throw(RSGISCmdException);
+    
 }}
 
 

@@ -37,6 +37,27 @@ namespace rsgis{namespace img{
     
     void RSGISCalcLocalMinInWin::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, double *outRefVal, unsigned int nOutRefVals) throw(RSGISImageCalcException)
     {
+        bool midPxlNoData = true;
+        if(useNoDataValue)
+        {
+            int winMid = (winSize-1)/2;
+            for(int n = 0; n < numBands; ++n)
+            {
+                if(dataBlock[n][winMid][winMid] != noDataValue)
+                {
+                    midPxlNoData = false;
+                    break;
+                }
+            }
+            
+            if(midPxlNoData)
+            {
+                output[0] = 0;
+                outRefVal[0] = 0;
+                return; // The central pixel is no data and therefore don't analyse.
+            }
+        }
+        
         for(int n = 0; n < this->bands.size(); ++n)
         {
             this->first[n] = true;

@@ -1689,4 +1689,78 @@ namespace rsgis{namespace img{
         }
     }
     
+    
+    
+    RSGISCalcMeanPxlValInMaskAcrossBands::RSGISCalcMeanPxlValInMaskAcrossBands(int maskVal, std::vector<unsigned int> bands, double noDataVal, bool useNoData):RSGISCalcImageValue(0)
+    {
+        this->maskVal = maskVal;
+        this->bands = bands;
+        this->noDataVal = noDataVal;
+        this->useNoData = useNoData;
+        
+        this->firstMean = true;
+        this->n = 0;
+        this->meanSum = 0.0;
+    }
+    
+    void RSGISCalcMeanPxlValInMaskAcrossBands::calcImageValue(float *bandValues, int numBands)throw(RSGISImageCalcException)
+    {
+        long pxlMskVal = (long) bandValues[0];
+        for(size_t i = 0; i < this->bands.size(); ++i)
+        {
+            if(pxlMskVal == this->maskVal)
+            {
+                if(this->useNoData)
+                {
+                    if(bandValues[this->bands.at(i)] != noDataVal)
+                    {
+                        if(this->firstMean)
+                        {
+                            this->meanSum = bandValues[this->bands.at(i)];
+                            this->n = 1;
+                            this->firstMean = false;
+                        }
+                        else
+                        {
+                            this->meanSum += bandValues[this->bands.at(i)];
+                            this->n += 1;
+                        }
+                    }
+                }
+                else
+                {
+                    if(this->firstMean)
+                    {
+                        this->meanSum = bandValues[this->bands.at(i)];
+                        this->n = 1;
+                        this->firstMean = false;
+                    }
+                    else
+                    {
+                        this->meanSum += bandValues[this->bands.at(i)];
+                        this->n += 1;
+                    }
+                }
+            }
+        }
+    }
+    
+    double RSGISCalcMeanPxlValInMaskAcrossBands::getMeanValue() throw(RSGISImageCalcException)
+    {
+        return this->meanSum/this->n;
+    }
+    
+    void RSGISCalcMeanPxlValInMaskAcrossBands::reset()
+    {
+        this->firstMean = true;
+        this->n = 0;
+        this->meanSum = 0.0;
+    }
+    
+    RSGISCalcMeanPxlValInMaskAcrossBands::~RSGISCalcMeanPxlValInMaskAcrossBands()
+    {
+        
+    }
+    
+    
 }}

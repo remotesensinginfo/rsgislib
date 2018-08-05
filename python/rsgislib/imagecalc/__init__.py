@@ -10,8 +10,16 @@ try:
     import osgeo.gdal as gdal
 except ImportError:
     haveGDALPy = False
+
 import rsgislib
 import numpy
+
+haveRIOS = True
+try:
+    from rios import applier
+    from rios import cuiprogress
+except ImportError as riosErr:
+    haveRIOS = False
 
 # define our own classes
 class BandDefn(object):
@@ -42,6 +50,38 @@ This is passed to the imagePixelColumnSummary function
         self.calcMean = calcMean
         self.calcStdDev = calcStdDev
         self.calcMedian = calcMedian
+
+
+
+class ImageBandRescale(object):
+    """
+Data structure for rescaling information for rescaleImgPxlVals function.
+* band - specified image band (band numbering starts at 1).
+* inMin - the input image band minimum value for rescaling. 
+* inMax - the input image band maximum value for rescaling.
+* inNoData - no data value for the input image band.
+* outMin - the output image band minimum value for rescaling. 
+* outMax - the output image band maximum value for rescaling.
+* outNoData - no data value for the output image band.
+"""
+    def __init__(self, band=0, inMin=0.0, inMax=0.0, inNoData=0, outMin=0.0, outMax=0.0, outNoData=0.0):
+        """
+        * band - specified image band (band numbering starts at 1).
+        * inMin - the input image band minimum value for rescaling. 
+        * inMax - the input image band maximum value for rescaling.
+        * inNoData - no data value for the input image band.
+        * outMin - the output image band minimum value for rescaling. 
+        * outMax - the output image band maximum value for rescaling.
+        * outNoData - no data value for the output image band.
+        """
+        self.band = band
+        self.inMin = inMin
+        self.inMax = inMax
+        self.inNoData = inNoData
+        self.outMin = outMin
+        self.outMax = outMax
+        self.outNoData = outNoData
+
 
 def calcDist2ImgVals(inputValsImg, outputDistImg, pxlVals, valsImgBand=1, gdalFormat='KEA', maxDist=None, noDataVal=None, unitGEO=True):
     """ 
@@ -387,4 +427,74 @@ Where::
             usenodataval=True
             nodataval=noData
         rsgislib.imageutils.popImageStats(outputImg, usenodataval, nodataval, True)
+
+
+def rescaleImgPxlVals(inputImg, outputImg, gdalformat, datatype, bandRescale, trim2Limits=True):
+    """
+Function which rescales an input image base on a list of rescaling parameters.
+
+Where:
+
+* inputImg - the input image
+* outputImg - the output image file name and path (will be same dimensions as the input)
+* gdalformat - the GDAL image file format of the output image file.
+* bandRescale - list of ImageBandRescale objects
+* trim2Limits - whether to trim the output to the output min/max values.
+
+"""
+    bandRescaleDict = dict()
+    for rescaleObj in bandRescale:
+        bandRescaleDict[rescaleObj.band-1] = rescaleObj
+    
+    numpyDT = numpy.float32
+    if datatype == rsgislib.TYPE_8INT:
+        numpyDT = numpy.int8
+    elif datatype == rsgislib.TYPE_16INT:
+        numpyDT = numpy.int16
+    elif datatype == rsgislib.TYPE_32INT:
+        numpyDT = numpy.int32
+    elif datatype == rsgislib.TYPE_64INT:
+        numpyDT = numpy.int64
+    elif datatype == rsgislib.TYPE_8UINT:
+        numpyDT = numpy.uint8
+    elif datatype == rsgislib.TYPE_16UINT:
+        numpyDT = numpy.uint16
+    elif datatype == rsgislib.TYPE_32UINT:
+        numpyDT = numpy.uint32
+    elif datatype == rsgislib.TYPE_64UINT:
+        numpyDT = numpy.uint64
+    elif datatype == rsgislib.TYPE_32FLOAT:
+        numpyDT = numpy.float32
+    elif datatype == rsgislib.TYPE_64FLOAT:
+        numpyDT = numpy.float64
+    else:
+        raise Exception('Datatype was not recognised.')
+    
+    infiles = applier.FilenameAssociations()
+    infiles.image = inputImg
+    outfiles = applier.FilenameAssociations()
+    outfiles.outimage = outputImg
+    otherargs = applier.OtherInputs()
+    otherargs.rescaleDict = bandRescaleDict
+    otherargs.trim = trim2Limits
+    otherargs.numpyDT = numpyDT
+    aControls = applier.ApplierControls()
+    aControls.progress = cuiprogress.CUIProgressBar()
+    aControls.drivername = gdalformat
+    aControls.omitPyramids = True
+    aControls.calcStats = False
+    
+    def _applyRescale(info, inputs, outputs, otherargs):
+        """
+        This is an internal rios function 
+        """
+        outputs.outimage = numpy.zeros_like(inputs.image, dtype=numpyDT)
+        for idx in range(inputs.image.shape[0]):
+            outputs.outimage[idx] = numpy.where(inputs.image[idx] == otherargs.rescaleDict[idx].inNoData, otherargs.rescaleDict[idx].outNoData, (((inputs.image[idx]-otherargs.rescaleDict[idx].inMin)/(inputs.image[idx]-otherargs.rescaleDict[idx].inMax - inputs.image[idx]-otherargs.rescaleDict[idx].inMin)) * (inputs.image[idx]-otherargs.rescaleDict[idx].outMax - inputs.image[idx]-otherargs.rescaleDict[idx].outMin)) + inputs.image[idx]-otherargs.rescaleDict[idx].outMin)
+            if otherargs.trim:
+                outputs.outimage[idx] = numpy.where((outputs.outimage[idx] != otherargs.rescaleDict[idx].outNoData) & (outputs.outimage[idx]<otherargs.rescaleDict[idx].outMin), otherargs.rescaleDict[idx].outMin, outputs.outimage[idx])
+                outputs.outimage[idx] = numpy.where((outputs.outimage[idx] != otherargs.rescaleDict[idx].outNoData) & (outputs.outimage[idx]>otherargs.rescaleDict[idx].outMax), otherargs.rescaleDict[idx].outMax, outputs.outimage[idx])
+
+    applier.apply(_applyRescale, infiles, outfiles, otherargs, controls=aControls)
+
 

@@ -1957,10 +1957,67 @@ static PyObject *ImageCalc_IdentifyMinPxlValueInWin(PyObject *self, PyObject *ar
     Py_RETURN_NONE;
 }
 
-
-
-
-
+static PyObject *ImageCalc_CalcImgMeanInMask(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    static char *kwlist[] = {"inputimg", "inputImgMsk", "mskValue", "bands", "nodataval", "usenodata", NULL};
+    const char *pInputImage = "";
+    const char *pInputImageMsk = "";
+    PyObject *bandsLstObj;
+    int useNoDataValue;
+    float noDataValue;
+    int mskValue = 0.0;
+    
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssiOfi:calcImgMeanInMask", kwlist, &pInputImage, &pInputImageMsk, &mskValue, &bandsLstObj, &noDataValue, &useNoDataValue))
+    {
+        return NULL;
+    }
+    
+    if( !PySequence_Check(bandsLstObj))
+    {
+        PyErr_SetString(GETSTATE(self)->error, "Bands list must be a sequence");
+        return NULL;
+    }
+    
+    Py_ssize_t nBands = PySequence_Size(bandsLstObj);
+    std::vector<unsigned int> bandsVec;
+    bandsVec.reserve(nBands);
+    int bandVal = 0;
+    for( Py_ssize_t n = 0; n < nBands; ++n)
+    {
+        PyObject *o = PySequence_GetItem(bandsLstObj, n);
+        
+        if(!RSGISPY_CHECK_INT(o))
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Band value must be an integer.");
+            Py_DECREF(o);
+            return NULL;
+        }
+        
+        bandVal = RSGISPY_INT_EXTRACT(o);
+        if(bandVal < 1)
+        {
+            PyErr_SetString(GETSTATE(self)->error, "Band value must be an integer with a minimum value of 1 (i.e., band indexing starts at 1).");
+            Py_DECREF(o);
+            return NULL;
+        }
+        bandsVec.push_back(bandVal);
+    }
+    
+    float meanVal = 0.0;
+    try
+    {
+        bool useNoData = (bool) useNoDataValue;
+        meanVal = rsgis::cmds::executeCalcImgMeanInMask(std::string(pInputImage), std::string(pInputImageMsk), mskValue, bandsVec, noDataValue, useNoData);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    PyObject *outVal = Py_BuildValue("f", meanVal);
+    return outVal;
+}
 
 // Our list of functions in this module
 static PyMethodDef ImageCalcMethods[] = {
@@ -2972,7 +3029,7 @@ static PyMethodDef ImageCalcMethods[] = {
     
 {"identifyMinPxlValueInWin", (PyCFunction)ImageCalc_IdentifyMinPxlValueInWin, METH_VARARGS | METH_KEYWORDS,
 "rsgislib.imagecalc.identifyMinPxlValueInWin(inputimg=string, outimage=string, outrefimg=string, bands=list, winsize=int, gdalformat=string, nodataval=float, usenodata=boolean)\n"
-"A function to identify the minimum \n"
+"A function to identify the minimum value across the image bands specified within a window.\n"
 "\n"
 "Where:\n"
 "\n"
@@ -2987,6 +3044,23 @@ static PyMethodDef ImageCalcMethods[] = {
 "\n"
 "\n"},
     
+{"calcImgMeanInMask", (PyCFunction)ImageCalc_CalcImgMeanInMask, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imagecalc.calcImgMeanInMask(inputimg=string, inputImgMsk=string, mskValue=int, bands=list, nodataval=float, usenodata=boolean)\n"
+"A function to calculate the mean value of all the pixels specified within\n"
+"the mask and across all the image bounds. \n"
+"\n"
+"Where:\n"
+"\n"
+"* inputimg is a string specifying input image file.\n"
+"* inputImgMsk is a string specifying image with the mask file.\n"
+"* mskValue the mask value (integer), within the input image mask, specifying the pixels over which the mean will be taken.\n"
+"* bands is a list of image bands (indexing starts at 1).\n"
+"* nodataval is a float specifying the no data value.\n"
+"* usenodata is a boolean specifiying whether to use the no data value.\n"
+"\n"
+"Return: \t float with mean value.\n"
+"\n"},
+
 {NULL}        /* Sentinel */
 };
 

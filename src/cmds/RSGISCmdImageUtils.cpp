@@ -2868,6 +2868,61 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
+                
+                
+                
+    void executeExportSingleMergedImgBand(std::string inputImage, std::string inputRefImage, std::string outputImage, std::string gdalFormat, RSGISLibDataType outDataType) throw(RSGISCmdException)
+    {
+        try
+        {
+            GDALAllRegister();
+            GDALDataset **datasets = new GDALDataset*[2];
+            
+            std::cout << "Openning: " << inputRefImage << std::endl;
+            datasets[0] = (GDALDataset *) GDALOpen(inputRefImage.c_str(), GA_ReadOnly);
+            if(datasets[0] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputRefImage;
+                throw RSGISImageException(message.c_str());
+            }
+            if(datasets[0]->GetRasterCount() != 1)
+            {
+                GDALClose(datasets[0]);
+                delete[] datasets;
+                throw RSGISImageException("The reference image inputted has more than one image band.");
+            }
+            
+            std::cout << "Openning: " << inputImage << std::endl;
+            datasets[1] = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+            if(datasets[1] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw RSGISImageException(message.c_str());
+            }
+            
+            double outNoDataVal = datasets[1]->GetRasterBand(1)->GetNoDataValue();
+            rsgis::img::RSGISCombineImgBands2SingleBand combineImgs2SingleBand = rsgis::img::RSGISCombineImgBands2SingleBand(outNoDataVal);
+            rsgis::img::RSGISCalcImage calcImg = rsgis::img::RSGISCalcImage(&combineImgs2SingleBand, "", true);
+            calcImg.calcImage(datasets, 1, 1, outputImage, false, NULL, gdalFormat, RSGIS_to_GDAL_Type(outDataType));
+            
+            // Tidy up
+            GDALClose(datasets[0]);
+            GDALClose(datasets[1]);
+            delete[] datasets;
+        }
+        catch (RSGISImageException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (RSGISException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
 
 }}
 
