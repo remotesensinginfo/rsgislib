@@ -304,5 +304,39 @@ void RSGISImageComposite::calcImageValue(float *bandValues, int numBands, double
         }
     }
     
+    
+    
+    RSGISCombineImgBands2SingleBand::RSGISCombineImgBands2SingleBand(double noDataVal) : RSGISCalcImageValue(1)
+    {
+        this->noDataVal = noDataVal;
+    }
+    
+    void RSGISCombineImgBands2SingleBand::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(RSGISImageCalcException)
+    {
+        if(numIntVals != 1)
+        {
+            throw RSGISImageCalcException("Should only have a single integer reference band.");
+        }
+        
+        if(((intBandValues[0]-1)>=0) & ((intBandValues[0]-1) < numfloatVals))
+        {
+            output[0] = floatBandValues[intBandValues[0]-1];
+        }
+        else
+        {
+            output[0] = noDataVal;
+        }
+        
+    }
+    
+    RSGISCombineImgBands2SingleBand::~RSGISCombineImgBands2SingleBand()
+    {
+        
+    }
+    
+    
+    
+    
+    
 }}
 

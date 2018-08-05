@@ -242,4 +242,15 @@ namespace rsgis { namespace img {
     };
     
     
+    class DllExport RSGISCombineImgBands2SingleBand : public RSGISCalcImageValue
+    {
+    public:
+        RSGISCombineImgBands2SingleBand(double noDataVal);
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(RSGISImageCalcException);
+        ~RSGISCombineImgBands2SingleBand();
+    protected:
+        double noDataVal;
+    };
+    
+    
 }}

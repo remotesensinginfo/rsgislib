@@ -392,6 +392,26 @@ namespace rsgis{namespace img{
     
     
     
+    class DllExport RSGISCalcMeanPxlValInMaskAcrossBands : public RSGISCalcImageValue
+    {
+    public:
+        RSGISCalcMeanPxlValInMaskAcrossBands(int maskVal, std::vector<unsigned int> bands, double noDataVal, bool useNoData);
+        void calcImageValue(float *bandValues, int numBands)throw(RSGISImageCalcException);
+        double getMeanValue() throw(RSGISImageCalcException);
+        void reset();
+        ~RSGISCalcMeanPxlValInMaskAcrossBands();
+    protected:
+        long maskVal;
+        std::vector<unsigned int> bands;
+        bool firstMean;
+        unsigned long n;
+        double meanSum;
+        double noDataVal;
+        bool useNoData;
+    };
+    
+    
+    
 	
 }}
 #endif

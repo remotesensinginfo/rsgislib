@@ -3323,5 +3323,57 @@ namespace rsgis{ namespace cmds {
         }
     }
                 
+                
+    float executeCalcImgMeanInMask(std::string inputImg, std::string inputImgMsk, int mskValue, std::vector<unsigned int> bands, float noDataValue, bool useNoDataValue) throw(RSGISCmdException)
+    {
+        float outImgVal = 0.0;
+        try
+        {
+            GDALAllRegister();
+            
+            GDALDataset **datasets = new GDALDataset*[2];
+            
+            datasets[0] = (GDALDataset *) GDALOpen(inputImgMsk.c_str(), GA_ReadOnly);
+            if(datasets[0] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImgMsk;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            if(datasets[0]->GetRasterCount() != 1)
+            {
+                throw rsgis::RSGISImageException("Mask image must only have one image band.");
+            }
+            
+            datasets[1] = (GDALDataset *) GDALOpen(inputImg.c_str(), GA_ReadOnly);
+            if(datasets[1] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImg;
+                throw rsgis::RSGISImageException(message.c_str());
+            }
+            
+            rsgis::img::RSGISCalcMeanPxlValInMaskAcrossBands calcMeanVal = rsgis::img::RSGISCalcMeanPxlValInMaskAcrossBands(mskValue, bands, noDataValue, useNoDataValue);
+            rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(&calcMeanVal, "", true);
+            calcImage.calcImage(datasets, 2);
+            outImgVal = calcMeanVal.getMeanValue();
+            
+            GDALClose(datasets[0]);
+            GDALClose(datasets[1]);
+            delete[] datasets;
+        }
+        catch(rsgis::RSGISImageException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        return outImgVal;
+    }
+                
 }}
 

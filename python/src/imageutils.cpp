@@ -1937,6 +1937,35 @@ static PyObject *ImageUtils_GenTimeseriesFillCompositeImg(PyObject *self, PyObje
 }
 
 
+static PyObject *ImageUtils_ExportSingleMergedImgBand(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    static char *kwlist[] = {"inputImg", "inputBandRefImg", "outputImg", "gdalformat", "datatype", NULL};
+    const char *pInputImg = "";
+    const char *pInputBandRefImg = "";
+    const char *pOutputImg = "";
+    const char *pszGDALFormat = "";
+    int nDataType;
+    
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssi:exportSingleMergedImgBand", kwlist, &pInputImg, &pInputBandRefImg, &pOutputImg, &pszGDALFormat, &nDataType))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
+        rsgis::cmds::executeExportSingleMergedImgBand(std::string(pInputImg), std::string(pInputBandRefImg), std::string(pOutputImg), std::string(pszGDALFormat), type);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
+
 // Our list of functions in this module
 static PyMethodDef ImageUtilsMethods[] = {
 {"stretchImage", (PyCFunction)ImageUtils_StretchImage, METH_VARARGS | METH_KEYWORDS,
@@ -2921,6 +2950,22 @@ For example, can be used to produce monthly composite images from a stack with i
 "* outRefFillImg \n"
 "* outCompImg \n"
 "* outCompRefImg \n"
+"* gdalformat is a string with the GDAL outCompImg file format.\n"
+"* datatype is an integer containing one of the values from rsgislib.TYPE_*, used for outCompImg\n"
+"\n"
+"\n"},
+    
+    
+{"exportSingleMergedImgBand", (PyCFunction)ImageUtils_ExportSingleMergedImgBand, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.exportSingleMergedImgBand(inputImg=string, inputBandRefImg=string, outputImg=string, gdalformat=string, datatype=int)\n"
+"A function which exports a single image band where the reference image specifies \n"
+"from which image band the output pixel is extracted from. \n"
+"\n"
+"Where:\n"
+"\n"
+"* inputImg is a string for the full (multi-band) image.\n"
+"* inputBandRefImg is a string with the reference image specifying the band to be outputted for each pixel.\n"
+"* outputImg is a string for the single band output image.\n"
 "* gdalformat is a string with the GDAL outCompImg file format.\n"
 "* datatype is an integer containing one of the values from rsgislib.TYPE_*, used for outCompImg\n"
 "\n"
