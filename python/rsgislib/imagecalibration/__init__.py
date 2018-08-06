@@ -222,3 +222,134 @@ Example::
         rsgisUtils.deleteFileWithBasename(tmpMorphOperator)
 
 
+def createEstimateSREFSurface(inputTOAImg, imgBands, bandRescale, winSize, outImage, gdalFormat, dataType, tmpDIR):
+    """
+    Estimate SREF surface from TOA input image using the method details in He, K., Sun, J., & Tang, X. (2011). 
+    'Single image haze removal using dark channel prior'. IEEE Transactions on Pattern Analysis and Machine Intelligence.
+    Method details were also identified with reference to https://www.kaggle.com/ivanl1/haze-removal-using-dark-channel-prior
+    
+    **** WARNING DO NOT USE - THIS FUNCTION IS STILL A WORK IN PROGRESS ****
+    
+    """
+    raise Exception("This function is not yet ready - needs more thought as how to get a fully working implementation.")
+    import rsgislib
+    import rsgislib.imagecalc
+    import rsgislib.imageutils
+    
+    import os.path
+    import shutil
+    
+    from rios import applier
+    from rios import cuiprogress
+    
+    import numpy
+    
+    baseName = os.path.splitext(os.path.basename(inputTOAImg))[0]    
+    tmpImgDIR = os.path.join(tmpDIR, baseName)
+    
+    tmpPresent = True
+    if not os.path.exists(tmpImgDIR):
+        os.makedirs(tmpImgDIR)
+        tmpPresent = False 
+    
+    ###############################################
+    ########## NEEDS TO CHANGE SCALING ############
+    ###############################################
+    #
+    # The scaling used seems to have a significant 
+    # effect on the results. Should a histogram or
+    # standard deviation approach be adopted?
+    #
+    ###############################################
+    
+    # Rescale input TOA 
+    rescaledInputImg = os.path.join(tmpImgDIR, baseName+'_rescaled.kea')
+    rsgislib.imagecalc.rescaleImgPxlVals(inputTOAImg, rescaledInputImg, 'KEA', rsgislib.TYPE_32FLOAT, bandRescale, trim2Limits=True)
+    
+    # Calculate the minium value (across all bands) within the window.
+    minValInWinImg = os.path.join(tmpImgDIR, baseName+'_minValInWin.kea')
+    minValInWinRefImg = os.path.join(tmpImgDIR, baseName+'_minValInWinRef.kea')
+    rsgislib.imagecalc.identifyMinPxlValueInWin(rescaledInputImg, minValInWinImg, minValInWinRefImg, imgBands, winSize, 'KEA', nodataval=0.0, usenodata=True)
+    
+    ###############################################
+    ########## NEEDS TO ADD FILTERING #############
+    ###############################################
+    #
+    # Published paper uses the Soft Matting algorithm 
+    # but this uses a lot of memory etc. so prob not
+    # suitable.
+    #
+    # A Guided Filter is an alternative and should be 
+    # implmented in RSGISLIb - would generally be useful.
+    #
+    ###############################################
+    
+    # Calculate the 99th percentile.
+    percentVals = rsgislib.imagecalc.bandPercentile(minValInWinImg, 0.99, 0)
+    
+    # Create mask of regions over 99th percentile
+    atmosMaskImg = os.path.join(tmpImgDIR, baseName+'_atmosMask.kea')
+    rsgislib.imagecalc.imageMath(minValInWinImg, atmosMaskImg, '(b1==0)?0:(b1>='+str(percentVals[0])+')?1:0', 'KEA', rsgislib.TYPE_8UINT)
+    
+    # Calculate the mean value within the atmospheric light mask
+    imgMeanVal = rsgislib.imagecalc.calcImgMeanInMask(rescaledInputImg, atmosMaskImg, 1, imgBands, 1, True)
+    
+    # Calculate the atmospheric transmission
+    # transmission = 1 - omega * imgDark / atomsphericLight
+    transImg = os.path.join(tmpImgDIR, baseName+'_transmission.kea')
+    rsgislib.imagecalc.imageMath(minValInWinImg, transImg, '(b1==0)?0:(1 - (1 * (b1/'+str(imgMeanVal)+')))<0.025?0.025:(1 - (1 * (b1/'+str(imgMeanVal)+')))', 'KEA', rsgislib.TYPE_32FLOAT)
+    
+    #####################################################################
+    # Calculate the scaled SREF pixel values.
+    srefScaledImg = os.path.join(tmpImgDIR, baseName+'_scaledSREF.kea')
+
+    infiles = applier.FilenameAssociations()
+    infiles.toaScaledImage = rescaledInputImg
+    infiles.transImg = transImg
+    outfiles = applier.FilenameAssociations()
+    outfiles.outimage = srefScaledImg
+    otherargs = applier.OtherInputs()
+    otherargs.atmosLight = imgMeanVal
+    otherargs.imgBands = imgBands
+    otherargs.numpyDT = numpy.float32
+    aControls = applier.ApplierControls()
+    aControls.progress = cuiprogress.CUIProgressBar()
+    aControls.drivername = 'KEA'
+    aControls.omitPyramids = True
+    aControls.calcStats = False
+    
+    def _calcScaleSREFVals(info, inputs, outputs, otherargs):
+        # This is an internal rios function 
+        outImgShape = [len(otherargs.imgBands), inputs.transImg.shape[1], inputs.transImg.shape[2]]
+        outputs.outimage = numpy.zeros(outImgShape, dtype=otherargs.numpyDT)
+        for idx in range(len(imgBands)):
+            bandIdx = imgBands[idx]-1
+            outputs.outimage[idx] = numpy.where(inputs.toaScaledImage[bandIdx] == 0.0, 0.0, (((inputs.toaScaledImage[bandIdx]-otherargs.atmosLight))/inputs.transImg[0])+otherargs.atmosLight)
+
+    applier.apply(_calcScaleSREFVals, infiles, outfiles, otherargs, controls=aControls)
+    # End of RIOS Section
+    #####################################################################
+    
+    ###############################################
+    ########## NEEDS TO CHANGE SCALING ############
+    ###############################################
+    #
+    # How to reliably rescale the results back to 
+    # to the original range. (I guess we need the
+    # original data range rather than the editted
+    # range from the stretch?)
+    #
+    ###############################################
+    
+    # Rescale the SREF image
+    bandRescaleSREF = []
+    outBand = 1
+    for band in imgBands:
+        bandRescaleSREF.append(rsgislib.imagecalc.ImageBandRescale(outBand, bandRescale[band-1].outMin, bandRescale[band-1].outMax, bandRescale[band-1].outNoData, 5, (bandRescale[band-1].inMax-bandRescale[band-1].inMin), 0))
+        outBand = outBand + 1
+        
+    rsgislib.imagecalc.rescaleImgPxlVals(srefScaledImg, outImage, gdalFormat, dataType, bandRescaleSREF, trim2Limits=True)
+    rsgislib.imageutils.popImageStats(outImage, usenodataval=True, nodataval=0, calcpyramids=True)
+    
+    if not tmpPresent:
+        shutil.rmtree(tmpImgDIR, ignore_errors=True)

@@ -58,6 +58,8 @@ Statistics
 .. autofunction:: rsgislib.imagecalc.getImgIdxForStat
 .. autofunction:: rsgislib.imagecalc.countPxlsOfVal
 .. autofunction:: rsgislib.imagecalc.getImgSumStatsInPxl
+.. autofunction:: rsgislib.imagecalc.calcImgMeanInMask
+.. autofunction:: rsgislib.imagecalc.identifyMinPxlValueInWin
 
 
 Normalise
@@ -65,6 +67,7 @@ Normalise
 
 .. autofunction:: rsgislib.imagecalc.standardise
 .. autofunction:: rsgislib.imagecalc.normalisation
+.. autofunction:: rsgislib.imagecalc.rescaleImgPxlVals
 
 
 Geometry

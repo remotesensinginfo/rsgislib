@@ -32,6 +32,7 @@ Mosaic and Composite
 .. autofunction:: rsgislib.imageutils.includeImages
 .. autofunction:: rsgislib.imageutils.includeImagesWithOverlap
 .. autofunction:: rsgislib.imageutils.combineImages2Band
+.. autofunction:: rsgislib.imageutils.exportSingleMergedImgBand
 
 Tile
 -------
@@ -119,6 +120,7 @@ Other
 .. autofunction:: rsgislib.imageutils.copyGCPs
 .. autofunction:: rsgislib.imageutils.setImgThematic
 .. autofunction:: rsgislib.imageutils.doImagesOverlap
+
 
 
 * :ref:`genindex`

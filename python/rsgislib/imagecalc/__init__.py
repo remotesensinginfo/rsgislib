@@ -81,6 +81,14 @@ Data structure for rescaling information for rescaleImgPxlVals function.
         self.outMin = outMin
         self.outMax = outMax
         self.outNoData = outNoData
+        
+    def __str__(self):
+        strVal = 'Band ' + str(self.band) + " ["+str(self.inMin)+", "+str(self.inMax)+", "+str(self.inNoData)+"] ["+str(self.outMin)+", "+str(self.outMax)+", "+str(self.outNoData)+"]"
+        return strVal
+        
+    def __repr__(self):
+        strVal = 'Band ' + str(self.band) + " ["+str(self.inMin)+", "+str(self.inMax)+", "+str(self.inNoData)+"] ["+str(self.outMin)+", "+str(self.outMax)+", "+str(self.outNoData)+"]"
+        return strVal
 
 
 def calcDist2ImgVals(inputValsImg, outputDistImg, pxlVals, valsImgBand=1, gdalFormat='KEA', maxDist=None, noDataVal=None, unitGEO=True):
