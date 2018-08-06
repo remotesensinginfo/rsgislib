@@ -2628,7 +2628,9 @@ namespace rsgis{ namespace cmds {
             }
             
             GDALAllRegister();
+            rsgis::rastergis::RSGISRasterAttUtils ratUtils;
             unsigned int countOutRefs = 0;
+            std::string inRefImg = "";
             std::list<rsgis::img::RSGISCompositeInfo> sortedCompInfo;
             rsgis::img::RSGISCompositeInfo outRefInfoObj;
             for(std::vector<RSGISCmdCompositeInfo>::iterator iterInfo = inCompInfo.begin(); iterInfo != inCompInfo.end(); ++iterInfo)
@@ -2650,6 +2652,7 @@ namespace rsgis{ namespace cmds {
                 {
                     std::cout << (*iterInfo).imgRef <<  " will the image for which the output will be produced.\n";
                     outRefInfoObj = compInfoObj;
+                    inRefImg = compInfoObj.imgRef;
                     ++countOutRefs;
                 }
             }
@@ -2684,10 +2687,10 @@ namespace rsgis{ namespace cmds {
             }
             imgIdx = imgIdx + 1;
             
-            
             std::vector<rsgis::img::RSGISCompositeInfo*> compInfoVec;
             std::string *strFileNameArr = new std::string[totNumImgs];
             strFileNameArr[0] = "";
+            unsigned int nCompImgRows = 0;
             for(std::list<rsgis::img::RSGISCompositeInfo>::iterator iterInfo = sortedCompInfo.begin(); iterInfo != sortedCompInfo.end(); ++iterInfo)
             {
                 std::cout << "Openning: " << (*iterInfo).imgRef << std::endl;
@@ -2716,15 +2719,20 @@ namespace rsgis{ namespace cmds {
                 tmpCompInfoObj->outRef = (*iterInfo).outRef;
                 tmpCompInfoObj->usedInComp = false;
                 tmpCompInfoObj->pxlRefContrib2Fill = std::set<long>();
+                tmpCompInfoObj->imgFileNames =  ratUtils.readStrColumnAsVec(datasets[imgIdx]->GetRasterBand(1)->GetDefaultRAT(), "Image");
                 compInfoVec.push_back(tmpCompInfoObj);
+                if(tmpCompInfoObj->outRef)
+                {
+                    nCompImgRows = datasets[imgIdx]->GetRasterBand(1)->GetDefaultRAT()->GetRowCount();
+                }
                 ++imgIdx;
             }
             
-            rsgis::img::RSGISTimeseriesFillRefImgImageComposite imgFillCompRefCalc = rsgis::img::RSGISTimeseriesFillRefImgImageComposite(compInfoVec);
+            std::map<std::string, unsigned int> *ratImgLst = new std::map<std::string, unsigned int>();
+            rsgis::img::RSGISTimeseriesFillRefImgImageComposite imgFillCompRefCalc = rsgis::img::RSGISTimeseriesFillRefImgImageComposite(compInfoVec, ratImgLst, nCompImgRows);
             rsgis::img::RSGISCalcImage calcImg = rsgis::img::RSGISCalcImage(&imgFillCompRefCalc, "", true);
             calcImg.calcImage(datasets, totNumImgs, 0, outFillRefImg, false, NULL, "KEA", GDT_Int32);
             compInfoVec.at(0)->usedInComp = true;
-            long maxRefImgPxlVal = imgFillCompRefCalc.getMaxRefPxlVal();
             
             GDALDataset *outDataset = (GDALDataset *) GDALOpen((outFillRefImg).c_str(), GA_Update);
             if(outDataset == NULL)
@@ -2736,13 +2744,10 @@ namespace rsgis{ namespace cmds {
             rsgis::rastergis::RSGISPopulateWithImageStats popImageStats;
             popImageStats.populateImageWithRasterGISStats(outDataset, true, true, true, 1);
 
-            //GDALRasterAttributeTable *gdalRAT = outDataset->GetRasterBand(1)->GetDefaultRAT();
-            //size_t nAttRows = gdalRAT->GetRowCount();
-            //std::cout << nAttRows << std::endl;
-            //std::cout << totNumImgs << std::endl;
-            //rsgis::rastergis::RSGISRasterAttUtils ratUtils;
-            //ratUtils.writeStrColumn(gdalRAT, "FileName", strFileNameArr, totNumImgs);
-            //delete[] strFileNameArr;
+            GDALRasterAttributeTable *gdalRAT = outDataset->GetRasterBand(1)->GetDefaultRAT();
+            gdalRAT->SetRowCount(totNumImgs);
+            ratUtils.writeStrColumn(gdalRAT, "FileName", strFileNameArr, totNumImgs);
+            delete[] strFileNameArr;
             GDALClose(outDataset);
             
             // Tidy up
@@ -2751,10 +2756,6 @@ namespace rsgis{ namespace cmds {
                 GDALClose(datasets[i]);
             }
             delete[] datasets;
-            
-            
-            
-            
             
             
             
@@ -2827,32 +2828,101 @@ namespace rsgis{ namespace cmds {
                 GDALClose(datasets[i]);
             }
             delete[] datasets;
+
             
             
-            unsigned int nExtraImgs2Fill = 0;
+            
+            
+            
+            
+            datasets = new GDALDataset*[totNumImgs];
+            imgIdx = 0;
+            std::cout << "Opening: " << (validMaskImage) << std::endl;
+            datasets[imgIdx] = (GDALDataset *) GDALOpen((validMaskImage).c_str(), GA_ReadOnly);
+            if(datasets[imgIdx] == NULL)
+            {
+                std::string message = std::string("Could not open image ") + (validMaskImage);
+                throw RSGISImageException(message.c_str());
+            }
+            if(datasets[imgIdx]->GetRasterCount() != 1)
+            {
+                GDALClose(datasets[imgIdx]);
+                throw RSGISImageException("The valid image inputted has more than one image band.");
+            }
+            
+            imgIdx = imgIdx + 1;
+            imgIdxAll = 1;
             for(std::vector<rsgis::img::RSGISCompositeInfo*>::iterator iterInfo = compInfoVec.begin(); iterInfo != compInfoVec.end(); ++iterInfo)
             {
                 if((*iterInfo)->usedInComp)
                 {
-                    nExtraImgs2Fill += (*iterInfo)->pxlRefContrib2Fill.size();
+                    std::cout << "Opening: " << (*iterInfo)->imgRef << std::endl;
+                    datasets[imgIdx] = (GDALDataset *) GDALOpen((*iterInfo)->imgRef.c_str(), GA_ReadOnly);
+                    if(datasets[imgIdx] == NULL)
+                    {
+                        std::string message = std::string("Could not open image ") + (*iterInfo)->imgRef;
+                        throw RSGISImageException(message.c_str());
+                    }
+                    
+                    if(datasets[imgIdx]->GetRasterCount() != 1)
+                    {
+                        for(int i = 0; i <= imgIdx; ++i)
+                        {
+                            GDALClose(datasets[i]);
+                        }
+                        delete[] datasets;
+                        throw RSGISImageException("Input images have different number of image bands.");
+                    }
+                    ++imgIdx;
                 }
+                else
+                {
+                    imgIdxLUT[imgIdxAll] = 0;
+                }
+                ++imgIdxAll;
             }
             
-            std::cout << "maxRefImgPxlVal = " << maxRefImgPxlVal << std::endl;
-            std::cout << "Number of extra images used to fill: " << nExtraImgs2Fill << std::endl;
+            rsgis::img::RSGISTimeseriesFillFinalRefImgImageComposite imgFillFinalRefCompCalc = rsgis::img::RSGISTimeseriesFillFinalRefImgImageComposite(compInfoVec, ratImgLst);
+            calcImg = rsgis::img::RSGISCalcImage(&imgFillFinalRefCompCalc, "", true);
+            calcImg.calcImage(datasets, imgIdx, 0, outCompRefImg, false, NULL, "KEA", GDT_Int32);
+            // Tidy up
+            for(int i = 0; i < imgIdx; ++i)
+            {
+                GDALClose(datasets[i]);
+            }
+            delete[] datasets;
             
+            GDALDataset *outRefDataset = (GDALDataset *) GDALOpen((outCompRefImg).c_str(), GA_Update);
+            if(outRefDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + (outCompRefImg);
+                throw RSGISImageException(message.c_str());
+            }
+            popImageStats.populateImageWithRasterGISStats(outRefDataset, true, true, true, 1);
             
+            GDALRasterAttributeTable *gdalRefRAT = outRefDataset->GetRasterBand(1)->GetDefaultRAT();
+            long ratLen = gdalRefRAT->GetRowCount();
+            strFileNameArr = new std::string[ratLen];
+            unsigned int idx = 0;
+            for(std::vector<std::string>::iterator iterFileName = compInfoVec.at(0)->imgFileNames->begin() ; iterFileName != compInfoVec.at(0)->imgFileNames->end(); ++iterFileName)
+            {
+                strFileNameArr[idx++] = (*iterFileName);
+            }
+            for(std::map<std::string, unsigned int>::iterator iterFileName = ratImgLst->begin() ; iterFileName != ratImgLst->end(); ++iterFileName)
+            {
+                strFileNameArr[(*iterFileName).second] = (*iterFileName).first;
+            }
+            ratUtils.writeStrColumn(gdalRefRAT, "FileName", strFileNameArr, ratLen);
+            delete[] strFileNameArr;
+            GDALClose(outRefDataset);
             
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
+            delete ratImgLst;
+            for(std::vector<rsgis::img::RSGISCompositeInfo*>::iterator iterInfo = compInfoVec.begin(); iterInfo != compInfoVec.end(); ++iterInfo)
+            {
+                delete (*iterInfo)->imgFileNames;
+                delete (*iterInfo);
+            }
+            std::cout << "Completed Fill\n";
 
         }
         catch (RSGISImageException& e)

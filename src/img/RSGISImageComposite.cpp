@@ -188,9 +188,10 @@ void RSGISImageComposite::calcImageValue(float *bandValues, int numBands, double
     
     
     
-    RSGISTimeseriesFillRefImgImageComposite::RSGISTimeseriesFillRefImgImageComposite(std::vector<rsgis::img::RSGISCompositeInfo*> compInfoVec) : RSGISCalcImageValue(1)
+    RSGISTimeseriesFillRefImgImageComposite::RSGISTimeseriesFillRefImgImageComposite(std::vector<rsgis::img::RSGISCompositeInfo*> compInfoVec, std::map<std::string, unsigned int> *ratImgLst, int refImgInitPxlVal) : RSGISCalcImageValue(1)
     {
         this->compInfoVec = compInfoVec;
+        this->ratImgLst = ratImgLst;
         int fillBandIdx = 1;
         for(std::vector<rsgis::img::RSGISCompositeInfo*>::iterator iterInfo = compInfoVec.begin(); iterInfo != compInfoVec.end(); ++iterInfo)
         {
@@ -207,6 +208,7 @@ void RSGISImageComposite::calcImageValue(float *bandValues, int numBands, double
             throw RSGISImageCalcException("The image being filled should be the first in the list");
         }
         maxRefPxlVal = 0;
+        this->refImgInitPxlVal = refImgInitPxlVal;
     }
 
     void RSGISTimeseriesFillRefImgImageComposite::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(RSGISImageCalcException)
@@ -219,13 +221,19 @@ void RSGISImageComposite::calcImageValue(float *bandValues, int numBands, double
         
         if((intBandValues[0] == 1) & (intBandValues[1] == 0))
         {
-            for(unsigned int i = 2; i < numIntVals; ++i)
+            for(int i = 2; i < numIntVals; ++i)
             {
                 if(intBandValues[i] > 0)
                 {
                     output[0] = i;
                     compInfoVec.at(i-1)->usedInComp = true;
                     compInfoVec.at(i-1)->pxlRefContrib2Fill.insert(intBandValues[i]);
+                    std::string fileName = compInfoVec.at(i-1)->imgFileNames->at(intBandValues[i]);
+                    if(ratImgLst->find(fileName) == ratImgLst->end())
+                    {
+                        ratImgLst->insert(std::pair<std::string, unsigned int>(fileName, this->refImgInitPxlVal));
+                        ++this->refImgInitPxlVal;
+                    }
                     break;
                 }
             }
@@ -277,7 +285,6 @@ void RSGISImageComposite::calcImageValue(float *bandValues, int numBands, double
         {
             unsigned int imgIdx = 0;
             imgIdx = this->imgIdxLUT[(intBandValues[0])];
-            //std::cout << "this->imgIdxLUT["<<intBandValues[0]<<"] = " << this->imgIdxLUT[intBandValues[0]] << std::endl;
             if((imgIdx >= this->nLUT))
             {
                 throw RSGISImageCalcException("LUT has incorrect valid.");
@@ -289,7 +296,6 @@ void RSGISImageComposite::calcImageValue(float *bandValues, int numBands, double
             
             int offset = (this->getNumOutBands() * imgIdx);
             
-            //std::cout << "offset = " << offset << std::endl;
             for(unsigned int i = 0; i < this->getNumOutBands(); ++i)
             {
                 output[i] = floatBandValues[offset+i];
@@ -301,6 +307,60 @@ void RSGISImageComposite::calcImageValue(float *bandValues, int numBands, double
             {
                 output[i] = floatBandValues[i];
             }
+        }
+    }
+    
+    
+    RSGISTimeseriesFillFinalRefImgImageComposite::RSGISTimeseriesFillFinalRefImgImageComposite(std::vector<rsgis::img::RSGISCompositeInfo*> compInfoVec, std::map<std::string, unsigned int> *ratImgLst) : RSGISCalcImageValue(1)
+    {
+        this->compInfoVec = compInfoVec;
+        this->ratImgLst = ratImgLst;
+        
+        int fillBandIdx = 1;
+        for(std::vector<rsgis::img::RSGISCompositeInfo*>::iterator iterInfo = compInfoVec.begin(); iterInfo != compInfoVec.end(); ++iterInfo)
+        {
+            if((*iterInfo)->outRef)
+            {
+                break;
+            }
+            ++fillBandIdx;
+        }
+        
+        if(fillBandIdx != 1)
+        {
+            std::cout << "this->fillBandIdx = " << fillBandIdx << std::endl;
+            throw RSGISImageCalcException("The image being filled should be the first in the list");
+        }
+    }
+    
+    void RSGISTimeseriesFillFinalRefImgImageComposite::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(RSGISImageCalcException)
+    {
+        output[0] = 0;
+        
+        if((intBandValues[0] == 1) & (intBandValues[1] == 0))
+        {
+            for(int i = 2; i < numIntVals; ++i)
+            {
+                if(intBandValues[i] > 0)
+                {
+                    std::string fileName = compInfoVec.at(i-1)->imgFileNames->at(intBandValues[i]);
+                    std::map<std::string, unsigned int>::iterator valPairIter = ratImgLst->find(fileName);
+                    
+                    if(valPairIter == ratImgLst->end())
+                    {
+                        std::cout << "fileName = " << fileName << std::endl;
+                        std::cout << "compInfoVec.at(" << i-1 << ")->imgRef = " << compInfoVec.at(i-1)->imgRef << std::endl;
+                        std::cout << "intBandValues[" << i << "] = " << intBandValues[i] << std::endl;
+                        throw RSGISImageCalcException("fileName was not within the map -- something has gone really wrong somewhere. Report as bug.");
+                    }
+                    output[0] = (*valPairIter).second;
+                    break;
+                }
+            }
+        }
+        else if((intBandValues[0] == 1) & (intBandValues[1] > 0))
+        {
+            output[0] = intBandValues[1];
         }
     }
     
