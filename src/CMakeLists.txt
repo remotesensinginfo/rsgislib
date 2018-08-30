@@ -127,6 +127,7 @@ set(LIB_COMMANDS_H
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdVectorUtils.h
     ${RSGIS_SRC_CMDS_DIR}/RSGISCmdZonalStats.h
     ${RSGIS_SRC_CMDS_DIR}/RSGISCmdHistoCube.h
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdElevationTools.h
 	)
 	
 set(LIB_COMMANDS_CPP
@@ -160,6 +161,8 @@ set(LIB_COMMANDS_CPP
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdZonalStats.h
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdHistoCube.cpp
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdHistoCube.h
+        ${RSGIS_SRC_CMDS_DIR}/RSGISCmdElevationTools.cpp
+        ${RSGIS_SRC_CMDS_DIR}/RSGISCmdElevationTools.h
 	)
 ###############################################################################
 
