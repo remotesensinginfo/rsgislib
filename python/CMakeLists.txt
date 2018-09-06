@@ -19,12 +19,6 @@ message(STATUS "installing Python libs to ${PYRSGIS_ROOT_PATH}")
 
 set(PYRSGIS_INSTALL_PATH "${PYRSGIS_ROOT_PATH}/rsgislib")
 
-#get_cmake_property(_variableNames VARIABLES)
-#list (SORT _variableNames)
-#foreach (_variableName ${_variableNames})
-#    message(STATUS "${_variableName}=${${_variableName}}")
-#endforeach()
-
 include_directories(${Python_INCLUDE_DIRS})
 include_directories(../src/cmds ../src)
 link_directories(../src)
