@@ -176,6 +176,8 @@ set(MPFR_LIB_PATH /usr/local/lib CACHE PATH "Library PATH for MPFR")
 set(KEA_INCLUDE_DIR /usr/local/include CACHE PATH "Include PATH for KEA")
 set(KEA_LIB_PATH /usr/local/lib CACHE PATH "Library PATH for KEA")
 
+option(RSGIS_PYTHON "Build Python bindings" ON)
+
 ###############################################################################
 
 ###############################################################################
@@ -408,6 +410,11 @@ endif(MSVC)
 include_directories(${PROJECT_SOURCE_DIR})
 add_subdirectory ("${PROJECT_SOURCE_DIR}")
 ###############################################################################
+# Python
+if( RSGIS_PYTHON )
+    message(STATUS "Doing python bindings")
+    add_subdirectory ("python")
+endif(RSGIS_PYTHON)
 
 ###############################################################################
 # Build executables
