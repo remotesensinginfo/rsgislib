@@ -471,10 +471,10 @@ Where:
     
     yMax = max(yValsOut)
     yMin = min(yValsOut)
-        
-    outPxlRes = outPxlRes.strip()
+    
+    outPxlRes = str(outPxlRes).strip()
     outRes = 0.0
-    if outPxlRes.isnumeric():
+    if rsgisUtils.isNumber(outPxlRes):
         outRes = math.fabs(float(outPxlRes))
     elif outPxlRes == 'image':
         outRes = inRes
