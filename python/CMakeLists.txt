@@ -7,14 +7,30 @@ if(NOT Python_FOUND)
     message(FATAL_ERROR "Could not find Python. Set RSGIS_PYTHON=OFF to disable.")
 endif(NOT Python_FOUND)
 
-set(PYRSGIS_INSTALL_PATH "${Python_SITELIB}/rsgislib")
+set(PYRSGIS_ROOT_PATH "${Python_SITELIB}")
+if(NOT CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+    # user has set CMAKE_INSTALL_PREFIX - ensure we install
+    # under there rather than the default Python install location.
+    # BUT we want to keep the last part of the path the same as Python_SITELIB
+    # (ie the lib/pythonX.X/site-packages part)
+    string(REPLACE "${_Python_PREFIX}" "${CMAKE_INSTALL_PREFIX}" PYRSGIS_ROOT_PATH "${PYRSGIS_ROOT_PATH}")
+endif(NOT CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+message(STATUS "installing Python libs to ${PYRSGIS_ROOT_PATH}")
+
+set(PYRSGIS_INSTALL_PATH "${PYRSGIS_ROOT_PATH}/rsgislib")
+
+#get_cmake_property(_variableNames VARIABLES)
+#list (SORT _variableNames)
+#foreach (_variableName ${_variableNames})
+#    message(STATUS "${_variableName}=${${_variableName}}")
+#endforeach()
 
 include_directories(${Python_INCLUDE_DIRS})
 include_directories(../src/cmds ../src)
 link_directories(../src)
 
 # copy all the .py files
-install(DIRECTORY rsgislib DESTINATION "${Python_SITELIB}")
+install(DIRECTORY rsgislib DESTINATION "${PYRSGIS_ROOT_PATH}")
 
 # _imagecalc
 add_library(_imagecalc SHARED src/imagecalc.cpp)
