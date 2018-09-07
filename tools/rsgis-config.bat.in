@@ -1,0 +1,28 @@
+@echo off
+
+IF "%1"=="" (
+   echo rsgis-config.bat [OPTIONS]
+   echo Options:
+   echo     [--prefix]
+   echo     [--version]
+   echo     [--libs]
+   echo     [--cflags]
+   echo     [--ldflags]
+   echo     [--libdir]
+   echo     [--includes]
+   EXIT /B 1
+) ELSE (
+:printValue
+    if "%1" neq "" (
+	    IF "%1"=="--prefix" echo @CMAKE_INSTALL_PREFIX@
+	    IF "%1"=="--version" echo @RSGISLIB_PACKAGE_VERSION@
+	    IF "%1"=="--cflags" echo -I@CMAKE_INSTALL_PREFIX@/include
+	    IF "%1"=="--libs" echo -LIBPATH:@CMAKE_INSTALL_PREFIX@/@PROJECT_LIBRARY_DIR@ @RSGISLIB_CALIBRATION_LIB_NAME@.lib  @RSGISLIB_CLASSIFY_LIB_NAME@.lib @RSGISLIB_COMMONS_LIB_NAME@.lib @RSGISLIB_DATASTRUCT_LIB_NAME@.lib @RSGISLIB_FILTERING_LIB_NAME@.lib @RSGISLIB_GEOM_LIB_NAME@.lib @RSGISLIB_IMG_LIB_NAME@.lib @RSGISLIB_MATHS_LIB_NAME@.lib @RSGISLIB_MODELING_LIB_NAME@.lib @RSGISLIB_RADAR_LIB_NAME@.lib @RSGISLIB_RASTERGIS_LIB_NAME@.lib @RSGISLIB_REGISTRATION_LIB_NAME@.lib @RSGISLIB_SEGMENTATION_LIB_NAME@.lib @RSGISLIB_UTILS_LIB_NAME@.lib @RSGISLIB_VECTOR_LIB_NAME@.lib
+	    IF "%1"=="--ldflags" echo @CMAKE_INSTALL_PREFIX@/@PROJECT_LIBRARY_DIR@
+	    IF "%1"=="--libdir" echo @CMAKE_INSTALL_PREFIX@/@PROJECT_LIBRARY_DIR@
+	    IF "%1"=="--includes" echo @CMAKE_INSTALL_PREFIX@/include
+		shift
+		goto :printValue
+    )
+	EXIT /B 0
+)
