@@ -400,7 +400,7 @@ class RSGISPyUtils (object):
         rasterDS = None
         
         brX = tlX + (xRes * xSize)
-        brY = tlY + (yRes * ySize)
+        brY = tlY - (yRes * ySize)
         
         return [tlX, brX, brY, tlY]
         
