@@ -303,7 +303,7 @@ Internal function for rios applier. Used within applyClassifer.
     outputs.outimage = outClassVals
     
     
-def applyClassifer(classTrainInfo, skClassifier, imgMask, imgMaskVal, imgFileInfo, outputImg, gdalFormat, classClrNames=True):
+def applyClassifer(classTrainInfo, skClassifier, imgMask, imgMaskVal, imgFileInfo, outputImg, gdalformat, classClrNames=True):
     """
 This function uses a trained classifier and applies it to the provided input image.
 
@@ -313,7 +313,7 @@ This function uses a trained classifier and applies it to the provided input ima
 * imgMaskVal - the pixel value within the imgMask to limit the region to which the classification is applied. Can be used to create a heirachical classification.
 * imgFileInfo - a list of rsgislib.imageutils.ImageBandInfo objects (also used within rsgislib.imageutils.extractZoneImageBandValues2HDF) to identify which images and bands are to be used for the classification so it adheres to the training data. 
 * outputImg - output image file with the classification. Note. by default a colour table and class names column is added to the image. If an error is produced use HFA or KEA formats.
-* gdalFormat - is the output image format - all GDAL supported formats are supported. 
+* gdalformat - is the output image format - all GDAL supported formats are supported. 
 * classClrNames - default is True and therefore a colour table will the colours specified in classTrainInfo and a ClassName column (from imgFileInfo) will be added to the output file.
 
     """
@@ -337,7 +337,7 @@ This function uses a trained classifier and applies it to the provided input ima
     
     aControls = applier.ApplierControls()
     aControls.progress = cuiprogress.CUIProgressBar()
-    aControls.drivername = gdalFormat
+    aControls.drivername = gdalformat
     aControls.omitPyramids = True
     aControls.calcStats = False
     print("Applying the Classifier")
@@ -367,7 +367,7 @@ This function uses a trained classifier and applies it to the provided input ima
         ratDataset = None
     
     
-def performPerPxlMLClassShpTrain(imageBandInfo=[], classInfo=dict(), outputImg='classImg.kea', gdalFormat='KEA', tmpPath='./tmp', skClassifier=RandomForestClassifier(), gridSearch=None, paramSearchSampNum=100):
+def performPerPxlMLClassShpTrain(imageBandInfo=[], classInfo=dict(), outputImg='classImg.kea', gdalformat='KEA', tmpPath='./tmp', skClassifier=RandomForestClassifier(), gridSearch=None, paramSearchSampNum=100):
     """
 A function which performs a per-pixel based classification of a scene using a machine learning classifier from the scikit-learn
 library where a single polygon shapefile per class is required to represent the training data. 
@@ -375,7 +375,7 @@ library where a single polygon shapefile per class is required to represent the 
 * imageBandInfo is a list of rsgislib.imageutils.ImageBandInfo objects specifying the images which should be used.
 * classInfo is a dict of rsgislib.classification.classimgutils.ClassInfoObj objects where the key is the class name. The fileH5 field is used to define the file path to the shapefile with the training data.
 * outputImg is the name and path to the output image file.
-* gdalFormat is the output image file format (e.g., KEA). 
+* gdalformat is the output image file format (e.g., KEA). 
 * tmpPath is a tempory file path which can be used during processing.
 * skClassifier is an instance of a scikit-learn classifier appropriately parameterised. If None then the gridSearch object must not be None.
 * gridSearch is an instance of a scikit-learn sklearn.model_selection.GridSearchCV object with the classifier and parameter search space specified. (If None then skClassifier will be used; if both not None then skClassifier will be used in preference to gridSearch)
@@ -395,7 +395,7 @@ Example::
     
     
     skClassifier=ExtraTreesClassifier(n_estimators=20)
-    classimgutils.performPerPxlMLClassShpTrain(imageBandInfo, classInfo, outputImg='classImg.kea', gdalFormat='KEA', tmpPath='./tmp', skClassifier=skClassifier)
+    classimgutils.performPerPxlMLClassShpTrain(imageBandInfo, classInfo, outputImg='classImg.kea', gdalformat='KEA', tmpPath='./tmp', skClassifier=skClassifier)
     
     """
     if not haveH5PY:
@@ -426,12 +426,12 @@ Example::
         tmpBaseName = os.path.splitext(os.path.basename(imgInfo.fileName))[0]
         vdmskFile = os.path.join(baseNameTmpDir, tmpBaseName+'_vmsk.kea')
         noDataVal = rsgisUtils.getImageNoDataValue(imgInfo.fileName)
-        rsgislib.imageutils.genValidMask(inimages=imgInfo.fileName, outimage=vdmskFile, format='KEA', nodata=noDataVal)
+        rsgislib.imageutils.genValidMask(inimages=imgInfo.fileName, outimage=vdmskFile, gdalformat='KEA', nodata=noDataVal)
         validMasks.append(vdmskFile)
     
     vdmskFile = os.path.join(baseNameTmpDir, baseName+'_vmsk.kea')
     if len(validMasks) > 1:
-        rsgislib.imageutils.genValidMask(inimages=validMasks, outimage=vdmskFile, format='KEA', nodata=0.0)
+        rsgislib.imageutils.genValidMask(inimages=validMasks, outimage=vdmskFile, gdalformat='KEA', nodata=0.0)
     else:
         vdmskFile = validMasks[0]
     
@@ -441,7 +441,7 @@ Example::
         shpFile = classInfo[cName].fileH5
         tmpBaseName = os.path.splitext(os.path.basename(shpFile))[0]
         tmpFile = os.path.join(baseNameTmpDir, tmpBaseName+'_rasterzone.kea')
-        rsgislib.vectorutils.rasterise2Image(shpFile, vdmskFile, tmpFile, gdalFormat='KEA', burnVal=classInfo[cName].id, shpExt=False)
+        rsgislib.vectorutils.rasterise2Image(shpFile, vdmskFile, tmpFile, gdalformat='KEA', burnVal=classInfo[cName].id, shpExt=False)
         rasterTrain[cName] = tmpFile
         tmpFileH5 = os.path.join(baseNameTmpDir, tmpBaseName+'_pxlVals.h5')
         rsgislib.imageutils.extractZoneImageBandValues2HDF(imageBandInfo, rasterTrain[cName], tmpFileH5, classInfo[cName].id)
@@ -452,7 +452,7 @@ Example::
     else:
         skClassifier = findClassifierParametersAndTrain(classInfo, paramSearchSampNum=0, gridSearch=gridSearch)
         
-    applyClassifer(classInfo, skClassifier, vdmskFile, 1, imageBandInfo, outputImg, gdalFormat, classClrNames=True)
+    applyClassifer(classInfo, skClassifier, vdmskFile, 1, imageBandInfo, outputImg, gdalformat, classClrNames=True)
     
     # Clean up tempory files.
     shutil.rmtree(baseNameTmpDir, ignore_errors=True)
@@ -483,22 +483,22 @@ def _applyClassification(inParams):
     classMaskPxlVal = inParams['classMaskPxlVal']
     imgFileInfo = inParams['imgFileInfo']
     tmpClassImgOut = inParams['tmpClassImgOut']
-    gdalFormat = inParams['gdalFormat']
+    gdalformat = inParams['gdalformat']
     trainSamplesInfo = inParams['trainSamplesInfo']
     rndSeed = inParams['rndSeed']
     
     classTrainInfo = dict()
     for trainSamples in trainSamplesInfo:
-        rsgislib.imageutils.performRandomPxlSampleInMaskLowPxlCount(inputImage=trainSamples.maskImg, outputImage=os.path.join(cTmpDIR, trainSamples.outSampImgFile), gdalformat=gdalFormat, maskvals=[trainSamples.maskPxlVal], numSamples=trainSamples.numSamps, rndSeed=rndSeed)
+        rsgislib.imageutils.performRandomPxlSampleInMaskLowPxlCount(inputImage=trainSamples.maskImg, outputImage=os.path.join(cTmpDIR, trainSamples.outSampImgFile), gdalformat=gdalformat, maskvals=[trainSamples.maskPxlVal], numSamples=trainSamples.numSamps, rndSeed=rndSeed)
         rsgislib.imageutils.extractZoneImageBandValues2HDF(imgFileInfo, os.path.join(cTmpDIR, trainSamples.outSampImgFile), os.path.join(cTmpDIR, trainSamples.samplesH5File), trainSamples.maskPxlVal)
         classTrainInfo[trainSamples.className] = ClassInfoObj(id=trainSamples.classID, fileH5=os.path.join(cTmpDIR, trainSamples.samplesH5File), red=trainSamples.red, green=trainSamples.green, blue=trainSamples.blue)
     
     trainClassifier(classTrainInfo, skClassifier)
-    applyClassifer(classTrainInfo, skClassifier, classAreaMask, classMaskPxlVal, imgFileInfo, tmpClassImgOut, gdalFormat)
+    applyClassifer(classTrainInfo, skClassifier, classAreaMask, classMaskPxlVal, imgFileInfo, tmpClassImgOut, gdalformat)
 
 
 
-def performVotingClassification(skClassifiers, trainSamplesInfo, imgFileInfo, classAreaMask, classMaskPxlVal, tmpDIR, tmpImgBase, outClassImg, gdalFormat='KEA', numCores=-1):
+def performVotingClassification(skClassifiers, trainSamplesInfo, imgFileInfo, classAreaMask, classMaskPxlVal, tmpDIR, tmpImgBase, outClassImg, gdalformat='KEA', numCores=-1):
     """
 A function which will perform a number of classification creating a combined classification by a simple vote. 
 The classifier parameters can be differed as a list of classifiers is provided (the length of the list is equal 
@@ -515,7 +515,7 @@ Where:
 * tmpDIR - a temporary file location which will be created and removed during processing.
 * tmpImgBase - the same name of files written to the tmpDIR
 * outClassImg - the final output image file.
-* gdalFormat - the output file format for outClassImg
+* gdalformat - the output file format for outClassImg
 * numCores - is the number of processing cores to be used for the analysis (if -1 then all cores on the machine will be used).
 
 Example::
@@ -542,7 +542,7 @@ Example::
         skClassifiers.append(ExtraTreesClassifier(n_estimators=100), max_depth=2)
     
     mangroveRegionClassImg = MangroveRegionClass.kea
-    classimgutils.performVotingClassification(skClassifiers, trainSamplesInfo, imgFileInfo, classWithinMask, 1, classVoteTemp, 'ClassImgSample', mangroveRegionClassImg, gdalFormat='KEA', numCores=-1)
+    classimgutils.performVotingClassification(skClassifiers, trainSamplesInfo, imgFileInfo, classWithinMask, 1, classVoteTemp, 'ClassImgSample', mangroveRegionClassImg, gdalformat='KEA', numCores=-1)
     
 
     """
@@ -581,7 +581,7 @@ Example::
         inParams['classMaskPxlVal'] = classMaskPxlVal
         inParams['imgFileInfo'] = imgFileInfo
         inParams['tmpClassImgOut'] = tmpClassImgOut
-        inParams['gdalFormat'] = 'KEA'
+        inParams['gdalformat'] = 'KEA'
         inParams['trainSamplesInfo'] = trainSamplesInfo
         inParams['rndSeed'] = random.randrange(1000)
         mCoreParams.append(inParams)
@@ -591,7 +591,7 @@ Example::
     mProccesPool.map(_applyClassification, mCoreParams)
     
     # Combine results using MODE. 
-    rsgislib.imagecalc.calcMultiImgBandStats(outClassImgs, outClassImg, rsgislib.SUMTYPE_MODE, gdalFormat, rsgislib.TYPE_8UINT, 0, True)
+    rsgislib.imagecalc.calcMultiImgBandStats(outClassImgs, outClassImg, rsgislib.SUMTYPE_MODE, gdalformat, rsgislib.TYPE_8UINT, 0, True)
     rsgislib.rastergis.populateStats(clumps=outClassImg, addclrtab=True, calcpyramids=True, ignorezero=True)
     
     # Colour output classification image.

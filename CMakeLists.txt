@@ -182,7 +182,7 @@ option(RSGIS_PYTHON "Build Python bindings" ON)
 
 ###############################################################################
 # CMake settings
-cmake_minimum_required(VERSION 2.8.9)
+cmake_minimum_required(VERSION 3.12)
 
 IF(NOT CMAKE_BUILD_TYPE)
   #SET(CMAKE_BUILD_TYPE "DEBUG")
