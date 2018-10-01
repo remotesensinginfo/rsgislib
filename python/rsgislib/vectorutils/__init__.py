@@ -660,5 +660,80 @@ A function which reprojects a vector layer.
     inDataSet = None
     outDataSet = None
 
-
+def getAttLstSelectFeats(vecFile, vecLyr, attName, selVecFile, selVecLyr):
+    """
+Function to get a list of attribute values from features which intersect
+with the select layer.
+* vecFile - vector layer from which the attribute data comes from.
+* vecLyr - the layer name from which the attribute data comes from.
+* attName - name of the attribute to be outputted.
+* selVecFile - the vector file which will be intersected within the vector file.
+* selVecLyr - the layer name which will be intersected within the vector file.
+"""
+    gdal.UseExceptions()
+    att_vals = []
+    try:
+    
+        dsVecFile = gdal.OpenEx(vecFile, gdal.OF_READONLY )
+        if dsVecFile is None:
+            raise Exception("Could not open '" + vecFile + "'")
+        
+        lyrVecObj = dsVecFile.GetLayerByName( vecLyr )
+        if lyrVecObj is None:
+            raise Exception("Could not find layer '" + vecLyr + "'")
+            
+        dsSelVecFile = gdal.OpenEx(selVecFile, gdal.OF_READONLY )
+        if dsSelVecFile is None:
+            raise Exception("Could not open '" + selVecFile + "'")
+        
+        lyrSelVecObj = dsSelVecFile.GetLayerByName( selVecLyr )
+        if lyrSelVecObj is None:
+            raise Exception("Could not find layer '" + selVecLyr + "'")
+        
+        lyrDefn = lyrVecObj.GetLayerDefn()
+        feat_idx = 0
+        found_att = False
+        for i in range(lyrDefn.GetFieldCount()):
+            if lyrDefn.GetFieldDefn(i).GetName() == attName:
+                feat_idx = i
+                feat_type = lyrDefn.GetFieldDefn(feat_idx).GetType()
+                found_att = True
+         
+        if not found_att:
+            dsSelVecFile = None            
+            dsVecFile = None
+            raise Exception("Could not find the attribute specified within the vector layer.")
+            
+        mem_driver = ogr.GetDriverByName('MEMORY')
+        
+        mem_sel_ds = mem_driver.CreateDataSource('MemSelData')
+        mem_sel_lyr = mem_sel_ds.CopyLayer(lyrSelVecObj, selVecLyr, ['OVERWRITE=YES'])
+        
+        mem_result_ds = mem_driver.CreateDataSource('MemResultData')
+        mem_result_lyr = mem_result_ds.CreateLayer("MemResultLyr", geom_type=lyrVecObj.GetGeomType())
+        
+        result_field = ogr.FieldDefn(attName, lyrDefn.GetFieldDefn(feat_idx).GetType())
+        mem_result_lyr.CreateField(result_field)
+        
+        lyrVecObj.Intersection(mem_sel_lyr, mem_result_lyr)
+        
+        # loop through the input features
+        inFeat = mem_result_lyr.GetNextFeature()
+        while inFeat:
+            if feat_type == ogr.OFTString:
+                att_vals.append(inFeat.GetFieldAsString(0))
+            elif feat_type == ogr.OFTReal:
+                att_vals.append(inFeat.GetFieldAsDouble(0))
+            elif feat_type == ogr.OFTInteger:
+                att_vals.append(inFeat.GetFieldAsInteger(0))
+            
+            inFeat = mem_result_lyr.GetNextFeature()
+        
+        dsSelVecFile = None        
+        dsVecFile = None
+        mem_sel_ds = None
+        mem_result_ds = None
+    except Exception as e:
+        raise e
+    return att_vals
 
