@@ -7,6 +7,10 @@ if(NOT Python_FOUND)
     message(FATAL_ERROR "Could not find Python. Set RSGIS_PYTHON=OFF to disable.")
 endif(NOT Python_FOUND)
 
+if(APPLE)
+    set(CMAKE_SHARED_LIBRARY_SUFFIX ".so")
+endif(APPLE)
+
 set(PYRSGIS_ROOT_PATH "${Python_SITELIB}")
 if(NOT CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     # user has set CMAKE_INSTALL_PREFIX - ensure we install
