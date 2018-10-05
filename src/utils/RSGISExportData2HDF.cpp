@@ -177,6 +177,162 @@ namespace rsgis{namespace utils{
     {
         
     }
+
+
+
+
+
+
+
+    
+    RSGISReadHDFColumnData::RSGISReadHDFColumnData()
+    {
+        fileOpen = false;
+    }
+    
+    void RSGISReadHDFColumnData::openFile(std::string filePath) throw(rsgis::RSGISFileException)
+    {
+        try
+        {
+            const H5std_string h5FilePath(filePath);
+            this->dataH5File = new H5::H5File(h5FilePath, H5F_ACC_RDONLY);
+            fileOpen = true;
+        }
+        catch (H5::FileIException &e)
+        {
+            std::string message  = std::string("Could not open HDF file: ") + filePath;
+            throw rsgis::RSGISFileException(message);
+        }
+    }
+    
+    unsigned int RSGISReadHDFColumnData::getNumRows() throw(rsgis::RSGISFileException)
+    {
+        unsigned int n_rows = 0;
+        if(fileOpen)
+        {
+            try
+            {
+                H5::DataSet dsetColData = dataH5File->openDataSet("/DATA/DATA");
+                H5::DataSpace dspaceColData = dsetColData.getSpace();
+                int nDIMs = dspaceColData.getSimpleExtentNdims();
+                hsize_t *dims = new hsize_t[nDIMs];
+                dspaceColData.getSimpleExtentDims(dims);
+                n_rows = dims[0];
+                delete[] dims;
+            }
+            catch (H5::Exception &e)
+            {
+                throw rsgis::RSGISFileException(e.getDetailMsg());
+            }
+        }
+        else
+        {
+            throw RSGISFileException("HDF5 file is not open.");
+        }
+        return n_rows;
+    }
+
+    unsigned int RSGISReadHDFColumnData::getNumCols() throw(rsgis::RSGISFileException)
+    {
+        unsigned int n_cols = 0;
+        if(fileOpen)
+        {
+            try
+            {
+                H5::DataSet dsetColData = dataH5File->openDataSet("/DATA/DATA");
+                H5::DataSpace dspaceColData = dsetColData.getSpace();
+                int nDIMs = dspaceColData.getSimpleExtentNdims();
+                hsize_t *dims = new hsize_t[nDIMs];
+                dspaceColData.getSimpleExtentDims(dims);
+                n_cols = dims[1];
+                delete[] dims;
+            }
+            catch (H5::Exception &e)
+            {
+                throw rsgis::RSGISFileException(e.getDetailMsg());
+            }
+        }
+        else
+        {
+            throw RSGISFileException("HDF5 file is not open.");
+        }
+        return n_cols;
+    }
+    
+    void RSGISReadHDFColumnData::getDataRows(void *data, unsigned int nColsData, unsigned int nRowsData, H5::DataType h5Datatype, unsigned int nRowsOff, unsigned int nRowsRead) throw(rsgis::RSGISFileException)
+    {
+        try
+        {
+            if(fileOpen)
+            {
+                H5::DataSet dsetColData = this->dataH5File->openDataSet("/DATA/DATA");
+                H5::DataSpace dspaceColData = dsetColData.getSpace();
+                int nDIMs = dspaceColData.getSimpleExtentNdims();
+                hsize_t *dims = new hsize_t[nDIMs];
+                dspaceColData.getSimpleExtentDims(dims);
+
+                if(nColsData != dims[1])
+                {
+                    delete[] dims;
+                    throw RSGISFileException("The number of columns in the dataset must be the same as the size of the input array in the column axis.");
+                }
+
+                if((nRowsOff+nRowsRead) > dims[0])
+                {
+                    delete[] dims;
+                    throw RSGISFileException("The number of rows to be read is bigger than the dataset.");
+                }
+
+                hsize_t dataOffset[2];
+                dataOffset[0] = nRowsOff;
+                dataOffset[1] = 0;
+                hsize_t dataDims[2];
+                dataDims[0] = nRowsRead;
+                dataDims[1] = nColsData;
+                H5::DataSpace readDataspace = H5::DataSpace(2, dataDims);
+                dspaceColData.selectHyperslab( H5S_SELECT_SET, dataDims, dataOffset);
+                dsetColData.read( data, h5Datatype, readDataspace, dspaceColData);
+
+                dsetColData.close();
+                dspaceColData.close();
+                readDataspace.close();
+
+                delete[] dims;
+            }
+            else
+            {
+                throw RSGISFileException("HDF5 file is not open.");
+            }
+        }
+        catch (H5::Exception &e)
+        {
+            throw rsgis::RSGISFileException(e.getDetailMsg());
+        }
+        catch (std::exception &e)
+        {
+            throw rsgis::RSGISFileException(e.what());
+        }
+    }
+    
+    void RSGISReadHDFColumnData::close()
+    {
+        if(fileOpen)
+        {
+            dataH5File->close();
+        }
+        else
+        {
+            throw RSGISFileException("HDF5 file is not open.");
+        }
+    }
+    
+    RSGISReadHDFColumnData::~RSGISReadHDFColumnData()
+    {
+        if(fileOpen)
+        {
+            this->close();
+        }
+    }
     
 }}
 

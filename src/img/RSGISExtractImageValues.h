@@ -39,6 +39,10 @@
 
 #include "utils/RSGISExportForPlottingIncremental.h"
 
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/uniform_int.hpp>
+#include <boost/random/variate_generator.hpp>
+
 // mark all exported classes/functions with DllExport to have
 // them exported by Visual Studio
 #undef DllExport
@@ -61,6 +65,7 @@ namespace rsgis{namespace img{
         RSGISExtractImageValues();
         void extractDataWithinMask2HDF(GDALDataset *mask, GDALDataset *image, std::string outHDFFile, float maskValue) throw(RSGISImageException);
         void extractImgBandDataWithinMask2HDF(std::vector<std::pair<std::string, std::vector<unsigned int> > > imageFiles, std::string maskImage, std::string outHDFFile, float maskValue) throw(RSGISImageException);
+        void sampleExtractedHDFData(std::string inputH5, std::string outputH5, unsigned int nSamples, int seed) throw(RSGISException);
         ~RSGISExtractImageValues();
     };
     
