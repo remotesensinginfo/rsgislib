@@ -79,6 +79,25 @@ namespace rsgis{namespace utils{
         unsigned int blockSize;
         unsigned int numColsWritten;
 	};
+    
+    class DllExport RSGISReadHDFColumnData
+    {
+    public:
+        RSGISReadHDFColumnData();
+        void openFile(std::string filePath) throw(rsgis::RSGISFileException);
+        unsigned int getNumRows() throw(rsgis::RSGISFileException);
+        unsigned int getNumCols() throw(rsgis::RSGISFileException);
+        void getDataRows(void *data, unsigned int nColsData, unsigned int nRowsData, H5::DataType h5Datatype, unsigned int nRowsOff, unsigned int nRowsRead) throw(rsgis::RSGISFileException);
+        void close();
+        ~RSGISReadHDFColumnData();
+    protected:
+        H5::H5File *dataH5File;
+        H5::DataSet columnDataSet;
+        unsigned int numCols;
+        unsigned int blockSize;
+        unsigned int numColsWritten;
+        bool fileOpen;
+    };
 
 }}
 

@@ -1965,6 +1965,32 @@ static PyObject *ImageUtils_ExportSingleMergedImgBand(PyObject *self, PyObject *
     Py_RETURN_NONE;
 }
 
+static PyObject *ImageUtils_RandomSampleHDF5File(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    static char *kwlist[] = {"inputh5", "outputh5", "sample", "seed", NULL};
+    const char *pInputH5 = "";
+    const char *pOutputH5 = "";
+    unsigned int sampleSize = 0;
+    int seed = 0;
+    
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssIi:randomSampleHDF5File", kwlist, &pInputH5, &pOutputH5, &sampleSize, &seed))
+    {
+        return NULL;
+    }
+    
+    try
+    {
+        rsgis::cmds::executeRandomSampleH5File(std::string(pInputH5), std::string(pOutputH5), sampleSize, seed);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+    
+    Py_RETURN_NONE;
+}
+
 
 // Our list of functions in this module
 static PyMethodDef ImageUtilsMethods[] = {
@@ -2392,6 +2418,19 @@ static PyMethodDef ImageUtilsMethods[] = {
 "   fileInfo.append(rsgislib.imageutils.ImageBandInfo('InputImg2.kea', 'Image2', [2]))\n"
 "   rsgislib.imageutils.extractZoneImageBandValues2HDF(fileInfo, 'ClassMask.kea', 'ForestRefl.h5', 1.0)\n"
 "\n"},
+
+{"randomSampleHDF5File", (PyCFunction)ImageUtils_RandomSampleHDF5File, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.randomSampleHDF5File(inputh5, outputh5, sample, seed)\n"
+"A function which randomly samples a HDF5 of extracted values. \n"
+"\n"
+"Where:\n"
+"\n"
+"* inputh5 is a string with the path to the input file.\n"
+"* outputh5 is a string with the path to the output file.\n"
+"* sample is an integer with the number values to be sampled from the input file.\n"
+"* seed is an integer which seeds the random number generator\n."
+"\n"
+},
 
     {"selectImageBands", ImageUtils_SelectImageBands, METH_VARARGS,
 "rsgislib.imageutils.selectImageBands(inputImage, outputImage, gdalformat, datatype, bands)\n"
