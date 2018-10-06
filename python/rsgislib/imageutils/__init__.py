@@ -158,11 +158,9 @@ Example::
 def getRSGISLibDataType(inImg):
     """
 Returns the rsgislib datatype ENUM for a raster file
-
 * inImg -- The file to get the datatype for
 
 return::
-
     The rsgislib datatype enum, e.g., rsgislib.TYPE_8INT
 
 """
@@ -258,7 +256,6 @@ Copy the GCPs from the srcImg to the destImg
 def getWKTProjFromImage(inImg):
     """
 A function which returns the WKT string representing the projection of the input image.
-
 * inImg - input image from which WKT string will be read.
 
 """
@@ -268,6 +265,38 @@ A function which returns the WKT string representing the projection of the input
     projStr = rasterDS.GetProjection()
     rasterDS = None
     return projStr
+
+def createBlankImgFromRefVector(inVecFile, inVecLyr, outputImg, outImgRes, outImgNBands, gdalformat, gdaltype):
+    """
+A function to create a new image file based on a vector layer to define the extent and projection
+of the output image. 
+* inVecFile - input vector file.
+* inVecLyr - name of the vector layer, if None then assume the layer name will be the same as the file
+             name of the input vector file.
+* outputImg - output image file.
+* outImgRes - output image resolution, square pixels so a single value.
+* outImgNBands - the number of image bands in the output image 
+* gdalformat - output image file format.
+* gdaltype - output image data type.
+"""
+
+    rsgisUtils = rsgislib.RSGISPyUtils()
+
+    baseExtent = rsgisUtils.getVecLayerExtent(inVecFile, inVecLyr)
+    xMin, xMax, yMin, yMax = rsgisUtils.findExtentOnGrid(baseExtent, outImgRes, fullContain=True)
+
+    tlX = xMin
+    tlY = yMax
+    
+    widthCoord = xMax - xMin
+    heightCoord = yMax - yMin
+    
+    width = int(math.ceil(widthCoord/outImgRes))
+    height = int(math.ceil(heightCoord/outImgRes))
+    
+    wktString = rsgisUtils.getProjWKTFromVec(inVecFile)
+
+    rsgislib.imageutils.createBlankImage(outputImg, outImgNBands, width, height, tlX, tlY, outImgRes, 0.0, '', wktString, gdalformat, gdaltype)
 
 def resampleImage2Match(inRefImg, inProcessImg, outImg, gdalformat, interpMethod, datatype=None, noDataVal=None, multicore=False):
     """
@@ -337,8 +366,6 @@ Where:
     
     inFile = None
     outFile = None
-
-
 
 
 def reprojectImage(inputImage, outputImage, outWKT, gdalformat='KEA', interp='cubic', inWKT=None, noData=0.0, outPxlRes='image', snap2Grid=True, multicore=False):
@@ -624,16 +651,6 @@ Example::
     return inImagesDict
 
 
-
-def _getXYPxlLocs(info, inputs, outputs, otherargs):
-    """
-    This is an internal rios function 
-    """
-    xBlock, yBlock = info.getBlockCoordArrays()
-    outputs.outimage = numpy.stack((xBlock,yBlock))
-
-
-
 def calcPixelLocations(inputImg, outputImg, gdalformat):
     """
 Function which produces a 2 band output image with the X and Y locations of the image pixels.
@@ -658,6 +675,13 @@ Where:
     aControls.drivername = gdalformat
     aControls.omitPyramids = True
     aControls.calcStats = False
+    
+    def _getXYPxlLocs(info, inputs, outputs, otherargs):
+        """
+        This is an internal rios function 
+        """
+        xBlock, yBlock = info.getBlockCoordArrays()
+        outputs.outimage = numpy.stack((xBlock,yBlock))
 
     applier.apply(_getXYPxlLocs, infiles, outfiles, otherargs, controls=aControls)
 
@@ -766,6 +790,15 @@ print("Images Overlap: " + str(overlap))
     img1BRX = img1GeoTransform[0] + (img1DS.RasterXSize * img1GeoTransform[1])
     img1BRY = img1GeoTransform[3] + (img1DS.RasterYSize * img1GeoTransform[5])
     
+    img2TLX_orig = img2GeoTransform[0]
+    img2TLY_orig = img2GeoTransform[3]
+    
+    img2BRX_orig = img2GeoTransform[0] + (img2DS.RasterXSize * img2GeoTransform[1])
+    img2BRY_orig = img2GeoTransform[3] + (img2DS.RasterYSize * img2GeoTransform[5])
+    
+    img1EPSG = rsgisUtils.getEPSGCode(image1)
+    img2EPSG = rsgisUtils.getEPSGCode(image2)
+    
     if projSame:
         img2TLX = img2GeoTransform[0]
         img2TLY = img2GeoTransform[3]
@@ -774,18 +807,34 @@ print("Images Overlap: " + str(overlap))
         img2BRY = img2GeoTransform[3] + (img2DS.RasterYSize * img2GeoTransform[5])
     else:
         inProj = osr.SpatialReference()
-        inProj.ImportFromEPSG(int(rsgisUtils.getEPSGCode(image2)))
+        
+        if img2EPSG is None:
+            wktImg2 = rsgisUtils.getWKTProjFromImage(image2)
+            if (wktImg2 is None) or (wktImg2 == ""):
+                raise rsgislib.RSGISPyException('Could not retrieve EPSG or WKT for image: ' + image2)
+            inProj.ImportFromWkt(wktImg2)
+        else:
+            inProj.ImportFromEPSG(int(img2EPSG))
         
         outProj = osr.SpatialReference()
-        outProj.ImportFromEPSG(int(rsgisUtils.getEPSGCode(image1)))
-        
-        if int(rsgisUtils.getEPSGCode(image1)) == 4326:
-            img2TLY, img2TLX = rsgisUtils.reprojPoint(inProj, outProj, img2GeoTransform[0], img2GeoTransform[3])
-            img2BRY, img2BRX = rsgisUtils.reprojPoint(inProj, outProj, (img2GeoTransform[0] + (img2DS.RasterXSize * img2GeoTransform[1])), (img2GeoTransform[3] + (img2DS.RasterYSize * img2GeoTransform[5])))
+        if img1EPSG is None:
+            wktImg1 = rsgisUtils.getWKTProjFromImage(image1)
+            if (wktImg1 is None) or (wktImg1 == ""):
+                raise rsgislib.RSGISPyException('Could not retrieve EPSG or WKT for image: ' + image1)
+            outProj.ImportFromWkt(wktImg1)
         else:
-            img2TLX, img2TLY = rsgisUtils.reprojPoint(inProj, outProj, img2GeoTransform[0], img2GeoTransform[3])
-            img2BRX, img2BRY = rsgisUtils.reprojPoint(inProj, outProj, (img2GeoTransform[0] + (img2DS.RasterXSize * img2GeoTransform[1])), (img2GeoTransform[3] + (img2DS.RasterYSize * img2GeoTransform[5]))) 
+            outProj.ImportFromEPSG(int(img1EPSG))
         
+        if img1EPSG is None:
+            img1EPSG = 0
+
+        if img1EPSG == 4326:
+            img2TLY, img2TLX = rsgisUtils.reprojPoint(inProj, outProj, img2TLX_orig, img2TLY_orig)
+            img2BRY, img2BRX = rsgisUtils.reprojPoint(inProj, outProj, img2BRX_orig, img2BRY_orig)
+        else:
+            img2TLX, img2TLY = rsgisUtils.reprojPoint(inProj, outProj, img2TLX_orig, img2TLY_orig)
+            img2BRX, img2BRY = rsgisUtils.reprojPoint(inProj, outProj, img2BRX_orig, img2BRY_orig)
+    
     xMin = img1TLX
     xMax = img1BRX
     yMin = img1BRY
@@ -804,17 +853,9 @@ print("Images Overlap: " + str(overlap))
         overlap = False
     elif yMax - yMin <= overThres:
         overlap = False
-    
+
     return overlap
 
-
-
-def _popPxlsRanVals(info, inputs, outputs, otherargs):
-    """
-    This is an internal rios function for generateRandomPxlValsImg()
-    """
-    outputs.outimage = numpy.random.random_integers(otherargs.lowVal, high=otherargs.upVal, size=inputs.inImg.shape)
-    outputs.outimage = outputs.outimage.astype(numpy.int32, copy=False)
 
 def generateRandomPxlValsImg(inputImg, outputImg, gdalformat, lowVal, upVal):
     """
@@ -844,6 +885,13 @@ Where:
     aControls.drivername = gdalformat
     aControls.omitPyramids = True
     aControls.calcStats = False
+    
+    def _popPxlsRanVals(info, inputs, outputs, otherargs):
+        """
+        This is an internal rios function for generateRandomPxlValsImg()
+        """
+        outputs.outimage = numpy.random.random_integers(otherargs.lowVal, high=otherargs.upVal, size=inputs.inImg.shape)
+        outputs.outimage = outputs.outimage.astype(numpy.int32, copy=False)
     
     applier.apply(_popPxlsRanVals, infiles, outfiles, otherargs, controls=aControls)
 
