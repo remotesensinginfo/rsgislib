@@ -361,6 +361,16 @@ class RSGISPyUtils (object):
         rasterDS = None
         return xRes, yRes
     
+    def doImageResMatch(self, img1, img2):
+        """
+        A function to test whether two images have the same
+        image pixel resolution.
+        """
+        img1XRes, img1YRes = self.getImageRes(img1)
+        img2XRes, img2YRes = self.getImageRes(img2)
+
+        return ((img1XRes == img2XRes) and (img1YRes == img2YRes))
+    
     def getImageSize(self, inImg):
         """
         A function to retrieve the image size in pixels.
@@ -551,8 +561,8 @@ class RSGISPyUtils (object):
         point = ogr.CreateGeometryFromWkt(wktPt)
         point.AssignSpatialReference(inProjOSRObj)
         point.TransformTo(outProjOSRObj)
-        outX = point.GetY()
-        outY = point.GetX()
+        outX = point.GetX()
+        outY = point.GetY()
         return outX, outY
     
     def getImageBandCount(self, inImg):

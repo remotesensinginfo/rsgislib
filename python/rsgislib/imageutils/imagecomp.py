@@ -205,8 +205,6 @@ LS8 images are submitted to match the images bands of LS7 (i.e., coastal band re
             
         # Generate Comp Ref layers:
         landWaterMskBandDefns = []
-        mskLandWaterExpP1 = ''
-        mskLandWaterExpP2 = ''
         mskImgs = []
         idx = 1
         onlyLS8 = True
@@ -310,8 +308,191 @@ LS8 images are submitted to match the images bands of LS7 (i.e., coastal band re
         shutil.copy(inImages[0], outCompImg)
     else:
         raise rsgislib.RSGISPyException("There were no input images for " + inImgsPattern)
-    
 
+    
+def createMaxNDVINDWIComposite(refImg, inImgsPattern, rBand, nBand, sBand, outRefImg, outCompImg, outMskImg, tmpPath='./tmp', gdalFormat='KEA', dataType=None, calcStats=True, reprojmethod='cubic'):
+    """
+Create an image composite from multiple input images where the pixel brought through into the composite is the one with
+the maximum NDVI over land and NDWI over water. A mask of land and water regions is also produced. The reference image is
+used to define the spatial extent of the output images and spatial projection.
+
+* refImg - is a reference image with any number of bands and data type which is used to define the output image extent and projection.
+* inImgsPattern - is a pattern (ready for glob.glob(inImgsPattern)) so needs an * within the pattern to find the input image files.
+* rBand - is an integer specifying the red band in the input images (starts at 1), used in the NDVI index.
+* nBand - is an integer specifying the NIR band in the input images (starts at 1), used in the NDVI and NDWI index.
+* sBand - is an integer specifying the SWIR band in the input images (starts at 1), used in the NDVI and NDWI index.
+* outRefImg - is the output reference image which details which input image is forming the output image pixel value (Note. this file will always be a KEA file as RAT is used).
+* outCompImg - is the output composite image for which gdalFormat and dataType define the format and data type.
+* outMskImg - is the output mask image for regions of water and land where ndvi vs ndwi are used (0=nodata, 1=land, 2=water)
+* tmpPath - is a temp path for intemediate files, if this path doesn't exist is will be created and deleted at runtime.
+* gdalFormat - is the output file format of the outCompImg, any GDAL compatable format is OK (Defaut is KEA).
+* dataType - is the data type of the output image (outCompImg). If None is provided then the data type of the first input image will be used (Default None). 
+* calcStats - calculate image statics and pyramids (Default=True)
+* reprojmethod - specifies the interpolation method used to reproject the input images which are in a different projection and/or pixel size as the reference image (default: cubic).
+    """
+    rsgisUtils = rsgislib.RSGISPyUtils()
+    uidStr = rsgisUtils.uidGenerator()
+    
+    # Get List of input images:
+    inImages = glob.glob(inImgsPattern)
+    
+    if len(inImages) > 1:
+        init_in_images = inImages
+        inImages = []
+        inImagesReProj = []
+        nBands = 0
+        first = True
+        for img in init_in_images:
+            if first:
+                nBands = rsgisUtils.getImageBandCount(img)
+                first = False
+            else:
+                cBands = rsgisUtils.getImageBandCount(img)
+                if cBands != nBands:
+                    raise rsgislib.RSGISPyException("The number of image bands is not consistent (Bands: {0} and {1})".format(nBands, cBands))
+            
+            sameProj = rsgisUtils.doGDALLayersHaveSameProj(refImg, img)
+            if rsgislib.imageutils.doImagesOverlap(refImg, img):
+                if sameProj:
+                    if rsgisUtils.doImageResMatch(refImg, img):
+                        inImages.append(img)
+                    else:
+                        inImagesReProj.append(img)
+                else:
+                    inImagesReProj.append(img)
+                    
+        nImgs = len(inImages) + len(inImagesReProj)
+        print("There are {} images with overlap to create the composite.".format(nImgs))
+        if nImgs > 1:
+            if dataType is None:
+                if len(inImages) > 0:
+                    dataType = rsgisUtils.getRSGISLibDataTypeFromImg(inImages[0])
+                else:
+                    dataType = rsgisUtils.getRSGISLibDataTypeFromImg(inImagesReProj[0])
+        
+            tmpPresent = True
+            if not os.path.exists(tmpPath):
+                os.makedirs(tmpPath)
+                tmpPresent = False 
+            
+            reprojLayersPath = os.path.join(tmpPath, 'Reproj_'+uidStr)
+            reprojImgTmpPresent = True
+            if not os.path.exists(reprojLayersPath):
+                os.makedirs(reprojLayersPath)
+                reprojImgTmpPresent = False
+                        
+            for img in inImagesReProj:
+                basename = os.path.splitext(os.path.basename(img))[0]
+                outImg = os.path.join(reprojLayersPath, basename+"_reproj.kea")
+                rsgislib.imageutils.resampleImage2Match(refImg, img, outImg, 'KEA', reprojmethod, dataType)
+                inImages.append(outImg)
+            
+            refLayersPath = os.path.join(tmpPath, 'RefLyrs_'+uidStr)
+            refImgTmpPresent = True
+            if not os.path.exists(refLayersPath):
+                os.makedirs(refLayersPath)
+                refImgTmpPresent = False
+                        
+            numInLyrs = len(inImages)
+            
+            numpy.random.seed(5)
+            red = numpy.random.randint(1, 255, numInLyrs+1, int)
+            red[0] = 0
+            numpy.random.seed(2)
+            green = numpy.random.randint(1, 255, numInLyrs+1, int)
+            green[0] = 0
+            numpy.random.seed(9)
+            blue = numpy.random.randint(1, 255, numInLyrs+1, int)
+            blue[0] = 0
+            alpha = numpy.zeros_like(blue)
+            alpha[...] = 255
+            imgLyrs = numpy.empty(numInLyrs+1, dtype=numpy.dtype('a255'))
+                
+            # Generate Comp Ref layers:
+            landWaterMskBandDefns = []
+            mskImgs = []
+            idx = 1
+            for img in inImages:
+                print('In Image ('+str(idx) + '):\t' + img)
+                imgLyrs[idx] = os.path.basename(img)
+                baseImgName = os.path.splitext(os.path.basename(img))[0]
+                refLyrNDVIImg = os.path.join(refLayersPath, baseImgName+'_ndvi.kea')
+                refLyrNDWIImg = os.path.join(refLayersPath, baseImgName+'_ndwi.kea')
+                rsgislib.imagecalc.calcindices.calcNDVI(img, rBand, nBand, refLyrNDVIImg, False)
+                rsgislib.imagecalc.calcindices.calcNDWI(img, nBand, sBand, refLyrNDWIImg, False)
+                
+                refLyrMskImg = os.path.join(refLayersPath, baseImgName+'_waterLandMsk.kea')
+                bandDefns = []
+                bandDefns.append(rsgislib.imagecalc.BandDefn('ndvi', refLyrNDVIImg, 1))
+                bandDefns.append(rsgislib.imagecalc.BandDefn('ndwi', refLyrNDWIImg, 1))
+                rsgislib.imagecalc.bandMath(refLyrMskImg, 'ndvi<-1?0:ndvi>0.3?1:ndwi>0.01?2:1', 'KEA', rsgislib.TYPE_8UINT, bandDefns)
+                mskImgs.append(refLyrMskImg)
+                idx = idx + 1
+            imgLyrs[0] = ""        
+            
+            refLyrMskStackImg = os.path.join(refLayersPath, uidStr+'_waterLandMskStack.kea')
+            rsgislib.imageutils.stackImageBands(mskImgs, None, refLyrMskStackImg, -1, -1, 'KEA', rsgislib.TYPE_8UINT)
+            rsgislib.imagecalc.imagePixelColumnSummary(refLyrMskStackImg, outMskImg, rsgislib.imagecalc.StatsSummary(calcMedian=True), 'KEA', rsgislib.TYPE_8UINT, 0, True)        
+            rsgislib.rastergis.populateStats(outMskImg, True, True, True)
+            
+            idx = 1
+            refLyrsLst = []
+            for img in inImages:
+                print('In Image ('+str(idx) + '):\t' + img)
+                baseImgName = os.path.splitext(os.path.basename(img))[0]
+                refLyrNDVIImg = os.path.join(refLayersPath, baseImgName+'_ndvi.kea')
+                refLyrNDWIImg = os.path.join(refLayersPath, baseImgName+'_ndwi.kea')
+                refLyrLclMskImg = os.path.join(refLayersPath, baseImgName+'_waterLandMsk.kea')
+                
+                refLyrImg = os.path.join(refLayersPath, baseImgName+'_refHybrid.kea')
+                bandDefns = []
+                bandDefns.append(rsgislib.imagecalc.BandDefn('lmsk', refLyrLclMskImg, 1))
+                bandDefns.append(rsgislib.imagecalc.BandDefn('omsk', outMskImg, 1))
+                bandDefns.append(rsgislib.imagecalc.BandDefn('ndvi', refLyrNDVIImg, 1))
+                bandDefns.append(rsgislib.imagecalc.BandDefn('ndwi', refLyrNDWIImg, 1))
+                rsgislib.imagecalc.bandMath(refLyrImg, 'lmsk==0?-999:omsk==1?ndvi:omsk==2?ndwi:-999', 'KEA', rsgislib.TYPE_32FLOAT, bandDefns)
+                refLyrsLst.append(refLyrImg)
+                idx = idx + 1
+            
+            # Create REF Image
+            rsgislib.imagecalc.getImgIdxForStat(refLyrsLst, outRefImg, 'KEA', -999, rsgislib.SUMTYPE_MAX)
+            if calcStats:
+                # Pop Ref Image with stats
+                rsgislib.rastergis.populateStats(outRefImg, True, True, True)
+                
+                # Open the clumps dataset as a gdal dataset
+                ratDataset = osgeo.gdal.Open(outRefImg, osgeo.gdal.GA_Update)
+                # Write colours to RAT
+                rios.rat.writeColumn(ratDataset, "Red", red)
+                rios.rat.writeColumn(ratDataset, "Green", green)
+                rios.rat.writeColumn(ratDataset, "Blue", blue)
+                rios.rat.writeColumn(ratDataset, "Alpha", alpha)
+                rios.rat.writeColumn(ratDataset, "Image", imgLyrs)
+                ratDataset = None
+            
+            # Create Composite Image
+            rsgislib.imageutils.createRefImgCompositeImg(inImages, outCompImg, outRefImg, gdalFormat, dataType, 0.0)
+            
+            if calcStats:
+                # Calc Stats
+                rsgislib.imageutils.popImageStats(outCompImg, usenodataval=True, nodataval=0, calcpyramids=True)
+            
+            if not refImgTmpPresent:
+                shutil.rmtree(refLayersPath, ignore_errors=True)
+                
+            if not reprojImgTmpPresent:
+                shutil.rmtree(reprojLayersPath, ignore_errors=True)            
+        
+            if not tmpPresent:
+                shutil.rmtree(tmpPath, ignore_errors=True)
+        else:
+            raise rsgislib.RSGISPyException("There were only {0} images which intersect with the reference image.".format(nImgs))
+
+    elif len(inImages) == 1:
+        print("Only 1 Input Image, Just Copying File to output")
+        shutil.copy(inImages[0], outCompImg)
+    else:
+        raise rsgislib.RSGISPyException("There were no input images for " + inImgsPattern)
 
 
 
