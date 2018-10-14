@@ -222,6 +222,31 @@ Example::
         rsgisUtils.deleteFileWithBasename(tmpMorphOperator)
 
 
+def getESUNValue(radiance, toaRefl, day, month, year, solarZenith):
+    """
+    Get the ESUN value where a radiance and TOA Reflectance value are known
+    for a pixel.
+    :param radiance:
+    :param toaRefl:
+    :param day:
+    :param month:
+    :param year:
+    :param solarZenith:
+    :return:
+    """
+    import rsgislib.imagecalibration
+    julianDay = rsgislib.imagecalibration.getJulianDay(year, month, day)
+    solarDist = rsgislib.imagecalibration.calcSolarDistance(julianDay)
+    # pi * L * d2
+    step1 = math.pi * radiance * (solarDist * solarDist)
+    # step1 / toaRefl
+    step2 = step1 / toaRefl
+    # step2 / cos(solarZenith)
+    esun = step2 / math.cos(math.radians(solarZenith))
+    return esun
+
+
+
 def createEstimateSREFSurface(inputTOAImg, imgBands, bandRescale, winSize, outImage, gdalFormat, dataType, tmpDIR):
     """
     Estimate SREF surface from TOA input image using the method details in He, K., Sun, J., & Tang, X. (2011). 
