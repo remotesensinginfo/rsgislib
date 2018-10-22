@@ -22,7 +22,9 @@ Create Vectors
 .. autofunction:: rsgislib.vectorutils.polygoniseRaster
 .. autofunction:: rsgislib.vectorutils.exportPxls2Pts
 .. autofunction:: rsgislib.vectorutils.createPolySHP4LstBBOXs
+.. autofunction:: rsgislib.vectorutils.createPolyVecBBOXs
 .. autofunction:: rsgislib.vectorutils.extractImageFootprint
+.. autofunction:: rsgislib.vectorutils.createImgExtentLUT
 
 
 Attributes
