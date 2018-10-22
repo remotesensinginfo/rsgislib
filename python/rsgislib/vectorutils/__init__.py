@@ -383,7 +383,7 @@ Get a count of the number of features in the vector layers.
 return:: nfeats
 
 """
-    from osgeo import gdal
+    gdal.UseExceptions()
     inDataSource = gdal.OpenEx(inVec, gdal.OF_VECTOR )
     if layerName is not None:
         inLayer = inDataSource.GetLayer(layerName)
@@ -476,6 +476,7 @@ This function takes a CSV file of bounding boxes (1 per line) and creates a poly
 * ignoreRows - The number of rows to ignore from the start of the CSV file (i.e., column headings)
 * force - If the output file already exists delete it before proceeding.
 """
+    gdal.UseExceptions()
     try:
         if os.path.exists(outSHP):
             if force:
@@ -541,6 +542,7 @@ def getVecLayerExtent(inVec, layerName=None, computeIfExp=True):
 return:: boundary box is returned (MinX, MaxX, MinY, MaxY)
 
 """
+    gdal.UseExceptions()
     # Get a Layer's Extent
     inDataSource = gdal.OpenEx(inVec, gdal.OF_VECTOR )
     if layerName is not None:
@@ -557,6 +559,7 @@ def getProjWKTFromVec(inVec):
 return:: WKT representation of projection
 
 """
+    gdal.UseExceptions()
     # Get shapefile projection as WKT
     dataset = gdal.OpenEx(inVec, gdal.OF_VECTOR )
     layer = dataset.GetLayer()
@@ -583,6 +586,7 @@ A function which reprojects a vector layer.
 """
     ## This code has been editted from https://pcjericks.github.io/py-gdalogr-cookbook/projection.html#reproject-a-layer
     ## Updated for GDAL 2.0
+    gdal.UseExceptions()
         
     # get the input layer
     inDataSet = gdal.OpenEx(inputVec, gdal.OF_VECTOR )
@@ -660,6 +664,7 @@ A function which reprojects a vector layer.
     inDataSet = None
     outDataSet = None
 
+
 def getAttLstSelectFeats(vecFile, vecLyr, attName, selVecFile, selVecLyr):
     """
 Function to get a list of attribute values from features which intersect
@@ -673,7 +678,6 @@ with the select layer.
     gdal.UseExceptions()
     att_vals = []
     try:
-    
         dsVecFile = gdal.OpenEx(vecFile, gdal.OF_READONLY )
         if dsVecFile is None:
             raise Exception("Could not open '" + vecFile + "'")
@@ -736,4 +740,138 @@ with the select layer.
     except Exception as e:
         raise e
     return att_vals
+
+
+def createPolyVecBBOXs(vectorFile, vectorLyr, vecDriver, espgCode, bboxs, atts=None, attTypes=None):
+    """
+This function creates a set of polygons for a set of bounding boxes. 
+
+When creating an attribute the available data types are ogr.OFTString, ogr.OFTInteger, ogr.OFTReal
+    
+* vectorFile - output vector file/path
+* vectorLyr - output vector layer
+* vecDriver - the output vector layer type.
+* espgCode - ESPG code specifying the projection of the data (e.g., 4326 is WSG84 Lat/Long).
+* bboxs - is a list of bounding boxes ([xMin, xMax, yMin, yMax]) to be saved to the output vector.
+* atts - is a dict of lists of attributes with the same length as the bboxs list. The dict should be named the same as the attTypes['names'] list.
+* attTypes - is a dict with a list of attribute names (attTypes['names']) and types (attTypes['types']). The list must be the same length as one another and the number of atts.
+"""
+    try:
+        gdal.UseExceptions()
+        # Create the output Driver
+        outDriver = ogr.GetDriverByName(vecDriver)
+        # create the spatial reference, WGS84
+        srs = osr.SpatialReference()
+        srs.ImportFromEPSG(int(espgCode))
+        # Create the output Shapefile
+        outDataSource = outDriver.CreateDataSource(vectorFile)
+        outLayer = outDataSource.CreateLayer(vectorLyr, srs, geom_type=ogr.wkbPolygon )
+        
+        
+        addAtts = False
+        if (atts is not None) and (attTypes is not None):
+            nAtts = 0
+            if not 'names' in attTypes:
+                raise Exception('attTypes must include a list for "names"')
+            nAtts = len(attTypes['names'])
+            if not 'types' in attTypes:
+                raise Exception('attTypes must include a list for "types"')
+            if nAtts != len(attTypes['types']):
+                raise Exception('attTypes "names" and "types" lists must be the same length.')
+            for i in range(nAtts):
+                if attTypes['names'][i] not in atts:
+                    raise Exception('"{}" is not within atts'.format(attTypes['names'][i]))
+                if len(atts[attTypes['names'][i]]) != len(bboxs):
+                    raise Exception('"{}" in atts does not have the same len as bboxs'.format(attTypes['names'][i]))
+                    
+            for i in range(nAtts):       
+                field_defn = ogr.FieldDefn( attTypes['names'][i], attTypes['types'][i] )
+                if outLayer.CreateField ( field_defn ) != 0:
+                    raise Exception("Creating '" + attTypes['names'][i] + "' field failed.\n")
+            addAtts = True
+        elif not ((atts is None) and (attTypes is None)): 
+            raise Exception('If atts or attTypes is not None then the other should also not be none and equalivent in length.')
+            
+        # Get the output Layer's Feature Definition
+        featureDefn = outLayer.GetLayerDefn()
+        
+        for n in range(len(bboxs)):
+            bbox = bboxs[n]
+            # Create Linear Ring
+            ring = ogr.Geometry(ogr.wkbLinearRing)
+            ring.AddPoint(bbox[0], bbox[3])
+            ring.AddPoint(bbox[1], bbox[3])
+            ring.AddPoint(bbox[1], bbox[2])
+            ring.AddPoint(bbox[0], bbox[2])
+            ring.AddPoint(bbox[0], bbox[3])
+            # Create polygon.
+            poly = ogr.Geometry(ogr.wkbPolygon)
+            poly.AddGeometry(ring)
+            # Add to output shapefile.
+            outFeature = ogr.Feature(featureDefn)
+            outFeature.SetGeometry(poly)
+            if addAtts:
+                # Add Attributes
+                for i in range(nAtts):
+                    outFeature.SetField(attTypes['names'][i], atts[attTypes['names'][i]][n])
+            outLayer.CreateFeature(outFeature)
+            outFeature = None
+        outDataSource = None
+    except Exception as e:
+        raise e
+
+
+
+
+
+def createImgExtentLUT(imgList, vectorFile, vectorLyr, vecDriver):
+    """
+Create a vector layer look up table (LUT) for a directory of images.
+
+* imgList - list of input images for the LUT. All input images should be the same projection/coordinate system.
+* vectorFile - output vector file/path
+* vectorLyr - output vector layer
+* vecDriver - the output vector layer type.
+
+Example::
+
+import glob
+import rsgislib.vectorutils
+imgList = glob.glob('/Users/pete/Temp/GabonLandsat/Hansen*.kea')
+rsgislib.vectorutils.createImgExtentLUT(imgList, './ImgExtents.shp', 'ImgExtents', 'ESRI Shapefile')
+
+"""
+    gdal.UseExceptions()
+    rsgisUtils = rsgislib.RSGISPyUtils()
+    
+    bboxs = []
+    atts=dict()
+    atts['filename'] = []
+    atts['path'] = []
+    
+    attTypes = dict()
+    attTypes['types'] = [ogr.OFTString, ogr.OFTString]
+    attTypes['names'] = ['filename', 'path']
+    
+    epsgCode = 0
+    
+    first = True
+    baseImg = ''
+    for img in imgList:
+        if first:
+            epsgCode = int(rsgisUtils.getEPSGCode(img))
+            baseImg = img
+            first = False
+        else:
+            epsgCodeTmp = int(rsgisUtils.getEPSGCode(img))
+            if epsgCodeTmp != epsgCode:
+                raise Exception("The EPSG codes ({0} & {1}) do not match. (Base: '{2}', Img: '{3}')".format(epsgCode, epsgCodeTmp, baseImg, img))
+        
+        bboxs.append(rsgisUtils.getImageBBOX(img))
+        baseName = os.path.basename(img)
+        filePath = os.path.dirname(img)
+        atts['filename'].append(baseName)
+        atts['path'].append(filePath)
+    # Create vector layer
+    createPolyVecBBOXs(vectorFile, vectorLyr, vecDriver, epsgCode, bboxs, atts, attTypes)
 
