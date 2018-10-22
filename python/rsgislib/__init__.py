@@ -610,7 +610,42 @@ class RSGISPyUtils (object):
                 rasterDS.GetRasterBand(b+1).SetNoDataValue(noDataValue)
 
         rasterDS = None
-
+    
+    def getImgBandColourInterp(self, inImg, band):
+        """
+        A function to get the colour interpretation for a specific band.
+        return is a GDALColorInterp value:
+        GCI_Undefined=0, GCI_GrayIndex=1, GCI_PaletteIndex=2, GCI_RedBand=3, 
+        GCI_GreenBand=4, GCI_BlueBand=5, GCI_AlphaBand=6, GCI_HueBand=7, 
+        GCI_SaturationBand=8, GCI_LightnessBand=9, GCI_CyanBand=10, GCI_MagentaBand=11, 
+        GCI_YellowBand=12, GCI_BlackBand=13, GCI_YCbCr_YBand=14, GCI_YCbCr_CbBand=15, 
+        GCI_YCbCr_CrBand=16, GCI_Max=16  
+        """
+        import osgeo.gdal as gdal
+        rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
+        if rasterDS is None:
+            raise RSGISPyException('Could not open raster image: \'' + inImg + '\'')
+        clrItrpVal = rasterDS.GetRasterBand(band).GetRasterColorInterpretation()
+        rasterDS = None
+        return clrItrpVal
+        
+    def setImgBandColourInterp(self, inImg, band, clrItrpVal):
+        """
+        A function to set the colour interpretation for a specific band.
+        input is a GDALColorInterp value:
+        GCI_Undefined=0, GCI_GrayIndex=1, GCI_PaletteIndex=2, GCI_RedBand=3, 
+        GCI_GreenBand=4, GCI_BlueBand=5, GCI_AlphaBand=6, GCI_HueBand=7, 
+        GCI_SaturationBand=8, GCI_LightnessBand=9, GCI_CyanBand=10, GCI_MagentaBand=11, 
+        GCI_YellowBand=12, GCI_BlackBand=13, GCI_YCbCr_YBand=14, GCI_YCbCr_CbBand=15, 
+        GCI_YCbCr_CrBand=16, GCI_Max=16  
+        """
+        import osgeo.gdal as gdal
+        rasterDS = gdal.Open(inImg, gdal.GA_Update)
+        if rasterDS is None:
+            raise RSGISPyException('Could not open raster image: \'' + inImg + '\'')
+        rasterDS.GetRasterBand(band).SetColorInterpretation(clrItrpVal)
+        rasterDS = None
+    
     def getWKTProjFromImage(self, inImg):
         """
         A function which returns the WKT string representing the projection 
