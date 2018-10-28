@@ -576,10 +576,18 @@ namespace rsgis{namespace classifier{
                 std::string message = std::string("Creating shapefile field \'") + vecClassRefCol + std::string("\' has failed");
                 throw rsgis::RSGISException(message);
             }
+
+            OGRFieldDefn processedField("Processed", OFTInteger);
+            if( outputSHPLayer->CreateField( &processedField ) != OGRERR_NONE )
+            {
+                std::string message = std::string("Creating shapefile field \'Processed\' has failed");
+                throw rsgis::RSGISException(message);
+            }
             
             OGRFeatureDefn *featDefn = outputSHPLayer->GetLayerDefn();
             int imgClassColIdx = featDefn->GetFieldIndex(vecClassImgCol.c_str());
             int refClassColIdx = featDefn->GetFieldIndex(vecClassRefCol.c_str());
+            int processedColIdx = featDefn->GetFieldIndex("Processed");
             
             for(std::list<RSGISAccPoint*>::iterator iterPts = accPts->begin(); iterPts != accPts->end(); ++iterPts)
             {
@@ -589,6 +597,7 @@ namespace rsgis{namespace classifier{
                 
                 poFeature->SetField(imgClassColIdx, (*iterPts)->mapClassName.c_str());
                 poFeature->SetField(refClassColIdx, (*iterPts)->trueClassName.c_str());
+                poFeature->SetField(processedColIdx, 0);
                 
                 outputSHPLayer->CreateFeature(poFeature);
             }
@@ -775,10 +784,18 @@ namespace rsgis{namespace classifier{
                 std::string message = std::string("Creating shapefile field \'") + vecClassRefCol + std::string("\' has failed");
                 throw rsgis::RSGISException(message);
             }
+
+            OGRFieldDefn processedField("Processed", OFTInteger);
+            if( outputSHPLayer->CreateField( &processedField ) != OGRERR_NONE )
+            {
+                std::string message = std::string("Creating shapefile field \'Processed\' has failed");
+                throw rsgis::RSGISException(message);
+            }
             
             OGRFeatureDefn *featDefn = outputSHPLayer->GetLayerDefn();
             int imgClassColIdx = featDefn->GetFieldIndex(vecClassImgCol.c_str());
             int refClassColIdx = featDefn->GetFieldIndex(vecClassRefCol.c_str());
+            int processedColIdx = featDefn->GetFieldIndex("Processed");
             
             for(std::vector<std::vector<RSGISAccPoint*> >::iterator iterPtsVecs = accClassPts->begin(); iterPtsVecs != accClassPts->end(); ++iterPtsVecs)
             {
@@ -790,6 +807,7 @@ namespace rsgis{namespace classifier{
                     
                     poFeature->SetField(imgClassColIdx, (*iterPts)->mapClassName.c_str());
                     poFeature->SetField(refClassColIdx, (*iterPts)->trueClassName.c_str());
+                    poFeature->SetField(processedColIdx, 0);
                     
                     outputSHPLayer->CreateFeature(poFeature);
                 }
@@ -897,10 +915,18 @@ namespace rsgis{namespace classifier{
                 std::string message = std::string("Creating shapefile field \'") + vecClassRefCol + std::string("\' has failed");
                 throw rsgis::RSGISException(message);
             }
+
+            OGRFieldDefn processedField("Processed", OFTInteger);
+            if( outputSHPLayer->CreateField( &processedField ) != OGRERR_NONE )
+            {
+                std::string message = std::string("Creating shapefile field \'Processed\' has failed");
+                throw rsgis::RSGISException(message);
+            }
             
             OGRFeatureDefn *featDefn = outputSHPLayer->GetLayerDefn();
             int imgClassColIdx = featDefn->GetFieldIndex(vecClassImgCol.c_str());
             int refClassColIdx = featDefn->GetFieldIndex(vecClassRefCol.c_str());
+            int processedColIdx = featDefn->GetFieldIndex("Processed");
             unsigned long pxlIdx = 0;
             bool foundPxl = false;
             unsigned long findPxlIterCount = 0;
@@ -951,6 +977,7 @@ namespace rsgis{namespace classifier{
                     
                     poFeature->SetField(imgClassColIdx, classNames->at(i).c_str());
                     poFeature->SetField(refClassColIdx, classNames->at(i).c_str());
+                    poFeature->SetField(processedColIdx, 0);
                     
                     outputSHPLayer->CreateFeature(poFeature);
                 }
@@ -1036,8 +1063,13 @@ namespace rsgis{namespace classifier{
                 }
                 vecClassRefField = std::string(refClassField.GetNameRef());
             }
-            
-            
+
+            OGRFieldDefn processedField("Processed", OFTInteger);
+            if( inputVecLayer->CreateField( &processedField ) != OGRERR_NONE )
+            {
+                std::string message = std::string("Creating shapefile field \'Processed\' has failed");
+                throw rsgis::RSGISException(message);
+            }
             
             OGRFeatureDefn *featDefn = inputVecLayer->GetLayerDefn();
             int imgClassColIdx = featDefn->GetFieldIndex(vecClassImgField.c_str());
@@ -1046,6 +1078,7 @@ namespace rsgis{namespace classifier{
             {
                 refClassColIdx = featDefn->GetFieldIndex(vecClassRefField.c_str());
             }
+            int processedColIdx = featDefn->GetFieldIndex("Processed");
             
             int numFeatures = inputVecLayer->GetFeatureCount(TRUE);
             
@@ -1121,6 +1154,7 @@ namespace rsgis{namespace classifier{
                             featObj->SetField(refClassColIdx, emptyStr.c_str());
                         }
                     }
+                    featObj->SetField(processedColIdx, 0);
                     
                     if( inputVecLayer->SetFeature(featObj) != OGRERR_NONE )
                     {
