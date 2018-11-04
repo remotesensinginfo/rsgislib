@@ -380,7 +380,6 @@ namespace rsgis{namespace calib{
     private:
         rsgis::math::RSGISMathsUtils *mathUtils;
         double noDataVal;
-        int winSize;
         double *xVals;
         double *yVals;
         double *zVals;
