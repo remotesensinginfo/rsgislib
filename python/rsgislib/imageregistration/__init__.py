@@ -41,7 +41,7 @@ TYPE_RSGIS_MAPOFFS = 4
 
 
 
-def warpUseGCPsWithGDAL(inRefImg, inProcessImg, outImg, gdalFormat, interpMethod, useTPS=False, usePoly=True, polyOrder=3, useMutliThread=False):
+def warpUseGCPsWithGDAL(inRefImg, inProcessImg, outImg, gdalformat, interpMethod, useTPS=False, usePoly=True, polyOrder=3, useMutliThread=False):
     """
 A utility function to warp an image file (inProcessImg) using GCPs defined within the image header - this is the same as using the 
 gdalwarp utility. However, the output image will have the same pixel grid and dimensions as the input reference image (inRefImg).
@@ -51,7 +51,7 @@ Where:
 * inRefImg is the input reference image to which the processing image is to resampled to.
 * inProcessImg is the image which is to be resampled.
 * outImg is the output image file.
-* gdalFormat is the gdal format for the output image.
+* gdalformat is the gdal format for the output image.
 * interpMethod is the interpolation method used to resample the image [bilinear, lanczos, cubicspline, nearestneighbour, cubic, average, mode]
 * useTPS is a boolean specifying that the thin plated splines method of warping should be used (i.e., rubbersheet); Default False.
 * usePoly is a boolean specifying that a polynomial method of warpping is used; Default True
@@ -88,7 +88,7 @@ Where:
     else:
         raise Exception("Interpolation method was not recognised or known.")
     
-    rsgislib.imageutils.createCopyImage(inRefImg, outImg, numBands, 0, gdalFormat, datatype)
+    rsgislib.imageutils.createCopyImage(inRefImg, outImg, numBands, 0, gdalformat, datatype)
 
     inFile = gdal.Open(inProcessImg, gdal.GA_ReadOnly)
     outFile = gdal.Open(outImg, gdal.GA_Update)

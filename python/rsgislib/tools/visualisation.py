@@ -70,7 +70,7 @@ def createKMZImg(inputImg, outputFile, bands, reprojLatLong=True, finiteMsk=Fals
         latLongImg = os.path.join(tmpDIR, baseName+'_latlong.kea')
         outWKT = os.path.join(tmpDIR, baseName+'_latlong.wkt')
         rsgisUtils.writeList2File(['GEOGCS["WGS_1984",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.2572235630016],TOWGS84[0,0,0,0,0,0,0]],PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433],AUTHORITY["EPSG","4326"]]'], outWKT)
-        rsgislib.imageutils.reprojectImage(stretchImg, latLongImg, outWKT, gdalFormat='KEA', interp='cubic', inWKT=None, noData=0.0, outPxlRes='auto', snap2Grid=True)
+        rsgislib.imageutils.reprojectImage(stretchImg, latLongImg, outWKT, gdalformat='KEA', interp='cubic', inWKT=None, noData=0.0, outPxlRes='auto', snap2Grid=True)
         gdalInFile = latLongImg
     
     cmd = 'gdal_translate -of KMLSUPEROVERLAY ' + gdalInFile + ' ' + outputFile

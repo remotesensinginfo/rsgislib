@@ -185,7 +185,7 @@ Example::
         if not haveNumpy:
             raise Exception("The numpy module is required for this function could not be imported\n\t" + numErr)
         
-        gdalFormat = "KEA"      
+        gdalformat = "KEA"      
         tmpOutFile = os.path.splitext(outputPlotFile)[0] + "_hist2dimgtmp.kea"
         #tmpOutFileStch = os.path.splitext(outputPlotFile)[0] + "_hist2dimgtmpStch.kea"
         
@@ -212,7 +212,7 @@ Example::
                 img2Max = max
         
         # Images are flipped so axis' come out correctly.
-        outBinSizeImg1, outBinSizeImg2, rSq = imagecalc.get2DImageHistogram(inputImage2, inputImage1, tmpOutFile, gdalFormat, img2Band, img1Band, numBins, img2Min, img2Max, img1Min, img1Max, img2Scale, img1Scale, img2Off, img1Off, normOutput)
+        outBinSizeImg1, outBinSizeImg2, rSq = imagecalc.get2DImageHistogram(inputImage2, inputImage1, tmpOutFile, gdalformat, img2Band, img1Band, numBins, img2Min, img2Max, img1Min, img1Max, img2Scale, img1Scale, img2Off, img1Off, normOutput)
         print("Image1 Bin Size: ", outBinSizeImg1)
         print("Image2 Bin Size: ", outBinSizeImg2)
         print("rSq: ", rSq)
@@ -256,7 +256,7 @@ Example::
         plt.savefig(outputPlotFile, format='PDF')
         
         # Tidy up temporary file.
-        gdalDriver = gdal.GetDriverByName(gdalFormat)
+        gdalDriver = gdal.GetDriverByName(gdalformat)
         gdalDriver.Delete(tmpOutFile)
                 
     except Exception as e:
