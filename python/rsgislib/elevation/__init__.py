@@ -37,7 +37,7 @@ Biosystems Engineering, 101(3), 293–305.
         srcbandHighRes = srcDSHighRes.GetRasterBand(1)
         srcbandHighResArr = srcbandHighRes.ReadAsArray()
     except Exception as e:
-        print('Unable to open \"'+ highResImg + '\"')
+        print('Unable to open \"'+ highResDEMImg + '\"')
         raise e
         
     try:
@@ -45,7 +45,7 @@ Biosystems Engineering, 101(3), 293–305.
         srcbandLowRes = srcDSLowRes.GetRasterBand(1)
         srcbandLowResArr = srcbandLowRes.ReadAsArray()
     except Exception as e:
-        print('Unable to open \"'+ lowResImg + '\"')
+        print('Unable to open \"'+ lowResDEMImg + '\"')
         raise e
     
     fftHighRes = numpy.fft.fft2(srcbandHighResArr)
