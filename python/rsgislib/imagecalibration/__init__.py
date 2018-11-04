@@ -240,6 +240,7 @@ Get the ESUN value where a radiance and TOA Reflectance value are known for a pi
 
 """
     import rsgislib.imagecalibration
+    import math
     julianDay = rsgislib.imagecalibration.getJulianDay(year, month, day)
     solarDist = rsgislib.imagecalibration.calcSolarDistance(julianDay)
     # pi * L * d2
