@@ -345,7 +345,7 @@ namespace rsgis {namespace histocube{
             unsigned int numBins = bins.size();
             std::string datasetName = "/DATA/"+name;
             
-            int fileChuckSize = chunkSize;
+            hsize_t fileChuckSize = chunkSize;
             if(this->numOfFeats < chunkSize)
             {
                 fileChuckSize = this->numOfFeats;
