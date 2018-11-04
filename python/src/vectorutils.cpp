@@ -627,7 +627,6 @@ static PyObject *VectorUtils_FitActiveContourBoundaries(PyObject *self, PyObject
     const char *pszInputVector;
     const char *pszOutputVector;
     const char *pszExterForceImg;
-    const char *clustersField;
     int force = false;
     double alphaVal;
     double betaVal;

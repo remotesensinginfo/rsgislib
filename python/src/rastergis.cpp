@@ -506,7 +506,6 @@ static PyObject *RasterGIS_ExportCol2GDALImage(PyObject *self, PyObject *args, P
     const char *inputImage, *outputFile, *imageFormat, *field;
     int dataType;
     int ratBand = 1;
-    PyObject *pFields;
 
     static char *kwlist[] = {"clumps", "outimage", "gdalformat", "datatype", "field", "ratband", NULL};
 
@@ -1985,7 +1984,6 @@ static PyObject *RasterGIS_ExportClumps2Images(PyObject *self, PyObject *args, P
     const char *inputImage, *outputBaseName, *outFileExt, *imageFormat;
     int binaryOut = false;
     int ratBand = 1;
-    PyObject *pFields;
     
     static char *kwlist[] = {"clumps", "outimgbase", "binout", "outimgext", "gdalformat", "ratband", NULL};
     
