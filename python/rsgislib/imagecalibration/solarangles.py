@@ -136,7 +136,7 @@ Internal functions used within calcSolarAzimuthZenith() - don't call independent
     outputs.outimage = numpy.stack((outAz,outZen))
 
 
-def calcSolarAzimuthZenith(inputImg, inImgDateTime, outputImg, gdalFormat):
+def calcSolarAzimuthZenith(inputImg, inImgDateTime, outputImg, gdalformat):
     """
 Function which calculate a solar azimuth (band 1) and zenith (band 2) image.
 
@@ -155,7 +155,7 @@ Function which calculate a solar azimuth (band 1) and zenith (band 2) image.
     otherargs.dateTime = inImgDateTime
     aControls = applier.ApplierControls()
     aControls.progress = cuiprogress.CUIProgressBar()
-    aControls.drivername = gdalFormat
+    aControls.drivername = gdalformat
 
 
     wgs84latlonProj = osr.SpatialReference()

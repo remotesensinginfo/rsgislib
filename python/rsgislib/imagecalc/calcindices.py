@@ -39,7 +39,7 @@ import rsgislib.imageutils
 import rsgislib.imagecalc
 
 
-def calcNDVI(image, rBand, nBand, outImage, stats=True, gdalFormat='KEA'):
+def calcNDVI(image, rBand, nBand, outImage, stats=True, gdalformat='KEA'):
     """ 
 Helper function to calculate NDVI ((NIR-RED)/(NIR+RED)), note the output no data value is -999.
     
@@ -50,21 +50,21 @@ Where:
 * nBand is an int specifying the nir band in the input image (band indexing starts at 1)
 * outImage is a string specifying the output image file.
 * stats is a boolean specifying whether pyramids and stats should be calculated (Default: True)
-* gdalFormat is a string specifing the output image file format (Default: KEA)
+* gdalformat is a string specifing the output image file format (Default: KEA)
     
 """
     expression = '(nir+red)!=0?(nir-red)/(nir+red):-999'
     bandDefns = []
     bandDefns.append(rsgislib.imagecalc.BandDefn('red', image, rBand))
     bandDefns.append(rsgislib.imagecalc.BandDefn('nir', image, nBand))
-    rsgislib.imagecalc.bandMath(outImage, expression, gdalFormat, rsgislib.TYPE_32FLOAT, bandDefns)
+    rsgislib.imagecalc.bandMath(outImage, expression, gdalformat, rsgislib.TYPE_32FLOAT, bandDefns)
     # Set no data value
     rsgislib.RSGISPyUtils().setImageNoDataValue(outImage, -999)
     if stats:
         rsgislib.imageutils.popImageStats(outImage,False,-999.,True)
 
 
-def calcWBI(image, bBand, nBand, outImage, stats=True, gdalFormat='KEA'):
+def calcWBI(image, bBand, nBand, outImage, stats=True, gdalformat='KEA'):
     """ 
 Helper function to calculate WBI (Blue/NIR), note the output no data value is -999.
     
@@ -75,21 +75,21 @@ Where:
 * nBand is an int specifying the nir band in the input image (band indexing starts at 1)
 * outImage is a string specifying the output image file.
 * stats is a boolean specifying whether pyramids and stats should be calculated (Default: True)
-* gdalFormat is a string specifing the output image file format (Default: KEA)
+* gdalformat is a string specifing the output image file format (Default: KEA)
     
 """
     expression = 'nir!=0?blue/nir:-999'
     bandDefns = []
     bandDefns.append(rsgislib.imagecalc.BandDefn('blue', image, bBand))
     bandDefns.append(rsgislib.imagecalc.BandDefn('nir', image, nBand))
-    rsgislib.imagecalc.bandMath(outImage, expression, gdalFormat, rsgislib.TYPE_32FLOAT, bandDefns)
+    rsgislib.imagecalc.bandMath(outImage, expression, gdalformat, rsgislib.TYPE_32FLOAT, bandDefns)
     # Set no data value
     rsgislib.RSGISPyUtils().setImageNoDataValue(outImage, -999)
     if stats:
         rsgislib.imageutils.popImageStats(outImage,False,-999.,True)
 
 
-def calcNDWI(image, nBand, sBand, outImage, stats=True, gdalFormat='KEA'):
+def calcNDWI(image, nBand, sBand, outImage, stats=True, gdalformat='KEA'):
     """ 
 Helper function to calculate NDWI ((NIR-SWIR)/(NIR+SWIR)), note the output no data value is -999.
 
@@ -104,14 +104,14 @@ Where:
 * sBand is an int specifying the swir band (e.g., Landsat TM Band 5) in the input image (band indexing starts at 1)
 * outImage is a string specifying the output image file.
 * stats is a boolean specifying whether pyramids and stats should be calculated (Default: True)
-* gdalFormat is a string specifing the output image file format (Default: KEA)
+* gdalformat is a string specifing the output image file format (Default: KEA)
     
 """
     expression = '(nir+swir)!=0?(nir-swir)/(nir+swir):-999'
     bandDefns = []
     bandDefns.append(rsgislib.imagecalc.BandDefn('swir', image, sBand))
     bandDefns.append(rsgislib.imagecalc.BandDefn('nir', image, nBand))
-    rsgislib.imagecalc.bandMath(outImage, expression, gdalFormat, rsgislib.TYPE_32FLOAT, bandDefns)
+    rsgislib.imagecalc.bandMath(outImage, expression, gdalformat, rsgislib.TYPE_32FLOAT, bandDefns)
     # Set no data value
     rsgislib.RSGISPyUtils().setImageNoDataValue(outImage, -999)
     if stats:
@@ -119,7 +119,7 @@ Where:
 
 
 
-def calcGNDWI(image, gBand, nBand, outImage, stats=True, gdalFormat='KEA'):
+def calcGNDWI(image, gBand, nBand, outImage, stats=True, gdalformat='KEA'):
     """ 
 Helper function to calculate NDWI ((GREEN-NIR)/(GREEN+NIR)), note the output no data value is -999.
 
@@ -134,21 +134,21 @@ Where:
 * nBand is an int specifying the nir band in the input image (band indexing starts at 1)
 * outImage is a string specifying the output image file.
 * stats is a boolean specifying whether pyramids and stats should be calculated (Default: True)
-* gdalFormat is a string specifing the output image file format (Default: KEA)
+* gdalformat is a string specifing the output image file format (Default: KEA)
     
 """
     expression = '(green+nir)!=0?(green-nir)/(green+nir):-999'
     bandDefns = []
     bandDefns.append(rsgislib.imagecalc.BandDefn('green', image, gBand))
     bandDefns.append(rsgislib.imagecalc.BandDefn('nir', image, nBand))
-    rsgislib.imagecalc.bandMath(outImage, expression, gdalFormat, rsgislib.TYPE_32FLOAT, bandDefns)
+    rsgislib.imagecalc.bandMath(outImage, expression, gdalformat, rsgislib.TYPE_32FLOAT, bandDefns)
     # Set no data value
     rsgislib.RSGISPyUtils().setImageNoDataValue(outImage, -999)
     if stats:
         rsgislib.imageutils.popImageStats(outImage,False,-999.,True)
 
 
-def calcGMNDWI(image, gBand, sBand, outImage, stats=True, gdalFormat='KEA'):
+def calcGMNDWI(image, gBand, sBand, outImage, stats=True, gdalformat='KEA'):
     """ 
 Helper function to calculate NDWI ((GREEN-SWIR)/(GREEN+SWIR)), note the output no data value is -999.
 
@@ -163,21 +163,21 @@ Where:
 * sBand is an int specifying the swir band (e.g., Landsat TM Band 5) in the input image (band indexing starts at 1)
 * outImage is a string specifying the output image file.
 * stats is a boolean specifying whether pyramids and stats should be calculated (Default: True)
-* gdalFormat is a string specifing the output image file format (Default: KEA)
+* gdalformat is a string specifing the output image file format (Default: KEA)
     
 """
     expression = '(green+swir)!=0?(green-swir)/(green+swir):-999'
     bandDefns = []
     bandDefns.append(rsgislib.imagecalc.BandDefn('green', image, gBand))
     bandDefns.append(rsgislib.imagecalc.BandDefn('swir', image, sBand))
-    rsgislib.imagecalc.bandMath(outImage, expression, gdalFormat, rsgislib.TYPE_32FLOAT, bandDefns)
+    rsgislib.imagecalc.bandMath(outImage, expression, gdalformat, rsgislib.TYPE_32FLOAT, bandDefns)
     # Set no data value
     rsgislib.RSGISPyUtils().setImageNoDataValue(outImage, -999)
     if stats:
         rsgislib.imageutils.popImageStats(outImage,False,-999.,True)
 
        
-def calcWhiteness(image, bBand, gBand, rBand, outImage, stats=True, gdalFormat='KEA'):
+def calcWhiteness(image, bBand, gBand, rBand, outImage, stats=True, gdalformat='KEA'):
     """ 
 Helper function to calculate whiteness, note the output no data value is -999.
     
@@ -189,7 +189,7 @@ Where:
 * rBand is an int specifying the red band in the input image (band indexing starts at 1)
 * outImage is a string specifying the output image file.
 * stats is a boolean specifying whether pyramids and stats should be calculated (Default: True)
-* gdalFormat is a string specifing the output image file format (Default: KEA)
+* gdalformat is a string specifing the output image file format (Default: KEA)
     
 """
     expression = '(blue+green+red)!=0?(abs(blue-((blue+green+red)/3)) + abs(green-((blue+green+red)/3)) + abs(red-((blue+green+red)/3)))/((blue+green+red)/3):-999'
@@ -197,13 +197,13 @@ Where:
     bandDefns.append(rsgislib.imagecalc.BandDefn('blue', image, bBand))
     bandDefns.append(rsgislib.imagecalc.BandDefn('green', image, gBand))
     bandDefns.append(rsgislib.imagecalc.BandDefn('red', image, rBand))
-    rsgislib.imagecalc.bandMath(outImage, expression, gdalFormat, rsgislib.TYPE_32FLOAT, bandDefns)
+    rsgislib.imagecalc.bandMath(outImage, expression, gdalformat, rsgislib.TYPE_32FLOAT, bandDefns)
     # Set no data value
     rsgislib.RSGISPyUtils().setImageNoDataValue(outImage, -999)
     if stats:
         rsgislib.imageutils.popImageStats(outImage,False,-999.,True)
 
-def calcBrightness(image, bBand, gBand, rBand, outImage, stats=True, gdalFormat='KEA', scalefac=1000):
+def calcBrightness(image, bBand, gBand, rBand, outImage, stats=True, gdalformat='KEA', scalefac=1000):
     """ 
 Helper function to calculate visable brightness, note the output no data value is -999.
     
@@ -215,7 +215,7 @@ Where:
 * rBand is an int specifying the red band in the input image (band indexing starts at 1)
 * outImage is a string specifying the output image file.
 * stats is a boolean specifying whether pyramids and stats should be calculated (Default: True)
-* gdalFormat is a string specifing the output image file format (Default: KEA)
+* gdalformat is a string specifing the output image file format (Default: KEA)
 * scalefac is a float which can be used retirved reflectance between 0-1 (Default: 1000 to match rsgislib/arcsi)
     
 """
@@ -224,14 +224,14 @@ Where:
     bandDefns.append(rsgislib.imagecalc.BandDefn('blue', image, bBand))
     bandDefns.append(rsgislib.imagecalc.BandDefn('green', image, gBand))
     bandDefns.append(rsgislib.imagecalc.BandDefn('red', image, rBand))
-    rsgislib.imagecalc.bandMath(outImage, expression, gdalFormat, rsgislib.TYPE_32FLOAT, bandDefns)
+    rsgislib.imagecalc.bandMath(outImage, expression, gdalformat, rsgislib.TYPE_32FLOAT, bandDefns)
     # Set no data value
     rsgislib.RSGISPyUtils().setImageNoDataValue(outImage, -999)
     if stats:
         rsgislib.imageutils.popImageStats(outImage,False,-999.,True)
         
 
-def calcBrightnessScaled(image, bBand, gBand, rBand, outImage, stats=True, gdalFormat='KEA'):
+def calcBrightnessScaled(image, bBand, gBand, rBand, outImage, stats=True, gdalformat='KEA'):
     """ 
 Helper function to calculate visable brightness, note the output no data value is -999.
     
@@ -243,19 +243,19 @@ Where:
 * rBand is an int specifying the red band in the input image (band indexing starts at 1)
 * outImage is a string specifying the output image file.
 * stats is a boolean specifying whether pyramids and stats should be calculated (Default: True)
-* gdalFormat is a string specifing the output image file format (Default: KEA)
+* gdalformat is a string specifing the output image file format (Default: KEA)
     
 """
     rsgisUtils = rsgislib.RSGISPyUtils()
     uidStr = rsgisUtils.uidGenerator()
-    tmpImg = os.path.splitext(outImage)[0]+'_tmp'+uidStr+'.'+rsgisUtils.getFileExtension(gdalFormat)
+    tmpImg = os.path.splitext(outImage)[0]+'_tmp'+uidStr+'.'+rsgisUtils.getFileExtension(gdalformat)
     expression = '(blue+green+red)!=0?((blue/'+str(scalefac)+')+(green/'+str(scalefac)+')+(red/'+str(scalefac)+'))/3:-999'
     bandDefns = []
     bandDefns.append(rsgislib.imagecalc.BandDefn('blue', image, bBand))
     bandDefns.append(rsgislib.imagecalc.BandDefn('green', image, gBand))
     bandDefns.append(rsgislib.imagecalc.BandDefn('red', image, rBand))
-    rsgislib.imagecalc.bandMath(tmpImg, expression, gdalFormat, rsgislib.TYPE_32FLOAT, bandDefns)
-    rsgislib.imageutils.normaliseImagePxlVals(inputimage=tmpImg, outputimage=outImage, gdalformat=gdalFormat, datatype=rsgislib.TYPE_32FLOAT, innodataval=-999, outnodataval=-999, outmin=0, outmax=1, stretchtype=rsgislib.imageutils.STRETCH_LINEARSTDDEV, stretchparam=2)
+    rsgislib.imagecalc.bandMath(tmpImg, expression, gdalformat, rsgislib.TYPE_32FLOAT, bandDefns)
+    rsgislib.imageutils.normaliseImagePxlVals(inputimage=tmpImg, outputimage=outImage, gdalformat=gdalformat, datatype=rsgislib.TYPE_32FLOAT, innodataval=-999, outnodataval=-999, outmin=0, outmax=1, stretchtype=rsgislib.imageutils.STRETCH_LINEARSTDDEV, stretchparam=2)
     rsgisUtils.deleteFileWithBasename(tmpImg)
     # Set no data value
     rsgisUtils.setImageNoDataValue(outImage, -999)
@@ -264,7 +264,7 @@ Where:
 
 
 
-def calcCTVI(image, bBand, nBand, outImage, stats=True, gdalFormat='KEA'):
+def calcCTVI(image, bBand, nBand, outImage, stats=True, gdalformat='KEA'):
     """ 
 Helper function to calculate Corrected Transformed Vegetation Index ((NDVI + 0.5)/sqrt(abs(NDVI + 0.5))), note the output no data value is -999.
     
@@ -275,14 +275,14 @@ Where:
 * nBand is an int specifying the nir band in the input image (band indexing starts at 1)
 * outImage is a string specifying the output image file.
 * stats is a boolean specifying whether pyramids and stats should be calculated (Default: True)
-* gdalFormat is a string specifing the output image file format (Default: KEA)
+* gdalformat is a string specifing the output image file format (Default: KEA)
     
 """
     expression = '(nir+red)!=0?(((nir-red)/(nir+red))+0.5)/sqrt(abs((nir-red)/(nir+red))+0.5)):-999'
     bandDefns = []
     bandDefns.append(rsgislib.imagecalc.BandDefn('blue', image, bBand))
     bandDefns.append(rsgislib.imagecalc.BandDefn('nir', image, nBand))
-    rsgislib.imagecalc.bandMath(outImage, expression, gdalFormat, rsgislib.TYPE_32FLOAT, bandDefns)
+    rsgislib.imagecalc.bandMath(outImage, expression, gdalformat, rsgislib.TYPE_32FLOAT, bandDefns)
     # Set no data value
     rsgislib.RSGISPyUtils().setImageNoDataValue(outImage, -999)
     if stats:

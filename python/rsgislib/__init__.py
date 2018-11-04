@@ -891,7 +891,7 @@ class RSGISTime (object):
 
             t = RSGISTime()
             t.start()
-            rsgislib.segmentation.clump(kMeansFileZonesNoSgls, initClumpsFile, gdalFormat, False, 0) 
+            rsgislib.segmentation.clump(kMeansFileZonesNoSgls, initClumpsFile, gdalformat, False, 0) 
             t.end()
         
         Note, this is only designed to provide some general feedback, for benchmarking the timeit module

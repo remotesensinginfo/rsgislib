@@ -56,13 +56,13 @@ Create a list of these objects to provide the Coeffs for ElevLUTFeat and AOTLUTF
         
 
 
-def performDOSCalc(inputFile, outputFile, gdalFormat='KEA', nonNegative=True, noDataVal=0, darkObjReflVal=0, darkObjPercentile=0.01, copyBandNames=True, calcStatsPyd=True):
+def performDOSCalc(inputFile, outputFile, gdalformat='KEA', nonNegative=True, noDataVal=0, darkObjReflVal=0, darkObjPercentile=0.01, copyBandNames=True, calcStatsPyd=True):
     """
 A command to perform a dark object subtraction (DOS) on an input image.
 
 * inputFile - input image to which the DOS method is to be applied. Typically, this image with be in top of atmosphere reflectance (TOA)
 * outputFile - the output image file
-* gdalFormat - the output image file format (default = KEA)
+* gdalformat - the output image file format (default = KEA)
 * nonNegative - is a boolean specifying where negative output pixel values will be accepted (Dafualt is True; i.e., no negative values)
 * noDataVal - is the no data value within the input image file. 
 * darkObjReflVal - is an offset which is applied to all pixel values to make a minimum reflectance value (Default = 0)
@@ -91,7 +91,7 @@ Example::
     for val in percentList:
         offsetsList.append(OffVal(offset=val))
     
-    applySubtractSingleOffsets(inputFile, outputFile, gdalFormat, outDataType, nonNegative, True, noDataVal, darkObjReflVal, offsetsList)
+    applySubtractSingleOffsets(inputFile, outputFile, gdalformat, outDataType, nonNegative, True, noDataVal, darkObjReflVal, offsetsList)
     
     if copyBandNames:
         bandNames = rsgislib.imageutils.getBandNames(inputFile)
@@ -195,7 +195,7 @@ Example::
     
     rsgislib.imagemorphology.createCircularOp(outputFile=tmpMorphOperator, opSize=morphSize)
     
-    rsgislib.imagemorphology.imageOpening(inputImage=tmpClearSkyRegionsFullExtentSelectClumps, outputImage=tmpClearSkyRegionsFullExtentSelectClumpsOpen, tempImage="", morphOperator=tmpMorphOperator, useOpFile=True, opSize=21, gdalFormat='KEA', dataType=rsgislib.TYPE_32UINT)
+    rsgislib.imagemorphology.imageOpening(inputImage=tmpClearSkyRegionsFullExtentSelectClumps, outputImage=tmpClearSkyRegionsFullExtentSelectClumpsOpen, tempImage="", morphOperator=tmpMorphOperator, useOpFile=True, opSize=21, gdalformat='KEA', dataType=rsgislib.TYPE_32UINT)
     
     rsgislib.segmentation.clump(tmpClearSkyRegionsFullExtentSelectClumpsOpen, tmpClearSkyRegionsFullExtentSelectClumpsOpenClump, 'KEA', False, 0.0, False)
     
@@ -247,7 +247,7 @@ def getESUNValue(radiance, toaRefl, day, month, year, solarZenith):
 
 
 
-def createEstimateSREFSurface(inputTOAImg, imgBands, bandRescale, winSize, outImage, gdalFormat, dataType, tmpDIR):
+def createEstimateSREFSurface(inputTOAImg, imgBands, bandRescale, winSize, outImage, gdalformat, dataType, tmpDIR):
     """
     Estimate SREF surface from TOA input image using the method details in He, K., Sun, J., & Tang, X. (2011). 
     'Single image haze removal using dark channel prior'. IEEE Transactions on Pattern Analysis and Machine Intelligence.
@@ -373,7 +373,7 @@ def createEstimateSREFSurface(inputTOAImg, imgBands, bandRescale, winSize, outIm
         bandRescaleSREF.append(rsgislib.imagecalc.ImageBandRescale(outBand, bandRescale[band-1].outMin, bandRescale[band-1].outMax, bandRescale[band-1].outNoData, 5, (bandRescale[band-1].inMax-bandRescale[band-1].inMin), 0))
         outBand = outBand + 1
         
-    rsgislib.imagecalc.rescaleImgPxlVals(srefScaledImg, outImage, gdalFormat, dataType, bandRescaleSREF, trim2Limits=True)
+    rsgislib.imagecalc.rescaleImgPxlVals(srefScaledImg, outImage, gdalformat, dataType, bandRescaleSREF, trim2Limits=True)
     rsgislib.imageutils.popImageStats(outImage, usenodataval=True, nodataval=0, calcpyramids=True)
     
     if not tmpPresent:

@@ -49,7 +49,7 @@ except ImportError as dcErr:
 from osgeo import gdal
 
 
-def getSingleTimeDataProd(dataProd, prodMeasurements, startDate, endDate, minLat, maxLat, minLon, maxLon, outImgFile, gdalFormat='KEA', gdalDataType=gdal.GDT_Byte, gdalOptions=[]):
+def getSingleTimeDataProd(dataProd, prodMeasurements, startDate, endDate, minLat, maxLat, minLon, maxLon, outImgFile, gdalformat='KEA', gdalDataType=gdal.GDT_Byte, gdalOptions=[]):
     """
 A function to extract data from an instance of the open data cube (https://www.opendatacube.org) and save it to a GDAL supported file format.
 Note. this function only saves files where only a single data layer is returned for the time period specified. 
@@ -63,14 +63,14 @@ Note. this function only saves files where only a single data layer is returned 
 * minLon - minimum longditude for the query bounding box
 * maxLon - maximum longditude for the query bounding box
 * outImgFile - file path and name for the output image file.
-* gdalFormat - output file format (Default: 'KEA'). Must support GDAL create function.
+* gdalformat - output file format (Default: 'KEA'). Must support GDAL create function.
 * gdalDataType - output file datatype (Default: gdal.GDT_Byte)
 * gdalOptions - array of options for gdal file creation (e.g., for GeoTIFF ["TILED=YES", "COMPRESS=DEFLATE"]). Default: []
 
 Example::
 
 getSingleTimeDataProd('fc_percentile_albers_annual', ['PV_PC_10', 'NPV_PC_10'], '2015-01-01', '2015-12-31', -24.9, -24.8, 142.5, 142.6 , 
-                      'FC_Percent_PV_NPV_2015.kea', gdalFormat='KEA', gdalDataType=gdal.GDT_Byte, gdalOptions=[])
+                      'FC_Percent_PV_NPV_2015.kea', gdalformat='KEA', gdalDataType=gdal.GDT_Byte, gdalOptions=[])
 
 """
     
@@ -108,7 +108,7 @@ getSingleTimeDataProd('fc_percentile_albers_annual', ['PV_PC_10', 'NPV_PC_10'], 
     ycoord = affine[5]
     geotransform = (xcoord - (xres*0.5), xres, 0, ycoord + (yres*0.5), 0, yres)
         
-    targetImgDS = gdal.GetDriverByName(gdalFormat).Create(outImgFile, xt, yt, nBands, gdalDataType, options=gdalOptions)
+    targetImgDS = gdal.GetDriverByName(gdalformat).Create(outImgFile, xt, yt, nBands, gdalDataType, options=gdalOptions)
     targetImgDS.SetGeoTransform(geotransform)
     targetImgDS.SetProjection(crswkt)
     
