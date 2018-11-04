@@ -25,6 +25,7 @@ scikit-image library (http://scikit-image.org/docs/stable/api/skimage.segmentati
 * calcStats - calculate image pixel statistics, histogram and image pyramids - note if you are not using a KEA file then the format needs to support RATs for this option as histogram and colour table are written to RAT.
 * usePCA - if there are not 1 or 3 image bands in the input file then you can use PCA to reduce the number of image bands.
 * nPCABands - the number of principle components outputs from the PCA - needs to be either 1 or 3.
+
 """
     # Create output image
     rsgislib.imageutils.createCopyImage(inputImg, outputImg, 1, 0, gdalformat, rsgislib.TYPE_32UINT)

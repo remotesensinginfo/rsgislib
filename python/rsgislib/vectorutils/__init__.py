@@ -310,6 +310,7 @@ A function to extract an image footprint as a vector.
 * outVec - output shapefile path and name.
 * tmpDIR - temp directory which will be used during processing. It will be created and deleted once processing complete.
 * rePrjTo - optional command 
+
 """
     gdal.UseExceptions()
 
@@ -374,8 +375,7 @@ def getVecFeatCount(inVec, layerName=None, computeCount=True):
 Get a count of the number of features in the vector layers.
 
 * inVec - is a string with the input vector file name and path.
-* layerName - is the layer for which extent is to be calculated (Default: None)
-*             if None assume there is only one layer and that will be read.
+* layerName - is the layer for which extent is to be calculated (Default: None). if None assume there is only one layer and that will be read.
 * computeCount - is a boolean which specifies whether the layer extent 
                  should be calculated (rather than estimated from header)
                  even if that operation is computationally expensive.
@@ -401,6 +401,7 @@ Where:
 
 * inFileList - is a list of input files.
 * outVecFile - is the output shapefile
+
 """
     if os.path.exists(outVecFile):
         driver = ogr.GetDriverByName('ESRI Shapefile')
@@ -434,6 +435,7 @@ Where:
 * outDBFile - is the output SQLite database (*.sqlite)
 * lyrName - is the layer name in the output database (i.e., you can merge layers into single layer or write a number of layers to the same database).
 * exists - boolean which specifies whether the database file exists or not.
+
 """
     first = True
     for inFile in inFileList:
@@ -475,6 +477,7 @@ This function takes a CSV file of bounding boxes (1 per line) and creates a poly
 * maxYCol - The index (starting at 0) for the column within the CSV file for the maximum Y coordinate.
 * ignoreRows - The number of rows to ignore from the start of the CSV file (i.e., column headings)
 * force - If the output file already exists delete it before proceeding.
+
 """
     gdal.UseExceptions()
     try:
@@ -532,6 +535,8 @@ This function takes a CSV file of bounding boxes (1 per line) and creates a poly
 
 def getVecLayerExtent(inVec, layerName=None, computeIfExp=True):
     """
+Get the extent of the vector layer.
+
 * inVec - is a string with the input vector file name and path.
 * layerName - is the layer for which extent is to be calculated (Default: None)
 *             if None assume there is only one layer and that will be read.
