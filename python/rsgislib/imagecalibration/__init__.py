@@ -13,8 +13,10 @@ from ._imagecalibration import *
 class ElevLUTFeat(object):
     """
 Create a list of these objects to pass to the rsgislib.imagecalibration.apply6SCoeffElevLUTParam
+
 * Elev - is the elevation value.
 * Coeffs - is the 6S coeffients as a Band6S object. 
+
 """
     def __init__(self, Elev=None, Coeffs=None):
         """
@@ -28,8 +30,10 @@ Create a list of these objects to pass to the rsgislib.imagecalibration.apply6SC
 class AOTLUTFeat(object):
     """
 Create a list of these objects to pass to the rsgislib.imagecalibration.apply6SCoeffElevAOTLUTParam
+
 * AOT - is the AOT value.
 * Coeffs - is the 6S coeffients as a Band6S object. 
+
 """
     def __init__(self, AOT=None, Coeffs=None):
         """
@@ -41,7 +45,8 @@ Create a list of these objects to pass to the rsgislib.imagecalibration.apply6SC
         
 class Band6SCoeff(object):
     """
-Create a list of these objects to provide the Coeffs for ElevLUTFeat and AOTLUTFeat
+Create a list of these objects to provide the Coeffs for ElevLUTFeat and AOTLUTFeat.
+
 """
     def __init__(self, band=None, aX=None, bX=None, cX=None, DirIrr=None, DifIrr=None, EnvIrr=None):
         """
@@ -224,16 +229,16 @@ Example::
 
 def getESUNValue(radiance, toaRefl, day, month, year, solarZenith):
     """
-    Get the ESUN value where a radiance and TOA Reflectance value are known
-    for a pixel.
-    :param radiance:
-    :param toaRefl:
-    :param day:
-    :param month:
-    :param year:
-    :param solarZenith:
-    :return:
-    """
+Get the ESUN value where a radiance and TOA Reflectance value are known for a pixel.
+
+* radiance:
+* toaRefl:
+* day:
+* month:
+* year:
+* solarZenith:
+
+"""
     import rsgislib.imagecalibration
     julianDay = rsgislib.imagecalibration.getJulianDay(year, month, day)
     solarDist = rsgislib.imagecalibration.calcSolarDistance(julianDay)
