@@ -398,9 +398,8 @@ static PyMethodDef ElevationMethods[] = {
     
 {"planeFitDetreatDEM", Elevation_planeFitDetreadDEM, METH_VARARGS,
 "rsgislib.elevation.planeFitDetreatDEM(inputDEMImage, outputImage, gdalformat, winSize)\n"
-"Filter the local minima in a DEM using the Soille and Gratin 1994 algorithm.\n\n"
-"Soille, P., and Gratin, C. (1994). An efficient algorithm for drainage network\n"
-"extraction on DEMs. J. Visual Communication and Image Representation. 5(2). 181-189.\n"
+"An algorithm to detread a DEM using local plane fitting. The winSize will define the scale\n"
+"at which the DEM will be detreaded.\n"
 "\n"
 "Where:\n"
 "\n"
