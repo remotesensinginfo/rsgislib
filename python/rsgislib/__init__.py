@@ -90,6 +90,10 @@ import os
 import time
 import datetime
 
+import osgeo.osr as osr
+import osgeo.ogr as ogr
+import osgeo.gdal as gdal
+
 TYPE_UNDEFINED = 0
 TYPE_8INT = 1
 TYPE_16INT = 2
@@ -238,7 +242,6 @@ class RSGISPyUtils (object):
         Returns the rsgislib datatype ENUM (e.g., rsgislib.TYPE_8INT) 
         for the inputted raster file
         """
-        import osgeo.gdal as gdal
         raster = gdal.Open(inImg, gdal.GA_ReadOnly)
         if raster == None:
             raise RSGISPyException('Could not open raster image: \'' + inImg+ '\'')
@@ -253,7 +256,6 @@ class RSGISPyUtils (object):
         """
         Returns the GDAL datatype ENUM (e.g., GDT_Float32) for the inputted raster file
         """
-        import osgeo.gdal as gdal
         raster = gdal.Open(inImg, gdal.GA_ReadOnly)
         if raster == None:
             raise RSGISPyException('Could not open raster image: \'' + inImg+ '\'')
@@ -268,7 +270,6 @@ class RSGISPyUtils (object):
         """
         Returns the GDAL datatype ENUM (e.g., GDT_Float32) for the inputted raster file
         """
-        import osgeo.gdal as gdal
         raster = gdal.Open(inImg, gdal.GA_ReadOnly)
         if raster == None:
             raise RSGISPyException('Could not open raster image: \'' + inImg+ '\'')
@@ -309,7 +310,6 @@ class RSGISPyUtils (object):
         """
         Rename all the files associated with a GDAL layer.
         """
-        import osgeo.gdal as gdal
         layerDS = gdal.Open(cFileName, gdal.GA_ReadOnly)
         gdalDriver = layerDS.GetDriver()
         layerDS = None
@@ -348,7 +348,6 @@ class RSGISPyUtils (object):
         A function to retrieve the image resolution.
         return xRes, yRes
         """
-        import osgeo.gdal as gdal
         rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
         if rasterDS == None:
             raise RSGISPyException('Could not open raster image: \'' + inImg+ '\'')
@@ -376,7 +375,6 @@ class RSGISPyUtils (object):
         A function to retrieve the image size in pixels.
         return xSize, ySize
         """
-        import osgeo.gdal as gdal
         rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
         if rasterDS == None:
             raise RSGISPyException('Could not open raster image: \'' + inImg+ '\'')
@@ -392,7 +390,6 @@ class RSGISPyUtils (object):
         coordinates of the image.
         return (MinX, MaxX, MinY, MaxY)
         """
-        import osgeo.gdal as gdal
         rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
         if rasterDS == None:
             raise RSGISPyException('Could not open raster image: \'' + inImg+ '\'')
@@ -554,9 +551,6 @@ class RSGISPyUtils (object):
         
         Returns x, y. (note if returning long, lat you might need to invert)
         """
-        import osgeo.gdal as gdal
-        import osgeo.ogr as ogr
-        import osgeo.osr as osr
         wktPt = 'POINT(%s %s)' % (x, y)
         point = ogr.CreateGeometryFromWkt(wktPt)
         point.AssignSpatialReference(inProjOSRObj)
@@ -570,7 +564,6 @@ class RSGISPyUtils (object):
         A function to retrieve the number of image bands in an image file.
         return nBands
         """
-        import osgeo.gdal as gdal
         rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
         if rasterDS == None:
             raise RSGISPyException('Could not open raster image: \'' + inImg+ '\'')
@@ -584,7 +577,6 @@ class RSGISPyUtils (object):
         A function to retrieve the no data value for the image 
         (from band; default 1).
         """
-        import osgeo.gdal as gdal
         rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
         if rasterDS == None:
             raise RSGISPyException('Could not open raster image: \'' + inImg+ '\'')
@@ -598,7 +590,6 @@ class RSGISPyUtils (object):
         A function to set the no data value for an image.
         If band is not specified sets value for all bands.
         """
-        import osgeo.gdal as gdal
         rasterDS = gdal.Open(inImg, gdal.GA_Update)
         if rasterDS is None:
             raise RSGISPyException('Could not open raster image: \'' + inImg + '\'')
@@ -615,13 +606,27 @@ class RSGISPyUtils (object):
         """
         A function to get the colour interpretation for a specific band.
         return is a GDALColorInterp value:
-        GCI_Undefined=0, GCI_GrayIndex=1, GCI_PaletteIndex=2, GCI_RedBand=3, 
-        GCI_GreenBand=4, GCI_BlueBand=5, GCI_AlphaBand=6, GCI_HueBand=7, 
-        GCI_SaturationBand=8, GCI_LightnessBand=9, GCI_CyanBand=10, GCI_MagentaBand=11, 
-        GCI_YellowBand=12, GCI_BlackBand=13, GCI_YCbCr_YBand=14, GCI_YCbCr_CbBand=15, 
-        GCI_YCbCr_CrBand=16, GCI_Max=16  
+        
+        * GCI_Undefined=0, 
+        * GCI_GrayIndex=1, 
+        * GCI_PaletteIndex=2, 
+        * GCI_RedBand=3, 
+        * GCI_GreenBand=4, 
+        * GCI_BlueBand=5, 
+        * GCI_AlphaBand=6, 
+        * GCI_HueBand=7, 
+        * GCI_SaturationBand=8, 
+        * GCI_LightnessBand=9, 
+        * GCI_CyanBand=10, 
+        * GCI_MagentaBand=11, 
+        * GCI_YellowBand=12, 
+        * GCI_BlackBand=13, 
+        * GCI_YCbCr_YBand=14, 
+        * GCI_YCbCr_CbBand=15, 
+        * GCI_YCbCr_CrBand=16, 
+        * GCI_Max=16 
+         
         """
-        import osgeo.gdal as gdal
         rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
         if rasterDS is None:
             raise RSGISPyException('Could not open raster image: \'' + inImg + '\'')
@@ -633,13 +638,27 @@ class RSGISPyUtils (object):
         """
         A function to set the colour interpretation for a specific band.
         input is a GDALColorInterp value:
-        GCI_Undefined=0, GCI_GrayIndex=1, GCI_PaletteIndex=2, GCI_RedBand=3, 
-        GCI_GreenBand=4, GCI_BlueBand=5, GCI_AlphaBand=6, GCI_HueBand=7, 
-        GCI_SaturationBand=8, GCI_LightnessBand=9, GCI_CyanBand=10, GCI_MagentaBand=11, 
-        GCI_YellowBand=12, GCI_BlackBand=13, GCI_YCbCr_YBand=14, GCI_YCbCr_CbBand=15, 
-        GCI_YCbCr_CrBand=16, GCI_Max=16  
+        
+        * GCI_Undefined=0, 
+        * GCI_GrayIndex=1, 
+        * GCI_PaletteIndex=2, 
+        * GCI_RedBand=3, 
+        * GCI_GreenBand=4, 
+        * GCI_BlueBand=5, 
+        * GCI_AlphaBand=6, 
+        * GCI_HueBand=7, 
+        * GCI_SaturationBand=8, 
+        * GCI_LightnessBand=9, 
+        * GCI_CyanBand=10, 
+        * GCI_MagentaBand=11, 
+        * GCI_YellowBand=12, 
+        * GCI_BlackBand=13, 
+        * GCI_YCbCr_YBand=14, 
+        * GCI_YCbCr_CbBand=15, 
+        * GCI_YCbCr_CrBand=16, 
+        * GCI_Max=16 
+         
         """
-        import osgeo.gdal as gdal
         rasterDS = gdal.Open(inImg, gdal.GA_Update)
         if rasterDS is None:
             raise RSGISPyException('Could not open raster image: \'' + inImg + '\'')
@@ -651,7 +670,6 @@ class RSGISPyUtils (object):
         A function which returns the WKT string representing the projection 
         of the input image.
         """
-        import osgeo.gdal as gdal
         rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
         if rasterDS == None:
             raise RSGISPyException('Could not open raster image: \'' + inImg+ '\'')
@@ -664,7 +682,6 @@ class RSGISPyUtils (object):
         A function which returns a list of the files associated (e.g., header etc.) 
         with the input image file.
         """
-        import osgeo.gdal as gdal
         imgDS = gdal.Open(inImg)
         fileList = imgDS.GetFileList()
         imgDS = None
@@ -675,8 +692,6 @@ class RSGISPyUtils (object):
         A function which returns a string with the UTM (XXN | XXS) zone of the input image 
         but only if it is projected within the UTM projection/coordinate system.
         """
-        from osgeo import osr
-        import osgeo.gdal as gdal
         rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
         if rasterDS == None:
             raise RSGISPyException('Could not open raster image: \'' + inImg+ '\'')
@@ -706,8 +721,6 @@ class RSGISPyUtils (object):
         """
         Using GDAL to return the EPSG code for the input layer.
         """
-        from osgeo import osr
-        import osgeo.gdal as gdal
         epsgCode = None
         try:
             layerDS = gdal.Open(gdalLayer, gdal.GA_ReadOnly)

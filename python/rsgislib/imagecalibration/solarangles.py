@@ -57,19 +57,20 @@ import datetime
 
 def getSolarIrrConventionSolarAzimuthFromUSGS(solarAz):
     """
-IN: USGS Convertion:
-          N (0)
-          |
- W (-90)-----E (90) 
-          |
-   (-180) S (180)
+IN: USGS Convertion::
 
-OUT: Solar Irradiance Convertion:
-          N (0)
-          |
- W (270)-----E (90) 
-          |
-          S (180)
+              N (0)
+              |
+     W (-90)-----E (90) 
+              |
+       (-180) S (180)
+
+OUT: Solar Irradiance Convertion::
+              N (0)
+              |
+     W (270)-----E (90) 
+              |
+              S (180)
 
 """
     solarAzOut = solarAz
@@ -80,19 +81,21 @@ OUT: Solar Irradiance Convertion:
     
 def getSolarIrrConventionSolarAzimuthFromTrad(solarAz):
     """
-IN: Traditional Convertion:
-   (-180) N (180)
-          |
- W (-90)-----E (90) 
-          |
-          S (0)
+IN: Traditional Convertion::
 
-OUT: Solar Irradiance Convertion:
-          N (0)
-          |
- W (270)-----E (90) 
-          |
-          S (180)    
+       (-180) N (180)
+              |
+     W (-90)-----E (90) 
+              |
+              S (0)
+
+OUT: Solar Irradiance Convertion::
+
+              N (0)
+              |
+     W (270)-----E (90) 
+              |
+              S (180)    
 
 """
     solarAzOut = 0.0
@@ -102,39 +105,6 @@ OUT: Solar Irradiance Convertion:
         solarAzOut = 180 + ((-1) * solarAz)
     return solarAzOut
     
-
-def _calcSolarAzimuthZenith(info, inputs, outputs, otherargs):
-    """
-Internal functions used within calcSolarAzimuthZenith() - don't call independently.
-
-"""
-    xBlock, yBlock = info.getBlockCoordArrays()
-
-    inProj = osr.SpatialReference()
-    inProj.ImportFromWkt(info.getProjection())
-
-    transform = osr.CoordinateTransformation(inProj, otherargs.wgs84latlonProj)
-    xBlockF = xBlock.flatten()
-    yBlockF = yBlock.flatten()
-    
-    pts = numpy.zeros((xBlockF.shape[0],2), dtype=numpy.float)
-    pts[...,0] = xBlockF
-    pts[...,1] = yBlockF
-    outPts = numpy.array(transform.TransformPoints(pts))
-
-    outAz = numpy.zeros_like(xBlockF, dtype=numpy.float)
-    outZen = numpy.zeros_like(xBlockF, dtype=numpy.float)
-
-    for i in range(outPts.shape[0]):
-        outAz[i] = 90-Pysolar.solar.GetAltitude(outPts[i,1], outPts[i,0], otherargs.dateTime)
-        outZen[i] = ((-1)*Pysolar.solar.GetAzimuth(outPts[i,1], outPts[i,0], otherargs.dateTime))-180
-
-    outAz = numpy.reshape(outAz, xBlock.shape)
-    outZen = numpy.reshape(outZen, xBlock.shape)
-
-    #print("Block End")
-    outputs.outimage = numpy.stack((outAz,outZen))
-
 
 def calcSolarAzimuthZenith(inputImg, inImgDateTime, outputImg, gdalformat):
     """
@@ -161,6 +131,38 @@ Function which calculate a solar azimuth (band 1) and zenith (band 2) image.
     wgs84latlonProj = osr.SpatialReference()
     wgs84latlonProj.ImportFromEPSG(4326)
     otherargs.wgs84latlonProj = wgs84latlonProj
+    
+    def _calcSolarAzimuthZenith(info, inputs, outputs, otherargs):
+        """
+        Internal functions used within calcSolarAzimuthZenith() - don't call independently.
+        
+        """
+        xBlock, yBlock = info.getBlockCoordArrays()
+    
+        inProj = osr.SpatialReference()
+        inProj.ImportFromWkt(info.getProjection())
+    
+        transform = osr.CoordinateTransformation(inProj, otherargs.wgs84latlonProj)
+        xBlockF = xBlock.flatten()
+        yBlockF = yBlock.flatten()
+        
+        pts = numpy.zeros((xBlockF.shape[0],2), dtype=numpy.float)
+        pts[...,0] = xBlockF
+        pts[...,1] = yBlockF
+        outPts = numpy.array(transform.TransformPoints(pts))
+    
+        outAz = numpy.zeros_like(xBlockF, dtype=numpy.float)
+        outZen = numpy.zeros_like(xBlockF, dtype=numpy.float)
+    
+        for i in range(outPts.shape[0]):
+            outAz[i] = 90-Pysolar.solar.GetAltitude(outPts[i,1], outPts[i,0], otherargs.dateTime)
+            outZen[i] = ((-1)*Pysolar.solar.GetAzimuth(outPts[i,1], outPts[i,0], otherargs.dateTime))-180
+    
+        outAz = numpy.reshape(outAz, xBlock.shape)
+        outZen = numpy.reshape(outZen, xBlock.shape)
+    
+        #print("Block End")
+        outputs.outimage = numpy.stack((outAz,outZen))
 
     # Apply the multiply function.
     applier.apply(_calcSolarAzimuthZenith, infiles, outfiles, otherargs, controls=aControls)

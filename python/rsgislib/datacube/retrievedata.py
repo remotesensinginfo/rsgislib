@@ -69,8 +69,8 @@ Note. this function only saves files where only a single data layer is returned 
 
 Example::
 
-getSingleTimeDataProd('fc_percentile_albers_annual', ['PV_PC_10', 'NPV_PC_10'], '2015-01-01', '2015-12-31', -24.9, -24.8, 142.5, 142.6 , 
-                      'FC_Percent_PV_NPV_2015.kea', gdalformat='KEA', gdalDataType=gdal.GDT_Byte, gdalOptions=[])
+    getSingleTimeDataProd('fc_percentile_albers_annual', ['PV_PC_10', 'NPV_PC_10'], '2015-01-01', '2015-12-31', -24.9, -24.8, 142.5, 142.6, 
+                          'FC_Percent_PV_NPV_2015.kea', gdalformat='KEA', gdalDataType=gdal.GDT_Byte, gdalOptions=[])
 
 """
     

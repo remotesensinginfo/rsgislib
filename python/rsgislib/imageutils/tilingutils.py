@@ -224,6 +224,7 @@ Where:
 * tilesNameBase is the base file name for the tile masks
 * tilesMaskDIR is the directory where the output images will be outputted
 * imgFormat is the output image file format of the tile masks
+
 """
     outBaseImg = os.path.join(tilesMaskDIR, tilesNameBase)
     rsgisUtils = rsgislib.RSGISPyUtils()
@@ -238,8 +239,9 @@ A function to apply the image tile masks defined in createTileMaskImages to the 
 Where:
 
 * inputImage is the input image being tiled.
-* tileMasksBase is the base path for the tile masks. glob will be used to find them with '*.kea' added to the end.
+* tileMasksBase is the base path for the tile masks. glob will be used to find them with \*.kea added to the end.
 * outTilesBase is the base file name for the tiles.
+
 """
     maskFiles = glob.glob(os.path.join(tilesMetaDIR, tilesBase+"*.kea"))
 
