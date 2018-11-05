@@ -2353,14 +2353,15 @@ static PyMethodDef ImageCalcMethods[] = {
 "\n"
 "Example::\n"
 "\n"
-"import rsgislib.imageutils\n"
-"rsgislib.imagecalc\n"
-"inputImg = 'Input.kea'\n"
-"eigenVecFile = 'EigenVec.mtxt'\n"
-"outputImg = './Output.kea'\n"
-"eigenVec, varExplain = rsgislib.imagecalc.getPCAEigenVector(inputImg, 1000, None, eigenVecFile)\n"
-"rsgislib.imagecalc.pca(inputImg, eigenVecFile, outputImg, varExplain.shape[0], 'KEA', rsgislib.TYPE_32FLOAT)\n"
-"rsgislib.imageutils.popImageStats(outputImg, usenodataval, nodataval, True)\n"
+"   import rsgislib.imageutils\n"
+"   import rsgislib.imagecalc\n"
+"   inputImg = 'Input.kea'\n"
+"   eigenVecFile = 'EigenVec.mtxt'\n"
+"   outputImg = './Output.kea'\n"
+"   eigenVec, varExplain = rsgislib.imagecalc.getPCAEigenVector(inputImg, 1000, None, eigenVecFile)\n"
+"   rsgislib.imagecalc.pca(inputImg, eigenVecFile, outputImg, varExplain.shape[0], 'KEA', rsgislib.TYPE_32FLOAT)\n"
+"   rsgislib.imageutils.popImageStats(outputImg, usenodataval, nodataval, True)\n"
+"\n"
 "\n"
 },
 
@@ -2513,6 +2514,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "    endmembersFile = \"./endmembers.mtxt\"\n"
 "    rsgislib.imagecalc.unconLinearSpecUnmix(imageLSImage, \"KEA\", rsgislib.TYPE_32FLOAT, unmixedImage, endmembersFile, lsumGain, lsumOffset)\n"
 "\n"
+"\n"
 },
 
 {"exhconLinearSpecUnmix", ImageCalc_ExhconLinearSpecUnmix, METH_VARARGS,
@@ -2552,6 +2554,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "    stepResolution = 0.1\n"
 "    rsgislib.imagecalc.exhconLinearSpecUnmix(imageLSImage, \"KEA\", rsgislib.TYPE_32FLOAT, unmixedImage, endmembersFile, stepResolution, lsumGain, lsumOffset)\n"
 "\n"
+"\n"
 },
 
 {"conSum1LinearSpecUnmix", ImageCalc_ConSum1LinearSpecUnmix, METH_VARARGS,
@@ -2590,6 +2593,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "\n"
 "    endmembersFile = \"./endmembers.mtxt\"\n"
 "    rsgislib.imagecalc.conSum1LinearSpecUnmix(imageLSImage, \"KEA\", rsgislib.TYPE_32FLOAT, lsumWeight, unmixedImage, endmembersFile, lsumGain, lsumOffset)\n"
+"\n"
 "\n"
 },
 
@@ -2957,7 +2961,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "* outputImage is a string with the name and path of the output image. No data value is 0 and indexes start at 1.\n"
 "* gdalformat is a string with the GDAL output file format.\n"
 "* nodata is the no data value in the input images (all images have the same no data value)."
-"* stat is of type rsgislib.SUMTYPE* and specifies how the index is calculated. Available options are: rsgislib.SUMTYPE_MEDIAN, rsgislib.SUMTYPE_MIN, rsgislib.SUMTYPE_MAX."
+"* stat is of type rsgislib.SUMTYPE_\\* and specifies how the index is calculated. Available options are: rsgislib.SUMTYPE_MEDIAN, rsgislib.SUMTYPE_MIN, rsgislib.SUMTYPE_MAX."
 "\n"
 "Example::\n"
 "\n"
@@ -2998,7 +3002,8 @@ static PyMethodDef ImageCalcMethods[] = {
 "    # Calc Stats\n"
 "    rsgislib.imageutils.popImageStats(outCompImg, usenodataval=True, nodataval=0, calcpyramids=True)\n"
 "\n"
-"\n"},
+"\n"
+},
     
 {"getImgSumStatsInPxl", (PyCFunction)ImageCalc_GetImgSumStatsInPxl, METH_VARARGS | METH_KEYWORDS,
 "rsgislib.imagecalc.getImgSumStatsInPxl(refimage=string, statsimage=string, outimage=string, gdalformat=string, datatype=int, sumstats=list, statsimageband=int, usenodata=bool, iogridx=int, iogridy=int)\n"

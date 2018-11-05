@@ -432,7 +432,7 @@ Function which will merge a list of vector files into an single output SQLite da
 Where:
 
 * inFileList - is a list of input files.
-* outDBFile - is the output SQLite database (*.sqlite)
+* outDBFile - is the output SQLite database (\*.sqlite)
 * lyrName - is the layer name in the output database (i.e., you can merge layers into single layer or write a number of layers to the same database).
 * exists - boolean which specifies whether the database file exists or not.
 
@@ -840,10 +840,10 @@ Create a vector layer look up table (LUT) for a directory of images.
 
 Example::
 
-import glob
-import rsgislib.vectorutils
-imgList = glob.glob('/Users/pete/Temp/GabonLandsat/Hansen*.kea')
-rsgislib.vectorutils.createImgExtentLUT(imgList, './ImgExtents.shp', 'ImgExtents', 'ESRI Shapefile')
+    import glob
+    import rsgislib.vectorutils
+    imgList = glob.glob('/Users/pete/Temp/GabonLandsat/Hansen*.kea')
+    rsgislib.vectorutils.createImgExtentLUT(imgList, './ImgExtents.shp', 'ImgExtents', 'ESRI Shapefile')
 
 """
     gdal.UseExceptions()

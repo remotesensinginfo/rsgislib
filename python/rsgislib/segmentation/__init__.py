@@ -26,20 +26,21 @@ Daniel Clewley, Peter Bunting, James Shepherd, Sam Gillingham, Neil Flood, John 
 
 # import the C++ extension into this level
 from ._segmentation import *
-import warnings
-
-def UnionOfClumps(outputimage, gdalformat, inputimagepaths, nodata):
-    """
-    Deprecated: is now 'unionOfClumps' (note starts with lower case 'u')
-    """
-    warnings.warn("'UnionOfClumps' has been renamed to 'unionOfClumps' (starts with lower case 'u'), please update your code.", Warning, stacklevel=2)
-    unionOfClumps(outputimage, gdalformat, inputimagepaths, nodata, False)
-
-
-def RMSmallClumpsStepwise(inputimage, clumpsimage, outputimage, gdalformat, stretchstatsavail, stretchstatsfile, storemean, processinmemory, minclumpsize, specThreshold):
-    """
-    Deprecated: is now 'rmSmallClumpsStepwise' (note starts with lower case 'rm')
-    """
-    warnings.warn("'RMSmallClumpsStepwise' has been renamed to 'rmSmallClumpsStepwise' (starts with lower case 'rm'), please update your code.", Warning, stacklevel=2)
-    rmSmallClumpsStepwise(inputimage, clumpsimage, outputimage, gdalformat, stretchstatsavail, stretchstatsfile, storemean, processinmemory, minclumpsize, specThreshold)
-    
+#import warnings
+#
+#
+#def UnionOfClumps(outputimage, gdalformat, inputimagepaths, nodata):
+#    """
+#    Deprecated: is now 'unionOfClumps' (note starts with lower case 'u')
+#    """
+#    warnings.warn("'UnionOfClumps' has been renamed to 'unionOfClumps' (starts with lower case 'u'), please update your code.", Warning, stacklevel=2)
+#    unionOfClumps(outputimage, gdalformat, inputimagepaths, nodata, False)
+#
+#
+#def RMSmallClumpsStepwise(inputimage, clumpsimage, outputimage, gdalformat, stretchstatsavail, stretchstatsfile, storemean, processinmemory, minclumpsize, specThreshold):
+#    """
+#    Deprecated: is now 'rmSmallClumpsStepwise' (note starts with lower case 'rm')
+#    """
+#    warnings.warn("'RMSmallClumpsStepwise' has been renamed to 'rmSmallClumpsStepwise' (starts with lower case 'rm'), please update your code.", Warning, stacklevel=2)
+#    rmSmallClumpsStepwise(inputimage, clumpsimage, outputimage, gdalformat, stretchstatsavail, stretchstatsfile, storemean, processinmemory, minclumpsize, specThreshold)
+#    

@@ -734,7 +734,9 @@ static PyMethodDef SegmentationMethods[] = {
 "* inputimagepaths is a list of input image paths\n"
 "* nodata is None or float\n"
 "* addPxlVals2Rat is a boolean specifying whether the pixel values (from inputimagepaths) should be added as a RAT; column names have prefix 'ClumpVal_' with index starting at 1 for each variable.\n"
-"\n"},
+"\n"
+"\n"
+},
 
     {"mergeSegmentationTiles", Segmentation_mergeSegmentationTiles, METH_VARARGS,
 "segmentation.mergeSegmentationTiles(outputimage, bordermaskimage, tileboundary, tileoverlap, tilebody, colsname, inputimagepaths)\n"

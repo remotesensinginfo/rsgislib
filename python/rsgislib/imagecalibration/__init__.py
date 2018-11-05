@@ -231,12 +231,16 @@ def getESUNValue(radiance, toaRefl, day, month, year, solarZenith):
     """
 Get the ESUN value where a radiance and TOA Reflectance value are known for a pixel.
 
-* radiance:
-* toaRefl:
-* day:
-* month:
-* year:
-* solarZenith:
+* radiance: input at sensor radiance value.
+* toaRefl: input the known at sensor (top of atmosphere) reflectance value for the given radiance.
+* day: input the day of the acquisition.
+* month: input the month of the acquisition.
+* year: input the year of the acquisition.
+* solarZenith: input the solar zenith angle for the acquisition.
+
+return:
+
+esun radiance
 
 """
     import rsgislib.imagecalibration
@@ -259,7 +263,7 @@ def createEstimateSREFSurface(inputTOAImg, imgBands, bandRescale, winSize, outIm
     'Single image haze removal using dark channel prior'. IEEE Transactions on Pattern Analysis and Machine Intelligence.
     Method details were also identified with reference to https://www.kaggle.com/ivanl1/haze-removal-using-dark-channel-prior
     
-    **** WARNING DO NOT USE - THIS FUNCTION IS STILL A WORK IN PROGRESS ****
+    **WARNING DO NOT USE - THIS FUNCTION IS STILL A WORK IN PROGRESS**
     
     """
     raise Exception("This function is not yet ready - needs more thought as how to get a fully working implementation.")

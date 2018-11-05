@@ -696,9 +696,10 @@ regions have been sourced from multiple images.
 
 Example::
 
-inTrainSamples = ['MSS_CloudTrain1.h5', 'MSS_CloudTrain2.h5', 'MSS_CloudTrain3.h5']
-cloudTrainSamples = 'LandsatMSS_CloudTrainingSamples.h5'
-rsgislib.imageutils.mergeExtractedHDF5Data(inTrainSamples, cloudTrainSamples)
+    inTrainSamples = ['MSS_CloudTrain1.h5', 'MSS_CloudTrain2.h5', 'MSS_CloudTrain3.h5']
+    cloudTrainSamples = 'LandsatMSS_CloudTrainingSamples.h5'
+    rsgislib.imageutils.mergeExtractedHDF5Data(inTrainSamples, cloudTrainSamples)
+
 """
     import h5py
     
@@ -750,12 +751,13 @@ Boolean specifying whether they overlap or not.
 
 Example::
 
-import rsgislib.imageutils
-img = "/Users/pete/Temp/LandsatStatsImgs/MSS/ClearSkyMsks/LS1MSS_19720823_lat52lon114_r24p218_osgb_clearsky.tif"
-tile = "/Users/pete/Temp/LandsatStatsImgs/MSS/RefImages/LandsatWalesRegion_60m_tile8.kea"
+    import rsgislib.imageutils
+    img = "/Users/pete/Temp/LandsatStatsImgs/MSS/ClearSkyMsks/LS1MSS_19720823_lat52lon114_r24p218_osgb_clearsky.tif"
+    tile = "/Users/pete/Temp/LandsatStatsImgs/MSS/RefImages/LandsatWalesRegion_60m_tile8.kea"
+    
+    overlap = rsgislib.imageutils.doImagesOverlap(tile, img)
+    print("Images Overlap: " + str(overlap))
 
-overlap = rsgislib.imageutils.doImagesOverlap(tile, img)
-print("Images Overlap: " + str(overlap))
 """
     overlap = True
     

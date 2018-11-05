@@ -361,7 +361,7 @@ Where::
 * noData - provide a no data value which is to be ignored during processing. If None then ignored (Default: None)
 * outMatrixFile - path and name for the output rsgislib matrix file. If None file is not created (Default: None)
 
-returns::
+returns:
 
 * array with the eigenvector
 * array with the ratio of the explained variance
@@ -406,7 +406,7 @@ def performImagePCA(inputImg, outputImg, eigenVecFile, nComponents=None, pxlNSam
     """
 A function which performs a PCA on the input image.
 
-Where::
+Where:
 
 * inputImg - the image from which the random sample will be taken.
 * outputImg - the output image transformed using the calculated PCA
