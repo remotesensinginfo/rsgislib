@@ -354,7 +354,7 @@ def getPCAEigenVector(inputImg, pxlNSample, noData=None, outMatrixFile=None):
 A function which takes a sample from an input image and uses it to 
 generate eigenvector for a PCA. Note. this can be used as input to rsgislib.imagecalc.pca
 
-Where::
+Where:
 
 * inputImg - the image from which the random sample will be taken.
 * pxlNSample - the sample to be taken (e.g., a value of 100 will sample every 100th pixel)

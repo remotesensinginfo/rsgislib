@@ -66,6 +66,7 @@ IN: USGS Convertion::
        (-180) S (180)
 
 OUT: Solar Irradiance Convertion::
+
               N (0)
               |
      W (270)-----E (90) 

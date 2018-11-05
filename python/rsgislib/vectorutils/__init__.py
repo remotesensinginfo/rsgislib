@@ -380,7 +380,7 @@ Get a count of the number of features in the vector layers.
                  should be calculated (rather than estimated from header)
                  even if that operation is computationally expensive.
 
-return:: nfeats
+return: nfeats
 
 """
     gdal.UseExceptions()
@@ -544,7 +544,7 @@ Get the extent of the vector layer.
                  should be calculated (rather than estimated from header)
                  even if that operation is computationally expensive.
 
-return:: boundary box is returned (MinX, MaxX, MinY, MaxY)
+return: boundary box is returned (MinX, MaxX, MinY, MaxY)
 
 """
     gdal.UseExceptions()
@@ -561,7 +561,7 @@ def getProjWKTFromVec(inVec):
     """
 * inVec - is a string with the input vector file name and path.
 
-return:: WKT representation of projection
+return: WKT representation of projection
 
 """
     gdal.UseExceptions()

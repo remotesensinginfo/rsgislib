@@ -27,9 +27,11 @@ except ImportError as riosErr:
 class ImageBandInfo(object):
     """
 Create a list of these objects to pass to the extractZoneImageBandValues2HDF function
+
 * fileName - is the input image file name and path.
 * name - is a name associated with this layer - doesn't really matter what you use but needs to be unique; this is used as a dict key in some functions. 
 * bands - is a list of image bands within the fileName to be used for processing (band numbers start at 1).
+
 """
     def __init__(self, fileName=None, name=None, bands=None):
         """
@@ -51,6 +53,7 @@ Create a list of these objects to pass to the sharpenLowResBands function.
            lowres bands will be sharpened using the highres bands and ignored bands 
            will just be copied into the output image.
 * name - is a name associated with this image band - doesn't really matter what you put in here. 
+
 """
     def __init__(self, band=None, status=None, name=None):
         """
@@ -66,11 +69,13 @@ Create a list of these objects to pass to the sharpenLowResBands function.
 class RSGISTimeseriesFillInfo(object):
     """
 Create a list of these objects to pass to the fillTimeSeriesGaps function
+
 * year - year the composite represents.
 * day - the (nominal) day within the year the composite represents (a value of zero and day will not be used)
 * compImg - The input compsite image which has been generated.
 * imgRef -  The reference layer (e.g., from createMaxNDVIComposite or createMaxNDVINDWICompositeLandsat) with zero for no data regions
 * outRef - A boolean variable specify which layer a fill reference layer is to be produced.
+
 """
     def __init__(self, year=1900, day=0, compImg=None, imgRef=None, outRef=False):
         """
@@ -158,9 +163,10 @@ Example::
 def getRSGISLibDataType(inImg):
     """
 Returns the rsgislib datatype ENUM for a raster file
+
 * inImg -- The file to get the datatype for
 
-return::
+return:
     The rsgislib datatype enum, e.g., rsgislib.TYPE_8INT
 
 """
@@ -180,9 +186,9 @@ Returns the rsgislib datatype ENUM for a raster file
 
 *  inImg -- The file to get the datatype for
 
-return::
-
+return:
     The rsgislib datatype enum, e.g., rsgislib.TYPE_8INT
+
 """
     raster = gdal.Open(inImg, gdal.GA_ReadOnly)
     if raster == None:
@@ -266,10 +272,11 @@ A function which returns the WKT string representing the projection of the input
     rasterDS = None
     return projStr
 
-def createBlankImgFromRefVector(inVecFile, inVecLyr, outputImg, outImgRes, outImgNBands, gdalformat, gdaltype):
+def createBlankImgFromRefVector(inVecFile, inVecLyr, outputImg, outImgRes, outImgNBands, gdalformat, datatype):
     """
 A function to create a new image file based on a vector layer to define the extent and projection
 of the output image. 
+
 * inVecFile - input vector file.
 * inVecLyr - name of the vector layer, if None then assume the layer name will be the same as the file
              name of the input vector file.
@@ -277,7 +284,8 @@ of the output image.
 * outImgRes - output image resolution, square pixels so a single value.
 * outImgNBands - the number of image bands in the output image 
 * gdalformat - output image file format.
-* gdaltype - output image data type.
+* datatype - output image data type.
+
 """
 
     rsgisUtils = rsgislib.RSGISPyUtils()
@@ -296,7 +304,7 @@ of the output image.
     
     wktString = rsgisUtils.getProjWKTFromVec(inVecFile)
 
-    rsgislib.imageutils.createBlankImage(outputImg, outImgNBands, width, height, tlX, tlY, outImgRes, 0.0, '', wktString, gdalformat, gdaltype)
+    rsgislib.imageutils.createBlankImage(outputImg, outImgNBands, width, height, tlX, tlY, outImgRes, 0.0, '', wktString, gdalformat, datatype)
 
 def resampleImage2Match(inRefImg, inProcessImg, outImg, gdalformat, interpMethod, datatype=None, noDataVal=None, multicore=False):
     """

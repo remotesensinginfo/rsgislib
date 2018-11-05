@@ -2432,7 +2432,7 @@ static PyMethodDef ImageUtilsMethods[] = {
 "\n"
 },
 
-    {"selectImageBands", ImageUtils_SelectImageBands, METH_VARARGS,
+{"selectImageBands", ImageUtils_SelectImageBands, METH_VARARGS,
 "rsgislib.imageutils.selectImageBands(inputImage, outputImage, gdalformat, datatype, bands)\n"
 "Copy selected image bands from an image to a new image.\n"
 "\n"
@@ -2442,7 +2442,7 @@ static PyMethodDef ImageUtilsMethods[] = {
 "* outputImage is a string containing the name and path of the output file.\n"
 "* gdalformat is a string providing the gdalformat of the output image (e.g., KEA).\n"
 "* datatype is a rsgislib.TYPE_* value providing the data type of the output image.\n"
-"* bands is a list of integers for the bands in the input image to exported to the output image (Note band count starts at 1)."
+"* bands is a list of integers for the bands in the input image to exported to the output image (Note band count starts at 1).\n"
 "\n"
 "Example::\n"
 "\n"
@@ -2450,9 +2450,11 @@ static PyMethodDef ImageUtilsMethods[] = {
 "   import rsgislib\n"
 "   bands = [1,2]\n"
 "   rsgislib.imageutils.selectImageBands('N06W053_07_ALL_sl_sub.kea', 'N06W053_07_ALL_sl_sub_HHVV.kea', 'KEA', rsgislib.TYPE_32INT, bands)\n"
-"\n"},
+"\n"
+"\n"
+},
 
-    {"subset", ImageUtils_Subset, METH_VARARGS,
+{"subset", ImageUtils_Subset, METH_VARARGS,
 "rsgislib.imageutils.subset(inputimage, inputvector, outputimage, gdalformat, datatype)\n"
 "Subset an image to the bounding box of a vector.\n"
 "\n"
