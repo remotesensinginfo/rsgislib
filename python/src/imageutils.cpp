@@ -2891,7 +2891,7 @@ For example, can be used to produce monthly composite images from a stack with i
 "                                  gdalformat='KEA', datatype=rsgislib.TYPE_UINT16)\n"
 "\n"
 "\n"},
-
+/*
 {"createMaxNDVICompositeImg", (PyCFunction)ImageUtils_CreateMaxNDVICompositeImg, METH_VARARGS | METH_KEYWORDS,
 "rsgislib.imageutils.createMaxNDVICompositeImg(inimages=list, outimage=string, redband=int, nirband=int, gdalformat=string, datatype=int)\n"
 "A function which creates a composite image where the pixel values from the image with the maximum NDVI is selected.\n"
@@ -2922,7 +2922,7 @@ For example, can be used to produce monthly composite images from a stack with i
 "    rsgislib.imageutils.popImageStats(outputImg, usenodataval=True, nodataval=0, calcpyramids=True)\n"
 "\n"
 "\n"},
-    
+*/
 {"createRefImgCompositeImg", (PyCFunction)ImageUtils_CreateRefImageCompositeImg, METH_VARARGS | METH_KEYWORDS,
 "rsgislib.imageutils.createRefImgCompositeImg(inimages=list, outimage=string, refimg=string, gdalformat=string, datatype=int, outnodata=float)\n"
 "A function which creates a composite image where the pixel values going into the output image by the\n"
