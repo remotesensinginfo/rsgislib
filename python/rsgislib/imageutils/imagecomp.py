@@ -338,8 +338,8 @@ used to define the spatial extent of the output images and spatial projection.
     
     if len(inImages) > 1:
         init_in_images = inImages
-        inImages = []
-        inImagesReProj = []
+        inImagesOverlap = []
+        inImages2ReProj = []
         nBands = 0
         first = True
         for img in init_in_images:
@@ -350,42 +350,59 @@ used to define the spatial extent of the output images and spatial projection.
                 cBands = rsgisUtils.getImageBandCount(img)
                 if cBands != nBands:
                     raise rsgislib.RSGISPyException("The number of image bands is not consistent (Bands: {0} and {1})".format(nBands, cBands))
-            
+
             sameProj = rsgisUtils.doGDALLayersHaveSameProj(refImg, img)
             if rsgislib.imageutils.doImagesOverlap(refImg, img):
                 if sameProj:
                     if rsgisUtils.doImageResMatch(refImg, img):
-                        inImages.append(img)
+                        inImagesOverlap.append(img)
                     else:
-                        inImagesReProj.append(img)
+                        inImages2ReProj.append(img)
                 else:
-                    inImagesReProj.append(img)
+                    inImages2ReProj.append(img)
                     
-        nImgs = len(inImages) + len(inImagesReProj)
+        nImgs = len(inImagesOverlap) + len(inImages2ReProj)
         print("There are {} images with overlap to create the composite.".format(nImgs))
         if nImgs > 1:
             if dataType is None:
-                if len(inImages) > 0:
-                    dataType = rsgisUtils.getRSGISLibDataTypeFromImg(inImages[0])
+                if len(inImagesOverlap) > 0:
+                    dataType = rsgisUtils.getRSGISLibDataTypeFromImg(inImagesOverlap[0])
                 else:
-                    dataType = rsgisUtils.getRSGISLibDataTypeFromImg(inImagesReProj[0])
+                    dataType = rsgisUtils.getRSGISLibDataTypeFromImg(inImages2ReProj[0])
         
             tmpPresent = True
             if not os.path.exists(tmpPath):
                 os.makedirs(tmpPath)
                 tmpPresent = False 
             
-            reprojLayersPath = os.path.join(tmpPath, 'Reproj_'+uidStr)
-            reprojImgTmpPresent = True
-            if not os.path.exists(reprojLayersPath):
-                os.makedirs(reprojLayersPath)
-                reprojImgTmpPresent = False
-                        
-            for img in inImagesReProj:
-                basename = os.path.splitext(os.path.basename(img))[0]
-                outImg = os.path.join(reprojLayersPath, basename+"_reproj.kea")
-                rsgislib.imageutils.resampleImage2Match(refImg, img, outImg, 'KEA', reprojmethod, dataType)
-                inImages.append(outImg)
+            if len(inImagesOverlap) > 0:
+                print("Subset images to reference extent.")
+                subsetLayersPath = os.path.join(tmpPath, 'Subset_'+uidStr)
+                subsetImgTmpPresent = True
+                if not os.path.exists(subsetLayersPath):
+                    os.makedirs(subsetLayersPath)
+                    subsetImgTmpPresent = False
+                
+                for img in inImagesOverlap:
+                    basename = os.path.splitext(os.path.basename(img))[0]
+                    outImg = os.path.join(subsetLayersPath, basename+"_subset.kea")
+                    rsgislib.imageutils.createCopyImage(refImg, outImg, nBands, 0, 'KEA', dataType)
+                    rsgislib.imageutils.includeImagesIndImgIntersect(outImg, [img])
+                    inImages.append(outImg)
+            
+            if len(inImages2ReProj) > 0:
+                print("Reproject images to reference extent.")
+                reprojLayersPath = os.path.join(tmpPath, 'Reproj_'+uidStr)
+                reprojImgTmpPresent = True
+                if not os.path.exists(reprojLayersPath):
+                    os.makedirs(reprojLayersPath)
+                    reprojImgTmpPresent = False
+                            
+                for img in inImages2ReProj:
+                    basename = os.path.splitext(os.path.basename(img))[0]
+                    outImg = os.path.join(reprojLayersPath, basename+"_reproj.kea")
+                    rsgislib.imageutils.resampleImage2Match(refImg, img, outImg, 'KEA', reprojmethod, dataType)
+                    inImages.append(outImg)
             
             refLayersPath = os.path.join(tmpPath, 'RefLyrs_'+uidStr)
             refImgTmpPresent = True
@@ -479,6 +496,9 @@ used to define the spatial extent of the output images and spatial projection.
             
             if not refImgTmpPresent:
                 shutil.rmtree(refLayersPath, ignore_errors=True)
+                
+            if not subsetImgTmpPresent:
+                shutil.rmtree(subsetLayersPath, ignore_errors=True)    
                 
             if not reprojImgTmpPresent:
                 shutil.rmtree(reprojLayersPath, ignore_errors=True)            
