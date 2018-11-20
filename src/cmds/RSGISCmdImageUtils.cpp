@@ -1845,6 +1845,13 @@ namespace rsgis{ namespace cmds {
                 std::string message = std::string("Could not open image ") + inputImage;
                 throw RSGISImageException(message.c_str());
             }
+
+            double *gdalTranslation = new double[6];
+            inDataset->GetGeoTransform(gdalTranslation);
+
+            double xPxlSize = gdalTranslation[1];
+            double yPxlSize = gdalTranslation[5];
+            delete[] gdalTranslation;
             
             GDALDataset *inputVecDS = NULL;
             OGRLayer *inputVecLayer = NULL;
@@ -1868,10 +1875,9 @@ namespace rsgis{ namespace cmds {
             }
             OGREnvelope ogrExtent;
             inputVecLayer->GetExtent(&ogrExtent);
-            geos::geom::Envelope extent = geos::geom::Envelope(ogrExtent.MinX, ogrExtent.MaxX, ogrExtent.MinY, ogrExtent.MaxY);
-            
+
             rsgis::img::RSGISImageUtils imgUtils;
-            GDALDataset *outDataset = imgUtils.createCopy(inDataset, numBands, outputImage, gdalFormat, RSGIS_to_GDAL_Type(outDataType), extent);
+            GDALDataset *outDataset = imgUtils.createCopy(inDataset, numBands, outputImage, gdalFormat, RSGIS_to_GDAL_Type(outDataType), ogrExtent.MinX, ogrExtent.MaxX, ogrExtent.MinY, ogrExtent.MaxY, xPxlSize, yPxlSize);
             imgUtils.assignValGDALDataset(outDataset, pxlVal);
             
             GDALClose(inDataset);
