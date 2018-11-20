@@ -340,6 +340,7 @@ used to define the spatial extent of the output images and spatial projection.
         init_in_images = inImages
         inImagesOverlap = []
         inImages2ReProj = []
+        inImagesSub2Ref = []
         nBands = 0
         first = True
         for img in init_in_images:
@@ -375,10 +376,10 @@ used to define the spatial extent of the output images and spatial projection.
                 os.makedirs(tmpPath)
                 tmpPresent = False 
             
+            subsetImgTmpPresent = True
             if len(inImagesOverlap) > 0:
                 print("Subset images to reference extent.")
                 subsetLayersPath = os.path.join(tmpPath, 'Subset_'+uidStr)
-                subsetImgTmpPresent = True
                 if not os.path.exists(subsetLayersPath):
                     os.makedirs(subsetLayersPath)
                     subsetImgTmpPresent = False
@@ -388,12 +389,12 @@ used to define the spatial extent of the output images and spatial projection.
                     outImg = os.path.join(subsetLayersPath, basename+"_subset.kea")
                     rsgislib.imageutils.createCopyImage(refImg, outImg, nBands, 0, 'KEA', dataType)
                     rsgislib.imageutils.includeImagesIndImgIntersect(outImg, [img])
-                    inImages.append(outImg)
+                    inImagesSub2Ref.append(outImg)
             
+            reprojImgTmpPresent = True
             if len(inImages2ReProj) > 0:
                 print("Reproject images to reference extent.")
                 reprojLayersPath = os.path.join(tmpPath, 'Reproj_'+uidStr)
-                reprojImgTmpPresent = True
                 if not os.path.exists(reprojLayersPath):
                     os.makedirs(reprojLayersPath)
                     reprojImgTmpPresent = False
@@ -402,7 +403,7 @@ used to define the spatial extent of the output images and spatial projection.
                     basename = os.path.splitext(os.path.basename(img))[0]
                     outImg = os.path.join(reprojLayersPath, basename+"_reproj.kea")
                     rsgislib.imageutils.resampleImage2Match(refImg, img, outImg, 'KEA', reprojmethod, dataType)
-                    inImages.append(outImg)
+                    inImagesSub2Ref.append(outImg)
             
             refLayersPath = os.path.join(tmpPath, 'RefLyrs_'+uidStr)
             refImgTmpPresent = True
@@ -410,7 +411,7 @@ used to define the spatial extent of the output images and spatial projection.
                 os.makedirs(refLayersPath)
                 refImgTmpPresent = False
                         
-            numInLyrs = len(inImages)
+            numInLyrs = len(inImagesSub2Ref)
             
             numpy.random.seed(5)
             red = numpy.random.randint(1, 255, numInLyrs+1, int)
@@ -429,7 +430,7 @@ used to define the spatial extent of the output images and spatial projection.
             landWaterMskBandDefns = []
             mskImgs = []
             idx = 1
-            for img in inImages:
+            for img in inImagesSub2Ref:
                 print('In Image ('+str(idx) + '):\t' + img)
                 imgLyrs[idx] = os.path.basename(img)
                 baseImgName = os.path.splitext(os.path.basename(img))[0]
@@ -454,7 +455,7 @@ used to define the spatial extent of the output images and spatial projection.
             
             idx = 1
             refLyrsLst = []
-            for img in inImages:
+            for img in inImagesSub2Ref:
                 print('In Image ('+str(idx) + '):\t' + img)
                 baseImgName = os.path.splitext(os.path.basename(img))[0]
                 refLyrNDVIImg = os.path.join(refLayersPath, baseImgName+'_ndvi.kea')
@@ -488,7 +489,7 @@ used to define the spatial extent of the output images and spatial projection.
                 ratDataset = None
             
             # Create Composite Image
-            rsgislib.imageutils.createRefImgCompositeImg(inImages, outCompImg, outRefImg, gdalformat, dataType, 0.0)
+            rsgislib.imageutils.createRefImgCompositeImg(inImagesSub2Ref, outCompImg, outRefImg, gdalformat, dataType, 0.0)
             
             if calcStats:
                 # Calc Stats
@@ -510,7 +511,11 @@ used to define the spatial extent of the output images and spatial projection.
 
     elif len(inImages) == 1:
         print("Only 1 Input Image, Just Copying File to output")
-        shutil.copy(inImages[0], outCompImg)
+        nBands = rsgisUtils.getImageBandCount(inImages[0])
+        if dataType is None:
+            dataType = rsgisUtils.getRSGISLibDataTypeFromImg(inImages[0])
+        rsgislib.imageutils.createCopyImage(refImg, outCompImg, nBands, 0, gdalformat, dataType)
+        rsgislib.imageutils.includeImagesIndImgIntersect(outImg, [inImages[0]])
     else:
         raise rsgislib.RSGISPyException("There were no input images for " + inImgsPattern)
 
