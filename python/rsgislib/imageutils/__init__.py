@@ -305,6 +305,41 @@ of the output image.
     wktString = rsgisUtils.getProjWKTFromVec(inVecFile)
 
     rsgislib.imageutils.createBlankImage(outputImg, outImgNBands, width, height, tlX, tlY, outImgRes, 0.0, '', wktString, gdalformat, datatype)
+    
+
+def createCopyImageVecExtentSnap2Grid(inVecFile, inVecLyr, outputImg, outImgRes, outImgNBands, gdalformat, datatype):
+    """
+A function to create a new image file based on a vector layer to define the extent and projection
+of the output image. The image file extent is snapped on to the grid defined by the vector layer.
+
+* inVecFile - input vector file.
+* inVecLyr - name of the vector layer, if None then assume the layer name will be the same as the file
+             name of the input vector file.
+* outputImg - output image file.
+* outImgRes - output image resolution, square pixels so a single value.
+* outImgNBands - the number of image bands in the output image 
+* gdalformat - output image file format.
+* datatype - output image data type.
+
+"""
+    rsgisUtils = rsgislib.RSGISPyUtils()
+    
+    vec_bbox = rsgisUtils.getVecLayerExtent(inVecFile, layerName=inVecLyr, computeIfExp=True)
+    xMin, xMax, yMin, yMax = rsgisUtils.findExtentOnWholeNumGrid(vec_bbox, outImgRes, True)   
+    
+    tlX = xMin
+    tlY = yMax
+    
+    widthCoord = xMax - xMin
+    heightCoord = yMax - yMin
+    
+    width = int(math.ceil(widthCoord/outImgRes))
+    height = int(math.ceil(heightCoord/outImgRes))
+    
+    wktString = rsgisUtils.getProjWKTFromVec(inVecFile)
+    
+    rsgislib.imageutils.createBlankImage(outputImg, outImgNBands, width, height, tlX, tlY, outImgRes, 0.0, '', wktString, gdalformat, datatype)
+    
 
 def resampleImage2Match(inRefImg, inProcessImg, outImg, gdalformat, interpMethod, datatype=None, noDataVal=None, multicore=False):
     """
