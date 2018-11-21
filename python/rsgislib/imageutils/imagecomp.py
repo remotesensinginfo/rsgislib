@@ -309,15 +309,41 @@ LS8 images are submitted to match the images bands of LS7 (i.e., coastal band re
     else:
         raise rsgislib.RSGISPyException("There were no input images for " + inImgsPattern)
 
-    
-def createMaxNDVINDWIComposite(refImg, inImgsPattern, rBand, nBand, sBand, outRefImg, outCompImg, outMskImg, tmpPath='./tmp', gdalformat='KEA', dataType=None, calcStats=True, reprojmethod='cubic'):
+
+def checkBuildLS8VRTs(in_imgs, outdir):
+    """
+A function which checks for Landsat 8 (LS8) images in the input list and creates
+a band subset (i.e., removes the coastal (1) band). This function should be used
+ahead of createMaxNDVINDWIComposite when combining LS8 with earlier landsat (i.e., 
+LS5 and LS7) data. Note, files who's file name contain 'LS8' are considered to be 
+Landsat 8 images.
+
+* in_imgs - input list of image file paths.
+* outdir - output directory for the VRT images (note. an absolute path to the input
+           image is used when building the VRT.
+"""
+    import subprocess
+    out_imgs = []
+    for img in in_imgs:
+        if 'LS8' in img:
+            abs_img = os.path.abspath(img)
+            vrt_img = os.path.join(outdir, os.path.splitext(os.path.basename(img))[0]+'_bsub.vrt')
+            cmd = "gdalbuildvrt -b 2 -b 3 -b 4 -b 5 -b 6 -b 7 {0} {1}".format(vrt_img, abs_img)
+            subprocess.call(cmd, shell=True)
+            out_imgs.append(vrt_img)
+        else:
+            out_imgs.append(img)
+    return out_imgs
+
+
+def createMaxNDVINDWIComposite(refImg, inImages, rBand, nBand, sBand, outRefImg, outCompImg, outMskImg, tmpPath='./tmp', gdalformat='KEA', dataType=None, calcStats=True, reprojmethod='cubic'):
     """
 Create an image composite from multiple input images where the pixel brought through into the composite is the one with
 the maximum NDVI over land and NDWI over water. A mask of land and water regions is also produced. The reference image is
 used to define the spatial extent of the output images and spatial projection.
 
 * refImg - is a reference image with any number of bands and data type which is used to define the output image extent and projection.
-* inImgsPattern - is a pattern (ready for glob.glob(inImgsPattern)) so needs an * within the pattern to find the input image files.
+* inImages - a list of all the input images being used to build the composite.
 * rBand - is an integer specifying the red band in the input images (starts at 1), used in the NDVI index.
 * nBand - is an integer specifying the NIR band in the input images (starts at 1), used in the NDVI and NDWI index.
 * sBand - is an integer specifying the SWIR band in the input images (starts at 1), used in the NDVI and NDWI index.
@@ -332,9 +358,6 @@ used to define the spatial extent of the output images and spatial projection.
     """
     rsgisUtils = rsgislib.RSGISPyUtils()
     uidStr = rsgisUtils.uidGenerator()
-    
-    # Get List of input images:
-    inImages = glob.glob(inImgsPattern)
     
     if len(inImages) > 1:
         init_in_images = inImages
