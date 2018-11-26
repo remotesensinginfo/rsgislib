@@ -1991,6 +1991,33 @@ static PyObject *ImageUtils_RandomSampleHDF5File(PyObject *self, PyObject *args,
     Py_RETURN_NONE;
 }
 
+static PyObject *ImageUtils_SplitSampleHDF5File(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    static char *kwlist[] = {"inputh5", "outputp1h5", "outputp2h5", "sample", "seed", NULL};
+    const char *pInputH5 = "";
+    const char *pOutputP1H5 = "";
+    const char *pOutputP2H5 = "";
+    unsigned int sampleSize = 0;
+    int seed = 0;
+
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssIi:randomSampleHDF5File", kwlist, &pInputH5, &pOutputP1H5, &pOutputP2H5, &sampleSize, &seed))
+    {
+        return NULL;
+    }
+
+    try
+    {
+        rsgis::cmds::executeSplitSampleH5File(std::string(pInputH5), std::string(pOutputP1H5), std::string(pOutputP2H5), sampleSize, seed);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
+
 
 // Our list of functions in this module
 static PyMethodDef ImageUtilsMethods[] = {
@@ -2427,6 +2454,20 @@ static PyMethodDef ImageUtilsMethods[] = {
 "\n"
 "* inputh5 is a string with the path to the input file.\n"
 "* outputh5 is a string with the path to the output file.\n"
+"* sample is an integer with the number values to be sampled from the input file.\n"
+"* seed is an integer which seeds the random number generator\n."
+"\n"
+},
+
+{"splitSampleHDF5File", (PyCFunction)ImageUtils_SplitSampleHDF5File, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.splitSampleHDF5File(inputh5, outputp1h5, outputp2h5, sample, seed)\n"
+"A function which splits samples a HDF5 of extracted values. \n"
+"\n"
+"Where:\n"
+"\n"
+"* inputh5 is a string with the path to the input file.\n"
+"* outputp1h5 is a string with the path to the output file.\n"
+"* outputp2h5 is a string with the path to the output file.\n"
 "* sample is an integer with the number values to be sampled from the input file.\n"
 "* seed is an integer which seeds the random number generator\n."
 "\n"
