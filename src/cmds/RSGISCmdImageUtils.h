@@ -151,6 +151,9 @@ namespace rsgis{ namespace cmds {
 
     /** A function to sample a list of values saved in a HDF5 file */
     DllExport void executeRandomSampleH5File(std::string inputH5, std::string outputH5, unsigned int nSample, int seed)throw(RSGISCmdException);
+
+    /** A function to sample a list of values saved in a HDF5 file */
+    DllExport void executeSplitSampleH5File(std::string inputH5, std::string outputP1H5, std::string outputP2H5, unsigned int nSample, int seed)throw(RSGISCmdException);
     
     /** A function to subset an image to the bounding box of a polygon */
     DllExport void executeSubset(std::string inputImage, std::string inputVector, std::string outputImage, std::string imageFormat, RSGISLibDataType outDataType) throw(RSGISCmdException);

@@ -1365,6 +1365,27 @@ namespace rsgis{ namespace cmds {
         }
     }
 
+    void executeSplitSampleH5File(std::string inputH5, std::string outputP1H5, std::string outputP2H5, unsigned int nSample, int seed)throw(RSGISCmdException)
+    {
+        try
+        {
+            rsgis::img::RSGISExtractImageValues extractVals;
+            extractVals.splitExtractedHDFData(inputH5, outputP1H5, outputP2H5, nSample, seed);
+        }
+        catch (RSGISImageException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (RSGISException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+
     void executeSubsetImageBands(std::string inputImage, std::string outputImage, std::vector<unsigned int> bands, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException)
     {
         try

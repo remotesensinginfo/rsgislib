@@ -271,7 +271,144 @@ namespace rsgis{namespace img{
             throw RSGISException(e.what());
         }
     }
-    
+
+    void RSGISExtractImageValues::splitExtractedHDFData(std::string inputH5, std::string outputP1H5, std::string outputP2H5, unsigned int nSamples, int seed) throw(RSGISException)
+    {
+        try
+        {
+            rsgis::utils::RSGISReadHDFColumnData readHDFCol;
+            readHDFCol.openFile(inputH5);
+            unsigned int nRows = readHDFCol.getNumRows();
+            unsigned int nCols = readHDFCol.getNumCols();
+
+            if(nRows > nSamples)
+            {
+                unsigned int blockSize = 1000;
+                unsigned int nFullBlocks = (int)floor(((double)nRows)/((double)blockSize));
+                unsigned int remain = nRows - (blockSize*nFullBlocks);
+                float *dataBlock = new float[nRows*nCols];
+
+                float propSamples = ((float)nSamples) / ((float)nRows);
+
+                unsigned int samplesPerBlock = (unsigned int)(ceil(((float)blockSize) * propSamples));
+                unsigned int samples4Remain = (unsigned int)(ceil(((float)remain) * propSamples));
+                //unsigned int totalSamples = (samplesPerBlock * nFullBlocks) + samples4Remain;
+
+                rsgis::utils::RSGISExportColumnData2HDF exportCols2HDF_P1;
+                exportCols2HDF_P1.createFile(outputP1H5, nCols, std::string("Sampled Pixels Extracted"), H5::PredType::IEEE_F32LE);
+                rsgis::utils::RSGISExportColumnData2HDF exportCols2HDF_P2;
+                exportCols2HDF_P2.createFile(outputP2H5, nCols, std::string("Sampled Pixels Extracted"), H5::PredType::IEEE_F32LE);
+                float *row = new float[nCols];
+                unsigned int *ranIdxes = new unsigned int[samplesPerBlock];
+
+                boost::mt19937 randomGen;
+                randomGen.seed(seed);
+                boost::uniform_int<> randomDist(0, blockSize);
+                boost::variate_generator<boost::mt19937&, boost::uniform_int<> > randomVal(randomGen, randomDist);
+
+                bool found = false;
+                unsigned int ranIdx = 0;
+                unsigned int nRowsOff = 0;
+                for(unsigned int i = 0; i < nFullBlocks; ++i)
+                {
+                    readHDFCol.getDataRows(dataBlock, nCols, blockSize, H5::PredType::NATIVE_FLOAT, nRowsOff, blockSize);
+
+                    for(unsigned int j = 0; j < samplesPerBlock; ++j)
+                    {
+                        ranIdx = randomVal();
+                        for(unsigned int n = 0; n < nCols; ++n)
+                        {
+                            row[n] = dataBlock[(ranIdx*nCols)+n];
+                        }
+                        exportCols2HDF_P1.addDataRow(row, H5::PredType::NATIVE_FLOAT);
+                        ranIdxes[j] = ranIdx;
+                    }
+
+                    for(unsigned int j = 0; j < blockSize; ++j)
+                    {
+                        found = false;
+                        for(unsigned int k = 0; k < samplesPerBlock; ++k)
+                        {
+                            if(ranIdxes[k] == j)
+                            {
+                                found = true;
+                                break;
+                            }
+                        }
+
+                        if(!found)
+                        {
+                            for(unsigned int n = 0; n < nCols; ++n)
+                            {
+                                row[n] = dataBlock[(j*nCols)+n];
+                            }
+                            exportCols2HDF_P2.addDataRow(row, H5::PredType::NATIVE_FLOAT);
+                        }
+                    }
+
+                    nRowsOff += blockSize;
+                }
+                if(remain > 0)
+                {
+                    boost::uniform_int<> randomDist(0, remain);
+                    boost::variate_generator<boost::mt19937&, boost::uniform_int<> > randomVal(randomGen, randomDist);
+
+                    readHDFCol.getDataRows(dataBlock, nCols, blockSize, H5::PredType::NATIVE_FLOAT, nRowsOff, remain);
+                    for(unsigned int j = 0; j < samples4Remain; ++j)
+                    {
+                        ranIdx = randomVal();
+                        for(unsigned int n = 0; n < nCols; ++n)
+                        {
+                            row[n] = dataBlock[(ranIdx*nCols)+n];
+                        }
+                        exportCols2HDF_P1.addDataRow(row, H5::PredType::NATIVE_FLOAT);
+                        ranIdxes[j] = ranIdx;
+                    }
+
+                    for(unsigned int j = 0; j < remain; ++j)
+                    {
+                        found = false;
+                        for(unsigned int k = 0; k < samples4Remain; ++k)
+                        {
+                            if(ranIdxes[k] == j)
+                            {
+                                found = true;
+                                break;
+                            }
+                        }
+
+                        if(!found)
+                        {
+                            for(unsigned int n = 0; n < nCols; ++n)
+                            {
+                                row[n] = dataBlock[(j*nCols)+n];
+                            }
+                            exportCols2HDF_P2.addDataRow(row, H5::PredType::NATIVE_FLOAT);
+                        }
+                    }
+                }
+                exportCols2HDF_P1.close();
+                exportCols2HDF_P2.close();
+                delete[] row;
+                delete[] dataBlock;
+                delete[] ranIdxes;
+            }
+            else
+            {
+                throw RSGISException("There are not enough rows to create that sample.");
+            }
+            readHDFCol.close();
+        }
+        catch (RSGISException &e)
+        {
+            throw e;
+        }
+        catch (std::exception &e)
+        {
+            throw RSGISException(e.what());
+        }
+    }
+
     RSGISExtractImageValues::~RSGISExtractImageValues()
     {
         

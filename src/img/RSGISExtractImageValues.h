@@ -66,6 +66,7 @@ namespace rsgis{namespace img{
         void extractDataWithinMask2HDF(GDALDataset *mask, GDALDataset *image, std::string outHDFFile, float maskValue) throw(RSGISImageException);
         void extractImgBandDataWithinMask2HDF(std::vector<std::pair<std::string, std::vector<unsigned int> > > imageFiles, std::string maskImage, std::string outHDFFile, float maskValue) throw(RSGISImageException);
         void sampleExtractedHDFData(std::string inputH5, std::string outputH5, unsigned int nSamples, int seed) throw(RSGISException);
+        void splitExtractedHDFData(std::string inputH5, std::string outputP1H5, std::string outputP2H5, unsigned int nSamples, int seed) throw(RSGISException);
         ~RSGISExtractImageValues();
     };
     
