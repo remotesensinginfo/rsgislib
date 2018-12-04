@@ -410,6 +410,69 @@ class RSGISPyUtils (object):
         brY = tlY - (yRes * ySize)
         
         return [tlX, brX, brY, tlY]
+    
+    def getImageBBOXInProj(self, inImg, outESPG):
+        """
+        A function to retrieve the bounding box in the spatial 
+        coordinates of the image.
+        return (MinX, MaxX, MinY, MaxY)
+        """
+        import osgeo.osr as osr
+        import osgeo.gdal as gdal
+        
+        inProjWKT = self.getWKTProjFromImage(input_dem)
+        inSpatRef = osr.SpatialReference()
+        inSpatRef.ImportFromWkt(inProjWKT)
+        
+        outSpatRef = osr.SpatialReference()
+        outSpatRef.ImportFromEPSG(outESPG)
+        
+        rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
+        if rasterDS == None:
+            raise RSGISPyException('Could not open raster image: \'' + inImg+ '\'')
+        
+        xSize = rasterDS.RasterXSize
+        ySize = rasterDS.RasterYSize
+        
+        geotransform = rasterDS.GetGeoTransform()
+        tlX = geotransform[0]
+        tlY = geotransform[3]
+        xRes = geotransform[1]
+        yRes = geotransform[5]
+        if yRes < 0:
+            yRes = yRes * -1
+        rasterDS = None
+        
+        brX = tlX + (xRes * xSize)
+        brY = tlY - (yRes * ySize)
+        
+        out_tlX = 0.0
+        out_tlY = 0.0
+        out_brX = 0.0
+        out_brY = 0.0
+        
+        out_tlX, out_tlY = self.reprojPoint(inSpatRef, outSpatRef, tlX, tlY)
+        out_brX, out_brY = self.reprojPoint(inSpatRef, outSpatRef, brX, brY)
+        
+        return [out_tlX, out_brX, out_brY, out_tlY]
+        
+    def reprojBBOX(self, bbox, inProjObj, outProjObj):
+        """
+        A function to reproject a bounding box.
+        * bbox - input bounding box (MinX, MaxX, MinY, MaxY)
+        * inProjObj - an osr.SpatialReference() object representing input projection.
+        * outProjObj - an osr.SpatialReference() object representing output projection. 
+        return (MinX, MaxX, MinY, MaxY)
+        """
+        tlX = bbox[0]
+        tlY = bbox[3]
+        brX = bbox[1]
+        brY = bbox[2]
+        
+        out_tlX, out_tlY = reprojPoint(inProjObj, outProjObj, tlX, tlY)
+        out_brX, out_brY = reprojPoint(inProjObj, outProjObj, brX, brY)
+        
+        return [out_tlX, out_brX, out_brY, out_tlY]
         
     def getVecLayerExtent(self, inVec, layerName=None, computeIfExp=True):
         """
