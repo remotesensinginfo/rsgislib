@@ -420,7 +420,7 @@ class RSGISPyUtils (object):
         import osgeo.osr as osr
         import osgeo.gdal as gdal
         
-        inProjWKT = self.getWKTProjFromImage(input_dem)
+        inProjWKT = self.getWKTProjFromImage(inImg)
         inSpatRef = osr.SpatialReference()
         inSpatRef.ImportFromWkt(inProjWKT)
         
