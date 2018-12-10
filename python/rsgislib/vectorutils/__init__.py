@@ -884,6 +884,19 @@ with the select layer.
             raise Exception("Could not find layer '" + vecLyr + "'")
         
         lyr_spatial_ref = lyrVecObj.GetSpatialRef()
+        
+        vec_lyr_bbox = extent = lyrVecObj.GetExtent(True)
+        
+        # Create polygon for bbox
+        ring = ogr.Geometry(ogr.wkbLinearRing)
+        ring.AddPoint(vec_lyr_bbox[0], vec_lyr_bbox[3])
+        ring.AddPoint(vec_lyr_bbox[1], vec_lyr_bbox[3])
+        ring.AddPoint(vec_lyr_bbox[1], vec_lyr_bbox[2])
+        ring.AddPoint(vec_lyr_bbox[0], vec_lyr_bbox[2])
+        ring.AddPoint(vec_lyr_bbox[0], vec_lyr_bbox[3])
+        # Create polygon.
+        vec_lyr_bbox_poly = ogr.Geometry(ogr.wkbPolygon)
+        vec_lyr_bbox_poly.AddGeometry(ring)
             
         dsSelVecFile = gdal.OpenEx(selVecFile, gdal.OF_READONLY )
         if dsSelVecFile is None:
@@ -893,19 +906,31 @@ with the select layer.
         if lyrSelVecObj is None:
             raise Exception("Could not find layer '" + selVecLyr + "'")
             
-        mem_driver = ogr.GetDriverByName('MEMORY')
-        mem_sel_ds = mem_driver.CreateDataSource('MemSelData')
-        mem_sel_lyr = mem_sel_ds.CopyLayer(lyrSelVecObj, selVecLyr, ['OVERWRITE=YES'])
+        geom_collect = ogr.Geometry(ogr.wkbGeometryCollection)
+        for feat in lyrSelVecObj:
+            geom = feat.GetGeometryRef()
+            if geom is not None:
+                if geom.Intersects(vec_lyr_bbox_poly):
+                    geom_collect.AddGeometry(geom)
         
         out_driver = ogr.GetDriverByName(outVecDrvr)        
         result_ds = out_driver.CreateDataSource(outputVec)
-        result_lyr = result_ds.CreateLayer(outVecLyrName, lyr_spatial_ref, geom_type=lyrVecObj.GetGeomType())    
+        result_lyr = result_ds.CreateLayer(outVecLyrName, lyr_spatial_ref, geom_type=lyrVecObj.GetGeomType()) 
         
-        lyrVecObj.Intersection(mem_sel_lyr, result_lyr, callback=gdal.TermProgress)
+        srcLayerDefn = lyrVecObj.GetLayerDefn()
+        for i in range(srcLayerDefn.GetFieldCount()):
+            fieldDefn = srcLayerDefn.GetFieldDefn(i)
+            result_lyr.CreateField(fieldDefn)
+        rsltLayerDefn = result_lyr.GetLayerDefn()   
         
+        for feat in lyrVecObj:
+            geom = feat.GetGeometryRef()
+            if geom is not None:
+                if geom.Intersects(geom_collect):
+                    result_lyr.CreateFeature(feat)
+                
         dsSelVecFile = None        
         dsVecFile = None
-        mem_sel_ds = None
         result_ds = None
     except Exception as e:
         raise e
