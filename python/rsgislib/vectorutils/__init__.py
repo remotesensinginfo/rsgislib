@@ -23,6 +23,7 @@ from rsgislib import imageutils
 # Import the RSGISLib RasterGIS module
 from rsgislib import rastergis
 
+
 def rasterise2Image(inputVec, inputImage, outImage, gdalformat="KEA", burnVal=1, shpAtt=None, shpExt=False):
     """ 
 A utillity to rasterise a shapefile into an image covering the same region and at the same resolution as the input image. 
@@ -759,7 +760,7 @@ When creating an attribute the available data types are ogr.OFTString, ogr.OFTIn
 * espgCode - ESPG code specifying the projection of the data (e.g., 4326 is WSG84 Lat/Long).
 * bboxs - is a list of bounding boxes ([xMin, xMax, yMin, yMax]) to be saved to the output vector.
 * atts - is a dict of lists of attributes with the same length as the bboxs list. The dict should be named the same as the attTypes['names'] list.
-* attTypes - is a dict with a list of attribute names (attTypes['names']) and types (attTypes['types']). The list must be the same length as one another and the number of atts.
+* attTypes - is a dict with a list of attribute names (attTypes['names']) and types (attTypes['types']). The list must be the same length as one another and the number of atts. Example type: ogr.OFTString
 """
     try:
         gdal.UseExceptions()
@@ -826,7 +827,117 @@ When creating an attribute the available data types are ogr.OFTString, ogr.OFTIn
         raise e
 
 
+def writePts2Vec(vectorFile, vectorLyr, vecDriver, espgCode, ptsX, ptsY, atts=None, attTypes=None):
+    """
+This function creates a set of polygons for a set of bounding boxes. 
 
+When creating an attribute the available data types are ogr.OFTString, ogr.OFTInteger, ogr.OFTReal
+    
+* vectorFile - output vector file/path
+* vectorLyr - output vector layer
+* vecDriver - the output vector layer type.
+* espgCode - ESPG code specifying the projection of the data (e.g., 4326 is WSG84 Lat/Long).
+* ptsX - is a list of x coordinates.
+* ptsY - is a list of y coordinates.
+* atts - is a dict of lists of attributes with the same length as the bboxs list. The dict should be named the same as the attTypes['names'] list.
+* attTypes - is a dict with a list of attribute names (attTypes['names']) and types (attTypes['types']). The list must be the same length as one another and the number of atts. Example type: ogr.OFTString
+"""
+    try:
+        if len(ptsX) != len(ptsY):
+            raise Exception("The X and Y coordinates lists are not the same length.")
+        nPts = len(ptsX)
+        
+        gdal.UseExceptions()
+        # Create the output Driver
+        outDriver = ogr.GetDriverByName(vecDriver)
+        # create the spatial reference, WGS84
+        srs = osr.SpatialReference()
+        srs.ImportFromEPSG(int(espgCode))
+        # Create the output Shapefile
+        outDataSource = outDriver.CreateDataSource(vectorFile)
+        outLayer = outDataSource.CreateLayer(vectorLyr, srs, geom_type=ogr.wkbPoint )
+        
+        addAtts = False
+        if (atts is not None) and (attTypes is not None):
+            nAtts = 0
+            if not 'names' in attTypes:
+                raise Exception('attTypes must include a list for "names"')
+            nAtts = len(attTypes['names'])
+            if not 'types' in attTypes:
+                raise Exception('attTypes must include a list for "types"')
+            if nAtts != len(attTypes['types']):
+                raise Exception('attTypes "names" and "types" lists must be the same length.')
+            for i in range(nAtts):
+                if attTypes['names'][i] not in atts:
+                    raise Exception('"{}" is not within atts'.format(attTypes['names'][i]))
+                if len(atts[attTypes['names'][i]]) != len(bboxs):
+                    raise Exception('"{}" in atts does not have the same len as bboxs'.format(attTypes['names'][i]))
+                    
+            for i in range(nAtts):       
+                field_defn = ogr.FieldDefn( attTypes['names'][i], attTypes['types'][i] )
+                if outLayer.CreateField ( field_defn ) != 0:
+                    raise Exception("Creating '" + attTypes['names'][i] + "' field failed.\n")
+            addAtts = True
+        elif not ((atts is None) and (attTypes is None)): 
+            raise Exception('If atts or attTypes is not None then the other should also not be none and equalivent in length.')
+            
+        # Get the output Layer's Feature Definition
+        featureDefn = outLayer.GetLayerDefn()
+        
+        for n in range(nPts):
+            # Create Linear Ring
+            pt = ogr.Geometry(ogr.wkbPoint)
+            pt.AddPoint(float(ptsX[n]), float(ptsY[n]))
+            # Add to output shapefile.
+            outFeature = ogr.Feature(featureDefn)
+            outFeature.SetGeometry(pt)
+            if addAtts:
+                # Add Attributes
+                for i in range(nAtts):
+                    outFeature.SetField(attTypes['names'][i], atts[attTypes['names'][i]][n])
+            outLayer.CreateFeature(outFeature)
+            outFeature = None
+        outDataSource = None
+    except Exception as e:
+        raise e
+
+
+def bboxIntersectsVecLyr(vectorFile, vectorLyr, bbox):
+    """
+A function which tests where a feature within an inputted vector layer intersects
+with a bounding box. 
+
+* vectorFile - vector file/path
+* vectorLyr - vector layer name
+* bbox - the bounding box (xMin, xMax, yMin, yMax). Same projection as vector layer.
+    """
+    dsVecFile = gdal.OpenEx(vectorFile, gdal.OF_READONLY )
+    if dsVecFile is None:
+        raise Exception("Could not open '" + vectorFile + "'")
+    
+    lyrVecObj = dsVecFile.GetLayerByName( vectorLyr )
+    if lyrVecObj is None:
+        raise Exception("Could not find layer '" + vectorLyr + "'")
+    
+    # Get a geometry collection object for shapefile.
+    geom_collect = ogr.Geometry(ogr.wkbGeometryCollection)
+    for feat in lyrVecObj:
+        geom_collect.AddGeometry(feat.GetGeometryRef())
+    
+    # Create polygon for bbox
+    ring = ogr.Geometry(ogr.wkbLinearRing)
+    ring.AddPoint(bbox[0], bbox[3])
+    ring.AddPoint(bbox[1], bbox[3])
+    ring.AddPoint(bbox[1], bbox[2])
+    ring.AddPoint(bbox[0], bbox[2])
+    ring.AddPoint(bbox[0], bbox[3])
+    # Create polygon.
+    poly = ogr.Geometry(ogr.wkbPolygon)
+    poly.AddGeometry(ring)
+    
+    # Do they intersect?
+    intersect = poly.Intersects(geom_collect)
+    return intersect
 
 
 def createImgExtentLUT(imgList, vectorFile, vectorLyr, vecDriver):
