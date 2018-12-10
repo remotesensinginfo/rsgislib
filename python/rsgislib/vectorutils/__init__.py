@@ -97,7 +97,6 @@ Example::
         raise e
 
 
-
 def copyShapefile2RAT(inputVec, inputImage, outputImage):
     """ 
 A utillity to create raster copy of a shapefile. The output image is a KEA file and the attribute table has the attributes from the shapefile. 
@@ -371,6 +370,7 @@ A function to extract an image footprint as a vector.
             driver = ogr.GetDriverByName('ESRI Shapefile')
             driver.DeleteDataSource(outVecTmpFile)
 
+
 def getVecFeatCount(inVec, layerName=None, computeCount=True):
     """
 Get a count of the number of features in the vector layers.
@@ -425,6 +425,7 @@ Where:
                     subprocess.call(cmd, shell=True)
                 except OSError as e:
                     raise Exception('Error running ogr2ogr: ' + cmd)
+
 
 def mergeVectors2SQLiteDB(inFileList, outDBFile, lyrName, exists):
     """
@@ -533,6 +534,24 @@ This function takes a CSV file of bounding boxes (1 per line) and creates a poly
         raise e
 
 
+def getVecLyrsLst(vecFile):
+    """
+A function which returns a list of available layers within the inputted vector file.
+
+* vecFile - file name and path to input vector layer.
+
+returns: list of layer names (can be used with gdal.Dataset.GetLayerByName()).
+"""
+    gdalDataset = gdal.OpenEx(vecFile, gdal.OF_VECTOR )
+    layerList = []
+    for lyr_idx in range(gdalDataset.GetLayerCount()):
+        lyr = gdalDataset.GetLayerByIndex(lyr_idx)
+        tLyrName = lyr.GetName()
+        if not tLyrName in layerList:
+            layerList.append(tLyrName)
+    gdalDataset = None
+    return layerList
+
 
 def getVecLayerExtent(inVec, layerName=None, computeIfExp=True):
     """
@@ -546,7 +565,6 @@ Get the extent of the vector layer.
                  even if that operation is computationally expensive.
 
 return: boundary box is returned (MinX, MaxX, MinY, MaxY)
-
 """
     gdal.UseExceptions()
     # Get a Layer's Extent
@@ -558,7 +576,8 @@ return: boundary box is returned (MinX, MaxX, MinY, MaxY)
     extent = inLayer.GetExtent(computeIfExp)
     return extent
 
-def getProjWKTFromVec(inVec):
+
+def getProjWKTFromVec(inVec, layerName=None):
     """
 * inVec - is a string with the input vector file name and path.
 
@@ -568,9 +587,102 @@ return: WKT representation of projection
     gdal.UseExceptions()
     # Get shapefile projection as WKT
     dataset = gdal.OpenEx(inVec, gdal.OF_VECTOR )
-    layer = dataset.GetLayer()
+    if layerName is not None:
+        layer = dataset.GetLayer(layerName)
+    else:
+        layer = dataset.GetLayer()
     spatialRef = layer.GetSpatialRef()
     return spatialRef.ExportToWkt()
+
+
+def splitVecLyr(vecFile, vecLyr, nfeats, outVecDrvr, outdir, outvecbase, outvecend):
+    """
+A function which splits the input vector layer into a number of output layers.
+
+* vecFile - input vector file.
+* vecLyr - input layer name.
+* nfeats - number of features within each output file.
+* outVecDrvr - output file driver.
+* outdir - output directory for the created output files.
+* outvecbase - output layer name will be the same as the base file name.
+* outvecend - file ending (e.g., .shp).
+"""
+    import math
+    import os.path
+
+    gdal.UseExceptions()
+    datasrc = gdal.OpenEx(vecFile, gdal.OF_VECTOR )
+    srcLyr = datasrc.GetLayer(vecLyr)
+    nInFeats = srcLyr.GetFeatureCount(True)
+    print(nInFeats)
+    
+    nOutFiles = math.floor(nInFeats/nfeats)
+    remainFeats = nInFeats - (nOutFiles*nfeats)
+    print(nOutFiles)
+    print(remainFeats)
+    
+    out_driver = ogr.GetDriverByName(outVecDrvr)
+    src_lyr_spat_ref = srcLyr.GetSpatialRef()
+    
+    cFeatN = 0
+    sFeatN = 0
+    eFeatN = nfeats
+    for i in range(nOutFiles):
+        outveclyr = "{0}{1}".format(outvecbase, i+1)
+        outvecfile = os.path.join(outdir, "{0}{1}".format(outveclyr, outvecend))
+        print("Creating: {}".format(outvecfile))
+        result_ds = out_driver.CreateDataSource(outvecfile)
+        result_lyr = result_ds.CreateLayer(outveclyr, src_lyr_spat_ref, geom_type=srcLyr.GetGeomType())
+        
+        srcLayerDefn = srcLyr.GetLayerDefn()
+        for i in range(srcLayerDefn.GetFieldCount()):
+            fieldDefn = srcLayerDefn.GetFieldDefn(i)
+            result_lyr.CreateField(fieldDefn)
+        rsltLayerDefn = result_lyr.GetLayerDefn()
+        
+        cFeatN = 0
+        srcLyr.ResetReading()
+        inFeat = srcLyr.GetNextFeature()
+        while inFeat:
+            if (cFeatN >= sFeatN) and (cFeatN < eFeatN):
+                geom = inFeat.GetGeometryRef()
+                if geom is not None:
+                    result_lyr.CreateFeature(inFeat)
+            elif cFeatN > eFeatN:
+                break
+            inFeat = srcLyr.GetNextFeature()
+            cFeatN = cFeatN + 1
+        result_ds = None
+        
+        sFeatN = sFeatN + nfeats
+        eFeatN = eFeatN + nfeats
+    
+    if remainFeats > 0:
+        outveclyr = "{0}{1}".format(outvecbase, nOutFiles+1)
+        outvecfile = os.path.join(outdir, "{0}{1}".format(outveclyr, outvecend))
+        print("Creating: {}".format(outvecfile))
+        result_ds = out_driver.CreateDataSource(outvecfile)
+        result_lyr = result_ds.CreateLayer(outveclyr, src_lyr_spat_ref, geom_type=srcLyr.GetGeomType())
+
+        srcLayerDefn = srcLyr.GetLayerDefn()
+        for i in range(srcLayerDefn.GetFieldCount()):
+            fieldDefn = srcLayerDefn.GetFieldDefn(i)
+            result_lyr.CreateField(fieldDefn)
+        rsltLayerDefn = result_lyr.GetLayerDefn()
+        
+        cFeatN = 0
+        srcLyr.ResetReading()
+        inFeat = srcLyr.GetNextFeature()
+        while inFeat:
+            if (cFeatN >= sFeatN):
+                geom = inFeat.GetGeometryRef()
+                if geom is not None:
+                    result_lyr.CreateFeature(inFeat)
+            inFeat = srcLyr.GetNextFeature()
+            cFeatN = cFeatN + 1
+        
+        result_ds = None
+    datasrc = None
 
 
 def reProjVectorLayer(inputVec, outputVec, outProjWKT, outDriverName='ESRI Shapefile', outLyrName=None, inLyrName=None, inProjWKT=None, force=False):
@@ -748,6 +860,57 @@ with the select layer.
     return att_vals
 
 
+def exportSpatialSelectFeats(vecFile, vecLyr, selVecFile, selVecLyr, outputVec, outVecLyrName, outVecDrvr):
+    """
+Function to get a list of attribute values from features which intersect
+with the select layer.
+* vecFile - vector layer from which the attribute data comes from.
+* vecLyr - the layer name from which the attribute data comes from.
+* selVecFile - the vector file which will be intersected within the vector file.
+* selVecLyr - the layer name which will be intersected within the vector file.
+* outputVec - output vector file/path
+* outVecLyrName - output vector layer
+* outVecDrvr - the output vector layer type.
+"""
+    gdal.UseExceptions()
+    att_vals = []
+    try:
+        dsVecFile = gdal.OpenEx(vecFile, gdal.OF_READONLY )
+        if dsVecFile is None:
+            raise Exception("Could not open '" + vecFile + "'")
+        
+        lyrVecObj = dsVecFile.GetLayerByName( vecLyr )
+        if lyrVecObj is None:
+            raise Exception("Could not find layer '" + vecLyr + "'")
+        
+        lyr_spatial_ref = lyrVecObj.GetSpatialRef()
+            
+        dsSelVecFile = gdal.OpenEx(selVecFile, gdal.OF_READONLY )
+        if dsSelVecFile is None:
+            raise Exception("Could not open '" + selVecFile + "'")
+        
+        lyrSelVecObj = dsSelVecFile.GetLayerByName( selVecLyr )
+        if lyrSelVecObj is None:
+            raise Exception("Could not find layer '" + selVecLyr + "'")
+            
+        mem_driver = ogr.GetDriverByName('MEMORY')
+        mem_sel_ds = mem_driver.CreateDataSource('MemSelData')
+        mem_sel_lyr = mem_sel_ds.CopyLayer(lyrSelVecObj, selVecLyr, ['OVERWRITE=YES'])
+        
+        out_driver = ogr.GetDriverByName(outVecDrvr)        
+        result_ds = out_driver.CreateDataSource(outputVec)
+        result_lyr = result_ds.CreateLayer(outVecLyrName, lyr_spatial_ref, geom_type=lyrVecObj.GetGeomType())    
+        
+        lyrVecObj.Intersection(mem_sel_lyr, result_lyr, callback=gdal.TermProgress)
+        
+        dsSelVecFile = None        
+        dsVecFile = None
+        mem_sel_ds = None
+        result_ds = None
+    except Exception as e:
+        raise e
+
+
 def createPolyVecBBOXs(vectorFile, vectorLyr, vecDriver, espgCode, bboxs, atts=None, attTypes=None):
     """
 This function creates a set of polygons for a set of bounding boxes. 
@@ -825,6 +988,62 @@ When creating an attribute the available data types are ogr.OFTString, ogr.OFTIn
         outDataSource = None
     except Exception as e:
         raise e
+
+
+def createVectorGrid(outputVec, vecDriver, vecLyrName, espgCode, grid_x, grid_y, bbox):
+    """
+A function which creates a regular grid across a defined area.
+
+* outputVec - outout file
+* espgCode - ESPG code of the output projection 
+* grid_x - the size in the x axis of the grid cells.
+* grid_y - the size in the y axis of the grid cells.
+* bbox - the area for which cells will be defined (MinX, MaxX, MinY, MaxY).
+* vecDriver - the output vector layer type.
+* vecLyrName - output vector layer
+"""
+    import math
+    
+    minX = float(bbox[0])
+    maxX = float(bbox[1])
+    minY = float(bbox[2])
+    maxY = float(bbox[3])
+    grid_x = float(grid_x)
+    grid_y = float(grid_y)
+    
+    nXCells = math.floor((maxX-minX)/grid_x)
+    x_remain = (maxX-minX) - (grid_x * nXCells)
+    
+    nYCells = math.floor((maxY-minY)/grid_y)
+    y_remain = (maxY-minY) - (grid_y * nYCells)
+    
+    print("Cells: [{0}, {1}]".format(nXCells, nYCells))
+    
+    bboxs = []
+    for i in range(nYCells):
+        cMaxY = maxY - (i*grid_y)
+        cMinY = cMaxY - grid_y
+        for j in range(nXCells):
+            cMinX = minX + (j*grid_x)
+            cMaxX = cMinX + grid_x
+            bboxs.append([cMinX, cMaxX, cMinY, cMaxY])
+        if x_remain > 0:
+            cMinX = minX + (nXCells*grid_x)
+            cMaxX = cMinX + x_remain
+            bboxs.append([cMinX, cMaxX, cMinY, cMaxY])
+    if y_remain > 0:
+        cMaxY = maxY - (nYCells*grid_y)
+        cMinY = cMaxY - y_remain
+        for j in range(nXCells):
+            cMinX = minX + (j*grid_x)
+            cMaxX = cMinX + grid_x
+            bboxs.append([cMinX, cMaxX, cMinY, cMaxY])
+        if x_remain > 0:
+            cMinX = minX + (nXCells*grid_x)
+            cMaxX = cMinX + x_remain
+            bboxs.append([cMinX, cMaxX, cMinY, cMaxY])
+    
+    createPolyVecBBOXs(outputVec, vecLyrName, vecDriver, espgCode, bboxs)
 
 
 def writePts2Vec(vectorFile, vectorLyr, vecDriver, espgCode, ptsX, ptsY, atts=None, attTypes=None):
