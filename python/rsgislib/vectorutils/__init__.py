@@ -9,6 +9,7 @@ import os.path
 import os
 import shutil
 import subprocess
+import warnings
 
 import osgeo.gdal as gdal
 import osgeo.osr as osr
@@ -18,15 +19,14 @@ import osgeo.ogr as ogr
 import rsgislib
 
 # Import the RSGISLib Image Utils module
-from rsgislib import imageutils
+import rsgislib.imageutils
 
 # Import the RSGISLib RasterGIS module
-from rsgislib import rastergis
-
+import rsgislib.rastergis 
 
 def rasterise2Image(inputVec, inputImage, outImage, gdalformat="KEA", burnVal=1, shpAtt=None, shpExt=False):
     """ 
-A utillity to rasterise a shapefile into an image covering the same region and at the same resolution as the input image. 
+*** Deprecated *** A utillity to rasterise a shapefile into an image covering the same region and at the same resolution as the input image. 
 
 Where:
 
@@ -48,17 +48,18 @@ Example::
     vectorutils.rasterise2Image(inputVector, inputImage, outputImage, 'KEA', shpAtt='FID')
 
 """
+    warnings.warn("Call to deprecated function {}, use rsgislib.vectorutils.rasteriseVecLyr.".format(func.__name__), category=DeprecationWarning, stacklevel=2)
     try:
         gdal.UseExceptions()
         
         if shpExt:
             print("Creating output image from shapefile extent")
-            imageutils.createCopyImageVecExtent(inputImage, inputVec, outImage, 1, 0, gdalformat, rsgislib.TYPE_32UINT)
+            rsgislib.imageutils.createCopyImageVecExtent(inputImage, inputVec, outImage, 1, 0, gdalformat, rsgislib.TYPE_32UINT)
         elif inputImage is None:
             print("Assuming output image is already created so just using.")
         else:
             print("Creating output image using input image")
-            imageutils.createCopyImage(inputImage, outImage, 1, 0, gdalformat, rsgislib.TYPE_32UINT)
+            rsgislib.imageutils.createCopyImage(inputImage, outImage, 1, 0, gdalformat, rsgislib.TYPE_32UINT)
         
         if shpAtt == "FID":   
             tmpVector = os.path.splitext(inputVec)[0] + "_tmpFIDFile.shp"
@@ -91,8 +92,91 @@ Example::
                 driver.DeleteDataSource(tmpVector)
         
         print("Adding Colour Table")
-        rastergis.populateStats(clumps=outImage, addclrtab=True, calcpyramids=True, ignorezero=True)
+        rsgislib.rastergis.populateStats(clumps=outImage, addclrtab=True, calcpyramids=True, ignorezero=True)
         print("Completed")
+    except Exception as e:
+        raise e
+
+
+def rasteriseVecLyr(inputVec, inputVecLyr, inputImage, outImage, gdalformat="KEA", burnVal=1, datatype=rsgislib.TYPE_8UINT, vecAtt=None, vecExt=False, thematic=True, nodata=0):
+    """ 
+A utillity to rasterise a vector layer to an image covering the same region and at the same resolution as the input image. 
+
+Where:
+
+* inputVec is a string specifying the input vector file
+* inputVecLyr is a string specifying the input vector layer name.
+* inputImage is a string specifying the input image defining the grid, pixel resolution and area for the rasterisation (if None and vecExt is False them assumes output image already exists and just uses it as is burning vector into it)
+* outImage is a string specifying the output image for the rasterised shapefile
+* gdalformat is the output image format (Default: KEA).
+* burnVal is the value for the output image pixels if no attribute is provided.
+* datatype of the output file, default is rsgislib.TYPE_8UINT
+* vecAtt is a string specifying the attribute to be rasterised, value of None creates a binary mask and \"FID\" creates a temp shapefile with a "FID" column and rasterises that column.
+* vecExt is a boolean specifying that the output image should be cut to the same extent as the input shapefile (Default is False and therefore output image will be the same as the input).
+* thematic is a boolean (default True) specifying that the output image is an thematic dataset so a colour table will be populated.
+* nodata is a float specifying the no data value associated with a continous output image.
+
+Example::
+
+    from rsgislib import vectorutils
+    
+    inputVector = 'crowns.shp'
+    inputVectorLyr = 'crowns'
+    inputImage = 'injune_p142_casi_sub_utm.kea'
+    outputImage = 'psu142_crowns.kea'  
+    vectorutils.rasteriseVecLyr(inputVector, inputVectorLyr, inputImage, outputImage, 'KEA', vecAtt='FID')
+
+"""
+    try:
+        gdal.UseExceptions()
+        
+        if vecExt:
+            print("Creating output image from shapefile extent")
+            rsgisUtils = rsgislib.RSGISPyUtils()
+            xRes, yRes = rsgisUtils.getImageRes(inputImage)
+            if yRes < -1:
+                yRes = yRes * (-1)
+            outRes = xRes
+            if xRes > yRes:
+                outRes = yRes
+            
+            rsgislib.imageutils.createCopyImageVecExtentSnap2Grid(inputVec, inputVecLyr, outImage, outRes, 1, gdalformat, datatype)#inputImage, inputVec, outImage, 1, 0, gdalformat, rsgislib.TYPE_32UINT)
+        elif inputImage is None:
+            print("Assuming output image is already created so just using.")
+        else:
+            print("Creating output image using input image")
+            rsgislib.imageutils.createCopyImage(inputImage, outImage, 1, 0, gdalformat, rsgislib.TYPE_32UINT)
+        
+        print("Running Rasterise now...")
+        out_img_ds = gdal.Open(outImage, gdal.GA_Update)
+        if out_img_ds is None:
+            raise Exception("Could not open '" + outImage + "'")
+            
+        vec_ds = gdal.OpenEx(inputVec, gdal.OF_VECTOR)
+        if vec_ds is None:
+            raise Exception("Could not open '" + inputVec + "'")
+        
+        vec_lyr = vec_ds.GetLayerByName( inputVecLyr )
+        if vec_lyr is None:
+            raise Exception("Could not find layer '" + inputVecLyr + "'")
+        
+        # Run the algorithm.
+        err = 0
+        if vecAtt is None:
+            err = gdal.RasterizeLayer(out_img_ds, [1], vec_lyr, burn_values=[burnVal])
+        else:
+            err = gdal.RasterizeLayer(out_img_ds, [1], vec_lyr, options=["ATTRIBUTE="+vecAtt])
+        if err != 0:
+            raise Exception("Rasterisation Error: " + str(err))
+        
+        out_img_ds = None
+        vec_ds = None
+        
+        if thematic:
+            print("Adding Colour Table")
+            rsgislib.rastergis.populateStats(clumps=outImage, addclrtab=True, calcpyramids=True, ignorezero=True)
+        else:
+            rsgislib.imageutils.popImageStats(outImage, usenodataval=True, nodataval=nodata, calcpyramids=True)
     except Exception as e:
         raise e
 
