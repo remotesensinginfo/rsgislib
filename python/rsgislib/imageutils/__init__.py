@@ -284,7 +284,7 @@ of the output image.
 * outImgRes - output image resolution, square pixels so a single value.
 * outImgNBands - the number of image bands in the output image 
 * gdalformat - output image file format.
-* datatype - output image data type.
+* datatype - is a rsgislib.TYPE_* value providing the data type of the output image
 
 """
 
@@ -319,7 +319,7 @@ of the output image. The image file extent is snapped on to the grid defined by 
 * outImgRes - output image resolution, square pixels so a single value.
 * outImgNBands - the number of image bands in the output image 
 * gdalformat - output image file format.
-* datatype - output image data type.
+* datatype - is a rsgislib.TYPE_* value providing the data type of the output image
 
 """
     rsgisUtils = rsgislib.RSGISPyUtils()
@@ -340,6 +340,95 @@ of the output image. The image file extent is snapped on to the grid defined by 
     
     rsgislib.imageutils.createBlankImage(outputImg, outImgNBands, width, height, tlX, tlY, outImgRes, 0.0, '', wktString, gdalformat, datatype)
     
+
+def createBlankImgFromBBOX(bbox, wktstr, outputImg, outImgRes, outImgPxlVal, outImgNBands, gdalformat, datatype, snap2grid=False):
+    """
+A function to create a new image file based on a bbox to define the extent. 
+
+* bbox - bounding box defining the extent of the output image (xMin, xMax, yMin, yMax)
+* wktstr - the WKT string defining the bbox and output image projection.
+* outputImg - output image file.
+* outImgRes - output image resolution, square pixels so a single value.
+* outImgPxlVal - output image pixel value.
+* outImgNBands - the number of image bands in the output image 
+* gdalformat - output image file format.
+* datatype - is a rsgislib.TYPE_* value providing the data type of the output image.
+* snap2grid - optional variable to snap the image to a grid of whole numbers with respect to the image pixel resolution.
+
+"""    
+    if snap2grid:
+        rsgisUtils = rsgislib.RSGISPyUtils()
+        bbox = rsgisUtils.findExtentOnGrid(bbox, outImgRes, fullContain=True)
+
+    xMin = bbox[0]
+    xMax = bbox[1]
+    yMin = bbox[2]
+    yMax = bbox[3]
+
+    tlX = xMin
+    tlY = yMax
+    
+    widthCoord = xMax - xMin
+    heightCoord = yMax - yMin
+    
+    width = int(math.ceil(widthCoord/outImgRes))
+    height = int(math.ceil(heightCoord/outImgRes))
+    
+    rsgislib.imageutils.createBlankImage(outputImg, outImgNBands, width, height, tlX, tlY, outImgRes, outImgPxlVal, '', wktstr, gdalformat, datatype)
+
+   
+def createImageForEachVecFeat(vectorFile, vectorLyr, fileNameCol, outImgPath, outImgExt, outImgPxlVal, outImgNBands, outImgRes, gdalformat, datatype, snap2grid=False):
+    """
+A function to create a set of image files representing the extent of each feature in the 
+inputted vector file.
+
+* vectorFile - the input vector file.
+* vectorLyr - the input vector layer
+* fileNameCol - the name of the column in the vector layer which will be used as the file names.
+* outImgPath - output file path (directory) where the images will be saved.
+* outImgExt - the file extension to be added on to the output file names.
+* outImgPxlVal - output image pixel value
+* outImgNBands - the number of image bands in the output image
+* outImgRes - output image resolution, square pixels so a single value
+* gdalformat - output image file format.
+* datatype - is a rsgislib.TYPE_* value providing the data type of the output image.
+* snap2grid - optional variable to snap the image to a grid of whole numbers with respect to the image pixel resolution.
+"""
+    
+    dsVecFile = gdal.OpenEx(vectorFile, gdal.OF_VECTOR )
+    if dsVecFile is None:
+        raise Exception("Could not open '" + vectorFile + "'")
+        
+    lyrVecObj = dsVecFile.GetLayerByName( vectorLyr )
+    if lyrVecObj is None:
+        raise Exception("Could not find layer '" + vectorLyr + "'")
+        
+    lyrSpatRef = lyrVecObj.GetSpatialRef()
+    wktstr = lyrSpatRef.ExportToWkt()
+        
+    colExists = False
+    feat_idx = 0
+    lyrDefn = lyrVecObj.GetLayerDefn()
+    for i in range( lyrDefn.GetFieldCount() ):
+        if lyrDefn.GetFieldDefn(i).GetName().lower() == fileNameCol.lower():
+            feat_idx = i
+            colExists = True
+            break
+    
+    if not colExists:
+        dsVecFile = None
+        raise Exception("The specified column does not exist in the input layer; check case as some drivers are case sensitive.")
+    
+    lyrVecObj.ResetReading()
+    for feat in lyrVecObj:
+        geom = feat.GetGeometryRef()
+        if geom is not None:
+            env = geom.GetEnvelope()
+            tilebasename = feat.GetFieldAsString(feat_idx)
+            outputImg = os.path.join(outImgPath, "{0}{1}".format(tilebasename, outImgExt))
+            print(outputImg)
+            createBlankImgFromBBOX(env, wktstr, outputImg, outImgRes, outImgPxlVal, outImgNBands, gdalformat, datatype, snap2grid)
+
 
 def resampleImage2Match(inRefImg, inProcessImg, outImg, gdalformat, interpMethod, datatype=None, noDataVal=None, multicore=False):
     """
