@@ -979,6 +979,98 @@ returns list of dictionaries with the output values.
         raise e
     return outvals
 
+def getAttLstSelectBBoxFeats(vecFile, vecLyr, attNames, bbox):
+    """
+Function to get a list of attribute values from features which intersect
+with the select layer.
+* vecFile - vector layer from which the attribute data comes from.
+* vecLyr - the layer name from which the attribute data comes from.
+* attNames - a list of attribute names to be outputted.
+* bbox - region of interest (bounding box). Define as [xMin, xMax, yMin, yMax].
+
+returns list of dictionaries with the output values.
+"""
+    gdal.UseExceptions()
+    att_vals = []
+    try:
+        dsVecFile = gdal.OpenEx(vecFile, gdal.OF_READONLY )
+        if dsVecFile is None:
+            raise Exception("Could not open '" + vecFile + "'")
+        
+        lyrVecObj = dsVecFile.GetLayerByName( vecLyr )
+        if lyrVecObj is None:
+            raise Exception("Could not find layer '" + vecLyr + "'")
+            
+        lyr_spatial_ref = lyrVecObj.GetSpatialRef()
+        
+        lyrDefn = lyrVecObj.GetLayerDefn()
+        feat_idxs = dict()
+        feat_types= dict()
+        found_atts = dict()
+        for attName in attNames:
+            found_atts[attName] = False
+        
+        for i in range(lyrDefn.GetFieldCount()):
+            if lyrDefn.GetFieldDefn(i).GetName() in attNames:
+                attName = lyrDefn.GetFieldDefn(i).GetName()
+                feat_idxs[attName] = i
+                feat_types[attName] = lyrDefn.GetFieldDefn(i).GetType()
+                found_atts[attName] = True
+                
+        for attName in attNames:
+            if not found_atts[attName]:
+                dsSelVecFile = None            
+                dsVecFile = None
+                raise Exception("Could not find the attribute ({}) specified within the vector layer.".format(attName))
+            
+        mem_driver = ogr.GetDriverByName('MEMORY')
+        
+        mem_sel_ds = mem_driver.CreateDataSource('MemSelData')
+        mem_sel_lyr = mem_sel_ds.CreateLayer("MemSelLyr", lyr_spatial_ref, geom_type=ogr.wkbPolygon)
+        mem_sel_defn = mem_sel_lyr.GetLayerDefn()
+        ring = ogr.Geometry(ogr.wkbLinearRing)
+        ring.AddPoint(bbox[0], bbox[3])
+        ring.AddPoint(bbox[1], bbox[3])
+        ring.AddPoint(bbox[1], bbox[2])
+        ring.AddPoint(bbox[0], bbox[2])
+        ring.AddPoint(bbox[0], bbox[3])
+        # Create polygon.
+        poly = ogr.Geometry(ogr.wkbPolygon)
+        poly.AddGeometry(ring)
+        mem_sel_feat = ogr.Feature(mem_sel_defn)
+        mem_sel_feat.SetGeometry(poly)
+        mem_sel_lyr.CreateFeature(mem_sel_feat)
+        
+        mem_result_ds = mem_driver.CreateDataSource('MemResultData')
+        mem_result_lyr = mem_result_ds.CreateLayer("MemResultLyr", geom_type=lyrVecObj.GetGeomType())
+        
+        for attName in attNames:
+            mem_result_lyr.CreateField(ogr.FieldDefn(attName, feat_types[attName]))
+        
+        lyrVecObj.Intersection(mem_sel_lyr, mem_result_lyr)
+        
+        # loop through the input features
+        inFeat = mem_result_lyr.GetNextFeature()
+        outvals = []
+        while inFeat:
+            outdict = dict()
+            for attName in attNames:
+                if feat_types[attName] == ogr.OFTString:
+                    outdict[attName] = inFeat.GetFieldAsString(feat_idxs[attName])
+                elif feat_types[attName] == ogr.OFTReal:
+                    outdict[attName] = inFeat.GetFieldAsDouble(feat_idxs[attName])
+                elif feat_types[attName] == ogr.OFTInteger:
+                    outdict[attName] = inFeat.GetFieldAsInteger(feat_idxs[attName])
+            outvals.append(outdict)
+            inFeat = mem_result_lyr.GetNextFeature()
+        
+        dsSelVecFile = None        
+        dsVecFile = None
+        mem_sel_ds = None
+        mem_result_ds = None
+    except Exception as e:
+        raise e
+    return outvals
 
 def exportSpatialSelectFeats(vecFile, vecLyr, selVecFile, selVecLyr, outputVec, outVecLyrName, outVecDrvr):
     """
