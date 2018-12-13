@@ -892,15 +892,17 @@ A function which reprojects a vector layer.
     outDataSet = None
 
 
-def getAttLstSelectFeats(vecFile, vecLyr, attName, selVecFile, selVecLyr):
+def getAttLstSelectFeats(vecFile, vecLyr, attNames, selVecFile, selVecLyr):
     """
 Function to get a list of attribute values from features which intersect
 with the select layer.
 * vecFile - vector layer from which the attribute data comes from.
 * vecLyr - the layer name from which the attribute data comes from.
-* attName - name of the attribute to be outputted.
+* attNames - a list of attribute names to be outputted.
 * selVecFile - the vector file which will be intersected within the vector file.
 * selVecLyr - the layer name which will be intersected within the vector file.
+
+returns list of dictionaries with the output values.
 """
     gdal.UseExceptions()
     att_vals = []
@@ -922,18 +924,24 @@ with the select layer.
             raise Exception("Could not find layer '" + selVecLyr + "'")
         
         lyrDefn = lyrVecObj.GetLayerDefn()
-        feat_idx = 0
-        found_att = False
+        feat_idxs = dict()
+        feat_types= dict()
+        found_atts = dict()
+        for attName in attNames:
+            found_atts[attName] = False
+        
         for i in range(lyrDefn.GetFieldCount()):
-            if lyrDefn.GetFieldDefn(i).GetName() == attName:
-                feat_idx = i
-                feat_type = lyrDefn.GetFieldDefn(feat_idx).GetType()
-                found_att = True
-         
-        if not found_att:
-            dsSelVecFile = None            
-            dsVecFile = None
-            raise Exception("Could not find the attribute specified within the vector layer.")
+            if lyrDefn.GetFieldDefn(i).GetName() in attNames:
+                attName = lyrDefn.GetFieldDefn(i).GetName()
+                feat_idxs[attName] = i
+                feat_types[attName] = lyrDefn.GetFieldDefn(i).GetType()
+                found_atts[attName] = True
+                
+        for attName in attNames:
+            if not found_atts[attName]:
+                dsSelVecFile = None            
+                dsVecFile = None
+                raise Exception("Could not find the attribute ({}) specified within the vector layer.".format(attName))
             
         mem_driver = ogr.GetDriverByName('MEMORY')
         
@@ -943,21 +951,24 @@ with the select layer.
         mem_result_ds = mem_driver.CreateDataSource('MemResultData')
         mem_result_lyr = mem_result_ds.CreateLayer("MemResultLyr", geom_type=lyrVecObj.GetGeomType())
         
-        result_field = ogr.FieldDefn(attName, lyrDefn.GetFieldDefn(feat_idx).GetType())
-        mem_result_lyr.CreateField(result_field)
+        for attName in attNames:
+            mem_result_lyr.CreateField(ogr.FieldDefn(attName, feat_types[attName]))
         
         lyrVecObj.Intersection(mem_sel_lyr, mem_result_lyr)
         
         # loop through the input features
         inFeat = mem_result_lyr.GetNextFeature()
+        outvals = []
         while inFeat:
-            if feat_type == ogr.OFTString:
-                att_vals.append(inFeat.GetFieldAsString(0))
-            elif feat_type == ogr.OFTReal:
-                att_vals.append(inFeat.GetFieldAsDouble(0))
-            elif feat_type == ogr.OFTInteger:
-                att_vals.append(inFeat.GetFieldAsInteger(0))
-            
+            outdict = dict()
+            for attName in attNames:
+                if feat_types[attName] == ogr.OFTString:
+                    outdict[attName] = inFeat.GetFieldAsString(feat_idxs[attName])
+                elif feat_types[attName] == ogr.OFTReal:
+                    outdict[attName] = inFeat.GetFieldAsDouble(feat_idxs[attName])
+                elif feat_types[attName] == ogr.OFTInteger:
+                    outdict[attName] = inFeat.GetFieldAsInteger(feat_idxs[attName])
+            outvals.append(outdict)
             inFeat = mem_result_lyr.GetNextFeature()
         
         dsSelVecFile = None        
@@ -966,7 +977,7 @@ with the select layer.
         mem_result_ds = None
     except Exception as e:
         raise e
-    return att_vals
+    return outvals
 
 
 def exportSpatialSelectFeats(vecFile, vecLyr, selVecFile, selVecLyr, outputVec, outVecLyrName, outVecDrvr):
