@@ -550,6 +550,31 @@ Where:
                     raise Exception('Error running ogr2ogr: ' + cmd)
 
 
+def mergeVectors2SQLiteDBIndLyrs(inFileList, outDBFile):
+    """
+Function which will merge a list of vector files into an single output SQLite database where each input 
+file forms a new layer using the existing layer name. This function wraps the ogr2ogr command.
+
+Where:
+
+* inFileList - is a list of input files.
+* outDBFile - is the output SQLite database (\*.sqlite)
+
+"""
+    for inFile in inFileList:
+        inlyrs = getVecLyrsLst(inFile)
+        print("Processing File: {0} has {1} layers to copy.".format(inFile, len(inlyrs)))
+        for lyr in inlyrs:
+            nFeat = getVecFeatCount(inFile, lyr)
+            print("Processing Layer: {0} has {1} features to copy.".format(lyr, nFeat))
+            if nFeat > 0:
+                cmd = 'ogr2ogr -overwrite -f "SQLite" -lco COMPRESS_GEOM=YES -lco SPATIAL_INDEX=YES -nln {0} "{1}" "{2}" {0}'.format(lyr, outDBFile, inFile)
+                try:
+                    subprocess.call(cmd, shell=True)
+                except OSError as e:
+                    raise Exception('Error running ogr2ogr: ' + cmd)
+
+
 def createPolySHP4LstBBOXs(csvFile, outSHP, espgCode, minXCol=0, maxXCol=1, minYCol=2, maxYCol=3, ignoreRows=0, force=False):
     """
 This function takes a CSV file of bounding boxes (1 per line) and creates a polygon shapefile.
@@ -969,7 +994,7 @@ with the select layer.
         
         lyr_spatial_ref = lyrVecObj.GetSpatialRef()
         
-        vec_lyr_bbox = extent = lyrVecObj.GetExtent(True)
+        vec_lyr_bbox = lyrVecObj.GetExtent(True)
         
         # Create polygon for bbox
         ring = ogr.Geometry(ogr.wkbLinearRing)
@@ -1268,7 +1293,7 @@ with a bounding box.
     return intersect
 
 
-def createImgExtentLUT(imgList, vectorFile, vectorLyr, vecDriver):
+def createImgExtentLUT(imgList, vectorFile, vectorLyr, vecDriver, ignore_none_imgs=False):
     """
 Create a vector layer look up table (LUT) for a directory of images.
 
@@ -1276,6 +1301,7 @@ Create a vector layer look up table (LUT) for a directory of images.
 * vectorFile - output vector file/path
 * vectorLyr - output vector layer
 * vecDriver - the output vector layer type.
+* ignore_none_imgs - if a NULL epsg is returned from an image then ignore and don't include in LUT else throw exception.
 
 Example::
 
@@ -1302,20 +1328,27 @@ Example::
     first = True
     baseImg = ''
     for img in imgList:
-        if first:
-            epsgCode = int(rsgisUtils.getEPSGCode(img))
-            baseImg = img
-            first = False
-        else:
-            epsgCodeTmp = int(rsgisUtils.getEPSGCode(img))
-            if epsgCodeTmp != epsgCode:
-                raise Exception("The EPSG codes ({0} & {1}) do not match. (Base: '{2}', Img: '{3}')".format(epsgCode, epsgCodeTmp, baseImg, img))
-        
-        bboxs.append(rsgisUtils.getImageBBOX(img))
-        baseName = os.path.basename(img)
-        filePath = os.path.dirname(img)
-        atts['filename'].append(baseName)
-        atts['path'].append(filePath)
+        epsgCodeTmp = rsgisUtils.getEPSGCode(img)
+        epsg_found = True
+        if epsgCodeTmp is None:
+            epsg_found = False
+            if not ignore_none_imgs:
+                raise Exception("The EPSG code is None: '{}'".format(img))
+        if epsg_found:
+            epsgCodeTmp = int(epsgCodeTmp)
+            if first:
+                epsgCode = epsgCodeTmp
+                baseImg = img
+                first = False
+            else:
+                if epsgCodeTmp != epsgCode:
+                    raise Exception("The EPSG codes ({0} & {1}) do not match. (Base: '{2}', Img: '{3}')".format(epsgCode, epsgCodeTmp, baseImg, img))
+            
+            bboxs.append(rsgisUtils.getImageBBOX(img))
+            baseName = os.path.basename(img)
+            filePath = os.path.dirname(img)
+            atts['filename'].append(baseName)
+            atts['path'].append(filePath)
     # Create vector layer
     createPolyVecBBOXs(vectorFile, vectorLyr, vecDriver, epsgCode, bboxs, atts, attTypes)
 
