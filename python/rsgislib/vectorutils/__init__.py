@@ -299,12 +299,10 @@ Example::
         raise Exception("Could not open '" + vectorFile + "'")
     
     lyr = ds.GetLayerByName( vectorLayer )
-    
     if lyr is None:
         raise Exception("Could not find layer '" + vectorLayer + "'")
     
     numFeats = lyr.GetFeatureCount()
-    
     if not len(colData) == numFeats:
         print("Number of Features: " + str(numFeats))
         print("Length of Data: " + str(len(colData)))
@@ -313,18 +311,26 @@ Example::
     colExists = False
     lyrDefn = lyr.GetLayerDefn()
     for i in range( lyrDefn.GetFieldCount() ):
-        if lyrDefn.GetFieldDefn(i).GetName() == colName:
+        if lyrDefn.GetFieldDefn(i).GetName().lower() == colName.lower():
             colExists = True
             break
-    
+
     if not colExists:
         field_defn = ogr.FieldDefn( colName, colDataType )
         if lyr.CreateField ( field_defn ) != 0:
-            raise Exception("Creating '" + colName + "' field failed.\n")
-
+            raise Exception("Creating '" + colName + "' field failed; becareful with case, some drivers are case insensitive but column might not be found.\n")
+    
+    lyr.ResetReading()
+    # WORK AROUND AS SQLITE GETS STUCK IN LOOP ON FIRST FEATURE WHEN USE SETFEATURE.
+    fids=[]
+    for feat in lyr:
+        fids.append(feat.GetFID())
+    
     lyr.ResetReading()
     i = 0
-    for feat in lyr:
+    for fid in fids:
+        # WORK AROUND AS SQLITE GETS STUCK IN LOOP ON FIRST FEATURE WHEN USE SETFEATURE.
+        feat = lyr.GetFeature(fid)
         feat.SetField(colName, colData[i] )
         lyr.SetFeature(feat)
         i = i + 1
@@ -342,28 +348,16 @@ Where:
 * vectorLayer - The layer to which the data is to be read from.
 * colName - Name of the input column
 
-Example::
-
-    from rsgislib import vectorutils
-    import rsgislib
-    
-    rsgisUtils = rsgislib.RSGISPyUtils()
-    requiredScenes = rsgisUtils.readTextFile2List("GMW_JERS-1_ScenesRequired.txt")
-    requiredScenesShp = "JERS-1_Scenes_Requred_shp"
-    vectorutils.writeVecColumn(requiredScenesShp+'.shp', requiredScenesShp, 'ScnName', ogr.OFTString, requiredScenes)
-
 """
     gdal.UseExceptions()
     
-    ds = gdal.OpenEx(vectorFile, gdal.OF_UPDATE )
+    ds = gdal.OpenEx(vectorFile, gdal.OF_VECTOR )
     if ds is None:
         raise Exception("Could not open '" + vectorFile + "'")
     
     lyr = ds.GetLayerByName( vectorLayer )
-    
     if lyr is None:
         raise Exception("Could not find layer '" + vectorLayer + "'")
-    
 
     colExists = False
     lyrDefn = lyr.GetLayerDefn()
@@ -373,17 +367,174 @@ Example::
             break
     
     if not colExists:
-        raise Exception("The specified column does not exist in the input layer.")
+        ds = None
+        raise Exception("The specified column does not exist in the input layer; check case as some drivers are case sensitive.")
     
     outVal = list()
     lyr.ResetReading()
     for feat in lyr:
         outVal.append(feat.GetField(colName))
-
-    lyr.SyncToDisk()
     ds = None
     
     return outVal
+
+
+def readVecColumns(vectorFile, vectorLayer, attNames):
+    """
+A function which will reads a column from a vector file
+
+Where:
+
+* vectorFile - The file / path to the vector data 'file'.
+* vectorLayer - The layer to which the data is to be read from.
+* attNames - List of input attribute column names to be read in.
+
+"""
+    gdal.UseExceptions()
+    
+    ds = gdal.OpenEx(vectorFile, gdal.OF_VECTOR )
+    if ds is None:
+        raise Exception("Could not open '{}'".format(vectorFile))
+    
+    lyr = ds.GetLayerByName( vectorLayer )
+    if lyr is None:
+        raise Exception("Could not find layer '{}'".format(vectorLayer))
+    
+    lyrDefn = lyr.GetLayerDefn()
+    
+    feat_idxs = dict()
+    feat_types= dict()
+    found_atts = dict()
+    for attName in attNames:
+        found_atts[attName] = False
+    
+    for i in range(lyrDefn.GetFieldCount()):
+        if lyrDefn.GetFieldDefn(i).GetName() in attNames:
+            attName = lyrDefn.GetFieldDefn(i).GetName()
+            feat_idxs[attName] = i
+            feat_types[attName] = lyrDefn.GetFieldDefn(i).GetType()
+            found_atts[attName] = True
+            
+    for attName in attNames:
+        if not found_atts[attName]:
+            ds = None
+            raise Exception("Could not find the attribute ({}) specified within the vector layer.".format(attName))
+    
+    outvals = []
+    lyr.ResetReading()
+    for feat in lyr:
+        outdict = dict()
+        for attName in attNames:
+            if feat_types[attName] == ogr.OFTString:
+                outdict[attName] = feat.GetFieldAsString(feat_idxs[attName])
+            elif feat_types[attName] == ogr.OFTReal:
+                outdict[attName] = feat.GetFieldAsDouble(feat_idxs[attName])
+            elif feat_types[attName] == ogr.OFTInteger:
+                outdict[attName] = feat.GetFieldAsInteger(feat_idxs[attName])
+            else:
+                outdict[attName] = feat.GetField(feat_idxs[attName])
+        outvals.append(outdict)
+    ds = None
+    
+    return outvals
+
+
+def popBBOXCols(vecFile, vecLyr, xminCol='xmin', xmaxCol='xmax', yminCol='ymin', ymaxCol='ymax'):
+    """
+A function which adds a polygons boundary bbox as attributes to each feature.
+
+* vecFile - vector file.
+* vecLyr - layer within the vector file.
+* xminCol - column name.
+* xmaxCol - column name.
+* yminCol - column name.
+* ymaxCol - column name.
+"""
+    import math
+
+    dsVecFile = gdal.OpenEx(vecFile, gdal.OF_UPDATE )
+    if dsVecFile is None:
+        raise Exception("Could not open '" + vecFile + "'")
+        
+    lyrVecObj = dsVecFile.GetLayerByName( vecLyr )
+    if lyrVecObj is None:
+        raise Exception("Could not find layer '" + vecLyr + "'")
+    
+    xminCol_exists = False
+    xmaxCol_exists = False
+    yminCol_exists = False
+    ymaxCol_exists = False
+    
+    lyrDefn = lyrVecObj.GetLayerDefn()
+    for i in range( lyrDefn.GetFieldCount() ):
+        if lyrDefn.GetFieldDefn(i).GetName() == xminCol:
+            xminCol_exists = True
+        if lyrDefn.GetFieldDefn(i).GetName() == xmaxCol:
+            xmaxCol_exists = True
+        if lyrDefn.GetFieldDefn(i).GetName() == yminCol:
+            yminCol_exists = True
+        if lyrDefn.GetFieldDefn(i).GetName() == ymaxCol:
+            ymaxCol_exists = True
+    
+    if not xminCol_exists:
+        xmin_field_defn = ogr.FieldDefn( xminCol, ogr.OFTReal )
+        if lyrVecObj.CreateField ( xmin_field_defn ) != 0:
+            raise Exception("Creating '{}' field failed.".format(xminCol))
+            
+    if not xmaxCol_exists:
+        xmax_field_defn = ogr.FieldDefn( xmaxCol, ogr.OFTReal )
+        if lyrVecObj.CreateField ( xmax_field_defn ) != 0:
+            raise Exception("Creating '{}' field failed.".format(xmaxCol))
+    
+    if not yminCol_exists:
+        ymin_field_defn = ogr.FieldDefn( yminCol, ogr.OFTReal )
+        if lyrVecObj.CreateField ( ymin_field_defn ) != 0:
+            raise Exception("Creating '{}' field failed.".format(yminCol))
+            
+    if not ymaxCol_exists:
+        ymax_field_defn = ogr.FieldDefn( ymaxCol, ogr.OFTReal )
+        if lyrVecObj.CreateField ( ymax_field_defn ) != 0:
+            raise Exception("Creating '{}' field failed.".format(ymaxCol))
+
+    # WORK AROUND AS SQLITE GETS STUCK IN LOOP ON FIRST FEATURE WHEN USE SETFEATURE.
+    fids=[]
+    for feat in lyrVecObj:
+        fids.append(feat.GetFID())
+        
+    nFeats = lyrVecObj.GetFeatureCount(True)
+    step = math.floor(nFeats/10)
+    feedback = 10
+    feedback_next = step
+    counter = 0
+    print("Started .0.", end='', flush=True)
+    lyrVecObj.ResetReading()
+    for fid in fids:
+        # WORK AROUND AS SQLITE GETS STUCK IN LOOP ON FIRST FEATURE WHEN USE SETFEATURE.
+        feat = lyrVecObj.GetFeature(fid)
+        if counter == feedback_next:
+            print(".{}.".format(feedback), end='', flush=True)
+            feedback_next = feedback_next + step
+            feedback = feedback + 10
+            
+        geom = feat.GetGeometryRef()
+        if geom is not None:
+            env = geom.GetEnvelope()
+            feat.SetField(xminCol, env[0])
+            feat.SetField(xmaxCol, env[1])
+            feat.SetField(yminCol, env[2])
+            feat.SetField(ymaxCol, env[3])
+        else:
+            feat.SetField(xminCol, 0.0)
+            feat.SetField(xmaxCol, 0.0)
+            feat.SetField(yminCol, 0.0)
+            feat.SetField(ymaxCol, 0.0)
+        rtn_val = lyrVecObj.SetFeature(feat)
+        if rtn_val != ogr.OGRERR_NONE:
+            raise Exception("An error has occurred setting a feature on a layer.")
+        counter = counter + 1
+    lyrVecObj.SyncToDisk()
+    dsVecFile = None
+    print(" Completed")
 
 
 def extractImageFootprint(inputImg, outVec, tmpDIR='./tmp', rePrjTo=None):
@@ -1061,6 +1212,8 @@ returns list of dictionaries with the output values.
                     outdict[attName] = inFeat.GetFieldAsDouble(feat_idxs[attName])
                 elif feat_types[attName] == ogr.OFTInteger:
                     outdict[attName] = inFeat.GetFieldAsInteger(feat_idxs[attName])
+                else:
+                    outdict[attName] = feat.GetField(feat_idxs[attName])
             outvals.append(outdict)
             inFeat = mem_result_lyr.GetNextFeature()
         
