@@ -140,7 +140,7 @@ Example::
             if xRes > yRes:
                 outRes = yRes
             
-            rsgislib.imageutils.createCopyImageVecExtentSnap2Grid(inputVec, inputVecLyr, outImage, outRes, 1, gdalformat, datatype)#inputImage, inputVec, outImage, 1, 0, gdalformat, rsgislib.TYPE_32UINT)
+            rsgislib.imageutils.createCopyImageVecExtentSnap2Grid(inputVec, inputVecLyr, outImage, outRes, 1, gdalformat, datatype)
         elif inputImage is None:
             print("Assuming output image is already created so just using.")
         else:
