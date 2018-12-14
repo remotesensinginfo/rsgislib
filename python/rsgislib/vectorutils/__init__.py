@@ -221,16 +221,6 @@ Where:
 * maskImg is an optional string mask file specifying a no data mask (default = None)
 * imgMaskBandNo is an int specifying the image band to be used the mask (default = 1)
 
-Example::
-
-    from rsgislib import vectorutils
-     
-    inputVector = 'crowns.shp'
-    inputImage = 'injune_p142_casi_sub_utm.kea'
-    outputImage = 'psu142_crowns.kea'
-        
-    vectorutils.copyShapefile2RAT(inputVector, inputImage, outputImage)
-
 """
     gdal.UseExceptions()
     
@@ -254,6 +244,55 @@ Example::
     
     layerName = os.path.splitext(os.path.basename(outShp))[0]
     outLayer = outDatasource.CreateLayer(layerName, srs=imgsrs)
+    
+    newField = ogr.FieldDefn('PXLVAL', ogr.OFTInteger)
+    outLayer.CreateField(newField)
+    dstFieldIdx = outLayer.GetLayerDefn().GetFieldIndex('PXLVAL')
+    
+    print("Polygonising...")
+    gdal.Polygonize(imgBand, imgMaskBand, outLayer, dstFieldIdx, [], callback=gdal.TermProgress )
+    print("Completed")
+    outDatasource.Destroy()
+    gdalImgData = None
+    if maskImg is not None:
+        gdalImgMaskData = None
+
+
+def polygoniseRaster2VecLyr(outvec, outlyr, vecdrv, inputImg, imgBandNo=1, maskImg=None, imgMaskBandNo=1):
+    """ 
+A utillity to polygonise a raster to a OGR vector layer. 
+    
+Where:
+
+* outvec is a string specifying the output vector file path. If it exists it will be deleted and overwritten.
+* outlyr is a string with the name of the vector layer.
+* vecdrv is a string with the driver
+* inputImg is a string specifying the input image file to be polygonised
+* imgBandNo is an int specifying the image band to be polygonised. (default = 1)
+* maskImg is an optional string mask file specifying a no data mask (default = None)
+* imgMaskBandNo is an int specifying the image band to be used the mask (default = 1)
+
+"""
+    gdal.UseExceptions()
+    
+    gdalImgData = gdal.Open(inputImg)
+    imgBand = gdalImgData.GetRasterBand(imgBandNo)
+    imgsrs = osr.SpatialReference()
+    imgsrs.ImportFromWkt(gdalImgData.GetProjectionRef())
+    
+    gdalImgMaskData = None
+    imgMaskBand = None
+    if maskImg is not None:
+        print("Using mask")
+        gdalImgMaskData = gdal.Open(maskImg)
+        imgMaskBand = gdalImgData.GetRasterBand(imgMaskBandNo)
+
+    
+    driver = ogr.GetDriverByName(vecdrv)
+    if os.path.exists(outvec):
+        driver.DeleteDataSource(outvec)
+    outDatasource = driver.CreateDataSource(outvec)
+    outLayer = outDatasource.CreateLayer(outlyr, srs=imgsrs)
     
     newField = ogr.FieldDefn('PXLVAL', ogr.OFTInteger)
     outLayer.CreateField(newField)
