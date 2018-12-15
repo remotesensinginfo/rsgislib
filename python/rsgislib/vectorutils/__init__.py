@@ -1147,17 +1147,21 @@ returns list of dictionaries with the output values.
         lyrVecObj.Intersection(mem_sel_lyr, mem_result_lyr)
         
         # loop through the input features
+        reslyrDefn = mem_result_lyr.GetLayerDefn()
         inFeat = mem_result_lyr.GetNextFeature()
         outvals = []
         while inFeat:
             outdict = dict()
             for attName in attNames:
+                feat_idx = reslyrDefn.GetFieldIndex(attName)
                 if feat_types[attName] == ogr.OFTString:
-                    outdict[attName] = inFeat.GetFieldAsString(feat_idxs[attName])
+                    outdict[attName] = inFeat.GetFieldAsString(feat_idx)
                 elif feat_types[attName] == ogr.OFTReal:
-                    outdict[attName] = inFeat.GetFieldAsDouble(feat_idxs[attName])
+                    outdict[attName] = inFeat.GetFieldAsDouble(feat_idx)
                 elif feat_types[attName] == ogr.OFTInteger:
-                    outdict[attName] = inFeat.GetFieldAsInteger(feat_idxs[attName])
+                    outdict[attName] = inFeat.GetFieldAsInteger(feat_idx)
+                else:
+                    outdict[attName] = feat.GetField(feat_idx)
             outvals.append(outdict)
             inFeat = mem_result_lyr.GetNextFeature()
         
@@ -1240,19 +1244,21 @@ returns list of dictionaries with the output values.
         lyrVecObj.Intersection(mem_sel_lyr, mem_result_lyr)
         
         # loop through the input features
+        reslyrDefn = mem_result_lyr.GetLayerDefn()
         inFeat = mem_result_lyr.GetNextFeature()
         outvals = []
         while inFeat:
             outdict = dict()
             for attName in attNames:
+                feat_idx = reslyrDefn.GetFieldIndex(attName)
                 if feat_types[attName] == ogr.OFTString:
-                    outdict[attName] = inFeat.GetFieldAsString(feat_idxs[attName])
+                    outdict[attName] = inFeat.GetFieldAsString(feat_idx)
                 elif feat_types[attName] == ogr.OFTReal:
-                    outdict[attName] = inFeat.GetFieldAsDouble(feat_idxs[attName])
+                    outdict[attName] = inFeat.GetFieldAsDouble(feat_idx)
                 elif feat_types[attName] == ogr.OFTInteger:
-                    outdict[attName] = inFeat.GetFieldAsInteger(feat_idxs[attName])
+                    outdict[attName] = inFeat.GetFieldAsInteger(feat_idx)
                 else:
-                    outdict[attName] = feat.GetField(feat_idxs[attName])
+                    outdict[attName] = feat.GetField(feat_idx)
             outvals.append(outdict)
             inFeat = mem_result_lyr.GetNextFeature()
         
