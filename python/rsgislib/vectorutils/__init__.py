@@ -365,14 +365,24 @@ Example::
     for feat in lyr:
         fids.append(feat.GetFID())
     
+    openTransaction = False
     lyr.ResetReading()
     i = 0
+    # WORK AROUND AS SQLITE GETS STUCK IN LOOP ON FIRST FEATURE WHEN USE SETFEATURE.
     for fid in fids:
-        # WORK AROUND AS SQLITE GETS STUCK IN LOOP ON FIRST FEATURE WHEN USE SETFEATURE.
+        if not openTransaction:
+            lyr.StartTransaction()
+            openTransaction = True
         feat = lyr.GetFeature(fid)
         feat.SetField(colName, colData[i] )
         lyr.SetFeature(feat)
+        if ((i % 20000) == 0) and openTransaction:
+            lyr.CommitTransaction()
+            openTransaction = False
         i = i + 1
+    if openTransaction:
+        lyr.CommitTransaction()
+        openTransaction = False
     lyr.SyncToDisk()
     ds = None
 
@@ -539,7 +549,8 @@ A function which adds a polygons boundary bbox as attributes to each feature.
     fids=[]
     for feat in lyrVecObj:
         fids.append(feat.GetFID())
-        
+    
+    openTransaction = False
     nFeats = lyrVecObj.GetFeatureCount(True)
     step = math.floor(nFeats/10)
     feedback = 10
@@ -550,10 +561,14 @@ A function which adds a polygons boundary bbox as attributes to each feature.
     for fid in fids:
         # WORK AROUND AS SQLITE GETS STUCK IN LOOP ON FIRST FEATURE WHEN USE SETFEATURE.
         feat = lyrVecObj.GetFeature(fid)
-        if counter == feedback_next:
+        if (nFeats>10) and (counter == feedback_next):
             print(".{}.".format(feedback), end='', flush=True)
             feedback_next = feedback_next + step
             feedback = feedback + 10
+        
+        if not openTransaction:
+            lyrVecObj.StartTransaction()
+            openTransaction = True
             
         geom = feat.GetGeometryRef()
         if geom is not None:
@@ -570,7 +585,13 @@ A function which adds a polygons boundary bbox as attributes to each feature.
         rtn_val = lyrVecObj.SetFeature(feat)
         if rtn_val != ogr.OGRERR_NONE:
             raise Exception("An error has occurred setting a feature on a layer.")
+        if ((counter % 20000) == 0) and openTransaction:
+            lyrVecObj.CommitTransaction()
+            openTransaction = False
         counter = counter + 1
+    if openTransaction:
+        lyrVecObj.CommitTransaction()
+        openTransaction = False
     lyrVecObj.SyncToDisk()
     dsVecFile = None
     print(" Completed")
@@ -740,6 +761,45 @@ Where:
                     raise Exception('Error running ogr2ogr: ' + cmd)
 
 
+def mergeVectors2GPKG(inFileList, outFile, lyrName, exists):
+    """
+Function which will merge a list of vector files into an single output GeoPackage (GPKG) file using ogr2ogr.
+
+Where:
+
+* inFileList - is a list of input files.
+* outFile - is the output GPKG database (\*.gpkg)
+* lyrName - is the layer name in the output database (i.e., you can merge layers into single layer or write a number of layers to the same database).
+* exists - boolean which specifies whether the database file exists or not.
+
+"""
+    first = True
+    for inFile in inFileList:
+        nFeat = getVecFeatCount(inFile)
+        print("Processing: " + inFile + " has " + str(nFeat) + " features.")
+        if nFeat > 0:
+            if first:
+                if not exists:
+                    cmd = 'ogr2ogr -f "GPKG" -lco SPATIAL_INDEX=YES -nln '+lyrName+' "' + outFile + '" "' + inFile + '"'
+                    try:
+                        subprocess.call(cmd, shell=True)
+                    except OSError as e:
+                        raise Exception('Error running ogr2ogr: ' + cmd)
+                else:
+                    cmd = 'ogr2ogr -update -f "GPKG" -lco SPATIAL_INDEX=YES -nln '+lyrName+' "' + outFile + '" "' + inFile + '"'
+                    try:
+                        subprocess.call(cmd, shell=True)
+                    except OSError as e:
+                        raise Exception('Error running ogr2ogr: ' + cmd)
+                first = False
+            else:
+                cmd = 'ogr2ogr -update -append -f "GPKG" -nln '+lyrName+' "' + outFile + '" "' + inFile + '"'
+                try:
+                    subprocess.call(cmd, shell=True)
+                except OSError as e:
+                    raise Exception('Error running ogr2ogr: ' + cmd)
+
+
 def mergeVectors2SQLiteDBIndLyrs(inFileList, outDBFile):
     """
 Function which will merge a list of vector files into an single output SQLite database where each input 
@@ -759,6 +819,31 @@ Where:
             print("Processing Layer: {0} has {1} features to copy.".format(lyr, nFeat))
             if nFeat > 0:
                 cmd = 'ogr2ogr -overwrite -f "SQLite" -lco COMPRESS_GEOM=YES -lco SPATIAL_INDEX=YES -nln {0} "{1}" "{2}" {0}'.format(lyr, outDBFile, inFile)
+                try:
+                    subprocess.call(cmd, shell=True)
+                except OSError as e:
+                    raise Exception('Error running ogr2ogr: ' + cmd)
+
+
+def mergeVectors2GPKGIndLyrs(inFileList, outFile):
+    """
+Function which will merge a list of vector files into an single output GPKG file where each input 
+file forms a new layer using the existing layer name. This function wraps the ogr2ogr command.
+
+Where:
+
+* inFileList - is a list of input files.
+* outFile - is the output GPKG database (\*.gpkg)
+
+"""
+    for inFile in inFileList:
+        inlyrs = getVecLyrsLst(inFile)
+        print("Processing File: {0} has {1} layers to copy.".format(inFile, len(inlyrs)))
+        for lyr in inlyrs:
+            nFeat = getVecFeatCount(inFile, lyr)
+            print("Processing Layer: {0} has {1} features to copy.".format(lyr, nFeat))
+            if nFeat > 0:
+                cmd = 'ogr2ogr -overwrite -f "GPKG" -lco SPATIAL_INDEX=YES -nln {0} "{1}" "{2}" {0}'.format(lyr, outFile, inFile)
                 try:
                     subprocess.call(cmd, shell=True)
                 except OSError as e:
@@ -942,6 +1027,7 @@ A function which splits the input vector layer into a number of output layers.
         cFeatN = 0
         srcLyr.ResetReading()
         inFeat = srcLyr.GetNextFeature()
+        result_lyr.StartTransaction()
         while inFeat:
             if (cFeatN >= sFeatN) and (cFeatN < eFeatN):
                 geom = inFeat.GetGeometryRef()
@@ -951,6 +1037,7 @@ A function which splits the input vector layer into a number of output layers.
                 break
             inFeat = srcLyr.GetNextFeature()
             cFeatN = cFeatN + 1
+        result_lyr.CommitTransaction()
         result_ds = None
         
         sFeatN = sFeatN + nfeats
@@ -972,6 +1059,7 @@ A function which splits the input vector layer into a number of output layers.
         cFeatN = 0
         srcLyr.ResetReading()
         inFeat = srcLyr.GetNextFeature()
+        result_lyr.StartTransaction()
         while inFeat:
             if (cFeatN >= sFeatN):
                 geom = inFeat.GetGeometryRef()
@@ -979,7 +1067,7 @@ A function which splits the input vector layer into a number of output layers.
                     result_lyr.CreateFeature(inFeat)
             inFeat = srcLyr.GetNextFeature()
             cFeatN = cFeatN + 1
-        
+        result_lyr.CommitTransaction()
         result_ds = None
     datasrc = None
 
@@ -1057,9 +1145,27 @@ A function which reprojects a vector layer.
     # get the output layer's feature definition
     outLayerDefn = outLayer.GetLayerDefn()
     
+    
+    openTransaction = False
+    nFeats = inLayer.GetFeatureCount(True)
+    step = math.floor(nFeats/10)
+    feedback = 10
+    feedback_next = step
+    counter = 0
+    print("Started .0.", end='', flush=True)
+    
     # loop through the input features
     inFeature = inLayer.GetNextFeature()
     while inFeature:
+        if (nFeats>10) and (counter == feedback_next):
+            print(".{}.".format(feedback), end='', flush=True)
+            feedback_next = feedback_next + step
+            feedback = feedback + 10
+        
+        if not openTransaction:
+            outLayer.StartTransaction()
+            openTransaction = True
+    
         # get the input geometry
         geom = inFeature.GetGeometryRef()
         if geom is not None:
@@ -1075,7 +1181,19 @@ A function which reprojects a vector layer.
             outLayer.CreateFeature(outFeature)
         # dereference the features and get the next input feature
         outFeature = None
+        
+        if ((counter % 20000) == 0) and openTransaction:
+            outLayer.CommitTransaction()
+            openTransaction = False
+        
         inFeature = inLayer.GetNextFeature()
+        counter = counter + 1
+    
+    if openTransaction:
+        outLayer.CommitTransaction()
+        openTransaction = False
+    outLayer.SyncToDisk()
+    print(" Completed")
     
     # Save and close the shapefiles
     inDataSet = None
@@ -1333,11 +1451,24 @@ with the select layer.
             result_lyr.CreateField(fieldDefn)
         rsltLayerDefn = result_lyr.GetLayerDefn()   
         
+        counter = 0
+        openTransaction = False
         for feat in lyrVecObj:
+            if not openTransaction:
+                result_lyr.StartTransaction()
+                openTransaction = True
             geom = feat.GetGeometryRef()
             if geom is not None:
                 if geom.Intersects(geom_collect):
                     result_lyr.CreateFeature(feat)
+                    counter = counter + 1
+            if ((counter % 20000) == 0) and openTransaction:
+                result_lyr.CommitTransaction()
+                openTransaction = False
+                    
+        if openTransaction:
+            result_lyr.CommitTransaction()
+            openTransaction = False
                 
         dsSelVecFile = None        
         dsVecFile = None
@@ -1399,7 +1530,12 @@ When creating an attribute the available data types are ogr.OFTString, ogr.OFTIn
         # Get the output Layer's Feature Definition
         featureDefn = outLayer.GetLayerDefn()
         
+        openTransaction = False
         for n in range(len(bboxs)):
+            if not openTransaction:
+                outLayer.StartTransaction()
+                openTransaction = True
+        
             bbox = bboxs[n]
             # Create Linear Ring
             ring = ogr.Geometry(ogr.wkbLinearRing)
@@ -1420,6 +1556,13 @@ When creating an attribute the available data types are ogr.OFTString, ogr.OFTIn
                     outFeature.SetField(attTypes['names'][i], atts[attTypes['names'][i]][n])
             outLayer.CreateFeature(outFeature)
             outFeature = None
+            if ((n % 20000) == 0) and openTransaction:
+                outLayer.CommitTransaction()
+                openTransaction = False
+        
+        if openTransaction:
+            outLayer.CommitTransaction()
+            openTransaction = False
         outDataSource = None
     except Exception as e:
         raise e
@@ -1538,8 +1681,12 @@ When creating an attribute the available data types are ogr.OFTString, ogr.OFTIn
         # Get the output Layer's Feature Definition
         featureDefn = outLayer.GetLayerDefn()
         
+        openTransaction = False
         for n in range(nPts):
-            # Create Linear Ring
+            if not openTransaction:
+                outLayer.StartTransaction()
+                openTransaction = True
+            # Create Point
             pt = ogr.Geometry(ogr.wkbPoint)
             pt.AddPoint(float(ptsX[n]), float(ptsY[n]))
             # Add to output shapefile.
@@ -1551,6 +1698,13 @@ When creating an attribute the available data types are ogr.OFTString, ogr.OFTIn
                     outFeature.SetField(attTypes['names'][i], atts[attTypes['names'][i]][n])
             outLayer.CreateFeature(outFeature)
             outFeature = None
+            if ((n % 20000) == 0) and openTransaction:
+                outLayer.CommitTransaction()
+                openTransaction = False
+            
+        if openTransaction:
+            outLayer.CommitTransaction()
+            openTransaction = False
         outDataSource = None
     except Exception as e:
         raise e
