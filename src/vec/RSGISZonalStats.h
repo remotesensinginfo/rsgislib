@@ -49,6 +49,7 @@
 #include "vec/RSGISVectorIO.h"
 #include "vec/RSGISVectorUtils.h"
 #include "vec/RSGISProcessOGRFeature.h"
+#include "vec/RSGISProcessVector.h"
 
 #include "geos/geom/Envelope.h"
 #include "geos/geom/Polygon.h"
@@ -56,6 +57,7 @@
 #include "geos/geom/Coordinate.h"
 
 #include <boost/math/special_functions/fpclassify.hpp>
+#include <boost/algorithm/string.hpp>
 
 // mark all exported classes/functions with DllExport to have
 // them exported by Visual Studio
@@ -94,7 +96,31 @@ namespace rsgis
 			int numBands;
 			int *bands;
 		};
-		
+
+        struct DllExport ZonalBandAttrs
+        {
+            int band;
+            std::string baseName;
+            std::string minName;
+            std::string maxName;
+            std::string meanName;
+            std::string stdName;
+            std::string countName;
+            std::string modeName;
+            std::string medianName;
+            std::string sumName;
+            bool outMin;
+            bool outMax;
+            bool outMean;
+            bool outStDev;
+            bool outCount;
+            bool outMode;
+            bool outMedian;
+            bool outSum;
+            float minThres;
+            float maxThres;
+        };
+
 		struct DllExport ZonalAttributes
 		{
 			std::string name;
@@ -123,8 +149,10 @@ namespace rsgis
 				void zonalStats(GDALDataset *image, OGRLayer *vector, bool **toCalc,  OGRLayer *outputSHPLayer)  throw(RSGISVectorZonalException,RSGISVectorOutputException);
 				void zonalStatsRaster(GDALDataset *image, GDALDataset *rasterFeatures, OGRLayer *inputLayer, OGRLayer *outputLayer, bool **toCalc) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException, RSGISVectorOutputException);
 				void zonalStatsRaster2txt(GDALDataset *image, GDALDataset *rasterFeatures, OGRLayer *inputLayer, std::string outputTxt, bool **toCalc) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException);
-				~ZonalStats();
+                void zonalStatsFeatsVectorLyr(GDALDataset *image, OGRLayer *vecLyr, std::vector<ZonalBandAttrs> *zonalBandAtts, rsgis::img::pixelInPolyOption pixelInPolyMethod) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException);
+                ~ZonalStats();
 			protected:
+                void addVecLyrDefn(OGRLayer *vecLyr, std::vector<ZonalBandAttrs> *zonalBandAtts) throw(RSGISVectorOutputException);
 				void createOutputSHPDefinition(OGRLayer *inputSHPLayer, OGRLayer *outputSHPLayer, bool **toCalc, int numBands) throw(RSGISVectorOutputException);
 				void createOutputSHPDefinition(OGRLayer *outputSHPLayer, classzonalstats** attributes, int numAttributes, OGRFeatureDefn *inLayerDef) throw(RSGISVectorOutputException);
 				void outputData2SHP(OGRLayer *inputLayer, OGRLayer *outputSHPLayer, int featureFieldCount, bool **toCalc, int numBands, imagestats **stats) throw(RSGISVectorOutputException);
@@ -286,7 +314,31 @@ namespace rsgis
 			int totalPxl;
 			int numAttributes;
 		};
-		
+
+        class DllExport RSGISZonalStatsPolyUpdateLyr : public RSGISProcessOGRFeature
+        {
+        public:
+            RSGISZonalStatsPolyUpdateLyr(GDALDataset *image, std::vector<ZonalBandAttrs> *zonalBandAtts, rsgis::img::pixelInPolyOption method);
+            virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException){throw RSGISVectorOutputException("Not Implemented RSGISZonalStatsPolyUpdateLyr::processFeature; outFeature");};
+            virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
+            virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException){throw RSGISVectorOutputException("Not Implemented RSGISZonalStatsPolyUpdateLyr::createOutputLayerDefinition");};
+            virtual ~RSGISZonalStatsPolyUpdateLyr();
+        protected:
+            GDALDataset **datasets;
+            std::vector<ZonalBandAttrs> *zonalBandAtts;
+            std::vector<float> **pxlVals;
+            unsigned int nBands;
+            rsgis::img::RSGISCalcImage *calcImage;
+            rsgis::img::RSGISCalcImageValue *calcValue;
+            rsgis::img::pixelInPolyOption method;
+            RSGISVectorUtils *vecUtils;
+            OGRPolygon *inOGRPoly;
+            geos::geom::Polygon *poly;
+            std::vector<double> *dataVal;
+            rsgis::math::RSGISStatsSummary *statsSummary;
+            rsgis::math::RSGISMathsUtils *mathUtils;
+        };
+
 	}}
 
 #endif

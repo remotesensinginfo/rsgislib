@@ -60,7 +60,7 @@ namespace rsgis{namespace vec{
 		public:
 			RSGISProcessVector(RSGISProcessOGRFeature *processFeatures);
 			void processVectors(OGRLayer *inputLayer, OGRLayer *outputLayer, bool copyData, bool outVertical, bool newFirst) throw(RSGISVectorOutputException,RSGISVectorException);
-			void processVectors(OGRLayer *inputLayer, bool outVertical) throw(RSGISVectorOutputException,RSGISVectorException);
+			void processVectors(OGRLayer *inputLayer, bool outVertical, bool morefeedback=false) throw(RSGISVectorOutputException,RSGISVectorException);
 			void processVectorsNoOutput(OGRLayer *inputLayer, bool outVertical) throw(RSGISVectorOutputException,RSGISVectorException);
 			~RSGISProcessVector();
 		protected:

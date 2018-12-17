@@ -118,7 +118,6 @@ namespace rsgis{namespace img {
 				returnVal = poly->Contains(centerPoint);
 				delete centerPoint;
 			}
-
 		}
 		else if(method == pixelAreaInPoly)
 		{
@@ -136,6 +135,33 @@ namespace rsgis{namespace img {
 	{
 		delete polyOGRPoly;
 	}
+
+
+
+
+    RSGISGetPixelsInPoly::RSGISGetPixelsInPoly(std::vector<float> **pxlVals, unsigned int nBands): RSGISCalcImageValue(0)
+    {
+        this->pxlVals = pxlVals;
+        this->nBands = nBands;
+    }
+
+    void RSGISGetPixelsInPoly::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException)
+    {
+        if(numBands != nBands)
+        {
+            throw RSGISImageCalcException("The number of bands being returned is not the same as the inputted pxlVals structure.");
+        }
+
+        for(unsigned int i = 0; i < nBands; ++i)
+        {
+            pxlVals[i]->push_back(bandValues[i]);
+        }
+    }
+
+    RSGISGetPixelsInPoly::~RSGISGetPixelsInPoly()
+    {
+
+    }
 
 }}
 

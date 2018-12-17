@@ -40,6 +40,7 @@
 #include "vec/RSGISZonalImage2HDF.h"
 #include "vec/RSGISExtractEndMembers2Matrix.h"
 
+#include <boost/algorithm/string.hpp>
 
 namespace rsgis{ namespace cmds {
 
@@ -607,7 +608,6 @@ namespace rsgis{ namespace cmds {
         GDALDataset *inputSHPDS = NULL;
         OGRLayer *inputSHPLayer = NULL;
 
-
         std::string outputDIR = "";
 
         try
@@ -723,6 +723,190 @@ namespace rsgis{ namespace cmds {
         }
         catch(std::exception& e)
         {
+            throw RSGISCmdException(e.what());
+        }
+    }
+
+    void executePixelBandStatsVecLyr(std::string inputImage, std::string vecfile, std::string veclyr, std::vector<RSGISZonalBandAttrsCmds> *zonBandAtts, int pixelInPolyMethodInt, bool ignoreProjection) throw(RSGISCmdException)
+    {
+        // Convert from int to enum
+        rsgis::img::pixelInPolyOption pixelInPolyMethod = rsgis::img::pixelInPolyInt2Enum(pixelInPolyMethodInt);
+
+        GDALAllRegister();
+        OGRRegisterAll();
+
+        GDALDataset *inImageDS = NULL;
+        GDALDataset *vecDS = NULL;
+        OGRLayer *vecLayer = NULL;
+
+        try
+        {
+            inImageDS = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+            if(inImageDS == NULL)
+            {
+                std::string message = std::string("Could not open image ") + inputImage;
+                throw rsgis::RSGISException(message.c_str());
+            }
+            // Set up attributes if using all bands
+            unsigned int nImageBands = inImageDS->GetRasterCount();
+
+            vecDS = (GDALDataset*) GDALOpenEx(vecfile.c_str(), GDAL_OF_VECTOR|GDAL_OF_UPDATE, NULL, NULL, NULL);
+            if(vecDS == NULL)
+            {
+                std::string message = std::string("Could not open vector file ") + vecfile;
+                throw RSGISException(message.c_str());
+            }
+            vecLayer = vecDS->GetLayerByName(veclyr.c_str());
+            if(vecLayer == NULL)
+            {
+                std::string message = std::string("Could not open vector layer '") + veclyr + "'";
+                throw RSGISException(message.c_str());
+            }
+            // Check the projection is the same for shapefile and image
+            if(!ignoreProjection)
+            {
+                OGRSpatialReference* vecProjObj = vecLayer->GetSpatialRef();
+                OGRSpatialReference* imgProjObj = new OGRSpatialReference(inImageDS->GetProjectionRef());
+
+                if(!vecProjObj->IsSame(imgProjObj))
+                {
+                    std::cerr << "WARNING: Vector layer and image are not the same projection! You might want to check these layers." <<  std::endl;
+                }
+                delete vecProjObj;
+                delete imgProjObj;
+            }
+            std::vector<rsgis::vec::ZonalBandAttrs> *rsgisZonalBandAtts = new std::vector<rsgis::vec::ZonalBandAttrs>();
+            for(std::vector<RSGISZonalBandAttrsCmds>::iterator iterAtts = zonBandAtts->begin(); iterAtts != zonBandAtts->end(); ++iterAtts)
+            {
+                rsgis::vec::ZonalBandAttrs tmpZonalAtt = rsgis::vec::ZonalBandAttrs();
+                tmpZonalAtt.band = (*iterAtts).band;
+                if((tmpZonalAtt.band < 1) | (tmpZonalAtt.band > nImageBands))
+                {
+                    throw RSGISException("At least one of the bands specified is not within the input image; note band numbering starts at 1.");
+                }
+
+                tmpZonalAtt.baseName = (*iterAtts).baseName;
+                if((*iterAtts).minName == "")
+                {
+                    tmpZonalAtt.minName = tmpZonalAtt.baseName+"Min";
+                }
+                else
+                {
+                    tmpZonalAtt.minName = (*iterAtts).minName;
+                }
+                boost::algorithm::to_lower(tmpZonalAtt.minName);
+
+                if((*iterAtts).maxName == "")
+                {
+                    tmpZonalAtt.maxName = tmpZonalAtt.baseName+"Max";
+                }
+                else
+                {
+                    tmpZonalAtt.maxName = (*iterAtts).maxName;
+                }
+                boost::algorithm::to_lower(tmpZonalAtt.maxName);
+
+                if((*iterAtts).meanName == "")
+                {
+                    tmpZonalAtt.meanName = tmpZonalAtt.baseName+"Mean";
+                }
+                else
+                {
+                    tmpZonalAtt.meanName = (*iterAtts).meanName;
+                }
+                boost::algorithm::to_lower(tmpZonalAtt.meanName);
+
+                if((*iterAtts).stdName == "")
+                {
+                    tmpZonalAtt.stdName = tmpZonalAtt.baseName+"StdDev";
+                }
+                else
+                {
+                    tmpZonalAtt.stdName = (*iterAtts).stdName;
+                }
+                boost::algorithm::to_lower(tmpZonalAtt.stdName);
+
+                if((*iterAtts).countName == "")
+                {
+                    tmpZonalAtt.countName = tmpZonalAtt.baseName+"Count";
+                }
+                else
+                {
+                    tmpZonalAtt.countName = (*iterAtts).countName;
+                }
+                boost::algorithm::to_lower(tmpZonalAtt.countName);
+
+                if((*iterAtts).modeName == "")
+                {
+                    tmpZonalAtt.modeName = tmpZonalAtt.baseName+"Mode";
+                }
+                else
+                {
+                    tmpZonalAtt.modeName = (*iterAtts).modeName;
+                }
+                if((*iterAtts).medianName == "")
+                {
+                    tmpZonalAtt.medianName = tmpZonalAtt.baseName+"Median";
+                }
+                else
+                {
+                    tmpZonalAtt.medianName = (*iterAtts).medianName;
+                }
+                boost::algorithm::to_lower(tmpZonalAtt.medianName);
+
+                if((*iterAtts).sumName == "")
+                {
+                    tmpZonalAtt.sumName = tmpZonalAtt.baseName+"Sum";
+                }
+                else
+                {
+                    tmpZonalAtt.sumName = (*iterAtts).sumName;
+                }
+                boost::algorithm::to_lower(tmpZonalAtt.sumName);
+
+                tmpZonalAtt.outMin = (*iterAtts).outMin;
+                tmpZonalAtt.outMax = (*iterAtts).outMax;
+                tmpZonalAtt.outMean = (*iterAtts).outMean;
+                tmpZonalAtt.outStDev = (*iterAtts).outStDev;
+                tmpZonalAtt.outCount = (*iterAtts).outCount;
+                tmpZonalAtt.outMode = (*iterAtts).outMode;
+                tmpZonalAtt.outMedian = (*iterAtts).outMedian;
+                tmpZonalAtt.outSum = (*iterAtts).outSum;
+                tmpZonalAtt.minThres = (*iterAtts).minThres;
+                tmpZonalAtt.maxThres = (*iterAtts).maxThres;
+                rsgisZonalBandAtts->push_back(tmpZonalAtt);
+            }
+            delete zonBandAtts;
+
+            rsgis::vec::ZonalStats zonalStatsObj = rsgis::vec::ZonalStats();
+            zonalStatsObj.zonalStatsFeatsVectorLyr(inImageDS, vecLayer, rsgisZonalBandAtts, pixelInPolyMethod);
+
+            delete rsgisZonalBandAtts;
+            delete vecDS;
+            delete inImageDS;
+        }
+        catch(RSGISException& e)
+        {
+            if(vecDS != NULL)
+            {
+                delete vecDS;
+            }
+            if(inImageDS != NULL)
+            {
+                delete inImageDS;
+            }
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            if(vecDS != NULL)
+            {
+                delete vecDS;
+            }
+            if(inImageDS != NULL)
+            {
+                delete inImageDS;
+            }
             throw RSGISCmdException(e.what());
         }
     }
