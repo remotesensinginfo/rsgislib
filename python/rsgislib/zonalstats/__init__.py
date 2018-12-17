@@ -76,7 +76,7 @@ A function which calculates zonal statistics for a particular image band.
 * modefield - the name of the field for the mode value (None or not specified to be ignored).
 * medianfield - the name of the field for the median value (None or not specified to be ignored).
 """
-    if medianfield is not None:
+    if modefield is not None:
         import scipy.stats.mstats
     gdal.UseExceptions()
     
