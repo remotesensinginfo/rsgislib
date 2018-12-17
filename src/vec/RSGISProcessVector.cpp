@@ -73,7 +73,8 @@ namespace rsgis{namespace vec{
 			{
 				std::cout << "Started" << std::flush;
 			}	
-			
+
+            bool inTransaction = false;
 			inputLayer->ResetReading();
 			while( (inFeature = inputLayer->GetNextFeature()) != NULL )
 			{
@@ -85,11 +86,16 @@ namespace rsgis{namespace vec{
 					}
 					else
 					{
-						std::cout << ".." << feedbackCounter << ".." << std::flush;
+						std::cout << "." << feedbackCounter << "." << std::flush;
 					}
 					
 					feedbackCounter = feedbackCounter + 10;
 				}
+                if(!inTransaction)
+                {
+                    outputLayer->StartTransaction();
+                    inTransaction = true;
+                }
 				
 				fid = inFeature->GetFID();
 				
@@ -150,14 +156,22 @@ namespace rsgis{namespace vec{
 					{
 						throw RSGISVectorOutputException("Failed to write feature to the output shapefile.");
 					}
-                    
-                    //printGeometry(outFeature->GetGeometryRef());
-                    
+
 					OGRFeature::DestroyFeature(outFeature);
 				}
 				OGRFeature::DestroyFeature(inFeature);
 				i++;
-			}
+                if(((i % 20000) == 0) & inTransaction)
+                {
+                    inputLayer->CommitTransaction();
+                    inTransaction = false;
+                }
+            }
+            if(inTransaction)
+            {
+                inputLayer->CommitTransaction();
+                inTransaction = false;
+            }
 			std::cout << " Complete.\n";
 		}
 		catch(RSGISVectorOutputException& e)
@@ -170,7 +184,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 		
-	void RSGISProcessVector::processVectors(OGRLayer *inputLayer, bool outVertical) throw(RSGISVectorOutputException,RSGISVectorException)
+	void RSGISProcessVector::processVectors(OGRLayer *inputLayer, bool outVertical, bool morefeedback) throw(RSGISVectorOutputException,RSGISVectorException)
 	{
 		RSGISVectorUtils vecUtils;
 		
@@ -194,6 +208,11 @@ namespace rsgis{namespace vec{
 			int feedback = numFeatures/10;
 			int feedbackCounter = 0;
 			int i = 0;
+
+            if(morefeedback)
+            {
+                feedback = numFeatures/20;
+            }
 			
 			if(outVertical)
 			{
@@ -201,9 +220,10 @@ namespace rsgis{namespace vec{
 			}
 			else
 			{
-				std::cout << "Started" << std::flush;
+				std::cout << "Started (" << numFeatures << " features) " << std::flush;
 			}	
-						
+
+            bool inTransaction = false;
 			inputLayer->ResetReading();
 			while( (inFeature = inputLayer->GetNextFeature()) != NULL )
 			{
@@ -215,11 +235,23 @@ namespace rsgis{namespace vec{
 					}
 					else
 					{
-						std::cout << ".." << feedbackCounter << ".." << std::flush;
+						std::cout << "." << feedbackCounter << "." << std::flush;
 					}
-					
-					feedbackCounter = feedbackCounter + 10;
+
+                    if(morefeedback)
+                    {
+                        feedbackCounter = feedbackCounter + 5;
+                    }
+                    else
+                    {
+                        feedbackCounter = feedbackCounter + 10;
+                    }
 				}
+                if(!inTransaction)
+                {
+                    inputLayer->StartTransaction();
+                    inTransaction = true;
+                }
 				
 				fid = inFeature->GetFID();
 				
@@ -265,13 +297,25 @@ namespace rsgis{namespace vec{
 
 					if( inputLayer->SetFeature(inFeature) != OGRERR_NONE )
 					{
-						throw RSGISVectorOutputException("Failed to write feature to the shapefile.");
+						throw RSGISVectorOutputException("Failed to write feature to the vector layer.");
 					}
 				}
 				
 				OGRFeature::DestroyFeature(inFeature);
 				i++;
+                if(((i % 20000) == 0) & inTransaction)
+                {
+                    std::cout << "w" << std::flush;
+                    inputLayer->CommitTransaction();
+                    inTransaction = false;
+                }
 			}
+            if(inTransaction)
+            {
+                std::cout << "w" << std::flush;
+                inputLayer->CommitTransaction();
+                inTransaction = false;
+            }
 			std::cout << " Complete.\n";
 		}
 		catch(RSGISVectorOutputException& e)

@@ -365,6 +365,247 @@ namespace rsgis{namespace vec{
 			delete[] featureStats;
 		}
 	}
+
+    void ZonalStats::zonalStatsFeatsVectorLyr(GDALDataset *image, OGRLayer *vecLyr, std::vector<ZonalBandAttrs> *zonalBandAtts, rsgis::img::pixelInPolyOption pixelInPolyMethod) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
+    {
+        try
+        {
+            // Define the output fields within vector layer.
+            this->addVecLyrDefn(vecLyr, zonalBandAtts);
+            RSGISZonalStatsPolyUpdateLyr *computeStats = new RSGISZonalStatsPolyUpdateLyr(image, zonalBandAtts, pixelInPolyMethod);
+            RSGISProcessVector processVec = RSGISProcessVector(computeStats);
+
+            long nFeats = vecLyr->GetFeatureCount();
+            bool moreFeedback = false;
+            if(nFeats > 20000)
+            {
+                moreFeedback = true;
+            }
+            processVec.processVectors(vecLyr, false, moreFeedback);
+            delete computeStats;
+        }
+        catch (rsgis::RSGISException &e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw rsgis::img::RSGISImageCalcException(e.what());
+        }
+    }
+
+    void ZonalStats::addVecLyrDefn(OGRLayer *vecLyr, std::vector<ZonalBandAttrs> *zonalBandAtts) throw(RSGISVectorOutputException)
+    {
+        try
+        {
+            int fCount = 0;
+            bool found = false;
+            OGRFeatureDefn *lyrDefn = vecLyr->GetLayerDefn();
+            for(std::vector<ZonalBandAttrs>::iterator iterAtts = zonalBandAtts->begin(); iterAtts != zonalBandAtts->end(); ++iterAtts)
+            {
+                // Min
+                if((*iterAtts).outMin)
+                {
+                    found = false;
+                    fCount = lyrDefn->GetFieldCount();
+                    for(int i = 0; i < fCount; ++i)
+                    {
+                        if(boost::algorithm::to_lower_copy(std::string(lyrDefn->GetFieldDefn(i)->GetNameRef())) == boost::algorithm::to_lower_copy((*iterAtts).minName))
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if(!found)
+                    {
+                        OGRFieldDefn vecField((*iterAtts).minName.c_str(), OFTReal);
+                        vecField.SetPrecision(10);
+                        if( vecLyr->CreateField( &vecField ) != OGRERR_NONE )
+                        {
+                            std::string message = std::string("Creating vector field '") + std::string((*iterAtts).minName) + std::string("' has failed");
+                            throw RSGISVectorOutputException(message.c_str());
+                        }
+                    }
+                }
+                // Max
+                if((*iterAtts).outMax)
+                {
+                    found = false;
+                    fCount = lyrDefn->GetFieldCount();
+                    for(int i = 0; i < fCount; ++i)
+                    {
+                        if(boost::algorithm::to_lower_copy(std::string(lyrDefn->GetFieldDefn(i)->GetNameRef())) == boost::algorithm::to_lower_copy((*iterAtts).maxName))
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if(!found)
+                    {
+                        OGRFieldDefn vecField((*iterAtts).maxName.c_str(), OFTReal);
+                        vecField.SetPrecision(10);
+                        if( vecLyr->CreateField( &vecField ) != OGRERR_NONE )
+                        {
+                            std::string message = std::string("Creating vector field '") + std::string((*iterAtts).maxName) + std::string("' has failed");
+                            throw RSGISVectorOutputException(message.c_str());
+                        }
+                    }
+                }
+                // Mean
+                if((*iterAtts).outMean)
+                {
+                    found = false;
+                    fCount = lyrDefn->GetFieldCount();
+                    for(int i = 0; i < fCount; ++i)
+                    {
+                        if(boost::algorithm::to_lower_copy(std::string(lyrDefn->GetFieldDefn(i)->GetNameRef())) == boost::algorithm::to_lower_copy((*iterAtts).meanName))
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if(!found)
+                    {
+                        OGRFieldDefn vecField((*iterAtts).meanName.c_str(), OFTReal);
+                        vecField.SetPrecision(10);
+                        if( vecLyr->CreateField( &vecField ) != OGRERR_NONE )
+                        {
+                            std::string message = std::string("Creating vector field '") + std::string((*iterAtts).meanName) + std::string("' has failed");
+                            throw RSGISVectorOutputException(message.c_str());
+                        }
+                    }
+                }
+                // StdDev
+                if((*iterAtts).outStDev)
+                {
+                    found = false;
+                    fCount = lyrDefn->GetFieldCount();
+                    for(int i = 0; i < fCount; ++i)
+                    {
+                        if(boost::algorithm::to_lower_copy(std::string(lyrDefn->GetFieldDefn(i)->GetNameRef())) == boost::algorithm::to_lower_copy((*iterAtts).stdName))
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if(!found)
+                    {
+                        OGRFieldDefn vecField((*iterAtts).stdName.c_str(), OFTReal);
+                        vecField.SetPrecision(10);
+                        if( vecLyr->CreateField( &vecField ) != OGRERR_NONE )
+                        {
+                            std::string message = std::string("Creating vector field '") + std::string((*iterAtts).stdName) + std::string("' has failed");
+                            throw RSGISVectorOutputException(message.c_str());
+                        }
+                    }
+                }
+                // Count
+                if((*iterAtts).outCount)
+                {
+                    found = false;
+                    fCount = lyrDefn->GetFieldCount();
+                    for(int i = 0; i < fCount; ++i)
+                    {
+                        if(boost::algorithm::to_lower_copy(std::string(lyrDefn->GetFieldDefn(i)->GetNameRef())) == boost::algorithm::to_lower_copy((*iterAtts).countName))
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if(!found)
+                    {
+                        OGRFieldDefn vecField((*iterAtts).countName.c_str(), OFTReal);
+                        vecField.SetPrecision(10);
+                        if( vecLyr->CreateField( &vecField ) != OGRERR_NONE )
+                        {
+                            std::string message = std::string("Creating vector field '") + std::string((*iterAtts).countName) + std::string("' has failed");
+                            throw RSGISVectorOutputException(message.c_str());
+                        }
+                    }
+                }
+                // Mode
+                if((*iterAtts).outMode)
+                {
+                    found = false;
+                    fCount = lyrDefn->GetFieldCount();
+                    for(int i = 0; i < fCount; ++i)
+                    {
+                        if(boost::algorithm::to_lower_copy(std::string(lyrDefn->GetFieldDefn(i)->GetNameRef())) == boost::algorithm::to_lower_copy((*iterAtts).modeName))
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if(!found)
+                    {
+                        OGRFieldDefn vecField((*iterAtts).modeName.c_str(), OFTReal);
+                        vecField.SetPrecision(10);
+                        if( vecLyr->CreateField( &vecField ) != OGRERR_NONE )
+                        {
+                            std::string message = std::string("Creating vector field '") + std::string((*iterAtts).modeName) + std::string("' has failed");
+                            throw RSGISVectorOutputException(message.c_str());
+                        }
+                    }
+                }
+                // Median
+                if((*iterAtts).outMedian)
+                {
+                    found = false;
+                    fCount = lyrDefn->GetFieldCount();
+                    for(int i = 0; i < fCount; ++i)
+                    {
+                        if(boost::algorithm::to_lower_copy(std::string(lyrDefn->GetFieldDefn(i)->GetNameRef())) == boost::algorithm::to_lower_copy((*iterAtts).medianName))
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if(!found)
+                    {
+                        OGRFieldDefn vecField((*iterAtts).medianName.c_str(), OFTReal);
+                        vecField.SetPrecision(10);
+                        if( vecLyr->CreateField( &vecField ) != OGRERR_NONE )
+                        {
+                            std::string message = std::string("Creating vector field '") + std::string((*iterAtts).medianName) + std::string("' has failed");
+                            throw RSGISVectorOutputException(message.c_str());
+                        }
+                    }
+                }
+                // Sum
+                if((*iterAtts).outSum)
+                {
+                    found = false;
+                    fCount = lyrDefn->GetFieldCount();
+                    for(int i = 0; i < fCount; ++i)
+                    {
+                        if(boost::algorithm::to_lower_copy(std::string(lyrDefn->GetFieldDefn(i)->GetNameRef())) == boost::algorithm::to_lower_copy((*iterAtts).sumName))
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if(!found)
+                    {
+                        OGRFieldDefn vecField((*iterAtts).sumName.c_str(), OFTReal);
+                        vecField.SetPrecision(10);
+                        if( vecLyr->CreateField( &vecField ) != OGRERR_NONE )
+                        {
+                            std::string message = std::string("Creating vector field '") + std::string((*iterAtts).sumName) + std::string("' has failed");
+                            throw RSGISVectorOutputException(message.c_str());
+                        }
+                    }
+                }
+            }
+        }
+        catch(RSGISVectorOutputException &e)
+        {
+            throw e;
+        }
+        catch(std::exception &e)
+        {
+            throw RSGISVectorOutputException(e.what());
+        }
+    }
 	
 	void ZonalStats::createOutputSHPDefinition(OGRLayer *inputSHPLayer, OGRLayer *outputSHPLayer, bool **toCalc, int numBands) throw(RSGISVectorOutputException)
 	{
@@ -1756,7 +1997,6 @@ namespace rsgis{namespace vec{
 				outFeature->SetField(outFeatureDefn->GetFieldIndex("TotalPxls"), this->data[0]);
 			}
 		}
-		
 		catch(RSGISException& e)
 		{
 			throw RSGISVectorException(e.what());
@@ -2238,6 +2478,140 @@ namespace rsgis{namespace vec{
 	{
 		delete[] values;
 	}
+
+
+
+
+
+    RSGISZonalStatsPolyUpdateLyr::RSGISZonalStatsPolyUpdateLyr(GDALDataset *image, std::vector<ZonalBandAttrs> *zonalBandAtts, rsgis::img::pixelInPolyOption method)
+    {
+        this->datasets = new GDALDataset*[1];
+        this->datasets[0] = image;
+        this->zonalBandAtts = zonalBandAtts;
+        this->method = method;
+        this->nBands = image->GetRasterCount();
+        this->pxlVals = new std::vector<float>*[this->nBands];
+        for(unsigned int i = 0; i < this->nBands; ++i)
+        {
+            this->pxlVals[i] = new std::vector<float>();
+            this->pxlVals[i]->reserve(62500);
+        }
+
+        this->calcValue = new rsgis::img::RSGISGetPixelsInPoly(this->pxlVals, this->nBands);
+        this->calcImage = new rsgis::img::RSGISCalcImage(this->calcValue);
+
+        this->vecUtils = new RSGISVectorUtils();
+        this->dataVal = new std::vector<double>();
+        this->dataVal->reserve(62500);
+
+        this->statsSummary = new rsgis::math::RSGISStatsSummary();
+        this->mathUtils = new rsgis::math::RSGISMathsUtils();
+        this->mathUtils->initStatsSummaryValues(this->statsSummary);
+    }
+
+    void RSGISZonalStatsPolyUpdateLyr::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+    {
+        // Check for polygon geometry
+        if((wkbFlatten(feature->GetGeometryRef()->getGeometryType()) != wkbPolygon) && (wkbFlatten(feature->GetGeometryRef()->getGeometryType()) != wkbMultiPolygon))
+        {
+            throw RSGISVectorException("Unsupported geometry; geometry must be polygon or multi-polygon.");
+        }
+        try
+        {
+            // Get Polygon
+            inOGRPoly = (OGRPolygon *) feature->GetGeometryRef();
+            poly = vecUtils->convertOGRPolygon2GEOSPolygon(inOGRPoly);
+            // Get Pixel values.
+            calcImage->calcImageWithinPolygonExtentInMem(this->datasets, 1, env, poly, this->method);
+
+            // Get Stats from pixels and add to feature.
+            for(std::vector<ZonalBandAttrs>::iterator iterAtts = zonalBandAtts->begin(); iterAtts != zonalBandAtts->end(); ++iterAtts)
+            {
+                int binIdx = (*iterAtts).band-1;
+                this->mathUtils->initStatsSummaryValues(this->statsSummary);
+                this->dataVal->clear();
+                for(std::vector<float>::iterator iterVal = this->pxlVals[binIdx]->begin(); iterVal != this->pxlVals[binIdx]->end(); ++iterVal)
+                {
+                    if( ((*iterVal) >= (*iterAtts).minThres) & ((*iterVal) < (*iterAtts).maxThres) )
+                    {
+                        this->dataVal->push_back(*iterVal);
+                    }
+                }
+                this->statsSummary->calcMin = (*iterAtts).outMin;
+                this->statsSummary->calcMax = (*iterAtts).outMax;
+                this->statsSummary->calcMean = (*iterAtts).outMean;
+                this->statsSummary->calcSum = (*iterAtts).outSum;
+                this->statsSummary->calcStdDev = (*iterAtts).outStDev;
+                this->statsSummary->calcMedian = (*iterAtts).outMedian;
+                this->statsSummary->calcMode = (*iterAtts).outMode;
+                this->statsSummary->calcVariance = false;
+                if(this->dataVal->size() > 0)
+                {
+                    this->mathUtils->generateStats(this->dataVal, this->statsSummary);
+                }
+
+                if((*iterAtts).outMin)
+                {
+                    feature->SetField((*iterAtts).minName.c_str(), this->statsSummary->min);
+                }
+                if((*iterAtts).outMax)
+                {
+                    feature->SetField((*iterAtts).maxName.c_str(), this->statsSummary->max);
+                }
+                if((*iterAtts).outMean)
+                {
+                    feature->SetField((*iterAtts).meanName.c_str(), this->statsSummary->mean);
+                }
+                if((*iterAtts).outSum)
+                {
+                    feature->SetField((*iterAtts).sumName.c_str(), this->statsSummary->sum);
+                }
+                if((*iterAtts).outStDev)
+                {
+                    feature->SetField((*iterAtts).stdName.c_str(), this->statsSummary->stdDev);
+                }
+                if((*iterAtts).outMedian)
+                {
+                    feature->SetField((*iterAtts).medianName.c_str(), this->statsSummary->median);
+                }
+                if((*iterAtts).outMode)
+                {
+                    feature->SetField((*iterAtts).modeName.c_str(), this->statsSummary->mode);
+                }
+                if((*iterAtts).outCount)
+                {
+                    feature->SetField((*iterAtts).countName.c_str(), (double)(this->dataVal->size()));
+                }
+            }
+
+            // Reset.
+            delete poly;
+            for(unsigned int i = 0; i < this->nBands; ++i)
+            {
+                this->pxlVals[i]->clear();
+            }
+        }
+        catch(RSGISException& e)
+        {
+            throw RSGISVectorException(e.what());
+        }
+    }
+
+    RSGISZonalStatsPolyUpdateLyr::~RSGISZonalStatsPolyUpdateLyr()
+    {
+        for(unsigned int i = 0; i < this->nBands; ++i)
+        {
+            delete this->pxlVals[i];
+        }
+        delete[] this->pxlVals;
+        delete[] this->datasets;
+        delete this->calcValue;
+        delete this->calcImage;
+        delete this->vecUtils;
+        delete this->dataVal;
+        delete this->statsSummary;
+        delete this->mathUtils;
+    }
 	
 	
 }}

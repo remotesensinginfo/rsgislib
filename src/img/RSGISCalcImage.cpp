@@ -13545,7 +13545,7 @@ namespace rsgis{namespace img{
 			}
 			
 			// Get Image Input Bands
-			bandOffsets = new int*[numInBands+numOutBands];
+			bandOffsets = new int*[numInBands];
 			inputRasterBands = new GDALRasterBand*[numInBands];
 			int counter = 0;
 			for(int i = 0; i < numDS; i++)
@@ -13838,6 +13838,393 @@ namespace rsgis{namespace img{
 			delete[] inputRasterBands;
 		}		
 	}
+
+    void RSGISCalcImage::calcImageWithinPolygonExtentInMem(GDALDataset **datasets, int numDS, geos::geom::Envelope *env, geos::geom::Polygon *poly, pixelInPolyOption pixelPolyOption) throw(RSGISImageCalcException,RSGISImageBandException)
+    {
+        GDALAllRegister();
+        RSGISImageUtils imgUtils;
+        double *gdalTranslation = new double[6];
+        int **dsOffsets = new int*[numDS];
+        for(int i = 0; i < numDS; i++)
+        {
+            dsOffsets[i] = new int[2];
+        }
+        int **bandOffsets = NULL;
+        int height = 0;
+        int width = 0;
+        int numInBands = 0;
+
+        float **inputData = NULL;
+        float *inDataColumn = NULL;
+
+        GDALRasterBand **inputRasterBands = NULL;
+        geos::geom::Envelope extent;
+        geos::geom::Coordinate pxlCentre;
+        const geos::geom::GeometryFactory *geomFactory = geos::geom::GeometryFactory::getDefaultInstance();
+        double pxlTLX = 0;
+        double pxlTLY = 0;
+        double pxlWidth = 0;
+        double pxlHeight = 0;
+
+        try
+        {
+            // CHECK ENVELOPE IS AT LEAST 1 x 1 Pixel
+            /* For small polygons the the envelope can be smaller than a pixel, which will cause problems.
+             * To avoid errors a buffer is applied to the envelope and this buffered envelope is used for 'getImageOverlap'
+             * The buffered envelope is created and destroyed in this class and does not effect the passed in envelope
+             */
+            bool buffer = false;
+
+            double *transformations = new double[6];
+            datasets[0]->GetGeoTransform(transformations);
+
+            // Get pixel size
+            pxlWidth = transformations[1];
+            pxlHeight = transformations[5];
+
+            if(pxlHeight < 0)
+            {
+                pxlHeight = pxlHeight * (-1);
+            }
+            delete[] transformations;
+
+            geos::geom::Envelope *bufferedEnvelope = NULL;
+
+            if ((env->getWidth() < pxlWidth) | (env->getHeight() < pxlHeight))
+            {
+                buffer = true;
+                bufferedEnvelope = new geos::geom::Envelope(env->getMinX() - pxlWidth, env->getMaxX() + pxlWidth, env->getMinY() - pxlHeight, env->getMaxY() + pxlHeight);
+            }
+
+            // Find image overlap
+            gdalTranslation = new double[6];
+
+            // Image block size.
+            int xBlockSize = 0;
+            int yBlockSize = 0;
+
+            if (buffer) // Use buffered envelope.
+            {
+                //imgUtils.getImageOverlap(datasets, numDS, dsOffsets, &width, &height, gdalTranslation, bufferedEnvelope);
+                imgUtils.getImageOverlapCut2Env(datasets, numDS, dsOffsets, &width, &height, gdalTranslation, bufferedEnvelope, &xBlockSize, &yBlockSize);
+            }
+            else // Use envelope passed in.
+            {
+                //imgUtils.getImageOverlap(datasets, numDS, dsOffsets, &width, &height, gdalTranslation, env);
+                imgUtils.getImageOverlapCut2Env(datasets, numDS, dsOffsets, &width, &height, gdalTranslation, env, &xBlockSize, &yBlockSize);
+            }
+
+            // Count number of input image bands
+            for(int i = 0; i < numDS; i++)
+            {
+                numInBands += datasets[i]->GetRasterCount();
+            }
+
+            // Get Pixel Size
+            pxlTLX = gdalTranslation[0];
+            pxlTLY = gdalTranslation[3];
+            pxlWidth = gdalTranslation[1];
+            pxlHeight = gdalTranslation[1];
+
+            if(pxlHeight < 0) // Check resolution is positive (negative in Southern hemisphere).
+            {
+                pxlHeight = pxlHeight * (-1);
+            }
+
+            // Get Image Input Bands
+            bandOffsets = new int*[numInBands];
+            inputRasterBands = new GDALRasterBand*[numInBands];
+            int counter = 0;
+            for(int i = 0; i < numDS; i++)
+            {
+                for(int j = 0; j < datasets[i]->GetRasterCount(); j++)
+                {
+                    inputRasterBands[counter] = datasets[i]->GetRasterBand(j+1);
+                    bandOffsets[counter] = new int[2];
+                    bandOffsets[counter][0] = dsOffsets[i][0];
+                    bandOffsets[counter][1] = dsOffsets[i][1];
+                    counter++;
+                }
+            }
+            // Allocate memory
+            inputData = new float*[numInBands];
+            for(int i = 0; i < numInBands; i++)
+            {
+                inputData[i] = (float *) CPLMalloc(sizeof(float)*width*height);
+            }
+            inDataColumn = new float[numInBands];
+
+            bool readSuccess = true;
+            for(int n = 0; n < numInBands; n++)
+            {
+                readSuccess = inputRasterBands[n]->RasterIO(GF_Read, bandOffsets[n][0], (bandOffsets[n][1]), width, height, inputData[n], width, height, GDT_Float32, 0, 0);
+            }
+
+            // Loop images to process data
+            for(int i = 0; i < height; i++)
+            {
+                for(int j = 0; j < width; j++)
+                {
+                    for(int n = 0; n < numInBands; n++)
+                    {
+                        inDataColumn[n] = inputData[n][(i*width)+j];
+                    }
+
+                    geos::geom::Coordinate pxlCentre;
+                    geos::geom::Point *pt = NULL;
+
+                    extent.init(pxlTLX, (pxlTLX+pxlWidth), pxlTLY, (pxlTLY-pxlHeight));
+                    extent.centre(pxlCentre);
+                    pt = geomFactory->createPoint(pxlCentre);
+
+                    if (pixelPolyOption == polyContainsPixelCenter)
+                    {
+                        if(poly->contains(pt)) // If polygon contains pixel center
+                        {
+                            this->calc->calcImageValue(inDataColumn, numInBands, extent);
+                        }
+                    }
+                    else if (pixelPolyOption == pixelAreaInPoly)
+                    {
+                        geos::geom::CoordinateSequence *coords = NULL;
+                        geos::geom::LinearRing *ring = NULL;
+                        geos::geom::Polygon *pixelGeosPoly = NULL;
+                        geos::geom::Geometry *intersectionGeom;
+
+                        coords = new geos::geom::CoordinateArraySequence();
+                        coords->add(geos::geom::Coordinate(pxlTLX, pxlTLY, 0));
+                        coords->add(geos::geom::Coordinate(pxlTLX + pxlWidth, pxlTLY, 0));
+                        coords->add(geos::geom::Coordinate(pxlTLX + pxlWidth, pxlTLY - pxlHeight, 0));
+                        coords->add(geos::geom::Coordinate(pxlTLX, pxlTLY - pxlHeight, 0));
+                        coords->add(geos::geom::Coordinate(pxlTLX, pxlTLY, 0));
+                        ring = geomFactory->createLinearRing(coords);
+                        pixelGeosPoly = geomFactory->createPolygon(ring, NULL);
+
+
+                        intersectionGeom = pixelGeosPoly->intersection(poly);
+                        double intersectionArea = intersectionGeom->getArea()  / pixelGeosPoly->getArea();
+
+                        if(intersectionArea > 0)
+                        {
+                            this->calc->calcImageValue(inDataColumn, numInBands, extent);
+                        }
+                    }
+                    else
+                    {
+                        RSGISPixelInPoly *pixelInPoly;
+                        OGRLinearRing *ring;
+                        OGRPolygon *pixelPoly;
+                        OGRPolygon *ogrPoly;
+                        OGRGeometry *ogrGeom;
+
+                        pixelInPoly = new RSGISPixelInPoly(pixelPolyOption);
+
+                        ring = new OGRLinearRing();
+                        ring->addPoint(pxlTLX, pxlTLY, 0);
+                        ring->addPoint(pxlTLX + pxlWidth, pxlTLY, 0);
+                        ring->addPoint(pxlTLX + pxlWidth, pxlTLY - pxlHeight, 0);
+                        ring->addPoint(pxlTLX, pxlTLY - pxlHeight, 0);
+                        ring->addPoint(pxlTLX, pxlTLY, 0);
+
+                        pixelPoly = new OGRPolygon();
+                        pixelPoly->addRingDirectly(ring);
+
+                        ogrPoly = new OGRPolygon();
+                        const geos::geom::LineString *line = poly->getExteriorRing();
+                        OGRLinearRing *ogrRing = new OGRLinearRing();
+                        const geos::geom::CoordinateSequence *coords = line->getCoordinatesRO();
+                        int numCoords = coords->getSize();
+                        geos::geom::Coordinate coord;
+                        for(int i = 0; i < numCoords; i++)
+                        {
+                            coord = coords->getAt(i);
+                            ogrRing->addPoint(coord.x, coord.y, coord.z);
+                        }
+                        ogrPoly->addRing(ogrRing);
+                        ogrGeom = (OGRGeometry *) ogrPoly;
+
+                        // Check if the pixel should be classed as part of the polygon using the specified method
+                        if (pixelInPoly->findPixelInPoly(ogrGeom, pixelPoly))
+                        {
+                            this->calc->calcImageValue(inDataColumn, numInBands, extent);
+                        }
+
+                        // Tidy
+                        delete pixelInPoly;
+                        delete pixelPoly;
+                        delete ogrPoly;
+                    }
+
+                    delete pt;
+
+                    pxlTLX += pxlWidth;
+                }
+                pxlTLY -= pxlHeight;
+                pxlTLX = gdalTranslation[0];
+            }
+        }
+        catch(RSGISImageCalcException& e)
+        {
+            if(gdalTranslation != NULL)
+            {
+                delete[] gdalTranslation;
+            }
+
+            if(dsOffsets != NULL)
+            {
+                for(int i = 0; i < numDS; i++)
+                {
+                    if(dsOffsets[i] != NULL)
+                    {
+                        delete[] dsOffsets[i];
+                    }
+                }
+                delete[] dsOffsets;
+            }
+
+            if(bandOffsets != NULL)
+            {
+                for(int i = 0; i < numInBands; i++)
+                {
+                    if(bandOffsets[i] != NULL)
+                    {
+                        delete[] bandOffsets[i];
+                    }
+                }
+                delete[] bandOffsets;
+            }
+
+            if(inputData != NULL)
+            {
+                for(int i = 0; i < numInBands; i++)
+                {
+                    if(inputData[i] != NULL)
+                    {
+                        delete[] inputData[i];
+                    }
+                }
+                delete[] inputData;
+            }
+
+            if(inDataColumn != NULL)
+            {
+                delete[] inDataColumn;
+            }
+
+            if(inputRasterBands != NULL)
+            {
+                delete[] inputRasterBands;
+            }
+
+            throw e;
+        }
+        catch(RSGISImageBandException& e)
+        {
+            if(gdalTranslation != NULL)
+            {
+                delete[] gdalTranslation;
+            }
+
+            if(dsOffsets != NULL)
+            {
+                for(int i = 0; i < numDS; i++)
+                {
+                    if(dsOffsets[i] != NULL)
+                    {
+                        delete[] dsOffsets[i];
+                    }
+                }
+                delete[] dsOffsets;
+            }
+
+            if(bandOffsets != NULL)
+            {
+                for(int i = 0; i < numInBands; i++)
+                {
+                    if(bandOffsets[i] != NULL)
+                    {
+                        delete[] bandOffsets[i];
+                    }
+                }
+                delete[] bandOffsets;
+            }
+
+            if(inputData != NULL)
+            {
+                for(int i = 0; i < numInBands; i++)
+                {
+                    if(inputData[i] != NULL)
+                    {
+                        delete[] inputData[i];
+                    }
+                }
+                delete[] inputData;
+            }
+
+            if(inDataColumn != NULL)
+            {
+                delete[] inDataColumn;
+            }
+
+            if(inputRasterBands != NULL)
+            {
+                delete[] inputRasterBands;
+            }
+
+            throw e;
+        }
+
+        if(gdalTranslation != NULL)
+        {
+            delete[] gdalTranslation;
+        }
+
+        if(dsOffsets != NULL)
+        {
+            for(int i = 0; i < numDS; i++)
+            {
+                if(dsOffsets[i] != NULL)
+                {
+                    delete[] dsOffsets[i];
+                }
+            }
+            delete[] dsOffsets;
+        }
+
+        if(bandOffsets != NULL)
+        {
+            for(int i = 0; i < numInBands; i++)
+            {
+                if(bandOffsets[i] != NULL)
+                {
+                    delete[] bandOffsets[i];
+                }
+            }
+            delete[] bandOffsets;
+        }
+
+        if(inputData != NULL)
+        {
+            for(int i = 0; i < numInBands; i++)
+            {
+                if(inputData[i] != NULL)
+                {
+                    delete[] inputData[i];
+                }
+            }
+            delete[] inputData;
+        }
+
+        if(inDataColumn != NULL)
+        {
+            delete[] inDataColumn;
+        }
+
+        if(inputRasterBands != NULL)
+        {
+            delete[] inputRasterBands;
+        }
+    }
 	
 	/* calcImageWithinRasterPolygon - takes existing output image */
 	void RSGISCalcImage::calcImageWithinRasterPolygon(GDALDataset **datasets, int numDS, geos::geom::Envelope *env, long fid) throw(RSGISImageCalcException,RSGISImageBandException)

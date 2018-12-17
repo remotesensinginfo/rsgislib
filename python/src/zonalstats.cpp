@@ -205,6 +205,271 @@ static PyObject *ZonalStats_PixelStats2SHP(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
+static PyObject *ZonalStats_PolyPixelStatsVecLyr(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    static char *kwlist[] = {"inputimg", "vecfile", "veclyr", "bandatts", "pixpolymeth", "noprojwarn", NULL};
+    const char *pszInputImage, *pszVector, *pszVectorLyr;
+    int noProjWarning = 0;
+    int pixelInPolyMethod = 1;
+    PyObject *pBandAttZonalStatsObj;
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssOi|i:polyPixelStatsVecLyr", kwlist, &pszInputImage, &pszVector, &pszVectorLyr,
+                                     &pBandAttZonalStatsObj, &pixelInPolyMethod, &noProjWarning))
+    {
+        return NULL;
+    }
+
+    if( !PySequence_Check(pBandAttZonalStatsObj))
+    {
+        PyErr_SetString(GETSTATE(self)->error, "bandatts argument must be a sequence");
+        return NULL;
+    }
+
+    Py_ssize_t nBandZonAtts = PySequence_Size(pBandAttZonalStatsObj);
+    std::vector<rsgis::cmds::RSGISZonalBandAttrsCmds> *bandZonalAttsVec = new std::vector<rsgis::cmds::RSGISZonalBandAttrsCmds>();
+    bandZonalAttsVec->reserve(nBandZonAtts);
+
+    for(int i = 0; i < nBandZonAtts; ++i)
+    {
+        PyObject *o = PySequence_GetItem(pBandAttZonalStatsObj, i);
+
+        PyObject *pBand = PyObject_GetAttrString(o, "band");
+        if( ( pBand == NULL ) || ( pBand == Py_None ) || !RSGISPY_CHECK_INT(pBand) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "could not find integer attribute \'band\'" );
+            Py_XDECREF(pBand);
+            Py_DECREF(o);
+            delete bandZonalAttsVec;
+            return NULL;
+        }
+
+        PyObject *pBaseName = PyObject_GetAttrString(o, "basename");
+        if( ( pBaseName == NULL ) || ( pBaseName == Py_None ) || !RSGISPY_CHECK_STRING(pBaseName) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'bandName\'" );
+            Py_XDECREF(pBand);
+            Py_XDECREF(pBaseName);
+            Py_DECREF(o);
+            delete bandZonalAttsVec;
+            return NULL;
+        }
+
+        PyObject *pMinThres = PyObject_GetAttrString(o, "minThres");
+        if( ( pMinThres == NULL ) || ( pMinThres == Py_None ) || !RSGISPY_CHECK_FLOAT(pMinThres) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "could not find float attribute \'minThres\'" );
+            Py_XDECREF(pBand);
+            Py_XDECREF(pBaseName);
+            Py_XDECREF(pMinThres);
+            Py_DECREF(o);
+            delete bandZonalAttsVec;
+            return NULL;
+        }
+
+        PyObject *pMaxThres = PyObject_GetAttrString(o, "maxThres");
+        if( ( pMaxThres == NULL ) || ( pMaxThres == Py_None ) || !RSGISPY_CHECK_FLOAT(pMaxThres) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "could not find float attribute \'maxThres\'" );
+            Py_XDECREF(pBand);
+            Py_XDECREF(pBaseName);
+            Py_XDECREF(pMinThres);
+            Py_XDECREF(pMaxThres);
+            Py_DECREF(o);
+            delete bandZonalAttsVec;
+            return NULL;
+        }
+
+        PyObject *pCalcCount = PyObject_GetAttrString(o, "calcCount");
+        if( ( pCalcCount == NULL ) || ( pCalcCount == Py_None ) || !RSGISPY_CHECK_INT(pCalcCount) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "could not find float attribute \'calcCount\'" );
+            Py_XDECREF(pBand);
+            Py_XDECREF(pBaseName);
+            Py_XDECREF(pMinThres);
+            Py_XDECREF(pMaxThres);
+            Py_XDECREF(pCalcCount);
+            Py_DECREF(o);
+            delete bandZonalAttsVec;
+            return NULL;
+        }
+
+        PyObject *pCalcMin = PyObject_GetAttrString(o, "calcMin");
+        if( ( pCalcMin == NULL ) || ( pCalcMin == Py_None ) || !RSGISPY_CHECK_INT(pCalcMin) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "could not find float attribute \'calcMin\'" );
+            Py_XDECREF(pBand);
+            Py_XDECREF(pBaseName);
+            Py_XDECREF(pMinThres);
+            Py_XDECREF(pMaxThres);
+            Py_XDECREF(pCalcCount);
+            Py_XDECREF(pCalcMin);
+            Py_DECREF(o);
+            delete bandZonalAttsVec;
+            return NULL;
+        }
+
+        PyObject *pCalcMax = PyObject_GetAttrString(o, "calcMax");
+        if( ( pCalcMax == NULL ) || ( pCalcMax == Py_None ) || !RSGISPY_CHECK_INT(pCalcMax) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "could not find float attribute \'calcMax\'" );
+            Py_XDECREF(pBand);
+            Py_XDECREF(pBaseName);
+            Py_XDECREF(pMinThres);
+            Py_XDECREF(pMaxThres);
+            Py_XDECREF(pCalcCount);
+            Py_XDECREF(pCalcMin);
+            Py_XDECREF(pCalcMax);
+            Py_DECREF(o);
+            delete bandZonalAttsVec;
+            return NULL;
+        }
+
+        PyObject *pCalcMean = PyObject_GetAttrString(o, "calcMean");
+        if( ( pCalcMean == NULL ) || ( pCalcMean == Py_None ) || !RSGISPY_CHECK_INT(pCalcMean) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "could not find float attribute \'calcMean\'" );
+            Py_XDECREF(pBand);
+            Py_XDECREF(pBaseName);
+            Py_XDECREF(pMinThres);
+            Py_XDECREF(pMaxThres);
+            Py_XDECREF(pCalcCount);
+            Py_XDECREF(pCalcMin);
+            Py_XDECREF(pCalcMax);
+            Py_XDECREF(pCalcMean);
+            Py_DECREF(o);
+            delete bandZonalAttsVec;
+            return NULL;
+        }
+
+        PyObject *pCalcStdDev = PyObject_GetAttrString(o, "calcStdDev");
+        if( ( pCalcStdDev == NULL ) || ( pCalcStdDev == Py_None ) || !RSGISPY_CHECK_INT(pCalcStdDev) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "could not find float attribute \'calcStdDev\'" );
+            Py_XDECREF(pBand);
+            Py_XDECREF(pBaseName);
+            Py_XDECREF(pMinThres);
+            Py_XDECREF(pMaxThres);
+            Py_XDECREF(pCalcCount);
+            Py_XDECREF(pCalcMin);
+            Py_XDECREF(pCalcMax);
+            Py_XDECREF(pCalcMean);
+            Py_XDECREF(pCalcStdDev);
+            Py_DECREF(o);
+            delete bandZonalAttsVec;
+            return NULL;
+        }
+
+        PyObject *pCalcMode = PyObject_GetAttrString(o, "calcMode");
+        if( ( pCalcMode == NULL ) || ( pCalcMode == Py_None ) || !RSGISPY_CHECK_INT(pCalcMode) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "could not find float attribute \'calcMode\'" );
+            Py_XDECREF(pBand);
+            Py_XDECREF(pBaseName);
+            Py_XDECREF(pMinThres);
+            Py_XDECREF(pMaxThres);
+            Py_XDECREF(pCalcCount);
+            Py_XDECREF(pCalcMin);
+            Py_XDECREF(pCalcMax);
+            Py_XDECREF(pCalcMean);
+            Py_XDECREF(pCalcStdDev);
+            Py_XDECREF(pCalcMode);
+            Py_DECREF(o);
+            delete bandZonalAttsVec;
+            return NULL;
+        }
+
+        PyObject *pCalcMedian = PyObject_GetAttrString(o, "calcMedian");
+        if( ( pCalcMedian == NULL ) || ( pCalcMedian == Py_None ) || !RSGISPY_CHECK_INT(pCalcMedian) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "could not find float attribute \'calcMedian\'" );
+            Py_XDECREF(pBand);
+            Py_XDECREF(pBaseName);
+            Py_XDECREF(pMinThres);
+            Py_XDECREF(pMaxThres);
+            Py_XDECREF(pCalcCount);
+            Py_XDECREF(pCalcMin);
+            Py_XDECREF(pCalcMax);
+            Py_XDECREF(pCalcMean);
+            Py_XDECREF(pCalcStdDev);
+            Py_XDECREF(pCalcMode);
+            Py_XDECREF(pCalcMedian);
+            Py_DECREF(o);
+            delete bandZonalAttsVec;
+            return NULL;
+        }
+
+        PyObject *pCalcSum = PyObject_GetAttrString(o, "calcSum");
+        if( ( pCalcSum == NULL ) || ( pCalcSum == Py_None ) || !RSGISPY_CHECK_INT(pCalcSum) )
+        {
+            PyErr_SetString(GETSTATE(self)->error, "could not find float attribute \'calcSum\'" );
+            Py_XDECREF(pBand);
+            Py_XDECREF(pBaseName);
+            Py_XDECREF(pMinThres);
+            Py_XDECREF(pMaxThres);
+            Py_XDECREF(pCalcCount);
+            Py_XDECREF(pCalcMin);
+            Py_XDECREF(pCalcMax);
+            Py_XDECREF(pCalcMean);
+            Py_XDECREF(pCalcStdDev);
+            Py_XDECREF(pCalcMode);
+            Py_XDECREF(pCalcMedian);
+            Py_XDECREF(pCalcSum);
+            Py_DECREF(o);
+            delete bandZonalAttsVec;
+            return NULL;
+        }
+
+        rsgis::cmds::RSGISZonalBandAttrsCmds zonalBandStatsObj = rsgis::cmds::RSGISZonalBandAttrsCmds();
+        zonalBandStatsObj.band = RSGISPY_INT_EXTRACT(pBand);
+        zonalBandStatsObj.baseName = RSGISPY_STRING_EXTRACT(pBaseName);
+        zonalBandStatsObj.minName = zonalBandStatsObj.baseName+"Min";
+        zonalBandStatsObj.maxName = zonalBandStatsObj.baseName+"Max";
+        zonalBandStatsObj.meanName = zonalBandStatsObj.baseName+"Mean";
+        zonalBandStatsObj.stdName = zonalBandStatsObj.baseName+"StdDev";
+        zonalBandStatsObj.countName = zonalBandStatsObj.baseName+"Count";
+        zonalBandStatsObj.modeName = zonalBandStatsObj.baseName+"Mode";
+        zonalBandStatsObj.medianName = zonalBandStatsObj.baseName+"Median";
+        zonalBandStatsObj.sumName = zonalBandStatsObj.baseName+"Sum";
+        zonalBandStatsObj.outMin = (bool)RSGISPY_INT_EXTRACT(pCalcMin);
+        zonalBandStatsObj.outMax = (bool)RSGISPY_INT_EXTRACT(pCalcMax);
+        zonalBandStatsObj.outMean = (bool)RSGISPY_INT_EXTRACT(pCalcMean);
+        zonalBandStatsObj.outStDev = (bool)RSGISPY_INT_EXTRACT(pCalcStdDev);
+        zonalBandStatsObj.outCount = (bool)RSGISPY_INT_EXTRACT(pCalcCount);
+        zonalBandStatsObj.outMode = (bool)RSGISPY_INT_EXTRACT(pCalcMode);
+        zonalBandStatsObj.outMedian = (bool)RSGISPY_INT_EXTRACT(pCalcMedian);
+        zonalBandStatsObj.outSum = (bool)RSGISPY_INT_EXTRACT(pCalcSum);
+        zonalBandStatsObj.minThres = RSGISPY_FLOAT_EXTRACT(pMinThres);
+        zonalBandStatsObj.maxThres = RSGISPY_FLOAT_EXTRACT(pMaxThres);
+        bandZonalAttsVec->push_back(zonalBandStatsObj);
+
+        Py_XDECREF(pBand);
+        Py_XDECREF(pBaseName);
+        Py_XDECREF(pMinThres);
+        Py_XDECREF(pMaxThres);
+        Py_XDECREF(pCalcCount);
+        Py_XDECREF(pCalcMin);
+        Py_XDECREF(pCalcMax);
+        Py_XDECREF(pCalcMean);
+        Py_XDECREF(pCalcStdDev);
+        Py_XDECREF(pCalcMode);
+        Py_XDECREF(pCalcMedian);
+        Py_XDECREF(pCalcSum);
+        Py_DECREF(o);
+    }
+
+    try
+    {
+        bool noProjWarningBool = (bool)noProjWarning;
+        rsgis::cmds::executePixelBandStatsVecLyr(std::string(pszInputImage), std::string(pszVector), std::string(pszVectorLyr), bandZonalAttsVec, pixelInPolyMethod, noProjWarningBool);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
+
 static PyObject *ZonalStats_PixelStats2TXT(PyObject *self, PyObject *args)
 {
     const char *pszInputImage, *pszInputVector, *pszOutputTxt;
@@ -423,7 +688,7 @@ static PyMethodDef ZonalStatsMethods[] = {
 "* inputimage is a string containing the name of the input image\n"
 "* inputvector is a string containing the name of the input vector\n"
 "* outputvector is a string containing the name of the output vector\n"
-"* ZonalAttributes is an rsgislib.rastergis.zonalattributes object that has attributes in line with rsgis::cmds::RSGISBandAttZStatsCmds\n"
+"* ZonalAttributes is an rsgislib.zonalstats.zonalattributes object that has attributes in line with rsgis::cmds::RSGISBandAttZStatsCmds\n"
 "   * minThreshold, a float providing the minimum pixel value to include when calculating statistics.\n"
 "   * maxThreshold, a float providing the maximum pixel value to include when calculating statistics.\n"
 "   * calcCount, a bool specifying whether to report a count of pixels between thresholds.\n"
@@ -450,7 +715,22 @@ static PyMethodDef ZonalStatsMethods[] = {
 "\n"
 },
 
-    {"pixelStats2TXT", ZonalStats_PixelStats2TXT, METH_VARARGS, 
+{"polyPixelStatsVecLyr", (PyCFunction)ZonalStats_PolyPixelStatsVecLyr, METH_VARARGS | METH_KEYWORDS,
+"zonalstats.polyPixelStatsVecLyr(inputimg=string, vecfile=string, veclyr=string, bandatts=list, pixpolymeth=rsgislib.zonalstats.METHOD_*, noprojwarn=boolean)\n"
+"Calculate statistics for pixels that intersect (defined using the specified method) with a feature in the vector layer.\n\n"
+"Where:\n"
+"\n"
+"* inputimg is a string containing the name of the input image\n"
+"* vecfile is a string containing the name of the input vector\n"
+"* veclyr is a string containing the name of the input vector layer\n"
+"* bandatts is a list of rsgislib.zonalstats.ZonalBandAttributes objects.\n"
+"* pixpolymeth is the method for determining if a pixel is included with a polygon of type rsgislib.zonalstats.METHOD_*.\n"
+"* noprojwarn is a bool, specifying whether to skip printing a warning if the vector and image have a different projections.\n"
+"\n"
+"\n"
+},
+
+{"pixelStats2TXT", ZonalStats_PixelStats2TXT, METH_VARARGS,
 "zonalstats.pixelStats2TXT(inputimage, inputvector, outputtxt, zonalattributes, useBandNames, noProjWarning=False, pixelInPolyMethod=METHOD_POLYCONTAINSPIXELCENTER, shortenBandNames=True)\n"
 "Calculate statistics for pixels falling within each polygon in a shapefile output as a CSV.\n\n"
 "Where:\n"

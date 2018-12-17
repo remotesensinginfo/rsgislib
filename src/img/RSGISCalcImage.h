@@ -91,6 +91,7 @@ namespace rsgis
 				void calcImageWithinPolygon(GDALDataset **datasets, int numDS, std::string outputImage, geos::geom::Envelope *env, geos::geom::Polygon *poly, float nodata, pixelInPolyOption pixelPolyOption, std::string gdalFormat="KEA",  GDALDataType gdalDataType=GDT_Float32) throw(RSGISImageCalcException,RSGISImageBandException);
 				void calcImageWithinPolygon(GDALDataset **datasets, int numDS, geos::geom::Envelope *env, geos::geom::Polygon *poly, pixelInPolyOption pixelPolyOption) throw(RSGISImageCalcException,RSGISImageBandException);
                 void calcImageWithinPolygonExtent(GDALDataset **datasets, int numDS, geos::geom::Envelope *env, geos::geom::Polygon *poly, pixelInPolyOption pixelPolyOption) throw(RSGISImageCalcException,RSGISImageBandException);
+                void calcImageWithinPolygonExtentInMem(GDALDataset **datasets, int numDS, geos::geom::Envelope *env, geos::geom::Polygon *poly, pixelInPolyOption pixelPolyOption) throw(RSGISImageCalcException,RSGISImageBandException);
 				void calcImageWithinRasterPolygon(GDALDataset **datasets, int numDS, geos::geom::Envelope *env, long fid) throw(RSGISImageCalcException,RSGISImageBandException);
                 void calcImageBorderPixels(GDALDataset *dataset, bool returnInt) throw(RSGISImageCalcException,RSGISImageBandException);
                 virtual ~RSGISCalcImage();
