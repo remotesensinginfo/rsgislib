@@ -1291,6 +1291,7 @@ returns list of dictionaries with the output values.
         raise e
     return outvals
 
+
 def getAttLstSelectBBoxFeats(vecFile, vecLyr, attNames, bbox):
     """
 Function to get a list of attribute values from features which intersect
@@ -1387,6 +1388,7 @@ returns list of dictionaries with the output values.
     except Exception as e:
         raise e
     return outvals
+
 
 def exportSpatialSelectFeats(vecFile, vecLyr, selVecFile, selVecLyr, outputVec, outVecLyrName, outVecDrvr):
     """
