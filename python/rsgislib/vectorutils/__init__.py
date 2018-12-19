@@ -1809,3 +1809,77 @@ Example::
     # Create vector layer
     createPolyVecBBOXs(vectorFile, vectorLyr, vecDriver, epsgCode, bboxs, atts, attTypes)
 
+
+def calcPolyCentroids(vecfile, veclyrname, outVecDrvr, vecoutfile, vecoutlyrname):
+    """
+Create a vector layer of the polygon centroids.
+
+* vecfile - input vector file
+* veclyrname - input vector layer within the input file.
+* outVecDrvr - the format driver for the output vector file (e.g., GPKG, ESRI Shapefile).
+* vecoutfile - output file path for the vector.
+* vecoutlyrname - output vector layer name.
+
+"""
+    gdal.UseExceptions()
+    
+    vecDS = gdal.OpenEx(vecfile, gdal.OF_VECTOR )
+    if vecDS is None:
+        raise Exception("Could not open '{}'".format(vecfile))
+
+    veclyr = vecDS.GetLayerByName(veclyrname)
+    if veclyr is None:
+        raise Exception("Could not open layer '{}'".format(veclyrname))
+    lyr_spat_ref = veclyr.GetSpatialRef()
+    
+    out_driver = ogr.GetDriverByName(outVecDrvr)
+    result_ds = out_driver.CreateDataSource(vecoutfile)
+    if result_ds is None:
+        raise Exception("Could not open '{}'".format(vecoutfile)) 
+    
+    result_lyr = result_ds.CreateLayer(vecoutlyrname, lyr_spat_ref, geom_type=ogr.wkbPoint)
+    if result_lyr is None:
+        raise Exception("Could not open layer '{}'".format(vecoutlyrname))
+    
+    featDefn = result_lyr.GetLayerDefn()
+    
+    openTransaction = False
+    nFeats = veclyr.GetFeatureCount(True)
+    step = math.floor(nFeats/10)
+    feedback = 10
+    feedback_next = step
+    counter = 0
+    print("Started .0.", end='', flush=True)
+    veclyr.ResetReading()
+    feat = veclyr.GetNextFeature()
+    while feat is not None:
+        if (nFeats>10) and (counter == feedback_next):
+            print(".{}.".format(feedback), end='', flush=True)
+            feedback_next = feedback_next + step
+            feedback = feedback + 10
+        
+        if not openTransaction:
+            result_lyr.StartTransaction()
+            openTransaction = True
+            
+        pt = feat.GetGeometryRef().Centroid()
+        outFeat = ogr.Feature(featDefn)
+        outFeat.SetGeometry(pt)
+        result_lyr.CreateFeature(outFeat)
+            
+        if ((counter % 20000) == 0) and openTransaction:
+            result_lyr.CommitTransaction()
+            openTransaction = False
+        
+        feat = veclyr.GetNextFeature()
+        counter = counter + 1
+
+    if openTransaction:
+        result_lyr.CommitTransaction()
+        openTransaction = False
+    result_lyr.SyncToDisk()
+    print(" Completed")
+
+    vecDS = None
+    result_ds = None
+

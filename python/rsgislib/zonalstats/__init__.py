@@ -55,7 +55,7 @@ This is passed to the polyPixelStatsVecLyr function. """
         self.calcMedian = calcMedian
         self.calcSum = calcSum
 
-def calcZonalBandsStats(vecfile, veclyrname, valsimg, imgbandidx, minthres, maxthres, minfield=None, maxfield=None, meanfield=None, stddevfield=None, sumfield=None, countfield=None, modefield=None, medianfield=None):
+def calcZonalBandStats(vecfile, veclyrname, valsimg, imgbandidx, minthres, maxthres, minfield=None, maxfield=None, meanfield=None, stddevfield=None, sumfield=None, countfield=None, modefield=None, medianfield=None):
     """
 A function which calculates zonal statistics for a particular image band.
 
@@ -226,6 +226,134 @@ A function which calculates zonal statistics for a particular image band.
         
         feat = veclyr.GetNextFeature()
         counter = counter + 1
+    if openTransaction:
+        veclyr.CommitTransaction()
+        openTransaction = False
+    veclyr.SyncToDisk()
+    print(" Completed")
+
+    vecDS = None
+    imgDS = None
+
+
+def calcZonalPolyPtsBandStats(vecfile, veclyrname, valsimg, imgbandidx, outfield):
+    """
+A funtion which extracts zonal stats for a polygon using the polygon centroid.
+This is useful when you are intesecting a low resolution image with respect to
+the polygon resolution.
+
+* vecfile - input vector file
+* veclyrname - input vector layer within the input file which specifies the features and where the output stats will be written.
+* valsimg - the values image
+* imgbandidx - the index (starting at 1) of the image band for which the stats will be calculated. If defined the no data value of the band will be ignored.
+* outfield - output field name within the vector layer.
+"""
+    gdal.UseExceptions()
+    
+    imgDS = gdal.OpenEx(valsimg, gdal.GA_ReadOnly)
+    if imgDS is None:
+        raise Exception("Could not open '{}'".format(valsimg))
+    imgband = imgDS.GetRasterBand(imgbandidx)
+    if imgband is None:
+        raise Exception("Could not find image band '{}'".format(imgbandidx))
+    imgGeoTrans = imgDS.GetGeoTransform()
+    img_wkt_str = imgDS.GetProjection()
+    img_spatial_ref = osr.SpatialReference()
+    img_spatial_ref.ImportFromWkt(img_wkt_str)
+
+    imgNoDataVal = imgband.GetNoDataValue()
+
+    vecDS = gdal.OpenEx(vecfile, gdal.OF_VECTOR|gdal.OF_UPDATE )
+    if vecDS is None:
+        raise Exception("Could not open '{}'".format(vecfile)) 
+
+    veclyr = vecDS.GetLayerByName(veclyrname)
+    if veclyr is None:
+        raise Exception("Could not open layer '{}'".format(veclyrname))
+    veclyr_spatial_ref = veclyr.GetSpatialRef()
+    
+    if not img_spatial_ref.IsSame(veclyr_spatial_ref):
+        imgDS = None
+        vecDS = None
+        raise Exception("Inputted raster and vector layers have different projections: ('{0}' '{1}') ".format(vecfile, valsimg))
+    
+    veclyrDefn = veclyr.GetLayerDefn()
+    
+    found = False
+    for i in range(veclyrDefn.GetFieldCount()):
+        if veclyrDefn.GetFieldDefn(i).GetName().lower() in outfield.lower():
+            found = True
+            break
+    if not found:
+        veclyr.CreateField(ogr.FieldDefn(outfield.lower(), ogr.OFTReal))
+    
+    outfieldidx = veclyr.FindFieldIndex(outfield.lower(), True)
+
+    vec_mem_drv = ogr.GetDriverByName('Memory')
+    img_mem_drv = gdal.GetDriverByName('MEM')
+    
+    # Iterate through features.
+    openTransaction = False
+    nFeats = veclyr.GetFeatureCount(True)
+    step = math.floor(nFeats/10)
+    feedback = 10
+    feedback_next = step
+    counter = 0
+    print("Started .0.", end='', flush=True)
+    veclyr.ResetReading()
+    feat = veclyr.GetNextFeature()
+    while feat is not None:
+        if (nFeats>10) and (counter == feedback_next):
+            print(".{}.".format(feedback), end='', flush=True)
+            feedback_next = feedback_next + step
+            feedback = feedback + 10
+        
+        if not openTransaction:
+            veclyr.StartTransaction()
+            openTransaction = True
+        
+        # Find the feature bbox
+        feat_bbox = feat.geometry().GetEnvelope()
+        pixel_width = imgGeoTrans[1]
+        pixel_height = imgGeoTrans[5]
+        x1 = int((feat_bbox[0] - imgGeoTrans[0]) / pixel_width)
+        x2 = int((feat_bbox[1] - imgGeoTrans[0]) / pixel_width) + 1
+        y1 = int((feat_bbox[3] - imgGeoTrans[3]) / pixel_height)
+        y2 = int((feat_bbox[2] - imgGeoTrans[3]) / pixel_height) + 1
+        xsize = x2 - x1
+        ysize = y2 - y1
+        # Define the image ROI for the feature
+        src_offset = (x1, y1, xsize, ysize)
+
+        # Read the band array.
+        src_array = imgband.ReadAsArray(*src_offset)
+    
+        if src_array is not None:
+            subTLX = (imgGeoTrans[0] + (src_offset[0] * imgGeoTrans[1]))
+            subTLY = (imgGeoTrans[3] + (src_offset[1] * imgGeoTrans[5]))
+            resX = imgGeoTrans[1]
+            resY = imgGeoTrans[5]
+                        
+            ptx,pty,ptz = feat.GetGeometryRef().Centroid().GetPoint()
+            
+            xOff = math.floor((ptx - subTLX) / resX)
+            yOff = math.floor((pty - subTLY) / resY)
+    
+            out_val = float(src_array[yOff, xOff])
+            feat.SetField(outfieldidx, out_val)
+
+            veclyr.SetFeature(feat)
+
+            vec_mem_ds = None
+            img_tmp_ds = None
+        
+        if ((counter % 20000) == 0) and openTransaction:
+            veclyr.CommitTransaction()
+            openTransaction = False
+        
+        feat = veclyr.GetNextFeature()
+        counter = counter + 1
+
     if openTransaction:
         veclyr.CommitTransaction()
         openTransaction = False
