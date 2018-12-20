@@ -181,7 +181,7 @@ Example::
         raise e
 
 
-def copyVec2RAT(vecfile, vecLyr inputImage, outputImage):
+def copyVec2RAT(vecfile, vecLyr, inputImage, outputImage):
     """ 
 A utillity to create raster copy of a shapefile. The output image is a KEA file and the attribute table has the attributes from the shapefile. 
     
