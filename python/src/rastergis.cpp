@@ -1623,14 +1623,14 @@ static PyObject *RasterGIS_CollapseRAT(PyObject *self, PyObject *args)
 
 static PyObject *RasterGIS_ImportVecAtts(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    const char *clumpsImage, *vectorFile, *vectorLyrName;
+    const char *clumpsImage, *vectorFile, *vectorLyrName, *fidColName;
     PyObject *pColNamesList;
     int ratBand;
     ratBand = 1;
     
-    static char *kwlist[] = {"clumps", "vector", "veclyr", "colnames", "ratband", NULL};
+    static char *kwlist[] = {"clumps", "vector", "veclyr", "fidcol", "colnames", "ratband", NULL};
     
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssO|i:importVecAtts", kwlist, &clumpsImage, &vectorFile, &vectorLyrName, &pColNamesList, &ratBand))
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssssO|i:importVecAtts", kwlist, &clumpsImage, &vectorFile, &vectorLyrName, &fidColName, &pColNamesList, &ratBand))
     {
         return NULL;
     }
@@ -1653,7 +1653,7 @@ static PyObject *RasterGIS_ImportVecAtts(PyObject *self, PyObject *args, PyObjec
             }
         }
         
-        rsgis::cmds::executeImportShpAtts(std::string(clumpsImage), ratBand, std::string(vectorFile), std::string(vectorLyrName), colNames);
+        rsgis::cmds::executeImportShpAtts(std::string(clumpsImage), ratBand, std::string(vectorFile), std::string(vectorLyrName), std::string(fidColName), colNames);
     }
     catch (rsgis::cmds::RSGISCmdException &e)
     {
@@ -2784,7 +2784,7 @@ static PyMethodDef RasterGISMethods[] = {
 
 
 {"importVecAtts", (PyCFunction)RasterGIS_ImportVecAtts, METH_VARARGS | METH_KEYWORDS,
-"rastergis.importVecAtts(clumps, vector, veclyr, colnames, ratband=1)\n"
+"rastergis.importVecAtts(clumps, vector, veclyr, fidcol, colnames, ratband=1)\n"
 "Copies the attributes from an input shapefile to the RAT.\n"
 "\n"
 "Where:\n"
@@ -2792,6 +2792,7 @@ static PyMethodDef RasterGISMethods[] = {
 "* clumps is a string containing the name of the input file with RAT\n"
 "* vector is a string containing the file path of the input vector file\n"
 "* veclyr is a string containing the layer name within the input vector file\n"
+"* fidcol is a string with the name of a column which has the clumps pixel value associated with the vector feature.\n"
 "* colnames is a list of strings specifying the columns to be copied to the RAT. If 'None' then all attributes will be copied.\n"
 "* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated.\n"
 "\n"
@@ -2801,7 +2802,7 @@ static PyMethodDef RasterGISMethods[] = {
 "   clumps = 'clumpsFiles.kea'\n"
 "   vectorFile = 'vectorFile.shp'\n"
 "   veclyr = 'vectorFile'\n"
-"   rastergis.importVecAtts(clumps, vectorFile, veclyr, None)\n"
+"   rastergis.importVecAtts(clumps, vectorFile, veclyr, 'pxlval', None)\n"
 "\n"},
 
 {"regionGrowClassNeighCritera", RasterGIS_RegionGrowClassNeighCritera, METH_VARARGS,

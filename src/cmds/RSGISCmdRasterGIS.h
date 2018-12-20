@@ -310,7 +310,7 @@ namespace rsgis{ namespace cmds {
     DllExport void executeCollapseRAT(std::string clumpsImage, unsigned int ratBand, std::string selectColumn, std::string outImage, std::string gdalFormat)throw(RSGISCmdException);
     
     /** Function for importing attribute table from a shapefile into a RAT */
-    DllExport void executeImportShpAtts(std::string clumpsImage, unsigned int ratBand, std::string inputVector, std::string inputVectorLyr, std::vector<std::string> *colNames=NULL)throw(RSGISCmdException);
+    DllExport void executeImportShpAtts(std::string clumpsImage, unsigned int ratBand, std::string inputVector, std::string inputVectorLyr, std::string fidColStr, std::vector<std::string> *colNames=NULL)throw(RSGISCmdException);
     
     /** Function to undertaken region growing of a class with a neighbour / object criteria */
     DllExport void executeClassRegionGrowingNeighCritera(std::string clumpsImage, unsigned int ratBand, std::string classColumn, std::string classVal, int maxIter, std::string xmlBlockGrowCriteria, std::string xmlBlockNeighCriteria)throw(RSGISCmdException);

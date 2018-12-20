@@ -1768,7 +1768,7 @@ namespace rsgis{ namespace cmds {
         }
     }
             
-    void executeImportShpAtts(std::string clumpsImage, unsigned int ratBand, std::string inputVector, std::string inputVectorLyr, std::vector<std::string> *colNames)throw(RSGISCmdException)
+    void executeImportShpAtts(std::string clumpsImage, unsigned int ratBand, std::string inputVector, std::string inputVectorLyr, std::string fidColStr, std::vector<std::string> *colNames)throw(RSGISCmdException)
     {
         try
         {
@@ -1813,15 +1813,9 @@ namespace rsgis{ namespace cmds {
                 std::cout << "No column names were specified so copying them all.\n";
                 colNames = vecUtils.getColumnNames(inputVecLyr);
             }
-            
-            std::cout << "Importing columns: \n";
-            for(std::vector<std::string>::iterator iterCols = colNames->begin(); iterCols != colNames->end(); ++iterCols)
-            {
-                std::cout << "\t\'" << *iterCols << "\'" << std::endl;
-            }
-            
+
             rsgis::rastergis::RSGISInputShapefileAttributes2RAT copyShpAtts2RAT;
-            copyShpAtts2RAT.copyVectorAtt2Rat(clumpsDataset, ratBand, inputVecLyr, colNames);
+            copyShpAtts2RAT.copyVectorAtt2Rat(clumpsDataset, ratBand, inputVecLyr, fidColStr, colNames);
             
             delete colNames;
             GDALClose(clumpsDataset);

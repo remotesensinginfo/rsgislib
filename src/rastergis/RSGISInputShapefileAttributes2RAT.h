@@ -57,21 +57,8 @@ namespace rsgis{namespace rastergis{
     {
     public:
         RSGISInputShapefileAttributes2RAT();
-        void copyVectorAtt2Rat(GDALDataset *clumpsImage, unsigned int ratBand, OGRLayer *vecLayer, std::vector<std::string> *colNames)throw(RSGISAttributeTableException);
+        void copyVectorAtt2Rat(GDALDataset *clumpsImage, unsigned int ratBand, OGRLayer *vecLayer, std::string fidColStr, std::vector<std::string> *colNames)throw(RSGISAttributeTableException);
         virtual ~RSGISInputShapefileAttributes2RAT();
-    };
-    
-    
-    class DllExport RSGISRATCalcValueCopyShapeAtts: public RSGISRATCalcValue
-    {
-    public:
-        RSGISRATCalcValueCopyShapeAtts(OGRLayer *vecLayer, std::vector<RSGISRATCol> ratColInfo, size_t numVecFeats);
-        virtual void calcRATValue(size_t fid, double *inRealCols, unsigned int numInRealCols, int *inIntCols, unsigned int numInIntCols, std::string *inStringCols, unsigned int numInStringCols, double *outRealCols, unsigned int numOutRealCols, int *outIntCols, unsigned int numOutIntCols, std::string *outStringCols, unsigned int numOutStringCols) throw(RSGISAttributeTableException);
-        virtual ~RSGISRATCalcValueCopyShapeAtts();
-    protected:
-        OGRLayer *vecLayer;
-        std::vector<RSGISRATCol> ratColInfo;
-        size_t numVecFeats;
     };
     
 }}
