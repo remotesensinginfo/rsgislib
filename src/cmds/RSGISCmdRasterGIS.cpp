@@ -1768,7 +1768,7 @@ namespace rsgis{ namespace cmds {
         }
     }
             
-    void executeImportShpAtts(std::string clumpsImage, unsigned int ratBand, std::string inputVector, std::vector<std::string> *colNames)throw(RSGISCmdException)
+    void executeImportShpAtts(std::string clumpsImage, unsigned int ratBand, std::string inputVector, std::string inputVectorLyr, std::vector<std::string> *colNames)throw(RSGISCmdException)
     {
         try
         {
@@ -1794,24 +1794,24 @@ namespace rsgis{ namespace cmds {
             //
             /////////////////////////////////////
             inputVector = boost::filesystem::absolute(inputVector).string();
-            GDALDataset *inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);
-            if(inputSHPDS == NULL)
+            GDALDataset *inputVecDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);
+            if(inputVecDS == NULL)
             {
                 std::string message = std::string("Could not open vector file ") + inputVector;
                 throw RSGISFileException(message.c_str());
             }
-            std::string SHPFileInLayer = vecUtils.getLayerName(inputVector);
-            OGRLayer *inputSHPLayer = inputSHPDS->GetLayerByName(SHPFileInLayer.c_str());
-            if(inputSHPLayer == NULL)
+
+            OGRLayer *inputVecLyr = inputVecDS->GetLayerByName(inputVectorLyr.c_str());
+            if(inputVecLyr == NULL)
             {
-                std::string message = std::string("Could not open vector layer ") + SHPFileInLayer;
+                std::string message = std::string("Could not open vector layer ") + inputVectorLyr;
                 throw RSGISFileException(message.c_str());
             }
             
             if(colNames == NULL)
             {
                 std::cout << "No column names were specified so copying them all.\n";
-                colNames = vecUtils.getColumnNames(inputSHPLayer);
+                colNames = vecUtils.getColumnNames(inputVecLyr);
             }
             
             std::cout << "Importing columns: \n";
@@ -1821,11 +1821,11 @@ namespace rsgis{ namespace cmds {
             }
             
             rsgis::rastergis::RSGISInputShapefileAttributes2RAT copyShpAtts2RAT;
-            copyShpAtts2RAT.copyVectorAtt2Rat(clumpsDataset, ratBand, inputSHPLayer, colNames);
+            copyShpAtts2RAT.copyVectorAtt2Rat(clumpsDataset, ratBand, inputVecLyr, colNames);
             
             delete colNames;
             GDALClose(clumpsDataset);
-            GDALClose(inputSHPDS);
+            GDALClose(inputVecDS);
         }
         catch(rsgis::RSGISException &e)
         {
