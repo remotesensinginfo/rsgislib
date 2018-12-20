@@ -1883,3 +1883,25 @@ Create a vector layer of the polygon centroids.
     vecDS = None
     result_ds = None
 
+def lstveclyrcols(vecfile, veclyr):
+    """
+A function which returns a list of columns from the input vector layer.
+
+* vecfile - input vector file.
+* veclyr - input vector layer
+"""
+    gdal.UseExceptions()
+    atts = []
+    
+    dsVecFile = gdal.OpenEx(vecfile, gdal.OF_READONLY )
+    if dsVecFile is None:
+        raise Exception("Could not open '" + vecfile + "'")
+    
+    lyrVecObj = dsVecFile.GetLayerByName( veclyr )
+    if lyrVecObj is None:
+        raise Exception("Could not find layer '" + veclyr + "'")
+    
+    lyrDefn = lyrVecObj.GetLayerDefn()
+    for i in range(lyrDefn.GetFieldCount()):
+        atts.append(lyrDefn.GetFieldDefn(i).GetName())
+    return atts

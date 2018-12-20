@@ -1630,7 +1630,7 @@ static PyObject *RasterGIS_ImportVecAtts(PyObject *self, PyObject *args, PyObjec
     
     static char *kwlist[] = {"clumps", "vector", "veclyr", "colnames", "ratband", NULL};
     
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssO|i:importVecAtts", kwlist, &clumpsImage, &vectorFile, &vectorLyrName, &pColNamesList, &ratBand))
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssO|i:importVecAtts", kwlist, &clumpsImage, &vectorFile, &vectorLyrName, &pColNamesList, &ratBand))
     {
         return NULL;
     }
