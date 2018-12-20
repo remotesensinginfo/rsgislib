@@ -181,7 +181,7 @@ Example::
         raise e
 
 
-def copyShapefile2RAT(inputVec, inputImage, outputImage):
+def copyVec2RAT(vecfile, vecLyr inputImage, outputImage):
     """ 
 A utillity to create raster copy of a shapefile. The output image is a KEA file and the attribute table has the attributes from the shapefile. 
     
@@ -199,12 +199,12 @@ Example::
     inputImage = 'injune_p142_casi_sub_utm.kea'
     outputImage = 'psu142_crowns.kea'
         
-    vectorutils.copyShapefile2RAT(inputVector, inputImage, outputImage)
+    vectorutils.copyShapefile2RAT(inputVector, 'crowns', inputImage, outputImage)
 
 """
     try:
-        rasterise2Image(inputVec, inputImage, outputImage, "KEA", shpAtt="FID")
-        rsgislib.rastergis.importVecAtts(outputImage, inputVec, None)
+        rasteriseVecLyr(vecfile, vecLyr, inputImage, outputImage, gdalformat="KEA", datatype=rsgislib.TYPE_32UINT, vecAtt="FID", vecExt=False, thematic=True, nodata=0)
+        rsgislib.rastergis.importVecAtts(outputImage, vecfile, vecLyr, 'pxlval', None)
     except Exception as e:
         raise e
 
