@@ -374,8 +374,9 @@ Example::
             lyr.StartTransaction()
             openTransaction = True
         feat = lyr.GetFeature(fid)
-        feat.SetField(colName, colData[i] )
-        lyr.SetFeature(feat)
+        if feat is not None:
+            feat.SetField(colName, colData[i])
+            lyr.SetFeature(feat)
         if ((i % 20000) == 0) and openTransaction:
             lyr.CommitTransaction()
             openTransaction = False
