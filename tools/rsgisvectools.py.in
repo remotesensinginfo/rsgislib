@@ -48,7 +48,7 @@ if __name__ == "__main__":
             print("{0}: {1}".format(i, lyr))
             i = i + 1
     if args.cols:
-        veccols = rsgislib.vectorutils.lstveclyrcols(args.vecfile, args.veclyr):
+        veccols = rsgislib.vectorutils.lstveclyrcols(args.vecfile, args.veclyr)
         i = 1
         for col in veccols:
             print("{0}: {1}".format(i, col))
