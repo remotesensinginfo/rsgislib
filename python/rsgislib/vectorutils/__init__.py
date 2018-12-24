@@ -574,6 +574,7 @@ A function which adds a polygons boundary bbox as attributes to each feature.
         geom = feat.GetGeometryRef()
         if geom is not None:
             env = geom.GetEnvelope()
+            ()
             feat.SetField(xminCol, env[0])
             feat.SetField(xmaxCol, env[1])
             feat.SetField(yminCol, env[2])
@@ -1906,3 +1907,49 @@ A function which returns a list of columns from the input vector layer.
     for i in range(lyrDefn.GetFieldCount()):
         atts.append(lyrDefn.GetFieldDefn(i).GetName())
     return atts
+
+
+def getFeatEnvs(vecFile, vecLyr):
+    """
+A function which returns a list of bounding boxes for each feature
+within the vector layer.
+
+* vecFile - vector file.
+* vecLyr - layer within the vector file.
+"""
+    import math
+
+    dsVecFile = gdal.OpenEx(vecFile, gdal.OF_VECTOR )
+    if dsVecFile is None:
+        raise Exception("Could not open '" + vecFile + "'")
+        
+    lyrVecObj = dsVecFile.GetLayerByName( vecLyr )
+    if lyrVecObj is None:
+        raise Exception("Could not find layer '" + vecLyr + "'")
+    
+    openTransaction = False
+    nFeats = lyrVecObj.GetFeatureCount(True)
+    step = math.floor(nFeats/10)
+    feedback = 10
+    feedback_next = step
+    counter = 0
+    print("Started .0.", end='', flush=True)
+    outenvs = []
+    # loop through the input features
+    inFeature = lyrVecObj.GetNextFeature()
+    while inFeature:
+        if (nFeats>10) and (counter == feedback_next):
+            print(".{}.".format(feedback), end='', flush=True)
+            feedback_next = feedback_next + step
+            feedback = feedback + 10
+            
+        # get the input geometry
+        geom = inFeature.GetGeometryRef()
+        if geom is not None:
+            outenvs.append(geom.GetEnvelope())
+        
+        inFeature = lyrVecObj.GetNextFeature()
+        counter = counter + 1
+    print(" Completed")
+    dsVecFile = None
+    return outenvs

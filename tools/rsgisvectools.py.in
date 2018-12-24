@@ -36,7 +36,9 @@ import argparse
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--vecfile", type=str, required=True, help="Input vector file.")
+    parser.add_argument("--veclyr", type=str, required=False, help="Input vector file layer.")
     parser.add_argument("--lyrs", action='store_true', default=False, help="List the layers in vector file.")
+    parser.add_argument("--cols", action='store_true', default=False, help="List the columns in vector layer.")
     args = parser.parse_args()
     
     if args.lyrs:
@@ -44,4 +46,10 @@ if __name__ == "__main__":
         i = 1
         for lyr in veclyrs:
             print("{0}: {1}".format(i, lyr))
+            i = i + 1
+    if args.cols:
+        veccols = rsgislib.vectorutils.lstveclyrcols(args.vecfile, args.veclyr):
+        i = 1
+        for col in veccols:
+            print("{0}: {1}".format(i, col))
             i = i + 1
