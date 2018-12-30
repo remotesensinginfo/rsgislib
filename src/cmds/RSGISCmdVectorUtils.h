@@ -94,6 +94,8 @@ namespace rsgis{ namespace cmds{
     DllExport void executeCreateLinesOfPoints(std::string inputLinesVec, std::string outputPtsVec, double step, bool force) throw(RSGISCmdException);
     /** Function to adjust polygon boundaries using active contours */
     DllExport void executeFitActiveContourBoundaries(std::string inputPolysVec, std::string outputPolysVec, std::string externalForceImg, double interAlpha, double interBeta, double interGamma, double minExtThres, bool force) throw(RSGISCmdException);
+    /** Function to check and validate the geometries within the vector file */
+    DllExport void executeCheckValidateGeometries(std::string inputVec, std::string lyrName, std::string outputVec, std::string vecDriver, bool printGeomErrs) throw(RSGISCmdException);
 }}
 
 

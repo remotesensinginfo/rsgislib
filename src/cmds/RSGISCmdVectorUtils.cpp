@@ -48,6 +48,7 @@
 #include "vec/RSGISPolygonReader.h"
 #include "vec/RSGISGetAttributeValues.h"
 #include "vec/RSGISFitActiveContour4Polys.h"
+#include "vec/RSGISCopyCheckPolygons.h"
 
 #include "geom/RSGISFitPolygon2Points.h"
 #include "geom/RSGISMinSpanTreeClustererStdDevThreshold.h"
@@ -2224,6 +2225,82 @@ namespace rsgis{ namespace cmds {
             GDALClose(inputSHPDS);
             GDALClose(outputSHPDS);
             GDALClose(extImgDS);
+        }
+        catch(rsgis::RSGISVectorException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(rsgis::RSGISException &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (std::exception &e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+
+    void executeCheckValidateGeometries(std::string inputVec, std::string lyrName, std::string outputVec, std::string vecDriver, bool printGeomErrs) throw(RSGISCmdException)
+    {
+        try
+        {
+            // Convert to absolute path
+            inputVec = boost::filesystem::absolute(inputVec).string();
+            outputVec = boost::filesystem::absolute(outputVec).string();
+
+            OGRRegisterAll();
+            GDALAllRegister();
+
+            /////////////////////////////////////
+            //
+            // Open Input Shapfile.
+            //
+            /////////////////////////////////////
+            GDALDataset *inputVecDS = (GDALDataset*) GDALOpenEx(inputVec.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);
+            if(inputVecDS == NULL)
+            {
+                std::string message = std::string("Could not open vector file ") + inputVec;
+                throw RSGISFileException(message.c_str());
+            }
+            OGRLayer *inputVecLayer = inputVecDS->GetLayerByName(lyrName.c_str());
+            if(inputVecLayer == NULL)
+            {
+                std::string message = std::string("Could not open vector layer ") + lyrName;
+                throw RSGISFileException(message.c_str());
+            }
+            OGRSpatialReference* spatialRef = inputVecLayer->GetSpatialRef();
+            OGRFeatureDefn *inFeatureDefn = inputVecLayer->GetLayerDefn();
+
+            /////////////////////////////////////
+            //
+            // Create Output Shapfile.
+            //
+            /////////////////////////////////////
+            GDALDriver *gdaldriver = GetGDALDriverManager()->GetDriverByName(vecDriver.c_str());
+            if( gdaldriver == NULL )
+            {
+                std::string message = std::string("Driver not avaiable: ") + vecDriver;
+                throw rsgis::vec::RSGISVectorOutputException(message.c_str());
+            }
+            GDALDataset *outputVecDS = gdaldriver->Create(outputVec.c_str(), 0, 0, 0, GDT_Unknown, NULL);
+            if( outputVecDS == NULL )
+            {
+                std::string message = std::string("Could not create vector file ") + outputVec;
+                throw rsgis::vec::RSGISVectorOutputException(message.c_str());
+            }
+            OGRLayer *outputVecLayer = outputVecDS->CreateLayer(lyrName.c_str(), spatialRef, inFeatureDefn->GetGeomType(), NULL );
+            if( outputVecLayer == NULL )
+            {
+                std::string message = std::string("Could not create vector layer ") + lyrName;
+                throw rsgis::vec::RSGISVectorOutputException(message.c_str());
+            }
+
+            std::cout.precision(12);
+            rsgis::vec::RSGISCopyCheckPolygons checkPolys;
+            checkPolys.copyCheckPolygons(inputVecLayer, outputVecLayer, printGeomErrs);
+
+            GDALClose(inputVecDS);
+            GDALClose(outputVecDS);
         }
         catch(rsgis::RSGISVectorException &e)
         {

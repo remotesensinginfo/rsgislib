@@ -62,16 +62,18 @@ namespace rsgis{namespace vec{
 			
 			unsigned long feedback = numFeatures/10;
 			unsigned long feedbackCounter = 0;
+            unsigned long nextFeedback = 0;
 			unsigned long i = 0;
 			std::cout << "Started" << std::flush;
 			
 			input->ResetReading();
 			while( (inFeature = input->GetNextFeature()) != NULL )
 			{
-				if((numFeatures >= 10) && ((i % feedback) == 0))
+				if((numFeatures >= 10) && (nextFeedback == i))
 				{
-					std::cout << ".." << feedbackCounter << ".." << std::flush;
+					std::cout << "." << feedbackCounter << "." << std::flush;
 					feedbackCounter = feedbackCounter + 10;
+                    nextFeedback = nextFeedback + feedback;
 				}
 				++i;
 				
@@ -92,7 +94,10 @@ namespace rsgis{namespace vec{
 					}
 					catch (RSGISVectorException &e) 
 					{
-						std::cout << fid << ": " << e.what() << std::endl;
+                        if(printErrors)
+                        {
+                            std::cout << fid << ": " << e.what() << std::endl;
+                        }
 						polyOK = false;
 					}
 					
@@ -100,7 +105,10 @@ namespace rsgis{namespace vec{
 				else 
 				{
 					nullGeometry = true;
-					std::cout << fid << ": Geometry was either the incorrect type or NULL." << std::endl;
+                    if(printErrors)
+                    {
+                        std::cout << fid << ": Geometry was either the incorrect type or NULL." << std::endl;
+                    }
 				}
 				
 				if(polyOK && !nullGeometry)
@@ -120,7 +128,10 @@ namespace rsgis{namespace vec{
 				}
 				else 
 				{
-					std::cout << fid << ": Geometry is either NULL or not a polygon\n";
+                    if(printErrors)
+                    {
+                        std::cout << fid << ": Geometry is either NULL or not a polygon\n";
+                    }
 				}
 
 				OGRFeature::DestroyFeature(inFeature);
@@ -140,12 +151,12 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISCopyCheckPolygons::copyFeatureDefn(OGRLayer *outputSHPLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+	void RSGISCopyCheckPolygons::copyFeatureDefn(OGRLayer *outputVecLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
 	{
 		int fieldCount = inFeatureDefn->GetFieldCount();
 		for(int i = 0; i < fieldCount; i++)
 		{
-			if( outputSHPLayer->CreateField( inFeatureDefn->GetFieldDefn(i) ) != OGRERR_NONE )
+			if( outputVecLayer->CreateField( inFeatureDefn->GetFieldDefn(i) ) != OGRERR_NONE )
 			{
 				std::string message = std::string("Creating ") + std::string(inFeatureDefn->GetFieldDefn(i)->GetNameRef()) + std::string(" field has failed.");
 				throw RSGISVectorOutputException(message.c_str());
