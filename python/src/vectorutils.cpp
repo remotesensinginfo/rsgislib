@@ -651,6 +651,33 @@ static PyObject *VectorUtils_FitActiveContourBoundaries(PyObject *self, PyObject
     Py_RETURN_NONE;
 }
 
+static PyObject *VectorUtils_CheckValidateGeometries(PyObject *self, PyObject *args)
+{
+    const char *pszInputVector;
+    const char *pszOutputVector;
+    const char *pszVectorLyrName;
+    const char *pszDriver;
+    int printGeomErrsInt = false;
+
+    if( !PyArg_ParseTuple(args, "ssss|i:checkValidateGeometries", &pszInputVector, &pszVectorLyrName, &pszOutputVector, &pszDriver, &printGeomErrsInt))
+    {
+        return NULL;
+    }
+
+    try
+    {
+        bool printGeomErrs = (bool) printGeomErrsInt;
+        rsgis::cmds::executeCheckValidateGeometries(std::string(pszInputVector), std::string(pszVectorLyrName), std::string(pszOutputVector), std::string(pszDriver), printGeomErrs);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
+
 
 // Our list of functions in this module
 static PyMethodDef VectorUtilsMethods[] = {
@@ -977,9 +1004,20 @@ static PyMethodDef VectorUtilsMethods[] = {
 "* minExtThresVal is a double specifying a hard boundary for the external energy which can't be crossed.\n"
 "* force is a bool, specifying whether to force removal of the output vector if it exists\n"
 "\n"},
+
+{"checkValidateGeometries", VectorUtils_CheckValidateGeometries, METH_VARARGS,
+"vectorutils.checkValidateGeometries(inputVector, veclayer, outputVector, outVecDriver, printGeomErrs)\n"
+"A command fit a polygon to the points inputted.\n\n"
+"Where:\n"
+"\n"
+"* inputVector is a string containing the name and path of the input vector.\n"
+"* veclayer is a string specifying name of the vector layer to be processed.\n"
+"* outputVector is a string containing the name and path of the output vector.\n"
+"* outVecDriver is a string specifying the output vector GDAL/OGR driver (e.g., GPKG).\n"
+"* printGeomErrs is a bool, specifying whether were errors are found they are printed to the console.\n"
+"\n"},
     
-    
-    {NULL}        /* Sentinel */
+{NULL}        /* Sentinel */
 };
 
 
