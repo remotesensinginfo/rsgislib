@@ -127,14 +127,15 @@ static PyObject *VectorUtils_PrintPolyGeom(PyObject *self, PyObject *args)
 static PyObject *VectorUtils_BufferVector(PyObject *self, PyObject *args)
 {
     const char *pszInputVector, *pszOutputVector;
+    const char *pszVectorLyrName;
+    const char *pszDriver;
     float bufferDist;
-    int force = false;
-    if( !PyArg_ParseTuple(args, "ssf|i:buffervector", &pszInputVector, &pszOutputVector, &bufferDist, &force))
+    if( !PyArg_ParseTuple(args, "ssssf:buffervector", &pszInputVector, &pszVectorLyrName, &pszOutputVector, &pszDriver, &bufferDist))
         return NULL;
 
     try
     {
-        rsgis::cmds::executeBufferVector(pszInputVector, pszOutputVector, bufferDist, force);
+        rsgis::cmds::executeBufferVector(std::string(pszInputVector), std::string(pszVectorLyrName), std::string(pszOutputVector), std::string(pszDriver), bufferDist);
      
     }
     catch(rsgis::cmds::RSGISCmdException &e)
