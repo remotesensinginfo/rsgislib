@@ -64,6 +64,9 @@ namespace rsgis{namespace vec{
 			unsigned long feedbackCounter = 0;
             unsigned long nextFeedback = 0;
 			unsigned long i = 0;
+            unsigned int transactionStep = 20000;
+            unsigned int nextTransaction = transactionStep;
+            bool openTransaction = false;
 			std::cout << "Started" << std::flush;
 			
 			input->ResetReading();
@@ -76,6 +79,12 @@ namespace rsgis{namespace vec{
                     nextFeedback = nextFeedback + feedback;
 				}
 				++i;
+
+                if(!openTransaction)
+                {
+                    output->StartTransaction();
+                    openTransaction = true;
+                }
 				
 				fid = inFeature->GetFID();
 				
@@ -134,8 +143,21 @@ namespace rsgis{namespace vec{
                     }
 				}
 
+                if(openTransaction && (i == nextTransaction))
+                {
+                    output->CommitTransaction();
+                    openTransaction = false;
+                    nextTransaction = nextTransaction + transactionStep;
+                }
+
 				OGRFeature::DestroyFeature(inFeature);
 			}
+
+            if(openTransaction)
+            {
+                output->CommitTransaction();
+                openTransaction = false;
+            }
 			std::cout << " Complete.\n";
 			
 			std::cout << numOutputted << " Polygons have been outputted from the " << numFeatures << " in the input file.\n";
