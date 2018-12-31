@@ -557,6 +557,16 @@ the polygon resolution.
                         
                         xOff = math.floor((ptx - subTLX) / resX)
                         yOff = math.floor((pty - subTLY) / resY)
+                        
+                        if xOff < 0:
+                            xOff = 0
+                        if xOff >= xsize
+                            xOff = xsize-1
+                            
+                        if yOff < 0:
+                            yOff = 0
+                        if yOff >= ysize
+                            yOff = ysize-1
                 
                         out_val = float(src_array[yOff, xOff])
                         feat.SetField(outfieldidx, out_val)
@@ -859,7 +869,17 @@ use this function.
                             
                             xOff = math.floor((ptx - subTLX) / resX)
                             yOff = math.floor((pty - subTLY) / resY)
-                    
+                            
+                            if xOff < 0:
+                                xOff = 0
+                            if xOff >= xsize
+                                xOff = xsize-1
+                                
+                            if yOff < 0:
+                                yOff = 0
+                            if yOff >= ysize
+                                yOff = ysize-1
+                            
                             out_val = float(src_array[yOff, xOff])
                             if minfield is not None:
                                 feat.SetField(fieldAttIdxs[minfield], out_val)
