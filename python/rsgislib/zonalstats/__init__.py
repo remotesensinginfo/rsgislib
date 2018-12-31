@@ -560,13 +560,13 @@ the polygon resolution.
                         
                         if xOff < 0:
                             xOff = 0
-                        if xOff >= xsize
-                            xOff = xsize-1
+                        if xOff >= xsize:
+                            xOff = xsize - 1
                             
                         if yOff < 0:
                             yOff = 0
-                        if yOff >= ysize
-                            yOff = ysize-1
+                        if yOff >= ysize:
+                            yOff = ysize - 1
                 
                         out_val = float(src_array[yOff, xOff])
                         feat.SetField(outfieldidx, out_val)
@@ -872,13 +872,13 @@ use this function.
                             
                             if xOff < 0:
                                 xOff = 0
-                            if xOff >= xsize
-                                xOff = xsize-1
+                            if xOff >= xsize:
+                                xOff = xsize - 1
                                 
                             if yOff < 0:
                                 yOff = 0
-                            if yOff >= ysize
-                                yOff = ysize-1
+                            if yOff >= ysize:
+                                yOff = ysize - 1
                             
                             out_val = float(src_array[yOff, xOff])
                             if minfield is not None:
