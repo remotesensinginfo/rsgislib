@@ -207,6 +207,7 @@ namespace rsgis{namespace vec{
 			
 			int feedback = numFeatures/10;
 			int feedbackCounter = 0;
+            unsigned long nextFeedback = 0;
 			int i = 0;
 
             if(morefeedback)
@@ -227,7 +228,7 @@ namespace rsgis{namespace vec{
 			inputLayer->ResetReading();
 			while( (inFeature = inputLayer->GetNextFeature()) != NULL )
 			{
-				if((numFeatures > 10) && ((i % feedback) == 0) && feedbackCounter <= 100)
+				if((numFeatures > 10) && (i == nextFeedback) && feedbackCounter <= 100)
 				{
 					if(outVertical)
 					{
@@ -246,6 +247,7 @@ namespace rsgis{namespace vec{
                     {
                         feedbackCounter = feedbackCounter + 10;
                     }
+                    nextFeedback = nextFeedback + feedback;
 				}
                 if(!inTransaction)
                 {

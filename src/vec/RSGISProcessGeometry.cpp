@@ -58,6 +58,7 @@ namespace rsgis{namespace vec{
 			
 			int feedback = numFeatures/10;
 			int feedbackCounter = 0;
+            unsigned long nextFeedback = 0;
 			int i = 0;
 			if(outVertical)
 			{
@@ -65,13 +66,17 @@ namespace rsgis{namespace vec{
 			}
 			else
 			{
-				std::cout << "Started" << std::flush;
+				std::cout << "Started " << std::flush;
 			}
-			
+
+            unsigned int transactionStep = 20000;
+            unsigned int nextTransaction = transactionStep;
+            bool openTransaction = false;
+
 			inputLayer->ResetReading();
 			while( (inFeature = inputLayer->GetNextFeature()) != NULL )
 			{
-				if((numFeatures > 10) && ((i % feedback) == 0))
+				if((numFeatures > 10) && (i == nextFeedback))
 				{
 					if(outVertical)
 					{
@@ -79,11 +84,19 @@ namespace rsgis{namespace vec{
 					}
 					else
 					{
-						std::cout << ".." << feedbackCounter << ".." << std::flush;
+						std::cout << "." << feedbackCounter << "." << std::flush;
 					}
 					
 					feedbackCounter = feedbackCounter + 10;
+                    nextFeedback = nextFeedback + feedback;
 				}
+
+                if(!openTransaction)
+                {
+                    outputLayer->StartTransaction();
+                    openTransaction = true;
+                }
+
 				fid = inFeature->GetFID();
 				
 				outFeature = OGRFeature::CreateFeature(outFeatureDefn);
@@ -130,11 +143,24 @@ namespace rsgis{namespace vec{
 				{
 					throw RSGISVectorOutputException("Failed to write feature to the output shapefile.");
 				}
+
+                if(openTransaction && (i == nextTransaction))
+                {
+                    outputLayer->CommitTransaction();
+                    openTransaction = false;
+                    nextTransaction = nextTransaction + transactionStep;
+                }
 				
 				OGRFeature::DestroyFeature(inFeature);
 				OGRFeature::DestroyFeature(outFeature);
 				i++;
 			}
+
+            if(openTransaction)
+            {
+                outputLayer->CommitTransaction();
+                openTransaction = false;
+            }
 			std::cout << " Complete.\n";
 			
 		}
@@ -175,6 +201,7 @@ namespace rsgis{namespace vec{
 			
 			int feedback = numFeatures/10;
 			int feedbackCounter = 0;
+            unsigned long nextFeedback = 0;
 			int i = 0;
 			if(outVertical)
 			{
@@ -182,13 +209,17 @@ namespace rsgis{namespace vec{
 			}
 			else
 			{
-				std::cout << "Started" << std::flush;
+				std::cout << "Started " << std::flush;
 			}
+
+            unsigned int transactionStep = 20000;
+            unsigned int nextTransaction = transactionStep;
+            bool openTransaction = false;
 			
 			inputLayer->ResetReading();
 			while( (inFeature = inputLayer->GetNextFeature()) != NULL )
 			{
-				if((numFeatures > 10) && ((i % feedback) == 0))
+				if((numFeatures > 10) && (i == nextFeedback))
 				{
 					if(outVertical)
 					{
@@ -196,11 +227,18 @@ namespace rsgis{namespace vec{
 					}
 					else
 					{
-						std::cout << ".." << feedbackCounter << ".." << std::flush;
+						std::cout << "." << feedbackCounter << "." << std::flush;
 					}
 				 
 					feedbackCounter = feedbackCounter + 10;
+                    nextFeedback = nextFeedback + feedback;
 				}
+
+                if(!openTransaction)
+                {
+                    outputLayer->StartTransaction();
+                    openTransaction = true;
+                }
 				
 				fid = inFeature->GetFID();
 				
@@ -229,11 +267,23 @@ namespace rsgis{namespace vec{
 				{
 					throw RSGISVectorOutputException("Failed to write feature to the output shapefile.");
 				}
+
+                if(openTransaction && (i == nextTransaction))
+                {
+                    outputLayer->CommitTransaction();
+                    openTransaction = false;
+                    nextTransaction = nextTransaction + transactionStep;
+                }
 				
 				OGRFeature::DestroyFeature(inFeature);
 				OGRFeature::DestroyFeature(outFeature);
 				i++;
 			}
+            if(openTransaction)
+            {
+                outputLayer->CommitTransaction();
+                openTransaction = false;
+            }
 			std::cout << " Complete.\n";
 			
 		}
