@@ -90,7 +90,7 @@ This is passed to the polyPixelStatsVecLyr function. """
         self.calcMedian = calcMedian
         self.calcSum = calcSum
 
-def calcZonalBandStats(vecfile, veclyrname, valsimg, imgbandidx, minthres, maxthres, minfield=None, maxfield=None, meanfield=None, stddevfield=None, sumfield=None, countfield=None, modefield=None, medianfield=None):
+def calcZonalBandStatsFile(vecfile, veclyrname, valsimg, imgbandidx, minthres, maxthres, minfield=None, maxfield=None, meanfield=None, stddevfield=None, sumfield=None, countfield=None, modefield=None, medianfield=None):
     """
 A function which calculates zonal statistics for a particular image band. 
 If you know that the pixels in the values image are small with respect to 
@@ -111,11 +111,56 @@ the polygons then use this function.
 * modefield - the name of the field for the mode value (None or not specified to be ignored).
 * medianfield - the name of the field for the median value (None or not specified to be ignored).
 """
+    gdal.UseExceptions()
+    
+    try:    
+        vecDS = gdal.OpenEx(vecfile, gdal.OF_VECTOR|gdal.OF_UPDATE )
+        if vecDS is None:
+            raise Exception("Could not open '{}'".format(vecfile)) 
+    
+        veclyr = vecDS.GetLayerByName(veclyrname)
+        if veclyr is None:
+            raise Exception("Could not open layer '{}'".format(veclyrname))
+        veclyr_spatial_ref = veclyr.GetSpatialRef()
+        
+        calcZonalBandStats(veclyr, valsimg, imgbandidx, minthres, maxthres, minfield, maxfield, meanfield, stddevfield, sumfield, countfield, modefield, medianfield)
+            
+        vecDS = None
+    except Exception as e:
+        print("Error Vector File: {}".format(vecfile), file=sys.stderr)
+        print("Error Vector Layer: {}".format(veclyrname), file=sys.stderr)
+        print("Error Image File: {}".format(valsimg), file=sys.stderr)
+        raise e
+
+
+def calcZonalBandStats(veclyr, valsimg, imgbandidx, minthres, maxthres, minfield=None, maxfield=None, meanfield=None, stddevfield=None, sumfield=None, countfield=None, modefield=None, medianfield=None):
+    """
+A function which calculates zonal statistics for a particular image band. 
+If you know that the pixels in the values image are small with respect to 
+the polygons then use this function.
+
+* veclyr - OGR vector layer object containing the geometries being processed and to which the stats will be written.
+* valsimg - the values image
+* imgbandidx - the index (starting at 1) of the image band for which the stats will be calculated. If defined the no data value of the band will be ignored.
+* minthres - a lower threshold for values which will be included in the stats calculation.
+* maxthres - a upper threshold for values which will be included in the stats calculation.
+* minfield - the name of the field for the min value (None or not specified to be ignored).
+* maxfield - the name of the field for the max value (None or not specified to be ignored).
+* meanfield - the name of the field for the mean value (None or not specified to be ignored).
+* stddevfield - the name of the field for the standard deviation value (None or not specified to be ignored).
+* sumfield - the name of the field for the sum value (None or not specified to be ignored).
+* countfield - the name of the field for the count (of number of pixels) value (None or not specified to be ignored).
+* modefield - the name of the field for the mode value (None or not specified to be ignored).
+* medianfield - the name of the field for the median value (None or not specified to be ignored).
+"""
     if modefield is not None:
         import scipy.stats.mstats
     gdal.UseExceptions()
     
     try:
+        if veclyr is None:
+            raise Exception("The inputted vector layer was None")
+    
         if (minfield is None) and (maxfield is None) and (meanfield is None) and (stddevfield is None) and (sumfield is None) and (countfield is None) and (modefield is None) and (medianfield is None):
             raise Exception("At least one field needs to be specified for there is to an output.")
     
@@ -129,16 +174,15 @@ the polygons then use this function.
         img_wkt_str = imgDS.GetProjection()
         img_spatial_ref = osr.SpatialReference()
         img_spatial_ref.ImportFromWkt(img_wkt_str)
+        
+        pixel_width = imgGeoTrans[1]
+        pixel_height = imgGeoTrans[5]
+        
+        imgSizeX = imgDS.RasterXSize
+        imgSizeY = imgDS.RasterYSize
     
         imgNoDataVal = imgband.GetNoDataValue()
-    
-        vecDS = gdal.OpenEx(vecfile, gdal.OF_VECTOR|gdal.OF_UPDATE )
-        if vecDS is None:
-            raise Exception("Could not open '{}'".format(vecfile)) 
-    
-        veclyr = vecDS.GetLayerByName(veclyrname)
-        if veclyr is None:
-            raise Exception("Could not open layer '{}'".format(veclyrname))
+
         veclyr_spatial_ref = veclyr.GetSpatialRef()
         
         if not img_spatial_ref.IsSame(veclyr_spatial_ref):
@@ -153,7 +197,7 @@ the polygons then use this function.
             if outattname is not None:
                 found = False
                 for i in range(veclyrDefn.GetFieldCount()):
-                    if veclyrDefn.GetFieldDefn(i).GetName().lower() in outattname.lower():
+                    if veclyrDefn.GetFieldDefn(i).GetName().lower() == outattname.lower():
                         found = True
                         break
                 if not found:
@@ -169,6 +213,8 @@ the polygons then use this function.
     
         # Iterate through features.
         openTransaction = False
+        transactionStep = 20000
+        nextTransaction = transactionStep
         nFeats = veclyr.GetFeatureCount(True)
         step = math.floor(nFeats/10)
         feedback = 10
@@ -191,21 +237,69 @@ the polygons then use this function.
                 feat_geom = feat.geometry()
                 if feat_geom is not None:
                     feat_bbox = feat_geom.GetEnvelope()
-                    pixel_width = imgGeoTrans[1]
-                    pixel_height = imgGeoTrans[5]
+                    havepxls = True
                     
-                    x1 = int((feat_bbox[0] - imgGeoTrans[0]) / pixel_width)
-                    x2 = int((feat_bbox[1] - imgGeoTrans[0]) / pixel_width) + 1
-                    y1 = int((feat_bbox[3] - imgGeoTrans[3]) / pixel_height)
-                    y2 = int((feat_bbox[2] - imgGeoTrans[3]) / pixel_height) + 1
+                    x1Sp = float(feat_bbox[0] - imgGeoTrans[0])
+                    x2Sp = float(feat_bbox[1] - imgGeoTrans[0])
+                    y1Sp = float(feat_bbox[3] - imgGeoTrans[3])
+                    y2Sp = float(feat_bbox[2] - imgGeoTrans[3])
+                                        
+                    if x1Sp == 0.0:
+                        x1 = 0
+                    else:
+                        x1 = int(x1Sp / pixel_width) - 1
+                        
+                    if x2Sp == 0.0:
+                        x2 = 0
+                    else:
+                        x2 = int(x2Sp / pixel_width) + 1
+                        
+                    if y1Sp == 0.0:
+                        y1 = 0
+                    else:
+                        y1 = int(y1Sp / pixel_height) - 1
+                        
+                    if y2Sp == 0.0:
+                        y2 = 0
+                    else:
+                        y2 = int(y2Sp / pixel_height) + 1
+                                        
+                    if x1 < 0:
+                        x1 = 0
+                    elif x1 >= imgSizeX:
+                        x1 = imgSizeX-1
+                        
+                    if x2 < 0:
+                        x2 = 0
+                    elif x2 >= imgSizeX:
+                        x2 = imgSizeX-1
+                        
+                    if y1 < 0:
+                        y1 = 0
+                    elif y1 >= imgSizeY:
+                        y1 = imgSizeY-1
+                    
+                    if y2 < 0:
+                        y2 = 0
+                    elif y2 >= imgSizeY:
+                        y2 = imgSizeY-1
+                                        
                     xsize = x2 - x1
                     ysize = y2 - y1
+                    
+                    if (xsize == 0) or (ysize == 0):
+                        havepxls = False
+                    
                     # Define the image ROI for the feature
                     src_offset = (x1, y1, xsize, ysize)
-                    # Read the band array.
-                    src_array = imgband.ReadAsArray(*src_offset)
+
+                    if havepxls:
+                        # Read the band array.
+                        src_array = imgband.ReadAsArray(*src_offset)
+                    else:
+                        src_array = None
                     
-                    if src_array is not None:
+                    if (src_array is not None) and havepxls:
                 
                         # calculate new geotransform of the feature subset
                         subGeoTrans = ((imgGeoTrans[0] + (src_offset[0] * imgGeoTrans[1])), imgGeoTrans[1], 0.0, (imgGeoTrans[3] + (src_offset[1] * imgGeoTrans[5])), 0.0, imgGeoTrans[5])
@@ -259,27 +353,25 @@ the polygons then use this function.
                         vec_mem_ds = None
                         img_tmp_ds = None
             
-            if ((counter % 20000) == 0) and openTransaction:
+            if (counter == nextTransaction) and openTransaction:
                 veclyr.CommitTransaction()
                 openTransaction = False
+                nextTransaction = nextTransaction + transactionStep
             
             feat = veclyr.GetNextFeature()
             counter = counter + 1
         if openTransaction:
             veclyr.CommitTransaction()
             openTransaction = False
-        veclyr.SyncToDisk()
         print(" Completed")
     
-        vecDS = None
         imgDS = None
     except Exception as e:
-        print("Error Vector File: {}".format(vecfile), file=sys.stderr)
-        print("Error Vector Layer: {}".format(veclyrname), file=sys.stderr)
         print("Error Image File: {}".format(valsimg), file=sys.stderr)
         raise e
 
-def calcZonalPolyPtsBandStats(vecfile, veclyrname, valsimg, imgbandidx, outfield):
+
+def calcZonalPolyPtsBandStatsFile(vecfile, veclyrname, valsimg, imgbandidx, outfield):
     """
 A funtion which extracts zonal stats for a polygon using the polygon centroid.
 This is useful when you are intesecting a low resolution image with respect to
@@ -292,7 +384,42 @@ the polygon resolution.
 * outfield - output field name within the vector layer.
 """
     gdal.UseExceptions()
+    try:    
+        vecDS = gdal.OpenEx(vecfile, gdal.OF_VECTOR|gdal.OF_UPDATE )
+        if vecDS is None:
+            raise Exception("Could not open '{}'".format(vecfile)) 
+    
+        veclyr = vecDS.GetLayerByName(veclyrname)
+        if veclyr is None:
+            raise Exception("Could not open layer '{}'".format(veclyrname))
+        veclyr_spatial_ref = veclyr.GetSpatialRef()
+        
+        calcZonalPolyPtsBandStats(veclyr, valsimg, imgbandidx, outfield)
+            
+        vecDS = None
+    except Exception as e:
+        print("Error Vector File: {}".format(vecfile), file=sys.stderr)
+        print("Error Vector Layer: {}".format(veclyrname), file=sys.stderr)
+        print("Error Image File: {}".format(valsimg), file=sys.stderr)
+        raise e
+
+
+def calcZonalPolyPtsBandStats(veclyr, valsimg, imgbandidx, outfield):
+    """
+A funtion which extracts zonal stats for a polygon using the polygon centroid.
+This is useful when you are intesecting a low resolution image with respect to
+the polygon resolution.
+
+* veclyr - OGR vector layer object containing the geometries being processed and to which the stats will be written.
+* valsimg - the values image
+* imgbandidx - the index (starting at 1) of the image band for which the stats will be calculated. If defined the no data value of the band will be ignored.
+* outfield - output field name within the vector layer.
+"""
+    gdal.UseExceptions()
     try:
+        if veclyr is None:
+            raise Exception("The inputted vector layer was None")
+    
         imgDS = gdal.OpenEx(valsimg, gdal.GA_ReadOnly)
         if imgDS is None:
             raise Exception("Could not open '{}'".format(valsimg))
@@ -303,14 +430,13 @@ the polygon resolution.
         img_wkt_str = imgDS.GetProjection()
         img_spatial_ref = osr.SpatialReference()
         img_spatial_ref.ImportFromWkt(img_wkt_str)
+        
+        pixel_width = imgGeoTrans[1]
+        pixel_height = imgGeoTrans[5]
+        
+        imgSizeX = imgDS.RasterXSize
+        imgSizeY = imgDS.RasterYSize
     
-        vecDS = gdal.OpenEx(vecfile, gdal.OF_VECTOR|gdal.OF_UPDATE )
-        if vecDS is None:
-            raise Exception("Could not open '{}'".format(vecfile)) 
-    
-        veclyr = vecDS.GetLayerByName(veclyrname)
-        if veclyr is None:
-            raise Exception("Could not open layer '{}'".format(veclyrname))
         veclyr_spatial_ref = veclyr.GetSpatialRef()
         
         if not img_spatial_ref.IsSame(veclyr_spatial_ref):
@@ -322,7 +448,7 @@ the polygon resolution.
         
         found = False
         for i in range(veclyrDefn.GetFieldCount()):
-            if veclyrDefn.GetFieldDefn(i).GetName().lower() in outfield.lower():
+            if veclyrDefn.GetFieldDefn(i).GetName().lower() == outfield.lower():
                 found = True
                 break
         if not found:
@@ -335,6 +461,8 @@ the polygon resolution.
         
         # Iterate through features.
         openTransaction = False
+        transactionStep = 20000
+        nextTransaction = transactionStep
         nFeats = veclyr.GetFeatureCount(True)
         step = math.floor(nFeats/10)
         feedback = 10
@@ -357,21 +485,69 @@ the polygon resolution.
                 feat_geom = feat.geometry()
                 if feat_geom is not None:
                     feat_bbox = feat_geom.GetEnvelope()
-                    pixel_width = imgGeoTrans[1]
-                    pixel_height = imgGeoTrans[5]
-                    x1 = int((feat_bbox[0] - imgGeoTrans[0]) / pixel_width)
-                    x2 = int((feat_bbox[1] - imgGeoTrans[0]) / pixel_width) + 1
-                    y1 = int((feat_bbox[3] - imgGeoTrans[3]) / pixel_height)
-                    y2 = int((feat_bbox[2] - imgGeoTrans[3]) / pixel_height) + 1
+                    havepxls = True
+                    
+                    x1Sp = float(feat_bbox[0] - imgGeoTrans[0])
+                    x2Sp = float(feat_bbox[1] - imgGeoTrans[0])
+                    y1Sp = float(feat_bbox[3] - imgGeoTrans[3])
+                    y2Sp = float(feat_bbox[2] - imgGeoTrans[3])
+                                        
+                    if x1Sp == 0.0:
+                        x1 = 0
+                    else:
+                        x1 = int(x1Sp / pixel_width) - 1
+                        
+                    if x2Sp == 0.0:
+                        x2 = 0
+                    else:
+                        x2 = int(x2Sp / pixel_width) + 1
+                        
+                    if y1Sp == 0.0:
+                        y1 = 0
+                    else:
+                        y1 = int(y1Sp / pixel_height) - 1
+                        
+                    if y2Sp == 0.0:
+                        y2 = 0
+                    else:
+                        y2 = int(y2Sp / pixel_height) + 1
+                                        
+                    if x1 < 0:
+                        x1 = 0
+                    elif x1 >= imgSizeX:
+                        x1 = imgSizeX-1
+                        
+                    if x2 < 0:
+                        x2 = 0
+                    elif x2 >= imgSizeX:
+                        x2 = imgSizeX-1
+                        
+                    if y1 < 0:
+                        y1 = 0
+                    elif y1 >= imgSizeY:
+                        y1 = imgSizeY-1
+                    
+                    if y2 < 0:
+                        y2 = 0
+                    elif y2 >= imgSizeY:
+                        y2 = imgSizeY-1
+                                        
                     xsize = x2 - x1
                     ysize = y2 - y1
+                    
+                    if (xsize == 0) or (ysize == 0):
+                        havepxls = False
+                    
                     # Define the image ROI for the feature
                     src_offset = (x1, y1, xsize, ysize)
-            
-                    # Read the band array.
-                    src_array = imgband.ReadAsArray(*src_offset)
-                
-                    if src_array is not None:
+
+                    if havepxls:
+                        # Read the band array.
+                        src_array = imgband.ReadAsArray(*src_offset)
+                    else:
+                        src_array = None
+                    
+                    if (src_array is not None) and havepxls:
                         subTLX = (imgGeoTrans[0] + (src_offset[0] * imgGeoTrans[1]))
                         subTLY = (imgGeoTrans[3] + (src_offset[1] * imgGeoTrans[5]))
                         resX = imgGeoTrans[1]
@@ -390,9 +566,10 @@ the polygon resolution.
                         vec_mem_ds = None
                         img_tmp_ds = None
             
-            if ((counter % 20000) == 0) and openTransaction:
+            if (counter == nextTransaction) and openTransaction:
                 veclyr.CommitTransaction()
                 openTransaction = False
+                nextTransaction = nextTransaction + transactionStep
             
             feat = veclyr.GetNextFeature()
             counter = counter + 1
@@ -400,18 +577,15 @@ the polygon resolution.
         if openTransaction:
             veclyr.CommitTransaction()
             openTransaction = False
-        veclyr.SyncToDisk()
         print(" Completed")
     
-        vecDS = None
         imgDS = None
     except Exception as e:
-        print("Error Vector File: {}".format(vecfile), file=sys.stderr)
-        print("Error Vector Layer: {}".format(veclyrname), file=sys.stderr)
         print("Error Image File: {}".format(valsimg), file=sys.stderr)
         raise e
 
-def calcZonalBandStatsTestPolyPts(vecfile, veclyrname, valsimg, imgbandidx, minthres, maxthres, minfield=None, maxfield=None, meanfield=None, stddevfield=None, sumfield=None, countfield=None, modefield=None, medianfield=None):
+
+def calcZonalBandStatsTestPolyPtsFile(vecfile, veclyrname, valsimg, imgbandidx, minthres, maxthres, minfield=None, maxfield=None, meanfield=None, stddevfield=None, sumfield=None, countfield=None, modefield=None, medianfield=None):
     """
 A function which calculates zonal statistics for a particular image band. If unsure then use this function. 
 This function tests whether 1 or more pixels has been found within the polygon and if not then the centroid 
@@ -435,11 +609,58 @@ use this function.
 * modefield - the name of the field for the mode value (None or not specified to be ignored).
 * medianfield - the name of the field for the median value (None or not specified to be ignored).
 """
+    gdal.UseExceptions()
+    
+    try:    
+        vecDS = gdal.OpenEx(vecfile, gdal.OF_VECTOR|gdal.OF_UPDATE )
+        if vecDS is None:
+            raise Exception("Could not open '{}'".format(vecfile)) 
+    
+        veclyr = vecDS.GetLayerByName(veclyrname)
+        if veclyr is None:
+            raise Exception("Could not open layer '{}'".format(veclyrname))
+            
+        calcZonalBandStatsTestPolyPts(veclyr, valsimg, imgbandidx, minthres, maxthres, minfield, maxfield, meanfield, stddevfield, sumfield, countfield, modefield, medianfield)
+    
+        vecDS = None
+    except Exception as e:
+        print("Error Vector File: {}".format(vecfile), file=sys.stderr)
+        print("Error Vector Layer: {}".format(veclyrname), file=sys.stderr)
+        print("Error Image File: {}".format(valsimg), file=sys.stderr)
+        raise e
+
+
+def calcZonalBandStatsTestPolyPts(veclyr, valsimg, imgbandidx, minthres, maxthres, minfield=None, maxfield=None, meanfield=None, stddevfield=None, sumfield=None, countfield=None, modefield=None, medianfield=None):
+    """
+A function which calculates zonal statistics for a particular image band. If unsure then use this function. 
+This function tests whether 1 or more pixels has been found within the polygon and if not then the centroid 
+use used to find a value for the polygon.
+
+If you are unsure as to whether the pixels are small enough to be contained within all the polygons then 
+use this function.
+
+* veclyr - OGR vector layer object containing the geometries being processed and to which the stats will be written.
+* valsimg - the values image
+* imgbandidx - the index (starting at 1) of the image band for which the stats will be calculated. If defined the no data value of the band will be ignored.
+* minthres - a lower threshold for values which will be included in the stats calculation.
+* maxthres - a upper threshold for values which will be included in the stats calculation.
+* minfield - the name of the field for the min value (None or not specified to be ignored).
+* maxfield - the name of the field for the max value (None or not specified to be ignored).
+* meanfield - the name of the field for the mean value (None or not specified to be ignored).
+* stddevfield - the name of the field for the standard deviation value (None or not specified to be ignored).
+* sumfield - the name of the field for the sum value (None or not specified to be ignored).
+* countfield - the name of the field for the count (of number of pixels) value (None or not specified to be ignored).
+* modefield - the name of the field for the mode value (None or not specified to be ignored).
+* medianfield - the name of the field for the median value (None or not specified to be ignored).
+"""
     if modefield is not None:
         import scipy.stats.mstats
     gdal.UseExceptions()
     
     try:
+        if veclyr is None:
+            raise Exception("The inputted vector layer was None")
+    
         if (minfield is None) and (maxfield is None) and (meanfield is None) and (stddevfield is None) and (sumfield is None) and (countfield is None) and (modefield is None) and (medianfield is None):
             raise Exception("At least one field needs to be specified for there is to an output.")
     
@@ -453,16 +674,15 @@ use this function.
         img_wkt_str = imgDS.GetProjection()
         img_spatial_ref = osr.SpatialReference()
         img_spatial_ref.ImportFromWkt(img_wkt_str)
-    
+        
+        pixel_width = imgGeoTrans[1]
+        pixel_height = imgGeoTrans[5]
+        
+        imgSizeX = imgDS.RasterXSize
+        imgSizeY = imgDS.RasterYSize
+            
         imgNoDataVal = imgband.GetNoDataValue()
     
-        vecDS = gdal.OpenEx(vecfile, gdal.OF_VECTOR|gdal.OF_UPDATE )
-        if vecDS is None:
-            raise Exception("Could not open '{}'".format(vecfile)) 
-    
-        veclyr = vecDS.GetLayerByName(veclyrname)
-        if veclyr is None:
-            raise Exception("Could not open layer '{}'".format(veclyrname))
         veclyr_spatial_ref = veclyr.GetSpatialRef()
         
         if not img_spatial_ref.IsSame(veclyr_spatial_ref):
@@ -477,7 +697,7 @@ use this function.
             if outattname is not None:
                 found = False
                 for i in range(veclyrDefn.GetFieldCount()):
-                    if veclyrDefn.GetFieldDefn(i).GetName().lower() in outattname.lower():
+                    if veclyrDefn.GetFieldDefn(i).GetName().lower() == outattname.lower():
                         found = True
                         break
                 if not found:
@@ -493,6 +713,8 @@ use this function.
     
         # Iterate through features.
         openTransaction = False
+        transactionStep = 20000
+        nextTransaction = transactionStep
         nFeats = veclyr.GetFeatureCount(True)
         step = math.floor(nFeats/10)
         feedback = 10
@@ -515,20 +737,70 @@ use this function.
                 feat_geom = feat.geometry()
                 if feat_geom is not None:
                     feat_bbox = feat_geom.GetEnvelope()
-                    pixel_width = imgGeoTrans[1]
-                    pixel_height = imgGeoTrans[5]
-                    x1 = int((feat_bbox[0] - imgGeoTrans[0]) / pixel_width)
-                    x2 = int((feat_bbox[1] - imgGeoTrans[0]) / pixel_width) + 1
-                    y1 = int((feat_bbox[3] - imgGeoTrans[3]) / pixel_height)
-                    y2 = int((feat_bbox[2] - imgGeoTrans[3]) / pixel_height) + 1
+                    
+                    havepxls = True
+                    
+                    x1Sp = float(feat_bbox[0] - imgGeoTrans[0])
+                    x2Sp = float(feat_bbox[1] - imgGeoTrans[0])
+                    y1Sp = float(feat_bbox[3] - imgGeoTrans[3])
+                    y2Sp = float(feat_bbox[2] - imgGeoTrans[3])
+                                        
+                    if x1Sp == 0.0:
+                        x1 = 0
+                    else:
+                        x1 = int(x1Sp / pixel_width) - 1
+                        
+                    if x2Sp == 0.0:
+                        x2 = 0
+                    else:
+                        x2 = int(x2Sp / pixel_width) + 1
+                        
+                    if y1Sp == 0.0:
+                        y1 = 0
+                    else:
+                        y1 = int(y1Sp / pixel_height) - 1
+                        
+                    if y2Sp == 0.0:
+                        y2 = 0
+                    else:
+                        y2 = int(y2Sp / pixel_height) + 1
+                                        
+                    if x1 < 0:
+                        x1 = 0
+                    elif x1 >= imgSizeX:
+                        x1 = imgSizeX-1
+                        
+                    if x2 < 0:
+                        x2 = 0
+                    elif x2 >= imgSizeX:
+                        x2 = imgSizeX-1
+                        
+                    if y1 < 0:
+                        y1 = 0
+                    elif y1 >= imgSizeY:
+                        y1 = imgSizeY-1
+                    
+                    if y2 < 0:
+                        y2 = 0
+                    elif y2 >= imgSizeY:
+                        y2 = imgSizeY-1
+                                        
                     xsize = x2 - x1
                     ysize = y2 - y1
+                    
+                    if (xsize == 0) or (ysize == 0):
+                        havepxls = False
+                    
                     # Define the image ROI for the feature
                     src_offset = (x1, y1, xsize, ysize)
-                    # Read the band array.
-                    src_array = imgband.ReadAsArray(*src_offset)
+
+                    if havepxls:
+                        # Read the band array.
+                        src_array = imgband.ReadAsArray(*src_offset)
+                    else:
+                        src_array = None
                     
-                    if src_array is not None:
+                    if (src_array is not None) and havepxls:
                 
                         # calculate new geotransform of the feature subset
                         subGeoTrans = ((imgGeoTrans[0] + (src_offset[0] * imgGeoTrans[1])), imgGeoTrans[1], 0.0, (imgGeoTrans[3] + (src_offset[1] * imgGeoTrans[5])), 0.0, imgGeoTrans[5])
@@ -610,25 +882,24 @@ use this function.
                         veclyr.SetFeature(feat)
             
                         vec_mem_ds = None
-                        img_tmp_ds = None
+                        img_tmp_ds = None            
             
-            if ((counter % 20000) == 0) and openTransaction:
+            if (counter == nextTransaction) and openTransaction:
                 veclyr.CommitTransaction()
                 openTransaction = False
+                nextTransaction = nextTransaction + transactionStep
             
             feat = veclyr.GetNextFeature()
             counter = counter + 1
         if openTransaction:
             veclyr.CommitTransaction()
             openTransaction = False
-        veclyr.SyncToDisk()
         print(" Completed")
     
-        vecDS = None
         imgDS = None
     except Exception as e:
-        print("Error Vector File: {}".format(vecfile), file=sys.stderr)
-        print("Error Vector Layer: {}".format(veclyrname), file=sys.stderr)
         print("Error Image File: {}".format(valsimg), file=sys.stderr)
         raise e
+
+
 
