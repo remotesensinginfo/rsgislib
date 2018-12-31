@@ -1953,3 +1953,58 @@ within the vector layer.
     print(" Completed")
     dsVecFile = None
     return outenvs
+    
+    
+def readVecLyr2Mem(vecfile, veclyrname):
+    """
+A function which reads a vector layer to an OGR in memory layer.
+
+* vecfile - input vector file
+* veclyrname - input vector layer within the input file.
+"""
+    gdal.UseExceptions()
+    try:
+        vecDS = gdal.OpenEx(vecfile, gdal.OF_READONLY )
+        if vecDS is None:
+            raise Exception("Could not open '" + vecfile + "'")
+        
+        veclyr = vecDS.GetLayerByName( veclyrname )
+        if veclyr is None:
+            raise Exception("Could not find layer '" + veclyrname + "'")
+            
+        mem_driver = ogr.GetDriverByName('MEMORY')
+        
+        mem_ds = mem_driver.CreateDataSource('MemSelData')
+        mem_lyr = mem_ds.CopyLayer(veclyr, veclyrname, ['OVERWRITE=YES'])
+            
+    except Exception as e:
+        print("Error Vector File: {}".format(vecfile), file=sys.stderr)
+        print("Error Vector Layer: {}".format(veclyrname), file=sys.stderr)
+        raise e
+    return mem_ds, mem_lyr
+    
+    
+def writeVecLyr2File(veclyr, vecfile, veclyrname, vecDriver, options=['OVERWRITE=YES']):
+    """
+A function which reads a vector layer to an OGR in memory layer.
+
+* veclyr - OGR vector layer object
+* vecfile - output vector file
+* veclyrname - output vector layer within the input file.
+* vecDriver - the OGR driver for the output file.
+* options - provide a list of driver specific options; see https://www.gdal.org/ogr_formats.html
+"""
+    gdal.UseExceptions()
+    try:
+        outdriver = ogr.GetDriverByName(vecDriver)
+        vecDS = outdriver.CreateDataSource(vecfile)    
+        if vecDS is None:
+            raise Exception("Could not open '" + vecfile + "'")            
+                
+        vecDS_lyr = vecDS.CopyLayer(veclyr, veclyrname, options)
+        vecDS = None
+            
+    except Exception as e:
+        print("Error Vector File: {}".format(vecfile), file=sys.stderr)
+        print("Error Vector Layer: {}".format(veclyrname), file=sys.stderr)
+        raise e
