@@ -67,7 +67,7 @@ namespace rsgis{namespace vec{
             unsigned int transactionStep = 20000;
             unsigned int nextTransaction = transactionStep;
             bool openTransaction = false;
-			std::cout << "Started" << std::flush;
+			std::cout << "Started " << std::flush;
 			
 			input->ResetReading();
 			while( (inFeature = input->GetNextFeature()) != NULL )

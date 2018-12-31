@@ -715,22 +715,24 @@ static PyMethodDef VectorUtilsMethods[] = {
 "\n"},
 
 {"buffervector", VectorUtils_BufferVector, METH_VARARGS, 
-"vectorutils.buffervector(inputvector, outputvector, bufferDist, force)\n"
+"vectorutils.buffervector(inputvector, veclayername outputvector, ogrdriver, bufferDist)\n"
 "A command to buffer a vector by a specified distance.\n\n"
 "Where:\n"
 "\n"
 "* inputvector is a string containing the name of the input vector\n"
+"* veclayername is a string with the name of the vector layer name\n"
 "* outputvector is a string containing the name of the output vector\n"
+"* ogrdriver is a string with the gdal/ogr driver specified (e.g., GPKG)\n"
 "* bufferDist is a float specifying the distance of the buffer, in map units.\n"
-"* force is a bool, specifying whether to force removal of the output vector if it exists\n"
 "\n"
 "Example::\n"
 "\n"
 "   from rsgislib import vectorutils\n"
-"   inputVector = './Vectors/injune_p142_stem_locations.shp'\n"
-"   outputVector = './TestOutputs/injune_p142_stem_locations_1mbuffer.shp'\n"
+"   inputVector = './Vectors/injune_p142_stem_locations.gpkg'\n"
+"   lyrName = 'polygons'\n"
+"   outputVector = './TestOutputs/injune_p142_stem_locations_1mbuffer.gpkg'\n"
 "   bufferDist = 1\n"
-"   vectorutils.buffervector(inputVector, outputVector, bufferDist, True)\n"
+"   vectorutils.buffervector(inputVector, lyrName, outputVector, 'GPKG', bufferDist)\n"
 "\n"},
 
 {"printpolygeom", VectorUtils_PrintPolyGeom, METH_VARARGS, 
