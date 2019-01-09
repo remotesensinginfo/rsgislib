@@ -7,9 +7,11 @@ from ._vectorutils import *
 
 import os.path
 import os
+import sys
 import shutil
 import subprocess
 import warnings
+import math
 
 import osgeo.gdal as gdal
 import osgeo.osr as osr
@@ -145,7 +147,7 @@ Example::
             print("Assuming output image is already created so just using.")
         else:
             print("Creating output image using input image")
-            rsgislib.imageutils.createCopyImage(inputImage, outImage, 1, 0, gdalformat, rsgislib.TYPE_32UINT)
+            rsgislib.imageutils.createCopyImage(inputImage, outImage, 1, 0, gdalformat, datatype)
         
         print("Running Rasterise now...")
         out_img_ds = gdal.Open(outImage, gdal.GA_Update)
@@ -178,6 +180,53 @@ Example::
         else:
             rsgislib.imageutils.popImageStats(outImage, usenodataval=True, nodataval=nodata, calcpyramids=True)
     except Exception as e:
+        raise e
+
+
+def rasteriseVecLyrObj(vec_lyr_obj, outImage, burnVal=1, vecAtt=None, calcstats=True, thematic=True, nodata=0):
+    """ 
+A utillity to rasterise a vector layer to an image covering the same region. 
+
+Where:
+
+* vec_lyr_obj is a OGR Vector Layer Object
+* outImage is a string specifying the output image, this image must already exist and intersect within the input vector layer.
+* burnVal is the value for the output image pixels if no attribute is provided.
+* vecAtt is a string specifying the attribute to be rasterised, value of None creates a binary mask and \"FID\" creates a temp shapefile with a "FID" column and rasterises that column.
+* calcstats is a boolean specifying whether image stats and pyramids should be calculated.
+* thematic is a boolean (default True) specifying that the output image is an thematic dataset so a colour table will be populated.
+* nodata is a float specifying the no data value associated with a continous output image.
+
+"""
+    try:
+        gdal.UseExceptions()
+        
+        if vec_lyr_obj is None:
+            raise Exception("The vec_lyr_obj passed to the function was None.")    
+        
+        print("Running Rasterise now...")
+        out_img_ds = gdal.Open(outImage, gdal.GA_Update)
+        if out_img_ds is None:
+            raise Exception("Could not open '{}'".format(outImage))
+        
+        # Run the algorithm.
+        err = 0
+        if vecAtt is None:
+            err = gdal.RasterizeLayer(out_img_ds, [1], vec_lyr_obj, burn_values=[burnVal])
+        else:
+            err = gdal.RasterizeLayer(out_img_ds, [1], vec_lyr_obj, options=["ATTRIBUTE="+vecAtt])
+        if err != 0:
+            raise Exception("Rasterisation Error: {}".format(err))
+        
+        out_img_ds = None
+                
+        if calcstats:
+            if thematic:
+                rsgislib.rastergis.populateStats(clumps=outImage, addclrtab=True, calcpyramids=True, ignorezero=True)
+            else:
+                rsgislib.imageutils.popImageStats(outImage, usenodataval=True, nodataval=nodata, calcpyramids=True)
+    except Exception as e:
+        print('Failed rasterising: {}'.format(outImage))
         raise e
 
 
@@ -561,8 +610,6 @@ A function which adds a polygons boundary bbox as attributes to each feature.
 * yminCol - column name.
 * ymaxCol - column name.
 """
-    import math
-
     dsVecFile = gdal.OpenEx(vecFile, gdal.OF_UPDATE )
     if dsVecFile is None:
         raise Exception("Could not open '" + vecFile + "'")
@@ -1054,9 +1101,6 @@ A function which splits the input vector layer into a number of output layers.
 * outvecbase - output layer name will be the same as the base file name.
 * outvecend - file ending (e.g., .shp).
 """
-    import math
-    import os.path
-
     gdal.UseExceptions()
     datasrc = gdal.OpenEx(vecFile, gdal.OF_VECTOR )
     srcLyr = datasrc.GetLayer(vecLyr)
@@ -1644,9 +1688,7 @@ A function which creates a regular grid across a defined area.
 * bbox - the area for which cells will be defined (MinX, MaxX, MinY, MaxY).
 * vecDriver - the output vector layer type.
 * vecLyrName - output vector layer
-"""
-    import math
-    
+"""    
     minX = float(bbox[0])
     maxX = float(bbox[1])
     minY = float(bbox[2])
@@ -1978,8 +2020,6 @@ within the vector layer.
 * vecFile - vector file.
 * vecLyr - layer within the vector file.
 """
-    import math
-
     dsVecFile = gdal.OpenEx(vecFile, gdal.OF_VECTOR )
     if dsVecFile is None:
         raise Exception("Could not open '" + vecFile + "'")
@@ -2014,14 +2054,87 @@ within the vector layer.
     print(" Completed")
     dsVecFile = None
     return outenvs
+
+
+def subsetEnvsVecLyrObj(lyrVecObj, bbox):
+    """
+Function to get an ogr vector layer for the defined bounding box. The returned
+layer is returned as an in memory ogr Layer object.
+
+* lyrVecObj - OGR Layer Object.
+* bbox - region of interest (bounding box). Define as [xMin, xMax, yMin, yMax].
+
+returns OGR Layer and Dataset objects.
+"""
+    gdal.UseExceptions()
+    if lyrVecObj is None:
+        raise Exception("Could not find layer '" + vecLyr + "'")
+        
+    lyr_spatial_ref = lyrVecObj.GetSpatialRef()
+    lyrDefn = lyrVecObj.GetLayerDefn()
     
+    # Copy the Layer to a new in memory OGR Layer.
+    mem_driver = ogr.GetDriverByName('MEMORY')
+    mem_result_ds = mem_driver.CreateDataSource('MemResultData')    
+    mem_result_lyr = mem_result_ds.CreateLayer("MemResultLyr", lyr_spatial_ref, geom_type=lyrVecObj.GetGeomType())
+    for i in range(lyrDefn.GetFieldCount()):
+        fieldDefn = lyrDefn.GetFieldDefn(i)
+        mem_result_lyr.CreateField(fieldDefn)
+        
+    openTransaction = False
+    trans_step = 20000
+    next_trans = trans_step
+    nFeats = lyrVecObj.GetFeatureCount(True)
+    step = math.floor(nFeats/10)
+    feedback = 10
+    feedback_next = step
+    counter = 0
+    print("Started .0.", end='', flush=True)
+    outenvs = []
+    # loop through the input features
+    inFeature = lyrVecObj.GetNextFeature()
+    while inFeature:
+        if (nFeats>10) and (counter == feedback_next):
+            print(".{}.".format(feedback), end='', flush=True)
+            feedback_next = feedback_next + step
+            feedback = feedback + 10
+            
+        if not openTransaction:
+            mem_result_lyr.StartTransaction()
+            openTransaction = True
+        
+        if inFeature is not None:
+            geom = inFeature.GetGeometryRef()
+            if geom is not None:
+                env = geom.GetEnvelope()
+            
+                if bbox[0] <= env[1] and bbox[1] >= env[0] and bbox[2] <= env[3] and bbox[3] >= env[2]:
+                    mem_result_lyr.CreateFeature(inFeature)
+        
+        if (counter == next_trans) and openTransaction:
+            mem_result_lyr.CommitTransaction()
+            openTransaction = False
+            next_trans = next_trans + trans_step
+        
+        inFeature = lyrVecObj.GetNextFeature()
+        counter = counter + 1
+    print(" Completed")
     
+    if openTransaction:
+        mem_result_lyr.CommitTransaction()
+        openTransaction = False
+        
+    return mem_result_ds, mem_result_lyr
+
+
 def readVecLyr2Mem(vecfile, veclyrname):
     """
 A function which reads a vector layer to an OGR in memory layer.
 
 * vecfile - input vector file
 * veclyrname - input vector layer within the input file.
+
+returns layer and datasets
 """
     gdal.UseExceptions()
     try:
@@ -2043,9 +2156,38 @@ A function which reads a vector layer to an OGR in memory layer.
         print("Error Vector Layer: {}".format(veclyrname), file=sys.stderr)
         raise e
     return mem_ds, mem_lyr
-    
-    
-def writeVecLyr2File(veclyr, vecfile, veclyrname, vecDriver, options=['OVERWRITE=YES']):
+
+
+def getMemVecLyrSubset(vecFile, vecLyr, bbox):
+    """
+Function to get an ogr vector layer for the defined bounding box. The returned
+layer is returned as an in memory ogr Layer object.
+
+* vecFile - vector layer from which the attribute data comes from.
+* vecLyr - the layer name from which the attribute data comes from.
+* bbox - region of interest (bounding box). Define as [xMin, xMax, yMin, yMax].
+
+returns OGR Layer and Dataset objects.
+"""
+    gdal.UseExceptions()
+    try:
+        dsVecFile = gdal.OpenEx(vecFile, gdal.OF_READONLY )
+        if dsVecFile is None:
+            raise Exception("Could not open '" + vecFile + "'")
+        
+        lyrVecObj = dsVecFile.GetLayerByName( vecLyr )
+        if lyrVecObj is None:
+            raise Exception("Could not find layer '" + vecLyr + "'")
+            
+        mem_result_ds, mem_result_lyr = subsetEnvsVecLyrObj(lyrVecObj, bbox)
+        
+    except Exception as e:
+        print("Error: Layer: {} File: {}".format(vecLyr, vecFile))
+        raise e
+    return mem_result_ds, mem_result_lyr
+
+
+def writeVecLyr2File(veclyr, vecfile, veclyrname, vecDriver, options=['OVERWRITE=YES'], replace=False):
     """
 A function which reads a vector layer to an OGR in memory layer.
 
@@ -2057,11 +2199,15 @@ A function which reads a vector layer to an OGR in memory layer.
 """
     gdal.UseExceptions()
     try:
-        outdriver = ogr.GetDriverByName(vecDriver)
-        vecDS = outdriver.CreateDataSource(vecfile)    
+        if os.path.exists(vecfile) and (not replace):
+            vecDS = gdal.OpenEx(vecfile, gdal.GA_Update )
+        else:            
+            outdriver = ogr.GetDriverByName(vecDriver)
+            vecDS = outdriver.CreateDataSource(vecfile)
+        
         if vecDS is None:
-            raise Exception("Could not open '" + vecfile + "'")            
-                
+            raise Exception("Could not open or create '{}'".format(vecfile))            
+
         vecDS_lyr = vecDS.CopyLayer(veclyr, veclyrname, options)
         vecDS = None
             
