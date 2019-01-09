@@ -307,7 +307,7 @@ of the output image.
     rsgislib.imageutils.createBlankImage(outputImg, outImgNBands, width, height, tlX, tlY, outImgRes, 0.0, '', wktString, gdalformat, datatype)
     
 
-def createCopyImageVecExtentSnap2Grid(inVecFile, inVecLyr, outputImg, outImgRes, outImgNBands, gdalformat, datatype):
+def createCopyImageVecExtentSnap2Grid(inVecFile, inVecLyr, outputImg, outImgRes, outImgNBands, gdalformat, datatype, bufnpxl=0):
     """
 A function to create a new image file based on a vector layer to define the extent and projection
 of the output image. The image file extent is snapped on to the grid defined by the vector layer.
@@ -320,12 +320,17 @@ of the output image. The image file extent is snapped on to the grid defined by 
 * outImgNBands - the number of image bands in the output image 
 * gdalformat - output image file format.
 * datatype - is a rsgislib.TYPE_* value providing the data type of the output image
+* bufnpxl - is an integer specifying the number of pixels to buffer the vector file extent by.
 
 """
     rsgisUtils = rsgislib.RSGISPyUtils()
     
     vec_bbox = rsgisUtils.getVecLayerExtent(inVecFile, layerName=inVecLyr, computeIfExp=True)
-    xMin, xMax, yMin, yMax = rsgisUtils.findExtentOnWholeNumGrid(vec_bbox, outImgRes, True)   
+    xMin = vec_bbox[0] - (outImgRes * bufnpxl)
+    xMax = vec_bbox[1] + (outImgRes * bufnpxl)
+    yMin = vec_bbox[2] - (outImgRes * bufnpxl)
+    yMax = vec_bbox[3] + (outImgRes * bufnpxl)
+    xMin, xMax, yMin, yMax = rsgisUtils.findExtentOnWholeNumGrid([xMin, xMax, yMin, yMax], outImgRes, True) 
     
     tlX = xMin
     tlY = yMax
