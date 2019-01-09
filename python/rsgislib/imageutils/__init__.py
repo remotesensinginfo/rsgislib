@@ -259,6 +259,7 @@ Copy the GCPs from the srcImg to the destImg
     srcDS = None
     destDS = None
 
+
 def getWKTProjFromImage(inImg):
     """
 A function which returns the WKT string representing the projection of the input image.
@@ -271,6 +272,7 @@ A function which returns the WKT string representing the projection of the input
     projStr = rasterDS.GetProjection()
     rasterDS = None
     return projStr
+
 
 def createBlankImgFromRefVector(inVecFile, inVecLyr, outputImg, outImgRes, outImgNBands, gdalformat, datatype):
     """
@@ -688,6 +690,99 @@ Where:
     inImgDS = None
     outImgDS = None    
 
+def subsetPxlBBox(inputimage, outputimage, gdalformat, datatype, xMinPxl, xMaxPxl, yMinPxl, yMaxPxl):
+    """
+Function to subset an input image using a defined pixel bbox.
+
+* inputimage - input image to be subset.
+* outputimage - output image file.
+* gdalformat - output image file format
+* datatype - datatype is a rsgislib.TYPE_* value providing the data type of the output image.
+* xMinPxl - min x in pixels
+* xMaxPxl - max x in pixels
+* yMinPxl - min y in pixels
+* yMaxPxl - max y in pixels
+"""
+    rsgis_utils = rsgislib.RSGISPyUtils()
+    bbox = rsgis_utils.getImageBBOX(inputimage)
+    xRes, yRes = rsgis_utils.getImageRes(inputimage)
+    xSize, ySize = rsgis_utils.getImageSize(inputimage)
+    
+    if (xMaxPxl > xSize) or (yMaxPxl > ySize):
+        raise Exception("The pixel extent defined is bigger than the input image.")
+    
+    xMin = bbox[0] + (xMinPxl * xRes)
+    xMax = bbox[0] + (xMaxPxl * xRes)
+    yMin = bbox[2] + (yMinPxl * yRes)
+    yMax = bbox[2] + (yMaxPxl * yRes)
+    
+    rsgislib.imageutils.subsetbbox(inputimage, outputimage, gdalformat, datatype, xMin, xMax, yMin, yMax)
+
+def _runSubset(tileinfo):
+    """ Internal function for createTilesMultiCore for multiprocessing Pool. """
+    subsetPxlBBox(tileinfo['inputimage'], tileinfo['outfile'], tileinfo['gdalformat'], tileinfo['datatype'], tileinfo['bbox'][0], tileinfo['bbox'][1], tileinfo['bbox'][2], tileinfo['bbox'][3])
+
+
+def createTilesMultiCore(inputimage, baseimage, width, height, gdalformat, datatype, ext, ncores=1):
+    """
+Function to generate a set of tiles for the input image.
+
+* inputimage - input image to be subset.
+* baseimage - output image files base path.
+* width - width in pixels of the tiles.
+* height - height in pixels of the tiles.
+* gdalformat - output image file format
+* datatype - datatype is a rsgislib.TYPE_* value providing the data type of the output image.
+* ext - output file extension to be added to the baseimage path (e.g., kea)
+* ncores - number of cores to be used; uses python multiprocessing module.
+"""
+    import multiprocessing
+    rsgis_utils = rsgislib.RSGISPyUtils()
+    xSize, ySize = rsgis_utils.getImageSize(inputimage)
+    
+    n_full_xtiles = math.floor(xSize/width)
+    x_remain_width = xSize - (n_full_xtiles * width)
+    n_full_ytiles = math.floor(ySize/height)
+    y_remain_height = ySize - (n_full_ytiles * height)
+    
+    tiles = []
+    
+    for ytile in range(n_full_ytiles):
+        y_pxl_min = ytile * height
+        y_pxl_max = y_pxl_min + height
+    
+        for xtile in range(n_full_xtiles):
+            x_pxl_min = xtile * width
+            x_pxl_max = x_pxl_min + width
+            tiles.append({'tile':'x{0}y{1}'.format(xtile+1, ytile+1), 'bbox':[x_pxl_min, x_pxl_max, y_pxl_min, y_pxl_max]})
+
+        if x_remain_width > 0:
+            x_pxl_min = n_full_xtiles * width
+            x_pxl_max = x_pxl_min + x_remain_width
+            tiles.append({'tile':'x{0}y{1}'.format(n_full_xtiles+1, ytile+1), 'bbox':[x_pxl_min, x_pxl_max, y_pxl_min, y_pxl_max]})
+    
+    if y_remain_height > 0:
+        y_pxl_min = n_full_ytiles * height
+        y_pxl_max = y_pxl_min + y_remain_height
+        
+        for xtile in range(n_full_xtiles):
+            x_pxl_min = xtile * width
+            x_pxl_max = x_pxl_min + width
+            tiles.append({'tile':'x{0}y{1}'.format(xtile+1, n_full_ytiles+1), 'bbox':[x_pxl_min, x_pxl_max, y_pxl_min, y_pxl_max]})
+
+        if x_remain_width > 0:
+            x_pxl_min = n_full_xtiles * width
+            x_pxl_max = x_pxl_min + x_remain_width
+            tiles.append({'tile':'x{0}y{1}'.format(n_full_xtiles+1, n_full_ytiles+1), 'bbox':[x_pxl_min, x_pxl_max, y_pxl_min, y_pxl_max]})
+    
+    for tile in tiles:
+        tile['inputimage'] = inputimage
+        tile['outfile'] = "{0}_{1}.{2}".format(baseimage, tile['tile'], ext)
+        tile['gdalformat'] = gdalformat
+        tile['datatype'] = datatype
+    
+    poolobj = multiprocessing.Pool(ncores)
+    poolobj.map(_runSubset, tiles)
 
 
 def subsetImgs2CommonExtent(inImagesDict, outShpEnv, gdalformat):
