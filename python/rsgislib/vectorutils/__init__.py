@@ -682,7 +682,6 @@ A function which adds a polygons boundary bbox as attributes to each feature.
         geom = feat.GetGeometryRef()
         if geom is not None:
             env = geom.GetEnvelope()
-            ()
             feat.SetField(xminCol, env[0])
             feat.SetField(xmaxCol, env[1])
             feat.SetField(yminCol, env[2])
@@ -904,6 +903,46 @@ Where:
                 first = False
             else:
                 cmd = 'ogr2ogr -update -append -f "GPKG" -nln '+lyrName+' "' + outFile + '" "' + inFile + '"'
+                try:
+                    subprocess.call(cmd, shell=True)
+                except OSError as e:
+                    raise Exception('Error running ogr2ogr: ' + cmd)
+
+
+def mergeVectorLyrs2GPKG(inputFile, outFile, lyrName, exists):
+    """
+Function which will merge a list of vector files into an single output GeoPackage (GPKG) file using ogr2ogr.
+
+Where:
+
+* inputFile - is a vector file which contains multiple layers which are to be merged
+* outFile - is the output GPKG database (\*.gpkg)
+* lyrName - is the layer name in the output database (i.e., you can merge layers into single layer or write a number of layers to the same database).
+* exists - boolean which specifies whether the database file exists or not.
+
+"""
+    lyrs = rsgislib.vectorutils.getVecLyrsLst(inputFile)
+    first = True
+    for lyr in lyrs:
+        nFeat = rsgislib.vectorutils.getVecFeatCount(inputFile, lyr)
+        print("Processing: " + lyr + " has " + str(nFeat) + " features.")
+        if nFeat > 0:
+            if first:
+                if not exists:
+                    cmd = 'ogr2ogr -f "GPKG" -lco SPATIAL_INDEX=YES -nln '+lyrName+' "' + outFile + '" "' + inputFile + '" "' + lyr + '"'
+                    try:
+                        subprocess.call(cmd, shell=True)
+                    except OSError as e:
+                        raise Exception('Error running ogr2ogr: ' + cmd)
+                else:
+                    cmd = 'ogr2ogr -update -f "GPKG" -lco SPATIAL_INDEX=YES -nln '+lyrName+' "' + outFile + '" "' + inputFile + '" "' + lyr + '"'
+                    try:
+                        subprocess.call(cmd, shell=True)
+                    except OSError as e:
+                        raise Exception('Error running ogr2ogr: ' + cmd)
+                first = False
+            else:
+                cmd = 'ogr2ogr -update -append -f "GPKG" -nln '+lyrName+' "' + outFile + '" "' + inputFile + '" "' + lyr + '"'
                 try:
                     subprocess.call(cmd, shell=True)
                 except OSError as e:
@@ -1393,6 +1432,78 @@ returns list of dictionaries with the output values.
         dsSelVecFile = None        
         dsVecFile = None
         mem_sel_ds = None
+        mem_result_ds = None
+    except Exception as e:
+        raise e
+    return outvals
+
+
+def getAttLstSelectFeatsLyrObjs(vecLyrObj, attNames, selVecLyrObj):
+    """
+Function to get a list of attribute values from features which intersect
+with the select layer.
+* vecLyrObj - the OGR layer object from which the attribute data comes from.
+* attNames - a list of attribute names to be outputted.
+* selVecLyrObj - the OGR layer object which will be intersected within the vector file.
+
+returns list of dictionaries with the output values.
+"""
+    gdal.UseExceptions()
+    att_vals = []
+    try:
+        if vecLyrObj is None:
+            raise Exception("The vector layer passed into the function was None.")
+        
+        if selVecLyrObj is None:
+            raise Exception("The select vector layer passed into the function was None.")
+        
+        lyrDefn = vecLyrObj.GetLayerDefn()
+        feat_idxs = dict()
+        feat_types= dict()
+        found_atts = dict()
+        for attName in attNames:
+            found_atts[attName] = False
+        
+        for i in range(lyrDefn.GetFieldCount()):
+            if lyrDefn.GetFieldDefn(i).GetName() in attNames:
+                attName = lyrDefn.GetFieldDefn(i).GetName()
+                feat_idxs[attName] = i
+                feat_types[attName] = lyrDefn.GetFieldDefn(i).GetType()
+                found_atts[attName] = True
+                
+        for attName in attNames:
+            if not found_atts[attName]:
+                raise Exception("Could not find the attribute ({}) specified within the vector layer.".format(attName))
+            
+        mem_driver = ogr.GetDriverByName('MEMORY')
+                
+        mem_result_ds = mem_driver.CreateDataSource('MemResultData')
+        mem_result_lyr = mem_result_ds.CreateLayer("MemResultLyr", geom_type=vecLyrObj.GetGeomType())
+        
+        for attName in attNames:
+            mem_result_lyr.CreateField(ogr.FieldDefn(attName, feat_types[attName]))
+        
+        vecLyrObj.Intersection(selVecLyrObj, mem_result_lyr)
+        
+        # loop through the input features
+        reslyrDefn = mem_result_lyr.GetLayerDefn()
+        inFeat = mem_result_lyr.GetNextFeature()
+        outvals = []
+        while inFeat:
+            outdict = dict()
+            for attName in attNames:
+                feat_idx = reslyrDefn.GetFieldIndex(attName)
+                if feat_types[attName] == ogr.OFTString:
+                    outdict[attName] = inFeat.GetFieldAsString(feat_idx)
+                elif feat_types[attName] == ogr.OFTReal:
+                    outdict[attName] = inFeat.GetFieldAsDouble(feat_idx)
+                elif feat_types[attName] == ogr.OFTInteger:
+                    outdict[attName] = inFeat.GetFieldAsInteger(feat_idx)
+                else:
+                    outdict[attName] = feat.GetField(feat_idx)
+            outvals.append(outdict)
+            inFeat = mem_result_lyr.GetNextFeature()
+        
         mem_result_ds = None
     except Exception as e:
         raise e
@@ -2196,6 +2307,7 @@ A function which reads a vector layer to an OGR in memory layer.
 * veclyrname - output vector layer within the input file.
 * vecDriver - the OGR driver for the output file.
 * options - provide a list of driver specific options; see https://www.gdal.org/ogr_formats.html
+* replace - if true the output file is replaced (i.e., overwritten to anything in an existing file will be lost).
 """
     gdal.UseExceptions()
     try:
