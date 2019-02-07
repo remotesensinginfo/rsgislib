@@ -1,0 +1,55 @@
+#!/usr/bin/env python
+
+#############################################
+# rsgisbuildimglut.py
+#
+#  Copyright 2019 RSGISLib.
+#
+#  RSGISLib: 'The remote sensing and GIS Software Library'
+#
+#  RSGISLib is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  RSGISLib is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with RSGISLib.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Purpose:  Build a (vector) look up table (LUT) for a directory of 
+#           images.
+#
+# Author: Pete Bunting
+# Email: petebunting@mac.com
+# Date: 01/02/2019
+# Version: 1.0
+# 
+#############################################
+
+import rsgislib.vectorutils
+import glob
+import os.path
+import argparse
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-i", "--imgsearch", type=str, required=True, help="""Input search path which includes wildcard (i.e., *) 
+                                                                        for python glob function to find the images to build
+                                                                        the LUT. Note. This input will need to be provided in \"quotes\".""")
+    parser.add_argument("-o", "--output", type=str, required=True, help="Output vector file representing the LUT.")
+    parser.add_argument("--veclyr", type=str, required=False, help="Alternative layer name (if supported) for the LUT vector file.")
+    parser.add_argument("--vecformat", type=str, required=False, default="GPKG", help="OGR vector format for the LUT file.")
+    args = parser.parse_args()
+    
+    if args.veclyr is None:
+        vec_lyr_name = os.path.splitext(os.path.basename(args.output))[0]
+    else:
+        vec_lyr_name = args.veclyr
+    
+    imgList = glob.glob(args.imgsearch)
+    rsgislib.vectorutils.createImgExtentLUT(imgList, args.output, vec_lyr_name, args.vecformat)
+    print("Finished Creating LUT.")
