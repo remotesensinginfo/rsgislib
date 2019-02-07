@@ -506,3 +506,91 @@ Where:
     applier.apply(_applyRescale, infiles, outfiles, otherargs, controls=aControls)
 
 
+def calcHistograms4MskVals(inputImg, imgBand, imgMsk, mskBand, minVal, maxVal, binWidth):
+    """
+A function which reads the image bands (values and mask) into memory and creates a 
+histogram for each value within the mask value.
+
+* inputImg - image values image file path.
+* imgBand - values image band
+* imgMsk - file path for image mask.
+* mskBand - mask image band
+* minVal - minimum value for the histogram bins
+* maxVal - maximum value for the histogram bins
+* binWidth - the width of the histograms bins.
+
+return:: returns a dict of mask values with an array for the histogram.
+"""
+    minVal = float(minVal)
+    maxVal = float(maxVal)
+    nBins = math.ceil((maxVal - minVal)/binWidth)
+    maxVal = float(minVal + (binWidth * nBins))
+    
+    imgValsDS = gdal.Open(inputImg)
+    imgValsBand = imgValsDS.GetRasterBand(imgBand)
+    valsArr = imgValsBand.ReadAsArray()
+    imgValsDS = None
+    
+    imgMskDS = gdal.Open(imgMsk)
+    imgMskBand = imgMskDS.GetRasterBand(mskBand)
+    mskArr = imgMskBand.ReadAsArray()
+    imgMskDS = None
+    
+    uniq_vals = numpy.unique(mskArr)
+    
+    hist_dict = dict()
+    
+    for msk_val in uniq_vals:
+        if msk_val != 0:
+            print(msk_val)
+            mskd_vals = valsArr[mskArr==msk_val]
+            hist_arr, bin_edges = numpy.histogram(mskd_vals, bins=nBins, range=(minVal, maxVal))
+            hist_dict[msk_val] = hist_arr
+    
+    valsArr = None
+    mskArr = None
+            
+    return hist_dict
+
+
+def calcWSG84PixelArea(img, out_img, scale=10000, gdalformat='KEA'):
+    """
+A function which calculates the area (in metres) of the pixel projected in WGS84.
+
+* img - input image, for which the per-pixel area will be calculated.
+* out_img - output image file.
+* scale - scale the output area to unit of interest. Scale=10000(Ha), Scale=1(sq m), Scale=1000000(sq km), Scale=4046.856(Acre), Scale=2590000(sq miles), Scale=0.0929022668(sq feet)
+"""
+    import rsgislib.tools
+    
+    rsgis_utils = rsgislib.RSGISPyUtils()
+    x_res, y_res = rsgis_utils.getImageRes(img)
+    
+    infiles = applier.FilenameAssociations()
+    infiles.img = img
+    outfiles = applier.FilenameAssociations()
+    outfiles.outimage = out_img
+    otherargs = applier.OtherInputs()
+    otherargs.x_res = x_res
+    otherargs.y_res = y_res
+    otherargs.scale = float(scale)
+    aControls = applier.ApplierControls()
+    aControls.progress = cuiprogress.CUIProgressBar()
+    aControls.drivername = gdalformat
+    aControls.omitPyramids = False
+    aControls.calcStats = False
+    
+    def _calcPixelArea(info, inputs, outputs, otherargs):
+        xBlock, yBlock = info.getBlockCoordArrays()
+            
+        x_res_arr = numpy.zeros_like(yBlock, dtype=float)
+        x_res_arr[...] = otherargs.x_res
+        y_res_arr = numpy.zeros_like(yBlock, dtype=float)
+        y_res_arr[...] = otherargs.y_res
+        x_res_arr_m, y_res_arr_m = rsgislib.tools.degrees_to_metres(yBlock, x_res_arr, y_res_arr)
+        outputs.outimage = numpy.expand_dims((x_res_arr_m*y_res_arr_m)/otherargs.scale, axis=0)
+    
+    applier.apply(_calcPixelArea, infiles, outfiles, otherargs, controls=aControls)
+
+
+
