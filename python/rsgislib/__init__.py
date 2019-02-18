@@ -975,6 +975,7 @@ class RSGISPyUtils (object):
             raise e
         return outList
     
+    
     def writeList2File(self, dataList, outFile):
         """
         Write a list a text file, one line per item.
@@ -988,6 +989,7 @@ class RSGISPyUtils (object):
         except Exception as e:
             raise e
     
+    
     def findFile(self, dirPath, fileSearch):
         """
         Search for a single file with a path using glob. Therefore, the file 
@@ -999,6 +1001,60 @@ class RSGISPyUtils (object):
         if len(files) != 1:
             raise RSGISPyException('Could not find a single file ('+fileSearch+'); found ' + str(len(files)) + ' files.')
         return files[0]
+    
+    
+    def createVarList(self, in_vals_lsts, val_dict=None):
+        """
+        A function which will produce a list of dictionaries with all the combinations 
+        of the input variables listed (i.e., the powerset). 
+        
+        in_vals_lsts - dictionary with each value having a list of values.
+        val_dict - variable used in iterative nature of function which lists
+                   the variable for which are still to be looped through. Would 
+                   normally not be provided by the user as default is None. Be
+                   careful if you set as otherwise.
+        returns: list of dictionaries with the same keys are the input but only a
+                 single value will be associate with key rather than a list.
+                   
+        Example::
+        
+        seg_vars_ranges = dict()
+        seg_vars_ranges['k'] = [5, 10, 20, 30, 40, 50, 60, 80, 100, 120]
+        seg_vars_ranges['d'] = [10, 20, 50, 100, 200, 1000, 10000]
+        seg_vars_ranges['minsize'] = [5, 10, 20, 50, 100, 200]
+        
+        seg_vars = rsgis_utils.createVarList(seg_vars_ranges)
+        
+        """
+        out_vars = []
+        if (in_vals_lsts is None) and (val_dict is not None):
+            out_val_dict = dict()
+            for key in val_dict.keys():
+                out_val_dict[key] = val_dict[key]
+            out_vars.append(out_val_dict)
+        elif in_vals_lsts is not None:
+            if len(in_vals_lsts.keys()) > 0:
+                key = list(in_vals_lsts.keys())[0]
+                vals_arr = in_vals_lsts[key]
+                next_vals_lsts = dict()
+                for ckey in in_vals_lsts.keys():
+                    if ckey != key:
+                        next_vals_lsts[ckey] = in_vals_lsts[ckey]
+                        
+                if len(next_vals_lsts.keys()) == 0:
+                    next_vals_lsts = None
+                
+                if val_dict is None:
+                    val_dict = dict()
+                
+                for val in vals_arr:
+                    c_val_dict = dict()
+                    for ckey in val_dict.keys():
+                        c_val_dict[ckey] = val_dict[ckey]
+                    c_val_dict[key] = val
+                    c_out_vars = createVarList(next_vals_lsts, c_val_dict)
+                    out_vars = out_vars+c_out_vars
+        return out_vars
 
 
 class RSGISTime (object):
