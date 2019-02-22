@@ -5,17 +5,9 @@ The Raster GIS module contains functions for attributing and manipulating raster
 # import the C++ extension into this level
 from ._rastergis import *
 
-haveGDALPy = True
-try:
-    import osgeo.gdal as gdal
-except ImportError as gdalErr:
-    haveGDALPy = False
+import osgeo.gdal as gdal
 
-haveNumpy = True
-try:
-    import numpy
-except ImportError as numErr:
-    haveNumpy = False
+import numpy
 
 haveHDF5 = True
 try:
@@ -109,9 +101,95 @@ Example::
         rsgisUtils.deleteFileWithBasename(tempFile)
 
 
+def getRATLength(clumps_img, rat_band=1):
+    """
+A function which returns the length (i.e., number of rows) within the RAT.
+
+* clumps_img - path to the image file with the RAT
+* rat_band - the band within the image file for which the RAT is to read. 
+"""
+    # Open input image file
+    clumps_img_ds = gdal.Open(clumps_img, gdal.GA_ReadOnly)
+    if clumps_img_ds is None:
+        raise Exception("Could not open the inputted clumps image.")
+    
+    clumps_img_band = clumps_img_ds.GetRasterBand(rat_band)
+    if clumps_img_band is None:
+        raise Exception("Could not open the inputted clumps image band.")
+    
+    clumps_img_rat = clumps_img_band.GetDefaultRAT()
+    if clumps_img_rat is None:
+        raise Exception("Could not open the inputted clumps image band RAT.")
+    
+    nrows = clumps_img_rat.GetRowCount()
+    
+    clumps_img_ds = None
+    return nrows
 
 
+def getRATColumns(clumps_img, rat_band=1):
+    """
+A function which returns a list of column names within the RAT.
 
+* clumps_img - path to the image file with the RAT
+* rat_band - the band within the image file for which the RAT is to read. 
+"""
+    # Open input image file
+    clumps_img_ds = gdal.Open(clumps_img, gdal.GA_ReadOnly)
+    if clumps_img_ds is None:
+        raise Exception("Could not open the inputted clumps image.")
+    
+    clumps_img_band = clumps_img_ds.GetRasterBand(rat_band)
+    if clumps_img_band is None:
+        raise Exception("Could not open the inputted clumps image band.")
+    
+    clumps_img_rat = clumps_img_band.GetDefaultRAT()
+    if clumps_img_rat is None:
+        raise Exception("Could not open the inputted clumps image band RAT.")
+        
+    ncols = clumps_img_rat.GetColumnCount()
+    col_names = []
+    for col_idx in range(ncols):
+        col_names.append(clumps_img_rat.GetNameOfCol(col_idx))
+    
+    clumps_img_ds = None
+    return col_names
+
+
+def readRATNeighbours(clumps_img, start_row=None, end_row=None, rat_band=1):
+    """
+A function which returns a list of clumps neighbours from a KEA RAT. Note, the
+neighbours are popualted using the function rsgislib.rastergis.findNeighbours. 
+By default the whole datasets of neightbours is read to memory but the start_row 
+and end_row variables can be used to read a subset of the RAT.
+
+* clumps_img - path to the image file with the RAT
+* start_row - the row within the RAT to start reading, if None will start at 0 (Default: None).
+* end_row - the row within the RAT to end reading, if None will end at n_rows within the RAT. (Default: None)
+* rat_band - the band within the image file for which the RAT is to read. 
+"""
+    if not haveH5PY:
+        raise Exception("Need the h5py library for this function")
+       
+    # Check that 'NumNeighbours' column exists
+    rat_columns = getRATColumns(clumps_img, rat_band)
+    if 'NumNeighbours' not in rat_columns:
+        raise Exception("Clumps image RAT does not contain 'NumNeighbours' column - have you populated neightbours?")
+    
+    n_rows = getRATLength('./444432_071117_flats_nztm_subset_clumps.kea')
+    
+    if start_row is None:
+        start_row = 0
+    
+    if end_row is None:
+        end_row = n_rows
+    
+    clumps_h5_file = h5py.File(clumps_img)
+    neighbours_path = 'BAND{}/ATT/NEIGHBOURS/NEIGHBOURS'.format(rat_band)
+    neighbours = clumps_h5_file[neighbours_path]
+    neighbours_data = neighbours[start_row:end_row]
+    clumps_h5_file = None
+    return neighbours_data
 
 
 
