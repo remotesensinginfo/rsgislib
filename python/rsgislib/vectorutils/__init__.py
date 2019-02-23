@@ -382,59 +382,64 @@ Example::
 """
     gdal.UseExceptions()
     
-    ds = gdal.OpenEx(vectorFile, gdal.OF_UPDATE )
-    if ds is None:
-        raise Exception("Could not open '" + vectorFile + "'")
+    try:
+        ds = gdal.OpenEx(vectorFile, gdal.OF_UPDATE )
+        if ds is None:
+            raise Exception("Could not open '" + vectorFile + "'")
+        
+        lyr = ds.GetLayerByName( vectorLayer )
+        if lyr is None:
+            raise Exception("Could not find layer '" + vectorLayer + "'")
+        
+        numFeats = lyr.GetFeatureCount()
+        if not len(colData) == numFeats:
+            print("Number of Features: " + str(numFeats))
+            print("Length of Data: " + str(len(colData)))
+            raise Exception( "The number of features and size of the input data is not equal." )
     
-    lyr = ds.GetLayerByName( vectorLayer )
-    if lyr is None:
-        raise Exception("Could not find layer '" + vectorLayer + "'")
+        colExists = False
+        lyrDefn = lyr.GetLayerDefn()
+        for i in range( lyrDefn.GetFieldCount() ):
+            if lyrDefn.GetFieldDefn(i).GetName().lower() == colName.lower():
+                colExists = True
+                break
     
-    numFeats = lyr.GetFeatureCount()
-    if not len(colData) == numFeats:
-        print("Number of Features: " + str(numFeats))
-        print("Length of Data: " + str(len(colData)))
-        raise Exception( "The number of features and size of the input data is not equal." )
-
-    colExists = False
-    lyrDefn = lyr.GetLayerDefn()
-    for i in range( lyrDefn.GetFieldCount() ):
-        if lyrDefn.GetFieldDefn(i).GetName().lower() == colName.lower():
-            colExists = True
-            break
-
-    if not colExists:
-        field_defn = ogr.FieldDefn( colName, colDataType )
-        if lyr.CreateField ( field_defn ) != 0:
-            raise Exception("Creating '" + colName + "' field failed; becareful with case, some drivers are case insensitive but column might not be found.\n")
-    
-    lyr.ResetReading()
-    # WORK AROUND AS SQLITE GETS STUCK IN LOOP ON FIRST FEATURE WHEN USE SETFEATURE.
-    fids=[]
-    for feat in lyr:
-        fids.append(feat.GetFID())
-    
-    openTransaction = False
-    lyr.ResetReading()
-    i = 0
-    # WORK AROUND AS SQLITE GETS STUCK IN LOOP ON FIRST FEATURE WHEN USE SETFEATURE.
-    for fid in fids:
-        if not openTransaction:
-            lyr.StartTransaction()
-            openTransaction = True
-        feat = lyr.GetFeature(fid)
-        if feat is not None:
-            feat.SetField(colName, colData[i])
-            lyr.SetFeature(feat)
-        if ((i % 20000) == 0) and openTransaction:
+        if not colExists:
+            field_defn = ogr.FieldDefn( colName, colDataType )
+            if lyr.CreateField ( field_defn ) != 0:
+                raise Exception("Creating '" + colName + "' field failed; becareful with case, some drivers are case insensitive but column might not be found.\n")
+        
+        lyr.ResetReading()
+        # WORK AROUND AS SQLITE GETS STUCK IN LOOP ON FIRST FEATURE WHEN USE SETFEATURE.
+        fids=[]
+        for feat in lyr:
+            fids.append(feat.GetFID())
+        
+        openTransaction = False
+        lyr.ResetReading()
+        i = 0
+        # WORK AROUND AS SQLITE GETS STUCK IN LOOP ON FIRST FEATURE WHEN USE SETFEATURE.
+        for fid in fids:
+            if not openTransaction:
+                lyr.StartTransaction()
+                openTransaction = True
+            feat = lyr.GetFeature(fid)
+            if feat is not None:
+                feat.SetField(colName, colData[i])
+                lyr.SetFeature(feat)
+            if ((i % 20000) == 0) and openTransaction:
+                lyr.CommitTransaction()
+                openTransaction = False
+            i = i + 1
+        if openTransaction:
             lyr.CommitTransaction()
             openTransaction = False
-        i = i + 1
-    if openTransaction:
-        lyr.CommitTransaction()
-        openTransaction = False
-    lyr.SyncToDisk()
-    ds = None
+        lyr.SyncToDisk()
+        ds = None
+    except Exception as e:
+        if i < numFeats:
+            print("Data type of the value being written is '{}'".format(type(colData[i])))
+        raise e
     
 def writeVecColumn2Layer(lyr, colName, colDataType, colData):
     """
