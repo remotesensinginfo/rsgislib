@@ -664,6 +664,33 @@ class RSGISPyUtils (object):
         outY = point.GetY()
         return outX, outY
     
+    
+    def getImageBandStats(self, img, band, compute=True):
+        """
+        A function which calls the GDAL function on the band selected to calculate the pixel stats
+        (min, max, mean, standard deviation). 
+        
+        * img - input image file path
+        * band - specified image band for which stats are to be calculated (starts at 1). 
+        * compute - whether the stats should be calculated (True; Default) or an approximation or pre-calculated stats are OK (False).
+        
+        return:: stats (min, max, mean, stddev)
+        """
+        img_ds = gdal.Open(img, gdal.GA_ReadOnly)
+        if img_ds is None:
+            raise Exception("Could not open image: '{}'".format(img))
+        n_bands = img_ds.RasterCount
+        
+        if band > 0 and band <= n_bands:
+            img_band = img_ds.GetRasterBand(band)
+            if img_band is None:
+                raise Exception("Could not open image band ('{0}') from : '{1}'".format(band, img))
+            img_stats = img_band.ComputeStatistics((not compute))
+        else:
+            raise Exception("Band specified is not within the image: '{}'".format(img))
+        return img_stats
+    
+    
     def getImageBandCount(self, inImg):
         """
         A function to retrieve the number of image bands in an image file.

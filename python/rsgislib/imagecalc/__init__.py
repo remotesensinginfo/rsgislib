@@ -506,10 +506,10 @@ Where:
     applier.apply(_applyRescale, infiles, outfiles, otherargs, controls=aControls)
 
 
-def calcHistograms4MskVals(inputImg, imgBand, imgMsk, mskBand, minVal, maxVal, binWidth):
+def calcHistograms4MskVals(inputImg, imgBand, imgMsk, mskBand, minVal, maxVal, binWidth, mskvals=None):
     """
 A function which reads the image bands (values and mask) into memory and creates a 
-histogram for each value within the mask value.
+histogram for each value within the mask value. Within the mask 0 is considered to be no data.
 
 * inputImg - image values image file path.
 * imgBand - values image band
@@ -518,6 +518,8 @@ histogram for each value within the mask value.
 * minVal - minimum value for the histogram bins
 * maxVal - maximum value for the histogram bins
 * binWidth - the width of the histograms bins.
+* mskvals - a list of values within the mask can be provided to just consider a limited number of mask values 
+            when calculating the histograms. If None (default) then calculated for all mask values. 
 
 return:: returns a dict of mask values with an array for the histogram.
 """
@@ -536,13 +538,15 @@ return:: returns a dict of mask values with an array for the histogram.
     mskArr = imgMskBand.ReadAsArray()
     imgMskDS = None
     
-    uniq_vals = numpy.unique(mskArr)
+    if mskvals is None:
+        uniq_vals = numpy.unique(mskArr)
+    else:
+        uniq_vals = mskvals
     
     hist_dict = dict()
     
     for msk_val in uniq_vals:
         if msk_val != 0:
-            print(msk_val)
             mskd_vals = valsArr[mskArr==msk_val]
             hist_arr, bin_edges = numpy.histogram(mskd_vals, bins=nBins, range=(minVal, maxVal))
             hist_dict[msk_val] = hist_arr
