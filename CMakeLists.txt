@@ -336,6 +336,8 @@ else()
 endif(MSVC)
 
 include_directories(${GEOS_INCLUDE_DIR})
+# Needed with newer geos versions to get complete class definitions
+add_definitions(-DGEOS_INLINE)
 if (MSVC)
     set(GEOS_LIBRARIES -LIBPATH:${GEOS_LIB_PATH} geos.lib)
 else()
