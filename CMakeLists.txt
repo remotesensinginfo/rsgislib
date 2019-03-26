@@ -445,6 +445,7 @@ if (RSGISLIB_WITH_UTILTIES)
 	configure_file ( "${PROJECT_TOOLS_DIR}/rsgisimg2webtiles.py.in" "${CMAKE_BINARY_DIR}/${PROJECT_BINARY_DIR}/rsgisimg2webtiles.py" )
 	configure_file ( "${PROJECT_TOOLS_DIR}/rsgisvectools.py.in" "${CMAKE_BINARY_DIR}/${PROJECT_BINARY_DIR}/rsgisvectools.py" )
 	configure_file ( "${PROJECT_TOOLS_DIR}/rsgisimginfo.py.in" "${CMAKE_BINARY_DIR}/${PROJECT_BINARY_DIR}/rsgisimginfo.py" )
+	configure_file ( "${PROJECT_TOOLS_DIR}/rsgisbuildimglut.py.in" "${CMAKE_BINARY_DIR}/${PROJECT_BINARY_DIR}/rsgisbuildimglut.py" )
 	configure_file ( "${PROJECT_TOOLS_DIR}/rsgisfilelut.py.in" "${CMAKE_BINARY_DIR}/${PROJECT_BINARY_DIR}/rsgisfilelut.py" )
 endif(RSGISLIB_WITH_UTILTIES)
 
