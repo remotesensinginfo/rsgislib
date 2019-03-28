@@ -13,6 +13,7 @@ except ImportError:
 
 import rsgislib
 import numpy
+import math
 
 haveRIOS = True
 try:
@@ -597,4 +598,117 @@ A function which calculates the area (in metres) of the pixel projected in WGS84
     applier.apply(_calcPixelArea, infiles, outfiles, otherargs, controls=aControls)
 
 
+def calcPPI(inputimg, outputimg, gdalformat, niters=1000, thres=0, img_gain=1, seed=None, calcstats=True):
+    """
+A function which calculate the pixel purity index (PPI). Using an appropriate number of iterations
+this can take a little while to run. Note, the whole input image is read into memory.
+
+Boardman J.W., Kruse F.A, and Green R.O., "Mapping Target Signatures via
+    Partial Unmixing of AVIRIS Data," Pasadena, California, USA, 23 Jan 1995,
+    URI: http://hdl.handle.net/2014/33635
+
+* inputImg - image values image file path.
+* outputimg - output image
+* gdalformat - GDAL file format (e.g., KEA) of the output image.
+* niters - number of iterations
+* thres - a threshold in the image space (after again as been applied) to select more pixels around the extreme (e.g., 1% reflectance)
+* img_gain - the gain by which the image was multipled, reflectance images are typically multiplied by 1000 or 10000. The result should be an image with a range 0-1.
+* seed - seed for the random squence of numbers being generated. Using the same seed will result in the same seqence and therefore the same output.
+* calcstats - whether to calculate image statistics and pyramids on the output image.
+
+""" 
+    # Check gdal is available
+    if not haveGDALPy:
+        raise ImportError("The GDAL python bindings are required for "
+                          "calcPPI function could not be imported")
+    
+    import rsgislib.imageutils
+    
+    imgDS = gdal.Open(inputimg)
+    if imgDS is None:
+        raise Exception("Could not open input image")
+    n_bands = imgDS.RasterCount
+    x_size = imgDS.RasterXSize
+    y_size = imgDS.RasterYSize
+    img_data = numpy.zeros((n_bands, (x_size*y_size)), dtype=numpy.float32)
+    img_data_msk = numpy.ones((x_size*y_size), dtype=bool)
+    img_data_mean = numpy.zeros(n_bands, dtype=numpy.float32)
+
+    for n in range(n_bands):
+        print("Importing Band {}".format(n+1))
+        imgBand = imgDS.GetRasterBand(n+1)
+        if imgBand is None:
+            raise Exception("Could not open image band ({})".format(n+1))
+        no_data_val = imgBand.GetNoDataValue()
+        band_arr = imgBand.ReadAsArray().flatten()
+        band_arr = band_arr.astype(numpy.float32)
+        img_data[n] = band_arr
+        img_data_msk[band_arr==no_data_val] = False
+        band_arr[band_arr==no_data_val] = numpy.nan
+        if img_gain > 1:
+            band_arr = band_arr/img_gain
+            img_data[n] = img_data[n]/img_gain
+        img_data_mean[n] = numpy.nanmean(band_arr)
+        img_data[n] = img_data[n] - img_data_mean[n]
+    imgDS = None
+    band_arr = None
+    
+    print("Create empty output image file")
+    rsgislib.imageutils.createCopyImage(inputimg, outputimg, 1, 0, gdalformat, rsgislib.TYPE_16UINT)
+    
+    # Open output image 
+    outImgDS = gdal.Open(outputimg, gdal.GA_Update)
+    if outImgDS is None:
+        raise Exception("Could not open output image")
+    outImgBand = outImgDS.GetRasterBand(1)
+    if outImgBand is None:
+        raise Exception("Could not open output image band (1)")
+    out_img_data = outImgBand.ReadAsArray()
+    
+    # Mask the datasets to obtain just the valid pixel values (i.e., using the no data value)
+    img_data = img_data.T
+    out_img_data = out_img_data.flatten()
+    pxl_idxs = numpy.arange(out_img_data.shape[0])
+    pxl_idxs = pxl_idxs[img_data_msk]
+    out_img_count = out_img_data[img_data_msk]
+    img_data = img_data[img_data_msk]
+    
+    print("Perform PPI iterations.")
+    step = math.floor(niters/10)
+    feedback = 10
+    feedback_next = step
+    print("Started .0.", end='', flush=True)
+    
+    for i in range(niters):
+        if (niters>=10) and (i == feedback_next):
+            print(".{}.".format(feedback), end='', flush=True)
+            feedback_next = feedback_next + step
+            feedback = feedback + 10
+        r = numpy.random.rand(n_bands) - 0.5
+        s = numpy.dot(img_data, r)
+
+        imin = numpy.argmin(s)
+        imax = numpy.argmax(s)
+        if thres == 0:
+            # Only the two extreme pixels are incremented
+            out_img_count[imin] += 1
+            out_img_count[imax] += 1
+        else:
+            # All pixels within threshold distance from the two extremes
+            out_img_count[s >= (s[imax] - thres)] += 1
+            out_img_count[s <= (s[imin] + thres)] += 1
+    s = None
+    print(" Completed")
+    
+    out_img_data[pxl_idxs] = out_img_count
+    out_img_data = out_img_data.reshape((y_size, x_size))
+    
+    outImgBand.WriteArray(out_img_data)
+    outImgDS = None
+    
+    if calcstats:
+        print("Calculate Image stats and pyramids.")
+        rsgislib.imageutils.popImageStats(outputimg, usenodataval=True, nodataval=0, calcpyramids=True)
+        
+        
 
