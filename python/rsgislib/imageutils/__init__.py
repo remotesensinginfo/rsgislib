@@ -1176,3 +1176,98 @@ return:: outputs a numpy array (n sampled values, n bands)
     return outArr
 
 
+def getUniqueValues(img, img_band=1):
+    """
+Find the unique image values within an image band.
+Note, the whole image band gets read into memory.
+
+* img - input image file path
+* img_band - image band to be processed (starts at 1)
+
+return - array of unique values.
+
+"""
+    imgDS = gdal.Open(img)
+    if imgDS is None:
+        raise Exception("Could not open output image")
+    imgBand = imgDS.GetRasterBand(img_band)
+    if imgBand is None:
+        raise Exception("Could not open output image band ({})".format(img_band))
+    valsArr = imgBand.ReadAsArray()
+    imgDS = None
+    
+    uniq_vals = numpy.unique(valsArr)
+
+    return uniq_vals
+    
+def combineBinaryMasks(msk_imgs_dict, out_img, output_lut, gdalformat='KEA'):
+    """
+A function which combines up to 8 binary image masks to create a single 
+output image with a unique value for each combination of intersecting 
+masks. A JSON LUT is also generated to identify the image values to a
+'class'.
+
+* msk_imgs_dict - dict of input images.
+* out_img - output image file.
+* output_lut - output file path to JSON LUT file identifying the image values.
+* gdalformat - output GDAL format (e.g., KEA)
+
+
+""" 
+    import json
+    rsgis_utils = rsgislib.RSGISPyUtils()
+
+    in_vals_dict = dict()
+    msk_imgs = list()
+    for key in msk_imgs_dict.keys():
+        msk_imgs.append(msk_imgs_dict[key])
+        in_vals_dict[key] = [0,1]
+    
+    # Generated the combined mask.
+    infiles = applier.FilenameAssociations()
+    infiles.msk_imgs = msk_imgs
+    outfiles = applier.FilenameAssociations()
+    outfiles.outimage = out_img
+    otherargs = applier.OtherInputs()
+    aControls = applier.ApplierControls()
+    aControls.progress = cuiprogress.CUIProgressBar()
+    aControls.drivername = gdalformat
+    aControls.omitPyramids = False
+    aControls.calcStats = False
+    
+    def _combineMsks(info, inputs, outputs, otherargs):
+        out_arr = numpy.zeros_like(inputs.msk_imgs[0], dtype=numpy.uint8)        
+        out_bit_arr = numpy.unpackbits(out_arr, axis=2)
+        img_n = 0
+        for img in inputs.msk_imgs:
+            for x in range(img.shape[1]):
+                for y in range(img.shape[2]):
+                    if img[0,x,y] > 1:
+                        out_bit_arr[0,x,(8*y)+img_n] = 1
+            img_n = img_n + 1
+        
+        out_arr = numpy.packbits(out_bit_arr, axis=2)
+        
+        outputs.outimage = out_arr
+    applier.apply(_combineMsks, infiles, outfiles, otherargs, controls=aControls)
+    
+    # find the unique output image files.
+    uniq_vals = getUniqueValues(out_img, img_band=1)
+    
+    # find the powerset of the inputs
+    possible_outputs = rsgis_utils.createVarList(in_vals_dict, val_dict=None)
+    
+    out_poss_lut = dict()
+    for poss in possible_outputs:
+        val = numpy.zeros(1, dtype=numpy.uint8)
+        val_bit_arr = numpy.unpackbits(val, axis=0)
+        i = 0
+        for key in msk_imgs_dict.keys():
+            val_bit_arr[i] = poss[key]
+            i = i + 1
+        out_arr = numpy.packbits(val_bit_arr)
+        if out_arr[0] in uniq_vals:
+            out_poss_lut[str(out_arr[0])] = poss
+        
+    with open(output_lut, 'w') as outJSONfile:
+        json.dump(out_poss_lut, outJSONfile, sort_keys=True,indent=4, separators=(',', ': '), ensure_ascii=False)
