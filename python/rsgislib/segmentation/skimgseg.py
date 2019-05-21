@@ -106,6 +106,7 @@ scikit-image library (http://scikit-image.org/docs/stable/api/skimage.segmentati
 * sigma - scikit-image Quickshift parameter: 'Width for Gaussian smoothing as preprocessing. Zero means no smoothing.'
 * convert2lab - scikit-image Quickshift parameter: 'Whether the input should be converted to Lab colorspace prior to segmentation. For this purpose, the input is assumed to be RGB.'
 * random_seed - scikit-image Quickshift parameter: 'Random seed used for breaking ties.'
+
 """
     # Create output image
     rsgislib.imageutils.createCopyImage(inputImg, outputImg, 1, 0, gdalformat, rsgislib.TYPE_32UINT)
@@ -174,6 +175,7 @@ scikit-image library (http://scikit-image.org/docs/stable/api/skimage.segmentati
 * min_size_factor - scikit-image Slic parameter: 'Proportion of the minimum segment size to be removed with respect to the supposed segment size "depth*width*height/n_segments"'
 * max_size_factor - scikit-image Slic parameter: 'Proportion of the maximum connected segment size. A value of 3 works in most of the cases.'
 * slic_zero - scikit-image Slic parameter: 'Run SLIC-zero, the zero-parameter mode of SLIC.'
+
 """
     # Create output image
     rsgislib.imageutils.createCopyImage(inputImg, outputImg, 1, 0, gdalformat, rsgislib.TYPE_32UINT)
@@ -249,6 +251,7 @@ scikit-image library (http://scikit-image.org/docs/stable/api/skimage.segmentati
 * nPCABands - the number of principle components outputs from the PCA - needs to be either 1 or 3.
 * compactness - scikit-image Watershed parameter: 'Use compact watershed with given compactness parameter. Higher values result in more regularly-shaped watershed basins; Peer Neubert & Peter Protzel (2014). Compact Watershed and Preemptive SLIC: On Improving Trade-offs of Superpixel Segmentation Algorithms. ICPR 2014'
 * watershed_line - scikit-image Watershed parameter: 'If watershed_line is True, a one-pixel wide line separates the regions obtained by the watershed algorithm. The line has the label 0.'
+
 """
     # Create output image
     rsgislib.imageutils.createCopyImage(inputImg, outputImg, 1, 0, gdalformat, rsgislib.TYPE_32UINT)
@@ -336,6 +339,7 @@ scikit-image library (http://scikit-image.org/docs/stable/api/skimage.segmentati
         ‘cg_mg’ (conjugate gradient with multigrid preconditioner): a preconditioner is computed using a multigrid solver, then the solution is computed with the Conjugate Gradient method. This mode requires that the pyamg module (http://pyamg.org/) is installed. For images of size > 512x512, this is the recommended (fastest) mode.
 * tol - scikit-image random_walker parameter: 'tolerance to achieve when solving the linear system, in cg’ and ‘cg_mg’ modes.'
 * spacing - scikit-image random_walker parameter: 'Spacing between voxels in each spatial dimension. If None, then the spacing between pixels/voxels in each dimension is assumed 1.'
+
 """
     # Create output image
     rsgislib.imageutils.createCopyImage(inputImg, outputImg, 1, 0, gdalformat, rsgislib.TYPE_32UINT)

@@ -110,6 +110,7 @@ the polygons then use this function.
 * countfield - the name of the field for the count (of number of pixels) value (None or not specified to be ignored).
 * modefield - the name of the field for the mode value (None or not specified to be ignored).
 * medianfield - the name of the field for the median value (None or not specified to be ignored).
+
 """
     gdal.UseExceptions()
     
@@ -152,6 +153,7 @@ the polygons then use this function.
 * countfield - the name of the field for the count (of number of pixels) value (None or not specified to be ignored).
 * modefield - the name of the field for the mode value (None or not specified to be ignored).
 * medianfield - the name of the field for the median value (None or not specified to be ignored).
+
 """
     if modefield is not None:
         import scipy.stats.mstats
@@ -382,6 +384,7 @@ the polygon resolution.
 * valsimg - the values image
 * imgbandidx - the index (starting at 1) of the image band for which the stats will be calculated. If defined the no data value of the band will be ignored.
 * outfield - output field name within the vector layer.
+
 """
     gdal.UseExceptions()
     try:    
@@ -414,6 +417,7 @@ the polygon resolution.
 * valsimg - the values image
 * imgbandidx - the index (starting at 1) of the image band for which the stats will be calculated. If defined the no data value of the band will be ignored.
 * outfield - output field name within the vector layer.
+
 """
     gdal.UseExceptions()
     try:
@@ -618,6 +622,7 @@ use this function.
 * countfield - the name of the field for the count (of number of pixels) value (None or not specified to be ignored).
 * modefield - the name of the field for the mode value (None or not specified to be ignored).
 * medianfield - the name of the field for the median value (None or not specified to be ignored).
+
 """
     gdal.UseExceptions()
     
@@ -662,6 +667,7 @@ use this function.
 * countfield - the name of the field for the count (of number of pixels) value (None or not specified to be ignored).
 * modefield - the name of the field for the mode value (None or not specified to be ignored).
 * medianfield - the name of the field for the median value (None or not specified to be ignored).
+
 """
     if modefield is not None:
         import scipy.stats.mstats

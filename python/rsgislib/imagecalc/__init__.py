@@ -64,6 +64,7 @@ Data structure for rescaling information for rescaleImgPxlVals function.
 * outMin - the output image band minimum value for rescaling. 
 * outMax - the output image band maximum value for rescaling.
 * outNoData - no data value for the output image band.
+
 """
     def __init__(self, band=0, inMin=0.0, inMax=0.0, inNoData=0, outMin=0.0, outMax=0.0, outNoData=0.0):
         """
@@ -74,6 +75,7 @@ Data structure for rescaling information for rescaleImgPxlVals function.
         * outMin - the output image band minimum value for rescaling. 
         * outMax - the output image band maximum value for rescaling.
         * outNoData - no data value for the output image band.
+
         """
         self.band = band
         self.inMin = inMin
@@ -523,6 +525,7 @@ histogram for each value within the mask value. Within the mask 0 is considered 
             when calculating the histograms. If None (default) then calculated for all mask values. 
 
 return:: returns a dict of mask values with an array for the histogram.
+
 """
     minVal = float(minVal)
     maxVal = float(maxVal)
@@ -565,6 +568,7 @@ A function which calculates the area (in metres) of the pixel projected in WGS84
 * img - input image, for which the per-pixel area will be calculated.
 * out_img - output image file.
 * scale - scale the output area to unit of interest. Scale=10000(Ha), Scale=1(sq m), Scale=1000000(sq km), Scale=4046.856(Acre), Scale=2590000(sq miles), Scale=0.0929022668(sq feet)
+
 """
     import rsgislib.tools
     

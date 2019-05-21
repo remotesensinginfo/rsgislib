@@ -204,9 +204,6 @@ The returned classifier instance will be trained using the input data.
         dataArrSamp = dataArr
         classArrSamp = classArr
     
-    #if not preProcessor is None:
-    #    dataArrSamp = reProcessor.fit_transform(dataArrSamp)
-    
     print("Training data size: {} x {}".format(dataArr.shape[0], dataArr.shape[1]))
     print("Training Sample data size: {} x {}".format(dataArrSamp.shape[0], dataArrSamp.shape[1]))
     
@@ -439,11 +436,11 @@ Example::
     rasterTrain = dict()
     for cName in classInfo:
         shpFile = classInfo[cName].fileH5
-        tmpBaseName = os.path.splitext(os.path.basename(shpFile))[0]
-        tmpFile = os.path.join(baseNameTmpDir, tmpBaseName+'_rasterzone.kea')
-        rsgislib.vectorutils.rasterise2Image(shpFile, vdmskFile, tmpFile, gdalformat='KEA', burnVal=classInfo[cName].id, shpExt=False)
+        vecLyrName = os.path.splitext(os.path.basename(shpFile))[0]
+        tmpFile = os.path.join(baseNameTmpDir, vecLyrName+'_rasterzone.kea')
+        rsgislib.vectorutils.rasteriseVecLyr(shpFile, vecLyrName, vdmskFile, tmpFile, gdalformat="KEA", burnVal=classInfo[cName].id, datatype=rsgislib.TYPE_8UINT, vecAtt=None, vecExt=False, thematic=True, nodata=0)
         rasterTrain[cName] = tmpFile
-        tmpFileH5 = os.path.join(baseNameTmpDir, tmpBaseName+'_pxlVals.h5')
+        tmpFileH5 = os.path.join(baseNameTmpDir, vecLyrName+'_pxlVals.h5')
         rsgislib.imageutils.extractZoneImageBandValues2HDF(imageBandInfo, rasterTrain[cName], tmpFileH5, classInfo[cName].id)
         classInfo[cName].fileH5 = tmpFileH5
     
