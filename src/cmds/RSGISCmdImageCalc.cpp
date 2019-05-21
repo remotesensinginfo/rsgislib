@@ -1897,7 +1897,6 @@ namespace rsgis{ namespace cmds {
                 throw rsgis::RSGISImageException(message.c_str());
             }
 
-
             rsgis::img::RSGISCalcLinearSpectralUnmixing calcSpecUnmix(imageFormat, RSGIS_to_GDAL_Type(outDataType), lsumGain, lsumOffset);
             calcSpecUnmix.performConstainedNNLinearSpectralUnmixing(datasets, 1, outputFile, endmembersFile, lsumWeight);
 

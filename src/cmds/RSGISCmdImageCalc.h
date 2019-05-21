@@ -140,6 +140,7 @@ namespace rsgis{ namespace cmds {
     DllExport void executeImageBandStats(std::string inputImage, std::string outputFile, bool ignoreZeros)throw(RSGISCmdException);
     /** Function to calculate the statistics for the whole image across all bands */
     DllExport void executeImageStats(std::string inputImage, std::string outputFile, bool ignoreZeros)throw(RSGISCmdException);
+    
     /** Function to undertake an unconstrained linear spectral unmixing of the input image for a set of endmembers */
     DllExport void executeUnconLinearSpecUnmix(std::string inputImage, std::string imageFormat, RSGISLibDataType outDataType, float lsumGain, float lsumOffset, std::string outputFile, std::string endmembersFile)throw(RSGISCmdException);
     /** Function to undertake an exhaustive constrained linear spectral unmixing of the input image for a set of endmembers */
@@ -148,6 +149,10 @@ namespace rsgis{ namespace cmds {
     DllExport void executeConSum1LinearSpecUnmix(std::string inputImage, std::string imageFormat, RSGISLibDataType outDataType, float lsumGain, float lsumOffset, float lsumWeight, std::string outputFile, std::string endmembersFile)throw(RSGISCmdException);
     /** Function to undertake a constrained linear spectral unmixing of the input image for a set of endmembers where the sum of the unmixing will be approximately 1 and non-negative */
     DllExport void executeNnConSum1LinearSpecUnmix(std::string inputImage, std::string imageFormat, RSGISLibDataType outDataType, float lsumGain, float lsumOffset, float lsumWeight, std::string outputFile, std::string endmembersFile)throw(RSGISCmdException);
+    
+    /** Funtion to undertake multiple endmember spectral mixture analysis using non-negative constrained linear spectral unmixing */
+    
+    
     /** Function to test whether all bands are equal to the same value */
     DllExport void executeAllBandsEqualTo(std::string inputImage, float imgValue, float outputTrueVal, float outputFalseVal, std::string outputImage, std::string imageFormat, RSGISLibDataType outDataType)throw(RSGISCmdException);
     /** Function to generate a histogram for the region of the mask selected */

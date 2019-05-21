@@ -56,7 +56,8 @@ Where:
 * useTPS is a boolean specifying that the thin plated splines method of warping should be used (i.e., rubbersheet); Default False.
 * usePoly is a boolean specifying that a polynomial method of warpping is used; Default True
 * polyOrder is the order of the polynomial used to represent the transformation (1, 2 or 3). Only used if usePoly=True
-* useMutliThread is a boolean specifying whether multiple processing cores should be used for the warpping.
+* useMutliThread is a boolean specifying whether multiple processing cores should be used for the warping.
+
 """
     import rsgislib.imageutils
     from osgeo import gdal

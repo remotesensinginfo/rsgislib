@@ -1141,13 +1141,13 @@ A function to populate a clumps file with training from a series of shapefiles (
 Where:
 
 * clumpsImg - input clumps file.
-* classesDict - A dict structure with the class names as keys and the values are an array of two values [int class val, file path for shapefile].
+* classesDict - A dict structure with the class names as keys and the values are an array of two values
+                [int class val, file path for shapefile].
 * tmpPath - File path (which needs to exist) where files can temporally be written.
 * classesIntCol - Output column name for integer values representing each class.
 * classesNameCol - Output column name for string class names.
 
     """
-    
     createdDIR = False
     if not os.path.isdir(tmpPath):
         os.makedirs(tmpPath)
@@ -1163,16 +1163,19 @@ Where:
     for key in classesDict:
         className = key
         classShpFile = classesDict[key][1]
+        classShpFileLyr = os.path.splitext(os.path.basename(classShpFile))[0]
         classImgFile = os.path.join(tmpPath, className+"_"+uid+".kea")
         classIntVal = classesDict[key][0]
-        vectorutils.rasterise2Image(classShpFile, clumpsImg, classImgFile, gdalformat="KEA", burnVal=classIntVal)
+        vectorutils.rasteriseVecLyr(classShpFile, classShpFileLyr, clumpsImg, classImgFile, gdalformat="KEA",
+                                    burnVal=classIntVal, datatype=rsgislib.TYPE_16UINT)
         tmpClassImgLayers.append(classImgFile)
         classNamesDict[classIntVal] = className
     
     combinedClassesImage = os.path.join(tmpPath, "CombinedClasses_" + uid + ".kea")
     imageutils.combineImages2Band(tmpClassImgLayers, combinedClassesImage, 'KEA', rsgislib.TYPE_8UINT, 0.0)
     
-    rastergis.populateRATWithMode(valsimage=combinedClassesImage, clumps=clumpsImg, outcolsname=classesIntCol, usenodata=False, nodataval=0, outnodata=False, modeband=1, ratband=1)
+    rastergis.populateRATWithMode(valsimage=combinedClassesImage, clumps=clumpsImg, outcolsname=classesIntCol,
+                                  usenodata=False, nodataval=0, outnodata=False, modeband=1, ratband=1)
     defineClassNames(clumpsImg, classesIntCol, classesNameCol, classNamesDict)
     
     for file in tmpClassImgLayers:
@@ -1371,6 +1374,7 @@ Example::
 def _computeProximityArrArgsFunc(argVals):
     """
     This function is used internally within calcDist2Classes for the multiprocessing Pool
+
     """
     classImgDS = gdal.Open(argVals[0], gdal.GA_ReadOnly)
     classImgBand = classImgDS.GetRasterBand(1)
@@ -1397,6 +1401,7 @@ def calcDist2Classes(clumpsImg, classCol, outImgBase, tmpDIR='./tmp', tileSize=2
     * maxDist is the maximum distance in units of the geographic units of the projection of the input image (Default: 1000).
     * nodata is the value applied to the pixels outside of the maxDist threshold (Default: 1000; i.e., the same as maxDist).
     * nCores is the number of processing cores which are available to be used for this processing. If -1 all available cores will be used. (Default: -1)
+
     """
     tmpPresent = True
     if not os.path.exists(tmpDIR):

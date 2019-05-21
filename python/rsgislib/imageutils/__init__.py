@@ -59,7 +59,8 @@ Create a list of these objects to pass to the sharpenLowResBands function.
         """
         * band - is the band number (band numbering starts at 1).
         * status - needs to be either 'ignore', 'lowres' or 'highres' - lowres bands will be sharpened using the highres bands and ignored bands will just be copied into the output image.
-        * name - is a name associated with this image band - doesn't really matter what you put in here. 
+        * name - is a name associated with this image band - doesn't really matter what you put in here.
+
         """
         self.band = band
         self.status = status
@@ -84,6 +85,7 @@ Create a list of these objects to pass to the fillTimeSeriesGaps function
         * compImg - The input compsite image which has been generated.
         * imgRef -  The reference layer (e.g., from createMaxNDVIComposite or createMaxNDVINDWICompositeLandsat) with zero for no data regions
         * outRef - A boolean variable specify which layer a fill reference layer is to be produced.
+
         """
         self.year = year
         self.day = day
@@ -223,6 +225,7 @@ Test whether the input image has GCPs - returns boolean
 Return: 
 
 * boolean True - has GCPs; False - does not have GCPs
+
 """
     raster = gdal.Open(inImg, gdal.GA_ReadOnly)
     if raster == None:
@@ -400,6 +403,7 @@ inputted vector file.
 * gdalformat - output image file format.
 * datatype - is a rsgislib.TYPE_* value providing the data type of the output image.
 * snap2grid - optional variable to snap the image to a grid of whole numbers with respect to the image pixel resolution.
+
 """
     
     dsVecFile = gdal.OpenEx(vectorFile, gdal.OF_VECTOR )
@@ -526,6 +530,7 @@ Where:
             3) provide a floating point value for the image resolution (note. pixels will be sqaure) 
 * snap2Grid is a boolean specifying whether the TL pixel should be snapped to a multiple of the pixel resolution (Default is True).
 * nCores - the number of processing cores available for processing (-1 is all cores: Default=-1)
+
     """    
     rsgisUtils = rsgislib.RSGISPyUtils()
     
@@ -702,6 +707,7 @@ Function to subset an input image using a defined pixel bbox.
 * xMaxPxl - max x in pixels
 * yMinPxl - min y in pixels
 * yMaxPxl - max y in pixels
+
 """
     rsgis_utils = rsgislib.RSGISPyUtils()
     bbox = rsgis_utils.getImageBBOX(inputimage)
@@ -735,6 +741,7 @@ Function to generate a set of tiles for the input image.
 * datatype - datatype is a rsgislib.TYPE_* value providing the data type of the output image.
 * ext - output file extension to be added to the baseimage path (e.g., kea)
 * ncores - number of cores to be used; uses python multiprocessing module.
+
 """
     import multiprocessing
     rsgis_utils = rsgislib.RSGISPyUtils()
@@ -1211,7 +1218,6 @@ masks. A JSON LUT is also generated to identify the image values to a
 * out_img - output image file.
 * output_lut - output file path to JSON LUT file identifying the image values.
 * gdalformat - output GDAL format (e.g., KEA)
-
 
 """ 
     import json

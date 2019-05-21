@@ -76,7 +76,7 @@ def createKMZImg(inputImg, outputFile, bands, reprojLatLong=True, finiteMsk=Fals
     cmd = 'gdal_translate -of KMLSUPEROVERLAY ' + gdalInFile + ' ' + outputFile
     print(cmd)
     try:
-        subprocess.call(cmd, shell=True)
+        subprocess.check_call(cmd, shell=True)
     except OSError as e:
        raise rsgislib.RSGISPyException('Could not execute command: ' + cmd)
         
@@ -140,7 +140,7 @@ def createWebTilesImg(inputImg, outputDIR, bands, zoomLevels='2-10', resample='a
     cmd = 'gdal2tiles.py -r ' + resample + ' -z ' + zoomLevels + ' -a  0 ' + stretchImg + ' ' + outputDIR
     print(cmd)
     try:
-        subprocess.call(cmd, shell=True)
+        subprocess.check_call(cmd, shell=True)
     except OSError as e:
        raise rsgislib.RSGISPyException('Could not execute command: ' + cmd)
         

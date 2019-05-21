@@ -89,6 +89,7 @@ import os.path
 import os
 import time
 import datetime
+import math
 
 import osgeo.osr as osr
 import osgeo.ogr as ogr
@@ -184,12 +185,14 @@ class RSGISPyException(Exception):
     def __init__(self, value):
         """
         Init for the RSGISPyException class
+
         """
         self.value = value
         
     def __str__(self):
         """
         Return a string representation of the exception
+
         """
         return repr(self.value)
 
@@ -202,6 +205,7 @@ class RSGISPyUtils (object):
         """
         A function to get the extension for a given file format 
         (NOTE, currently only KEA, GTIFF, HFA, PCI and ENVI are supported).
+
         """
         ext = ".NA"
         if gdalformat.lower() == "kea":
@@ -219,7 +223,9 @@ class RSGISPyUtils (object):
         return ext
     
     def getGDALFormatFromExt(self, fileName):
-        """ Get GDAL format, based on filename """
+        """
+        Get GDAL format, based on filename
+        """
         gdalStr = ''
         extension = os.path.splitext(fileName)[-1] 
         if extension == '.env':
@@ -241,6 +247,7 @@ class RSGISPyUtils (object):
         """
         Returns the rsgislib datatype ENUM (e.g., rsgislib.TYPE_8INT) 
         for the inputted raster file
+
         """
         raster = gdal.Open(inImg, gdal.GA_ReadOnly)
         if raster == None:
@@ -254,7 +261,8 @@ class RSGISPyUtils (object):
         
     def getGDALDataTypeFromImg(self, inImg):
         """
-        Returns the GDAL datatype ENUM (e.g., GDT_Float32) for the inputted raster file
+        Returns the GDAL datatype ENUM (e.g., GDT_Float32) for the inputted raster file.
+
         """
         raster = gdal.Open(inImg, gdal.GA_ReadOnly)
         if raster == None:
@@ -268,7 +276,8 @@ class RSGISPyUtils (object):
         
     def getGDALDataTypeNameFromImg(self, inImg):
         """
-        Returns the GDAL datatype ENUM (e.g., GDT_Float32) for the inputted raster file
+        Returns the GDAL datatype ENUM (e.g., GDT_Float32) for the inputted raster file.
+
         """
         raster = gdal.Open(inImg, gdal.GA_ReadOnly)
         if raster == None:
@@ -284,6 +293,7 @@ class RSGISPyUtils (object):
         """
         Function to delete all the files which have a path
         and base name defined in the filePath attribute.
+
         """
         import glob
         baseName = os.path.splitext(filePath)[0]
@@ -296,7 +306,8 @@ class RSGISPyUtils (object):
         """
         A function which will delete a directory, if files and other directories
         are within the path specified they will be recursively deleted as well.
-        So becareful you don't delete things within meaning it.
+        So be careful you don't delete things within meaning it.
+
         """
         for root, dirs, files in os.walk(dirPath, topdown=False):
             for name in files:
@@ -309,6 +320,7 @@ class RSGISPyUtils (object):
     def renameGDALLayer(self, cFileName, oFileName):
         """
         Rename all the files associated with a GDAL layer.
+
         """
         layerDS = gdal.Open(cFileName, gdal.GA_ReadOnly)
         gdalDriver = layerDS.GetDriver()
@@ -316,8 +328,9 @@ class RSGISPyUtils (object):
         gdalDriver.Rename(oFileName, cFileName)
 
     def getRSGISLibDataType(self, gdaltype):
-        """ Convert from GDAL data name type string to 
-            RSGISLib data type int.
+        """
+        Convert from GDAL data name type string to RSGISLib data type int.
+
         """
         gdaltype = gdaltype.lower()
         if gdaltype == 'int8':
@@ -347,6 +360,7 @@ class RSGISPyUtils (object):
         """
         A function to retrieve the image resolution.
         return xRes, yRes
+
         """
         rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
         if rasterDS == None:
@@ -364,6 +378,7 @@ class RSGISPyUtils (object):
         """
         A function to test whether two images have the same
         image pixel resolution.
+
         """
         img1XRes, img1YRes = self.getImageRes(img1)
         img2XRes, img2YRes = self.getImageRes(img2)
@@ -374,6 +389,7 @@ class RSGISPyUtils (object):
         """
         A function to retrieve the image size in pixels.
         return xSize, ySize
+
         """
         rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
         if rasterDS == None:
@@ -389,6 +405,7 @@ class RSGISPyUtils (object):
         A function to retrieve the bounding box in the spatial 
         coordinates of the image.
         return (MinX, MaxX, MinY, MaxY)
+
         """
         rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
         if rasterDS == None:
@@ -416,10 +433,8 @@ class RSGISPyUtils (object):
         A function to retrieve the bounding box in the spatial 
         coordinates of the image.
         return (MinX, MaxX, MinY, MaxY)
+
         """
-        import osgeo.osr as osr
-        import osgeo.gdal as gdal
-        
         inProjWKT = self.getWKTProjFromImage(inImg)
         inSpatRef = osr.SpatialReference()
         inSpatRef.ImportFromWkt(inProjWKT)
@@ -463,6 +478,7 @@ class RSGISPyUtils (object):
         * inProjObj - an osr.SpatialReference() object representing input projection.
         * outProjObj - an osr.SpatialReference() object representing output projection. 
         return (MinX, MaxX, MinY, MaxY)
+
         """
         tlX = bbox[0]
         tlY = bbox[3]
@@ -488,7 +504,6 @@ class RSGISPyUtils (object):
         return:: boundary box is returned (MinX, MaxX, MinY, MaxY)
         
         """
-        from osgeo import gdal
         inDataSource = gdal.OpenEx(inVec, gdal.OF_VECTOR )
         if layerName is not None:
             inLayer = inDataSource.GetLayer(layerName)
@@ -511,7 +526,6 @@ class RSGISPyUtils (object):
         return:: nfeats
         
         """
-        from osgeo import gdal
         inDataSource = gdal.OpenEx(inVec, gdal.OF_VECTOR )
         if layerName is not None:
             inLayer = inDataSource.GetLayer(layerName)
@@ -533,9 +547,8 @@ class RSGISPyUtils (object):
                                     False: move output onto grid will decrease size of bbox (i.e., bbox fully contained within intesection)
         
         return:: bbox (xMin, xMax, yMin, yMax)
+
         """
-        import math
-        
         xMinOverlap = baseExtent[0]
         xMaxOverlap = baseExtent[1]
         yMinOverlap = baseExtent[2]
@@ -582,9 +595,8 @@ class RSGISPyUtils (object):
                                     False: move output onto grid will decrease size of bbox (i.e., bbox fully contained within intesection)
         
         return:: bbox (xMin, xMax, yMin, yMax)
+
         """
-        import math
-        
         xMin = baseExtent[0]
         xMax = baseExtent[1]
         yMin = baseExtent[2]
@@ -618,9 +630,8 @@ class RSGISPyUtils (object):
                                     False: move output onto grid will decrease size of bbox (i.e., bbox fully contained within intesection)
         
         return:: bbox (xMin, xMax, yMin, yMax)
+
         """
-        import math
-        
         xMin = baseExtent[0]
         xMax = baseExtent[1]
         yMin = baseExtent[2]
@@ -655,6 +666,7 @@ class RSGISPyUtils (object):
         osgeo.osr.SpatialReference objects. 
         
         Returns x, y. (note if returning long, lat you might need to invert)
+
         """
         wktPt = 'POINT(%s %s)' % (x, y)
         point = ogr.CreateGeometryFromWkt(wktPt)
@@ -675,6 +687,7 @@ class RSGISPyUtils (object):
         * compute - whether the stats should be calculated (True; Default) or an approximation or pre-calculated stats are OK (False).
         
         return:: stats (min, max, mean, stddev)
+
         """
         img_ds = gdal.Open(img, gdal.GA_ReadOnly)
         if img_ds is None:
@@ -695,6 +708,7 @@ class RSGISPyUtils (object):
         """
         A function to retrieve the number of image bands in an image file.
         return nBands
+
         """
         rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
         if rasterDS == None:
@@ -708,6 +722,7 @@ class RSGISPyUtils (object):
         """
         A function to retrieve the no data value for the image 
         (from band; default 1).
+
         """
         rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
         if rasterDS == None:
@@ -721,6 +736,7 @@ class RSGISPyUtils (object):
         """
         A function to set the no data value for an image.
         If band is not specified sets value for all bands.
+
         """
         rasterDS = gdal.Open(inImg, gdal.GA_Update)
         if rasterDS is None:
@@ -801,6 +817,7 @@ class RSGISPyUtils (object):
         """
         A function which returns the WKT string representing the projection 
         of the input image.
+
         """
         rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
         if rasterDS == None:
@@ -813,6 +830,7 @@ class RSGISPyUtils (object):
         """
         A function which returns a list of the files associated (e.g., header etc.) 
         with the input image file.
+
         """
         imgDS = gdal.Open(inImg)
         fileList = imgDS.GetFileList()
@@ -823,6 +841,7 @@ class RSGISPyUtils (object):
         """
         A function which returns a string with the UTM (XXN | XXS) zone of the input image 
         but only if it is projected within the UTM projection/coordinate system.
+
         """
         rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
         if rasterDS == None:
@@ -852,6 +871,7 @@ class RSGISPyUtils (object):
     def getEPSGCode(self, gdalLayer):
         """
         Using GDAL to return the EPSG code for the input layer.
+
         """
         epsgCode = None
         try:
@@ -875,6 +895,7 @@ class RSGISPyUtils (object):
         projection/coordinate system. This is done using the GDAL SpatialReference
         function AutoIdentifyEPSG. If the identified EPSG codes are different then 
         False is returned otherwise True.
+
         """
         layer1EPSG = self.getEPSGCode(layer1)
         layer2EPSG = self.getEPSGCode(layer2)
@@ -892,8 +913,8 @@ class RSGISPyUtils (object):
         * inVec - is a string with the input vector file name and path.
         
         return:: WKT representation of projection
+
         """
-        from osgeo import gdal
         dataset = gdal.OpenEx(inVec, gdal.OF_VECTOR )
         layer = dataset.GetLayer()
         spatialRef = layer.GetSpatialRef()
@@ -902,8 +923,8 @@ class RSGISPyUtils (object):
     def getEPSGCodeFromWKT(self, wktString):
         """
         Using GDAL to return the EPSG code for inputted WKT string.
+
         """
-        from osgeo import osr
         epsgCode = None
         try:        
             spatRef = osr.SpatialReference()
@@ -919,8 +940,8 @@ class RSGISPyUtils (object):
         Using GDAL to return the WKT string for inputted EPSG Code.
         
         * epsgCode integer variable of the epsg code.
+
         """
-        from osgeo import osr
         wktString = None
         try:        
             spatRef = osr.SpatialReference()
@@ -933,6 +954,7 @@ class RSGISPyUtils (object):
     def uidGenerator(self, size=6):
         """
         A function which will generate a 'random' string of the specified length based on the UUID
+
         """
         import uuid
         randomStr = str(uuid.uuid4())
@@ -942,6 +964,7 @@ class RSGISPyUtils (object):
     def isNumber(self, strVal):
         """
         A function which tests whether the input string contains a number of not.
+
         """
         try:
             float(strVal) # for int, long and float
@@ -955,6 +978,7 @@ class RSGISPyUtils (object):
     def getEnvironmentVariable(self, var):
         """
         A function to get an environmental variable, if variable is not present returns None.
+
         """
         outVar = None
         try:
@@ -966,6 +990,7 @@ class RSGISPyUtils (object):
     def numProcessCores(self):
         """
         A functions which returns the number of processing cores available on the machine
+
         """
         import multiprocessing
         return multiprocessing.cpu_count()
@@ -974,6 +999,7 @@ class RSGISPyUtils (object):
         """
         Read a text file into a single string
         removing new lines.
+
         """
         txtStr = ""
         try:
@@ -989,6 +1015,7 @@ class RSGISPyUtils (object):
         """
         Read a text file into a list where each line 
         is an element in the list.
+
         """
         outList = []
         try:
@@ -1006,6 +1033,7 @@ class RSGISPyUtils (object):
     def writeList2File(self, dataList, outFile):
         """
         Write a list a text file, one line per item.
+
         """
         try:
             f = open(outFile, 'w')
@@ -1022,6 +1050,7 @@ class RSGISPyUtils (object):
         Search for a single file with a path using glob. Therefore, the file 
         path returned is a true path. Within the fileSearch provide the file
         name with '*' as wildcard(s).
+
         """
         import glob
         files = glob.glob(os.path.join(dirPath, fileSearch))
@@ -1035,12 +1064,12 @@ class RSGISPyUtils (object):
         A function which will produce a list of dictionaries with all the combinations 
         of the input variables listed (i.e., the powerset). 
         
-        in_vals_lsts - dictionary with each value having a list of values.
-        val_dict - variable used in iterative nature of function which lists
+        :param in_vals_lsts - dictionary with each value having a list of values.
+        :param val_dict - variable used in iterative nature of function which lists
                    the variable for which are still to be looped through. Would 
                    normally not be provided by the user as default is None. Be
                    careful if you set as otherwise.
-        returns: list of dictionaries with the same keys are the input but only a
+        :returns: list of dictionaries with the same keys are the input but only a
                  single value will be associate with key rather than a list.
                    
         Example::
@@ -1096,32 +1125,49 @@ class RSGISTime (object):
             t.end()
         
         Note, this is only designed to provide some general feedback, for benchmarking the timeit module
-        is better suited."""
+        is better suited.
+
+    """
 
     def __init__(self):
         self.startTime = time.time()
         self.endTime = time.time()
 
     def start(self, printStartTime=False):
-        """ Start timer, optionally printing start time"""
+        """
+        Start timer, optionally printing start time
+
+        :param printStartTime: A boolean specifiying whether the start time should be printed to console.
+
+        """
         self.startTime = time.time()
         if printStartTime:
             print(time.strftime('Start Time: %H:%M:%S, %a %b %m %Y.'))
 
-    def end(self,reportDiff = True, preceedStr="", postStr=""):
+    def end(self, reportDiff=True, preceedStr="", postStr=""):
         """ 
         End timer and optionally print difference.
         If preceedStr or postStr have a value then they will be used instead
         of the generic wording around the time. 
         
         preceedStr + time + postStr
+
+        :param reportDiff: A boolean specifiying whether time difference should be printed to console.
+        :param preceedStr: A string which is printed ahead of time difference
+        :param postStr: A string which is printed after the time difference
+
         """
         self.endTime = time.time()
         if reportDiff:
             self.calcDiff(preceedStr, postStr)
 
     def calcDiff(self, preceedStr="", postStr=""):
-        """ Calculate time difference, format and print. """
+        """
+        Calculate time difference, format and print.
+        :param preceedStr: A string which is printed ahead of time difference
+        :param postStr: A string which is printed after the time difference
+
+        """
         timeDiff = self.endTime - self.startTime
         
         useCustomMss = False

@@ -26,6 +26,7 @@ import rsgislib.imageutils
 # Import the RSGISLib RasterGIS module
 import rsgislib.rastergis 
 
+
 def rasterise2Image(inputVec, inputImage, outImage, gdalformat="KEA", burnVal=1, shpAtt=None, shpExt=False):
     """ 
 *** Deprecated *** A utillity to rasterise a shapefile into an image covering the same region and at the same resolution as the input image. 
@@ -50,7 +51,7 @@ Example::
     vectorutils.rasterise2Image(inputVector, inputImage, outputImage, 'KEA', shpAtt='FID')
 
 """
-    warnings.warn("Call to deprecated function {}, use rsgislib.vectorutils.rasteriseVecLyr.".format(func.__name__), category=DeprecationWarning, stacklevel=2)
+    warnings.warn("Call to deprecated function rsgislib.vectorutils.rasterise2Image, use rsgislib.vectorutils.rasteriseVecLyr.", category=DeprecationWarning, stacklevel=2)
     try:
         gdal.UseExceptions()
         
@@ -72,9 +73,16 @@ Example::
         
         print("Running Rasterise now...")
         outRasterDS = gdal.Open(outImage, gdal.GA_Update)
+        if outRasterDS is None:
+            raise Exception("Could not open '" + outImage + "'")
         
         inVectorDS = ogr.Open(tmpVector)
+        if inVectorDS is None:
+            raise Exception("Could not open '" + tmpVector + "'")
+
         inVectorLayer = inVectorDS.GetLayer(0)
+        if inVectorLayer is None:
+            raise Exception("Could not find layer in vector file.")
         
         # Run the algorithm.
         err = 0
@@ -614,6 +622,7 @@ A function which adds a polygons boundary bbox as attributes to each feature.
 * xmaxCol - column name.
 * yminCol - column name.
 * ymaxCol - column name.
+
 """
     dsVecFile = gdal.OpenEx(vecFile, gdal.OF_UPDATE )
     if dsVecFile is None:
@@ -768,7 +777,7 @@ A function to extract an image footprint as a vector.
         cmd = 'ogr2ogr -f "ESRI Shapefile" -t_srs ' + rePrjTo + ' ' + outVec + ' ' + outVecTmpFile
         print(cmd)
         try:
-            subprocess.call(cmd, shell=True)
+            subprocess.check_call(cmd, shell=True)
         except OSError as e:
             raise Exception('Could not re-projection shapefile: ' + cmd)
     
@@ -824,14 +833,14 @@ Where:
             if first:
                 cmd = 'ogr2ogr -f "ESRI Shapefile"  "' + outVecFile + '" "' + inFile + '"'
                 try:
-                    subprocess.call(cmd, shell=True)
+                    subprocess.check_call(cmd, shell=True)
                 except OSError as e:
                     raise Exception('Error running ogr2ogr: ' + cmd)
                 first = False
             else:
                 cmd = 'ogr2ogr -update -append -f "ESRI Shapefile" "' + outVecFile + '" "' + inFile + '"'
                 try:
-                    subprocess.call(cmd, shell=True)
+                    subprocess.check_call(cmd, shell=True)
                 except OSError as e:
                     raise Exception('Error running ogr2ogr: ' + cmd)
 
@@ -857,20 +866,20 @@ Where:
                 if not exists:
                     cmd = 'ogr2ogr -f "SQLite" -lco COMPRESS_GEOM=YES -lco SPATIAL_INDEX=YES -nln '+lyrName+' "' + outDBFile + '" "' + inFile + '"'
                     try:
-                        subprocess.call(cmd, shell=True)
+                        subprocess.check_call(cmd, shell=True)
                     except OSError as e:
                         raise Exception('Error running ogr2ogr: ' + cmd)
                 else:
                     cmd = 'ogr2ogr -update -f "SQLite" -lco COMPRESS_GEOM=YES -lco SPATIAL_INDEX=YES -nln '+lyrName+' "' + outDBFile + '" "' + inFile + '"'
                     try:
-                        subprocess.call(cmd, shell=True)
+                        subprocess.check_call(cmd, shell=True)
                     except OSError as e:
                         raise Exception('Error running ogr2ogr: ' + cmd)
                 first = False
             else:
                 cmd = 'ogr2ogr -update -append -f "SQLite" -nln '+lyrName+' "' + outDBFile + '" "' + inFile + '"'
                 try:
-                    subprocess.call(cmd, shell=True)
+                    subprocess.check_call(cmd, shell=True)
                 except OSError as e:
                     raise Exception('Error running ogr2ogr: ' + cmd)
 
@@ -896,20 +905,20 @@ Where:
                 if not exists:
                     cmd = 'ogr2ogr -f "GPKG" -lco SPATIAL_INDEX=YES -nln '+lyrName+' "' + outFile + '" "' + inFile + '"'
                     try:
-                        subprocess.call(cmd, shell=True)
+                        subprocess.check_call(cmd, shell=True)
                     except OSError as e:
                         raise Exception('Error running ogr2ogr: ' + cmd)
                 else:
                     cmd = 'ogr2ogr -update -f "GPKG" -lco SPATIAL_INDEX=YES -nln '+lyrName+' "' + outFile + '" "' + inFile + '"'
                     try:
-                        subprocess.call(cmd, shell=True)
+                        subprocess.check_call(cmd, shell=True)
                     except OSError as e:
                         raise Exception('Error running ogr2ogr: ' + cmd)
                 first = False
             else:
                 cmd = 'ogr2ogr -update -append -f "GPKG" -nln '+lyrName+' "' + outFile + '" "' + inFile + '"'
                 try:
-                    subprocess.call(cmd, shell=True)
+                    subprocess.check_call(cmd, shell=True)
                 except OSError as e:
                     raise Exception('Error running ogr2ogr: ' + cmd)
 
@@ -936,20 +945,20 @@ Where:
                 if not exists:
                     cmd = 'ogr2ogr -f "GPKG" -lco SPATIAL_INDEX=YES -nln '+lyrName+' "' + outFile + '" "' + inputFile + '" "' + lyr + '"'
                     try:
-                        subprocess.call(cmd, shell=True)
+                        subprocess.check_call(cmd, shell=True)
                     except OSError as e:
                         raise Exception('Error running ogr2ogr: ' + cmd)
                 else:
                     cmd = 'ogr2ogr -update -f "GPKG" -lco SPATIAL_INDEX=YES -nln '+lyrName+' "' + outFile + '" "' + inputFile + '" "' + lyr + '"'
                     try:
-                        subprocess.call(cmd, shell=True)
+                        subprocess.check_call(cmd, shell=True)
                     except OSError as e:
                         raise Exception('Error running ogr2ogr: ' + cmd)
                 first = False
             else:
                 cmd = 'ogr2ogr -update -append -f "GPKG" -nln '+lyrName+' "' + outFile + '" "' + inputFile + '" "' + lyr + '"'
                 try:
-                    subprocess.call(cmd, shell=True)
+                    subprocess.check_call(cmd, shell=True)
                 except OSError as e:
                     raise Exception('Error running ogr2ogr: ' + cmd)
 
@@ -974,7 +983,7 @@ Where:
             if nFeat > 0:
                 cmd = 'ogr2ogr -overwrite -f "SQLite" -lco COMPRESS_GEOM=YES -lco SPATIAL_INDEX=YES -nln {0} "{1}" "{2}" {0}'.format(lyr, outDBFile, inFile)
                 try:
-                    subprocess.call(cmd, shell=True)
+                    subprocess.check_call(cmd, shell=True)
                 except OSError as e:
                     raise Exception('Error running ogr2ogr: ' + cmd)
 
@@ -999,7 +1008,7 @@ Where:
             if nFeat > 0:
                 cmd = 'ogr2ogr -overwrite -f "GPKG" -lco SPATIAL_INDEX=YES -nln {0} "{1}" "{2}" {0}'.format(lyr, outFile, inFile)
                 try:
-                    subprocess.call(cmd, shell=True)
+                    subprocess.check_call(cmd, shell=True)
                 except OSError as e:
                     raise Exception('Error running ogr2ogr: ' + cmd)
 
@@ -1079,6 +1088,7 @@ A function which returns a list of available layers within the inputted vector f
 * vecFile - file name and path to input vector layer.
 
 returns: list of layer names (can be used with gdal.Dataset.GetLayerByName()).
+
 """
     gdalDataset = gdal.OpenEx(vecFile, gdal.OF_VECTOR )
     layerList = []
@@ -1103,6 +1113,7 @@ Get the extent of the vector layer.
                  even if that operation is computationally expensive.
 
 return: boundary box is returned (MinX, MaxX, MinY, MaxY)
+
 """
     gdal.UseExceptions()
     # Get a Layer's Extent
@@ -1144,6 +1155,7 @@ A function which splits the input vector layer into a number of output layers.
 * outdir - output directory for the created output files.
 * outvecbase - output layer name will be the same as the base file name.
 * outvecend - file ending (e.g., .shp).
+
 """
     gdal.UseExceptions()
     datasrc = gdal.OpenEx(vecFile, gdal.OF_VECTOR )
@@ -1362,6 +1374,7 @@ with the select layer.
 * selVecLyr - the layer name which will be intersected within the vector file.
 
 returns list of dictionaries with the output values.
+
 """
     gdal.UseExceptions()
     att_vals = []
@@ -1452,6 +1465,7 @@ with the select layer.
 * selVecLyrObj - the OGR layer object which will be intersected within the vector file.
 
 returns list of dictionaries with the output values.
+
 """
     gdal.UseExceptions()
     att_vals = []
@@ -1525,6 +1539,7 @@ with the select layer.
 * bbox - region of interest (bounding box). Define as [xMin, xMax, yMin, yMax].
 
 returns list of dictionaries with the output values.
+
 """
     gdal.UseExceptions()
     att_vals = []
@@ -1713,8 +1728,11 @@ When creating an attribute the available data types are ogr.OFTString, ogr.OFTIn
 * vecDriver - the output vector layer type.
 * espgCode - ESPG code specifying the projection of the data (e.g., 4326 is WSG84 Lat/Long).
 * bboxs - is a list of bounding boxes ([xMin, xMax, yMin, yMax]) to be saved to the output vector.
-* atts - is a dict of lists of attributes with the same length as the bboxs list. The dict should be named the same as the attTypes['names'] list.
-* attTypes - is a dict with a list of attribute names (attTypes['names']) and types (attTypes['types']). The list must be the same length as one another and the number of atts. Example type: ogr.OFTString
+* atts - is a dict of lists of attributes with the same length as the bboxs list. The dict should be named
+         the same as the attTypes['names'] list.
+* attTypes - is a dict with a list of attribute names (attTypes['names']) and types (attTypes['types']).
+             The list must be the same length as one another and the number of atts. Example type: ogr.OFTString
+
 """
     try:
         gdal.UseExceptions()
@@ -1804,6 +1822,7 @@ A function which creates a regular grid across a defined area.
 * bbox - the area for which cells will be defined (MinX, MaxX, MinY, MaxY).
 * vecDriver - the output vector layer type.
 * vecLyrName - output vector layer
+
 """    
     minX = float(bbox[0])
     maxX = float(bbox[1])
@@ -1859,8 +1878,11 @@ When creating an attribute the available data types are ogr.OFTString, ogr.OFTIn
 * espgCode - ESPG code specifying the projection of the data (e.g., 4326 is WSG84 Lat/Long).
 * ptsX - is a list of x coordinates.
 * ptsY - is a list of y coordinates.
-* atts - is a dict of lists of attributes with the same length as the bboxs list. The dict should be named the same as the attTypes['names'] list.
-* attTypes - is a dict with a list of attribute names (attTypes['names']) and types (attTypes['types']). The list must be the same length as one another and the number of atts. Example type: ogr.OFTString
+* atts - is a dict of lists of attributes with the same length as the bboxs list.
+         The dict should be named the same as the attTypes['names'] list.
+* attTypes - is a dict with a list of attribute names (attTypes['names']) and types (attTypes['types']).
+             The list must be the same length as one another and the number of atts. Example type: ogr.OFTString
+
 """
     try:
         if len(ptsX) != len(ptsY):
@@ -1941,7 +1963,8 @@ with a bounding box.
 * vectorFile - vector file/path
 * vectorLyr - vector layer name
 * bbox - the bounding box (xMin, xMax, yMin, yMax). Same projection as vector layer.
-    """
+
+"""
     dsVecFile = gdal.OpenEx(vectorFile, gdal.OF_READONLY )
     if dsVecFile is None:
         raise Exception("Could not open '" + vectorFile + "'")
@@ -2110,6 +2133,7 @@ A function which returns a list of columns from the input vector layer.
 
 * vecfile - input vector file.
 * veclyr - input vector layer
+
 """
     gdal.UseExceptions()
     atts = []
@@ -2135,6 +2159,7 @@ within the vector layer.
 
 * vecFile - vector file.
 * vecLyr - layer within the vector file.
+
 """
     dsVecFile = gdal.OpenEx(vecFile, gdal.OF_VECTOR )
     if dsVecFile is None:
@@ -2181,6 +2206,7 @@ layer is returned as an in memory ogr Layer object.
 * bbox - region of interest (bounding box). Define as [xMin, xMax, yMin, yMax].
 
 returns OGR Layer and Dataset objects.
+
 """
     gdal.UseExceptions()
     if lyrVecObj is None:
@@ -2251,6 +2277,7 @@ A function which reads a vector layer to an OGR in memory layer.
 * veclyrname - input vector layer within the input file.
 
 returns layer and datasets
+
 """
     gdal.UseExceptions()
     try:
@@ -2284,6 +2311,7 @@ layer is returned as an in memory ogr Layer object.
 * bbox - region of interest (bounding box). Define as [xMin, xMax, yMin, yMax].
 
 returns OGR Layer and Dataset objects.
+
 """
     gdal.UseExceptions()
     try:
@@ -2313,6 +2341,7 @@ A function which reads a vector layer to an OGR in memory layer.
 * vecDriver - the OGR driver for the output file.
 * options - provide a list of driver specific options; see https://www.gdal.org/ogr_formats.html
 * replace - if true the output file is replaced (i.e., overwritten to anything in an existing file will be lost).
+
 """
     gdal.UseExceptions()
     try:

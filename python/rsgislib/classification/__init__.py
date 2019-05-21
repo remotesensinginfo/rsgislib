@@ -23,6 +23,7 @@ Where:
 * classRefVecCol is an optional string specifiying an output column in the shapefile which can be used in the accuracy assessment for the reference data.
 * lineStep is a double specifying the step along the lines between the points
 * force is an optional boolean specifying whether the output shapefile should be deleted if is already exists (True and it will be deleted; Default is False)
+
     """
     vectorutils.createLinesOfPoints(inputLinesShp, outputPtsShp, lineStep, force)
     

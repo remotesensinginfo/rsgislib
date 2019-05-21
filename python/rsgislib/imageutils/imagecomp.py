@@ -61,6 +61,7 @@ the maximum NDVI.
 * gdalformat - is the output file format of the outCompImg, any GDAL compatable format is OK (Defaut is KEA).
 * dataType - is the data type of the output image (outCompImg). If None is provided then the data type of the first input image will be used (Default None). 
 * calcStats calculate image statics and pyramids (Default=True)
+
     """
     rsgisUtils = rsgislib.RSGISPyUtils()
     uidStr = rsgisUtils.uidGenerator()
@@ -165,6 +166,7 @@ LS8 images are submitted to match the images bands of LS7 (i.e., coastal band re
 * gdalformat - is the output file format of the outCompImg, any GDAL compatable format is OK (Defaut is KEA).
 * dataType - is the data type of the output image (outCompImg). If None is provided then the data type of the first input image will be used (Default None). 
 * calcStats calculate image statics and pyramids (Default=True)
+
     """
     rsgisUtils = rsgislib.RSGISPyUtils()
     uidStr = rsgisUtils.uidGenerator()
@@ -321,15 +323,16 @@ Landsat 8 images.
 * in_imgs - input list of image file paths.
 * outdir - output directory for the VRT images (note. an absolute path to the input
            image is used when building the VRT.
+
 """
     import subprocess
     out_imgs = []
     for img in in_imgs:
-        if 'LS8' in img:
+        if 'LS8' in os.path.basename(img):
             abs_img = os.path.abspath(img)
             vrt_img = os.path.join(outdir, os.path.splitext(os.path.basename(img))[0]+'_bsub.vrt')
             cmd = "gdalbuildvrt -b 2 -b 3 -b 4 -b 5 -b 6 -b 7 {0} {1}".format(vrt_img, abs_img)
-            subprocess.call(cmd, shell=True)
+            subprocess.check_call(cmd, shell=True)
             out_imgs.append(vrt_img)
         else:
             out_imgs.append(img)
@@ -355,6 +358,7 @@ used to define the spatial extent of the output images and spatial projection.
 * dataType - is the data type of the output image (outCompImg). If None is provided then the data type of the first input image will be used (Default None). 
 * calcStats - calculate image statics and pyramids (Default=True)
 * reprojmethod - specifies the interpolation method used to reproject the input images which are in a different projection and/or pixel size as the reference image (default: cubic).
+
     """
     rsgisUtils = rsgislib.RSGISPyUtils()
     uidStr = rsgisUtils.uidGenerator()
@@ -540,7 +544,7 @@ used to define the spatial extent of the output images and spatial projection.
         rsgislib.imageutils.createCopyImage(refImg, outCompImg, nBands, 0, gdalformat, dataType)
         rsgislib.imageutils.includeImagesIndImgIntersect(outImg, [inImages[0]])
     else:
-        raise rsgislib.RSGISPyException("There were no input images for " + inImgsPattern)
+        raise rsgislib.RSGISPyException("List of input images was empty ")
 
 
 

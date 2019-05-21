@@ -106,7 +106,8 @@ def getRATLength(clumps_img, rat_band=1):
 A function which returns the length (i.e., number of rows) within the RAT.
 
 * clumps_img - path to the image file with the RAT
-* rat_band - the band within the image file for which the RAT is to read. 
+* rat_band - the band within the image file for which the RAT is to read.
+
 """
     # Open input image file
     clumps_img_ds = gdal.Open(clumps_img, gdal.GA_ReadOnly)
@@ -132,7 +133,8 @@ def getRATColumns(clumps_img, rat_band=1):
 A function which returns a list of column names within the RAT.
 
 * clumps_img - path to the image file with the RAT
-* rat_band - the band within the image file for which the RAT is to read. 
+* rat_band - the band within the image file for which the RAT is to read.
+
 """
     # Open input image file
     clumps_img_ds = gdal.Open(clumps_img, gdal.GA_ReadOnly)
@@ -166,7 +168,8 @@ and end_row variables can be used to read a subset of the RAT.
 * clumps_img - path to the image file with the RAT
 * start_row - the row within the RAT to start reading, if None will start at 0 (Default: None).
 * end_row - the row within the RAT to end reading, if None will end at n_rows within the RAT. (Default: None)
-* rat_band - the band within the image file for which the RAT is to read. 
+* rat_band - the band within the image file for which the RAT is to read.
+
 """
     if not haveH5PY:
         raise Exception("Need the h5py library for this function")
@@ -176,7 +179,7 @@ and end_row variables can be used to read a subset of the RAT.
     if 'NumNeighbours' not in rat_columns:
         raise Exception("Clumps image RAT does not contain 'NumNeighbours' column - have you populated neightbours?")
     
-    n_rows = getRATLength('./444432_071117_flats_nztm_subset_clumps.kea')
+    n_rows = getRATLength(clumps_img)
     
     if start_row is None:
         start_row = 0

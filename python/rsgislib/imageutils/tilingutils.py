@@ -187,7 +187,8 @@ Where:
 * tilesNameBase is the base file name for the tile masks
 * tilesMaskDIR is the directory where the output images will be outputted
 * tmpdir is a string with a temporary directory for temp outputs to be stored (they will be deleted)
-    * If tmpdir doesn't exist it will be created and then deleted during the processing. 
+    * If tmpdir doesn't exist it will be created and then deleted during the processing.
+
 """
     
     tmpPresent = True
@@ -205,8 +206,9 @@ Where:
     idx = 1
     for shpFile in shpFiles:
         imgTileFile = os.path.join(tilesMaskDIR, tilesNameBase + str(idx) + '.kea')
-        #print(imgTileFile)
-        vectorutils.rasterise2Image(shpFile, inputImage, imgTileFile, imgFormat, shpAtt=None, shpExt=True)
+        shpFileLyr = os.path.splitext(os.path.basename(shpFile))[0]
+        vectorutils.rasteriseVecLyr(shpFile, shpFileLyr, inputImage, imgTileFile, gdalformat=imgFormat, burnVal=1,
+                        datatype=rsgislib.TYPE_8UINT, vecAtt=None, vecExt=False, thematic=True, nodata=0)
         drv.DeleteDataSource(shpFile)
         idx = idx + 1
     

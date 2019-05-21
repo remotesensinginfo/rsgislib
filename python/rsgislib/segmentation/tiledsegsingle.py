@@ -51,14 +51,17 @@ import shutil
 
 class RSGISTiledShepherdSegmentationSingleThread (object):
     """
-    A class for running the tiled version of the shepherd segmentation algorithm.
+    A class for running the tiled version of the Shepherd et al (2019) segmentation algorithm.
     This can process larger images than the single scene version with a smaller
     memory footprint.
+
+    Shepherd, J. D., Bunting, P., & Dymond, J. R. (2019). Operational Large-Scale Segmentation of Imagery Based on Iterative Elimination. Remote Sensing, 11(6), 658. http://doi.org/10.3390/rs11060658
     
     This version can only used a single thread for execution. 
     
     It is not intended that this class will be directly used. Please use the 
-    function performTiledSegmentation to call this functionality. 
+    function performTiledSegmentation to call this functionality.
+
     """
 
     def findSegStatsFiles(self, tileImg, segStatsInfo):

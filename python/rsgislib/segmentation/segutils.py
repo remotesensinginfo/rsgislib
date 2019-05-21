@@ -56,9 +56,12 @@ import osgeo.gdal as gdal
 # Import the python JSON module
 import json
 
+
 def runShepherdSegmentation(inputImg, outputClumps, outputMeanImg=None, tmpath='.', gdalformat='KEA', noStats=False, noStretch=False, noDelete=False, numClusters=60, minPxls=100, distThres=100, bands=None, sampling=100, kmMaxIter=200, processInMem=False, saveProcessStats=False, imgStretchStats="", kMeansCentres="", imgStatsJSONFile=""): 
     """
-Utility function to call the segmentation algorithm of Shepherd et al. (2014).
+Utility function to call the segmentation algorithm of Shepherd et al. (2019).
+
+Shepherd, J. D., Bunting, P., & Dymond, J. R. (2019). Operational Large-Scale Segmentation of Imagery Based on Iterative Elimination. Remote Sensing, 11(6), 658. http://doi.org/10.3390/rs11060658
 
 Where:
 
@@ -249,7 +252,9 @@ Example::
 
 def runShepherdSegmentationPreCalcdStats(inputImg, outputClumps, kMeansCentres, imgStretchStats, outputMeanImg=None, tmpath='.', gdalformat='KEA', noStats=False, noStretch=False, noDelete=False, minPxls=100, distThres=100, bands=None, processInMem=False): 
     """
-Utility function to call the segmentation algorithm of Shepherd et al. (2014) using pre-calculated stretch stats and KMeans cluster centres.
+Utility function to call the segmentation algorithm of Shepherd et al. (2019) using pre-calculated stretch stats and KMeans cluster centres.
+
+Shepherd, J. D., Bunting, P., & Dymond, J. R. (2019). Operational Large-Scale Segmentation of Imagery Based on Iterative Elimination. Remote Sensing, 11(6), 658. http://doi.org/10.3390/rs11060658
 
 Where:
 
@@ -397,7 +402,9 @@ Example::
 
 def runShepherdSegmentationTestNumClumps(inputImg, outputClumpsBase, outStatsFile, outputMeanImgBase=None, tmpath='.', gdalformat='KEA', noStats=False, noStretch=False, noDelete=False, numClustersStart=10, numClustersStep=10, numOfClustersSteps=10, minPxls=10, distThres=1000000, bands=None, sampling=100, kmMaxIter=200, processInMem=False, minNormV=None, maxNormV=None, minNormMI=None, maxNormMI=None): 
     """
-Utility function to call the segmentation algorithm of Shepherd et al. (2014) and to test are range of 'k' within the kMeans.
+Utility function to call the segmentation algorithm of Shepherd et al. (2019) and to test are range of 'k' within the kMeans.
+
+Shepherd, J. D., Bunting, P., & Dymond, J. R. (2019). Operational Large-Scale Segmentation of Imagery Based on Iterative Elimination. Remote Sensing, 11(6), 658. http://doi.org/10.3390/rs11060658
 
 Where:
 
@@ -557,10 +564,10 @@ Example::
         
     fileStats.close()
     print("Complete.\n")
-    
+
 def runShepherdSegmentationTestMinObjSize(inputImg, outputClumpsBase, outStatsFile, outputMeanImgBase=None, tmpath='.', gdalformat='KEA', noStats=False, noStretch=False, noDelete=False, numClusters=100, minPxlsStart=10, minPxlsStep=5, numOfMinPxlsSteps=20, distThres=1000000, bands=None, sampling=100, kmMaxIter=200, minNormV=None, maxNormV=None, minNormMI=None, maxNormMI=None): 
     """
-Utility function to call the segmentation algorithm of Shepherd et al. (2014) and to test are range of 'k' within the kMeans.
+Utility function to call the segmentation algorithm of Shepherd et al. (2019) and to test are range of 'k' within the kMeans.
 
 Where:
 
