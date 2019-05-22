@@ -340,7 +340,7 @@ class RSGISPyUtils (object):
 
     def getRSGISLibDataType(self, gdaltype):
         """
-        Convert from GDAL data name type string to RSGISLib data type int.
+        Convert from GDAL data type string to RSGISLib data type int.
 
         :return: int
 
@@ -368,6 +368,40 @@ class RSGISPyUtils (object):
             return TYPE_64FLOAT
         else:
             raise RSGISPyException("The data type '" + str(gdaltype) + "' is unknown / not supported.")
+
+    def getNumpyDataType(self, rsgislib_datatype):
+        """
+        Convert from RSGISLib data type to numpy datatype
+
+        :param rsgis_datatype:
+        :return:
+        """
+        import numpy
+        numpyDT = numpy.float32
+        if rsgislib_datatype == TYPE_8INT:
+            numpyDT = numpy.int8
+        elif rsgislib_datatype == TYPE_16INT:
+            numpyDT = numpy.int16
+        elif rsgislib_datatype == TYPE_32INT:
+            numpyDT = numpy.int32
+        elif rsgislib_datatype == TYPE_64INT:
+            numpyDT = numpy.int64
+        elif rsgislib_datatype == TYPE_8UINT:
+            numpyDT = numpy.uint8
+        elif rsgislib_datatype == TYPE_16UINT:
+            numpyDT = numpy.uint16
+        elif rsgislib_datatype == TYPE_32UINT:
+            numpyDT = numpy.uint32
+        elif rsgislib_datatype == TYPE_64UINT:
+            numpyDT = numpy.uint64
+        elif rsgislib_datatype == TYPE_32FLOAT:
+            numpyDT = numpy.float32
+        elif rsgislib_datatype == TYPE_64FLOAT:
+            numpyDT = numpy.float64
+        else:
+            raise Exception('Datatype was not recognised.')
+
+        return numpyDT
     
     def getImageRes(self, inImg):
         """

@@ -456,31 +456,10 @@ Where:
     bandRescaleDict = dict()
     for rescaleObj in bandRescale:
         bandRescaleDict[rescaleObj.band-1] = rescaleObj
-    
-    numpyDT = numpy.float32
-    if datatype == rsgislib.TYPE_8INT:
-        numpyDT = numpy.int8
-    elif datatype == rsgislib.TYPE_16INT:
-        numpyDT = numpy.int16
-    elif datatype == rsgislib.TYPE_32INT:
-        numpyDT = numpy.int32
-    elif datatype == rsgislib.TYPE_64INT:
-        numpyDT = numpy.int64
-    elif datatype == rsgislib.TYPE_8UINT:
-        numpyDT = numpy.uint8
-    elif datatype == rsgislib.TYPE_16UINT:
-        numpyDT = numpy.uint16
-    elif datatype == rsgislib.TYPE_32UINT:
-        numpyDT = numpy.uint32
-    elif datatype == rsgislib.TYPE_64UINT:
-        numpyDT = numpy.uint64
-    elif datatype == rsgislib.TYPE_32FLOAT:
-        numpyDT = numpy.float32
-    elif datatype == rsgislib.TYPE_64FLOAT:
-        numpyDT = numpy.float64
-    else:
-        raise Exception('Datatype was not recognised.')
-    
+
+    rsgis_utils = rsgislib.RSGISPyUtils()
+    numpyDT = rsgis_utils.getNumpyDataType(datatype)
+
     infiles = applier.FilenameAssociations()
     infiles.image = inputImg
     outfiles = applier.FilenameAssociations()
@@ -713,6 +692,47 @@ Boardman J.W., Kruse F.A, and Green R.O., "Mapping Target Signatures via
     if calcstats:
         print("Calculate Image stats and pyramids.")
         rsgislib.imageutils.popImageStats(outputimg, usenodataval=True, nodataval=0, calcpyramids=True)
-        
-        
+
+
+def calcImgsPxlMode(inputImgs, outputImg, gdalformat, no_data_val=0):
+    """
+Function which calculates the mode of a group of images.
+
+Where:
+
+* inputImgs - the list of images
+* outputImg - the output image file name and path (will be same dimensions as the input)
+* gdalformat - the GDAL image file format of the output image file.
+
+"""
+    import scipy.stats
+    rsgis_utils = rsgislib.RSGISPyUtils()
+
+    datatype = rsgis_utils.getRSGISLibDataTypeFromImg(inputImgs[0])
+    numpyDT = rsgis_utils.getNumpyDataType(datatype)
+
+    infiles = applier.FilenameAssociations()
+    infiles.images = inputImgs
+    outfiles = applier.FilenameAssociations()
+    outfiles.outimage = outputImg
+    otherargs = applier.OtherInputs()
+    otherargs.no_data_val = no_data_val
+    otherargs.numpyDT = numpyDT
+    aControls = applier.ApplierControls()
+    aControls.progress = cuiprogress.CUIProgressBar()
+    aControls.drivername = gdalformat
+    aControls.omitPyramids = True
+    aControls.calcStats = False
+
+    def _applyCalcMode(info, inputs, outputs, otherargs):
+        """
+        This is an internal rios function
+        """
+        image_data = numpy.concatenate(inputs.images, axis=0).astype(numpy.float32)
+        image_data[image_data == otherargs.no_data_val] = numpy.nan
+        mode_arr, count_arr = scipy.stats.mode(image_data, axis=0, nan_policy='omit')
+        outputs.outimage = mode_arr.astype(otherargs.numpyDT)
+
+    applier.apply(_applyCalcMode, infiles, outfiles, otherargs, controls=aControls)
+
 

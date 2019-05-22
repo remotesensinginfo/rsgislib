@@ -651,6 +651,7 @@ namespace rsgis{ namespace cmds {
             mathSummaryStats->calcStdDev = summaryStats.calcStdDev;
             mathSummaryStats->calcSum = summaryStats.calcSum;
             mathSummaryStats->calcMedian = summaryStats.calcMedian;
+            mathSummaryStats->calcMode = summaryStats.calcMode;
 
             unsigned int numOutBands = 0;
             if(mathSummaryStats->calcMin)
@@ -666,6 +667,10 @@ namespace rsgis{ namespace cmds {
                 ++numOutBands;
             }
             if(mathSummaryStats->calcMedian)
+            {
+                ++numOutBands;
+            }
+            if(mathSummaryStats->calcMode)
             {
                 ++numOutBands;
             }
@@ -700,6 +705,10 @@ namespace rsgis{ namespace cmds {
             if(mathSummaryStats->calcMedian)
             {
                 bandNames[nameIdx++] = "Median";
+            }
+            if(mathSummaryStats->calcMode)
+            {
+                bandNames[nameIdx++] = "Mode";
             }
             if(mathSummaryStats->calcSum)
             {
@@ -1658,7 +1667,7 @@ namespace rsgis{ namespace cmds {
             char **wktString = new char*[1];    // TODO: check deletion
             inputSpatialRef->exportToWkt(wktString);
             std::string projection = std::string(wktString[0]);
-            OGRFree(wktString);
+            CPLFree(wktString);
             OGREnvelope ogrExtent;
             inputSHPLayer->GetExtent(&ogrExtent);
             geos::geom::Envelope extent = geos::geom::Envelope(ogrExtent.MinX, ogrExtent.MaxX, ogrExtent.MinY, ogrExtent.MaxY);

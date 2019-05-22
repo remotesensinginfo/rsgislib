@@ -49,12 +49,14 @@ namespace rsgis{ namespace cmds {
         bool calcSum;
         bool calcStdDev;
         bool calcMedian;
+        bool calcMode;
         double min;
         double max;
         double mean;
         double sum;
         double stdDev;
         double median;
+        double mode;
     };
     
 }}

@@ -808,6 +808,8 @@ return: nfeats
         inLayer = inDataSource.GetLayer(layerName)
     else:
         inLayer = inDataSource.GetLayer()
+    if inLayer is None:
+        raise Exception("Check layer name as did not open layer.")
     nFeats = inLayer.GetFeatureCount(computeCount)
     return nFeats
 
