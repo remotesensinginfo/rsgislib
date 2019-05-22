@@ -75,7 +75,7 @@ namespace rsgis{namespace vec{
 		OGRSpatialReference *ogrSpatialRef = layer->GetSpatialRef();
 		ogrSpatialRef->exportToWkt(spatRefWKT);
 		imageDS->SetProjection(spatRefWKT[0]);
-		OGRFree(spatRefWKT);
+		CPLFree(spatRefWKT);
 		
 		GDALRasterBand *imageBand = imageDS->GetRasterBand(1);
 		float *data = (float *) CPLMalloc(sizeof(float)*imageWidth);
@@ -125,7 +125,7 @@ namespace rsgis{namespace vec{
 		char **spatRefWKT = new char*[1];
 		spatialRef->exportToWkt(spatRefWKT);
 		imageDS->SetProjection(spatRefWKT[0]);
-		OGRFree(spatRefWKT);
+		CPLFree(spatRefWKT);
 		
 		GDALRasterBand *imageBand = imageDS->GetRasterBand(1);
 		float *data = (float *) CPLMalloc(sizeof(float)*imageWidth);

@@ -542,7 +542,7 @@ used to define the spatial extent of the output images and spatial projection.
         if dataType is None:
             dataType = rsgisUtils.getRSGISLibDataTypeFromImg(inImages[0])
         rsgislib.imageutils.createCopyImage(refImg, outCompImg, nBands, 0, gdalformat, dataType)
-        rsgislib.imageutils.includeImagesIndImgIntersect(outImg, [inImages[0]])
+        rsgislib.imageutils.includeImagesIndImgIntersect(outCompImg, [inImages[0]])
     else:
         raise rsgislib.RSGISPyException("List of input images was empty ")
 

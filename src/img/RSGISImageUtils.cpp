@@ -4335,9 +4335,9 @@ namespace rsgis{namespace img{
 			ogrSpatial.exportToProj4(proj4spatialref);
 			std::cout << "As Proj4: \'" << proj4spatialref[0] << "\'" << std::endl;
 			
-			OGRFree(wktspatialref);
-			OGRFree(wktInSpatialRef);
-			OGRFree(proj4spatialref);
+			CPLFree(wktspatialref);
+			CPLFree(wktInSpatialRef);
+			CPLFree(proj4spatialref);
 			
 			data = (float *) CPLMalloc(sizeof(float)*width);
 			std::cout << "Image size [" << width << "," << height << "]\n";

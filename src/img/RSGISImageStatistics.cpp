@@ -1149,6 +1149,10 @@ namespace rsgis{namespace img{
         {
             output[outIdx++] = statsSummary->median;
         }
+        if(statsSummary->calcMode)
+        {
+            output[outIdx++] = statsSummary->mode;
+        }
         if(statsSummary->calcSum)
         {
             output[outIdx++] = statsSummary->sum;

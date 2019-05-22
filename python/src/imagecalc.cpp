@@ -348,11 +348,25 @@ static PyObject *ImageCalc_ImagePixelColumnSummary(PyObject *self, PyObject *arg
         Py_DECREF(pCalcMin);
         return NULL;
     }
+    
+    PyObject *pCalcMode = PyObject_GetAttrString(summaryStats, "calcMode");
+    if( ( pCalcMode == NULL ) || ( pCalcMode == Py_None ) || !RSGISPY_CHECK_INT(pCalcMode) ) {
+        PyErr_SetString(GETSTATE(self)->error, "could not find bool attribute \'calcMode\'" );
+        Py_XDECREF(pCalcMode);
+        Py_DECREF(pCalcMedian);
+        Py_DECREF(pCalcStdDev);
+        Py_DECREF(pCalcSum);
+        Py_DECREF(pCalcMean);
+        Py_DECREF(pCalcMax);
+        Py_DECREF(pCalcMin);
+        return NULL;
+    }
 
     PyObject *pMin = PyObject_GetAttrString(summaryStats, "min");
     if( ( pMin == NULL ) || ( pMin == Py_None ) || !RSGISPY_CHECK_FLOAT(pMin) ) {
         PyErr_SetString(GETSTATE(self)->error, "could not find float attribute \'min\'" );
         Py_XDECREF(pMin);
+        Py_DECREF(pCalcMode);
         Py_DECREF(pCalcMedian);
         Py_DECREF(pCalcStdDev);
         Py_DECREF(pCalcSum);
@@ -367,6 +381,7 @@ static PyObject *ImageCalc_ImagePixelColumnSummary(PyObject *self, PyObject *arg
         PyErr_SetString(GETSTATE(self)->error, "could not find float attribute \'max\'" );
         Py_XDECREF(pMax);
         Py_DECREF(pMin);
+        Py_DECREF(pCalcMode);
         Py_DECREF(pCalcMedian);
         Py_DECREF(pCalcStdDev);
         Py_DECREF(pCalcSum);
@@ -382,6 +397,7 @@ static PyObject *ImageCalc_ImagePixelColumnSummary(PyObject *self, PyObject *arg
         Py_XDECREF(pMean);
         Py_DECREF(pMax);
         Py_DECREF(pMin);
+        Py_DECREF(pCalcMode);
         Py_DECREF(pCalcMedian);
         Py_DECREF(pCalcStdDev);
         Py_DECREF(pCalcSum);
@@ -398,6 +414,7 @@ static PyObject *ImageCalc_ImagePixelColumnSummary(PyObject *self, PyObject *arg
         Py_DECREF(pMean);
         Py_DECREF(pMax);
         Py_DECREF(pMin);
+        Py_DECREF(pCalcMode);
         Py_DECREF(pCalcMedian);
         Py_DECREF(pCalcStdDev);
         Py_DECREF(pCalcSum);
@@ -415,6 +432,7 @@ static PyObject *ImageCalc_ImagePixelColumnSummary(PyObject *self, PyObject *arg
         Py_DECREF(pMean);
         Py_DECREF(pMax);
         Py_DECREF(pMin);
+        Py_DECREF(pCalcMode);
         Py_DECREF(pCalcMedian);
         Py_DECREF(pCalcStdDev);
         Py_DECREF(pCalcSum);
@@ -426,13 +444,34 @@ static PyObject *ImageCalc_ImagePixelColumnSummary(PyObject *self, PyObject *arg
 
     PyObject *pMedian = PyObject_GetAttrString(summaryStats, "median");
     if( ( pMedian == NULL ) || ( pMedian == Py_None ) || !RSGISPY_CHECK_FLOAT(pMedian) ) {
-        PyErr_SetString(GETSTATE(self)->error, "could not find float attribute \'median\'" );
+        PyErr_SetString(GETSTATE(self)->error, "could not find float attribute \'median\'" );
         Py_XDECREF(pMedian);
         Py_DECREF(pStdDev);
         Py_DECREF(pSum);
         Py_DECREF(pMean);
         Py_DECREF(pMax);
         Py_DECREF(pMin);
+        Py_DECREF(pCalcMode);
+        Py_DECREF(pCalcMedian);
+        Py_DECREF(pCalcStdDev);
+        Py_DECREF(pCalcSum);
+        Py_DECREF(pCalcMean);
+        Py_DECREF(pCalcMax);
+        Py_DECREF(pCalcMin);
+        return NULL;
+    }
+    
+    PyObject *pMode = PyObject_GetAttrString(summaryStats, "mode");
+    if( ( pMode == NULL ) || ( pMode == Py_None ) || !RSGISPY_CHECK_FLOAT(pMode) ) {
+        PyErr_SetString(GETSTATE(self)->error, "could not find float attribute \'modes\'" );
+        Py_XDECREF(pMode);
+        Py_DECREF(pMedian);
+        Py_DECREF(pStdDev);
+        Py_DECREF(pSum);
+        Py_DECREF(pMean);
+        Py_DECREF(pMax);
+        Py_DECREF(pMin);
+        Py_DECREF(pCalcMode);
         Py_DECREF(pCalcMedian);
         Py_DECREF(pCalcStdDev);
         Py_DECREF(pCalcSum);
@@ -450,6 +489,7 @@ static PyObject *ImageCalc_ImagePixelColumnSummary(PyObject *self, PyObject *arg
     summary.calcSum = RSGISPY_INT_EXTRACT(pCalcSum);
     summary.calcStdDev = RSGISPY_INT_EXTRACT(pCalcStdDev);
     summary.calcMedian = RSGISPY_INT_EXTRACT(pCalcMedian);
+    summary.calcMode = RSGISPY_INT_EXTRACT(pCalcMode);
 
     summary.min = RSGISPY_FLOAT_EXTRACT(pMin);
     summary.max = RSGISPY_FLOAT_EXTRACT(pMax);
@@ -457,6 +497,7 @@ static PyObject *ImageCalc_ImagePixelColumnSummary(PyObject *self, PyObject *arg
     summary.sum = RSGISPY_FLOAT_EXTRACT(pSum);
     summary.stdDev = RSGISPY_FLOAT_EXTRACT(pStdDev);
     summary.median = RSGISPY_FLOAT_EXTRACT(pMedian);
+    summary.median = RSGISPY_FLOAT_EXTRACT(pMode);
     
     Py_DECREF(pCalcMin);
     Py_DECREF(pCalcMax);
@@ -464,12 +505,14 @@ static PyObject *ImageCalc_ImagePixelColumnSummary(PyObject *self, PyObject *arg
     Py_DECREF(pCalcSum);
     Py_DECREF(pCalcStdDev);
     Py_DECREF(pCalcMedian);
+    Py_DECREF(pCalcMode);
     Py_DECREF(pMin);
     Py_DECREF(pMax);
     Py_DECREF(pMean);
     Py_DECREF(pSum);
     Py_DECREF(pStdDev);
     Py_DECREF(pMedian);
+    Py_DECREF(pMode);
 
     rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)datatype;
 
@@ -2229,12 +2272,14 @@ static PyMethodDef ImageCalcMethods[] = {
 "   *  calcMean: boolean defining if the mean value should be calculated\n"
 "   *  calcStdDev: boolean defining if the standard deviation should be calculated\n"
 "   *  calcMedian: boolean defining if the median value should be calculated\n"
+"   *  calcMode: boolean defining if the mode value should be calculated; warning can be slow.\n"
 "   *  min: float defining the min value to use\n"
 "   *  max: float defining the max value to use\n"
 "   *  mean: float defining the mean value to use\n"
 "   *  sum: float defining the sum value to use\n"
 "   *  stdDev: float defining the standard deviation value to use\n"
 "   *  median: float defining the median value to use\n"
+"   *  mode: float defining the mode value to use\n"
 "* gdalFormat is a string containing the GDAL format for the output file - eg 'KEA'\n"
 "* gdalDataType is an int containing one of the values from rsgislib.TYPE_*\n"
 "* noDataValue is a float specifying what value is used to signify no data\n"

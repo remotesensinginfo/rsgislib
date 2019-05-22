@@ -402,7 +402,7 @@ namespace rsgis{ namespace cmds {
                 {
                     std::cerr << "WARNING: Shapefile and image are not the same projection!\n\tImage is: " + std::string(pszWKTImg) + "\n\tShapefile is: " + std::string(pszWKTShp[0]) << "\n...Continuing anyway" << std::endl;
                 }
-                OGRFree(pszWKTShp);
+                CPLFree(pszWKTShp);
             }
 
             if(!outputToText)
@@ -563,7 +563,7 @@ namespace rsgis{ namespace cmds {
                 {
                     std::cerr << "WARNING: Shapefile and image are not the same projection!\n\tImage is: " + std::string(pszWKTImg) + "\n\tShapefile is: " + std::string(pszWKTShp[0]) << "\n...Continuing anyway" << std::endl;
                 }
-                OGRFree(pszWKTShp);
+                CPLFree(pszWKTShp);
             }
 
             processFeature = new rsgis::vec::RSGISPixelVals22Txt(inputImageDS, outputTextBase, polyAttribute, rOutTextForm, pixelInPolyMethod);
