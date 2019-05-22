@@ -167,7 +167,7 @@ def getRSGISLibVersion():
     # Try calling rsgis-config to get minor version number
     try:
         import subprocess
-        out = subprocess.Popen('rsgis-config --version',shell=True,stdin=subprocess.PIPE, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+        out = subprocess.Popen('rsgis-config --version',shell=True,stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (stdout, stderr) = out.communicate()
         versionStr = stdout.decode()
         versionStr = versionStr.split('\n')[0]
@@ -206,6 +206,8 @@ class RSGISPyUtils (object):
         A function to get the extension for a given file format 
         (NOTE, currently only KEA, GTIFF, HFA, PCI and ENVI are supported).
 
+        :return: string
+
         """
         ext = ".NA"
         if gdalformat.lower() == "kea":
@@ -225,6 +227,9 @@ class RSGISPyUtils (object):
     def getGDALFormatFromExt(self, fileName):
         """
         Get GDAL format, based on filename
+
+        :return: string
+
         """
         gdalStr = ''
         extension = os.path.splitext(fileName)[-1] 
@@ -248,6 +253,8 @@ class RSGISPyUtils (object):
         Returns the rsgislib datatype ENUM (e.g., rsgislib.TYPE_8INT) 
         for the inputted raster file
 
+        :return: int
+
         """
         raster = gdal.Open(inImg, gdal.GA_ReadOnly)
         if raster == None:
@@ -263,6 +270,8 @@ class RSGISPyUtils (object):
         """
         Returns the GDAL datatype ENUM (e.g., GDT_Float32) for the inputted raster file.
 
+        :return: ints
+
         """
         raster = gdal.Open(inImg, gdal.GA_ReadOnly)
         if raster == None:
@@ -277,6 +286,8 @@ class RSGISPyUtils (object):
     def getGDALDataTypeNameFromImg(self, inImg):
         """
         Returns the GDAL datatype ENUM (e.g., GDT_Float32) for the inputted raster file.
+
+        :return: int
 
         """
         raster = gdal.Open(inImg, gdal.GA_ReadOnly)
@@ -331,6 +342,8 @@ class RSGISPyUtils (object):
         """
         Convert from GDAL data name type string to RSGISLib data type int.
 
+        :return: int
+
         """
         gdaltype = gdaltype.lower()
         if gdaltype == 'int8':
@@ -359,7 +372,8 @@ class RSGISPyUtils (object):
     def getImageRes(self, inImg):
         """
         A function to retrieve the image resolution.
-        return xRes, yRes
+
+        :return: xRes, yRes
 
         """
         rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
@@ -379,6 +393,8 @@ class RSGISPyUtils (object):
         A function to test whether two images have the same
         image pixel resolution.
 
+        :return: boolean
+
         """
         img1XRes, img1YRes = self.getImageRes(img1)
         img2XRes, img2YRes = self.getImageRes(img2)
@@ -388,7 +404,8 @@ class RSGISPyUtils (object):
     def getImageSize(self, inImg):
         """
         A function to retrieve the image size in pixels.
-        return xSize, ySize
+
+        :return: xSize, ySize
 
         """
         rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
@@ -404,7 +421,8 @@ class RSGISPyUtils (object):
         """
         A function to retrieve the bounding box in the spatial 
         coordinates of the image.
-        return (MinX, MaxX, MinY, MaxY)
+
+        :return: (MinX, MaxX, MinY, MaxY)
 
         """
         rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
@@ -432,7 +450,8 @@ class RSGISPyUtils (object):
         """
         A function to retrieve the bounding box in the spatial 
         coordinates of the image.
-        return (MinX, MaxX, MinY, MaxY)
+
+        :return: (MinX, MaxX, MinY, MaxY)
 
         """
         inProjWKT = self.getWKTProjFromImage(inImg)
@@ -476,19 +495,42 @@ class RSGISPyUtils (object):
         A function to reproject a bounding box.
         * bbox - input bounding box (MinX, MaxX, MinY, MaxY)
         * inProjObj - an osr.SpatialReference() object representing input projection.
-        * outProjObj - an osr.SpatialReference() object representing output projection. 
-        return (MinX, MaxX, MinY, MaxY)
+        * outProjObj - an osr.SpatialReference() object representing output projection.
+
+        :return: (MinX, MaxX, MinY, MaxY)
 
         """
         tlX = bbox[0]
         tlY = bbox[3]
+        trX = bbox[1]
+        trY = bbox[3]
         brX = bbox[1]
         brY = bbox[2]
-        
-        out_tlX, out_tlY = reprojPoint(inProjObj, outProjObj, tlX, tlY)
-        out_brX, out_brY = reprojPoint(inProjObj, outProjObj, brX, brY)
-        
-        return [out_tlX, out_brX, out_brY, out_tlY]
+        blX = bbox[0]
+        blY = bbox[2]
+
+        out_tlX, out_tlY = self.reprojPoint(inProjObj, outProjObj, tlX, tlY)
+        out_trX, out_trY = self.reprojPoint(inProjObj, outProjObj, trX, trY)
+        out_brX, out_brY = self.reprojPoint(inProjObj, outProjObj, brX, brY)
+        out_blX, out_blY = self.reprojPoint(inProjObj, outProjObj, blX, blY)
+
+        minX = out_tlX
+        if out_blX < minX:
+            minX = out_blX
+
+        maxX = out_brX
+        if out_trX > maxX:
+            maxX = out_trX
+
+        minY = out_brY
+        if out_blY < minY:
+            minY = out_blY
+
+        maxY = out_tlY
+        if out_trY > maxY:
+            maxY = out_trY
+
+        return [minX, maxX, minY, maxY]
         
     def getVecLayerExtent(self, inVec, layerName=None, computeIfExp=True):
         """
@@ -501,7 +543,7 @@ class RSGISPyUtils (object):
                          should be calculated (rather than estimated from header)
                          even if that operation is computationally expensive.
         
-        return:: boundary box is returned (MinX, MaxX, MinY, MaxY)
+        :return: boundary box is returned (MinX, MaxX, MinY, MaxY)
         
         """
         inDataSource = gdal.OpenEx(inVec, gdal.OF_VECTOR )
@@ -523,7 +565,7 @@ class RSGISPyUtils (object):
                          should be calculated (rather than estimated from header)
                          even if that operation is computationally expensive.
         
-        return:: nfeats
+        :return: nfeats
         
         """
         inDataSource = gdal.OpenEx(inVec, gdal.OF_VECTOR )
@@ -546,7 +588,7 @@ class RSGISPyUtils (object):
         * fullContain is a boolean. True: moving output onto grid will increase size of bbox (i.e., intersection fully contained)
                                     False: move output onto grid will decrease size of bbox (i.e., bbox fully contained within intesection)
         
-        return:: bbox (xMin, xMax, yMin, yMax)
+        :return: bbox (xMin, xMax, yMin, yMax)
 
         """
         xMinOverlap = baseExtent[0]
@@ -594,7 +636,7 @@ class RSGISPyUtils (object):
         * fullContain is a boolean. True: moving output onto grid will increase size of bbox (i.e., intersection fully contained)
                                     False: move output onto grid will decrease size of bbox (i.e., bbox fully contained within intesection)
         
-        return:: bbox (xMin, xMax, yMin, yMax)
+        :return: bbox (xMin, xMax, yMin, yMax)
 
         """
         xMin = baseExtent[0]
@@ -618,54 +660,123 @@ class RSGISPyUtils (object):
         yMinOut = yMax - (nPxlY * baseGrid)
     
         return [xMin, xMaxOut, yMinOut, yMax]
-        
-    def findExtentOnWholeNumGrid(self, baseExtent, baseGrid, fullContain=True):
+
+    def findExtentOnWholeNumGrid(self, baseExtent, baseGrid, fullContain=True, round_vals=None):
         """
-        A function which calculates the extent but defined on a grid with defined resolution. 
+        A function which calculates the extent but defined on a grid with defined resolution.
         Useful for finding extent on a particular image grid.
-        
+
         * baseExtent is a bbox (xMin, xMax, yMin, yMax) providing the base for the grid on which output will be defined.
         * baseGrid the size of the (square) grid on which output will be defined.
         * fullContain is a boolean. True: moving output onto grid will increase size of bbox (i.e., intersection fully contained)
                                     False: move output onto grid will decrease size of bbox (i.e., bbox fully contained within intesection)
-        
-        return:: bbox (xMin, xMax, yMin, yMax)
+        * round_vals specify whether outputted values should be rounded. None for no rounding (default) or integer for number of
+                     significant figures to round to.
+
+        :return: bbox (xMin, xMax, yMin, yMax)
 
         """
         xMin = baseExtent[0]
         xMax = baseExtent[1]
         yMin = baseExtent[2]
         yMax = baseExtent[3]
-        
-        nPxlXMin = math.floor(xMin/baseGrid)
-        nPxlYMin = math.floor(yMin/baseGrid)
-        
+
+        nPxlXMin = math.floor(xMin / baseGrid)
+        nPxlYMin = math.floor(yMin / baseGrid)
+
         xMinOut = nPxlXMin * baseGrid
         yMinOut = nPxlYMin * baseGrid
-        
+
         diffX = xMax - xMinOut
         diffY = abs(yMax - yMinOut)
-        
+
         nPxlX = 0.0
         nPxlY = 0.0
         if fullContain:
-            nPxlX = math.ceil(diffX/baseGrid)
-            nPxlY = math.ceil(diffY/baseGrid)
+            nPxlX = math.ceil(diffX / baseGrid)
+            nPxlY = math.ceil(diffY / baseGrid)
         else:
-            nPxlX = math.floor(diffX/baseGrid)
-            nPxlY = math.floor(diffY/baseGrid)
-        
+            nPxlX = math.floor(diffX / baseGrid)
+            nPxlY = math.floor(diffY / baseGrid)
+
         xMaxOut = xMinOut + (nPxlX * baseGrid)
         yMaxOut = yMinOut + (nPxlY * baseGrid)
-    
-        return [xMinOut, xMaxOut, yMinOut, yMaxOut]
+
+        if round_vals is None:
+            out_bbox = [xMinOut, xMaxOut, yMinOut, yMaxOut]
+        else:
+            out_bbox = [round(xMinOut, round_vals), round(xMaxOut, round_vals), round(yMinOut, round_vals),
+                        round(yMaxOut, round_vals)]
+        return out_bbox
+
+    def getBBoxGrid(self, bbox, x_size, y_size):
+        """
+        Create a grid with size x_size, y_size for the area represented by bbox.
+
+        * bbox - a bounding box within which the grid will be created (xMin, xMax, yMin, yMax)
+        * x_size - Output grid size in X axis (same unit as bbox).
+        * y_size - Output grid size in Y axis (same unit as bbox).
+
+        :return: list of bounding boxes (xMin, xMax, yMin, yMax)
+
+        """
+        width = bbox[1] - bbox[0]
+        height = bbox[3] - bbox[2]
+
+        n_tiles_x = math.floor(width / x_size)
+        n_tiles_y = math.floor(height / y_size)
+
+        if (n_tiles_x > 10000) or (n_tiles_y > 10000):
+            print("WARNING: did you mean to product so many tiles (X: {}, Y: {}) "
+                  "might want to check your units".format(n_tiles_x, n_tiles_y))
+
+        full_tile_width = n_tiles_x * x_size
+        full_tile_height = n_tiles_y * y_size
+
+        x_remain = width - full_tile_width
+        if x_remain < 0.000001:
+            x_remain = 0.0
+        y_remain = height - full_tile_height
+        if y_remain < 0.000001:
+            y_remain = 0.0
+
+        c_min_y = bbox[2]
+        c_max_y = c_min_y + y_size
+
+        bboxs = list()
+        for ny in range(n_tiles_y):
+            c_min_x = bbox[0]
+            c_max_x = c_min_x + x_size
+            for nx in range(n_tiles_x):
+                bboxs.append([c_min_x, c_max_x, c_min_y, c_max_y])
+                c_min_x = c_max_x
+                c_max_x = c_max_x + x_size
+            if x_remain > 0:
+                c_max_x = c_min_x + x_remain
+                bboxs.append([c_min_x, c_max_x, c_min_y, c_max_y])
+            c_min_y = c_max_y
+            c_max_y = c_max_y + y_size
+        if y_remain > 0:
+            c_max_y = c_min_y + y_remain
+            c_min_x = bbox[0]
+            c_max_x = c_min_x + x_size
+            for nx in range(n_tiles_x):
+                bboxs.append([c_min_x, c_max_x, c_min_y, c_max_y])
+                c_min_x = c_max_x
+                c_max_x = c_max_x + x_size
+            if x_remain > 0:
+                c_max_x = c_min_x + x_remain
+                bboxs.append([c_min_x, c_max_x, c_min_y, c_max_y])
+
+        return bboxs
+
     
     def reprojPoint(self, inProjOSRObj, outProjOSRObj, x, y):
         """
         Reproject a point from 'inProjOSRObj' to 'outProjOSRObj' where they are gdal
         osgeo.osr.SpatialReference objects. 
         
-        Returns x, y. (note if returning long, lat you might need to invert)
+        :return: x, y. (note if returning long, lat you might need to invert)
 
         """
         wktPt = 'POINT(%s %s)' % (x, y)
@@ -686,7 +797,7 @@ class RSGISPyUtils (object):
         * band - specified image band for which stats are to be calculated (starts at 1). 
         * compute - whether the stats should be calculated (True; Default) or an approximation or pre-calculated stats are OK (False).
         
-        return:: stats (min, max, mean, stddev)
+        :return: stats (min, max, mean, stddev)
 
         """
         img_ds = gdal.Open(img, gdal.GA_ReadOnly)
@@ -707,7 +818,8 @@ class RSGISPyUtils (object):
     def getImageBandCount(self, inImg):
         """
         A function to retrieve the number of image bands in an image file.
-        return nBands
+
+        :return: nBands
 
         """
         rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
@@ -722,6 +834,8 @@ class RSGISPyUtils (object):
         """
         A function to retrieve the no data value for the image 
         (from band; default 1).
+
+        :return: number
 
         """
         rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
@@ -753,7 +867,8 @@ class RSGISPyUtils (object):
     def getImgBandColourInterp(self, inImg, band):
         """
         A function to get the colour interpretation for a specific band.
-        return is a GDALColorInterp value:
+
+        :return: is a GDALColorInterp value:
         
         * GCI_Undefined=0, 
         * GCI_GrayIndex=1, 
@@ -818,6 +933,8 @@ class RSGISPyUtils (object):
         A function which returns the WKT string representing the projection 
         of the input image.
 
+        :return: string
+
         """
         rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
         if rasterDS == None:
@@ -831,6 +948,8 @@ class RSGISPyUtils (object):
         A function which returns a list of the files associated (e.g., header etc.) 
         with the input image file.
 
+        :return: lists
+
         """
         imgDS = gdal.Open(inImg)
         fileList = imgDS.GetFileList()
@@ -841,6 +960,8 @@ class RSGISPyUtils (object):
         """
         A function which returns a string with the UTM (XXN | XXS) zone of the input image 
         but only if it is projected within the UTM projection/coordinate system.
+
+        :return: string
 
         """
         rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
@@ -872,6 +993,8 @@ class RSGISPyUtils (object):
         """
         Using GDAL to return the EPSG code for the input layer.
 
+        :return: EPSG code
+
         """
         epsgCode = None
         try:
@@ -896,6 +1019,8 @@ class RSGISPyUtils (object):
         function AutoIdentifyEPSG. If the identified EPSG codes are different then 
         False is returned otherwise True.
 
+        :return: boolean
+
         """
         layer1EPSG = self.getEPSGCode(layer1)
         layer2EPSG = self.getEPSGCode(layer2)
@@ -912,7 +1037,7 @@ class RSGISPyUtils (object):
         
         * inVec - is a string with the input vector file name and path.
         
-        return:: WKT representation of projection
+        :return: WKT representation of projection
 
         """
         dataset = gdal.OpenEx(inVec, gdal.OF_VECTOR )
@@ -923,6 +1048,8 @@ class RSGISPyUtils (object):
     def getEPSGCodeFromWKT(self, wktString):
         """
         Using GDAL to return the EPSG code for inputted WKT string.
+
+        :return: the EPSG code.
 
         """
         epsgCode = None
@@ -941,6 +1068,8 @@ class RSGISPyUtils (object):
         
         * epsgCode integer variable of the epsg code.
 
+        :return: string with WKT representation of the projection.
+
         """
         wktString = None
         try:        
@@ -955,6 +1084,8 @@ class RSGISPyUtils (object):
         """
         A function which will generate a 'random' string of the specified length based on the UUID
 
+        :return: string of length size.
+
         """
         import uuid
         randomStr = str(uuid.uuid4())
@@ -964,6 +1095,8 @@ class RSGISPyUtils (object):
     def isNumber(self, strVal):
         """
         A function which tests whether the input string contains a number of not.
+
+        :return: boolean
 
         """
         try:
@@ -979,6 +1112,8 @@ class RSGISPyUtils (object):
         """
         A function to get an environmental variable, if variable is not present returns None.
 
+        :return: value of env var.
+
         """
         outVar = None
         try:
@@ -991,6 +1126,8 @@ class RSGISPyUtils (object):
         """
         A functions which returns the number of processing cores available on the machine
 
+        :return: int
+
         """
         import multiprocessing
         return multiprocessing.cpu_count()
@@ -999,6 +1136,8 @@ class RSGISPyUtils (object):
         """
         Read a text file into a single string
         removing new lines.
+
+        :return: string
 
         """
         txtStr = ""
@@ -1015,6 +1154,8 @@ class RSGISPyUtils (object):
         """
         Read a text file into a list where each line 
         is an element in the list.
+
+        :return: list
 
         """
         outList = []
@@ -1051,6 +1192,8 @@ class RSGISPyUtils (object):
         path returned is a true path. Within the fileSearch provide the file
         name with '*' as wildcard(s).
 
+        :return: string
+
         """
         import glob
         files = glob.glob(os.path.join(dirPath, fileSearch))
@@ -1069,6 +1212,7 @@ class RSGISPyUtils (object):
                    the variable for which are still to be looped through. Would 
                    normally not be provided by the user as default is None. Be
                    careful if you set as otherwise.
+
         :returns: list of dictionaries with the same keys are the input but only a
                  single value will be associate with key rather than a list.
                    
@@ -1108,9 +1252,51 @@ class RSGISPyUtils (object):
                     for ckey in val_dict.keys():
                         c_val_dict[ckey] = val_dict[ckey]
                     c_val_dict[key] = val
-                    c_out_vars = createVarList(next_vals_lsts, c_val_dict)
+                    c_out_vars = self.createVarList(next_vals_lsts, c_val_dict)
                     out_vars = out_vars+c_out_vars
         return out_vars
+
+    def in_bounds(self, x, lower, upper, upper_strict=False):
+        """
+        Checks whether a value is within specified bounds.
+
+        :param x: value or array of values to check.
+        :param lower: lower bound
+        :param upper: upper bound
+        :param upper_strict: True is less than upper; False is less than equal to upper
+
+        :return:
+
+        """
+        import numpy
+        if upper_strict:
+            return lower <= numpy.min(x) and numpy.max(x) < upper
+        else:
+            return lower <= numpy.min(x) and numpy.max(x) <= upper
+        return lower <= x <= upper
+
+    def mixed_signs(self, x):
+        """
+        Check whether a list of numbers has a mix of postive and negative values.
+
+        :param x: list of values.
+
+        :return: boolean
+
+        """
+        import numpy
+        return numpy.min(x) < 0 and numpy.max(x) >= 0
+
+    def negative(x):
+        """
+        Is the maximum number in the list negative.
+        :param x: list of values
+
+        :return: boolean
+
+        """
+        import numpy
+        return numpy.max(x) < 0
 
 
 class RSGISTime (object):

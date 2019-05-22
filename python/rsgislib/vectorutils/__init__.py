@@ -1717,7 +1717,132 @@ with the select layer.
         raise e
 
 
-def createPolyVecBBOXs(vectorFile, vectorLyr, vecDriver, espgCode, bboxs, atts=None, attTypes=None):
+def defineGrid(bbox, x_size, y_size, in_epsg_code, out_vec, out_vec_lyr, vec_drv='GPKG', out_epsg_code=None,
+               utm_grid=False, utm_hemi=False):
+    """
+Define a grid of bounding boxes for a specified bounding box. The output grid can be in a different projection
+to the inputted bounding box. Where a UTM grid is required and there are multiple UTM zones then the
+layer name will be appended with utmXX[n|s]. Note. this only works with formats such as GPKG which support
+multiple layers. A shapefile which only supports 1 layer will not work.
+
+* bbox - a bounding box (xMin, xMax, yMin, yMax)
+* x_size - Output grid size in X axis. If out_epsg_code or utm_grid defined then the grid size
+           needs to be in the output unit.
+* y_size - Output grid size in Y axis. If out_epsg_code or utm_grid defined then the grid size
+           needs to be in the output unit.
+* in_epsg_code - EPDSG code for the projection of the bbox
+* out_vec - output vector file.
+* out_vec_lyr - output vector layer name.
+* vec_drv - output vector file format (see OGR codes). Default is GPKG.
+* out_epsg_code - if provided the output grid is reprojected to the projection defined by this EPSG code.
+                  (note. the grid size needs to the in the unit of this projection). Default is None.
+* utm_grid - provide the output grid in UTM projection where grid might go across multiple UTM zones.
+             Default is False. grid size unit should be metres.
+* utm_hemi - if outputting a UTM projected grid then decided whether to use hemispheres or otherwise. If False
+             then everything will be projected northern hemisphere (e.g., as with landsat or sentinel-2).
+             Default is False.
+
+"""
+    import rsgislib.tools.utm
+    rsgis_utils = rsgislib.RSGISPyUtils()
+    if (out_epsg_code is not None) and utm_grid:
+        raise Exception("Cannot specify both new output projection and UTM grid.")
+    elif utm_grid:
+        wgs84_bbox = bbox
+        if in_epsg_code != 4326:
+            in_proj_obj = osr.SpatialReference()
+            in_proj_obj.ImportFromEPSG(in_epsg_code)
+            out_proj_obj = osr.SpatialReference()
+            out_proj_obj.ImportFromEPSG(4326)
+            wgs84_bbox = rsgis_utils.reprojBBOX(bbox, in_proj_obj, out_proj_obj)
+
+        multi_zones = False
+        if (wgs84_bbox[0] < -180) and (wgs84_bbox[1] < -180):
+            wgs84_bbox = [360 + wgs84_bbox[0], 360 + wgs84_bbox[1], wgs84_bbox[2], wgs84_bbox[3]]
+        elif (wgs84_bbox[0] > 180) and (wgs84_bbox[1] > 180):
+            wgs84_bbox = [360 - wgs84_bbox[0], 360 - wgs84_bbox[1], wgs84_bbox[2], wgs84_bbox[3]]
+        elif (wgs84_bbox[0] < -180) or (wgs84_bbox[0] > 180):
+            multi_zones = True
+
+        if not multi_zones:
+            utm_tl = rsgislib.tools.utm.from_latlon(wgs84_bbox[3], wgs84_bbox[0])
+            utm_tr = rsgislib.tools.utm.from_latlon(wgs84_bbox[3], wgs84_bbox[1])
+            utm_br = rsgislib.tools.utm.from_latlon(wgs84_bbox[2], wgs84_bbox[1])
+            utm_bl = rsgislib.tools.utm.from_latlon(wgs84_bbox[2], wgs84_bbox[0])
+
+            utm_top_hemi = 'N'
+            if utm_hemi and (wgs84_bbox[3] < 0):
+                utm_top_hemi = 'S'
+
+        if (not multi_zones) and (utm_tl[2] == utm_tr[2] == utm_br[2] == utm_bl[2]):
+            utm_zone = utm_tl[2]
+
+            utm_proj_epsg = rsgislib.tools.utm.epsg_for_UTM(utm_zone, utm_top_hemi)
+
+            defineGrid(bbox, x_size, y_size, in_epsg_code, out_vec, out_vec_lyr, vec_drv=vec_drv,
+                       out_epsg_code=utm_proj_epsg, utm_grid=False, utm_hemi=False)
+        else:
+            multi_zones = True
+
+            utm_zone_bboxs = []
+            if (wgs84_bbox[0] < -180):
+                wgs84_bbox_W = [-180, wgs84_bbox[1], wgs84_bbox[2], wgs84_bbox[3]]
+                wgs84_bbox_E = [360 + wgs84_bbox[1], 180, wgs84_bbox[2], wgs84_bbox[3]]
+
+                utm_zone_bboxs = utm_zone_bboxs + rsgislib.tools.utm.split_wgs84_bbox_utm_zones(wgs84_bbox_W)
+                utm_zone_bboxs = utm_zone_bboxs + rsgislib.tools.utm.split_wgs84_bbox_utm_zones(wgs84_bbox_E)
+
+            elif (wgs84_bbox[0] > 180):
+                wgs84_bbox_W = [wgs84_bbox[0], 180, wgs84_bbox[2], wgs84_bbox[3]]
+                wgs84_bbox_E = [-180, 360 - wgs84_bbox[1], wgs84_bbox[2], wgs84_bbox[3]]
+
+                utm_zone_bboxs = utm_zone_bboxs + rsgislib.tools.utm.split_wgs84_bbox_utm_zones(wgs84_bbox_W)
+                utm_zone_bboxs = utm_zone_bboxs + rsgislib.tools.utm.split_wgs84_bbox_utm_zones(wgs84_bbox_E)
+
+            else:
+                utm_zone_bboxs = rsgislib.tools.utm.split_wgs84_bbox_utm_zones(wgs84_bbox)
+
+            in_proj_obj = osr.SpatialReference()
+            in_proj_obj.ImportFromEPSG(4326)
+
+            first = True
+            for zone_roi in utm_zone_bboxs:
+                utm_top_hemi = 'N'
+                if utm_hemi:
+                    if zone_roi[1][3] < 0:
+                        utm_top_hemi = 'S'
+
+                utm_proj_epsg = int(rsgislib.tools.utm.epsg_for_UTM(zone_roi[0], utm_top_hemi))
+
+                out_proj_obj = osr.SpatialReference()
+                out_proj_obj.ImportFromEPSG(utm_proj_epsg)
+
+                utm_bbox = rsgis_utils.reprojBBOX(zone_roi[1], in_proj_obj, out_proj_obj)
+                bboxs = rsgis_utils.getBBoxGrid(utm_bbox, x_size, y_size)
+
+                utm_out_vec_lyr = out_vec_lyr + '_utm{0}{1}'.format(zone_roi[0], utm_top_hemi.lower())
+                createPolyVecBBOXs(out_vec, utm_out_vec_lyr, vec_drv, utm_proj_epsg, bboxs, overwrite=first)
+                first = False
+    else:
+        if out_epsg_code is not None:
+            in_proj_obj = osr.SpatialReference()
+            in_proj_obj.ImportFromEPSG(in_epsg_code)
+            out_proj_obj = osr.SpatialReference()
+            out_proj_obj.ImportFromEPSG(out_epsg_code)
+            proj_bbox = rsgis_utils.reprojBBOX(bbox, in_proj_obj, out_proj_obj)
+        else:
+            proj_bbox = bbox
+
+        bboxs = rsgis_utils.getBBoxGrid(proj_bbox, x_size, y_size)
+
+        if out_epsg_code is None:
+            createPolyVecBBOXs(out_vec, out_vec_lyr, vec_drv, in_epsg_code, bboxs)
+        else:
+            createPolyVecBBOXs(out_vec, out_vec_lyr, vec_drv, out_epsg_code, bboxs)
+
+
+
+def createPolyVecBBOXs(vectorFile, vectorLyr, vecDriver, espgCode, bboxs, atts=None, attTypes=None, overwrite=True):
     """
 This function creates a set of polygons for a set of bounding boxes. 
 
@@ -1732,17 +1857,24 @@ When creating an attribute the available data types are ogr.OFTString, ogr.OFTIn
          the same as the attTypes['names'] list.
 * attTypes - is a dict with a list of attribute names (attTypes['names']) and types (attTypes['types']).
              The list must be the same length as one another and the number of atts. Example type: ogr.OFTString
+* overwrite - overwrite the vector file specified if it exists. Use False for GPKG where you want to add multiple layers.
 
 """
     try:
         gdal.UseExceptions()
-        # Create the output Driver
-        outDriver = ogr.GetDriverByName(vecDriver)
-        # create the spatial reference, WGS84
+
+        if os.path.exists(vectorFile) and (not overwrite):
+            # Open the output file.
+            outDataSource = gdal.OpenEx(vectorFile, gdal.GA_Update)
+        else:
+            # Create the output Driver
+            outDriver = ogr.GetDriverByName(vecDriver)
+            # Create the output vector file
+            outDataSource = outDriver.CreateDataSource(vectorFile)
+
+        # create the spatial reference
         srs = osr.SpatialReference()
         srs.ImportFromEPSG(int(espgCode))
-        # Create the output Shapefile
-        outDataSource = outDriver.CreateDataSource(vectorFile)
         outLayer = outDataSource.CreateLayer(vectorLyr, srs, geom_type=ogr.wkbPolygon )
         
         
