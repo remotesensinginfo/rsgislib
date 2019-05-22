@@ -5,3 +5,4 @@ from .plotting import *
 from .projection import *
 from .filemanipulation import *
 from .visualisation import *
+from .utm import *
