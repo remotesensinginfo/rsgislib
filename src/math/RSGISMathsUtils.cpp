@@ -682,40 +682,48 @@ namespace rsgis{namespace math{
                     double minVal = 0.0;
                     double maxVal = 0.0;
                     gsl_stats_minmax (&minVal, &maxVal, &(*data)[0], 1, data->size());
-                    long minBin = floor(minVal);
-                    long maxBin = floor(maxVal+1);
-                    long numBins = maxBin - minBin;
-                    long *bins = new long[numBins];
-                    for(long i = 0; i < numBins; ++i)
-                    {
-                        bins[i] = 0;
-                    }
                     
-                    long tmpVal = 0;
-                    long tmpBin = 0;
-                    for(std::vector<double>::iterator iterVals = data->begin(); iterVals != data->end(); ++iterVals)
+                    if(minVal == maxVal)
                     {
-                        tmpVal = floor(*iterVals);
-                        tmpBin = tmpVal - minBin;
-                        ++bins[tmpBin];
+                        stats->mode = floor(minVal);
                     }
-                    
-                    long maxFreqBinIdx = 0;
-                    for(long i = 0; i < numBins; ++i)
+                    else
                     {
-                        if(i == 0)
+                        long minBin = floor(minVal);
+                        long maxBin = floor(maxVal+1);
+                        
+                        long numBins = maxBin - minBin;
+                        long *bins = new long[numBins];
+                        for(long i = 0; i < numBins; ++i)
                         {
-                            maxFreqBinIdx = 0;
+                            bins[i] = 0;
                         }
-                        else if(bins[i] > bins[maxFreqBinIdx])
+                        
+                        long tmpVal = 0;
+                        long tmpBin = 0;
+                        for(std::vector<double>::iterator iterVals = data->begin(); iterVals != data->end(); ++iterVals)
                         {
-                            maxFreqBinIdx = i;
+                            tmpVal = floor(*iterVals);
+                            tmpBin = tmpVal - minBin;
+                            ++bins[tmpBin];
                         }
+                        
+                        long maxFreqBinIdx = 0;
+                        for(long i = 0; i < numBins; ++i)
+                        {
+                            if(i == 0)
+                            {
+                                maxFreqBinIdx = 0;
+                            }
+                            else if(bins[i] > bins[maxFreqBinIdx])
+                            {
+                                maxFreqBinIdx = i;
+                            }
+                        }
+                        stats->mode = minBin + maxFreqBinIdx;
+                        
+                        delete[] bins;
                     }
-                    
-                    stats->mode = minBin + maxFreqBinIdx;
-                    
-                    delete[] bins;
                 }
             }
             else
