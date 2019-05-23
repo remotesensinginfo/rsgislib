@@ -242,7 +242,7 @@ LS8 images are submitted to match the images bands of LS7 (i.e., coastal band re
         
         refLyrMskStackImg = os.path.join(refLayersPath, uidStr+'_waterLandMskStack.kea')
         rsgislib.imageutils.stackImageBands(mskImgs, None, refLyrMskStackImg, -1, -1, 'KEA', rsgislib.TYPE_8UINT)
-        rsgislib.imagecalc.imagePixelColumnSummary(refLyrMskStackImg, outMskImg, rsgislib.imagecalc.StatsSummary(calcMedian=True), 'KEA', rsgislib.TYPE_8UINT, 0, True)        
+        rsgislib.imagecalc.imagePixelColumnSummary(refLyrMskStackImg, outMskImg, rsgislib.imagecalc.StatsSummary(calcMode=True), 'KEA', rsgislib.TYPE_8UINT, 0, True)
         rsgislib.rastergis.populateStats(outMskImg, True, True, True)
         
         idx = 1
@@ -477,7 +477,7 @@ used to define the spatial extent of the output images and spatial projection.
             
             refLyrMskStackImg = os.path.join(refLayersPath, uidStr+'_waterLandMskStack.kea')
             rsgislib.imageutils.stackImageBands(mskImgs, None, refLyrMskStackImg, -1, -1, 'KEA', rsgislib.TYPE_8UINT)
-            rsgislib.imagecalc.imagePixelColumnSummary(refLyrMskStackImg, outMskImg, rsgislib.imagecalc.StatsSummary(calcMedian=True), 'KEA', rsgislib.TYPE_8UINT, 0, True)        
+            rsgislib.imagecalc.imagePixelColumnSummary(refLyrMskStackImg, outMskImg, rsgislib.imagecalc.StatsSummary(calcMode=True), 'KEA', rsgislib.TYPE_8UINT, 0, True)
             rsgislib.rastergis.populateStats(outMskImg, True, True, True)
             
             idx = 1
