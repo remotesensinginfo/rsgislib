@@ -150,8 +150,7 @@ the maximum NDVI.
         raise rsgislib.RSGISPyException("There were no input images for " + inImgsPattern)
 
 
-
-def createMaxNDVINDWICompositeLandsat(inImgsPattern, outRefImg, outCompImg, outMskImg, tmpPath='./tmp', gdalformat='KEA', dataType=None, calcStats=True):
+def createMaxNDVINDWICompositeLandsat(inImgsPattern, outRefImg, outCompImg, outMskImg, tmpPath='./tmp', gdalformat='KEA', dataType=None, calcStats=True, use_mode=True):
     """
 Create an image composite from multiple input images where the pixel brought through into the composite is the one with
 the maximum NDVI over land and NDWI over water. A mask of land and water regions is also produced. Landsat 8 images are 
@@ -166,6 +165,7 @@ LS8 images are submitted to match the images bands of LS7 (i.e., coastal band re
 * gdalformat - is the output file format of the outCompImg, any GDAL compatable format is OK (Defaut is KEA).
 * dataType - is the data type of the output image (outCompImg). If None is provided then the data type of the first input image will be used (Default None). 
 * calcStats calculate image statics and pyramids (Default=True)
+* use_mode - True: the land/water masks are combined using the mode and False: the land water masks are combined using median.
 
     """
     rsgisUtils = rsgislib.RSGISPyUtils()
@@ -242,7 +242,14 @@ LS8 images are submitted to match the images bands of LS7 (i.e., coastal band re
         
         refLyrMskStackImg = os.path.join(refLayersPath, uidStr+'_waterLandMskStack.kea')
         rsgislib.imageutils.stackImageBands(mskImgs, None, refLyrMskStackImg, -1, -1, 'KEA', rsgislib.TYPE_8UINT)
-        rsgislib.imagecalc.imagePixelColumnSummary(refLyrMskStackImg, outMskImg, rsgislib.imagecalc.StatsSummary(calcMode=True), 'KEA', rsgislib.TYPE_8UINT, 0, True)
+        if use_mode:
+            rsgislib.imagecalc.imagePixelColumnSummary(refLyrMskStackImg, outMskImg,
+                                                       rsgislib.imagecalc.StatsSummary(calcMode=True), 'KEA',
+                                                       rsgislib.TYPE_8UINT, 0, True)
+        else:
+            rsgislib.imagecalc.imagePixelColumnSummary(refLyrMskStackImg, outMskImg,
+                                                       rsgislib.imagecalc.StatsSummary(calcMedian=True), 'KEA',
+                                                       rsgislib.TYPE_8UINT, 0, True)
         rsgislib.rastergis.populateStats(outMskImg, True, True, True)
         
         idx = 1
@@ -339,7 +346,7 @@ Landsat 8 images.
     return out_imgs
 
 
-def createMaxNDVINDWIComposite(refImg, inImages, rBand, nBand, sBand, outRefImg, outCompImg, outMskImg, tmpPath='./tmp', gdalformat='KEA', dataType=None, calcStats=True, reprojmethod='cubic'):
+def createMaxNDVINDWIComposite(refImg, inImages, rBand, nBand, sBand, outRefImg, outCompImg, outMskImg, tmpPath='./tmp', gdalformat='KEA', dataType=None, calcStats=True, reprojmethod='cubic', use_mode=True):
     """
 Create an image composite from multiple input images where the pixel brought through into the composite is the one with
 the maximum NDVI over land and NDWI over water. A mask of land and water regions is also produced. The reference image is
@@ -358,6 +365,7 @@ used to define the spatial extent of the output images and spatial projection.
 * dataType - is the data type of the output image (outCompImg). If None is provided then the data type of the first input image will be used (Default None). 
 * calcStats - calculate image statics and pyramids (Default=True)
 * reprojmethod - specifies the interpolation method used to reproject the input images which are in a different projection and/or pixel size as the reference image (default: cubic).
+* use_mode - True: the land/water masks are combined using the mode and False: the land water masks are combined using median.
 
     """
     rsgisUtils = rsgislib.RSGISPyUtils()
@@ -477,7 +485,14 @@ used to define the spatial extent of the output images and spatial projection.
             
             refLyrMskStackImg = os.path.join(refLayersPath, uidStr+'_waterLandMskStack.kea')
             rsgislib.imageutils.stackImageBands(mskImgs, None, refLyrMskStackImg, -1, -1, 'KEA', rsgislib.TYPE_8UINT)
-            rsgislib.imagecalc.imagePixelColumnSummary(refLyrMskStackImg, outMskImg, rsgislib.imagecalc.StatsSummary(calcMode=True), 'KEA', rsgislib.TYPE_8UINT, 0, True)
+            if use_mode:
+                rsgislib.imagecalc.imagePixelColumnSummary(refLyrMskStackImg, outMskImg,
+                                                           rsgislib.imagecalc.StatsSummary(calcMode=True), 'KEA',
+                                                           rsgislib.TYPE_8UINT, 0, True)
+            else:
+                rsgislib.imagecalc.imagePixelColumnSummary(refLyrMskStackImg, outMskImg,
+                                                           rsgislib.imagecalc.StatsSummary(calcMedian=True), 'KEA',
+                                                           rsgislib.TYPE_8UINT, 0, True)
             rsgislib.rastergis.populateStats(outMskImg, True, True, True)
             
             idx = 1
