@@ -497,7 +497,7 @@ static PyObject *ImageCalc_ImagePixelColumnSummary(PyObject *self, PyObject *arg
     summary.sum = RSGISPY_FLOAT_EXTRACT(pSum);
     summary.stdDev = RSGISPY_FLOAT_EXTRACT(pStdDev);
     summary.median = RSGISPY_FLOAT_EXTRACT(pMedian);
-    summary.median = RSGISPY_FLOAT_EXTRACT(pMode);
+    summary.mode = RSGISPY_FLOAT_EXTRACT(pMode);
     
     Py_DECREF(pCalcMin);
     Py_DECREF(pCalcMax);
