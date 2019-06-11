@@ -50,5 +50,3 @@ parser.add_argument("-f", "--finite", action='store_true', default=False, help='
 args = parser.parse_args()
 
 rsgislib.tools.createWebTilesImg(args.input, args.output, args.bands, args.zoom, args.resample, args.finite)
-
-(inputImg, outputDIR, bands, zoomLevels='2-10', resample='average', finiteMsk=False)

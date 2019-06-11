@@ -1015,13 +1015,13 @@ Where:
                     raise Exception('Error running ogr2ogr: ' + cmd)
 
 
-def createPolySHP4LstBBOXs(csvFile, outSHP, espgCode, minXCol=0, maxXCol=1, minYCol=2, maxYCol=3, ignoreRows=0, force=False):
+def createPolySHP4LstBBOXs(csvFile, outSHP, epsgCode, minXCol=0, maxXCol=1, minYCol=2, maxYCol=3, ignoreRows=0, force=False):
     """
 This function takes a CSV file of bounding boxes (1 per line) and creates a polygon shapefile.
     
 * csvFile - input CSV file.
 * outSHP - output ESRI shapefile
-* espgCode - ESPG code specifying the projection of the data (4326 is WSG84 Lat/Long).
+* epsgCode - EPSG code specifying the projection of the data (4326 is WSG84 Lat/Long).
 * minXCol - The index (starting at 0) for the column within the CSV file for the minimum X coordinate.
 * maxXCol - The index (starting at 0) for the column within the CSV file for the maximum X coordinate.
 * minYCol - The index (starting at 0) for the column within the CSV file for the minimum Y coordinate.
@@ -1042,7 +1042,7 @@ This function takes a CSV file of bounding boxes (1 per line) and creates a poly
         outDriver = ogr.GetDriverByName('ESRI Shapefile')
         # create the spatial reference, WGS84
         srs = osr.SpatialReference()
-        srs.ImportFromEPSG(int(espgCode))
+        srs.ImportFromEPSG(int(epsgCode))
         # Create the output Shapefile
         outDataSource = outDriver.CreateDataSource(outSHP)
         outLayer = outDataSource.CreateLayer(os.path.splitext(os.path.basename(outSHP))[0], srs, geom_type=ogr.wkbPolygon )
@@ -1844,7 +1844,7 @@ multiple layers. A shapefile which only supports 1 layer will not work.
 
 
 
-def createPolyVecBBOXs(vectorFile, vectorLyr, vecDriver, espgCode, bboxs, atts=None, attTypes=None, overwrite=True):
+def createPolyVecBBOXs(vectorFile, vectorLyr, vecDriver, epsgCode, bboxs, atts=None, attTypes=None, overwrite=True):
     """
 This function creates a set of polygons for a set of bounding boxes. 
 
@@ -1853,7 +1853,7 @@ When creating an attribute the available data types are ogr.OFTString, ogr.OFTIn
 * vectorFile - output vector file/path
 * vectorLyr - output vector layer
 * vecDriver - the output vector layer type.
-* espgCode - ESPG code specifying the projection of the data (e.g., 4326 is WSG84 Lat/Long).
+* epsgCode - EPSG code specifying the projection of the data (e.g., 4326 is WSG84 Lat/Long).
 * bboxs - is a list of bounding boxes ([xMin, xMax, yMin, yMax]) to be saved to the output vector.
 * atts - is a dict of lists of attributes with the same length as the bboxs list. The dict should be named
          the same as the attTypes['names'] list.
@@ -1876,7 +1876,7 @@ When creating an attribute the available data types are ogr.OFTString, ogr.OFTIn
 
         # create the spatial reference
         srs = osr.SpatialReference()
-        srs.ImportFromEPSG(int(espgCode))
+        srs.ImportFromEPSG(int(epsgCode))
         outLayer = outDataSource.CreateLayer(vectorLyr, srs, geom_type=ogr.wkbPolygon )
         
         
@@ -1945,12 +1945,12 @@ When creating an attribute the available data types are ogr.OFTString, ogr.OFTIn
         raise e
 
 
-def createVectorGrid(outputVec, vecDriver, vecLyrName, espgCode, grid_x, grid_y, bbox):
+def createVectorGrid(outputVec, vecDriver, vecLyrName, epsgCode, grid_x, grid_y, bbox):
     """
 A function which creates a regular grid across a defined area.
 
 * outputVec - outout file
-* espgCode - ESPG code of the output projection 
+* epsgCode - EPSG code of the output projection 
 * grid_x - the size in the x axis of the grid cells.
 * grid_y - the size in the y axis of the grid cells.
 * bbox - the area for which cells will be defined (MinX, MaxX, MinY, MaxY).
@@ -1997,10 +1997,10 @@ A function which creates a regular grid across a defined area.
             cMaxX = cMinX + x_remain
             bboxs.append([cMinX, cMaxX, cMinY, cMaxY])
     
-    createPolyVecBBOXs(outputVec, vecLyrName, vecDriver, espgCode, bboxs)
+    createPolyVecBBOXs(outputVec, vecLyrName, vecDriver, epsgCode, bboxs)
 
 
-def writePts2Vec(vectorFile, vectorLyr, vecDriver, espgCode, ptsX, ptsY, atts=None, attTypes=None):
+def writePts2Vec(vectorFile, vectorLyr, vecDriver, epsgCode, ptsX, ptsY, atts=None, attTypes=None):
     """
 This function creates a set of polygons for a set of bounding boxes. 
 
@@ -2009,7 +2009,7 @@ When creating an attribute the available data types are ogr.OFTString, ogr.OFTIn
 * vectorFile - output vector file/path
 * vectorLyr - output vector layer
 * vecDriver - the output vector layer type.
-* espgCode - ESPG code specifying the projection of the data (e.g., 4326 is WSG84 Lat/Long).
+* epsgCode - EPSG code specifying the projection of the data (e.g., 4326 is WSG84 Lat/Long).
 * ptsX - is a list of x coordinates.
 * ptsY - is a list of y coordinates.
 * atts - is a dict of lists of attributes with the same length as the bboxs list.
@@ -2028,7 +2028,7 @@ When creating an attribute the available data types are ogr.OFTString, ogr.OFTIn
         outDriver = ogr.GetDriverByName(vecDriver)
         # create the spatial reference, WGS84
         srs = osr.SpatialReference()
-        srs.ImportFromEPSG(int(espgCode))
+        srs.ImportFromEPSG(int(epsgCode))
         # Create the output Shapefile
         outDataSource = outDriver.CreateDataSource(vectorFile)
         outLayer = outDataSource.CreateLayer(vectorLyr, srs, geom_type=ogr.wkbPoint )
@@ -2128,7 +2128,7 @@ with a bounding box.
     return intersect
 
 
-def createImgExtentLUT(imgList, vectorFile, vectorLyr, vecDriver, ignore_none_imgs=False):
+def createImgExtentLUT(imgList, vectorFile, vectorLyr, vecDriver, ignore_none_imgs=False, out_proj_wgs84=False):
     """
 Create a vector layer look up table (LUT) for a directory of images.
 
@@ -2137,6 +2137,7 @@ Create a vector layer look up table (LUT) for a directory of images.
 * vectorLyr - output vector layer
 * vecDriver - the output vector layer type.
 * ignore_none_imgs - if a NULL epsg is returned from an image then ignore and don't include in LUT else throw exception.
+* out_proj_wgs84 - if True then the image bounding boxes will be re-projected to EPSG:4326.
 
 Example::
 
@@ -2170,16 +2171,24 @@ Example::
             if not ignore_none_imgs:
                 raise Exception("The EPSG code is None: '{}'".format(img))
         if epsg_found:
-            epsgCodeTmp = int(epsgCodeTmp)
-            if first:
-                epsgCode = epsgCodeTmp
-                baseImg = img
-                first = False
+            if out_proj_wgs84:
+                epsgCode = 4326
             else:
-                if epsgCodeTmp != epsgCode:
-                    raise Exception("The EPSG codes ({0} & {1}) do not match. (Base: '{2}', Img: '{3}')".format(epsgCode, epsgCodeTmp, baseImg, img))
-            
-            bboxs.append(rsgisUtils.getImageBBOX(img))
+                epsgCodeTmp = int(epsgCodeTmp)
+                if first:
+                    epsgCode = epsgCodeTmp
+                    baseImg = img
+                    first = False
+                else:
+                    if epsgCodeTmp != epsgCode:
+                        raise Exception("The EPSG codes ({0} & {1}) do not match. (Base: '{2}', Img: '{3}')".format(epsgCode, epsgCodeTmp, baseImg, img))
+
+            if out_proj_wgs84:
+                img_bbox = rsgisUtils.getImageBBOXInProj(img, 4326)
+            else:
+                img_bbox = rsgisUtils.getImageBBOX(img)
+
+            bboxs.append(img_bbox)
             baseName = os.path.basename(img)
             filePath = os.path.dirname(img)
             atts['filename'].append(baseName)
@@ -2344,7 +2353,7 @@ returns OGR Layer and Dataset objects.
 """
     gdal.UseExceptions()
     if lyrVecObj is None:
-        raise Exception("Could not find layer '" + vecLyr + "'")
+        raise Exception("Vector layer object which was provided was None.")
         
     lyr_spatial_ref = lyrVecObj.GetSpatialRef()
     lyrDefn = lyrVecObj.GetLayerDefn()
@@ -2495,3 +2504,56 @@ A function which reads a vector layer to an OGR in memory layer.
         print("Error Vector File: {}".format(vecfile), file=sys.stderr)
         print("Error Vector Layer: {}".format(veclyrname), file=sys.stderr)
         raise e
+
+
+def queryFileLUT(lut_file, lut_lyr, roi_file, roi_lyr, out_dest, targz_out, cp_cmds):
+    """
+    A function which allows the file LUT to be queried (intersection) and commands generated for completing operations.
+    Must select (pass true) for either targz_out or cp_cmds not both. If both are False then the list of intersecting
+    files will be returned.
+
+    :param lut_file: OGR vector file with the LUT.
+    :param lut_lyr: name of the layer within the LUT file.
+    :param roi_file: region of interest OGR vector file.
+    :param roi_lyr: layer name within the ROI file.
+    :param out_dest: the destination for outputs from command (e.g., where are the files to be copied to or output
+                     file name for tar.gz file.
+    :param targz_out: boolean which specifies that the command for generating a tar.gz file should be generated.
+    :param cp_cmds: boolean which specifies that the command for copying the LUT files to a out_dest should be generated.
+
+    :return: returns a list of commands to be executed.
+
+    """
+
+    if lut_lyr is None:
+        lut_lyr = os.path.splitext(os.path.basename(lut_file))[0]
+
+    if roi_lyr is None:
+        roi_lyr = os.path.splitext(os.path.basename(roi_file))[0]
+
+    roi_mem_ds, roi_mem_lyr = rsgislib.vectorutils.readVecLyr2Mem(roi_file, roi_lyr)
+
+    roi_bbox = roi_mem_lyr.GetExtent(True)
+
+    lut_mem_ds, lut_mem_lyr = rsgislib.vectorutils.getMemVecLyrSubset(lut_file, lut_lyr, roi_bbox)
+
+    fileListDict = rsgislib.vectorutils.getAttLstSelectFeatsLyrObjs(lut_mem_lyr, ['path', 'filename'], roi_mem_lyr)
+
+    out_cmds = []
+    if targz_out:
+        cmd = 'tar -czf ' + out_dest
+        for fileItem in fileListDict:
+            filepath = os.path.join(fileItem['path'], fileItem['filename'])
+            cmd = cmd + " " + filepath
+
+        out_cmds.append(cmd)
+    elif cp_cmds:
+        for fileItem in fileListDict:
+            filepath = os.path.join(fileItem['path'], fileItem['filename'])
+            out_cmds.append("cp {0} {1}".format(filepath, out_dest))
+    else:
+        for fileItem in fileListDict:
+            filepath = os.path.join(fileItem['path'], fileItem['filename'])
+            out_cmds.append(filepath)
+
+    return out_cmds
