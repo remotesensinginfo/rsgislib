@@ -35,6 +35,7 @@
 #############################################
 
 import argparse
+import rsgislib
 import rsgislib.vectorutils   
     
 if __name__ == "__main__":
@@ -49,10 +50,11 @@ if __name__ == "__main__":
     parser.add_argument("--copy", action='store_true', default=False, help="Create copy command for the list of files.")
     args = parser.parse_args()
         
-    cmds = rsgislib.vectorutils.queryFileLUT(args.lutlyr, args.lutlyr, args.roifile, args.roilyr, args.dest, args.targz, args.copy)
+    cmds = rsgislib.vectorutils.queryFileLUT(args.lutfile, args.lutlyr, args.roifile, args.roilyr, args.dest, args.targz, args.copy)
     
     if args.outputfile is None:
         for cmd in cmds:
             print(cmd)
     else:
+        rsgis_utils = rsgislib.RSGISPyUtils()
         rsgis_utils.writeList2File(cmds, args.outputfile)
