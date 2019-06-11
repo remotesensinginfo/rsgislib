@@ -2128,7 +2128,8 @@ with a bounding box.
     return intersect
 
 
-def createImgExtentLUT(imgList, vectorFile, vectorLyr, vecDriver, ignore_none_imgs=False, out_proj_wgs84=False):
+def createImgExtentLUT(imgList, vectorFile, vectorLyr, vecDriver, ignore_none_imgs=False, out_proj_wgs84=False,
+                       overwrite_lut_file=False):
     """
 Create a vector layer look up table (LUT) for a directory of images.
 
@@ -2138,6 +2139,7 @@ Create a vector layer look up table (LUT) for a directory of images.
 * vecDriver - the output vector layer type.
 * ignore_none_imgs - if a NULL epsg is returned from an image then ignore and don't include in LUT else throw exception.
 * out_proj_wgs84 - if True then the image bounding boxes will be re-projected to EPSG:4326.
+* overwrite_lut_file if True then output file will be overwritten. If false then not, e.g., can add extra layer to GPKG
 
 Example::
 
@@ -2194,7 +2196,7 @@ Example::
             atts['filename'].append(baseName)
             atts['path'].append(filePath)
     # Create vector layer
-    createPolyVecBBOXs(vectorFile, vectorLyr, vecDriver, epsgCode, bboxs, atts, attTypes)
+    createPolyVecBBOXs(vectorFile, vectorLyr, vecDriver, epsgCode, bboxs, atts, attTypes, overwrite=overwrite_lut_file)
 
 
 def calcPolyCentroids(vecfile, veclyrname, outVecDrvr, vecoutfile, vecoutlyrname):
