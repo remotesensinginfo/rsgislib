@@ -43,6 +43,9 @@ if __name__ == "__main__":
     parser.add_argument("-o", "--output", type=str, required=True, help="Output vector file representing the LUT.")
     parser.add_argument("--veclyr", type=str, required=False, help="Alternative layer name (if supported) for the LUT vector file.")
     parser.add_argument("--vecformat", type=str, required=False, default="GPKG", help="OGR vector format for the LUT file.")
+    parser.add_argument("--wgs84", action='store_true', default=False, help="Reproject footprints to EPSG:4326 (WGS84).")
+    parser.add_argument("--ignore_noproj", action='store_true', default=False, help="Silently ignored images which do not have a defined projection.")
+    
     args = parser.parse_args()
     
     if args.veclyr is None:
@@ -51,5 +54,5 @@ if __name__ == "__main__":
         vec_lyr_name = args.veclyr
     
     imgList = glob.glob(args.imgsearch)
-    rsgislib.vectorutils.createImgExtentLUT(imgList, args.output, vec_lyr_name, args.vecformat)
+    rsgislib.vectorutils.createImgExtentLUT(imgList, args.output, vec_lyr_name, args.vecformat, ignore_none_imgs=args.ignore_noproj, out_proj_wgs84=args.wgs84)
     print("Finished Creating LUT.")

@@ -196,6 +196,7 @@ class RSGISPyException(Exception):
         """
         return repr(self.value)
 
+
 class RSGISPyUtils (object):
     """
     A class with useful utilities within RSGISLib.
@@ -480,7 +481,7 @@ class RSGISPyUtils (object):
         
         return [tlX, brX, brY, tlY]
     
-    def getImageBBOXInProj(self, inImg, outESPG):
+    def getImageBBOXInProj(self, inImg, outEPSG):
         """
         A function to retrieve the bounding box in the spatial 
         coordinates of the image.
@@ -493,7 +494,7 @@ class RSGISPyUtils (object):
         inSpatRef.ImportFromWkt(inProjWKT)
         
         outSpatRef = osr.SpatialReference()
-        outSpatRef.ImportFromEPSG(outESPG)
+        outSpatRef.ImportFromEPSG(outEPSG)
         
         rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
         if rasterDS == None:
@@ -1059,11 +1060,11 @@ class RSGISPyUtils (object):
         layer1EPSG = self.getEPSGCode(layer1)
         layer2EPSG = self.getEPSGCode(layer2)
         
-        sameESPG = False
+        sameEPSG = False
         if layer1EPSG == layer2EPSG:
-            sameESPG = True
+            sameEPSG = True
         
-        return sameESPG
+        return sameEPSG
         
     def getProjWKTFromVec(self, inVec):
         """
@@ -1203,8 +1204,7 @@ class RSGISPyUtils (object):
         except Exception as e:
             raise e
         return outList
-    
-    
+
     def writeList2File(self, dataList, outFile):
         """
         Write a list a text file, one line per item.
@@ -1218,7 +1218,6 @@ class RSGISPyUtils (object):
             f.close()
         except Exception as e:
             raise e
-    
     
     def findFile(self, dirPath, fileSearch):
         """
@@ -1234,8 +1233,7 @@ class RSGISPyUtils (object):
         if len(files) != 1:
             raise RSGISPyException('Could not find a single file ('+fileSearch+'); found ' + str(len(files)) + ' files.')
         return files[0]
-    
-    
+
     def createVarList(self, in_vals_lsts, val_dict=None):
         """
         A function which will produce a list of dictionaries with all the combinations 

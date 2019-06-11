@@ -48,6 +48,7 @@ Example::
 
     return xsize, ysize
 
+
 def metres_to_degrees(latitude, xsize, ysize):
     """ 
 Convert pixel sizes or distances in metres to degrees.
