@@ -1066,17 +1066,48 @@ class RSGISPyUtils (object):
         
         return sameEPSG
         
-    def getProjWKTFromVec(self, inVec):
+    def getProjWKTFromVec(self, inVec, vecLyr=None):
         """
         A function which gets the WKT projection from the inputted vector file.
         
         * inVec - is a string with the input vector file name and path.
+        * vecLyr - is a string with the input vector layer name, if None then first layer read. (default: None)
         
         :return: WKT representation of projection
 
         """
         dataset = gdal.OpenEx(inVec, gdal.OF_VECTOR )
-        layer = dataset.GetLayer()
+        if dataset is None:
+            raise Exception("Could not open file: {}".format(inVec))
+        if vecLyr is None:
+            layer = dataset.GetLayer()
+        else:
+            layer = dataset.GetLayer(vecLyr)
+        if layer is None:
+            raise Exception("Could not open layer within file: {}".format(inVec))
+        spatialRef = layer.GetSpatialRef()
+        spatialRef.AutoIdentifyEPSG()
+        return spatialRef.GetAuthorityCode(None)
+
+    def getProjEPSGFromVec(self, inVec, vecLyr=None):
+        """
+        A function which gets the EPSG projection from the inputted vector file.
+
+        * inVec - is a string with the input vector file name and path.
+        * vecLyr - is a string with the input vector layer name, if None then first layer read. (default: None)
+
+        :return: EPSG representation of projection
+
+        """
+        dataset = gdal.OpenEx(inVec, gdal.OF_VECTOR)
+        if dataset is None:
+            raise Exception("Could not open file: {}".format(inVec))
+        if vecLyr is None:
+            layer = dataset.GetLayer()
+        else:
+            layer = dataset.GetLayer(vecLyr)
+        if layer is None:
+            raise Exception("Could not open layer within file: {}".format(inVec))
         spatialRef = layer.GetSpatialRef()
         return spatialRef.ExportToWkt()
         
@@ -1305,7 +1336,6 @@ class RSGISPyUtils (object):
             return lower <= numpy.min(x) and numpy.max(x) < upper
         else:
             return lower <= numpy.min(x) and numpy.max(x) <= upper
-        return lower <= x <= upper
 
     def mixed_signs(self, x):
         """
