@@ -1183,6 +1183,59 @@ return:: outputs a numpy array (n sampled values, n bands)
     return outArr
 
 
+def extractImgPxlValsInMsk(img, img_bands, img_mask, img_mask_val, no_data=None):
+    """
+A function which extracts the image values within a mask for the specified image bands.
+
+* img - the image from which the random sample will be taken.
+* img_bands - the image bands the values are to be read from.
+* img_mask - the image mask specifying the regions of interest.
+* img_mask_val - the pixel value within the mask defining the region of interest.
+
+return:: outputs a numpy array (n values, n bands)
+
+"""
+    # Import the RIOS image reader
+    from rios.imagereader import ImageReader
+    outArr = None
+    first = True
+    reader = ImageReader([img, img_mask], windowxsize=200, windowysize=200)
+    print('Started .0.', end='', flush=True)
+    outCount = 10
+    for (info, block) in reader:
+        if info.getPercent() > outCount:
+            print('.' + str(int(outCount)) + '.', end='', flush=True)
+            outCount = outCount + 10
+
+        blk_img = block[0]
+        blk_msk = block[1].flatten()
+        blk_img_shape = blk_img.shape
+
+        blk_bands = blk_img.reshape((blk_img_shape[0], (blk_img_shape[1] * blk_img_shape[2])))
+        band_lst = []
+        for band in img_bands:
+            if (band > 0) and (band <= blk_bands.shape[0]):
+                band_lst.append(blk_bands[band - 1])
+            else:
+                raise Exception("Band ({}) specified is not within the image".format(band))
+        blk_bands_sel = numpy.stack(band_lst, axis=0)
+        blk_bands_trans = numpy.transpose(blk_bands_sel)
+
+        if no_data is not None:
+            blk_msk = blk_msk[(blk_bands_trans != no_data).all(axis=1)]
+            blk_bands_trans = blk_bands_trans[(blk_bands_trans != no_data).all(axis=1)]
+
+        if blk_bands_trans.shape[0] > 0:
+            blk_bands_trans = blk_bands_trans[blk_msk == img_mask_val]
+            if first:
+                out_arr = blk_bands_trans
+                first = False
+            else:
+                out_arr = numpy.concatenate((out_arr, blk_bands_trans), axis=0)
+    print('. Completed')
+    return out_arr
+
+
 def getUniqueValues(img, img_band=1):
     """
 Find the unique image values within an image band.
