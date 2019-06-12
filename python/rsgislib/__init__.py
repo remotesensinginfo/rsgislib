@@ -494,7 +494,7 @@ class RSGISPyUtils (object):
         inSpatRef.ImportFromWkt(inProjWKT)
         
         outSpatRef = osr.SpatialReference()
-        outSpatRef.ImportFromEPSG(outEPSG)
+        outSpatRef.ImportFromEPSG(int(outEPSG))
         
         rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
         if rasterDS == None:
@@ -805,7 +805,6 @@ class RSGISPyUtils (object):
 
         return bboxs
 
-    
     def reprojPoint(self, inProjOSRObj, outProjOSRObj, x, y):
         """
         Reproject a point from 'inProjOSRObj' to 'outProjOSRObj' where they are gdal
@@ -821,8 +820,7 @@ class RSGISPyUtils (object):
         outX = point.GetX()
         outY = point.GetY()
         return outX, outY
-    
-    
+
     def getImageBandStats(self, img, band, compute=True):
         """
         A function which calls the GDAL function on the band selected to calculate the pixel stats
@@ -974,7 +972,7 @@ class RSGISPyUtils (object):
         rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
         if rasterDS == None:
             raise RSGISPyException('Could not open raster image: \'' + inImg+ '\'')
-        projStr = rasterDS.GetProjection()
+        projStr = rasterDS.GetProjecxtion()
         rasterDS = None
         return projStr
     
@@ -1086,8 +1084,7 @@ class RSGISPyUtils (object):
         if layer is None:
             raise Exception("Could not open layer within file: {}".format(inVec))
         spatialRef = layer.GetSpatialRef()
-        spatialRef.AutoIdentifyEPSG()
-        return spatialRef.GetAuthorityCode(None)
+        return spatialRef.ExportToWkt()
 
     def getProjEPSGFromVec(self, inVec, vecLyr=None):
         """
@@ -1109,7 +1106,8 @@ class RSGISPyUtils (object):
         if layer is None:
             raise Exception("Could not open layer within file: {}".format(inVec))
         spatialRef = layer.GetSpatialRef()
-        return spatialRef.ExportToWkt()
+        spatialRef.AutoIdentifyEPSG()
+        return spatialRef.GetAuthorityCode(None)
         
     def getEPSGCodeFromWKT(self, wktString):
         """
