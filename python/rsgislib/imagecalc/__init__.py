@@ -700,6 +700,8 @@ def calcImgsPxlMode(inputImgs, outputImg, gdalformat, no_data_val=0):
     """
 Function which calculates the mode of a group of images.
 
+Warning, this function can be very slow. Use rsgislib.imagecalc.imagePixelColumnSummary
+
 Where:
 
 * inputImgs - the list of images
@@ -737,4 +739,95 @@ Where:
 
     applier.apply(_applyCalcMode, infiles, outfiles, otherargs, controls=aControls)
 
+
+def calcImgBasicStats4RefRegion(ref_img, stats_imgs, output_img, gdalformat='KEA'):
+    """
+A function which calculates the mean and standard deviation through a series of
+input images. The region for processing is defined by the reference image and
+images padded with no-data where no data is present.
+
+The output image has twice the number of bands as the input image providing
+a mean and standard deviation for each input band.
+
+If the input images has 2 bands then the output bands will have the following
+order:
+
+1. band 1 mean
+2. band 1 std dev
+3. band 2 mean
+4. band 3 std dev
+
+:param ref_img: reference image which defines the output image
+:param stats_imgs: a list of input images over which the stats will be calculated.
+:param output_img: the output image path and file name
+:param gdalformat: the output image file format. Default KEA.
+
+"""
+    import rsgislib.imageutils
+
+    rsgis_utils = rsgislib.RSGISPyUtils()
+    first = True
+    n_bands = 0
+    no_data_val = 0
+    for img in stats_imgs:
+        print(img)
+        if first:
+            n_bands = rsgis_utils.getImageBandCount(img)
+            no_data_val = rsgis_utils.getImageNoDataValue(img)
+            first = False
+        else:
+            if n_bands != rsgis_utils.getImageBandCount(img):
+                raise Exception("The number of bands must be the same in all input images.")
+            if no_data_val != rsgis_utils.getImageNoDataValue(img):
+                raise Exception("The no data value should be the same in all input images.")
+
+    # RIOS internal function to calculate  mean and standard deviation of the input images
+    def _calcBasicStats(info, inputs, outputs, otherargs):
+        n_imgs = len(inputs.imgs)
+        blk_shp = inputs.imgs[0].shape
+        if blk_shp[0] != otherargs.n_bands:
+            raise Exception("Block shape and the number of input image bands do not align.")
+        outputs.output_img = numpy.zeros((blk_shp[0] * 2, blk_shp[1], blk_shp[2]), dtype=float)
+
+        band_arr = []
+        for band in range(blk_shp[0]):
+            band_arr.append(numpy.zeros((n_imgs, blk_shp[1], blk_shp[2]), dtype=float))
+
+        img_idx = 0
+        for img_blk in inputs.imgs:
+            for band in range(blk_shp[0]):
+                band_arr[band][img_idx] = img_blk[band]
+            img_idx = img_idx + 1
+
+        for band in range(blk_shp[0]):
+            band_arr[band][band_arr[band] == otherargs.no_data_val] = numpy.nan
+
+            outputs.output_img[band * 2] = numpy.nanmean(band_arr[band], axis=0)
+            outputs.output_img[band * 2 + 1] = numpy.nanstd(band_arr[band], axis=0)
+
+            outputs.output_img[band * 2][numpy.isnan(outputs.output_img[band * 2])] = otherargs.no_data_val
+            outputs.output_img[band * 2 + 1][numpy.isnan(outputs.output_img[band * 2 + 1])] = 0.0
+
+    infiles = applier.FilenameAssociations()
+    infiles.imgs = stats_imgs
+
+    otherargs = applier.OtherInputs()
+    otherargs.n_bands = n_bands
+    otherargs.no_data_val = no_data_val
+
+    outfiles = applier.FilenameAssociations()
+    outfiles.output_img = output_img
+
+    aControls = applier.ApplierControls()
+    aControls.referenceImage = ref_img
+    aControls.footprint = applier.BOUNDS_FROM_REFERENCE
+    aControls.progress = cuiprogress.CUIProgressBar()
+    aControls.drivername = gdalformat
+    aControls.omitPyramids = True
+    aControls.calcStats = False
+    print("Calculating Stats Image.")
+    applier.apply(_calcBasicStats, infiles, outfiles, otherargs, controls=aControls)
+    print("Completed")
+
+    rsgislib.imageutils.popImageStats(output_img, usenodataval=True, nodataval=no_data_val, calcpyramids=True)
 
