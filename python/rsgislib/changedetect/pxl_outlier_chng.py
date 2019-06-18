@@ -52,14 +52,14 @@ except ImportError as riosErr:
     haveRIOS = False
 
 
-def find_class_outliers(pyob_obj, img, img_mask, out_lbls_img, out_scores_img=None, img_mask_val=1, img_bands=None,
+def find_class_outliers(pyod_obj, img, img_mask, out_lbls_img, out_scores_img=None, img_mask_val=1, img_bands=None,
                         gdalformat="KEA"):
     """
 This function uses the pyod (https://github.com/yzhao062/pyod) library to find outliers within a class.
 It is assumed that the input images are from a different date than the mask (classification) and therefore
 the outliners will related to class changes.
 
-:param pyob_obj: an instance of a pyod.models (e.g., pyod.models.knn.KNN) pass parameters to the constructor
+:param pyod_obj: an instance of a pyod.models (e.g., pyod.models.knn.KNN) pass parameters to the constructor
 :param img: input image used for analysis
 :param img_mask: input image mask use to define the region of interest.
 :param out_lbls_img: output image with pixel over of 1 for within mask but not outlier and 2 for in mask and outlier.
@@ -88,7 +88,7 @@ the outliners will related to class changes.
     print("There were {} pixels within the mask.".format(msk_arr_vals.shape[0]))
 
     print("Fitting oulier detector")
-    pyob_obj.fit(msk_arr_vals)
+    pyod_obj.fit(msk_arr_vals)
     print("Fitted oulier detector")
 
     # RIOS function to apply classifer
@@ -126,7 +126,7 @@ the outliners will related to class changes.
             img_bands_trans = img_bands_trans[img_msk_vals == otherargs.msk_val]
 
             if img_bands_trans.shape[0] > 0:
-                pred_lbls = otherargs.pyob_obj.predict(img_bands_trans)
+                pred_lbls = otherargs.pyod_obj.predict(img_bands_trans)
                 pred_lbls = pred_lbls + 1
                 out_lbls_vals[ID] = pred_lbls
             out_lbls_vals = numpy.expand_dims(
@@ -134,7 +134,7 @@ the outliners will related to class changes.
 
             if otherargs.out_scores:
                 if img_bands_trans.shape[0] > 0:
-                    pred_probs = otherargs.pyob_obj.predict_proba(img_bands_trans, method='unify')
+                    pred_probs = otherargs.pyod_obj.predict_proba(img_bands_trans, method='unify')
                     out_scores_vals[ID] = pred_probs[:, 1]
                 out_scores_vals = numpy.expand_dims(
                     out_scores_vals.reshape((inputs.image_mask.shape[1], inputs.image_mask.shape[2])), axis=0)
@@ -148,7 +148,7 @@ the outliners will related to class changes.
     infiles.img = img
 
     otherargs = applier.OtherInputs()
-    otherargs.pyob_obj = pyob_obj
+    otherargs.pyod_obj = pyod_obj
     otherargs.msk_val = img_mask_val
     otherargs.img_bands = img_bands
     otherargs.out_scores = False
