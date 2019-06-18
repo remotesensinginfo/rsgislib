@@ -1445,7 +1445,7 @@ returns list of dictionaries with the output values.
                 elif feat_types[attName] == ogr.OFTInteger:
                     outdict[attName] = inFeat.GetFieldAsInteger(feat_idx)
                 else:
-                    outdict[attName] = feat.GetField(feat_idx)
+                    outdict[attName] = inFeat.GetField(feat_idx)
             outvals.append(outdict)
             inFeat = mem_result_lyr.GetNextFeature()
         
@@ -1521,7 +1521,7 @@ returns list of dictionaries with the output values.
                 elif feat_types[attName] == ogr.OFTInteger:
                     outdict[attName] = inFeat.GetFieldAsInteger(feat_idx)
                 else:
-                    outdict[attName] = feat.GetField(feat_idx)
+                    outdict[attName] = inFeat.GetField(feat_idx)
             outvals.append(outdict)
             inFeat = mem_result_lyr.GetNextFeature()
         
@@ -1531,56 +1531,82 @@ returns list of dictionaries with the output values.
     return outvals
 
 
-def getAttLstSelectBBoxFeats(vecFile, vecLyr, attNames, bbox):
+def getAttLstSelectBBoxFeats(vec_file, vec_lyr, attNames, bbox, bbox_epsg=None):
     """
 Function to get a list of attribute values from features which intersect
 with the select layer.
-* vecFile - vector layer from which the attribute data comes from.
-* vecLyr - the layer name from which the attribute data comes from.
+* vec_file - the OGR file from which the attribute data comes from.
+* vec_lyr - the layer name within the file from which the attribute data comes from.
 * attNames - a list of attribute names to be outputted.
-* bbox - region of interest (bounding box). Define as [xMin, xMax, yMin, yMax].
+* bbox - the bounding box for the region of interest (xMin, xMax, yMin, yMax).
+* bbox_epsg - the projection of the BBOX (if None then ignore).
+
+returns list of dictionaries with the output values.
+
+"""
+    dsVecFile = gdal.OpenEx(vec_file, gdal.OF_READONLY)
+    if dsVecFile is None:
+        raise Exception("Could not open '" + vec_file + "'")
+
+    lyrVecObj = dsVecFile.GetLayerByName(vec_lyr)
+    if lyrVecObj is None:
+        raise Exception("Could not find layer '" + vec_lyr + "'")
+
+    outvals = getAttLstSelectBBoxFeatsLyrObjs(lyrVecObj, attNames, bbox, bbox_epsg)
+    dsVecFile = None
+
+    return outvals
+
+
+def getAttLstSelectBBoxFeatsLyrObjs(vecLyrObj, attNames, bbox, bbox_epsg=None):
+    """
+Function to get a list of attribute values from features which intersect
+with the select layer.
+* vecLyrObj - the OGR layer object from which the attribute data comes from.
+* attNames - a list of attribute names to be outputted.
+* bbox - the bounding box for the region of interest (xMin, xMax, yMin, yMax).
+* bbox_epsg - the projection of the BBOX (if None then ignore).
 
 returns list of dictionaries with the output values.
 
 """
     gdal.UseExceptions()
-    att_vals = []
+    outvals = []
     try:
-        dsVecFile = gdal.OpenEx(vecFile, gdal.OF_READONLY )
-        if dsVecFile is None:
-            raise Exception("Could not open '" + vecFile + "'")
-        
-        lyrVecObj = dsVecFile.GetLayerByName( vecLyr )
-        if lyrVecObj is None:
-            raise Exception("Could not find layer '" + vecLyr + "'")
-            
-        lyr_spatial_ref = lyrVecObj.GetSpatialRef()
-        
-        lyrDefn = lyrVecObj.GetLayerDefn()
+        if vecLyrObj is None:
+            raise Exception("The vector layer passed into the function was None.")
+
+        in_vec_lyr_spat_ref = vecLyrObj.GetSpatialRef()
+        if bbox_epsg is not None:
+            in_vec_lyr_spat_ref.AutoIdentifyEPSG()
+            in_vec_lyr_epsg = in_vec_lyr_spat_ref.GetAuthorityCode(None)
+
+            if (in_vec_lyr_epsg is not None) and (int(in_vec_lyr_epsg) != int(bbox_epsg)):
+                raise Exception("The EPSG codes for the BBOX and input vector layer are not the same.")
+
+        lyrDefn = vecLyrObj.GetLayerDefn()
         feat_idxs = dict()
-        feat_types= dict()
+        feat_types = dict()
         found_atts = dict()
         for attName in attNames:
             found_atts[attName] = False
-        
+
         for i in range(lyrDefn.GetFieldCount()):
             if lyrDefn.GetFieldDefn(i).GetName() in attNames:
                 attName = lyrDefn.GetFieldDefn(i).GetName()
                 feat_idxs[attName] = i
                 feat_types[attName] = lyrDefn.GetFieldDefn(i).GetType()
                 found_atts[attName] = True
-                
+
         for attName in attNames:
             if not found_atts[attName]:
-                dsSelVecFile = None            
-                dsVecFile = None
                 raise Exception("Could not find the attribute ({}) specified within the vector layer.".format(attName))
-            
+
+        # Create in-memory layer for the BBOX layer.
         mem_driver = ogr.GetDriverByName('MEMORY')
-        
-        mem_sel_ds = mem_driver.CreateDataSource('MemSelData')
-        mem_sel_lyr = mem_sel_ds.CreateLayer("MemSelLyr", lyr_spatial_ref, geom_type=ogr.wkbPolygon)
-        mem_sel_defn = mem_sel_lyr.GetLayerDefn()
+        mem_bbox_ds = mem_driver.CreateDataSource('MemBBOXData')
+        mem_bbox_lyr = mem_bbox_ds.CreateLayer("MemBBOXLyr", in_vec_lyr_spat_ref, geom_type=ogr.wkbPolygon)
+        mem_bbox_feat_defn = mem_bbox_lyr.GetLayerDefn()
         ring = ogr.Geometry(ogr.wkbLinearRing)
         ring.AddPoint(bbox[0], bbox[3])
         ring.AddPoint(bbox[1], bbox[3])
@@ -1590,22 +1616,26 @@ returns list of dictionaries with the output values.
         # Create polygon.
         poly = ogr.Geometry(ogr.wkbPolygon)
         poly.AddGeometry(ring)
-        mem_sel_feat = ogr.Feature(mem_sel_defn)
-        mem_sel_feat.SetGeometry(poly)
-        mem_sel_lyr.CreateFeature(mem_sel_feat)
-        
+        out_bbox_feat = ogr.Feature(mem_bbox_feat_defn)
+        out_bbox_feat.SetGeometryDirectly(poly)
+        mem_bbox_lyr.CreateFeature(out_bbox_feat)
+        mem_bbox_lyr.ResetReading()
+
         mem_result_ds = mem_driver.CreateDataSource('MemResultData')
-        mem_result_lyr = mem_result_ds.CreateLayer("MemResultLyr", geom_type=lyrVecObj.GetGeomType())
-        
+        mem_result_lyr = mem_result_ds.CreateLayer("MemResultLyr", in_vec_lyr_spat_ref,
+                                                   geom_type=vecLyrObj.GetGeomType())
+
         for attName in attNames:
             mem_result_lyr.CreateField(ogr.FieldDefn(attName, feat_types[attName]))
-        
-        lyrVecObj.Intersection(mem_sel_lyr, mem_result_lyr)
-        
+
+        vecLyrObj.Intersection(mem_bbox_lyr, mem_result_lyr)
+
+        mem_result_lyr.SyncToDisk()
+        mem_result_lyr.ResetReading()
+
         # loop through the input features
         reslyrDefn = mem_result_lyr.GetLayerDefn()
         inFeat = mem_result_lyr.GetNextFeature()
-        outvals = []
         while inFeat:
             outdict = dict()
             for attName in attNames:
@@ -1617,14 +1647,12 @@ returns list of dictionaries with the output values.
                 elif feat_types[attName] == ogr.OFTInteger:
                     outdict[attName] = inFeat.GetFieldAsInteger(feat_idx)
                 else:
-                    outdict[attName] = feat.GetField(feat_idx)
+                    outdict[attName] = inFeat.GetField(feat_idx)
             outvals.append(outdict)
             inFeat = mem_result_lyr.GetNextFeature()
-        
-        dsSelVecFile = None        
-        dsVecFile = None
-        mem_sel_ds = None
+
         mem_result_ds = None
+        mem_bbox_ds = None
     except Exception as e:
         raise e
     return outvals
@@ -1877,7 +1905,7 @@ When creating an attribute the available data types are ogr.OFTString, ogr.OFTIn
         # create the spatial reference
         srs = osr.SpatialReference()
         srs.ImportFromEPSG(int(epsgCode))
-        outLayer = outDataSource.CreateLayer(vectorLyr, srs, geom_type=ogr.wkbPolygon )
+        outLayer = outDataSource.CreateLayer(vectorLyr, srs, geom_type=ogr.wkbPolygon)
         
         
         addAtts = False
