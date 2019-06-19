@@ -972,7 +972,7 @@ class RSGISPyUtils (object):
         rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
         if rasterDS == None:
             raise RSGISPyException('Could not open raster image: \'' + inImg+ '\'')
-        projStr = rasterDS.GetProjecxtion()
+        projStr = rasterDS.GetProjection()
         rasterDS = None
         return projStr
     
