@@ -825,7 +825,7 @@ namespace rsgis{ namespace cmds {
                         outFileNames->push_back(outputFilePath);
                     }
                 }
-                catch (rsgis::img::RSGISImageBandException e)
+                catch (rsgis::img::RSGISImageBandException &e)
                 {
                     throw RSGISCmdException(e.what());
                 }
@@ -1632,7 +1632,7 @@ namespace rsgis{ namespace cmds {
                     calcImage->calcImageInEnv(dataset, 1, outputFilePath, data[i]->getBBox(), false, NULL, imageFormat, RSGIS_to_GDAL_Type(outDataType));
                     if(outFileNames != NULL){outFileNames->push_back(outputFilePath);}
                 }
-                catch (rsgis::img::RSGISImageBandException e)
+                catch (rsgis::img::RSGISImageBandException &e)
                 {
                     ++failCount;
                     if(failCount <= 100)
@@ -2952,11 +2952,11 @@ namespace rsgis{ namespace cmds {
             long ratLen = gdalRefRAT->GetRowCount();
             strFileNameArr = new std::string[ratLen];
             unsigned int idx = 0;
-            for(std::vector<std::string>::iterator iterFileName = compInfoVec.at(0)->imgFileNames->begin() ; iterFileName != compInfoVec.at(0)->imgFileNames->end(); ++iterFileName)
+            for(std::vector<std::string>::iterator iterFileName = compInfoVec.at(0)->imgFileNames->begin(); iterFileName != compInfoVec.at(0)->imgFileNames->end(); ++iterFileName)
             {
                 strFileNameArr[idx++] = (*iterFileName);
             }
-            for(std::map<std::string, unsigned int>::iterator iterFileName = ratImgLst->begin() ; iterFileName != ratImgLst->end(); ++iterFileName)
+            for(std::map<std::string, unsigned int>::iterator iterFileName = ratImgLst->begin(); iterFileName != ratImgLst->end(); ++iterFileName)
             {
                 strFileNameArr[(*iterFileName).second] = (*iterFileName).first;
             }

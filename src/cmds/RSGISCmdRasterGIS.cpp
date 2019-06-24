@@ -670,7 +670,7 @@ namespace rsgis{ namespace cmds {
         {
             throw RSGISCmdException(e.what());
         }
-        catch(RSGISCmdException e)
+        catch(RSGISCmdException &e)
         {
             throw e;
         }

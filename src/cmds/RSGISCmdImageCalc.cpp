@@ -77,10 +77,11 @@
 
 namespace rsgis{ namespace cmds {
 
-    void executeBandMaths(VariableStruct *variables, unsigned int numVars, std::string outputImage, std::string mathsExpression, std::string gdalFormat, RSGISLibDataType outDataType, bool useExpAsbandName)throw(RSGISCmdException)
+    void executeBandMaths(VariableStruct *variables, unsigned int numVars, std::string outputImage, std::string mathsExpression, std::string gdalFormat, RSGISLibDataType outDataType, bool useExpAsbandName, bool editOutputImg)throw(RSGISCmdException)
     {
         GDALAllRegister();
         GDALDataset **datasets = NULL;
+        GDALDataset *outDataset = NULL;
         rsgis::img::RSGISBandMath *bandmaths = NULL;
         rsgis::img::RSGISCalcImage *calcImage = NULL;
         mu::Parser *muParser = new mu::Parser();
@@ -95,33 +96,62 @@ namespace rsgis{ namespace cmds {
             }
             
             rsgis::img::VariableBands **processVaribles = new rsgis::img::VariableBands*[numVars];
-            datasets = new GDALDataset*[numVars];
 
             int numRasterBands = 0;
             int totalNumRasterBands = 0;
-
+            
+            std::list<std::string> file_names = std::list<std::string>();
             for(int i = 0; i < numVars; ++i)
             {
-                std::cout << variables[i].image << std::endl;
-                datasets[i] = (GDALDataset *) GDALOpen(variables[i].image.c_str(), GA_ReadOnly);
-                if(datasets[i] == NULL)
+                variables[i].defined = false;
+                file_names.push_back(variables[i].image);
+            }
+            
+            file_names.sort();
+            file_names.unique();
+            int total_n_imgs = file_names.size();
+            datasets = new GDALDataset*[total_n_imgs];
+            
+            int n_img = 0;
+            for(std::list<std::string>::iterator iter_filenames = file_names.begin(); iter_filenames != file_names.end(); ++iter_filenames)
+            {
+                std::cout << (*iter_filenames) << std::endl;
+                datasets[n_img] = (GDALDataset *) GDALOpen((*iter_filenames).c_str(), GA_ReadOnly);
+                if(datasets[n_img] == NULL)
                 {
-                    std::string message = std::string("Could not open image ") + variables[i].image;
+                    std::string message = std::string("Could not open image ") + (*iter_filenames);
                     throw rsgis::RSGISImageException(message.c_str());
                 }
-
-                numRasterBands = datasets[i]->GetRasterCount();
-
-                if((variables[i].bandNum < 0) | (variables[i].bandNum > numRasterBands))
+                numRasterBands = datasets[n_img]->GetRasterCount();
+                
+                for(int i = 0; i < numVars; ++i)
                 {
-                    throw rsgis::RSGISImageException("You have specified a band which is not within the image");
+                    if((variables[i].image == (*iter_filenames)) & !variables[i].defined)
+                    {
+                        if((variables[i].bandNum < 0) | (variables[i].bandNum > numRasterBands))
+                        {
+                            std::string message = std::string("You have specified a band for variable ") + variables[i].name + std::string("' which is not within the image ") + variables[i].image;
+                            throw rsgis::RSGISImageException(message);
+                        }
+
+                        processVaribles[i] = new rsgis::img::VariableBands();
+                        processVaribles[i]->name = variables[i].name;
+                        processVaribles[i]->band = totalNumRasterBands + (variables[i].bandNum - 1);
+                        
+                        variables[i].defined = true;
+                    }
                 }
-
-                processVaribles[i] = new rsgis::img::VariableBands();
-                processVaribles[i]->name = variables[i].name;
-                processVaribles[i]->band = totalNumRasterBands + (variables[i].bandNum - 1);
-
                 totalNumRasterBands += numRasterBands;
+                ++n_img;
+            }
+                
+            for(int i = 0; i < numVars; ++i)
+            {
+                if(!variables[i].defined)
+                {
+                    std::string message = std::string("Specified variable is not defined for variable '") + variables[i].name + std::string("' within image ") + variables[i].image;
+                    throw rsgis::RSGISImageException(message.c_str());
+                }
             }
 
             mu::value_type *inVals = new mu::value_type[numVars];
@@ -132,11 +162,30 @@ namespace rsgis{ namespace cmds {
             }
 
             muParser->SetExpr(mathsExpression.c_str());
+                
+            if(editOutputImg)
+            {
+                outDataset = (GDALDataset *) GDALOpen(outputImage.c_str(), GA_Update);
+                if(outDataset == NULL)
+                {
+                    std::string message = std::string("Could not open image ") + outputImage;
+                    throw rsgis::RSGISImageException(message.c_str());
+                }
+            }
 
             bandmaths = new rsgis::img::RSGISBandMath(1, processVaribles, numVars, muParser);
 
             calcImage = new rsgis::img::RSGISCalcImage(bandmaths, "", true);
-            calcImage->calcImage(datasets, numVars, outputImage, useExpAsbandName, outBandName, gdalFormat, RSGIS_to_GDAL_Type(outDataType));
+                
+            if(editOutputImg)
+            {
+                calcImage->calcImagePartialOutput(datasets, numVars, outDataset);
+            }
+            else
+            {
+                calcImage->calcImage(datasets, numVars, outputImage, useExpAsbandName, outBandName, gdalFormat, RSGIS_to_GDAL_Type(outDataType));
+            }
+            
 
             for(int i = 0; i < numVars; ++i)
             {
@@ -154,6 +203,10 @@ namespace rsgis{ namespace cmds {
             if(useExpAsbandName)
             {
                 delete[] outBandName;
+            }
+            if(editOutputImg)
+            {
+                GDALClose(outDataset);
             }
         }
         catch(rsgis::RSGISImageException &e)
@@ -175,10 +228,11 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeImageMaths(std::string inputImage, std::string outputImage, std::string mathsExpression, std::string imageFormat, RSGISLibDataType outDataType, bool useExpAsbandName)throw(RSGISCmdException)
+    void executeImageMaths(std::string inputImage, std::string outputImage, std::string mathsExpression, std::string imageFormat, RSGISLibDataType outDataType, bool useExpAsbandName, bool editOutputImg)throw(RSGISCmdException)
     {
         GDALAllRegister();
         GDALDataset **datasets = NULL;
+        GDALDataset *outDataset = NULL;
         rsgis::img::RSGISImageMaths *imageMaths = NULL;
         rsgis::img::RSGISCalcImage *calcImage = NULL;
         mu::Parser *muParser = new mu::Parser();
@@ -202,6 +256,16 @@ namespace rsgis{ namespace cmds {
             }
 
             int numRasterBands = datasets[0]->GetRasterCount();
+            
+            if(editOutputImg)
+            {
+                outDataset = (GDALDataset *) GDALOpen(outputImage.c_str(), GA_Update);
+                if(outDataset == NULL)
+                {
+                    std::string message = std::string("Could not open image ") + outputImage;
+                    throw rsgis::RSGISImageException(message.c_str());
+                }
+            }
 
             mu::value_type inVal;
             muParser->DefineVar(_T("b1"), &inVal);
@@ -210,11 +274,23 @@ namespace rsgis{ namespace cmds {
             imageMaths = new rsgis::img::RSGISImageMaths(numRasterBands, muParser);
 
             calcImage = new rsgis::img::RSGISCalcImage(imageMaths, "", true);
-            calcImage->calcImage(datasets, 1, outputImage, useExpAsbandName, outBandName, imageFormat, RSGIS_to_GDAL_Type(outDataType));
+            
+            if(editOutputImg)
+            {
+                calcImage->calcImagePartialOutput(datasets, 1, outDataset);
+            }
+            else
+            {
+                calcImage->calcImage(datasets, 1, outputImage, useExpAsbandName, outBandName, imageFormat, RSGIS_to_GDAL_Type(outDataType));
+            }
 
             GDALClose(datasets[0]);
             delete[] datasets;
-
+            
+            if(editOutputImg)
+            {
+                GDALClose(outDataset);
+            }
             
             if(useExpAsbandName)
             {
@@ -245,10 +321,11 @@ namespace rsgis{ namespace cmds {
     }
                 
                 
-    void executeImageBandMaths(std::string inputImage, std::string outputImage, std::string mathsExpression, std::string imageFormat, RSGISLibDataType outDataType, bool useExpAsbandName)throw(RSGISCmdException)
+    void executeImageBandMaths(std::string inputImage, std::string outputImage, std::string mathsExpression, std::string imageFormat, RSGISLibDataType outDataType, bool useExpAsbandName, bool editOutputImg)throw(RSGISCmdException)
     {
         GDALAllRegister();
         GDALDataset **datasets = NULL;
+        GDALDataset *outDataset = NULL;
         rsgis::img::RSGISImageBandMaths *imageMaths = NULL;
         rsgis::img::RSGISCalcImage *calcImage = NULL;
         mu::Parser *muParser = new mu::Parser();
@@ -274,6 +351,16 @@ namespace rsgis{ namespace cmds {
             
             int numRasterBands = datasets[0]->GetRasterCount();
             
+            if(editOutputImg)
+            {
+                outDataset = (GDALDataset *) GDALOpen(outputImage.c_str(), GA_Update);
+                if(outDataset == NULL)
+                {
+                    std::string message = std::string("Could not open image ") + outputImage;
+                    throw rsgis::RSGISImageException(message.c_str());
+                }
+            }
+            
             std::vector<std::string> bNames;
             mu::value_type *inVals = new mu::value_type[numRasterBands];
             for(int i = 0; i < numRasterBands; ++i)
@@ -288,7 +375,15 @@ namespace rsgis{ namespace cmds {
             imageMaths = new rsgis::img::RSGISImageBandMaths(muParser, numRasterBands, bNames);
             
             calcImage = new rsgis::img::RSGISCalcImage(imageMaths, "", true);
-            calcImage->calcImage(datasets, 1, outputImage, useExpAsbandName, outBandName, imageFormat, RSGIS_to_GDAL_Type(outDataType));
+            
+            if(editOutputImg)
+            {
+                calcImage->calcImagePartialOutput(datasets, 1, outDataset);
+            }
+            else
+            {
+                calcImage->calcImage(datasets, 1, outputImage, useExpAsbandName, outBandName, imageFormat, RSGIS_to_GDAL_Type(outDataType));
+            }
             
             GDALClose(datasets[0]);
             delete[] datasets;
@@ -296,6 +391,11 @@ namespace rsgis{ namespace cmds {
             if(useExpAsbandName)
             {
                 delete[] outBandName;
+            }
+            
+            if(editOutputImg)
+            {
+                GDALClose(outDataset);
             }
             
             delete muParser;
@@ -864,7 +964,7 @@ namespace rsgis{ namespace cmds {
                 delete[] outMaxBands;
             }
         }
-        catch(rsgis::RSGISException e)
+        catch(rsgis::RSGISException &e)
         {
             throw RSGISCmdException(e.what());
         }
@@ -1029,10 +1129,10 @@ namespace rsgis{ namespace cmds {
             covarianceMatrix = calcImgMatrix->calcImageMatrix(datasetsA, datasetsB, 1);
             matrixUtils.saveMatrix2txt(covarianceMatrix, outputMatrix);
         }
-        catch(rsgis::RSGISException e) {
+        catch(rsgis::RSGISException &e) {
             throw RSGISCmdException(e.what());
         }
-        catch(rsgis::math::RSGISMatricesException e) {
+        catch(rsgis::math::RSGISMatricesException &e) {
             throw RSGISCmdException(e.what());
         }
         
@@ -1117,7 +1217,7 @@ namespace rsgis{ namespace cmds {
             meanVectorMatrix = calcImgMatrix->calcImageVector(datasets, 1);
             matrixUtils.saveMatrix2txt(meanVectorMatrix, outputMatrix);
         }
-        catch(rsgis::RSGISException e)
+        catch(rsgis::RSGISException &e)
         {
             throw RSGISCmdException(e.what());
         }
@@ -1188,7 +1288,7 @@ namespace rsgis{ namespace cmds {
             }
 
         }
-        catch(rsgis::RSGISException e)
+        catch(rsgis::RSGISException &e)
         {
             throw e;
         }
@@ -1246,7 +1346,7 @@ namespace rsgis{ namespace cmds {
             delete [] datasets;
 
         }
-        catch(rsgis::RSGISException e)
+        catch(rsgis::RSGISException &e)
         {
             throw e;
         }
@@ -1434,7 +1534,7 @@ namespace rsgis{ namespace cmds {
             delete[] imgBandsInStack;
 
         }
-        catch(rsgis::RSGISException e)
+        catch(rsgis::RSGISException &e)
         {
             throw RSGISCmdException(e.what());
         }
@@ -1468,7 +1568,7 @@ namespace rsgis{ namespace cmds {
             delete calcImage;
             delete calcImageValue;
         }
-        catch(rsgis::RSGISException e)
+        catch(rsgis::RSGISException &e)
         {
             throw RSGISCmdException(e.what());
         }
@@ -1534,7 +1634,7 @@ namespace rsgis{ namespace cmds {
             }
 
         }
-        catch(rsgis::RSGISException e)
+        catch(rsgis::RSGISException &e)
         {
             throw RSGISCmdException(e.what());
         }
@@ -1705,7 +1805,7 @@ namespace rsgis{ namespace cmds {
             GDALClose(inputSHPDS);
             GDALClose(outImage);
         }
-        catch (rsgis::RSGISException e)
+        catch (rsgis::RSGISException &e)
         {
             throw RSGISCmdException(e.what());
         }
@@ -1756,7 +1856,7 @@ namespace rsgis{ namespace cmds {
             GDALClose(datasets[0]);
             delete[] datasets;
         }
-        catch(rsgis::RSGISException e)
+        catch(rsgis::RSGISException &e)
         {
             throw RSGISCmdException(e.what());
         }
@@ -1801,7 +1901,7 @@ namespace rsgis{ namespace cmds {
             delete[] datasets;
 
         }
-        catch(rsgis::RSGISException e)
+        catch(rsgis::RSGISException &e)
         {
             throw RSGISCmdException(e.what());
         }
@@ -1829,7 +1929,7 @@ namespace rsgis{ namespace cmds {
             GDALClose(datasets[0]);
             delete[] datasets;
         }
-        catch(rsgis::RSGISException e)
+        catch(rsgis::RSGISException &e)
         {
             throw RSGISCmdException(e.what());
         }
@@ -1857,7 +1957,7 @@ namespace rsgis{ namespace cmds {
             GDALClose(datasets[0]);
             delete[] datasets;
         }
-        catch(rsgis::RSGISException e)
+        catch(rsgis::RSGISException &e)
         {
             throw RSGISCmdException(e.what());
         }
@@ -1885,7 +1985,7 @@ namespace rsgis{ namespace cmds {
             GDALClose(datasets[0]);
             delete[] datasets;
         }
-        catch(rsgis::RSGISException e)
+        catch(rsgis::RSGISException &e)
         {
             throw RSGISCmdException(e.what());
         }
@@ -1912,7 +2012,7 @@ namespace rsgis{ namespace cmds {
             GDALClose(datasets[0]);
             delete[] datasets;
         }
-        catch(rsgis::RSGISException e)
+        catch(rsgis::RSGISException &e)
         {
             throw RSGISCmdException(e.what());
         }
@@ -1940,7 +2040,7 @@ namespace rsgis{ namespace cmds {
             delete[] datasets;
             delete calcImageValue;
         }
-        catch(rsgis::RSGISException e)
+        catch(rsgis::RSGISException &e)
         {
             throw RSGISCmdException(e.what());
         }
@@ -2004,7 +2104,7 @@ namespace rsgis{ namespace cmds {
             GDALClose(datasets[1]);
             delete[] datasets;
         }
-        catch(rsgis::RSGISException e)
+        catch(rsgis::RSGISException &e)
         {
             throw RSGISCmdException(e.what());
         }
@@ -2058,7 +2158,7 @@ namespace rsgis{ namespace cmds {
             
             GDALClose(dataset);
         }
-        catch(rsgis::RSGISException e)
+        catch(rsgis::RSGISException &e)
         {
             throw RSGISCmdException(e.what());
         }
@@ -2098,7 +2198,7 @@ namespace rsgis{ namespace cmds {
 
             GDALClose(imageDataset);
         }
-        catch(rsgis::RSGISException e)
+        catch(rsgis::RSGISException &e)
         {
             throw RSGISCmdException(e.what());
         }
@@ -2182,7 +2282,7 @@ namespace rsgis{ namespace cmds {
             GDALClose(outImage);
             GDALClose(imgDataset);
         }
-        catch (rsgis::RSGISException e)
+        catch (rsgis::RSGISException &e)
         {
             throw RSGISCmdException(e.what());
         }
