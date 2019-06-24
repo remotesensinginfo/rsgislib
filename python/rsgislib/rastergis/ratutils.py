@@ -1120,6 +1120,16 @@ def _ratapplier_defClassNames(info, inputs, outputs, otherargs):
     setattr(outputs.outrat, otherargs.classNameCol, classNames)
 
 def defineClassNames(clumps, classNumCol, classNameCol, classNamesDict):
+    """
+A function to create a class names column in a RAT based on segmented clumps where a number of clumps
+have the same number class.
+
+:param clumps: input clumps image.
+:param classNumCol: column specifying the class number (e.g., where clumps are segments in a segmentation)
+:param classNameCol: the output column name where a string will be created if it doesn't already exists.
+:param classNamesDict: Dictionary to look up the class names. The key needs to the integer number for the class
+
+"""
     in_rats = ratapplier.RatAssociations()
     out_rats = ratapplier.RatAssociations()
                 
@@ -1132,6 +1142,86 @@ def defineClassNames(clumps, classNumCol, classNameCol, classNamesDict):
     otherargs.classNamesDict = classNamesDict
 
     ratapplier.apply(_ratapplier_defClassNames, in_rats, out_rats, otherargs)
+
+
+def setClassNamesColours(clumpsImg, classNamesCol, classInfoDict):
+    """
+A function to define a class names column and define the class colours.
+
+classInfoDict = dict()
+classInfoDict[1] = {classname='Forest', red=0, green=255, blue=0}
+classInfoDict[2] = {classname='Water', red=0, green=0, blue=255}
+
+:param clumpsImg: Input clumps image - expecting a classification (rather than segmentation)
+                  where the number is the pixel value.
+:param classNamesCol: The output column for the class names.
+:param classInfoDict: a dict where the key is the pixel value for the class.
+
+"""
+    # Check numpy is available
+    if not haveNumpy:
+        raise Exception("The numpy module is required for this function could not be imported\n\t" + numErr)
+    # Check gdal is available
+    if not haveGDALPy:
+        raise Exception("The GDAL python bindings are required for this function could not be imported\n\t" + gdalErr)
+    # Check rios rat is available
+    if not haveRIOSRat:
+        raise Exception("The RIOS rat tools are required for this function could not be imported\n\t" + riosRatErr)
+
+    n_rows = rsgislib.rastergis.getRATLength(clumpsImg)
+    col_names = rsgislib.rastergis.getRATColumns(clumpsImg)
+
+    red_avail = False
+    green_avail = False
+    blue_avail = False
+    if 'Red' in col_names:
+        red_avail = True
+    if 'Green' in col_names:
+        green_avail = True
+    if 'Blue' in col_names:
+        blue_avail = True
+
+    class_names_col_avail = False
+    if classNamesCol in col_names:
+        class_names_col_avail = True
+
+    ratDataset = gdal.Open(clumpsImg, gdal.GA_Update)
+
+    if red_avail:
+        red_arr = rat.readColumn(ratDataset, 'Red')
+    else:
+        red_arr = numpy.zeros(n_rows, dtype=int)
+
+    if green_avail:
+        green_arr = rat.readColumn(ratDataset, 'Green')
+    else:
+        green_arr = numpy.zeros(n_rows, dtype=int)
+
+    if blue_avail:
+        blue_arr = rat.readColumn(ratDataset, 'Blue')
+    else:
+        blue_arr = numpy.zeros(n_rows, dtype=int)
+
+    if class_names_col_avail:
+        class_names_arr = rat.readColumn(ratDataset, classNamesCol)
+    else:
+        class_names_arr = numpy.zeros(n_rows, dtype=numpy.dtype('a255'))
+
+    for class_key in classInfoDict:
+        if (class_key >= 0) and (class_key < n_rows):
+            class_names_arr[class_key] = classInfoDict[class_key]['classname']
+            red_arr[class_key] = classInfoDict[class_key]['red']
+            green_arr[class_key] = classInfoDict[class_key]['green']
+            blue_arr[class_key] = classInfoDict[class_key]['blue']
+        else:
+            raise Exception("Class key ({}) was not within the number of rows in the RAT.".format(class_key))
+
+    rat.writeColumn(ratDataset, classNamesCol, class_names_arr)
+    rat.writeColumn(ratDataset, 'Red', red_arr)
+    rat.writeColumn(ratDataset, 'Green', green_arr)
+    rat.writeColumn(ratDataset, 'Blue', blue_arr)
+
+    ratDataset = None
 
 
 def populateClumpsWithClassTraining(clumpsImg, classesDict, tmpPath, classesIntCol, classesNameCol):
@@ -1493,6 +1583,7 @@ def calcDist2Classes(clumpsImg, classCol, outImgBase, tmpDIR='./tmp', tileSize=2
     else:
         os.remove(classesImg)
 
+
 def calcDistBetweenClumps(clumpsImg, outColName, tmpDIR='./tmp', useIdx=False, maxDistThres=10):
     """
 Calculate the distance between all clumps
@@ -1527,7 +1618,6 @@ Calculate the distance between all clumps
     
     if not tmpPresent:
         shutil.rmtree(tmpDIR, ignore_errors=True)
-
 
 
 def calcDistToLargeClumps(clumpsImg, outColName, sizeThres, tmpDIR='./tmp', useIdx=False, maxDistThres=10):
@@ -1615,7 +1705,6 @@ Calculate the distance from each small clump to a large clump. Split defined by 
     
     if not tmpPresent:
         shutil.rmtree(tmpDIR, ignore_errors=True)
-
 
 
 def takeRandomSample(clumpsImg, inColName, inColVal, outColName, sampleRatio, seed=0):
