@@ -38,19 +38,18 @@ struct ImageCalcState
 static struct ImageCalcState _state;
 #endif
 
-static PyObject *ImageCalc_BandMath(PyObject *self, PyObject *args)
+static PyObject *ImageCalc_BandMath(PyObject *self, PyObject *args, PyObject *keywds)
 {
+    static char *kwlist[] = {"outputimg", "exp", "gdalformat", "datatype", "banddefseq", "expbandname", "outputexists", NULL};
     const char *pszOutputFile, *pszExpression, *pszGDALFormat;
     int nDataType;
     int bExpBandName = 0;
+    int bOutputImgExists = 0;
     PyObject *pBandDefnObj;
-    if( !PyArg_ParseTuple(args, "sssiO|i:bandMath", &pszOutputFile, &pszExpression, &pszGDALFormat, &nDataType, &pBandDefnObj, &bExpBandName))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssiO|ii:bandMath", kwlist, &pszOutputFile, &pszExpression, &pszGDALFormat, &nDataType, &pBandDefnObj, &bExpBandName, &bOutputImgExists))
     {
         return NULL;
     }
-
-    // we made these values the same so should work
-    rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
 
     if( !PySequence_Check(pBandDefnObj))
     {
@@ -110,8 +109,10 @@ static PyObject *ImageCalc_BandMath(PyObject *self, PyObject *args)
 
     try
     {
+        rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
         bool useExpAsbandName = (bool)bExpBandName;
-        rsgis::cmds::executeBandMaths(pRSGISStruct, nBandDefns, pszOutputFile, pszExpression, pszGDALFormat, type, useExpAsbandName);
+        bool outputImgExists = (bool)bOutputImgExists;
+        rsgis::cmds::executeBandMaths(pRSGISStruct, nBandDefns, pszOutputFile, pszExpression, pszGDALFormat, type, useExpAsbandName, outputImgExists);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -124,12 +125,14 @@ static PyObject *ImageCalc_BandMath(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-static PyObject *ImageCalc_ImageMath(PyObject *self, PyObject *args)
+static PyObject *ImageCalc_ImageMath(PyObject *self, PyObject *args, PyObject *keywds)
 {
+    static char *kwlist[] = {"inputimg", "outputimg", "exp", "gdalformat", "datatype", "expbandname", "outputexists", NULL};
     const char *pszInputImage, *pszOutputFile, *pszExpression, *pszGDALFormat;
     int nDataType;
     int bExpBandName = 0;
-    if( !PyArg_ParseTuple(args, "ssssi|i:imageMath", &pszInputImage, &pszOutputFile, &pszExpression, &pszGDALFormat, &nDataType, &bExpBandName))
+    int bOutputImgExists = 0;
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssi|i:imageMath", kwlist, &pszInputImage, &pszOutputFile, &pszExpression, &pszGDALFormat, &nDataType, &bExpBandName, &bOutputImgExists))
     {
         return NULL;
     }
@@ -138,7 +141,8 @@ static PyObject *ImageCalc_ImageMath(PyObject *self, PyObject *args)
     {
         rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
         bool useExpAsbandName = (bool)bExpBandName;
-        rsgis::cmds::executeImageMaths(pszInputImage, pszOutputFile, pszExpression, pszGDALFormat, type, useExpAsbandName);
+        bool outputImgExists = (bool)bOutputImgExists;
+        rsgis::cmds::executeImageMaths(pszInputImage, pszOutputFile, pszExpression, pszGDALFormat, type, useExpAsbandName, outputImgExists);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -149,12 +153,14 @@ static PyObject *ImageCalc_ImageMath(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-static PyObject *ImageCalc_ImageBandMath(PyObject *self, PyObject *args)
+static PyObject *ImageCalc_ImageBandMath(PyObject *self, PyObject *args, PyObject *keywds)
 {
+    static char *kwlist[] = {"inputimg", "outputimg", "exp", "gdalformat", "datatype", "expbandname", "outputexists", NULL};
     const char *pszInputImage, *pszOutputFile, *pszExpression, *pszGDALFormat;
     int nDataType;
     int bExpBandName = 0;
-    if( !PyArg_ParseTuple(args, "ssssi|i:imageBandMath", &pszInputImage, &pszOutputFile, &pszExpression, &pszGDALFormat, &nDataType, &bExpBandName))
+    int bOutputImgExists = 0;
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssi|i:imageBandMath", kwlist, &pszInputImage, &pszOutputFile, &pszExpression, &pszGDALFormat, &nDataType, &bExpBandName, &bOutputImgExists))
     {
         return NULL;
     }
@@ -163,7 +169,8 @@ static PyObject *ImageCalc_ImageBandMath(PyObject *self, PyObject *args)
     {
         rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
         bool useExpAsbandName = (bool)bExpBandName;
-        rsgis::cmds::executeImageBandMaths(pszInputImage, pszOutputFile, pszExpression, pszGDALFormat, type, useExpAsbandName);
+        bool outputImgExists = (bool)bOutputImgExists;
+        rsgis::cmds::executeImageBandMaths(pszInputImage, pszOutputFile, pszExpression, pszGDALFormat, type, useExpAsbandName, outputImgExists);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -2064,19 +2071,20 @@ static PyObject *ImageCalc_CalcImgMeanInMask(PyObject *self, PyObject *args, PyO
 
 // Our list of functions in this module
 static PyMethodDef ImageCalcMethods[] = {
-    {"bandMath", ImageCalc_BandMath, METH_VARARGS,
-"rsgislib.imagecalc.bandMath(outputImage, expression, gdalformat, datatype, bandDefnSeq, useExpAsbandName)\n"
+    {"bandMath", (PyCFunction)ImageCalc_BandMath, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imagecalc.bandMath(outputimg, exp, gdalformat, datatype, banddefseq, expbandname, outputexists)\n"
 "Performs band math calculation.\n"
 "The syntax for the expression is from the muparser library ('http://muparser.beltoforion.de <http://muparser.beltoforion.de>`): `see here <http://beltoforion.de/article.php?a=muparser&hl=en&p=features&s=idPageTop>`\n."
 "\n"
 "Where:\n"
 "\n"
-"* outputImage is a string containing the name of the output file\n"
-"* expression is a string containing the expression to run over the images, uses muparser syntax.\n"
+"* outputimg is a string containing the name of the output file\n"
+"* exp is a string containing the expression to run over the images, uses muparser syntax.\n"
 "* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
 "* datatype is an containing one of the values from rsgislib.TYPE_*\n"
-"* bandDefnSeq is a sequence of rsgislib.imagecalc.BandDefn objects that define the inputs\n"
-"* useExpAsbandName is an optional bool specifying whether the band name should be the expression (Default = False).\n"
+"* banddefseq is a sequence of rsgislib.imagecalc.BandDefn objects that define the inputs\n"
+"* expbandname is an optional bool specifying whether the band name should be the expression (Default = False).\n"
+"* outputexists is an optional bool specifying whether the output image already exists and it should be editted rather than overwritten (Default=False)."
 "\n"
 "Example::\n"
 "\n"
@@ -2102,20 +2110,21 @@ static PyMethodDef ImageCalcMethods[] = {
 "   imagecalc.bandMath('out.kea', ‘(b1==1) || (b2==1) || (b3==1)?1:0', 'KEA', rsgislib.TYPE_8UINT, bandDefns)\n"
 "\n"},
 
-{"imageMath", ImageCalc_ImageMath, METH_VARARGS,
-"rsgislib.imagecalc.imageMath(inputImage, outputImage, expression, gdalformat, datatype, useExpAsbandName)\n"
+{"imageMath", (PyCFunction)ImageCalc_ImageMath, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imagecalc.imageMath(inputimg, outputimg, exp, gdalformat, datatype, expbandname, outputexists)\n"
 "Performs image math calculations. Produces an output image file with the same number of bands as the input image.\n"
 "This function applies the same calculation to each image band (i.e., b1 is the only variable).\n"
 "The syntax for the expression is from the muparser library ('http://muparser.beltoforion.de <http://muparser.beltoforion.de>`): `see here <http://beltoforion.de/article.php?a=muparser&hl=en&p=features&s=idPageTop>`\n."
 "\n"
 "Where:\n"
 "\n"
-"* inimage is a string containing the name of the input file\n"
-"* outputImage is a string containing the name of the output file\n"
-"* expression is a string containing the expression to run over the images, uses myparser syntax.\n"
+"* inputimg is a string containing the name of the input file\n"
+"* outputimg is a string containing the name of the output file\n"
+"* exp is a string containing the expression to run over the images, uses myparser syntax.\n"
 "* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
 "* datatype is an containing one of the values from rsgislib.TYPE_*\n"
-"* useExpAsbandName is an optional bool specifying whether the band name should be the expression (Default = False).\n"
+"* expbandname is an optional bool specifying whether the band name should be the expression (Default = False).\n"
+"* outputexists is an optional bool specifying whether the output image already exists and it should be editted rather than overwritten (Default=False)."
 "\n"
 "Example::\n"
 "\n"
@@ -2127,21 +2136,22 @@ static PyMethodDef ImageCalcMethods[] = {
 "   expression = 'b1*1000'\n"
 "   imagecalc.imageMath(inFileName, outputImage, expression, gdalformat, datatype)\n"
 "\n"},
-    
-{"imageBandMath", ImageCalc_ImageBandMath, METH_VARARGS,
-"rsgislib.imagecalc.imageBandMath(inputImage, outputImage, expression, gdalformat, datatype, useExpAsbandName)\n"
+
+{"imageBandMath", (PyCFunction)ImageCalc_ImageBandMath, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imagecalc.imageBandMath(inputimg, outputimg, exp, gdalformat, datatype, expbandname, outputexists)\n"
 "Performs image band math calculations. Produces a single output file with a single image band.\n"
 "The image bands can be referred to individually using b1, b2 ... bn. where n is the number of image bands, starting at 1.\n"
 "The syntax for the expression is from the muparser library ('http://muparser.beltoforion.de <http://muparser.beltoforion.de>`): `see here <http://beltoforion.de/article.php?a=muparser&hl=en&p=features&s=idPageTop>`\n."
 "\n"
 "Where:\n"
 "\n"
-"* inimage is a string containing the name of the input file\n"
-"* outputImage is a string containing the name of the output file\n"
-"* expression is a string containing the expression to run over the images, uses myparser syntax.\n"
+"* inputimg is a string containing the name of the input file\n"
+"* outputimg is a string containing the name of the output file\n"
+"* exp is a string containing the expression to run over the images, uses myparser syntax.\n"
 "* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
 "* datatype is an containing one of the values from rsgislib.TYPE_*\n"
-"* useExpAsbandName is an optional bool specifying whether the band name should be the expression (Default = False).\n"
+"* expbandname is an optional bool specifying whether the band name should be the expression (Default = False).\n"
+"* outputexists is an optional bool specifying whether the output image already exists and it should be editted rather than overwritten (Default=False)."
 "\n"
 "Example::\n"
 "\n"
