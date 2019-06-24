@@ -38,28 +38,6 @@ struct ElevationState
 static struct ElevationState _state;
 #endif
 
-// Helper function to extract python sequence to array of strings
-static std::string *ExtractStringArrayFromSequence(PyObject *sequence, int *nElements) {
-    Py_ssize_t nFields = PySequence_Size(sequence);
-    *nElements = nFields;
-    std::string *stringsArray = new std::string[nFields];
-
-    for(int i = 0; i < nFields; ++i) {
-        PyObject *stringObj = PySequence_GetItem(sequence, i);
-
-        if(!RSGISPY_CHECK_STRING(stringObj)) {
-            PyErr_SetString(GETSTATE(sequence)->error, "Fields must be strings");
-            Py_DECREF(stringObj);
-            return stringsArray;
-        }
-
-        stringsArray[i] = RSGISPY_STRING_EXTRACT(stringObj);
-        Py_DECREF(stringObj);
-    }
-
-    return stringsArray;
-}
-
 static PyObject *Elevation_calcSlope(PyObject *self, PyObject *args)
 {
     const char *pszInputImage, *pszOutputFile, *pszGDALFormat, *pszOutUnit;
