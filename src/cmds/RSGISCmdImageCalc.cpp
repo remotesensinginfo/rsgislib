@@ -115,7 +115,7 @@ namespace rsgis{ namespace cmds {
             int n_img = 0;
             for(std::list<std::string>::iterator iter_filenames = file_names.begin(); iter_filenames != file_names.end(); ++iter_filenames)
             {
-                std::cout << (*iter_filenames) << std::endl;
+                std::cout << "Image: " << (*iter_filenames) << std::endl;
                 datasets[n_img] = (GDALDataset *) GDALOpen((*iter_filenames).c_str(), GA_ReadOnly);
                 if(datasets[n_img] == NULL)
                 {
@@ -128,6 +128,7 @@ namespace rsgis{ namespace cmds {
                 {
                     if((variables[i].image == (*iter_filenames)) & !variables[i].defined)
                     {
+                        std::cout << "\t Variable '" << variables[i].name << " is band " << variables[i].bandNum << std::endl;
                         if((variables[i].bandNum < 0) | (variables[i].bandNum > numRasterBands))
                         {
                             std::string message = std::string("You have specified a band for variable ") + variables[i].name + std::string("' which is not within the image ") + variables[i].image;
@@ -144,7 +145,7 @@ namespace rsgis{ namespace cmds {
                 totalNumRasterBands += numRasterBands;
                 ++n_img;
             }
-                
+
             for(int i = 0; i < numVars; ++i)
             {
                 if(!variables[i].defined)
@@ -160,9 +161,8 @@ namespace rsgis{ namespace cmds {
                 inVals[i] = 0;
                 muParser->DefineVar(_T(processVaribles[i]->name.c_str()), &inVals[i]);
             }
-
             muParser->SetExpr(mathsExpression.c_str());
-                
+            
             if(editOutputImg)
             {
                 outDataset = (GDALDataset *) GDALOpen(outputImage.c_str(), GA_Update);
@@ -174,25 +174,26 @@ namespace rsgis{ namespace cmds {
             }
 
             bandmaths = new rsgis::img::RSGISBandMath(1, processVaribles, numVars, muParser);
-
             calcImage = new rsgis::img::RSGISCalcImage(bandmaths, "", true);
-                
             if(editOutputImg)
             {
-                calcImage->calcImagePartialOutput(datasets, numVars, outDataset);
+                calcImage->calcImagePartialOutput(datasets, total_n_imgs, outDataset);
             }
             else
             {
-                calcImage->calcImage(datasets, numVars, outputImage, useExpAsbandName, outBandName, gdalFormat, RSGIS_to_GDAL_Type(outDataType));
+                calcImage->calcImage(datasets, total_n_imgs, outputImage, useExpAsbandName, outBandName, gdalFormat, RSGIS_to_GDAL_Type(outDataType));
             }
             
-
-            for(int i = 0; i < numVars; ++i)
+            for(int i = 0; i < total_n_imgs; ++i)
             {
                 GDALClose(datasets[i]);
-                delete processVaribles[i];
             }
             delete[] datasets;
+            
+            for(int i = 0; i < numVars; ++i)
+            {
+                delete processVaribles[i];
+            }
             delete[] processVaribles;
 
             delete[] inVals;
