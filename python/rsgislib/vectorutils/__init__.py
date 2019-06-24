@@ -1658,6 +1658,57 @@ returns list of dictionaries with the output values.
     return outvals
 
 
+def selectIntersectFeats(vecFile, vecLyr, roiVecFile, roiVecLyr, out_vec_file, out_vec_lyr, out_vec_format='GPKG'):
+    """
+Function to select the features which intersect with region of interest (ROI) features which will be outputted
+into a new vector layer.
+
+* vecFile - vector layer from which the attribute data comes from.
+* vecLyr - the layer name from which the attribute data comes from.
+* roiVecFile - the vector file which will be intersected within the vector file.
+* roiVecLyr - the layer name which will be intersected within the vector file.
+* out_vec_file - the vector file which will be outputted.
+* out_vec_lyr - the layer name which will be outputted.
+* out_vec_format - output vector format (default GPKG)
+
+"""
+    gdal.UseExceptions()
+    dsVecFile = gdal.OpenEx(vecFile, gdal.OF_READONLY)
+    if dsVecFile is None:
+        raise Exception("Could not open '" + vecFile + "'")
+
+    lyrVecObj = dsVecFile.GetLayerByName(vecLyr)
+    if lyrVecObj is None:
+        raise Exception("Could not find layer '" + vecLyr + "'")
+
+    in_vec_lyr_spat_ref = lyrVecObj.GetSpatialRef()
+
+    dsROIVecFile = gdal.OpenEx(roiVecFile, gdal.OF_READONLY)
+    if dsROIVecFile is None:
+        raise Exception("Could not open '" + roiVecFile + "'")
+
+    lyrROIVecObj = dsROIVecFile.GetLayerByName(roiVecLyr)
+    if lyrROIVecObj is None:
+        raise Exception("Could not find layer '" + roiVecLyr + "'")
+
+    lyrDefn = lyrVecObj.GetLayerDefn()
+
+    mem_driver = ogr.GetDriverByName('MEMORY')
+    mem_roi_ds = mem_driver.CreateDataSource('MemSelData')
+    mem_roi_lyr = mem_roi_ds.CopyLayer(lyrROIVecObj, roiVecLyr, ['OVERWRITE=YES'])
+
+    out_driver = ogr.GetDriverByName(out_vec_format)
+    result_ds = out_driver.CreateDataSource(out_vec_file)
+    result_lyr = result_ds.CreateLayer(out_vec_lyr, in_vec_lyr_spat_ref, geom_type=lyrVecObj.GetGeomType())
+
+    lyrVecObj.Intersection(mem_roi_lyr, result_lyr)
+
+    dsVecFile = None
+    dsROIVecFile = None
+    mem_roi_ds = None
+    result_ds = None
+
+
 def exportSpatialSelectFeats(vecFile, vecLyr, selVecFile, selVecLyr, outputVec, outVecLyrName, outVecDrvr):
     """
 Function to get a list of attribute values from features which intersect

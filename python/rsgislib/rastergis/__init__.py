@@ -71,7 +71,6 @@ Example::
    rastergis.exportCols2GDALImage(clumps, outimage, gdalformat, datatype, fields)
 
 """
-    
     import os
     import rsgislib
     from rsgislib import imageutils
