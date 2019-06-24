@@ -30,7 +30,7 @@ namespace rsgis{namespace img{
 		
 	}
 	
-	void RSGISImageNormalisation::normaliseImage(GDALDataset *dataset, double *imageMax, double *imageMin, double *outMax, double *outMin, bool calcStats, std::string outputImage)throw(RSGISImageCalcException,RSGISImageBandException)
+	void RSGISImageNormalisation::normaliseImage(GDALDataset *dataset, double *imageMax, double *imageMin, double *outMax, double *outMin, bool calcStats, std::string outputImage)
 	{
 		GDALDataset **datasets = NULL;
 		RSGISImageStatistics *calcImageStats = NULL;
@@ -82,7 +82,7 @@ namespace rsgis{namespace img{
 			calcImg->calcImage(datasets, 1, outputImage);
 			
 		}
-		catch(RSGISImageCalcException e)
+		catch(RSGISImageCalcException &e)
 		{
 			if(datasets != NULL)
 			{
@@ -90,7 +90,7 @@ namespace rsgis{namespace img{
 			}
 			throw e;
 		}
-		catch(RSGISImageBandException e)
+		catch(RSGISImageBandException &e)
 		{
 			if(datasets != NULL)
 			{
@@ -113,7 +113,7 @@ namespace rsgis{namespace img{
 		this->outMin = outMinIn;
 	}
 	
-	void RSGISNormaliseImage::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+	void RSGISNormaliseImage::calcImageValue(float *bandValues, int numBands, double *output) 
 	{
 		double inDiff = 0;
 		double norm2min = 0;
@@ -138,27 +138,27 @@ namespace rsgis{namespace img{
 		}
 	}
 	
-	void RSGISNormaliseImage::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+	void RSGISNormaliseImage::calcImageValue(float *bandValues, int numBands) 
 	{
 		throw RSGISImageCalcException("No implemented");
 	}
 	
-	void RSGISNormaliseImage::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException)
+	void RSGISNormaliseImage::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) 
 	{
 		throw RSGISImageCalcException("Not Implemented");
 	}
 	
-	void RSGISNormaliseImage::calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) throw(RSGISImageCalcException)
+	void RSGISNormaliseImage::calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) 
 	{
 		throw RSGISImageCalcException("No implemented");
 	}
 	
-	void RSGISNormaliseImage::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException)
+	void RSGISNormaliseImage::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
 	{
 		throw RSGISImageCalcException("No implemented");
 	}
 
-	bool RSGISNormaliseImage::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException)
+	bool RSGISNormaliseImage::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) 
 	{
 		throw RSGISImageCalcException("No implemented");
 	}

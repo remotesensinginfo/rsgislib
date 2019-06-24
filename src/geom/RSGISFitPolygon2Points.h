@@ -86,10 +86,10 @@ namespace rsgis{namespace geom{
     {
     public:
         RSGISFitAlphaShapesPolygonToPoints();
-        geos::geom::Polygon* fitPolygon(std::vector<OGRPoint*> *pts, double alphaVal) throw(RSGISGeometryException);
+        geos::geom::Polygon* fitPolygon(std::vector<OGRPoint*> *pts, double alphaVal);
         ~RSGISFitAlphaShapesPolygonToPoints();
     protected:
-        geos::geom::Polygon* extractPolygonFromEdges(std::vector<geos::geom::LineSegment *> *lines) throw(RSGISGeometryException);
+        geos::geom::Polygon* extractPolygonFromEdges(std::vector<geos::geom::LineSegment *> *lines);
         void createCoordSequence(EdgesGraph *edgesGraph, vertexDescr currV, std::vector<int> *mark, std::vector<RSGIS2DPoint*> *ptVerts, geos::geom::CoordinateSequence *coords, std::vector<geos::geom::CoordinateSequence*> *loops);
     };
     

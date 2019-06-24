@@ -30,7 +30,7 @@ namespace rsgis{namespace img{
 		
 	}
 	
-	void RSGISCreateTestImages::createRowMajorNumberedImage(std::string outputImage, int width, int height) throw(RSGISImageException)
+	void RSGISCreateTestImages::createRowMajorNumberedImage(std::string outputImage, int width, int height)
 	{
 		GDALAllRegister();
 		GDALDriver *poDriver = NULL;
@@ -78,7 +78,7 @@ namespace rsgis{namespace img{
 				imgBand->RasterIO(GF_Write, 0, i, width, 1, imgData, width, 1, GDT_Float32, 0, 0);
 			}
 		}
-		catch(RSGISImageException e)
+		catch(RSGISImageException &e)
 		{
 			if(imgData != NULL)
 			{

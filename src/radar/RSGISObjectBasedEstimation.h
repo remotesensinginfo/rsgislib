@@ -75,9 +75,9 @@ namespace rsgis{namespace radar{
 	{
 	public:
 		RSGISObjectBasedEstimation(GDALDataset *inputImage, GDALDataset *outputImage, GDALDataset *rasterFeatures, std::vector<gsl_vector*> *initialPar, std::vector<RSGISEstimationOptimiser*> *slowOptimiser, std::vector<RSGISEstimationOptimiser*> *fastOptimiser, estParameters parameters, double ***minMaxVals = NULL, std::string classHeading = "", bool useClass = false);
-		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)throw(RSGISVectorException);
-		virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid)throw(RSGISVectorException);
-		virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(rsgis::vec::RSGISVectorOutputException);
+		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid);
+		virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid);
+		virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn);
 		virtual ~RSGISObjectBasedEstimation();
 	protected:
 		GDALDataset **datasetsIO;
@@ -109,9 +109,9 @@ namespace rsgis{namespace radar{
 	{
 	public:
 		RSGISObjectBasedEstimationObjectAP(GDALDataset *inputImage, GDALDataset *outputImage, GDALDataset *rasterFeatures, std::vector<gsl_vector*> *initialPar, std::vector<RSGISEstimationOptimiser*> *slowOptimiser, std::vector<RSGISEstimationOptimiser*> *fastOptimiser, estParameters parameters, std::string *apParField, double ***minMaxVals = NULL, std::string classHeading = "", bool useClass = false);
-		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)throw(RSGISVectorException);
-        virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid)throw(RSGISVectorException);
-		virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(rsgis::vec::RSGISVectorOutputException);
+		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid);
+        virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid);
+		virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn);
 		virtual ~RSGISObjectBasedEstimationObjectAP();
 	protected:
 		GDALDataset **datasetsIO;
@@ -149,11 +149,11 @@ namespace rsgis{namespace radar{
 		/// Loops though bands and loads pixel values to vectors
 	public:
 		RSGISObjectBasedEstimationGetObjVals(std::vector<float> **pixelVals, int numBands);
-		void calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
-		void calcImageValue(float *bandValuesImage, int numBands, int band) throw(rsgis::img::RSGISImageCalcException);
-		void calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
-		void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(rsgis::img::RSGISImageCalcException);
-		double* getOutputValues() throw(rsgis::img::RSGISImageCalcException);
+		void calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) {throw rsgis::img::RSGISImageCalcException("Not Implemented");};
+		void calcImageValue(float *bandValuesImage, int numBands, int band);
+		void calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) {throw rsgis::img::RSGISImageCalcException("Not Implemented");};
+		void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt);
+		double* getOutputValues();
 		void reset();
 		~RSGISObjectBasedEstimationGetObjVals();
 	protected:

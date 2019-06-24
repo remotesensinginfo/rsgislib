@@ -30,22 +30,22 @@ namespace rsgis{namespace img{
 		this->n = 0;
 	}
 	
-	void RSGISPolygonPixelCount::calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) throw(RSGISImageCalcException)
+	void RSGISPolygonPixelCount::calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) 
 	{
 		throw RSGISImageCalcException("Not implemented!");
 	}
 	
-	void RSGISPolygonPixelCount::calcImageValue(float *bandValuesImage, int numBands, int band) throw(RSGISImageCalcException)
+	void RSGISPolygonPixelCount::calcImageValue(float *bandValuesImage, int numBands, int band) 
 	{
 		throw RSGISImageCalcException("Not implemented!");
 	}
 	
-	void RSGISPolygonPixelCount::calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) throw(RSGISImageCalcException)
+	void RSGISPolygonPixelCount::calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) 
 	{
 		throw RSGISImageCalcException("Not implemented!");
 	}
 	
-	void RSGISPolygonPixelCount::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(RSGISImageCalcException)
+	void RSGISPolygonPixelCount::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) 
 	{
 		if(poly->contains(pt))
 		{
@@ -53,7 +53,7 @@ namespace rsgis{namespace img{
 		}
 	}
 	
-	double* RSGISPolygonPixelCount::getOutputValues() throw(RSGISImageCalcException)
+	double* RSGISPolygonPixelCount::getOutputValues() 
 	{
 		this->outputValues[0] = n;
 		return outputValues;

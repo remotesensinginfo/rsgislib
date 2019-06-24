@@ -29,7 +29,7 @@ namespace rsgis{namespace math{
         
     }
     
-    std::vector<GaussianModelParams> RSGISFitGaussianMixModel::performFit(std::vector<std::pair<double, double> > *hist, float binWidth, double peakThres, double ampVar, unsigned int peakLocVar, unsigned int initWidth, double minWidth, double maxWidth, bool debug_info)throw(RSGISMathException)
+    std::vector<GaussianModelParams> RSGISFitGaussianMixModel::performFit(std::vector<std::pair<double, double> > *hist, float binWidth, double peakThres, double ampVar, unsigned int peakLocVar, unsigned int initWidth, double minWidth, double maxWidth, bool debug_info)
     {
         std::vector<GaussianModelParams> outGauParams;
         try

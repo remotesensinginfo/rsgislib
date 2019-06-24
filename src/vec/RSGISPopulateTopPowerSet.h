@@ -64,12 +64,12 @@ namespace rsgis{namespace vec{
 		{
 		public:
 			RSGISPopulateTopPowerSet(GDALDataset *image, GDALDataset *rasterFeatures, CountAttributes** attributes, int numAttributes, int nTop);
-			virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-			virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-			virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
+			virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid);
+			virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid);
+			virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn);
 			virtual ~RSGISPopulateTopPowerSet();
 		protected:
-			void identifyPowerSet(CountAttributes** allAttributes, int numAttributes, std::string *topAttributeNames, int numTop, CountAttributes** powerSetAttributes, int numPSAttributes) throw(rsgis::math::RSGISMathException,RSGISVectorException);
+			void identifyPowerSet(CountAttributes** allAttributes, int numAttributes, std::string *topAttributeNames, int numTop, CountAttributes** powerSetAttributes, int numPSAttributes);
 			GDALDataset **datasets;
 			CountAttributes** attributes;
 			int numAttributes;

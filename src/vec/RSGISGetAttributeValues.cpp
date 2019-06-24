@@ -31,12 +31,12 @@ namespace rsgis{namespace vec{
 		this->attribute = attribute;
 	}
 	
-	void RSGISGetAttributeValues::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISGetAttributeValues::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)
 	{
 		throw RSGISVectorException("Not implemented..");
 	}
 	
-	void RSGISGetAttributeValues::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISGetAttributeValues::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid)
 	{
 		OGRFeatureDefn *featureDefn = feature->GetDefnRef();
 		int fieldIdx = featureDefn->GetFieldIndex(attribute.c_str());
@@ -49,7 +49,7 @@ namespace rsgis{namespace vec{
 		values->push_back(feature->GetFieldAsDouble(fieldIdx));
 	}
 	
-	void RSGISGetAttributeValues::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+	void RSGISGetAttributeValues::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn)
 	{
 		// Nothing to do!
 	}

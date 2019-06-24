@@ -30,10 +30,10 @@ namespace rsgis{namespace math{
 		this->coefficients = coefficients;
 		this->order = order;
 	}
-	double RSGISFunctionPolynomial::calcFunction(double xVal) throw(RSGISMathException)
+	double RSGISFunctionPolynomial::calcFunction(double xVal)
 	{
 		double yVal = 0; 
-		for(int i = 0; i < order ; i++)
+		for(int i = 0; i < order; i++)
 		{
 			double xPow = pow(xVal, i); // x^n;
 			double coeff = coefficients[i]; // a_n
@@ -43,10 +43,10 @@ namespace rsgis{namespace math{
 		
 		return yVal;
 	}
-	double RSGISFunctionPolynomial::dX(double xVal) throw(RSGISMathException)
+	double RSGISFunctionPolynomial::dX(double xVal)
 	{
 		double yVal = 0; 
-		for(int i = 0; i < order ; i++)
+		for(int i = 0; i < order; i++)
 		{
 			double xPow = i * pow(xVal, i - 1); // x^n;
 			double coeff = coefficients[i]; // a_n
@@ -66,10 +66,10 @@ namespace rsgis{namespace math{
 		this->coefficients = coefficients;
 		this->order = order;
 	}
-	double RSGISFunctionPolynomialGSL::calcFunction(double xVal) throw(RSGISMathException)
+	double RSGISFunctionPolynomialGSL::calcFunction(double xVal)
 	{
 		double yVal = 0; 
-		for(int i = 0; i < order ; i++)
+		for(int i = 0; i < order; i++)
 		{
 			double xPow = pow(xVal, i); // x^n;
 			double coeff = gsl_vector_get(coefficients, i); // a_n
@@ -79,10 +79,10 @@ namespace rsgis{namespace math{
 		
 		return yVal;
 	}
-	double RSGISFunctionPolynomialGSL::dX(double xVal) throw(RSGISMathException)
+	double RSGISFunctionPolynomialGSL::dX(double xVal)
 	{
 		double yVal = 0; 
-		for(int i = 0; i < order ; i++)
+		for(int i = 0; i < order; i++)
 		{
 			double xPow = i * pow(xVal, i - 1); // x^n;
 			double coeff = gsl_vector_get(coefficients, i); // a_n
@@ -93,7 +93,7 @@ namespace rsgis{namespace math{
 		return yVal;
 	}
 	
-	void RSGISFunctionPolynomialGSL::updateCoefficents(double *newCoefficents) throw(RSGISMathException)
+	void RSGISFunctionPolynomialGSL::updateCoefficents(double *newCoefficents)
 	{
 		for(int i = 0; i < order; i++)
 		{
@@ -111,11 +111,11 @@ namespace rsgis{namespace math{
 		this->coeffA = coeffA;
 		this->coeffB = coeffB;
 	}
-	double RSGISFunctionLn::calcFunction(double value) throw(RSGISMathException)
+	double RSGISFunctionLn::calcFunction(double value)
 	{
 		return this->coeffA + (this->coeffB * log(value));
 	}
-	double RSGISFunctionLn::dX(double value) throw(RSGISMathException)
+	double RSGISFunctionLn::dX(double value)
 	{
 		return this->coeffB / value;
 	}
@@ -130,15 +130,15 @@ namespace rsgis{namespace math{
 		this->coeffB = coeffB;
 		this->coeffC = coeffC;
 	}
-	double RSGISFunction2VarLn::calcFunction(double valueX, double valueY) throw(RSGISMathException)
+	double RSGISFunction2VarLn::calcFunction(double valueX, double valueY)
 	{
 		return this->coeffA + (this->coeffB * valueY) + (this->coeffC * valueY * log(valueX));
 	}
-	double RSGISFunction2VarLn::dX(double valueX, double valueY) throw(RSGISMathException)
+	double RSGISFunction2VarLn::dX(double valueX, double valueY)
 	{
 		return (this->coeffC * valueY) / (valueX);
 	}
-	double RSGISFunction2VarLn::dY(double valueX, double valueY) throw(RSGISMathException)
+	double RSGISFunction2VarLn::dY(double valueX, double valueY)
 	{
 		return this->coeffB + (this->coeffC * log(valueX));
 	}
@@ -155,17 +155,17 @@ namespace rsgis{namespace math{
 		this->coeffC1 = coeffC1;
 
 	}
-	double RSGISFunctionLinXfLinY::calcFunction(double valueX, double valueY) throw(RSGISMathException)
+	double RSGISFunctionLinXfLinY::calcFunction(double valueX, double valueY)
 	{
 		double a0 = coeffB0 + (coeffB1 * valueY);
 		double a1 = coeffC0 + (coeffC1 * valueY);
 		return a0 + (a1 * valueX);
 	}
-	double RSGISFunctionLinXfLinY::dX(double valueX, double valueY) throw(RSGISMathException)
+	double RSGISFunctionLinXfLinY::dX(double valueX, double valueY)
 	{
 		return coeffC0 + (coeffC1 * valueY);
 	}
-	double RSGISFunctionLinXfLinY::dY(double valueX, double valueY) throw(RSGISMathException)
+	double RSGISFunctionLinXfLinY::dY(double valueX, double valueY)
 	{
 		return coeffB1 + (coeffC1 * valueX);
 	}
@@ -180,15 +180,15 @@ namespace rsgis{namespace math{
 		this->coeffB = coeffB;
 		this->coeffC = coeffC;
 	}
-	double RSGISFunction2VarLnQuadratic::calcFunction(double valueX, double valueY) throw(RSGISMathException)
+	double RSGISFunction2VarLnQuadratic::calcFunction(double valueX, double valueY)
 	{
 		return this->coeffA + (this->coeffB * log(valueX)) + (this->coeffC * valueY * log(valueX * valueX));
 	}
-	double RSGISFunction2VarLnQuadratic::dX(double valueX, double valueY) throw(RSGISMathException)
+	double RSGISFunction2VarLnQuadratic::dX(double valueX, double valueY)
 	{
 		return (this->coeffC * valueY) / (valueX);
 	}
-	double RSGISFunction2VarLnQuadratic::dY(double valueX, double valueY) throw(RSGISMathException)
+	double RSGISFunction2VarLnQuadratic::dY(double valueX, double valueY)
 	{
 		return this->coeffB + (this->coeffC * log(valueX));
 	}
@@ -204,7 +204,7 @@ namespace rsgis{namespace math{
 		this->dataA = dataA;
 		this->dataB = dataB;
 	}
-	double RSGISFunction2Var2DataLeastSquares::calcFunction(double valueX, double valueY) throw(RSGISMathException)
+	double RSGISFunction2Var2DataLeastSquares::calcFunction(double valueX, double valueY)
 	{
 		double diffA = dataA - functionA->calcFunction(valueX, valueY);
 		double diffB = dataB - functionB->calcFunction(valueX, valueY);
@@ -230,7 +230,7 @@ namespace rsgis{namespace math{
 		this->dataB = dataB;
 		this->dataC = dataC;
 	}
-	double RSGISFunction2Var3DataLeastSquares::calcFunction(double valueX, double valueY) throw(RSGISMathException)
+	double RSGISFunction2Var3DataLeastSquares::calcFunction(double valueX, double valueY)
 	{
 		
 		double diffA = dataA - functionA->calcFunction(valueX, valueY);
@@ -265,7 +265,7 @@ namespace rsgis{namespace math{
 		}
 
 	}
-	double RSGISFunction2Var2DataPreconditionedLeastSquares::calcFunction(double valueX, double valueY) throw(RSGISMathException)
+	double RSGISFunction2Var2DataPreconditionedLeastSquares::calcFunction(double valueX, double valueY)
 	{
 		/** L(X) = 1/2 { || f(X) - d0 || ^2 + || X - Xap || ^2 } */
 		
@@ -330,7 +330,7 @@ namespace rsgis{namespace math{
 			this->useAP = false;
 		}
 	}
-	double RSGISFunction2Var3DataPreconditionedLeastSquares::calcFunction(double valueX, double valueY) throw(RSGISMathException)
+	double RSGISFunction2Var3DataPreconditionedLeastSquares::calcFunction(double valueX, double valueY)
 	{
 		/** L(X) = 1/2 { || f(X) - d0 || ^2 + || X - Xap || ^2 } */
 		
@@ -408,7 +408,7 @@ namespace rsgis{namespace math{
 		}
 		
 	}
-	double RSGISFunction3Var3DataPreconditionedLeastSquares::calcFunction(double valueX, double valueY, double valueZ) throw(RSGISMathException)
+	double RSGISFunction3Var3DataPreconditionedLeastSquares::calcFunction(double valueX, double valueY, double valueZ)
 	{
 		/** L(X) = 1/2 { || f(X) - d0 || ^2 + || X - Xap || ^2 } */
 		
@@ -482,7 +482,7 @@ namespace rsgis{namespace math{
 			this->useAP = false;
 		}
 	}
-	double RSGISFunction3Var4DataPreconditionedLeastSquares::calcFunction(double valueX, double valueY, double valueZ) throw(RSGISMathException)
+	double RSGISFunction3Var4DataPreconditionedLeastSquares::calcFunction(double valueX, double valueY, double valueZ)
 	{
 		/** L(X) = 1/2 { || f(X) - d0 || ^2 + || X - Xap || ^2 } */
 		
@@ -540,7 +540,7 @@ namespace rsgis{namespace math{
 		this->dataA = dataA;
 		this->dataB = dataB;
 	}
-	double RSGISFunctionEstimationLeastSquares::calcFunction(double valueX, double valueY) throw(RSGISMathException)
+	double RSGISFunctionEstimationLeastSquares::calcFunction(double valueX, double valueY)
 	{
 		double fHH = functionA->calcFunction(valueX, valueY);
 		double fHV = functionB->calcFunction(valueX, valueY);
@@ -571,7 +571,7 @@ namespace rsgis{namespace math{
 		this->orderX = coefficients->size1; // Get polynomial order
 		this->orderY = coefficients->size2 - 1; // Get polynomial order
 	}
-	double RSGISFunction2DPoly::calcFunction(double valueX, double valueY) throw(RSGISMathException)
+	double RSGISFunction2DPoly::calcFunction(double valueX, double valueY)
 	{		
 		double outVal = 0.0;
 		
@@ -581,7 +581,7 @@ namespace rsgis{namespace math{
 			
 			double aCoeff = 0.0; 
 			
-			for(int y = 0; y < orderY ; y++) // Calculate a_n(density)
+			for(int y = 0; y < orderY; y++) // Calculate a_n(density)
 			{
 				double yPow = pow(valueY,y); // y^n;
 				double bcoeff = gsl_matrix_get(coefficients, x, y); // b_n
@@ -595,7 +595,7 @@ namespace rsgis{namespace math{
 		
 		return outVal;
 	}
-	double RSGISFunction2DPoly::dX(double valueX, double valueY) throw(RSGISMathException)
+	double RSGISFunction2DPoly::dX(double valueX, double valueY)
 	{
 		double outValdX = 0.0;
 		
@@ -605,7 +605,7 @@ namespace rsgis{namespace math{
 			
 			double aCoeff = 0.0;
 			
-			for(int y = 0; y < orderY ; y++) // 
+			for(int y = 0; y < orderY; y++) // 
 			{
 				double yPow = pow(valueY, y); // y^n;
 				double bcoeff = gsl_matrix_get(coefficients, x, y); // b_n
@@ -620,7 +620,7 @@ namespace rsgis{namespace math{
 		
 		return outValdX;
 	}
-	double RSGISFunction2DPoly::dY(double valueX, double valueY) throw(RSGISMathException)
+	double RSGISFunction2DPoly::dY(double valueX, double valueY)
 	{
 
 		double outValdY = 0.0;
@@ -631,7 +631,7 @@ namespace rsgis{namespace math{
 			
 			double aCoeffF = 0.0; 
 			
-			for(int y = 0; y < orderY ; y++) // Calculate a_n(y)
+			for(int y = 0; y < orderY; y++) // Calculate a_n(y)
 			{
 				double dyPow = y * pow(valueY, y - 1); // n * y^(n-1)
 				double bcoeff = gsl_matrix_get(coefficients, x, y); // b_n
@@ -657,7 +657,7 @@ namespace rsgis{namespace math{
 		this->orderY = orderY;
 		this->orderZ = orderZ;
 	}
-	double RSGISFunction3DPoly::calcFunction(double valueX, double valueY, double valueZ) throw(RSGISMathException)
+	double RSGISFunction3DPoly::calcFunction(double valueX, double valueY, double valueZ)
 	{		
 		double outVal = 0.0;
 		double aCoeffPowX = 0.0;
@@ -693,7 +693,7 @@ namespace rsgis{namespace math{
         
 		return outVal;
 	}
-	double RSGISFunction3DPoly::dX(double valueX, double valueY, double valueZ) throw(RSGISMathException)
+	double RSGISFunction3DPoly::dX(double valueX, double valueY, double valueZ)
 	{
 		double outValdX = 0.0;
 		double aCoeffPowX = 0.0;
@@ -750,7 +750,7 @@ namespace rsgis{namespace math{
 		
 		return outValdX;
 	}
-	double RSGISFunction3DPoly::dY(double valueX, double valueY, double valueZ) throw(RSGISMathException)
+	double RSGISFunction3DPoly::dY(double valueX, double valueY, double valueZ)
 	{
 		double outValdY = 0.0;
 		double aCoeffPowX = 0.0;
@@ -806,7 +806,7 @@ namespace rsgis{namespace math{
 		outValdY = aCoeffPowXdY;
 		return outValdY;
 	}
-	double RSGISFunction3DPoly::dZ(double valueX, double valueY, double valueZ) throw(RSGISMathException)
+	double RSGISFunction3DPoly::dZ(double valueX, double valueY, double valueZ)
 	{
 		double outValdZ = 0.0;
 		double aCoeffPowX = 0.0;
@@ -874,7 +874,7 @@ namespace rsgis{namespace math{
         this->polyOrders = polyOrders;
         this->numVar = polyOrders->size();
 	}
-	double RSGISFunctionNDPoly::calcFunction(std::vector<double> *values) throw(RSGISMathException)
+	double RSGISFunctionNDPoly::calcFunction(std::vector<double> *values)
 	{		
 		double outVal = 0.0;
         if(values->size() != this->numVar)
@@ -898,7 +898,7 @@ namespace rsgis{namespace math{
                 
                 double aCoeff = 0.0; 
                 
-                for(int y = 0; y < this->polyOrders->at(1) ; y++) // Calculate a_n(density)
+                for(int y = 0; y < this->polyOrders->at(1); y++) // Calculate a_n(density)
                 {
                     double yPow = pow(values->at(1),y); // y^n;
                     double bcoeff = gsl_matrix_get(coefficients, x, y); // b_n
@@ -943,11 +943,11 @@ namespace rsgis{namespace math{
         
 		return outVal;
 	}
-    int RSGISFunctionNDPoly::numCoefficients() throw(RSGISMathException)
+    int RSGISFunctionNDPoly::numCoefficients()
     {
         return 1;
     }
-    int RSGISFunctionNDPoly::numVariables() throw(RSGISMathException)
+    int RSGISFunctionNDPoly::numVariables()
     {
         return this->numVar;
     }
@@ -956,7 +956,7 @@ namespace rsgis{namespace math{
 		gsl_matrix_free(this->coefficients);
 	}
 	
-	double RSGISFunctionRosenbrocksParabolicValley::calcFunction(double valueX, double valueY) throw(RSGISMathException)
+	double RSGISFunctionRosenbrocksParabolicValley::calcFunction(double valueX, double valueY)
 	{
 		return (100*pow(valueY - (valueX*valueX),2)) + pow(1 - valueX,2);
 	}
@@ -979,7 +979,7 @@ namespace rsgis{namespace math{
 		}
 		
 	}
-	double RSGISFunctionMuParser::calcFunction(double value) throw(RSGISMathException)
+	double RSGISFunctionMuParser::calcFunction(double value)
 	{
 		double outVal = 0;
 		
@@ -997,7 +997,7 @@ namespace rsgis{namespace math{
 		
 		return outVal;
 	}
-	double RSGISFunctionMuParser::dX(double value) throw(RSGISMathException)
+	double RSGISFunctionMuParser::dX(double value)
 	{
 		double outVal = 0;
 		if (this->usedX) 
@@ -1052,7 +1052,7 @@ namespace rsgis{namespace math{
 		}
 		
 	}
-	double RSGISFunctionMuParser2Var::calcFunction(double valueX, double valueY) throw(RSGISMathException)
+	double RSGISFunctionMuParser2Var::calcFunction(double valueX, double valueY)
 	{
 		double outVal = 0;
 		
@@ -1071,7 +1071,7 @@ namespace rsgis{namespace math{
 		
 		return outVal;
 	}
-	double RSGISFunctionMuParser2Var::dX(double valueX, double valueY) throw(RSGISMathException)
+	double RSGISFunctionMuParser2Var::dX(double valueX, double valueY)
 	{
 		double outVal = 0;
 		if (this->usediff) 
@@ -1096,7 +1096,7 @@ namespace rsgis{namespace math{
 		return outVal;
 		
 	}
-	double RSGISFunctionMuParser2Var::dY(double valueX, double valueY) throw(RSGISMathException)
+	double RSGISFunctionMuParser2Var::dY(double valueX, double valueY)
 	{
 		double outVal = 0;
 		if (this->usediff) 

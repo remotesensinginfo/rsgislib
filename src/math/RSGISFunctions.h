@@ -64,9 +64,9 @@ namespace rsgis{namespace math{
 		/// Polynomial function
 	public: 
 		RSGISFunctionPolynomial(double *coefficients, int order);
-		virtual double calcFunction(double value) throw(RSGISMathException);
-		virtual double dX(double value) throw(RSGISMathException);
-		virtual int numCoefficients() throw(RSGISMathException) {return order;}
+		virtual double calcFunction(double value);
+		virtual double dX(double value);
+		virtual int numCoefficients() {return order;}
 		virtual void updateCoefficents(double *newCoefficents){this->coefficients = newCoefficents;}
 		virtual ~RSGISFunctionPolynomial();
 	private:
@@ -78,10 +78,10 @@ namespace rsgis{namespace math{
 		/// Polynomial function, with coefficients read as GSL vector
 	public: 
 		RSGISFunctionPolynomialGSL(gsl_vector *coefficients, int order);
-		virtual double calcFunction(double value) throw(RSGISMathException);
-		virtual double dX(double value) throw(RSGISMathException);
-		virtual int numCoefficients() throw(RSGISMathException) {return order;}
-		virtual void updateCoefficents(double *newCoefficents) throw(RSGISMathException);
+		virtual double calcFunction(double value);
+		virtual double dX(double value);
+		virtual int numCoefficients() {return order;}
+		virtual void updateCoefficents(double *newCoefficents);
 		virtual ~RSGISFunctionPolynomialGSL();
 	private:
 		gsl_vector *coefficients;
@@ -92,10 +92,10 @@ namespace rsgis{namespace math{
 		/// a + b Ln(x)
 	public: 
 		RSGISFunctionLn(double coeffA, double coeffB);
-		virtual double calcFunction(double value) throw(RSGISMathException);
-		virtual double dX(double value) throw(RSGISMathException);
-		virtual int numCoefficients() throw(RSGISMathException) {return 2;}
-		virtual void updateCoefficents(double *newCoefficents) throw(RSGISMathException){this->coeffA = newCoefficents[0]; this->coeffB = newCoefficents[1];}
+		virtual double calcFunction(double value);
+		virtual double dX(double value);
+		virtual int numCoefficients() {return 2;}
+		virtual void updateCoefficents(double *newCoefficents){this->coeffA = newCoefficents[0]; this->coeffB = newCoefficents[1];}
 		virtual ~RSGISFunctionLn();
 	private:
 		double coeffA;
@@ -107,11 +107,11 @@ namespace rsgis{namespace math{
 		/// a + (b * y) + (c * y * ln(x))
 	public: 
 		RSGISFunction2VarLn(double coeffA, double coeffB, double coeffC);
-		virtual double calcFunction(double valueX, double valueY) throw(RSGISMathException);
-		virtual double dX(double valueX, double valueY) throw(RSGISMathException);
-		virtual double dY(double valueX, double valueY) throw(RSGISMathException);
-		virtual int numCoefficients() throw(RSGISMathException) {return 3;};
-		virtual void updateCoefficents(double *newCoefficents) throw(RSGISMathException){this->coeffA = newCoefficents[0]; this->coeffB = newCoefficents[1];this->coeffC = newCoefficents[2];};
+		virtual double calcFunction(double valueX, double valueY);
+		virtual double dX(double valueX, double valueY);
+		virtual double dY(double valueX, double valueY);
+		virtual int numCoefficients() {return 3;};
+		virtual void updateCoefficents(double *newCoefficents){this->coeffA = newCoefficents[0]; this->coeffB = newCoefficents[1];this->coeffC = newCoefficents[2];};
 		virtual ~RSGISFunction2VarLn();
 	private:
 		double coeffA;
@@ -124,11 +124,11 @@ namespace rsgis{namespace math{
 		/// (b0 + b1 y) + (c0 + c1 y) * x
 	public: 
 		RSGISFunctionLinXfLinY(double coeffB0, double coeffB1, double coeffC0, double coeffC1);
-		virtual double calcFunction(double valueX, double valueY) throw(RSGISMathException);
-		virtual double dX(double valueX, double valueY) throw(RSGISMathException);
-		virtual double dY(double valueX, double valueY) throw(RSGISMathException);
-		virtual int numCoefficients() throw(RSGISMathException) {return 3;};
-		virtual void updateCoefficents(double *newCoefficents) throw(RSGISMathException){this->coeffB0 = newCoefficents[0]; this->coeffB1 = newCoefficents[1];this->coeffC0 = newCoefficents[2];this->coeffC1 = newCoefficents[3];};
+		virtual double calcFunction(double valueX, double valueY);
+		virtual double dX(double valueX, double valueY);
+		virtual double dY(double valueX, double valueY);
+		virtual int numCoefficients() {return 3;};
+		virtual void updateCoefficents(double *newCoefficents){this->coeffB0 = newCoefficents[0]; this->coeffB1 = newCoefficents[1];this->coeffC0 = newCoefficents[2];this->coeffC1 = newCoefficents[3];};
 		virtual ~RSGISFunctionLinXfLinY();
 	private:
 		double coeffB0;
@@ -143,11 +143,11 @@ namespace rsgis{namespace math{
 		/// a + b ln(x) + c y ln(x^2)  
 	public: 
 		RSGISFunction2VarLnQuadratic(double coeffA, double coeffB, double coeffC);
-		virtual double calcFunction(double valueX, double valueY) throw(RSGISMathException);
-		virtual double dX(double valueX, double valueY) throw(RSGISMathException);
-		virtual double dY(double valueX, double valueY) throw(RSGISMathException);
-		virtual int numCoefficients() throw(RSGISMathException) {return 3;};
-		virtual void updateCoefficents(double *newCoefficents) throw(RSGISMathException){this->coeffA = newCoefficents[0]; this->coeffB = newCoefficents[1];this->coeffC = newCoefficents[2];};
+		virtual double calcFunction(double valueX, double valueY);
+		virtual double dX(double valueX, double valueY);
+		virtual double dY(double valueX, double valueY);
+		virtual int numCoefficients() {return 3;};
+		virtual void updateCoefficents(double *newCoefficents){this->coeffA = newCoefficents[0]; this->coeffB = newCoefficents[1];this->coeffC = newCoefficents[2];};
 		virtual ~RSGISFunction2VarLnQuadratic();
 	private:
 		double coeffA;
@@ -160,11 +160,11 @@ namespace rsgis{namespace math{
 		/// Least squares
 	public: 
 		RSGISFunction2Var2DataLeastSquares(RSGISMathTwoVariableFunction *functionA, RSGISMathTwoVariableFunction *functionB, double dataA, double dataB);
-		virtual double calcFunction(double valueX, double valueY) throw(RSGISMathException);
-		virtual double dX(double valueX, double valueY) throw(RSGISMathException){throw RSGISMathException("Not implemented");};
-		virtual double dY(double valueX, double valueY) throw(RSGISMathException){throw RSGISMathException("Not implemented");};
-		virtual int numCoefficients() throw(RSGISMathException){throw RSGISMathException("Not implemented");};
-		virtual void updateCoefficents(double *newCoefficents) throw(RSGISMathException){throw RSGISMathException("Not implemented");};
+		virtual double calcFunction(double valueX, double valueY);
+		virtual double dX(double valueX, double valueY){throw RSGISMathException("Not implemented");};
+		virtual double dY(double valueX, double valueY){throw RSGISMathException("Not implemented");};
+		virtual int numCoefficients(){throw RSGISMathException("Not implemented");};
+		virtual void updateCoefficents(double *newCoefficents){throw RSGISMathException("Not implemented");};
 		virtual ~RSGISFunction2Var2DataLeastSquares();
 	private:
 		RSGISMathTwoVariableFunction *functionA;
@@ -178,11 +178,11 @@ namespace rsgis{namespace math{
 		/// Least squares
 	public: 
 		RSGISFunction2Var3DataLeastSquares(RSGISMathTwoVariableFunction *functionA, RSGISMathTwoVariableFunction *functionB, RSGISMathTwoVariableFunction *functionC, double dataA, double dataB, double dataC);
-		virtual double calcFunction(double valueX, double valueY) throw(RSGISMathException);
-		virtual double dX(double valueX, double valueY) throw(RSGISMathException){throw RSGISMathException("Not implemented");};
-		virtual double dY(double valueX, double valueY) throw(RSGISMathException){throw RSGISMathException("Not implemented");};
-		virtual int numCoefficients() throw(RSGISMathException){throw RSGISMathException("Not implemented");};
-		virtual void updateCoefficents(double *newCoefficents) throw(RSGISMathException){throw RSGISMathException("Not implemented");};
+		virtual double calcFunction(double valueX, double valueY);
+		virtual double dX(double valueX, double valueY){throw RSGISMathException("Not implemented");};
+		virtual double dY(double valueX, double valueY){throw RSGISMathException("Not implemented");};
+		virtual int numCoefficients(){throw RSGISMathException("Not implemented");};
+		virtual void updateCoefficents(double *newCoefficents){throw RSGISMathException("Not implemented");};
 		virtual ~RSGISFunction2Var3DataLeastSquares();
 	private:
 		RSGISMathTwoVariableFunction *functionA;
@@ -200,11 +200,11 @@ namespace rsgis{namespace math{
 	public: 
 		RSGISFunction2Var2DataPreconditionedLeastSquares(RSGISMathTwoVariableFunction *functionA, RSGISMathTwoVariableFunction *functionB, 
 														 double dataA, double dataB, double apX1, double apX2, gsl_matrix *invCovMatrixP, gsl_matrix *invCovMatrixD);
-		virtual double calcFunction(double valueX, double valueY) throw(RSGISMathException);
-		virtual double dX(double valueX, double valueY) throw(RSGISMathException) {throw RSGISMathException("Not implemented");};
-		virtual double dY(double valueX, double valueY) throw(RSGISMathException) {throw RSGISMathException("Not implemented");};
-	    virtual int numCoefficients() throw(RSGISMathException){throw RSGISMathException("Not implemented");};
-		virtual void updateCoefficents(double *newCoefficents) throw(RSGISMathException){throw RSGISMathException("Not implemented");};
+		virtual double calcFunction(double valueX, double valueY);
+		virtual double dX(double valueX, double valueY) {throw RSGISMathException("Not implemented");};
+		virtual double dY(double valueX, double valueY) {throw RSGISMathException("Not implemented");};
+	    virtual int numCoefficients(){throw RSGISMathException("Not implemented");};
+		virtual void updateCoefficents(double *newCoefficents){throw RSGISMathException("Not implemented");};
 		virtual ~RSGISFunction2Var2DataPreconditionedLeastSquares();
 	private:
 		RSGISMathTwoVariableFunction *functionA;
@@ -228,11 +228,11 @@ namespace rsgis{namespace math{
 	public: 
 		RSGISFunction2Var3DataPreconditionedLeastSquares(RSGISMathTwoVariableFunction *functionA, RSGISMathTwoVariableFunction *functionB, RSGISMathTwoVariableFunction *functionC, 
 														 double dataA, double dataB, double dataC, double apX1, double apX2, gsl_matrix *invCovMatrixP, gsl_matrix *invCovMatrixD);
-		virtual double calcFunction(double valueX, double valueY) throw(RSGISMathException);
-		virtual double dX(double valueX, double valueY) throw(RSGISMathException) {throw RSGISMathException("Not implemented");};
-		virtual double dY(double valueX, double valueY) throw(RSGISMathException) {throw RSGISMathException("Not implemented");};
-	    virtual int numCoefficients() throw(RSGISMathException){throw RSGISMathException("Not implemented");};
-		virtual void updateCoefficents(double *newCoefficents) throw(RSGISMathException){throw RSGISMathException("Not implemented");};
+		virtual double calcFunction(double valueX, double valueY);
+		virtual double dX(double valueX, double valueY) {throw RSGISMathException("Not implemented");};
+		virtual double dY(double valueX, double valueY) {throw RSGISMathException("Not implemented");};
+	    virtual int numCoefficients(){throw RSGISMathException("Not implemented");};
+		virtual void updateCoefficents(double *newCoefficents){throw RSGISMathException("Not implemented");};
 		virtual ~RSGISFunction2Var3DataPreconditionedLeastSquares();
 	private:
 		RSGISMathTwoVariableFunction *functionA;
@@ -259,12 +259,12 @@ namespace rsgis{namespace math{
 	public: 
 		RSGISFunction3Var3DataPreconditionedLeastSquares(RSGISMathThreeVariableFunction *functionA, RSGISMathThreeVariableFunction *functionB, RSGISMathThreeVariableFunction *functionC, 
 														 double dataA, double dataB, double dataC, double apX1, double apX2, double apX3, gsl_matrix *invCovMatrixP, gsl_matrix *invCovMatrixD);
-		virtual double calcFunction(double valueX, double valueY, double valueZ) throw(RSGISMathException);
-		virtual double dX(double valueX, double valueY, double valueZ) throw(RSGISMathException) {throw RSGISMathException("Not implemented");};
-		virtual double dY(double valueX, double valueY, double valueZ) throw(RSGISMathException) {throw RSGISMathException("Not implemented");};
-		virtual double dZ(double valueX, double valueY, double valueZ) throw(RSGISMathException) {throw RSGISMathException("Not implemented");};
-	    virtual int numCoefficients() throw(RSGISMathException){throw RSGISMathException("Not implemented");};
-		virtual void updateCoefficents(double *newCoefficents) throw(RSGISMathException){throw RSGISMathException("Not implemented");};
+		virtual double calcFunction(double valueX, double valueY, double valueZ);
+		virtual double dX(double valueX, double valueY, double valueZ) {throw RSGISMathException("Not implemented");};
+		virtual double dY(double valueX, double valueY, double valueZ) {throw RSGISMathException("Not implemented");};
+		virtual double dZ(double valueX, double valueY, double valueZ) {throw RSGISMathException("Not implemented");};
+	    virtual int numCoefficients(){throw RSGISMathException("Not implemented");};
+		virtual void updateCoefficents(double *newCoefficents){throw RSGISMathException("Not implemented");};
 		virtual ~RSGISFunction3Var3DataPreconditionedLeastSquares();
 	private:
 		RSGISMathThreeVariableFunction *functionA;
@@ -292,12 +292,12 @@ namespace rsgis{namespace math{
 	public: 
 		RSGISFunction3Var4DataPreconditionedLeastSquares(RSGISMathThreeVariableFunction *functionA, RSGISMathThreeVariableFunction *functionB, RSGISMathThreeVariableFunction *functionC, RSGISMathThreeVariableFunction *functionD, 
 														 double dataA, double dataB, double dataC, double dataD,double apX1, double apX2, double apX3, gsl_matrix *invCovMatrixP, gsl_matrix *invCovMatrixD);
-		virtual double calcFunction(double valueX, double valueY, double valueZ) throw(RSGISMathException);
-		virtual double dX(double valueX, double valueY, double valueZ) throw(RSGISMathException) {throw RSGISMathException("Not implemented");};
-		virtual double dY(double valueX, double valueY, double valueZ) throw(RSGISMathException) {throw RSGISMathException("Not implemented");};
-		virtual double dZ(double valueX, double valueY, double valueZ) throw(RSGISMathException) {throw RSGISMathException("Not implemented");};
-	    virtual int numCoefficients() throw(RSGISMathException){throw RSGISMathException("Not implemented");};
-		virtual void updateCoefficents(double *newCoefficents) throw(RSGISMathException){throw RSGISMathException("Not implemented");};
+		virtual double calcFunction(double valueX, double valueY, double valueZ);
+		virtual double dX(double valueX, double valueY, double valueZ) {throw RSGISMathException("Not implemented");};
+		virtual double dY(double valueX, double valueY, double valueZ) {throw RSGISMathException("Not implemented");};
+		virtual double dZ(double valueX, double valueY, double valueZ) {throw RSGISMathException("Not implemented");};
+	    virtual int numCoefficients(){throw RSGISMathException("Not implemented");};
+		virtual void updateCoefficents(double *newCoefficents){throw RSGISMathException("Not implemented");};
 		virtual ~RSGISFunction3Var4DataPreconditionedLeastSquares();
 	private:
 		RSGISMathThreeVariableFunction *functionA;
@@ -326,11 +326,11 @@ namespace rsgis{namespace math{
 		/// Least squares
 	public: 
 		RSGISFunctionEstimationLeastSquares(RSGISMathTwoVariableFunction *functionA, RSGISMathTwoVariableFunction *functionB, double dataA, double dataB);
-		virtual double calcFunction(double valueX, double valueY) throw(RSGISMathException);
-		virtual double dX(double valueX, double valueY) throw(RSGISMathException){throw RSGISMathException("Not implemented");}
-		virtual double dY(double valueX, double valueY) throw(RSGISMathException){throw RSGISMathException("Not implemented");}
-		virtual int numCoefficients() throw(RSGISMathException){throw RSGISMathException("Not implemented");};
-		virtual void updateCoefficents(double *newCoefficents) throw(RSGISMathException){throw RSGISMathException("Not implemented");};
+		virtual double calcFunction(double valueX, double valueY);
+		virtual double dX(double valueX, double valueY){throw RSGISMathException("Not implemented");}
+		virtual double dY(double valueX, double valueY){throw RSGISMathException("Not implemented");}
+		virtual int numCoefficients(){throw RSGISMathException("Not implemented");};
+		virtual void updateCoefficents(double *newCoefficents){throw RSGISMathException("Not implemented");};
 		virtual ~RSGISFunctionEstimationLeastSquares();
 	private:
 		RSGISMathTwoVariableFunction *functionA;
@@ -349,11 +349,11 @@ namespace rsgis{namespace math{
 		
 	public: 
 		RSGISFunction2DPoly(gsl_matrix *inCoefficients);
-		virtual double calcFunction(double valueX, double valueY) throw(RSGISMathException);
-		virtual double dX(double valueX, double valueY) throw(RSGISMathException);
-		virtual double dY(double valueX, double valueY) throw(RSGISMathException);
-		virtual int numCoefficients() throw(RSGISMathException) {return orderX * orderY;}
-		virtual void updateCoefficents(double *newCoefficents) throw(RSGISMathException){throw RSGISMathException("Not implemented");};
+		virtual double calcFunction(double valueX, double valueY);
+		virtual double dX(double valueX, double valueY);
+		virtual double dY(double valueX, double valueY);
+		virtual int numCoefficients() {return orderX * orderY;}
+		virtual void updateCoefficents(double *newCoefficents){throw RSGISMathException("Not implemented");};
 		virtual ~RSGISFunction2DPoly();
 	private:
 		gsl_matrix *coefficients;
@@ -371,12 +371,12 @@ namespace rsgis{namespace math{
 		 // TODO: Tidy up differential functions to only calculate neccesary values (not all)
 	public: 
 		RSGISFunction3DPoly(gsl_matrix *inCoefficients, int orderX, int orderY, int orderZ);
-		virtual double calcFunction(double valueX, double valueY, double valueZ) throw(RSGISMathException);
-		virtual double dX(double valueX, double valueY, double valueZ) throw(RSGISMathException);
-		virtual double dY(double valueX, double valueY, double valueZ) throw(RSGISMathException);
-		virtual double dZ(double valueX, double valueY, double valueZ) throw(RSGISMathException);
-		virtual int numCoefficients() throw(RSGISMathException) {return orderX * orderY * orderZ;}
-		virtual void updateCoefficents(double *newCoefficents) throw(RSGISMathException){throw RSGISMathException("Not implemented");};
+		virtual double calcFunction(double valueX, double valueY, double valueZ);
+		virtual double dX(double valueX, double valueY, double valueZ);
+		virtual double dY(double valueX, double valueY, double valueZ);
+		virtual double dZ(double valueX, double valueY, double valueZ);
+		virtual int numCoefficients() {return orderX * orderY * orderZ;}
+		virtual void updateCoefficents(double *newCoefficents){throw RSGISMathException("Not implemented");};
 		virtual ~RSGISFunction3DPoly();
 	private:
 		gsl_matrix *coefficients;
@@ -394,10 +394,10 @@ namespace rsgis{namespace math{
 		 */
 	public: 
 		RSGISFunctionNDPoly(gsl_matrix *inCoefficients, std::vector<int> *polyOrders);
-		virtual double calcFunction(std::vector<double> *values) throw(RSGISMathException);
-		virtual int numCoefficients() throw(RSGISMathException);
-        virtual int numVariables() throw(RSGISMathException);
-		virtual void updateCoefficents(double *newCoefficents) throw(RSGISMathException){throw RSGISMathException("Not implemented");};
+		virtual double calcFunction(std::vector<double> *values);
+		virtual int numCoefficients();
+        virtual int numVariables();
+		virtual void updateCoefficents(double *newCoefficents){throw RSGISMathException("Not implemented");};
 		virtual ~RSGISFunctionNDPoly();
 	private:
 		gsl_matrix *coefficients;
@@ -411,11 +411,11 @@ namespace rsgis{namespace math{
 		/// Rosenbrock's Parabolic Valley (Rosenbrock, 1960).
 	public: 
 		RSGISFunctionRosenbrocksParabolicValley(){};
-		virtual double calcFunction(double valueX, double valueY) throw(RSGISMathException);
-		virtual double dX(double valueX, double valueY) throw(RSGISMathException){throw RSGISMathException("Not implemented");}
-		virtual double dY(double valueX, double valueY) throw(RSGISMathException){throw RSGISMathException("Not implemented");}
-		virtual int numCoefficients() throw(RSGISMathException){throw RSGISMathException("Not implemented");};
-		virtual void updateCoefficents(double *newCoefficents) throw(RSGISMathException){throw RSGISMathException("Not implemented");};
+		virtual double calcFunction(double valueX, double valueY);
+		virtual double dX(double valueX, double valueY){throw RSGISMathException("Not implemented");}
+		virtual double dY(double valueX, double valueY){throw RSGISMathException("Not implemented");}
+		virtual int numCoefficients(){throw RSGISMathException("Not implemented");};
+		virtual void updateCoefficents(double *newCoefficents){throw RSGISMathException("Not implemented");};
 		virtual ~RSGISFunctionRosenbrocksParabolicValley(){};
 	};
 	
@@ -424,10 +424,10 @@ namespace rsgis{namespace math{
 		/// Returns zero
 	public: 
 		RSGISFunctionReturnZero(){};
-		virtual double calcFunction(double value) throw(RSGISMathException){return 0;};
-		virtual double dX(double value) throw(RSGISMathException){throw RSGISMathException("Not implemented");};
-		virtual int numCoefficients() throw(RSGISMathException){throw RSGISMathException("Not implemented");};
-		virtual void updateCoefficents(double *newCoefficents) throw(RSGISMathException){throw RSGISMathException("Not implemented");};
+		virtual double calcFunction(double value){return 0;};
+		virtual double dX(double value){throw RSGISMathException("Not implemented");};
+		virtual int numCoefficients(){throw RSGISMathException("Not implemented");};
+		virtual void updateCoefficents(double *newCoefficents){throw RSGISMathException("Not implemented");};
 		virtual ~RSGISFunctionReturnZero(){};
 	private:
 	};
@@ -443,10 +443,10 @@ namespace rsgis{namespace math{
 		  */
 	public: 
 		RSGISFunctionMuParser(std::string fxExpression, std::string varName = "x", std::string dxExpression = "", bool usedX = false);
-		virtual double calcFunction(double value) throw(RSGISMathException);
-		virtual double dX(double value) throw(RSGISMathException);
-		virtual int numCoefficients() throw(RSGISMathException) {throw RSGISMathException("Not known for muparser expression");};
-		virtual void updateCoefficents(double *newCoefficents) throw(RSGISMathException){throw RSGISMathException("Not implemented");};
+		virtual double calcFunction(double value);
+		virtual double dX(double value);
+		virtual int numCoefficients() {throw RSGISMathException("Not known for muparser expression");};
+		virtual void updateCoefficents(double *newCoefficents){throw RSGISMathException("Not implemented");};
 		virtual ~RSGISFunctionMuParser();
 	private:
         mu::Parser *muParserfX; // muParser to hold function
@@ -466,11 +466,11 @@ namespace rsgis{namespace math{
 		 */
 	public: 
 		RSGISFunctionMuParser2Var(std::string fxyExpression, std::string varName1 = "x", std::string varName2 = "y", std::string dxExpression = "", std::string dyExpression = "", bool usediff = false);
-		virtual double calcFunction(double valueX, double valueY) throw(RSGISMathException);
-		virtual double dX(double valueX, double valueY) throw(RSGISMathException);
-		virtual double dY(double valueX, double valueY) throw(RSGISMathException);
-		virtual int numCoefficients() throw(RSGISMathException) {throw RSGISMathException("Not known for muparser expression");};
-		virtual void updateCoefficents(double *newCoefficents) throw(RSGISMathException){throw RSGISMathException("Not implemented");};
+		virtual double calcFunction(double valueX, double valueY);
+		virtual double dX(double valueX, double valueY);
+		virtual double dY(double valueX, double valueY);
+		virtual int numCoefficients() {throw RSGISMathException("Not known for muparser expression");};
+		virtual void updateCoefficents(double *newCoefficents){throw RSGISMathException("Not implemented");};
 		virtual ~RSGISFunctionMuParser2Var();
 	private:
         mu::Parser *muParserfXY; // muParser to hold function

@@ -57,9 +57,9 @@ namespace rsgis{namespace vec{
 	{
 	public:
 		RSGISRemoveContainedPolygons();
-		long unsigned removeContainedPolygons(OGRLayer *input, OGRLayer *output)throw(RSGISVectorException);
-		long unsigned removeContainedPolygons(OGRLayer *input, OGRLayer *output, std::vector<OGRPolygon*> *inputPolys)throw(RSGISVectorException);
-		void copyFeatureDefn(OGRLayer *outputSHPLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
+		long unsigned removeContainedPolygons(OGRLayer *input, OGRLayer *output);
+		long unsigned removeContainedPolygons(OGRLayer *input, OGRLayer *output, std::vector<OGRPolygon*> *inputPolys);
+		void copyFeatureDefn(OGRLayer *outputSHPLayer, OGRFeatureDefn *inFeatureDefn);
 		void copyFeatureData(OGRFeature *inFeature, OGRFeature *outFeature, OGRFeatureDefn *inFeatureDefn, OGRFeatureDefn *outFeatureDefn);
 		~RSGISRemoveContainedPolygons();
 	};

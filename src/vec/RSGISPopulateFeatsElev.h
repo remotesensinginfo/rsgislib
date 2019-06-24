@@ -63,12 +63,12 @@ namespace rsgis{namespace vec{
 	class DllExport RSGISPopulateFeatsElev : public RSGISProcessOGRFeature
 	{
 	public:
-		RSGISPopulateFeatsElev(GDALDataset *image, unsigned int band)throw(RSGISVectorException);
-		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-		virtual void processFeature(OGRFeature *inFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-		virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
+		RSGISPopulateFeatsElev(GDALDataset *image, unsigned int band);
+		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid);
+		virtual void processFeature(OGRFeature *inFeature, geos::geom::Envelope *env, long fid);
+		virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn);
 		double* getPixelColumns(int xPxl, int yPxl);
-        OGRLinearRing* popZfield(OGRLinearRing *inGeomRing) throw(RSGISVectorOutputException);
+        OGRLinearRing* popZfield(OGRLinearRing *inGeomRing);
 		virtual ~RSGISPopulateFeatsElev();
 	private:
 		GDALDataset *image;

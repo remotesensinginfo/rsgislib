@@ -32,7 +32,7 @@ namespace rsgis{namespace img{
         
     }
     
-    void img::RSGISAddBands::addBandToFile(GDALDataset *input, GDALDataset *toAdd, std::string *outputFile, int band) throw(RSGISImageBandException)
+    void img::RSGISAddBands::addBandToFile(GDALDataset *input, GDALDataset *toAdd, std::string *outputFile, int band) 
     {
     	rsgis::img::RSGISImageUtils imgUtils;
     	double *inputTrans = new double[6];
@@ -152,7 +152,7 @@ namespace rsgis{namespace img{
         GDALClose(outputImage);
     }
     
-    void RSGISAddBands::addMultipleBands(GDALDataset *input, GDALDataset **toAdd, std::string *outputFile, int *band, int numAddBands) throw(RSGISImageBandException)
+    void RSGISAddBands::addMultipleBands(GDALDataset *input, GDALDataset **toAdd, std::string *outputFile, int *band, int numAddBands) 
     {
     	rsgis::img::RSGISImageUtils imgUtils;
 
@@ -326,7 +326,7 @@ namespace rsgis{namespace img{
         GDALClose(outputImage);
     }
     
-    void RSGISAddBands::stackImages(GDALDataset **datasets, int numDS, std::string outputImage, std::string *imageBandNames, bool skipPixels, float skipValue, float noDataValue, std::string gdalFormat, GDALDataType gdalDataType, bool replaceBandNames) throw(RSGISImageBandException)
+    void RSGISAddBands::stackImages(GDALDataset **datasets, int numDS, std::string outputImage, std::string *imageBandNames, bool skipPixels, float skipValue, float noDataValue, std::string gdalFormat, GDALDataType gdalDataType, bool replaceBandNames) 
     {
         GDALAllRegister();
 		RSGISImageUtils imgUtils;
@@ -670,7 +670,7 @@ namespace rsgis{namespace img{
         this->noDataVal = noDataVal;
     }
     
-    void RSGISCombineImagesIgnoreNoData::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+    void RSGISCombineImagesIgnoreNoData::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         if(numOutBands != 1)
         {

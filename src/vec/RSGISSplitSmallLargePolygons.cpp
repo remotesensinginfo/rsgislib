@@ -32,7 +32,7 @@ namespace rsgis{namespace vec{
 		
 	}
 	
-	void RSGISSplitSmallLargePolygons::splitPolygons(OGRLayer *input, OGRLayer *outputSmall, OGRLayer *outputLarge, float threshold)throw(RSGISVectorException)
+	void RSGISSplitSmallLargePolygons::splitPolygons(OGRLayer *input, OGRLayer *outputSmall, OGRLayer *outputLarge, float threshold)
 	{		
 		OGRFeature *inFeature = NULL;
 		OGRFeature *outFeature = NULL;
@@ -109,7 +109,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISSplitSmallLargePolygons::copyFeatureDefn(OGRLayer *outputSHPLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+	void RSGISSplitSmallLargePolygons::copyFeatureDefn(OGRLayer *outputSHPLayer, OGRFeatureDefn *inFeatureDefn)
 	{
 		int fieldCount = inFeatureDefn->GetFieldCount();
 		for(int i = 0; i < fieldCount; i++)

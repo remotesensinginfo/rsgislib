@@ -30,7 +30,7 @@ namespace rsgis{namespace vec{
 		this->processFeatures = processFeatures;
 	}
 	
-	void RSGISProcessVector::processVectors(OGRLayer *inputLayer, OGRLayer *outputLayer, bool copyData, bool outVertical, bool newFirst) throw(RSGISVectorOutputException,RSGISVectorException)
+	void RSGISProcessVector::processVectors(OGRLayer *inputLayer, OGRLayer *outputLayer, bool copyData, bool outVertical, bool newFirst)
 	{
 		RSGISVectorUtils vecUtils;
 		
@@ -184,7 +184,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 		
-	void RSGISProcessVector::processVectors(OGRLayer *inputLayer, bool outVertical, bool morefeedback) throw(RSGISVectorOutputException,RSGISVectorException)
+	void RSGISProcessVector::processVectors(OGRLayer *inputLayer, bool outVertical, bool morefeedback)
 	{
 		RSGISVectorUtils vecUtils;
 		
@@ -330,7 +330,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISProcessVector::processVectorsNoOutput(OGRLayer *inputLayer, bool outVertical) throw(RSGISVectorOutputException,RSGISVectorException)
+	void RSGISProcessVector::processVectorsNoOutput(OGRLayer *inputLayer, bool outVertical)
 	{
 		RSGISVectorUtils vecUtils;
 		
@@ -444,7 +444,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISProcessVector::copyFeatureDefn(OGRLayer *outputSHPLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+	void RSGISProcessVector::copyFeatureDefn(OGRLayer *outputSHPLayer, OGRFeatureDefn *inFeatureDefn)
 	{
 		int fieldCount = inFeatureDefn->GetFieldCount();
 		for(int i = 0; i < fieldCount; i++)

@@ -30,7 +30,7 @@ namespace rsgis { namespace img {
         
     }
     
-    void RSGISGenHistogram::genHistogram(GDALDataset **datasets, unsigned int numDS, std::string outputFile, unsigned int imgBand, double imgMin, double imgMax, float maskValue, float binWidth)throw(RSGISImageCalcException)
+    void RSGISGenHistogram::genHistogram(GDALDataset **datasets, unsigned int numDS, std::string outputFile, unsigned int imgBand, double imgMin, double imgMax, float maskValue, float binWidth)
     {
         try 
         {
@@ -85,7 +85,7 @@ namespace rsgis { namespace img {
         }
     }
     
-    unsigned int* RSGISGenHistogram::genGetHistogram(GDALDataset *dataset, unsigned int imgBand, double imgMin, double imgMax, float binWidth, unsigned int *nBins)throw(RSGISImageCalcException)
+    unsigned int* RSGISGenHistogram::genGetHistogram(GDALDataset *dataset, unsigned int imgBand, double imgMin, double imgMax, float binWidth, unsigned int *nBins)
     {
         unsigned int *bins = NULL;
         try
@@ -122,7 +122,7 @@ namespace rsgis { namespace img {
         return bins;
     }
     
-    void RSGISGenHistogram::gen2DHistogram(GDALDataset **datasets, unsigned int numDS, unsigned int img1BandIdx, unsigned int img2BandIdx, double **histgramMatrix, unsigned int numBins, double *img1Bins, double *img2Bins, double img1Scale, double img2Scale, double img1Off, double img2Off, double *rSq)throw(RSGISImageCalcException)
+    void RSGISGenHistogram::gen2DHistogram(GDALDataset **datasets, unsigned int numDS, unsigned int img1BandIdx, unsigned int img2BandIdx, double **histgramMatrix, unsigned int numBins, double *img1Bins, double *img2Bins, double img1Scale, double img2Scale, double img1Off, double img2Off, double *rSq)
     {
         try
         {
@@ -199,7 +199,7 @@ namespace rsgis { namespace img {
         this->binWidth = binWidth;
     }
     
-    void RSGISGenHistogramCalcVal::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+    void RSGISGenHistogramCalcVal::calcImageValue(float *bandValues, int numBands) 
     {
         try
         {
@@ -250,7 +250,7 @@ namespace rsgis { namespace img {
         this->binWidth = binWidth;
     }
     
-    void RSGISGenHistogramNoMaskCalcVal::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+    void RSGISGenHistogramNoMaskCalcVal::calcImageValue(float *bandValues, int numBands) 
     {
         try
         {
@@ -297,7 +297,7 @@ namespace rsgis { namespace img {
         this->img2Off = img2Off;
     }
     
-    void RSGISGen2DHistogramCalcVal::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+    void RSGISGen2DHistogramCalcVal::calcImageValue(float *bandValues, int numBands) 
     {
         try
         {

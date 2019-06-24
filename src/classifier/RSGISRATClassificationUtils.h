@@ -76,10 +76,10 @@ namespace rsgis{ namespace classifier{
     {
     public:
         RSGISCollapseSegmentsClassification();
-        void collapseClassification(GDALDataset *segments, std::string classNameCol, std::string classIntCol, bool useIntCol, std::string outputImage, std::string imageFormat) throw(RSGISClassificationException);
+        void collapseClassification(GDALDataset *segments, std::string classNameCol, std::string classIntCol, bool useIntCol, std::string outputImage, std::string imageFormat);
         ~RSGISCollapseSegmentsClassification();
     protected:
-        std::map<std::string, RSGISClassInfo*>* findAllClassNames(const GDALRasterAttributeTable *inRAT, unsigned int classNameIdx, unsigned int redIdx, unsigned int greenIdx, unsigned int blueIdx, unsigned int alphaIdx) throw(RSGISClassificationException);
+        std::map<std::string, RSGISClassInfo*>* findAllClassNames(const GDALRasterAttributeTable *inRAT, unsigned int classNameIdx, unsigned int redIdx, unsigned int greenIdx, unsigned int blueIdx, unsigned int alphaIdx);
     };
     
     
@@ -87,7 +87,7 @@ namespace rsgis{ namespace classifier{
     {
     public:
         RSGISFindAllClassNames(std::map<std::string, RSGISClassInfo*> *classes, bool useIntCol);
-        void calcRATValue(size_t fid, double *inRealCols, unsigned int numInRealCols, int *inIntCols, unsigned int numInIntCols, std::string *inStringCols, unsigned int numInStringCols, double *outRealCols, unsigned int numOutRealCols, int *outIntCols, unsigned int numOutIntCols, std::string *outStringCols, unsigned int numOutStringCols) throw(RSGISAttributeTableException);
+        void calcRATValue(size_t fid, double *inRealCols, unsigned int numInRealCols, int *inIntCols, unsigned int numInIntCols, std::string *inStringCols, unsigned int numInStringCols, double *outRealCols, unsigned int numOutRealCols, int *outIntCols, unsigned int numOutIntCols, std::string *outStringCols, unsigned int numOutStringCols);
         ~RSGISFindAllClassNames();
     protected:
         std::map<std::string, RSGISClassInfo*> *classes;
@@ -102,16 +102,7 @@ namespace rsgis{ namespace classifier{
 	{
 	public:
 		RSGISRecodeRasterFromClasses(const GDALRasterAttributeTable *rat, char **classColVals, size_t classNameColLen, std::map<std::string, RSGISClassInfo*> *classes);
-		void calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
-		void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(rsgis::img::RSGISImageCalcException);
-		void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent)throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
-		void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
-		void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
-		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output);
 		~RSGISRecodeRasterFromClasses();
 	protected:
         const GDALRasterAttributeTable *rat;
@@ -132,16 +123,7 @@ namespace rsgis{ namespace classifier{
 	{
 	public:
 		RSGISColourImageFromClassRAT(GDALColorTable *clrTab);
-		void calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException);
-		void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent)throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
-		void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
-		void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
-		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
+		void calcImageValue(float *bandValues, int numBands, double *output);
 		~RSGISColourImageFromClassRAT();
 	protected:
 		GDALColorTable *clrTab;

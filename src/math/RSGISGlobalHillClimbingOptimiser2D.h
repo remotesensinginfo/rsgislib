@@ -53,8 +53,8 @@ namespace rsgis{namespace math{
 		{
 		public:
 			RSGISGlobalHillClimbingOptimiser2D(RSGISGlobalOptimisationFunction *func, bool maximise, int maxNumIterations);
-			virtual std::vector<geos::geom::Coordinate*>* optimise4Neighbor(std::vector<geos::geom::Coordinate*> *coords, double step, geos::geom::Envelope *boundary) throw(RSGISOptimisationException);
-			virtual std::vector<geos::geom::Coordinate*>* optimise8Neighbor(std::vector<geos::geom::Coordinate*> *coords, double step, geos::geom::Envelope *boundary) throw(RSGISOptimisationException);
+			virtual std::vector<geos::geom::Coordinate*>* optimise4Neighbor(std::vector<geos::geom::Coordinate*> *coords, double step, geos::geom::Envelope *boundary);
+			virtual std::vector<geos::geom::Coordinate*>* optimise8Neighbor(std::vector<geos::geom::Coordinate*> *coords, double step, geos::geom::Envelope *boundary);
 			virtual ~RSGISGlobalHillClimbingOptimiser2D();
 		private:
 			int maxNumIterations;
@@ -64,8 +64,8 @@ namespace rsgis{namespace math{
 	{
 	public:
 		RSGISGlobalHillClimbingOptimiser2DVaryNumPts(RSGISGlobalOptimisationFunction *func, bool maximise, int maxNumIterations);
-		virtual std::vector<geos::geom::Coordinate*>* optimise4Neighbor(std::vector<geos::geom::Coordinate*> *coords, double step, geos::geom::Envelope *boundary) throw(RSGISOptimisationException);
-		virtual std::vector<geos::geom::Coordinate*>* optimise8Neighbor(std::vector<geos::geom::Coordinate*> *coords, double step, geos::geom::Envelope *boundary) throw(RSGISOptimisationException);
+		virtual std::vector<geos::geom::Coordinate*>* optimise4Neighbor(std::vector<geos::geom::Coordinate*> *coords, double step, geos::geom::Envelope *boundary);
+		virtual std::vector<geos::geom::Coordinate*>* optimise8Neighbor(std::vector<geos::geom::Coordinate*> *coords, double step, geos::geom::Envelope *boundary);
 		virtual ~RSGISGlobalHillClimbingOptimiser2DVaryNumPts();
 	private:
 		int maxNumIterations;

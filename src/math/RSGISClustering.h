@@ -57,25 +57,25 @@ namespace rsgis {namespace math{
 	{
 	public:
 		RSGISClusterer(){};
-        virtual std::vector< RSGISClusterCentre >* calcClusterCentres(std::vector< std::vector<float> > *input, unsigned int numFeatures, unsigned int numClusters, unsigned int maxNumIterations, float degreeOfChange) throw(RSGISClustererException) = 0;
-        void calcDataRanges(std::vector< std::vector<float> > *input, unsigned int numFeatures, float *min, float *max)throw(RSGISClustererException);
-        void calcDataStats(std::vector< std::vector<float> > *input, unsigned int numFeatures, float *min, float *max, float *mean, float *stddev)throw(RSGISClustererException);
-        std::vector< RSGISClusterCentre >* initializeClusterCentresRandom(unsigned int numFeatures, float *min, float *max, unsigned int numClusters)throw(RSGISClustererException);
-        std::vector< RSGISClusterCentre >* initializeClusterCentresRandom(std::vector< std::vector<float> > *input, unsigned int numFeatures, unsigned int numClusters)throw(RSGISClustererException);
-        std::vector< RSGISClusterCentre >* initializeClusterCentresDiagonal(unsigned int numFeatures, float *min, float *max, unsigned int numClusters)throw(RSGISClustererException);
-        std::vector< RSGISClusterCentre >* initializeClusterCentresDiagonal(unsigned int numFeatures, float *min, float *max, float *mean, float *stddev, unsigned int numClusters)throw(RSGISClustererException);
-        std::vector< RSGISClusterCentre >* initializeClusterCentresDiagonal(std::vector< std::vector<float> > *input, unsigned int numFeatures, float *min, float *max, unsigned int numClusters)throw(RSGISClustererException);
-        std::vector< RSGISClusterCentre >* initializeClusterCentresDiagonal(std::vector< std::vector<float> > *input, unsigned int numFeatures, float *min, float *max, float *mean, float *stddev, unsigned int numClusters)throw(RSGISClustererException);
-        std::vector< RSGISClusterCentre >* initializeClusterCentresKPP(std::vector< std::vector<float> > *input, unsigned int numFeatures, float *min, float *max, unsigned int numClusters)throw(RSGISClustererException);
+        virtual std::vector< RSGISClusterCentre >* calcClusterCentres(std::vector< std::vector<float> > *input, unsigned int numFeatures, unsigned int numClusters, unsigned int maxNumIterations, float degreeOfChange) = 0;
+        void calcDataRanges(std::vector< std::vector<float> > *input, unsigned int numFeatures, float *min, float *max);
+        void calcDataStats(std::vector< std::vector<float> > *input, unsigned int numFeatures, float *min, float *max, float *mean, float *stddev);
+        std::vector< RSGISClusterCentre >* initializeClusterCentresRandom(unsigned int numFeatures, float *min, float *max, unsigned int numClusters);
+        std::vector< RSGISClusterCentre >* initializeClusterCentresRandom(std::vector< std::vector<float> > *input, unsigned int numFeatures, unsigned int numClusters);
+        std::vector< RSGISClusterCentre >* initializeClusterCentresDiagonal(unsigned int numFeatures, float *min, float *max, unsigned int numClusters);
+        std::vector< RSGISClusterCentre >* initializeClusterCentresDiagonal(unsigned int numFeatures, float *min, float *max, float *mean, float *stddev, unsigned int numClusters);
+        std::vector< RSGISClusterCentre >* initializeClusterCentresDiagonal(std::vector< std::vector<float> > *input, unsigned int numFeatures, float *min, float *max, unsigned int numClusters);
+        std::vector< RSGISClusterCentre >* initializeClusterCentresDiagonal(std::vector< std::vector<float> > *input, unsigned int numFeatures, float *min, float *max, float *mean, float *stddev, unsigned int numClusters);
+        std::vector< RSGISClusterCentre >* initializeClusterCentresKPP(std::vector< std::vector<float> > *input, unsigned int numFeatures, float *min, float *max, unsigned int numClusters);
         
         std::vector< std::pair< unsigned int, std::vector<float> > >* createClusterDataInitClusterIDs(std::vector< std::vector<float> > *input, std::vector< RSGISClusterCentre > *clusterCentres);
         unsigned int reassignClusterIDs( std::vector< std::pair< unsigned int, std::vector<float> > > *clusterData, std::vector< RSGISClusterCentre > *clusterCentres);
         void recalcClusterCentres( std::vector< std::pair< unsigned int, std::vector<float> > > *clusterData, std::vector< RSGISClusterCentre > *clusterCentres, bool calcStdDev);
-        void assign2ClosestDataPoint(RSGISClusterCentre *cc, std::vector< std::vector<float> > *input, unsigned int numFeatures, std::vector< RSGISClusterCentre > *used)throw(RSGISClustererException);
+        void assign2ClosestDataPoint(RSGISClusterCentre *cc, std::vector< std::vector<float> > *input, unsigned int numFeatures, std::vector< RSGISClusterCentre > *used);
         
         ~RSGISClusterer(){};
     protected:
-        double calcEucDistance(std::vector<float> d1, std::vector<float> d2)throw(RSGISClustererException)
+        double calcEucDistance(std::vector<float> d1, std::vector<float> d2)
         {
             unsigned int numVals = d1.size(); 
             if(numVals != d2.size())
@@ -111,7 +111,7 @@ namespace rsgis {namespace math{
     {
     public:
 		RSGISKMeansClusterer(InitClustererMethods initCentres);
-        std::vector< RSGISClusterCentre >* calcClusterCentres(std::vector< std::vector<float> > *input, unsigned int numFeatures, unsigned int numClusters, unsigned int maxNumIterations, float degreeOfChange) throw(RSGISClustererException);
+        std::vector< RSGISClusterCentre >* calcClusterCentres(std::vector< std::vector<float> > *input, unsigned int numFeatures, unsigned int numClusters, unsigned int maxNumIterations, float degreeOfChange);
 		~RSGISKMeansClusterer();
     private:
         InitClustererMethods initCentres;
@@ -121,7 +121,7 @@ namespace rsgis {namespace math{
     {
     public:
 		RSGISISODataClusterer(InitClustererMethods initCentres, float minDistBetweenClusters, unsigned int minNumFeatures, float maxStdDev, unsigned int minNumClusters, unsigned int startIteration, unsigned int endIteration);
-        std::vector< RSGISClusterCentre >* calcClusterCentres(std::vector< std::vector<float> > *input, unsigned int numFeatures, unsigned int numClusters, unsigned int maxNumIterations, float degreeOfChange) throw(RSGISClustererException);
+        std::vector< RSGISClusterCentre >* calcClusterCentres(std::vector< std::vector<float> > *input, unsigned int numFeatures, unsigned int numClusters, unsigned int maxNumIterations, float degreeOfChange);
 		void addRemoveClusters(std::vector< RSGISClusterCentre > *clusterCentres);
         ~RSGISISODataClusterer();
     private:

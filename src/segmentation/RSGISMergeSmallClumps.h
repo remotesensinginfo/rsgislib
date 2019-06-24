@@ -54,7 +54,7 @@ namespace rsgis{namespace segment{
     {
     public:
         RSGISMergeSmallClumps();
-        void mergeSmallClumps(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize) throw(rsgis::img::RSGISImageCalcException);
+        void mergeSmallClumps(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize);
         ~RSGISMergeSmallClumps();
     };
     

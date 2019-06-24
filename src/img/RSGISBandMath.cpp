@@ -38,7 +38,7 @@ namespace rsgis{namespace img{
 		
 	}
 
-	void RSGISBandMath::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+	void RSGISBandMath::calcImageValue(float *bandValues, int numBands, double *output) 
 	{
 		if(numOutBands != 1)
 		{
@@ -89,7 +89,7 @@ namespace rsgis{namespace img{
         this->totalPxlCount = 0.0;
     }
 
-    void RSGISCalcPropExpTruePxls::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+    void RSGISCalcPropExpTruePxls::calcImageValue(float *bandValues, int numBands) 
     {
         try
         {

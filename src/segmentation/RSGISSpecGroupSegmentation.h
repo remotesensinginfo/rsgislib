@@ -53,9 +53,9 @@ namespace rsgis{namespace segment{
     {
     public:
         RSGISSpecGroupSegmentation();
-        void performSimpleClump(GDALDataset *spectral, GDALDataset *clumps, float specThreshold, bool noDataValProvided, float noDataVal) throw(rsgis::img::RSGISImageCalcException);
-        void performSimpleClumpKeepPxlVals(GDALDataset *spectral, GDALDataset *clumps, float specThreshold) throw(rsgis::img::RSGISImageCalcException);
-        void performSimpleClumpStdDevWeights(GDALDataset *spectral, GDALDataset *clumps, float specThreshold, bool noDataValProvided, float noDataVal) throw(rsgis::img::RSGISImageCalcException);
+        void performSimpleClump(GDALDataset *spectral, GDALDataset *clumps, float specThreshold, bool noDataValProvided, float noDataVal);
+        void performSimpleClumpKeepPxlVals(GDALDataset *spectral, GDALDataset *clumps, float specThreshold);
+        void performSimpleClumpStdDevWeights(GDALDataset *spectral, GDALDataset *clumps, float specThreshold, bool noDataValProvided, float noDataVal);
         ~RSGISSpecGroupSegmentation();
     protected:
         float eucDistance(float *vals1, float *vals2, unsigned int numVals);

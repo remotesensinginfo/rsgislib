@@ -42,7 +42,7 @@ namespace rsgis{namespace utils{
 		return instance;
 	}
 	
-	RSGISExportForPlotting* RSGISExportForPlotting::getInstance() throw(rsgis::RSGISException)
+	RSGISExportForPlotting* RSGISExportForPlotting::getInstance() 
 	{
 		if(instance == NULL)
 		{
@@ -56,7 +56,7 @@ namespace rsgis{namespace utils{
 		return filepath;
 	}
 	
-	void RSGISExportForPlotting::export2DFreq(std::string filename, std::list<double> *values) throw(rsgis::RSGISOutputStreamException)
+	void RSGISExportForPlotting::export2DFreq(std::string filename, std::list<double> *values)
 	{
 		std::string outputFilename = this->filepath + filename + std::string(".ptxt");
 		std::ofstream outTxtFile;
@@ -84,7 +84,7 @@ namespace rsgis{namespace utils{
 		}
 	}
 	
-	void RSGISExportForPlotting::export3DFreq(std::string filename, std::list<double> *values1, std::list<double> *values2) throw(rsgis::RSGISOutputStreamException)
+	void RSGISExportForPlotting::export3DFreq(std::string filename, std::list<double> *values1, std::list<double> *values2)
 	{
 		std::string outputFilename = filepath + filename + std::string(".ptxt");
 		std::ofstream outTxtFile;
@@ -124,7 +124,7 @@ namespace rsgis{namespace utils{
 		}	
 	}
 	
-	void RSGISExportForPlotting::export2DLines(std::string filename, std::list<geos::geom::LineSegment> *lines) throw(rsgis::RSGISOutputStreamException)
+	void RSGISExportForPlotting::export2DLines(std::string filename, std::list<geos::geom::LineSegment> *lines)
 	{
 		std::string outputFilename = filepath + filename + std::string(".ptxt");
 		std::ofstream outTxtFile;
@@ -152,7 +152,7 @@ namespace rsgis{namespace utils{
 		}	
 	}
 	
-	void RSGISExportForPlotting::export3DLines(std::string filename, std::list<geos::geom::LineSegment> *lines) throw(rsgis::RSGISOutputStreamException)
+	void RSGISExportForPlotting::export3DLines(std::string filename, std::list<geos::geom::LineSegment> *lines)
 	{
 		std::string outputFilename = filepath + filename + std::string(".ptxt");
 		std::ofstream outTxtFile;
@@ -180,7 +180,7 @@ namespace rsgis{namespace utils{
 		}	
 	}
 	
-	void RSGISExportForPlotting::exportDensity(std::string filename, double *x, double *y, int numPts) throw(rsgis::RSGISOutputStreamException)
+	void RSGISExportForPlotting::exportDensity(std::string filename, double *x, double *y, int numPts)
 	{
 		std::string outputFilename = filepath + filename + std::string(".ptxt");
 		std::ofstream outTxtFile;
@@ -206,7 +206,7 @@ namespace rsgis{namespace utils{
 		}	
 	}
 	
-	void RSGISExportForPlotting::export2DScatter(std::string filename, double *x, double *y, int numPts) throw(rsgis::RSGISOutputStreamException)
+	void RSGISExportForPlotting::export2DScatter(std::string filename, double *x, double *y, int numPts)
 	{
 		std::string outputFilename = filepath + filename + std::string(".ptxt");
 		std::ofstream outTxtFile;
@@ -232,7 +232,7 @@ namespace rsgis{namespace utils{
 		}	
 	}
 	
-	void RSGISExportForPlotting::export3DScatter(std::string filename, double *x, double *y, double *z, int numPts) throw(rsgis::RSGISOutputStreamException)
+	void RSGISExportForPlotting::export3DScatter(std::string filename, double *x, double *y, double *z, int numPts)
 	{
 		std::string outputFilename = filepath + filename + std::string(".ptxt");
 		std::ofstream outTxtFile;
@@ -258,7 +258,7 @@ namespace rsgis{namespace utils{
 		}	
 	}
 	
-	void RSGISExportForPlotting::export2DColourScatter(std::string filename, double *x, double *y, double *c, int numPts) throw(rsgis::RSGISOutputStreamException)
+	void RSGISExportForPlotting::export2DColourScatter(std::string filename, double *x, double *y, double *c, int numPts)
 	{
 		std::string outputFilename = filepath + filename + std::string(".ptxt");
 		std::ofstream outTxtFile;
@@ -284,7 +284,7 @@ namespace rsgis{namespace utils{
 		}	
 	}
 	
-	void RSGISExportForPlotting::export3DColourScatter(std::string filename, double *x, double *y, double *z, double *c, int numPts) throw(rsgis::RSGISOutputStreamException)
+	void RSGISExportForPlotting::export3DColourScatter(std::string filename, double *x, double *y, double *z, double *c, int numPts)
 	{
 		std::string outputFilename = filepath + filename + std::string(".ptxt");
 		std::ofstream outTxtFile;
@@ -310,7 +310,7 @@ namespace rsgis{namespace utils{
 		}			
 	}
 	
-	void RSGISExportForPlotting::exportSurface(std::string filename, double *x, double *y, double *z, int numPts) throw(rsgis::RSGISOutputStreamException)
+	void RSGISExportForPlotting::exportSurface(std::string filename, double *x, double *y, double *z, int numPts)
 	{
 		std::string outputFilename = filepath + filename + std::string(".ptxt");
 		std::ofstream outTxtFile;
@@ -336,7 +336,7 @@ namespace rsgis{namespace utils{
 		}	
 	}
 	
-	void RSGISExportForPlotting::exportColourSurface(std::string filename, double *x, double *y, double *z, double *c, int numPts) throw(rsgis::RSGISOutputStreamException)
+	void RSGISExportForPlotting::exportColourSurface(std::string filename, double *x, double *y, double *z, double *c, int numPts)
 	{
 		std::string outputFilename = filepath + filename + std::string(".ptxt");
 		std::ofstream outTxtFile;
@@ -362,7 +362,7 @@ namespace rsgis{namespace utils{
 		}			
 	}
 	
-	void RSGISExportForPlotting::exportTriangles2d(std::string filename, double *x, double *y, unsigned long numPts) throw(rsgis::RSGISOutputStreamException)
+	void RSGISExportForPlotting::exportTriangles2d(std::string filename, double *x, double *y, unsigned long numPts)
 	{
 		std::string outputFilename = filepath + filename + std::string(".ptxt");
 		std::ofstream outTxtFile;
@@ -391,7 +391,7 @@ namespace rsgis{namespace utils{
 		
 	}
 	
-	void RSGISExportForPlotting::exportTriangles3d(std::string filename, double *x, double *y, double *z, unsigned long numPts) throw(rsgis::RSGISOutputStreamException)
+	void RSGISExportForPlotting::exportTriangles3d(std::string filename, double *x, double *y, double *z, unsigned long numPts)
 	{
 		std::string outputFilename = filepath + filename + std::string(".ptxt");
 		std::ofstream outTxtFile;

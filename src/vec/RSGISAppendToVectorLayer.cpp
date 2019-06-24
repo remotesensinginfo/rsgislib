@@ -32,7 +32,7 @@ namespace rsgis{namespace vec{
 		
 	}
 	
-	void RSGISAppendToVectorLayer::appendLayer(OGRLayer *input, OGRLayer *outputLayer, bool ignoreAttr)throw(RSGISVectorException)
+	void RSGISAppendToVectorLayer::appendLayer(OGRLayer *input, OGRLayer *outputLayer, bool ignoreAttr)
 	{		
 		OGRFeature *inFeature = NULL;
 		OGRFeature *outFeature = NULL;
@@ -84,7 +84,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISAppendToVectorLayer::copyFeatureDefn(OGRLayer *outputSHPLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+	void RSGISAppendToVectorLayer::copyFeatureDefn(OGRLayer *outputSHPLayer, OGRFeatureDefn *inFeatureDefn)
 	{
 		int fieldCount = inFeatureDefn->GetFieldCount();
 		for(int i = 0; i < fieldCount; i++)

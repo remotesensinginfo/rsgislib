@@ -62,8 +62,8 @@ namespace rsgis { namespace img {
 		
 	public:
 		RSGISGenerateImageFromXYZData(std::string inputDataFile, std::string outputFile, char delimiter, std::string proj4, bool xyOrder, float resolution);
-		void createImageRepresentingXYZData() throw(rsgis::RSGISFileException, rsgis::RSGISImageException);
-		void readInputData() throw(rsgis::RSGISFileException);
+		void createImageRepresentingXYZData();
+		void readInputData();
 		~RSGISGenerateImageFromXYZData();
 	protected:
         std::string inputFile;

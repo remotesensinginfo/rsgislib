@@ -29,7 +29,7 @@ namespace rsgis{namespace img{
 		this->scale = scale;
 	}
 	
-	void RSGISAddRandomNoise::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+	void RSGISAddRandomNoise::calcImageValue(float *bandValues, int numBands, double *output) 
 	{
 		if(numOutBands != numBands)
 		{
@@ -53,7 +53,7 @@ namespace rsgis{namespace img{
 		this->gRand = new rsgis::math::RSGISRandDistroGaussian(0,1);
 	}
 	
-	void RSGISAddRandomGaussianNoisePercent::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+	void RSGISAddRandomGaussianNoisePercent::calcImageValue(float *bandValues, int numBands, double *output) 
 	{
 		if(numOutBands != numBands)
 		{

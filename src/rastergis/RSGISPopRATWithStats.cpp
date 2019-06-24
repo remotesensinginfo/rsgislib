@@ -31,7 +31,7 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    void RSGISPopRATWithStats::populateRATWithBasicStats(GDALDataset *inputClumps, GDALDataset *inputValsImage, std::vector<RSGISBandAttStats*> *bandStats, unsigned int ratBand)throw(RSGISAttributeTableException)
+    void RSGISPopRATWithStats::populateRATWithBasicStats(GDALDataset *inputClumps, GDALDataset *inputValsImage, std::vector<RSGISBandAttStats*> *bandStats, unsigned int ratBand)
     {
         try
         {
@@ -417,7 +417,7 @@ namespace rsgis{namespace rastergis{
         }
     }
     
-    void RSGISPopRATWithStats::populateRATWithPercentileStats(GDALDataset *inputClumps, GDALDataset *inputValsImage, unsigned int band, std::vector<RSGISBandAttPercentiles*> *bandStats, unsigned int ratBand, unsigned int numHistBins)throw(RSGISAttributeTableException)
+    void RSGISPopRATWithStats::populateRATWithPercentileStats(GDALDataset *inputClumps, GDALDataset *inputValsImage, unsigned int band, std::vector<RSGISBandAttPercentiles*> *bandStats, unsigned int ratBand, unsigned int numHistBins)
     {
         try
         {
@@ -579,7 +579,7 @@ namespace rsgis{namespace rastergis{
         }
     }
 
-    void RSGISPopRATWithStats::populateRATWithMeanLitStats(GDALDataset *inputClumps, GDALDataset *inputValsImage, GDALDataset *inputMeanLitImage, unsigned int meanLitBand, std::string meanLitCol, std::string pxlCountCol, std::vector<RSGISBandAttStats*> *bandStats, unsigned int ratBand)throw(RSGISAttributeTableException)
+    void RSGISPopRATWithStats::populateRATWithMeanLitStats(GDALDataset *inputClumps, GDALDataset *inputValsImage, GDALDataset *inputMeanLitImage, unsigned int meanLitBand, std::string meanLitCol, std::string pxlCountCol, std::vector<RSGISBandAttStats*> *bandStats, unsigned int ratBand)
     {
         try
         {
@@ -975,7 +975,7 @@ namespace rsgis{namespace rastergis{
         }
     }
     
-    void RSGISPopRATWithStats::populateRATWithModeStats(GDALDataset *inputClumps, GDALDataset *inputValsImage, std::string outColsName, bool useNoDataVal, long noDataVal, bool outNoDataVal, unsigned int modeBand, unsigned int ratBand)throw(RSGISAttributeTableException)
+    void RSGISPopRATWithStats::populateRATWithModeStats(GDALDataset *inputClumps, GDALDataset *inputValsImage, std::string outColsName, bool useNoDataVal, long noDataVal, bool outNoDataVal, unsigned int modeBand, unsigned int ratBand)
     {
         try
         {
@@ -1149,7 +1149,7 @@ namespace rsgis{namespace rastergis{
         }
     }
     
-    void RSGISPopRATWithStats::populateRATWithPopValidPixels(GDALDataset *inputClumps, GDALDataset *inputValsImage, std::string outColsName, double noDataVal, unsigned int ratBand)throw(RSGISAttributeTableException)
+    void RSGISPopRATWithStats::populateRATWithPopValidPixels(GDALDataset *inputClumps, GDALDataset *inputValsImage, std::string outColsName, double noDataVal, unsigned int ratBand)
     {
         try
         {
@@ -1240,7 +1240,7 @@ namespace rsgis{namespace rastergis{
         this->ratBand = ratBand;
     }
     
-    void RSGISCalcClusterPxlValueStats::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCalcClusterPxlValueStats::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) 
     {
         if(intBandValues[ratBand-1] > 0)
         {
@@ -1321,7 +1321,7 @@ namespace rsgis{namespace rastergis{
         this->ratBand = ratBand;
     }
     
-    void RSGISCalcClusterPxlValueStdDev::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCalcClusterPxlValueStdDev::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) 
     {
         if(intBandValues[ratBand-1] > 0)
         {
@@ -1371,7 +1371,7 @@ namespace rsgis{namespace rastergis{
         this->useNoDataVal = useNoDataVal;
     }
 
-    void RSGISCalcClusterPxlValueHistograms::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCalcClusterPxlValueHistograms::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) 
     {
         if(intBandValues[ratBand-1] > 0)
         {
@@ -1439,7 +1439,7 @@ namespace rsgis{namespace rastergis{
         this->ratBand = ratBand;
     }
     
-    void RSGISCalcClusterPxlValueStatsMeanLit::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCalcClusterPxlValueStatsMeanLit::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) 
     {
         if(intBandValues[ratBand-1] > 0)
         {
@@ -1527,7 +1527,7 @@ namespace rsgis{namespace rastergis{
         this->ratBand = ratBand;
     }
     
-    void RSGISCalcClusterPxlValueStdDevMeanLit::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCalcClusterPxlValueStdDevMeanLit::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) 
     {
         if(intBandValues[ratBand-1] > 0)
         {
@@ -1579,7 +1579,7 @@ namespace rsgis{namespace rastergis{
         this->band = band;
     }
     
-    void RSGISCalcImageMinMaxIntVals::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCalcImageMinMaxIntVals::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) 
     {
         if(numIntVals == 0)
         {
@@ -1634,7 +1634,7 @@ namespace rsgis{namespace rastergis{
         this->noDataVal = noDataVal;
     }
     
-    void RSGISCalcClusterModeHistograms::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCalcClusterModeHistograms::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) 
     {
         if(numIntVals == 0)
         {
@@ -1686,7 +1686,7 @@ namespace rsgis{namespace rastergis{
         this->ratBandIdx = ratBandIdx;
     }
     
-    void RSGISCalcCountValidPxlValues::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCalcCountValidPxlValues::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) 
     {
         if(intBandValues[ratBandIdx] > 0)
         {

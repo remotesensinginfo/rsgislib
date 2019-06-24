@@ -33,12 +33,12 @@ namespace rsgis{namespace vec{
 		this->replace = replace;
 	}
 	
-	void RSGISVectorAttributeFindReplace::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISVectorAttributeFindReplace::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)
 	{
 		throw RSGISVectorException("Not implemented..");
 	}
 	
-	void RSGISVectorAttributeFindReplace::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISVectorAttributeFindReplace::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid)
 	{
 		OGRFeatureDefn *featureDefn = feature->GetDefnRef();
 		int fieldIdx = featureDefn->GetFieldIndex(attribute.c_str());
@@ -82,7 +82,7 @@ namespace rsgis{namespace vec{
 			
 	}
 	
-	void RSGISVectorAttributeFindReplace::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+	void RSGISVectorAttributeFindReplace::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn)
 	{
 		
 	}

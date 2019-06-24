@@ -49,7 +49,7 @@ namespace rsgis{namespace vec{
 		
 	}
 	
-	void RSGISImageTileVector::createLayerDefinition(OGRLayer *outputSHPLayer)throw(RSGISVectorOutputException)
+	void RSGISImageTileVector::createLayerDefinition(OGRLayer *outputSHPLayer)
 	{
 		// Create class attribute column
 		OGRFieldDefn classField( "filename", OFTString );

@@ -58,13 +58,13 @@ namespace rsgis{namespace img{
 											 double outputXResolution, 
 											 double outputYResolution, 
                                              std::string filename)
-			throw(rsgis::RSGISFileException, rsgis::RSGISImageException);
+			;
 			void interpolateNewImage(GDALDataset *data,
 											 double outputXResolution, 
 											 double outputYResolution, 
 											 std::string filename,
 											 int band)
-			throw(rsgis::RSGISFileException, rsgis::RSGISImageException);
+			;
 			void findOutputResolution(GDALDataset *dataset, float scale, int *outResolutionX, int *outResolutionY);
 			~RSGISImageInterpolation();
 		protected:
@@ -77,7 +77,7 @@ namespace rsgis{namespace img{
     {
     public:
         RSGISPopulateImageFromInterpolator();
-        void populateImage(rsgis::math::RSGIS2DInterpolator *interpolator, GDALDataset *image)throw(rsgis::RSGISImageException, rsgis::math::RSGISInterpolationException);
+        void populateImage(rsgis::math::RSGIS2DInterpolator *interpolator, GDALDataset *image);
         ~RSGISPopulateImageFromInterpolator();
     };
     

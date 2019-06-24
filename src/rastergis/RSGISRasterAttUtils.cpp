@@ -29,7 +29,7 @@ namespace rsgis{namespace rastergis{
 
     }
 
-    void RSGISRasterAttUtils::copyAttColumns(GDALDataset *inImage, GDALDataset *outImage, std::vector<std::string> fields, bool copyColours, bool copyHist, int ratBand) throw(RSGISAttributeTableException)
+    void RSGISRasterAttUtils::copyAttColumns(GDALDataset *inImage, GDALDataset *outImage, std::vector<std::string> fields, bool copyColours, bool copyHist, int ratBand)
     {
         try
         {
@@ -277,7 +277,7 @@ namespace rsgis{namespace rastergis{
     }
 
     
-    void RSGISRasterAttUtils::copyAttColumnsWithOff(GDALRasterAttributeTable *inRAT, GDALRasterAttributeTable *outRAT, std::vector<std::string> fields, unsigned int offset, bool ignoreFirstRow, bool copyColours, bool copyHist) throw(RSGISAttributeTableException)
+    void RSGISRasterAttUtils::copyAttColumnsWithOff(GDALRasterAttributeTable *inRAT, GDALRasterAttributeTable *outRAT, std::vector<std::string> fields, unsigned int offset, bool ignoreFirstRow, bool copyColours, bool copyHist)
     {
         if(inRAT == NULL)
         {
@@ -531,7 +531,7 @@ namespace rsgis{namespace rastergis{
         delete[] blockDataStr;
     }
     
-    void RSGISRasterAttUtils::copyColourForCats(GDALDataset *catsImage, GDALDataset *classImage, std::string classField) throw(RSGISAttributeTableException)
+    void RSGISRasterAttUtils::copyColourForCats(GDALDataset *catsImage, GDALDataset *classImage, std::string classField)
     {
         try
         {
@@ -727,7 +727,7 @@ namespace rsgis{namespace rastergis{
         }
     }
 
-    void RSGISRasterAttUtils::exportColumns2ASCII(GDALDataset *inImage, std::string outputFile, std::vector<std::string> fields, int ratBand) throw(RSGISAttributeTableException)
+    void RSGISRasterAttUtils::exportColumns2ASCII(GDALDataset *inImage, std::string outputFile, std::vector<std::string> fields, int ratBand)
     {
         try
         {
@@ -874,7 +874,7 @@ namespace rsgis{namespace rastergis{
                             }
                             else if(gdalAttIn->GetTypeOfCol(colInIdxs[j]) == GFT_String)
                             {
-                                outFile << "\"" << blockDataStr[colBlockIndxs[j]][m] << "\"" ;
+                                outFile << "\"" << blockDataStr[colBlockIndxs[j]][m] << "\"";
                             }
                             else
                             {
@@ -935,7 +935,7 @@ namespace rsgis{namespace rastergis{
                             }
                             else if(gdalAttIn->GetTypeOfCol(colInIdxs[j]) == GFT_String)
                             {
-                                outFile << "\"" << blockDataStr[colBlockIndxs[j]][m] << "\"" ;
+                                outFile << "\"" << blockDataStr[colBlockIndxs[j]][m] << "\"";
                             }
                             else
                             {
@@ -986,7 +986,7 @@ namespace rsgis{namespace rastergis{
         }
     }
 
-    void RSGISRasterAttUtils::translateClasses(GDALDataset *inImage, std::string classInField, std::string classOutField, std::map<size_t, size_t> classPairs) throw(RSGISAttributeTableException)
+    void RSGISRasterAttUtils::translateClasses(GDALDataset *inImage, std::string classInField, std::string classOutField, std::map<size_t, size_t> classPairs)
     {
         try
         {
@@ -1087,7 +1087,7 @@ namespace rsgis{namespace rastergis{
         }
     }
 
-    void RSGISRasterAttUtils::applyClassColours(GDALDataset *inImage, std::string classInField, std::map<size_t, rsgis::utils::RSGISColourInt> classColoursPairs, int ratBand) throw(RSGISAttributeTableException)
+    void RSGISRasterAttUtils::applyClassColours(GDALDataset *inImage, std::string classInField, std::map<size_t, rsgis::utils::RSGISColourInt> classColoursPairs, int ratBand)
     {
         std::cout << "Import attribute table to memory.\n";
         GDALRasterAttributeTable *gdalAttInTmp = inImage->GetRasterBand(ratBand)->GetDefaultRAT();
@@ -1248,7 +1248,7 @@ namespace rsgis{namespace rastergis{
 
     }
 
-    void RSGISRasterAttUtils::applyClassStrColours(GDALDataset *inImage, std::string classInField, std::map<std::string, rsgis::utils::RSGISColourInt> classColoursPairs, int ratBand) throw(RSGISAttributeTableException)
+    void RSGISRasterAttUtils::applyClassStrColours(GDALDataset *inImage, std::string classInField, std::map<std::string, rsgis::utils::RSGISColourInt> classColoursPairs, int ratBand)
     {
 
         std::cout << "Import attribute table to memory.\n";
@@ -1410,7 +1410,7 @@ namespace rsgis{namespace rastergis{
 
     }
 
-    unsigned int RSGISRasterAttUtils::findColumnIndex(const GDALRasterAttributeTable *gdalATT, std::string colName) throw(RSGISAttributeTableException)
+    unsigned int RSGISRasterAttUtils::findColumnIndex(const GDALRasterAttributeTable *gdalATT, std::string colName)
     {
         int numColumns = gdalATT->GetColumnCount();
         bool foundCol = false;
@@ -1434,7 +1434,7 @@ namespace rsgis{namespace rastergis{
         return colIdx;
     }
 
-    unsigned int RSGISRasterAttUtils::findColumnIndexOrCreate(GDALRasterAttributeTable *gdalATT, std::string colName, GDALRATFieldType dType, GDALRATFieldUsage dUsage) throw(RSGISAttributeTableException)
+    unsigned int RSGISRasterAttUtils::findColumnIndexOrCreate(GDALRasterAttributeTable *gdalATT, std::string colName, GDALRATFieldType dType, GDALRATFieldUsage dUsage)
     {
         int numColumns = gdalATT->GetColumnCount();
         bool foundCol = false;
@@ -1458,7 +1458,7 @@ namespace rsgis{namespace rastergis{
         return colIdx;
     }
 
-    double RSGISRasterAttUtils::readDoubleColumnVal(const GDALRasterAttributeTable *gdalATT, std::string colName, unsigned int row) throw(RSGISAttributeTableException)
+    double RSGISRasterAttUtils::readDoubleColumnVal(const GDALRasterAttributeTable *gdalATT, std::string colName, unsigned int row)
     {
         double val = 0.0;
         try
@@ -1481,7 +1481,7 @@ namespace rsgis{namespace rastergis{
         return val;
     }
 
-    long RSGISRasterAttUtils::readIntColumnVal(const GDALRasterAttributeTable *gdalATT, std::string colName, unsigned int row) throw(RSGISAttributeTableException)
+    long RSGISRasterAttUtils::readIntColumnVal(const GDALRasterAttributeTable *gdalATT, std::string colName, unsigned int row)
     {
         long val = 0;
         try
@@ -1504,7 +1504,7 @@ namespace rsgis{namespace rastergis{
         return val;
     }
 
-    std::string RSGISRasterAttUtils::readStringColumnVal(const GDALRasterAttributeTable *gdalATT, std::string colName, unsigned int row) throw(RSGISAttributeTableException)
+    std::string RSGISRasterAttUtils::readStringColumnVal(const GDALRasterAttributeTable *gdalATT, std::string colName, unsigned int row)
     {
         std::string val = "";
         try
@@ -1528,7 +1528,7 @@ namespace rsgis{namespace rastergis{
     }
 
 
-    double* RSGISRasterAttUtils::readDoubleColumn(GDALRasterAttributeTable *attTable, std::string colName, size_t *colLen) throw(RSGISAttributeTableException)
+    double* RSGISRasterAttUtils::readDoubleColumn(GDALRasterAttributeTable *attTable, std::string colName, size_t *colLen)
     {
         double *outData = NULL;
         try
@@ -1617,7 +1617,7 @@ namespace rsgis{namespace rastergis{
         return outData;
     }
 
-    int* RSGISRasterAttUtils::readIntColumn(GDALRasterAttributeTable *attTable, std::string colName, size_t *colLen) throw(RSGISAttributeTableException)
+    int* RSGISRasterAttUtils::readIntColumn(GDALRasterAttributeTable *attTable, std::string colName, size_t *colLen)
     {
         int *outData = NULL;
         try
@@ -1706,7 +1706,7 @@ namespace rsgis{namespace rastergis{
         return outData;
     }
 
-    char** RSGISRasterAttUtils::readStrColumn(GDALRasterAttributeTable *attTable, std::string colName, size_t *colLen) throw(RSGISAttributeTableException)
+    char** RSGISRasterAttUtils::readStrColumn(GDALRasterAttributeTable *attTable, std::string colName, size_t *colLen)
     {
         char **outData = NULL;
         try
@@ -1794,7 +1794,7 @@ namespace rsgis{namespace rastergis{
         return outData;
     }
     
-    std::string* RSGISRasterAttUtils::readStrColumnStdStr(GDALRasterAttributeTable *attTable, std::string colName, size_t *colLen) throw(RSGISAttributeTableException)
+    std::string* RSGISRasterAttUtils::readStrColumnStdStr(GDALRasterAttributeTable *attTable, std::string colName, size_t *colLen)
     {
         std::string *outData = NULL;
         try
@@ -1886,7 +1886,7 @@ namespace rsgis{namespace rastergis{
     
     
     
-    std::vector<double>* RSGISRasterAttUtils::readDoubleColumnAsVec(GDALRasterAttributeTable *attTable, std::string colName) throw(RSGISAttributeTableException)
+    std::vector<double>* RSGISRasterAttUtils::readDoubleColumnAsVec(GDALRasterAttributeTable *attTable, std::string colName)
     {
         std::vector<double> *outData = new std::vector<double>();
         try
@@ -1974,7 +1974,7 @@ namespace rsgis{namespace rastergis{
         return outData;
     }
     
-    std::vector<int>* RSGISRasterAttUtils::readIntColumnAsVec(GDALRasterAttributeTable *attTable, std::string colName) throw(RSGISAttributeTableException)
+    std::vector<int>* RSGISRasterAttUtils::readIntColumnAsVec(GDALRasterAttributeTable *attTable, std::string colName)
     {
         std::vector<int> *outData = new std::vector<int>();
         try
@@ -2062,7 +2062,7 @@ namespace rsgis{namespace rastergis{
         return outData;
     }
     
-    std::vector<std::string>* RSGISRasterAttUtils::readStrColumnAsVec(GDALRasterAttributeTable *attTable, std::string colName) throw(RSGISAttributeTableException)
+    std::vector<std::string>* RSGISRasterAttUtils::readStrColumnAsVec(GDALRasterAttributeTable *attTable, std::string colName)
     {
         std::vector<std::string> *outData = new std::vector<std::string>();
         try
@@ -2154,7 +2154,7 @@ namespace rsgis{namespace rastergis{
     
     
     
-    std::vector<std::vector<size_t>* >* RSGISRasterAttUtils::getRATNeighbours(GDALDataset *clumpImage, unsigned int ratBand) throw(RSGISAttributeTableException)
+    std::vector<std::vector<size_t>* >* RSGISRasterAttUtils::getRATNeighbours(GDALDataset *clumpImage, unsigned int ratBand)
     {
         std::vector<std::vector<size_t>* > *neighbours = new std::vector<std::vector<size_t>* >();
         
@@ -2216,7 +2216,7 @@ namespace rsgis{namespace rastergis{
     }
     
     
-    void RSGISRasterAttUtils::writeStrColumn(GDALRasterAttributeTable *attTable, std::string colName, std::string *strDataVal, size_t colLen) throw(RSGISAttributeTableException)
+    void RSGISRasterAttUtils::writeStrColumn(GDALRasterAttributeTable *attTable, std::string colName, std::string *strDataVal, size_t colLen)
     {
         try
         {
@@ -2305,7 +2305,7 @@ namespace rsgis{namespace rastergis{
         }
     }
     
-    std::vector<RSGISRATCol>* RSGISRasterAttUtils::getRatColumnsList(GDALRasterAttributeTable *gdalATT) throw(RSGISAttributeTableException)
+    std::vector<RSGISRATCol>* RSGISRasterAttUtils::getRatColumnsList(GDALRasterAttributeTable *gdalATT)
     {
         std::vector<RSGISRATCol> *ratCols = new std::vector<RSGISRATCol>();
         try
@@ -2343,7 +2343,7 @@ namespace rsgis{namespace rastergis{
         return ratCols;
     }
     
-    std::vector<RSGISRATCol>* RSGISRasterAttUtils::getVectorColumns(OGRLayer *layer, bool ignoreErr) throw(RSGISAttributeTableException)
+    std::vector<RSGISRATCol>* RSGISRasterAttUtils::getVectorColumns(OGRLayer *layer, bool ignoreErr)
     {
         std::vector<RSGISRATCol> *colNames = new std::vector<RSGISRATCol>();
         try
@@ -2395,7 +2395,7 @@ namespace rsgis{namespace rastergis{
     }
     
 
-    void RSGISRasterAttUtils::writeIntColumn(GDALRasterAttributeTable *attTable, std::string colName, int *intDataVal, size_t colLen) throw(RSGISAttributeTableException)
+    void RSGISRasterAttUtils::writeIntColumn(GDALRasterAttributeTable *attTable, std::string colName, int *intDataVal, size_t colLen)
     {
         try
         {
@@ -2485,7 +2485,7 @@ namespace rsgis{namespace rastergis{
     }
 
 
-    void RSGISRasterAttUtils::writeRealColumn(GDALRasterAttributeTable *attTable, std::string colName, double *realDataVal, size_t colLen) throw(RSGISAttributeTableException)
+    void RSGISRasterAttUtils::writeRealColumn(GDALRasterAttributeTable *attTable, std::string colName, double *realDataVal, size_t colLen)
     {
         try
         {
@@ -2574,7 +2574,7 @@ namespace rsgis{namespace rastergis{
         }
     }
     
-    void RSGISRasterAttUtils::getImageBandMinMax(GDALDataset *inImage, int band, long *minVal, long *maxVal) throw(RSGISAttributeTableException)
+    void RSGISRasterAttUtils::getImageBandMinMax(GDALDataset *inImage, int band, long *minVal, long *maxVal)
     {
         try
         {
@@ -2609,7 +2609,7 @@ namespace rsgis{namespace rastergis{
         first = true;
     }
     
-    void RSGISCalcImgMinMax::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCalcImgMinMax::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) 
     {
         if(first)
         {

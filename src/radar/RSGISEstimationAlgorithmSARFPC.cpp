@@ -24,7 +24,7 @@ namespace rsgis {namespace radar
 			this->order = coeffHH->size2 - 1;
 			this->fpcOrder = coeffFPCHV->size - 1;
 		}
-		void RSGISEstimationAlgorithmDualPolFPCMoistureSingleSpecies::calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException)
+		void RSGISEstimationAlgorithmDualPolFPCMoistureSingleSpecies::calcImageValue(float *bandValues, int numBands, float *output) 
 		{
 			RSGISConjugateGradient conjGrad;
 			RSGISVectors vectorUtils;
@@ -46,14 +46,14 @@ namespace rsgis {namespace radar
 			double coeff = 0;
 			double coeffXPow = 0;
 			
-			for(int z = 0; z < fpcOrder ; z++)
+			for(int z = 0; z < fpcOrder; z++)
 			{
 				gsl_vector_set(fpcPow, z, pow(fpc, z));
 			}
 			
 			// Calculate HH branch scattering from FPC data (dB)
 			double sigmaHHBranch = 0; 
-			for(int j = 0; j < fpcOrder ; j++)
+			for(int j = 0; j < fpcOrder; j++)
 			{
 				coeff = gsl_vector_get(coeffFPCHH, j); // a_n
 				coeffXPow = coeff * gsl_vector_get(fpcPow, j); // a_n * x^n				
@@ -62,7 +62,7 @@ namespace rsgis {namespace radar
 			
 			// Calculate HV branch scattering from FPC data (dB)
 			double sigmaHVBranch = 0;
-			for(int j = 0; j < fpcOrder ; j++)
+			for(int j = 0; j < fpcOrder; j++)
 			{
 				coeff = gsl_vector_get(coeffFPCHV, j); // a_n
 				coeffXPow = coeff * gsl_vector_get(fpcPow, j); // a_n * x^n				
@@ -71,7 +71,7 @@ namespace rsgis {namespace radar
 			
 			// Calculate H attenuation from FPC data (dB / m)
 			double attenuationH = 0; 
-			for(int j = 0; j < fpcOrder ; j++)
+			for(int j = 0; j < fpcOrder; j++)
 			{
 				coeff = gsl_vector_get(coeffFPCAttenuationH, j); // a_n
 				coeffXPow = coeff * gsl_vector_get(fpcPow, j); // a_n * x^n				
@@ -80,7 +80,7 @@ namespace rsgis {namespace radar
 			
 			// Calculate V attenuation from FPC data (dB / m)
 			double attenuationV = 0; 
-			for(int j = 0; j < fpcOrder ; j++)
+			for(int j = 0; j < fpcOrder; j++)
 			{
 				coeff = gsl_vector_get(coeffFPCAttenuationV, j); // a_n
 				coeffXPow = coeff * gsl_vector_get(fpcPow, j); // a_n * x^n				

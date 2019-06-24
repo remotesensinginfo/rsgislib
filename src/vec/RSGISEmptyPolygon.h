@@ -50,7 +50,7 @@ namespace rsgis{namespace vec{
 		public:
 			RSGISEmptyPolygon();
 			virtual void readAttribtues(OGRFeature *feature, OGRFeatureDefn *featDefn);
-			virtual void createLayerDefinition(OGRLayer *outputSHPLayer)throw(RSGISVectorOutputException);
+			virtual void createLayerDefinition(OGRLayer *outputSHPLayer);
 			virtual void populateFeature(OGRFeature *feature, OGRFeatureDefn *featDefn);
 			virtual ~RSGISEmptyPolygon();
 		};

@@ -25,7 +25,7 @@
 
 namespace rsgis{namespace utils{
 	
-	RSGISReadENVIASCIIROI::RSGISReadENVIASCIIROI(std::string file) throw(rsgis::RSGISInputStreamException,RSGISTextException)
+	RSGISReadENVIASCIIROI::RSGISReadENVIASCIIROI(std::string file)
 	{
 		this->inputfile = file;
 		this->parsefile();
@@ -46,7 +46,7 @@ namespace rsgis{namespace utils{
 		return numrois;
 	}
 	
-	std::string* RSGISReadENVIASCIIROI::getName(int i) throw(RSGISENVIROIException)
+	std::string* RSGISReadENVIASCIIROI::getName(int i)
 	{
 		if(i < 0 & i >= numrois)
 		{
@@ -55,7 +55,7 @@ namespace rsgis{namespace utils{
 		return &rois[i].name;
 	}
 	
-	rsgis::math::Matrix* RSGISReadENVIASCIIROI::getMatrix(int i) throw(RSGISENVIROIException)
+	rsgis::math::Matrix* RSGISReadENVIASCIIROI::getMatrix(int i)
 	{
 		if(i < 0 & i >= numrois)
 		{
@@ -64,7 +64,7 @@ namespace rsgis{namespace utils{
 		return rois[i].data;
 	}
 	
-	int RSGISReadENVIASCIIROI::getNumSamples(int i) throw(RSGISENVIROIException)
+	int RSGISReadENVIASCIIROI::getNumSamples(int i)
 	{
 		if(i < 0 & i >= numrois)
 		{
@@ -73,7 +73,7 @@ namespace rsgis{namespace utils{
 		return rois[i].samples;
 	}
 	
-	RSGISColour* RSGISReadENVIASCIIROI::getColour(int i) throw(RSGISENVIROIException)
+	RSGISColour* RSGISReadENVIASCIIROI::getColour(int i)
 	{
 		if(i < 0 & i >= numrois)
 		{
@@ -87,7 +87,7 @@ namespace rsgis{namespace utils{
 		return numVariables;
 	}
 	
-	enviroi* RSGISReadENVIASCIIROI::getENVIROI(int i) throw(RSGISENVIROIException)
+	enviroi* RSGISReadENVIASCIIROI::getENVIROI(int i)
 	{
 		if(i < 0 & i >= numrois)
 		{
@@ -101,7 +101,7 @@ namespace rsgis{namespace utils{
 		
 	}
 	
-	void RSGISReadENVIASCIIROI::parsefile() throw(rsgis::RSGISInputStreamException,RSGISTextException)
+	void RSGISReadENVIASCIIROI::parsefile()
 	{
 		rsgis::math::RSGISMatrices matrixUtils;
 		RSGISTextUtils textUtils;

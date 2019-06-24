@@ -29,7 +29,7 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    void RSGISApplyRATKNN::applyKNNExtrapolation(GDALDataset *clumpsDS, std::string inExtrapField, std::string outExtrapField, std::string trainRegionsField, std::string applyRegionsField, bool useApplyField, std::vector<std::string> fields, unsigned int kFeatures, rsgis::math::rsgisdistmetrics distKNN, float distThreshold, rsgis::math::rsgissummarytype summeriseKNN, unsigned int ratBand) throw(RSGISAttributeTableException)
+    void RSGISApplyRATKNN::applyKNNExtrapolation(GDALDataset *clumpsDS, std::string inExtrapField, std::string outExtrapField, std::string trainRegionsField, std::string applyRegionsField, bool useApplyField, std::vector<std::string> fields, unsigned int kFeatures, rsgis::math::rsgisdistmetrics distKNN, float distThreshold, rsgis::math::rsgissummarytype summeriseKNN, unsigned int ratBand)
     {
         try
         {
@@ -217,7 +217,7 @@ namespace rsgis{namespace rastergis{
         this->numTrainPts = numTrainPts;
     }
     
-    void RSGISCountTrainingValues::calcRATValue(size_t fid, double *inRealCols, unsigned int numInRealCols, int *inIntCols, unsigned int numInIntCols, std::string *inStringCols, unsigned int numInStringCols, double *outRealCols, unsigned int numOutRealCols, int *outIntCols, unsigned int numOutIntCols, std::string *outStringCols, unsigned int numOutStringCols) throw(RSGISAttributeTableException)
+    void RSGISCountTrainingValues::calcRATValue(size_t fid, double *inRealCols, unsigned int numInRealCols, int *inIntCols, unsigned int numInIntCols, std::string *inStringCols, unsigned int numInStringCols, double *outRealCols, unsigned int numOutRealCols, int *outIntCols, unsigned int numOutIntCols, std::string *outStringCols, unsigned int numOutStringCols)
     {
         if(numInIntCols != 1)
         {
@@ -243,7 +243,7 @@ namespace rsgis{namespace rastergis{
         this->counter = 0;
     }
     
-    void RSGISExtractTrainingValues::calcRATValue(size_t fid, double *inRealCols, unsigned int numInRealCols, int *inIntCols, unsigned int numInIntCols, std::string *inStringCols, unsigned int numInStringCols, double *outRealCols, unsigned int numOutRealCols, int *outIntCols, unsigned int numOutIntCols, std::string *outStringCols, unsigned int numOutStringCols) throw(RSGISAttributeTableException)
+    void RSGISExtractTrainingValues::calcRATValue(size_t fid, double *inRealCols, unsigned int numInRealCols, int *inIntCols, unsigned int numInIntCols, std::string *inStringCols, unsigned int numInStringCols, double *outRealCols, unsigned int numOutRealCols, int *outIntCols, unsigned int numOutIntCols, std::string *outStringCols, unsigned int numOutStringCols)
     {
         if(numInIntCols != 1)
         {
@@ -294,7 +294,7 @@ namespace rsgis{namespace rastergis{
         this->mathSumStats = mathSumStats;
     }
     
-    void RSGISPerformKNNCalcValues::calcRATValue(size_t fid, double *inRealCols, unsigned int numInRealCols, int *inIntCols, unsigned int numInIntCols, std::string *inStringCols, unsigned int numInStringCols, double *outRealCols, unsigned int numOutRealCols, int *outIntCols, unsigned int numOutIntCols, std::string *outStringCols, unsigned int numOutStringCols) throw(RSGISAttributeTableException)
+    void RSGISPerformKNNCalcValues::calcRATValue(size_t fid, double *inRealCols, unsigned int numInRealCols, int *inIntCols, unsigned int numInIntCols, std::string *inStringCols, unsigned int numInStringCols, double *outRealCols, unsigned int numOutRealCols, int *outIntCols, unsigned int numOutIntCols, std::string *outStringCols, unsigned int numOutStringCols)
     {
         if(numOutRealCols != 1)
         {
@@ -387,7 +387,7 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    void RSGISPerformKNNCalcValues::findKVals(std::list<std::pair<double, double*> > *kVals, double *featVals)throw(RSGISAttributeTableException)
+    void RSGISPerformKNNCalcValues::findKVals(std::list<std::pair<double, double*> > *kVals, double *featVals)
     {
         try
         {

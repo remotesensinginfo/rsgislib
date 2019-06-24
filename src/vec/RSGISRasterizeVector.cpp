@@ -31,7 +31,7 @@ namespace rsgis{namespace vec{
 		this->method = rsgis::img::pixelContainsPolyCenter;
 	}
 	
-	GDALDataset* RSGISRasterizeVector::createDataset(GDALDriver *gdalDriver, OGRLayer *layer, std::string filename, float resolution, float constVal) throw(RSGISImageException)
+	GDALDataset* RSGISRasterizeVector::createDataset(GDALDriver *gdalDriver, OGRLayer *layer, std::string filename, float resolution, float constVal)
 	{
 		RSGISVectorUtils vecUtils;
 		
@@ -98,7 +98,7 @@ namespace rsgis{namespace vec{
 		return imageDS;
 	}
 	
-	GDALDataset* RSGISRasterizeVector::createDataset(GDALDriver *gdalDriver, std::vector<geos::geom::Polygon*> *polys, std::string filename, float resolution, OGRSpatialReference *spatialRef, float constVal) throw(RSGISImageException)
+	GDALDataset* RSGISRasterizeVector::createDataset(GDALDriver *gdalDriver, std::vector<geos::geom::Polygon*> *polys, std::string filename, float resolution, OGRSpatialReference *spatialRef, float constVal)
 	{
 		RSGISVectorUtils vecUtils;
 		
@@ -147,7 +147,7 @@ namespace rsgis{namespace vec{
 		return imageDS;
 	}
 
-	void RSGISRasterizeVector::rasterizeLayer(OGRLayer *layer, GDALDataset *image, std::string attribute, rsgis::img::pixelInPolyOption method) throw(RSGISVectorException)
+	void RSGISRasterizeVector::rasterizeLayer(OGRLayer *layer, GDALDataset *image, std::string attribute, rsgis::img::pixelInPolyOption method)
 	{
 		this->method = method;
 		
@@ -247,7 +247,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISRasterizeVector::rasterizeLayer(geos::geom::Geometry *geom, GDALDataset *image, bool useFID, float constVal, rsgis::img::pixelInPolyOption method) throw(RSGISVectorException)
+	void RSGISRasterizeVector::rasterizeLayer(geos::geom::Geometry *geom, GDALDataset *image, bool useFID, float constVal, rsgis::img::pixelInPolyOption method)
 	{
 		this->method = method;
 		try
@@ -338,7 +338,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 
-	int RSGISRasterizeVector::editPixels(GDALDataset *image, float pixelValue, geos::geom::Envelope *env, OGRGeometry *geom) throw(RSGISImageException)
+	int RSGISRasterizeVector::editPixels(GDALDataset *image, float pixelValue, geos::geom::Envelope *env, OGRGeometry *geom)
 	{
 		long pixelsEdited = 0; // Count for number of pixels edited
 		

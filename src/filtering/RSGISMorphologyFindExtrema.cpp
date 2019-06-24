@@ -29,7 +29,7 @@ namespace rsgis{namespace filter{
         
 	}
     
-    void RSGISImageMorphologyFindExtrema::findMinima(GDALDataset **datasets, std::string outputImage, rsgis::math::Matrix *matrixOperator, RSGISMinimaOutputs outputType, bool allowEquals, std::string format, GDALDataType outDataType) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
+    void RSGISImageMorphologyFindExtrema::findMinima(GDALDataset **datasets, std::string outputImage, rsgis::math::Matrix *matrixOperator, RSGISMinimaOutputs outputType, bool allowEquals, std::string format, GDALDataType outDataType)
 	{
         if(matrixOperator->n != matrixOperator->m)
         {
@@ -54,7 +54,7 @@ namespace rsgis{namespace filter{
         delete findMinima;
 	}
     
-    void RSGISImageMorphologyFindExtrema::findMinimaAll(GDALDataset **datasets, std::string outputImage, rsgis::math::Matrix *matrixOperator, RSGISMinimaOutputs outputType, bool allowEquals, std::string format, GDALDataType outDataType) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
+    void RSGISImageMorphologyFindExtrema::findMinimaAll(GDALDataset **datasets, std::string outputImage, rsgis::math::Matrix *matrixOperator, RSGISMinimaOutputs outputType, bool allowEquals, std::string format, GDALDataType outDataType)
 	{
         if(matrixOperator->n != matrixOperator->m)
         {
@@ -91,7 +91,7 @@ namespace rsgis{namespace filter{
         }
 	}
     
-	void RSGISMorphologyFindLocalMinima::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISMorphologyFindLocalMinima::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
 	{
         int cPxlIdx = ((winSize-1)/2);
 		float *values = new float[numBands];
@@ -184,7 +184,7 @@ namespace rsgis{namespace filter{
         this->outVal = 1;
 	}
     
-	void RSGISMorphologyFindLocalMinimaAll::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISMorphologyFindLocalMinimaAll::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
 	{
 		int cPxlIdx = ((winSize-1)/2);
 		float value = 0;

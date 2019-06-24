@@ -29,7 +29,7 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    void RSGISClumpBorders::calcClumpBorderLength(GDALDataset *clumpImage, bool includeZeroEdges, std::string colName) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISClumpBorders::calcClumpBorderLength(GDALDataset *clumpImage, bool includeZeroEdges, std::string colName) 
     {
         try
         {
@@ -92,7 +92,7 @@ namespace rsgis{namespace rastergis{
         }
     }
     
-    void RSGISClumpBorders::calcClumpRelBorderLen2Class(GDALDataset *clumpImage, bool includeZeroEdges, std::string colName, std::string classColName, std::string className) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISClumpBorders::calcClumpRelBorderLen2Class(GDALDataset *clumpImage, bool includeZeroEdges, std::string colName, std::string classColName, std::string className) 
     {
         try
         {
@@ -190,7 +190,7 @@ namespace rsgis{namespace rastergis{
         this->yRes = yRes;
     }
     
-    void RSGISCalcBorderLenInPixels::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCalcBorderLenInPixels::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
     {
         try
         {
@@ -395,7 +395,7 @@ namespace rsgis{namespace rastergis{
         this->className = className;
     }
     
-    void RSGISCalcBorderLenInPixelsWithClass::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCalcBorderLenInPixelsWithClass::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
     {
         try
         {

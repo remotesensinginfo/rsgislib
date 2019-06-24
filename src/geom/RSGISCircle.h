@@ -55,8 +55,8 @@ namespace rsgis{namespace geom{
 		{
 		public:
 			RSGISCircle(RSGIS2DPoint *centre, double radius);
-			RSGISCircle(RSGIS2DPoint *a, RSGIS2DPoint *b, RSGIS2DPoint *c) throw(RSGISGeometryException);
-			void updateCircle(RSGIS2DPoint *a, RSGIS2DPoint *b, RSGIS2DPoint *c) throw(RSGISGeometryException);
+			RSGISCircle(RSGIS2DPoint *a, RSGIS2DPoint *b, RSGIS2DPoint *c);
+			void updateCircle(RSGIS2DPoint *a, RSGIS2DPoint *b, RSGIS2DPoint *c);
 			bool contained(RSGIS2DPoint *pt);
 			bool containedBBOX(RSGIS2DPoint *pt);
 			double getRadius();

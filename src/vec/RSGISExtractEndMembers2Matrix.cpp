@@ -31,7 +31,7 @@ namespace rsgis{namespace vec{
         
     }
 		
-    void RSGISExtractEndMembers2Matrix::extractColumnPerPolygon2Matrix(GDALDataset *dataset, OGRLayer *vecLayer, std::string outputMatrix, rsgis::img::pixelInPolyOption pixelPolyOption)throw(RSGISVectorZonalException)
+    void RSGISExtractEndMembers2Matrix::extractColumnPerPolygon2Matrix(GDALDataset *dataset, OGRLayer *vecLayer, std::string outputMatrix, rsgis::img::pixelInPolyOption pixelPolyOption)
     {
         try
         {
@@ -139,7 +139,7 @@ namespace rsgis{namespace vec{
         this->pixelPolyOption = pixelPolyOption;
     }
     
-    void RSGISExtractSumPixelValues::processFeature(OGRFeature *feature, OGRPolygon *poly, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+    void RSGISExtractSumPixelValues::processFeature(OGRFeature *feature, OGRPolygon *poly, geos::geom::Envelope *env, long fid)
     {
         try
         {
@@ -169,7 +169,7 @@ namespace rsgis{namespace vec{
         this->numSumVals = numSumVals;
     }
     
-    void RSGISCalcSumValues::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCalcSumValues::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) 
     {
         if(numSumVals != ((unsigned int) numBands))
         {

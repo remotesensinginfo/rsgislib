@@ -29,7 +29,7 @@ namespace rsgis{namespace geom{
 		
 	}
 	
-	void RSGISGeometry::fitPlane2Points(point3D *pts, int numPts, double *a, double *b, double *c) throw(RSGISGeometryException)
+	void RSGISGeometry::fitPlane2Points(point3D *pts, int numPts, double *a, double *b, double *c)
 	{
 		rsgis::math::RSGISMatrices matrices;
 		rsgis::math::Matrix *matrixA = NULL;
@@ -85,7 +85,7 @@ namespace rsgis{namespace geom{
 			*b = outputs->matrix[1];
 			*c = outputs->matrix[2];
 		}
-		catch(rsgis::math::RSGISMatricesException e)
+		catch(rsgis::math::RSGISMatricesException &e)
 		{
 			if(matrixA != NULL)
 			{
@@ -118,7 +118,7 @@ namespace rsgis{namespace geom{
 
 	}
 	
-	double RSGISGeometry::calcPlaneFit(point3D *pts, int numPts, double a, double b, double c) throw(RSGISGeometryException)
+	double RSGISGeometry::calcPlaneFit(point3D *pts, int numPts, double a, double b, double c)
 	{
 		double planeZ = 0;
 		double diff = 0;
@@ -132,7 +132,7 @@ namespace rsgis{namespace geom{
 		return sqrt(sqdiff);
 	}
 	
-	double RSGISGeometry::calcPlaneZAt(double a, double b, double c, double x, double y) throw(RSGISGeometryException)
+	double RSGISGeometry::calcPlaneZAt(double a, double b, double c, double x, double y)
 	{
 		return ((a * x) + (b * y) + c);
 	}
@@ -145,7 +145,7 @@ namespace rsgis{namespace geom{
 		return sqrt(sqdiff);
 	}
 	
-	geos::geom::Polygon* RSGISGeometry::createCircle(float a, float b, float r, float resolution)throw(RSGISGeometryException)
+	geos::geom::Polygon* RSGISGeometry::createCircle(float a, float b, float r, float resolution)
 	{
 		const geos::geom::GeometryFactory* geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
 		
@@ -257,7 +257,7 @@ namespace rsgis{namespace geom{
 		return outPolys;
 	}
 	
-	geos::geom::Envelope* RSGISGeometry::findBBox(std::list<RSGIS2DPoint*> *pts) throw(RSGISGeometryException)
+	geos::geom::Envelope* RSGISGeometry::findBBox(std::list<RSGIS2DPoint*> *pts)
 	{
 		if(pts->size() < 2)
 		{
@@ -310,7 +310,7 @@ namespace rsgis{namespace geom{
 		return new geos::geom::Envelope(minX, maxX, minY, maxY);
 	}
 
-	geos::geom::Envelope* RSGISGeometry::findBBox(std::vector<RSGIS2DPoint*> *pts) throw(RSGISGeometryException)
+	geos::geom::Envelope* RSGISGeometry::findBBox(std::vector<RSGIS2DPoint*> *pts)
 	{
 		if(pts->size() < 2)
 		{
@@ -364,7 +364,7 @@ namespace rsgis{namespace geom{
 	}
 	
 	
-	RSGISTriangle* RSGISGeometry::findBoundingTriangle(std::list<RSGIS2DPoint*> *pts) throw(RSGISGeometryException)
+	RSGISTriangle* RSGISGeometry::findBoundingTriangle(std::list<RSGIS2DPoint*> *pts)
 	{
 		geos::geom::Envelope *env = NULL;
 		try
@@ -400,7 +400,7 @@ namespace rsgis{namespace geom{
 		return tri;
 	}
 	
-	RSGISTriangle* RSGISGeometry::findBoundingTriangle(std::vector<RSGIS2DPoint*> *pts) throw(RSGISGeometryException)
+	RSGISTriangle* RSGISGeometry::findBoundingTriangle(std::vector<RSGIS2DPoint*> *pts)
 	{
 		geos::geom::Envelope *env = NULL;
 		try
@@ -478,7 +478,7 @@ namespace rsgis{namespace geom{
 		return geomFactory->createMultiPolygon(*polygons);
 	}
 	
-	geos::geom::Polygon* RSGISGeometry::findConvexHull(std::vector<geos::geom::Polygon*> *geoms) throw(RSGISGeometryException)
+	geos::geom::Polygon* RSGISGeometry::findConvexHull(std::vector<geos::geom::Polygon*> *geoms)
 	{
 		std::vector<geos::geom::Coordinate> *coordinates  = new std::vector<geos::geom::Coordinate>();
 		geos::geom::CoordinateSequence *geomCoords = NULL;
@@ -500,7 +500,7 @@ namespace rsgis{namespace geom{
 		return poly;
 	}
 	
-	geos::geom::Polygon* RSGISGeometry::findConvexHull(std::list<geos::geom::Polygon*> *geoms) throw(RSGISGeometryException)
+	geos::geom::Polygon* RSGISGeometry::findConvexHull(std::list<geos::geom::Polygon*> *geoms)
 	{
 		std::vector<geos::geom::Coordinate> *coordinates  = new std::vector<geos::geom::Coordinate>();
 		geos::geom::CoordinateSequence *geomCoords = NULL;
@@ -522,7 +522,7 @@ namespace rsgis{namespace geom{
 		return poly;
 	}
 	
-	geos::geom::Polygon* RSGISGeometry::findConvexHull(const std::vector<geos::geom::Geometry*> *geometries) throw(RSGISGeometryException)
+	geos::geom::Polygon* RSGISGeometry::findConvexHull(const std::vector<geos::geom::Geometry*> *geometries)
 	{
 		std::vector<geos::geom::Geometry*> *geoms = const_cast<std::vector<geos::geom::Geometry*>*>(geometries);
 		std::vector<geos::geom::Coordinate> *coordinates  = new std::vector<geos::geom::Coordinate>();
@@ -545,7 +545,7 @@ namespace rsgis{namespace geom{
 		return poly;
 	}
 	
-	geos::geom::Polygon* RSGISGeometry::findConvexHull(std::vector<geos::geom::LineSegment> *lines) throw(RSGISGeometryException)
+	geos::geom::Polygon* RSGISGeometry::findConvexHull(std::vector<geos::geom::LineSegment> *lines)
 	{
 		std::vector<geos::geom::Coordinate> *coordinates  = new std::vector<geos::geom::Coordinate>();
 		std::vector<geos::geom::LineSegment>::iterator iterLines;
@@ -560,7 +560,7 @@ namespace rsgis{namespace geom{
 		return poly;
 	}
 	
-	geos::geom::Polygon* RSGISGeometry::findConvexHull(std::vector<geos::geom::Coordinate> *coordinates) throw(RSGISGeometryException)
+	geos::geom::Polygon* RSGISGeometry::findConvexHull(std::vector<geos::geom::Coordinate> *coordinates)
 	{
         geos::geom::Polygon *poly = NULL;
         try
@@ -675,7 +675,7 @@ namespace rsgis{namespace geom{
 		return poly;
 	}
     
-    geos::geom::Polygon* RSGISGeometry::findBoundingBox(std::vector<geos::geom::Coordinate> *coordinates) throw(RSGISGeometryException)
+    geos::geom::Polygon* RSGISGeometry::findBoundingBox(std::vector<geos::geom::Coordinate> *coordinates)
     {
         geos::geom::Polygon *poly = NULL;
         try
@@ -1050,7 +1050,7 @@ namespace rsgis{namespace geom{
 		}
 	}
 	
-	void RSGISGeometry::dissolveMergeSmallPolygons(std::vector<geos::geom::Polygon*> *polygons, std::vector<geos::geom::Polygon*> *smallPolygons, RSGISIdentifyNonConvexPolygons *nonconvexoutline) throw(RSGISGeometryException)
+	void RSGISGeometry::dissolveMergeSmallPolygons(std::vector<geos::geom::Polygon*> *polygons, std::vector<geos::geom::Polygon*> *smallPolygons, RSGISIdentifyNonConvexPolygons *nonconvexoutline)
 	{
 		try
 		{
@@ -1152,7 +1152,7 @@ namespace rsgis{namespace geom{
 		}
 	}
 	
-	void RSGISGeometry::mergeWithNearest(std::vector<geos::geom::Polygon*> *polygons, std::vector<geos::geom::Polygon*> *polygonsToMerge, RSGISIdentifyNonConvexPolygons *identifyNonConvexPolygon) throw(RSGISGeometryException)
+	void RSGISGeometry::mergeWithNearest(std::vector<geos::geom::Polygon*> *polygons, std::vector<geos::geom::Polygon*> *polygonsToMerge, RSGISIdentifyNonConvexPolygons *identifyNonConvexPolygon)
 	{
 		int numPolygons = polygons->size();
 		int numPolygonsToMerge = polygonsToMerge->size();
@@ -1195,7 +1195,7 @@ namespace rsgis{namespace geom{
 		delete polygonsMerge;
 	}
 	
-	void RSGISGeometry::mergeWithNeighbor(std::vector<geos::geom::Polygon*> *polygons, std::vector<geos::geom::Polygon*> *polygonsToMerge, float relBorderThreshold, RSGISIdentifyNonConvexPolygons *nonconvexoutline) throw(RSGISGeometryException)
+	void RSGISGeometry::mergeWithNeighbor(std::vector<geos::geom::Polygon*> *polygons, std::vector<geos::geom::Polygon*> *polygonsToMerge, float relBorderThreshold, RSGISIdentifyNonConvexPolygons *nonconvexoutline)
 	{
 		try
 		{
@@ -1273,7 +1273,7 @@ namespace rsgis{namespace geom{
 		
 	}
 	
-	float RSGISGeometry::calcRelativeBorder(geos::geom::Polygon *poly1in, geos::geom::Polygon *poly2in) throw(RSGISGeometryException)
+	float RSGISGeometry::calcRelativeBorder(geos::geom::Polygon *poly1in, geos::geom::Polygon *poly2in)
 	{
 		float relBorder = 0;
 		try
@@ -1336,7 +1336,7 @@ namespace rsgis{namespace geom{
 		return relBorder;
 	}
 	
-	geos::geom::Polygon* RSGISGeometry::mergePolygons(geos::geom::Polygon *poly1, geos::geom::Polygon *poly2, RSGISIdentifyNonConvexPolygons *nonconvexoutline) throw(RSGISGeometryException)
+	geos::geom::Polygon* RSGISGeometry::mergePolygons(geos::geom::Polygon *poly1, geos::geom::Polygon *poly2, RSGISIdentifyNonConvexPolygons *nonconvexoutline)
 	{
 		float tolerance = 0.25;
 		geos::geom::Polygon *poly = NULL;
@@ -1615,7 +1615,7 @@ namespace rsgis{namespace geom{
 		return poly;
 	}
 	
-	geos::geom::Polygon* RSGISGeometry::mergePolygons(geos::geom::Polygon *poly1, std::vector<geos::geom::Polygon*> *polygons, RSGISIdentifyNonConvexPolygons *nonconvexoutline) throw(RSGISGeometryException)
+	geos::geom::Polygon* RSGISGeometry::mergePolygons(geos::geom::Polygon *poly1, std::vector<geos::geom::Polygon*> *polygons, RSGISIdentifyNonConvexPolygons *nonconvexoutline)
 	{
 		geos::geom::Polygon *poly = poly1;
 		geos::geom::Polygon *tmpPoly = NULL;
@@ -1641,7 +1641,7 @@ namespace rsgis{namespace geom{
 		return poly;
 	}
 	
-	void RSGISGeometry::findContaining(geos::geom::Polygon *outline, std::vector<geos::geom::Polygon*> *polygons, std::vector<geos::geom::Polygon*> *outPolygons) throw(RSGISGeometryException)
+	void RSGISGeometry::findContaining(geos::geom::Polygon *outline, std::vector<geos::geom::Polygon*> *polygons, std::vector<geos::geom::Polygon*> *outPolygons)
 	{
 		// Find the polygons from 'polygons' that are contained within 'outline'
 		// Save polygons to 'outPolygons'
@@ -1667,7 +1667,7 @@ namespace rsgis{namespace geom{
 		}
 	}
 	
-	void RSGISGeometry::removeOverlaps(std::vector<geos::geom::Polygon*> *polygons, geos::geom::Envelope *env, float tolerance, float dissolveThreshold) throw(RSGISGeometryException)
+	void RSGISGeometry::removeOverlaps(std::vector<geos::geom::Polygon*> *polygons, geos::geom::Envelope *env, float tolerance, float dissolveThreshold)
 	{
 		rsgis::math::RSGISMathsUtils mathUtils;
 		try
@@ -2126,7 +2126,7 @@ namespace rsgis{namespace geom{
 		std::cout << " - Complete.\n";
 	}
 	
-	geos::geom::Polygon* RSGISGeometry::createHole(const geos::geom::Polygon *poly, const geos::geom::Polygon *hole) throw(RSGISGeometryException)
+	geos::geom::Polygon* RSGISGeometry::createHole(const geos::geom::Polygon *poly, const geos::geom::Polygon *hole)
 	{
 		const geos::geom::GeometryFactory* geomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
 		
@@ -2147,7 +2147,7 @@ namespace rsgis{namespace geom{
 		return geomFactory->createPolygon(shell, holes); 
 	}
 	
-	geos::geom::Polygon* RSGISGeometry::insertIntersectNodes(geos::geom::Polygon *poly, geos::geom::Polygon *intersect) throw(RSGISGeometryException)
+	geos::geom::Polygon* RSGISGeometry::insertIntersectNodes(geos::geom::Polygon *poly, geos::geom::Polygon *intersect)
 	{
 		geos::geom::Polygon *polygon = NULL;
 		try
@@ -2248,7 +2248,7 @@ namespace rsgis{namespace geom{
 		return polygon;
 	}
 	
-	double RSGISGeometry::minDistanceBetweenPoints(geos::geom::Polygon *poly) throw(RSGISGeometryException)
+	double RSGISGeometry::minDistanceBetweenPoints(geos::geom::Polygon *poly)
 	{
 		geos::geom::CoordinateSequence *polyCoords = poly->getExteriorRing()->getCoordinates();
 		int numCoords = polyCoords->size()-1;
@@ -2269,7 +2269,7 @@ namespace rsgis{namespace geom{
 		return distance;
 	}
 	
-	geos::geom::Polygon* RSGISGeometry::snapToXYGrid(geos::geom::Polygon *poly, double tolerance, bool calcTolerance, geos::geom::Envelope *env) throw(RSGISGeometryException)
+	geos::geom::Polygon* RSGISGeometry::snapToXYGrid(geos::geom::Polygon *poly, double tolerance, bool calcTolerance, geos::geom::Envelope *env)
 	{
 		geos::geom::Polygon *polygon = NULL;
 		try
@@ -2366,7 +2366,7 @@ namespace rsgis{namespace geom{
 		outTxtFile.close();
 	}
 	
-	void RSGISGeometry::retrievePolygons(geos::geom::Geometry *geom, std::vector<geos::geom::Polygon*> *polygons) throw(RSGISGeometryException)
+	void RSGISGeometry::retrievePolygons(geos::geom::Geometry *geom, std::vector<geos::geom::Polygon*> *polygons)
 	{
 		try
 		{
@@ -2406,7 +2406,7 @@ namespace rsgis{namespace geom{
 		}
 	}
 	
-	void RSGISGeometry::retrieveLines(geos::geom::Geometry *geom, std::vector<geos::geom::LineString*> *lines) throw(RSGISGeometryException)
+	void RSGISGeometry::retrieveLines(geos::geom::Geometry *geom, std::vector<geos::geom::LineString*> *lines)
 	{
 		try
 		{			
@@ -2440,7 +2440,7 @@ namespace rsgis{namespace geom{
 		}
 	}
 	
-	void RSGISGeometry::performMorphologicalOperation(std::vector<geos::geom::Polygon*> *polygons, Morphology morphology, float buffer, int curveSegments) throw(RSGISGeometryException)
+	void RSGISGeometry::performMorphologicalOperation(std::vector<geos::geom::Polygon*> *polygons, Morphology morphology, float buffer, int curveSegments)
 	{
 		try
 		{
@@ -2614,7 +2614,7 @@ namespace rsgis{namespace geom{
 		}	
 	}
 	
-	void RSGISGeometry::performMorphologicalOperation(std::vector<geos::geom::Geometry*> *geometries, Morphology morphology, float buffer, int curveSegments) throw(RSGISGeometryException)
+	void RSGISGeometry::performMorphologicalOperation(std::vector<geos::geom::Geometry*> *geometries, Morphology morphology, float buffer, int curveSegments)
 	{
 		try
 		{
@@ -2786,7 +2786,7 @@ namespace rsgis{namespace geom{
 		return thetaDeg;
 	}
 	
-	std::vector<geos::geom::Polygon*>* RSGISGeometry::polygonsBasicClean(std::vector<geos::geom::Polygon*> *polygons) throw(RSGISGeometryException)
+	std::vector<geos::geom::Polygon*>* RSGISGeometry::polygonsBasicClean(std::vector<geos::geom::Polygon*> *polygons)
 	{
 		std::vector<geos::geom::Polygon*> *outPolygons = new std::vector<geos::geom::Polygon*>();
 		std::vector<geos::geom::Polygon*> *tmpPolys = new std::vector<geos::geom::Polygon*>();
@@ -2848,7 +2848,7 @@ namespace rsgis{namespace geom{
 		return outPolygons;
 	}
 	
-	std::vector<geos::geom::Polygon*>* RSGISGeometry::polygonsSnapToXYGrid(std::vector<geos::geom::Polygon*> *polygons, float tolerance) throw(RSGISGeometryException)
+	std::vector<geos::geom::Polygon*>* RSGISGeometry::polygonsSnapToXYGrid(std::vector<geos::geom::Polygon*> *polygons, float tolerance)
 	{
 		std::vector<geos::geom::Polygon*> *snappedPolygons = new std::vector<geos::geom::Polygon*>();
 		std::vector<geos::geom::Polygon*> *outPolygons = NULL;
@@ -2881,7 +2881,7 @@ namespace rsgis{namespace geom{
 		return outPolygons;
 	}
 	
-	geos::geom::Geometry* RSGISGeometry::getIntersection(geos::geom::Polygon *poly1, geos::geom::Polygon *poly2) throw(RSGISGeometryException)
+	geos::geom::Geometry* RSGISGeometry::getIntersection(geos::geom::Polygon *poly1, geos::geom::Polygon *poly2)
 	{
 		if(poly1 == NULL)
 		{
@@ -3128,7 +3128,7 @@ namespace rsgis{namespace geom{
 		return geom;
 	}
 	
-	geos::geom::Geometry* RSGISGeometry::getIntersection(geos::geom::Geometry *geom1in, geos::geom::Geometry *geom2in) throw(RSGISGeometryException)
+	geos::geom::Geometry* RSGISGeometry::getIntersection(geos::geom::Geometry *geom1in, geos::geom::Geometry *geom2in)
 	{
 		if(geom1in == NULL)
 		{
@@ -3263,7 +3263,7 @@ namespace rsgis{namespace geom{
 		return geom;
 	}
 	
-	geos::geom::Geometry* RSGISGeometry::getDifference(geos::geom::Geometry *geom1in, geos::geom::Geometry *geom2in) throw(RSGISGeometryException)
+	geos::geom::Geometry* RSGISGeometry::getDifference(geos::geom::Geometry *geom1in, geos::geom::Geometry *geom2in)
 	{
 		if(geom1in == NULL)
 		{
@@ -3398,7 +3398,7 @@ namespace rsgis{namespace geom{
 		return geom;
 	}
 	
-	geos::geom::Polygon* RSGISGeometry::polygonUnion(geos::geom::Polygon *poly1in, geos::geom::Polygon *poly2in) throw(RSGISGeometryException)
+	geos::geom::Polygon* RSGISGeometry::polygonUnion(geos::geom::Polygon *poly1in, geos::geom::Polygon *poly2in)
 	{
 		float tolerance = 0.05;
 		geos::geom::Polygon *poly = NULL;
@@ -3714,7 +3714,7 @@ namespace rsgis{namespace geom{
 		return poly;
 	}
 	
-	void RSGISGeometry::mergeTouchingPolygons(std::vector<geos::geom::Polygon*> *polys) throw(RSGISGeometryException)
+	void RSGISGeometry::mergeTouchingPolygons(std::vector<geos::geom::Polygon*> *polys)
 	{
 		try
 		{
@@ -3779,7 +3779,7 @@ namespace rsgis{namespace geom{
 		}
 	}
 	
-	void RSGISGeometry::mergeTouchingPolygonsWithIndex(std::vector<geos::geom::Polygon*> *polys) throw(RSGISGeometryException)
+	void RSGISGeometry::mergeTouchingPolygonsWithIndex(std::vector<geos::geom::Polygon*> *polys)
 	{
 		try
 		{
@@ -3884,7 +3884,7 @@ namespace rsgis{namespace geom{
 		}
 	}
 	
-	void RSGISGeometry::mergeTouchingPolygonsForce(std::vector<geos::geom::Polygon*> *polys) throw(RSGISGeometryException)
+	void RSGISGeometry::mergeTouchingPolygonsForce(std::vector<geos::geom::Polygon*> *polys)
 	{
 		try
 		{
@@ -3938,7 +3938,7 @@ namespace rsgis{namespace geom{
 		}
 	}
 	
-	bool RSGISGeometry::shareBorder(geos::geom::Polygon *poly1, geos::geom::Polygon *poly2) throw(RSGISGeometryException)
+	bool RSGISGeometry::shareBorder(geos::geom::Polygon *poly1, geos::geom::Polygon *poly2)
 	{
 		bool shareborder = false;
 		try
@@ -3982,7 +3982,7 @@ namespace rsgis{namespace geom{
 		return shareborder;
 	}
 	
-	bool RSGISGeometry::equalLineSegments(geos::geom::LineSegment *line1, geos::geom::LineSegment *line2, float threshold) throw(RSGISGeometryException)
+	bool RSGISGeometry::equalLineSegments(geos::geom::LineSegment *line1, geos::geom::LineSegment *line2, float threshold)
 	{
 		bool linesequal = false;
 		try
@@ -4010,7 +4010,7 @@ namespace rsgis{namespace geom{
 		return linesequal;
 	}
 	
-	bool RSGISGeometry::straightLine(RSGIS2DPoint *p1, RSGIS2DPoint *p2, RSGIS2DPoint *p3) throw(RSGISGeometryException)
+	bool RSGISGeometry::straightLine(RSGIS2DPoint *p1, RSGIS2DPoint *p2, RSGIS2DPoint *p3)
 	{
 		bool returnValue = false;
 		try
@@ -4064,7 +4064,7 @@ namespace rsgis{namespace geom{
 		return returnValue;
 	}
 	
-	float RSGISGeometry::amountOfOverlap(geos::geom::Polygon *poly, std::vector<geos::geom::Polygon*> *polys) throw(RSGISGeometryException)
+	float RSGISGeometry::amountOfOverlap(geos::geom::Polygon *poly, std::vector<geos::geom::Polygon*> *polys)
 	{
 		bool first = true;
 		float maxOverlap = 0;
@@ -4107,7 +4107,7 @@ namespace rsgis{namespace geom{
 		return maxOverlap;
 	}
 	
-	void RSGISGeometry::mergeTouchingPolygons(std::vector<geos::geom::Polygon*> *polys, float sizeThreshold) throw(RSGISGeometryException)
+	void RSGISGeometry::mergeTouchingPolygons(std::vector<geos::geom::Polygon*> *polys, float sizeThreshold)
 	{
 		try
 		{
@@ -4175,7 +4175,7 @@ namespace rsgis{namespace geom{
 		}
 	}
 	
-	bool RSGISGeometry::geometryBetweenFast(geos::geom::Polygon *poly1, geos::geom::Polygon *poly2, geos::geom::Geometry *master) throw(RSGISGeometryException)
+	bool RSGISGeometry::geometryBetweenFast(geos::geom::Polygon *poly1, geos::geom::Polygon *poly2, geos::geom::Geometry *master)
 	{
 		bool returnVal = false;
 		try
@@ -4212,7 +4212,7 @@ namespace rsgis{namespace geom{
 		return returnVal;
 	}
 	
-	bool RSGISGeometry::geometryBetweenAccurate(geos::geom::Polygon *poly1, geos::geom::Polygon *poly2, geos::geom::Geometry *master) throw(RSGISGeometryException)
+	bool RSGISGeometry::geometryBetweenAccurate(geos::geom::Polygon *poly1, geos::geom::Polygon *poly2, geos::geom::Geometry *master)
 	{
 		bool returnVal = false;
 		try
@@ -4248,7 +4248,7 @@ namespace rsgis{namespace geom{
 		return returnVal;
 	}
 	
-	geos::geom::Polygon* RSGISGeometry::addNodes(geos::geom::Polygon *poly, int nodeStep) throw(RSGISGeometryException)
+	geos::geom::Polygon* RSGISGeometry::addNodes(geos::geom::Polygon *poly, int nodeStep)
 	{
 		RSGISGeometry geomUtils;
 		geos::geom::Polygon *outPoly = NULL;
@@ -4284,7 +4284,7 @@ namespace rsgis{namespace geom{
 		return outPoly;
 	}
 	
-	std::vector<geos::geom::LineSegment*>* RSGISGeometry::findLineProj(geos::geom::Polygon *poly) throw(RSGISGeometryException)
+	std::vector<geos::geom::LineSegment*>* RSGISGeometry::findLineProj(geos::geom::Polygon *poly)
 	{
 		std::vector<geos::geom::LineSegment*> *lines = new std::vector<geos::geom::LineSegment*>();
 		
@@ -4325,7 +4325,7 @@ namespace rsgis{namespace geom{
 		return lines;
 	}
 	
-	std::vector<geos::geom::LineSegment*>* RSGISGeometry::findLineProj(std::vector<geos::geom::Coordinate*> *coords, float lineLength) throw(RSGISGeometryException)
+	std::vector<geos::geom::LineSegment*>* RSGISGeometry::findLineProj(std::vector<geos::geom::Coordinate*> *coords, float lineLength)
 	{
 		std::vector<geos::geom::LineSegment*> *lines = new std::vector<geos::geom::LineSegment*>();
 		
@@ -4399,7 +4399,7 @@ namespace rsgis{namespace geom{
 		}
 	}
 	
-	float RSGISGeometry::overlap(geos::geom::Geometry *geom1, geos::geom::Geometry *geom2) throw(RSGISGeometryException)
+	float RSGISGeometry::overlap(geos::geom::Geometry *geom1, geos::geom::Geometry *geom2)
 	{
 		float areaOverlap = 0;
 		try 
@@ -4424,7 +4424,7 @@ namespace rsgis{namespace geom{
         return areaOverlap;
 	}
 	
-	float RSGISGeometry::overlapForce(geos::geom::Geometry *geom1, geos::geom::Geometry *geom2) throw(RSGISGeometryException)
+	float RSGISGeometry::overlapForce(geos::geom::Geometry *geom1, geos::geom::Geometry *geom2)
 	{
 		float areaOverlap = 0;
 		try 
@@ -4476,7 +4476,7 @@ namespace rsgis{namespace geom{
         return polysOut;
     }
     
-    void RSGISGeometry::convertGeometryCollection2Lines(OGRGeometryCollection *geomCollectionIn, OGRGeometryCollection *geomCollectionOut) throw(RSGISGeometryException)
+    void RSGISGeometry::convertGeometryCollection2Lines(OGRGeometryCollection *geomCollectionIn, OGRGeometryCollection *geomCollectionOut)
     {
         try 
         {
@@ -4513,7 +4513,7 @@ namespace rsgis{namespace geom{
         }
     }
     
-    void RSGISGeometry::convertPolygons2Lines(OGRPolygon *poly, OGRGeometryCollection *geomCollectionOut) throw(RSGISGeometryException)
+    void RSGISGeometry::convertPolygons2Lines(OGRPolygon *poly, OGRGeometryCollection *geomCollectionOut)
     {
         try 
         {

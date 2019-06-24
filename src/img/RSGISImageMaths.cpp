@@ -34,7 +34,7 @@ namespace rsgis{namespace img{
 		
 	}
 	
-	void RSGISImageMaths::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+	void RSGISImageMaths::calcImageValue(float *bandValues, int numBands, double *output) 
 	{
 		if(numOutBands != numBands)
 		{
@@ -82,7 +82,7 @@ namespace rsgis{namespace img{
         
     }
     
-    void RSGISImageBandMaths::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+    void RSGISImageBandMaths::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         try
         {
@@ -117,7 +117,7 @@ namespace rsgis{namespace img{
 		this->outFalseVal = outFalseVal;
 	}
 	
-	void RSGISAllBandsEqualTo::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+	void RSGISAllBandsEqualTo::calcImageValue(float *bandValues, int numBands, double *output) 
 	{
 		if(!(numOutBands > 0))
 		{

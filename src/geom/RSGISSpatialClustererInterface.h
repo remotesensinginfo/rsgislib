@@ -49,7 +49,7 @@ namespace rsgis{namespace geom{
 	class DllExport RSGISSpatialClustererInterface
 		{
 		public:
-			virtual std::list<RSGIS2DPoint*>** clusterData(std::vector<RSGIS2DPoint*> *data, int *numclusters, double *threshold) throw(rsgis::math::RSGISClustererException) = 0;
+			virtual std::list<RSGIS2DPoint*>** clusterData(std::vector<RSGIS2DPoint*> *data, int *numclusters, double *threshold) = 0;
 			virtual ~RSGISSpatialClustererInterface(){};
 		};
 }}

@@ -30,12 +30,12 @@ namespace rsgis{namespace vec{
 		this->polygons = polygons;
 	}
 	
-	void RSGISOGRPolygonReader::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISOGRPolygonReader::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)
 	{
 		throw RSGISVectorException("Not implemented..");
 	}
 	
-	void RSGISOGRPolygonReader::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISOGRPolygonReader::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid)
 	{
 		OGRwkbGeometryType geometryType = feature->GetGeometryRef()->getGeometryType();
 		
@@ -51,7 +51,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISOGRPolygonReader::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+	void RSGISOGRPolygonReader::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn)
 	{
 		// Nothing to do!
 	}
@@ -67,12 +67,12 @@ namespace rsgis{namespace vec{
         this->polysIdx = polysIdx;
     }
     
-    void RSGISOGRPolygonReader2Index::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+    void RSGISOGRPolygonReader2Index::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)
     {
         throw RSGISVectorException("Not implemented..");
     }
     
-    void RSGISOGRPolygonReader2Index::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+    void RSGISOGRPolygonReader2Index::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid)
     {
         OGRwkbGeometryType geometryType = feature->GetGeometryRef()->getGeometryType();
         
@@ -91,7 +91,7 @@ namespace rsgis{namespace vec{
         }
     }
     
-    void RSGISOGRPolygonReader2Index::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+    void RSGISOGRPolygonReader2Index::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn)
     {
         // Nothing to do!
     }

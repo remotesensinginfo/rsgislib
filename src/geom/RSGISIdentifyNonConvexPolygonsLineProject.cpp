@@ -29,7 +29,7 @@ namespace rsgis{namespace geom{
 		this->resolution = resolution;
 	}
 	
-	std::vector<geos::geom::Polygon*>* RSGISIdentifyNonConvexPolygonsLineProject::retrievePolygons(std::list<RSGIS2DPoint*> **clusters, int numClusters) throw(RSGISGeometryException)
+	std::vector<geos::geom::Polygon*>* RSGISIdentifyNonConvexPolygonsLineProject::retrievePolygons(std::list<RSGIS2DPoint*> **clusters, int numClusters)
 	{
 		RSGISGeometry geomUtils;
 		std::vector<geos::geom::Polygon*> *polys = new std::vector<geos::geom::Polygon*>();
@@ -60,7 +60,7 @@ namespace rsgis{namespace geom{
 		return polys;
 	}
 	
-	std::vector<geos::geom::Polygon*>* RSGISIdentifyNonConvexPolygonsLineProject::retrievePolygons(std::list<RSGISPolygon*> **clusters, int numClusters) throw(RSGISGeometryException)
+	std::vector<geos::geom::Polygon*>* RSGISIdentifyNonConvexPolygonsLineProject::retrievePolygons(std::list<RSGISPolygon*> **clusters, int numClusters)
 	{
 		RSGISGeometry geomUtils;
 		std::vector<geos::geom::Polygon*> *polys = new std::vector<geos::geom::Polygon*>();
@@ -91,7 +91,7 @@ namespace rsgis{namespace geom{
 		return polys;
 	}
 	
-	std::vector<geos::geom::Polygon*>* RSGISIdentifyNonConvexPolygonsLineProject::retrievePolygons(std::list<geos::geom::Polygon*> **clusters, int numClusters) throw(RSGISGeometryException)
+	std::vector<geos::geom::Polygon*>* RSGISIdentifyNonConvexPolygonsLineProject::retrievePolygons(std::list<geos::geom::Polygon*> **clusters, int numClusters)
 	{
 		RSGISGeometry geomUtils;
 		std::vector<geos::geom::Polygon*> *polys = new std::vector<geos::geom::Polygon*>();
@@ -122,7 +122,7 @@ namespace rsgis{namespace geom{
 		return polys;
 	}
 	
-	geos::geom::Polygon* RSGISIdentifyNonConvexPolygonsLineProject::retrievePolygon(std::vector<geos::geom::Polygon*> *polygons) throw(RSGISGeometryException)
+	geos::geom::Polygon* RSGISIdentifyNonConvexPolygonsLineProject::retrievePolygon(std::vector<geos::geom::Polygon*> *polygons)
 	{
 		RSGISGeometry geomUtils;
 		geos::geom::Polygon *poly = NULL;
@@ -147,7 +147,7 @@ namespace rsgis{namespace geom{
 		return poly;
 	}
 	
-	geos::geom::Polygon* RSGISIdentifyNonConvexPolygonsLineProject::retrievePolygon(std::list<geos::geom::Polygon*> *polygons) throw(RSGISGeometryException)
+	geos::geom::Polygon* RSGISIdentifyNonConvexPolygonsLineProject::retrievePolygon(std::list<geos::geom::Polygon*> *polygons)
 	{
 		RSGISGeometry geomUtils;
 		geos::geom::Polygon *poly = NULL;
@@ -172,7 +172,7 @@ namespace rsgis{namespace geom{
 		return poly;
 	}
 	
-	geos::geom::Polygon* RSGISIdentifyNonConvexPolygonsLineProject::identifyIrregularBoundaryLineProj(std::vector<geos::geom::LineSegment> *lines) throw(RSGISGeometryException)
+	geos::geom::Polygon* RSGISIdentifyNonConvexPolygonsLineProject::identifyIrregularBoundaryLineProj(std::vector<geos::geom::LineSegment> *lines)
 	{
 		geos::geom::Polygon *poly = NULL;
 		RSGISGeometry geomUtils;
@@ -239,7 +239,7 @@ namespace rsgis{namespace geom{
 		return poly;
 	}
 	
-	std::vector<geos::geom::Coordinate*>* RSGISIdentifyNonConvexPolygonsLineProject::identifyIrregularBoundaryCoordinatesLineProj(std::vector<geos::geom::LineSegment> *lines, geos::geom::Polygon *convexhull) throw(RSGISGeometryException)
+	std::vector<geos::geom::Coordinate*>* RSGISIdentifyNonConvexPolygonsLineProject::identifyIrregularBoundaryCoordinatesLineProj(std::vector<geos::geom::LineSegment> *lines, geos::geom::Polygon *convexhull)
 	{
 		RSGISGeometry geomUtils;
 		std::vector<geos::geom::Coordinate*> *coords = new std::vector<geos::geom::Coordinate*>();

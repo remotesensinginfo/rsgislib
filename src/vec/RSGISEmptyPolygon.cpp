@@ -35,7 +35,7 @@ namespace rsgis{namespace vec{
 		// There are no attributes to read.
 	}
 	
-	void RSGISEmptyPolygon::createLayerDefinition(OGRLayer *outputSHPLayer)throw(RSGISVectorOutputException)
+	void RSGISEmptyPolygon::createLayerDefinition(OGRLayer *outputSHPLayer)
 	{
 		// There are no attributes to output
 	}

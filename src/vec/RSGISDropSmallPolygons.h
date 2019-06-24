@@ -53,8 +53,8 @@ namespace rsgis{namespace vec{
 	{
 	public:
 		RSGISDropSmallPolygons();
-		void dropSmallPolys(OGRLayer *input, OGRLayer *output, float threshold)throw(RSGISVectorException);
-		void copyFeatureDefn(OGRLayer *outputSHPLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
+		void dropSmallPolys(OGRLayer *input, OGRLayer *output, float threshold);
+		void copyFeatureDefn(OGRLayer *outputSHPLayer, OGRFeatureDefn *inFeatureDefn);
 		void copyFeatureData(OGRFeature *inFeature, OGRFeature *outFeature, OGRFeatureDefn *inFeatureDefn, OGRFeatureDefn *outFeatureDefn);
 		~RSGISDropSmallPolygons();
 	};

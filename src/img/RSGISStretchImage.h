@@ -87,15 +87,15 @@ namespace rsgis { namespace img {
 	{
 	public:
 		RSGISStretchImage(GDALDataset *inputImage, std::string outputImage, bool outStats, std::string outStatsFile, bool onePassSD, std::string imageFormat, GDALDataType outDataType, float outMinVal, float outMaxVal, bool useNoData, double inNoData, double outNoData);
-		void executeLinearMinMaxStretch() throw(RSGISImageCalcException);
-		void executeLinearPercentStretch(float percent) throw(RSGISImageCalcException);
-		void executeLinearStdDevStretch(float stddev) throw(RSGISImageCalcException);
-		void executeHistogramStretch() throw(RSGISImageCalcException);
-		void executeExponentialStretch() throw(RSGISImageCalcException);
-		void executeLogrithmicStretch() throw(RSGISImageCalcException);
-		void executePowerLawStretch(float power) throw(RSGISImageCalcException);
+		void executeLinearMinMaxStretch();
+		void executeLinearPercentStretch(float percent);
+		void executeLinearStdDevStretch(float stddev);
+		void executeHistogramStretch();
+		void executeExponentialStretch();
+		void executeLogrithmicStretch();
+		void executePowerLawStretch(float power);
         
-        static std::vector<BandSpecThresholdStats>* readBandSpecThresholds(std::string inputFile)throw(rsgis::RSGISFileException)
+        static std::vector<BandSpecThresholdStats>* readBandSpecThresholds(std::string inputFile)
         {
             std::vector<BandSpecThresholdStats> *bandStats = new std::vector<BandSpecThresholdStats>();
             
@@ -174,13 +174,13 @@ namespace rsgis { namespace img {
 	{
 	public:
 		RSGISStretchImageWithStats(GDALDataset *inputImage, std::string outputImage, std::string inStatsFile, std::string imageFormat, GDALDataType outDataType, float outMinVal, float outMaxVal, bool useNoData, double inNoData, double outNoData);
-		void executeLinearMinMaxStretch() throw(RSGISImageCalcException);
-		void executeHistogramStretch() throw(RSGISImageCalcException);
-		void executeExponentialStretch() throw(RSGISImageCalcException);
-		void executeLogrithmicStretch() throw(RSGISImageCalcException);
-		void executePowerLawStretch(float power) throw(RSGISImageCalcException);
+		void executeLinearMinMaxStretch();
+		void executeHistogramStretch();
+		void executeExponentialStretch();
+		void executeLogrithmicStretch();
+		void executePowerLawStretch(float power);
         
-        static std::vector<BandSpecThresholdStats>* readBandSpecThresholds(std::string inputFile)throw(rsgis::RSGISFileException)
+        static std::vector<BandSpecThresholdStats>* readBandSpecThresholds(std::string inputFile)
         {
             std::vector<BandSpecThresholdStats> *bandStats = new std::vector<BandSpecThresholdStats>();
             
@@ -257,9 +257,9 @@ namespace rsgis { namespace img {
 	{
 	public:
 		RSGISExponentStretchFunction(){};
-		double calcFunction(double value) throw(rsgis::math::RSGISMathException);
-		double dX(double value) throw(rsgis::math::RSGISMathException){throw rsgis::math::RSGISMathException("dX is not implemented");};
-		int numCoefficients() throw(rsgis::math::RSGISMathException) {return 0;}
+		double calcFunction(double value);
+		double dX(double value){throw rsgis::math::RSGISMathException("dX is not implemented");};
+		int numCoefficients() {return 0;}
 		void updateCoefficents(double *newCoefficents){}
 		~RSGISExponentStretchFunction(){};
 	};
@@ -268,9 +268,9 @@ namespace rsgis { namespace img {
 	{
 	public:
 		RSGISLogrithmStretchFunction(){};
-		double calcFunction(double value) throw(rsgis::math::RSGISMathException);
-		double dX(double value) throw(rsgis::math::RSGISMathException){throw rsgis::math::RSGISMathException("dX is not implemented");};
-		int numCoefficients() throw(rsgis::math::RSGISMathException) {return 0;}
+		double calcFunction(double value);
+		double dX(double value){throw rsgis::math::RSGISMathException("dX is not implemented");};
+		int numCoefficients() {return 0;}
 		void updateCoefficents(double *newCoefficents){}
 		~RSGISLogrithmStretchFunction(){};
 	};
@@ -279,9 +279,9 @@ namespace rsgis { namespace img {
 	{
 	public:
 		RSGISPowerLawStretchFunction(float power){this->power = power;};
-		double calcFunction(double value) throw(rsgis::math::RSGISMathException);
-		double dX(double value) throw(rsgis::math::RSGISMathException){throw rsgis::math::RSGISMathException("dX is not implemented");};
-		int numCoefficients() throw(rsgis::math::RSGISMathException) {return 0;}
+		double calcFunction(double value);
+		double dX(double value){throw rsgis::math::RSGISMathException("dX is not implemented");};
+		int numCoefficients() {return 0;}
 		void updateCoefficents(double *newCoefficents){}
 		~RSGISPowerLawStretchFunction(){};
 	protected:
@@ -294,16 +294,16 @@ namespace rsgis { namespace img {
 	{
 	public:
 		RSGISLinearStretchImage(int numberOutBands, double *imageMaxIn, double *imageMinIn, double *outMaxIn, double *outMinIn, bool useNoData, double inNoData, double outNoData);
-		void calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException);
-		void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-		void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent)throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-		void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-		void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands, double *output);
+		void calcImageValue(float *bandValues, int numBands) {throw RSGISImageCalcException("No implemented");};
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) {throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) {throw RSGISImageCalcException("Not implemented");};
+		void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) {throw RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) {throw RSGISImageCalcException("No implemented");};
+		void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) {throw RSGISImageCalcException("No implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) {throw RSGISImageCalcException("No implemented");};
+		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) {throw RSGISImageCalcException("No implemented");};
 		~RSGISLinearStretchImage();
 	protected:
 		double *imageMax;
@@ -320,16 +320,16 @@ namespace rsgis { namespace img {
 	{
 	public:
 		RSGISFuncLinearStretchImage(int numberOutBands, double *imageMaxIn, double *imageMinIn, double *outMaxIn, double *outMinIn, bool useNoData, double inNoData, double outNoData, rsgis::math::RSGISMathFunction *func);
-		void calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException);
-		void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-		void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent)throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-		void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-		void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands, double *output);
+		void calcImageValue(float *bandValues, int numBands) {throw RSGISImageCalcException("No implemented");};
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) {throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) {throw RSGISImageCalcException("Not implemented");};
+		void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) {throw RSGISImageCalcException("No implemented");};
+		void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) {throw RSGISImageCalcException("No implemented");};
+		void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) {throw RSGISImageCalcException("No implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) {throw RSGISImageCalcException("No implemented");};
+		bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) {throw RSGISImageCalcException("No implemented");};
 		~RSGISFuncLinearStretchImage();
 	protected:
 		double *imageMax;

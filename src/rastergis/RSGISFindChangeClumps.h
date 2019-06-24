@@ -77,7 +77,7 @@ namespace rsgis{namespace rastergis{
         void getThresholds();
         void calcRATValue(size_t fid, double *inRealCols, unsigned int numInRealCols, int *inIntCols, unsigned int numInIntCols, std::string *inStringCols,
                           unsigned int numInStringCols, double *outRealCols, unsigned int numOutRealCols, int *outIntCols, unsigned int numOutIntCols,
-                          std::string *outStringCols, unsigned int numOutStringCols) throw(RSGISAttributeTableException);
+                          std::string *outStringCols, unsigned int numOutStringCols);
         ~RSGISFindChangeClumpsStdDevThreshold();
     public:
         GDALRasterAttributeTable *attTable;
@@ -116,7 +116,7 @@ namespace rsgis{namespace rastergis{
         void getStats();
         void calcRATValue(size_t fid, double *inRealCols, unsigned int numInRealCols, int *inIntCols, unsigned int numInIntCols,
                           std::string *inStringCols, unsigned int numInStringCols, double *outRealCols, unsigned int numOutRealCols,
-                          int *outIntCols, unsigned int numOutIntCols, std::string *outStringCols, unsigned int numOutStringCols) throw(RSGISAttributeTableException);
+                          int *outIntCols, unsigned int numOutIntCols, std::string *outStringCols, unsigned int numOutStringCols);
         ~RSGISGetGlobalClassStats();
     public:
         GDALRasterAttributeTable *attTable;

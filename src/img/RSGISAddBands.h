@@ -57,9 +57,9 @@ namespace rsgis
 		{
 			public:
 				RSGISAddBands();
-				void addMultipleBands(GDALDataset *input, GDALDataset **toAdd, std::string *outputFile, int *band, int numAddBands) throw(RSGISImageBandException);
-				void addBandToFile(GDALDataset *input, GDALDataset *toAdd, std::string *outputFile, int band) throw(RSGISImageBandException);
-				void stackImages(GDALDataset **datasets, int numDS, std::string outputImage, std::string *imageBandNames, bool skipPixels, float skipValue = 0, float noDataValue = 0, std::string gdalFormat="ENVI", GDALDataType gdalDataType=GDT_Float32, bool replaceBandNames=false) throw(RSGISImageBandException);
+				void addMultipleBands(GDALDataset *input, GDALDataset **toAdd, std::string *outputFile, int *band, int numAddBands);
+				void addBandToFile(GDALDataset *input, GDALDataset *toAdd, std::string *outputFile, int band);
+				void stackImages(GDALDataset **datasets, int numDS, std::string outputImage, std::string *imageBandNames, bool skipPixels, float skipValue = 0, float noDataValue = 0, std::string gdalFormat="ENVI", GDALDataType gdalDataType=GDT_Float32, bool replaceBandNames=false);
 				~RSGISAddBands();
 		};
         
@@ -69,16 +69,7 @@ namespace rsgis
         {
         public:
             RSGISCombineImagesIgnoreNoData(float noDataVal);
-            void calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException);
-            void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-            void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-            void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-            void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent)throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
-            void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-            void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-            void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-            void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
-            bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("No implemented");};
+            void calcImageValue(float *bandValues, int numBands, double *output);
             ~RSGISCombineImagesIgnoreNoData();
         protected:
             float noDataVal;

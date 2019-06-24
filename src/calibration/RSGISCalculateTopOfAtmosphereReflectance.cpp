@@ -34,7 +34,7 @@ namespace rsgis{namespace calib{
         this->distSq = distance * distance;
     }
     
-    void RSGISCalculateTopOfAtmosphereReflectance::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCalculateTopOfAtmosphereReflectance::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         if(numBands != this->numOutBands)
         {
@@ -61,7 +61,7 @@ namespace rsgis{namespace calib{
         this->scaleFactor = scaleFactor;
     }
     
-    void RSGISCalculateTOAThermalBrightness::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCalculateTOAThermalBrightness::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         if(numBands != this->numOutBands)
         {
@@ -104,7 +104,7 @@ namespace rsgis{namespace calib{
         this->distSq = distance * distance;
     }
     
-    void RSGISCalculateRadianceFromTOAReflectance::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCalculateRadianceFromTOAReflectance::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         if(numBands != this->numOutBands)
         {

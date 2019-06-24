@@ -47,10 +47,10 @@ namespace rsgis{namespace math{
 		public:
 			RSGISBaysianIntergrateFunctionPrior(RSGISMathFunction *function, RSGISProbDistro *probDistro, double variance);
 			void updateValue(float value);
-			virtual double dX(double value) throw(RSGISMathException){throw RSGISMathException("Not implemented");};
-			virtual double calcFunction(double predictVal) throw(RSGISMathException);
-			virtual int numCoefficients() throw(RSGISMathException){throw RSGISMathException("Not implemented");};
-			virtual void updateCoefficents(double *newCoefficents) throw(RSGISMathException){throw RSGISMathException("Not implemented");};
+			virtual double dX(double value){throw RSGISMathException("Not implemented");};
+			virtual double calcFunction(double predictVal);
+			virtual int numCoefficients(){throw RSGISMathException("Not implemented");};
+			virtual void updateCoefficents(double *newCoefficents){throw RSGISMathException("Not implemented");};
 		protected:
 			RSGISMathFunction *function;
 			RSGISProbDistro *probDistro;

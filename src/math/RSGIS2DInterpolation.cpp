@@ -32,7 +32,7 @@ namespace rsgis {namespace math{
         this->k = k;
     }
     
-    void RSGISSearchKNN2DInterpolator::initInterpolator(std::vector<RSGISInterpolatorDataPoint> *pts) throw(RSGISInterpolationException)
+    void RSGISSearchKNN2DInterpolator::initInterpolator(std::vector<RSGISInterpolatorDataPoint> *pts)
     {
         try
         {
@@ -51,7 +51,7 @@ namespace rsgis {namespace math{
     }
     
     
-    std::list<std::pair<double,RSGISInterpolatorDataPoint> >* RSGISSearchKNN2DInterpolator::findKNN(double eastings, double northings) throw(RSGISInterpolationException)
+    std::list<std::pair<double,RSGISInterpolatorDataPoint> >* RSGISSearchKNN2DInterpolator::findKNN(double eastings, double northings)
     {
         std::list<std::pair<double,RSGISInterpolatorDataPoint> > *knn = new std::list<std::pair<double,RSGISInterpolatorDataPoint> >();
         try
@@ -97,7 +97,7 @@ namespace rsgis {namespace math{
     
     
     
-    void RSGIS2DTriagulatorInterpolator::initInterpolator(std::vector<RSGISInterpolatorDataPoint> *pts) throw(RSGISInterpolationException)
+    void RSGIS2DTriagulatorInterpolator::initInterpolator(std::vector<RSGISInterpolatorDataPoint> *pts)
     {
         try
         {
@@ -155,7 +155,7 @@ namespace rsgis {namespace math{
     
     
     
-    double RSGISNearestNeighbour2DInterpolator::getValue(double eastings, double northings) throw(RSGISInterpolationException)
+    double RSGISNearestNeighbour2DInterpolator::getValue(double eastings, double northings)
     {
         double outValue = std::numeric_limits<double>::signaling_NaN();
 		if(initialised)
@@ -176,7 +176,7 @@ namespace rsgis {namespace math{
     
     
     
-    double RSGISNaturalNeighbor2DInterpolator::getValue(double eastings, double northings) throw(RSGISInterpolationException)
+    double RSGISNaturalNeighbor2DInterpolator::getValue(double eastings, double northings)
     {
         float outValue = std::numeric_limits<float>::signaling_NaN();
         if(initialised)
@@ -213,7 +213,7 @@ namespace rsgis {namespace math{
     
     
     
-    double RSGISNaturalNearestNeighbor2DInterpolator::getValue(double eastings, double northings) throw(RSGISInterpolationException)
+    double RSGISNaturalNearestNeighbor2DInterpolator::getValue(double eastings, double northings)
     {
         float outValue = std::numeric_limits<float>::signaling_NaN();
         if(initialised)
@@ -247,7 +247,7 @@ namespace rsgis {namespace math{
     
     
     
-    double RSGISKNearestNeighbour2DInterpolator::getValue(double eastings, double northings) throw(RSGISInterpolationException)
+    double RSGISKNearestNeighbour2DInterpolator::getValue(double eastings, double northings)
     {
         float outValue = std::numeric_limits<float>::signaling_NaN();
         if(initialised)
@@ -276,13 +276,13 @@ namespace rsgis {namespace math{
     
     
     
-    void RSGISAllPointsIDWInterpolator::initInterpolator(std::vector<RSGISInterpolatorDataPoint> *pts) throw(RSGISInterpolationException)
+    void RSGISAllPointsIDWInterpolator::initInterpolator(std::vector<RSGISInterpolatorDataPoint> *pts)
     {
         this->pts = pts;
         this->initialised = true;
     }
     
-    double RSGISAllPointsIDWInterpolator::getValue(double eastings, double northings) throw(RSGISInterpolationException)
+    double RSGISAllPointsIDWInterpolator::getValue(double eastings, double northings)
     {
         float outValue = std::numeric_limits<float>::signaling_NaN();
         if(initialised)
@@ -317,7 +317,7 @@ namespace rsgis {namespace math{
     }
     
    
-    void RSGISLinearTrendInterpolator::initInterpolator(std::vector<RSGISInterpolatorDataPoint> *pts) throw(RSGISInterpolationException)
+    void RSGISLinearTrendInterpolator::initInterpolator(std::vector<RSGISInterpolatorDataPoint> *pts)
     {
         RSGISMatrices matrices;
 		Matrix *matrixA = NULL;
@@ -373,7 +373,7 @@ namespace rsgis {namespace math{
 			b = outputs->matrix[1];
 			c = outputs->matrix[2];
 		}
-		catch(RSGISMatricesException e)
+		catch(RSGISMatricesException &e)
 		{
 			if(matrixA != NULL)
 			{
@@ -409,7 +409,7 @@ namespace rsgis {namespace math{
         matrices.freeMatrix(outputs);
     }
     
-    double RSGISLinearTrendInterpolator::getValue(double eastings, double northings) throw(RSGISInterpolationException)
+    double RSGISLinearTrendInterpolator::getValue(double eastings, double northings)
     {
         double outVal = 0.0;
         try
@@ -431,7 +431,7 @@ namespace rsgis {namespace math{
     
     
 
-    void RSGISCombine2DInterpolators::initInterpolator(std::vector<RSGISInterpolatorDataPoint> *pts) throw(RSGISInterpolationException)
+    void RSGISCombine2DInterpolators::initInterpolator(std::vector<RSGISInterpolatorDataPoint> *pts)
     {
         try
         {
@@ -469,7 +469,7 @@ namespace rsgis {namespace math{
         }
     }
     
-    double RSGISCombine2DInterpolators::getValue(double eastings, double northings) throw(RSGISInterpolationException)
+    double RSGISCombine2DInterpolators::getValue(double eastings, double northings)
     {
         double outVal = 0.0;
         try

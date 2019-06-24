@@ -47,7 +47,7 @@ namespace rsgis{namespace filter{
 		{
 		public: 
 			RSGISGenerateFilter(RSGISCalcFilter *calcFilter);
-			ImageFilter* generateFilter(int size) throw(RSGISImageFilterException);
+			ImageFilter* generateFilter(int size);
 			~RSGISGenerateFilter();
 		protected:
 			RSGISCalcFilter *calcFilter;

@@ -30,7 +30,7 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    void RSGISPopulateWithImageStats::populateImageWithRasterGISStats(GDALDataset *clumpsDataset, bool addColourTable, bool calcImagePyramids, bool ignoreZero, unsigned int ratBand) throw(rsgis::RSGISImageException)
+    void RSGISPopulateWithImageStats::populateImageWithRasterGISStats(GDALDataset *clumpsDataset, bool addColourTable, bool calcImagePyramids, bool ignoreZero, unsigned int ratBand)
     {
         try
         {
@@ -54,7 +54,7 @@ namespace rsgis{namespace rastergis{
         }
     }
     
-    void RSGISPopulateWithImageStats::populateImageWithRasterGISStats(GDALDataset *clumpsDataset, bool addColourTable, bool ignoreZero, unsigned int ratBand) throw(rsgis::RSGISImageException)
+    void RSGISPopulateWithImageStats::populateImageWithRasterGISStats(GDALDataset *clumpsDataset, bool addColourTable, bool ignoreZero, unsigned int ratBand)
     {
         try
         {
@@ -297,7 +297,7 @@ namespace rsgis{namespace rastergis{
         }
     }
     
-    void RSGISPopulateWithImageStats::calcPyramids(GDALDataset *clumpsDataset) throw(rsgis::RSGISImageException)
+    void RSGISPopulateWithImageStats::calcPyramids(GDALDataset *clumpsDataset)
     {
         try
         {
@@ -356,7 +356,7 @@ namespace rsgis{namespace rastergis{
         this->band = band;
     }
 
-    void RSGISGetClumpsHistogram::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISGetClumpsHistogram::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) 
     {
         if(numIntVals <= band)
         {

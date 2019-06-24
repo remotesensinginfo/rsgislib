@@ -44,7 +44,7 @@ namespace rsgis{namespace vec{
 		calcImage = new rsgis::img::RSGISCalcImageSingle(calcValue);
 	}
 	
-	void RSGISPixelAreaCountInPolygon::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISPixelAreaCountInPolygon::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)
 	{
 		calcValue->reset();
 		calcImage->calcImageWithinRasterPolygon(datasets, 1, data, env, fid, true);
@@ -54,12 +54,12 @@ namespace rsgis{namespace vec{
 		outFeature->SetField(outFeatureDefn->GetFieldIndex("Area"), (data[0]*pxlresolution));
 	}
 	
-	void RSGISPixelAreaCountInPolygon::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISPixelAreaCountInPolygon::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid)
 	{
 		throw RSGISVectorException("Not Implemented");
 	}
 	
-	void RSGISPixelAreaCountInPolygon::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+	void RSGISPixelAreaCountInPolygon::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn)
 	{
 		OGRFieldDefn shpField_totalpxl("TotalPxls", OFTReal);
 		shpField_totalpxl.SetPrecision(10);
@@ -94,27 +94,27 @@ namespace rsgis{namespace vec{
 		this->totalPxl = 0;
 	}
 	
-	void RSGISCalcPixelCountFromRasterPolygon::calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISCalcPixelCountFromRasterPolygon::calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) 
 	{
 		throw rsgis::img::RSGISImageCalcException("Not Implemented");
 	}
 	
-	void RSGISCalcPixelCountFromRasterPolygon::calcImageValue(float *bandValuesImage, int numBands, int band) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISCalcPixelCountFromRasterPolygon::calcImageValue(float *bandValuesImage, int numBands, int band) 
 	{
 		totalPxl++;
 	}
 	
-	void RSGISCalcPixelCountFromRasterPolygon::calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISCalcPixelCountFromRasterPolygon::calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) 
 	{
 		throw rsgis::img::RSGISImageCalcException("Not Implemented");
 	}
 	
-	void RSGISCalcPixelCountFromRasterPolygon::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISCalcPixelCountFromRasterPolygon::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) 
 	{
 		throw rsgis::img::RSGISImageCalcException("Not Implemented");
 	}
 	
-	double* RSGISCalcPixelCountFromRasterPolygon::getOutputValues() throw(rsgis::img::RSGISImageCalcException)
+	double* RSGISCalcPixelCountFromRasterPolygon::getOutputValues() 
 	{
 		outputValues[0] = this->totalPxl;
 		

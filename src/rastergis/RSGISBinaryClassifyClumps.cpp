@@ -26,7 +26,7 @@ namespace rsgis{namespace rastergis{
     
     
     
-    rsgis::math::RSGISLogicExpression* RSGISRATLogicXMLParse::parseLogicXML(std::string xmlStr, std::vector<RSGISColumnLogicIdxs*> *colIdxes) throw(RSGISAttributeTableException)
+    rsgis::math::RSGISLogicExpression* RSGISRATLogicXMLParse::parseLogicXML(std::string xmlStr, std::vector<RSGISColumnLogicIdxs*> *colIdxes)
     {
         rsgis::math::RSGISLogicExpression *outExp = NULL;
         xercesc::DOMLSParser* parser = NULL;
@@ -136,7 +136,7 @@ namespace rsgis{namespace rastergis{
     }
     
     
-    rsgis::math::RSGISLogicExpression* RSGISRATLogicXMLParse::createExpression(xercesc::DOMElement *expElement, std::vector<RSGISColumnLogicIdxs*> *colIdxes) throw(RSGISAttributeTableException)
+    rsgis::math::RSGISLogicExpression* RSGISRATLogicXMLParse::createExpression(xercesc::DOMElement *expElement, std::vector<RSGISColumnLogicIdxs*> *colIdxes)
     {
         rsgis::math::RSGISLogicExpression *outExp = NULL;
         try
@@ -557,7 +557,7 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    void RSGISBinaryClassifyClumps::classifyClumps(GDALDataset *inputClumps, unsigned int ratBand, std::string xmlBlock, std::string outColumn)throw(RSGISAttributeTableException)
+    void RSGISBinaryClassifyClumps::classifyClumps(GDALDataset *inputClumps, unsigned int ratBand, std::string xmlBlock, std::string outColumn)
     {
         try
         {
@@ -645,7 +645,7 @@ namespace rsgis{namespace rastergis{
         this->exp = exp;
     }
     
-    void RSGISBinaryClumpClassifier::calcRATValue(size_t fid, double *inRealCols, unsigned int numInRealCols, int *inIntCols, unsigned int numInIntCols, std::string *inStringCols, unsigned int numInStringCols, double *outRealCols, unsigned int numOutRealCols, int *outIntCols, unsigned int numOutIntCols, std::string *outStringCols, unsigned int numOutStringCols) throw(RSGISAttributeTableException)
+    void RSGISBinaryClumpClassifier::calcRATValue(size_t fid, double *inRealCols, unsigned int numInRealCols, int *inIntCols, unsigned int numInIntCols, std::string *inStringCols, unsigned int numInStringCols, double *outRealCols, unsigned int numOutRealCols, int *outIntCols, unsigned int numOutIntCols, std::string *outStringCols, unsigned int numOutStringCols)
     {
         try
         {

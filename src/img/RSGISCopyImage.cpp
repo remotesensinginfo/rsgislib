@@ -29,7 +29,7 @@ namespace rsgis{namespace img{
 		
 	}
 	
-	void RSGISCopyImage::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+	void RSGISCopyImage::calcImageValue(float *bandValues, int numBands, double *output) 
 	{
 		if(numBands != numOutBands)
 		{
@@ -54,7 +54,7 @@ namespace rsgis{namespace img{
         this->bands = bands;
     }
     
-    void RSGISCopyImageBandSelect::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+    void RSGISCopyImageBandSelect::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         if(numOutBands == 0)
 		{

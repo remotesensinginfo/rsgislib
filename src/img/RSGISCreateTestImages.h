@@ -49,7 +49,7 @@ namespace rsgis{namespace img{
 		{
 		public:
 			RSGISCreateTestImages();
-			void createRowMajorNumberedImage(std::string outputImage, int width, int height) throw(RSGISImageException);
+			void createRowMajorNumberedImage(std::string outputImage, int width, int height);
 			~RSGISCreateTestImages();
 		};
 }}

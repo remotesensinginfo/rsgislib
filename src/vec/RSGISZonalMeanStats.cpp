@@ -42,7 +42,7 @@ namespace rsgis{namespace vec{
 		calcImage = new rsgis::img:: RSGISCalcImageSingle(calcValue);
 	}
 	
-	void RSGISZonalMeanStats::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISZonalMeanStats::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)
 	{
 		try
 		{
@@ -69,7 +69,7 @@ namespace rsgis{namespace vec{
 	
 	}
 	
-	void RSGISZonalMeanStats::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+	void RSGISZonalMeanStats::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn)
 	{
 		for(int i = 0; i < numAttributes; i++)
 		{
@@ -122,7 +122,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISCalcZonalMeanFromRasterPolygon::calcImageValue(float *bandValuesImage, int numBands, int band) throw(rsgis::img:: RSGISImageCalcException)
+	void RSGISCalcZonalMeanFromRasterPolygon::calcImageValue(float *bandValuesImage, int numBands, int band)
 	{
 		float min = 0;
 		bool first = true;
@@ -172,7 +172,7 @@ namespace rsgis{namespace vec{
 		totalPxl++;
 	}
 	
-	double* RSGISCalcZonalMeanFromRasterPolygon::getOutputValues() throw(rsgis::img:: RSGISImageCalcException)
+	double* RSGISCalcZonalMeanFromRasterPolygon::getOutputValues()
 	{
 		//double *outputData = new double[this->numOutputValues];
 		outputValues[0] = this->totalPxl;
@@ -230,7 +230,7 @@ namespace rsgis{namespace vec{
 		calcImage = new rsgis::img::RSGISCalcImageSingle(calcValue);
 	}
 	
-	void RSGISZonalMeanStatsPoly::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISZonalMeanStatsPoly::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)
 	{
 		try
 		{
@@ -264,7 +264,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISZonalMeanStatsPoly::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+	void RSGISZonalMeanStatsPoly::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn)
 	{
 		for(int i = 0; i < numAttributes; i++)
 		{
@@ -317,7 +317,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISCalcZonalMeanFromPolygon::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(rsgis::img:: RSGISImageCalcException)
+	void RSGISCalcZonalMeanFromPolygon::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt)
 	{
 		float min = 0;
 		bool first = true;
@@ -367,7 +367,7 @@ namespace rsgis{namespace vec{
 		totalPxl++;
 	}
 	
-	double* RSGISCalcZonalMeanFromPolygon::getOutputValues() throw(rsgis::img:: RSGISImageCalcException)
+	double* RSGISCalcZonalMeanFromPolygon::getOutputValues()
 	{
 		//double *outputData = new double[this->numOutputValues];
 		outputValues[0] = this->totalPxl;
@@ -415,7 +415,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISCalcZonalMeanFromPolygondB::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(rsgis::img:: RSGISImageCalcException)
+	void RSGISCalcZonalMeanFromPolygondB::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt)
 	{
 		float min = 0;
 		bool first = true;
@@ -465,7 +465,7 @@ namespace rsgis{namespace vec{
 		totalPxl++;
 	}
 	
-	double* RSGISCalcZonalMeanFromPolygondB::getOutputValues() throw(rsgis::img:: RSGISImageCalcException)
+	double* RSGISCalcZonalMeanFromPolygondB::getOutputValues()
 	{
 		//double *outputData = new double[this->numOutputValues];
 		outputValues[0] = this->totalPxl;
@@ -515,7 +515,7 @@ namespace rsgis{namespace vec{
 		calcImage = new rsgis::img:: RSGISCalcImageSingle(calcValue);
 	}
 	
-	void RSGISZonalWeightedMeanStatsPoly::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISZonalWeightedMeanStatsPoly::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)
 	{
 		try
 		{
@@ -550,7 +550,7 @@ namespace rsgis{namespace vec{
 		
 	}
 	
-	void RSGISZonalWeightedMeanStatsPoly::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+	void RSGISZonalWeightedMeanStatsPoly::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn)
 	{
 		for(int i = 0; i < numAttributes; i++)
 		{
@@ -603,7 +603,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISCalcZonalWeightedMeanStatsPoly::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(rsgis::img:: RSGISImageCalcException)
+	void RSGISCalcZonalWeightedMeanStatsPoly::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt)
 	{
 		double weightedVal = 0;
 		bool found = false;
@@ -654,7 +654,7 @@ namespace rsgis{namespace vec{
 		totalPxl++;
 	}
 	
-	double* RSGISCalcZonalWeightedMeanStatsPoly::getOutputValues() throw(rsgis::img:: RSGISImageCalcException)
+	double* RSGISCalcZonalWeightedMeanStatsPoly::getOutputValues()
 	{
 		//double *outputData = new double[this->numOutputValues];
 		outputValues[0] = this->totalPxl;

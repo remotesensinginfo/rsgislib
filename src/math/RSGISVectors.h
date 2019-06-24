@@ -63,23 +63,23 @@ namespace rsgis{namespace math{
 		{
 		public:
 			RSGISVectors();
-			Vector* createVector(int n) throw(RSGISVectorsException);
+			Vector* createVector(int n);
 			void freeVector(Vector *vector);
 			void printVector(Vector *vector);
 			void printGSLVector(gsl_vector *vector);
-			void saveVector2GridTxt(Vector *vector, std::string filepath) throw(RSGISVectorsException,RSGISOutputStreamException);
-			void saveVector2txt(Vector *vector, std::string filepath) throw(RSGISVectorsException,RSGISOutputStreamException);
-			void saveGSLVector2Txt(gsl_vector *gslVector, std::string filepath) throw(RSGISVectorsException,RSGISOutputStreamException);
-			void saveGSLVector2GridTxt(gsl_vector *gslVector, std::string filepath) throw(RSGISVectorsException,RSGISOutputStreamException);
-			Vector* readVectorFromTxt(std::string filepath) throw(RSGISVectorsException,RSGISInputStreamException);
-			Vector* readVectorFromGridTxt(std::string filepath) throw(RSGISVectorsException,RSGISInputStreamException);
-			gsl_vector* readGSLVectorFromTxt(std::string filepath) throw(RSGISVectorsException);
-			gsl_vector* readGSLVectorFromGridTxt(std::string filepath) throw(RSGISVectorsException);
-			gsl_vector* convertRSGIS2GSLVector(Vector *vector) throw(RSGISVectorsException);
-			Vector* convertGSL2RSGISVector(gsl_vector *inVector) throw(RSGISVectorsException);
-			double dotProductVectorVectorGSL(gsl_vector *inVectorA, gsl_vector *inVectorB) throw(RSGISVectorsException);
-			gsl_vector* crossProductVectorVectorGSL(gsl_vector *inVectorA, gsl_vector *inVectorB) throw(RSGISVectorsException);
-			double euclideanDistance(Vector *vecA, Vector *vecB) throw(RSGISVectorsException);
+			void saveVector2GridTxt(Vector *vector, std::string filepath);
+			void saveVector2txt(Vector *vector, std::string filepath);
+			void saveGSLVector2Txt(gsl_vector *gslVector, std::string filepath);
+			void saveGSLVector2GridTxt(gsl_vector *gslVector, std::string filepath);
+			Vector* readVectorFromTxt(std::string filepath);
+			Vector* readVectorFromGridTxt(std::string filepath);
+			gsl_vector* readGSLVectorFromTxt(std::string filepath);
+			gsl_vector* readGSLVectorFromGridTxt(std::string filepath);
+			gsl_vector* convertRSGIS2GSLVector(Vector *vector);
+			Vector* convertGSL2RSGISVector(gsl_vector *inVector);
+			double dotProductVectorVectorGSL(gsl_vector *inVectorA, gsl_vector *inVectorB);
+			gsl_vector* crossProductVectorVectorGSL(gsl_vector *inVectorA, gsl_vector *inVectorB);
+			double euclideanDistance(Vector *vecA, Vector *vecB);
 			~RSGISVectors();
 		};
 }}

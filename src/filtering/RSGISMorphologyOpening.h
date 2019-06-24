@@ -56,7 +56,7 @@ namespace rsgis{namespace filter{
     {
     public:
         RSGISImageMorphologyOpening();
-        void performOpening(GDALDataset *dataset, std::string outputImage, std::string tempImage, bool useMemory, rsgis::math::Matrix *matrixOperator, unsigned int numIterations, std::string format, GDALDataType outDataType) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException);
+        void performOpening(GDALDataset *dataset, std::string outputImage, std::string tempImage, bool useMemory, rsgis::math::Matrix *matrixOperator, unsigned int numIterations, std::string format, GDALDataType outDataType);
         ~RSGISImageMorphologyOpening();
     };
     

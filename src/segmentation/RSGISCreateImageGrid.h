@@ -61,11 +61,11 @@ namespace rsgis{namespace segment{
     {
     public:
         RSGISCreateImageGrid();
-        void createClumpsGrid(GDALDataset *clumpsImage, unsigned int numXPxls, unsigned int numYPxls)throw(rsgis::img::RSGISImageCalcException);
-        void createClumpsOffsetGrid(GDALDataset *clumpsImage, unsigned int numXPxls, unsigned int numYPxls)throw(rsgis::img::RSGISImageCalcException);
+        void createClumpsGrid(GDALDataset *clumpsImage, unsigned int numXPxls, unsigned int numYPxls);
+        void createClumpsOffsetGrid(GDALDataset *clumpsImage, unsigned int numXPxls, unsigned int numYPxls);
         ~RSGISCreateImageGrid();
     protected:
-        void writeImagePxlVal2Region(GDALDataset *clumpsImage, unsigned int pxlVal, unsigned int startX, unsigned int endX, unsigned int startY, unsigned int endY) throw(rsgis::img::RSGISImageCalcException);
+        void writeImagePxlVal2Region(GDALDataset *clumpsImage, unsigned int pxlVal, unsigned int startX, unsigned int endX, unsigned int startY, unsigned int endY);
     };
     
     

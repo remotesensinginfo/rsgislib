@@ -30,7 +30,7 @@ namespace rsgis{namespace img{
 		this->proj = proj;
 	}
 	
-	void RSGISDefiniensCSVRasterise::rasteriseTiles(rsgis::datastruct::SortedGenericList<rsgis::utils::RSGISDefiniensWorkspaceFileName> *sortedTIFs, rsgis::datastruct::SortedGenericList<rsgis::utils::RSGISDefiniensWorkspaceFileName> *sortedCSVs, std::string outputDIR) throw(rsgis::RSGISImageException,rsgis::RSGISFileException)
+	void RSGISDefiniensCSVRasterise::rasteriseTiles(rsgis::datastruct::SortedGenericList<rsgis::utils::RSGISDefiniensWorkspaceFileName> *sortedTIFs, rsgis::datastruct::SortedGenericList<rsgis::utils::RSGISDefiniensWorkspaceFileName> *sortedCSVs, std::string outputDIR)
 	{
 		int size = sortedTIFs->getSize();
 		
@@ -85,17 +85,17 @@ namespace rsgis{namespace img{
 				}
 			}
 		}
-		catch(rsgis::RSGISImageException e)
+		catch(rsgis::RSGISImageException &e)
 		{
 			throw e;
 		}
-		catch (rsgis::RSGISFileException e) 
+		catch (rsgis::RSGISFileException &e) 
 		{
 			throw e;
 		}
 	}
     
-    void RSGISDefiniensCSVRasterise::rasteriseFile(std::string tifFile, std::string csvFile, std::string outputImage) throw(rsgis::RSGISImageException, rsgis::RSGISFileException)
+    void RSGISDefiniensCSVRasterise::rasteriseFile(std::string tifFile, std::string csvFile, std::string outputImage)
     {
         try
         {
@@ -133,7 +133,7 @@ namespace rsgis{namespace img{
         }
     }
 	
-	void RSGISDefiniensCSVRasterise::calcNumFeaturesObjects(rsgis::utils::RSGISDefiniensWorkspaceFileName *csvFilepath, int *numFeatures, int *numObjects) throw(rsgis::RSGISFileException)
+	void RSGISDefiniensCSVRasterise::calcNumFeaturesObjects(rsgis::utils::RSGISDefiniensWorkspaceFileName *csvFilepath, int *numFeatures, int *numObjects)
 	{
 		std::ifstream csvFile;
 		csvFile.open(csvFilepath->getFileNameWithPath().c_str());
@@ -185,7 +185,7 @@ namespace rsgis{namespace img{
 		}
 	}
     
-    void RSGISDefiniensCSVRasterise::calcNumFeaturesObjects(std::string csvInFile, int *numFeatures, int *numObjects) throw(rsgis::RSGISFileException)
+    void RSGISDefiniensCSVRasterise::calcNumFeaturesObjects(std::string csvInFile, int *numFeatures, int *numObjects)
 	{
 		std::ifstream csvFile;
 		csvFile.open(csvInFile.c_str());
@@ -237,7 +237,7 @@ namespace rsgis{namespace img{
 		}
 	}
 	
-	void RSGISDefiniensCSVRasterise::readCSVToMemory(rsgis::utils::RSGISDefiniensWorkspaceFileName *csvFilepath, float **csvData, int numFeatures, int numObjects) throw(rsgis::RSGISFileException)
+	void RSGISDefiniensCSVRasterise::readCSVToMemory(rsgis::utils::RSGISDefiniensWorkspaceFileName *csvFilepath, float **csvData, int numFeatures, int numObjects)
 	{
 		std::ifstream csvFile;
 		csvFile.open(csvFilepath->getFileNameWithPath().c_str());
@@ -277,7 +277,7 @@ namespace rsgis{namespace img{
 		}
 	}
     
-    void RSGISDefiniensCSVRasterise::readCSVToMemory(std::string csvInFile, float **csvData, int numFeatures, int numObjects) throw(rsgis::RSGISFileException)
+    void RSGISDefiniensCSVRasterise::readCSVToMemory(std::string csvInFile, float **csvData, int numFeatures, int numObjects)
 	{
 		std::ifstream csvFile;
 		csvFile.open(csvInFile.c_str());
@@ -316,7 +316,7 @@ namespace rsgis{namespace img{
 		}
 	}
 	
-	void RSGISDefiniensCSVRasterise::convertCSVLine(std::string strLine, float *data, int numFeatures, int objNumber) throw(rsgis::RSGISFileException)
+	void RSGISDefiniensCSVRasterise::convertCSVLine(std::string strLine, float *data, int numFeatures, int objNumber)
 	{
 		try
         {
@@ -361,7 +361,7 @@ namespace rsgis{namespace img{
         }
 	}
 	
-	void RSGISDefiniensCSVRasterise::checkTIFCreatePopulateImageTile(rsgis::utils::RSGISDefiniensWorkspaceFileName *tifFilepath, std::string outputDIR, int numFeatures, int numObjects, float **csvData) throw(rsgis::RSGISImageException)
+	void RSGISDefiniensCSVRasterise::checkTIFCreatePopulateImageTile(rsgis::utils::RSGISDefiniensWorkspaceFileName *tifFilepath, std::string outputDIR, int numFeatures, int numObjects, float **csvData)
 	{
 		GDALAllRegister();
 		
@@ -418,21 +418,21 @@ namespace rsgis{namespace img{
 			GDALClose(dataset[0]);
 			delete[] dataset;
 		}
-		catch(RSGISImageCalcException e)
+		catch(RSGISImageCalcException &e)
 		{
 			throw rsgis::RSGISImageException(e.what());
 		}
-		catch(RSGISImageBandException e)
+		catch(RSGISImageBandException &e)
 		{
 			throw rsgis::RSGISImageException(e.what());
 		}
-		catch(rsgis::RSGISImageException e)
+		catch(rsgis::RSGISImageException &e)
 		{
 			throw e;
 		}
 	}
     
-    void RSGISDefiniensCSVRasterise::checkTIFCreatePopulateImageTile(std::string tifFilepath, std::string outputFile, int numFeatures, int numObjects, float **csvData) throw(rsgis::RSGISImageException)
+    void RSGISDefiniensCSVRasterise::checkTIFCreatePopulateImageTile(std::string tifFilepath, std::string outputFile, int numFeatures, int numObjects, float **csvData)
 	{
 		GDALAllRegister();
 		
@@ -488,15 +488,15 @@ namespace rsgis{namespace img{
 			GDALClose(dataset[0]);
 			delete[] dataset;
 		}
-		catch(RSGISImageCalcException e)
+		catch(RSGISImageCalcException &e)
 		{
 			throw rsgis::RSGISImageException(e.what());
 		}
-		catch(RSGISImageBandException e)
+		catch(RSGISImageBandException &e)
 		{
 			throw rsgis::RSGISImageException(e.what());
 		}
-		catch(rsgis::RSGISImageException e)
+		catch(rsgis::RSGISImageException &e)
 		{
 			throw e;
 		}
@@ -520,7 +520,7 @@ namespace rsgis{namespace img{
 		this->numObjects = numberObjects;
 	}
 	
-	void RSGISDefiniensCSVRasteriseValue::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+	void RSGISDefiniensCSVRasteriseValue::calcImageValue(float *bandValues, int numBands, double *output) 
 	{
 		if(bandValues[0] < 0 | bandValues[0] >= this->numObjects)
 		{
@@ -535,27 +535,27 @@ namespace rsgis{namespace img{
 		}
 	}
 	
-	void RSGISDefiniensCSVRasteriseValue::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+	void RSGISDefiniensCSVRasteriseValue::calcImageValue(float *bandValues, int numBands) 
 	{
 		throw RSGISImageCalcException("Not implemented");
 	}
 	
-	void RSGISDefiniensCSVRasteriseValue::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException)
+	void RSGISDefiniensCSVRasteriseValue::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) 
 	{
 		throw RSGISImageCalcException("Not Implemented");
 	}
 	
-	void RSGISDefiniensCSVRasteriseValue::calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) throw(RSGISImageCalcException)
+	void RSGISDefiniensCSVRasteriseValue::calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) 
 	{
 		throw RSGISImageCalcException("Not implemented");
 	}
 	
-	void RSGISDefiniensCSVRasteriseValue::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException)
+	void RSGISDefiniensCSVRasteriseValue::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
 	{
 		throw RSGISImageCalcException("Not implemented");
 	}
 
-	bool RSGISDefiniensCSVRasteriseValue::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException)
+	bool RSGISDefiniensCSVRasteriseValue::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) 
 	{
 		throw RSGISImageCalcException("Not implemented");
 	}

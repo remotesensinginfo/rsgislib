@@ -89,7 +89,7 @@ namespace rsgis{namespace geom{
 		{
 		public:
 			RSGISMinSpanTreeClustererStdDevThreshold(float stddevthreshold, float maxEdgeLength);
-			virtual std::list<RSGIS2DPoint*>** clusterData(std::vector<RSGIS2DPoint*> *data, int *numclusters, double *threshold) throw(rsgis::math::RSGISClustererException);
+			virtual std::list<RSGIS2DPoint*>** clusterData(std::vector<RSGIS2DPoint*> *data, int *numclusters, double *threshold);
 			virtual ~RSGISMinSpanTreeClustererStdDevThreshold();
 		protected:
 			float stddevthreshold;
@@ -103,7 +103,7 @@ namespace rsgis{namespace geom{
     {
     public:
         RSGISGraphGeomClusterer(bool useMinSpanTree, float stddevthreshold, double maxEdgeLength, std::string shpFileEdges, bool outShpEdges, std::string h5EdgeLengths, bool outH5EdgeLens);
-        virtual std::list<RSGIS2DPoint*>** clusterData(std::vector<RSGIS2DPoint*> *data, int *numclusters, double *threshold) throw(rsgis::math::RSGISClustererException);
+        virtual std::list<RSGIS2DPoint*>** clusterData(std::vector<RSGIS2DPoint*> *data, int *numclusters, double *threshold);
         virtual ~RSGISGraphGeomClusterer();
     protected:
         bool useMinSpanTree;
@@ -113,8 +113,8 @@ namespace rsgis{namespace geom{
         bool outShpEdges;
         std::string h5EdgeLengths;
         bool outH5EdgeLens;
-        ClusterGraph* constructGraph(DelaunayTriangulation *dt, PointValueMap *values, std::vector<RSGIS2DPoint*> *data) throw(rsgis::math::RSGISClustererException);
-        void constructMinimumSpanningTree(ClusterGraph *cg) throw(rsgis::math::RSGISClustererException);
+        ClusterGraph* constructGraph(DelaunayTriangulation *dt, PointValueMap *values, std::vector<RSGIS2DPoint*> *data);
+        void constructMinimumSpanningTree(ClusterGraph *cg);
     };
     
     

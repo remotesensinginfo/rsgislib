@@ -29,7 +29,7 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    void RSGISCalcNeighbourStats::populateStatsDiff2Neighbours(GDALDataset *inputClumps, RSGISFieldAttStats *fieldStats, bool useAbsDiff, unsigned int ratBand)throw(RSGISAttributeTableException)
+    void RSGISCalcNeighbourStats::populateStatsDiff2Neighbours(GDALDataset *inputClumps, RSGISFieldAttStats *fieldStats, bool useAbsDiff, unsigned int ratBand)
     {
         try
         {

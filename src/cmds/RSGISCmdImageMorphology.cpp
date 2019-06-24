@@ -43,7 +43,7 @@ namespace rsgis{ namespace cmds {
     
     
     /** A function to create a circular morphological operator */
-    void executeCreateCircularOperator(std::string morphOperatorFile, unsigned int morphOpSize)throw(RSGISCmdException)
+    void executeCreateCircularOperator(std::string morphOperatorFile, unsigned int morphOpSize)
     {
         try
         {
@@ -68,7 +68,7 @@ namespace rsgis{ namespace cmds {
     }
     
     /** A function to perform a morphological dilation on an image */
-    void executeImageDilate(std::string inImage, std::string outImage, std::string morphOperatorFile, bool useOperatorFile, unsigned int morphOpSize, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException)
+    void executeImageDilate(std::string inImage, std::string outImage, std::string morphOperatorFile, bool useOperatorFile, unsigned int morphOpSize, std::string gdalFormat, RSGISLibDataType outDataType)
     {
         try
         {
@@ -113,7 +113,7 @@ namespace rsgis{ namespace cmds {
     }
     
     /** A function to perform a morphological erosion on an image */
-    void executeImageErode(std::string inImage, std::string outImage, std::string morphOperatorFile, bool useOperatorFile, unsigned int morphOpSize, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException)
+    void executeImageErode(std::string inImage, std::string outImage, std::string morphOperatorFile, bool useOperatorFile, unsigned int morphOpSize, std::string gdalFormat, RSGISLibDataType outDataType)
     {
         try
         {
@@ -158,7 +158,7 @@ namespace rsgis{ namespace cmds {
     }
     
     /** A function to calculate a morphological gradiance for an image */
-    void executeImageGradiant(std::string inImage, std::string outImage, std::string morphOperatorFile, bool useOperatorFile, unsigned int morphOpSize, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException)
+    void executeImageGradiant(std::string inImage, std::string outImage, std::string morphOperatorFile, bool useOperatorFile, unsigned int morphOpSize, std::string gdalFormat, RSGISLibDataType outDataType)
     {
         try
         {
@@ -203,7 +203,7 @@ namespace rsgis{ namespace cmds {
     }
     
     /** A function to perform a morphological dilation on an image combining the results of the output bands into a single image band */
-    void executeImageDilateCombinedOut(std::string inImage, std::string outImage, std::string morphOperatorFile, bool useOperatorFile, unsigned int morphOpSize, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException)
+    void executeImageDilateCombinedOut(std::string inImage, std::string outImage, std::string morphOperatorFile, bool useOperatorFile, unsigned int morphOpSize, std::string gdalFormat, RSGISLibDataType outDataType)
     {
         try
         {
@@ -248,7 +248,7 @@ namespace rsgis{ namespace cmds {
     }
     
     /** A function to perform a morphological erosion on an image combining the results of the output bands into a single image band */
-    void executeImageErodeCombinedOut(std::string inImage, std::string outImage, std::string morphOperatorFile, bool useOperatorFile, unsigned int morphOpSize, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException)
+    void executeImageErodeCombinedOut(std::string inImage, std::string outImage, std::string morphOperatorFile, bool useOperatorFile, unsigned int morphOpSize, std::string gdalFormat, RSGISLibDataType outDataType)
     {
         try
         {
@@ -293,7 +293,7 @@ namespace rsgis{ namespace cmds {
     }
     
     /** A function to calculate a morphological gradiance for an image combining the results of the output bands into a single image band */
-    void executeImageGradiantCombinedOut(std::string inImage, std::string outImage, std::string morphOperatorFile, bool useOperatorFile, unsigned int morphOpSize, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException)
+    void executeImageGradiantCombinedOut(std::string inImage, std::string outImage, std::string morphOperatorFile, bool useOperatorFile, unsigned int morphOpSize, std::string gdalFormat, RSGISLibDataType outDataType)
     {
         try
         {
@@ -338,7 +338,7 @@ namespace rsgis{ namespace cmds {
     }
     
     /** A function to perform a morphological operation to find local minima */
-    void executeImageLocalMinima(std::string inImage, std::string outImage, bool outputSequencial, bool allowEquals, std::string morphOperatorFile, bool useOperatorFile, unsigned int morphOpSize, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException)
+    void executeImageLocalMinima(std::string inImage, std::string outImage, bool outputSequencial, bool allowEquals, std::string morphOperatorFile, bool useOperatorFile, unsigned int morphOpSize, std::string gdalFormat, RSGISLibDataType outDataType)
     {
         try
         {
@@ -393,7 +393,7 @@ namespace rsgis{ namespace cmds {
     }
     
     /** A function to perform a morphological operation to find local minima combining the results of the output bands into a single image band */
-    void executeImageLocalMinimaCombinedOut(std::string inImage, std::string outImage, bool outputSequencial, bool allowEquals, std::string morphOperatorFile, bool useOperatorFile, unsigned int morphOpSize, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException)
+    void executeImageLocalMinimaCombinedOut(std::string inImage, std::string outImage, bool outputSequencial, bool allowEquals, std::string morphOperatorFile, bool useOperatorFile, unsigned int morphOpSize, std::string gdalFormat, RSGISLibDataType outDataType)
     {
         try
         {
@@ -448,7 +448,7 @@ namespace rsgis{ namespace cmds {
     }
     
     /** A function to perform a morphological opening on an image */
-    void executeImageOpening(std::string inImage, std::string outImage, std::string tmpImage, std::string morphOperatorFile, bool useOperatorFile, unsigned int morphOpSize, unsigned int numIterations, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException)
+    void executeImageOpening(std::string inImage, std::string outImage, std::string tmpImage, std::string morphOperatorFile, bool useOperatorFile, unsigned int morphOpSize, unsigned int numIterations, std::string gdalFormat, RSGISLibDataType outDataType)
     {
         try
         {
@@ -499,7 +499,7 @@ namespace rsgis{ namespace cmds {
     }
     
     /** A function to perform a morphological closing on an image */
-    void executeImageClosing(std::string inImage, std::string outImage, std::string tmpImage, std::string morphOperatorFile, bool useOperatorFile, unsigned int morphOpSize, unsigned int numIterations, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException)
+    void executeImageClosing(std::string inImage, std::string outImage, std::string tmpImage, std::string morphOperatorFile, bool useOperatorFile, unsigned int morphOpSize, unsigned int numIterations, std::string gdalFormat, RSGISLibDataType outDataType)
     {
         try
         {
@@ -550,7 +550,7 @@ namespace rsgis{ namespace cmds {
     }
     
     /** A function to perform a morphological black top hat on an image */
-    void executeImageBlackTopHat(std::string inImage, std::string outImage, std::string tmpImage, std::string morphOperatorFile, bool useOperatorFile, unsigned int morphOpSize, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException)
+    void executeImageBlackTopHat(std::string inImage, std::string outImage, std::string tmpImage, std::string morphOperatorFile, bool useOperatorFile, unsigned int morphOpSize, std::string gdalFormat, RSGISLibDataType outDataType)
     {
         try
         {
@@ -601,7 +601,7 @@ namespace rsgis{ namespace cmds {
     }
     
     /** A function to perform a morphological white top hat on an image */
-    void executeImageWhiteTopHat(std::string inImage, std::string outImage, std::string tmpImage, std::string morphOperatorFile, bool useOperatorFile, unsigned int morphOpSize, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException)
+    void executeImageWhiteTopHat(std::string inImage, std::string outImage, std::string tmpImage, std::string morphOperatorFile, bool useOperatorFile, unsigned int morphOpSize, std::string gdalFormat, RSGISLibDataType outDataType)
     {
         try
         {

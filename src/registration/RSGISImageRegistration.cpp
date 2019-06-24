@@ -44,7 +44,7 @@ namespace rsgis{namespace reg{
 		this->finaliseRegistration();
 	}
 	
-	void RSGISImageRegistration::findOverlap() throw(RSGISRegistrationException)
+	void RSGISImageRegistration::findOverlap()
 	{
 		try 
 		{
@@ -97,7 +97,7 @@ namespace rsgis{namespace reg{
 		overlapDefined = true;
 	}
 	
-	void RSGISImageRegistration::defineFirstTiePoint(unsigned int *startXOff, unsigned int *startYOff, unsigned int numXPts, unsigned int numYPts, unsigned int gap) throw(RSGISRegistrationException)
+	void RSGISImageRegistration::defineFirstTiePoint(unsigned int *startXOff, unsigned int *startYOff, unsigned int numXPts, unsigned int numYPts, unsigned int gap)
 	{
 		if(!overlapDefined)
 		{
@@ -114,7 +114,7 @@ namespace rsgis{namespace reg{
 
 	}
 	
-	float RSGISImageRegistration::findTiePointLocation(TiePoint *tiePt, unsigned int windowSize, unsigned int searchArea, RSGISImageSimilarityMetric *metric, float metricThreshold, unsigned int subPixelResolution, float *moveInX, float *moveInY) throw(RSGISRegistrationException)
+	float RSGISImageRegistration::findTiePointLocation(TiePoint *tiePt, unsigned int windowSize, unsigned int searchArea, RSGISImageSimilarityMetric *metric, float metricThreshold, unsigned int subPixelResolution, float *moveInX, float *moveInY)
 	{
 		float distanceMoved = 0;
 		
@@ -411,7 +411,7 @@ namespace rsgis{namespace reg{
 		return distanceMoved;
 	}
     
-    float RSGISImageRegistration::findTiePointLocation(TiePoint *tiePt, unsigned int windowSize, unsigned int searchArea, RSGISImageSimilarityMetric *metric, unsigned int subPixelResolution, float *moveInX, float *moveInY) throw(RSGISRegistrationException)
+    float RSGISImageRegistration::findTiePointLocation(TiePoint *tiePt, unsigned int windowSize, unsigned int searchArea, RSGISImageSimilarityMetric *metric, unsigned int subPixelResolution, float *moveInX, float *moveInY)
 	{
 		float distanceMoved = 0;
 		
@@ -710,7 +710,7 @@ namespace rsgis{namespace reg{
             
             // Predict coresponding y value.
             double yPredicted = 0;
-			for(unsigned int j = 0; j < order ; j++)
+			for(unsigned int j = 0; j < order; j++)
 			{
 				double xPow = pow(extremeX, static_cast<int>(j)); // x^n;
 				double coeff = gsl_vector_get(coefficients, j); // a_n
@@ -732,7 +732,7 @@ namespace rsgis{namespace reg{
             
             // Predict coresponding y value.
             double yPredicted1 = 0;
-			for(unsigned int j = 0; j < order ; j++)
+			for(unsigned int j = 0; j < order; j++)
 			{
 				double xPow = pow(xValue1, static_cast<int>(j)); // x^n;
 				double coeff = gsl_vector_get(coefficients, j); // a_n
@@ -741,7 +741,7 @@ namespace rsgis{namespace reg{
 			}
             
             double yPredicted2 = 0;
-			for(unsigned int j = 0; j < order ; j++)
+			for(unsigned int j = 0; j < order; j++)
 			{
 				double xPow = pow(xValue2, static_cast<int>(j)); // x^n;
 				double coeff = gsl_vector_get(coefficients, j); // a_n
@@ -766,7 +766,7 @@ namespace rsgis{namespace reg{
                 {
                     xValue = minRange + (i*division);
                     yPredicted = 0;
-                    for(unsigned int j = 0; j < order ; j++)
+                    for(unsigned int j = 0; j < order; j++)
                     {
                         double xPow = pow(xValue, static_cast<int>(j)); // x^n;
                         double coeff = gsl_vector_get(coefficients, j); // a_n
@@ -799,7 +799,7 @@ namespace rsgis{namespace reg{
             {
 			xValue = minRange + (i*division);
 			yPredicted = 0;
-			for(unsigned int j = 0; j < order ; j++)
+			for(unsigned int j = 0; j < order; j++)
 			{
 				double xPow = pow(xValue, static_cast<int>(j)); // x^n;
 				double coeff = gsl_vector_get(coefficients, j); // a_n
@@ -829,7 +829,7 @@ namespace rsgis{namespace reg{
 		return extremeX;
 	}
 	
-    void RSGISImageRegistration::getImageOverlapFloat(GDALDataset **datasets, int numDS,  float **dsOffsets, int *width, int *height, double *gdalTransform) throw(RSGISRegistrationException)
+    void RSGISImageRegistration::getImageOverlapFloat(GDALDataset **datasets, int numDS,  float **dsOffsets, int *width, int *height, double *gdalTransform)
 	{
         /**
          Get the overlap of two images. Like getImageOverlap in image utils, however the offsets are retured as floats.
@@ -1025,7 +1025,7 @@ namespace rsgis{namespace reg{
 		}
 	}
     
-    void RSGISImageRegistration::getImageOverlapWithFloatShift(float xShift, float yShift, int **dsOffsets, int *width, int *height, double *gdalTransform, geos::geom::Envelope *env, float *remainderX, float *remainderY) throw(RSGISRegistrationException)
+    void RSGISImageRegistration::getImageOverlapWithFloatShift(float xShift, float yShift, int **dsOffsets, int *width, int *height, double *gdalTransform, geos::geom::Envelope *env, float *remainderX, float *remainderY)
 	{
 		if(!overlapDefined)
 		{
@@ -1349,7 +1349,7 @@ namespace rsgis{namespace reg{
 		return stdDev;
 	}
 	
-	void RSGISImageRegistration::exportTiePointsENVIImage2MapImpl(std::string filepath, std::list<TiePoint*> *tiePts) throw(RSGISRegistrationException)
+	void RSGISImageRegistration::exportTiePointsENVIImage2MapImpl(std::string filepath, std::list<TiePoint*> *tiePts)
 	{
         std::ofstream outPtsFile(filepath.c_str(), std::ios::out | std::ios::trunc);
 		
@@ -1382,7 +1382,7 @@ namespace rsgis{namespace reg{
 		outPtsFile.close();
 	}
 	
-	void RSGISImageRegistration::exportTiePointsENVIImage2ImageImpl(std::string filepath, std::list<TiePoint*> *tiePts) throw(RSGISRegistrationException)
+	void RSGISImageRegistration::exportTiePointsENVIImage2ImageImpl(std::string filepath, std::list<TiePoint*> *tiePts)
 	{
         std::ofstream outPtsFile(filepath.c_str(), std::ios::out | std::ios::trunc);
 		
@@ -1415,7 +1415,7 @@ namespace rsgis{namespace reg{
 		outPtsFile.close();
 	}
 	
-	void RSGISImageRegistration::exportTiePointsRSGISImage2MapImpl(std::string filepath, std::list<TiePoint*> *tiePts) throw(RSGISRegistrationException)
+	void RSGISImageRegistration::exportTiePointsRSGISImage2MapImpl(std::string filepath, std::list<TiePoint*> *tiePts)
 	{
 		std::ofstream outPtsFile(filepath.c_str(), std::ios::out | std::ios::trunc);
 		
@@ -1449,7 +1449,7 @@ namespace rsgis{namespace reg{
 		outPtsFile.close();
 	}
     
-    void RSGISImageRegistration::exportTiePointsRSGISMapOffsImpl(std::string filepath, std::list<TiePoint*> *tiePts)throw(RSGISRegistrationException)
+    void RSGISImageRegistration::exportTiePointsRSGISMapOffsImpl(std::string filepath, std::list<TiePoint*> *tiePts)
     {
         std::ofstream outPtsFile(filepath.c_str(), std::ios::out | std::ios::trunc);
 		

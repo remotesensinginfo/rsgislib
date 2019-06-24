@@ -53,7 +53,7 @@ namespace rsgis{namespace img{
     {
         public:
             RSGISImgSummaryStatsFromMultiResImgs();
-            void calcSummaryStats4LowResPxlsFromHighResImg(GDALDataset *refDataset, GDALDataset *statsDataset, unsigned int statsImgBand, std::string outImg, std::string gdalFormat, GDALDataType gdalDataType, bool useNoData, std::vector<rsgis::math::rsgissummarytype> sumStats, unsigned int xIOGrid, unsigned int yIOGrid) throw(RSGISImageException);
+            void calcSummaryStats4LowResPxlsFromHighResImg(GDALDataset *refDataset, GDALDataset *statsDataset, unsigned int statsImgBand, std::string outImg, std::string gdalFormat, GDALDataType gdalDataType, bool useNoData, std::vector<rsgis::math::rsgissummarytype> sumStats, unsigned int xIOGrid, unsigned int yIOGrid);
             ~RSGISImgSummaryStatsFromMultiResImgs();
     };
     
@@ -65,7 +65,7 @@ namespace rsgis{namespace img{
     {
     public:
         RSGISCalcHighResImgSummaryStats(int numberOutBands, std::vector<rsgis::math::rsgissummarytype> sumStats);
-        void calcImageValue(float *bandValues, int numInVals, bool useNoData, float noDataVal, double *output) throw(RSGISImageCalcException);
+        void calcImageValue(float *bandValues, int numInVals, bool useNoData, float noDataVal, double *output);
         ~RSGISCalcHighResImgSummaryStats();
     protected:
         std::vector<rsgis::math::rsgissummarytype> sumStats;

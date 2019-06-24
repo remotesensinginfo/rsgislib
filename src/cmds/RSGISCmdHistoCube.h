@@ -60,22 +60,22 @@ namespace rsgis{ namespace cmds {
     };
     
     /** A function to create an empty histocube file ready to be populated */
-    DllExport void executeCreateEmptyHistoCube(std::string histCubeFile, unsigned long numFeats)throw(RSGISCmdException);
+    DllExport void executeCreateEmptyHistoCube(std::string histCubeFile, unsigned long numFeats);
     
     /** A function to create a zero'd histocube layer */
-    DllExport void executeCreateHistoCubeLayer(std::string histCubeFile, std::string layerName, int lowBin, int upBin, float scale, float offset, bool hasDateTime, std::string dataTime)throw(RSGISCmdException);
+    DllExport void executeCreateHistoCubeLayer(std::string histCubeFile, std::string layerName, int lowBin, int upBin, float scale, float offset, bool hasDateTime, std::string dataTime);
     
     /** A function to populate a single histogram layer from multiple input files */
-    DllExport void executePopulateSingleHistoCubeLayer(std::string histCubeFile, std::string layerName, std::string clumpsImg, std::string valsImg, unsigned int imgBand, bool inMem)throw(RSGISCmdException);
+    DllExport void executePopulateSingleHistoCubeLayer(std::string histCubeFile, std::string layerName, std::string clumpsImg, std::string valsImg, unsigned int imgBand, bool inMem);
     
     /** A function to export histogram columns as a multi-band image dataset */
-    DllExport void executeExportHistBins2Img(std::string histCubeFile, std::string layerName, std::string clumpsImg, std::string outputImg, std::string gdalFormat, std::vector<unsigned int> exportBins) throw(RSGISCmdException);
+    DllExport void executeExportHistBins2Img(std::string histCubeFile, std::string layerName, std::string clumpsImg, std::string outputImg, std::string gdalFormat, std::vector<unsigned int> exportBins);
     
     /** A function to get a list of all the datasets layers within a histocube file*/
-    DllExport std::vector<std::string> executeExportHistBins2Img(std::string histCubeFile)throw(RSGISCmdException);
+    DllExport std::vector<std::string> executeExportHistBins2Img(std::string histCubeFile);
     
     /** A function to export statistics from each histogram to an output image */
-    DllExport void executeExportHistStats2Img(std::string histCubeFile, std::string layerName, std::string clumpsImg, std::string outputImg, std::string gdalFormat, RSGISLibDataType outDataType, std::vector<RSGISCmdsHistSummariseStats> exportStats) throw(RSGISCmdException);
+    DllExport void executeExportHistStats2Img(std::string histCubeFile, std::string layerName, std::string clumpsImg, std::string outputImg, std::string gdalFormat, RSGISLibDataType outDataType, std::vector<RSGISCmdsHistSummariseStats> exportStats);
 
 }}
 

@@ -25,7 +25,7 @@
 
 namespace rsgis{namespace img{
             
-    bool RSGISClumpImage::calcValue(bool firstIter, unsigned int numBands, unsigned int *dataCol, unsigned int **rowAbove, unsigned int **rowBelow, unsigned int *left, unsigned int *right)throw(RSGISImageCalcException)
+    bool RSGISClumpImage::calcValue(bool firstIter, unsigned int numBands, unsigned int *dataCol, unsigned int **rowAbove, unsigned int **rowBelow, unsigned int *left, unsigned int *right)
     {
         bool valChange = false;
         
@@ -96,7 +96,7 @@ namespace rsgis{namespace img{
         nextPixelVal = 1;
     }
     
-    void RSGISUniquePixelClumps::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+    void RSGISUniquePixelClumps::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         bool validData = true;
         if(noDataDefined)

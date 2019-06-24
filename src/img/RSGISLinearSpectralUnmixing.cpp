@@ -33,7 +33,7 @@ namespace rsgis{namespace img{
         this->offset = offset;
     }
     
-    void RSGISCalcLinearSpectralUnmixing::performUnconstainedLinearSpectralUnmixing(GDALDataset **datasets, int numDatasets, std::string outputImage, std::string endmembersFilePath)throw(RSGISImageCalcException)
+    void RSGISCalcLinearSpectralUnmixing::performUnconstainedLinearSpectralUnmixing(GDALDataset **datasets, int numDatasets, std::string outputImage, std::string endmembersFilePath)
     {
         try
         {
@@ -90,7 +90,7 @@ namespace rsgis{namespace img{
         }
     }
     
-    void RSGISCalcLinearSpectralUnmixing::performPartConstainedLinearSpectralUnmixing(GDALDataset **datasets, int numDatasets, std::string outputImage, std::string endmembersFilePath, float weight) throw(RSGISImageCalcException)
+    void RSGISCalcLinearSpectralUnmixing::performPartConstainedLinearSpectralUnmixing(GDALDataset **datasets, int numDatasets, std::string outputImage, std::string endmembersFilePath, float weight) 
     {
         
         try
@@ -164,7 +164,7 @@ namespace rsgis{namespace img{
         }
     }
     
-    void RSGISCalcLinearSpectralUnmixing::performConstainedNNLinearSpectralUnmixing(GDALDataset **datasets, int numDatasets, std::string outputImage, std::string endmembersFilePath, float weight) throw(RSGISImageCalcException)
+    void RSGISCalcLinearSpectralUnmixing::performConstainedNNLinearSpectralUnmixing(GDALDataset **datasets, int numDatasets, std::string outputImage, std::string endmembersFilePath, float weight) 
     {
         try
         {
@@ -285,7 +285,7 @@ namespace rsgis{namespace img{
     }
     
     
-    void RSGISCalcLinearSpectralUnmixing::performExhaustiveConstrainedSpectralUnmixing(GDALDataset **datasets, int numDatasets, std::string outputImage, std::string endmembersFilePath, float stepResolution)throw(RSGISImageCalcException)
+    void RSGISCalcLinearSpectralUnmixing::performExhaustiveConstrainedSpectralUnmixing(GDALDataset **datasets, int numDatasets, std::string outputImage, std::string endmembersFilePath, float stepResolution)
     {
         try
         {
@@ -352,7 +352,7 @@ namespace rsgis{namespace img{
         this->offset = offset;
     }
         
-    void RSGISUnconstrainedLinearSpectralUnmixing::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+    void RSGISUnconstrainedLinearSpectralUnmixing::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         try 
         {
@@ -407,7 +407,7 @@ namespace rsgis{namespace img{
         this->offset = offset;
     }
     
-    void RSGISPartConstrainedLinearSpectralUnmixing::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+    void RSGISPartConstrainedLinearSpectralUnmixing::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         try 
         {
@@ -459,7 +459,7 @@ namespace rsgis{namespace img{
         this->offset = offset;
     }
     
-    void RSGISExhaustiveLinearSpectralUnmixing::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+    void RSGISExhaustiveLinearSpectralUnmixing::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         // All values have to be greater than zero.
         
@@ -622,7 +622,7 @@ namespace rsgis{namespace img{
         delete[] normBandVals;
     }
     
-    float RSGISExhaustiveLinearSpectralUnmixing::calcDistance2MeasuredSpectra(float em1Val, float em2Val, float em3Val, float *normSpectra, unsigned int numBands) throw(RSGISImageCalcException)
+    float RSGISExhaustiveLinearSpectralUnmixing::calcDistance2MeasuredSpectra(float em1Val, float em2Val, float em3Val, float *normSpectra, unsigned int numBands) 
     {
         float *genSpectra = new float[numBands];
         for(unsigned int i = 0; i < numBands; ++i)
@@ -643,7 +643,7 @@ namespace rsgis{namespace img{
         return errorVal;
     }
     
-    float RSGISExhaustiveLinearSpectralUnmixing::calcDistance2MeasuredSpectra(float em1Val, float em2Val, float *normSpectra, unsigned int numBands) throw(RSGISImageCalcException)
+    float RSGISExhaustiveLinearSpectralUnmixing::calcDistance2MeasuredSpectra(float em1Val, float em2Val, float *normSpectra, unsigned int numBands) 
     {
         float *genSpectra = new float[numBands];
         for(unsigned int i = 0; i < numBands; ++i)

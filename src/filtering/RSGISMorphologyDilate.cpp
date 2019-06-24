@@ -29,7 +29,7 @@ namespace rsgis{namespace filter{
 
 	}
 
-	void RSGISImageMorphologyDilate::dilateImage(GDALDataset **datasets, std::string outputImage,rsgis::math::Matrix *matrixOperator, std::string format, GDALDataType outDataType) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
+	void RSGISImageMorphologyDilate::dilateImage(GDALDataset **datasets, std::string outputImage,rsgis::math::Matrix *matrixOperator, std::string format, GDALDataType outDataType)
 	{
         if(matrixOperator->n != matrixOperator->m)
         {
@@ -54,7 +54,7 @@ namespace rsgis{namespace filter{
         delete dilateImage;
 	}
     
-    void RSGISImageMorphologyDilate::dilateImageAll(GDALDataset **datasets, std::string outputImage,rsgis::math::Matrix*matrixOperator, std::string format, GDALDataType outDataType) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
+    void RSGISImageMorphologyDilate::dilateImageAll(GDALDataset **datasets, std::string outputImage,rsgis::math::Matrix*matrixOperator, std::string format, GDALDataType outDataType)
 	{
         if(matrixOperator->n != matrixOperator->m)
         {
@@ -83,7 +83,7 @@ namespace rsgis{namespace filter{
         this->matrixOperator = matrixOperator;
 	}
 
-	void RSGISMorphologyDilate::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISMorphologyDilate::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
 	{
 		bool first = true;
 		double *largest = new double[numBands];
@@ -139,7 +139,7 @@ namespace rsgis{namespace filter{
         this->matrixOperator = matrixOperator;
 	}
     
-	void RSGISMorphologyDilateAll::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISMorphologyDilateAll::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
 	{
 		bool first = true;
 		double largest = 0;

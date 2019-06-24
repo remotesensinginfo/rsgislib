@@ -34,7 +34,7 @@ namespace rsgis { namespace img {
 		this->imageStats = imageStats;
 	}
 	
-	void RSGISHCSPanSharpen::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+	void RSGISHCSPanSharpen::calcImageValue(float *bandValues, int numBands, double *output) 
 	{
 		float meanMS = this->imageStats[0];
 		float meanPAN = this->imageStats[1];
@@ -91,7 +91,7 @@ namespace rsgis { namespace img {
 	}
 	
 	
-	void RSGISHCSPanSharpen::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException)
+	void RSGISHCSPanSharpen::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
 	{
 		
 		//dataBlock[k][i][j]; k = band; j = y axis; i = x axis
@@ -182,7 +182,7 @@ namespace rsgis { namespace img {
 		this->nPix = 0;
 	}
 	
-	void RSGISHCSPanSharpenCalcMeanStats::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+	void RSGISHCSPanSharpenCalcMeanStats::calcImageValue(float *bandValues, int numBands) 
 	{
 		
 		if(bandValues[0] > 0)
@@ -216,7 +216,7 @@ namespace rsgis { namespace img {
 		this->nPix = 0;
 	}
 	
-	void RSGISHCSPanSharpenCalcSDStats::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+	void RSGISHCSPanSharpenCalcSDStats::calcImageValue(float *bandValues, int numBands) 
 	{
 		if(bandValues[0] > 0)
 		{

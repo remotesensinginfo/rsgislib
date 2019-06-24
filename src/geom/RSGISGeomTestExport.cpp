@@ -139,7 +139,7 @@ namespace rsgis{namespace geom{
 		return outPoint;
 	}
 
-	bool RSGISGeomTestExport::checkDIR4SHP(std::string dir, std::string shp) throw(RSGISGeometryException)
+	bool RSGISGeomTestExport::checkDIR4SHP(std::string dir, std::string shp)
 	{
         rsgis::utils::RSGISFileUtils fileUtils;
 		std::string *dirList = NULL;
@@ -160,7 +160,7 @@ namespace rsgis{namespace geom{
 				}
 			}
 		}
-		catch(rsgis::RSGISException e)
+		catch(rsgis::RSGISException &e)
 		{
 			std::cout << e.what() << std::endl;
 			throw RSGISGeometryException(e.what());
@@ -170,7 +170,7 @@ namespace rsgis{namespace geom{
 		return returnVal;
 	}
 	
-	void RSGISGeomTestExport::deleteSHP(std::string dir, std::string shp) throw(RSGISGeometryException)
+	void RSGISGeomTestExport::deleteSHP(std::string dir, std::string shp)
 	{
 		rsgis::utils::RSGISFileUtils fileUtils;
 		std::string *dirList = NULL;
@@ -242,7 +242,7 @@ namespace rsgis{namespace geom{
 				}
 			}
 		}
-		catch(rsgis::RSGISException e)
+		catch(rsgis::RSGISException &e)
 		{
 			throw RSGISGeometryException(e.what());
 		}
@@ -250,7 +250,7 @@ namespace rsgis{namespace geom{
 	}
 	
 	
-	void RSGISGeomTestExport::exportGEOSPolygons2SHP(std::string outputFile, bool deleteIfPresent, std::list<geos::geom::Polygon*> *polys) throw(RSGISGeometryException)
+	void RSGISGeomTestExport::exportGEOSPolygons2SHP(std::string outputFile, bool deleteIfPresent, std::list<geos::geom::Polygon*> *polys)
 	{
 		OGRRegisterAll();
 		rsgis::utils::RSGISFileUtils fileUtils;
@@ -323,7 +323,7 @@ namespace rsgis{namespace geom{
 		GDALClose(outputSHPDS);
 	}
 	
-	void RSGISGeomTestExport::exportGEOSPolygons2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::Polygon*> *polys) throw(RSGISGeometryException)
+	void RSGISGeomTestExport::exportGEOSPolygons2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::Polygon*> *polys)
 	{
 		OGRRegisterAll();
         rsgis::utils::RSGISFileUtils fileUtils;
@@ -396,7 +396,7 @@ namespace rsgis{namespace geom{
 		GDALClose(outputSHPDS);
 	}
 	
-	void RSGISGeomTestExport::exportGEOSCoordinates2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::Coordinate*> *coords) throw(RSGISGeometryException)
+	void RSGISGeomTestExport::exportGEOSCoordinates2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::Coordinate*> *coords)
 	{
 		OGRRegisterAll();
         rsgis::utils::RSGISFileUtils fileUtils;
@@ -469,7 +469,7 @@ namespace rsgis{namespace geom{
 		GDALClose(outputSHPDS);
 	}
 	
-	void RSGISGeomTestExport::exportGEOSLineStrings2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::LineString*> *lines) throw(RSGISGeometryException)
+	void RSGISGeomTestExport::exportGEOSLineStrings2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::LineString*> *lines)
 	{
 		OGRRegisterAll();
         rsgis::utils::RSGISFileUtils fileUtils;
@@ -543,7 +543,7 @@ namespace rsgis{namespace geom{
 		GDALClose(outputSHPDS);
 	}
 	
-	void RSGISGeomTestExport::exportGEOSLineSegments2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::LineSegment*> *lines) throw(RSGISGeometryException)
+	void RSGISGeomTestExport::exportGEOSLineSegments2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::LineSegment*> *lines)
 	{
 		OGRRegisterAll();
         rsgis::utils::RSGISFileUtils fileUtils;
@@ -616,7 +616,7 @@ namespace rsgis{namespace geom{
 		GDALClose(outputSHPDS);
 	}
     
-    void RSGISGeomTestExport::exportGEOSLineSegments2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::LineSegment*> *lines, std::vector<double> *vals) throw(RSGISGeometryException)
+    void RSGISGeomTestExport::exportGEOSLineSegments2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::LineSegment*> *lines, std::vector<double> *vals)
     {
         if(lines->size() != vals->size())
         {

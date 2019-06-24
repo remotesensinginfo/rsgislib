@@ -53,7 +53,7 @@ namespace rsgis{namespace rastergis{
     {
     public:
         RSGISRATCalc(RSGISRATCalcValue *ratCalcVal);
-        virtual void calcRATValues(GDALRasterAttributeTable *gdalRAT, std::vector<unsigned int> inRealColIdx, std::vector<unsigned int> inIntColIdx, std::vector<unsigned int> inStrColIdx, std::vector<unsigned int> outRealColIdx, std::vector<unsigned int> outIntColIdx, std::vector<unsigned int> outStrColIdx) throw(RSGISAttributeTableException);
+        virtual void calcRATValues(GDALRasterAttributeTable *gdalRAT, std::vector<unsigned int> inRealColIdx, std::vector<unsigned int> inIntColIdx, std::vector<unsigned int> inStrColIdx, std::vector<unsigned int> outRealColIdx, std::vector<unsigned int> outIntColIdx, std::vector<unsigned int> outStrColIdx);
         virtual ~RSGISRATCalc();
     protected:
         RSGISRATCalcValue *ratCalcVal;

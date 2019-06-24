@@ -24,24 +24,24 @@
 
 namespace rsgis{ namespace classifier{
 
-	RSGISNearestNeighbourClassifier::RSGISNearestNeighbourClassifier(ClassData **trainingData, int numClasses) throw(RSGISClassificationException) : RSGISClassifier(trainingData, numClasses)
+	RSGISNearestNeighbourClassifier::RSGISNearestNeighbourClassifier(ClassData **trainingData, int numClasses) : RSGISClassifier(trainingData, numClasses)
 	{
 
 	}
 	
-	int RSGISNearestNeighbourClassifier::getClassID(float *variables, int numVars) throw(RSGISClassificationException)
+	int RSGISNearestNeighbourClassifier::getClassID(float *variables, int numVars)
 	{
 		ClassData *classToReturn = this->findClass(variables, numVars);
 		return classToReturn->classID;
 	}
 	
-	std::string RSGISNearestNeighbourClassifier::getClassName(float *variables, int numVars) throw(RSGISClassificationException)
+	std::string RSGISNearestNeighbourClassifier::getClassName(float *variables, int numVars)
 	{
 		ClassData *classToReturn = this->findClass(variables, numVars);
 		return classToReturn->className;
 	}
 	
-	ClassData* RSGISNearestNeighbourClassifier::findClass(float *variables, int numVars) throw(RSGISClassificationException)
+	ClassData* RSGISNearestNeighbourClassifier::findClass(float *variables, int numVars)
 	{
 		double distance = 0;
 		double minDistance = 0;
@@ -66,7 +66,7 @@ namespace rsgis{ namespace classifier{
 		return minDistData;
 	}
 	
-	double RSGISNearestNeighbourClassifier::findClosestPointInClass(ClassData *data, float *variables, int numVars) throw(RSGISClassificationException)
+	double RSGISNearestNeighbourClassifier::findClosestPointInClass(ClassData *data, float *variables, int numVars)
 	{
 		double minDistance = 0;
 		double distance = 0;

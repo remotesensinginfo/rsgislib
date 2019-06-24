@@ -32,7 +32,7 @@ namespace rsgis {namespace histocube{
         
     }
     
-    long RSGISHistoCubeUtils::getBinsIndex(int val, std::vector<int> bins) throw(rsgis::RSGISHistoCubeException)
+    long RSGISHistoCubeUtils::getBinsIndex(int val, std::vector<int> bins)
     {
         long idx = -1;
         try

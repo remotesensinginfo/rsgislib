@@ -37,7 +37,7 @@ namespace rsgis{ namespace cmds {
     
     
     
-    void executeCreateEmptyHistoCube(std::string histCubeFile, unsigned long numFeats)throw(RSGISCmdException)
+    void executeCreateEmptyHistoCube(std::string histCubeFile, unsigned long numFeats)
     {
         try
         {
@@ -51,7 +51,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void executeCreateHistoCubeLayer(std::string histCubeFile, std::string layerName, int lowBin, int upBin, float scale, float offset, bool hasDateTime, std::string dataTime)throw(RSGISCmdException)
+    void executeCreateHistoCubeLayer(std::string histCubeFile, std::string layerName, int lowBin, int upBin, float scale, float offset, bool hasDateTime, std::string dataTime)
     {
         try
         {
@@ -83,7 +83,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void executePopulateSingleHistoCubeLayer(std::string histCubeFile, std::string layerName, std::string clumpsImg, std::string valsImg, unsigned int imgBand, bool inMem)throw(RSGISCmdException)
+    void executePopulateSingleHistoCubeLayer(std::string histCubeFile, std::string layerName, std::string clumpsImg, std::string valsImg, unsigned int imgBand, bool inMem)
     {
         GDALAllRegister();
         try
@@ -182,7 +182,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void executeExportHistBins2Img(std::string histCubeFile, std::string layerName, std::string clumpsImg, std::string outputImg, std::string gdalFormat, std::vector<unsigned int> exportBins) throw(RSGISCmdException)
+    void executeExportHistBins2Img(std::string histCubeFile, std::string layerName, std::string clumpsImg, std::string outputImg, std::string gdalFormat, std::vector<unsigned int> exportBins) 
     {
         GDALAllRegister();
         try
@@ -244,7 +244,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    std::vector<std::string> executeExportHistBins2Img(std::string histCubeFile)throw(RSGISCmdException)
+    std::vector<std::string> executeExportHistBins2Img(std::string histCubeFile)
     {
         std::vector<std::string> lyrNames;
         try
@@ -267,7 +267,7 @@ namespace rsgis{ namespace cmds {
         return lyrNames;
     }
     
-    void executeExportHistStats2Img(std::string histCubeFile, std::string layerName, std::string clumpsImg, std::string outputImg, std::string gdalFormat, RSGISLibDataType outDataType, std::vector<RSGISCmdsHistSummariseStats> exportStats) throw(RSGISCmdException)
+    void executeExportHistStats2Img(std::string histCubeFile, std::string layerName, std::string clumpsImg, std::string outputImg, std::string gdalFormat, RSGISLibDataType outDataType, std::vector<RSGISCmdsHistSummariseStats> exportStats) 
     {
         GDALAllRegister();
         try

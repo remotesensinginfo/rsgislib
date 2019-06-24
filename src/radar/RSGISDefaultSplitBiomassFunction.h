@@ -72,10 +72,10 @@ namespace rsgis
 				 */ 
 			public:
 				RSGISDefaultSplitBiomassFunction(double coefAGT, double coefBGT, double coefALT, double coefBLT, double split);
-				virtual double calcFunction(double value) throw(rsgis::math::RSGISMathException);
-				virtual double dX(double value) throw(rsgis::math::RSGISMathException){throw rsgis::math::RSGISMathException("Not implemented");};
-				virtual int numCoefficients() throw(rsgis::math::RSGISMathException){return 5;};
-				virtual void updateCoefficents(double *newCoefficents) throw(rsgis::math::RSGISMathException){throw rsgis::math::RSGISMathException("Not implemented");};
+				virtual double calcFunction(double value);
+				virtual double dX(double value){throw rsgis::math::RSGISMathException("Not implemented");};
+				virtual int numCoefficients(){return 5;};
+				virtual void updateCoefficents(double *newCoefficents){throw rsgis::math::RSGISMathException("Not implemented");};
 				~RSGISDefaultSplitBiomassFunction();
 			protected:
 				double coefAGT;

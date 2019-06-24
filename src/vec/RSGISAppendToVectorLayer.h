@@ -54,8 +54,8 @@ namespace rsgis{namespace vec{
 	{
 	public:
 		RSGISAppendToVectorLayer();
-		void appendLayer(OGRLayer *input, OGRLayer *outputLayer, bool ignoreAttr)throw(RSGISVectorException);
-		void copyFeatureDefn(OGRLayer *outputSHPLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
+		void appendLayer(OGRLayer *input, OGRLayer *outputLayer, bool ignoreAttr);
+		void copyFeatureDefn(OGRLayer *outputSHPLayer, OGRFeatureDefn *inFeatureDefn);
 		void copyFeatureData(OGRFeature *inFeature, OGRFeature *outFeature, OGRFeatureDefn *inFeatureDefn, OGRFeatureDefn *outFeatureDefn);
 		~RSGISAppendToVectorLayer();
 	};

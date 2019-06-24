@@ -30,7 +30,7 @@ namespace rsgis{namespace utils{
         
     }
 
-    void RSGISFileUtils::getDIRList(std::string dir, std::list<std::string> *files) throw(RSGISFileException)
+    void RSGISFileUtils::getDIRList(std::string dir, std::list<std::string> *files)
     {
         boost::filesystem::path inDIR(dir);
         try
@@ -61,7 +61,7 @@ namespace rsgis{namespace utils{
         }
     }
 
-    void RSGISFileUtils::getDIRList(std::string dir, std::vector<std::string> *files) throw(RSGISFileException)
+    void RSGISFileUtils::getDIRList(std::string dir, std::vector<std::string> *files)
     {
         boost::filesystem::path inDIR(dir);
         try
@@ -92,7 +92,7 @@ namespace rsgis{namespace utils{
         }
     }
 
-    void RSGISFileUtils::getDIRList(std::string dir, std::string ext, std::list<std::string> *files, bool withpath) throw(RSGISFileException)
+    void RSGISFileUtils::getDIRList(std::string dir, std::string ext, std::list<std::string> *files, bool withpath)
     {
         boost::filesystem::path tmpPath;
         boost::filesystem::path inDIR(dir);
@@ -135,7 +135,7 @@ namespace rsgis{namespace utils{
         }
     }
 
-    void RSGISFileUtils::getDIRList(std::string dir, std::string ext, std::vector<std::string> *files, bool withpath) throw(RSGISFileException)
+    void RSGISFileUtils::getDIRList(std::string dir, std::string ext, std::vector<std::string> *files, bool withpath)
     {
         boost::filesystem::path tmpPath;
         boost::filesystem::path inDIR(dir);
@@ -178,7 +178,7 @@ namespace rsgis{namespace utils{
         }
     }
 
-    std::string* RSGISFileUtils::getDIRList(std::string dir, std::string ext, int *numFiles, bool withpath) throw(RSGISFileException)
+    std::string* RSGISFileUtils::getDIRList(std::string dir, std::string ext, int *numFiles, bool withpath)
     {
         std::vector<std::string> files;
         boost::filesystem::path tmpPath;
@@ -230,7 +230,7 @@ namespace rsgis{namespace utils{
         return outFiles;
     }
 
-    std::string* RSGISFileUtils::getFilesInDIRWithName(std::string dir, std::string name, int *numFiles) throw(RSGISFileException)
+    std::string* RSGISFileUtils::getFilesInDIRWithName(std::string dir, std::string name, int *numFiles)
     {
         std::vector<std::string> files;
         boost::filesystem::path tmpPath;

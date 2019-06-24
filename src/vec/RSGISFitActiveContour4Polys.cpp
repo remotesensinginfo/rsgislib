@@ -29,7 +29,7 @@ namespace rsgis{namespace vec{
         
     }
     
-    void RSGISFitActiveContour2Geoms::fitActiveContours2Polys(OGRLayer *inputOGRLayer, OGRLayer *outputOGRLayer, GDALDataset *externalForceImg, double interAlpha, double interBeta, double extGamma, double minExtThres, bool force)throw(rsgis::RSGISVectorException)
+    void RSGISFitActiveContour2Geoms::fitActiveContours2Polys(OGRLayer *inputOGRLayer, OGRLayer *outputOGRLayer, GDALDataset *externalForceImg, double interAlpha, double interBeta, double extGamma, double minExtThres, bool force)
     {
         try
         {
@@ -79,7 +79,7 @@ namespace rsgis{namespace vec{
         delete[] trans;
     }
     
-    OGRPolygon* RSGISFitActiveContourProcessOGRGeometry::processGeometry(OGRGeometry *geom) throw(RSGISVectorException)
+    OGRPolygon* RSGISFitActiveContourProcessOGRGeometry::processGeometry(OGRGeometry *geom)
     {
         OGRPolygon *ogrNewPoly = NULL;
         try
@@ -146,7 +146,7 @@ namespace rsgis{namespace vec{
         
     }
     
-    void RSGISFitActiveContour2Coords::fitActiveCountour(std::vector<RSGISACCoordFit> *coords, GDALDataset *externalForceImg, double interAlpha, double interBeta, double extGamma, double minExtThres, unsigned int maxNumIters, float propChanges2Term)throw(rsgis::RSGISVectorException)
+    void RSGISFitActiveContour2Coords::fitActiveCountour(std::vector<RSGISACCoordFit> *coords, GDALDataset *externalForceImg, double interAlpha, double interBeta, double extGamma, double minExtThres, unsigned int maxNumIters, float propChanges2Term)
     {
         try
         {
@@ -576,7 +576,7 @@ namespace rsgis{namespace vec{
         }
     }
     
-    void RSGISFitActiveContour2Coords::calcUpdateInternalEnergies(double interAlpha, double interBeta, RSGISACCoordFit *c, RSGISACCoordFit *next, RSGISACCoordFit *prev, RSGISACCoordFit *next1, RSGISACCoordFit *prev1, double *cCInt, double *cNInt, double *cPInt) throw(RSGISVectorException)
+    void RSGISFitActiveContour2Coords::calcUpdateInternalEnergies(double interAlpha, double interBeta, RSGISACCoordFit *c, RSGISACCoordFit *next, RSGISACCoordFit *prev, RSGISACCoordFit *next1, RSGISACCoordFit *prev1, double *cCInt, double *cNInt, double *cPInt)
     {
         double dist1 = this->calcDist(c, next);
         double dist2 = this->calcDist(c, prev);
@@ -642,7 +642,7 @@ namespace rsgis{namespace vec{
     }
     
     
-    double RSGISFitActiveContour2Coords::calcPointStiffnesss(RSGISACCoordFit *p1, RSGISACCoordFit *p2, RSGISACCoordFit *stiffPt)throw(RSGISVectorException)
+    double RSGISFitActiveContour2Coords::calcPointStiffnesss(RSGISACCoordFit *p1, RSGISACCoordFit *p2, RSGISACCoordFit *stiffPt)
     {
         double distance = this->calcDist(p1, stiffPt);
         if(distance == 0)

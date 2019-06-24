@@ -60,10 +60,10 @@ namespace rsgis{ namespace cmds {
     };
 
     /** Function to apply filters to an image */
-    DllExport void executeFilter(std::string inputImage, std::vector <rsgis::cmds::RSGISFilterParameters*> *filterParameters, std::string outputImageBase, std::string imageFormat, std::string imageExt, RSGISLibDataType outDataType) throw(RSGISCmdException);
+    DllExport void executeFilter(std::string inputImage, std::vector <rsgis::cmds::RSGISFilterParameters*> *filterParameters, std::string outputImageBase, std::string imageFormat, std::string imageExt, RSGISLibDataType outDataType);
 
     /** Function to set up LeuncMalik Filter Band */
-    DllExport std::vector<rsgis::cmds::RSGISFilterParameters*> *createLeungMalikFilterBank() throw(RSGISCmdException);
+    DllExport std::vector<rsgis::cmds::RSGISFilterParameters*> *createLeungMalikFilterBank();
     
 }}
 

@@ -32,7 +32,7 @@ namespace rsgis { namespace math{
 		this->invShpSclGammaShp = 1 / (pow(scale, shape));
 		
 	}
-	double RSGISProbDistGamma::calcProb(double predictVal) throw(RSGISMathException)
+	double RSGISProbDistGamma::calcProb(double predictVal)
 	{
 		double valPowShape = pow(predictVal, (shape - 1));
 		double expValScale = exp((-1) * ((predictVal / scale)));
@@ -48,7 +48,7 @@ namespace rsgis { namespace math{
 	{
 		this->rate = rate;
 	}
-	double RSGISProbDistExponential::calcProb(double predictVal) throw(RSGISMathException)
+	double RSGISProbDistExponential::calcProb(double predictVal)
 	{
 		double valrate = (-1) * (rate * predictVal);
 		double exprate = exp (valrate);
@@ -65,7 +65,7 @@ namespace rsgis { namespace math{
 		this->mean = mean;
 		this->stdev = stdev;
 	}
-	double RSGISProbDistNormal::calcProb(double predictVal) throw(RSGISMathException)
+	double RSGISProbDistNormal::calcProb(double predictVal)
 	{
 		double pi = 3.141592653589793;
 		double valDiff = (predictVal - mean);
@@ -115,7 +115,7 @@ namespace rsgis { namespace math{
 		gsl_rng_set (gslRand, seed);
 		
 	}
-	double RSGISProbDistNeymanTypeA::calcProb(double iVal) throw(RSGISMathException)
+	double RSGISProbDistNeymanTypeA::calcProb(double iVal)
 	{
 		double pVal = 0;
 
@@ -153,7 +153,7 @@ namespace rsgis { namespace math{
 	{
 		this->val = val;
 	}
-	double RSGISProbDistReturnVal::calcProb(double newVal) throw(RSGISMathException)
+	double RSGISProbDistReturnVal::calcProb(double newVal)
 	{
 		return val;
 	}

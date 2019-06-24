@@ -55,7 +55,7 @@ namespace rsgis{namespace math{
     {
     public:
         RSGISLogicExpression(std::string expName){this->expName = expName;};
-        virtual bool evaluate()throw(RSGISMathLogicException) = 0;
+        virtual bool evaluate() = 0;
         std::string getExpName(){return expName;};
         virtual ~RSGISLogicExpression(){};
     protected:
@@ -70,7 +70,7 @@ namespace rsgis{namespace math{
         {
             this->exps = exps;
         };
-        bool evaluate()throw(RSGISMathLogicException);
+        bool evaluate();
         ~RSGISLogicAndExpression()
         {
             for(std::vector<RSGISLogicExpression*>::iterator iterExps = exps->begin(); iterExps != exps->end(); ++iterExps)
@@ -90,7 +90,7 @@ namespace rsgis{namespace math{
         {
             this->exps = exps;
         };
-        bool evaluate()throw(RSGISMathLogicException);
+        bool evaluate();
         ~RSGISLogicOrExpression()
         {
             for(std::vector<RSGISLogicExpression*>::iterator iterExps = exps->begin(); iterExps != exps->end(); ++iterExps)
@@ -110,7 +110,7 @@ namespace rsgis{namespace math{
         {
             this->exp = exp;
         };
-        bool evaluate()throw(RSGISMathLogicException);
+        bool evaluate();
         ~RSGISLogicNotExpression()
         {
             delete exp;
@@ -126,7 +126,7 @@ namespace rsgis{namespace math{
         {
             this->exps = exps;
         };
-        bool evaluate()throw(RSGISMathLogicException);
+        bool evaluate();
         ~RSGISLogicEqualsExpression()
         {
             for(std::vector<RSGISLogicExpression*>::iterator iterExps = exps->begin(); iterExps != exps->end(); ++iterExps)
@@ -147,7 +147,7 @@ namespace rsgis{namespace math{
             this->val1 = val1;
             this->val2 = val2;
         };
-        bool evaluate()throw(RSGISMathLogicException);
+        bool evaluate();
         ~RSGISLogicEqualsValueExpression(){};
     protected:
         double *val1;
@@ -162,7 +162,7 @@ namespace rsgis{namespace math{
             this->val1 = val1;
             this->val2 = val2;
         };
-        bool evaluate()throw(RSGISMathLogicException);
+        bool evaluate();
         
         ~RSGISLogicGreaterThanValueExpression(){};
     protected:
@@ -179,7 +179,7 @@ namespace rsgis{namespace math{
             this->val1 = val1;
             this->val2 = val2;
         };
-        bool evaluate()throw(RSGISMathLogicException);
+        bool evaluate();
         ~RSGISLogicLessThanValueExpression(){};
     protected:
         double *val1;
@@ -195,7 +195,7 @@ namespace rsgis{namespace math{
             this->val1 = val1;
             this->val2 = val2;
         };
-        bool evaluate()throw(RSGISMathLogicException);
+        bool evaluate();
         ~RSGISLogicGreaterEqualToValueExpression(){};
     protected:
         double *val1;
@@ -211,7 +211,7 @@ namespace rsgis{namespace math{
             this->val1 = val1;
             this->val2 = val2;
         };
-        bool evaluate()throw(RSGISMathLogicException);
+        bool evaluate();
         ~RSGISLogicLessEqualToValueExpression(){};
     protected:
         double *val1;
@@ -226,7 +226,7 @@ namespace rsgis{namespace math{
             this->val1 = val1;
             this->val2 = val2;
         };
-        bool evaluate()throw(RSGISMathLogicException);
+        bool evaluate();
         ~RSGISLogicNotValueExpression(){};
     protected:
         double *val1;

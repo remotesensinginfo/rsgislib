@@ -29,7 +29,7 @@ namespace rsgis{namespace filter{
 
 	}
 
-	void RSGISImageMorphologyErode::erodeImage(GDALDataset **datasets, std::string outputImage, rsgis::math::Matrix *matrixOperator, std::string format, GDALDataType outDataType) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
+	void RSGISImageMorphologyErode::erodeImage(GDALDataset **datasets, std::string outputImage, rsgis::math::Matrix *matrixOperator, std::string format, GDALDataType outDataType)
 	{
         if(matrixOperator->n != matrixOperator->m)
         {
@@ -54,7 +54,7 @@ namespace rsgis{namespace filter{
         delete erodeImage;
 	}
     
-    void RSGISImageMorphologyErode::erodeImageAll(GDALDataset **datasets, std::string outputImage, rsgis::math::Matrix *matrixOperator, std::string format, GDALDataType outDataType) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
+    void RSGISImageMorphologyErode::erodeImageAll(GDALDataset **datasets, std::string outputImage, rsgis::math::Matrix *matrixOperator, std::string format, GDALDataType outDataType)
 	{
         if(matrixOperator->n != matrixOperator->m)
         {
@@ -83,7 +83,7 @@ namespace rsgis{namespace filter{
         this->matrixOperator = matrixOperator;
 	}
 
-	void RSGISMorphologyErode::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISMorphologyErode::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
 	{
 		bool first = true;
 		double *smallest = new double[numBands];
@@ -138,7 +138,7 @@ namespace rsgis{namespace filter{
         this->matrixOperator = matrixOperator;
 	}
     
-	void RSGISMorphologyErodeAll::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISMorphologyErodeAll::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
 	{
 		bool first = true;
 		double smallest = 0;

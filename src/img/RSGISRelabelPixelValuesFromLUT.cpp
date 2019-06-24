@@ -31,7 +31,7 @@ namespace rsgis { namespace img {
         
     }
     
-    void RSGISRelabelPixelValuesFromLUT::relabelPixelValues(GDALDataset *inData, std::string outputFile, std::string matrixLUTFile, std::string imageFormat)throw(RSGISImageCalcException)
+    void RSGISRelabelPixelValuesFromLUT::relabelPixelValues(GDALDataset *inData, std::string outputFile, std::string matrixLUTFile, std::string imageFormat)
     {
         try
         {
@@ -68,7 +68,7 @@ namespace rsgis { namespace img {
         this->lut = lut;
     }
 		
-    void RSGISRelabelPixelValuesFromLUTCalcVal::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+    void RSGISRelabelPixelValuesFromLUTCalcVal::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         if(numBands != numOutBands)
         {

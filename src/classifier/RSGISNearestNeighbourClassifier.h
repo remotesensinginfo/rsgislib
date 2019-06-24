@@ -48,13 +48,13 @@ namespace rsgis{ namespace classifier{
 	class DllExport RSGISNearestNeighbourClassifier : public RSGISClassifier
 		{
 		public:
-			RSGISNearestNeighbourClassifier(ClassData **trainingData, int numClasses)  throw(RSGISClassificationException);
-			virtual int getClassID(float *variables, int numVars)  throw(RSGISClassificationException);
-			virtual std::string getClassName(float *variables, int numVars)  throw(RSGISClassificationException);
+			RSGISNearestNeighbourClassifier(ClassData **trainingData, int numClasses);
+			virtual int getClassID(float *variables, int numVars);
+			virtual std::string getClassName(float *variables, int numVars);
 			~RSGISNearestNeighbourClassifier();
 		protected:
-			ClassData* findClass(float *variables, int numVars)  throw(RSGISClassificationException);
-			double findClosestPointInClass(ClassData *data, float *variables, int numVars)  throw(RSGISClassificationException);
+			ClassData* findClass(float *variables, int numVars);
+			double findClosestPointInClass(ClassData *data, float *variables, int numVars);
 		};
 
 }}

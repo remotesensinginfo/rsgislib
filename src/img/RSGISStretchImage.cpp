@@ -41,7 +41,7 @@ namespace rsgis { namespace img {
         this->outNoData = outNoData;
 	}
 	
-	void RSGISStretchImage::executeLinearMinMaxStretch() throw(RSGISImageCalcException)
+	void RSGISStretchImage::executeLinearMinMaxStretch() 
 	{
 		GDALDataset **datasets = NULL;
 		RSGISImageStatistics *calcImageStats = NULL;
@@ -115,7 +115,7 @@ namespace rsgis { namespace img {
 			calcImg->calcImage(datasets, 1, outputImage, false, NULL, imageFormat, outDataType);
 			
 		}
-		catch(RSGISImageCalcException e)
+		catch(RSGISImageCalcException &e)
 		{
 			if(datasets != NULL)
 			{
@@ -123,7 +123,7 @@ namespace rsgis { namespace img {
 			}
 			throw e;
 		}
-		catch(RSGISImageBandException e)
+		catch(RSGISImageBandException &e)
 		{
 			if(datasets != NULL)
 			{
@@ -146,7 +146,7 @@ namespace rsgis { namespace img {
 		}
 	}
 	
-	void RSGISStretchImage::executeLinearPercentStretch(float percent) throw(RSGISImageCalcException)
+	void RSGISStretchImage::executeLinearPercentStretch(float percent) 
 	{
 		GDALDataset **datasets = NULL;
 		RSGISImageStatistics *calcImageStats = NULL;
@@ -228,7 +228,7 @@ namespace rsgis { namespace img {
 			calcImg->calcImage(datasets, 1, outputImage, false, NULL, imageFormat, outDataType);
 			
 		}
-		catch(RSGISImageCalcException e)
+		catch(RSGISImageCalcException &e)
 		{
 			if(datasets != NULL)
 			{
@@ -236,7 +236,7 @@ namespace rsgis { namespace img {
 			}
 			throw e;
 		}
-		catch(RSGISImageBandException e)
+		catch(RSGISImageBandException &e)
 		{
 			if(datasets != NULL)
 			{
@@ -260,7 +260,7 @@ namespace rsgis { namespace img {
 		
 	}
 	
-	void RSGISStretchImage::executeLinearStdDevStretch(float stddev) throw(RSGISImageCalcException)
+	void RSGISStretchImage::executeLinearStdDevStretch(float stddev) 
 	{
 		GDALDataset **datasets = NULL;
 		RSGISImageStatistics *calcImageStats = NULL;
@@ -345,7 +345,7 @@ namespace rsgis { namespace img {
 			calcImg->calcImage(datasets, 1, outputImage, false, NULL, imageFormat, outDataType);
 			
 		}
-		catch(RSGISImageCalcException e)
+		catch(RSGISImageCalcException &e)
 		{
 			if(datasets != NULL)
 			{
@@ -353,7 +353,7 @@ namespace rsgis { namespace img {
 			}
 			throw e;
 		}
-		catch(RSGISImageBandException e)
+		catch(RSGISImageBandException &e)
 		{
 			if(datasets != NULL)
 			{
@@ -376,12 +376,12 @@ namespace rsgis { namespace img {
 		}
 	}
 	
-	void RSGISStretchImage::executeHistogramStretch() throw(RSGISImageCalcException)
+	void RSGISStretchImage::executeHistogramStretch() 
 	{
 		throw RSGISImageCalcException("Histogram Stretch is not implmented yet\n");
 	}
 	
-	void RSGISStretchImage::executeExponentialStretch() throw(RSGISImageCalcException)
+	void RSGISStretchImage::executeExponentialStretch() 
 	{
 		GDALDataset **datasets = NULL;
 		RSGISImageStatistics *calcImageStats = NULL;
@@ -465,7 +465,7 @@ namespace rsgis { namespace img {
 			calcImg->calcImage(datasets, 1, outputImage, false, NULL, imageFormat, outDataType);
 			
 		}
-		catch(RSGISImageCalcException e)
+		catch(RSGISImageCalcException &e)
 		{
 			if(datasets != NULL)
 			{
@@ -473,7 +473,7 @@ namespace rsgis { namespace img {
 			}
 			throw e;
 		}
-		catch(RSGISImageBandException e)
+		catch(RSGISImageBandException &e)
 		{
 			if(datasets != NULL)
 			{
@@ -497,7 +497,7 @@ namespace rsgis { namespace img {
 		}
 	}
 	
-	void RSGISStretchImage::executeLogrithmicStretch() throw(RSGISImageCalcException)
+	void RSGISStretchImage::executeLogrithmicStretch() 
 	{
 		GDALDataset **datasets = NULL;
 		RSGISImageStatistics *calcImageStats = NULL;
@@ -581,7 +581,7 @@ namespace rsgis { namespace img {
 			calcImg->calcImage(datasets, 1, outputImage, false, NULL, imageFormat, outDataType);
 			
 		}
-		catch(RSGISImageCalcException e)
+		catch(RSGISImageCalcException &e)
 		{
 			if(datasets != NULL)
 			{
@@ -589,7 +589,7 @@ namespace rsgis { namespace img {
 			}
 			throw e;
 		}
-		catch(RSGISImageBandException e)
+		catch(RSGISImageBandException &e)
 		{
 			if(datasets != NULL)
 			{
@@ -613,7 +613,7 @@ namespace rsgis { namespace img {
 		}
 	}
 	
-	void RSGISStretchImage::executePowerLawStretch(float power) throw(RSGISImageCalcException)
+	void RSGISStretchImage::executePowerLawStretch(float power) 
 	{
 		GDALDataset **datasets = NULL;
 		RSGISImageStatistics *calcImageStats = NULL;
@@ -692,7 +692,7 @@ namespace rsgis { namespace img {
 			calcImg->calcImage(datasets, 1, outputImage, false, NULL, imageFormat, outDataType);
 			
 		}
-		catch(RSGISImageCalcException e)
+		catch(RSGISImageCalcException &e)
 		{
 			if(datasets != NULL)
 			{
@@ -700,7 +700,7 @@ namespace rsgis { namespace img {
 			}
 			throw e;
 		}
-		catch(RSGISImageBandException e)
+		catch(RSGISImageBandException &e)
 		{
 			if(datasets != NULL)
 			{
@@ -748,7 +748,7 @@ namespace rsgis { namespace img {
         this->outNoData = outNoData;
 	}
 	
-	void RSGISStretchImageWithStats::executeLinearMinMaxStretch() throw(RSGISImageCalcException)
+	void RSGISStretchImageWithStats::executeLinearMinMaxStretch() 
 	{
 		GDALDataset **datasets = NULL;
 		RSGISCalcImage *calcImg = NULL;
@@ -787,7 +787,7 @@ namespace rsgis { namespace img {
 			calcImg->calcImage(datasets, 1, outputImage, false, NULL, imageFormat, outDataType);
 			
 		}
-		catch(RSGISImageCalcException e)
+		catch(RSGISImageCalcException &e)
 		{
 			if(datasets != NULL)
 			{
@@ -795,7 +795,7 @@ namespace rsgis { namespace img {
 			}
 			throw e;
 		}
-		catch(RSGISImageBandException e)
+		catch(RSGISImageBandException &e)
 		{
 			if(datasets != NULL)
 			{
@@ -818,12 +818,12 @@ namespace rsgis { namespace img {
 		}
 	}
 	
-	void RSGISStretchImageWithStats::executeHistogramStretch() throw(RSGISImageCalcException)
+	void RSGISStretchImageWithStats::executeHistogramStretch() 
 	{
 		throw RSGISImageCalcException("Histogram Stretch is not implmented yet\n");
 	}
 	
-	void RSGISStretchImageWithStats::executeExponentialStretch() throw(RSGISImageCalcException)
+	void RSGISStretchImageWithStats::executeExponentialStretch() 
 	{
 		GDALDataset **datasets = NULL;
 		RSGISCalcImage *calcImg = NULL;
@@ -865,7 +865,7 @@ namespace rsgis { namespace img {
 			calcImg->calcImage(datasets, 1, outputImage, false, NULL, imageFormat, outDataType);
 			
 		}
-		catch(RSGISImageCalcException e)
+		catch(RSGISImageCalcException &e)
 		{
 			if(datasets != NULL)
 			{
@@ -873,7 +873,7 @@ namespace rsgis { namespace img {
 			}
 			throw e;
 		}
-		catch(RSGISImageBandException e)
+		catch(RSGISImageBandException &e)
 		{
 			if(datasets != NULL)
 			{
@@ -897,7 +897,7 @@ namespace rsgis { namespace img {
 		}
 	}
 	
-	void RSGISStretchImageWithStats::executeLogrithmicStretch() throw(RSGISImageCalcException)
+	void RSGISStretchImageWithStats::executeLogrithmicStretch() 
 	{
 		GDALDataset **datasets = NULL;
 		RSGISCalcImage *calcImg = NULL;
@@ -939,7 +939,7 @@ namespace rsgis { namespace img {
 			calcImg->calcImage(datasets, 1, outputImage, false, NULL, imageFormat, outDataType);
 			
 		}
-		catch(RSGISImageCalcException e)
+		catch(RSGISImageCalcException &e)
 		{
 			if(datasets != NULL)
 			{
@@ -947,7 +947,7 @@ namespace rsgis { namespace img {
 			}
 			throw e;
 		}
-		catch(RSGISImageBandException e)
+		catch(RSGISImageBandException &e)
 		{
 			if(datasets != NULL)
 			{
@@ -971,7 +971,7 @@ namespace rsgis { namespace img {
 		}
 	}
 	
-	void RSGISStretchImageWithStats::executePowerLawStretch(float power) throw(RSGISImageCalcException)
+	void RSGISStretchImageWithStats::executePowerLawStretch(float power) 
 	{
 		GDALDataset **datasets = NULL;
 		RSGISCalcImage *calcImg = NULL;
@@ -1013,7 +1013,7 @@ namespace rsgis { namespace img {
 			calcImg->calcImage(datasets, 1, outputImage, false, NULL, imageFormat, outDataType);
 			
 		}
-		catch(RSGISImageCalcException e)
+		catch(RSGISImageCalcException &e)
 		{
 			if(datasets != NULL)
 			{
@@ -1021,7 +1021,7 @@ namespace rsgis { namespace img {
 			}
 			throw e;
 		}
-		catch(RSGISImageBandException e)
+		catch(RSGISImageBandException &e)
 		{
 			if(datasets != NULL)
 			{
@@ -1054,7 +1054,7 @@ namespace rsgis { namespace img {
     
 	
 	
-	double RSGISExponentStretchFunction::calcFunction(double value) throw(rsgis::math::RSGISMathException)
+	double RSGISExponentStretchFunction::calcFunction(double value)
 	{
 		float outVal = exp(value);
 		if((boost::math::isinf)(outVal))
@@ -1064,7 +1064,7 @@ namespace rsgis { namespace img {
 		return outVal;
 	}
 	
-	double RSGISLogrithmStretchFunction::calcFunction(double value) throw(rsgis::math::RSGISMathException)
+	double RSGISLogrithmStretchFunction::calcFunction(double value)
 	{
 		float outVal = log(value);
 		if(((boost::math::isinf)(outVal)) & (outVal < 0))
@@ -1074,7 +1074,7 @@ namespace rsgis { namespace img {
 		return outVal;
 	}
 	
-	double RSGISPowerLawStretchFunction::calcFunction(double value) throw(rsgis::math::RSGISMathException)
+	double RSGISPowerLawStretchFunction::calcFunction(double value)
 	{
 		return pow(value,((double)power));
 	}
@@ -1091,7 +1091,7 @@ namespace rsgis { namespace img {
         this->outNoData = outNoData;
 	}
 	
-	void RSGISLinearStretchImage::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+	void RSGISLinearStretchImage::calcImageValue(float *bandValues, int numBands, double *output) 
 	{
 		double inDiff = 0;
 		double norm2min = 0;
@@ -1150,7 +1150,7 @@ namespace rsgis { namespace img {
 		this->func = func;
 	}
 	
-	void RSGISFuncLinearStretchImage::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+	void RSGISFuncLinearStretchImage::calcImageValue(float *bandValues, int numBands, double *output) 
 	{
 		for(int i = 0; i < numBands; i++)
 		{

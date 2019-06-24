@@ -34,7 +34,7 @@ namespace rsgis{namespace reg{
         std::cout << "polyOrder = " << polyOrder << std::endl;
 	}
 	
-	void RSGISPolynomialImageWarp::initWarp()throw(RSGISImageWarpException)
+	void RSGISPolynomialImageWarp::initWarp()
 	{
 		/** Initialises warp by create polynominal models based on ground countrol points.
             Models are created expressing image pixels as a function of easting and northing, used for warping
@@ -164,7 +164,7 @@ namespace rsgis{namespace reg{
 
 	}
 	
-	geos::geom::Envelope* RSGISPolynomialImageWarp::newImageExtent(unsigned int width, unsigned int height) throw(RSGISImageWarpException)
+	geos::geom::Envelope* RSGISPolynomialImageWarp::newImageExtent(unsigned int width, unsigned int height)
 	{
 		
         double minEastings = 0;
@@ -223,7 +223,7 @@ namespace rsgis{namespace reg{
 		return env;
 	}
 	
-	void RSGISPolynomialImageWarp::findNearestPixel(double eastings, double northings, unsigned int *x, unsigned int *y, float inImgRes) throw(RSGISImageWarpException)
+	void RSGISPolynomialImageWarp::findNearestPixel(double eastings, double northings, unsigned int *x, unsigned int *y, float inImgRes)
 	{
 		
         /* Return nearest pixel based on input easting and northing.

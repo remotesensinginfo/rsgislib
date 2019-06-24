@@ -53,9 +53,9 @@ namespace rsgis{namespace rastergis{
     {
     public:
         RSGISRATStats();
-        float calc1DJMDistance(GDALDataset *clumpsImage, std::string varCol, float binWidth, std::string classColumn, std::string class1Val, std::string class2Val, unsigned int ratBand) throw(RSGISAttributeTableException);
-        float calc2DJMDistance(GDALDataset *clumpsImage, std::string var1Col, std::string var2Col, float var1binWidth, float var2binWidth, std::string classColumn, std::string class1Val, std::string class2Val, unsigned int ratBand) throw(RSGISAttributeTableException);
-        float calcBhattacharyyaDistance(GDALDataset *clumpsImage, std::string varCol, std::string classColumn, std::string class1Val, std::string class2Val, unsigned int ratBand) throw(RSGISAttributeTableException);
+        float calc1DJMDistance(GDALDataset *clumpsImage, std::string varCol, float binWidth, std::string classColumn, std::string class1Val, std::string class2Val, unsigned int ratBand);
+        float calc2DJMDistance(GDALDataset *clumpsImage, std::string var1Col, std::string var2Col, float var1binWidth, float var2binWidth, std::string classColumn, std::string class1Val, std::string class2Val, unsigned int ratBand);
+        float calcBhattacharyyaDistance(GDALDataset *clumpsImage, std::string varCol, std::string classColumn, std::string class1Val, std::string class2Val, unsigned int ratBand);
         ~RSGISRATStats();
     };
     

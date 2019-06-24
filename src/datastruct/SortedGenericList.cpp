@@ -40,8 +40,8 @@ namespace rsgis{ namespace datastruct{
 			T* peekTop();
 			T* peekBottom();
 			T* getAt(int index);
-			void remove(T *obj) throw(RSGISItemNotFoundException);
-			void removeNoDelete(T *obj) throw(RSGISItemNotFoundException);
+			void remove(T *obj);
+			void removeNoDelete(T *obj);
 			int getSize();
 			void clearList();
 			void clearListDelete();
@@ -129,7 +129,7 @@ namespace rsgis{ namespace datastruct{
 	}
 	
 	template <typename T>
-	void SortedGenericList<T>::remove(T *obj) throw(RSGISItemNotFoundException)
+	void SortedGenericList<T>::remove(T *obj)
 	{
 		int location = 0;
 		this->binaryChopSearch(obj, &location);
@@ -145,7 +145,7 @@ namespace rsgis{ namespace datastruct{
 	}
 	
 	template <typename T>
-	void SortedGenericList<T>::removeNoDelete(T *obj) throw(RSGISItemNotFoundException)
+	void SortedGenericList<T>::removeNoDelete(T *obj)
 	{
 		int location = 0;
 		this->binaryChopSearch(obj, &location);

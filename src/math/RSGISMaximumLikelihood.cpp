@@ -43,7 +43,7 @@ namespace rsgis {namespace math{
         
     }
     
-    int RSGISMaximumLikelihood::compute_ml(MaximumLikelihood *ml,int n,int d,double *x[],int y[]) throw(RSGISMaximumLikelihoodException)
+    int RSGISMaximumLikelihood::compute_ml(MaximumLikelihood *ml,int n,int d,double *x[],int y[])
     {
         double ***tmpMat;
         int *index;
@@ -208,7 +208,7 @@ namespace rsgis {namespace math{
     }
     
     
-    int RSGISMaximumLikelihood::predict_ml(MaximumLikelihood *ml, double x[], double **margin) throw(RSGISMaximumLikelihoodException)
+    int RSGISMaximumLikelihood::predict_ml(MaximumLikelihood *ml, double x[], double **margin)
     {
         int i,j,c;
         double *tmpVect;
@@ -292,7 +292,7 @@ namespace rsgis {namespace math{
         return ml->classes[max_posterior_index];
     }
     
-    int RSGISMaximumLikelihood::iunique(int y[], int n, int **values) throw(RSGISMaximumLikelihoodException)
+    int RSGISMaximumLikelihood::iunique(int y[], int n, int **values)
     {
         int nvalues=1;
         int i,j;

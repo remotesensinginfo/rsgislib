@@ -58,11 +58,11 @@ namespace rsgis{namespace vec{
 		{
 		public:
 			RSGISVectorMorphology(float buffer, rsgis::geom::Morphology morphologytype);
-			virtual void processGeometry(OGRPolygon *polygon) throw(RSGISVectorException);
-			virtual void processGeometry(OGRMultiPolygon *multiPolygon) throw(RSGISVectorException);
-			virtual void processGeometry(OGRPoint *point) throw(RSGISVectorException);
-			virtual void processGeometry(OGRLineString *line) throw(RSGISVectorException);
-			virtual OGRPolygon* processGeometry(OGRGeometry *geom) throw(RSGISVectorException);
+			virtual void processGeometry(OGRPolygon *polygon);
+			virtual void processGeometry(OGRMultiPolygon *multiPolygon);
+			virtual void processGeometry(OGRPoint *point);
+			virtual void processGeometry(OGRLineString *line);
+			virtual OGRPolygon* processGeometry(OGRGeometry *geom);
 			virtual ~RSGISVectorMorphology();
 		protected:
 			float buffer;

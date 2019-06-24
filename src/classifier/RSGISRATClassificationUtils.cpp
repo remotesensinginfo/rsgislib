@@ -33,7 +33,7 @@ namespace rsgis{ namespace classifier{
         
     }
     
-    void RSGISCollapseSegmentsClassification::collapseClassification(GDALDataset *segments, std::string classNameCol, std::string classIntCol, bool useIntCol, std::string outputImage, std::string imageFormat) throw(RSGISClassificationException)
+    void RSGISCollapseSegmentsClassification::collapseClassification(GDALDataset *segments, std::string classNameCol, std::string classIntCol, bool useIntCol, std::string outputImage, std::string imageFormat)
     {
         try
         {
@@ -174,7 +174,7 @@ namespace rsgis{ namespace classifier{
         this->useIntCol = useIntCol;
     }
     
-    void RSGISFindAllClassNames::calcRATValue(size_t fid, double *inRealCols, unsigned int numInRealCols, int *inIntCols, unsigned int numInIntCols, std::string *inStringCols, unsigned int numInStringCols, double *outRealCols, unsigned int numOutRealCols, int *outIntCols, unsigned int numOutIntCols, std::string *outStringCols, unsigned int numOutStringCols) throw(RSGISAttributeTableException)
+    void RSGISFindAllClassNames::calcRATValue(size_t fid, double *inRealCols, unsigned int numInRealCols, int *inIntCols, unsigned int numInIntCols, std::string *inStringCols, unsigned int numInStringCols, double *outRealCols, unsigned int numOutRealCols, int *outIntCols, unsigned int numOutIntCols, std::string *outStringCols, unsigned int numOutStringCols)
     {
         try
         {
@@ -251,7 +251,7 @@ namespace rsgis{ namespace classifier{
         // Load string column to memory
     }
     
-    void RSGISRecodeRasterFromClasses::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISRecodeRasterFromClasses::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) 
     {
         try
         {
@@ -307,7 +307,7 @@ namespace rsgis{ namespace classifier{
         this->clrTab = clrTab;
     }
     
-    void RSGISColourImageFromClassRAT::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISColourImageFromClassRAT::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         try
         {

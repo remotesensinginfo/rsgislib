@@ -38,12 +38,12 @@ namespace rsgis { namespace cmds {
 		msgs = message;
 	}
     
-	const char* RSGISCmdException::what() const throw()
+	const char* RSGISCmdException::what()
 	{
 		return msgs.c_str();
 	}
     
-	RSGISCmdException::~RSGISCmdException() throw()
+	RSGISCmdException::~RSGISCmdException()
 	{
         
 	}

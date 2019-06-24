@@ -83,17 +83,17 @@ namespace rsgis{ namespace cmds {
     };
 
     /** Function to extract pixel value for points and save as a shapefile or CSV */
-    DllExport void executePointValue(std::string inputImage, std::string inputVecPolys, std::string outputStatsFile, bool outputToText = false, bool force = false, bool useBandNames = true, bool shortenBandNames=true)throw(RSGISCmdException);
+    DllExport void executePointValue(std::string inputImage, std::string inputVecPolys, std::string outputStatsFile, bool outputToText = false, bool force = false, bool useBandNames = true, bool shortenBandNames=true);
     /** Function to extract statistics for pixels falling within a polygon */
-    DllExport void executePixelStats(std::string inputImage, std::string inputVecPolys, std::string outputStatsFile, RSGISBandAttZonalStatsCmds *calcStats, std::string inputRasPolys = "", bool outputToText = false, bool force = false, bool useBandNames = true, bool ignoreProjection = false, int pixelInPolyMethodInt = 1, bool shortenBandNames = true)throw(RSGISCmdException);
+    DllExport void executePixelStats(std::string inputImage, std::string inputVecPolys, std::string outputStatsFile, RSGISBandAttZonalStatsCmds *calcStats, std::string inputRasPolys = "", bool outputToText = false, bool force = false, bool useBandNames = true, bool ignoreProjection = false, int pixelInPolyMethodInt = 1, bool shortenBandNames = true);
     /** Function to extract pixel values for each polygon and save to a seperate text file */
-    DllExport void executePixelVals2txt(std::string inputImage, std::string inputVecPolys, std::string outputTextBase, std::string polyAttribute, std::string outtxtform = "csv", bool ignoreProjection = false, int pixelInPolyMethodInt = 1)throw(RSGISCmdException);
+    DllExport void executePixelVals2txt(std::string inputImage, std::string inputVecPolys, std::string outputTextBase, std::string polyAttribute, std::string outtxtform = "csv", bool ignoreProjection = false, int pixelInPolyMethodInt = 1);
     /** Function to extract the all the pixel values for regions to a HDF5 file */
-    DllExport void executeZonesImage2HDF5(std::string inputImage, std::string inputVecPolys, std::string outputHDF, bool ignoreProjection = false, int pixelInPolyMethodInt = 1)throw(RSGISCmdException);
+    DllExport void executeZonesImage2HDF5(std::string inputImage, std::string inputVecPolys, std::string outputHDF, bool ignoreProjection = false, int pixelInPolyMethodInt = 1);
     /** Function to extract the average endmember's defined by polygons for linear spectral unmixing */
-    DllExport void executeExtractAvgEndMembers(std::string inputImage, std::string inputVecPolys, std::string outputMatrixFile,  int pixelInPolyMethodInt = 1)throw(RSGISCmdException);
+    DllExport void executeExtractAvgEndMembers(std::string inputImage, std::string inputVecPolys, std::string outputMatrixFile,  int pixelInPolyMethodInt = 1);
     /** Function to extract statistics for pixels falling within a polygon */
-    DllExport void executePixelBandStatsVecLyr(std::string inputImage, std::string vecfile, std::string veclyr, std::vector<RSGISZonalBandAttrsCmds> *zonBandAtts, int pixelInPolyMethodInt, bool ignoreProjection=false)throw(RSGISCmdException);
+    DllExport void executePixelBandStatsVecLyr(std::string inputImage, std::string vecfile, std::string veclyr, std::vector<RSGISZonalBandAttrsCmds> *zonBandAtts, int pixelInPolyMethodInt, bool ignoreProjection=false);
 
 }}
 

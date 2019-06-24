@@ -29,7 +29,7 @@ namespace rsgis{namespace filter{
 		this->filter = filter;
 	}
 	
-	void RSGISImageKernelFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISImageKernelFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
 	{		
 		if(winSize != size)
 		{
@@ -52,12 +52,12 @@ namespace rsgis{namespace filter{
 		}
 	}
 	
-	bool RSGISImageKernelFilter::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
+	bool RSGISImageKernelFilter::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) 
 	{
 		throw rsgis::img::RSGISImageCalcException("Not implemented");
 	}
 
-	void RSGISImageKernelFilter::exportAsImage(std::string filename) throw(RSGISImageFilterException)
+	void RSGISImageKernelFilter::exportAsImage(std::string filename)
 	{
 		GDALAllRegister();
 		GDALDataset *outputImageDS = NULL;
@@ -85,7 +85,7 @@ namespace rsgis{namespace filter{
 				outputRasterBand->RasterIO(GF_Write, 0, i, filter->size, 1, outputData, filter->size, 1, GDT_Float32, 0, 0);
 			}	
 		}
-		catch(rsgis::RSGISImageException e)
+		catch(rsgis::RSGISImageException &e)
 		{
 			if(outputData == NULL)
 			{

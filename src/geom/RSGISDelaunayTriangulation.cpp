@@ -47,7 +47,7 @@ namespace rsgis{namespace geom{
 		this->cOuter = tri->getPointC();
 	}
 	
-	RSGISDelaunayTriangulation::RSGISDelaunayTriangulation(std::list<RSGIS2DPoint*> *data) throw(RSGISGeometryException)
+	RSGISDelaunayTriangulation::RSGISDelaunayTriangulation(std::list<RSGIS2DPoint*> *data)
 	{
 		RSGISGeometry geomUtils;
 		RSGISTriangle *tri = geomUtils.findBoundingTriangle(data);
@@ -81,7 +81,7 @@ namespace rsgis{namespace geom{
 		this->finaliseTriangulation();
 	}
 	
-	RSGISDelaunayTriangulation::RSGISDelaunayTriangulation(std::vector<RSGIS2DPoint*> *data) throw(RSGISGeometryException)
+	RSGISDelaunayTriangulation::RSGISDelaunayTriangulation(std::vector<RSGIS2DPoint*> *data)
 	{
 		RSGISGeometry geomUtils;
 		RSGISTriangle *tri = geomUtils.findBoundingTriangle(data);
@@ -115,7 +115,7 @@ namespace rsgis{namespace geom{
 		this->finaliseTriangulation();
 	}
 	
-	void RSGISDelaunayTriangulation::createDelaunayTriangulation(std::list<RSGIS2DPoint*> *data) throw(RSGISGeometryException)
+	void RSGISDelaunayTriangulation::createDelaunayTriangulation(std::list<RSGIS2DPoint*> *data)
 	{
 		rsgis::math::RSGISMathsUtils mathsUtils;
 		int i = 0;
@@ -137,7 +137,7 @@ namespace rsgis{namespace geom{
 		std::cout << " Complete.\n";
 	}
 	
-	void RSGISDelaunayTriangulation::addVertex(RSGIS2DPoint *pt) throw(RSGISGeometryException)
+	void RSGISDelaunayTriangulation::addVertex(RSGIS2DPoint *pt)
 	{
 		RSGISGeometry geomUtils;
 		try

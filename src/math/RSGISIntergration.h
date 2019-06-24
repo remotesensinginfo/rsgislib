@@ -54,9 +54,9 @@ namespace rsgis{namespace math{
 		{
 		public:
 			RSGISIntergration(RSGISMathFunction *function);
-			virtual double calcArea(double min, double max, bool total) throw(RSGISMathException)=0;
-			virtual double calcValue4Area(double area) throw(RSGISMathException)=0;
-			virtual double calcValue4ProportionArea(double propArea) throw(RSGISMathException)=0;
+			virtual double calcArea(double min, double max, bool total)=0;
+			virtual double calcValue4Area(double area)=0;
+			virtual double calcValue4ProportionArea(double propArea)=0;
 			virtual ~RSGISIntergration(){};
 		protected:
 			RSGISMathFunction *function;
@@ -70,14 +70,14 @@ namespace rsgis{namespace math{
 		{
 		public: 
 			TrapeziumIntegration(RSGISMathFunction *function, double division);
-			virtual double calcArea(double min, double max, bool total) throw(RSGISMathException);
-			virtual double calcValue4Area(double area) throw(RSGISMathException);
-			virtual double calcValue4ProportionArea(double propArea) throw(RSGISMathException);
-			double calcMaxValue()throw(RSGISMathException);
-			void getUpperLowerValues(double lower, double upper, double prob)throw(RSGISMathException);
+			virtual double calcArea(double min, double max, bool total);
+			virtual double calcValue4Area(double area);
+			virtual double calcValue4ProportionArea(double propArea);
+			double calcMaxValue();
+			void getUpperLowerValues(double lower, double upper, double prob);
 			virtual ~TrapeziumIntegration();
 		protected:
-			double calcTrapziumArea(point2D bl, point2D tl, point2D tr, point2D br) throw(RSGISMathException);
+			double calcTrapziumArea(point2D bl, point2D tl, point2D tr, point2D br);
 			double division;
 			double *segmentAreas;
 			double *segmentY;

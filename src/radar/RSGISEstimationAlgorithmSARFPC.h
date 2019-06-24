@@ -66,10 +66,10 @@ namespace rsgis
 			/// Estimates parameters from dual-pol SAR data and FPC for a single species
 		public: 
 			RSGISEstimationAlgorithmDualPolFPCMoistureSingleSpecies(int numOutputBands, gsl_matrix *coeffHH, gsl_matrix *coeffHV, gsl_vector *coeffFPCHH, gsl_vector *coeffFPCHV, gsl_vector *coeffFPCAttenuationH, gsl_vector *coeffFPCAttenuationV, estParameters parameters, treeSpecies species, int ittmax);
-			virtual void calcImageValue(float *bandValues, int numBands, float *output) throw(RSGISImageCalcException);
-			virtual void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-			virtual void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};
-			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not implemented");};								
+			virtual void calcImageValue(float *bandValues, int numBands, float *output);
+			virtual void calcImageValue(float *bandValues, int numBands) {throw RSGISImageCalcException("Not implemented");};
+			virtual void calcImageValue(float *bandValues, int numBands, float *output, Envelope extent) {throw RSGISImageCalcException("Not implemented");};
+			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, float *output) {throw RSGISImageCalcException("Not implemented");};								
 			~RSGISEstimationAlgorithmDualPolFPCMoistureSingleSpecies();
 		protected:
 			estParameters parameters;

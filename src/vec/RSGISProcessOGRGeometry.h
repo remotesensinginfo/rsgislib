@@ -52,11 +52,11 @@ namespace rsgis{namespace vec{
 		{
 		public:
 			RSGISProcessOGRGeometry(){};
-			virtual void processGeometry(OGRPolygon *polygon) throw(RSGISVectorException)= 0;
-			virtual void processGeometry(OGRMultiPolygon *multiPolygon) throw(RSGISVectorException)= 0;
-			virtual void processGeometry(OGRPoint *point) throw(RSGISVectorException)= 0;
-			virtual void processGeometry(OGRLineString *line) throw(RSGISVectorException)= 0;
-			virtual OGRPolygon* processGeometry(OGRGeometry *geom) throw(RSGISVectorException)= 0;
+			virtual void processGeometry(OGRPolygon *polygon)= 0;
+			virtual void processGeometry(OGRMultiPolygon *multiPolygon)= 0;
+			virtual void processGeometry(OGRPoint *point)= 0;
+			virtual void processGeometry(OGRLineString *line)= 0;
+			virtual OGRPolygon* processGeometry(OGRGeometry *geom)= 0;
 			virtual ~RSGISProcessOGRGeometry(){};
 		};
 }}

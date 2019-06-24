@@ -32,7 +32,7 @@ namespace rsgis{namespace img{
         
     }
     
-    void RSGISExtractImageValues::extractDataWithinMask2HDF(GDALDataset *mask, GDALDataset *image, std::string outHDFFile, float maskValue) throw(RSGISImageException)
+    void RSGISExtractImageValues::extractDataWithinMask2HDF(GDALDataset *mask, GDALDataset *image, std::string outHDFFile, float maskValue)
     {
         try
         {
@@ -90,7 +90,7 @@ namespace rsgis{namespace img{
         }
     }
     
-    void RSGISExtractImageValues::extractImgBandDataWithinMask2HDF(std::vector<std::pair<std::string, std::vector<unsigned int> > > imageFiles, std::string maskImage, std::string outHDFFile, float maskValue) throw(RSGISImageException)
+    void RSGISExtractImageValues::extractImgBandDataWithinMask2HDF(std::vector<std::pair<std::string, std::vector<unsigned int> > > imageFiles, std::string maskImage, std::string outHDFFile, float maskValue)
     {
         try
         {
@@ -188,7 +188,7 @@ namespace rsgis{namespace img{
         }
     }
     
-    void RSGISExtractImageValues::sampleExtractedHDFData(std::string inputH5, std::string outputH5, unsigned int nSamples, int seed) throw(RSGISException)
+    void RSGISExtractImageValues::sampleExtractedHDFData(std::string inputH5, std::string outputH5, unsigned int nSamples, int seed)
     {
         try
         {
@@ -272,7 +272,7 @@ namespace rsgis{namespace img{
         }
     }
 
-    void RSGISExtractImageValues::splitExtractedHDFData(std::string inputH5, std::string outputP1H5, std::string outputP2H5, unsigned int nSamples, int seed) throw(RSGISException)
+    void RSGISExtractImageValues::splitExtractedHDFData(std::string inputH5, std::string outputP1H5, std::string outputP2H5, unsigned int nSamples, int seed)
     {
         try
         {
@@ -422,7 +422,7 @@ namespace rsgis{namespace img{
         this->maskValue = maskValue;
     }
     
-    void RSGISExtractImageValuesWithMask::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+    void RSGISExtractImageValuesWithMask::calcImageValue(float *bandValues, int numBands) 
     {
         if(bandValues[0] == maskValue)
         {
@@ -454,7 +454,7 @@ namespace rsgis{namespace img{
         this->numOutVals = this->imgBands.size();
     }
     
-    void RSGISExtractImageBandValuesWithMask::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+    void RSGISExtractImageBandValuesWithMask::calcImageValue(float *bandValues, int numBands) 
     {
         if(bandValues[0] == maskValue)
         {
@@ -484,7 +484,7 @@ namespace rsgis{namespace img{
         
     }
     
-    void RSGISExtractPxlsAsPts::exportPixelsAsPoints(GDALDataset *image, OGRLayer *vecLayer, float maskVal) throw(RSGISImageException)
+    void RSGISExtractPxlsAsPts::exportPixelsAsPoints(GDALDataset *image, OGRLayer *vecLayer, float maskVal)
     {
         try
         {
@@ -509,7 +509,7 @@ namespace rsgis{namespace img{
         }
     }
     
-    void RSGISExtractPxlsAsPts::exportPixelsAsPoints(GDALDataset *image, float maskVal, std::vector<std::pair<double,double> > *pxPts, geos::geom::Envelope *env) throw(RSGISImageException)
+    void RSGISExtractPxlsAsPts::exportPixelsAsPoints(GDALDataset *image, float maskVal, std::vector<std::pair<double,double> > *pxPts, geos::geom::Envelope *env)
     {
         try
         {
@@ -539,7 +539,7 @@ namespace rsgis{namespace img{
         }
     }
     
-    void RSGISExtractPxlsAsPts::exportPixelsAsPointsWithVal(GDALDataset *image, float maskVal, GDALDataset *valImg, int valImgBand, std::vector<std::pair<std::pair<double,double>,double> > *pxPts, bool quiet, geos::geom::Envelope *env) throw(RSGISImageException)
+    void RSGISExtractPxlsAsPts::exportPixelsAsPointsWithVal(GDALDataset *image, float maskVal, GDALDataset *valImg, int valImgBand, std::vector<std::pair<std::pair<double,double>,double> > *pxPts, bool quiet, geos::geom::Envelope *env)
     {
         try
         {
@@ -593,7 +593,7 @@ namespace rsgis{namespace img{
         this->featDefn = vecLayer->GetLayerDefn();
     }
     
-    void RSGISExtractPxlsAsPtsImgCalc::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException)
+    void RSGISExtractPxlsAsPtsImgCalc::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) 
     {
         if(bandValues[0] == maskValue)
         {
@@ -620,7 +620,7 @@ namespace rsgis{namespace img{
         this->maskValue = maskValue;
     }
     
-    void RSGISExtractPxlsAsPts2VecImgCalc::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException)
+    void RSGISExtractPxlsAsPts2VecImgCalc::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) 
     {
         if(bandValues[0] == maskValue)
         {
@@ -642,7 +642,7 @@ namespace rsgis{namespace img{
         this->valIdx = valIdx;
     }
     
-    void RSGISExtractPxlsAsPts2VecWithValImgCalc::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException)
+    void RSGISExtractPxlsAsPts2VecWithValImgCalc::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) 
     {
         if(bandValues[0] == maskValue)
         {

@@ -35,7 +35,7 @@ namespace rsgis{namespace img{
         this->first = new bool[bands.size()];
     }
     
-    void RSGISCalcLocalMinInWin::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, double *outRefVal, unsigned int nOutRefVals) throw(RSGISImageCalcException)
+    void RSGISCalcLocalMinInWin::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, double *outRefVal, unsigned int nOutRefVals) 
     {
         bool midPxlNoData = true;
         if(useNoDataValue)

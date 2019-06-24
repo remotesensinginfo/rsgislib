@@ -48,11 +48,11 @@ namespace rsgis{namespace img{
 		{
 		public:
 			RSGISCalcMeanVectorIndividual(int numOutputValues);
-			void calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) throw(RSGISImageCalcException);
-			void calcImageValue(float *bandValuesImage, int numBands, int band) throw(RSGISImageCalcException);
-			void calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) throw(RSGISImageCalcException);
-			void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(RSGISImageCalcException);
-			double* getOutputValues() throw(RSGISImageCalcException);
+			void calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB);
+			void calcImageValue(float *bandValuesImage, int numBands, int band);
+			void calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent);
+			void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt);
+			double* getOutputValues();
 			void reset();
 			//virtual ~RSGISCalcMeanVectorIndividual();
 		private:
@@ -64,11 +64,11 @@ namespace rsgis{namespace img{
 		{
 		public:
 			RSGISCalcMeanVectorAll(int numOutputValues);
-			void calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) throw(RSGISImageCalcException);
-			void calcImageValue(float *bandValuesImage, int numBands, int band) throw(RSGISImageCalcException);
-			void calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) throw(RSGISImageCalcException);
-			void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(RSGISImageCalcException);
-			double* getOutputValues() throw(RSGISImageCalcException);
+			void calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB);
+			void calcImageValue(float *bandValuesImage, int numBands, int band);
+			void calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent);
+			void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt);
+			double* getOutputValues();
 			void reset();
 			//virtual ~RSGISCalcMeanVectorAll();
 		private:

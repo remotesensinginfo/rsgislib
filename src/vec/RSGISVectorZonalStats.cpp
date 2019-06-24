@@ -107,7 +107,7 @@ namespace rsgis{namespace vec{
 
 	}
 	
-	void RSGISVectorZonalStats::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISVectorZonalStats::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)
 	{
 		OGRGeometry *geometry = inFeature->GetGeometryRef();
 		if( geometry != NULL && wkbFlatten(geometry->getGeometryType()) == wkbPolygon )
@@ -174,7 +174,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISVectorZonalStats::processFeature(OGRFeature *inFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISVectorZonalStats::processFeature(OGRFeature *inFeature, geos::geom::Envelope *env, long fid)
 	{
         // Add header info for first line
         if(this->firstLine)
@@ -260,7 +260,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISVectorZonalStats::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+	void RSGISVectorZonalStats::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn)
 	{
         rsgis::math::RSGISMathsUtils mathUtils;
 		std::string fieldname = "";

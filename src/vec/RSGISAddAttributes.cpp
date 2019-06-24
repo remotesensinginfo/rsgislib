@@ -33,17 +33,17 @@ namespace rsgis{namespace vec{
 		this->numAttributes = numAttributes;
 	}
 		
-	void RSGISAddAttributes::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISAddAttributes::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)
 	{
         // Do nothing - just adding column.
 	}
 	
-	void RSGISAddAttributes::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISAddAttributes::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid)
 	{
 		throw RSGISVectorException("Not implemented..");
 	}
 	
-	void RSGISAddAttributes::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+	void RSGISAddAttributes::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn)
 	{
 		for(int i = 0; i < numAttributes; i++)
 		{

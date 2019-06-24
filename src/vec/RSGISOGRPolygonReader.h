@@ -57,9 +57,9 @@ namespace rsgis{namespace vec{
 	{
 	public:
 		RSGISOGRPolygonReader(std::vector<OGRPolygon*> *polygons);
-		void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-		void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-		void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
+		void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid);
+		void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid);
+		void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn);
 		~RSGISOGRPolygonReader();
 	protected:
         std::vector<OGRPolygon*> *polygons;
@@ -70,9 +70,9 @@ namespace rsgis{namespace vec{
     {
     public:
         RSGISOGRPolygonReader2Index(geos::index::SpatialIndex *polysIdx);
-        void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-        void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-        void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
+        void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid);
+        void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid);
+        void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn);
         ~RSGISOGRPolygonReader2Index();
     protected:
         geos::index::SpatialIndex *polysIdx;

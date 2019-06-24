@@ -42,7 +42,7 @@ namespace rsgis{namespace vec{
 		calcImage = new rsgis::img::RSGISCalcImageSingle(calcValue);
 	}
 	
-	void RSGISZonalCountStats::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISZonalCountStats::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)
 	{
 		try
 		{
@@ -73,12 +73,12 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISZonalCountStats::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISZonalCountStats::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid)
 	{
 		throw RSGISVectorException("Not Implemented");
 	}
 	
-	void RSGISZonalCountStats::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+	void RSGISZonalCountStats::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn)
 	{
 		for(int i = 0; i < numAttributes; i++)
 		{
@@ -145,12 +145,12 @@ namespace rsgis{namespace vec{
 		this->totalPxl = 0;
 	}
 	
-	void RSGISCalcZonalCountFromRasterPolygon::calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISCalcZonalCountFromRasterPolygon::calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) 
 	{
 		throw rsgis::img::RSGISImageCalcException("Not Implemented");
 	}
 	
-	void RSGISCalcZonalCountFromRasterPolygon::calcImageValue(float *bandValuesImage, int numBands, int band) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISCalcZonalCountFromRasterPolygon::calcImageValue(float *bandValuesImage, int numBands, int band) 
 	{
 		float min = 0;
 		bool first = true;
@@ -203,17 +203,17 @@ namespace rsgis{namespace vec{
 		totalPxl++;
 	}
 	
-	void RSGISCalcZonalCountFromRasterPolygon::calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISCalcZonalCountFromRasterPolygon::calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) 
 	{
 		throw rsgis::img::RSGISImageCalcException("Not Implemented");
 	}
 	
-	void RSGISCalcZonalCountFromRasterPolygon::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISCalcZonalCountFromRasterPolygon::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) 
 	{
 		throw rsgis::img::RSGISImageCalcException("Not Implemented");
 	}
 	
-	double* RSGISCalcZonalCountFromRasterPolygon::getOutputValues() throw(rsgis::img::RSGISImageCalcException)
+	double* RSGISCalcZonalCountFromRasterPolygon::getOutputValues() 
 	{
 		//double *outputData = new double[this->numOutputValues];
 		outputValues[0] = this->totalPxl;

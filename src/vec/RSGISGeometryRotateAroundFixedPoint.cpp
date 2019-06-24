@@ -31,17 +31,17 @@ namespace rsgis{namespace vec{
 		this->angle = angle;
 	}
 	
-	void RSGISGeometryRotateAroundFixedPoint::processGeometry(OGRPolygon *polygon) throw(RSGISVectorException)
+	void RSGISGeometryRotateAroundFixedPoint::processGeometry(OGRPolygon *polygon)
 	{
 		throw RSGISVectorException("Not Implemented");
 	}
 	
-	void RSGISGeometryRotateAroundFixedPoint::processGeometry(OGRMultiPolygon *multiPolygon) throw(RSGISVectorException)
+	void RSGISGeometryRotateAroundFixedPoint::processGeometry(OGRMultiPolygon *multiPolygon)
 	{
 		throw RSGISVectorException("Not Implemented");
 	}
 	
-	void RSGISGeometryRotateAroundFixedPoint::processGeometry(OGRPoint *point) throw(RSGISVectorException)
+	void RSGISGeometryRotateAroundFixedPoint::processGeometry(OGRPoint *point)
 	{
         rsgis::math::RSGISMathsUtils mathUtils;
 		
@@ -72,12 +72,12 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISGeometryRotateAroundFixedPoint::processGeometry(OGRLineString *line) throw(RSGISVectorException)
+	void RSGISGeometryRotateAroundFixedPoint::processGeometry(OGRLineString *line)
 	{
 		throw RSGISVectorException("Not Implemented");
 	}
 	
-	OGRPolygon* RSGISGeometryRotateAroundFixedPoint::processGeometry(OGRGeometry *geom) throw(RSGISVectorException)
+	OGRPolygon* RSGISGeometryRotateAroundFixedPoint::processGeometry(OGRGeometry *geom)
 	{
 		throw RSGISVectorException("Not Implemented");
 	}

@@ -31,7 +31,7 @@ namespace rsgis{namespace segment{
         
     }
     
-    void RSGISSpecGroupSegmentation::performSimpleClump(GDALDataset *spectral, GDALDataset *clumps, float specThreshold, bool noDataValProvided, float noDataVal) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISSpecGroupSegmentation::performSimpleClump(GDALDataset *spectral, GDALDataset *clumps, float specThreshold, bool noDataValProvided, float noDataVal) 
     {
         if(spectral->GetRasterXSize() != clumps->GetRasterXSize())
         {
@@ -250,7 +250,7 @@ namespace rsgis{namespace segment{
         delete[] specCPxlVals;
     }
     
-    void RSGISSpecGroupSegmentation::performSimpleClumpKeepPxlVals(GDALDataset *spectral, GDALDataset *clumps, float specThreshold) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISSpecGroupSegmentation::performSimpleClumpKeepPxlVals(GDALDataset *spectral, GDALDataset *clumps, float specThreshold) 
     {
         if(spectral->GetRasterXSize() != clumps->GetRasterXSize())
         {
@@ -446,7 +446,7 @@ namespace rsgis{namespace segment{
         delete[] specCPxlVals;
     }
 
-    void RSGISSpecGroupSegmentation::performSimpleClumpStdDevWeights(GDALDataset *spectral, GDALDataset *clumps, float specThreshold, bool noDataValProvided, float noDataVal) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISSpecGroupSegmentation::performSimpleClumpStdDevWeights(GDALDataset *spectral, GDALDataset *clumps, float specThreshold, bool noDataValProvided, float noDataVal) 
     {
         if(spectral->GetRasterXSize() != clumps->GetRasterXSize())
         {

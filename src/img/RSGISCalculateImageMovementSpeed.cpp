@@ -35,7 +35,7 @@ namespace rsgis{namespace img{
 		this->upper = upper;
 	}
 	
-	void RSGISCalculateImageMovementSpeed::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+	void RSGISCalculateImageMovementSpeed::calcImageValue(float *bandValues, int numBands, double *output) 
 	{
 		float meanSum = 0;
 		float min = 0;

@@ -61,9 +61,9 @@ namespace rsgis{namespace vec{
 		{
 		public:
 			RSGISAddAttributes(Attribute **attributes, int numAttributes);
-			virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(rsgis::RSGISVectorException);
-			virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(rsgis::RSGISVectorException);
-			virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
+			virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid);
+			virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid);
+			virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn);
 			virtual ~RSGISAddAttributes();
 		protected:
 			Attribute **attributes;

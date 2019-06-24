@@ -30,7 +30,7 @@ namespace rsgis{namespace utils{
 		
 	}
 	
-	size_t RSGISTextUtils::countLines(std::string input)throw(RSGISTextException)
+	size_t RSGISTextUtils::countLines(std::string input)
 	{
 		size_t count = 0;
         std::ifstream inputFile;
@@ -56,7 +56,7 @@ namespace rsgis{namespace utils{
 		return count;
 	}
 	
-	void RSGISTextUtils::transpose(std::string input, std::string output, std::string delimiter) throw(RSGISTextException)
+	void RSGISTextUtils::transpose(std::string input, std::string output, std::string delimiter)
 	{
 		
 	}
@@ -154,7 +154,7 @@ namespace rsgis{namespace utils{
 		return output;
 	}
 	
-	std::string RSGISTextUtils::readFileToString(std::string input) throw(RSGISTextException)
+	std::string RSGISTextUtils::readFileToString(std::string input)
 	{
 		std::string wholeFile = "";
 		std::ifstream inputFileStream;
@@ -205,7 +205,7 @@ namespace rsgis{namespace utils{
 		return wholeFile;
 	}
     
-    std::vector<std::string> RSGISTextUtils::readFileToStringVector(std::string input) throw(RSGISTextException)
+    std::vector<std::string> RSGISTextUtils::readFileToStringVector(std::string input)
     {
         std::vector<std::string> wholeFile;
 		std::ifstream inputFileStream;
@@ -256,7 +256,7 @@ namespace rsgis{namespace utils{
 		return wholeFile;
     }
     
-    void RSGISTextUtils::writeStringToFile(std::string file, std::string output) throw(RSGISTextException)
+    void RSGISTextUtils::writeStringToFile(std::string file, std::string output)
     {
         try 
         {
@@ -281,7 +281,7 @@ namespace rsgis{namespace utils{
         }
     }
 	
-	double RSGISTextUtils::strtodouble(std::string inValue) throw(RSGISTextException)
+	double RSGISTextUtils::strtodouble(std::string inValue)
 	{
 		double outValue = 0;
 		try
@@ -296,7 +296,7 @@ namespace rsgis{namespace utils{
 		return outValue;
 	}
 	
-	float RSGISTextUtils::strtofloat(std::string inValue) throw(RSGISTextException)
+	float RSGISTextUtils::strtofloat(std::string inValue)
 	{
 		float outValue = 0;
 		try
@@ -312,7 +312,7 @@ namespace rsgis{namespace utils{
 	}
     
     
-    int RSGISTextUtils::strtoInt(std::string inValue)throw(RSGISTextException)
+    int RSGISTextUtils::strtoInt(std::string inValue)
     {
         int outValue = 0;
         try
@@ -327,7 +327,7 @@ namespace rsgis{namespace utils{
         return outValue;
     }
     
-    unsigned int RSGISTextUtils::strtoUInt(std::string inValue)throw(RSGISTextException)
+    unsigned int RSGISTextUtils::strtoUInt(std::string inValue)
     {
         unsigned int outValue = 0;
         try
@@ -342,7 +342,7 @@ namespace rsgis{namespace utils{
         return outValue;
     }
     
-    long RSGISTextUtils::strtoLong(std::string inValue)throw(RSGISTextException)
+    long RSGISTextUtils::strtoLong(std::string inValue)
     {
         long outValue = 0;
         try
@@ -357,7 +357,7 @@ namespace rsgis{namespace utils{
         return outValue;
     }
     
-    unsigned long RSGISTextUtils::strtoULong(std::string inValue)throw(RSGISTextException)
+    unsigned long RSGISTextUtils::strtoULong(std::string inValue)
     {
         unsigned long outValue = 0;
         try
@@ -372,7 +372,7 @@ namespace rsgis{namespace utils{
         return outValue;
     }
 	
-	uint_fast8_t RSGISTextUtils::strto8bitUInt(std::string inValue) throw(RSGISTextException)
+	uint_fast8_t RSGISTextUtils::strto8bitUInt(std::string inValue)
 	{
 		uint_fast8_t outValue = 0;
 		try
@@ -387,7 +387,7 @@ namespace rsgis{namespace utils{
 		return outValue;
 	}
 	
-	uint_fast16_t RSGISTextUtils::strto16bitUInt(std::string inValue) throw(RSGISTextException)
+	uint_fast16_t RSGISTextUtils::strto16bitUInt(std::string inValue)
 	{
 		uint_fast16_t outValue = 0;
 		try
@@ -402,7 +402,7 @@ namespace rsgis{namespace utils{
 		return outValue;
 	}
 	
-	uint_fast32_t RSGISTextUtils::strto32bitUInt(std::string inValue) throw(RSGISTextException)
+	uint_fast32_t RSGISTextUtils::strto32bitUInt(std::string inValue)
 	{
 		uint_fast32_t outValue = 0;
 		try
@@ -417,7 +417,7 @@ namespace rsgis{namespace utils{
 		return outValue;
 	}
 	
-	uint_fast64_t RSGISTextUtils::strto64bitUInt(std::string inValue) throw(RSGISTextException)
+	uint_fast64_t RSGISTextUtils::strto64bitUInt(std::string inValue)
 	{
 		uint_fast64_t outValue = 0;
 		try
@@ -432,7 +432,7 @@ namespace rsgis{namespace utils{
 		return outValue;
 	}
 	
-	int_fast8_t RSGISTextUtils::strto8bitInt(std::string inValue) throw(RSGISTextException)
+	int_fast8_t RSGISTextUtils::strto8bitInt(std::string inValue)
 	{
 		int_fast8_t outValue = 0;
 		try
@@ -447,7 +447,7 @@ namespace rsgis{namespace utils{
 		return outValue;
 	}
 	
-	int_fast16_t RSGISTextUtils::strto16bitInt(std::string inValue) throw(RSGISTextException)
+	int_fast16_t RSGISTextUtils::strto16bitInt(std::string inValue)
 	{
 		int_fast16_t outValue = 0;
 		try
@@ -462,7 +462,7 @@ namespace rsgis{namespace utils{
 		return outValue;
 	}
 	
-	int_fast32_t RSGISTextUtils::strto32bitInt(std::string inValue) throw(RSGISTextException)
+	int_fast32_t RSGISTextUtils::strto32bitInt(std::string inValue)
 	{
 		int_fast32_t outValue = 0;
 		try
@@ -477,7 +477,7 @@ namespace rsgis{namespace utils{
 		return outValue;
 	}
 	
-	int_fast64_t RSGISTextUtils::strto64bitInt(std::string inValue) throw(RSGISTextException)
+	int_fast64_t RSGISTextUtils::strto64bitInt(std::string inValue)
 	{
 		int_fast64_t outValue = 0;
 		try
@@ -492,7 +492,7 @@ namespace rsgis{namespace utils{
 		return outValue;
 	}
     
-    size_t RSGISTextUtils::strtosizet(std::string inValue)throw(RSGISTextException)
+    size_t RSGISTextUtils::strtosizet(std::string inValue)
     {
         size_t outValue = 0;
 		try
@@ -507,7 +507,7 @@ namespace rsgis{namespace utils{
 		return outValue;
     }
 	
-	std::string RSGISTextUtils::doubletostring(double number) throw(RSGISTextException)
+	std::string RSGISTextUtils::doubletostring(double number)
 	{
 		std::string outValue = "";
 		try
@@ -521,7 +521,7 @@ namespace rsgis{namespace utils{
 		return outValue;
 	}
 	
-	std::string RSGISTextUtils::floattostring(float number) throw(RSGISTextException)
+	std::string RSGISTextUtils::floattostring(float number)
 	{
 		std::string outValue = "";
 		try
@@ -535,7 +535,7 @@ namespace rsgis{namespace utils{
 		return outValue;
 	}
 	
-	std::string RSGISTextUtils::uInt8bittostring(uint_fast8_t number) throw(RSGISTextException)
+	std::string RSGISTextUtils::uInt8bittostring(uint_fast8_t number)
 	{
 		std::string outValue = "";
 		try
@@ -549,7 +549,7 @@ namespace rsgis{namespace utils{
 		return outValue;
 	}
 	
-	std::string RSGISTextUtils::uInt16bittostring(uint_fast16_t number) throw(RSGISTextException)
+	std::string RSGISTextUtils::uInt16bittostring(uint_fast16_t number)
 	{
 		std::string outValue = "";
 		try
@@ -563,7 +563,7 @@ namespace rsgis{namespace utils{
 		return outValue;
 	}
 	
-	std::string RSGISTextUtils::uInt32bittostring(uint_fast32_t number) throw(RSGISTextException)
+	std::string RSGISTextUtils::uInt32bittostring(uint_fast32_t number)
 	{
 		std::string outValue = "";
 		try
@@ -577,7 +577,7 @@ namespace rsgis{namespace utils{
 		return outValue;
 	}
 	
-	std::string RSGISTextUtils::uInt64bittostring(uint_fast64_t number) throw(RSGISTextException)
+	std::string RSGISTextUtils::uInt64bittostring(uint_fast64_t number)
 	{
 		std::string outValue = "";
 		try
@@ -591,7 +591,7 @@ namespace rsgis{namespace utils{
 		return outValue;
 	}
 	
-	std::string RSGISTextUtils::int8bittostring(int_fast8_t number) throw(RSGISTextException)
+	std::string RSGISTextUtils::int8bittostring(int_fast8_t number)
 	{
 		std::string outValue = "";
 		try
@@ -605,7 +605,7 @@ namespace rsgis{namespace utils{
 		return outValue;
 	}
 	
-	std::string RSGISTextUtils::int16bittostring(int_fast16_t number) throw(RSGISTextException)
+	std::string RSGISTextUtils::int16bittostring(int_fast16_t number)
 	{
 		std::string outValue = "";
 		try
@@ -619,7 +619,7 @@ namespace rsgis{namespace utils{
 		return outValue;
 	}
 	
-	std::string RSGISTextUtils::int32bittostring(int_fast32_t number) throw(RSGISTextException)
+	std::string RSGISTextUtils::int32bittostring(int_fast32_t number)
 	{
 		std::string outValue = "";
 		try
@@ -633,7 +633,7 @@ namespace rsgis{namespace utils{
 		return outValue;
 	}
 	
-	std::string RSGISTextUtils::int64bittostring(int_fast64_t number) throw(RSGISTextException)
+	std::string RSGISTextUtils::int64bittostring(int_fast64_t number)
 	{
 		std::string outValue = "";
 		try
@@ -647,7 +647,7 @@ namespace rsgis{namespace utils{
 		return outValue;
 	}
     
-    std::string RSGISTextUtils::sizettostring(size_t number)throw(RSGISTextException)
+    std::string RSGISTextUtils::sizettostring(size_t number)
     {
         std::string outValue = "";
 		try
@@ -662,21 +662,7 @@ namespace rsgis{namespace utils{
     }
     
     
-    std::string RSGISTextUtils::inttostring(int number)throw(RSGISTextException)
-    {
-        std::string outValue = "";
-        try
-        {
-            outValue = boost::lexical_cast<std::string>(number);
-        }
-        catch(boost::bad_lexical_cast &e)
-        {
-            throw RSGISTextException(e.what());
-        }
-        return outValue;
-    }
-    
-    std::string RSGISTextUtils::uInttostring(unsigned int number)throw(RSGISTextException)
+    std::string RSGISTextUtils::inttostring(int number)
     {
         std::string outValue = "";
         try
@@ -690,7 +676,7 @@ namespace rsgis{namespace utils{
         return outValue;
     }
     
-    std::string RSGISTextUtils::longtostring(long number)throw(RSGISTextException)
+    std::string RSGISTextUtils::uInttostring(unsigned int number)
     {
         std::string outValue = "";
         try
@@ -704,7 +690,21 @@ namespace rsgis{namespace utils{
         return outValue;
     }
     
-    std::string RSGISTextUtils::uLongtostring(unsigned long number)throw(RSGISTextException)
+    std::string RSGISTextUtils::longtostring(long number)
+    {
+        std::string outValue = "";
+        try
+        {
+            outValue = boost::lexical_cast<std::string>(number);
+        }
+        catch(boost::bad_lexical_cast &e)
+        {
+            throw RSGISTextException(e.what());
+        }
+        return outValue;
+    }
+    
+    std::string RSGISTextUtils::uLongtostring(unsigned long number)
     {
         std::string outValue = "";
         try
@@ -732,7 +732,7 @@ namespace rsgis{namespace utils{
 		
 	}
 	
-	void RSGISTextFileLineReader::openFile(std::string filepath)throw(RSGISTextException)
+	void RSGISTextFileLineReader::openFile(std::string filepath)
 	{
 		inputFileStream.open(filepath.c_str(), std::ios_base::in);
 		if(!inputFileStream.is_open())
@@ -751,7 +751,7 @@ namespace rsgis{namespace utils{
 		return true;
 	}
 	
-	std::string RSGISTextFileLineReader::readLine()throw(RSGISTextException)
+	std::string RSGISTextFileLineReader::readLine()
 	{
 		std::string strLine = "";
 		bool lineEnding = false;
@@ -792,7 +792,7 @@ namespace rsgis{namespace utils{
 		return strLine;
 	}
 	
-	void RSGISTextFileLineReader::closeFile()throw(RSGISTextException)
+	void RSGISTextFileLineReader::closeFile()
 	{
 		inputFileStream.close();
 		fileOpened = false;

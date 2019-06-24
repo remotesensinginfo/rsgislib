@@ -30,7 +30,7 @@ namespace rsgis{namespace segment{
         
     }
     
-    void RSGISMergeSmallClumps::mergeSmallClumps(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISMergeSmallClumps::mergeSmallClumps(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize) 
     {
         if(spectral->GetRasterXSize() != clumps->GetRasterXSize())
         {

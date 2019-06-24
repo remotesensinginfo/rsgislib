@@ -28,19 +28,19 @@ namespace rsgis{namespace geom{
 
 	}
 
-	std::vector<geos::geom::Polygon*>* RSGISIdentifyNonConvexPolygonsDelaunay::retrievePolygons(std::list<RSGIS2DPoint*> **clusters, int numClusters) throw(RSGISGeometryException)
+	std::vector<geos::geom::Polygon*>* RSGISIdentifyNonConvexPolygonsDelaunay::retrievePolygons(std::list<RSGIS2DPoint*> **clusters, int numClusters)
 	{
 		throw RSGISGeometryException("NOT IMPLEMENT!");
 		return NULL;
 	}
 
-	std::vector<geos::geom::Polygon*>* RSGISIdentifyNonConvexPolygonsDelaunay::retrievePolygons(std::list<RSGISPolygon*> **clusters, int numClusters) throw(RSGISGeometryException)
+	std::vector<geos::geom::Polygon*>* RSGISIdentifyNonConvexPolygonsDelaunay::retrievePolygons(std::list<RSGISPolygon*> **clusters, int numClusters)
 	{
 		throw RSGISGeometryException("NOT IMPLEMENT!");
 		return NULL;
 	}
 	
-	std::vector<geos::geom::Polygon*>* RSGISIdentifyNonConvexPolygonsDelaunay::retrievePolygons(std::list<geos::geom::Polygon*> **clusters, int numClusters) throw(RSGISGeometryException)
+	std::vector<geos::geom::Polygon*>* RSGISIdentifyNonConvexPolygonsDelaunay::retrievePolygons(std::list<geos::geom::Polygon*> **clusters, int numClusters)
 	{
 		std::vector<geos::geom::Polygon*> *polys = NULL;
 		
@@ -66,7 +66,7 @@ namespace rsgis{namespace geom{
 		return polys;
 	}
 
-	geos::geom::Polygon* RSGISIdentifyNonConvexPolygonsDelaunay::retrievePolygon(std::vector<geos::geom::Polygon*> *polygons) throw(RSGISGeometryException)
+	geos::geom::Polygon* RSGISIdentifyNonConvexPolygonsDelaunay::retrievePolygon(std::vector<geos::geom::Polygon*> *polygons)
 	{
 		RSGISGeometry geomUtils;
 		geos::geom::Polygon *poly = NULL;
@@ -213,7 +213,7 @@ namespace rsgis{namespace geom{
 		return poly;
 	}
 	
-	geos::geom::Polygon* RSGISIdentifyNonConvexPolygonsDelaunay::retrievePolygon(std::list<geos::geom::Polygon*> *polygons) throw(RSGISGeometryException)
+	geos::geom::Polygon* RSGISIdentifyNonConvexPolygonsDelaunay::retrievePolygon(std::list<geos::geom::Polygon*> *polygons)
 	{
 		RSGISGeometry geomUtils;
 		geos::geom::Polygon *poly = NULL;
@@ -360,7 +360,7 @@ namespace rsgis{namespace geom{
 		return poly;
 	}
 
-	std::vector<geos::geom::Polygon*>* RSGISIdentifyNonConvexPolygonsDelaunay::findPolygonsFromCoordinates(std::list<RSGIS2DPoint*> *pts, int numClusters) throw(RSGISGeometryException)
+	std::vector<geos::geom::Polygon*>* RSGISIdentifyNonConvexPolygonsDelaunay::findPolygonsFromCoordinates(std::list<RSGIS2DPoint*> *pts, int numClusters)
 	{
 		std::vector<geos::geom::Polygon*> *polys = new std::vector<geos::geom::Polygon*>();
 		try
@@ -415,7 +415,7 @@ namespace rsgis{namespace geom{
 						polys->push_back(this->findPolygonFromTriangles(clusterTriangles[i], i, true));
 					}
 				}
-				catch(RSGISGeometryException e)
+				catch(RSGISGeometryException &e)
 				{
 					std::cout << "ERROR OCCURED!!: " << e.what() << " IGNORING!" << std::endl;
 				}
@@ -429,7 +429,7 @@ namespace rsgis{namespace geom{
 		return polys;
 	}
 	
-	geos::geom::Polygon* RSGISIdentifyNonConvexPolygonsDelaunay::findPolygonFromTriangles(std::list<RSGISTriangle*> *cluster, int id, bool tryAgain) throw(RSGISGeometryException)
+	geos::geom::Polygon* RSGISIdentifyNonConvexPolygonsDelaunay::findPolygonFromTriangles(std::list<RSGISTriangle*> *cluster, int id, bool tryAgain)
 	{
 		geos::geom::Polygon *outPoly = NULL;
 		RSGISGeometry geomUtils;
@@ -532,7 +532,7 @@ namespace rsgis{namespace geom{
 			}
 			delete polys;
 		}
-		catch(RSGISGeometryException e)
+		catch(RSGISGeometryException &e)
 		{
 			throw e;
 		}

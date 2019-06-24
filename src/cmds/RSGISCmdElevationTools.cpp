@@ -28,7 +28,7 @@
 
 namespace rsgis{ namespace cmds {
     
-    void executeCalcSlope(std::string demImage, std::string outputImage, RSGISAngleMeasure outAngleUnit, std::string outImageFormat)throw(RSGISCmdException)
+    void executeCalcSlope(std::string demImage, std::string outputImage, RSGISAngleMeasure outAngleUnit, std::string outImageFormat)
     {
         try
         {
@@ -79,7 +79,7 @@ namespace rsgis{ namespace cmds {
     }
 
     
-    void executeCalcAspect(std::string demImage, std::string outputImage, std::string outImageFormat)throw(RSGISCmdException)
+    void executeCalcAspect(std::string demImage, std::string outputImage, std::string outImageFormat)
     {
         try
         {
@@ -130,7 +130,7 @@ namespace rsgis{ namespace cmds {
         }
     }
             
-    void executeCatagoriseAspect(std::string aspectImage, std::string outputImage, std::string outImageFormat)throw(RSGISCmdException)
+    void executeCatagoriseAspect(std::string aspectImage, std::string outputImage, std::string outImageFormat)
     {
         try
         {
@@ -158,7 +158,7 @@ namespace rsgis{ namespace cmds {
     }
 
     
-    void executeCalcHillshade(std::string demImage, std::string outputImage, float solarAzimuth, float solarZenith, std::string outImageFormat)throw(RSGISCmdException)
+    void executeCalcHillshade(std::string demImage, std::string outputImage, float solarAzimuth, float solarZenith, std::string outImageFormat)
     {
         try
         {
@@ -222,7 +222,7 @@ namespace rsgis{ namespace cmds {
     }
 
     
-    void executeCalcShadowMask(std::string demImage, std::string outputImage, float solarAzimuth, float solarZenith, float maxHeight, std::string outImageFormat)throw(RSGISCmdException)
+    void executeCalcShadowMask(std::string demImage, std::string outputImage, float solarAzimuth, float solarZenith, float maxHeight, std::string outImageFormat)
     {
         try
         {
@@ -284,7 +284,7 @@ namespace rsgis{ namespace cmds {
     }
 
     
-    void executeCalcLocalIncidenceAngle(std::string demImage, std::string outputImage, float solarAzimuth, float solarZenith, std::string outImageFormat)throw(RSGISCmdException)
+    void executeCalcLocalIncidenceAngle(std::string demImage, std::string outputImage, float solarAzimuth, float solarZenith, std::string outImageFormat)
     {
         try
         {
@@ -336,7 +336,7 @@ namespace rsgis{ namespace cmds {
     }
 
     
-    void executeCalcLocalExitanceAngle(std::string demImage, std::string outputImage, float viewAzimuth, float viewZenith, std::string outImageFormat)throw(RSGISCmdException)
+    void executeCalcLocalExitanceAngle(std::string demImage, std::string outputImage, float viewAzimuth, float viewZenith, std::string outImageFormat)
     {
         try
         {
@@ -387,7 +387,7 @@ namespace rsgis{ namespace cmds {
         }
     }
             
-    void executeDTMAspectMedianFilter(std::string demImage, std::string aspectImage, std::string outputImage, float aspectRange, int winHSize, std::string outImageFormat)throw(RSGISCmdException)
+    void executeDTMAspectMedianFilter(std::string demImage, std::string aspectImage, std::string outputImage, float aspectRange, int winHSize, std::string outImageFormat)
     {
         try
         {
@@ -439,7 +439,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void executeDEMFillSoilleGratin1994(std::string inImage, std::string validDataImg, std::string outputImage, std::string outImageFormat)throw(RSGISCmdException)
+    void executeDEMFillSoilleGratin1994(std::string inImage, std::string validDataImg, std::string outputImage, std::string outImageFormat)
     {
         try
         {
@@ -486,7 +486,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void executePlaneFitDetreadDEM(std::string demImage, std::string outputImage, std::string outImageFormat, int winSize)throw(RSGISCmdException)
+    void executePlaneFitDetreadDEM(std::string demImage, std::string outputImage, std::string outImageFormat, int winSize)
     {
         try
         {

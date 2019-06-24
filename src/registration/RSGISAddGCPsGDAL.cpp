@@ -72,7 +72,7 @@ namespace rsgis{namespace reg{
 
     }
     
-    void RSGISAddGCPsGDAL::readGCPFile(std::string gcpFilePath, std::vector<RSGISGCPImg2MapNode*> *gcps) throw(RSGISImageWarpException)
+    void RSGISAddGCPsGDAL::readGCPFile(std::string gcpFilePath, std::vector<RSGISGCPImg2MapNode*> *gcps)
 	{
         rsgis::utils::RSGISTextUtils textUtils;
         rsgis::math::RSGISMathsUtils mathUtils;
@@ -124,7 +124,7 @@ namespace rsgis{namespace reg{
         
 	}
     
-    void RSGISAddGCPsGDAL::convertRSGIS2GDALGCP(std::vector<RSGISGCPImg2MapNode*> *gcps, GDAL_GCP *gdalGCPList) throw(RSGISImageWarpException)
+    void RSGISAddGCPsGDAL::convertRSGIS2GDALGCP(std::vector<RSGISGCPImg2MapNode*> *gcps, GDAL_GCP *gdalGCPList)
     {
         
         unsigned int gcpNum=0;
@@ -146,7 +146,7 @@ namespace rsgis{namespace reg{
         
     }
     
-    void RSGISAddGCPsGDAL::copyImageWithoutSpatialRef(std::string inFileName, std::string outFileName, std::string gdalFormat, GDALDataType gdalDataType) throw(RSGISImageWarpException)
+    void RSGISAddGCPsGDAL::copyImageWithoutSpatialRef(std::string inFileName, std::string outFileName, std::string gdalFormat, GDALDataType gdalDataType)
     {
         
         GDALAllRegister();

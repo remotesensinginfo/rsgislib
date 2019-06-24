@@ -30,7 +30,7 @@ namespace rsgis{namespace calib{
         
     }
     
-    void RSGISHydroDEMFillSoilleGratin94::performSoilleGratin94Fill(GDALDataset *inDEMImgDS, GDALDataset *inValidImgDS, GDALDataset *outImgDS, bool calcBorderVal, long borderVal)throw(rsgis::img::RSGISImageCalcException)
+    void RSGISHydroDEMFillSoilleGratin94::performSoilleGratin94Fill(GDALDataset *inDEMImgDS, GDALDataset *inValidImgDS, GDALDataset *outImgDS, bool calcBorderVal, long borderVal)
     {
         try
         {
@@ -203,7 +203,7 @@ namespace rsgis{namespace calib{
         pxQ[qIdx]->push_back(pxl);
     }
     
-    std::list<Q2DPxl>* RSGISHydroDEMFillSoilleGratin94::getNeighbours(Q2DPxl pxl, GDALRasterBand *inValidImg) throw(rsgis::img::RSGISImageCalcException)
+    std::list<Q2DPxl>* RSGISHydroDEMFillSoilleGratin94::getNeighbours(Q2DPxl pxl, GDALRasterBand *inValidImg) 
     {
         std::list<Q2DPxl> *nPxls = new std::list<Q2DPxl>();
         
@@ -260,14 +260,14 @@ namespace rsgis{namespace calib{
         return nPxls;
     }
     
-    long RSGISHydroDEMFillSoilleGratin94::getPxlVal(Q2DPxl pxl, GDALRasterBand *imgData)throw(rsgis::img::RSGISImageCalcException)
+    long RSGISHydroDEMFillSoilleGratin94::getPxlVal(Q2DPxl pxl, GDALRasterBand *imgData)
     {
         float outVal = 0;
         imgData->RasterIO(GF_Read, pxl.x, pxl.y, 1, 1, &outVal, 1, 1, GDT_Float32, 0, 0);
         return (long)outVal;
     }
     
-    void RSGISHydroDEMFillSoilleGratin94::setPxlVal(Q2DPxl pxl, long val, GDALRasterBand *imgData)throw(rsgis::img::RSGISImageCalcException)
+    void RSGISHydroDEMFillSoilleGratin94::setPxlVal(Q2DPxl pxl, long val, GDALRasterBand *imgData)
     {
         float outVal = val;
         imgData->RasterIO(GF_Write, pxl.x, pxl.y, 1, 1, &outVal, 1, 1, GDT_Float32, 0, 0);
@@ -283,7 +283,7 @@ namespace rsgis{namespace calib{
         return outVal;
     }
     
-    void RSGISHydroDEMFillSoilleGratin94::getImagesEdgesToInitFill(GDALRasterBand *imgData, double borderVal, std::list<Q2DPxl> *pxQ)throw(rsgis::img::RSGISImageCalcException)
+    void RSGISHydroDEMFillSoilleGratin94::getImagesEdgesToInitFill(GDALRasterBand *imgData, double borderVal, std::list<Q2DPxl> *pxQ)
     {
         try
         {
@@ -349,7 +349,7 @@ namespace rsgis{namespace calib{
         this->pxQ = pxQ;
     }
     
-    void RSGISInitOutputImageSoilleGratin94::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISInitOutputImageSoilleGratin94::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) 
     {
         if(winSize != 3)
         {

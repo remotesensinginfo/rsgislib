@@ -32,7 +32,7 @@ RSGISImageComposite::RSGISImageComposite(int numberOutBands, unsigned int nCompo
     this->outStat = outStat;
 }
 
-void RSGISImageComposite::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+void RSGISImageComposite::calcImageValue(float *bandValues, int numBands, double *output) 
 {
     for(int i = 0; i < this->numberOutBands; ++i)
     {
@@ -91,7 +91,7 @@ void RSGISImageComposite::calcImageValue(float *bandValues, int numBands, double
         this->numInImgs = numInImgs;
     }
     
-    void RSGISMaxNDVIImageComposite::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+    void RSGISMaxNDVIImageComposite::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         bool noData = true;
         for(int i = 0; i < numBands; ++i)
@@ -153,7 +153,7 @@ void RSGISImageComposite::calcImageValue(float *bandValues, int numBands, double
         this->outNoDataVal = outNoDataVal;
     }
     
-    void RSGISRefImgImageComposite::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(RSGISImageCalcException)
+    void RSGISRefImgImageComposite::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) 
     {
         if(intBandValues[0] == 0)
         {
@@ -211,7 +211,7 @@ void RSGISImageComposite::calcImageValue(float *bandValues, int numBands, double
         this->refImgInitPxlVal = refImgInitPxlVal;
     }
 
-    void RSGISTimeseriesFillRefImgImageComposite::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(RSGISImageCalcException)
+    void RSGISTimeseriesFillRefImgImageComposite::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) 
     {
         if(numIntVals != (compInfoVec.size()+1))
         {
@@ -270,7 +270,7 @@ void RSGISImageComposite::calcImageValue(float *bandValues, int numBands, double
         }
     }
     
-    void RSGISTimeseriesFillImgImageComposite::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(RSGISImageCalcException)
+    void RSGISTimeseriesFillImgImageComposite::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) 
     {
         if(numIntVals != 1)
         {
@@ -333,7 +333,7 @@ void RSGISImageComposite::calcImageValue(float *bandValues, int numBands, double
         }
     }
     
-    void RSGISTimeseriesFillFinalRefImgImageComposite::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(RSGISImageCalcException)
+    void RSGISTimeseriesFillFinalRefImgImageComposite::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) 
     {
         output[0] = 0;
         
@@ -371,7 +371,7 @@ void RSGISImageComposite::calcImageValue(float *bandValues, int numBands, double
         this->noDataVal = noDataVal;
     }
     
-    void RSGISCombineImgBands2SingleBand::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(RSGISImageCalcException)
+    void RSGISCombineImgBands2SingleBand::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) 
     {
         if(numIntVals != 1)
         {

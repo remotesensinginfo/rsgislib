@@ -41,7 +41,7 @@ namespace rsgis{namespace vec{
 		// There are no attributes to read.
 	}
 	
-	void RSGISZonalPolygons::createLayerDefinition(OGRLayer *outputSHPLayer)throw(RSGISVectorOutputException)
+	void RSGISZonalPolygons::createLayerDefinition(OGRLayer *outputSHPLayer)
 	{
 		for(int i = 0; i < numBands; i++)
 		{

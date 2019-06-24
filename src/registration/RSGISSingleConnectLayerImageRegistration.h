@@ -64,13 +64,13 @@ namespace rsgis{namespace reg{
 		};
 		
 		RSGISSingleConnectLayerImageRegistration(GDALDataset *reference, GDALDataset *floating, unsigned int gap, float metricThreshold, unsigned int windowSize, unsigned int searchArea, RSGISImageSimilarityMetric *metric, float stdDevRefThreshold, float stdDevFloatThreshold, unsigned int subPixelResolution, float distanceThreshold, unsigned int maxNumIterations, float moveChangeThreshold, float pSmoothness);
-		void initRegistration()throw(RSGISRegistrationException);
-		void executeRegistration()throw(RSGISRegistrationException);
-		void finaliseRegistration()throw(RSGISRegistrationException);
-		void exportTiePointsENVIImage2Map(std::string filepath)throw(RSGISRegistrationException);
-		void exportTiePointsENVIImage2Image(std::string filepath)throw(RSGISRegistrationException);
-		void exportTiePointsRSGISImage2Map(std::string filepath)throw(RSGISRegistrationException);
-        void exportTiePointsRSGISMapOffs(std::string filepath)throw(RSGISRegistrationException);
+		void initRegistration();
+		void executeRegistration();
+		void finaliseRegistration();
+		void exportTiePointsENVIImage2Map(std::string filepath);
+		void exportTiePointsENVIImage2Image(std::string filepath);
+		void exportTiePointsRSGISImage2Map(std::string filepath);
+        void exportTiePointsRSGISMapOffs(std::string filepath);
 		~RSGISSingleConnectLayerImageRegistration();
 	private:
 		std::list<TiePointInSingleLayer*> *tiePoints;

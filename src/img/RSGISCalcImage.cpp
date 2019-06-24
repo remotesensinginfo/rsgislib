@@ -33,7 +33,7 @@ namespace rsgis{namespace img{
 	}
     
     
-    void RSGISCalcImage::calcImage(GDALDataset **datasets, int numDS, std::string outputImage, bool setOutNames, std::string *bandNames, std::string gdalFormat, GDALDataType gdalDataType) throw(RSGISImageCalcException,RSGISImageBandException)
+    void RSGISCalcImage::calcImage(GDALDataset **datasets, int numDS, std::string outputImage, bool setOutNames, std::string *bandNames, std::string gdalFormat, GDALDataType gdalDataType)
     {
         GDALAllRegister();
 		RSGISImageUtils imgUtils;
@@ -466,7 +466,7 @@ namespace rsgis{namespace img{
     
     
     
-    void RSGISCalcImage::calcImage(GDALDataset **datasets, int numDS, std::string outputImage, std::string outputRefIntImage, std::string gdalFormat, GDALDataType gdalDataType) throw(RSGISImageCalcException,RSGISImageBandException)
+    void RSGISCalcImage::calcImage(GDALDataset **datasets, int numDS, std::string outputImage, std::string outputRefIntImage, std::string gdalFormat, GDALDataType gdalDataType)
     {
         GDALAllRegister();
         RSGISImageUtils imgUtils;
@@ -937,7 +937,7 @@ namespace rsgis{namespace img{
     
     
     
-    void RSGISCalcImage::calcImage(GDALDataset **datasets, int numDS, GDALDataset *outputImageDS) throw(RSGISImageCalcException,RSGISImageBandException)
+    void RSGISCalcImage::calcImage(GDALDataset **datasets, int numDS, GDALDataset *outputImageDS)
 	{
 		GDALAllRegister();
 		RSGISImageUtils imgUtils;
@@ -1352,7 +1352,7 @@ namespace rsgis{namespace img{
 		}
 	}
     
-    void RSGISCalcImage::calcImagePartialOutput(GDALDataset **datasets, int numDS, GDALDataset *outputImageDS) throw(RSGISImageCalcException,RSGISImageBandException)
+    void RSGISCalcImage::calcImagePartialOutput(GDALDataset **datasets, int numDS, GDALDataset *outputImageDS)
     {
         GDALAllRegister();
         RSGISImageUtils imgUtils;
@@ -1765,7 +1765,7 @@ namespace rsgis{namespace img{
         }
     }
     
-    void RSGISCalcImage::calcImage(GDALDataset **datasets, int numIntDS, int numFloatDS, std::string outputImage, bool setOutNames, std::string *bandNames , std::string gdalFormat, GDALDataType gdalDataType) throw(RSGISImageCalcException,RSGISImageBandException)
+    void RSGISCalcImage::calcImage(GDALDataset **datasets, int numIntDS, int numFloatDS, std::string outputImage, bool setOutNames, std::string *bandNames , std::string gdalFormat, GDALDataType gdalDataType)
     {
         GDALAllRegister();
 		RSGISImageUtils imgUtils;
@@ -2359,7 +2359,7 @@ namespace rsgis{namespace img{
     }
     
     
-    void RSGISCalcImage::calcImage(GDALDataset **datasets, int numIntDS, int numFloatDS, std::string outputImage, std::string outputRefIntImage, std::string gdalFormat, GDALDataType gdalDataType) throw(RSGISImageCalcException,RSGISImageBandException)
+    void RSGISCalcImage::calcImage(GDALDataset **datasets, int numIntDS, int numFloatDS, std::string outputImage, std::string outputRefIntImage, std::string gdalFormat, GDALDataType gdalDataType)
     {
         GDALAllRegister();
         RSGISImageUtils imgUtils;
@@ -2978,7 +2978,7 @@ namespace rsgis{namespace img{
     
     
     
-    void RSGISCalcImage::calcImage(GDALDataset **datasets, int numIntDS, int numFloatDS, geos::geom::Envelope *env, bool quiet) throw(RSGISImageCalcException,RSGISImageBandException)
+    void RSGISCalcImage::calcImage(GDALDataset **datasets, int numIntDS, int numFloatDS, geos::geom::Envelope *env, bool quiet)
     {
         GDALAllRegister();
 		RSGISImageUtils imgUtils;
@@ -3435,7 +3435,7 @@ namespace rsgis{namespace img{
         }
     }
 	
-    void RSGISCalcImage::calcImage(GDALDataset **datasets, int numIntDS, int numFloatDS, GDALDataset *outputImageDS) throw(RSGISImageCalcException,RSGISImageBandException)
+    void RSGISCalcImage::calcImage(GDALDataset **datasets, int numIntDS, int numFloatDS, GDALDataset *outputImageDS)
     {
         GDALAllRegister();
 		RSGISImageUtils imgUtils;
@@ -4011,7 +4011,7 @@ namespace rsgis{namespace img{
         }
     }
     
-	void RSGISCalcImage::calcImage(GDALDataset **datasets, int numDS) throw(RSGISImageCalcException,RSGISImageBandException)
+	void RSGISCalcImage::calcImage(GDALDataset **datasets, int numDS)
 	{
 		GDALAllRegister();
 		RSGISImageUtils imgUtils;
@@ -4288,7 +4288,7 @@ namespace rsgis{namespace img{
 		}
 	}
     
-    void RSGISCalcImage::calcImageBand(GDALDataset **datasets, int numDS, std::string outputImageBase, std::string gdalFormat) throw(RSGISImageCalcException,RSGISImageBandException)
+    void RSGISCalcImage::calcImageBand(GDALDataset **datasets, int numDS, std::string outputImageBase, std::string gdalFormat)
 	{
 		GDALAllRegister();
 		RSGISImageUtils imgUtils;
@@ -4536,7 +4536,7 @@ namespace rsgis{namespace img{
 	}
 
     
-    void RSGISCalcImage::calcImageInEnv(GDALDataset **datasets, int numDS, std::string outputImage, geos::geom::Envelope *env, bool setOutNames, std::string *bandNames, std::string gdalFormat, GDALDataType gdalDataType) throw(RSGISImageCalcException,RSGISImageBandException)
+    void RSGISCalcImage::calcImageInEnv(GDALDataset **datasets, int numDS, std::string outputImage, geos::geom::Envelope *env, bool setOutNames, std::string *bandNames, std::string gdalFormat, GDALDataType gdalDataType)
     {
         GDALAllRegister();
 		RSGISImageUtils imgUtils;
@@ -4967,7 +4967,7 @@ namespace rsgis{namespace img{
 		}
     }
     
-    void RSGISCalcImage::calcImageInEnv(GDALDataset **datasets, int numDS, geos::geom::Envelope *env, bool quiet) throw(RSGISImageCalcException,RSGISImageBandException)
+    void RSGISCalcImage::calcImageInEnv(GDALDataset **datasets, int numDS, geos::geom::Envelope *env, bool quiet)
     {
         GDALAllRegister();
 		RSGISImageUtils imgUtils;
@@ -5260,7 +5260,7 @@ namespace rsgis{namespace img{
 		}
     }
     
-    void RSGISCalcImage::calcImageInEnv(GDALDataset **datasets, int numIntDS, int numFloatDS, geos::geom::Envelope *env, bool quiet) throw(RSGISImageCalcException,RSGISImageBandException)
+    void RSGISCalcImage::calcImageInEnv(GDALDataset **datasets, int numIntDS, int numFloatDS, geos::geom::Envelope *env, bool quiet)
     {
         GDALAllRegister();
         RSGISImageUtils imgUtils;
@@ -5710,7 +5710,7 @@ namespace rsgis{namespace img{
         }
     }
     
-    void RSGISCalcImage::calcImagePosPxl(GDALDataset **datasets, int numDS) throw(RSGISImageCalcException,RSGISImageBandException)
+    void RSGISCalcImage::calcImagePosPxl(GDALDataset **datasets, int numDS)
 	{
 		GDALAllRegister();
 		RSGISImageUtils imgUtils;
@@ -6000,7 +6000,7 @@ namespace rsgis{namespace img{
 		}
 	}
     
-    void RSGISCalcImage::calcImagePosPxl(GDALDataset **datasets, int numIntDS, int numFloatDS) throw(RSGISImageCalcException,RSGISImageBandException)
+    void RSGISCalcImage::calcImagePosPxl(GDALDataset **datasets, int numIntDS, int numFloatDS)
     {
         GDALAllRegister();
         RSGISImageUtils imgUtils;
@@ -6458,7 +6458,7 @@ namespace rsgis{namespace img{
         }
     }
     
-    void RSGISCalcImage::calcImageExtent(GDALDataset **datasets, int numDS, geos::geom::Envelope *env, bool quiet) throw(RSGISImageCalcException,RSGISImageBandException)
+    void RSGISCalcImage::calcImageExtent(GDALDataset **datasets, int numDS, geos::geom::Envelope *env, bool quiet)
 	{
 		GDALAllRegister();
 		RSGISImageUtils imgUtils;
@@ -6738,7 +6738,7 @@ namespace rsgis{namespace img{
 		}
 	}
     
-    void RSGISCalcImage::calcImageExtent(GDALDataset **datasets, int numIntDS, int numFloatDS) throw(RSGISImageCalcException,RSGISImageBandException)
+    void RSGISCalcImage::calcImageExtent(GDALDataset **datasets, int numIntDS, int numFloatDS)
     {
         GDALAllRegister();
 		RSGISImageUtils imgUtils;
@@ -7212,7 +7212,7 @@ namespace rsgis{namespace img{
         }
     }
 	
-	void RSGISCalcImage::calcImageExtent(GDALDataset **datasets, int numDS, std::string outputImage, std::string gdalFormat, GDALDataType gdalDataType) throw(RSGISImageCalcException,RSGISImageBandException)
+	void RSGISCalcImage::calcImageExtent(GDALDataset **datasets, int numDS, std::string outputImage, std::string gdalFormat, GDALDataType gdalDataType)
 	{
 		GDALAllRegister();
 		RSGISImageUtils imgUtils;
@@ -7599,7 +7599,7 @@ namespace rsgis{namespace img{
 		}
 	}
 	
-    void RSGISCalcImage::calcImageWindowData(GDALDataset **datasets, int numDS, int windowSize) throw(RSGISImageCalcException,RSGISImageBandException)
+    void RSGISCalcImage::calcImageWindowData(GDALDataset **datasets, int numDS, int windowSize)
 	{
 		GDALAllRegister();
 		RSGISImageUtils imgUtils;
@@ -8477,7 +8477,7 @@ namespace rsgis{namespace img{
 		}
 	}
     
-    void RSGISCalcImage::calcImageWindowData(GDALDataset **datasets, int numDS, std::string outputImage, int windowSize, std::string gdalFormat, GDALDataType gdalDataType) throw(RSGISImageCalcException,RSGISImageBandException)
+    void RSGISCalcImage::calcImageWindowData(GDALDataset **datasets, int numDS, std::string outputImage, int windowSize, std::string gdalFormat, GDALDataType gdalDataType)
 	{
 		GDALAllRegister();
 		RSGISImageUtils imgUtils;
@@ -9451,7 +9451,7 @@ namespace rsgis{namespace img{
 		GDALClose(outputImageDS);
 	}
     
-    void RSGISCalcImage::calcImageWindowData(GDALDataset **datasets, int numDS, std::string outputImage, std::string outputRefIntImage, int windowSize, std::string gdalFormat, GDALDataType gdalDataType) throw(RSGISImageCalcException,RSGISImageBandException)
+    void RSGISCalcImage::calcImageWindowData(GDALDataset **datasets, int numDS, std::string outputImage, std::string outputRefIntImage, int windowSize, std::string gdalFormat, GDALDataType gdalDataType)
     {
         GDALAllRegister();
         RSGISImageUtils imgUtils;
@@ -10465,7 +10465,7 @@ namespace rsgis{namespace img{
     }
     
     
-    void RSGISCalcImage::calcImageWindowData(GDALDataset **datasets, int numDS, GDALDataset *outputImageDS, int windowSize, bool passPxlXY) throw(RSGISImageCalcException,RSGISImageBandException)
+    void RSGISCalcImage::calcImageWindowData(GDALDataset **datasets, int numDS, GDALDataset *outputImageDS, int windowSize, bool passPxlXY)
 	{
 		if(outputImageDS == NULL)
         {
@@ -11456,7 +11456,7 @@ namespace rsgis{namespace img{
 	}
      
     /* Keeps returning a window of data based upon the supplied windowSize until all finished provides the extent on the central pixel (as envelope) at each iteration */
-	void RSGISCalcImage::calcImageWindowDataExtent(GDALDataset **datasets, int numDS, std::string outputImage, int windowSize, std::string gdalFormat, GDALDataType gdalDataType) throw(RSGISImageCalcException,RSGISImageBandException)
+	void RSGISCalcImage::calcImageWindowDataExtent(GDALDataset **datasets, int numDS, std::string outputImage, int windowSize, std::string gdalFormat, GDALDataType gdalDataType)
 	{
         GDALAllRegister();
         RSGISImageUtils imgUtils;
@@ -12452,7 +12452,7 @@ namespace rsgis{namespace img{
         GDALClose(outputImageDS);
     }
 	
-	void RSGISCalcImage::calcImageWithinPolygon(GDALDataset **datasets, int numDS, std::string outputImage, geos::geom::Envelope *env, geos::geom::Polygon *poly, float nodata, pixelInPolyOption pixelPolyOption, std::string gdalFormat,  GDALDataType gdalDataType) throw(RSGISImageCalcException,RSGISImageBandException)
+	void RSGISCalcImage::calcImageWithinPolygon(GDALDataset **datasets, int numDS, std::string outputImage, geos::geom::Envelope *env, geos::geom::Polygon *poly, float nodata, pixelInPolyOption pixelPolyOption, std::string gdalFormat,  GDALDataType gdalDataType)
 	{
 		GDALAllRegister();
 		RSGISImageUtils imgUtils;
@@ -12957,7 +12957,7 @@ namespace rsgis{namespace img{
 	}
 	
 	/* calcImageWithinPolygon - takes existing output image */
-	void RSGISCalcImage::calcImageWithinPolygon(GDALDataset **datasets, int numDS, geos::geom::Envelope *env, geos::geom::Polygon *poly, pixelInPolyOption pixelPolyOption) throw(RSGISImageCalcException,RSGISImageBandException)
+	void RSGISCalcImage::calcImageWithinPolygon(GDALDataset **datasets, int numDS, geos::geom::Envelope *env, geos::geom::Polygon *poly, pixelInPolyOption pixelPolyOption)
 	{
 		/* Input and output images as gdal datasets
 		 * Stored as:
@@ -13457,7 +13457,7 @@ namespace rsgis{namespace img{
 	}
     
     /* calcImageWithinPolygon - Does not use an output image */
-	void RSGISCalcImage::calcImageWithinPolygonExtent(GDALDataset **datasets, int numDS, geos::geom::Envelope *env, geos::geom::Polygon *poly, pixelInPolyOption pixelPolyOption) throw(RSGISImageCalcException,RSGISImageBandException)
+	void RSGISCalcImage::calcImageWithinPolygonExtent(GDALDataset **datasets, int numDS, geos::geom::Envelope *env, geos::geom::Polygon *poly, pixelInPolyOption pixelPolyOption)
 	{
 		GDALAllRegister();
 		RSGISImageUtils imgUtils;
@@ -13839,7 +13839,7 @@ namespace rsgis{namespace img{
 		}		
 	}
 
-    void RSGISCalcImage::calcImageWithinPolygonExtentInMem(GDALDataset **datasets, int numDS, geos::geom::Envelope *env, geos::geom::Polygon *poly, pixelInPolyOption pixelPolyOption) throw(RSGISImageCalcException,RSGISImageBandException)
+    void RSGISCalcImage::calcImageWithinPolygonExtentInMem(GDALDataset **datasets, int numDS, geos::geom::Envelope *env, geos::geom::Polygon *poly, pixelInPolyOption pixelPolyOption)
     {
         GDALAllRegister();
         RSGISImageUtils imgUtils;
@@ -14227,7 +14227,7 @@ namespace rsgis{namespace img{
     }
 	
 	/* calcImageWithinRasterPolygon - takes existing output image */
-	void RSGISCalcImage::calcImageWithinRasterPolygon(GDALDataset **datasets, int numDS, geos::geom::Envelope *env, long fid) throw(RSGISImageCalcException,RSGISImageBandException)
+	void RSGISCalcImage::calcImageWithinRasterPolygon(GDALDataset **datasets, int numDS, geos::geom::Envelope *env, long fid)
 	{
 		/** Input and output images as gdal datasets
 		 * Stored as:
@@ -14654,7 +14654,7 @@ namespace rsgis{namespace img{
 		}		
 	}
 	
-    void RSGISCalcImage::calcImageBorderPixels(GDALDataset *dataset, bool returnInt) throw(RSGISImageCalcException,RSGISImageBandException)
+    void RSGISCalcImage::calcImageBorderPixels(GDALDataset *dataset, bool returnInt)
     {
         GDALAllRegister();
         
@@ -14785,7 +14785,7 @@ namespace rsgis{namespace img{
         this->valueCalcSum = valueCalcSum;
     }
     
-    void RSGISCalcImageMultiImgRes::calcImageHighResForLowRegions(GDALDataset *refDataset, GDALDataset *statsDataset, unsigned int statsImgBand, std::string outputImage, std::string gdalFormat, GDALDataType gdalDataType, bool useNoDataVal, unsigned int xIOGrid, unsigned int yIOGrid, bool setOutNames, std::string *bandNames) throw(RSGISImageException)
+    void RSGISCalcImageMultiImgRes::calcImageHighResForLowRegions(GDALDataset *refDataset, GDALDataset *statsDataset, unsigned int statsImgBand, std::string outputImage, std::string gdalFormat, GDALDataType gdalDataType, bool useNoDataVal, unsigned int xIOGrid, unsigned int yIOGrid, bool setOutNames, std::string *bandNames)
     {
         try
         {

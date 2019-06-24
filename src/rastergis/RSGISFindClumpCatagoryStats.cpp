@@ -29,7 +29,7 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    void RSGISFindClumpCatagoryStats::calcCatergoriesOverlaps(GDALDataset *clumpsDS, GDALDataset *catsDS, std::string outColsName, std::string majorityColName, bool copyClassName, std::string majClassNameField, std::string classNameField, unsigned int ratBandClumps, unsigned int ratBandCats) throw(rsgis::RSGISAttributeTableException)
+    void RSGISFindClumpCatagoryStats::calcCatergoriesOverlaps(GDALDataset *clumpsDS, GDALDataset *catsDS, std::string outColsName, std::string majorityColName, bool copyClassName, std::string majClassNameField, std::string classNameField, unsigned int ratBandClumps, unsigned int ratBandCats)
     {
         try
         {
@@ -363,7 +363,7 @@ namespace rsgis{namespace rastergis{
         this->ratBandCats = ratBandCats;
     }
     
-    void RSGISCountNumPxlsInCats::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCountNumPxlsInCats::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) 
     {
         size_t cat = boost::lexical_cast<size_t>(intBandValues[ratBandCats-1]);
         ++catsCount[cat-minCat];
@@ -388,7 +388,7 @@ namespace rsgis{namespace rastergis{
         this->ratCatsBand = ratCatsBand;
     }
 		
-    void RSGISCountNumPxlsInCatsPerClump::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCountNumPxlsInCatsPerClump::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) 
     {
         if(intBandValues[ratClumpsBand] > 0)
         {

@@ -30,7 +30,7 @@ namespace rsgis{namespace vec{
 
 	}
 	
-	void RSGISCalcPolygonArea::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISCalcPolygonArea::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)
 	{
 		OGRFeatureDefn *outFeatureDefn = outFeature->GetDefnRef();
 		
@@ -48,13 +48,13 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISCalcPolygonArea::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISCalcPolygonArea::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid)
 	{
 		throw RSGISVectorException("Not implemented..");
 		
 	}
 	
-	void RSGISCalcPolygonArea::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+	void RSGISCalcPolygonArea::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn)
 	{
 		OGRFieldDefn shpField("Area", OFTReal);
 		shpField.SetPrecision(10);

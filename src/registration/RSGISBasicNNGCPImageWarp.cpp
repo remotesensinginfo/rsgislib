@@ -33,7 +33,7 @@ namespace rsgis{namespace reg{
 		
 	}
 	
-	void RSGISBasicNNGCPImageWarp::initWarp()throw(RSGISImageWarpException)
+	void RSGISBasicNNGCPImageWarp::initWarp()
 	{
 		// Create Index
 		std::cout << "Creating Index\n";
@@ -47,7 +47,7 @@ namespace rsgis{namespace reg{
 		}
 	}
 	
-	geos::geom::Envelope* RSGISBasicNNGCPImageWarp::newImageExtent(unsigned int width, unsigned int height) throw(RSGISImageWarpException)
+	geos::geom::Envelope* RSGISBasicNNGCPImageWarp::newImageExtent(unsigned int width, unsigned int height)
 	{
 		double minEastings = 0;
 		double maxEastings = 0;
@@ -104,7 +104,7 @@ namespace rsgis{namespace reg{
 		return env;
 	}
 	
-	void RSGISBasicNNGCPImageWarp::findNearestPixel(double eastings, double northings, unsigned int *x, unsigned int *y, float inImgRes) throw(RSGISImageWarpException)
+	void RSGISBasicNNGCPImageWarp::findNearestPixel(double eastings, double northings, unsigned int *x, unsigned int *y, float inImgRes)
 	{
 		RSGISGCPImg2MapNode *pxl = new RSGISGCPImg2MapNode(eastings, northings, 0, 0);
 		

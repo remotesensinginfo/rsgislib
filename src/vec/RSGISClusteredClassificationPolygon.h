@@ -53,7 +53,7 @@ namespace rsgis{namespace vec{
 			RSGISClusteredClassificationPolygon();
 			RSGISClusteredClassificationPolygon(RSGISClusteredClassificationPolygon *data);
 			virtual void readAttribtues(OGRFeature *feature, OGRFeatureDefn *featDefn);
-			virtual void createLayerDefinition(OGRLayer *outputSHPLayer)throw(RSGISVectorOutputException);
+			virtual void createLayerDefinition(OGRLayer *outputSHPLayer);
 			virtual void populateFeature(OGRFeature *feature, OGRFeatureDefn *featDefn);
 			void setArea(float area);
 			float getArea();

@@ -65,12 +65,12 @@ namespace rsgis{namespace vec{
 		{
 		public:
 			RSGISRasterizeVector();
-			GDALDataset* createDataset(GDALDriver *gdalDriver, OGRLayer *layer, std::string filename, float resolution, float constVal) throw(RSGISImageException);
-			GDALDataset* createDataset(GDALDriver *gdalDriver, std::vector<geos::geom::Polygon*> *polys, std::string filename, float resolution, OGRSpatialReference *spatialRef, float constVal) throw(RSGISImageException);
-			void rasterizeLayer(OGRLayer *layer, GDALDataset *image, std::string attribute, rsgis::img::pixelInPolyOption method) throw(RSGISVectorException);
-			void rasterizeLayer(geos::geom::Geometry *geom, GDALDataset *image, bool useFID, float constVal, rsgis::img::pixelInPolyOption method) throw(RSGISVectorException);
-			int editPixels(GDALDataset *image, float pixelValue, geos::geom::Envelope *env, OGRGeometry *geom) throw(RSGISImageException);
-			//void editPixels(GDALDataset *image, float pixelValue, Envelope *env, Geometry *geom) throw(RSGISImageException);
+			GDALDataset* createDataset(GDALDriver *gdalDriver, OGRLayer *layer, std::string filename, float resolution, float constVal);
+			GDALDataset* createDataset(GDALDriver *gdalDriver, std::vector<geos::geom::Polygon*> *polys, std::string filename, float resolution, OGRSpatialReference *spatialRef, float constVal);
+			void rasterizeLayer(OGRLayer *layer, GDALDataset *image, std::string attribute, rsgis::img::pixelInPolyOption method);
+			void rasterizeLayer(geos::geom::Geometry *geom, GDALDataset *image, bool useFID, float constVal, rsgis::img::pixelInPolyOption method);
+			int editPixels(GDALDataset *image, float pixelValue, geos::geom::Envelope *env, OGRGeometry *geom);
+			//void editPixels(GDALDataset *image, float pixelValue, Envelope *env, Geometry *geom);
 			~RSGISRasterizeVector();
 		private:
             rsgis::img::pixelInPolyOption method;

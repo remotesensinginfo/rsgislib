@@ -30,7 +30,7 @@ namespace rsgis{namespace segment{
         
     }
     
-    void RSGISMergeSegments::mergeSelectedClumps(GDALDataset *clumpsImage, GDALDataset *valsImageDS, std::string clumps2MergeCol, std::string noDataClumpsCol)throw(rsgis::img::RSGISImageCalcException)
+    void RSGISMergeSegments::mergeSelectedClumps(GDALDataset *clumpsImage, GDALDataset *valsImageDS, std::string clumps2MergeCol, std::string noDataClumpsCol)
     {
         try
         {
@@ -333,7 +333,7 @@ namespace rsgis{namespace segment{
         }
     }
     
-    void RSGISMergeSegments::mergeEquivlentClumpsInRAT(GDALDataset *clumpsImage, std::vector<std::string> clumpsCols2Merge)throw(rsgis::img::RSGISImageCalcException)
+    void RSGISMergeSegments::mergeEquivlentClumpsInRAT(GDALDataset *clumpsImage, std::vector<std::string> clumpsCols2Merge)
     {
         try
         {

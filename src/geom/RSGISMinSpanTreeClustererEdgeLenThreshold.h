@@ -64,7 +64,7 @@ namespace rsgis{namespace geom{
 		{
 		public:
 			RSGISMinSpanTreeClustererEdgeLenThreshold(float lengththreshold);
-			virtual std::list<RSGIS2DPoint*>** clusterData(std::vector<RSGIS2DPoint*> *data, int *numclusters, double *threshold) throw(rsgis::math::RSGISClustererException);
+			virtual std::list<RSGIS2DPoint*>** clusterData(std::vector<RSGIS2DPoint*> *data, int *numclusters, double *threshold);
 			void updateLengthThreshold(float lengththreshold);
 			virtual ~RSGISMinSpanTreeClustererEdgeLenThreshold();
 		protected:

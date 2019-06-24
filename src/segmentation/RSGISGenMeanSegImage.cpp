@@ -30,7 +30,7 @@ namespace rsgis{namespace segment{
         
     }
     
-    void RSGISGenMeanSegImage::generateMeanImage(GDALDataset *spectral, GDALDataset *clumps, GDALDataset *meanImg) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISGenMeanSegImage::generateMeanImage(GDALDataset *spectral, GDALDataset *clumps, GDALDataset *meanImg) 
     {
         if((spectral->GetRasterXSize() != clumps->GetRasterXSize()) |
            (spectral->GetRasterXSize() != meanImg->GetRasterXSize()))
@@ -252,7 +252,7 @@ namespace rsgis{namespace segment{
         delete[] pxlMask;
     }
     
-    void RSGISGenMeanSegImage::generateMeanImageUsingClumpTable(GDALDataset *spectral, GDALDataset *clumps, GDALDataset *meanImg) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISGenMeanSegImage::generateMeanImageUsingClumpTable(GDALDataset *spectral, GDALDataset *clumps, GDALDataset *meanImg) 
     {
         if((spectral->GetRasterXSize() != clumps->GetRasterXSize()) |
            (spectral->GetRasterXSize() != meanImg->GetRasterXSize()))
@@ -401,7 +401,7 @@ namespace rsgis{namespace segment{
         delete clumpTab;
     }
     
-    void RSGISGenMeanSegImage::generateMeanImageUsingCalcImage(GDALDataset *spectral, GDALDataset *clumps, GDALDataset *meanImg) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISGenMeanSegImage::generateMeanImageUsingCalcImage(GDALDataset *spectral, GDALDataset *clumps, GDALDataset *meanImg) 
     {
         try
         {
@@ -513,7 +513,7 @@ namespace rsgis{namespace segment{
         this->numClumps = numClumps;
     }
     
-    void RSGISPopulateMeans::calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISPopulateMeans::calcImageValue(float *bandValues, int numBands) 
     {
         try
         {
@@ -567,7 +567,7 @@ namespace rsgis{namespace segment{
         this->numClumps = numClumps;
     }
     
-    void RSGISApplyMeans2Output::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISApplyMeans2Output::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         try
         {

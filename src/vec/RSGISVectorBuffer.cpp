@@ -32,27 +32,27 @@ namespace rsgis{namespace vec{
 		this->buffer = buffer;
 	}
 	
-	void RSGISVectorBuffer::processGeometry(OGRPolygon *polygon) throw(RSGISVectorException)
+	void RSGISVectorBuffer::processGeometry(OGRPolygon *polygon)
 	{
 		throw RSGISVectorException("Not Implemented");
 	}
 	
-	void RSGISVectorBuffer::processGeometry(OGRMultiPolygon *multiPolygon) throw(RSGISVectorException)
+	void RSGISVectorBuffer::processGeometry(OGRMultiPolygon *multiPolygon)
 	{
 		throw RSGISVectorException("Not Implemented");
 	}
 	
-	void RSGISVectorBuffer::processGeometry(OGRPoint *point) throw(RSGISVectorException)
+	void RSGISVectorBuffer::processGeometry(OGRPoint *point)
 	{
 		throw RSGISVectorException("Not Implemented");
 	}
 	
-	void RSGISVectorBuffer::processGeometry(OGRLineString *line) throw(RSGISVectorException)
+	void RSGISVectorBuffer::processGeometry(OGRLineString *line)
 	{
 		throw RSGISVectorException("Not Implemented");
 	}
 	
-	OGRPolygon* RSGISVectorBuffer::processGeometry(OGRGeometry *geom) throw(RSGISVectorException)
+	OGRPolygon* RSGISVectorBuffer::processGeometry(OGRGeometry *geom)
 	{
 		OGRPolygon *polygon = (OGRPolygon *) geom->Buffer(this->buffer, 30);
 		return polygon;

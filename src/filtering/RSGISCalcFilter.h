@@ -45,7 +45,7 @@ namespace rsgis{namespace filter{
 		{
 		public: 
 			RSGISCalcFilter(){};
-			virtual float calcFilterValue(int x, int y) throw(RSGISImageFilterException) = 0;
+			virtual float calcFilterValue(int x, int y) = 0;
 			virtual ~RSGISCalcFilter(){};
 		};
 	

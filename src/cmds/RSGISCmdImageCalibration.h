@@ -130,64 +130,64 @@ namespace rsgis{ namespace cmds {
     };
     
     /** Function to convert DN landsat scence to radiance */
-    DllExport void executeConvertLandsat2Radiance(std::string outputImage, std::string gdalFormat, std::vector<CmdsLandsatRadianceGainsOffsets> landsatRadGainOffs)throw(RSGISCmdException);
+    DllExport void executeConvertLandsat2Radiance(std::string outputImage, std::string gdalFormat, std::vector<CmdsLandsatRadianceGainsOffsets> landsatRadGainOffs);
     
     /** Function to convert DN landsat scence to radiance using mutliplication and addition values */
-    DllExport void executeConvertLandsat2RadianceMultiAdd(std::string outputImage, std::string gdalFormat, std::vector<CmdsLandsatRadianceGainsOffsetsMultiAdd> landsatRadGainOffs)throw(RSGISCmdException);
+    DllExport void executeConvertLandsat2RadianceMultiAdd(std::string outputImage, std::string gdalFormat, std::vector<CmdsLandsatRadianceGainsOffsetsMultiAdd> landsatRadGainOffs);
     
     /** Function to convert DN WorldView2 scence to radiance */
-    DllExport void executeConvertWorldView2ToRadiance(std::string inputImage, std::string outputImage, std::string gdalFormat, std::vector<CmdsWorldView2RadianceGainsOffsets> wv2RadGainOffs)throw(RSGISCmdException);
+    DllExport void executeConvertWorldView2ToRadiance(std::string inputImage, std::string outputImage, std::string gdalFormat, std::vector<CmdsWorldView2RadianceGainsOffsets> wv2RadGainOffs);
     
     /** Function to convert DN SPOT5 scence to radiance */
-    DllExport void executeConvertSPOT5ToRadiance(std::string inputImage, std::string outputImage, std::string gdalFormat, std::vector<CmdsSPOTRadianceGainsOffsets> spot5RadGainOffs)throw(RSGISCmdException);
+    DllExport void executeConvertSPOT5ToRadiance(std::string inputImage, std::string outputImage, std::string gdalFormat, std::vector<CmdsSPOTRadianceGainsOffsets> spot5RadGainOffs);
     
     /** Function to convert radiance into TOA reflectance */
-    DllExport void executeConvertRadiance2TOARefl(std::string inputImage, std::string outputImage, std::string gdalFormat, rsgis::RSGISLibDataType rsgisOutDataType, float scaleFactor, unsigned int julianDay, bool useJulianDay, unsigned int year, unsigned int month, unsigned int day, float solarZenith, float *solarIrradiance, unsigned int numBands) throw(RSGISCmdException);
+    DllExport void executeConvertRadiance2TOARefl(std::string inputImage, std::string outputImage, std::string gdalFormat, rsgis::RSGISLibDataType rsgisOutDataType, float scaleFactor, unsigned int julianDay, bool useJulianDay, unsigned int year, unsigned int month, unsigned int day, float solarZenith, float *solarIrradiance, unsigned int numBands);
     
     /** Function to convert TOA reflectance to radiance */
-    DllExport void executeConvertTOARefl2Radiance(std::vector<std::string> inputImages, std::string outputImage, std::string gdalFormat, rsgis::RSGISLibDataType rsgisOutDataType, float scaleFactor, float solarDistance, float solarZenith, float *solarIrradiance, unsigned int numBands) throw(RSGISCmdException);
+    DllExport void executeConvertTOARefl2Radiance(std::vector<std::string> inputImages, std::string outputImage, std::string gdalFormat, rsgis::RSGISLibDataType rsgisOutDataType, float scaleFactor, float solarDistance, float solarZenith, float *solarIrradiance, unsigned int numBands);
     
     /** Function to convert radiance into surface reflectance using a single parameterisation of 6S */
-    DllExport void executeRad2SREFSingle6sParams(std::string inputImage, std::string outputImage, std::string gdalFormat, rsgis::RSGISLibDataType rsgisOutDataType, float scaleFactor, unsigned int *imageBands, float *aX, float *bX, float *cX, int numValues, float noDataVal, bool useNoDataVal)throw(RSGISCmdException);
+    DllExport void executeRad2SREFSingle6sParams(std::string inputImage, std::string outputImage, std::string gdalFormat, rsgis::RSGISLibDataType rsgisOutDataType, float scaleFactor, unsigned int *imageBands, float *aX, float *bX, float *cX, int numValues, float noDataVal, bool useNoDataVal);
     
     /** Function to convert radiance into surface reflectance using a LUT for surface elevation of 6S */
-    DllExport void executeRad2SREFElevLUT6sParams(std::string inputRadImage, std::string inputDEM, std::string outputImage, std::string gdalFormat, rsgis::RSGISLibDataType rsgisOutDataType, float scaleFactor, std::vector<Cmds6SElevationLUT> *lut, float noDataVal, bool useNoDataVal)throw(RSGISCmdException);
+    DllExport void executeRad2SREFElevLUT6sParams(std::string inputRadImage, std::string inputDEM, std::string outputImage, std::string gdalFormat, rsgis::RSGISLibDataType rsgisOutDataType, float scaleFactor, std::vector<Cmds6SElevationLUT> *lut, float noDataVal, bool useNoDataVal);
     
     /** Function to convert radiance into surface reflectance using a LUT for surface elevation and AOT of 6S */
-    DllExport void executeRad2SREFElevAOTLUT6sParams(std::string inputRadImage, std::string inputDEM, std::string inputAOTImg, std::string outputImage, std::string gdalFormat, rsgis::RSGISLibDataType rsgisOutDataType, float scaleFactor, std::vector<Cmds6SBaseElevAOTLUT> *lut, float noDataVal, bool useNoDataVal)throw(RSGISCmdException);
+    DllExport void executeRad2SREFElevAOTLUT6sParams(std::string inputRadImage, std::string inputDEM, std::string inputAOTImg, std::string outputImage, std::string gdalFormat, rsgis::RSGISLibDataType rsgisOutDataType, float scaleFactor, std::vector<Cmds6SBaseElevAOTLUT> *lut, float noDataVal, bool useNoDataVal);
     
     /** Function to apply an offset image within the context of dark object subtraction */
-    DllExport void executeApplySubtractOffsets(std::string inputImage, std::string outputImage, std::string offsetImage, bool nonNegative, std::string gdalFormat, rsgis::RSGISLibDataType rsgisOutDataType, float noDataVal, bool useNoDataVal, float darkObjReflVal) throw(RSGISCmdException);
+    DllExport void executeApplySubtractOffsets(std::string inputImage, std::string outputImage, std::string offsetImage, bool nonNegative, std::string gdalFormat, rsgis::RSGISLibDataType rsgisOutDataType, float noDataVal, bool useNoDataVal, float darkObjReflVal);
     
     /** Function to convert thermal radiance to thermal brightness for Landsat */
-    DllExport void executeLandsatThermalRad2ThermalBrightness(std::string inputImage, std::string outputImage, std::string gdalFormat, rsgis::RSGISLibDataType rsgisOutDataType, float scaleFactor, std::vector<CmdsLandsatThermalCoeffs> landsatThermalCoeffs) throw(RSGISCmdException);
+    DllExport void executeLandsatThermalRad2ThermalBrightness(std::string inputImage, std::string outputImage, std::string gdalFormat, rsgis::RSGISLibDataType rsgisOutDataType, float scaleFactor, std::vector<CmdsLandsatThermalCoeffs> landsatThermalCoeffs);
     
     /** Function to generate a per-band image band mask of the saturated image pixels */
-    DllExport void executeGenerateSaturationMask(std::string outputImage, std::string gdalFormat, std::vector<CmdsSaturatedPixel> imgBandInfo)throw(RSGISCmdException);
+    DllExport void executeGenerateSaturationMask(std::string outputImage, std::string gdalFormat, std::vector<CmdsSaturatedPixel> imgBandInfo);
     
     /** Function to apply the FMask algorithm for classifying cloud for Landsat TM and ETM+ data */
-    DllExport void executeLandsatTMCloudFMask(std::string inputTOAImage, std::string inputThermalImage, std::string inputSaturateImage, std::string validImg, std::string outputImage, std::string gdalFormat, double sunAz, double sunZen, double senAz, double senZen, float whitenessThreshold, float scaleFactorIn, std::string tmpImgsBase, std::string tmpImgFileExt, bool rmTmpImgs=true) throw(RSGISCmdException);
+    DllExport void executeLandsatTMCloudFMask(std::string inputTOAImage, std::string inputThermalImage, std::string inputSaturateImage, std::string validImg, std::string outputImage, std::string gdalFormat, double sunAz, double sunZen, double senAz, double senZen, float whitenessThreshold, float scaleFactorIn, std::string tmpImgsBase, std::string tmpImgFileExt, bool rmTmpImgs=true);
     
     /** Function to apply DOS offsets (per band) to the input image */
-    DllExport void executeApplySubtractSingleOffsets(std::string inputImage, std::string outputImage, std::vector<double> offsetValues, bool nonNegative, std::string gdalFormat, rsgis::RSGISLibDataType rsgisOutDataType, float noDataVal, bool useNoDataVal, float darkObjReflVal) throw(RSGISCmdException);
+    DllExport void executeApplySubtractSingleOffsets(std::string inputImage, std::string outputImage, std::vector<double> offsetValues, bool nonNegative, std::string gdalFormat, rsgis::RSGISLibDataType rsgisOutDataType, float noDataVal, bool useNoDataVal, float darkObjReflVal);
     
     /** Function to calculate the view angle across the swath of a nadir input image */
-    DllExport void executeCalcNadirImageViewAngle(std::string imgFootprint, std::string outViewAngleImg, std::string gdalFormat, double sateAltitude, std::string minXXCol, std::string minXYCol, std::string maxXXCol, std::string maxXYCol, std::string minYXCol, std::string minYYCol, std::string maxYXCol, std::string maxYYCol) throw(RSGISCmdException);
+    DllExport void executeCalcNadirImageViewAngle(std::string imgFootprint, std::string outViewAngleImg, std::string gdalFormat, double sateAltitude, std::string minXXCol, std::string minXYCol, std::string maxXXCol, std::string maxXYCol, std::string minYXCol, std::string minYYCol, std::string maxYXCol, std::string maxYYCol);
     
     /** Function to calculate the total, direct and diffuse irradiance using a LUT from 6S */
-    DllExport void executeCalcIrradianceElevLUT(std::string inputDataMaskImg, std::string inputDEMImg, std::string inputIncidenceAngleImg, std::string inputSlopeImg, std::string shadowMaskImg, std::string srefInputImage, std::string outputImg, std::string gdalFormat, float solarZenith, float reflScaleFactor, std::vector<Cmds6SElevationLUT> *lut) throw(RSGISCmdException);
+    DllExport void executeCalcIrradianceElevLUT(std::string inputDataMaskImg, std::string inputDEMImg, std::string inputIncidenceAngleImg, std::string inputSlopeImg, std::string shadowMaskImg, std::string srefInputImage, std::string outputImg, std::string gdalFormat, float solarZenith, float reflScaleFactor, std::vector<Cmds6SElevationLUT> *lut);
     
     /** Function to calculate standardised reflectance taking into account topography */
-    DllExport void executeCalcStandardisedReflectanceSD2010(std::string inputDataMaskImg, std::string srefInputImage, std::string inputSolarIrradiance, std::string inputIncidenceAngleImg, std::string inputExitanceAngleImg, std::string outputImg, std::string gdalFormat, float brdfBeta, float outIncidenceAngle, float outExitanceAngle, float reflScaleFactor) throw(RSGISCmdException);
+    DllExport void executeCalcStandardisedReflectanceSD2010(std::string inputDataMaskImg, std::string srefInputImage, std::string inputSolarIrradiance, std::string inputIncidenceAngleImg, std::string inputExitanceAngleImg, std::string outputImg, std::string gdalFormat, float brdfBeta, float outIncidenceAngle, float outExitanceAngle, float reflScaleFactor);
     
     /** Function to calculate the julian day for a year, month, day */
-    DllExport unsigned int executeGetJulianDay(unsigned int year, unsigned int month, unsigned int day) throw(RSGISCmdException);
+    DllExport unsigned int executeGetJulianDay(unsigned int year, unsigned int month, unsigned int day);
     
     /** Function to calculate the Earth / Sun distance for a julian day */
-    DllExport float executeGetEarthSunDistance(unsigned int julianDay) throw(RSGISCmdException);
+    DllExport float executeGetEarthSunDistance(unsigned int julianDay);
     
     /** Function to identify cloud shadows */
-    DllExport void executePerformCloudShadowMasking(std::string cloudMsk, std::string inputImage, std::string validAreaImage, unsigned int darkFillBand, std::string outputImg, std::string gdalFormat, float scaleFactorIn, std::string tmpImgsBase, std::string tmpImgFileExt, bool rmTmpImgs, double sunAz, double sunZen, double senAz, double senZen) throw(RSGISCmdException);
+    DllExport void executePerformCloudShadowMasking(std::string cloudMsk, std::string inputImage, std::string validAreaImage, unsigned int darkFillBand, std::string outputImg, std::string gdalFormat, float scaleFactorIn, std::string tmpImgsBase, std::string tmpImgFileExt, bool rmTmpImgs, double sunAz, double sunZen, double senAz, double senZen);
     
 }}
 

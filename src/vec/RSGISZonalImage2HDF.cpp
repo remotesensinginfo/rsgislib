@@ -30,7 +30,7 @@ namespace rsgis{namespace vec{
         
     }
 		
-    void RSGISZonalImage2HDF::extractBandsToColumns(GDALDataset *dataset, OGRLayer *vecLayer, std::string outputFile, rsgis::img::pixelInPolyOption pixelPolyOption)throw(RSGISVectorZonalException)
+    void RSGISZonalImage2HDF::extractBandsToColumns(GDALDataset *dataset, OGRLayer *vecLayer, std::string outputFile, rsgis::img::pixelInPolyOption pixelPolyOption)
     {
         try
         {
@@ -121,7 +121,7 @@ namespace rsgis{namespace vec{
         this->pxlVals = pxlVals;
     }
     
-    void RSGISExtractPixelValues::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISExtractPixelValues::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) 
     {
         float *data = new float[numBands];
         for(unsigned i = 0; i < numBands; ++i)
@@ -145,7 +145,7 @@ namespace rsgis{namespace vec{
         this->pixelPolyOption = pixelPolyOption;
     }
     
-    void RSGISExtractZonalPixelValues::processFeature(OGRFeature *feature, OGRPolygon *poly, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+    void RSGISExtractZonalPixelValues::processFeature(OGRFeature *feature, OGRPolygon *poly, geos::geom::Envelope *env, long fid)
     {
         try
         {

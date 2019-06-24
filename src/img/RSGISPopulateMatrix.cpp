@@ -32,22 +32,22 @@ namespace rsgis{namespace img{
 		this->matrix = rsgisMatrices.createMatrix(numOutputValues, numPixels);
 	}
 	
-	void RSGISPopulateMatrix::calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) throw(RSGISImageCalcException)
+	void RSGISPopulateMatrix::calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) 
 	{
 		throw RSGISImageCalcException("Not implemented!");
 	}
 	
-	void RSGISPopulateMatrix::calcImageValue(float *bandValuesImage, int numBands, int band) throw(RSGISImageCalcException)
+	void RSGISPopulateMatrix::calcImageValue(float *bandValuesImage, int numBands, int band) 
 	{
 		throw RSGISImageCalcException("Not implemented!");
 	}
 	
-	void RSGISPopulateMatrix::calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) throw(RSGISImageCalcException)
+	void RSGISPopulateMatrix::calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) 
 	{
 		throw RSGISImageCalcException("Not implemented!");
 	}
 	
-	void RSGISPopulateMatrix::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(RSGISImageCalcException)
+	void RSGISPopulateMatrix::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) 
 	{
 		if(numBands != numOutputValues)
 		{
@@ -60,7 +60,7 @@ namespace rsgis{namespace img{
 		}
 	}
 	
-	double* RSGISPopulateMatrix::getOutputValues()  throw(RSGISImageCalcException)
+	double* RSGISPopulateMatrix::getOutputValues()  
 	{
 		for(int i = 0; i < numOutputValues; i++)
 		{

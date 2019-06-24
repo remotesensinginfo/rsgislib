@@ -32,7 +32,7 @@ namespace rsgis{namespace img{
         this->geomOrigCollection = geomOrigCollection;
     }
 
-    void RSGISCalcDist2Geom::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException)
+    void RSGISCalcDist2Geom::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) 
     {
         try 
         {
@@ -70,12 +70,12 @@ namespace rsgis{namespace img{
         this->imgRes = imgRes;
     }
     
-    void RSGISCalcDistViaIterativeGrowth::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+    void RSGISCalcDistViaIterativeGrowth::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         output[0] = bandValues[0] * imgRes;
     }
 		
-    void RSGISCalcDistViaIterativeGrowth::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException)
+    void RSGISCalcDistViaIterativeGrowth::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
     {
         int midPoint = floor(((float)winSize)/2.0);
                 

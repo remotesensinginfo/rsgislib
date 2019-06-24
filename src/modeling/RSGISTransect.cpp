@@ -90,7 +90,7 @@ namespace rsgis{ namespace modeling  {
 	unsigned int RSGISTransect::getHeight()
 	{
 		// Returns transet height (z)
-		return this->transectHeight ;
+		return this->transectHeight;
 	}
 	double RSGISTransect::getRes()
 	{

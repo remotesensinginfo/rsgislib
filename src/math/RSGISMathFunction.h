@@ -48,9 +48,9 @@ namespace rsgis{namespace math{
 		 */
 	public: 
 		RSGISMathFunction(){};
-		virtual double calcFunction(double value) throw(RSGISMathException) = 0;
-		virtual double dX(double value) throw(RSGISMathException) = 0;
-		virtual int numCoefficients() throw(RSGISMathException) = 0;
+		virtual double calcFunction(double value) = 0;
+		virtual double dX(double value) = 0;
+		virtual int numCoefficients() = 0;
 		virtual void updateCoefficents(double *coefficients) = 0;
 		virtual ~RSGISMathFunction(){};
 	};
@@ -62,10 +62,10 @@ namespace rsgis{namespace math{
 		 */
 	public: 
 		RSGISMathTwoVariableFunction(){};
-		virtual double calcFunction(double valueX, double valueY) throw(RSGISMathException) = 0;
-		virtual double dX(double valueX, double valueY) throw(RSGISMathException) = 0;
-		virtual double dY(double valueX, double valueY) throw(RSGISMathException) = 0;
-		virtual int numCoefficients() throw(RSGISMathException) = 0;
+		virtual double calcFunction(double valueX, double valueY) = 0;
+		virtual double dX(double valueX, double valueY) = 0;
+		virtual double dY(double valueX, double valueY) = 0;
+		virtual int numCoefficients() = 0;
 		virtual void updateCoefficents(double *coefficients) = 0;
 		virtual ~RSGISMathTwoVariableFunction(){};
 	};
@@ -77,11 +77,11 @@ namespace rsgis{namespace math{
 		 */
 	public: 
 		RSGISMathThreeVariableFunction(){};
-		virtual double calcFunction(double valueX, double valueY, double valueZ) throw(RSGISMathException) = 0;
-		virtual double dX(double valueX, double valueY, double valueZ) throw(RSGISMathException) = 0;
-		virtual double dY(double valueX, double valueY, double valueZ) throw(RSGISMathException) = 0;
-		virtual double dZ(double valueX, double valueY, double valueZ) throw(RSGISMathException) = 0;
-		virtual int numCoefficients() throw(RSGISMathException) = 0;
+		virtual double calcFunction(double valueX, double valueY, double valueZ) = 0;
+		virtual double dX(double valueX, double valueY, double valueZ) = 0;
+		virtual double dY(double valueX, double valueY, double valueZ) = 0;
+		virtual double dZ(double valueX, double valueY, double valueZ) = 0;
+		virtual int numCoefficients() = 0;
 		virtual void updateCoefficents(double *coefficients) = 0;
 		virtual ~RSGISMathThreeVariableFunction(){};
 	};
@@ -93,9 +93,9 @@ namespace rsgis{namespace math{
 		 */
 	public: 
 		RSGISMathNVariableFunction(){};
-		virtual double calcFunction(std::vector <double> *values) throw(RSGISMathException) = 0;
-		virtual int numCoefficients() throw(RSGISMathException) = 0;
-        virtual int numVariables() throw(RSGISMathException) = 0;
+		virtual double calcFunction(std::vector <double> *values) = 0;
+		virtual int numCoefficients() = 0;
+        virtual int numVariables() = 0;
 		virtual void updateCoefficents(double *coefficients) = 0;
 		virtual ~RSGISMathNVariableFunction(){};
 	};

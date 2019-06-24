@@ -49,7 +49,7 @@ namespace rsgis{namespace math{
 	class DllExport RSGISGlobalOptimisationFunction
 		{
 		public:
-			virtual double calcValue(std::vector<geos::geom::Coordinate*> *coords) throw(RSGISOptimisationException) = 0;
+			virtual double calcValue(std::vector<geos::geom::Coordinate*> *coords) = 0;
 			virtual ~RSGISGlobalOptimisationFunction(){};
 		};
 }}

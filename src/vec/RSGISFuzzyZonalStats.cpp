@@ -49,7 +49,7 @@ namespace rsgis{namespace vec{
 		this->setupFuzzyAttributes();
 	}
 	
-	void RSGISFuzzyZonalStats::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISFuzzyZonalStats::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)
 	{
 		try
 		{
@@ -120,12 +120,12 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISFuzzyZonalStats::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISFuzzyZonalStats::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid)
 	{
 		throw RSGISVectorException("Not Implemented");
 	}
 	
-	void RSGISFuzzyZonalStats::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+	void RSGISFuzzyZonalStats::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn)
 	{
 		std::cout << "(dataSize-1) = " << (dataSize-1) << std::endl;
 		for(int i = 0; i < (dataSize-1); i++)
@@ -338,12 +338,12 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISCalcFuzzyZonalStatsFromRasterPolygon::calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISCalcFuzzyZonalStatsFromRasterPolygon::calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) 
 	{
 		throw rsgis::img::RSGISImageCalcException("Not implemented");
 	}
 	
-	void RSGISCalcFuzzyZonalStatsFromRasterPolygon::calcImageValue(float *bandValuesImage, int numBands, int band) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISCalcFuzzyZonalStatsFromRasterPolygon::calcImageValue(float *bandValuesImage, int numBands, int band) 
 	{
 		float min = 0;
 		int histogramBin = 0;
@@ -393,17 +393,17 @@ namespace rsgis{namespace vec{
 		numPxls++;
 	}
 	
-	void RSGISCalcFuzzyZonalStatsFromRasterPolygon::calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISCalcFuzzyZonalStatsFromRasterPolygon::calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) 
 	{
 		throw rsgis::img::RSGISImageCalcException("Not implemented");
 	}
 	
-	void RSGISCalcFuzzyZonalStatsFromRasterPolygon::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISCalcFuzzyZonalStatsFromRasterPolygon::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) 
 	{
 		throw rsgis::img::RSGISImageCalcException("Not implemented");
 	}
 	
-	double* RSGISCalcFuzzyZonalStatsFromRasterPolygon::getOutputValues() throw(rsgis::img::RSGISImageCalcException)
+	double* RSGISCalcFuzzyZonalStatsFromRasterPolygon::getOutputValues() 
 	{
 		for(int i = 0; i < this->numOutputValues; i++)
 		{

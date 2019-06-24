@@ -29,7 +29,7 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    void RSGISClumpRegionGrowing::growClassRegion(GDALDataset *inputClumps, std::string classColumn, std::string classVal, int maxIter, unsigned int ratBand, std::string xmlBlock)throw(RSGISAttributeTableException)
+    void RSGISClumpRegionGrowing::growClassRegion(GDALDataset *inputClumps, std::string classColumn, std::string classVal, int maxIter, unsigned int ratBand, std::string xmlBlock)
     {
         try
         {
@@ -247,7 +247,7 @@ namespace rsgis{namespace rastergis{
         }
     }
     
-    void RSGISClumpRegionGrowing::growClassRegionNeighCriteria(GDALDataset *inputClumps, std::string classColumn, std::string classVal, int maxIter, unsigned int ratBand, std::string xmlBlockCriteria, std::string xmlBlockNeighCriteria)throw(RSGISAttributeTableException)
+    void RSGISClumpRegionGrowing::growClassRegionNeighCriteria(GDALDataset *inputClumps, std::string classColumn, std::string classVal, int maxIter, unsigned int ratBand, std::string xmlBlockCriteria, std::string xmlBlockNeighCriteria)
     {
         try
         {

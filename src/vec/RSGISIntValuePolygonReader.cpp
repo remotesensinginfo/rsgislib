@@ -34,12 +34,12 @@ namespace rsgis{namespace vec{
 		this->data = data;
 	}
 	
-	void RSGISIntValuePolygonReader::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISIntValuePolygonReader::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)
 	{
 		throw RSGISVectorException("Not implemented..");
 	}
 	
-	void RSGISIntValuePolygonReader::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISIntValuePolygonReader::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid)
 	{
 		// Set up the Species Polygon object and add to Delunay triangulation.
 		
@@ -94,7 +94,7 @@ namespace rsgis{namespace vec{
 		
 	}
 	
-	void RSGISIntValuePolygonReader::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+	void RSGISIntValuePolygonReader::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn)
 	{
 		// Nothing to do!
 	}

@@ -49,8 +49,8 @@ namespace rsgis{ namespace cmds {
         RSGISCmdException();
         RSGISCmdException(const char *message);
         RSGISCmdException(std::string message);
-        virtual ~RSGISCmdException() throw();
-        virtual const char* what() const throw();
+        virtual ~RSGISCmdException();
+        virtual const char* what();
     protected:
         std::string msgs;
 	};

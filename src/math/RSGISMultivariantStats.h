@@ -46,10 +46,10 @@ namespace rsgis{namespace math{
 		{
 		public:
 			RSGISMultivariantStats();
-			Matrix* findMeanVector(Matrix *inputData) throw(RSGISMatricesException);
-			Matrix* standardiseMatrix(Matrix *inputData, Matrix *meanVector) throw(RSGISMatricesException,RSGISMultivariantStatsException);
-			float calcCovariance(Matrix *inputData, int var1, int var2, Matrix *meanVector) throw(RSGISMatricesException,RSGISMultivariantStatsException); 
-			Matrix* calcCovarianceMatrix(Matrix *inputData, Matrix *meanVector) throw(RSGISMatricesException,RSGISMultivariantStatsException);
+			Matrix* findMeanVector(Matrix *inputData);
+			Matrix* standardiseMatrix(Matrix *inputData, Matrix *meanVector);
+			float calcCovariance(Matrix *inputData, int var1, int var2, Matrix *meanVector); 
+			Matrix* calcCovarianceMatrix(Matrix *inputData, Matrix *meanVector);
 			~RSGISMultivariantStats();
 		};
 }}

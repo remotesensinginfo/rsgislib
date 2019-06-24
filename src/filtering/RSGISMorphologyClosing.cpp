@@ -30,7 +30,7 @@ namespace rsgis{namespace filter{
         
     }
     
-    void RSGISImageMorphologyClosing::performClosing(GDALDataset *dataset, std::string outputImage, std::string tempImage, bool useMemory, rsgis::math::Matrix *matrixOperator, unsigned int numIterations, std::string format, GDALDataType outDataType) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
+    void RSGISImageMorphologyClosing::performClosing(GDALDataset *dataset, std::string outputImage, std::string tempImage, bool useMemory, rsgis::math::Matrix *matrixOperator, unsigned int numIterations, std::string format, GDALDataType outDataType)
     {
         try 
         {

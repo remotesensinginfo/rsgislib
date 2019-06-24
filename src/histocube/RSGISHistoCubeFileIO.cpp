@@ -35,7 +35,7 @@ namespace rsgis {namespace histocube{
         cubeLayers = new std::vector<RSGISHistCubeLayerMeta*>();
     }
     
-    void RSGISHistoCubeFile::openFile(std::string filePath, bool fileRWAccess, int mdcElmts, hsize_t rdccNElmts, hsize_t rdccNBytes, double rdccW0, hsize_t sieveBuf, hsize_t metaBlockSize)throw(rsgis::RSGISHistoCubeException)
+    void RSGISHistoCubeFile::openFile(std::string filePath, bool fileRWAccess, int mdcElmts, hsize_t rdccNElmts, hsize_t rdccNBytes, double rdccW0, hsize_t sieveBuf, hsize_t metaBlockSize)
     {
         try
         {
@@ -221,7 +221,7 @@ namespace rsgis {namespace histocube{
 
     }
     
-    void RSGISHistoCubeFile::createNewFile(std::string filePath, unsigned long numFeats, int mdcElmts, hsize_t rdccNElmts, hsize_t rdccNBytes, double rdccW0, hsize_t sieveBuf, hsize_t metaBlockSize) throw(rsgis::RSGISHistoCubeException)
+    void RSGISHistoCubeFile::createNewFile(std::string filePath, unsigned long numFeats, int mdcElmts, hsize_t rdccNElmts, hsize_t rdccNBytes, double rdccW0, hsize_t sieveBuf, hsize_t metaBlockSize)
     {
         try
         {
@@ -287,7 +287,7 @@ namespace rsgis {namespace histocube{
         }
     }
     
-    void RSGISHistoCubeFile::createDataset(std::string name, std::vector<int> bins, float scale, float offset, bool hasDateTime, boost::posix_time::ptime *layerDateTime, unsigned int chunkSize, int deflate) throw(rsgis::RSGISHistoCubeException)
+    void RSGISHistoCubeFile::createDataset(std::string name, std::vector<int> bins, float scale, float offset, bool hasDateTime, boost::posix_time::ptime *layerDateTime, unsigned int chunkSize, int deflate)
     {
         try
         {
@@ -441,7 +441,7 @@ namespace rsgis {namespace histocube{
         }
     }
     
-    void RSGISHistoCubeFile::getHistoRow(std::string name, unsigned int row, unsigned int *data, unsigned int dataLen) throw(rsgis::RSGISHistoCubeException)
+    void RSGISHistoCubeFile::getHistoRow(std::string name, unsigned int row, unsigned int *data, unsigned int dataLen)
     {
         if(!this->fileOpen)
         {
@@ -527,7 +527,7 @@ namespace rsgis {namespace histocube{
         }
     }
     
-    void RSGISHistoCubeFile::setHistoRow(std::string name, unsigned int row, unsigned int *data, unsigned int dataLen) throw(rsgis::RSGISHistoCubeException)
+    void RSGISHistoCubeFile::setHistoRow(std::string name, unsigned int row, unsigned int *data, unsigned int dataLen)
     {
         if(!this->fileOpen)
         {
@@ -618,7 +618,7 @@ namespace rsgis {namespace histocube{
         }
     }
     
-    void RSGISHistoCubeFile::getHistoRows(std::string name, unsigned int sRow, unsigned int eRow, unsigned int *data, unsigned int dataLen) throw(rsgis::RSGISHistoCubeException)
+    void RSGISHistoCubeFile::getHistoRows(std::string name, unsigned int sRow, unsigned int eRow, unsigned int *data, unsigned int dataLen)
     {
         if(!this->fileOpen)
         {
@@ -710,7 +710,7 @@ namespace rsgis {namespace histocube{
         }
     }
     
-    void RSGISHistoCubeFile::setHistoRows(std::string name, unsigned int sRow, unsigned int eRow, unsigned int *data, unsigned int dataLen) throw(rsgis::RSGISHistoCubeException)
+    void RSGISHistoCubeFile::setHistoRows(std::string name, unsigned int sRow, unsigned int eRow, unsigned int *data, unsigned int dataLen)
     {
         if(!this->fileOpen)
         {
@@ -817,7 +817,7 @@ namespace rsgis {namespace histocube{
         return this->numOfFeats;
     }
     
-    void RSGISHistoCubeFile::closeFile() throw(rsgis::RSGISHistoCubeException)
+    void RSGISHistoCubeFile::closeFile()
     {
         this->hcH5File->close();
         delete this->hcH5File;

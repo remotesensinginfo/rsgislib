@@ -31,7 +31,7 @@ namespace rsgis{namespace vec{
         
     }
     
-    void RSGISAttCountPolyIntersect::countPolysIntersections(rsgis::rastergis::RSGISAttributeTable *attTable, GDALDataset *clumps, OGRLayer *polys, std::string field, rsgis::img::pixelInPolyOption pixelPolyOption)throw(rsgis::RSGISAttributeTableException)
+    void RSGISAttCountPolyIntersect::countPolysIntersections(rsgis::rastergis::RSGISAttributeTable *attTable, GDALDataset *clumps, OGRLayer *polys, std::string field, rsgis::img::pixelInPolyOption pixelPolyOption)
     {
         try
         {
@@ -85,7 +85,7 @@ namespace rsgis{namespace vec{
         }
     }
     
-    void RSGISAttCountPolyIntersect::countPolysIntersections(rsgis::rastergis::RSGISAttributeTable *attTable, GDALDataset *clumps, std::vector<OGRPolygon*> *polys, std::string field, rsgis::img::pixelInPolyOption pixelPolyOption)throw(rsgis::RSGISAttributeTableException)
+    void RSGISAttCountPolyIntersect::countPolysIntersections(rsgis::rastergis::RSGISAttributeTable *attTable, GDALDataset *clumps, std::vector<OGRPolygon*> *polys, std::string field, rsgis::img::pixelInPolyOption pixelPolyOption)
     {
         try
         {
@@ -111,7 +111,7 @@ namespace rsgis{namespace vec{
         }
     }
     
-    void RSGISAttCountPolyIntersect::countPolyIntersections(rsgis::rastergis::RSGISAttributeTable *attTable, GDALDataset *clumps, OGRPolygon *ogrPoly, unsigned int field, rsgis::img::pixelInPolyOption pixelPolyOption)throw(rsgis::RSGISAttributeTableException)
+    void RSGISAttCountPolyIntersect::countPolyIntersections(rsgis::rastergis::RSGISAttributeTable *attTable, GDALDataset *clumps, OGRPolygon *ogrPoly, unsigned int field, rsgis::img::pixelInPolyOption pixelPolyOption)
     {
         try
         {
@@ -149,7 +149,7 @@ namespace rsgis{namespace vec{
         this->pixelPolyOption = pixelPolyOption;
     }
     
-    void RSGISPopulateAttTableForPolygonIntersect::processFeature(OGRFeature *feature, OGRPolygon *poly, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+    void RSGISPopulateAttTableForPolygonIntersect::processFeature(OGRFeature *feature, OGRPolygon *poly, geos::geom::Envelope *env, long fid)
     {
         try
         {
@@ -178,7 +178,7 @@ namespace rsgis{namespace vec{
         this->fieldIdx = fieldIdx;
     }
     
-    void RSGISCalcValueCountInAttTable::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCalcValueCountInAttTable::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) 
     {        
         if(bandValues[0] > 0)
         {

@@ -37,7 +37,7 @@ namespace rsgis{namespace calib{
         this->useNoDataVal = useNoDataVal;
     }
     
-    void RSGISApply6SCoefficientsSingleParam::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISApply6SCoefficientsSingleParam::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         if(numValues != this->numOutBands)
         {
@@ -139,7 +139,7 @@ namespace rsgis{namespace calib{
         }
     }
     
-    void RSGISApply6SCoefficientsElevLUTParam::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISApply6SCoefficientsElevLUTParam::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         if(numBands-1 != this->numOutBands)
         {
@@ -307,7 +307,7 @@ namespace rsgis{namespace calib{
         this->useNoDataVal = useNoDataVal;
     }
     
-    void RSGISApply6SCoefficientsElevAOTLUTParam::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISApply6SCoefficientsElevAOTLUTParam::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         if(numBands-2 != this->numOutBands)
         {
@@ -464,7 +464,7 @@ namespace rsgis{namespace calib{
 		}
     }
     
-    void RSGISApply6SCoefficients::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISApply6SCoefficients::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         if(numValues != this->numOutBands)
         {
@@ -542,7 +542,7 @@ namespace rsgis{namespace calib{
         this->solarZenith = solarZenith;
     }
     
-    void RSGISCalcSolarIrradianceElevLUTParam::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCalcSolarIrradianceElevLUTParam::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         /*
          * bandValues[0] - valid data mask
@@ -725,7 +725,7 @@ namespace rsgis{namespace calib{
         this->reflScaleFactor = reflScaleFactor;
     }
     
-    void RSGISCalcStandardisedReflectanceSD2010::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCalcStandardisedReflectanceSD2010::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         /*
          * bandValues[0] - valid data mask

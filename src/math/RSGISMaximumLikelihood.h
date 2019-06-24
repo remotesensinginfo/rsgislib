@@ -110,7 +110,7 @@ namespace rsgis {namespace math{
          *
          * Return value: 0 on success, 1 otherwise.
          */
-        int compute_ml(MaximumLikelihood *ml, int n, int d, double *x[], int y[]) throw(RSGISMaximumLikelihoodException);
+        int compute_ml(MaximumLikelihood *ml, int n, int d, double *x[], int y[]);
         /**
          * predicts ml model on a test point x. Posteriors probability
          * for each class will be stored within the array margin
@@ -120,7 +120,7 @@ namespace rsgis {namespace math{
          * binary classification; 1,...,nclasses in the multiclass case),
          * 0 on succes with non unique classification, -2 otherwise.
          */
-        int predict_ml(MaximumLikelihood *ml, double x[], double **margin) throw(RSGISMaximumLikelihoodException);
+        int predict_ml(MaximumLikelihood *ml, double x[], double **margin);
         ~RSGISMaximumLikelihood();
     protected:
         /**
@@ -128,7 +128,7 @@ namespace rsgis {namespace math{
          *
          * Return value: the number of unique values on success, 0 otherwise.
          */
-        int iunique(int y[], int n, int **values) throw(RSGISMaximumLikelihoodException);
+        int iunique(int y[], int n, int **values);
         /**
          * Sort a[] (an array of n integers) by "heapsort" according to action
          * action=SORT_ASCENDING (=1) --> sorting in ascending order

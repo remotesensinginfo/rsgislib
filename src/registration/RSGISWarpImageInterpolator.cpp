@@ -26,7 +26,7 @@
 
 namespace rsgis{namespace reg{
 	
-	void RSGISWarpImageNNInterpolator::calcValue(GDALDataset *image, float *outValues, unsigned int numOutVals, double eastings, double northings, unsigned int xPxl, unsigned int yPxl, float inImgRes, float outImgRes) throw(RSGISImageWarpException)
+	void RSGISWarpImageNNInterpolator::calcValue(GDALDataset *image, float *outValues, unsigned int numOutVals, double eastings, double northings, unsigned int xPxl, unsigned int yPxl, float inImgRes, float outImgRes)
 	{
         rsgis::img::RSGISImageUtils imgUtils;
 		

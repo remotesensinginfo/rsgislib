@@ -61,16 +61,16 @@ namespace rsgis{namespace segment{
     {
     public:
         RSGISMergeSegmentationTiles();
-        void createTileBorderClumpMask(GDALDataset *borderMaskDataset, std::vector<std::string> inputImagePaths, unsigned int tileBoundary, unsigned int tileOverlap, unsigned int tileBody, std::string colsName) throw(rsgis::img::RSGISImageCalcException);
-        void mergeClumpBodies(GDALDataset *outputDataset, GDALDataset *borderMaskDataset, std::vector<std::string> inputImagePaths, unsigned int tileBoundary, unsigned int tileOverlap, unsigned int tileBody, std::string colsName) throw(rsgis::img::RSGISImageCalcException);
-        void mergeClumpImages(GDALDataset *outputDataset, std::vector<std::string> inputImagePaths, bool mergeRATs=false) throw(rsgis::img::RSGISImageCalcException);
+        void createTileBorderClumpMask(GDALDataset *borderMaskDataset, std::vector<std::string> inputImagePaths, unsigned int tileBoundary, unsigned int tileOverlap, unsigned int tileBody, std::string colsName);
+        void mergeClumpBodies(GDALDataset *outputDataset, GDALDataset *borderMaskDataset, std::vector<std::string> inputImagePaths, unsigned int tileBoundary, unsigned int tileOverlap, unsigned int tileBody, std::string colsName);
+        void mergeClumpImages(GDALDataset *outputDataset, std::vector<std::string> inputImagePaths, bool mergeRATs=false);
         ~RSGISMergeSegmentationTiles();
     protected:
-        size_t numberBodyClumps(GDALRasterAttributeTable *gdalATT, std::string outColName, std::string clumpPosColName, int tileBody, size_t clumpsOffset) throw(RSGISException);
-        size_t numberClumps(GDALRasterAttributeTable *gdalATT, std::string outColName, size_t clumpsOffset) throw(RSGISException);
-        void addTileBodyClumps(GDALDataset *outputDataset, GDALDataset *tileDataset, GDALDataset *borderMaskDataset, GDALRasterAttributeTable *gdalATT, std::string outClumpIDColName, std::string clumpPosColName, unsigned int tileBody, unsigned int tileBoundary) throw(rsgis::img::RSGISImageCalcException);
-        void addTileBorder2Mask(GDALDataset *tileDataset, GDALDataset *borderMaskDataset, GDALRasterAttributeTable *gdalATT, std::string clumpPosColName, unsigned int tileBoundary) throw(rsgis::img::RSGISImageCalcException);
-        void addImageClumps(GDALDataset *outputDataset, GDALDataset *clumpsDataset, GDALRasterAttributeTable *gdalATT, std::string outClumpIDColName) throw(rsgis::img::RSGISImageCalcException);
+        size_t numberBodyClumps(GDALRasterAttributeTable *gdalATT, std::string outColName, std::string clumpPosColName, int tileBody, size_t clumpsOffset);
+        size_t numberClumps(GDALRasterAttributeTable *gdalATT, std::string outColName, size_t clumpsOffset);
+        void addTileBodyClumps(GDALDataset *outputDataset, GDALDataset *tileDataset, GDALDataset *borderMaskDataset, GDALRasterAttributeTable *gdalATT, std::string outClumpIDColName, std::string clumpPosColName, unsigned int tileBody, unsigned int tileBoundary);
+        void addTileBorder2Mask(GDALDataset *tileDataset, GDALDataset *borderMaskDataset, GDALRasterAttributeTable *gdalATT, std::string clumpPosColName, unsigned int tileBoundary);
+        void addImageClumps(GDALDataset *outputDataset, GDALDataset *clumpsDataset, GDALRasterAttributeTable *gdalATT, std::string outClumpIDColName);
     };
     
     

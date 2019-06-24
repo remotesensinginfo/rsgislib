@@ -27,7 +27,7 @@
 namespace rsgis { namespace img {
 
     
-    void RSGISPopWithStats::calcPopStats( GDALDataset *imgDS, bool useNoDataVal, float noDataVal, bool calcPyramid, std::vector<int> decimatFactors ) throw(rsgis::RSGISImageException)
+    void RSGISPopWithStats::calcPopStats( GDALDataset *imgDS, bool useNoDataVal, float noDataVal, bool calcPyramid, std::vector<int> decimatFactors )
     {
         rsgis::utils::RSGISTextUtils textUtils;
         
@@ -248,7 +248,7 @@ namespace rsgis { namespace img {
         }
     }
     
-    void RSGISPopWithStats::addPyramids(GDALDataset *imgDS, std::vector<int> decimatFactors) throw(rsgis::RSGISImageException)
+    void RSGISPopWithStats::addPyramids(GDALDataset *imgDS, std::vector<int> decimatFactors)
     {
         int nOverviews = decimatFactors.size();
         
@@ -256,7 +256,7 @@ namespace rsgis { namespace img {
         imgDS->BuildOverviews("AVERAGE", nOverviews, decimatFactors.data(), 0, NULL,  (GDALProgressFunc)StatsTextProgress, &nLastProgress );
     }
     
-    unsigned int RSGISPopWithStats::findColumnIndexOrCreate(GDALRasterAttributeTable *gdalATT, std::string colName, GDALRATFieldType dType, GDALRATFieldUsage dUsage) throw(rsgis::RSGISImageException)
+    unsigned int RSGISPopWithStats::findColumnIndexOrCreate(GDALRasterAttributeTable *gdalATT, std::string colName, GDALRATFieldType dType, GDALRATFieldUsage dUsage)
     {
         int numColumns = gdalATT->GetColumnCount();
         bool foundCol = false;
@@ -299,7 +299,7 @@ namespace rsgis { namespace img {
         
     }
     
-    void RSGISCalcImageMinMaxMean::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+    void RSGISCalcImageMinMaxMean::calcImageValue(float *bandValues, int numBands) 
     {
         if(numVals != numBands)
         {
@@ -393,7 +393,7 @@ namespace rsgis { namespace img {
         
     }
     
-    void RSGISCalcImageStdDevPopHist::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+    void RSGISCalcImageStdDevPopHist::calcImageValue(float *bandValues, int numBands) 
     {
         if(numVals != numBands)
         {

@@ -47,19 +47,19 @@
 namespace rsgis{ namespace cmds {
 
     /** A function to collapse a segmentation RAT to a classification (i.e., 1 row per class) */
-    DllExport void executeCollapseRAT2Class(std::string clumpsImage, std::string outputImage, std::string outImageFormat, std::string classColumn, std::string classIntCol="", bool useIntCol=false)throw(RSGISCmdException);
+    DllExport void executeCollapseRAT2Class(std::string clumpsImage, std::string outputImage, std::string outImageFormat, std::string classColumn, std::string classIntCol="", bool useIntCol=false);
     
     /** A function to generate a 3 band colour image from the colour table */
-    DllExport void executeGenerate3BandFromColourTable(std::string clumpsImage, std::string outputImage, std::string outImageFormat)throw(RSGISCmdException);
+    DllExport void executeGenerate3BandFromColourTable(std::string clumpsImage, std::string outputImage, std::string outImageFormat);
     
     /** A function to generate random points which can be used to assess the accuracy of a map */
-    DllExport void executeGenerateRandomAccuracyPts(std::string classImage, std::string outputShp, std::string classImgCol, std::string classImgVecCol, std::string classRefVecCol, unsigned int numPts, unsigned int seed, bool force)throw(RSGISCmdException);
+    DllExport void executeGenerateRandomAccuracyPts(std::string classImage, std::string outputShp, std::string classImgCol, std::string classImgVecCol, std::string classRefVecCol, unsigned int numPts, unsigned int seed, bool force);
     
     /** A function to generate stratified random points which can be used to assess the accuracy of a map */
-    DllExport void executeGenerateStratifiedRandomAccuracyPts(std::string classImage, std::string outputShp, std::string classImgCol, std::string classImgVecCol, std::string classRefVecCol, unsigned int numPtsPerClass, unsigned int seed, bool force, bool usePxlLst)throw(RSGISCmdException);
+    DllExport void executeGenerateStratifiedRandomAccuracyPts(std::string classImage, std::string outputShp, std::string classImgCol, std::string classImgVecCol, std::string classRefVecCol, unsigned int numPtsPerClass, unsigned int seed, bool force, bool usePxlLst);
     
     /** A function to populate a set of points with the class information to assess the accuracy of a map */
-    DllExport void executePopClassInfoAccuracyPts(std::string classImage, std::string shpFile, std::string classImgCol, std::string classImgVecCol, std::string classRefVecCol="", bool addRefCol=false)throw(RSGISCmdException);
+    DllExport void executePopClassInfoAccuracyPts(std::string classImage, std::string shpFile, std::string classImgCol, std::string classImgVecCol, std::string classRefVecCol="", bool addRefCol=false);
 
     
 }}

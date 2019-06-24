@@ -29,7 +29,7 @@ namespace rsgis{namespace img{
 		this->valueCalc = valueCalc;
 	}
 	
-	void RSGISCalcImageSingle::calcImage(GDALDataset **datasetsA, GDALDataset **datasetsB, int numDS, double *outputValue, int bandA, int bandB) throw(RSGISImageCalcException,RSGISImageBandException)
+	void RSGISCalcImageSingle::calcImage(GDALDataset **datasetsA, GDALDataset **datasetsB, int numDS, double *outputValue, int bandA, int bandB)
 	{
 		GDALAllRegister();
 		RSGISImageUtils imgUtils;
@@ -183,11 +183,11 @@ namespace rsgis{namespace img{
 			}
 			
 		}
-		catch(RSGISImageCalcException e)
+		catch(RSGISImageCalcException &e)
 		{
 			throw e;
 		}
-		catch(RSGISImageBandException e)
+		catch(RSGISImageBandException &e)
 		{
 			throw e;
 		}
@@ -256,7 +256,7 @@ namespace rsgis{namespace img{
 		}
 	}
 	
-	void RSGISCalcImageSingle::calcImage(GDALDataset **datasetsA, int numDS, double *outputValue, int band) throw(RSGISImageCalcException,RSGISImageBandException)
+	void RSGISCalcImageSingle::calcImage(GDALDataset **datasetsA, int numDS, double *outputValue, int band)
 	{
 		GDALAllRegister();
 		RSGISImageUtils imgUtils;
@@ -347,11 +347,11 @@ namespace rsgis{namespace img{
 			}
 			
 		}
-		catch(RSGISImageCalcException e)
+		catch(RSGISImageCalcException &e)
 		{
 			throw e;
 		}
-		catch(RSGISImageBandException e)
+		catch(RSGISImageBandException &e)
 		{
 			throw e;
 		}
@@ -393,7 +393,7 @@ namespace rsgis{namespace img{
 		}
 	}
 	
-	void RSGISCalcImageSingle::calcImageWindow(GDALDataset **datasetsA, int numDS, double *outputValue) throw(RSGISImageCalcException,RSGISImageBandException)
+	void RSGISCalcImageSingle::calcImageWindow(GDALDataset **datasetsA, int numDS, double *outputValue)
 	{
 		GDALAllRegister();
 		RSGISImageUtils imgUtils;
@@ -545,7 +545,7 @@ namespace rsgis{namespace img{
 		}
 	}
 	
-	void RSGISCalcImageSingle::calcImageWithinPolygon(GDALDataset **datasets, int numDS, double *outputValue, geos::geom::Envelope *env, geos::geom::Polygon *poly, bool output, pixelInPolyOption pixelPolyOption) throw(RSGISImageCalcException,RSGISImageBandException)
+	void RSGISCalcImageSingle::calcImageWithinPolygon(GDALDataset **datasets, int numDS, double *outputValue, geos::geom::Envelope *env, geos::geom::Polygon *poly, bool output, pixelInPolyOption pixelPolyOption)
 	{
 		GDALAllRegister();
 		RSGISImageUtils imgUtils;
@@ -859,7 +859,7 @@ namespace rsgis{namespace img{
 		}
 	}
 	
-	void RSGISCalcImageSingle::calcImageWithinRasterPolygon(GDALDataset **datasets, int numDS, double *outputValue, geos::geom::Envelope *env, long fid, bool output) throw(RSGISImageCalcException,RSGISImageBandException)
+	void RSGISCalcImageSingle::calcImageWithinRasterPolygon(GDALDataset **datasets, int numDS, double *outputValue, geos::geom::Envelope *env, long fid, bool output)
 	{
 		GDALAllRegister();
 		RSGISImageUtils imgUtils;

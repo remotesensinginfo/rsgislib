@@ -29,7 +29,7 @@ namespace rsgis{namespace img{
 		
 	}
 	
-	void RSGISImageStatistics::calcImageStatistics(GDALDataset **datasets, int numDS, ImageStats **stats, int numInputBands, bool stddev, bool useNoData, float noDataVal, bool onePassSD)throw(RSGISImageCalcException,RSGISImageBandException)
+	void RSGISImageStatistics::calcImageStatistics(GDALDataset **datasets, int numDS, ImageStats **stats, int numInputBands, bool stddev, bool useNoData, float noDataVal, bool onePassSD)
 	{
 		RSGISCalcImageStatistics *calcImageStats = NULL;
 		RSGISCalcImage *calcImg = NULL;
@@ -50,7 +50,7 @@ namespace rsgis{namespace img{
 			
 			calcImageStats->getImageStats(stats, numInputBands);
 		}
-		catch(RSGISImageCalcException e)
+		catch(RSGISImageCalcException &e)
 		{
 			if(calcImageStats != NULL)
 			{
@@ -62,7 +62,7 @@ namespace rsgis{namespace img{
 			}
 			throw e;
 		}
-		catch(RSGISImageBandException e)
+		catch(RSGISImageBandException &e)
 		{
 			if(calcImageStats != NULL)
 			{
@@ -85,7 +85,7 @@ namespace rsgis{namespace img{
 		}
 	}
 	
-	void RSGISImageStatistics::calcImageStatistics(GDALDataset **datasets, int numDS, ImageStats **stats, int numInputBands, bool stddev, rsgis::math::RSGISMathFunction *func, bool useNoData, float noDataVal, bool onePassSD)throw(RSGISImageCalcException,RSGISImageBandException)
+	void RSGISImageStatistics::calcImageStatistics(GDALDataset **datasets, int numDS, ImageStats **stats, int numInputBands, bool stddev, rsgis::math::RSGISMathFunction *func, bool useNoData, float noDataVal, bool onePassSD)
 	{
 		RSGISCalcImageStatistics *calcImageStats = NULL;
 		RSGISCalcImage *calcImg = NULL;
@@ -105,7 +105,7 @@ namespace rsgis{namespace img{
 			
 			calcImageStats->getImageStats(stats, numInputBands);
 		}
-		catch(RSGISImageCalcException e)
+		catch(RSGISImageCalcException &e)
 		{
 			if(calcImageStats != NULL)
 			{
@@ -117,7 +117,7 @@ namespace rsgis{namespace img{
 			}
 			throw e;
 		}
-		catch(RSGISImageBandException e)
+		catch(RSGISImageBandException &e)
 		{
 			if(calcImageStats != NULL)
 			{
@@ -140,7 +140,7 @@ namespace rsgis{namespace img{
 		}
 	}
     
-    void RSGISImageStatistics::calcImageStatistics(GDALDataset **datasets, int numDS, ImageStats *stats, bool stddev, bool useNoData, float noDataVal, bool onePassSD)throw(RSGISImageCalcException,RSGISImageBandException)
+    void RSGISImageStatistics::calcImageStatistics(GDALDataset **datasets, int numDS, ImageStats *stats, bool stddev, bool useNoData, float noDataVal, bool onePassSD)
 	{
 		RSGISCalcImageStatisticsAllBands *calcImageStats = NULL;
 		RSGISCalcImage *calcImg = NULL;
@@ -160,7 +160,7 @@ namespace rsgis{namespace img{
 			
 			calcImageStats->getImageStats(stats);
 		}
-		catch(RSGISImageCalcException e)
+		catch(RSGISImageCalcException &e)
 		{
 			if(calcImageStats != NULL)
 			{
@@ -172,7 +172,7 @@ namespace rsgis{namespace img{
 			}
 			throw e;
 		}
-		catch(RSGISImageBandException e)
+		catch(RSGISImageBandException &e)
 		{
 			if(calcImageStats != NULL)
 			{
@@ -195,7 +195,7 @@ namespace rsgis{namespace img{
 		}
 	}
 	
-    void RSGISImageStatistics::calcImageStatistics(GDALDataset **datasets, int numDS, ImageStats **stats, int numInputBands, bool stddev, bool noDataSpecified, float noDataVal, bool onePassSD, double xMin, double xMax, double yMin, double yMax)throw(RSGISImageCalcException,RSGISImageBandException)
+    void RSGISImageStatistics::calcImageStatistics(GDALDataset **datasets, int numDS, ImageStats **stats, int numInputBands, bool stddev, bool noDataSpecified, float noDataVal, bool onePassSD, double xMin, double xMax, double yMin, double yMax)
     {
         RSGISCalcImageStatisticsNoData *calcImageStats = NULL;
 		RSGISCalcImage *calcImg = NULL;
@@ -223,7 +223,7 @@ namespace rsgis{namespace img{
             
             delete env;
 		}
-		catch(RSGISImageCalcException e)
+		catch(RSGISImageCalcException &e)
 		{
 			if(calcImageStats != NULL)
 			{
@@ -235,7 +235,7 @@ namespace rsgis{namespace img{
 			}
 			throw e;
 		}
-		catch(RSGISImageBandException e)
+		catch(RSGISImageBandException &e)
 		{
 			if(calcImageStats != NULL)
 			{
@@ -258,7 +258,7 @@ namespace rsgis{namespace img{
 		}
     }
     
-    void RSGISImageStatistics::calcImageHistogram(GDALDataset **datasets, int numDS, unsigned int imgBand, unsigned int numBins, float *binRanges, unsigned int *binCounts, bool noDataSpecified, float noDataVal, double xMin, double xMax, double yMin, double yMax)throw(RSGISImageCalcException,RSGISImageBandException)
+    void RSGISImageStatistics::calcImageHistogram(GDALDataset **datasets, int numDS, unsigned int imgBand, unsigned int numBins, float *binRanges, unsigned int *binCounts, bool noDataSpecified, float noDataVal, double xMin, double xMax, double yMin, double yMax)
     {
         RSGISCalcImageHistogramNoData *calcImageStats = NULL;
 		RSGISCalcImage *calcImg = NULL;
@@ -273,7 +273,7 @@ namespace rsgis{namespace img{
 
             delete env;
 		}
-		catch(RSGISImageCalcException e)
+		catch(RSGISImageCalcException &e)
 		{
 			if(calcImageStats != NULL)
 			{
@@ -285,7 +285,7 @@ namespace rsgis{namespace img{
 			}
 			throw e;
 		}
-		catch(RSGISImageBandException e)
+		catch(RSGISImageBandException &e)
 		{
 			if(calcImageStats != NULL)
 			{
@@ -308,7 +308,7 @@ namespace rsgis{namespace img{
 		}
     }
     
-    void RSGISImageStatistics::calcImageStatisticsMask(GDALDataset *dataset, GDALDataset *imgMask, long maskVal, ImageStats **stats, double *noDataVals, bool useNoData, int numInputBands, bool stddev, bool onePassSD)throw(RSGISImageCalcException,RSGISImageBandException)
+    void RSGISImageStatistics::calcImageStatisticsMask(GDALDataset *dataset, GDALDataset *imgMask, long maskVal, ImageStats **stats, double *noDataVals, bool useNoData, int numInputBands, bool stddev, bool onePassSD)
     {
         GDALDataset **datasets = new GDALDataset*[2];
         datasets[0] = imgMask;
@@ -333,17 +333,17 @@ namespace rsgis{namespace img{
             calcImageStats.getImageStats(stats, numInputBands);
             delete[] datasets;
         }
-        catch(RSGISImageCalcException e)
+        catch(RSGISImageCalcException &e)
         {
             throw e;
         }
-        catch(RSGISImageBandException e)
+        catch(RSGISImageBandException &e)
         {
             throw e;
         }
     }
     
-    void RSGISImageStatistics::calcImageBandStatistics(GDALDataset *dataset, int imgBand, ImageStats *stats, bool stddev, bool useNoData, float noDataVal, bool onePassSD)throw(RSGISImageCalcException,RSGISImageBandException)
+    void RSGISImageStatistics::calcImageBandStatistics(GDALDataset *dataset, int imgBand, ImageStats *stats, bool stddev, bool useNoData, float noDataVal, bool onePassSD)
     {
         try
         {
@@ -394,11 +394,11 @@ namespace rsgis{namespace img{
             }
             delete[] bandStats;
         }
-        catch(RSGISImageCalcException e)
+        catch(RSGISImageCalcException &e)
         {
             throw e;
         }
-        catch(RSGISImageBandException e)
+        catch(RSGISImageBandException &e)
         {
             throw e;
         }
@@ -438,7 +438,7 @@ namespace rsgis{namespace img{
 		this->func = func;
 	}
 	
-	void RSGISCalcImageStatistics::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+	void RSGISCalcImageStatistics::calcImageValue(float *bandValues, int numBands) 
 	{
 		if(numBands != this->numInputBands)
 		{
@@ -546,7 +546,7 @@ namespace rsgis{namespace img{
         }
 	}
 	
-	void RSGISCalcImageStatistics::getImageStats(ImageStats** inStats, int numInputBands) throw(RSGISImageCalcException)
+	void RSGISCalcImageStatistics::getImageStats(ImageStats** inStats, int numInputBands) 
 	{
 		if(this->numInputBands != numInputBands)
 		{
@@ -632,7 +632,7 @@ namespace rsgis{namespace img{
 		this->func = func;
 	}
 	
-	void RSGISCalcImageStatisticsNoData::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+	void RSGISCalcImageStatisticsNoData::calcImageValue(float *bandValues, int numBands) 
 	{
 		if(numBands != this->numInputBands)
 		{
@@ -740,7 +740,7 @@ namespace rsgis{namespace img{
         }
 	}
 	
-	void RSGISCalcImageStatisticsNoData::getImageStats(ImageStats** inStats, int numInputBands) throw(RSGISImageCalcException)
+	void RSGISCalcImageStatisticsNoData::getImageStats(ImageStats** inStats, int numInputBands) 
 	{
 		if(this->numInputBands != numInputBands)
 		{
@@ -812,7 +812,7 @@ namespace rsgis{namespace img{
 		this->func = func;
 	}
 	
-	void RSGISCalcImageStatisticsAllBands::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+	void RSGISCalcImageStatisticsAllBands::calcImageValue(float *bandValues, int numBands) 
 	{
 		
 		bool foundNan = false;
@@ -912,7 +912,7 @@ namespace rsgis{namespace img{
 	}
 	
     
-	void RSGISCalcImageStatisticsAllBands::getImageStats(ImageStats *inStats) throw(RSGISImageCalcException)
+	void RSGISCalcImageStatisticsAllBands::getImageStats(ImageStats *inStats) 
 	{
 		inStats->mean = meanSum/n;
         inStats->min = min;
@@ -945,7 +945,7 @@ namespace rsgis{namespace img{
         
     }
     
-    rsgis::math::Matrix* RSGISImagePercentiles::getPercentilesForAllBands(GDALDataset* dataset, float percentile, float noDataVal, bool noDataDefined)throw(rsgis::RSGISImageException)
+    rsgis::math::Matrix* RSGISImagePercentiles::getPercentilesForAllBands(GDALDataset* dataset, float percentile, float noDataVal, bool noDataDefined)
     {
         rsgis::math::RSGISMatrices matrixUtils;
         rsgis::math::Matrix *outPercentiles = NULL;
@@ -976,7 +976,7 @@ namespace rsgis{namespace img{
         return outPercentiles;
     }
     
-    double RSGISImagePercentiles::getPercentile(GDALDataset *dataset, unsigned int band, float percentile, float noDataVal, bool noDataDefined)throw(rsgis::RSGISImageException)
+    double RSGISImagePercentiles::getPercentile(GDALDataset *dataset, unsigned int band, float percentile, float noDataVal, bool noDataDefined)
     {
         double percentileVal = 0.0;
         try
@@ -1003,7 +1003,7 @@ namespace rsgis{namespace img{
         return percentileVal;
     }
     
-    double RSGISImagePercentiles::getPercentile(GDALDataset *dataset, unsigned int band, GDALDataset *maskDS, int maskVal, float percentile, float noDataVal, bool noDataDefined)throw(rsgis::RSGISImageException)
+    double RSGISImagePercentiles::getPercentile(GDALDataset *dataset, unsigned int band, GDALDataset *maskDS, int maskVal, float percentile, float noDataVal, bool noDataDefined)
     {
         double percentileVal = 0.0;
         try
@@ -1038,7 +1038,7 @@ namespace rsgis{namespace img{
         return percentileVal;
     }
     
-    double RSGISImagePercentiles::getPercentile(GDALDataset *dataset, unsigned int band, GDALDataset *maskDS, int maskVal, float percentile, float noDataVal, bool noDataDefined, geos::geom::Envelope *env, bool quiet)throw(rsgis::RSGISImageException)
+    double RSGISImagePercentiles::getPercentile(GDALDataset *dataset, unsigned int band, GDALDataset *maskDS, int maskVal, float percentile, float noDataVal, bool noDataDefined, geos::geom::Envelope *env, bool quiet)
     {
         double percentileVal = 0.0;
         try
@@ -1080,7 +1080,7 @@ namespace rsgis{namespace img{
 	
     
     
-    void RSGISGetPixelBandValues::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(RSGISImageCalcException)
+    void RSGISGetPixelBandValues::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) 
     {
         if(numIntVals != 1)
         {
@@ -1111,7 +1111,7 @@ namespace rsgis{namespace img{
         this->useNoDataValue = useNoDataValue;
     }
     
-    void RSGISImagePixelSummaries::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+    void RSGISImagePixelSummaries::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         std::vector<double> *dataVals = new std::vector<double>();
         for(int i = 0; i < numBands; ++i)
@@ -1187,7 +1187,7 @@ namespace rsgis{namespace img{
         this->binCounts = binCounts;
     }
     
-    void RSGISCalcImageHistogramNoData::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+    void RSGISCalcImageHistogramNoData::calcImageValue(float *bandValues, int numBands) 
     {
         if(this->noDataSpecified)
         {
@@ -1257,7 +1257,7 @@ namespace rsgis{namespace img{
         this->useNoData = useNoData;
     }
     
-    void RSGISCalcImageStatisticsMaskStatsNoData::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(RSGISImageCalcException)
+    void RSGISCalcImageStatisticsMaskStatsNoData::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) 
     {
         if(numfloatVals != this->numInputBands)
         {
@@ -1347,7 +1347,7 @@ namespace rsgis{namespace img{
         }
     }
     
-    void RSGISCalcImageStatisticsMaskStatsNoData::getImageStats(ImageStats** inStats, int numInputBands) throw(RSGISImageCalcException)
+    void RSGISCalcImageStatisticsMaskStatsNoData::getImageStats(ImageStats** inStats, int numInputBands) 
     {
         if(this->numInputBands != numInputBands)
         {
@@ -1458,7 +1458,7 @@ namespace rsgis{namespace img{
         this->totNumInBands = numInImgBands * numInImgs;
     }
     
-    void RSGISCalcMultiImageStatSummaries::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+    void RSGISCalcMultiImageStatSummaries::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         if(numBands != totNumInBands)
         {
@@ -1555,7 +1555,7 @@ namespace rsgis{namespace img{
         
     }
     
-    void RSGISCalcImageDifference::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+    void RSGISCalcImageDifference::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         if((numBands/2) != this->numOutBands)
         {
@@ -1590,7 +1590,7 @@ namespace rsgis{namespace img{
         
     }
 
-    void RSGISCalcImgStackIdxForStat::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+    void RSGISCalcImgStackIdxForStat::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         output[0] = 0.0; // Zero is output no data value.
         if(this->sumStat == rsgis::math::sumtype_min)
@@ -1707,7 +1707,7 @@ namespace rsgis{namespace img{
         this->meanSum = 0.0;
     }
     
-    void RSGISCalcMeanPxlValInMaskAcrossBands::calcImageValue(float *bandValues, int numBands)throw(RSGISImageCalcException)
+    void RSGISCalcMeanPxlValInMaskAcrossBands::calcImageValue(float *bandValues, int numBands)
     {
         long pxlMskVal = (long) bandValues[0];
         for(size_t i = 0; i < this->bands.size(); ++i)
@@ -1749,7 +1749,7 @@ namespace rsgis{namespace img{
         }
     }
     
-    double RSGISCalcMeanPxlValInMaskAcrossBands::getMeanValue() throw(RSGISImageCalcException)
+    double RSGISCalcMeanPxlValInMaskAcrossBands::getMeanValue() 
     {
         return this->meanSum/this->n;
     }

@@ -32,7 +32,7 @@ namespace rsgis{namespace img{
 		this->lower = lower;
 	}
 	
-	void RSGISCountValsAboveThresInCol::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+	void RSGISCountValsAboveThresInCol::calcImageValue(float *bandValues, int numBands, double *output) 
 	{
 		int countVals = 0;
 		for(int i = 0; i < numBands; ++i)

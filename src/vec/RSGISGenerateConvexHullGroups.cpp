@@ -31,7 +31,7 @@ namespace rsgis{namespace vec{
         
     }
     
-    std::vector<std::pair<std::string,std::vector<geos::geom::Coordinate>* >* >* RSGISGenerateConvexHullGroups::getCoordinateGroups(std::string inputFile, unsigned int eastingsColIdx, unsigned int northingsColIdx, unsigned int attributeColIdx)throw(RSGISVectorException)
+    std::vector<std::pair<std::string,std::vector<geos::geom::Coordinate>* >* >* RSGISGenerateConvexHullGroups::getCoordinateGroups(std::string inputFile, unsigned int eastingsColIdx, unsigned int northingsColIdx, unsigned int attributeColIdx)
     {
         std::vector<std::pair<std::string,std::vector<geos::geom::Coordinate>* >* > *coordGrps = NULL;
         try
@@ -144,7 +144,7 @@ namespace rsgis{namespace vec{
     }
     
     
-    void RSGISGenerateConvexHullGroups::createPolygonsAsShapefile(std::vector<std::pair<std::string,std::vector<geos::geom::Coordinate>* >* > *coordGrps, std::string outputFile, std::string outProj, bool force)throw(RSGISVectorException)
+    void RSGISGenerateConvexHullGroups::createPolygonsAsShapefile(std::vector<std::pair<std::string,std::vector<geos::geom::Coordinate>* >* > *coordGrps, std::string outputFile, std::string outProj, bool force)
     {
         try
         {

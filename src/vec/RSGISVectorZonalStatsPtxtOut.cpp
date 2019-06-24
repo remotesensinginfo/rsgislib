@@ -26,7 +26,7 @@
 
 namespace rsgis{namespace vec{
 	
-	RSGISVectorZonalStatsPtxtOut::RSGISVectorZonalStatsPtxtOut(GDALDataset *image, rsgis::utils::RSGISExportForPlottingIncremental *plotter, int bX, int bY, int bZ, int bC ) throw(RSGISVectorException)
+	RSGISVectorZonalStatsPtxtOut::RSGISVectorZonalStatsPtxtOut(GDALDataset *image, rsgis::utils::RSGISExportForPlottingIncremental *plotter, int bX, int bY, int bZ, int bC )
 	{
 		this->plotter = plotter;
 		this->bX = bX;
@@ -113,7 +113,7 @@ namespace rsgis{namespace vec{
 		
 	}
 	
-	void RSGISVectorZonalStatsPtxtOut::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISVectorZonalStatsPtxtOut::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)
 	{
 		OGRGeometry *geometry = inFeature->GetGeometryRef();
 		if( geometry != NULL && wkbFlatten(geometry->getGeometryType()) == wkbPolygon )
@@ -185,12 +185,12 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISVectorZonalStatsPtxtOut::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISVectorZonalStatsPtxtOut::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid)
 	{
 		throw RSGISVectorException("Not implemented");
 	}
 	
-	void RSGISVectorZonalStatsPtxtOut::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+	void RSGISVectorZonalStatsPtxtOut::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn)
 	{
 
 	}

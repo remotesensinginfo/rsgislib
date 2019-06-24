@@ -54,8 +54,8 @@ namespace rsgis{namespace img{
 		{
 		public:
 			RSGISCalcImageMatrix(RSGISCalcImageSingle *calcImage);
-            rsgis::math::Matrix* calcImageMatrix(GDALDataset **datasetsA, GDALDataset **datasetsB, int numDS) throw(RSGISImageCalcException,RSGISImageBandException);
-			rsgis::math::Matrix* calcImageVector(GDALDataset **datasetsA, int numDS) throw(RSGISImageCalcException,RSGISImageBandException);
+            rsgis::math::Matrix* calcImageMatrix(GDALDataset **datasetsA, GDALDataset **datasetsB, int numDS);
+			rsgis::math::Matrix* calcImageVector(GDALDataset **datasetsA, int numDS);
 			~RSGISCalcImageMatrix();
 		protected:
 			RSGISCalcImageSingle *calcImage;

@@ -30,7 +30,7 @@ namespace rsgis{namespace img {
 		this->method = method;
 		this->polyOGRPoly = NULL;
 	}
-	bool RSGISPixelInPoly::findPixelInPoly(OGRGeometry *poly, OGRPolygon *pixel) throw(rsgis::RSGISVectorException)
+	bool RSGISPixelInPoly::findPixelInPoly(OGRGeometry *poly, OGRPolygon *pixel)
 	{
 		bool returnVal = false;
 
@@ -145,7 +145,7 @@ namespace rsgis{namespace img {
         this->nBands = nBands;
     }
 
-    void RSGISGetPixelsInPoly::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException)
+    void RSGISGetPixelsInPoly::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) 
     {
         if(numBands != nBands)
         {

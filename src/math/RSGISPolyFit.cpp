@@ -212,7 +212,7 @@ namespace rsgis {namespace math {
 			yMeasured = gsl_matrix_get(inData, i, 1); // Get measured y value.
 			yPredicted = 0;
 			
-			for(int j = 0; j < order ; j++)
+			for(int j = 0; j < order; j++)
 			{
 				double xPow = pow(xVal, j); // x^n;
 				double coeff = gsl_vector_get(coefficients, j); // a_n
@@ -417,7 +417,7 @@ namespace rsgis {namespace math {
 				
 				double aCoeff = 0.0; 
 				
-				for(int y = 0; y < orderY ; y++) // Calculate a_n(y)
+				for(int y = 0; y < orderY; y++) // Calculate a_n(y)
 				{
 					double yPow = pow(yVal, y); // y^n;
 					double bcoeff = gsl_matrix_get(coefficients, x, y); // b_n

@@ -72,9 +72,9 @@ namespace rsgis{namespace vec{
 
 		public:
 			RSGISGeometryToCircle(float resolution, std::string areaAttribute, std::string radiusAttribute, float radius);
-			virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-			virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-			virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
+			virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid);
+			virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid);
+			virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn);
 			virtual ~RSGISGeometryToCircle();
 		protected:
             rsgis::geom::RSGISGeometry *geomUtils;

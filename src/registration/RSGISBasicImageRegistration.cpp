@@ -39,7 +39,7 @@ namespace rsgis{namespace reg{
 		this->subPixelResolution = subPixelResolution;
 	}
 		
-	void RSGISBasicImageRegistration::initRegistration() throw(RSGISRegistrationException)
+	void RSGISBasicImageRegistration::initRegistration()
 	{
 		if(gap < 1)
 		{
@@ -113,7 +113,7 @@ namespace rsgis{namespace reg{
 		initExecuted = true;
 	}
 	
-	void RSGISBasicImageRegistration::executeRegistration() throw(RSGISRegistrationException)
+	void RSGISBasicImageRegistration::executeRegistration()
 	{
 		if(!initExecuted)
 		{
@@ -150,7 +150,7 @@ namespace rsgis{namespace reg{
 		std::cout << ". Complete\n";
 	}
 	
-	void RSGISBasicImageRegistration::finaliseRegistration() throw(RSGISRegistrationException)
+	void RSGISBasicImageRegistration::finaliseRegistration()
 	{
 		if(!initExecuted)
 		{
@@ -208,22 +208,22 @@ namespace rsgis{namespace reg{
 		}
 	}
 	
-	void RSGISBasicImageRegistration::exportTiePointsENVIImage2Map(std::string filepath)throw(RSGISRegistrationException)
+	void RSGISBasicImageRegistration::exportTiePointsENVIImage2Map(std::string filepath)
 	{
 		this->exportTiePointsENVIImage2MapImpl(filepath, tiePoints);
 	}
 	
-	void RSGISBasicImageRegistration::exportTiePointsENVIImage2Image(std::string filepath)throw(RSGISRegistrationException)
+	void RSGISBasicImageRegistration::exportTiePointsENVIImage2Image(std::string filepath)
 	{
 		this->exportTiePointsENVIImage2ImageImpl(filepath, tiePoints);
 	}
 	
-	void RSGISBasicImageRegistration::exportTiePointsRSGISImage2Map(std::string filepath)throw(RSGISRegistrationException)
+	void RSGISBasicImageRegistration::exportTiePointsRSGISImage2Map(std::string filepath)
 	{
 		this->exportTiePointsRSGISImage2MapImpl(filepath, tiePoints);
 	}
     
-    void RSGISBasicImageRegistration::exportTiePointsRSGISMapOffs(std::string filepath)throw(RSGISRegistrationException)
+    void RSGISBasicImageRegistration::exportTiePointsRSGISMapOffs(std::string filepath)
     {
         this->exportTiePointsRSGISMapOffsImpl(filepath, tiePoints);
     }

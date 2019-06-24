@@ -30,7 +30,7 @@ namespace rsgis{namespace segment{
         
     }
     
-    void RSGISCreateImageGrid::createClumpsGrid(GDALDataset *clumpsImage, unsigned int numXPxls, unsigned int numYPxls)throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCreateImageGrid::createClumpsGrid(GDALDataset *clumpsImage, unsigned int numXPxls, unsigned int numYPxls)
     {
         try
         {
@@ -111,7 +111,7 @@ namespace rsgis{namespace segment{
         }
     }
     
-    void RSGISCreateImageGrid::createClumpsOffsetGrid(GDALDataset *clumpsImage, unsigned int numXPxls, unsigned int numYPxls)throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCreateImageGrid::createClumpsOffsetGrid(GDALDataset *clumpsImage, unsigned int numXPxls, unsigned int numYPxls)
     {
         try
         {
@@ -242,7 +242,7 @@ namespace rsgis{namespace segment{
         }
     }
     
-    void RSGISCreateImageGrid::writeImagePxlVal2Region(GDALDataset *clumpsImage, unsigned int pxlVal, unsigned int startX, unsigned int endX, unsigned int startY, unsigned int endY) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCreateImageGrid::writeImagePxlVal2Region(GDALDataset *clumpsImage, unsigned int pxlVal, unsigned int startX, unsigned int endX, unsigned int startY, unsigned int endY) 
     {
         try
         {

@@ -30,7 +30,7 @@ namespace rsgis{namespace filter{
 		this->stddev = stddev;
 	}
 	
-	float RSGISCalcLapacianFilter::calcFilterValue(int x, int y) throw(RSGISImageFilterException)
+	float RSGISCalcLapacianFilter::calcFilterValue(int x, int y)
 	{
 		float xSq = x * x;
 		float ySq = y * y;
@@ -51,7 +51,7 @@ namespace rsgis{namespace filter{
 		this->angle = angle;
 	}
 	
-	float RSGISCalcGaussianSmoothFilter::calcFilterValue(int x, int y) throw(RSGISImageFilterException)
+	float RSGISCalcGaussianSmoothFilter::calcFilterValue(int x, int y)
 	{
 		float xVar = stddevX * stddevX;
 		float yVar = stddevY * stddevY;
@@ -86,7 +86,7 @@ namespace rsgis{namespace filter{
 		this->angle = angle;
 	}
 	
-	float RSGISCalcGaussianFirstDerivativeFilter::calcFilterValue(int x, int y) throw(RSGISImageFilterException)
+	float RSGISCalcGaussianFirstDerivativeFilter::calcFilterValue(int x, int y)
 	{
 		float xVar = stddevX * stddevX;
 		float yVar = stddevY * stddevY;
@@ -126,7 +126,7 @@ namespace rsgis{namespace filter{
 		this->angle = angle;
 	}
 	
-	float RSGISCalcGaussianSecondDerivativeFilter::calcFilterValue(int x, int y) throw(RSGISImageFilterException)
+	float RSGISCalcGaussianSecondDerivativeFilter::calcFilterValue(int x, int y)
 	{
 		float xVar = stddevX * stddevX;
 		float yVar = stddevY * stddevY;

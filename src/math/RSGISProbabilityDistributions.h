@@ -58,7 +58,7 @@ namespace rsgis{namespace math{
 		 */ 
 	public:
 		RSGISProbDistGamma(double shape, double scale);
-		virtual double calcProb(double predictVal) throw(RSGISMathException);
+		virtual double calcProb(double predictVal);
 		virtual double calcRand(){std::cout << "Not Implemented" << std::endl; return 0;};
 		~RSGISProbDistGamma();
 	protected:
@@ -80,7 +80,7 @@ namespace rsgis{namespace math{
 		 */ 
 	public:
 		RSGISProbDistExponential(double rate);
-		virtual double calcProb(double predictVal) throw(RSGISMathException);
+		virtual double calcProb(double predictVal);
 		virtual double calcRand(){std::cout << "Not Implemented" << std::endl; return 0;};
 		~RSGISProbDistExponential();
 	protected:
@@ -100,7 +100,7 @@ namespace rsgis{namespace math{
 		
 	public:
 		RSGISProbDistNormal(double mean, double stdev);
-		virtual double calcProb (double predictVal) throw(RSGISMathException);
+		virtual double calcProb (double predictVal);
 		virtual double calcRand(){std::cout << "Not Implemented" << std::endl; return 0;};
 		virtual ~RSGISProbDistNormal();
 	protected:
@@ -113,7 +113,7 @@ namespace rsgis{namespace math{
 		/// Statistical function for a Neyman Type A distribution.
 	public:
 		RSGISProbDistNeymanTypeA(double m1, double m2, unsigned int maxVal = 0);
-		virtual double calcProb(double iVal) throw(RSGISMathException);
+		virtual double calcProb(double iVal);
 		virtual double calcRand();
 		~RSGISProbDistNeymanTypeA();
 	protected:
@@ -130,7 +130,7 @@ namespace rsgis{namespace math{
 		/// Returns value (use to provide constant in place of distrobution)
 	public:
 		RSGISProbDistReturnVal(double val);
-		virtual double calcProb(double iVal) throw(RSGISMathException);
+		virtual double calcProb(double iVal);
 		virtual double calcRand();
 		~RSGISProbDistReturnVal();
 	protected:

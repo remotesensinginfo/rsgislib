@@ -29,7 +29,7 @@ namespace rsgis{namespace segment{
         
     }
     
-    void RSGISMergeSegmentationTiles::createTileBorderClumpMask(GDALDataset *borderMaskDataset, std::vector<std::string> inputImagePaths, unsigned int tileBoundary, unsigned int tileOverlap, unsigned int tileBody, std::string colsName) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISMergeSegmentationTiles::createTileBorderClumpMask(GDALDataset *borderMaskDataset, std::vector<std::string> inputImagePaths, unsigned int tileBoundary, unsigned int tileOverlap, unsigned int tileBody, std::string colsName) 
     {
         try
         {
@@ -88,7 +88,7 @@ namespace rsgis{namespace segment{
         }
     }
     
-    void RSGISMergeSegmentationTiles::mergeClumpBodies(GDALDataset *outputDataset, GDALDataset *borderMaskDataset, std::vector<std::string> inputImagePaths, unsigned int tileBoundary, unsigned int tileOverlap, unsigned int tileBody, std::string colsName) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISMergeSegmentationTiles::mergeClumpBodies(GDALDataset *outputDataset, GDALDataset *borderMaskDataset, std::vector<std::string> inputImagePaths, unsigned int tileBoundary, unsigned int tileOverlap, unsigned int tileBody, std::string colsName) 
     {
         try
         {
@@ -153,7 +153,7 @@ namespace rsgis{namespace segment{
         }
     }
     
-    void RSGISMergeSegmentationTiles::mergeClumpImages(GDALDataset *outputDataset, std::vector<std::string> inputImagePaths, bool mergeRATs) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISMergeSegmentationTiles::mergeClumpImages(GDALDataset *outputDataset, std::vector<std::string> inputImagePaths, bool mergeRATs) 
     {
         try
         {
@@ -266,7 +266,7 @@ namespace rsgis{namespace segment{
         }
     }
     
-    size_t RSGISMergeSegmentationTiles::numberBodyClumps(GDALRasterAttributeTable *gdalATT, std::string outColName, std::string clumpPosColName, int tileBody, size_t clumpsOffset) throw(RSGISException)
+    size_t RSGISMergeSegmentationTiles::numberBodyClumps(GDALRasterAttributeTable *gdalATT, std::string outColName, std::string clumpPosColName, int tileBody, size_t clumpsOffset)
     {
         size_t numBodyClumps = 0;
         try
@@ -308,7 +308,7 @@ namespace rsgis{namespace segment{
         return numBodyClumps;
     }
     
-    size_t RSGISMergeSegmentationTiles::numberClumps(GDALRasterAttributeTable *gdalATT, std::string outColName, size_t clumpsOffset) throw(RSGISException)
+    size_t RSGISMergeSegmentationTiles::numberClumps(GDALRasterAttributeTable *gdalATT, std::string outColName, size_t clumpsOffset)
     {
         rsgis::rastergis::RSGISRasterAttUtils attUtils;
         size_t numClumps = 0;
@@ -339,7 +339,7 @@ namespace rsgis{namespace segment{
         return numClumps;
     }
     
-    void RSGISMergeSegmentationTiles::addTileBodyClumps(GDALDataset *outputDataset, GDALDataset *tileDataset, GDALDataset *borderMaskDataset, GDALRasterAttributeTable *gdalATT, std::string outClumpIDColName, std::string clumpPosColName, unsigned int tileBody, unsigned int tileBoundary) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISMergeSegmentationTiles::addTileBodyClumps(GDALDataset *outputDataset, GDALDataset *tileDataset, GDALDataset *borderMaskDataset, GDALRasterAttributeTable *gdalATT, std::string outClumpIDColName, std::string clumpPosColName, unsigned int tileBody, unsigned int tileBoundary) 
     {
         rsgis::img::RSGISImageUtils imgUtils;
         try
@@ -556,7 +556,7 @@ namespace rsgis{namespace segment{
         }
     }
     
-    void RSGISMergeSegmentationTiles::addTileBorder2Mask(GDALDataset *tileDataset, GDALDataset *borderMaskDataset, GDALRasterAttributeTable *gdalATT, std::string clumpPosColName, unsigned int tileBoundary) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISMergeSegmentationTiles::addTileBorder2Mask(GDALDataset *tileDataset, GDALDataset *borderMaskDataset, GDALRasterAttributeTable *gdalATT, std::string clumpPosColName, unsigned int tileBoundary) 
     {
         rsgis::img::RSGISImageUtils imgUtils;
         try
@@ -745,7 +745,7 @@ namespace rsgis{namespace segment{
         }
     }
     
-    void RSGISMergeSegmentationTiles::addImageClumps(GDALDataset *outputDataset, GDALDataset *clumpsDataset, GDALRasterAttributeTable *gdalATT, std::string outClumpIDColName) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISMergeSegmentationTiles::addImageClumps(GDALDataset *outputDataset, GDALDataset *clumpsDataset, GDALRasterAttributeTable *gdalATT, std::string outClumpIDColName) 
     {
         rsgis::img::RSGISImageUtils imgUtils;
         try

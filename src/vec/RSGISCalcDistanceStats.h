@@ -59,9 +59,9 @@ namespace rsgis{namespace vec{
     {
     public:
         RSGISCalcMinDists2Polys(std::vector<OGRGeometry*> *polys);
-        virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-        virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException){throw RSGISVectorException("Not implemented");};
-        virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
+        virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid);
+        virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid){throw RSGISVectorException("Not implemented");};
+        virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn);
         virtual ~RSGISCalcMinDists2Polys();
     protected:
         std::vector<OGRGeometry*> *polys;
@@ -72,9 +72,9 @@ namespace rsgis{namespace vec{
     {
     public:
         RSGISCalcMinDist2Geoms(std::string outColName, std::vector<OGRGeometry*> *geoms);
-        virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-        virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-        virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
+        virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid);
+        virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid);
+        virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn);
         double getMaxMinDist(){return this->maxMinDist;};
         virtual ~RSGISCalcMinDist2Geoms();
     protected:
@@ -89,9 +89,9 @@ namespace rsgis{namespace vec{
     {
     public:
         RSGISCalcMinDist2GeomsUseIdx(std::string outColName, geos::index::SpatialIndex *geomIdx, double maxSearchDist);
-        virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-        virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-        virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
+        virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid);
+        virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid);
+        virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn);
         double getMaxMinDist(){return this->maxMinDist;};
         virtual ~RSGISCalcMinDist2GeomsUseIdx();
     protected:

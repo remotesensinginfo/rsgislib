@@ -31,7 +31,7 @@ namespace rsgis{namespace vec{
 		
 	}
 	
-	void RSGISVectorSQLClassification::classifyVector(GDALDataset *source, OGRLayer *inputLayer, sqlclass **rules, int numRules, std::string classAttribute) throw(RSGISVectorException)
+	void RSGISVectorSQLClassification::classifyVector(GDALDataset *source, OGRLayer *inputLayer, sqlclass **rules, int numRules, std::string classAttribute)
 	{
 		// Check layer - output feature is present.
 		OGRFeatureDefn *layerDef = inputLayer->GetLayerDefn();

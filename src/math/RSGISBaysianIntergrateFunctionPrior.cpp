@@ -37,7 +37,7 @@ namespace rsgis{namespace math{
 		this->value = value;
 	}
 	
-	double RSGISBaysianIntergrateFunctionPrior::calcFunction(double predictVal) throw(RSGISMathException)
+	double RSGISBaysianIntergrateFunctionPrior::calcFunction(double predictVal)
 	{		
 		double fVal = function->calcFunction(predictVal);
 		double diff = value - fVal;

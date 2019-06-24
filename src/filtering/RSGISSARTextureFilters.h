@@ -62,9 +62,9 @@ namespace rsgis{namespace filter{
     public:
 
         RSGISNormVarPowerFilter(int numberOutBands, int size, std::string filenameEnding);
-        virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException);
-        virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException){throw RSGISImageFilterException("Not implemented for NVarPower filter!");};;
-        virtual void exportAsImage(std::string filename) throw(RSGISImageFilterException){throw RSGISImageFilterException("No image to output!");};
+        virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output);
+        virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) {throw RSGISImageFilterException("Not implemented for NVarPower filter!");};;
+        virtual void exportAsImage(std::string filename){throw RSGISImageFilterException("No image to output!");};
         ~RSGISNormVarPowerFilter(){};
     };
 
@@ -81,9 +81,9 @@ namespace rsgis{namespace filter{
     public:
 
         RSGISNormVarAmplitudeFilter(int numberOutBands, int size, std::string filenameEnding);
-        virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException);
-        virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException){throw RSGISImageFilterException("Not implemented for NVarAmplitude filter!");};;
-        virtual void exportAsImage(std::string filename) throw(RSGISImageFilterException){throw RSGISImageFilterException("No image to output!");};
+        virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output);
+        virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) {throw RSGISImageFilterException("Not implemented for NVarAmplitude filter!");};;
+        virtual void exportAsImage(std::string filename){throw RSGISImageFilterException("No image to output!");};
         ~RSGISNormVarAmplitudeFilter(){};
     };
 
@@ -100,9 +100,9 @@ namespace rsgis{namespace filter{
     public:
 
         RSGISNormVarLnPowerFilter(int numberOutBands, int size, std::string filenameEnding);
-        virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException);
-        virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException){throw RSGISImageFilterException("Not implemented for NVarLogPower filter!");};;
-        virtual void exportAsImage(std::string filename) throw(RSGISImageFilterException){throw RSGISImageFilterException("No image to output!");};
+        virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output);
+        virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) {throw RSGISImageFilterException("Not implemented for NVarLogPower filter!");};;
+        virtual void exportAsImage(std::string filename){throw RSGISImageFilterException("No image to output!");};
         ~RSGISNormVarLnPowerFilter(){};
     };
 
@@ -119,9 +119,9 @@ namespace rsgis{namespace filter{
     public:
 
         RSGISNormLnFilter(int numberOutBands, int size, std::string filenameEnding);
-        virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException);
-        virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException){throw RSGISImageFilterException("Not implemented for NVarLogPower filter!");};;
-        virtual void exportAsImage(std::string filename) throw(RSGISImageFilterException){throw RSGISImageFilterException("No image to output!");};
+        virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output);
+        virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) {throw RSGISImageFilterException("Not implemented for NVarLogPower filter!");};;
+        virtual void exportAsImage(std::string filename){throw RSGISImageFilterException("No image to output!");};
         ~RSGISNormLnFilter(){};
     };
 
@@ -140,9 +140,9 @@ namespace rsgis{namespace filter{
     public:
 
         RSGISTextureVar(int numberOutBands, int size, std::string filenameEnding);
-        virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException);
-        virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException){throw RSGISImageFilterException("Not implemented for NVarLogPower filter!");};;
-        virtual void exportAsImage(std::string filename) throw(RSGISImageFilterException){throw RSGISImageFilterException("No image to output!");};
+        virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output);
+        virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) {throw RSGISImageFilterException("Not implemented for NVarLogPower filter!");};;
+        virtual void exportAsImage(std::string filename){throw RSGISImageFilterException("No image to output!");};
         ~RSGISTextureVar(){};
     };
 }}

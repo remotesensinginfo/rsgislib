@@ -94,19 +94,19 @@ namespace rsgis{namespace vec{
 			geos::geom::Envelope* getEnvelope(OGRGeometry *geom);
 			geos::geom::Envelope* getEnvelopePixelBuffer(OGRGeometry *geom, double imageRes);
 			geos::geom::Point* createPoint(geos::geom::Coordinate *coord);
-			bool checkDIR4SHP(std::string dir, std::string shp) throw(RSGISVectorException);
-			void deleteSHP(std::string dir, std::string shp) throw(RSGISVectorException);
-			geos::geom::GeometryCollection* createGeomCollection(std::vector<geos::geom::Polygon*> *polys) throw(RSGISVectorException);
-			geos::geom::Polygon* createPolygon(double tlX, double tlY, double brX, double brY) throw(RSGISVectorException);
-			OGRPolygon* createOGRPolygon(double tlX, double tlY, double brX, double brY) throw(RSGISVectorException);
-            OGRPolygon* createOGRPolygon(geos::geom::Envelope *env) throw(RSGISVectorException);
-			OGRPolygon* checkCloseOGRPolygon(OGRPolygon *poly) throw(RSGISVectorException);
-			OGRPolygon* removeHolesOGRPolygon(OGRPolygon *poly) throw(RSGISVectorException);
-            OGRPolygon* removeHolesOGRPolygon(OGRPolygon *poly, float areaThreshold) throw(RSGISVectorException);
-			OGRPolygon* moveOGRPolygon(OGRPolygon *poly, double shiftX, double shiftY, double shiftZ) throw(RSGISVectorException);
-			std::vector<std::string>* findUniqueVals(OGRLayer *layer, std::string attribute) throw(RSGISVectorException);
-            std::vector<std::string>* getColumnNames(OGRLayer *layer) throw(RSGISVectorException);
-            std::vector<OGRPoint*>* getRegularStepPoints(std::vector<OGRLineString*> *lines, double step) throw(RSGISVectorException);
+			bool checkDIR4SHP(std::string dir, std::string shp);
+			void deleteSHP(std::string dir, std::string shp);
+			geos::geom::GeometryCollection* createGeomCollection(std::vector<geos::geom::Polygon*> *polys);
+			geos::geom::Polygon* createPolygon(double tlX, double tlY, double brX, double brY);
+			OGRPolygon* createOGRPolygon(double tlX, double tlY, double brX, double brY);
+            OGRPolygon* createOGRPolygon(geos::geom::Envelope *env);
+			OGRPolygon* checkCloseOGRPolygon(OGRPolygon *poly);
+			OGRPolygon* removeHolesOGRPolygon(OGRPolygon *poly);
+            OGRPolygon* removeHolesOGRPolygon(OGRPolygon *poly, float areaThreshold);
+			OGRPolygon* moveOGRPolygon(OGRPolygon *poly, double shiftX, double shiftY, double shiftZ);
+			std::vector<std::string>* findUniqueVals(OGRLayer *layer, std::string attribute);
+            std::vector<std::string>* getColumnNames(OGRLayer *layer);
+            std::vector<OGRPoint*>* getRegularStepPoints(std::vector<OGRLineString*> *lines, double step);
 		};
 
     

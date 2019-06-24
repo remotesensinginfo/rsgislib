@@ -53,7 +53,7 @@ namespace rsgis
         {
         public:
             RSGISCalcImgValueAlongsideOut(){};
-            virtual bool calcValue(bool firstIter, unsigned int numBands, unsigned int *dataCol, unsigned int **rowAbove, unsigned int **rowBelow, unsigned int *left, unsigned int *right)throw(RSGISImageCalcException)=0;
+            virtual bool calcValue(bool firstIter, unsigned int numBands, unsigned int *dataCol, unsigned int **rowAbove, unsigned int **rowBelow, unsigned int *left, unsigned int *right)=0;
             virtual ~RSGISCalcImgValueAlongsideOut(){};
         };
         
@@ -61,7 +61,7 @@ namespace rsgis
         {
         public:
             RSGISCalcImgAlongsideOut(RSGISCalcImgValueAlongsideOut *valueCalc);
-            void calcImageIterate(GDALDataset *dataset) throw(RSGISImageCalcException,RSGISImageBandException);
+            void calcImageIterate(GDALDataset *dataset);
             ~RSGISCalcImgAlongsideOut(){};
         private:
             RSGISCalcImgValueAlongsideOut *calc;

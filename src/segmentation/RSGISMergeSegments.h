@@ -94,8 +94,8 @@ namespace rsgis{namespace segment{
     {
     public:
         RSGISMergeSegments();
-        void mergeSelectedClumps(GDALDataset *clumpsImage, GDALDataset *valsImageDS, std::string clumps2MergeCol, std::string noDataClumpsCol)throw(rsgis::img::RSGISImageCalcException);
-        void mergeEquivlentClumpsInRAT(GDALDataset *clumpsImage, std::vector<std::string> clumpsCols2Merge)throw(rsgis::img::RSGISImageCalcException);
+        void mergeSelectedClumps(GDALDataset *clumpsImage, GDALDataset *valsImageDS, std::string clumps2MergeCol, std::string noDataClumpsCol);
+        void mergeEquivlentClumpsInRAT(GDALDataset *clumpsImage, std::vector<std::string> clumpsCols2Merge);
         ~RSGISMergeSegments();
     protected:
         double calcDist(double *valsRef, double *valsTest, int numVals)

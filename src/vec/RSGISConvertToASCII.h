@@ -56,9 +56,9 @@ namespace rsgis{namespace vec{
 		{
 		public:
 			RSGISConvertToASCII(std::string outputTextFile);
-			void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-			void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-			void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
+			void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid);
+			void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid);
+			void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn);
 			~RSGISConvertToASCII();
 		protected:
             std::string outputTextFile;

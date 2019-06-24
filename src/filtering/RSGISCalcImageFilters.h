@@ -50,7 +50,7 @@ namespace rsgis{namespace filter{
 		{
 		public: 
 			RSGISCalcLapacianFilter(float stddev);
-			virtual float calcFilterValue(int x, int y) throw(RSGISImageFilterException);
+			virtual float calcFilterValue(int x, int y);
 			virtual ~RSGISCalcLapacianFilter(){};
 		protected:
 			float stddev;
@@ -60,7 +60,7 @@ namespace rsgis{namespace filter{
 		{
 		public: 
 			RSGISCalcGaussianSmoothFilter(float stddevX, float stddevY, float angle);
-			virtual float calcFilterValue(int x, int y) throw(RSGISImageFilterException);
+			virtual float calcFilterValue(int x, int y);
 			virtual ~RSGISCalcGaussianSmoothFilter(){};
 		protected:
 			float stddevX;
@@ -72,7 +72,7 @@ namespace rsgis{namespace filter{
 		{
 		public: 
 			RSGISCalcGaussianFirstDerivativeFilter(float stddevX, float stddevY, float angle);
-			virtual float calcFilterValue(int x, int y) throw(RSGISImageFilterException);
+			virtual float calcFilterValue(int x, int y);
 			virtual ~RSGISCalcGaussianFirstDerivativeFilter(){};
 		protected:
 			float stddevX;
@@ -84,7 +84,7 @@ namespace rsgis{namespace filter{
 		{
 		public: 
 			RSGISCalcGaussianSecondDerivativeFilter(float stddevX, float stddevY, float angle);
-			virtual float calcFilterValue(int x, int y) throw(RSGISImageFilterException);
+			virtual float calcFilterValue(int x, int y);
 			virtual ~RSGISCalcGaussianSecondDerivativeFilter(){};
 		protected:
 			float stddevX;

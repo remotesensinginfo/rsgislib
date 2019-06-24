@@ -36,7 +36,7 @@ namespace rsgis{namespace reg{
         this->subPixelResolution = subPixelResolution;
     }
     
-    void RSGISImagePixelRegistration::initRegistration()throw(RSGISRegistrationException)
+    void RSGISImagePixelRegistration::initRegistration()
     {
         try
         {
@@ -105,7 +105,7 @@ namespace rsgis{namespace reg{
         initExecuted = true;
     }
     
-    void RSGISImagePixelRegistration::executeRegistration()throw(RSGISRegistrationException)
+    void RSGISImagePixelRegistration::executeRegistration()
     {
         try
         {
@@ -186,7 +186,7 @@ namespace rsgis{namespace reg{
         }
     }
     
-    void RSGISImagePixelRegistration::finaliseRegistration()throw(RSGISRegistrationException)
+    void RSGISImagePixelRegistration::finaliseRegistration()
     {
         try
         {
@@ -210,22 +210,22 @@ namespace rsgis{namespace reg{
         }
     }
     
-    void RSGISImagePixelRegistration::exportTiePointsENVIImage2Map(std::string filepath)throw(RSGISRegistrationException)
+    void RSGISImagePixelRegistration::exportTiePointsENVIImage2Map(std::string filepath)
     {
         throw RSGISRegistrationException("Tie point export is not implemented.");
     }
     
-    void RSGISImagePixelRegistration::exportTiePointsENVIImage2Image(std::string filepath)throw(RSGISRegistrationException)
+    void RSGISImagePixelRegistration::exportTiePointsENVIImage2Image(std::string filepath)
     {
         throw RSGISRegistrationException("Tie point export is not implemented.");
     }
     
-    void RSGISImagePixelRegistration::exportTiePointsRSGISImage2Map(std::string filepath)throw(RSGISRegistrationException)
+    void RSGISImagePixelRegistration::exportTiePointsRSGISImage2Map(std::string filepath)
     {
         throw RSGISRegistrationException("Tie point export is not implemented.");
     }
     
-    void RSGISImagePixelRegistration::exportTiePointsRSGISMapOffs(std::string filepath)throw(RSGISRegistrationException)
+    void RSGISImagePixelRegistration::exportTiePointsRSGISMapOffs(std::string filepath)
     {
         throw RSGISRegistrationException("Tie point export is not implemented.");
     }

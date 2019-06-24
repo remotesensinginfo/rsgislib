@@ -30,7 +30,7 @@ namespace rsgis{namespace filter{
         this->internalScaleFactor = internalScaleFactor;
     }
 	
-	void RSGISLeeFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISLeeFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
 	{
 	
         unsigned int middleVal = floor(((float)winSize) / 2);

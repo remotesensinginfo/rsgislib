@@ -30,7 +30,7 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    void RSGISExportClumps2Images::exportClumps2Images(GDALDataset *clumpsDataset, std::string outImgBase, std::string imgFileExt, std::string imageFormat, bool binaryOut, std::string minXPxl, std::string maxXPxl, std::string minYPxl, std::string maxYPxl, std::string tlX, std::string tlY, unsigned int ratBand)throw(rsgis::RSGISImageException)
+    void RSGISExportClumps2Images::exportClumps2Images(GDALDataset *clumpsDataset, std::string outImgBase, std::string imgFileExt, std::string imageFormat, bool binaryOut, std::string minXPxl, std::string maxXPxl, std::string minYPxl, std::string maxYPxl, std::string tlX, std::string tlY, unsigned int ratBand)
     {
         try
         {
@@ -143,7 +143,7 @@ namespace rsgis{namespace rastergis{
         this->binOut = binOut;
     }
     
-    void RSGISCopyImageBand4ClumpExport::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCopyImageBand4ClumpExport::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) 
     {
         if((band-1) >= (numIntVals-1))
         {
