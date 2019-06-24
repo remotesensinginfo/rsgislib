@@ -75,9 +75,9 @@ namespace rsgis{namespace vec{
 		{
 		public:
 			RSGISZonalMeanStats(GDALDataset *image, GDALDataset *rasterFeatures, MeanAttributes** attributes, int numAttributes, bool outPxlCount);
-			virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-			virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException){throw RSGISVectorException("Not Implemented");};
-			virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
+			virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid);
+			virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid){throw RSGISVectorException("Not Implemented");};
+			virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn);
 			virtual ~RSGISZonalMeanStats();
 		protected:
 			GDALDataset **datasets;
@@ -94,11 +94,11 @@ namespace rsgis{namespace vec{
 		{
 		public: 
 			RSGISCalcZonalMeanFromRasterPolygon(int numOutputValues, MeanAttributes **attributes, int numAttributes);
-			void calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
-			void calcImageValue(float *bandValuesImage, int numBands, int band) throw(rsgis::img::RSGISImageCalcException);
-			void calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
-			void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
-			double* getOutputValues() throw(rsgis::img::RSGISImageCalcException);
+			void calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) {throw rsgis::img::RSGISImageCalcException("Not Implemented");};
+			void calcImageValue(float *bandValuesImage, int numBands, int band);
+			void calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) {throw rsgis::img::RSGISImageCalcException("Not Implemented");};
+			void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) {throw rsgis::img::RSGISImageCalcException("Not Implemented");};
+			double* getOutputValues();
 			void reset();
 			~RSGISCalcZonalMeanFromRasterPolygon();
 		protected:
@@ -113,9 +113,9 @@ namespace rsgis{namespace vec{
 	{
 	public:
 		RSGISZonalMeanStatsPoly(GDALDataset *image, MeanAttributes** attributes, int numAttributes, bool outPxlCount, rsgis::img::pixelInPolyOption method, bool dB = false);
-		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-		virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException){throw RSGISVectorException("Not Implemented");};
-		virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
+		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid);
+		virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid){throw RSGISVectorException("Not Implemented");};
+		virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn);
 		virtual ~RSGISZonalMeanStatsPoly();
 	protected:
 		GDALDataset **datasets;
@@ -133,11 +133,11 @@ namespace rsgis{namespace vec{
 	{
 	public: 
 		RSGISCalcZonalMeanFromPolygon(int numOutputValues, MeanAttributes **attributes, int numAttributes);
-		void calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
-		void calcImageValue(float *bandValuesImage, int numBands, int band) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
-		void calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
-		void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(rsgis::img::RSGISImageCalcException);
-		double* getOutputValues() throw(rsgis::img::RSGISImageCalcException);
+		void calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) {throw rsgis::img::RSGISImageCalcException("Not Implemented");};
+		void calcImageValue(float *bandValuesImage, int numBands, int band) {throw rsgis::img::RSGISImageCalcException("Not Implemented");};
+		void calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) {throw rsgis::img::RSGISImageCalcException("Not Implemented");};
+		void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt);
+		double* getOutputValues();
 		void reset();
 		~RSGISCalcZonalMeanFromPolygon();
 	protected:
@@ -152,11 +152,11 @@ namespace rsgis{namespace vec{
 	{
 	public: 
 		RSGISCalcZonalMeanFromPolygondB(int numOutputValues, MeanAttributes **attributes, int numAttributes);
-		void calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
-		void calcImageValue(float *bandValuesImage, int numBands, int band) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
-		void calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
-		void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(rsgis::img::RSGISImageCalcException);
-		double* getOutputValues() throw(rsgis::img::RSGISImageCalcException);
+		void calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) {throw rsgis::img::RSGISImageCalcException("Not Implemented");};
+		void calcImageValue(float *bandValuesImage, int numBands, int band) {throw rsgis::img::RSGISImageCalcException("Not Implemented");};
+		void calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) {throw rsgis::img::RSGISImageCalcException("Not Implemented");};
+		void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt);
+		double* getOutputValues();
 		void reset();
 		~RSGISCalcZonalMeanFromPolygondB();
 	protected:
@@ -171,9 +171,9 @@ namespace rsgis{namespace vec{
 	{
 	public:
 		RSGISZonalWeightedMeanStatsPoly(GDALDataset *image, MeanAttributes** attributes, int numAttributes, bool outPxlCount);
-		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-		virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException){throw RSGISVectorException("Not Implemented");};
-		virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
+		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid);
+		virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid){throw RSGISVectorException("Not Implemented");};
+		virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn);
 		virtual ~RSGISZonalWeightedMeanStatsPoly();
 	protected:
 		GDALDataset **datasets;
@@ -190,11 +190,11 @@ namespace rsgis{namespace vec{
 	{
 	public: 
 		RSGISCalcZonalWeightedMeanStatsPoly(int numOutputValues, MeanAttributes **attributes, int numAttributes);
-		void calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
-		void calcImageValue(float *bandValuesImage, int numBands, int band) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
-		void calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not Implemented");};
-		void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(rsgis::img::RSGISImageCalcException);
-		double* getOutputValues() throw(rsgis::img::RSGISImageCalcException);
+		void calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) {throw rsgis::img::RSGISImageCalcException("Not Implemented");};
+		void calcImageValue(float *bandValuesImage, int numBands, int band) {throw rsgis::img::RSGISImageCalcException("Not Implemented");};
+		void calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) {throw rsgis::img::RSGISImageCalcException("Not Implemented");};
+		void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt);
+		double* getOutputValues();
 		void reset();
 		~RSGISCalcZonalWeightedMeanStatsPoly();
 	protected:

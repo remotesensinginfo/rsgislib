@@ -78,7 +78,7 @@ namespace rsgis{namespace vec{
     public:
         RSGISFitActiveContour2Geoms();
         
-        void fitActiveContours2Polys(OGRLayer *inputOGRLayer, OGRLayer *outputOGRLayer, GDALDataset *externalForceImg, double interAlpha, double interBeta, double extGamma, double minExtThres, bool force)throw(rsgis::RSGISVectorException);
+        void fitActiveContours2Polys(OGRLayer *inputOGRLayer, OGRLayer *outputOGRLayer, GDALDataset *externalForceImg, double interAlpha, double interBeta, double extGamma, double minExtThres, bool force);
         
         ~RSGISFitActiveContour2Geoms();
     };
@@ -88,11 +88,11 @@ namespace rsgis{namespace vec{
     {
     public:
         RSGISFitActiveContourProcessOGRGeometry(GDALDataset *externalForceImg, double interAlpha, double interBeta, double extGamma, double minExtThres);
-        void processGeometry(OGRPolygon *polygon) throw(RSGISVectorException){throw RSGISVectorException("RSGISFitActiveContourProcessOGRGeometry: Function not implemented");};
-        void processGeometry(OGRMultiPolygon *multiPolygon) throw(RSGISVectorException){throw RSGISVectorException("RSGISFitActiveContourProcessOGRGeometry: Function not implemented");};
-        void processGeometry(OGRPoint *point) throw(RSGISVectorException){throw RSGISVectorException("RSGISFitActiveContourProcessOGRGeometry: Function not implemented");};
-        void processGeometry(OGRLineString *line) throw(RSGISVectorException){throw RSGISVectorException("RSGISFitActiveContourProcessOGRGeometry: Function not implemented");};
-        OGRPolygon* processGeometry(OGRGeometry *geom) throw(RSGISVectorException);
+        void processGeometry(OGRPolygon *polygon){throw RSGISVectorException("RSGISFitActiveContourProcessOGRGeometry: Function not implemented");};
+        void processGeometry(OGRMultiPolygon *multiPolygon){throw RSGISVectorException("RSGISFitActiveContourProcessOGRGeometry: Function not implemented");};
+        void processGeometry(OGRPoint *point){throw RSGISVectorException("RSGISFitActiveContourProcessOGRGeometry: Function not implemented");};
+        void processGeometry(OGRLineString *line){throw RSGISVectorException("RSGISFitActiveContourProcessOGRGeometry: Function not implemented");};
+        OGRPolygon* processGeometry(OGRGeometry *geom);
         ~RSGISFitActiveContourProcessOGRGeometry();
     protected:
         RSGISVectorUtils *vecUtils;
@@ -111,13 +111,13 @@ namespace rsgis{namespace vec{
     {
     public:
         RSGISFitActiveContour2Coords();
-        void fitActiveCountour(std::vector<RSGISACCoordFit> *coords, GDALDataset *externalForceImg, double interAlpha, double interBeta, double extGamma, double minExtThres, unsigned int maxNumIters, float propChanges2Term)throw(rsgis::RSGISVectorException);
+        void fitActiveCountour(std::vector<RSGISACCoordFit> *coords, GDALDataset *externalForceImg, double interAlpha, double interBeta, double extGamma, double minExtThres, unsigned int maxNumIters, float propChanges2Term);
         ~RSGISFitActiveContour2Coords();
     protected:
-        void calcUpdateInternalEnergies(double interAlpha, double interBeta, RSGISACCoordFit *c, RSGISACCoordFit *next, RSGISACCoordFit *prev, RSGISACCoordFit *next1, RSGISACCoordFit *prev1, double *cCInt, double *cNInt, double *cPInt) throw(RSGISVectorException);
+        void calcUpdateInternalEnergies(double interAlpha, double interBeta, RSGISACCoordFit *c, RSGISACCoordFit *next, RSGISACCoordFit *prev, RSGISACCoordFit *next1, RSGISACCoordFit *prev1, double *cCInt, double *cNInt, double *cPInt);
         double calcDist(RSGISACCoordFit *a, RSGISACCoordFit *b);
         void findPointOnLine(RSGISACCoordFit *p1, RSGISACCoordFit *p2, double distance, RSGISACCoordFit *p3);
-        double calcPointStiffnesss(RSGISACCoordFit *p1, RSGISACCoordFit *p2, RSGISACCoordFit *stiffPt) throw(RSGISVectorException);
+        double calcPointStiffnesss(RSGISACCoordFit *p1, RSGISACCoordFit *p2, RSGISACCoordFit *stiffPt);
     };
     
 }}

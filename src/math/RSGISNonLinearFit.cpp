@@ -427,7 +427,7 @@ namespace rsgis {namespace math{
 	{
 		double chiSq = 0;
 		
-		for (unsigned int i = 0; i < depVar->size ; i++) 
+		for (unsigned int i = 0; i < depVar->size; i++) 
 		{
 			// [(y - f(X)) / sigma]^2
 			
@@ -448,7 +448,7 @@ namespace rsgis {namespace math{
 	{
 		double chiSq = 0;
 		
-		for (unsigned int i = 0; i < depVar->size ; i++) 
+		for (unsigned int i = 0; i < depVar->size; i++) 
 		{
 			// [(y - f(X)) / sigma]^2
 			

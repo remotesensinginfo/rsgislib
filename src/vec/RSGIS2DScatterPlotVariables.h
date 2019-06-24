@@ -65,9 +65,9 @@ namespace rsgis{namespace vec{
 	{
 	public:
 		RSGIS2DScatterPlotVariables(rsgis::utils::RSGISExportForPlottingIncremental *plotter, std::string col1, std::string col2);
-		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-		virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-		virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
+		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid);
+		virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid);
+		virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn);
 		virtual ~RSGIS2DScatterPlotVariables();
 	protected:
         rsgis::utils::RSGISExportForPlottingIncremental *plotter;

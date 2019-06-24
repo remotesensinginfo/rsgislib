@@ -32,7 +32,7 @@ namespace rsgis{namespace img{
         gsl_set_error_handler_off();
     }
     
-    void RSGISCalcImgPxlNeighboursDist::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException)
+    void RSGISCalcImgPxlNeighboursDist::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
     {
         try
         {
@@ -174,7 +174,7 @@ namespace rsgis{namespace img{
 
     }
     
-    void RSGISCalcImgPxl2WindowDist::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException)
+    void RSGISCalcImgPxl2WindowDist::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
     {
         unsigned int numPxls = winSize * winSize;
         double dist = 0;
@@ -231,7 +231,7 @@ namespace rsgis{namespace img{
         this->bandB = bandB;
     }
     
-    void RSGISCalcImage2ImageCorrelation::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException)
+    void RSGISCalcImage2ImageCorrelation::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
     {
         
         if( (this->bandA > numBands ) | (this->bandB > numBands) )

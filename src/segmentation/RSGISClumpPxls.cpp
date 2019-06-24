@@ -30,7 +30,7 @@ namespace rsgis{namespace segment{
         
     }
         
-    void RSGISClumpPxls::performClump(GDALDataset *catagories, GDALDataset *clumps, bool noDataValProvided, unsigned int noDataVal, std::vector<unsigned int> *clumpPxlVals) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISClumpPxls::performClump(GDALDataset *catagories, GDALDataset *clumps, bool noDataValProvided, unsigned int noDataVal, std::vector<unsigned int> *clumpPxlVals) 
     {
         if(catagories->GetRasterXSize() != clumps->GetRasterXSize())
         {
@@ -190,7 +190,7 @@ namespace rsgis{namespace segment{
         
     }
     
-    void RSGISClumpPxls::performClumpPosVals(GDALDataset *catagories, GDALDataset *clumps) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISClumpPxls::performClumpPosVals(GDALDataset *catagories, GDALDataset *clumps) 
     {
         if(catagories->GetRasterXSize() != clumps->GetRasterXSize())
         {
@@ -336,7 +336,7 @@ namespace rsgis{namespace segment{
         std::cout << " Complete (Generated " << clumpIdx-1 << " clumps).\n";
     }
     
-    void RSGISClumpPxls::performMultiBandClump(std::vector<GDALDataset*> *catagories, std::string clumpsOutputPath, std::string outFormat, bool noDataValProvided, unsigned int noDataVal, bool addRatPxlVals) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISClumpPxls::performMultiBandClump(std::vector<GDALDataset*> *catagories, std::string clumpsOutputPath, std::string outFormat, bool noDataValProvided, unsigned int noDataVal, bool addRatPxlVals) 
     {
         try
         {
@@ -667,7 +667,7 @@ namespace rsgis{namespace segment{
         
     }
     
-    void RSGISRelabelClumps::relabelClumps(GDALDataset *catagories, GDALDataset *clumps) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISRelabelClumps::relabelClumps(GDALDataset *catagories, GDALDataset *clumps) 
     {
         if(catagories->GetRasterXSize() != clumps->GetRasterXSize())
         {
@@ -776,7 +776,7 @@ namespace rsgis{namespace segment{
         delete[] clumpIdxs;
     }
     
-    void RSGISRelabelClumps::relabelClumpsCalcImg(GDALDataset *catagories, GDALDataset *clumps) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISRelabelClumps::relabelClumpsCalcImg(GDALDataset *catagories, GDALDataset *clumps) 
     {
         try
         {
@@ -848,7 +848,7 @@ namespace rsgis{namespace segment{
         this->nextVal = 1;
     }
 
-    void RSGISCreateRelabelLookupTable::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCreateRelabelLookupTable::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) 
     {
         try
         {
@@ -901,7 +901,7 @@ namespace rsgis{namespace segment{
         this->numVals = numVals;
     }
 		
-    void RSGISApplyRelabelLookupTable::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISApplyRelabelLookupTable::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) 
     {
         try
         {

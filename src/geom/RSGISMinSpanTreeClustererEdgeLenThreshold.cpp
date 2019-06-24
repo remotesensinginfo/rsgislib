@@ -30,7 +30,7 @@ namespace rsgis{namespace geom{
 		this->lengththreshold = lengththreshold;
 	}
 	
-	std::list<RSGIS2DPoint*>** RSGISMinSpanTreeClustererEdgeLenThreshold::clusterData(std::vector<RSGIS2DPoint*> *data, int *numclusters, double *threshold) throw(rsgis::math::RSGISClustererException)
+	std::list<RSGIS2DPoint*>** RSGISMinSpanTreeClustererEdgeLenThreshold::clusterData(std::vector<RSGIS2DPoint*> *data, int *numclusters, double *threshold)
 	{
 		try
 		{

@@ -57,7 +57,7 @@ namespace rsgis{namespace rastergis{
     {
     public:
         RSGISInputShapefileAttributes2RAT();
-        void copyVectorAtt2Rat(GDALDataset *clumpsImage, unsigned int ratBand, OGRLayer *vecLayer, std::string fidColStr, std::vector<std::string> *colNames)throw(RSGISAttributeTableException);
+        void copyVectorAtt2Rat(GDALDataset *clumpsImage, unsigned int ratBand, OGRLayer *vecLayer, std::string fidColStr, std::vector<std::string> *colNames);
         virtual ~RSGISInputShapefileAttributes2RAT();
     };
     

@@ -48,22 +48,22 @@ namespace rsgis{namespace img{
     {
         public:
             RSGISCalcImageValue(int numberOutBands);
-            virtual void calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented - RSGISCalcImageValue Base Class");};
-            virtual void calcImageValue(float *bandValues, int numBands, double *output, double *outRefVal, unsigned int nOutRefVals) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented - RSGISCalcImageValue Base Class");};
-            virtual void calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented - Base Class");};
-            virtual void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented - RSGISCalcImageValue Base Class");};
-            virtual void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented - RSGISCalcImageValue Base Class");};
-            virtual void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output, double *outRefVal, unsigned int nOutRefVals) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented - RSGISCalcImageValue Base Class");};
-            virtual void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented - RSGISCalcImageValue Base Class");};
-            virtual void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented - RSGISCalcImageValue Base Class");};
-            virtual void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented - RSGISCalcImageValue Base Class");};
-            virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented - RSGISCalcImageValue Base Class");};
-            virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, double *outRefVal, unsigned int nOutRefVals) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented - RSGISCalcImageValue Base Class");};
+            virtual void calcImageValue(float *bandValues, int numBands, double *output) {throw RSGISImageCalcException("Not Implemented - RSGISCalcImageValue Base Class");};
+            virtual void calcImageValue(float *bandValues, int numBands, double *output, double *outRefVal, unsigned int nOutRefVals) {throw RSGISImageCalcException("Not Implemented - RSGISCalcImageValue Base Class");};
+            virtual void calcImageValue(float *bandValues, int numBands) {throw RSGISImageCalcException("Not Implemented - Base Class");};
+            virtual void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) {throw RSGISImageCalcException("Not Implemented - RSGISCalcImageValue Base Class");};
+            virtual void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) {throw RSGISImageCalcException("Not Implemented - RSGISCalcImageValue Base Class");};
+            virtual void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output, double *outRefVal, unsigned int nOutRefVals) {throw RSGISImageCalcException("Not Implemented - RSGISCalcImageValue Base Class");};
+            virtual void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent) {throw RSGISImageCalcException("Not Implemented - RSGISCalcImageValue Base Class");};
+            virtual void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) {throw RSGISImageCalcException("Not Implemented - RSGISCalcImageValue Base Class");};
+            virtual void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) {throw RSGISImageCalcException("Not Implemented - RSGISCalcImageValue Base Class");};
+            virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) {throw RSGISImageCalcException("Not Implemented - RSGISCalcImageValue Base Class");};
+            virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, double *outRefVal, unsigned int nOutRefVals) {throw RSGISImageCalcException("Not Implemented - RSGISCalcImageValue Base Class");};
             /**
              * Extent only refers to the central window.
              */
-            virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented - RSGISCalcImageValue Base Class");};
-            virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException){throw RSGISImageCalcException("Not Implemented - RSGISCalcImageValue Base Class");};
+            virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) {throw RSGISImageCalcException("Not Implemented - RSGISCalcImageValue Base Class");};
+            virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) {throw RSGISImageCalcException("Not Implemented - RSGISCalcImageValue Base Class");};
             virtual int getNumOutBands();
             virtual void setNumOutBands(int bands);
             virtual ~RSGISCalcImageValue(){};
@@ -77,7 +77,7 @@ namespace rsgis{namespace img{
     {
     public:
         RSGISCalcValuesFromMultiResInputs(int numberOutBands);
-        virtual void calcImageValue(float *bandValues, int numInVals, bool useNoData, float noDataVal, double *output) throw(RSGISImageCalcException) = 0;
+        virtual void calcImageValue(float *bandValues, int numInVals, bool useNoData, float noDataVal, double *output)  = 0;
         virtual int getNumOutBands();
         virtual void setNumOutBands(int bands);
         virtual ~RSGISCalcValuesFromMultiResInputs();

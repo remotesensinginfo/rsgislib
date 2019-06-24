@@ -31,7 +31,7 @@ namespace rsgis{namespace utils{
         
     }
     
-    void RSGISExportColumnData2HDF::createFile(std::string filePath, unsigned int numCols, std::string description, H5::DataType dataType) throw(rsgis::RSGISFileException)
+    void RSGISExportColumnData2HDF::createFile(std::string filePath, unsigned int numCols, std::string description, H5::DataType dataType)
     {
         try
         {
@@ -113,7 +113,7 @@ namespace rsgis{namespace utils{
         }
     }
     
-    void RSGISExportColumnData2HDF::addDataRow(void *data, H5::DataType h5Datatype) throw(rsgis::RSGISFileException)
+    void RSGISExportColumnData2HDF::addDataRow(void *data, H5::DataType h5Datatype)
     {
         try
         {
@@ -190,7 +190,7 @@ namespace rsgis{namespace utils{
         fileOpen = false;
     }
     
-    void RSGISReadHDFColumnData::openFile(std::string filePath) throw(rsgis::RSGISFileException)
+    void RSGISReadHDFColumnData::openFile(std::string filePath)
     {
         try
         {
@@ -205,7 +205,7 @@ namespace rsgis{namespace utils{
         }
     }
     
-    unsigned int RSGISReadHDFColumnData::getNumRows() throw(rsgis::RSGISFileException)
+    unsigned int RSGISReadHDFColumnData::getNumRows()
     {
         unsigned int n_rows = 0;
         if(fileOpen)
@@ -232,7 +232,7 @@ namespace rsgis{namespace utils{
         return n_rows;
     }
 
-    unsigned int RSGISReadHDFColumnData::getNumCols() throw(rsgis::RSGISFileException)
+    unsigned int RSGISReadHDFColumnData::getNumCols()
     {
         unsigned int n_cols = 0;
         if(fileOpen)
@@ -259,7 +259,7 @@ namespace rsgis{namespace utils{
         return n_cols;
     }
     
-    void RSGISReadHDFColumnData::getDataRows(void *data, unsigned int nColsData, unsigned int nRowsData, H5::DataType h5Datatype, unsigned int nRowsOff, unsigned int nRowsRead) throw(rsgis::RSGISFileException)
+    void RSGISReadHDFColumnData::getDataRows(void *data, unsigned int nColsData, unsigned int nRowsData, H5::DataType h5Datatype, unsigned int nRowsOff, unsigned int nRowsRead)
     {
         try
         {

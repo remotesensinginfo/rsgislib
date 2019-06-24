@@ -47,7 +47,7 @@ namespace rsgis{ namespace cmds {
     void excecuteBasicRegistration(std::string inputReferenceImage, std::string inputFloatingmage, int gcpGap,
                                                   float metricThreshold, int windowSize, int searchArea, float stdDevRefThreshold,
                                                   float stdDevFloatThreshold, int subPixelResolution, unsigned int metricTypeInt,
-                                                  unsigned int outputType, std::string outputGCPFile) throw(RSGISCmdException)
+                                                  unsigned int outputType, std::string outputGCPFile) 
     {
         
         try
@@ -135,7 +135,7 @@ namespace rsgis{ namespace cmds {
                                                   float metricThreshold, int windowSize, int searchArea, float stdDevRefThreshold,
                                                   float stdDevFloatThreshold, int subPixelResolution, int distanceThreshold,
                                                   int maxNumIterations, float moveChangeThreshold, float pSmoothness, unsigned int metricTypeInt,
-                                                  unsigned int outputType, std::string outputGCPFile) throw(RSGISCmdException)
+                                                  unsigned int outputType, std::string outputGCPFile) 
     {
                 
         try
@@ -222,7 +222,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void excecuteNNWarp(std::string inputImage, std::string outputImage, std::string projFile, std::string inputGCPs, float resolution, std::string imageFormat, bool genTransformImage) throw(RSGISCmdException)
+    void excecuteNNWarp(std::string inputImage, std::string outputImage, std::string projFile, std::string inputGCPs, float resolution, std::string imageFormat, bool genTransformImage) 
     {
         
         try
@@ -259,7 +259,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void excecuteTriangularWarp(std::string inputImage, std::string outputImage, std::string projFile, std::string inputGCPs, float resolution, std::string imageFormat, bool genTransformImage) throw(RSGISCmdException)
+    void excecuteTriangularWarp(std::string inputImage, std::string outputImage, std::string projFile, std::string inputGCPs, float resolution, std::string imageFormat, bool genTransformImage) 
     {
         
         try
@@ -297,7 +297,7 @@ namespace rsgis{ namespace cmds {
     }
     
     
-    void excecutePolyWarp(std::string inputImage, std::string outputImage, std::string projFile, std::string inputGCPs, float resolution, int polyOrder, std::string imageFormat, bool genTransformImage) throw(RSGISCmdException)
+    void excecutePolyWarp(std::string inputImage, std::string outputImage, std::string projFile, std::string inputGCPs, float resolution, int polyOrder, std::string imageFormat, bool genTransformImage) 
     {
         
         try
@@ -334,7 +334,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void excecuteAddGCPsGDAL(std::string inputImage, std::string inputGCPs, std::string outputImage, std::string gdalFormat, RSGISLibDataType outDataType) throw(RSGISCmdException)
+    void excecuteAddGCPsGDAL(std::string inputImage, std::string inputGCPs, std::string outputImage, std::string gdalFormat, RSGISLibDataType outDataType) 
     {
         try
         {
@@ -353,7 +353,7 @@ namespace rsgis{ namespace cmds {
     }
     
     
-    void executeApplyOffset2Image(std::string inputImage, std::string outputImage, std::string gdalFormat, RSGISLibDataType outDataType, double xOff, double yOff) throw(RSGISCmdException)
+    void executeApplyOffset2Image(std::string inputImage, std::string outputImage, std::string gdalFormat, RSGISLibDataType outDataType, double xOff, double yOff) 
     {
         try
         {

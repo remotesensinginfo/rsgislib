@@ -46,7 +46,7 @@ namespace rsgis{namespace math{
 	class DllExport RSGISPrincipalComponentAnalysis
 		{
 		public:
-			RSGISPrincipalComponentAnalysis(Matrix *inputData) throw(RSGISMatricesException,RSGISMultivariantStatsException);
+			RSGISPrincipalComponentAnalysis(Matrix *inputData);
 			Matrix* getMeanVector();
 			Matrix* getStandardisedData();
 			Matrix* getCovarianceMatrix();
@@ -57,7 +57,7 @@ namespace rsgis{namespace math{
 			Matrix* getAllComponents();
 			~RSGISPrincipalComponentAnalysis();
 		protected:
-			void calcIntermediateSteps() throw(RSGISMatricesException,RSGISMultivariantStatsException);
+			void calcIntermediateSteps();
 			Matrix *inputData;
 			Matrix *stdInputData;
 			Matrix *meanVec;

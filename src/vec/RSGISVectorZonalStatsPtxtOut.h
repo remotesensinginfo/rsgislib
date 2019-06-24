@@ -63,10 +63,10 @@ namespace rsgis{namespace vec{
 	class DllExport RSGISVectorZonalStatsPtxtOut : public RSGISProcessOGRFeature
 	{
 	public:
-		RSGISVectorZonalStatsPtxtOut(GDALDataset *image, rsgis::utils::RSGISExportForPlottingIncremental *plotter, int bX, int bY, int bZ, int bC ) throw(RSGISVectorException);
-		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-		virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-		virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
+		RSGISVectorZonalStatsPtxtOut(GDALDataset *image, rsgis::utils::RSGISExportForPlottingIncremental *plotter, int bX, int bY, int bZ, int bC );
+		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid);
+		virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid);
+		virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn);
 		float* getPixelColumns(int xPxl, int yPxl);
 		virtual ~RSGISVectorZonalStatsPtxtOut();
 	private:

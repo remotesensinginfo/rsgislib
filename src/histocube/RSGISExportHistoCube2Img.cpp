@@ -35,7 +35,7 @@ namespace rsgis {namespace histocube{
         this->binsIdxs = binsIdxs;
     }
     
-    void RSGISExportBins2ImgBands::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISExportBins2ImgBands::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) 
     {
         try
         {
@@ -73,7 +73,7 @@ namespace rsgis {namespace histocube{
         this->summaryStats = summaryStats;
     }
     
-    void RSGISExportHistSummaryStats2ImgBands::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISExportHistSummaryStats2ImgBands::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) 
     {
         try
         {

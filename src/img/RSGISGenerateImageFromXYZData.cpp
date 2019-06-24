@@ -38,7 +38,7 @@ namespace rsgis { namespace img {
 		this->resolution = resolution;
 	}
 	
-	void RSGISGenerateImageFromXYZData::createImageRepresentingXYZData() throw(rsgis::RSGISFileException, rsgis::RSGISImageException)
+	void RSGISGenerateImageFromXYZData::createImageRepresentingXYZData()
 	{
 		try 
 		{
@@ -139,7 +139,7 @@ namespace rsgis { namespace img {
 		}
 	}
 	
-	void RSGISGenerateImageFromXYZData::readInputData() throw(rsgis::RSGISFileException)
+	void RSGISGenerateImageFromXYZData::readInputData()
 	{
         rsgis::utils::RSGISTextFileLineReader lineReader;
 		rsgis::utils::RSGISTextUtils textUtils;

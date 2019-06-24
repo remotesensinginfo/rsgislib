@@ -107,7 +107,7 @@ namespace rsgis{namespace math{
     {
     public:
         RSGISFitGaussianMixModel();
-        std::vector<GaussianModelParams> performFit(std::vector<std::pair<double, double> > *hist, float binWidth, double peakThres=0.005, double ampVar=0.01, unsigned int peakLocVar=2, unsigned int initWidth=2, double minWidth=0.01, double maxWidth=10, bool debug_info=false)throw(RSGISMathException);
+        std::vector<GaussianModelParams> performFit(std::vector<std::pair<double, double> > *hist, float binWidth, double peakThres=0.005, double ampVar=0.01, unsigned int peakLocVar=2, unsigned int initWidth=2, double minWidth=0.01, double maxWidth=10, bool debug_info=false);
         ~RSGISFitGaussianMixModel();
         
     };

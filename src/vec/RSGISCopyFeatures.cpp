@@ -32,18 +32,18 @@ namespace rsgis{namespace vec{
 		
 	}
 	
-	void RSGISCopyFeatures::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISCopyFeatures::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)
 	{
 		
 	}
 	
-	void RSGISCopyFeatures::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISCopyFeatures::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid)
 	{
 		
 		
 	}
 	
-	void RSGISCopyFeatures::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+	void RSGISCopyFeatures::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn)
 	{
 		
 	}
@@ -62,19 +62,19 @@ namespace rsgis{namespace vec{
         fieldIdx = 0;
 	}
 	
-	void RSGISCopyFeaturesAddFIDCol::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISCopyFeaturesAddFIDCol::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)
 	{        
 		outFeature->SetField(fieldIdx, fidCount);
         ++fidCount;
 	}
 	
-	void RSGISCopyFeaturesAddFIDCol::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISCopyFeaturesAddFIDCol::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid)
 	{
 		
 		
 	}
 	
-	void RSGISCopyFeaturesAddFIDCol::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+	void RSGISCopyFeaturesAddFIDCol::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn)
 	{
 		if( outputLayer->CreateField( new OGRFieldDefn("FID", OFTInteger)) != OGRERR_NONE )
         {

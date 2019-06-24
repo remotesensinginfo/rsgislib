@@ -30,7 +30,7 @@ namespace rsgis{namespace vec{
 		
 	}
 	
-	void ZonalStats::zonalStats(GDALDataset *image, OGRLayer *vector, bool **toCalc,  OGRLayer *outputSHPLayer)  throw(RSGISVectorZonalException, RSGISVectorOutputException)
+	void ZonalStats::zonalStats(GDALDataset *image, OGRLayer *vector, bool **toCalc,  OGRLayer *outputSHPLayer) 
 	{
 		this->createOutputSHPDefinition(vector, outputSHPLayer, toCalc, image->GetRasterCount());
 		OGRPolygon *polygon = NULL;
@@ -79,7 +79,7 @@ namespace rsgis{namespace vec{
 		this->outputData2SHP(vector, outputSHPLayer, fieldCount, toCalc, image->GetRasterCount(), featureStats);
 	}
 	
-	void ZonalStats::zonalStatsVector(GDALDataset *image, OGRLayer *vector, bool **toCalc,  OGRLayer *outputSHPLayer) throw(RSGISVectorZonalException,RSGISVectorOutputException)
+	void ZonalStats::zonalStatsVector(GDALDataset *image, OGRLayer *vector, bool **toCalc,  OGRLayer *outputSHPLayer) 
 	{
 		int numAttributes = image->GetRasterCount();
 		int numFeatures = vector->GetFeatureCount();
@@ -104,7 +104,7 @@ namespace rsgis{namespace vec{
 		vecIO->exportPolygons2Shp(outputSHPLayer, data, numFeatures);
 	}
 	
-	void ZonalStats::zonalStatsRaster(GDALDataset *image, GDALDataset *rasterFeatures, OGRLayer *inputLayer, OGRLayer *outputLayer, bool **toCalc) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException, RSGISVectorOutputException)
+	void ZonalStats::zonalStatsRaster(GDALDataset *image, GDALDataset *rasterFeatures, OGRLayer *inputLayer, OGRLayer *outputLayer, bool **toCalc)
 	{
 		int numFeatures = inputLayer->GetFeatureCount();
 		int numAttributes = image->GetRasterCount();
@@ -159,7 +159,7 @@ namespace rsgis{namespace vec{
 			int fieldCount = featDefn->GetFieldCount();
 			this->outputData2SHP(inputLayer, outputLayer, fieldCount, toCalc, numAttributes, featureStats);
 		}
-		catch(rsgis::img::RSGISImageCalcException e)
+		catch(rsgis::img::RSGISImageCalcException &e)
 		{
 			if(calcImg != NULL)
 			{
@@ -184,7 +184,7 @@ namespace rsgis{namespace vec{
 			}
 			throw e;
 		}
-		catch(rsgis::img::RSGISImageBandException e)
+		catch(rsgis::img::RSGISImageBandException &e)
 		{
 			if(calcImg != NULL)
 			{
@@ -209,7 +209,7 @@ namespace rsgis{namespace vec{
 			}
 			throw e;
 		}
-		catch(RSGISVectorOutputException e)
+		catch(RSGISVectorOutputException &e)
 		{
 			if(calcImg != NULL)
 			{
@@ -258,7 +258,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 		
-	void ZonalStats::zonalStatsRaster2txt(GDALDataset *image, GDALDataset *rasterFeatures, OGRLayer *inputLayer, std::string outputTxt, bool **toCalc) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
+	void ZonalStats::zonalStatsRaster2txt(GDALDataset *image, GDALDataset *rasterFeatures, OGRLayer *inputLayer, std::string outputTxt, bool **toCalc)
 	{
 		int numFeatures = inputLayer->GetFeatureCount();
 		int numAttributes = image->GetRasterCount();
@@ -304,7 +304,7 @@ namespace rsgis{namespace vec{
 			delete[] datasets;
 			this->outputData2Text(outputTxt, toCalc, featureStats, numFeatures, numAttributes);
 		}
-		catch(rsgis::img::RSGISImageCalcException e)
+		catch(rsgis::img::RSGISImageCalcException &e)
 		{
 			if(calcImg != NULL)
 			{
@@ -325,7 +325,7 @@ namespace rsgis{namespace vec{
 			}
 			throw e;
 		}
-		catch(rsgis::img::RSGISImageBandException e)
+		catch(rsgis::img::RSGISImageBandException &e)
 		{
 			if(calcImg != NULL)
 			{
@@ -366,7 +366,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 
-    void ZonalStats::zonalStatsFeatsVectorLyr(GDALDataset *image, OGRLayer *vecLyr, std::vector<ZonalBandAttrs> *zonalBandAtts, rsgis::img::pixelInPolyOption pixelInPolyMethod) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
+    void ZonalStats::zonalStatsFeatsVectorLyr(GDALDataset *image, OGRLayer *vecLyr, std::vector<ZonalBandAttrs> *zonalBandAtts, rsgis::img::pixelInPolyOption pixelInPolyMethod)
     {
         try
         {
@@ -394,7 +394,7 @@ namespace rsgis{namespace vec{
         }
     }
 
-    void ZonalStats::addVecLyrDefn(OGRLayer *vecLyr, std::vector<ZonalBandAttrs> *zonalBandAtts) throw(RSGISVectorOutputException)
+    void ZonalStats::addVecLyrDefn(OGRLayer *vecLyr, std::vector<ZonalBandAttrs> *zonalBandAtts)
     {
         try
         {
@@ -607,7 +607,7 @@ namespace rsgis{namespace vec{
         }
     }
 	
-	void ZonalStats::createOutputSHPDefinition(OGRLayer *inputSHPLayer, OGRLayer *outputSHPLayer, bool **toCalc, int numBands) throw(RSGISVectorOutputException)
+	void ZonalStats::createOutputSHPDefinition(OGRLayer *inputSHPLayer, OGRLayer *outputSHPLayer, bool **toCalc, int numBands)
 	{
 		////////////////////////////////////////////
 		//
@@ -684,7 +684,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void ZonalStats::createOutputSHPDefinition(OGRLayer *outputSHPLayer, classzonalstats** attributes, int numAttributes, OGRFeatureDefn *inLayerDef) throw(RSGISVectorOutputException)
+	void ZonalStats::createOutputSHPDefinition(OGRLayer *outputSHPLayer, classzonalstats** attributes, int numAttributes, OGRFeatureDefn *inLayerDef)
 	{
 		int fieldCount = inLayerDef->GetFieldCount();
 		for(int i = 0; i < fieldCount; i++)
@@ -720,7 +720,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void ZonalStats::outputData2SHP(OGRLayer *inputLayer, OGRLayer *outputSHPLayer, int featureFieldCount, bool **toCalc, int numBands, imagestats **stats) throw(RSGISVectorOutputException)
+	void ZonalStats::outputData2SHP(OGRLayer *inputLayer, OGRLayer *outputSHPLayer, int featureFieldCount, bool **toCalc, int numBands, imagestats **stats)
 	{
 		OGRFeatureDefn *outputDefn = outputSHPLayer->GetLayerDefn();
 		OGRFeature *featureOutput = NULL;
@@ -808,7 +808,7 @@ namespace rsgis{namespace vec{
 		}	
 	}
 	
-	void ZonalStats::calcImageStats(GDALDataset *image, RSGISZonalPolygons *polygon) throw(RSGISVectorZonalException)
+	void ZonalStats::calcImageStats(GDALDataset *image, RSGISZonalPolygons *polygon)
 	{
 		std::cout.precision(15);
 		geos::geom::Envelope *envelope = NULL;
@@ -957,7 +957,7 @@ namespace rsgis{namespace vec{
 			}
 			
 		}
-		catch(RSGISVectorZonalException e)
+		catch(RSGISVectorZonalException &e)
 		{
 			if(envelope != NULL)
 			{
@@ -996,7 +996,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void ZonalStats::calcImageStats(GDALDataset *image, OGRPolygon *polygon, imagestats *stats) throw(RSGISVectorZonalException)
+	void ZonalStats::calcImageStats(GDALDataset *image, OGRPolygon *polygon, imagestats *stats)
 	{
 		OGREnvelope *polyEnvelope = NULL;
 		GDALRasterBand *imageBand;
@@ -1125,7 +1125,7 @@ namespace rsgis{namespace vec{
 			}
 			
 		}
-		catch(RSGISVectorZonalException e)
+		catch(RSGISVectorZonalException &e)
 		{
 			if(polyEnvelope != NULL)
 			{
@@ -1172,7 +1172,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void ZonalStats::outputData2Text(std::string outputTxt, bool **toCalc, imagestats **stats, int numFeatures, int numAttributes) throw(rsgis::utils::RSGISTextException)
+	void ZonalStats::outputData2Text(std::string outputTxt, bool **toCalc, imagestats **stats, int numFeatures, int numAttributes)
 	{
 		std::ofstream outputTxtFile(outputTxt.c_str());
 		try
@@ -1236,7 +1236,7 @@ namespace rsgis{namespace vec{
 			outputTxtFile.flush();
 			outputTxtFile.close();
 		}
-		catch(rsgis::utils::RSGISTextException e)
+		catch(rsgis::utils::RSGISTextException &e)
 		{
 			if(outputTxtFile.is_open())
 			{
@@ -1260,22 +1260,22 @@ namespace rsgis{namespace vec{
 		this->stddev = stddev;
 	}
 	
-	void RSGISCalcZonalStatsFromRaster::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISCalcZonalStatsFromRaster::calcImageValue(float *bandValues, int numBands, double *output) 
 	{
 		throw rsgis::img::RSGISImageCalcException("RSGISCalcZonalStatsFromRaster: No Implemented.");
 	}
 	
-	void RSGISCalcZonalStatsFromRaster::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISCalcZonalStatsFromRaster::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) 
 	{
 		throw rsgis::img::RSGISImageCalcException("RSGISCalcZonalStatsFromRaster: Not Implemented");
 	}
 	
-	void RSGISCalcZonalStatsFromRaster::calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISCalcZonalStatsFromRaster::calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) 
 	{
 		throw rsgis::img::RSGISImageCalcException("RSGISCalcZonalStatsFromRaster: No Implemented.");
 	}
 	
-	void RSGISCalcZonalStatsFromRaster::calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISCalcZonalStatsFromRaster::calcImageValue(float *bandValues, int numBands) 
 	{
 		if((numBands-1) != numInBands)
 		{
@@ -1332,12 +1332,12 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISCalcZonalStatsFromRaster::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISCalcZonalStatsFromRaster::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
 	{
 		throw rsgis::img::RSGISImageCalcException("Not implemented");
 	}
 	
-	bool RSGISCalcZonalStatsFromRaster::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
+	bool RSGISCalcZonalStatsFromRaster::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) 
 	{
 		throw rsgis::img::RSGISImageCalcException("Not implemented");
 	}
@@ -1377,7 +1377,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISZonalStats::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISZonalStats::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)
 	{
 		try
 		{
@@ -1440,7 +1440,7 @@ namespace rsgis{namespace vec{
 		
 	}
 	
-	void RSGISZonalStats::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISZonalStats::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid)
 	{
 		
 		if(!outZonalFile.is_open())
@@ -1472,7 +1472,7 @@ namespace rsgis{namespace vec{
 					
 					if (attributes[i]->outMin) 
 					{
-						this->outZonalFile << "," << attMin ;
+						this->outZonalFile << "," << attMin;
 					}
 					if (attributes[i]->outMax) 
 					{
@@ -1559,7 +1559,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISZonalStats::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+	void RSGISZonalStats::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn)
 	{
 		for(int i = 0; i < numAttributes; i++)
 		{
@@ -1688,7 +1688,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISCalcZonalStatsFromRasterPolygon::calcImageValue(float *bandValuesImage, int numBands, int band) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISCalcZonalStatsFromRasterPolygon::calcImageValue(float *bandValuesImage, int numBands, int band) 
 	{
 		for(int i = 0; i < this->numAttributes; i++)
 		{
@@ -1736,7 +1736,7 @@ namespace rsgis{namespace vec{
 		totalPxl++;
 	}
 	
-	double* RSGISCalcZonalStatsFromRasterPolygon::getOutputValues() throw(rsgis::img::RSGISImageCalcException)
+	double* RSGISCalcZonalStatsFromRasterPolygon::getOutputValues() 
 	{
 		/* Calculte statistics and save to data array
 		 *  Array is in the form:
@@ -1927,7 +1927,7 @@ namespace rsgis{namespace vec{
         
     }
 	
-	void RSGISZonalStatsPoly::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISZonalStatsPoly::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)
 	{
         // Check for polygon geometry
         if( (wkbFlatten(inFeature->GetGeometryRef()->getGeometryType()) != wkbPolygon) && (wkbFlatten(inFeature->GetGeometryRef()->getGeometryType()) != wkbMultiPolygon)   )
@@ -2003,7 +2003,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISZonalStatsPoly::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISZonalStatsPoly::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid)
 	{
 		// Zonal stats - output to text file.
 		if(!outZonalFile.is_open())
@@ -2046,7 +2046,7 @@ namespace rsgis{namespace vec{
 					
 					if (attributes[i]->outMin) 
 					{
-						this->outZonalFile << "," << attMin ;
+						this->outZonalFile << "," << attMin;
 					}
 					if (attributes[i]->outMax) 
 					{
@@ -2133,7 +2133,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISZonalStatsPoly::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+	void RSGISZonalStatsPoly::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn)
 	{
 		for(int i = 0; i < numAttributes; i++)
 		{
@@ -2266,7 +2266,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISCalcZonalStatsFromPolygon::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISCalcZonalStatsFromPolygon::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) 
 	{
 		for(int i = 0; i < this->numAttributes; i++)
 		{
@@ -2314,7 +2314,7 @@ namespace rsgis{namespace vec{
 		totalPxl++;
 	}
 	
-	double* RSGISCalcZonalStatsFromPolygon::getOutputValues() throw(rsgis::img::RSGISImageCalcException)
+	double* RSGISCalcZonalStatsFromPolygon::getOutputValues() 
 	{
 		/* Calculte statistics and save to data array
 		 *  Array is in the form:
@@ -2509,7 +2509,7 @@ namespace rsgis{namespace vec{
         this->mathUtils->initStatsSummaryValues(this->statsSummary);
     }
 
-    void RSGISZonalStatsPolyUpdateLyr::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+    void RSGISZonalStatsPolyUpdateLyr::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid)
     {
         // Check for polygon geometry
         if((wkbFlatten(feature->GetGeometryRef()->getGeometryType()) != wkbPolygon) && (wkbFlatten(feature->GetGeometryRef()->getGeometryType()) != wkbMultiPolygon))

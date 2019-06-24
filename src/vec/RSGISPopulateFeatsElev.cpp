@@ -25,7 +25,7 @@
 
 namespace rsgis{namespace vec{
 	
-	RSGISPopulateFeatsElev::RSGISPopulateFeatsElev(GDALDataset *image, unsigned int band)throw(RSGISVectorException)
+	RSGISPopulateFeatsElev::RSGISPopulateFeatsElev(GDALDataset *image, unsigned int band)
 	{
         this->image = image;
 		this->band = band;
@@ -62,7 +62,7 @@ namespace rsgis{namespace vec{
 		}
     }
 	
-	void RSGISPopulateFeatsElev::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISPopulateFeatsElev::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)
 	{
 		OGRGeometry *geometry = inFeature->GetGeometryRef();
 		if( geometry != NULL && wkbFlatten(geometry->getGeometryType()) == wkbPolygon )
@@ -148,12 +148,12 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISPopulateFeatsElev::processFeature(OGRFeature *inFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISPopulateFeatsElev::processFeature(OGRFeature *inFeature, geos::geom::Envelope *env, long fid)
 	{
         throw RSGISVectorException("RSGISPopulateFeatsElev::processFeature(OGRFeature *inFeature, geos::geom::Envelope *env, long fid) is not implemented as not needed.");
 	}
 	
-	void RSGISPopulateFeatsElev::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+	void RSGISPopulateFeatsElev::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn)
 	{
         
 	}
@@ -169,7 +169,7 @@ namespace rsgis{namespace vec{
 		return values;
 	}
     
-    OGRLinearRing* RSGISPopulateFeatsElev::popZfield(OGRLinearRing *inGeomRing) throw(RSGISVectorOutputException)
+    OGRLinearRing* RSGISPopulateFeatsElev::popZfield(OGRLinearRing *inGeomRing)
     {
         OGRLinearRing *outGeomRing = new OGRLinearRing();
         try

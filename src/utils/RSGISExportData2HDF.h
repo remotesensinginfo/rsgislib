@@ -68,8 +68,8 @@ namespace rsgis{namespace utils{
 	{
 	public:
 		RSGISExportColumnData2HDF();
-        void createFile(std::string filePath, unsigned int numCols, std::string description, H5::DataType dataType) throw(rsgis::RSGISFileException);
-        void addDataRow(void *data, H5::DataType h5Datatype) throw(rsgis::RSGISFileException);
+        void createFile(std::string filePath, unsigned int numCols, std::string description, H5::DataType dataType);
+        void addDataRow(void *data, H5::DataType h5Datatype);
         void close();
 		~RSGISExportColumnData2HDF();
     protected:
@@ -84,10 +84,10 @@ namespace rsgis{namespace utils{
     {
     public:
         RSGISReadHDFColumnData();
-        void openFile(std::string filePath) throw(rsgis::RSGISFileException);
-        unsigned int getNumRows() throw(rsgis::RSGISFileException);
-        unsigned int getNumCols() throw(rsgis::RSGISFileException);
-        void getDataRows(void *data, unsigned int nColsData, unsigned int nRowsData, H5::DataType h5Datatype, unsigned int nRowsOff, unsigned int nRowsRead) throw(rsgis::RSGISFileException);
+        void openFile(std::string filePath);
+        unsigned int getNumRows();
+        unsigned int getNumCols();
+        void getDataRows(void *data, unsigned int nColsData, unsigned int nRowsData, H5::DataType h5Datatype, unsigned int nRowsOff, unsigned int nRowsRead);
         void close();
         ~RSGISReadHDFColumnData();
     protected:

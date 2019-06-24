@@ -76,11 +76,11 @@ namespace rsgis{namespace vec{
 		{
 		public: 
 			RSGISCalcFuzzyZonalStatsFromRasterPolygon(int numOutputValues, FuzzyAttributes **attributes, int numAttributes, float binsize, float hardThreshold);
-			void calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) throw(rsgis::img::RSGISImageCalcException);
-			void calcImageValue(float *bandValuesImage, int numBands, int band) throw(rsgis::img::RSGISImageCalcException);
-			void calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) throw(rsgis::img::RSGISImageCalcException);
-			void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(rsgis::img::RSGISImageCalcException);
-			double* getOutputValues()  throw(rsgis::img::RSGISImageCalcException);
+			void calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB);
+			void calcImageValue(float *bandValuesImage, int numBands, int band);
+			void calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent);
+			void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt);
+			double* getOutputValues()  ;
 			void reset();
 			void updateAttributes(FuzzyAttributes **attributes, int numAttributes, bool hard);
 			~RSGISCalcFuzzyZonalStatsFromRasterPolygon();
@@ -102,9 +102,9 @@ namespace rsgis{namespace vec{
 		{
 		public:
 			RSGISFuzzyZonalStats(GDALDataset *image, GDALDataset *rasterFeatures, FuzzyAttributes** attributes, int numAttributes, float binSize, float threshold, bool outPxlCount, std::string classattribute);
-			virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-			virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-			virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
+			virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid);
+			virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid);
+			virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn);
 			virtual ~RSGISFuzzyZonalStats();
 		protected:
 			void setupFuzzyAttributes();

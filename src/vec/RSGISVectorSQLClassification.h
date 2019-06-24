@@ -59,7 +59,7 @@ namespace rsgis{namespace vec{
 		{
 		public:
 			RSGISVectorSQLClassification();
-			void classifyVector(GDALDataset *source, OGRLayer *inputLayer, sqlclass **rules, int numRules, std::string classAttribute) throw(RSGISVectorException);
+			void classifyVector(GDALDataset *source, OGRLayer *inputLayer, sqlclass **rules, int numRules, std::string classAttribute);
 			~RSGISVectorSQLClassification();
 		};
 }}

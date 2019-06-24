@@ -30,7 +30,7 @@ namespace rsgis{namespace rastergis{
         this->ratCalcVal = ratCalcVal;
     }
     
-    void RSGISRATCalc::calcRATValues(GDALRasterAttributeTable *gdalRAT, std::vector<unsigned int> inRealColIdx, std::vector<unsigned int> inIntColIdx, std::vector<unsigned int> inStrColIdx, std::vector<unsigned int> outRealColIdx, std::vector<unsigned int> outIntColIdx, std::vector<unsigned int> outStrColIdx) throw(RSGISAttributeTableException)
+    void RSGISRATCalc::calcRATValues(GDALRasterAttributeTable *gdalRAT, std::vector<unsigned int> inRealColIdx, std::vector<unsigned int> inIntColIdx, std::vector<unsigned int> inStrColIdx, std::vector<unsigned int> outRealColIdx, std::vector<unsigned int> outIntColIdx, std::vector<unsigned int> outStrColIdx)
     {
         try
         {

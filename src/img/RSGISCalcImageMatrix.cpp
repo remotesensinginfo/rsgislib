@@ -29,7 +29,7 @@ namespace rsgis{namespace img{
 		this->calcImage = calcImage;
 	}
 	
-	rsgis::math::Matrix* RSGISCalcImageMatrix::calcImageMatrix(GDALDataset **datasetsA, GDALDataset **datasetsB, int numDS) throw(RSGISImageCalcException,RSGISImageBandException)
+	rsgis::math::Matrix* RSGISCalcImageMatrix::calcImageMatrix(GDALDataset **datasetsA, GDALDataset **datasetsB, int numDS)
 	{
 		GDALAllRegister();
 		RSGISImageUtils imgUtils;
@@ -104,7 +104,7 @@ namespace rsgis{namespace img{
 		return outputMatrix;
 	}
 	
-	rsgis::math::Matrix* RSGISCalcImageMatrix::calcImageVector(GDALDataset **datasetsA, int numDS) throw(RSGISImageCalcException,RSGISImageBandException)
+	rsgis::math::Matrix* RSGISCalcImageMatrix::calcImageVector(GDALDataset **datasetsA, int numDS)
 	{
 		GDALAllRegister();
 		RSGISImageUtils imgUtils;
@@ -147,12 +147,12 @@ namespace rsgis{namespace img{
 				std::cout << std::endl;
 			}
 		}
-		catch(RSGISImageCalcException e)
+		catch(RSGISImageCalcException &e)
 		{
 			std::cout << e.what() << std::endl;
 			throw e;
 		}
-		catch(RSGISImageBandException e)
+		catch(RSGISImageBandException &e)
 		{
 			std::cout << e.what() << std::endl;
 			throw e;

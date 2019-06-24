@@ -58,7 +58,7 @@ namespace rsgis{namespace segment{
     {
     public:
         RSGISRegionGrowAttributeTable();
-        void growClassRegionsUsingThresholds(rsgis::rastergis::RSGISAttributeTable *attTable, GDALDataset *clumps, std::vector<rsgis::rastergis::RSGISIfStatement*> *statements, std::string classAttName, int classAttVal)throw(rsgis::RSGISAttributeTableException,rsgis::RSGISImageException);
+        void growClassRegionsUsingThresholds(rsgis::rastergis::RSGISAttributeTable *attTable, GDALDataset *clumps, std::vector<rsgis::rastergis::RSGISIfStatement*> *statements, std::string classAttName, int classAttVal);
         ~RSGISRegionGrowAttributeTable();
     private:
         bool** createMask(rsgis::rastergis::RSGISAttributeTable *attTable, GDALDataset *clumps, unsigned int *width, unsigned int *height, unsigned int classFieldIdx, int classVal);

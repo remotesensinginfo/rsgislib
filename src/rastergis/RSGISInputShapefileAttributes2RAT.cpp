@@ -31,7 +31,7 @@ namespace rsgis{namespace rastergis{
         
     }
 
-    void RSGISInputShapefileAttributes2RAT::copyVectorAtt2Rat(GDALDataset *clumpsImage, unsigned int ratBand, OGRLayer *vecLayer, std::string fidColStr, std::vector<std::string> *colNames)throw(RSGISAttributeTableException)
+    void RSGISInputShapefileAttributes2RAT::copyVectorAtt2Rat(GDALDataset *clumpsImage, unsigned int ratBand, OGRLayer *vecLayer, std::string fidColStr, std::vector<std::string> *colNames)
     {
         try
         {

@@ -32,7 +32,7 @@ namespace rsgis{namespace vec{
         this->areaThresholdUsed = areaThresholdUsed;
 	}
 	
-	void RSGISRemovePolygonHoles::removeholes(OGRLayer *input, OGRLayer *output)throw(RSGISVectorException)
+	void RSGISRemovePolygonHoles::removeholes(OGRLayer *input, OGRLayer *output)
 	{
 		RSGISVectorUtils vecUtils;
 		
@@ -148,7 +148,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISRemovePolygonHoles::copyFeatureDefn(OGRLayer *outputSHPLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+	void RSGISRemovePolygonHoles::copyFeatureDefn(OGRLayer *outputSHPLayer, OGRFeatureDefn *inFeatureDefn)
 	{
 		int fieldCount = inFeatureDefn->GetFieldCount();
 		for(int i = 0; i < fieldCount; i++)

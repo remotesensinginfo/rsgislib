@@ -78,7 +78,7 @@ namespace rsgis { namespace img {
         this->mathUtils = rsgis::math::RSGISMathsUtils();
     }
     
-    void RSGISSharpenLowResBands::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException)
+    void RSGISSharpenLowResBands::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
     {
         if(this->nBandInfo != numBands)
         {

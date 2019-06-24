@@ -104,7 +104,7 @@ namespace rsgis{namespace rastergis{
         std::cout << ".Completed\n";
     }
     
-    void RSGISExportColumns2ImageCalcImage::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISExportColumns2ImageCalcImage::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) 
     {
         if(intBandValues[0] > 0)
         {

@@ -31,17 +31,17 @@ namespace rsgis{namespace vec{
         this->geometries = geometries;
     }
     
-	void RSGISGetOGRGeometries::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISGetOGRGeometries::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)
     {
         throw RSGISVectorException("Not implemented..");
     }
     
-	void RSGISGetOGRGeometries::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISGetOGRGeometries::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid)
     {
         geometries->push_back(feature->GetGeometryRef()->clone());
     }
 		
-    void RSGISGetOGRGeometries::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+    void RSGISGetOGRGeometries::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn)
     {
         // Do nothing...
     }
@@ -60,12 +60,12 @@ namespace rsgis{namespace vec{
         this->geomIdx = geomIdx;
     }
     
-    void RSGISGetOGRGeometriesInIdx::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+    void RSGISGetOGRGeometriesInIdx::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)
     {
         throw RSGISVectorException("Not implemented..");
     }
     
-    void RSGISGetOGRGeometriesInIdx::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+    void RSGISGetOGRGeometriesInIdx::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid)
     {
         RSGISGEOSGeomFID *geomObj = new RSGISGEOSGeomFID();
         geomObj->geom = feature->GetGeometryRef()->clone();
@@ -74,7 +74,7 @@ namespace rsgis{namespace vec{
         this->geomIdx->insert(env, geomObj);
     }
     
-    void RSGISGetOGRGeometriesInIdx::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+    void RSGISGetOGRGeometriesInIdx::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn)
     {
         // Do nothing...
     }
@@ -100,12 +100,12 @@ namespace rsgis{namespace vec{
         std::cout.precision(12);
     }
     
-	void RSGISPrintGeometryToConsole::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISPrintGeometryToConsole::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)
     {
         throw RSGISVectorException("Not implemented..");
     }
     
-	void RSGISPrintGeometryToConsole::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISPrintGeometryToConsole::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid)
     {
         OGRGeometry *geometry = feature->GetGeometryRef();
 		if( geometry != NULL && wkbFlatten(geometry->getGeometryType()) == wkbPolygon )
@@ -166,12 +166,12 @@ namespace rsgis{namespace vec{
 		}
     }
     
-    void RSGISPrintGeometryToConsole::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+    void RSGISPrintGeometryToConsole::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn)
     {
         // Do nothing...
     }
     
-    void RSGISPrintGeometryToConsole::printRing(OGRLinearRing *inGeomRing) throw(RSGISVectorOutputException)
+    void RSGISPrintGeometryToConsole::printRing(OGRLinearRing *inGeomRing)
     {
         unsigned int numPts = inGeomRing->getNumPoints();
         std::cout << "Line (" << numPts << "):\t";
@@ -202,12 +202,12 @@ namespace rsgis{namespace vec{
         this->points = points;
     }
     
-    void RSGISOGRPointReader::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+    void RSGISOGRPointReader::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)
     {
         throw RSGISVectorException("Not implemented..");
     }
     
-    void RSGISOGRPointReader::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+    void RSGISOGRPointReader::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid)
     {
         OGRwkbGeometryType geometryType = feature->GetGeometryRef()->getGeometryType();
         
@@ -223,7 +223,7 @@ namespace rsgis{namespace vec{
         }
     }
     
-    void RSGISOGRPointReader::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+    void RSGISOGRPointReader::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn)
     {
         // Nothing to do!
     }
@@ -239,12 +239,12 @@ namespace rsgis{namespace vec{
         this->lines = lines;
     }
     
-    void RSGISOGRLineReader::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+    void RSGISOGRLineReader::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)
     {
         throw RSGISVectorException("Not implemented..");
     }
     
-    void RSGISOGRLineReader::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+    void RSGISOGRLineReader::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid)
     {
         OGRwkbGeometryType geometryType = feature->GetGeometryRef()->getGeometryType();
         
@@ -260,7 +260,7 @@ namespace rsgis{namespace vec{
         }
     }
     
-    void RSGISOGRLineReader::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+    void RSGISOGRLineReader::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn)
     {
         // Nothing to do!
     }

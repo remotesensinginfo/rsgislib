@@ -29,7 +29,7 @@ namespace rsgis{namespace segment{
         
     }
     
-    void RSGISEliminateSinglePixels::eliminate(GDALDataset *inSpecData, GDALDataset *inClumpsData, GDALDataset *tmpData, std::string outputImage, float noDataVal, bool noDataValProvided, bool projFromImage, std::string proj, std::string format)throw(rsgis::img::RSGISImageCalcException)
+    void RSGISEliminateSinglePixels::eliminate(GDALDataset *inSpecData, GDALDataset *inClumpsData, GDALDataset *tmpData, std::string outputImage, float noDataVal, bool noDataValProvided, bool projFromImage, std::string proj, std::string format)
     {
         try
         {
@@ -92,7 +92,7 @@ namespace rsgis{namespace segment{
         }
     }
     
-    void RSGISEliminateSinglePixels::eliminateBlocks(GDALDataset *inSpecData, GDALDataset *inClumpsData, GDALDataset *tmpData, std::string outputImage, float noDataVal, bool noDataValProvided, bool projFromImage, std::string proj, std::string format)throw(rsgis::img::RSGISImageCalcException)
+    void RSGISEliminateSinglePixels::eliminateBlocks(GDALDataset *inSpecData, GDALDataset *inClumpsData, GDALDataset *tmpData, std::string outputImage, float noDataVal, bool noDataValProvided, bool projFromImage, std::string proj, std::string format)
     {
         try
         {
@@ -175,7 +175,7 @@ namespace rsgis{namespace segment{
         }
     }
     
-    unsigned long RSGISEliminateSinglePixels::findSinglePixels(GDALDataset *inClumpsData, GDALDataset *tmpData, float noDataVal, bool noDataValProvided) throw(rsgis::img::RSGISImageCalcException)
+    unsigned long RSGISEliminateSinglePixels::findSinglePixels(GDALDataset *inClumpsData, GDALDataset *tmpData, float noDataVal, bool noDataValProvided) 
     {
         unsigned long countSingles = 0;
         try 
@@ -448,7 +448,7 @@ namespace rsgis{namespace segment{
         return countSingles;
     }
     
-    bool RSGISEliminateSinglePixels::eliminateSinglePixels(GDALDataset *inSpecData, GDALDataset *inClumpsData, GDALDataset *tmpData, GDALDataset *outDataset, float noDataVal, bool noDataValProvided) throw(rsgis::img::RSGISImageCalcException)
+    bool RSGISEliminateSinglePixels::eliminateSinglePixels(GDALDataset *inSpecData, GDALDataset *inClumpsData, GDALDataset *tmpData, GDALDataset *outDataset, float noDataVal, bool noDataValProvided) 
     {
         bool hasChangeOccured = false;
         try 
@@ -1187,7 +1187,7 @@ namespace rsgis{namespace segment{
         numSingles = 0;
     }
     
-    void RSGISFindSinglePixels::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISFindSinglePixels::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
     {
         try
         {
@@ -1262,7 +1262,7 @@ namespace rsgis{namespace segment{
         this->noDataValProvided = noDataValProvided;
     }
     
-    void RSGISElimSinglePixelsCalcImg::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISElimSinglePixelsCalcImg::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
     {
         try
         {

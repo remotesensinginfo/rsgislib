@@ -58,11 +58,11 @@ namespace rsgis{namespace vec{
 		{
 		public:
 			RSGISProcessGeometry(RSGISProcessOGRGeometry *processGeom);
-			void processGeometry(OGRLayer *inputLayer, OGRLayer *outputLayer, bool copyData, bool outVertical) throw(RSGISVectorOutputException,RSGISVectorException);
-			void processGeometryPolygonOutput(OGRLayer *inputLayer, OGRLayer *outputLayer, bool copyData, bool outVertical) throw(RSGISVectorOutputException,RSGISVectorException);
+			void processGeometry(OGRLayer *inputLayer, OGRLayer *outputLayer, bool copyData, bool outVertical);
+			void processGeometryPolygonOutput(OGRLayer *inputLayer, OGRLayer *outputLayer, bool copyData, bool outVertical);
 			~RSGISProcessGeometry();
 		protected:
-			void copyFeatureDefn(OGRLayer *outputSHPLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
+			void copyFeatureDefn(OGRLayer *outputSHPLayer, OGRFeatureDefn *inFeatureDefn);
 			void copyFeatureData(OGRFeature *inFeature, OGRFeature *outFeature, OGRFeatureDefn *inFeatureDefn, OGRFeatureDefn *outFeatureDefn);
 			RSGISProcessOGRGeometry *processGeom;
 		};

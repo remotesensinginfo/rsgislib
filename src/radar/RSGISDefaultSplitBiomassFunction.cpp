@@ -46,7 +46,7 @@ namespace rsgis{namespace radar{
 		
 	}
 	
-	double RSGISDefaultSplitBiomassFunction::calcFunction(double value) throw(rsgis::math::RSGISMathException)
+	double RSGISDefaultSplitBiomassFunction::calcFunction(double value)
 	{
 		double gamma = 0;
 		if(value <= 0)

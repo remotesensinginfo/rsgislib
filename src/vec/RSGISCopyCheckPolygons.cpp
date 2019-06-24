@@ -31,7 +31,7 @@ namespace rsgis{namespace vec{
 		
 	}
 	
-	void RSGISCopyCheckPolygons::copyCheckPolygons(OGRLayer *input, OGRLayer *output, bool printErrors)throw(RSGISVectorException)
+	void RSGISCopyCheckPolygons::copyCheckPolygons(OGRLayer *input, OGRLayer *output, bool printErrors)
 	{
 		RSGISVectorUtils vecUtils;
 		
@@ -173,7 +173,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISCopyCheckPolygons::copyFeatureDefn(OGRLayer *outputVecLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+	void RSGISCopyCheckPolygons::copyFeatureDefn(OGRLayer *outputVecLayer, OGRFeatureDefn *inFeatureDefn)
 	{
 		int fieldCount = inFeatureDefn->GetFieldCount();
 		for(int i = 0; i < fieldCount; i++)

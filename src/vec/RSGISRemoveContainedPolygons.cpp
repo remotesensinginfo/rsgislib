@@ -32,7 +32,7 @@ namespace rsgis{namespace vec{
 		
 	}
 	
-	long unsigned RSGISRemoveContainedPolygons::removeContainedPolygons(OGRLayer *input, OGRLayer *output)throw(RSGISVectorException)
+	long unsigned RSGISRemoveContainedPolygons::removeContainedPolygons(OGRLayer *input, OGRLayer *output)
 	{		
 		OGRFeature *inFeature = NULL;
 		OGRFeature *tmpFeature = NULL;
@@ -133,7 +133,7 @@ namespace rsgis{namespace vec{
 		return numOutputted;
 	}
 	
-	long unsigned RSGISRemoveContainedPolygons::removeContainedPolygons(OGRLayer *input, OGRLayer *output, std::vector<OGRPolygon*> *inputPolys)throw(RSGISVectorException)
+	long unsigned RSGISRemoveContainedPolygons::removeContainedPolygons(OGRLayer *input, OGRLayer *output, std::vector<OGRPolygon*> *inputPolys)
 	{
 		OGRFeature *inFeature = NULL;
 		OGRFeature *outFeature = NULL;
@@ -217,7 +217,7 @@ namespace rsgis{namespace vec{
 		return numOutputted;
 	}
 	
-	void RSGISRemoveContainedPolygons::copyFeatureDefn(OGRLayer *outputSHPLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+	void RSGISRemoveContainedPolygons::copyFeatureDefn(OGRLayer *outputSHPLayer, OGRFeatureDefn *inFeatureDefn)
 	{
 		int fieldCount = inFeatureDefn->GetFieldCount();
 		for(int i = 0; i < fieldCount; i++)

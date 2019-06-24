@@ -31,7 +31,7 @@ namespace rsgis{namespace math{
 		
 	}
 	
-	Matrix* RSGISMultivariantStats::findMeanVector(Matrix *inputData) throw(RSGISMatricesException)
+	Matrix* RSGISMultivariantStats::findMeanVector(Matrix *inputData)
 	{
 		RSGISMatrices matrixUtils;
 		Matrix *meanVector = NULL;
@@ -58,7 +58,7 @@ namespace rsgis{namespace math{
 			matrixUtils.freeMatrix(sumVector);
 			return meanVector;
 		}
-		catch(RSGISMatricesException e)
+		catch(RSGISMatricesException &e)
 		{
 			if(meanVector != NULL)
 			{
@@ -72,7 +72,7 @@ namespace rsgis{namespace math{
 		}
 	}
 	
-	Matrix* RSGISMultivariantStats::standardiseMatrix(Matrix *inputData, Matrix *meanVector) throw(RSGISMatricesException,RSGISMultivariantStatsException)
+	Matrix* RSGISMultivariantStats::standardiseMatrix(Matrix *inputData, Matrix *meanVector)
 	{
 		RSGISMatrices matrixUtils;
 		Matrix *standardiseMatrix = NULL;
@@ -90,7 +90,7 @@ namespace rsgis{namespace math{
 			}
 			return standardiseMatrix;
 		}
-		catch(RSGISMatricesException e)
+		catch(RSGISMatricesException &e)
 		{
 			if(standardiseMatrix != NULL)
 			{
@@ -98,7 +98,7 @@ namespace rsgis{namespace math{
 			}
 			throw e;
 		}
-		catch(RSGISMultivariantStatsException e)
+		catch(RSGISMultivariantStatsException &e)
 		{
 			if(standardiseMatrix != NULL)
 			{
@@ -108,7 +108,7 @@ namespace rsgis{namespace math{
 		}
 	}
 	
-	float RSGISMultivariantStats::calcCovariance(Matrix *inputData, int var1, int var2, Matrix *meanVector) throw(RSGISMatricesException,RSGISMultivariantStatsException)
+	float RSGISMultivariantStats::calcCovariance(Matrix *inputData, int var1, int var2, Matrix *meanVector)
 	{ 
 		if(inputData->m < var1 | inputData->m < var2)
 		{
@@ -138,7 +138,7 @@ namespace rsgis{namespace math{
 		return (sum/(inputData->m-1));
 	}
 	
-	Matrix* RSGISMultivariantStats::calcCovarianceMatrix(Matrix *inputData, Matrix *meanVector) throw(RSGISMatricesException,RSGISMultivariantStatsException)
+	Matrix* RSGISMultivariantStats::calcCovarianceMatrix(Matrix *inputData, Matrix *meanVector)
 	{		
 		if(meanVector->n != inputData->n)
 		{
@@ -164,7 +164,7 @@ namespace rsgis{namespace math{
 			}
 			return covariance;
 		}
-		catch(RSGISMatricesException e)
+		catch(RSGISMatricesException &e)
 		{
 			if(covariance != NULL)
 			{
@@ -172,7 +172,7 @@ namespace rsgis{namespace math{
 			}
 			throw e;
 		}
-		catch(RSGISMultivariantStatsException e)
+		catch(RSGISMultivariantStatsException &e)
 		{
 			if(covariance != NULL)
 			{

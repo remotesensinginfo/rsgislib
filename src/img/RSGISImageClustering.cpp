@@ -31,7 +31,7 @@ namespace rsgis{namespace img{
         
     }
         
-    void RSGISImageClustering::findKMeansCentres(GDALDataset *dataset, std::string outputMatrix, unsigned int numClusters, unsigned int maxNumIterations, unsigned int subSample, bool ignoreZeros, float degreeOfChange, rsgis::math::InitClustererMethods initMethod)throw(rsgis::RSGISImageException, rsgis::math::RSGISClustererException)
+    void RSGISImageClustering::findKMeansCentres(GDALDataset *dataset, std::string outputMatrix, unsigned int numClusters, unsigned int maxNumIterations, unsigned int subSample, bool ignoreZeros, float degreeOfChange, rsgis::math::InitClustererMethods initMethod)
     {
         try 
         {
@@ -71,7 +71,7 @@ namespace rsgis{namespace img{
     }
         
     
-    void RSGISImageClustering::findISODataCentres(GDALDataset *dataset, std::string outputMatrix, unsigned int numClusters, unsigned int maxNumIterations, unsigned int subSample, bool ignoreZeros, float degreeOfChange, rsgis::math::InitClustererMethods initMethod, float minDistBetweenClusters, unsigned int minNumFeatures, float maxStdDev, unsigned int minNumClusters, unsigned int startIteration, unsigned int endIteration)throw(rsgis::RSGISImageException, rsgis::math::RSGISClustererException)
+    void RSGISImageClustering::findISODataCentres(GDALDataset *dataset, std::string outputMatrix, unsigned int numClusters, unsigned int maxNumIterations, unsigned int subSample, bool ignoreZeros, float degreeOfChange, rsgis::math::InitClustererMethods initMethod, float minDistBetweenClusters, unsigned int minNumFeatures, float maxStdDev, unsigned int minNumClusters, unsigned int startIteration, unsigned int endIteration)
     {
         try 
         {
@@ -111,7 +111,7 @@ namespace rsgis{namespace img{
     }
     
     
-    std::vector< std::vector<float> >* RSGISImageClustering::sampleImage(GDALDataset *dataset, unsigned int subSample, bool ignoreZeros) throw(rsgis::RSGISImageException)
+    std::vector< std::vector<float> >* RSGISImageClustering::sampleImage(GDALDataset *dataset, unsigned int subSample, bool ignoreZeros)
     {
         std::vector< std::vector<float> > *pxlValues = new std::vector< std::vector<float> >();
         

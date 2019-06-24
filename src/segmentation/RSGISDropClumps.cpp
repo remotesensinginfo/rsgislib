@@ -30,7 +30,7 @@ namespace rsgis{namespace segment{
         
     }
     
-    void RSGISDropClumps::dropSelectedClumps(GDALDataset *clumpsImage, std::string outputImage, std::string selClumps2Drop, std::string gdalFormat, unsigned int ratBand)throw(rsgis::img::RSGISImageCalcException)
+    void RSGISDropClumps::dropSelectedClumps(GDALDataset *clumpsImage, std::string outputImage, std::string selClumps2Drop, std::string gdalFormat, unsigned int ratBand)
     {
         try
         {
@@ -112,7 +112,7 @@ namespace rsgis{namespace segment{
         this->nRows = nRows;
     }
     
-    void RSGISDropClumpsRelabelling::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISDropClumpsRelabelling::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) 
     {
         if(intBandValues[0] > 0)
         {

@@ -44,7 +44,7 @@ namespace rsgis{namespace reg{
 		this->pSmoothness = pSmoothness;
 	}
 	
-	void RSGISSingleConnectLayerImageRegistration::initRegistration() throw(RSGISRegistrationException)
+	void RSGISSingleConnectLayerImageRegistration::initRegistration()
 	{
 		if(gap < 1)
 		{
@@ -143,7 +143,7 @@ namespace rsgis{namespace reg{
         std::cout << "Initialisation Complete\n";
 	}
 	
-	void RSGISSingleConnectLayerImageRegistration::executeRegistration() throw(RSGISRegistrationException)
+	void RSGISSingleConnectLayerImageRegistration::executeRegistration()
 	{
 		if(!initExecuted)
 		{
@@ -233,7 +233,7 @@ namespace rsgis{namespace reg{
 		
 	}
 	
-	void RSGISSingleConnectLayerImageRegistration::finaliseRegistration() throw(RSGISRegistrationException)
+	void RSGISSingleConnectLayerImageRegistration::finaliseRegistration()
 	{
 		if(!initExecuted)
 		{
@@ -314,7 +314,7 @@ namespace rsgis{namespace reg{
         std::cout << numRMDue2ImageExtent << " tie points were removed due to being move to a position outside of the image extent.\n";
 	}
 	
-	void RSGISSingleConnectLayerImageRegistration::exportTiePointsENVIImage2Map(std::string filepath)throw(RSGISRegistrationException)
+	void RSGISSingleConnectLayerImageRegistration::exportTiePointsENVIImage2Map(std::string filepath)
 	{
 		std::list<TiePoint*> *tmpTiePts = new std::list<TiePoint*>();
 		std::list<TiePointInSingleLayer*>::iterator iterTiePts;
@@ -326,7 +326,7 @@ namespace rsgis{namespace reg{
 		delete tmpTiePts;
 	}
 	
-	void RSGISSingleConnectLayerImageRegistration::exportTiePointsENVIImage2Image(std::string filepath)throw(RSGISRegistrationException)
+	void RSGISSingleConnectLayerImageRegistration::exportTiePointsENVIImage2Image(std::string filepath)
 	{
 		std::list<TiePoint*> *tmpTiePts = new std::list<TiePoint*>();
 		std::list<TiePointInSingleLayer*>::iterator iterTiePts;
@@ -338,7 +338,7 @@ namespace rsgis{namespace reg{
 		delete tmpTiePts;
 	}
 	
-	void RSGISSingleConnectLayerImageRegistration::exportTiePointsRSGISImage2Map(std::string filepath)throw(RSGISRegistrationException)
+	void RSGISSingleConnectLayerImageRegistration::exportTiePointsRSGISImage2Map(std::string filepath)
 	{
 		std::list<TiePoint*> *tmpTiePts = new std::list<TiePoint*>();
 		std::list<TiePointInSingleLayer*>::iterator iterTiePts;
@@ -350,7 +350,7 @@ namespace rsgis{namespace reg{
 		delete tmpTiePts;
 	}
     
-    void RSGISSingleConnectLayerImageRegistration::exportTiePointsRSGISMapOffs(std::string filepath)throw(RSGISRegistrationException)
+    void RSGISSingleConnectLayerImageRegistration::exportTiePointsRSGISMapOffs(std::string filepath)
     {
         std::list<TiePoint*> *tmpTiePts = new std::list<TiePoint*>();
 		std::list<TiePointInSingleLayer*>::iterator iterTiePts;

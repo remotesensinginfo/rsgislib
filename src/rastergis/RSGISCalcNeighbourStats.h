@@ -80,7 +80,7 @@ namespace rsgis{namespace rastergis{
     {
     public:
         RSGISCalcNeighbourStats();
-        void populateStatsDiff2Neighbours(GDALDataset *inputClumps, RSGISFieldAttStats *fieldStats, bool useAbsDiff, unsigned int ratBand)throw(RSGISAttributeTableException);
+        void populateStatsDiff2Neighbours(GDALDataset *inputClumps, RSGISFieldAttStats *fieldStats, bool useAbsDiff, unsigned int ratBand);
         ~RSGISCalcNeighbourStats();
     };
     

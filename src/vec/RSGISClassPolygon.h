@@ -52,7 +52,7 @@ namespace rsgis{namespace vec{
 		public:
 			RSGISClassPolygon(std::string classAttribute);
 			virtual void readAttribtues(OGRFeature *feature, OGRFeatureDefn *featDefn);
-			virtual void createLayerDefinition(OGRLayer *outputSHPLayer)throw(RSGISVectorOutputException);
+			virtual void createLayerDefinition(OGRLayer *outputSHPLayer);
 			virtual void populateFeature(OGRFeature *feature, OGRFeatureDefn *featDefn);
 			std::string getClassName();
 			void setClassName(std::string name);

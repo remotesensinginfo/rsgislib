@@ -30,7 +30,7 @@ namespace rsgis{namespace geom{
         
     }
     
-    geos::geom::Polygon* RSGISFitAlphaShapesPolygonToPoints::fitPolygon(std::vector<OGRPoint*> *pts, double alphaVal) throw(RSGISGeometryException)
+    geos::geom::Polygon* RSGISFitAlphaShapesPolygonToPoints::fitPolygon(std::vector<OGRPoint*> *pts, double alphaVal)
     {
         geos::geom::Polygon *poly = NULL;
         try
@@ -88,7 +88,7 @@ namespace rsgis{namespace geom{
         return poly;
     }
     
-    geos::geom::Polygon* RSGISFitAlphaShapesPolygonToPoints::extractPolygonFromEdges(std::vector<geos::geom::LineSegment *> *lines) throw(RSGISGeometryException)
+    geos::geom::Polygon* RSGISFitAlphaShapesPolygonToPoints::extractPolygonFromEdges(std::vector<geos::geom::LineSegment *> *lines)
     {
         geos::geom::Polygon *poly = NULL;
         try

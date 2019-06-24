@@ -32,12 +32,12 @@ namespace rsgis{namespace vec{
 		outTxtFile.open(outputTextFile.c_str(), std::ios::out | std::ios::trunc);
 	}
 	
-	void RSGISConvertToASCII::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISConvertToASCII::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)
 	{
 		throw RSGISVectorException("Not implemented..");
 	}
 	
-	void RSGISConvertToASCII::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISConvertToASCII::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid)
 	{
 		if(outTxtFile.is_open())
 		{
@@ -51,7 +51,7 @@ namespace rsgis{namespace vec{
 				throw RSGISVectorException("Unsupport data type.");
 			}
 			outTxtFile.precision(10);
-			outTxtFile << fid << "," << point->getX() << "," << point->getY() << "," << point->getZ() ;
+			outTxtFile << fid << "," << point->getX() << "," << point->getY() << "," << point->getZ();
 			featureDefn = feature->GetDefnRef();
 			int fieldCount = featureDefn->GetFieldCount();
 			for(int i = 0; i < fieldCount; i++)
@@ -71,7 +71,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISConvertToASCII::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+	void RSGISConvertToASCII::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn)
 	{
 		// Nothing to do!
 	}

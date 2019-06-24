@@ -32,7 +32,7 @@ namespace rsgis { namespace img {
 		this->bandValuesWidths = bandValuesWidths;
 	}
 	
-	void RSGISCumulativeArea::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+	void RSGISCumulativeArea::calcImageValue(float *bandValues, int numBands, double *output) 
 	{	
 		if(bandValuesWidths->n != numBands)
 		{

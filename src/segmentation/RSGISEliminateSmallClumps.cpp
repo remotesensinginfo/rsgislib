@@ -29,7 +29,7 @@ namespace rsgis{namespace segment{
         
     }
     
-    void RSGISEliminateSmallClumps::eliminateSmallClumps(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize, float specThreshold) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISEliminateSmallClumps::eliminateSmallClumps(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize, float specThreshold) 
     {
         if(spectral->GetRasterXSize() != clumps->GetRasterXSize())
         {
@@ -281,7 +281,7 @@ namespace rsgis{namespace segment{
         delete[] spectralVals;
     }
     
-    void RSGISEliminateSmallClumps::stepwiseEliminateSmallClumps(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize, float specThreshold, std::vector<rsgis::img::BandSpecThresholdStats> *bandStretchStats, bool bandStatsAvail) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISEliminateSmallClumps::stepwiseEliminateSmallClumps(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize, float specThreshold, std::vector<rsgis::img::BandSpecThresholdStats> *bandStretchStats, bool bandStatsAvail) 
     {
         if(spectral->GetRasterXSize() != clumps->GetRasterXSize())
         {
@@ -563,7 +563,7 @@ namespace rsgis{namespace segment{
         }
     }
     
-    void RSGISEliminateSmallClumps::stepwiseIterativeEliminateSmallClumps(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize, float specThreshold, std::vector<rsgis::img::BandSpecThresholdStats> *bandStretchStats, bool bandStatsAvail) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISEliminateSmallClumps::stepwiseIterativeEliminateSmallClumps(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize, float specThreshold, std::vector<rsgis::img::BandSpecThresholdStats> *bandStretchStats, bool bandStatsAvail) 
     {
         if(spectral->GetRasterXSize() != clumps->GetRasterXSize())
         {
@@ -879,7 +879,7 @@ namespace rsgis{namespace segment{
         }
     }
     
-    void RSGISEliminateSmallClumps::stepwiseEliminateSmallClumpsNoMean(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize, float specThreshold, std::vector<rsgis::img::BandSpecThresholdStats> *bandStretchStats, bool bandStatsAvail) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISEliminateSmallClumps::stepwiseEliminateSmallClumpsNoMean(GDALDataset *spectral, GDALDataset *clumps, unsigned int minClumpSize, float specThreshold, std::vector<rsgis::img::BandSpecThresholdStats> *bandStretchStats, bool bandStatsAvail) 
     {
         if(spectral->GetRasterXSize() != clumps->GetRasterXSize())
         {
@@ -1155,7 +1155,7 @@ namespace rsgis{namespace segment{
         this->numSpecBands = numSpecBands;
     }
     
-    void RSGISPopulateMeansPxlLocs::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISPopulateMeansPxlLocs::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) 
     {
         try
         {            
@@ -1214,7 +1214,7 @@ namespace rsgis{namespace segment{
         this->numHistVals = numHistVals;
     }
     
-    void RSGISRemoveClumpsBelowThreshold::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISRemoveClumpsBelowThreshold::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) 
     {
         try
         {

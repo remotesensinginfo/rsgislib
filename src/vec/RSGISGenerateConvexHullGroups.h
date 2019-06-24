@@ -60,8 +60,8 @@ namespace rsgis{namespace vec{
 	{
 	public:
 		RSGISGenerateConvexHullGroups();
-        std::vector<std::pair<std::string,std::vector<geos::geom::Coordinate>* >* >* getCoordinateGroups(std::string inputFile, unsigned int eastingsColIdx, unsigned int northingsColIdx, unsigned int attributeColIdx)throw(RSGISVectorException);
-		void createPolygonsAsShapefile(std::vector<std::pair<std::string,std::vector<geos::geom::Coordinate>* >* > *coordGrps, std::string outputFile, std::string outProj, bool force)throw(RSGISVectorException);
+        std::vector<std::pair<std::string,std::vector<geos::geom::Coordinate>* >* >* getCoordinateGroups(std::string inputFile, unsigned int eastingsColIdx, unsigned int northingsColIdx, unsigned int attributeColIdx);
+		void createPolygonsAsShapefile(std::vector<std::pair<std::string,std::vector<geos::geom::Coordinate>* >* > *coordGrps, std::string outputFile, std::string outProj, bool force);
         
         ~RSGISGenerateConvexHullGroups();
 	};

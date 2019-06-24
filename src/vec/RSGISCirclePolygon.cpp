@@ -60,7 +60,7 @@ namespace rsgis{namespace vec{
 		
 	}
 	
-	void RSGISCirclePolygon::createLayerDefinition(OGRLayer *outputSHPLayer)throw(RSGISVectorOutputException)
+	void RSGISCirclePolygon::createLayerDefinition(OGRLayer *outputSHPLayer)
 	{
 		// Create class attribute column
 		OGRFieldDefn areaField( "Area", OFTReal );

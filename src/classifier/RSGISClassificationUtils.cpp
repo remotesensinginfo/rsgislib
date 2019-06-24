@@ -40,7 +40,7 @@ namespace rsgis{ namespace classifier{
 		return classData;
 	}
 
-	ClassData** RSGISClassificationUtils::parseClassificationInputFile(std::string inputFile, int *numClasses) throw(RSGISClassificationException, rsgis::RSGISInputStreamException, rsgis::math::RSGISMatricesException)
+	ClassData** RSGISClassificationUtils::parseClassificationInputFile(std::string inputFile, int *numClasses)
 	{
         rsgis::math::RSGISMathsUtils mathsUtils;
         rsgis::math::RSGISMatrices matrixUtils;
@@ -130,15 +130,15 @@ namespace rsgis{ namespace classifier{
 			std::string outMessage =  std::string("DOMException : ") + std::string(message);
 			throw RSGISClassificationException(outMessage.c_str());
 		}
-		catch(RSGISInputStreamException e)
+		catch(RSGISInputStreamException &e)
 		{
 			throw e;
 		}
-		catch(RSGISClassificationException e)
+		catch(RSGISClassificationException &e)
 		{
 			throw e;
 		}
-		catch(rsgis::math::RSGISMatricesException e)
+		catch(rsgis::math::RSGISMatricesException &e)
 		{
 			throw e;
 		}
@@ -146,7 +146,7 @@ namespace rsgis{ namespace classifier{
 		return classData;
 	}
 	
-	void RSGISClassificationUtils::convertShapeFile2SpecLib(std::string vector, std::string outputFile, std::string classAttribute, std::vector<std::string> *attributes, bool group) throw(RSGISClassificationException)
+	void RSGISClassificationUtils::convertShapeFile2SpecLib(std::string vector, std::string outputFile, std::string classAttribute, std::vector<std::string> *attributes, bool group)
 	{
 		OGRRegisterAll();
 		
@@ -299,7 +299,7 @@ namespace rsgis{ namespace classifier{
         
     }
     
-    void RSGISEliminateSingleClassPixels::eliminate(GDALDataset *inImageData, GDALDataset *tmpData, std::string outputImage, float noDataVal, bool noDataValProvided, std::string format, rsgis::img::RSGISRasterConnectivity filterConnectivity)throw(rsgis::img::RSGISImageCalcException)
+    void RSGISEliminateSingleClassPixels::eliminate(GDALDataset *inImageData, GDALDataset *tmpData, std::string outputImage, float noDataVal, bool noDataValProvided, std::string format, rsgis::img::RSGISRasterConnectivity filterConnectivity)
     {
         try
         {
@@ -377,7 +377,7 @@ namespace rsgis{ namespace classifier{
         }
     }
     
-    unsigned long RSGISEliminateSingleClassPixels::findSinglePixelsConnect4(GDALDataset *inImageData, GDALDataset *tmpData, float noDataVal, bool noDataValProvided) throw(rsgis::img::RSGISImageCalcException)
+    unsigned long RSGISEliminateSingleClassPixels::findSinglePixelsConnect4(GDALDataset *inImageData, GDALDataset *tmpData, float noDataVal, bool noDataValProvided) 
     {
         unsigned long countSingles = 0;
         try
@@ -650,7 +650,7 @@ namespace rsgis{ namespace classifier{
         return countSingles;
     }
     
-    bool RSGISEliminateSingleClassPixels::eliminateSinglePixelsConnect4(GDALDataset *inImageData, GDALDataset *tmpData, GDALDataset *outDataset, float noDataVal, bool noDataValProvided) throw(rsgis::img::RSGISImageCalcException)
+    bool RSGISEliminateSingleClassPixels::eliminateSinglePixelsConnect4(GDALDataset *inImageData, GDALDataset *tmpData, GDALDataset *outDataset, float noDataVal, bool noDataValProvided) 
     {
         bool hasChangeOccured = false;
         try
@@ -1033,7 +1033,7 @@ namespace rsgis{ namespace classifier{
         return hasChangeOccured;
     }
     
-    unsigned long RSGISEliminateSingleClassPixels::findSinglePixelsConnect8(GDALDataset *inImageData, GDALDataset *tmpData, float noDataVal, bool noDataValProvided) throw(rsgis::img::RSGISImageCalcException)
+    unsigned long RSGISEliminateSingleClassPixels::findSinglePixelsConnect8(GDALDataset *inImageData, GDALDataset *tmpData, float noDataVal, bool noDataValProvided) 
     {
         unsigned long countSingles = 0;
         try
@@ -1386,7 +1386,7 @@ namespace rsgis{ namespace classifier{
         return countSingles;
     }
     
-    bool RSGISEliminateSingleClassPixels::eliminateSinglePixelsConnect8(GDALDataset *inImageData, GDALDataset *tmpData, GDALDataset *outDataset, float noDataVal, bool noDataValProvided) throw(rsgis::img::RSGISImageCalcException)
+    bool RSGISEliminateSingleClassPixels::eliminateSinglePixelsConnect8(GDALDataset *inImageData, GDALDataset *tmpData, GDALDataset *outDataset, float noDataVal, bool noDataValProvided) 
     {
         bool hasChangeOccured = false;
         try

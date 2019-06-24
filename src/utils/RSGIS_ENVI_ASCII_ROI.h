@@ -61,18 +61,18 @@ namespace rsgis{namespace utils{
 	class DllExport RSGISReadENVIASCIIROI
 		{
 		public:
-			RSGISReadENVIASCIIROI(std::string file)throw(rsgis::RSGISInputStreamException,RSGISTextException);
+			RSGISReadENVIASCIIROI(std::string file);
 			void printROIs();
 			int getNumROIs();
-			std::string* getName(int i) throw(RSGISENVIROIException);
-			rsgis::math::Matrix* getMatrix(int i) throw(RSGISENVIROIException);
-			int getNumSamples(int i) throw(RSGISENVIROIException);
-			RSGISColour* getColour(int i) throw(RSGISENVIROIException);
+			std::string* getName(int i);
+			rsgis::math::Matrix* getMatrix(int i);
+			int getNumSamples(int i);
+			RSGISColour* getColour(int i);
 			int getNumVariables();
-			enviroi* getENVIROI(int i) throw(RSGISENVIROIException);
+			enviroi* getENVIROI(int i);
 			~RSGISReadENVIASCIIROI();
 		protected:
-			void parsefile() throw(rsgis::RSGISInputStreamException,RSGISTextException);
+			void parsefile();
 			std::string inputfile;
 			enviroi *rois;
 			int numrois;

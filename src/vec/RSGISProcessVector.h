@@ -59,12 +59,12 @@ namespace rsgis{namespace vec{
 		{
 		public:
 			RSGISProcessVector(RSGISProcessOGRFeature *processFeatures);
-			void processVectors(OGRLayer *inputLayer, OGRLayer *outputLayer, bool copyData, bool outVertical, bool newFirst) throw(RSGISVectorOutputException,RSGISVectorException);
-			void processVectors(OGRLayer *inputLayer, bool outVertical, bool morefeedback=false) throw(RSGISVectorOutputException,RSGISVectorException);
-			void processVectorsNoOutput(OGRLayer *inputLayer, bool outVertical) throw(RSGISVectorOutputException,RSGISVectorException);
+			void processVectors(OGRLayer *inputLayer, OGRLayer *outputLayer, bool copyData, bool outVertical, bool newFirst);
+			void processVectors(OGRLayer *inputLayer, bool outVertical, bool morefeedback=false);
+			void processVectorsNoOutput(OGRLayer *inputLayer, bool outVertical);
 			~RSGISProcessVector();
 		protected:
-			void copyFeatureDefn(OGRLayer *outputSHPLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
+			void copyFeatureDefn(OGRLayer *outputSHPLayer, OGRFeatureDefn *inFeatureDefn);
 			void copyFeatureData(OGRFeature *inFeature, OGRFeature *outFeature, OGRFeatureDefn *inFeatureDefn, OGRFeatureDefn *outFeatureDefn);
             void printGeometry(OGRGeometry *geometry);
             void printRing(OGRLinearRing *inGeomRing);

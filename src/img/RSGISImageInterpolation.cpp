@@ -32,7 +32,7 @@ namespace rsgis{namespace img{
 	void RSGISImageInterpolation::interpolateNewImage(GDALDataset *data,
 															  double outputXResolution, 
 															  double outputYResolution, 
-															  std::string filename) throw(rsgis::RSGISFileException, rsgis::RSGISImageException)
+															  std::string filename)
 	{
 		// Image Data Stores.
 		float *scanline0 = NULL;
@@ -280,7 +280,7 @@ namespace rsgis{namespace img{
 			GDALClose(output);
 			std::cout << "Interpolation complete\n";
 		}
-		catch(rsgis::RSGISFileException e)
+		catch(rsgis::RSGISFileException &e)
 		{
 			if( transformation != NULL )
 			{
@@ -308,7 +308,7 @@ namespace rsgis{namespace img{
 			}
 			throw e;
 		}
-		catch(rsgis::RSGISImageException e)
+		catch(rsgis::RSGISImageException &e)
 		{
 			if( transformation != NULL )
 			{
@@ -367,7 +367,7 @@ namespace rsgis{namespace img{
 															  double outputXResolution, 
 															  double outputYResolution, 
 															  std::string filename,
-															  int band) throw(rsgis::RSGISFileException, rsgis::RSGISImageException)
+															  int band)
 	{
 		// Image Data Stores.
 		float *scanline0 = NULL;
@@ -615,7 +615,7 @@ namespace rsgis{namespace img{
 			GDALClose(output);
 			std::cout << ".. Complete." << std::endl;
 		}
-		catch(rsgis::RSGISFileException e)
+		catch(rsgis::RSGISFileException &e)
 		{
 			if( transformation != NULL )
 			{
@@ -643,7 +643,7 @@ namespace rsgis{namespace img{
 			}
 			throw e;
 		}
-		catch(rsgis::RSGISImageException e)
+		catch(rsgis::RSGISImageException &e)
 		{
 			if( transformation != NULL )
 			{
@@ -767,7 +767,7 @@ namespace rsgis{namespace img{
         
     }
     
-    void RSGISPopulateImageFromInterpolator::populateImage(rsgis::math::RSGIS2DInterpolator *interpolator, GDALDataset *image)throw(rsgis::RSGISImageException, rsgis::math::RSGISInterpolationException)
+    void RSGISPopulateImageFromInterpolator::populateImage(rsgis::math::RSGIS2DInterpolator *interpolator, GDALDataset *image)
     {
         try
         {

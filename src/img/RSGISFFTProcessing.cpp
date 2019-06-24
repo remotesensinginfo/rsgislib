@@ -31,7 +31,7 @@ namespace rsgis{namespace img{
 		
 	}
 	
-    geos::geom::Polygon** RSGISFFTProcessing::findDominateFreq(rsgis::math::Matrix *magnitude, int startCircle, int endCircle, int *numPolys) throw(RSGISFFTException)
+    geos::geom::Polygon** RSGISFFTProcessing::findDominateFreq(rsgis::math::Matrix *magnitude, int startCircle, int endCircle, int *numPolys)
 	{
 		rsgis::math::RSGISMatrices matrixUtils;
 		rsgis::geom::RSGISGeometry geomUtils;
@@ -185,7 +185,7 @@ namespace rsgis{namespace img{
 			*numPolys = numPts;
 			return ptPolys;
 		}
-		catch(RSGISFFTException e)
+		catch(RSGISFFTException &e)
 		{
 			
 			

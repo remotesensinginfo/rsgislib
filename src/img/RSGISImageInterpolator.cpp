@@ -41,7 +41,7 @@ namespace rsgis{namespace img{
 		
 	}
 	
-	double RSGISCubicInterpolator::interpolate(double xShift, double yShift, double *pixels) throw(rsgis::RSGISImageException)
+	double RSGISCubicInterpolator::interpolate(double xShift, double yShift, double *pixels)
 	{
 		double pixelValue = 0;
 		
@@ -100,7 +100,7 @@ namespace rsgis{namespace img{
 		
 	}
 	
-	double RSGISBilinearAreaInterpolator::interpolate(double xShift, double yShift, double *pixels) throw(rsgis::RSGISImageException)
+	double RSGISBilinearAreaInterpolator::interpolate(double xShift, double yShift, double *pixels)
 	{
 		/************ Calculate New Pixel Value ************/
 		double pixelValue = 0;
@@ -119,7 +119,7 @@ namespace rsgis{namespace img{
 		
 	}
 	
-	double RSGISBilinearPointInterpolator::interpolate(double xShift, double yShift, double *pixels) throw(rsgis::RSGISImageException)
+	double RSGISBilinearPointInterpolator::interpolate(double xShift, double yShift, double *pixels)
 	{
 		double pixelValue = 0;
 		double x1Linear = 0;
@@ -139,7 +139,7 @@ namespace rsgis{namespace img{
 		
 	}
 	
-	double RSGISNearestNeighbourInterpolator::interpolate(double xShift, double yShift, double *pixels) throw(rsgis::RSGISImageException)
+	double RSGISNearestNeighbourInterpolator::interpolate(double xShift, double yShift, double *pixels)
 	{		
 		/************ Calculate New Pixel Value ************/
 		double pixelValue = 0;
@@ -179,7 +179,7 @@ namespace rsgis{namespace img{
 		
 	}
 	
-	double RSGISTriangulationInterpolator::interpolate(double xShift, double yShift, double *pixels) throw(rsgis::RSGISImageException)
+	double RSGISTriangulationInterpolator::interpolate(double xShift, double yShift, double *pixels)
 	{
 		/********** Calc pixels which create triangle ************/
 		double newPixelValue1 = this->triangle(xShift, yShift, pixels, true);

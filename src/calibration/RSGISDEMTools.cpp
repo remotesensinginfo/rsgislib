@@ -35,7 +35,7 @@ namespace rsgis{namespace calib{
         this->outType = outType;
         this->noDataVal = noDataVal;
     }
-    void RSGISCalcSlope::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCalcSlope::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
     {
         if(winSize != 3)
         {
@@ -122,7 +122,7 @@ namespace rsgis{namespace calib{
         this->noDataVal = noDataVal;
     }
 		
-    void RSGISCalcAspect::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCalcAspect::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
     {
         if(winSize != 3)
         {
@@ -221,7 +221,7 @@ namespace rsgis{namespace calib{
         
     }
 
-    void RSGISRecodeAspect::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISRecodeAspect::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         if(boost::math::isnan(bandValues[0]))
         {
@@ -295,7 +295,7 @@ namespace rsgis{namespace calib{
         this->nsRes = nsRes;
         this->noDataVal = noDataVal;
     }
-    void RSGISCalcSlopeAspect::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCalcSlopeAspect::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
     {
         if(winSize != 3)
         {
@@ -421,7 +421,7 @@ namespace rsgis{namespace calib{
         this->noDataVal = noDataVal;
     }
     
-    void RSGISCalcHillShade::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCalcHillShade::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
     {
         if(winSize != 3)
         {
@@ -540,7 +540,7 @@ namespace rsgis{namespace calib{
         extractPixels = new rsgis::img::RSGISExtractImagePixelsOnLine();
     }
 		
-    void RSGISCalcShadowBinaryMask::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCalcShadowBinaryMask::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) 
     {
         
         if(winSize != 3)
@@ -759,7 +759,7 @@ namespace rsgis{namespace calib{
         this->noDataVal = noDataVal;
     }
 		
-    void RSGISCalcRayIncidentAngle::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCalcRayIncidentAngle::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
     {
         float outputValue = 0;
         
@@ -901,7 +901,7 @@ namespace rsgis{namespace calib{
         this->noDataVal = noDataVal;
     }
 		
-    void RSGISCalcRayExitanceAngle::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCalcRayExitanceAngle::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
     {
         float outputValue = 0;
         
@@ -1046,7 +1046,7 @@ namespace rsgis{namespace calib{
         this->noDataVal = noDataVal;
     }
 		
-    void RSGISCalcRayIncidentAndExitanceAngles::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCalcRayIncidentAndExitanceAngles::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
     {
         float incidenceAngle = 0;
         float existanceAngle = 0;
@@ -1206,7 +1206,7 @@ namespace rsgis{namespace calib{
         this->nodata = nodata;
     }
 		
-    void RSGISFillDEMHoles::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISFillDEMHoles::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
     {
         if(numBands != numOutBands)
         {
@@ -1256,7 +1256,7 @@ namespace rsgis{namespace calib{
         this->holeValue = holeValue;
     }
     
-    void RSGISInFillDerivedHoles::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISInFillDerivedHoles::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
     {
         int midPoint = floor(((float)winSize)/2.0);
         
@@ -1298,7 +1298,7 @@ namespace rsgis{namespace calib{
         this->noDataVal = noDataVal;
     }
     
-    void RSGISFilterDTMWithAspectMedianFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISFilterDTMWithAspectMedianFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
     {
         rsgis::math::RSGISMathsUtils mathUtils;
         int midPoint = floor(((float)winSize)/2.0);
@@ -1385,7 +1385,7 @@ namespace rsgis{namespace calib{
         this->nVals = 0;
     }
     
-    void RSGISDetreadDEMUsingPlaneFit::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISDetreadDEMUsingPlaneFit::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
     {
         int midPoint = floor(((float)winSize)/2.0);
         

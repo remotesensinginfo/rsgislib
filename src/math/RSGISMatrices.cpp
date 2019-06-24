@@ -30,7 +30,7 @@ namespace rsgis{namespace math{
 		
 	}
 	
-	Matrix* RSGISMatrices::createMatrix(int n, int m) throw(RSGISMatricesException)
+	Matrix* RSGISMatrices::createMatrix(int n, int m)
 	{
 		/// Create matrix n rows by m colums
 		if(n < 1 | m < 1)
@@ -51,7 +51,7 @@ namespace rsgis{namespace math{
 		return matrix;
 	}
 	
-	Matrix* RSGISMatrices::createMatrix(Matrix *matrix) throw(RSGISMatricesException)
+	Matrix* RSGISMatrices::createMatrix(Matrix *matrix)
 	{
 		if(matrix == NULL)
 		{
@@ -73,7 +73,7 @@ namespace rsgis{namespace math{
 		return newMatrix;
 	}
 	
-	Matrix* RSGISMatrices::copyMatrix(Matrix *matrix) throw(RSGISMatricesException)
+	Matrix* RSGISMatrices::copyMatrix(Matrix *matrix)
 	{
 		if(matrix == NULL)
 		{
@@ -106,7 +106,7 @@ namespace rsgis{namespace math{
 		}
 	}
     
-    void RSGISMatrices::setValues(Matrix *matrix, double val) throw(RSGISMatricesException)
+    void RSGISMatrices::setValues(Matrix *matrix, double val)
     {
         int totalElements = matrix->n * matrix->m;
         for(int i = 0; i < totalElements; i++)
@@ -115,7 +115,7 @@ namespace rsgis{namespace math{
         }
     }
 	
-	double RSGISMatrices::determinant(Matrix *matrix) throw(RSGISMatricesException)
+	double RSGISMatrices::determinant(Matrix *matrix)
 	{
 		double sum = 0;
 		if(matrix->n != matrix->m)
@@ -164,7 +164,7 @@ namespace rsgis{namespace math{
 		return sum;
 	}
 	
-	Matrix* RSGISMatrices::cofactors(Matrix *matrix) throw(RSGISMatricesException)
+	Matrix* RSGISMatrices::cofactors(Matrix *matrix)
 	{
 		if(matrix->n != matrix->m)
 		{
@@ -203,7 +203,7 @@ namespace rsgis{namespace math{
 		return newMatrix;
 	}
 	
-	Matrix* RSGISMatrices::transpose(Matrix *matrix) throw(RSGISMatricesException)
+	Matrix* RSGISMatrices::transpose(Matrix *matrix)
 	{
 		Matrix *newMatrix = NULL;
 		newMatrix = this->createMatrix(matrix->m, matrix->n);
@@ -217,7 +217,7 @@ namespace rsgis{namespace math{
 		return newMatrix;
 	}
 
-	void RSGISMatrices::transposeGSL(gsl_matrix *inMatrix, gsl_matrix *outMatrix) throw(RSGISMatricesException)
+	void RSGISMatrices::transposeGSL(gsl_matrix *inMatrix, gsl_matrix *outMatrix)
 	{
 		/// Returns the transpose of a gsl_matrix, the origional matrix is unmodified.
 		/** Uses the GSL function for a square matrix or calls 'transposeNonSquareGSL' for a
@@ -235,7 +235,7 @@ namespace rsgis{namespace math{
 
 	}
 	
-	void RSGISMatrices::transposeNonSquareGSL(gsl_matrix *inMatrix, gsl_matrix *outMatrix) throw(RSGISMatricesException)
+	void RSGISMatrices::transposeNonSquareGSL(gsl_matrix *inMatrix, gsl_matrix *outMatrix)
 	{
 		/// Returns the transpose of a gsl_matrix, the origional matrix is unmodified.
 		
@@ -250,7 +250,7 @@ namespace rsgis{namespace math{
 
 	}
 	
-	void RSGISMatrices::inv2x2GSLMatrix(gsl_matrix *inMatrix, gsl_matrix *outMatrix) throw(RSGISMatricesException)
+	void RSGISMatrices::inv2x2GSLMatrix(gsl_matrix *inMatrix, gsl_matrix *outMatrix)
 	{
 		
 		/// Calculates the inverse of a 2 x 2 gsl_matrix
@@ -283,7 +283,7 @@ namespace rsgis{namespace math{
 
 	}
 	
-	void RSGISMatrices::multipleSingle(Matrix *matrix, double multiple) throw(RSGISMatricesException)
+	void RSGISMatrices::multipleSingle(Matrix *matrix, double multiple)
 	{
 		int numElements = matrix->n * matrix->m;
 		for(int i = 0; i < numElements; i++)
@@ -292,7 +292,7 @@ namespace rsgis{namespace math{
 		}
 	}
 	
-	Matrix* RSGISMatrices::multiplication(Matrix *matrixA, Matrix *matrixB) throw(RSGISMatricesException)
+	Matrix* RSGISMatrices::multiplication(Matrix *matrixA, Matrix *matrixB)
 	{
 		Matrix *matrix1 = NULL;
 		Matrix *matrix2 = NULL;
@@ -338,7 +338,7 @@ namespace rsgis{namespace math{
 	}
 
 	
-	void RSGISMatrices::productMatrixVectorGSL(gsl_matrix *inMatrix, gsl_vector *inVector, gsl_vector *outVector) throw(RSGISMatricesException)
+	void RSGISMatrices::productMatrixVectorGSL(gsl_matrix *inMatrix, gsl_vector *inVector, gsl_vector *outVector)
 	{
 		/// Calculates the product of a gsl_matrix and a gsl_vector, returns a gsl_vector
         
@@ -383,13 +383,13 @@ namespace rsgis{namespace math{
 			for(unsigned int j = 0; j < matrix->size2; j++)
 			{
 				double outm = gsl_matrix_get(matrix, i, j); 
-				std::cout << outm << " " ;
+				std::cout << outm << " ";
 			}
 			std::cout << std::endl;
 		}
 	}
 	
-	void RSGISMatrices::saveMatrix2GridTxt(Matrix *matrix, std::string filepath) throw(RSGISMatricesException,RSGISOutputStreamException)
+	void RSGISMatrices::saveMatrix2GridTxt(Matrix *matrix, std::string filepath)
 	{
         std::string outputFilename = filepath;
         std::string ext = getFileExt(filepath);
@@ -433,7 +433,7 @@ namespace rsgis{namespace math{
 		
 	}
 	
-	void RSGISMatrices::saveMatrix2CSV(Matrix *matrix, std::string filepath) throw(RSGISMatricesException,RSGISOutputStreamException)
+	void RSGISMatrices::saveMatrix2CSV(Matrix *matrix, std::string filepath)
 	{
         std::string outputFilename = filepath;
         std::string ext = getFileExt(filepath);
@@ -473,7 +473,7 @@ namespace rsgis{namespace math{
 		
 	}
 	
-	void RSGISMatrices::saveGSLMatrix2CSV(gsl_matrix *gslMatrix, std::string filepath) throw(RSGISMatricesException,RSGISOutputStreamException)
+	void RSGISMatrices::saveGSLMatrix2CSV(gsl_matrix *gslMatrix, std::string filepath)
 	{
 		Matrix *rsgisMatrix;
 		rsgisMatrix = this->convertGSL2RSGISMatrix(gslMatrix);
@@ -481,7 +481,7 @@ namespace rsgis{namespace math{
 		this->freeMatrix(rsgisMatrix);
 	}
 	
-	void RSGISMatrices::saveMatrix2txt(Matrix *matrix, std::string filepath) throw(RSGISMatricesException,RSGISOutputStreamException)
+	void RSGISMatrices::saveMatrix2txt(Matrix *matrix, std::string filepath)
 	{
         std::string outputFilename = filepath;
         std::string ext = getFileExt(filepath);
@@ -519,7 +519,7 @@ namespace rsgis{namespace math{
 		}
 	}
 	
-	void RSGISMatrices::saveMatrix2txtOptions(Matrix *matrix, std::string filepath, outTXTform outtxt) throw(RSGISMatricesException,RSGISOutputStreamException)
+	void RSGISMatrices::saveMatrix2txtOptions(Matrix *matrix, std::string filepath, outTXTform outtxt)
 	{		
 		if(outtxt == mtxt)
 		{
@@ -540,7 +540,7 @@ namespace rsgis{namespace math{
 
 	}
 	
-	void RSGISMatrices::saveGSLMatrix2GridTxt(gsl_matrix *gslMatrix, std::string filepath) throw(RSGISMatricesException,RSGISOutputStreamException)
+	void RSGISMatrices::saveGSLMatrix2GridTxt(gsl_matrix *gslMatrix, std::string filepath)
 	{
 		Matrix *rsgisMatrix;
 		rsgisMatrix = this->convertGSL2RSGISMatrix(gslMatrix);
@@ -548,7 +548,7 @@ namespace rsgis{namespace math{
 		this->freeMatrix(rsgisMatrix);
 	}
 
-	void RSGISMatrices::saveGSLMatrix2Txt(gsl_matrix *gslMatrix, std::string filepath) throw(RSGISMatricesException,RSGISOutputStreamException)
+	void RSGISMatrices::saveGSLMatrix2Txt(gsl_matrix *gslMatrix, std::string filepath)
 	{
 		Matrix *rsgisMatrix;
 		rsgisMatrix = this->convertGSL2RSGISMatrix(gslMatrix);
@@ -556,7 +556,7 @@ namespace rsgis{namespace math{
 		this->freeMatrix(rsgisMatrix);
 	}
 	
-	void RSGISMatrices::saveMatrix2Binary(Matrix *matrix, std::string filepath) throw(RSGISMatricesException,RSGISOutputStreamException)
+	void RSGISMatrices::saveMatrix2Binary(Matrix *matrix, std::string filepath)
 	{
 		std::ofstream matrixOutput;
         std::string matrixFilepath = filepath;
@@ -584,7 +584,7 @@ namespace rsgis{namespace math{
 		matrixOutput.close();
 	}
 	
-	Matrix* RSGISMatrices::readMatrixFromTxt(std::string filepath) throw(RSGISMatricesException,RSGISInputStreamException)
+	Matrix* RSGISMatrices::readMatrixFromTxt(std::string filepath)
 	{
 		Matrix *matrix = new Matrix();
 		std::ifstream inputMatrix;
@@ -677,7 +677,7 @@ namespace rsgis{namespace math{
 		return matrix;
 	}
 	
-	Matrix* RSGISMatrices::readMatrixFromGridTxt(std::string filepath) throw(RSGISMatricesException,RSGISInputStreamException)
+	Matrix* RSGISMatrices::readMatrixFromGridTxt(std::string filepath)
 	{
 		Matrix *matrix = new Matrix();
 		std::ifstream inputMatrix;
@@ -735,7 +735,7 @@ namespace rsgis{namespace math{
 			// data
 			int dataCounter = 0;
 			int start = 0;
-			int lineLength = wholeline.length(); ;
+			int lineLength = wholeline.length();;
 			int numDataPoints = matrix->n*matrix->m;
 			matrix->matrix = new double[numDataPoints];
 			
@@ -771,7 +771,7 @@ namespace rsgis{namespace math{
 	}
 	
 	
-	Matrix* RSGISMatrices::readMatrixFromBinary(std::string filepath) throw(RSGISMatricesException,RSGISInputStreamException)
+	Matrix* RSGISMatrices::readMatrixFromBinary(std::string filepath)
 	{
 		Matrix *matrix = new Matrix();
 		std::string matrixFilepath = filepath + std::string(".mtx");
@@ -807,7 +807,7 @@ namespace rsgis{namespace math{
 		return matrix;
 	}
 	
-	gsl_matrix* RSGISMatrices::readGSLMatrixFromTxt(std::string filepath) throw(RSGISMatricesException)
+	gsl_matrix* RSGISMatrices::readGSLMatrixFromTxt(std::string filepath)
 	{
 		Matrix *rsgisMatrix;
 		gsl_matrix *gslMatrix;
@@ -817,7 +817,7 @@ namespace rsgis{namespace math{
 		return gslMatrix;
 	}
 
-	gsl_matrix* RSGISMatrices::readGSLMatrixFromGridTxt(std::string filepath) throw(RSGISMatricesException)
+	gsl_matrix* RSGISMatrices::readGSLMatrixFromGridTxt(std::string filepath)
 	{
 		Matrix *rsgisMatrix;
 		gsl_matrix *gslMatrix;
@@ -827,7 +827,7 @@ namespace rsgis{namespace math{
 		return gslMatrix;
 	}
 	
-	gsl_matrix* RSGISMatrices::readGSLMatrixFromBinary(std::string filepath) throw(RSGISMatricesException)
+	gsl_matrix* RSGISMatrices::readGSLMatrixFromBinary(std::string filepath)
 	{
 		Matrix *rsgisMatrix;
 		gsl_matrix *gslMatrix;
@@ -837,7 +837,7 @@ namespace rsgis{namespace math{
 		return gslMatrix;
 	}
 	
-	void RSGISMatrices::calcEigenVectorValue(Matrix *matrix, Matrix *eigenvalues, Matrix *eigenvectors) throw(RSGISMatricesException)
+	void RSGISMatrices::calcEigenVectorValue(Matrix *matrix, Matrix *eigenvalues, Matrix *eigenvectors)
 	{
 		
 		if(eigenvalues->m != eigenvectors->m)
@@ -872,7 +872,7 @@ namespace rsgis{namespace math{
 		gsl_matrix_free (eigenVectorsGSL);
 	}
 	
-	void RSGISMatrices::exportAsImage(Matrix *matrix, std::string filepath, std::string format) throw(RSGISMatricesException)
+	void RSGISMatrices::exportAsImage(Matrix *matrix, std::string filepath, std::string format)
 	{
 		GDALAllRegister();
 		GDALDataset *outputImageDS = NULL;
@@ -907,14 +907,14 @@ namespace rsgis{namespace math{
 			delete row;
 			GDALClose(outputImageDS);
 		}
-		catch(RSGISMatricesException e)
+		catch(RSGISMatricesException &e)
 		{
 			throw e;
 		}
 		
 	}
 	
-	Matrix* RSGISMatrices::normalisedMatrix(Matrix *matrix, double min, double max) throw(RSGISMatricesException)
+	Matrix* RSGISMatrices::normalisedMatrix(Matrix *matrix, double min, double max)
 	{
 		double matrixMIN = 0;
 		double matrixMAX = 0;
@@ -959,7 +959,7 @@ namespace rsgis{namespace math{
 		return outMatrix;
 	}
 	
-    Matrix* RSGISMatrices::normalisedColumnsMatrix(Matrix *matrix) throw(RSGISMatricesException)
+    Matrix* RSGISMatrices::normalisedColumnsMatrix(Matrix *matrix)
     {
         Matrix *outMatrix = this->createMatrix(matrix);
         
@@ -988,7 +988,7 @@ namespace rsgis{namespace math{
         return outMatrix;
     }
     
-    gsl_matrix* RSGISMatrices::normalisedColumnsMatrix(gsl_matrix *matrix) throw(RSGISMatricesException)
+    gsl_matrix* RSGISMatrices::normalisedColumnsMatrix(gsl_matrix *matrix)
     {
         gsl_matrix *outMatrix = gsl_matrix_alloc (matrix->size1, matrix->size2);
         
@@ -1020,7 +1020,7 @@ namespace rsgis{namespace math{
     }
     
     
-	Matrix* RSGISMatrices::duplicateMatrix(Matrix *matrix, int xDuplications, int yDuplications) throw(RSGISMatricesException)
+	Matrix* RSGISMatrices::duplicateMatrix(Matrix *matrix, int xDuplications, int yDuplications)
 	{
 		int newM = matrix->m * xDuplications;
 		int newN = matrix->n * yDuplications;
@@ -1069,7 +1069,7 @@ namespace rsgis{namespace math{
 		return outMatrix;
 	}
 	
-	gsl_matrix* RSGISMatrices::convertRSGIS2GSLMatrix(Matrix *matrix) throw(RSGISMatricesException)
+	gsl_matrix* RSGISMatrices::convertRSGIS2GSLMatrix(Matrix *matrix)
 	{
 		/// Converts RSGIS matrix to a GSL matrix
 		gsl_matrix *convertedMatrix = gsl_matrix_alloc (matrix->n, matrix->m);
@@ -1087,7 +1087,7 @@ namespace rsgis{namespace math{
 		return convertedMatrix;
 	}
 	
-	Matrix* RSGISMatrices::convertGSL2RSGISMatrix(gsl_matrix *matrix) throw(RSGISMatricesException)
+	Matrix* RSGISMatrices::convertGSL2RSGISMatrix(gsl_matrix *matrix)
 	{
 		/// Converts RSGIS matrix to a GSL matrix
 		Matrix *convertedMatrix = this->createMatrix(matrix->size1, matrix->size2);		
@@ -1106,7 +1106,7 @@ namespace rsgis{namespace math{
 	}
     
     
-    void RSGISMatrices::makeCircularBinaryMatrix(Matrix *matrix) throw(RSGISMatricesException)
+    void RSGISMatrices::makeCircularBinaryMatrix(Matrix *matrix)
     {
         if(matrix->n != matrix->m)
         {

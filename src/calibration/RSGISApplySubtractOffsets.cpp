@@ -35,7 +35,7 @@ namespace rsgis{namespace calib{
         this->darkObjReflVal = darkObjReflVal;
     }
     
-    void RSGISApplyDarkObjSubtractOffsets::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISApplyDarkObjSubtractOffsets::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         if( (numBands/2) != this->numImageBands)
         {
@@ -95,7 +95,7 @@ namespace rsgis{namespace calib{
         this->offsetValues = offsetValues;
     }
     
-    void RSGISApplyDarkObjSubtractSingleOffsets::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISApplyDarkObjSubtractSingleOffsets::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         for(unsigned int i = 0; i < this->numImageBands; ++i)
         {

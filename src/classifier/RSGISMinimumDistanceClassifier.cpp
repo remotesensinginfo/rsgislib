@@ -24,23 +24,23 @@
 
 namespace rsgis{ namespace classifier{
 	
-	RSGISMinimumDistanceClassifier::RSGISMinimumDistanceClassifier(ClassData **trainingData, int numClasses, MinDistCentreType centreType)  throw(RSGISClassificationException) : RSGISClassifier(trainingData, numClasses)
+	RSGISMinimumDistanceClassifier::RSGISMinimumDistanceClassifier(ClassData **trainingData, int numClasses, MinDistCentreType centreType)  : RSGISClassifier(trainingData, numClasses)
 	{
 		this->centreType = centreType;
 		this->calcClusterCentres();
 	}
 	
-	int RSGISMinimumDistanceClassifier::getClassID(float *variables, int numVars) throw(RSGISClassificationException)
+	int RSGISMinimumDistanceClassifier::getClassID(float *variables, int numVars)
 	{
 		return this->findClass(variables, numVars)->classID;
 	}
 	
-	std::string RSGISMinimumDistanceClassifier::getClassName(float *variables, int numVars) throw(RSGISClassificationException)
+	std::string RSGISMinimumDistanceClassifier::getClassName(float *variables, int numVars)
 	{
 		return this->findClass(variables, numVars)->className;
 	}
 	
-	void RSGISMinimumDistanceClassifier::calcClusterCentres() throw(RSGISClassificationException)
+	void RSGISMinimumDistanceClassifier::calcClusterCentres()
 	{
         rsgis::math::RSGISMatrices matrixUtils;
 		clusterCentres = new ClassData[numClasses];
@@ -122,7 +122,7 @@ namespace rsgis{ namespace classifier{
 		
 	}
 	
-	ClassData* RSGISMinimumDistanceClassifier::findClass(float *variables, int numVars) throw(RSGISClassificationException)
+	ClassData* RSGISMinimumDistanceClassifier::findClass(float *variables, int numVars)
 	{
 		double distance = 0;
 		double minDistance = 0;

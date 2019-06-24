@@ -35,7 +35,7 @@ namespace rsgis{namespace vec{
 		this->nTop = nTop;
 	}
 	
-	void RSGISPopulateTopPowerSet::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISPopulateTopPowerSet::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)
 	{
         rsgis::math::RSGISMathsUtils mathUtils;
 		
@@ -169,12 +169,12 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISPopulateTopPowerSet::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISPopulateTopPowerSet::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid)
 	{
 		throw RSGISVectorException("Not Implemented");
 	}
 	
-	void RSGISPopulateTopPowerSet::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+	void RSGISPopulateTopPowerSet::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn)
 	{
         rsgis::math::RSGISMathsUtils mathUtils;
 		std::string name = "";
@@ -223,7 +223,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISPopulateTopPowerSet::identifyPowerSet(CountAttributes** allAttributes, int numAttributes, std::string *topAttributeNames, int numTop, CountAttributes** powerSetAttributes, int numPSAttributes) throw(rsgis::math::RSGISMathException,RSGISVectorException)
+	void RSGISPopulateTopPowerSet::identifyPowerSet(CountAttributes** allAttributes, int numAttributes, std::string *topAttributeNames, int numTop, CountAttributes** powerSetAttributes, int numPSAttributes)
 	{
         rsgis::math::RSGISMathsUtils mathUtils;
 		int **indexes = NULL;

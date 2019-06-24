@@ -29,7 +29,7 @@ namespace rsgis{namespace img{
         this->calc = valueCalc;
     }
         
-    void RSGISCalcImgAlongsideOut::calcImageIterate(GDALDataset *dataset) throw(RSGISImageCalcException,RSGISImageBandException)
+    void RSGISCalcImgAlongsideOut::calcImageIterate(GDALDataset *dataset)
     {
 		unsigned long height = 0;
 		unsigned long width = 0;

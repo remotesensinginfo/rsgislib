@@ -31,7 +31,7 @@ namespace rsgis{namespace segment{
         this->pixelCount = 0;
     }
     
-    void RSGISLabelPixelsUsingPixelsCalcImg::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISLabelPixelsUsingPixelsCalcImg::calcImageValue(float *bandValues, int numBands, double *output) 
     {
 
         bool nonZeroFound = false;

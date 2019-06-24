@@ -203,7 +203,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISVectorProcessing::createPlotPolygons(std::vector<rsgis::utils::PlotPoly*> *polyDetails, std::string output, bool force) throw(RSGISVectorException)
+	void RSGISVectorProcessing::createPlotPolygons(std::vector<rsgis::utils::PlotPoly*> *polyDetails, std::string output, bool force)
 	{
         rsgis::math::RSGISMathsUtils mathUtils;
         rsgis::utils::RSGISPlotPolygonsCSVParse parse;
@@ -276,7 +276,7 @@ namespace rsgis{namespace vec{
 		delete polys;
 	}
 	
-	void RSGISVectorProcessing::createImageFootprintPolygons(std::vector<rsgis::utils::ImageFootPrintPoly*> *polyDetails, std::string output, bool force) throw(RSGISVectorException)
+	void RSGISVectorProcessing::createImageFootprintPolygons(std::vector<rsgis::utils::ImageFootPrintPoly*> *polyDetails, std::string output, bool force)
 	{
         rsgis::math::RSGISMathsUtils mathUtils;
 		
@@ -317,7 +317,7 @@ namespace rsgis{namespace vec{
 		delete polys;
 	}
 	
-	void RSGISVectorProcessing::createGrid(std::string outputShapefile, OGRSpatialReference* spatialRef, bool deleteIfPresent, double xTLStart, double yTLStart, double resolutionX, double resolutionY, double width, double height) throw(RSGISVectorException)
+	void RSGISVectorProcessing::createGrid(std::string outputShapefile, OGRSpatialReference* spatialRef, bool deleteIfPresent, double xTLStart, double yTLStart, double resolutionX, double resolutionY, double width, double height)
 	{
 		const geos::geom::GeometryFactory* geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
         std::vector<geos::geom::Polygon*> *polys = new std::vector<geos::geom::Polygon*>();
@@ -370,7 +370,7 @@ namespace rsgis{namespace vec{
 		delete polys;
 	}
     
-    float RSGISVectorProcessing::calcMeanMinDistance(std::vector<OGRGeometry*> *geometries) throw(RSGISVectorException)
+    float RSGISVectorProcessing::calcMeanMinDistance(std::vector<OGRGeometry*> *geometries)
     {
         float meanMinDistance = 0;
         try

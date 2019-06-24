@@ -60,9 +60,9 @@ namespace rsgis{namespace reg{
 	{
 	public:
         RSGISAddGCPsGDAL(std::string inFileName, std::string gcpFilePath, std::string outFileName = "",  std::string gdalFormat = "KEA", GDALDataType gdalDataType = GDT_Float32);
-        void readGCPFile(std::string gcpFilePath, std::vector<RSGISGCPImg2MapNode*> *gcps) throw(RSGISImageWarpException);
-        void convertRSGIS2GDALGCP(std::vector<RSGISGCPImg2MapNode*> *gcps, GDAL_GCP *gdalGCPList) throw(RSGISImageWarpException);
-        void copyImageWithoutSpatialRef(std::string inFileName, std::string outFileName, std::string gdalFormat, GDALDataType gdalDataType) throw(RSGISImageWarpException);
+        void readGCPFile(std::string gcpFilePath, std::vector<RSGISGCPImg2MapNode*> *gcps);
+        void convertRSGIS2GDALGCP(std::vector<RSGISGCPImg2MapNode*> *gcps, GDAL_GCP *gdalGCPList);
+        void copyImageWithoutSpatialRef(std::string inFileName, std::string outFileName, std::string gdalFormat, GDALDataType gdalDataType);
         ~RSGISAddGCPsGDAL(){};
 	};
 	

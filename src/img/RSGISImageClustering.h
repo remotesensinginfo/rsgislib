@@ -56,9 +56,9 @@ namespace rsgis{namespace img{
     {
     public:
         RSGISImageClustering();
-        void findKMeansCentres(GDALDataset *dataset, std::string outputMatrix, unsigned int numClusters, unsigned int maxNumIterations, unsigned int subSample, bool ignoreZeros, float degreeOfChange, rsgis::math::InitClustererMethods initMethod)throw(rsgis::RSGISImageException, rsgis::math::RSGISClustererException);
-        void findISODataCentres(GDALDataset *dataset, std::string outputMatrix, unsigned int numClusters, unsigned int maxNumIterations, unsigned int subSample, bool ignoreZeros, float degreeOfChange, rsgis::math::InitClustererMethods initMethod, float minDistBetweenClusters, unsigned int minNumFeatures, float maxStdDev, unsigned int minNumClusters, unsigned int startIteration, unsigned int endIteration)throw(rsgis::RSGISImageException, rsgis::math::RSGISClustererException);
-        std::vector< std::vector<float> >* sampleImage(GDALDataset *dataset, unsigned int subSample, bool ignoreZeros) throw(rsgis::RSGISImageException);
+        void findKMeansCentres(GDALDataset *dataset, std::string outputMatrix, unsigned int numClusters, unsigned int maxNumIterations, unsigned int subSample, bool ignoreZeros, float degreeOfChange, rsgis::math::InitClustererMethods initMethod);
+        void findISODataCentres(GDALDataset *dataset, std::string outputMatrix, unsigned int numClusters, unsigned int maxNumIterations, unsigned int subSample, bool ignoreZeros, float degreeOfChange, rsgis::math::InitClustererMethods initMethod, float minDistBetweenClusters, unsigned int minNumFeatures, float maxStdDev, unsigned int minNumClusters, unsigned int startIteration, unsigned int endIteration);
+        std::vector< std::vector<float> >* sampleImage(GDALDataset *dataset, unsigned int subSample, bool ignoreZeros);
         ~RSGISImageClustering();
     };
     

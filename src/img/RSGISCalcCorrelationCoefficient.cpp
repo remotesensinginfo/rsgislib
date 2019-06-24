@@ -34,7 +34,7 @@ namespace rsgis{namespace img{
 		this->bSQ = 0;
 	}
 	
-	void RSGISCalcCC::calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) throw(RSGISImageCalcException)
+	void RSGISCalcCC::calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) 
 	{
 		if(bandA > numBands)
 		{
@@ -55,22 +55,22 @@ namespace rsgis{namespace img{
 		bSQ += (bandValuesImageB[bandB] * bandValuesImageB[bandB]);
 	}
 	
-	void RSGISCalcCC::calcImageValue(float *bandValuesImageA, int numBands, int band) throw(RSGISImageCalcException)
+	void RSGISCalcCC::calcImageValue(float *bandValuesImageA, int numBands, int band) 
 	{
 		throw RSGISImageCalcException("Not implemented!");
 	}
 	
-	void RSGISCalcCC::calcImageValue(float *bandValuesImageA, int numBands, geos::geom::Envelope *extent) throw(RSGISImageCalcException)
+	void RSGISCalcCC::calcImageValue(float *bandValuesImageA, int numBands, geos::geom::Envelope *extent) 
 	{
 		throw RSGISImageCalcException("Not implemented!");
 	}
 	
-	void RSGISCalcCC::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(RSGISImageCalcException)
+	void RSGISCalcCC::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) 
 	{
 		throw RSGISImageCalcException("Not implemented!");
 	}
 	
-	double* RSGISCalcCC::getOutputValues()  throw(RSGISImageCalcException)
+	double* RSGISCalcCC::getOutputValues()  
 	{
 		double partA = n * ab;
 		double partB = a * b;

@@ -20,7 +20,7 @@ namespace rsgis{namespace img{
 		this->imagebandValues = imagebandValues;
 	}
 	
-	void RSGISSavitzkyGolaySmoothingFilters::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+	void RSGISSavitzkyGolaySmoothingFilters::calcImageValue(float *bandValues, int numBands, double *output) 
 	{
 		if(numBands != numOutBands)
 		{
@@ -68,7 +68,7 @@ namespace rsgis{namespace img{
 			coefficients = polyFit.PolyfitOneDimensionQuiet(this->order, inputValues);	
 			
 			double yPredicted = 0;
-			for(int j = 0; j < order ; j++)
+			for(int j = 0; j < order; j++)
 			{
 				double xPow = pow(imagebandValues->vector[i], j); // x^n;
 				double coeff = gsl_vector_get(coefficients, j); // a_n
@@ -82,27 +82,27 @@ namespace rsgis{namespace img{
 		}
 	}
 	
-	void RSGISSavitzkyGolaySmoothingFilters::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+	void RSGISSavitzkyGolaySmoothingFilters::calcImageValue(float *bandValues, int numBands) 
 	{
 		throw RSGISImageCalcException("Not implemented");
 	}
 	
-	void RSGISSavitzkyGolaySmoothingFilters::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException)
+	void RSGISSavitzkyGolaySmoothingFilters::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) 
 	{
 		throw RSGISImageCalcException("Not implemented");
 	}
 	
-	void RSGISSavitzkyGolaySmoothingFilters::calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) throw(RSGISImageCalcException)
+	void RSGISSavitzkyGolaySmoothingFilters::calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) 
 	{
 		throw RSGISImageCalcException("Not implemented");
 	}
 	
-	void RSGISSavitzkyGolaySmoothingFilters::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException)
+	void RSGISSavitzkyGolaySmoothingFilters::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
 	{
 		throw RSGISImageCalcException("Not implemented");
 	}
 	
-	bool RSGISSavitzkyGolaySmoothingFilters::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException)
+	bool RSGISSavitzkyGolaySmoothingFilters::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) 
 	{
 		throw RSGISImageCalcException("Not implemented");
 	}

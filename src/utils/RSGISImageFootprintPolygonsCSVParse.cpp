@@ -31,7 +31,7 @@ namespace rsgis{ namespace utils{
 		
 	}
 	
-	std::vector<ImageFootPrintPoly*>* RSGISImageFootprintPolygonsCSVParse::parsePoly(std::string inputfile) throw(rsgis::RSGISInputStreamException, RSGISTextException)
+	std::vector<ImageFootPrintPoly*>* RSGISImageFootprintPolygonsCSVParse::parsePoly(std::string inputfile)
 	{
 		std::vector<ImageFootPrintPoly*> *plotPolys = new std::vector<ImageFootPrintPoly*>();
 		

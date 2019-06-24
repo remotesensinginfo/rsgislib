@@ -37,7 +37,7 @@ namespace rsgis{namespace img{
 
 	}
 
-	void RSGISImageMosaic::mosaic(std::string *inputImages, int numDS, std::string outputImage, float background, bool projFromImage, std::string proj, std::string format, GDALDataType imgDataType) throw(RSGISImageException)
+	void RSGISImageMosaic::mosaic(std::string *inputImages, int numDS, std::string outputImage, float background, bool projFromImage, std::string proj, std::string format, GDALDataType imgDataType)
 	{
 		RSGISImageUtils imgUtils;
         rsgis::math::RSGISMathsUtils mathsUtils;
@@ -203,7 +203,7 @@ namespace rsgis{namespace img{
 			std::cout << ".complete\n";
 
 		}
-		catch(RSGISImageBandException e)
+		catch(RSGISImageBandException &e)
 		{
             if(inputData != NULL)
             {
@@ -252,7 +252,7 @@ namespace rsgis{namespace img{
 		GDALClose(outputDataset);
 	}
 
-	void RSGISImageMosaic::mosaicSkipVals(std::string *inputImages, int numDS, std::string outputImage, float background, float skipVal, bool projFromImage, std::string proj, unsigned int skipBand, unsigned int overlapBehaviour, std::string format, GDALDataType imgDataType) throw(RSGISImageException)
+	void RSGISImageMosaic::mosaicSkipVals(std::string *inputImages, int numDS, std::string outputImage, float background, float skipVal, bool projFromImage, std::string proj, unsigned int skipBand, unsigned int overlapBehaviour, std::string format, GDALDataType imgDataType)
 	{
 		RSGISImageUtils imgUtils;
 		rsgis::math::RSGISMathsUtils mathsUtils;
@@ -568,7 +568,7 @@ namespace rsgis{namespace img{
 			std::cout << ".complete\n";
 
 		}
-		catch(RSGISImageBandException e)
+		catch(RSGISImageBandException &e)
 		{
             if(inputData != NULL)
             {
@@ -628,7 +628,7 @@ namespace rsgis{namespace img{
 		GDALClose(outputDataset);
 	}
 
-	void RSGISImageMosaic::mosaicSkipThresh(std::string *inputImages, int numDS, std::string outputImage, float background, float skipLowerThresh, float skipUpperThresh, bool projFromImage, std::string proj, unsigned int threshBand, unsigned int overlapBehaviour, std::string format, GDALDataType imgDataType) throw(RSGISImageException)
+	void RSGISImageMosaic::mosaicSkipThresh(std::string *inputImages, int numDS, std::string outputImage, float background, float skipLowerThresh, float skipUpperThresh, bool projFromImage, std::string proj, unsigned int threshBand, unsigned int overlapBehaviour, std::string format, GDALDataType imgDataType)
 	{
 		RSGISImageUtils imgUtils;
         rsgis::math::RSGISMathsUtils mathsUtils;
@@ -943,7 +943,7 @@ namespace rsgis{namespace img{
 			std::cout << ".complete\n";
 
 		}
-		catch(RSGISImageBandException e)
+		catch(RSGISImageBandException &e)
 		{
             if(inputData != NULL)
             {
@@ -1003,7 +1003,7 @@ namespace rsgis{namespace img{
 		GDALClose(outputDataset);
 	}
 
-	void RSGISImageMosaic::includeDatasets(GDALDataset *baseImage, std::string *inputImages, int numDS, std::vector<int> bands, bool bandsDefined) throw(RSGISImageException)
+	void RSGISImageMosaic::includeDatasets(GDALDataset *baseImage, std::string *inputImages, int numDS, std::vector<int> bands, bool bandsDefined)
 	{
 		RSGISImageUtils imgUtils;
         GDALDataset *dataset = NULL;
@@ -1224,7 +1224,7 @@ namespace rsgis{namespace img{
 			}
 			std::cout << ".complete\n";
 		}
-		catch(RSGISImageBandException e)
+		catch(RSGISImageBandException &e)
 		{
 			if(imgData != NULL)
 			{
@@ -1251,7 +1251,7 @@ namespace rsgis{namespace img{
 		}
 	}
 
-    void RSGISImageMosaic::includeDatasetsSkipVals(GDALDataset *baseImage, std::string *inputImages, int numDS, std::vector<int> bands, bool bandsDefined, float skipVal) throw(RSGISImageException)
+    void RSGISImageMosaic::includeDatasetsSkipVals(GDALDataset *baseImage, std::string *inputImages, int numDS, std::vector<int> bands, bool bandsDefined, float skipVal)
     {
         RSGISImageUtils imgUtils;
         GDALDataset *dataset = NULL;
@@ -1525,7 +1525,7 @@ namespace rsgis{namespace img{
             }
             std::cout << ".complete\n";
         }
-        catch(RSGISImageBandException e)
+        catch(RSGISImageBandException &e)
         {
             if(imgInData != NULL)
             {
@@ -1556,7 +1556,7 @@ namespace rsgis{namespace img{
         }
     }
     
-    void RSGISImageMosaic::includeDatasetsIgnoreOverlap(GDALDataset *baseImage, std::string *inputImages, int numDS, int numOverlapPxls) throw(RSGISImageException)
+    void RSGISImageMosaic::includeDatasetsIgnoreOverlap(GDALDataset *baseImage, std::string *inputImages, int numDS, int numOverlapPxls)
     {
         RSGISImageUtils imgUtils;
         GDALDataset *dataset = NULL;
@@ -1715,7 +1715,7 @@ namespace rsgis{namespace img{
             }
             std::cout << ".complete\n";
         }
-        catch(RSGISImageBandException e)
+        catch(RSGISImageBandException &e)
         {
             if(imgData != NULL)
             {
@@ -1742,7 +1742,7 @@ namespace rsgis{namespace img{
         }
     }
     
-    void RSGISImageMosaic::orderInImagesValidData(std::vector<std::string> images, std::vector<std::string> *orderedImages, float noDataValue) throw(RSGISImageException)
+    void RSGISImageMosaic::orderInImagesValidData(std::vector<std::string> images, std::vector<std::string> *orderedImages, float noDataValue)
     {
         try
         {
@@ -1834,7 +1834,7 @@ namespace rsgis{namespace img{
         this->noDataVal = noDataVal;
     }
 
-    void RSGISCountValidPixels::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+    void RSGISCountValidPixels::calcImageValue(float *bandValues, int numBands) 
     {
         bool pxlIsNoData = true;
         for(int i = 0; i < numBands; ++i)
@@ -1876,7 +1876,7 @@ namespace rsgis{namespace img{
         
     }
     
-    void RSGISCombineImgTileOverview::combineKEAImgTileOverviews(GDALDataset *baseImg, std::vector<std::string> inputImages, std::vector<int> pyraScaleVals) throw(RSGISImageException)
+    void RSGISCombineImgTileOverview::combineKEAImgTileOverviews(GDALDataset *baseImg, std::vector<std::string> inputImages, std::vector<int> pyraScaleVals)
     {
         try
         {
@@ -2150,7 +2150,7 @@ namespace rsgis{namespace img{
         this->noDataVal = noDataVal;
     }
     
-    void RSGISIncludeSingleImgCalcImgVal::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+    void RSGISIncludeSingleImgCalcImgVal::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         if((this->numOutBands*2) != numBands)
         {

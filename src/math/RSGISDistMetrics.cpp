@@ -33,12 +33,12 @@ namespace rsgis{namespace math{
         
     }
     
-    void RSGISCalcEuclideanDistMetric::init() throw(RSGISMathException)
+    void RSGISCalcEuclideanDistMetric::init()
     {
         this->initalised = true;
     }
     
-    double RSGISCalcEuclideanDistMetric::calcDist(double *vals1, size_t sIdx1, size_t eIdx1, double *vals2, size_t sIdx2, size_t eIdx2) throw(RSGISMathException)
+    double RSGISCalcEuclideanDistMetric::calcDist(double *vals1, size_t sIdx1, size_t eIdx1, double *vals2, size_t sIdx2, size_t eIdx2)
     {
         double dist = std::numeric_limits<double>::signaling_NaN();
         try
@@ -83,12 +83,12 @@ namespace rsgis{namespace math{
         
     }
     
-    void RSGISCalcManhattenDistMetric::init() throw(RSGISMathException)
+    void RSGISCalcManhattenDistMetric::init()
     {
         this->initalised = true;
     }
     
-    double RSGISCalcManhattenDistMetric::calcDist(double *vals1, size_t sIdx1, size_t eIdx1, double *vals2, size_t sIdx2, size_t eIdx2) throw(RSGISMathException)
+    double RSGISCalcManhattenDistMetric::calcDist(double *vals1, size_t sIdx1, size_t eIdx1, double *vals2, size_t sIdx2, size_t eIdx2)
     {
         double dist = std::numeric_limits<double>::signaling_NaN();
         try
@@ -132,7 +132,7 @@ namespace rsgis{namespace math{
         this->n = n;
     }
     
-    void RSGISCalcMahalanobisDistMetric::init() throw(RSGISMathException)
+    void RSGISCalcMahalanobisDistMetric::init()
     {
         this->invCovarianceMatrix = gsl_matrix_alloc(n, n);
         gsl_matrix *coVarGSL = gsl_matrix_alloc(n, n);
@@ -159,7 +159,7 @@ namespace rsgis{namespace math{
         this->initalised = true;
     }
     
-    double RSGISCalcMahalanobisDistMetric::calcDist(double *vals1, size_t sIdx1, size_t eIdx1, double *vals2, size_t sIdx2, size_t eIdx2) throw(RSGISMathException)
+    double RSGISCalcMahalanobisDistMetric::calcDist(double *vals1, size_t sIdx1, size_t eIdx1, double *vals2, size_t sIdx2, size_t eIdx2)
     {
         double dist = std::numeric_limits<double>::signaling_NaN();
         try
@@ -214,12 +214,12 @@ namespace rsgis{namespace math{
         
     }
     
-    void RSGISCalcMinkowskiDistMetric::init() throw(RSGISMathException)
+    void RSGISCalcMinkowskiDistMetric::init()
     {
         this->initalised = true;
     }
     
-    double RSGISCalcMinkowskiDistMetric::calcDist(double *vals1, size_t sIdx1, size_t eIdx1, double *vals2, size_t sIdx2, size_t eIdx2) throw(RSGISMathException)
+    double RSGISCalcMinkowskiDistMetric::calcDist(double *vals1, size_t sIdx1, size_t eIdx1, double *vals2, size_t sIdx2, size_t eIdx2)
     {
         double dist = std::numeric_limits<double>::signaling_NaN();
         try
@@ -256,12 +256,12 @@ namespace rsgis{namespace math{
         
     }
     
-    void RSGISCalcChebyshevDistMetric::init() throw(RSGISMathException)
+    void RSGISCalcChebyshevDistMetric::init()
     {
         this->initalised = true;
     }
     
-    double RSGISCalcChebyshevDistMetric::calcDist(double *vals1, size_t sIdx1, size_t eIdx1, double *vals2, size_t sIdx2, size_t eIdx2) throw(RSGISMathException)
+    double RSGISCalcChebyshevDistMetric::calcDist(double *vals1, size_t sIdx1, size_t eIdx1, double *vals2, size_t sIdx2, size_t eIdx2)
     {
         double dist = std::numeric_limits<double>::signaling_NaN();
         try

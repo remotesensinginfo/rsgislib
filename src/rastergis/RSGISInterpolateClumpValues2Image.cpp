@@ -29,7 +29,7 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    void RSGISInterpolateClumpValues2Image::interpolateImageFromClumps(GDALDataset *clumpsDataset, std::string selectField, std::string eastingsField, std::string northingsField, std::string valueField, std::string outputFile, std::string imageFormat, GDALDataType dataType, rsgis::math::RSGIS2DInterpolator *interpolator, unsigned int ratband)throw(rsgis::RSGISAttributeTableException)
+    void RSGISInterpolateClumpValues2Image::interpolateImageFromClumps(GDALDataset *clumpsDataset, std::string selectField, std::string eastingsField, std::string northingsField, std::string valueField, std::string outputFile, std::string imageFormat, GDALDataType dataType, rsgis::math::RSGIS2DInterpolator *interpolator, unsigned int ratband)
     {
         try
         {
@@ -141,7 +141,7 @@ namespace rsgis{namespace rastergis{
         this->numSelectValues = numSelectValues;
     }
     
-    void RSGISExtractPtValues::calcRATValue(size_t fid, double *inRealCols, unsigned int numInRealCols, int *inIntCols, unsigned int numInIntCols, std::string *inStringCols, unsigned int numInStringCols, double *outRealCols, unsigned int numOutRealCols, int *outIntCols, unsigned int numOutIntCols, std::string *outStringCols, unsigned int numOutStringCols) throw(RSGISAttributeTableException)
+    void RSGISExtractPtValues::calcRATValue(size_t fid, double *inRealCols, unsigned int numInRealCols, int *inIntCols, unsigned int numInIntCols, std::string *inStringCols, unsigned int numInStringCols, double *outRealCols, unsigned int numOutRealCols, int *outIntCols, unsigned int numOutIntCols, std::string *outStringCols, unsigned int numOutStringCols)
     {
         if(numInRealCols != 3)
         {

@@ -31,12 +31,12 @@ namespace rsgis{namespace vec{
 		this->mPolygons = mPolygons;
 	}
 	
-	void RSGISGEOSMultiPolygonReader::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISGEOSMultiPolygonReader::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)
 	{
 		throw RSGISVectorException("Not implemented..");
 	}
 	
-	void RSGISGEOSMultiPolygonReader::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISGEOSMultiPolygonReader::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid)
 	{
 		OGRwkbGeometryType geometryType = feature->GetGeometryRef()->getGeometryType();
 		
@@ -63,7 +63,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISGEOSMultiPolygonReader::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+	void RSGISGEOSMultiPolygonReader::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn)
 	{
 		// Nothing to do!
 	}

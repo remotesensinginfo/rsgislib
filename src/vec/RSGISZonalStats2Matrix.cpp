@@ -170,7 +170,7 @@ namespace rsgis{namespace vec{
 				}
 			}
 		}
-		catch(RSGISVectorException e)
+		catch(RSGISVectorException &e)
 		{
 			if(calcImageValue != NULL)
 			{
@@ -206,7 +206,7 @@ namespace rsgis{namespace vec{
 			
 			throw e;
 		}
-		catch(rsgis::img::RSGISImageCalcException e)
+		catch(rsgis::img::RSGISImageCalcException &e)
 		{
 			if(calcImageValue != NULL)
 			{
@@ -242,7 +242,7 @@ namespace rsgis{namespace vec{
 			
 			throw e;
 		}
-		catch(rsgis::img::RSGISImageBandException e)
+		catch(rsgis::img::RSGISImageBandException &e)
 		{
 			if(calcImageValue != NULL)
 			{
@@ -278,7 +278,7 @@ namespace rsgis{namespace vec{
 			
 			throw e;
 		}
-		catch(RSGISException e)
+		catch(RSGISException &e)
 		{
 			if(calcImageValue != NULL)
 			{
@@ -402,7 +402,7 @@ namespace rsgis{namespace vec{
 				delete calcPolyMatrix;
 			}
 		}
-		catch(RSGISVectorException e)
+		catch(RSGISVectorException &e)
 		{
 			if(polyData != NULL)
 			{
@@ -417,7 +417,7 @@ namespace rsgis{namespace vec{
 			}
 			throw e;
 		}
-		catch(rsgis::img::RSGISImageBandException e)
+		catch(rsgis::img::RSGISImageBandException &e)
 		{
 			if(polyData != NULL)
 			{
@@ -432,7 +432,7 @@ namespace rsgis{namespace vec{
 			}
 			throw e;
 		}
-		catch(RSGISException e)
+		catch(RSGISException &e)
 		{
 			if(polyData != NULL)
 			{
@@ -497,7 +497,7 @@ namespace rsgis{namespace vec{
 		
     }
 	
-	void RSGISPixelVals22Txt::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISPixelVals22Txt::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid)
 	{
 		// Zonal stats - output to text file.
 		try
@@ -622,7 +622,7 @@ namespace rsgis{namespace vec{
         this->numInBands = numInBands;
 	}
 	
-	void RSGISCalcPixelValsFromPolygon::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISCalcPixelValsFromPolygon::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) 
 	{
 		for(int i = 0; i < this->numInBands; i++)
 		{
@@ -633,7 +633,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	double* RSGISCalcPixelValsFromPolygon::getOutputValues() throw(rsgis::img::RSGISImageCalcException)
+	double* RSGISCalcPixelValsFromPolygon::getOutputValues() 
 	{
         return outputValues;
 	}

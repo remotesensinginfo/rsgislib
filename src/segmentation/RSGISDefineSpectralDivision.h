@@ -62,10 +62,10 @@ namespace rsgis{namespace segment{
     {
     public:
         RSGISDefineSpectralDivision();
-        void findSpectralDivision(GDALDataset *inData, std::string outputImage, unsigned int subDivision, float noDataVal, bool noDataValProvided, bool projFromImage, std::string proj, std::string format)throw(rsgis::img::RSGISImageCalcException);
+        void findSpectralDivision(GDALDataset *inData, std::string outputImage, unsigned int subDivision, float noDataVal, bool noDataValProvided, bool projFromImage, std::string proj, std::string format);
         ~RSGISDefineSpectralDivision();
     private:
-        void assignToCategory(GDALDataset *reflDataset, GDALDataset *catsDataset, std::vector<std::pair<float, float> > **catThresholds, unsigned int numBands, unsigned int numCats, float noDataVal, bool noDataValProvided)throw(rsgis::img::RSGISImageCalcException);
+        void assignToCategory(GDALDataset *reflDataset, GDALDataset *catsDataset, std::vector<std::pair<float, float> > **catThresholds, unsigned int numBands, unsigned int numCats, float noDataVal, bool noDataValProvided);
         void generateSpectralDivThresholds(std::pair<float, float> *pThreshold, unsigned int bandIdx, unsigned int numBands, unsigned int subDivision, std::vector<std::pair<float, float> > **bandThresholds, std::vector<std::pair<float, float> > **catThresholds);
     };
     

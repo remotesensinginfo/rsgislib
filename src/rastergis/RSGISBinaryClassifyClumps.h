@@ -88,8 +88,8 @@ namespace rsgis{namespace rastergis{
     {
     public:
         RSGISRATLogicXMLParse(){};
-        rsgis::math::RSGISLogicExpression* parseLogicXML(std::string xmlStr, std::vector<RSGISColumnLogicIdxs*> *colIdxes) throw(RSGISAttributeTableException);
-        rsgis::math::RSGISLogicExpression* createExpression(xercesc::DOMElement *expElement, std::vector<RSGISColumnLogicIdxs*> *colIdxes) throw(RSGISAttributeTableException);
+        rsgis::math::RSGISLogicExpression* parseLogicXML(std::string xmlStr, std::vector<RSGISColumnLogicIdxs*> *colIdxes);
+        rsgis::math::RSGISLogicExpression* createExpression(xercesc::DOMElement *expElement, std::vector<RSGISColumnLogicIdxs*> *colIdxes);
         ~RSGISRATLogicXMLParse(){};
     };
     
@@ -97,7 +97,7 @@ namespace rsgis{namespace rastergis{
     {
     public:
         RSGISBinaryClassifyClumps();
-        void classifyClumps(GDALDataset *inputClumps, unsigned int ratBand, std::string xmlBlock, std::string outColumn)throw(RSGISAttributeTableException);
+        void classifyClumps(GDALDataset *inputClumps, unsigned int ratBand, std::string xmlBlock, std::string outColumn);
         ~RSGISBinaryClassifyClumps();
     };
     
@@ -106,7 +106,7 @@ namespace rsgis{namespace rastergis{
     {
     public:
         RSGISBinaryClumpClassifier(std::vector<rsgis::rastergis::RSGISColumnLogicIdxs*> *colIdxes, rsgis::math::RSGISLogicExpression *exp);
-        void calcRATValue(size_t fid, double *inRealCols, unsigned int numInRealCols, int *inIntCols, unsigned int numInIntCols, std::string *inStringCols, unsigned int numInStringCols, double *outRealCols, unsigned int numOutRealCols, int *outIntCols, unsigned int numOutIntCols, std::string *outStringCols, unsigned int numOutStringCols) throw(RSGISAttributeTableException);
+        void calcRATValue(size_t fid, double *inRealCols, unsigned int numInRealCols, int *inIntCols, unsigned int numInIntCols, std::string *inStringCols, unsigned int numInStringCols, double *outRealCols, unsigned int numOutRealCols, int *outIntCols, unsigned int numOutIntCols, std::string *outStringCols, unsigned int numOutStringCols);
         ~RSGISBinaryClumpClassifier();
     protected:
         std::vector<rsgis::rastergis::RSGISColumnLogicIdxs*> *colIdxes;

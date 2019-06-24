@@ -39,7 +39,7 @@
 
 namespace rsgis{ namespace cmds {
     
-    void executeCollapseRAT2Class(std::string clumpsImage, std::string outputImage, std::string outImageFormat, std::string classColumn, std::string classIntCol, bool useIntCol)throw(RSGISCmdException)
+    void executeCollapseRAT2Class(std::string clumpsImage, std::string outputImage, std::string outImageFormat, std::string classColumn, std::string classIntCol, bool useIntCol)
     {
         try
         {
@@ -71,7 +71,7 @@ namespace rsgis{ namespace cmds {
         }
     }
             
-    void executeGenerate3BandFromColourTable(std::string clumpsImage, std::string outputImage, std::string outImageFormat)throw(RSGISCmdException)
+    void executeGenerate3BandFromColourTable(std::string clumpsImage, std::string outputImage, std::string outImageFormat)
     {
         try
         {
@@ -116,7 +116,7 @@ namespace rsgis{ namespace cmds {
     }
     
     
-    void executeGenerateRandomAccuracyPts(std::string classImage, std::string outputShp, std::string classImgCol, std::string classImgVecCol, std::string classRefVecCol, unsigned int numPts, unsigned int seed, bool force)throw(RSGISCmdException)
+    void executeGenerateRandomAccuracyPts(std::string classImage, std::string outputShp, std::string classImgCol, std::string classImgVecCol, std::string classRefVecCol, unsigned int numPts, unsigned int seed, bool force)
     {
         try
         {
@@ -199,7 +199,7 @@ namespace rsgis{ namespace cmds {
     }
 
     
-    void executeGenerateStratifiedRandomAccuracyPts(std::string classImage, std::string outputShp, std::string classImgCol, std::string classImgVecCol, std::string classRefVecCol, unsigned int numPtsPerClass, unsigned int seed, bool force, bool usePxlLst)throw(RSGISCmdException)
+    void executeGenerateStratifiedRandomAccuracyPts(std::string classImage, std::string outputShp, std::string classImgCol, std::string classImgVecCol, std::string classRefVecCol, unsigned int numPtsPerClass, unsigned int seed, bool force, bool usePxlLst)
     {
         try
         {
@@ -288,7 +288,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void executePopClassInfoAccuracyPts(std::string classImage, std::string shpFile, std::string classImgCol, std::string classImgVecCol, std::string classRefVecCol, bool addRefCol)throw(RSGISCmdException)
+    void executePopClassInfoAccuracyPts(std::string classImage, std::string shpFile, std::string classImgCol, std::string classImgVecCol, std::string classRefVecCol, bool addRefCol)
     {
         try
         {

@@ -45,7 +45,7 @@ namespace rsgis{namespace math{
 	 * Area calculating only works with positive y values!
 	 *
 	 */
-	double TrapeziumIntegration::calcArea(double min, double max, bool total) throw(RSGISMathException)
+	double TrapeziumIntegration::calcArea(double min, double max, bool total)
 	{
 		if(segmentAreas != NULL)
 		{
@@ -123,7 +123,7 @@ namespace rsgis{namespace math{
 	 * Area calculating only works with positive y values!
 	 *
 	 */
-	double TrapeziumIntegration::calcTrapziumArea(point2D bl, point2D tl, point2D tr, point2D br) throw(RSGISMathException)
+	double TrapeziumIntegration::calcTrapziumArea(point2D bl, point2D tl, point2D tr, point2D br)
 	{
 		if(bl.y < 0 | tl.y < 0 | br.y < 0 | tr.y < 0)
 		{
@@ -162,7 +162,7 @@ namespace rsgis{namespace math{
 		return area;
 	}
 	
-	double TrapeziumIntegration::calcValue4Area(double area) throw(RSGISMathException)
+	double TrapeziumIntegration::calcValue4Area(double area)
 	{
 		if(!totalCalulated)
 		{
@@ -189,7 +189,7 @@ namespace rsgis{namespace math{
 		return (areaMin + (index * division));
 	}
 	
-	double TrapeziumIntegration::calcValue4ProportionArea(double propArea) throw(RSGISMathException)
+	double TrapeziumIntegration::calcValue4ProportionArea(double propArea)
 	{
 		if(!totalCalulated)
 		{
@@ -202,7 +202,7 @@ namespace rsgis{namespace math{
 		
 	}
 	
-	double TrapeziumIntegration::calcMaxValue()throw(RSGISMathException)
+	double TrapeziumIntegration::calcMaxValue()
 	{
 		if(!totalCalulated)
 		{
@@ -229,7 +229,7 @@ namespace rsgis{namespace math{
 		return (areaMin + (maxSegment * division));
 	}
 	
-	void TrapeziumIntegration::getUpperLowerValues(double lower, double upper, double prob)throw(RSGISMathException)
+	void TrapeziumIntegration::getUpperLowerValues(double lower, double upper, double prob)
 	{
 		if(!totalCalulated)
 		{

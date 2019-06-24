@@ -33,13 +33,13 @@ namespace rsgis{namespace img{
 		this->numVal = 0;
 	}
 	
-	void RSGISCalcRMSE::calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) throw(RSGISImageCalcException)
+	void RSGISCalcRMSE::calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) 
 	{
 		this->sumSqDiff = this->sumSqDiff + (bandValuesImageA[bandA] - bandValuesImageB[bandB])*(bandValuesImageA[bandA] - bandValuesImageB[bandB]);
 		this->numVal++;
 	}
 	
-	double* RSGISCalcRMSE::getOutputValues() throw(RSGISImageCalcException)
+	double* RSGISCalcRMSE::getOutputValues() 
 	{
 		rmseReturn[0] = sqrt(sumSqDiff / numVal);
 		return rmseReturn;

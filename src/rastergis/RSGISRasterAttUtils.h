@@ -167,32 +167,32 @@ namespace rsgis{namespace rastergis{
     {
     public:
         RSGISRasterAttUtils();
-        void copyAttColumns(GDALDataset *inImage, GDALDataset *outImage, std::vector<std::string> fields,  bool copyColours=true, bool copyHist=true, int ratBand=1) throw(RSGISAttributeTableException);
-        void copyAttColumnsWithOff(GDALRasterAttributeTable *inRAT, GDALRasterAttributeTable *outRAT, std::vector<std::string> fields, unsigned int offset, bool ignoreFirstRow=true, bool copyColours=true, bool copyHist=true) throw(RSGISAttributeTableException);
-        void copyColourForCats(GDALDataset *catsImage, GDALDataset *classImage, std::string classField) throw(RSGISAttributeTableException);
-        void exportColumns2ASCII(GDALDataset *inImage, std::string outputFile, std::vector<std::string> fields, int ratBand=1) throw(RSGISAttributeTableException);
-        void translateClasses(GDALDataset *inImage, std::string classInField, std::string classOutField, std::map<size_t, size_t> classPairs) throw(RSGISAttributeTableException);
-        void applyClassColours(GDALDataset *inImage, std::string classInField, std::map<size_t, rsgis::utils::RSGISColourInt> classColoursPairs, int ratBand=1) throw(RSGISAttributeTableException);
-        void applyClassStrColours(GDALDataset *inImage, std::string classInField, std::map<std::string, rsgis::utils::RSGISColourInt> classColoursPairs, int ratBand=1) throw(RSGISAttributeTableException);
-        unsigned int findColumnIndex(const GDALRasterAttributeTable *gdalATT, std::string colName) throw(RSGISAttributeTableException);
-        unsigned int findColumnIndexOrCreate(GDALRasterAttributeTable *gdalATT, std::string colName, GDALRATFieldType dType, GDALRATFieldUsage dUsage=GFU_Generic) throw(RSGISAttributeTableException);
-        double readDoubleColumnVal(const GDALRasterAttributeTable *gdalATT, std::string colName, unsigned int row) throw(RSGISAttributeTableException);
-        long readIntColumnVal(const GDALRasterAttributeTable *gdalATT, std::string colName, unsigned int row) throw(RSGISAttributeTableException);
-        std::string readStringColumnVal(const GDALRasterAttributeTable *gdalATT, std::string colName, unsigned int row) throw(RSGISAttributeTableException);
-        double* readDoubleColumn(GDALRasterAttributeTable *attTable, std::string colName, size_t *colLen) throw(RSGISAttributeTableException);
-        int* readIntColumn(GDALRasterAttributeTable *attTable, std::string colName, size_t *colLen) throw(RSGISAttributeTableException);
-        char** readStrColumn(GDALRasterAttributeTable *attTable, std::string colName, size_t *colLen) throw(RSGISAttributeTableException);
-        std::string* readStrColumnStdStr(GDALRasterAttributeTable *attTable, std::string colName, size_t *colLen) throw(RSGISAttributeTableException);
-        std::vector<double>* readDoubleColumnAsVec(GDALRasterAttributeTable *attTable, std::string colName) throw(RSGISAttributeTableException);
-        std::vector<int>* readIntColumnAsVec(GDALRasterAttributeTable *attTable, std::string colName) throw(RSGISAttributeTableException);
-        std::vector<std::string>* readStrColumnAsVec(GDALRasterAttributeTable *attTable, std::string colName) throw(RSGISAttributeTableException);
-        std::vector<std::vector<size_t>* >* getRATNeighbours(GDALDataset *clumpImage, unsigned int ratBand) throw(RSGISAttributeTableException);
-        void writeStrColumn(GDALRasterAttributeTable *attTable, std::string colName, std::string *strDataVal, size_t colLen) throw(RSGISAttributeTableException);
-        void writeIntColumn(GDALRasterAttributeTable *attTable, std::string colName, int *intDataVal, size_t colLen) throw(RSGISAttributeTableException);
-        void writeRealColumn(GDALRasterAttributeTable *attTable, std::string colName, double *realDataVal, size_t colLen) throw(RSGISAttributeTableException);
-        std::vector<RSGISRATCol>* getRatColumnsList(GDALRasterAttributeTable *gdalATT) throw(RSGISAttributeTableException);
-        std::vector<RSGISRATCol>* getVectorColumns(OGRLayer *layer, bool ignoreErr=false) throw(RSGISAttributeTableException);
-        void getImageBandMinMax(GDALDataset *inImage, int band, long *minVal, long *maxVal) throw(RSGISAttributeTableException);
+        void copyAttColumns(GDALDataset *inImage, GDALDataset *outImage, std::vector<std::string> fields,  bool copyColours=true, bool copyHist=true, int ratBand=1);
+        void copyAttColumnsWithOff(GDALRasterAttributeTable *inRAT, GDALRasterAttributeTable *outRAT, std::vector<std::string> fields, unsigned int offset, bool ignoreFirstRow=true, bool copyColours=true, bool copyHist=true);
+        void copyColourForCats(GDALDataset *catsImage, GDALDataset *classImage, std::string classField);
+        void exportColumns2ASCII(GDALDataset *inImage, std::string outputFile, std::vector<std::string> fields, int ratBand=1);
+        void translateClasses(GDALDataset *inImage, std::string classInField, std::string classOutField, std::map<size_t, size_t> classPairs);
+        void applyClassColours(GDALDataset *inImage, std::string classInField, std::map<size_t, rsgis::utils::RSGISColourInt> classColoursPairs, int ratBand=1);
+        void applyClassStrColours(GDALDataset *inImage, std::string classInField, std::map<std::string, rsgis::utils::RSGISColourInt> classColoursPairs, int ratBand=1);
+        unsigned int findColumnIndex(const GDALRasterAttributeTable *gdalATT, std::string colName);
+        unsigned int findColumnIndexOrCreate(GDALRasterAttributeTable *gdalATT, std::string colName, GDALRATFieldType dType, GDALRATFieldUsage dUsage=GFU_Generic);
+        double readDoubleColumnVal(const GDALRasterAttributeTable *gdalATT, std::string colName, unsigned int row);
+        long readIntColumnVal(const GDALRasterAttributeTable *gdalATT, std::string colName, unsigned int row);
+        std::string readStringColumnVal(const GDALRasterAttributeTable *gdalATT, std::string colName, unsigned int row);
+        double* readDoubleColumn(GDALRasterAttributeTable *attTable, std::string colName, size_t *colLen);
+        int* readIntColumn(GDALRasterAttributeTable *attTable, std::string colName, size_t *colLen);
+        char** readStrColumn(GDALRasterAttributeTable *attTable, std::string colName, size_t *colLen);
+        std::string* readStrColumnStdStr(GDALRasterAttributeTable *attTable, std::string colName, size_t *colLen);
+        std::vector<double>* readDoubleColumnAsVec(GDALRasterAttributeTable *attTable, std::string colName);
+        std::vector<int>* readIntColumnAsVec(GDALRasterAttributeTable *attTable, std::string colName);
+        std::vector<std::string>* readStrColumnAsVec(GDALRasterAttributeTable *attTable, std::string colName);
+        std::vector<std::vector<size_t>* >* getRATNeighbours(GDALDataset *clumpImage, unsigned int ratBand);
+        void writeStrColumn(GDALRasterAttributeTable *attTable, std::string colName, std::string *strDataVal, size_t colLen);
+        void writeIntColumn(GDALRasterAttributeTable *attTable, std::string colName, int *intDataVal, size_t colLen);
+        void writeRealColumn(GDALRasterAttributeTable *attTable, std::string colName, double *realDataVal, size_t colLen);
+        std::vector<RSGISRATCol>* getRatColumnsList(GDALRasterAttributeTable *gdalATT);
+        std::vector<RSGISRATCol>* getVectorColumns(OGRLayer *layer, bool ignoreErr=false);
+        void getImageBandMinMax(GDALDataset *inImage, int band, long *minVal, long *maxVal);
         ~RSGISRasterAttUtils();
     };
     
@@ -201,7 +201,7 @@ namespace rsgis{namespace rastergis{
     {
     public:
         RSGISCalcImgMinMax(long *minVal, long *maxVal, unsigned int band);
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException);
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals);
         ~RSGISCalcImgMinMax();
     private:
         long *minVal;

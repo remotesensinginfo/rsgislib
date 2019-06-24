@@ -54,7 +54,7 @@ namespace rsgis{namespace vec{
 			void readPoint(OGRPoint *point);
 			void printGeometry();
 			virtual void readAttribtues(OGRFeature *feature, OGRFeatureDefn *featDefn)=0;
-			virtual void createLayerDefinition(OGRLayer *layer)throw(RSGISVectorOutputException)=0;
+			virtual void createLayerDefinition(OGRLayer *layer)=0;
 			virtual void populateFeature(OGRFeature *feature, OGRFeatureDefn *featDefn)=0;
 			double distance(RSGISPolygonData *data);
 			double distance(RSGISPointData *data);

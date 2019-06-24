@@ -29,7 +29,7 @@ namespace rsgis{namespace segment{
         
     }
         
-    void RSGISRandomColourClumps::generateRandomColouredClump(GDALDataset *clumps, GDALDataset *colourImg, std::string inputLUTFile, bool importLUT, std::string exportLUTFile, bool exportLUT) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISRandomColourClumps::generateRandomColouredClump(GDALDataset *clumps, GDALDataset *colourImg, std::string inputLUTFile, bool importLUT, std::string exportLUTFile, bool exportLUT) 
     {
         if(clumps->GetRasterXSize() != colourImg->GetRasterXSize())
         {
@@ -143,7 +143,7 @@ namespace rsgis{namespace segment{
         delete clumpTab;
     }
     
-    std::vector<ImgClumpRGB*>* RSGISRandomColourClumps::importLUTFromFile(std::string inFile) throw(rsgis::utils::RSGISTextException)
+    std::vector<ImgClumpRGB*>* RSGISRandomColourClumps::importLUTFromFile(std::string inFile)
     {
         std::vector<ImgClumpRGB*> *clumpTab = new std::vector<ImgClumpRGB*>();
         try 
@@ -186,7 +186,7 @@ namespace rsgis{namespace segment{
         return clumpTab;
     }
     
-    void RSGISRandomColourClumps::exportLUT2File(std::string outFile, std::vector<ImgClumpRGB*> *clumpTab) throw(rsgis::utils::RSGISTextException)
+    void RSGISRandomColourClumps::exportLUT2File(std::string outFile, std::vector<ImgClumpRGB*> *clumpTab)
     {
         try 
         {

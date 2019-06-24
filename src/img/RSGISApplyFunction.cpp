@@ -30,7 +30,7 @@ namespace rsgis{namespace img{
 		this->imagefunction = imagefunction;
 		this->ignoreVal = ignoreVal;
 	}
-	void RSGISApplySingleVarFunction::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+	void RSGISApplySingleVarFunction::calcImageValue(float *bandValues, int numBands, double *output) 
 	{
 		if (bandValues[0] != ignoreVal) 
 		{
@@ -52,7 +52,7 @@ namespace rsgis{namespace img{
 		this->imagefunction = imagefunction;
 		this->ignoreVal = ignoreVal;
 	}
-	void RSGISApplyTwoVarFunction::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+	void RSGISApplyTwoVarFunction::calcImageValue(float *bandValues, int numBands, double *output) 
 	{
 		if ((bandValues[0] != ignoreVal) && (bandValues[1] != ignoreVal)) 
 		{
@@ -74,7 +74,7 @@ namespace rsgis{namespace img{
 		this->imagefunction = imagefunction;
 		this->ignoreVal = ignoreVal;
 	}
-	void RSGISApplyThreeVarFunction::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+	void RSGISApplyThreeVarFunction::calcImageValue(float *bandValues, int numBands, double *output) 
 	{
 		if ((bandValues[0] != ignoreVal) && (bandValues[1] != ignoreVal) && (bandValues[2] != ignoreVal)) 
 		{

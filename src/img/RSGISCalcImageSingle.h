@@ -60,11 +60,11 @@ namespace rsgis{namespace img{
 		{
 		public:
 			RSGISCalcImageSingle(RSGISCalcImageSingleValue *valueCalc);
-			void calcImage(GDALDataset **datasetsA, GDALDataset **datasetsB, int numDS, double *outputValue, int bandA, int bandB) throw(RSGISImageCalcException,RSGISImageBandException);
-			void calcImage(GDALDataset **datasetsA, int numDS, double *outputValue, int band) throw(RSGISImageCalcException,RSGISImageBandException);
-			void calcImageWindow(GDALDataset **datasetsA, int numDS, double *outputValue) throw(RSGISImageCalcException,RSGISImageBandException);
-			void calcImageWithinPolygon(GDALDataset **datasets, int numDS, double *outputValue, geos::geom::Envelope *env, geos::geom::Polygon *poly, bool output, pixelInPolyOption pixelPolyOption) throw(RSGISImageCalcException,RSGISImageBandException);
-			void calcImageWithinRasterPolygon(GDALDataset **datasets, int numDS, double *outputValue, geos::geom::Envelope *env, long fid, bool output) throw(RSGISImageCalcException,RSGISImageBandException);
+			void calcImage(GDALDataset **datasetsA, GDALDataset **datasetsB, int numDS, double *outputValue, int bandA, int bandB);
+			void calcImage(GDALDataset **datasetsA, int numDS, double *outputValue, int band);
+			void calcImageWindow(GDALDataset **datasetsA, int numDS, double *outputValue);
+			void calcImageWithinPolygon(GDALDataset **datasets, int numDS, double *outputValue, geos::geom::Envelope *env, geos::geom::Polygon *poly, bool output, pixelInPolyOption pixelPolyOption);
+			void calcImageWithinRasterPolygon(GDALDataset **datasets, int numDS, double *outputValue, geos::geom::Envelope *env, long fid, bool output);
 			RSGISCalcImageSingleValue* getRSGISCalcImageSingleValue();
 			virtual ~RSGISCalcImageSingle();
 		protected:

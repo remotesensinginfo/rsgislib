@@ -30,7 +30,7 @@ namespace rsgis{namespace img{
         
     }
     
-    void RSGISImgSummaryStatsFromMultiResImgs::calcSummaryStats4LowResPxlsFromHighResImg(GDALDataset *refDataset, GDALDataset *statsDataset, unsigned int statsImgBand, std::string outImg, std::string gdalFormat, GDALDataType gdalDataType, bool useNoData, std::vector<rsgis::math::rsgissummarytype> sumStats, unsigned int xIOGrid, unsigned int yIOGrid) throw(RSGISImageException)
+    void RSGISImgSummaryStatsFromMultiResImgs::calcSummaryStats4LowResPxlsFromHighResImg(GDALDataset *refDataset, GDALDataset *statsDataset, unsigned int statsImgBand, std::string outImg, std::string gdalFormat, GDALDataType gdalDataType, bool useNoData, std::vector<rsgis::math::rsgissummarytype> sumStats, unsigned int xIOGrid, unsigned int yIOGrid)
     {
         try
         {
@@ -63,7 +63,7 @@ namespace rsgis{namespace img{
         this->sumStats = sumStats;
     }
     
-    void RSGISCalcHighResImgSummaryStats::calcImageValue(float *bandValues, int numInVals, bool useNoData, float noDataVal, double *output) throw(RSGISImageCalcException)
+    void RSGISCalcHighResImgSummaryStats::calcImageValue(float *bandValues, int numInVals, bool useNoData, float noDataVal, double *output) 
     {
         if(this->sumStats.size() != this->getNumOutBands())
         {

@@ -24,7 +24,7 @@
 
 namespace rsgis{namespace math{
 	
-	RSGISBaysianStatsPrior::RSGISBaysianStatsPrior(RSGISMathFunction *function, RSGISProbDistro *probDist, double variance, double interval, double minVal, double maxVal, double lowerLimit, double upperLimit, deltatypedef deltatype) throw(RSGISBaysianStatsException)
+	RSGISBaysianStatsPrior::RSGISBaysianStatsPrior(RSGISMathFunction *function, RSGISProbDistro *probDist, double variance, double interval, double minVal, double maxVal, double lowerLimit, double upperLimit, deltatypedef deltatype)
 	{
 		this->variance = variance;
 		this->interval = interval;
@@ -45,7 +45,7 @@ namespace rsgis{namespace math{
 	 *
 	 */
 	
-	double* RSGISBaysianStatsPrior::calcImageValuePrior(float value) throw(RSGISBaysianStatsException)
+	double* RSGISBaysianStatsPrior::calcImageValuePrior(float value)
 	{
 		/***
 		 * Calculates the maximum likelyhood of B given A.

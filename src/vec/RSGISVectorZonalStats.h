@@ -63,9 +63,9 @@ namespace rsgis{namespace vec{
 	{
 	public:
 		RSGISVectorZonalStats(GDALDataset *image, std::string outZonalFileName = "", bool useBandNames = false, bool shortenFileNames = true);
-		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-		virtual void processFeature(OGRFeature *inFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-		virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
+		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid);
+		virtual void processFeature(OGRFeature *inFeature, geos::geom::Envelope *env, long fid);
+		virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn);
 		float* getPixelColumns(int xPxl, int yPxl);
 		virtual ~RSGISVectorZonalStats();
 	private:

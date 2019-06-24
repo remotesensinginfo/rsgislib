@@ -56,7 +56,7 @@ namespace rsgis{namespace math{
 				this->func = func;
 				this->maximise = maximise;
 			}
-			virtual Coordinate* optimise(geos::geom::Coordinate *coord, double step, geos::geom::Envelope *boundary) throw(RSGISOptimisationException) = 0;
+			virtual Coordinate* optimise(geos::geom::Coordinate *coord, double step, geos::geom::Envelope *boundary) = 0;
 			virtual ~RSGISOptimiser2D(){};
 		protected:
 			RSGISOptimisationFunction *func;

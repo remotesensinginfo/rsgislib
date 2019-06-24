@@ -29,7 +29,7 @@ namespace rsgis{namespace filter{
 		this->calcFilter = calcFilter;
 	}
 	
-	ImageFilter* RSGISGenerateFilter::generateFilter(int size)throw(RSGISImageFilterException)
+	ImageFilter* RSGISGenerateFilter::generateFilter(int size)
 	{
 		if(size % 2 == 0)
 		{

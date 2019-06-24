@@ -32,17 +32,17 @@ namespace rsgis{namespace img{
 		this->threshold = threshold;
 	}
 	
-	void RSGISCreatePixelPolygons::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+	void RSGISCreatePixelPolygons::calcImageValue(float *bandValues, int numBands, double *output) 
 	{
 		throw RSGISImageCalcException("Not Implemented");
 	}
 	
-	void RSGISCreatePixelPolygons::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+	void RSGISCreatePixelPolygons::calcImageValue(float *bandValues, int numBands) 
 	{
 		throw RSGISImageCalcException("Not Implemented");
 	}
 	
-	void RSGISCreatePixelPolygons::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException)
+	void RSGISCreatePixelPolygons::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) 
 	{
 		if(bandValues[0] < threshold)
 		{
@@ -50,17 +50,17 @@ namespace rsgis{namespace img{
 		}
 	}
 	
-	void RSGISCreatePixelPolygons::calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) throw(RSGISImageCalcException)
+	void RSGISCreatePixelPolygons::calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) 
 	{
 		throw RSGISImageCalcException("Not Implemented");
 	}
 	
-	void RSGISCreatePixelPolygons::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException)
+	void RSGISCreatePixelPolygons::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
 	{
 		throw RSGISImageCalcException("Not Implemented");
 	}
 	
-	bool RSGISCreatePixelPolygons::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException)
+	bool RSGISCreatePixelPolygons::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) 
 	{
 		throw RSGISImageCalcException("Not Implemented");
 	}

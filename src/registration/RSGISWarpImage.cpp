@@ -38,7 +38,7 @@ namespace rsgis{namespace reg{
 		gcps = new std::vector<RSGISGCPImg2MapNode*>();
 	}
 	
-	void RSGISWarpImage::performWarp() throw(RSGISImageWarpException)
+	void RSGISWarpImage::performWarp()
 	{
 		try 
 		{
@@ -57,7 +57,7 @@ namespace rsgis{namespace reg{
 		}
 	}
     
-    void RSGISWarpImage::generateTransformImage() throw(RSGISImageWarpException)
+    void RSGISWarpImage::generateTransformImage()
 	{
 		try 
 		{
@@ -76,7 +76,7 @@ namespace rsgis{namespace reg{
 		}
 	}
 	
-	void RSGISWarpImage::readGCPFile() throw(RSGISImageWarpException)
+	void RSGISWarpImage::readGCPFile()
 	{
         rsgis::utils::RSGISTextUtils textUtils;
         rsgis::math::RSGISMathsUtils mathUtils;
@@ -126,7 +126,7 @@ namespace rsgis{namespace reg{
 		}
 	}
 	
-	void RSGISWarpImage::createOutputImage() throw(RSGISImageWarpException)
+	void RSGISWarpImage::createOutputImage()
 	{
         rsgis::img::RSGISImageUtils imgUtils;
 
@@ -166,7 +166,7 @@ namespace rsgis{namespace reg{
 		} 
 	}
     
-    void RSGISWarpImage::createOutputTransformImage() throw(RSGISImageWarpException)
+    void RSGISWarpImage::createOutputTransformImage()
 	{
         rsgis::img::RSGISImageUtils imgUtils;
         
@@ -204,7 +204,7 @@ namespace rsgis{namespace reg{
 		} 
 	}
 	
-	void RSGISWarpImage::populateOutputImage() throw(RSGISImageWarpException)
+	void RSGISWarpImage::populateOutputImage()
 	{
         rsgis::img::RSGISImageUtils imgUtils;
 		
@@ -370,7 +370,7 @@ namespace rsgis{namespace reg{
 		} 
 	}
     
-    void RSGISWarpImage::populateTransformImage() throw(RSGISImageWarpException)
+    void RSGISWarpImage::populateTransformImage()
 	{
 		rsgis::img::RSGISImageUtils imgUtils;
 		

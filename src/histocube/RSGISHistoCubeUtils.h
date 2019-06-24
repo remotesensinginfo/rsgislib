@@ -56,7 +56,7 @@ namespace rsgis {namespace histocube{
     {
     public:
         RSGISHistoCubeUtils();
-        long getBinsIndex(int val, std::vector<int> bins) throw(rsgis::RSGISHistoCubeException);
+        long getBinsIndex(int val, std::vector<int> bins);
         ~RSGISHistoCubeUtils();
     };
     

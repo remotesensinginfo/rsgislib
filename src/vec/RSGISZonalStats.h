@@ -145,36 +145,32 @@ namespace rsgis
 			{
 			public:
 				ZonalStats();
-				void zonalStatsVector(GDALDataset *image, OGRLayer *vector, bool **toCalc,  OGRLayer *outputSHPLayer) throw(RSGISVectorZonalException,RSGISVectorOutputException);
-				void zonalStats(GDALDataset *image, OGRLayer *vector, bool **toCalc,  OGRLayer *outputSHPLayer)  throw(RSGISVectorZonalException,RSGISVectorOutputException);
-				void zonalStatsRaster(GDALDataset *image, GDALDataset *rasterFeatures, OGRLayer *inputLayer, OGRLayer *outputLayer, bool **toCalc) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException, RSGISVectorOutputException);
-				void zonalStatsRaster2txt(GDALDataset *image, GDALDataset *rasterFeatures, OGRLayer *inputLayer, std::string outputTxt, bool **toCalc) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException);
-                void zonalStatsFeatsVectorLyr(GDALDataset *image, OGRLayer *vecLyr, std::vector<ZonalBandAttrs> *zonalBandAtts, rsgis::img::pixelInPolyOption pixelInPolyMethod) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException);
+				void zonalStatsVector(GDALDataset *image, OGRLayer *vector, bool **toCalc,  OGRLayer *outputSHPLayer);
+				void zonalStats(GDALDataset *image, OGRLayer *vector, bool **toCalc,  OGRLayer *outputSHPLayer);
+				void zonalStatsRaster(GDALDataset *image, GDALDataset *rasterFeatures, OGRLayer *inputLayer, OGRLayer *outputLayer, bool **toCalc);
+				void zonalStatsRaster2txt(GDALDataset *image, GDALDataset *rasterFeatures, OGRLayer *inputLayer, std::string outputTxt, bool **toCalc);
+                void zonalStatsFeatsVectorLyr(GDALDataset *image, OGRLayer *vecLyr, std::vector<ZonalBandAttrs> *zonalBandAtts, rsgis::img::pixelInPolyOption pixelInPolyMethod);
                 ~ZonalStats();
 			protected:
-                void addVecLyrDefn(OGRLayer *vecLyr, std::vector<ZonalBandAttrs> *zonalBandAtts) throw(RSGISVectorOutputException);
-				void createOutputSHPDefinition(OGRLayer *inputSHPLayer, OGRLayer *outputSHPLayer, bool **toCalc, int numBands) throw(RSGISVectorOutputException);
-				void createOutputSHPDefinition(OGRLayer *outputSHPLayer, classzonalstats** attributes, int numAttributes, OGRFeatureDefn *inLayerDef) throw(RSGISVectorOutputException);
-				void outputData2SHP(OGRLayer *inputLayer, OGRLayer *outputSHPLayer, int featureFieldCount, bool **toCalc, int numBands, imagestats **stats) throw(RSGISVectorOutputException);
-				void calcImageStats(GDALDataset *image, OGRPolygon *polygon, imagestats *stats) throw(RSGISVectorZonalException);
-				void calcImageStats(GDALDataset *image, RSGISZonalPolygons *polygon) throw(RSGISVectorZonalException);
-				void outputData2Text(std::string outputTxt, bool **toCalc, imagestats **stats, int numFeatures, int numAttributes) throw(rsgis::utils::RSGISTextException);
+                void addVecLyrDefn(OGRLayer *vecLyr, std::vector<ZonalBandAttrs> *zonalBandAtts);
+				void createOutputSHPDefinition(OGRLayer *inputSHPLayer, OGRLayer *outputSHPLayer, bool **toCalc, int numBands);
+				void createOutputSHPDefinition(OGRLayer *outputSHPLayer, classzonalstats** attributes, int numAttributes, OGRFeatureDefn *inLayerDef);
+				void outputData2SHP(OGRLayer *inputLayer, OGRLayer *outputSHPLayer, int featureFieldCount, bool **toCalc, int numBands, imagestats **stats);
+				void calcImageStats(GDALDataset *image, OGRPolygon *polygon, imagestats *stats);
+				void calcImageStats(GDALDataset *image, RSGISZonalPolygons *polygon);
+				void outputData2Text(std::string outputTxt, bool **toCalc, imagestats **stats, int numFeatures, int numAttributes);
 			};
 		
 		class DllExport RSGISCalcZonalStatsFromRaster : public rsgis::img::RSGISCalcImageValue
 			{
 			public: 
 				RSGISCalcZonalStatsFromRaster(int numberOutBands, imagestats **stats, int numInBands, int numFeatures, bool stddev);
-				void calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException);
-				void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException);
-                void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
-                void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
-				void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent)throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
-                void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException);
-				void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException);
-				void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException);
-                void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
-				bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException);
+				void calcImageValue(float *bandValues, int numBands, double *output);
+				void calcImageValue(float *bandValues, int numBands);
+                void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent);
+				void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent);
+				void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output);
+				bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output);
 				void setStdDev(bool stddev);
 				virtual ~RSGISCalcZonalStatsFromRaster();
 			protected:
@@ -193,9 +189,9 @@ namespace rsgis
 			 */
 		public:
 			RSGISZonalStats(GDALDataset *image, GDALDataset *rasterFeatures, ZonalAttributes** attributes, int numAttributes, bool outPxlCount, std::string outZonalFileName = "");
-			virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-			virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-			virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
+			virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid);
+			virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid);
+			virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn);
 			virtual ~RSGISZonalStats();
 		protected:
 			GDALDataset **datasets;
@@ -235,11 +231,11 @@ namespace rsgis
 			 */
 		public: 
 			RSGISCalcZonalStatsFromRasterPolygon(int numOutputValues, ZonalAttributes **attributes, int numAttributes);
-			void calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("RSGISCalcZonalStatsFromRasterPolygon: Not Implemented");};
-			void calcImageValue(float *bandValuesImage, int numBands, int band) throw(rsgis::img::RSGISImageCalcException);
-			void calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("RSGISCalcZonalStatsFromRasterPolygon: Not Implemented");};
-			void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("RSGISCalcZonalStatsFromRasterPolygon: Not Implemented");};
-			double* getOutputValues() throw(rsgis::img::RSGISImageCalcException);
+			void calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) {throw rsgis::img::RSGISImageCalcException("RSGISCalcZonalStatsFromRasterPolygon: Not Implemented");};
+			void calcImageValue(float *bandValuesImage, int numBands, int band);
+			void calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) {throw rsgis::img::RSGISImageCalcException("RSGISCalcZonalStatsFromRasterPolygon: Not Implemented");};
+			void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) {throw rsgis::img::RSGISImageCalcException("RSGISCalcZonalStatsFromRasterPolygon: Not Implemented");};
+			double* getOutputValues();
 			void reset();
 			~RSGISCalcZonalStatsFromRasterPolygon();
 		protected:
@@ -258,9 +254,9 @@ namespace rsgis
 			 */
 		public:
 			RSGISZonalStatsPoly(GDALDataset *image, ZonalAttributes** attributes, int numAttributes, bool outPxlCount, rsgis::img::pixelInPolyOption method, std::string outZonalFileName = "");
-			virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-			virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-			virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
+			virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid);
+			virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid);
+			virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn);
 			virtual ~RSGISZonalStatsPoly();
 		protected:
 			GDALDataset **datasets;
@@ -301,11 +297,11 @@ namespace rsgis
 			 */
 		public: 
 			RSGISCalcZonalStatsFromPolygon(int numOutputValues, ZonalAttributes **attributes, int numAttributes);
-			void calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("RSGISCalcZonalStatsFromPolygon, Not Implemented");};
-			void calcImageValue(float *bandValuesImage, int numBands, int band) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("RSGISCalcZonalStatsFromPolygon, Not Implemented");};
-			void calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("RSGISCalcZonalStatsFromPolygon, Not Implemented");};
-			void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(rsgis::img::RSGISImageCalcException);
-			double* getOutputValues() throw(rsgis::img::RSGISImageCalcException);
+			void calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) {throw rsgis::img::RSGISImageCalcException("RSGISCalcZonalStatsFromPolygon, Not Implemented");};
+			void calcImageValue(float *bandValuesImage, int numBands, int band) {throw rsgis::img::RSGISImageCalcException("RSGISCalcZonalStatsFromPolygon, Not Implemented");};
+			void calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) {throw rsgis::img::RSGISImageCalcException("RSGISCalcZonalStatsFromPolygon, Not Implemented");};
+			void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt);
+			double* getOutputValues();
 			void reset();
 			~RSGISCalcZonalStatsFromPolygon();
 		protected:
@@ -319,9 +315,9 @@ namespace rsgis
         {
         public:
             RSGISZonalStatsPolyUpdateLyr(GDALDataset *image, std::vector<ZonalBandAttrs> *zonalBandAtts, rsgis::img::pixelInPolyOption method);
-            virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException){throw RSGISVectorOutputException("Not Implemented RSGISZonalStatsPolyUpdateLyr::processFeature; outFeature");};
-            virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-            virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException){throw RSGISVectorOutputException("Not Implemented RSGISZonalStatsPolyUpdateLyr::createOutputLayerDefinition");};
+            virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid){throw RSGISVectorOutputException("Not Implemented RSGISZonalStatsPolyUpdateLyr::processFeature; outFeature");};
+            virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid);
+            virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn){throw RSGISVectorOutputException("Not Implemented RSGISZonalStatsPolyUpdateLyr::createOutputLayerDefinition");};
             virtual ~RSGISZonalStatsPolyUpdateLyr();
         protected:
             GDALDataset **datasets;

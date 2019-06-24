@@ -52,12 +52,12 @@ namespace rsgis{namespace utils{
     {
         public: 
             RSGISFileUtils();
-            void getDIRList(std::string dir, std::list<std::string> *files) throw(RSGISFileException);
-            void getDIRList(std::string dir, std::vector<std::string> *files) throw(RSGISFileException);
-            void getDIRList(std::string dir, std::string ext, std::list<std::string> *files, bool withpath) throw(RSGISFileException);
-            void getDIRList(std::string dir, std::string ext, std::vector<std::string> *files, bool withpath) throw(RSGISFileException);
-            std::string* getDIRList(std::string dir, std::string ext, int *numFiles, bool withpath) throw(RSGISFileException);
-            std::string* getFilesInDIRWithName(std::string dir, std::string name, int *numFiles) throw(RSGISFileException);
+            void getDIRList(std::string dir, std::list<std::string> *files);
+            void getDIRList(std::string dir, std::vector<std::string> *files);
+            void getDIRList(std::string dir, std::string ext, std::list<std::string> *files, bool withpath);
+            void getDIRList(std::string dir, std::string ext, std::vector<std::string> *files, bool withpath);
+            std::string* getDIRList(std::string dir, std::string ext, int *numFiles, bool withpath);
+            std::string* getFilesInDIRWithName(std::string dir, std::string name, int *numFiles);
             std::string getFileNameNoExtension(std::string filepath);
             std::string getFileName(std::string filepath);
             std::string removeExtension(std::string filepath);

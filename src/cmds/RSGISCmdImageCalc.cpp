@@ -77,7 +77,7 @@
 
 namespace rsgis{ namespace cmds {
 
-    void executeBandMaths(VariableStruct *variables, unsigned int numVars, std::string outputImage, std::string mathsExpression, std::string gdalFormat, RSGISLibDataType outDataType, bool useExpAsbandName, bool editOutputImg)throw(RSGISCmdException)
+    void executeBandMaths(VariableStruct *variables, unsigned int numVars, std::string outputImage, std::string mathsExpression, std::string gdalFormat, RSGISLibDataType outDataType, bool useExpAsbandName, bool editOutputImg)
     {
         GDALAllRegister();
         GDALDataset **datasets = NULL;
@@ -228,7 +228,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeImageMaths(std::string inputImage, std::string outputImage, std::string mathsExpression, std::string imageFormat, RSGISLibDataType outDataType, bool useExpAsbandName, bool editOutputImg)throw(RSGISCmdException)
+    void executeImageMaths(std::string inputImage, std::string outputImage, std::string mathsExpression, std::string imageFormat, RSGISLibDataType outDataType, bool useExpAsbandName, bool editOutputImg)
     {
         GDALAllRegister();
         GDALDataset **datasets = NULL;
@@ -321,7 +321,7 @@ namespace rsgis{ namespace cmds {
     }
                 
                 
-    void executeImageBandMaths(std::string inputImage, std::string outputImage, std::string mathsExpression, std::string imageFormat, RSGISLibDataType outDataType, bool useExpAsbandName, bool editOutputImg)throw(RSGISCmdException)
+    void executeImageBandMaths(std::string inputImage, std::string outputImage, std::string mathsExpression, std::string imageFormat, RSGISLibDataType outDataType, bool useExpAsbandName, bool editOutputImg)
     {
         GDALAllRegister();
         GDALDataset **datasets = NULL;
@@ -421,7 +421,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeKMeansClustering(std::string inputImage, std::string outputMatrixFile, unsigned int numClusters, unsigned int maxNumIterations, unsigned int subSample, bool ignoreZeros, float degreeOfChange, RSGISInitClustererMethods initClusterMethod)throw(RSGISCmdException)
+    void executeKMeansClustering(std::string inputImage, std::string outputMatrixFile, unsigned int numClusters, unsigned int maxNumIterations, unsigned int subSample, bool ignoreZeros, float degreeOfChange, RSGISInitClustererMethods initClusterMethod)
     {
         
         std::cout << "inputImage = " << inputImage << std::endl;
@@ -488,7 +488,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeISODataClustering(std::string inputImage, std::string outputMatrixFile, unsigned int numClusters, unsigned int maxNumIterations, unsigned int subSample, bool ignoreZeros, float degreeOfChange, RSGISInitClustererMethods initClusterMethod, float minDistBetweenClusters, unsigned int minNumFeatures, float maxStdDev, unsigned int minNumClusters, unsigned int startIteration, unsigned int endIteration)throw(RSGISCmdException)
+    void executeISODataClustering(std::string inputImage, std::string outputMatrixFile, unsigned int numClusters, unsigned int maxNumIterations, unsigned int subSample, bool ignoreZeros, float degreeOfChange, RSGISInitClustererMethods initClusterMethod, float minDistBetweenClusters, unsigned int minNumFeatures, float maxStdDev, unsigned int minNumClusters, unsigned int startIteration, unsigned int endIteration)
     {
         try
         {
@@ -542,7 +542,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeMahalanobisDistFilter(std::string inputImage, std::string outputImage, unsigned int winSize, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException)
+    void executeMahalanobisDistFilter(std::string inputImage, std::string outputImage, unsigned int winSize, std::string gdalFormat, RSGISLibDataType outDataType)
     {
         try
         {
@@ -580,7 +580,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeMahalanobisDist2ImgFilter(std::string inputImage, std::string outputImage, unsigned int winSize, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException)
+    void executeMahalanobisDist2ImgFilter(std::string inputImage, std::string outputImage, unsigned int winSize, std::string gdalFormat, RSGISLibDataType outDataType)
     {
         try
         {
@@ -675,7 +675,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeImageCalcDistance(std::string inputImage, std::string outputImage, std::string gdalFormat)throw(RSGISCmdException)
+    void executeImageCalcDistance(std::string inputImage, std::string outputImage, std::string gdalFormat)
     {
         try
         {
@@ -729,7 +729,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeImagePixelColumnSummary(std::string inputImage, std::string outputImage, rsgis::cmds::RSGISCmdStatsSummary summaryStats, std::string gdalFormat, RSGISLibDataType outDataType, float noDataValue, bool useNoDataValue)throw(RSGISCmdException)
+    void executeImagePixelColumnSummary(std::string inputImage, std::string outputImage, rsgis::cmds::RSGISCmdStatsSummary summaryStats, std::string gdalFormat, RSGISLibDataType outDataType, float noDataValue, bool useNoDataValue)
     {
         try
         {
@@ -838,7 +838,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeImagePixelLinearFit(std::string inputImage, std::string outputImage, std::string gdalFormat, std::string bandValues, float noDataValue, bool useNoDataValue)throw(RSGISCmdException)
+    void executeImagePixelLinearFit(std::string inputImage, std::string outputImage, std::string gdalFormat, std::string bandValues, float noDataValue, bool useNoDataValue)
     {
         try
         {
@@ -903,7 +903,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeNormalisation(std::vector<std::string> inputImages, std::vector<std::string> outputImages, bool calcInMinMax, double inMin, double inMax, double outMin, double outMax)throw(RSGISCmdException)
+    void executeNormalisation(std::vector<std::string> inputImages, std::vector<std::string> outputImages, bool calcInMinMax, double inMin, double inMax, double outMin, double outMax)
     {
         GDALAllRegister();
         GDALDataset *dataset = NULL;
@@ -976,7 +976,7 @@ namespace rsgis{ namespace cmds {
 
     }
 
-    double** executeCorrelation(std::string inputImageA, std::string inputImageB, std::string outputMatrixFile, unsigned int *nrows, unsigned int *ncols) throw(RSGISCmdException)
+    double** executeCorrelation(std::string inputImageA, std::string inputImageB, std::string outputMatrixFile, unsigned int *nrows, unsigned int *ncols) 
     {
         GDALAllRegister();
         GDALDataset **datasetsA = NULL;
@@ -1066,7 +1066,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeCovariance(std::string inputImageA, std::string inputImageB, std::string inputMatrixA, std::string inputMatrixB, bool shouldCalcMean, std::string outputMatrix)throw(RSGISCmdException)
+    void executeCovariance(std::string inputImageA, std::string inputImageB, std::string inputMatrixA, std::string inputMatrixB, bool shouldCalcMean, std::string outputMatrix)
     {
         GDALAllRegister();
         GDALDataset **datasetsA = NULL;
@@ -1188,7 +1188,7 @@ namespace rsgis{ namespace cmds {
 
     }
 
-    void executeMeanVector(std::string inputImage, std::string outputMatrix)throw(RSGISCmdException)
+    void executeMeanVector(std::string inputImage, std::string outputMatrix)
     {
         GDALAllRegister();
         GDALDataset **datasets = NULL;
@@ -1248,7 +1248,7 @@ namespace rsgis{ namespace cmds {
 
     }
 
-    void executePCA(std::string inputImage, std::string eigenvectors, std::string outputImage, int numComponents, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException)
+    void executePCA(std::string inputImage, std::string eigenvectors, std::string outputImage, int numComponents, std::string gdalFormat, RSGISLibDataType outDataType)
     {
         GDALAllRegister();
         GDALDataset **datasets = NULL;
@@ -1310,7 +1310,7 @@ namespace rsgis{ namespace cmds {
         delete [] datasets;
     }
 
-    void executeStandardise(std::string meanvectorStr, std::string inputImage, std::string outputImage)throw(RSGISCmdException)
+    void executeStandardise(std::string meanvectorStr, std::string inputImage, std::string outputImage)
     {
         GDALAllRegister();
         GDALDataset **datasets = NULL;
@@ -1352,7 +1352,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeReplaceValuesLessThan(std::string inputImage, std::string outputImage, double threshold, double value)throw(RSGISCmdException)
+    void executeReplaceValuesLessThan(std::string inputImage, std::string outputImage, double threshold, double value)
     {
         GDALAllRegister();
         GDALDataset **datasets = NULL;
@@ -1392,7 +1392,7 @@ namespace rsgis{ namespace cmds {
 
     }
 
-    void executeUnitArea(std::string inputImage, std::string outputImage, std::string inMatrixfile)throw(RSGISCmdException)
+    void executeUnitArea(std::string inputImage, std::string outputImage, std::string inMatrixfile)
     {
         GDALAllRegister();
         GDALDataset **datasets = NULL;
@@ -1453,7 +1453,7 @@ namespace rsgis{ namespace cmds {
 
     }
 
-    void executeMovementSpeed(std::vector<std::string> inputImages, std::vector<unsigned int> imageBands, std::vector<float> imageTimes, float upper, float lower, std::string outputImage)throw(RSGISCmdException)
+    void executeMovementSpeed(std::vector<std::string> inputImages, std::vector<unsigned int> imageBands, std::vector<float> imageTimes, float upper, float lower, std::string outputImage)
     {
         GDALAllRegister();
         GDALDataset **datasets = NULL;
@@ -1541,7 +1541,7 @@ namespace rsgis{ namespace cmds {
 
     }
 
-    void executeCountValsInCols(std::string inputImage, float upper, float lower, std::string outputImage)throw(RSGISCmdException)
+    void executeCountValsInCols(std::string inputImage, float upper, float lower, std::string outputImage)
     {
         GDALAllRegister();
         GDALDataset **datasets = NULL;
@@ -1574,7 +1574,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    double executeCalculateRMSE(std::string inputImageA, int inputBandA, std::string inputImageB, int inputBandB)throw(RSGISCmdException)
+    double executeCalculateRMSE(std::string inputImageA, int inputBandA, std::string inputImageB, int inputBandB)
     {
         GDALAllRegister();
         GDALDataset **datasetsA = NULL;
@@ -1642,7 +1642,7 @@ namespace rsgis{ namespace cmds {
         return rmse;
     }
 
-    void executeApply2VarFunction(std::string inputImage, void *twoVarFunction, std::string outputImage)throw(RSGISCmdException)
+    void executeApply2VarFunction(std::string inputImage, void *twoVarFunction, std::string outputImage)
     {
         GDALAllRegister();
         GDALDataset **datasets = NULL;
@@ -1686,7 +1686,7 @@ namespace rsgis{ namespace cmds {
         delete applyFunction;
     }
 
-    void executeApply3VarFunction(std::string inputImage, void *threeVarFunction, std::string outputImage)throw(RSGISCmdException)
+    void executeApply3VarFunction(std::string inputImage, void *threeVarFunction, std::string outputImage)
     {
         GDALAllRegister();
         GDALDataset **datasets = NULL;
@@ -1730,7 +1730,7 @@ namespace rsgis{ namespace cmds {
 
     }
 
-    void executeDist2Geoms(std::string inputVector, float imgResolution, std::string outputImage)throw(RSGISCmdException)
+    void executeDist2Geoms(std::string inputVector, float imgResolution, std::string outputImage)
     {
         OGRRegisterAll();
 
@@ -1811,7 +1811,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeImageBandStats(std::string inputImage, std::string outputFile, bool ignoreZeros)throw(RSGISCmdException)
+    void executeImageBandStats(std::string inputImage, std::string outputFile, bool ignoreZeros)
     {
         GDALAllRegister();
         GDALDataset **datasets = NULL;
@@ -1863,7 +1863,7 @@ namespace rsgis{ namespace cmds {
 
     }
 
-    void executeImageStats(std::string inputImage, std::string outputFile, bool ignoreZeros)throw(RSGISCmdException)
+    void executeImageStats(std::string inputImage, std::string outputFile, bool ignoreZeros)
     {
         GDALAllRegister();
         GDALDataset **datasets = NULL;
@@ -1908,7 +1908,7 @@ namespace rsgis{ namespace cmds {
 
     }
 
-    void executeUnconLinearSpecUnmix(std::string inputImage, std::string imageFormat, RSGISLibDataType outDataType, float lsumGain, float lsumOffset, std::string outputFile, std::string endmembersFile)throw(RSGISCmdException)
+    void executeUnconLinearSpecUnmix(std::string inputImage, std::string imageFormat, RSGISLibDataType outDataType, float lsumGain, float lsumOffset, std::string outputFile, std::string endmembersFile)
     {
         GDALAllRegister();
         GDALDataset **datasets = NULL;
@@ -1936,7 +1936,7 @@ namespace rsgis{ namespace cmds {
 
     }
 
-    void executeExhconLinearSpecUnmix(std::string inputImage, std::string imageFormat, RSGISLibDataType outDataType, float lsumGain, float lsumOffset, std::string outputFile, std::string endmembersFile, float stepResolution)throw(RSGISCmdException)
+    void executeExhconLinearSpecUnmix(std::string inputImage, std::string imageFormat, RSGISLibDataType outDataType, float lsumGain, float lsumOffset, std::string outputFile, std::string endmembersFile, float stepResolution)
     {
         GDALAllRegister();
         GDALDataset **datasets = NULL;
@@ -1964,7 +1964,7 @@ namespace rsgis{ namespace cmds {
 
     }
 
-    void executeConSum1LinearSpecUnmix(std::string inputImage, std::string imageFormat, RSGISLibDataType outDataType, float lsumGain, float lsumOffset, float lsumWeight, std::string outputFile, std::string endmembersFile)throw(RSGISCmdException)
+    void executeConSum1LinearSpecUnmix(std::string inputImage, std::string imageFormat, RSGISLibDataType outDataType, float lsumGain, float lsumOffset, float lsumWeight, std::string outputFile, std::string endmembersFile)
     {
         GDALAllRegister();
         GDALDataset **datasets = NULL;
@@ -1991,7 +1991,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeNnConSum1LinearSpecUnmix(std::string inputImage, std::string imageFormat, RSGISLibDataType outDataType, float lsumGain, float lsumOffset, float lsumWeight, std::string outputFile, std::string endmembersFile)throw(RSGISCmdException)
+    void executeNnConSum1LinearSpecUnmix(std::string inputImage, std::string imageFormat, RSGISLibDataType outDataType, float lsumGain, float lsumOffset, float lsumWeight, std::string outputFile, std::string endmembersFile)
     {
         GDALAllRegister();
         GDALDataset **datasets = NULL;
@@ -2019,7 +2019,7 @@ namespace rsgis{ namespace cmds {
 
     }
 
-    void executeAllBandsEqualTo(std::string inputImage, float imgValue, float outputTrueVal, float outputFalseVal, std::string outputImage, std::string imageFormat, RSGISLibDataType outDataType)throw(RSGISCmdException)
+    void executeAllBandsEqualTo(std::string inputImage, float imgValue, float outputTrueVal, float outputFalseVal, std::string outputImage, std::string imageFormat, RSGISLibDataType outDataType)
     {
         try
         {
@@ -2047,7 +2047,7 @@ namespace rsgis{ namespace cmds {
 
     }
 
-    void executeHistogram(std::string inputImage, std::string imageMask, std::string outputFile, unsigned int imgBand, float imgValue, double binWidth, bool calcInMinMax, double inMin, double inMax)throw(RSGISCmdException)
+    void executeHistogram(std::string inputImage, std::string imageMask, std::string outputFile, unsigned int imgBand, float imgValue, double binWidth, bool calcInMinMax, double inMin, double inMax)
     {
         try {
             GDALAllRegister();
@@ -2110,7 +2110,7 @@ namespace rsgis{ namespace cmds {
         }
     }
                 
-    unsigned int* executeGetHistogram(std::string inputImage, unsigned int imgBand, double binWidth, unsigned int *nBins, bool calcInMinMax, double *inMin, double *inMax)throw(RSGISCmdException)
+    unsigned int* executeGetHistogram(std::string inputImage, unsigned int imgBand, double binWidth, unsigned int *nBins, bool calcInMinMax, double *inMin, double *inMax)
     {
         unsigned int *bins = NULL;
         try
@@ -2166,7 +2166,7 @@ namespace rsgis{ namespace cmds {
         return bins;
     }
 
-    std::vector<double> executeBandPercentile(std::string inputImage, float percentile, float noDataValue, bool noDataValueSpecified)throw(RSGISCmdException)
+    std::vector<double> executeBandPercentile(std::string inputImage, float percentile, float noDataValue, bool noDataValueSpecified)
     {
         std::vector<double> outVals;
         try
@@ -2206,7 +2206,7 @@ namespace rsgis{ namespace cmds {
         return outVals;
     }
 
-    void executeImageDist2Geoms(std::string inputImage, std::string inputVector, std::string imageFormat, std::string outputImage)throw(RSGISCmdException)
+    void executeImageDist2Geoms(std::string inputImage, std::string inputVector, std::string imageFormat, std::string outputImage)
     {
         GDALAllRegister();
         OGRRegisterAll();
@@ -2289,7 +2289,7 @@ namespace rsgis{ namespace cmds {
 
     }
                 
-    void executeCorrelationWindow(std::string inputImage, std::string outputImage, unsigned int winSize, unsigned int corrBandA, unsigned int corrBandB, std::string gdalFormat, RSGISLibDataType outDataType)throw(RSGISCmdException)
+    void executeCorrelationWindow(std::string inputImage, std::string outputImage, unsigned int winSize, unsigned int corrBandA, unsigned int corrBandB, std::string gdalFormat, RSGISLibDataType outDataType)
     {
         
         try
@@ -2336,7 +2336,7 @@ namespace rsgis{ namespace cmds {
                 
                 
                 
-    void executeImageBandStatsEnv(std::string inputImage, rsgis::cmds::ImageStatsCmds *stats, unsigned int imgBand, bool noDataValueSpecified, float noDataVal, double latMin, double latMax, double longMin, double longMax)throw(RSGISCmdException)
+    void executeImageBandStatsEnv(std::string inputImage, rsgis::cmds::ImageStatsCmds *stats, unsigned int imgBand, bool noDataValueSpecified, float noDataVal, double latMin, double latMax, double longMin, double longMax)
     {
         try
         {
@@ -2468,7 +2468,7 @@ namespace rsgis{ namespace cmds {
     }
                 
                 
-    float executeImageBandModeEnv(std::string inputImage, float binWidth, unsigned int imgBand, bool noDataValueSpecified, float noDataVal, double latMin, double latMax, double longMin, double longMax)throw(RSGISCmdException)
+    float executeImageBandModeEnv(std::string inputImage, float binWidth, unsigned int imgBand, bool noDataValueSpecified, float noDataVal, double latMin, double latMax, double longMin, double longMax)
     {
         std::cout.precision(12);
         float outputModeVal = 0.0;
@@ -2677,7 +2677,7 @@ namespace rsgis{ namespace cmds {
     }
                 
                 
-    double executeImageComparison2dHisto(std::string inputImage1, std::string inputImage2, std::string outputImage, std::string gdalFormat, unsigned int img1Band, unsigned int img2Band, unsigned int numBins, double *binWidthImg1, double *binWidthImg2, double img1Min, double img1Max, double img2Min, double img2Max, double img1Scale, double img2Scale, double img1Off, double img2Off, bool normOutput) throw(RSGISCmdException)
+    double executeImageComparison2dHisto(std::string inputImage1, std::string inputImage2, std::string outputImage, std::string gdalFormat, unsigned int img1Band, unsigned int img2Band, unsigned int numBins, double *binWidthImg1, double *binWidthImg2, double img1Min, double img1Max, double img2Min, double img2Max, double img1Scale, double img2Scale, double img1Off, double img2Off, bool normOutput) 
     {
         double rSq = 0.0;
         try
@@ -2842,7 +2842,7 @@ namespace rsgis{ namespace cmds {
         return rSq;
     }
                 
-    void executeCalcMaskImgPxlValProb(std::string inputImage, std::vector<unsigned int> inImgBandIdxs, std::string maskImage, int maskVal, std::string outputImage, std::string gdalFormat, std::vector<float> histBinWidths, bool calcHistBinWidth, bool useImgNoData, bool rescaleProbs) throw(RSGISCmdException)
+    void executeCalcMaskImgPxlValProb(std::string inputImage, std::vector<unsigned int> inImgBandIdxs, std::string maskImage, int maskVal, std::string outputImage, std::string gdalFormat, std::vector<float> histBinWidths, bool calcHistBinWidth, bool useImgNoData, bool rescaleProbs) 
     {
         try
         {
@@ -2890,7 +2890,7 @@ namespace rsgis{ namespace cmds {
         }
     }
                 
-    float executeCalcPropTrueExp(VariableStruct *variables, unsigned int numVars, std::string mathsExpression, std::string inValidImage, bool useValidImg) throw(RSGISCmdException)
+    float executeCalcPropTrueExp(VariableStruct *variables, unsigned int numVars, std::string mathsExpression, std::string inValidImage, bool useValidImg) 
     {
         GDALAllRegister();
         GDALDataset **datasets = NULL;
@@ -2994,7 +2994,7 @@ namespace rsgis{ namespace cmds {
         return propPxls;
     }
                 
-    void calcMultiImgBandsStats(std::vector<std::string> inputImages, std::string outputImage, RSGISCmdsSummariseStats summaryStats, std::string gdalFormat, RSGISLibDataType outDataType, bool useNoData, float noDataVal) throw(RSGISCmdException)
+    void calcMultiImgBandsStats(std::vector<std::string> inputImages, std::string outputImage, RSGISCmdsSummariseStats summaryStats, std::string gdalFormat, RSGISLibDataType outDataType, bool useNoData, float noDataVal) 
     {
         try
         {
@@ -3099,7 +3099,7 @@ namespace rsgis{ namespace cmds {
     }
                 
                 
-    void calcImageDifference(std::string inputImage1, std::string inputImage2, std::string outputImage, std::string gdalFormat, RSGISLibDataType outDataType) throw(RSGISCmdException)
+    void calcImageDifference(std::string inputImage1, std::string inputImage2, std::string outputImage, std::string gdalFormat, RSGISLibDataType outDataType) 
     {
         try
         {
@@ -3153,7 +3153,7 @@ namespace rsgis{ namespace cmds {
         }
     }
                 
-    std::pair<double,double> getImageBandMinMax(std::string inputImage, unsigned int imgBand, bool useNoData, float noDataVal) throw(RSGISCmdException)
+    std::pair<double,double> getImageBandMinMax(std::string inputImage, unsigned int imgBand, bool useNoData, float noDataVal) 
     {
         std::pair<double,double> outVals;
         try
@@ -3192,7 +3192,7 @@ namespace rsgis{ namespace cmds {
         return outVals;
     }
                 
-    void executeRescaleImages(std::vector<std::string> inputImgs, std::string outputImg, std::string gdalFormat, RSGISLibDataType outDataType, float cNoDataVal, float cOffset, float cGain, float nNoDataVal, float nOffset, float nGain) throw(RSGISCmdException)
+    void executeRescaleImages(std::vector<std::string> inputImgs, std::string outputImg, std::string gdalFormat, RSGISLibDataType outDataType, float cNoDataVal, float cOffset, float cGain, float nNoDataVal, float nOffset, float nGain) 
     {
         try
         {
@@ -3238,7 +3238,7 @@ namespace rsgis{ namespace cmds {
         }
     }
                 
-    void executeGetImgIdxForStat(std::vector<std::string> inputImgs, std::string outputImg, std::string gdalFormat, float noDataVal, RSGISCmdsSummariseStats sumStat) throw(RSGISCmdException)
+    void executeGetImgIdxForStat(std::vector<std::string> inputImgs, std::string outputImg, std::string gdalFormat, float noDataVal, RSGISCmdsSummariseStats sumStat) 
     {
         try
         {
@@ -3311,7 +3311,7 @@ namespace rsgis{ namespace cmds {
     }
     
                 
-    void executeGetWithinPxlImgStatSummaries(std::string refImg, std::string statsImg, unsigned int statsImgBand, std::string outImg, std::string gdalFormat, RSGISLibDataType outDataType, bool useNoData, std::vector<RSGISCmdsSummariseStats> cmdSumStats, unsigned int xIOGrid, unsigned int yIOGrid) throw(RSGISCmdException)
+    void executeGetWithinPxlImgStatSummaries(std::string refImg, std::string statsImg, unsigned int statsImgBand, std::string outImg, std::string gdalFormat, RSGISLibDataType outDataType, bool useNoData, std::vector<RSGISCmdsSummariseStats> cmdSumStats, unsigned int xIOGrid, unsigned int yIOGrid) 
     {
         try
         {
@@ -3396,7 +3396,7 @@ namespace rsgis{ namespace cmds {
         }
     }
                 
-    void executeIdentifyMinPxlValueInWin(std::string inputImg, std::string outputImg, std::string outputRefImg, std::vector<unsigned int> bands, unsigned int winSize, std::string gdalFormat, float noDataValue, bool useNoDataValue) throw(RSGISCmdException)
+    void executeIdentifyMinPxlValueInWin(std::string inputImg, std::string outputImg, std::string outputRefImg, std::vector<unsigned int> bands, unsigned int winSize, std::string gdalFormat, float noDataValue, bool useNoDataValue) 
     {
         try
         {
@@ -3432,7 +3432,7 @@ namespace rsgis{ namespace cmds {
     }
                 
                 
-    float executeCalcImgMeanInMask(std::string inputImg, std::string inputImgMsk, int mskValue, std::vector<unsigned int> bands, float noDataValue, bool useNoDataValue) throw(RSGISCmdException)
+    float executeCalcImgMeanInMask(std::string inputImg, std::string inputImgMsk, int mskValue, std::vector<unsigned int> bands, float noDataValue, bool useNoDataValue) 
     {
         float outImgVal = 0.0;
         try

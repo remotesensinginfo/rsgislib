@@ -32,7 +32,7 @@ namespace rsgis{namespace vec{
 		this->dominant = dominant;
 	}
 	
-	void RSGISLabelPolygonsFromClassification::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISLabelPolygonsFromClassification::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)
 	{
 		RSGISVectorUtils vecUtils;
 		OGRFeatureDefn *outFeatureDefn = outFeature->GetDefnRef();
@@ -278,12 +278,12 @@ namespace rsgis{namespace vec{
 		
 	}
 	
-	void RSGISLabelPolygonsFromClassification::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISLabelPolygonsFromClassification::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid)
 	{
 		throw RSGISVectorException("Not implemented..");
 	}
 	
-	void RSGISLabelPolygonsFromClassification::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+	void RSGISLabelPolygonsFromClassification::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn)
 	{
 		///////////////////////////////////////////
 		// Text codes of top three dominant species

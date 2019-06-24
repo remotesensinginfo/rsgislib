@@ -68,7 +68,7 @@
 
 namespace rsgis{ namespace cmds {
     
-    void executeGenerateConvexHullsGroups(std::string inputFile, std::string outputVector, std::string outVecProj, bool force, unsigned int eastingsColIdx, unsigned int northingsColIdx, unsigned int attributeColIdx)throw(RSGISCmdException)
+    void executeGenerateConvexHullsGroups(std::string inputFile, std::string outputVector, std::string outVecProj, bool force, unsigned int eastingsColIdx, unsigned int northingsColIdx, unsigned int attributeColIdx)
     {
         try
         {
@@ -106,7 +106,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void executeRemoveAttributes(std::string inputVector, std::string outputVector, bool force)throw(RSGISCmdException)
+    void executeRemoveAttributes(std::string inputVector, std::string outputVector, bool force)
     {
         try
         {
@@ -221,7 +221,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void executeBufferVector(std::string inputVector, std::string lyrName, std::string outputVector, std::string vecDriver, float bufferDist) throw(RSGISCmdException)
+    void executeBufferVector(std::string inputVector, std::string lyrName, std::string outputVector, std::string vecDriver, float bufferDist) 
     {
         try
         {
@@ -302,7 +302,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void  executePrintPolyGeom(std::string inputVector) throw(RSGISCmdException)
+    void  executePrintPolyGeom(std::string inputVector) 
     {
         try
         {
@@ -364,7 +364,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void  executeFindReplaceText(std::string inputVector, std::string attribute, std::string find, std::string replace) throw(RSGISCmdException)
+    void  executeFindReplaceText(std::string inputVector, std::string attribute, std::string find, std::string replace) 
     {
         try
         {
@@ -424,7 +424,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void executeCalcPolyArea(std::string inputVector, std::string outputVector, bool force) throw(RSGISCmdException)
+    void executeCalcPolyArea(std::string inputVector, std::string outputVector, bool force) 
     {
         try
         {
@@ -538,7 +538,7 @@ namespace rsgis{ namespace cmds {
         
     }
     
-    void executePolygonsInPolygon(std::string inputVector, std::string inputCoverVector, std::string output_DIR, std::string attributeName, bool force) throw(RSGISCmdException)
+    void executePolygonsInPolygon(std::string inputVector, std::string inputCoverVector, std::string output_DIR, std::string attributeName, bool force) 
     {
         try
         {
@@ -727,7 +727,7 @@ namespace rsgis{ namespace cmds {
     }
             
             
-    void executePopulateGeomZField(std::string inputVector, std::string inputImage, unsigned int imgBand, std::string outputVector, bool force) throw(RSGISCmdException)
+    void executePopulateGeomZField(std::string inputVector, std::string inputImage, unsigned int imgBand, std::string outputVector, bool force) 
     {
         // Convert to absolute path
         inputVector = boost::filesystem::absolute(inputVector).string();
@@ -886,7 +886,7 @@ namespace rsgis{ namespace cmds {
     }
             
             
-    void executeVectorMaths(std::string inputVector, std::string outputVector, std::string outColumn, std::string expression, bool force, std::vector<RSGISVariableFieldCmds> vars) throw(RSGISCmdException)
+    void executeVectorMaths(std::string inputVector, std::string outputVector, std::string outColumn, std::string expression, bool force, std::vector<RSGISVariableFieldCmds> vars) 
     {
         try
         {
@@ -1014,7 +1014,7 @@ namespace rsgis{ namespace cmds {
     }
             
             
-    void executeAddFIDColumn(std::string inputVector, std::string outputVector, bool force) throw(RSGISCmdException)
+    void executeAddFIDColumn(std::string inputVector, std::string outputVector, bool force) 
     {
         try
         {
@@ -1123,7 +1123,7 @@ namespace rsgis{ namespace cmds {
     }
             
             
-    void executeFindCommonImgExtent(std::vector<std::string> inputImages, std::string outputVector, bool force) throw(RSGISCmdException)
+    void executeFindCommonImgExtent(std::vector<std::string> inputImages, std::string outputVector, bool force) 
     {
         try
         {
@@ -1231,7 +1231,7 @@ namespace rsgis{ namespace cmds {
     }
             
             
-    void executeSplitFeatures(std::string inputVector, std::string outputVectorBase, bool force) throw(RSGISCmdException)
+    void executeSplitFeatures(std::string inputVector, std::string outputVectorBase, bool force) 
     {
         // Convert to absolute path
         inputVector = boost::filesystem::absolute(inputVector).string();
@@ -1288,7 +1288,7 @@ namespace rsgis{ namespace cmds {
     }
            
             
-    void executeExportPxls2Pts(std::string inputImage, std::string outputVec, bool force, float maskVal) throw(RSGISCmdException)
+    void executeExportPxls2Pts(std::string inputImage, std::string outputVec, bool force, float maskVal) 
     {
         try
         {
@@ -1374,7 +1374,7 @@ namespace rsgis{ namespace cmds {
         }
     }
             
-    double executeCalcDist2NearestGeom(std::string inputVec, std::string outputVec, std::string outColName, bool force, bool useIdx, double idxMaxSearch) throw(RSGISCmdException)
+    double executeCalcDist2NearestGeom(std::string inputVec, std::string outputVec, std::string outColName, bool force, bool useIdx, double idxMaxSearch) 
     {
         double maxMinDist = 0.0;
         try
@@ -1505,7 +1505,7 @@ namespace rsgis{ namespace cmds {
     }
             
             
-    double executeCalcMaxDist2NearestGeom(std::string inputVec) throw(RSGISCmdException)
+    double executeCalcMaxDist2NearestGeom(std::string inputVec) 
     {
         double maxMinDist = 0.0;
         try
@@ -1571,7 +1571,7 @@ namespace rsgis{ namespace cmds {
         return maxMinDist;
     }
             
-    double executeCalcDist2NearestGeom(std::string inputVec, std::string inDist2Vec, std::string outputVec, std::string outColName, bool force, bool useIdx, double idxMaxSearch) throw(RSGISCmdException)
+    double executeCalcDist2NearestGeom(std::string inputVec, std::string inDist2Vec, std::string outputVec, std::string outColName, bool force, bool useIdx, double idxMaxSearch) 
     {
         double maxMinDist = 0.0;
         try
@@ -1717,7 +1717,7 @@ namespace rsgis{ namespace cmds {
         return maxMinDist;
     }
             
-    void executeSpatialGraphClusterGeoms(std::string inputVec, std::string outputVec, bool useMinSpanTree, float edgeLenSDThres, double maxEdgeLen, bool force, std::string shpFileEdges, bool outShpEdges, std::string h5EdgeLengths, bool outH5EdgeLens) throw(RSGISCmdException)
+    void executeSpatialGraphClusterGeoms(std::string inputVec, std::string outputVec, bool useMinSpanTree, float edgeLenSDThres, double maxEdgeLen, bool force, std::string shpFileEdges, bool outShpEdges, std::string h5EdgeLengths, bool outH5EdgeLens) 
     {
         try
         {
@@ -1834,7 +1834,7 @@ namespace rsgis{ namespace cmds {
     }
     
     
-    void executeFitPolygonToPoints(std::string inputVec, std::string outputVec, double alphaVal, bool force) throw(RSGISCmdException)
+    void executeFitPolygonToPoints(std::string inputVec, std::string outputVec, double alphaVal, bool force) 
     {
         try
         {
@@ -1912,7 +1912,7 @@ namespace rsgis{ namespace cmds {
     }
             
             
-    void executeFitPolygonsToPointClusters(std::string inputVec, std::string outputVec, std::string clusterField, double alphaVal, bool force) throw(RSGISCmdException)
+    void executeFitPolygonsToPointClusters(std::string inputVec, std::string outputVec, std::string clusterField, double alphaVal, bool force) 
     {
         try
         {
@@ -2038,7 +2038,7 @@ namespace rsgis{ namespace cmds {
     }
             
             
-    void executeCreateLinesOfPoints(std::string inputLinesVec, std::string outputPtsVec, double step, bool force) throw(RSGISCmdException)
+    void executeCreateLinesOfPoints(std::string inputLinesVec, std::string outputPtsVec, double step, bool force) 
     {
         try
         {
@@ -2104,7 +2104,7 @@ namespace rsgis{ namespace cmds {
     }
             
             
-    void executeFitActiveContourBoundaries(std::string inputPolysVec, std::string outputPolysVec, std::string externalForceImg, double interAlpha, double interBeta, double interGamma, double minExtThres, bool force) throw(RSGISCmdException)
+    void executeFitActiveContourBoundaries(std::string inputPolysVec, std::string outputPolysVec, std::string externalForceImg, double interAlpha, double interBeta, double interGamma, double minExtThres, bool force) 
     {
         try
         {
@@ -2209,7 +2209,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeCheckValidateGeometries(std::string inputVec, std::string lyrName, std::string outputVec, std::string vecDriver, bool printGeomErrs) throw(RSGISCmdException)
+    void executeCheckValidateGeometries(std::string inputVec, std::string lyrName, std::string outputVec, std::string vecDriver, bool printGeomErrs) 
     {
         try
         {

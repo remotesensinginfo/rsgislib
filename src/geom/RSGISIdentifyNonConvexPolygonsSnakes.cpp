@@ -39,14 +39,14 @@ namespace rsgis{namespace geom{
 		this->maxNumIterations = maxNumIterations;
 	}
 			
-	std::vector<geos::geom::Polygon*>* RSGISIdentifyNonConvexPolygonsSnakes::retrievePolygons(std::list<RSGIS2DPoint*> **clusters, int numClusters) throw(RSGISGeometryException)
+	std::vector<geos::geom::Polygon*>* RSGISIdentifyNonConvexPolygonsSnakes::retrievePolygons(std::list<RSGIS2DPoint*> **clusters, int numClusters)
 	{
 		throw RSGISGeometryException("Not Implemented");
 		
 		return NULL;
 	}
 	
-	std::vector<geos::geom::Polygon*>* RSGISIdentifyNonConvexPolygonsSnakes::retrievePolygons(std::list<RSGISPolygon*> **clusters, int numClusters) throw(RSGISGeometryException)
+	std::vector<geos::geom::Polygon*>* RSGISIdentifyNonConvexPolygonsSnakes::retrievePolygons(std::list<RSGISPolygon*> **clusters, int numClusters)
 	{
 		std::vector<geos::geom::Polygon*> *outPolys = new std::vector<geos::geom::Polygon*>();
 		
@@ -76,7 +76,7 @@ namespace rsgis{namespace geom{
 		return outPolys;
 	}
 	
-	std::vector<geos::geom::Polygon*>* RSGISIdentifyNonConvexPolygonsSnakes::retrievePolygons(std::list<geos::geom::Polygon*> **clusters, int numClusters) throw(RSGISGeometryException)
+	std::vector<geos::geom::Polygon*>* RSGISIdentifyNonConvexPolygonsSnakes::retrievePolygons(std::list<geos::geom::Polygon*> **clusters, int numClusters)
 	{
 		std::vector<geos::geom::Polygon*> *outPolys = new std::vector<geos::geom::Polygon*>();
 		
@@ -97,7 +97,7 @@ namespace rsgis{namespace geom{
 		return outPolys;
 	}
 	
-	geos::geom::Polygon* RSGISIdentifyNonConvexPolygonsSnakes::retrievePolygon(std::vector<geos::geom::Polygon*> *polygons) throw(RSGISGeometryException)
+	geos::geom::Polygon* RSGISIdentifyNonConvexPolygonsSnakes::retrievePolygon(std::vector<geos::geom::Polygon*> *polygons)
 	{
 		RSGISGeometry geomUtils;
 		geos::geom::Polygon *outPoly = NULL;
@@ -306,7 +306,7 @@ namespace rsgis{namespace geom{
 		return outPoly;
 	}
 	
-	geos::geom::Polygon* RSGISIdentifyNonConvexPolygonsSnakes::retrievePolygon(std::list<geos::geom::Polygon*> *polygons) throw(RSGISGeometryException)
+	geos::geom::Polygon* RSGISIdentifyNonConvexPolygonsSnakes::retrievePolygon(std::list<geos::geom::Polygon*> *polygons)
 	{
 		RSGISGeometry geomUtils;
 		geos::geom::Polygon *outPoly = NULL;
@@ -521,7 +521,7 @@ namespace rsgis{namespace geom{
 		return outPoly;
 	}
 		
-	GDALDataset* RSGISIdentifyNonConvexPolygonsSnakes::createDataset(GDALDriver *gdalDriver, geos::geom::Geometry *geom, std::string filename, float resolution, float constVal) throw(RSGISImageException)
+	GDALDataset* RSGISIdentifyNonConvexPolygonsSnakes::createDataset(GDALDriver *gdalDriver, geos::geom::Geometry *geom, std::string filename, float resolution, float constVal)
 	{
 		RSGISGeometry geomUtils;
 		
@@ -568,7 +568,7 @@ namespace rsgis{namespace geom{
 		return imageDS;
 	}
 	
-	void RSGISIdentifyNonConvexPolygonsSnakes::rasterizeLayer(geos::geom::Geometry *geom, GDALDataset *image, float constVal) throw(rsgis::RSGISImageException)
+	void RSGISIdentifyNonConvexPolygonsSnakes::rasterizeLayer(geos::geom::Geometry *geom, GDALDataset *image, float constVal)
 	{		
 		try
 		{
@@ -657,7 +657,7 @@ namespace rsgis{namespace geom{
 		}
 	}
 	
-	void RSGISIdentifyNonConvexPolygonsSnakes::createDistanceImage(GDALDataset *image, geos::geom::Geometry *geom) throw(RSGISImageException, RSGISGeometryException)
+	void RSGISIdentifyNonConvexPolygonsSnakes::createDistanceImage(GDALDataset *image, geos::geom::Geometry *geom)
 	{
 		try
 		{
@@ -748,7 +748,7 @@ namespace rsgis{namespace geom{
 		}
 	}
 	
-	geos::geom::GeometryCollection * RSGISIdentifyNonConvexPolygonsSnakes::createGeomCollection(std::vector<geos::geom::Polygon*> *polys) throw(RSGISGeometryException)
+	geos::geom::GeometryCollection * RSGISIdentifyNonConvexPolygonsSnakes::createGeomCollection(std::vector<geos::geom::Polygon*> *polys)
 	{
 		geos::geom::GeometryCollection  *geom = NULL;
 		try
@@ -771,7 +771,7 @@ namespace rsgis{namespace geom{
 		return geom;
 	}
 	
-	geos::geom::GeometryCollection * RSGISIdentifyNonConvexPolygonsSnakes::createGeomCollection(std::list<geos::geom::Polygon*> *polys) throw(RSGISGeometryException)
+	geos::geom::GeometryCollection * RSGISIdentifyNonConvexPolygonsSnakes::createGeomCollection(std::list<geos::geom::Polygon*> *polys)
 	{
 		geos::geom::GeometryCollection  *geom = NULL;
 		try
@@ -794,7 +794,7 @@ namespace rsgis{namespace geom{
 		return geom;
 	}
 	
-	void RSGISIdentifyNonConvexPolygonsSnakes::populatePixelPolygons(GDALDataset *image, float threshold, std::vector<geos::geom::Polygon*> *polys) throw(RSGISGeometryException)
+	void RSGISIdentifyNonConvexPolygonsSnakes::populatePixelPolygons(GDALDataset *image, float threshold, std::vector<geos::geom::Polygon*> *polys)
 	{
 		double *gdalTranslation = new double[6];
 		int height = 0;
@@ -944,7 +944,7 @@ namespace rsgis{namespace geom{
 		this->gamma = gamma;
 	}
 	
-	double RSGISSnakeNonConvexGlobalOptimisationFunction::calcValue(std::vector<geos::geom::Coordinate*> *coords) throw(rsgis::math::RSGISOptimisationException)
+	double RSGISSnakeNonConvexGlobalOptimisationFunction::calcValue(std::vector<geos::geom::Coordinate*> *coords)
 	{
         rsgis::math::RSGISMathsUtils mathUtils;
 		
@@ -1074,7 +1074,7 @@ namespace rsgis{namespace geom{
 		this->lines = lines;
 	}
 	
-	double RSGISSnakeNonConvexLineProjGlobalOptimisationFunction::calcValue(std::vector<geos::geom::Coordinate*> *coords) throw(rsgis::math::RSGISOptimisationException)
+	double RSGISSnakeNonConvexLineProjGlobalOptimisationFunction::calcValue(std::vector<geos::geom::Coordinate*> *coords)
 	{
         rsgis::math::RSGISMathsUtils mathUtils;
 		

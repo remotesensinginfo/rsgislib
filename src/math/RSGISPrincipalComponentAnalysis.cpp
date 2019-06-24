@@ -24,7 +24,7 @@
 
 namespace rsgis{namespace math{
 
-	RSGISPrincipalComponentAnalysis::RSGISPrincipalComponentAnalysis(Matrix *inputData) throw(RSGISMatricesException,RSGISMultivariantStatsException)
+	RSGISPrincipalComponentAnalysis::RSGISPrincipalComponentAnalysis(Matrix *inputData)
 	{
 		this->inputData = inputData;
 		this->calcIntermediateSteps();
@@ -117,7 +117,7 @@ namespace rsgis{namespace math{
 		matrixUtils.freeMatrix(this->eigenvectors);
 	}
 	
-	void RSGISPrincipalComponentAnalysis::calcIntermediateSteps() throw(RSGISMatricesException,RSGISMultivariantStatsException)
+	void RSGISPrincipalComponentAnalysis::calcIntermediateSteps()
 	{
 		RSGISMultivariantStats mvarStats;
 		RSGISMatrices matrixUtils;

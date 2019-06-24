@@ -31,7 +31,7 @@ namespace rsgis{namespace geom{
 		this->maxEdgeLength = maxEdgeLength;
 	}
 	
-    std::list<RSGIS2DPoint*>** RSGISMinSpanTreeClustererStdDevThreshold::clusterData(std::vector<RSGIS2DPoint*> *data, int *numclusters, double *threshold) throw(rsgis::math::RSGISClustererException)
+    std::list<RSGIS2DPoint*>** RSGISMinSpanTreeClustererStdDevThreshold::clusterData(std::vector<RSGIS2DPoint*> *data, int *numclusters, double *threshold)
 	{
 		try
 		{
@@ -265,7 +265,7 @@ namespace rsgis{namespace geom{
         this->useMinSpanTree = useMinSpanTree;
     }
     
-    std::list<RSGIS2DPoint*>** RSGISGraphGeomClusterer::clusterData(std::vector<RSGIS2DPoint*> *data, int *numclusters, double *threshold) throw(rsgis::math::RSGISClustererException)
+    std::list<RSGIS2DPoint*>** RSGISGraphGeomClusterer::clusterData(std::vector<RSGIS2DPoint*> *data, int *numclusters, double *threshold)
     {
         std::list<RSGIS2DPoint*> **outputClusters = NULL;
         *numclusters = 0;
@@ -434,7 +434,7 @@ namespace rsgis{namespace geom{
         return outputClusters;
     }
     
-    ClusterGraph* RSGISGraphGeomClusterer::constructGraph(DelaunayTriangulation *dt, PointValueMap *values, std::vector<RSGIS2DPoint*> *data) throw(rsgis::math::RSGISClustererException)
+    ClusterGraph* RSGISGraphGeomClusterer::constructGraph(DelaunayTriangulation *dt, PointValueMap *values, std::vector<RSGIS2DPoint*> *data)
     {
         // Create graph with vertex's
         ClusterGraph *cg = new ClusterGraph(data->size());
@@ -516,7 +516,7 @@ namespace rsgis{namespace geom{
         return cg;
     }
     
-    void RSGISGraphGeomClusterer::constructMinimumSpanningTree(ClusterGraph *cg) throw(rsgis::math::RSGISClustererException)
+    void RSGISGraphGeomClusterer::constructMinimumSpanningTree(ClusterGraph *cg)
     {
         try
         {

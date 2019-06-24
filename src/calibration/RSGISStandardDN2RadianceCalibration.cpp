@@ -25,7 +25,7 @@
 
 namespace rsgis{namespace calib{
     
-    void RSGISLandsatRadianceCalibration::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISLandsatRadianceCalibration::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         double gain = 0;
         
@@ -63,7 +63,7 @@ namespace rsgis{namespace calib{
     }
     
     
-    void RSGISLandsatRadianceCalibrationMultiAdd::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISLandsatRadianceCalibrationMultiAdd::calcImageValue(float *bandValues, int numBands, double *output) 
     {        
         // If pixels values are 0 - consider image border
         bool nodata = true;
@@ -96,7 +96,7 @@ namespace rsgis{namespace calib{
         }
     }
     
-    void RSGISSPOTRadianceCalibration::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISSPOTRadianceCalibration::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         for(unsigned int i = 0; i < this->numOutBands; ++i)
         {
@@ -108,7 +108,7 @@ namespace rsgis{namespace calib{
         }
     }
     
-    void RSGISIkonosRadianceCalibration::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISIkonosRadianceCalibration::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         for(unsigned int i = 0; i < this->numOutBands; ++i)
         {
@@ -120,7 +120,7 @@ namespace rsgis{namespace calib{
         }
     }
     
-    void RSGISASTERRadianceCalibration::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISASTERRadianceCalibration::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         for(unsigned int i = 0; i < this->numOutBands; ++i)
         {
@@ -132,7 +132,7 @@ namespace rsgis{namespace calib{
         }
     }
     
-    void RSGISIRSRadianceCalibration::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISIRSRadianceCalibration::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         double gain = 0;
         
@@ -147,7 +147,7 @@ namespace rsgis{namespace calib{
         }
     }
     
-    void RSGISQuickbird16bitRadianceCalibration::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISQuickbird16bitRadianceCalibration::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         for(unsigned int i = 0; i < this->numOutBands; ++i)
         {
@@ -159,7 +159,7 @@ namespace rsgis{namespace calib{
         }
     }
     
-    void RSGISQuickbird8bitRadianceCalibration::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISQuickbird8bitRadianceCalibration::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         for(unsigned int i = 0; i < this->numOutBands; ++i)
         {
@@ -171,7 +171,7 @@ namespace rsgis{namespace calib{
         }
     }
     
-    void RSGISWorldView2RadianceCalibration::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISWorldView2RadianceCalibration::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         for(unsigned int i = 0; i < this->numOutBands; ++i)
         {
@@ -184,7 +184,7 @@ namespace rsgis{namespace calib{
     }
     
     
-    void RSGISIdentifySaturatePixels::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISIdentifySaturatePixels::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         for(unsigned int i = 0; i < this->numOutBands; ++i)
         {

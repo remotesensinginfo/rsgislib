@@ -31,7 +31,7 @@ namespace rsgis { namespace radar {
 		this->calcScatteringHV = calcScatteringHV;
 		this->calcScatteringVV = calcScatteringVV;
 	}
-	void RSGISEstimationFPCCanopyScattering::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISEstimationFPCCanopyScattering::calcImageValue(float *bandValues, int numBands, double *output) 
 	{
 		double fpc = bandValues[0]; // Get FPC
 		output[0] = calcScatteringHH->calcFunction(fpc);
@@ -55,7 +55,7 @@ namespace rsgis { namespace radar {
 		this->calcAttenuationH = calcAttenuationH;
 		this->calcAttenuationV = calcAttenuationV;
 	}
-	void RSGISEstimationFPCCanopyAttenuation::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISEstimationFPCCanopyAttenuation::calcImageValue(float *bandValues, int numBands, double *output) 
 	{
 		double fpc = bandValues[0]; // Get FPC
 		output[0] = calcAttenuationH->calcFunction(fpc);
@@ -79,7 +79,7 @@ namespace rsgis { namespace radar {
 		this->calcAttenuationH = calcAttenuationH;
 		this->calcAttenuationV = calcAttenuationV;
 	}
-	void RSGISEstimationFPCCanopyScatteringAttenuation::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISEstimationFPCCanopyScatteringAttenuation::calcImageValue(float *bandValues, int numBands, double *output) 
 	{
 		double fpc = bandValues[0]; // Get FPC
 		output[0] = calcScatteringHH->calcFunction(fpc);
@@ -100,7 +100,7 @@ namespace rsgis { namespace radar {
 		this->calcAttenuationH = calcAttenuationH;
 		this->calcAttenuationV = calcAttenuationV;
 	}
-	void RSGISEstimationFPCDualPolTrunkGround::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISEstimationFPCDualPolTrunkGround::calcImageValue(float *bandValues, int numBands, double *output) 
 	{
 		double fpc = bandValues[0];
 		double totalHH = bandValues[1];
@@ -145,7 +145,7 @@ namespace rsgis { namespace radar {
 		this->calcAttenuationH = calcAttenuationH;
 		this->calcAttenuationV = calcAttenuationV;
 	}
-	void RSGISEstimationFPCFullPolTrunkGroundDualPol::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISEstimationFPCFullPolTrunkGroundDualPol::calcImageValue(float *bandValues, int numBands, double *output) 
 	{
 		double fpc = bandValues[0];
 		double totalHH = bandValues[1];

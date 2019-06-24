@@ -53,9 +53,9 @@ namespace rsgis{namespace vec{
 		{
 		public:
 			RSGISProcessOGRFeature(){};
-			virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)= 0;
-			virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)= 0;
-			virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException) = 0;
+			virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)= 0;
+			virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid)= 0;
+			virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) = 0;
 			virtual ~RSGISProcessOGRFeature(){};
 		};
 }}

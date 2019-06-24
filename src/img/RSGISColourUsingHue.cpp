@@ -35,7 +35,7 @@ namespace rsgis { namespace img {
 		this->background = background;
 	}
 	
-	void RSGISColourUsingHue::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+	void RSGISColourUsingHue::calcImageValue(float *bandValues, int numBands, double *output) 
 	{
 		
 		float inValue = bandValues[imageBand];

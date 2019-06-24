@@ -32,7 +32,7 @@ namespace rsgis { namespace classifier {
 		std::cout << "Number of Refference Spectra = " << refSpectra->size2 << std::endl;
 		this->imageSpecArray = new double[refSpectra->size1];
 	}
-	void RSGISSpectralCorrelationMapperRule::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISSpectralCorrelationMapperRule::calcImageValue(float *bandValues, int numBands, double *output) 
 	{
 		
 		// Load pixel into memory - saves time on disk reads when comparing to a large number of refference spectra.
@@ -89,7 +89,7 @@ namespace rsgis { namespace classifier {
 	{
 		this->threashold = threashold;
 	}
-	void RSGISSpectralCorrelationMapperClassifier::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISSpectralCorrelationMapperClassifier::calcImageValue(float *bandValues, int numBands, double *output) 
 	{										
 		double maxCorrelation = 0;
 		double maxCorrelationTemp = 0;

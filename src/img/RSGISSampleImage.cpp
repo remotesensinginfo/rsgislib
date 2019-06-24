@@ -30,7 +30,7 @@ namespace rsgis{namespace img{
         
     }
     
-    void RSGISSampleImage::subSampleImage(GDALDataset *inputImage, std::string outputFile, unsigned int sample, float noData, bool useNoData)throw(RSGISImageException)
+    void RSGISSampleImage::subSampleImage(GDALDataset *inputImage, std::string outputFile, unsigned int sample, float noData, bool useNoData)
     {
         try
         {
@@ -68,7 +68,7 @@ namespace rsgis{namespace img{
         }
     }
     
-    void RSGISSampleImage::randomSampleImageMask(GDALDataset *inputImage, unsigned int imgBand, GDALDataset *outputImage, std::vector<int> maskVals, unsigned long numSamples)throw(RSGISImageException)
+    void RSGISSampleImage::randomSampleImageMask(GDALDataset *inputImage, unsigned int imgBand, GDALDataset *outputImage, std::vector<int> maskVals, unsigned long numSamples)
     {
         try
         {
@@ -158,7 +158,7 @@ namespace rsgis{namespace img{
     }
     
     
-    void RSGISSampleImage::randomSampleImageMaskSmallPxlCount(GDALDataset *inputImage, unsigned int imgBand, GDALDataset *outputImage, std::vector<int> maskVals, unsigned long numSamples, int rndSeed)throw(RSGISImageException)
+    void RSGISSampleImage::randomSampleImageMaskSmallPxlCount(GDALDataset *inputImage, unsigned int imgBand, GDALDataset *outputImage, std::vector<int> maskVals, unsigned long numSamples, int rndSeed)
     {
         try
         {
@@ -259,7 +259,7 @@ namespace rsgis{namespace img{
         this->dataRow = dataRow;
     }
     
-    void RSGISSampleCalcImage::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+    void RSGISSampleCalcImage::calcImageValue(float *bandValues, int numBands) 
     {
         try
         {
@@ -328,7 +328,7 @@ namespace rsgis{namespace img{
         this->imgBand = imgBand;
     }
     
-    void RSGISGetPxlLocAsVec::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent)throw(rsgis::img::RSGISImageCalcException)
+    void RSGISGetPxlLocAsVec::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent)
     {
         for(size_t i = 0; i < maskVals.size(); ++i)
         {

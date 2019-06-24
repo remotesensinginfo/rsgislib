@@ -33,7 +33,7 @@ namespace rsgis
 
         }
         
-        std::vector<ImagePixelValuePt*>* RSGISExtractImagePixelsOnLine::getImagePixelValues(GDALDataset *image, unsigned int imageBand, geos::geom::Coordinate *pt1, float azimuthRad, float zenithRad, float rayElevThreshold) throw(RSGISImageCalcException)
+        std::vector<ImagePixelValuePt*>* RSGISExtractImagePixelsOnLine::getImagePixelValues(GDALDataset *image, unsigned int imageBand, geos::geom::Coordinate *pt1, float azimuthRad, float zenithRad, float rayElevThreshold) 
         {
             std::vector<ImagePixelValuePt*> *pxlValues = new std::vector<ImagePixelValuePt*>();
             
@@ -185,7 +185,7 @@ namespace rsgis
             return pxlValues;
         }
         
-        void RSGISExtractImagePixelsOnLine::populateWithImageValues(GDALDataset *image, unsigned int imageBand, std::vector<ImagePixelValuePt*> *ptPxlValues) throw(RSGISImageException)
+        void RSGISExtractImagePixelsOnLine::populateWithImageValues(GDALDataset *image, unsigned int imageBand, std::vector<ImagePixelValuePt*> *ptPxlValues)
         {
             if(ptPxlValues->size() > 0)
             {

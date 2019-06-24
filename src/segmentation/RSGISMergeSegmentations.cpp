@@ -29,7 +29,7 @@ namespace rsgis{namespace segment{
         
     }
     
-    void RSGISMergeSegmentations::includeRegions(GDALDataset *clumpsImage, GDALDataset *regionsImage, std::string outputImage, std::string format)throw(rsgis::img::RSGISImageCalcException)
+    void RSGISMergeSegmentations::includeRegions(GDALDataset *clumpsImage, GDALDataset *regionsImage, std::string outputImage, std::string format)
     {
         try
         {
@@ -68,7 +68,7 @@ namespace rsgis{namespace segment{
         this->offset = offset;
     }
 
-    void RSGISAddWithSegOffset::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISAddWithSegOffset::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) 
     {
         if(intBandValues[1] != 0)
         {

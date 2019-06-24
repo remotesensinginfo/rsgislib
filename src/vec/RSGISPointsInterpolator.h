@@ -50,7 +50,7 @@ namespace rsgis{namespace vec{
 		{
 		public:
 			RSGISPointsInterpolator(){};
-			virtual void calcValue(rsgis::geom::point3D *pts, int numPoints, rsgis::geom::point2D *pt, double *outVal) throw(RSGISVectorException) = 0;
+			virtual void calcValue(rsgis::geom::point3D *pts, int numPoints, rsgis::geom::point2D *pt, double *outVal) = 0;
 			virtual ~RSGISPointsInterpolator(){};
 		};
 	
@@ -58,7 +58,7 @@ namespace rsgis{namespace vec{
 		{
 		public:
 			RSGISInverseWeightedDistanceInterpolator(double power);
-			virtual void calcValue(rsgis::geom::point3D *pts, int numPoints, rsgis::geom::point2D *pt, double *outVal) throw(RSGISVectorException);
+			virtual void calcValue(rsgis::geom::point3D *pts, int numPoints, rsgis::geom::point2D *pt, double *outVal);
 			virtual ~RSGISInverseWeightedDistanceInterpolator();
 		protected:
 			double power;

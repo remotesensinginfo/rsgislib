@@ -57,9 +57,9 @@ namespace rsgis{namespace vec{
 	{
 	public:
 		RSGISGetOGRGeometries(std::vector<OGRGeometry*> *geometries);
-		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-		virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-		virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
+		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid);
+		virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid);
+		virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn);
 		virtual ~RSGISGetOGRGeometries();
 	protected:
         std::vector<OGRGeometry*> *geometries;
@@ -71,9 +71,9 @@ namespace rsgis{namespace vec{
     {
     public:
         RSGISGetOGRGeometriesInIdx(geos::index::SpatialIndex *geomIdx);
-        virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-        virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-        virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
+        virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid);
+        virtual void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid);
+        virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn);
         virtual ~RSGISGetOGRGeometriesInIdx();
     protected:
         geos::index::SpatialIndex *geomIdx;
@@ -87,10 +87,10 @@ namespace rsgis{namespace vec{
 	{
 	public:
 		RSGISPrintGeometryToConsole();
-		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-		virtual void processFeature(OGRFeature *inFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-		virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
-        void printRing(OGRLinearRing *inGeomRing) throw(RSGISVectorOutputException);
+		virtual void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid);
+		virtual void processFeature(OGRFeature *inFeature, geos::geom::Envelope *env, long fid);
+		virtual void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn);
+        void printRing(OGRLinearRing *inGeomRing);
 		virtual ~RSGISPrintGeometryToConsole();
     };
     
@@ -99,9 +99,9 @@ namespace rsgis{namespace vec{
     {
     public:
         RSGISOGRPointReader(std::vector<OGRPoint*> *points);
-        void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-        void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-        void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
+        void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid);
+        void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid);
+        void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn);
         ~RSGISOGRPointReader();
     protected:
         std::vector<OGRPoint*> *points;
@@ -111,9 +111,9 @@ namespace rsgis{namespace vec{
     {
     public:
         RSGISOGRLineReader(std::vector<OGRLineString*> *lines);
-        void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-        void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException);
-        void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
+        void processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid);
+        void processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid);
+        void createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn);
         ~RSGISOGRLineReader();
     protected:
         std::vector<OGRLineString*> *lines;

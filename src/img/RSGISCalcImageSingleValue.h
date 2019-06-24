@@ -50,13 +50,13 @@ namespace rsgis{namespace img{
 		{
 		public:
 			RSGISCalcImageSingleValue(int numOutputValues);
-			virtual void calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) throw(RSGISImageCalcException) = 0;
-			virtual void calcImageValue(float *bandValuesImage, int numBands, int band) throw(RSGISImageCalcException) = 0;
-			virtual void calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) throw(RSGISImageCalcException) = 0;
-			virtual void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(RSGISImageCalcException) = 0;
+			virtual void calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) {throw RSGISImageCalcException("Not Implemented - RSGISCalcImageSingleValue Base Class");};
+			virtual void calcImageValue(float *bandValuesImage, int numBands, int band) {throw RSGISImageCalcException("Not Implemented - RSGISCalcImageSingleValue Base Class");};
+			virtual void calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) {throw RSGISImageCalcException("Not Implemented - RSGISCalcImageSingleValue Base Class");};
+			virtual void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) {throw RSGISImageCalcException("Not Implemented - RSGISCalcImageSingleValue Base Class");};
 			int getNumberOfOutValues();
-			virtual double* getOutputValues() throw(RSGISImageCalcException) = 0;
-			virtual void reset() = 0;
+			virtual double* getOutputValues() {throw RSGISImageCalcException("Not Implemented - RSGISCalcImageSingleValue Base Class");};
+			virtual void reset() {throw RSGISImageCalcException("Not Implemented - RSGISCalcImageSingleValue Base Class");};
 			virtual ~RSGISCalcImageSingleValue();
 		protected:
 			int numOutputValues;

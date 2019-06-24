@@ -29,7 +29,7 @@ namespace rsgis{namespace rastergis{
         
     }
         
-    void RSGISCalcClusterLocation::populateAttWithClumpLocation(GDALDataset *dataset, unsigned int ratBand, std::string eastColumn, std::string northColumn)throw(rsgis::RSGISAttributeTableException)
+    void RSGISCalcClusterLocation::populateAttWithClumpLocation(GDALDataset *dataset, unsigned int ratBand, std::string eastColumn, std::string northColumn)
     {
         try
         {
@@ -156,7 +156,7 @@ namespace rsgis{namespace rastergis{
         }
     }
     
-    void RSGISCalcClusterLocation::populateAttWithClumpLocationExtent(GDALDataset *dataset, unsigned int ratBand, std::string minXColX, std::string minXColY, std::string maxXColX, std::string maxXColY, std::string minYColX, std::string minYColY, std::string maxYColX, std::string maxYColY) throw(rsgis::RSGISAttributeTableException)
+    void RSGISCalcClusterLocation::populateAttWithClumpLocationExtent(GDALDataset *dataset, unsigned int ratBand, std::string minXColX, std::string minXColY, std::string maxXColX, std::string maxXColY, std::string minYColX, std::string minYColY, std::string maxYColX, std::string maxYColY)
     {
         try
         {
@@ -311,7 +311,7 @@ namespace rsgis{namespace rastergis{
         }
     }
     
-    void RSGISCalcClusterLocation::populateAttWithClumpPxlLocation(GDALDataset *dataset, unsigned int ratBand, std::string minXCol, std::string maxXCol, std::string minYCol, std::string maxYCol) throw(rsgis::RSGISAttributeTableException)
+    void RSGISCalcClusterLocation::populateAttWithClumpPxlLocation(GDALDataset *dataset, unsigned int ratBand, std::string minXCol, std::string maxXCol, std::string minYCol, std::string maxYCol)
     {
         try
         {
@@ -447,7 +447,7 @@ namespace rsgis{namespace rastergis{
         this->ratBand = ratBand;
     }
     
-    void RSGISCalcClusterLocationCalcValue::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCalcClusterLocationCalcValue::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent) 
     {
         if(intBandValues[ratBand-1] > 0)
         {
@@ -475,7 +475,7 @@ namespace rsgis{namespace rastergis{
         this->ratBand = ratBand;
     }
     
-    void RSGISCalcClusterExtentCalcValue::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCalcClusterExtentCalcValue::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent) 
     {
         if(intBandValues[ratBand-1] > 0)
         {
@@ -535,7 +535,7 @@ namespace rsgis{namespace rastergis{
         this->ratBand = ratBand;
     }
     
-    void RSGISCalcClusterPxlExtentCalcValue::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCalcClusterPxlExtentCalcValue::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent) 
     {
         if(intBandValues[ratBand-1] > 0)
         {

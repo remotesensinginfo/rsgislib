@@ -95,7 +95,7 @@ namespace rsgis{namespace vec{
 		
 	}
 	
-	void RSGISClusterData::createLayerDefinition(OGRLayer *outputSHPLayer)throw(RSGISVectorOutputException)
+	void RSGISClusterData::createLayerDefinition(OGRLayer *outputSHPLayer)
 	{
 		
 	}

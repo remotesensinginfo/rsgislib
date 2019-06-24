@@ -52,7 +52,7 @@
 
 namespace rsgis{ namespace cmds {
     
-    void executeLabelPixelsFromClusterCentres(std::string inputImage, std::string outputImage, std::string clusterCentresFile, bool ignoreZeros, std::string imageFormat)throw(RSGISCmdException)
+    void executeLabelPixelsFromClusterCentres(std::string inputImage, std::string outputImage, std::string clusterCentresFile, bool ignoreZeros, std::string imageFormat)
     {
         try
         {
@@ -81,7 +81,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void executeEliminateSinglePixels(std::string inputImage, std::string clumpsImage, std::string outputImage, std::string tempImage, std::string imageFormat, bool processInMemory, bool ignoreZeros)throw(RSGISCmdException)
+    void executeEliminateSinglePixels(std::string inputImage, std::string clumpsImage, std::string outputImage, std::string tempImage, std::string imageFormat, bool processInMemory, bool ignoreZeros)
     {
         try
         {
@@ -136,7 +136,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void executeClump(std::string inputImage, std::string outputImage, std::string imageFormat, bool processInMemory, bool noDataValProvided, float noDataVal, bool addRatPxlVals) throw(RSGISCmdException)
+    void executeClump(std::string inputImage, std::string outputImage, std::string imageFormat, bool processInMemory, bool noDataValProvided, float noDataVal, bool addRatPxlVals) 
     {        
         try
         {
@@ -239,7 +239,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void executeRMSmallClumpsStepwise(std::string inputImage, std::string clumpsImage, std::string outputImage, std::string imageFormat, bool stretchStatsAvail, std::string stretchStatsFile, bool storeMean, bool processInMemory, unsigned int minClumpSize, float specThreshold)throw(RSGISCmdException)
+    void executeRMSmallClumpsStepwise(std::string inputImage, std::string clumpsImage, std::string outputImage, std::string imageFormat, bool stretchStatsAvail, std::string stretchStatsFile, bool storeMean, bool processInMemory, unsigned int minClumpSize, float specThreshold)
     {
         try
         {
@@ -332,7 +332,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void executeRelabelClumps(std::string inputImage, std::string outputImage, std::string imageFormat, bool processInMemory) throw(RSGISCmdException)
+    void executeRelabelClumps(std::string inputImage, std::string outputImage, std::string imageFormat, bool processInMemory) 
     {
         try
         {
@@ -394,7 +394,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void executeMeanImage(std::string inputImage, std::string clumpsImage, std::string outputImage, std::string imageFormat, RSGISLibDataType outDataType, bool processInMemory) throw(RSGISCmdException)
+    void executeMeanImage(std::string inputImage, std::string clumpsImage, std::string outputImage, std::string imageFormat, RSGISLibDataType outDataType, bool processInMemory) 
     {
         try
         {
@@ -465,7 +465,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeRandomColourClumps(std::string inputImage, std::string outputImage, std::string imageFormat, bool processInMemory, std::string importLUTFile, bool importLUT, std::string exportLUTFile, bool exportLUT)throw(RSGISCmdException)
+    void executeRandomColourClumps(std::string inputImage, std::string outputImage, std::string imageFormat, bool processInMemory, std::string importLUTFile, bool importLUT, std::string exportLUTFile, bool exportLUT)
     {
         try
         {
@@ -523,7 +523,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void executeUnionOfClumps(std::vector<std::string> inputImagePaths, std::string outputImage, std::string imageFormat, bool noDataValProvided, float noDataVal, bool addRatPxlVals)throw(RSGISCmdException)
+    void executeUnionOfClumps(std::vector<std::string> inputImagePaths, std::string outputImage, std::string imageFormat, bool noDataValProvided, float noDataVal, bool addRatPxlVals)
     {
         try
         {
@@ -561,7 +561,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void executeMergeSegmentationTiles(std::string outputImage, std::string borderMaskImage, std::vector<std::string> inputImagePaths, unsigned int tileBoundary, unsigned int tileOverlap, unsigned int tileBody, std::string colsName)throw(RSGISCmdException)
+    void executeMergeSegmentationTiles(std::string outputImage, std::string borderMaskImage, std::vector<std::string> inputImagePaths, unsigned int tileBoundary, unsigned int tileOverlap, unsigned int tileBody, std::string colsName)
     {
         try
         {
@@ -601,7 +601,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void executeFindTileBordersMask(std::vector<std::string> inputImagePaths, std::string borderMaskImage, unsigned int tileBoundary, unsigned int tileOverlap, unsigned int tileBody, std::string colsName)throw(RSGISCmdException)
+    void executeFindTileBordersMask(std::vector<std::string> inputImagePaths, std::string borderMaskImage, unsigned int tileBoundary, unsigned int tileOverlap, unsigned int tileBody, std::string colsName)
     {
         try
         {
@@ -632,7 +632,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void executeMergeClumpImages(std::vector<std::string> inputImagePaths, std::string outputImage, bool mergeRATs)throw(RSGISCmdException)
+    void executeMergeClumpImages(std::vector<std::string> inputImagePaths, std::string outputImage, bool mergeRATs)
     {
         try
         {
@@ -663,7 +663,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void executeExtractBrightFeatures(std::string inputImage, std::string maskImage, std::string outputImage, std::string temp1Image, std::string temp2Image, std::string outputFormat, float initThres, float thresIncrement, float thresholdUpper, std::vector<rsgis::cmds::FeatureShapeDescription*> shapeFeatDescript)throw(RSGISCmdException)
+    void executeExtractBrightFeatures(std::string inputImage, std::string maskImage, std::string outputImage, std::string temp1Image, std::string temp2Image, std::string outputFormat, float initThres, float thresIncrement, float thresholdUpper, std::vector<rsgis::cmds::FeatureShapeDescription*> shapeFeatDescript)
     {
         /*
         try
@@ -725,7 +725,7 @@ namespace rsgis{ namespace cmds {
          */
     }
     
-    void executeRMSmallClumps(std::string clumpsImage, std::string outputImage, float threshold, std::string imgFormat)throw(RSGISCmdException)
+    void executeRMSmallClumps(std::string clumpsImage, std::string outputImage, float threshold, std::string imgFormat)
     {
         GDALAllRegister();
         GDALDataset *clumpsDataset;
@@ -772,7 +772,7 @@ namespace rsgis{ namespace cmds {
     }
             
             
-    void executeGenerateRegularGrid(std::string inputImage, std::string outputClumpImage, std::string imageFormat, unsigned int numXPxls, unsigned int numYPxls, bool offset)throw(RSGISCmdException)
+    void executeGenerateRegularGrid(std::string inputImage, std::string outputClumpImage, std::string imageFormat, unsigned int numXPxls, unsigned int numYPxls, bool offset)
     {
         GDALAllRegister();
         
@@ -811,7 +811,7 @@ namespace rsgis{ namespace cmds {
     }
             
             
-    void executeIncludeClumpedRegion(std::string inputClumps, std::string inputRegion, std::string outputClumpImage, std::string imageFormat)throw(RSGISCmdException)
+    void executeIncludeClumpedRegion(std::string inputClumps, std::string inputRegion, std::string outputClumpImage, std::string imageFormat)
     {
         GDALAllRegister();
         
@@ -869,7 +869,7 @@ namespace rsgis{ namespace cmds {
         }
     }
             
-    void executeMergeSelectClumps2Neighbour(std::string inputImage, std::string clumpsImage, std::string outputImage, std::string imageFormat, std::string selectClumpsCol, std::string noDataClumpsCol)throw(RSGISCmdException)
+    void executeMergeSelectClumps2Neighbour(std::string inputImage, std::string clumpsImage, std::string outputImage, std::string imageFormat, std::string selectClumpsCol, std::string noDataClumpsCol)
     {
         try
         {
@@ -931,7 +931,7 @@ namespace rsgis{ namespace cmds {
     }
             
             
-    void executeDropSelectedClumps(std::string clumpsImage, std::string outputImage, std::string imageFormat, std::string selectClumpsCol)throw(RSGISCmdException)
+    void executeDropSelectedClumps(std::string clumpsImage, std::string outputImage, std::string imageFormat, std::string selectClumpsCol)
     {
         try
         {
@@ -959,7 +959,7 @@ namespace rsgis{ namespace cmds {
         }
     }
             
-    void executeMergeClumpsEquivalentVal(std::string clumpsImage, std::string outputImage, std::string imageFormat, std::vector<std::string> clumpsValCols)throw(RSGISCmdException)
+    void executeMergeClumpsEquivalentVal(std::string clumpsImage, std::string outputImage, std::string imageFormat, std::vector<std::string> clumpsValCols)
     {
         try
         {
@@ -1013,7 +1013,7 @@ namespace rsgis{ namespace cmds {
     }
             
             
-    DllExport void executePxlGrowRegions(std::string clumpsImage, std::string valsImage, std::string outputImage, std::string imageFormat, std::string muParseCriteria, std::vector<VarImgBandPairs> varNameBandPairs)throw(RSGISCmdException)
+    DllExport void executePxlGrowRegions(std::string clumpsImage, std::string valsImage, std::string outputImage, std::string imageFormat, std::string muParseCriteria, std::vector<VarImgBandPairs> varNameBandPairs)
     {
         try
         {

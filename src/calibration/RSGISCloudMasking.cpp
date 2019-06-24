@@ -25,7 +25,7 @@
 
 namespace rsgis{namespace calib{
     
-    RSGISLandsatFMaskPass1CloudMasking::RSGISLandsatFMaskPass1CloudMasking(unsigned int scaleFactor, unsigned int numLSBands, double whitenessThreshold) throw(rsgis::img::RSGISImageCalcException):rsgis::img::RSGISCalcImageValue(16)
+    RSGISLandsatFMaskPass1CloudMasking::RSGISLandsatFMaskPass1CloudMasking(unsigned int scaleFactor, unsigned int numLSBands, double whitenessThreshold) :rsgis::img::RSGISCalcImageValue(16)
     {
         this->scaleFactor = scaleFactor;
         this->whitenessThreshold = whitenessThreshold;
@@ -108,7 +108,7 @@ namespace rsgis{namespace calib{
         }
     }
     
-    void RSGISLandsatFMaskPass1CloudMasking::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISLandsatFMaskPass1CloudMasking::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         bool noData = true;
         for(unsigned i = 0; i < numBands; ++i)
@@ -303,13 +303,13 @@ namespace rsgis{namespace calib{
     }
     
     
-    RSGISLandsatFMaskExportPass1LandWaterCloudMasking::RSGISLandsatFMaskExportPass1LandWaterCloudMasking()throw(rsgis::img::RSGISImageCalcException):rsgis::img::RSGISCalcImageValue(1)
+    RSGISLandsatFMaskExportPass1LandWaterCloudMasking::RSGISLandsatFMaskExportPass1LandWaterCloudMasking():rsgis::img::RSGISCalcImageValue(1)
     {
         this->numValidPxls = 0.0;
         this->numPCPPxls = 0.0;
     }
     
-    void RSGISLandsatFMaskExportPass1LandWaterCloudMasking::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISLandsatFMaskExportPass1LandWaterCloudMasking::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         output[0] = 0;
         if(bandValues[10] == 1)
@@ -350,7 +350,7 @@ namespace rsgis{namespace calib{
     
     
     
-    RSGISLandsatFMaskPass2ClearSkyCloudProbCloudMasking::RSGISLandsatFMaskPass2ClearSkyCloudProbCloudMasking(unsigned int scaleFactor, unsigned int numLSBands, double water82ndThres, double land82ndThres, double land17thThres) throw(rsgis::img::RSGISImageCalcException):rsgis::img::RSGISCalcImageValue(6)
+    RSGISLandsatFMaskPass2ClearSkyCloudProbCloudMasking::RSGISLandsatFMaskPass2ClearSkyCloudProbCloudMasking(unsigned int scaleFactor, unsigned int numLSBands, double water82ndThres, double land82ndThres, double land17thThres) :rsgis::img::RSGISCalcImageValue(6)
     {
         this->scaleFactor = scaleFactor;
         this->numLSBands = numLSBands;
@@ -418,7 +418,7 @@ namespace rsgis{namespace calib{
         }
     }
     
-    void RSGISLandsatFMaskPass2ClearSkyCloudProbCloudMasking::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISLandsatFMaskPass2ClearSkyCloudProbCloudMasking::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         bool noData = true;
         for(unsigned i = 1; i < numBands; ++i)
@@ -508,7 +508,7 @@ namespace rsgis{namespace calib{
     }
     
     
-    RSGISLandsatFMaskPass2CloudMasking::RSGISLandsatFMaskPass2CloudMasking(unsigned int scaleFactor, unsigned int numLSBands, double landCloudProbUpperThres, double waterCloudProbUpperThres, double lowerLandTempThres) throw(rsgis::img::RSGISImageCalcException):rsgis::img::RSGISCalcImageValue(1)
+    RSGISLandsatFMaskPass2CloudMasking::RSGISLandsatFMaskPass2CloudMasking(unsigned int scaleFactor, unsigned int numLSBands, double landCloudProbUpperThres, double waterCloudProbUpperThres, double lowerLandTempThres) :rsgis::img::RSGISCalcImageValue(1)
     {
         this->scaleFactor = scaleFactor;
         this->numLSBands = numLSBands;
@@ -588,7 +588,7 @@ namespace rsgis{namespace calib{
         }
     }
     
-    void RSGISLandsatFMaskPass2CloudMasking::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISLandsatFMaskPass2CloudMasking::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         bool noData = true;
         for(unsigned i = 1; i <= numLSBands; ++i)
@@ -675,7 +675,7 @@ namespace rsgis{namespace calib{
     
     
 
-    void RSGISCalcImageCloudMajorityFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCalcImageCloudMajorityFilter::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
     {
         if(numBands != 1)
         {
@@ -711,7 +711,7 @@ namespace rsgis{namespace calib{
     }
     
   
-    void RSGISCalcImagePotentialCloudShadowsMask::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCalcImagePotentialCloudShadowsMask::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         if(numBands != 5)
         {
@@ -745,7 +745,7 @@ namespace rsgis{namespace calib{
     
     
     
-    void RSGISCalcImagePotentialCloudShadowsMaskSingleInput::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCalcImagePotentialCloudShadowsMaskSingleInput::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         if(numBands != 3)
         {
@@ -777,7 +777,7 @@ namespace rsgis{namespace calib{
     
     
     
-    void RSGISCalcCloudParams::calcCloudHeights(GDALDataset *thermal, GDALDataset *cloudClumpsDS, GDALDataset *initCloudHeights, double lowerLandThres, double upperLandThres, float scaleFactor)throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCalcCloudParams::calcCloudHeights(GDALDataset *thermal, GDALDataset *cloudClumpsDS, GDALDataset *initCloudHeights, double lowerLandThres, double upperLandThres, float scaleFactor)
     {
         try
         {
@@ -906,7 +906,7 @@ namespace rsgis{namespace calib{
         
     }
     
-    void RSGISCalcCloudParams::calcCloudHeightsNoThermal(GDALDataset *cloudClumpsDS, GDALDataset *initCloudHeightsDS)throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCalcCloudParams::calcCloudHeightsNoThermal(GDALDataset *cloudClumpsDS, GDALDataset *initCloudHeightsDS)
     {
         try
         {
@@ -959,7 +959,7 @@ namespace rsgis{namespace calib{
     }
     
     
-    void RSGISCalcCloudParams::projFitCloudShadow(GDALDataset *cloudClumpsDS, GDALDataset *initCloudHeights, GDALDataset *potentCloudShadowRegions, GDALDataset *cloudShadowTestRegionsDS, GDALDataset *cloudShadowRegionsDS, double sunAz, double sunZen, double senAz, double senZen)throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCalcCloudParams::projFitCloudShadow(GDALDataset *cloudClumpsDS, GDALDataset *initCloudHeights, GDALDataset *potentCloudShadowRegions, GDALDataset *cloudShadowTestRegionsDS, GDALDataset *cloudShadowRegionsDS, double sunAz, double sunZen, double senAz, double senZen)
     {
         try
         {
@@ -1201,7 +1201,7 @@ namespace rsgis{namespace calib{
         this->imgCalc = new rsgis::img::RSGISCalcImage(this->calcCloudShadCorr);
     }
     
-    bool RSGISEditCloudShadowImg::turnOnPxl(double x, double y)throw(rsgis::img::RSGISImageCalcException)
+    bool RSGISEditCloudShadowImg::turnOnPxl(double x, double y)
     {
         bool rtnStat = true;
         if((x < this->tlX) | (x > this->brX))
@@ -1245,14 +1245,14 @@ namespace rsgis{namespace calib{
         return rtnStat;
     }
     
-    void RSGISEditCloudShadowImg::reset()throw(rsgis::img::RSGISImageCalcException)
+    void RSGISEditCloudShadowImg::reset()
     {
         this->testImgBand->Fill(0.0);
         extent.init(0,0,0,0);
         this->firstPts = true;
     }
     
-    bool RSGISEditCloudShadowImg::calcCorrelation(GDALDataset *cloudClumpsDS, GDALDataset *potentCloudShadowRegions, GDALDataset *cloudShadowTestRegionsDS, double *cloudPropOverlap, unsigned long *numPxlOverlap)throw(rsgis::img::RSGISImageCalcException)
+    bool RSGISEditCloudShadowImg::calcCorrelation(GDALDataset *cloudClumpsDS, GDALDataset *potentCloudShadowRegions, GDALDataset *cloudShadowTestRegionsDS, double *cloudPropOverlap, unsigned long *numPxlOverlap)
     {
         bool insideimg = true;
         try
@@ -1339,7 +1339,7 @@ namespace rsgis{namespace calib{
     
     
     
-    void RSGISCalcPxlCloudBaseAndTopHeight::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCalcPxlCloudBaseAndTopHeight::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) 
     {
         if(numIntVals != 1)
         {
@@ -1388,7 +1388,7 @@ namespace rsgis{namespace calib{
     }
     
     
-    void RSGISCalcPxlCloudBaseAndTopHeightNoThermal::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCalcPxlCloudBaseAndTopHeightNoThermal::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) 
     {
         if(numIntVals != 1)
         {
@@ -1415,7 +1415,7 @@ namespace rsgis{namespace calib{
     }
     
     
-    void RSGISCalcCloudShadowCorrespondance::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCalcCloudShadowCorrespondance::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) 
     {
         if(numIntVals != 3)
         {
@@ -1454,7 +1454,7 @@ namespace rsgis{namespace calib{
     }
     
     
-    void RSGISCalcCombineMasks::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCalcCombineMasks::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) 
     {
         if(numIntVals != 2)
         {
@@ -1477,7 +1477,7 @@ namespace rsgis{namespace calib{
     }
     
     
-    void RSGISExportMaskForOverPCPThreshold::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISExportMaskForOverPCPThreshold::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) 
     {
         if(numIntVals != 1)
         {

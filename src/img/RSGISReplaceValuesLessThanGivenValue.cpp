@@ -31,7 +31,7 @@ namespace rsgis{namespace img{
 		this->value = value;
 	}
 	
-	void RSGISReplaceValuesLessThanGivenValue::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+	void RSGISReplaceValuesLessThanGivenValue::calcImageValue(float *bandValues, int numBands, double *output) 
 	{
 		if(numBands != numOutBands)
 		{
@@ -51,27 +51,27 @@ namespace rsgis{namespace img{
 		}
 	}
 	
-	void RSGISReplaceValuesLessThanGivenValue::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+	void RSGISReplaceValuesLessThanGivenValue::calcImageValue(float *bandValues, int numBands) 
 	{
 		throw RSGISImageCalcException("Not implemented");
 	}
 	
-	void RSGISReplaceValuesLessThanGivenValue::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException)
+	void RSGISReplaceValuesLessThanGivenValue::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) 
 	{
 		throw RSGISImageCalcException("Not implemented");
 	}
 	
-	void RSGISReplaceValuesLessThanGivenValue::calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) throw(RSGISImageCalcException)
+	void RSGISReplaceValuesLessThanGivenValue::calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) 
 	{
 		throw RSGISImageCalcException("Not implemented");
 	}
 	
-	void RSGISReplaceValuesLessThanGivenValue::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException)
+	void RSGISReplaceValuesLessThanGivenValue::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
 	{
 		throw RSGISImageCalcException("Not implemented");
 	}
 	
-	bool RSGISReplaceValuesLessThanGivenValue::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException)
+	bool RSGISReplaceValuesLessThanGivenValue::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) 
 	{
 		throw RSGISImageCalcException("Not implemented");
 	}

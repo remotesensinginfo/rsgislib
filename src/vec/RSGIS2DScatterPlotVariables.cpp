@@ -33,12 +33,12 @@ namespace rsgis{namespace vec{
 		this->col2 = col2;
 	}
 	
-	void RSGIS2DScatterPlotVariables::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGIS2DScatterPlotVariables::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)
 	{
 		throw RSGISVectorException("Not implemented..");
 	}
 	
-	void RSGIS2DScatterPlotVariables::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGIS2DScatterPlotVariables::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid)
 	{
 		OGRFeatureDefn *featureDefn = feature->GetDefnRef();
 		
@@ -63,7 +63,7 @@ namespace rsgis{namespace vec{
 				
 	}
 	
-	void RSGIS2DScatterPlotVariables::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+	void RSGIS2DScatterPlotVariables::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn)
 	{
 		// Nothing to do!
 	}

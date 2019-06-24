@@ -45,7 +45,7 @@
 namespace rsgis{ namespace cmds {
 
     void executePointValue(std::string inputImage, std::string inputVecPolys, std::string outputStatsFile, bool outputToText,
-                           bool force, bool useBandNames, bool shortenBandNames)throw(RSGISCmdException)
+                           bool force, bool useBandNames, bool shortenBandNames)
     {
         // Convert to absolute path
         inputVecPolys = boost::filesystem::absolute(inputVecPolys).string();
@@ -192,7 +192,7 @@ namespace rsgis{ namespace cmds {
 
     void executePixelStats(std::string inputImage, std::string inputVecPolys, std::string outputStatsFile, rsgis::cmds::RSGISBandAttZonalStatsCmds *calcStats,
                            std::string inputRasPolys, bool outputToText, bool force, bool useBandNames,
-                           bool ignoreProjection, int pixelInPolyMethodInt, bool shortenBandNames) throw(RSGISCmdException)
+                           bool ignoreProjection, int pixelInPolyMethodInt, bool shortenBandNames) 
     {
         // Convert to absolute path
         inputVecPolys = boost::filesystem::absolute(inputVecPolys).string();
@@ -487,7 +487,7 @@ namespace rsgis{ namespace cmds {
     }
 
     void executePixelVals2txt(std::string inputImage, std::string inputVecPolys, std::string outputTextBase, std::string polyAttribute, std::string outtxtform,
-                              bool ignoreProjection, int pixelInPolyMethodInt) throw(RSGISCmdException)
+                              bool ignoreProjection, int pixelInPolyMethodInt) 
     {
         // Convert to absolute path
         inputVecPolys = boost::filesystem::absolute(inputVecPolys).string();
@@ -591,7 +591,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeZonesImage2HDF5(std::string inputImage, std::string inputVecPolys, std::string outputHDF, bool ignoreProjection, int pixelInPolyMethodInt) throw(RSGISCmdException)
+    void executeZonesImage2HDF5(std::string inputImage, std::string inputVecPolys, std::string outputHDF, bool ignoreProjection, int pixelInPolyMethodInt) 
     {
         std::cout.precision(12);
         // Convert to absolute path
@@ -660,7 +660,7 @@ namespace rsgis{ namespace cmds {
 
     }
         
-    void executeExtractAvgEndMembers(std::string inputImage, std::string inputVecPolys, std::string outputMatrixFile, int pixelInPolyMethodInt)throw(RSGISCmdException)
+    void executeExtractAvgEndMembers(std::string inputImage, std::string inputVecPolys, std::string outputMatrixFile, int pixelInPolyMethodInt)
     {
         std::cout.precision(12);
         // Convert to absolute path
@@ -727,7 +727,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executePixelBandStatsVecLyr(std::string inputImage, std::string vecfile, std::string veclyr, std::vector<RSGISZonalBandAttrsCmds> *zonBandAtts, int pixelInPolyMethodInt, bool ignoreProjection) throw(RSGISCmdException)
+    void executePixelBandStatsVecLyr(std::string inputImage, std::string vecfile, std::string veclyr, std::vector<RSGISZonalBandAttrsCmds> *zonBandAtts, int pixelInPolyMethodInt, bool ignoreProjection) 
     {
         // Convert from int to enum
         rsgis::img::pixelInPolyOption pixelInPolyMethod = rsgis::img::pixelInPolyInt2Enum(pixelInPolyMethodInt);

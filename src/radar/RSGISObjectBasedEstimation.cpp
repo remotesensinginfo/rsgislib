@@ -95,7 +95,7 @@ namespace rsgis{namespace radar{
 		std::cout << "Parameters read in OK" << std::endl;
 	}
 
-	void RSGISObjectBasedEstimation::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISObjectBasedEstimation::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)
 	{
 		try
 		{
@@ -291,7 +291,7 @@ namespace rsgis{namespace radar{
 
 	}
 
-	void RSGISObjectBasedEstimation::processFeature(OGRFeature *inFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISObjectBasedEstimation::processFeature(OGRFeature *inFeature, geos::geom::Envelope *env, long fid)
 	{
 
 		try
@@ -465,7 +465,7 @@ namespace rsgis{namespace radar{
 		}
 	}
 
-	void RSGISObjectBasedEstimation::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(rsgis::vec::RSGISVectorOutputException)
+	void RSGISObjectBasedEstimation::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn)
 	{
 		if(this->parameters == heightDensity)
 		{
@@ -624,7 +624,7 @@ namespace rsgis{namespace radar{
 
 	}
 
-	void RSGISObjectBasedEstimationObjectAP::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISObjectBasedEstimationObjectAP::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)
 	{
 		try
 		{
@@ -840,7 +840,7 @@ namespace rsgis{namespace radar{
 
 	}
 
-	void RSGISObjectBasedEstimationObjectAP::processFeature(OGRFeature *inFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISObjectBasedEstimationObjectAP::processFeature(OGRFeature *inFeature, geos::geom::Envelope *env, long fid)
 	{
 		try
 		{
@@ -1040,7 +1040,7 @@ namespace rsgis{namespace radar{
 
 	}
 
-	void RSGISObjectBasedEstimationObjectAP::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(rsgis::vec::RSGISVectorOutputException)
+	void RSGISObjectBasedEstimationObjectAP::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn)
 	{
 		if(this->parameters == heightDensity)
 		{
@@ -1147,7 +1147,7 @@ namespace rsgis{namespace radar{
         }
 	}
 
-	void RSGISObjectBasedEstimationGetObjVals::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISObjectBasedEstimationGetObjVals::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) 
 	{
 		for(int i = 0; i < this->numInBands; i++) // Loop through bands
 		{
@@ -1158,7 +1158,7 @@ namespace rsgis{namespace radar{
 		}
 	}
 
-	void RSGISObjectBasedEstimationGetObjVals::calcImageValue(float *bandValuesImage, int numBands, int band) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISObjectBasedEstimationGetObjVals::calcImageValue(float *bandValuesImage, int numBands, int band) 
 	{
 		for(int i = 1; i < this->numInBands + 1;  i++) // Loop through bands
 		{
@@ -1169,7 +1169,7 @@ namespace rsgis{namespace radar{
 		}
 	}
 
-	double* RSGISObjectBasedEstimationGetObjVals::getOutputValues() throw(rsgis::img::RSGISImageCalcException)
+	double* RSGISObjectBasedEstimationGetObjVals::getOutputValues() 
 	{
 		return NULL;
 	}

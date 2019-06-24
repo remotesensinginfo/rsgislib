@@ -29,7 +29,7 @@ namespace rsgis{namespace filter{
         
 	}
     
-	void RSGISImageMorphologyGradient::calcGradientImage(GDALDataset **datasets, std::string outputImage, rsgis::math::Matrix *matrixOperator, std::string format, GDALDataType outDataType) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
+	void RSGISImageMorphologyGradient::calcGradientImage(GDALDataset **datasets, std::string outputImage, rsgis::math::Matrix *matrixOperator, std::string format, GDALDataType outDataType)
 	{
         if(matrixOperator->n != matrixOperator->m)
         {
@@ -54,7 +54,7 @@ namespace rsgis{namespace filter{
         delete gradImage;
 	}
     
-    void RSGISImageMorphologyGradient::calcGradientImageAll(GDALDataset **datasets, std::string outputImage, rsgis::math::Matrix *matrixOperator, std::string format, GDALDataType outDataType) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
+    void RSGISImageMorphologyGradient::calcGradientImageAll(GDALDataset **datasets, std::string outputImage, rsgis::math::Matrix *matrixOperator, std::string format, GDALDataType outDataType)
 	{
         if(matrixOperator->n != matrixOperator->m)
         {
@@ -83,7 +83,7 @@ namespace rsgis{namespace filter{
         this->matrixOperator = matrixOperator;
 	}
 	
-	void RSGISMorphologyGradient::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISMorphologyGradient::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
 	{
 		bool first = true;
 		double *largest = new double[numBands];
@@ -145,7 +145,7 @@ namespace rsgis{namespace filter{
         this->matrixOperator = matrixOperator;
 	}
 	
-	void RSGISMorphologyGradientAll::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISMorphologyGradientAll::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
 	{
 		bool first = true;
 		double largest = 0;

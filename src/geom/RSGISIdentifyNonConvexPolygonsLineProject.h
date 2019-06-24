@@ -56,16 +56,16 @@ namespace rsgis{namespace geom{
 		{
 		public:
 			RSGISIdentifyNonConvexPolygonsLineProject(float resolution);
-			virtual std::vector<geos::geom::Polygon*>* retrievePolygons(std::list<RSGIS2DPoint*> **clusters, int numClusters) throw(RSGISGeometryException);
-			virtual std::vector<geos::geom::Polygon*>* retrievePolygons(std::list<RSGISPolygon*> **clusters, int numClusters) throw(RSGISGeometryException);
-			virtual std::vector<geos::geom::Polygon*>* retrievePolygons(std::list<geos::geom::Polygon*> **clusters, int numClusters) throw(RSGISGeometryException);
-			virtual geos::geom::Polygon* retrievePolygon(std::vector<geos::geom::Polygon*> *polygons) throw(RSGISGeometryException);
-			virtual geos::geom::Polygon* retrievePolygon(std::list<geos::geom::Polygon*> *polygons) throw(RSGISGeometryException);
+			virtual std::vector<geos::geom::Polygon*>* retrievePolygons(std::list<RSGIS2DPoint*> **clusters, int numClusters);
+			virtual std::vector<geos::geom::Polygon*>* retrievePolygons(std::list<RSGISPolygon*> **clusters, int numClusters);
+			virtual std::vector<geos::geom::Polygon*>* retrievePolygons(std::list<geos::geom::Polygon*> **clusters, int numClusters);
+			virtual geos::geom::Polygon* retrievePolygon(std::vector<geos::geom::Polygon*> *polygons);
+			virtual geos::geom::Polygon* retrievePolygon(std::list<geos::geom::Polygon*> *polygons);
 			virtual ~RSGISIdentifyNonConvexPolygonsLineProject();
 		protected:
 			float resolution;
-			virtual geos::geom::Polygon* identifyIrregularBoundaryLineProj(std::vector<geos::geom::LineSegment> *lines) throw(RSGISGeometryException);
-			virtual std::vector<geos::geom::Coordinate*>* identifyIrregularBoundaryCoordinatesLineProj(std::vector<geos::geom::LineSegment> *lines, geos::geom::Polygon *convexhull) throw(RSGISGeometryException);
+			virtual geos::geom::Polygon* identifyIrregularBoundaryLineProj(std::vector<geos::geom::LineSegment> *lines);
+			virtual std::vector<geos::geom::Coordinate*>* identifyIrregularBoundaryCoordinatesLineProj(std::vector<geos::geom::LineSegment> *lines, geos::geom::Polygon *convexhull);
 		};
 }}
 

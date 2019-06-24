@@ -49,8 +49,8 @@ namespace rsgis
 		class DllExport RSGISBaysianStatsNoPrior
 			{
 			public:
-				RSGISBaysianStatsNoPrior(RSGISMathFunction *function, double variance, double interval, double minVal, double maxVal, double lowerLimit, double upperLimit, deltatypedef deltatype) throw(RSGISBaysianStatsException);
-				virtual double* calcImageValueNoPrior(float value) throw(RSGISBaysianStatsException);
+				RSGISBaysianStatsNoPrior(RSGISMathFunction *function, double variance, double interval, double minVal, double maxVal, double lowerLimit, double upperLimit, deltatypedef deltatype);
+				virtual double* calcImageValueNoPrior(float value);
 				virtual ~RSGISBaysianStatsNoPrior(){};
 			protected:
 				deltatypedef deltatype;

@@ -29,7 +29,7 @@ namespace rsgis{namespace img{
 		
 	}
 	
-	GDALDataset* RSGISCopyImageBands::outputImageBands(GDALDataset *inputDS, std::string outputFile, int *outBands, int numOutBands, std::string outputProj, bool useInProj) throw(RSGISImageCalcException,RSGISImageBandException,RSGISImageException)
+	GDALDataset* RSGISCopyImageBands::outputImageBands(GDALDataset *inputDS, std::string outputFile, int *outBands, int numOutBands, std::string outputProj, bool useInProj)
 	{
 		RSGISIdentifyImageValues *copyImageValues = NULL;
 		RSGISCalcImage *calcImage = NULL;
@@ -45,7 +45,7 @@ namespace rsgis{namespace img{
 			calcImage = new RSGISCalcImage(copyImageValues, outputProj, useInProj);
 			calcImage->calcImage(datasets, 1, outputFile);
 		}
-		catch(RSGISImageCalcException e)
+		catch(RSGISImageCalcException &e)
 		{
 			if(copyImageValues != NULL)
 			{
@@ -61,7 +61,7 @@ namespace rsgis{namespace img{
 			}
 			throw e;
 		}
-		catch(RSGISImageBandException e)
+		catch(RSGISImageBandException &e)
 		{
 			if(copyImageValues != NULL)
 			{
@@ -104,7 +104,7 @@ namespace rsgis{namespace img{
 		this->outBands = outBands;
 	}
 	
-	void RSGISIdentifyImageValues::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+	void RSGISIdentifyImageValues::calcImageValue(float *bandValues, int numBands, double *output) 
 	{
 		if(numBands < numOutBands)
 		{
@@ -121,27 +121,27 @@ namespace rsgis{namespace img{
 		}
 	}
 	
-	void RSGISIdentifyImageValues::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+	void RSGISIdentifyImageValues::calcImageValue(float *bandValues, int numBands) 
 	{
 		throw RSGISImageCalcException("Not implemented");
 	}
 	
-	void RSGISIdentifyImageValues::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException)
+	void RSGISIdentifyImageValues::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) 
 	{
 		throw RSGISImageCalcException("Not Implemented");
 	}
 	
-	void RSGISIdentifyImageValues::calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) throw(RSGISImageCalcException)
+	void RSGISIdentifyImageValues::calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) 
 	{
 		throw RSGISImageCalcException("Not implemented");
 	}
 	
-	void RSGISIdentifyImageValues::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException)
+	void RSGISIdentifyImageValues::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
 	{
 		throw RSGISImageCalcException("No implemented");
 	}
 
-	bool RSGISIdentifyImageValues::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException)
+	bool RSGISIdentifyImageValues::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) 
 	{
 		throw RSGISImageCalcException("No implemented");
 	}	

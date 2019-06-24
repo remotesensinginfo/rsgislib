@@ -47,7 +47,7 @@ namespace rsgis{namespace img{
 		{
 		public:
 			RSGISInterpolator();
-			virtual double interpolate(double xShift, double yShift, double *pixels) throw(rsgis::RSGISImageException)=0;
+			virtual double interpolate(double xShift, double yShift, double *pixels)=0;
 			virtual ~RSGISInterpolator();
 		};
 	
@@ -55,7 +55,7 @@ namespace rsgis{namespace img{
 		{
 		public:
 			RSGISCubicInterpolator();
-			double interpolate(double xShift, double yShift, double *pixels) throw(rsgis::RSGISImageException);
+			double interpolate(double xShift, double yShift, double *pixels);
 		protected:
 			double estimateNewValueFromCurve(double *pixels, double shift);
 		};
@@ -64,21 +64,21 @@ namespace rsgis{namespace img{
 		{
 		public:
 			RSGISBilinearAreaInterpolator();
-			double interpolate(double xShift, double yShift, double *pixels) throw(rsgis::RSGISImageException);
+			double interpolate(double xShift, double yShift, double *pixels);
 		};
 	
 	class DllExport RSGISBilinearPointInterpolator : public RSGISInterpolator
 		{
 		public:
 			RSGISBilinearPointInterpolator();
-			double interpolate(double xShift, double yShift, double *pixels) throw(rsgis::RSGISImageException);
+			double interpolate(double xShift, double yShift, double *pixels);
 		};
 	
 	class DllExport RSGISNearestNeighbourInterpolator : public RSGISInterpolator
 		{
 		public:
 			RSGISNearestNeighbourInterpolator();
-			double interpolate(double xShift, double yShift, double *pixels) throw(rsgis::RSGISImageException);
+			double interpolate(double xShift, double yShift, double *pixels);
 		protected:
 			int findIndexOfMax(double *arr, int size);
 		};
@@ -87,7 +87,7 @@ namespace rsgis{namespace img{
 		{
 		public:
 			RSGISTriangulationInterpolator();
-			double interpolate(double xShift, double yShift, double *pixels) throw(rsgis::RSGISImageException);
+			double interpolate(double xShift, double yShift, double *pixels);
 		protected:
 			double triangle(double xShift, double yShift, double *pixels, bool triangulation);
 		};

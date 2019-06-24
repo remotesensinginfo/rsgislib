@@ -31,7 +31,7 @@ namespace rsgis{ namespace utils{
 		
 	}
 	
-	std::vector<PlotPoly*>* RSGISPlotPolygonsCSVParse::parsePolyPlots(std::string inputfile) throw(rsgis::RSGISInputStreamException, RSGISTextException)
+	std::vector<PlotPoly*>* RSGISPlotPolygonsCSVParse::parsePolyPlots(std::string inputfile)
 	{
 		std::vector<PlotPoly*> *plotPolys = new std::vector<PlotPoly*>();
 		

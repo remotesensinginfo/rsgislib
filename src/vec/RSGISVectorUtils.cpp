@@ -310,7 +310,7 @@ namespace rsgis{namespace vec{
 		return geosGeomFactory->createPoint(*coord);
 	}
 	
-	bool RSGISVectorUtils::checkDIR4SHP(std::string dir, std::string shp) throw(RSGISVectorException)
+	bool RSGISVectorUtils::checkDIR4SHP(std::string dir, std::string shp)
 	{
         rsgis::utils::RSGISFileUtils fileUtils;
 		std::string *dirList = NULL;
@@ -331,7 +331,7 @@ namespace rsgis{namespace vec{
 				}
 			}
 		}
-		catch(RSGISException e)
+		catch(RSGISException &e)
 		{
 			std::cout << e.what() << std::endl;
 			throw RSGISVectorException(e.what());
@@ -341,7 +341,7 @@ namespace rsgis{namespace vec{
 		return returnVal;
 	}
 	
-	void RSGISVectorUtils::deleteSHP(std::string dir, std::string shp) throw(RSGISVectorException)
+	void RSGISVectorUtils::deleteSHP(std::string dir, std::string shp)
 	{
         rsgis::utils::RSGISFileUtils fileUtils;
 		std::string *dirList = NULL;
@@ -413,7 +413,7 @@ namespace rsgis{namespace vec{
 				}
 			}
 		}
-		catch(RSGISException e)
+		catch(RSGISException &e)
 		{
 			throw RSGISVectorException(e.what());
 		}
@@ -421,7 +421,7 @@ namespace rsgis{namespace vec{
 	}
 
 	
-	geos::geom::GeometryCollection* RSGISVectorUtils::createGeomCollection(std::vector<geos::geom::Polygon*> *polys) throw(RSGISVectorException)
+	geos::geom::GeometryCollection* RSGISVectorUtils::createGeomCollection(std::vector<geos::geom::Polygon*> *polys)
 	{
 		geos::geom::GeometryCollection *geom = NULL;
 		try
@@ -444,7 +444,7 @@ namespace rsgis{namespace vec{
 		return geom;
 	}
 	
-	geos::geom::Polygon* RSGISVectorUtils::createPolygon(double tlX, double tlY, double brX, double brY) throw(RSGISVectorException)
+	geos::geom::Polygon* RSGISVectorUtils::createPolygon(double tlX, double tlY, double brX, double brY)
 	{
 		const geos::geom::GeometryFactory* geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
 		
@@ -464,7 +464,7 @@ namespace rsgis{namespace vec{
 		
 	}
 	
-	OGRPolygon* RSGISVectorUtils::createOGRPolygon(double tlX, double tlY, double brX, double brY) throw(RSGISVectorException)
+	OGRPolygon* RSGISVectorUtils::createOGRPolygon(double tlX, double tlY, double brX, double brY)
 	{
 		OGRPolygon *ogrPoly = new OGRPolygon();
 		
@@ -479,7 +479,7 @@ namespace rsgis{namespace vec{
 		return ogrPoly;
 	}
     
-    OGRPolygon* RSGISVectorUtils::createOGRPolygon(geos::geom::Envelope *env) throw(RSGISVectorException)
+    OGRPolygon* RSGISVectorUtils::createOGRPolygon(geos::geom::Envelope *env)
     {
         OGRPolygon *ogrPoly = new OGRPolygon();
         
@@ -494,7 +494,7 @@ namespace rsgis{namespace vec{
         return ogrPoly;
     }
 	
-	OGRPolygon* RSGISVectorUtils::checkCloseOGRPolygon(OGRPolygon *poly) throw(RSGISVectorException)
+	OGRPolygon* RSGISVectorUtils::checkCloseOGRPolygon(OGRPolygon *poly)
 	{
 		OGRPolygon *ogrPoly = new OGRPolygon();
 		OGRLinearRing *ogrRing = new OGRLinearRing();
@@ -536,7 +536,7 @@ namespace rsgis{namespace vec{
 		
 	}
 	
-	OGRPolygon* RSGISVectorUtils::removeHolesOGRPolygon(OGRPolygon *poly) throw(RSGISVectorException)
+	OGRPolygon* RSGISVectorUtils::removeHolesOGRPolygon(OGRPolygon *poly)
 	{
 		OGRPolygon *ogrPoly = new OGRPolygon();
 		OGRLinearRing *ogrRing = new OGRLinearRing();
@@ -578,7 +578,7 @@ namespace rsgis{namespace vec{
 		
 	}
     
-    OGRPolygon* RSGISVectorUtils::removeHolesOGRPolygon(OGRPolygon *poly, float areaThreshold) throw(RSGISVectorException)
+    OGRPolygon* RSGISVectorUtils::removeHolesOGRPolygon(OGRPolygon *poly, float areaThreshold)
 	{
 		OGRPolygon *ogrPoly = new OGRPolygon();
 		OGRLinearRing *ogrRing = new OGRLinearRing();
@@ -661,7 +661,7 @@ namespace rsgis{namespace vec{
 		
 	}
 	
-	OGRPolygon* RSGISVectorUtils::moveOGRPolygon(OGRPolygon *poly, double shiftX, double shiftY, double shiftZ) throw(RSGISVectorException)
+	OGRPolygon* RSGISVectorUtils::moveOGRPolygon(OGRPolygon *poly, double shiftX, double shiftY, double shiftZ)
 	{
 		OGRPolygon *ogrPoly = new OGRPolygon();
 		OGRLinearRing *ogrRing = new OGRLinearRing();
@@ -688,7 +688,7 @@ namespace rsgis{namespace vec{
 		return ogrPoly;
 	}
 	
-	std::vector<std::string>* RSGISVectorUtils::findUniqueVals(OGRLayer *layer, std::string attribute) throw(RSGISVectorException)
+	std::vector<std::string>* RSGISVectorUtils::findUniqueVals(OGRLayer *layer, std::string attribute)
 	{
 		std::vector<std::string>::iterator iterVals;
 		std::vector<std::string> *values = new std::vector<std::string>();
@@ -726,7 +726,7 @@ namespace rsgis{namespace vec{
 	}
     
     
-    std::vector<std::string>* RSGISVectorUtils::getColumnNames(OGRLayer *layer) throw(RSGISVectorException)
+    std::vector<std::string>* RSGISVectorUtils::getColumnNames(OGRLayer *layer)
     {
         std::vector<std::string> *colNames = new std::vector<std::string>();
         try
@@ -749,7 +749,7 @@ namespace rsgis{namespace vec{
     
     
     
-    std::vector<OGRPoint*>* RSGISVectorUtils::getRegularStepPoints(std::vector<OGRLineString*> *lines, double step) throw(RSGISVectorException)
+    std::vector<OGRPoint*>* RSGISVectorUtils::getRegularStepPoints(std::vector<OGRLineString*> *lines, double step)
     {
         std::vector<OGRPoint*> *pts = new std::vector<OGRPoint*>();
         try

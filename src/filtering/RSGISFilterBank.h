@@ -59,8 +59,8 @@ namespace rsgis{namespace filter{
 			void addFilter(RSGISImageFilter *filter);
 			RSGISImageFilter* getFilter(int i);
 			int getNumFilters();
-			void executeFilters(GDALDataset **datasets, int numDS, std::string outImageBase, std::string gdalFormat, std::string imgExt, GDALDataType outDataType) throw(rsgis::RSGISImageException);
-			void exectuteFilter(int i, GDALDataset **datasets, int numDS, std::string outImageBase, std::string gdalFormat, GDALDataType outDataType) throw(rsgis::RSGISImageException);
+			void executeFilters(GDALDataset **datasets, int numDS, std::string outImageBase, std::string gdalFormat, std::string imgExt, GDALDataType outDataType);
+			void exectuteFilter(int i, GDALDataset **datasets, int numDS, std::string outImageBase, std::string gdalFormat, GDALDataType outDataType);
 			void exportFilterBankImages(std::string imagebase);
 			~RSGISFilterBank();
 		protected:

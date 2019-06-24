@@ -30,7 +30,7 @@ namespace rsgis{namespace segment{
         
     }
     
-    void RSGISFindClumpIDs::exportClumpIDsAsTxtFile(GDALDataset *clumps, std::string outputText, std::vector<ImgSeeds> *seedPxls) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISFindClumpIDs::exportClumpIDsAsTxtFile(GDALDataset *clumps, std::string outputText, std::vector<ImgSeeds> *seedPxls) 
     {
         unsigned int width = clumps->GetRasterXSize();
         unsigned int height = clumps->GetRasterYSize();
@@ -61,7 +61,7 @@ namespace rsgis{namespace segment{
         outTextFile.close();
     }
     
-    std::vector<ClumpSeed>* RSGISFindClumpIDs::readClumpSeedIDs(std::string inputTextFile)throw(rsgis::utils::RSGISTextException)
+    std::vector<ClumpSeed>* RSGISFindClumpIDs::readClumpSeedIDs(std::string inputTextFile)
     {
         std::vector<ClumpSeed> *clumpSeeds = new std::vector<ClumpSeed>();
         
@@ -106,7 +106,7 @@ namespace rsgis{namespace segment{
         
     }
     
-    void RSGISRegionGrowingSegmentation::performRegionGrowUsingClumps(GDALDataset *spectral, GDALDataset *clumps, GDALDataset *output, std::vector<ClumpSeed> *seeds, float initThreshold, float thresholdIncrements, float maxThreshold, unsigned int maxIterations )throw(rsgis::img::RSGISImageCalcException)
+    void RSGISRegionGrowingSegmentation::performRegionGrowUsingClumps(GDALDataset *spectral, GDALDataset *clumps, GDALDataset *output, std::vector<ClumpSeed> *seeds, float initThreshold, float thresholdIncrements, float maxThreshold, unsigned int maxIterations )
     {
         if((spectral->GetRasterXSize() != clumps->GetRasterXSize()) |
            (spectral->GetRasterXSize() != output->GetRasterXSize()))
@@ -369,7 +369,7 @@ namespace rsgis{namespace segment{
     }
     
     
-    rsgis::img::ImgClumpRG* RSGISRegionGrowingSegmentation::growRegion(float threshold, unsigned int maxNumIterations, std::vector<rsgis::img::ImgClumpRG*> *clumpTab, unsigned int numSpecBands, unsigned long seedClumpID, unsigned long seed, std::list<unsigned long> *regionClumps)throw(rsgis::img::RSGISImageCalcException)
+    rsgis::img::ImgClumpRG* RSGISRegionGrowingSegmentation::growRegion(float threshold, unsigned int maxNumIterations, std::vector<rsgis::img::ImgClumpRG*> *clumpTab, unsigned int numSpecBands, unsigned long seedClumpID, unsigned long seed, std::list<unsigned long> *regionClumps)
     {
         rsgis::img::ImgClumpRG *region = NULL;
         try 
@@ -529,7 +529,7 @@ namespace rsgis{namespace segment{
         
     }
     
-    void RSGISGenerateSeeds::genSeedsHistogram(GDALDataset *spectral, GDALDataset *clumps, GDALDataset *output, std::vector<BandThreshold> *thresholds) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISGenerateSeeds::genSeedsHistogram(GDALDataset *spectral, GDALDataset *clumps, GDALDataset *output, std::vector<BandThreshold> *thresholds) 
     {
         if((spectral->GetRasterXSize() != clumps->GetRasterXSize()) |
            (spectral->GetRasterXSize() != output->GetRasterXSize()))
@@ -805,7 +805,7 @@ namespace rsgis{namespace segment{
         delete clumpTab;
     }
     
-    void RSGISGenerateSeeds::genSeedsHistogram(GDALDataset *spectral, GDALDataset *clumps, std::string outputFile, std::vector<BandThreshold> *thresholds) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISGenerateSeeds::genSeedsHistogram(GDALDataset *spectral, GDALDataset *clumps, std::string outputFile, std::vector<BandThreshold> *thresholds) 
     {
         if(spectral->GetRasterXSize() != clumps->GetRasterXSize())
         {
@@ -1087,7 +1087,7 @@ namespace rsgis{namespace segment{
         
     }
     
-    void RSGISSelectClumps::selectClumps(GDALDataset *spectral, GDALDataset *clumps, GDALDataset *largeClumps, GDALDataset *output, ClumpSelection selection) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISSelectClumps::selectClumps(GDALDataset *spectral, GDALDataset *clumps, GDALDataset *largeClumps, GDALDataset *output, ClumpSelection selection) 
     {
         if((spectral->GetRasterXSize() != clumps->GetRasterXSize()) |
            (spectral->GetRasterXSize() != largeClumps->GetRasterXSize()) |
@@ -1502,7 +1502,7 @@ namespace rsgis{namespace segment{
         delete clumpTab;
     }
     
-    void RSGISSelectClumps::selectClumps(GDALDataset *spectral, GDALDataset *clumps, GDALDataset *largeClumps, std::string outputFile, ClumpSelection selection) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISSelectClumps::selectClumps(GDALDataset *spectral, GDALDataset *clumps, GDALDataset *largeClumps, std::string outputFile, ClumpSelection selection) 
     {
         if((spectral->GetRasterXSize() != clumps->GetRasterXSize()) |
            (spectral->GetRasterXSize() != largeClumps->GetRasterXSize()))

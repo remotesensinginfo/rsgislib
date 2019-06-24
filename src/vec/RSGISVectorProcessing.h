@@ -68,10 +68,10 @@ namespace rsgis{namespace vec{
 			void listAttributes(OGRLayer *inputSHPLayer);
 			void printAttribute(OGRLayer *inputLayer, std::string attribute);
 			void splitFeatures(OGRLayer *inputLayer, std::string outputBase, bool force);
-			void createPlotPolygons(std::vector<rsgis::utils::PlotPoly*> *polyDetails, std::string output, bool force) throw(RSGISVectorException);
-			void createImageFootprintPolygons(std::vector<rsgis::utils::ImageFootPrintPoly*> *polyDetails, std::string output, bool force) throw(RSGISVectorException);
-			void createGrid(std::string outputShapefile, OGRSpatialReference* spatialRef, bool deleteIfPresent, double xTLStart, double yTLStart, double resolutionX, double resolutionY, double width, double height) throw(RSGISVectorException);
-            float calcMeanMinDistance(std::vector<OGRGeometry*> *geometries) throw(RSGISVectorException);
+			void createPlotPolygons(std::vector<rsgis::utils::PlotPoly*> *polyDetails, std::string output, bool force);
+			void createImageFootprintPolygons(std::vector<rsgis::utils::ImageFootPrintPoly*> *polyDetails, std::string output, bool force);
+			void createGrid(std::string outputShapefile, OGRSpatialReference* spatialRef, bool deleteIfPresent, double xTLStart, double yTLStart, double resolutionX, double resolutionY, double width, double height);
+            float calcMeanMinDistance(std::vector<OGRGeometry*> *geometries);
             ~RSGISVectorProcessing();
 		};
 }}

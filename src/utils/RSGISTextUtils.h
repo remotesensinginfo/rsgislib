@@ -79,55 +79,55 @@ namespace rsgis{namespace utils{
 		{
 		public:
 			RSGISTextUtils();
-			size_t countLines(std::string input) throw(RSGISTextException);
-			void transpose(std::string input, std::string output, std::string delimiter) throw(RSGISTextException);
+			size_t countLines(std::string input);
+			void transpose(std::string input, std::string output, std::string delimiter);
 			bool lineStart(std::string line, char token);
 			bool blankline(std::string line);
 			void tokenizeString(std::string line, char token, std::vector<std::string> *tokens, bool ignoreDuplicateTokens=true, bool trimWhitespace=false);
 			std::string removeNewLine(std::string line);
 			
-			std::string readFileToString(std::string input) throw(RSGISTextException);
-            std::vector<std::string> readFileToStringVector(std::string input) throw(RSGISTextException);
-            void writeStringToFile(std::string file, std::string output) throw(RSGISTextException);
+			std::string readFileToString(std::string input);
+            std::vector<std::string> readFileToStringVector(std::string input);
+            void writeStringToFile(std::string file, std::string output);
 			
-			double strtodouble(std::string inValue)throw(RSGISTextException);
-			float strtofloat(std::string inValue)throw(RSGISTextException);
+			double strtodouble(std::string inValue);
+			float strtofloat(std::string inValue);
 			
-            int strtoInt(std::string inValue)throw(RSGISTextException);
-            unsigned int strtoUInt(std::string inValue)throw(RSGISTextException);
+            int strtoInt(std::string inValue);
+            unsigned int strtoUInt(std::string inValue);
             
-            long strtoLong(std::string inValue)throw(RSGISTextException);
-            unsigned long strtoULong(std::string inValue)throw(RSGISTextException);
+            long strtoLong(std::string inValue);
+            unsigned long strtoULong(std::string inValue);
             
-			uint_fast8_t strto8bitUInt(std::string inValue)throw(RSGISTextException);
-			uint_fast16_t strto16bitUInt(std::string inValue)throw(RSGISTextException);
-			uint_fast32_t strto32bitUInt(std::string inValue)throw(RSGISTextException);
-			uint_fast64_t strto64bitUInt(std::string inValue)throw(RSGISTextException);
+			uint_fast8_t strto8bitUInt(std::string inValue);
+			uint_fast16_t strto16bitUInt(std::string inValue);
+			uint_fast32_t strto32bitUInt(std::string inValue);
+			uint_fast64_t strto64bitUInt(std::string inValue);
 			
-			int_fast8_t strto8bitInt(std::string inValue)throw(RSGISTextException);
-			int_fast16_t strto16bitInt(std::string inValue)throw(RSGISTextException);
-			int_fast32_t strto32bitInt(std::string inValue)throw(RSGISTextException);
-			int_fast64_t strto64bitInt(std::string inValue)throw(RSGISTextException);
-            size_t strtosizet(std::string inValue)throw(RSGISTextException);
+			int_fast8_t strto8bitInt(std::string inValue);
+			int_fast16_t strto16bitInt(std::string inValue);
+			int_fast32_t strto32bitInt(std::string inValue);
+			int_fast64_t strto64bitInt(std::string inValue);
+            size_t strtosizet(std::string inValue);
 			
-			std::string doubletostring(double number)throw(RSGISTextException);
-			std::string floattostring(float number)throw(RSGISTextException);
+			std::string doubletostring(double number);
+			std::string floattostring(float number);
 			
-			std::string uInt8bittostring(uint_fast8_t number)throw(RSGISTextException);
-			std::string uInt16bittostring(uint_fast16_t number)throw(RSGISTextException);
-			std::string uInt32bittostring(uint_fast32_t number)throw(RSGISTextException);
-			std::string uInt64bittostring(uint_fast64_t number)throw(RSGISTextException);
+			std::string uInt8bittostring(uint_fast8_t number);
+			std::string uInt16bittostring(uint_fast16_t number);
+			std::string uInt32bittostring(uint_fast32_t number);
+			std::string uInt64bittostring(uint_fast64_t number);
 			
-			std::string int8bittostring(int_fast8_t number)throw(RSGISTextException);
-			std::string int16bittostring(int_fast16_t number)throw(RSGISTextException);
-			std::string int32bittostring(int_fast32_t number)throw(RSGISTextException);
-			std::string int64bittostring(int_fast64_t number)throw(RSGISTextException);
-            std::string sizettostring(size_t number)throw(RSGISTextException);
+			std::string int8bittostring(int_fast8_t number);
+			std::string int16bittostring(int_fast16_t number);
+			std::string int32bittostring(int_fast32_t number);
+			std::string int64bittostring(int_fast64_t number);
+            std::string sizettostring(size_t number);
             
-            std::string inttostring(int number)throw(RSGISTextException);
-            std::string uInttostring(unsigned int number)throw(RSGISTextException);
-            std::string longtostring(long number)throw(RSGISTextException);
-            std::string uLongtostring(unsigned long number)throw(RSGISTextException);
+            std::string inttostring(int number);
+            std::string uInttostring(unsigned int number);
+            std::string longtostring(long number);
+            std::string uLongtostring(unsigned long number);
 			
 			~RSGISTextUtils();
 		};
@@ -136,10 +136,10 @@ namespace rsgis{namespace utils{
 	{
 	public:
 		RSGISTextFileLineReader();
-		void openFile(std::string filepath)throw(RSGISTextException);
+		void openFile(std::string filepath);
 		bool endOfFile();
-		std::string readLine()throw(RSGISTextException);
-		void closeFile()throw(RSGISTextException);
+		std::string readLine();
+		void closeFile();
 		~RSGISTextFileLineReader();	
 	private:
         std::ifstream inputFileStream;

@@ -50,7 +50,7 @@ namespace rsgis{namespace vec{
 		public:
 			RSGISZonalPolygons(int numBands, bool **toCalc);
 			virtual void readAttribtues(OGRFeature *feature, OGRFeatureDefn *featDefn);
-			virtual void createLayerDefinition(OGRLayer *outputSHPLayer)throw(RSGISVectorOutputException);
+			virtual void createLayerDefinition(OGRLayer *outputSHPLayer);
 			virtual void populateFeature(OGRFeature *feature, OGRFeatureDefn *featDefn);
 			void setMean(double mean, int index);
 			void setMin(double min, int index);

@@ -29,7 +29,7 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    void RSGISDefineClumpsInTiles::defineSegmentTilePos(GDALDataset *clumpsDataset, GDALDataset *tileDataset, std::string outColName, unsigned int tileOverlap, unsigned int tileBoundary, unsigned int tileBody) throw(RSGISImageException, RSGISAttributeTableException)
+    void RSGISDefineClumpsInTiles::defineSegmentTilePos(GDALDataset *clumpsDataset, GDALDataset *tileDataset, std::string outColName, unsigned int tileOverlap, unsigned int tileBoundary, unsigned int tileBody)
     {
         try
         {
@@ -119,7 +119,7 @@ namespace rsgis{namespace rastergis{
         }
     }
 
-    void RSGISDefineClumpsInTiles::defineBorderSegmentsUsingMask(GDALDataset *clumpsDataset, GDALDataset *maskDataset, std::string outColName, unsigned int tileOverlap, unsigned int tileBoundary, unsigned int tileBody) throw(RSGISImageException, RSGISAttributeTableException)
+    void RSGISDefineClumpsInTiles::defineBorderSegmentsUsingMask(GDALDataset *clumpsDataset, GDALDataset *maskDataset, std::string outColName, unsigned int tileOverlap, unsigned int tileBoundary, unsigned int tileBody)
     {
         try
         {
@@ -206,7 +206,7 @@ namespace rsgis{namespace rastergis{
         }
     }
 
-    void RSGISDefineClumpsInTiles::defineBorderSegments(GDALDataset *clumpsDataset, std::string outColName) throw(RSGISImageException, RSGISAttributeTableException)
+    void RSGISDefineClumpsInTiles::defineBorderSegments(GDALDataset *clumpsDataset, std::string outColName)
     {
         RSGISRasterAttUtils attUtils;
         
@@ -264,7 +264,7 @@ namespace rsgis{namespace rastergis{
         this->tileBody = tileBody;
     }
 		
-    void RSGISFindClumpPositionsInTile::calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISFindClumpPositionsInTile::calcImageValue(float *bandValues, int numBands) 
     {
         if((bandValues[0] > 0) && (bandValues[0] < numRows))
         {
@@ -297,7 +297,7 @@ namespace rsgis{namespace rastergis{
         this->borderMask = borderMask;
     }
     
-    void RSGISFindImageBorder::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISFindImageBorder::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) 
     {
         if(numIntVals == 1)
         {

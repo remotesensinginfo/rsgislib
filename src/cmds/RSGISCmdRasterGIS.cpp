@@ -64,7 +64,7 @@
 
 namespace rsgis{ namespace cmds {
 
-    void executePopulateStats(std::string clumpsImage, bool addColourTable2Img, bool calcImgPyramids, bool ignoreZero, unsigned int ratBand)throw(RSGISCmdException)
+    void executePopulateStats(std::string clumpsImage, bool addColourTable2Img, bool calcImgPyramids, bool ignoreZero, unsigned int ratBand)
     {
         try
         {
@@ -115,7 +115,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeCopyRAT(std::string inputImage, std::string clumpsImage,  int ratBand)throw(RSGISCmdException)
+    void executeCopyRAT(std::string inputImage, std::string clumpsImage,  int ratBand)
     {
         try
         {
@@ -154,7 +154,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeCopyGDALATTColumns(std::string inputImage, std::string clumpsImage, std::vector<std::string> fields, bool copyColours, bool copyHist, int ratBand) throw(RSGISCmdException)
+    void executeCopyGDALATTColumns(std::string inputImage, std::string clumpsImage, std::vector<std::string> fields, bool copyColours, bool copyHist, int ratBand) 
     {
         try
         {
@@ -191,7 +191,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeSpatialLocation(std::string inputImage, unsigned int ratBand, std::string eastingsField, std::string northingsField)throw(RSGISCmdException)
+    void executeSpatialLocation(std::string inputImage, unsigned int ratBand, std::string eastingsField, std::string northingsField)
     {
         try
         {
@@ -219,7 +219,7 @@ namespace rsgis{ namespace cmds {
         }
     }
             
-    void executeSpatialLocationExtent(std::string inputImage, unsigned int ratBand, std::string minXColX, std::string minXColY, std::string maxXColX, std::string maxXColY, std::string minYColX, std::string minYColY, std::string maxYColX, std::string maxYColY)throw(RSGISCmdException)
+    void executeSpatialLocationExtent(std::string inputImage, unsigned int ratBand, std::string minXColX, std::string minXColY, std::string maxXColX, std::string maxXColY, std::string minYColX, std::string minYColY, std::string maxYColX, std::string maxYColY)
     {
         try
         {
@@ -247,7 +247,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executePopulateRATWithStats(std::string inputImage, std::string clumpsImage, std::vector<rsgis::cmds::RSGISBandAttStatsCmds*> *bandStatsCmds, unsigned int ratBand)throw(RSGISCmdException)
+    void executePopulateRATWithStats(std::string inputImage, std::string clumpsImage, std::vector<rsgis::cmds::RSGISBandAttStatsCmds*> *bandStatsCmds, unsigned int ratBand)
     {
         try
         {
@@ -312,7 +312,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executePopulateRATWithPercentiles(std::string inputImage, std::string clumpsImage, unsigned int band, std::vector<rsgis::cmds::RSGISBandAttPercentilesCmds*> *bandPercentilesCmds, unsigned int ratBand, unsigned int numHistBins)throw(RSGISCmdException)
+    void executePopulateRATWithPercentiles(std::string inputImage, std::string clumpsImage, unsigned int band, std::vector<rsgis::cmds::RSGISBandAttPercentilesCmds*> *bandPercentilesCmds, unsigned int ratBand, unsigned int numHistBins)
     {
         try
         {
@@ -370,7 +370,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executePopulateCategoryProportions(std::string categoriesImage, std::string clumpsImage, std::string outColsName, std::string majorityColName, bool copyClassNames, std::string majClassNameField, std::string classNameField, unsigned int ratBandClumps, unsigned int ratBandCats)throw(RSGISCmdException)
+    void executePopulateCategoryProportions(std::string categoriesImage, std::string clumpsImage, std::string outColsName, std::string majorityColName, bool copyClassNames, std::string majClassNameField, std::string classNameField, unsigned int ratBandClumps, unsigned int ratBandCats)
     {
         try
         {
@@ -408,7 +408,7 @@ namespace rsgis{ namespace cmds {
         }
     }
             
-    void executePopulateRATWithMode(std::string inputImage, std::string clumpsImage, std::string outColsName, bool useNoDataVal, long noDataVal, bool outNoDataVal, unsigned int modeBand, unsigned int ratBand)throw(RSGISCmdException)
+    void executePopulateRATWithMode(std::string inputImage, std::string clumpsImage, std::string outColsName, bool useNoDataVal, long noDataVal, bool outNoDataVal, unsigned int modeBand, unsigned int ratBand)
     {
         try
         {
@@ -448,7 +448,7 @@ namespace rsgis{ namespace cmds {
             
             
 /*
-    void executeCopyCategoriesColours(std::string categoriesImage, std::string clumpsImage, std::string classField)throw(RSGISCmdException) {
+    void executeCopyCategoriesColours(std::string categoriesImage, std::string clumpsImage, std::string classField) {
         try
         {
             GDALAllRegister();
@@ -484,7 +484,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     */
-    void executeExportCols2GDALImage(std::string inputImage, std::string outputFile, std::string imageFormat, RSGISLibDataType outDataType, std::string field, int ratBand) throw(RSGISCmdException)
+    void executeExportCols2GDALImage(std::string inputImage, std::string outputFile, std::string imageFormat, RSGISLibDataType outDataType, std::string field, int ratBand) 
     {
         try
         {
@@ -526,7 +526,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     /*
-    void executeEucDistFromFeature(std::string inputImage, size_t fid, std::string outputField, std::vector<std::string> fields)throw(RSGISCmdException) {
+    void executeEucDistFromFeature(std::string inputImage, size_t fid, std::string outputField, std::vector<std::string> fields) {
         GDALAllRegister();
         GDALDataset *inputDataset;
 
@@ -546,7 +546,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeFindTopN(std::string inputImage, std::string spatialDistField, std::string distanceField, std::string outputField, unsigned int nFeatures, float distThreshold)throw(RSGISCmdException) {
+    void executeFindTopN(std::string inputImage, std::string spatialDistField, std::string distanceField, std::string outputField, unsigned int nFeatures, float distThreshold) {
         GDALAllRegister();
         GDALDataset *inputDataset;
 
@@ -567,7 +567,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeFindSpecClose(std::string inputImage, std::string distanceField, std::string spatialDistField, std::string outputField, float specDistThreshold, float distThreshold)throw(RSGISCmdException) {
+    void executeFindSpecClose(std::string inputImage, std::string distanceField, std::string spatialDistField, std::string outputField, float specDistThreshold, float distThreshold) {
         GDALAllRegister();
         GDALDataset *inputDataset;
 
@@ -589,7 +589,7 @@ namespace rsgis{ namespace cmds {
 
     }
 */
-    void executeApplyKNN(std::string inClumpsImage, unsigned int ratBand, std::string inExtrapField, std::string outExtrapField, std::string trainRegionsField, std::string applyRegionsField, bool useApplyField, std::vector<std::string> fields, unsigned int kFeatures, rsgisKNNDistCmd distKNNCmd, float distThreshold, rsgisKNNSummeriseCmd summeriseKNNCmd) throw(RSGISCmdException)
+    void executeApplyKNN(std::string inClumpsImage, unsigned int ratBand, std::string inExtrapField, std::string outExtrapField, std::string trainRegionsField, std::string applyRegionsField, bool useApplyField, std::vector<std::string> fields, unsigned int kFeatures, rsgisKNNDistCmd distKNNCmd, float distThreshold, rsgisKNNSummeriseCmd summeriseKNNCmd) 
     {
         GDALAllRegister();
         GDALDataset *clumpsDataset;
@@ -681,7 +681,7 @@ namespace rsgis{ namespace cmds {
 
     }
 
-    void executeExport2Ascii(std::string inputImage, std::string outputFile, std::vector<std::string> fields, int ratBand)throw(RSGISCmdException)
+    void executeExport2Ascii(std::string inputImage, std::string outputFile, std::vector<std::string> fields, int ratBand)
     {
         GDALAllRegister();
         GDALDataset *inputDataset;
@@ -704,7 +704,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 /*
-    void executeClassTranslate(std::string inputImage, std::string classInField, std::string classOutField, std::map<size_t, size_t> classPairs)throw(RSGISCmdException) {
+    void executeClassTranslate(std::string inputImage, std::string classInField, std::string classOutField, std::map<size_t, size_t> classPairs) {
         GDALAllRegister();
         GDALDataset *inputDataset;
 
@@ -725,7 +725,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 */
-    void executeColourClasses(std::string inputImage, std::string classInField, std::map<size_t, RSGISColourIntCmds> classColourPairs, int ratBand)throw(RSGISCmdException)
+    void executeColourClasses(std::string inputImage, std::string classInField, std::map<size_t, RSGISColourIntCmds> classColourPairs, int ratBand)
     {
         GDALAllRegister();
         GDALDataset *inputDataset;
@@ -764,7 +764,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeColourStrClasses(std::string inputImage, std::string classInField, std::map<std::string, RSGISColourIntCmds> classStrColourPairs, int ratBand)throw(RSGISCmdException)
+    void executeColourStrClasses(std::string inputImage, std::string classInField, std::map<std::string, RSGISColourIntCmds> classStrColourPairs, int ratBand)
     {
         GDALAllRegister();
         GDALDataset *inputDataset;
@@ -801,7 +801,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 /*
-    void executeGenerateColourTable(std::string inputImage, std::string clumpsImage, unsigned int redBand, unsigned int greenBand, unsigned int blueBand)throw(RSGISCmdException) {
+    void executeGenerateColourTable(std::string inputImage, std::string clumpsImage, unsigned int redBand, unsigned int greenBand, unsigned int blueBand) {
         GDALAllRegister();
         GDALDataset *inputDataset, *clumpsDataset;
         try {
@@ -831,7 +831,7 @@ namespace rsgis{ namespace cmds {
     }
 */
             
-    void executeStrClassMajority(std::string baseSegment, std::string infoSegment, std::string baseClassCol, std::string infoClassCol, bool ignoreZero, int baseRatBand, int infoRatBand)throw(RSGISCmdException)
+    void executeStrClassMajority(std::string baseSegment, std::string infoSegment, std::string baseClassCol, std::string infoClassCol, bool ignoreZero, int baseRatBand, int infoRatBand)
     {
         GDALAllRegister();
         GDALDataset *baseSegDataset, *infoSegDataset;
@@ -864,7 +864,7 @@ namespace rsgis{ namespace cmds {
     }
             
 /*
-    void executeSpecDistMajorityClassifier(std::string inputImage, std::string inClassNameField, std::string outClassNameField, std::string trainingSelectCol, std::string eastingsField, std::string northingsField, std::string areaField, std::string majWeightField, std::vector<std::string> fields, float distThreshold, float specDistThreshold, SpectralDistanceMethodCmds distMethod, float specThresOriginDist)throw(RSGISCmdException) {
+    void executeSpecDistMajorityClassifier(std::string inputImage, std::string inClassNameField, std::string outClassNameField, std::string trainingSelectCol, std::string eastingsField, std::string northingsField, std::string areaField, std::string majWeightField, std::vector<std::string> fields, float distThreshold, float specDistThreshold, SpectralDistanceMethodCmds distMethod, float specThresOriginDist) {
         GDALAllRegister();
         GDALDataset *inputDataset;
         try {
@@ -886,7 +886,7 @@ namespace rsgis{ namespace cmds {
     }
 
     void executeMaxLikelihoodClassifier(std::string inputImage, std::string inClassNameField, std::string outClassNameField, std::string trainingSelectCol,
-            std::string classifySelectCol, std::string areaField, std::vector<std::string> fields, rsgismlpriorscmds priorsMethod, std::vector<std::string> priorStrs)throw(RSGISCmdException) {
+            std::string classifySelectCol, std::string areaField, std::vector<std::string> fields, rsgismlpriorscmds priorsMethod, std::vector<std::string> priorStrs) {
         GDALAllRegister();
         GDALDataset *inputDataset;
         std::vector<float> priors;
@@ -924,7 +924,7 @@ namespace rsgis{ namespace cmds {
 
     void executeMaxLikelihoodClassifierLocalPriors(std::string inputImage, std::string inClassNameField, std::string outClassNameField, std::string trainingSelectCol, std::string classifySelectCol,
                                                   std::string areaField, std::vector<std::string> fields, std::string eastingsField, std::string northingsField,
-                                                  float distThreshold, rsgismlpriorscmds priorsMethod, float weightA, bool allowZeroPriors, bool forceChangeInClassification)throw(RSGISCmdException) {
+                                                  float distThreshold, rsgismlpriorscmds priorsMethod, float weightA, bool allowZeroPriors, bool forceChangeInClassification) {
         GDALAllRegister();
         GDALDataset *inputDataset;
         try {
@@ -947,7 +947,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeClassMask(std::string inputImage, std::string classField, std::string className, std::string outputFile, std::string imageFormat, RSGISLibDataType dataType)throw(RSGISCmdException) {
+    void executeClassMask(std::string inputImage, std::string classField, std::string className, std::string outputFile, std::string imageFormat, RSGISLibDataType dataType) {
         GDALAllRegister();
         GDALDataset *inputDataset;
         try {
@@ -979,7 +979,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 */
-    void executeFindNeighbours(std::string inputImage, unsigned int ratBand)throw(RSGISCmdException)
+    void executeFindNeighbours(std::string inputImage, unsigned int ratBand)
     {
         GDALAllRegister();
         GDALDataset *inputDataset;
@@ -1004,7 +1004,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeFindBoundaryPixels(std::string inputImage, unsigned int ratBand, std::string outputFile, std::string imageFormat)throw(RSGISCmdException)
+    void executeFindBoundaryPixels(std::string inputImage, unsigned int ratBand, std::string outputFile, std::string imageFormat)
     {
         GDALAllRegister();
         GDALDataset *inputDataset;
@@ -1031,7 +1031,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeCalcBorderLength(std::string inputImage, bool ignoreZeroEdges, std::string outColsName)throw(RSGISCmdException)
+    void executeCalcBorderLength(std::string inputImage, bool ignoreZeroEdges, std::string outColsName)
     {
         GDALAllRegister();
         GDALDataset *inputDataset;
@@ -1056,7 +1056,7 @@ namespace rsgis{ namespace cmds {
 
     }
 
-    void executeCalcRelBorder(std::string inputImage, std::string outColsName, std::string classNameField, std::string className, bool ignoreZeroEdges)throw(RSGISCmdException)
+    void executeCalcRelBorder(std::string inputImage, std::string outColsName, std::string classNameField, std::string className, bool ignoreZeroEdges)
     {
         GDALAllRegister();
         GDALDataset *inputDataset;
@@ -1080,7 +1080,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 /*
-    void executeCalcShapeIndices(std::string inputImage, std::vector<RSGISShapeParamCmds> shapeIndexes)throw(RSGISCmdException) {
+    void executeCalcShapeIndices(std::string inputImage, std::vector<RSGISShapeParamCmds> shapeIndexes) {
         GDALAllRegister();
         GDALDataset *inputDataset;
         try
@@ -1123,7 +1123,7 @@ namespace rsgis{ namespace cmds {
     }
 */
 
-    void executeDefineClumpTilePositions(std::string clumpsImage, std::string tileImage, std::string outColsName, unsigned int tileOverlap, unsigned int tileBoundary, unsigned int tileBody)throw(RSGISCmdException) {
+    void executeDefineClumpTilePositions(std::string clumpsImage, std::string tileImage, std::string outColsName, unsigned int tileOverlap, unsigned int tileBoundary, unsigned int tileBody) {
         GDALAllRegister();
         GDALDataset *clumpsDataset, *tileDataset;
         try {
@@ -1149,7 +1149,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeDefineBorderClumps(std::string clumpsImage, std::string outColsName)throw(RSGISCmdException)
+    void executeDefineBorderClumps(std::string clumpsImage, std::string outColsName)
     {
         GDALAllRegister();
 
@@ -1173,7 +1173,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeFindChangeClumpsFromStdDev(std::string clumpsImage, std::string classField, std::string changeField, std::vector<std::string> attFields, std::vector<cmds::RSGISClassChangeFieldsCmds> classChangeFields, int ratBand)throw(RSGISCmdException)
+    void executeFindChangeClumpsFromStdDev(std::string clumpsImage, std::string classField, std::string changeField, std::vector<std::string> attFields, std::vector<cmds::RSGISClassChangeFieldsCmds> classChangeFields, int ratBand)
     {
         try
         {
@@ -1251,7 +1251,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeGetGlobalClassStats(std::string clumpsImage, std::string classField, std::vector<std::string> attFields, std::vector<cmds::RSGISClassChangeFieldsCmds> classChangeFields, int ratBand)throw(RSGISCmdException)
+    void executeGetGlobalClassStats(std::string clumpsImage, std::string classField, std::vector<std::string> attFields, std::vector<cmds::RSGISClassChangeFieldsCmds> classChangeFields, int ratBand)
     {
         try
         {
@@ -1330,7 +1330,7 @@ namespace rsgis{ namespace cmds {
         }
     }
  
-    void executeIdentifyClumpExtremesOnGrid(std::string clumpsImage, std::string inSelectField, std::string outSelectField, std::string eastingsCol, std::string northingsCol, std::string methodStr, unsigned int rows, unsigned int cols, std::string metricField)throw(RSGISCmdException)
+    void executeIdentifyClumpExtremesOnGrid(std::string clumpsImage, std::string inSelectField, std::string outSelectField, std::string eastingsCol, std::string northingsCol, std::string methodStr, unsigned int rows, unsigned int cols, std::string metricField)
     {
         GDALAllRegister();
         GDALDataset *clumpsDataset;
@@ -1377,7 +1377,7 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeInterpolateClumpValuesToImage(std::string clumpsImage, std::string selectField, std::string eastingsField, std::string northingsField, std::string methodStr, std::string valueField, std::string outputFile, std::string imageFormat, RSGISLibDataType dataType, unsigned int ratband)throw(RSGISCmdException)
+    void executeInterpolateClumpValuesToImage(std::string clumpsImage, std::string selectField, std::string eastingsField, std::string northingsField, std::string methodStr, std::string valueField, std::string outputFile, std::string imageFormat, RSGISLibDataType dataType, unsigned int ratband)
     {
         GDALAllRegister();
         GDALDataset *clumpsDataset;
@@ -1452,7 +1452,7 @@ namespace rsgis{ namespace cmds {
 
 /*
 
-    float executeFindGlobalSegmentationScore4Clumps(std::string clumpsImage, std::string inputImage, std::string colPrefix, bool calcNeighbours, float minNormV, float maxNormV, float minNormMI, float maxNormMI, std::vector<cmds::RSGISJXSegQualityScoreBandCmds> *scoreBandComps)throw(RSGISCmdException)
+    float executeFindGlobalSegmentationScore4Clumps(std::string clumpsImage, std::string inputImage, std::string colPrefix, bool calcNeighbours, float minNormV, float maxNormV, float minNormMI, float maxNormMI, std::vector<cmds::RSGISJXSegQualityScoreBandCmds> *scoreBandComps)
     {
         double returnGSSVal = 0.0;
         GDALAllRegister();
@@ -1561,7 +1561,7 @@ namespace rsgis{ namespace cmds {
 */
             
             
-    void executeCalcRelDiffNeighbourStats(std::string clumpsImage, rsgis::cmds::RSGISFieldAttStatsCmds *fieldStatsCmds, bool useAbsDiff, unsigned int ratBand)throw(RSGISCmdException)
+    void executeCalcRelDiffNeighbourStats(std::string clumpsImage, rsgis::cmds::RSGISFieldAttStatsCmds *fieldStatsCmds, bool useAbsDiff, unsigned int ratBand)
     {
         try
         {
@@ -1606,7 +1606,7 @@ namespace rsgis{ namespace cmds {
         }
     }
       
-    void executeClassRegionGrowing(std::string clumpsImage, unsigned int ratBand, std::string classColumn, std::string classVal, int maxIter, std::string xmlBlock)throw(RSGISCmdException)
+    void executeClassRegionGrowing(std::string clumpsImage, unsigned int ratBand, std::string classColumn, std::string classVal, int maxIter, std::string xmlBlock)
     {
         try
         {
@@ -1635,7 +1635,7 @@ namespace rsgis{ namespace cmds {
         }
     }
             
-    void executeBinaryClassify(std::string clumpsImage, unsigned int ratBand, std::string xmlBlock, std::string outColumn)throw(RSGISCmdException)
+    void executeBinaryClassify(std::string clumpsImage, unsigned int ratBand, std::string xmlBlock, std::string outColumn)
     {
         try
         {
@@ -1664,7 +1664,7 @@ namespace rsgis{ namespace cmds {
         }
     }
             
-    void executePopulateRATWithMeanLitStats(std::string inputImage, std::string clumpsImage, std::string inputMeanLitImage, unsigned int meanlitBand, std::string meanLitColumn, std::string pxlCountCol, std::vector<rsgis::cmds::RSGISBandAttStatsCmds*> *bandStatsCmds, unsigned int ratBand)throw(RSGISCmdException)
+    void executePopulateRATWithMeanLitStats(std::string inputImage, std::string clumpsImage, std::string inputMeanLitImage, unsigned int meanlitBand, std::string meanLitColumn, std::string pxlCountCol, std::vector<rsgis::cmds::RSGISBandAttStatsCmds*> *bandStatsCmds, unsigned int ratBand)
     {
         try
         {
@@ -1740,7 +1740,7 @@ namespace rsgis{ namespace cmds {
         }
     }
             
-    void executeCollapseRAT(std::string clumpsImage, unsigned int ratBand, std::string selectColumn, std::string outImage, std::string gdalFormat)throw(RSGISCmdException)
+    void executeCollapseRAT(std::string clumpsImage, unsigned int ratBand, std::string selectColumn, std::string outImage, std::string gdalFormat)
     {
         try
         {
@@ -1768,7 +1768,7 @@ namespace rsgis{ namespace cmds {
         }
     }
             
-    void executeImportShpAtts(std::string clumpsImage, unsigned int ratBand, std::string inputVector, std::string inputVectorLyr, std::string fidColStr, std::vector<std::string> *colNames)throw(RSGISCmdException)
+    void executeImportShpAtts(std::string clumpsImage, unsigned int ratBand, std::string inputVector, std::string inputVectorLyr, std::string fidColStr, std::vector<std::string> *colNames)
     {
         try
         {
@@ -1831,7 +1831,7 @@ namespace rsgis{ namespace cmds {
         }
     }
             
-    void executeClassRegionGrowingNeighCritera(std::string clumpsImage, unsigned int ratBand, std::string classColumn, std::string classVal, int maxIter, std::string xmlBlockGrowCriteria, std::string xmlBlockNeighCriteria)throw(RSGISCmdException)
+    void executeClassRegionGrowingNeighCritera(std::string clumpsImage, unsigned int ratBand, std::string classColumn, std::string classVal, int maxIter, std::string xmlBlockGrowCriteria, std::string xmlBlockNeighCriteria)
     {
         try
         {
@@ -1861,7 +1861,7 @@ namespace rsgis{ namespace cmds {
     }
             
             
-    void executeHistSampling(std::string clumpsImage, unsigned int ratBand, std::string varCol, std::string outSelectCol, float propOfSample, float binWidth, bool classRestrict, std::string classColumn, std::string classVal)throw(RSGISCmdException)
+    void executeHistSampling(std::string clumpsImage, unsigned int ratBand, std::string varCol, std::string outSelectCol, float propOfSample, float binWidth, bool classRestrict, std::string classColumn, std::string classVal)
     {
         try
         {
@@ -1896,7 +1896,7 @@ namespace rsgis{ namespace cmds {
     }
             
             
-    void executeFitHistGausianMixtureModel(std::string clumpsImage, unsigned int ratBand, std::string outH5File, std::string varCol, float binWidth, std::string classColumn, std::string classVal, bool outputHist, std::string outHistFile)throw(RSGISCmdException)
+    void executeFitHistGausianMixtureModel(std::string clumpsImage, unsigned int ratBand, std::string outH5File, std::string varCol, float binWidth, std::string classColumn, std::string classVal, bool outputHist, std::string outHistFile)
     {
         try
         {
@@ -1925,7 +1925,7 @@ namespace rsgis{ namespace cmds {
         }
     }
             
-    void executeClassSplitFitHistGausianMixtureModel(std::string clumpsImage, unsigned int ratBand, std::string outColumn, std::string varCol, float binWidth, std::string classColumn, std::string classVal)throw(RSGISCmdException)
+    void executeClassSplitFitHistGausianMixtureModel(std::string clumpsImage, unsigned int ratBand, std::string outColumn, std::string varCol, float binWidth, std::string classColumn, std::string classVal)
     {
         try
         {
@@ -1954,7 +1954,7 @@ namespace rsgis{ namespace cmds {
         }
     }
             
-    void executeCalcPropOfValidPixelsInClump(std::string inputImage, std::string clumpsImage, unsigned int ratBand, std::string outColumn, double noDataVal)throw(RSGISCmdException)
+    void executeCalcPropOfValidPixelsInClump(std::string inputImage, std::string clumpsImage, unsigned int ratBand, std::string outColumn, double noDataVal)
     {
         try
         {
@@ -1997,7 +1997,7 @@ namespace rsgis{ namespace cmds {
             
             
             
-    float executeCalc1DJMDistance(std::string clumpsImage, std::string varCol, float binWidth, std::string classColumn, std::string class1Val, std::string class2Val, unsigned int ratBand)throw(RSGISCmdException)
+    float executeCalc1DJMDistance(std::string clumpsImage, std::string varCol, float binWidth, std::string classColumn, std::string class1Val, std::string class2Val, unsigned int ratBand)
     {
         float dist = 0.0;
         try
@@ -2030,7 +2030,7 @@ namespace rsgis{ namespace cmds {
         return dist;
     }
 
-    float executeCalc2DJMDistance(std::string clumpsImage, std::string var1Col, std::string var2Col, float var1binWidth, float var2binWidth, std::string classColumn, std::string class1Val, std::string class2Val, unsigned int ratBand)throw(RSGISCmdException)
+    float executeCalc2DJMDistance(std::string clumpsImage, std::string var1Col, std::string var2Col, float var1binWidth, float var2binWidth, std::string classColumn, std::string class1Val, std::string class2Val, unsigned int ratBand)
     {
         float dist = 0.0;
         try
@@ -2063,7 +2063,7 @@ namespace rsgis{ namespace cmds {
         return dist;
     }
 
-    float executeCalcBhattacharyyaDistance(std::string clumpsImage, std::string varCol, std::string classColumn, std::string class1Val, std::string class2Val, unsigned int ratBand)throw(RSGISCmdException)
+    float executeCalcBhattacharyyaDistance(std::string clumpsImage, std::string varCol, std::string classColumn, std::string class1Val, std::string class2Val, unsigned int ratBand)
     {
         float dist = 0.0;
         try
@@ -2097,7 +2097,7 @@ namespace rsgis{ namespace cmds {
     }
     
     
-    void executeExportClumps2Images(std::string clumpsImage, std::string outImgBase, std::string imgFileExt, std::string imageFormat, bool binaryOut, unsigned int ratBand)throw(RSGISCmdException)
+    void executeExportClumps2Images(std::string clumpsImage, std::string outImgBase, std::string imgFileExt, std::string imageFormat, bool binaryOut, unsigned int ratBand)
     {
         try
         {

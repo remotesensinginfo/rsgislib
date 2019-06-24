@@ -25,7 +25,7 @@
 namespace rsgis{namespace math{
 
 
-    bool RSGISLogicAndExpression::evaluate()throw(RSGISMathLogicException)
+    bool RSGISLogicAndExpression::evaluate()
     {
         bool outVal = true;
         try
@@ -56,7 +56,7 @@ namespace rsgis{namespace math{
     }
 
     
-    bool RSGISLogicOrExpression::evaluate()throw(RSGISMathLogicException)
+    bool RSGISLogicOrExpression::evaluate()
     {
         bool outVal = false;
         try
@@ -87,7 +87,7 @@ namespace rsgis{namespace math{
     }
     
 
-    bool RSGISLogicNotExpression::evaluate()throw(RSGISMathLogicException)
+    bool RSGISLogicNotExpression::evaluate()
     {
         bool outVal = false;
         try
@@ -110,7 +110,7 @@ namespace rsgis{namespace math{
         return outVal;
     }
     
-    bool RSGISLogicEqualsExpression::evaluate()throw(RSGISMathLogicException)
+    bool RSGISLogicEqualsExpression::evaluate()
     {
         bool outVal = true;
         try
@@ -151,7 +151,7 @@ namespace rsgis{namespace math{
     
     
 
-    bool RSGISLogicEqualsValueExpression::evaluate()throw(RSGISMathLogicException)
+    bool RSGISLogicEqualsValueExpression::evaluate()
     {
         bool outVal = false;
         try
@@ -183,7 +183,7 @@ namespace rsgis{namespace math{
         return outVal;
     }
     
-    bool RSGISLogicGreaterThanValueExpression::evaluate()throw(RSGISMathLogicException)
+    bool RSGISLogicGreaterThanValueExpression::evaluate()
     {
         bool outVal = false;
         try
@@ -215,7 +215,7 @@ namespace rsgis{namespace math{
         return outVal;
     }
     
-    bool RSGISLogicLessThanValueExpression::evaluate()throw(RSGISMathLogicException)
+    bool RSGISLogicLessThanValueExpression::evaluate()
     {
         bool outVal = false;
         try
@@ -247,7 +247,7 @@ namespace rsgis{namespace math{
         return outVal;
     }
     
-    bool RSGISLogicGreaterEqualToValueExpression::evaluate()throw(RSGISMathLogicException)
+    bool RSGISLogicGreaterEqualToValueExpression::evaluate()
     {
         bool outVal = false;
         try
@@ -279,7 +279,7 @@ namespace rsgis{namespace math{
         return outVal;
     }
     
-    bool RSGISLogicLessEqualToValueExpression::evaluate()throw(RSGISMathLogicException)
+    bool RSGISLogicLessEqualToValueExpression::evaluate()
     {
         bool outVal = false;
         try
@@ -311,7 +311,7 @@ namespace rsgis{namespace math{
         return outVal;
     }
     
-    bool RSGISLogicNotValueExpression::evaluate()throw(RSGISMathLogicException)
+    bool RSGISLogicNotValueExpression::evaluate()
     {
         bool outVal = false;
         try

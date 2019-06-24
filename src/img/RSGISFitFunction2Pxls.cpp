@@ -31,7 +31,7 @@ namespace rsgis{namespace img{
         this->useNoDataValue = useNoDataValue;
     }
     
-    void RSGISLinearFit2Column::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+    void RSGISLinearFit2Column::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         try
         {

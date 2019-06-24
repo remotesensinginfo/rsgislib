@@ -29,7 +29,7 @@ namespace rsgis{namespace rastergis{
 
     }
 
-    void RSGISFindInfoBetweenLayers::findClassMajority(GDALDataset *baseSegmentsDS, GDALDataset *infoSegmentsDS, std::string baseClassCol, std::string infoClassCol, bool ignoreZero, int baseRatBand, int infoRatBand) throw(RSGISAttributeTableException)
+    void RSGISFindInfoBetweenLayers::findClassMajority(GDALDataset *baseSegmentsDS, GDALDataset *infoSegmentsDS, std::string baseClassCol, std::string infoClassCol, bool ignoreZero, int baseRatBand, int infoRatBand)
     {
         RSGISRasterAttUtils attUtils;
         try
@@ -215,7 +215,7 @@ namespace rsgis{namespace rastergis{
         this->ignoreZero = ignoreZero; // Ignore values less than 0 in info layer
         
     }
-    void RSGISCalcClumpClassMajorities::calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCalcClumpClassMajorities::calcImageValue(float *bandValues, int numBands) 
     {
         if(numBands != 2)
         {

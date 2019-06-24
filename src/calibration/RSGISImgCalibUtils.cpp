@@ -25,7 +25,7 @@
 
 namespace rsgis{namespace calib{
     
-    void RSGISImgCalibUtils::calcNadirImgViewAngle(GDALDataset *imgFPDataset, std::string outViewAngleImg, std::string gdalFormat, double sateAltitude, std::string minXXCol, std::string minXYCol, std::string maxXXCol, std::string maxXYCol, std::string minYXCol, std::string minYYCol, std::string maxYXCol, std::string maxYYCol) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISImgCalibUtils::calcNadirImgViewAngle(GDALDataset *imgFPDataset, std::string outViewAngleImg, std::string gdalFormat, double sateAltitude, std::string minXXCol, std::string minXYCol, std::string maxXXCol, std::string maxXYCol, std::string minYXCol, std::string minYYCol, std::string maxYXCol, std::string maxYYCol) 
     {
         try
         {
@@ -81,7 +81,7 @@ namespace rsgis{namespace calib{
         this->sateAltitude = sateAltitude;
     }
     
-    void RSGISCalcNadirViewAngle::calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent)throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCalcNadirViewAngle::calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent)
     {
         if(numBands != 1)
         {

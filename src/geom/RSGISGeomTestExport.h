@@ -70,15 +70,15 @@ namespace rsgis{namespace geom{
 			OGRPolygon* convertGEOSPolygon2OGRPolygon(geos::geom::Polygon *poly);
 			OGRPoint* convertGEOSPoint2OGRPoint(geos::geom::Point *point);
 			OGRPoint* convertGEOSCoordinate2OGRPoint(geos::geom::Coordinate *coord);
-			bool checkDIR4SHP(std::string dir, std::string shp) throw(RSGISGeometryException);
-			void deleteSHP(std::string dir, std::string shp) throw(RSGISGeometryException);
+			bool checkDIR4SHP(std::string dir, std::string shp);
+			void deleteSHP(std::string dir, std::string shp);
 			
-			void exportGEOSPolygons2SHP(std::string outputFile, bool deleteIfPresent, std::list<geos::geom::Polygon*> *polys) throw(RSGISGeometryException);
-			void exportGEOSPolygons2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::Polygon*> *polys) throw(RSGISGeometryException);
-			void exportGEOSCoordinates2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::Coordinate*> *coords) throw(RSGISGeometryException);
-			void exportGEOSLineStrings2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::LineString*> *lines) throw(RSGISGeometryException);
-			void exportGEOSLineSegments2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::LineSegment*> *lines) throw(RSGISGeometryException);
-            void exportGEOSLineSegments2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::LineSegment*> *lines, std::vector<double> *vals) throw(RSGISGeometryException);
+			void exportGEOSPolygons2SHP(std::string outputFile, bool deleteIfPresent, std::list<geos::geom::Polygon*> *polys);
+			void exportGEOSPolygons2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::Polygon*> *polys);
+			void exportGEOSCoordinates2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::Coordinate*> *coords);
+			void exportGEOSLineStrings2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::LineString*> *lines);
+			void exportGEOSLineSegments2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::LineSegment*> *lines);
+            void exportGEOSLineSegments2SHP(std::string outputFile, bool deleteIfPresent, std::vector<geos::geom::LineSegment*> *lines, std::vector<double> *vals);
 			
 			~RSGISGeomTestExport();
 		};

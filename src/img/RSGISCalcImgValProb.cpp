@@ -26,7 +26,7 @@
 namespace rsgis{namespace img{
     
 
-    void RSGISCalcImgValProb::calcMaskImgPxlValProb(GDALDataset *inImgDS, std::vector<unsigned int> inImgBandIdxs, GDALDataset *inMaskDS, int maskVal, std::string outputImage, std::string gdalFormat, std::vector<float> histBinWidths, bool calcHistBinWidth, bool useImgNoData, bool rescaleProbs)throw(RSGISImageCalcException)
+    void RSGISCalcImgValProb::calcMaskImgPxlValProb(GDALDataset *inImgDS, std::vector<unsigned int> inImgBandIdxs, GDALDataset *inMaskDS, int maskVal, std::string outputImage, std::string gdalFormat, std::vector<float> histBinWidths, bool calcHistBinWidth, bool useImgNoData, bool rescaleProbs)
     {
         try
         {
@@ -172,11 +172,11 @@ namespace rsgis{namespace img{
             delete[] numBins;
             delete[] noDataVals;
         }
-        catch(RSGISImageCalcException e)
+        catch(RSGISImageCalcException &e)
         {
             throw e;
         }
-        catch(RSGISImageBandException e)
+        catch(RSGISImageBandException &e)
         {
             throw RSGISImageCalcException(e.what());
         }
@@ -207,7 +207,7 @@ namespace rsgis{namespace img{
         this->totalNumBins = totalNumBins;
     }
     
-    void RSGISCalcImagePopNDHist::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals)throw(RSGISImageCalcException)
+    void RSGISCalcImagePopNDHist::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals)
     {
         if(numIntVals != 1)
         {
@@ -270,7 +270,7 @@ namespace rsgis{namespace img{
         }
     }
     
-    void RSGISCalcImagePopNDHist::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+    void RSGISCalcImagePopNDHist::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         output[0] = 0.0;
         unsigned long *binIdxs = new unsigned long[inImgBandIdxs.size()];

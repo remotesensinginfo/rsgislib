@@ -57,8 +57,8 @@ namespace rsgis{namespace math{
     {
     public:
         RSGISCalcDistMetric(){this->initalised = false;};
-        virtual void init() throw(RSGISMathException) = 0;
-        virtual double calcDist(double *vals1, size_t sIdx1, size_t eIdx1, double *vals2, size_t sIdx2, size_t eIdx2) throw(RSGISMathException) = 0;
+        virtual void init() = 0;
+        virtual double calcDist(double *vals1, size_t sIdx1, size_t eIdx1, double *vals2, size_t sIdx2, size_t eIdx2) = 0;
         virtual ~RSGISCalcDistMetric(){};
     protected:
         bool initalised;
@@ -69,8 +69,8 @@ namespace rsgis{namespace math{
     {
     public:
         RSGISCalcEuclideanDistMetric();
-        virtual void init() throw(RSGISMathException);
-        virtual double calcDist(double *vals1, size_t sIdx1, size_t eIdx1, double *vals2, size_t sIdx2, size_t eIdx2) throw(RSGISMathException);
+        virtual void init();
+        virtual double calcDist(double *vals1, size_t sIdx1, size_t eIdx1, double *vals2, size_t sIdx2, size_t eIdx2);
         virtual ~RSGISCalcEuclideanDistMetric();
     };
     
@@ -78,8 +78,8 @@ namespace rsgis{namespace math{
     {
     public:
         RSGISCalcManhattenDistMetric();
-        virtual void init() throw(RSGISMathException);
-        virtual double calcDist(double *vals1, size_t sIdx1, size_t eIdx1, double *vals2, size_t sIdx2, size_t eIdx2) throw(RSGISMathException);
+        virtual void init();
+        virtual double calcDist(double *vals1, size_t sIdx1, size_t eIdx1, double *vals2, size_t sIdx2, size_t eIdx2);
         virtual ~RSGISCalcManhattenDistMetric();
     };
     
@@ -87,8 +87,8 @@ namespace rsgis{namespace math{
     {
     public:
         RSGISCalcMahalanobisDistMetric(double **covarMatrixm, size_t n);
-        virtual void init() throw(RSGISMathException);
-        virtual double calcDist(double *vals1, size_t sIdx1, size_t eIdx1, double *vals2, size_t sIdx2, size_t eIdx2) throw(RSGISMathException);
+        virtual void init();
+        virtual double calcDist(double *vals1, size_t sIdx1, size_t eIdx1, double *vals2, size_t sIdx2, size_t eIdx2);
         virtual ~RSGISCalcMahalanobisDistMetric();
     protected:
         double **covarMatrix;
@@ -102,8 +102,8 @@ namespace rsgis{namespace math{
     {
     public:
         RSGISCalcMinkowskiDistMetric();
-        virtual void init() throw(RSGISMathException);
-        virtual double calcDist(double *vals1, size_t sIdx1, size_t eIdx1, double *vals2, size_t sIdx2, size_t eIdx2) throw(RSGISMathException);
+        virtual void init();
+        virtual double calcDist(double *vals1, size_t sIdx1, size_t eIdx1, double *vals2, size_t sIdx2, size_t eIdx2);
         virtual ~RSGISCalcMinkowskiDistMetric();
     };
     
@@ -111,8 +111,8 @@ namespace rsgis{namespace math{
     {
     public:
         RSGISCalcChebyshevDistMetric();
-        virtual void init() throw(RSGISMathException);
-        virtual double calcDist(double *vals1, size_t sIdx1, size_t eIdx1, double *vals2, size_t sIdx2, size_t eIdx2) throw(RSGISMathException);
+        virtual void init();
+        virtual double calcDist(double *vals1, size_t sIdx1, size_t eIdx1, double *vals2, size_t sIdx2, size_t eIdx2);
         virtual ~RSGISCalcChebyshevDistMetric();
     };
     

@@ -31,7 +31,7 @@ namespace rsgis{namespace math{
 		this->maxNumIterations = maxNumIterations;
 	}
 	
-    std::vector<geos::geom::Coordinate*>* RSGISGlobalHillClimbingOptimiser2D::optimise4Neighbor(std::vector<geos::geom::Coordinate*> *coords, double step, geos::geom::Envelope *boundary) throw(RSGISOptimisationException)
+    std::vector<geos::geom::Coordinate*>* RSGISGlobalHillClimbingOptimiser2D::optimise4Neighbor(std::vector<geos::geom::Coordinate*> *coords, double step, geos::geom::Envelope *boundary)
 	{
         std::vector<geos::geom::Coordinate*> *outCoords = new std::vector<geos::geom::Coordinate*>();
 		try
@@ -199,7 +199,7 @@ namespace rsgis{namespace math{
 		return outCoords;
 	}
 	
-    std::vector<geos::geom::Coordinate*>* RSGISGlobalHillClimbingOptimiser2D::optimise8Neighbor(std::vector<geos::geom::Coordinate*> *coords, double step, geos::geom::Envelope *boundary) throw(RSGISOptimisationException)
+    std::vector<geos::geom::Coordinate*>* RSGISGlobalHillClimbingOptimiser2D::optimise8Neighbor(std::vector<geos::geom::Coordinate*> *coords, double step, geos::geom::Envelope *boundary)
 	{
         std::vector<geos::geom::Coordinate*> *outCoords = new std::vector<geos::geom::Coordinate*>();
 		try
@@ -436,7 +436,7 @@ namespace rsgis{namespace math{
 		this->maxNumIterations = maxNumIterations;
 	}
 	
-    std::vector<geos::geom::Coordinate*>* RSGISGlobalHillClimbingOptimiser2DVaryNumPts::optimise4Neighbor(std::vector<geos::geom::Coordinate*> *coords, double step, geos::geom::Envelope *boundary) throw(RSGISOptimisationException)
+    std::vector<geos::geom::Coordinate*>* RSGISGlobalHillClimbingOptimiser2DVaryNumPts::optimise4Neighbor(std::vector<geos::geom::Coordinate*> *coords, double step, geos::geom::Envelope *boundary)
 	{
         std::vector<geos::geom::Coordinate*> *outCoords = new std::vector<geos::geom::Coordinate*>();
 		try
@@ -654,7 +654,7 @@ namespace rsgis{namespace math{
 		return outCoords;
 	}
 	
-    std::vector<geos::geom::Coordinate*>* RSGISGlobalHillClimbingOptimiser2DVaryNumPts::optimise8Neighbor(std::vector<geos::geom::Coordinate*> *coords, double step, geos::geom::Envelope *boundary) throw(RSGISOptimisationException)
+    std::vector<geos::geom::Coordinate*>* RSGISGlobalHillClimbingOptimiser2DVaryNumPts::optimise8Neighbor(std::vector<geos::geom::Coordinate*> *coords, double step, geos::geom::Envelope *boundary)
 	{
         std::vector<geos::geom::Coordinate*> *outCoords = new std::vector<geos::geom::Coordinate*>();
 		try

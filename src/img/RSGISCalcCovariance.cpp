@@ -33,7 +33,7 @@ namespace rsgis{namespace img{
 		this->bMeans = bMeans;
 	}
 	
-	void RSGISCalcCovariance::calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) throw(RSGISImageCalcException)
+	void RSGISCalcCovariance::calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) 
 	{
 		if(bandA > numBands)
 		{
@@ -50,22 +50,22 @@ namespace rsgis{namespace img{
 		sum += ((bandValuesImageA[bandA]-aMeans->matrix[bandA])*(bandValuesImageB[bandB]-bMeans->matrix[bandB]));
 	}
 	
-	void RSGISCalcCovariance::calcImageValue(float *bandValuesImage, int numBands, int band) throw(RSGISImageCalcException)
+	void RSGISCalcCovariance::calcImageValue(float *bandValuesImage, int numBands, int band) 
 	{
 		throw RSGISImageCalcException("Not implemented!");
 	}
 	
-	void RSGISCalcCovariance::calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) throw(RSGISImageCalcException)
+	void RSGISCalcCovariance::calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) 
 	{
 		throw RSGISImageCalcException("Not implemented!");
 	}
 	
-	void RSGISCalcCovariance::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(RSGISImageCalcException)
+	void RSGISCalcCovariance::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) 
 	{
 		throw RSGISImageCalcException("Not implemented!");
 	}
 	
-	double* RSGISCalcCovariance::getOutputValues()  throw(RSGISImageCalcException)
+	double* RSGISCalcCovariance::getOutputValues()  
 	{
 		this->outputValues[0] = sum/(n-1);
 		return outputValues;
@@ -88,7 +88,7 @@ namespace rsgis{namespace img{
         this->covarianceMatrix = covarianceMatrix;
     }
 
-    void RSGISCreateCovarianceMatrix::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+    void RSGISCreateCovarianceMatrix::calcImageValue(float *bandValues, int numBands) 
     {
         bool allZero = true;
         for(int i = 0; i < numBands; ++i)

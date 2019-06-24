@@ -40,7 +40,7 @@ namespace rsgis{namespace vec{
 		muParser->SetExpr(mathsExpression.c_str());
 	}
 	
-	void RSGISVectorMaths::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISVectorMaths::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)
 	{
 		try 
 		{
@@ -68,7 +68,7 @@ namespace rsgis{namespace vec{
 		
 	}	
 	
-	void RSGISVectorMaths::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+	void RSGISVectorMaths::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn)
 	{
 		if(this->outHeading.length() > 10)
 		{

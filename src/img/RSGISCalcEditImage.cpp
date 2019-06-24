@@ -31,7 +31,7 @@ namespace rsgis
             calc = valueCalc;
         }
             
-        void RSGISCalcEditImage::calcImage(GDALDataset *dataset) throw(RSGISImageCalcException,RSGISImageBandException)
+        void RSGISCalcEditImage::calcImage(GDALDataset *dataset)
         {
             RSGISImageUtils imgUtils;
             double *gdalTranslation = new double[6];
@@ -211,7 +211,7 @@ namespace rsgis
             }
         }
         
-        void RSGISCalcEditImage::calcImageUseOut(GDALDataset *dataset) throw(RSGISImageCalcException,RSGISImageBandException)
+        void RSGISCalcEditImage::calcImageUseOut(GDALDataset *dataset)
         {
             RSGISImageUtils imgUtils;
             
@@ -476,7 +476,7 @@ namespace rsgis
             }
         }
         
-        void RSGISCalcEditImage::calcImageWindowData(GDALDataset *dataset, int windowSize, float fillval) throw(RSGISImageCalcException,RSGISImageBandException)
+        void RSGISCalcEditImage::calcImageWindowData(GDALDataset *dataset, int windowSize, float fillval)
         {
             if(dataset == NULL)
             {

@@ -31,7 +31,7 @@ namespace rsgis{namespace reg{
         
 	}
 	
-	void RSGISWarpImageUsingTriangulation::initWarp()throw(RSGISImageWarpException)
+	void RSGISWarpImageUsingTriangulation::initWarp()
 	{
         std::cout << "Building Triangulation\n";
         
@@ -56,7 +56,7 @@ namespace rsgis{namespace reg{
         
 	}
 	
-	geos::geom::Envelope* RSGISWarpImageUsingTriangulation::newImageExtent(unsigned int width, unsigned int height) throw(RSGISImageWarpException)
+	geos::geom::Envelope* RSGISWarpImageUsingTriangulation::newImageExtent(unsigned int width, unsigned int height)
 	{
 		double minEastings = 0;
 		double maxEastings = 0;
@@ -113,7 +113,7 @@ namespace rsgis{namespace reg{
 		return env;
 	}
 	
-	void RSGISWarpImageUsingTriangulation::findNearestPixel(double eastings, double northings, unsigned int *x, unsigned int *y, float inImgRes) throw(RSGISImageWarpException)
+	void RSGISWarpImageUsingTriangulation::findNearestPixel(double eastings, double northings, unsigned int *x, unsigned int *y, float inImgRes)
 	{
 		CGALPoint p(eastings, northings);
         Vertex_handle vh = dt->nearest_vertex(p);
@@ -181,7 +181,7 @@ namespace rsgis{namespace reg{
 		return normTriPts;
 	}
 	
-	void RSGISWarpImageUsingTriangulation::fitPlane2XPoints(std::list<RSGISGCPImg2MapNode*> *normPts, double *a, double *b, double *c) throw(RSGISImageWarpException)
+	void RSGISWarpImageUsingTriangulation::fitPlane2XPoints(std::list<RSGISGCPImg2MapNode*> *normPts, double *a, double *b, double *c)
 	{
 		rsgis::math::RSGISMatrices matrices;
 		
@@ -241,13 +241,13 @@ namespace rsgis{namespace reg{
 			matrices.freeMatrix(matrixCoFactorsT);
 			matrices.freeMatrix(outputs);
 		}
-		catch(rsgis::math::RSGISMatricesException e)
+		catch(rsgis::math::RSGISMatricesException &e)
 		{
 			throw RSGISImageWarpException(e.what());
 		}
 	}
 	
-	void RSGISWarpImageUsingTriangulation::fitPlane2YPoints(std::list<RSGISGCPImg2MapNode*> *normPts, double *a, double *b, double *c) throw(RSGISImageWarpException)
+	void RSGISWarpImageUsingTriangulation::fitPlane2YPoints(std::list<RSGISGCPImg2MapNode*> *normPts, double *a, double *b, double *c)
 	{
 		rsgis::math::RSGISMatrices matrices;
 		
@@ -307,7 +307,7 @@ namespace rsgis{namespace reg{
 			matrices.freeMatrix(matrixCoFactorsT);
 			matrices.freeMatrix(outputs);
 		}
-		catch(rsgis::math::RSGISMatricesException e)
+		catch(rsgis::math::RSGISMatricesException &e)
 		{
 			throw RSGISImageWarpException(e.what());
 		}

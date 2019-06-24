@@ -32,27 +32,27 @@ namespace rsgis{namespace vec{
 		this->morphologytype = morphologytype;
 	}
 	
-	void RSGISVectorMorphology::processGeometry(OGRPolygon *polygon) throw(RSGISVectorException)
+	void RSGISVectorMorphology::processGeometry(OGRPolygon *polygon)
 	{
 		throw RSGISVectorException("Not Implemented");
 	}
 	
-	void RSGISVectorMorphology::processGeometry(OGRMultiPolygon *multiPolygon) throw(RSGISVectorException)
+	void RSGISVectorMorphology::processGeometry(OGRMultiPolygon *multiPolygon)
 	{
 		throw RSGISVectorException("Not Implemented");
 	}
 	
-	void RSGISVectorMorphology::processGeometry(OGRPoint *point) throw(RSGISVectorException)
+	void RSGISVectorMorphology::processGeometry(OGRPoint *point)
 	{
 		throw RSGISVectorException("Not Implemented");
 	}
 	
-	void RSGISVectorMorphology::processGeometry(OGRLineString *line) throw(RSGISVectorException)
+	void RSGISVectorMorphology::processGeometry(OGRLineString *line)
 	{
 		throw RSGISVectorException("Not Implemented");
 	}
 	
-	OGRPolygon* RSGISVectorMorphology::processGeometry(OGRGeometry *geom) throw(RSGISVectorException)
+	OGRPolygon* RSGISVectorMorphology::processGeometry(OGRGeometry *geom)
 	{
 		OGRPolygon *polygon = NULL;
 		if(morphologytype == rsgis::geom::closing)

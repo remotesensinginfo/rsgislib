@@ -36,7 +36,7 @@ namespace rsgis{namespace vec{
 		this->vecUtils = new RSGISVectorUtils();
 	}
 	
-	void RSGISGeometryToCircle::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISGeometryToCircle::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)
 	{
 		OGRwkbGeometryType geometryType = inFeature->GetGeometryRef()->getGeometryType();
 		OGRFeatureDefn *inFeatureDefn = inFeature->GetDefnRef();
@@ -176,12 +176,12 @@ namespace rsgis{namespace vec{
 		
 	}
 	
-	void RSGISGeometryToCircle::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISGeometryToCircle::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid)
 	{
 		throw RSGISVectorException("Not Implemented");
 	}
 	
-	void RSGISGeometryToCircle::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+	void RSGISGeometryToCircle::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn)
 	{
 		
 	}

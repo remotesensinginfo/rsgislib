@@ -38,7 +38,7 @@
 
 namespace rsgis{ namespace cmds {
 
-    void executeFilter(std::string inputImage, std::vector<rsgis::cmds::RSGISFilterParameters*> *filterParameters, std::string outputImageBase, std::string imageFormat, std::string imageExt, RSGISLibDataType outDataType) throw(RSGISCmdException)
+    void executeFilter(std::string inputImage, std::vector<rsgis::cmds::RSGISFilterParameters*> *filterParameters, std::string outputImageBase, std::string imageFormat, std::string imageExt, RSGISLibDataType outDataType) 
     {
         try
         {
@@ -274,7 +274,7 @@ namespace rsgis{ namespace cmds {
     }
                     
                     
-    std::vector<rsgis::cmds::RSGISFilterParameters*> *createLeungMalikFilterBank() throw(RSGISCmdException)
+    std::vector<rsgis::cmds::RSGISFilterParameters*> *createLeungMalikFilterBank() 
     {
         try
         {

@@ -96,7 +96,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISClusteredClassificationPolygon::createLayerDefinition(OGRLayer *outputSHPLayer)throw(RSGISVectorOutputException)
+	void RSGISClusteredClassificationPolygon::createLayerDefinition(OGRLayer *outputSHPLayer)
 	{
 		// Create class attribute column
 		OGRFieldDefn shpField1( "ClustClass", OFTString );

@@ -31,7 +31,7 @@ namespace rsgis{namespace radar{
 		this->deg = deg;
 	}
 	
-	void RSGISCalcGammaZero::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISCalcGammaZero::calcImageValue(float *bandValues, int numBands, double *output) 
 	{
 		// Input bands
 		// Incidence Angle
@@ -60,12 +60,12 @@ namespace rsgis{namespace radar{
 		}
 	}
 	
-	void RSGISCalcGammaZero::calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISCalcGammaZero::calcImageValue(float *bandValues, int numBands) 
 	{
 		throw rsgis::img::RSGISImageCalcException("Not implemented");
 	}
 	
-	void RSGISCalcGammaZero::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISCalcGammaZero::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) 
 	{
 		throw rsgis::img::RSGISImageCalcException("Not Implemented");
 	}

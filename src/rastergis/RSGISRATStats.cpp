@@ -30,7 +30,7 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    float RSGISRATStats::calc1DJMDistance(GDALDataset *clumpsImage, std::string varCol, float binWidth, std::string classColumn, std::string class1Val, std::string class2Val, unsigned int ratBand) throw(RSGISAttributeTableException)
+    float RSGISRATStats::calc1DJMDistance(GDALDataset *clumpsImage, std::string varCol, float binWidth, std::string classColumn, std::string class1Val, std::string class2Val, unsigned int ratBand)
     {
         float dist = 0.0;
         try
@@ -156,7 +156,7 @@ namespace rsgis{namespace rastergis{
         return dist;
     }
     
-    float RSGISRATStats::calc2DJMDistance(GDALDataset *clumpsImage, std::string var1Col, std::string var2Col, float var1binWidth, float var2binWidth, std::string classColumn, std::string class1Val, std::string class2Val, unsigned int ratBand) throw(RSGISAttributeTableException)
+    float RSGISRATStats::calc2DJMDistance(GDALDataset *clumpsImage, std::string var1Col, std::string var2Col, float var1binWidth, float var2binWidth, std::string classColumn, std::string class1Val, std::string class2Val, unsigned int ratBand)
     {
         float dist = 0.0;
         try
@@ -371,7 +371,7 @@ namespace rsgis{namespace rastergis{
         return dist;
     }
     
-    float RSGISRATStats::calcBhattacharyyaDistance(GDALDataset *clumpsImage, std::string varCol, std::string classColumn, std::string class1Val, std::string class2Val, unsigned int ratBand) throw(RSGISAttributeTableException)
+    float RSGISRATStats::calcBhattacharyyaDistance(GDALDataset *clumpsImage, std::string varCol, std::string classColumn, std::string class1Val, std::string class2Val, unsigned int ratBand)
     {
         float dist = 0.0;
         try

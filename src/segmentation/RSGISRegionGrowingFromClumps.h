@@ -112,8 +112,8 @@ namespace rsgis{namespace segment{
     {
     public:
         RSGISFindClumpIDs();
-        void exportClumpIDsAsTxtFile(GDALDataset *clumps, std::string outputText, std::vector<ImgSeeds> *seedPxls) throw(rsgis::img::RSGISImageCalcException);
-        std::vector<ClumpSeed>* readClumpSeedIDs(std::string inputTextFile)throw(rsgis::utils::RSGISTextException);
+        void exportClumpIDsAsTxtFile(GDALDataset *clumps, std::string outputText, std::vector<ImgSeeds> *seedPxls);
+        std::vector<ClumpSeed>* readClumpSeedIDs(std::string inputTextFile);
         ~RSGISFindClumpIDs();
     };
     
@@ -122,10 +122,10 @@ namespace rsgis{namespace segment{
     {
     public:
         RSGISRegionGrowingSegmentation();
-        void performRegionGrowUsingClumps(GDALDataset *spectral, GDALDataset *clumps, GDALDataset *output, std::vector<ClumpSeed> *seeds, float initThreshold, float thresholdIncrements, float maxThreshold, unsigned int maxIterations )throw(rsgis::img::RSGISImageCalcException);
+        void performRegionGrowUsingClumps(GDALDataset *spectral, GDALDataset *clumps, GDALDataset *output, std::vector<ClumpSeed> *seeds, float initThreshold, float thresholdIncrements, float maxThreshold, unsigned int maxIterations );
         ~RSGISRegionGrowingSegmentation();
     protected:
-        rsgis::img::ImgClumpRG* growRegion(float threshold, unsigned int maxNumIterations, std::vector<rsgis::img::ImgClumpRG*> *clumpTab, unsigned int numSpecBands, unsigned long seedClumpID, unsigned long seed, std::list<unsigned long> *regionClumps)throw(rsgis::img::RSGISImageCalcException);
+        rsgis::img::ImgClumpRG* growRegion(float threshold, unsigned int maxNumIterations, std::vector<rsgis::img::ImgClumpRG*> *clumpTab, unsigned int numSpecBands, unsigned long seedClumpID, unsigned long seed, std::list<unsigned long> *regionClumps);
     };
     
     
@@ -133,8 +133,8 @@ namespace rsgis{namespace segment{
     {
     public:
         RSGISGenerateSeeds();
-        void genSeedsHistogram(GDALDataset *spectral, GDALDataset *clumps, GDALDataset *output, std::vector<BandThreshold> *thresholds) throw(rsgis::img::RSGISImageCalcException);
-        void genSeedsHistogram(GDALDataset *spectral, GDALDataset *clumps, std::string outputFile, std::vector<BandThreshold> *thresholds) throw(rsgis::img::RSGISImageCalcException);
+        void genSeedsHistogram(GDALDataset *spectral, GDALDataset *clumps, GDALDataset *output, std::vector<BandThreshold> *thresholds);
+        void genSeedsHistogram(GDALDataset *spectral, GDALDataset *clumps, std::string outputFile, std::vector<BandThreshold> *thresholds);
         ~RSGISGenerateSeeds();
     };
     
@@ -151,8 +151,8 @@ namespace rsgis{namespace segment{
             percent95th
 		};
         RSGISSelectClumps();
-        void selectClumps(GDALDataset *spectral, GDALDataset *clumps, GDALDataset *largeClumps, GDALDataset *output, ClumpSelection selection) throw(rsgis::img::RSGISImageCalcException);
-        void selectClumps(GDALDataset *spectral, GDALDataset *clumps, GDALDataset *largeClumps, std::string outputFile, ClumpSelection selection) throw(rsgis::img::RSGISImageCalcException);
+        void selectClumps(GDALDataset *spectral, GDALDataset *clumps, GDALDataset *largeClumps, GDALDataset *output, ClumpSelection selection);
+        void selectClumps(GDALDataset *spectral, GDALDataset *clumps, GDALDataset *largeClumps, std::string outputFile, ClumpSelection selection);
         ~RSGISSelectClumps();
     };
     

@@ -55,7 +55,7 @@ namespace rsgis{namespace vec{
 		calcImageSurrounding = new rsgis::img::RSGISCalcImageSingle(calcValueSurrounding);
 	}
 	
-	void RSGISZonalLSSMeanVar::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISZonalLSSMeanVar::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)
 	{
 		try
 		{
@@ -149,7 +149,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISZonalLSSMeanVar::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+	void RSGISZonalLSSMeanVar::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn)
 	{
 		for(int i = 0; i < numAttributes; i++)
 		{
@@ -212,7 +212,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISCalcZonalLSSMeanVar::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISCalcZonalLSSMeanVar::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) 
 	{
 		float min = 0;
 		bool first = true;
@@ -261,7 +261,7 @@ namespace rsgis{namespace vec{
 		totalPxl++;
 	}
 	
-	double* RSGISCalcZonalLSSMeanVar::getOutputValues() throw(rsgis::img::RSGISImageCalcException)
+	double* RSGISCalcZonalLSSMeanVar::getOutputValues() 
 	{
 		//double *outputData = new double[this->numOutputValues];
 		outputValues[0] = this->totalPxl;

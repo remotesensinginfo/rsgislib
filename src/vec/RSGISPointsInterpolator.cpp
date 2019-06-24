@@ -30,7 +30,7 @@ namespace rsgis{namespace vec{
 		this->power = power;
 	}
 	
-	void RSGISInverseWeightedDistanceInterpolator::calcValue(rsgis::geom::point3D *pts, int numPoints, rsgis::geom::point2D *pt, double *outVal) throw(RSGISVectorException)
+	void RSGISInverseWeightedDistanceInterpolator::calcValue(rsgis::geom::point3D *pts, int numPoints, rsgis::geom::point2D *pt, double *outVal)
 	{
 		if(numPoints == 0)
 		{

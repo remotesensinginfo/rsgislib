@@ -74,7 +74,7 @@ namespace rsgis{ namespace utils{
 	{
 		public:
 			RSGISPlotPolygonsCSVParse();
-			std::vector<PlotPoly*>* parsePolyPlots(std::string inputfile) throw(rsgis::RSGISInputStreamException,RSGISTextException);
+			std::vector<PlotPoly*>* parsePolyPlots(std::string inputfile);
 			std::string formattedString(PlotPoly *poly);
 			~RSGISPlotPolygonsCSVParse();
 	};

@@ -68,18 +68,18 @@ namespace rsgis{namespace reg{
 	{
 	public:
 		RSGISWarpImage(std::string inputImage, std::string outputImage, std::string outProjWKT, std::string gcpFilePath, float outImgRes, RSGISWarpImageInterpolator *interpolator, std::string gdalFormat);
-		void performWarp() throw(RSGISImageWarpException);
-        void generateTransformImage() throw(RSGISImageWarpException);
-		void readGCPFile() throw(RSGISImageWarpException);
-		void createOutputImage() throw(RSGISImageWarpException);
-        void createOutputTransformImage() throw(RSGISImageWarpException);
-		void populateOutputImage() throw(RSGISImageWarpException);
-        void populateTransformImage() throw(RSGISImageWarpException);
-		virtual void initWarp() throw(RSGISImageWarpException) = 0;
+		void performWarp();
+        void generateTransformImage();
+		void readGCPFile();
+		void createOutputImage();
+        void createOutputTransformImage();
+		void populateOutputImage();
+        void populateTransformImage();
+		virtual void initWarp() = 0;
 		virtual ~RSGISWarpImage();
 	protected:
-		virtual geos::geom::Envelope* newImageExtent(unsigned int width, unsigned int height) throw(RSGISImageWarpException) = 0;
-		virtual void findNearestPixel(double eastings, double northings, unsigned int *x, unsigned int *y, float inImgRes) throw(RSGISImageWarpException) = 0;
+		virtual geos::geom::Envelope* newImageExtent(unsigned int width, unsigned int height) = 0;
+		virtual void findNearestPixel(double eastings, double northings, unsigned int *x, unsigned int *y, float inImgRes) = 0;
         std::string inputImage;
 		std::string outputImage;
 		std::string outProjWKT;

@@ -68,10 +68,10 @@ namespace rsgis{namespace geom{
 			 */
 			RSGISDelaunayTriangulation(RSGIS2DPoint *a, RSGIS2DPoint *b, RSGIS2DPoint *c);
 			RSGISDelaunayTriangulation(RSGISTriangle *tri);
-			RSGISDelaunayTriangulation(std::list<RSGIS2DPoint*> *data) throw(RSGISGeometryException);
-			RSGISDelaunayTriangulation(std::vector<RSGIS2DPoint*> *data) throw(RSGISGeometryException);
-			void createDelaunayTriangulation(std::list<RSGIS2DPoint*> *data) throw(RSGISGeometryException);
-			void addVertex(RSGIS2DPoint *pt) throw(RSGISGeometryException);
+			RSGISDelaunayTriangulation(std::list<RSGIS2DPoint*> *data);
+			RSGISDelaunayTriangulation(std::vector<RSGIS2DPoint*> *data);
+			void createDelaunayTriangulation(std::list<RSGIS2DPoint*> *data);
+			void addVertex(RSGIS2DPoint *pt);
 			void finaliseTriangulation(std::list<RSGIS2DPoint*> *data);
 			void finaliseTriangulation();
 			std::list<RSGISTriangle*>* getTriangulation();

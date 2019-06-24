@@ -30,7 +30,7 @@ namespace rsgis{namespace math{
 		
 	}
 	
-	Vector* RSGISVectors::createVector(int n) throw(RSGISVectorsException)
+	Vector* RSGISVectors::createVector(int n)
 	{
 		if(n < 1)
 		{
@@ -77,12 +77,12 @@ namespace rsgis{namespace math{
 		for(unsigned int j = 0; j < vector->size; j++)
 		{
 			double outm = gsl_vector_get(vector, j); 
-			std::cout << outm << " " ;
+			std::cout << outm << " ";
 		}
 		std::cout << std::endl;		
 	}
 	
-	void RSGISVectors::saveVector2GridTxt(Vector *vector, std::string filepath) throw(RSGISVectorsException,RSGISOutputStreamException)
+	void RSGISVectors::saveVector2GridTxt(Vector *vector, std::string filepath)
 	{
 		std::string outputFilename = filepath + std::string(".gmtxt");
 		std::ofstream outTxtFile;
@@ -119,7 +119,7 @@ namespace rsgis{namespace math{
 		
 	}
 	
-	void RSGISVectors::saveVector2txt(Vector *vector, std::string filepath) throw(RSGISVectorsException,RSGISOutputStreamException)
+	void RSGISVectors::saveVector2txt(Vector *vector, std::string filepath)
 	{
 		std::string outputFilename = filepath + std::string(".mtxt");
 		std::ofstream outTxtFile;
@@ -151,7 +151,7 @@ namespace rsgis{namespace math{
 		} 
 	}
 	
-	void RSGISVectors::saveGSLVector2GridTxt(gsl_vector *gslVector, std::string filepath) throw(RSGISVectorsException,RSGISOutputStreamException)
+	void RSGISVectors::saveGSLVector2GridTxt(gsl_vector *gslVector, std::string filepath)
 	{
 		Vector *rsgisVector;
 		rsgisVector = this->convertGSL2RSGISVector(gslVector);
@@ -159,7 +159,7 @@ namespace rsgis{namespace math{
 		this->freeVector(rsgisVector);
 	}
 	
-	void RSGISVectors::saveGSLVector2Txt(gsl_vector *gslVector, std::string filepath) throw(RSGISVectorsException,RSGISOutputStreamException)
+	void RSGISVectors::saveGSLVector2Txt(gsl_vector *gslVector, std::string filepath)
 	{
 		Vector *rsgisVector;
 		rsgisVector = this->convertGSL2RSGISVector(gslVector);
@@ -167,7 +167,7 @@ namespace rsgis{namespace math{
 		this->freeVector(rsgisVector);
 	}	
 	
-	Vector* RSGISVectors::readVectorFromTxt(std::string filepath) throw(RSGISVectorsException,RSGISInputStreamException)
+	Vector* RSGISVectors::readVectorFromTxt(std::string filepath)
 	{
 		Vector *vector = new Vector();
 		std::ifstream inputVector;
@@ -249,7 +249,7 @@ namespace rsgis{namespace math{
 		return vector;
 	}
 	
-	Vector* RSGISVectors::readVectorFromGridTxt(std::string filepath) throw(RSGISVectorsException,RSGISInputStreamException)
+	Vector* RSGISVectors::readVectorFromGridTxt(std::string filepath)
 	{
 		Vector *vector = new Vector();
 		std::ifstream inputVector;
@@ -301,7 +301,7 @@ namespace rsgis{namespace math{
 			// data
 			int dataCounter = 0;
 			int start = 0;
-			int lineLength = wholeline.length(); ;
+			int lineLength = wholeline.length();;
 			int numDataPoints = vector->n;
 			vector->vector = new double[numDataPoints];
 			
@@ -336,7 +336,7 @@ namespace rsgis{namespace math{
 		return vector;
 	}
 	
-	gsl_vector* RSGISVectors::readGSLVectorFromTxt(std::string filepath) throw(RSGISVectorsException)
+	gsl_vector* RSGISVectors::readGSLVectorFromTxt(std::string filepath)
 	{
 		Vector *rsgisVector;
 		gsl_vector *gslVector;
@@ -346,7 +346,7 @@ namespace rsgis{namespace math{
 		return gslVector;
 	}
 	
-	gsl_vector* RSGISVectors::readGSLVectorFromGridTxt(std::string filepath) throw(RSGISVectorsException)
+	gsl_vector* RSGISVectors::readGSLVectorFromGridTxt(std::string filepath)
 	{
 		Vector *rsgisVector;
 		gsl_vector *gslVector;
@@ -356,7 +356,7 @@ namespace rsgis{namespace math{
 		return gslVector;
 	}
 	
-	gsl_vector* RSGISVectors::convertRSGIS2GSLVector(Vector *inVector) throw(RSGISVectorsException)
+	gsl_vector* RSGISVectors::convertRSGIS2GSLVector(Vector *inVector)
 	{
 		gsl_vector *convertedVector = gsl_vector_alloc(inVector->n);
 		
@@ -371,7 +371,7 @@ namespace rsgis{namespace math{
 		return convertedVector;
 	}
 
-	Vector* RSGISVectors::convertGSL2RSGISVector(gsl_vector *inVector) throw(RSGISVectorsException)
+	Vector* RSGISVectors::convertGSL2RSGISVector(gsl_vector *inVector)
 	{
 		/// Converts GSL vector to a RSGIS vector
 		Vector *convertedVector = this->createVector(inVector->size);		
@@ -385,7 +385,7 @@ namespace rsgis{namespace math{
 		return convertedVector;
 	}
 	
-	double RSGISVectors::dotProductVectorVectorGSL(gsl_vector *inVectorA, gsl_vector *inVectorB) throw(RSGISVectorsException)
+	double RSGISVectors::dotProductVectorVectorGSL(gsl_vector *inVectorA, gsl_vector *inVectorB)
 	{
 		/// Calculates the dot product of two vectors.
 		/**
@@ -409,7 +409,7 @@ namespace rsgis{namespace math{
 		
 	}
 
-	gsl_vector* RSGISVectors::crossProductVectorVectorGSL(gsl_vector *inVectorA, gsl_vector *inVectorB) throw(RSGISVectorsException)
+	gsl_vector* RSGISVectors::crossProductVectorVectorGSL(gsl_vector *inVectorA, gsl_vector *inVectorB)
 	{
 		/// Calculates the cross product of two vectors.
 		/**
@@ -418,7 +418,7 @@ namespace rsgis{namespace math{
 		return NULL;
 	}
 	
-	double RSGISVectors::euclideanDistance(Vector *vecA, Vector *vecB) throw(RSGISVectorsException)
+	double RSGISVectors::euclideanDistance(Vector *vecA, Vector *vecB)
 	{
 		if(vecA->n != vecB->n)
 		{

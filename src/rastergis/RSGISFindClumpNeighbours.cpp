@@ -29,7 +29,7 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    std::vector<std::list<size_t>* >* RSGISFindClumpNeighbours::findNeighbours(GDALDataset *clumpImage, unsigned int ratBand) throw(rsgis::img::RSGISImageCalcException)
+    std::vector<std::list<size_t>* >* RSGISFindClumpNeighbours::findNeighbours(GDALDataset *clumpImage, unsigned int ratBand) 
     {
         std::vector<std::list<size_t>* > *neighbours = new std::vector<std::list<size_t>* >();
         try
@@ -229,7 +229,7 @@ namespace rsgis{namespace rastergis{
         return neighbours;
     }
     
-    void RSGISFindClumpNeighbours::findNeighboursKEAImageCalc(GDALDataset *clumpImage, unsigned int ratBand) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISFindClumpNeighbours::findNeighboursKEAImageCalc(GDALDataset *clumpImage, unsigned int ratBand) 
     {
         try
         {
@@ -340,7 +340,7 @@ namespace rsgis{namespace rastergis{
         this->ratBand = ratBand;
     }
     
-    void RSGISFindNeighboursCalcImage::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISFindNeighboursCalcImage::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
     {
         try
         {
@@ -596,7 +596,7 @@ namespace rsgis{namespace rastergis{
         this->ratBand = ratBand;
     }
     
-    void RSGISIdentifyBoundaryPixels::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISIdentifyBoundaryPixels::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
     {
         try
         {

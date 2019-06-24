@@ -28,7 +28,7 @@ namespace rsgis{namespace filter{
     {
     }
     
-    void RSGISApplyNonLocalDenoising::ApplyFilter(GDALDataset **inputImageDS, int numDS, std::string outputImage, unsigned int filterWindowSize, unsigned int searchWindowSize, double aPar, double hPar, std::string gdalFormat, GDALDataType gdalDataType) throw(rsgis::img::RSGISImageCalcException,rsgis::img::RSGISImageBandException)
+    void RSGISApplyNonLocalDenoising::ApplyFilter(GDALDataset **inputImageDS, int numDS, std::string outputImage, unsigned int filterWindowSize, unsigned int searchWindowSize, double aPar, double hPar, std::string gdalFormat, GDALDataType gdalDataType)
 	{
         
         rsgis::img::RSGISImageUtils imgUtils;

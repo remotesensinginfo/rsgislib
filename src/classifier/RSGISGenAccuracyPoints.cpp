@@ -30,7 +30,7 @@ namespace rsgis{namespace classifier{
         
     }
     
-    void RSGISGenAccuracyPoints::generateRandomPoints(GDALDataset *inputImage, GDALDataset *inputDEM, bool demProvided, std::string outputFile, std::string classColName, unsigned int numPts, unsigned int seed) throw(rsgis::RSGISImageException)
+    void RSGISGenAccuracyPoints::generateRandomPoints(GDALDataset *inputImage, GDALDataset *inputDEM, bool demProvided, std::string outputFile, std::string classColName, unsigned int numPts, unsigned int seed)
     {
         try
         {
@@ -222,7 +222,7 @@ namespace rsgis{namespace classifier{
     }
     
     
-    void RSGISGenAccuracyPoints::generateStratifiedRandomPoints(GDALDataset *inputImage, GDALDataset *inputDEM, bool demProvided, std::string outputFile, std::string classColName, unsigned int numPts, unsigned int seed) throw(rsgis::RSGISImageException)
+    void RSGISGenAccuracyPoints::generateStratifiedRandomPoints(GDALDataset *inputImage, GDALDataset *inputDEM, bool demProvided, std::string outputFile, std::string classColName, unsigned int numPts, unsigned int seed)
     {
         try
         {
@@ -467,7 +467,7 @@ namespace rsgis{namespace classifier{
     }
     
     
-    void RSGISGenAccuracyPoints::generateRandomPointsVecOut(GDALDataset *inputImage, OGRLayer *outputSHPLayer, std::string imgClassCol, std::string vecClassImgCol, std::string vecClassRefCol, unsigned int numPts, unsigned int seed) throw(rsgis::RSGISImageException)
+    void RSGISGenAccuracyPoints::generateRandomPointsVecOut(GDALDataset *inputImage, OGRLayer *outputSHPLayer, std::string imgClassCol, std::string vecClassImgCol, std::string vecClassRefCol, unsigned int numPts, unsigned int seed)
     {
         try
         {
@@ -614,7 +614,7 @@ namespace rsgis{namespace classifier{
     }
     
     
-    void RSGISGenAccuracyPoints::generateStratifiedRandomPointsVecOut(GDALDataset *inputImage, OGRLayer *outputSHPLayer, std::string imgClassCol, std::string vecClassImgCol, std::string vecClassRefCol, unsigned int numPts, unsigned int seed) throw(rsgis::RSGISImageException)
+    void RSGISGenAccuracyPoints::generateStratifiedRandomPointsVecOut(GDALDataset *inputImage, OGRLayer *outputSHPLayer, std::string imgClassCol, std::string vecClassImgCol, std::string vecClassRefCol, unsigned int numPts, unsigned int seed)
     {
         try
         {
@@ -828,7 +828,7 @@ namespace rsgis{namespace classifier{
     }
     
     
-    void RSGISGenAccuracyPoints::generateStratifiedRandomPointsVecOutUsePxlLst(GDALDataset *inputImage, OGRLayer *outputSHPLayer, std::string imgClassCol, std::string vecClassImgCol, std::string vecClassRefCol, unsigned int numPts, unsigned int seed) throw(rsgis::RSGISImageException)
+    void RSGISGenAccuracyPoints::generateStratifiedRandomPointsVecOutUsePxlLst(GDALDataset *inputImage, OGRLayer *outputSHPLayer, std::string imgClassCol, std::string vecClassImgCol, std::string vecClassRefCol, unsigned int numPts, unsigned int seed)
     {
         try
         {
@@ -1001,7 +1001,7 @@ namespace rsgis{namespace classifier{
     }
     
     
-    void RSGISGenAccuracyPoints::popClassInfo2Vec(GDALDataset *inputImage, OGRLayer *inputVecLayer, std::string imgClassCol, std::string vecClassImgCol, std::string vecClassRefCol, bool addRefCol)throw(rsgis::RSGISImageException)
+    void RSGISGenAccuracyPoints::popClassInfo2Vec(GDALDataset *inputImage, OGRLayer *inputVecLayer, std::string imgClassCol, std::string vecClassImgCol, std::string vecClassRefCol, bool addRefCol)
     {
         try
         {
@@ -1180,7 +1180,7 @@ namespace rsgis{namespace classifier{
     }
     
     
-    float RSGISGenAccuracyPoints::findPixelVal(GDALDataset *image, unsigned int band, double eastings, double northings, double tlX, double tlY, double xRes, double yRes, unsigned int xSize, unsigned int ySize) throw(rsgis::RSGISImageException)
+    float RSGISGenAccuracyPoints::findPixelVal(GDALDataset *image, unsigned int band, double eastings, double northings, double tlX, double tlY, double xRes, double yRes, unsigned int xSize, unsigned int ySize)
     {
         
         double diffX = eastings - tlX;
@@ -1222,7 +1222,7 @@ namespace rsgis{namespace classifier{
         return val;
     }
     
-    std::string RSGISGenAccuracyPoints::findClassVal(GDALDataset *image, unsigned int band, GDALRasterAttributeTable *attTable, unsigned int classNameColIdx, unsigned int xPxl, unsigned int yPxl) throw(rsgis::RSGISImageException)
+    std::string RSGISGenAccuracyPoints::findClassVal(GDALDataset *image, unsigned int band, GDALRasterAttributeTable *attTable, unsigned int classNameColIdx, unsigned int xPxl, unsigned int yPxl)
     {
         if((image->GetRasterCount() < band) | (band == 0))
         {
@@ -1253,7 +1253,7 @@ namespace rsgis{namespace classifier{
         return className;
     }
     
-    std::list<std::string>* RSGISGenAccuracyPoints::findUniqueClasses(GDALRasterAttributeTable *attTable, unsigned int classNameColIdx, int histoColIdx) throw(rsgis::RSGISImageException)
+    std::list<std::string>* RSGISGenAccuracyPoints::findUniqueClasses(GDALRasterAttributeTable *attTable, unsigned int classNameColIdx, int histoColIdx)
     {
         std::list<std::string> *classes = new std::list<std::string>();
         
@@ -1312,7 +1312,7 @@ namespace rsgis{namespace classifier{
         this->numClasses = numClasses;
     }
     
-    void RSGISExtractClassPxllocs::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent)throw(rsgis::img::RSGISImageCalcException)
+    void RSGISExtractClassPxllocs::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent)
     {
         if((numIntVals != 1) & (numfloatVals != 0))
         {

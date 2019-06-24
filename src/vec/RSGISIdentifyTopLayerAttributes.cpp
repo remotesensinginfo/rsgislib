@@ -35,7 +35,7 @@ namespace rsgis{namespace vec{
 		this->sortedAttributes = new rsgis::datastruct::SortedGenericList<RSGISFloatAttribute>(numAttributes, numAttributes/2);
 	}
 	
-	void RSGISIdentifyTopLayerAttributes::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISIdentifyTopLayerAttributes::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)
 	{
         rsgis::math::RSGISMathsUtils mathUtils;
 		this->sortedAttributes->clearListDelete();
@@ -85,12 +85,12 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISIdentifyTopLayerAttributes::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+	void RSGISIdentifyTopLayerAttributes::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid)
 	{
 		throw RSGISVectorException("Not Implemented");
 	}
 	
-	void RSGISIdentifyTopLayerAttributes::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+	void RSGISIdentifyTopLayerAttributes::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn)
 	{
         rsgis::math::RSGISMathsUtils mathUtils;
 		std::string name = "";

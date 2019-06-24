@@ -60,7 +60,7 @@ namespace rsgis{namespace rastergis{
     {
     public:
         RSGISApplyRATKNN();
-        void applyKNNExtrapolation(GDALDataset *clumpsDS, std::string inExtrapField, std::string outExtrapField, std::string trainRegionsField, std::string applyRegionsField, bool useApplyField, std::vector<std::string> fields, unsigned int kFeatures=12, rsgis::math::rsgisdistmetrics distKNN=rsgis::math::rsgis_mahalanobis, float distThreshold=100000, rsgis::math::rsgissummarytype summeriseKNN=rsgis::math::sumtype_median, unsigned int ratBand=1) throw(RSGISAttributeTableException);
+        void applyKNNExtrapolation(GDALDataset *clumpsDS, std::string inExtrapField, std::string outExtrapField, std::string trainRegionsField, std::string applyRegionsField, bool useApplyField, std::vector<std::string> fields, unsigned int kFeatures=12, rsgis::math::rsgisdistmetrics distKNN=rsgis::math::rsgis_mahalanobis, float distThreshold=100000, rsgis::math::rsgissummarytype summeriseKNN=rsgis::math::sumtype_median, unsigned int ratBand=1);
         ~RSGISApplyRATKNN();
     };
     
@@ -68,7 +68,7 @@ namespace rsgis{namespace rastergis{
     {
     public:
         RSGISCountTrainingValues(size_t *numTrainPts);
-        void calcRATValue(size_t fid, double *inRealCols, unsigned int numInRealCols, int *inIntCols, unsigned int numInIntCols, std::string *inStringCols, unsigned int numInStringCols, double *outRealCols, unsigned int numOutRealCols, int *outIntCols, unsigned int numOutIntCols, std::string *outStringCols, unsigned int numOutStringCols) throw(RSGISAttributeTableException);
+        void calcRATValue(size_t fid, double *inRealCols, unsigned int numInRealCols, int *inIntCols, unsigned int numInIntCols, std::string *inStringCols, unsigned int numInStringCols, double *outRealCols, unsigned int numOutRealCols, int *outIntCols, unsigned int numOutIntCols, std::string *outStringCols, unsigned int numOutStringCols);
         ~RSGISCountTrainingValues();
     private:
         size_t *numTrainPts;
@@ -78,7 +78,7 @@ namespace rsgis{namespace rastergis{
     {
     public:
         RSGISExtractTrainingValues(double **trainData, size_t n, size_t m);
-        void calcRATValue(size_t fid, double *inRealCols, unsigned int numInRealCols, int *inIntCols, unsigned int numInIntCols, std::string *inStringCols, unsigned int numInStringCols, double *outRealCols, unsigned int numOutRealCols, int *outIntCols, unsigned int numOutIntCols, std::string *outStringCols, unsigned int numOutStringCols) throw(RSGISAttributeTableException);
+        void calcRATValue(size_t fid, double *inRealCols, unsigned int numInRealCols, int *inIntCols, unsigned int numInIntCols, std::string *inStringCols, unsigned int numInStringCols, double *outRealCols, unsigned int numOutRealCols, int *outIntCols, unsigned int numOutIntCols, std::string *outStringCols, unsigned int numOutStringCols);
         void resetCounter();
         ~RSGISExtractTrainingValues();
     private:
@@ -92,8 +92,8 @@ namespace rsgis{namespace rastergis{
     {
     public:
         RSGISPerformKNNCalcValues(double **trainData, size_t n, size_t m, unsigned int kFeatures, rsgis::math::RSGISCalcDistMetric *calcDist, float distThreshold, rsgis::math::RSGISStatsSummary *mathSumStats);
-        void calcRATValue(size_t fid, double *inRealCols, unsigned int numInRealCols, int *inIntCols, unsigned int numInIntCols, std::string *inStringCols, unsigned int numInStringCols, double *outRealCols, unsigned int numOutRealCols, int *outIntCols, unsigned int numOutIntCols, std::string *outStringCols, unsigned int numOutStringCols) throw(RSGISAttributeTableException);
-        void findKVals(std::list<std::pair<double, double*> > *kVals, double *featVals)throw(RSGISAttributeTableException);
+        void calcRATValue(size_t fid, double *inRealCols, unsigned int numInRealCols, int *inIntCols, unsigned int numInIntCols, std::string *inStringCols, unsigned int numInStringCols, double *outRealCols, unsigned int numOutRealCols, int *outIntCols, unsigned int numOutIntCols, std::string *outStringCols, unsigned int numOutStringCols);
+        void findKVals(std::list<std::pair<double, double*> > *kVals, double *featVals);
         ~RSGISPerformKNNCalcValues();
     private:
         double **trainData;

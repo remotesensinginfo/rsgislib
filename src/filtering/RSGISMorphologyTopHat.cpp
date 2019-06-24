@@ -29,7 +29,7 @@ namespace rsgis{namespace filter{
     }
     
     // Closing - Input Image
-    void RSGISImageMorphologyTopHat::performBlackTopHat(GDALDataset *dataset, std::string outputImage, std::string tempImage, bool useMemory, rsgis::math::Matrix *matrixOperator, std::string format, GDALDataType outDataType) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
+    void RSGISImageMorphologyTopHat::performBlackTopHat(GDALDataset *dataset, std::string outputImage, std::string tempImage, bool useMemory, rsgis::math::Matrix *matrixOperator, std::string format, GDALDataType outDataType)
     {
         try 
         {
@@ -98,7 +98,7 @@ namespace rsgis{namespace filter{
     }
     
     // Input Image - Opening
-    void RSGISImageMorphologyTopHat::performWhiteTopHat(GDALDataset *dataset, std::string outputImage, std::string tempImage, bool useMemory, rsgis::math::Matrix *matrixOperator, std::string format, GDALDataType outDataType) throw(rsgis::img::RSGISImageCalcException, rsgis::img::RSGISImageBandException)
+    void RSGISImageMorphologyTopHat::performWhiteTopHat(GDALDataset *dataset, std::string outputImage, std::string tempImage, bool useMemory, rsgis::math::Matrix *matrixOperator, std::string format, GDALDataType outDataType)
     {
         try 
         {
@@ -177,7 +177,7 @@ namespace rsgis{namespace filter{
 
 	}
     
-	void RSGISMorphologyImageDiff::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISMorphologyImageDiff::calcImageValue(float *bandValues, int numBands, double *output) 
 	{        
         if((numBands/2) != this->numOutBands)
         {

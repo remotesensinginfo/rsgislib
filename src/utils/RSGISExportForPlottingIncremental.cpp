@@ -33,7 +33,7 @@ namespace rsgis{namespace utils{
 		type = unknown;
 	}
 	
-	bool RSGISExportForPlottingIncremental::openFile(std::string file, PlotTypes inType) throw(rsgis::RSGISOutputStreamException)
+	bool RSGISExportForPlottingIncremental::openFile(std::string file, PlotTypes inType)
 	{
 		outputFileStream = new std::ofstream();
 		outputFileStream->open(file.c_str(), std::ios::out | std::ios::trunc);
@@ -132,7 +132,7 @@ namespace rsgis{namespace utils{
 		
 	}
 	
-	void RSGISExportForPlottingIncremental::writeFrequency2DLine(double value) throw(rsgis::RSGISOutputStreamException)
+	void RSGISExportForPlottingIncremental::writeFrequency2DLine(double value)
 	{
 		if(!open)
 		{
@@ -146,7 +146,7 @@ namespace rsgis{namespace utils{
 		(*outputFileStream) << value << std::endl;
 	}
 	
-	void RSGISExportForPlottingIncremental::writeFrequency3DLine(double value1, double value2) throw(rsgis::RSGISOutputStreamException)
+	void RSGISExportForPlottingIncremental::writeFrequency3DLine(double value1, double value2)
 	{
 		if(!open)
 		{
@@ -160,7 +160,7 @@ namespace rsgis{namespace utils{
 		(*outputFileStream) << value1 << "," << value2 << std::endl;	
 	}
 
-	void RSGISExportForPlottingIncremental::writeScatterNDLine(std::vector<double> *vals) throw(rsgis::RSGISOutputStreamException)
+	void RSGISExportForPlottingIncremental::writeScatterNDLine(std::vector<double> *vals)
 	{
 		if(!open)
 		{
@@ -188,7 +188,7 @@ namespace rsgis{namespace utils{
 		 (*outputFileStream) << std::endl;	
 	}
 	
-	void RSGISExportForPlottingIncremental::writeScatter2DLine(double x, double y) throw(rsgis::RSGISOutputStreamException)
+	void RSGISExportForPlottingIncremental::writeScatter2DLine(double x, double y)
 	{
 		if(!open)
 		{
@@ -202,7 +202,7 @@ namespace rsgis{namespace utils{
 		(*outputFileStream) << x << "," << y << std::endl;	
 	}
 	
-	void RSGISExportForPlottingIncremental::writeScatter3DLine(double x, double y, double z) throw(rsgis::RSGISOutputStreamException)
+	void RSGISExportForPlottingIncremental::writeScatter3DLine(double x, double y, double z)
 	{
 		if(!open)
 		{
@@ -216,7 +216,7 @@ namespace rsgis{namespace utils{
 		(*outputFileStream) << x << "," << y << "," << z << std::endl;
 	}
 	
-	void RSGISExportForPlottingIncremental::writeCScatter2DLine(double x, double y, double c) throw(rsgis::RSGISOutputStreamException)
+	void RSGISExportForPlottingIncremental::writeCScatter2DLine(double x, double y, double c)
 	{
 		if(!open)
 		{
@@ -230,7 +230,7 @@ namespace rsgis{namespace utils{
 		(*outputFileStream) << x << "," << y << "," << c << std::endl;
 	}
 	
-	void RSGISExportForPlottingIncremental::writeCScatter3DLine(double x, double y, double z, double c) throw(rsgis::RSGISOutputStreamException)
+	void RSGISExportForPlottingIncremental::writeCScatter3DLine(double x, double y, double z, double c)
 	{
 		if(!open)
 		{
@@ -244,7 +244,7 @@ namespace rsgis{namespace utils{
 		(*outputFileStream) << x << "," << y << "," << z << "," << c << std::endl;
 	}
 	
-	void RSGISExportForPlottingIncremental::writeDensityLine(double x, double y) throw(rsgis::RSGISOutputStreamException)
+	void RSGISExportForPlottingIncremental::writeDensityLine(double x, double y)
 	{
 		if(!open)
 		{
@@ -258,7 +258,7 @@ namespace rsgis{namespace utils{
 		(*outputFileStream) << x << "," << y << std::endl;
 	}
 	
-	void RSGISExportForPlottingIncremental::writeSurfaceLine(double x, double y, double z) throw(rsgis::RSGISOutputStreamException)
+	void RSGISExportForPlottingIncremental::writeSurfaceLine(double x, double y, double z)
 	{
 		if(!open)
 		{
@@ -272,7 +272,7 @@ namespace rsgis{namespace utils{
 		(*outputFileStream) << x << "," << y << "," << z << std::endl;
 	}
 	
-	void RSGISExportForPlottingIncremental::writeCSurfaceLine(double x, double y, double z, double c) throw(rsgis::RSGISOutputStreamException)
+	void RSGISExportForPlottingIncremental::writeCSurfaceLine(double x, double y, double z, double c)
 	{
 		if(!open)
 		{
@@ -286,7 +286,7 @@ namespace rsgis{namespace utils{
 		(*outputFileStream) << x << "," << y << "," << z << "," << c << std::endl;
 	}
 	
-	void RSGISExportForPlottingIncremental::writeLines2DLine(double x1, double y1, double x2, double y2) throw(rsgis::RSGISOutputStreamException)
+	void RSGISExportForPlottingIncremental::writeLines2DLine(double x1, double y1, double x2, double y2)
 	{
 		if(!open)
 		{
@@ -300,7 +300,7 @@ namespace rsgis{namespace utils{
 		(*outputFileStream) << x1 << "," << y1 << "," << x2 << "," << y2 << std::endl;
 	}
 	
-	void RSGISExportForPlottingIncremental::writeLines3DLine(double x1, double y1, double z1, double x2, double y2, double z2) throw(rsgis::RSGISOutputStreamException)
+	void RSGISExportForPlottingIncremental::writeLines3DLine(double x1, double y1, double z1, double x2, double y2, double z2)
 	{
 		if(!open)
 		{
@@ -314,7 +314,7 @@ namespace rsgis{namespace utils{
 		(*outputFileStream) << x1 << "," << y1 << "," << z1 << "," << x2 << "," << y2 << "," << z2 << std::endl;
 	}
 	
-	void RSGISExportForPlottingIncremental::writeTriangle2D(double x1, double y1, double x2, double y2, double x3, double y3) throw(rsgis::RSGISOutputStreamException)
+	void RSGISExportForPlottingIncremental::writeTriangle2D(double x1, double y1, double x2, double y2, double x3, double y3)
 	{
 		if(!open)
 		{
@@ -330,7 +330,7 @@ namespace rsgis{namespace utils{
 		(*outputFileStream) << x3 << "," << y3 << std::endl;
 	}
 	
-	void RSGISExportForPlottingIncremental::writeTriangle3D(double x1, double y1, double z1, double x2, double y2, double z2, double x3, double y3, double z3) throw(rsgis::RSGISOutputStreamException)
+	void RSGISExportForPlottingIncremental::writeTriangle3D(double x1, double y1, double z1, double x2, double y2, double z2, double x3, double y3, double z3)
 	{
 		if(!open)
 		{

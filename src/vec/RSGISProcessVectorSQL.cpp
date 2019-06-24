@@ -32,7 +32,7 @@ namespace rsgis{namespace vec{
 		this->processFeatures = processFeatures;
 	}
 	
-	void RSGISProcessVectorSQL::processVectors(GDALDataset *inputDS, OGRLayer *outputLayer, bool copyData, bool outVertical, std::string sql) throw(RSGISVectorOutputException,RSGISVectorException)
+	void RSGISProcessVectorSQL::processVectors(GDALDataset *inputDS, OGRLayer *outputLayer, bool copyData, bool outVertical, std::string sql)
 	{
 		RSGISVectorUtils vecUtils;
 		
@@ -189,7 +189,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISProcessVectorSQL::processVectors(GDALDataset *inputDS, bool outVertical, std::string sql) throw(RSGISVectorOutputException,RSGISVectorException)
+	void RSGISProcessVectorSQL::processVectors(GDALDataset *inputDS, bool outVertical, std::string sql)
 	{
 		RSGISVectorUtils vecUtils;
 		
@@ -320,7 +320,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISProcessVectorSQL::processVectorsNoOutput(GDALDataset *inputDS, bool outVertical, std::string sql) throw(RSGISVectorOutputException,RSGISVectorException)
+	void RSGISProcessVectorSQL::processVectorsNoOutput(GDALDataset *inputDS, bool outVertical, std::string sql)
 	{
 		RSGISVectorUtils vecUtils;
 		
@@ -446,7 +446,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISProcessVectorSQL::copyFeatureDefn(OGRLayer *outputSHPLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+	void RSGISProcessVectorSQL::copyFeatureDefn(OGRLayer *outputSHPLayer, OGRFeatureDefn *inFeatureDefn)
 	{
 		int fieldCount = inFeatureDefn->GetFieldCount();
 		for(int i = 0; i < fieldCount; i++)

@@ -31,7 +31,7 @@ namespace rsgis{namespace vec{
 		this->processGeom = processGeom;
 	}
 	
-	void RSGISProcessGeometry::processGeometry(OGRLayer *inputLayer, OGRLayer *outputLayer, bool copyData, bool outVertical) throw(RSGISVectorOutputException,RSGISVectorException)
+	void RSGISProcessGeometry::processGeometry(OGRLayer *inputLayer, OGRLayer *outputLayer, bool copyData, bool outVertical)
 	{
 		OGRGeometry *geometry = NULL;
 		
@@ -174,7 +174,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISProcessGeometry::processGeometryPolygonOutput(OGRLayer *inputLayer, OGRLayer *outputLayer, bool copyData, bool outVertical) throw(RSGISVectorOutputException,RSGISVectorException)
+	void RSGISProcessGeometry::processGeometryPolygonOutput(OGRLayer *inputLayer, OGRLayer *outputLayer, bool copyData, bool outVertical)
 	{
 		OGRGeometry *geometry = NULL;
 		
@@ -297,7 +297,7 @@ namespace rsgis{namespace vec{
 		}
 	}
 	
-	void RSGISProcessGeometry::copyFeatureDefn(OGRLayer *outputSHPLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+	void RSGISProcessGeometry::copyFeatureDefn(OGRLayer *outputSHPLayer, OGRFeatureDefn *inFeatureDefn)
 	{
 		int fieldCount = inFeatureDefn->GetFieldCount();
 		for(int i = 0; i < fieldCount; i++)

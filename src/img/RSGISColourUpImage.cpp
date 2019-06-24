@@ -30,7 +30,7 @@ namespace rsgis{ namespace img{
 		this->numClasses = numClasses;
 	}
 	
-	void RSGISColourUpImage::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+	void RSGISColourUpImage::calcImageValue(float *bandValues, int numBands, double *output) 
 	{
 		if(!(numClasses > 0))
 		{
@@ -78,7 +78,7 @@ namespace rsgis{ namespace img{
 		this->numClasses = numClasses;
 	}
 	
-	void RSGISColourUpImageBand::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+	void RSGISColourUpImageBand::calcImageValue(float *bandValues, int numBands, double *output) 
 	{
 		if(!(numClasses > 0))
 		{
@@ -118,7 +118,7 @@ namespace rsgis{ namespace img{
 		
 	}
 	
-	ClassColour** RSGISClassColourReader::readClassColourXML(int *numClasses, std::string xmlFile) throw(RSGISParseColourException)
+	ClassColour** RSGISClassColourReader::readClassColourXML(int *numClasses, std::string xmlFile)
 	{
         rsgis::math::RSGISMathsUtils mathsUtils;
 		
@@ -208,11 +208,11 @@ namespace rsgis{ namespace img{
 			std::string outMessage =  std::string("DOMException : ") + std::string(message);
 			throw RSGISParseColourException(outMessage.c_str());
 		}
-		catch(RSGISInputStreamException e)
+		catch(RSGISInputStreamException &e)
 		{
 			throw RSGISParseColourException(e.what());
 		}
-		catch(RSGISParseColourException e)
+		catch(RSGISParseColourException &e)
 		{
 			throw e;
 		}

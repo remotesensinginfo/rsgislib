@@ -51,7 +51,7 @@ namespace rsgis{namespace img{
 		{
 		public:
 			RSGISFFTProcessing();
-            geos::geom::Polygon** findDominateFreq(rsgis::math::Matrix *magnitude, int startCircle, int endCircle, int *numPolys) throw(RSGISFFTException);
+            geos::geom::Polygon** findDominateFreq(rsgis::math::Matrix *magnitude, int startCircle, int endCircle, int *numPolys);
 			~RSGISFFTProcessing();
 		};
 }}

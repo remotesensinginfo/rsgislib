@@ -30,7 +30,7 @@ namespace rsgis{namespace math{
 		
 	}
 	
-	double RSGISMathsUtils::strtodouble(std::string inValue)throw(RSGISMathException)
+	double RSGISMathsUtils::strtodouble(std::string inValue)
 	{
 		double outValue = 0;
 		try
@@ -45,7 +45,7 @@ namespace rsgis{namespace math{
 		return outValue;
 	}
 	
-	float RSGISMathsUtils::strtofloat(std::string inValue)throw(RSGISMathException)
+	float RSGISMathsUtils::strtofloat(std::string inValue)
 	{
 		float outValue = 0;
 		try
@@ -60,7 +60,7 @@ namespace rsgis{namespace math{
 		return outValue;
 	}
 	
-	int RSGISMathsUtils::strtoint(std::string inValue)throw(RSGISMathException)
+	int RSGISMathsUtils::strtoint(std::string inValue)
 	{
 		int outValue = 0;
 		try
@@ -75,7 +75,7 @@ namespace rsgis{namespace math{
 		return outValue;
 	}
 	
-	unsigned int RSGISMathsUtils::strtounsignedint(std::string inValue)throw(RSGISMathException)
+	unsigned int RSGISMathsUtils::strtounsignedint(std::string inValue)
 	{
 		unsigned int outValue = 0;
 		try
@@ -90,7 +90,7 @@ namespace rsgis{namespace math{
 		return outValue;
 	}
 	
-	long RSGISMathsUtils::strtolong(std::string inValue)throw(RSGISMathException)
+	long RSGISMathsUtils::strtolong(std::string inValue)
 	{
 		long outValue = 0;
 		try
@@ -105,7 +105,7 @@ namespace rsgis{namespace math{
 		return outValue;
 	}
     
-    unsigned long RSGISMathsUtils::strtounsignedlong(std::string inValue)throw(RSGISMathException)
+    unsigned long RSGISMathsUtils::strtounsignedlong(std::string inValue)
 	{
 		unsigned long outValue = 0;
 		try
@@ -120,7 +120,7 @@ namespace rsgis{namespace math{
 		return outValue;
 	}
 	
-	std::string RSGISMathsUtils::floattostring(float number)throw(RSGISMathException)
+	std::string RSGISMathsUtils::floattostring(float number)
 	{
 		std::string outValue = "";
 		try
@@ -134,7 +134,7 @@ namespace rsgis{namespace math{
 		return outValue;
 	}
 	
-	std::string RSGISMathsUtils::doubletostring(double number)throw(RSGISMathException)
+	std::string RSGISMathsUtils::doubletostring(double number)
 	{
 		std::string outValue = "";
 		try
@@ -148,7 +148,7 @@ namespace rsgis{namespace math{
 		return outValue;
 	}
 	
-	std::string RSGISMathsUtils::inttostring(int number)throw(RSGISMathException)
+	std::string RSGISMathsUtils::inttostring(int number)
 	{
 		std::string outValue = "";
 		try
@@ -162,7 +162,7 @@ namespace rsgis{namespace math{
 		return outValue;
 	}
     
-    std::string RSGISMathsUtils::uinttostring(unsigned int number)throw(RSGISMathException)
+    std::string RSGISMathsUtils::uinttostring(unsigned int number)
 	{
         std::string outValue = "";
 		try
@@ -176,7 +176,7 @@ namespace rsgis{namespace math{
 		return outValue;
 	}
 	
-	std::string RSGISMathsUtils::longtostring(long number)throw(RSGISMathException)
+	std::string RSGISMathsUtils::longtostring(long number)
 	{
 		std::string outValue = "";
 		try
@@ -200,7 +200,7 @@ namespace rsgis{namespace math{
 		return angle * (180 / M_PI);
 	}
 	
-	void RSGISMathsUtils::getPowerSet(int numItems, int *numBands, int **indexes, int numSets) throw(RSGISMathException)
+	void RSGISMathsUtils::getPowerSet(int numItems, int *numBands, int **indexes, int numSets)
 	{
 		if(numItems == 0)
 		{
@@ -533,7 +533,7 @@ namespace rsgis{namespace math{
 		return outData;
 	}
     
-    void RSGISMathsUtils::fitPlane(double *x, double *y, double *z, unsigned int numValues, double *a, double *b, double *c) throw(RSGISMathException)
+    void RSGISMathsUtils::fitPlane(double *x, double *y, double *z, unsigned int numValues, double *a, double *b, double *c)
     {
         RSGISMatrices matrices;
 		Matrix *matrixA = NULL;
@@ -589,7 +589,7 @@ namespace rsgis{namespace math{
 			*b = outputs->matrix[1];
 			*c = outputs->matrix[2];
 		}
-		catch(RSGISMatricesException e)
+		catch(RSGISMatricesException &e)
 		{
 			if(matrixA != NULL)
 			{
@@ -621,7 +621,7 @@ namespace rsgis{namespace math{
         matrices.freeMatrix(outputs);
     }
     
-    void RSGISMathsUtils::generateStats(std::vector<double> *data, RSGISStatsSummary *stats) throw(RSGISMathException)
+    void RSGISMathsUtils::generateStats(std::vector<double> *data, RSGISStatsSummary *stats)
     {
         try
         {
@@ -830,7 +830,7 @@ namespace rsgis{namespace math{
         return withinRange;
     }
     
-    double RSGISMathsUtils::calcPercentile(float percentile, double *binBounds, double binWidth, unsigned int numBins, unsigned int *hist) throw(RSGISMathException)
+    double RSGISMathsUtils::calcPercentile(float percentile, double *binBounds, double binWidth, unsigned int numBins, unsigned int *hist)
     {
         double percentVal = 0.0;
         try
@@ -888,7 +888,7 @@ namespace rsgis{namespace math{
         return percentVal;
     }
     
-    double RSGISMathsUtils::calcPercentile(float percentile, double histMinVal, double binWidth, unsigned int numBins, unsigned int *hist) throw(RSGISMathException)
+    double RSGISMathsUtils::calcPercentile(float percentile, double histMinVal, double binWidth, unsigned int numBins, unsigned int *hist)
     {
         double percentVal = 0.0;
         try
@@ -946,7 +946,7 @@ namespace rsgis{namespace math{
         return percentVal;
     }
 
-    double* RSGISMathsUtils::calcMeanVector(double **data, size_t n, size_t m, size_t sMIdx, size_t eMIdx) throw(RSGISMathException)
+    double* RSGISMathsUtils::calcMeanVector(double **data, size_t n, size_t m, size_t sMIdx, size_t eMIdx)
     {
         size_t numVals = eMIdx - sMIdx;
         double *meanVec = new double[numVals];
@@ -986,7 +986,7 @@ namespace rsgis{namespace math{
         return meanVec;
     }
     
-    double** RSGISMathsUtils::calcCovarianceMatrix(double **data, double *meanVec, size_t n, size_t m, size_t sMIdx, size_t eMIdx) throw(RSGISMathException)
+    double** RSGISMathsUtils::calcCovarianceMatrix(double **data, double *meanVec, size_t n, size_t m, size_t sMIdx, size_t eMIdx)
     {
         size_t numVals = eMIdx - sMIdx;
         double **covarMatrix = new double*[numVals];
@@ -1035,7 +1035,7 @@ namespace rsgis{namespace math{
     }
     
     
-    std::vector<std::pair<size_t, double> >* RSGISMathsUtils::sampleUseHistogramMethod(std::vector<std::pair<size_t, double> > *inData, double minVal, double maxVal, double binWidth, float propOfPop) throw(RSGISMathException)
+    std::vector<std::pair<size_t, double> >* RSGISMathsUtils::sampleUseHistogramMethod(std::vector<std::pair<size_t, double> > *inData, double minVal, double maxVal, double binWidth, float propOfPop)
     {
         std::vector<std::pair<size_t, double> > *outData = new std::vector<std::pair<size_t, double> >();
         try
@@ -1099,7 +1099,7 @@ namespace rsgis{namespace math{
         return outData;
     }
     
-    std::vector<std::pair<size_t, double> >** RSGISMathsUtils::calcHistogram(std::vector<std::pair<size_t, double> > *inData, double minVal, double maxVal, double binWidth, size_t *numBins) throw(RSGISMathException)
+    std::vector<std::pair<size_t, double> >** RSGISMathsUtils::calcHistogram(std::vector<std::pair<size_t, double> > *inData, double minVal, double maxVal, double binWidth, size_t *numBins)
     {
         std::vector<std::pair<size_t, double> > **hist = NULL;
         try
@@ -1139,7 +1139,7 @@ namespace rsgis{namespace math{
     }
     
     
-    std::vector<std::pair<double, double> >* RSGISMathsUtils::calcHistogram(std::vector<double> *data, double minVal, double maxVal, double binWidth, bool norm) throw(RSGISMathException)
+    std::vector<std::pair<double, double> >* RSGISMathsUtils::calcHistogram(std::vector<double> *data, double minVal, double maxVal, double binWidth, bool norm)
     {
         std::vector<std::pair<double, double> > *hist = new std::vector<std::pair<double, double> >();
         try
@@ -1190,7 +1190,7 @@ namespace rsgis{namespace math{
     }
     
     
-    std::vector<std::vector<RSGIS2DHistBin>* >* RSGISMathsUtils::calc2DHistogram(std::vector<double> *data1, double minVal1, double maxVal1, double binWidth1, std::vector<double> *data2, double minVal2, double maxVal2, double binWidth2, bool norm) throw(RSGISMathException)
+    std::vector<std::vector<RSGIS2DHistBin>* >* RSGISMathsUtils::calc2DHistogram(std::vector<double> *data1, double minVal1, double maxVal1, double binWidth1, std::vector<double> *data2, double minVal2, double maxVal2, double binWidth2, bool norm)
     {
         std::vector<std::vector<RSGIS2DHistBin>* > *hist = new std::vector<std::vector<RSGIS2DHistBin>* >();
         try
@@ -1267,7 +1267,7 @@ namespace rsgis{namespace math{
     }
     
     
-    unsigned int* RSGISMathsUtils::calcHistogram(double *data, size_t numVals, double binWidth, double *minVal, double *maxVal, unsigned int *numBins, bool ignoreFirstVal) throw(RSGISMathException)
+    unsigned int* RSGISMathsUtils::calcHistogram(double *data, size_t numVals, double binWidth, double *minVal, double *maxVal, unsigned int *numBins, bool ignoreFirstVal)
     {
         unsigned int *hist = NULL;
         try
@@ -1345,7 +1345,7 @@ namespace rsgis{namespace math{
         return hist;
     }
     
-    RSGISLinearFitVals* RSGISMathsUtils::performLinearFit(double *xData, double *yData, size_t nVals, double noDataVal) throw(RSGISMathException)
+    RSGISLinearFitVals* RSGISMathsUtils::performLinearFit(double *xData, double *yData, size_t nVals, double noDataVal)
     {
         RSGISLinearFitVals *fitVals = new RSGISLinearFitVals();
         try
@@ -1420,7 +1420,7 @@ namespace rsgis{namespace math{
         return fitVals;
     }
     
-    void RSGISMathsUtils::performLinearFit(double *xData, double *yData, size_t nVals, double noDataVal, RSGISLinearFitVals *fitVals) throw(RSGISMathException)
+    void RSGISMathsUtils::performLinearFit(double *xData, double *yData, size_t nVals, double noDataVal, RSGISLinearFitVals *fitVals)
     {
         try
         {
@@ -1490,7 +1490,7 @@ namespace rsgis{namespace math{
         }
     }
     
-    double RSGISMathsUtils::predFromLinearFit(double val, RSGISLinearFitVals *fitVals, double minAccVal, double maxAccVal) throw(RSGISMathException)
+    double RSGISMathsUtils::predFromLinearFit(double val, RSGISLinearFitVals *fitVals, double minAccVal, double maxAccVal)
     {
         double outVal = 0.0;
         

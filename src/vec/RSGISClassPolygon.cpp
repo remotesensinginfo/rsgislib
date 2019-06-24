@@ -49,7 +49,7 @@ namespace rsgis{namespace vec{
 		
 	}
 	
-	void RSGISClassPolygon::createLayerDefinition(OGRLayer *outputSHPLayer)throw(RSGISVectorOutputException)
+	void RSGISClassPolygon::createLayerDefinition(OGRLayer *outputSHPLayer)
 	{
 		// Create class attribute column
 		OGRFieldDefn classField( "class", OFTString );

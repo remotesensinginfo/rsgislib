@@ -45,7 +45,7 @@ namespace rsgis{namespace filter{
 		return this->filters->size();
 	}
 	
-	void RSGISFilterBank::executeFilters(GDALDataset **datasets, int numDS, std::string outImageBase, std::string gdalFormat, std::string imgExt, GDALDataType outDataType) throw(rsgis::RSGISImageException)
+	void RSGISFilterBank::executeFilters(GDALDataset **datasets, int numDS, std::string outImageBase, std::string gdalFormat, std::string imgExt, GDALDataType outDataType)
 	{
 		try
 		{
@@ -65,20 +65,20 @@ namespace rsgis{namespace filter{
 				this->filters->at(i)->runFilter(datasets, numDS, filename, gdalFormat, outDataType);
 			}
 		}
-		catch(rsgis::RSGISImageException e)
+		catch(rsgis::RSGISImageException &e)
 		{
 			throw e;
 		}
 	}
 	
-	void RSGISFilterBank::exectuteFilter(int i, GDALDataset **datasets, int numDS, std::string outImageBase, std::string gdalFormat, GDALDataType outDataType) throw(rsgis::RSGISImageException)
+	void RSGISFilterBank::exectuteFilter(int i, GDALDataset **datasets, int numDS, std::string outImageBase, std::string gdalFormat, GDALDataType outDataType)
 	{
 		try
 		{
 			std::string filename = outImageBase + this->filters->at(i)->getFileNameEnding();
 			this->filters->at(i)->runFilter(datasets, numDS, filename, gdalFormat, outDataType);
 		}
-		catch(rsgis::RSGISImageException e)
+		catch(rsgis::RSGISImageException &e)
 		{
 			throw e;
 		}

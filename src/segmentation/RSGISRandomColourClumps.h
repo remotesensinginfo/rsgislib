@@ -70,11 +70,11 @@ namespace rsgis{namespace segment{
     {
     public:
         RSGISRandomColourClumps();
-        void generateRandomColouredClump(GDALDataset *clumps, GDALDataset *colourImg, std::string inputLUTFile, bool importLUT, std::string exportLUTFile, bool exportLUT) throw(rsgis::img::RSGISImageCalcException);
+        void generateRandomColouredClump(GDALDataset *clumps, GDALDataset *colourImg, std::string inputLUTFile, bool importLUT, std::string exportLUTFile, bool exportLUT);
         ~RSGISRandomColourClumps();
     protected:
-        std::vector<ImgClumpRGB*>* importLUTFromFile(std::string inFile) throw(rsgis::utils::RSGISTextException);
-        void exportLUT2File(std::string outFile, std::vector<ImgClumpRGB*> *clumpTab) throw(rsgis::utils::RSGISTextException);
+        std::vector<ImgClumpRGB*>* importLUTFromFile(std::string inFile);
+        void exportLUT2File(std::string outFile, std::vector<ImgClumpRGB*> *clumpTab);
     };
     
 }}

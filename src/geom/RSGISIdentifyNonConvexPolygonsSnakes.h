@@ -69,11 +69,11 @@ namespace rsgis{namespace geom{
 		{
 		public:
 			RSGISIdentifyNonConvexPolygonsSnakes(double resolution, OGRSpatialReference* spatialRef, double alpha, double beta, double gamma, double delta, int maxNumIterations);
-			virtual std::vector<geos::geom::Polygon*>* retrievePolygons(std::list<RSGIS2DPoint*> **clusters, int numClusters) throw(RSGISGeometryException);
-			virtual std::vector<geos::geom::Polygon*>* retrievePolygons(std::list<RSGISPolygon*> **clusters, int numClusters) throw(RSGISGeometryException);
-			virtual std::vector<geos::geom::Polygon*>* retrievePolygons(std::list<geos::geom::Polygon*> **clusters, int numClusters) throw(RSGISGeometryException);
-			virtual geos::geom::Polygon* retrievePolygon(std::vector<geos::geom::Polygon*> *polygons) throw(RSGISGeometryException);
-			virtual geos::geom::Polygon* retrievePolygon(std::list<geos::geom::Polygon*> *polygons) throw(RSGISGeometryException);
+			virtual std::vector<geos::geom::Polygon*>* retrievePolygons(std::list<RSGIS2DPoint*> **clusters, int numClusters);
+			virtual std::vector<geos::geom::Polygon*>* retrievePolygons(std::list<RSGISPolygon*> **clusters, int numClusters);
+			virtual std::vector<geos::geom::Polygon*>* retrievePolygons(std::list<geos::geom::Polygon*> **clusters, int numClusters);
+			virtual geos::geom::Polygon* retrievePolygon(std::vector<geos::geom::Polygon*> *polygons);
+			virtual geos::geom::Polygon* retrievePolygon(std::list<geos::geom::Polygon*> *polygons);
 			virtual ~RSGISIdentifyNonConvexPolygonsSnakes();
 		private:
 			double resolution;
@@ -84,12 +84,12 @@ namespace rsgis{namespace geom{
 			int maxNumIterations;
 			OGRSpatialReference* spatialRef;
 			GDALDriver *gdalDriver;
-			GDALDataset* createDataset(GDALDriver *gdalDriver, geos::geom::Geometry *geom, std::string filename, float resolution, float constVal) throw(RSGISImageException);
-			void rasterizeLayer(geos::geom::Geometry *geom, GDALDataset *image, float constVal) throw(rsgis::RSGISImageException);
-			void createDistanceImage(GDALDataset *inputImage, geos::geom::Geometry *geom) throw(RSGISImageException, RSGISGeometryException);
-			geos::geom::GeometryCollection* createGeomCollection(std::vector<geos::geom::Polygon*> *polys) throw(RSGISGeometryException); 
-			geos::geom::GeometryCollection* createGeomCollection(std::list<geos::geom::Polygon*> *polys) throw(RSGISGeometryException); 
-			void populatePixelPolygons(GDALDataset *image, float threshold, std::vector<geos::geom::Polygon*> *polys) throw(RSGISGeometryException); 
+			GDALDataset* createDataset(GDALDriver *gdalDriver, geos::geom::Geometry *geom, std::string filename, float resolution, float constVal);
+			void rasterizeLayer(geos::geom::Geometry *geom, GDALDataset *image, float constVal);
+			void createDistanceImage(GDALDataset *inputImage, geos::geom::Geometry *geom);
+			geos::geom::GeometryCollection* createGeomCollection(std::vector<geos::geom::Polygon*> *polys); 
+			geos::geom::GeometryCollection* createGeomCollection(std::list<geos::geom::Polygon*> *polys); 
+			void populatePixelPolygons(GDALDataset *image, float threshold, std::vector<geos::geom::Polygon*> *polys); 
 			geos::geom::Polygon* createPolygonFromEnv(geos::geom::Envelope env);
 		};
 	
@@ -98,7 +98,7 @@ namespace rsgis{namespace geom{
 		{
 		public:
 			RSGISSnakeNonConvexGlobalOptimisationFunction(GDALDataset *image, double alpha, double beta, double gamma);
-			virtual double calcValue(std::vector<geos::geom::Coordinate*> *coords) throw(rsgis::math::RSGISOptimisationException);
+			virtual double calcValue(std::vector<geos::geom::Coordinate*> *coords);
 			virtual ~RSGISSnakeNonConvexGlobalOptimisationFunction();
 		protected:
 			GDALDataset *image;
@@ -117,7 +117,7 @@ namespace rsgis{namespace geom{
 		{
 		public:
 			RSGISSnakeNonConvexLineProjGlobalOptimisationFunction(GDALDataset *image, double alpha, double beta, double gamma, double delta, std::vector<geos::geom::LineSegment*> *lines);
-			virtual double calcValue(std::vector<geos::geom::Coordinate*> *coords) throw(rsgis::math::RSGISOptimisationException);
+			virtual double calcValue(std::vector<geos::geom::Coordinate*> *coords);
 			virtual ~RSGISSnakeNonConvexLineProjGlobalOptimisationFunction();
 		protected:
 			GDALDataset *image;

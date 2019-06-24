@@ -31,7 +31,7 @@ namespace rsgis{namespace segment{
         
     }
     
-    void RSGISLabelPixelsUsingClusters::labelPixelsUsingClusters(GDALDataset **datasets, int numDatasets, std::string output, std::string clusterCentresFile, bool ignoreZeros, std::string imageFormat, bool useImageProj, std::string outProjStr) throw(rsgis::RSGISImageException)
+    void RSGISLabelPixelsUsingClusters::labelPixelsUsingClusters(GDALDataset **datasets, int numDatasets, std::string output, std::string clusterCentresFile, bool ignoreZeros, std::string imageFormat, bool useImageProj, std::string outProjStr)
     {
         try 
         {
@@ -79,7 +79,7 @@ namespace rsgis{namespace segment{
         this->ignoreZeros = ignoreZeros;
     }
     
-    void RSGISLabelPixelsUsingClustersCalcImg::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISLabelPixelsUsingClustersCalcImg::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         unsigned int clusterID = 0;
         float minDist = 0;

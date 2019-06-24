@@ -56,8 +56,8 @@ namespace rsgis{namespace math{
 				this->func = func;
 				this->maximise = maximise;
 			}
-			virtual std::vector<geos::geom::Coordinate*>* optimise4Neighbor(std::vector<geos::geom::Coordinate*> *coords, double step, geos::geom::Envelope *boundary) throw(RSGISOptimisationException) = 0;
-			virtual std::vector<geos::geom::Coordinate*>* optimise8Neighbor(std::vector<geos::geom::Coordinate*> *coords, double step, geos::geom::Envelope *boundary) throw(RSGISOptimisationException) = 0;
+			virtual std::vector<geos::geom::Coordinate*>* optimise4Neighbor(std::vector<geos::geom::Coordinate*> *coords, double step, geos::geom::Envelope *boundary) = 0;
+			virtual std::vector<geos::geom::Coordinate*>* optimise8Neighbor(std::vector<geos::geom::Coordinate*> *coords, double step, geos::geom::Envelope *boundary) = 0;
 			virtual ~RSGISGlobalOptimiser2D(){};
 		protected:
 			RSGISGlobalOptimisationFunction *func;

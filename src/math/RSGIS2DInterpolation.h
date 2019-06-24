@@ -92,8 +92,8 @@ namespace rsgis {namespace math{
 	{
 	public:
 		RSGIS2DInterpolator(){};
-		virtual void initInterpolator(std::vector<RSGISInterpolatorDataPoint> *pts) throw(RSGISInterpolationException) = 0;
-		virtual double getValue(double eastings, double northings) throw(RSGISInterpolationException) = 0;
+		virtual void initInterpolator(std::vector<RSGISInterpolatorDataPoint> *pts) = 0;
+		virtual double getValue(double eastings, double northings) = 0;
 		virtual ~RSGIS2DInterpolator(){};
 	protected:
 		bool initialised;
@@ -103,11 +103,11 @@ namespace rsgis {namespace math{
 	{
 	public:
 		RSGISSearchKNN2DInterpolator(unsigned int k);
-		virtual void initInterpolator(std::vector<RSGISInterpolatorDataPoint> *pts) throw(RSGISInterpolationException);
-        virtual double getValue(double eastings, double northings) throw(RSGISInterpolationException) = 0;
+		virtual void initInterpolator(std::vector<RSGISInterpolatorDataPoint> *pts);
+        virtual double getValue(double eastings, double northings) = 0;
 		virtual ~RSGISSearchKNN2DInterpolator(){};
 	protected:
-        virtual std::list<std::pair<double,RSGISInterpolatorDataPoint> >* findKNN(double eastings, double northings) throw(RSGISInterpolationException);
+        virtual std::list<std::pair<double,RSGISInterpolatorDataPoint> >* findKNN(double eastings, double northings);
 		unsigned int k;
         std::vector<RSGISInterpolatorDataPoint> *dataPTS;
 	};
@@ -116,8 +116,8 @@ namespace rsgis {namespace math{
 	{
 	public:
 		RSGIS2DTriagulatorInterpolator():RSGIS2DInterpolator(){};
-		virtual void initInterpolator(std::vector<RSGISInterpolatorDataPoint> *pts) throw(RSGISInterpolationException);
-		virtual double getValue(double eastings, double northings) throw(RSGISInterpolationException) = 0;
+		virtual void initInterpolator(std::vector<RSGISInterpolatorDataPoint> *pts);
+		virtual double getValue(double eastings, double northings) = 0;
 		virtual ~RSGIS2DTriagulatorInterpolator(){};
 	protected:
 		DelaunayTriangulation *dt;
@@ -128,7 +128,7 @@ namespace rsgis {namespace math{
 	{
 	public:
 		RSGISNearestNeighbour2DInterpolator():RSGIS2DTriagulatorInterpolator(){};
-		double getValue(double eastings, double northings) throw(RSGISInterpolationException);
+		double getValue(double eastings, double northings);
 		~RSGISNearestNeighbour2DInterpolator(){};
 	};
     
@@ -136,7 +136,7 @@ namespace rsgis {namespace math{
 	{
 	public:
 		RSGISNaturalNeighbor2DInterpolator():RSGIS2DTriagulatorInterpolator(){};
-		double getValue(double eastings, double northings) throw(RSGISInterpolationException);
+		double getValue(double eastings, double northings);
 		~RSGISNaturalNeighbor2DInterpolator(){};
 	};
     
@@ -144,7 +144,7 @@ namespace rsgis {namespace math{
 	{
 	public:
 		RSGISNaturalNearestNeighbor2DInterpolator():RSGIS2DTriagulatorInterpolator(){};
-		double getValue(double eastings, double northings) throw(RSGISInterpolationException);
+		double getValue(double eastings, double northings);
 		~RSGISNaturalNearestNeighbor2DInterpolator(){};
 	};
     
@@ -153,7 +153,7 @@ namespace rsgis {namespace math{
 	{
 	public:
 		RSGISKNearestNeighbour2DInterpolator(unsigned int k):RSGISSearchKNN2DInterpolator(k){};
-		double getValue(double eastings, double northings) throw(RSGISInterpolationException);
+		double getValue(double eastings, double northings);
 		~RSGISKNearestNeighbour2DInterpolator(){};
 	};
     
@@ -162,8 +162,8 @@ namespace rsgis {namespace math{
 	{
 	public:
 		RSGISAllPointsIDWInterpolator(float p):RSGIS2DInterpolator(){this->p = p;};
-        void initInterpolator(std::vector<RSGISInterpolatorDataPoint> *pts) throw(RSGISInterpolationException);
-		double getValue(double eastings, double northings) throw(RSGISInterpolationException);
+        void initInterpolator(std::vector<RSGISInterpolatorDataPoint> *pts);
+		double getValue(double eastings, double northings);
 		~RSGISAllPointsIDWInterpolator(){};
     protected:
         std::vector<RSGISInterpolatorDataPoint> *pts;
@@ -174,8 +174,8 @@ namespace rsgis {namespace math{
 	{
 	public:
 		RSGISLinearTrendInterpolator():RSGIS2DInterpolator(){};
-        void initInterpolator(std::vector<RSGISInterpolatorDataPoint> *pts) throw(RSGISInterpolationException);
-		double getValue(double eastings, double northings) throw(RSGISInterpolationException);
+        void initInterpolator(std::vector<RSGISInterpolatorDataPoint> *pts);
+		double getValue(double eastings, double northings);
 		~RSGISLinearTrendInterpolator(){};
     protected:
         double a;
@@ -192,8 +192,8 @@ namespace rsgis {namespace math{
             this->interp2 = interp2;
             this->stdDevThres = stdDevThres;
         };
-        void initInterpolator(std::vector<RSGISInterpolatorDataPoint> *pts) throw(RSGISInterpolationException);
-		double getValue(double eastings, double northings) throw(RSGISInterpolationException);
+        void initInterpolator(std::vector<RSGISInterpolatorDataPoint> *pts);
+		double getValue(double eastings, double northings);
 		~RSGISCombine2DInterpolators()
         {
             delete interp1;

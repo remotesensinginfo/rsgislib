@@ -50,7 +50,7 @@ namespace rsgis{namespace img{
         {
         public:
             RSGISCalcLocalMinInWin(std::vector<unsigned int> bands, float noDataValue, bool useNoDataValue);
-            void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, double *outRefVal, unsigned int nOutRefVals) throw(RSGISImageCalcException);
+            void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, double *outRefVal, unsigned int nOutRefVals);
             ~RSGISCalcLocalMinInWin();
         protected:
             std::vector<unsigned int> bands;

@@ -67,7 +67,7 @@ namespace rsgis{namespace filter{
         
     public: 
         RSGISApplyNonLocalDenoising();
-        void ApplyFilter(GDALDataset **inputImageDS, int numDS, std::string outputImage, unsigned int filterWindowSize, unsigned int searchWindowSize, double aPar=2.0, double hPar=2.0, std::string gdalFormat="ENVI", GDALDataType gdalDataType=GDT_Float32) throw(rsgis::img::RSGISImageCalcException,rsgis::img::RSGISImageBandException);
+        void ApplyFilter(GDALDataset **inputImageDS, int numDS, std::string outputImage, unsigned int filterWindowSize, unsigned int searchWindowSize, double aPar=2.0, double hPar=2.0, std::string gdalFormat="ENVI", GDALDataType gdalDataType=GDT_Float32);
         ~RSGISApplyNonLocalDenoising();
     protected:
         unsigned int searchWindowSize; // Window size of search space

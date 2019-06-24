@@ -31,7 +31,7 @@ namespace rsgis { namespace classifier {
 		this->samples = samples;
 	}
 	
-	void RSGISCumulativeAreaClassifierGenRules::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISCumulativeAreaClassifierGenRules::calcImageValue(float *bandValues, int numBands, double *output) 
 	{
 		if(this->samples->m != this->numOutBands)
 		{
@@ -94,7 +94,7 @@ namespace rsgis { namespace classifier {
 		this->threshold = threshold;
 	}
 	
-	void RSGISCumulativeAreaClassifierDecide::calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException)
+	void RSGISCumulativeAreaClassifierDecide::calcImageValue(float *bandValues, int numBands, double *output) 
 	{		
 		bool first = true;
 		int minIdx = 0;

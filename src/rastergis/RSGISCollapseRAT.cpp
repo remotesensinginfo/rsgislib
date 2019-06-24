@@ -30,7 +30,7 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    void RSGISCollapseRAT::classifyClumps(GDALDataset *inputClumps, unsigned int ratBand, std::string selectColumn, std::string outImage, std::string gdalFormat)throw(RSGISAttributeTableException)
+    void RSGISCollapseRAT::classifyClumps(GDALDataset *inputClumps, unsigned int ratBand, std::string selectColumn, std::string outImage, std::string gdalFormat)
     {
         try
         {
@@ -229,7 +229,7 @@ namespace rsgis{namespace rastergis{
         this->ratArrIdx = ratBand-1;
     }
     
-    void RSGISCollapseRATPopNewImage::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISCollapseRATPopNewImage::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) 
     {
         if(intBandValues[0] < numVals)
         {

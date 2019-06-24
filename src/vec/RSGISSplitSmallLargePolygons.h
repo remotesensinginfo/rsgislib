@@ -54,8 +54,8 @@ namespace rsgis{namespace vec{
 	{
 	public:
 		RSGISSplitSmallLargePolygons();
-		void splitPolygons(OGRLayer *input, OGRLayer *outputSmall, OGRLayer *outputLarge, float threshold)throw(RSGISVectorException);
-		void copyFeatureDefn(OGRLayer *outputSHPLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
+		void splitPolygons(OGRLayer *input, OGRLayer *outputSmall, OGRLayer *outputLarge, float threshold);
+		void copyFeatureDefn(OGRLayer *outputSHPLayer, OGRFeatureDefn *inFeatureDefn);
 		void copyFeatureData(OGRFeature *inFeature, OGRFeature *outFeature, OGRFeatureDefn *inFeatureDefn, OGRFeatureDefn *outFeatureDefn);
 		~RSGISSplitSmallLargePolygons();
 	};

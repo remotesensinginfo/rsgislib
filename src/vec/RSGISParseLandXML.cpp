@@ -29,7 +29,7 @@ namespace rsgis { namespace vec {
 	{
 	}
 	
-	void RSGISParseLandXML::getLandXMLLine(std::string xmlFile, std::vector<geos::geom::LineSegment*> *outLines) throw(RSGISVectorException)
+	void RSGISParseLandXML::getLandXMLLine(std::string xmlFile, std::vector<geos::geom::LineSegment*> *outLines)
 	{
 		this->xmlFile = xmlFile;
 		XMLCh tempStr[100];

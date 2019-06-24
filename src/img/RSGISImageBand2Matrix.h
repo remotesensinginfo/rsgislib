@@ -49,12 +49,12 @@ namespace rsgis{namespace img{
 		{
 		public:
 			RSGISImageBand2Matrix(int numOutputValues, int band, int x, int y);
-			void calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) throw(RSGISImageCalcException);
-			void calcImageValue(float *bandValuesImage, int numBands, int band) throw(RSGISImageCalcException);
-			void calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) throw(RSGISImageCalcException);
-			void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) throw(RSGISImageCalcException);
+			void calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB);
+			void calcImageValue(float *bandValuesImage, int numBands, int band);
+			void calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent);
+			void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt);
 			rsgis::math::Matrix* getMatrix();
-			virtual double* getOutputValues() throw(RSGISImageCalcException);
+			virtual double* getOutputValues();
 			void reset(int band, int x, int y);
 			virtual ~RSGISImageBand2Matrix();
 		protected:

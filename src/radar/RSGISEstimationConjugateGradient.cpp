@@ -117,7 +117,7 @@ namespace rsgis {namespace radar
 				density = gsl_vector_get(estimatedPar, 1);
 
 				// Set up vectors to hold powers
-				for(int i = 0; i < order ; i++)
+				for(int i = 0; i < order; i++)
 				{
 					xPow = pow(height, i);
 					dxPow = i * pow(height, i - 1);
@@ -145,7 +145,7 @@ namespace rsgis {namespace radar
 					aCoeff = 0.0;
 					aCoeffF = 0.0;
 
-					for(int y = 0; y < order ; y++) // Calculate a_n(density)
+					for(int y = 0; y < order; y++) // Calculate a_n(density)
 					{
 						yPow = gsl_vector_get(yPowers, y); // density^n;
 						dyPow = gsl_vector_get(dyPowers, y); // density^(n-1)
@@ -186,7 +186,7 @@ namespace rsgis {namespace radar
 					aCoeff = 0.0;
 					aCoeffF = 0.0;
 
-					for(int y = 0; y < order ; y++) // Calculate a_n(density)
+					for(int y = 0; y < order; y++) // Calculate a_n(density)
 					{
 						yPow = gsl_vector_get(yPowers, y); // density^n;
 						dyPow = gsl_vector_get(dyPowers, y); // density^(n-1)
@@ -351,7 +351,7 @@ namespace rsgis {namespace radar
 				density = gsl_vector_get(estimatedPar, 1);
 
 				// Set up vectors to hold powers
-				for(int i = 0; i < order ; i++)
+				for(int i = 0; i < order; i++)
 				{
 					xPow = pow(height, i);
 					dxPow = i * pow(height, i - 1);
@@ -379,7 +379,7 @@ namespace rsgis {namespace radar
 					aCoeff = 0.0;
 					aCoeffF = 0.0;
 
-					for(int y = 0; y < order ; y++) // Calculate a_n(density)
+					for(int y = 0; y < order; y++) // Calculate a_n(density)
 					{
 						yPow = gsl_vector_get(yPowers, y); // density^n;
 						dyPow = gsl_vector_get(dyPowers, y); // density^(n-1)
@@ -419,7 +419,7 @@ namespace rsgis {namespace radar
 					aCoeff = 0.0;
 					aCoeffF = 0.0;
 
-					for(int y = 0; y < order ; y++) // Calculate a_n(density)
+					for(int y = 0; y < order; y++) // Calculate a_n(density)
 					{
 						yPow = gsl_vector_get(yPowers, y); // density^n;
 						dyPow = gsl_vector_get(dyPowers, y); // density^(n-1)
@@ -459,7 +459,7 @@ namespace rsgis {namespace radar
 					aCoeff = 0.0;
 					aCoeffF = 0.0;
 
-					for(int y = 0; y < order ; y++) // Calculate a_n(density)
+					for(int y = 0; y < order; y++) // Calculate a_n(density)
 					{
 						yPow = gsl_vector_get(yPowers, y); // density^n;
 						dyPow = gsl_vector_get(dyPowers, y); // density^(n-1)
@@ -650,7 +650,7 @@ namespace rsgis {namespace radar
 				height = gsl_vector_get(estimatedPar, 2);
 
 				// Set up vectors to hold powers
-				for(int i = 0; i < order ; i++)
+				for(int i = 0; i < order; i++)
 				{
 					xPow = pow(dielectric, i);
 					dxPow = i * pow(dielectric, i - 1);
@@ -974,7 +974,7 @@ namespace rsgis {namespace radar
 				density = gsl_vector_get(estimatedPar, 1);
 
 				// Set up vectors to hold powers
-				for(int i = 0; i < order ; i++)
+				for(int i = 0; i < order; i++)
 				{
 					xPow = pow(height, i);
 					dxPow = i * pow(height, i - 1);
@@ -1002,7 +1002,7 @@ namespace rsgis {namespace radar
 					aCoeff = 0.0;
 					aCoeffF = 0.0;
 
-					for(int y = 0; y < order ; y++) // Calculate a_n(density)
+					for(int y = 0; y < order; y++) // Calculate a_n(density)
 					{
 						yPow = gsl_vector_get(yPowers, y); // density^n;
 						dyPow = gsl_vector_get(dyPowers, y); // density^(n-1)
@@ -1043,7 +1043,7 @@ namespace rsgis {namespace radar
 					aCoeff = 0.0;
 					aCoeffF = 0.0;
 
-					for(int y = 0; y < order ; y++) // Calculate a_n(density)
+					for(int y = 0; y < order; y++) // Calculate a_n(density)
 					{
 						yPow = gsl_vector_get(yPowers, y); // density^n;
 						dyPow = gsl_vector_get(dyPowers, y); // density^(n-1)
@@ -1259,21 +1259,21 @@ namespace rsgis {namespace radar
 				height = gsl_vector_get(estimatedPar, 2);
 
 				// Set up vectors to hold powers
-				for(int i = 0; i < orderX ; i++)
+				for(int i = 0; i < orderX; i++)
 				{
 					xPow = pow(dielectric, i);
 					dxPow = i * pow(dielectric, i - 1);
 					gsl_vector_set(xPowers, i, xPow);
 					gsl_vector_set(dxPowers, i, dxPow);
 				}
-				for(int i = 0; i < orderY ; i++)
+				for(int i = 0; i < orderY; i++)
 				{
 					yPow = pow(density, i);
 					dyPow = i * pow(density, i - 1);
 					gsl_vector_set(yPowers, i, yPow);
 					gsl_vector_set(dyPowers, i, dyPow);
 				}
-				for(int i = 0; i < orderZ ; i++)
+				for(int i = 0; i < orderZ; i++)
 				{
 					zPow = pow(height, i);
 					dzPow = i * pow(height, i - 1);
@@ -1663,21 +1663,21 @@ namespace rsgis {namespace radar
 				height = gsl_vector_get(estimatedPar, 2);
 
 				// Set up vectors to hold powers
-				for(int i = 0; i < orderX ; i++)
+				for(int i = 0; i < orderX; i++)
 				{
 					xPow = pow(dielectric, i);
 					dxPow = i * pow(dielectric, i - 1);
 					gsl_vector_set(xPowers, i, xPow);
 					gsl_vector_set(dxPowers, i, dxPow);
 				}
-				for(int i = 0; i < orderY ; i++)
+				for(int i = 0; i < orderY; i++)
 				{
 					yPow = pow(density, i);
 					dyPow = i * pow(density, i - 1);
 					gsl_vector_set(yPowers, i, yPow);
 					gsl_vector_set(dyPowers, i, dyPow);
 				}
-				for(int i = 0; i < orderZ ; i++)
+				for(int i = 0; i < orderZ; i++)
 				{
 					zPow = pow(height, i);
 					dzPow = i * pow(height, i - 1);

@@ -59,19 +59,19 @@ namespace rsgis{namespace filter{
 		{
 		public: 
 			RSGISImageFilter(int numberOutBands, int size, std::string filenameEnding);
-			void runFilter(GDALDataset **datasets, int numDS, std::string outputImage, std::string gdalFormat, GDALDataType outDataType) throw(rsgis::RSGISImageException);
-			virtual rsgis::img::RSGISCalcImage* getCalcImage()throw(rsgis::RSGISImageException);
-			virtual void calcImageValue(float *bandValues, int numBands, double *output) throw(rsgis::img::RSGISImageCalcException);
-			virtual void calcImageValue(float *bandValues, int numBands) throw(rsgis::img::RSGISImageCalcException);
-            virtual void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
-            virtual void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
-			virtual void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent)throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("Not implemented");};
-            virtual void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException);
-			virtual void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException);
-			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException) = 0;
-            virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) throw(rsgis::img::RSGISImageCalcException){throw rsgis::img::RSGISImageCalcException("No implemented");};
-			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(rsgis::img::RSGISImageCalcException) = 0;
-			virtual void exportAsImage(std::string filename) throw(RSGISImageFilterException) = 0;
+			void runFilter(GDALDataset **datasets, int numDS, std::string outputImage, std::string gdalFormat, GDALDataType outDataType);
+			virtual rsgis::img::RSGISCalcImage* getCalcImage();
+			virtual void calcImageValue(float *bandValues, int numBands, double *output);
+			virtual void calcImageValue(float *bandValues, int numBands);
+            virtual void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) {throw rsgis::img::RSGISImageCalcException("Not implemented");};
+            virtual void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) {throw rsgis::img::RSGISImageCalcException("Not implemented");};
+			virtual void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+            virtual void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent);
+			virtual void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent);
+			virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output)  = 0;
+            virtual void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) {throw rsgis::img::RSGISImageCalcException("No implemented");};
+			virtual bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output)  = 0;
+			virtual void exportAsImage(std::string filename) = 0;
 			virtual std::string getFileNameEnding();
 			~RSGISImageFilter();
 		protected:

@@ -30,7 +30,7 @@ namespace rsgis{namespace vec{
         this->polys = polys;
     }
     
-    void RSGISCalcMinDists2Polys::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+    void RSGISCalcMinDists2Polys::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)
     {
         try
         {
@@ -56,7 +56,7 @@ namespace rsgis{namespace vec{
         }
     }
     
-    void RSGISCalcMinDists2Polys::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+    void RSGISCalcMinDists2Polys::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn)
     {
         rsgis::math::RSGISMathsUtils mathUtils;
 		std::string name = "";
@@ -91,7 +91,7 @@ namespace rsgis{namespace vec{
         this->maxMinDist = 0.0;
     }
     
-    void RSGISCalcMinDist2Geoms::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+    void RSGISCalcMinDist2Geoms::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)
     {
         try
         {
@@ -137,7 +137,7 @@ namespace rsgis{namespace vec{
         }
     }
     
-    void RSGISCalcMinDist2Geoms::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+    void RSGISCalcMinDist2Geoms::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid)
     {
         try
         {
@@ -184,7 +184,7 @@ namespace rsgis{namespace vec{
         }
     }
     
-    void RSGISCalcMinDist2Geoms::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+    void RSGISCalcMinDist2Geoms::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn)
     {
         OGRFieldDefn shpField(outColName.c_str(), OFTReal);
         shpField.SetPrecision(10);
@@ -243,7 +243,7 @@ namespace rsgis{namespace vec{
         this->maxMinDist = 0.0;
     }
     
-    void RSGISCalcMinDist2GeomsUseIdx::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+    void RSGISCalcMinDist2GeomsUseIdx::processFeature(OGRFeature *inFeature, OGRFeature *outFeature, geos::geom::Envelope *env, long fid)
     {
         try
         {
@@ -311,7 +311,7 @@ namespace rsgis{namespace vec{
         }
     }
     
-    void RSGISCalcMinDist2GeomsUseIdx::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid) throw(RSGISVectorException)
+    void RSGISCalcMinDist2GeomsUseIdx::processFeature(OGRFeature *feature, geos::geom::Envelope *env, long fid)
     {
         try
         {
@@ -378,7 +378,7 @@ namespace rsgis{namespace vec{
         }
     }
     
-    void RSGISCalcMinDist2GeomsUseIdx::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+    void RSGISCalcMinDist2GeomsUseIdx::createOutputLayerDefinition(OGRLayer *outputLayer, OGRFeatureDefn *inFeatureDefn)
     {
         OGRFieldDefn shpField(outColName.c_str(), OFTReal);
         shpField.SetPrecision(10);

@@ -59,12 +59,12 @@ namespace rsgis{namespace vec{
 	{
 	public:
 		RSGISProcessVectorSQL(RSGISProcessOGRFeature *processFeatures);
-		void processVectors(GDALDataset *inputDS, OGRLayer *outputLayer, bool copyData, bool outVertical, std::string sql) throw(RSGISVectorOutputException,RSGISVectorException);
-		void processVectors(GDALDataset *inputDS, bool outVertical, std::string sql) throw(RSGISVectorOutputException,RSGISVectorException);
-		void processVectorsNoOutput(GDALDataset *inputDS, bool outVertical, std::string sql) throw(RSGISVectorOutputException,RSGISVectorException);
+		void processVectors(GDALDataset *inputDS, OGRLayer *outputLayer, bool copyData, bool outVertical, std::string sql);
+		void processVectors(GDALDataset *inputDS, bool outVertical, std::string sql);
+		void processVectorsNoOutput(GDALDataset *inputDS, bool outVertical, std::string sql);
 		~RSGISProcessVectorSQL();
 	protected:
-		void copyFeatureDefn(OGRLayer *outputSHPLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
+		void copyFeatureDefn(OGRLayer *outputSHPLayer, OGRFeatureDefn *inFeatureDefn);
 		void copyFeatureData(OGRFeature *inFeature, OGRFeature *outFeature, OGRFeatureDefn *inFeatureDefn, OGRFeatureDefn *outFeatureDefn);
 		RSGISProcessOGRFeature *processFeatures;
 	};

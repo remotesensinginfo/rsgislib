@@ -53,8 +53,8 @@ namespace rsgis{namespace vec{
 	{
 	public:
 		RSGISCopyCheckPolygons();
-		void copyCheckPolygons(OGRLayer *input, OGRLayer *output, bool printErrors)throw(RSGISVectorException);
-		void copyFeatureDefn(OGRLayer *outputVecLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException);
+		void copyCheckPolygons(OGRLayer *input, OGRLayer *output, bool printErrors);
+		void copyFeatureDefn(OGRLayer *outputVecLayer, OGRFeatureDefn *inFeatureDefn);
 		void copyFeatureData(OGRFeature *inFeature, OGRFeature *outFeature, OGRFeatureDefn *inFeatureDefn, OGRFeatureDefn *outFeatureDefn);
 		~RSGISCopyCheckPolygons();
 	};

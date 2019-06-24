@@ -75,8 +75,8 @@ namespace rsgis
         {
         public:
             RSGISExtractImagePixelsOnLine();
-            std::vector<ImagePixelValuePt*>* getImagePixelValues(GDALDataset *image, unsigned int imageBand, geos::geom::Coordinate *pt1, float azimuthRad, float zenithRad, float rayElevThreshold) throw(RSGISImageCalcException);
-            void populateWithImageValues(GDALDataset *image, unsigned int imageBand, std::vector<ImagePixelValuePt*> *ptPxlValues) throw(rsgis::RSGISImageException);
+            std::vector<ImagePixelValuePt*>* getImagePixelValues(GDALDataset *image, unsigned int imageBand, geos::geom::Coordinate *pt1, float azimuthRad, float zenithRad, float rayElevThreshold);
+            void populateWithImageValues(GDALDataset *image, unsigned int imageBand, std::vector<ImagePixelValuePt*> *ptPxlValues);
             ~RSGISExtractImagePixelsOnLine();
         };
     }

@@ -37,7 +37,7 @@ namespace rsgis{namespace geom{
 		bbox = new geos::geom::Envelope(minX, maxX, minY, maxY);
 	}
 	
-	RSGISCircle::RSGISCircle(RSGIS2DPoint *a, RSGIS2DPoint *b, RSGIS2DPoint *c) throw(RSGISGeometryException)
+	RSGISCircle::RSGISCircle(RSGIS2DPoint *a, RSGIS2DPoint *b, RSGIS2DPoint *c)
 	{
 		this->updateCircle(a, b, c);
 		
@@ -48,7 +48,7 @@ namespace rsgis{namespace geom{
 		bbox = new geos::geom::Envelope(minX, maxX, minY, maxY);
 	}
 	
-	void RSGISCircle::updateCircle(RSGIS2DPoint *a, RSGIS2DPoint *b, RSGIS2DPoint *c) throw(RSGISGeometryException)
+	void RSGISCircle::updateCircle(RSGIS2DPoint *a, RSGIS2DPoint *b, RSGIS2DPoint *c)
 	{
         geos::geom::Coordinate *centreCoord = new geos::geom::Coordinate();
         // Centre X

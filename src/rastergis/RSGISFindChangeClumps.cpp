@@ -203,7 +203,7 @@ namespace rsgis{namespace rastergis{
                                                             std::string *inStringCols, unsigned int numInStringCols,
                                                             double *outRealCols, unsigned int numOutRealCols, int *outIntCols,
                                                             unsigned int numOutIntCols,
-                                                            std::string *outStringCols, unsigned int numOutStringCols) throw(RSGISAttributeTableException)
+                                                            std::string *outStringCols, unsigned int numOutStringCols)
     {
         bool withinClass = false;
 
@@ -428,7 +428,7 @@ namespace rsgis{namespace rastergis{
                                                             std::string *inStringCols, unsigned int numInStringCols,
                                                             double *outRealCols, unsigned int numOutRealCols, int *outIntCols,
                                                             unsigned int numOutIntCols,
-                                                            std::string *outStringCols, unsigned int numOutStringCols) throw(RSGISAttributeTableException)
+                                                            std::string *outStringCols, unsigned int numOutStringCols)
     {
         //bool withinClass = false;
 

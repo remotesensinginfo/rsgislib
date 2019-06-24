@@ -63,7 +63,7 @@ namespace rsgis{namespace vec{
 		RSGISClusterData();
 		RSGISClusterData(geos::geom::Polygon *poly, std::vector<RSGISClassificationPolygon*> *clusterPolys, std::vector<RSGISClassificationPolygon*> *allIntersect);
 		virtual void readAttribtues(OGRFeature *feature, OGRFeatureDefn *featDefn);
-		virtual void createLayerDefinition(OGRLayer *outputSHPLayer)throw(RSGISVectorOutputException);
+		virtual void createLayerDefinition(OGRLayer *outputSHPLayer);
 		virtual void populateFeature(OGRFeature *feature, OGRFeatureDefn *featDefn);
 		float getArea();
 		float getClusterPolyArea();

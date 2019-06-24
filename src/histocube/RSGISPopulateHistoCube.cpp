@@ -40,7 +40,7 @@ namespace rsgis {namespace histocube{
         this->dataArr = new unsigned int[this->dataArrLen];
     }
     
-    void RSGISPopHistoCubeLayerFromImgBand::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISPopHistoCubeLayerFromImgBand::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) 
     {
         try
         {
@@ -72,7 +72,7 @@ namespace rsgis {namespace histocube{
     
     
     
-    RSGISPopHistoCubeLayerFromImgBandInMem::RSGISPopHistoCubeLayerFromImgBandInMem(unsigned int *dataArr, unsigned long dataArrLen, unsigned int bandIdx, unsigned int maxRow, float scale, float offset, std::vector<int> bins) throw(rsgis::RSGISHistoCubeException) : rsgis::img::RSGISCalcImageValue(0)
+    RSGISPopHistoCubeLayerFromImgBandInMem::RSGISPopHistoCubeLayerFromImgBandInMem(unsigned int *dataArr, unsigned long dataArrLen, unsigned int bandIdx, unsigned int maxRow, float scale, float offset, std::vector<int> bins) : rsgis::img::RSGISCalcImageValue(0)
     {
         this->dataArrLen = dataArrLen;
         this->rowLen = bins.size();
@@ -96,7 +96,7 @@ namespace rsgis {namespace histocube{
         this->hcUtils = RSGISHistoCubeUtils();
     }
     
-    void RSGISPopHistoCubeLayerFromImgBandInMem::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) throw(rsgis::img::RSGISImageCalcException)
+    void RSGISPopHistoCubeLayerFromImgBandInMem::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) 
     {
         try
         {

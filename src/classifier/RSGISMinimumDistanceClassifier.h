@@ -53,13 +53,13 @@ namespace rsgis{ namespace classifier{
 	class DllExport RSGISMinimumDistanceClassifier : public RSGISClassifier
 		{
 		public:
-			RSGISMinimumDistanceClassifier(ClassData **trainingData, int numClasses, MinDistCentreType centreType)  throw(RSGISClassificationException);
-			virtual int getClassID(float *variables, int numVars) throw(RSGISClassificationException);
-			virtual std::string getClassName(float *variables, int numVars) throw(RSGISClassificationException);
+			RSGISMinimumDistanceClassifier(ClassData **trainingData, int numClasses, MinDistCentreType centreType);
+			virtual int getClassID(float *variables, int numVars);
+			virtual std::string getClassName(float *variables, int numVars);
 			~RSGISMinimumDistanceClassifier();
 		protected:
-			void calcClusterCentres() throw(RSGISClassificationException);
-			ClassData* findClass(float *variables, int numVars) throw(RSGISClassificationException);
+			void calcClusterCentres();
+			ClassData* findClass(float *variables, int numVars);
 			ClassData *clusterCentres;
 			MinDistCentreType centreType;
 		};

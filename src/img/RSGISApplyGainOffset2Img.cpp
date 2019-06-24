@@ -37,7 +37,7 @@ namespace rsgis{namespace img{
         this->nGain = nGain;
     }
     
-    void RSGISRescaleImageData::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+    void RSGISRescaleImageData::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         for(int i = 0; i < numBands; ++i)
         {

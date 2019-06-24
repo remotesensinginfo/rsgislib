@@ -69,7 +69,7 @@ namespace rsgis{ namespace utils{
 	{
 		public:
 			RSGISImageFootprintPolygonsCSVParse();
-            std::vector<ImageFootPrintPoly*>* parsePoly(std::string inputfile) throw(rsgis::RSGISInputStreamException,RSGISTextException);
+            std::vector<ImageFootPrintPoly*>* parsePoly(std::string inputfile);
 			std::string formatedString(ImageFootPrintPoly *poly);
 			~RSGISImageFootprintPolygonsCSVParse();
 	};

@@ -31,7 +31,7 @@ namespace rsgis{namespace vec{
 		
 	}
 	
-	long unsigned RSGISCopyPolygonsInPolygon::copyPolygonsInPoly(OGRLayer *input, OGRLayer *output, OGRGeometry *coverPolygon)throw(RSGISVectorException)
+	long unsigned RSGISCopyPolygonsInPolygon::copyPolygonsInPoly(OGRLayer *input, OGRLayer *output, OGRGeometry *coverPolygon)
 	{
 		
 		OGRFeature *inFeature = NULL;
@@ -93,7 +93,7 @@ namespace rsgis{namespace vec{
 		return numOutputted;
 	}
 	
-	void RSGISCopyPolygonsInPolygon::copyFeatureDefn(OGRLayer *outputSHPLayer, OGRFeatureDefn *inFeatureDefn) throw(RSGISVectorOutputException)
+	void RSGISCopyPolygonsInPolygon::copyFeatureDefn(OGRLayer *outputSHPLayer, OGRFeatureDefn *inFeatureDefn)
 	{
 		int fieldCount = inFeatureDefn->GetFieldCount();
 		for(int i = 0; i < fieldCount; i++)

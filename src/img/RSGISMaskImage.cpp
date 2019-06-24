@@ -29,7 +29,7 @@ namespace rsgis{namespace img{
 		
 	}
 	
-	void RSGISMaskImage::maskImage(GDALDataset *dataset, GDALDataset *mask, std::string outputImage, std::string imageFormat, GDALDataType outDataType, double outputValue, std::vector<float> maskValues)throw(RSGISImageCalcException,RSGISImageBandException)
+	void RSGISMaskImage::maskImage(GDALDataset *dataset, GDALDataset *mask, std::string outputImage, std::string imageFormat, GDALDataType outDataType, double outputValue, std::vector<float> maskValues)
 	{
 		GDALDataset **datasets = NULL;
 		try
@@ -48,7 +48,7 @@ namespace rsgis{namespace img{
                 delete[] datasets;
             }
 		}
-		catch(RSGISImageCalcException e)
+		catch(RSGISImageCalcException &e)
 		{
 			if(datasets != NULL)
 			{
@@ -57,7 +57,7 @@ namespace rsgis{namespace img{
 			
 			throw e;
 		}
-		catch(RSGISImageBandException e)
+		catch(RSGISImageBandException &e)
 		{
 			if(datasets != NULL)
 			{
@@ -68,7 +68,7 @@ namespace rsgis{namespace img{
 		}
 	}
     
-    void RSGISMaskImage::genFiniteImgMask(GDALDataset *dataset, std::string outputImage, std::string imageFormat)throw(RSGISImageCalcException,RSGISImageBandException)
+    void RSGISMaskImage::genFiniteImgMask(GDALDataset *dataset, std::string outputImage, std::string imageFormat)
     {
         try
         {
@@ -76,17 +76,17 @@ namespace rsgis{namespace img{
             RSGISCalcImage calcImg = RSGISCalcImage(&createMask, "", true);
             calcImg.calcImage(&dataset, 1, outputImage, false, NULL, imageFormat, GDT_Byte);
         }
-        catch(RSGISImageCalcException e)
+        catch(RSGISImageCalcException &e)
         {
             throw e;
         }
-        catch(RSGISImageBandException e)
+        catch(RSGISImageBandException &e)
         {
             throw e;
         }
     }
     
-    void RSGISMaskImage::genValidImgMask(GDALDataset **dataset, unsigned int numImages, std::string outputImage, std::string imageFormat, float noDataVal)throw(RSGISImageCalcException,RSGISImageBandException)
+    void RSGISMaskImage::genValidImgMask(GDALDataset **dataset, unsigned int numImages, std::string outputImage, std::string imageFormat, float noDataVal)
     {
         try
         {
@@ -94,11 +94,11 @@ namespace rsgis{namespace img{
             RSGISCalcImage calcImg = RSGISCalcImage(&createMask, "", true);
             calcImg.calcImage(dataset, numImages, outputImage, false, NULL, imageFormat, GDT_Byte);
         }
-        catch(RSGISImageCalcException e)
+        catch(RSGISImageCalcException &e)
         {
             throw e;
         }
-        catch(RSGISImageBandException e)
+        catch(RSGISImageBandException &e)
         {
             throw e;
         }
@@ -111,7 +111,7 @@ namespace rsgis{namespace img{
         this->maskValues = maskValues;
 	}
 	
-	void RSGISApplyImageMask::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+	void RSGISApplyImageMask::calcImageValue(float *bandValues, int numBands, double *output) 
 	{
         bool foundMaskVal = false;
         for(std::vector<float>::iterator iterVals = maskValues.begin(); iterVals != maskValues.end(); ++iterVals)
@@ -151,7 +151,7 @@ namespace rsgis{namespace img{
         
     }
     
-    void RSGISCreateFiniteImageMask::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+    void RSGISCreateFiniteImageMask::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         bool finiteVal = true;
         for(int i = 0; i < numBands; ++i)
@@ -184,7 +184,7 @@ namespace rsgis{namespace img{
         this->noDataVal = noDataVal;
     }
     
-    void RSGISGenValidImageMask::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+    void RSGISGenValidImageMask::calcImageValue(float *bandValues, int numBands, double *output) 
     {
         bool validData = true;
         for(int i = 0; i < numBands; ++i)

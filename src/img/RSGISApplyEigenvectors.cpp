@@ -29,7 +29,7 @@ namespace rsgis{namespace img{
 		this->eigenvectors = eigenvectors;
 	}
 	
-	void RSGISApplyEigenvectors::calcImageValue(float *bandValues, int numBands, double *output) throw(RSGISImageCalcException)
+	void RSGISApplyEigenvectors::calcImageValue(float *bandValues, int numBands, double *output) 
 	{
 		if(this->numOutBands > this->eigenvectors->n)
 		{
@@ -49,27 +49,27 @@ namespace rsgis{namespace img{
 		}
 	}
 	
-	void RSGISApplyEigenvectors::calcImageValue(float *bandValues, int numBands) throw(RSGISImageCalcException)
+	void RSGISApplyEigenvectors::calcImageValue(float *bandValues, int numBands) 
 	{
 		throw RSGISImageCalcException("Not implemented");
 	}
 	
-	void RSGISApplyEigenvectors::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) throw(RSGISImageCalcException)
+	void RSGISApplyEigenvectors::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) 
 	{
 		throw RSGISImageCalcException("Not Implemented");
 	}
 	
-	void RSGISApplyEigenvectors::calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) throw(RSGISImageCalcException)
+	void RSGISApplyEigenvectors::calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) 
 	{
 		throw RSGISImageCalcException("Not implemented");
 	}
 
-	void RSGISApplyEigenvectors::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException)
+	void RSGISApplyEigenvectors::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
 	{
 		throw RSGISImageCalcException("Not implemented");
 	}
 
-	bool RSGISApplyEigenvectors::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) throw(RSGISImageCalcException)
+	bool RSGISApplyEigenvectors::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) 
 	{
 		throw RSGISImageCalcException("Not implemented");
 	}

@@ -50,7 +50,7 @@ namespace rsgis{namespace vec{
 		public:
 			RSGISImageTileVector(std::string filenameAttribute);
 			virtual void readAttribtues(OGRFeature *feature, OGRFeatureDefn *featDefn);
-			virtual void createLayerDefinition(OGRLayer *outputSHPLayer)throw(RSGISVectorOutputException);
+			virtual void createLayerDefinition(OGRLayer *outputSHPLayer);
 			virtual void populateFeature(OGRFeature *feature, OGRFeatureDefn *featDefn);
             std::string getFileName();
 			void setFileName(std::string name);

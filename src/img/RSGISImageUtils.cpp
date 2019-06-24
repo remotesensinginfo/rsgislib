@@ -29,7 +29,7 @@ namespace rsgis{namespace img{
 		 this->resDiffThresh = resDiffThresh;
 	}
 	
-	void RSGISImageUtils::getImageOverlap(GDALDataset **datasets, int numDS, int **dsOffsets, int *width, int *height, double *gdalTransform) throw(RSGISImageBandException)
+	void RSGISImageUtils::getImageOverlap(GDALDataset **datasets, int numDS, int **dsOffsets, int *width, int *height, double *gdalTransform) 
 	{
 		double **transformations = new double*[numDS];
 		int *xSize = new int[numDS];
@@ -286,7 +286,7 @@ namespace rsgis{namespace img{
 		}
 	}
     
-    void RSGISImageUtils::getImageOverlap(std::vector<GDALDataset*> *datasets, int **dsOffsets, int *width, int *height, double *gdalTransform) throw(RSGISImageBandException)
+    void RSGISImageUtils::getImageOverlap(std::vector<GDALDataset*> *datasets, int **dsOffsets, int *width, int *height, double *gdalTransform) 
 	{
         unsigned int numDS = datasets->size();
 		double **transformations = new double*[numDS];
@@ -543,7 +543,7 @@ namespace rsgis{namespace img{
 		}
 	}
     
-    void RSGISImageUtils::getImageOverlap(GDALDataset **datasets, int numDS,  int **dsOffsets, int *width, int *height, double *gdalTransform, int *maxBlockX, int *maxBlockY) throw(RSGISImageBandException)
+    void RSGISImageUtils::getImageOverlap(GDALDataset **datasets, int numDS,  int **dsOffsets, int *width, int *height, double *gdalTransform, int *maxBlockX, int *maxBlockY) 
 	{
         std::cout.precision(12);
 		double **transformations = new double*[numDS];
@@ -816,7 +816,7 @@ namespace rsgis{namespace img{
 		}
 	}
     
-    void RSGISImageUtils::getImageOverlap(std::vector<GDALDataset*> *datasets,  int **dsOffsets, int *width, int *height, double *gdalTransform, int *maxBlockX, int *maxBlockY) throw(RSGISImageBandException)
+    void RSGISImageUtils::getImageOverlap(std::vector<GDALDataset*> *datasets,  int **dsOffsets, int *width, int *height, double *gdalTransform, int *maxBlockX, int *maxBlockY) 
 	{
         unsigned int numDS = datasets->size();
 		double **transformations = new double*[numDS];
@@ -1089,7 +1089,7 @@ namespace rsgis{namespace img{
 		}
 	}
     
-	void RSGISImageUtils::getImageOverlap(GDALDataset **datasets, int numDS,  int **dsOffsets, int *width, int *height, double *gdalTransform, geos::geom::Envelope *env) throw(RSGISImageBandException)
+	void RSGISImageUtils::getImageOverlap(GDALDataset **datasets, int numDS,  int **dsOffsets, int *width, int *height, double *gdalTransform, geos::geom::Envelope *env) 
 	{
 		double **transformations = new double*[numDS];
 		int *xSize = new int[numDS];
@@ -1441,7 +1441,7 @@ namespace rsgis{namespace img{
 		}
 	}
     
-    void RSGISImageUtils::getImageOverlapCut2Env(GDALDataset **datasets, int numDS,  int **dsOffsets, int *width, int *height, double *gdalTransform, geos::geom::Envelope *env) throw(RSGISImageBandException)
+    void RSGISImageUtils::getImageOverlapCut2Env(GDALDataset **datasets, int numDS,  int **dsOffsets, int *width, int *height, double *gdalTransform, geos::geom::Envelope *env) 
 	{
 		double **transformations = new double*[numDS];
 		int *xSize = new int[numDS];
@@ -1734,7 +1734,7 @@ namespace rsgis{namespace img{
 		}
 	}
     
-    void RSGISImageUtils::getImageOverlapCut2Env(GDALDataset **datasets, int numDS,  int **dsOffsets, int *width, int *height, double *gdalTransform, geos::geom::Envelope *env, int *maxBlockX, int *maxBlockY) throw(RSGISImageBandException)
+    void RSGISImageUtils::getImageOverlapCut2Env(GDALDataset **datasets, int numDS,  int **dsOffsets, int *width, int *height, double *gdalTransform, geos::geom::Envelope *env, int *maxBlockX, int *maxBlockY) 
 	{
 		double **transformations = new double*[numDS];
 		int *xSize = new int[numDS];
@@ -2044,7 +2044,7 @@ namespace rsgis{namespace img{
         delete[] yBlockSize;
 	}
 	
-	void RSGISImageUtils::getImageOverlap(GDALDataset **datasets, int numDS, int *width, int *height, geos::geom::Envelope *env) throw(RSGISImageBandException)
+	void RSGISImageUtils::getImageOverlap(GDALDataset **datasets, int numDS, int *width, int *height, geos::geom::Envelope *env) 
 	{
 		double **transformations = new double*[numDS];
 		int *xSize = new int[numDS];
@@ -2223,7 +2223,7 @@ namespace rsgis{namespace img{
 		}
 	}
     
-    void RSGISImageUtils::getImageOverlap(GDALDataset **datasets, int numDS, geos::geom::Envelope *env) throw(RSGISImageBandException)
+    void RSGISImageUtils::getImageOverlap(GDALDataset **datasets, int numDS, geos::geom::Envelope *env) 
     {
         double **transformations = new double*[numDS];
         int *xSize = new int[numDS];
@@ -2367,7 +2367,7 @@ namespace rsgis{namespace img{
         }
     }
 	
-	void RSGISImageUtils::getImagesExtent(GDALDataset **datasets, int numDS, int *width, int *height, double *gdalTransform) throw(RSGISImageBandException)
+	void RSGISImageUtils::getImagesExtent(GDALDataset **datasets, int numDS, int *width, int *height, double *gdalTransform) 
 	{
 		double **transformations = new double*[numDS];
 		int *xSize = new int[numDS];
@@ -2516,7 +2516,7 @@ namespace rsgis{namespace img{
 		}
 	}
 	
-    void RSGISImageUtils::getImagesExtent(std::string *inputImages, int numDS, int *width, int *height, double *gdalTransform) throw(RSGISImageBandException)
+    void RSGISImageUtils::getImagesExtent(std::string *inputImages, int numDS, int *width, int *height, double *gdalTransform) 
     {
         double **transformations = new double*[numDS];
 		int *xSize = new int[numDS];
@@ -2683,7 +2683,7 @@ namespace rsgis{namespace img{
 		}
     }
     
-    void RSGISImageUtils::getImagesExtent(std::vector<std::string> inputImages, int *width, int *height, double *gdalTransform) throw(RSGISImageBandException)
+    void RSGISImageUtils::getImagesExtent(std::vector<std::string> inputImages, int *width, int *height, double *gdalTransform) 
     {
         int numDS = inputImages.size();
         double **transformations = new double*[numDS];
@@ -2851,7 +2851,7 @@ namespace rsgis{namespace img{
         }
     }
     
-    void RSGISImageUtils::getImagePixelOverlaps(GDALDataset **datasets, int numDS, int **dsOffsets, unsigned int *width, unsigned int *height) throw(RSGISImageBandException)
+    void RSGISImageUtils::getImagePixelOverlaps(GDALDataset **datasets, int numDS, int **dsOffsets, unsigned int *width, unsigned int *height) 
     {
         std::cout.precision(12);
         double **transformations = new double*[numDS];
@@ -3128,7 +3128,7 @@ namespace rsgis{namespace img{
         }
     }
     
-    OGREnvelope* RSGISImageUtils::getSpatialExtent(GDALDataset *dataset) throw(RSGISImageBandException)
+    OGREnvelope* RSGISImageUtils::getSpatialExtent(GDALDataset *dataset) 
     {
         OGREnvelope *env = new OGREnvelope();
         try
@@ -3156,7 +3156,7 @@ namespace rsgis{namespace img{
     }
     
     
-    bool RSGISImageUtils::doImageSpatAndExtMatch(GDALDataset **datasets, int numDS) throw(RSGISImageBandException)
+    bool RSGISImageUtils::doImageSpatAndExtMatch(GDALDataset **datasets, int numDS) 
     {
         bool match = true;
         try
@@ -3221,7 +3221,7 @@ namespace rsgis{namespace img{
     
     
     
-	void RSGISImageUtils::exportImageToTextCol(GDALDataset *image, int band, std::string outputText)throw(RSGISImageBandException, RSGISOutputStreamException)
+	void RSGISImageUtils::exportImageToTextCol(GDALDataset *image, int band, std::string outputText)
 	{
 		RSGISImageUtils imgUtils;
 		double *gdalTranslation = new double[6];
@@ -3283,12 +3283,12 @@ namespace rsgis{namespace img{
 			}
 			std::cout << "..100 Complete.\n";
 		}
-		catch(RSGISImageBandException e)
+		catch(RSGISImageBandException &e)
 		{
 			
 			throw e;
 		}
-		catch(RSGISOutputStreamException e)
+		catch(RSGISOutputStreamException &e)
 		{
 			
 			throw e;
@@ -3304,7 +3304,7 @@ namespace rsgis{namespace img{
 		}
 	}
 	
-	GDALDataset* RSGISImageUtils::createBlankImage(std::string imageFile, double *transformation, int xSize, int ySize, int numBands, std::string projection, float value, std::string gdalFormat, GDALDataType imgDataType) throw(RSGISImageException, RSGISImageBandException)
+	GDALDataset* RSGISImageUtils::createBlankImage(std::string imageFile, double *transformation, int xSize, int ySize, int numBands, std::string projection, float value, std::string gdalFormat, GDALDataType imgDataType)
 	{
 		GDALAllRegister();
 		GDALDriver *poDriver = NULL;
@@ -3352,7 +3352,7 @@ namespace rsgis{namespace img{
 			
             this->assignValGDALDataset(outputImage, value);
 		}
-		catch(RSGISImageBandException e)
+		catch(RSGISImageBandException &e)
 		{
 			if(transformation != NULL)
 			{
@@ -3376,7 +3376,7 @@ namespace rsgis{namespace img{
             }
 			throw e;
 		}
-		catch(RSGISImageException e)
+		catch(RSGISImageException &e)
 		{
 			if(transformation != NULL)
 			{
@@ -3422,7 +3422,7 @@ namespace rsgis{namespace img{
 		return outputImage;
 	}
     
-    GDALDataset* RSGISImageUtils::createBlankImage(std::string imageFile, double *transformation, int xSize, int ySize, int numBands, std::string projection, float value, std::vector<std::string> bandNames, std::string gdalFormat, GDALDataType imgDataType) throw(RSGISImageException, RSGISImageBandException)
+    GDALDataset* RSGISImageUtils::createBlankImage(std::string imageFile, double *transformation, int xSize, int ySize, int numBands, std::string projection, float value, std::vector<std::string> bandNames, std::string gdalFormat, GDALDataType imgDataType)
 	{
 		GDALAllRegister();
 		GDALDriver *poDriver = NULL;
@@ -3470,7 +3470,7 @@ namespace rsgis{namespace img{
 			
             this->assignValGDALDataset(outputImage, value);
 		}
-		catch(RSGISImageBandException e)
+		catch(RSGISImageBandException &e)
 		{
 			if(transformation != NULL)
 			{
@@ -3494,7 +3494,7 @@ namespace rsgis{namespace img{
             }
 			throw e;
 		}
-		catch(RSGISImageException e)
+		catch(RSGISImageException &e)
 		{
 			if(transformation != NULL)
 			{
@@ -3540,7 +3540,7 @@ namespace rsgis{namespace img{
 		return outputImage;
 	}
 	
-	GDALDataset* RSGISImageUtils::createBlankImage(std::string imageFile, geos::geom::Envelope extent, double resolution, int numBands, std::string projection, float value, std::string gdalFormat, GDALDataType imgDataType) throw(RSGISImageException, RSGISImageBandException)
+	GDALDataset* RSGISImageUtils::createBlankImage(std::string imageFile, geos::geom::Envelope extent, double resolution, int numBands, std::string projection, float value, std::string gdalFormat, GDALDataType imgDataType)
 	{
 		GDALAllRegister();
 		GDALDriver *poDriver = NULL;
@@ -3603,7 +3603,7 @@ namespace rsgis{namespace img{
 			
 			this->assignValGDALDataset(outputImage, value);
 		}
-		catch(RSGISImageBandException e)
+		catch(RSGISImageBandException &e)
 		{
 			if(transformation != NULL)
 			{
@@ -3615,7 +3615,7 @@ namespace rsgis{namespace img{
 			}
 			throw e;
 		}
-		catch(RSGISImageException e)
+		catch(RSGISImageException &e)
 		{
 			if(transformation != NULL)
 			{
@@ -3640,7 +3640,7 @@ namespace rsgis{namespace img{
 		return outputImage;
 	}
 	
-	void RSGISImageUtils::exportImageBands(std::string imageFile, std::string outputFilebase, std::string format) throw(RSGISImageException, RSGISImageBandException)
+	void RSGISImageUtils::exportImageBands(std::string imageFile, std::string outputFilebase, std::string format)
 	{
 		GDALAllRegister();
 		GDALDataset *dataset = NULL;
@@ -3717,14 +3717,14 @@ namespace rsgis{namespace img{
 			}
 			GDALClose(dataset);
 		}
-		catch(RSGISImageException e)
+		catch(RSGISImageException &e)
 		{
 			
 			throw e;
 		}
 	}
 	
-	void RSGISImageUtils::exportImageStack(std::string *inputImages, std::string *outputImages, std::string outputFormat, int numImages)  throw(RSGISImageException, RSGISImageBandException)
+	void RSGISImageUtils::exportImageStack(std::string *inputImages, std::string *outputImages, std::string outputFormat, int numImages) 
 	{
 		GDALAllRegister();
 		GDALDataset **inDatasets = NULL;
@@ -3820,13 +3820,13 @@ namespace rsgis{namespace img{
 			delete[] gdalTranslation;
 			
 		}
-		catch(RSGISImageException e)
+		catch(RSGISImageException &e)
 		{
 			throw e;
 		}
 	}
 	
-	void RSGISImageUtils::exportImageStackWithMask(std::string *inputImages, std::string *outputImages, std::string imageMask, std::string outputFormat, int numImages, float maskValue)  throw(RSGISImageException, RSGISImageBandException)
+	void RSGISImageUtils::exportImageStackWithMask(std::string *inputImages, std::string *outputImages, std::string imageMask, std::string outputFormat, int numImages, float maskValue) 
 	{
 		GDALAllRegister();
 		GDALDataset **inDatasets = NULL;
@@ -3940,7 +3940,7 @@ namespace rsgis{namespace img{
 			delete data;
 			delete[] gdalTranslation;
 		}
-		catch(RSGISImageException e)
+		catch(RSGISImageException &e)
 		{
 			throw e;
 		}
@@ -4038,7 +4038,7 @@ namespace rsgis{namespace img{
 			GDALClose(inDataset);
 			delete data;
 		}
-		catch(RSGISImageException e)
+		catch(RSGISImageException &e)
 		{
 			throw e;
 		}
@@ -4087,7 +4087,7 @@ namespace rsgis{namespace img{
 		return outVals;
 	}
     
-    std::vector<double>* RSGISImageUtils::getImageBandValues(GDALDataset *dataset, unsigned int band, bool noDataValDefined, float noDataVal)throw(RSGISImageException)
+    std::vector<double>* RSGISImageUtils::getImageBandValues(GDALDataset *dataset, unsigned int band, bool noDataValDefined, float noDataVal)
     {
         std::vector<double> *imgVals = new std::vector<double>();
         try
@@ -4155,7 +4155,7 @@ namespace rsgis{namespace img{
     }
     
 	
-	void RSGISImageUtils::copyImageRemoveSpatialReference(std::string inputImage, std::string outputImage)throw(RSGISImageException)
+	void RSGISImageUtils::copyImageRemoveSpatialReference(std::string inputImage, std::string outputImage)
 	{
 		GDALAllRegister();
 		GDALDataset *inDataset = NULL;
@@ -4250,13 +4250,13 @@ namespace rsgis{namespace img{
 			delete data;
 			delete transformation;
 		}
-		catch(RSGISImageException e)
+		catch(RSGISImageException &e)
 		{
 			throw e;
 		}
 	}
 
-	void RSGISImageUtils::copyImageDefiningSpatialReference(std::string inputImage, std::string outputImage, std::string proj, double tlX, double tlY, float xRes, float yRes)throw(RSGISImageException)
+	void RSGISImageUtils::copyImageDefiningSpatialReference(std::string inputImage, std::string outputImage, std::string proj, double tlX, double tlY, float xRes, float yRes)
 	{
 		GDALAllRegister();
 		GDALDataset *inDataset = NULL;
@@ -4372,13 +4372,13 @@ namespace rsgis{namespace img{
 			delete data;
 			delete transformation;
 		}
-		catch(RSGISImageException e)
+		catch(RSGISImageException &e)
 		{
 			throw e;
 		}
 	}
     
-    void RSGISImageUtils::createImageSlices(GDALDataset *dataset, std::string outputImageBase) throw(RSGISImageException)
+    void RSGISImageUtils::createImageSlices(GDALDataset *dataset, std::string outputImageBase)
     {
         rsgis::math::RSGISMathsUtils mathUtils;
         
@@ -4439,7 +4439,7 @@ namespace rsgis{namespace img{
         }
     }
     
-    void RSGISImageUtils::copyFloatGDALDataset(GDALDataset *inData, GDALDataset *outData) throw(RSGISImageException)
+    void RSGISImageUtils::copyFloatGDALDataset(GDALDataset *inData, GDALDataset *outData)
     {
         try
         {
@@ -4490,7 +4490,7 @@ namespace rsgis{namespace img{
         }
     }
     
-    void RSGISImageUtils::copyIntGDALDataset(GDALDataset *inData, GDALDataset *outData) throw(RSGISImageException)
+    void RSGISImageUtils::copyIntGDALDataset(GDALDataset *inData, GDALDataset *outData)
     {
         try
         {
@@ -4541,7 +4541,7 @@ namespace rsgis{namespace img{
         }
     }
     
-    void RSGISImageUtils::copyUIntGDALDataset(GDALDataset *inData, GDALDataset *outData) throw(RSGISImageException)
+    void RSGISImageUtils::copyUIntGDALDataset(GDALDataset *inData, GDALDataset *outData)
     {
         try
         {
@@ -4592,7 +4592,7 @@ namespace rsgis{namespace img{
         }
     }
     
-    void RSGISImageUtils::copyFloat32GDALDataset(GDALDataset *inData, GDALDataset *outData) throw(RSGISImageException)
+    void RSGISImageUtils::copyFloat32GDALDataset(GDALDataset *inData, GDALDataset *outData)
     {
         try
         {
@@ -4643,7 +4643,7 @@ namespace rsgis{namespace img{
         }
     }
     
-    void RSGISImageUtils::copyByteGDALDataset(GDALDataset *inData, GDALDataset *outData) throw(RSGISImageException)
+    void RSGISImageUtils::copyByteGDALDataset(GDALDataset *inData, GDALDataset *outData)
     {
         try
         {
@@ -4694,7 +4694,7 @@ namespace rsgis{namespace img{
         }
     }
     
-    void RSGISImageUtils::zerosUIntGDALDataset(GDALDataset *data) throw(RSGISImageException)
+    void RSGISImageUtils::zerosUIntGDALDataset(GDALDataset *data)
     {
         try
         {
@@ -4761,7 +4761,7 @@ namespace rsgis{namespace img{
         }
     }
     
-    void RSGISImageUtils::zerosFloatGDALDataset(GDALDataset *data) throw(RSGISImageException)
+    void RSGISImageUtils::zerosFloatGDALDataset(GDALDataset *data)
     {
         try
         {
@@ -4828,7 +4828,7 @@ namespace rsgis{namespace img{
         }
     }
     
-    void RSGISImageUtils::zerosByteGDALDataset(GDALDataset *data) throw(RSGISImageException)
+    void RSGISImageUtils::zerosByteGDALDataset(GDALDataset *data)
     {
         try
         {
@@ -4895,7 +4895,7 @@ namespace rsgis{namespace img{
         }
     }
     
-    void RSGISImageUtils::assignValGDALDataset(GDALDataset *data, float value) throw(RSGISImageException)
+    void RSGISImageUtils::assignValGDALDataset(GDALDataset *data, float value)
     {
         try
         {
@@ -4962,7 +4962,7 @@ namespace rsgis{namespace img{
         }
     }
     
-    GDALDataset* RSGISImageUtils::createCopy(GDALDataset *inData, std::string outputFilePath, std::string outputFormat, GDALDataType eType, bool useImgProj, std::string proj)throw(RSGISImageException)
+    GDALDataset* RSGISImageUtils::createCopy(GDALDataset *inData, std::string outputFilePath, std::string outputFormat, GDALDataType eType, bool useImgProj, std::string proj)
     {
         unsigned long width = inData->GetRasterXSize();
         unsigned long height = inData->GetRasterYSize();
@@ -5004,7 +5004,7 @@ namespace rsgis{namespace img{
 
     }
     
-    GDALDataset* RSGISImageUtils::createCopy(GDALDataset *inData, unsigned int numBands, std::string outputFilePath, std::string outputFormat, GDALDataType eType, bool useImgProj, std::string proj)throw(RSGISImageException)
+    GDALDataset* RSGISImageUtils::createCopy(GDALDataset *inData, unsigned int numBands, std::string outputFilePath, std::string outputFormat, GDALDataType eType, bool useImgProj, std::string proj)
     {
         unsigned long width = inData->GetRasterXSize();
         unsigned long height = inData->GetRasterYSize();
@@ -5043,7 +5043,7 @@ namespace rsgis{namespace img{
         
     }
     
-    GDALDataset* RSGISImageUtils::createCopy(GDALDataset *inData, unsigned int numBands, std::string outputFilePath, std::string outputFormat, GDALDataType eType, geos::geom::Envelope extent, bool useImgProj, std::string proj)throw(RSGISImageException)
+    GDALDataset* RSGISImageUtils::createCopy(GDALDataset *inData, unsigned int numBands, std::string outputFilePath, std::string outputFormat, GDALDataType eType, geos::geom::Envelope extent, bool useImgProj, std::string proj)
     {
         GDALDataset *dataset = NULL;
         try
@@ -5132,7 +5132,7 @@ namespace rsgis{namespace img{
     }
     
     
-    GDALDataset* RSGISImageUtils::createCopy(GDALDataset *inData, unsigned int numBands, std::string outputFilePath, std::string outputFormat, GDALDataType eType, double xMin, double xMax, double yMin, double yMax, double xRes, double yRes, bool useImgProj, std::string proj)throw(RSGISImageException)
+    GDALDataset* RSGISImageUtils::createCopy(GDALDataset *inData, unsigned int numBands, std::string outputFilePath, std::string outputFormat, GDALDataType eType, double xMin, double xMax, double yMin, double yMax, double xRes, double yRes, bool useImgProj, std::string proj)
     {
         GDALDataset *dataset = NULL;
         try
@@ -5196,7 +5196,7 @@ namespace rsgis{namespace img{
     }
     
     
-    GDALDataset* RSGISImageUtils::createCopy(GDALDataset **datasets, int numDS, unsigned int numBands, std::string outputFilePath, std::string outputFormat, GDALDataType eType, bool useImgProj, std::string proj)throw(RSGISImageException)
+    GDALDataset* RSGISImageUtils::createCopy(GDALDataset **datasets, int numDS, unsigned int numBands, std::string outputFilePath, std::string outputFormat, GDALDataType eType, bool useImgProj, std::string proj)
     {
         GDALDataset *dataset = NULL;
         try
@@ -5259,7 +5259,7 @@ namespace rsgis{namespace img{
         return dataset;
     }
     
-    void RSGISImageUtils::createKMLText(std::string inputImage, std::string outKMLFile) throw(RSGISImageBandException)
+    void RSGISImageUtils::createKMLText(std::string inputImage, std::string outKMLFile) 
     {
         
         // Open text file for writing
@@ -5359,7 +5359,7 @@ namespace rsgis{namespace img{
     	return closeRes;
     }
     
-    double RSGISImageUtils::getPixelValue(GDALDataset *image, unsigned int imgBand, double xLoc, double yLoc) throw(RSGISImageException)
+    double RSGISImageUtils::getPixelValue(GDALDataset *image, unsigned int imgBand, double xLoc, double yLoc)
     {
         double outVal = 0.0;
         try
@@ -5432,7 +5432,7 @@ namespace rsgis{namespace img{
         return outVal;
     }
     
-    double RSGISImageUtils::getPixelValue(GDALDataset *image, unsigned int imgBand, unsigned int xPxl, unsigned int yPxl) throw(RSGISImageException)
+    double RSGISImageUtils::getPixelValue(GDALDataset *image, unsigned int imgBand, unsigned int xPxl, unsigned int yPxl)
     {
         double outVal = 0.0;
         try
@@ -5469,7 +5469,7 @@ namespace rsgis{namespace img{
         return outVal;
     }
     
-    void RSGISImageUtils::setPixelValue(GDALDataset *image, unsigned int imgBand, unsigned int xPxl, unsigned int yPxl, double val) throw(RSGISImageException)
+    void RSGISImageUtils::setPixelValue(GDALDataset *image, unsigned int imgBand, unsigned int xPxl, unsigned int yPxl, double val)
     {
         try
         {
@@ -5500,7 +5500,7 @@ namespace rsgis{namespace img{
         }
     }
     
-    void RSGISImageUtils::createImageGrid(GDALDataset *inData, unsigned int numXPxls, unsigned int numYPxls, bool offset) throw(RSGISImageException)
+    void RSGISImageUtils::createImageGrid(GDALDataset *inData, unsigned int numXPxls, unsigned int numYPxls, bool offset)
     {
         //std::cerr << "WARNING: RSGISImageUtils::createImageGrid shouldn't be used; use rsgis::segment::RSGISCreateImageGrid\n";
         try
@@ -5560,7 +5560,7 @@ namespace rsgis{namespace img{
         }
     }
     
-    void RSGISImageUtils::populateImagePixelsInRange(GDALDataset *image, int minVal, int maxVal, bool singleLine) throw(RSGISImageException)
+    void RSGISImageUtils::populateImagePixelsInRange(GDALDataset *image, int minVal, int maxVal, bool singleLine)
     {
         try
         {
@@ -5623,7 +5623,7 @@ namespace rsgis{namespace img{
     }
     
     
-    void RSGISImageUtils::setImageBandNames(GDALDataset *dataset, std::vector<std::string> bandNames, bool quiet) throw(RSGISImageException)
+    void RSGISImageUtils::setImageBandNames(GDALDataset *dataset, std::vector<std::string> bandNames, bool quiet)
     {
         try
         {
