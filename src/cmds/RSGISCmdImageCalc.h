@@ -26,6 +26,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <list>
 
 #include "common/RSGISCommons.h"
 #include "RSGISCmdException.h"
@@ -51,6 +52,7 @@ namespace rsgis{ namespace cmds {
         std::string image;
         std::string name;
         int bandNum;
+        bool defined;
     };
     
     struct DllExport ImageStatsCmds
@@ -89,11 +91,11 @@ namespace rsgis{ namespace cmds {
     };
 
     /** Function to run the band maths tools */
-    DllExport void executeBandMaths(VariableStruct *variables, unsigned int numVars, std::string outputImage, std::string mathsExpression, std::string gdalFormat, RSGISLibDataType outDataType, bool useExpAsbandName)throw(RSGISCmdException);
+    DllExport void executeBandMaths(VariableStruct *variables, unsigned int numVars, std::string outputImage, std::string mathsExpression, std::string gdalFormat, RSGISLibDataType outDataType, bool useExpAsbandName, bool editOutputImg=false)throw(RSGISCmdException);
     /** Function to run the image maths tools */
-    DllExport void executeImageMaths(std::string inputImage, std::string outputImage, std::string mathsExpression, std::string imageFormat, RSGISLibDataType outDataType, bool useExpAsbandName)throw(RSGISCmdException);
+    DllExport void executeImageMaths(std::string inputImage, std::string outputImage, std::string mathsExpression, std::string imageFormat, RSGISLibDataType outDataType, bool useExpAsbandName, bool editOutputImg=false)throw(RSGISCmdException);
     /** Function to run the image band maths tools */
-    DllExport void executeImageBandMaths(std::string inputImage, std::string outputImage, std::string mathsExpression, std::string imageFormat, RSGISLibDataType outDataType, bool useExpAsbandName)throw(RSGISCmdException);
+    DllExport void executeImageBandMaths(std::string inputImage, std::string outputImage, std::string mathsExpression, std::string imageFormat, RSGISLibDataType outDataType, bool useExpAsbandName, bool editOutputImg=false)throw(RSGISCmdException);
     /** Function to run the KMeans tool */
     DllExport void executeKMeansClustering(std::string inputImage, std::string outputMatrixFile, unsigned int numClusters, unsigned int maxNumIterations, unsigned int subSample, bool ignoreZeros, float degreeOfChange, RSGISInitClustererMethods initClusterMethod)throw(RSGISCmdException);
     /** Function to run the KMeans tool */
@@ -140,7 +142,6 @@ namespace rsgis{ namespace cmds {
     DllExport void executeImageBandStats(std::string inputImage, std::string outputFile, bool ignoreZeros)throw(RSGISCmdException);
     /** Function to calculate the statistics for the whole image across all bands */
     DllExport void executeImageStats(std::string inputImage, std::string outputFile, bool ignoreZeros)throw(RSGISCmdException);
-    
     /** Function to undertake an unconstrained linear spectral unmixing of the input image for a set of endmembers */
     DllExport void executeUnconLinearSpecUnmix(std::string inputImage, std::string imageFormat, RSGISLibDataType outDataType, float lsumGain, float lsumOffset, std::string outputFile, std::string endmembersFile)throw(RSGISCmdException);
     /** Function to undertake an exhaustive constrained linear spectral unmixing of the input image for a set of endmembers */

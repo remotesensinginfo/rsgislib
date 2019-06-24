@@ -252,7 +252,6 @@ namespace rsgis{ namespace cmds {
                 throw RSGISFileException(message.c_str());
             }
             OGRSpatialReference* inputSpatialRef = inputVecLayer->GetSpatialRef();
-            OGRFeatureDefn *inFeatureDefn = inputVecLayer->GetLayerDefn();
             
             /////////////////////////////////////
             //

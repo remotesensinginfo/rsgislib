@@ -72,7 +72,7 @@ namespace rsgis{ namespace cmds {
             GDALClose(dataset);
             delete calcSlope;
         }
-        catch(rsgis::RSGISException e)
+        catch(rsgis::RSGISException &e)
         {
             throw RSGISCmdException(e.what());
         }
@@ -124,7 +124,7 @@ namespace rsgis{ namespace cmds {
             GDALClose(dataset);
             delete calcAspect;
         }
-        catch(rsgis::RSGISException e)
+        catch(rsgis::RSGISException &e)
         {
             throw RSGISCmdException(e.what());
         }
@@ -151,7 +151,7 @@ namespace rsgis{ namespace cmds {
             GDALClose(dataset);
             delete catAspect;
         }
-        catch(rsgis::RSGISException e)
+        catch(rsgis::RSGISException &e)
         {
             throw RSGISCmdException(e.what());
         }
@@ -215,7 +215,7 @@ namespace rsgis{ namespace cmds {
             GDALClose(dataset);
             delete calcHillshade;
         }
-        catch(rsgis::RSGISException e)
+        catch(rsgis::RSGISException &e)
         {
             throw RSGISCmdException(e.what());
         }
@@ -277,7 +277,7 @@ namespace rsgis{ namespace cmds {
             GDALClose(dataset);
             delete calcShadowMask;
         }
-        catch(rsgis::RSGISException e)
+        catch(rsgis::RSGISException &e)
         {
             throw RSGISCmdException(e.what());
         }
@@ -329,7 +329,7 @@ namespace rsgis{ namespace cmds {
             GDALClose(dataset);
             delete calcIncidAngle;
         }
-        catch(rsgis::RSGISException e)
+        catch(rsgis::RSGISException &e)
         {
             throw RSGISCmdException(e.what());
         }
@@ -381,7 +381,7 @@ namespace rsgis{ namespace cmds {
             GDALClose(dataset);
             delete calcExitAngle;
         }
-        catch(rsgis::RSGISException e)
+        catch(rsgis::RSGISException &e)
         {
             throw RSGISCmdException(e.what());
         }
@@ -433,7 +433,7 @@ namespace rsgis{ namespace cmds {
             GDALClose(datasets[1]);
             delete[] datasets;
         }
-        catch(rsgis::RSGISException e)
+        catch(rsgis::RSGISException &e)
         {
             throw RSGISCmdException(e.what());
         }
@@ -476,7 +476,7 @@ namespace rsgis{ namespace cmds {
             GDALClose(inValidImgDS);
             GDALClose(outImgDS);
         }
-        catch(rsgis::RSGISException e)
+        catch(rsgis::RSGISException &e)
         {
             throw RSGISCmdException(e.what());
         }
@@ -516,7 +516,7 @@ namespace rsgis{ namespace cmds {
             
             GDALClose(inImgDS);
         }
-        catch(rsgis::RSGISException e)
+        catch(rsgis::RSGISException &e)
         {
             throw RSGISCmdException(e.what());
         }
