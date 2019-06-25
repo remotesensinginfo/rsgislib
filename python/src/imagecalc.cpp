@@ -132,7 +132,7 @@ static PyObject *ImageCalc_ImageMath(PyObject *self, PyObject *args, PyObject *k
     int nDataType;
     int bExpBandName = 0;
     int bOutputImgExists = 0;
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssi|i:imageMath", kwlist, &pszInputImage, &pszOutputFile, &pszExpression, &pszGDALFormat, &nDataType, &bExpBandName, &bOutputImgExists))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssi|ii:imageMath", kwlist, &pszInputImage, &pszOutputFile, &pszExpression, &pszGDALFormat, &nDataType, &bExpBandName, &bOutputImgExists))
     {
         return NULL;
     }
@@ -160,7 +160,7 @@ static PyObject *ImageCalc_ImageBandMath(PyObject *self, PyObject *args, PyObjec
     int nDataType;
     int bExpBandName = 0;
     int bOutputImgExists = 0;
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssi|i:imageBandMath", kwlist, &pszInputImage, &pszOutputFile, &pszExpression, &pszGDALFormat, &nDataType, &bExpBandName, &bOutputImgExists))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssi|ii:imageBandMath", kwlist, &pszInputImage, &pszOutputFile, &pszExpression, &pszGDALFormat, &nDataType, &bExpBandName, &bOutputImgExists))
     {
         return NULL;
     }

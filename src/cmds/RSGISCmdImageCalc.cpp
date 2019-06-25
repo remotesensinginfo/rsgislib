@@ -85,6 +85,7 @@ namespace rsgis{ namespace cmds {
         rsgis::img::RSGISBandMath *bandmaths = NULL;
         rsgis::img::RSGISCalcImage *calcImage = NULL;
         mu::Parser *muParser = new mu::Parser();
+        bool openedOutput = false;
 
         try
         {
@@ -116,7 +117,16 @@ namespace rsgis{ namespace cmds {
             for(std::list<std::string>::iterator iter_filenames = file_names.begin(); iter_filenames != file_names.end(); ++iter_filenames)
             {
                 std::cout << "Image: " << (*iter_filenames) << std::endl;
-                datasets[n_img] = (GDALDataset *) GDALOpen((*iter_filenames).c_str(), GA_ReadOnly);
+                if(editOutputImg && (outputImage == (*iter_filenames).c_str()))
+                {
+                    datasets[n_img] = (GDALDataset *) GDALOpen((*iter_filenames).c_str(), GA_Update);
+                    outDataset = datasets[n_img];
+                    openedOutput = true;
+                }
+                else
+                {
+                    datasets[n_img] = (GDALDataset *) GDALOpen((*iter_filenames).c_str(), GA_ReadOnly);
+                }
                 if(datasets[n_img] == NULL)
                 {
                     std::string message = std::string("Could not open image ") + (*iter_filenames);
@@ -128,7 +138,7 @@ namespace rsgis{ namespace cmds {
                 {
                     if((variables[i].image == (*iter_filenames)) & !variables[i].defined)
                     {
-                        std::cout << "\t Variable '" << variables[i].name << " is band " << variables[i].bandNum << std::endl;
+                        std::cout << "\t Variable '" << variables[i].name << "' is band " << variables[i].bandNum << std::endl;
                         if((variables[i].bandNum < 0) | (variables[i].bandNum > numRasterBands))
                         {
                             std::string message = std::string("You have specified a band for variable ") + variables[i].name + std::string("' which is not within the image ") + variables[i].image;
@@ -165,7 +175,10 @@ namespace rsgis{ namespace cmds {
             
             if(editOutputImg)
             {
-                outDataset = (GDALDataset *) GDALOpen(outputImage.c_str(), GA_Update);
+                if(!openedOutput)
+                {
+                    outDataset = (GDALDataset *) GDALOpen(outputImage.c_str(), GA_Update);
+                }
                 if(outDataset == NULL)
                 {
                     std::string message = std::string("Could not open image ") + outputImage;
@@ -205,7 +218,7 @@ namespace rsgis{ namespace cmds {
             {
                 delete[] outBandName;
             }
-            if(editOutputImg)
+            if(editOutputImg && (!openedOutput))
             {
                 GDALClose(outDataset);
             }
@@ -237,7 +250,8 @@ namespace rsgis{ namespace cmds {
         rsgis::img::RSGISImageMaths *imageMaths = NULL;
         rsgis::img::RSGISCalcImage *calcImage = NULL;
         mu::Parser *muParser = new mu::Parser();
-
+        bool openedOutput = false;
+        
         try
         {
             std::string *outBandName = NULL;
@@ -248,8 +262,18 @@ namespace rsgis{ namespace cmds {
             }
             
             datasets = new GDALDataset*[1];
-
-            datasets[0] = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+            
+            if(editOutputImg && (inputImage == outputImage))
+            {
+                datasets[0] = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_Update);
+                outDataset = datasets[0];
+                openedOutput = true;
+            }
+            else
+            {
+                datasets[0] = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+            }
+            
             if(datasets[0] == NULL)
             {
                 std::string message = std::string("Could not open image ") + inputImage;
@@ -260,7 +284,10 @@ namespace rsgis{ namespace cmds {
             
             if(editOutputImg)
             {
-                outDataset = (GDALDataset *) GDALOpen(outputImage.c_str(), GA_Update);
+                if(!openedOutput)
+                {
+                    outDataset = (GDALDataset *) GDALOpen(outputImage.c_str(), GA_Update);
+                }
                 if(outDataset == NULL)
                 {
                     std::string message = std::string("Could not open image ") + outputImage;
@@ -288,7 +315,7 @@ namespace rsgis{ namespace cmds {
             GDALClose(datasets[0]);
             delete[] datasets;
             
-            if(editOutputImg)
+            if(editOutputImg && !openedOutput)
             {
                 GDALClose(outDataset);
             }
@@ -331,6 +358,7 @@ namespace rsgis{ namespace cmds {
         rsgis::img::RSGISCalcImage *calcImage = NULL;
         mu::Parser *muParser = new mu::Parser();
         rsgis::math::RSGISMathsUtils mathUtils;
+        bool openedOutput = false;
         
         try
         {
@@ -343,7 +371,17 @@ namespace rsgis{ namespace cmds {
             
             datasets = new GDALDataset*[1];
             
-            datasets[0] = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+            if(editOutputImg && (inputImage == outputImage))
+            {
+                datasets[0] = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_Update);
+                outDataset = datasets[0];
+                openedOutput = true;
+            }
+            else
+            {
+                datasets[0] = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+            }
+            
             if(datasets[0] == NULL)
             {
                 std::string message = std::string("Could not open image ") + inputImage;
@@ -354,7 +392,10 @@ namespace rsgis{ namespace cmds {
             
             if(editOutputImg)
             {
-                outDataset = (GDALDataset *) GDALOpen(outputImage.c_str(), GA_Update);
+                if(!openedOutput)
+                {
+                    outDataset = (GDALDataset *) GDALOpen(outputImage.c_str(), GA_Update);
+                }
                 if(outDataset == NULL)
                 {
                     std::string message = std::string("Could not open image ") + outputImage;
@@ -394,7 +435,7 @@ namespace rsgis{ namespace cmds {
                 delete[] outBandName;
             }
             
-            if(editOutputImg)
+            if(editOutputImg && !openedOutput)
             {
                 GDALClose(outDataset);
             }
