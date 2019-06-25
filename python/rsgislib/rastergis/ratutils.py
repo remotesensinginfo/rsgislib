@@ -239,8 +239,6 @@ Example::
         t.end()
 
 
-
-
 def calcPlotGaussianHistoModel(clumpsFile, outGausH5File, outHistH5File, outPlotFile, varCol, binWidth, classColumn, classVal, plotTitle):
     """ Extracts a column from the RAT, masking by a class calculating the histogram and 
         fitting a Gaussian mixture model to the histogram. Outputs include a plot and HDF5
@@ -346,8 +344,7 @@ Example::
     gausFile.close()
     histFile.close()
     
-    
-    
+
 def findChangeClumpsHistSkewKurtTest(inputClumps, inClassCol, classOfInterest, changeVarCol, outChangeFeatCol, noDataVals=[], thresMeasure=RSGISRATThresMeasure.auto, exportPlot=None, showAllThreshPlot=False):
     """
 This function identifies potential change features from both sides of the histogram 
@@ -573,7 +570,8 @@ Return:
     
     ratDataset = None
     return [lowerThres, upperThres]
-    
+
+
 def findChangeClumpsHistSkewKurtTestLower(inputClumps, inClassCol, classOfInterest, changeVarCol, outChangeFeatCol, noDataVals=[], thresMeasure=RSGISRATThresMeasure.auto, exportPlot=None, showAllThreshPlot=False):
     """
 This function identifies potential change features from just the lower (left) side of the histogram 
@@ -780,6 +778,7 @@ Return:
     
     ratDataset = None
     return [lowerThres, upperThres]
+
 
 def findChangeClumpsHistSkewKurtTestUpper(inputClumps, inClassCol, classOfInterest, changeVarCol, outChangeFeatCol, noDataVals=[], thresMeasure=RSGISRATThresMeasure.auto, exportPlot=None, showAllThreshPlot=False):
     """
@@ -1003,6 +1002,7 @@ class RSGISRATChangeVarInfo:
         self.lowerThreshold = lowerThreshold
         self.upperThreshold = upperThreshold
 
+
 def findChangeClumpsHistSkewKurtTestVoteMultiVars(inputClumps, inClassCol, classOfInterest, outChangeFeatCol, vars=[]):
     """
 A function to call one of the findChangeClumpsHistSkewKurtTest functions for multiple 
@@ -1057,6 +1057,7 @@ Where:
     
     rat.writeColumn(ratDataset, outChangeFeatCol, changeVote)
     ratDataset = None
+
 
 def findClumpsWithinExistingThresholds(inputClumps, inClassCol, classOfInterest, outFeatsCol, vars=[]):
     """
@@ -1118,6 +1119,7 @@ def _ratapplier_defClassNames(info, inputs, outputs, otherargs):
         classNames = numpy.where((classNum == key), otherargs.classNamesDict[key], classNames)
 
     setattr(outputs.outrat, otherargs.classNameCol, classNames)
+
 
 def defineClassNames(clumps, classNumCol, classNameCol, classNamesDict):
     """
@@ -1275,7 +1277,6 @@ Where:
     if createdDIR:
         shutil.rmtree(tmpPath)
     
-
 
 def createClumpsSHPBBOX(clumpsImg, minXCol, maxXCol, minYCol, maxYCol, outShpLyrName, roundInt=False, ignoreFirstRow=False):
     """

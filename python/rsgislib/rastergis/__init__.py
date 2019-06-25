@@ -157,6 +157,42 @@ A function which returns a list of column names within the RAT.
     return col_names
 
 
+def getRATColumnsInfo(clumps_img, rat_band=1):
+    """
+A function which returns a dictionary of column names with type (GFT_Integer, GFT_Real, GFT_String)
+and usage (e.g., GFU_Generic, GFU_PixelCount, GFU_Name, etc.) within the RAT.
+
+* clumps_img - path to the image file with the RAT
+* rat_band - the band within the image file for which the RAT is to read.
+
+"""
+    # Open input image file
+    clumps_img_ds = gdal.Open(clumps_img, gdal.GA_ReadOnly)
+    if clumps_img_ds is None:
+        raise Exception("Could not open the inputted clumps image.")
+
+    clumps_img_band = clumps_img_ds.GetRasterBand(rat_band)
+    if clumps_img_band is None:
+        raise Exception("Could not open the inputted clumps image band.")
+
+    clumps_img_rat = clumps_img_band.GetDefaultRAT()
+    if clumps_img_rat is None:
+        raise Exception("Could not open the inputted clumps image band RAT.")
+
+    ncols = clumps_img_rat.GetColumnCount()
+    col_info = dict()
+    for col_idx in range(ncols):
+        col_name = clumps_img_rat.GetNameOfCol(col_idx)
+        col_type = clumps_img_rat.GetTypeOfCol(col_idx)
+        col_usage = clumps_img_rat.GetUsageOfCol(col_idx)
+        col_info[col_name] = dict()
+        col_info[col_name]['type'] = col_type
+        col_info[col_name]['usage'] = col_usage
+
+    clumps_img_ds = None
+    return col_info
+
+
 def readRATNeighbours(clumps_img, start_row=None, end_row=None, rat_band=1):
     """
 A function which returns a list of clumps neighbours from a KEA RAT. Note, the
@@ -170,7 +206,7 @@ and end_row variables can be used to read a subset of the RAT.
 * rat_band - the band within the image file for which the RAT is to read.
 
 """
-    if not haveH5PY:
+    if not haveHDF5:
         raise Exception("Need the h5py library for this function")
        
     # Check that 'NumNeighbours' column exists
