@@ -289,7 +289,6 @@ Where:
     gdalImgMaskData = None
     imgMaskBand = None
     if maskImg is not None:
-        print("Using mask")
         gdalImgMaskData = gdal.Open(maskImg)
         imgMaskBand = gdalImgData.GetRasterBand(imgMaskBandNo)
 
@@ -315,10 +314,10 @@ Where:
         gdalImgMaskData = None
 
 
-def polygoniseRaster2VecLyr(outvec, outlyr, vecdrv, inputImg, imgBandNo=1, maskImg=None, imgMaskBandNo=1):
+def polygoniseRaster2VecLyr(outvec, outlyr, vecdrv, inputImg, imgBandNo=1, maskImg=None, imgMaskBandNo=1, replace=True):
     """ 
-A utillity to polygonise a raster to a OGR vector layer. 
-    
+A utility to polygonise a raster to a OGR vector layer.
+
 Where:
 
 * outvec is a string specifying the output vector file path. If it exists it will be deleted and overwritten.
@@ -328,40 +327,46 @@ Where:
 * imgBandNo is an int specifying the image band to be polygonised. (default = 1)
 * maskImg is an optional string mask file specifying a no data mask (default = None)
 * imgMaskBandNo is an int specifying the image band to be used the mask (default = 1)
+* replace is a boolean specifying whether the vector layer should be replaced (i.e., overwritten). Default=True.
 
 """
     gdal.UseExceptions()
-    
-    gdalImgData = gdal.Open(inputImg)
-    imgBand = gdalImgData.GetRasterBand(imgBandNo)
+
+    gdalImgDS = gdal.Open(inputImg)
+    imgBand = gdalImgDS.GetRasterBand(imgBandNo)
     imgsrs = osr.SpatialReference()
-    imgsrs.ImportFromWkt(gdalImgData.GetProjectionRef())
-    
-    gdalImgMaskData = None
+    imgsrs.ImportFromWkt(gdalImgDS.GetProjectionRef())
+
+    gdalImgMaskDS = None
     imgMaskBand = None
     if maskImg is not None:
-        print("Using mask")
-        gdalImgMaskData = gdal.Open(maskImg)
-        imgMaskBand = gdalImgData.GetRasterBand(imgMaskBandNo)
+        gdalImgMaskDS = gdal.Open(maskImg)
+        imgMaskBand = gdalImgMaskDS.GetRasterBand(imgMaskBandNo)
 
-    
-    driver = ogr.GetDriverByName(vecdrv)
-    if os.path.exists(outvec):
-        driver.DeleteDataSource(outvec)
-    outDatasource = driver.CreateDataSource(outvec)
-    outLayer = outDatasource.CreateLayer(outlyr, srs=imgsrs)
-    
+    if os.path.exists(outvec) and (not replace):
+        vecDS = gdal.OpenEx(outvec, gdal.GA_Update)
+    else:
+        outdriver = ogr.GetDriverByName(vecdrv)
+        if os.path.exists(vecdrv):
+            outdriver.DeleteDataSource(vecdrv)
+        vecDS = outdriver.CreateDataSource(outvec)
+
+    if vecDS is None:
+        raise Exception("Could not open or create '{}'".format(outvec))
+
+    outLayer = vecDS.CreateLayer(outlyr, srs=imgsrs)
+
     newField = ogr.FieldDefn('PXLVAL', ogr.OFTInteger)
     outLayer.CreateField(newField)
     dstFieldIdx = outLayer.GetLayerDefn().GetFieldIndex('PXLVAL')
-    
+
     print("Polygonising...")
-    gdal.Polygonize(imgBand, imgMaskBand, outLayer, dstFieldIdx, [], callback=gdal.TermProgress )
+    gdal.Polygonize(imgBand, imgMaskBand, outLayer, dstFieldIdx, [], callback=gdal.TermProgress)
     print("Completed")
-    outDatasource.Destroy()
-    gdalImgData = None
+    vecDS.Destroy()
+    gdalImgDS = None
     if maskImg is not None:
-        gdalImgMaskData = None
+        gdalImgMaskDS = None
 
 
 def writeVecColumn(vectorFile, vectorLayer, colName, colDataType, colData):
@@ -415,7 +420,7 @@ Example::
         if not colExists:
             field_defn = ogr.FieldDefn( colName, colDataType )
             if lyr.CreateField ( field_defn ) != 0:
-                raise Exception("Creating '" + colName + "' field failed; becareful with case, some drivers are case insensitive but column might not be found.\n")
+                raise Exception("Creating '" + colName + "' field failed; becareful with case, some drivers are case insensitive but column might not be found.")
         
         lyr.ResetReading()
         # WORK AROUND AS SQLITE GETS STUCK IN LOOP ON FIRST FEATURE WHEN USE SETFEATURE.
@@ -1922,7 +1927,6 @@ multiple layers. A shapefile which only supports 1 layer will not work.
             createPolyVecBBOXs(out_vec, out_vec_lyr, vec_drv, out_epsg_code, bboxs)
 
 
-
 def createPolyVecBBOXs(vectorFile, vectorLyr, vecDriver, epsgCode, bboxs, atts=None, attTypes=None, overwrite=True):
     """
 This function creates a set of polygons for a set of bounding boxes. 
@@ -2351,6 +2355,7 @@ Create a vector layer of the polygon centroids.
     vecDS = None
     result_ds = None
 
+
 def lstveclyrcols(vecfile, veclyr):
     """
 A function which returns a list of columns from the input vector layer.
@@ -2638,3 +2643,159 @@ def queryFileLUT(lut_file, lut_lyr, roi_file, roi_lyr, out_dest, targz_out, cp_c
             out_cmds.append(filepath)
 
     return out_cmds
+
+
+def ogrVectorColDataTypeFromGDALRATColType(rat_datatype):
+    """
+Returns the data type to create a column in a OGR vector layer for equalivant to
+rat_datatype.
+
+:param rat_datatype: the datatype (GFT_Integer, GFT_Real, GFT_String) for the RAT column.
+:return: OGR datatype (OFTInteger, OFTReal, OFTString)
+
+"""
+    if rat_datatype == gdal.GFT_Integer:
+        rtn_type = ogr.OFTInteger
+    elif rat_datatype == gdal.GFT_Real:
+        rtn_type = ogr.OFTReal
+    elif rat_datatype == gdal.GFT_String:
+        rtn_type = ogr.OFTString
+    else:
+        raise Exception("Do not recognise inputted datatype")
+    return rtn_type
+
+
+def copyRATCols2VectorLyr(vec_file, vec_lyr, rat_row_col, clumps_img, ratcols, outcolnames=None, outcoltypes=None):
+    """
+    A function to copy columns from RAT to a vector layer. Note, the vector layer needs a column, which already exists,
+    that specifies the row from the RAT the feature is related to. If you created the vector using the polygonise
+    function then that column will have been created and called 'PXLVAL'.
+
+    :param vec_file: The vector file to be used.
+    :param vec_lyr: The name of the layer within the vector file.
+    :param rat_row_col: The column in the layer which specifies the RAT row the feature corresponds with.
+    :param clumps_img: The clumps image with the RAT from which information should be taken.
+    :param ratcols: The names of the columns in the RAT to be copied.
+    :param outcolnames: If you do not want the same column names as the RAT then you can specify alternatives. If None
+                        then the names will be the same as the RAT. (Default = None)
+    :param outcoltypes: The data types used for the columns in vector layer. If None then matched to RAT.
+                        Default is None
+
+    """
+    gdal.UseExceptions()
+    from rios import rat
+
+    if outcolnames is None:
+        outcolnames = ratcols
+    else:
+        if len(outcolnames) != len(ratcols):
+            raise Exception("The output columns names list is not the same length ({}) as the length of "
+                            "the RAT columns list ({}) - they must be the same.".format(len(outcolnames), len(ratcols)))
+
+    if outcoltypes is not None:
+        if len(outcolnames) == len(outcoltypes):
+            raise Exception("Either specify the column types as None or the length of the list needs to be "
+                            "the same as the number output columns.")
+
+    if not os.path.exists(vec_file):
+        raise Exception("Input vector does not exist, check path: {}".format(vec_file))
+
+    clumps_img_ds = gdal.Open(clumps_img, gdal.GA_ReadOnly)
+    if clumps_img_ds is None:
+        raise Exception("Could not open the inputted clumps image: {}".format(clumps_img))
+
+    vecDS = gdal.OpenEx(vec_file, gdal.GA_Update)
+    if vecDS is None:
+        raise Exception("Could not open '{}'".format(vec_file))
+
+    vec_lyr_obj = vecDS.GetLayerByName(vec_lyr)
+    if vec_lyr_obj is None:
+        raise Exception("Could not find layer '" + vec_file + "'")
+
+    rat_cols_all = rsgislib.rastergis.getRATColumnsInfo(clumps_img)
+
+    cols_exist = []
+    for ratcol in ratcols:
+        if ratcol not in rat_cols_all:
+            raise Exception("Column '{}' is not within the clumps image: {}".format(ratcol, clumps_img))
+        cols_exist.append(False)
+
+    if outcoltypes is None:
+        outcoltypes = []
+        for colname in ratcols:
+            rat_type = rat_cols_all[colname]['type']
+            ogr_type = ogrVectorColDataTypeFromGDALRATColType(rat_type)
+            outcoltypes.append(ogr_type)
+
+    lyrDefn = vec_lyr_obj.GetLayerDefn()
+
+    rat_row_col_exists = False
+    for i in range(lyrDefn.GetFieldCount()):
+        if lyrDefn.GetFieldDefn(i).GetName().lower() == rat_row_col.lower():
+            rat_row_col_exists = True
+            break
+    if not rat_row_col_exists:
+        raise Exception("Could not find column '{}' within the vector layers.".format(rat_row_col))
+
+    for i in range(lyrDefn.GetFieldCount()):
+        col_n = 0
+        for colname in outcolnames:
+            if lyrDefn.GetFieldDefn(i).GetName().lower() == colname.lower():
+                cols_exist[col_n] = True
+                break
+            col_n = col_n + 1
+
+    col_n = 0
+    for colname in outcolnames:
+        if not cols_exist[col_n]:
+            field_defn = ogr.FieldDefn(colname, outcoltypes[col_n])
+            if vec_lyr_obj.CreateField(field_defn) != 0:
+                raise Exception(
+                    "Creating '{}' field failed; becareful with case, some drivers are case insensitive but column might not be found.".format(
+                        colname))
+
+            cols_exist[col_n] = True
+        col_n = col_n + 1
+
+    # Read in the RAT columns
+    rat_cols_data = []
+    for colname in ratcols:
+        rat_cols_data.append(rat.readColumn(clumps_img_ds, colname))
+
+    vec_lyr_obj.ResetReading()
+    # WORK AROUND AS SQLITE GETS STUCK IN LOOP ON FIRST FEATURE WHEN USE SETFEATURE.
+    fids = []
+    for feat in vec_lyr_obj:
+        fids.append(feat.GetFID())
+
+    openTransaction = False
+    vec_lyr_obj.ResetReading()
+    i = 0
+    # WORK AROUND AS SQLITE GETS STUCK IN LOOP ON FIRST FEATURE WHEN USE SETFEATURE.
+    for fid in fids:
+        if not openTransaction:
+            vec_lyr_obj.StartTransaction()
+            openTransaction = True
+        feat = vec_lyr_obj.GetFeature(fid)
+        if feat is not None:
+            rat_row = feat.GetFieldAsInteger(rat_row_col)
+            for n_col in range(len(outcolnames)):
+                if outcoltypes[n_col] == ogr.OFTInteger:
+                    feat.SetField("{}".format(outcolnames[n_col]), int(rat_cols_data[n_col][rat_row]))
+                elif outcoltypes[n_col] == ogr.OFTReal:
+                    feat.SetField("{}".format(outcolnames[n_col]), float(rat_cols_data[n_col][rat_row]))
+                elif outcoltypes[n_col] == ogr.OFTString:
+                    feat.SetField("{}".format(outcolnames[n_col]), "{}".format(rat_cols_data[n_col][rat_row]))
+                else:
+                    feat.SetField("{}".format(outcolnames[n_col]), rat_cols_data[n_col][rat_row])
+            vec_lyr_obj.SetFeature(feat)
+        if ((i % 20000) == 0) and openTransaction:
+            vec_lyr_obj.CommitTransaction()
+            openTransaction = False
+        i = i + 1
+    if openTransaction:
+        vec_lyr_obj.CommitTransaction()
+        openTransaction = False
+    vec_lyr_obj.SyncToDisk()
+    vecDS = None
+    clumps_img_ds = None
