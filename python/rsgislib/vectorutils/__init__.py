@@ -308,14 +308,15 @@ Where:
     print("Polygonising...")
     gdal.Polygonize(imgBand, imgMaskBand, outLayer, dstFieldIdx, [], callback=gdal.TermProgress )
     print("Completed")
-    outDatasource.Destroy()
+    outLayer.SyncToDisk()
+    outDatasource = None
     gdalImgData = None
     if maskImg is not None:
         gdalImgMaskData = None
 
 
 def polygoniseRaster2VecLyr(outvec, outlyr, vecdrv, inputImg, imgBandNo=1, maskImg=None, imgMaskBandNo=1,
-                            replace_file=True, replace_lyr=True):
+                            replace_file=True, replace_lyr=True, pxl_val_fieldname='PXLVAL'):
     """ 
 A utility to polygonise a raster to a OGR vector layer.
 
@@ -330,6 +331,8 @@ Where:
 * imgMaskBandNo is an int specifying the image band to be used the mask (default = 1)
 * replace_file is a boolean specifying whether the vector file should be replaced (i.e., overwritten). Default=True.
 * replace_lyr is a boolean specifying whether the vector layer should be replaced (i.e., overwritten). Default=True.
+* pxl_val_fieldname is a string to specify the name of the output column representing the pixel value within the
+                    input image.
 
 """
     gdal.UseExceptions()
@@ -362,14 +365,15 @@ Where:
 
     outLayer = vecDS.CreateLayer(outlyr, srs=imgsrs, options=lcl_options)
 
-    newField = ogr.FieldDefn('PXLVAL', ogr.OFTInteger)
+    newField = ogr.FieldDefn(pxl_val_fieldname, ogr.OFTInteger)
     outLayer.CreateField(newField)
-    dstFieldIdx = outLayer.GetLayerDefn().GetFieldIndex('PXLVAL')
+    dstFieldIdx = outLayer.GetLayerDefn().GetFieldIndex(pxl_val_fieldname)
 
     print("Polygonising...")
     gdal.Polygonize(imgBand, imgMaskBand, outLayer, dstFieldIdx, [], callback=gdal.TermProgress)
     print("Completed")
-    vecDS.Destroy()
+    outLayer.SyncToDisk()
+    vecDS = None
     gdalImgDS = None
     if maskImg is not None:
         gdalImgMaskDS = None
