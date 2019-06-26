@@ -314,7 +314,8 @@ Where:
         gdalImgMaskData = None
 
 
-def polygoniseRaster2VecLyr(outvec, outlyr, vecdrv, inputImg, imgBandNo=1, maskImg=None, imgMaskBandNo=1, replace=True):
+def polygoniseRaster2VecLyr(outvec, outlyr, vecdrv, inputImg, imgBandNo=1, maskImg=None, imgMaskBandNo=1,
+                            replace_file=True, replace_lyr=True):
     """ 
 A utility to polygonise a raster to a OGR vector layer.
 
@@ -327,7 +328,8 @@ Where:
 * imgBandNo is an int specifying the image band to be polygonised. (default = 1)
 * maskImg is an optional string mask file specifying a no data mask (default = None)
 * imgMaskBandNo is an int specifying the image band to be used the mask (default = 1)
-* replace is a boolean specifying whether the vector layer should be replaced (i.e., overwritten). Default=True.
+* replace_file is a boolean specifying whether the vector file should be replaced (i.e., overwritten). Default=True.
+* replace_lyr is a boolean specifying whether the vector layer should be replaced (i.e., overwritten). Default=True.
 
 """
     gdal.UseExceptions()
@@ -343,7 +345,7 @@ Where:
         gdalImgMaskDS = gdal.Open(maskImg)
         imgMaskBand = gdalImgMaskDS.GetRasterBand(imgMaskBandNo)
 
-    if os.path.exists(outvec) and (not replace):
+    if os.path.exists(outvec) and (not replace_file):
         vecDS = gdal.OpenEx(outvec, gdal.GA_Update)
     else:
         outdriver = ogr.GetDriverByName(vecdrv)
@@ -354,7 +356,11 @@ Where:
     if vecDS is None:
         raise Exception("Could not open or create '{}'".format(outvec))
 
-    outLayer = vecDS.CreateLayer(outlyr, srs=imgsrs)
+    lcl_options = []
+    if replace_lyr:
+        lcl_options = ['OVERWRITE=YES']
+
+    outLayer = vecDS.CreateLayer(outlyr, srs=imgsrs, options=lcl_options)
 
     newField = ogr.FieldDefn('PXLVAL', ogr.OFTInteger)
     outLayer.CreateField(newField)
