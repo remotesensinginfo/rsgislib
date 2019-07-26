@@ -770,7 +770,7 @@ A function to extract an image footprint as a vector.
     vecLayerName = os.path.splitext(os.path.basename(outVecTmpFile))[0]
     ds = gdal.OpenEx(outVecTmpFile, gdal.OF_READONLY )
     if ds is None:
-        raise Exception("Could not open '" + vectorFile + "'")
+        raise Exception("Could not open '" + outVecTmpFile + "'")
     
     lyr = ds.GetLayerByName( vecLayerName )
     if lyr is None:
@@ -2139,7 +2139,7 @@ When creating an attribute the available data types are ogr.OFTString, ogr.OFTIn
             for i in range(nAtts):
                 if attTypes['names'][i] not in atts:
                     raise Exception('"{}" is not within atts'.format(attTypes['names'][i]))
-                if len(atts[attTypes['names'][i]]) != len(bboxs):
+                if len(atts[attTypes['names'][i]]) != len(ptsX):
                     raise Exception('"{}" in atts does not have the same len as bboxs'.format(attTypes['names'][i]))
                     
             for i in range(nAtts):       
@@ -2229,7 +2229,7 @@ Create a vector layer look up table (LUT) for a directory of images.
 * imgList - list of input images for the LUT. All input images should be the same projection/coordinate system.
 * vectorFile - output vector file/path
 * vectorLyr - output vector layer
-* vecDriver - the output vector layer type.
+* vecDriver - the output vector layer type (e.g., GPKG).
 * ignore_none_imgs - if a NULL epsg is returned from an image then ignore and don't include in LUT else throw exception.
 * out_proj_wgs84 - if True then the image bounding boxes will be re-projected to EPSG:4326.
 * overwrite_lut_file if True then output file will be overwritten. If false then not, e.g., can add extra layer to GPKG
@@ -2239,7 +2239,7 @@ Example::
     import glob
     import rsgislib.vectorutils
     imgList = glob.glob('/Users/pete/Temp/GabonLandsat/Hansen*.kea')
-    rsgislib.vectorutils.createImgExtentLUT(imgList, './ImgExtents.shp', 'ImgExtents', 'ESRI Shapefile')
+    rsgislib.vectorutils.createImgExtentLUT(imgList, './ImgExtents.gpkg', 'HansenImgExtents', 'GPKG')
 
 """
     gdal.UseExceptions()

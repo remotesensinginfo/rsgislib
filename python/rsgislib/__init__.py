@@ -1347,7 +1347,7 @@ class RSGISPyUtils (object):
         import numpy
         return numpy.min(x) < 0 and numpy.max(x) >= 0
 
-    def negative(x):
+    def negative(self, x):
         """
         Is the maximum number in the list negative.
         :param x: list of values
