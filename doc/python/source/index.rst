@@ -34,6 +34,7 @@ Python documentation
 
    rsgislib
    rsgislib_calibration
+   rsgislib_changedetection
    rsgislib_classification
    rsgislib_datacube
    rsgislib_elevation
