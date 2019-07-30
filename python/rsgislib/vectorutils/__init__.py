@@ -405,42 +405,42 @@ Example::
 """
     gdal.UseExceptions()
     
+    ds = gdal.OpenEx(vectorFile, gdal.OF_UPDATE )
+    if ds is None:
+        raise Exception("Could not open '" + vectorFile + "'")
+
+    lyr = ds.GetLayerByName( vectorLayer )
+    if lyr is None:
+        raise Exception("Could not find layer '" + vectorLayer + "'")
+
+    numFeats = lyr.GetFeatureCount()
+    if not len(colData) == numFeats:
+        print("Number of Features: " + str(numFeats))
+        print("Length of Data: " + str(len(colData)))
+        raise Exception( "The number of features and size of the input data is not equal." )
+
+    colExists = False
+    lyrDefn = lyr.GetLayerDefn()
+    for i in range( lyrDefn.GetFieldCount() ):
+        if lyrDefn.GetFieldDefn(i).GetName().lower() == colName.lower():
+            colExists = True
+            break
+
+    if not colExists:
+        field_defn = ogr.FieldDefn( colName, colDataType )
+        if lyr.CreateField ( field_defn ) != 0:
+            raise Exception("Creating '" + colName + "' field failed; becareful with case, some drivers are case insensitive but column might not be found.")
+
+    lyr.ResetReading()
+    # WORK AROUND AS SQLITE GETS STUCK IN LOOP ON FIRST FEATURE WHEN USE SETFEATURE.
+    fids=[]
+    for feat in lyr:
+        fids.append(feat.GetFID())
+
+    openTransaction = False
+    lyr.ResetReading()
+    i = 0
     try:
-        ds = gdal.OpenEx(vectorFile, gdal.OF_UPDATE )
-        if ds is None:
-            raise Exception("Could not open '" + vectorFile + "'")
-        
-        lyr = ds.GetLayerByName( vectorLayer )
-        if lyr is None:
-            raise Exception("Could not find layer '" + vectorLayer + "'")
-        
-        numFeats = lyr.GetFeatureCount()
-        if not len(colData) == numFeats:
-            print("Number of Features: " + str(numFeats))
-            print("Length of Data: " + str(len(colData)))
-            raise Exception( "The number of features and size of the input data is not equal." )
-    
-        colExists = False
-        lyrDefn = lyr.GetLayerDefn()
-        for i in range( lyrDefn.GetFieldCount() ):
-            if lyrDefn.GetFieldDefn(i).GetName().lower() == colName.lower():
-                colExists = True
-                break
-    
-        if not colExists:
-            field_defn = ogr.FieldDefn( colName, colDataType )
-            if lyr.CreateField ( field_defn ) != 0:
-                raise Exception("Creating '" + colName + "' field failed; becareful with case, some drivers are case insensitive but column might not be found.")
-        
-        lyr.ResetReading()
-        # WORK AROUND AS SQLITE GETS STUCK IN LOOP ON FIRST FEATURE WHEN USE SETFEATURE.
-        fids=[]
-        for feat in lyr:
-            fids.append(feat.GetFID())
-        
-        openTransaction = False
-        lyr.ResetReading()
-        i = 0
         # WORK AROUND AS SQLITE GETS STUCK IN LOOP ON FIRST FEATURE WHEN USE SETFEATURE.
         for fid in fids:
             if not openTransaction:
