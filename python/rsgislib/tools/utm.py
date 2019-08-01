@@ -1,3 +1,4 @@
+#! /usr/bin/env python
 """
 The tools.utm module contains some useful tools for work with UTM projection.
 
