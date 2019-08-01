@@ -46,6 +46,7 @@ Python documentation
    rsgislib_imageutils
    rsgislib_rastergis
    rsgislib_segmentation
+   rsgislib_timeseries
    rsgislib_tools
    rsgislib_vectorutils
    rsgislib_zonalstats
