@@ -663,10 +663,6 @@ Return:
             ID = ID[vals != noDataVal]
             vals = vals[vals != noDataVal]
 
-        
-    #print(ID)
-    #print(vals)
-    
     n = vals.shape[0]
     lq = numpy.percentile(vals, 25)
     uq = numpy.percentile(vals, 75)
@@ -693,32 +689,21 @@ Return:
     lowBins = numpy.zeros((lqNumBins), dtype=numpy.int)
     
     for lowBin in range(lqNumBins):
-        #print("Bin [" + str(lowBin) + ", " + str(numBins-upBin) + "]")
         histTmp = hist[lowBin:-1]
-        #print(histTmp)
-        #print(histTmp.shape)
         lowBins[lowBin] = lowBin
         
         kurtosisVals[lowBin] = scipy.stats.kurtosis(histTmp)
         skewnessVals[lowBin] = scipy.stats.skew(histTmp)
-            
-    
-    #print(kurtosisVals)
-    #print(skewnessVals)
+
     kurtosisValsAbs = numpy.absolute(kurtosisVals)
     skewnessValsAbs = numpy.absolute(skewnessVals)
     print("Kurtosis Range: [" + str(numpy.min(kurtosisValsAbs)) + ", " + str(numpy.max(kurtosisValsAbs)) + "]") 
     print("Skewness Range: [" + str(numpy.min(skewnessValsAbs)) + ", " + str(numpy.max(skewnessValsAbs)) + "]") 
     kurtosisValsNorm = (kurtosisValsAbs-numpy.min(kurtosisValsAbs)) / (numpy.max(kurtosisValsAbs)-numpy.min(kurtosisValsAbs))
     skewnessValsNorm = (skewnessValsAbs-numpy.min(skewnessValsAbs)) / (numpy.max(skewnessValsAbs)-numpy.min(skewnessValsAbs))
-    
-    #print("Kurtosis Norm Range: [" + str(numpy.min(kurtosisValsNorm)) + ", " + str(numpy.max(kurtosisValsNorm)) + "]") 
-    #print("Skewness Norm Range: [" + str(numpy.min(skewnessValsNorm)) + ", " + str(numpy.max(skewnessValsNorm)) + "]") 
-    
+
     combined = kurtosisValsNorm + skewnessValsNorm
-    #combined = kurtosisValsAbs + skewnessValsAbs
-    #print(combined)
-    
+
     minKurt = numpy.argmin(kurtosisValsAbs)
     minSkew = numpy.argmin(skewnessValsAbs)
     minComb = numpy.argmin(combined)
@@ -870,9 +855,6 @@ Return:
         for noDataVal in noDataVals:
             ID = ID[vals != noDataVal]
             vals = vals[vals != noDataVal]
-        
-    #print(ID)
-    #print(vals)
     
     n = vals.shape[0]
     lq = numpy.percentile(vals, 25)
@@ -900,31 +882,20 @@ Return:
     upBins = numpy.zeros((uqNumBins), dtype=numpy.int)
     
     for upBin in range(uqNumBins):
-        #print("Bin [" + str(lowBin) + ", " + str(numBins-upBin) + "]")
         histTmp = hist[0:(numBins-upBin)]
-        #print(histTmp)
-        #print(histTmp.shape)
         upBins[upBin] = numBins-upBin
         
         kurtosisVals[upBin] = scipy.stats.kurtosis(histTmp)
         skewnessVals[upBin] = scipy.stats.skew(histTmp)
-        
-    
-    #print(kurtosisVals)
-    #print(skewnessVals)
+
     kurtosisValsAbs = numpy.absolute(kurtosisVals)
     skewnessValsAbs = numpy.absolute(skewnessVals)
     print("Kurtosis Range: [" + str(numpy.min(kurtosisValsAbs)) + ", " + str(numpy.max(kurtosisValsAbs)) + "]") 
     print("Skewness Range: [" + str(numpy.min(skewnessValsAbs)) + ", " + str(numpy.max(skewnessValsAbs)) + "]") 
     kurtosisValsNorm = (kurtosisValsAbs-numpy.min(kurtosisValsAbs)) / (numpy.max(kurtosisValsAbs)-numpy.min(kurtosisValsAbs))
     skewnessValsNorm = (skewnessValsAbs-numpy.min(skewnessValsAbs)) / (numpy.max(skewnessValsAbs)-numpy.min(skewnessValsAbs))
-    
-    #print("Kurtosis Norm Range: [" + str(numpy.min(kurtosisValsNorm)) + ", " + str(numpy.max(kurtosisValsNorm)) + "]") 
-    #print("Skewness Norm Range: [" + str(numpy.min(skewnessValsNorm)) + ", " + str(numpy.max(skewnessValsNorm)) + "]") 
-    
+
     combined = kurtosisValsNorm + skewnessValsNorm
-    #combined = kurtosisValsAbs + skewnessValsAbs
-    #print(combined)
     
     minKurt = numpy.argmin(kurtosisValsAbs)
     minSkew = numpy.argmin(skewnessValsAbs)
@@ -1151,8 +1122,8 @@ def setClassNamesColours(clumpsImg, classNamesCol, classInfoDict):
 A function to define a class names column and define the class colours.
 
 classInfoDict = dict()
-classInfoDict[1] = {classname='Forest', red=0, green=255, blue=0}
-classInfoDict[2] = {classname='Water', red=0, green=0, blue=255}
+classInfoDict[1] = {'classname':'Forest', 'red':0, 'green':255, 'blue':0}
+classInfoDict[2] = {'classname':'Water', 'red':0, 'green':0, 'blue':255}
 
 :param clumpsImg: Input clumps image - expecting a classification (rather than segmentation)
                   where the number is the pixel value.
@@ -1216,7 +1187,7 @@ classInfoDict[2] = {classname='Water', red=0, green=0, blue=255}
             green_arr[class_key] = classInfoDict[class_key]['green']
             blue_arr[class_key] = classInfoDict[class_key]['blue']
         else:
-            raise Exception("Class key ({}) was not within the number of rows in the RAT.".format(class_key))
+            print("Class key ({}) was not within the number of rows in the RAT.".format(class_key), file=sys.stderr)
 
     rat.writeColumn(ratDataset, classNamesCol, class_names_arr)
     rat.writeColumn(ratDataset, 'Red', red_arr)
@@ -1755,4 +1726,68 @@ A function to take a random sample of an input column.
     rat.writeColumn(ratDataset, outColName, outColVals)
     ratDataset = None
 
+
+def getColumnData(clumpsImg, columnName):
+    """
+A function to read a column of data from a RAT.
+
+:param clumpsImg: Input clumps image
+:param columnName: Name of the column to be read.
+
+:return: numpy array with values from the clumpsImg
+
+"""
+    # Check numpy is available
+    if not haveNumpy:
+        raise Exception("The numpy module is required for this function could not be imported\n\t" + numErr)
+    # Check gdal is available
+    if not haveGDALPy:
+        raise Exception("The GDAL python bindings are required for this function could not be imported\n\t" + gdalErr)
+    # Check rios rat is available
+    if not haveRIOSRat:
+        raise Exception("The RIOS rat tools are required for this function could not be imported\n\t" + riosRatErr)
+
+    col_names = rsgislib.rastergis.getRATColumns(clumpsImg)
+
+    if columnName not in col_names:
+        raise Exception("Column specified is not within the RAT.")
+
+    ratDataset = gdal.Open(clumpsImg, gdal.GA_ReadOnly)
+    if ratDataset is None:
+        raise Exception("The input image could not be opened.")
+
+    col_data = rat.readColumn(ratDataset, columnName)
+    ratDataset = None
+    return col_data
+
+
+def setColumnData(clumpsImg, columnName, columnData):
+    """
+A function to read a column of data from a RAT.
+
+:param clumpsImg: Input clumps image
+:param columnName: Name of the column to be written.
+:param columnData: Data to be written to the column.
+
+"""
+    # Check numpy is available
+    if not haveNumpy:
+        raise Exception("The numpy module is required for this function could not be imported\n\t" + numErr)
+    # Check gdal is available
+    if not haveGDALPy:
+        raise Exception("The GDAL python bindings are required for this function could not be imported\n\t" + gdalErr)
+    # Check rios rat is available
+    if not haveRIOSRat:
+        raise Exception("The RIOS rat tools are required for this function could not be imported\n\t" + riosRatErr)
+
+    rat_length = rsgislib.rastergis.getRATLength(clumpsImg)
+    if rat_length != (columnData.shape[0]):
+        raise Exception("The input data array is not the same length as the RAT.")
+
+    ratDataset = gdal.Open(clumpsImg, gdal.GA_Update)
+    if ratDataset is None:
+        raise Exception("The input image could not be opened.")
+
+    rat.writeColumn(ratDataset, columnName, columnData)
+    ratDataset = None
 
