@@ -293,7 +293,7 @@ def _applyClassifier(info, inputs, outputs, otherargs):
     ID = ID[numpy.isfinite(xData).all(axis=1)]
     vData = xData[numpy.isfinite(xData).all(axis=1)]
         
-    if not otherargs.roiCol is None:
+    if otherargs.roiCol is not None:
         roi = getattr(inputs.inrat, otherargs.roiCol)
         roi = roi[numpy.isfinite(xData).all(axis=1)]
         vData = vData[roi == otherargs.roiVal]

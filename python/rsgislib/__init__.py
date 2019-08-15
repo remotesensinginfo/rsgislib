@@ -1263,6 +1263,22 @@ class RSGISPyUtils (object):
             raise RSGISPyException('Could not find a single file ('+fileSearch+'); found ' + str(len(files)) + ' files.')
         return files[0]
 
+    def findFileNone(self, dirPath, fileSearch):
+        """
+        Search for a single file with a path using glob. Therefore, the file
+        path returned is a true path. Within the fileSearch provide the file
+        name with '*' as wildcard(s). Returns None is not found.
+
+        :return: string
+
+        """
+        import glob
+        import os.path
+        files = glob.glob(os.path.join(dirPath, fileSearch))
+        if len(files) != 1:
+            return None
+        return files[0]
+
     def createVarList(self, in_vals_lsts, val_dict=None):
         """
         A function which will produce a list of dictionaries with all the combinations 
