@@ -608,35 +608,12 @@ Where:
     inImgBand = inImgDS.GetRasterBand( 1 );
     gdalDataType = gdal.GetDataTypeName(inImgBand.DataType)
     rsgisDataType = rsgisUtils.getRSGISLibDataType(gdalDataType)
-    
-    tlPtWKT = 'POINT(%s %s)' % (tlXIn, tlYIn)
-    tlPt = ogr.CreateGeometryFromWkt(tlPtWKT)
-    tlPt.AssignSpatialReference(inImgProj)
-    tlPt.TransformTo(outImgProj)
-    tlXOut = tlPt.GetX()
-    tlYOut = tlPt.GetY()
-    
-    brPtWKT = 'POINT(%s %s)' % (brXIn, brYIn)
-    brPt = ogr.CreateGeometryFromWkt(brPtWKT)
-    brPt.AssignSpatialReference(inImgProj)
-    brPt.TransformTo(outImgProj)
-    brXOut = brPt.GetX()
-    brYOut = brPt.GetY()
-    
-    trPtWKT = 'POINT(%s %s)' % (trXIn, trYIn)
-    trPt = ogr.CreateGeometryFromWkt(trPtWKT)
-    trPt.AssignSpatialReference(inImgProj)
-    trPt.TransformTo(outImgProj)
-    trXOut = trPt.GetX()
-    trYOut = trPt.GetY()
-    
-    blPtWKT = 'POINT(%s %s)' % (blXIn, blYIn)
-    btPt = ogr.CreateGeometryFromWkt(blPtWKT)
-    btPt.AssignSpatialReference(inImgProj)
-    btPt.TransformTo(outImgProj)
-    blXOut = btPt.GetX()
-    blYOut = btPt.GetY()
-    
+
+    tlXOut, tlYOut = rsgisUtils.reprojPoint(inImgProj, outImgProj, tlXIn, tlYIn)
+    brXOut, brYOut = rsgisUtils.reprojPoint(inImgProj, outImgProj, brXIn, brYIn)
+    trXOut, trYOut = rsgisUtils.reprojPoint(inImgProj, outImgProj, trXIn, trYIn)
+    blXOut, blYOut = rsgisUtils.reprojPoint(inImgProj, outImgProj, blXIn, blYIn)
+
     xValsOut = [tlXOut, brXOut, trXOut, blXOut]
     yValsOut = [tlYOut, brYOut, trYOut, blYOut]
     
@@ -1072,12 +1049,8 @@ Example::
         if img1EPSG is None:
             img1EPSG = 0
 
-        if img1EPSG == 4326:
-            img2TLY, img2TLX = rsgisUtils.reprojPoint(inProj, outProj, img2TLX_orig, img2TLY_orig)
-            img2BRY, img2BRX = rsgisUtils.reprojPoint(inProj, outProj, img2BRX_orig, img2BRY_orig)
-        else:
-            img2TLX, img2TLY = rsgisUtils.reprojPoint(inProj, outProj, img2TLX_orig, img2TLY_orig)
-            img2BRX, img2BRY = rsgisUtils.reprojPoint(inProj, outProj, img2BRX_orig, img2BRY_orig)
+        img2TLX, img2TLY = rsgisUtils.reprojPoint(inProj, outProj, img2TLX_orig, img2TLY_orig)
+        img2BRX, img2BRY = rsgisUtils.reprojPoint(inProj, outProj, img2BRX_orig, img2BRY_orig)
     
     xMin = img1TLX
     xMax = img1BRX
