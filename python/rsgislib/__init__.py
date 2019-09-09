@@ -792,8 +792,30 @@ class RSGISPyUtils (object):
         point = ogr.CreateGeometryFromWkt(wktPt)
         point.AssignSpatialReference(inProjOSRObj)
         point.TransformTo(outProjOSRObj)
-        outX = point.GetX()
-        outY = point.GetY()
+
+        if int(gdal.VersionInfo()) >= 3000000:
+            # With GDAL > 3.0 see RFC73.
+            outProjOSRObj.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
+            axis_idx = outProjOSRObj.GetDataAxisToSRSAxisMapping()
+            # Get the X Value.
+            if axis_idx[0] == 1:
+                outX = point.GetX()
+            else:
+                outX = point.GetY()
+
+            # Get the Y Value.
+            if axis_idx[1] == 2:
+                outY = point.GetY()
+            else:
+                outY = point.GetX()
+        else:
+            # With GDAL versions below 3.X.
+            if outProjOSRObj.EPSGTreatsAsLatLong():
+                outX = point.GetY()
+                outY = point.GetX()
+            else:
+                outX = point.GetX()
+                outY = point.GetY()
         return outX, outY
 
     def getImageBandStats(self, img, band, compute=True):
