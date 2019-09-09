@@ -415,7 +415,10 @@ inputted vector file.
         raise Exception("Could not find layer '" + vectorLyr + "'")
         
     lyrSpatRef = lyrVecObj.GetSpatialRef()
-    wktstr = lyrSpatRef.ExportToWkt()
+    if lyrSpatRef is not None:
+        wktstr = lyrSpatRef.ExportToWkt()
+    else:
+        wktstr = ''
         
     colExists = False
     feat_idx = 0
