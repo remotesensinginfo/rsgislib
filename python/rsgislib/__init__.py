@@ -495,35 +495,10 @@ class RSGISPyUtils (object):
         
         outSpatRef = osr.SpatialReference()
         outSpatRef.ImportFromEPSG(int(outEPSG))
-        
-        rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
-        if rasterDS == None:
-            raise RSGISPyException('Could not open raster image: \'' + inImg+ '\'')
-        
-        xSize = rasterDS.RasterXSize
-        ySize = rasterDS.RasterYSize
-        
-        geotransform = rasterDS.GetGeoTransform()
-        tlX = geotransform[0]
-        tlY = geotransform[3]
-        xRes = geotransform[1]
-        yRes = geotransform[5]
-        if yRes < 0:
-            yRes = yRes * -1
-        rasterDS = None
-        
-        brX = tlX + (xRes * xSize)
-        brY = tlY - (yRes * ySize)
-        
-        out_tlX = 0.0
-        out_tlY = 0.0
-        out_brX = 0.0
-        out_brY = 0.0
-        
-        out_tlX, out_tlY = self.reprojPoint(inSpatRef, outSpatRef, tlX, tlY)
-        out_brX, out_brY = self.reprojPoint(inSpatRef, outSpatRef, brX, brY)
-        
-        return [out_tlX, out_brX, out_brY, out_tlY]
+
+        img_bbox = self.getImageBBOX(inImg)
+        reproj_img_bbox = self.reprojBBOX(img_bbox, inSpatRef, outSpatRef)
+        return reproj_img_bbox
         
     def reprojBBOX(self, bbox, inProjObj, outProjObj):
         """
