@@ -45,7 +45,7 @@ if __name__ == "__main__":
     parser.add_argument("--vecformat", type=str, required=False, default="GPKG", help="OGR vector format for the LUT file.")
     parser.add_argument("--wgs84", action='store_true', default=False, help="Reproject footprints to EPSG:4326 (WGS84).")
     parser.add_argument("--ignore_noproj", action='store_true', default=False, help="Silently ignored images which do not have a defined projection.")
-    parser.add_argument("--overwrite", action='store_true', default=False, help="Silently ignored images which do not have a defined projection.")
+    parser.add_argument("--overwrite", action='store_true', default=False, help="Overwrite the output vector file, if not specified then layer will be added to exisitng file.")
     
     args = parser.parse_args()
     
