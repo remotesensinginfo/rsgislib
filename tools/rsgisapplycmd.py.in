@@ -1,0 +1,136 @@
+#! /usr/bin/env python
+
+############################################################################
+# Copyright (c) 2019 Dr. Peter Bunting, Aberystwyth University
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+#
+#
+# Purpose:  A command to apply a command (e.g., gdal_translate) using subprocess 
+#           to all files in an input directory while replicating the file structure 
+#           of the input directory in the output directory.
+#
+# Author: Pete Bunting
+# Email: pfb@aber.ac.uk
+# Date: 11/09/2019
+# Version: 1.0
+#
+# History:
+# Version 1.0 - Created.
+#
+#############################################################################
+
+import sys
+import argparse
+import pathlib
+import os
+import os.path
+import jinja2
+import subprocess
+from multiprocessing import Pool
+
+def run_cmd(execmd):
+    try:
+        subprocess.call(execmd, shell=True)
+    except OSError as e:
+        raise Exception('Could not excute command: {}'.format(execmd))
+
+
+
+if __name__ == '__main__':
+    """
+    The command line user interface
+    """
+    
+    if len(sys.argv) == 1:
+        print('rsgisapplycmd.py [options]')
+        print('help : rsgisapplycmd.py --help')
+        print('  or : rsgisapplycmd.py -h')
+        print('')
+        print('Example: rsgisapplycmd.py --indir ./KEA --outdir ./GTIFF --inext kea --outext tif --ncores 10 \\')
+        print('                          --cmd "gdal_translate -of GTIFF {{ input }} {{ output }}"\n')
+    
+        print('Example: docker run -iv ${PWD}:/data petebunting/au-eoed rsgisapplycmd.py --indir /data/KEA \\')
+        print('         --outdir /data/GTIFF --inext kea --outext tif --ncores 20 \\')
+        print('         --cmd "gdal_translate -of GTIFF -co  TILED=YES -co COMPRESS=LZW -co COPY_SRC_OVERVIEWS=YES {{ input }} {{ output }}"\n')
+    
+    else:
+        parser = argparse.ArgumentParser(prog='rsgisapplycmd.py', description='''Applies a command (e.g., gdal_translate) using 
+                                                                                 subprocess to all files in an input directory
+                                                                                 while replicating the file structure of the 
+                                                                                 input directory in the output directory.''')
+    
+        parser.add_argument("--indir", type=str, required=True, help='''Input directory.''')
+        parser.add_argument("--outdir", type=str, required=True, help='''Ouput directory.''')
+        parser.add_argument("--inext", type=str, required=True, help='''Input file extension of the files to be processed (e.g., kea).''')
+        parser.add_argument("--outext", type=str, required=True, help='''Output file extension for the output files (e.g., tif).''')
+        parser.add_argument("--nameapp", type=str, required=False, default='', help='''Provide a string to be appended on the file 
+                                                                                       name after the existing name and before the extension.''')
+        parser.add_argument("--cmd", type=str, required=True, help='''The command to be excuted with {{ input }} and {{ output }} 
+                                                                      specifying the where the input and output files should be.
+                                                                      e.g., "gdal_translate -of GTIFF {{ input }} {{ output }}"''')
+        parser.add_argument("--ncores", type=int, required=False, default=1, help='''Number of cores to used for processing (default = 1).''')
+        parser.add_argument("--printcmds", action='store_true', default=False, help='''Prints the commands to be executed to the terminal rather than running.''')
+        
+    
+        # Call the parser to parse the arguments.
+        args = parser.parse_args()
+    
+        search_dir = args.indir
+        search_dir_path = pathlib.Path(search_dir)
+        output_dir = args.outdir
+        output_dir_path = pathlib.Path(output_dir)
+        
+        in_ext = args.inext
+        out_ext = args.outext
+        out_app_name = args.nameapp
+        
+        cmds = []
+        for root, dirs, files in os.walk(search_dir):
+            for c_dir in dirs:
+                c_path = pathlib.Path(os.path.join(root, c_dir))
+                rel_to_root_path = c_path.relative_to(search_dir_path)
+                out_dir_path = output_dir_path.joinpath(rel_to_root_path)
+                if not os.path.exists(out_dir_path):
+                   os.makedirs(out_dir_path)
+            
+            c_path = pathlib.Path(root)
+            rel_to_root_path = c_path.relative_to(search_dir_path)
+            out_dir_path = output_dir_path.joinpath(rel_to_root_path)
+            for c_file in files:
+                c_file_wpath = os.path.join(root, c_file)
+                
+                c_file_noext, c_ext = os.path.splitext(c_file)
+                c_ext = c_ext[1:]
+                if c_ext == in_ext:
+                    o_file = '{0}{1}.{2}'.format(c_file_noext, out_app_name, out_ext)
+                    o_file_wpath = os.path.join(out_dir_path, o_file)
+                    
+                    template = jinja2.Template(args.cmd)            
+                    popd_cmd = template.render(input=c_file_wpath, output=o_file_wpath)
+                    cmds.append(popd_cmd)
+        
+        if args.printcmds:
+            for cmd in cmds:
+                print(cmd)
+        else:
+            mpool = Pool(args.ncores)
+            mpool.map(run_cmd, cmds)
+                
+
+
