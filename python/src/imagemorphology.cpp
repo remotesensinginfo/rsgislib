@@ -87,7 +87,7 @@ static PyObject *ImageMorphology_ImageDilate(PyObject *self, PyObject *args, PyO
 
     try
     {
-        rsgis::cmds::executeImageDilate(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, std::string(pszImageFormat), (rsgis::RSGISLibdatatype)datatype);
+        rsgis::cmds::executeImageDilate(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, std::string(pszImageFormat), (rsgis::RSGISLibDataType)datatype);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -115,7 +115,7 @@ static PyObject *ImageMorphology_ImageErode(PyObject *self, PyObject *args, PyOb
     
     try
     {
-        rsgis::cmds::executeImageErode(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, std::string(pszImageFormat), (rsgis::RSGISLibdatatype)datatype);
+        rsgis::cmds::executeImageErode(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, std::string(pszImageFormat), (rsgis::RSGISLibDataType)datatype);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -143,7 +143,7 @@ static PyObject *ImageMorphology_ImageGradiant(PyObject *self, PyObject *args, P
     
     try
     {
-        rsgis::cmds::executeImageGradiant(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, std::string(pszImageFormat), (rsgis::RSGISLibdatatype)datatype);
+        rsgis::cmds::executeImageGradiant(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, std::string(pszImageFormat), (rsgis::RSGISLibDataType)datatype);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -171,7 +171,7 @@ static PyObject *ImageMorphology_ImageDilateCombinedOut(PyObject *self, PyObject
     
     try
     {
-        rsgis::cmds::executeImageDilateCombinedOut(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, std::string(pszImageFormat), (rsgis::RSGISLibdatatype)datatype);
+        rsgis::cmds::executeImageDilateCombinedOut(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, std::string(pszImageFormat), (rsgis::RSGISLibDataType)datatype);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -199,7 +199,7 @@ static PyObject *ImageMorphology_ImageErodeCombinedOut(PyObject *self, PyObject 
     
     try
     {
-        rsgis::cmds::executeImageErodeCombinedOut(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, std::string(pszImageFormat), (rsgis::RSGISLibdatatype)datatype);
+        rsgis::cmds::executeImageErodeCombinedOut(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, std::string(pszImageFormat), (rsgis::RSGISLibDataType)datatype);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -227,7 +227,7 @@ static PyObject *ImageMorphology_ImageGradiantCombinedOut(PyObject *self, PyObje
     
     try
     {
-        rsgis::cmds::executeImageGradiantCombinedOut(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, std::string(pszImageFormat), (rsgis::RSGISLibdatatype)datatype);
+        rsgis::cmds::executeImageGradiantCombinedOut(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, std::string(pszImageFormat), (rsgis::RSGISLibDataType)datatype);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -257,7 +257,7 @@ static PyObject *ImageMorphology_ImageLocalMinima(PyObject *self, PyObject *args
     
     try
     {
-        rsgis::cmds::executeImageLocalMinima(std::string(pszInputImage), std::string(pszOutputImage), (bool)outputSequencial, (bool)allowEquals, std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, std::string(pszImageFormat), (rsgis::RSGISLibdatatype)datatype);
+        rsgis::cmds::executeImageLocalMinima(std::string(pszInputImage), std::string(pszOutputImage), (bool)outputSequencial, (bool)allowEquals, std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, std::string(pszImageFormat), (rsgis::RSGISLibDataType)datatype);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -287,7 +287,7 @@ static PyObject *ImageMorphology_ImageLocalMinimaCombinedOut(PyObject *self, PyO
     
     try
     {
-        rsgis::cmds::executeImageLocalMinimaCombinedOut(std::string(pszInputImage), std::string(pszOutputImage), (bool)outputSequencial, (bool)allowEquals, std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, std::string(pszImageFormat), (rsgis::RSGISLibdatatype)datatype);
+        rsgis::cmds::executeImageLocalMinimaCombinedOut(std::string(pszInputImage), std::string(pszOutputImage), (bool)outputSequencial, (bool)allowEquals, std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, std::string(pszImageFormat), (rsgis::RSGISLibDataType)datatype);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -316,7 +316,7 @@ static PyObject *ImageMorphology_ImageOpening(PyObject *self, PyObject *args, Py
     
     try
     {
-        rsgis::cmds::executeImageOpening(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszTempImage), std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, numIterations, std::string(pszImageFormat), (rsgis::RSGISLibdatatype)datatype);
+        rsgis::cmds::executeImageOpening(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszTempImage), std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, numIterations, std::string(pszImageFormat), (rsgis::RSGISLibDataType)datatype);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -345,7 +345,7 @@ static PyObject *ImageMorphology_ImageClosing(PyObject *self, PyObject *args, Py
     
     try
     {
-        rsgis::cmds::executeImageClosing(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszTempImage), std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, numIterations, std::string(pszImageFormat), (rsgis::RSGISLibdatatype)datatype);
+        rsgis::cmds::executeImageClosing(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszTempImage), std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, numIterations, std::string(pszImageFormat), (rsgis::RSGISLibDataType)datatype);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -373,7 +373,7 @@ static PyObject *ImageMorphology_ImageBlackTopHat(PyObject *self, PyObject *args
     
     try
     {
-        rsgis::cmds::executeImageBlackTopHat(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszTempImage), std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, std::string(pszImageFormat), (rsgis::RSGISLibdatatype)datatype);
+        rsgis::cmds::executeImageBlackTopHat(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszTempImage), std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, std::string(pszImageFormat), (rsgis::RSGISLibDataType)datatype);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -401,7 +401,7 @@ static PyObject *ImageMorphology_ImageWhiteTopHat(PyObject *self, PyObject *args
     
     try
     {
-        rsgis::cmds::executeImageWhiteTopHat(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszTempImage), std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, std::string(pszImageFormat), (rsgis::RSGISLibdatatype)datatype);
+        rsgis::cmds::executeImageWhiteTopHat(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszTempImage), std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, std::string(pszImageFormat), (rsgis::RSGISLibDataType)datatype);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
