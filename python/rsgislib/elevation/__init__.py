@@ -21,10 +21,10 @@ Karkee, M., Steward, B. L., & Aziz, S. A. (2008). Improving quality
 of public domain digital elevation models through data fusion. 
 Biosystems Engineering, 101(3), 293–305.
 
-* highResDEMImg is an input image file for the high resolution DEM file.
-* lowResDEMImg is an input image file for the low resolution DEM file.
-* fusedDEMImg is an output image file for the resulting fused DEM.
-* cSize is the threshold (int) defining the high and low frequencies.
+:param highResDEMImg: is an input image file for the high resolution DEM file.
+:param lowResDEMImg: is an input image file for the low resolution DEM file.
+:param fusedDEMImg: is an output image file for the resulting fused DEM.
+:param cSize: is the threshold (int) defining the high and low frequencies.
 
 """
     import numpy

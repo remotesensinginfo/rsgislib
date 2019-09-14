@@ -48,15 +48,15 @@ gdalwarp utility. However, the output image will have the same pixel grid and di
 
 Where:
 
-* inRefImg is the input reference image to which the processing image is to resampled to.
-* inProcessImg is the image which is to be resampled.
-* outImg is the output image file.
-* gdalformat is the gdal format for the output image.
-* interpMethod is the interpolation method used to resample the image [bilinear, lanczos, cubicspline, nearestneighbour, cubic, average, mode]
-* useTPS is a boolean specifying that the thin plated splines method of warping should be used (i.e., rubbersheet); Default False.
-* usePoly is a boolean specifying that a polynomial method of warpping is used; Default True
-* polyOrder is the order of the polynomial used to represent the transformation (1, 2 or 3). Only used if usePoly=True
-* useMutliThread is a boolean specifying whether multiple processing cores should be used for the warping.
+:param inRefImg: is the input reference image to which the processing image is to resampled to.
+:param inProcessImg: is the image which is to be resampled.
+:param outImg: is the output image file.
+:param gdalformat: is the gdal format for the output image.
+:param interpMethod: is the interpolation method used to resample the image [bilinear, lanczos, cubicspline, nearestneighbour, cubic, average, mode]
+:param useTPS: is a boolean specifying that the thin plated splines method of warping should be used (i.e., rubbersheet); Default False.
+:param usePoly: is a boolean specifying that a polynomial method of warpping is used; Default True
+:param polyOrder: is the order of the polynomial used to represent the transformation (1, 2 or 3). Only used if usePoly=True
+:param useMutliThread: is a boolean specifying whether multiple processing cores should be used for the warping.
 
 """
     import rsgislib.imageutils

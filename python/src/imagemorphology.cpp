@@ -75,19 +75,19 @@ static PyObject *ImageMorphology_ImageDilate(PyObject *self, PyObject *args, PyO
     const char *pszInputImage, *pszOutputImage;
     const char *pszMorphOperator;
     const char *pszImageFormat = "KEA";
-    int dataType;
+    int datatype;
     int useOperatorFile;
     int morphOpSize;
     
-    static char *kwlist[] = {"inputImage", "outputImage", "morphOperator", "useOpFile", "opSize", "gdalFormat", "dataType", NULL};
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssiisi:imageDilate", kwlist, &pszInputImage, &pszOutputImage, &pszMorphOperator, &useOperatorFile, &morphOpSize, &pszImageFormat, &dataType))
+    static char *kwlist[] = {"inputImage", "outputImage", "morphOperator", "useOpFile", "opSize", "gdalformat", "datatype", NULL};
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssiisi:imageDilate", kwlist, &pszInputImage, &pszOutputImage, &pszMorphOperator, &useOperatorFile, &morphOpSize, &pszImageFormat, &datatype))
     {
         return NULL;
     }
 
     try
     {
-        rsgis::cmds::executeImageDilate(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, std::string(pszImageFormat), (rsgis::RSGISLibDataType)dataType);
+        rsgis::cmds::executeImageDilate(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, std::string(pszImageFormat), (rsgis::RSGISLibdatatype)datatype);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -103,19 +103,19 @@ static PyObject *ImageMorphology_ImageErode(PyObject *self, PyObject *args, PyOb
     const char *pszInputImage, *pszOutputImage;
     const char *pszMorphOperator;
     const char *pszImageFormat = "KEA";
-    int dataType;
+    int datatype;
     int useOperatorFile;
     int morphOpSize;
     
-    static char *kwlist[] = {"inputImage", "outputImage", "morphOperator", "useOpFile", "opSize", "gdalFormat", "dataType", NULL};
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssiisi:imageErode", kwlist, &pszInputImage, &pszOutputImage, &pszMorphOperator, &useOperatorFile, &morphOpSize, &pszImageFormat, &dataType))
+    static char *kwlist[] = {"inputImage", "outputImage", "morphOperator", "useOpFile", "opSize", "gdalformat", "datatype", NULL};
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssiisi:imageErode", kwlist, &pszInputImage, &pszOutputImage, &pszMorphOperator, &useOperatorFile, &morphOpSize, &pszImageFormat, &datatype))
     {
         return NULL;
     }
     
     try
     {
-        rsgis::cmds::executeImageErode(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, std::string(pszImageFormat), (rsgis::RSGISLibDataType)dataType);
+        rsgis::cmds::executeImageErode(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, std::string(pszImageFormat), (rsgis::RSGISLibdatatype)datatype);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -131,19 +131,19 @@ static PyObject *ImageMorphology_ImageGradiant(PyObject *self, PyObject *args, P
     const char *pszInputImage, *pszOutputImage;
     const char *pszMorphOperator;
     const char *pszImageFormat = "KEA";
-    int dataType;
+    int datatype;
     int useOperatorFile;
     int morphOpSize;
     
-    static char *kwlist[] = {"inputImage", "outputImage", "morphOperator", "useOpFile", "opSize", "gdalFormat", "dataType", NULL};
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssiisi:imageGradiant", kwlist, &pszInputImage, &pszOutputImage, &pszMorphOperator, &useOperatorFile, &morphOpSize, &pszImageFormat, &dataType))
+    static char *kwlist[] = {"inputImage", "outputImage", "morphOperator", "useOpFile", "opSize", "gdalformat", "datatype", NULL};
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssiisi:imageGradiant", kwlist, &pszInputImage, &pszOutputImage, &pszMorphOperator, &useOperatorFile, &morphOpSize, &pszImageFormat, &datatype))
     {
         return NULL;
     }
     
     try
     {
-        rsgis::cmds::executeImageGradiant(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, std::string(pszImageFormat), (rsgis::RSGISLibDataType)dataType);
+        rsgis::cmds::executeImageGradiant(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, std::string(pszImageFormat), (rsgis::RSGISLibdatatype)datatype);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -159,19 +159,19 @@ static PyObject *ImageMorphology_ImageDilateCombinedOut(PyObject *self, PyObject
     const char *pszInputImage, *pszOutputImage;
     const char *pszMorphOperator;
     const char *pszImageFormat = "KEA";
-    int dataType;
+    int datatype;
     int useOperatorFile;
     int morphOpSize;
     
-    static char *kwlist[] = {"inputImage", "outputImage", "morphOperator", "useOpFile", "opSize", "gdalFormat", "dataType", NULL};
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssiisi:imageDilateCombinedOut", kwlist, &pszInputImage, &pszOutputImage, &pszMorphOperator, &useOperatorFile, &morphOpSize, &pszImageFormat, &dataType))
+    static char *kwlist[] = {"inputImage", "outputImage", "morphOperator", "useOpFile", "opSize", "gdalformat", "datatype", NULL};
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssiisi:imageDilateCombinedOut", kwlist, &pszInputImage, &pszOutputImage, &pszMorphOperator, &useOperatorFile, &morphOpSize, &pszImageFormat, &datatype))
     {
         return NULL;
     }
     
     try
     {
-        rsgis::cmds::executeImageDilateCombinedOut(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, std::string(pszImageFormat), (rsgis::RSGISLibDataType)dataType);
+        rsgis::cmds::executeImageDilateCombinedOut(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, std::string(pszImageFormat), (rsgis::RSGISLibdatatype)datatype);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -187,19 +187,19 @@ static PyObject *ImageMorphology_ImageErodeCombinedOut(PyObject *self, PyObject 
     const char *pszInputImage, *pszOutputImage;
     const char *pszMorphOperator;
     const char *pszImageFormat = "KEA";
-    int dataType;
+    int datatype;
     int useOperatorFile;
     int morphOpSize;
     
-    static char *kwlist[] = {"inputImage", "outputImage", "morphOperator", "useOpFile", "opSize", "gdalFormat", "dataType", NULL};
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssiisi:imageErodeCombinedOut", kwlist, &pszInputImage, &pszOutputImage, &pszMorphOperator, &useOperatorFile, &morphOpSize, &pszImageFormat, &dataType))
+    static char *kwlist[] = {"inputImage", "outputImage", "morphOperator", "useOpFile", "opSize", "gdalformat", "datatype", NULL};
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssiisi:imageErodeCombinedOut", kwlist, &pszInputImage, &pszOutputImage, &pszMorphOperator, &useOperatorFile, &morphOpSize, &pszImageFormat, &datatype))
     {
         return NULL;
     }
     
     try
     {
-        rsgis::cmds::executeImageErodeCombinedOut(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, std::string(pszImageFormat), (rsgis::RSGISLibDataType)dataType);
+        rsgis::cmds::executeImageErodeCombinedOut(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, std::string(pszImageFormat), (rsgis::RSGISLibdatatype)datatype);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -215,19 +215,19 @@ static PyObject *ImageMorphology_ImageGradiantCombinedOut(PyObject *self, PyObje
     const char *pszInputImage, *pszOutputImage;
     const char *pszMorphOperator;
     const char *pszImageFormat = "KEA";
-    int dataType;
+    int datatype;
     int useOperatorFile;
     int morphOpSize;
     
-    static char *kwlist[] = {"inputImage", "outputImage", "morphOperator", "useOpFile", "opSize", "gdalFormat", "dataType", NULL};
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssiisi:imageGradiantCombinedOut", kwlist, &pszInputImage, &pszOutputImage, &pszMorphOperator, &useOperatorFile, &morphOpSize, &pszImageFormat, &dataType))
+    static char *kwlist[] = {"inputImage", "outputImage", "morphOperator", "useOpFile", "opSize", "gdalformat", "datatype", NULL};
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssiisi:imageGradiantCombinedOut", kwlist, &pszInputImage, &pszOutputImage, &pszMorphOperator, &useOperatorFile, &morphOpSize, &pszImageFormat, &datatype))
     {
         return NULL;
     }
     
     try
     {
-        rsgis::cmds::executeImageGradiantCombinedOut(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, std::string(pszImageFormat), (rsgis::RSGISLibDataType)dataType);
+        rsgis::cmds::executeImageGradiantCombinedOut(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, std::string(pszImageFormat), (rsgis::RSGISLibdatatype)datatype);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -243,21 +243,21 @@ static PyObject *ImageMorphology_ImageLocalMinima(PyObject *self, PyObject *args
     const char *pszInputImage, *pszOutputImage;
     const char *pszMorphOperator;
     const char *pszImageFormat = "KEA";
-    int dataType;
+    int datatype;
     int useOperatorFile;
     int morphOpSize;
     int outputSequencial;
     int allowEquals;
     
-    static char *kwlist[] = {"inputImage", "outputImage", "sequencialOut", "allowEqual", "morphOperator", "useOpFile", "opSize", "gdalFormat", "dataType", NULL};
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssiisiisi:imageLocalMinima", kwlist, &pszInputImage, &pszOutputImage, &outputSequencial, &allowEquals, &pszMorphOperator, &useOperatorFile, &morphOpSize, &pszImageFormat, &dataType))
+    static char *kwlist[] = {"inputImage", "outputImage", "sequencialOut", "allowEqual", "morphOperator", "useOpFile", "opSize", "gdalformat", "datatype", NULL};
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssiisiisi:imageLocalMinima", kwlist, &pszInputImage, &pszOutputImage, &outputSequencial, &allowEquals, &pszMorphOperator, &useOperatorFile, &morphOpSize, &pszImageFormat, &datatype))
     {
         return NULL;
     }
     
     try
     {
-        rsgis::cmds::executeImageLocalMinima(std::string(pszInputImage), std::string(pszOutputImage), (bool)outputSequencial, (bool)allowEquals, std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, std::string(pszImageFormat), (rsgis::RSGISLibDataType)dataType);
+        rsgis::cmds::executeImageLocalMinima(std::string(pszInputImage), std::string(pszOutputImage), (bool)outputSequencial, (bool)allowEquals, std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, std::string(pszImageFormat), (rsgis::RSGISLibdatatype)datatype);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -273,21 +273,21 @@ static PyObject *ImageMorphology_ImageLocalMinimaCombinedOut(PyObject *self, PyO
     const char *pszInputImage, *pszOutputImage;
     const char *pszMorphOperator;
     const char *pszImageFormat = "KEA";
-    int dataType;
+    int datatype;
     int useOperatorFile;
     int morphOpSize;
     int outputSequencial;
     int allowEquals;
     
-    static char *kwlist[] = {"inputImage", "outputImage", "sequencialOut", "allowEqual", "morphOperator", "useOpFile", "opSize", "gdalFormat", "dataType", NULL};
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssiisiisi:imageLocalMinimaCombinedOut", kwlist, &pszInputImage, &pszOutputImage, &outputSequencial, &allowEquals, &pszMorphOperator, &useOperatorFile, &morphOpSize, &pszImageFormat, &dataType))
+    static char *kwlist[] = {"inputImage", "outputImage", "sequencialOut", "allowEqual", "morphOperator", "useOpFile", "opSize", "gdalformat", "datatype", NULL};
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssiisiisi:imageLocalMinimaCombinedOut", kwlist, &pszInputImage, &pszOutputImage, &outputSequencial, &allowEquals, &pszMorphOperator, &useOperatorFile, &morphOpSize, &pszImageFormat, &datatype))
     {
         return NULL;
     }
     
     try
     {
-        rsgis::cmds::executeImageLocalMinimaCombinedOut(std::string(pszInputImage), std::string(pszOutputImage), (bool)outputSequencial, (bool)allowEquals, std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, std::string(pszImageFormat), (rsgis::RSGISLibDataType)dataType);
+        rsgis::cmds::executeImageLocalMinimaCombinedOut(std::string(pszInputImage), std::string(pszOutputImage), (bool)outputSequencial, (bool)allowEquals, std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, std::string(pszImageFormat), (rsgis::RSGISLibdatatype)datatype);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -303,20 +303,20 @@ static PyObject *ImageMorphology_ImageOpening(PyObject *self, PyObject *args, Py
     const char *pszInputImage, *pszOutputImage, *pszTempImage;
     const char *pszMorphOperator;
     const char *pszImageFormat = "KEA";
-    int dataType;
+    int datatype;
     int useOperatorFile;
     int morphOpSize;
     int numIterations=1;
     
-    static char *kwlist[] = {"inputImage", "outputImage", "tempImage", "morphOperator", "useOpFile", "opSize", "gdalFormat", "dataType", "niters", NULL};
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssssiisi|i:imageOpening", kwlist, &pszInputImage, &pszOutputImage, &pszTempImage, &pszMorphOperator, &useOperatorFile, &morphOpSize, &pszImageFormat, &dataType, &numIterations))
+    static char *kwlist[] = {"inputImage", "outputImage", "tempImage", "morphOperator", "useOpFile", "opSize", "gdalformat", "datatype", "niters", NULL};
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssssiisi|i:imageOpening", kwlist, &pszInputImage, &pszOutputImage, &pszTempImage, &pszMorphOperator, &useOperatorFile, &morphOpSize, &pszImageFormat, &datatype, &numIterations))
     {
         return NULL;
     }
     
     try
     {
-        rsgis::cmds::executeImageOpening(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszTempImage), std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, numIterations, std::string(pszImageFormat), (rsgis::RSGISLibDataType)dataType);
+        rsgis::cmds::executeImageOpening(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszTempImage), std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, numIterations, std::string(pszImageFormat), (rsgis::RSGISLibdatatype)datatype);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -332,20 +332,20 @@ static PyObject *ImageMorphology_ImageClosing(PyObject *self, PyObject *args, Py
     const char *pszInputImage, *pszOutputImage, *pszTempImage;
     const char *pszMorphOperator;
     const char *pszImageFormat = "KEA";
-    int dataType;
+    int datatype;
     int useOperatorFile;
     int morphOpSize;
     int numIterations=1;
     
-    static char *kwlist[] = {"inputImage", "outputImage", "tempImage", "morphOperator", "useOpFile", "opSize", "gdalFormat", "dataType", "niters", NULL};
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssssiisi|i:imageClosing", kwlist, &pszInputImage, &pszOutputImage, &pszTempImage, &pszMorphOperator, &useOperatorFile, &morphOpSize, &pszImageFormat, &dataType, &numIterations))
+    static char *kwlist[] = {"inputImage", "outputImage", "tempImage", "morphOperator", "useOpFile", "opSize", "gdalformat", "datatype", "niters", NULL};
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssssiisi|i:imageClosing", kwlist, &pszInputImage, &pszOutputImage, &pszTempImage, &pszMorphOperator, &useOperatorFile, &morphOpSize, &pszImageFormat, &datatype, &numIterations))
     {
         return NULL;
     }
     
     try
     {
-        rsgis::cmds::executeImageClosing(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszTempImage), std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, numIterations, std::string(pszImageFormat), (rsgis::RSGISLibDataType)dataType);
+        rsgis::cmds::executeImageClosing(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszTempImage), std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, numIterations, std::string(pszImageFormat), (rsgis::RSGISLibdatatype)datatype);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -361,19 +361,19 @@ static PyObject *ImageMorphology_ImageBlackTopHat(PyObject *self, PyObject *args
     const char *pszInputImage, *pszOutputImage, *pszTempImage;
     const char *pszMorphOperator;
     const char *pszImageFormat = "KEA";
-    int dataType;
+    int datatype;
     int useOperatorFile;
     int morphOpSize;
     
-    static char *kwlist[] = {"inputImage", "outputImage", "tempImage", "morphOperator", "useOpFile", "opSize", "gdalFormat", "dataType", NULL};
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssssiisi:imageBlackTopHat", kwlist, &pszInputImage, &pszOutputImage, &pszTempImage, &pszMorphOperator, &useOperatorFile, &morphOpSize, &pszImageFormat, &dataType))
+    static char *kwlist[] = {"inputImage", "outputImage", "tempImage", "morphOperator", "useOpFile", "opSize", "gdalformat", "datatype", NULL};
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssssiisi:imageBlackTopHat", kwlist, &pszInputImage, &pszOutputImage, &pszTempImage, &pszMorphOperator, &useOperatorFile, &morphOpSize, &pszImageFormat, &datatype))
     {
         return NULL;
     }
     
     try
     {
-        rsgis::cmds::executeImageBlackTopHat(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszTempImage), std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, std::string(pszImageFormat), (rsgis::RSGISLibDataType)dataType);
+        rsgis::cmds::executeImageBlackTopHat(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszTempImage), std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, std::string(pszImageFormat), (rsgis::RSGISLibdatatype)datatype);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -389,19 +389,19 @@ static PyObject *ImageMorphology_ImageWhiteTopHat(PyObject *self, PyObject *args
     const char *pszInputImage, *pszOutputImage, *pszTempImage;
     const char *pszMorphOperator;
     const char *pszImageFormat = "KEA";
-    int dataType;
+    int datatype;
     int useOperatorFile;
     int morphOpSize;
     
-    static char *kwlist[] = {"inputImage", "outputImage", "tempImage", "morphOperator", "useOpFile", "opSize", "gdalFormat", "dataType", NULL};
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssssiisi:imageWhiteTopHat", kwlist, &pszInputImage, &pszOutputImage, &pszTempImage, &pszMorphOperator, &useOperatorFile, &morphOpSize, &pszImageFormat, &dataType))
+    static char *kwlist[] = {"inputImage", "outputImage", "tempImage", "morphOperator", "useOpFile", "opSize", "gdalformat", "datatype", NULL};
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssssiisi:imageWhiteTopHat", kwlist, &pszInputImage, &pszOutputImage, &pszTempImage, &pszMorphOperator, &useOperatorFile, &morphOpSize, &pszImageFormat, &datatype))
     {
         return NULL;
     }
     
     try
     {
-        rsgis::cmds::executeImageWhiteTopHat(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszTempImage), std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, std::string(pszImageFormat), (rsgis::RSGISLibDataType)dataType);
+        rsgis::cmds::executeImageWhiteTopHat(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszTempImage), std::string(pszMorphOperator), (bool)useOperatorFile, morphOpSize, std::string(pszImageFormat), (rsgis::RSGISLibdatatype)datatype);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -422,8 +422,8 @@ static PyMethodDef ImageMorphologyMethods[] = {
 "\n"
 "Where:\n"
 "\n"
-"* outputFile is a string specifying the name and path of the output matrix file.\n"
-"* opSize is a integer specifying the size of the operator.\n"
+":param outputFile: is a string specifying the name and path of the output matrix file.\n"
+":param opSize: is a integer specifying the size of the operator.\n"
 "\n"
 "Example::\n"
 "\n"
@@ -434,18 +434,18 @@ static PyMethodDef ImageMorphologyMethods[] = {
     
     
 {"imageDilate", (PyCFunction)ImageMorphology_ImageDilate, METH_VARARGS | METH_KEYWORDS,
-"imagemorphology.imageDilate(inputImage=string, outputImage=string, morphOperator=string, useOpFile=boolean, opSize=int, gdalFormat=string, dataType=int)\n"
+"imagemorphology.imageDilate(inputImage=string, outputImage=string, morphOperator=string, useOpFile=boolean, opSize=int, gdalformat=string, datatype=int)\n"
 "Performs an image morphology dilate operation.\n"
 "\n"
 "Where:\n"
 "\n"
-"* inputImage is a string specifying the name and path of the input file.\n"
-"* outputImage is a string specifying the name and path of the output file.\n"
-"* morphOperator is a string with the name and path to a .gmtxt file with a square binary matrix specifying the morphology operator\n"
-"* useOpFile is a boolean specifying whether the morphOperator file is present or whether a square operator (specified via opSize) should be used. (True = morphOperator, False = opSize)\n"
-"* opSize is a integer specifying the square operator size (only used if useOpFile is False)\n"
-"* gdalFormat is a string specifying the GDAL image format (e.g., KEA)\n"
-"* dataType is an int containing one of the values from rsgislib.TYPE_*\n"
+":param inputImage: is a string specifying the name and path of the input file.\n"
+":param outputImage: is a string specifying the name and path of the output file.\n"
+":param morphOperator: is a string with the name and path to a .gmtxt file with a square binary matrix specifying the morphology operator\n"
+":param useOpFile: is a boolean specifying whether the morphOperator file is present or whether a square operator (specified via opSize) should be used. (True = morphOperator, False = opSize)\n"
+":param opSize: is a integer specifying the square operator size (only used if useOpFile is False)\n"
+":param gdalformat: is a string specifying the GDAL image format (e.g., KEA)\n"
+":param datatype: is an int containing one of the values from rsgislib.TYPE_*\n"
 "\n"
 "Example::\n"
 "\n"
@@ -455,182 +455,182 @@ static PyMethodDef ImageMorphologyMethods[] = {
 "   inImg = 'clumpsImage.kea'\n"
 "   outImg = 'clumpsImage_Dilate.kea'\n"
 "   \n"
-"   rsgislib.imagemorphology.imageDilate(inputImage=inImg, outputImage=outImg, morphOperator="", useOpFile=False, opSize=5, gdalFormat='KEA', dataType=rsgislib.TYPE_32UINT)\n"
+"   rsgislib.imagemorphology.imageDilate(inputImage=inImg, outputImage=outImg, morphOperator="", useOpFile=False, opSize=5, gdalformat='KEA', datatype=rsgislib.TYPE_32UINT)\n"
 "\n"},
     
 {"imageErode", (PyCFunction)ImageMorphology_ImageErode, METH_VARARGS | METH_KEYWORDS,
-"imagemorphology.imageErode(inputImage=string, outputImage=string, morphOperator=string, useOpFile=boolean, opSize=int, gdalFormat=string, dataType=int)\n"
+"imagemorphology.imageErode(inputImage=string, outputImage=string, morphOperator=string, useOpFile=boolean, opSize=int, gdalformat=string, datatype=int)\n"
 "Performs an image morphology erode operation. \n"
 "\n"
 "Where:\n"
 "\n"
-"* inputImage is a string specifying the name and path of the input file.\n"
-"* outputImage is a string specifying the name and path of the output file.\n"
-"* morphOperator is a string with the name and path to a .gmtxt file with a square binary matrix specifying the morphology operator\n"
-"* useOpFile is a boolean specifying whether the morphOperator file is present or whether a square operator (specified via opSize) should be used. (True = morphOperator, False = opSize)\n"
-"* opSize is a integer specifying the square operator size (only used if useOpFile is False)\n"
-"* gdalFormat is a string specifying the GDAL image format (e.g., KEA)\n"
-"* dataType is an int containing one of the values from rsgislib.TYPE_*\n"
+":param inputImage: is a string specifying the name and path of the input file.\n"
+":param outputImage: is a string specifying the name and path of the output file.\n"
+":param morphOperator: is a string with the name and path to a .gmtxt file with a square binary matrix specifying the morphology operator\n"
+":param useOpFile: is a boolean specifying whether the morphOperator file is present or whether a square operator (specified via opSize) should be used. (True = morphOperator, False = opSize)\n"
+":param opSize: is a integer specifying the square operator size (only used if useOpFile is False)\n"
+":param gdalformat: is a string specifying the GDAL image format (e.g., KEA)\n"
+":param datatype: is an int containing one of the values from rsgislib.TYPE_*\n"
 "\n"},
 
 {"imageGradiant", (PyCFunction)ImageMorphology_ImageGradiant, METH_VARARGS | METH_KEYWORDS,
-"imagemorphology.imageGradiant(inputImage=string, outputImage=string, morphOperator=string, useOpFile=boolean, opSize=int, gdalFormat=string, dataType=int)\n"
+"imagemorphology.imageGradiant(inputImage=string, outputImage=string, morphOperator=string, useOpFile=boolean, opSize=int, gdalformat=string, datatype=int)\n"
 "Performs an image morphology gradiant operation. \n"
 "\n"
 "Where:\n"
 "\n"
-"* inputImage is a string specifying the name and path of the input file.\n"
-"* outputImage is a string specifying the name and path of the output file.\n"
-"* morphOperator is a string with the name and path to a .gmtxt file with a square binary matrix specifying the morphology operator\n"
-"* useOpFile is a boolean specifying whether the morphOperator file is present or whether a square operator (specified via opSize) should be used. (True = morphOperator, False = opSize)\n"
-"* opSize is a integer specifying the square operator size (only used if useOpFile is False)\n"
-"* gdalFormat is a string specifying the GDAL image format (e.g., KEA)\n"
-"* dataType is an int containing one of the values from rsgislib.TYPE_*\n"
+":param inputImage: is a string specifying the name and path of the input file.\n"
+":param outputImage: is a string specifying the name and path of the output file.\n"
+":param morphOperator: is a string with the name and path to a .gmtxt file with a square binary matrix specifying the morphology operator\n"
+":param useOpFile: is a boolean specifying whether the morphOperator file is present or whether a square operator (specified via opSize) should be used. (True = morphOperator, False = opSize)\n"
+":param opSize: is a integer specifying the square operator size (only used if useOpFile is False)\n"
+":param gdalformat: is a string specifying the GDAL image format (e.g., KEA)\n"
+":param datatype: is an int containing one of the values from rsgislib.TYPE_*\n"
 "\n"},
     
 {"imageDilateCombinedOut", (PyCFunction)ImageMorphology_ImageDilateCombinedOut, METH_VARARGS | METH_KEYWORDS,
-"imagemorphology.imageDilateCombinedOut(inputImage=string, outputImage=string, morphOperator=string, useOpFile=boolean, opSize=int, gdalFormat=string, dataType=int)\n"
+"imagemorphology.imageDilateCombinedOut(inputImage=string, outputImage=string, morphOperator=string, useOpFile=boolean, opSize=int, gdalformat=string, datatype=int)\n"
 "Performs an image morphology dilate operation, where the outputs will be combined into a single image. \n"
 "\n"
 "Where:\n"
 "\n"
-"* inputImage is a string specifying the name and path of the input file.\n"
-"* outputImage is a string specifying the name and path of the output file.\n"
-"* morphOperator is a string with the name and path to a .gmtxt file with a square binary matrix specifying the morphology operator\n"
-"* useOpFile is a boolean specifying whether the morphOperator file is present or whether a square operator (specified via opSize) should be used. (True = morphOperator, False = opSize)\n"
-"* opSize is a integer specifying the square operator size (only used if useOpFile is False)\n"
-"* gdalFormat is a string specifying the GDAL image format (e.g., KEA)\n"
-"* dataType is an int containing one of the values from rsgislib.TYPE_*\n"
+":param inputImage: is a string specifying the name and path of the input file.\n"
+":param outputImage: is a string specifying the name and path of the output file.\n"
+":param morphOperator: is a string with the name and path to a .gmtxt file with a square binary matrix specifying the morphology operator\n"
+":param useOpFile: is a boolean specifying whether the morphOperator file is present or whether a square operator (specified via opSize) should be used. (True = morphOperator, False = opSize)\n"
+":param opSize: is a integer specifying the square operator size (only used if useOpFile is False)\n"
+":param gdalformat: is a string specifying the GDAL image format (e.g., KEA)\n"
+":param datatype: is an int containing one of the values from rsgislib.TYPE_*\n"
 "\n"},
 
 {"imageErodeCombinedOut", (PyCFunction)ImageMorphology_ImageErodeCombinedOut, METH_VARARGS | METH_KEYWORDS,
-"imagemorphology.imageErodeCombinedOut(inputImage=string, outputImage=string, morphOperator=string, useOpFile=boolean, opSize=int, gdalFormat=string, dataType=int)\n"
+"imagemorphology.imageErodeCombinedOut(inputImage=string, outputImage=string, morphOperator=string, useOpFile=boolean, opSize=int, gdalformat=string, datatype=int)\n"
 "Performs an image morphology erode operation, where the outputs will be combined into a single image. \n"
 "\n"
 "Where:\n"
 "\n"
-"* inputImage is a string specifying the name and path of the input file.\n"
-"* outputImage is a string specifying the name and path of the output file.\n"
-"* morphOperator is a string with the name and path to a .gmtxt file with a square binary matrix specifying the morphology operator\n"
-"* useOpFile is a boolean specifying whether the morphOperator file is present or whether a square operator (specified via opSize) should be used. (True = morphOperator, False = opSize)\n"
-"* opSize is a integer specifying the square operator size (only used if useOpFile is False)\n"
-"* gdalFormat is a string specifying the GDAL image format (e.g., KEA)\n"
-"* dataType is an int containing one of the values from rsgislib.TYPE_*\n"
+":param inputImage: is a string specifying the name and path of the input file.\n"
+":param outputImage: is a string specifying the name and path of the output file.\n"
+":param morphOperator: is a string with the name and path to a .gmtxt file with a square binary matrix specifying the morphology operator\n"
+":param useOpFile: is a boolean specifying whether the morphOperator file is present or whether a square operator (specified via opSize) should be used. (True = morphOperator, False = opSize)\n"
+":param opSize: is a integer specifying the square operator size (only used if useOpFile is False)\n"
+":param gdalformat: is a string specifying the GDAL image format (e.g., KEA)\n"
+":param datatype: is an int containing one of the values from rsgislib.TYPE_*\n"
 "\n"},
 
 {"imageGradiantCombinedOut", (PyCFunction)ImageMorphology_ImageGradiantCombinedOut, METH_VARARGS | METH_KEYWORDS,
-"imagemorphology.imageGradiantCombinedOut(inputImage=string, outputImage=string, morphOperator=string, useOpFile=boolean, opSize=int, gdalFormat=string, dataType=int)\n"
+"imagemorphology.imageGradiantCombinedOut(inputImage=string, outputImage=string, morphOperator=string, useOpFile=boolean, opSize=int, gdalformat=string, datatype=int)\n"
 "Performs an image morphology gradiant operation, where the outputs will be combined into a single image. \n"
 "\n"
 "Where:\n"
 "\n"
-"* inputImage is a string specifying the name and path of the input file.\n"
-"* outputImage is a string specifying the name and path of the output file.\n"
-"* morphOperator is a string with the name and path to a .gmtxt file with a square binary matrix specifying the morphology operator\n"
-"* useOpFile is a boolean specifying whether the morphOperator file is present or whether a square operator (specified via opSize) should be used. (True = morphOperator, False = opSize)\n"
-"* opSize is a integer specifying the square operator size (only used if useOpFile is False)\n"
-"* gdalFormat is a string specifying the GDAL image format (e.g., KEA)\n"
-"* dataType is an int containing one of the values from rsgislib.TYPE_*\n"
+":param inputImage: is a string specifying the name and path of the input file.\n"
+":param outputImage: is a string specifying the name and path of the output file.\n"
+":param morphOperator: is a string with the name and path to a .gmtxt file with a square binary matrix specifying the morphology operator\n"
+":param useOpFile: is a boolean specifying whether the morphOperator file is present or whether a square operator (specified via opSize) should be used. (True = morphOperator, False = opSize)\n"
+":param opSize: is a integer specifying the square operator size (only used if useOpFile is False)\n"
+":param gdalformat: is a string specifying the GDAL image format (e.g., KEA)\n"
+":param datatype: is an int containing one of the values from rsgislib.TYPE_*\n"
 "\n"},
     
 {"imageLocalMinima", (PyCFunction)ImageMorphology_ImageLocalMinima, METH_VARARGS | METH_KEYWORDS,
-"imagemorphology.imageLocalMinima(inputImage=string, outputImage=string, sequencialOut=boolean, allowEqual=boolean, morphOperator=string, useOpFile=boolean, opSize=int, gdalFormat=string, dataType=int)\n"
+"imagemorphology.imageLocalMinima(inputImage=string, outputImage=string, sequencialOut=boolean, allowEqual=boolean, morphOperator=string, useOpFile=boolean, opSize=int, gdalformat=string, datatype=int)\n"
 "Uses image morphology to find local minima. \n"
 "\n"
 "Where:\n"
 "\n"
-"* inputImage is a string specifying the name and path of the input file.\n"
-"* outputImage is a string specifying the name and path of the output file.\n"
-"* sequencialOut is a boolean whether the output minima should be individual numbered (True) or just a binary mask (False).\n"
-"* allowEqual is a boolean specifying whether equal values are allowed in the output.\n"
-"* morphOperator is a string with the name and path to a .gmtxt file with a square binary matrix specifying the morphology operator\n"
-"* useOpFile is a boolean specifying whether the morphOperator file is present or whether a square operator (specified via opSize) should be used. (True = morphOperator, False = opSize)\n"
-"* opSize is a integer specifying the square operator size (only used if useOpFile is False)\n"
-"* gdalFormat is a string specifying the GDAL image format (e.g., KEA)\n"
-"* dataType is an int containing one of the values from rsgislib.TYPE_*\n"
+":param inputImage: is a string specifying the name and path of the input file.\n"
+":param outputImage: is a string specifying the name and path of the output file.\n"
+":param sequencialOut: is a boolean whether the output minima should be individual numbered (True) or just a binary mask (False).\n"
+":param allowEqual: is a boolean specifying whether equal values are allowed in the output.\n"
+":param morphOperator: is a string with the name and path to a .gmtxt file with a square binary matrix specifying the morphology operator\n"
+":param useOpFile: is a boolean specifying whether the morphOperator file is present or whether a square operator (specified via opSize) should be used. (True = morphOperator, False = opSize)\n"
+":param opSize: is a integer specifying the square operator size (only used if useOpFile is False)\n"
+":param gdalformat: is a string specifying the GDAL image format (e.g., KEA)\n"
+":param datatype: is an int containing one of the values from rsgislib.TYPE_*\n"
 "\n"},
     
 {"imageLocalMinimaCombinedOut", (PyCFunction)ImageMorphology_ImageLocalMinimaCombinedOut, METH_VARARGS | METH_KEYWORDS,
-"imagemorphology.imageLocalMinimaCombinedOut(inputImage=string, outputImage=string, sequencialOut=boolean, allowEqual=boolean, morphOperator=string, useOpFile=boolean, opSize=int, gdalFormat=string, dataType=int)\n"
+"imagemorphology.imageLocalMinimaCombinedOut(inputImage=string, outputImage=string, sequencialOut=boolean, allowEqual=boolean, morphOperator=string, useOpFile=boolean, opSize=int, gdalformat=string, datatype=int)\n"
 "Uses image morphology to find local minima, where the outputs will be combined into a single image.\n"
 "\n"
 "Where:\n"
 "\n"
-"* inputImage is a string specifying the name and path of the input file.\n"
-"* outputImage is a string specifying the name and path of the output file.\n"
-"* sequencialOut is a boolean whether the output minima should be individual numbered (True) or just a binary mask (False).\n"
-"* allowEqual is a boolean specifying whether equal values are allowed in the output.\n"
-"* morphOperator is a string with the name and path to a .gmtxt file with a square binary matrix specifying the morphology operator\n"
-"* useOpFile is a boolean specifying whether the morphOperator file is present or whether a square operator (specified via opSize) should be used. (True = morphOperator, False = opSize)\n"
-"* opSize is a integer specifying the square operator size (only used if useOpFile is False)\n"
-"* gdalFormat is a string specifying the GDAL image format (e.g., KEA)\n"
-"* dataType is an int containing one of the values from rsgislib.TYPE_*\n"
+":param inputImage: is a string specifying the name and path of the input file.\n"
+":param outputImage: is a string specifying the name and path of the output file.\n"
+":param sequencialOut: is a boolean whether the output minima should be individual numbered (True) or just a binary mask (False).\n"
+":param allowEqual: is a boolean specifying whether equal values are allowed in the output.\n"
+":param morphOperator: is a string with the name and path to a .gmtxt file with a square binary matrix specifying the morphology operator\n"
+":param useOpFile: is a boolean specifying whether the morphOperator file is present or whether a square operator (specified via opSize) should be used. (True = morphOperator, False = opSize)\n"
+":param opSize: is a integer specifying the square operator size (only used if useOpFile is False)\n"
+":param gdalformat: is a string specifying the GDAL image format (e.g., KEA)\n"
+":param datatype: is an int containing one of the values from rsgislib.TYPE_*\n"
 "\n"},
 
 {"imageOpening", (PyCFunction)ImageMorphology_ImageOpening, METH_VARARGS | METH_KEYWORDS,
-"imagemorphology.imageOpening(inputImage=string, outputImage=string, tempImage=string, morphOperator=string, useOpFile=boolean, opSize=int, gdalFormat=string, dataType=int, niters=int)\n"
+"imagemorphology.imageOpening(inputImage=string, outputImage=string, tempImage=string, morphOperator=string, useOpFile=boolean, opSize=int, gdalformat=string, datatype=int, niters=int)\n"
 "Performs an image morphology opening operation. \n"
 "\n"
 "Where:\n"
 "\n"
-"* inputImage is a string specifying the name and path of the input file.\n"
-"* outputImage is a string specifying the name and path of the output file.\n"
-"* tempImage is a string specifying the name and path of a tempory file used for intermediate processing step(s). If empty string ('') then an in memory image will be used.\n"
-"* morphOperator is a string with the name and path to a .gmtxt file with a square binary matrix specifying the morphology operator\n"
-"* useOpFile is a boolean specifying whether the morphOperator file is present or whether a square operator (specified via opSize) should be used. (True = morphOperator, False = opSize)\n"
-"* opSize is a integer specifying the square operator size (only used if useOpFile is False)\n"
-"* gdalFormat is a string specifying the GDAL image format (e.g., KEA)\n"
-"* dataType is an int containing one of the values from rsgislib.TYPE_*\n"
-"* niters is an int for the number of iterations of the operators (Optional, default = 1)\n"
+":param inputImage: is a string specifying the name and path of the input file.\n"
+":param outputImage: is a string specifying the name and path of the output file.\n"
+":param tempImage: is a string specifying the name and path of a tempory file used for intermediate processing step(s). If empty string ('') then an in memory image will be used.\n"
+":param morphOperator: is a string with the name and path to a .gmtxt file with a square binary matrix specifying the morphology operator\n"
+":param useOpFile: is a boolean specifying whether the morphOperator file is present or whether a square operator (specified via opSize) should be used. (True = morphOperator, False = opSize)\n"
+":param opSize: is a integer specifying the square operator size (only used if useOpFile is False)\n"
+":param gdalformat: is a string specifying the GDAL image format (e.g., KEA)\n"
+":param datatype: is an int containing one of the values from rsgislib.TYPE_*\n"
+":param niters: is an int for the number of iterations of the operators (Optional, default = 1)\n"
 "\n"},
 
 {"imageClosing", (PyCFunction)ImageMorphology_ImageClosing, METH_VARARGS | METH_KEYWORDS,
-"imagemorphology.imageClosing(inputImage=string, outputImage=string, tempImage=string, morphOperator=string, useOpFile=boolean, opSize=int, gdalFormat=string, dataType=int, niters=int)\n"
+"imagemorphology.imageClosing(inputImage=string, outputImage=string, tempImage=string, morphOperator=string, useOpFile=boolean, opSize=int, gdalformat=string, datatype=int, niters=int)\n"
 "Performs an image morphology closing operation. \n"
 "\n"
 "Where:\n"
 "\n"
-"* inputImage is a string specifying the name and path of the input file.\n"
-"* outputImage is a string specifying the name and path of the output file.\n"
-"* tempImage is a string specifying the name and path of a tempory file used for intermediate processing step(s). If empty string ('') then an in memory image will be used.\n"
-"* morphOperator is a string with the name and path to a .gmtxt file with a square binary matrix specifying the morphology operator\n"
-"* useOpFile is a boolean specifying whether the morphOperator file is present or whether a square operator (specified via opSize) should be used. (True = morphOperator, False = opSize)\n"
-"* opSize is a integer specifying the square operator size (only used if useOpFile is False)\n"
-"* gdalFormat is a string specifying the GDAL image format (e.g., KEA)\n"
-"* dataType is an int containing one of the values from rsgislib.TYPE_*\n"
-"* niters is an int for the number of iterations of the operators (Optional, default = 1)\n"
+":param inputImage: is a string specifying the name and path of the input file.\n"
+":param outputImage: is a string specifying the name and path of the output file.\n"
+":param tempImage: is a string specifying the name and path of a tempory file used for intermediate processing step(s). If empty string ('') then an in memory image will be used.\n"
+":param morphOperator: is a string with the name and path to a .gmtxt file with a square binary matrix specifying the morphology operator\n"
+":param useOpFile: is a boolean specifying whether the morphOperator file is present or whether a square operator (specified via opSize) should be used. (True = morphOperator, False = opSize)\n"
+":param opSize: is a integer specifying the square operator size (only used if useOpFile is False)\n"
+":param gdalformat: is a string specifying the GDAL image format (e.g., KEA)\n"
+":param datatype: is an int containing one of the values from rsgislib.TYPE_*\n"
+":param niters: is an int for the number of iterations of the operators (Optional, default = 1)\n"
 "\n"},
 
 {"imageBlackTopHat", (PyCFunction)ImageMorphology_ImageBlackTopHat, METH_VARARGS | METH_KEYWORDS,
-"imagemorphology.imageBlackTopHat(inputImage=string, outputImage=string, tempImage=string, morphOperator=string, useOpFile=boolean, opSize=int, gdalFormat=string, dataType=int)\n"
+"imagemorphology.imageBlackTopHat(inputImage=string, outputImage=string, tempImage=string, morphOperator=string, useOpFile=boolean, opSize=int, gdalformat=string, datatype=int)\n"
 "Performs an image morphology black top hat operation. \n"
 "\n"
 "Where:\n"
 "\n"
-"* inputImage is a string specifying the name and path of the input file.\n"
-"* outputImage is a string specifying the name and path of the output file.\n"
-"* tempImage is a string specifying the name and path of a tempory file used for intermediate processing step(s).\n"
-"* morphOperator is a string with the name and path to a .gmtxt file with a square binary matrix specifying the morphology operator\n"
-"* useOpFile is a boolean specifying whether the morphOperator file is present or whether a square operator (specified via opSize) should be used. (True = morphOperator, False = opSize)\n"
-"* opSize is a integer specifying the square operator size (only used if useOpFile is False)\n"
-"* gdalFormat is a string specifying the GDAL image format (e.g., KEA)\n"
-"* dataType is an int containing one of the values from rsgislib.TYPE_*\n"
+":param inputImage: is a string specifying the name and path of the input file.\n"
+":param outputImage: is a string specifying the name and path of the output file.\n"
+":param tempImage: is a string specifying the name and path of a tempory file used for intermediate processing step(s).\n"
+":param morphOperator: is a string with the name and path to a .gmtxt file with a square binary matrix specifying the morphology operator\n"
+":param useOpFile: is a boolean specifying whether the morphOperator file is present or whether a square operator (specified via opSize) should be used. (True = morphOperator, False = opSize)\n"
+":param opSize: is a integer specifying the square operator size (only used if useOpFile is False)\n"
+":param gdalformat: is a string specifying the GDAL image format (e.g., KEA)\n"
+":param datatype: is an int containing one of the values from rsgislib.TYPE_*\n"
 "\n"},
 
 {"imageWhiteTopHat", (PyCFunction)ImageMorphology_ImageWhiteTopHat, METH_VARARGS | METH_KEYWORDS,
-"imagemorphology.imageWhiteTopHat(inputImage=string, outputImage=string, tempImage=string, morphOperator=string, useOpFile=boolean, opSize=int, gdalFormat=string, dataType=int)\n"
+"imagemorphology.imageWhiteTopHat(inputImage=string, outputImage=string, tempImage=string, morphOperator=string, useOpFile=boolean, opSize=int, gdalformat=string, datatype=int)\n"
 "Performs an image morphology white top hat operation. \n"
 "\n"
 "Where:\n"
 "\n"
-"* inputImage is a string specifying the name and path of the input file.\n"
-"* outputImage is a string specifying the name and path of the output file.\n"
-"* tempImage is a string specifying the name and path of a tempory file used for intermediate processing step(s).\n"
-"* morphOperator is a string with the name and path to a .gmtxt file with a square binary matrix specifying the morphology operator\n"
-"* useOpFile is a boolean specifying whether the morphOperator file is present or whether a square operator (specified via opSize) should be used. (True = morphOperator, False = opSize)\n"
-"* opSize is a integer specifying the square operator size (only used if useOpFile is False)\n"
-"* gdalFormat is a string specifying the GDAL image format (e.g., KEA)\n"
-"* dataType is an int containing one of the values from rsgislib.TYPE_*\n"
+":param inputImage: is a string specifying the name and path of the input file.\n"
+":param outputImage: is a string specifying the name and path of the output file.\n"
+":param tempImage: is a string specifying the name and path of a tempory file used for intermediate processing step(s).\n"
+":param morphOperator: is a string with the name and path to a .gmtxt file with a square binary matrix specifying the morphology operator\n"
+":param useOpFile: is a boolean specifying whether the morphOperator file is present or whether a square operator (specified via opSize) should be used. (True = morphOperator, False = opSize)\n"
+":param opSize: is a integer specifying the square operator size (only used if useOpFile is False)\n"
+":param gdalformat: is a string specifying the GDAL image format (e.g., KEA)\n"
+":param datatype: is an int containing one of the values from rsgislib.TYPE_*\n"
 "\n"},
     
 {NULL}        /* Sentinel */

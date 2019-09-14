@@ -42,15 +42,13 @@ import rsgislib.imagecalc
 def calcNDVI(image, rBand, nBand, outImage, stats=True, gdalformat='KEA'):
     """ 
 Helper function to calculate NDVI ((NIR-RED)/(NIR+RED)), note the output no data value is -999.
-    
-Where:
 
-* image is a string specifying the input image file.
-* rBand is an int specifying the red band in the input image (band indexing starts at 1)
-* nBand is an int specifying the nir band in the input image (band indexing starts at 1)
-* outImage is a string specifying the output image file.
-* stats is a boolean specifying whether pyramids and stats should be calculated (Default: True)
-* gdalformat is a string specifing the output image file format (Default: KEA)
+:param image: is a string specifying the input image file.
+:param rBand: is an int specifying the red band in the input image (band indexing starts at 1)
+:param nBand: is an int specifying the nir band in the input image (band indexing starts at 1)
+:param outImage: is a string specifying the output image file.
+:param stats: is a boolean specifying whether pyramids and stats should be calculated (Default: True)
+:param gdalformat: is a string specifing the output image file format (Default: KEA)
     
 """
     expression = '(nir+red)!=0?(nir-red)/(nir+red):-999'
@@ -67,15 +65,13 @@ Where:
 def calcWBI(image, bBand, nBand, outImage, stats=True, gdalformat='KEA'):
     """ 
 Helper function to calculate WBI (Blue/NIR), note the output no data value is -999.
-    
-Where:
 
-* image is a string specifying the input image file.
-* bBand is an int specifying the blue band in the input image (band indexing starts at 1)
-* nBand is an int specifying the nir band in the input image (band indexing starts at 1)
-* outImage is a string specifying the output image file.
-* stats is a boolean specifying whether pyramids and stats should be calculated (Default: True)
-* gdalformat is a string specifing the output image file format (Default: KEA)
+:param image: is a string specifying the input image file.
+:param bBand: is an int specifying the blue band in the input image (band indexing starts at 1)
+:param nBand: is an int specifying the nir band in the input image (band indexing starts at 1)
+:param outImage: is a string specifying the output image file.
+:param stats: is a boolean specifying whether pyramids and stats should be calculated (Default: True)
+:param gdalformat: is a string specifing the output image file format (Default: KEA)
     
 """
     expression = 'nir!=0?blue/nir:-999'
@@ -99,12 +95,12 @@ See: Xu, H. (2006). Modification of normalised difference water index (NDWI) to 
     
 Where:
 
-* image is a string specifying the input image file.
-* nBand is an int specifying the nir band in the input image (band indexing starts at 1)
-* sBand is an int specifying the swir band (e.g., Landsat TM Band 5) in the input image (band indexing starts at 1)
-* outImage is a string specifying the output image file.
-* stats is a boolean specifying whether pyramids and stats should be calculated (Default: True)
-* gdalformat is a string specifing the output image file format (Default: KEA)
+:param image: is a string specifying the input image file.
+:param nBand: is an int specifying the nir band in the input image (band indexing starts at 1)
+:param sBand: is an int specifying the swir band (e.g., Landsat TM Band 5) in the input image (band indexing starts at 1)
+:param outImage: is a string specifying the output image file.
+:param stats: is a boolean specifying whether pyramids and stats should be calculated (Default: True)
+:param gdalformat: is a string specifing the output image file format (Default: KEA)
     
 """
     expression = '(nir+swir)!=0?(nir-swir)/(nir+swir):-999'
@@ -129,12 +125,12 @@ See: Xu, H. (2006). Modification of normalised difference water index (NDWI) to 
 
 Where:
 
-* image is a string specifying the input image file.
-* gBand is an int specifying the green band in the input image (band indexing starts at 1)
-* nBand is an int specifying the nir band in the input image (band indexing starts at 1)
-* outImage is a string specifying the output image file.
-* stats is a boolean specifying whether pyramids and stats should be calculated (Default: True)
-* gdalformat is a string specifing the output image file format (Default: KEA)
+:param image: is a string specifying the input image file.
+:param gBand: is an int specifying the green band in the input image (band indexing starts at 1)
+:param nBand: is an int specifying the nir band in the input image (band indexing starts at 1)
+:param outImage: is a string specifying the output image file.
+:param stats: is a boolean specifying whether pyramids and stats should be calculated (Default: True)
+:param gdalformat: is a string specifing the output image file format (Default: KEA)
     
 """
     expression = '(green+nir)!=0?(green-nir)/(green+nir):-999'
@@ -158,12 +154,12 @@ See: Xu, H. (2006). Modification of normalised difference water index (NDWI) to 
 
 Where:
 
-* image is a string specifying the input image file.
-* gBand is an int specifying the green band in the input image (band indexing starts at 1)
-* sBand is an int specifying the swir band (e.g., Landsat TM Band 5) in the input image (band indexing starts at 1)
-* outImage is a string specifying the output image file.
-* stats is a boolean specifying whether pyramids and stats should be calculated (Default: True)
-* gdalformat is a string specifing the output image file format (Default: KEA)
+:param image: is a string specifying the input image file.
+:param gBand: is an int specifying the green band in the input image (band indexing starts at 1)
+:param sBand: is an int specifying the swir band (e.g., Landsat TM Band 5) in the input image (band indexing starts at 1)
+:param outImage: is a string specifying the output image file.
+:param stats: is a boolean specifying whether pyramids and stats should be calculated (Default: True)
+:param gdalformat: is a string specifing the output image file format (Default: KEA)
     
 """
     expression = '(green+swir)!=0?(green-swir)/(green+swir):-999'
@@ -183,13 +179,13 @@ Helper function to calculate whiteness, note the output no data value is -999.
     
 Where:
 
-* image is a string specifying the input image file.
-* bBand is an int specifying the blue band in the input image (band indexing starts at 1)
-* gBand is an int specifying the green band in the input image (band indexing starts at 1)
-* rBand is an int specifying the red band in the input image (band indexing starts at 1)
-* outImage is a string specifying the output image file.
-* stats is a boolean specifying whether pyramids and stats should be calculated (Default: True)
-* gdalformat is a string specifing the output image file format (Default: KEA)
+:param image: is a string specifying the input image file.
+:param bBand: is an int specifying the blue band in the input image (band indexing starts at 1)
+:param gBand: is an int specifying the green band in the input image (band indexing starts at 1)
+:param rBand: is an int specifying the red band in the input image (band indexing starts at 1)
+:param outImage: is a string specifying the output image file.
+:param stats: is a boolean specifying whether pyramids and stats should be calculated (Default: True)
+:param gdalformat: is a string specifing the output image file format (Default: KEA)
     
 """
     expression = '(blue+green+red)!=0?(abs(blue-((blue+green+red)/3)) + abs(green-((blue+green+red)/3)) + abs(red-((blue+green+red)/3)))/((blue+green+red)/3):-999'
@@ -209,14 +205,14 @@ Helper function to calculate visable brightness, note the output no data value i
     
 Where:
 
-* image is a string specifying the input image file.
-* bBand is an int specifying the blue band in the input image (band indexing starts at 1)
-* gBand is an int specifying the green band in the input image (band indexing starts at 1)
-* rBand is an int specifying the red band in the input image (band indexing starts at 1)
-* outImage is a string specifying the output image file.
-* stats is a boolean specifying whether pyramids and stats should be calculated (Default: True)
-* gdalformat is a string specifing the output image file format (Default: KEA)
-* scalefac is a float which can be used retirved reflectance between 0-1 (Default: 1000 to match rsgislib/arcsi)
+:param image: is a string specifying the input image file.
+:param bBand: is an int specifying the blue band in the input image (band indexing starts at 1)
+:param gBand: is an int specifying the green band in the input image (band indexing starts at 1)
+:param rBand: is an int specifying the red band in the input image (band indexing starts at 1)
+:param outImage: is a string specifying the output image file.
+:param stats: is a boolean specifying whether pyramids and stats should be calculated (Default: True)
+:param gdalformat: is a string specifing the output image file format (Default: KEA)
+:param scalefac: is a float which can be used retirved reflectance between 0-1 (Default: 1000 to match rsgislib/arcsi)
     
 """
     expression = '(blue+green+red)!=0?((blue/'+str(scalefac)+')+(green/'+str(scalefac)+')+(red/'+str(scalefac)+'))/3:-999'
@@ -237,13 +233,13 @@ Helper function to calculate visable brightness, note the output no data value i
     
 Where:
 
-* image is a string specifying the input image file.
-* bBand is an int specifying the blue band in the input image (band indexing starts at 1)
-* gBand is an int specifying the green band in the input image (band indexing starts at 1)
-* rBand is an int specifying the red band in the input image (band indexing starts at 1)
-* outImage is a string specifying the output image file.
-* stats is a boolean specifying whether pyramids and stats should be calculated (Default: True)
-* gdalformat is a string specifing the output image file format (Default: KEA)
+:param image: is a string specifying the input image file.
+:param bBand: is an int specifying the blue band in the input image (band indexing starts at 1)
+:param gBand: is an int specifying the green band in the input image (band indexing starts at 1)
+:param rBand: is an int specifying the red band in the input image (band indexing starts at 1)
+:param outImage: is a string specifying the output image file.
+:param stats: is a boolean specifying whether pyramids and stats should be calculated (Default: True)
+:param gdalformat: is a string specifing the output image file format (Default: KEA)
     
 """
     rsgisUtils = rsgislib.RSGISPyUtils()
@@ -270,12 +266,12 @@ Helper function to calculate Corrected Transformed Vegetation Index ((NDVI + 0.5
     
 Where:
 
-* image is a string specifying the input image file.
-* bBand is an int specifying the blue band in the input image (band indexing starts at 1)
-* nBand is an int specifying the nir band in the input image (band indexing starts at 1)
-* outImage is a string specifying the output image file.
-* stats is a boolean specifying whether pyramids and stats should be calculated (Default: True)
-* gdalformat is a string specifing the output image file format (Default: KEA)
+:param image: is a string specifying the input image file.
+:param bBand: is an int specifying the blue band in the input image (band indexing starts at 1)
+:param nBand: is an int specifying the nir band in the input image (band indexing starts at 1)
+:param outImage: is a string specifying the output image file.
+:param stats: is a boolean specifying whether pyramids and stats should be calculated (Default: True)
+:param gdalformat: is a string specifing the output image file format (Default: KEA)
     
 """
     expression = '(nir+red)!=0?(((nir-red)/(nir+red))+0.5)/sqrt(abs((nir-red)/(nir+red))+0.5)):-999'

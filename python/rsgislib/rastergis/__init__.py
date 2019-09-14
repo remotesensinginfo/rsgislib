@@ -54,12 +54,12 @@ def exportCols2GDALImage(clumps, outimage, gdalformat, datatype, fields, ratband
 
 Where:
 
-* clumps is a string containing the name of the input image file with RAT
-* outimage is a string containing the name of the output gdal file
-* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'
-* datatype is an int containing one of the values from rsgislib.TYPE_*
-* field is a list of strings, providing the names of the column to be exported.
-* ratband is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated.
+:param clumps: is a string containing the name of the input image file with RAT
+:param outimage: is a string containing the name of the output gdal file
+:param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'
+:param datatype: is an int containing one of the values from rsgislib.TYPE_*
+:param field: is a list of strings, providing the names of the column to be exported.
+:param ratband: is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated.
 
 Example::
 
@@ -104,8 +104,8 @@ def getRATLength(clumps_img, rat_band=1):
     """
 A function which returns the length (i.e., number of rows) within the RAT.
 
-* clumps_img - path to the image file with the RAT
-* rat_band - the band within the image file for which the RAT is to read.
+:param clumps_img: path to the image file with the RAT
+:param rat_band: the band within the image file for which the RAT is to read.
 
 """
     # Open input image file
@@ -131,8 +131,8 @@ def getRATColumns(clumps_img, rat_band=1):
     """
 A function which returns a list of column names within the RAT.
 
-* clumps_img - path to the image file with the RAT
-* rat_band - the band within the image file for which the RAT is to read.
+:param clumps_img: path to the image file with the RAT
+:param rat_band: the band within the image file for which the RAT is to read.
 
 """
     # Open input image file
@@ -162,8 +162,8 @@ def getRATColumnsInfo(clumps_img, rat_band=1):
 A function which returns a dictionary of column names with type (GFT_Integer, GFT_Real, GFT_String)
 and usage (e.g., GFU_Generic, GFU_PixelCount, GFU_Name, etc.) within the RAT.
 
-* clumps_img - path to the image file with the RAT
-* rat_band - the band within the image file for which the RAT is to read.
+:param clumps_img: path to the image file with the RAT
+:param rat_band: the band within the image file for which the RAT is to read.
 
 """
     # Open input image file
@@ -200,10 +200,10 @@ neighbours are popualted using the function rsgislib.rastergis.findNeighbours.
 By default the whole datasets of neightbours is read to memory but the start_row 
 and end_row variables can be used to read a subset of the RAT.
 
-* clumps_img - path to the image file with the RAT
-* start_row - the row within the RAT to start reading, if None will start at 0 (Default: None).
-* end_row - the row within the RAT to end reading, if None will end at n_rows within the RAT. (Default: None)
-* rat_band - the band within the image file for which the RAT is to read.
+:param clumps_img: path to the image file with the RAT
+:param start_row: the row within the RAT to start reading, if None will start at 0 (Default: None).
+:param end_row: the row within the RAT to end reading, if None will end at n_rows within the RAT. (Default: None)
+:param rat_band: the band within the image file for which the RAT is to read.
 
 """
     if not haveHDF5:

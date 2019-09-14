@@ -77,21 +77,21 @@ class ClassInfoObj(object):
     """
     This is a class to store the information associated within the classification.
     
-    * id - Output pixel value for this class
-    * fileH5 - hdf5 file (from rsgislib.imageutils.extractZoneImageBandValues2HDF) with the training data for the class
-    * red - Red colour for visualisation (0-255)
-    * green - Green colour for visualisation (0-255)
-    * blue - Blue colour for visualisation (0-255)
+    :param id: Output pixel value for this class
+    :param fileH5: hdf5 file (from rsgislib.imageutils.extractZoneImageBandValues2HDF) with the training data for the class
+    :param red: Red colour for visualisation (0-255)
+    :param green: Green colour for visualisation (0-255)
+    :param blue: Blue colour for visualisation (0-255)
 
     """
     def __init__(self, id=None, fileH5=None, red=None, green=None, blue=None):
         """
 
-        * id - Output pixel value for this class
-        * fileH5 - hdf5 file (from rsgislib.imageutils.extractZoneImageBandValues2HDF) with the training data for the class
-        * red - Red colour for visualisation (0-255)
-        * green - Green colour for visualisation (0-255)
-        * blue - Blue colour for visualisation (0-255)
+        :param id: Output pixel value for this class
+        :param fileH5: hdf5 file (from rsgislib.imageutils.extractZoneImageBandValues2HDF) with the training data for the class
+        :param red: Red colour for visualisation (0-255)
+        :param green: Green colour for visualisation (0-255)
+        :param blue: Blue colour for visualisation (0-255)
         
         """
         self.id = id
@@ -106,31 +106,31 @@ class SamplesInfoObj(object):
     """
     This is a class to store the information associated within the classification.
     
-    * className - The name of the class
-    * classID - Is the classification numeric ID (i.e., output pixel value)
-    * maskImg - The input image mask from which samples are taken
-    * maskPxlVal - The pixel value within the mask for the class
-    * outSampImgFile - Temporary file which will store the sampled pixels.
-    * numSamps - The number of samples required.
-    * samplesH5File - File location for the HDF5 file with the input image values for training.
-    * red - for visualisation red value.
-    * green - for visualisation green value.
-    * blue - for visualisation blue value.
+    :param className: The name of the class
+    :param classID: Is the classification numeric ID (i.e., output pixel value)
+    :param maskImg: The input image mask from which samples are taken
+    :param maskPxlVal: The pixel value within the mask for the class
+    :param outSampImgFile: Temporary file which will store the sampled pixels.
+    :param numSamps: The number of samples required.
+    :param samplesH5File: File location for the HDF5 file with the input image values for training.
+    :param red: for visualisation red value.
+    :param green: for visualisation green value.
+    :param blue: for visualisation blue value.
 
     """
     def __init__(self, className=None, classID=None, maskImg=None, maskPxlVal=None, outSampImgFile=None, numSamps=None, samplesH5File=None, red=None, green=None, blue=None):
         """
 
-        * className - The name of the class
-        * classID - Is the classification numeric ID (i.e., output pixel value)
-        * maskImg - The input image mask from which samples are taken
-        * maskPxlVal - The pixel value within the mask for the class
-        * outSampImgFile - Temporary file which will store the sampled pixels.
-        * numSamps - The number of samples required.
-        * samplesH5File - File location for the HDF5 file with the input image values for training.
-        * red - for visualisation red value.
-        * green - for visualisation green value.
-        * blue - for visualisation blue value.
+        :param className: The name of the class
+        :param classID: Is the classification numeric ID (i.e., output pixel value)
+        :param maskImg: The input image mask from which samples are taken
+        :param maskPxlVal: The pixel value within the mask for the class
+        :param outSampImgFile: Temporary file which will store the sampled pixels.
+        :param numSamps: The number of samples required.
+        :param samplesH5File: File location for the HDF5 file with the input image values for training.
+        :param red: for visualisation red value.
+        :param green: for visualisation green value.
+        :param blue: for visualisation blue value.
 
         """
         self.className = className
@@ -152,9 +152,9 @@ def findClassifierParametersAndTrain(classTrainInfo, paramSearchSampNum=0, gridS
 A function to find the optimal parameters for classification using a Grid Search (http://scikit-learn.org/stable/modules/grid_search.html). 
 The returned classifier instance will be trained using the input data.
 
-* classTrainInfo - list of ClassInfoObj objects which will be used to train the classifier.
-* paramSearchSampNum - the number of samples that will be randomly sampled from the training data for each class for applying the grid search (tend to use a small data sample as can take a long time). A value of 500 would use 500 samples per class.
-* gridSearch - is an instance of the sklearn.model_selection.GridSearchCV with an instance of the choosen classifier and parameters to be searched.
+:param classTrainInfo: list of ClassInfoObj objects which will be used to train the classifier.
+:param paramSearchSampNum: the number of samples that will be randomly sampled from the training data for each class for applying the grid search (tend to use a small data sample as can take a long time). A value of 500 would use 500 samples per class.
+:param gridSearch: is an instance of the sklearn.model_selection.GridSearchCV with an instance of the choosen classifier and parameters to be searched.
 
     """
     # Check h5py is available
@@ -227,8 +227,8 @@ def trainClassifier(classTrainInfo, skClassifier):
     """
 This function trains the classifier. 
 
-* classTrainInfo - list of ClassInfoObj objects which will be used to train the classifier.
-* skClassifier - an instance of a parameterised scikit-learn classifier (http://scikit-learn.org/stable/supervised_learning.html)
+:param classTrainInfo: list of ClassInfoObj objects which will be used to train the classifier.
+:param skClassifier: an instance of a parameterised scikit-learn classifier (http://scikit-learn.org/stable/supervised_learning.html)
 
     """
      # Check h5py is available
@@ -304,14 +304,14 @@ def applyClassifer(classTrainInfo, skClassifier, imgMask, imgMaskVal, imgFileInf
     """
 This function uses a trained classifier and applies it to the provided input image.
 
-* classTrainInfo - dict (where the key is the class name) of ClassInfoObj objects which will be used to train the classifier (i.e., trainClassifier()), provide pixel value id and RGB class values.
-* skClassifier - a trained instance of a scikit-learn classifier (e.g., use trainClassifier or findClassifierParametersAndTrain)
-* imgMask - is an image file providing a mask to specify where should be classified. Simplest mask is all the valid data regions (rsgislib.imageutils.genValidMask)
-* imgMaskVal - the pixel value within the imgMask to limit the region to which the classification is applied. Can be used to create a heirachical classification.
-* imgFileInfo - a list of rsgislib.imageutils.ImageBandInfo objects (also used within rsgislib.imageutils.extractZoneImageBandValues2HDF) to identify which images and bands are to be used for the classification so it adheres to the training data. 
-* outputImg - output image file with the classification. Note. by default a colour table and class names column is added to the image. If an error is produced use HFA or KEA formats.
-* gdalformat - is the output image format - all GDAL supported formats are supported. 
-* classClrNames - default is True and therefore a colour table will the colours specified in classTrainInfo and a ClassName column (from imgFileInfo) will be added to the output file.
+:param classTrainInfo: dict (where the key is the class name) of ClassInfoObj objects which will be used to train the classifier (i.e., trainClassifier()), provide pixel value id and RGB class values.
+:param skClassifier: a trained instance of a scikit-learn classifier (e.g., use trainClassifier or findClassifierParametersAndTrain)
+:param imgMask: is an image file providing a mask to specify where should be classified. Simplest mask is all the valid data regions (rsgislib.imageutils.genValidMask)
+:param imgMaskVal: the pixel value within the imgMask to limit the region to which the classification is applied. Can be used to create a heirachical classification.
+:param imgFileInfo: a list of rsgislib.imageutils.ImageBandInfo objects (also used within rsgislib.imageutils.extractZoneImageBandValues2HDF) to identify which images and bands are to be used for the classification so it adheres to the training data.
+:param outputImg: output image file with the classification. Note. by default a colour table and class names column is added to the image. If an error is produced use HFA or KEA formats.
+:param gdalformat: is the output image format - all GDAL supported formats are supported.
+:param classClrNames: default is True and therefore a colour table will the colours specified in classTrainInfo and a ClassName column (from imgFileInfo) will be added to the output file.
 
     """
     if not haveRIOS:
@@ -369,13 +369,13 @@ def performPerPxlMLClassShpTrain(imageBandInfo=[], classInfo=dict(), outputImg='
 A function which performs a per-pixel based classification of a scene using a machine learning classifier from the scikit-learn
 library where a single polygon shapefile per class is required to represent the training data. 
 
-* imageBandInfo is a list of rsgislib.imageutils.ImageBandInfo objects specifying the images which should be used.
-* classInfo is a dict of rsgislib.classification.classimgutils.ClassInfoObj objects where the key is the class name. The fileH5 field is used to define the file path to the shapefile with the training data.
-* outputImg is the name and path to the output image file.
-* gdalformat is the output image file format (e.g., KEA). 
-* tmpPath is a tempory file path which can be used during processing.
-* skClassifier is an instance of a scikit-learn classifier appropriately parameterised. If None then the gridSearch object must not be None.
-* gridSearch is an instance of a scikit-learn sklearn.model_selection.GridSearchCV object with the classifier and parameter search space specified. (If None then skClassifier will be used; if both not None then skClassifier will be used in preference to gridSearch)
+:param imageBandInfo: is a list of rsgislib.imageutils.ImageBandInfo objects specifying the images which should be used.
+:param classInfo: is a dict of rsgislib.classification.classimgutils.ClassInfoObj objects where the key is the class name. The fileH5 field is used to define the file path to the shapefile with the training data.
+:param outputImg: is the name and path to the output image file.
+:param gdalformat: is the output image file format (e.g., KEA).
+:param tmpPath: is a tempory file path which can be used during processing.
+:param skClassifier: is an instance of a scikit-learn classifier appropriately parameterised. If None then the gridSearch object must not be None.
+:param gridSearch: is an instance of a scikit-learn sklearn.model_selection.GridSearchCV object with the classifier and parameter search space specified. (If None then skClassifier will be used; if both not None then skClassifier will be used in preference to gridSearch)
 
 Example::
     
@@ -457,18 +457,6 @@ Example::
         shutil.rmtree(tmpPath, ignore_errors=True)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 def _applyClassification(inParams):
     """
     Internal function which is used by performVotingClassification
@@ -504,16 +492,16 @@ using multiple processing cores.
 
 Where:
 
-* skClassifiers a list of classifiers (from scikit-learn), the number of classifiers defined will be equal to the number of votes.
-* trainSamplesInfo - a list of rsgislib.classification.classimgutils.SamplesInfoObj objects used to parameters the classifer and extract training data.
-* imgFileInfo - a list of rsgislib.imageutils.ImageBandInfo objects (also used within rsgislib.imageutils.extractZoneImageBandValues2HDF) to identify which images and bands are to be used for the classification so it adheres to the training data. 
-* classAreaMask - a mask image which is used to specified the areas of the scene which are to be classified.
-* classMaskPxlVal - is the pixel value within the classAreaMask image for the areas of the image which are to be classified.
-* tmpDIR - a temporary file location which will be created and removed during processing.
-* tmpImgBase - the same name of files written to the tmpDIR
-* outClassImg - the final output image file.
-* gdalformat - the output file format for outClassImg
-* numCores - is the number of processing cores to be used for the analysis (if -1 then all cores on the machine will be used).
+:param skClassifiers: a list of classifiers (from scikit-learn), the number of classifiers defined will be equal to the number of votes.
+:param trainSamplesInfo: a list of rsgislib.classification.classimgutils.SamplesInfoObj objects used to parameters the classifer and extract training data.
+:param imgFileInfo: a list of rsgislib.imageutils.ImageBandInfo objects (also used within rsgislib.imageutils.extractZoneImageBandValues2HDF) to identify which images and bands are to be used for the classification so it adheres to the training data.
+:param classAreaMask: a mask image which is used to specified the areas of the scene which are to be classified.
+:param classMaskPxlVal: is the pixel value within the classAreaMask image for the areas of the image which are to be classified.
+:param tmpDIR: a temporary file location which will be created and removed during processing.
+:param tmpImgBase: the same name of files written to the tmpDIR
+:param outClassImg: the final output image file.
+:param gdalformat: the output file format for outClassImg
+:param numCores: is the number of processing cores to be used for the analysis (if -1 then all cores on the machine will be used).
 
 Example::
     
@@ -627,14 +615,14 @@ image and then applied using the predict function (therefore this function is on
 compatiable with clusterers which have the predict function implemented) to the whole
 image.
 
-* inputImg - input image file.
-* outputImg - output image file.
-* gdalformat - output image file format.
-* noDataVal - no data value associated with the input image.
-* imgSamp - the input image sampling. (e.g., 100 is every 100th pixel)
-* clusterer - clusterer from scikit-learn which must have a predict function.
-* calcStats - calculate image pixel statistics, histogram and image pyramids - note if you are not using a KEA file then the format needs to support RATs for this option as histogram and colour table are written to RAT.
-* useMeanShiftEstBandWidth - use the mean-shift algorithm as the clusterer (pass None as the clusterer) where the bandwidth is calculated from the data itself.
+:param inputImg: input image file.
+:param outputImg: output image file.
+:param gdalformat: output image file format.
+:param noDataVal: no data value associated with the input image.
+:param imgSamp: the input image sampling. (e.g., 100 is every 100th pixel)
+:param clusterer: clusterer from scikit-learn which must have a predict function.
+:param calcStats: calculate image pixel statistics, histogram and image pyramids - note if you are not using a KEA file then the format needs to support RATs for this option as histogram and colour table are written to RAT.
+:param useMeanShiftEstBandWidth: use the mean-shift algorithm as the clusterer (pass None as the clusterer) where the bandwidth is calculated from the data itself.
 
 """
     print('Sample input image:')
@@ -697,15 +685,15 @@ within the scikit-learn library. The clusterer is applied to a single tile at a 
 and therefore produces tile boundaries in the result. However, memory is controlled 
 such that usage isn't excessive which it could be when processing a whole image.
 
-* inputImg - input image file.
-* outputImg - output image file.
-* gdalformat - output image file format.
-* noDataVal - no data value associated with the input image.
-* clusterer - clusterer from scikit-learn which must have a predict function.
-* calcStats - calculate image pixel statistics, histogram and image pyramids - note if you are not using a KEA file then the format needs to support RATs for this option as histogram and colour table are written to RAT.
-* useMeanShiftEstBandWidth - use the mean-shift algorithm as the clusterer (pass None as the clusterer) where the bandwidth is calculated from the data itself.
-* tileXSize - tile size in the x-axis in pixels.
-* tileYSize - tile size in the y-axis in pixels.
+:param inputImg: input image file.
+:param outputImg: output image file.
+:param gdalformat: output image file format.
+:param noDataVal: no data value associated with the input image.
+:param clusterer: clusterer from scikit-learn which must have a predict function.
+:param calcStats: calculate image pixel statistics, histogram and image pyramids - note if you are not using a KEA file then the format needs to support RATs for this option as histogram and colour table are written to RAT.
+:param useMeanShiftEstBandWidth: use the mean-shift algorithm as the clusterer (pass None as the clusterer) where the bandwidth is calculated from the data itself.
+:param tileXSize: tile size in the x-axis in pixels.
+:param tileYSize: tile size in the y-axis in pixels.
 
 """
     if useMeanShiftEstBandWidth:
@@ -764,13 +752,13 @@ operation so therefore requires the whole image to be loaded into memory. Howeve
 if there is sufficent memory all the clustering algorithms within scikit-learn can be
 applied without boundary artifacts. 
 
-* inputImg - input image file.
-* outputImg - output image file.
-* gdalformat - output image file format.
-* noDataVal - no data value associated with the input image.
-* clusterer - clusterer from scikit-learn which must have a predict function.
-* calcStats - calculate image pixel statistics, histogram and image pyramids - note if you are not using a KEA file then the format needs to support RATs for this option as histogram and colour table are written to RAT.
-* useMeanShiftEstBandWidth - use the mean-shift algorithm as the clusterer (pass None as the clusterer) where the bandwidth is calculated from the data itself.
+:param inputImg: input image file.
+:param outputImg: output image file.
+:param gdalformat: output image file format.
+:param noDataVal: no data value associated with the input image.
+:param clusterer: clusterer from scikit-learn which must have a predict function.
+:param calcStats: calculate image pixel statistics, histogram and image pyramids - note if you are not using a KEA file then the format needs to support RATs for this option as histogram and colour table are written to RAT.
+:param useMeanShiftEstBandWidth: use the mean-shift algorithm as the clusterer (pass None as the clusterer) where the bandwidth is calculated from the data itself.
 
 """
     # Create output image

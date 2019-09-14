@@ -40,14 +40,14 @@ def plotImageSpectra(inputImage, roiFile, outputPlotFile, wavelengths, plotTitle
     """A utility function to extract and plot image spectra.
 Where:
 
-* inputImage is the input image
-* roiFile is the region of interest file as a shapefile - if multiple polygons are defined the spectra for each will be added to the plot.
-* outputPlotFile is the output PDF file for the plot which has been create
-* wavelengths is list of numbers with the wavelength of each band (must have the same number of wavelengths as image bands)
-* plotTitle is a string with the title for the plot
-* scaleFactor is a float specifying the scaling to percentage (0 - 100). (Default is 0.1, i.e., pixel values are scaled between 0-1000; ARCSI default).
-* showReflStd is a boolean (default: True) to specify whether a shaded region showing 1 standard deviation from the mean on the plot alongside the mean spectra.
-* reflMax is a parameter for setting the maximum reflectance value on the Y axis (if None the maximum value in the dataset is used
+:param inputImage: is the input image
+:param roiFile: is the region of interest file as a shapefile - if multiple polygons are defined the spectra for each will be added to the plot.
+:param outputPlotFile: is the output PDF file for the plot which has been create
+:param wavelengths: is list of numbers with the wavelength of each band (must have the same number of wavelengths as image bands)
+:param plotTitle: is a string with the title for the plot
+:param scaleFactor: is a float specifying the scaling to percentage (0 - 100). (Default is 0.1, i.e., pixel values are scaled between 0-1000; ARCSI default).
+:param showReflStd: is a boolean (default: True) to specify whether a shaded region showing 1 standard deviation from the mean on the plot alongside the mean spectra.
+:param reflMax: is a parameter for setting the maximum reflectance value on the Y axis (if None the maximum value in the dataset is used
 
 Example::
 
@@ -142,26 +142,26 @@ def plotImageComparison(inputImage1, inputImage2, img1Band, img2Band, outputPlot
     """A function to plot two images against each other. 
 Where:
 
-* inputImage1 is a string with the path to the first image.
-* inputImage2 is a string with the path to the second image.
-* img1Band is an int specifying the band in the first image to be plotted.
-* img2Band is an int specifying the band in the second image to be plotted.
-* outputPlotFile is a string specifying the output PDF for the plot.
-* numBins is an int specifying the number of bins within each axis of the histogram (default: 100)
-* img1Min is a double specifying the minimum value to be used in the histogram from image 1. If value is None then taken from the image.
-* img1Max is a double specifying the maximum value to be used in the histogram from image 1. If value is None then taken from the image.
-* img2Min is a double specifying the minimum value to be used in the histogram from image 2. If value is None then taken from the image.
-* img2Max is a double specifying the maximum value to be used in the histogram from image 2. If value is None then taken from the image.
-* img1Scale is a double specifying the scale for image 1 (Default 1).
-* img2Scale is a double specifying the scale for image 2 (Default 1).
-* img1Off is a double specifying the offset for image 1 (Default 0).
-* img2Off is a double specifying the offset for image 2 (Default 0).
-* normOutput is a boolean specifying whether the histogram should be normalised (Default: False).
-* plotTitle is a string specifying the title of the plot (Default: '2D Histogram').
-* xLabel is a string specifying the x axis label (Default: 'X Axis')
-* yLabel is a string specifying the y axis label (Default: 'Y Axis')
-* ctable is a string specifying the colour table to be used (Default: jet), list of available colour tables specified by matplotlib: http://matplotlib.org/examples/color/colormaps_reference.html
-* interp is a string specifying the interpolation algorithm to be used (Default: 'nearest'). Available values are ‘none’, ‘nearest’, ‘bilinear’, ‘bicubic’, ‘spline16’, ‘spline36’, ‘hanning’, ‘hamming’, ‘hermite’, ‘kaiser’, ‘quadric’, ‘catrom’, ‘gaussian’, ‘bessel’, ‘mitchell’, ‘sinc’, ‘lanczos’.
+:param inputImage1: is a string with the path to the first image.
+:param inputImage2: is a string with the path to the second image.
+:param img1Band: is an int specifying the band in the first image to be plotted.
+:param img2Band: is an int specifying the band in the second image to be plotted.
+:param outputPlotFile: is a string specifying the output PDF for the plot.
+:param numBins: is an int specifying the number of bins within each axis of the histogram (default: 100)
+:param img1Min: is a double specifying the minimum value to be used in the histogram from image 1. If value is None then taken from the image.
+:param img1Max: is a double specifying the maximum value to be used in the histogram from image 1. If value is None then taken from the image.
+:param img2Min: is a double specifying the minimum value to be used in the histogram from image 2. If value is None then taken from the image.
+:param img2Max: is a double specifying the maximum value to be used in the histogram from image 2. If value is None then taken from the image.
+:param img1Scale: is a double specifying the scale for image 1 (Default 1).
+:param img2Scale: is a double specifying the scale for image 2 (Default 1).
+:param img1Off: is a double specifying the offset for image 1 (Default 0).
+:param img2Off: is a double specifying the offset for image 2 (Default 0).
+:param normOutput: is a boolean specifying whether the histogram should be normalised (Default: False).
+:param plotTitle: is a string specifying the title of the plot (Default: '2D Histogram').
+:param xLabel: is a string specifying the x axis label (Default: 'X Axis')
+:param yLabel: is a string specifying the y axis label (Default: 'Y Axis')
+:param ctable: is a string specifying the colour table to be used (Default: jet), list of available colour tables specified by matplotlib: http://matplotlib.org/examples/color/colormaps_reference.html
+:param interp: is a string specifying the interpolation algorithm to be used (Default: 'nearest'). Available values are ‘none’, ‘nearest’, ‘bilinear’, ‘bicubic’, ‘spline16’, ‘spline36’, ‘hanning’, ‘hamming’, ‘hermite’, ‘kaiser’, ‘quadric’, ‘catrom’, ‘gaussian’, ‘bessel’, ‘mitchell’, ‘sinc’, ‘lanczos’.
     
 Example::
 
@@ -262,22 +262,25 @@ Example::
     except Exception as e:
         raise e
 
+
 def plotImageHistogram(inputImage, imgBand, outputPlotFile, numBins=100, imgMin=None, imgMax=None, normOutput=False, plotTitle='Histogram', xLabel='X Axis', colour='blue', edgecolour='black', linewidth=None):
-    """A function to plot the histogram of an image. 
+    """
+A function to plot the histogram of an image.
+
 Where:
 
-* inputImage is a string with the path to the image.
-* imgBand is an int specifying the band in the image to be plotted.
-* outputPlotFile is a string specifying the output PDF for the plot.
-* numBins is an int specifying the number of bins within each axis of the histogram (default: 100)
-* imgMin is a double specifying the minimum value to be used in the histogram from the image. If value is None then taken from the image.
-* imgMax is a double specifying the maximum value to be used in the histogram from the image. If value is None then taken from the image.
-* normOutput is a boolean specifying whether the histogram should be normalised (Default: False).
-* plotTitle is a string specifying the title of the plot (Default: '2D Histogram').
-* xLabel is a string specifying the x axis label (Default: 'X Axis')
-* colour is the colour of the bars in the plot (see matplotlib documentation for how to specify, either keyword or RGB values (e.g., [1.0,0,0])
-* edgecolour is the colour of the edges of the bars
-* linewidth is the thickness of the edges of the bars in the plot.
+:param inputImage: is a string with the path to the image.
+:param imgBand: is an int specifying the band in the image to be plotted.
+:param outputPlotFile: is a string specifying the output PDF for the plot.
+:param numBins: is an int specifying the number of bins within each axis of the histogram (default: 100)
+:param imgMin: is a double specifying the minimum value to be used in the histogram from the image. If value is None then taken from the image.
+:param imgMax: is a double specifying the maximum value to be used in the histogram from the image. If value is None then taken from the image.
+:param normOutput: is a boolean specifying whether the histogram should be normalised (Default: False).
+:param plotTitle: is a string specifying the title of the plot (Default: '2D Histogram').
+:param xLabel: is a string specifying the x axis label (Default: 'X Axis')
+:param colour: is the colour of the bars in the plot (see matplotlib documentation for how to specify, either keyword or RGB values (e.g., [1.0,0,0])
+:param edgecolour: is the colour of the edges of the bars
+:param linewidth: is the thickness of the edges of the bars in the plot.
     
 Example::
 

@@ -51,9 +51,9 @@ class RSGISAbstractFilter:
     Abstract class for filter defining the interface to be used within the performTiledImgFilter function.
     Must define:
     
-    * self.filterSize - size of the image filter (must be an odd number)
-    * self.gdalformat - the output image file format
-    * self.dataType - the output image data type (e.g., rsgislib.TYPE_16UINT)
+    :param self.filterSize: size of the image filter (must be an odd number)
+    :param self.gdalformat: the output image file format
+    :param self.dataType: the output image data type (e.g., rsgislib.TYPE_16UINT)
     """
     __metaclass__ = ABCMeta
     
@@ -68,8 +68,8 @@ class RSGISAbstractFilter:
         Abstract function through which the input image
         is filtered to produce the output image.
         
-        * inputimage - is the name and path of the input image.
-        * outputimage - is the name and path of the output image.
+        :param inputimage: is the name and path of the input image.
+        :param outputimage: is the name and path of the output image.
         """
         pass
     
@@ -598,19 +598,19 @@ def _performFilteringFunc(filterParams):
     filterParams[2].applyFilter(filterParams[0], filterParams[1])
 
 
-def performTiledImgFilter(inputImg, outputImg, filterInst, dataType=None, imgFormat='KEA', tmpDIR='tmp', width=2000, height=2000, nCores=-1):
+def performTiledImgFilter(inputImg, outputImg, filterInst, dataType=None, gdalformat='KEA', tmpDIR='tmp', width=2000, height=2000, nCores=-1):
     """
 This function will perform a filtering of an input image where the input image will be tiled and the tiles executed on multiple processing cores. This function is primarily of use for larger images or when using very large filter windows otherwise the over head of tiling and mosaicking are not worth it.
 
-* inputImg - is the file name and path for the input image file.
-* outputImg - is the file name and path for the output image file.
-* filterInst - is an instance of a filter class available within rsgislib.imagefilter.tiledfilter. 
-* datatype - is the output image data type (e.g., rsgislib.TYPE_32FLOAT; Default is None). If None then data type of input image is used.
-* imgformat - string with the GDAL image format for the output image (Default = KEA). NOTE. KEA is used as intermediate format internally and therefore needs to be available.
-* tmpDIR - the temporary directory where intermediate files will be written (default is 'tmp'). Directory will be created and deleted if does not exist.
-* width - int for width of the image tiles used for processing (Default = 2000).
-* height - int for height of the image tiles used for processing (Default = 2000).
-* nCores - is an int specifying the number of cores to be used for clumping processing.
+:param inputImg: is the file name and path for the input image file.
+:param outputImg: is the file name and path for the output image file.
+:param filterInst: is an instance of a filter class available within rsgislib.imagefilter.tiledfilter.
+:param datatype: is the output image data type (e.g., rsgislib.TYPE_32FLOAT; Default is None). If None then data type of input image is used.
+:param gdalformat: string with the GDAL image format for the output image (Default = KEA). NOTE. KEA is used as intermediate format internally and therefore needs to be available.
+:param tmpDIR: the temporary directory where intermediate files will be written (default is 'tmp'). Directory will be created and deleted if does not exist.
+:param width: int for width of the image tiles used for processing (Default = 2000).
+:param height: int for height of the image tiles used for processing (Default = 2000).
+:param nCores: is an int specifying the number of cores to be used for clumping processing.
 
 Example::
 
@@ -670,7 +670,7 @@ Example::
     
     numOutBands = rsgisUtils.getImageBandCount(inputImg)
     
-    imageutils.createCopyImage(inputImg, outputImg, numOutBands, 0, imgFormat, dataType)
+    imageutils.createCopyImage(inputImg, outputImg, numOutBands, 0, gdalformat, dataType)
     
     imageutils.includeImagesWithOverlap(outputImg, imgFilterTiles, int(tileOverlap))
     
@@ -678,20 +678,21 @@ Example::
     shutil.rmtree(tilesFilterDIR)
     if createdTmp:
         shutil.rmtree(tmpDIR)
-        
-def performTiledImgMultiFilter(inputImg, outputImgs, filterInsts, dataType=None, imgFormat='KEA', tmpDIR='tmp', width=2000, height=2000, nCores=-1):
+
+
+def performTiledImgMultiFilter(inputImg, outputImgs, filterInsts, dataType=None, gdalformat='KEA', tmpDIR='tmp', width=2000, height=2000, nCores=-1):
     """
 This function will perform the filtering using multiple filters of an input image where the input image will be tiled and the tiles executed on multiple processing cores. This function is primarily of use for larger images or when using very large filter windows otherwise the over head of tiling and mosaicking are not worth it.
 
-* inputImg - is the file name and path for the input image file.
-* outputImgs - is a list of file names and paths for the output image files - Note, must be the same length as filterInsts.
-* filterInsts - is a list of filter instances of the classes available within rsgislib.imagefilter.tiledfilter  - Note, must be the same length as filterInsts.
-* datatype - is the output image data type (e.g., rsgislib.TYPE_32FLOAT; Default is None). If None then data type of input image is used.
-* imgformat - string with the GDAL image format for the output image (Default = KEA). NOTE. KEA is used as intermediate format internally and therefore needs to be available.
-* tmpDIR - the temporary directory where intermediate files will be written (default is 'tmp'). Directory will be created and deleted if does not exist.
-* width - int for width of the image tiles used for processing (Default = 2000).
-* height - int for height of the image tiles used for processing (Default = 2000).
-* nCores - is an int specifying the number of cores to be used for clumping processing.
+:param inputImg: is the file name and path for the input image file.
+:param outputImgs: is a list of file names and paths for the output image files - Note, must be the same length as filterInsts.
+:param filterInsts: is a list of filter instances of the classes available within rsgislib.imagefilter.tiledfilter  - Note, must be the same length as filterInsts.
+:param datatype: is the output image data type (e.g., rsgislib.TYPE_32FLOAT; Default is None). If None then data type of input image is used.
+:param gdalformat: string with the GDAL image format for the output image (Default = KEA). NOTE. KEA is used as intermediate format internally and therefore needs to be available.
+:param tmpDIR: the temporary directory where intermediate files will be written (default is 'tmp'). Directory will be created and deleted if does not exist.
+:param width: int for width of the image tiles used for processing (Default = 2000).
+:param height: int for height of the image tiles used for processing (Default = 2000).
+:param nCores: is an int specifying the number of cores to be used for clumping processing.
 
 Example::
 
@@ -770,7 +771,7 @@ Example::
         
         numOutBands = rsgisUtils.getImageBandCount(inputImg)
         
-        imageutils.createCopyImage(inputImg, outputImg, numOutBands, 0, imgFormat, dataType)
+        imageutils.createCopyImage(inputImg, outputImg, numOutBands, 0, gdalformat, dataType)
         
         imageutils.includeImagesWithOverlap(outputImg, imgFilterTiles, int(filterInst.getFilterHSize()))
         

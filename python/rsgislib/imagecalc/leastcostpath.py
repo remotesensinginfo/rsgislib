@@ -100,12 +100,12 @@ def performLeastCostPathCalc(costSurfaceImg, outputPathImg, startCoord, stopCoor
 
     Version of code from: https://pcjericks.github.io/py-gdalogr-cookbook/raster_layers.html#create-least-cost-path
 
-        * costSurfaceImg - Input image to calculate cost path from
-        * outputPathImg - Output image
-        * startCoord - Start coordinate
-        * stopCoord - End coordinate
-        * gdalformat - GDAL format (default=KEA)
-        * costImgBand - Band in input image to use for cost analysis (default=1)
+    :param costSurfaceImg: Input image to calculate cost path from
+    :param outputPathImg: Output image
+    :param startCoord: Start coordinate
+    :param stopCoord: End coordinate
+    :param gdalformat: GDAL format (default=KEA)
+    :param costImgBand: Band in input image to use for cost analysis (default=1)
 
     """
     # Read gdal raster as array.

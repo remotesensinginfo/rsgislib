@@ -18,16 +18,16 @@ def performFelsenszwalbSegmentation(inputImg, outputImg, gdalformat='KEA', noDat
 A function to perform the Felsenszwalb segmentation algorithm from the
 scikit-image library (http://scikit-image.org/docs/stable/api/skimage.segmentation.html).
 
-* inputImg - input image file.
-* outputImg - output image file.
-* gdalformat - output image file format.
-* tmpDIR - temp DIR used to output PCA files
-* calcStats - calculate image pixel statistics, histogram and image pyramids - note if you are not using a KEA file then the format needs to support RATs for this option as histogram and colour table are written to RAT.
-* usePCA - if there are not 1 or 3 image bands in the input file then you can use PCA to reduce the number of image bands.
-* nPCABands - the number of principle components outputs from the PCA - needs to be either 1 or 3.
-* scale - scikit-image Felsenszwalb parameter: 'Free parameter. Higher means larger clusters.'
-* sigma - scikit-image Felsenszwalb parameter: 'Width of Gaussian kernel used in preprocessing.'
-* min_size - scikit-image Felsenszwalb parameter: 'Minimum component size. Enforced using postprocessing.'
+:param inputImg: input image file.
+:param outputImg: output image file.
+:param gdalformat: output image file format.
+:param tmpDIR: temp DIR used to output PCA files
+:param calcStats: calculate image pixel statistics, histogram and image pyramids - note if you are not using a KEA file then the format needs to support RATs for this option as histogram and colour table are written to RAT.
+:param usePCA: if there are not 1 or 3 image bands in the input file then you can use PCA to reduce the number of image bands.
+:param nPCABands: the number of principle components outputs from the PCA - needs to be either 1 or 3.
+:param scale: scikit-image Felsenszwalb parameter: 'Free parameter. Higher means larger clusters.'
+:param sigma: scikit-image Felsenszwalb parameter: 'Width of Gaussian kernel used in preprocessing.'
+:param min_size: scikit-image Felsenszwalb parameter: 'Minimum component size. Enforced using postprocessing.'
 
 """
     # Create output image
@@ -94,18 +94,18 @@ def performQuickshiftSegmentation(inputImg, outputImg, gdalformat='KEA', noDataV
 A function to perform the quickshift segmentation algorithm from the
 scikit-image library (http://scikit-image.org/docs/stable/api/skimage.segmentation.html).
 
-* inputImg - input image file.
-* outputImg - output image file.
-* gdalformat - output image file format.
-* tmpDIR - temp DIR used to output PCA files
-* calcStats - calculate image pixel statistics, histogram and image pyramids - note if you are not using a KEA file then the format needs to support RATs for this option as histogram and colour table are written to RAT.
-* usePCA - if there are not 3 image bands in the input file then you can use PCA to reduce the number of image bands.
-* ratio - scikit-image Quickshift parameter: 'Balances color-space proximity and image-space proximity. Higher values give more weight to color-space. (between 0 and 1)'
-* kernel_size - scikit-image Quickshift parameter: 'Width of Gaussian kernel used in smoothing the sample density. Higher means fewer clusters.'
-* max_dist - scikit-image Quickshift parameter: 'Cut-off point for data distances. Higher means fewer clusters.'
-* sigma - scikit-image Quickshift parameter: 'Width for Gaussian smoothing as preprocessing. Zero means no smoothing.'
-* convert2lab - scikit-image Quickshift parameter: 'Whether the input should be converted to Lab colorspace prior to segmentation. For this purpose, the input is assumed to be RGB.'
-* random_seed - scikit-image Quickshift parameter: 'Random seed used for breaking ties.'
+:param inputImg: input image file.
+:param outputImg: output image file.
+:param gdalformat: output image file format.
+:param tmpDIR: temp DIR used to output PCA files
+:param calcStats: calculate image pixel statistics, histogram and image pyramids - note if you are not using a KEA file then the format needs to support RATs for this option as histogram and colour table are written to RAT.
+:param usePCA: if there are not 3 image bands in the input file then you can use PCA to reduce the number of image bands.
+:param ratio: scikit-image Quickshift parameter: 'Balances color-space proximity and image-space proximity. Higher values give more weight to color-space. (between 0 and 1)'
+:param kernel_size: scikit-image Quickshift parameter: 'Width of Gaussian kernel used in smoothing the sample density. Higher means fewer clusters.'
+:param max_dist: scikit-image Quickshift parameter: 'Cut-off point for data distances. Higher means fewer clusters.'
+:param sigma: scikit-image Quickshift parameter: 'Width for Gaussian smoothing as preprocessing. Zero means no smoothing.'
+:param convert2lab: scikit-image Quickshift parameter: 'Whether the input should be converted to Lab colorspace prior to segmentation. For this purpose, the input is assumed to be RGB.'
+:param random_seed: scikit-image Quickshift parameter: 'Random seed used for breaking ties.'
 
 """
     # Create output image
@@ -158,23 +158,23 @@ def performSlicSegmentation(inputImg, outputImg, gdalformat='KEA', noDataVal=0, 
 A function to perform the slic segmentation algorithm from the
 scikit-image library (http://scikit-image.org/docs/stable/api/skimage.segmentation.html).
 
-* inputImg - input image file.
-* outputImg - output image file.
-* gdalformat - output image file format.
-* tmpDIR - temp DIR used to output PCA files
-* calcStats - calculate image pixel statistics, histogram and image pyramids - note if you are not using a KEA file then the format needs to support RATs for this option as histogram and colour table are written to RAT.
-* usePCA - if there are not 1 or 3 image bands in the input file then you can use PCA to reduce the number of image bands.
-* nPCABands - the number of principle components outputs from the PCA - needs to be either 1 or 3.
-* n_segments - scikit-image Slic parameter: 'The (approximate) number of labels in the segmented output image.'
-* compactness - scikit-image Slic parameter: 'Balances color proximity and space proximity. Higher values give more weight to space proximity, making superpixel shapes more square/cubic. In SLICO mode, this is the initial compactness. This parameter depends strongly on image contrast and on the shapes of objects in the image. We recommend exploring possible values on a log scale, e.g., 0.01, 0.1, 1, 10, 100, before refining around a chosen value.'
-* max_iter - scikit-image Slic parameter: 'Maximum number of iterations of k-means.'
-* sigma - scikit-image Slic parameter: 'Width of Gaussian smoothing kernel for pre-processing for each dimension of the image. The same sigma is applied to each dimension in case of a scalar value. Zero means no smoothing. Note, that sigma is automatically scaled if it is scalar and a manual voxel spacing is provided (see Notes section).'
-* spacing - scikit-image Slic parameter: 'The voxel spacing along each image dimension. By default, slic assumes uniform spacing (same voxel resolution along z, y and x). This parameter controls the weights of the distances along z, y, and x during k-means clustering.'
-* convert2lab - scikit-image Slic parameter: 'Whether the input should be converted to Lab colorspace prior to segmentation. The input image must be RGB. Highly recommended.'
-* enforce_connectivity - scikit-image Slic parameter: 'Whether the generated segments are connected or not'
-* min_size_factor - scikit-image Slic parameter: 'Proportion of the minimum segment size to be removed with respect to the supposed segment size "depth*width*height/n_segments"'
-* max_size_factor - scikit-image Slic parameter: 'Proportion of the maximum connected segment size. A value of 3 works in most of the cases.'
-* slic_zero - scikit-image Slic parameter: 'Run SLIC-zero, the zero-parameter mode of SLIC.'
+:param inputImg: input image file.
+:param outputImg: output image file.
+:param gdalformat: output image file format.
+:param tmpDIR: temp DIR used to output PCA files
+:param calcStats: calculate image pixel statistics, histogram and image pyramids - note if you are not using a KEA file then the format needs to support RATs for this option as histogram and colour table are written to RAT.
+:param usePCA: if there are not 1 or 3 image bands in the input file then you can use PCA to reduce the number of image bands.
+:param nPCABands: the number of principle components outputs from the PCA - needs to be either 1 or 3.
+:param n_segments: scikit-image Slic parameter: 'The (approximate) number of labels in the segmented output image.'
+:param compactness: scikit-image Slic parameter: 'Balances color proximity and space proximity. Higher values give more weight to space proximity, making superpixel shapes more square/cubic. In SLICO mode, this is the initial compactness. This parameter depends strongly on image contrast and on the shapes of objects in the image. We recommend exploring possible values on a log scale, e.g., 0.01, 0.1, 1, 10, 100, before refining around a chosen value.'
+:param max_iter: scikit-image Slic parameter: 'Maximum number of iterations of k-means.'
+:param sigma: scikit-image Slic parameter: 'Width of Gaussian smoothing kernel for pre-processing for each dimension of the image. The same sigma is applied to each dimension in case of a scalar value. Zero means no smoothing. Note, that sigma is automatically scaled if it is scalar and a manual voxel spacing is provided (see Notes section).'
+:param spacing: scikit-image Slic parameter: 'The voxel spacing along each image dimension. By default, slic assumes uniform spacing (same voxel resolution along z, y and x). This parameter controls the weights of the distances along z, y, and x during k-means clustering.'
+:param convert2lab: scikit-image Slic parameter: 'Whether the input should be converted to Lab colorspace prior to segmentation. The input image must be RGB. Highly recommended.'
+:param enforce_connectivity: scikit-image Slic parameter: 'Whether the generated segments are connected or not'
+:param min_size_factor: scikit-image Slic parameter: 'Proportion of the minimum segment size to be removed with respect to the supposed segment size "depth:paramwidth*height/n_segments"'
+:param max_size_factor: scikit-image Slic parameter: 'Proportion of the maximum connected segment size. A value of 3 works in most of the cases.'
+:param slic_zero: scikit-image Slic parameter: 'Run SLIC-zero, the zero-parameter mode of SLIC.'
 
 """
     # Create output image
@@ -241,16 +241,16 @@ def performWatershedSegmentation(inputImg, markersImg, outputImg, gdalformat='KE
 A function to perform the watershed segmentation algorithm from the
 scikit-image library (http://scikit-image.org/docs/stable/api/skimage.segmentation.html).
 
-* inputImg - input image file.
-* markersImg - input markers image file.
-* outputImg - output image file.
-* gdalformat - output image file format.
-* tmpDIR - temp DIR used to output PCA files
-* calcStats - calculate image pixel statistics, histogram and image pyramids - note if you are not using a KEA file then the format needs to support RATs for this option as histogram and colour table are written to RAT.
-* usePCA - if there are not 1 or 3 image bands in the input file then you can use PCA to reduce the number of image bands.
-* nPCABands - the number of principle components outputs from the PCA - needs to be either 1 or 3.
-* compactness - scikit-image Watershed parameter: 'Use compact watershed with given compactness parameter. Higher values result in more regularly-shaped watershed basins; Peer Neubert & Peter Protzel (2014). Compact Watershed and Preemptive SLIC: On Improving Trade-offs of Superpixel Segmentation Algorithms. ICPR 2014'
-* watershed_line - scikit-image Watershed parameter: 'If watershed_line is True, a one-pixel wide line separates the regions obtained by the watershed algorithm. The line has the label 0.'
+:param inputImg: input image file.
+:param markersImg: input markers image file.
+:param outputImg: output image file.
+:param gdalformat: output image file format.
+:param tmpDIR: temp DIR used to output PCA files
+:param calcStats: calculate image pixel statistics, histogram and image pyramids - note if you are not using a KEA file then the format needs to support RATs for this option as histogram and colour table are written to RAT.
+:param usePCA: if there are not 1 or 3 image bands in the input file then you can use PCA to reduce the number of image bands.
+:param nPCABands: the number of principle components outputs from the PCA - needs to be either 1 or 3.
+:param compactness: scikit-image Watershed parameter: 'Use compact watershed with given compactness parameter. Higher values result in more regularly-shaped watershed basins; Peer Neubert & Peter Protzel (2014). Compact Watershed and Preemptive SLIC: On Improving Trade-offs of Superpixel Segmentation Algorithms. ICPR 2014'
+:param watershed_line: scikit-image Watershed parameter: 'If watershed_line is True, a one-pixel wide line separates the regions obtained by the watershed algorithm. The line has the label 0.'
 
 """
     # Create output image
@@ -324,21 +324,21 @@ def performRandomWalkerSegmentation(inputImg, markersImg, outputImg, gdalformat=
 A function to perform the random walker segmentation algorithm from the
 scikit-image library (http://scikit-image.org/docs/stable/api/skimage.segmentation.html).
 
-* inputImg - input image file.
-* markersImg - input markers image file - markers must be uniquely numbered.
-* outputImg - output image file.
-* gdalformat - output image file format.
-* tmpDIR - temp DIR used to output PCA files
-* calcStats - calculate image pixel statistics, histogram and image pyramids - note if you are not using a KEA file then the format needs to support RATs for this option as histogram and colour table are written to RAT.
-* usePCA - if there are not 1 or 3 image bands in the input file then you can use PCA to reduce the number of image bands.
-* nPCABands - the number of principle components outputs from the PCA - needs to be either 1 or 3.
-* beta - scikit-image random_walker parameter: 'Penalization coefficient for the random walker motion (the greater beta, the more difficult the diffusion).'
-* mode - scikit-image random_walker parameter: 'Mode for solving the linear system in the random walker algorithm. Available options {'cg_mg', 'cg', 'bf'}.'
-        ‘bf’ (brute force): an LU factorization of the Laplacian is computed. This is fast for small images (<1024x1024), but very slow and memory-intensive for large images (e.g., 3-D volumes).
-        ‘cg’ (conjugate gradient): the linear system is solved iteratively using the Conjugate Gradient method from scipy.sparse.linalg. This is less memory-consuming than the brute force method for large images, but it is quite slow.
-        ‘cg_mg’ (conjugate gradient with multigrid preconditioner): a preconditioner is computed using a multigrid solver, then the solution is computed with the Conjugate Gradient method. This mode requires that the pyamg module (http://pyamg.org/) is installed. For images of size > 512x512, this is the recommended (fastest) mode.
-* tol - scikit-image random_walker parameter: 'tolerance to achieve when solving the linear system, in cg’ and ‘cg_mg’ modes.'
-* spacing - scikit-image random_walker parameter: 'Spacing between voxels in each spatial dimension. If None, then the spacing between pixels/voxels in each dimension is assumed 1.'
+:param inputImg: input image file.
+:param markersImg: input markers image file - markers must be uniquely numbered.
+:param outputImg: output image file.
+:param gdalformat: output image file format.
+:param tmpDIR: temp DIR used to output PCA files
+:param calcStats: calculate image pixel statistics, histogram and image pyramids - note if you are not using a KEA file then the format needs to support RATs for this option as histogram and colour table are written to RAT.
+:param usePCA: if there are not 1 or 3 image bands in the input file then you can use PCA to reduce the number of image bands.
+:param nPCABands: the number of principle components outputs from the PCA - needs to be either 1 or 3.
+:param beta: scikit-image random_walker parameter: 'Penalization coefficient for the random walker motion (the greater beta, the more difficult the diffusion).'
+:param mode: scikit-image random_walker parameter: 'Mode for solving the linear system in the random walker algorithm. Available options {'cg_mg', 'cg', 'bf'}.'
+             'bf' (brute force): an LU factorization of the Laplacian is computed. This is fast for small images (<1024x1024), but very slow and memory-intensive for large images (e.g., 3-D volumes).
+             'cg' (conjugate gradient): the linear system is solved iteratively using the Conjugate Gradient method from scipy.sparse.linalg. This is less memory-consuming than the brute force method for large images, but it is quite slow.
+             'cg_mg' (conjugate gradient with multigrid preconditioner): a preconditioner is computed using a multigrid solver, then the solution is computed with the Conjugate Gradient method. This mode requires that the pyamg module (http://pyamg.org/) is installed. For images of size > 512x512, this is the recommended (fastest) mode.
+:param tol: scikit-image random_walker parameter: 'tolerance to achieve when solving the linear system, in cg’ and ‘cg_mg’ modes.'
+:param spacing: scikit-image random_walker parameter: 'Spacing between voxels in each spatial dimension. If None, then the spacing between pixels/voxels in each dimension is assumed 1.'
 
 """
     # Create output image

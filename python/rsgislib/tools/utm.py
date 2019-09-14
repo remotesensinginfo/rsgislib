@@ -156,13 +156,13 @@ def to_latlon(easting, northing, zone_number, zone_letter=None, northern=None, s
     """
 This function convert an UTM coordinate into Latitude and Longitude
 
-:param: easting: int or array: Easting value of UTM coordinate
-:param: northing: int or array: Northing value of UTM coordinate
-:param: zone number: int: Zone Number is represented with global map numbers of an UTM Zone
+:param easting: int or array: Easting value of UTM coordinate
+:param northing: int or array: Northing value of UTM coordinate
+:param zone number: int: Zone Number is represented with global map numbers of an UTM Zone
     Numbers Map. More information see http://www.jaworski.ca/utmzones.htm
-:param: zone_letter: str: Zone Letter can be represented as string values.
+:param zone_letter: str: Zone Letter can be represented as string values.
     Where UTM Zone Designators can be accessed in http://www.jaworski.ca/utmzones.htm
-:param: northern: bool: You can set True or False to set this parameter. Default is None
+:param northern: bool: You can set True or False to set this parameter. Default is None
 
 """
     import rsgislib
@@ -242,8 +242,6 @@ def from_latlon(latitude, longitude, force_zone_number=None, force_zone_letter=N
     """
 This function convert Latitude and Longitude to UTM coordinate
 
-Parameters
-----------
 :param: latitude: float or array. Latitude between 80 deg S and 84 deg N, e.g. (-80.0 to 84.0)
 :param: longitude: float or array: Longitude between 180 deg W and 180 deg E, e.g. (-180.0 to 180.0).
 :param: force_zone number: int: Zone Number is represented with global map numbers of an UTM Zone
@@ -368,7 +366,6 @@ def zone_number_to_central_longitude(zone_number):
 Find the central longitude for the given zone.
 
 :param zone_number: int
-
 :return: float
 
 """

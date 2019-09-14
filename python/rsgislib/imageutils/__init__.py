@@ -28,16 +28,16 @@ class ImageBandInfo(object):
     """
 Create a list of these objects to pass to the extractZoneImageBandValues2HDF function
 
-* fileName - is the input image file name and path.
-* name - is a name associated with this layer - doesn't really matter what you use but needs to be unique; this is used as a dict key in some functions. 
-* bands - is a list of image bands within the fileName to be used for processing (band numbers start at 1).
+:param fileName: is the input image file name and path.
+:param name: is a name associated with this layer - doesn't really matter what you use but needs to be unique; this is used as a dict key in some functions.
+:param bands: is a list of image bands within the fileName to be used for processing (band numbers start at 1).
 
 """
     def __init__(self, fileName=None, name=None, bands=None):
         """
-        * fileName - is the input image file name and path.
-        * name - is a name associated with this layer - doesn't really matter what you use but needs to be unique; this is used as a dict key in some functions. 
-        * bands - is a list of image bands within the fileName to be used for processing (band numbers start at 1).
+        :param fileName: is the input image file name and path.
+        :param name: is a name associated with this layer - doesn't really matter what you use but needs to be unique; this is used as a dict key in some functions.
+        :param bands: is a list of image bands within the fileName to be used for processing (band numbers start at 1).
         """
         self.fileName = fileName
         self.name = name
@@ -48,18 +48,18 @@ class SharpBandInfo(object):
     """
 Create a list of these objects to pass to the sharpenLowResBands function.
 
-* band - is the band number (band numbering starts at 1).
-* status - needs to be either rsgislib.SHARP_RES_IGNORE, rsgislib.SHARP_RES_LOW or rsgislib.SHARP_RES_HIGH
-           lowres bands will be sharpened using the highres bands and ignored bands 
-           will just be copied into the output image.
-* name - is a name associated with this image band - doesn't really matter what you put in here. 
+:param band: is the band number (band numbering starts at 1).
+:param status: needs to be either rsgislib.SHARP_RES_IGNORE, rsgislib.SHARP_RES_LOW or rsgislib.SHARP_RES_HIGH
+               lowres bands will be sharpened using the highres bands and ignored bands
+               will just be copied into the output image.
+:param name: is a name associated with this image band - doesn't really matter what you put in here.
 
 """
     def __init__(self, band=None, status=None, name=None):
         """
-        * band - is the band number (band numbering starts at 1).
-        * status - needs to be either 'ignore', 'lowres' or 'highres' - lowres bands will be sharpened using the highres bands and ignored bands will just be copied into the output image.
-        * name - is a name associated with this image band - doesn't really matter what you put in here.
+        :param band: is the band number (band numbering starts at 1).
+        :param status: needs to be either 'ignore', 'lowres' or 'highres' - lowres bands will be sharpened using the highres bands and ignored bands will just be copied into the output image.
+        :param name: is a name associated with this image band - doesn't really matter what you put in here.
 
         """
         self.band = band
@@ -71,20 +71,20 @@ class RSGISTimeseriesFillInfo(object):
     """
 Create a list of these objects to pass to the fillTimeSeriesGaps function
 
-* year - year the composite represents.
-* day - the (nominal) day within the year the composite represents (a value of zero and day will not be used)
-* compImg - The input compsite image which has been generated.
-* imgRef -  The reference layer (e.g., from createMaxNDVIComposite or createMaxNDVINDWICompositeLandsat) with zero for no data regions
-* outRef - A boolean variable specify which layer a fill reference layer is to be produced.
+:param year: year the composite represents.
+:param day: the (nominal) day within the year the composite represents (a value of zero and day will not be used)
+:param compImg: The input compsite image which has been generated.
+:param imgRef:  The reference layer (e.g., from createMaxNDVIComposite or createMaxNDVINDWICompositeLandsat) with zero for no data regions
+:param outRef: A boolean variable specify which layer a fill reference layer is to be produced.
 
 """
     def __init__(self, year=1900, day=0, compImg=None, imgRef=None, outRef=False):
         """
-        * year - year the composite represents.
-        * day - the (nominal) day within the year the composite represents (a value of zero and day will not be used)
-        * compImg - The input compsite image which has been generated.
-        * imgRef -  The reference layer (e.g., from createMaxNDVIComposite or createMaxNDVINDWICompositeLandsat) with zero for no data regions
-        * outRef - A boolean variable specify which layer a fill reference layer is to be produced.
+        :param year: year the composite represents.
+        :param day: the (nominal) day within the year the composite represents (a value of zero and day will not be used)
+        :param compImg: The input compsite image which has been generated.
+        :param imgRef:  The reference layer (e.g., from createMaxNDVIComposite or createMaxNDVINDWICompositeLandsat) with zero for no data regions
+        :param outRef: A boolean variable specify which layer a fill reference layer is to be produced.
 
         """
         self.year = year
@@ -101,9 +101,9 @@ def setBandNames(inputImage, bandNames, feedback=False):
     """A utility function to set band names.
 Where:
 
-* inImage is the input image
-* bandNames is a list of band names
-* feedback is a boolean specifying whether feedback will be printed to the console (True= Printed / False (default) Not Printed)
+:param inImage: is the input image
+:param bandNames: is a list of band names
+:param feedback: is a boolean specifying whether feedback will be printed to the console (True= Printed / False (default) Not Printed)
 
 Example::
 
@@ -136,11 +136,9 @@ A utility function to get band names.
 
 Where:
 
-* inImage is the input image
+:param inImage: is the input image
 
-Return: 
-
-* list of band names
+:return: list of band names
 
 Example::
 
@@ -162,14 +160,14 @@ Example::
             raise Exception("Could not open the image band: ", band)
     return bandNames
 
+
 def getRSGISLibDataType(inImg):
     """
 Returns the rsgislib datatype ENUM for a raster file
 
-* inImg -- The file to get the datatype for
+:param inImg: The file to get the datatype for
 
-return:
-    The rsgislib datatype enum, e.g., rsgislib.TYPE_8INT
+:return: The rsgislib datatype enum, e.g., rsgislib.TYPE_8INT
 
 """
     raster = gdal.Open(inImg, gdal.GA_ReadOnly)
@@ -181,15 +179,15 @@ return:
     rsgis_utils = rsgislib.RSGISPyUtils()
 
     return rsgis_utils.getRSGISLibDataType(gdal_dtype)
-    
+
+
 def getGDALDataType(inImg):
     """
 Returns the rsgislib datatype ENUM for a raster file
 
-*  inImg -- The file to get the datatype for
+:param inImg: The file to get the datatype for
 
-return:
-    The rsgislib datatype enum, e.g., rsgislib.TYPE_8INT
+:return: The rsgislib datatype enum, e.g., rsgislib.TYPE_8INT
 
 """
     raster = gdal.Open(inImg, gdal.GA_ReadOnly)
@@ -204,7 +202,7 @@ def setImgThematic(imageFile):
     """
 Set all image bands to be thematic. 
 
-* imageFile - The file for which the bands are to be set as thematic
+:param imageFile: The file for which the bands are to be set as thematic
 
 """
     ds = gdal.Open(imageFile, gdal.GA_Update)
@@ -220,11 +218,9 @@ def hasGCPs(inImg):
     """
 Test whether the input image has GCPs - returns boolean
 
-* inImg - input image file
+:param inImg: input image file
 
-Return: 
-
-* boolean True - has GCPs; False - does not have GCPs
+:return: boolean True - has GCPs; False - does not have GCPs
 
 """
     raster = gdal.Open(inImg, gdal.GA_ReadOnly)
@@ -241,8 +237,8 @@ def copyGCPs(srcImg, destImg):
     """
 Copy the GCPs from the srcImg to the destImg
 
-* srcImg - Raster layer with GCPs
-* destImg - Raster layer to which GCPs will be added
+:param srcImg: Raster layer with GCPs
+:param destImg: Raster layer to which GCPs will be added
     
 """
     srcDS = gdal.Open(srcImg, gdal.GA_ReadOnly)
@@ -266,7 +262,8 @@ Copy the GCPs from the srcImg to the destImg
 def getWKTProjFromImage(inImg):
     """
 A function which returns the WKT string representing the projection of the input image.
-* inImg - input image from which WKT string will be read.
+
+:param inImg: input image from which WKT string will be read.
 
 """
     rasterDS = gdal.Open(inImg, gdal.GA_ReadOnly)
@@ -282,14 +279,14 @@ def createBlankImgFromRefVector(inVecFile, inVecLyr, outputImg, outImgRes, outIm
 A function to create a new image file based on a vector layer to define the extent and projection
 of the output image. 
 
-* inVecFile - input vector file.
-* inVecLyr - name of the vector layer, if None then assume the layer name will be the same as the file
-             name of the input vector file.
-* outputImg - output image file.
-* outImgRes - output image resolution, square pixels so a single value.
-* outImgNBands - the number of image bands in the output image 
-* gdalformat - output image file format.
-* datatype - is a rsgislib.TYPE_* value providing the data type of the output image
+:param inVecFile: input vector file.
+:param inVecLyr: name of the vector layer, if None then assume the layer name will be the same as the file
+                 name of the input vector file.
+:param outputImg: output image file.
+:param outImgRes: output image resolution, square pixels so a single value.
+:param outImgNBands: the number of image bands in the output image
+:param gdalformat: output image file format.
+:param datatype: is a rsgislib.TYPE_* value providing the data type of the output image
 
 """
 
@@ -317,15 +314,15 @@ def createCopyImageVecExtentSnap2Grid(inVecFile, inVecLyr, outputImg, outImgRes,
 A function to create a new image file based on a vector layer to define the extent and projection
 of the output image. The image file extent is snapped on to the grid defined by the vector layer.
 
-* inVecFile - input vector file.
-* inVecLyr - name of the vector layer, if None then assume the layer name will be the same as the file
-             name of the input vector file.
-* outputImg - output image file.
-* outImgRes - output image resolution, square pixels so a single value.
-* outImgNBands - the number of image bands in the output image 
-* gdalformat - output image file format.
-* datatype - is a rsgislib.TYPE_* value providing the data type of the output image
-* bufnpxl - is an integer specifying the number of pixels to buffer the vector file extent by.
+:param inVecFile: input vector file.
+:param inVecLyr: name of the vector layer, if None then assume the layer name will be the same as the file
+                 name of the input vector file.
+:param outputImg: output image file.
+:param outImgRes: output image resolution, square pixels so a single value.
+:param outImgNBands: the number of image bands in the output image
+:param gdalformat: output image file format.
+:param datatype: is a rsgislib.TYPE_* value providing the data type of the output image
+:param bufnpxl: is an integer specifying the number of pixels to buffer the vector file extent by.
 
 """
     rsgisUtils = rsgislib.RSGISPyUtils()
@@ -355,15 +352,15 @@ def createBlankImgFromBBOX(bbox, wktstr, outputImg, outImgRes, outImgPxlVal, out
     """
 A function to create a new image file based on a bbox to define the extent. 
 
-* bbox - bounding box defining the extent of the output image (xMin, xMax, yMin, yMax)
-* wktstr - the WKT string defining the bbox and output image projection.
-* outputImg - output image file.
-* outImgRes - output image resolution, square pixels so a single value.
-* outImgPxlVal - output image pixel value.
-* outImgNBands - the number of image bands in the output image 
-* gdalformat - output image file format.
-* datatype - is a rsgislib.TYPE_* value providing the data type of the output image.
-* snap2grid - optional variable to snap the image to a grid of whole numbers with respect to the image pixel resolution.
+:param bbox: bounding box defining the extent of the output image (xMin, xMax, yMin, yMax)
+:param wktstr: the WKT string defining the bbox and output image projection.
+:param outputImg: output image file.
+:param outImgRes: output image resolution, square pixels so a single value.
+:param outImgPxlVal: output image pixel value.
+:param outImgNBands: the number of image bands in the output image
+:param gdalformat: output image file format.
+:param datatype: is a rsgislib.TYPE_* value providing the data type of the output image.
+:param snap2grid: optional variable to snap the image to a grid of whole numbers with respect to the image pixel resolution.
 
 """    
     if snap2grid:
@@ -392,17 +389,17 @@ def createImageForEachVecFeat(vectorFile, vectorLyr, fileNameCol, outImgPath, ou
 A function to create a set of image files representing the extent of each feature in the 
 inputted vector file.
 
-* vectorFile - the input vector file.
-* vectorLyr - the input vector layer
-* fileNameCol - the name of the column in the vector layer which will be used as the file names.
-* outImgPath - output file path (directory) where the images will be saved.
-* outImgExt - the file extension to be added on to the output file names.
-* outImgPxlVal - output image pixel value
-* outImgNBands - the number of image bands in the output image
-* outImgRes - output image resolution, square pixels so a single value
-* gdalformat - output image file format.
-* datatype - is a rsgislib.TYPE_* value providing the data type of the output image.
-* snap2grid - optional variable to snap the image to a grid of whole numbers with respect to the image pixel resolution.
+:param vectorFile: the input vector file.
+:param vectorLyr: the input vector layer
+:param fileNameCol: the name of the column in the vector layer which will be used as the file names.
+:param outImgPath: output file path (directory) where the images will be saved.
+:param outImgExt: the file extension to be added on to the output file names.
+:param outImgPxlVal: output image pixel value
+:param outImgNBands: the number of image bands in the output image
+:param outImgRes: output image resolution, square pixels so a single value
+:param gdalformat: output image file format.
+:param datatype: is a rsgislib.TYPE_* value providing the data type of the output image.
+:param snap2grid: optional variable to snap the image to a grid of whole numbers with respect to the image pixel resolution.
 
 """
     
@@ -450,13 +447,13 @@ A utility function to resample an existing image to the projection and/or pixel 
 
 Where:
 
-* inRefImg is the input reference image to which the processing image is to resampled to.
-* inProcessImg is the image which is to be resampled.
-* outImg is the output image file.
-* gdalformat is the gdal format for the output image.
-* interpMethod is the interpolation method used to resample the image [bilinear, lanczos, cubicspline, nearestneighbour, cubic, average, mode]
-* datatype is the rsgislib datatype of the output image (if none then it will be the same as the input file).
-* multicore - use multiple processing cores (Default = False)
+:param inRefImg: is the input reference image to which the processing image is to resampled to.
+:param inProcessImg: is the image which is to be resampled.
+:param outImg: is the output image file.
+:param gdalformat: is the gdal format for the output image.
+:param interpMethod: is the interpolation method used to resample the image [bilinear, lanczos, cubicspline, nearestneighbour, cubic, average, mode]
+:param datatype: is the rsgislib datatype of the output image (if none then it will be the same as the input file).
+:param multicore: - use multiple processing cores (Default = False)
 
 """ 
     rsgisUtils = rsgislib.RSGISPyUtils()
@@ -520,19 +517,19 @@ This function provides a tool which uses the gdalwarp function to reproject an i
 
 Where:
 
-* inputImage - the input image name and path
-* outputImage - the output image name and path
-* outWKT - a WKT file representing the output projection
-* gdalformat - the output image file format (Default is KEA)
-* interp - interpolation algorithm. Options are: near, bilinear, cubic, cubicspline, lanczos, average, mode. (Default is cubic)
-* inWKT - if input image is not well defined this is the input image projection as a WKT file (Default is None, i.e., ignored)
-* noData - float representing the not data value (Default is 0.0)
-* outPxlRes three inputs can be provided 
-            1) 'image' where the output resolution will match the input (Default is image)
-            2) 'auto' where an output resolution maintaining the image size of the input image will be used
-            3) provide a floating point value for the image resolution (note. pixels will be sqaure) 
-* snap2Grid is a boolean specifying whether the TL pixel should be snapped to a multiple of the pixel resolution (Default is True).
-* nCores - the number of processing cores available for processing (-1 is all cores: Default=-1)
+:param inputImage: the input image name and path
+:param outputImage: the output image name and path
+:param outWKT: a WKT file representing the output projection
+:param gdalformat: the output image file format (Default is KEA)
+:param interp: interpolation algorithm. Options are: near, bilinear, cubic, cubicspline, lanczos, average, mode. (Default is cubic)
+:param inWKT: if input image is not well defined this is the input image projection as a WKT file (Default is None, i.e., ignored)
+:param noData: float representing the not data value (Default is 0.0)
+:param outPxlRes: three inputs can be provided
+                  1) 'image' where the output resolution will match the input (Default is image)
+                  2) 'auto' where an output resolution maintaining the image size of the input image will be used
+                  3) provide a floating point value for the image resolution (note. pixels will be sqaure)
+:param snap2Grid: is a boolean specifying whether the TL pixel should be snapped to a multiple of the pixel resolution (Default is True).
+:param nCores: the number of processing cores available for processing (-1 is all cores: Default=-1)
 
     """    
     rsgisUtils = rsgislib.RSGISPyUtils()
@@ -679,14 +676,14 @@ def subsetPxlBBox(inputimage, outputimage, gdalformat, datatype, xMinPxl, xMaxPx
     """
 Function to subset an input image using a defined pixel bbox.
 
-* inputimage - input image to be subset.
-* outputimage - output image file.
-* gdalformat - output image file format
-* datatype - datatype is a rsgislib.TYPE_* value providing the data type of the output image.
-* xMinPxl - min x in pixels
-* xMaxPxl - max x in pixels
-* yMinPxl - min y in pixels
-* yMaxPxl - max y in pixels
+:param inputimage: input image to be subset.
+:param outputimage: output image file.
+:param gdalformat: output image file format
+:param datatype: datatype is a rsgislib.TYPE_* value providing the data type of the output image.
+:param xMinPxl: min x in pixels
+:param xMaxPxl: max x in pixels
+:param yMinPxl: min y in pixels
+:param yMaxPxl: max y in pixels
 
 """
     rsgis_utils = rsgislib.RSGISPyUtils()
@@ -713,14 +710,14 @@ def createTilesMultiCore(inputimage, baseimage, width, height, gdalformat, datat
     """
 Function to generate a set of tiles for the input image.
 
-* inputimage - input image to be subset.
-* baseimage - output image files base path.
-* width - width in pixels of the tiles.
-* height - height in pixels of the tiles.
-* gdalformat - output image file format
-* datatype - datatype is a rsgislib.TYPE_* value providing the data type of the output image.
-* ext - output file extension to be added to the baseimage path (e.g., kea)
-* ncores - number of cores to be used; uses python multiprocessing module.
+:param inputimage: input image to be subset.
+:param baseimage: output image files base path.
+:param width: width in pixels of the tiles.
+:param height: height in pixels of the tiles.
+:param gdalformat: output image file format
+:param datatype: datatype is a rsgislib.TYPE_* value providing the data type of the output image.
+:param ext: output file extension to be added to the baseimage path (e.g., kea)
+:param ncores: number of cores to be used; uses python multiprocessing module.
 
 """
     import multiprocessing
@@ -778,9 +775,9 @@ A command to subset a set of images to the same overlapped extent.
 
 Where:
 
-* inImagesDict is a list of dictionaries containing values for IN (input image) OUT (output image) and TYPE (data type for output)
-* outShpEnv is a file path for the output shapefile representing the overlap extent.
-* gdalformat is the gdal format of the output images.
+:param inImagesDict: is a list of dictionaries containing values for IN (input image) OUT (output image) and TYPE (data type for output)
+:param outShpEnv: is a file path for the output shapefile representing the overlap extent.
+:param gdalformat: is the gdal format of the output images.
 
 Example::
     
@@ -816,10 +813,10 @@ subsetImgs2CommonExtent(inImagesDict, outShpEnv, imgFormat) function.
 
 Where:
 
-* globFindImgsStr is a string to be passed to the glob module to find the input image files.
-* outDir is the output directory path for the images.
-* suffix is a suffix to be appended on to the end of the file name (can be a blank string, i.e., '')
-* ext is a string with the output file extension
+:param globFindImgsStr: is a string to be passed to the glob module to find the input image files.
+:param outDir: is the output directory path for the images.
+:param suffix: is a suffix to be appended on to the end of the file name (can be a blank string, i.e., '')
+:param ext: is a string with the output file extension
 
 Example::
     
@@ -876,9 +873,9 @@ Function which produces a 2 band output image with the X and Y locations of the 
 
 Where:
 
-* inputImg - the input reference image
-* outputImg - the output image file name and path (will be same dimensions as the input)
-* gdalformat - the GDAL image file format of the output image file.
+:param inputImg: the input reference image
+:param outputImg: the output image file name and path (will be same dimensions as the input)
+:param gdalformat: the GDAL image file format of the output image file.
 
 """
     if not haveRIOS:
@@ -910,8 +907,8 @@ A function to merge a list of HDF files (e.g., from rsgislib.imageutils.extractZ
 with the same number of variables (i.e., columns) into a single file. For example, if class training
 regions have been sourced from multiple images. 
 
-* h5Files - a list of input files. 
-* outH5File - the output file.
+:param h5Files: a list of input files.
+:param outH5File: the output file.
 
 Example::
 
@@ -960,13 +957,11 @@ def doImagesOverlap(image1, image2, overThres=0.0):
 Function to test whether two images overlap with one another.
 If the images have a difference projection/coordinate system then corners 
 
-* image1 - path to first image
-* image2 - path to second image
-* overThres - the amount of overlap required to return true (e.g., at least 1 pixel)
+:param image1: path to first image
+:param image2: path to second image
+:param overThres: the amount of overlap required to return true (e.g., at least 1 pixel)
 
-Returns:
-
-Boolean specifying whether they overlap or not.
+:return: Boolean specifying whether they overlap or not.
 
 Example::
 
@@ -1080,11 +1075,11 @@ Function which produces a 1 band image with random values between lowVal and upV
 
 Where:
 
-* inputImg - the input reference image
-* outputImg - the output image file name and path (will be same dimensions as the input)
-* gdalformat - the GDAL image file format of the output image file.
-* lowVal - lower value
-* upVal - upper value 
+:param inputImg: the input reference image
+:param outputImg: the output image file name and path (will be same dimensions as the input)
+:param gdalformat: the GDAL image file format of the output image file.
+:param lowVal: lower value
+:param upVal: upper value
 
 """
     if not haveRIOS:
@@ -1118,11 +1113,11 @@ def extractImgPxlSample(inputImg, pxlNSample, noData=None):
 A function which extracts a sample of pixels from the 
 input image file to a number array.
 
-* inputImg - the image from which the random sample will be taken.
-* pxlNSample - the sample to be taken (e.g., a value of 100 will sample every 100th, valid (if noData specified), pixel)
-* noData - provide a no data value which is to be ignored during processing. If None then ignored (Default: None)
+:param inputImg: the image from which the random sample will be taken.
+:param pxlNSample: the sample to be taken (e.g., a value of 100 will sample every 100th, valid (if noData specified), pixel)
+:param noData: provide a no data value which is to be ignored during processing. If None then ignored (Default: None)
 
-return:: outputs a numpy array (n sampled values, n bands)
+:return: outputs a numpy array (n sampled values, n bands)
 
 """ 
     # Import the RIOS image reader
@@ -1163,12 +1158,12 @@ def extractImgPxlValsInMsk(img, img_bands, img_mask, img_mask_val, no_data=None)
     """
 A function which extracts the image values within a mask for the specified image bands.
 
-* img - the image from which the random sample will be taken.
-* img_bands - the image bands the values are to be read from.
-* img_mask - the image mask specifying the regions of interest.
-* img_mask_val - the pixel value within the mask defining the region of interest.
+:param img: the image from which the random sample will be taken.
+:param img_bands: the image bands the values are to be read from.
+:param img_mask: the image mask specifying the regions of interest.
+:param img_mask_val: the pixel value within the mask defining the region of interest.
 
-return:: outputs a numpy array (n values, n bands)
+:return: outputs a numpy array (n values, n bands)
 
 """
     # Import the RIOS image reader
@@ -1217,10 +1212,10 @@ def getUniqueValues(img, img_band=1):
 Find the unique image values within an image band.
 Note, the whole image band gets read into memory.
 
-* img - input image file path
-* img_band - image band to be processed (starts at 1)
+:param img: input image file path
+:param img_band: image band to be processed (starts at 1)
 
-return - array of unique values.
+:return: array of unique values.
 
 """
     imgDS = gdal.Open(img)
@@ -1243,10 +1238,10 @@ output image with a unique value for each combination of intersecting
 masks. A JSON LUT is also generated to identify the image values to a
 'class'.
 
-* msk_imgs_dict - dict of input images.
-* out_img - output image file.
-* output_lut - output file path to JSON LUT file identifying the image values.
-* gdalformat - output GDAL format (e.g., KEA)
+:param msk_imgs_dict: dict of input images.
+:param out_img: output image file.
+:param output_lut: output file path to JSON LUT file identifying the image values.
+:param gdalformat: output GDAL format (e.g., KEA)
 
 """ 
     import json

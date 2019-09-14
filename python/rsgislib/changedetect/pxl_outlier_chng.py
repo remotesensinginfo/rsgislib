@@ -68,7 +68,7 @@ the outliners will related to class changes.
 :param img_mask_val: the pixel value within the mask image for the class of interest. (Default 1)
 :param img_bands: the image bands to be used for the analysis. If None then all used (Default: None)
 :param gdalformat: file format for the output image(s). Default KEA.
-:return:
+
 """
     if not haveRIOS:
         raise Exception("The rios module is required for this function could not be imported\n\t" + riosErr)

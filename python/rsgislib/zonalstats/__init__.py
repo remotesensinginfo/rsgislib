@@ -96,20 +96,20 @@ A function which calculates zonal statistics for a particular image band.
 If you know that the pixels in the values image are small with respect to 
 the polygons then use this function.
 
-* vecfile - input vector file
-* veclyrname - input vector layer within the input file which specifies the features and where the output stats will be written.
-* valsimg - the values image
-* imgbandidx - the index (starting at 1) of the image band for which the stats will be calculated. If defined the no data value of the band will be ignored.
-* minthres - a lower threshold for values which will be included in the stats calculation.
-* maxthres - a upper threshold for values which will be included in the stats calculation.
-* minfield - the name of the field for the min value (None or not specified to be ignored).
-* maxfield - the name of the field for the max value (None or not specified to be ignored).
-* meanfield - the name of the field for the mean value (None or not specified to be ignored).
-* stddevfield - the name of the field for the standard deviation value (None or not specified to be ignored).
-* sumfield - the name of the field for the sum value (None or not specified to be ignored).
-* countfield - the name of the field for the count (of number of pixels) value (None or not specified to be ignored).
-* modefield - the name of the field for the mode value (None or not specified to be ignored).
-* medianfield - the name of the field for the median value (None or not specified to be ignored).
+:param vecfile: input vector file
+:param veclyrname: input vector layer within the input file which specifies the features and where the output stats will be written.
+:param valsimg: the values image
+:param imgbandidx: the index (starting at 1) of the image band for which the stats will be calculated. If defined the no data value of the band will be ignored.
+:param minthres: a lower threshold for values which will be included in the stats calculation.
+:param maxthres: a upper threshold for values which will be included in the stats calculation.
+:param minfield: the name of the field for the min value (None or not specified to be ignored).
+:param maxfield: the name of the field for the max value (None or not specified to be ignored).
+:param meanfield: the name of the field for the mean value (None or not specified to be ignored).
+:param stddevfield: the name of the field for the standard deviation value (None or not specified to be ignored).
+:param sumfield: the name of the field for the sum value (None or not specified to be ignored).
+:param countfield: the name of the field for the count (of number of pixels) value (None or not specified to be ignored).
+:param modefield: the name of the field for the mode value (None or not specified to be ignored).
+:param medianfield: the name of the field for the median value (None or not specified to be ignored).
 
 """
     gdal.UseExceptions()
@@ -140,19 +140,19 @@ A function which calculates zonal statistics for a particular image band.
 If you know that the pixels in the values image are small with respect to 
 the polygons then use this function.
 
-* veclyr - OGR vector layer object containing the geometries being processed and to which the stats will be written.
-* valsimg - the values image
-* imgbandidx - the index (starting at 1) of the image band for which the stats will be calculated. If defined the no data value of the band will be ignored.
-* minthres - a lower threshold for values which will be included in the stats calculation.
-* maxthres - a upper threshold for values which will be included in the stats calculation.
-* minfield - the name of the field for the min value (None or not specified to be ignored).
-* maxfield - the name of the field for the max value (None or not specified to be ignored).
-* meanfield - the name of the field for the mean value (None or not specified to be ignored).
-* stddevfield - the name of the field for the standard deviation value (None or not specified to be ignored).
-* sumfield - the name of the field for the sum value (None or not specified to be ignored).
-* countfield - the name of the field for the count (of number of pixels) value (None or not specified to be ignored).
-* modefield - the name of the field for the mode value (None or not specified to be ignored).
-* medianfield - the name of the field for the median value (None or not specified to be ignored).
+:param veclyr: OGR vector layer object containing the geometries being processed and to which the stats will be written.
+:param valsimg: the values image
+:param imgbandidx: the index (starting at 1) of the image band for which the stats will be calculated. If defined the no data value of the band will be ignored.
+:param minthres: a lower threshold for values which will be included in the stats calculation.
+:param maxthres: a upper threshold for values which will be included in the stats calculation.
+:param minfield: the name of the field for the min value (None or not specified to be ignored).
+:param maxfield: the name of the field for the max value (None or not specified to be ignored).
+:param meanfield: the name of the field for the mean value (None or not specified to be ignored).
+:param stddevfield: the name of the field for the standard deviation value (None or not specified to be ignored).
+:param sumfield: the name of the field for the sum value (None or not specified to be ignored).
+:param countfield: the name of the field for the count (of number of pixels) value (None or not specified to be ignored).
+:param modefield: the name of the field for the mode value (None or not specified to be ignored).
+:param medianfield: the name of the field for the median value (None or not specified to be ignored).
 
 """
     if modefield is not None:
@@ -379,11 +379,11 @@ A funtion which extracts zonal stats for a polygon using the polygon centroid.
 This is useful when you are intesecting a low resolution image with respect to
 the polygon resolution.
 
-* vecfile - input vector file
-* veclyrname - input vector layer within the input file which specifies the features and where the output stats will be written.
-* valsimg - the values image
-* imgbandidx - the index (starting at 1) of the image band for which the stats will be calculated. If defined the no data value of the band will be ignored.
-* outfield - output field name within the vector layer.
+:param vecfile: input vector file
+:param veclyrname: input vector layer within the input file which specifies the features and where the output stats will be written.
+:param valsimg: the values image
+:param imgbandidx: the index (starting at 1) of the image band for which the stats will be calculated. If defined the no data value of the band will be ignored.
+:param outfield: output field name within the vector layer.
 
 """
     gdal.UseExceptions()
@@ -413,10 +413,10 @@ A funtion which extracts zonal stats for a polygon using the polygon centroid.
 This is useful when you are intesecting a low resolution image with respect to
 the polygon resolution.
 
-* veclyr - OGR vector layer object containing the geometries being processed and to which the stats will be written.
-* valsimg - the values image
-* imgbandidx - the index (starting at 1) of the image band for which the stats will be calculated. If defined the no data value of the band will be ignored.
-* outfield - output field name within the vector layer.
+:param veclyr: OGR vector layer object containing the geometries being processed and to which the stats will be written.
+:param valsimg: the values image
+:param imgbandidx: the index (starting at 1) of the image band for which the stats will be calculated. If defined the no data value of the band will be ignored.
+:param outfield: output field name within the vector layer.
 
 """
     gdal.UseExceptions()
@@ -608,20 +608,20 @@ use used to find a value for the polygon.
 If you are unsure as to whether the pixels are small enough to be contained within all the polygons then 
 use this function.
 
-* vecfile - input vector file
-* veclyrname - input vector layer within the input file which specifies the features and where the output stats will be written.
-* valsimg - the values image
-* imgbandidx - the index (starting at 1) of the image band for which the stats will be calculated. If defined the no data value of the band will be ignored.
-* minthres - a lower threshold for values which will be included in the stats calculation.
-* maxthres - a upper threshold for values which will be included in the stats calculation.
-* minfield - the name of the field for the min value (None or not specified to be ignored).
-* maxfield - the name of the field for the max value (None or not specified to be ignored).
-* meanfield - the name of the field for the mean value (None or not specified to be ignored).
-* stddevfield - the name of the field for the standard deviation value (None or not specified to be ignored).
-* sumfield - the name of the field for the sum value (None or not specified to be ignored).
-* countfield - the name of the field for the count (of number of pixels) value (None or not specified to be ignored).
-* modefield - the name of the field for the mode value (None or not specified to be ignored).
-* medianfield - the name of the field for the median value (None or not specified to be ignored).
+:param vecfile: input vector file
+:param veclyrname: input vector layer within the input file which specifies the features and where the output stats will be written.
+:param valsimg: the values image
+:param imgbandidx: the index (starting at 1) of the image band for which the stats will be calculated. If defined the no data value of the band will be ignored.
+:param minthres: a lower threshold for values which will be included in the stats calculation.
+:param maxthres: a upper threshold for values which will be included in the stats calculation.
+:param minfield: the name of the field for the min value (None or not specified to be ignored).
+:param maxfield: the name of the field for the max value (None or not specified to be ignored).
+:param meanfield: the name of the field for the mean value (None or not specified to be ignored).
+:param stddevfield: the name of the field for the standard deviation value (None or not specified to be ignored).
+:param sumfield: the name of the field for the sum value (None or not specified to be ignored).
+:param countfield: the name of the field for the count (of number of pixels) value (None or not specified to be ignored).
+:param modefield: the name of the field for the mode value (None or not specified to be ignored).
+:param medianfield: the name of the field for the median value (None or not specified to be ignored).
 
 """
     gdal.UseExceptions()
@@ -654,19 +654,19 @@ use used to find a value for the polygon.
 If you are unsure as to whether the pixels are small enough to be contained within all the polygons then 
 use this function.
 
-* veclyr - OGR vector layer object containing the geometries being processed and to which the stats will be written.
-* valsimg - the values image
-* imgbandidx - the index (starting at 1) of the image band for which the stats will be calculated. If defined the no data value of the band will be ignored.
-* minthres - a lower threshold for values which will be included in the stats calculation.
-* maxthres - a upper threshold for values which will be included in the stats calculation.
-* minfield - the name of the field for the min value (None or not specified to be ignored).
-* maxfield - the name of the field for the max value (None or not specified to be ignored).
-* meanfield - the name of the field for the mean value (None or not specified to be ignored).
-* stddevfield - the name of the field for the standard deviation value (None or not specified to be ignored).
-* sumfield - the name of the field for the sum value (None or not specified to be ignored).
-* countfield - the name of the field for the count (of number of pixels) value (None or not specified to be ignored).
-* modefield - the name of the field for the mode value (None or not specified to be ignored).
-* medianfield - the name of the field for the median value (None or not specified to be ignored).
+:param veclyr: OGR vector layer object containing the geometries being processed and to which the stats will be written.
+:param valsimg: the values image
+:param imgbandidx: the index (starting at 1) of the image band for which the stats will be calculated. If defined the no data value of the band will be ignored.
+:param minthres: a lower threshold for values which will be included in the stats calculation.
+:param maxthres: a upper threshold for values which will be included in the stats calculation.
+:param minfield: the name of the field for the min value (None or not specified to be ignored).
+:param maxfield: the name of the field for the max value (None or not specified to be ignored).
+:param meanfield: the name of the field for the mean value (None or not specified to be ignored).
+:param stddevfield: the name of the field for the standard deviation value (None or not specified to be ignored).
+:param sumfield: the name of the field for the sum value (None or not specified to be ignored).
+:param countfield: the name of the field for the count (of number of pixels) value (None or not specified to be ignored).
+:param modefield: the name of the field for the mode value (None or not specified to be ignored).
+:param medianfield: the name of the field for the median value (None or not specified to be ignored).
 
 """
     if modefield is not None:

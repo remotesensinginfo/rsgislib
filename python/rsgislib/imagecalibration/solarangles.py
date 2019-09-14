@@ -111,6 +111,11 @@ def calcSolarAzimuthZenith(inputImg, inImgDateTime, outputImg, gdalformat):
     """
 Function which calculate a solar azimuth (band 1) and zenith (band 2) image.
 
+:param inputImg: input image file (can be any image with a spatial header)
+:param inImgDateTime: a datatime object for the data/time of the acquasition
+:param outputImg: output image file and path
+:param gdalformat: output file format (e.g., KEA)
+
 """
     if not havePysolar:
         raise Exception("The PySolar module required for this function could not be imported.")
