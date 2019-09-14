@@ -15,14 +15,14 @@ populating with the information for undertaking an accuracy assessment.
 
 Where:
 
-* inputImage is a string specifying the input image file with classification.
-* inputLinesShp is a string specifying the input lines shapefile path. 
-* outputPtsShp is a string specifying the output points shapefile path.
-* classImgCol is a string speciyfing the name of the column in the image file containing the class names.
-* classImgVecCol is a string specifiying the output column in the shapefile for the classified class names.
-* classRefVecCol is an optional string specifiying an output column in the shapefile which can be used in the accuracy assessment for the reference data.
-* lineStep is a double specifying the step along the lines between the points
-* force is an optional boolean specifying whether the output shapefile should be deleted if is already exists (True and it will be deleted; Default is False)
+:param inputImage: is a string specifying the input image file with classification.
+:param inputLinesShp: is a string specifying the input lines shapefile path.
+:param outputPtsShp: is a string specifying the output points shapefile path.
+:param classImgCol: is a string speciyfing the name of the column in the image file containing the class names.
+:param classImgVecCol: is a string specifiying the output column in the shapefile for the classified class names.
+:param classRefVecCol: is an optional string specifiying an output column in the shapefile which can be used in the accuracy assessment for the reference data.
+:param lineStep: is a double specifying the step along the lines between the points
+:param force: is an optional boolean specifying whether the output shapefile should be deleted if is already exists (True and it will be deleted; Default is False)
 
     """
     vectorutils.createLinesOfPoints(inputLinesShp, outputPtsShp, lineStep, force)

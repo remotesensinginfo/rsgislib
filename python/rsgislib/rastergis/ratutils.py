@@ -124,15 +124,15 @@ Attribute RAT with statistics from from all bands in an input image.
 
 Where:
 
-* inputImage - input image to calculate statistics from, if band names are avaialble these will be used for attribute names in the output RAT.
-* clumpsFile - input clumps file, statistics are added to RAT.
-* threshold - float, values below this are ignored (default=0)
-* outascii - string providing output CSV file (optional).
-* calcMin - Calculate minimum
-* calcMax - Calculate maximum
-* calcSum - Calculate sum
-* calcMean - Calculate mean
-* calcStDev - Calculate standard deviation
+:param inputImage: input image to calculate statistics from, if band names are avaialble these will be used for attribute names in the output RAT.
+:param clumpsFile: input clumps file, statistics are added to RAT.
+:param threshold: float, values below this are ignored (default=0)
+:param outascii: string providing output CSV file (optional).
+:param calcMin: Calculate minimum
+:param calcMax: Calculate maximum
+:param calcSum: Calculate sum
+:param calcMean: Calculate mean
+:param calcStDev: Calculate standard deviation
 
 Example::
 
@@ -246,15 +246,15 @@ def calcPlotGaussianHistoModel(clumpsFile, outGausH5File, outHistH5File, outPlot
 
 Where:
 
-* clumpsFile - input clumps file with populated RAT.
-* outGausH5File - the output HDF5 file for the Gaussian Mixture Model
-* outHistH5File - the output HDF5 file for the histogram.
-* outPlotFile - the output PDF file for the plot
-* varCol - Column within the RAT for the variable to be used for the histogram
-* binWidth - Bin width for the histogram
-* classColumn - Column where the classes are specified
-* classVal - Class used to mask the input variable
-* plotTitle - title for the plot
+:param clumpsFile: input clumps file with populated RAT.
+:param outGausH5File: the output HDF5 file for the Gaussian Mixture Model
+:param outHistH5File: the output HDF5 file for the histogram.
+:param outPlotFile: the output PDF file for the plot
+:param varCol: Column within the RAT for the variable to be used for the histogram
+:param binWidth: Bin width for the histogram
+:param classColumn: Column where the classes are specified
+:param classVal: Class used to mask the input variable
+:param plotTitle: title for the plot
 
 Example::
 
@@ -352,19 +352,17 @@ by slicing the histogram and finding an optimal skewness and kurtosis.
 
 Where:
 
-* inputClumps - input clumps file.
-* inClassCol - The column specifiying the classes, one of which change will be found.
-* classOfInterest - The class (as defined in inClassCol) on which changed is being found.
-* changeVarCol - Variable(s) to be used to find change. Expecting column name. Needs to be numeric. If a list of column names is provided then they are combined using PCA and the first PC is used for the change process.
-* outChangeFeatCol - the output column. Regions lower than lower threshold have value 1. Regions higher than upper threshold have value 2. No change had threshold 0.
-* noDataVals - list of no data values to be ignored.
-* thresMeasure - needs to be of type RSGISRATThresMeasure (default is auto)
-* exportPlot - file name for exporting a histogram plot with thresholds annotated. No plot is create if None is passed (default is none).
-* showAllThreshPlot - option when plotting to put all the thresholds on to the plot rather than just the one being used.
+:param inputClumps: input clumps file.
+:param inClassCol: The column specifiying the classes, one of which change will be found.
+:param classOfInterest: The class (as defined in inClassCol) on which changed is being found.
+:param changeVarCol: Variable(s) to be used to find change. Expecting column name. Needs to be numeric. If a list of column names is provided then they are combined using PCA and the first PC is used for the change process.
+:param outChangeFeatCol: the output column. Regions lower than lower threshold have value 1. Regions higher than upper threshold have value 2. No change had threshold 0.
+:param noDataVals: list of no data values to be ignored.
+:param thresMeasure: needs to be of type RSGISRATThresMeasure (default is auto)
+:param exportPlot: file name for exporting a histogram plot with thresholds annotated. No plot is create if None is passed (default is none).
+:param showAllThreshPlot: option when plotting to put all the thresholds on to the plot rather than just the one being used.
 
-Return:
-
-* list of lower [0] and upper [1] thresholds used to define the no change region.
+:return: list of lower [0] and upper [1] thresholds used to define the no change region.
 
     """
     # Check numpy is available
@@ -579,19 +577,17 @@ by slicing the histogram and finding an optimal skewness and kurtosis.
 
 Where:
 
-* inputClumps - input clumps file.
-* inClassCol - The column specifiying the classes, one of which change will be found.
-* classOfInterest - The class (as defined in inClassCol) on which changed is being found.
-* changeVarCol - changeVarCol - Variable(s) to be used to find change. Expecting column name. Needs to be numeric. If a list of column names is provided then they are combined using PCA and the first PC is used for the change process.
-* outChangeFeatCol - the output column. Regions lower than lower threshold have value 1. Regions higher than upper threshold have value 2. No change had threshold 0.
-* noDataVals - list of no data values to be ignored.
-* thresMeasure - needs to be of type RSGISRATThresMeasure (default is auto)
-* exportPlot - file name for exporting a histogram plot with thresholds annotated. No plot is create if None is passed (default is none).
-* showAllThreshPlot - option when plotting to put all the thresholds on to the plot rather than just the one being used.
+:param inputClumps: input clumps file.
+:param inClassCol: The column specifiying the classes, one of which change will be found.
+:param classOfInterest: The class (as defined in inClassCol) on which changed is being found.
+:param changeVarCol: changeVarCol - Variable(s) to be used to find change. Expecting column name. Needs to be numeric. If a list of column names is provided then they are combined using PCA and the first PC is used for the change process.
+:param outChangeFeatCol: the output column. Regions lower than lower threshold have value 1. Regions higher than upper threshold have value 2. No change had threshold 0.
+:param noDataVals: list of no data values to be ignored.
+:param thresMeasure: needs to be of type RSGISRATThresMeasure (default is auto)
+:param exportPlot: file name for exporting a histogram plot with thresholds annotated. No plot is create if None is passed (default is none).
+:param showAllThreshPlot: option when plotting to put all the thresholds on to the plot rather than just the one being used.
 
-Return:
-
-* list of lower [0] and upper [1] thresholds used to define the no change region.
+:return: list of lower [0] and upper [1] thresholds used to define the no change region.
     
     """
     # Check numpy is available
@@ -772,19 +768,17 @@ by slicing the histogram and finding an optimal skewness and kurtosis.
 
 Where:
 
-* inputClumps - input clumps file.
-* inClassCol - The column specifiying the classes, one of which change will be found.
-* classOfInterest - The class (as defined in inClassCol) on which changed is being found.
-* changeVarCol - changeVarCol - Variable(s) to be used to find change. Expecting column name. Needs to be numeric. If a list of column names is provided then they are combined using PCA and the first PC is used for the change process.
-* outChangeFeatCol - the output column. Regions lower than lower threshold have value 1. Regions higher than upper threshold have value 2. No change had threshold 0.
-* noDataVals - list of no data values to be ignored.
-* thresMeasure - needs to be of type RSGISRATThresMeasure (default is auto)
-* exportPlot - file name for exporting a histogram plot with thresholds annotated. No plot is create if None is passed (default is none).
-* showAllThreshPlot - option when plotting to put all the thresholds on to the plot rather than just the one being used.
+:param inputClumps: input clumps file.
+:param inClassCol: The column specifiying the classes, one of which change will be found.
+:param classOfInterest: The class (as defined in inClassCol) on which changed is being found.
+:param changeVarCol: changeVarCol - Variable(s) to be used to find change. Expecting column name. Needs to be numeric. If a list of column names is provided then they are combined using PCA and the first PC is used for the change process.
+:param outChangeFeatCol: the output column. Regions lower than lower threshold have value 1. Regions higher than upper threshold have value 2. No change had threshold 0.
+:param noDataVals: list of no data values to be ignored.
+:param thresMeasure: needs to be of type RSGISRATThresMeasure (default is auto)
+:param exportPlot: file name for exporting a histogram plot with thresholds annotated. No plot is create if None is passed (default is none).
+:param showAllThreshPlot: option when plotting to put all the thresholds on to the plot rather than just the one being used.
 
-Return:
-
-* list of lower [0] and upper [1] thresholds used to define the no change region.
+:return: list of lower [0] and upper [1] thresholds used to define the no change region.
 
     """
     # Check numpy is available
@@ -981,11 +975,11 @@ variables and then combine together by voting to find change features.
 
 Where:
 
-* inputClumps - input clumps file.
-* inClassCol - The column specifiying the classes, one of which change will be found.
-* classOfInterest - The class (as defined in inClassCol) on which changed is being found.
-* outChangeFeatCol - the output column with the vote scores.
-* vars - a list of RSGISRATChangeVarInfo objects used to specify the variables and function to be called.
+:param inputClumps: input clumps file.
+:param inClassCol: The column specifiying the classes, one of which change will be found.
+:param classOfInterest: The class (as defined in inClassCol) on which changed is being found.
+:param outChangeFeatCol: the output column with the vote scores.
+:param vars: a list of RSGISRATChangeVarInfo objects used to specify the variables and function to be called.
 
     """
     # Check numpy is available
@@ -1039,11 +1033,11 @@ variables (i.e., len(var) > 1) then variables are combined with an and operation
 
 Where:
 
-* inputClumps - input clumps file.
-* inClassCol - The column specifiying the classes, one of which change will be found.
-* classOfInterest - The class (as defined in inClassCol) on which changed is being found.
-* outFeatsCol - the output binary column specifying whether a feature is within the thresholds.
-* vars - a list of RSGISRATChangeVarInfo objects used to specify the variables and function to be called.
+:param inputClumps: input clumps file.
+:param inClassCol: The column specifiying the classes, one of which change will be found.
+:param classOfInterest: The class (as defined in inClassCol) on which changed is being found.
+:param outFeatsCol: the output binary column specifying whether a feature is within the thresholds.
+:param vars: a list of RSGISRATChangeVarInfo objects used to specify the variables and function to be called.
 
     """
     # Check numpy is available
@@ -1203,12 +1197,12 @@ A function to populate a clumps file with training from a series of shapefiles (
 
 Where:
 
-* clumpsImg - input clumps file.
-* classesDict - A dict structure with the class names as keys and the values are an array of two values
-                [int class val, file path for shapefile].
-* tmpPath - File path (which needs to exist) where files can temporally be written.
-* classesIntCol - Output column name for integer values representing each class.
-* classesNameCol - Output column name for string class names.
+:param clumpsImg: input clumps file.
+:param classesDict: A dict structure with the class names as keys and the values are an array of two values
+                   [int class val, file path for shapefile].
+:param tmpPath: File path (which needs to exist) where files can temporally be written.
+:param classesIntCol: Output column name for integer values representing each class.
+:param classesNameCol: Output column name for string class names.
 
     """
     createdDIR = False
@@ -1256,13 +1250,13 @@ the minX, maxX, minY and maxY coordinates for the features.
 
 Where:
 
-* clumpsImg - input clumps file.
-* minXCol - the minX column in RAT.
-* maxXCol - the maxX column in RAT.
-* minYCol - the minY column in RAT.
-* maxYCol - the maxY column in RAT.
-* outShpLyrName - The output shapefile name (layer name do not include the .shp it will be appended).
-* roundInt - Boolean specifying whether the coordinated should be rounded to integers (Default: False)
+:param clumpsImg: input clumps file.
+:param minXCol: the minX column in RAT.
+:param maxXCol: the maxX column in RAT.
+:param minYCol: the minY column in RAT.
+:param maxYCol: the maxY column in RAT.
+:param outShpLyrName: The output shapefile name (layer name do not include the .shp it will be appended).
+:param roundInt: Boolean specifying whether the coordinated should be rounded to integers (Default: False)
 
     """   
     
@@ -1349,15 +1343,15 @@ Identify small connected units within a classification. The threshold to define 
 is provided by the user in pixels. Note, the outColName and smallClumpsThres variables
 can be provided as lists to identify a number of thresholds of small units.
 
-* clumpsImg - string for the clumps image file containing input classification
-* classCol - string for the column name representing the classification as integer values
-* tmpPath - directory path where temporary layers are stored (if directory is created within the function it will be deleted once function is complete).
-* outColName - a list of output column names (i.e., one for each threshold)
-* smallClumpsThres - a list of thresholds for identifying small clumps.
-* useTiledClump - a boolean to specify whether the tiled clumping algorithm should be used (Default is False; select True for large datasets)
-* nCores - if the tiled version of the clumping algorithm is being used then there is an option to use multiple processing cores; specify the number to be used (Default is 2).
-* tileWidth - is the width of the image tile (in pixels) if tiled clumping is used.
-* tileHeight - is the height of the image tile (in pixels) if tiled clumping is used.
+:param clumpsImg: string for the clumps image file containing input classification
+:param classCol: string for the column name representing the classification as integer values
+:param tmpPath: directory path where temporary layers are stored (if directory is created within the function it will be deleted once function is complete).
+:param outColName: a list of output column names (i.e., one for each threshold)
+:param smallClumpsThres: a list of thresholds for identifying small clumps.
+:param useTiledClump: a boolean to specify whether the tiled clumping algorithm should be used (Default is False; select True for large datasets)
+:param nCores: if the tiled version of the clumping algorithm is being used then there is an option to use multiple processing cores; specify the number to be used (Default is 2).
+:param tileWidth: is the width of the image tile (in pixels) if tiled clumping is used.
+:param tileHeight: is the height of the image tile (in pixels) if tiled clumping is used.
 
 Example::
 
@@ -1455,14 +1449,14 @@ def calcDist2Classes(clumpsImg, classCol, outImgBase, tmpDIR='./tmp', tileSize=2
     """
     A function which will calculate proximity rasters for a set of classes defined within the RAT.
     
-    * clumpsImg is a string specifying the input image with the associated RAT
-    * classCol is the column in the RAT which has the classification
-    * outImgBase is the base name of the output image - output files will be KEA files.
-    * tmpDIR is a directory to be used for storing the image tiles and other temporary files - if not directory does not exist it will be created and deleted on completion (Default: ./tmp).
-    * tileSize is an int specifying in pixels the size of the image tiles used for processing (Default: 2000)
-    * maxDist is the maximum distance in units of the geographic units of the projection of the input image (Default: 1000).
-    * nodata is the value applied to the pixels outside of the maxDist threshold (Default: 1000; i.e., the same as maxDist).
-    * nCores is the number of processing cores which are available to be used for this processing. If -1 all available cores will be used. (Default: -1)
+    :param clumpsImg: is a string specifying the input image with the associated RAT
+    :param classCol: is the column in the RAT which has the classification
+    :param outImgBase: is the base name of the output image - output files will be KEA files.
+    :param tmpDIR: is a directory to be used for storing the image tiles and other temporary files - if not directory does not exist it will be created and deleted on completion (Default: ./tmp).
+    :param tileSize: is an int specifying in pixels the size of the image tiles used for processing (Default: 2000)
+    :param maxDist: is the maximum distance in units of the geographic units of the projection of the input image (Default: 1000).
+    :param nodata: is the value applied to the pixels outside of the maxDist threshold (Default: 1000; i.e., the same as maxDist).
+    :param nCores: is the number of processing cores which are available to be used for this processing. If -1 all available cores will be used. (Default: -1)
 
     """
     tmpPresent = True
@@ -1560,11 +1554,11 @@ def calcDistBetweenClumps(clumpsImg, outColName, tmpDIR='./tmp', useIdx=False, m
     """
 Calculate the distance between all clumps
 
-* clumpsImg - image clumps for which the distance will be calculated.
-* outColName - output column within the clumps image.
-* tmpDIR - directory out tempory files will be outputted to.
-* useIdx - use a spatial index when calculating the distance between clumps (needed for large number of clumps).
-* maxDistThres - if using an index than an upper limit on the distance between clumps can be defined.
+:param clumpsImg: image clumps for which the distance will be calculated.
+:param outColName: output column within the clumps image.
+:param tmpDIR: directory out tempory files will be outputted to.
+:param useIdx: use a spatial index when calculating the distance between clumps (needed for large number of clumps).
+:param maxDistThres: if using an index than an upper limit on the distance between clumps can be defined.
 
 """
     tmpPresent = True
@@ -1596,12 +1590,12 @@ def calcDistToLargeClumps(clumpsImg, outColName, sizeThres, tmpDIR='./tmp', useI
     """
 Calculate the distance from each small clump to a large clump. Split defined by the threshold provided.
 
-* clumpsImg - image clumps for which the distance will be calculated.
-* outColName - output column within the clumps image.
-* sizeThres - is a threshold to seperate the sets of large and small clumps.
-* tmpDIR - directory out tempory files will be outputted to.
-* useIdx - use a spatial index when calculating the distance between clumps (needed for large number of clumps).
-* maxDistThres - if using an index than an upper limit on the distance between clumps can be defined.
+:param clumpsImg: image clumps for which the distance will be calculated.
+:param outColName: output column within the clumps image.
+:param sizeThres: is a threshold to seperate the sets of large and small clumps.
+:param tmpDIR: directory out tempory files will be outputted to.
+:param useIdx: use a spatial index when calculating the distance between clumps (needed for large number of clumps).
+:param maxDistThres: if using an index than an upper limit on the distance between clumps can be defined.
 
 """
     tmpPresent = True
@@ -1683,12 +1677,12 @@ def takeRandomSample(clumpsImg, inColName, inColVal, outColName, sampleRatio, se
     """
 A function to take a random sample of an input column.
 
-* clumpsImg - clumps image.
-* inColName - input column name.
-* inColVal - numeric value for which the random sample is to be taken for.
-* outColName - output column where value of 1 is selected within the random sample and 0 is not selected.
-* sampleRatio - the size of the sample (0 - 1.0; i.e., 10% = 0.1) to be taken of the number of rows within input value.
-* seed - is the seed for the random number generation (optional; default is 0).
+:param clumpsImg: clumps image.
+:param inColName: input column name.
+:param inColVal: numeric value for which the random sample is to be taken for.
+:param outColName: output column where value of 1 is selected within the random sample and 0 is not selected.
+:param sampleRatio: the size of the sample (0 - 1.0; i.e., 10% = 0.1) to be taken of the number of rows within input value.
+:param seed: is the seed for the random number generation (optional; default is 0).
 
 """
     if (sampleRatio <= 0) or (sampleRatio >= 1):

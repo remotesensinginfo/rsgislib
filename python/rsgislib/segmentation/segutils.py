@@ -65,25 +65,25 @@ Shepherd, J. D., Bunting, P., & Dymond, J. R. (2019). Operational Large-Scale Se
 
 Where:
 
-* inputImg is a string containing the name of the input file.
-* outputClumps is a string containing the name of the output clump file.
-* outputMeanImg is the output mean image file (clumps attributed with pixel mean from input image) - pass 'None' to skip creating.
-* tmpath is a file path for intermediate files (default is current directory).
-* gdalformat is a string containing the GDAL format for the output file (default = KEA).
-* noStats is a bool which specifies that no image statistics and pyramids should be built for the output images (default = False)/
-* noStretch is a bool which specifies that the input image bands should not be stretched (default = False).
-* noDelete is a bool which specifies that the temporary images created during processing should not be deleted once processing has been completed (default = False).
-* numClusters is an int which specifies the number of clusters within the KMeans clustering (default = 60).
-* minPxls is an int which specifies the minimum number pixels within a segments (default = 100).
-* distThres specifies the distance threshold for joining the segments (default = 100, set to large number to turn off this option).
-* bands is an array providing a subset of image bands to use (default is None to use all bands).
-* sampling specify the subsampling of the image for the data used within the KMeans (default = 100; 1 == no subsampling).
-* kmMaxIter maximum iterations for KMeans.
-* processInMem where functions allow it perform processing in memory rather than on disk.
-* saveProcessStats is a bool which specifies that the image stretch stats and the kMeans centre stats should be saved along with a header.
-* imgStretchStats is a string providing the file name and path for the image stretch stats (Output).
-* kMeansCentres is a string providing the file name and path for the KMeans clusters centres (don't include file extension; .gmtxt will be added to the end) (Output).
-* imgStatsJSONFile is a string providing the name and path of a JSON file storing the image spatial extent and imgStretchStats and kMeansCentres file paths for use by other commands (Output).
+:param inputImg: is a string containing the name of the input file.
+:param outputClumps: is a string containing the name of the output clump file.
+:param outputMeanImg: is the output mean image file (clumps attributed with pixel mean from input image) - pass 'None' to skip creating.
+:param tmpath: is a file path for intermediate files (default is current directory).
+:param gdalformat: is a string containing the GDAL format for the output file (default = KEA).
+:param noStats: is a bool which specifies that no image statistics and pyramids should be built for the output images (default = False)/
+:param noStretch: is a bool which specifies that the input image bands should not be stretched (default = False).
+:param noDelete: is a bool which specifies that the temporary images created during processing should not be deleted once processing has been completed (default = False).
+:param numClusters: is an int which specifies the number of clusters within the KMeans clustering (default = 60).
+:param minPxls: is an int which specifies the minimum number pixels within a segments (default = 100).
+:param distThres: specifies the distance threshold for joining the segments (default = 100, set to large number to turn off this option).
+:param bands: is an array providing a subset of image bands to use (default is None to use all bands).
+:param sampling: specify the subsampling of the image for the data used within the KMeans (default = 100; 1 == no subsampling).
+:param kmMaxIter: maximum iterations for KMeans.
+:param processInMem: where functions allow it perform processing in memory rather than on disk.
+:param saveProcessStats: is a bool which specifies that the image stretch stats and the kMeans centre stats should be saved along with a header.
+:param imgStretchStats: is a string providing the file name and path for the image stretch stats (Output).
+:param kMeansCentres: is a string providing the file name and path for the KMeans clusters centres (don't include file extension; .gmtxt will be added to the end) (Output).
+:param imgStatsJSONFile: is a string providing the name and path of a JSON file storing the image spatial extent and imgStretchStats and kMeansCentres file paths for use by other commands (Output).
 
 Example::
 
@@ -258,21 +258,21 @@ Shepherd, J. D., Bunting, P., & Dymond, J. R. (2019). Operational Large-Scale Se
 
 Where:
 
-* inputImg is a string containing the name of the input file.
-* outputClumps is a string containing the name of the output clump file.
-* kMeansCentres is a string providing the file name and path for the KMeans clusters centres (Input)
-* imgStretchStats is a string providing the file name and path for the image stretch stats (Input - not required if noStretch=True)
-* outputMeanImg is the output mean image file (clumps attributed with pixel mean from input image) - pass 'None' to skip creating.
-* tmpath is a file path for intermediate files (default is current directory).
-* gdalformat is a string containing the GDAL format for the output file (default = KEA).
-* noStats is a bool which specifies that no image statistics and pyramids should be built for the output images (default = False)/
-* noStretch is a bool which specifies that the input image bands should not be stretched (default = False).
-* noDelete is a bool which specifies that the temporary images created during processing should not be deleted once processing has been completed (default = False).
-* minPxls is an int which specifies the minimum number pixels within a segments (default = 100).
-* distThres specifies the distance threshold for joining the segments (default = 100, set to large number to turn off this option).
-* bands is an array providing a subset of image bands to use (default is None to use all bands).
-* sampling specify the subsampling of the image for the data used within the KMeans (default = 100; 1 == no subsampling).
-* processInMem where functions allow it perform processing in memory rather than on disk.
+:param inputImg: is a string containing the name of the input file.
+:param outputClumps: is a string containing the name of the output clump file.
+:param kMeansCentres: is a string providing the file name and path for the KMeans clusters centres (Input)
+:param imgStretchStats: is a string providing the file name and path for the image stretch stats (Input - not required if noStretch=True)
+:param outputMeanImg: is the output mean image file (clumps attributed with pixel mean from input image) - pass 'None' to skip creating.
+:param tmpath: is a file path for intermediate files (default is current directory).
+:param gdalformat: is a string containing the GDAL format for the output file (default = KEA).
+:param noStats: is a bool which specifies that no image statistics and pyramids should be built for the output images (default = False)/
+:param noStretch: is a bool which specifies that the input image bands should not be stretched (default = False).
+:param noDelete: is a bool which specifies that the temporary images created during processing should not be deleted once processing has been completed (default = False).
+:param minPxls: is an int which specifies the minimum number pixels within a segments (default = 100).
+:param distThres: specifies the distance threshold for joining the segments (default = 100, set to large number to turn off this option).
+:param bands: is an array providing a subset of image bands to use (default is None to use all bands).
+:param sampling: specify the subsampling of the image for the data used within the KMeans (default = 100; 1 == no subsampling).
+:param processInMem: where functions allow it perform processing in memory rather than on disk.
 
 Example::
 
@@ -408,28 +408,28 @@ Shepherd, J. D., Bunting, P., & Dymond, J. R. (2019). Operational Large-Scale Se
 
 Where:
 
-* inputImg is a string containing the name of the input file
-* outputClumps is a string containing the name of the output clump file
-* outStatsFile is a string containing the name of the output CSV file with the image segmentation stats
-* outputMeanImg is the output mean image file (clumps attributed with pixel mean from input image) - pass 'None' to skip creating.
-* tmpath is a file path for intermediate files (default is current directory).
-* gdalformat is a string containing the GDAL format for the output file (default is KEA)
-* noStats is a bool which specifies that no image statistics and pyramids should be built for the output images.
-* noStretch is a bool which specifies that the input image bands should not be stretched.
-* noDelete is a book which specifies that the temporary images created during processing should not be deleted once processing has been completed.
-* numClustersStart is an int which specifies the number of clusters within the KMeans clustering to start the process
-* numClustersStep is an int which specifies the number of clusters within the KMeans clustering added with each step
-* numOfClustersSteps is an int which specifies the number steps (i.e., tests) which are performed.
-* minPxls is an int which specifies the minimum number pixels within a segments.
-* distThres specifies the distance threshold for joining the segments (default is a very large value which turns off this option.).
-* bands is an array providing a subset of image bands to use (default is None to use all bands)
-* sampling specify the subsampling of the image for the data used within the KMeans (1 == no subsampling; default is 100)
-* kmMaxIter maximum iterations for KMeans.
-* processInMem where functions allow it perform processing in memory rather than on disk.
-* minNormV is a floating point =None
-* maxNormV=None
-* minNormMI=None
-* maxNormMI=None)
+:param inputImg: is a string containing the name of the input file
+:param outputClumps: is a string containing the name of the output clump file
+:param outStatsFile: is a string containing the name of the output CSV file with the image segmentation stats
+:param outputMeanImg: is the output mean image file (clumps attributed with pixel mean from input image) - pass 'None' to skip creating.
+:param tmpath: is a file path for intermediate files (default is current directory).
+:param gdalformat: is a string containing the GDAL format for the output file (default is KEA)
+:param noStats: is a bool which specifies that no image statistics and pyramids should be built for the output images.
+:param noStretch: is a bool which specifies that the input image bands should not be stretched.
+:param noDelete: is a book which specifies that the temporary images created during processing should not be deleted once processing has been completed.
+:param numClustersStart: is an int which specifies the number of clusters within the KMeans clustering to start the process
+:param numClustersStep: is an int which specifies the number of clusters within the KMeans clustering added with each step
+:param numOfClustersSteps: is an int which specifies the number steps (i.e., tests) which are performed.
+:param minPxls: is an int which specifies the minimum number pixels within a segments.
+:param distThres: specifies the distance threshold for joining the segments (default is a very large value which turns off this option.).
+:param bands: is an array providing a subset of image bands to use (default is None to use all bands)
+:param sampling: specify the subsampling of the image for the data used within the KMeans (1 == no subsampling; default is 100)
+:param kmMaxIter: maximum iterations for KMeans.
+:param processInMem: where functions allow it perform processing in memory rather than on disk.
+:param minNormV: is a floating point =None
+:param maxNormV: None
+:param minNormMI: None
+:param maxNormMI: None
 
 Example::
 
@@ -571,32 +571,31 @@ Utility function to call the segmentation algorithm of Shepherd et al. (2019) an
 
 Where:
 
-* inputImg is a string containing the name of the input file
-* outputClumps is a string containing the name of the output clump file
-* outStatsFile is a string containing the name of the output CSV file with the image segmentation stats
-* outputMeanImg is the output mean image file (clumps attributed with pixel mean from input image) - pass 'None' to skip creating.
-* tmpath is a file path for intermediate files (default is current directory).
-* gdalformat is a string containing the GDAL format for the output file (default is KEA)
-* noStats is a bool which specifies that no image statistics and pyramids should be built for the output images.
-* noStretch is a bool which specifies that the input image bands should not be stretched.
-* noDelete is a book which specifies that the temporary images created during processing should not be deleted once processing has been completed.
-* numClusters is an int which specifies the number of clusters within the KMeans clustering process
-* minPxlsStart is an int which specifies the minimum number pixels within a segments at the start of processing.
-* minPxlsStep is an int which specifies the minimum number pixels within a segments increment each step.
-* numOfMinPxlsSteps is an int which specifies the number steps (i.e., tests) which are performed.
-* distThres specifies the distance threshold for joining the segments (default is a very large value which turns off this option.).
-* bands is an array providing a subset of image bands to use (default is None to use all bands)
-* sampling specify the subsampling of the image for the data used within the KMeans (1 == no subsampling; default is 100)
-* kmMaxIter maximum iterations for KMeans.
-* minNormV is a floating point =None
-* maxNormV=None
-* minNormMI=None
-* maxNormMI=None)
+:param inputImg: is a string containing the name of the input file
+:param outputClumps: is a string containing the name of the output clump file
+:param outStatsFile: is a string containing the name of the output CSV file with the image segmentation stats
+:param outputMeanImg: is the output mean image file (clumps attributed with pixel mean from input image) - pass 'None' to skip creating.
+:param tmpath: is a file path for intermediate files (default is current directory).
+:param gdalformat: is a string containing the GDAL format for the output file (default is KEA)
+:param noStats: is a bool which specifies that no image statistics and pyramids should be built for the output images.
+:param noStretch: is a bool which specifies that the input image bands should not be stretched.
+:param noDelete: is a book which specifies that the temporary images created during processing should not be deleted once processing has been completed.
+:param numClusters: is an int which specifies the number of clusters within the KMeans clustering process
+:param minPxlsStart: is an int which specifies the minimum number pixels within a segments at the start of processing.
+:param minPxlsStep: is an int which specifies the minimum number pixels within a segments increment each step.
+:param numOfMinPxlsSteps: is an int which specifies the number steps (i.e., tests) which are performed.
+:param distThres: specifies the distance threshold for joining the segments (default is a very large value which turns off this option.).
+:param bands: is an array providing a subset of image bands to use (default is None to use all bands)
+:param sampling: specify the subsampling of the image for the data used within the KMeans (1 == no subsampling; default is 100)
+:param kmMaxIter: maximum iterations for KMeans.
+:param minNormV: is a floating point =None
+:param maxNormV: None
+:param minNormMI: None
+:param maxNormMI: None
 
 Example::
 
     from rsgislib.segmentation import segutils
-
 
     inputImg = './WV2_525N040W_20110727_TOARefl_b762_stch.kea'
     outputClumpsBase = './OptimalTests/WV2_525N040W_20110727_MinPxl'
@@ -606,7 +605,6 @@ Example::
 
     # Will test minimum number of pixels within an object from 10 to 100 with intervals of 5.
     segutils.runShepherdSegmentationTestMinObjSize(inputImg, outputClumpsBase, outStatsFile, outputMeanImgBase=outputMeanImgBase, tmpath=tmpath, noStretch=True, numClusters=100, minPxlsStart=5, minPxlsStep=5, numOfMinPxlsSteps=20, minNormV=None, maxNormV=None, minNormMI=None, maxNormMI=None)
-
 
     """
     colsPrefix = 'gs'

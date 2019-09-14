@@ -88,18 +88,18 @@ def classifyWithinRAT(clumpsImg, classesIntCol, classesNameCol, variables, class
     """
 A function which will perform a classification within the RAT using a classifier from scikit-learn
 
-* clumpsImg is the clumps image on which the classification is to be performed
-* classesIntCol is the column with the training data as int values
-* classesNameCol is the column with the training data as string class names
-* variables is an array of column names which are to be used for the classification
-* classifier is an instance of a scikit-learn classifier (e.g., RandomForests which is Default)
-* outColInt is the output column name for the int class representation (Default: 'OutClass')
-* outColStr is the output column name for the class names column (Default: 'OutClassName')
-* roiCol is a column name for a column which specifies the region to be classified. If None ignored (Default: None)
-* roiVal is a int value used within the roiCol to select a region to be classified (Default: 1)
-* classColours is a python dict using the class name as the key along with arrays of length 3 specifying the RGB colours for the class.
-* preProcessor is a scikit-learn processors such as sklearn.preprocessing.MaxAbsScaler() which can rescale the input variables independently as read in (Define: None; i.e., not in use).
-* justFit is a boolean specifying that the classifier should just be fitted to the data and not applied (Default: False; i.e., apply classification)
+:param clumpsImg: is the clumps image on which the classification is to be performed
+:param classesIntCol: is the column with the training data as int values
+:param classesNameCol: is the column with the training data as string class names
+:param variables: is an array of column names which are to be used for the classification
+:param classifier: is an instance of a scikit-learn classifier (e.g., RandomForests which is Default)
+:param outColInt: is the output column name for the int class representation (Default: 'OutClass')
+:param outColStr: is the output column name for the class names column (Default: 'OutClassName')
+:param roiCol: is a column name for a column which specifies the region to be classified. If None ignored (Default: None)
+:param roiVal: is a int value used within the roiCol to select a region to be classified (Default: 1)
+:param classColours: is a python dict using the class name as the key along with arrays of length 3 specifying the RGB colours for the class.
+:param preProcessor: is a scikit-learn processors such as sklearn.preprocessing.MaxAbsScaler() which can rescale the input variables independently as read in (Define: None; i.e., not in use).
+:param justFit: is a boolean specifying that the classifier should just be fitted to the data and not applied (Default: False; i.e., apply classification)
 
 
 Example::
@@ -340,18 +340,18 @@ def classifyWithinRATTiled(clumpsImg, classesIntCol, classesNameCol, variables, 
     """
 A function which will perform a classification within the RAT using a classifier from scikit-learn using the rios ratapplier interface allowing very large RATs to be processed. 
 
-* clumpsImg is the clumps image on which the classification is to be performed
-* classesIntCol is the column with the training data as int values
-* classesNameCol is the column with the training data as string class names
-* variables is an array of column names which are to be used for the classification
-* classifier is an instance of a scikit-learn classifier (e.g., RandomForests which is Default)
-* outColInt is the output column name for the int class representation (Default: 'OutClass')
-* outColStr is the output column name for the class names column (Default: 'OutClassName')
-* roiCol is a column name for a column which specifies the region to be classified. If None ignored (Default: None)
-* roiVal is a int value used within the roiCol to select a region to be classified (Default: 1)
-* classColours is a python dict using the class name as the key along with arrays of length 3 specifying the RGB colours for the class.
-* scaleVarsRange will rescale each variable independently to a range of 0-1 (default: False).
-* justFit is a boolean specifying that the classifier should just be fitted to the data and not applied (Default: False; i.e., apply classification)
+:param clumpsImg: is the clumps image on which the classification is to be performed
+:param classesIntCol: is the column with the training data as int values
+:param classesNameCol: is the column with the training data as string class names
+:param variables: is an array of column names which are to be used for the classification
+:param classifier: is an instance of a scikit-learn classifier (e.g., RandomForests which is Default)
+:param outColInt: is the output column name for the int class representation (Default: 'OutClass')
+:param outColStr: is the output column name for the class names column (Default: 'OutClassName')
+:param roiCol: is a column name for a column which specifies the region to be classified. If None ignored (Default: None)
+:param roiVal: is a int value used within the roiCol to select a region to be classified (Default: 1)
+:param classColours: is a python dict using the class name as the key along with arrays of length 3 specifying the RGB colours for the class.
+:param scaleVarsRange: will rescale each variable independently to a range of 0-1 (default: False).
+:param justFit: is a boolean specifying that the classifier should just be fitted to the data and not applied (Default: False; i.e., apply classification)
 
 
 Example::
@@ -478,16 +478,16 @@ def clusterWithinRAT(clumpsImg, variables, clusterer=MiniBatchKMeans(n_clusters=
     """
 A function which will perform a clustering within the RAT using a clustering algorithm from scikit-learn
 
-* clumpsImg is the clumps image on which the classification is to be performed.
-* variables is an array of column names which are to be used for the clustering.
-* clusterer is an instance of a scikit-learn clusterer (e.g., MiniBatchKMeans which is Default; Note with 8 clusters).
-* outColInt is the output column name identifying the clusters (Default: 'OutCluster').
-* roiCol is a column name for a column which specifies the region to be clustered. If None ignored (Default: None).
-* roiVal is a int value used within the roiCol to select a region to be clustered (Default: 1).
-* clrClusters is a boolean specifying whether the colour table should be updated to correspond to the clusters (Default: True).
-* clrSeed is an integer seeding the random generator used to generate the colours (Default=10; if None provided system time used).
-* addConnectivity is a boolean which adds a kneighbors_graph to the clusterer (just an option for the AgglomerativeClustering algorithm)
-* preProcessor is a scikit-learn processors such as sklearn.preprocessing.MaxAbsScaler() which can rescale the input variables independently as read in (Define: None; i.e., not in use).
+:param clumpsImg: is the clumps image on which the classification is to be performed.
+:param variables: is an array of column names which are to be used for the clustering.
+:param clusterer: is an instance of a scikit-learn clusterer (e.g., MiniBatchKMeans which is Default; Note with 8 clusters).
+:param outColInt: is the output column name identifying the clusters (Default: 'OutCluster').
+:param roiCol: is a column name for a column which specifies the region to be clustered. If None ignored (Default: None).
+:param roiVal: is a int value used within the roiCol to select a region to be clustered (Default: 1).
+:param clrClusters: is a boolean specifying whether the colour table should be updated to correspond to the clusters (Default: True).
+:param clrSeed: is an integer seeding the random generator used to generate the colours (Default=10; if None provided system time used).
+:param addConnectivity: is a boolean which adds a kneighbors_graph to the clusterer (just an option for the AgglomerativeClustering algorithm)
+:param preProcessor: is a scikit-learn processors such as sklearn.preprocessing.MaxAbsScaler() which can rescale the input variables independently as read in (Define: None; i.e., not in use).
 
 
 Example::
@@ -606,15 +606,13 @@ def findClassifierParameters(clumpsImg, classesIntCol, variables, preProcessor=N
     """
 Find the optimal parameters for a classifier using a grid search and return a classifier instance with those optimal parameters.
 
-* clumpsImg is the clumps image on which the classification is to be performed
-* classesIntCol is the column with the training data as int values
-* variables is an array of column names which are to be used for the classification
-* preProcessor is a scikit-learn processors such as sklearn.preprocessing.MaxAbsScaler() which can rescale the input variables independently as read in (Define: None; i.e., not in use).
-* gridSearch is an instance of GridSearchCV parameterised with a classifier and parameters to be searched.
+:param clumpsImg: is the clumps image on which the classification is to be performed
+:param classesIntCol: is the column with the training data as int values
+:param variables: is an array of column names which are to be used for the classification
+:param preProcessor: is a scikit-learn processors such as sklearn.preprocessing.MaxAbsScaler() which can rescale the input variables independently as read in (Define: None; i.e., not in use).
+:param gridSearch: is an instance of GridSearchCV parameterised with a classifier and parameters to be searched.
 
-return:
-
-* Instance of the classifier with optimal parameters defined.
+:return: Instance of the classifier with optimal parameters defined.
 
 Example::
 
@@ -699,11 +697,11 @@ A function to balance the number of training samples for classification so the n
 a minimum threshold (minNoSamples) and all equal to the class with the smallest number of samples
 unless that is above a set maximum (maxNoSamples).
 
-* clumpsImg is a string with the file path to the input image with RAT
-* trainCol is a string for the name of the input column specifying the training samples (zero is no data)
-* outTrainCol is a string with the name of the outputted training samples.
-* minNoSamples is an int specifying the minimum number of training samples for a class (if below threshold class is removed).
-* maxNoSamples is an int specifiying the maximum number of training samples per class.
+:param clumpsImg: is a string with the file path to the input image with RAT
+:param trainCol: is a string for the name of the input column specifying the training samples (zero is no data)
+:param outTrainCol: is a string with the name of the outputted training samples.
+:param minNoSamples: is an int specifying the minimum number of training samples for a class (if below threshold class is removed).
+:param maxNoSamples: is an int specifiying the maximum number of training samples per class.
 
 """
      # Check gdal is available

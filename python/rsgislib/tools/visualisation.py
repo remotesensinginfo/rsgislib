@@ -19,11 +19,11 @@ def createKMZImg(inputImg, outputFile, bands, reprojLatLong=True, finiteMsk=Fals
     
     Where:
     
-    * inputImg - input image file (any format that gdal supports)
-    * outputFile - output image file (extension kmz for KMZ output / kml for KML output)
-    * bands - a string (comma seperated) with the bands to be selected. (e.g., '1', '1,2,3', '5,6,4')
-    * reprojLatLong - specify whether the image should be explicitly reprojected to WGS84 Lat/Long before transformation to KML.
-    * finiteMsk - specify whether the image data should be masked so all values are finite before stretching.
+    :param inputImg: input image file (any format that gdal supports)
+    :param outputFile: output image file (extension kmz for KMZ output / kml for KML output)
+    :param bands: a string (comma seperated) with the bands to be selected. (e.g., '1', '1,2,3', '5,6,4')
+    :param reprojLatLong: specify whether the image should be explicitly reprojected to WGS84 Lat/Long before transformation to KML.
+    :param finiteMsk: specify whether the image data should be masked so all values are finite before stretching.
     
     """
     
@@ -90,15 +90,14 @@ def createWebTilesImg(inputImg, outputDIR, bands, zoomLevels='2-10', resample='a
     
     Where:
     
-    * inputImg - input image file (any format that gdal supports)
-    * outputDIR - output directory within which the cache will be created.
-    * bands - a string (comma seperated) with the bands to be selected. (e.g., '1', '1,2,3', '5,6,4')
-    * reprojLatLong - specify whether the image should be explicitly reprojected to WGS84 Lat/Long before transformation to KML.
-    * finiteMsk - specify whether the image data should be masked so all values are finite before stretching.
-    * resample - Method of resampling (average,near,bilinear,cubic,cubicspline,lanczos,antialias)
+    :param inputImg: input image file (any format that gdal supports)
+    :param outputDIR: output directory within which the cache will be created.
+    :param bands: a string (comma seperated) with the bands to be selected. (e.g., '1', '1,2,3', '5,6,4')
+    :param reprojLatLong: specify whether the image should be explicitly reprojected to WGS84 Lat/Long before transformation to KML.
+    :param finiteMsk: specify whether the image data should be masked so all values are finite before stretching.
+    :param resample: Method of resampling (average,near,bilinear,cubic,cubicspline,lanczos,antialias)
     
     """
-    
     bandLst = bands.split(',')
     multiBand = False
     if len(bandLst) == 3:

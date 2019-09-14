@@ -33,13 +33,13 @@ def rasterise2Image(inputVec, inputImage, outImage, gdalformat="KEA", burnVal=1,
 
 Where:
 
-* inputVec is a string specifying the input vector (shapefile) file
-* inputImage is a string specifying the input image defining the grid, pixel resolution and area for the rasterisation (if None and shpExt is False them assumes output image already exists and just uses it as is burning vector into it)
-* outImage is a string specifying the output image for the rasterised shapefile
-* gdalformat is the output image format (Default: KEA).
-* burnVal is the value for the output image pixels if no attribute is provided.
-* shpAtt is a string specifying the attribute to be rasterised, value of None creates a binary mask and \"FID\" creates a temp shapefile with a "FID" column and rasterises that column.
-* shpExt is a boolean specifying that the output image should be cut to the same extent as the input shapefile (Default is False and therefore output image will be the same as the input).
+:param inputVec: is a string specifying the input vector (shapefile) file
+:param inputImage: is a string specifying the input image defining the grid, pixel resolution and area for the rasterisation (if None and shpExt is False them assumes output image already exists and just uses it as is burning vector into it)
+:param outImage: is a string specifying the output image for the rasterised shapefile
+:param gdalformat: is the output image format (Default: KEA).
+:param burnVal: is the value for the output image pixels if no attribute is provided.
+:param shpAtt: is a string specifying the attribute to be rasterised, value of None creates a binary mask and \"FID\" creates a temp shapefile with a "FID" column and rasterises that column.
+:param shpExt: is a boolean specifying that the output image should be cut to the same extent as the input shapefile (Default is False and therefore output image will be the same as the input).
 
 Example::
 
@@ -114,17 +114,17 @@ A utillity to rasterise a vector layer to an image covering the same region and 
 
 Where:
 
-* inputVec is a string specifying the input vector file
-* inputVecLyr is a string specifying the input vector layer name.
-* inputImage is a string specifying the input image defining the grid, pixel resolution and area for the rasterisation (if None and vecExt is False them assumes output image already exists and just uses it as is burning vector into it)
-* outImage is a string specifying the output image for the rasterised shapefile
-* gdalformat is the output image format (Default: KEA).
-* burnVal is the value for the output image pixels if no attribute is provided.
-* datatype of the output file, default is rsgislib.TYPE_8UINT
-* vecAtt is a string specifying the attribute to be rasterised, value of None creates a binary mask and \"FID\" creates a temp shapefile with a "FID" column and rasterises that column.
-* vecExt is a boolean specifying that the output image should be cut to the same extent as the input shapefile (Default is False and therefore output image will be the same as the input).
-* thematic is a boolean (default True) specifying that the output image is an thematic dataset so a colour table will be populated.
-* nodata is a float specifying the no data value associated with a continous output image.
+:param inputVec: is a string specifying the input vector file
+:param inputVecLyr: is a string specifying the input vector layer name.
+:param inputImage: is a string specifying the input image defining the grid, pixel resolution and area for the rasterisation (if None and vecExt is False them assumes output image already exists and just uses it as is burning vector into it)
+:param outImage: is a string specifying the output image for the rasterised shapefile
+:param gdalformat: is the output image format (Default: KEA).
+:param burnVal: is the value for the output image pixels if no attribute is provided.
+:param datatype: of the output file, default is rsgislib.TYPE_8UINT
+:param vecAtt: is a string specifying the attribute to be rasterised, value of None creates a binary mask and \"FID\" creates a temp shapefile with a "FID" column and rasterises that column.
+:param vecExt: is a boolean specifying that the output image should be cut to the same extent as the input shapefile (Default is False and therefore output image will be the same as the input).
+:param thematic: is a boolean (default True) specifying that the output image is an thematic dataset so a colour table will be populated.
+:param nodata: is a float specifying the no data value associated with a continous output image.
 
 Example::
 
@@ -193,17 +193,17 @@ Example::
 
 def rasteriseVecLyrObj(vec_lyr_obj, outImage, burnVal=1, vecAtt=None, calcstats=True, thematic=True, nodata=0):
     """ 
-A utillity to rasterise a vector layer to an image covering the same region. 
+A utility to rasterise a vector layer to an image covering the same region.
 
 Where:
 
-* vec_lyr_obj is a OGR Vector Layer Object
-* outImage is a string specifying the output image, this image must already exist and intersect within the input vector layer.
-* burnVal is the value for the output image pixels if no attribute is provided.
-* vecAtt is a string specifying the attribute to be rasterised, value of None creates a binary mask and \"FID\" creates a temp shapefile with a "FID" column and rasterises that column.
-* calcstats is a boolean specifying whether image stats and pyramids should be calculated.
-* thematic is a boolean (default True) specifying that the output image is an thematic dataset so a colour table will be populated.
-* nodata is a float specifying the no data value associated with a continous output image.
+:param vec_lyr_obj: is a OGR Vector Layer Object
+:param outImage: is a string specifying the output image, this image must already exist and intersect within the input vector layer.
+:param burnVal: is the value for the output image pixels if no attribute is provided.
+:param vecAtt: is a string specifying the attribute to be rasterised, value of None creates a binary mask and \"FID\" creates a temp shapefile with a "FID" column and rasterises that column.
+:param calcstats: is a boolean specifying whether image stats and pyramids should be calculated.
+:param thematic: is a boolean (default True) specifying that the output image is an thematic dataset so a colour table will be populated.
+:param nodata: is a float specifying the no data value associated with a continous output image.
 
 """
     try:
@@ -244,9 +244,9 @@ A utillity to create raster copy of a shapefile. The output image is a KEA file 
     
 Where:
 
-* inputVec is a string specifying the input vector (shapefile) file
-* inputImage is a string specifying the input image defining the grid, pixel resolution and area for the rasterisation
-* outputImage is a string specifying the output KEA image for the rasterised shapefile
+:param inputVec: is a string specifying the input vector (shapefile) file
+:param inputImage: is a string specifying the input image defining the grid, pixel resolution and area for the rasterisation
+:param outputImage: is a string specifying the output KEA image for the rasterised shapefile
 
 Example::
 
@@ -272,11 +272,11 @@ A utillity to polygonise a raster to a ESRI Shapefile.
     
 Where:
 
-* inputImg is a string specifying the input image file to be polygonised
-* outShp is a string specifying the output shapefile path. If it exists it will be deleted and overwritten.
-* imgBandNo is an int specifying the image band to be polygonised. (default = 1)
-* maskImg is an optional string mask file specifying a no data mask (default = None)
-* imgMaskBandNo is an int specifying the image band to be used the mask (default = 1)
+:param inputImg: is a string specifying the input image file to be polygonised
+:param outShp: is a string specifying the output shapefile path. If it exists it will be deleted and overwritten.
+:param imgBandNo: is an int specifying the image band to be polygonised. (default = 1)
+:param maskImg: is an optional string mask file specifying a no data mask (default = None)
+:param imgMaskBandNo: is an int specifying the image band to be used the mask (default = 1)
 
 """
     gdal.UseExceptions()
@@ -322,17 +322,16 @@ A utility to polygonise a raster to a OGR vector layer.
 
 Where:
 
-* outvec is a string specifying the output vector file path. If it exists it will be deleted and overwritten.
-* outlyr is a string with the name of the vector layer.
-* vecdrv is a string with the driver
-* inputImg is a string specifying the input image file to be polygonised
-* imgBandNo is an int specifying the image band to be polygonised. (default = 1)
-* maskImg is an optional string mask file specifying a no data mask (default = None)
-* imgMaskBandNo is an int specifying the image band to be used the mask (default = 1)
-* replace_file is a boolean specifying whether the vector file should be replaced (i.e., overwritten). Default=True.
-* replace_lyr is a boolean specifying whether the vector layer should be replaced (i.e., overwritten). Default=True.
-* pxl_val_fieldname is a string to specify the name of the output column representing the pixel value within the
-                    input image.
+:param outvec: is a string specifying the output vector file path. If it exists it will be deleted and overwritten.
+:param outlyr: is a string with the name of the vector layer.
+:param vecdrv: is a string with the driver
+:param inputImg: is a string specifying the input image file to be polygonised
+:param imgBandNo: is an int specifying the image band to be polygonised. (default = 1)
+:param maskImg: is an optional string mask file specifying a no data mask (default = None)
+:param imgMaskBandNo: is an int specifying the image band to be used the mask (default = 1)
+:param replace_file: is a boolean specifying whether the vector file should be replaced (i.e., overwritten). Default=True.
+:param replace_lyr: is a boolean specifying whether the vector layer should be replaced (i.e., overwritten). Default=True.
+:param pxl_val_fieldname: is a string to specify the name of the output column representing the pixel value within the input image.
 
 """
     gdal.UseExceptions()
@@ -385,11 +384,11 @@ A function which will write a column to a vector file
 
 Where:
 
-* vectorFile - The file / path to the vector data 'file'.
-* vectorLayer - The layer to which the data is to be added.
-* colName - Name of the output column
-* colDataType - ogr data type (e.g., ogr.OFTString, ogr.OFTInteger, ogr.OFTReal)
-* colData - A list of the same length as the number of features in vector file.
+:param vectorFile: The file / path to the vector data 'file'.
+:param vectorLayer: The layer to which the data is to be added.
+:param colName: Name of the output column
+:param colDataType: ogr data type (e.g., ogr.OFTString, ogr.OFTInteger, ogr.OFTReal)
+:param colData: A list of the same length as the number of features in vector file.
 
 Example::
 
@@ -470,10 +469,10 @@ A function which will write a column to a vector layer.
 
 Where:
 
-* lyr - GDAL/OGR vector layer object
-* colName - Name of the output column
-* colDataType - ogr data type (e.g., ogr.OFTString, ogr.OFTInteger, ogr.OFTReal)
-* colData - A list of the same length as the number of features in vector file.
+:param lyr: GDAL/OGR vector layer object
+:param colName: Name of the output column
+:param colDataType: ogr data type (e.g., ogr.OFTString, ogr.OFTInteger, ogr.OFTReal)
+:param colData: A list of the same length as the number of features in vector file.
 
 """
     gdal.UseExceptions()
@@ -532,9 +531,9 @@ A function which will reads a column from a vector file
 
 Where:
 
-* vectorFile - The file / path to the vector data 'file'.
-* vectorLayer - The layer to which the data is to be read from.
-* colName - Name of the input column
+:param vectorFile: The file / path to the vector data 'file'.
+:param vectorLayer: The layer to which the data is to be read from.
+:param colName: Name of the input column
 
 """
     gdal.UseExceptions()
@@ -573,9 +572,9 @@ A function which will reads a column from a vector file
 
 Where:
 
-* vectorFile - The file / path to the vector data 'file'.
-* vectorLayer - The layer to which the data is to be read from.
-* attNames - List of input attribute column names to be read in.
+:param vectorFile: The file / path to the vector data 'file'.
+:param vectorLayer: The layer to which the data is to be read from.
+:param attNames: List of input attribute column names to be read in.
 
 """
     gdal.UseExceptions()
@@ -631,12 +630,12 @@ def popBBOXCols(vecFile, vecLyr, xminCol='xmin', xmaxCol='xmax', yminCol='ymin',
     """
 A function which adds a polygons boundary bbox as attributes to each feature.
 
-* vecFile - vector file.
-* vecLyr - layer within the vector file.
-* xminCol - column name.
-* xmaxCol - column name.
-* yminCol - column name.
-* ymaxCol - column name.
+:param vecFile: vector file.
+:param vecLyr: layer within the vector file.
+:param xminCol: column name.
+:param xmaxCol: column name.
+:param yminCol: column name.
+:param ymaxCol: column name.
 
 """
     dsVecFile = gdal.OpenEx(vecFile, gdal.OF_UPDATE )
@@ -739,10 +738,10 @@ def extractImageFootprint(inputImg, outVec, tmpDIR='./tmp', rePrjTo=None):
     """
 A function to extract an image footprint as a vector.
 
-* inputImg - the input image file for which the footprint will be extracted.
-* outVec - output shapefile path and name.
-* tmpDIR - temp directory which will be used during processing. It will be created and deleted once processing complete.
-* rePrjTo - optional command 
+:param inputImg: the input image file for which the footprint will be extracted.
+:param outVec: output shapefile path and name.
+:param tmpDIR: temp directory which will be used during processing. It will be created and deleted once processing complete.
+:param rePrjTo: optional command
 
 """
     gdal.UseExceptions()
@@ -808,13 +807,13 @@ def getVecFeatCount(inVec, layerName=None, computeCount=True):
     """
 Get a count of the number of features in the vector layers.
 
-* inVec - is a string with the input vector file name and path.
-* layerName - is the layer for which extent is to be calculated (Default: None). if None assume there is only one layer and that will be read.
-* computeCount - is a boolean which specifies whether the layer extent 
-                 should be calculated (rather than estimated from header)
-                 even if that operation is computationally expensive.
+:param inVec: is a string with the input vector file name and path.
+:param layerName: is the layer for which extent is to be calculated (Default: None). if None assume there is only one layer and that will be read.
+:param computeCount: is a boolean which specifies whether the layer extent
+                     should be calculated (rather than estimated from header)
+                     even if that operation is computationally expensive.
 
-return: nfeats
+:return: nfeats
 
 """
     gdal.UseExceptions()
@@ -835,8 +834,8 @@ Function which will merge a list of shapefiles into an single shapefile using og
 
 Where:
 
-* inFileList - is a list of input files.
-* outVecFile - is the output shapefile
+:param inFileList: is a list of input files.
+:param outVecFile: is the output shapefile
 
 """
     if os.path.exists(outVecFile):
@@ -868,10 +867,10 @@ Function which will merge a list of vector files into an single output SQLite da
 
 Where:
 
-* inFileList - is a list of input files.
-* outDBFile - is the output SQLite database (\*.sqlite)
-* lyrName - is the layer name in the output database (i.e., you can merge layers into single layer or write a number of layers to the same database).
-* exists - boolean which specifies whether the database file exists or not.
+:param inFileList: is a list of input files.
+:param outDBFile: is the output SQLite database (\*.sqlite)
+:param lyrName: is the layer name in the output database (i.e., you can merge layers into single layer or write a number of layers to the same database).
+:param exists: boolean which specifies whether the database file exists or not.
 
 """
     first = True
@@ -907,10 +906,10 @@ Function which will merge a list of vector files into an single output GeoPackag
 
 Where:
 
-* inFileList - is a list of input files.
-* outFile - is the output GPKG database (\*.gpkg)
-* lyrName - is the layer name in the output database (i.e., you can merge layers into single layer or write a number of layers to the same database).
-* exists - boolean which specifies whether the database file exists or not.
+:param inFileList: is a list of input files.
+:param outFile: is the output GPKG database (\*.gpkg)
+:param lyrName: is the layer name in the output database (i.e., you can merge layers into single layer or write a number of layers to the same database).
+:param exists: boolean which specifies whether the database file exists or not.
 
 """
     first = True
@@ -946,10 +945,10 @@ Function which will merge a list of vector files into an single output GeoPackag
 
 Where:
 
-* inputFile - is a vector file which contains multiple layers which are to be merged
-* outFile - is the output GPKG database (\*.gpkg)
-* lyrName - is the layer name in the output database (i.e., you can merge layers into single layer or write a number of layers to the same database).
-* exists - boolean which specifies whether the database file exists or not.
+:param inputFile: is a vector file which contains multiple layers which are to be merged
+:param outFile: is the output GPKG database (\*.gpkg)
+:param lyrName: is the layer name in the output database (i.e., you can merge layers into single layer or write a number of layers to the same database).
+:param exists: boolean which specifies whether the database file exists or not.
 
 """
     lyrs = rsgislib.vectorutils.getVecLyrsLst(inputFile)
@@ -987,8 +986,8 @@ file forms a new layer using the existing layer name. This function wraps the og
 
 Where:
 
-* inFileList - is a list of input files.
-* outDBFile - is the output SQLite database (\*.sqlite)
+:param inFileList: is a list of input files.
+:param outDBFile: is the output SQLite database (\*.sqlite)
 
 """
     for inFile in inFileList:
@@ -1012,8 +1011,8 @@ file forms a new layer using the existing layer name. This function wraps the og
 
 Where:
 
-* inFileList - is a list of input files.
-* outFile - is the output GPKG database (\*.gpkg)
+:param inFileList: is a list of input files.
+:param outFile: is the output GPKG database (\*.gpkg)
 
 """
     for inFile in inFileList:
@@ -1033,16 +1032,16 @@ Where:
 def createPolySHP4LstBBOXs(csvFile, outSHP, epsgCode, minXCol=0, maxXCol=1, minYCol=2, maxYCol=3, ignoreRows=0, force=False):
     """
 This function takes a CSV file of bounding boxes (1 per line) and creates a polygon shapefile.
-    
-* csvFile - input CSV file.
-* outSHP - output ESRI shapefile
-* epsgCode - EPSG code specifying the projection of the data (4326 is WSG84 Lat/Long).
-* minXCol - The index (starting at 0) for the column within the CSV file for the minimum X coordinate.
-* maxXCol - The index (starting at 0) for the column within the CSV file for the maximum X coordinate.
-* minYCol - The index (starting at 0) for the column within the CSV file for the minimum Y coordinate.
-* maxYCol - The index (starting at 0) for the column within the CSV file for the maximum Y coordinate.
-* ignoreRows - The number of rows to ignore from the start of the CSV file (i.e., column headings)
-* force - If the output file already exists delete it before proceeding.
+
+:param csvFile: input CSV file.
+:param outSHP: output ESRI shapefile
+:param epsgCode: EPSG code specifying the projection of the data (4326 is WSG84 Lat/Long).
+:param minXCol: The index (starting at 0) for the column within the CSV file for the minimum X coordinate.
+:param maxXCol: The index (starting at 0) for the column within the CSV file for the maximum X coordinate.
+:param minYCol: The index (starting at 0) for the column within the CSV file for the minimum Y coordinate.
+:param maxYCol: The index (starting at 0) for the column within the CSV file for the maximum Y coordinate.
+:param ignoreRows: The number of rows to ignore from the start of the CSV file (i.e., column headings)
+:param force: If the output file already exists delete it before proceeding.
 
 """
     gdal.UseExceptions()
@@ -1102,9 +1101,9 @@ def getVecLyrsLst(vecFile):
     """
 A function which returns a list of available layers within the inputted vector file.
 
-* vecFile - file name and path to input vector layer.
+:param vecFile: file name and path to input vector layer.
 
-returns: list of layer names (can be used with gdal.Dataset.GetLayerByName()).
+:return: list of layer names (can be used with gdal.Dataset.GetLayerByName()).
 
 """
     gdalDataset = gdal.OpenEx(vecFile, gdal.OF_VECTOR )
@@ -1122,14 +1121,14 @@ def getVecLayerExtent(inVec, layerName=None, computeIfExp=True):
     """
 Get the extent of the vector layer.
 
-* inVec - is a string with the input vector file name and path.
-* layerName - is the layer for which extent is to be calculated (Default: None)
-*             if None assume there is only one layer and that will be read.
-* computeIfExp - is a boolean which specifies whether the layer extent 
-                 should be calculated (rather than estimated from header)
-                 even if that operation is computationally expensive.
+:param inVec: is a string with the input vector file name and path.
+:param layerName: is the layer for which extent is to be calculated (Default: None)
+                  if None assume there is only one layer and that will be read.
+:param computeIfExp: is a boolean which specifies whether the layer extent
+                     should be calculated (rather than estimated from header)
+                     even if that operation is computationally expensive.
 
-return: boundary box is returned (MinX, MaxX, MinY, MaxY)
+:return: boundary box is returned (MinX, MaxX, MinY, MaxY)
 
 """
     gdal.UseExceptions()
@@ -1145,9 +1144,9 @@ return: boundary box is returned (MinX, MaxX, MinY, MaxY)
 
 def getProjWKTFromVec(inVec, layerName=None):
     """
-* inVec - is a string with the input vector file name and path.
+:param inVec: is a string with the input vector file name and path.
 
-return: WKT representation of projection
+:return: WKT representation of projection
 
 """
     gdal.UseExceptions()
@@ -1165,13 +1164,13 @@ def splitVecLyr(vecFile, vecLyr, nfeats, outVecDrvr, outdir, outvecbase, outvece
     """
 A function which splits the input vector layer into a number of output layers.
 
-* vecFile - input vector file.
-* vecLyr - input layer name.
-* nfeats - number of features within each output file.
-* outVecDrvr - output file driver.
-* outdir - output directory for the created output files.
-* outvecbase - output layer name will be the same as the base file name.
-* outvecend - file ending (e.g., .shp).
+:param vecFile: input vector file.
+:param vecLyr: input layer name.
+:param nfeats: number of features within each output file.
+:param outVecDrvr: output file driver.
+:param outdir: output directory for the created output files.
+:param outvecbase: output layer name will be the same as the base file name.
+:param outvecend: file ending (e.g., .shp).
 
 """
     gdal.UseExceptions()
@@ -1255,18 +1254,18 @@ A function which splits the input vector layer into a number of output layers.
 def reProjVectorLayer(inputVec, outputVec, outProjWKT, outDriverName='ESRI Shapefile', outLyrName=None, inLyrName=None, inProjWKT=None, force=False):
     """
 A function which reprojects a vector layer. 
-    
-* inputVec is a string with name and path to input vector file.
-* outputVec is a string with name and path to output vector file.
-* outProjWKT is a string with the WKT string for the output vector file.
-* outDriverName is the output vector file format. Default is ESRI Shapefile.
-* outLyrName is a string for the output layer name. If None then ignored and 
-             assume there is just a single layer in the vector and layer name
-             is the same as the file name.
-* inLyrName is a string for the input layer name. If None then ignored and 
-            assume there is just a single layer in the vector.
-* inProjWKT is a string with the WKT string for the input shapefile 
-            (Optional; taken from input file if not specified).
+
+:param inputVec: is a string with name and path to input vector file.
+:param outputVec: is a string with name and path to output vector file.
+:param outProjWKT: is a string with the WKT string for the output vector file.
+:param outDriverName: is the output vector file format. Default is ESRI Shapefile.
+:param outLyrName: is a string for the output layer name. If None then ignored and
+                   assume there is just a single layer in the vector and layer name
+                   is the same as the file name.
+:param inLyrName: is a string for the input layer name. If None then ignored and
+                  assume there is just a single layer in the vector.
+:param inProjWKT: is a string with the WKT string for the input shapefile
+                  (Optional; taken from input file if not specified).
 
 """
     ## This code has been editted from https://pcjericks.github.io/py-gdalogr-cookbook/projection.html#reproject-a-layer
@@ -1324,7 +1323,6 @@ A function which reprojects a vector layer.
     
     # get the output layer's feature definition
     outLayerDefn = outLayer.GetLayerDefn()
-    
     
     openTransaction = False
     nFeats = inLayer.GetFeatureCount(True)
@@ -1384,13 +1382,13 @@ def getAttLstSelectFeats(vecFile, vecLyr, attNames, selVecFile, selVecLyr):
     """
 Function to get a list of attribute values from features which intersect
 with the select layer.
-* vecFile - vector layer from which the attribute data comes from.
-* vecLyr - the layer name from which the attribute data comes from.
-* attNames - a list of attribute names to be outputted.
-* selVecFile - the vector file which will be intersected within the vector file.
-* selVecLyr - the layer name which will be intersected within the vector file.
+:param vecFile: vector layer from which the attribute data comes from.
+:param vecLyr: the layer name from which the attribute data comes from.
+:param attNames: a list of attribute names to be outputted.
+:param selVecFile: the vector file which will be intersected within the vector file.
+:param selVecLyr: the layer name which will be intersected within the vector file.
 
-returns list of dictionaries with the output values.
+:return: list of dictionaries with the output values.
 
 """
     gdal.UseExceptions()
@@ -1477,11 +1475,12 @@ def getAttLstSelectFeatsLyrObjs(vecLyrObj, attNames, selVecLyrObj):
     """
 Function to get a list of attribute values from features which intersect
 with the select layer.
-* vecLyrObj - the OGR layer object from which the attribute data comes from.
-* attNames - a list of attribute names to be outputted.
-* selVecLyrObj - the OGR layer object which will be intersected within the vector file.
 
-returns list of dictionaries with the output values.
+:param vecLyrObj: the OGR layer object from which the attribute data comes from.
+:param attNames: a list of attribute names to be outputted.
+:param selVecLyrObj: the OGR layer object which will be intersected within the vector file.
+
+:return: list of dictionaries with the output values.
 
 """
     gdal.UseExceptions()
@@ -1550,13 +1549,14 @@ def getAttLstSelectBBoxFeats(vec_file, vec_lyr, attNames, bbox, bbox_epsg=None):
     """
 Function to get a list of attribute values from features which intersect
 with the select layer.
-* vec_file - the OGR file from which the attribute data comes from.
-* vec_lyr - the layer name within the file from which the attribute data comes from.
-* attNames - a list of attribute names to be outputted.
-* bbox - the bounding box for the region of interest (xMin, xMax, yMin, yMax).
-* bbox_epsg - the projection of the BBOX (if None then ignore).
 
-returns list of dictionaries with the output values.
+:param vec_file: the OGR file from which the attribute data comes from.
+:param vec_lyr: the layer name within the file from which the attribute data comes from.
+:param attNames: a list of attribute names to be outputted.
+:param bbox: the bounding box for the region of interest (xMin, xMax, yMin, yMax).
+:param bbox_epsg: the projection of the BBOX (if None then ignore).
+
+:return: list of dictionaries with the output values.
 
 """
     dsVecFile = gdal.OpenEx(vec_file, gdal.OF_READONLY)
@@ -1577,12 +1577,13 @@ def getAttLstSelectBBoxFeatsLyrObjs(vecLyrObj, attNames, bbox, bbox_epsg=None):
     """
 Function to get a list of attribute values from features which intersect
 with the select layer.
-* vecLyrObj - the OGR layer object from which the attribute data comes from.
-* attNames - a list of attribute names to be outputted.
-* bbox - the bounding box for the region of interest (xMin, xMax, yMin, yMax).
-* bbox_epsg - the projection of the BBOX (if None then ignore).
 
-returns list of dictionaries with the output values.
+:param vecLyrObj: the OGR layer object from which the attribute data comes from.
+:param attNames: a list of attribute names to be outputted.
+:param bbox: the bounding box for the region of interest (xMin, xMax, yMin, yMax).
+:param bbox_epsg: the projection of the BBOX (if None then ignore).
+
+:return: list of dictionaries with the output values.
 
 """
     gdal.UseExceptions()
@@ -1678,13 +1679,13 @@ def selectIntersectFeats(vecFile, vecLyr, roiVecFile, roiVecLyr, out_vec_file, o
 Function to select the features which intersect with region of interest (ROI) features which will be outputted
 into a new vector layer.
 
-* vecFile - vector layer from which the attribute data comes from.
-* vecLyr - the layer name from which the attribute data comes from.
-* roiVecFile - the vector file which will be intersected within the vector file.
-* roiVecLyr - the layer name which will be intersected within the vector file.
-* out_vec_file - the vector file which will be outputted.
-* out_vec_lyr - the layer name which will be outputted.
-* out_vec_format - output vector format (default GPKG)
+:param vecFile: vector layer from which the attribute data comes from.
+:param vecLyr: the layer name from which the attribute data comes from.
+:param roiVecFile: the vector file which will be intersected within the vector file.
+:param roiVecLyr: the layer name which will be intersected within the vector file.
+:param out_vec_file: the vector file which will be outputted.
+:param out_vec_lyr: the layer name which will be outputted.
+:param out_vec_format: output vector format (default GPKG)
 
 """
     gdal.UseExceptions()
@@ -1728,13 +1729,15 @@ def exportSpatialSelectFeats(vecFile, vecLyr, selVecFile, selVecLyr, outputVec, 
     """
 Function to get a list of attribute values from features which intersect
 with the select layer.
-* vecFile - vector layer from which the attribute data comes from.
-* vecLyr - the layer name from which the attribute data comes from.
-* selVecFile - the vector file which will be intersected within the vector file.
-* selVecLyr - the layer name which will be intersected within the vector file.
-* outputVec - output vector file/path
-* outVecLyrName - output vector layer
-* outVecDrvr - the output vector layer type.
+
+:param vecFile: vector layer from which the attribute data comes from.
+:param vecLyr: the layer name from which the attribute data comes from.
+:param selVecFile: the vector file which will be intersected within the vector file.
+:param selVecLyr: the layer name which will be intersected within the vector file.
+:param outputVec: output vector file/path
+:param outVecLyrName: output vector layer
+:param outVecDrvr: the output vector layer type.
+
 """
     gdal.UseExceptions()
     att_vals = []
@@ -1821,22 +1824,22 @@ to the inputted bounding box. Where a UTM grid is required and there are multipl
 layer name will be appended with utmXX[n|s]. Note. this only works with formats such as GPKG which support
 multiple layers. A shapefile which only supports 1 layer will not work.
 
-* bbox - a bounding box (xMin, xMax, yMin, yMax)
-* x_size - Output grid size in X axis. If out_epsg_code or utm_grid defined then the grid size
-           needs to be in the output unit.
-* y_size - Output grid size in Y axis. If out_epsg_code or utm_grid defined then the grid size
-           needs to be in the output unit.
-* in_epsg_code - EPDSG code for the projection of the bbox
-* out_vec - output vector file.
-* out_vec_lyr - output vector layer name.
-* vec_drv - output vector file format (see OGR codes). Default is GPKG.
-* out_epsg_code - if provided the output grid is reprojected to the projection defined by this EPSG code.
-                  (note. the grid size needs to the in the unit of this projection). Default is None.
-* utm_grid - provide the output grid in UTM projection where grid might go across multiple UTM zones.
-             Default is False. grid size unit should be metres.
-* utm_hemi - if outputting a UTM projected grid then decided whether to use hemispheres or otherwise. If False
-             then everything will be projected northern hemisphere (e.g., as with landsat or sentinel-2).
-             Default is False.
+:param bbox: a bounding box (xMin, xMax, yMin, yMax)
+:param x_size: Output grid size in X axis. If out_epsg_code or utm_grid defined then the grid size
+               needs to be in the output unit.
+:param y_size: Output grid size in Y axis. If out_epsg_code or utm_grid defined then the grid size
+               needs to be in the output unit.
+:param in_epsg_code: EPDSG code for the projection of the bbox
+:param out_vec: output vector file.
+:param out_vec_lyr: output vector layer name.
+:param vec_drv: output vector file format (see OGR codes). Default is GPKG.
+:param out_epsg_code: if provided the output grid is reprojected to the projection defined by this EPSG code.
+                      (note. the grid size needs to the in the unit of this projection). Default is None.
+:param utm_grid: provide the output grid in UTM projection where grid might go across multiple UTM zones.
+                 Default is False. grid size unit should be metres.
+:param utm_hemi: if outputting a UTM projected grid then decided whether to use hemispheres or otherwise. If False
+                 then everything will be projected northern hemisphere (e.g., as with landsat or sentinel-2).
+                 Default is False.
 
 """
     import rsgislib.tools.utm
@@ -1939,20 +1942,19 @@ multiple layers. A shapefile which only supports 1 layer will not work.
 
 def createPolyVecBBOXs(vectorFile, vectorLyr, vecDriver, epsgCode, bboxs, atts=None, attTypes=None, overwrite=True):
     """
-This function creates a set of polygons for a set of bounding boxes. 
-
+This function creates a set of polygons for a set of bounding boxes.
 When creating an attribute the available data types are ogr.OFTString, ogr.OFTInteger, ogr.OFTReal
-    
-* vectorFile - output vector file/path
-* vectorLyr - output vector layer
-* vecDriver - the output vector layer type.
-* epsgCode - EPSG code specifying the projection of the data (e.g., 4326 is WSG84 Lat/Long).
-* bboxs - is a list of bounding boxes ([xMin, xMax, yMin, yMax]) to be saved to the output vector.
-* atts - is a dict of lists of attributes with the same length as the bboxs list. The dict should be named
-         the same as the attTypes['names'] list.
-* attTypes - is a dict with a list of attribute names (attTypes['names']) and types (attTypes['types']).
-             The list must be the same length as one another and the number of atts. Example type: ogr.OFTString
-* overwrite - overwrite the vector file specified if it exists. Use False for GPKG where you want to add multiple layers.
+
+:param vectorFile: output vector file/path
+:param vectorLyr: output vector layer
+:param vecDriver: the output vector layer type.
+:param epsgCode: EPSG code specifying the projection of the data (e.g., 4326 is WSG84 Lat/Long).
+:param bboxs: is a list of bounding boxes ([xMin, xMax, yMin, yMax]) to be saved to the output vector.
+:param atts: is a dict of lists of attributes with the same length as the bboxs list. The dict should be named
+             the same as the attTypes['names'] list.
+:param attTypes: is a dict with a list of attribute names (attTypes['names']) and types (attTypes['types']).
+                 The list must be the same length as one another and the number of atts. Example type: ogr.OFTString
+:param overwrite - overwrite the vector file specified if it exists. Use False for GPKG where you want to add multiple layers.
 
 """
     try:
@@ -2042,13 +2044,13 @@ def createVectorGrid(outputVec, vecDriver, vecLyrName, epsgCode, grid_x, grid_y,
     """
 A function which creates a regular grid across a defined area.
 
-* outputVec - outout file
-* epsgCode - EPSG code of the output projection 
-* grid_x - the size in the x axis of the grid cells.
-* grid_y - the size in the y axis of the grid cells.
-* bbox - the area for which cells will be defined (MinX, MaxX, MinY, MaxY).
-* vecDriver - the output vector layer type.
-* vecLyrName - output vector layer
+:param outputVec: outout file
+:param epsgCode: EPSG code of the output projection
+:param grid_x: the size in the x axis of the grid cells.
+:param grid_y: the size in the y axis of the grid cells.
+:param bbox: the area for which cells will be defined (MinX, MaxX, MinY, MaxY).
+:param vecDriver: the output vector layer type.
+:param vecLyrName: output vector layer
 
 """    
     minX = float(bbox[0])
@@ -2095,20 +2097,19 @@ A function which creates a regular grid across a defined area.
 
 def writePts2Vec(vectorFile, vectorLyr, vecDriver, epsgCode, ptsX, ptsY, atts=None, attTypes=None):
     """
-This function creates a set of polygons for a set of bounding boxes. 
-
+This function creates a set of polygons for a set of bounding boxes.
 When creating an attribute the available data types are ogr.OFTString, ogr.OFTInteger, ogr.OFTReal
     
-* vectorFile - output vector file/path
-* vectorLyr - output vector layer
-* vecDriver - the output vector layer type.
-* epsgCode - EPSG code specifying the projection of the data (e.g., 4326 is WSG84 Lat/Long).
-* ptsX - is a list of x coordinates.
-* ptsY - is a list of y coordinates.
-* atts - is a dict of lists of attributes with the same length as the bboxs list.
-         The dict should be named the same as the attTypes['names'] list.
-* attTypes - is a dict with a list of attribute names (attTypes['names']) and types (attTypes['types']).
-             The list must be the same length as one another and the number of atts. Example type: ogr.OFTString
+:param vectorFile: output vector file/path
+:param vectorLyr: output vector layer
+:param vecDriver: the output vector layer type.
+:param epsgCode: EPSG code specifying the projection of the data (e.g., 4326 is WSG84 Lat/Long).
+:param ptsX: is a list of x coordinates.
+:param ptsY: is a list of y coordinates.
+:param atts: is a dict of lists of attributes with the same length as the bboxs list.
+             The dict should be named the same as the attTypes['names'] list.
+:param attTypes: is a dict with a list of attribute names (attTypes['names']) and types (attTypes['types']).
+                 The list must be the same length as one another and the number of atts. Example type: ogr.OFTString
 
 """
     try:
@@ -2187,9 +2188,9 @@ def bboxIntersectsVecLyr(vectorFile, vectorLyr, bbox):
 A function which tests where a feature within an inputted vector layer intersects
 with a bounding box. 
 
-* vectorFile - vector file/path
-* vectorLyr - vector layer name
-* bbox - the bounding box (xMin, xMax, yMin, yMax). Same projection as vector layer.
+:param vectorFile: vector file/path
+:param vectorLyr: vector layer name
+:param bbox: the bounding box (xMin, xMax, yMin, yMax). Same projection as vector layer.
 
 """
     dsVecFile = gdal.OpenEx(vectorFile, gdal.OF_READONLY )
@@ -2226,13 +2227,13 @@ def createImgExtentLUT(imgList, vectorFile, vectorLyr, vecDriver, ignore_none_im
     """
 Create a vector layer look up table (LUT) for a directory of images.
 
-* imgList - list of input images for the LUT. All input images should be the same projection/coordinate system.
-* vectorFile - output vector file/path
-* vectorLyr - output vector layer
-* vecDriver - the output vector layer type (e.g., GPKG).
-* ignore_none_imgs - if a NULL epsg is returned from an image then ignore and don't include in LUT else throw exception.
-* out_proj_wgs84 - if True then the image bounding boxes will be re-projected to EPSG:4326.
-* overwrite_lut_file if True then output file will be overwritten. If false then not, e.g., can add extra layer to GPKG
+:param imgList: list of input images for the LUT. All input images should be the same projection/coordinate system.
+:param vectorFile: output vector file/path
+:param vectorLyr: output vector layer
+:param vecDriver: the output vector layer type (e.g., GPKG).
+:param ignore_none_imgs: if a NULL epsg is returned from an image then ignore and don't include in LUT else throw exception.
+:param out_proj_wgs84: if True then the image bounding boxes will be re-projected to EPSG:4326.
+:param overwrite_lut_file: if True then output file will be overwritten. If false then not, e.g., can add extra layer to GPKG
 
 Example::
 
@@ -2296,11 +2297,11 @@ def calcPolyCentroids(vecfile, veclyrname, outVecDrvr, vecoutfile, vecoutlyrname
     """
 Create a vector layer of the polygon centroids.
 
-* vecfile - input vector file
-* veclyrname - input vector layer within the input file.
-* outVecDrvr - the format driver for the output vector file (e.g., GPKG, ESRI Shapefile).
-* vecoutfile - output file path for the vector.
-* vecoutlyrname - output vector layer name.
+:param vecfile: input vector file
+:param veclyrname: input vector layer within the input file.
+:param outVecDrvr: the format driver for the output vector file (e.g., GPKG, ESRI Shapefile).
+:param vecoutfile: output file path for the vector.
+:param vecoutlyrname: output vector layer name.
 
 """
     gdal.UseExceptions()
@@ -2370,8 +2371,8 @@ def lstveclyrcols(vecfile, veclyr):
     """
 A function which returns a list of columns from the input vector layer.
 
-* vecfile - input vector file.
-* veclyr - input vector layer
+:param vecfile: input vector file.
+:param veclyr: input vector layer
 
 """
     gdal.UseExceptions()
@@ -2396,8 +2397,8 @@ def getFeatEnvs(vecFile, vecLyr):
 A function which returns a list of bounding boxes for each feature
 within the vector layer.
 
-* vecFile - vector file.
-* vecLyr - layer within the vector file.
+:param vecFile: vector file.
+:param vecLyr: layer within the vector file.
 
 """
     dsVecFile = gdal.OpenEx(vecFile, gdal.OF_VECTOR )
@@ -2441,10 +2442,10 @@ def subsetEnvsVecLyrObj(lyrVecObj, bbox):
 Function to get an ogr vector layer for the defined bounding box. The returned
 layer is returned as an in memory ogr Layer object.
 
-* lyrVecObj - OGR Layer Object.
-* bbox - region of interest (bounding box). Define as [xMin, xMax, yMin, yMax].
+:param lyrVecObj: OGR Layer Object.
+:param bbox: region of interest (bounding box). Define as [xMin, xMax, yMin, yMax].
 
-returns OGR Layer and Dataset objects.
+:return: OGR Layer and Dataset objects.
 
 """
     gdal.UseExceptions()
@@ -2512,10 +2513,10 @@ def readVecLyr2Mem(vecfile, veclyrname):
     """
 A function which reads a vector layer to an OGR in memory layer.
 
-* vecfile - input vector file
-* veclyrname - input vector layer within the input file.
+:param vecfile: input vector file
+:param veclyrname: input vector layer within the input file.
 
-returns layer and datasets
+:return: ogr_dataset, ogr_layer
 
 """
     gdal.UseExceptions()
@@ -2545,11 +2546,11 @@ def getMemVecLyrSubset(vecFile, vecLyr, bbox):
 Function to get an ogr vector layer for the defined bounding box. The returned
 layer is returned as an in memory ogr Layer object.
 
-* vecFile - vector layer from which the attribute data comes from.
-* vecLyr - the layer name from which the attribute data comes from.
-* bbox - region of interest (bounding box). Define as [xMin, xMax, yMin, yMax].
+:param vecFile: vector layer from which the attribute data comes from.
+:param vecLyr: the layer name from which the attribute data comes from.
+:param bbox: region of interest (bounding box). Define as [xMin, xMax, yMin, yMax].
 
-returns OGR Layer and Dataset objects.
+:return: OGR Layer and Dataset objects.
 
 """
     gdal.UseExceptions()
@@ -2574,12 +2575,12 @@ def writeVecLyr2File(veclyr, vecfile, veclyrname, vecDriver, options=['OVERWRITE
     """
 A function which reads a vector layer to an OGR in memory layer.
 
-* veclyr - OGR vector layer object
-* vecfile - output vector file
-* veclyrname - output vector layer within the input file.
-* vecDriver - the OGR driver for the output file.
-* options - provide a list of driver specific options; see https://www.gdal.org/ogr_formats.html
-* replace - if true the output file is replaced (i.e., overwritten to anything in an existing file will be lost).
+:param veclyr: OGR vector layer object
+:param vecfile: output vector file
+:param veclyrname: output vector layer within the input file.
+:param vecDriver: the OGR driver for the output file.
+:param options: provide a list of driver specific options; see https://www.gdal.org/ogr_formats.html
+:param replace: if true the output file is replaced (i.e., overwritten to anything in an existing file will be lost).
 
 """
     gdal.UseExceptions()

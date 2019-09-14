@@ -375,7 +375,7 @@ class RSGISPyUtils (object):
         Convert from RSGISLib data type to numpy datatype
 
         :param rsgis_datatype:
-        :return:
+        :return: numpy datatype
         """
         import numpy
         numpyDT = numpy.float32
@@ -503,9 +503,9 @@ class RSGISPyUtils (object):
     def reprojBBOX(self, bbox, inProjObj, outProjObj):
         """
         A function to reproject a bounding box.
-        * bbox - input bounding box (MinX, MaxX, MinY, MaxY)
-        * inProjObj - an osr.SpatialReference() object representing input projection.
-        * outProjObj - an osr.SpatialReference() object representing output projection.
+        :param bbox: input bounding box (MinX, MaxX, MinY, MaxY)
+        :param inProjObj: an osr.SpatialReference() object representing input projection.
+        :param outProjObj: an osr.SpatialReference() object representing output projection.
 
         :return: (MinX, MaxX, MinY, MaxY)
 
@@ -546,12 +546,12 @@ class RSGISPyUtils (object):
         """
         Get the extent of the vector layer.
         
-        * inVec - is a string with the input vector file name and path.
-        * layerName - is the layer for which extent is to be calculated (Default: None)
-        *             if None assume there is only one layer and that will be read.
-        * computeIfExp - is a boolean which specifies whether the layer extent 
-                         should be calculated (rather than estimated from header)
-                         even if that operation is computationally expensive.
+        :param inVec: is a string with the input vector file name and path.
+        :param layerName: is the layer for which extent is to be calculated (Default: None)
+                           if None assume there is only one layer and that will be read.
+        :param computeIfExp: is a boolean which specifies whether the layer extent
+                             should be calculated (rather than estimated from header)
+                             even if that operation is computationally expensive.
         
         :return: boundary box is returned (MinX, MaxX, MinY, MaxY)
         
@@ -568,12 +568,12 @@ class RSGISPyUtils (object):
         """
         Get a count of the number of features in the vector layers.
         
-        * inVec - is a string with the input vector file name and path.
-        * layerName - is the layer for which extent is to be calculated (Default: None)
-        *             if None assume there is only one layer and that will be read.
-        * computeCount - is a boolean which specifies whether the layer extent 
-                         should be calculated (rather than estimated from header)
-                         even if that operation is computationally expensive.
+        :param inVec: is a string with the input vector file name and path.
+        :param layerName: is the layer for which extent is to be calculated (Default: None)
+                          if None assume there is only one layer and that will be read.
+        :param computeCount: is a boolean which specifies whether the layer extent
+                             should be calculated (rather than estimated from header)
+                             even if that operation is computationally expensive.
         
         :return: nfeats
         
@@ -592,11 +592,11 @@ class RSGISPyUtils (object):
         A function which calculates the common extent between two extents but defines output on 
         grid with defined resolutions. Useful for finding common extent on a particular image grid.
         
-        * baseExtent is a bbox (xMin, xMax, yMin, yMax) providing the base for the grid on which output will be defined.
-        * baseGrid the size of the (square) grid on which output will be defined.
-        * otherExtent is a bbox (xMin, xMax, yMin, yMax) to be intersected with the baseExtent.
-        * fullContain is a boolean. True: moving output onto grid will increase size of bbox (i.e., intersection fully contained)
-                                    False: move output onto grid will decrease size of bbox (i.e., bbox fully contained within intesection)
+        :param baseExtent: is a bbox (xMin, xMax, yMin, yMax) providing the base for the grid on which output will be defined.
+        :param baseGrid: the size of the (square) grid on which output will be defined.
+        :param otherExtent: is a bbox (xMin, xMax, yMin, yMax) to be intersected with the baseExtent.
+        :param fullContain: is a boolean. True: moving output onto grid will increase size of bbox (i.e., intersection fully contained)
+                                          False: move output onto grid will decrease size of bbox (i.e., bbox fully contained within intesection)
         
         :return: bbox (xMin, xMax, yMin, yMax)
 
@@ -641,10 +641,10 @@ class RSGISPyUtils (object):
         A function which calculates the extent but defined on a grid with defined resolution. 
         Useful for finding extent on a particular image grid.
         
-        * baseExtent is a bbox (xMin, xMax, yMin, yMax) providing the base for the grid on which output will be defined.
-        * baseGrid the size of the (square) grid on which output will be defined.
-        * fullContain is a boolean. True: moving output onto grid will increase size of bbox (i.e., intersection fully contained)
-                                    False: move output onto grid will decrease size of bbox (i.e., bbox fully contained within intesection)
+        :param baseExtent: is a bbox (xMin, xMax, yMin, yMax) providing the base for the grid on which output will be defined.
+        :param baseGrid: the size of the (square) grid on which output will be defined.
+        :param fullContain: is a boolean. True: moving output onto grid will increase size of bbox (i.e., intersection fully contained)
+                                          False: move output onto grid will decrease size of bbox (i.e., bbox fully contained within intesection)
         
         :return: bbox (xMin, xMax, yMin, yMax)
 
@@ -676,12 +676,12 @@ class RSGISPyUtils (object):
         A function which calculates the extent but defined on a grid with defined resolution.
         Useful for finding extent on a particular image grid.
 
-        * baseExtent is a bbox (xMin, xMax, yMin, yMax) providing the base for the grid on which output will be defined.
-        * baseGrid the size of the (square) grid on which output will be defined.
-        * fullContain is a boolean. True: moving output onto grid will increase size of bbox (i.e., intersection fully contained)
-                                    False: move output onto grid will decrease size of bbox (i.e., bbox fully contained within intesection)
-        * round_vals specify whether outputted values should be rounded. None for no rounding (default) or integer for number of
-                     significant figures to round to.
+        :param baseExtent: is a bbox (xMin, xMax, yMin, yMax) providing the base for the grid on which output will be defined.
+        :param baseGrid: the size of the (square) grid on which output will be defined.
+        :param fullContain: is a boolean. True: moving output onto grid will increase size of bbox (i.e., intersection fully contained)
+                                          False: move output onto grid will decrease size of bbox (i.e., bbox fully contained within intesection)
+        :param round_vals: specify whether outputted values should be rounded. None for no rounding (default) or integer for number of
+                           significant figures to round to.
 
         :return: bbox (xMin, xMax, yMin, yMax)
 
@@ -723,9 +723,9 @@ class RSGISPyUtils (object):
         """
         Create a grid with size x_size, y_size for the area represented by bbox.
 
-        * bbox - a bounding box within which the grid will be created (xMin, xMax, yMin, yMax)
-        * x_size - Output grid size in X axis (same unit as bbox).
-        * y_size - Output grid size in Y axis (same unit as bbox).
+        :param bbox: a bounding box within which the grid will be created (xMin, xMax, yMin, yMax)
+        :param x_size: Output grid size in X axis (same unit as bbox).
+        :param y_size: Output grid size in Y axis (same unit as bbox).
 
         :return: list of bounding boxes (xMin, xMax, yMin, yMax)
 
@@ -806,9 +806,9 @@ class RSGISPyUtils (object):
         A function which calls the GDAL function on the band selected to calculate the pixel stats
         (min, max, mean, standard deviation). 
         
-        * img - input image file path
-        * band - specified image band for which stats are to be calculated (starts at 1). 
-        * compute - whether the stats should be calculated (True; Default) or an approximation or pre-calculated stats are OK (False).
+        :param img: - input image file path
+        :param band: - specified image band for which stats are to be calculated (starts at 1).
+        :param compute: - whether the stats should be calculated (True; Default) or an approximation or pre-calculated stats are OK (False).
         
         :return: stats (min, max, mean, stddev)
 
@@ -1048,8 +1048,8 @@ class RSGISPyUtils (object):
         """
         A function which gets the WKT projection from the inputted vector file.
         
-        * inVec - is a string with the input vector file name and path.
-        * vecLyr - is a string with the input vector layer name, if None then first layer read. (default: None)
+        :param inVec: is a string with the input vector file name and path.
+        :param vecLyr: is a string with the input vector layer name, if None then first layer read. (default: None)
         
         :return: WKT representation of projection
 
@@ -1070,8 +1070,8 @@ class RSGISPyUtils (object):
         """
         A function which gets the EPSG projection from the inputted vector file.
 
-        * inVec - is a string with the input vector file name and path.
-        * vecLyr - is a string with the input vector layer name, if None then first layer read. (default: None)
+        :param inVec: is a string with the input vector file name and path.
+        :param vecLyr: is a string with the input vector layer name, if None then first layer read. (default: None)
 
         :return: EPSG representation of projection
 
@@ -1110,7 +1110,7 @@ class RSGISPyUtils (object):
         """
         Using GDAL to return the WKT string for inputted EPSG Code.
         
-        * epsgCode integer variable of the epsg code.
+        :param epsgCode: integer variable of the epsg code.
 
         :return: string with WKT representation of the projection.
 
@@ -1322,7 +1322,7 @@ class RSGISPyUtils (object):
         :param upper: upper bound
         :param upper_strict: True is less than upper; False is less than equal to upper
 
-        :return:
+        :return: boolean
 
         """
         import numpy

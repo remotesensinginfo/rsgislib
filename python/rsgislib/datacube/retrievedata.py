@@ -54,18 +54,18 @@ def getSingleTimeDataProd(dataProd, prodMeasurements, startDate, endDate, minLat
 A function to extract data from an instance of the open data cube (https://www.opendatacube.org) and save it to a GDAL supported file format.
 Note. this function only saves files where only a single data layer is returned for the time period specified. 
 
-* dataProd - provide the name of the data product to be extracted.
-* prodMeasurements - provide input array of measurements
-* startDate - start period (YYYY-MM-DD)
-* endDate - end period (YYYY-MM-DD)
-* minLat - minimum latitude for the query bounding box
-* maxLat - maximum latitude for the query bounding box
-* minLon - minimum longditude for the query bounding box
-* maxLon - maximum longditude for the query bounding box
-* outImgFile - file path and name for the output image file.
-* gdalformat - output file format (Default: 'KEA'). Must support GDAL create function.
-* gdalDataType - output file datatype (Default: gdal.GDT_Byte)
-* gdalOptions - array of options for gdal file creation (e.g., for GeoTIFF ["TILED=YES", "COMPRESS=DEFLATE"]). Default: []
+:param dataProd: provide the name of the data product to be extracted.
+:param prodMeasurements: provide input array of measurements
+:param startDate: start period (YYYY-MM-DD)
+:param endDate: end period (YYYY-MM-DD)
+:param minLat: minimum latitude for the query bounding box
+:param maxLat: maximum latitude for the query bounding box
+:param minLon: minimum longditude for the query bounding box
+:param maxLon: maximum longditude for the query bounding box
+:param outImgFile: file path and name for the output image file.
+:param gdalformat: output file format (Default: 'KEA'). Must support GDAL create function.
+:param gdalDataType: output file datatype (Default: gdal.GDT_Byte)
+:param gdalOptions: array of options for gdal file creation (e.g., for GeoTIFF ["TILED=YES", "COMPRESS=DEFLATE"]). Default: []
 
 Example::
 

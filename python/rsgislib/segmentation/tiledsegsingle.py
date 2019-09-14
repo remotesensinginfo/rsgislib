@@ -246,18 +246,18 @@ def performTiledSegmentation(inputImage, clumpsImage, tmpDIR='segtmp', tileWidth
     """
 Utility function to call the segmentation algorithm of Shepherd et al. (2014) using the tiled process outlined in Clewley et al (2015).
 
-* inputImage is a string containing the name of the input file.
-* clumpsImage is a string containing the name of the output clump file.
-* tmpath is a file path for intermediate files (default is to create a directory 'segtmp'). If path does current not exist then it will be created and deleted afterwards.
-* tileWidth is an int specifying the width of the tiles used for processing (Default 2000)
-* tileHeight is an int specifying the height of the tiles used for processing (Default 2000)
-* validDataThreshold is a float (value between 0 - 1) used to specify the amount of valid image pixels (i.e., not a no data value of zero) are within a tile. Tiles failing to meet this threshold are merged with ones which do (Default 0.3).
-* numClusters is an int which specifies the number of clusters within the KMeans clustering (default = 60).
-* minPxls is an int which specifies the minimum number pixels within a segments (default = 100).
-* distThres specifies the distance threshold for joining the segments (default = 100, set to large number to turn off this option).
-* bands is an array providing a subset of image bands to use (default is None to use all bands).
-* sampling specify the subsampling of the image for the data used within the KMeans (default = 100; 1 == no subsampling).
-* kmMaxIter maximum iterations for KMeans (Default 200).
+:param inputImage: is a string containing the name of the input file.
+:param clumpsImage: is a string containing the name of the output clump file.
+:param tmpath: is a file path for intermediate files (default is to create a directory 'segtmp'). If path does current not exist then it will be created and deleted afterwards.
+:param tileWidth: is an int specifying the width of the tiles used for processing (Default 2000)
+:param tileHeight: is an int specifying the height of the tiles used for processing (Default 2000)
+:param validDataThreshold: is a float (value between 0 - 1) used to specify the amount of valid image pixels (i.e., not a no data value of zero) are within a tile. Tiles failing to meet this threshold are merged with ones which do (Default 0.3).
+:param numClusters: is an int which specifies the number of clusters within the KMeans clustering (default = 60).
+:param minPxls: is an int which specifies the minimum number pixels within a segments (default = 100).
+:param distThres: specifies the distance threshold for joining the segments (default = 100, set to large number to turn off this option).
+:param bands: is an array providing a subset of image bands to use (default is None to use all bands).
+:param sampling: specify the subsampling of the image for the data used within the KMeans (default = 100; 1 == no subsampling).
+:param kmMaxIter: maximum iterations for KMeans (Default 200).
 
 Example::
 

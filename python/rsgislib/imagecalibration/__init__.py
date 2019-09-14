@@ -14,14 +14,14 @@ class ElevLUTFeat(object):
     """
 Create a list of these objects to pass to the rsgislib.imagecalibration.apply6SCoeffElevLUTParam
 
-* Elev - is the elevation value.
-* Coeffs - is the 6S coeffients as a Band6S object. 
+:param Elev: is the elevation value.
+:param Coeffs: is the 6S coeffients as a Band6S object.
 
 """
     def __init__(self, Elev=None, Coeffs=None):
         """
-        * Elev - is the elevation value.
-        * Coeffs - is the 6S coeffients as a Band6S object. 
+        :param Elev: is the elevation value.
+        :param Coeffs: is the 6S coeffients as a Band6S object.
         """
         self.Elev = Elev
         self.Coeffs = Coeffs
@@ -31,14 +31,14 @@ class AOTLUTFeat(object):
     """
 Create a list of these objects to pass to the rsgislib.imagecalibration.apply6SCoeffElevAOTLUTParam
 
-* AOT - is the AOT value.
-* Coeffs - is the 6S coeffients as a Band6S object. 
+:param AOT: is the AOT value.
+:param Coeffs: is the 6S coeffients as a Band6S object.
 
 """
     def __init__(self, AOT=None, Coeffs=None):
         """
-        * AOT - is the AOT value.
-        * Coeffs - is the 6S coeffients as a Band6S object. 
+        :param AOT: is the AOT value.
+        :param Coeffs: is the 6S coeffients as a Band6S object.
         """
         self.AOT = AOT
         self.Coeffs = Coeffs
@@ -65,15 +65,15 @@ def performDOSCalc(inputFile, outputFile, gdalformat='KEA', nonNegative=True, no
     """
 A command to perform a dark object subtraction (DOS) on an input image.
 
-* inputFile - input image to which the DOS method is to be applied. Typically, this image with be in top of atmosphere reflectance (TOA)
-* outputFile - the output image file
-* gdalformat - the output image file format (default = KEA)
-* nonNegative - is a boolean specifying where negative output pixel values will be accepted (Dafualt is True; i.e., no negative values)
-* noDataVal - is the no data value within the input image file. 
-* darkObjReflVal - is an offset which is applied to all pixel values to make a minimum reflectance value (Default = 0)
-* darkObjPercentile - is the percentile of the input image used to define the dark object threshold, range is 0 - 1 (Default is 0.01; i.e., 1%).
-* copyBandNames - is a boolean specifying that the band names of the input image should be copied to the output image file (Default: True)
-* calcStatsPyd - is a boolean specifying that the image stats and pyramids should be calculated on the output image (Default: True)
+:param inputFile: input image to which the DOS method is to be applied. Typically, this image with be in top of atmosphere reflectance (TOA)
+:param outputFile: the output image file
+:param gdalformat: the output image file format (default = KEA)
+:param nonNegative: is a boolean specifying where negative output pixel values will be accepted (Dafualt is True; i.e., no negative values)
+:param noDataVal: is the no data value within the input image file.
+:param darkObjReflVal: is an offset which is applied to all pixel values to make a minimum reflectance value (Default = 0)
+:param darkObjPercentile: is the percentile of the input image used to define the dark object threshold, range is 0 - 1 (Default is 0.01; i.e., 1%).
+:param copyBandNames: is a boolean specifying that the band names of the input image should be copied to the output image file (Default: True)
+:param calcStatsPyd: is a boolean specifying that the image stats and pyramids should be calculated on the output image (Default: True)
 
 Example::
 
@@ -111,16 +111,16 @@ def calcClearSkyRegions(cloudsImg, validAreaImg, outputClearSkyMask, outFormat, 
     """
 Given a cloud mask, identify the larger extent regions of useful clear-sky regions.
 
-* cloudsImg - An image with the input mask of the cloud (pixel == 1) and shadow (pixel == 2) 
-* validAreaImg - A mask of the image data area (1 = valid and 0 = not-valid; i.e., outside of the data area)
-* outputClearSkyMask - The output mask of the clear sky areas
-* outFormat - The output image format.
-* tmpPath - The path for temporay images produced during the processing to be stored (Default: './tmpClearSky'; Note. all temp files are generated as KEA files).
-* deleteTmpFiles - Boolean as to whether the intermediate files should be deleted following processing (Default: True - delete files).
-* initClearSkyRegionDist - The distance in metres from a cloud/shadow object for the initial identification of clear sky regions (Default: 5000)
-* initClearSkyRegionMinSize - The minimum size (in pixels) of the initial clear sky regions (Default: 3000 pixels)
-* finalClearSkyRegionDist - The distance in metres from a cloud/shadow object for the final boundaries of the clear sky regions (Default: 1000)
-* morphSize - the size of the circular morphological operator used to tidy up the result (Default: 21)
+:param cloudsImg: An image with the input mask of the cloud (pixel == 1) and shadow (pixel == 2)
+:param validAreaImg: A mask of the image data area (1 = valid and 0 = not-valid; i.e., outside of the data area)
+:param outputClearSkyMask: The output mask of the clear sky areas
+:param outFormat: The output image format.
+:param tmpPath: The path for temporay images produced during the processing to be stored (Default: './tmpClearSky'; Note. all temp files are generated as KEA files).
+:param deleteTmpFiles: Boolean as to whether the intermediate files should be deleted following processing (Default: True - delete files).
+:param initClearSkyRegionDist: The distance in metres from a cloud/shadow object for the initial identification of clear sky regions (Default: 5000)
+:param initClearSkyRegionMinSize: The minimum size (in pixels) of the initial clear sky regions (Default: 3000 pixels)
+:param finalClearSkyRegionDist: The distance in metres from a cloud/shadow object for the final boundaries of the clear sky regions (Default: 1000)
+:param morphSize: the size of the circular morphological operator used to tidy up the result (Default: 21)
 
 Example::
 
@@ -231,12 +231,12 @@ def getESUNValue(radiance, toaRefl, day, month, year, solarZenith):
     """
 Get the ESUN value where a radiance and TOA Reflectance value are known for a pixel.
 
-* radiance: input at sensor radiance value.
-* toaRefl: input the known at sensor (top of atmosphere) reflectance value for the given radiance.
-* day: input the day of the acquisition.
-* month: input the month of the acquisition.
-* year: input the year of the acquisition.
-* solarZenith: input the solar zenith angle for the acquisition.
+:param radiance: input at sensor radiance value.
+:param toaRefl: input the known at sensor (top of atmosphere) reflectance value for the given radiance.
+:param day: input the day of the acquisition.
+:param month: input the month of the acquisition.
+:param year: input the year of the acquisition.
+:param solarZenith: input the solar zenith angle for the acquisition.
 
 return:
 
@@ -256,16 +256,16 @@ esun radiance
     return esun
 
 
-
+"""
 def createEstimateSREFSurface(inputTOAImg, imgBands, bandRescale, winSize, outImage, gdalformat, dataType, tmpDIR):
-    """
+    ###
     Estimate SREF surface from TOA input image using the method details in He, K., Sun, J., & Tang, X. (2011). 
     'Single image haze removal using dark channel prior'. IEEE Transactions on Pattern Analysis and Machine Intelligence.
     Method details were also identified with reference to https://www.kaggle.com/ivanl1/haze-removal-using-dark-channel-prior
     
     **WARNING DO NOT USE - THIS FUNCTION IS STILL A WORK IN PROGRESS**
     
-    """
+    ###
     raise Exception("This function is not yet ready - needs more thought as how to get a fully working implementation.")
     import rsgislib
     import rsgislib.imagecalc
@@ -388,3 +388,4 @@ def createEstimateSREFSurface(inputTOAImg, imgBands, bandRescale, winSize, outIm
     
     if not tmpPresent:
         shutil.rmtree(tmpImgDIR, ignore_errors=True)
+"""

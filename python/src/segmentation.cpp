@@ -40,16 +40,16 @@ static struct SegmentationState _state;
 
 static PyObject *Segmentation_labelPixelsFromClusterCentres(PyObject *self, PyObject *args)
 {
-    const char *pszInputImage, *pszOutputImage, *pszClusterCentres, *pszGDALFormat;
+    const char *pszInputImage, *pszOutputImage, *pszClusterCentres, *pszgdalformat;
     int ignoreZeros;
     if( !PyArg_ParseTuple(args, "sssis:labelPixelsFromClusterCentres", &pszInputImage, &pszOutputImage, 
-                                &pszClusterCentres, &ignoreZeros, &pszGDALFormat ))
+                                &pszClusterCentres, &ignoreZeros, &pszgdalformat ))
         return NULL;
 
     try
     {
         rsgis::cmds::executeLabelPixelsFromClusterCentres(pszInputImage, pszOutputImage, pszClusterCentres,
-                        ignoreZeros, pszGDALFormat );
+                        ignoreZeros, pszgdalformat );
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -63,17 +63,17 @@ static PyObject *Segmentation_labelPixelsFromClusterCentres(PyObject *self, PyOb
 
 static PyObject *Segmentation_eliminateSinglePixels(PyObject *self, PyObject *args)
 {
-    const char *pszInputImage, *pszOutputImage, *pszClumpsImage, *pszGDALFormat, *pszTempImage;
+    const char *pszInputImage, *pszOutputImage, *pszClumpsImage, *pszgdalformat, *pszTempImage;
     int processInMemory, ignoreZeros;
 
-    if( !PyArg_ParseTuple(args, "sssssii:eliminateSinglePixels", &pszInputImage, &pszClumpsImage, &pszOutputImage, &pszTempImage, &pszGDALFormat, &processInMemory, &ignoreZeros ))
+    if( !PyArg_ParseTuple(args, "sssssii:eliminateSinglePixels", &pszInputImage, &pszClumpsImage, &pszOutputImage, &pszTempImage, &pszgdalformat, &processInMemory, &ignoreZeros ))
     {
         return NULL;
     }
 
     try
     {
-        rsgis::cmds::executeEliminateSinglePixels(pszInputImage, pszClumpsImage, pszOutputImage, pszTempImage, pszGDALFormat, processInMemory, ignoreZeros);
+        rsgis::cmds::executeEliminateSinglePixels(pszInputImage, pszClumpsImage, pszOutputImage, pszTempImage, pszgdalformat, processInMemory, ignoreZeros);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -87,13 +87,13 @@ static PyObject *Segmentation_eliminateSinglePixels(PyObject *self, PyObject *ar
 
 static PyObject *Segmentation_clump(PyObject *self, PyObject *args)
 {
-    const char *pszInputImage, *pszOutputImage, *pszGDALFormat;
+    const char *pszInputImage, *pszOutputImage, *pszgdalformat;
     int processInMemory = false;
     bool nodataprovided;
     float fnodata;
     int addRatPxlVals = false;
     PyObject *pNoData = Py_None; //could be none or a number
-    if( !PyArg_ParseTuple(args, "sss|iOi:clump", &pszInputImage, &pszOutputImage, &pszGDALFormat, &processInMemory, &pNoData, &addRatPxlVals))
+    if( !PyArg_ParseTuple(args, "sss|iOi:clump", &pszInputImage, &pszOutputImage, &pszgdalformat, &processInMemory, &pNoData, &addRatPxlVals))
         return NULL;
     
     if( pNoData == Py_None )
@@ -118,7 +118,7 @@ static PyObject *Segmentation_clump(PyObject *self, PyObject *args)
 
     try
     {
-        rsgis::cmds::executeClump(pszInputImage, pszOutputImage, pszGDALFormat, 
+        rsgis::cmds::executeClump(pszInputImage, pszOutputImage, pszgdalformat,
                                 processInMemory, nodataprovided, fnodata, addRatPxlVals);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
@@ -133,17 +133,17 @@ static PyObject *Segmentation_clump(PyObject *self, PyObject *args)
 
 static PyObject *Segmentation_RMSmallClumpsStepwise(PyObject *self, PyObject *args)
 {
-    const char *pszInputImage, *pszClumpsImage, *pszOutputImage, *pszGDALFormat, *pszStretchStatsFile;
+    const char *pszInputImage, *pszClumpsImage, *pszOutputImage, *pszgdalformat, *pszStretchStatsFile;
     int storeMean,processInMemory,stretchStatsAvail;
     unsigned int minClumpSize;
     float specThreshold;                   
-    if( !PyArg_ParseTuple(args, "ssssisiiIf:rmSmallClumpsStepwise", &pszInputImage, &pszClumpsImage, &pszOutputImage, &pszGDALFormat,
+    if( !PyArg_ParseTuple(args, "ssssisiiIf:rmSmallClumpsStepwise", &pszInputImage, &pszClumpsImage, &pszOutputImage, &pszgdalformat,
                     &stretchStatsAvail, &pszStretchStatsFile, &storeMean, &processInMemory, &minClumpSize, &specThreshold))            
         return NULL;
     
     try
     {
-        rsgis::cmds::executeRMSmallClumpsStepwise(pszInputImage, pszClumpsImage, pszOutputImage, pszGDALFormat, 
+        rsgis::cmds::executeRMSmallClumpsStepwise(pszInputImage, pszClumpsImage, pszOutputImage, pszgdalformat,
                                 stretchStatsAvail, pszStretchStatsFile, storeMean, processInMemory, minClumpSize, specThreshold);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
@@ -158,16 +158,16 @@ static PyObject *Segmentation_RMSmallClumpsStepwise(PyObject *self, PyObject *ar
  
 static PyObject *Segmentation_relabelClumps(PyObject *self, PyObject *args)
 {
-    const char *pszInputImage, *pszOutputImage, *pszGDALFormat;
+    const char *pszInputImage, *pszOutputImage, *pszgdalformat;
     int processInMemory;
     if( !PyArg_ParseTuple(args, "sssi:relabelClumps", &pszInputImage, 
-                        &pszOutputImage, &pszGDALFormat, &processInMemory ))
+                        &pszOutputImage, &pszgdalformat, &processInMemory ))
         return NULL;
 
     try
     {
         rsgis::cmds::executeRelabelClumps(pszInputImage, pszOutputImage,
-                    pszGDALFormat, processInMemory);
+                    pszgdalformat, processInMemory);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -181,14 +181,14 @@ static PyObject *Segmentation_relabelClumps(PyObject *self, PyObject *args)
 
 static PyObject *Segmentation_unionOfClumps(PyObject *self, PyObject *args)
 {
-    const char *pszOutputImage, *pszGDALFormat;
+    const char *pszOutputImage, *pszgdalformat;
     std::string inputImage;
     bool nodataprovided;
     float fnodata;
     PyObject *pNoData; //could be none or a number
     PyObject *pInputListObj;
     int addRatPxlVals = false;
-    if( !PyArg_ParseTuple(args, "ssOOi:unionOfClumps", &pszOutputImage, &pszGDALFormat,
+    if( !PyArg_ParseTuple(args, "ssOOi:unionOfClumps", &pszOutputImage, &pszgdalformat,
                                 &pInputListObj, &pNoData, &addRatPxlVals))
         return NULL;
 
@@ -240,7 +240,7 @@ static PyObject *Segmentation_unionOfClumps(PyObject *self, PyObject *args)
     try
     {
                         
-        rsgis::cmds::executeUnionOfClumps(inputImagePaths, pszOutputImage, pszGDALFormat, nodataprovided, fnodata, addRatPxlVals);
+        rsgis::cmds::executeUnionOfClumps(inputImagePaths, pszOutputImage, pszgdalformat, nodataprovided, fnodata, addRatPxlVals);
 
     }
     catch(rsgis::cmds::RSGISCmdException &e)
@@ -405,14 +405,14 @@ static PyObject *Segmentation_findTileBordersMask(PyObject *self, PyObject *args
 
 static PyObject *Segmentation_rmSmallClumps(PyObject *self, PyObject *args)
 {
-    const char *pszInputClumps, *pszOutputClumps, *pszGDALFormat;
+    const char *pszInputClumps, *pszOutputClumps, *pszgdalformat;
     float areaThreshold;
-    if( !PyArg_ParseTuple(args, "ssfs:rmSmallClumps", &pszInputClumps, &pszOutputClumps, &areaThreshold, &pszGDALFormat))
+    if( !PyArg_ParseTuple(args, "ssfs:rmSmallClumps", &pszInputClumps, &pszOutputClumps, &areaThreshold, &pszgdalformat))
         return NULL;
     
     try
     {
-        rsgis::cmds::executeRMSmallClumps(pszInputClumps, pszOutputClumps, areaThreshold, pszGDALFormat);
+        rsgis::cmds::executeRMSmallClumps(pszInputClumps, pszOutputClumps, areaThreshold, pszgdalformat);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -426,15 +426,15 @@ static PyObject *Segmentation_rmSmallClumps(PyObject *self, PyObject *args)
 
 static PyObject *Segmentation_meanImage(PyObject *self, PyObject *args)
 {
-    const char *pszInputImage, *pszInputClumps, *pszOutputImage, *pszGDALFormat;
+    const char *pszInputImage, *pszInputClumps, *pszOutputImage, *pszgdalformat;
     int nDataType;
-    if( !PyArg_ParseTuple(args, "ssssi:mergeImage", &pszInputImage, &pszInputClumps, &pszOutputImage, &pszGDALFormat, &nDataType))
+    if( !PyArg_ParseTuple(args, "ssssi:mergeImage", &pszInputImage, &pszInputClumps, &pszOutputImage, &pszgdalformat, &nDataType))
         return NULL;
     
     try
     {
         rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
-        rsgis::cmds::executeMeanImage(pszInputImage, pszInputClumps, pszOutputImage, pszGDALFormat, type, false);
+        rsgis::cmds::executeMeanImage(pszInputImage, pszInputClumps, pszOutputImage, pszgdalformat, type, false);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -448,17 +448,17 @@ static PyObject *Segmentation_meanImage(PyObject *self, PyObject *args)
 
 static PyObject *Segmentation_GenerateRegularGrid(PyObject *self, PyObject *args)
 {
-    const char *pszInputImage, *pszOutputImage, *pszGDALFormat;
+    const char *pszInputImage, *pszOutputImage, *pszgdalformat;
     unsigned int numXPxls, numYPxls;
     int offset = 0;
-    if( !PyArg_ParseTuple(args, "sssII|i:generateRegularGrid", &pszInputImage, &pszOutputImage, &pszGDALFormat, &numXPxls, &numYPxls, &offset))
+    if( !PyArg_ParseTuple(args, "sssII|i:generateRegularGrid", &pszInputImage, &pszOutputImage, &pszgdalformat, &numXPxls, &numYPxls, &offset))
     {
         return NULL;
     }
     
     try
     {
-        rsgis::cmds::executeGenerateRegularGrid(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszGDALFormat), numXPxls, numYPxls, (bool)offset);
+        rsgis::cmds::executeGenerateRegularGrid(std::string(pszInputImage), std::string(pszOutputImage), std::string(pszgdalformat), numXPxls, numYPxls, (bool)offset);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -472,16 +472,16 @@ static PyObject *Segmentation_GenerateRegularGrid(PyObject *self, PyObject *args
 
 static PyObject *Segmentation_IncludeRegionsInClumps(PyObject *self, PyObject *args)
 {
-    const char *pszClumpsImage, *pszRegionsImage, *pszOutputImage, *pszGDALFormat;
+    const char *pszClumpsImage, *pszRegionsImage, *pszOutputImage, *pszgdalformat;
 
-    if( !PyArg_ParseTuple(args, "ssss:includeRegionsInClumps", &pszClumpsImage, &pszRegionsImage, &pszOutputImage, &pszGDALFormat ))
+    if( !PyArg_ParseTuple(args, "ssss:includeRegionsInClumps", &pszClumpsImage, &pszRegionsImage, &pszOutputImage, &pszgdalformat ))
     {
         return NULL;
     }
     
     try
     {
-        rsgis::cmds::executeIncludeClumpedRegion(std::string(pszClumpsImage), std::string(pszRegionsImage), std::string(pszOutputImage), std::string(pszGDALFormat));
+        rsgis::cmds::executeIncludeClumpedRegion(std::string(pszClumpsImage), std::string(pszRegionsImage), std::string(pszOutputImage), std::string(pszgdalformat));
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -494,15 +494,15 @@ static PyObject *Segmentation_IncludeRegionsInClumps(PyObject *self, PyObject *a
 
 static PyObject *Segmentation_mergeSegments2Neighbours(PyObject *self, PyObject *args)
 {
-    const char *pszInputClumpsImage, *pszInputSpecImage, *pszOutputImage, *pszGDALFormat, *selectClumpsCol, *noDataClumpsCol;
-    if( !PyArg_ParseTuple(args, "ssssss:mergeSegments2Neighbours", &pszInputClumpsImage, &pszInputSpecImage, &pszOutputImage, &pszGDALFormat, &selectClumpsCol, &noDataClumpsCol))
+    const char *pszInputClumpsImage, *pszInputSpecImage, *pszOutputImage, *pszgdalformat, *selectClumpsCol, *noDataClumpsCol;
+    if( !PyArg_ParseTuple(args, "ssssss:mergeSegments2Neighbours", &pszInputClumpsImage, &pszInputSpecImage, &pszOutputImage, &pszgdalformat, &selectClumpsCol, &noDataClumpsCol))
     {
         return NULL;
     }
     
     try
     {
-        rsgis::cmds::executeMergeSelectClumps2Neighbour(std::string(pszInputSpecImage), std::string(pszInputClumpsImage), std::string(pszOutputImage), std::string(pszGDALFormat), std::string(selectClumpsCol), std::string(noDataClumpsCol));
+        rsgis::cmds::executeMergeSelectClumps2Neighbour(std::string(pszInputSpecImage), std::string(pszInputClumpsImage), std::string(pszOutputImage), std::string(pszgdalformat), std::string(selectClumpsCol), std::string(noDataClumpsCol));
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -515,15 +515,15 @@ static PyObject *Segmentation_mergeSegments2Neighbours(PyObject *self, PyObject 
 
 static PyObject *Segmentation_dropSelectedSegments(PyObject *self, PyObject *args)
 {
-    const char *pszInputClumpsImage, *pszOutputImage, *pszGDALFormat, *selectClumpsCol;
-    if( !PyArg_ParseTuple(args, "ssss:dropSelectedClumps", &pszInputClumpsImage, &pszOutputImage, &pszGDALFormat, &selectClumpsCol ))
+    const char *pszInputClumpsImage, *pszOutputImage, *pszgdalformat, *selectClumpsCol;
+    if( !PyArg_ParseTuple(args, "ssss:dropSelectedClumps", &pszInputClumpsImage, &pszOutputImage, &pszgdalformat, &selectClumpsCol ))
     {
         return NULL;
     }
     
     try
     {
-        rsgis::cmds::executeDropSelectedClumps(std::string(pszInputClumpsImage), std::string(pszOutputImage), std::string(pszGDALFormat), std::string(selectClumpsCol));
+        rsgis::cmds::executeDropSelectedClumps(std::string(pszInputClumpsImage), std::string(pszOutputImage), std::string(pszgdalformat), std::string(selectClumpsCol));
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -536,9 +536,9 @@ static PyObject *Segmentation_dropSelectedSegments(PyObject *self, PyObject *arg
 
 static PyObject *Segmentation_mergeEquivalentClumps(PyObject *self, PyObject *args)
 {
-    const char *pszInputClumpsImage, *pszOutputImage, *pszGDALFormat;
+    const char *pszInputClumpsImage, *pszOutputImage, *pszgdalformat;
     PyObject *valClumpsCols;
-    if( !PyArg_ParseTuple(args, "sssO:mergeEquivClumps", &pszInputClumpsImage, &pszOutputImage, &pszGDALFormat, &valClumpsCols))
+    if( !PyArg_ParseTuple(args, "sssO:mergeEquivClumps", &pszInputClumpsImage, &pszOutputImage, &pszgdalformat, &valClumpsCols))
     {
         return NULL;
     }
@@ -566,7 +566,7 @@ static PyObject *Segmentation_mergeEquivalentClumps(PyObject *self, PyObject *ar
     
     try
     {
-        rsgis::cmds::executeMergeClumpsEquivalentVal(std::string(pszInputClumpsImage), std::string(pszOutputImage), std::string(pszGDALFormat), cols);
+        rsgis::cmds::executeMergeClumpsEquivalentVal(std::string(pszInputClumpsImage), std::string(pszOutputImage), std::string(pszgdalformat), cols);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -580,9 +580,9 @@ static PyObject *Segmentation_mergeEquivalentClumps(PyObject *self, PyObject *ar
 
 static PyObject *Segmentation_PxlGrowRegions(PyObject *self, PyObject *args)
 {
-    const char *pszInputClumpsImage, *pszValsImage, *pszOutputImage, *pszGDALFormat, *pszMuParseCriteria;
+    const char *pszInputClumpsImage, *pszValsImage, *pszOutputImage, *pszgdalformat, *pszMuParseCriteria;
     PyObject *varNameBandPairsObj;
-    if( !PyArg_ParseTuple(args, "sssssO:pxlGrowRegions", &pszInputClumpsImage, &pszValsImage, &pszOutputImage, &pszGDALFormat, &pszMuParseCriteria, &varNameBandPairsObj))
+    if( !PyArg_ParseTuple(args, "sssssO:pxlGrowRegions", &pszInputClumpsImage, &pszValsImage, &pszOutputImage, &pszgdalformat, &pszMuParseCriteria, &varNameBandPairsObj))
     {
         return NULL;
     }
@@ -636,7 +636,7 @@ static PyObject *Segmentation_PxlGrowRegions(PyObject *self, PyObject *args)
     
     try
     {
-        rsgis::cmds::executePxlGrowRegions(std::string(pszInputClumpsImage), std::string(pszValsImage), std::string(pszOutputImage), std::string(pszGDALFormat), std::string(pszMuParseCriteria), varNameBandPairs);
+        rsgis::cmds::executePxlGrowRegions(std::string(pszInputClumpsImage), std::string(pszValsImage), std::string(pszOutputImage), std::string(pszgdalformat), std::string(pszMuParseCriteria), varNameBandPairs);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -657,11 +657,11 @@ static PyMethodDef SegmentationMethods[] = {
 "\n"
 "Where:\n"
 "\n"
-"* inputimage is a string containing the name of the input file\n"
-"* outputimage is a string containing the name of the output file\n"
-"* clustercentres is a string containing the name of the cluster centre file\n"
-"* ignore zeros is a bool\n"
-"* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
+":param inputimage: is a string containing the name of the input file\n"
+":param outputimage: is a string containing the name of the output file\n"
+":param clustercentres: is a string containing the name of the cluster centre file\n"
+":param ignore: zeros is a bool\n"
+":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
 "\n"},
 
     {"eliminateSinglePixels", Segmentation_eliminateSinglePixels, METH_VARARGS, 
@@ -670,13 +670,13 @@ static PyMethodDef SegmentationMethods[] = {
 "\n"
 "Where:\n"
 "\n"
-"* inputimage is a string containing the name of the input file\n"
-"* clumpsimage is a string containing the name of the clump file\n"
-"* outputimage is a string containing the name of the output file\n"
-"* tempfile is a string containing the name of the temporary file to use\n"
-"* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
-"* processinmemory is a bool specifying if processing should be carried out in memory (faster if sufficient RAM is available, set to False if unsure).\n"
-"* ignore zeros is a bool\n"
+":param inputimage: is a string containing the name of the input file\n"
+":param clumpsimage: is a string containing the name of the clump file\n"
+":param outputimage: is a string containing the name of the output file\n"
+":param tempfile: is a string containing the name of the temporary file to use\n"
+":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
+":param processinmemory: is a bool specifying if processing should be carried out in memory (faster if sufficient RAM is available, set to False if unsure).\n"
+":param ignorezeros: is a bool\n"
 "\n"},
 
     {"clump", Segmentation_clump, METH_VARARGS,
@@ -685,12 +685,12 @@ static PyMethodDef SegmentationMethods[] = {
 "\n"
 "Where:\n"
 "\n"
-"* inputimage is a string containing the name of the input file\n"
-"* outputimage is a string containing the name of the output file\n"
-"* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
-"* processinmemory is a bool specifying if processing should be carried out in memory (faster if sufficient RAM is available, set to False if unsure).\n"
-"* nodata is None or float\n"
-"* addPxlVal2Rat is a boolean specifying whether the pixel value (from inputimage) should be added as a RAT.\n"
+":param inputimage: is a string containing the name of the input file\n"
+":param outputimage: is a string containing the name of the output file\n"
+":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
+":param processinmemory: is a bool specifying if processing should be carried out in memory (faster if sufficient RAM is available, set to False if unsure).\n"
+":param nodata: is None or float\n"
+":param addPxlVal2Rat: is a boolean specifying whether the pixel value (from inputimage) should be added as a RAT.\n"
 "\n"},
 
     {"rmSmallClumpsStepwise", Segmentation_RMSmallClumpsStepwise, METH_VARARGS,
@@ -699,16 +699,16 @@ static PyMethodDef SegmentationMethods[] = {
 "\n"
 "Where:\n"
 "\n"
-"* inputimage is a string containing the name of the input file\n"
-"* clumpsimage is a string containing the name of the clump file\n"
-"* outputimage is a string containing the name of the output file\n"
-"* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
-"* stretchstatsavail is a bool\n"
-"* stretchstatsfile is a string containing the name of the stretch stats file\n"
-"* storemean is a bool\n"
-"* processinmemory is a bool specifying if processing should be carried out in memory (faster if sufficient RAM is available, set to False if unsure).\n"
-"* minclumpsize is an unsigned integer providing the minimum size for clumps.\n"
-"* specThreshold is a float providing the maximum (Euclidian distance) spectral separation for which to merge clumps. Set to a large value to ignore spectral separation and always merge.\n"
+":param inputimage: is a string containing the name of the input file\n"
+":param clumpsimage: is a string containing the name of the clump file\n"
+":param outputimage: is a string containing the name of the output file\n"
+":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
+":param stretchstatsavail: is a bool\n"
+":param stretchstatsfile: is a string containing the name of the stretch stats file\n"
+":param storemean: is a bool\n"
+":param processinmemory: is a bool specifying if processing should be carried out in memory (faster if sufficient RAM is available, set to False if unsure).\n"
+":param minclumpsize: is an unsigned integer providing the minimum size for clumps.\n"
+":param specThreshold: is a float providing the maximum (Euclidian distance) spectral separation for which to merge clumps. Set to a large value to ignore spectral separation and always merge.\n"
 "\n"},
 
     {"relabelClumps", Segmentation_relabelClumps, METH_VARARGS,
@@ -717,10 +717,10 @@ static PyMethodDef SegmentationMethods[] = {
 "\n"
 "Where:\n"
 "\n"
-"* inputimage is a string containing the name of the input file\n"
-"* outputimage is a string containing the name of the output file\n"
-"* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
-"* processinmemory is a bool specifying if processing should be carried out in memory (faster if sufficient RAM is available, set to False if unsure).\n"
+":param inputimage: is a string containing the name of the input file\n"
+":param outputimage: is a string containing the name of the output file\n"
+":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
+":param processinmemory: is a bool specifying if processing should be carried out in memory (faster if sufficient RAM is available, set to False if unsure).\n"
 "\n"},
                                 
     {"unionOfClumps", Segmentation_unionOfClumps, METH_VARARGS,
@@ -729,11 +729,11 @@ static PyMethodDef SegmentationMethods[] = {
 "\n"
 "Where:\n"
 "\n"
-"* outputimage is a string containing the name of the output file\n"
-"* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
-"* inputimagepaths is a list of input image paths\n"
-"* nodata is None or float\n"
-"* addPxlVals2Rat is a boolean specifying whether the pixel values (from inputimagepaths) should be added as a RAT; column names have prefix 'ClumpVal_' with index starting at 1 for each variable.\n"
+":param outputimage: is a string containing the name of the output file\n"
+":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
+":param inputimagepaths: is a list of input image paths\n"
+":param nodata: is None or float\n"
+":param addPxlVals2Rat: is a boolean specifying whether the pixel values (from inputimagepaths) should be added as a RAT; column names have prefix 'ClumpVal_' with index starting at 1 for each variable.\n"
 "\n"
 "\n"
 },
@@ -744,13 +744,13 @@ static PyMethodDef SegmentationMethods[] = {
 "\n"
 "Where:\n"
 "\n"
-" * outputimage is a string containing the name of the output file\n"
-" * bordermaskimage is a string containing the name of the border mask file\n"
-" * tileboundary is an unsigned integer containing the tile boundary pixel value\n"
-" * tileoverlap is an unsigned integer containing the tile overlap pixel value\n"
-" * tilebody is an unsigned integer containing the tile body pixel value\n"
-" * colsname is a string containing the name of the object id column\n"
-" * inputimagepaths is a list of input image paths\n"
+":param outputimage: is a string containing the name of the output file\n"
+":param bordermaskimage: is a string containing the name of the border mask file\n"
+":param tileboundary: is an unsigned integer containing the tile boundary pixel value\n"
+":param tileoverlap: is an unsigned integer containing the tile overlap pixel value\n"
+":param tilebody: is an unsigned integer containing the tile body pixel value\n"
+":param colsname: is a string containing the name of the object id column\n"
+":param inputimagepaths: is a list of input image paths\n"
 "\n"},
 
     {"mergeClumpImages", Segmentation_mergeClumpImages, METH_VARARGS,
@@ -759,9 +759,9 @@ static PyMethodDef SegmentationMethods[] = {
 "\n"
 "Where:\n"
 "\n"
-" * inputimagepaths is a list of input image paths\n"
-" * outputimage is a string containing the name of the output file\n"
-" * mergeRATs is a boolean specifying with the image RATs are to merged (Default: false; Optional)\n"
+":param inputimagepaths: is a list of input image paths\n"
+":param outputimage: is a string containing the name of the output file\n"
+":param mergeRATs: is a boolean specifying with the image RATs are to merged (Default: false; Optional)\n"
 "\n"},
 
     {"findTileBordersMask", Segmentation_findTileBordersMask, METH_VARARGS,
@@ -770,12 +770,12 @@ static PyMethodDef SegmentationMethods[] = {
 "\n"
 "Where:\n"
 "\n"
-" * bordermaskimage is a string containing the name of the border mask file\n"
-" * tileboundary is an unsigned integer containing the tile boundary pixel value\n"
-" * tileoverlap is an unsigned integer containing the tile overlap pixel value\n"
-" * tilebody is an unsigned integer containing the tile body pixel value\n"
-" * colsname is a string containing the name of the object id column\n"
-" * inputimagepaths is a list of input clump image paths\n"
+":param bordermaskimage: is a string containing the name of the border mask file\n"
+":param tileboundary: is an unsigned integer containing the tile boundary pixel value\n"
+":param tileoverlap: is an unsigned integer containing the tile overlap pixel value\n"
+":param tilebody: is an unsigned integer containing the tile body pixel value\n"
+":param colsname: is a string containing the name of the object id column\n"
+":param inputimagepaths: is a list of input clump image paths\n"
 "\n"},
 
     {"rmSmallClumps", Segmentation_rmSmallClumps, METH_VARARGS,
@@ -784,10 +784,10 @@ static PyMethodDef SegmentationMethods[] = {
 "\n"
 "Where:\n"
 "\n"
-"* clumpsImage is a string containing the name of the input clumps file - note a column called \'Histogram\'.\n"
-"* outputImage is a string containing the name of the output clumps file\n"
-"* threshold is a float containing the area threshold (in pixels)\n"
-"* gdalformat is a string defining the format of the output image.\n"
+":param clumpsImage: is a string containing the name of the input clumps file - note a column called \'Histogram\'.\n"
+":param outputImage: is a string containing the name of the output clumps file\n"
+":param threshold: is a float containing the area threshold (in pixels)\n"
+":param gdalformat: is a string defining the format of the output image.\n"
 "\n"},
     
     {"meanImage", Segmentation_meanImage, METH_VARARGS,
@@ -796,11 +796,11 @@ static PyMethodDef SegmentationMethods[] = {
 "\n"
 "Where:\n"
 "\n"
-"* inputImage is a string containing the name of the input image file from which the mean is taken.\n"
-"* inputClumps is a string containing the name of the input clumps file\n"
-"* outputImage is a string containing the name of the output image.\n"
-"* gdalformat is a string defining the format of the output image.\n"
-"* datatype is an containing one of the values from rsgislib.TYPE_*\n"
+":param inputImage: is a string containing the name of the input image file from which the mean is taken.\n"
+":param inputClumps: is a string containing the name of the input clumps file\n"
+":param outputImage: is a string containing the name of the output image.\n"
+":param gdalformat: is a string defining the format of the output image.\n"
+":param datatype: is an containing one of the values from rsgislib.TYPE_*\n"
 "\n"},
 
 {"generateRegularGrid", Segmentation_GenerateRegularGrid, METH_VARARGS,
@@ -809,74 +809,77 @@ static PyMethodDef SegmentationMethods[] = {
 "\n"
 "Where:\n"
 "\n"
-"* inputImage is a string containing the name of the input image file specifying the dimensions of the output image.\n"
-"* outputClumps is a string containing the name and path of the output clumps image\n"
-"* gdalformat is a string defining the format of the output image.\n"
-"* numXPxls is the size of the grid cells in the X axis in pixel units.\n"
-"* numYPxls is the size of the grid cells in the Y axis in pixel units.\n"
-"* offset is a boolean specifying whether the grid should be offset, i.e., starts half way point of numXPxls and numYPxls (Default is false; optional)"
+":param inputImage: is a string containing the name of the input image file specifying the dimensions of the output image.\n"
+":param outputClumps: is a string containing the name and path of the output clumps image\n"
+":param gdalformat: is a string defining the format of the output image.\n"
+":param numXPxls: is the size of the grid cells in the X axis in pixel units.\n"
+":param numYPxls: is the size of the grid cells in the Y axis in pixel units.\n"
+":param offset: is a boolean specifying whether the grid should be offset, i.e., starts half way point of numXPxls and numYPxls (Default is false; optional)"
 "\n"},
     
 {"includeRegionsInClumps", Segmentation_IncludeRegionsInClumps, METH_VARARGS,
-"segmentation.includeRegionsInClumps(clumpsImage, regionsImage, outputClumps, gdalFormat)\n"
+"segmentation.includeRegionsInClumps(clumpsImage, regionsImage, outputClumps, gdalformat)\n"
 "A function to include a set of clumped regions within an existing clumps (i.e., segmentation) image.\n"
 "NOTE. You should run the relabelClumps function on the output of this command before using further.\n"
 "\n"
 "Where:\n"
 "\n"
-"* clumpsImage is a string containing the filepath for the input clumps image.\n"
-"* regionsImage is a string containing the filepath for the input regions image.\n"
-"* outputClumps is a string containing the name and path of the output clumps image\n"
-"* gdalFormat is a string defining the format of the output image.\n"
+":param clumpsImage: is a string containing the filepath for the input clumps image.\n"
+":param regionsImage: is a string containing the filepath for the input regions image.\n"
+":param outputClumps: is a string containing the name and path of the output clumps image\n"
+":param gdalformat: is a string defining the format of the output image.\n"
 "\n"},
+    
 {"mergeSegments2Neighbours", Segmentation_mergeSegments2Neighbours, METH_VARARGS,
-"segmentation.mergeSegments2Neighbours(clumpsImage, spectralImage, outputClumps, gdalFormat, selectedClumpsCol, noDataClumpsCol)\n"
+"segmentation.mergeSegments2Neighbours(clumpsImage, spectralImage, outputClumps, gdalformat, selectedClumpsCol, noDataClumpsCol)\n"
 "A function to merge some selected clumps with the neighbours based on colour (spectral) distance where clumps identified as no data are ignored.\n"
 "\n"
 "Where:\n"
 "\n"
-"* clumpsImage is a string containing the filepath for the input clumps image.\n"
-"* spectralImage is a string containing the filepath for the input image used to define 'distance'.\n"
-"* outputClumps is a string containing the name and path of the output clumps image\n"
-"* gdalFormat is a string defining the format of the output image.\n"
-"* selectClumpsCol is a string defining the binary column for defining the segments to be merged (1 == selected clumps).\n"
-"* noDataClumpsCol is a string defining the binary column for defining the segments to be ignored as no data (1 == no-data clumps).\n"
+":param clumpsImage: is a string containing the filepath for the input clumps image.\n"
+":param spectralImage: is a string containing the filepath for the input image used to define 'distance'.\n"
+":param outputClumps: is a string containing the name and path of the output clumps image\n"
+":param gdalformat: is a string defining the format of the output image.\n"
+":param selectClumpsCol: is a string defining the binary column for defining the segments to be merged (1 == selected clumps).\n"
+":param noDataClumpsCol: is a string defining the binary column for defining the segments to be ignored as no data (1 == no-data clumps).\n"
 "\n"},
+    
 {"dropSelectedClumps", Segmentation_dropSelectedSegments, METH_VARARGS,
-"segmentation.dropSelectedClumps(clumpsImage, outputClumps, gdalFormat)\n"
+"segmentation.dropSelectedClumps(clumpsImage, outputClumps, gdalformat)\n"
 "A function to drop the selected clumps from the segmentation.\n"
 "\n"
 "Where:\n"
 "\n"
-"* clumpsImage is a string containing the filepath for the input clumps image.\n"
-"* outputClumps is a string containing the name and path of the output clumps image\n"
-"* gdalFormat is a string defining the format of the output image.\n"
-"* selectClumpsCol is a string defining the binary column for defining the segments to be merged (1 == selected clumps).\n"
+":param clumpsImage: is a string containing the filepath for the input clumps image.\n"
+":param outputClumps: is a string containing the name and path of the output clumps image\n"
+":param gdalformat: is a string defining the format of the output image.\n"
+":param selectClumpsCol: is a string defining the binary column for defining the segments to be merged (1 == selected clumps).\n"
 "\n"},
+    
 {"mergeEquivClumps", Segmentation_mergeEquivalentClumps, METH_VARARGS,
-"segmentation.mergeEquivClumps(clumpsImage, outputClumps, gdalFormat, valClumpsCols)\n"
+"segmentation.mergeEquivClumps(clumpsImage, outputClumps, gdalformat, valClumpsCols)\n"
 "A function to merge neighbouring clumps which have the same value - for example when merging across tile boundaries.\n"
 "\n"
 "Where:\n"
 "\n"
-"* clumpsImage is a string containing the filepath for the input clumps image.\n"
-"* outputClumps is a string containing the name and path of the output clumps image\n"
-"* gdalFormat is a string defining the format of the output image.\n"
-"* valClumpsCol is a list of strings defining the value(s) used to define equivalence (typically it might be the original pixel values when clumping through tiling).\n"
+":param clumpsImage: is a string containing the filepath for the input clumps image.\n"
+":param outputClumps: is a string containing the name and path of the output clumps image\n"
+":param gdalformat: is a string defining the format of the output image.\n"
+":param valClumpsCol: is a list of strings defining the value(s) used to define equivalence (typically it might be the original pixel values when clumping through tiling).\n"
 "\n"},
 
 {"pxlGrowRegions", Segmentation_PxlGrowRegions, METH_VARARGS,
-"segmentation.pxlGrowRegions(clumpsImage, valsImage, outputImage, gdalFormat, muParseCriteria, varNameBandPairs)\n"
+"segmentation.pxlGrowRegions(clumpsImage, valsImage, outputImage, gdalformat, muParseCriteria, varNameBandPairs)\n"
 "A function to merge neighbouring clumps which have the same value - for example when merging across tile boundaries.\n"
 "\n"
 "Where:\n"
 "\n"
-"* clumpsImage is a string containing the filepath for the input clumps image.\n"
-"* valsImage is a string containing the file path for the values (criteria) image.\n"
-"* outputClumps is a string containing the name and path of the output clumps image\n"
-"* gdalFormat is a string defining the format of the output image.\n"
-"* muParseCriteria is a string with an muparser criteria (muparser; e.g., b1 < 20?1:0). Expression output must be 0 or 1 (1 for True).\n"
-"* varNameBandPairs is a list pairs specifying the variable name (in muparser expression) and the band number to which it refers in valsImage (note band numbers start a 1).\n"
+":param clumpsImage: is a string containing the filepath for the input clumps image.\n"
+":param valsImage: is a string containing the file path for the values (criteria) image.\n"
+":param outputClumps: is a string containing the name and path of the output clumps image\n"
+":param gdalformat: is a string defining the format of the output image.\n"
+":param muParseCriteria: is a string with an muparser criteria (muparser; e.g., b1 < 20?1:0). Expression output must be 0 or 1 (1 for True).\n"
+":param varNameBandPairs: is a list pairs specifying the variable name (in muparser expression) and the band number to which it refers in valsImage (note band numbers start a 1).\n"
 "\n"
 "Example::\n"
 "\n"

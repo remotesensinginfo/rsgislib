@@ -261,10 +261,10 @@ static PyMethodDef ElevationMethods[] = {
 "\n"
 "Where:\n"
 "\n"
-"* inputImage is a string containing the name and path of the input DEM file.\n"
-"* outputImage is a string containing the name and path of the output file.\n"
-"* outAngleUnit is a string specifying the output unit ('degrees' or 'radians').\n"
-"* gdalformat is a string with the output image format for the GDAL driver.\n"},
+":param inputImage: is a string containing the name and path of the input DEM file.\n"
+":param outputImage: is a string containing the name and path of the output file.\n"
+":param outAngleUnit: is a string specifying the output unit ('degrees' or 'radians').\n"
+":param gdalformat: is a string with the output image format for the GDAL driver.\n"},
 
 {"aspect", Elevation_calcAspect, METH_VARARGS,
 "rsgislib.elevation.aspect(inputImage, outputImage, gdalformat)\n"
@@ -272,9 +272,9 @@ static PyMethodDef ElevationMethods[] = {
 "\n"
 "Where:\n"
 "\n"
-"* inputImage is a string containing the name and path of the input DEM file.\n"
-"* outputImage is a string containing the name and path of the output file.\n"
-"* gdalformat is a string with the output image format for the GDAL driver.\n"},
+":param inputImage: is a string containing the name and path of the input DEM file.\n"
+":param outputImage: is a string containing the name and path of the output file.\n"
+":param gdalformat: is a string with the output image format for the GDAL driver.\n"},
     
 {"catagoriseAspect", Elevation_catAspect, METH_VARARGS,
 "rsgislib.elevation.catagoriseAspect(inputImage, outputImage, gdalformat)\n"
@@ -283,9 +283,9 @@ static PyMethodDef ElevationMethods[] = {
 "\n"
 "Where:\n"
 "\n"
-"* inputImage is a string containing the name and path of the input aspect (in degrees) file.\n"
-"* outputImage is a string containing the name and path of the output file.\n"
-"* gdalformat is a string with the output image format for the GDAL driver.\n"},
+":param inputImage: is a string containing the name and path of the input aspect (in degrees) file.\n"
+":param outputImage: is a string containing the name and path of the output file.\n"
+":param gdalformat: is a string with the output image format for the GDAL driver.\n"},
     
 {"hillshade", Elevation_calcHillshade, METH_VARARGS,
 "rsgislib.elevation.hillshade(inputImage, outputImage, solarAzimuth, solarZenith, gdalformat)\n"
@@ -293,11 +293,11 @@ static PyMethodDef ElevationMethods[] = {
 "\n"
 "Where:\n"
 "\n"
-"* inputImage is a string containing the name and path of the input DEM file.\n"
-"* outputImage is a string containing the name and path of the output file.\n"
-"* solarAzimuth is a float with the solar azimuth in degrees (Good value is 315).\n"
-"* solarZenith is a float with the solar zenith in degrees (Good value is 45).\n"
-"* gdalformat is a string with the output image format for the GDAL driver.\n"},
+":param inputImage: is a string containing the name and path of the input DEM file.\n"
+":param outputImage: is a string containing the name and path of the output file.\n"
+":param solarAzimuth: is a float with the solar azimuth in degrees (Good value is 315).\n"
+":param solarZenith: is a float with the solar zenith in degrees (Good value is 45).\n"
+":param gdalformat: is a string with the output image format for the GDAL driver.\n"},
     
 {"shadowmask", Elevation_calcShadowMask, METH_VARARGS,
 "rsgislib.elevation.shadowmask(inputImage, outputImage, solarAzimuth, solarZenith, maxHeight, gdalformat)\n"
@@ -305,12 +305,12 @@ static PyMethodDef ElevationMethods[] = {
 "\n"
 "Where:\n"
 "\n"
-"* inputImage is a string containing the name and path of the input DEM file.\n"
-"* outputImage is a string containing the name and path of the output file.\n"
-"* solarAzimuth is a float with the solar azimuth in degrees.\n"
-"* solarZenith is a float with the solar zenith in degrees.\n"
-"* maxHeight is a float with the maximum height for the ray tracing (should be above the maximum elevation within the scene)."
-"* gdalformat is a string with the output image format for the GDAL driver.\n"},
+":param inputImage: is a string containing the name and path of the input DEM file.\n"
+":param outputImage: is a string containing the name and path of the output file.\n"
+":param solarAzimuth: is a float with the solar azimuth in degrees.\n"
+":param solarZenith: is a float with the solar zenith in degrees.\n"
+":param maxHeight: is a float with the maximum height for the ray tracing (should be above the maximum elevation within the scene)."
+":param gdalformat: is a string with the output image format for the GDAL driver.\n"},
     
     
 {"localIncidenceAngle", Elevation_calcLocalIncidenceAngle, METH_VARARGS,
@@ -319,11 +319,11 @@ static PyMethodDef ElevationMethods[] = {
 "\n"
 "Where:\n"
 "\n"
-"* inputImage is a string containing the name and path of the input DEM file.\n"
-"* outputImage is a string containing the name and path of the output file.\n"
-"* solarAzimuth is a float with the solar azimuth in degrees.\n"
-"* solarZenith is a float with the solar zenith in degrees.\n"
-"* gdalformat is a string with the output image format for the GDAL driver.\n"},
+":param inputImage: is a string containing the name and path of the input DEM file.\n"
+":param outputImage: is a string containing the name and path of the output file.\n"
+":param solarAzimuth: is a float with the solar azimuth in degrees.\n"
+":param solarZenith: is a float with the solar zenith in degrees.\n"
+":param gdalformat: is a string with the output image format for the GDAL driver.\n"},
     
 {"localExistanceAngle", Elevation_calcLocalExistanceAngle, METH_VARARGS,
 "rsgislib.elevation.localExistanceAngle(inputImage, outputImage, azimuth, zenith, gdalformat)\n"
@@ -331,11 +331,11 @@ static PyMethodDef ElevationMethods[] = {
 "\n"
 "Where:\n"
 "\n"
-"* inputImage is a string containing the name and path of the input DEM file.\n"
-"* outputImage is a string containing the name and path of the output file.\n"
-"* azimuth is a float with the solar azimuth in degrees.\n"
-"* zenith is a float with the solar zenith in degrees.\n"
-"* gdalformat is a string with the output image format for the GDAL driver.\n"},
+":param inputImage: is a string containing the name and path of the input DEM file.\n"
+":param outputImage: is a string containing the name and path of the output file.\n"
+":param azimuth: is a float with the solar azimuth in degrees.\n"
+":param zenith: is a float with the solar zenith in degrees.\n"
+":param gdalformat: is a string with the output image format for the GDAL driver.\n"},
     
 {"dtmAspectMedianFilter", Elevation_dtmAspectMedianFilter, METH_VARARGS,
 "rsgislib.elevation.dtmAspectMedianFilter(inputDTMImage, inputAspectImage, outputImage, aspectRange, winHSize, gdalformat)\n"
@@ -344,12 +344,12 @@ static PyMethodDef ElevationMethods[] = {
 "\n"
 "Where:\n"
 "\n"
-"* inputDTMImage is a string containing the name and path of the input DTM file.\n"
-"* inputAspectImage is a string containing the name and path of the input Aspect file (in degrees).\n"
-"* outputImage is a string containing the name and path of the output file.\n"
-"* aspectRange is a float with the range of from the centre pixel in degrees.\n"
-"* winHSize is an integer for half the window size.\n"
-"* gdalformat is a string with the output image format for the GDAL driver.\n"},
+":param inputDTMImage: is a string containing the name and path of the input DTM file.\n"
+":param inputAspectImage: is a string containing the name and path of the input Aspect file (in degrees).\n"
+":param outputImage: is a string containing the name and path of the output file.\n"
+":param aspectRange: is a float with the range of from the centre pixel in degrees.\n"
+":param winHSize: is an integer for half the window size.\n"
+":param gdalformat: is a string with the output image format for the GDAL driver.\n"},
 
 {"fillDEMSoilleGratin1994", Elevation_fillDEMSoilleGratin1994, METH_VARARGS,
 "rsgislib.elevation.fillDEMSoilleGratin1994(inputDEMImage, validMaskImage, outputImage, gdalformat)\n"
@@ -359,10 +359,10 @@ static PyMethodDef ElevationMethods[] = {
 "\n"
 "Where:\n"
 "\n"
-"* inputDEMImage is a string containing the name and path of the input DEM file.\n"
-"* validMaskImage is a string containing the name and path to a binary image specifying the valid data region (1 == valid)\n"
-"* outputImage is a string containing the name and path of the output file.\n"
-"* gdalformat is a string with the output image format for the GDAL driver.\n"
+":param inputDEMImage: is a string containing the name and path of the input DEM file.\n"
+":param validMaskImage: is a string containing the name and path to a binary image specifying the valid data region (1 == valid)\n"
+":param outputImage: is a string containing the name and path of the output file.\n"
+":param gdalformat: is a string with the output image format for the GDAL driver.\n"
 "\n"
 "Example::\n"
 "\n"
@@ -381,10 +381,10 @@ static PyMethodDef ElevationMethods[] = {
 "\n"
 "Where:\n"
 "\n"
-"* inputDEMImage is a string containing the name and path of the input DEM file.\n"
-"* outputImage is a string containing the name and path of the output file.\n"
-"* gdalformat is a string with the output image format for the GDAL driver.\n"
-"* winSize is an integer with the window size within which the plane is fitted.\n"
+":param inputDEMImage: is a string containing the name and path of the input DEM file.\n"
+":param outputImage: is a string containing the name and path of the output file.\n"
+":param gdalformat: is a string with the output image format for the GDAL driver.\n"
+":param winSize: is an integer with the window size within which the plane is fitted.\n"
 "\n"
 "Example::\n"
 "\n"

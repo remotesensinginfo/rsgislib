@@ -24,11 +24,11 @@ def applyMedianFilter(inputimage, outputImage, filterSize, gdalformat, datatype)
 
 Where:
 
-* inputImage - string specifying the input image to be filtered.
-* outputImage - string specifying the output image file..
-* filterSize - int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
-* gdalformat - string specifying the output image format (e.g., KEA).
-* datatype - Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
+:param inputImage: string specifying the input image to be filtered.
+:param outputImage: string specifying the output image file..
+:param filterSize: int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
+:param gdalformat: string specifying the output image format (e.g., KEA).
+:param datatype: Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
 
 Example::
 
@@ -45,16 +45,17 @@ Example::
     filters.append(FilterParameters(filterType = 'Median', fileEnding = '', size=filterSize) )
     applyfilters(inputimage, outputImageBase, filters, gdalformat, outExt, datatype)
 
+
 def applyMeanFilter(inputimage, outputImage, filterSize, gdalformat, datatype):
     """ Apply a mean filter to the specified input image.
 
 Where:
 
-* inputImage - string specifying the input image to be filtered.
-* outputImage - string specifying the output image file..
-* filterSize - int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
-* gdalformat - string specifying the output image format (e.g., KEA).
-* datatype - Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
+:param inputImage: string specifying the input image to be filtered.
+:param outputImage: string specifying the output image file..
+:param filterSize: int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
+:param gdalformat: string specifying the output image format (e.g., KEA).
+:param datatype: Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
 
 Example::
 
@@ -76,11 +77,11 @@ def applyMinFilter(inputimage, outputImage, filterSize, gdalformat, datatype):
 
 Where:
 
-* inputImage - string specifying the input image to be filtered.
-* outputImage - string specifying the output image file..
-* filterSize - int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
-* gdalformat - string specifying the output image format (e.g., KEA).
-* datatype - Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
+:param inputImage: string specifying the input image to be filtered.
+:param outputImage: string specifying the output image file..
+:param filterSize: int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
+:param gdalformat: string specifying the output image format (e.g., KEA).
+:param datatype: Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
 
 Example::
 
@@ -103,11 +104,11 @@ def applyMaxFilter(inputimage, outputImage, filterSize, gdalformat, datatype):
 
 Where:
 
-* inputImage - string specifying the input image to be filtered.
-* outputImage - string specifying the output image file..
-* filterSize - int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
-* gdalformat - string specifying the output image format (e.g., KEA).
-* datatype - Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
+:param inputImage: string specifying the input image to be filtered.
+:param outputImage: string specifying the output image file..
+:param filterSize: int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
+:param gdalformat: string specifying the output image format (e.g., KEA).
+:param datatype: Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
 
 Example::
 
@@ -130,11 +131,11 @@ def applyModeFilter(inputimage, outputImage, filterSize, gdalformat, datatype):
 
 Where:
 
-* inputImage - string specifying the input image to be filtered.
-* outputImage - string specifying the output image file..
-* filterSize - int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
-* gdalformat - string specifying the output image format (e.g., KEA).
-* datatype - Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
+:param inputImage: string specifying the input image to be filtered.
+:param outputImage: string specifying the output image file..
+:param filterSize: int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
+:param gdalformat: string specifying the output image format (e.g., KEA).
+:param datatype: Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
 
 Example::
 
@@ -157,11 +158,11 @@ def applyStdDevFilter(inputimage, outputImage, filterSize, gdalformat, datatype)
 
 Where:
 
-* inputImage - string specifying the input image to be filtered.
-* outputImage - string specifying the output image file..
-* filterSize - int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
-* gdalformat - string specifying the output image format (e.g., KEA).
-* datatype - Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
+:param inputImage: string specifying the input image to be filtered.
+:param outputImage: string specifying the output image file..
+:param filterSize: int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
+:param gdalformat: string specifying the output image format (e.g., KEA).
+:param datatype: Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
 
 Example::
 
@@ -185,11 +186,11 @@ def applyRangeFilter(inputimage, outputImage, filterSize, gdalformat, datatype):
 
 Where:
 
-* inputImage - string specifying the input image to be filtered.
-* outputImage - string specifying the output image file..
-* filterSize - int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
-* gdalformat - string specifying the output image format (e.g., KEA).
-* datatype - Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
+:param inputImage: string specifying the input image to be filtered.
+:param outputImage: string specifying the output image file..
+:param filterSize: int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
+:param gdalformat: string specifying the output image format (e.g., KEA).
+:param datatype: Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
 
 Example::
 
@@ -212,11 +213,11 @@ def applyMeanDiffFilter(inputimage, outputImage, filterSize, gdalformat, datatyp
 
 Where:
 
-* inputImage - string specifying the input image to be filtered.
-* outputImage - string specifying the output image file..
-* filterSize - int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
-* gdalformat - string specifying the output image format (e.g., KEA).
-* datatype - Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
+:param inputImage: string specifying the input image to be filtered.
+:param outputImage: string specifying the output image file..
+:param filterSize: int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
+:param gdalformat: string specifying the output image format (e.g., KEA).
+:param datatype: Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
 
 Example::
 
@@ -239,11 +240,11 @@ def applyMeanDiffAbsFilter(inputimage, outputImage, filterSize, gdalformat, data
 
 Where:
 
-* inputImage - string specifying the input image to be filtered.
-* outputImage - string specifying the output image file..
-* filterSize - int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
-* gdalformat - string specifying the output image format (e.g., KEA).
-* datatype - Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
+:param inputImage: string specifying the input image to be filtered.
+:param outputImage: string specifying the output image file..
+:param filterSize: int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
+:param gdalformat: string specifying the output image format (e.g., KEA).
+:param datatype: Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
 
 Example::
 
@@ -268,11 +269,11 @@ def applyTotalDiffFilter(inputimage, outputImage, filterSize, gdalformat, dataty
 
 Where:
 
-* inputImage - string specifying the input image to be filtered.
-* outputImage - string specifying the output image file..
-* filterSize - int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
-* gdalformat - string specifying the output image format (e.g., KEA).
-* datatype - Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
+:param inputImage: string specifying the input image to be filtered.
+:param outputImage: string specifying the output image file..
+:param filterSize: int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
+:param gdalformat: string specifying the output image format (e.g., KEA).
+:param datatype: Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
 
 Example::
 
@@ -295,11 +296,11 @@ def applyTotalDiffAbsFilter(inputimage, outputImage, filterSize, gdalformat, dat
 
 Where:
 
-* inputImage - string specifying the input image to be filtered.
-* outputImage - string specifying the output image file..
-* filterSize - int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
-* gdalformat - string specifying the output image format (e.g., KEA).
-* datatype - Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
+:param inputImage: string specifying the input image to be filtered.
+:param outputImage: string specifying the output image file..
+:param filterSize: int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
+:param gdalformat: string specifying the output image format (e.g., KEA).
+:param datatype: Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
 
 Example::
 
@@ -324,11 +325,11 @@ def applyCoeffOfVarFilter(inputimage, outputImage, filterSize, gdalformat, datat
 
 Where:
 
-* inputImage - string specifying the input image to be filtered.
-* outputImage - string specifying the output image file..
-* filterSize - int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
-* gdalformat - string specifying the output image format (e.g., KEA).
-* datatype - Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
+:param inputImage: string specifying the input image to be filtered.
+:param outputImage: string specifying the output image file..
+:param filterSize: int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
+:param gdalformat: string specifying the output image format (e.g., KEA).
+:param datatype: Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
 
 Example::
 
@@ -351,11 +352,11 @@ def applyTotalFilter(inputimage, outputImage, filterSize, gdalformat, datatype):
 
 Where:
 
-* inputImage - string specifying the input image to be filtered.
-* outputImage - string specifying the output image file..
-* filterSize - int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
-* gdalformat - string specifying the output image format (e.g., KEA).
-* datatype - Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
+:param inputImage: string specifying the input image to be filtered.
+:param outputImage: string specifying the output image file..
+:param filterSize: int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
+:param gdalformat: string specifying the output image format (e.g., KEA).
+:param datatype: Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
 
 Example::
 
@@ -377,11 +378,11 @@ def applyNormVarFilter(inputimage, outputImage, filterSize, gdalformat, datatype
 
 Where:
 
-* inputImage - string specifying the input image to be filtered.
-* outputImage - string specifying the output image file..
-* filterSize - int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
-* gdalformat - string specifying the output image format (e.g., KEA).
-* datatype - Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
+:param inputImage: string specifying the input image to be filtered.
+:param outputImage: string specifying the output image file..
+:param filterSize: int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
+:param gdalformat: string specifying the output image format (e.g., KEA).
+:param datatype: Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
 
 Example::
 
@@ -404,11 +405,11 @@ def applyNormVarSqrtFilter(inputimage, outputImage, filterSize, gdalformat, data
 
 Where:
 
-* inputImage - string specifying the input image to be filtered.
-* outputImage - string specifying the output image file..
-* filterSize - int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
-* gdalformat - string specifying the output image format (e.g., KEA).
-* datatype - Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
+:param inputImage: string specifying the input image to be filtered.
+:param outputImage: string specifying the output image file..
+:param filterSize: int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
+:param gdalformat: string specifying the output image format (e.g., KEA).
+:param datatype: Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
 
 Example::
 
@@ -433,11 +434,11 @@ def applyNormVarLnFilter(inputimage, outputImage, filterSize, gdalformat, dataty
 
 Where:
 
-* inputImage - string specifying the input image to be filtered.
-* outputImage - string specifying the output image file..
-* filterSize - int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
-* gdalformat - string specifying the output image format (e.g., KEA).
-* datatype - Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
+:param inputImage: string specifying the input image to be filtered.
+:param outputImage: string specifying the output image file..
+:param filterSize: int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
+:param gdalformat: string specifying the output image format (e.g., KEA).
+:param datatype: Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
 
 Example::
 
@@ -461,11 +462,11 @@ def applyTextureVarFilter(inputimage, outputImage, filterSize, gdalformat, datat
 
 Where:
 
-* inputImage - string specifying the input image to be filtered.
-* outputImage - string specifying the output image file..
-* filterSize - int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
-* gdalformat - string specifying the output image format (e.g., KEA).
-* datatype - Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
+:param inputImage: string specifying the input image to be filtered.
+:param outputImage: string specifying the output image file..
+:param filterSize: int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
+:param gdalformat: string specifying the output image format (e.g., KEA).
+:param datatype: Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
 
 Example::
 
@@ -489,11 +490,11 @@ def applyKuwaharaFilter(inputimage, outputImage, filterSize, gdalformat, datatyp
 
 Where:
 
-* inputImage - string specifying the input image to be filtered.
-* outputImage - string specifying the output image file..
-* filterSize - int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
-* gdalformat - string specifying the output image format (e.g., KEA).
-* datatype - Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
+:param inputImage: string specifying the input image to be filtered.
+:param outputImage: string specifying the output image file..
+:param filterSize: int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
+:param gdalformat: string specifying the output image format (e.g., KEA).
+:param datatype: Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
 
 Example::
 
@@ -516,10 +517,10 @@ def applySobelFilter(inputimage, outputImage, gdalformat, datatype):
 
 Where:
 
-* inputImage - string specifying the input image to be filtered.
-* outputImage - string specifying the output image file..
-* gdalformat - string specifying the output image format (e.g., KEA).
-* datatype - Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
+:param inputImage: string specifying the input image to be filtered.
+:param outputImage: string specifying the output image file..
+:param gdalformat: string specifying the output image format (e.g., KEA).
+:param datatype: Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
 
 Example::
 
@@ -541,10 +542,10 @@ def applySobelXFilter(inputimage, outputImage, gdalformat, datatype):
 
 Where:
 
-* inputImage - string specifying the input image to be filtered.
-* outputImage - string specifying the output image file..
-* gdalformat - string specifying the output image format (e.g., KEA).
-* datatype - Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
+:param inputImage: string specifying the input image to be filtered.
+:param outputImage: string specifying the output image file..
+:param gdalformat: string specifying the output image format (e.g., KEA).
+:param datatype: Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
 
 Example::
 
@@ -566,10 +567,10 @@ def applySobelYFilter(inputimage, outputImage, gdalformat, datatype):
 
 Where:
 
-* inputImage - string specifying the input image to be filtered.
-* outputImage - string specifying the output image file..
-* gdalformat - string specifying the output image format (e.g., KEA).
-* datatype - Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
+:param inputImage: string specifying the input image to be filtered.
+:param outputImage: string specifying the output image file..
+:param gdalformat: string specifying the output image format (e.g., KEA).
+:param datatype: Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
 
 Example::
 
@@ -592,10 +593,10 @@ def applyPrewittFilter(inputimage, outputImage, gdalformat, datatype):
 
 Where:
 
-* inputImage - string specifying the input image to be filtered.
-* outputImage - string specifying the output image file..
-* gdalformat - string specifying the output image format (e.g., KEA).
-* datatype - Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
+:param inputImage: string specifying the input image to be filtered.
+:param outputImage: string specifying the output image file..
+:param gdalformat: string specifying the output image format (e.g., KEA).
+:param datatype: Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
 
 Example::
 
@@ -620,10 +621,10 @@ def applyPrewittXFilter(inputimage, outputImage, gdalformat, datatype):
 
 Where:
 
-* inputImage - string specifying the input image to be filtered.
-* outputImage - string specifying the output image file..
-* gdalformat - string specifying the output image format (e.g., KEA).
-* datatype - Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
+:param inputImage: string specifying the input image to be filtered.
+:param outputImage: string specifying the output image file..
+:param gdalformat: string specifying the output image format (e.g., KEA).
+:param datatype: Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
 
 Example::
 
@@ -648,10 +649,10 @@ def applyPrewittYFilter(inputimage, outputImage, gdalformat, datatype):
 
 Where:
 
-* inputImage - string specifying the input image to be filtered.
-* outputImage - string specifying the output image file..
-* gdalformat - string specifying the output image format (e.g., KEA).
-* datatype - Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
+:param inputImage: string specifying the input image to be filtered.
+:param outputImage: string specifying the output image file..
+:param gdalformat: string specifying the output image format (e.g., KEA).
+:param datatype: Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
 
 Example::
 
@@ -680,11 +681,11 @@ def applyGaussianSmoothFilter(inputimage, outputImage, filterSize, stddevX, stdd
 
 Where:
 
-* inputImage - string specifying the input image to be filtered.
-* outputImage - string specifying the output image file..
-* filterSize - int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
-* gdalformat - string specifying the output image format (e.g., KEA).
-* datatype - Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
+:param inputImage: string specifying the input image to be filtered.
+:param outputImage: string specifying the output image file..
+:param filterSize: int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
+:param gdalformat: string specifying the output image format (e.g., KEA).
+:param datatype: Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
 
 Example::
 
@@ -708,11 +709,11 @@ def applyGaussian1stDerivFilter(inputimage, outputImage, filterSize, stddevX, st
 
 Where:
 
-* inputImage - string specifying the input image to be filtered.
-* outputImage - string specifying the output image file..
-* filterSize - int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
-* gdalformat - string specifying the output image format (e.g., KEA).
-* datatype - Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
+:param inputImage: string specifying the input image to be filtered.
+:param outputImage: string specifying the output image file..
+:param filterSize: int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
+:param gdalformat: string specifying the output image format (e.g., KEA).
+:param datatype: Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
 
 Example::
 
@@ -728,17 +729,18 @@ Example::
     filters = []
     filters.append(FilterParameters(filterType = 'Gaussian1st', fileEnding = '', size=filterSize, stddevX = stddevX, stddevY = stddevY, angle = filterAngle) )
     applyfilters(inputimage, outputImageBase, filters, gdalformat, outExt, datatype)
-    
+
+
 def applyGaussian2ndDerivFilter(inputimage, outputImage, filterSize, stddevX, stddevY, filterAngle, gdalformat, datatype):
     """ Apply a Gaussian second derivative filter to the specified input image.
 
 Where:
 
-* inputImage - string specifying the input image to be filtered.
-* outputImage - string specifying the output image file..
-* filterSize - int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
-* gdalformat - string specifying the output image format (e.g., KEA).
-* datatype - Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
+:param inputImage: string specifying the input image to be filtered.
+:param outputImage: string specifying the output image file..
+:param filterSize: int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
+:param gdalformat: string specifying the output image format (e.g., KEA).
+:param datatype: Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
 
 Example::
 
@@ -761,11 +763,11 @@ def applyLaplacianFilter(inputimage, outputImage, filterSize, stddev, gdalformat
 
 Where:
 
-* inputImage - string specifying the input image to be filtered.
-* outputImage - string specifying the output image file..
-* filterSize - int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
-* gdalformat - string specifying the output image format (e.g., KEA).
-* datatype - Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
+:param inputImage: string specifying the input image to be filtered.
+:param outputImage: string specifying the output image file..
+:param filterSize: int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
+:param gdalformat: string specifying the output image format (e.g., KEA).
+:param datatype: Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
 
 Example::
 
@@ -781,21 +783,19 @@ Example::
     filters = []
     filters.append(FilterParameters(filterType = 'Laplacian', fileEnding = '', size=filterSize, stddev=stddev) )
     applyfilters(inputimage, outputImageBase, filters, gdalformat, outExt, datatype)
-    
-    
-    
- 
+
+
 def applyLeeFilter(inputimage, outputImage, filterSize, nLooks, gdalformat, datatype):
     """ Apply a Lee SAR filter to the specified input image.
 
 Where:
 
-* inputImage - string specifying the input image to be filtered.
-* outputImage - string specifying the output image file..
-* filterSize - int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
-* nLooks - int specfiying the number of looks applied to the SAR image.
-* gdalformat - string specifying the output image format (e.g., KEA).
-* datatype - Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
+:param inputImage: string specifying the input image to be filtered.
+:param outputImage: string specifying the output image file..
+:param filterSize: int specfiying the size of the image filter (must be an odd number, i.e., 3, 5, 7, etc).
+:param nLooks: int specfiying the number of looks applied to the SAR image.
+:param gdalformat: string specifying the output image format (e.g., KEA).
+:param datatype: Specifying the output image pixel data type (e.g., rsgislib.TYPE_32FLOAT).
 
 Example::
 

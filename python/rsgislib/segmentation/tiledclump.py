@@ -46,16 +46,16 @@ from rsgislib import imageutils
 
 ################################ Clumping Functions ################################
 
-def performClumpingSingleThread(inputImage, clumpsImage, tmpDIR='tmp', width=2000, height=2000, imgFormat='KEA'):
+def performClumpingSingleThread(inputImage, clumpsImage, tmpDIR='tmp', width=2000, height=2000, gdalformat='KEA'):
     """
 Clump the input image using a tiled processing chain allowing large images to be clumped more quickly.
 
-* inputImage - the input image to be clumped.
-* clumpsImage - the output clumped image.
-* tmpDIR - the temporary directory where intermediate files will be written (default is 'tmp'). Directory will be created and deleted if does not exist.
-* width - int for width of the image tiles used for processing (Default = 2000).
-* height - int for height of the image tiles used for processing (Default = 2000).
-* imgformat - string with the GDAL image format for the output image (Default = KEA). NOTE. KEA is used as intermediate format internally and therefore needs to be available.
+:param inputImage: the input image to be clumped.
+:param clumpsImage: the output clumped image.
+:param tmpDIR: the temporary directory where intermediate files will be written (default is 'tmp'). Directory will be created and deleted if does not exist.
+:param width: int for width of the image tiles used for processing (Default = 2000).
+:param height: int for height of the image tiles used for processing (Default = 2000).
+:param gdalformat: string with the GDAL image format for the output image (Default = KEA). NOTE. KEA is used as intermediate format internally and therefore needs to be available.
 
     """
     createdTmp = False
@@ -90,31 +90,33 @@ Clump the input image using a tiled processing chain allowing large images to be
     print("Merge Tiles into Blank Image")
     segmentation.mergeClumpImages(clumpTiles, initMergedClumps, True)
     print("Merge Tile Boundaries")
-    segmentation.mergeEquivClumps(initMergedClumps, clumpsImage, imgFormat, ['PixelVal'])
+    segmentation.mergeEquivClumps(initMergedClumps, clumpsImage, gdalformat, ['PixelVal'])
     
     shutil.rmtree(imgTilesDIR)
     shutil.rmtree(tilesClumpsDIR)
     os.remove(initMergedClumps)
     if createdTmp:
         shutil.rmtree(tmpDIR)
-        
+
+
 def clumpImgFunc(imgs):
     """
     Clump an image with values provides as an array for use within a multiprocessing Pool
     """
     segmentation.clump(imgs[0], imgs[1], 'KEA', True, 0, True)
-    
-def performClumpingMultiProcess(inputImage, clumpsImage, tmpDIR='tmp', width=2000, height=2000, imgFormat='KEA', nCores=-1):
+
+
+def performClumpingMultiProcess(inputImage, clumpsImage, tmpDIR='tmp', width=2000, height=2000, gdalformat='KEA', nCores=-1):
     """
 Clump the input image using a tiled processing chain allowing large images to be clumped more quickly.
 
-* inputImage - the input image to be clumped.
-* clumpsImage - the output clumped image.
-* tmpDIR - the temporary directory where intermediate files will be written (default is 'tmp'). Directory will be created and deleted if does not exist.
-* width - int for width of the image tiles used for processing (Default = 2000).
-* height - int for height of the image tiles used for processing (Default = 2000).
-* imgformat - string with the GDAL image format for the output image (Default = KEA). NOTE. KEA is used as intermediate format internally and therefore needs to be available.
-* nCores - is an int specifying the number of cores to be used for clumping processing.
+:param inputImage: the input image to be clumped.
+:param clumpsImage: the output clumped image.
+:param tmpDIR: the temporary directory where intermediate files will be written (default is 'tmp'). Directory will be created and deleted if does not exist.
+:param width: int for width of the image tiles used for processing (Default = 2000).
+:param height: int for height of the image tiles used for processing (Default = 2000).
+:param gdalformat: string with the GDAL image format for the output image (Default = KEA). NOTE. KEA is used as intermediate format internally and therefore needs to be available.
+:param nCores: is an int specifying the number of cores to be used for clumping processing.
 
     """
     createdTmp = False
@@ -156,7 +158,7 @@ Clump the input image using a tiled processing chain allowing large images to be
     print("Merge Tiles into Blank Image")
     segmentation.mergeClumpImages(clumpTiles, initMergedClumps, True)
     print("Merge Tile Boundaries")
-    segmentation.mergeEquivClumps(initMergedClumps, clumpsImage, imgFormat, ['PixelVal'])
+    segmentation.mergeEquivClumps(initMergedClumps, clumpsImage, gdalformat, ['PixelVal'])
     
     shutil.rmtree(imgTilesDIR)
     shutil.rmtree(tilesClumpsDIR)
@@ -168,17 +170,17 @@ Clump the input image using a tiled processing chain allowing large images to be
 
 ################################ Union Clumping Functions ################################
 
-def performUnionClumpingSingleThread(inputImage, refImg, clumpsImage, tmpDIR='tmp', width=2000, height=2000, imgFormat='KEA'):
+def performUnionClumpingSingleThread(inputImage, refImg, clumpsImage, tmpDIR='tmp', width=2000, height=2000, gdalformat='KEA'):
     """
 Clump and union with the reference image the input image using a tiled processing chain allowing large images to be clumped more quickly.
 
-* inputImage - the input image to be clumped.
-* refImg - the reference image which the union is undertaken with (typically an existing classification)
-* clumpsImage - the output clumped image.
-* tmpDIR - the temporary directory where intermediate files will be written (default is 'tmp'). Directory will be created and deleted if does not exist.
-* width - int for width of the image tiles used for processing (Default = 2000).
-* height - int for height of the image tiles used for processing (Default = 2000).
-* imgformat - string with the GDAL image format for the output image (Default = KEA). NOTE. KEA is used as intermediate format internally and therefore needs to be available.
+:param inputImage: the input image to be clumped.
+:param refImg: the reference image which the union is undertaken with (typically an existing classification)
+:param clumpsImage: the output clumped image.
+:param tmpDIR: the temporary directory where intermediate files will be written (default is 'tmp'). Directory will be created and deleted if does not exist.
+:param width: int for width of the image tiles used for processing (Default = 2000).
+:param height: int for height of the image tiles used for processing (Default = 2000).
+:param gdalformat: string with the GDAL image format for the output image (Default = KEA). NOTE. KEA is used as intermediate format internally and therefore needs to be available.
 
     """
     createdTmp = False
@@ -213,7 +215,7 @@ Clump and union with the reference image the input image using a tiled processin
     print("Merge Tiles into Blank Image")
     segmentation.mergeClumpImages(clumpTiles, initMergedClumps, True)
     print("Merge Tile Boundaries")
-    segmentation.mergeEquivClumps(initMergedClumps, clumpsImage, imgFormat, ['ClumpVal_1', 'ClumpVal_2'])
+    segmentation.mergeEquivClumps(initMergedClumps, clumpsImage, gdalformat, ['ClumpVal_1', 'ClumpVal_2'])
     
     shutil.rmtree(imgTilesDIR)
     shutil.rmtree(tilesClumpsDIR)
@@ -227,18 +229,18 @@ def unionClumpImgFunc(imgs):
     """
     segmentation.unionOfClumps(imgs[2], 'KEA', [imgs[0], imgs[1]], 0, True)
     
-def performUnionClumpingMultiProcess(inputImage, refImg, clumpsImage, tmpDIR='tmp', width=2000, height=2000, imgFormat='KEA', nCores=-1):
+def performUnionClumpingMultiProcess(inputImage, refImg, clumpsImage, tmpDIR='tmp', width=2000, height=2000, gdalformat='KEA', nCores=-1):
     """
 Clump and union with the reference image the input image using a tiled processing chain allowing large images to be clumped more quickly.
 
-* inputImage - the input image to be clumped.
-* refImg - the reference image which the union is undertaken with (typically an existing classification)
-* clumpsImage - the output clumped image.
-* tmpDIR - the temporary directory where intermediate files will be written (default is 'tmp'). Directory will be created and deleted if does not exist.
-* width - int for width of the image tiles used for processing (Default = 2000).
-* height - int for height of the image tiles used for processing (Default = 2000).
-* imgformat - string with the GDAL image format for the output image (Default = KEA). NOTE. KEA is used as intermediate format internally and therefore needs to be available.
-* nCores - is an int specifying the number of cores to be used for clumping processing.
+:param inputImage: the input image to be clumped.
+:param refImg: the reference image which the union is undertaken with (typically an existing classification)
+:param clumpsImage: the output clumped image.
+:param tmpDIR: the temporary directory where intermediate files will be written (default is 'tmp'). Directory will be created and deleted if does not exist.
+:param width: int for width of the image tiles used for processing (Default = 2000).
+:param height: int for height of the image tiles used for processing (Default = 2000).
+:param gdalformat: string with the GDAL image format for the output image (Default = KEA). NOTE. KEA is used as intermediate format internally and therefore needs to be available.
+:param nCores: is an int specifying the number of cores to be used for clumping processing.
 
     """
     createdTmp = False
@@ -280,7 +282,7 @@ Clump and union with the reference image the input image using a tiled processin
     print("Merge Tiles into Blank Image")
     segmentation.mergeClumpImages(clumpTiles, initMergedClumps, True)
     print("Merge Tile Boundaries")
-    segmentation.mergeEquivClumps(initMergedClumps, clumpsImage, imgFormat, ['ClumpVal_1', 'ClumpVal_2'])
+    segmentation.mergeEquivClumps(initMergedClumps, clumpsImage, gdalformat, ['ClumpVal_1', 'ClumpVal_2'])
     
     shutil.rmtree(imgTilesDIR)
     shutil.rmtree(tilesClumpsDIR)
@@ -288,6 +290,5 @@ Clump and union with the reference image the input image using a tiled processin
     if createdTmp:
         shutil.rmtree(tmpDIR)
 
-################################################################################################
 
 

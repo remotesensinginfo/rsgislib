@@ -86,22 +86,23 @@ try:
 except ImportError as numpyErr:
     haveNumpy = False
 
+
 def createMinDataTiles(inputImage, outshp, outclumpsFile, width, height, validDataThreshold, maskIntersect=None, offset=False, force=True, tmpdir='tilestemp', inImgNoDataVal=0.0):
     """
 A function to create a tiling for an input image where each tile has a minimum amount of valid data.
 
 Where:
 
-* inputImage is a string for the image to be tiled
-* outshp is a string for the output shapefile the tiling will be written to (if None a shapefile won't be outputted).
-* outclumpsFile is a string for the output image file containing the tiling
-* width is an int for the width of the tiles
-* height is an int for the height of the tiles
-* validDataThreshold is a float (0-1) with the proportion of valid data needed within a tile.
-* force is a boolean (default True) to delete the output shapefile if it already exists.
-* tmpdir is a string with a temporary directory for temp outputs to be stored (they will be deleted) 
-    * if tmpdir doesn't exist it will be created and then deleted during the processing.
-* inImgNoDataVal is a float for providing the input image no data value (Default: 0.0)
+:param inputImage: is a string for the image to be tiled
+:param outshp: is a string for the output shapefile the tiling will be written to (if None a shapefile won't be outputted).
+:param outclumpsFile: is a string for the output image file containing the tiling
+:param width: is an int for the width of the tiles
+:param height: is an int for the height of the tiles
+:param validDataThreshold: is a float (0-1) with the proportion of valid data needed within a tile.
+:param force: is a boolean (default True) to delete the output shapefile if it already exists.
+:param tmpdir: is a string with a temporary directory for temp outputs to be stored (they will be deleted).
+              if tmpdir doesn't exist it will be created and then deleted during the processing.
+:param inImgNoDataVal: is a float for providing the input image no data value (Default: 0.0)
 
 """
     tmpPresent = True
@@ -182,12 +183,12 @@ individually used to mask (using rsgislib mask function) each tile from the inpu
 
 Where:
 
-* inputImage is the input image being tiled.
-* tileShp is a shapefile containing the shapefile tiles.
-* tilesNameBase is the base file name for the tile masks
-* tilesMaskDIR is the directory where the output images will be outputted
-* tmpdir is a string with a temporary directory for temp outputs to be stored (they will be deleted)
-    * If tmpdir doesn't exist it will be created and then deleted during the processing.
+:param inputImage: is the input image being tiled.
+:param tileShp: is a shapefile containing the shapefile tiles.
+:param tilesNameBase: is the base file name for the tile masks
+:param tilesMaskDIR: is the directory where the output images will be outputted
+:param tmpdir: is a string with a temporary directory for temp outputs to be stored (they will be deleted)
+               If tmpdir doesn't exist it will be created and then deleted during the processing.
 
 """
     
@@ -215,23 +216,23 @@ Where:
     if not tmpPresent:
         shutil.rmtree(tmpdir, ignore_errors=True)
 
-def createTileMaskImagesFromClumps(clumpsImage, tilesNameBase, tilesMaskDIR, imgFormat='KEA'):
+def createTileMaskImagesFromClumps(clumpsImage, tilesNameBase, tilesMaskDIR, gdalformat='KEA'):
     """
 A function to create individual image masks from the tiles shapefile which can be
 individually used to mask (using rsgislib mask function) each tile from the inputimage.
 
 Where:
 
-* clumpsImage is an image file with RAT where each clump represented a tile region.
-* tilesNameBase is the base file name for the tile masks
-* tilesMaskDIR is the directory where the output images will be outputted
-* imgFormat is the output image file format of the tile masks
+:param clumpsImage: is an image file with RAT where each clump represented a tile region.
+:param tilesNameBase: is the base file name for the tile masks
+:param tilesMaskDIR: is the directory where the output images will be outputted
+:param gdalformat: is the output image file format of the tile masks
 
 """
     outBaseImg = os.path.join(tilesMaskDIR, tilesNameBase)
     rsgisUtils = rsgislib.RSGISPyUtils()
-    outImgExt = rsgisUtils.getFileExtension(imgFormat)[1:]
-    rastergis.exportClumps2Images(clumpsImage, outBaseImg, True, outImgExt, imgFormat, 1)
+    outImgExt = rsgisUtils.getFileExtension(gdalformat)[1:]
+    rastergis.exportClumps2Images(clumpsImage, outBaseImg, True, outImgExt, gdalformat, 1)
 
 
 def createTilesFromMasks(inputImage, tilesBase, tilesMetaDIR, tilesImgDIR, datatype, gdalformat):
@@ -240,9 +241,9 @@ A function to apply the image tile masks defined in createTileMaskImages to the 
 
 Where:
 
-* inputImage is the input image being tiled.
-* tileMasksBase is the base path for the tile masks. glob will be used to find them with \*.kea added to the end.
-* outTilesBase is the base file name for the tiles.
+:param inputImage: is the input image being tiled.
+:param tileMasksBase: is the base path for the tile masks. glob will be used to find them with \*.kea added to the end.
+:param outTilesBase: is the base file name for the tiles.
 
 """
     maskFiles = glob.glob(os.path.join(tilesMetaDIR, tilesBase+"*.kea"))
@@ -250,6 +251,5 @@ Where:
     idx = 1
     for maskFile in maskFiles:
         tileImage = os.path.join(tilesImgDIR, os.path.basename(maskFile))
-        #print(tileImage)
         imageutils.maskImage(inputImage, maskFile, tileImage, gdalformat, datatype, 0, 0)
         imageutils.popImageStats(tileImage,True,0.,True)

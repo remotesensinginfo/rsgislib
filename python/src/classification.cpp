@@ -219,11 +219,11 @@ static PyMethodDef ClassificationMethods[] = {
 "\n"
 "Where:\n"
 "\n"
-"* inputImage is a string containing the name and path of the input file with attribute table.\n"
-"* outputImage is a string containing the name and path of the output file.\n"
-"* gdalformat is a string with the output image format for the GDAL driver.\n"
-"* classColumn is a string with the name of the column with the class names - internally this will be treated as a string column even if a numerical column is specified.\n"
-"* classIntCol is a sting specifying the name of a column with the integer class representation. This is an optional parameter but if specified then the int reprentation of the classes will be reserved."},
+":param inputImage: is a string containing the name and path of the input file with attribute table.\n"
+":param outputImage: is a string containing the name and path of the output file.\n"
+":param gdalformat: is a string with the output image format for the GDAL driver.\n"
+":param classColumn: is a string with the name of the column with the class names - internally this will be treated as a string column even if a numerical column is specified.\n"
+":param classIntCol: is a sting specifying the name of a column with the integer class representation. This is an optional parameter but if specified then the int reprentation of the classes will be reserved."},
 
 {"colour3bands", Classification_Colour3Bands, METH_VARARGS,
 "classification.colour3bands(inputimage, outputimage, gdalformat)\n"
@@ -231,9 +231,9 @@ static PyMethodDef ClassificationMethods[] = {
 "\n"
 "Where:\n"
 "\n"
-"* inputImage is a string containing the name and path of the input file with attribute table.\n"
-"* outputImage is a string containing the name and path of the output file.\n"
-"* gdalformat is a string with the output image format for the GDAL driver.\n"},
+":param inputImage: is a string containing the name and path of the input file with attribute table.\n"
+":param outputImage: is a string containing the name and path of the output file.\n"
+":param gdalformat: is a string with the output image format for the GDAL driver.\n"},
     
 {"generateRandomAccuracyPts", Classification_GenRandomAccuracyPts, METH_VARARGS,
 "classification.generateRandomAccuracyPts(inputImage, outputShp, classImgCol, classImgVecCol, classRefVecCol, numPts, seed, force)\n"
@@ -241,14 +241,14 @@ static PyMethodDef ClassificationMethods[] = {
 "\n"
 "Where:\n"
 "\n"
-"* inputImage is a string containing the name and path of the input image with attribute table.\n"
-"* outputShp is a string containing the name and path of the output shapefile.\n"
-"* classImgCol is a string speciyfing the name of the column in the image file containing the class names.\n"
-"* classImgVecCol is a string specifiying the output column in the shapefile for the classified class names.\n"
-"* classRefVecCol is a string specifiying an output column in the shapefile which can be used in the accuracy assessment for the reference data.\n"
-"* numPts is an int specifying the total number of points which should be created.\n"
-"* seed is an int specifying the seed for the random number generator. (Optional: Default 10)\n"
-"* force is a bool, specifying whether to force removal of the output vector if it exists. (Optional: Default False)\n"
+":param inputImage: is a string containing the name and path of the input image with attribute table.\n"
+":param outputShp: is a string containing the name and path of the output shapefile.\n"
+":param classImgCol: is a string speciyfing the name of the column in the image file containing the class names.\n"
+":param classImgVecCol: is a string specifiying the output column in the shapefile for the classified class names.\n"
+":param classRefVecCol: is a string specifiying an output column in the shapefile which can be used in the accuracy assessment for the reference data.\n"
+":param numPts: is an int specifying the total number of points which should be created.\n"
+":param seed: is an int specifying the seed for the random number generator. (Optional: Default 10)\n"
+":param force: is a bool, specifying whether to force removal of the output vector if it exists. (Optional: Default False)\n"
 },
 
 {"generateStratifiedRandomAccuracyPts", Classification_GenStratifiedRandomAccuracyPts, METH_VARARGS,
@@ -257,15 +257,15 @@ static PyMethodDef ClassificationMethods[] = {
 "\n"
 "Where:\n"
 "\n"
-"* inputImage is a string containing the name and path of the input image with attribute table.\n"
-"* outputShp is a string containing the name and path of the output shapefile.\n"
-"* classImgCol is a string speciyfing the name of the column in the image file containing the class names.\n"
-"* classImgVecCol is a string specifiying the output column in the shapefile for the classified class names.\n"
-"* classRefVecCol is a string specifiying an output column in the shapefile which can be used in the accuracy assessment for the reference data.\n"
-"* numPts is an int specifying the number of points for each class which should be created.\n"
-"* seed is an int specifying the seed for the random number generator. (Optional: Default 10)\n"
-"* force is a bool, specifying whether to force removal of the output vector if it exists. (Optional: Default False)\n"
-"* usePxlLst is a bool, if there are only a small number of pixels then creating a list of all the pixel locations will speed up processing. (Optional: Default False)\n"
+":param inputImage: is a string containing the name and path of the input image with attribute table.\n"
+":param outputShp: is a string containing the name and path of the output shapefile.\n"
+":param classImgCol: is a string speciyfing the name of the column in the image file containing the class names.\n"
+":param classImgVecCol: is a string specifiying the output column in the shapefile for the classified class names.\n"
+":param classRefVecCol: is a string specifiying an output column in the shapefile which can be used in the accuracy assessment for the reference data.\n"
+":param numPts: is an int specifying the number of points for each class which should be created.\n"
+":param seed: is an int specifying the seed for the random number generator. (Optional: Default 10)\n"
+":param force: is a bool, specifying whether to force removal of the output vector if it exists. (Optional: Default False)\n"
+":param usePxlLst: is a bool, if there are only a small number of pixels then creating a list of all the pixel locations will speed up processing. (Optional: Default False)\n"
 },
     
 {"popClassInfoAccuracyPts", Classification_PopClassInfoAccuracyPts, METH_VARARGS,
@@ -274,11 +274,11 @@ static PyMethodDef ClassificationMethods[] = {
 "\n"
 "Where:\n"
 "\n"
-"* inputImage is a string containing the name and path of the input image with attribute table.\n"
-"* inputShp is a string containing the name and path of the input shapefile.\n"
-"* classImgCol is a string speciyfing the name of the column in the image file containing the class names.\n"
-"* classImgVecCol is a string specifiying the output column in the shapefile for the classified class names.\n"
-"* classRefVecCol is an optional string specifiying an output column in the shapefile which can be used in the accuracy assessment for the reference data.\n"
+":param inputImage: is a string containing the name and path of the input image with attribute table.\n"
+":param inputShp: is a string containing the name and path of the input shapefile.\n"
+":param classImgCol: is a string speciyfing the name of the column in the image file containing the class names.\n"
+":param classImgVecCol: is a string specifiying the output column in the shapefile for the classified class names.\n"
+":param classRefVecCol: is an optional string specifiying an output column in the shapefile which can be used in the accuracy assessment for the reference data.\n"
 },
 
     {NULL}        /* Sentinel */

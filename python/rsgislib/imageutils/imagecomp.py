@@ -52,15 +52,15 @@ def createMaxNDVIComposite(inImgsPattern, rBand, nBand, outRefImg, outCompImg, t
 Create an image composite from multiple input images where the pixel brought through into the composite is the one with
 the maximum NDVI.
 
-* inImgsPattern - is a pattern (ready for glob.glob(inImgsPattern)) so needs an * within the pattern to find the input image files.
-* rBand - is the image band within the input images (same for all) for the red band - note band indexing starts at 1.
-* nBand - is the image band within the input images (same for all) for the nir band - note band indexing starts at 1.
-* outRefImg - is the output reference image which details which input image is forming the output image pixel value (Note. this file will always be a KEA file as RAT is used).
-* outCompImg - is the output composite image for which gdalformat and dataType define the format and data type.
-* tmpPath - is a temp path for intemediate files, if this path doesn't exist is will be created and deleted at runtime.
-* gdalformat - is the output file format of the outCompImg, any GDAL compatable format is OK (Defaut is KEA).
-* dataType - is the data type of the output image (outCompImg). If None is provided then the data type of the first input image will be used (Default None). 
-* calcStats calculate image statics and pyramids (Default=True)
+:param inImgsPattern: is a pattern (ready for glob.glob(inImgsPattern)) so needs an '*' within the pattern to find the input image files.
+:param rBand: is the image band within the input images (same for all) for the red band - note band indexing starts at 1.
+:param nBand: is the image band within the input images (same for all) for the nir band - note band indexing starts at 1.
+:param outRefImg: is the output reference image which details which input image is forming the output image pixel value (Note. this file will always be a KEA file as RAT is used).
+:param outCompImg: is the output composite image for which gdalformat and dataType define the format and data type.
+:param tmpPath: is a temp path for intemediate files, if this path doesn't exist is will be created and deleted at runtime.
+:param gdalformat: is the output file format of the outCompImg, any GDAL compatable format is OK (Defaut is KEA).
+:param dataType: is the data type of the output image (outCompImg). If None is provided then the data type of the first input image will be used (Default None).
+:param calcStats: calculate image statics and pyramids (Default=True)
 
     """
     rsgisUtils = rsgislib.RSGISPyUtils()
@@ -157,15 +157,15 @@ the maximum NDVI over land and NDWI over water. A mask of land and water regions
 identified as image file names are expected to start 'LS8'. If composite includes a mix of LS8 and LS7 images then the 
 LS8 images are submitted to match the images bands of LS7 (i.e., coastal band removed).
 
-* inImgsPattern - is a pattern (ready for glob.glob(inImgsPattern)) so needs an * within the pattern to find the input image files.
-* outRefImg - is the output reference image which details which input image is forming the output image pixel value (Note. this file will always be a KEA file as RAT is used).
-* outCompImg - is the output composite image for which gdalformat and dataType define the format and data type.
-* outMskImg - is the output mask image for regions of water and land where ndvi vs ndwi are used (0=nodata, 1=land, 2=water)
-* tmpPath - is a temp path for intemediate files, if this path doesn't exist is will be created and deleted at runtime.
-* gdalformat - is the output file format of the outCompImg, any GDAL compatable format is OK (Defaut is KEA).
-* dataType - is the data type of the output image (outCompImg). If None is provided then the data type of the first input image will be used (Default None). 
-* calcStats calculate image statics and pyramids (Default=True)
-* use_mode - True: the land/water masks are combined using the mode and False: the land water masks are combined using median.
+:param inImgsPattern: is a pattern (ready for glob.glob(inImgsPattern)) so needs an '*' within the pattern to find the input image files.
+:param outRefImg: is the output reference image which details which input image is forming the output image pixel value (Note. this file will always be a KEA file as RAT is used).
+:param outCompImg: is the output composite image for which gdalformat and dataType define the format and data type.
+:param outMskImg: is the output mask image for regions of water and land where ndvi vs ndwi are used (0=nodata, 1=land, 2=water)
+:param tmpPath: is a temp path for intemediate files, if this path doesn't exist is will be created and deleted at runtime.
+:param gdalformat: is the output file format of the outCompImg, any GDAL compatable format is OK (Defaut is KEA).
+:param dataType: is the data type of the output image (outCompImg). If None is provided then the data type of the first input image will be used (Default None).
+:param calcStats: calculate image statics and pyramids (Default=True)
+:param use_mode: True: the land/water masks are combined using the mode and False: the land water masks are combined using median.
 
     """
     rsgisUtils = rsgislib.RSGISPyUtils()
@@ -327,9 +327,8 @@ ahead of createMaxNDVINDWIComposite when combining LS8 with earlier landsat (i.e
 LS5 and LS7) data. Note, files who's file name contain 'LS8' are considered to be 
 Landsat 8 images.
 
-* in_imgs - input list of image file paths.
-* outdir - output directory for the VRT images (note. an absolute path to the input
-           image is used when building the VRT.
+:param in_imgs: input list of image file paths.
+:param outdir: output directory for the VRT images (Note. an absolute path to the input image is used when building the VRT.)
 
 """
     import subprocess
@@ -352,20 +351,20 @@ Create an image composite from multiple input images where the pixel brought thr
 the maximum NDVI over land and NDWI over water. A mask of land and water regions is also produced. The reference image is
 used to define the spatial extent of the output images and spatial projection.
 
-* refImg - is a reference image with any number of bands and data type which is used to define the output image extent and projection.
-* inImages - a list of all the input images being used to build the composite.
-* rBand - is an integer specifying the red band in the input images (starts at 1), used in the NDVI index.
-* nBand - is an integer specifying the NIR band in the input images (starts at 1), used in the NDVI and NDWI index.
-* sBand - is an integer specifying the SWIR band in the input images (starts at 1), used in the NDVI and NDWI index.
-* outRefImg - is the output reference image which details which input image is forming the output image pixel value (Note. this file will always be a KEA file as RAT is used).
-* outCompImg - is the output composite image for which gdalformat and dataType define the format and data type.
-* outMskImg - is the output mask image for regions of water and land where ndvi vs ndwi are used (0=nodata, 1=land, 2=water)
-* tmpPath - is a temp path for intemediate files, if this path doesn't exist is will be created and deleted at runtime.
-* gdalformat - is the output file format of the outCompImg, any GDAL compatable format is OK (Defaut is KEA).
-* dataType - is the data type of the output image (outCompImg). If None is provided then the data type of the first input image will be used (Default None). 
-* calcStats - calculate image statics and pyramids (Default=True)
-* reprojmethod - specifies the interpolation method used to reproject the input images which are in a different projection and/or pixel size as the reference image (default: cubic).
-* use_mode - True: the land/water masks are combined using the mode and False: the land water masks are combined using median.
+:param refImg: is a reference image with any number of bands and data type which is used to define the output image extent and projection.
+:param inImages: a list of all the input images being used to build the composite.
+:param rBand: is an integer specifying the red band in the input images (starts at 1), used in the NDVI index.
+:param nBand: is an integer specifying the NIR band in the input images (starts at 1), used in the NDVI and NDWI index.
+:param sBand: is an integer specifying the SWIR band in the input images (starts at 1), used in the NDVI and NDWI index.
+:param outRefImg: is the output reference image which details which input image is forming the output image pixel value (Note. this file will always be a KEA file as RAT is used).
+:param outCompImg: is the output composite image for which gdalformat and dataType define the format and data type.
+:param outMskImg: is the output mask image for regions of water and land where ndvi vs ndwi are used (0=nodata, 1=land, 2=water)
+:param tmpPath: is a temp path for intemediate files, if this path doesn't exist is will be created and deleted at runtime.
+:param gdalformat: is the output file format of the outCompImg, any GDAL compatable format is OK (Defaut is KEA).
+:param dataType: is the data type of the output image (outCompImg). If None is provided then the data type of the first input image will be used (Default None).
+:param calcStats: calculate image statics and pyramids (Default=True)
+:param reprojmethod : specifies the interpolation method used to reproject the input images which are in a different projection and/or pixel size as the reference image (default: cubic).
+:param use_mode: True: the land/water masks are combined using the mode and False: the land water masks are combined using median.
 
     """
     rsgisUtils = rsgislib.RSGISPyUtils()

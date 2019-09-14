@@ -59,24 +59,24 @@ This is passed to the imagePixelColumnSummary function
 class ImageBandRescale(object):
     """
 Data structure for rescaling information for rescaleImgPxlVals function.
-* band - specified image band (band numbering starts at 1).
-* inMin - the input image band minimum value for rescaling. 
-* inMax - the input image band maximum value for rescaling.
-* inNoData - no data value for the input image band.
-* outMin - the output image band minimum value for rescaling. 
-* outMax - the output image band maximum value for rescaling.
-* outNoData - no data value for the output image band.
+:param band: specified image band (band numbering starts at 1).
+:param inMin: the input image band minimum value for rescaling.
+:param inMax: the input image band maximum value for rescaling.
+:param inNoData: no data value for the input image band.
+:param outMin: the output image band minimum value for rescaling.
+:param outMax: the output image band maximum value for rescaling.
+:param outNoData: no data value for the output image band.
 
 """
     def __init__(self, band=0, inMin=0.0, inMax=0.0, inNoData=0, outMin=0.0, outMax=0.0, outNoData=0.0):
         """
-        * band - specified image band (band numbering starts at 1).
-        * inMin - the input image band minimum value for rescaling. 
-        * inMax - the input image band maximum value for rescaling.
-        * inNoData - no data value for the input image band.
-        * outMin - the output image band minimum value for rescaling. 
-        * outMax - the output image band maximum value for rescaling.
-        * outNoData - no data value for the output image band.
+        :param band: specified image band (band numbering starts at 1).
+        :param inMin: the input image band minimum value for rescaling.
+        :param inMax: the input image band maximum value for rescaling.
+        :param inNoData: no data value for the input image band.
+        :param outMin: the output image band minimum value for rescaling.
+        :param outMax: the output image band maximum value for rescaling.
+        :param outNoData: no data value for the output image band.
 
         """
         self.band = band
@@ -102,14 +102,14 @@ A function to calculate the distance to the nearest pixel value with one of the 
 
 Where:
 
-* inputValsImg is a string specifying the input image file.
-* outputDistImg is a string specfiying the output image file.
-* pxlVals is a number of list of numbers specifying the features to which the distance from should be calculated.
-* valsImgBand is an integer specifying the image band of the input image to be used (Default = 1).
-* gdalformat is a string specifying the output image format (Default = KEA)
-* maxDist is a number specifying the maximum distance to be calculated, if None not max value is used (Default = None).
-* noDataVal is the no data value in the input image for which distance should not be calculated for (Default = None; None = no specified no data value).
-* unitGEO is a boolean specifying the output distance units. True = Geographic units (e.g., metres), False is in Pixels (Default = True).
+:param inputValsImg: is a string specifying the input image file.
+:param outputDistImg: is a string specfiying the output image file.
+:param pxlVals: is a number of list of numbers specifying the features to which the distance from should be calculated.
+:param valsImgBand: is an integer specifying the image band of the input image to be used (Default = 1).
+:param gdalformat: is a string specifying the output image format (Default = KEA)
+:param maxDist: is a number specifying the maximum distance to be calculated, if None not max value is used (Default = None).
+:param noDataVal: is the no data value in the input image for which distance should not be calculated for (Default = None; None = no specified no data value).
+:param unitGEO: is a boolean specifying the output distance units. True = Geographic units (e.g., metres), False is in Pixels (Default = True).
 
 Example::
 
@@ -189,19 +189,17 @@ def calcDist2ImgValsTiled(inputValsImg, outputDistImg, pxlVals, valsImgBand=1, m
     """ 
 A function to calculate the distance to the nearest pixel value with one of the specified values.
 
-Where:
-
-* inputValsImg is a string specifying the input image file.
-* outputDistImg is a string specfiying the output image file.
-* pxlVals is a number of list of numbers specifying the features to which the distance from should be calculated.
-* valsImgBand is an integer specifying the image band of the input image to be used (Default = 1).
-* gdalformat is a string specifying the output image format (Default = KEA)
-* maxDist is a number specifying the maximum distance to be calculated, if None not max value is used (Default = None).
-* noDataVal is the no data value in the input image for which distance should not be calculated for (Default = None; None = no specified no data value).
-* unitGEO is a boolean specifying the output distance units. True = Geographic units (e.g., metres), False is in Pixels (Default = True).
-* tmpDIR is a directory to be used for storing the image tiles and other temporary files - if not directory does not exist it will be created and deleted on completion (Default: ./tmp).
-* tileSize is an int specifying in pixels the size of the image tiles used for processing (Default: 2000)
-* nCores is the number of processing cores which are available to be used for this processing. If -1 all available cores will be used. (Default: -1)
+:param inputValsImg: is a string specifying the input image file.
+:param outputDistImg: is a string specfiying the output image file.
+:param pxlVals: is a number of list of numbers specifying the features to which the distance from should be calculated.
+:param valsImgBand: is an integer specifying the image band of the input image to be used (Default = 1).
+:param gdalformat: is a string specifying the output image format (Default = KEA)
+:param maxDist: is a number specifying the maximum distance to be calculated, if None not max value is used (Default = None).
+:param noDataVal: is the no data value in the input image for which distance should not be calculated for (Default = None; None = no specified no data value).
+:param unitGEO: is a boolean specifying the output distance units. True = Geographic units (e.g., metres), False is in Pixels (Default = True).
+:param tmpDIR: is a directory to be used for storing the image tiles and other temporary files - if not directory does not exist it will be created and deleted on completion (Default: ./tmp).
+:param tileSize: is an int specifying in pixels the size of the image tiles used for processing (Default: 2000)
+:param nCores: is the number of processing cores which are available to be used for this processing. If -1 all available cores will be used. (Default: -1)
 
 Example::
 
@@ -333,10 +331,8 @@ def countPxlsOfVal(inputImg, vals=[0]):
     """
 Function which counts the number of pixels of a set of values returning a list in the same order as the list of values provided.
 
-Where:
-
-* inputImg - the input image
-* vals - is a list of pixel values to be counted
+:param inputImg: the input image
+:param vals: is a list of pixel values to be counted
 
 """
     if len(vals) == 0:
@@ -359,17 +355,12 @@ def getPCAEigenVector(inputImg, pxlNSample, noData=None, outMatrixFile=None):
 A function which takes a sample from an input image and uses it to 
 generate eigenvector for a PCA. Note. this can be used as input to rsgislib.imagecalc.pca
 
-Where:
+:param inputImg: the image from which the random sample will be taken.
+:param pxlNSample: the sample to be taken (e.g., a value of 100 will sample every 100th pixel)
+:param noData: provide a no data value which is to be ignored during processing. If None then ignored (Default: None)
+:param outMatrixFile: path and name for the output rsgislib matrix file. If None file is not created (Default: None)
 
-* inputImg - the image from which the random sample will be taken.
-* pxlNSample - the sample to be taken (e.g., a value of 100 will sample every 100th pixel)
-* noData - provide a no data value which is to be ignored during processing. If None then ignored (Default: None)
-* outMatrixFile - path and name for the output rsgislib matrix file. If None file is not created (Default: None)
-
-returns:
-
-* array with the eigenvector
-* array with the ratio of the explained variance
+:returns: 1. array with the eigenvector, 2. array with the ratio of the explained variance
 
 """ 
     from sklearn.decomposition import PCA
@@ -411,17 +402,15 @@ def performImagePCA(inputImg, outputImg, eigenVecFile, nComponents=None, pxlNSam
     """
 A function which performs a PCA on the input image.
 
-Where:
-
-* inputImg - the image from which the random sample will be taken.
-* outputImg - the output image transformed using the calculated PCA
-* eigenVecFile - path and name for the output rsgislib matrix file containing the eigenvector for the PCA.
-* nComponents - the number of PCA compoents outputted. A value of None is all components (Default: None)
-* pxlNSample - the sample to be taken (e.g., a value of 100 will sample every 100th pixel) (Default: 100)
-* gdalformat - the output gdal supported file format (Default KEA)
-* datatype - the output data type of the input image (Default: rsgislib.TYPE_32UINT)
-* noData - provide a no data value which is to be ignored during processing. If None then ignored (Default: None)
-* calcStats - Boolean specifying whether pyramids and statistics should be calculated for the output image. (Default: True)
+:param inputImg: the image from which the random sample will be taken.
+:param outputImg: the output image transformed using the calculated PCA
+:param eigenVecFile: path and name for the output rsgislib matrix file containing the eigenvector for the PCA.
+:param nComponents: the number of PCA compoents outputted. A value of None is all components (Default: None)
+:param pxlNSample: the sample to be taken (e.g., a value of 100 will sample every 100th pixel) (Default: 100)
+:param gdalformat: the output gdal supported file format (Default KEA)
+:param datatype: the output data type of the input image (Default: rsgislib.TYPE_32UINT)
+:param noData: provide a no data value which is to be ignored during processing. If None then ignored (Default: None)
+:param calcStats: Boolean specifying whether pyramids and statistics should be calculated for the output image. (Default: True)
 
 """
     import rsgislib.imageutils
@@ -446,13 +435,11 @@ def rescaleImgPxlVals(inputImg, outputImg, gdalformat, datatype, bandRescale, tr
     """
 Function which rescales an input image base on a list of rescaling parameters.
 
-Where:
-
-* inputImg - the input image
-* outputImg - the output image file name and path (will be same dimensions as the input)
-* gdalformat - the GDAL image file format of the output image file.
-* bandRescale - list of ImageBandRescale objects
-* trim2Limits - whether to trim the output to the output min/max values.
+:param inputImg: the input image
+:param outputImg: the output image file name and path (will be same dimensions as the input)
+:param gdalformat: the GDAL image file format of the output image file.
+:param bandRescale: list of ImageBandRescale objects
+:param trim2Limits: whether to trim the output to the output min/max values.
 
 """
     bandRescaleDict = dict()
@@ -495,17 +482,17 @@ def calcHistograms4MskVals(inputImg, imgBand, imgMsk, mskBand, minVal, maxVal, b
 A function which reads the image bands (values and mask) into memory and creates a 
 histogram for each value within the mask value. Within the mask 0 is considered to be no data.
 
-* inputImg - image values image file path.
-* imgBand - values image band
-* imgMsk - file path for image mask.
-* mskBand - mask image band
-* minVal - minimum value for the histogram bins
-* maxVal - maximum value for the histogram bins
-* binWidth - the width of the histograms bins.
-* mskvals - a list of values within the mask can be provided to just consider a limited number of mask values 
-            when calculating the histograms. If None (default) then calculated for all mask values. 
+:param inputImg: image values image file path.
+:param imgBand: values image band
+:param imgMsk: file path for image mask.
+:param mskBand: mask image band
+:param minVal: minimum value for the histogram bins
+:param maxVal: maximum value for the histogram bins
+:param binWidth: the width of the histograms bins.
+:param mskvals: a list of values within the mask can be provided to just consider a limited number of mask values
+                when calculating the histograms. If None (default) then calculated for all mask values.
 
-return:: returns a dict of mask values with an array for the histogram.
+:return: returns a dict of mask values with an array for the histogram.
 
 """
     minVal = float(minVal)
@@ -546,9 +533,9 @@ def calcWSG84PixelArea(img, out_img, scale=10000, gdalformat='KEA'):
     """
 A function which calculates the area (in metres) of the pixel projected in WGS84.
 
-* img - input image, for which the per-pixel area will be calculated.
-* out_img - output image file.
-* scale - scale the output area to unit of interest. Scale=10000(Ha), Scale=1(sq m), Scale=1000000(sq km), Scale=4046.856(Acre), Scale=2590000(sq miles), Scale=0.0929022668(sq feet)
+:param img: input image, for which the per-pixel area will be calculated.
+:param out_img: output image file.
+:param scale: scale the output area to unit of interest. Scale=10000(Ha), Scale=1(sq m), Scale=1000000(sq km), Scale=4046.856(Acre), Scale=2590000(sq miles), Scale=0.0929022668(sq feet)
 
 """
     import rsgislib.tools
@@ -592,14 +579,14 @@ Boardman J.W., Kruse F.A, and Green R.O., "Mapping Target Signatures via
     Partial Unmixing of AVIRIS Data," Pasadena, California, USA, 23 Jan 1995,
     URI: http://hdl.handle.net/2014/33635
 
-* inputImg - image values image file path.
-* outputimg - output image
-* gdalformat - GDAL file format (e.g., KEA) of the output image.
-* niters - number of iterations
-* thres - a threshold in the image space (after again as been applied) to select more pixels around the extreme (e.g., 1% reflectance)
-* img_gain - the gain by which the image was multipled, reflectance images are typically multiplied by 1000 or 10000. The result should be an image with a range 0-1.
-* seed - seed for the random squence of numbers being generated. Using the same seed will result in the same seqence and therefore the same output.
-* calcstats - whether to calculate image statistics and pyramids on the output image.
+:param inputImg: image values image file path.
+:param outputimg: output image
+:param gdalformat: GDAL file format (e.g., KEA) of the output image.
+:param niters: number of iterations
+:param thres: a threshold in the image space (after again as been applied) to select more pixels around the extreme (e.g., 1% reflectance)
+:param img_gain: the gain by which the image was multipled, reflectance images are typically multiplied by 1000 or 10000. The result should be an image with a range 0-1.
+:param seed: seed for the random squence of numbers being generated. Using the same seed will result in the same seqence and therefore the same output.
+:param calcstats: whether to calculate image statistics and pyramids on the output image.
 
 """ 
     # Check gdal is available
@@ -702,11 +689,9 @@ Function which calculates the mode of a group of images.
 
 Warning, this function can be very slow. Use rsgislib.imagecalc.imagePixelColumnSummary
 
-Where:
-
-* inputImgs - the list of images
-* outputImg - the output image file name and path (will be same dimensions as the input)
-* gdalformat - the GDAL image file format of the output image file.
+:param inputImgs: the list of images
+:param outputImg: the output image file name and path (will be same dimensions as the input)
+:param gdalformat: the GDAL image file format of the output image file.
 
 """
     import scipy.stats
