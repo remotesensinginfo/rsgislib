@@ -2063,7 +2063,7 @@ static PyMethodDef ImageUtilsMethods[] = {
 "Where:\n"
 "\n"
 ":param inputImage: is a string containing the name of the input file\n"
-":param outputImage is a string containing the name of the output file\n":
+":param outputImage: is a string containing the name of the output file\n"
 ":param instatsfile: is a string providing the name of the file to read stats from.\n"
 ":param ignorezeros: is a bool specifying if pixels with a value of zero should be ignored.\n"
 ":param onepasssd: is a bool specifying if is single pass should be used for calculating standard deviation (faster but less accurate)\n"
