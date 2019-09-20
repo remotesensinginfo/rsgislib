@@ -36,6 +36,9 @@ Visualisation
 
 .. autofunction:: rsgislib.elevation.hillshade
 
+Fusion
+-------
+.. autofunction:: rsgislib.elevation.fftDEMFusion
 
 * :ref:`genindex`
 * :ref:`modindex`

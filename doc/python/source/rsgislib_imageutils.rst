@@ -4,6 +4,16 @@ RSGISLib Image Utilities Module
 .. automodule:: rsgislib.imageutils
    :undoc-members:
 
+.. autoclass:: ImageBandInfo
+    :members:
+    
+.. autoclass:: RSGISTimeseriesFillInfo
+    :members:
+    
+.. autoclass:: SharpBandInfo
+    :members:
+
+
 Image Stats and Pyramids
 ------------------------
 .. autofunction:: rsgislib.imageutils.popImageStats
@@ -21,22 +31,33 @@ Projection
 .. autofunction:: rsgislib.imageutils.reprojectImage
 .. autofunction:: rsgislib.imageutils.getWKTProjFromImage
 
-Mosaic and Composite
-----------------------
+
+Mosaic 
+-------
 
 .. autofunction:: rsgislib.imageutils.createImageMosaic
-.. autofunction:: rsgislib.imageutils.createRefImgCompositeImg
-.. autofunction:: rsgislib.imageutils.imagecomp.createMaxNDVIComposite
-.. autofunction:: rsgislib.imageutils.imagecomp.createMaxNDVINDWICompositeLandsat
-.. autofunction:: rsgislib.imageutils.genTimeseriesFillCompositeImg
 .. autofunction:: rsgislib.imageutils.includeImages
 .. autofunction:: rsgislib.imageutils.includeImagesWithOverlap
+.. autofunction:: rsgislib.imageutils.includeImagesIndImgIntersect
 .. autofunction:: rsgislib.imageutils.combineImages2Band
+
+
+Composite
+----------
+.. autofunction:: rsgislib.imageutils.imagecomp.createMaxNDVIComposite
+.. autofunction:: rsgislib.imageutils.imagecomp.createMaxNDVINDWIComposite
+.. autofunction:: rsgislib.imageutils.imagecomp.createMaxNDVINDWICompositeLandsat
+.. autofunction:: rsgislib.imageutils.imagecomp.checkBuildLS8VRTs
+.. autofunction:: rsgislib.imageutils.genTimeseriesFillCompositeImg
+.. autofunction:: rsgislib.imageutils.createRefImgCompositeImg
+.. autofunction:: rsgislib.imageutils.combineBinaryMasks
 .. autofunction:: rsgislib.imageutils.exportSingleMergedImgBand
+
 
 Tile
 -------
 .. autofunction:: rsgislib.imageutils.createTiles
+.. autofunction:: rsgislib.imageutils.createTilesMultiCore
 .. autofunction:: rsgislib.imageutils.tilingutils.createMinDataTiles
 .. autofunction:: rsgislib.imageutils.tilingutils.createTileMaskImagesFromShp
 .. autofunction:: rsgislib.imageutils.tilingutils.createTileMaskImagesFromClumps
@@ -58,6 +79,7 @@ Subset / Mask
 .. autofunction:: rsgislib.imageutils.subset2polys
 .. autofunction:: rsgislib.imageutils.subsetImgs2CommonExtent
 .. autofunction:: rsgislib.imageutils.subsetbbox
+.. autofunction:: rsgislib.imageutils.subsetPxlBBox
 .. autofunction:: rsgislib.imageutils.buildImgSubDict
 .. autofunction:: rsgislib.imageutils.genFiniteMask
 .. autofunction:: rsgislib.imageutils.genValidMask
@@ -73,15 +95,22 @@ Extract
 .. autofunction:: rsgislib.imageutils.performRandomPxlSampleInMask
 .. autofunction:: rsgislib.imageutils.performRandomPxlSampleInMaskLowPxlCount
 .. autofunction:: rsgislib.imageutils.extractImgPxlSample
+.. autofunction:: rsgislib.imageutils.extractImgPxlValsInMsk
+.. autofunction:: rsgislib.imageutils.splitSampleHDF5File
 
 
 Create
 ---------
 
 .. autofunction:: rsgislib.imageutils.createBlankImage
+.. autofunction:: rsgislib.imageutils.createBlankImgFromBBOX
+.. autofunction:: rsgislib.imageutils.createBlankImgFromRefVector
 .. autofunction:: rsgislib.imageutils.createCopyImage
 .. autofunction:: rsgislib.imageutils.createCopyImageDefExtent
 .. autofunction:: rsgislib.imageutils.createCopyImageVecExtent
+.. autofunction:: rsgislib.imageutils.createCopyImageVecExtentSnap2Grid
+.. autofunction:: rsgislib.imageutils.createImageForEachVecFeat
+
 
 Select / Stack bands
 ---------------------
@@ -105,7 +134,8 @@ Band Names
 
 
 Image Data Types
-----------------
+-----------------
+
 .. autofunction:: rsgislib.imageutils.getGDALDataType
 .. autofunction:: rsgislib.imageutils.getRSGISLibDataType
 
@@ -121,6 +151,9 @@ Other
 .. autofunction:: rsgislib.imageutils.copyGCPs
 .. autofunction:: rsgislib.imageutils.setImgThematic
 .. autofunction:: rsgislib.imageutils.doImagesOverlap
+.. autofunction:: rsgislib.imageutils.generateRandomPxlValsImg
+.. autofunction:: rsgislib.imageutils.getUniqueValues
+
 
 
 
