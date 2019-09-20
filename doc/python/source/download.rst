@@ -1,58 +1,72 @@
 Download
-===============
+=========
+
+Docker and Singularity
+------------------------
+
+The simplest way to download and use RSGISLib and associated packages is via Docker (https://www.docker.com). We provide stable and development Docker images:
+
+* Stable: petebunting/au-eoed 
+* Development: petebunting/au-eoed-dev
+
+.. code-block:: bash
+
+    docker pull petebunting/au-eoed 
+    # Note. for commands below all data and script need to be available in your 
+    # local directory and to be referenced from the /data path.
+    # Run your rsgislib python script
+    docker run -i -t -v ${PWD}:/data petebunting/au-eoed python /data/my_rsgislib_script.py
+    # Run an RSGISLib command line tool
+    docker run -i -t -v ${PWD}:/data petebunting/au-eoed rsgiscalcimgstats.py -i img.kea -n 0
+    # Gain access to the docker image terminal
+    docker run -i -t -v ${PWD}:/data petebunting/au-eoed /bin/bash
+
+For HPC users Docker cannot be used as it requires to execute as root user. However, Singularity (https://sylabs.io) allows Docker images to be imported and executed as a local user. 
+
+.. code-block:: bash
+
+    singularity pull docker://petebunting/au-eoed
+    # Note. Singularity has the advantage that is can use local paths and does not 
+    # need to mount the file system to access file.
+    # Run your rsgislib python script
+    singularity exec au-eoed.simg python my_rsgislib_script.py
+    # Run an RSGISLib command line tool
+    singularity exec au-eoed.simg rsgiscalcimgstats.py -i img.kea -n 0
+
+Binary Downloads
+-----------------
+
+We make binary downloads available for Windows, Linux and MacOD, built using Python 3, through conda. You can get conda through the Anaconda or Miniconda Python distribution (https://docs.conda.io/en/latest/miniconda.html). More details are available from http://conda.pydata.org
+
+The recomended way to install RSGISlib locally is from conda-forge using the following commands on MacOS and Linux:
+
+.. code-block:: bash
+
+    conda create -n osgeo-env-v1 python=3.7
+    source activate osgeo-env-v1
+    conda install -c conda-forge rsgislib
+    
+The following video shows the steps to undertake this installation.
+
+.. youtube:: 9HqKLioyAeM
+
 
 Source
---------------------
+-------
 
 The RSGISLib source is available to download from  https://bitbucket.org/petebunting/rsgislib . Releases are available from the downloads tab, for the latest version of RSGISLib you can check out the development version with mercurial using:
-
 
 .. code-block:: bash
 
     hg clone https://bitbucket.org/petebunting/rsgislib rsgislib-code
+    
+
+We have also created spack (https://spack.readthedocs.io) build instructions, which are updated on an adhoc basis. See https://github.com/spack/spack for spack source.
 
 
-Instructions on installing RSGISLib and the pre-requisites are in the documentation, available from: https://bitbucket.org/petebunting/rsgislib-documentation/
-
-For help with installation you can email our mailing list:
+For help with compiling or downloading RSGISLib you can email our mailing list:
 
 rsgislib-support@googlegroups.com
 
 The archives can be accessed at: 
 https://groups.google.com/forum/#!forum/rsgislib-support
-
-
-Binary Downloads
----------------------
-
-We make binary downloads available for Linux and OS X, built using Python 3, through conda. You can get conda through the Anaconda or Miniconda Python distribution. More details are available from http://conda.pydata.org
-
-The recomended way to install is though the conda environment we provide. On Linux run:
-
-.. code-block:: bash
-
-    conda env create au-eoed/au-osgeo-lnx
-    source activate au-osgeo-lnx
-
-And for OS X:
-
-.. code-block:: bash
-
-    conda env create au-eoed/au-osgeo-osx
-    source activate au-osgeo-osx
-
-
-If you just want RSGISLib without the extras in the pre-packaged environments above then you can also install using the following commands:
-
-.. code-block:: bash
-
-    conda install -c conda-forge -c rios rsgislib
-    
-It is recommended that you also install the following packages:
-
-.. code-block:: bash
-
-    conda install -c conda-forge -c rios scikit-learn rios tuiview h5py
-
-
-
