@@ -25,6 +25,7 @@ Export Data
 ------------
 
 .. autofunction:: rsgislib.histocube.exportHistoBins2ImgBands
+.. autofunction:: rsgislib.histocube.exportHistoStats2ImgBands
 
 
 Get Metadata
