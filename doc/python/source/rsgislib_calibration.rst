@@ -11,6 +11,7 @@ Radiance
 .. autofunction:: rsgislib.imagecalibration.landsat2RadianceMultiAdd
 .. autofunction:: rsgislib.imagecalibration.spot5ToRadiance
 .. autofunction:: rsgislib.imagecalibration.worldview2ToRadiance
+.. autofunction:: rsgislib.imagecalibration.toaRefl2Radiance
 
 Top-of Atmosphere Reflectance
 -------------------------------

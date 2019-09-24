@@ -816,3 +816,38 @@ order:
 
     rsgislib.imageutils.popImageStats(output_img, usenodataval=True, nodataval=no_data_val, calcpyramids=True)
 
+def rescaleUnmixingResults(inputImg, outputImg, gdalformat):
+    """
+A function which rescales an output from a spectral unmixing
+(e.g., rsgislib.imagecalc.conSum1LinearSpecUnmix) so that
+negative values are removed and each pixel sums to 1.
+
+:param inputImg: Input image with the spectral unmixing result (pixels need to range from 0-1)
+:param outputImg: Output image with the result of the rescaling (pixel values will be in range 0-1)
+:param gdalformat: the file format of the output file.
+
+"""
+    infiles = applier.FilenameAssociations()
+    infiles.image = inputImg
+    outfiles = applier.FilenameAssociations()
+    outfiles.outimage = outputImg
+    otherargs = applier.OtherInputs()
+    aControls = applier.ApplierControls()
+    aControls.progress = cuiprogress.CUIProgressBar()
+    aControls.drivername = gdalformat
+    aControls.omitPyramids = True
+    aControls.calcStats = False
+
+    def _applyUnmixRescale(info, inputs, outputs, otherargs):
+        """
+        This is an internal rios function
+        """
+        inputs.image[inputs.image < 0] = 0
+        outputs.outimage = numpy.zeros_like(inputs.image, dtype=numpy.float32)
+        for idx in range(inputs.image.shape[0]):
+            outputs.outimage[idx] = inputs.image[idx] / numpy.sum(inputs.image, axis=0)
+
+    applier.apply(_applyUnmixRescale, infiles, outfiles, otherargs, controls=aControls)
+
+
+

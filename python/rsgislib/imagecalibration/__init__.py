@@ -3,7 +3,7 @@ The image calibration module contains functions for calibrating optical data fro
 
 For obtaining the correct parameters for each function it is recomented that rather than running directly they are called through the Atmospheric and Radiometric Correction of Satellite Imagery (ARCSI) software. 
 
-More details on ARCSI are avaialble from http://rsgislib.org/arcsi
+More details on ARCSI are avaialble from https://remotesensing.info/arcsi
 """
 
 # import the C++ extension into this level
@@ -237,10 +237,7 @@ Get the ESUN value where a radiance and TOA Reflectance value are known for a pi
 :param month: input the month of the acquisition.
 :param year: input the year of the acquisition.
 :param solarZenith: input the solar zenith angle for the acquisition.
-
-return:
-
-esun radiance
+:returns: esun radiance
 
 """
     import rsgislib.imagecalibration

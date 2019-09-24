@@ -133,6 +133,7 @@ A function which returns a list of column names within the RAT.
 
 :param clumps_img: path to the image file with the RAT
 :param rat_band: the band within the image file for which the RAT is to read.
+:returns: list of column names.
 
 """
     # Open input image file
@@ -164,6 +165,7 @@ and usage (e.g., GFU_Generic, GFU_PixelCount, GFU_Name, etc.) within the RAT.
 
 :param clumps_img: path to the image file with the RAT
 :param rat_band: the band within the image file for which the RAT is to read.
+:returns: dict of column information.
 
 """
     # Open input image file
@@ -204,6 +206,7 @@ and end_row variables can be used to read a subset of the RAT.
 :param start_row: the row within the RAT to start reading, if None will start at 0 (Default: None).
 :param end_row: the row within the RAT to end reading, if None will end at n_rows within the RAT. (Default: None)
 :param rat_band: the band within the image file for which the RAT is to read.
+:returns: list of lists with neighbour indexes.
 
 """
     if not haveHDF5:

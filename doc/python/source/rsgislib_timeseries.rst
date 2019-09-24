@@ -23,6 +23,7 @@ The input is a JSON file with a list of date:filepath pairs as strings, e.g::
     }
 
 To fit the model use the following function::
+    
     rsgislib.timeseries.modelfitting.get_ST_model_coeffs('example.json', 'coeffs.kea', bands=[3,4,5,6,7], num_processes=4)
 
 The output image can then be used directly (e.g., for classification) or use to predict an output image of particular date::

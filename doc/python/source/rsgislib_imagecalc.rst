@@ -68,6 +68,8 @@ Normalise
 .. autofunction:: rsgislib.imagecalc.standardise
 .. autofunction:: rsgislib.imagecalc.normalisation
 .. autofunction:: rsgislib.imagecalc.rescaleImgPxlVals
+.. autofunction:: rsgislib.imagecalc.calcImageRescale
+.. autofunction:: rsgislib.imagecalc.rescaleUnmixingResults
 
 
 Geometry
