@@ -85,12 +85,12 @@ Constants specifying how bands should be treated when sharpening (see rsgislib.i
     * SHARP_RES_HIGH = 2
 
 """
+from __future__ import print_function
 import os.path
 import os
 import time
 import datetime
 import math
-from __future__ import print_function
 
 import osgeo.osr as osr
 import osgeo.ogr as ogr
