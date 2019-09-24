@@ -46,6 +46,7 @@ import osgeo.osr as osr
 import numpy
 import math
 import sys
+from __future__ import print_function
 
 METHOD_POLYCONTAINSPIXEL = 0           # Polygon completely contains pixel
 METHOD_POLYCONTAINSPIXELCENTER = 1     # Pixel center is within the polygon

@@ -12,6 +12,7 @@ import shutil
 import subprocess
 import warnings
 import math
+from __future__ import print_function
 
 import osgeo.gdal as gdal
 import osgeo.osr as osr
