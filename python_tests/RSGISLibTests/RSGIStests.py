@@ -788,9 +788,10 @@ class RSGISTests:
     def testBufferVector(self):
         print("PYTHON TEST: buffervector")
         inputVector = './Vectors/injune_p142_stem_locations.shp'
+        lyrName = 'injune_p142_stem_locations'
         outputVector = './TestOutputs/injune_p142_stem_locations_1mbuffer.shp'
         bufferDist = 1
-        vectorutils.buffervector(inputVector, outputVector, bufferDist, True)
+        vectorutils.buffervector(inputVector, lyrName, outputVector, 'ESRI Shapefile', bufferDist)
 
     def testPrintPolyGeom(self):
         print("PYTHON TEST: buffervector")
