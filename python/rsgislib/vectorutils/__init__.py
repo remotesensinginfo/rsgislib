@@ -5,6 +5,7 @@ The vector utils module performs geometry / attribute table operations on vector
 # import the C++ extension into this level
 from ._vectorutils import *
 
+from __future__ import print_function
 import os.path
 import os
 import sys
@@ -12,7 +13,6 @@ import shutil
 import subprocess
 import warnings
 import math
-from __future__ import print_function
 
 import osgeo.gdal as gdal
 import osgeo.osr as osr
