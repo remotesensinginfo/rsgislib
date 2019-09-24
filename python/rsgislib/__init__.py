@@ -1266,21 +1266,19 @@ class RSGISPyUtils (object):
         
         :param in_vals_lsts - dictionary with each value having a list of values.
         :param val_dict - variable used in iterative nature of function which lists
-                   the variable for which are still to be looped through. Would 
-                   normally not be provided by the user as default is None. Be
-                   careful if you set as otherwise.
+                          the variable for which are still to be looped through. Would 
+                          normally not be provided by the user as default is None. Be
+                          careful if you set as otherwise.
 
         :returns: list of dictionaries with the same keys are the input but only a
-                 single value will be associate with key rather than a list.
+                  single value will be associate with key rather than a list.
                    
         Example::
-        
-        seg_vars_ranges = dict()
-        seg_vars_ranges['k'] = [5, 10, 20, 30, 40, 50, 60, 80, 100, 120]
-        seg_vars_ranges['d'] = [10, 20, 50, 100, 200, 1000, 10000]
-        seg_vars_ranges['minsize'] = [5, 10, 20, 50, 100, 200]
-        
-        seg_vars = rsgis_utils.createVarList(seg_vars_ranges)
+			seg_vars_ranges = dict()
+			seg_vars_ranges['k'] = [5, 10, 20, 30, 40, 50, 60, 80, 100, 120]
+			seg_vars_ranges['d'] = [10, 20, 50, 100, 200, 1000, 10000]
+			seg_vars_ranges['minsize'] = [5, 10, 20, 50, 100, 200]
+			seg_vars = rsgis_utils.createVarList(seg_vars_ranges)
         
         """
         out_vars = []

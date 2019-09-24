@@ -334,9 +334,9 @@ scikit-image library (http://scikit-image.org/docs/stable/api/skimage.segmentati
 :param nPCABands: the number of principle components outputs from the PCA - needs to be either 1 or 3.
 :param beta: scikit-image random_walker parameter: 'Penalization coefficient for the random walker motion (the greater beta, the more difficult the diffusion).'
 :param mode: scikit-image random_walker parameter: 'Mode for solving the linear system in the random walker algorithm. Available options {'cg_mg', 'cg', 'bf'}.'
-             'bf' (brute force): an LU factorization of the Laplacian is computed. This is fast for small images (<1024x1024), but very slow and memory-intensive for large images (e.g., 3-D volumes).
-             'cg' (conjugate gradient): the linear system is solved iteratively using the Conjugate Gradient method from scipy.sparse.linalg. This is less memory-consuming than the brute force method for large images, but it is quite slow.
-             'cg_mg' (conjugate gradient with multigrid preconditioner): a preconditioner is computed using a multigrid solver, then the solution is computed with the Conjugate Gradient method. This mode requires that the pyamg module (http://pyamg.org/) is installed. For images of size > 512x512, this is the recommended (fastest) mode.
+        * 'bf' (brute force): an LU factorization of the Laplacian is computed. This is fast for small images (<1024x1024), but very slow and memory-intensive for large images (e.g., 3-D volumes).
+        * 'cg' (conjugate gradient): the linear system is solved iteratively using the Conjugate Gradient method from scipy.sparse.linalg. This is less memory-consuming than the brute force method for large images, but it is quite slow.
+        * 'cg_mg' (conjugate gradient with multigrid preconditioner): a preconditioner is computed using a multigrid solver, then the solution is computed with the Conjugate Gradient method. This mode requires that the pyamg module (http://pyamg.org/) is installed. For images of size > 512x512, this is the recommended (fastest) mode.
 :param tol: scikit-image random_walker parameter: 'tolerance to achieve when solving the linear system, in cg’ and ‘cg_mg’ modes.'
 :param spacing: scikit-image random_walker parameter: 'Spacing between voxels in each spatial dimension. If None, then the spacing between pixels/voxels in each dimension is assumed 1.'
 

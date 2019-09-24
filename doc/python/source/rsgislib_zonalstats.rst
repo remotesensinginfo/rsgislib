@@ -21,6 +21,7 @@ These functions take a polygons as input and either calculate statistics from pi
 .. autofunction:: rsgislib.zonalstats.pixelStats2SHP
 .. autofunction:: rsgislib.zonalstats.pixelStats2TXT
 .. autofunction:: rsgislib.zonalstats.imageZoneToHDF
+.. autofunction:: rsgislib.zonalstats.polyPixelStatsVecLyr
 
 Endmember Analysis
 -------------------

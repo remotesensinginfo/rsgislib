@@ -453,7 +453,7 @@ Where:
 :param gdalformat: is the gdal format for the output image.
 :param interpMethod: is the interpolation method used to resample the image [bilinear, lanczos, cubicspline, nearestneighbour, cubic, average, mode]
 :param datatype: is the rsgislib datatype of the output image (if none then it will be the same as the input file).
-:param multicore: - use multiple processing cores (Default = False)
+:param multicore: use multiple processing cores (Default = False)
 
 """ 
     rsgisUtils = rsgislib.RSGISPyUtils()
@@ -1301,40 +1301,6 @@ masks. A JSON LUT is also generated to identify the image values to a
         
     with open(output_lut, 'w') as outJSONfile:
         json.dump(out_poss_lut, outJSONfile, sort_keys=True,indent=4, separators=(',', ': '), ensure_ascii=False)
-
-
-def rescaleUnmixingResults(inputImg, outputImg, gdalformat):
-    """
-A function which rescales an output from a spectral unmixing
-(e.g., rsgislib.imagecalc.conSum1LinearSpecUnmix) so that
-negative values are removed and each pixel sums to 1.
-
-:param inputImg: Input image with the spectral unmixing result (pixels need to range from 0-1)
-:param outputImg: Output image with the result of the rescaling (pixel values will be in range 0-1)
-:param gdalformat: the file format of the output file.
-
-"""
-    infiles = applier.FilenameAssociations()
-    infiles.image = inputImg
-    outfiles = applier.FilenameAssociations()
-    outfiles.outimage = outputImg
-    otherargs = applier.OtherInputs()
-    aControls = applier.ApplierControls()
-    aControls.progress = cuiprogress.CUIProgressBar()
-    aControls.drivername = gdalformat
-    aControls.omitPyramids = True
-    aControls.calcStats = False
-
-    def _applyUnmixRescale(info, inputs, outputs, otherargs):
-        """
-        This is an internal rios function
-        """
-        inputs.image[inputs.image < 0] = 0
-        outputs.outimage = numpy.zeros_like(inputs.image, dtype=numpy.float32)
-        for idx in range(inputs.image.shape[0]):
-            outputs.outimage[idx] = inputs.image[idx] / numpy.sum(inputs.image, axis=0)
-
-    applier.apply(_applyUnmixRescale, infiles, outfiles, otherargs, controls=aControls)
 
 
 
