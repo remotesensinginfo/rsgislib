@@ -141,7 +141,7 @@ namespace rsgis
 			float *maxThresholds;
 		};
 		
-		class ZonalStats
+		class DllExport ZonalStats
 			{
 			public:
 				ZonalStats();
