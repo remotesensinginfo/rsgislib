@@ -1,11 +1,11 @@
 """
 The vector utils module performs geometry / attribute table operations on vectors.
 """
+from __future__ import print_function
 
 # import the C++ extension into this level
 from ._vectorutils import *
 
-from __future__ import print_function
 import os.path
 import os
 import sys
