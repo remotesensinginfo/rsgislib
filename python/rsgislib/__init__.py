@@ -86,6 +86,7 @@ Constants specifying how bands should be treated when sharpening (see rsgislib.i
 
 """
 from __future__ import print_function
+
 import os.path
 import os
 import time

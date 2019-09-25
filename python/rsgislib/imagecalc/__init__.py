@@ -1,6 +1,7 @@
 """
 The imagecalc module contains functions for performing a number of calculating on images.
 """
+from __future__ import print_function
 
 # import the C++ extension into this level
 from ._imagecalc import *

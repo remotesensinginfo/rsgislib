@@ -34,8 +34,8 @@ method of intersection. The options for intersection are:
 * METHOD_PIXELAREAINPOLY = 8             # Percent of pixel area that is within the polygon
 * METHOD_POLYAREAINPIXEL = 9             # Percent of polygon area that is within pixel
 
-
 """
+from __future__ import print_function
 
 # import the C++ extension into this level
 from ._zonalstats import *
