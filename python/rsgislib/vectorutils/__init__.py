@@ -1,6 +1,7 @@
 """
 The vector utils module performs geometry / attribute table operations on vectors.
 """
+from __future__ import print_function
 
 # import the C++ extension into this level
 from ._vectorutils import *
@@ -256,7 +257,7 @@ Example::
     inputImage = 'injune_p142_casi_sub_utm.kea'
     outputImage = 'psu142_crowns.kea'
         
-    vectorutils.copyShapefile2RAT(inputVector, 'crowns', inputImage, outputImage)
+    vectorutils.copyVec2RAT(inputVector, 'crowns', inputImage, outputImage)
 
 """
     try:
@@ -1954,7 +1955,7 @@ When creating an attribute the available data types are ogr.OFTString, ogr.OFTIn
              the same as the attTypes['names'] list.
 :param attTypes: is a dict with a list of attribute names (attTypes['names']) and types (attTypes['types']).
                  The list must be the same length as one another and the number of atts. Example type: ogr.OFTString
-:param overwrite - overwrite the vector file specified if it exists. Use False for GPKG where you want to add multiple layers.
+:param overwrite: - overwrite the vector file specified if it exists. Use False for GPKG where you want to add multiple layers.
 
 """
     try:
@@ -2191,6 +2192,7 @@ with a bounding box.
 :param vectorFile: vector file/path
 :param vectorLyr: vector layer name
 :param bbox: the bounding box (xMin, xMax, yMin, yMax). Same projection as vector layer.
+:returns: boolean (True = Intersection)
 
 """
     dsVecFile = gdal.OpenEx(vectorFile, gdal.OF_READONLY )
@@ -2373,6 +2375,7 @@ A function which returns a list of columns from the input vector layer.
 
 :param vecfile: input vector file.
 :param veclyr: input vector layer
+:returns: list of column names
 
 """
     gdal.UseExceptions()
@@ -2399,6 +2402,7 @@ within the vector layer.
 
 :param vecFile: vector file.
 :param vecLyr: layer within the vector file.
+:returns: list of BBOXs
 
 """
     dsVecFile = gdal.OpenEx(vecFile, gdal.OF_VECTOR )

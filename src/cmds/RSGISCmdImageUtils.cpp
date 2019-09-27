@@ -3042,5 +3042,28 @@ namespace rsgis{ namespace cmds {
         }
     }
 
+    std::map<std::string, std::string> executeGetGDALImageCreationOpts(std::string gdalFormat)
+    {
+        std::map<std::string, std::string> gdalCreationOpts;
+        try
+        {
+            rsgis::img::RSGISImageUtils imgUtils;
+            gdalCreationOpts = imgUtils.getCreateGDALImgEnvVars(gdalFormat);
+        }
+        catch (RSGISImageException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (RSGISException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        return gdalCreationOpts;
+    }
+
 }}
 
