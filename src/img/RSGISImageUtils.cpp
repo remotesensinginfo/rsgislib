@@ -5650,6 +5650,53 @@ namespace rsgis{namespace img{
         }
     }
 
+    std::map<std::string, std::string> getCreateGDALImgEnvVars(std::string gdalFormat)
+    {
+        std::map<std::string, std::string> gdal_creation_opts;
+        std::string var_name = "RSGISLIB_IMG_CRT_OPTS_" + boost::to_upper_copy(gdalFormat);
+        if(const char* env_p = std::getenv(var_name.c_str()))
+        {
+            std::string in_env_var = std::string(env_p);
+            std::vector<std::string> *img_vars = new std::vector<std::string>();
+            std::vector<std::string> *tmp_var = new std::vector<std::string>();
+            rsgis::utils::RSGISTextUtils textUtils;
+            textUtils.tokenizeString(in_env_var, ':', img_vars);
+            for(std::vector<std::string>::iterator iterImgVars = img_vars->begin(); iterImgVars != img_vars->end(); ++iterImgVars )
+            {
+                textUtils.tokenizeString((*iterImgVars), '=', tmp_var);
+                if(tmp_var->size() != 2)
+                {
+                    std::string mess = std::string("Could not parse GDAL Image Creation Options (Variable: '") + var_name + std::string("'. Error: Should have two components split with '='. Recieved: '") + (*iterImgVars) + std::string("'");
+                    delete img_vars;
+                    delete tmp_var;
+                    throw rsgis::RSGISImageException(mess);
+                }
+                if(gdal_creation_opts.insert(std::make_pair(tmp_var->at(0), tmp_var->at(1))).second == false)
+                {
+                    std::string mess = std::string("Key was duplicated, check your input for '") + var_name + std::string("'. Duplicated Key: '") + (*iterImgVars)  + std::string("'");
+                    delete img_vars;
+                    delete tmp_var;
+                    throw rsgis::RSGISImageException(mess);
+                }
+            }
+            
+            delete img_vars;
+            delete tmp_var;
+        }
+        return gdal_creation_opts;
+    }
+
+    char** getGDALCreationOptions(std::map<std::string, std::string> gdal_creation_options)
+    {
+        char **papszOptions=NULL;
+        for(std::map<std::string, std::string>::iterator iterOpts = gdal_creation_options.begin(); iterOpts != gdal_creation_options.end(); ++iterOpts)
+        {
+            std::cout << iterOpts->first << " :: " << iterOpts->second << std::endl;
+            papszOptions = CSLSetNameValue(papszOptions, (iterOpts->first).c_str(), (iterOpts->second).c_str());
+        }
+        return papszOptions;
+    }
+
 	RSGISImageUtils::~RSGISImageUtils()
 	{
 		

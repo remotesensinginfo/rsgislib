@@ -40,10 +40,13 @@
 #include "common/RSGISImageException.h"
 #include "common/RSGISOutputStreamException.h"
 
+#include "utils/RSGISTextUtils.h"
+
 #include "geos/geom/Envelope.h"
 #include "geos/geom/Polygon.h"
 
 #include <boost/cstdint.hpp>
+#include <boost/algorithm/string.hpp>
 
 // mark all exported classes/functions with DllExport to have
 // them exported by Visual Studio
@@ -199,6 +202,8 @@ namespace rsgis
                 void createImageGrid(GDALDataset *inData, unsigned int numXPxls, unsigned int numYPxls, bool offset);
                 void populateImagePixelsInRange(GDALDataset *image, int minVal, int maxVal, bool singleLine);
                 void setImageBandNames(GDALDataset *dataset, std::vector<std::string> bandNames, bool quiet=false);
+                std::map<std::string, std::string> getCreateGDALImgEnvVars(std::string gdalFormat);
+                char** getGDALCreationOptions(std::map<std::string, std::string> gdal_creation_options)
                 ~RSGISImageUtils();
 			private:
                 double resDiffThresh; // Maximum difference between image resolutions (as a fraction).

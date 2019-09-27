@@ -43,7 +43,6 @@ This should be the same for all zones.
 
 :param latitude: float
 :param zone: int
-
 :return: tuple [min, max]
 
 """
@@ -63,9 +62,9 @@ This should be the same for all zones.
 def epsg_for_UTM(zone, hemisphere):
     """
 Return EPSG code for given UTM zone and hemisphere using WGS84 datum.
+
 :param zone: UTM zone
 :param hemisphere: hemisphere either 'N' or 'S'
-
 :return: corresponding EPSG code
 
 """
@@ -93,7 +92,6 @@ a number of small bounding boxes (MinX, MaxX, MinY, MaxY) at UTM zone
 boundaries.
 
 :param wgs84_bbox: bounding box in lat/long WGS84 (MinX, MaxX, MinY, MaxY)
-
 :return: list [utm zone, bbox]
 
 """
@@ -242,9 +240,9 @@ def from_latlon(latitude, longitude, force_zone_number=None, force_zone_letter=N
     """
 This function convert Latitude and Longitude to UTM coordinate
 
-:param: latitude: float or array. Latitude between 80 deg S and 84 deg N, e.g. (-80.0 to 84.0)
-:param: longitude: float or array: Longitude between 180 deg W and 180 deg E, e.g. (-180.0 to 180.0).
-:param: force_zone number: int: Zone Number is represented with global map numbers of an UTM Zone
+:param latitude: float or array. Latitude between 80 deg S and 84 deg N, e.g. (-80.0 to 84.0)
+:param longitude: float or array: Longitude between 180 deg W and 180 deg E, e.g. (-180.0 to 180.0).
+:param force_zone number: int: Zone Number is represented with global map numbers of an UTM Zone
     Numbers Map. You may force conversion including one UTM Zone Number.
     More information see http://www.jaworski.ca/utmzones.htm
 

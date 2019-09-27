@@ -1622,13 +1622,13 @@ static PyMethodDef ImageCalibrationMethods[] = {
 ":param outputImage: is a string containing the name of the output file\n"
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
 ":param bandDefnSeq: is a sequence of rsgislib.imagecalibration.CmdsLandsatRadianceGainsOffsets objects that define the inputs\n"
-"   * bandName - Name of image band in output file.\n"
-"   * fileName - input image file.\n"
-"   * bandIndex - Index (starting from 1) of the band in the image file.\n"
-"   * lMin - lMin value from Landsat header.\n"
-"   * lMax - lMax value from Landsat header.\n"
-"   * qCalMin - qCalMin value from Landsat header.\n"
-"   * qCalMax - qCalMax value from Landsat header.\n"
+"        * bandName - Name of image band in output file.\n"
+"        * fileName - input image file.\n"
+"        * bandIndex - Index (starting from 1) of the band in the image file.\n"
+"        * lMin - lMin value from Landsat header.\n"
+"        * lMax - lMax value from Landsat header.\n"
+"        * qCalMin - qCalMin value from Landsat header.\n"
+"        * qCalMax - qCalMax value from Landsat header.\n"
 "\n"},
 
 {"landsat2RadianceMultiAdd", ImageCalibration_landsat2RadianceMultiAdd, METH_VARARGS,
@@ -1640,11 +1640,11 @@ static PyMethodDef ImageCalibrationMethods[] = {
 ":param outputImage: is a string containing the name of the output file\n"
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
 ":param bandDefnSeq: is a sequence of rsgislib.imagecalibration.CmdsLandsatRadianceGainsOffsets objects that define the inputs\n"
-"   * bandName - Name of image band in output file.\n"
-"   * fileName - input image file.\n"
-"   * bandIndex - Index (starting from 1) of the band in the image file.\n"
-"   * addVal - RADIANCE_ADD value from Landsat header.\n"
-"   * multiVal - RADIANCE_MULT value from Landsat header.\n"
+"        * bandName - Name of image band in output file.\n"
+"        * fileName - input image file.\n"
+"        * bandIndex - Index (starting from 1) of the band in the image file.\n"
+"        * addVal - RADIANCE_ADD value from Landsat header.\n"
+"        * multiVal - RADIANCE_MULT value from Landsat header.\n"
 "\n"},
 
 {"radiance2TOARefl", ImageCalibration_Radiance2TOARefl, METH_VARARGS,
@@ -1696,10 +1696,10 @@ static PyMethodDef ImageCalibrationMethods[] = {
 ":param noDataValue: is a float which if all bands contain that value will be ignored.\n"
 ":param useNoDataValue: is a boolean as to whether the no data value specified is to be used.\n"
 ":param bandCoeffs: is a sequence of objects with the following named fields.\n"
-"   * band - An integer specifying the image band in the input file.\n"
-"   * aX - A float for the aX coefficient.\n"
-"   * bX - A float for the bX coefficient.\n"
-"   * cX - A float for the cX coefficient.\n"
+"        * band - An integer specifying the image band in the input file.\n"
+"        * aX - A float for the aX coefficient.\n"
+"        * bX - A float for the bX coefficient.\n"
+"        * cX - A float for the cX coefficient.\n"
 "\n"},
 
 {"apply6SCoeffElevLUTParam", ImageCalibration_Apply6SCoefficentsElevLUTParam, METH_VARARGS,
@@ -1717,12 +1717,12 @@ static PyMethodDef ImageCalibrationMethods[] = {
 ":param noDataValue: is a float which if all bands contain that value will be ignored.\n"
 ":param useNoDataValue: is a boolean as to whether the no data value specified is to be used.\n"
 ":param lutElev: is a sequence of objects with the following named fields - note these are expected to be in elevation order (low to high).\n"
-"    * \'Elev\' - The elevation for the element in the LUT (in metres).\n"
-"    * \'Coeffs\' - The sequence of 6S coeffecients for the given elevation for the element in the LUT.\n"
-"        * \'band\' - An integer specifying the image band in the input file (band numbers start at 1).\n"
-"        * \'aX\' - A float for the aX coefficient.\n"
-"        * \'bX\' - A float for the bX coefficient.\n"
-"        * \'cX\' - A float for the cX coefficient.\n"
+"        * \'Elev\' - The elevation for the element in the LUT (in metres).\n"
+"        * \'Coeffs\' - The sequence of 6S coeffecients for the given elevation for the element in the LUT.\n"
+"            * \'band\' - An integer specifying the image band in the input file (band numbers start at 1).\n"
+"            * \'aX\' - A float for the aX coefficient.\n"
+"            * \'bX\' - A float for the bX coefficient.\n"
+"            * \'cX\' - A float for the cX coefficient.\n"
 "\n"},
 
 {"apply6SCoeffElevAOTLUTParam", ImageCalibration_Apply6SCoefficentsElevAOTLUTParam, METH_VARARGS,
@@ -1740,14 +1740,14 @@ static PyMethodDef ImageCalibrationMethods[] = {
 ":param scaleFactor: is a float which can be used to scale the output pixel values (e.g., multiple by 1000), set as 1 for no scaling.\n"
 ":param noDataValue: is a float which if all bands contain that value will be ignored.\n"
 ":param useNoDataValue: is a boolean as to whether the no data value specified is to be used.\n"
-":param lutElevAOT: is a sequence of objects with the following named fields - note these are expected to be in elevation order (low to high) and then AOT order (low to high).\n"
-"    * \'Elev\' - The elevation for the element in the LUT (in metres).\n"
-"        * \'AOT\' - The AOT value for this element within the LUT.\n"
-"        * \'Coeffs\' - The sequence of 6S coeffecients for the given elevation and AOT for the element in the LUT.\n"
-"            * \'band\' - An integer specifying the image band in the input file (band numbers start at 1).\n"
-"            * \'aX\' - A float for the aX coefficient.\n"
-"            * \'bX\' - A float for the bX coefficient.\n"
-"            * \'cX\' - A float for the cX coefficient.\n"
+":param lutElevAOT: is a sequence of objects with the following named fields - note these are expected to be in elevation order (low to high and then AOT order (low to high).\n"
+"        * \'Elev\' - The elevation for the element in the LUT (in metres).\n"
+"            * \'AOT\' - The AOT value for this element within the LUT.\n"
+"            * \'Coeffs\' - The sequence of 6S coeffecients for the given elevation and AOT for the element in the LUT.\n"
+"                * \'band\' - An integer specifying the image band in the input file (band numbers start at 1).\n"
+"                * \'aX\' - A float for the aX coefficient.\n"
+"                * \'bX\' - A float for the bX coefficient.\n"
+"                * \'cX\' - A float for the cX coefficient.\n"
 "\n"},
 
 {"applySubtractSingleOffsets", ImageCalibration_ApplySubtractSingleOffsets, METH_VARARGS,
@@ -1793,10 +1793,10 @@ static PyMethodDef ImageCalibrationMethods[] = {
 ":param outputImage: is a string containing the name of the output file\n"
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
 ":param bandDefnSeq: is a sequence of rsgislib.imagecalibration.CmdsSaturatedPixel objects that define the inputs\n"
-"    *  bandName - Name of image band in output file.\n"
-"    *  fileName - input image file.\n"
-"    *  bandIndex - Index (starting from 1) of the band in the image file.\n"
-"    *  satVal - Saturation value for the image band.\n"
+"        *  bandName - Name of image band in output file.\n"
+"        *  fileName - input image file.\n"
+"        *  bandIndex - Index (starting from 1) of the band in the image file.\n"
+"        *  satVal - Saturation value for the image band.\n"
 "\n"},
 
 {"landsatThermalRad2Brightness", ImageCalibration_landsatThermalRad2Brightness, METH_VARARGS,
@@ -1811,10 +1811,10 @@ static PyMethodDef ImageCalibrationMethods[] = {
 ":param datatype: is an containing one of the values from rsgislib.TYPE_*\n"
 ":param scaleFactor: is a float which can be used to scale the output pixel values (e.g., multiple by 1000), set as 1 for no scaling.\n"
 ":param bandDefnSeq: is a sequence of rsgislib.imagecalibration.CmdsLandsatThermalCoeffs objects that define the inputs\n"
-"    *  bandName - Name of image band in output file.\n"
-"    *  bandIndex - Index (starting from 1) of the band in the image file.\n"
-"    *  k1 - k1 coefficient from Landsat header.\n"
-"    *  k2 - k2 coefficient from Landsat header.\n"
+"        *  bandName - Name of image band in output file.\n"
+"        *  bandIndex - Index (starting from 1) of the band in the image file.\n"
+"        *  k1 - k1 coefficient from Landsat header.\n"
+"        *  k2 - k2 coefficient from Landsat header.\n"
 "\n"},
     
 {"applyLandsatTMCloudFMask", ImageCalibration_applyLandsatTMCloudFMask, METH_VARARGS,
@@ -1869,10 +1869,10 @@ static PyMethodDef ImageCalibrationMethods[] = {
 ":param outputImage: is a string containing the name of the output file\n"
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
 ":param bandDefnSeq: is a sequence of rsgislib.imagecalibration.CmdsWorldView2RadianceGainsOffsets objects that define the inputs\n"
-"   * bandName - Name of image band in output file.\n"
-"   * bandIndex - Index (starting from 1) of the band in the image file.\n"
-"   * absCalFact - ABSCALFACTOR value from WorldView2 XML header.\n"
-"   * effBandWidth - EFFECTIVEBANDWIDTH value from WorldView2 XML header.\n"
+"        * bandName - Name of image band in output file.\n"
+"        * bandIndex - Index (starting from 1) of the band in the image file.\n"
+"        * absCalFact - ABSCALFACTOR value from WorldView2 XML header.\n"
+"        * effBandWidth - EFFECTIVEBANDWIDTH value from WorldView2 XML header.\n"
 "\n"},
 
 {"spot5ToRadiance", ImageCalibration_spot5ToRadiance, METH_VARARGS,
@@ -1885,10 +1885,10 @@ static PyMethodDef ImageCalibrationMethods[] = {
 ":param outputImage: is a string containing the name of the output file\n"
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
 ":param bandDefnSeq: is a sequence of rsgislib.imagecalibration.CmdsSPOT5RadianceGainsOffsets objects in order of the input image bands that define the inputs\n"
-"   * bandName - Name of image band in output file.\n"
-"   * bandIndex - Index (starting from 1) of the output image band order (i.e., to reorder the image bands).\n"
-"   * gain - PHYSICAL_GAIN value from SPOT5 XML header.\n"
-"   * bias - PHYSICAL_BIAS value from SPOT5 XML header.\n"
+"        * bandName - Name of image band in output file.\n"
+"        * bandIndex - Index (starting from 1) of the output image band order (i.e., to reorder the image bands).\n"
+"        * gain - PHYSICAL_GAIN value from SPOT5 XML header.\n"
+"        * bias - PHYSICAL_BIAS value from SPOT5 XML header.\n"
 "\n"},
 
 {"calcNadirImgViewAngle", ImageCalibration_calcNadirImgViewAngle, METH_VARARGS,
@@ -1928,12 +1928,12 @@ static PyMethodDef ImageCalibrationMethods[] = {
 ":param solarZenith: is a float with the solar zenith for the whole scene.\n"
 ":param reflScaleFactor: is a float with the scale factor to convert the SREF image to a range of 0-1\n"
 ":param lutElev: is a sequence of objects with the following named fields - note these are expected to be in elevation order (low to high).\n"
-"    * \'Elev\' - The elevation for the element in the LUT (in metres).\n"
-"    * \'BandVals\' - The sequence of solar irradiance values for the bands in the SREF image.\n"
-"        * \'band\' - An integer specifying the image band in the input file (band numbers start at 1).\n"
-"        * \'DirIrr\' - A float for the direct irradiance for this band and elevation (i.e., as provided by 6S).\n"
-"        * \'DifIrr\' - A float for the diffuse irradiance for this band and elevation (i.e., as provided by 6S).\n"
-"        * \'EnvIrr\' - A float for the environment irradiance for this band and elevation (i.e., as provided by 6S).\n"
+"        * \'Elev\' - The elevation for the element in the LUT (in metres).\n"
+"        * \'BandVals\' - The sequence of solar irradiance values for the bands in the SREF image.\n"
+"            * \'band\' - An integer specifying the image band in the input file (band numbers start at 1).\n"
+"            * \'DirIrr\' - A float for the direct irradiance for this band and elevation (i.e., as provided by 6S).\n"
+"            * \'DifIrr\' - A float for the diffuse irradiance for this band and elevation (i.e., as provided by 6S).\n"
+"            * \'EnvIrr\' - A float for the environment irradiance for this band and elevation (i.e., as provided by 6S).\n"
 "\n"},
 
 {"calcStandardisedReflectanceSD2010", ImageCalibration_CalcStandardisedReflectanceSD2010, METH_VARARGS,

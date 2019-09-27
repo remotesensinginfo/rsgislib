@@ -6,15 +6,15 @@ RSGISLib Raster GIS Module
    :undoc-members:
 
 Utilities
----------
+----------
 
 .. autofunction:: rsgislib.rastergis.populateStats
 .. autofunction:: rsgislib.rastergis.ratutils.populateImageStats
 .. autofunction:: rsgislib.rastergis.collapseRAT
 .. autofunction:: rsgislib.rastergis.ratutils.createClumpsSHPBBOX
-.. autofunction:: rsgislib.rastergis.ratutils.calcDist2Classes
+.. autofunction:: rsgislib.rastergis.ratutils.getColumnData
 
-Attribute Segments
+Attribute Clumps
 -------------------
 
 .. autofunction:: rsgislib.rastergis.calcBorderLength
@@ -37,6 +37,8 @@ Attribute Segments
 .. autofunction:: rsgislib.rastergis.populateRATWithMode
 .. autofunction:: rsgislib.rastergis.populateRATWithPropValidPxls
 .. autofunction:: rsgislib.rastergis.ratutils.defineClassNames
+.. autofunction:: rsgislib.rastergis.ratutils.calcDist2Classes
+.. autofunction:: rsgislib.rastergis.ratutils.setColumnData
 
 Sampling
 --------
@@ -92,6 +94,7 @@ Copy & Export
 Colour Tables
 ---------------
 .. autofunction:: rsgislib.rastergis.colourClasses
+.. autofunction:: rsgislib.rastergis.ratutils.setClassNamesColours
 
 Data Structures / Enums
 -----------------------

@@ -2018,6 +2018,29 @@ static PyObject *ImageUtils_SplitSampleHDF5File(PyObject *self, PyObject *args, 
     Py_RETURN_NONE;
 }
 
+static PyObject *ImageUtils_GetGDALImageCreationOpts(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    static char *kwlist[] = {"gdalformat", NULL};
+    const char *pGDALFormat = "";
+
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "s:getGDALImageCreationOpts", kwlist, &pGDALFormat))
+    {
+        return NULL;
+    }
+
+    try
+    {
+        std::map<std::string, std::string> gdalCreationOpts = rsgis::cmds::executeGetGDALImageCreationOpts(std::string(pGDALFormat));
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
+
 
 // Our list of functions in this module
 static PyMethodDef ImageUtilsMethods[] = {
@@ -2036,12 +2059,12 @@ static PyMethodDef ImageUtilsMethods[] = {
 ":param gdalformat: is a string providing the output gdalformat of the tiles (e.g., KEA).\n"
 ":param datatype: is a rsgislib.TYPE_* value providing the output data type.\n"
 ":param stretchtype: is a STRETCH_* value providing the type of stretch, options are:\n"
-"   * imageutils.STRETCH_LINEARMINMAX - Stretches between min and max.\n"
-"   * imageutils.STRETCH_LINEARPERCENT - Stretches between percentage of image range. Parameter defines percent.\n"
-"   * imageutils.STRETCH_LINEARSTDDEV - Stretches between mean - sd to mean + sd. Parameter defines number of standard deviations.\n"
-"   * imageutils.STRETCH_EXPONENTIAL - Exponential stretch between mean - 2*sd to mean + 2*sd. No parameter.\n"
-"   * imageutils.STRETCH_LOGARITHMIC - Logarithmic stretch between mean - 2*sd to mean + 2*sd. No parameter.\n"
-"   * imageutils.STRETCH_POWERLAW - Power law stretch between mean - 2*sd to mean + 2*sd. Parameter defines power.\n"
+"        * imageutils.STRETCH_LINEARMINMAX - Stretches between min and max.\n"
+"        * imageutils.STRETCH_LINEARPERCENT - Stretches between percentage of image range. Parameter defines percent.\n"
+"        * imageutils.STRETCH_LINEARSTDDEV - Stretches between mean - sd to mean + sd. Parameter defines number of standard deviations.\n"
+"        * imageutils.STRETCH_EXPONENTIAL - Exponential stretch between mean - 2*sd to mean + 2*sd. No parameter.\n"
+"        * imageutils.STRETCH_LOGARITHMIC - Logarithmic stretch between mean - 2*sd to mean + 2*sd. No parameter.\n"
+"        * imageutils.STRETCH_POWERLAW - Power law stretch between mean - 2*sd to mean + 2*sd. Parameter defines power.\n"
 ":param stretchparam: is a float, providing the input parameter to the stretch (if required).\n"
 "\n"
 "Example::\n"
@@ -2070,12 +2093,12 @@ static PyMethodDef ImageUtilsMethods[] = {
 ":param gdalformat: is a string providing the output gdalformat of the tiles (e.g., KEA).\n"
 ":param datatype: is a rsgislib.TYPE_* value providing the output data type.\n"
 ":param stretchtype: is a STRETCH_* value providing the type of stretch, options are:\n"
-"   * imageutils.STRETCH_LINEARMINMAX - Stretches between min and max.\n"
-"   * imageutils.STRETCH_LINEARPERCENT - Stretches between percentage of image range. Parameter defines percent.\n"
-"   * imageutils.STRETCH_LINEARSTDDEV - Stretches between mean - sd to mean + sd. Parameter defines number of standard deviations.\n"
-"   * imageutils.STRETCH_EXPONENTIAL - Exponential stretch between mean - 2*sd to mean + 2*sd. No parameter.\n"
-"   * imageutils.STRETCH_LOGARITHMIC - Logarithmic stretch between mean - 2*sd to mean + 2*sd. No parameter.\n"
-"   * imageutils.STRETCH_POWERLAW - Power law stretch between mean - 2*sd to mean + 2*sd. Parameter defines power.\n"
+"        * imageutils.STRETCH_LINEARMINMAX - Stretches between min and max.\n"
+"        * imageutils.STRETCH_LINEARPERCENT - Stretches between percentage of image range. Parameter defines percent.\n"
+"        * imageutils.STRETCH_LINEARSTDDEV - Stretches between mean - sd to mean + sd. Parameter defines number of standard deviations.\n"
+"        * imageutils.STRETCH_EXPONENTIAL - Exponential stretch between mean - 2*sd to mean + 2*sd. No parameter.\n"
+"        * imageutils.STRETCH_LOGARITHMIC - Logarithmic stretch between mean - 2*sd to mean + 2*sd. No parameter.\n"
+"        * imageutils.STRETCH_POWERLAW - Power law stretch between mean - 2*sd to mean + 2*sd. Parameter defines power.\n"
 ":param stretchparam: is a float, providing the input parameter to the stretch (if required).\n"
 "\n"
 "Example::\n"
@@ -2108,12 +2131,12 @@ static PyMethodDef ImageUtilsMethods[] = {
 ":param outmin: is a float which specifies the output minimum pixel value (Default = 0)\n"
 ":param outmax: is a float which specifies the output maximum pixel value (Default = 1)\n"
 ":param stretchtype: is a STRETCH_* value providing the type of stretch, options are:\n"
-"   * imageutils.STRETCH_LINEARMINMAX - Stretches between min and max.\n"
-"   * imageutils.STRETCH_LINEARPERCENT - Stretches between percentage of image range. Parameter defines percent.\n"
-"   * imageutils.STRETCH_LINEARSTDDEV - Stretches between mean - sd to mean + sd. Parameter defines number of standard deviations.\n"
-"   * imageutils.STRETCH_EXPONENTIAL - Exponential stretch between mean - 2*sd to mean + 2*sd. No parameter.\n"
-"   * imageutils.STRETCH_LOGARITHMIC - Logarithmic stretch between mean - 2*sd to mean + 2*sd. No parameter.\n"
-"   * imageutils.STRETCH_POWERLAW - Power law stretch between mean - 2*sd to mean + 2*sd. Parameter defines power.\n"
+"        * imageutils.STRETCH_LINEARMINMAX - Stretches between min and max.\n"
+"        * imageutils.STRETCH_LINEARPERCENT - Stretches between percentage of image range. Parameter defines percent.\n"
+"        * imageutils.STRETCH_LINEARSTDDEV - Stretches between mean - sd to mean + sd. Parameter defines number of standard deviations.\n"
+"        * imageutils.STRETCH_EXPONENTIAL - Exponential stretch between mean - 2*sd to mean + 2*sd. No parameter.\n"
+"        * imageutils.STRETCH_LOGARITHMIC - Logarithmic stretch between mean - 2*sd to mean + 2*sd. No parameter.\n"
+"        * imageutils.STRETCH_POWERLAW - Power law stretch between mean - 2*sd to mean + 2*sd. Parameter defines power.\n"
 ":param stretchparam: is a float, providing the input parameter to the stretch (if required; Default=2.0).\n"
 "\n"
 "Example::\n"
@@ -2446,7 +2469,7 @@ static PyMethodDef ImageUtilsMethods[] = {
 
 {"randomSampleHDF5File", (PyCFunction)ImageUtils_RandomSampleHDF5File, METH_VARARGS | METH_KEYWORDS,
 "rsgislib.imageutils.randomSampleHDF5File(inputh5, outputh5, sample, seed)\n"
-"A function which randomly samples a HDF5 of extracted values. \n"
+"A function which randomly samples a HDF5 of extracted values.\n"
 "\n"
 "Where:\n"
 "\n"
@@ -3048,7 +3071,23 @@ For example, can be used to produce monthly composite images from a stack with i
 "\n"
 "\n"},
     
-    {NULL}        /* Sentinel */
+{"getGDALImageCreationOpts", (PyCFunction)ImageUtils_GetGDALImageCreationOpts, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.getGDALImageCreationOpts(gdalformat=string)\n"
+"This function returns a dict from by reading an environment variable to retrieve any creation options for \n"
+"a particular image file format. Variables should have the name RSGISLIB_IMG_CRT_OPTS_<GDAL_FORMAT> where \n"
+"a key value pairs separated by colons (:) is provided. The gdal format string must be upper case.\n"
+"For example: \n"
+"export RSGISLIB_IMG_CRT_OPTS_GTIFF=TILED=YES:COMPRESS=LZW:BIGTIFF=YES\n"
+"export RSGISLIB_IMG_CRT_OPTS_HFA=COMPRESSED=YES:USE_SPILL=YES:AUX=NO:STATISTICS=YES\n"
+"\n"
+"Where:\n"
+"\n"
+":param gdalformat: is a string specifying the GDAL image file format of interest.\n"
+":returns: a dict of the options.\n"
+"\n"
+"\n"},
+    
+{NULL}        /* Sentinel */
 };
 
 

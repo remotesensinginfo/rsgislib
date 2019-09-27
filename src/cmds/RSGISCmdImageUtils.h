@@ -26,6 +26,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <map>
 
 #include "common/RSGISCommons.h"
 #include "RSGISCmdException.h"
@@ -220,6 +221,9 @@ namespace rsgis{ namespace cmds {
     
     /** A function to combine multiple image bands into a single band using a reference image. */
     DllExport void executeExportSingleMergedImgBand(std::string inputImage, std::string inputRefImage, std::string outputImage, std::string gdalFormat, RSGISLibDataType outDataType);
+
+    /** A function to get the GDAL image creation options for a given format via the defined environmental variable */
+    DllExport std::map<std::string, std::string> executeGetGDALImageCreationOpts(std::string gdalFormat);
     
 }}
 

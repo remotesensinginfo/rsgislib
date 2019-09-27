@@ -244,7 +244,7 @@ class RSGISTiledShepherdSegmentationSingleThread (object):
 
 def performTiledSegmentation(inputImage, clumpsImage, tmpDIR='segtmp', tileWidth=2000, tileHeight=2000, validDataThreshold = 0.3, numClusters=60, minPxls=100, distThres=100, bands=None, sampling=100, kmMaxIter=200):
     """
-Utility function to call the segmentation algorithm of Shepherd et al. (2014) using the tiled process outlined in Clewley et al (2015).
+Utility function to call the segmentation algorithm of Shepherd et al. (2019) using the tiled process outlined in Clewley et al (2015).
 
 :param inputImage: is a string containing the name of the input file.
 :param clumpsImage: is a string containing the name of the output clump file.
