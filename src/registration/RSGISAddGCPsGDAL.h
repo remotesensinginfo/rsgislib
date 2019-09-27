@@ -38,6 +38,8 @@
 #include "common/RSGISImageException.h"
 #include "math/RSGISMathsUtils.h"
 
+#include "img/RSGISImageUtils.h"
+
 #include "registration/RSGISImageWarpException.h"
 #include "registration/RSGISGCPImg2MapNode.h"
 

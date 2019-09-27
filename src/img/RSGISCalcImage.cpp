@@ -77,9 +77,10 @@ namespace rsgis{namespace img{
 			{
 				throw RSGISImageBandException("Requested GDAL driver does not exists..");
 			}
+            char **papszOptions = imgUtils.getGDALCreationOptionsForFormat(gdalFormat);
 			std::cout << "New image width = " << width << " height = " << height << " bands = " << this->numOutBands << std::endl;
 			
-			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, NULL);
+			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, papszOptions);
 			
 			if(outputImageDS == NULL)
 			{
@@ -514,9 +515,10 @@ namespace rsgis{namespace img{
             {
                 throw RSGISImageBandException("Requested GDAL driver does not exists..");
             }
+            char **papszOptions = imgUtils.getGDALCreationOptionsForFormat(gdalFormat);
             std::cout << "New image width = " << width << " height = " << height << " bands = " << this->numOutBands << std::endl;
             
-            outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, NULL);
+            outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, papszOptions);
             if(outputImageDS == NULL)
             {
                 throw RSGISImageBandException("Output image could not be created. Check filepath.");
@@ -531,7 +533,7 @@ namespace rsgis{namespace img{
                 outputImageDS->SetProjection(proj.c_str());
             }
             
-            outputRefImageDS = gdalDriver->Create(outputRefIntImage.c_str(), width, height, 1, GDT_UInt32, NULL);
+            outputRefImageDS = gdalDriver->Create(outputRefIntImage.c_str(), width, height, 1, GDT_UInt32, papszOptions);
             if(outputRefImageDS == NULL)
             {
                 throw RSGISImageBandException("Output reference image could not be created. Check filepath.");
@@ -1823,9 +1825,10 @@ namespace rsgis{namespace img{
 			{
 				throw RSGISImageBandException("Requested GDAL driver does not exists..");
 			}
+            char **papszOptions = imgUtils.getGDALCreationOptionsForFormat(gdalFormat);
 			std::cout << "New image width = " << width << " height = " << height << " bands = " << this->numOutBands << std::endl;
 			
-			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, NULL);
+			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, papszOptions);
 			
 			if(outputImageDS == NULL)
 			{
@@ -2421,9 +2424,10 @@ namespace rsgis{namespace img{
             {
                 throw RSGISImageBandException("Requested GDAL driver does not exists..");
             }
+            char **papszOptions = imgUtils.getGDALCreationOptionsForFormat(gdalFormat);
             std::cout << "New image width = " << width << " height = " << height << " bands = " << this->numOutBands << std::endl;
             
-            outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, NULL);
+            outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, papszOptions);
             if(outputImageDS == NULL)
             {
                 throw RSGISImageBandException("Output image could not be created. Check filepath.");
@@ -2438,7 +2442,7 @@ namespace rsgis{namespace img{
                 outputImageDS->SetProjection(proj.c_str());
             }
             
-            outputRefImageDS = gdalDriver->Create(outputRefIntImage.c_str(), width, height, 1, GDT_UInt32, NULL);
+            outputRefImageDS = gdalDriver->Create(outputRefIntImage.c_str(), width, height, 1, GDT_UInt32, papszOptions);
             if(outputRefImageDS == NULL)
             {
                 throw RSGISImageBandException("Output reference image could not be created. Check filepath.");
@@ -4331,8 +4335,9 @@ namespace rsgis{namespace img{
 			gdalDriver = GetGDALDriverManager()->GetDriverByName(gdalFormat.c_str());
 			if(gdalDriver == NULL)
 			{
-				throw RSGISImageBandException("ENVI driver does not exists..");
+				throw RSGISImageBandException("GDAL driver does not exists..");
 			}
+            char **papszOptions = imgUtils.getGDALCreationOptionsForFormat(gdalFormat);
             
             for(int cImgBand = 0; cImgBand < numInBands; ++cImgBand)
             {
@@ -4340,7 +4345,7 @@ namespace rsgis{namespace img{
                 
                 std::cout << "New image width = " << width << " height = " << height << " bands = " << this->numOutBands << std::endl;
 				
-				outputImageDS = gdalDriver->Create(outputImageFileName.c_str(), width, height, this->numOutBands, GDT_Float32, NULL);
+				outputImageDS = gdalDriver->Create(outputImageFileName.c_str(), width, height, this->numOutBands, GDT_Float32, papszOptions);
 				
                 if(outputImageDS == NULL)
                 {
@@ -4580,9 +4585,10 @@ namespace rsgis{namespace img{
 			{
 				throw RSGISImageBandException("Requested GDAL driver does not exists..");
 			}
+            char **papszOptions = imgUtils.getGDALCreationOptionsForFormat(gdalFormat);
 			std::cout << "New image width = " << width << " height = " << height << " bands = " << this->numOutBands << std::endl;
 			
-			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, NULL);
+			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, papszOptions);
 			
 			if(outputImageDS == NULL)
 			{
@@ -7259,8 +7265,9 @@ namespace rsgis{namespace img{
 			{
 				throw RSGISImageBandException(gdalFormat + std::string(" driver does not exists.."));
 			}
-
-			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, NULL);
+            char **papszOptions = imgUtils.getGDALCreationOptionsForFormat(gdalFormat);
+            
+			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, papszOptions);
 			
 			if(outputImageDS == NULL)
 			{
@@ -8534,8 +8541,8 @@ namespace rsgis{namespace img{
 			{
 				throw RSGISImageBandException("Driver does not exists..");
 			}
-            
-			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, NULL);
+            char **papszOptions = imgUtils.getGDALCreationOptionsForFormat(gdalFormat);
+			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, papszOptions);
 			
 			if(outputImageDS == NULL)
 			{
@@ -9512,8 +9519,8 @@ namespace rsgis{namespace img{
             {
                 throw RSGISImageBandException("Driver does not exists..");
             }
-            
-            outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, NULL);
+            char **papszOptions = imgUtils.getGDALCreationOptionsForFormat(gdalFormat);
+            outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, papszOptions);
             if(outputImageDS == NULL)
             {
                 throw RSGISImageBandException("Output image could not be created. Check filepath.");
@@ -9528,7 +9535,7 @@ namespace rsgis{namespace img{
                 outputImageDS->SetProjection(proj.c_str());
             }
             
-            outputRefImageDS = gdalDriver->Create(outputRefIntImage.c_str(), width, height, 1, GDT_UInt32, NULL);
+            outputRefImageDS = gdalDriver->Create(outputRefIntImage.c_str(), width, height, 1, GDT_UInt32, papszOptions);
             if(outputRefImageDS == NULL)
             {
                 throw RSGISImageBandException("Output reference image could not be created. Check filepath.");
@@ -11513,8 +11520,8 @@ namespace rsgis{namespace img{
             {
                 throw RSGISImageBandException("Driver does not exists..");
             }
-            
-            outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, NULL);
+            char **papszOptions = imgUtils.getGDALCreationOptionsForFormat(gdalFormat);
+            outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, papszOptions);
             
             if(outputImageDS == NULL)
             {
@@ -12501,8 +12508,8 @@ namespace rsgis{namespace img{
 			{
 				throw RSGISImageBandException("ENVI driver does not exists..");
 			}
-
-			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, NULL);
+            char **papszOptions = imgUtils.getGDALCreationOptionsForFormat(gdalFormat);
+			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, papszOptions);
 			
 			if(outputImageDS == NULL)
 			{
@@ -14789,6 +14796,9 @@ namespace rsgis{namespace img{
     {
         try
         {
+            GDALAllRegister();
+            RSGISImageUtils imgUtils;
+            
             if( (statsImgBand == 0) || (statsImgBand > statsDataset->GetRasterCount()) )
             {
                 throw RSGISImageException("The image band specified for the stats image is not within the image. Don't forget, band numbering starts at 1.");
@@ -14927,8 +14937,8 @@ namespace rsgis{namespace img{
                 throw RSGISImageException("Requested GDAL driver does not exists..");
             }
             std::cout << "New image width = " << refPxlWidth << " height = " << refPxlHeight << " bands = " << numOutImgBands << std::endl;
-            
-            GDALDataset *outputImageDS = gdalDriver->Create(outputImage.c_str(), refPxlWidth, refPxlHeight, numOutImgBands, gdalDataType, NULL);
+            char **papszOptions = imgUtils.getGDALCreationOptionsForFormat(gdalFormat);
+            GDALDataset *outputImageDS = gdalDriver->Create(outputImage.c_str(), refPxlWidth, refPxlHeight, numOutImgBands, gdalDataType, papszOptions);
             
             if(outputImageDS == NULL)
             {

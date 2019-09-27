@@ -148,8 +148,8 @@ namespace rsgis{namespace reg{
     
     void RSGISAddGCPsGDAL::copyImageWithoutSpatialRef(std::string inFileName, std::string outFileName, std::string gdalFormat, GDALDataType gdalDataType)
     {
-        
         GDALAllRegister();
+        rsgis::img::RSGISImageUtils imgUtils;
 
 		int height = 0;
 		int width = 0;
@@ -176,8 +176,8 @@ namespace rsgis{namespace reg{
 			{
 				throw RSGISImageWarpException("Requested GDAL driver does not exists..");
 			}
-			
-			outputImageDS = gdalDriver->Create(outFileName.c_str(), width, height,numInBands, gdalDataType, NULL);
+			char **papszOptions = imgUtils.getGDALCreationOptionsForFormat(gdalFormat);
+			outputImageDS = gdalDriver->Create(outFileName.c_str(), width, height,numInBands, gdalDataType, papszOptions);
 			
 			if(outputImageDS == NULL)
 			{

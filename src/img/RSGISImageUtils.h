@@ -203,7 +203,8 @@ namespace rsgis
                 void populateImagePixelsInRange(GDALDataset *image, int minVal, int maxVal, bool singleLine);
                 void setImageBandNames(GDALDataset *dataset, std::vector<std::string> bandNames, bool quiet=false);
                 std::map<std::string, std::string> getCreateGDALImgEnvVars(std::string gdalFormat);
-                char** getGDALCreationOptions(std::map<std::string, std::string> gdal_creation_options)
+                char** getGDALCreationOptions(std::map<std::string, std::string> gdal_creation_options);
+                char** getGDALCreationOptionsForFormat(std::string gdalFormat);
                 ~RSGISImageUtils();
 			private:
                 double resDiffThresh; // Maximum difference between image resolutions (as a fraction).

@@ -112,12 +112,12 @@ namespace rsgis{namespace img{
         {
             throw RSGISImageBandException("Driver does not exists!");
         }
-        
+        char **papszOptions = imgUtils.getGDALCreationOptionsForFormat("ENVI");
         int numBands = input->GetRasterCount()+1;
         
         // Create new file. 
         GDALDataset *outputImage = NULL;
-        outputImage = poDriver->Create(outputFile->c_str(), inputXSize, inputYSize, numBands, GDT_Float32, NULL);
+        outputImage = poDriver->Create(outputFile->c_str(), inputXSize, inputYSize, numBands, GDT_Float32, papszOptions);
         outputImage->SetGeoTransform(inputTrans);
         outputImage->SetProjection(input->GetProjectionRef());
         
@@ -272,9 +272,10 @@ namespace rsgis{namespace img{
         {
             throw RSGISImageBandException("ENVI Driver does not exists!");
         }
+        char **papszOptions = imgUtils.getGDALCreationOptionsForFormat("ENVI");
         
         // Create new file. 
-        outputImage = poDriver->Create(outputFile->c_str(), inputXSize, inputYSize, numBands, GDT_Float32, NULL);
+        outputImage = poDriver->Create(outputFile->c_str(), inputXSize, inputYSize, numBands, GDT_Float32, papszOptions);
         outputImage->SetGeoTransform(inputTrans);
         outputImage->SetProjection(input->GetProjectionRef());
         
@@ -369,9 +370,10 @@ namespace rsgis{namespace img{
 			{
 				throw RSGISImageBandException("Requested GDAL driver does not exists..");
 			}
+            char **papszOptions = imgUtils.getGDALCreationOptionsForFormat(gdalFormat);
 			std::cout << "New image width = " << width << " height = " << height << " bands = " << numInBands << std::endl;
 			
-			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, numInBands, gdalDataType, NULL);
+			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, numInBands, gdalDataType, papszOptions);
 			
 			if(outputImageDS == NULL)
 			{
