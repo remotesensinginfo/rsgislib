@@ -2027,18 +2027,38 @@ static PyObject *ImageUtils_GetGDALImageCreationOpts(PyObject *self, PyObject *a
     {
         return NULL;
     }
-
+    
+    bool rtn_dict = false;
+    PyObject *out_info_dict = NULL;
     try
     {
         std::map<std::string, std::string> gdalCreationOpts = rsgis::cmds::executeGetGDALImageCreationOpts(std::string(pGDALFormat));
+        
+        if(gdalCreationOpts.size() > 0)
+        {
+            out_info_dict = PyDict_New();
+            for(std::map<std::string, std::string>::iterator iterOpts = gdalCreationOpts.begin(); iterOpts != gdalCreationOpts.end(); ++iterOpts)
+            {
+                PyDict_SetItem(out_info_dict, Py_BuildValue("s", (iterOpts->first).c_str()), Py_BuildValue("s", (iterOpts->second).c_str()));
+            }
+            rtn_dict = true;
+        }
+            
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
         return NULL;
     }
-
-    Py_RETURN_NONE;
+    
+    if(rtn_dict)
+    {
+        return out_info_dict;
+    }
+    else
+    {
+        Py_RETURN_NONE;
+    }
 }
 
 

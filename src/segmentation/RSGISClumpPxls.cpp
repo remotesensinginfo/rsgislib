@@ -366,9 +366,10 @@ namespace rsgis{namespace segment{
                 
                 throw rsgis::img::RSGISImageBandException("Requested GDAL driver does not exists..");
 			}
+            char **papszOptions = imgUtils.getGDALCreationOptionsForFormat(outFormat);
 			std::cout << "New image width = " << width << " height = " << height << std::endl;
             
-            GDALDataset *clumpsDS = gdalDriver->Create(clumpsOutputPath.c_str(), width, height, 1, GDT_UInt32, NULL);
+            GDALDataset *clumpsDS = gdalDriver->Create(clumpsOutputPath.c_str(), width, height, 1, GDT_UInt32, papszOptions);
 			
 			if(clumpsDS == NULL)
 			{

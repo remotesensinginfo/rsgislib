@@ -60,10 +60,11 @@ namespace rsgis{namespace reg{
             {
                 throw rsgis::RSGISImageException("Requested GDAL driver does not exists..");
             }
-            
+            rsgis::img::RSGISImageUtils imgUtils;
+            char **papszOptions = imgUtils.getGDALCreationOptionsForFormat(outputFormat);
             std::cout << "Output image has size [" << this->overlap->xSize << "," << this->overlap->ySize << "]\n";
             
-            outputImage = gdalDriver->Create(outputImagePath.c_str(), this->overlap->xSize, this->overlap->ySize, 3, GDT_Float32, NULL);
+            outputImage = gdalDriver->Create(outputImagePath.c_str(), this->overlap->xSize, this->overlap->ySize, 3, GDT_Float32, papszOptions);
             double *gdalTranslation = new double[6];
             gdalTranslation[0] = this->overlap->tlX;
             gdalTranslation[1] = this->overlap->xRes;

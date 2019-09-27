@@ -3340,8 +3340,8 @@ namespace rsgis{namespace img{
 			}
 			
 			// Create new file. 
-			// Set unsupported options to NULL
-			outputImage = poDriver->Create(imageFile.c_str(), xSize, ySize, numBands, imgDataType, NULL);
+            char **papszOptions = this->getGDALCreationOptionsForFormat(gdalFormat);
+			outputImage = poDriver->Create(imageFile.c_str(), xSize, ySize, numBands, imgDataType, papszOptions);
 			
 			if(outputImage == NULL)
 			{
@@ -3458,8 +3458,8 @@ namespace rsgis{namespace img{
 			}
 			
 			// Create new file.
-			// Set unsupported options to NULL
-			outputImage = poDriver->Create(imageFile.c_str(), xSize, ySize, numBands, imgDataType, NULL);
+			char **papszOptions = this->getGDALCreationOptionsForFormat(gdalFormat);
+			outputImage = poDriver->Create(imageFile.c_str(), xSize, ySize, numBands, imgDataType, papszOptions);
 			
 			if(outputImage == NULL)
 			{
@@ -3589,7 +3589,8 @@ namespace rsgis{namespace img{
 			}
 			
 			// Create new file.
-			outputImage = poDriver->Create(imageFile.c_str(), xSize, ySize, numBands, imgDataType, NULL);
+            char **papszOptions = this->getGDALCreationOptionsForFormat(gdalFormat);
+			outputImage = poDriver->Create(imageFile.c_str(), xSize, ySize, numBands, imgDataType, papszOptions);
 			
 			if(outputImage == NULL)
 			{
@@ -3670,6 +3671,7 @@ namespace rsgis{namespace img{
 				std::string message = format + std::string(" image driver is not available.");
 				throw RSGISImageException(message.c_str());
 			}
+            char **papszOptions = this->getGDALCreationOptionsForFormat(format);
 			
 			gdalDriverMetaInfo = gdalDriver->GetMetadata();
 			if(CSLFetchBoolean(gdalDriverMetaInfo, GDAL_DCAP_CREATE, FALSE ))
@@ -3695,8 +3697,7 @@ namespace rsgis{namespace img{
 				*outStrStream << outputFilebase << "_b" << i << ".tif";
 				outImageFile = outStrStream->str();
 				std::cout << "File: " << outImageFile << std::endl;
-
-				outputImage = gdalDriver->Create(outImageFile.c_str(), xSize, ySize, 1, GDT_Float32, NULL);
+				outputImage = gdalDriver->Create(outImageFile.c_str(), xSize, ySize, 1, GDT_Float32, papszOptions);
 				
 				if(outputImage == NULL)
 				{
@@ -3753,6 +3754,7 @@ namespace rsgis{namespace img{
 				std::string message = std::string("Driver for ") + outputFormat + std::string(" does not exist\n");
 				throw RSGISImageException(message.c_str());
 			}
+            char **papszOptions = this->getGDALCreationOptionsForFormat(outputFormat);
 			
 			inDatasets = new GDALDataset*[numImages];
 			for(int i = 0; i < numImages; i++)
@@ -3778,8 +3780,8 @@ namespace rsgis{namespace img{
 			{
 				std::cout << "Converting image " << inputImages[i] << std::endl;
 				numOutBands = inDatasets[i]->GetRasterCount();
-
-				outputImageDS = gdalDriver->Create(outputImages[i].c_str(), stackWidth, stackHeight, numOutBands, GDT_Float32, NULL);
+                
+				outputImageDS = gdalDriver->Create(outputImages[i].c_str(), stackWidth, stackHeight, numOutBands, GDT_Float32, papszOptions);
 				
 				outputImageDS->SetGeoTransform(gdalTranslation);
 				outputImageDS->SetProjection(inDatasets[0]->GetProjectionRef());
@@ -3854,6 +3856,7 @@ namespace rsgis{namespace img{
 				std::string message = std::string("Driver for ") + outputFormat + std::string(" does not exist\n");
 				throw RSGISImageException(message.c_str());
 			}
+            char **papszOptions = this->getGDALCreationOptionsForFormat(outputFormat);
 			
 			inDatasets = new GDALDataset*[numImages];
 			std::cout << imageMask << std::endl;
@@ -3893,7 +3896,7 @@ namespace rsgis{namespace img{
 			{
 				std::cout << "Converting image " << inputImages[i-1] << std::endl;
 				numOutBands = inDatasets[i]->GetRasterCount();
-				outputImageDS = gdalDriver->Create(outputImages[i-1].c_str(), stackWidth, stackHeight, numOutBands, GDT_Float32, NULL);
+				outputImageDS = gdalDriver->Create(outputImages[i-1].c_str(), stackWidth, stackHeight, numOutBands, GDT_Float32, papszOptions);
 				outputImageDS->SetGeoTransform(gdalTranslation);
 				outputImageDS->SetProjection(inDatasets[0]->GetProjectionRef());
 				
@@ -4181,7 +4184,7 @@ namespace rsgis{namespace img{
 				std::string message = std::string("Driver for ENVI does not exist\n");
 				throw RSGISImageException(message.c_str());
 			}
-			
+			char **papszOptions = this->getGDALCreationOptionsForFormat("ENVI");
 			
 			std::cout << "Openning image " << inputImage << std::endl;
 			inDataset = (GDALDataset *) GDALOpenShared(inputImage.c_str(), GA_ReadOnly);
@@ -4205,7 +4208,7 @@ namespace rsgis{namespace img{
 			transformation[5] = -1;
 			
 			std::cout << "Creating image " << outputImage << std::endl;
-			outDataset = gdalDriver->Create(outputImage.c_str(), width, height, numOutBands, GDT_Float32, NULL);
+			outDataset = gdalDriver->Create(outputImage.c_str(), width, height, numOutBands, GDT_Float32, papszOptions);
 			
 			if(outDataset == NULL)
 			{
@@ -4282,7 +4285,7 @@ namespace rsgis{namespace img{
 				std::string message = std::string("Driver for ENVI does not exist\n");
 				throw RSGISImageException(message.c_str());
 			}
-			
+			char **papszOptions = this->getGDALCreationOptionsForFormat("ENVI");
 			
 			std::cout << "Openning image " << inputImage << std::endl;
 			inDataset = (GDALDataset *) GDALOpenShared(inputImage.c_str(), GA_ReadOnly);
@@ -4306,7 +4309,7 @@ namespace rsgis{namespace img{
 			transformation[5] = yRes;
 			
 			std::cout << "Creating image " << outputImage << std::endl;
-			outDataset = gdalDriver->Create(outputImage.c_str(), width, height, numOutBands, GDT_Float32, NULL);
+			outDataset = gdalDriver->Create(outputImage.c_str(), width, height, numOutBands, GDT_Float32, papszOptions);
 			if(outDataset == NULL)
 			{
 				std::string message = std::string("Could not open image ") + outputImage;
@@ -4397,6 +4400,7 @@ namespace rsgis{namespace img{
 				std::string message = std::string("Driver for ENVI does not exist\n");
 				throw RSGISImageException(message.c_str());
 			}
+            char **papszOptions = this->getGDALCreationOptionsForFormat("ENVI");
             
             unsigned int width = dataset->GetRasterXSize();
             unsigned int height = dataset->GetRasterCount();
@@ -4412,7 +4416,7 @@ namespace rsgis{namespace img{
             for(int i = 0; i < dataset->GetRasterYSize(); ++i)
             {
                 std::string outputImage = outputImageBase + mathUtils.inttostring(i) + std::string(".env");
-				outDataset = gdalDriver->Create(outputImage.c_str(), width, height, 1, GDT_Float32, NULL);
+				outDataset = gdalDriver->Create(outputImage.c_str(), width, height, 1, GDT_Float32, papszOptions);
                 if(outDataset == NULL)
                 {
                     std::string message = std::string("Could not open image ") + outputImage;
@@ -4980,7 +4984,8 @@ namespace rsgis{namespace img{
             std::string message = std::string("Driver for ") + outputFormat + std::string(" does not exist\n");
             throw RSGISImageException(message.c_str());
         }
-        GDALDataset *dataset = gdalDriver->Create(outputFilePath.c_str(), width, height, numBands, eType, NULL);
+        char **papszOptions = this->getGDALCreationOptionsForFormat(outputFormat);
+        GDALDataset *dataset = gdalDriver->Create(outputFilePath.c_str(), width, height, numBands, eType, papszOptions);
         if(dataset == NULL)
         {
             delete[] gdalTranslation;
@@ -5019,8 +5024,8 @@ namespace rsgis{namespace img{
             std::string message = std::string("Driver for ") + outputFormat + std::string(" does not exist\n");
             throw RSGISImageException(message.c_str());
         }
-        
-        GDALDataset *dataset = gdalDriver->Create(outputFilePath.c_str(), width, height, numBands, eType, NULL);
+        char **papszOptions = this->getGDALCreationOptionsForFormat(outputFormat);
+        GDALDataset *dataset = gdalDriver->Create(outputFilePath.c_str(), width, height, numBands, eType, papszOptions);
         if(dataset == NULL)
         {
             delete[] gdalTranslation;
@@ -5104,8 +5109,9 @@ namespace rsgis{namespace img{
                 std::string message = std::string("Driver for ") + outputFormat + std::string(" does not exist\n");
                 throw RSGISImageException(message.c_str());
             }
+            char **papszOptions = this->getGDALCreationOptionsForFormat(outputFormat);
             
-            dataset = gdalDriver->Create(outputFilePath.c_str(), outImgWidth, outImgHeight, numBands, eType, NULL);
+            dataset = gdalDriver->Create(outputFilePath.c_str(), outImgWidth, outImgHeight, numBands, eType, papszOptions);
             if(dataset == NULL)
             {
                 delete[] gdalTranslation;
@@ -5168,8 +5174,9 @@ namespace rsgis{namespace img{
                 std::string message = std::string("Driver for ") + outputFormat + std::string(" does not exist\n");
                 throw RSGISImageException(message.c_str());
             }
-                        
-            dataset = gdalDriver->Create(outputFilePath.c_str(), outImgWidth, outImgHeight, numBands, eType, NULL);
+            char **papszOptions = this->getGDALCreationOptionsForFormat(outputFormat);
+            
+            dataset = gdalDriver->Create(outputFilePath.c_str(), outImgWidth, outImgHeight, numBands, eType, papszOptions);
             if(dataset == NULL)
             {
                 delete[] gdalTranslation;
@@ -5224,7 +5231,9 @@ namespace rsgis{namespace img{
                 std::string message = std::string("Driver for ") + outputFormat + std::string(" does not exist\n");
                 throw RSGISImageException(message.c_str());
             }
-            dataset = gdalDriver->Create(outputFilePath.c_str(), width, height, numBands, eType, NULL);
+            char **papszOptions = this->getGDALCreationOptionsForFormat(outputFormat);
+            
+            dataset = gdalDriver->Create(outputFilePath.c_str(), width, height, numBands, eType, papszOptions);
             if(dataset == NULL)
             {
                 delete[] gdalTranslation;
@@ -5650,7 +5659,7 @@ namespace rsgis{namespace img{
         }
     }
 
-    std::map<std::string, std::string> getCreateGDALImgEnvVars(std::string gdalFormat)
+    std::map<std::string, std::string> RSGISImageUtils::getCreateGDALImgEnvVars(std::string gdalFormat)
     {
         std::map<std::string, std::string> gdal_creation_opts;
         std::string var_name = "RSGISLIB_IMG_CRT_OPTS_" + boost::to_upper_copy(gdalFormat);
@@ -5663,6 +5672,7 @@ namespace rsgis{namespace img{
             textUtils.tokenizeString(in_env_var, ':', img_vars);
             for(std::vector<std::string>::iterator iterImgVars = img_vars->begin(); iterImgVars != img_vars->end(); ++iterImgVars )
             {
+                tmp_var->clear();
                 textUtils.tokenizeString((*iterImgVars), '=', tmp_var);
                 if(tmp_var->size() != 2)
                 {
@@ -5686,14 +5696,20 @@ namespace rsgis{namespace img{
         return gdal_creation_opts;
     }
 
-    char** getGDALCreationOptions(std::map<std::string, std::string> gdal_creation_options)
+    char** RSGISImageUtils::getGDALCreationOptions(std::map<std::string, std::string> gdal_creation_options)
     {
         char **papszOptions=NULL;
         for(std::map<std::string, std::string>::iterator iterOpts = gdal_creation_options.begin(); iterOpts != gdal_creation_options.end(); ++iterOpts)
         {
-            std::cout << iterOpts->first << " :: " << iterOpts->second << std::endl;
             papszOptions = CSLSetNameValue(papszOptions, (iterOpts->first).c_str(), (iterOpts->second).c_str());
         }
+        return papszOptions;
+    }
+
+    char** RSGISImageUtils::getGDALCreationOptionsForFormat(std::string gdalFormat)
+    {
+        std::map<std::string, std::string> gdal_creation_options = this->getCreateGDALImgEnvVars(gdalFormat);
+        char **papszOptions = this->getGDALCreationOptions(gdal_creation_options);
         return papszOptions;
     }
 

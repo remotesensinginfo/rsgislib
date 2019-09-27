@@ -153,7 +153,7 @@ Other
 .. autofunction:: rsgislib.imageutils.doImagesOverlap
 .. autofunction:: rsgislib.imageutils.generateRandomPxlValsImg
 .. autofunction:: rsgislib.imageutils.getUniqueValues
-
+.. autofunction:: rsgislib.imageutils.getGDALImageCreationOpts
 
 
 

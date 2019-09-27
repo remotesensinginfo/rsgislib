@@ -102,3 +102,12 @@ Pete Bunting is employed by Aberystwyth University and has been since RSGISLib w
 
 Dan Clewley's PhD (2008 - 2012) at Aberystwyth University was funded by a NERC studentship. Following his PhD he worked on RSGISLib during his postdoc in `Mahta Moghaddam's <http://mixil.usc.edu/people/director/>`_ Microwave Systems Sensors and Imaging Lab (MiXIL) at the University of Southern California, which was primarily funded through a NASA-ESDR award.
 
+**How do I define Image Creation Options**
+
+GDAL allows creation options to be defined and these are defined on a per format basis. RSGISLib can use these when creating output file by defining an environment variable. Variables should have the name RSGISLIB_IMG_CRT_OPTS_<GDAL_FORMAT> where a key value pairs separated by colons (:) is provided. The gdal format string must be upper case. Common examples include::
+
+    export RSGISLIB_IMG_CRT_OPTS_GTIFF=TILED=YES:COMPRESS=LZW:BIGTIFF=YES
+    export RSGISLIB_IMG_CRT_OPTS_HFA=COMPRESSED=YES:USE_SPILL=YES:AUX=NO:STATISTICS=YES
+
+See the GDAL pages for the options available for an individual format.
+

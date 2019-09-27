@@ -36,6 +36,8 @@
 
 #include "common/RSGISRegistrationException.h"
 
+#include "img/RSGISImageUtils.h"
+
 #include "registration/RSGISImageRegistration.h"
 
 #include "boost/math/special_functions/fpclassify.hpp"
