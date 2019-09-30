@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 """
 These utilities allow for a more 'intelligent tiling process to be carried out:
 

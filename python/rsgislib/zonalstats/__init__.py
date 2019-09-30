@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 The zonal stats module provides functions to perform pixel-in-polygon or point-in-pixel analysis. 
 

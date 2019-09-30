@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 The changedetect module provides tools for change detection using remotely sensed imagery.
 """

@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 This namespace contains rsgislib Python bindings 
 

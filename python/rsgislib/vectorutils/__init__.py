@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 The vector utils module performs geometry / attribute table operations on vectors.
 """

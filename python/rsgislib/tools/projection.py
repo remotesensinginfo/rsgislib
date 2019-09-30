@@ -1,8 +1,8 @@
+#!/usr/bin/env python
 """
 The tools.projection module contains some useful tools for working with projections.
 """
 
-# Import numpy
 import numpy
 
 haveGDALPy = True

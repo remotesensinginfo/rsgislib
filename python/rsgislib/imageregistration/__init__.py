@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 The image registration module contains algorithms for generating tie points matching two image and warping images based on tie points.
 
