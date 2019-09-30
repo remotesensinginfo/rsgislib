@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 The imagecalc module contains functions for performing a number of calculating on images.
 """

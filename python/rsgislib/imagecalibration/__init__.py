@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 The image calibration module contains functions for calibrating optical data from DN to radience and top of atmosphere reflectance and, using coefficients from 6S, surface reflectance.
 

@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 The segmentation module contains the segmentation functionality for RSGISLib.
 

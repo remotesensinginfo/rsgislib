@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 The tools.visualisation module contains functions for aiding visualisation of data.
 """

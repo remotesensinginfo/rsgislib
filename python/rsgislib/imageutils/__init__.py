@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 The imageutils module contains general utilities for applying to images.
 """
