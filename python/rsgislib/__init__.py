@@ -791,11 +791,13 @@ class RSGISPyUtils (object):
         :return: x, y. (note if returning long, lat you might need to invert)
 
         """
-        wktPt = 'POINT(%s %s)' % (x, y)
+        if inProjOSRObj.EPSGTreatsAsLatLong():
+            wktPt = 'POINT(%s %s)' % (y, x)
+        else:
+            wktPt = 'POINT(%s %s)' % (x, y)
         point = ogr.CreateGeometryFromWkt(wktPt)
         point.AssignSpatialReference(inProjOSRObj)
         point.TransformTo(outProjOSRObj)
-
         if outProjOSRObj.EPSGTreatsAsLatLong():
             outX = point.GetY()
             outY = point.GetX()
