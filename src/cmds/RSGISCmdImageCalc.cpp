@@ -2423,14 +2423,14 @@ namespace rsgis{ namespace cmds {
             }
             else
             {
-                OGREnvlope *inBBOX = new OGREnvlope();
+                OGREnvelope *inBBOX = new OGREnvelope();
                 inBBOX->MinX = longMin;
                 inBBOX->MaxX = longMax;
                 inBBOX->MinY = latMin;
                 inBBOX->MaxY = latMax;
-                OGREnvlope *outBBOX = new OGREnvlope();
+                OGREnvelope *outBBOX = new OGREnvelope();
                 rsgis::math::RSGISCoordsTransform coord_transform = rsgis::math::RSGISCoordsTransform();
-                coord_transform.transformBBOX(&latLongSpatRef, &imgSpatRef, inBBOX, outBBOX)
+                coord_transform.transformBBOX(&latLongSpatRef, &imgSpatRef, inBBOX, outBBOX);
                 minX = outBBOX->MinX;
                 maxX = outBBOX->MaxX;
                 minY = outBBOX->MinY;
@@ -2572,14 +2572,14 @@ namespace rsgis{ namespace cmds {
             }
             else
             {
-                OGREnvlope *inBBOX = new OGREnvlope();
+                OGREnvelope *inBBOX = new OGREnvelope();
                 inBBOX->MinX = longMin;
                 inBBOX->MaxX = longMax;
                 inBBOX->MinY = latMin;
                 inBBOX->MaxY = latMax;
-                OGREnvlope *outBBOX = new OGREnvlope();
+                OGREnvelope *outBBOX = new OGREnvelope();
                 rsgis::math::RSGISCoordsTransform coord_transform = rsgis::math::RSGISCoordsTransform();
-                coord_transform.transformBBOX(&latLongSpatRef, &imgSpatRef, inBBOX, outBBOX)
+                coord_transform.transformBBOX(&latLongSpatRef, &imgSpatRef, inBBOX, outBBOX);
                 minX = outBBOX->MinX;
                 maxX = outBBOX->MaxX;
                 minY = outBBOX->MinY;
