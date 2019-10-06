@@ -1525,7 +1525,7 @@ void RSGISCoordsTransform::transformPoint(OGRSpatialReference *input_spat_ref, O
     double convert_x_val = 0.0;
     double convert_y_val = 0.0;
     
-    if(input_spat_ref.EPSGTreatsAsLatLong())
+    if(input_spat_ref->EPSGTreatsAsLatLong())
     {
         convert_x_val = inY;
         convert_y_val = inX;
@@ -1541,7 +1541,7 @@ void RSGISCoordsTransform::transformPoint(OGRSpatialReference *input_spat_ref, O
         throw rsgis::RSGISException("Coordinate System Transformation failed.");
     }
     
-    if(output_spat_ref.EPSGTreatsAsLatLong())
+    if(output_spat_ref->EPSGTreatsAsLatLong())
     {
         (*outX) = convert_y_val;
         (*outY) = convert_x_val;
@@ -1553,7 +1553,7 @@ void RSGISCoordsTransform::transformPoint(OGRSpatialReference *input_spat_ref, O
     }
 }
 
-void RSGISCoordsTransform::transformBBOX(OGRSpatialReference &input_spat_ref, OGRSpatialReference &output_spat_ref, OGREnvlope *inBBOX, OGREnvlope *outBBOX)
+void RSGISCoordsTransform::transformBBOX(OGRSpatialReference *input_spat_ref, OGRSpatialReference *output_spat_ref, OGREnvelope *inBBOX, OGREnvelope *outBBOX)
 {
     double in_tlX = inBBOX->MinX;
     double in_tlY = inBBOX->MaxY;
@@ -1584,21 +1584,29 @@ void RSGISCoordsTransform::transformBBOX(OGRSpatialReference &input_spat_ref, OG
     double minY = 0.0;
     double maxY = 0.0;
     
-    minX = out_tlX
-    if in_blX < minX:
-        minX = in_blX
+    minX = out_tlX;
+    if(in_blX < minX)
+    {
+        minX = in_blX;
+    }
 
-    maxX = out_trX
-    if out_brX > maxX:
-        maxX = out_brX
+    maxX = out_trX;
+    if(out_brX > maxX)
+    {
+        maxX = out_brX;
+    }
 
-    minY = out_brY
-    if out_blY < minY:
-        minY = out_blY
+    minY = out_brY;
+    if(out_blY < minY)
+    {
+        minY = out_blY;
+    }
 
-    maxY = out_tlY
-    if out_trY > maxY:
-        maxY = out_trY
+    maxY = out_tlY;
+    if(out_trY > maxY)
+    {
+        maxY = out_trY;
+    }
 
     outBBOX->MinX = minX;
     outBBOX->MaxX = maxX;

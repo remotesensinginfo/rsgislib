@@ -193,9 +193,9 @@ class DllExport RSGISCoordsTransform
 public:
     RSGISCoordsTransform(){};
     void transformPoint(OGRSpatialReference *input_spat_ref, OGRSpatialReference *output_spat_ref, double inX, double inY, double *outX, double *outY);
-    void transformBBOX(OGRSpatialReference *input_spat_ref, OGRSpatialReference *output_spat_ref, OGREnvlope inBBOX, OGREnvlope *outBBOX);
+    void transformBBOX(OGRSpatialReference *input_spat_ref, OGRSpatialReference *output_spat_ref, OGREnvelope *inBBOX, OGREnvelope *outBBOX);
     ~RSGISCoordsTransform(){};
-}
+};
 	
 }}
 
