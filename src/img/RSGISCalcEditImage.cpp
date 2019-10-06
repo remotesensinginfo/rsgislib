@@ -242,9 +242,7 @@ namespace rsgis
                 }
 
                 rasterBands[0]->GetBlockSize (&xBlockSize, &yBlockSize);
-                
-                std::cout << "Max. block size: " << yBlockSize << std::endl;
-                
+                                
                 // Allocate memory
                 inputData = new float*[numBands];
                 for(int i = 0; i < numBands; i++)

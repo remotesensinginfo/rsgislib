@@ -41,6 +41,9 @@
 #include "math/RSGISVectors.h"
 #include "math/RSGISMatrices.h"
 
+#include "ogrsf_frmts.h"
+#include "ogr_api.h"
+
 // mark all exported classes/functions with DllExport to have
 // them exported by Visual Studio
 #undef DllExport
@@ -183,6 +186,16 @@ namespace rsgis{namespace math{
             void performLinearFit(double *xData, double *yData, size_t nVals, double noDataVal, RSGISLinearFitVals *fitVals);
             double predFromLinearFit(double val, RSGISLinearFitVals *fitVals, double minAccVal, double maxAccVal);
 		};
+
+
+class DllExport RSGISCoordsTransform
+{
+public:
+    RSGISCoordsTransform(){};
+    void transformPoint(OGRSpatialReference *input_spat_ref, OGRSpatialReference *output_spat_ref, double inX, double inY, double *outX, double *outY);
+    void transformBBOX(OGRSpatialReference *input_spat_ref, OGRSpatialReference *output_spat_ref, OGREnvlope inBBOX, OGREnvlope *outBBOX);
+    ~RSGISCoordsTransform(){};
+}
 	
 }}
 

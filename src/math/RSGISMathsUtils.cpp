@@ -1512,6 +1512,100 @@ namespace rsgis{namespace math{
         
         return outVal;
     }
+
+
+
+
+
+
+void RSGISCoordsTransform::transformPoint(OGRSpatialReference *input_spat_ref, OGRSpatialReference *output_spat_ref, double inX, double inY, double *outX, double *outY)
+{
+    OGRCoordinateTransformation *poCT = OGRCreateCoordinateTransformation(input_spat_ref, output_spat_ref);
+    
+    double convert_x_val = 0.0;
+    double convert_y_val = 0.0;
+    
+    if(input_spat_ref.EPSGTreatsAsLatLong())
+    {
+        convert_x_val = inY;
+        convert_y_val = inX;
+    }
+    else
+    {
+        convert_x_val = inX;
+        convert_y_val = inY;
+    }
+    
+    if( poCT == NULL || !poCT->Transform( 1, &convert_x_val, &convert_y_val ) )
+    {
+        throw rsgis::RSGISException("Coordinate System Transformation failed.");
+    }
+    
+    if(output_spat_ref.EPSGTreatsAsLatLong())
+    {
+        (*outX) = convert_y_val;
+        (*outY) = convert_x_val;
+    }
+    else
+    {
+        (*outX) = convert_x_val;
+        (*outY) = convert_y_val;
+    }
+}
+
+void RSGISCoordsTransform::transformBBOX(OGRSpatialReference &input_spat_ref, OGRSpatialReference &output_spat_ref, OGREnvlope *inBBOX, OGREnvlope *outBBOX)
+{
+    double in_tlX = inBBOX->MinX;
+    double in_tlY = inBBOX->MaxY;
+    double out_tlX = 0.0;
+    double out_tlY = 0.0;
+    this->transformPoint(input_spat_ref, output_spat_ref, in_tlX, in_tlY, &out_tlX, &out_tlY);
+
+    double in_trX = inBBOX->MaxX;
+    double in_trY = inBBOX->MaxY;
+    double out_trX = 0.0;
+    double out_trY = 0.0;
+    this->transformPoint(input_spat_ref, output_spat_ref, in_trX, in_trY, &out_trX, &out_trY);
+    
+    double in_blX = inBBOX->MinX;
+    double in_blY = inBBOX->MinY;
+    double out_blX = 0.0;
+    double out_blY = 0.0;
+    this->transformPoint(input_spat_ref, output_spat_ref, in_blY, in_trY, &out_blX, &out_blY);
+    
+    double in_brX = inBBOX->MaxX;
+    double in_brY = inBBOX->MinY;
+    double out_brX = 0.0;
+    double out_brY = 0.0;
+    this->transformPoint(input_spat_ref, output_spat_ref, in_brX, in_brY, &out_brX, &out_brY);
+    
+    double minX = 0.0;
+    double maxX = 0.0;
+    double minY = 0.0;
+    double maxY = 0.0;
+    
+    minX = out_tlX
+    if in_blX < minX:
+        minX = in_blX
+
+    maxX = out_trX
+    if out_brX > maxX:
+        maxX = out_brX
+
+    minY = out_brY
+    if out_blY < minY:
+        minY = out_blY
+
+    maxY = out_tlY
+    if out_trY > maxY:
+        maxY = out_trY
+
+    outBBOX->MinX = minX;
+    outBBOX->MaxX = maxX;
+    outBBOX->MinY = minY;
+    outBBOX->MaxY = maxY;
+}
+
     
 }}
 
