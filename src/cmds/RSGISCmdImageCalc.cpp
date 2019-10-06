@@ -58,6 +58,7 @@
 
 #include "math/RSGISVectors.h"
 #include "math/RSGISMatrices.h"
+#include "math/RSGISMathsUtils.h"
 
 #include "utils/RSGISTextUtils.h"
 #include "utils/RSGISFileUtils.h"
@@ -2422,6 +2423,20 @@ namespace rsgis{ namespace cmds {
             }
             else
             {
+                OGREnvlope *inBBOX = new OGREnvlope();
+                inBBOX->MinX = longMin;
+                inBBOX->MaxX = longMax;
+                inBBOX->MinY = latMin;
+                inBBOX->MaxY = latMax;
+                OGREnvlope *outBBOX = new OGREnvlope();
+                rsgis::math::RSGISCoordsTransform coord_transform = rsgis::math::RSGISCoordsTransform();
+                coord_transform.transformBBOX(&latLongSpatRef, &imgSpatRef, inBBOX, outBBOX)
+                minX = outBBOX->MinX;
+                maxX = outBBOX->MaxX;
+                minY = outBBOX->MinY;
+                maxY = outBBOX->MaxX;
+
+                /*
                 // Convert bbox to the same projection as the input image...
                 std::cout << "Converting Image Projection\n";
                 OGRCoordinateTransformation *poCT = OGRCreateCoordinateTransformation( &latLongSpatRef, &imgSpatRef );
@@ -2469,6 +2484,7 @@ namespace rsgis{ namespace cmds {
                     minY = yMinLatCon;
                     maxY = yMaxLatCon;
                 }
+                */
             }
             
             rsgis::img::ImageStats **imgStats = new rsgis::img::ImageStats*[numImageBands];
@@ -2556,6 +2572,19 @@ namespace rsgis{ namespace cmds {
             }
             else
             {
+                OGREnvlope *inBBOX = new OGREnvlope();
+                inBBOX->MinX = longMin;
+                inBBOX->MaxX = longMax;
+                inBBOX->MinY = latMin;
+                inBBOX->MaxY = latMax;
+                OGREnvlope *outBBOX = new OGREnvlope();
+                rsgis::math::RSGISCoordsTransform coord_transform = rsgis::math::RSGISCoordsTransform();
+                coord_transform.transformBBOX(&latLongSpatRef, &imgSpatRef, inBBOX, outBBOX)
+                minX = outBBOX->MinX;
+                maxX = outBBOX->MaxX;
+                minY = outBBOX->MinY;
+                maxY = outBBOX->MaxX;
+                /*
                 // Convert bbox to the same projection as the input image...
                 std::cout << "Converting Image Projection\n";
                 OGRCoordinateTransformation *poCT = OGRCreateCoordinateTransformation( &latLongSpatRef, &imgSpatRef );
@@ -2598,6 +2627,7 @@ namespace rsgis{ namespace cmds {
                     minY = yMinLatCon;
                     maxY = yMaxLatCon;
                 }
+                */
             }
             
             double xRange = maxX - minX;

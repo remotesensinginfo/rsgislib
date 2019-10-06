@@ -426,7 +426,6 @@ namespace rsgis{namespace img{
             {
                 yBlockSize = outYBlockSize;
             }
-            std::cout << "Max. block size: " << yBlockSize << std::endl;
             
 			// Allocate memory
 			inputData = new float*[numInBands];
