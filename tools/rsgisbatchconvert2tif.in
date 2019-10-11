@@ -1,0 +1,81 @@
+#!/bin/sh
+#############################################
+# rsgisbatchconvert2tif.sh
+#
+#  Copyright 2019 RSGISLib.
+#
+#  RSGISLib: 'The remote sensing and GIS Software Library'
+#
+#  RSGISLib is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  RSGISLib is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with RSGISLib.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Purpose:  Batch convert input images files to GeoTIFF.
+#
+# Author: Pete Bunting
+# Email: petebunting@mac.com
+# Date: 08/10/2019
+# Version: 1.0
+# 
+#############################################
+
+# Define default paths.
+INPUT="."
+OUTPUT="."
+EXT=".kea"
+
+usage()
+{
+    cat <<EOF
+Usage: rsgis-config [OPTIONS]
+Options (at least one needs to be provided):
+     [--input] - input directory (default .)
+     [--output] - output directory (default .)
+     [--ext] - input file extension (default .kea)
+EOF
+    exit $1
+}
+if test $# -eq 0; then
+  usage 1 1>&2
+fi
+while test $# -gt 0; do
+case "$1" in
+    -*=*) optarg=`echo "$1" | sed 's/[-_a-zA-Z0-9]*=//'` ;;
+    *) optarg= ;;
+esac
+case $1 in
+    --input)
+      INPUT="$2"
+     ;;
+    --output)
+      OUTPUT="$2"
+     ;;
+    --ext)
+      EXT="$2" 
+     ;;
+  esac
+  shift
+done
+
+echo Input directory: ${INPUT}
+echo Output directory: ${OUTPUT}
+echo Input file extension: ${EXT}
+
+
+FILES=${INPUT}/*${EXT}
+for f in $FILES
+do
+  echo "Processing $f file..."
+  filename=`basename ${f} ${EXT}`
+  echo "Output: ${OUTPUT}/${filename}.tif"
+  gdal_translate -of GTIFF -co TILED=YES -co COMPRESS=LZW -co BIGTIFF=IF_SAFER -co COPY_SRC_OVERVIEWS=YES ${f} ${OUTPUT}/${filename}.tif
+done
