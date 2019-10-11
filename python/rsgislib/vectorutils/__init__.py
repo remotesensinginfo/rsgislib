@@ -2815,3 +2815,55 @@ def copyRATCols2VectorLyr(vec_file, vec_lyr, rat_row_col, clumps_img, ratcols, o
     vec_lyr_obj.SyncToDisk()
     vecDS = None
     clumps_img_ds = None
+
+
+def performSpatialJoin(base_vec_file, join_vec_file, output_vec_file, base_lyr=None, join_lyr=None, output_lyr=None,
+                           outVecDrvr=None, join_how="inner", join_op="within"):
+    """
+    A function to perform a spatial join between two vector layers. This function uses geopandas so this needs
+    to be installed. You also need to have the rtree package to generate the index used to perform the intersection.
+
+    For more information see: http://geopandas.org/mergingdata.html#spatial-joins
+
+    :param base_vec_file: the base vector file with the geometries which will be outputted.
+    :param join_vec_file: the vector with the attributes which will be joined to the base vector geometries.
+    :param output_vec_file: the output vector file.
+    :param base_lyr: the layer name for the base vector, not needed if input file is a shapefile (Default None).
+    :param join_lyr: the layer name for the join vector, not needed if input file is a shapefile (Default None).
+    :param output_lyr: the layer name for the output vector, not needed if input file is a shapefile (Default None).
+    :param outVecDrvr: The output vector file format, if none then shapefile outputted (Default None)
+    :param join_how: Specifies the type of join that will occur and which geometry is retained. The options are
+                    [left, right, inner]. The default is 'inner'
+    :param join_op: Defines whether or not to join the attributes of one object to another.
+                   The options are [intersects, within, contains] and default is 'within'
+    """
+    if join_how not in ['left', 'right', 'inner']:
+        raise Exception('The join_how specifed is not valid.')
+    if join_op not in ['intersects', 'within', 'contains']:
+        raise Exception('The join_op specifed is not valid.')
+
+    import geopandas # Import geopandas module.
+    import rtree # this is imported to provide useful error message as will be used in sjoin but if not present
+                 # the error message is not very user friendly:
+                 # AttributeError: 'NoneType' object has no attribute 'intersection'
+
+    if base_lyr is None:
+        base_gpd_df = geopandas.read_file(base_vec_file)
+    else:
+        base_gpd_df = geopandas.read_file(base_vec_file, layer=base_lyr)
+
+    if join_lyr is None:
+        join_gpg_df = geopandas.read_file(join_vec_file)
+    else:
+        join_gpg_df = geopandas.read_file(join_vec_file, layer=join_lyr)
+
+    join_gpg_df = geopandas.sjoin(base_gpd_df, join_gpg_df, how=join_how, op=join_op)
+
+    if outVecDrvr is None:
+        join_gpg_df.to_file(output_vec_file)
+    else:
+        if output_lyr is None:
+            join_gpg_df.to_file(output_vec_file, driver=outVecDrvr)
+        else:
+            join_gpg_df.to_file(output_vec_file, layer=output_lyr, driver=outVecDrvr)
+
