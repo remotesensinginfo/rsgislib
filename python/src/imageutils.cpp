@@ -137,6 +137,33 @@ static PyObject *ImageUtils_StretchImage(PyObject *self, PyObject *args, PyObjec
     Py_RETURN_NONE;
 }
 
+static PyObject *ImageUtils_StretchImageNoData(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    static char *kwlist[] = {"inputimage", "outputimage", "saveoutstats", "outstatsfile", "nodataval", "onepasssd", "gdalformat", "datatype", "stretchtype", "stretchparam", NULL};
+    const char *pszInputImage, *pszOutputFile, *pszGDALFormat, *pszOutStatsFile;
+    int saveOutStats, onePassSD;
+    int nOutDataType, nStretchType;
+    float fStretchParam = 2.0;
+    float inNoData = 0.0;
+    
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssisfisii|f:stretchImageNoData", kwlist, &pszInputImage, &pszOutputFile, &saveOutStats, &pszOutStatsFile, &inNoData, &onePassSD, &pszGDALFormat, &nOutDataType, &nStretchType, &fStretchParam))
+    {
+        return NULL;
+    }
+
+    try
+    {
+        rsgis::cmds::executeStretchImageNoData(pszInputImage, pszOutputFile, inNoData, saveOutStats, pszOutStatsFile, onePassSD, pszGDALFormat, (rsgis::RSGISLibDataType)nOutDataType, (rsgis::cmds::RSGISStretches)nStretchType, fStretchParam);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
+
 static PyObject *ImageUtils_StretchImageWithStats(PyObject *self, PyObject *args, PyObject *keywds)
 {
     static char *kwlist[] = {"inputimage", "outputimage", "instatsfile", "gdalformat", "datatype", "stretchtype", "stretchparam", NULL};
@@ -153,6 +180,33 @@ static PyObject *ImageUtils_StretchImageWithStats(PyObject *self, PyObject *args
     try
     {
         rsgis::cmds::executeStretchImageWithStats(pszInputImage, pszOutputFile, pszInStatsFile, pszGDALFormat, (rsgis::RSGISLibDataType)nOutDataType, (rsgis::cmds::RSGISStretches)nStretchType, fStretchParam);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
+
+static PyObject *ImageUtils_StretchImageWithStatsNoData(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    static char *kwlist[] = {"inputimage", "outputimage", "instatsfile", "gdalformat", "datatype", "nodataval", "stretchtype", "stretchparam", NULL};
+    
+    const char *pszInputImage, *pszOutputFile, *pszGDALFormat, *pszInStatsFile;
+    int nOutDataType, nStretchType;
+    float fStretchParam = 2.0;
+    float nodataval = 0.0;
+    
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssifi|f:stretchImageWithStatsNoData", kwlist, &pszInputImage, &pszOutputFile, &pszInStatsFile, &pszGDALFormat, &nOutDataType, &nodataval, &nStretchType, &fStretchParam))
+    {
+        return NULL;
+    }
+
+    try
+    {
+        rsgis::cmds::executeStretchImageWithStatsNoData(pszInputImage, pszOutputFile, pszInStatsFile, pszGDALFormat, (rsgis::RSGISLibDataType)nOutDataType, (rsgis::cmds::RSGISStretches)nStretchType, fStretchParam, nodataval);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -2097,6 +2151,41 @@ static PyMethodDef ImageUtilsMethods[] = {
 "   datatype = rsgislib.TYPE_8INT\n"
 "   imageutils.stretchImage(inputImage, outputImage, False, '', True, False, gdalformat, datatype, imageutils.STRETCH_LINEARSTDDEV, 2)\n"
 "\n"},
+    
+{"stretchImageNoData", (PyCFunction)ImageUtils_StretchImageNoData, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.stretchImageNoData(inputimage, outputimage, saveoutstats, outstatsfile, nodataval, onepasssd, gdalformat, datatype, stretchtype, stretchparam)\n"
+"Stretches (scales) pixel values to a range of 0 - 255, which is typically for visualisation but the function can also be used for normalisation.\n"
+"\n"
+"Where:\n"
+"\n"
+":param inputImage: is a string containing the name of the input file\n"
+":param outputImage: is a string containing the name of the output file\n"
+":param saveoutstats: is a bool specifying if stats should be saved to a text file.\n"
+":param outstatsfile: is a string providing the name of the file to save stats to.\n"
+":param nodataval: is a float specifying the no data value of the input image.\n"
+":param onepasssd: is a bool specifying if is single pass should be used for calculating standard deviation (faster but less accurate)\n"
+":param gdalformat: is a string providing the output gdalformat of the tiles (e.g., KEA).\n"
+":param datatype: is a rsgislib.TYPE_* value providing the output data type.\n"
+":param stretchtype: is a STRETCH_* value providing the type of stretch, options are:\n"
+"        * imageutils.STRETCH_LINEARMINMAX - Stretches between min and max.\n"
+"        * imageutils.STRETCH_LINEARPERCENT - Stretches between percentage of image range. Parameter defines percent.\n"
+"        * imageutils.STRETCH_LINEARSTDDEV - Stretches between mean - sd to mean + sd. Parameter defines number of standard deviations.\n"
+"        * imageutils.STRETCH_EXPONENTIAL - Exponential stretch between mean - 2*sd to mean + 2*sd. No parameter.\n"
+"        * imageutils.STRETCH_LOGARITHMIC - Logarithmic stretch between mean - 2*sd to mean + 2*sd. No parameter.\n"
+"        * imageutils.STRETCH_POWERLAW - Power law stretch between mean - 2*sd to mean + 2*sd. Parameter defines power.\n"
+":param stretchparam: is a float, providing the input parameter to the stretch (if required).\n"
+"\n"
+"Example::\n"
+"\n"
+"   import rsgislib\n"
+"   from rsgislib import imageutils\n"
+"   inputImage = './Rasters/injune_p142_casi_sub_utm.kea'\n"
+"   outputImage = './TestOutputs/injune_p142_casi_sub_utm_2sd.kea'\n"
+"   gdalformat = 'KEA'\n"
+"   datatype = rsgislib.TYPE_8INT\n"
+"   nodataval = 0.0\n"
+"   imageutils.stretchImage(inputImage, outputImage, False, '', nodataval, False, gdalformat, datatype, imageutils.STRETCH_LINEARSTDDEV, 2)\n"
+"\n"},
 
 {"stretchImageWithStats", (PyCFunction)ImageUtils_StretchImageWithStats, METH_VARARGS | METH_KEYWORDS,
 "rsgislib.imageutils.stretchImageWithStats(inputimage, outputimage, instatsfile, gdalformat, datatype, stretchtype, stretchparam)\n"
@@ -2134,6 +2223,45 @@ static PyMethodDef ImageUtilsMethods[] = {
 "\n"
 "\n"},
 
+{"stretchImageWithStatsNoData", (PyCFunction)ImageUtils_StretchImageWithStatsNoData, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.stretchImageWithStatsNoData(inputimage, outputimage, instatsfile, gdalformat, datatype, nodataval, stretchtype, stretchparam)\n"
+"Stretches (scales) pixel values to a range of 0 - 255, which is typically for visualisation but the function can also be used for normalisation.\n"
+"This function uses pre-calculated statistics - normally from rsgislib.imageutils.stretchImage.\n"
+"\n"
+"Where:\n"
+"\n"
+":param inputImage: is a string containing the name of the input file\n"
+":param outputImage: is a string containing the name of the output file\n"
+":param instatsfile: is a string providing the name of the file to read stats from.\n"
+":param ignorezeros: is a bool specifying if pixels with a value of zero should be ignored.\n"
+":param onepasssd: is a bool specifying if is single pass should be used for calculating standard deviation (faster but less accurate)\n"
+":param gdalformat: is a string providing the output gdalformat of the tiles (e.g., KEA).\n"
+":param datatype: is a rsgislib.TYPE_* value providing the output data type.\n"
+":param nodataval: is a float with the no data value of the input image.\n"
+":param stretchtype: is a STRETCH_* value providing the type of stretch, options are:\n"
+"        * imageutils.STRETCH_LINEARMINMAX - Stretches between min and max.\n"
+"        * imageutils.STRETCH_LINEARPERCENT - Stretches between percentage of image range. Parameter defines percent.\n"
+"        * imageutils.STRETCH_LINEARSTDDEV - Stretches between mean - sd to mean + sd. Parameter defines number of standard deviations.\n"
+"        * imageutils.STRETCH_EXPONENTIAL - Exponential stretch between mean - 2*sd to mean + 2*sd. No parameter.\n"
+"        * imageutils.STRETCH_LOGARITHMIC - Logarithmic stretch between mean - 2*sd to mean + 2*sd. No parameter.\n"
+"        * imageutils.STRETCH_POWERLAW - Power law stretch between mean - 2*sd to mean + 2*sd. Parameter defines power.\n"
+":param stretchparam: is a float, providing the input parameter to the stretch (if required).\n"
+"\n"
+"Example::\n"
+"\n"
+"   import rsgislib\n"
+"   from rsgislib import imageutils\n"
+"   inputImage = './Rasters/injune_p142_casi_sub_utm.kea'\n"
+"   inputImageStats = './Rasters/injune_p142_casi_sub_utm_stats.txt'\n"
+"   outputImage = './TestOutputs/injune_p142_casi_sub_utm_2sd.kea'\n"
+"   gdalformat = 'KEA'\n"
+"   datatype = rsgislib.TYPE_8UINT\n"
+"   nodataval = 0.0\n"
+"   imageutils.stretchImageWithStatsNoData(inputImage, outputImage, inputImageStats, True, False, gdalformat, datatype, nodataval, imageutils.STRETCH_LINEARSTDDEV, 2)\n"
+"\n"
+"\n"},
+    
+    
 {"normaliseImagePxlVals", (PyCFunction)ImageUtils_NormaliseImagePxlVals, METH_VARARGS | METH_KEYWORDS,
 "rsgislib.imageutils.normaliseImagePxlVals(inputimage=string, outputimage=string, gdalformat=string, datatype=rsgislib.TYPE_*, innodataval=float, outnodataval=float, outmin=float, outmax=float, stretchtype=imageutils.STRETCH_*, stretchparam=float)\n"
 "Normalises the image pixel values to a range of outmin to outmax (default 0-1) where the no data value is specified by the user.\n"

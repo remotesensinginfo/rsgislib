@@ -207,13 +207,14 @@ def createWebTilesImg(inputImg, bands, outputDIR, zoomLevels='2-10', img_stats_m
                                       rsgisUtils.getRSGISLibDataTypeFromImg(inputImg), img_no_data_val, img_msk_vals)
         stretchImgStats = os.path.join(tmpDIR, baseName + '_stretch_statstmp.txt')
         stretchImgTmp = os.path.join(tmpDIR, baseName + '_stretch_tmp.kea')
-        rsgislib.imageutils.stretchImage(img2StchMskd, stretchImgTmp, True, stretchImgStats, True, False, 'KEA',
-                                         rsgislib.TYPE_8UINT, rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
+        rsgislib.imageutils.stretchImageNoData(img2StchMskd, stretchImgTmp, True, stretchImgStats, img_no_data_val,
+                                               False, 'KEA', rsgislib.TYPE_8UINT,
+                                               rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
 
-        rsgislib.imageutils.stretchImageWithStats(img2Stch, stretchImg, stretchImgStats, 'KEA', rsgislib.TYPE_8UINT,
-                                                  rsgislib.imageutils.STRETCH_LINEARMINMAX, 2)
+        rsgislib.imageutils.stretchImageWithStatsNoData(img2Stch, stretchImg, stretchImgStats, 'KEA', rsgislib.TYPE_8UINT,
+                                                  img_no_data_val, rsgislib.imageutils.STRETCH_LINEARMINMAX, 2)
     else:
-        rsgislib.imageutils.stretchImage(img2Stch, stretchImg, False, '', True, False, 'KEA', rsgislib.TYPE_8UINT,
+        rsgislib.imageutils.stretchImageNoData(img2Stch, stretchImg, False, '', img_no_data_val, False, 'KEA', rsgislib.TYPE_8UINT,
                                          rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
 
     webview_opt = 'none'
@@ -298,14 +299,15 @@ def createQuicklookImgs(inputImg, bands, outputImgs='quicklook.jpg', output_img_
                                       rsgisUtils.getRSGISLibDataTypeFromImg(inputImg), img_no_data_val, img_msk_vals)
         stretchImgStats = os.path.join(tmpDIR, baseName + '_stretch_statstmp.txt')
         stretchImgTmp = os.path.join(tmpDIR, baseName + '_stretch_tmp.kea')
-        rsgislib.imageutils.stretchImage(img2StchMskd, stretchImgTmp, True, stretchImgStats, True, False, 'KEA',
-                                         rsgislib.TYPE_8UINT, rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
+        rsgislib.imageutils.stretchImageNoData(img2StchMskd, stretchImgTmp, True, stretchImgStats, img_no_data_val,
+                                               False, 'KEA', rsgislib.TYPE_8UINT,
+                                               rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
 
-        rsgislib.imageutils.stretchImageWithStats(img2Stch, stretchImg, stretchImgStats, 'KEA', rsgislib.TYPE_8UINT,
-                                                  rsgislib.imageutils.STRETCH_LINEARMINMAX, 2)
+        rsgislib.imageutils.stretchImageWithStatsNoData(img2Stch, stretchImg, stretchImgStats, 'KEA', rsgislib.TYPE_8UINT,
+                                                        img_no_data_val, rsgislib.imageutils.STRETCH_LINEARMINMAX, 2)
     else:
-        rsgislib.imageutils.stretchImage(img2Stch, stretchImg, False, '', True, False, 'KEA', rsgislib.TYPE_8UINT,
-                                         rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
+        rsgislib.imageutils.stretchImageNoData(img2Stch, stretchImg, False, '', img_no_data_val, False, 'KEA',
+                                               rsgislib.TYPE_8UINT, rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
 
 
 
