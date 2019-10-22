@@ -144,7 +144,7 @@ namespace rsgis{ namespace cmds {
             
             double outNoData = 0.0;
             
-            rsgis::img::RSGISStretchImage stretchImg = rsgis::img::RSGISStretchImage(inDataset, outputImage, saveOutStats, outStatsFile, onePassSD, gdalFormat, RSGIS_to_GDAL_Type(outDataType), 0, 255, True, inNoData, outNoData);
+            rsgis::img::RSGISStretchImage stretchImg = rsgis::img::RSGISStretchImage(inDataset, outputImage, saveOutStats, outStatsFile, onePassSD, gdalFormat, RSGIS_to_GDAL_Type(outDataType), 0, 255, true, inNoData, outNoData);
             if(stretchType == linearMinMax)
             {
                 stretchImg.executeLinearMinMaxStretch();
