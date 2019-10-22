@@ -82,9 +82,13 @@ namespace rsgis{ namespace cmds {
     
     /** Function to run the stretch image command */
     DllExport void executeStretchImage(std::string inputImage, std::string outputImage, bool saveOutStats, std::string outStatsFile, bool ignoreZeros, bool onePassSD, std::string gdalFormat, RSGISLibDataType outDataType, RSGISStretches stretchType, float stretchParam);
+
+    DllExport void executeStretchImageNoData(std::string inputImage, std::string outputImage, double inNoData, bool saveOutStats, std::string outStatsFile, bool onePassSD, std::string gdalFormat, RSGISLibDataType outDataType, RSGISStretches stretchType, float stretchParam)
     
     /** Function to run the stretch image command with predefined stretch parameters*/
     DllExport void executeStretchImageWithStats(std::string inputImage, std::string outputImage, std::string inStatsFile, std::string gdalFormat, RSGISLibDataType outDataType, RSGISStretches stretchType, float stretchParam);
+
+    DllExport void executeStretchImageWithStatsNoData(std::string inputImage, std::string outputImage, std::string inStatsFile, std::string gdalFormat, RSGISLibDataType outDataType, RSGISStretches stretchType, float stretchParam, double nodataval)
     
     /** Function to run the stretch image command with predefined stretch parameters*/
     DllExport void executeNormaliseImgPxlVals(std::string inputImage, std::string outputImage, std::string gdalFormat, RSGISLibDataType outDataType, float inNoDataVal, float outNoDataVal, float outMinVal, float outMaxVal, RSGISStretches stretchType, float stretchParam);
