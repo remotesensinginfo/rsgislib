@@ -2443,13 +2443,14 @@ within the vector layer.
     return outenvs
 
 
-def subsetEnvsVecLyrObj(lyrVecObj, bbox):
+def subsetEnvsVecLyrObj(lyrVecObj, bbox, epsg=None):
     """
 Function to get an ogr vector layer for the defined bounding box. The returned
 layer is returned as an in memory ogr Layer object.
 
 :param lyrVecObj: OGR Layer Object.
 :param bbox: region of interest (bounding box). Define as [xMin, xMax, yMin, yMax].
+:param epsg: provide an EPSG code for the layer if not well defined by the input layer.
 
 :return: OGR Layer and Dataset objects.
 
@@ -2457,8 +2458,14 @@ layer is returned as an in memory ogr Layer object.
     gdal.UseExceptions()
     if lyrVecObj is None:
         raise Exception("Vector layer object which was provided was None.")
-        
-    lyr_spatial_ref = lyrVecObj.GetSpatialRef()
+
+    if epsg is not None:
+        lyr_spatial_ref = osr.SpatialReference()
+        lyr_spatial_ref.ImportFromEPSG(epsg)
+    else:
+        lyr_spatial_ref = lyrVecObj.GetSpatialRef()
+    if lyr_spatial_ref is None:
+        raise Exception("The spatial reference for the layer is None - please provide EPSG code.")
     lyrDefn = lyrVecObj.GetLayerDefn()
     
     # Copy the Layer to a new in memory OGR Layer.
@@ -2513,6 +2520,33 @@ layer is returned as an in memory ogr Layer object.
         openTransaction = False
         
     return mem_result_ds, mem_result_lyr
+
+
+def subset_veclyr_to_featboxs(vec_file_bbox, vec_lyr_bbox, vec_file_tosub, vec_lyr_tosub, out_lyr_name, out_file_base, out_file_end='.gpkg', out_file_driver='GPKG'):
+    """
+    A function which subsets an input vector layer using the BBOXs of the features within another vector
+    layer.
+    :param vec_file_bbox: The vector file for the features which define the BBOXs
+    :param vec_lyr_bbox: The vector layer for the features which define the BBOXs
+    :param vec_file_tosub: The vector file for the layer which is to be subset.
+    :param vec_lyr_tosub: The vector layer for the layer which is to be subset.
+    :param out_lyr_name: The layer name for the output files - all output files will have the same layer name.
+    :param out_file_base: The base name for the output files.
+                          A numeric count 0-n will be inserted between this and the ending.
+    :param out_file_end: The output file ending (e.g., .gpkg).
+    :param out_file_driver: The output file driver (e.g., GPKG).
+
+    """
+    bboxes = rsgislib.vectorutils.getFeatEnvs(vec_file_bbox, vec_lyr_bbox)
+    print("There are {} bboxes to subset to.".format(len(bboxes)))
+    for i in range(len(bboxes)):
+        print(bboxes[i])
+        grid_02d_ds, grid_02d_lyr = rsgislib.vectorutils.readVecLyr2Mem(vec_file_tosub, vec_lyr_tosub)
+        mem_result_ds, mem_result_lyr = rsgislib.vectorutils.subsetEnvsVecLyrObj(grid_02d_lyr, bboxes[i])
+        out_vec_file = '{0}{1}{2}'.format(out_file_base, i, out_file_end)
+        rsgislib.vectorutils.writeVecLyr2File(mem_result_lyr, out_vec_file, out_lyr_name, out_file_driver, options=['OVERWRITE=YES'], replace=True)
+        mem_result_ds = None
+        grid_02d_ds = None
 
 
 def readVecLyr2Mem(vecfile, veclyrname):
