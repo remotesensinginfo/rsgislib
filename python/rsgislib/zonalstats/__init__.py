@@ -177,6 +177,8 @@ the polygons then use this function.
         img_wkt_str = imgDS.GetProjection()
         img_spatial_ref = osr.SpatialReference()
         img_spatial_ref.ImportFromWkt(img_wkt_str)
+        img_spatial_ref.AutoIdentifyEPSG()
+        epsg_img_spatial = img_spatial_ref.GetAuthorityCode(None)
         
         pixel_width = imgGeoTrans[1]
         pixel_height = imgGeoTrans[5]
@@ -187,11 +189,11 @@ the polygons then use this function.
         imgNoDataVal = imgband.GetNoDataValue()
 
         veclyr_spatial_ref = veclyr.GetSpatialRef()
-        
-        if not img_spatial_ref.IsSame(veclyr_spatial_ref):
+        epsg_vec_spatial = veclyr_spatial_ref.GetAuthorityCode(None)
+        if epsg_vec_spatial != epsg_img_spatial:
             imgDS = None
             vecDS = None
-            raise Exception("Inputted raster and vector layers have different projections: ('{0}' '{1}') ".format(vecfile, valsimg))
+            raise Exception("Inputted raster and vector layers have different projections: ('{0}' '{1}') ".format('Vector Layer Provided', valsimg))
         
         veclyrDefn = veclyr.GetLayerDefn()
         
@@ -435,6 +437,7 @@ the polygon resolution.
         img_wkt_str = imgDS.GetProjection()
         img_spatial_ref = osr.SpatialReference()
         img_spatial_ref.ImportFromWkt(img_wkt_str)
+        epsg_img_spatial = img_spatial_ref.GetAuthorityCode(None)
         
         pixel_width = imgGeoTrans[1]
         pixel_height = imgGeoTrans[5]
@@ -443,11 +446,11 @@ the polygon resolution.
         imgSizeY = imgDS.RasterYSize
     
         veclyr_spatial_ref = veclyr.GetSpatialRef()
-        
-        if not img_spatial_ref.IsSame(veclyr_spatial_ref):
+        epsg_vec_spatial = veclyr_spatial_ref.GetAuthorityCode(None)
+        if epsg_vec_spatial != epsg_img_spatial:
             imgDS = None
             vecDS = None
-            raise Exception("Inputted raster and vector layers have different projections: ('{0}' '{1}') ".format(vecfile, valsimg))
+            raise Exception("Inputted raster and vector layers have different projections: ('{0}' '{1}') ".format('Vector Layer Provided', valsimg))
         
         veclyrDefn = veclyr.GetLayerDefn()
         
@@ -691,6 +694,7 @@ use this function.
         img_wkt_str = imgDS.GetProjection()
         img_spatial_ref = osr.SpatialReference()
         img_spatial_ref.ImportFromWkt(img_wkt_str)
+        epsg_img_spatial = img_spatial_ref.GetAuthorityCode(None)
         
         pixel_width = imgGeoTrans[1]
         pixel_height = imgGeoTrans[5]
@@ -701,11 +705,11 @@ use this function.
         imgNoDataVal = imgband.GetNoDataValue()
     
         veclyr_spatial_ref = veclyr.GetSpatialRef()
-        
-        if not img_spatial_ref.IsSame(veclyr_spatial_ref):
+        epsg_vec_spatial = veclyr_spatial_ref.GetAuthorityCode(None)
+        if epsg_vec_spatial != epsg_img_spatial:
             imgDS = None
             vecDS = None
-            raise Exception("Inputted raster and vector layers have different projections: ('{0}' '{1}') ".format(vecfile, valsimg))
+            raise Exception("Inputted raster and vector layers have different projections: ('{0}' '{1}') ".format('Vector Layer Provided', valsimg))
         
         veclyrDefn = veclyr.GetLayerDefn()
         
