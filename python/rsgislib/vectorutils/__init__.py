@@ -943,7 +943,8 @@ Where:
 
 def mergeVectorLyrs2GPKG(inputFile, outFile, lyrName, exists):
     """
-Function which will merge a list of vector files into an single output GeoPackage (GPKG) file using ogr2ogr.
+Function which will merge all the layers in the input vector file into an single output GeoPackage (GPKG)
+file using ogr2ogr.
 
 Where:
 
