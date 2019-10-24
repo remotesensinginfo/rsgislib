@@ -92,6 +92,22 @@ def query_img_lut(scn_bbox, lutdbfile, lyrname):
     return imgs
 
 
+def get_all_lut_imgs(lutdbfile, lyrname):
+    """
+    Get a list of all the images within the LUT.
+    :param lutdbfile: The file path to the LUT datbase file (e.g., lut.gpkg).
+    :param lyrname: The layer name within the database file.
+    :return: a list of files from the LUT
+    """
+    import rsgislib.vectorutils
+    fileListLUT = rsgislib.vectorutils.readVecColumns(lutdbfile, lyrname, ['path', 'filename'])
+    imgs = []
+    for item in fileListLUT:
+        print(item)
+        imgs.append(os.path.join(item['path'], item['filename']))
+    return imgs
+
+
 def getRasterLyr(scn_bbox, lutdbfile, lyrname, tmp_path):
     """
     This function provides a single raster layer using the LUT file provided. If

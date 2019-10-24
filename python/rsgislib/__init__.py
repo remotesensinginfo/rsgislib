@@ -251,7 +251,26 @@ class RSGISPyUtils (object):
             raise RSGISPyException('Type not recognised')
         
         return gdalStr
-    
+
+    def get_file_basename(self, filepath, checkvalid=False):
+        """
+        Uses os.path module to return file basename (i.e., path and extension removed)
+        :param filepath: string for the input file name and path
+        :param checkvalid: if True then resulting basename will be checked for punctuation
+                            characters (other than underscores) and spaces, punctuation
+                            will be either removed and spaces changed to an underscore.
+                           (Default = False)
+        :return: basename for file
+        """
+        import string
+        basename = os.path.splitext(os.path.basename(filepath))[0]
+        if checkvalid:
+            basename = basename.replace(' ', '_')
+            for punch in string.punctuation:
+                if punch != '_':
+                    basename = basename.replace(punch, '')
+        return basename
+
     def getRSGISLibDataTypeFromImg(self, inImg):
         """
         Returns the rsgislib datatype ENUM (e.g., rsgislib.TYPE_8INT) 
