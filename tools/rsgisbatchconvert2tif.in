@@ -66,9 +66,9 @@ case $1 in
   shift
 done
 
-echo Input directory: ${INPUT}
-echo Output directory: ${OUTPUT}
-echo Input file extension: ${EXT}
+echo "Input directory: ${INPUT}"
+echo "Output directory: ${OUTPUT}"
+echo "Input file extension: ${EXT}"
 
 
 FILES=${INPUT}/*${EXT}
