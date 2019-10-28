@@ -2413,6 +2413,8 @@ namespace rsgis{ namespace cmds {
             double minY = 0.0;
             double maxY = 0.0;
             
+            std::cout << "Input BBOX (longMin, longMax, LatMin, LatMax) [" << longMin << ", " << longMax << "][" << latMin << ", " << latMax << "]\n";
+            
             if(latLongSpatRef.IsSame(&imgSpatRef))
             {
                 minX = longMin;
@@ -2433,58 +2435,10 @@ namespace rsgis{ namespace cmds {
                 minX = outBBOX->MinX;
                 maxX = outBBOX->MaxX;
                 minY = outBBOX->MinY;
-                maxY = outBBOX->MaxX;
-
-                /*
-                // Convert bbox to the same projection as the input image...
-                std::cout << "Converting Image Projection\n";
-                OGRCoordinateTransformation *poCT = OGRCreateCoordinateTransformation( &latLongSpatRef, &imgSpatRef );
-                
-                double xMinLongCon, yMinLatCon, xMaxLongCon, yMaxLatCon = 0.0;
-                xMinLongCon = longMin;
-                yMinLatCon = latMin;
-                
-                xMaxLongCon = longMax;
-                yMaxLatCon = latMax;
-                
-                if( poCT == NULL || !poCT->Transform( 1, &xMinLongCon, &yMinLatCon ) )
-                {
-                    throw rsgis::RSGISException("Coordinate System Transformation failed (Min).");
-                }
-                
-                if( poCT == NULL || !poCT->Transform( 1, &xMaxLongCon, &yMaxLatCon ) )
-                {
-                    throw rsgis::RSGISException("Coordinate System Transformation failed (Max).");
-                }
-                std::cout.precision(12);
-                std::cout << "Min X: " << xMinLongCon << std::endl;
-                std::cout << "Max X: " << xMaxLongCon << std::endl;
-                std::cout << "Min Y: " << yMinLatCon << std::endl;
-                std::cout << "Max Y: " << yMaxLatCon << std::endl;
-                
-                if(xMinLongCon > xMaxLongCon)
-                {
-                    minX = xMaxLongCon;
-                    maxX = xMinLongCon;
-                }
-                else
-                {
-                    minX = xMinLongCon;
-                    maxX = xMaxLongCon;
-                }
-                
-                if(yMinLatCon > yMaxLatCon)
-                {
-                    minY = yMaxLatCon;
-                    maxY = yMinLatCon;
-                }
-                else
-                {
-                    minY = yMinLatCon;
-                    maxY = yMaxLatCon;
-                }
-                */
+                maxY = outBBOX->MaxY;
             }
+            
+            std::cout << "Input BBOX (minX, maxX, minY, maxY) [" << minX << ", " << maxX << "][" << minY << ", " << maxY << "]\n";
             
             rsgis::img::ImageStats **imgStats = new rsgis::img::ImageStats*[numImageBands];
             for(unsigned int i = 0; i < numImageBands; ++i)
