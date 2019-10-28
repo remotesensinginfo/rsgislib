@@ -1763,7 +1763,6 @@ namespace rsgis{namespace img{
 		const char *proj = NULL;
 		bool first = true;
 		
-		
 		try
 		{
 			// Calculate Image Overlap.
