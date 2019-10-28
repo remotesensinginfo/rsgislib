@@ -1585,9 +1585,9 @@ void RSGISCoordsTransform::transformBBOX(OGRSpatialReference *input_spat_ref, OG
     double maxY = 0.0;
     
     minX = out_tlX;
-    if(in_blX < minX)
+    if(out_blX < minX)
     {
-        minX = in_blX;
+        minX = out_blX;
     }
 
     maxX = out_trX;
