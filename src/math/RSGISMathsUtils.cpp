@@ -1571,7 +1571,7 @@ void RSGISCoordsTransform::transformBBOX(OGRSpatialReference *input_spat_ref, OG
     double in_blY = inBBOX->MinY;
     double out_blX = 0.0;
     double out_blY = 0.0;
-    this->transformPoint(input_spat_ref, output_spat_ref, in_blY, in_trY, &out_blX, &out_blY);
+    this->transformPoint(input_spat_ref, output_spat_ref, in_blX, in_blY, &out_blX, &out_blY);
     
     double in_brX = inBBOX->MaxX;
     double in_brY = inBBOX->MinY;
