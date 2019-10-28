@@ -2399,7 +2399,6 @@ namespace rsgis{ namespace cmds {
             }
             
             const char *wktProj = dataset->GetProjectionRef();
-            
             if(std::string(wktProj) == "")
             {
                 throw rsgis::RSGISException("The input image needs to have the projection defined within the file.");
