@@ -41,6 +41,8 @@ import numpy.random
 
 from osgeo import gdal
 
+import rsgislib.imageutils
+import rsgislib.imagecalc
 import rsgislib.rastergis
 import rsgislib
 import random
@@ -811,5 +813,273 @@ applied without boundary artifacts.
     
     if calcStats:
         rsgislib.rastergis.populateStats(clumps=outputImg, addclrtab=True, calcpyramids=True, ignorezero=True)
+
+
+def train_lightgbm_binary_classifer(out_mdl_file, cls1_train_file, cls1_valid_file, cls1_test_file, cls2_train_file, cls2_valid_file, cls2_test_file, out_info_file=None):
+    """
+    A function which performs a bayesian optimisation of the hyper-parameters for a binary lightgbm
+    classifier. Class 1 is the class which you are interested in and Class 2 is the 'other class'.
+
+    This function requires that lightgbm and skopt modules to be installed.
+
+    :param out_mdl_file: The output model which can be loaded to perform a classification.
+    :param cls1_train_file:
+    :param cls1_valid_file:
+    :param cls1_test_file:
+    :param cls2_train_file:
+    :param cls2_valid_file:
+    :param cls2_test_file:
+    :param out_info_file: An optional output JSON file with information about the classifier which has been created.
+
+    """
+    import lightgbm as lgb
+    from skopt.space import Real, Integer
+    from skopt.utils import use_named_args
+    from skopt import gp_minimize
+    from sklearn.metrics import roc_auc_score
+    from sklearn.metrics import accuracy_score
+    import gc
+    if not haveH5PY:
+        raise rsgislib.RSGISPyException("h5py module is not installed.")
+
+    print("Reading Class 1 Training")
+    f = h5py.File(cls1_train_file, 'r')
+    num_train_rows = f['DATA/DATA'].shape[0]
+    train_cls1 = numpy.array(f['DATA/DATA'])
+    train_cls1_lbl = numpy.ones(num_train_rows, dtype=int)
+
+    print("Reading Class 1 Validation")
+    f = h5py.File(cls1_valid_file, 'r')
+    num_valid_rows = f['DATA/DATA'].shape[0]
+    valid_cls1 = numpy.array(f['DATA/DATA'])
+    valid_cls1_lbl = numpy.ones(num_valid_rows, dtype=int)
+
+    print("Reading Class 1 Testing")
+    f = h5py.File(cls1_test_file, 'r')
+    num_test_rows = f['DATA/DATA'].shape[0]
+    test_cls1 = numpy.array(f['DATA/DATA'])
+    test_cls1_lbl = numpy.ones(num_test_rows, dtype=int)
+
+    print("Reading Class 2 Training")
+    f = h5py.File(cls2_test_file, 'r')
+    num_train_rows = f['DATA/DATA'].shape[0]
+    train_cls2 = numpy.array(f['DATA/DATA'])
+    train_cls2_lbl = numpy.zeros(num_train_rows, dtype=int)
+
+    print("Reading Class 2 Validation")
+    f = h5py.File(cls2_valid_file, 'r')
+    num_valid_rows = f['DATA/DATA'].shape[0]
+    valid_cls2 = numpy.array(f['DATA/DATA'])
+    valid_cls2_lbl = numpy.zeros(num_valid_rows, dtype=int)
+
+    print("Reading Class 2 Testing")
+    f = h5py.File(cls2_test_file, 'r')
+    num_test_rows = f['DATA/DATA'].shape[0]
+    test_cls2 = numpy.array(f['DATA/DATA'])
+    test_cls2_lbl = numpy.zeros(num_test_rows, dtype=int)
+
+    print("Finished Reading Data")
+
+    d_train = lgb.Dataset([train_cls2, train_cls1], label=numpy.concatenate((train_cls2_lbl, train_cls1_lbl)))
+    d_valid = lgb.Dataset([valid_cls2, valid_cls1], label=numpy.concatenate((valid_cls2_lbl, valid_cls1_lbl)))
+
+    vaild_np = numpy.concatenate((valid_cls2, valid_cls1))
+    vaild_lbl_np = numpy.concatenate((valid_cls2_lbl, valid_cls1_lbl))
+
+    test_np = numpy.concatenate((test_cls2, test_cls1))
+    test_lbl_np = numpy.concatenate((test_cls2_lbl, test_cls1_lbl))
+
+    space = [Integer(3, 10, name='max_depth'),
+             Integer(6, 30, name='num_leaves'),
+             Integer(50, 200, name='min_child_samples'),
+             Real(1, 400, name='scale_pos_weight'),
+             Real(0.6, 0.9, name='subsample'),
+             Real(0.6, 0.9, name='colsample_bytree'),
+             Integer(10, 200, name='early_stopping_rounds'),
+             Integer(50, 1000, name='num_boost_round')
+             ]
+
+    def _objective(values):
+        params = {'max_depth': values[0],
+                  'num_leaves': values[1],
+                  'min_child_samples': values[2],
+                  'scale_pos_weight': values[3],
+                  'subsample': values[4],
+                  'colsample_bytree': values[5],
+                  'metric': 'auc',
+                  'nthread': 4,
+                  'boosting_type': 'gbdt',
+                  'objective': 'binary',
+                  'learning_rate': 0.15,
+                  'max_bin': 100,
+                  'min_child_weight': 0,
+                  'min_split_gain': 0,
+                  'subsample_freq': 1,
+                  'boost_from_average': True,
+                  'is_unbalance': False}
+
+        print('\nNext set of params.....', params)
+
+        early_stopping_rounds = values[6]
+        num_boost_round = values[7]
+        print("early_stopping_rounds = {}. \t num_boost_round = {}.".format(early_stopping_rounds, num_boost_round))
+
+        evals_results = {}
+        model_lgb = lgb.train(params, d_train, valid_sets=[d_train, d_valid],
+                              valid_names=['train', 'valid'],
+                              evals_result=evals_results,
+                              num_boost_round=num_boost_round,
+                              early_stopping_rounds=early_stopping_rounds,
+                              verbose_eval=None, feval=None)
+
+        auc = -roc_auc_score(vaild_lbl_np, model_lgb.predict(vaild_np))
+
+        print('\nAUROC.....', -auc, ".....iter.....", model_lgb.current_iteration())
+
+        gc.collect()
+
+        return auc
+
+    res_gp = gp_minimize(_objective, space, n_calls=20, random_state=0, n_random_starts=10)
+
+    print("Best score={}".format(res_gp.fun))
+
+    best_params = res_gp.x
+
+    print("Best Params:\n{}".format(best_params))
+
+    print("Start Training Find Classifier")
+
+    params = {'max_depth': best_params[0],
+              'num_leaves': best_params[1],
+              'min_child_samples': best_params[2],
+              'scale_pos_weight': best_params[3],
+              'subsample': best_params[4],
+              'colsample_bytree': best_params[5],
+              'metric': 'auc',
+              'nthread': 4,
+              'boosting_type': 'gbdt',
+              'objective': 'binary',
+              'learning_rate': 0.15,
+              'max_bin': 100,
+              'min_child_weight': 0,
+              'min_split_gain': 0,
+              'subsample_freq': 1,
+              'boost_from_average': True,
+              'is_unbalance': False}
+
+    early_stopping_rounds = best_params[6]
+    num_boost_round = best_params[7]
+
+    evals_results = {}
+    model = lgb.train(params, d_train, valid_sets=[d_train, d_valid], valid_names=['train', 'valid'],
+                      evals_result=evals_results, num_boost_round=num_boost_round,
+                      early_stopping_rounds=early_stopping_rounds, verbose_eval=None, feval=None)
+    test_auc = roc_auc_score(test_lbl_np, model.predict(test_np))
+    print("Testing AUC: {}".format(test_auc))
+    print("Finish Training")
+
+    model.save_model(out_mdl_file)
+
+    pred_test = model.predict(test_np)
+    for i in range(test_np.shape[0]):
+        if (pred_test[i] >= 0.5):
+            pred_test[i] = 1
+        else:
+            pred_test[i] = 0
+    len(pred_test)
+
+    test_acc = accuracy_score(test_lbl_np, pred_test)
+    print("Testing Accuracy: {}".format(test_acc))
+
+    if out_info_file is not None:
+        out_info = dict()
+        out_info['params'] = params
+        out_info['test_auc_score'] = test_auc
+        out_info['test_accuracy'] = test_acc
+        with open(out_info_file, 'w') as outfile:
+            import json
+            json.dump(out_info, outfile, sort_keys=True, indent=4, separators=(',', ': '), ensure_ascii=False)
+
+
+def apply_lightgbm_binary_classifier(model_file, imgMask, imgMaskVal, imgFileInfo, outProbImg, gdalformat, outClassImg=None, class_thres=0.5):
+    """
+This function applies a trained binary (i.e., two classes) lightgbm model. The function train_lightgbm_binary_classifer
+can be used to train such as model. The output image will contain the probability of membership to the class of interest.
+You will need to threshold this image to get a final hard classification. Alternative, a hard class output image and
+threshold can be applied to this image.
+
+:param model_file: a trained lightgbm binary model which can be loaded with lgb.Booster(model_file=model_file).
+:param imgMask: is an image file providing a mask to specify where should be classified. Simplest mask is all the valid data regions (rsgislib.imageutils.genValidMask)
+:param imgMaskVal: the pixel value within the imgMask to limit the region to which the classification is applied. Can be used to create a heirachical classification.
+:param imgFileInfo: a list of rsgislib.imageutils.ImageBandInfo objects (also used within rsgislib.imageutils.extractZoneImageBandValues2HDF) to identify which images and bands are to be used for the classification so it adheres to the training data.
+:param outProbImg: output image file with the classification probabilities.
+:param gdalformat: is the output image format - all GDAL supported formats are supported.
+:param outClassImg: Optional output image which will contain the hard classification, defined with a threshold on the
+                    probability image.
+:param class_thres: The threshold used to define the hard classification. Default is 0.5.
+
+    """
+    if not haveRIOS:
+        raise rsgislib.RSGISPyException("rios module is not installed.")
+    import lightgbm as lgb
+
+    def _applyLGBMClassifier(info, inputs, outputs, otherargs):
+        outClassVals = numpy.zeros_like(inputs.imageMask, dtype=numpy.float)
+        if numpy.any(inputs.imageMask == otherargs.mskVal):
+            outClassVals = outClassVals.flatten()
+            imgMaskVals = inputs.imageMask.flatten()
+            classVars = numpy.zeros((outClassVals.shape[0], otherargs.numClassVars), dtype=numpy.float)
+            # Array index which can be used to populate the output array following masking etc.
+            ID = numpy.arange(imgMaskVals.shape[0])
+            classVarsIdx = 0
+            for imgFile in otherargs.imgFileInfo:
+                imgArr = inputs.__dict__[imgFile.name]
+                for band in imgFile.bands:
+                    classVars[..., classVarsIdx] = imgArr[(band - 1)].flatten()
+                    classVarsIdx = classVarsIdx + 1
+            classVars = classVars[imgMaskVals == otherargs.mskVal]
+            ID = ID[imgMaskVals == otherargs.mskVal]
+            predClass = otherargs.classifier.predict(classVars)
+            outClassVals[ID] = predClass
+            outClassVals = numpy.expand_dims(
+                outClassVals.reshape((inputs.imageMask.shape[1], inputs.imageMask.shape[2])), axis=0)
+        outputs.outimage = outClassVals
+
+    classifier = lgb.Booster(model_file=model_file)
+
+    infiles = applier.FilenameAssociations()
+    infiles.imageMask = imgMask
+    numClassVars = 0
+    for imgFile in imgFileInfo:
+        infiles.__dict__[imgFile.name] = imgFile.fileName
+        numClassVars = numClassVars + len(imgFile.bands)
+
+    outfiles = applier.FilenameAssociations()
+    outfiles.outimage = outProbImg
+    otherargs = applier.OtherInputs()
+    otherargs.classifier = classifier
+    otherargs.mskVal = imgMaskVal
+    otherargs.numClassVars = numClassVars
+    otherargs.imgFileInfo = imgFileInfo
+
+    aControls = applier.ApplierControls()
+    aControls.progress = cuiprogress.CUIProgressBar()
+    aControls.drivername = gdalformat
+    aControls.omitPyramids = True
+    aControls.calcStats = False
+    print("Applying the Classifier")
+    applier.apply(_applyLGBMClassifier, infiles, outfiles, otherargs, controls=aControls)
+    print("Completed")
+    rsgislib.imageutils.popImageStats(outProbImg, usenodataval=True, nodataval=0, calcpyramids=True)
+
+    if outClassImg is not None:
+        rsgislib.imagecalc.imageMath(outProbImg, outClassImg, 'b1>{}?1:0'.format(class_thres), gdalformat, rsgislib.TYPE_8UINT)
+        rsgislib.rastergis.populateStats(outProbImg, addclrtab=True, calcpyramids=True, ignorezero=True)
+
+
+
+
+
 
 
