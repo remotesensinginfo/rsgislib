@@ -1002,7 +1002,7 @@ def train_lightgbm_binary_classifer(out_mdl_file, cls1_train_file, cls1_valid_fi
             json.dump(out_info, outfile, sort_keys=True, indent=4, separators=(',', ': '), ensure_ascii=False)
 
 
-def apply_lightgbm_binary_classifier(model_file, imgMask, imgMaskVal, imgFileInfo, outProbImg, gdalformat, outClassImg=None, class_thres=0.5):
+def apply_lightgbm_binary_classifier(model_file, imgMask, imgMaskVal, imgFileInfo, outProbImg, gdalformat, outClassImg=None, class_thres=5000):
     """
 This function applies a trained binary (i.e., two classes) lightgbm model. The function train_lightgbm_binary_classifer
 can be used to train such as model. The output image will contain the probability of membership to the class of interest.
@@ -1013,11 +1013,11 @@ threshold can be applied to this image.
 :param imgMask: is an image file providing a mask to specify where should be classified. Simplest mask is all the valid data regions (rsgislib.imageutils.genValidMask)
 :param imgMaskVal: the pixel value within the imgMask to limit the region to which the classification is applied. Can be used to create a heirachical classification.
 :param imgFileInfo: a list of rsgislib.imageutils.ImageBandInfo objects (also used within rsgislib.imageutils.extractZoneImageBandValues2HDF) to identify which images and bands are to be used for the classification so it adheres to the training data.
-:param outProbImg: output image file with the classification probabilities.
+:param outProbImg: output image file with the classification probabilities - this image is scaled by multiplying by 10000.
 :param gdalformat: is the output image format - all GDAL supported formats are supported.
 :param outClassImg: Optional output image which will contain the hard classification, defined with a threshold on the
                     probability image.
-:param class_thres: The threshold used to define the hard classification. Default is 0.5.
+:param class_thres: The threshold used to define the hard classification. Default is 5000 (i.e., probability of 0.5).
 
     """
     if not haveRIOS:
@@ -1025,7 +1025,7 @@ threshold can be applied to this image.
     import lightgbm as lgb
 
     def _applyLGBMClassifier(info, inputs, outputs, otherargs):
-        outClassVals = numpy.zeros_like(inputs.imageMask, dtype=numpy.float)
+        outClassVals = numpy.zeros_like(inputs.imageMask, dtype=numpy.uint16)
         if numpy.any(inputs.imageMask == otherargs.mskVal):
             outClassVals = outClassVals.flatten()
             imgMaskVals = inputs.imageMask.flatten()
@@ -1040,7 +1040,7 @@ threshold can be applied to this image.
                     classVarsIdx = classVarsIdx + 1
             classVars = classVars[imgMaskVals == otherargs.mskVal]
             ID = ID[imgMaskVals == otherargs.mskVal]
-            predClass = otherargs.classifier.predict(classVars)
+            predClass = numpy.around(otherargs.classifier.predict(classVars) * 10000)
             outClassVals[ID] = predClass
             outClassVals = numpy.expand_dims(
                 outClassVals.reshape((inputs.imageMask.shape[1], inputs.imageMask.shape[2])), axis=0)
@@ -1075,7 +1075,7 @@ threshold can be applied to this image.
 
     if outClassImg is not None:
         rsgislib.imagecalc.imageMath(outProbImg, outClassImg, 'b1>{}?1:0'.format(class_thres), gdalformat, rsgislib.TYPE_8UINT)
-        rsgislib.rastergis.populateStats(outProbImg, addclrtab=True, calcpyramids=True, ignorezero=True)
+        rsgislib.rastergis.populateStats(outClassImg, addclrtab=True, calcpyramids=True, ignorezero=True)
 
 
 
