@@ -199,6 +199,7 @@ Returns the rsgislib datatype ENUM for a raster file
     raster = None
     return gdal_dtype
 
+
 def setImgThematic(imageFile):
     """
 Set all image bands to be thematic. 
@@ -214,6 +215,21 @@ Set all image bands to be thematic.
         band.SetMetadataItem('LAYER_TYPE', 'thematic')
     ds = None
 
+
+def setImgNotThematic(imageFile):
+    """
+Set all image bands to be not thematic (athematic).
+
+:param imageFile: The file for which the bands are to be set as not thematic (athematic)
+
+"""
+    ds = gdal.Open(imageFile, gdal.GA_Update)
+    if ds == None:
+        raise Exception("Could not open the imageFile.")
+    for bandnum in range(ds.RasterCount):
+        band = ds.GetRasterBand(bandnum + 1)
+        band.SetMetadataItem('LAYER_TYPE', 'athematic')
+    ds = None
 
 def hasGCPs(inImg):
     """

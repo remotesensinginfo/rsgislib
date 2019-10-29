@@ -167,9 +167,9 @@ namespace rsgis{ namespace cmds {
     /** Function to calculate correlation for windows */
     DllExport void executeCorrelationWindow(std::string inputImage, std::string outputImage, unsigned int winSize, unsigned int corrBandA, unsigned int corrBandB, std::string gdalFormat, RSGISLibDataType outDataType);
     /** Function to calculate the statistics for an individual image band within an envelope defined in Lat / Long */
-    DllExport void executeImageBandStatsEnv(std::string inputImage, rsgis::cmds::ImageStatsCmds *stats, unsigned int imgBand, bool noDataValueSpecified, float noDataVal, double latMin, double latMax, double longMin, double longMax);
+    DllExport void executeImageBandStatsEnv(std::string inputImage, rsgis::cmds::ImageStatsCmds *stats, unsigned int imgBand, bool noDataValueSpecified, float noDataVal, double longMin, double longMax, double latMin, double latMax);
     /** Function to calculate the mode for an individual image band within an envelope defined in Lat / Long */
-    DllExport float executeImageBandModeEnv(std::string inputImage, float binWidth, unsigned int imgBand, bool noDataValueSpecified, float noDataVal, double latMin, double latMax, double longMin, double longMax);
+    DllExport float executeImageBandModeEnv(std::string inputImage, float binWidth, unsigned int imgBand, bool noDataValueSpecified, float noDataVal, double longMin, double longMax, double latMin, double latMax);
     /** A function to calculate a 2D histogram comparison of two images */
     DllExport double executeImageComparison2dHisto(std::string inputImage1, std::string inputImage2, std::string outputImage, std::string gdalFormat, unsigned int img1Band, unsigned int img2Band, unsigned int numBins, double *binWidthImg1, double *binWidthImg2, double img1Min, double img1Max, double img2Min, double img2Max, double img1Scale=1.0, double img2Scale=1.0, double img1Off=0.0, double img2Off=0.0, bool normOutput=false);
     /** A function to compute the probability of the pixel value from a masked region of the image occuring */
