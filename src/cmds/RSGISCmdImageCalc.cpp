@@ -2381,6 +2381,7 @@ namespace rsgis{ namespace cmds {
                 
     void executeImageBandStatsEnv(std::string inputImage, rsgis::cmds::ImageStatsCmds *stats, unsigned int imgBand, bool noDataValueSpecified, float noDataVal, double longMin, double longMax, double latMin, double latMax)
     {
+        std::cout.precision(12);
         try
         {
             GDALAllRegister();
