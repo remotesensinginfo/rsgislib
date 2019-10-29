@@ -1233,7 +1233,7 @@ static PyObject *ImageCalc_GetImageStatsInEnv(PyObject *self, PyObject *args) {
     double latMin, latMax, longMin, longMax;
     PyObject *noDataValueObj;
     
-    if(!PyArg_ParseTuple(args, "sIOdddd:getImageStatsInEnv", &inputImage, &imgBand, &noDataValueObj, &latMin, &latMax, &longMin, &longMax))
+    if(!PyArg_ParseTuple(args, "sIOdddd:getImageStatsInEnv", &inputImage, &imgBand, &noDataValueObj, &longMin, &longMax, &latMin, &latMax))
         return NULL;
     
     bool noDataValueSpecified = false;
@@ -1303,7 +1303,7 @@ static PyObject *ImageCalc_GetImageBandModeInEnv(PyObject *self, PyObject *args)
     float binWidth;
     PyObject *noDataValueObj;
     
-    if(!PyArg_ParseTuple(args, "sIfOdddd:getImageBandModeInEnv", &inputImage, &imgBand, &binWidth, &noDataValueObj, &latMin, &latMax, &longMin, &longMax))
+    if(!PyArg_ParseTuple(args, "sIfOdddd:getImageBandModeInEnv", &inputImage, &imgBand, &binWidth, &noDataValueObj, &longMin, &longMax, &latMin, &latMax))
         return NULL;
     
     bool noDataValueSpecified = false;
@@ -1322,7 +1322,7 @@ static PyObject *ImageCalc_GetImageBandModeInEnv(PyObject *self, PyObject *args)
     PyObject *outVal = PyTuple_New(1);
     try
     {
-        float modeVal = rsgis::cmds::executeImageBandModeEnv(std::string(inputImage), binWidth, imgBand, noDataValueSpecified, noDataValue, latMin, latMax, longMin, longMax);
+        float modeVal = rsgis::cmds::executeImageBandModeEnv(std::string(inputImage), binWidth, imgBand, noDataValueSpecified, noDataValue, longMin, longMax, latMin, latMax);
         
         if(PyTuple_SetItem(outVal, 0, Py_BuildValue("f", modeVal)) == -1)
         {
@@ -2777,7 +2777,7 @@ static PyMethodDef ImageCalcMethods[] = {
 {"getImageStatsInEnv", ImageCalc_GetImageStatsInEnv, METH_VARARGS,
 "rsgislib.imagecalc.getImageStatsInEnv(inputImage, imgBand, noDataVal, longMin, longMax, latMin, latMax)\n"
 "Calculates and returns statistics (min, max, mean, stddev, sum) for a region.\n"
-"defined by the bounding box (latMin, latMax, longMin, longMax) which is specified\n"
+"defined by the bounding box (longMin, longMax, latMin, latMax) which is specified\n"
 "geographic latitude and longitude. The coordinates are converted to the projection\n"
 "of the input image at runtime (if required) and therefore the image projection needs\n"
 "to be correctly defined so please check this is the case and define it if necessary.\n"
@@ -2797,7 +2797,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "Example::\n"
 "\n"
 "   import rsgislib.imagecalc\n"
-"   stats = rsgislib.imagecalc.getImageStatsInEnv(\"./FinalSRTMTanzaniaDEM_30m.kea\", 1, -32767.0, -7.0, -8.0, 30.0, 31.0)\n"
+"   stats = rsgislib.imagecalc.getImageStatsInEnv(\"./FinalSRTMTanzaniaDEM_30m.kea\", 1, -32767.0, 30.0, 31.0, -7.0, -8.0)\n"
 "   print(\"Min: \", stats[0])\n"
 "   print(\"Max: \", stats[1])\n"
 "   print(\"Mean: \", stats[2])\n"
@@ -2808,7 +2808,7 @@ static PyMethodDef ImageCalcMethods[] = {
 {"getImageBandModeInEnv", ImageCalc_GetImageBandModeInEnv, METH_VARARGS,
 "rsgislib.imagecalc.getImageBandModeInEnv(inputImage, imgBand, binWidth, noDataVal, longMin, longMax, latMin, latMax)\n"
 "Calculates and returns the image mode for a region.\n"
-"defined by the bounding box (latMin, latMax, longMin, longMax) which is specified\n"
+"defined by the bounding box (longMin, longMax, latMin, latMax) which is specified\n"
 "geographic latitude and longitude. The coordinates are converted to the projection\n"
 "of the input image at runtime (if required) and therefore the image projection needs\n"
 "to be correctly defined so please check this is the case and define it if necessary.\n"
