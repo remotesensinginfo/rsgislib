@@ -815,7 +815,9 @@ applied without boundary artifacts.
         rsgislib.rastergis.populateStats(clumps=outputImg, addclrtab=True, calcpyramids=True, ignorezero=True)
 
 
-def train_lightgbm_binary_classifer(out_mdl_file, cls1_train_file, cls1_valid_file, cls1_test_file, cls2_train_file, cls2_valid_file, cls2_test_file, out_info_file=None):
+def train_lightgbm_binary_classifer(out_mdl_file, cls1_train_file, cls1_valid_file, cls1_test_file, cls2_train_file,
+                                    cls2_valid_file, cls2_test_file, out_info_file=None, unbalanced=False, nthread=2,
+                                    scale_pos_weight=None):
     """
     A function which performs a bayesian optimisation of the hyper-parameters for a binary lightgbm
     classifier. Class 1 is the class which you are interested in and Class 2 is the 'other class'.
@@ -844,39 +846,45 @@ def train_lightgbm_binary_classifer(out_mdl_file, cls1_train_file, cls1_valid_fi
 
     print("Reading Class 1 Training")
     f = h5py.File(cls1_train_file, 'r')
-    num_train_rows = f['DATA/DATA'].shape[0]
+    num_cls1_train_rows = f['DATA/DATA'].shape[0]
+    print("num_cls1_train_rows = {}".format(num_cls1_train_rows))
     train_cls1 = numpy.array(f['DATA/DATA'])
-    train_cls1_lbl = numpy.ones(num_train_rows, dtype=int)
+    train_cls1_lbl = numpy.ones(num_cls1_train_rows, dtype=int)
 
     print("Reading Class 1 Validation")
     f = h5py.File(cls1_valid_file, 'r')
-    num_valid_rows = f['DATA/DATA'].shape[0]
+    num_cls1_valid_rows = f['DATA/DATA'].shape[0]
+    print("num_cls1_valid_rows = {}".format(num_cls1_valid_rows))
     valid_cls1 = numpy.array(f['DATA/DATA'])
-    valid_cls1_lbl = numpy.ones(num_valid_rows, dtype=int)
+    valid_cls1_lbl = numpy.ones(num_cls1_valid_rows, dtype=int)
 
     print("Reading Class 1 Testing")
     f = h5py.File(cls1_test_file, 'r')
-    num_test_rows = f['DATA/DATA'].shape[0]
+    num_cls1_test_rows = f['DATA/DATA'].shape[0]
+    print("num_cls1_test_rows = {}".format(num_cls1_test_rows))
     test_cls1 = numpy.array(f['DATA/DATA'])
-    test_cls1_lbl = numpy.ones(num_test_rows, dtype=int)
+    test_cls1_lbl = numpy.ones(num_cls1_test_rows, dtype=int)
 
     print("Reading Class 2 Training")
-    f = h5py.File(cls2_test_file, 'r')
-    num_train_rows = f['DATA/DATA'].shape[0]
+    f = h5py.File(cls2_train_file, 'r')
+    num_cls2_train_rows = f['DATA/DATA'].shape[0]
+    print("num_cls2_train_rows = {}".format(num_cls2_train_rows))
     train_cls2 = numpy.array(f['DATA/DATA'])
-    train_cls2_lbl = numpy.zeros(num_train_rows, dtype=int)
+    train_cls2_lbl = numpy.zeros(num_cls2_train_rows, dtype=int)
 
     print("Reading Class 2 Validation")
     f = h5py.File(cls2_valid_file, 'r')
-    num_valid_rows = f['DATA/DATA'].shape[0]
+    num_cls2_valid_rows = f['DATA/DATA'].shape[0]
+    print("num_cls2_valid_rows = {}".format(num_cls2_valid_rows))
     valid_cls2 = numpy.array(f['DATA/DATA'])
-    valid_cls2_lbl = numpy.zeros(num_valid_rows, dtype=int)
+    valid_cls2_lbl = numpy.zeros(num_cls2_valid_rows, dtype=int)
 
     print("Reading Class 2 Testing")
     f = h5py.File(cls2_test_file, 'r')
-    num_test_rows = f['DATA/DATA'].shape[0]
+    num_cls2_test_rows = f['DATA/DATA'].shape[0]
+    print("num_cls2_test_rows = {}".format(num_cls2_test_rows))
     test_cls2 = numpy.array(f['DATA/DATA'])
-    test_cls2_lbl = numpy.zeros(num_test_rows, dtype=int)
+    test_cls2_lbl = numpy.zeros(num_cls2_test_rows, dtype=int)
 
     print("Finished Reading Data")
 
@@ -892,36 +900,72 @@ def train_lightgbm_binary_classifer(out_mdl_file, cls1_train_file, cls1_valid_fi
     space = [Integer(3, 10, name='max_depth'),
              Integer(6, 30, name='num_leaves'),
              Integer(50, 200, name='min_child_samples'),
-             Real(1, 400, name='scale_pos_weight'),
              Real(0.6, 0.9, name='subsample'),
              Real(0.6, 0.9, name='colsample_bytree'),
+             Real(0.05, 0.5, name='learning_rate'),
+             Integer(50, 1000, name='max_bin'),
+             Real(0, 8, name='min_child_weight'),
+             Real(1, 1.2, name='reg_alpha'),
+             Real(1, 1.4, name='reg_lambda'),
+             Integer(10000, 250000, name='subsample_for_bin'),
              Integer(10, 200, name='early_stopping_rounds'),
              Integer(50, 1000, name='num_boost_round')
              ]
 
+    if scale_pos_weight is None:
+        scale_pos_weight = num_cls2_train_rows / num_cls1_train_rows
+        if scale_pos_weight < 1:
+            scale_pos_weight = 1
+    print("scale_pos_weight = {}".format(scale_pos_weight))
+
     def _objective(values):
-        params = {'max_depth': values[0],
-                  'num_leaves': values[1],
-                  'min_child_samples': values[2],
-                  'scale_pos_weight': values[3],
-                  'subsample': values[4],
-                  'colsample_bytree': values[5],
-                  'metric': 'auc',
-                  'nthread': 4,
-                  'boosting_type': 'gbdt',
-                  'objective': 'binary',
-                  'learning_rate': 0.15,
-                  'max_bin': 100,
-                  'min_child_weight': 0,
-                  'min_split_gain': 0,
-                  'subsample_freq': 1,
-                  'boost_from_average': True,
-                  'is_unbalance': False}
+        if unbalanced:
+            params = {'max_depth': values[0],
+                      'num_leaves': values[1],
+                      'min_child_samples': values[2],
+                      'subsample': values[3],
+                      'colsample_bytree': values[4],
+                      'metric': 'auc,binary_error',
+                      'nthread': nthread,
+                      'boosting_type': 'gbdt',
+                      'objective': 'binary',
+                      'learning_rate': values[5],
+                      'max_bin': values[6],
+                      'min_child_weight': values[7],
+                      'min_split_gain': 0,
+                      'reg_alpha': values[8],
+                      'reg_lambda': values[9],
+                      'subsample_freq': 1,
+                      'subsample_for_bin': values[10],
+                      'boost_from_average': True,
+                      'is_unbalance': True}
+
+        else:
+            params = {'max_depth': values[0],
+                      'num_leaves': values[1],
+                      'min_child_samples': values[2],
+                      'scale_pos_weight': scale_pos_weight,
+                      'subsample': values[3],
+                      'colsample_bytree': values[4],
+                      'metric': 'auc,binary_error',
+                      'nthread': nthread,
+                      'boosting_type': 'gbdt',
+                      'objective': 'binary',
+                      'learning_rate': values[5],
+                      'max_bin': values[6],
+                      'min_child_weight': values[7],
+                      'min_split_gain': 0,
+                      'reg_alpha': values[8],
+                      'reg_lambda': values[9],
+                      'subsample_freq': 1,
+                      'subsample_for_bin': values[10],
+                      'boost_from_average': True,
+                      'is_unbalance': False}
 
         print('\nNext set of params.....', params)
 
-        early_stopping_rounds = values[6]
-        num_boost_round = values[7]
+        early_stopping_rounds = values[11]
+        num_boost_round = values[12]
         print("early_stopping_rounds = {}. \t num_boost_round = {}.".format(early_stopping_rounds, num_boost_round))
 
         evals_results = {}
@@ -950,26 +994,50 @@ def train_lightgbm_binary_classifer(out_mdl_file, cls1_train_file, cls1_valid_fi
 
     print("Start Training Find Classifier")
 
-    params = {'max_depth': best_params[0],
-              'num_leaves': best_params[1],
-              'min_child_samples': best_params[2],
-              'scale_pos_weight': best_params[3],
-              'subsample': best_params[4],
-              'colsample_bytree': best_params[5],
-              'metric': 'auc',
-              'nthread': 4,
-              'boosting_type': 'gbdt',
-              'objective': 'binary',
-              'learning_rate': 0.15,
-              'max_bin': 100,
-              'min_child_weight': 0,
-              'min_split_gain': 0,
-              'subsample_freq': 1,
-              'boost_from_average': True,
-              'is_unbalance': False}
+    if unbalanced:
+        params = {'max_depth': best_params[0],
+                  'num_leaves': best_params[1],
+                  'min_child_samples': best_params[2],
+                  'subsample': best_params[3],
+                  'colsample_bytree': best_params[4],
+                  'metric': 'auc',
+                  'nthread': nthread,
+                  'boosting_type': 'gbdt',
+                  'objective': 'binary',
+                  'learning_rate': best_params[5],
+                  'max_bin': best_params[6],
+                  'min_child_weight': best_params[7],
+                  'min_split_gain': 0,
+                  'reg_alpha': best_params[8],
+                  'reg_lambda': best_params[9],
+                  'subsample_freq': 1,
+                  'subsample_for_bin': best_params[10],
+                  'boost_from_average': True,
+                  'is_unbalance': True}
+    else:
+        params = {'max_depth': best_params[0],
+                  'num_leaves': best_params[1],
+                  'min_child_samples': best_params[2],
+                  'scale_pos_weight': scale_pos_weight,
+                  'subsample': best_params[3],
+                  'colsample_bytree': best_params[4],
+                  'metric': 'auc',
+                  'nthread': nthread,
+                  'boosting_type': 'gbdt',
+                  'objective': 'binary',
+                  'learning_rate': best_params[5],
+                  'max_bin': best_params[6],
+                  'min_child_weight': best_params[7],
+                  'min_split_gain': 0,
+                  'reg_alpha': best_params[8],
+                  'reg_lambda': best_params[9],
+                  'subsample_freq': 1,
+                  'subsample_for_bin': best_params[10],
+                  'boost_from_average': True,
+                  'is_unbalance': False}
 
-    early_stopping_rounds = best_params[6]
-    num_boost_round = best_params[7]
+    early_stopping_rounds = best_params[11]
+    num_boost_round = best_params[12]
 
     evals_results = {}
     model = lgb.train(params, d_train, valid_sets=[d_train, d_valid], valid_names=['train', 'valid'],
