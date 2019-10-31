@@ -940,7 +940,7 @@ Example::
     numVars = 0
     numVals = 0
     for h5File in h5Files:
-        fH5 = h5py.File(h5File)
+        fH5 = h5py.File(h5File, 'r')
         dataShp = fH5['DATA/DATA'].shape
         if first:
             numVars = dataShp[1]
@@ -954,13 +954,13 @@ Example::
     
     rowInit = 0
     for h5File in h5Files:
-        fH5 = h5py.File(h5File)
+        fH5 = h5py.File(h5File, 'r')
         numRows = fH5['DATA/DATA'].shape[0]
         dataArr[rowInit:(rowInit+numRows)] = fH5['DATA/DATA']
         rowInit += numRows
         fH5.close()
     
-    fH5Out = h5py.File(outH5File,'w')
+    fH5Out = h5py.File(outH5File, 'w')
     dataGrp = fH5Out.create_group("DATA")
     metaGrp = fH5Out.create_group("META-DATA")
     dataGrp.create_dataset('DATA', data=dataArr, chunks=True, compression="gzip", shuffle=True)

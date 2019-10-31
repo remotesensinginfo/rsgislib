@@ -252,7 +252,7 @@ class RSGISPyUtils (object):
         
         return gdalStr
 
-    def get_file_basename(self, filepath, checkvalid=False):
+    def get_file_basename(self, filepath, checkvalid=False, n_comps=0):
         """
         Uses os.path module to return file basename (i.e., path and extension removed)
         :param filepath: string for the input file name and path
@@ -260,6 +260,9 @@ class RSGISPyUtils (object):
                             characters (other than underscores) and spaces, punctuation
                             will be either removed and spaces changed to an underscore.
                            (Default = False)
+        :param n_comps: if > 0 then the resulting basename will be split using underscores
+                        and the return based name will be defined using the n_comps
+                        components split by under scores.
         :return: basename for file
         """
         import string
@@ -267,8 +270,20 @@ class RSGISPyUtils (object):
         if checkvalid:
             basename = basename.replace(' ', '_')
             for punch in string.punctuation:
-                if punch != '_':
+                if (punch != '_') and (punch != '-'):
                     basename = basename.replace(punch, '')
+        if n_comps > 0:
+            basename_split = basename.split('_')
+            if len(basename_split) < n_comps:
+                raise RSGISPyException(
+                    "The number of components specified is more than the number of components in the basename.")
+            out_basename = ""
+            for i in range(n_comps):
+                if i == 0:
+                    out_basename = basename_split[i]
+                else:
+                    out_basename = out_basename + '_' + basename_split[i]
+            basename = out_basename
         return basename
 
     def getRSGISLibDataTypeFromImg(self, inImg):
