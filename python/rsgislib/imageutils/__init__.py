@@ -291,6 +291,42 @@ A function which returns the WKT string representing the projection of the input
     return projStr
 
 
+def createBlankImagePy(output_img, n_bands, width, height, tlX, tlY, out_img_res_x, out_img_res_y, wkt_string,
+                       gdal_format, data_type, options=[], no_data_val=0):
+    """
+    Create a blank output image file - this is a pure python implementation of rsgislib.imageutils.createBlankImage
+
+    :param output_img: the output file and path.
+    :param n_bands: the number of output image bands.
+    :param width: the number of x pixels.
+    :param height: the number of Y pixels.
+    :param tlX: the top-left corner x coordinate
+    :param tlY: the top-left corner y coordinate
+    :param out_img_res_x: the output image resolution in the x axis
+    :param out_img_res_y: the output image resolution in the y axis
+    :param wkt_string: a WKT string with the output image projection
+    :param gdal_format: the output image file format.
+    :param data_type: the output image data type - needs to be a rsgislib datatype (e.g., )
+    :param options: image creation options e.g., ["TILED=YES", "INTERLEAVE=PIXEL", "COMPRESS=LZW", "BIGTIFF=YES"]
+    :param no_data_val: the output image no data value.
+
+    """
+    rsgis_utils = rsgislib.RSGISPyUtils()
+    gdal_data_type = rsgis_utils.getGDALDataType(data_type)
+    gdal_driver = gdal.GetDriverByName(gdal_format)
+    out_img_ds_obj = gdal_driver.Create(output_img, width, height, n_bands, gdal_data_type, options=options)
+    out_img_ds_obj.SetGeoTransform((tlX, out_img_res_x, 0, tlY, 0, out_img_res_y))
+    out_img_ds_obj.SetProjection(wkt_string)
+
+    raster = numpy.zeros((height, width), dtype=rsgis_utils.getNumpyDataType(data_type))
+    raster[...] = no_data_val
+    for band in range(n_bands):
+        band_obj = out_img_ds_obj.GetRasterBand(band + 1)
+        band_obj.SetNoDataValue(no_data_val)
+        band_obj.WriteArray(raster)
+    out_img_ds_obj = None
+
+
 def createBlankImgFromRefVector(inVecFile, inVecLyr, outputImg, outImgRes, outImgNBands, gdalformat, datatype):
     """
 A function to create a new image file based on a vector layer to define the extent and projection
@@ -528,7 +564,7 @@ Where:
     outFile = None
 
 
-def reprojectImage(inputImage, outputImage, outWKT, gdalformat='KEA', interp='cubic', inWKT=None, noData=0.0, outPxlRes='image', snap2Grid=True, multicore=False):
+def reprojectImage(inputImage, outputImage, outWKT, gdalformat='KEA', interp='cubic', inWKT=None, noData=0.0, outPxlRes='image', snap2Grid=True, multicore=False, gdal_options=[]):
     """
 This function provides a tool which uses the gdalwarp function to reproject an input image.
 
@@ -547,6 +583,7 @@ Where:
                   3) provide a floating point value for the image resolution (note. pixels will be sqaure)
 :param snap2Grid: is a boolean specifying whether the TL pixel should be snapped to a multiple of the pixel resolution (Default is True).
 :param nCores: the number of processing cores available for processing (-1 is all cores: Default=-1)
+:param gdal_options: GDAL file creation options e.g., ["TILED=YES", "COMPRESS=LZW", "BIGTIFF=YES"]
 
     """    
     rsgisUtils = rsgislib.RSGISPyUtils()
@@ -619,7 +656,7 @@ Where:
     
     numBands = inImgDS.RasterCount
     
-    inImgBand = inImgDS.GetRasterBand( 1 );
+    inImgBand = inImgDS.GetRasterBand( 1 )
     gdalDataType = gdal.GetDataTypeName(inImgBand.DataType)
     rsgisDataType = rsgisUtils.getRSGISLibDataType(gdalDataType)
 
@@ -669,7 +706,8 @@ Where:
         outHeight = int(round((yMax - yMin) / outRes)) + 10
     
     print('Creating blank image')
-    rsgislib.imageutils.createBlankImage(outputImage, numBands, outWidth, outHeight, outTLX, outTLY, outRes, noData, "", outWKTStr, gdalformat, rsgisDataType)
+    rsgislib.imageutils.createBlankImagePy(outputImage, numBands, outWidth, outHeight, outTLX, outTLY, outRes,
+                       (outRes * (-1)), outWKTStr, gdalformat, rsgisDataType, options=gdal_options, no_data_val=noData)
 
     outImgDS = gdal.Open(outputImage, gdal.GA_Update)
     

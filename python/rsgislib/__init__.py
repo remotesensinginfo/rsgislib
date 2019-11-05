@@ -407,6 +407,30 @@ class RSGISPyUtils (object):
         else:
             raise RSGISPyException("The data type '" + str(gdaltype) + "' is unknown / not supported.")
 
+    def getGDALDataType(self, rsgislib_datatype):
+        """
+        Convert from RSGIS data type to GDAL data type int.
+
+        :return: int
+
+        """
+        if rsgislib_datatype == TYPE_16INT:
+            return gdal.GDT_Int16
+        elif rsgislib_datatype == TYPE_32INT:
+            return gdal.GDT_Int32
+        elif rsgislib_datatype == TYPE_8UINT:
+            return gdal.GDT_Byte
+        elif rsgislib_datatype == TYPE_16UINT:
+            return gdal.GDT_UInt16
+        elif rsgislib_datatype == TYPE_32UINT:
+            return gdal.GDT_UInt32
+        elif rsgislib_datatype == TYPE_32FLOAT:
+            return gdal.GDT_Float32
+        elif rsgislib_datatype == TYPE_64FLOAT:
+            return gdal.GDT_Float64
+        else:
+            raise RSGISPyException("The data type '" + str(rsgislib_datatype) + "' is unknown / not supported.")
+
     def getNumpyDataType(self, rsgislib_datatype):
         """
         Convert from RSGISLib data type to numpy datatype
