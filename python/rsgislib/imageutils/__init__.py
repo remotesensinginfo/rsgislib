@@ -1358,4 +1358,29 @@ masks. A JSON LUT is also generated to identify the image values to a
         json.dump(out_poss_lut, outJSONfile, sort_keys=True,indent=4, separators=(',', ': '), ensure_ascii=False)
 
 
+def gdal_translate(input_img, output_img, gdal_format='GTIFF', options=''):
+    """
+    Using GDAL translate to convert input image to a different format, if GTIFF selected
+    and no options are provided then a cloud optimised GeoTIFF will be outputted.
 
+    :param input_img: Input image which is GDAL readable.
+    :param output_img: The output image file.
+    :param gdal_format: The output image file format
+    :param options: options for the output driver (e.g., "-co TILED=YES -co COMPRESS=LZW -co BIGTIFF=YES")
+    """
+    if (gdal_format == 'GTIFF') and (options != ''):
+        options = "-co TILED=YES -co INTERLEAVE=PIXEL -co BLOCKXSIZE=256 -co BLOCKYSIZE=256 -co COMPRESS=LZW -co BIGTIFF=YES -co COPY_SRC_OVERVIEWS=YES"
+    trans_opt = gdal.TranslateOptions(format=gdal_format, options=options)
+    gdal.Translate(output_img, input_img, options=trans_opt)
+
+
+def gdal_stack_images_vrt(input_imgs, output_vrt_file):
+    """
+    A function which creates a GDAL VRT file from a set of input images by stacking the input images
+    in a multi-band output file.
+
+    :param input_imgs: A list of input images
+    :param output_vrt_file: The output file location for the VRT.
+    """
+    build_vrt_opt = gdal.BuildVRTOptions(separate=True)
+    gdal.BuildVRT(output_vrt_file, input_imgs, options=build_vrt_opt)
