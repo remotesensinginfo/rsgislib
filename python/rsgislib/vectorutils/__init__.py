@@ -2188,7 +2188,7 @@ When creating an attribute the available data types are ogr.OFTString, ogr.OFTIn
 
 def bboxIntersectsVecLyr(vectorFile, vectorLyr, bbox):
     """
-A function which tests where a feature within an inputted vector layer intersects
+A function which tests whether a feature within an inputted vector layer intersects
 with a bounding box. 
 
 :param vectorFile: vector file/path
@@ -2484,6 +2484,7 @@ layer is returned as an in memory ogr Layer object.
     feedback = 10
     feedback_next = step
     counter = 0
+    lyrVecObj.ResetReading()
     print("Started .0.", end='', flush=True)
     outenvs = []
     # loop through the input features
