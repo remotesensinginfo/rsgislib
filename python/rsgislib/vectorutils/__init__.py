@@ -1007,29 +1007,50 @@ Where:
                     raise Exception('Error running ogr2ogr: ' + cmd)
 
 
-def mergeVectors2GPKGIndLyrs(inFileList, outFile):
+def mergeVectors2GPKGIndLyrs(inFileList, outFile, rename_dup_lyrs=False, geom_type=None):
     """
-Function which will merge a list of vector files into an single output GPKG file where each input 
+Function which will merge a list of vector files into an single output GPKG file where each input
 file forms a new layer using the existing layer name. This function wraps the ogr2ogr command.
 
 Where:
 
 :param inFileList: is a list of input files.
 :param outFile: is the output GPKG database (\*.gpkg)
+:param rename_dup_lyrs: If False an exception will be throw if any input layers has the same name.
+                        If True a layer will be renamed - with a random set of letters/numbers on the end.
+:param geom_type: Force the output vector to have a particular geometry type (e.g., 'POLYGON'). Same options as ogr2ogr.
 
 """
+    rsgis_utils = rsgislib.RSGISPyUtils()
+    out_lyr_names = []
+
+    out_geom_type = ''
+    if geom_type is not None:
+        out_geom_type = ' -nlt {} '.format(geom_type)
+
     for inFile in inFileList:
-        inlyrs = getVecLyrsLst(inFile)
+        inlyrs = rsgislib.vectorutils.getVecLyrsLst(inFile)
         print("Processing File: {0} has {1} layers to copy.".format(inFile, len(inlyrs)))
         for lyr in inlyrs:
-            nFeat = getVecFeatCount(inFile, lyr)
-            print("Processing Layer: {0} has {1} features to copy.".format(lyr, nFeat))
+            nFeat = rsgislib.vectorutils.getVecFeatCount(inFile, lyr)
+            out_lyr = lyr
+            if lyr in out_lyr_names:
+                if rename_dup_lyrs:
+                    out_lyr = '{}_{}'.format(lyr, rsgis_utils.uidGenerator())
+                else:
+                    raise Exception("Input files have layers with the same name, these will be over written.")
+            print("Processing Layer: {0} has {1} features to copy - output layer name: {2}".format(lyr, nFeat, out_lyr))
             if nFeat > 0:
-                cmd = 'ogr2ogr -overwrite -f "GPKG" -lco SPATIAL_INDEX=YES -nln {0} "{1}" "{2}" {0}'.format(lyr, outFile, inFile)
+                cmd = 'ogr2ogr -overwrite -f "GPKG" {4} -lco SPATIAL_INDEX=YES -nln {0} "{1}" "{2}" {3}'.format(out_lyr,
+                                                                                                                outFile,
+                                                                                                                inFile,
+                                                                                                                lyr,
+                                                                                                                out_geom_type)
                 try:
                     subprocess.check_call(cmd, shell=True)
                 except OSError as e:
                     raise Exception('Error running ogr2ogr: ' + cmd)
+                out_lyr_names.append(out_lyr)
 
 
 def createPolySHP4LstBBOXs(csvFile, outSHP, epsgCode, minXCol=0, maxXCol=1, minYCol=2, maxYCol=3, ignoreRows=0, force=False):
