@@ -1358,7 +1358,7 @@ masks. A JSON LUT is also generated to identify the image values to a
         json.dump(out_poss_lut, outJSONfile, sort_keys=True,indent=4, separators=(',', ': '), ensure_ascii=False)
 
 
-def gdal_translate(input_img, output_img, gdal_format='GTIFF', options=''):
+def gdal_translate(input_img, output_img, gdal_format='KEA', options=''):
     """
     Using GDAL translate to convert input image to a different format, if GTIFF selected
     and no options are provided then a cloud optimised GeoTIFF will be outputted.

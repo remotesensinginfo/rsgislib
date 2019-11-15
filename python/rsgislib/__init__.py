@@ -602,6 +602,37 @@ class RSGISPyUtils (object):
             maxY = out_trY
 
         return [minX, maxX, minY, maxY]
+
+    def do_bboxes_intersect(self, bbox1, bbox2):
+        """
+        A function which tests whether two bboxes (MinX, MaxX, MinY, MaxY) intersect.
+
+        :param bbox1: The first bounding box (MinX, MaxX, MinY, MaxY)
+        :param bbox2: The first bounding box (MinX, MaxX, MinY, MaxY)
+
+        :return: boolean (True they intersect; False they do not intersect)
+        """
+        x_min = 0
+        x_max = 1
+        y_min = 2
+        y_max = 3
+        intersect = ((bbox1[x_max] > bbox2[x_min]) and (bbox2[x_max] > bbox1[x_min]) and (
+                    bbox1[y_max] > bbox2[y_min]) and (bbox2[y_max] > bbox1[y_min]))
+        return intersect
+
+    def buffer_bbox(self, bbox, buf):
+        """
+        Buffer the input BBOX by a set amount.
+        :param bbox: the bounding box (MinX, MaxX, MinY, MaxY)
+        :param buf: the amount of buffer by
+        :return: return the buffered bbox (MinX, MaxX, MinY, MaxY)
+        """
+        out_bbox = [0, 0, 0, 0]
+        out_bbox[0] = bbox[0] - buf
+        out_bbox[1] = bbox[1] + buf
+        out_bbox[2] = bbox[2] - buf
+        out_bbox[3] = bbox[3] + buf
+        return out_bbox
         
     def getVecLayerExtent(self, inVec, layerName=None, computeIfExp=True):
         """
