@@ -286,6 +286,18 @@ class RSGISPyUtils (object):
             basename = out_basename
         return basename
 
+    def get_dir_name(self, in_file):
+        """
+        A function which returns just the name of the directory of the input file without the rest of the path.
+
+        :param in_file: string for the input file name and path
+        :return: directory name
+        """
+        in_file = os.path.abspath(in_file)
+        dir_path = os.path.dirname(in_file)
+        dir_name = os.path.basename(dir_path)
+        return dir_name
+
     def getRSGISLibDataTypeFromImg(self, inImg):
         """
         Returns the rsgislib datatype ENUM (e.g., rsgislib.TYPE_8INT) 
