@@ -742,7 +742,7 @@ order:
 1. band 1 mean
 2. band 1 std dev
 3. band 2 mean
-4. band 3 std dev
+4. band 2 std dev
 
 :param ref_img: reference image which defines the output image
 :param stats_imgs: a list of input images over which the stats will be calculated.
