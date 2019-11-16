@@ -1402,6 +1402,128 @@ A function which reprojects a vector layer.
     outDataSet = None
 
 
+def reproj_vec_lyr(in_vec_lyr, out_vec_file, out_epsg, out_vec_drv='MEMORY', out_lyr_name=None, in_epsg=None,
+                      print_feedback=True):
+    """
+A function which reprojects a vector layer.
+
+:param in_vec_lyr: is a GDAL vector layer object.
+:param out_vec_file: is a string with name and path to output vector file - is created.
+:param out_epsg: is an int with the EPSG code to which the input vector layer is to be reprojected to.
+:param out_vec_drv: is the output vector file format. Default is MEMORY - i.e., nothing written to disk.
+:param out_lyr_name: is a string for the output layer name. If None then ignored and
+                   assume there is just a single layer in the vector and layer name
+                   is the same as the file name.
+:param inLyrName: is a string for the input layer name. If None then ignored and
+                  assume there is just a single layer in the vector.
+:param in_epsg: is an int with the EPSG code for the input vector file
+                  (Optional; taken from input file if not specified).
+:param print_feedback: is a boolean (Default True) specifying whether feedback should be printed to the console.
+:return: Returns the output datasource and layer objects (result_ds, result_lyr). datasource needs to be set to None
+         once you have finished using to free memory and if written to disk to ensure the whole dataset is written.
+
+"""
+    ## This code has been editted from https://pcjericks.github.io/py-gdalogr-cookbook/projection.html#reproject-a-layer
+    ## Updated for GDAL 2.0
+    gdal.UseExceptions()
+
+    in_vec_lyr.ResetReading()
+
+    # input SpatialReference
+    in_spat_ref = osr.SpatialReference()
+    if in_epsg is not None:
+        in_spat_ref.ImportFromEPSG(in_epsg)
+    else:
+        in_spat_ref = in_vec_lyr.GetSpatialRef()
+
+    # output SpatialReference
+    out_spat_ref = osr.SpatialReference()
+    out_spat_ref.ImportFromEPSG(out_epsg)
+
+    # create the CoordinateTransformation
+    coord_trans = osr.CoordinateTransformation(in_spat_ref, out_spat_ref)
+
+    # Create shapefile driver
+    driver = ogr.GetDriverByName(out_vec_drv)
+    if driver == None:
+        raise Exception("Driver has not be recognised.")
+
+    # create the output layer
+    result_ds = driver.CreateDataSource(out_vec_file)
+    if result_ds == None:
+        raise Exception("The output vector data source was not created: {}".format(out_vec_file))
+    if out_lyr_name == None:
+        out_lyr_name = os.path.splitext(os.path.basename(out_vec_file))[0]
+    result_lyr = result_ds.CreateLayer(out_lyr_name, out_spat_ref, geom_type=in_vec_lyr.GetGeomType())
+
+    # add fields
+    in_vec_lyr_defn = in_vec_lyr.GetLayerDefn()
+    for i in range(0, in_vec_lyr_defn.GetFieldCount()):
+        fieldDefn = in_vec_lyr_defn.GetFieldDefn(i)
+        result_lyr.CreateField(fieldDefn)
+
+    # get the output layer's feature definition
+    result_lyr_defn = result_lyr.GetLayerDefn()
+
+    openTransaction = False
+    nFeats = in_vec_lyr.GetFeatureCount(True)
+    step = math.floor(nFeats / 10)
+    feedback = 10
+    feedback_next = step
+    counter = 0
+    if print_feedback:
+        print("Started .0.", end='', flush=True)
+
+    # loop through the input features
+    inFeature = in_vec_lyr.GetNextFeature()
+    while inFeature:
+        if (nFeats > 10) and (counter == feedback_next):
+            if print_feedback:
+                print(".{}.".format(feedback), end='', flush=True)
+            feedback_next = feedback_next + step
+            feedback = feedback + 10
+
+        if not openTransaction:
+            result_lyr.StartTransaction()
+            openTransaction = True
+
+        # get the input geometry
+        geom = inFeature.GetGeometryRef()
+        if geom is not None:
+            # reproject the geometry
+            trans_err_code = geom.Transform(coord_trans)
+            if trans_err_code != ogr.OGRERR_NONE:
+                raise Exception("Geometry transformation failed... Error Code: {}".format(trans_err_code))
+            # create a new feature
+            outFeature = ogr.Feature(result_lyr_defn)
+            # set the geometry and attribute
+            outFeature.SetGeometry(geom)
+            for i in range(0, result_lyr_defn.GetFieldCount()):
+                outFeature.SetField(result_lyr_defn.GetFieldDefn(i).GetNameRef(), inFeature.GetField(i))
+            # add the feature to the shapefile
+            result_lyr.CreateFeature(outFeature)
+        # dereference the features and get the next input feature
+        outFeature = None
+
+        if ((counter % 20000) == 0) and openTransaction:
+            result_lyr.CommitTransaction()
+            openTransaction = False
+
+        inFeature = in_vec_lyr.GetNextFeature()
+        counter = counter + 1
+
+    if openTransaction:
+        result_lyr.CommitTransaction()
+        openTransaction = False
+    result_lyr.SyncToDisk()
+    if print_feedback:
+        print(" Completed")
+
+    result_lyr.ResetReading()
+
+    return result_ds, result_lyr
+
+
 def getAttLstSelectFeats(vecFile, vecLyr, attNames, selVecFile, selVecLyr):
     """
 Function to get a list of attribute values from features which intersect
@@ -2601,6 +2723,32 @@ A function which reads a vector layer to an OGR in memory layer.
         print("Error Vector Layer: {}".format(veclyrname), file=sys.stderr)
         raise e
     return mem_ds, mem_lyr
+
+
+def open_gdal_vec_lyr(vec_file, vec_lyr=None):
+    """
+    A function which opens a GDAL/OGR vector layer and returns
+    the Dataset and Layer objects. Note, the file must be closed
+    by setting the dataset to None.
+
+    :param vec_file: the file path to the vector file.
+    :param vec_lyr: the name of the vector layer. If None then first layer is returned.
+    :return: GDAL dataset, GDAL Layer
+    """
+    vec_obj_ds = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
+    if vec_obj_ds is None:
+        raise Exception("Could not open '{}'".format(vec_file))
+
+    if vec_lyr == None:
+        lyr_obj = vec_obj_ds.GetLayer()
+        if lyr_obj is None:
+            raise Exception("Could not find a layer.")
+    else:
+        lyr_obj = vec_obj_ds.GetLayerByName(vec_lyr)
+        if lyr_obj is None:
+            raise Exception("Could not find layer '{}'".format(vec_lyr))
+
+    return vec_obj_ds, lyr_obj
 
 
 def getMemVecLyrSubset(vecFile, vecLyr, bbox):
