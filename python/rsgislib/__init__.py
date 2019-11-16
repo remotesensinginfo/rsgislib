@@ -1129,7 +1129,7 @@ class RSGISPyUtils (object):
             epsgCode = spatRef.GetAuthorityCode(None)
         except Exception:
             epsgCode = None
-        return epsgCode
+        return int(epsgCode)
         
     def doGDALLayersHaveSameProj(self, layer1, layer2):
         """
