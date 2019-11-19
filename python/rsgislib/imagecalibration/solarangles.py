@@ -121,6 +121,12 @@ Function which calculate a solar azimuth (band 1) and zenith (band 2) image.
     if not haveRIOS:
         raise Exception("The RIOS module required for this function could not be imported.")
 
+    try:
+        import tqdm
+        progress_bar = rsgislib.TQDMProgressBar()
+    except:
+        progress_bar = cuiprogress.GDALProgressBar()
+
     infiles = applier.FilenameAssociations()
     infiles.image1 = inputImg
     outfiles = applier.FilenameAssociations()
@@ -128,7 +134,7 @@ Function which calculate a solar azimuth (band 1) and zenith (band 2) image.
     otherargs = applier.OtherInputs()
     otherargs.dateTime = inImgDateTime
     aControls = applier.ApplierControls()
-    aControls.progress = cuiprogress.CUIProgressBar()
+    aControls.progress = progress_bar
     aControls.drivername = gdalformat
 
 

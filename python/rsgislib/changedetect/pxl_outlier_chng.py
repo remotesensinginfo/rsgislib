@@ -159,8 +159,14 @@ the outliners will related to class changes.
         outfiles.out_scores_img = out_scores_img
         otherargs.out_scores = True
 
+    try:
+        import tqdm
+        progress_bar = rsgislib.TQDMProgressBar()
+    except:
+        progress_bar = cuiprogress.GDALProgressBar()
+
     aControls = applier.ApplierControls()
-    aControls.progress = cuiprogress.CUIProgressBar()
+    aControls.progress = progress_bar
     aControls.drivername = gdalformat
     aControls.omitPyramids = True
     aControls.calcStats = False

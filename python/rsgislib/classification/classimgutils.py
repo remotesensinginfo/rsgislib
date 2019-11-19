@@ -332,9 +332,15 @@ This function uses a trained classifier and applies it to the provided input ima
     otherargs.mskVal = imgMaskVal
     otherargs.numClassVars = numClassVars
     otherargs.imgFileInfo = imgFileInfo
-    
+
+    try:
+        import tqdm
+        progress_bar = rsgislib.TQDMProgressBar()
+    except:
+        progress_bar = cuiprogress.GDALProgressBar()
+
     aControls = applier.ApplierControls()
-    aControls.progress = cuiprogress.CUIProgressBar()
+    aControls.progress = progress_bar
     aControls.drivername = gdalformat
     aControls.omitPyramids = True
     aControls.calcStats = False
@@ -1131,8 +1137,14 @@ threshold can be applied to this image.
     otherargs.numClassVars = numClassVars
     otherargs.imgFileInfo = imgFileInfo
 
+    try:
+        import tqdm
+        progress_bar = rsgislib.TQDMProgressBar()
+    except:
+        progress_bar = cuiprogress.GDALProgressBar()
+
     aControls = applier.ApplierControls()
-    aControls.progress = cuiprogress.CUIProgressBar()
+    aControls.progress = progress_bar
     aControls.drivername = gdalformat
     aControls.omitPyramids = True
     aControls.calcStats = False
