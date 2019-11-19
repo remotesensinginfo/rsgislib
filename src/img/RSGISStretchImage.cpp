@@ -1109,7 +1109,7 @@ namespace rsgis { namespace img {
                     output[i] = outMin[i];
                 }
 			}
-            else if(this->outNoData && (bandValues[i] == this->inNoData))
+            else if(this->useNoData && (bandValues[i] == this->inNoData))
             {
                 output[i] = this->outNoData;
             }
@@ -1180,7 +1180,7 @@ namespace rsgis { namespace img {
                     output[i] = outMin[i];
                 }
 			}
-            else if(this->outNoData && (bandValues[i] == this->inNoData))
+            else if(this->useNoData && (bandValues[i] == this->inNoData))
             {
                 output[i] = this->outNoData;
             }
