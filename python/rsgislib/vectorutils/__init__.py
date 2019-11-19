@@ -1975,7 +1975,7 @@ multiple layers. A shapefile which only supports 1 layer will not work.
                needs to be in the output unit.
 :param y_size: Output grid size in Y axis. If out_epsg_code or utm_grid defined then the grid size
                needs to be in the output unit.
-:param in_epsg_code: EPDSG code for the projection of the bbox
+:param in_epsg_code: EPSG code for the projection of the bbox
 :param out_vec: output vector file.
 :param out_vec_lyr: output vector layer name.
 :param vec_drv: output vector file format (see OGR codes). Default is GPKG.
