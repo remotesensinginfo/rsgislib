@@ -306,9 +306,16 @@ Where:
     newField = ogr.FieldDefn('PXLVAL', ogr.OFTInteger)
     outLayer.CreateField(newField)
     dstFieldIdx = outLayer.GetLayerDefn().GetFieldIndex('PXLVAL')
+
+    try:
+        import tqdm
+        pbar = tqdm.tqdm(total=100)
+        callback = lambda *args, **kw: pbar.update()
+    except:
+        callback = gdal.TermProgress
     
     print("Polygonising...")
-    gdal.Polygonize(imgBand, imgMaskBand, outLayer, dstFieldIdx, [], callback=gdal.TermProgress )
+    gdal.Polygonize(imgBand, imgMaskBand, outLayer, dstFieldIdx, [], callback=callback )
     print("Completed")
     outLayer.SyncToDisk()
     outDatasource = None
@@ -370,8 +377,15 @@ Where:
     outLayer.CreateField(newField)
     dstFieldIdx = outLayer.GetLayerDefn().GetFieldIndex(pxl_val_fieldname)
 
+    try:
+        import tqdm
+        pbar = tqdm.tqdm(total=100)
+        callback = lambda *args, **kw: pbar.update()
+    except:
+        callback = gdal.TermProgress
+
     print("Polygonising...")
-    gdal.Polygonize(imgBand, imgMaskBand, outLayer, dstFieldIdx, [], callback=gdal.TermProgress)
+    gdal.Polygonize(imgBand, imgMaskBand, outLayer, dstFieldIdx, [], callback=callback )
     print("Completed")
     outLayer.SyncToDisk()
     vecDS = None

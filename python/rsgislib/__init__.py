@@ -93,6 +93,7 @@ import os
 import time
 import datetime
 import math
+import sys
 
 import osgeo.osr as osr
 import osgeo.ogr as ogr
@@ -188,14 +189,12 @@ class RSGISPyException(Exception):
     def __init__(self, value):
         """
         Init for the RSGISPyException class
-
         """
         self.value = value
         
     def __str__(self):
         """
         Return a string representation of the exception
-
         """
         return repr(self.value)
 
@@ -1287,6 +1286,7 @@ class RSGISPyUtils (object):
         Read a text file into a single string
         removing new lines.
 
+        :param file: File path to the input file.
         :return: string
 
         """
@@ -1305,6 +1305,7 @@ class RSGISPyUtils (object):
         Read a text file into a list where each line 
         is an element in the list.
 
+        :param file: File path to the input file.
         :return: list
 
         """
@@ -1324,11 +1325,31 @@ class RSGISPyUtils (object):
         """
         Write a list a text file, one line per item.
 
+        :param dataList: List of values to be written to the output file.
+        :param out_file: File path to the output file.
+
         """
         try:
             f = open(outFile, 'w')
             for item in dataList:
                f.write(str(item)+'\n')
+            f.flush()
+            f.close()
+        except Exception as e:
+            raise e
+
+    def writeData2File(self, data_val, out_file):
+        """
+        Write some data (a string or can be converted to a string using str(data_val) to
+        an output text file.
+
+        :param data_val: Data to be written to the output file.
+        :param out_file: File path to the output file.
+
+        """
+        try:
+            f = open(out_file, 'w')
+            f.write(str(data_val)+'\n')
             f.flush()
             f.close()
         except Exception as e:
@@ -1534,4 +1555,43 @@ class RSGISTime (object):
             else:
                 print('Algorithm Completed in %s.'%(timeDiffStr))
         
+class TQDMProgressBar(object):
+    """
+    Uses TQDM TermProgress to print a progress bar to the terminal
+    """
+    def __init__(self):
+        self.lprogress = 0
 
+    def setTotalSteps(self,steps):
+        import tqdm
+        self.pbar = tqdm.tqdm(total=steps)
+        self.lprogress = 0
+
+    def setProgress(self, progress):
+        step = progress - self.lprogress
+        self.pbar.update(step)
+        self.lprogress = progress
+
+    def reset(self):
+        self.pbar.close()
+        import tqdm
+        self.pbar = tqdm.tqdm(total=100)
+        self.lprogress = 0
+
+    def setLabelText(self,text):
+        sys.stdout.write('\n%s\n' % text)
+
+    def wasCancelled(self):
+        return False
+
+    def displayException(self,trace):
+        sys.stdout.write(trace)
+
+    def displayWarning(self,text):
+        sys.stdout.write("Warning: %s\n" % text)
+
+    def displayError(self,text):
+        sys.stdout.write("Error: %s\n" % text)
+
+    def displayInfo(self,text):
+        sys.stdout.write("Info: %s\n" % text)

@@ -1435,12 +1435,17 @@ def _computeProximityArrArgsFunc(argVals):
     imageutils.createCopyImage(argVals[0], argVals[1], 1, argVals[3], argVals[4], rsgislib.TYPE_32FLOAT)
     distImgDS = gdal.Open(argVals[1], gdal.GA_Update)
     distImgBand = distImgDS.GetRasterBand(1)
-    gdal.ComputeProximity(classImgBand, distImgBand, argVals[2], callback=gdal.TermProgress)
+    try:
+        import tqdm
+        pbar = tqdm.tqdm(total=100)
+        callback = lambda *args, **kw: pbar.update()
+    except:
+        callback = gdal.TermProgress
+    gdal.ComputeProximity(classImgBand, distImgBand, argVals[2], callback=callback)
     distImgBand = None
     distImgDS = None
     classImgBand = None
     classImgDS = None
-
 
 
 def calcDist2Classes(clumpsImg, classCol, outImgBase, tmpDIR='./tmp', tileSize=2000, maxDist=1000, nodata=1000, nCores=-1):

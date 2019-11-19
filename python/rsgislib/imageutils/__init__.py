@@ -546,17 +546,24 @@ Where:
     inFile = gdal.Open(inProcessImg, gdal.GA_ReadOnly)
     outFile = gdal.Open(outImg, gdal.GA_Update)
 
+    try:
+        import tqdm
+        pbar = tqdm.tqdm(total=100)
+        callback = lambda *args, **kw: pbar.update()
+    except:
+        callback = gdal.TermProgress
+
     wrpOpts = []
     if multicore:
         if haveNoData:
-            wrpOpts = gdal.WarpOptions(resampleAlg=interpolationMethod, srcNodata=noDataVal, dstNodata=noDataVal, multithread=True, callback=gdal.TermProgress)    
+            wrpOpts = gdal.WarpOptions(resampleAlg=interpolationMethod, srcNodata=noDataVal, dstNodata=noDataVal, multithread=True, callback=callback )
         else:
-            wrpOpts = gdal.WarpOptions(resampleAlg=interpolationMethod, multithread=True, callback=gdal.TermProgress)
+            wrpOpts = gdal.WarpOptions(resampleAlg=interpolationMethod, multithread=True, callback=callback )
     else:
         if haveNoData:
-            wrpOpts = gdal.WarpOptions(resampleAlg=interpolationMethod, srcNodata=noDataVal, dstNodata=noDataVal, multithread=False, callback=gdal.TermProgress)    
+            wrpOpts = gdal.WarpOptions(resampleAlg=interpolationMethod, srcNodata=noDataVal, dstNodata=noDataVal, multithread=False, callback=callback )
         else:
-            wrpOpts = gdal.WarpOptions(resampleAlg=interpolationMethod, multithread=False, callback=gdal.TermProgress)
+            wrpOpts = gdal.WarpOptions(resampleAlg=interpolationMethod, multithread=False, callback=callback )
     
     gdal.Warp(outFile, inFile, options=wrpOpts)
     
@@ -566,7 +573,8 @@ Where:
 
 def reprojectImage(inputImage, outputImage, outWKT, gdalformat='KEA', interp='cubic', inWKT=None, noData=0.0, outPxlRes='image', snap2Grid=True, multicore=False, gdal_options=[]):
     """
-This function provides a tool which uses the gdalwarp function to reproject an input image.
+This function provides a tool which uses the gdalwarp function to reproject an input image. When you want an simpler
+interface use the rsgislib.imageutils.gdal_warp function. This handles more automatically.
 
 Where:
 
@@ -579,7 +587,8 @@ Where:
 :param noData: float representing the not data value (Default is 0.0)
 :param outPxlRes: three inputs can be provided
                   1) 'image' where the output resolution will match the input (Default is image)
-                  2) 'auto' where an output resolution maintaining the image size of the input image will be used
+                  2) 'auto' where an output resolution maintaining the image size of the input image will be used.
+                            You may consider using rsgislib.imageutils.gdal_warp instead of this option.
                   3) provide a floating point value for the image resolution (note. pixels will be sqaure)
 :param snap2Grid: is a boolean specifying whether the TL pixel should be snapped to a multiple of the pixel resolution (Default is True).
 :param nCores: the number of processing cores available for processing (-1 is all cores: Default=-1)
@@ -688,7 +697,7 @@ Where:
             outRes = yOutRes
     else: 
         raise Exception('Was not able to defined the output resolution. Check Input: \'' + outPxlRes + '\'')
-    
+
     outTLX = xMin
     outTLY = yMax
     outWidth = int(round((xMax - xMin) / outRes)) + 1
@@ -713,19 +722,78 @@ Where:
     
     for i in range(numBands):
         outImgDS.GetRasterBand(i+1).SetNoDataValue(noData)
-    
+
+    try:
+        import tqdm
+        pbar = tqdm.tqdm(total=100)
+        callback = lambda *args, **kw: pbar.update()
+    except:
+        callback = gdal.TermProgress
+
     print("Performing the reprojection")
-    
     wrpOpts = []
     if multicore:
-        wrpOpts = gdal.WarpOptions(resampleAlg=eResampleAlg, srcNodata=noData, dstNodata=noData, multithread=True, callback=gdal.TermProgress)
+        wrpOpts = gdal.WarpOptions(resampleAlg=eResampleAlg, srcNodata=noData, dstNodata=noData, multithread=True, callback=callback)
     else:
-        wrpOpts = gdal.WarpOptions(resampleAlg=eResampleAlg, srcNodata=noData, dstNodata=noData, multithread=False, callback=gdal.TermProgress)    
+        wrpOpts = gdal.WarpOptions(resampleAlg=eResampleAlg, srcNodata=noData, dstNodata=noData, multithread=False, callback=callback)
 
     gdal.Warp(outImgDS, inImgDS, options=wrpOpts)
 
     inImgDS = None
-    outImgDS = None    
+    outImgDS = None
+
+
+def gdal_warp(input_img, output_img, out_epsg, interp='near', gdalformat='KEA', use_multi_threaded=True, options=[]):
+    """
+    A function which runs GDAL Warp function to tranform an image from one projection to another. Use this function
+    when you want GDAL to do procesing of pixel size and image size automatically. rsgislib.imageutils.reprojectImage
+    should be used when you want to put the output image on a particular grid etc.
+
+    :param input_img: input image file
+    :param output_img: output image file
+    :param out_epsg: the EPSG for the output image file.
+    :param interp: interpolation algorithm. Options are: near, bilinear, cubic, cubicspline, lanczos, average, mode. (Default is near)
+    :param gdalformat: output image file format
+    :param use_multi_threaded: Use multiple cores for processing (Default: True).
+    :param options: GDAL file creation options e.g., ["TILED=YES", "COMPRESS=LZW", "BIGTIFF=YES"]
+
+    """
+    from osgeo import gdal
+    gdal.UseExceptions()
+    rsgisUtils = rsgislib.RSGISPyUtils()
+    in_no_data_val = rsgisUtils.getImageNoDataValue(input_img)
+    in_epsg = rsgisUtils.getEPSGCode(input_img)
+    img_data_type = rsgisUtils.getGDALDataTypeFromImg(input_img)
+
+    eResampleAlg = gdal.GRA_CubicSpline
+    if interp == 'near':
+        eResampleAlg = gdal.GRA_NearestNeighbour
+    elif interp == 'bilinear':
+        eResampleAlg = gdal.GRA_Bilinear
+    elif interp == 'cubic':
+        eResampleAlg = gdal.GRA_Cubic
+    elif interp == 'cubicspline':
+        eResampleAlg = gdal.GRA_CubicSpline
+    elif interp == 'lanczos':
+        eResampleAlg = gdal.GRA_Lanczos
+    elif interp == 'average':
+        eResampleAlg = gdal.GRA_Average
+    elif interp == 'mode':
+        eResampleAlg = gdal.GRA_Mode
+    else:
+        raise Exception('The interpolation algorithm was not recogonised: \'' + interp + '\'')
+
+    try:
+        import tqdm
+        pbar = tqdm.tqdm(total=100)
+        callback = lambda *args, **kw: pbar.update()
+    except:
+        callback = gdal.TermProgress
+    warp_opts = gdal.WarpOptions(format=gdalformat, srcSRS="EPSG:{}".format(in_epsg), dstSRS="EPSG:{}".format(out_epsg),
+                                 resampleAlg=eResampleAlg, srcNodata=in_no_data_val, dstNodata=in_no_data_val,
+                                 callback=callback, creationOptions=options, outputType=img_data_type,
+                                 workingType=gdal.GDT_Float32, multithread=use_multi_threaded)
+    gdal.Warp(output_img, input_img, options=warp_opts)
 
 def subsetPxlBBox(inputimage, outputimage, gdalformat, datatype, xMinPxl, xMaxPxl, yMinPxl, yMaxPxl):
     """
@@ -755,11 +823,6 @@ Function to subset an input image using a defined pixel bbox.
     yMax = bbox[2] + (yMaxPxl * yRes)
     
     rsgislib.imageutils.subsetbbox(inputimage, outputimage, gdalformat, datatype, xMin, xMax, yMin, yMax)
-
-def _runSubset(tileinfo):
-    """ Internal function for createTilesMultiCore for multiprocessing Pool. """
-    subsetPxlBBox(tileinfo['inputimage'], tileinfo['outfile'], tileinfo['gdalformat'], tileinfo['datatype'], tileinfo['bbox'][0], tileinfo['bbox'][1], tileinfo['bbox'][2], tileinfo['bbox'][3])
-
 
 def createTilesMultiCore(inputimage, baseimage, width, height, gdalformat, datatype, ext, ncores=1):
     """
@@ -819,7 +882,12 @@ Function to generate a set of tiles for the input image.
         tile['outfile'] = "{0}_{1}.{2}".format(baseimage, tile['tile'], ext)
         tile['gdalformat'] = gdalformat
         tile['datatype'] = datatype
-    
+
+    def _runSubset(tileinfo):
+        """ Internal function for createTilesMultiCore for multiprocessing Pool. """
+        subsetPxlBBox(tileinfo['inputimage'], tileinfo['outfile'], tileinfo['gdalformat'], tileinfo['datatype'],
+                      tileinfo['bbox'][0], tileinfo['bbox'][1], tileinfo['bbox'][2], tileinfo['bbox'][3])
+
     poolobj = multiprocessing.Pool(ncores)
     poolobj.map(_runSubset, tiles)
 
@@ -857,8 +925,6 @@ Example::
     
     for inImgDict in inImagesDict:
         rsgislib.imageutils.subset(inImgDict['IN'], outShpEnv, inImgDict['OUT'], gdalformat, inImgDict['TYPE'])
-    
-
 
 
 def buildImgSubDict(globFindImgsStr, outDir, suffix, ext):
@@ -936,13 +1002,19 @@ Where:
     if not haveRIOS:
         raise Exception("The RIOS module required for this function could not be imported\n\t" + riosErr)
 
+    try:
+        import tqdm
+        progress_bar = rsgislib.TQDMProgressBar()
+    except:
+        progress_bar = cuiprogress.GDALProgressBar()
+
     infiles = applier.FilenameAssociations()
     infiles.image1 = inputImg
     outfiles = applier.FilenameAssociations()
     outfiles.outimage = outputImg
     otherargs = applier.OtherInputs()
     aControls = applier.ApplierControls()
-    aControls.progress = cuiprogress.CUIProgressBar()
+    aControls.progress = progress_bar
     aControls.drivername = gdalformat
     aControls.omitPyramids = True
     aControls.calcStats = False
@@ -1140,6 +1212,12 @@ Where:
     if not haveRIOS:
         raise Exception("The RIOS module required for this function could not be imported\n\t" + riosErr)
 
+    try:
+        import tqdm
+        progress_bar = rsgislib.TQDMProgressBar()
+    except:
+        progress_bar = cuiprogress.GDALProgressBar()
+
     infiles = applier.FilenameAssociations()
     infiles.inImg = inputImg
     outfiles = applier.FilenameAssociations()
@@ -1148,7 +1226,7 @@ Where:
     otherargs.lowVal = lowVal
     otherargs.upVal = upVal
     aControls = applier.ApplierControls()
-    aControls.progress = cuiprogress.CUIProgressBar()
+    aControls.progress = progress_bar
     aControls.drivername = gdalformat
     aControls.omitPyramids = True
     aControls.calcStats = False
@@ -1302,6 +1380,12 @@ masks. A JSON LUT is also generated to identify the image values to a
     import json
     rsgis_utils = rsgislib.RSGISPyUtils()
 
+    try:
+        import tqdm
+        progress_bar = rsgislib.TQDMProgressBar()
+    except:
+        progress_bar = cuiprogress.GDALProgressBar()
+
     in_vals_dict = dict()
     msk_imgs = list()
     for key in msk_imgs_dict.keys():
@@ -1315,7 +1399,7 @@ masks. A JSON LUT is also generated to identify the image values to a
     outfiles.outimage = out_img
     otherargs = applier.OtherInputs()
     aControls = applier.ApplierControls()
-    aControls.progress = cuiprogress.CUIProgressBar()
+    aControls.progress = progress_bar
     aControls.drivername = gdalformat
     aControls.omitPyramids = False
     aControls.calcStats = False
@@ -1370,7 +1454,15 @@ def gdal_translate(input_img, output_img, gdal_format='KEA', options=''):
     """
     if (gdal_format == 'GTIFF') and (options != ''):
         options = "-co TILED=YES -co INTERLEAVE=PIXEL -co BLOCKXSIZE=256 -co BLOCKYSIZE=256 -co COMPRESS=LZW -co BIGTIFF=YES -co COPY_SRC_OVERVIEWS=YES"
-    trans_opt = gdal.TranslateOptions(format=gdal_format, options=options)
+
+    try:
+        import tqdm
+        pbar = tqdm.tqdm(total=100)
+        callback = lambda *args, **kw: pbar.update()
+    except:
+        callback = gdal.TermProgress
+
+    trans_opt = gdal.TranslateOptions(format=gdal_format, options=options, callback=callback)
     gdal.Translate(output_img, input_img, options=trans_opt)
 
 
@@ -1382,5 +1474,12 @@ def gdal_stack_images_vrt(input_imgs, output_vrt_file):
     :param input_imgs: A list of input images
     :param output_vrt_file: The output file location for the VRT.
     """
-    build_vrt_opt = gdal.BuildVRTOptions(separate=True)
+    try:
+        import tqdm
+        pbar = tqdm.tqdm(total=100)
+        callback = lambda *args, **kw: pbar.update()
+    except:
+        callback = gdal.TermProgress
+
+    build_vrt_opt = gdal.BuildVRTOptions(separate=True, callback=callback)
     gdal.BuildVRT(output_vrt_file, input_imgs, options=build_vrt_opt)
