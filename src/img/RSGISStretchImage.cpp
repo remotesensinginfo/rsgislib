@@ -1132,16 +1132,16 @@ namespace rsgis { namespace img {
                 {
                     if(this->outNoData == outMax[i])
                     {
-                        output[i] = outVal - 1
+                        output[i] = outVal - 1;
                     }
                     else
                     {
-                        output[i] = outVal + 1
+                        output[i] = outVal + 1;
                     }
                 }
                 else
                 {
-                    output[i] = outVal
+                    output[i] = outVal;
                 }
 			}
 		}
@@ -1218,16 +1218,16 @@ namespace rsgis { namespace img {
                 {
                     if(this->outNoData == outMax[i])
                     {
-                        output[i] = outVal - 1
+                        output[i] = outVal - 1;
                     }
                     else
                     {
-                        output[i] = outVal + 1
+                        output[i] = outVal + 1;
                     }
                 }
                 else
                 {
-                    output[i] = outVal
+                    output[i] = outVal;
                 }
             }
 		}
