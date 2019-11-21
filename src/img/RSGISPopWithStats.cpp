@@ -252,8 +252,9 @@ namespace rsgis { namespace img {
     {
         int nOverviews = decimatFactors.size();
         
-        int nLastProgress = -1;
-        imgDS->BuildOverviews("AVERAGE", nOverviews, decimatFactors.data(), 0, NULL,  (GDALProgressFunc)StatsTextProgress, &nLastProgress );
+        rsgis_tqdm *pbar = new rsgis_tqdm();
+        imgDS->BuildOverviews("AVERAGE", nOverviews, decimatFactors.data(), 0, NULL,  (GDALProgressFunc)RSGISTQDMProgress, pbar );
+        delete pbar;
     }
     
     unsigned int RSGISPopWithStats::findColumnIndexOrCreate(GDALRasterAttributeTable *gdalATT, std::string colName, GDALRATFieldType dType, GDALRATFieldUsage dUsage)
