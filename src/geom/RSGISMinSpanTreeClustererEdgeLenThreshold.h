@@ -31,6 +31,8 @@
 #include "geom/RSGISSpatialClustererInterface.h"
 #include "geom/RSGISDelaunayTriangulation.h"
 
+#include "common/rsgis-tqdm.h"
+
 #include "math/RSGISClustererException.h"
 
 #include <boost/config.hpp>

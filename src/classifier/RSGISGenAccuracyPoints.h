@@ -35,6 +35,7 @@
 #include "gdal_rat.h"
 #include "ogrsf_frmts.h"
 
+#include "common/rsgis-tqdm.h"
 #include "common/RSGISImageException.h"
 #include "utils/RSGISTextUtils.h"
 

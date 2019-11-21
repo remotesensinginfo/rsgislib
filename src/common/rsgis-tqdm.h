@@ -72,10 +72,10 @@ namespace rsgis
                 right_pad = "|";
             };
             void set_label(std::string label_) { label = label_; };
-            void disable_colors() 
+            void enable_colors()
             {
-                color_transition = false;
-                use_colors = false;
+                color_transition = true;
+                use_colors = true;
             };
     
             void finish() 
@@ -200,8 +200,8 @@ namespace rsgis
             bool in_screen = (system("test $STY") == 0);
             bool in_tmux = (system("test $TMUX") == 0);
             bool is_tty = isatty(1);
-            bool use_colors = true;
-            bool color_transition = true;
+            bool use_colors = false;
+            bool color_transition = false;
             int width = 40;
     
             std::string right_pad = "▏";

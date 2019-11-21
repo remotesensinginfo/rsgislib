@@ -28,7 +28,11 @@
 
 #include <iostream>
 #include <string>
+
 #include "gdal_priv.h"
+
+#include "common/rsgis-tqdm.h"
+
 #include "img/RSGISImageBandException.h"
 #include "img/RSGISImageUtils.h"
 #include "img/RSGISImageCalcException.h"

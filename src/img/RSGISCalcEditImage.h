@@ -33,6 +33,8 @@
 #include "geos/geom/Geometry.h"
 #include "geos/geom/Coordinate.h"
 
+#include "common/rsgis-tqdm.h"
+
 #include "img/RSGISPixelInPoly.h"
 #include "img/RSGISImageCalcException.h"
 #include "img/RSGISCalcImageValue.h"

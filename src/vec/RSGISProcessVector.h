@@ -30,6 +30,7 @@
 
 #include "ogrsf_frmts.h"
 
+#include "common/rsgis-tqdm.h"
 #include "common/RSGISVectorException.h"
 
 #include "math/RSGISMathsUtils.h"

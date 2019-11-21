@@ -37,6 +37,8 @@
 
 #include "libkea/KEAImageIO.h"
 
+#include "common/rsgis-tqdm.h"
+
 #include "rastergis/RSGISRasterAttUtils.h"
 
 #include "gdal_priv.h"

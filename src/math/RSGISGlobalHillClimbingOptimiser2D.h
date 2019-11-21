@@ -27,6 +27,8 @@
 #include <string>
 #include <math.h>
 
+#include "common/rsgis-tqdm.h"
+
 #include "math/RSGISGlobalOptimiser2D.h"
 #include "math/RSGISGlobalOptimisationFunction.h"
 #include "math/RSGISOptimisationException.h"

@@ -29,6 +29,7 @@
 #include <vector>
 #include <algorithm>
 
+#include "common/rsgis-tqdm.h"
 #include "common/RSGISImageException.h"
 
 #include "geom/RSGISPolygon.h"

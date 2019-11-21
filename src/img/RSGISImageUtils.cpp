@@ -3261,17 +3261,11 @@ namespace rsgis{namespace img{
 			// Get Raster band
 			inputRasterBand = image->GetRasterBand(band);
 			
-			int feedback = height/10;
-			int feedbackCounter = 0;
-			std::cout << "Started" << std::flush;
+			rsgis_tqdm pbar;
 			// Loop images to process data
 			for(int i = 0; i < height; i++)
 			{
-				if((i % feedback) == 0)
-				{
-					std::cout << ".." << feedbackCounter << ".." << std::flush;
-					feedbackCounter = feedbackCounter + 10;
-				}
+				pbar.progress(i, height);
 				inputRasterBand->RasterIO(GF_Read, 0, i, width, 1, inputData, width, 1, GDT_Float32, 0, 0);
 				
 				for(int j = 0; j < width; j++)
@@ -3280,7 +3274,7 @@ namespace rsgis{namespace img{
 					outFile << inputData[j] << std::endl;
 				}
 			}
-			std::cout << "..100 Complete.\n";
+			pbar.finish();
 		}
 		catch(RSGISImageBandException &e)
 		{
@@ -3792,23 +3786,15 @@ namespace rsgis{namespace img{
 					inputRasterBand = inDatasets[i]->GetRasterBand(n);
 					outputRasterBand = outputImageDS->GetRasterBand(n);
 					
-					int feedback = stackHeight/10;
-					int feedbackCounter = 0;
-					std::cout << "Started" << std::flush;
-					
+					rsgis_tqdm pbar;
 					for(int m = 0; m < stackHeight; m++)
 					{
-						if((m % feedback) == 0)
-						{
-							std::cout << ".." << feedbackCounter << ".." << std::flush;
-							feedbackCounter = feedbackCounter + 10;
-						}
+						pbar.progress(m, stackHeight);
 						inputRasterBand->RasterIO(GF_Read, dsOffsets[i][0], (dsOffsets[i][1]+m), stackWidth, 1, data, stackWidth, 1, GDT_Float32, 0, 0);						
 						outputRasterBand->RasterIO(GF_Write, 0, m, stackWidth, 1, data, stackWidth, 1, GDT_Float32, 0, 0);
 					}
-					std::cout << " Complete.\n";
+					pbar.finish();
 				}
-
 				GDALClose(outputImageDS);
 			}
 			
@@ -3885,8 +3871,7 @@ namespace rsgis{namespace img{
 			// Find image overlap
 			this->getImageOverlap(inDatasets, numImages, dsOffsets, &stackWidth, &stackHeight, gdalTranslation);
 			
-			std::cout << "Stack Height = " << stackHeight << std::endl;
-			std::cout << "Stack Width = " << stackWidth << std::endl;
+			std::cout << "Stack Height = " << stackHeight << " Width = " << stackWidth << std::endl;
 			
 			data = (float *) CPLMalloc(sizeof(float)*stackWidth);
 			mask = (float *) CPLMalloc(sizeof(float)*stackWidth);
@@ -4726,17 +4711,11 @@ namespace rsgis{namespace img{
             int remainRows = ySize - (nYBlocks * yBlockSize);
             int rowOffset = 0;
             
-            int feedback = nYBlocks/10;
-            int feedbackCounter = 0;
-            std::cout << "Started" << std::flush;
+            rsgis_tqdm pbar;
             // Loop images to process data
             for(int i = 0; i < nYBlocks; i++)
             {
-                if((feedback != 0) && (i % feedback == 0))
-                {
-                    std::cout << "." << feedbackCounter << "." << std::flush;
-                    feedbackCounter = feedbackCounter + 10;
-                }
+                pbar.progress(i, nYBlocks);
                 
                 for(int n = 0; n < numBands; n++)
                 {
@@ -4753,7 +4732,7 @@ namespace rsgis{namespace img{
                     rasterBands[n]->RasterIO(GF_Write, 0, rowOffset, xSize, remainRows, dataVals, xSize, remainRows, GDT_UInt32, 0, 0);
                 }
             }
-            std::cout << " Complete.\n";
+            pbar.finish();
             
             delete[] rasterBands;
             delete[] dataVals;
@@ -4793,17 +4772,11 @@ namespace rsgis{namespace img{
             int remainRows = ySize - (nYBlocks * yBlockSize);
             int rowOffset = 0;
             
-            int feedback = nYBlocks/10;
-            int feedbackCounter = 0;
-            std::cout << "Started" << std::flush;
+            rsgis_tqdm pbar;
             // Loop images to process data
             for(int i = 0; i < nYBlocks; i++)
             {
-                if((feedback != 0) && (i % feedback == 0))
-                {
-                    std::cout << "." << feedbackCounter << "." << std::flush;
-                    feedbackCounter = feedbackCounter + 10;
-                }
+                pbar.progress(i, nYBlocks);
                 
                 for(int n = 0; n < numBands; n++)
                 {
@@ -4820,7 +4793,7 @@ namespace rsgis{namespace img{
                     rasterBands[n]->RasterIO(GF_Write, 0, rowOffset, xSize, remainRows, dataVals, xSize, remainRows, GDT_Float32, 0, 0);
                 }
             }
-            std::cout << " Complete.\n";
+            pbar.finish();
             
             delete[] rasterBands;
             delete[] dataVals;
@@ -4860,17 +4833,11 @@ namespace rsgis{namespace img{
             int remainRows = ySize - (nYBlocks * yBlockSize);
             int rowOffset = 0;
             
-            int feedback = nYBlocks/10;
-            int feedbackCounter = 0;
-            std::cout << "Started" << std::flush;
+            rsgis_tqdm pbar;
             // Loop images to process data
             for(int i = 0; i < nYBlocks; i++)
             {
-                if((feedback != 0) && (i % feedback == 0))
-                {
-                    std::cout << "." << feedbackCounter << "." << std::flush;
-                    feedbackCounter = feedbackCounter + 10;
-                }
+                pbar.progress(i, nYBlocks);
                 
                 for(int n = 0; n < numBands; n++)
                 {
@@ -4887,7 +4854,7 @@ namespace rsgis{namespace img{
                     rasterBands[n]->RasterIO(GF_Write, 0, rowOffset, xSize, remainRows, dataVals, xSize, remainRows, GDT_Byte, 0, 0);
                 }
             }
-            std::cout << " Complete.\n";
+            pbar.finish();
             
             delete[] rasterBands;
             delete[] dataVals;
@@ -4927,17 +4894,11 @@ namespace rsgis{namespace img{
             int remainRows = ySize - (nYBlocks * yBlockSize);
             int rowOffset = 0;
             
-            int feedback = nYBlocks/10;
-            int feedbackCounter = 0;
-            std::cout << "Started" << std::flush;
+            rsgis_tqdm pbar;;
             // Loop images to process data
             for(int i = 0; i < nYBlocks; i++)
             {
-                if((feedback != 0) && (i % feedback == 0))
-                {
-                    std::cout << "." << feedbackCounter << "." << std::flush;
-                    feedbackCounter = feedbackCounter + 10;
-                }
+                pbar.progress(i, nYBlocks);
                 
                 for(int n = 0; n < numBands; n++)
                 {
@@ -4954,7 +4915,7 @@ namespace rsgis{namespace img{
                     rasterBands[n]->RasterIO(GF_Write, 0, rowOffset, xSize, remainRows, dataVals, xSize, remainRows, GDT_Float32, 0, 0);
                 }
             }
-            std::cout << " Complete.\n";
+            pbar.finish();
             
             delete[] rasterBands;
             delete[] dataVals;
@@ -5053,8 +5014,6 @@ namespace rsgis{namespace img{
         try
         {
             double outImgMinX = 0.0;
-            //double outImgMaxX = 0.0;
-            //double outImgMinY = 0.0;
             double outImgMaxY = 0.0;
             unsigned long outImgWidth = 0;
             unsigned long outImgHeight = 0;

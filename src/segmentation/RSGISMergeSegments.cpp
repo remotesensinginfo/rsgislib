@@ -395,18 +395,12 @@ namespace rsgis{namespace segment{
             }
             
             std::cout << "Run Iterative Merge\n";
-            int feedback = numRows/10;
-            int feedbackCounter = 0;
-            std::cout << "Started" << std::flush;
+            rsgis_tqdm pbar;
             rsgisClumpMergeInfo *cClump;
             unsigned int outIdx = 0;
             for(size_t i = 0; i < clumps.size(); ++i)
             {
-                if((feedback != 0) && (i % feedback == 0))
-                {
-                    std::cout << "." << feedbackCounter << "." << std::flush;
-                    feedbackCounter = feedbackCounter + 10;
-                }
+                pbar.progress(i, numRows);
                 
                 cClump = clumps.at(i);
                 
@@ -429,7 +423,7 @@ namespace rsgis{namespace segment{
                     ++outIdx;
                 }
             }
-            std::cout << " Complete.\n";
+            pbar.finish();
             
             int *clumpIDUp = new int[numRows];
             for(size_t i = 0; i < clumps.size(); ++i)

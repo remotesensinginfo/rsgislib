@@ -33,6 +33,8 @@
 #include "gdal_priv.h"
 #include "ogrsf_frmts.h"
 
+#include "common/rsgis-tqdm.h"
+
 #include "img/RSGISImageBandException.h"
 
 #include "math/RSGISMathsUtils.h"
