@@ -81,16 +81,10 @@ namespace rsgis{namespace segment{
         std::vector<float> *clumpSpecPxlVals = new std::vector<float>[numSpecBands];
         float *specPxlVals = new float[numSpecBands];
         
-        int feedback = height/10;
-        int feedbackCounter = 0;
-        std::cout << "Started" << std::flush;
+        rsgis_tqdm pbar;
         for(unsigned int i = 0; i < height; ++i)
         {
-            if((i % feedback) == 0)
-            {
-                std::cout << ".." << feedbackCounter << ".." << std::flush;
-                feedbackCounter = feedbackCounter + 10;
-            }
+            pbar.progress(i, height);
             
             for(unsigned int j = 0; j < width; ++j)
             {
@@ -238,7 +232,7 @@ namespace rsgis{namespace segment{
                 }
             }
         }
-        std::cout << " Complete.\n";
+        pbar.finish();
         
         delete[] clumpSpecPxlVals;
         delete[] specPxlVals;

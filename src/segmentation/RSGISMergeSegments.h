@@ -28,6 +28,7 @@
 #include <math.h>
 #include <stdlib.h>
 
+#include "common/rsgis-tqdm.h"
 #include "common/RSGISAttributeTableException.h"
 
 #include "utils/RSGISTextUtils.h"

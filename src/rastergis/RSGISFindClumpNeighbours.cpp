@@ -42,17 +42,10 @@ namespace rsgis{namespace rastergis{
             unsigned int *clumpIdxs = new unsigned int[width];
             unsigned long maxClumpIdx = 0;
             
-            int feedback = height/10;
-			int feedbackCounter = 0;
-			std::cout << "Started" << std::flush;
-            
+            rsgis_tqdm pbar;
             for(unsigned int i = 0; i < height; ++i)
             {
-                if((i % feedback) == 0)
-				{
-					std::cout << ".." << feedbackCounter << ".." << std::flush;
-					feedbackCounter = feedbackCounter + 10;
-				}
+                pbar.progress(i, height);
                 imgBand->RasterIO(GF_Read, 0, i, width, 1, clumpIdxs, width, 1, GDT_UInt32, 0, 0);
                 for(unsigned int j = 0; j < width; ++j)
                 {
@@ -66,7 +59,7 @@ namespace rsgis{namespace rastergis{
                     }
                 }
             }
-            std::cout << " Complete.\n";
+            pbar.finish();
             delete[] clumpIdxs;
             
             std::cout << "Number of clumps = " << maxClumpIdx << std::endl;
@@ -98,16 +91,11 @@ namespace rsgis{namespace rastergis{
             
             unsigned long clumpID = 0;
             
-			feedbackCounter = 0;
-			std::cout << "Started" << std::flush;
+			pbar.reset();
 			// Loop images to process data
 			for(int i = 0; i < height; i++)
 			{				
-				if((i % feedback) == 0)
-				{
-					std::cout << ".." << feedbackCounter << ".." << std::flush;
-					feedbackCounter = feedbackCounter + 10;
-				}
+				pbar.progress(i, height);
 				                
 				for(int m = 0; m < windowSize; m++)
 				{
@@ -205,7 +193,7 @@ namespace rsgis{namespace rastergis{
                     }
 				}
 			}
-			std::cout << " Complete.\n";
+			pbar.finish();
             
 			for(int i = 0; i < windowSize; i++)
             {

@@ -38,6 +38,8 @@
 #include "gdal_rat.h"
 #include "cpl_string.h"
 
+#include "common/rsgis-tqdm.h"
+
 #include "common/RSGISImageException.h"
 
 #include "img/RSGISImageCalcException.h"

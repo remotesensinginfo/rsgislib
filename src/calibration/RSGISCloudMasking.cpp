@@ -998,17 +998,11 @@ namespace rsgis{namespace calib{
             double *bestFitBaseLine = new double[numClumps];
             bestFitBaseLine[0] = 0.0;
             
-            int feedback = numClumps/10.0;
-            int feedbackCounter = 0;
             std::cout << "Iteratively finding optimal cloud height. This step may take a while; there are " << numClumps << " clumps\n";
-            std::cout << "Started ." << std::flush;
+            rsgis_tqdm pbar;
             for(size_t i = 1; i < numClumps; ++i)
             {
-                if((feedback != 0) && ((i % feedback) == 0))
-                {
-                    std::cout << "." << feedbackCounter << "." << std::flush;
-                    feedbackCounter = feedbackCounter + 10;
-                }
+                pbar.progress(i, numClumps);
                 
                 std::vector<std::pair<std::pair<double,double>,double> > *pxPts = new std::vector<std::pair<std::pair<double,double>,double> >();
                 pxPts->reserve(cloudsRATHisto[i]);
@@ -1070,7 +1064,7 @@ namespace rsgis{namespace calib{
                 
                 delete pxPts;
             }
-            std::cout << ". Complete.\n";
+            pbar.finish();
             attUtils.writeRealColumn(cloudsRAT, "FitBaseLine", bestFitBaseLine, numClumps);
             rsgis::math::RSGISMathsUtils mathUtils;
             
@@ -1109,17 +1103,12 @@ namespace rsgis{namespace calib{
             }
             attUtils.writeRealColumn(cloudsRAT, "FitBaseLineEdit", bestFitBaseLine, numClumps);
             
-            feedbackCounter = 0;
+            pbar.reset();
             std::cout << "Producing cloud shadow mask using optimal heights:\n";
-            std::cout << "Started ." << std::flush;
             // Add Shadow with most correspondance to Final Shadow Image.
             for(size_t i = 1; i < numClumps; ++i)
             {
-                if((feedback != 0) && ((i % feedback) == 0))
-                {
-                    std::cout << "." << feedbackCounter << "." << std::flush;
-                    feedbackCounter = feedbackCounter + 10;
-                }
+                pbar.progress(i, numClumps);
                 
                 std::vector<std::pair<std::pair<double,double>,double> > *pxPts = new std::vector<std::pair<std::pair<double,double>,double> >();
                 pxPts->reserve(cloudsRATHisto[i]);
@@ -1144,7 +1133,7 @@ namespace rsgis{namespace calib{
                 
                 delete pxPts;
             }
-            std::cout << ". Complete.\n";
+            pbar.finish();
             
             delete env;
             delete[] cloudBase;

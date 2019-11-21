@@ -40,6 +40,7 @@
 
 #include "libkea/KEAImageIO.h"
 
+#include "common/rsgis-tqdm.h"
 #include "common/RSGISAttributeTableException.h"
 
 #include "utils/RSGISColour.h"

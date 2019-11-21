@@ -29,6 +29,7 @@
 
 #include "gdal_priv.h"
 
+#include "common/rsgis-tqdm.h"
 #include "common/RSGISAttributeTableException.h"
 
 #include "rastergis/RSGISRasterAttUtils.h"

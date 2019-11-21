@@ -30,6 +30,7 @@
 
 #include "gdal_priv.h"
 
+#include "common/rsgis-tqdm.h"
 #include "common/RSGISImageException.h"
 
 #include "math/RSGISMatrices.h"

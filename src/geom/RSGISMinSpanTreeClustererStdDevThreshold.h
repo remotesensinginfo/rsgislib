@@ -29,6 +29,8 @@
 #include <algorithm>
 #include <iterator>
 
+#include "common/rsgis-tqdm.h"
+
 #include "geom/RSGIS2DPoint.h"
 #include "geom/RSGISSpatialClustererInterface.h"
 #include "geom/RSGISDelaunayTriangulation.h"

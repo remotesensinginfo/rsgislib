@@ -39,6 +39,7 @@
 #include "math/RSGISMathsUtils.h"
 
 #include "img/RSGISImageUtils.h"
+#include "common/rsgis-tqdm.h"
 
 #include "registration/RSGISImageWarpException.h"
 #include "registration/RSGISGCPImg2MapNode.h"

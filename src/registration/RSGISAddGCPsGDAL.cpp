@@ -218,22 +218,11 @@ namespace rsgis{namespace reg{
             int remainRows = height - (nYBlocks * yBlockSize);
             int rowOffset = 0;
             
-			int feedback = height/10.0;
-			int feedbackCounter = 0;
-            bool provideFeedback = false;
-            
-            // Only provide feedback if more than 10 blocks
-            if(nYBlocks > 10){provideFeedback = true;}
-            
-			if(provideFeedback){std::cout << "Started" << std::flush;}
+            rsgis_tqdm pbar;
 			// Loop images to process data
 			for(int i = 0; i < nYBlocks; i++)
 			{
-                if((provideFeedback) && (feedback != 0) && (i*yBlockSize > feedback*feedbackCounter) )
-                {
-                    std::cout << "." << feedbackCounter*10 << "." << std::flush;
-                    ++feedbackCounter;
-                }
+                pbar.progress(i, nYBlocks);
 				for(int n = 0; n < numInBands; n++)
 				{
                     rowOffset = yBlockSize * i;
@@ -245,6 +234,7 @@ namespace rsgis{namespace reg{
             
             if(remainRows > 0)
             {
+                pbar.progress(nYBlocks, nYBlocks);
                 for(int n = 0; n < numInBands; n++)
 				{
                     rowOffset = yBlockSize * nYBlocks;
@@ -253,7 +243,7 @@ namespace rsgis{namespace reg{
 				}
                 
             }
-			if(provideFeedback){std::cout << " Complete.\n";}
+			pbar.finish();
 		}
 		catch(RSGISImageWarpException& e)
 		{

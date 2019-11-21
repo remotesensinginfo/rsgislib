@@ -27,6 +27,7 @@
 #include <string>
 
 #include "gdal_priv.h"
+
 #include <geos/geom/Envelope.h>
 #include <geos/geom/Polygon.h>
 #include <geos/geom/GeometryFactory.h>
@@ -36,6 +37,9 @@
 #include "geos/geom/LineString.h"
 #include "geos/geom/PrecisionModel.h"
 #include "geos/util/IllegalArgumentException.h"
+
+#include "common/rsgis-tqdm.h"
+
 #include "img/RSGISImageCalcException.h"
 #include "img/RSGISCalcImageSingleValue.h"
 #include "img/RSGISImageUtils.h"

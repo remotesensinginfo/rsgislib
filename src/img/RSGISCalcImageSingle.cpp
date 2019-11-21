@@ -138,17 +138,11 @@ namespace rsgis{namespace img{
 			}
 			inDataColumnB = new float[numInBandsDSB];
 			
-			int feedback = height/10;
-			int feedbackCounter = 0;
-			std::cout << "Started" << std::flush;
+			rsgis_tqdm pbar;
 			// Loop images to process data
 			for(int i = 0; i < height; i++)
 			{
-				if((i % feedback) == 0)
-				{
-					std::cout << ".." << feedbackCounter << ".." << std::flush;
-					feedbackCounter = feedbackCounter + 10;
-				}
+				pbar.progress(i, height);
 				
 				for(int n = 0; n < numInBandsDSA; n++)
 				{
@@ -172,7 +166,6 @@ namespace rsgis{namespace img{
 					this->valueCalc->calcImageValue(inDataColumnA, inDataColumnB, numInBands, bandA, bandB);
 				}
 			}
-			std::cout << " Complete.\n";
 			
 			double *tempOutVal;
 			tempOutVal = valueCalc->getOutputValues();
@@ -181,7 +174,7 @@ namespace rsgis{namespace img{
 			{
 				outputValue[i] = tempOutVal[i];
 			}
-			
+			pbar.finish();
 		}
 		catch(RSGISImageCalcException &e)
 		{
@@ -315,17 +308,11 @@ namespace rsgis{namespace img{
 			}
 			inDataColumnA = new float[numInBands];
 			
-			int feedback = height/10;
-			int feedbackCounter = 0;
-			std::cout << "Started" << std::flush;
+			rsgis_tqdm pbar;
 			// Loop images to process data
 			for(int i = 0; i < height; i++)
 			{
-				if((i % feedback) == 0)
-				{
-					std::cout << ".." << feedbackCounter << ".." << std::flush;
-					feedbackCounter = feedbackCounter + 10;
-				}
+				pbar.progress(i, height);
 				
 				for(int n = 0; n < numInBands; n++)
 				{
@@ -340,12 +327,12 @@ namespace rsgis{namespace img{
 					this->valueCalc->calcImageValue(inDataColumnA, numInBands, band);
 				}
 			}
-			std::cout << " Complete.\n";
+			
 			for(int i = 0; i < valueCalc->getNumberOfOutValues(); i++)
 			{
 				outputValue[i] = this->valueCalc->getOutputValues()[i];
 			}
-			
+			pbar.finish();
 		}
 		catch(RSGISImageCalcException &e)
 		{
@@ -462,17 +449,11 @@ namespace rsgis{namespace img{
 			}
 			inDataColumnA = new float[numInBands];
 			
-			int feedback = height/10;
-			int feedbackCounter = 0;
-			std::cout << "Started" << std::flush;
+			rsgis_tqdm pbar;
 			// Loop images to process data
 			for(int i = 0; i < height; i++)
 			{
-				if((i % feedback) == 0)
-				{
-					std::cout << ".." << feedbackCounter << ".." << std::flush;
-					feedbackCounter = feedbackCounter + 10;
-				}
+				pbar.progress(i, height);
 				
 				for(int n = 0; n < numInBands; n++)
 				{
@@ -492,12 +473,12 @@ namespace rsgis{namespace img{
 				pxlTLY -= pxlHeight;
 				pxlTLX = gdalTranslation[0];
 			}
-			std::cout << " Complete.\n";
+			
 			for(int i = 0; i < valueCalc->getNumberOfOutValues(); i++)
 			{
 				outputValue[i] = valueCalc->getOutputValues()[i];
 			}
-			
+			pbar.finish();
 		}
 		catch(RSGISImageCalcException& e)
 		{

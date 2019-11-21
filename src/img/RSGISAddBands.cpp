@@ -438,9 +438,7 @@ namespace rsgis{namespace img{
             int remainRows = height - (nYBlocks * yBlockSize);
             int rowOffset = 0;
             
-			int feedback = height/10;
-			int feedbackCounter = 0;
-			std::cout << "Started" << std::flush;
+			rsgis_tqdm pbar;
 			// Loop images to process data
 			for(int i = 0; i < nYBlocks; i++)
 			{
@@ -452,11 +450,7 @@ namespace rsgis{namespace img{
                 
                 for(int m = 0; m < yBlockSize; ++m)
                 {
-                    if((feedback != 0) && ((((i*yBlockSize)+m) % feedback) == 0))
-                    {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
-                    }
+                    pbar.progress((i*yBlockSize)+m, height);
                     
                     if(skipPixels) // If skipping pixels, look through input values and check for skip value in any of the bands.
                     {
@@ -500,11 +494,7 @@ namespace rsgis{namespace img{
                 
                 for(int m = 0; m < remainRows; ++m)
                 {
-                    if((feedback != 0) && ((((nYBlocks*yBlockSize)+m) % feedback) == 0))
-                    {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
-                    }
+                    pbar.progress((nYBlocks*yBlockSize)+m, height);
                     
                     if(skipPixels) // If skipping pixels, look through input values and check for skip value in any of the bands.
                     {
@@ -536,7 +526,7 @@ namespace rsgis{namespace img{
 					outputRasterBands[n]->RasterIO(GF_Write, 0, rowOffset, width, remainRows, inputData[n], width, remainRows, GDT_Float32, 0, 0);
 				}
             }
-			std::cout << " Complete.\n";
+			pbar.finish();
 		}
 		catch(RSGISImageBandException& e)
 		{			

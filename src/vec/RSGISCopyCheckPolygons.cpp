@@ -60,24 +60,16 @@ namespace rsgis{namespace vec{
 			
 			std::cout << "There are " << numFeatures << " to process\n";
 			
-			unsigned long feedback = numFeatures/10;
-			unsigned long feedbackCounter = 0;
-            unsigned long nextFeedback = 0;
 			unsigned long i = 0;
             unsigned int transactionStep = 20000;
             unsigned int nextTransaction = transactionStep;
             bool openTransaction = false;
-			std::cout << "Started " << std::flush;
+			rsgis_tqdm pbar;
 			
 			input->ResetReading();
 			while( (inFeature = input->GetNextFeature()) != NULL )
 			{
-				if((numFeatures >= 10) && (nextFeedback == i))
-				{
-					std::cout << "." << feedbackCounter << "." << std::flush;
-					feedbackCounter = feedbackCounter + 10;
-                    nextFeedback = nextFeedback + feedback;
-				}
+				pbar.progress(i numFeatures);
 				++i;
 
                 if(!openTransaction)
@@ -158,7 +150,7 @@ namespace rsgis{namespace vec{
                 output->CommitTransaction();
                 openTransaction = false;
             }
-			std::cout << " Complete.\n";
+			pbar.finish();
 			
 			std::cout << numOutputted << " Polygons have been outputted from the " << numFeatures << " in the input file.\n";
 			std::cout << (numFeatures-numOutputted) << " features have been dropped during this process\n";

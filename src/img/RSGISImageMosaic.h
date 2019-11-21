@@ -33,6 +33,8 @@
 
 #include "libkea/KEAImageIO.h"
 
+#include "common/rsgis-tqdm.h"
+
 #include "img/RSGISImageCalcException.h"
 #include "img/RSGISCalcImageValue.h"
 #include "img/RSGISImageUtils.h"
