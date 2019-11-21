@@ -69,7 +69,7 @@ namespace rsgis{namespace vec{
 			input->ResetReading();
 			while( (inFeature = input->GetNextFeature()) != NULL )
 			{
-				pbar.progress(i numFeatures);
+				pbar.progress(i, numFeatures);
 				++i;
 
                 if(!openTransaction)
