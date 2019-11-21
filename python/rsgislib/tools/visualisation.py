@@ -427,7 +427,7 @@ def createMBTileFile(input_img, bands, output_mbtiles, scale_input_img=50, img_s
 
 
 def createWebTilesVisGTIFFImg(input_img, bands, output_dir, scaled_gtiff_img, zoomLevels='2-10', img_stats_msk=None,
-                      img_msk_vals=1, tmp_dir=None, webview=True):
+                              img_msk_vals=1, tmp_dir=None, webview=True, scale=0):
     """
     A function to produce web cache and scaled and stretched geotiff.
 
@@ -444,6 +444,8 @@ def createWebTilesVisGTIFFImg(input_img, bands, output_dir, scaled_gtiff_img, zo
                     (i.e., input is None) then a local directory will be define in the same folder as the input
                     image.
     :param webview: Provide default GDAL leaflet web viewer.
+    :param scale: the scale output geotiff. Input is percentage in the x-axis. If zero (default) then no scaling
+                  will be applied.
 
     """
     from osgeo import gdal
@@ -512,16 +514,14 @@ def createWebTilesVisGTIFFImg(input_img, bands, output_dir, scaled_gtiff_img, zo
     except OSError as e:
         raise rsgislib.RSGISPyException('Could not execute command: ' + cmd)
 
-    rsgislib.imageutils.popImageStats(stretchImg, usenodataval=True, nodataval=0, calcpyramids=True)
+    if scale > 0:
+        cmd = 'gdal_translate -of GTIFF -co TILED=YES -co COMPRESS=JPEG -co BIGTIFF=NO -ot Byte -outsize {0}% 0 -r average {1} {2}'.format(scale, stretchImg, scaled_gtiff_img)
+    else:
+        cmd = 'gdal_translate -of GTIFF -co TILED=YES -co COMPRESS=JPEG -co BIGTIFF=NO -ot Byte -r average {0} {1}'.format(stretchImg, scaled_gtiff_img)
+
     try:
-        import tqdm
-        pbar = tqdm.tqdm(total=100)
-        callback = lambda *args, **kw: pbar.update()
-    except:
-        callback = gdal.TermProgress
-
-    trans_opt = gdal.TranslateOptions(format='GTIFF', noData=0, callback=callback,
-                                      options="-co TILED=YES -co COMPRESS=JPEG -co BIGTIFF=NO -co COPY_SRC_OVERVIEWS=YES")
-    gdal.Translate(scaled_gtiff_img, stretchImg, options=trans_opt)
-
+        subprocess.check_call(cmd, shell=True)
+    except OSError as e:
+        raise rsgislib.RSGISPyException('Could not execute command: ' + cmd)
+    rsgislib.imageutils.popImageStats(scaled_gtiff_img, usenodataval=True, nodataval=0, calcpyramids=True)
     shutil.rmtree(tmpDIR)
