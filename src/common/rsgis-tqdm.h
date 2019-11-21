@@ -1,5 +1,5 @@
-#ifndef TQDM_H
-#define TQDM_H
+#ifndef RSGIS_TQDM_H
+#define RSGIS_TQDM_H
 
 #if _MSC_VER
 #include <io.h>
@@ -18,9 +18,21 @@
 #include <math.h>
 #include <algorithm>
 
+// mark all exported classes/functions with DllExport to have
+// them exported by Visual Studio
+#undef DllExport
+#ifdef _MSC_VER
+    #ifdef rsgis_commons_EXPORTS
+        #define DllExport   __declspec( dllexport )
+    #else
+        #define DllExport   __declspec( dllimport )
+    #endif
+#else
+    #define DllExport
+#endif
+
 namespace rsgis
 {
-    
     class DllExport rsgis_tqdm 
     {
         public:
