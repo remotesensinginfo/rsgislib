@@ -614,6 +614,25 @@ class RSGISPyUtils (object):
 
         return [minX, maxX, minY, maxY]
 
+    def reprojBBOX_epsg(self, bbox, inEPSG, outEPSG):
+        """
+        A function to reproject a bounding box.
+        :param bbox: input bounding box (MinX, MaxX, MinY, MaxY)
+        :param inEPSG: an EPSG code representing input projection.
+        :param outEPSG: an EPSG code representing output projection.
+
+        :return: (MinX, MaxX, MinY, MaxY)
+
+        """
+        inProjObj = osr.SpatialReference()
+        inProjObj.ImportFromEPSG(int(inEPSG))
+
+        outProjObj = osr.SpatialReference()
+        outProjObj.ImportFromEPSG(int(outEPSG))
+
+        out_bbox = self.reprojBBOX(bbox, inProjObj, outProjObj)
+        return out_bbox
+
     def do_bboxes_intersect(self, bbox1, bbox2):
         """
         A function which tests whether two bboxes (MinX, MaxX, MinY, MaxY) intersect.
@@ -630,6 +649,38 @@ class RSGISPyUtils (object):
         intersect = ((bbox1[x_max] > bbox2[x_min]) and (bbox2[x_max] > bbox1[x_min]) and (
                     bbox1[y_max] > bbox2[y_min]) and (bbox2[y_max] > bbox1[y_min]))
         return intersect
+
+    def bbox_intersection(self, bbox1, bbox2):
+        """
+        A function which calculates the intersection of the two bboxes (xMin, xMax, yMin, yMax).
+
+        :param bbox1: is a bbox (xMin, xMax, yMin, yMax)
+        :param bbox2: is a bbox (xMin, xMax, yMin, yMax)
+
+        :return: bbox (xMin, xMax, yMin, yMax)
+
+        """
+        if not self.do_bboxes_intersect(bbox1, bbox2):
+            raise Exception("Bounding Boxes do not intersect.")
+
+        xMinOverlap = bbox1[0]
+        xMaxOverlap = bbox1[1]
+        yMinOverlap = bbox1[2]
+        yMaxOverlap = bbox1[3]
+
+        if bbox2[0] > xMinOverlap:
+            xMinOverlap = bbox2[0]
+
+        if bbox2[1] < xMaxOverlap:
+            xMaxOverlap = bbox2[1]
+
+        if bbox2[2] > yMinOverlap:
+            yMinOverlap = bbox2[2]
+
+        if bbox2[3] < yMaxOverlap:
+            yMaxOverlap = bbox2[3]
+
+        return [xMinOverlap, xMaxOverlap, yMinOverlap, yMaxOverlap]
 
     def buffer_bbox(self, bbox, buf):
         """

@@ -10,6 +10,7 @@ import rsgislib
 
 import os.path
 import math
+import shutil
 
 import numpy
 
@@ -1483,3 +1484,109 @@ def gdal_stack_images_vrt(input_imgs, output_vrt_file):
 
     build_vrt_opt = gdal.BuildVRTOptions(separate=True, callback=callback)
     gdal.BuildVRT(output_vrt_file, input_imgs, options=build_vrt_opt)
+
+
+def subset_to_vec(in_img, out_img, gdalformat, roi_vec_file, roi_vec_lyr, datatype=None, vec_epsg=None):
+    """
+    A function which subsets an input image using the extent of a vector layer where the
+    input vector can be a different projection to the input image. Reprojection will be handled.
+
+    :param in_img: Input Image file.
+    :param out_img: Output Image file.
+    :param gdalformat: Output image file format.
+    :param roi_vec_file: The input vector file.
+    :param roi_vec_lyr: The name of the input layer.
+    :param datatype: Output image data type. If None then the datatype of the input image will be used.
+    :param vec_epsg: If projection is poorly defined by the vector layer then it can be specified.
+    """
+    rsgis_utils = rsgislib.RSGISPyUtils()
+    if vec_epsg is None:
+        vec_epsg = rsgis_utils.getProjEPSGFromVec(roi_vec_file, roi_vec_lyr)
+    img_epsg = rsgis_utils.getEPSGCode(in_img)
+    if img_epsg == vec_epsg:
+
+        projs_match = True
+    else:
+        img_bbox = rsgis_utils.getImageBBOXInProj(in_img, vec_epsg)
+        projs_match = False
+    img_bbox = rsgis_utils.getImageBBOX(in_img)
+    vec_bbox = rsgis_utils.getVecLayerExtent(roi_vec_file, roi_vec_lyr, computeIfExp=True)
+    if img_epsg != vec_epsg:
+        vec_bbox = rsgis_utils.reprojBBOX_epsg(vec_bbox, vec_epsg, img_epsg)
+
+    if rsgis_utils.do_bboxes_intersect(img_bbox, vec_bbox):
+        common_bbox = rsgis_utils.bbox_intersection(img_bbox, vec_bbox)
+        if datatype == None:
+            datatype = rsgis_utils.getRSGISLibDataTypeFromImg(in_img)
+        rsgislib.imageutils.subsetbbox(in_img, out_img, gdalformat, datatype, common_bbox[0], common_bbox[1],
+                                       common_bbox[2], common_bbox[3])
+    else:
+        raise Exception("The image and vector do not intersect and therefore the image cannot be subset.")
+
+
+def mask_img_with_vec(input_img, output_img, gdalformat, roi_vec_file, roi_vec_lyr, tmp_dir, outvalue=0, datatype=None,
+                      vec_epsg=None):
+    """
+    This function masks the input image using a polygon vector file.
+
+    :param input_img: Input Image file.
+    :param output_img: Output Image file.
+    :param gdalformat: Output image file format.
+    :param roi_vec_file: The input vector file.
+    :param roi_vec_lyr: The name of the input layer.
+    :param tmp_dir: a temporary directory for files generated during processing.
+    :param outvalue: The output value in the regions masked.
+    :param datatype: Output image data type. If None then the datatype of the input image will be used.
+    :param vec_epsg: If projection is poorly defined by the vector layer then it can be specified.
+
+    """
+    import rsgislib.vectorutils
+    rsgis_utils = rsgislib.RSGISPyUtils()
+
+    # Does the input image BBOX intersect the BBOX of the ROI vector?
+    if vec_epsg is None:
+        vec_epsg = rsgis_utils.getProjEPSGFromVec(roi_vec_file, roi_vec_lyr)
+    img_epsg = rsgis_utils.getEPSGCode(input_img)
+    if img_epsg == vec_epsg:
+        img_bbox = rsgis_utils.getImageBBOX(input_img)
+        projs_match = True
+    else:
+        img_bbox = rsgis_utils.getImageBBOXInProj(input_img, vec_epsg)
+        projs_match = False
+    vec_bbox = rsgis_utils.getVecLayerExtent(roi_vec_file, roi_vec_lyr, computeIfExp=True)
+
+    if rsgis_utils.do_bboxes_intersect(img_bbox, vec_bbox):
+        uid_str = rsgis_utils.uidGenerator()
+        base_vmsk_img = rsgis_utils.get_file_basename(input_img)
+
+        tmp_file_dir = os.path.join(tmp_dir, "{}_{}".format(base_vmsk_img, uid_str))
+        if not os.path.exists(tmp_file_dir):
+            os.mkdir(tmp_file_dir)
+
+        # Rasterise the vector layer to the input image extent.
+        mem_ds, mem_lyr = rsgislib.vectorutils.getMemVecLyrSubset(roi_vec_file, roi_vec_lyr, img_bbox)
+
+        if not projs_match:
+            mem_result_ds, mem_result_lyr = rsgislib.vectorutils.reproj_vec_lyr(mem_lyr, 'mem_vec', img_epsg,
+                                                                                out_vec_drv='MEMORY', out_lyr_name=None,
+                                                                                in_epsg=None, print_feedback=True)
+            mem_ds = None
+        else:
+            mem_result_ds = mem_ds
+            mem_result_lyr = mem_lyr
+
+        roi_img = os.path.join(tmp_file_dir, "{}_roiimg.kea".format(base_vmsk_img))
+        rsgislib.imageutils.createCopyImage(input_img, roi_img, 1, 0, 'KEA', rsgislib.TYPE_8UINT)
+        rsgislib.vectorutils.rasteriseVecLyrObj(mem_result_lyr, roi_img, burnVal=1, vecAtt=None, calcstats=True,
+                                                thematic=True, nodata=0)
+        mem_result_ds = None
+
+        if datatype == None:
+            datatype = rsgis_utils.getRSGISLibDataTypeFromImg(input_img)
+        rsgislib.imageutils.maskImage(input_img, roi_img, output_img, gdalformat, datatype, outvalue, 0)
+        shutil.rmtree(tmp_file_dir)
+    else:
+        raise Exception("The vector file and image file do not intersect.")
+
+
+
