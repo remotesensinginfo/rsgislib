@@ -326,8 +326,9 @@ namespace rsgis{namespace rastergis{
                 }
             }
             
-            int nLastProgress = -1;
-            clumpsDataset->BuildOverviews(pszType, nOverviews, nLevels, 0, NULL,  (GDALProgressFunc)RSGISRATStatsTextProgress, &nLastProgress);
+            rsgis_tqdm *pbar = new rsgis_tqdm();
+            clumpsDataset->BuildOverviews(pszType, nOverviews, nLevels, 0, NULL,  (GDALProgressFunc)RSGISRATStatsTextProgress, pbar);
+            delete pbar;
         }
         catch(rsgis::RSGISImageException &e)
         {

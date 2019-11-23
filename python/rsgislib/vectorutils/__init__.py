@@ -3086,3 +3086,73 @@ def performSpatialJoin(base_vec_file, join_vec_file, output_vec_file, base_lyr=N
         else:
             join_gpg_df.to_file(output_vec_file, layer=output_lyr, driver=outVecDrvr)
 
+
+def does_vmsk_img_intersect(input_vmsk_img, roi_vec_file, roi_vec_lyr, tmp_dir, vec_epsg=None):
+    """
+    This function checks whether the input binary raster mask intesects with the input vector
+    layer. A check is first done as to whether the bounding boxes intersect, if they do then
+    the intersection between the images is then calculated. The input image and vector can be
+    in different projections but the projection needs to be well defined.
+
+    :param input_vmsk_img: Input binary mask image file.
+    :param roi_vec_file: The input vector file.
+    :param roi_vec_lyr: The name of the input layer.
+    :param tmp_dir: a temporary directory for files generated during processing.
+    :param vec_epsg: If projection is poorly defined by the vector layer then it can be specified.
+    """
+    import rsgislib.imagecalc
+    rsgis_utils = rsgislib.RSGISPyUtils()
+
+    # Does the input image BBOX intersect the BBOX of the ROI vector?
+    if vec_epsg is None:
+        vec_epsg = rsgis_utils.getProjEPSGFromVec(roi_vec_file, roi_vec_lyr)
+    img_epsg = rsgis_utils.getEPSGCode(input_vmsk_img)
+    print(vec_epsg)
+    print(img_epsg)
+    if img_epsg == vec_epsg:
+        img_bbox = rsgis_utils.getImageBBOX(input_vmsk_img)
+        projs_match = True
+    else:
+        img_bbox = rsgis_utils.getImageBBOXInProj(input_vmsk_img, vec_epsg)
+        projs_match = False
+    vec_bbox = rsgis_utils.getVecLayerExtent(roi_vec_file, roi_vec_lyr, computeIfExp=True)
+
+    img_intersect = False
+    if rsgis_utils.do_bboxes_intersect(img_bbox, vec_bbox):
+        uid_str = rsgis_utils.uidGenerator()
+        base_vmsk_img = rsgis_utils.get_file_basename(input_vmsk_img)
+
+        tmp_file_dir = os.path.join(tmp_dir, "{}_{}".format(base_vmsk_img, uid_str))
+        if not os.path.exists(tmp_file_dir):
+            os.mkdir(tmp_file_dir)
+
+        # Rasterise the vector layer to the input image extent.
+        mem_ds, mem_lyr = getMemVecLyrSubset(roi_vec_file, roi_vec_lyr, img_bbox)
+
+        if not projs_match:
+            mem_result_ds, mem_result_lyr = reproj_vec_lyr(mem_lyr, 'mem_vec', img_epsg,
+                                                           out_vec_drv='MEMORY', out_lyr_name=None,
+                                                           in_epsg=None, print_feedback=False)
+            mem_ds = None
+        else:
+            mem_result_ds = mem_ds
+            mem_result_lyr = mem_lyr
+
+        roi_img = os.path.join(tmp_file_dir, "{}_roiimg.kea".format(base_vmsk_img))
+        rsgislib.imageutils.createCopyImage(input_vmsk_img, roi_img, 1, 0, 'KEA', rsgislib.TYPE_8UINT)
+        rasteriseVecLyrObj(mem_result_lyr, roi_img, burnVal=1, vecAtt=None, calcstats=True, thematic=True, nodata=0)
+        mem_result_ds = None
+
+        bandDefns = []
+        bandDefns.append(rsgislib.imagecalc.BandDefn('vmsk', input_vmsk_img, 1))
+        bandDefns.append(rsgislib.imagecalc.BandDefn('roi', roi_img, 1))
+        intersect_img = os.path.join(tmp_file_dir, "{}_intersectimg.kea".format(base_vmsk_img))
+        rsgislib.imagecalc.bandMath(intersect_img, "(vmsk==1) && (roi==1)?1:0", 'KEA', rsgislib.TYPE_8UINT, bandDefns)
+        rsgislib.rastergis.populateStats(intersect_img, addclrtab=True, calcpyramids=True, ignorezero=True)
+        n_vals = rsgislib.imagecalc.countPxlsOfVal(intersect_img, vals=[1])
+        if n_vals[0] > 0:
+            img_intersect = True
+        shutil.rmtree(tmp_file_dir)
+    return img_intersect
+
+

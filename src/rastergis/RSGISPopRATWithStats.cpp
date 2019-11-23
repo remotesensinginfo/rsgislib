@@ -455,8 +455,9 @@ namespace rsgis{namespace rastergis{
 
             double imageValMin = 0.0;
             double imageValMax = 0.0;
-            int nLastProgress = -1;
-            inputValsImage->GetRasterBand(band)->ComputeStatistics(false, &imageValMin, &imageValMax, NULL, NULL,  (GDALProgressFunc)RSGISRATStatsTextProgress, &nLastProgress);
+            rsgis_tqdm *pbar = new rsgis_tqdm();
+            inputValsImage->GetRasterBand(band)->ComputeStatistics(false, &imageValMin, &imageValMax, NULL, NULL,  (GDALProgressFunc)RSGISRATStatsTextProgress, pbar);
+            delete pbar;
             
             std::cout << "Image Min = " << imageValMin << " Image Max = " << imageValMax << std::endl;
             
