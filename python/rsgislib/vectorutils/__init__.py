@@ -3107,8 +3107,6 @@ def does_vmsk_img_intersect(input_vmsk_img, roi_vec_file, roi_vec_lyr, tmp_dir, 
     if vec_epsg is None:
         vec_epsg = rsgis_utils.getProjEPSGFromVec(roi_vec_file, roi_vec_lyr)
     img_epsg = rsgis_utils.getEPSGCode(input_vmsk_img)
-    print(vec_epsg)
-    print(img_epsg)
     if img_epsg == vec_epsg:
         img_bbox = rsgis_utils.getImageBBOX(input_vmsk_img)
         projs_match = True
