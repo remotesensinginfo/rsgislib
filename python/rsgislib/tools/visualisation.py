@@ -233,7 +233,8 @@ def createWebTilesImg(inputImg, bands, outputDIR, zoomLevels='2-10', img_stats_m
         raise rsgislib.RSGISPyException('Could not execute command: ' + cmd)
     shutil.rmtree(tmpDIR)
 
-def createQuicklookImgs(inputImg, bands, outputImgs='quicklook.jpg', output_img_sizes=250, img_stats_msk=None,
+
+def createQuicklookImgs(inputImg, bands, outputImgs='quicklook.jpg', output_img_sizes=250, scale_axis='auto', img_stats_msk=None,
                             img_msk_vals=1, tmp_dir=None):
     """
     A function to produce
@@ -241,7 +242,9 @@ def createQuicklookImgs(inputImg, bands, outputImgs='quicklook.jpg', output_img_
     :param inputImg: input image file (any format that gdal supports)
     :param bands: a string (comma seperated) with the bands to be selected. (e.g., '1', '1,2,3', '5,6,4')
     :param outputImgs: a single output image or list of output images. The same size as output_img_sizes.
-    :param output_img_sizes: the output image size (in pixels; of x axis) or list of output image sizes.
+    :param output_img_sizes: the output image size (in pixels) or list of output image sizes.
+    :param scale_axis: the axis to which the output_img_sizes refer. Options: width, height or auto.
+                       Auto applies the output_img_sizes to the longest of the two axes.
     :param img_stats_msk: Optional (default=None) input image which is used to define regions calculate
                           the image stats for stretch.
     :param img_msk_vals: The pixel(s) value define the region of interest in the image mask
@@ -251,13 +254,16 @@ def createQuicklookImgs(inputImg, bands, outputImgs='quicklook.jpg', output_img_
                     image.
 
     """
+    if scale_axis not in ['width', 'height', 'auto']:
+        raise rsgislib.RSGISPyException("Input parameter 'scale_axis' must have the value 'width', 'height' or 'auto'.")
+
     n_out_imgs = 1
     if type(outputImgs) is list:
         n_out_imgs = len(outputImgs)
         if type(output_img_sizes) is not list:
-            raise Exception("If the outputImgs input is a list so must output_img_sizes.")
-            if len(output_img_sizes) != n_out_imgs:
-                raise Exception("outputImgs and output_img_sizes must be the same length")
+            raise rsgislib.RSGISPyException("If the outputImgs input is a list so must output_img_sizes.")
+        if len(output_img_sizes) != n_out_imgs:
+            raise rsgislib.RSGISPyException("outputImgs and output_img_sizes must be the same length")
 
         if n_out_imgs == 1:
             outputImgs = outputImgs[0]
@@ -313,11 +319,20 @@ def createQuicklookImgs(inputImg, bands, outputImgs='quicklook.jpg', output_img_
         rsgislib.imageutils.stretchImageNoData(img2Stch, stretchImg, False, '', img_no_data_val, False, 'KEA',
                                                rsgislib.TYPE_8UINT, rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
 
-
+    if scale_axis == 'auto':
+        x_size, y_size = rsgisUtils.getImageSize(stretchImg)
+        if x_size > y_size:
+            scale_axis = 'width'
+        else:
+            scale_axis = 'height'
 
     if n_out_imgs == 1:
-        cmd = 'gdal_translate -of JPEG -ot Byte -scale -outsize {0} 0 -r average {1} {2}'.format(output_img_sizes,
-                                                                                                stretchImg, outputImgs)
+        if scale_axis == 'width':
+            out_size = '-outsize {0} 0'.format(output_img_sizes)
+        else:
+            out_size = '-outsize 0 {0}'.format(output_img_sizes)
+
+        cmd = 'gdal_translate -of JPEG -ot Byte -scale {0}} -r average {1} {2}'.format(out_size, stretchImg, outputImgs)
         print(cmd)
         try:
             subprocess.check_call(cmd, shell=True)
@@ -326,9 +341,13 @@ def createQuicklookImgs(inputImg, bands, outputImgs='quicklook.jpg', output_img_
 
     elif n_out_imgs > 1:
         for i in range(n_out_imgs):
-            cmd = 'gdal_translate -of JPEG -ot Byte -scale -outsize {0} 0 -r average {1} {2}'.format(output_img_sizes[i],
-                                                                                                    stretchImg,
-                                                                                                    outputImgs[i])
+            if scale_axis == 'width':
+                out_size = '-outsize {0} 0'.format(output_img_sizes[i])
+            else:
+                out_size = '-outsize 0 {0}'.format(output_img_sizes[i])
+
+            cmd = 'gdal_translate -of JPEG -ot Byte -scale {0} -r average {1} {2}'.format(out_size, stretchImg,
+                                                                                    outputImgs[i])
             print(cmd)
             try:
                 subprocess.check_call(cmd, shell=True)
