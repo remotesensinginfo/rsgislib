@@ -234,8 +234,8 @@ def createWebTilesImg(inputImg, bands, outputDIR, zoomLevels='2-10', img_stats_m
     shutil.rmtree(tmpDIR)
 
 
-def createQuicklookImgs(inputImg, bands, outputImgs='quicklook.jpg', output_img_sizes=250, scale_axis='auto', img_stats_msk=None,
-                            img_msk_vals=1, tmp_dir=None):
+def createQuicklookImgs(inputImg, bands, outputImgs='quicklook.jpg', output_img_sizes=250, scale_axis='auto',
+                        img_stats_msk=None, img_msk_vals=1, stretch_file=None, tmp_dir=None):
     """
     A function to produce
 
@@ -249,6 +249,7 @@ def createQuicklookImgs(inputImg, bands, outputImgs='quicklook.jpg', output_img_
                           the image stats for stretch.
     :param img_msk_vals: The pixel(s) value define the region of interest in the image mask
                         (can be list of values or single value).
+    :param stretch_file: a stretch stats file to standardise the stretch between a number of input files.
     :param tmp_dir: an input directory which can be used to write tempory files/directories. If not provided
                     (i.e., input is None) then a local directory will be define in the same folder as the input
                     image.
@@ -303,7 +304,10 @@ def createQuicklookImgs(inputImg, bands, outputImgs='quicklook.jpg', output_img_
 
     img2Stch = selImgBandsImg
     stretchImg = os.path.join(tmpDIR, baseName + '_stretch.kea')
-    if img_stats_msk is not None:
+    if stretch_file is not None:
+        rsgislib.imageutils.stretchImageWithStats(img2Stch, stretchImg, stretch_file, 'KEA', rsgislib.TYPE_8UINT,
+                                                  rsgislib.imageutils.STRETCH_LINEARMINMAX, 2)
+    elif img_stats_msk is not None:
         img2StchMskd = os.path.join(tmpDIR, baseName + '_MskdImg.kea')
         rsgislib.imageutils.maskImage(selImgBandsImg, img_stats_msk, img2StchMskd, 'KEA',
                                       rsgisUtils.getRSGISLibDataTypeFromImg(inputImg), img_no_data_val, img_msk_vals)
@@ -446,7 +450,7 @@ def createMBTileFile(input_img, bands, output_mbtiles, scale_input_img=50, img_s
 
 
 def createWebTilesVisGTIFFImg(input_img, bands, output_dir, scaled_gtiff_img, zoomLevels='2-10', img_stats_msk=None,
-                              img_msk_vals=1, tmp_dir=None, webview=True, scale=0):
+                              img_msk_vals=1, stretch_file=None, tmp_dir=None, webview=True, scale=0):
     """
     A function to produce web cache and scaled and stretched geotiff.
 
@@ -459,6 +463,7 @@ def createWebTilesVisGTIFFImg(input_img, bands, output_dir, scaled_gtiff_img, zo
                           the image stats for stretch.
     :param img_msk_vals: The pixel(s) value define the region of interest in the image mask
                         (can be list of values or single value).
+    :param stretch_file: a stretch stats file to standardise the stretch between a number of input files.
     :param tmp_dir: an input directory which can be used to write tempory files/directories. If not provided
                     (i.e., input is None) then a local directory will be define in the same folder as the input
                     image.
@@ -504,7 +509,10 @@ def createWebTilesVisGTIFFImg(input_img, bands, output_dir, scaled_gtiff_img, zo
 
     img2Stch = selImgBandsImg
     stretchImg = os.path.join(tmpDIR, baseName + '_stretch.kea')
-    if img_stats_msk is not None:
+    if stretch_file is not None:
+        rsgislib.imageutils.stretchImageWithStats(img2Stch, stretchImg, stretch_file, 'KEA', rsgislib.TYPE_8UINT,
+                                                  rsgislib.imageutils.STRETCH_LINEARMINMAX, 2)
+    elif img_stats_msk is not None:
         img2StchMskd = os.path.join(tmpDIR, baseName + '_MskdImg.kea')
         rsgislib.imageutils.maskImage(selImgBandsImg, img_stats_msk, img2StchMskd, 'KEA',
                                       rsgisUtils.getRSGISLibDataTypeFromImg(input_img), img_no_data_val, img_msk_vals)
