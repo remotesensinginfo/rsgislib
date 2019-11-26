@@ -305,8 +305,8 @@ def createQuicklookImgs(inputImg, bands, outputImgs='quicklook.jpg', output_img_
     img2Stch = selImgBandsImg
     stretchImg = os.path.join(tmpDIR, baseName + '_stretch.kea')
     if stretch_file is not None:
-        rsgislib.imageutils.stretchImageWithStats(img2Stch, stretchImg, stretch_file, 'KEA', rsgislib.TYPE_8UINT,
-                                                  rsgislib.imageutils.STRETCH_LINEARMINMAX, 2)
+        rsgislib.imageutils.stretchImageWithStatsNoData(img2Stch, stretchImg, stretch_file, 'KEA', rsgislib.TYPE_8UINT,
+                                                        img_no_data_val, rsgislib.imageutils.STRETCH_LINEARMINMAX, 2)
     elif img_stats_msk is not None:
         img2StchMskd = os.path.join(tmpDIR, baseName + '_MskdImg.kea')
         rsgislib.imageutils.maskImage(selImgBandsImg, img_stats_msk, img2StchMskd, 'KEA',
@@ -317,8 +317,9 @@ def createQuicklookImgs(inputImg, bands, outputImgs='quicklook.jpg', output_img_
                                                False, 'KEA', rsgislib.TYPE_8UINT,
                                                rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
 
-        rsgislib.imageutils.stretchImageWithStatsNoData(img2Stch, stretchImg, stretchImgStats, 'KEA', rsgislib.TYPE_8UINT,
-                                                        img_no_data_val, rsgislib.imageutils.STRETCH_LINEARMINMAX, 2)
+        rsgislib.imageutils.stretchImageWithStatsNoData(img2Stch, stretchImg, stretchImgStats, 'KEA',
+                                                        rsgislib.TYPE_8UINT, img_no_data_val,
+                                                        rsgislib.imageutils.STRETCH_LINEARMINMAX, 2)
     else:
         rsgislib.imageutils.stretchImageNoData(img2Stch, stretchImg, False, '', img_no_data_val, False, 'KEA',
                                                rsgislib.TYPE_8UINT, rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
@@ -510,8 +511,8 @@ def createWebTilesVisGTIFFImg(input_img, bands, output_dir, scaled_gtiff_img, zo
     img2Stch = selImgBandsImg
     stretchImg = os.path.join(tmpDIR, baseName + '_stretch.kea')
     if stretch_file is not None:
-        rsgislib.imageutils.stretchImageWithStats(img2Stch, stretchImg, stretch_file, 'KEA', rsgislib.TYPE_8UINT,
-                                                  rsgislib.imageutils.STRETCH_LINEARMINMAX, 2)
+        rsgislib.imageutils.stretchImageWithStatsNoData(img2Stch, stretchImg, stretch_file, 'KEA', rsgislib.TYPE_8UINT,
+                                                        img_no_data_val, rsgislib.imageutils.STRETCH_LINEARMINMAX, 2)
     elif img_stats_msk is not None:
         img2StchMskd = os.path.join(tmpDIR, baseName + '_MskdImg.kea')
         rsgislib.imageutils.maskImage(selImgBandsImg, img_stats_msk, img2StchMskd, 'KEA',
@@ -523,8 +524,8 @@ def createWebTilesVisGTIFFImg(input_img, bands, output_dir, scaled_gtiff_img, zo
                                                rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
 
         rsgislib.imageutils.stretchImageWithStatsNoData(img2Stch, stretchImg, stretchImgStats, 'KEA',
-                                                        rsgislib.TYPE_8UINT,
-                                                        img_no_data_val, rsgislib.imageutils.STRETCH_LINEARMINMAX, 2)
+                                                        rsgislib.TYPE_8UINT, img_no_data_val,
+                                                        rsgislib.imageutils.STRETCH_LINEARMINMAX, 2)
     else:
         rsgislib.imageutils.stretchImageNoData(img2Stch, stretchImg, False, '', img_no_data_val, False, 'KEA',
                                                rsgislib.TYPE_8UINT,
