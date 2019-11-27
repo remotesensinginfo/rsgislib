@@ -1486,6 +1486,25 @@ def gdal_stack_images_vrt(input_imgs, output_vrt_file):
     gdal.BuildVRT(output_vrt_file, input_imgs, options=build_vrt_opt)
 
 
+def gdal_mosaic_images_vrt(input_imgs, output_vrt_file):
+    """
+    A function which creates a GDAL VRT file from a set of input images by mosaicking
+    the input images.
+
+    :param input_imgs: A list of input images
+    :param output_vrt_file: The output file location for the VRT.
+    """
+    try:
+        import tqdm
+        pbar = tqdm.tqdm(total=100)
+        callback = lambda *args, **kw: pbar.update()
+    except:
+        callback = gdal.TermProgress
+
+    build_vrt_opt = gdal.BuildVRTOptions(callback=callback)
+    gdal.BuildVRT(output_vrt_file, input_imgs, options=build_vrt_opt)
+
+
 def subset_to_vec(in_img, out_img, gdalformat, roi_vec_file, roi_vec_lyr, datatype=None, vec_epsg=None):
     """
     A function which subsets an input image using the extent of a vector layer where the
