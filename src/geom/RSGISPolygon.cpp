@@ -76,7 +76,7 @@ namespace rsgis{namespace geom{
 	{
 		if(poly != NULL)
 		{
-			geos::geom::CoordinateSequence *coords = poly->getCoordinates();
+			std::unique_ptr<geos::geom::CoordinateSequence> coords = poly->getCoordinates();
 			geos::geom::Coordinate coord;
 			RSGIS2DPoint *pt = NULL;
 			for(unsigned int i = 0; i < coords->getSize(); i++)
@@ -85,7 +85,6 @@ namespace rsgis{namespace geom{
 				pt = new RSGIS2DPoint(new geos::geom::Coordinate(coord.x, coord.y, coord.z));
 				pts->push_back(pt);
 			}
-			delete coords;
 		}
 	}
 	
@@ -93,7 +92,7 @@ namespace rsgis{namespace geom{
 	{
 		if(poly != NULL)
 		{
-			geos::geom::CoordinateSequence *coords = poly->getCoordinates();
+			std::unique_ptr<geos::geom::CoordinateSequence> coords = poly->getCoordinates();
 			geos::geom::Coordinate coord;
 			RSGIS2DPoint *pt = NULL;
 			for(unsigned int i = 0; i < coords->getSize(); i++)
@@ -103,7 +102,6 @@ namespace rsgis{namespace geom{
 				pt->setClassID(classID);
 				pts->push_back(pt);
 			}
-			delete coords;
 		}
 	}
     
