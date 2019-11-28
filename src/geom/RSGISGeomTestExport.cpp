@@ -69,7 +69,7 @@ namespace rsgis{namespace geom{
 	{
 		OGRLineString *OGRLine = new OGRLineString();
 		
-		geos::geom::CoordinateSequence *coordSeq = line->getCoordinates();
+		std::unique_ptr<geos::geom::CoordinateSequence> coordSeq = line->getCoordinates();
 		geos::geom::Coordinate coord;
 		int numCoords = coordSeq->getSize();
 		for(int i = 0; i < numCoords; i++)
@@ -99,7 +99,8 @@ namespace rsgis{namespace geom{
 	OGRPolygon* RSGISGeomTestExport::convertGEOSPolygon2OGRPolygon(geos::geom::Polygon *poly)
 	{
 		OGRPolygon *ogrPoly = new OGRPolygon();
-		
+        /*
+        // TODO: THIS NEEDS SORTING OUT WITH THE LATEST VERSION OF GEOS...
 		// Add outer ring!
 		const geos::geom::LineString *exteriorRing = poly->getExteriorRing();
 		OGRLinearRing *ogrRing = this->convertGEOSLineString2OGRLinearRing(const_cast<geos::geom::LineString *>(exteriorRing));
@@ -117,8 +118,9 @@ namespace rsgis{namespace geom{
 			ogrPoly->addRing(ogrRing);
 			delete ogrRing;
 		}
-		
-		return ogrPoly;	}
+		*/
+		return ogrPoly;
+    }
 	
 	OGRPoint* RSGISGeomTestExport::convertGEOSPoint2OGRPoint(geos::geom::Point *point)
 	{
