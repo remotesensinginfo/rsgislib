@@ -1477,7 +1477,7 @@ def gdal_stack_images_vrt(input_imgs, output_vrt_file):
     """
     try:
         import tqdm
-        pbar = tqdm.tqdm(total=100)
+        pbar = tqdm.tqdm(total=len(input_imgs))
         callback = lambda *args, **kw: pbar.update()
     except:
         callback = gdal.TermProgress
@@ -1496,7 +1496,7 @@ def gdal_mosaic_images_vrt(input_imgs, output_vrt_file):
     """
     try:
         import tqdm
-        pbar = tqdm.tqdm(total=100)
+        pbar = tqdm.tqdm(total=len(input_imgs))
         callback = lambda *args, **kw: pbar.update()
     except:
         callback = gdal.TermProgress
