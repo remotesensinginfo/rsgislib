@@ -1284,6 +1284,7 @@ class RSGISPyUtils (object):
         """
         A function which will generate a 'random' string of the specified length based on the UUID
 
+        :param size: the length of the returned string.
         :return: string of length size.
 
         """
