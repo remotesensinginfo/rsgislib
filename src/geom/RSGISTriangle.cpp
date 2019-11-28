@@ -220,7 +220,7 @@ namespace rsgis{namespace geom{
 		
 		// Get Min and Max X values
 		
-		if((a->getX() < b->getX()) & (a->getX() < c->getX()))
+		if(a->getX() < b->getX() & a->getX() < c->getX())
 		{
 			xMin = a->getX();
 		}
@@ -233,7 +233,7 @@ namespace rsgis{namespace geom{
 			xMin = c->getX();
 		}
 		
-		if((a->getX() > b->getX()) & (a->getX() > c->getX()))
+		if(a->getX() > b->getX() & a->getX() > c->getX())
 		{
 			xMax = a->getX();
 		}
@@ -248,7 +248,7 @@ namespace rsgis{namespace geom{
 		
 		// Get min and max Y values
 		
-		if((a->getY() < b->getY()) & (a->getY() < c->getY()))
+		if(a->getY() < b->getY() & a->getY() < c->getY())
 		{
 			yMin = a->getY();
 		}
@@ -261,7 +261,7 @@ namespace rsgis{namespace geom{
 			yMin = c->getY();
 		}
 		
-		if((a->getY() > b->getY()) & (a->getY() > c->getY()))
+		if(a->getY() > b->getY() & a->getY() > c->getY())
 		{
 			yMax = a->getY();
 		}
@@ -281,7 +281,7 @@ namespace rsgis{namespace geom{
 	
 	geos::geom::Polygon* RSGISTriangle::createPolygon()
 	{
-		geos::geom::CoordinateArraySequence *coords = new geos::geom::CoordinateArraySequence();
+		geos::geom::CoordinateSequence *coords = new geos::geom::CoordinateArraySequence();
 		coords->add(geos::geom::Coordinate(a->getX(), a->getY(), a->getZ()));
 		coords->add(geos::geom::Coordinate(b->getX(), b->getY(), b->getZ()));
 		coords->add(geos::geom::Coordinate(c->getX(), c->getY(), c->getZ()));
