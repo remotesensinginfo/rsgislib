@@ -1486,13 +1486,15 @@ def gdal_stack_images_vrt(input_imgs, output_vrt_file):
     gdal.BuildVRT(output_vrt_file, input_imgs, options=build_vrt_opt)
 
 
-def gdal_mosaic_images_vrt(input_imgs, output_vrt_file):
+def gdal_mosaic_images_vrt(input_imgs, output_vrt_file, vrt_extent=None):
     """
     A function which creates a GDAL VRT file from a set of input images by mosaicking
     the input images.
 
     :param input_imgs: A list of input images
     :param output_vrt_file: The output file location for the VRT.
+    :param vrt_extent: An optional (If None then ignored) extent (minX, minY, maxX, maxY)
+                       for the VRT image.
     """
     try:
         import tqdm
@@ -1500,8 +1502,10 @@ def gdal_mosaic_images_vrt(input_imgs, output_vrt_file):
         callback = lambda *args, **kw: pbar.update()
     except:
         callback = gdal.TermProgress
-
-    build_vrt_opt = gdal.BuildVRTOptions(callback=callback)
+    if vrt_extent is not None:
+        build_vrt_opt = gdal.BuildVRTOptions(outputBounds=vrt_extent, callback=callback)
+    else:
+        build_vrt_opt = gdal.BuildVRTOptions(callback=callback)
     gdal.BuildVRT(output_vrt_file, input_imgs, options=build_vrt_opt)
 
 
