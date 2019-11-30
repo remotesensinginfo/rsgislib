@@ -912,4 +912,143 @@ def createQuicklookOverviewImgsVecOverlay(input_imgs, bands, tmp_dir, vec_overla
     shutil.rmtree(usr_tmp_dir)
 
 
+def createVisualOverviewImgsVecExtent(input_imgs, bands, tmp_dir, vec_extent_file, vec_extent_lyr,
+                                      outputImgs='quicklook.tif', output_img_sizes=500, gdalformat='GTIFF',
+                                      scale_axis='auto', stretch_file=None):
+    """
+    A function to produce an 8bit overview image (i.e., stretched visualisation) with an optional specified
+    extent.
 
+    :param input_imgs: input image file (any format that gdal supports)
+    :param bands: a string (comma seperated) with the bands to be selected. (e.g., '1', '1,2,3', '5,6,4')
+    :param tmp_dir: an input directory which can be used to write tempory files/directories.
+    :param vec_extent_file: an vector file to define the extent of the output image files.
+    :param vec_extent_lyr: the layer name for the vector extent.
+    :param outputImgs: a single output image or list of output images. The same size as output_img_sizes.
+    :param output_img_sizes: the output image size (in pixels) or list of output image sizes.
+    :param gdalformat: the output file format - probably either JPG, PNG or GTIFF.
+    :param scale_axis: the axis to which the output_img_sizes refer. Options: width, height or auto.
+                       Auto applies the output_img_sizes to the longest of the two axes.
+    :param stretch_file: a stretch stats file to standardise the stretch between a number of input files.
+
+    """
+    if scale_axis not in ['width', 'height', 'auto']:
+        raise rsgislib.RSGISPyException("Input parameter 'scale_axis' must have the value 'width', 'height' or 'auto'.")
+
+    if type(input_imgs) is not list:
+        raise rsgislib.RSGISPyException("Input images must be a list")
+    n_in_imgs = len(input_imgs)
+
+    n_out_imgs = 1
+    if type(outputImgs) is list:
+        n_out_imgs = len(outputImgs)
+        if type(output_img_sizes) is not list:
+            raise rsgislib.RSGISPyException("If the outputImgs input is a list so must output_img_sizes.")
+        if len(output_img_sizes) != n_out_imgs:
+            raise rsgislib.RSGISPyException("outputImgs and output_img_sizes must be the same length")
+
+        if n_out_imgs == 1:
+            outputImgs = outputImgs[0]
+            output_img_sizes = output_img_sizes[0]
+
+    rsgis_utils = rsgislib.RSGISPyUtils()
+    uid_str = rsgis_utils.uidGenerator()
+    usr_tmp_dir = os.path.join(tmp_dir, "qklk_tmp_{}".format(uid_str))
+    if not os.path.exists(usr_tmp_dir):
+        os.makedirs(usr_tmp_dir)
+
+    img_basename = rsgis_utils.get_file_basename(input_imgs[0], checkvalid=True)
+    bandLst = bands.split(',')
+    multiBand = False
+    if len(bandLst) == 3:
+        multiBand = True
+    elif len(bandLst) == 1:
+        multiBand = False
+    else:
+        print(bandLst)
+        raise rsgislib.RSGISPyException('You need to either provide 1 or 3 bands.')
+
+    sBands = []
+    for strBand in bandLst:
+        sBands.append(int(strBand))
+
+    nImgBands = rsgis_utils.getImageBandCount(input_imgs[0])
+    img_no_data_val = rsgis_utils.getImageNoDataValue(input_imgs[0])
+
+    b_sel_imgs = []
+    for img in input_imgs:
+        tmp_n_bands = rsgis_utils.getImageBandCount(img)
+        tmp_no_data_val = rsgis_utils.getImageNoDataValue(img)
+
+        if tmp_n_bands != nImgBands:
+            raise rsgislib.RSGISPyException('The number of bands in the input images is different.')
+
+        if tmp_no_data_val != img_no_data_val:
+            raise rsgislib.RSGISPyException('The no data value is different between the input images.')
+
+        selImgBandsImg = ''
+        if (nImgBands == 1) and (not multiBand):
+            selImgBandsImg = img
+        elif (nImgBands == 3) and (multiBand) and (bandLst[0] == '1') and (bandLst[1] == '2') and (bandLst[2] == '3'):
+            selImgBandsImg = img
+        else:
+            lcl_img_basename = rsgis_utils.get_file_basename(img, checkvalid=True)
+            selImgBandsImg = os.path.join(usr_tmp_dir, '{}_sband.kea'.format(lcl_img_basename))
+            rsgislib.imageutils.selectImageBands(img, selImgBandsImg, 'KEA',
+                                                 rsgis_utils.getRSGISLibDataTypeFromImg(img), sBands)
+            rsgis_utils.setImageNoDataValue(selImgBandsImg, img_no_data_val)
+        b_sel_imgs.append(selImgBandsImg)
+
+    tmp_vrt_img = os.path.join(usr_tmp_dir, "{}_{}.vrt".format(img_basename, uid_str))
+    if vec_extent_file is None:
+        rsgislib.imageutils.gdal_mosaic_images_vrt(b_sel_imgs, tmp_vrt_img)
+    else:
+        vec_extent_bbox = rsgis_utils.getVecLayerExtent(vec_extent_file, vec_extent_lyr, computeIfExp=True)
+        vrt_extent = [vec_extent_bbox[0], vec_extent_bbox[2], vec_extent_bbox[1], vec_extent_bbox[3]]
+        rsgislib.imageutils.gdal_mosaic_images_vrt(b_sel_imgs, tmp_vrt_img, vrt_extent)
+
+    stretchImg = os.path.join(usr_tmp_dir, '{}_stretch.kea'.format(img_basename))
+    if stretch_file is not None:
+        rsgislib.imageutils.stretchImageWithStatsNoData(tmp_vrt_img, stretchImg, stretch_file, 'KEA',
+                                                        rsgislib.TYPE_8UINT,
+                                                        img_no_data_val, rsgislib.imageutils.STRETCH_LINEARMINMAX, 2)
+    else:
+        rsgislib.imageutils.stretchImageNoData(tmp_vrt_img, stretchImg, False, '', img_no_data_val, False, 'KEA',
+                                               rsgislib.TYPE_8UINT, rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
+
+    if scale_axis == 'auto':
+        x_size, y_size = rsgis_utils.getImageSize(stretchImg)
+        if x_size > y_size:
+            scale_axis = 'width'
+        else:
+            scale_axis = 'height'
+
+    if n_out_imgs == 1:
+        if scale_axis == 'width':
+            out_size = '-outsize {0} 0'.format(output_img_sizes)
+        else:
+            out_size = '-outsize 0 {0}'.format(output_img_sizes)
+        # Create the resized output image.
+        cmd = 'gdal_translate -of {0} -ot Byte -scale {1} -r average {2} {3}'.format(gdalformat, out_size,
+                                                                                     stretchImg, outputImgs)
+        print(cmd)
+        try:
+            subprocess.check_call(cmd, shell=True)
+        except OSError as e:
+            raise rsgislib.RSGISPyException('Could not execute command: ' + cmd)
+    else:
+        for i in range(n_out_imgs):
+            if scale_axis == 'width':
+                out_size = '-outsize {0} 0'.format(output_img_sizes[i])
+            else:
+                out_size = '-outsize 0 {0}'.format(output_img_sizes[i])
+
+            # Create the resized output image.
+            cmd = 'gdal_translate -of {0} -ot Byte -scale {1} -r average {2} {3}'.format(gdalformat, out_size,
+                                                                                         stretchImg, outputImgs[i])
+            print(cmd)
+            try:
+                subprocess.check_call(cmd, shell=True)
+            except OSError as e:
+                raise rsgislib.RSGISPyException('Could not execute command: ' + cmd)
+    shutil.rmtree(usr_tmp_dir)
