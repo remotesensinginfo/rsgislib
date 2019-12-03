@@ -834,6 +834,7 @@ def createQuicklookOverviewImgsVecOverlay(input_imgs, bands, tmp_dir, vec_overla
         b_sel_imgs.append(selImgBandsImg)
 
     if overlay_clr is None:
+        overlay_clr = list()
         for i in range(nImgBands):
             overlay_clr.append(255)
 
@@ -912,4 +913,56 @@ def createQuicklookOverviewImgsVecOverlay(input_imgs, bands, tmp_dir, vec_overla
     shutil.rmtree(usr_tmp_dir)
 
 
+    def overlay_vec_on_img(input_img, output_img, vec_overlay_file, vec_overlay_lyr, tmp_dir, gdalformat='PNG',
+                           overlay_clr=None):
+        """
+        A function to overlay a vector layer on to a raster image 'burning' in the vector as a particular
+        colour. This is most appropriate for polyline vectors, polygons will be filled.
+
+        :param input_img: The input image, usually a stretched 8uint image ready for visualisation but needs
+                          spatial header information associated.
+        :param output_img: A output image file commonly in none specialist format such as JPEG, PNG or TIFF.
+        :param vec_overlay_file: The vector file to overlay (recommended to be a polyline vector)
+        :param vec_overlay_lyr: The name of the vector layer
+        :param tmp_dir: A temporary were processing stage file can be written during processing.
+        :param gdalformat: The output format - commonly PNG, JPEG or GTIFF.
+        :param overlay_clr: An array with the output pixel values for the vector overlay, needs
+                            the same length as the number of image bands. If None then the overlay
+                            will be white (i.e., [255, 255, 255].
+
+        """
+        rsgis_utils = rsgislib.RSGISPyUtils()
+
+        # Check the overlay colour is defined and correct.
+        n_img_bands = rsgis_utils.getImageBandCount(input_img)
+        if overlay_clr is None:
+            overlay_clr = list()
+            for i in range(n_img_bands):
+                overlay_clr.append(255)
+        elif len(overlay_clr) != n_img_bands:
+            raise Exception("The overlay colour does not have the same number of "
+                            "values as the number of bands within the input image.")
+
+        # Create a tempory directory for processing stage outputs.
+        img_basename = rsgis_utils.get_file_basename(input_img)
+        uid_str = rsgis_utils.uidGenerator()
+        usr_tmp_dir = os.path.join(tmp_dir, "{}_qklk_overlay_tmp_{}".format(img_basename, uid_str))
+        if not os.path.exists(usr_tmp_dir):
+            os.makedirs(usr_tmp_dir)
+
+        # Create raster of the vector to be overlain.
+        tmp_vec_overlay_img = os.path.join(usr_tmp_dir, '{}_vec_overlay.kea'.format(img_basename))
+        rsgislib.vectorutils.rasteriseVecLyr(vec_overlay_file, vec_overlay_lyr, input_img, tmp_vec_overlay_img,
+                                             gdalformat="KEA", burnVal=1, datatype=rsgislib.TYPE_8UINT, vecAtt=None,
+                                             thematic=True, nodata=0)
+
+        # Merge the overlay and base image
+        tmp_final_img = os.path.join(usr_tmp_dir, '{}_final.kea'.format(img_basename))
+        burn_in_binary_msk(input_img, tmp_vec_overlay_img, tmp_final_img, 'KEA', overlay_clr)
+
+        # Convert to final format (e.g., JPG, TIFF or PNG)
+        rsgislib.imageutils.gdal_translate(tmp_final_img, output_img, gdal_format=gdalformat)
+
+        # Remove the temporary directory.
+        shutil.rmtree(usr_tmp_dir)
 
