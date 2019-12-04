@@ -268,9 +268,9 @@ class RSGISPyUtils (object):
         basename = os.path.splitext(os.path.basename(filepath))[0]
         if checkvalid:
             basename = basename.replace(' ', '_')
-            for punch in string.punctuation:
-                if (punch != '_') and (punch != '-'):
-                    basename = basename.replace(punch, '')
+            for punct in string.punctuation:
+                if (punct != '_') and (punct != '-'):
+                    basename = basename.replace(punct, '')
         if n_comps > 0:
             basename_split = basename.split('_')
             if len(basename_split) < n_comps:
