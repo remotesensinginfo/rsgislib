@@ -200,7 +200,7 @@ Example::
     
     rsgislib.imagemorphology.createCircularOp(outputFile=tmpMorphOperator, opSize=morphSize)
     
-    rsgislib.imagemorphology.imageOpening(inputImage=tmpClearSkyRegionsFullExtentSelectClumps, outputImage=tmpClearSkyRegionsFullExtentSelectClumpsOpen, tempImage="", morphOperator=tmpMorphOperator, useOpFile=True, opSize=21, gdalformat='KEA', dataType=rsgislib.TYPE_32UINT)
+    rsgislib.imagemorphology.imageOpening(inputImage=tmpClearSkyRegionsFullExtentSelectClumps, outputImage=tmpClearSkyRegionsFullExtentSelectClumpsOpen, tempImage="", morphOperator=tmpMorphOperator, useOpFile=True, opSize=21, gdalformat='KEA', datatype=rsgislib.TYPE_32UINT)
     
     rsgislib.segmentation.clump(tmpClearSkyRegionsFullExtentSelectClumpsOpen, tmpClearSkyRegionsFullExtentSelectClumpsOpenClump, 'KEA', False, 0.0, False)
     
