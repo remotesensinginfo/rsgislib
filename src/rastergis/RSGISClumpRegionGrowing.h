@@ -30,6 +30,7 @@
 #include "gdal_priv.h"
 #include "gdal_rat.h"
 
+#include "common/rsgis-tqdm.h"
 #include "common/RSGISAttributeTableException.h"
 
 #include "math/RSGISMathsUtils.h"

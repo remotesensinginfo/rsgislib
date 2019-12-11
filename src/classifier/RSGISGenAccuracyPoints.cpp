@@ -1088,22 +1088,14 @@ namespace rsgis{namespace classifier{
             std::string classVal = "";
             std::string emptyStr = "";
             long pxlVal = 0.0;
-            
-            int feedback = numFeatures/10;
-            int feedbackCounter = 0;
             int i = 0;
             
             OGRFeature *featObj = NULL;
             inputVecLayer->ResetReading();
-            std::cout << "Started. " << std::flush;
+            rsgis_tqdm pbar;
             while( (featObj = inputVecLayer->GetNextFeature()) != NULL )
             {
-                if((numFeatures > 10) && ((i % feedback) == 0) && feedbackCounter <= 100)
-                {
-                    std::cout << "." << feedbackCounter << "." << std::flush;
-                    
-                    feedbackCounter = feedbackCounter + 10;
-                }
+                pbar.progress(i, numFeatures);
                 
                 // Get Geometry.
                 nullGeometry = false;
@@ -1165,7 +1157,7 @@ namespace rsgis{namespace classifier{
                 OGRFeature::DestroyFeature(featObj);
                 i++;
             }
-            std::cout << ". Complete.\n";
+            pbar.finish();
             
         
         }

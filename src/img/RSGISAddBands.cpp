@@ -112,12 +112,12 @@ namespace rsgis{namespace img{
         {
             throw RSGISImageBandException("Driver does not exists!");
         }
-        
+        char **papszOptions = imgUtils.getGDALCreationOptionsForFormat("ENVI");
         int numBands = input->GetRasterCount()+1;
         
         // Create new file. 
         GDALDataset *outputImage = NULL;
-        outputImage = poDriver->Create(outputFile->c_str(), inputXSize, inputYSize, numBands, GDT_Float32, NULL);
+        outputImage = poDriver->Create(outputFile->c_str(), inputXSize, inputYSize, numBands, GDT_Float32, papszOptions);
         outputImage->SetGeoTransform(inputTrans);
         outputImage->SetProjection(input->GetProjectionRef());
         
@@ -272,9 +272,10 @@ namespace rsgis{namespace img{
         {
             throw RSGISImageBandException("ENVI Driver does not exists!");
         }
+        char **papszOptions = imgUtils.getGDALCreationOptionsForFormat("ENVI");
         
         // Create new file. 
-        outputImage = poDriver->Create(outputFile->c_str(), inputXSize, inputYSize, numBands, GDT_Float32, NULL);
+        outputImage = poDriver->Create(outputFile->c_str(), inputXSize, inputYSize, numBands, GDT_Float32, papszOptions);
         outputImage->SetGeoTransform(inputTrans);
         outputImage->SetProjection(input->GetProjectionRef());
         
@@ -369,9 +370,10 @@ namespace rsgis{namespace img{
 			{
 				throw RSGISImageBandException("Requested GDAL driver does not exists..");
 			}
+            char **papszOptions = imgUtils.getGDALCreationOptionsForFormat(gdalFormat);
 			std::cout << "New image width = " << width << " height = " << height << " bands = " << numInBands << std::endl;
 			
-			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, numInBands, gdalDataType, NULL);
+			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, numInBands, gdalDataType, papszOptions);
 			
 			if(outputImageDS == NULL)
 			{
@@ -424,7 +426,6 @@ namespace rsgis{namespace img{
             {
                 yBlockSize = outYBlockSize;
             }
-            std::cout << "Max. block size: " << yBlockSize << std::endl;
             
 			// Allocate memory
 			inputData = new float*[numInBands];
@@ -437,9 +438,7 @@ namespace rsgis{namespace img{
             int remainRows = height - (nYBlocks * yBlockSize);
             int rowOffset = 0;
             
-			int feedback = height/10;
-			int feedbackCounter = 0;
-			std::cout << "Started" << std::flush;
+			rsgis_tqdm pbar;
 			// Loop images to process data
 			for(int i = 0; i < nYBlocks; i++)
 			{
@@ -451,11 +450,7 @@ namespace rsgis{namespace img{
                 
                 for(int m = 0; m < yBlockSize; ++m)
                 {
-                    if((feedback != 0) && ((((i*yBlockSize)+m) % feedback) == 0))
-                    {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
-                    }
+                    pbar.progress((i*yBlockSize)+m, height);
                     
                     if(skipPixels) // If skipping pixels, look through input values and check for skip value in any of the bands.
                     {
@@ -499,11 +494,7 @@ namespace rsgis{namespace img{
                 
                 for(int m = 0; m < remainRows; ++m)
                 {
-                    if((feedback != 0) && ((((nYBlocks*yBlockSize)+m) % feedback) == 0))
-                    {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
-                    }
+                    pbar.progress((nYBlocks*yBlockSize)+m, height);
                     
                     if(skipPixels) // If skipping pixels, look through input values and check for skip value in any of the bands.
                     {
@@ -535,7 +526,7 @@ namespace rsgis{namespace img{
 					outputRasterBands[n]->RasterIO(GF_Write, 0, rowOffset, width, remainRows, inputData[n], width, remainRows, GDT_Float32, 0, 0);
 				}
             }
-			std::cout << " Complete.\n";
+			pbar.finish();
 		}
 		catch(RSGISImageBandException& e)
 		{			

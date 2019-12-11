@@ -77,9 +77,10 @@ namespace rsgis{namespace img{
 			{
 				throw RSGISImageBandException("Requested GDAL driver does not exists..");
 			}
+            char **papszOptions = imgUtils.getGDALCreationOptionsForFormat(gdalFormat);
 			std::cout << "New image width = " << width << " height = " << height << " bands = " << this->numOutBands << std::endl;
 			
-			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, NULL);
+			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, papszOptions);
 			
 			if(outputImageDS == NULL)
 			{
@@ -149,9 +150,7 @@ namespace rsgis{namespace img{
             int remainRows = height - (nYBlocks * yBlockSize);
             int rowOffset = 0;
             
-			int feedback = height/10.0;
-			int feedbackCounter = 0;
-			std::cout << "Started " << std::flush;
+			rsgis_tqdm pbar;
 			// Loop images to process data
 			for(int i = 0; i < nYBlocks; i++)
 			{
@@ -163,13 +162,8 @@ namespace rsgis{namespace img{
                 
                 for(int m = 0; m < yBlockSize; ++m)
                 {
-                    if((feedback != 0) && (((i*yBlockSize)+m) % feedback) == 0)
-                    {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
-                    }
-                    
-                    
+                    pbar.progress((i*yBlockSize)+m, height);
+                                        
                     for(int j = 0; j < width; j++)
                     {
                         for(int n = 0; n < numInBands; n++)
@@ -204,11 +198,7 @@ namespace rsgis{namespace img{
                                 
                 for(int m = 0; m < remainRows; ++m)
                 {
-                    if((feedback != 0) && ((((nYBlocks*yBlockSize)+m) % feedback) == 0))
-                    {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
-                    }
+                    pbar.progress((nYBlocks*yBlockSize)+m, height);
                     
                     for(int j = 0; j < width; j++)
                     {
@@ -233,7 +223,7 @@ namespace rsgis{namespace img{
 					outputRasterBands[n]->RasterIO(GF_Write, 0, rowOffset, width, remainRows, outputData[n], width, remainRows, GDT_Float64, 0, 0);
 				}
             }
-			std::cout << " Complete.\n";
+			pbar.finish();
 		}
 		catch(RSGISImageCalcException& e)
 		{
@@ -514,9 +504,10 @@ namespace rsgis{namespace img{
             {
                 throw RSGISImageBandException("Requested GDAL driver does not exists..");
             }
+            char **papszOptions = imgUtils.getGDALCreationOptionsForFormat(gdalFormat);
             std::cout << "New image width = " << width << " height = " << height << " bands = " << this->numOutBands << std::endl;
             
-            outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, NULL);
+            outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, papszOptions);
             if(outputImageDS == NULL)
             {
                 throw RSGISImageBandException("Output image could not be created. Check filepath.");
@@ -531,7 +522,7 @@ namespace rsgis{namespace img{
                 outputImageDS->SetProjection(proj.c_str());
             }
             
-            outputRefImageDS = gdalDriver->Create(outputRefIntImage.c_str(), width, height, 1, GDT_UInt32, NULL);
+            outputRefImageDS = gdalDriver->Create(outputRefIntImage.c_str(), width, height, 1, GDT_UInt32, papszOptions);
             if(outputRefImageDS == NULL)
             {
                 throw RSGISImageBandException("Output reference image could not be created. Check filepath.");
@@ -599,9 +590,7 @@ namespace rsgis{namespace img{
             int remainRows = height - (nYBlocks * yBlockSize);
             int rowOffset = 0;
             
-            int feedback = height/10.0;
-            int feedbackCounter = 0;
-            std::cout << "Started " << std::flush;
+            rsgis_tqdm pbar;
             // Loop images to process data
             for(int i = 0; i < nYBlocks; i++)
             {
@@ -613,12 +602,7 @@ namespace rsgis{namespace img{
                 
                 for(int m = 0; m < yBlockSize; ++m)
                 {
-                    if((feedback != 0) && (((i*yBlockSize)+m) % feedback) == 0)
-                    {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
-                    }
-                    
+                    pbar.progress((i*yBlockSize)+m, height);
                     
                     for(int j = 0; j < width; j++)
                     {
@@ -655,11 +639,7 @@ namespace rsgis{namespace img{
                 
                 for(int m = 0; m < remainRows; ++m)
                 {
-                    if((feedback != 0) && ((((nYBlocks*yBlockSize)+m) % feedback) == 0))
-                    {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
-                    }
+                    pbar.progress((nYBlocks*yBlockSize)+m, height);
                     
                     for(int j = 0; j < width; j++)
                     {
@@ -685,7 +665,7 @@ namespace rsgis{namespace img{
                 }
                 outputRefRasterBand->RasterIO(GF_Write, 0, rowOffset, width, remainRows, outputRefData, width, remainRows, GDT_Float64, 0, 0);
             }
-            std::cout << " Complete.\n";
+            pbar.finish();
         }
         catch(RSGISImageCalcException& e)
         {
@@ -1039,9 +1019,7 @@ namespace rsgis{namespace img{
             int remainRows = height - (nYBlocks * yBlockSize);
             int rowOffset = 0;
             
-			int feedback = height/10;
-			int feedbackCounter = 0;
-			std::cout << "Started " << std::flush;
+			rsgis_tqdm pbar;
 			// Loop images to process data
 			for(int i = 0; i < nYBlocks; i++)
 			{
@@ -1053,12 +1031,7 @@ namespace rsgis{namespace img{
                 
                 for(int m = 0; m < yBlockSize; ++m)
                 {
-                    if((feedback != 0) && ((((i*yBlockSize)+m) % feedback) == 0))
-                    {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
-                    }
-                    
+                    pbar.progress((i*yBlockSize)+m, height);
                     
                     for(int j = 0; j < width; j++)
                     {
@@ -1094,11 +1067,7 @@ namespace rsgis{namespace img{
                 
                 for(int m = 0; m < remainRows; ++m)
                 {
-                    if((feedback != 0) && ((((nYBlocks*yBlockSize)+m) % feedback) == 0))
-                    {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
-                    }
+                    pbar.progress((nYBlocks*yBlockSize)+m, height);
                     
                     for(int j = 0; j < width; j++)
                     {
@@ -1123,7 +1092,7 @@ namespace rsgis{namespace img{
 					outputRasterBands[n]->RasterIO(GF_Write, 0, rowOffset, width, remainRows, outputData[n], width, remainRows, GDT_Float64, 0, 0);
 				}
             }
-			std::cout << " Complete.\n";
+			pbar.finish();
 		}
 		catch(RSGISImageCalcException& e)
 		{			
@@ -1452,9 +1421,7 @@ namespace rsgis{namespace img{
             int remainRows = height - (nYBlocks * yBlockSize);
             int rowOffset = 0;
             
-            int feedback = height/10;
-            int feedbackCounter = 0;
-            std::cout << "Started " << std::flush;
+            rsgis_tqdm pbar;
             // Loop images to process data
             for(int i = 0; i < nYBlocks; i++)
             {
@@ -1466,12 +1433,7 @@ namespace rsgis{namespace img{
                 
                 for(int m = 0; m < yBlockSize; ++m)
                 {
-                    if((feedback != 0) && ((((i*yBlockSize)+m) % feedback) == 0))
-                    {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
-                    }
-                    
+                    pbar.progress((i*yBlockSize)+m, height);
                     
                     for(int j = 0; j < width; j++)
                     {
@@ -1507,11 +1469,7 @@ namespace rsgis{namespace img{
                 
                 for(int m = 0; m < remainRows; ++m)
                 {
-                    if((feedback != 0) && ((((nYBlocks*yBlockSize)+m) % feedback) == 0))
-                    {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
-                    }
+                    pbar.progress((nYBlocks*yBlockSize)+m, height);
                     
                     for(int j = 0; j < width; j++)
                     {
@@ -1536,7 +1494,7 @@ namespace rsgis{namespace img{
                     outputRasterBands[n]->RasterIO(GF_Write, outXOffset, rowOffset, width, remainRows, outputData[n], width, remainRows, GDT_Float64, 0, 0);
                 }
             }
-            std::cout << " Complete.\n";
+            pbar.finish();
         }
         catch(RSGISImageCalcException& e)
         {
@@ -1823,9 +1781,10 @@ namespace rsgis{namespace img{
 			{
 				throw RSGISImageBandException("Requested GDAL driver does not exists..");
 			}
+            char **papszOptions = imgUtils.getGDALCreationOptionsForFormat(gdalFormat);
 			std::cout << "New image width = " << width << " height = " << height << " bands = " << this->numOutBands << std::endl;
 			
-			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, NULL);
+			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, papszOptions);
 			
 			if(outputImageDS == NULL)
 			{
@@ -1919,9 +1878,7 @@ namespace rsgis{namespace img{
             int remainRows = height - (nYBlocks * yBlockSize);
             int rowOffset = 0;
             
-			int feedback = height/10;
-			int feedbackCounter = 0;
-			std::cout << "Started " << std::flush;
+			rsgis_tqdm pbar;
 			// Loop images to process data
 			for(int i = 0; i < nYBlocks; i++)
 			{
@@ -1939,12 +1896,7 @@ namespace rsgis{namespace img{
                 
                 for(int m = 0; m < yBlockSize; ++m)
                 {
-                    if((feedback != 0) && ((((i*yBlockSize)+m) % feedback) == 0))
-                    {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
-                    }
-                    
+                    pbar.progress((i*yBlockSize)+m, height);
                     
                     for(int j = 0; j < width; j++)
                     {
@@ -1990,11 +1942,7 @@ namespace rsgis{namespace img{
                 
                 for(int m = 0; m < remainRows; ++m)
                 {
-                    if((feedback != 0) && ((((nYBlocks*yBlockSize)+m) % feedback) == 0))
-                    {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
-                    }
+                    pbar.progress((nYBlocks*yBlockSize)+m, height);
                     
                     for(int j = 0; j < width; j++)
                     {
@@ -2023,7 +1971,7 @@ namespace rsgis{namespace img{
                     }
                 }
             }
-			std::cout << " Complete.\n";
+			pbar.finish();
 		}
 		catch(RSGISImageCalcException& e)
 		{
@@ -2421,9 +2369,10 @@ namespace rsgis{namespace img{
             {
                 throw RSGISImageBandException("Requested GDAL driver does not exists..");
             }
+            char **papszOptions = imgUtils.getGDALCreationOptionsForFormat(gdalFormat);
             std::cout << "New image width = " << width << " height = " << height << " bands = " << this->numOutBands << std::endl;
             
-            outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, NULL);
+            outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, papszOptions);
             if(outputImageDS == NULL)
             {
                 throw RSGISImageBandException("Output image could not be created. Check filepath.");
@@ -2438,7 +2387,7 @@ namespace rsgis{namespace img{
                 outputImageDS->SetProjection(proj.c_str());
             }
             
-            outputRefImageDS = gdalDriver->Create(outputRefIntImage.c_str(), width, height, 1, GDT_UInt32, NULL);
+            outputRefImageDS = gdalDriver->Create(outputRefIntImage.c_str(), width, height, 1, GDT_UInt32, papszOptions);
             if(outputRefImageDS == NULL)
             {
                 throw RSGISImageBandException("Output reference image could not be created. Check filepath.");
@@ -2530,9 +2479,7 @@ namespace rsgis{namespace img{
             int remainRows = height - (nYBlocks * yBlockSize);
             int rowOffset = 0;
             
-            int feedback = height/10;
-            int feedbackCounter = 0;
-            std::cout << "Started " << std::flush;
+            rsgis_tqdm pbar;
             // Loop images to process data
             for(int i = 0; i < nYBlocks; i++)
             {
@@ -2550,12 +2497,7 @@ namespace rsgis{namespace img{
                 
                 for(int m = 0; m < yBlockSize; ++m)
                 {
-                    if((feedback != 0) && ((((i*yBlockSize)+m) % feedback) == 0))
-                    {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
-                    }
-                    
+                    pbar.progress((i*yBlockSize)+m, height);
                     
                     for(int j = 0; j < width; j++)
                     {
@@ -2603,11 +2545,7 @@ namespace rsgis{namespace img{
                 
                 for(int m = 0; m < remainRows; ++m)
                 {
-                    if((feedback != 0) && ((((nYBlocks*yBlockSize)+m) % feedback) == 0))
-                    {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
-                    }
+                    pbar.progress((nYBlocks*yBlockSize)+m, height);
                     
                     for(int j = 0; j < width; j++)
                     {
@@ -2638,7 +2576,7 @@ namespace rsgis{namespace img{
                     outputRefRasterBand->RasterIO(GF_Write, 0, rowOffset, width, remainRows, outputRefData, width, remainRows, GDT_Float64, 0, 0);
                 }
             }
-            std::cout << " Complete.\n";
+            pbar.finish();
         }
         catch(RSGISImageCalcException& e)
         {
@@ -3081,11 +3019,10 @@ namespace rsgis{namespace img{
             int remainRows = height - (nYBlocks * yBlockSize);
             int rowOffset = 0;
             
-			int feedback = height/10;
-			int feedbackCounter = 0;
+            rsgis_tqdm *pbar = NULL;
             if(!quiet)
             {
-                std::cout << "Started " << std::flush;
+                pbar = new rsgis_tqdm();
             }
 			// Loop images to process data
 			for(int i = 0; i < nYBlocks; i++)
@@ -3104,10 +3041,9 @@ namespace rsgis{namespace img{
                 
                 for(int m = 0; m < yBlockSize; ++m)
                 {
-                    if((!quiet) && (feedback != 0) && ((((i*yBlockSize)+m) % feedback) == 0))
+                    if(!quiet)
                     {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
+                        pbar->progress((i*yBlockSize)+m, height);
                     }
                     
                     
@@ -3145,10 +3081,9 @@ namespace rsgis{namespace img{
                 
                 for(int m = 0; m < remainRows; ++m)
                 {
-                    if((!quiet) && (feedback != 0) && ((((nYBlocks*yBlockSize)+m) % feedback) == 0))
+                    if(!quiet)
                     {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
+                        pbar->progress((nYBlocks*yBlockSize)+m, height);
                     }
                     
                     for(int j = 0; j < width; j++)
@@ -3169,7 +3104,8 @@ namespace rsgis{namespace img{
             }
             if(!quiet)
             {
-                std::cout << " Complete.\n";
+                pbar->finish();
+                delete pbar;
             }
 		}
 		catch(RSGISImageCalcException& e)
@@ -3573,9 +3509,7 @@ namespace rsgis{namespace img{
             int remainRows = height - (nYBlocks * yBlockSize);
             int rowOffset = 0;
             
-			int feedback = height/10;
-			int feedbackCounter = 0;
-			std::cout << "Started " << std::flush;
+			rsgis_tqdm pbar;
             std::cout.precision(20);
 			// Loop images to process data
 			for(int i = 0; i < nYBlocks; i++)
@@ -3594,12 +3528,7 @@ namespace rsgis{namespace img{
                 
                 for(int m = 0; m < yBlockSize; ++m)
                 {
-                    if((feedback != 0) && ((((i*yBlockSize)+m) % feedback) == 0))
-                    {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
-                    }
-                    
+                    pbar.progress((i*yBlockSize)+m, height);
                     
                     for(int j = 0; j < width; j++)
                     {
@@ -3645,11 +3574,7 @@ namespace rsgis{namespace img{
                 
                 for(int m = 0; m < remainRows; ++m)
                 {
-                    if((feedback != 0) && ((((nYBlocks*yBlockSize)+m) % feedback) == 0))
-                    {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
-                    }
+                    pbar.progress((nYBlocks*yBlockSize)+m, height);
                     
                     for(int j = 0; j < width; j++)
                     {
@@ -3678,7 +3603,7 @@ namespace rsgis{namespace img{
                     }
                 }
             }
-			std::cout << " Complete.\n";
+			pbar.finish();
 		}
 		catch(RSGISImageCalcException& e)
 		{
@@ -4072,9 +3997,7 @@ namespace rsgis{namespace img{
             int remainRows = height - (nYBlocks * yBlockSize);
             int rowOffset = 0;
             
-			int feedback = height/10;
-			int feedbackCounter = 0;
-			std::cout << "Started " << std::flush;
+			rsgis_tqdm pbar;
 			// Loop images to process data
 			for(int i = 0; i < nYBlocks; i++)
 			{
@@ -4086,11 +4009,7 @@ namespace rsgis{namespace img{
                 
                 for(int m = 0; m < yBlockSize; ++m)
                 {
-                    if((feedback != 0) && ((((i*yBlockSize)+m) % feedback) == 0))
-                    {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
-                    }
+                    pbar.progress((i*yBlockSize)+m, height);
                     
                     for(int j = 0; j < width; j++)
                     {
@@ -4114,11 +4033,7 @@ namespace rsgis{namespace img{
                 
                 for(int m = 0; m < remainRows; ++m)
                 {
-                    if((feedback != 0) && ((((nYBlocks*yBlockSize)+m) % feedback) == 0))
-                    {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
-                    }
+                    pbar.progress((nYBlocks*yBlockSize)+m, height);
                     
                     for(int j = 0; j < width; j++)
                     {
@@ -4131,7 +4046,7 @@ namespace rsgis{namespace img{
                     }
                 }
             }
-			std::cout << " Complete.\n";
+			pbar.finish();
 		}
 		catch(RSGISImageCalcException& e)
 		{
@@ -4331,16 +4246,17 @@ namespace rsgis{namespace img{
 			gdalDriver = GetGDALDriverManager()->GetDriverByName(gdalFormat.c_str());
 			if(gdalDriver == NULL)
 			{
-				throw RSGISImageBandException("ENVI driver does not exists..");
+				throw RSGISImageBandException("GDAL driver does not exists..");
 			}
-            
+            char **papszOptions = imgUtils.getGDALCreationOptionsForFormat(gdalFormat);
+            rsgis_tqdm pbar;
             for(int cImgBand = 0; cImgBand < numInBands; ++cImgBand)
             {
                 outputImageFileName = outputImageBase + mathUtils.inttostring(cImgBand) + std::string(".env");
                 
                 std::cout << "New image width = " << width << " height = " << height << " bands = " << this->numOutBands << std::endl;
 				
-				outputImageDS = gdalDriver->Create(outputImageFileName.c_str(), width, height, this->numOutBands, GDT_Float32, NULL);
+				outputImageDS = gdalDriver->Create(outputImageFileName.c_str(), width, height, this->numOutBands, GDT_Float32, papszOptions);
 				
                 if(outputImageDS == NULL)
                 {
@@ -4389,18 +4305,12 @@ namespace rsgis{namespace img{
                     outputData[i] = (double *) CPLMalloc(sizeof(double)*width);
                 }
                 outDataColumn = new double[this->numOutBands];
-            
-                int feedback = height/10;
-                int feedbackCounter = 0;
-                std::cout << "Started (Band " << cImgBand+1 << "):\t" << std::flush;
+                pbar.reset();
+                pbar.set_label("Band " + mathUtils.inttostring(cImgBand+1));
                 // Loop images to process data
                 for(int i = 0; i < height; i++)
                 {
-                    if((feedback != 0) && ((i % feedback) == 0))
-                    {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
-                    }
+                    pbar.progress(i, height);
 
                     inputRasterBands[cImgBand]->RasterIO(GF_Read, bandOffsets[cImgBand][0], (bandOffsets[cImgBand][1]+i), width, 1, inputData, width, 1, GDT_Float32, 0, 0);
                     
@@ -4422,7 +4332,7 @@ namespace rsgis{namespace img{
                         outputRasterBands[n]->RasterIO(GF_Write, 0, i, width, 1, outputData[n], width, 1, GDT_Float64, 0, 0);
                     }
                 }
-                std::cout << " Complete.\n";
+                pbar.finish();
                 
                 GDALClose(outputImageDS);
                 
@@ -4580,9 +4490,10 @@ namespace rsgis{namespace img{
 			{
 				throw RSGISImageBandException("Requested GDAL driver does not exists..");
 			}
+            char **papszOptions = imgUtils.getGDALCreationOptionsForFormat(gdalFormat);
 			std::cout << "New image width = " << width << " height = " << height << " bands = " << this->numOutBands << std::endl;
 			
-			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, NULL);
+			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, papszOptions);
 			
 			if(outputImageDS == NULL)
 			{
@@ -4652,9 +4563,7 @@ namespace rsgis{namespace img{
             int remainRows = height - (nYBlocks * yBlockSize);
             int rowOffset = 0;
             
-			int feedback = height/10.0;
-			int feedbackCounter = 0;
-			std::cout << "Started " << std::flush;
+			rsgis_tqdm pbar;
 			// Loop images to process data
 			for(int i = 0; i < nYBlocks; i++)
 			{
@@ -4666,12 +4575,7 @@ namespace rsgis{namespace img{
                 
                 for(int m = 0; m < yBlockSize; ++m)
                 {
-                    if((feedback != 0) && (((i*yBlockSize)+m) % feedback) == 0)
-                    {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
-                    }
-                    
+                    pbar.progress((i*yBlockSize)+m, height);
                     
                     for(int j = 0; j < width; j++)
                     {
@@ -4707,11 +4611,7 @@ namespace rsgis{namespace img{
                 
                 for(int m = 0; m < remainRows; ++m)
                 {
-                    if((feedback != 0) && ((((nYBlocks*yBlockSize)+m) % feedback) == 0))
-                    {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
-                    }
+                    pbar.progress((nYBlocks*yBlockSize)+m, height);
                     
                     for(int j = 0; j < width; j++)
                     {
@@ -4736,7 +4636,7 @@ namespace rsgis{namespace img{
 					outputRasterBands[n]->RasterIO(GF_Write, 0, rowOffset, width, remainRows, outputData[n], width, remainRows, GDT_Float64, 0, 0);
 				}
             }
-			std::cout << " Complete.\n";
+			pbar.finish();
 		}
 		catch(RSGISImageCalcException& e)
 		{
@@ -5029,11 +4929,10 @@ namespace rsgis{namespace img{
             int remainRows = height - (nYBlocks * yBlockSize);
             int rowOffset = 0;
             
-			int feedback = height/10.0;
-			int feedbackCounter = 0;
+			rsgis_tqdm *pbar = NULL;
             if(!quiet)
             {
-                std::cout << "Started " << std::flush;
+                pbar = new rsgis_tqdm();
             }
 			// Loop images to process data
 			for(int i = 0; i < nYBlocks; i++)
@@ -5046,12 +4945,10 @@ namespace rsgis{namespace img{
                 
                 for(int m = 0; m < yBlockSize; ++m)
                 {
-                    if((!quiet) && (feedback != 0) && (((i*yBlockSize)+m) % feedback) == 0)
+                    if(!quiet)
                     {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
+                        pbar->progress((i*yBlockSize)+m, height);
                     }
-                    
                     
                     for(int j = 0; j < width; j++)
                     {
@@ -5061,7 +4958,6 @@ namespace rsgis{namespace img{
                         }
                         
                         this->calc->calcImageValue(inDataColumn, numInBands);
-                        
                     }
                 }
 			}
@@ -5076,10 +4972,9 @@ namespace rsgis{namespace img{
                 
                 for(int m = 0; m < remainRows; ++m)
                 {
-                    if((!quiet) && (feedback != 0) && ((((nYBlocks*yBlockSize)+m) % feedback) == 0))
+                    if(!quiet)
                     {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
+                        pbar->progress((nYBlocks*yBlockSize)+m, height);
                     }
                     
                     for(int j = 0; j < width; j++)
@@ -5095,7 +4990,8 @@ namespace rsgis{namespace img{
             }
             if(!quiet)
             {
-                std::cout << " Complete.\n";
+                pbar->finish();
+                delete pbar;
             }
 		}
 		catch(RSGISImageCalcException& e)
@@ -5356,11 +5252,10 @@ namespace rsgis{namespace img{
             int remainRows = height - (nYBlocks * yBlockSize);
             int rowOffset = 0;
             
-            int feedback = height/10;
-            int feedbackCounter = 0;
+            rsgis_tqdm *pbar = NULL;
             if(!quiet)
             {
-                std::cout << "Started " << std::flush;
+                pbar = new rsgis_tqdm();
             }
             // Loop images to process data
             for(int i = 0; i < nYBlocks; i++)
@@ -5379,12 +5274,10 @@ namespace rsgis{namespace img{
                 
                 for(int m = 0; m < yBlockSize; ++m)
                 {
-                    if((!quiet) && (feedback != 0) && ((((i*yBlockSize)+m) % feedback) == 0))
+                    if(!quiet)
                     {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
+                        pbar->progress((i*yBlockSize)+m, height);
                     }
-                    
                     
                     for(int j = 0; j < width; j++)
                     {
@@ -5420,10 +5313,9 @@ namespace rsgis{namespace img{
                 
                 for(int m = 0; m < remainRows; ++m)
                 {
-                    if((!quiet) && (feedback != 0) && ((((nYBlocks*yBlockSize)+m) % feedback) == 0))
+                    if(!quiet)
                     {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
+                        pbar->progress((nYBlocks*yBlockSize)+m, height);
                     }
                     
                     for(int j = 0; j < width; j++)
@@ -5444,7 +5336,8 @@ namespace rsgis{namespace img{
             }
             if(!quiet)
             {
-                std::cout << " Complete.\n";
+                pbar->finish();
+                delete pbar;
             }
         }
         catch(RSGISImageCalcException& e)
@@ -5771,12 +5664,10 @@ namespace rsgis{namespace img{
             int remainRows = height - (nYBlocks * yBlockSize);
             int rowOffset = 0;
             
-			int feedback = height/10;
-			int feedbackCounter = 0;
             unsigned int xPxl = 0;
             unsigned int yPxl = 0;
             geos::geom::Envelope extent;
-			std::cout << "Started " << std::flush;
+			rsgis_tqdm pbar;
 			// Loop images to process data
 			for(int i = 0; i < nYBlocks; i++)
 			{
@@ -5788,11 +5679,7 @@ namespace rsgis{namespace img{
                 
                 for(int m = 0; m < yBlockSize; ++m)
                 {
-                    if((feedback != 0) && ((((i*yBlockSize)+m) % feedback) == 0))
-                    {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
-                    }
+                    pbar.progress((i*yBlockSize)+m, height);
                     
                     xPxl = 0;
                     for(int j = 0; j < width; j++)
@@ -5821,11 +5708,7 @@ namespace rsgis{namespace img{
                 
                 for(int m = 0; m < remainRows; ++m)
                 {
-                    if((feedback != 0) && ((((nYBlocks*yBlockSize)+m) % feedback) == 0))
-                    {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
-                    }
+                    pbar.progress((nYBlocks*yBlockSize)+m, height);
                     
                     xPxl = 0;
                     for(int j = 0; j < width; j++)
@@ -5843,7 +5726,7 @@ namespace rsgis{namespace img{
                     ++yPxl;
                 }
             }
-			std::cout << " Complete.\n";
+			pbar.finish();
 		}
 		catch(RSGISImageCalcException& e)
 		{
@@ -6100,9 +5983,7 @@ namespace rsgis{namespace img{
             int remainRows = height - (nYBlocks * yBlockSize);
             int rowOffset = 0;
             
-            int feedback = height/10;
-            int feedbackCounter = 0;
-            std::cout << "Started " << std::flush;
+            rsgis_tqdm pbar;
             // Loop images to process data
             for(int i = 0; i < nYBlocks; i++)
             {
@@ -6120,11 +6001,7 @@ namespace rsgis{namespace img{
                 
                 for(int m = 0; m < yBlockSize; ++m)
                 {
-                    if((feedback != 0) && ((((i*yBlockSize)+m) % feedback) == 0))
-                    {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
-                    }
+                    pbar.progress((i*yBlockSize)+m, height);
                     
                     xPxl = 0;
                     for(int j = 0; j < width; j++)
@@ -6166,11 +6043,7 @@ namespace rsgis{namespace img{
                 
                 for(int m = 0; m < remainRows; ++m)
                 {
-                    if((feedback != 0) && ((((nYBlocks*yBlockSize)+m) % feedback) == 0))
-                    {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
-                    }
+                    pbar.progress((nYBlocks*yBlockSize)+m, height);
                     
                     xPxl = 0;
                     for(int j = 0; j < width; j++)
@@ -6193,7 +6066,7 @@ namespace rsgis{namespace img{
                     yPxl += 1;
                 }
             }
-            std::cout << " Complete.\n";
+            pbar.finish();
         }
         catch(RSGISImageCalcException& e)
         {
@@ -6536,20 +6409,18 @@ namespace rsgis{namespace img{
 			}
 			inDataColumn = new float[numInBands];
 			
-			int feedback = height/10;
-			int feedbackCounter = 0;
+			rsgis_tqdm *pbar = NULL;
             if(!quiet)
             {
-                std::cout << "Started " << std::flush;
+                pbar = new rsgis_tqdm();
             }
 			// Loop images to process data
 			for(int i = 0; i < height; i++)
 			{
-				if((!quiet) && (feedback != 0) && ((i % feedback) == 0))
-				{
-                    std::cout << "." << feedbackCounter << "." << std::flush;
-                    feedbackCounter = feedbackCounter + 10;
-				}
+				if(!quiet)
+                {
+                    pbar->progress(i, height);
+                }
 				
 				for(int n = 0; n < numInBands; n++)
 				{
@@ -6574,7 +6445,8 @@ namespace rsgis{namespace img{
 			}
             if(!quiet)
             {
-                std::cout << " Complete.\n";
+                pbar->finish();
+                delete pbar;
             }
 		}
 		catch(RSGISImageCalcException& e)
@@ -6854,9 +6726,7 @@ namespace rsgis{namespace img{
             int rowOffset = 0;
             pxlTLY = imgTLY;
             
-			int feedback = height/10;
-			int feedbackCounter = 0;
-			std::cout << "Started " << std::flush;
+			rsgis_tqdm pbar;
 			// Loop images to process data
 			for(int i = 0; i < nYBlocks; i++)
 			{
@@ -6874,11 +6744,7 @@ namespace rsgis{namespace img{
                 
                 for(int m = 0; m < yBlockSize; ++m)
                 {
-                    if((feedback != 0) && ((((i*yBlockSize)+m) % feedback) == 0))
-                    {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
-                    }
+                    pbar.progress((i*yBlockSize)+m, height);
                     
                     pxlTLX = imgTLX;
                     for(int j = 0; j < width; j++)
@@ -6920,11 +6786,7 @@ namespace rsgis{namespace img{
                 
                 for(int m = 0; m < remainRows; ++m)
                 {
-                    if((feedback != 0) && ((((nYBlocks*yBlockSize)+m) % feedback) == 0))
-                    {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
-                    }
+                    pbar.progress((nYBlocks*yBlockSize)+m, height);
                     
                     pxlTLX = imgTLX;
                     for(int j = 0; j < width; j++)
@@ -6947,7 +6809,7 @@ namespace rsgis{namespace img{
                     pxlTLY -= pxlHeight;
                 }
             }
-			std::cout << " Complete.\n";
+			pbar.finish();
 		}
 		catch(RSGISImageCalcException& e)
 		{
@@ -7259,8 +7121,9 @@ namespace rsgis{namespace img{
 			{
 				throw RSGISImageBandException(gdalFormat + std::string(" driver does not exists.."));
 			}
-
-			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, NULL);
+            char **papszOptions = imgUtils.getGDALCreationOptionsForFormat(gdalFormat);
+            
+			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, papszOptions);
 			
 			if(outputImageDS == NULL)
 			{
@@ -7324,17 +7187,11 @@ namespace rsgis{namespace img{
 			}
 			outDataColumn = new double[this->numOutBands];
 			
-			int feedback = height/10;
-			int feedbackCounter = 0;
-			std::cout << "Started " << std::flush;
+			rsgis_tqdm pbar;
 			// Loop images to process data
 			for(int i = 0; i < height; i++)
 			{
-				if((feedback != 0) && ((i % feedback) == 0))
-				{
-					std::cout << "." << feedbackCounter << "." << std::flush;
-					feedbackCounter = feedbackCounter + 10;
-				}
+				pbar.progress(i, height);
 				
 				for(int n = 0; n < numInBands; n++)
 				{
@@ -7368,7 +7225,7 @@ namespace rsgis{namespace img{
 					outputRasterBands[n]->RasterIO(GF_Write, 0, i, width, 1, outputData[n], width, 1, GDT_Float64, 0, 0);
 				}
 			}
-			std::cout << " Complete.\n";
+			pbar.finish();
 		}
 		catch(RSGISImageCalcException& e)
 		{			
@@ -7722,10 +7579,7 @@ namespace rsgis{namespace img{
             int dWinX = 0;
             int dWinY = 0;
             
-            int feedback = height/10.0;
-			int feedbackCounter = 0;
-			std::cout << "Started " << std::flush;
-			
+            rsgis_tqdm pbar;
             if(nYBlocks > 0)
             {
                 for(int i = 0; i < nYBlocks; i++)
@@ -7848,11 +7702,7 @@ namespace rsgis{namespace img{
                     for(int m = 0; m < numOfLines; ++m)
                     {
                         line = (i*numOfLines)+m;
-                        if((feedback != 0) && (line % feedback) == 0)
-                        {
-                            std::cout << "." << feedbackCounter << "." << std::flush;
-                            feedbackCounter = feedbackCounter + 10;
-                        }
+                        pbar.progress(line, height);
                         
                         cLinePxl = m*width;
                         
@@ -8067,12 +7917,7 @@ namespace rsgis{namespace img{
                     for(int m = 0; m < remainRows; ++m)
                     {
                         line = (nYBlocks*numOfLines)+m;
-
-                        if((feedback != 0) && (line % feedback) == 0)
-                        {
-                            std::cout << "." << feedbackCounter << "." << std::flush;
-                            feedbackCounter = feedbackCounter + 10;
-                        }
+                        pbar.progress(line, height);
                         
                         cLinePxl = m*width;
                         
@@ -8253,15 +8098,8 @@ namespace rsgis{namespace img{
                         }
                     }
                 }
-                
             }
-            else
-            {
-                
-            }
-            
-            
-            std::cout << " Complete.\n";
+            pbar.finish();
 		}
 		catch(RSGISImageCalcException& e)
 		{
@@ -8534,8 +8372,8 @@ namespace rsgis{namespace img{
 			{
 				throw RSGISImageBandException("Driver does not exists..");
 			}
-            
-			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, NULL);
+            char **papszOptions = imgUtils.getGDALCreationOptionsForFormat(gdalFormat);
+			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, papszOptions);
 			
 			if(outputImageDS == NULL)
 			{
@@ -8648,10 +8486,7 @@ namespace rsgis{namespace img{
             int dWinX = 0;
             int dWinY = 0;
             
-            int feedback = height/10.0;
-			int feedbackCounter = 0;
-			std::cout << "Started " << std::flush;
-			
+            rsgis_tqdm pbar;
             if(nYBlocks > 0)
             {
                 for(int i = 0; i < nYBlocks; i++)
@@ -8774,11 +8609,7 @@ namespace rsgis{namespace img{
                     for(int m = 0; m < numOfLines; ++m)
                     {
                         line = (i*numOfLines)+m;
-                        if((feedback != 0) && (line % feedback) == 0)
-                        {
-                            std::cout << "." << feedbackCounter << "." << std::flush;
-                            feedbackCounter = feedbackCounter + 10;
-                        }
+                        pbar.progress(line, height);
                         
                         cLinePxl = m*width;
                         
@@ -8962,7 +8793,6 @@ namespace rsgis{namespace img{
                                 outputData[n][cPxl] = outDataColumn[n];
                             }
                         }
-                        
                     }
                     
                     for(int n = 0; n < this->numOutBands; n++)
@@ -9003,11 +8833,7 @@ namespace rsgis{namespace img{
                     for(int m = 0; m < remainRows; ++m)
                     {
                         line = (nYBlocks*numOfLines)+m;
-                        if((feedback != 0) && (line % feedback) == 0)
-                        {
-                            std::cout << "." << feedbackCounter << "." << std::flush;
-                            feedbackCounter = feedbackCounter + 10;
-                        }
+                        pbar.progress(line, height);
                         
                         cLinePxl = m*width;
                         
@@ -9200,13 +9026,7 @@ namespace rsgis{namespace img{
                 }
                 
             }
-            else
-            {
-                
-            }
-            
-
-            std::cout << " Complete.\n";
+            pbar.finish();
 		}
 		catch(RSGISImageCalcException& e)
 		{
@@ -9512,8 +9332,8 @@ namespace rsgis{namespace img{
             {
                 throw RSGISImageBandException("Driver does not exists..");
             }
-            
-            outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, NULL);
+            char **papszOptions = imgUtils.getGDALCreationOptionsForFormat(gdalFormat);
+            outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, papszOptions);
             if(outputImageDS == NULL)
             {
                 throw RSGISImageBandException("Output image could not be created. Check filepath.");
@@ -9528,7 +9348,7 @@ namespace rsgis{namespace img{
                 outputImageDS->SetProjection(proj.c_str());
             }
             
-            outputRefImageDS = gdalDriver->Create(outputRefIntImage.c_str(), width, height, 1, GDT_UInt32, NULL);
+            outputRefImageDS = gdalDriver->Create(outputRefIntImage.c_str(), width, height, 1, GDT_UInt32, papszOptions);
             if(outputRefImageDS == NULL)
             {
                 throw RSGISImageBandException("Output reference image could not be created. Check filepath.");
@@ -9642,10 +9462,7 @@ namespace rsgis{namespace img{
             int dWinX = 0;
             int dWinY = 0;
             
-            int feedback = height/10.0;
-            int feedbackCounter = 0;
-            std::cout << "Started " << std::flush;
-            
+            rsgis_tqdm pbar;
             if(nYBlocks > 0)
             {
                 for(int i = 0; i < nYBlocks; i++)
@@ -9768,11 +9585,7 @@ namespace rsgis{namespace img{
                     for(int m = 0; m < numOfLines; ++m)
                     {
                         line = (i*numOfLines)+m;
-                        if((feedback != 0) && (line % feedback) == 0)
-                        {
-                            std::cout << "." << feedbackCounter << "." << std::flush;
-                            feedbackCounter = feedbackCounter + 10;
-                        }
+                        pbar.progress(line, height);
                         
                         cLinePxl = m*width;
                         
@@ -9999,11 +9812,7 @@ namespace rsgis{namespace img{
                     for(int m = 0; m < remainRows; ++m)
                     {
                         line = (nYBlocks*numOfLines)+m;
-                        if((feedback != 0) && (line % feedback) == 0)
-                        {
-                            std::cout << "." << feedbackCounter << "." << std::flush;
-                            feedbackCounter = feedbackCounter + 10;
-                        }
+                        pbar.progress(line, height);
                         
                         cLinePxl = m*width;
                         
@@ -10197,13 +10006,7 @@ namespace rsgis{namespace img{
                     outputRefRasterBand->RasterIO(GF_Write, 0, (nYBlocks*numOfLines), width, remainRows, outputRefData, width, remainRows, GDT_Float64, 0, 0);
                 }
             }
-            else
-            {
-                
-            }
-            
-            
-            std::cout << " Complete.\n";
+            pbar.finish();
         }
         catch(RSGISImageCalcException& e)
         {
@@ -10634,10 +10437,7 @@ namespace rsgis{namespace img{
             long yPxl = 0;
             geos::geom::Envelope pxlPos;
             
-            int feedback = height/10.0;
-			int feedbackCounter = 0;
-			std::cout << "Started " << std::flush;
-			
+            rsgis_tqdm pbar;
             if(nYBlocks > 0)
             {
                 for(int i = 0; i < nYBlocks; i++)
@@ -10760,11 +10560,7 @@ namespace rsgis{namespace img{
                     for(int m = 0; m < numOfLines; ++m)
                     {
                         line = (i*numOfLines)+m;
-                        if((feedback != 0) && (line % feedback) == 0)
-                        {
-                            std::cout << "." << feedbackCounter << "." << std::flush;
-                            feedbackCounter = feedbackCounter + 10;
-                        }
+                        pbar.progress(line, height);
                         
                         cLinePxl = m*width;
                         
@@ -10999,12 +10795,7 @@ namespace rsgis{namespace img{
                     for(int m = 0; m < remainRows; ++m)
                     {
                         line = (nYBlocks*numOfLines)+m;
-
-                        if((feedback != 0) && (line % feedback) == 0)
-                        {
-                            std::cout << "." << feedbackCounter << "." << std::flush;
-                            feedbackCounter = feedbackCounter + 10;
-                        }
+                        pbar.progress(line, height);
                         
                         cLinePxl = m*width;
                         
@@ -11208,11 +10999,7 @@ namespace rsgis{namespace img{
                 }
                 
             }
-            else
-            {
-                
-            }
-            std::cout << " Complete.\n";
+            pbar.finish();
 		}
 		catch(RSGISImageCalcException& e)
 		{
@@ -11513,8 +11300,8 @@ namespace rsgis{namespace img{
             {
                 throw RSGISImageBandException("Driver does not exists..");
             }
-            
-            outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, NULL);
+            char **papszOptions = imgUtils.getGDALCreationOptionsForFormat(gdalFormat);
+            outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, papszOptions);
             
             if(outputImageDS == NULL)
             {
@@ -11643,10 +11430,7 @@ namespace rsgis{namespace img{
                 pxlHeight *= (-1);
             }
             
-            int feedback = height/10.0;
-            int feedbackCounter = 0;
-            std::cout << "Started " << std::flush;
-            
+            rsgis_tqdm pbar;
             if(nYBlocks > 0)
             {
                 for(int i = 0; i < nYBlocks; i++)
@@ -11769,11 +11553,7 @@ namespace rsgis{namespace img{
                     for(int m = 0; m < numOfLines; ++m)
                     {
                         line = (i*numOfLines)+m;
-                        if((feedback != 0) && (line % feedback) == 0)
-                        {
-                            std::cout << "." << feedbackCounter << "." << std::flush;
-                            feedbackCounter = feedbackCounter + 10;
-                        }
+                        pbar.progress(line, height);
                         
                         cLinePxl = m*width;
                         
@@ -12001,11 +11781,7 @@ namespace rsgis{namespace img{
                     for(int m = 0; m < remainRows; ++m)
                     {
                         line = (nYBlocks*numOfLines)+m;
-                        if((feedback != 0) && (line % feedback) == 0)
-                        {
-                            std::cout << "." << feedbackCounter << "." << std::flush;
-                            feedbackCounter = feedbackCounter + 10;
-                        }
+                        pbar.progress(line, height);
                         
                         cLinePxl = m*width;
                         
@@ -12203,11 +11979,7 @@ namespace rsgis{namespace img{
                 }
                 
             }
-            else
-            {
-                
-            }
-            std::cout << " Complete.\n";
+            pbar.finish();
         }
         catch(RSGISImageCalcException& e)
         {
@@ -12501,8 +12273,8 @@ namespace rsgis{namespace img{
 			{
 				throw RSGISImageBandException("ENVI driver does not exists..");
 			}
-
-			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, NULL);
+            char **papszOptions = imgUtils.getGDALCreationOptionsForFormat(gdalFormat);
+			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, this->numOutBands, gdalDataType, papszOptions);
 			
 			if(outputImageDS == NULL)
 			{
@@ -12561,24 +12333,11 @@ namespace rsgis{namespace img{
 			}
 			outDataColumn = new double[this->numOutBands];
 			
-			int feedback = height/10;
-			if (feedback == 0)
-            {
-                feedback = 1; // Set feedback to 1
-            }
-			int feedbackCounter = 0;
-			if(height > 100)
-			{
-				std::cout << "Started " << std::flush;
-			}
+			rsgis_tqdm pbar;
             // Loop images to process data
 			for(int i = 0; i < height; i++)
 			{				
-				if((feedback != 0) && ((i % feedback) == 0))
-				{
-					std::cout << "." << feedbackCounter << "." << std::flush;
-					feedbackCounter = feedbackCounter + 10;
-				}
+				pbar.progress(i, height);
 				
 				for(int n = 0; n < numInBands; n++)
 				{
@@ -12722,10 +12481,7 @@ namespace rsgis{namespace img{
 					outputRasterBands[n]->RasterIO(GF_Write, 0, i, width, 1, outputData[n], width, 1, GDT_Float64, 0, 0);
 				}
 			}
-			if (height > 100) 
-			{
-				std::cout << " Complete.\n";
-			}
+			pbar.finish();
 		}
 		catch(RSGISImageCalcException& e)
 		{
@@ -14789,6 +14545,9 @@ namespace rsgis{namespace img{
     {
         try
         {
+            GDALAllRegister();
+            RSGISImageUtils imgUtils;
+            
             if( (statsImgBand == 0) || (statsImgBand > statsDataset->GetRasterCount()) )
             {
                 throw RSGISImageException("The image band specified for the stats image is not within the image. Don't forget, band numbering starts at 1.");
@@ -14927,8 +14686,8 @@ namespace rsgis{namespace img{
                 throw RSGISImageException("Requested GDAL driver does not exists..");
             }
             std::cout << "New image width = " << refPxlWidth << " height = " << refPxlHeight << " bands = " << numOutImgBands << std::endl;
-            
-            GDALDataset *outputImageDS = gdalDriver->Create(outputImage.c_str(), refPxlWidth, refPxlHeight, numOutImgBands, gdalDataType, NULL);
+            char **papszOptions = imgUtils.getGDALCreationOptionsForFormat(gdalFormat);
+            GDALDataset *outputImageDS = gdalDriver->Create(outputImage.c_str(), refPxlWidth, refPxlHeight, numOutImgBands, gdalDataType, papszOptions);
             
             if(outputImageDS == NULL)
             {
@@ -14992,21 +14751,15 @@ namespace rsgis{namespace img{
             int ib_rowOffStats = 0;
             int ib_colOffStats = 0;
             
-            long feedback = nBlocks/10;
             long blockCounter = 0;
-            int feedbackCounter = 0;
-            std::cout << "Started " << std::flush;
+            rsgis_tqdm pbar;
             for(long i = 0; i < nYBlocks; i++)
             {
                 colOffsetStats = 0;
                 colOffsetRef = 0;
                 for(long j = 0; j < nXBlocks; j++)
                 {
-                    if((feedback != 0) && ((blockCounter % feedback) == 0))
-                    {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
-                    }
+                    pbar.progress(blockCounter, nBlocks);
                     
                     // Read Block
                     if(statsBand->RasterIO(GF_Read, colOffsetStats, rowOffsetStats, xIOGridStats, yIOGridStats, statsDataArr, xIOGridStats, yIOGridStats, GDT_Float32, 0, 0))
@@ -15056,11 +14809,7 @@ namespace rsgis{namespace img{
                 
                 if(remainCols > 0)
                 {
-                    if((feedback != 0) && ((blockCounter % feedback) == 0))
-                    {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
-                    }
+                    pbar.progress(blockCounter, nBlocks);
                     
                     // Read Block
                     if(statsBand->RasterIO(GF_Read, colOffsetStats, rowOffsetStats, remainColsStats, yIOGridStats, statsDataArr, remainColsStats, yIOGridStats, GDT_Float32, 0, 0))
@@ -15118,11 +14867,7 @@ namespace rsgis{namespace img{
                 colOffsetRef = 0;
                 for(long j = 0; j < nXBlocks; j++)
                 {
-                    if((feedback != 0) && ((blockCounter % feedback) == 0))
-                    {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
-                    }
+                    pbar.progress(blockCounter, nBlocks);
                     
                     // Read Block
                     if(statsBand->RasterIO(GF_Read, colOffsetStats, rowOffsetStats, xIOGridStats, remainRowsStats, statsDataArr, xIOGridStats, remainRowsStats, GDT_Float32, 0, 0))
@@ -15172,11 +14917,7 @@ namespace rsgis{namespace img{
                 
                 if(remainCols > 0)
                 {
-                    if((feedback != 0) && ((blockCounter % feedback) == 0))
-                    {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
-                    }
+                    pbar.progress(blockCounter, nBlocks);
                     
                     // Read Block
                     if(statsBand->RasterIO(GF_Read, colOffsetStats, rowOffsetStats, remainColsStats, remainRowsStats, statsDataArr, remainColsStats, remainRowsStats, GDT_Float32, 0, 0))
@@ -15226,7 +14967,7 @@ namespace rsgis{namespace img{
                 rowOffsetStats += remainRowsStats;
                 rowOffsetRef += remainRows;
             }
-            std::cout << " Complete.\n";
+            pbar.finish();
             
             GDALClose(outputImageDS);
             

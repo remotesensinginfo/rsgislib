@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 The tools.plotting module contains functions for extracting and plotting remote sensing data.
 """

@@ -38,12 +38,13 @@
 
 #include "gdal_priv.h"
 
+#include "common/rsgis-tqdm.h"
+
 #include "img/RSGISImageCalcException.h"
 #include "img/RSGISCalcImageValue.h"
 #include "img/RSGISImageUtils.h"
 #include "img/RSGISExtractImagePixelsInPolygon.h"
 #include "img/RSGISImageStatistics.h"
-
 
 #include "math/RSGISMathsUtils.h"
 

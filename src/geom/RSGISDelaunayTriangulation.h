@@ -34,6 +34,8 @@
 
 #include "geos/geom/Envelope.h"
 
+#include "common/rsgis-tqdm.h"
+
 #include "math/RSGISMathsUtils.h"
 
 // mark all exported classes/functions with DllExport to have

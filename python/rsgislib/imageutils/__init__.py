@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 The imageutils module contains general utilities for applying to images.
 """
@@ -9,6 +10,7 @@ import rsgislib
 
 import os.path
 import math
+import shutil
 
 import numpy
 
@@ -198,6 +200,7 @@ Returns the rsgislib datatype ENUM for a raster file
     raster = None
     return gdal_dtype
 
+
 def setImgThematic(imageFile):
     """
 Set all image bands to be thematic. 
@@ -213,6 +216,21 @@ Set all image bands to be thematic.
         band.SetMetadataItem('LAYER_TYPE', 'thematic')
     ds = None
 
+
+def setImgNotThematic(imageFile):
+    """
+Set all image bands to be not thematic (athematic).
+
+:param imageFile: The file for which the bands are to be set as not thematic (athematic)
+
+"""
+    ds = gdal.Open(imageFile, gdal.GA_Update)
+    if ds == None:
+        raise Exception("Could not open the imageFile.")
+    for bandnum in range(ds.RasterCount):
+        band = ds.GetRasterBand(bandnum + 1)
+        band.SetMetadataItem('LAYER_TYPE', 'athematic')
+    ds = None
 
 def hasGCPs(inImg):
     """
@@ -272,6 +290,42 @@ A function which returns the WKT string representing the projection of the input
     projStr = rasterDS.GetProjection()
     rasterDS = None
     return projStr
+
+
+def createBlankImagePy(output_img, n_bands, width, height, tlX, tlY, out_img_res_x, out_img_res_y, wkt_string,
+                       gdal_format, data_type, options=[], no_data_val=0):
+    """
+    Create a blank output image file - this is a pure python implementation of rsgislib.imageutils.createBlankImage
+
+    :param output_img: the output file and path.
+    :param n_bands: the number of output image bands.
+    :param width: the number of x pixels.
+    :param height: the number of Y pixels.
+    :param tlX: the top-left corner x coordinate
+    :param tlY: the top-left corner y coordinate
+    :param out_img_res_x: the output image resolution in the x axis
+    :param out_img_res_y: the output image resolution in the y axis
+    :param wkt_string: a WKT string with the output image projection
+    :param gdal_format: the output image file format.
+    :param data_type: the output image data type - needs to be a rsgislib datatype (e.g., )
+    :param options: image creation options e.g., ["TILED=YES", "INTERLEAVE=PIXEL", "COMPRESS=LZW", "BIGTIFF=YES"]
+    :param no_data_val: the output image no data value.
+
+    """
+    rsgis_utils = rsgislib.RSGISPyUtils()
+    gdal_data_type = rsgis_utils.getGDALDataType(data_type)
+    gdal_driver = gdal.GetDriverByName(gdal_format)
+    out_img_ds_obj = gdal_driver.Create(output_img, width, height, n_bands, gdal_data_type, options=options)
+    out_img_ds_obj.SetGeoTransform((tlX, out_img_res_x, 0, tlY, 0, out_img_res_y))
+    out_img_ds_obj.SetProjection(wkt_string)
+
+    raster = numpy.zeros((height, width), dtype=rsgis_utils.getNumpyDataType(data_type))
+    raster[...] = no_data_val
+    for band in range(n_bands):
+        band_obj = out_img_ds_obj.GetRasterBand(band + 1)
+        band_obj.SetNoDataValue(no_data_val)
+        band_obj.WriteArray(raster)
+    out_img_ds_obj = None
 
 
 def createBlankImgFromRefVector(inVecFile, inVecLyr, outputImg, outImgRes, outImgNBands, gdalformat, datatype):
@@ -493,17 +547,24 @@ Where:
     inFile = gdal.Open(inProcessImg, gdal.GA_ReadOnly)
     outFile = gdal.Open(outImg, gdal.GA_Update)
 
+    try:
+        import tqdm
+        pbar = tqdm.tqdm(total=100)
+        callback = lambda *args, **kw: pbar.update()
+    except:
+        callback = gdal.TermProgress
+
     wrpOpts = []
     if multicore:
         if haveNoData:
-            wrpOpts = gdal.WarpOptions(resampleAlg=interpolationMethod, srcNodata=noDataVal, dstNodata=noDataVal, multithread=True, callback=gdal.TermProgress)    
+            wrpOpts = gdal.WarpOptions(resampleAlg=interpolationMethod, srcNodata=noDataVal, dstNodata=noDataVal, multithread=True, callback=callback )
         else:
-            wrpOpts = gdal.WarpOptions(resampleAlg=interpolationMethod, multithread=True, callback=gdal.TermProgress)
+            wrpOpts = gdal.WarpOptions(resampleAlg=interpolationMethod, multithread=True, callback=callback )
     else:
         if haveNoData:
-            wrpOpts = gdal.WarpOptions(resampleAlg=interpolationMethod, srcNodata=noDataVal, dstNodata=noDataVal, multithread=False, callback=gdal.TermProgress)    
+            wrpOpts = gdal.WarpOptions(resampleAlg=interpolationMethod, srcNodata=noDataVal, dstNodata=noDataVal, multithread=False, callback=callback )
         else:
-            wrpOpts = gdal.WarpOptions(resampleAlg=interpolationMethod, multithread=False, callback=gdal.TermProgress)
+            wrpOpts = gdal.WarpOptions(resampleAlg=interpolationMethod, multithread=False, callback=callback )
     
     gdal.Warp(outFile, inFile, options=wrpOpts)
     
@@ -511,9 +572,10 @@ Where:
     outFile = None
 
 
-def reprojectImage(inputImage, outputImage, outWKT, gdalformat='KEA', interp='cubic', inWKT=None, noData=0.0, outPxlRes='image', snap2Grid=True, multicore=False):
+def reprojectImage(inputImage, outputImage, outWKT, gdalformat='KEA', interp='cubic', inWKT=None, noData=0.0, outPxlRes='image', snap2Grid=True, multicore=False, gdal_options=[]):
     """
-This function provides a tool which uses the gdalwarp function to reproject an input image.
+This function provides a tool which uses the gdalwarp function to reproject an input image. When you want an simpler
+interface use the rsgislib.imageutils.gdal_warp function. This handles more automatically.
 
 Where:
 
@@ -526,10 +588,12 @@ Where:
 :param noData: float representing the not data value (Default is 0.0)
 :param outPxlRes: three inputs can be provided
                   1) 'image' where the output resolution will match the input (Default is image)
-                  2) 'auto' where an output resolution maintaining the image size of the input image will be used
+                  2) 'auto' where an output resolution maintaining the image size of the input image will be used.
+                            You may consider using rsgislib.imageutils.gdal_warp instead of this option.
                   3) provide a floating point value for the image resolution (note. pixels will be sqaure)
 :param snap2Grid: is a boolean specifying whether the TL pixel should be snapped to a multiple of the pixel resolution (Default is True).
 :param nCores: the number of processing cores available for processing (-1 is all cores: Default=-1)
+:param gdal_options: GDAL file creation options e.g., ["TILED=YES", "COMPRESS=LZW", "BIGTIFF=YES"]
 
     """    
     rsgisUtils = rsgislib.RSGISPyUtils()
@@ -602,7 +666,7 @@ Where:
     
     numBands = inImgDS.RasterCount
     
-    inImgBand = inImgDS.GetRasterBand( 1 );
+    inImgBand = inImgDS.GetRasterBand( 1 )
     gdalDataType = gdal.GetDataTypeName(inImgBand.DataType)
     rsgisDataType = rsgisUtils.getRSGISLibDataType(gdalDataType)
 
@@ -634,7 +698,7 @@ Where:
             outRes = yOutRes
     else: 
         raise Exception('Was not able to defined the output resolution. Check Input: \'' + outPxlRes + '\'')
-    
+
     outTLX = xMin
     outTLY = yMax
     outWidth = int(round((xMax - xMin) / outRes)) + 1
@@ -652,25 +716,85 @@ Where:
         outHeight = int(round((yMax - yMin) / outRes)) + 10
     
     print('Creating blank image')
-    rsgislib.imageutils.createBlankImage(outputImage, numBands, outWidth, outHeight, outTLX, outTLY, outRes, noData, "", outWKTStr, gdalformat, rsgisDataType)
+    rsgislib.imageutils.createBlankImagePy(outputImage, numBands, outWidth, outHeight, outTLX, outTLY, outRes,
+                       (outRes * (-1)), outWKTStr, gdalformat, rsgisDataType, options=gdal_options, no_data_val=noData)
 
     outImgDS = gdal.Open(outputImage, gdal.GA_Update)
     
     for i in range(numBands):
         outImgDS.GetRasterBand(i+1).SetNoDataValue(noData)
-    
+
+    try:
+        import tqdm
+        pbar = tqdm.tqdm(total=100)
+        callback = lambda *args, **kw: pbar.update()
+    except:
+        callback = gdal.TermProgress
+
     print("Performing the reprojection")
-    
     wrpOpts = []
     if multicore:
-        wrpOpts = gdal.WarpOptions(resampleAlg=eResampleAlg, srcNodata=noData, dstNodata=noData, multithread=True, callback=gdal.TermProgress)
+        wrpOpts = gdal.WarpOptions(resampleAlg=eResampleAlg, srcNodata=noData, dstNodata=noData, multithread=True, callback=callback)
     else:
-        wrpOpts = gdal.WarpOptions(resampleAlg=eResampleAlg, srcNodata=noData, dstNodata=noData, multithread=False, callback=gdal.TermProgress)    
+        wrpOpts = gdal.WarpOptions(resampleAlg=eResampleAlg, srcNodata=noData, dstNodata=noData, multithread=False, callback=callback)
 
     gdal.Warp(outImgDS, inImgDS, options=wrpOpts)
 
     inImgDS = None
-    outImgDS = None    
+    outImgDS = None
+
+
+def gdal_warp(input_img, output_img, out_epsg, interp='near', gdalformat='KEA', use_multi_threaded=True, options=[]):
+    """
+    A function which runs GDAL Warp function to tranform an image from one projection to another. Use this function
+    when you want GDAL to do procesing of pixel size and image size automatically. rsgislib.imageutils.reprojectImage
+    should be used when you want to put the output image on a particular grid etc.
+
+    :param input_img: input image file
+    :param output_img: output image file
+    :param out_epsg: the EPSG for the output image file.
+    :param interp: interpolation algorithm. Options are: near, bilinear, cubic, cubicspline, lanczos, average, mode. (Default is near)
+    :param gdalformat: output image file format
+    :param use_multi_threaded: Use multiple cores for processing (Default: True).
+    :param options: GDAL file creation options e.g., ["TILED=YES", "COMPRESS=LZW", "BIGTIFF=YES"]
+
+    """
+    from osgeo import gdal
+    gdal.UseExceptions()
+    rsgisUtils = rsgislib.RSGISPyUtils()
+    in_no_data_val = rsgisUtils.getImageNoDataValue(input_img)
+    in_epsg = rsgisUtils.getEPSGCode(input_img)
+    img_data_type = rsgisUtils.getGDALDataTypeFromImg(input_img)
+
+    eResampleAlg = gdal.GRA_CubicSpline
+    if interp == 'near':
+        eResampleAlg = gdal.GRA_NearestNeighbour
+    elif interp == 'bilinear':
+        eResampleAlg = gdal.GRA_Bilinear
+    elif interp == 'cubic':
+        eResampleAlg = gdal.GRA_Cubic
+    elif interp == 'cubicspline':
+        eResampleAlg = gdal.GRA_CubicSpline
+    elif interp == 'lanczos':
+        eResampleAlg = gdal.GRA_Lanczos
+    elif interp == 'average':
+        eResampleAlg = gdal.GRA_Average
+    elif interp == 'mode':
+        eResampleAlg = gdal.GRA_Mode
+    else:
+        raise Exception('The interpolation algorithm was not recogonised: \'' + interp + '\'')
+
+    try:
+        import tqdm
+        pbar = tqdm.tqdm(total=100)
+        callback = lambda *args, **kw: pbar.update()
+    except:
+        callback = gdal.TermProgress
+    warp_opts = gdal.WarpOptions(format=gdalformat, srcSRS="EPSG:{}".format(in_epsg), dstSRS="EPSG:{}".format(out_epsg),
+                                 resampleAlg=eResampleAlg, srcNodata=in_no_data_val, dstNodata=in_no_data_val,
+                                 callback=callback, creationOptions=options, outputType=img_data_type,
+                                 workingType=gdal.GDT_Float32, multithread=use_multi_threaded)
+    gdal.Warp(output_img, input_img, options=warp_opts)
 
 def subsetPxlBBox(inputimage, outputimage, gdalformat, datatype, xMinPxl, xMaxPxl, yMinPxl, yMaxPxl):
     """
@@ -700,11 +824,6 @@ Function to subset an input image using a defined pixel bbox.
     yMax = bbox[2] + (yMaxPxl * yRes)
     
     rsgislib.imageutils.subsetbbox(inputimage, outputimage, gdalformat, datatype, xMin, xMax, yMin, yMax)
-
-def _runSubset(tileinfo):
-    """ Internal function for createTilesMultiCore for multiprocessing Pool. """
-    subsetPxlBBox(tileinfo['inputimage'], tileinfo['outfile'], tileinfo['gdalformat'], tileinfo['datatype'], tileinfo['bbox'][0], tileinfo['bbox'][1], tileinfo['bbox'][2], tileinfo['bbox'][3])
-
 
 def createTilesMultiCore(inputimage, baseimage, width, height, gdalformat, datatype, ext, ncores=1):
     """
@@ -764,7 +883,12 @@ Function to generate a set of tiles for the input image.
         tile['outfile'] = "{0}_{1}.{2}".format(baseimage, tile['tile'], ext)
         tile['gdalformat'] = gdalformat
         tile['datatype'] = datatype
-    
+
+    def _runSubset(tileinfo):
+        """ Internal function for createTilesMultiCore for multiprocessing Pool. """
+        subsetPxlBBox(tileinfo['inputimage'], tileinfo['outfile'], tileinfo['gdalformat'], tileinfo['datatype'],
+                      tileinfo['bbox'][0], tileinfo['bbox'][1], tileinfo['bbox'][2], tileinfo['bbox'][3])
+
     poolobj = multiprocessing.Pool(ncores)
     poolobj.map(_runSubset, tiles)
 
@@ -802,8 +926,6 @@ Example::
     
     for inImgDict in inImagesDict:
         rsgislib.imageutils.subset(inImgDict['IN'], outShpEnv, inImgDict['OUT'], gdalformat, inImgDict['TYPE'])
-    
-
 
 
 def buildImgSubDict(globFindImgsStr, outDir, suffix, ext):
@@ -881,13 +1003,19 @@ Where:
     if not haveRIOS:
         raise Exception("The RIOS module required for this function could not be imported\n\t" + riosErr)
 
+    try:
+        import tqdm
+        progress_bar = rsgislib.TQDMProgressBar()
+    except:
+        progress_bar = cuiprogress.GDALProgressBar()
+
     infiles = applier.FilenameAssociations()
     infiles.image1 = inputImg
     outfiles = applier.FilenameAssociations()
     outfiles.outimage = outputImg
     otherargs = applier.OtherInputs()
     aControls = applier.ApplierControls()
-    aControls.progress = cuiprogress.CUIProgressBar()
+    aControls.progress = progress_bar
     aControls.drivername = gdalformat
     aControls.omitPyramids = True
     aControls.calcStats = False
@@ -923,7 +1051,7 @@ Example::
     numVars = 0
     numVals = 0
     for h5File in h5Files:
-        fH5 = h5py.File(h5File)
+        fH5 = h5py.File(h5File, 'r')
         dataShp = fH5['DATA/DATA'].shape
         if first:
             numVars = dataShp[1]
@@ -937,13 +1065,13 @@ Example::
     
     rowInit = 0
     for h5File in h5Files:
-        fH5 = h5py.File(h5File)
+        fH5 = h5py.File(h5File, 'r')
         numRows = fH5['DATA/DATA'].shape[0]
         dataArr[rowInit:(rowInit+numRows)] = fH5['DATA/DATA']
         rowInit += numRows
         fH5.close()
     
-    fH5Out = h5py.File(outH5File,'w')
+    fH5Out = h5py.File(outH5File, 'w')
     dataGrp = fH5Out.create_group("DATA")
     metaGrp = fH5Out.create_group("META-DATA")
     dataGrp.create_dataset('DATA', data=dataArr, chunks=True, compression="gzip", shuffle=True)
@@ -1085,6 +1213,12 @@ Where:
     if not haveRIOS:
         raise Exception("The RIOS module required for this function could not be imported\n\t" + riosErr)
 
+    try:
+        import tqdm
+        progress_bar = rsgislib.TQDMProgressBar()
+    except:
+        progress_bar = cuiprogress.GDALProgressBar()
+
     infiles = applier.FilenameAssociations()
     infiles.inImg = inputImg
     outfiles = applier.FilenameAssociations()
@@ -1093,7 +1227,7 @@ Where:
     otherargs.lowVal = lowVal
     otherargs.upVal = upVal
     aControls = applier.ApplierControls()
-    aControls.progress = cuiprogress.CUIProgressBar()
+    aControls.progress = progress_bar
     aControls.drivername = gdalformat
     aControls.omitPyramids = True
     aControls.calcStats = False
@@ -1247,6 +1381,12 @@ masks. A JSON LUT is also generated to identify the image values to a
     import json
     rsgis_utils = rsgislib.RSGISPyUtils()
 
+    try:
+        import tqdm
+        progress_bar = rsgislib.TQDMProgressBar()
+    except:
+        progress_bar = cuiprogress.GDALProgressBar()
+
     in_vals_dict = dict()
     msk_imgs = list()
     for key in msk_imgs_dict.keys():
@@ -1260,7 +1400,7 @@ masks. A JSON LUT is also generated to identify the image values to a
     outfiles.outimage = out_img
     otherargs = applier.OtherInputs()
     aControls = applier.ApplierControls()
-    aControls.progress = cuiprogress.CUIProgressBar()
+    aControls.progress = progress_bar
     aControls.drivername = gdalformat
     aControls.omitPyramids = False
     aControls.calcStats = False
@@ -1301,6 +1441,175 @@ masks. A JSON LUT is also generated to identify the image values to a
         
     with open(output_lut, 'w') as outJSONfile:
         json.dump(out_poss_lut, outJSONfile, sort_keys=True,indent=4, separators=(',', ': '), ensure_ascii=False)
+
+
+def gdal_translate(input_img, output_img, gdal_format='KEA', options=''):
+    """
+    Using GDAL translate to convert input image to a different format, if GTIFF selected
+    and no options are provided then a cloud optimised GeoTIFF will be outputted.
+
+    :param input_img: Input image which is GDAL readable.
+    :param output_img: The output image file.
+    :param gdal_format: The output image file format
+    :param options: options for the output driver (e.g., "-co TILED=YES -co COMPRESS=LZW -co BIGTIFF=YES")
+    """
+    if (gdal_format == 'GTIFF') and (options != ''):
+        options = "-co TILED=YES -co INTERLEAVE=PIXEL -co BLOCKXSIZE=256 -co BLOCKYSIZE=256 -co COMPRESS=LZW -co BIGTIFF=YES -co COPY_SRC_OVERVIEWS=YES"
+
+    try:
+        import tqdm
+        pbar = tqdm.tqdm(total=100)
+        callback = lambda *args, **kw: pbar.update()
+    except:
+        callback = gdal.TermProgress
+
+    trans_opt = gdal.TranslateOptions(format=gdal_format, options=options, callback=callback)
+    gdal.Translate(output_img, input_img, options=trans_opt)
+
+
+def gdal_stack_images_vrt(input_imgs, output_vrt_file):
+    """
+    A function which creates a GDAL VRT file from a set of input images by stacking the input images
+    in a multi-band output file.
+
+    :param input_imgs: A list of input images
+    :param output_vrt_file: The output file location for the VRT.
+    """
+    try:
+        import tqdm
+        pbar = tqdm.tqdm(total=len(input_imgs))
+        callback = lambda *args, **kw: pbar.update()
+    except:
+        callback = gdal.TermProgress
+
+    build_vrt_opt = gdal.BuildVRTOptions(separate=True, callback=callback)
+    gdal.BuildVRT(output_vrt_file, input_imgs, options=build_vrt_opt)
+
+
+def gdal_mosaic_images_vrt(input_imgs, output_vrt_file, vrt_extent=None):
+    """
+    A function which creates a GDAL VRT file from a set of input images by mosaicking
+    the input images.
+
+    :param input_imgs: A list of input images
+    :param output_vrt_file: The output file location for the VRT.
+    :param vrt_extent: An optional (If None then ignored) extent (minX, minY, maxX, maxY)
+                       for the VRT image.
+    """
+    try:
+        import tqdm
+        pbar = tqdm.tqdm(total=len(input_imgs))
+        callback = lambda *args, **kw: pbar.update()
+    except:
+        callback = gdal.TermProgress
+    if vrt_extent is not None:
+        build_vrt_opt = gdal.BuildVRTOptions(outputBounds=vrt_extent, callback=callback)
+    else:
+        build_vrt_opt = gdal.BuildVRTOptions(callback=callback)
+    gdal.BuildVRT(output_vrt_file, input_imgs, options=build_vrt_opt)
+
+
+def subset_to_vec(in_img, out_img, gdalformat, roi_vec_file, roi_vec_lyr, datatype=None, vec_epsg=None):
+    """
+    A function which subsets an input image using the extent of a vector layer where the
+    input vector can be a different projection to the input image. Reprojection will be handled.
+
+    :param in_img: Input Image file.
+    :param out_img: Output Image file.
+    :param gdalformat: Output image file format.
+    :param roi_vec_file: The input vector file.
+    :param roi_vec_lyr: The name of the input layer.
+    :param datatype: Output image data type. If None then the datatype of the input image will be used.
+    :param vec_epsg: If projection is poorly defined by the vector layer then it can be specified.
+    """
+    rsgis_utils = rsgislib.RSGISPyUtils()
+    if vec_epsg is None:
+        vec_epsg = rsgis_utils.getProjEPSGFromVec(roi_vec_file, roi_vec_lyr)
+    img_epsg = rsgis_utils.getEPSGCode(in_img)
+    if img_epsg == vec_epsg:
+
+        projs_match = True
+    else:
+        img_bbox = rsgis_utils.getImageBBOXInProj(in_img, vec_epsg)
+        projs_match = False
+    img_bbox = rsgis_utils.getImageBBOX(in_img)
+    vec_bbox = rsgis_utils.getVecLayerExtent(roi_vec_file, roi_vec_lyr, computeIfExp=True)
+    if img_epsg != vec_epsg:
+        vec_bbox = rsgis_utils.reprojBBOX_epsg(vec_bbox, vec_epsg, img_epsg)
+
+    if rsgis_utils.do_bboxes_intersect(img_bbox, vec_bbox):
+        common_bbox = rsgis_utils.bbox_intersection(img_bbox, vec_bbox)
+        if datatype == None:
+            datatype = rsgis_utils.getRSGISLibDataTypeFromImg(in_img)
+        rsgislib.imageutils.subsetbbox(in_img, out_img, gdalformat, datatype, common_bbox[0], common_bbox[1],
+                                       common_bbox[2], common_bbox[3])
+    else:
+        raise Exception("The image and vector do not intersect and therefore the image cannot be subset.")
+
+
+def mask_img_with_vec(input_img, output_img, gdalformat, roi_vec_file, roi_vec_lyr, tmp_dir, outvalue=0, datatype=None,
+                      vec_epsg=None):
+    """
+    This function masks the input image using a polygon vector file.
+
+    :param input_img: Input Image file.
+    :param output_img: Output Image file.
+    :param gdalformat: Output image file format.
+    :param roi_vec_file: The input vector file.
+    :param roi_vec_lyr: The name of the input layer.
+    :param tmp_dir: a temporary directory for files generated during processing.
+    :param outvalue: The output value in the regions masked.
+    :param datatype: Output image data type. If None then the datatype of the input image will be used.
+    :param vec_epsg: If projection is poorly defined by the vector layer then it can be specified.
+
+    """
+    import rsgislib.vectorutils
+    rsgis_utils = rsgislib.RSGISPyUtils()
+
+    # Does the input image BBOX intersect the BBOX of the ROI vector?
+    if vec_epsg is None:
+        vec_epsg = rsgis_utils.getProjEPSGFromVec(roi_vec_file, roi_vec_lyr)
+    img_epsg = rsgis_utils.getEPSGCode(input_img)
+    if img_epsg == vec_epsg:
+        img_bbox = rsgis_utils.getImageBBOX(input_img)
+        projs_match = True
+    else:
+        img_bbox = rsgis_utils.getImageBBOXInProj(input_img, vec_epsg)
+        projs_match = False
+    vec_bbox = rsgis_utils.getVecLayerExtent(roi_vec_file, roi_vec_lyr, computeIfExp=True)
+
+    if rsgis_utils.do_bboxes_intersect(img_bbox, vec_bbox):
+        uid_str = rsgis_utils.uidGenerator()
+        base_vmsk_img = rsgis_utils.get_file_basename(input_img)
+
+        tmp_file_dir = os.path.join(tmp_dir, "{}_{}".format(base_vmsk_img, uid_str))
+        if not os.path.exists(tmp_file_dir):
+            os.mkdir(tmp_file_dir)
+
+        # Rasterise the vector layer to the input image extent.
+        mem_ds, mem_lyr = rsgislib.vectorutils.getMemVecLyrSubset(roi_vec_file, roi_vec_lyr, img_bbox)
+
+        if not projs_match:
+            mem_result_ds, mem_result_lyr = rsgislib.vectorutils.reproj_vec_lyr(mem_lyr, 'mem_vec', img_epsg,
+                                                                                out_vec_drv='MEMORY', out_lyr_name=None,
+                                                                                in_epsg=None, print_feedback=True)
+            mem_ds = None
+        else:
+            mem_result_ds = mem_ds
+            mem_result_lyr = mem_lyr
+
+        roi_img = os.path.join(tmp_file_dir, "{}_roiimg.kea".format(base_vmsk_img))
+        rsgislib.imageutils.createCopyImage(input_img, roi_img, 1, 0, 'KEA', rsgislib.TYPE_8UINT)
+        rsgislib.vectorutils.rasteriseVecLyrObj(mem_result_lyr, roi_img, burnVal=1, vecAtt=None, calcstats=True,
+                                                thematic=True, nodata=0)
+        mem_result_ds = None
+
+        if datatype == None:
+            datatype = rsgis_utils.getRSGISLibDataTypeFromImg(input_img)
+        rsgislib.imageutils.maskImage(input_img, roi_img, output_img, gdalformat, datatype, outvalue, 0)
+        shutil.rmtree(tmp_file_dir)
+    else:
+        raise Exception("The vector file and image file do not intersect.")
 
 
 

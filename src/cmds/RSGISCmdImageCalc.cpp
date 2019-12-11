@@ -58,6 +58,7 @@
 
 #include "math/RSGISVectors.h"
 #include "math/RSGISMatrices.h"
+#include "math/RSGISMathsUtils.h"
 
 #include "utils/RSGISTextUtils.h"
 #include "utils/RSGISFileUtils.h"
@@ -2378,8 +2379,9 @@ namespace rsgis{ namespace cmds {
                 
                 
                 
-    void executeImageBandStatsEnv(std::string inputImage, rsgis::cmds::ImageStatsCmds *stats, unsigned int imgBand, bool noDataValueSpecified, float noDataVal, double latMin, double latMax, double longMin, double longMax)
+    void executeImageBandStatsEnv(std::string inputImage, rsgis::cmds::ImageStatsCmds *stats, unsigned int imgBand, bool noDataValueSpecified, float noDataVal, double longMin, double longMax, double latMin, double latMax)
     {
+        std::cout.precision(12);
         try
         {
             GDALAllRegister();
@@ -2398,7 +2400,6 @@ namespace rsgis{ namespace cmds {
             }
             
             const char *wktProj = dataset->GetProjectionRef();
-            
             if(std::string(wktProj) == "")
             {
                 throw rsgis::RSGISException("The input image needs to have the projection defined within the file.");
@@ -2413,6 +2414,8 @@ namespace rsgis{ namespace cmds {
             double minY = 0.0;
             double maxY = 0.0;
             
+            std::cout << "Input BBOX (longMin, longMax, LatMin, LatMax) [" << longMin << ", " << longMax << "][" << latMin << ", " << latMax << "]\n";
+            
             if(latLongSpatRef.IsSame(&imgSpatRef))
             {
                 minX = longMin;
@@ -2422,54 +2425,21 @@ namespace rsgis{ namespace cmds {
             }
             else
             {
-                // Convert bbox to the same projection as the input image...
-                std::cout << "Converting Image Projection\n";
-                OGRCoordinateTransformation *poCT = OGRCreateCoordinateTransformation( &latLongSpatRef, &imgSpatRef );
-                
-                double xMinLongCon, yMinLatCon, xMaxLongCon, yMaxLatCon = 0.0;
-                xMinLongCon = longMin;
-                yMinLatCon = latMin;
-                
-                xMaxLongCon = longMax;
-                yMaxLatCon = latMax;
-                
-                if( poCT == NULL || !poCT->Transform( 1, &xMinLongCon, &yMinLatCon ) )
-                {
-                    throw rsgis::RSGISException("Coordinate System Transformation failed (Min).");
-                }
-                
-                if( poCT == NULL || !poCT->Transform( 1, &xMaxLongCon, &yMaxLatCon ) )
-                {
-                    throw rsgis::RSGISException("Coordinate System Transformation failed (Max).");
-                }
-                std::cout.precision(12);
-                std::cout << "Min X: " << xMinLongCon << std::endl;
-                std::cout << "Max X: " << xMaxLongCon << std::endl;
-                std::cout << "Min Y: " << yMinLatCon << std::endl;
-                std::cout << "Max Y: " << yMaxLatCon << std::endl;
-                
-                if(xMinLongCon > xMaxLongCon)
-                {
-                    minX = xMaxLongCon;
-                    maxX = xMinLongCon;
-                }
-                else
-                {
-                    minX = xMinLongCon;
-                    maxX = xMaxLongCon;
-                }
-                
-                if(yMinLatCon > yMaxLatCon)
-                {
-                    minY = yMaxLatCon;
-                    maxY = yMinLatCon;
-                }
-                else
-                {
-                    minY = yMinLatCon;
-                    maxY = yMaxLatCon;
-                }
+                OGREnvelope *inBBOX = new OGREnvelope();
+                inBBOX->MinX = longMin;
+                inBBOX->MaxX = longMax;
+                inBBOX->MinY = latMin;
+                inBBOX->MaxY = latMax;
+                OGREnvelope *outBBOX = new OGREnvelope();
+                rsgis::math::RSGISCoordsTransform coord_transform = rsgis::math::RSGISCoordsTransform();
+                coord_transform.transformBBOX(&latLongSpatRef, &imgSpatRef, inBBOX, outBBOX);
+                minX = outBBOX->MinX;
+                maxX = outBBOX->MaxX;
+                minY = outBBOX->MinY;
+                maxY = outBBOX->MaxY;
             }
+            
+            std::cout << "Input BBOX (minX, maxX, minY, maxY) [" << minX << ", " << maxX << "][" << minY << ", " << maxY << "]\n";
             
             rsgis::img::ImageStats **imgStats = new rsgis::img::ImageStats*[numImageBands];
             for(unsigned int i = 0; i < numImageBands; ++i)
@@ -2510,7 +2480,7 @@ namespace rsgis{ namespace cmds {
     }
                 
                 
-    float executeImageBandModeEnv(std::string inputImage, float binWidth, unsigned int imgBand, bool noDataValueSpecified, float noDataVal, double latMin, double latMax, double longMin, double longMax)
+    float executeImageBandModeEnv(std::string inputImage, float binWidth, unsigned int imgBand, bool noDataValueSpecified, float noDataVal, double longMin, double longMax, double latMin, double latMax)
     {
         std::cout.precision(12);
         float outputModeVal = 0.0;
@@ -2556,48 +2526,18 @@ namespace rsgis{ namespace cmds {
             }
             else
             {
-                // Convert bbox to the same projection as the input image...
-                std::cout << "Converting Image Projection\n";
-                OGRCoordinateTransformation *poCT = OGRCreateCoordinateTransformation( &latLongSpatRef, &imgSpatRef );
-                
-                double xMinLongCon, yMinLatCon, xMaxLongCon, yMaxLatCon = 0.0;
-                xMinLongCon = longMin;
-                yMinLatCon = latMin;
-                
-                xMaxLongCon = longMax;
-                yMaxLatCon = latMax;
-                
-                if( poCT == NULL || !poCT->Transform( 1, &xMinLongCon, &yMinLatCon ) )
-                {
-                    throw rsgis::RSGISException("Coordinate System Transformation failed (Min).");
-                }
-                
-                if( poCT == NULL || !poCT->Transform( 1, &xMaxLongCon, &yMaxLatCon ) )
-                {
-                    throw rsgis::RSGISException("Coordinate System Transformation failed (Max).");
-                }
-                
-                if(xMinLongCon > xMaxLongCon)
-                {
-                    minX = xMaxLongCon;
-                    maxX = xMinLongCon;
-                }
-                else
-                {
-                    minX = xMinLongCon;
-                    maxX = xMaxLongCon;
-                }
-                
-                if(yMinLatCon > yMaxLatCon)
-                {
-                    minY = yMaxLatCon;
-                    maxY = yMinLatCon;
-                }
-                else
-                {
-                    minY = yMinLatCon;
-                    maxY = yMaxLatCon;
-                }
+                OGREnvelope *inBBOX = new OGREnvelope();
+                inBBOX->MinX = longMin;
+                inBBOX->MaxX = longMax;
+                inBBOX->MinY = latMin;
+                inBBOX->MaxY = latMax;
+                OGREnvelope *outBBOX = new OGREnvelope();
+                rsgis::math::RSGISCoordsTransform coord_transform = rsgis::math::RSGISCoordsTransform();
+                coord_transform.transformBBOX(&latLongSpatRef, &imgSpatRef, inBBOX, outBBOX);
+                minX = outBBOX->MinX;
+                maxX = outBBOX->MaxX;
+                minY = outBBOX->MinY;
+                maxY = outBBOX->MaxX;
             }
             
             double xRange = maxX - minX;

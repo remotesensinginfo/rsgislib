@@ -28,6 +28,8 @@
 #include <math.h>
 #include <stdlib.h>
 
+#include "common/rsgis-tqdm.h"
+
 #include "img/RSGISImageUtils.h"
 #include "img/RSGISImageCalcException.h"
 #include "math/RSGISMathsUtils.h"

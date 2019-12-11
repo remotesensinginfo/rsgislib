@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 The Raster GIS module contains functions for attributing and manipulating raster attribute tables.
 """

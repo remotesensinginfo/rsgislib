@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 The imagecalc module contains functions for performing a number of calculating on images.
 """
@@ -155,13 +156,20 @@ Example::
         proxOptions.append('VALUES='+strVals)    
     else:
         proxOptions.append('VALUES='+str(pxlVals))
+
+    try:
+        import tqdm
+        pbar = tqdm.tqdm(total=100)
+        callback = lambda *args, **kw: pbar.update()
+    except:
+        callback = gdal.TermProgress
         
     valsImgDS = gdal.Open(inputValsImg, gdal.GA_ReadOnly)
     valsImgBand = valsImgDS.GetRasterBand(valsImgBand)
     rsgislib.imageutils.createCopyImage(inputValsImg, outputDistImg, 1, 0.0, gdalformat, rsgislib.TYPE_32FLOAT)
     distImgDS = gdal.Open(outputDistImg, gdal.GA_Update)
     distImgBand = distImgDS.GetRasterBand(1)
-    gdal.ComputeProximity(valsImgBand, distImgBand, proxOptions, callback=gdal.TermProgress)
+    gdal.ComputeProximity(valsImgBand, distImgBand, proxOptions, callback=callback)
     distImgBand = None
     distImgDS = None
     classImgBand = None
@@ -173,12 +181,18 @@ def _computeProximityArrArgsFunc(argVals):
 This function is used internally within calcDist2Classes for the multiprocessing Pool
 """
     import rsgislib.imageutils
+    try:
+        import tqdm
+        pbar = tqdm.tqdm(total=100)
+        callback = lambda *args, **kw: pbar.update()
+    except:
+        callback = gdal.TermProgress
     classImgDS = gdal.Open(argVals[0], gdal.GA_ReadOnly)
     classImgBand = classImgDS.GetRasterBand(1)
     rsgislib.imageutils.createCopyImage(argVals[0], argVals[1], 1, argVals[3], argVals[4], rsgislib.TYPE_32FLOAT)
     distImgDS = gdal.Open(argVals[1], gdal.GA_Update)
     distImgBand = distImgDS.GetRasterBand(1)
-    gdal.ComputeProximity(classImgBand, distImgBand, argVals[2], callback=gdal.TermProgress)
+    gdal.ComputeProximity(classImgBand, distImgBand, argVals[2], callback=callback)
     distImgBand = None
     distImgDS = None
     classImgBand = None
@@ -450,6 +464,12 @@ Function which rescales an input image base on a list of rescaling parameters.
     rsgis_utils = rsgislib.RSGISPyUtils()
     numpyDT = rsgis_utils.getNumpyDataType(datatype)
 
+    try:
+        import tqdm
+        progress_bar = rsgislib.TQDMProgressBar()
+    except:
+        progress_bar = cuiprogress.GDALProgressBar()
+
     infiles = applier.FilenameAssociations()
     infiles.image = inputImg
     outfiles = applier.FilenameAssociations()
@@ -459,7 +479,7 @@ Function which rescales an input image base on a list of rescaling parameters.
     otherargs.trim = trim2Limits
     otherargs.numpyDT = numpyDT
     aControls = applier.ApplierControls()
-    aControls.progress = cuiprogress.CUIProgressBar()
+    aControls.progress = progress_bar
     aControls.drivername = gdalformat
     aControls.omitPyramids = True
     aControls.calcStats = False
@@ -540,7 +560,13 @@ A function which calculates the area (in metres) of the pixel projected in WGS84
 
 """
     import rsgislib.tools
-    
+
+    try:
+        import tqdm
+        progress_bar = rsgislib.TQDMProgressBar()
+    except:
+        progress_bar = cuiprogress.GDALProgressBar()
+
     rsgis_utils = rsgislib.RSGISPyUtils()
     x_res, y_res = rsgis_utils.getImageRes(img)
     
@@ -553,7 +579,7 @@ A function which calculates the area (in metres) of the pixel projected in WGS84
     otherargs.y_res = y_res
     otherargs.scale = float(scale)
     aControls = applier.ApplierControls()
-    aControls.progress = cuiprogress.CUIProgressBar()
+    aControls.progress = progress_bar
     aControls.drivername = gdalformat
     aControls.omitPyramids = False
     aControls.calcStats = False
@@ -701,6 +727,12 @@ Warning, this function can be very slow. Use rsgislib.imagecalc.imagePixelColumn
     datatype = rsgis_utils.getRSGISLibDataTypeFromImg(inputImgs[0])
     numpyDT = rsgis_utils.getNumpyDataType(datatype)
 
+    try:
+        import tqdm
+        progress_bar = rsgislib.TQDMProgressBar()
+    except:
+        progress_bar = cuiprogress.GDALProgressBar()
+
     infiles = applier.FilenameAssociations()
     infiles.images = inputImgs
     outfiles = applier.FilenameAssociations()
@@ -709,7 +741,7 @@ Warning, this function can be very slow. Use rsgislib.imagecalc.imagePixelColumn
     otherargs.no_data_val = no_data_val
     otherargs.numpyDT = numpyDT
     aControls = applier.ApplierControls()
-    aControls.progress = cuiprogress.CUIProgressBar()
+    aControls.progress = progress_bar
     aControls.drivername = gdalformat
     aControls.omitPyramids = True
     aControls.calcStats = False
@@ -741,7 +773,7 @@ order:
 1. band 1 mean
 2. band 1 std dev
 3. band 2 mean
-4. band 3 std dev
+4. band 2 std dev
 
 :param ref_img: reference image which defines the output image
 :param stats_imgs: a list of input images over which the stats will be calculated.
@@ -794,6 +826,12 @@ order:
             outputs.output_img[band * 2][numpy.isnan(outputs.output_img[band * 2])] = otherargs.no_data_val
             outputs.output_img[band * 2 + 1][numpy.isnan(outputs.output_img[band * 2 + 1])] = 0.0
 
+    try:
+        import tqdm
+        progress_bar = rsgislib.TQDMProgressBar()
+    except:
+        progress_bar = cuiprogress.GDALProgressBar()
+
     infiles = applier.FilenameAssociations()
     infiles.imgs = stats_imgs
 
@@ -807,7 +845,7 @@ order:
     aControls = applier.ApplierControls()
     aControls.referenceImage = ref_img
     aControls.footprint = applier.BOUNDS_FROM_REFERENCE
-    aControls.progress = cuiprogress.CUIProgressBar()
+    aControls.progress = progress_bar
     aControls.drivername = gdalformat
     aControls.omitPyramids = True
     aControls.calcStats = False
@@ -828,13 +866,19 @@ negative values are removed and each pixel sums to 1.
 :param gdalformat: the file format of the output file.
 
 """
+    try:
+        import tqdm
+        progress_bar = rsgislib.TQDMProgressBar()
+    except:
+        progress_bar = cuiprogress.GDALProgressBar()
+
     infiles = applier.FilenameAssociations()
     infiles.image = inputImg
     outfiles = applier.FilenameAssociations()
     outfiles.outimage = outputImg
     otherargs = applier.OtherInputs()
     aControls = applier.ApplierControls()
-    aControls.progress = cuiprogress.CUIProgressBar()
+    aControls.progress = progress_bar
     aControls.drivername = gdalformat
     aControls.omitPyramids = True
     aControls.calcStats = False

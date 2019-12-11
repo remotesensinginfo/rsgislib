@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 The image calibration module contains functions for calibrating optical data from DN to radience and top of atmosphere reflectance and, using coefficients from 6S, surface reflectance.
 
@@ -334,7 +335,13 @@ def createEstimateSREFSurface(inputTOAImg, imgBands, bandRescale, winSize, outIm
     #####################################################################
     # Calculate the scaled SREF pixel values.
     srefScaledImg = os.path.join(tmpImgDIR, baseName+'_scaledSREF.kea')
-
+    
+    try:
+        import tqdm
+        progress_bar = rsgislib.TQDMProgressBar()
+    except:
+        progress_bar = cuiprogress.GDALProgressBar()
+    
     infiles = applier.FilenameAssociations()
     infiles.toaScaledImage = rescaledInputImg
     infiles.transImg = transImg
@@ -345,7 +352,7 @@ def createEstimateSREFSurface(inputTOAImg, imgBands, bandRescale, winSize, outIm
     otherargs.imgBands = imgBands
     otherargs.numpyDT = numpy.float32
     aControls = applier.ApplierControls()
-    aControls.progress = cuiprogress.CUIProgressBar()
+    aControls.progress = progress_bar
     aControls.drivername = 'KEA'
     aControls.omitPyramids = True
     aControls.calcStats = False

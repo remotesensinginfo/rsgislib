@@ -1096,6 +1096,7 @@ namespace rsgis { namespace img {
 		double inDiff = 0;
 		double norm2min = 0;
 		double outDiff = 0;
+        double outVal = 0;
 		for(int i = 0; i < numBands; i++)
 		{
 			if(boost::math::isnan(bandValues[i]))
@@ -1109,7 +1110,7 @@ namespace rsgis { namespace img {
                     output[i] = outMin[i];
                 }
 			}
-            else if(this->outNoData && (bandValues[i] == this->inNoData))
+            else if(this->useNoData && (bandValues[i] == this->inNoData))
             {
                 output[i] = this->outNoData;
             }
@@ -1126,7 +1127,22 @@ namespace rsgis { namespace img {
 				inDiff = imageMax[i] - imageMin[i];
 				norm2min = bandValues[i] - imageMin[i];
 				outDiff = outMax[i] - outMin[i];
-				output[i] = ((norm2min/inDiff)*outDiff)+outMin[i];
+                outVal = ((norm2min/inDiff)*outDiff)+outMin[i];
+                if(outVal == this->outNoData)
+                {
+                    if(this->outNoData == outMax[i])
+                    {
+                        output[i] = outVal - 1;
+                    }
+                    else
+                    {
+                        output[i] = outVal + 1;
+                    }
+                }
+                else
+                {
+                    output[i] = outVal;
+                }
 			}
 		}
 	}
@@ -1163,10 +1179,10 @@ namespace rsgis { namespace img {
 			}
 		}
 		
-		
 		double inDiff = 0;
 		double norm2min = 0;
 		double outDiff = 0;
+        double outVal = 0;
 		for(int i = 0; i < numBands; i++)
 		{
 			if(boost::math::isnan(bandValues[i]))
@@ -1180,7 +1196,7 @@ namespace rsgis { namespace img {
                     output[i] = outMin[i];
                 }
 			}
-            else if(this->outNoData && (bandValues[i] == this->inNoData))
+            else if(this->useNoData && (bandValues[i] == this->inNoData))
             {
                 output[i] = this->outNoData;
             }
@@ -1197,8 +1213,23 @@ namespace rsgis { namespace img {
 				inDiff = imageMax[i] - imageMin[i];
 				norm2min = bandValues[i] - imageMin[i];
 				outDiff = outMax[i] - outMin[i];
-				output[i] = ((norm2min/inDiff)*outDiff)+outMin[i];
-			}
+                outVal = ((norm2min/inDiff)*outDiff)+outMin[i];
+                if(outVal == this->outNoData)
+                {
+                    if(this->outNoData == outMax[i])
+                    {
+                        output[i] = outVal - 1;
+                    }
+                    else
+                    {
+                        output[i] = outVal + 1;
+                    }
+                }
+                else
+                {
+                    output[i] = outVal;
+                }
+            }
 		}
 	}
 	

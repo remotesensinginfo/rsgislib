@@ -66,16 +66,10 @@ namespace rsgis{namespace segment{
         float dist = 0;
         bool noDataValFound = false;
         
-        int feedback = height/10;
-        int feedbackCounter = 0;
-        std::cout << "Started" << std::flush;
+        rsgis_tqdm pbar;
         for(unsigned int i = 0; i < height; ++i)
         {
-            if((i % feedback) == 0)
-            {
-                std::cout << ".." << feedbackCounter << ".." << std::flush;
-                feedbackCounter = feedbackCounter + 10;
-            }
+            pbar.progress(i, height);
             
             for(unsigned int j = 0; j < width; ++j)
             {
@@ -244,7 +238,8 @@ namespace rsgis{namespace segment{
                 }
             }
         }
-        std::cout << " Complete (Generated " << clumpIdx-1 << " clumps).\n";
+        pbar.finish();
+        std::cout << "(Generated " << clumpIdx-1 << " clumps).\n";
         
         delete[] specPxlVals;
         delete[] specCPxlVals;
@@ -285,16 +280,10 @@ namespace rsgis{namespace segment{
         unsigned int uiPxlVal = 0;
         float dist = 0;
         
-        int feedback = height/10;
-        int feedbackCounter = 0;
-        std::cout << "Started" << std::flush;
+        rsgis_tqdm pbar;
         for(unsigned int i = 0; i < height; ++i)
         {
-            if((i % feedback) == 0)
-            {
-                std::cout << ".." << feedbackCounter << ".." << std::flush;
-                feedbackCounter = feedbackCounter + 10;
-            }
+            pbar.progress(i, height);
             
             for(unsigned int j = 0; j < width; ++j)
             {
@@ -439,7 +428,8 @@ namespace rsgis{namespace segment{
                 }
             }
         }
-        std::cout << " Complete (Generated " << clumpIdx-1 << " clumps).\n";
+        pbar.finish();
+        std::cout << "(Generated " << clumpIdx-1 << " clumps).\n";
         
         delete[] clumpSpecPxlVals;
         delete[] specPxlVals;
@@ -534,16 +524,10 @@ namespace rsgis{namespace segment{
         float dist = 0;
         bool noDataValFound = false;
         
-        int feedback = height/10;
-        int feedbackCounter = 0;
-        std::cout << "Started" << std::flush;
+        rsgis_tqdm pbar;
         for(unsigned int i = 0; i < height; ++i)
         {
-            if((i % feedback) == 0)
-            {
-                std::cout << ".." << feedbackCounter << ".." << std::flush;
-                feedbackCounter = feedbackCounter + 10;
-            }
+            pbar.progress(i, height);
             
             for(unsigned int j = 0; j < width; ++j)
             {
@@ -712,7 +696,8 @@ namespace rsgis{namespace segment{
                 }
             }
         }
-        std::cout << " Complete (Generated " << clumpIdx-1 << " clumps).\n";
+        pbar.finish();
+        std::cout << "(Generated " << clumpIdx-1 << " clumps).\n";
         
         delete[] specPxlVals;
         delete[] specCPxlVals;

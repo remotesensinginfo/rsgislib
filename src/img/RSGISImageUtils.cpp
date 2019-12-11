@@ -1763,7 +1763,6 @@ namespace rsgis{namespace img{
 		const char *proj = NULL;
 		bool first = true;
 		
-		
 		try
 		{
 			// Calculate Image Overlap.
@@ -3262,17 +3261,11 @@ namespace rsgis{namespace img{
 			// Get Raster band
 			inputRasterBand = image->GetRasterBand(band);
 			
-			int feedback = height/10;
-			int feedbackCounter = 0;
-			std::cout << "Started" << std::flush;
+			rsgis_tqdm pbar;
 			// Loop images to process data
 			for(int i = 0; i < height; i++)
 			{
-				if((i % feedback) == 0)
-				{
-					std::cout << ".." << feedbackCounter << ".." << std::flush;
-					feedbackCounter = feedbackCounter + 10;
-				}
+				pbar.progress(i, height);
 				inputRasterBand->RasterIO(GF_Read, 0, i, width, 1, inputData, width, 1, GDT_Float32, 0, 0);
 				
 				for(int j = 0; j < width; j++)
@@ -3281,7 +3274,7 @@ namespace rsgis{namespace img{
 					outFile << inputData[j] << std::endl;
 				}
 			}
-			std::cout << "..100 Complete.\n";
+			pbar.finish();
 		}
 		catch(RSGISImageBandException &e)
 		{
@@ -3340,8 +3333,8 @@ namespace rsgis{namespace img{
 			}
 			
 			// Create new file. 
-			// Set unsupported options to NULL
-			outputImage = poDriver->Create(imageFile.c_str(), xSize, ySize, numBands, imgDataType, NULL);
+            char **papszOptions = this->getGDALCreationOptionsForFormat(gdalFormat);
+			outputImage = poDriver->Create(imageFile.c_str(), xSize, ySize, numBands, imgDataType, papszOptions);
 			
 			if(outputImage == NULL)
 			{
@@ -3458,8 +3451,8 @@ namespace rsgis{namespace img{
 			}
 			
 			// Create new file.
-			// Set unsupported options to NULL
-			outputImage = poDriver->Create(imageFile.c_str(), xSize, ySize, numBands, imgDataType, NULL);
+			char **papszOptions = this->getGDALCreationOptionsForFormat(gdalFormat);
+			outputImage = poDriver->Create(imageFile.c_str(), xSize, ySize, numBands, imgDataType, papszOptions);
 			
 			if(outputImage == NULL)
 			{
@@ -3589,7 +3582,8 @@ namespace rsgis{namespace img{
 			}
 			
 			// Create new file.
-			outputImage = poDriver->Create(imageFile.c_str(), xSize, ySize, numBands, imgDataType, NULL);
+            char **papszOptions = this->getGDALCreationOptionsForFormat(gdalFormat);
+			outputImage = poDriver->Create(imageFile.c_str(), xSize, ySize, numBands, imgDataType, papszOptions);
 			
 			if(outputImage == NULL)
 			{
@@ -3670,6 +3664,7 @@ namespace rsgis{namespace img{
 				std::string message = format + std::string(" image driver is not available.");
 				throw RSGISImageException(message.c_str());
 			}
+            char **papszOptions = this->getGDALCreationOptionsForFormat(format);
 			
 			gdalDriverMetaInfo = gdalDriver->GetMetadata();
 			if(CSLFetchBoolean(gdalDriverMetaInfo, GDAL_DCAP_CREATE, FALSE ))
@@ -3695,8 +3690,7 @@ namespace rsgis{namespace img{
 				*outStrStream << outputFilebase << "_b" << i << ".tif";
 				outImageFile = outStrStream->str();
 				std::cout << "File: " << outImageFile << std::endl;
-
-				outputImage = gdalDriver->Create(outImageFile.c_str(), xSize, ySize, 1, GDT_Float32, NULL);
+				outputImage = gdalDriver->Create(outImageFile.c_str(), xSize, ySize, 1, GDT_Float32, papszOptions);
 				
 				if(outputImage == NULL)
 				{
@@ -3753,6 +3747,7 @@ namespace rsgis{namespace img{
 				std::string message = std::string("Driver for ") + outputFormat + std::string(" does not exist\n");
 				throw RSGISImageException(message.c_str());
 			}
+            char **papszOptions = this->getGDALCreationOptionsForFormat(outputFormat);
 			
 			inDatasets = new GDALDataset*[numImages];
 			for(int i = 0; i < numImages; i++)
@@ -3778,8 +3773,8 @@ namespace rsgis{namespace img{
 			{
 				std::cout << "Converting image " << inputImages[i] << std::endl;
 				numOutBands = inDatasets[i]->GetRasterCount();
-
-				outputImageDS = gdalDriver->Create(outputImages[i].c_str(), stackWidth, stackHeight, numOutBands, GDT_Float32, NULL);
+                
+				outputImageDS = gdalDriver->Create(outputImages[i].c_str(), stackWidth, stackHeight, numOutBands, GDT_Float32, papszOptions);
 				
 				outputImageDS->SetGeoTransform(gdalTranslation);
 				outputImageDS->SetProjection(inDatasets[0]->GetProjectionRef());
@@ -3791,23 +3786,15 @@ namespace rsgis{namespace img{
 					inputRasterBand = inDatasets[i]->GetRasterBand(n);
 					outputRasterBand = outputImageDS->GetRasterBand(n);
 					
-					int feedback = stackHeight/10;
-					int feedbackCounter = 0;
-					std::cout << "Started" << std::flush;
-					
+					rsgis_tqdm pbar;
 					for(int m = 0; m < stackHeight; m++)
 					{
-						if((m % feedback) == 0)
-						{
-							std::cout << ".." << feedbackCounter << ".." << std::flush;
-							feedbackCounter = feedbackCounter + 10;
-						}
+						pbar.progress(m, stackHeight);
 						inputRasterBand->RasterIO(GF_Read, dsOffsets[i][0], (dsOffsets[i][1]+m), stackWidth, 1, data, stackWidth, 1, GDT_Float32, 0, 0);						
 						outputRasterBand->RasterIO(GF_Write, 0, m, stackWidth, 1, data, stackWidth, 1, GDT_Float32, 0, 0);
 					}
-					std::cout << " Complete.\n";
+					pbar.finish();
 				}
-
 				GDALClose(outputImageDS);
 			}
 			
@@ -3854,6 +3841,7 @@ namespace rsgis{namespace img{
 				std::string message = std::string("Driver for ") + outputFormat + std::string(" does not exist\n");
 				throw RSGISImageException(message.c_str());
 			}
+            char **papszOptions = this->getGDALCreationOptionsForFormat(outputFormat);
 			
 			inDatasets = new GDALDataset*[numImages];
 			std::cout << imageMask << std::endl;
@@ -3883,8 +3871,7 @@ namespace rsgis{namespace img{
 			// Find image overlap
 			this->getImageOverlap(inDatasets, numImages, dsOffsets, &stackWidth, &stackHeight, gdalTranslation);
 			
-			std::cout << "Stack Height = " << stackHeight << std::endl;
-			std::cout << "Stack Width = " << stackWidth << std::endl;
+			std::cout << "Stack Height = " << stackHeight << " Width = " << stackWidth << std::endl;
 			
 			data = (float *) CPLMalloc(sizeof(float)*stackWidth);
 			mask = (float *) CPLMalloc(sizeof(float)*stackWidth);
@@ -3893,7 +3880,7 @@ namespace rsgis{namespace img{
 			{
 				std::cout << "Converting image " << inputImages[i-1] << std::endl;
 				numOutBands = inDatasets[i]->GetRasterCount();
-				outputImageDS = gdalDriver->Create(outputImages[i-1].c_str(), stackWidth, stackHeight, numOutBands, GDT_Float32, NULL);
+				outputImageDS = gdalDriver->Create(outputImages[i-1].c_str(), stackWidth, stackHeight, numOutBands, GDT_Float32, papszOptions);
 				outputImageDS->SetGeoTransform(gdalTranslation);
 				outputImageDS->SetProjection(inDatasets[0]->GetProjectionRef());
 				
@@ -4181,7 +4168,7 @@ namespace rsgis{namespace img{
 				std::string message = std::string("Driver for ENVI does not exist\n");
 				throw RSGISImageException(message.c_str());
 			}
-			
+			char **papszOptions = this->getGDALCreationOptionsForFormat("ENVI");
 			
 			std::cout << "Openning image " << inputImage << std::endl;
 			inDataset = (GDALDataset *) GDALOpenShared(inputImage.c_str(), GA_ReadOnly);
@@ -4205,7 +4192,7 @@ namespace rsgis{namespace img{
 			transformation[5] = -1;
 			
 			std::cout << "Creating image " << outputImage << std::endl;
-			outDataset = gdalDriver->Create(outputImage.c_str(), width, height, numOutBands, GDT_Float32, NULL);
+			outDataset = gdalDriver->Create(outputImage.c_str(), width, height, numOutBands, GDT_Float32, papszOptions);
 			
 			if(outDataset == NULL)
 			{
@@ -4282,7 +4269,7 @@ namespace rsgis{namespace img{
 				std::string message = std::string("Driver for ENVI does not exist\n");
 				throw RSGISImageException(message.c_str());
 			}
-			
+			char **papszOptions = this->getGDALCreationOptionsForFormat("ENVI");
 			
 			std::cout << "Openning image " << inputImage << std::endl;
 			inDataset = (GDALDataset *) GDALOpenShared(inputImage.c_str(), GA_ReadOnly);
@@ -4306,7 +4293,7 @@ namespace rsgis{namespace img{
 			transformation[5] = yRes;
 			
 			std::cout << "Creating image " << outputImage << std::endl;
-			outDataset = gdalDriver->Create(outputImage.c_str(), width, height, numOutBands, GDT_Float32, NULL);
+			outDataset = gdalDriver->Create(outputImage.c_str(), width, height, numOutBands, GDT_Float32, papszOptions);
 			if(outDataset == NULL)
 			{
 				std::string message = std::string("Could not open image ") + outputImage;
@@ -4397,6 +4384,7 @@ namespace rsgis{namespace img{
 				std::string message = std::string("Driver for ENVI does not exist\n");
 				throw RSGISImageException(message.c_str());
 			}
+            char **papszOptions = this->getGDALCreationOptionsForFormat("ENVI");
             
             unsigned int width = dataset->GetRasterXSize();
             unsigned int height = dataset->GetRasterCount();
@@ -4412,7 +4400,7 @@ namespace rsgis{namespace img{
             for(int i = 0; i < dataset->GetRasterYSize(); ++i)
             {
                 std::string outputImage = outputImageBase + mathUtils.inttostring(i) + std::string(".env");
-				outDataset = gdalDriver->Create(outputImage.c_str(), width, height, 1, GDT_Float32, NULL);
+				outDataset = gdalDriver->Create(outputImage.c_str(), width, height, 1, GDT_Float32, papszOptions);
                 if(outDataset == NULL)
                 {
                     std::string message = std::string("Could not open image ") + outputImage;
@@ -4723,17 +4711,11 @@ namespace rsgis{namespace img{
             int remainRows = ySize - (nYBlocks * yBlockSize);
             int rowOffset = 0;
             
-            int feedback = nYBlocks/10;
-            int feedbackCounter = 0;
-            std::cout << "Started" << std::flush;
+            rsgis_tqdm pbar;
             // Loop images to process data
             for(int i = 0; i < nYBlocks; i++)
             {
-                if((feedback != 0) && (i % feedback == 0))
-                {
-                    std::cout << "." << feedbackCounter << "." << std::flush;
-                    feedbackCounter = feedbackCounter + 10;
-                }
+                pbar.progress(i, nYBlocks);
                 
                 for(int n = 0; n < numBands; n++)
                 {
@@ -4750,7 +4732,7 @@ namespace rsgis{namespace img{
                     rasterBands[n]->RasterIO(GF_Write, 0, rowOffset, xSize, remainRows, dataVals, xSize, remainRows, GDT_UInt32, 0, 0);
                 }
             }
-            std::cout << " Complete.\n";
+            pbar.finish();
             
             delete[] rasterBands;
             delete[] dataVals;
@@ -4790,17 +4772,11 @@ namespace rsgis{namespace img{
             int remainRows = ySize - (nYBlocks * yBlockSize);
             int rowOffset = 0;
             
-            int feedback = nYBlocks/10;
-            int feedbackCounter = 0;
-            std::cout << "Started" << std::flush;
+            rsgis_tqdm pbar;
             // Loop images to process data
             for(int i = 0; i < nYBlocks; i++)
             {
-                if((feedback != 0) && (i % feedback == 0))
-                {
-                    std::cout << "." << feedbackCounter << "." << std::flush;
-                    feedbackCounter = feedbackCounter + 10;
-                }
+                pbar.progress(i, nYBlocks);
                 
                 for(int n = 0; n < numBands; n++)
                 {
@@ -4817,7 +4793,7 @@ namespace rsgis{namespace img{
                     rasterBands[n]->RasterIO(GF_Write, 0, rowOffset, xSize, remainRows, dataVals, xSize, remainRows, GDT_Float32, 0, 0);
                 }
             }
-            std::cout << " Complete.\n";
+            pbar.finish();
             
             delete[] rasterBands;
             delete[] dataVals;
@@ -4857,17 +4833,11 @@ namespace rsgis{namespace img{
             int remainRows = ySize - (nYBlocks * yBlockSize);
             int rowOffset = 0;
             
-            int feedback = nYBlocks/10;
-            int feedbackCounter = 0;
-            std::cout << "Started" << std::flush;
+            rsgis_tqdm pbar;
             // Loop images to process data
             for(int i = 0; i < nYBlocks; i++)
             {
-                if((feedback != 0) && (i % feedback == 0))
-                {
-                    std::cout << "." << feedbackCounter << "." << std::flush;
-                    feedbackCounter = feedbackCounter + 10;
-                }
+                pbar.progress(i, nYBlocks);
                 
                 for(int n = 0; n < numBands; n++)
                 {
@@ -4884,7 +4854,7 @@ namespace rsgis{namespace img{
                     rasterBands[n]->RasterIO(GF_Write, 0, rowOffset, xSize, remainRows, dataVals, xSize, remainRows, GDT_Byte, 0, 0);
                 }
             }
-            std::cout << " Complete.\n";
+            pbar.finish();
             
             delete[] rasterBands;
             delete[] dataVals;
@@ -4924,17 +4894,11 @@ namespace rsgis{namespace img{
             int remainRows = ySize - (nYBlocks * yBlockSize);
             int rowOffset = 0;
             
-            int feedback = nYBlocks/10;
-            int feedbackCounter = 0;
-            std::cout << "Started" << std::flush;
+            rsgis_tqdm pbar;;
             // Loop images to process data
             for(int i = 0; i < nYBlocks; i++)
             {
-                if((feedback != 0) && (i % feedback == 0))
-                {
-                    std::cout << "." << feedbackCounter << "." << std::flush;
-                    feedbackCounter = feedbackCounter + 10;
-                }
+                pbar.progress(i, nYBlocks);
                 
                 for(int n = 0; n < numBands; n++)
                 {
@@ -4951,7 +4915,7 @@ namespace rsgis{namespace img{
                     rasterBands[n]->RasterIO(GF_Write, 0, rowOffset, xSize, remainRows, dataVals, xSize, remainRows, GDT_Float32, 0, 0);
                 }
             }
-            std::cout << " Complete.\n";
+            pbar.finish();
             
             delete[] rasterBands;
             delete[] dataVals;
@@ -4980,7 +4944,8 @@ namespace rsgis{namespace img{
             std::string message = std::string("Driver for ") + outputFormat + std::string(" does not exist\n");
             throw RSGISImageException(message.c_str());
         }
-        GDALDataset *dataset = gdalDriver->Create(outputFilePath.c_str(), width, height, numBands, eType, NULL);
+        char **papszOptions = this->getGDALCreationOptionsForFormat(outputFormat);
+        GDALDataset *dataset = gdalDriver->Create(outputFilePath.c_str(), width, height, numBands, eType, papszOptions);
         if(dataset == NULL)
         {
             delete[] gdalTranslation;
@@ -5019,8 +4984,8 @@ namespace rsgis{namespace img{
             std::string message = std::string("Driver for ") + outputFormat + std::string(" does not exist\n");
             throw RSGISImageException(message.c_str());
         }
-        
-        GDALDataset *dataset = gdalDriver->Create(outputFilePath.c_str(), width, height, numBands, eType, NULL);
+        char **papszOptions = this->getGDALCreationOptionsForFormat(outputFormat);
+        GDALDataset *dataset = gdalDriver->Create(outputFilePath.c_str(), width, height, numBands, eType, papszOptions);
         if(dataset == NULL)
         {
             delete[] gdalTranslation;
@@ -5049,8 +5014,6 @@ namespace rsgis{namespace img{
         try
         {
             double outImgMinX = 0.0;
-            //double outImgMaxX = 0.0;
-            //double outImgMinY = 0.0;
             double outImgMaxY = 0.0;
             unsigned long outImgWidth = 0;
             unsigned long outImgHeight = 0;
@@ -5104,8 +5067,9 @@ namespace rsgis{namespace img{
                 std::string message = std::string("Driver for ") + outputFormat + std::string(" does not exist\n");
                 throw RSGISImageException(message.c_str());
             }
+            char **papszOptions = this->getGDALCreationOptionsForFormat(outputFormat);
             
-            dataset = gdalDriver->Create(outputFilePath.c_str(), outImgWidth, outImgHeight, numBands, eType, NULL);
+            dataset = gdalDriver->Create(outputFilePath.c_str(), outImgWidth, outImgHeight, numBands, eType, papszOptions);
             if(dataset == NULL)
             {
                 delete[] gdalTranslation;
@@ -5168,8 +5132,9 @@ namespace rsgis{namespace img{
                 std::string message = std::string("Driver for ") + outputFormat + std::string(" does not exist\n");
                 throw RSGISImageException(message.c_str());
             }
-                        
-            dataset = gdalDriver->Create(outputFilePath.c_str(), outImgWidth, outImgHeight, numBands, eType, NULL);
+            char **papszOptions = this->getGDALCreationOptionsForFormat(outputFormat);
+            
+            dataset = gdalDriver->Create(outputFilePath.c_str(), outImgWidth, outImgHeight, numBands, eType, papszOptions);
             if(dataset == NULL)
             {
                 delete[] gdalTranslation;
@@ -5224,7 +5189,9 @@ namespace rsgis{namespace img{
                 std::string message = std::string("Driver for ") + outputFormat + std::string(" does not exist\n");
                 throw RSGISImageException(message.c_str());
             }
-            dataset = gdalDriver->Create(outputFilePath.c_str(), width, height, numBands, eType, NULL);
+            char **papszOptions = this->getGDALCreationOptionsForFormat(outputFormat);
+            
+            dataset = gdalDriver->Create(outputFilePath.c_str(), width, height, numBands, eType, papszOptions);
             if(dataset == NULL)
             {
                 delete[] gdalTranslation;
@@ -5648,6 +5615,60 @@ namespace rsgis{namespace img{
         {
             throw e;
         }
+    }
+
+    std::map<std::string, std::string> RSGISImageUtils::getCreateGDALImgEnvVars(std::string gdalFormat)
+    {
+        std::map<std::string, std::string> gdal_creation_opts;
+        std::string var_name = "RSGISLIB_IMG_CRT_OPTS_" + boost::to_upper_copy(gdalFormat);
+        if(const char* env_p = std::getenv(var_name.c_str()))
+        {
+            std::string in_env_var = std::string(env_p);
+            std::vector<std::string> *img_vars = new std::vector<std::string>();
+            std::vector<std::string> *tmp_var = new std::vector<std::string>();
+            rsgis::utils::RSGISTextUtils textUtils;
+            textUtils.tokenizeString(in_env_var, ':', img_vars);
+            for(std::vector<std::string>::iterator iterImgVars = img_vars->begin(); iterImgVars != img_vars->end(); ++iterImgVars )
+            {
+                tmp_var->clear();
+                textUtils.tokenizeString((*iterImgVars), '=', tmp_var);
+                if(tmp_var->size() != 2)
+                {
+                    std::string mess = std::string("Could not parse GDAL Image Creation Options (Variable: '") + var_name + std::string("'. Error: Should have two components split with '='. Recieved: '") + (*iterImgVars) + std::string("'");
+                    delete img_vars;
+                    delete tmp_var;
+                    throw rsgis::RSGISImageException(mess);
+                }
+                if(gdal_creation_opts.insert(std::make_pair(tmp_var->at(0), tmp_var->at(1))).second == false)
+                {
+                    std::string mess = std::string("Key was duplicated, check your input for '") + var_name + std::string("'. Duplicated Key: '") + (*iterImgVars)  + std::string("'");
+                    delete img_vars;
+                    delete tmp_var;
+                    throw rsgis::RSGISImageException(mess);
+                }
+            }
+            
+            delete img_vars;
+            delete tmp_var;
+        }
+        return gdal_creation_opts;
+    }
+
+    char** RSGISImageUtils::getGDALCreationOptions(std::map<std::string, std::string> gdal_creation_options)
+    {
+        char **papszOptions=NULL;
+        for(std::map<std::string, std::string>::iterator iterOpts = gdal_creation_options.begin(); iterOpts != gdal_creation_options.end(); ++iterOpts)
+        {
+            papszOptions = CSLSetNameValue(papszOptions, (iterOpts->first).c_str(), (iterOpts->second).c_str());
+        }
+        return papszOptions;
+    }
+
+    char** RSGISImageUtils::getGDALCreationOptionsForFormat(std::string gdalFormat)
+    {
+        std::map<std::string, std::string> gdal_creation_options = this->getCreateGDALImgEnvVars(gdalFormat);
+        char **papszOptions = this->getGDALCreationOptions(gdal_creation_options);
+        return papszOptions;
     }
 
 	RSGISImageUtils::~RSGISImageUtils()

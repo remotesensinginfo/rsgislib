@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 This namespace contains rsgislib Python bindings 
 
@@ -92,6 +93,7 @@ import os
 import time
 import datetime
 import math
+import sys
 
 import osgeo.osr as osr
 import osgeo.ogr as ogr
@@ -187,14 +189,12 @@ class RSGISPyException(Exception):
     def __init__(self, value):
         """
         Init for the RSGISPyException class
-
         """
         self.value = value
         
     def __str__(self):
         """
         Return a string representation of the exception
-
         """
         return repr(self.value)
 
@@ -250,7 +250,53 @@ class RSGISPyUtils (object):
             raise RSGISPyException('Type not recognised')
         
         return gdalStr
-    
+
+    def get_file_basename(self, filepath, checkvalid=False, n_comps=0):
+        """
+        Uses os.path module to return file basename (i.e., path and extension removed)
+        :param filepath: string for the input file name and path
+        :param checkvalid: if True then resulting basename will be checked for punctuation
+                            characters (other than underscores) and spaces, punctuation
+                            will be either removed and spaces changed to an underscore.
+                           (Default = False)
+        :param n_comps: if > 0 then the resulting basename will be split using underscores
+                        and the return based name will be defined using the n_comps
+                        components split by under scores.
+        :return: basename for file
+        """
+        import string
+        basename = os.path.splitext(os.path.basename(filepath))[0]
+        if checkvalid:
+            basename = basename.replace(' ', '_')
+            for punct in string.punctuation:
+                if (punct != '_') and (punct != '-'):
+                    basename = basename.replace(punct, '')
+        if n_comps > 0:
+            basename_split = basename.split('_')
+            if len(basename_split) < n_comps:
+                raise RSGISPyException(
+                    "The number of components specified is more than the number of components in the basename.")
+            out_basename = ""
+            for i in range(n_comps):
+                if i == 0:
+                    out_basename = basename_split[i]
+                else:
+                    out_basename = out_basename + '_' + basename_split[i]
+            basename = out_basename
+        return basename
+
+    def get_dir_name(self, in_file):
+        """
+        A function which returns just the name of the directory of the input file without the rest of the path.
+
+        :param in_file: string for the input file name and path
+        :return: directory name
+        """
+        in_file = os.path.abspath(in_file)
+        dir_path = os.path.dirname(in_file)
+        dir_name = os.path.basename(dir_path)
+        return dir_name
+
     def getRSGISLibDataTypeFromImg(self, inImg):
         """
         Returns the rsgislib datatype ENUM (e.g., rsgislib.TYPE_8INT) 
@@ -371,6 +417,30 @@ class RSGISPyUtils (object):
             return TYPE_64FLOAT
         else:
             raise RSGISPyException("The data type '" + str(gdaltype) + "' is unknown / not supported.")
+
+    def getGDALDataType(self, rsgislib_datatype):
+        """
+        Convert from RSGIS data type to GDAL data type int.
+
+        :return: int
+
+        """
+        if rsgislib_datatype == TYPE_16INT:
+            return gdal.GDT_Int16
+        elif rsgislib_datatype == TYPE_32INT:
+            return gdal.GDT_Int32
+        elif rsgislib_datatype == TYPE_8UINT:
+            return gdal.GDT_Byte
+        elif rsgislib_datatype == TYPE_16UINT:
+            return gdal.GDT_UInt16
+        elif rsgislib_datatype == TYPE_32UINT:
+            return gdal.GDT_UInt32
+        elif rsgislib_datatype == TYPE_32FLOAT:
+            return gdal.GDT_Float32
+        elif rsgislib_datatype == TYPE_64FLOAT:
+            return gdal.GDT_Float64
+        else:
+            raise RSGISPyException("The data type '" + str(rsgislib_datatype) + "' is unknown / not supported.")
 
     def getNumpyDataType(self, rsgislib_datatype):
         """
@@ -543,6 +613,88 @@ class RSGISPyUtils (object):
             maxY = out_trY
 
         return [minX, maxX, minY, maxY]
+
+    def reprojBBOX_epsg(self, bbox, inEPSG, outEPSG):
+        """
+        A function to reproject a bounding box.
+        :param bbox: input bounding box (MinX, MaxX, MinY, MaxY)
+        :param inEPSG: an EPSG code representing input projection.
+        :param outEPSG: an EPSG code representing output projection.
+
+        :return: (MinX, MaxX, MinY, MaxY)
+
+        """
+        inProjObj = osr.SpatialReference()
+        inProjObj.ImportFromEPSG(int(inEPSG))
+
+        outProjObj = osr.SpatialReference()
+        outProjObj.ImportFromEPSG(int(outEPSG))
+
+        out_bbox = self.reprojBBOX(bbox, inProjObj, outProjObj)
+        return out_bbox
+
+    def do_bboxes_intersect(self, bbox1, bbox2):
+        """
+        A function which tests whether two bboxes (MinX, MaxX, MinY, MaxY) intersect.
+
+        :param bbox1: The first bounding box (MinX, MaxX, MinY, MaxY)
+        :param bbox2: The first bounding box (MinX, MaxX, MinY, MaxY)
+
+        :return: boolean (True they intersect; False they do not intersect)
+        """
+        x_min = 0
+        x_max = 1
+        y_min = 2
+        y_max = 3
+        intersect = ((bbox1[x_max] > bbox2[x_min]) and (bbox2[x_max] > bbox1[x_min]) and (
+                    bbox1[y_max] > bbox2[y_min]) and (bbox2[y_max] > bbox1[y_min]))
+        return intersect
+
+    def bbox_intersection(self, bbox1, bbox2):
+        """
+        A function which calculates the intersection of the two bboxes (xMin, xMax, yMin, yMax).
+
+        :param bbox1: is a bbox (xMin, xMax, yMin, yMax)
+        :param bbox2: is a bbox (xMin, xMax, yMin, yMax)
+
+        :return: bbox (xMin, xMax, yMin, yMax)
+
+        """
+        if not self.do_bboxes_intersect(bbox1, bbox2):
+            raise Exception("Bounding Boxes do not intersect.")
+
+        xMinOverlap = bbox1[0]
+        xMaxOverlap = bbox1[1]
+        yMinOverlap = bbox1[2]
+        yMaxOverlap = bbox1[3]
+
+        if bbox2[0] > xMinOverlap:
+            xMinOverlap = bbox2[0]
+
+        if bbox2[1] < xMaxOverlap:
+            xMaxOverlap = bbox2[1]
+
+        if bbox2[2] > yMinOverlap:
+            yMinOverlap = bbox2[2]
+
+        if bbox2[3] < yMaxOverlap:
+            yMaxOverlap = bbox2[3]
+
+        return [xMinOverlap, xMaxOverlap, yMinOverlap, yMaxOverlap]
+
+    def buffer_bbox(self, bbox, buf):
+        """
+        Buffer the input BBOX by a set amount.
+        :param bbox: the bounding box (MinX, MaxX, MinY, MaxY)
+        :param buf: the amount of buffer by
+        :return: return the buffered bbox (MinX, MaxX, MinY, MaxY)
+        """
+        out_bbox = [0, 0, 0, 0]
+        out_bbox[0] = bbox[0] - buf
+        out_bbox[1] = bbox[1] + buf
+        out_bbox[2] = bbox[2] - buf
+        out_bbox[3] = bbox[3] + buf
+        return out_bbox
         
     def getVecLayerExtent(self, inVec, layerName=None, computeIfExp=True):
         """
@@ -790,11 +942,13 @@ class RSGISPyUtils (object):
         :return: x, y. (note if returning long, lat you might need to invert)
 
         """
-        wktPt = 'POINT(%s %s)' % (x, y)
+        if inProjOSRObj.EPSGTreatsAsLatLong():
+            wktPt = 'POINT(%s %s)' % (y, x)
+        else:
+            wktPt = 'POINT(%s %s)' % (x, y)
         point = ogr.CreateGeometryFromWkt(wktPt)
         point.AssignSpatialReference(inProjOSRObj)
         point.TransformTo(outProjOSRObj)
-
         if outProjOSRObj.EPSGTreatsAsLatLong():
             outX = point.GetY()
             outY = point.GetX()
@@ -1025,7 +1179,7 @@ class RSGISPyUtils (object):
             epsgCode = spatRef.GetAuthorityCode(None)
         except Exception:
             epsgCode = None
-        return epsgCode
+        return int(epsgCode)
         
     def doGDALLayersHaveSameProj(self, layer1, layer2):
         """
@@ -1130,6 +1284,7 @@ class RSGISPyUtils (object):
         """
         A function which will generate a 'random' string of the specified length based on the UUID
 
+        :param size: the length of the returned string.
         :return: string of length size.
 
         """
@@ -1183,6 +1338,7 @@ class RSGISPyUtils (object):
         Read a text file into a single string
         removing new lines.
 
+        :param file: File path to the input file.
         :return: string
 
         """
@@ -1201,6 +1357,7 @@ class RSGISPyUtils (object):
         Read a text file into a list where each line 
         is an element in the list.
 
+        :param file: File path to the input file.
         :return: list
 
         """
@@ -1220,11 +1377,31 @@ class RSGISPyUtils (object):
         """
         Write a list a text file, one line per item.
 
+        :param dataList: List of values to be written to the output file.
+        :param out_file: File path to the output file.
+
         """
         try:
             f = open(outFile, 'w')
             for item in dataList:
                f.write(str(item)+'\n')
+            f.flush()
+            f.close()
+        except Exception as e:
+            raise e
+
+    def writeData2File(self, data_val, out_file):
+        """
+        Write some data (a string or can be converted to a string using str(data_val) to
+        an output text file.
+
+        :param data_val: Data to be written to the output file.
+        :param out_file: File path to the output file.
+
+        """
+        try:
+            f = open(out_file, 'w')
+            f.write(str(data_val)+'\n')
             f.flush()
             f.close()
         except Exception as e:
@@ -1430,4 +1607,43 @@ class RSGISTime (object):
             else:
                 print('Algorithm Completed in %s.'%(timeDiffStr))
         
+class TQDMProgressBar(object):
+    """
+    Uses TQDM TermProgress to print a progress bar to the terminal
+    """
+    def __init__(self):
+        self.lprogress = 0
 
+    def setTotalSteps(self,steps):
+        import tqdm
+        self.pbar = tqdm.tqdm(total=steps)
+        self.lprogress = 0
+
+    def setProgress(self, progress):
+        step = progress - self.lprogress
+        self.pbar.update(step)
+        self.lprogress = progress
+
+    def reset(self):
+        self.pbar.close()
+        import tqdm
+        self.pbar = tqdm.tqdm(total=100)
+        self.lprogress = 0
+
+    def setLabelText(self,text):
+        sys.stdout.write('\n%s\n' % text)
+
+    def wasCancelled(self):
+        return False
+
+    def displayException(self,trace):
+        sys.stdout.write(trace)
+
+    def displayWarning(self,text):
+        sys.stdout.write("Warning: %s\n" % text)
+
+    def displayError(self,text):
+        sys.stdout.write("Error: %s\n" % text)
+
+    def displayInfo(self,text):
+        sys.stdout.write("Info: %s\n" % text)

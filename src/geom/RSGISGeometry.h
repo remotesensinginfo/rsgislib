@@ -18,6 +18,8 @@
 #include <list>
 #include <algorithm>
 
+#include "common/rsgis-tqdm.h"
+
 #include "geom/RSGISGeometryException.h"
 #include "geom/RSGIS2DPoint.h"
 #include "geom/RSGISPolygon.h"

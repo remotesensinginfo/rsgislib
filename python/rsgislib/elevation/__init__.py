@@ -1,12 +1,10 @@
+#!/usr/bin/env python
 """
 The elevation module contains functions for performing analysis on elevation data.
 """
 
 # import the C++ extension into this level
 from ._elevation import *
-
-
-
 
 def fftDEMFusion(highResDEMImg, lowResDEMImg, fusedDEMImg, cSize=20):
     """

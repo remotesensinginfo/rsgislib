@@ -39,6 +39,8 @@
 #include "geos/geom/Polygon.h"
 #include "geos/geom/LineSegment.h"
 
+#include "common/rsgis-tqdm.h"
+
 #include "utils/RSGISGEOSFactoryGenerator.h"
 
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>

@@ -29,6 +29,7 @@
 #include <stdlib.h>
 
 #include "common/RSGISAttributeTableException.h"
+#include "common/rsgis-tqdm.h"
 
 #include "img/RSGISImageUtils.h"
 #include "img/RSGISImageCalcException.h"

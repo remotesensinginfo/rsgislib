@@ -34,7 +34,10 @@
 #include "gdal_priv.h"
 #include "ogrsf_frmts.h"
 
+#include "common/rsgis-tqdm.h"
 #include "common/RSGISRegistrationException.h"
+
+#include "img/RSGISImageUtils.h"
 
 #include "registration/RSGISImageRegistration.h"
 
