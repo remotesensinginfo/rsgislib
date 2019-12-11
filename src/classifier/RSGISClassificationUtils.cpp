@@ -395,16 +395,10 @@ namespace rsgis{ namespace classifier{
             unsigned int *outData = new unsigned int[width];
             bool notSingle = false;
             
-            int feedback = height/10;
-            int feedbackCounter = 0;
-            std::cout << "Started" << std::flush;
+            rsgis_tqdm pbar;
             for(unsigned int i = 0; i < height; ++i)
             {
-                if((i % feedback) == 0)
-                {
-                    std::cout << "." << feedbackCounter << "." << std::flush;
-                    feedbackCounter = feedbackCounter + 10;
-                }
+                pbar.progress(i, height);
                 if(i == 0)
                 {
                     clumpBand->RasterIO(GF_Read, 0, i, width, 1, inData[1], width, 1, GDT_UInt32, 0, 0);
@@ -634,7 +628,7 @@ namespace rsgis{ namespace classifier{
                 
                 tmpBand->RasterIO(GF_Write, 0, i, width, 1, outData, width, 1, GDT_UInt32, 0, 0);
             }
-            std::cout << ". Complete\n";
+            pbar.finish();
             
             delete[] inData[0];
             delete[] inData[1];
@@ -676,16 +670,10 @@ namespace rsgis{ namespace classifier{
             
             unsigned int *outData = new unsigned int[width];
             
-            int feedback = height/10;
-            int feedbackCounter = 0;
-            std::cout << "Started" << std::flush;
+            rsgis_tqdm pbar;
             for(unsigned int i = 0; i < height; ++i)
             {
-                if((i % feedback) == 0)
-                {
-                    std::cout << "." << feedbackCounter << "." << std::flush;
-                    feedbackCounter = feedbackCounter + 10;
-                }
+                pbar.progress(i, height);
                 if(i == 0)
                 {
                     clumpBand->RasterIO(GF_Read, 0, i, width, 1, inData[1], width, 1, GDT_UInt32, 0, 0);
@@ -1013,7 +1001,7 @@ namespace rsgis{ namespace classifier{
                 
                 outBand->RasterIO(GF_Write, 0, i, width, 1, outData, width, 1, GDT_UInt32, 0, 0);
             }
-            std::cout << ". Complete\n";
+            pbar.finish();
             
             delete sortedList;
             delete[] inData[0];
@@ -1051,16 +1039,10 @@ namespace rsgis{ namespace classifier{
             unsigned int *outData = new unsigned int[width];
             bool notSingle = false;
             
-            int feedback = height/10;
-            int feedbackCounter = 0;
-            std::cout << "Started" << std::flush;
+            rsgis_tqdm pbar;
             for(unsigned int i = 0; i < height; ++i)
             {
-                if((i % feedback) == 0)
-                {
-                    std::cout << "." << feedbackCounter << "." << std::flush;
-                    feedbackCounter = feedbackCounter + 10;
-                }
+                pbar.progress(i, height);
                 if(i == 0)
                 {
                     clumpBand->RasterIO(GF_Read, 0, i, width, 1, inData[1], width, 1, GDT_UInt32, 0, 0);
@@ -1370,7 +1352,7 @@ namespace rsgis{ namespace classifier{
                 
                 tmpBand->RasterIO(GF_Write, 0, i, width, 1, outData, width, 1, GDT_UInt32, 0, 0);
             }
-            std::cout << ". Complete\n";
+            pbar.finish();
             
             delete[] inData[0];
             delete[] inData[1];
@@ -1412,16 +1394,10 @@ namespace rsgis{ namespace classifier{
             
             unsigned int *outData = new unsigned int[width];
             
-            int feedback = height/10;
-            int feedbackCounter = 0;
-            std::cout << "Started" << std::flush;
+            rsgis_tqdm pbar;
             for(unsigned int i = 0; i < height; ++i)
             {
-                if((i % feedback) == 0)
-                {
-                    std::cout << "." << feedbackCounter << "." << std::flush;
-                    feedbackCounter = feedbackCounter + 10;
-                }
+                pbar.progress(i, height);
                 if(i == 0)
                 {
                     clumpBand->RasterIO(GF_Read, 0, i, width, 1, inData[1], width, 1, GDT_UInt32, 0, 0);
@@ -1829,7 +1805,7 @@ namespace rsgis{ namespace classifier{
                 
                 outBand->RasterIO(GF_Write, 0, i, width, 1, outData, width, 1, GDT_UInt32, 0, 0);
             }
-            std::cout << ". Complete\n";
+            pbar.finish();
             
             delete sortedList;
             delete[] inData[0];

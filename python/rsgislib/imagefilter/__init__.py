@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 Contains image filtering functionality for rsgislib
 """

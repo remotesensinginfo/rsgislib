@@ -148,8 +148,8 @@ namespace rsgis{namespace reg{
     
     void RSGISAddGCPsGDAL::copyImageWithoutSpatialRef(std::string inFileName, std::string outFileName, std::string gdalFormat, GDALDataType gdalDataType)
     {
-        
         GDALAllRegister();
+        rsgis::img::RSGISImageUtils imgUtils;
 
 		int height = 0;
 		int width = 0;
@@ -176,8 +176,8 @@ namespace rsgis{namespace reg{
 			{
 				throw RSGISImageWarpException("Requested GDAL driver does not exists..");
 			}
-			
-			outputImageDS = gdalDriver->Create(outFileName.c_str(), width, height,numInBands, gdalDataType, NULL);
+			char **papszOptions = imgUtils.getGDALCreationOptionsForFormat(gdalFormat);
+			outputImageDS = gdalDriver->Create(outFileName.c_str(), width, height,numInBands, gdalDataType, papszOptions);
 			
 			if(outputImageDS == NULL)
 			{
@@ -218,22 +218,11 @@ namespace rsgis{namespace reg{
             int remainRows = height - (nYBlocks * yBlockSize);
             int rowOffset = 0;
             
-			int feedback = height/10.0;
-			int feedbackCounter = 0;
-            bool provideFeedback = false;
-            
-            // Only provide feedback if more than 10 blocks
-            if(nYBlocks > 10){provideFeedback = true;}
-            
-			if(provideFeedback){std::cout << "Started" << std::flush;}
+            rsgis_tqdm pbar;
 			// Loop images to process data
 			for(int i = 0; i < nYBlocks; i++)
 			{
-                if((provideFeedback) && (feedback != 0) && (i*yBlockSize > feedback*feedbackCounter) )
-                {
-                    std::cout << "." << feedbackCounter*10 << "." << std::flush;
-                    ++feedbackCounter;
-                }
+                pbar.progress(i, nYBlocks);
 				for(int n = 0; n < numInBands; n++)
 				{
                     rowOffset = yBlockSize * i;
@@ -245,6 +234,7 @@ namespace rsgis{namespace reg{
             
             if(remainRows > 0)
             {
+                pbar.progress(nYBlocks, nYBlocks);
                 for(int n = 0; n < numInBands; n++)
 				{
                     rowOffset = yBlockSize * nYBlocks;
@@ -253,7 +243,7 @@ namespace rsgis{namespace reg{
 				}
                 
             }
-			if(provideFeedback){std::cout << " Complete.\n";}
+			pbar.finish();
 		}
 		catch(RSGISImageWarpException& e)
 		{

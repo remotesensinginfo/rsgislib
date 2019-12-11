@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 The histocube module provides histogram cube functionality within RSGISLib.
 

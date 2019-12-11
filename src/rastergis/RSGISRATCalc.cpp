@@ -158,10 +158,7 @@ namespace rsgis{namespace rastergis{
                 }
             }
             
-            int feedback = nRows/10.0;
-            int feedbackCounter = 0;
-            
-            std::cout << "Started " << std::flush;
+            rsgis_tqdm pbar;
             size_t startRow = 0;
             size_t rowID = 0;
             for(int i = 0; i < nBlocks; i++)
@@ -186,11 +183,8 @@ namespace rsgis{namespace rastergis{
                 for(int j = 0; j < RAT_BLOCK_LENGTH; ++j)
                 {
                     // Show progress
-                    if((feedback != 0) && ((rowID % feedback) == 0))
-                    {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
-                    }
+                    pbar.progress(rowID, nRows);
+                    
                     for(unsigned int n = 0; n < numInRealCols; ++n)
                     {
                         dCalcInVals[n] = inRealData[n][j];
@@ -280,11 +274,8 @@ namespace rsgis{namespace rastergis{
                 for(int j = 0; j < remainRows; ++j)
                 {
                     // Show progress
-                    if((feedback != 0) && ((rowID % feedback) == 0))
-                    {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
-                    }
+                    pbar.progress(rowID, nRows);
+                    
                     for(unsigned int n = 0; n < numInRealCols; ++n)
                     {
                         dCalcInVals[n] = inRealData[n][j];
@@ -338,7 +329,7 @@ namespace rsgis{namespace rastergis{
                     gdalRAT->ValuesIO(GF_Write, outStrColIdx[n], startRow, remainRows, outStrData[n]);
                 }
             }
-            std::cout << ".Completed\n";
+            pbar.finish();
             
             // Clean out and release memory...
             if(numInRealCols > 0)

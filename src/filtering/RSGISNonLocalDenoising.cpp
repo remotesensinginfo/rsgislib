@@ -100,9 +100,10 @@ namespace rsgis{namespace filter{
 			{
 				throw rsgis::img::RSGISImageBandException("Driver does not exists..");
 			}
+            char **papszOptions = imgUtils.getGDALCreationOptionsForFormat(gdalFormat);
 			std::cout << "New image width = " << width << " height = " << height << " bands = " << numOutBands << std::endl;
             
-			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, numOutBands, gdalDataType, NULL);
+			outputImageDS = gdalDriver->Create(outputImage.c_str(), width, height, numOutBands, gdalDataType, papszOptions);
 			
 			if(outputImageDS == NULL)
 			{

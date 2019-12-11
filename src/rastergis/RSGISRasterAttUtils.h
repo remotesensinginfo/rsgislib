@@ -40,6 +40,7 @@
 
 #include "libkea/KEAImageIO.h"
 
+#include "common/rsgis-tqdm.h"
 #include "common/RSGISAttributeTableException.h"
 
 #include "utils/RSGISColour.h"
@@ -68,6 +69,17 @@ namespace rsgis{namespace rastergis{
     
     inline int RSGISRATStatsTextProgress( double dfComplete, const char *pszMessage, void *pData)
     {
+        rsgis_tqdm *pbar = reinterpret_cast<rsgis_tqdm *>( pData );
+        int nPercent = int(dfComplete*100);
+        if(nPercent >= 100)
+        {
+            pbar->finish();
+        }
+        else
+        {
+            pbar->progress(nPercent, 100);
+        }
+        /*
         int nPercent = int(dfComplete*100);
         int *pnLastComplete = (int*)pData;
         
@@ -133,7 +145,7 @@ namespace rsgis{namespace rastergis{
         }
         
         *pnLastComplete = nPercent;
-        
+        */
         return true;
     };
     

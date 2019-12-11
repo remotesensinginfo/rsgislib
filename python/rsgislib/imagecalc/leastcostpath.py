@@ -1,9 +1,4 @@
 #!/usr/bin/env python
-
-"""
-Utility for calculating the least cost path across a raster.
-
-"""
 ############################################################################
 #  leastcostpath.py
 #

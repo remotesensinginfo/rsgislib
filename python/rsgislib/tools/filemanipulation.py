@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 The tools.filemanipulation module contains functions for manipulating and moving files around.
 """

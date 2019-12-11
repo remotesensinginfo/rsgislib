@@ -28,6 +28,8 @@
 
 #include "gdal_priv.h"
 
+#include "common/rsgis-tqdm.h"
+
 #include "img/RSGISImageBandException.h"
 #include "img/RSGISImageCalcException.h"
 #include "img/RSGISImageUtils.h"

@@ -28,6 +28,7 @@
 
 #include "gdal_priv.h"
 
+#include "common/rsgis-tqdm.h"
 #include "common/RSGISFileException.h"
 #include "common/RSGISImageException.h"
 

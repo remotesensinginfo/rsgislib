@@ -32,6 +32,7 @@
 
 #include "ogrsf_frmts.h"
 
+#include "common/rsgis-tqdm.h"
 #include "common/RSGISVectorException.h"
 
 // mark all exported classes/functions with DllExport to have

@@ -121,17 +121,11 @@ namespace rsgis{namespace calib{
             long hcrt = minVal;
             long imgVal = 0;
             long img2Val = 0;
-            int feedback = numLevels/10.0;
-            int feedbackCounter = 0;
             std::cout << "Perform Fill:\n";
-            std::cout << "Started ." << std::flush;
+            rsgis_tqdm pbar;
             for(long n = 0; n < numLevels; ++n)
             {
-                if((feedback != 0) && ((n % feedback) == 0))
-                {
-                    std::cout << "." << feedbackCounter << "." << std::flush;
-                    feedbackCounter = feedbackCounter + 10;
-                }
+                pbar.progress(n, numLevels);
 
                 while(!this->qEmpty(hcrt))
                 {
@@ -160,7 +154,7 @@ namespace rsgis{namespace calib{
                 
                 ++hcrt;
             }
-            std::cout << ". Complete.\n";
+            pbar.finish();
             
             for(long n = 0; n < numLevels; ++n)
             {

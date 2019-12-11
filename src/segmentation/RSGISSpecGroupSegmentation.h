@@ -31,6 +31,8 @@
 
 #include "gdal_priv.h"
 
+#include "common/rsgis-tqdm.h"
+
 #include "img/RSGISImageUtils.h"
 #include "img/RSGISImageCalcException.h"
 

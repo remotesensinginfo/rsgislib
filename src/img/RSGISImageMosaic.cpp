@@ -118,8 +118,6 @@ namespace rsgis{namespace img{
             int yBlockSize = 0;
             outputRasterBands[0]->GetBlockSize (&xBlockSize, &yBlockSize);
 
-            std::cout << "Max. block size: " << yBlockSize << std::endl;
-
 			std::cout << "Started (total " << numDS << ") ." << std::flush;
 
             for(int ds = 0; ds < numDS; ds++)
@@ -335,8 +333,6 @@ namespace rsgis{namespace img{
             int xBlockSize = 0;
             int yBlockSize = 0;
             outputRasterBands[0]->GetBlockSize (&xBlockSize, &yBlockSize);
-
-            std::cout << "Max. block size: " << yBlockSize << std::endl;
 
 			std::cout << "Started (total " << numDS << ") ." << std::flush;
 
@@ -710,8 +706,6 @@ namespace rsgis{namespace img{
             int xBlockSize = 0;
             int yBlockSize = 0;
             outputRasterBands[0]->GetBlockSize (&xBlockSize, &yBlockSize);
-
-            std::cout << "Max. block size: " << yBlockSize << std::endl;
 
 			std::cout << "Started (total " << numDS << ") ." << std::flush;
 
@@ -1117,8 +1111,6 @@ namespace rsgis{namespace img{
             int yBlockSize = 0;
             outputBand[0]->GetBlockSize (&xBlockSize, &yBlockSize);
 
-            std::cout << "Max. block size: " << yBlockSize << std::endl;
-
 			std::cout << "Started (total " << numDS << ") ." << std::flush;
 
 			for(int i = 0; i < numDS; i++)
@@ -1365,9 +1357,7 @@ namespace rsgis{namespace img{
             int xBlockSize = 0;
             int yBlockSize = 0;
             outputBand[0]->GetBlockSize (&xBlockSize, &yBlockSize);
-            
-            std::cout << "Max. block size: " << yBlockSize << std::endl;
-            
+                        
             std::cout << "Started (total " << numDS << ") ." << std::flush;
             
             for(int i = 0; i < numDS; i++)
@@ -1648,9 +1638,7 @@ namespace rsgis{namespace img{
             int xBlockSize = 0;
             int yBlockSize = 0;
             outputBand[0]->GetBlockSize (&xBlockSize, &yBlockSize);
-            
-            std::cout << "Max. block size: " << yBlockSize << std::endl;
-            
+                        
             std::cout << "Started (total " << numDS << ") ." << std::flush;
             
             for(int i = 0; i < numDS; i++)

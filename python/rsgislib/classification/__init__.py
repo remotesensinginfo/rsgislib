@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 The classification module provides classification functionality within RSGISLib.
 """

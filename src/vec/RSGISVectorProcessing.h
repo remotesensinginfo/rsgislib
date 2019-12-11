@@ -29,6 +29,8 @@
 #include "ogrsf_frmts.h"
 #include "math.h"
 
+#include "common/rsgis-tqdm.h"
+
 #include "vec/RSGISPolygonData.h"
 #include "vec/RSGISPointData.h"
 #include "vec/RSGISCirclePoint.h"

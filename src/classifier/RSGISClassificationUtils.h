@@ -30,6 +30,7 @@
 #include <vector>
 
 #include "common/RSGISClassificationException.h"
+#include "common/rsgis-tqdm.h"
 
 #include "utils/RSGIS_ENVI_ASCII_ROI.h"
 

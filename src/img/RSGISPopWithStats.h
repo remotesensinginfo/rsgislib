@@ -38,6 +38,8 @@
 #include "gdal_rat.h"
 #include "cpl_string.h"
 
+#include "common/rsgis-tqdm.h"
+
 #include "common/RSGISImageException.h"
 
 #include "img/RSGISImageCalcException.h"
@@ -62,9 +64,20 @@
 
 namespace rsgis { namespace img {
     
-    inline int StatsTextProgress( double dfComplete, const char *pszMessage, void *pData)
+    inline int RSGISTQDMProgress( double dfComplete, const char *pszMessage, void *pData)
     {
+        rsgis_tqdm *pbar = reinterpret_cast<rsgis_tqdm *>( pData );
         int nPercent = int(dfComplete*100);
+        if(nPercent >= 100)
+        {
+            pbar->finish();
+        }
+        else
+        {
+            pbar->progress(nPercent, 100);
+        }
+        /*
+        
         int *pnLastComplete = (int*)pData;
         
         if(nPercent < 10)
@@ -129,7 +142,7 @@ namespace rsgis { namespace img {
         }
         
         *pnLastComplete = nPercent;
-        
+        */
         return true;
     };
     

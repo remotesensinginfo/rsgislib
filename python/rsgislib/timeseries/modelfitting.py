@@ -1,5 +1,4 @@
 #! /usr/bin/env python
-
 ############################################################################
 #  modelfitting.py
 #
@@ -38,6 +37,8 @@
 import sys
 import json
 from datetime import datetime
+
+import rsgislib
 
 import numpy
 
@@ -294,7 +295,12 @@ of blocks and use of multiprocessing is all handled by RIOS.
     app.setOutputDriverName(gdalformat)
     
     # Set progress
-    app.progress = cuiprogress.CUIProgressBar()
+    try:
+        import tqdm
+        progress_bar = rsgislib.TQDMProgressBar()
+    except:
+        progress_bar = cuiprogress.GDALProgressBar()
+    app.progress = progress_bar
 
     # Set that pyramids and statistics are not calculated.
     app.omitPyramids = True
@@ -412,7 +418,12 @@ all handled by RIOS.
     app.setOutputDriverName(gdalformat)
     
     # Set progress
-    app.progress = cuiprogress.CUIProgressBar()
+    try:
+        import tqdm
+        progress_bar = rsgislib.TQDMProgressBar()
+    except:
+        progress_bar = cuiprogress.GDALProgressBar()
+    app.progress = progress_bar
 
     # Set that pyramids and statistics are not calculated.
     app.omitPyramids = True

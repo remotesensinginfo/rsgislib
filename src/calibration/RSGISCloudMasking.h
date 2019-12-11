@@ -32,6 +32,7 @@
 
 #include "geos/geom/Envelope.h"
 
+#include "common/rsgis-tqdm.h"
 #include "common/RSGISException.h"
 
 #include "img/RSGISImageCalcException.h"

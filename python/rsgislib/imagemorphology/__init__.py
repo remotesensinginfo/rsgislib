@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 The image morphology module contains functions for performing image morphology operations.
 """

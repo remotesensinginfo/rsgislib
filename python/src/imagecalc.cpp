@@ -1233,7 +1233,7 @@ static PyObject *ImageCalc_GetImageStatsInEnv(PyObject *self, PyObject *args) {
     double latMin, latMax, longMin, longMax;
     PyObject *noDataValueObj;
     
-    if(!PyArg_ParseTuple(args, "sIOdddd:getImageStatsInEnv", &inputImage, &imgBand, &noDataValueObj, &latMin, &latMax, &longMin, &longMax))
+    if(!PyArg_ParseTuple(args, "sIOdddd:getImageStatsInEnv", &inputImage, &imgBand, &noDataValueObj, &longMin, &longMax, &latMin, &latMax))
         return NULL;
     
     bool noDataValueSpecified = false;
@@ -1260,7 +1260,7 @@ static PyObject *ImageCalc_GetImageStatsInEnv(PyObject *self, PyObject *args) {
         stats->stddev = 0;
         stats->sum = 0;
         
-        rsgis::cmds::executeImageBandStatsEnv(std::string(inputImage), stats, imgBand, noDataValueSpecified, noDataValue, latMin, latMax, longMin, longMax);
+        rsgis::cmds::executeImageBandStatsEnv(std::string(inputImage), stats, imgBand, noDataValueSpecified, noDataValue, longMin, longMax, latMin, latMax);
         
         
         if(PyTuple_SetItem(outValsList, 0, Py_BuildValue("d", stats->min)) == -1)
@@ -1303,7 +1303,7 @@ static PyObject *ImageCalc_GetImageBandModeInEnv(PyObject *self, PyObject *args)
     float binWidth;
     PyObject *noDataValueObj;
     
-    if(!PyArg_ParseTuple(args, "sIfOdddd:getImageBandModeInEnv", &inputImage, &imgBand, &binWidth, &noDataValueObj, &latMin, &latMax, &longMin, &longMax))
+    if(!PyArg_ParseTuple(args, "sIfOdddd:getImageBandModeInEnv", &inputImage, &imgBand, &binWidth, &noDataValueObj, &longMin, &longMax, &latMin, &latMax))
         return NULL;
     
     bool noDataValueSpecified = false;
@@ -1322,7 +1322,7 @@ static PyObject *ImageCalc_GetImageBandModeInEnv(PyObject *self, PyObject *args)
     PyObject *outVal = PyTuple_New(1);
     try
     {
-        float modeVal = rsgis::cmds::executeImageBandModeEnv(std::string(inputImage), binWidth, imgBand, noDataValueSpecified, noDataValue, latMin, latMax, longMin, longMax);
+        float modeVal = rsgis::cmds::executeImageBandModeEnv(std::string(inputImage), binWidth, imgBand, noDataValueSpecified, noDataValue, longMin, longMax, latMin, latMax);
         
         if(PyTuple_SetItem(outVal, 0, Py_BuildValue("f", modeVal)) == -1)
         {
@@ -2775,9 +2775,9 @@ static PyMethodDef ImageCalcMethods[] = {
 "\n"},
 
 {"getImageStatsInEnv", ImageCalc_GetImageStatsInEnv, METH_VARARGS,
-"rsgislib.imagecalc.getImageStatsInEnv(inputImage, imgBand, noDataVal, latMin, latMax, longMin, longMax)\n"
+"rsgislib.imagecalc.getImageStatsInEnv(inputImage, imgBand, noDataVal, longMin, longMax, latMin, latMax)\n"
 "Calculates and returns statistics (min, max, mean, stddev, sum) for a region.\n"
-"defined by the bounding box (latMin, latMax, longMin, longMax) which is specified\n"
+"defined by the bounding box (longMin, longMax, latMin, latMax) which is specified\n"
 "geographic latitude and longitude. The coordinates are converted to the projection\n"
 "of the input image at runtime (if required) and therefore the image projection needs\n"
 "to be correctly defined so please check this is the case and define it if necessary.\n"
@@ -2787,17 +2787,17 @@ static PyMethodDef ImageCalcMethods[] = {
 ":param inputImage: is a string containing the name of the input image file\n"
 ":param imgBand: is an unsigned int specifying the image band starting from 1.\n"
 ":param noDataVal: is a float specifying a no data value, to be ignored in the calculation. If a value of \'None\' is provided then a no data value is not used.\n"
-":param latMin: is a double specifying the minimum latitude of the BBOX\n"
-":param latMax: is a double specifying the maximum latitude of the BBOX\n"
 ":param longMin: is a double specifying the minimum longitude of the BBOX\n"
 ":param longMax: is a double specifying the maximum longitude of the BBOX\n"
+":param latMin: is a double specifying the minimum latitude of the BBOX\n"
+":param latMax: is a double specifying the maximum latitude of the BBOX\n"
 "\n"
 ":return: list with 5 values (min, max, mean, stddev, sum)\n"
 "\n"
 "Example::\n"
 "\n"
 "   import rsgislib.imagecalc\n"
-"   stats = rsgislib.imagecalc.getImageStatsInEnv(\"./FinalSRTMTanzaniaDEM_30m.kea\", 1, -32767.0, -7.0, -8.0, 30.0, 31.0)\n"
+"   stats = rsgislib.imagecalc.getImageStatsInEnv(\"./FinalSRTMTanzaniaDEM_30m.kea\", 1, -32767.0, 30.0, 31.0, -7.0, -8.0)\n"
 "   print(\"Min: \", stats[0])\n"
 "   print(\"Max: \", stats[1])\n"
 "   print(\"Mean: \", stats[2])\n"
@@ -2806,9 +2806,9 @@ static PyMethodDef ImageCalcMethods[] = {
 "\n"},
     
 {"getImageBandModeInEnv", ImageCalc_GetImageBandModeInEnv, METH_VARARGS,
-"rsgislib.imagecalc.getImageBandModeInEnv(inputImage, imgBand, binWidth, noDataVal, latMin, latMax, longMin, longMax)\n"
+"rsgislib.imagecalc.getImageBandModeInEnv(inputImage, imgBand, binWidth, noDataVal, longMin, longMax, latMin, latMax)\n"
 "Calculates and returns the image mode for a region.\n"
-"defined by the bounding box (latMin, latMax, longMin, longMax) which is specified\n"
+"defined by the bounding box (longMin, longMax, latMin, latMax) which is specified\n"
 "geographic latitude and longitude. The coordinates are converted to the projection\n"
 "of the input image at runtime (if required) and therefore the image projection needs\n"
 "to be correctly defined so please check this is the case and define it if necessary.\n"
@@ -2820,10 +2820,10 @@ static PyMethodDef ImageCalcMethods[] = {
 ":param binWidth: is a float specifying the binWidth for the histogram generated to calculate the mode.\n"
 ":param noDataVal: is a float specifying a no data value, to be ignored in the calculation.\n"
 "            If a value of \'None\' is provided then a no data value is not used.\n"
-":param latMin: is a double specifying the minimum latitude of the BBOX\n"
-":param latMax: is a double specifying the maximum latitude of the BBOX\n"
 ":param longMin: is a double specifying the minimum longitude of the BBOX\n"
 ":param longMax: is a double specifying the maximum longitude of the BBOX\n"
+":param latMin: is a double specifying the minimum latitude of the BBOX\n"
+":param latMax: is a double specifying the maximum latitude of the BBOX\n"
 "\n"
 ":return: float with image mode for the region within the BBOX.\n"
 "\n"

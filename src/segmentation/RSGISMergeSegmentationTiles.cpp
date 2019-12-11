@@ -394,9 +394,7 @@ namespace rsgis{namespace segment{
             int *clumpIdVals = attUtils.readIntColumn(gdalATT, outClumpIDColName, &numRows);
             size_t fid = 0;
             
-			int feedback = height/10;
-			int feedbackCounter = 0;
-			std::cout << "Started" << std::flush;
+			rsgis_tqdm pbar;
 			// Loop images to process data
 			for(int i = 0; i < nYBlocks; i++)
 			{
@@ -409,11 +407,7 @@ namespace rsgis{namespace segment{
                 
                 for(int m = 0; m < yBlockSize; ++m)
                 {
-                    if((feedback != 0) && ((((i*yBlockSize)+m) % feedback) == 0))
-                    {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
-                    }
+                    pbar.progress((i*yBlockSize)+m, height);
                     
                     for(int j = 0; j < width; j++)
                     {
@@ -470,11 +464,7 @@ namespace rsgis{namespace segment{
                 
                 for(int m = 0; m < remainRows; ++m)
                 {
-                    if((feedback != 0) && ((((nYBlocks*yBlockSize)+m) % feedback) == 0))
-                    {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
-                    }
+                    pbar.progress((nYBlocks*yBlockSize)+m, height);
                     
                     for(int j = 0; j < width; j++)
                     {
@@ -517,7 +507,7 @@ namespace rsgis{namespace segment{
                 rowOffset = maskOffset[1] + (yBlockSize * nYBlocks);
                 maskBand->RasterIO(GF_Write, maskOffset[0], rowOffset, width, remainRows, imgMaskData, width, remainRows, GDT_UInt32, 0, 0);
             }
-            std::cout << " Complete.\n";
+            pbar.finish();
             
             CPLFree(imgInData);
             CPLFree(imgOutData);
@@ -603,9 +593,7 @@ namespace rsgis{namespace segment{
             int *posVals = attUtils.readIntColumn(gdalATT, clumpPosColName, &numRows);
             size_t fid = 0;
             
-			int feedback = height/10;
-			int feedbackCounter = 0;
-			std::cout << "Started" << std::flush;
+			rsgis_tqdm pbar;
 			// Loop images to process data
 			for(int i = 0; i < nYBlocks; i++)
 			{
@@ -616,11 +604,7 @@ namespace rsgis{namespace segment{
                 
                 for(int m = 0; m < yBlockSize; ++m)
                 {
-                    if((feedback != 0) && ((((i*yBlockSize)+m) % feedback) == 0))
-                    {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
-                    }
+                    pbar.progress((i*yBlockSize)+m, height);
                     
                     for(int j = 0; j < width; j++)
                     {
@@ -668,11 +652,7 @@ namespace rsgis{namespace segment{
                 
                 for(int m = 0; m < remainRows; ++m)
                 {
-                    if((feedback != 0) && ((((nYBlocks*yBlockSize)+m) % feedback) == 0))
-                    {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
-                    }
+                    pbar.progress((nYBlocks*yBlockSize)+m, height);
                     
                     for(int j = 0; j < width; j++)
                     {
@@ -709,7 +689,7 @@ namespace rsgis{namespace segment{
                 rowOffset = maskOffset[1] + (yBlockSize * nYBlocks);
                 maskBand->RasterIO(GF_Write, maskOffset[0], rowOffset, width, remainRows, imgMaskData, width, remainRows, GDT_UInt32, 0, 0);
             }
-            std::cout << " Complete.\n";
+            pbar.finish();
             
             CPLFree(imgInData);
             CPLFree(imgMaskData);
@@ -792,9 +772,7 @@ namespace rsgis{namespace segment{
             int *clumpIdVals = attUtils.readIntColumn(gdalATT, outClumpIDColName, &numRows);
             size_t fid = 0;
             
-			int feedback = height/10;
-			int feedbackCounter = 0;
-			std::cout << "Started" << std::flush;
+			rsgis_tqdm pbar;
 			// Loop images to process data
 			for(int i = 0; i < nYBlocks; i++)
 			{
@@ -805,11 +783,7 @@ namespace rsgis{namespace segment{
                 
                 for(int m = 0; m < yBlockSize; ++m)
                 {
-                    if((feedback != 0) && ((((i*yBlockSize)+m) % feedback) == 0))
-                    {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
-                    }
+                    pbar.progress((i*yBlockSize)+m, height);
                     
                     for(int j = 0; j < width; j++)
                     {
@@ -855,11 +829,7 @@ namespace rsgis{namespace segment{
                 
                 for(int m = 0; m < remainRows; ++m)
                 {
-                    if((feedback != 0) && ((((nYBlocks*yBlockSize)+m) % feedback) == 0))
-                    {
-                        std::cout << "." << feedbackCounter << "." << std::flush;
-                        feedbackCounter = feedbackCounter + 10;
-                    }
+                    pbar.progress((nYBlocks*yBlockSize)+m, height);
                     
                     for(int j = 0; j < width; j++)
                     {
@@ -893,7 +863,7 @@ namespace rsgis{namespace segment{
                 rowOffset = outOffset[1] + (yBlockSize * nYBlocks);
                 outputBand->RasterIO(GF_Write, outOffset[0], rowOffset, width, remainRows, imgOutData, width, remainRows, GDT_UInt32, 0, 0);
             }
-            std::cout << " Complete.\n";
+            pbar.finish();
             
             CPLFree(imgInData);
             CPLFree(imgOutData);

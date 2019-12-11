@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 The image registration module contains algorithms for generating tie points matching two image and warping images based on tie points.
 
@@ -93,12 +94,19 @@ Where:
 
     inFile = gdal.Open(inProcessImg, gdal.GA_ReadOnly)
     outFile = gdal.Open(outImg, gdal.GA_Update)
-    
+
+    try:
+        import tqdm
+        pbar = tqdm.tqdm(total=100)
+        callback = lambda *args, **kw: pbar.update()
+    except:
+        callback = gdal.TermProgress
+
     wrpOpts = None
     if useTPS:
-        wrpOpts = gdal.WarpOptions(resampleAlg=interpolationMethod, srcNodata=noDataVal, dstNodata=noDataVal, multithread=useMutliThread, tps=useTPS, callback=gdal.TermProgress)    
+        wrpOpts = gdal.WarpOptions(resampleAlg=interpolationMethod, srcNodata=noDataVal, dstNodata=noDataVal, multithread=useMutliThread, tps=useTPS, callback=callback)
     elif usePoly:
-        wrpOpts = gdal.WarpOptions(resampleAlg=interpolationMethod, srcNodata=noDataVal, dstNodata=noDataVal, multithread=useMutliThread, polynomialOrder=polyOrder, callback=gdal.TermProgress)
+        wrpOpts = gdal.WarpOptions(resampleAlg=interpolationMethod, srcNodata=noDataVal, dstNodata=noDataVal, multithread=useMutliThread, polynomialOrder=polyOrder, callback=callback)
     else:
         warpOptions = None    
     

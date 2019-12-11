@@ -58,16 +58,10 @@ namespace rsgis{namespace segment{
         
         unsigned int uiPxlVal = 0;
         
-        int feedback = height/10;
-        int feedbackCounter = 0;
-        std::cout << "Started" << std::flush;
+        rsgis_tqdm pbar;
         for(unsigned int i = 0; i < height; ++i)
         {
-            if((feedback > 0) && (i % feedback) == 0)
-            {
-                std::cout << "." << feedbackCounter << "." << std::flush;
-                feedbackCounter = feedbackCounter + 10;
-            }
+            pbar.progress(i, height);
             
             for(unsigned int j = 0; j < width; ++j)
             {
@@ -178,7 +172,8 @@ namespace rsgis{namespace segment{
                 }
             }
         }
-        std::cout << " Complete (Generated " << clumpIdx-1 << " clumps).\n";
+        pbar.finish();
+        std::cout << "(Generated " << clumpIdx-1 << " clumps).\n";
         if(clumpPxlVals != NULL)
         {
             if(clumpPxlVals->size() != (clumpIdx-1))
@@ -218,16 +213,10 @@ namespace rsgis{namespace segment{
         
         unsigned int uiPxlVal = 0;
         
-        int feedback = height/10;
-        int feedbackCounter = 0;
-        std::cout << "Started" << std::flush;
+        rsgis_tqdm pbar;
         for(unsigned int i = 0; i < height; ++i)
         {
-            if((i % feedback) == 0)
-            {
-                std::cout << "." << feedbackCounter << "." << std::flush;
-                feedbackCounter = feedbackCounter + 10;
-            }
+            pbar.progress(i, height);
             
             for(unsigned int j = 0; j < width; ++j)
             {
@@ -333,7 +322,8 @@ namespace rsgis{namespace segment{
                 }
             }
         }
-        std::cout << " Complete (Generated " << clumpIdx-1 << " clumps).\n";
+        pbar.finish();
+        std::cout << "(Generated " << clumpIdx-1 << " clumps).\n";
     }
     
     void RSGISClumpPxls::performMultiBandClump(std::vector<GDALDataset*> *catagories, std::string clumpsOutputPath, std::string outFormat, bool noDataValProvided, unsigned int noDataVal, bool addRatPxlVals) 
@@ -366,9 +356,10 @@ namespace rsgis{namespace segment{
                 
                 throw rsgis::img::RSGISImageBandException("Requested GDAL driver does not exists..");
 			}
+            char **papszOptions = imgUtils.getGDALCreationOptionsForFormat(outFormat);
 			std::cout << "New image width = " << width << " height = " << height << std::endl;
             
-            GDALDataset *clumpsDS = gdalDriver->Create(clumpsOutputPath.c_str(), width, height, 1, GDT_UInt32, NULL);
+            GDALDataset *clumpsDS = gdalDriver->Create(clumpsOutputPath.c_str(), width, height, 1, GDT_UInt32, papszOptions);
 			
 			if(clumpsDS == NULL)
 			{
@@ -421,16 +412,10 @@ namespace rsgis{namespace segment{
             unsigned int uiPxlVal = 0;
             std::vector<int*> outRATVals;
             
-            int feedback = height/10;
-            int feedbackCounter = 0;
-            std::cout << "Started" << std::flush;
+            rsgis_tqdm pbar;
             for(unsigned int i = 0; i < height; ++i)
             {
-                if((i % feedback) == 0)
-                {
-                    std::cout << "." << feedbackCounter << "." << std::flush;
-                    feedbackCounter = feedbackCounter + 10;
-                }
+                pbar.progress(i, height);
                 
                 for(unsigned int j = 0; j < width; ++j)
                 {
@@ -562,7 +547,8 @@ namespace rsgis{namespace segment{
                     }
                 }
             }
-            std::cout << " Complete (Generated " << clumpIdx-1 << " clumps).\n";
+            pbar.finish();
+            std::cout << "(Generated " << clumpIdx-1 << " clumps).\n";
             
             clumpBand->SetMetadataItem("LAYER_TYPE", "thematic");
             if(addRatPxlVals)
@@ -691,16 +677,10 @@ namespace rsgis{namespace segment{
         
         unsigned long maxClumpIdx = 0;
         
-        unsigned int feedback = height/10;
-        unsigned int feedbackCounter = 0;
-        std::cout << "Started ." << std::flush;
+        rsgis_tqdm pbar;
         for(unsigned int i = 0; i < height; ++i)
         {
-            if((i % feedback) == 0)
-            {
-                std::cout << "." << feedbackCounter << "." << std::flush;
-                feedbackCounter += 10;
-            }
+            pbar.progress(i, height);
             catagoryBand->RasterIO(GF_Read, 0, i, width, 1, clumpIdxs, width, 1, GDT_UInt32, 0, 0);
             for(unsigned int j = 0; j < width; ++j)
             {
@@ -714,7 +694,7 @@ namespace rsgis{namespace segment{
                 }
             }
         }
-        std::cout << ". Complete\n";
+        pbar.finish();
         std::vector<unsigned int> clumpTable;
         clumpTable.reserve(maxClumpIdx);
         
@@ -723,15 +703,10 @@ namespace rsgis{namespace segment{
             clumpTable.push_back(0);
         }
         
-         feedbackCounter = 0;
-        std::cout << "Started ." << std::flush;
+        pbar.reset();
         for(unsigned int i = 0; i < height; ++i)
         {
-            if((i % feedback) == 0)
-            {
-                std::cout << "." << feedbackCounter << "." << std::flush;
-                feedbackCounter += 10;
-            }
+            pbar.progress(i, height);
             catagoryBand->RasterIO(GF_Read, 0, i, width, 1, clumpIdxs, width, 1, GDT_UInt32, 0, 0);
             for(unsigned int j = 0; j < width; ++j)
             {
@@ -741,7 +716,7 @@ namespace rsgis{namespace segment{
                 }
             }
         }
-        std::cout << ". Complete\n";
+        pbar.finish();
         
         unsigned int idx = 1;
         for(size_t i = 0; i < maxClumpIdx; ++i)
@@ -752,15 +727,10 @@ namespace rsgis{namespace segment{
             }
         }
         
-        feedbackCounter = 0;
-        std::cout << "Started ." << std::flush;
+        pbar.reset();
         for(unsigned int i = 0; i < height; ++i)
         {
-            if((i % feedback) == 0)
-            {
-                std::cout << "." << feedbackCounter << "." << std::flush;
-                feedbackCounter += 10;
-            }
+            pbar.progress(i, height);
             catagoryBand->RasterIO(GF_Read, 0, i, width, 1, clumpIdxs, width, 1, GDT_UInt32, 0, 0);
             for(unsigned int j = 0; j < width; ++j)
             {
@@ -771,7 +741,7 @@ namespace rsgis{namespace segment{
             }
             clumpBand->RasterIO(GF_Write, 0, i, width, 1, clumpIdxs, width, 1, GDT_UInt32, 0, 0);
         }
-        std::cout << ". Complete\n";
+        pbar.finish();
                  
         delete[] clumpIdxs;
     }
