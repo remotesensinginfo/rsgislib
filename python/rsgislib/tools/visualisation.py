@@ -916,7 +916,7 @@ def createQuicklookOverviewImgsVecOverlay(input_imgs, bands, tmp_dir, vec_overla
 
 def createVisualOverviewImgsVecExtent(input_imgs, bands, tmp_dir, vec_extent_file, vec_extent_lyr,
                                       outputImgs='quicklook.tif', output_img_sizes=500, gdalformat='GTIFF',
-                                      scale_axis='auto', stretch_file=None):
+                                      scale_axis='auto', stretch_file=None, export_stretch_file=False):
     """
     A function to produce an 8bit overview image (i.e., stretched visualisation) with an optional specified
     extent.
@@ -931,11 +931,17 @@ def createVisualOverviewImgsVecExtent(input_imgs, bands, tmp_dir, vec_extent_fil
     :param gdalformat: the output file format - probably either JPG, PNG or GTIFF.
     :param scale_axis: the axis to which the output_img_sizes refer. Options: width, height or auto.
                        Auto applies the output_img_sizes to the longest of the two axes.
-    :param stretch_file: a stretch stats file to standardise the stretch between a number of input files.
+    :param stretch_file: a stretch stats file to standardise the stretch between a number of input files. If
+                         export_stretch_file is True then this variable is used as the output stretch file path.
+    :param export_stretch_file: If true then the stretch parameters are outputted as a text file to the path defined
+                                by stretch_file.
 
     """
     if scale_axis not in ['width', 'height', 'auto']:
         raise rsgislib.RSGISPyException("Input parameter 'scale_axis' must have the value 'width', 'height' or 'auto'.")
+
+    if export_stretch_file and (stretch_file is None):
+        raise rsgislib.RSGISPyException("If export_stretch_file is True then a stretch_file path must be provided.")
 
     if type(input_imgs) is not list:
         raise rsgislib.RSGISPyException("Input images must be a list")
@@ -1010,13 +1016,14 @@ def createVisualOverviewImgsVecExtent(input_imgs, bands, tmp_dir, vec_extent_fil
         rsgislib.imageutils.gdal_mosaic_images_vrt(b_sel_imgs, tmp_vrt_img, vrt_extent)
 
     stretchImg = os.path.join(usr_tmp_dir, '{}_stretch.kea'.format(img_basename))
-    if stretch_file is not None:
+    if (stretch_file is not None) and (export_stretch_file == False):
         rsgislib.imageutils.stretchImageWithStatsNoData(tmp_vrt_img, stretchImg, stretch_file, 'KEA',
                                                         rsgislib.TYPE_8UINT,
                                                         img_no_data_val, rsgislib.imageutils.STRETCH_LINEARMINMAX, 2)
     else:
-        rsgislib.imageutils.stretchImageNoData(tmp_vrt_img, stretchImg, False, '', img_no_data_val, False, 'KEA',
-                                               rsgislib.TYPE_8UINT, rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
+        rsgislib.imageutils.stretchImageNoData(tmp_vrt_img, stretchImg, export_stretch_file, stretch_file,
+                                               img_no_data_val, False, 'KEA', rsgislib.TYPE_8UINT,
+                                               rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
     if scale_axis == 'auto':
         x_size, y_size = rsgis_utils.getImageSize(stretchImg)
         if x_size > y_size:
