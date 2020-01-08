@@ -35,7 +35,7 @@
 # UCLS, NNLS, FCLS classes adapted from pysptools module:
 # https://github.com/ctherien/pysptools
 # which has has the following license:
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Copyright (c) 2013-2014, Christian Therien
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -49,13 +49,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 #
 from abc import ABCMeta, abstractmethod
 import numpy
 from rios import applier
 from rios import cuiprogress
 import rsgislib
+
 
 class UnmixingImpl(object):
     """
@@ -72,17 +73,17 @@ class UnmixingImpl(object):
         N is the number of image pixels being processed. 
         p is the number of image bands
         q is the number of endmembers.
-        
+
         :param M: `numpy array` 2D data matrix (N x p).
         :param U: `numpy array` 2D matrix of endmembers (q x p).
         :return: `numpy array` An abundance maps (N x q).
         """
         pass
-    
+
     def read_endmembers_mtxt(self, endmembers_file):
         """
         A function to read endmembers mtxt file
-        :param endmembers_file: File path to the mtxt input file. 
+        :param endmembers_file: File path to the mtxt input file.
         :return: [m, n, endmemarr]; m size, n size and a numpy array with the end members
         """
         dataList = []
@@ -94,21 +95,21 @@ class UnmixingImpl(object):
         dataFile.close()
         m = int(dataList[0].split('=')[-1])
         n = int(dataList[1].split('=')[-1])
-        endmemarr = numpy.zeros((m,n))
+        endmemarr = numpy.zeros((m, n))
         datavals = dataList[2].split(',')
-        
+
         i = 0
         for m_idx in range(m):
             for n_idx in range(n):
                 endmemarr[m_idx, n_idx] = float(datavals[i])
                 i = i + 1
-        
+
         return m, n, endmemarr
-    
+
     def read_endmembers_mtxt_weight(self, endmembers_file, weight=100):
         """
         A function to read endmembers mtxt file
-        :param endmembers_file: File path to the mtxt input file. 
+        :param endmembers_file: File path to the mtxt input file.
         :return: [m, n, endmemarr]; m size, n size and a numpy array with the end members
         """
         dataList = []
@@ -119,20 +120,21 @@ class UnmixingImpl(object):
                 dataList.append(line)
         dataFile.close()
         m = int(dataList[0].split('=')[-1])
-        n = int(dataList[1].split('=')[-1])+1
-        endmemarr = numpy.zeros((m,n))
+        n = int(dataList[1].split('=')[-1]) + 1
+        endmemarr = numpy.zeros((m, n))
         datavals = dataList[2].split(',')
-        
+
         i = 0
         for m_idx in range(m):
-            for n_idx in range(n-1):
+            for n_idx in range(n - 1):
                 endmemarr[m_idx, n_idx] = float(datavals[i])
                 i = i + 1
-            endmemarr[m_idx, n-1] = weight
-        
+            endmemarr[m_idx, n - 1] = weight
+
         return m, n, endmemarr
 
-    def perform_simple_unmixing(self, input_image, output_image, gdalformat, endmembers_file, weight=None):
+    def perform_simple_unmixing(self, input_image, output_image, gdalformat, endmembers_file, weight=None,
+                                scale_factor=1000):
         """
         A function which uses the RIOS to iterate through the input image
         and perform a simple/standard spectral unmixing on the input image
@@ -145,6 +147,8 @@ class UnmixingImpl(object):
         :param endmembers_file: The endmembers for the unmixing in the RSGISLib mtxt format.
         :param weight: Optional (if None ignored) to provide a weight to implement the approach of Scarth et al (2010)
                    adding a weight to the least squares optimisation to get the abundances to sum to 1.
+        :param scale_factor: Scale factor for integerising the resulting image. If value is 1 then output image
+                             will be a floating point image.
 
         References:
             Scarth, P., Roder, A., & Schmidt, M. (2010). Tracking grazing pressure and climate
@@ -158,56 +162,190 @@ class UnmixingImpl(object):
             progress_bar = rsgislib.TQDMProgressBar()
         except:
             progress_bar = cuiprogress.GDALProgressBar()
-        
+
         if weight is not None:
             endmembers_info = self.read_endmembers_mtxt_weight(endmembers_file, weight)
         else:
             endmembers_info = self.read_endmembers_mtxt(endmembers_file)
         print(endmembers_info)
-        
+
         infiles = applier.FilenameAssociations()
         infiles.image = input_image
         outfiles = applier.FilenameAssociations()
         outfiles.outimage = output_image
         otherargs = applier.OtherInputs()
         otherargs.endmembers_q = endmembers_info[0]
-        otherargs.endmembers_p = endmembers_info[2]
+        otherargs.endmembers_p = endmembers_info[1]
         otherargs.endmembers_arr = endmembers_info[2]
         otherargs.weight = weight
+        otherargs.scale_factor = scale_factor
         aControls = applier.ApplierControls()
         aControls.progress = progress_bar
         aControls.drivername = gdalformat
         aControls.omitPyramids = True
         aControls.calcStats = False
-        
+
         def _simple_unmix(info, inputs, outputs, otherargs):
             """
-            This is an internal rios function 
+            This is an internal rios function
             """
             block_shp = inputs.image.shape
-            img_flat = inputs.image.reshape([block_shp[0], (block_shp[1]*block_shp[2])]).T
+            img_flat = inputs.image.reshape([block_shp[0], (block_shp[1] * block_shp[2])]).T
             if otherargs.weight is not None:
                 img_flat_dtype = img_flat.dtype
                 tmp_img_flat = img_flat
-                img_flat = numpy.zeros((img_flat.shape[0], img_flat.shape[1]+1), dtype=img_flat_dtype)
+                img_flat = numpy.zeros((img_flat.shape[0], img_flat.shape[1] + 1), dtype=img_flat_dtype)
                 img_flat[...] = weight
-                img_flat[:,:-1] = tmp_img_flat
+                img_flat[:, :-1] = tmp_img_flat
             img_flat_shp = img_flat.shape
-            
-            img_nodata = numpy.where(img_flat==0, True, False)
+
+            img_nodata = numpy.where(img_flat == 0, True, False)
             img_flat_nodata = numpy.all(img_nodata, axis=1)
-            
+
             ID = numpy.arange(img_flat_shp[0])
-            ID = ID[img_flat_nodata==False]
-            img_flat_data = img_flat[img_flat_nodata==False, ...]
-            
+            ID = ID[img_flat_nodata == False]
+            img_flat_data = img_flat[img_flat_nodata == False, ...]
+
             abundances_arr = self.calc_abundance(img_flat_data, otherargs.endmembers_arr)
-            outarr = numpy.zeros([img_flat_shp[0], otherargs.endmembers_q], dtype=numpy.int16)
-            outarr[ID] = (abundances_arr * 1000)
+            if otherargs.scale_factor > 1:
+                outarr = numpy.zeros([img_flat_shp[0], otherargs.endmembers_q], dtype=numpy.int16)
+            else:
+                outarr = numpy.zeros([img_flat_shp[0], otherargs.endmembers_q], dtype=numpy.float32)
+            outarr[ID] = (abundances_arr * otherargs.scale_factor)
             outarr = outarr.T
             outputs.outimage = outarr.reshape((otherargs.endmembers_q, block_shp[1], block_shp[2]))
-                
+
         applier.apply(_simple_unmix, infiles, outfiles, otherargs, controls=aControls)
+
+    def predict_refl_img_from_simple_unmixing(self, input_unmix_img, endmembers_file, output_img, gdalformat,
+                                              scale_factor=1000):
+        """
+        """
+        try:
+            import tqdm
+            progress_bar = rsgislib.TQDMProgressBar()
+        except:
+            progress_bar = cuiprogress.GDALProgressBar()
+
+        endmembers_info = self.read_endmembers_mtxt(endmembers_file)
+
+        infiles = applier.FilenameAssociations()
+        infiles.image_unmix = input_unmix_img
+        outfiles = applier.FilenameAssociations()
+        outfiles.outimage = output_img
+        otherargs = applier.OtherInputs()
+        otherargs.endmembers_q = endmembers_info[0]
+        otherargs.endmembers_p = endmembers_info[1]
+        otherargs.endmembers_arr = endmembers_info[2]
+        otherargs.scale_factor = scale_factor
+        aControls = applier.ApplierControls()
+        aControls.progress = progress_bar
+        aControls.drivername = gdalformat
+        aControls.omitPyramids = True
+        aControls.calcStats = False
+
+        def _predict_refl_img(info, inputs, outputs, otherargs):
+            """
+            This is an internal rios function
+            """
+            block_unmix_shp = inputs.image_unmix.shape
+            img_unmix_coef_flat = inputs.image_unmix.reshape(
+                [block_unmix_shp[0], (block_unmix_shp[1] * block_unmix_shp[2])]).T
+
+            img_unmix_coef_flat_data_flt = numpy.zeros_like(img_unmix_coef_flat, dtype=numpy.float32)
+            img_unmix_coef_flat_data_flt[...] = img_unmix_coef_flat / float(scale_factor)
+
+            img_nodata_flat_shp = img_unmix_coef_flat_data_flt.shape
+
+            pred_refl_img = numpy.zeros((img_unmix_coef_flat.shape[0], otherargs.endmembers_p), dtype=numpy.int16)
+            for i in range(img_unmix_coef_flat.shape[0]):
+                for q in range(otherargs.endmembers_q):
+                    pred_refl_img[i] = pred_refl_img[i] + (
+                                img_unmix_coef_flat_data_flt[i, q] * otherargs.endmembers_arr[q])
+
+            pred_refl_img = pred_refl_img.T
+            outputs.outimage = pred_refl_img.reshape((otherargs.endmembers_p, block_unmix_shp[1], block_unmix_shp[2]))
+
+        applier.apply(_predict_refl_img, infiles, outfiles, otherargs, controls=aControls)
+
+    def calc_unmixing_rmse_residualerr(self, input_img, input_unmix_img, endmembers_file, output_img, gdalformat,
+                                       scale_factor=1000):
+        """
+        """
+        try:
+            import tqdm
+            progress_bar = rsgislib.TQDMProgressBar()
+        except:
+            progress_bar = cuiprogress.GDALProgressBar()
+
+        endmembers_info = self.read_endmembers_mtxt(endmembers_file)
+
+        infiles = applier.FilenameAssociations()
+        infiles.image_orig = input_img
+        infiles.image_unmix = input_unmix_img
+        outfiles = applier.FilenameAssociations()
+        outfiles.outimage = output_img
+        otherargs = applier.OtherInputs()
+        otherargs.endmembers_q = endmembers_info[0]
+        otherargs.endmembers_p = endmembers_info[1]
+        otherargs.endmembers_arr = endmembers_info[2]
+        otherargs.scale_factor = scale_factor
+        aControls = applier.ApplierControls()
+        aControls.progress = progress_bar
+        aControls.drivername = gdalformat
+        aControls.omitPyramids = True
+        aControls.calcStats = False
+
+        def _calc_unmix_err_rmse(info, inputs, outputs, otherargs):
+            """
+            This is an internal rios function
+            """
+            block_refl_shp = inputs.image_orig.shape
+            img_orig_refl_flat = inputs.image_orig.reshape(
+                [block_refl_shp[0], (block_refl_shp[1] * block_refl_shp[2])]).T
+            block_unmix_shp = inputs.image_unmix.shape
+            img_unmix_coef_flat = inputs.image_unmix.reshape(
+                [block_unmix_shp[0], (block_unmix_shp[1] * block_unmix_shp[2])]).T
+            img_flat_shp = img_orig_refl_flat.shape
+
+            img_orig_refl_nodata = numpy.where(img_orig_refl_flat == 0, True, False)
+            img_orig_refl_flat_nodata = numpy.all(img_orig_refl_nodata, axis=1)
+
+            ID = numpy.arange(img_flat_shp[0])
+            ID = ID[img_orig_refl_flat_nodata == False]
+            img_orig_refl_flat_data = img_orig_refl_flat[img_orig_refl_flat_nodata == False, ...]
+            img_orig_refl_flat_data_flt = numpy.zeros_like(img_orig_refl_flat_data, dtype=numpy.float32)
+            img_orig_refl_flat_data_flt[...] = img_orig_refl_flat_data
+            img_unmix_coef_flat_data = img_unmix_coef_flat[img_orig_refl_flat_nodata == False, ...]
+            img_unmix_coef_flat_data_flt = numpy.zeros_like(img_unmix_coef_flat_data, dtype=numpy.float32)
+            img_unmix_coef_flat_data_flt[...] = img_unmix_coef_flat_data / float(scale_factor)
+
+            img_nodata_flat_shp = img_unmix_coef_flat_data_flt.shape
+
+            pred_refl_img = numpy.zeros_like(img_orig_refl_flat_data, dtype=float)
+            for i in range(img_nodata_flat_shp[0]):
+                for q in range(otherargs.endmembers_q):
+                    pred_refl_img[i] = pred_refl_img[i] + (
+                                img_unmix_coef_flat_data_flt[i, q] * otherargs.endmembers_arr[q])
+
+            # Calc Diff
+            diff = img_orig_refl_flat_data_flt - pred_refl_img
+
+            # Calc RMSE
+            diff_sq = diff * diff
+            mean_sum_diff_sq = numpy.sum(diff_sq, axis=1) / otherargs.endmembers_p
+            rmse_arr = numpy.sqrt(mean_sum_diff_sq)
+
+            # Calc Residual Error
+            abs_diff = numpy.absolute(diff)
+            residual_arr = numpy.sum(abs_diff, axis=1) / otherargs.endmembers_p
+
+            outarr = numpy.zeros((img_flat_shp[0], 2))
+            outarr[ID] = numpy.stack([rmse_arr, residual_arr], axis=-1)
+            outarr = outarr.T
+            outputs.outimage = outarr.reshape((2, block_refl_shp[1], block_refl_shp[2]))
+
+        applier.apply(_calc_unmix_err_rmse, infiles, outfiles, otherargs, controls=aControls)
 
 
 class Unmixing_UCLS(UnmixingImpl):
@@ -221,7 +359,7 @@ class Unmixing_UCLS(UnmixingImpl):
         :return: `numpy array` An abundance maps (N x q).
         """
         Uinv = numpy.linalg.pinv(U.T)
-        return numpy.dot(Uinv, M[0:,:].T).T
+        return numpy.dot(Uinv, M[0:, :].T).T
 
 
 class Unmixing_NNLS(UnmixingImpl):
@@ -317,7 +455,7 @@ class Unmixing_FCLS(UnmixingImpl):
         A = self._numpy_to_cvxopt_matrix(A)
         b = self._numpy_to_cvxopt_matrix(b)
 
-        Aeq = self._numpy_to_cvxopt_matrix(numpy.ones((1,nvars)))
+        Aeq = self._numpy_to_cvxopt_matrix(numpy.ones((1, nvars)))
         beq = self._numpy_to_cvxopt_matrix(numpy.ones(1))
 
         M = numpy.array(M, dtype=numpy.float64)
@@ -335,11 +473,11 @@ def rescale_unmixing_results(input_img, output_img, gdalformat, scale_factor=100
     A function which rescales an output from a spectral unmixing
     (e.g., rsgislib.imagecalc.specunmixing.calc_unconstrained_unmixing) so that
     negative values are removed and each pixel sums to 1.
-    
+
     :param inputImg: Input image with the spectral unmixing result (pixels need to range from 0-1)
     :param outputImg: Output image with the result of the rescaling (pixel values will be in range 0-1)
     :param gdalformat: the file format of the output file.
-    
+
     """
     try:
         import tqdm
@@ -375,11 +513,11 @@ def rescale_unmixing_results(input_img, output_img, gdalformat, scale_factor=100
 
 
 def calc_unconstrained_unmixing(input_img, output_img, gdalformat, endmembers_file, weight=None,
-                                rescaled_output_img=None, calc_stats=True):
+                                rescaled_output_img=None, calc_stats=True, scale_factor=1000):
     """
     A function which uses the Unmixing_UCLS class to perform an uncontrained spectral
     unmixing.
-    
+
     :param input_image: The file path to a GDAL readable input image.
     :param output_image: The file path to the GDAL writable output image
                          (Note pixel values will be between 0-1000)
@@ -390,6 +528,8 @@ def calc_unconstrained_unmixing(input_img, output_img, gdalformat, endmembers_fi
     :param rescaled_output_img: A file path to an output image which has been rescaled so the abundances sum to 1.
                                 Optional, if None then ignored.
     :param calc_stats: If True (default) then image statistics and pyramids are calculated for the output images
+    :param scale_factor: Scale factor for integerising the resulting image. If value is 1 then output image
+                             will be a floating point image.
 
     References:
         Scarth, P., Roder, A., & Schmidt, M. (2010). Tracking grazing pressure and climate
@@ -399,23 +539,25 @@ def calc_unconstrained_unmixing(input_img, output_img, gdalformat, endmembers_fi
 
     """
     unmix_obj = Unmixing_UCLS()
-    unmix_obj.perform_simple_unmixing(input_img, output_img, gdalformat, endmembers_file, weight)
+    unmix_obj.perform_simple_unmixing(input_img, output_img, gdalformat, endmembers_file, weight, scale_factor)
     if calc_stats:
         import rsgislib.imageutils
-        rsgislib.imageutils.popImageStats(output_img, usenodataval=True, nodataval=9999, calcpyramids=True)
-        
+        rsgislib.imageutils.popImageStats(output_img, usenodataval=True, nodataval=(scale_factor + 1),
+                                          calcpyramids=True)
+
     if rescaled_output_img is not None:
-        rescale_unmixing_results(output_img, rescaled_output_img, gdalformat, scale_factor=1000)
+        rescale_unmixing_results(output_img, rescaled_output_img, gdalformat, scale_factor=scale_factor)
         if calc_stats:
-            rsgislib.imageutils.popImageStats(rescaled_output_img, usenodataval=True, nodataval=9999, calcpyramids=True)
-    
+            rsgislib.imageutils.popImageStats(rescaled_output_img, usenodataval=True, nodataval=(scale_factor + 1),
+                                              calcpyramids=True)
+
 
 def calc_non_negative_unmixing(input_img, output_img, gdalformat, endmembers_file, weight=None,
-                               rescaled_output_img=None, calc_stats=True):
+                               rescaled_output_img=None, calc_stats=True, scale_factor=1000):
     """
     A function which uses the Unmixing_NNLS class to perform an non-negative constrained
     spectral unmixing.
-    
+
     :param input_image: The file path to a GDAL readable input image.
     :param output_image: The file path to the GDAL writable output image
                          (Note pixel values will be between 0-1000)
@@ -426,6 +568,8 @@ def calc_non_negative_unmixing(input_img, output_img, gdalformat, endmembers_fil
     :param rescaled_output_img: A file path to an output image which has been rescaled so the abundances sum to 1.
                                 Optional, if None then ignored.
     :param calc_stats: If True (default) then image statistics and pyramids are calculated for the output images
+    :param scale_factor: Scale factor for integerising the resulting image. If value is 1 then output image
+                             will be a floating point image.
 
     References:
         Scarth, P., Roder, A., & Schmidt, M. (2010). Tracking grazing pressure and climate
@@ -435,32 +579,83 @@ def calc_non_negative_unmixing(input_img, output_img, gdalformat, endmembers_fil
 
     """
     unmix_obj = Unmixing_NNLS()
-    unmix_obj.perform_simple_unmixing(input_img, output_img, gdalformat, endmembers_file, weight)
+    unmix_obj.perform_simple_unmixing(input_img, output_img, gdalformat, endmembers_file, weight, scale_factor)
     if calc_stats:
         import rsgislib.imageutils
-        rsgislib.imageutils.popImageStats(output_img, usenodataval=True, nodataval=9999, calcpyramids=True)
+        rsgislib.imageutils.popImageStats(output_img, usenodataval=True, nodataval=(scale_factor + 1),
+                                          calcpyramids=True)
     if rescaled_output_img is not None:
-        rescale_unmixing_results(output_img, rescaled_output_img, gdalformat, scale_factor=1000)
+        rescale_unmixing_results(output_img, rescaled_output_img, gdalformat, scale_factor=scale_factor)
         if calc_stats:
-            rsgislib.imageutils.popImageStats(rescaled_output_img, usenodataval=True, nodataval=9999, calcpyramids=True)
+            rsgislib.imageutils.popImageStats(rescaled_output_img, usenodataval=True, nodataval=(scale_factor + 1),
+                                              calcpyramids=True)
 
 
-def calc_fully_constrained_unmixing(input_img, output_img, gdalformat, endmembers_file, calc_stats=True):
+def calc_fully_constrained_unmixing(input_img, output_img, gdalformat, endmembers_file, calc_stats=True,
+                                    scale_factor=1000):
     """
     A function which uses the Unmixing_FCLS class to perform a fully contrained spectral
     unmixing.
-    
+
     :param input_image: The file path to a GDAL readable input image.
     :param output_image: The file path to the GDAL writable output image
                          (Note pixel values will be between 0-1000)
     :param gdalformat: The output image format to be used.
     :param endmembers_file: The endmembers for the unmixing in the RSGISLib mtxt format.
     :param calc_stats: If True (default) then image statistics and pyramids are calculated for the output images
+    :param scale_factor: Scale factor for integerising the resulting image. If value is 1 then output image
+                             will be a floating point image.
 
     """
     unmix_obj = Unmixing_FCLS()
-    unmix_obj.perform_simple_unmixing(input_img, output_img, gdalformat, endmembers_file)
+    unmix_obj.perform_simple_unmixing(input_img, output_img, gdalformat, endmembers_file, scale_factor=scale_factor)
     if calc_stats:
         import rsgislib.imageutils
-        rsgislib.imageutils.popImageStats(output_img, usenodataval=True, nodataval=9999, calcpyramids=True)
+        rsgislib.imageutils.popImageStats(output_img, usenodataval=True, nodataval=(scale_factor + 1),
+                                          calcpyramids=True)
+
+
+def calc_unmix_rmse_residualerr(input_refl_img, input_unmix_coef_img, endmembers_file, output_img, gdalformat,
+                                scale_factor=1000, calc_stats=True):
+    """
+    A function to calculate the prediction residual and RMSE using the defined abundances and endmembers.
+
+    :param input_refl_img: The original input reference image.
+    :param input_unmix_coef_img: The unmixed abundance coefficients.
+    :param endmembers_file: The endmembers file used for the unmixing in the RSGISLib mtxt format.
+    :param output_image: The file path to the GDAL writable output image (Band 1: RMSE, Band 2: Residual)
+    :param gdalformat: The output image format to be used.
+    :param scale_factor: Scale factor used to integerising the endmember abundances image.
+    :param calc_stats: If True (default) then image statistics and pyramids are calculated for the output images
+
+    """
+    unmix_obj = Unmixing_UCLS()
+    unmix_obj.calc_unmixing_rmse_residualerr(input_refl_img, input_unmix_coef_img, endmembers_file, output_img,
+                                             gdalformat, scale_factor)
+    if calc_stats:
+        import rsgislib.imageutils
+        rsgislib.imageutils.setBandNames(output_img, ['RMSE', 'Residual'], feedback=False)
+        rsgislib.imageutils.popImageStats(output_img, usenodataval=False, nodataval=0, calcpyramids=True)
+
+
+def predict_refl_img_from_simple_unmixing(input_unmix_coef_img, endmembers_file, output_img, gdalformat,
+                                          scale_factor=1000, calc_stats=True):
+    """
+    A function to calculate the predicted pixel value using the inputted abundances and endmembers.
+
+    :param input_unmix_coef_img: The unmixed abundance coefficients.
+    :param endmembers_file: The endmembers file used for the unmixing in the RSGISLib mtxt format.
+    :param output_image: The file path to the GDAL writable output image
+    :param gdalformat: The output image format to be used.
+    :param scale_factor: Scale factor used to integerising the endmember abundances image.
+    :param calc_stats: If True (default) then image statistics and pyramids are calculated for the output images
+
+    """
+    unmix_obj = Unmixing_UCLS()
+    unmix_obj.predict_refl_img_from_simple_unmixing(input_unmix_coef_img, endmembers_file, output_img, gdalformat,
+                                                    scale_factor)
+    if calc_stats:
+        import rsgislib.imageutils
+        rsgislib.imageutils.popImageStats(output_img, usenodataval=True, nodataval=0, calcpyramids=True)
+
 

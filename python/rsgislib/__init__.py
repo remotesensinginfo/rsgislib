@@ -1177,9 +1177,11 @@ class RSGISPyUtils (object):
             spatRef.ImportFromWkt(projStr)            
             spatRef.AutoIdentifyEPSG()
             epsgCode = spatRef.GetAuthorityCode(None)
+            if epsgCode is not None:
+                epsgCode = int(epsgCode)
         except Exception:
             epsgCode = None
-        return int(epsgCode)
+        return epsgCode
         
     def doGDALLayersHaveSameProj(self, layer1, layer2):
         """
