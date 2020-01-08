@@ -143,6 +143,14 @@ class UnmixingImpl(object):
                              (Note pixel values will be between 0-1000)
         :param gdalformat: The output image format to be used.
         :param endmembers_file: The endmembers for the unmixing in the RSGISLib mtxt format.
+        :param weight: Optional (if None ignored) to provide a weight to implement the approach of Scarth et al (2010)
+                   adding a weight to the least squares optimisation to get the abundances to sum to 1.
+
+        References:
+            Scarth, P., Roder, A., & Schmidt, M. (2010). Tracking grazing pressure and climate
+            interaction—The role of Landsat fractional cover in time series analysis. Proceedings of
+            the 15th Australasian Remote Sensing and Photogrammetry ConferenceAustralia: Alice Springs.
+            http://dx.doi.org/10.6084/m9.ﬁgshare.94250.
 
         """
         try:
@@ -366,7 +374,8 @@ def rescale_unmixing_results(input_img, output_img, gdalformat, scale_factor=100
     applier.apply(_applyUnmixRescale, infiles, outfiles, otherargs, controls=aControls)
 
 
-def calc_unconstrained_unmixing(input_img, output_img, gdalformat, endmembers_file, weight=None, rescaled_output_img=None, calc_stats=True):
+def calc_unconstrained_unmixing(input_img, output_img, gdalformat, endmembers_file, weight=None,
+                                rescaled_output_img=None, calc_stats=True):
     """
     A function which uses the Unmixing_UCLS class to perform an uncontrained spectral
     unmixing.
@@ -376,7 +385,18 @@ def calc_unconstrained_unmixing(input_img, output_img, gdalformat, endmembers_fi
                          (Note pixel values will be between 0-1000)
     :param gdalformat: The output image format to be used.
     :param endmembers_file: The endmembers for the unmixing in the RSGISLib mtxt format.
-    
+    :param weight: Optional (if None ignored) to provide a weight to implement the approach of Scarth et al (2010)
+                   adding a weight to the least squares optimisation to get the abundances to sum to 1.
+    :param rescaled_output_img: A file path to an output image which has been rescaled so the abundances sum to 1.
+                                Optional, if None then ignored.
+    :param calc_stats: If True (default) then image statistics and pyramids are calculated for the output images
+
+    References:
+        Scarth, P., Roder, A., & Schmidt, M. (2010). Tracking grazing pressure and climate
+        interaction—The role of Landsat fractional cover in time series analysis. Proceedings of
+        the 15th Australasian Remote Sensing and Photogrammetry ConferenceAustralia: Alice Springs.
+        http://dx.doi.org/10.6084/m9.ﬁgshare.94250.
+
     """
     unmix_obj = Unmixing_UCLS()
     unmix_obj.perform_simple_unmixing(input_img, output_img, gdalformat, endmembers_file, weight)
@@ -390,7 +410,8 @@ def calc_unconstrained_unmixing(input_img, output_img, gdalformat, endmembers_fi
             rsgislib.imageutils.popImageStats(rescaled_output_img, usenodataval=True, nodataval=9999, calcpyramids=True)
     
 
-def calc_non_negative_unmixing(input_img, output_img, gdalformat, endmembers_file, weight=None, rescaled_output_img=None, calc_stats=True):
+def calc_non_negative_unmixing(input_img, output_img, gdalformat, endmembers_file, weight=None,
+                               rescaled_output_img=None, calc_stats=True):
     """
     A function which uses the Unmixing_NNLS class to perform an non-negative constrained
     spectral unmixing.
@@ -400,7 +421,18 @@ def calc_non_negative_unmixing(input_img, output_img, gdalformat, endmembers_fil
                          (Note pixel values will be between 0-1000)
     :param gdalformat: The output image format to be used.
     :param endmembers_file: The endmembers for the unmixing in the RSGISLib mtxt format.
-    
+    :param weight: Optional (if None ignored) to provide a weight to implement the approach of Scarth et al (2010)
+                   adding a weight to the least squares optimisation to get the abundances to sum to 1.
+    :param rescaled_output_img: A file path to an output image which has been rescaled so the abundances sum to 1.
+                                Optional, if None then ignored.
+    :param calc_stats: If True (default) then image statistics and pyramids are calculated for the output images
+
+    References:
+        Scarth, P., Roder, A., & Schmidt, M. (2010). Tracking grazing pressure and climate
+        interaction—The role of Landsat fractional cover in time series analysis. Proceedings of
+        the 15th Australasian Remote Sensing and Photogrammetry ConferenceAustralia: Alice Springs.
+        http://dx.doi.org/10.6084/m9.ﬁgshare.94250.
+
     """
     unmix_obj = Unmixing_NNLS()
     unmix_obj.perform_simple_unmixing(input_img, output_img, gdalformat, endmembers_file, weight)
@@ -423,18 +455,12 @@ def calc_fully_constrained_unmixing(input_img, output_img, gdalformat, endmember
                          (Note pixel values will be between 0-1000)
     :param gdalformat: The output image format to be used.
     :param endmembers_file: The endmembers for the unmixing in the RSGISLib mtxt format.
-    
+    :param calc_stats: If True (default) then image statistics and pyramids are calculated for the output images
+
     """
     unmix_obj = Unmixing_FCLS()
     unmix_obj.perform_simple_unmixing(input_img, output_img, gdalformat, endmembers_file)
     if calc_stats:
         import rsgislib.imageutils
         rsgislib.imageutils.popImageStats(output_img, usenodataval=True, nodataval=9999, calcpyramids=True)
-    
-
-#calc_unconstrained_unmixing('S2_UVD_27sept_27700_sub.kea', 'S2_UVD_27sept_27700_sub_uc_unmix.kea', 'KEA', 'endmembers_27sept_mean.mtxt', 40, 'S2_UVD_27sept_27700_sub_uc_unmix_scaled.kea')
-calc_non_negative_unmixing('S2_UVD_27sept_27700_sub.kea', 'S2_UVD_27sept_27700_sub_nn_unmix_weight.kea', 'KEA', 'endmembers_27sept_mean.mtxt', 100, 'S2_UVD_27sept_27700_sub_nn_unmix_scaled_weight.kea')
-#calc_non_negative_unmixing('S2_UVD_27sept_27700_sub.kea', 'test0.kea', 'KEA', 'endmembers_27sept_mean.mtxt')
-#calc_fully_constrained_unmixing('S2_UVD_27sept_27700_sub.kea', 'test0.kea', 'KEA', 'endmembers_27sept_mean.mtxt')
-
 
