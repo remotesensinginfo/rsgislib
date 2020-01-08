@@ -2651,7 +2651,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "\n"
 "\n"
 },
-
+/*
 {"nnConSum1LinearSpecUnmix", ImageCalc_NnConSum1LinearSpecUnmix, METH_VARARGS,
 "rsgislib.imagecalc.nnConSum1LinearSpecUnmix(inputImage, gdalformat, datatype, lsumWeight, outputFile, endmembersFile, lsumGain, lsumOffset)\n"
 "Performs a constrained linear spectral unmixing of the input image for a set of endmembers where the sum of the unmixing will be approximately 1 and non-negative.\n"
@@ -2670,7 +2670,7 @@ static PyMethodDef ImageCalcMethods[] = {
 ":param lsumOffset: is a float specifying an offset which can be applied to the output pixel values (outvalue = offset + (gain * value)). Optional, default = 0.\n"
 "\n"
 },
-
+*/
 {"allBandsEqualTo", ImageCalc_AllBandsEqualTo, METH_VARARGS,
 "rsgislib.imagecalc.allBandsEqualTo(inputImage, imgValue, outputTrueVal, outputFalseVal, outputImage, gdalformat, datatype)\n"
 "Tests whether all bands are equal to the same value\n"
