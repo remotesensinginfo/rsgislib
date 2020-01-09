@@ -8,6 +8,7 @@ from __future__ import print_function
 from ._imageutils import *
 import rsgislib 
 
+import os
 import os.path
 import math
 import shutil
@@ -1611,5 +1612,37 @@ def mask_img_with_vec(input_img, output_img, gdalformat, roi_vec_file, roi_vec_l
     else:
         raise Exception("The vector file and image file do not intersect.")
 
+
+def create_valid_mask(imgBandInfo, out_msk_file, gdalformat, tmpdir):
+    """
+    A function to create a single valid mask from the intersection of the valid masks for all the input
+    images.
+
+    :param imgBandInfo: A list of rsgislib.imageutils.ImageBandInfo objects to define the images and and bands of interest.
+    :param out_msk_file: A output image file and path
+    :param gdalformat: The output file format.
+    :param tmpdir: A directory for temporary outputs created during the processing.
+
+    """
+    rsgis_utils = rsgislib.RSGISPyUtils()
+    if len(imgBandInfo) == 1:
+        no_data_val = rsgis_utils.getImageNoDataValue(imgBandInfo[0].fileName)
+        rsgislib.imageutils.genValidMask(imgBandInfo[0].fileName, out_msk_file, gdalformat, no_data_val)
+    else:
+        uid_str = rsgis_utils.uidGenerator()
+        tmp_lcl_dir = os.path.join(tmpdir, "create_valid_mask_{}".format(uid_str))
+        if not os.path.exists(tmp_lcl_dir):
+            os.makedirs(tmp_lcl_dir)
+
+        validMasks = []
+        for imgInfo in imgBandInfo:
+            tmpBaseName = rsgis_utils.get_file_basename(imgInfo.fileName)
+            vdmskFile = os.path.join(tmp_lcl_dir, '{}_vmsk.kea'.format(tmpBaseName))
+            no_data_val = rsgis_utils.getImageNoDataValue(imgInfo.fileName)
+            rsgislib.imageutils.genValidMask(imgInfo.fileName, vdmskFile, gdalformat='KEA', nodata=no_data_val)
+            validMasks.append(vdmskFile)
+
+        rsgislib.imageutils.genValidMask(validMasks, out_msk_file, gdalformat, nodata=0.0)
+        shutil.rmtree(tmp_lcl_dir)
 
 
