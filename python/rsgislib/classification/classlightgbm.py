@@ -419,7 +419,6 @@ def train_lightgbm_multiclass_classifer(out_mdl_file, clsinfodict, out_info_file
     test_data_lst = []
     test_lbls_lst = []
     cls_ids = []
-    n_classes = 0
     for clsname in clsinfodict:
         sgl_cls_info = {}
         print("Reading Class {} Training".format(clsname))
@@ -453,7 +452,6 @@ def train_lightgbm_multiclass_classifer(out_mdl_file, clsinfodict, out_info_file
         test_lbls_lst.append(sgl_cls_info['test_data_lbls'])
 
         cls_data_dict[clsname] = sgl_cls_info
-        n_classes = n_classes + 1
         cls_ids.append(clsinfodict[clsname].id)
 
     print("Finished Reading Data")
@@ -636,7 +634,7 @@ output image and threshold can be applied to this image.
 :param classTrainInfo: dict (where the key is the class name) of rsgislib.classification.ClassInfoObj
                        objects which will be used to train the classifier (i.e., train_lightgbm_multiclass_classifer()),
                        provide pixel value id and RGB class values.
-:param model_file: a trained lightgbm binary model which can be loaded with lgb.Booster(model_file=model_file).
+:param model_file: a trained lightgbm multiclass model which can be loaded with lgb.Booster(model_file=model_file).
 :param imgMask: is an image file providing a mask to specify where should be classified. Simplest mask is all the
                 valid data regions (rsgislib.imageutils.genValidMask)
 :param imgMaskVal: the pixel value within the imgMask to limit the region to which the classification is applied.
