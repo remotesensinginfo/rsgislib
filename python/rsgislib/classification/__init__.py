@@ -176,8 +176,8 @@ Where:
 
     """
     # Import the RSGISLib Image Utils module
-    from rsgislib import vectorutils
-    vectorutils.createLinesOfPoints(inputLinesShp, outputPtsShp, lineStep, force)
+    import rsgislib.vectorutils
+    rsgislib.vectorutils.createLinesOfPoints(inputLinesShp, outputPtsShp, lineStep, force)
     popClassInfoAccuracyPts(inputImage, outputPtsShp, classImgCol, classImgVecCol, classRefVecCol)
 
 
@@ -185,8 +185,7 @@ def get_class_training_data(imgBandInfo, classVecSampleInfo, tmpdir, refImg=None
     """
     A function to extract training for vector regions for a given input image set.
 
-    :param imgBandInfo: A list of rsgislib.imageutils.ImageBandInfo objects to define the images and and
-                        bands of interest.
+    :param imgBandInfo: A list of rsgislib.imageutils.ImageBandInfo objects to define the images and bands of interest.
     :param classVecSampleInfo: A list of rsgislib.classification.ClassVecSamplesInfoObj objects to define the
                                training regions.
     :param tmpdir: A directory for temporary outputs created during the processing.
@@ -197,6 +196,7 @@ def get_class_training_data(imgBandInfo, classVecSampleInfo, tmpdir, refImg=None
     """
     import rsgislib
     import rsgislib.imageutils
+    import rsgislib.vectorutils
     import os
     import os.path
     import random
@@ -233,6 +233,61 @@ def get_class_training_data(imgBandInfo, classVecSampleInfo, tmpdir, refImg=None
                                                                     green=rand_grn_val,
                                                                     blue=rand_blu_val)
 
+    shutil.rmtree(tmp_lcl_dir)
+    return classInfo
+
+
+def get_class_training_chips_data(imgBandInfo, classVecSampleInfo, chip_h_size, tmpdir, refImg=None):
+    """
+    A function to extract training chips (windows/regions) for vector regions for a given input image set.
+
+    :param imgBandInfo: A list of rsgislib.imageutils.ImageBandInfo objects to define the images and bands of interest.
+    :param classVecSampleInfo: A list of rsgislib.classification.ClassVecSamplesInfoObj objects to define the
+                               training regions.
+    :param chip_h_size: is half the chip size to be extracted (i.e., 10 with output image chips 21x21, 10 pixels
+                        either size of the one of interest).
+    :param tmpdir: A directory for temporary outputs created during the processing.
+    :param refImg: A reference image which defines the area of interest, pixel size etc. for the processing.
+                   If None then an image will be generated using the input images but the tmpdir needs to be defined.
+    :return: dictionary of ClassSimpleInfoObj objects.
+
+    """
+    import rsgislib
+    import rsgislib.imageutils
+    import rsgislib.vectorutils
+    import os
+    import os.path
+    import random
+    import shutil
+
+    # Get valid mask, rasterised to this
+    rsgis_utils = rsgislib.RSGISPyUtils()
+    uid_str = rsgis_utils.uidGenerator()
+    tmp_lcl_dir = os.path.join(tmpdir, "get_class_training_chips_data_{}".format(uid_str))
+    if not os.path.exists(tmp_lcl_dir):
+        os.makedirs(tmp_lcl_dir)
+
+    rasterise_ref_img = refImg
+    if refImg is None:
+        rasterise_ref_img = os.path.join(tmp_lcl_dir, "ref_img_vmsk.kea")
+        rsgislib.imageutils.create_valid_mask(imgBandInfo, rasterise_ref_img, 'KEA', tmp_lcl_dir)
+
+    classInfo = dict()
+    for class_sample_info in classVecSampleInfo:
+        cls_basename = rsgis_utils.get_file_basename(class_sample_info.fileH5)
+        out_vec_img = os.path.join(tmp_lcl_dir, "{}_img.kea".format(cls_basename))
+        rsgislib.vectorutils.rasteriseVecLyr(class_sample_info.vecfile, class_sample_info.veclyr, rasterise_ref_img,
+                                             out_vec_img, gdalformat="KEA", burnVal=class_sample_info.id,
+                                             datatype=rsgislib.TYPE_16UINT, vecAtt=None, vecExt=False, thematic=True,
+                                             nodata=0)
+        rsgislib.imageutils.extractChipZoneImageBandValues2HDF(imgBandInfo, out_vec_img, class_sample_info.id,
+                                                               chip_h_size, class_sample_info.fileH5)
+        rand_red_val = random.randint(1, 255)
+        rand_grn_val = random.randint(1, 255)
+        rand_blu_val = random.randint(1, 255)
+        classInfo[class_sample_info.classname] = ClassSimpleInfoObj(id=class_sample_info.id,
+                                                                    fileH5=class_sample_info.fileH5, red=rand_red_val,
+                                                                    green=rand_grn_val, blue=rand_blu_val)
     shutil.rmtree(tmp_lcl_dir)
     return classInfo
 
