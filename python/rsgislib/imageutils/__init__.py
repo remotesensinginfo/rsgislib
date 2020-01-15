@@ -19,12 +19,9 @@ import osgeo.gdal as gdal
 import osgeo.ogr as ogr
 import osgeo.osr as osr
 
-haveRIOS = True
-try:
-    from rios import applier
-    from rios import cuiprogress
-except ImportError as riosErr:
-    haveRIOS = False
+from rios import applier
+from rios import cuiprogress
+
 
 # define our own classes
 class ImageBandInfo(object):
@@ -45,7 +42,8 @@ Create a list of these objects to pass to the extractZoneImageBandValues2HDF fun
         self.fileName = fileName
         self.name = name
         self.bands = bands
-        
+
+
 # define our own classes
 class SharpBandInfo(object):
     """
@@ -1001,9 +999,6 @@ Where:
 :param gdalformat: the GDAL image file format of the output image file.
 
 """
-    if not haveRIOS:
-        raise Exception("The RIOS module required for this function could not be imported\n\t" + riosErr)
-
     try:
         import tqdm
         progress_bar = rsgislib.TQDMProgressBar()
@@ -1211,9 +1206,6 @@ Where:
 :param upVal: upper value
 
 """
-    if not haveRIOS:
-        raise Exception("The RIOS module required for this function could not be imported\n\t" + riosErr)
-
     try:
         import tqdm
         progress_bar = rsgislib.TQDMProgressBar()
@@ -1257,16 +1249,11 @@ input image file to a number array.
 """ 
     # Import the RIOS image reader
     from rios.imagereader import ImageReader
-    
+    import tqdm
+
     first = True
     reader = ImageReader(inputImg, windowxsize=200, windowysize=200)
-    print('Started .0.', end='', flush=True)
-    outCount = 10
-    for (info, block) in reader:
-        if info.getPercent() > outCount:
-            print('.'+str(int(outCount))+'.', end='', flush=True)
-            outCount = outCount + 10
-                
+    for (info, block) in tqdm.tqdm(reader):
         blkShape = block.shape
         blkBands = block.reshape((blkShape[0], (blkShape[1]*blkShape[2])))
         
@@ -1285,7 +1272,6 @@ input image file to a number array.
                 first = False
             else:
                 outArr = numpy.concatenate((outArr, blkBandsTransSamp), axis=0)
-    print('. Completed')
     return outArr
 
 
@@ -1303,16 +1289,12 @@ A function which extracts the image values within a mask for the specified image
 """
     # Import the RIOS image reader
     from rios.imagereader import ImageReader
+    import tqdm
+
     outArr = None
     first = True
     reader = ImageReader([img, img_mask], windowxsize=200, windowysize=200)
-    print('Started .0.', end='', flush=True)
-    outCount = 10
-    for (info, block) in reader:
-        if info.getPercent() > outCount:
-            print('.' + str(int(outCount)) + '.', end='', flush=True)
-            outCount = outCount + 10
-
+    for (info, block) in tqdm.tqdm(reader):
         blk_img = block[0]
         blk_msk = block[1].flatten()
         blk_img_shape = blk_img.shape
@@ -1338,8 +1320,103 @@ A function which extracts the image values within a mask for the specified image
                 first = False
             else:
                 out_arr = numpy.concatenate((out_arr, blk_bands_trans), axis=0)
-    print('. Completed')
     return out_arr
+
+
+def extractChipZoneImageBandValues2HDF(inputImageInfo, imageMask, maskValue, chipHSize, outputHDF):
+    """
+A function which extracts a chip/window of image pixel values. The expectation is that
+this is used to train a classifer (see deep learning functions in classification) but it
+could be used to extract image 'chips' for other purposes.
+
+:param inputImageInfo: is a list of rsgislib.imageutils.ImageBandInfo objects specifying the input images and bands
+:param imageMask: is a single band input image to specify the regions of interest
+:param maskValue: is the pixel value within the imageMask to specify the region of interest
+:param chipHSize: is half the window size (i.e., 10 with output image chips 21x21, 10 pixels either
+                  size of the one of interest).
+:param outputHDF: is the output HDF5 file. If it all ready exists then it is overwritten.
+
+"""
+    # Import the RIOS image reader
+    from rios.imagereader import ImageReader
+    import h5py
+    import tqdm
+
+    chipSize = (chipHSize * 2) + 1
+
+    ######################################################################
+    # Count the number of features to extract so arrays can be initialised
+    # at the correct size.
+    ######################################################################
+    nFeats = 0
+    reader = ImageReader(imageMask, windowxsize=200, windowysize=200)
+    for (info, block) in tqdm.tqdm(reader):
+        nFeats = nFeats + numpy.sum(block[0] == maskValue)
+    ######################################################################
+    print("There are {} pixel samples in the mask.".format(nFeats))
+
+    ######################################################################
+    # Initialise the numpy array for the feature data
+    ######################################################################
+    nBands = 0
+    for inImgInfo in inputImageInfo:
+        for band in inImgInfo.bands:
+            nBands = nBands + 1
+    featArr = numpy.zeros([nFeats, nBands, chipSize, chipSize], dtype=numpy.float32)
+    ######################################################################
+
+    ######################################################################
+    # Populate the feature arrays with the input data
+    ######################################################################
+    inImgs = list()
+    inImgBands = list()
+
+    inImgs.append(imageMask)
+    inImgBands.append([1])
+
+    for inImgInfo in inputImageInfo:
+        inImgs.append(inImgInfo.fileName)
+        inImgBands.append(inImgInfo.bands)
+    nImgs = len(inputImageInfo)
+
+    scnOverlap = chipHSize
+
+    reader = ImageReader(inImgs, windowxsize=200, windowysize=200, overlap=scnOverlap, layerselection=inImgBands)
+    iFeat = 0
+    for (info, block) in tqdm.tqdm(reader):
+        classMskArr = block[0]
+        blkShape = classMskArr.shape
+
+        xSize = blkShape[2] - (scnOverlap * 2)
+        ySize = blkShape[1] - (scnOverlap * 2)
+        xRange = numpy.arange(scnOverlap, scnOverlap + xSize, 1)
+        yRange = numpy.arange(scnOverlap, scnOverlap + ySize, 1)
+
+        for y in yRange:
+            yMin = y - scnOverlap
+            yMax = y + scnOverlap + 1
+            for x in xRange:
+                xMin = x - scnOverlap
+                xMax = x + scnOverlap + 1
+                if classMskArr[0][y][x] == 1:
+                    for nImg in range(nImgs):
+                        imgBlk = block[nImg + 1][..., yMin:yMax, xMin:xMax]
+                        for iBand in range(imgBlk.shape[0]):
+                            numpy.copyto(featArr[iFeat, iBand], imgBlk[iBand], casting='safe')
+                    iFeat = iFeat + 1
+    ######################################################################
+
+    ######################################################################
+    # Create the output HDF5 file and populate with data.
+    ######################################################################
+    fH5Out = h5py.File(outputHDF, 'w')
+    dataGrp = fH5Out.create_group("DATA")
+    metaGrp = fH5Out.create_group("META-DATA")
+    dataGrp.create_dataset('DATA', data=featArr, chunks=True, compression="gzip", shuffle=True)
+    describDS = metaGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
+    describDS[0] = 'IMAGE TILES'.encode()
+    fH5Out.close()
+    ######################################################################
 
 
 def getUniqueValues(img, img_band=1):
@@ -1365,7 +1442,8 @@ Note, the whole image band gets read into memory.
     uniq_vals = numpy.unique(valsArr)
 
     return uniq_vals
-    
+
+
 def combineBinaryMasks(msk_imgs_dict, out_img, output_lut, gdalformat='KEA'):
     """
 A function which combines up to 8 binary image masks to create a single 
