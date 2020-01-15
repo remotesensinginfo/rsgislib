@@ -1419,6 +1419,78 @@ could be used to extract image 'chips' for other purposes.
     ######################################################################
 
 
+def splitSampleChipHDF5File(input_h5_file, sample_h5_file, remain_h5_file, sample_size, rnd_seed):
+    """
+    A function to split the HDF5 outputs from the rsgislib.imageutils.extractChipZoneImageBandValues2HDF
+    function into two sets by taking a random set with the defined sample size from the input file,
+    saving the sample and the remainder to output HDF5 files.
+
+    :param input_h5_file: The input HDF5 file to the split.
+    :param sample_h5_file: The output HDF5 file with the sample outputted.
+    :param remain_h5_file: The output HDF5 file with the remainder outputted.
+    :param sample_size: An integer specifying the size of the sample to be taken.
+    :param rnd_seed: An integer specifying the seed for the random number generator,
+                     allowing the same 'random' sample to be taken.
+
+    """
+    import numpy
+    import h5py
+
+    f = h5py.File(input_h5_file, 'r')
+    n_rows = f['DATA/DATA'].shape[0]
+    f.close()
+
+    if sample_size > n_rows:
+        raise Exception("The requested sample is larger than the number samples in the input file.")
+
+    rnd_obj = numpy.random.RandomState(rnd_seed)
+    # Find sufficient unique sample indexes.
+    smp_idxs = numpy.zeros(sample_size, dtype=int)
+    while numpy.unique(smp_idxs).shape[0] != sample_size:
+        tmp_idxs = rnd_obj.randint(0, n_rows, sample_size)
+        tmp_uniq_idxs = numpy.unique(tmp_idxs)
+        c_idx = 0
+        if numpy.sum(smp_idxs) > 0:
+            c_smp = smp_idxs[smp_idxs > 0]
+            tmp_idxs = numpy.concatenate((c_smp, tmp_uniq_idxs))
+            tmp_uniq_idxs = numpy.unique(tmp_idxs)
+
+        max_idx = (sample_size - 1)
+        if tmp_uniq_idxs.shape[0] < max_idx:
+            max_idx = tmp_uniq_idxs.shape[0]
+        smp_idxs[0:max_idx] = tmp_uniq_idxs[0:max_idx]
+    smp_idxs = numpy.sort(smp_idxs)
+
+    # Get the remaining indexes
+    remain_idxs = numpy.arange(0, n_rows)
+    remain_idxs = remain_idxs[numpy.isin(remain_idxs, smp_idxs, assume_unique=True, invert=True)]
+
+    # Read the input HDF5 file.
+    f = h5py.File(input_h5_file, 'r')
+    in_samples = f['DATA/DATA']
+    out_samples = in_samples[smp_idxs]
+    remain_samples = in_samples[remain_idxs]
+    f.close()
+
+    # Create an output HDF5 file and populate with sample data.
+    fSampleH5Out = h5py.File(sample_h5_file, 'w')
+    dataSampleGrp = fSampleH5Out.create_group("DATA")
+    metaSampleGrp = fSampleH5Out.create_group("META-DATA")
+    dataSampleGrp.create_dataset('DATA', data=out_samples, chunks=True, compression="gzip", shuffle=True)
+    describSampleDS = metaSampleGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
+    describSampleDS[0] = 'IMAGE TILES'.encode()
+    fSampleH5Out.close()
+
+    # Create an output HDF5 file and populate with remain data.
+    fSampleH5Out = h5py.File(remain_h5_file, 'w')
+    dataSampleGrp = fSampleH5Out.create_group("DATA")
+    metaSampleGrp = fSampleH5Out.create_group("META-DATA")
+    dataSampleGrp.create_dataset('DATA', data=remain_samples, chunks=True, compression="gzip", shuffle=True)
+    describSampleDS = metaSampleGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
+    describSampleDS[0] = 'IMAGE TILES'.encode()
+    fSampleH5Out.close()
+
+
 def getUniqueValues(img, img_band=1):
     """
 Find the unique image values within an image band.
