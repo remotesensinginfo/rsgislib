@@ -56,7 +56,7 @@ def train_keras_pixel_classifer(cls_mdl, clsinfodict, out_mdl_file=None, train_e
     A function which trains a neural network defined using the keras API for the classification of remotely sensed data.
     A dict of class information, as ClassInfoObj objects, is defined with the training data.
 
-    This function requires that lightgbm and skopt modules to be installed.
+    This function requires that tensorflow and keras modules to be installed.
 
     :param out_mdl_file: The output model which can be loaded to perform a classification.
     :param clsinfodict: dict (key is string with class name) of ClassInfoObj objects defining the training data.
