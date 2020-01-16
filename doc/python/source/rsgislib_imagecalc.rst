@@ -26,8 +26,12 @@ Spectral Unmixing
 .. autofunction:: rsgislib.imagecalc.unconLinearSpecUnmix
 .. autofunction:: rsgislib.imagecalc.exhconLinearSpecUnmix
 .. autofunction:: rsgislib.imagecalc.conSum1LinearSpecUnmix
-.. autofunction:: rsgislib.imagecalc.nnConSum1LinearSpecUnmix
-
+.. autofunction:: rsgislib.imagecalc.specunmixing.rescale_unmixing_results
+.. autofunction:: rsgislib.imagecalc.specunmixing.calc_unconstrained_unmixing
+.. autofunction:: rsgislib.imagecalc.specunmixing.calc_non_negative_unmixing
+.. autofunction:: rsgislib.imagecalc.specunmixing.calc_fully_constrained_unmixing
+.. autofunction:: rsgislib.imagecalc.specunmixing.calc_unmix_rmse_residualerr
+.. autofunction:: rsgislib.imagecalc.specunmixing.predict_refl_img_from_simple_unmixing
 
 
 Statistics
@@ -69,7 +73,6 @@ Normalise
 .. autofunction:: rsgislib.imagecalc.normalisation
 .. autofunction:: rsgislib.imagecalc.rescaleImgPxlVals
 .. autofunction:: rsgislib.imagecalc.calcImageRescale
-.. autofunction:: rsgislib.imagecalc.rescaleUnmixingResults
 
 
 Geometry

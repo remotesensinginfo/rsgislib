@@ -364,7 +364,7 @@ used to define the spatial extent of the output images and spatial projection.
 :param gdalformat: is the output file format of the outCompImg, any GDAL compatable format is OK (Defaut is KEA).
 :param dataType: is the data type of the output image (outCompImg). If None is provided then the data type of the first input image will be used (Default None).
 :param calcStats: calculate image statics and pyramids (Default=True)
-:param reprojmethod : specifies the interpolation method used to reproject the input images which are in a different projection and/or pixel size as the reference image (default: cubic).
+:param reprojmethod: specifies the interpolation method used to reproject the input images which are in a different projection and/or pixel size as the reference image (default: cubic).
 :param use_mode: True: the land/water masks are combined using the mode and False: the land water masks are combined using median.
 
     """

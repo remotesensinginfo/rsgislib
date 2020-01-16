@@ -57,7 +57,7 @@ namespace rsgis{ namespace cmds{
     /** Function to copy geometry but remove attributes */
     DllExport void executeRemoveAttributes(std::string inputVector, std::string outputVector, bool force);
     /** Function to buffer vector */
-    DllExport void executeBufferVector(std::string inputVector, std::string lyrName, std::string outputVector, std::string vecDriver, float bufferDist);
+    DllExport void executeBufferVector(std::string inputVector, std::string lyrName, std::string outputVector, std::string outLyrName, std::string vecDriver, float bufferDist);
     /** Function to print polygon geometry */
     DllExport void executePrintPolyGeom(std::string inputVector);
     /** Function to find and replace text within an attribute table */

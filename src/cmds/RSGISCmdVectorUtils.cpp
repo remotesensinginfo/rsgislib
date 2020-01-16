@@ -221,7 +221,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void executeBufferVector(std::string inputVector, std::string lyrName, std::string outputVector, std::string vecDriver, float bufferDist) 
+    void executeBufferVector(std::string inputVector, std::string lyrName, std::string outputVector, std::string outLyrName, std::string vecDriver, float bufferDist)
     {
         try
         {
@@ -236,7 +236,7 @@ namespace rsgis{ namespace cmds {
             
             /////////////////////////////////////
             //
-            // Open Input Shapfile.
+            // Open Input Vector.
             //
             /////////////////////////////////////
             GDALDataset *inputVecDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);
@@ -255,7 +255,7 @@ namespace rsgis{ namespace cmds {
             
             /////////////////////////////////////
             //
-            // Create Output Shapfile.
+            // Create Output Vector.
             //
             /////////////////////////////////////
             GDALDriver *ogrVecDriver =  GetGDALDriverManager()->GetDriverByName(vecDriver.c_str());
@@ -270,10 +270,10 @@ namespace rsgis{ namespace cmds {
                 std::string message = std::string("Could not create vector file ") + outputVector;
                 throw rsgis::vec::RSGISVectorOutputException(message.c_str());
             }
-            OGRLayer *outputVecLayer = outputVecDS->CreateLayer(lyrName.c_str(), inputSpatialRef, wkbPolygon, NULL );
+            OGRLayer *outputVecLayer = outputVecDS->CreateLayer(outLyrName.c_str(), inputSpatialRef, wkbPolygon, NULL );
             if( outputVecLayer == NULL )
             {
-                std::string message = std::string("Could not create vector layer ") + lyrName;
+                std::string message = std::string("Could not create vector layer ") + outLyrName;
                 throw rsgis::vec::RSGISVectorOutputException(message.c_str());
             }
             

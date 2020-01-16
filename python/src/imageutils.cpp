@@ -2054,7 +2054,7 @@ static PyObject *ImageUtils_SplitSampleHDF5File(PyObject *self, PyObject *args, 
     unsigned int sampleSize = 0;
     int seed = 0;
 
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssIi:randomSampleHDF5File", kwlist, &pInputH5, &pOutputP1H5, &pOutputP2H5, &sampleSize, &seed))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssIi:splitSampleHDF5File", kwlist, &pInputH5, &pOutputP1H5, &pOutputP2H5, &sampleSize, &seed))
     {
         return NULL;
     }
@@ -2625,7 +2625,7 @@ static PyMethodDef ImageUtilsMethods[] = {
 ":param outputh5: is a string with the path to the output file.\n"
 ":param sample: is an integer with the number values to be sampled from the input file.\n"
 ":param seed: is an integer which seeds the random number generator\n."
-"\n"
+"\n\n"
 },
 
 {"splitSampleHDF5File", (PyCFunction)ImageUtils_SplitSampleHDF5File, METH_VARARGS | METH_KEYWORDS,
@@ -2639,7 +2639,7 @@ static PyMethodDef ImageUtilsMethods[] = {
 ":param outputp2h5: is a string with the path to the output file.\n"
 ":param sample: is an integer with the number values to be sampled from the input file.\n"
 ":param seed: is an integer which seeds the random number generator\n."
-"\n"
+"\n\n"
 },
 
 {"selectImageBands", ImageUtils_SelectImageBands, METH_VARARGS,
