@@ -7,22 +7,9 @@ from __future__ import print_function
 # import the C++ extension into this level
 from ._imagecalc import *
 
-haveGDALPy = True
-try:
-    import osgeo.gdal as gdal
-except ImportError:
-    haveGDALPy = False
-
 import rsgislib
 import numpy
 import math
-
-haveRIOS = True
-try:
-    from rios import applier
-    from rios import cuiprogress
-except ImportError as riosErr:
-    haveRIOS = False
 
 # define our own classes
 class BandDefn(object):
@@ -124,9 +111,7 @@ Example::
     
 """
     # Check gdal is available
-    if not haveGDALPy:
-        raise ImportError("The GDAL python bindings are required for "
-                          "calcDist2ImgVals function could not be imported")
+    import osgeo.gdal as gdal
     import rsgislib.imageutils
     
     haveListVals = False
@@ -228,9 +213,7 @@ Example::
 """
     
     # Check gdal is available
-    if not haveGDALPy:
-        raise ImportError("The GDAL python bindings are required for "
-                          "calcDist2ImgValsTiled function could not be imported")
+    import osgeo.gdal as gdal
     import os.path
     import math
     import glob
@@ -308,7 +291,6 @@ Example::
         proxOptions.append('VALUES='+strVals)    
     else:
         proxOptions.append('VALUES='+str(pxlVals))
-    
 
     distTiles = []
     distTileArgs = []
@@ -457,6 +439,8 @@ Function which rescales an input image base on a list of rescaling parameters.
 :param trim2Limits: whether to trim the output to the output min/max values.
 
 """
+    from rios import applier
+
     bandRescaleDict = dict()
     for rescaleObj in bandRescale:
         bandRescaleDict[rescaleObj.band-1] = rescaleObj
@@ -468,6 +452,7 @@ Function which rescales an input image base on a list of rescaling parameters.
         import tqdm
         progress_bar = rsgislib.TQDMProgressBar()
     except:
+        from rios import cuiprogress
         progress_bar = cuiprogress.GDALProgressBar()
 
     infiles = applier.FilenameAssociations()
@@ -560,11 +545,13 @@ A function which calculates the area (in metres) of the pixel projected in WGS84
 
 """
     import rsgislib.tools
+    from rios import applier
 
     try:
         import tqdm
         progress_bar = rsgislib.TQDMProgressBar()
     except:
+        from rios import cuiprogress
         progress_bar = cuiprogress.GDALProgressBar()
 
     rsgis_utils = rsgislib.RSGISPyUtils()
@@ -617,10 +604,7 @@ Boardman J.W., Kruse F.A, and Green R.O., "Mapping Target Signatures via
 
 """ 
     # Check gdal is available
-    if not haveGDALPy:
-        raise ImportError("The GDAL python bindings are required for "
-                          "calcPPI function could not be imported")
-    
+    import osgeo.gdal as gdal
     import rsgislib.imageutils
     
     imgDS = gdal.Open(inputimg)
@@ -722,6 +706,8 @@ Warning, this function can be very slow. Use rsgislib.imagecalc.imagePixelColumn
 
 """
     import scipy.stats
+    from rios import applier
+
     rsgis_utils = rsgislib.RSGISPyUtils()
 
     datatype = rsgis_utils.getRSGISLibDataTypeFromImg(inputImgs[0])
@@ -731,6 +717,7 @@ Warning, this function can be very slow. Use rsgislib.imagecalc.imagePixelColumn
         import tqdm
         progress_bar = rsgislib.TQDMProgressBar()
     except:
+        from rios import cuiprogress
         progress_bar = cuiprogress.GDALProgressBar()
 
     infiles = applier.FilenameAssociations()
@@ -782,6 +769,7 @@ order:
 
 """
     import rsgislib.imageutils
+    from rios import applier
 
     rsgis_utils = rsgislib.RSGISPyUtils()
     first = True
@@ -830,6 +818,7 @@ order:
         import tqdm
         progress_bar = rsgislib.TQDMProgressBar()
     except:
+        from rios import cuiprogress
         progress_bar = cuiprogress.GDALProgressBar()
 
     infiles = applier.FilenameAssociations()

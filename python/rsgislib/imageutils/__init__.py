@@ -16,11 +16,10 @@ import shutil
 import numpy
 
 import osgeo.gdal as gdal
-import osgeo.ogr as ogr
 import osgeo.osr as osr
 
 from rios import applier
-from rios import cuiprogress
+
 
 
 # define our own classes
@@ -1003,6 +1002,7 @@ Where:
         import tqdm
         progress_bar = rsgislib.TQDMProgressBar()
     except:
+        from rios import cuiprogress
         progress_bar = cuiprogress.GDALProgressBar()
 
     infiles = applier.FilenameAssociations()
@@ -1210,6 +1210,7 @@ Where:
         import tqdm
         progress_bar = rsgislib.TQDMProgressBar()
     except:
+        from rios import cuiprogress
         progress_bar = cuiprogress.GDALProgressBar()
 
     infiles = applier.FilenameAssociations()
@@ -1536,6 +1537,7 @@ masks. A JSON LUT is also generated to identify the image values to a
         import tqdm
         progress_bar = rsgislib.TQDMProgressBar()
     except:
+        from rios import cuiprogress
         progress_bar = cuiprogress.GDALProgressBar()
 
     in_vals_dict = dict()
