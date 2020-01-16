@@ -254,15 +254,17 @@ class RSGISPyUtils (object):
     def get_file_basename(self, filepath, checkvalid=False, n_comps=0):
         """
         Uses os.path module to return file basename (i.e., path and extension removed)
+
         :param filepath: string for the input file name and path
         :param checkvalid: if True then resulting basename will be checked for punctuation
-                            characters (other than underscores) and spaces, punctuation
-                            will be either removed and spaces changed to an underscore.
+                           characters (other than underscores) and spaces, punctuation
+                           will be either removed and spaces changed to an underscore.
                            (Default = False)
         :param n_comps: if > 0 then the resulting basename will be split using underscores
                         and the return based name will be defined using the n_comps
                         components split by under scores.
         :return: basename for file
+
         """
         import string
         basename = os.path.splitext(os.path.basename(filepath))[0]
@@ -380,6 +382,9 @@ class RSGISPyUtils (object):
     def renameGDALLayer(self, cFileName, oFileName):
         """
         Rename all the files associated with a GDAL layer.
+
+        :param cFileName: The current name of the GDAL layer.
+        :param oFileName: The output name of the GDAL layer.
 
         """
         layerDS = gdal.Open(cFileName, gdal.GA_ReadOnly)
@@ -575,6 +580,7 @@ class RSGISPyUtils (object):
     def reprojBBOX(self, bbox, inProjObj, outProjObj):
         """
         A function to reproject a bounding box.
+
         :param bbox: input bounding box (MinX, MaxX, MinY, MaxY)
         :param inProjObj: an osr.SpatialReference() object representing input projection.
         :param outProjObj: an osr.SpatialReference() object representing output projection.
@@ -617,6 +623,7 @@ class RSGISPyUtils (object):
     def reprojBBOX_epsg(self, bbox, inEPSG, outEPSG):
         """
         A function to reproject a bounding box.
+
         :param bbox: input bounding box (MinX, MaxX, MinY, MaxY)
         :param inEPSG: an EPSG code representing input projection.
         :param outEPSG: an EPSG code representing output projection.
@@ -685,9 +692,11 @@ class RSGISPyUtils (object):
     def buffer_bbox(self, bbox, buf):
         """
         Buffer the input BBOX by a set amount.
+
         :param bbox: the bounding box (MinX, MaxX, MinY, MaxY)
         :param buf: the amount of buffer by
-        :return: return the buffered bbox (MinX, MaxX, MinY, MaxY)
+        :return: the buffered bbox (MinX, MaxX, MinY, MaxY)
+
         """
         out_bbox = [0, 0, 0, 0]
         out_bbox[0] = bbox[0] - buf
@@ -1445,21 +1454,22 @@ class RSGISPyUtils (object):
         A function which will produce a list of dictionaries with all the combinations 
         of the input variables listed (i.e., the powerset). 
         
-        :param in_vals_lsts - dictionary with each value having a list of values.
-        :param val_dict - variable used in iterative nature of function which lists
-                          the variable for which are still to be looped through. Would 
-                          normally not be provided by the user as default is None. Be
-                          careful if you set as otherwise.
+        :param in_vals_lsts: dictionary with each value having a list of values.
+        :param val_dict: variable used in iterative nature of function which lists
+                         the variable for which are still to be looped through. Would
+                         normally not be provided by the user as default is None. Be
+                         careful if you set as otherwise.
 
         :returns: list of dictionaries with the same keys are the input but only a
                   single value will be associate with key rather than a list.
                    
         Example::
-			seg_vars_ranges = dict()
-			seg_vars_ranges['k'] = [5, 10, 20, 30, 40, 50, 60, 80, 100, 120]
-			seg_vars_ranges['d'] = [10, 20, 50, 100, 200, 1000, 10000]
-			seg_vars_ranges['minsize'] = [5, 10, 20, 50, 100, 200]
-			seg_vars = rsgis_utils.createVarList(seg_vars_ranges)
+
+            seg_vars_ranges = dict()
+            seg_vars_ranges['k'] = [5, 10, 20, 30, 40, 50, 60, 80, 100, 120]
+            seg_vars_ranges['d'] = [10, 20, 50, 100, 200, 1000, 10000]
+            seg_vars_ranges['minsize'] = [5, 10, 20, 50, 100, 200]
+            seg_vars = rsgis_utils.createVarList(seg_vars_ranges)
         
         """
         out_vars = []

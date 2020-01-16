@@ -21,7 +21,6 @@ import osgeo.osr as osr
 from rios import applier
 
 
-
 # define our own classes
 class ImageBandInfo(object):
     """

@@ -127,16 +127,15 @@ static PyObject *VectorUtils_PrintPolyGeom(PyObject *self, PyObject *args)
 static PyObject *VectorUtils_BufferVector(PyObject *self, PyObject *args)
 {
     const char *pszInputVector, *pszOutputVector;
-    const char *pszVectorLyrName;
+    const char *pszVectorLyrName, *pszVectorOutLyrName;
     const char *pszDriver;
     float bufferDist;
-    if( !PyArg_ParseTuple(args, "ssssf:buffervector", &pszInputVector, &pszVectorLyrName, &pszOutputVector, &pszDriver, &bufferDist))
+    if( !PyArg_ParseTuple(args, "sssssf:buffervector", &pszInputVector, &pszVectorLyrName, &pszOutputVector, &pszVectorOutLyrName, &pszDriver, &bufferDist))
         return NULL;
 
     try
     {
-        rsgis::cmds::executeBufferVector(std::string(pszInputVector), std::string(pszVectorLyrName), std::string(pszOutputVector), std::string(pszDriver), bufferDist);
-     
+        rsgis::cmds::executeBufferVector(std::string(pszInputVector), std::string(pszVectorLyrName), std::string(pszOutputVector), std::string(pszVectorOutLyrName), std::string(pszDriver), bufferDist);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -715,13 +714,14 @@ static PyMethodDef VectorUtilsMethods[] = {
 "\n"},
 
 {"buffervector", VectorUtils_BufferVector, METH_VARARGS, 
-"vectorutils.buffervector(inputvector, veclayername outputvector, ogrdriver, bufferDist)\n"
+"vectorutils.buffervector(inputvector, veclayername outputvector, outlayername, ogrdriver, bufferDist)\n"
 "A command to buffer a vector by a specified distance.\n\n"
 "Where:\n"
 "\n"
 ":param inputvector: is a string containing the name of the input vector\n"
 ":param veclayername: is a string with the name of the vector layer name\n"
 ":param outputvector: is a string containing the name of the output vector\n"
+":param outlayername: is a string containing the name of the output vector layer."
 ":param ogrdriver: is a string with the gdal/ogr driver specified (e.g., GPKG)\n"
 ":param bufferDist: is a float specifying the distance of the buffer, in map units.\n"
 "\n"
@@ -732,7 +732,7 @@ static PyMethodDef VectorUtilsMethods[] = {
 "   lyrName = 'polygons'\n"
 "   outputVector = './TestOutputs/injune_p142_stem_locations_1mbuffer.gpkg'\n"
 "   bufferDist = 1\n"
-"   vectorutils.buffervector(inputVector, lyrName, outputVector, 'GPKG', bufferDist)\n"
+"   vectorutils.buffervector(inputVector, lyrName, outputVector, lyrName, 'GPKG', bufferDist)\n"
 "\n"},
 
 {"printpolygeom", VectorUtils_PrintPolyGeom, METH_VARARGS, 

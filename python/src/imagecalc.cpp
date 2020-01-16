@@ -2086,6 +2086,7 @@ static PyMethodDef ImageCalcMethods[] = {
 ":param expbandname: is an optional bool specifying whether the band name should be the expression (Default = False).\n"
 ":param outputexists: is an optional bool specifying whether the output image already exists and it should be editted rather than overwritten (Default=False)."
 "\n"
+"\n"
 "Example::\n"
 "\n"
 "   import rsgislib\n"
@@ -2108,6 +2109,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "   bandDefns.append(BandDefn('b2', inFileName, 2))\n"
 "   bandDefns.append(BandDefn('b3', inFileName, 3))\n"
 "   imagecalc.bandMath('out.kea', ‘(b1==1) || (b2==1) || (b3==1)?1:0', 'KEA', rsgislib.TYPE_8UINT, bandDefns)\n"
+"\n"
 "\n"},
 
 {"imageMath", (PyCFunction)ImageCalc_ImageMath, METH_VARARGS | METH_KEYWORDS,
@@ -2126,6 +2128,7 @@ static PyMethodDef ImageCalcMethods[] = {
 ":param expbandname: is an optional bool specifying whether the band name should be the expression (Default = False).\n"
 ":param outputexists: is an optional bool specifying whether the output image already exists and it should be editted rather than overwritten (Default=False)."
 "\n"
+"\n"
 "Example::\n"
 "\n"
 "   import rsgislib\n"
@@ -2135,6 +2138,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "   datatype = rsgislib.TYPE_32UINT\n"
 "   expression = 'b1*1000'\n"
 "   imagecalc.imageMath(inFileName, outputImage, expression, gdalformat, datatype)\n"
+"\n"
 "\n"},
 
 {"imageBandMath", (PyCFunction)ImageCalc_ImageBandMath, METH_VARARGS | METH_KEYWORDS,
@@ -2153,6 +2157,7 @@ static PyMethodDef ImageCalcMethods[] = {
 ":param expbandname: is an optional bool specifying whether the band name should be the expression (Default = False).\n"
 ":param outputexists: is an optional bool specifying whether the output image already exists and it should be editted rather than overwritten (Default=False)."
 "\n"
+"\n"
 "Example::\n"
 "\n"
 "   import rsgislib\n"
@@ -2167,6 +2172,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "   import rsgislib\n"
 "   from rsgislib import imagecalc\n"
 "   imagecalc.imageBandMath('in.kea', 'out.kea', '(b1==1) || (b2==1) || (b3==1)?1:0', 'KEA', rsgislib.TYPE_8UINT)\n"
+"\n"
 "\n"},
 
 {"kMeansClustering", ImageCalc_KMeansClustering, METH_VARARGS,
@@ -2207,7 +2213,7 @@ static PyMethodDef ImageCalcMethods[] = {
 ":param inputImage: is a string providing the input image\n"
 ":param outputMatrix: is a string providing the output matrix (text file) to save the cluster centres to.\n"
 ":param numClusters: is the number of clusters to start with.\n"
-":param maxIterations: is the maximum number of itterations.\n"
+":param maxIterations: is the maximum number of iterations.\n"
 ":param subSample: is an int specifying what fraction of the total pixels should be considered (e.g., 100 = 1/100 pixels).\n"
 ":param ignoreZeros: is a bool specifying if zeros in the image should be treated as no data.\n"
 ":param initMethod: the method for initialising the clusters and is one of INITCLUSTER_:param values\n"
@@ -2992,6 +2998,7 @@ static PyMethodDef ImageCalcMethods[] = {
 ":param nNoDataVal: is a float for the new no-data value for the imagery (note, all input images have the same no-data value).\n"
 ":param nOffset: is a float for the new offset value.\n"
 ":param nGain: is a float for the new gain value.\n"
+"\n"
 "\n"},
     
     
