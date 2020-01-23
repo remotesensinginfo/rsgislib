@@ -2,7 +2,19 @@ RSGISLib Classification Module
 =================================
 
 .. automodule:: rsgislib.classification
-   :undoc-members:
+
+A number of options for classification are available within this module:
+
+.. toctree::
+   :maxdepth: 3
+
+   rsgislib_classification_classsklearn
+   rsgislib_classification_classlightgbm
+   rsgislib_classification_classkeraspxl
+   rsgislib_classification_clustersklearn
+   rsgislib_classification_classratutils
+
+
 
 Training Data
 --------------

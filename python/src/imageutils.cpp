@@ -2630,7 +2630,7 @@ static PyMethodDef ImageUtilsMethods[] = {
 
 {"splitSampleHDF5File", (PyCFunction)ImageUtils_SplitSampleHDF5File, METH_VARARGS | METH_KEYWORDS,
 "rsgislib.imageutils.splitSampleHDF5File(inputh5, outputp1h5, outputp2h5, sample, seed)\n"
-"A function which splits samples a HDF5 of extracted values. \n"
+"A function which splits samples a HDF5 of extracted values.\n"
 "\n"
 "Where:\n"
 "\n"
