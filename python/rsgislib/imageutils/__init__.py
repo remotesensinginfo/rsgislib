@@ -580,15 +580,18 @@ Where:
 :param outputImage: the output image name and path
 :param outWKT: a WKT file representing the output projection
 :param gdalformat: the output image file format (Default is KEA)
-:param interp: interpolation algorithm. Options are: near, bilinear, cubic, cubicspline, lanczos, average, mode. (Default is cubic)
-:param inWKT: if input image is not well defined this is the input image projection as a WKT file (Default is None, i.e., ignored)
+:param interp: interpolation algorithm. Options are: near, bilinear, cubic, cubicspline, lanczos, average,
+               mode. (Default is cubic)
+:param inWKT: if input image is not well defined this is the input image projection as a WKT file (Default
+              is None, i.e., ignored)
 :param noData: float representing the not data value (Default is 0.0)
-:param outPxlRes: three inputs can be provided
-                  1) 'image' where the output resolution will match the input (Default is image)
-                  2) 'auto' where an output resolution maintaining the image size of the input image will be used.
-                            You may consider using rsgislib.imageutils.gdal_warp instead of this option.
-                  3) provide a floating point value for the image resolution (note. pixels will be sqaure)
-:param snap2Grid: is a boolean specifying whether the TL pixel should be snapped to a multiple of the pixel resolution (Default is True).
+:param outPxlRes: three inputs can be provided. 1) 'image' where the output resolution will match the input
+                  (Default is image). 2) 'auto' where an output resolution maintaining the image size of the
+                  input image will be used. You may consider using rsgislib.imageutils.gdal_warp instead of
+                  this option. 3) provide a floating point value for the image resolution (note. pixels will
+                  be sqaure)
+:param snap2Grid: is a boolean specifying whether the TL pixel should be snapped to a multiple of the pixel
+                  resolution (Default is True).
 :param nCores: the number of processing cores available for processing (-1 is all cores: Default=-1)
 :param gdal_options: GDAL file creation options e.g., ["TILED=YES", "COMPRESS=LZW", "BIGTIFF=YES"]
 

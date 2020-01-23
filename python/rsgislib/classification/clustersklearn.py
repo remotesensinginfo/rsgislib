@@ -254,8 +254,3 @@ applied without boundary artifacts.
 
 
 
-
-img_pixel_cluster('S2_UVD_27sept_27700_sub.kea', 'S2_UVD_27sept_27700_sub_clusters_tiled.kea', gdalformat='KEA', noDataVal=0,
-                             clusterer=MiniBatchKMeans(n_clusters=60, init='k-means++', max_iter=100, batch_size=100),
-                             calcStats=True, useMeanShiftEstBandWidth=False)
-

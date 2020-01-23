@@ -627,7 +627,6 @@ class RSGISPyUtils (object):
         :param bbox: input bounding box (MinX, MaxX, MinY, MaxY)
         :param inEPSG: an EPSG code representing input projection.
         :param outEPSG: an EPSG code representing output projection.
-
         :return: (MinX, MaxX, MinY, MaxY)
 
         """
@@ -646,8 +645,8 @@ class RSGISPyUtils (object):
 
         :param bbox1: The first bounding box (MinX, MaxX, MinY, MaxY)
         :param bbox2: The first bounding box (MinX, MaxX, MinY, MaxY)
-
         :return: boolean (True they intersect; False they do not intersect)
+
         """
         x_min = 0
         x_max = 1
@@ -663,7 +662,6 @@ class RSGISPyUtils (object):
 
         :param bbox1: is a bbox (xMin, xMax, yMin, yMax)
         :param bbox2: is a bbox (xMin, xMax, yMin, yMax)
-
         :return: bbox (xMin, xMax, yMin, yMax)
 
         """
@@ -711,11 +709,10 @@ class RSGISPyUtils (object):
         
         :param inVec: is a string with the input vector file name and path.
         :param layerName: is the layer for which extent is to be calculated (Default: None)
-                           if None assume there is only one layer and that will be read.
+                          if None assume there is only one layer and that will be read.
         :param computeIfExp: is a boolean which specifies whether the layer extent
                              should be calculated (rather than estimated from header)
                              even if that operation is computationally expensive.
-        
         :return: boundary box is returned (MinX, MaxX, MinY, MaxY)
         
         """
@@ -971,9 +968,9 @@ class RSGISPyUtils (object):
         A function which calls the GDAL function on the band selected to calculate the pixel stats
         (min, max, mean, standard deviation). 
         
-        :param img: - input image file path
-        :param band: - specified image band for which stats are to be calculated (starts at 1).
-        :param compute: - whether the stats should be calculated (True; Default) or an approximation or pre-calculated stats are OK (False).
+        :param img: input image file path
+        :param band: specified image band for which stats are to be calculated (starts at 1).
+        :param compute: whether the stats should be calculated (True; Default) or an approximation or pre-calculated stats are OK (False).
         
         :return: stats (min, max, mean, stddev)
 

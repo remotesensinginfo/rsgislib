@@ -2984,14 +2984,14 @@ static PyMethodDef ImageCalcMethods[] = {
 "A function which can take either a list of images or a single image to produce a single stacked output image.\n"
 "The image values are rescaled applying the input (current; c) gain and offset and then applying the new (n) gain"
 " and offset to the output image. Note, the nodata image value is also defined and can be changed. \n"
-"For reference gain/offset are applied as: ImgVal = (gain * DN) + offset\n"
+"For reference gain/offset are applied as: ImgVal = (gain x DN) + offset\n"
 "\n"
 "Where:\n"
 "\n"
 ":param inputImgs: can be either a single input image file or a list of images to be stacked.\n"
 ":param outputImage: is the output image file.\n"
 ":param gdalformat: output raster format (e.g., KEA)\n"
-":param datatype: is an containing one of the values from rsgislib.TYPE_*\n"
+":param datatype: is an containing one of the values from rsgislib.TYPE_\n"
 ":param cNoDataVal: is a float for the current (existing) no-data value for the imagery (note, all input images have the same no-data value).\n"
 ":param cOffset: is a float for the current offset value.\n"
 ":param cGain:is a float for the current gain value.\n"
@@ -3003,7 +3003,7 @@ static PyMethodDef ImageCalcMethods[] = {
     
     
 {"getImgIdxForStat", (PyCFunction)ImageCalc_GetImgIdxForStat, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imagecalc.getImgIdxForStat(inimages=list, outimage=string, gdalformat=string, nodata=float, stat=rsgislib.SUMTYPE_*)\n"
+"rsgislib.imagecalc.getImgIdxForStat(inimages=list, outimage=string, gdalformat=string, nodata=float, stat=rsgislib.SUMTYPE_)\n"
 "A function which calculates the index (starting at 1) of the image in the list of input images which has the stat selected. \n"
 "The output image can be used within the rsgislib.imageutils.createMaxNDVICompositeImg function."
 "\n"
