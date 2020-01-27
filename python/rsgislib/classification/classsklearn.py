@@ -63,6 +63,7 @@ from rios import applier
 from rios import cuiprogress
 from rios import rat
 
+
 def train_sklearn_classifer_gridsearch(classTrainInfo, paramSearchSampNum=0,
                                        gridSearch=GridSearchCV(RandomForestClassifier(), {})):
     """
@@ -73,7 +74,7 @@ The returned classifier instance will be trained using all the inputted data.
 :param classTrainInfo: list of rsgislib.classification.ClassSimpleInfoObj objects which will be used to train the classifier.
 :param paramSearchSampNum: the number of samples that will be randomly sampled from the training data for each class
                            for applying the grid search (tend to use a small data sample as can take a long time).
-                            A value of 500 would use 500 samples per class.
+                           A value of 500 would use 500 samples per class.
 :param gridSearch: is an instance of the sklearn.model_selection.GridSearchCV with an instance of the choosen
                    classifier and parameters to be searched.
 
