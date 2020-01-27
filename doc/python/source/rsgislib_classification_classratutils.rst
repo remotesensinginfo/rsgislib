@@ -109,15 +109,15 @@ Finally, to produce a classification image file, rather than segmentation, where
     out_class_img = 's2_uvd_27sept_class.kea'
     rsgislib.classification.collapseClasses(clumps_img, out_class_img, 'KEA', out_class_str_col, out_class_int_col)
 
-Training
----------
+Training Functions
+-------------------
 
 .. autofunction:: rsgislib.classification.classratutils.findClassifierParameters
 .. autofunction:: rsgislib.classification.classratutils.balanceSampleTrainingRandom
 
 
-Classify
---------
+Classify Functions
+-------------------
 
 .. autofunction:: rsgislib.classification.classratutils.classifyWithinRAT
 .. autofunction:: rsgislib.classification.classratutils.classifyWithinRATTiled
