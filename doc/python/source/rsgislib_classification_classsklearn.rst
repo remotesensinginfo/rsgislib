@@ -15,18 +15,18 @@ To define training a raster with a unique value for each class, or multiple bina
     import rsgislib.vectorutils
     
     sen2_img = 'sen2_srefimg.kea'
-    mangroves_sample_vec_file = 'mangrove_cls_samples.json'
+    mangroves_sample_vec_file = 'mangrove_cls_samples.geojson'
     mangroves_sample_vec_lyr = 'mangrove_cls_samples'
     mangroves_sample_img = 'mangrove_cls_samples.kea'
     rsgislib.vectorutils.rasteriseVecLyr(mangroves_sample_vec_file, mangroves_sample_vec_lyr, sen2_img, mangroves_sample_img, gdalformat='KEA')
     
-    other_sample_vec_file = 'other_cls_samples.json'
+    other_sample_vec_file = 'other_cls_samples.geojson'
     other_sample_vec_lyr = 'other_cls_samples'
     other_sample_img = 'other_cls_samples.kea'
     rsgislib.vectorutils.rasteriseVecLyr(other_sample_vec_file, other_sample_vec_lyr, sen2_img, other_sample_img, gdalformat='KEA')
 
 
-To extract the image pixel values, which are stored within a HDF5 file (see https://portal.hdfgroup.org/display/HDF5/HDF5 for more information) the following functions are used. To define the images and associated bands to be used for the classification and therefore values need to be extracted then a list of rsgislib.imageutils.ImageBandInfo classes needs to be provided ::
+To extract the image pixel values, which are stored within a HDF5 file (see https://portal.hdfgroup.org/display/HDF5/HDF5 for more information) the following functions are used. To define the images and associated bands to be used for the classification and therefore values need to be extracted then a list of rsgislib.imageutils.ImageBandInfo classes needs to be provided::
     
     import rsgislib.imageutils
     

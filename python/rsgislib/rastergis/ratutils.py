@@ -1197,7 +1197,7 @@ Where:
 
 :param clumpsImg: input clumps file.
 :param classesDict: A dict structure with the class names as keys and the values are an array of two values
-                   [int class val, file path for shapefile].
+                   [int class val, file path for a vector file (e.g., shapefile)].
 :param tmpPath: File path (which needs to exist) where files can temporally be written.
 :param classesIntCol: Output column name for integer values representing each class.
 :param classesNameCol: Output column name for string class names.
@@ -1219,14 +1219,14 @@ Where:
         className = key
         classShpFile = classesDict[key][1]
         classShpFileLyr = os.path.splitext(os.path.basename(classShpFile))[0]
-        classImgFile = os.path.join(tmpPath, className+"_"+uid+".kea")
+        classImgFile = os.path.join(tmpPath, className+"_{}.kea".format(uid))
         classIntVal = classesDict[key][0]
         vectorutils.rasteriseVecLyr(classShpFile, classShpFileLyr, clumpsImg, classImgFile, gdalformat="KEA",
                                     burnVal=classIntVal, datatype=rsgislib.TYPE_16UINT)
         tmpClassImgLayers.append(classImgFile)
         classNamesDict[classIntVal] = className
     
-    combinedClassesImage = os.path.join(tmpPath, "CombinedClasses_" + uid + ".kea")
+    combinedClassesImage = os.path.join(tmpPath, "CombinedClasses_{}.kea".format(uid))
     imageutils.combineImages2Band(tmpClassImgLayers, combinedClassesImage, 'KEA', rsgislib.TYPE_8UINT, 0.0)
     
     rastergis.populateRATWithMode(valsimage=combinedClassesImage, clumps=clumpsImg, outcolsname=classesIntCol,
