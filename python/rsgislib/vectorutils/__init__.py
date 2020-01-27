@@ -1542,12 +1542,12 @@ def getAttLstSelectFeats(vecFile, vecLyr, attNames, selVecFile, selVecLyr):
     """
 Function to get a list of attribute values from features which intersect
 with the select layer.
+
 :param vecFile: vector layer from which the attribute data comes from.
 :param vecLyr: the layer name from which the attribute data comes from.
 :param attNames: a list of attribute names to be outputted.
 :param selVecFile: the vector file which will be intersected within the vector file.
 :param selVecLyr: the layer name which will be intersected within the vector file.
-
 :return: list of dictionaries with the output values.
 
 """
