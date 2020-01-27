@@ -64,7 +64,7 @@ Attributes
 .. autofunction:: rsgislib.vectorutils.getAttLstSelectFeats
 .. autofunction:: rsgislib.vectorutils.getAttLstSelectFeatsLyrObjs
 .. autofunction:: rsgislib.vectorutils.popBBOXCols
-
+.. autofunction:: rsgislib.vectorutils.performSpatialJoin
 
 Querying
 ---------
@@ -89,7 +89,7 @@ Rasterisation
 .. autofunction:: rsgislib.vectorutils.rasteriseVecLyr
 .. autofunction:: rsgislib.vectorutils.rasteriseVecLyrObj
 .. autofunction:: rsgislib.vectorutils.copyVec2RAT
-
+.. autofunction:: rsgislib.vectorutils.does_vmsk_img_intersect
 
 Image Information
 ------------------
