@@ -2721,7 +2721,7 @@ def calculate_mean_responses(responses, replicates):
 def apply_decision_tree_estimator(params, presence_absence_data, estimator=None, validation='split-sample', test_fraction=0.15,
                                   replicates=10, gdalformat='GTiff', clf_labels='Presence-Absence', Overwrite=True):
     """
-    A function to model species distributions using scikit-learn decision tree classifiers supporting the methods: feature_importances_ and predict_proba.
+    A function to model species distributions using scikit-learn decision tree classifiers supporting the methods feature_importances_ and predict_proba.
     Use with: DecisionTreeClassifier, GradientBoostingClassifier, RandomForestClassifier, ExtraTreesClassifier or AdaBoostClassifier.
 
     :param params: A python dictionary containing the simulation parameters.
