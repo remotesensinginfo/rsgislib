@@ -96,14 +96,14 @@ To apply trained classifier you need to use the following function::
 The output image file name needs to be defined and an image mask also needs to provided which defines the parts of the image to be classified. This is useful as by using a previous classification result as the mask for another classifier a hierarchical classification process could be built.
 
 
-Training
----------
+Training Functions
+-------------------
 
 .. autofunction:: rsgislib.classification.classsklearn.train_sklearn_classifer_gridsearch
 .. autofunction:: rsgislib.classification.classsklearn.train_sklearn_classifier
 
-Classify
---------
+Classify Functions
+-------------------
 
 .. autofunction:: rsgislib.classification.classsklearn.apply_sklearn_classifer
 .. autofunction:: rsgislib.classification.classsklearn.perform_voting_classification

@@ -70,16 +70,18 @@ def train_lightgbm_binary_classifer(out_mdl_file, cls1_train_file, cls1_valid_fi
     This function requires that lightgbm and skopt modules to be installed.
 
     :param out_mdl_file: The output model which can be loaded to perform a classification.
-    :param cls1_train_file:
-    :param cls1_valid_file:
-    :param cls1_test_file:
-    :param cls2_train_file:
-    :param cls2_valid_file:
-    :param cls2_test_file:
+    :param cls1_train_file: Training samples HDF5 file for the primary class (i.e., the one being classified)
+    :param cls1_valid_file: Validation samples HDF5 file for the primary class (i.e., the one being classified)
+    :param cls1_test_file: Testing samples HDF5 file for the primary class (i.e., the one being classified)
+    :param cls2_train_file: Training samples HDF5 file for the 'other' class
+    :param cls2_valid_file: Validation samples HDF5 file for the 'other' class
+    :param cls2_test_file: Testing samples HDF5 file for the 'other' class
     :param out_info_file: An optional output JSON file with information about the classifier which has been created.
-    :param unbalanced:
-    :param nthread:
-    :param scale_pos_weight:
+    :param unbalanced: Specify that the training data is unbalance (i.e., a different number of samples per class)
+                       and LightGBM will try to take this into account during training.
+    :param nthread: The number of threads to use for the training.
+    :param scale_pos_weight: Optional, default is None. If None then a value will automatically be calculated.
+                             Parameter used to balance imbalanced training data.
 
     """
     print("Reading Class 1 Training")
