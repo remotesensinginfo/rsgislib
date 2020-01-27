@@ -86,7 +86,7 @@ Logistic Regression (MaxEnt)::
 
     # define the estimator:
     from sklearn.linear_model import LogisticRegression as maxent
-    estimator = maxent(solver='liblinear', max_iter=500, penalty='l2', tol=0.0001, C=0.1, fit_intercept=True, intercept_scaling=1, n_jobs=4)
+    estimator = maxent(solver='liblinear', max_iter=500, penalty='l2', tol=0.0001, C=0.1, fit_intercept=True, intercept_scaling=1, n_jobs=1)
 
     # run the simulation:
     rsgislib.sdm.apply_meta_estimator(simulation, presence_absence_data, estimator, validation='split-sample', test_fraction=0.1, replicates=10, gdalformat='GTiff', clf_labels='Presence-Absence', Overwrite=True)
@@ -101,6 +101,23 @@ Gradiant Boosting::
     # run the simulation:
     rsgislib.sdm.apply_decision_tree_estimator(simulation, presence_absence_data, estimator, validation='split-sample', test_fraction=0.1, replicates=10, gdalformat='GTiff', clf_labels='Presence-Absence', Overwrite=True)
     del presence_absence_data, simulation
+
+
+Docker
+------
+If you are running these functions from within Docker (or Singularity) then you may get an error from matplotlib either a 'Segmentation Fault' or error related to the 'Backend'. This is due to fast that there is no graphical interface within a docker image and therefore we need to use an appropriate 'backend'.
+
+To change to use the Agg backend the following import and function need to run before the rsgislib.sdm import::
+
+    import matplotlib
+    matplotlib.use('Agg')
+
+Python Future Warnings
+-----------------------
+From the scikit-learn functions you sometimes get future warning printed to the console. You can set the following filters to the top of your script prevent these printing to the console::
+
+    import warnings
+    warnings.simplefilter(action='ignore', category=FutureWarning)
 
 
 Loading Data
