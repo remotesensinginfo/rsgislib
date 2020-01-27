@@ -89,12 +89,11 @@ Rasterisation
 .. autofunction:: rsgislib.vectorutils.rasteriseVecLyr
 .. autofunction:: rsgislib.vectorutils.rasteriseVecLyrObj
 .. autofunction:: rsgislib.vectorutils.copyVec2RAT
-.. autofunction:: rsgislib.vectorutils.does_vmsk_img_intersect
 
 Image Information
 ------------------
 .. autofunction:: rsgislib.vectorutils.findCommonImgExtent
-
+.. autofunction:: rsgislib.vectorutils.does_vmsk_img_intersect
 
 Utilities
 ---------
