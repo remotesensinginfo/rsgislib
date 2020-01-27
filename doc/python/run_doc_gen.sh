@@ -1,4 +1,4 @@
-#docker run -itv petebunting/au-eoed-dev /bin/bash
+#docker run -itv ${PWD}:/data petebunting/au-eoed-dev /bin/bash
 
 pip install python-docs-theme
 pip install sphinxcontrib.yt
