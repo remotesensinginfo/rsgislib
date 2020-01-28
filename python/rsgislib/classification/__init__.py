@@ -181,7 +181,7 @@ Where:
     popClassInfoAccuracyPts(inputImage, outputPtsShp, classImgCol, classImgVecCol, classRefVecCol)
 
 
-def get_class_training_data(imgBandInfo, classVecSampleInfo, tmpdir, refImg=None):
+def get_class_training_data(imgBandInfo, classVecSampleInfo, tmpdir, sub_sample=None, refImg=None):
     """
     A function to extract training for vector regions for a given input image set.
 
@@ -189,6 +189,8 @@ def get_class_training_data(imgBandInfo, classVecSampleInfo, tmpdir, refImg=None
     :param classVecSampleInfo: A list of rsgislib.classification.ClassVecSamplesInfoObj objects to define the
                                training regions.
     :param tmpdir: A directory for temporary outputs created during the processing.
+    :param sub_sample: If not None then an integer needs to be provided which takes a random selection from the
+                       available samples to balance the number of samples used for the classification.
     :param refImg: A reference image which defines the area of interest, pixel size etc. for the processing.
                    If None then an image will be generated using the input images but the tmpdir needs to be defined.
     :return: dictionary of ClassSimpleInfoObj objects.
@@ -222,6 +224,14 @@ def get_class_training_data(imgBandInfo, classVecSampleInfo, tmpdir, refImg=None
                                              out_vec_img, gdalformat="KEA", burnVal=class_sample_info.id,
                                              datatype=rsgislib.TYPE_16UINT, vecAtt=None, vecExt=False, thematic=True,
                                              nodata=0)
+
+        if sub_sample is not None:
+            out_vec_img_subsample = os.path.join(tmp_lcl_dir, "{}_img_subsample.kea".format(cls_basename))
+            rsgislib.imageutils.performRandomPxlSampleInMaskLowPxlCount(out_vec_img, out_vec_img_subsample,
+                                                                        'KEA', maskvals=[class_sample_info.id],
+                                                                        numSamples=sub_sample)
+            out_vec_img = out_vec_img_subsample
+
         rsgislib.imageutils.extractZoneImageBandValues2HDF(imgBandInfo, out_vec_img, class_sample_info.fileH5,
                                                            class_sample_info.id)
         rand_red_val = random.randint(1, 255)
