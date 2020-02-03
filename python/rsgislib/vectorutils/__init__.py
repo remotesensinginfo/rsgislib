@@ -28,6 +28,26 @@ import rsgislib.imageutils
 # Import the RSGISLib RasterGIS module
 import rsgislib.rastergis 
 
+class VecLayersInfoObj(object):
+    """
+    This is a class to store the information associated within the rsgislib.vectorutils.merge_to_multi_layer_vec function.
+
+    :param vecfile: input vector file.
+    :param veclyr: input vector layer name
+    :param outlyr: output vector layer name
+
+    """
+
+    def __init__(self, vecfile=None, veclyr=None, outlyr=None):
+        """
+        :param vecfile: input vector file.
+        :param veclyr: input vector layer name
+        :param outlyr: output vector layer name
+
+        """
+        self.vecfile = vecfile
+        self.veclyr = veclyr
+        self.outlyr = outlyr
 
 def rasterise2Image(inputVec, inputImage, outImage, gdalformat="KEA", burnVal=1, shpAtt=None, shpExt=False):
     """ 
@@ -3153,4 +3173,26 @@ def does_vmsk_img_intersect(input_vmsk_img, roi_vec_file, roi_vec_lyr, tmp_dir, 
         shutil.rmtree(tmp_file_dir)
     return img_intersect
 
+def merge_to_multi_layer_vec(input_file_lyrs, output_file, format='GPKG', overwrite=True):
+    """
+    A function which takes a list of vector files and layers (as VecLayersInfoObj objects)
+    and merged them into a multi-layer vector file.
+
+    :param input_file_lyrs: list of VecLayersInfoObj objects.
+    :param output_file: output vector file.
+    :param format: output format Default='GPKG'.
+    :param overwrite: bool (default = True) specifying whether the input file should be 
+                      overwritten if it already exists.
+
+    """
+    first = True
+    for vec in input_file_lyrs:
+        vec_lyr_obj = open_gdal_vec_lyr(vec.vecfile, vec.veclyr)
+        if first and overwrite:
+            rsgislib.vectorutils.writeVecLyr2File(vec_lyr_obj, output_file, vec.outlyr, format,
+                                                  options=['OVERWRITE=YES'], replace=True)
+        else:
+            rsgislib.vectorutils.writeVecLyr2File(vec_lyr_obj, output_file, vec.outlyr, format)
+        vec_lyr_obj = None
+        first = False
 
