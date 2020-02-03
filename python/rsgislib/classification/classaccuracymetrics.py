@@ -125,9 +125,26 @@ def calc_class_accuracy_metrics(ref_samples, pred_samples, cls_area=None, cls_na
     user_accuracy = [(row[idx] / row.sum()) * 100 for idx, row in enumerate(cm)]
     producer_accuracy = [(col[idx] / col.sum()) * 100 for idx, col in enumerate(cm.T)]
 
+    # convert absolute areas into proportional areas:
+    prop_area = (cls_area / cls_area.sum()).reshape(-1, 1)  # same as Comparison Total (see Ref.)
+    # normalise the confusion matrix by proportional area:
+    norm_cm = cm.astype(float) / cm.sum(axis=1)[:, ].reshape(-1, 1)
+    norm_cm = norm_cm * prop_area
+    comp_total = norm_cm.sum(axis=1)  # same as proportional area
+    ref_total = norm_cm.sum(axis=0)
+    commission = [(row.sum() - row[idx]) for idx, row in enumerate(norm_cm)]
+    ommission = ref_total - numpy.diag(norm_cm)
+    # Sum the normalised cm columns to estimate the proportion of scene for each class.
+    cls_area_prop = numpy.sum(norm_cm, axis=0)
+
     acc_metrics['confusion_matrix'] = cm.tolist()
     acc_metrics['user_accuracy'] = user_accuracy
     acc_metrics['producer_accuracy'] = producer_accuracy
+
+    acc_metrics['norm_confusion_matrix'] = norm_cm.tolist()
+    acc_metrics['commission'] = commission
+    acc_metrics['ommission'] = ommission.tolist()
+    acc_metrics['est_prop_cls_area'] = cls_area_prop.tolist()
 
     if cls_area is not None:
         quantity_metrics = cls_quantity_accuracy(ref_samples, pred_samples, cls_area)
@@ -160,6 +177,7 @@ def calc_acc_metrics_vecsamples(in_vec_file, in_vec_lyr, ref_col, cls_col, cls_i
                          a CSV file (Default=None).
 
     """
+    import rsgislib
     import rsgislib.vectorutils
     import rsgislib.rastergis
     import rsgislib.rastergis.ratutils
@@ -198,8 +216,14 @@ def calc_acc_metrics_vecsamples(in_vec_file, in_vec_lyr, ref_col, cls_col, cls_i
     img_hist_data = rsgislib.rastergis.ratutils.getColumnData(cls_img, img_hist_col)
     img_clsname_data = rsgislib.rastergis.ratutils.getColumnData(cls_img, img_cls_name_col)
 
+    rsgis_utils = rsgislib.RSGISPyUtils()
+    pxl_size_x, pxl_size_y = rsgis_utils.getImageRes(cls_img)
+    pxl_area = pxl_size_x * pxl_size_y
+
     # Find the class areas (pixel counts)
     cls_pxl_count_dict = dict()
+    cls_area_dict = dict()
+    tot_area = 0.0
     cls_pxl_counts = numpy.zeros_like(unq_cls_names, dtype=int)
     for i, cls_name in enumerate(img_clsname_data):
         cls_name = str(cls_name.decode())
@@ -208,10 +232,13 @@ def calc_acc_metrics_vecsamples(in_vec_file, in_vec_lyr, ref_col, cls_col, cls_i
                 raise Exception("Class ('{}') found in image which was not in point samples...".format(cls_name))
             cls_pxl_counts[cls_name_lut[cls_name]] = img_hist_data[i]
             cls_pxl_count_dict[cls_name] = img_hist_data[i]
+            cls_area_dict[cls_name] = img_hist_data[i] * pxl_area
+            tot_area = tot_area + (img_hist_data[i] * pxl_area)
 
     acc_metrics = calc_class_accuracy_metrics(ref_int_vals, cls_int_vals, cls_pxl_counts, unq_cls_names)
 
-    acc_metrics['pixel_area'] = cls_pxl_count_dict
+    acc_metrics['pixel_count'] = cls_pxl_count_dict
+    acc_metrics['pixel_area'] = cls_area_dict
 
     if out_json_file is not None:
         import json
@@ -256,6 +283,7 @@ def calc_acc_metrics_vecsamples(in_vec_file, in_vec_lyr, ref_col, cls_col, cls_i
             acc_metrics_writer.writerow([''])
 
             # Output the confusion matrix
+            acc_metrics_writer.writerow(['Point Count Confusion Matrix'])
             cm_top_row = ['']
             for cls_name in unq_cls_names:
                 cm_top_row.append(cls_name)
@@ -272,11 +300,32 @@ def calc_acc_metrics_vecsamples(in_vec_file, in_vec_lyr, ref_col, cls_col, cls_i
             for prod_val in acc_metrics['producer_accuracy']:
                 cm_bot_row.append(prod_val)
             acc_metrics_writer.writerow(cm_bot_row)
+            acc_metrics_writer.writerow([''])
+
+            acc_metrics_writer.writerow(['Normalised Confusion Matrix'])
+            # Output the normalised confusion matrix
+            cm_top_row = ['']
+            for cls_name in unq_cls_names:
+                cm_top_row.append(cls_name)
+            acc_metrics_writer.writerow(cm_top_row)
+            for cls_name, cm_row in zip(unq_cls_names, acc_metrics['norm_confusion_matrix']):
+                row = [cls_name]
+                for val in cm_row:
+                    row.append(val)
+                acc_metrics_writer.writerow(row)
 
             acc_metrics_writer.writerow([''])
-            acc_metrics_writer.writerow(['class', 'pixel count'])
-            for cls_name in unq_cls_names:
-                acc_metrics_writer.writerow([cls_name, cls_pxl_count_dict[cls_name]])
+            acc_metrics_writer.writerow(['class', 'commission', 'ommision'])
+            for i, cls_name in enumerate(unq_cls_names):
+                acc_metrics_writer.writerow([cls_name, acc_metrics['commission'][i], acc_metrics['ommission'][i]])
 
-    import pprint
-    pprint.pprint(acc_metrics)
+            acc_metrics_writer.writerow([''])
+            acc_metrics_writer.writerow(['class', 'pixel count', 'pixel area', 'Est. Prop. Area', 'Est. Area'])
+            for i, cls_name in enumerate(unq_cls_names):
+                acc_metrics_writer.writerow([cls_name, cls_pxl_count_dict[cls_name], cls_area_dict[cls_name],
+                                             acc_metrics['est_prop_cls_area'][i],
+                                             (tot_area * acc_metrics['est_prop_cls_area'][i])])
+
+    if (out_json_file is None) and (out_csv_file is None):
+        import pprint
+        pprint.pprint(acc_metrics)
