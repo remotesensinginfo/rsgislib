@@ -447,7 +447,7 @@ def train_lightgbm_multiclass_classifer(out_mdl_file, clsinfodict, out_info_file
         f = h5py.File(clsinfodict[clsname].testfileH5, 'r')
         sgl_cls_info['test_n_rows'] = f['DATA/DATA'].shape[0]
         sgl_cls_info['test_data'] = numpy.array(f['DATA/DATA'])
-        sgl_cls_info['test_data_lbls'] = numpy.zeros(sgl_cls_info['valid_n_rows'], dtype=int)
+        sgl_cls_info['test_data_lbls'] = numpy.zeros(sgl_cls_info['test_n_rows'], dtype=int)
         sgl_cls_info['test_data_lbls'][...] = clsinfodict[clsname].id
         f.close()
         test_data_lst.append(sgl_cls_info['test_data'])
