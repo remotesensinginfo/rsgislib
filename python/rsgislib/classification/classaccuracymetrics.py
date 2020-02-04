@@ -215,6 +215,7 @@ def calc_acc_metrics_vecsamples(in_vec_file, in_vec_lyr, ref_col, cls_col, cls_i
 
     img_hist_data = rsgislib.rastergis.ratutils.getColumnData(cls_img, img_hist_col)
     img_clsname_data = rsgislib.rastergis.ratutils.getColumnData(cls_img, img_cls_name_col)
+    img_clsname_data[0] = ''
 
     rsgis_utils = rsgislib.RSGISPyUtils()
     pxl_size_x, pxl_size_y = rsgis_utils.getImageRes(cls_img)
@@ -242,13 +243,13 @@ def calc_acc_metrics_vecsamples(in_vec_file, in_vec_lyr, ref_col, cls_col, cls_i
 
     if out_json_file is not None:
         import json
-        with open(out_json_file, 'w') as out_json_file:
-            json.dump(acc_metrics, out_json_file, sort_keys=True, indent=4, separators=(',', ': '), ensure_ascii=False)
+        with open(out_json_file, 'w') as out_json_file_obj:
+            json.dump(acc_metrics, out_json_file_obj, sort_keys=True, indent=4, separators=(',', ': '), ensure_ascii=False)
 
     if out_csv_file is not None:
         import csv
-        with open(out_csv_file, mode='w') as out_csv_file:
-            acc_metrics_writer = csv.writer(out_csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        with open(out_csv_file, mode='w') as out_csv_file_obj:
+            acc_metrics_writer = csv.writer(out_csv_file_obj, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
             # Overall Accuracy
             acc_metrics_writer.writerow(['overall accuracy', acc_metrics['accuracy']])
