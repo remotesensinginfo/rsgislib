@@ -458,8 +458,8 @@ def train_lightgbm_multiclass_classifer(out_mdl_file, clsinfodict, out_info_file
 
     print("Finished Reading Data")
 
-    d_train = lgb.Dataset(train_data_lst, label=numpy.concatenate(train_lbls_lst))
-    d_valid = lgb.Dataset(valid_data_lst, label=numpy.concatenate(valid_lbls_lst))
+    d_train = lgb.Dataset(numpy.concatenate(train_data_lst), label=numpy.concatenate(train_lbls_lst))
+    d_valid = lgb.Dataset(numpy.concatenate(valid_data_lst), label=numpy.concatenate(valid_lbls_lst))
 
     vaild_np = numpy.concatenate(valid_data_lst)
     vaild_lbl_np = numpy.concatenate(valid_lbls_lst)
