@@ -228,7 +228,7 @@ def calc_acc_metrics_vecsamples(in_vec_file, in_vec_lyr, ref_col, cls_col, cls_i
     cls_pxl_counts = numpy.zeros_like(unq_cls_names, dtype=int)
     for i, cls_name in enumerate(img_clsname_data):
         cls_name = str(cls_name.decode())
-        if i > 0:
+        if (i > 0) and (cls_name !=''):
             if cls_name not in unq_cls_names:
                 raise Exception("Class ('{}') found in image which was not in point samples...".format(cls_name))
             cls_pxl_counts[cls_name_lut[cls_name]] = img_hist_data[i]
