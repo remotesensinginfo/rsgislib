@@ -8,3 +8,4 @@ from .filemanipulation import *
 from .visualisation import *
 from .utm import *
 from .stats import *
+from .tilecacheutils import *
