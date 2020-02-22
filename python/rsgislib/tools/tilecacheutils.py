@@ -334,3 +334,54 @@ def get_tiles(bbox, zooms, tms=True, truncate=False):
                     tiles[z].append((i, j, z))
     return tiles
 
+
+def convert_between_tms_xyz(tiles_dir):
+    """
+    A function which converts between TMS and XYZ tile indexing. The conversion is performed in-situ
+    with the files simply renamed. If a tile cache is in TMS format then this function will convert
+    it to XYZ, while if it is in XYZ format then it will convert it to TMS (they are easily interchangeable)
+
+    The TMS format uses a grid with the origin at the bottom-left. While the XYZ
+    format is uses a grid with the origin in the top-left.
+
+    XYZ grids can be loads into QGIS and other GIS systems as layers.
+    TMS grids are outputted by gdal2tiles.py.
+
+    :param tiles_dir: The input directory for the tile cache.
+
+    """
+    import os
+    import rsgislib
+    import tqdm
+    c_pwd = os.getcwd()
+    rsgis_utils = rsgislib.RSGISPyUtils()
+    in_zoom_dirs = []
+    lcl_files = os.listdir(tiles_dir)
+    for lcl_file in lcl_files:
+        lcl_name = lcl_file
+        lcl_file = os.path.join(tiles_dir, lcl_file)
+        if os.path.isdir(lcl_file) and rsgis_utils.isNumber(lcl_name):
+            in_zoom_dirs.append(os.path.abspath(lcl_file))
+    for zoom_dir in tqdm.tqdm(in_zoom_dirs, desc='overall'):
+        zoom = int(os.path.basename(zoom_dir))
+        x_dirs = os.listdir(zoom_dir)
+        for x_dir in tqdm.tqdm(x_dirs, desc='zoom {}'.format(zoom), leave=False):
+            if rsgis_utils.isNumber(x_dir):
+                x = int(x_dir)
+                x_dir = os.path.join(zoom_dir, x_dir)
+                if os.path.isdir(x_dir) and rsgis_utils.isNumber(x):
+                    y_files = os.listdir(x_dir)
+                    os.chdir(x_dir)
+                    for y_file in tqdm.tqdm(y_files, desc='y', leave=False):
+                        y_cur_file = os.path.join(x_dir, y_file)
+                        y_in_str = os.path.splitext(y_file)[0]
+                        if rsgis_utils.isNumber(y_in_str):
+                            y_in = int(y_in_str)
+                            img_ext = os.path.splitext(y_file)[1]
+                            n_tile_x, n_tile_y, n_zoom = flip_xyz_tms_tiles(x, y_in, zoom)
+                            out_img_file = "{}{}".format(n_tile_y, img_ext)
+                            os.rename(y_cur_file, out_img_file)
+    os.chdir(c_pwd)
+
+
+
