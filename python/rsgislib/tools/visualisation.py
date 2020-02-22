@@ -6,13 +6,10 @@ The tools.visualisation module contains functions for aiding visualisation of da
 # Import modules
 import rsgislib
 import rsgislib.imageutils
-
 import os.path
 import os
 import shutil
 import subprocess
-import math
-
 
 def createKMZImg(inputImg, outputFile, bands, reprojLatLong=True, finiteMsk=False):
     """
@@ -28,7 +25,6 @@ def createKMZImg(inputImg, outputFile, bands, reprojLatLong=True, finiteMsk=Fals
     :param finiteMsk: specify whether the image data should be masked so all values are finite before stretching.
     
     """
-    
     bandLst = bands.split(',')
     multiBand = False
     if len(bandLst) == 3:
@@ -87,7 +83,7 @@ def createKMZImg(inputImg, outputFile, bands, reprojLatLong=True, finiteMsk=Fals
     shutil.rmtree(tmpDIR)
 
 
-def createWebTilesImg(inputImg, outputDIR, bands, zoomLevels='2-10', resample='average', finiteMsk=False):
+def createWebTilesImg(inputImg, outputDIR, bands, zoomLevels='2-10', resample='average', finiteMsk=False, tms=True):
     """
     A function to convert an input image to a tile cache for web map servers, where the input image
     is stretched and bands sub-selected / ordered as required for visualisation.
@@ -100,6 +96,10 @@ def createWebTilesImg(inputImg, outputDIR, bands, zoomLevels='2-10', resample='a
     :param zoomLevels: The zoom levels to be created for the web tile cache.
     :param resample: Method of resampling (average,near,bilinear,cubic,cubicspline,lanczos,antialias)
     :param finiteMsk: specify whether the image data should be masked so all values are finite before stretching.
+    :param tms: if TMS is True then a tile grid in TMS format is returned with
+                the grid origin at the bottom-left. If False then an XYZ tile grid
+                format is used with the origin in the top-left.
+                (TMS: gdal2tiles.py native. XYZ: GIS Compatible)
     
     """
     bandLst = bands.split(',')
@@ -140,18 +140,22 @@ def createWebTilesImg(inputImg, outputDIR, bands, zoomLevels='2-10', resample='a
     stretchImg = os.path.join(tmpDIR, baseName+'_stretch.kea')
     rsgislib.imageutils.stretchImage(img2Stch, stretchImg, False, '', True, False, 'KEA', rsgislib.TYPE_8UINT, rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
     
-    cmd = 'gdal2tiles.py -r ' + resample + ' -z ' + zoomLevels + ' -a  0 ' + stretchImg + ' ' + outputDIR
+    cmd = 'gdal2tiles.py -r {0} -z {1} -a  0 {2} {3}'.format(resample, zoomLevels, stretchImg, outputDIR)
     print(cmd)
     try:
         subprocess.check_call(cmd, shell=True)
     except OSError as e:
        raise rsgislib.RSGISPyException('Could not execute command: ' + cmd)
-        
+
+    if not tms:
+        from rsgislib.tools import convert_between_tms_xyz
+        convert_between_tms_xyz(outputDIR)
+
     shutil.rmtree(tmpDIR)
 
 
 def createWebTilesImg(inputImg, bands, outputDIR, zoomLevels='2-10', img_stats_msk=None, img_msk_vals=1, tmp_dir=None,
-                      webview=True):
+                      webview=True, tms=True):
     """
     A function to produce a web cache for the input image.
 
@@ -167,6 +171,10 @@ def createWebTilesImg(inputImg, bands, outputDIR, zoomLevels='2-10', img_stats_m
                     (i.e., input is None) then a local directory will be define in the same folder as the input
                     image.
     :param webview: Provide default GDAL leaflet web viewer.
+    :param tms: if TMS is True then a tile grid in TMS format is returned with
+                the grid origin at the bottom-left. If False then an XYZ tile grid
+                format is used with the origin in the top-left.
+                (TMS: gdal2tiles.py native. XYZ: GIS Compatible)
 
     """
     bandLst = bands.split(',')
@@ -233,6 +241,9 @@ def createWebTilesImg(inputImg, bands, outputDIR, zoomLevels='2-10', img_stats_m
         raise rsgislib.RSGISPyException('Could not execute command: ' + cmd)
     shutil.rmtree(tmpDIR)
 
+    if not tms:
+        from rsgislib.tools import convert_between_tms_xyz
+        convert_between_tms_xyz(outputDIR)
 
 def createQuicklookImgs(inputImg, bands, outputImgs='quicklook.jpg', output_img_sizes=250, scale_axis='auto',
                         img_stats_msk=None, img_msk_vals=1, stretch_file=None, tmp_dir=None):
@@ -451,7 +462,7 @@ def createMBTileFile(input_img, bands, output_mbtiles, scale_input_img=50, img_s
 
 
 def createWebTilesVisGTIFFImg(input_img, bands, output_dir, scaled_gtiff_img, zoomLevels='2-10', img_stats_msk=None,
-                              img_msk_vals=1, stretch_file=None, tmp_dir=None, webview=True, scale=0):
+                              img_msk_vals=1, stretch_file=None, tmp_dir=None, webview=True, scale=0, tms=True):
     """
     A function to produce web cache and scaled and stretched geotiff.
 
@@ -471,6 +482,10 @@ def createWebTilesVisGTIFFImg(input_img, bands, output_dir, scaled_gtiff_img, zo
     :param webview: Provide default GDAL leaflet web viewer.
     :param scale: the scale output geotiff. Input is percentage in the x-axis. If zero (default) then no scaling
                   will be applied.
+    :param tms: if TMS is True then a tile grid in TMS format is returned with
+                the grid origin at the bottom-left. If False then an XYZ tile grid
+                format is used with the origin in the top-left.
+                (TMS: gdal2tiles.py native. XYZ: GIS Compatible)
 
     """
     from osgeo import gdal
@@ -541,6 +556,10 @@ def createWebTilesVisGTIFFImg(input_img, bands, output_dir, scaled_gtiff_img, zo
         subprocess.check_call(cmd, shell=True)
     except OSError as e:
         raise rsgislib.RSGISPyException('Could not execute command: ' + cmd)
+
+    if not tms:
+        from rsgislib.tools import convert_between_tms_xyz
+        convert_between_tms_xyz(output_dir)
 
     if scale > 0:
         cmd = 'gdal_translate -of GTIFF -co TILED=YES -co COMPRESS=JPEG -co BIGTIFF=NO -ot Byte -outsize {0}% 0 -r average {1} {2}'.format(scale, stretchImg, scaled_gtiff_img)
