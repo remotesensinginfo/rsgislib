@@ -3196,3 +3196,273 @@ def merge_to_multi_layer_vec(input_file_lyrs, output_file, format='GPKG', overwr
         vec_lyr_obj = None
         first = False
 
+
+def convert_polygon2polyline(vec_poly_file, vec_poly_lyr, vec_line_file, vec_line_lyr=None,
+                             out_format="ESRI Shapefile"):
+    """
+    A function to convert a polygon vector file to a polyline file.
+
+    :param vec_poly_file: Input polygon vector file
+    :param vec_poly_lyr: The name of the vector layer
+    :param vec_line_file: The output vector file
+    :param vec_line_lyr: The output vector layer name
+    :param out_format: The output vector file format (default: ESRI Shapefile).
+
+    """
+    from osgeo import gdal
+    from osgeo import ogr
+    import os
+    import tqdm
+    if os.path.exists(vec_line_file):
+        raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(vec_line_file))
+
+    if vec_line_lyr is None:
+        vec_line_lyr = os.path.splitext(os.path.basename(vec_line_file))[0]
+
+    gdal.UseExceptions()
+    vec_poly_ds_obj = gdal.OpenEx(vec_poly_file, gdal.OF_VECTOR)
+    vec_poly_lyr_obj = vec_poly_ds_obj.GetLayer(vec_poly_lyr)
+    vec_poly_spat_ref = vec_poly_lyr_obj.GetSpatialRef()
+
+    out_vec_drv = gdal.GetDriverByName(out_format)
+    if out_vec_drv == None:
+        raise Exception("Driver ('{}') has not be recognised.".format(out_format))
+
+    out_ds_obj = out_vec_drv.Create(vec_line_file, 0, 0, 0, gdal.GDT_Unknown)
+    out_lyr_obj = out_ds_obj.CreateLayer(vec_line_lyr, vec_poly_spat_ref, geom_type=ogr.wkbLineString)
+    feat_defn = out_lyr_obj.GetLayerDefn()
+
+    n_feats = vec_poly_lyr_obj.GetFeatureCount(True)
+    pbar = tqdm.tqdm(total=n_feats)
+    open_transaction = False
+    counter = 0
+    in_feature = vec_poly_lyr_obj.GetNextFeature()
+    while in_feature:
+        if not open_transaction:
+            out_lyr_obj.StartTransaction()
+            open_transaction = True
+
+        geom = in_feature.GetGeometryRef()
+        if geom is not None:
+            ring = geom.GetGeometryRef(0)
+            out_feat = ogr.Feature(feat_defn)
+            out_feat.SetGeometry(ring)
+            out_lyr_obj.CreateFeature(out_feat)
+            out_feat = None
+
+        if ((counter % 20000) == 0) and open_transaction:
+            out_lyr_obj.CommitTransaction()
+            open_transaction = False
+
+        in_feature = vec_poly_lyr_obj.GetNextFeature()
+        counter = counter + 1
+        pbar.update(counter)
+
+    if open_transaction:
+        out_lyr_obj.CommitTransaction()
+        open_transaction = False
+    pbar.close()
+    out_lyr_obj.SyncToDisk()
+
+
+def get_pt_on_line(pt1, pt2, dist):
+    """
+    A function that calculates a point on the vector defined by pt1 and pt2.
+
+    :param pt1: An ogr point geometry which has functions GetX() and GetY().
+    :param pt2: An ogr point geometry which has functions GetX() and GetY().
+    :param dist: The distance from pt1 the new point is to be created.
+    :return: The created point; returned as a set of floats: (x, y)
+
+    """
+    import math
+    out_pt_x = 0.0
+    out_pt_y = 0.0
+    if dist == 0:
+        out_pt_x = pt1.GetX()
+        out_pt_y = pt1.GetY()
+    else:
+        dx = pt2.GetX() - pt1.GetX()
+        dy = pt2.GetY() - pt1.GetY()
+        theta = math.atan(dy / dx)
+        y1 = dist * math.sin(theta)
+        x1 = dist * math.cos(theta)
+
+        if (dx >= 0) and (dy > 0):
+            out_pt_x = pt1.GetX() + x1
+            out_pt_y = pt1.GetY() + y1
+        elif (dx >= 0) and (dy <= 0):
+            out_pt_x = pt1.GetX() + x1
+            out_pt_y = pt1.GetY() + y1
+        elif (dx < 0) & (dy > 0):
+            out_pt_x = pt1.GetX() - x1
+            out_pt_y = pt1.GetY() - y1
+        elif (dx < 0) & (dy <= 0):
+            out_pt_x = pt1.GetX() - x1
+            out_pt_y = pt1.GetY() - y1
+    return out_pt_x, out_pt_y
+
+
+def find_pt_to_side(pt_start, pt, pt_end, line_len, left_hand=False):
+    """
+    A function to calculate a point location at a right-angle to the vector defined
+    by the points pt_start and pt_end at the location pt.
+
+    :param pt_start: An ogr point geometry which has functions GetX(), GetY() and Distance().
+    :param pt: An ogr point geometry which has functions GetX(), GetY() and Distance().
+    :param pt_end: An ogr point geometry which has functions GetX(), GetY() and Distance().
+    :param line_len: The distance from the pt_start and pt_end vector to the new point.
+    :param left_hand: Specify which side the point is projected from the pt_start and pt_end vector.
+                      Default: False - project right-hand side of vector, True - project left-hand side of vector
+    :return: The created point; returned as a set of floats: (x, y)
+
+    """
+    if left_hand:
+        tmp_pt = pt_end
+        pt_end = pt_start
+        pt_start = tmp_pt
+    import math
+    dx = pt_end.GetX() - pt_start.GetX()
+    dy = pt_end.GetY() - pt_start.GetY()
+    beta = math.atan(dy / dx)
+
+    distanceP1P2 = pt_start.Distance(pt)
+    distanceP1P3 = math.sqrt((line_len * line_len) + (distanceP1P2 * distanceP1P2))
+    theta = math.atan(line_len / distanceP1P2)
+    alpha = math.pi - (theta - beta)
+
+    localX = distanceP1P3 * math.cos(alpha)
+    localY = distanceP1P3 * math.sin(alpha)
+
+    if (dx >= 0) and (dy > 0):
+        out_pt_x = pt_start.GetX() - localX
+        out_pt_y = pt_start.GetY() - localY
+    elif (dx >= 0) and (dy <= 0):
+        out_pt_x = pt_start.GetX() - localX
+        out_pt_y = pt_start.GetY() - localY
+    elif (dx < 0) and (dy > 0):
+        out_pt_x = pt_start.GetX() + localX
+        out_pt_y = pt_start.GetY() + localY
+    elif (dx < 0) and (dy <= 0):
+        out_pt_x = pt_start.GetX() + localX
+        out_pt_y = pt_start.GetY() + localY
+    else:
+        raise Exception("Could not resolve find_pt_to_side...")
+
+    return out_pt_x, out_pt_y
+
+
+def create_orthg_lines(vec_file, vec_lyr, out_vec_file, out_vec_lyr=None, pt_step=1000, line_len=10000, left_hand=False,
+                       out_format="GEOJSON"):
+    """
+    A function to create a set of lines which are orthogonal to the lines of the input
+    vector file.
+    
+    :param vec_file: The inputted vector file path - this should be a polyline vector file
+    :param vec_lyr: The name of the vector layer
+    :param out_vec_file: The output vector file path - this will be a polyline vector file
+    :param out_vec_lyr: The name of the output vector layer (if None then created as the same as the file name)
+    :param pt_step: The steps (in the unit of the coordinate system) along lines in the layer at which lines
+                    are created.
+    :param line_len: The length of the lines created.
+    :param left_hand: Specify which side the point is projected from the line (i.e., left or right side)
+                      Default: False - project right-hand side of vector, True - project left-hand side of vector
+    :param out_format: The output file format of the vector file.
+
+    """
+    from osgeo import gdal
+    from osgeo import ogr
+    import os
+    import tqdm
+    if os.path.exists(out_vec_file):
+        raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
+
+    if out_vec_lyr is None:
+        out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
+
+    gdal.UseExceptions()
+    vec_ds_obj = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
+    vec_lyr_obj = vec_ds_obj.GetLayer(vec_lyr)
+    vec_spat_ref = vec_lyr_obj.GetSpatialRef()
+
+    out_vec_drv = gdal.GetDriverByName(out_format)
+    if out_vec_drv == None:
+        raise Exception("Driver ('{}') has not be recognised.".format(out_format))
+
+    out_ds_obj = out_vec_drv.Create(out_vec_file, 0, 0, 0, gdal.GDT_Unknown)
+    out_lyr_obj = out_ds_obj.CreateLayer(out_vec_lyr, vec_spat_ref, geom_type=ogr.wkbLineString)
+    uid_field = ogr.FieldDefn('uid', ogr.OFTInteger)
+    out_lyr_obj.CreateField(uid_field)
+    feat_defn = out_lyr_obj.GetLayerDefn()
+
+    n_feats = vec_lyr_obj.GetFeatureCount(True)
+    pbar = tqdm.tqdm(total=n_feats)
+    open_transaction = False
+    counter = 0
+    line_uid = 1
+    p_pt = ogr.Geometry(ogr.wkbPoint)
+    p_pt.AddPoint(0.0, 0.0)
+    c_pt = ogr.Geometry(ogr.wkbPoint)
+    c_pt.AddPoint(0.0, 0.0)
+    c_dist = 0.0
+    first_pt = True
+    in_feature = vec_lyr_obj.GetNextFeature()
+    while in_feature:
+        if not open_transaction:
+            out_lyr_obj.StartTransaction()
+            open_transaction = True
+
+        geom = in_feature.GetGeometryRef()
+        if geom is not None:
+            pts = geom.GetPoints()
+            first_pt = True
+            c_dist = 0.0
+            for pt in pts:
+                if first_pt:
+                    p_pt.SetPoint(0, pt[0], pt[1])
+                    c_pt.SetPoint(0, pt[0], pt[1])
+                    first_pt = False
+                else:
+                    p_pt.SetPoint(0, c_pt.GetX(), c_pt.GetY())
+                    c_pt.SetPoint(0, pt[0], pt[1])
+                    n_step = 0
+                    step_c_dist = c_dist
+                    while True:
+                        if ((p_pt.Distance(c_pt) + step_c_dist) - (pt_step * n_step)) > pt_step:
+                            pt_at_dist = ((pt_step * n_step) + pt_step) - step_c_dist
+                            ptx, pty = get_pt_on_line(p_pt, c_pt, pt_at_dist)
+                            base_pt = ogr.Geometry(ogr.wkbPoint)
+                            base_pt.AddPoint(ptx, pty)
+                            ptx_end, pty_end = find_pt_to_side(p_pt, base_pt, c_pt, line_len, left_hand)
+                            out_line = ogr.Geometry(ogr.wkbLineString)
+                            out_line.AddPoint(ptx, pty)
+                            out_line.AddPoint(ptx_end, pty_end)
+                            out_feat = ogr.Feature(feat_defn)
+                            out_feat.SetGeometry(out_line)
+                            out_feat.SetField('uid', line_uid)
+                            out_lyr_obj.CreateFeature(out_feat)
+                            out_feat = None
+                            line_uid = line_uid + 1
+                            n_step = n_step + 1
+                        else:
+                            if n_step == 0:
+                                c_dist = c_dist + p_pt.Distance(c_pt)
+                            else:
+                                c_dist = (p_pt.Distance(c_pt) + step_c_dist) - (pt_step * n_step)
+                            break
+
+        if ((counter % 20000) == 0) and open_transaction:
+            out_lyr_obj.CommitTransaction()
+            open_transaction = False
+
+        in_feature = vec_lyr_obj.GetNextFeature()
+        counter = counter + 1
+        pbar.update(counter)
+
+    if open_transaction:
+        out_lyr_obj.CommitTransaction()
+        open_transaction = False
+    pbar.close()
+    out_lyr_obj.SyncToDisk()
+
+
