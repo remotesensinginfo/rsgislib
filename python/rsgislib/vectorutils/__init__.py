@@ -3263,6 +3263,7 @@ def convert_polygon2polyline(vec_poly_file, vec_poly_lyr, vec_line_file, vec_lin
         open_transaction = False
     pbar.close()
     out_lyr_obj.SyncToDisk()
+    out_ds_obj = None
 
 
 def get_pt_on_line(pt1, pt2, dist):
@@ -3348,7 +3349,6 @@ def find_pt_to_side(pt_start, pt, pt_end, line_len, left_hand=False):
         out_pt_y = pt_start.GetY() + localY
     else:
         raise Exception("Could not resolve find_pt_to_side...")
-
     return out_pt_x, out_pt_y
 
 
@@ -3476,5 +3476,354 @@ def create_orthg_lines(vec_file, vec_lyr, out_vec_file, out_vec_lyr=None, pt_ste
         open_transaction = False
     pbar.close()
     out_lyr_obj.SyncToDisk()
+    out_ds_obj = None
+    vec_ds_obj = None
+
+
+def closest_line_intersection(vec_line_file, vec_line_lyr, vec_objs_file, vec_objs_lyr, out_vec_file, out_vec_lyr=None,
+                              start_x_field='start_x', start_y_field='start_y', uid_field='uid', out_format="GEOJSON"):
+    """
+    A function which intersects each line within the input vector layer (vec_objs_file, vec_objs_lyr)
+    creating a new line between the start point of the input layer (defined in the vector attribute table:
+    start_x_field, start_y_field) and the intersection point which is closest to the start point.
+
+    :param vec_line_file: Input lines vector file path.
+    :param vec_line_lyr: Input lines vector layer name.
+    :param vec_objs_file: The vector file for the objects (expecting polygons) to be intersected with.
+    :param vec_objs_lyr: The vector layer for the objects (expecting polygons) to be intersected with.
+    :param out_vec_file: The output vector file path.
+    :param out_vec_lyr: The output vector layer name
+    :param start_x_field: The field name for the start point X coordinate for the input lines.
+    :param start_y_field: The field name for the start point Y coordinate for the input lines.
+    :param uid_field: The field name for the Unique ID (UID) of the input lines.
+    :param out_format: The output file format of the vector file.
+
+    """
+    from osgeo import gdal
+    from osgeo import ogr
+    import rsgislib
+    import os
+    import tqdm
+    if os.path.exists(out_vec_file):
+        raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
+
+    if out_vec_lyr is None:
+        out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
+
+    gdal.UseExceptions()
+    rsgis_utils = rsgislib.RSGISPyUtils()
+    vec_bbox = rsgis_utils.getVecLayerExtent(vec_line_file, vec_line_lyr)
+
+    ds_line_vec = gdal.OpenEx(vec_line_file, gdal.OF_READONLY)
+    if ds_line_vec is None:
+        raise Exception("Could not open '{}'".format(vec_line_file))
+
+    lyr_line_vec = ds_line_vec.GetLayerByName(vec_line_lyr)
+    if lyr_line_vec is None:
+        raise Exception("Could not find layer '{}'".format(vec_line_lyr))
+
+    x_col_exists = False
+    y_col_exists = False
+    uid_col_exists = False
+    lyr_line_defn = lyr_line_vec.GetLayerDefn()
+    for i in range(lyr_line_defn.GetFieldCount()):
+        if lyr_line_defn.GetFieldDefn(i).GetName() == start_x_field:
+            x_col_exists = True
+        if lyr_line_defn.GetFieldDefn(i).GetName() == start_y_field:
+            y_col_exists = True
+        if lyr_line_defn.GetFieldDefn(i).GetName() == uid_field:
+            uid_col_exists = True
+        if x_col_exists and y_col_exists and uid_col_exists:
+            break
+
+    if (not x_col_exists) or (not y_col_exists) or (not uid_col_exists):
+        ds_line_vec = None
+        raise Exception("The start x and y columns and/or UID column are not present within the input file.")
+
+    ds_objs_vec = gdal.OpenEx(vec_objs_file, gdal.OF_READONLY)
+    if ds_objs_vec is None:
+        raise Exception("Could not open '{}'".format(vec_objs_file))
+
+    lyr_objs_vec = ds_objs_vec.GetLayerByName(vec_objs_lyr)
+    if lyr_objs_vec is None:
+        raise Exception("Could not find layer '{}'".format(vec_objs_lyr))
+
+    ds_objs_sub_vec, lyr_objs_sub_vec = subsetEnvsVecLyrObj(lyr_objs_vec, vec_bbox)
+
+    spat_ref = lyr_objs_vec.GetSpatialRef()
+
+    out_driver = ogr.GetDriverByName(out_format)
+    out_ds_obj = out_driver.CreateDataSource(out_vec_file)
+    out_lyr_obj = out_ds_obj.CreateLayer(out_vec_lyr, spat_ref, geom_type=ogr.wkbLineString)
+    uid_field_obj = ogr.FieldDefn('uid', ogr.OFTInteger)
+    out_lyr_obj.CreateField(uid_field_obj)
+    length_field = ogr.FieldDefn('len', ogr.OFTReal)
+    out_lyr_obj.CreateField(length_field)
+    feat_defn = out_lyr_obj.GetLayerDefn()
+
+    geom_collect = ogr.Geometry(ogr.wkbGeometryCollection)
+    n_obj_feats = lyr_objs_sub_vec.GetFeatureCount(True)
+    geom_pbar = tqdm.tqdm(total=n_obj_feats, leave=True)
+    in_obj_feat = lyr_objs_sub_vec.GetNextFeature()
+    while in_obj_feat:
+        geom = in_obj_feat.GetGeometryRef()
+        if geom is not None:
+            boundary = geom.Boundary()
+            geom_collect.AddGeometry(boundary)
+        in_obj_feat = lyr_objs_sub_vec.GetNextFeature()
+        geom_pbar.update(1)
+    geom_pbar.close()
+
+    n_feats = lyr_line_vec.GetFeatureCount(True)
+    pbar = tqdm.tqdm(total=n_feats, leave=True)
+    open_transaction = False
+    counter = 0
+    in_feature = lyr_line_vec.GetNextFeature()
+    while in_feature:
+        pbar.update(1)
+        if not open_transaction:
+            out_lyr_obj.StartTransaction()
+            open_transaction = True
+
+        line_geom = in_feature.GetGeometryRef()
+        if line_geom is not None:
+            uid_str = in_feature.GetField(uid_field)
+            start_pt_x = in_feature.GetField(start_x_field)
+            start_pt_y = in_feature.GetField(start_y_field)
+            start_pt = ogr.Geometry(ogr.wkbPoint)
+            start_pt.AddPoint(start_pt_x, start_pt_y)
+
+            inter_geom = geom_collect.Intersection(line_geom)
+
+            if (inter_geom is not None) and (inter_geom.GetGeometryCount() > 0):
+                min_dist_pt_x = 0.0
+                min_dist_pt_y = 0.0
+                min_dist = 0.0
+                c_pt = ogr.Geometry(ogr.wkbPoint)
+                c_pt.AddPoint(0.0, 0.0)
+                first_dist = True
+                for i in range(inter_geom.GetGeometryCount()):
+                    c_geom = inter_geom.GetGeometryRef(i)
+                    pts = c_geom.GetPoints()
+                    for pt in pts:
+                        c_pt.SetPoint(0, pt[0], pt[1])
+                        if first_dist:
+                            min_dist = start_pt.Distance(c_pt)
+                            min_dist_pt_x = pt[0]
+                            min_dist_pt_y = pt[1]
+                            first_dist = False
+                        else:
+                            pt_dist = start_pt.Distance(c_pt)
+                            if pt_dist < min_dist:
+                                min_dist = pt_dist
+                                min_dist_pt_x = pt[0]
+                                min_dist_pt_y = pt[1]
+                out_line = ogr.Geometry(ogr.wkbLineString)
+                out_line.AddPoint(start_pt_x, start_pt_y)
+                out_line.AddPoint(min_dist_pt_x, min_dist_pt_y)
+                out_feat = ogr.Feature(feat_defn)
+                out_feat.SetGeometry(out_line)
+                out_feat.SetField('uid', uid_str)
+                out_feat.SetField('len', min_dist)
+                out_lyr_obj.CreateFeature(out_feat)
+                out_feat = None
+
+        if ((counter % 20000) == 0) and open_transaction:
+            out_lyr_obj.CommitTransaction()
+            open_transaction = False
+
+        in_feature = lyr_line_vec.GetNextFeature()
+        counter = counter + 1
+
+    if open_transaction:
+        out_lyr_obj.CommitTransaction()
+        open_transaction = False
+    pbar.close()
+    out_lyr_obj.SyncToDisk()
+    out_ds_obj = None
+    ds_line_vec = None
+    ds_objs_vec = None
+    ds_objs_sub_vec = None
+
+
+def line_intersection_range(vec_line_file, vec_line_lyr, vec_objs_file, vec_objs_lyr, out_vec_file, out_vec_lyr=None,
+                            start_x_field='start_x', start_y_field='start_y', uid_field='uid', out_format="GEOJSON"):
+    """
+    A function which intersects each line within the input vector layer (vec_objs_file, vec_objs_lyr)
+    creating a new line between the closest intersection to the start point of the input layer
+    (defined in the vector attribute table: start_x_field, start_y_field) and the intersection point
+    which is furthest to the start point.
+
+    :param vec_line_file: Input lines vector file path.
+    :param vec_line_lyr: Input lines vector layer name.
+    :param vec_objs_file: The vector file for the objects (expecting polygons) to be intersected with.
+    :param vec_objs_lyr: The vector layer for the objects (expecting polygons) to be intersected with.
+    :param out_vec_file: The output vector file path.
+    :param out_vec_lyr: The output vector layer name
+    :param start_x_field: The field name for the start point X coordinate for the input lines.
+    :param start_y_field: The field name for the start point Y coordinate for the input lines.
+    :param uid_field: The field name for the Unique ID (UID) of the input lines.
+    :param out_format: The output file format of the vector file.
+
+    """
+    from osgeo import gdal
+    from osgeo import ogr
+    import rsgislib
+    import os
+    import tqdm
+    if os.path.exists(out_vec_file):
+        raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
+
+    if out_vec_lyr is None:
+        out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
+
+    gdal.UseExceptions()
+    rsgis_utils = rsgislib.RSGISPyUtils()
+    vec_bbox = rsgis_utils.getVecLayerExtent(vec_line_file, vec_line_lyr)
+
+    ds_line_vec = gdal.OpenEx(vec_line_file, gdal.OF_READONLY)
+    if ds_line_vec is None:
+        raise Exception("Could not open '{}'".format(vec_line_file))
+
+    lyr_line_vec = ds_line_vec.GetLayerByName(vec_line_lyr)
+    if lyr_line_vec is None:
+        raise Exception("Could not find layer '{}'".format(vec_line_lyr))
+
+    x_col_exists = False
+    y_col_exists = False
+    uid_col_exists = False
+    lyr_line_defn = lyr_line_vec.GetLayerDefn()
+    for i in range(lyr_line_defn.GetFieldCount()):
+        if lyr_line_defn.GetFieldDefn(i).GetName() == start_x_field:
+            x_col_exists = True
+        if lyr_line_defn.GetFieldDefn(i).GetName() == start_y_field:
+            y_col_exists = True
+        if lyr_line_defn.GetFieldDefn(i).GetName() == uid_field:
+            uid_col_exists = True
+        if x_col_exists and y_col_exists and uid_col_exists:
+            break
+
+    if (not x_col_exists) or (not y_col_exists) or (not uid_col_exists):
+        ds_line_vec = None
+        raise Exception("The start x and y columns and/or UID column are not present within the input file.")
+
+    ds_objs_vec = gdal.OpenEx(vec_objs_file, gdal.OF_READONLY)
+    if ds_objs_vec is None:
+        raise Exception("Could not open '{}'".format(vec_objs_file))
+
+    lyr_objs_vec = ds_objs_vec.GetLayerByName(vec_objs_lyr)
+    if lyr_objs_vec is None:
+        raise Exception("Could not find layer '{}'".format(vec_objs_lyr))
+
+    ds_objs_sub_vec, lyr_objs_sub_vec = subsetEnvsVecLyrObj(lyr_objs_vec, vec_bbox)
+
+    spat_ref = lyr_objs_vec.GetSpatialRef()
+
+    out_driver = ogr.GetDriverByName(out_format)
+    out_ds_obj = out_driver.CreateDataSource(out_vec_file)
+    out_lyr_obj = out_ds_obj.CreateLayer(out_vec_lyr, spat_ref, geom_type=ogr.wkbLineString)
+    uid_field_obj = ogr.FieldDefn('uid', ogr.OFTInteger)
+    out_lyr_obj.CreateField(uid_field_obj)
+    length_field = ogr.FieldDefn('len', ogr.OFTReal)
+    out_lyr_obj.CreateField(length_field)
+    feat_defn = out_lyr_obj.GetLayerDefn()
+
+    geom_collect = ogr.Geometry(ogr.wkbGeometryCollection)
+    n_obj_feats = lyr_objs_sub_vec.GetFeatureCount(True)
+    geom_pbar = tqdm.tqdm(total=n_obj_feats, leave=True)
+    in_obj_feat = lyr_objs_sub_vec.GetNextFeature()
+    while in_obj_feat:
+        geom = in_obj_feat.GetGeometryRef()
+        if geom is not None:
+            boundary = geom.Boundary()
+            geom_collect.AddGeometry(boundary)
+        in_obj_feat = lyr_objs_sub_vec.GetNextFeature()
+        geom_pbar.update(1)
+    geom_pbar.close()
+
+    n_feats = lyr_line_vec.GetFeatureCount(True)
+    pbar = tqdm.tqdm(total=n_feats, leave=True)
+    open_transaction = False
+    counter = 0
+    in_feature = lyr_line_vec.GetNextFeature()
+    while in_feature:
+        if not open_transaction:
+            out_lyr_obj.StartTransaction()
+            open_transaction = True
+
+        line_geom = in_feature.GetGeometryRef()
+        if line_geom is not None:
+            uid_str = in_feature.GetField(uid_field)
+            start_pt_x = in_feature.GetField(start_x_field)
+            start_pt_y = in_feature.GetField(start_y_field)
+            start_pt = ogr.Geometry(ogr.wkbPoint)
+            start_pt.AddPoint(start_pt_x, start_pt_y)
+
+            inter_geom = geom_collect.Intersection(line_geom)
+
+            if (inter_geom is not None) and (inter_geom.GetGeometryCount() > 0):
+                min_dist_pt_x = 0.0
+                min_dist_pt_y = 0.0
+                min_dist = 0.0
+                max_dist_pt_x = 0.0
+                max_dist_pt_y = 0.0
+                max_dist = 0.0
+                c_pt = ogr.Geometry(ogr.wkbPoint)
+                c_pt.AddPoint(0.0, 0.0)
+                first_dist = True
+                for i in range(inter_geom.GetGeometryCount()):
+                    c_geom = inter_geom.GetGeometryRef(i)
+                    pts = c_geom.GetPoints()
+                    for pt in pts:
+                        c_pt.SetPoint(0, pt[0], pt[1])
+                        if first_dist:
+                            min_dist = start_pt.Distance(c_pt)
+                            min_dist_pt_x = pt[0]
+                            min_dist_pt_y = pt[1]
+                            max_dist = min_dist
+                            max_dist_pt_x = min_dist_pt_x
+                            max_dist_pt_y = min_dist_pt_y
+                            first_dist = False
+                        else:
+                            pt_dist = start_pt.Distance(c_pt)
+                            if pt_dist < min_dist:
+                                min_dist = pt_dist
+                                min_dist_pt_x = pt[0]
+                                min_dist_pt_y = pt[1]
+                            if pt_dist > max_dist:
+                                max_dist = pt_dist
+                                max_dist_pt_x = pt[0]
+                                max_dist_pt_y = pt[1]
+                out_line = ogr.Geometry(ogr.wkbLineString)
+                out_line.AddPoint(min_dist_pt_x, min_dist_pt_y)
+                out_line.AddPoint(max_dist_pt_x, max_dist_pt_y)
+                out_feat = ogr.Feature(feat_defn)
+                out_feat.SetGeometry(out_line)
+                out_feat.SetField('uid', uid_str)
+                start_pt.SetPoint(0, min_dist_pt_x, min_dist_pt_y)
+                c_pt.SetPoint(0, max_dist_pt_x, max_dist_pt_y)
+                dist = start_pt.Distance(c_pt)
+                out_feat.SetField('len', dist)
+                out_lyr_obj.CreateFeature(out_feat)
+                out_feat = None
+
+        if ((counter % 20000) == 0) and open_transaction:
+            out_lyr_obj.CommitTransaction()
+            open_transaction = False
+
+        in_feature = lyr_line_vec.GetNextFeature()
+        counter = counter + 1
+        pbar.update(1)
+
+    if open_transaction:
+        out_lyr_obj.CommitTransaction()
+        open_transaction = False
+    pbar.close()
+    out_lyr_obj.SyncToDisk()
+    out_ds_obj = None
+    ds_line_vec = None
+    ds_objs_vec = None
+    ds_objs_sub_vec = None
+
 
 
