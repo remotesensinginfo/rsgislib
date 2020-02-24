@@ -3393,6 +3393,14 @@ def create_orthg_lines(vec_file, vec_lyr, out_vec_file, out_vec_lyr=None, pt_ste
     out_lyr_obj = out_ds_obj.CreateLayer(out_vec_lyr, vec_spat_ref, geom_type=ogr.wkbLineString)
     uid_field = ogr.FieldDefn('uid', ogr.OFTInteger)
     out_lyr_obj.CreateField(uid_field)
+    start_x_field = ogr.FieldDefn('start_x', ogr.OFTReal)
+    out_lyr_obj.CreateField(start_x_field)
+    start_y_field = ogr.FieldDefn('start_y', ogr.OFTReal)
+    out_lyr_obj.CreateField(start_y_field)
+    end_x_field = ogr.FieldDefn('end_x', ogr.OFTReal)
+    out_lyr_obj.CreateField(end_x_field)
+    end_y_field = ogr.FieldDefn('end_y', ogr.OFTReal)
+    out_lyr_obj.CreateField(end_y_field)
     feat_defn = out_lyr_obj.GetLayerDefn()
 
     n_feats = vec_lyr_obj.GetFeatureCount(True)
@@ -3440,6 +3448,10 @@ def create_orthg_lines(vec_file, vec_lyr, out_vec_file, out_vec_lyr=None, pt_ste
                             out_feat = ogr.Feature(feat_defn)
                             out_feat.SetGeometry(out_line)
                             out_feat.SetField('uid', line_uid)
+                            out_feat.SetField('start_x', ptx)
+                            out_feat.SetField('start_y', pty)
+                            out_feat.SetField('end_x', ptx_end)
+                            out_feat.SetField('end_y', pty_end)
                             out_lyr_obj.CreateFeature(out_feat)
                             out_feat = None
                             line_uid = line_uid + 1
