@@ -2424,6 +2424,7 @@ Example::
     rsgislib.vectorutils.createImgExtentLUT(imgList, './ImgExtents.gpkg', 'HansenImgExtents', 'GPKG')
 
 """
+    import tqdm
     gdal.UseExceptions()
     rsgisUtils = rsgislib.RSGISPyUtils()
     
@@ -2440,7 +2441,7 @@ Example::
     
     first = True
     baseImg = ''
-    for img in imgList:
+    for img in tqdm.tqdm(imgList):
         epsgCodeTmp = rsgisUtils.getEPSGCode(img)
         epsg_found = True
         if epsgCodeTmp is None:
