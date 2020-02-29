@@ -113,7 +113,6 @@ Where:
         rsgislib.imageutils.popImageStats(outImage,False,-999.,True)
 
 
-
 def calcGNDWI(image, gBand, nBand, outImage, stats=True, gdalformat='KEA'):
     """ 
 Helper function to calculate NDWI ((GREEN-NIR)/(GREEN+NIR)), note the output no data value is -999.
