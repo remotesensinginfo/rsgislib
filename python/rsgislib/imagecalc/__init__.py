@@ -845,6 +845,30 @@ order:
     rsgislib.imageutils.popImageStats(output_img, usenodataval=True, nodataval=no_data_val, calcpyramids=True)
 
 
+def normalise_image_band(input_img, band, output_img, gdal_format='KEA'):
+    """
+    Perform a simple normalisation a single image band (val - min)/range.
 
+    :param input_img: The input image file.
+    :param band: the image band (starts at 1) to be normalised
+    :param output_img: the output image file (will just be a single band).
+    :param gdal_format: The output image format.
 
+    """
+    import rsgislib
+    import rsgislib.imageutils
+    rsgis_utils = rsgislib.RSGISPyUtils()
+    no_data_val = rsgis_utils.getImageNoDataValue(input_img, band)
+    use_no_data_val = True
+    if no_data_val is None:
+        use_no_data_val = False
+        no_data_val = 0.0
+
+    band_min, band_max = rsgislib.imagecalc.getImageBandMinMax(input_img, band, use_no_data_val, no_data_val)
+
+    band_defns = [rsgislib.imagecalc.BandDefn('b1', input_img, band)]
+    band_range = band_max - band_min
+    exp = '(b1=={0})?0.0:(b1-{1})/{2}'.format(no_data_val, band_min, band_range)
+    rsgislib.imagecalc.bandMath(output_img, exp, gdal_format, rsgislib.TYPE_32FLOAT, band_defns)
+    rsgislib.imageutils.popImageStats(output_img, usenodataval=True, nodataval=0.0, calcpyramids=True)
 
