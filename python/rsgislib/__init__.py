@@ -687,6 +687,25 @@ class RSGISPyUtils (object):
 
         return [xMinOverlap, xMaxOverlap, yMinOverlap, yMaxOverlap]
 
+    def bboxes_intersection(self, bboxes):
+        """
+        A function to find the intersection between a list of
+        bboxes.
+
+        :param bboxes: a list of bboxes [(xMin, xMax, yMin, yMax)]
+        :return: bbox (xMin, xMax, yMin, yMax)
+
+        """
+        if len(bboxes) == 1:
+            return bboxes[0]
+        elif len(bboxes) == 2:
+            return self.bbox_intersection(bboxes[0], bboxes[1])
+
+        inter_bbox = bboxes[0]
+        for bbox in bboxes[1:]:
+            inter_bbox = self.bbox_intersection(inter_bbox, bbox)
+        return inter_bbox
+
     def buffer_bbox(self, bbox, buf):
         """
         Buffer the input BBOX by a set amount.

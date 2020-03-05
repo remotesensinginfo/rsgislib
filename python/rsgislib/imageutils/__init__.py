@@ -21,7 +21,6 @@ import osgeo.osr as osr
 from rios import applier
 
 
-# define our own classes
 class ImageBandInfo(object):
     """
 Create a list of these objects to pass to the extractZoneImageBandValues2HDF function
@@ -42,7 +41,36 @@ Create a list of these objects to pass to the extractZoneImageBandValues2HDF fun
         self.bands = bands
 
 
-# define our own classes
+class OutImageInfo(object):
+    """
+A class which is used to define the information to create a new output image.
+This class is used within the StdImgBlockIter class.
+
+:param file_name: is the output image file name and path.
+:param name: is a name associated with this layer - doesn't really matter what you use but needs to be unique; this is used as a dict key in some functions.
+:param nbands: is an int with the number of output image bands.
+:param no_data_val: is a no data value for the output image
+:param gdal_format: is the output image file format
+:param datatype: is the output datatype rsgislib.TYPE_*
+
+"""
+    def __init__(self, file_name=None, name=None, nbands=None, no_data_val=None, gdal_format=None, datatype=None):
+        """
+        :param file_name: is the input image file name and path.
+        :param name: is a name associated with this layer - doesn't really matter what you use but needs to be unique; this is used as a dict key in some functions.
+        :param nbands: is an int with the number of output image bands.
+        :param no_data_val: is a no data value for the output image
+        :param gdal_format: is the output image file format
+        :param datatype: is the output datatype rsgislib.TYPE_*
+        """
+        self.file_name = file_name
+        self.name = name
+        self.nbands = nbands
+        self.no_data_val = no_data_val
+        self.gdal_format = gdal_format
+        self.datatype = datatype
+
+
 class SharpBandInfo(object):
     """
 Create a list of these objects to pass to the sharpenLowResBands function.
