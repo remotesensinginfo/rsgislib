@@ -6,71 +6,50 @@ import numpy
 import osgeo.gdal as gdal
 
 
-def find_pxl_subset_bbox(spat_img_bbox, pxl_res, spat_sub_bbox):
-    """
-
-    :param spat_img_bbox:
-    :param pxl_res:
-    :param spat_sub_bbox:
-    :return:
-
-    """
-    min_x_diff = spat_sub_bbox[0] - spat_img_bbox[0]
-    max_y_diff = spat_img_bbox[3] - spat_sub_bbox[3]
-    
-    min_x_pxls = math.floor((min_x_diff/pxl_res[0])+0.5)
-    max_y_pxls = math.floor((max_y_diff/pxl_res[1])+0.5)
-    
-    sub_width = math.floor(((spat_sub_bbox[1] - spat_sub_bbox[0])/pxl_res[0])+0.5)
-    sub_height = math.floor(((spat_sub_bbox[3] - spat_sub_bbox[2])/pxl_res[1])+0.5)
-    
-    max_x_pxls = min_x_pxls + sub_width
-    min_y_pxls = max_y_pxls + sub_height
-    
-    return [min_x_pxls, max_x_pxls, min_y_pxls, max_y_pxls]
-    
-
 class StdImgBlockIter:
 
     """
-    A class to iterate a set of
+    A class to read and write images in blocks where all blocks are all identical in size.
+    To deal with image boundaries, where block do not divide into the the image size, the
+    outside blocks will be overlapped with the previous block being defined with reference
+    with the right and bottom edges rather than the left and top edges.
     """
 
-    def __init__(self, img_info_lst, tile_size):
+    def __init__(self, img_info_lst, block_size):
         """
 
         :param img_info_lst:
-        :param tile_size:
+        :param block_size:
 
         """
         self.img_info_lst = img_info_lst
         self.n_imgs = len(img_info_lst)
-        self.tile_size = tile_size
+        self.block_size = block_size
         self.img_info = dict()
         self.define_overlaps()
         pprint.pprint(self.img_info)
         
-        self.remain_x_tile = False
-        self.n_x_tiles = math.floor(self.overlap_width / tile_size)
-        if (self.n_x_tiles * tile_size) < self.overlap_width:
-            self.n_x_tiles += 1
-            self.remain_x_tile = True
+        self.remain_x_block = False
+        self.n_x_blocks = math.floor(self.overlap_width / block_size)
+        if (self.n_x_blocks * block_size) < self.overlap_width:
+            self.n_x_blocks += 1
+            self.remain_x_block = True
         
-        self.remain_y_tile = False
-        self.n_y_tiles = math.floor(self.overlap_height / tile_size)
-        if (self.n_y_tiles * tile_size) < self.overlap_height:
-            self.n_y_tiles += 1
-            self.remain_y_tile = True
+        self.remain_y_block = False
+        self.n_y_blocks = math.floor(self.overlap_height / block_size)
+        if (self.n_y_blocks * block_size) < self.overlap_height:
+            self.n_y_blocks += 1
+            self.remain_y_block = True
         
-        self.n_tiles = self.n_x_tiles * self.n_y_tiles
+        self.n_blocks = self.n_x_blocks * self.n_y_blocks
         
-        self.c_tiles = 0
-        self.c_x_tiles = -1
-        self.c_y_tiles = 0
+        self.c_blocks = 0
+        self.c_x_blocks = -1
+        self.c_y_blocks = 0
 
         for img in self.img_info_lst:
             self.img_info[img.name]['n_bands'] = len(img.bands)
-            self.img_info[img.name]['np_arr'] = numpy.zeros((len(img.bands), tile_size, tile_size), dtype=float)
+            self.img_info[img.name]['np_arr'] = numpy.zeros((len(img.bands), block_size, block_size), dtype=float)
             self.img_info[img.name]['dataset'] = gdal.Open(img.fileName, gdal.GA_ReadOnly)
             if self.img_info[img.name]['dataset'] is None:
                 raise Exception("Could not open image file: {}".format(img.fileName))
@@ -82,20 +61,42 @@ class StdImgBlockIter:
         
         # Output image variables
         self.out_imgs_info = None
-        
+
+    def find_pxl_subset_bbox(self, spat_img_bbox, pxl_res, spat_sub_bbox):
+        """
+
+        :param spat_img_bbox:
+        :param pxl_res:
+        :param spat_sub_bbox:
+        :return:
+
+        """
+        min_x_diff = spat_sub_bbox[0] - spat_img_bbox[0]
+        max_y_diff = spat_img_bbox[3] - spat_sub_bbox[3]
+
+        min_x_pxls = math.floor((min_x_diff / pxl_res[0]) + 0.5)
+        max_y_pxls = math.floor((max_y_diff / pxl_res[1]) + 0.5)
+
+        sub_width = math.floor(((spat_sub_bbox[1] - spat_sub_bbox[0]) / pxl_res[0]) + 0.5)
+        sub_height = math.floor(((spat_sub_bbox[3] - spat_sub_bbox[2]) / pxl_res[1]) + 0.5)
+
+        max_x_pxls = min_x_pxls + sub_width
+        min_y_pxls = max_y_pxls + sub_height
+
+        return [min_x_pxls, max_x_pxls, min_y_pxls, max_y_pxls]
     
     def reset_iter(self):
         """
-
+        Reset the variables used for the iterator.
 
         """
-        self.c_tiles = 0
-        self.c_x_tiles = -1
-        self.c_y_tiles = 0
+        self.c_blocks = 0
+        self.c_x_blocks = -1
+        self.c_y_blocks = 0
     
     def define_overlaps(self):
         """
-
+        An internal function used to calculate the amount of overlap between the input images.
 
         """
         rsgis_utils = rsgislib.RSGISPyUtils()
@@ -130,7 +131,7 @@ class StdImgBlockIter:
         self.overlap_height = 0
         
         for img in self.img_info_lst:
-            self.img_info[img.name]['pxl_bbox'] = find_pxl_subset_bbox(self.img_info[img.name]['bbox'], self.img_info[img.name]['res'], self.img_info[img.name]['pxl_size'], self.bbox_intersect)
+            self.img_info[img.name]['pxl_bbox'] = self.find_pxl_subset_bbox(self.img_info[img.name]['bbox'], self.img_info[img.name]['res'], self.img_info[img.name]['pxl_size'], self.bbox_intersect)
             if (self.overlap_width == 0) and (self.overlap_height == 0):
                 self.overlap_width = self.img_info[img.name]['pxl_bbox'][1] - self.img_info[img.name]['pxl_bbox'][0]
                 self.overlap_height = self.img_info[img.name]['pxl_bbox'][2] - self.img_info[img.name]['pxl_bbox'][3]
@@ -144,70 +145,76 @@ class StdImgBlockIter:
             
     def __iter__(self):
         """
-
+        Returns an instances of itself.
         """
         return self
 
     def __next__(self):
         """
+        The key function for the iterator used to read the image blocks.
 
-        :return:
+        :return: x_block, y_block, img_data (dict with image name as key; each image has
+                 a np_arr variable for the image data.
+
         """
-        if self.c_tiles < self.n_tiles:
-            if self.c_x_tiles < (self.n_x_tiles-1):
-                self.c_x_tiles += 1
+        if self.c_blocks < self.n_blocks:
+            if self.c_x_blocks < (self.n_x_blocks-1):
+                self.c_x_blocks += 1
             else:
-                self.c_x_tiles = 0
-                self.c_y_tiles += 1
-            self.c_tiles += 1
+                self.c_x_blocks = 0
+                self.c_y_blocks += 1
+            self.c_blocks += 1
             
             out_img_data = dict()
             
-            if self.c_y_tiles == (self.n_y_tiles-1):
-                if self.c_x_tiles == (self.n_x_tiles-1):
+            if self.c_y_blocks == (self.n_y_blocks-1):
+                if self.c_x_blocks == (self.n_x_blocks-1):
                     # X,Y End Case
                     for img in self.img_info_lst:
                         out_img_data[img.name] = dict()
-                        out_img_data[img.name]['pxl_x'] = self.img_info[img.name]['pxl_bbox'][1] - self.tile_size
-                        out_img_data[img.name]['pxl_y'] = self.img_info[img.name]['pxl_bbox'][2] - self.tile_size
+                        out_img_data[img.name]['pxl_x'] = self.img_info[img.name]['pxl_bbox'][1] - self.block_size
+                        out_img_data[img.name]['pxl_y'] = self.img_info[img.name]['pxl_bbox'][2] - self.block_size
                 else:
                     # Y End Case
                     for img in self.img_info_lst:
                         out_img_data[img.name] = dict()
-                        out_img_data[img.name]['pxl_x'] = self.img_info[img.name]['pxl_bbox'][0] + (self.tile_size * self.c_x_tiles)
-                        out_img_data[img.name]['pxl_y'] = self.img_info[img.name]['pxl_bbox'][2] - self.tile_size
-            elif self.c_x_tiles == (self.n_x_tiles-1):
+                        out_img_data[img.name]['pxl_x'] = self.img_info[img.name]['pxl_bbox'][0] + (self.block_size * self.c_x_blocks)
+                        out_img_data[img.name]['pxl_y'] = self.img_info[img.name]['pxl_bbox'][2] - self.block_size
+            elif self.c_x_blocks == (self.n_x_blocks-1):
                 # X End Case.
                 for img in self.img_info_lst:
                     out_img_data[img.name] = dict()
-                    out_img_data[img.name]['pxl_x'] = self.img_info[img.name]['pxl_bbox'][1] - self.tile_size
-                    out_img_data[img.name]['pxl_y'] = self.img_info[img.name]['pxl_bbox'][3] + (self.tile_size * self.c_y_tiles)
+                    out_img_data[img.name]['pxl_x'] = self.img_info[img.name]['pxl_bbox'][1] - self.block_size
+                    out_img_data[img.name]['pxl_y'] = self.img_info[img.name]['pxl_bbox'][3] + (self.block_size * self.c_y_blocks)
             else:
                 # Not End Case
                 for img in self.img_info_lst:
                     out_img_data[img.name] = dict()
-                    out_img_data[img.name]['pxl_x'] = self.img_info[img.name]['pxl_bbox'][0] + (self.tile_size * self.c_x_tiles)
-                    out_img_data[img.name]['pxl_y'] = self.img_info[img.name]['pxl_bbox'][3] + (self.tile_size * self.c_y_tiles)
+                    out_img_data[img.name]['pxl_x'] = self.img_info[img.name]['pxl_bbox'][0] + (self.block_size * self.c_x_blocks)
+                    out_img_data[img.name]['pxl_y'] = self.img_info[img.name]['pxl_bbox'][3] + (self.block_size * self.c_y_blocks)
                     
             for img in self.img_info_lst:
                 for band in img.bands:
-                    self.img_info[img.name]['bands'][band].ReadAsArray(xoff=out_img_data[img.name]['pxl_x'], yoff=out_img_data[img.name]['pxl_y'], win_xsize=self.tile_size, win_ysize=self.tile_size, buf_obj=self.img_info[img.name]['np_arr'][band-1])
+                    self.img_info[img.name]['bands'][band].ReadAsArray(xoff=out_img_data[img.name]['pxl_x'], yoff=out_img_data[img.name]['pxl_y'], win_xsize=self.block_size, win_ysize=self.block_size, buf_obj=self.img_info[img.name]['np_arr'][band-1])
                 out_img_data[img.name]['np_arr'] = self.img_info[img.name]['np_arr']
                                             
-            return (self.c_x_tiles, self.c_y_tiles, out_img_data)
+            return (self.c_x_blocks, self.c_y_blocks, out_img_data)
         raise StopIteration
         
     def __len__(self):
         """
+        A function which returns the length of the iterator (i.e., number of blocks).
 
-        :return:
+        :return: number of blocks.
+
         """
-        return self.n_tiles
+        return self.n_blocks
     
     def create_output_imgs(self, out_imgs_info):
         """
+        A function to create the output image(s) if required during processing.
 
-        :param out_imgs_info:
+        :param out_imgs_info: a list of rsgislib.imageutils.OutImageInfo objects specifying the output image(s).
 
         """
         rsgis_utils = rsgislib.RSGISPyUtils()
@@ -236,37 +243,44 @@ class StdImgBlockIter:
     
     def write_block_to_image(self, x_block, y_block, img_blocks):
         """
+        A function to write the processed blocks to an output image.
 
-        :param x_block:
-        :param y_block:
-        :param img_blocks:
+        :param x_block: The X index of the block being written.
+        :param y_block: The Y index of the block being written.
+        :param img_blocks: A dict of output image block data. Keys must match the name of the images.
+                           Note. data block data returned must have shape (nbands, xsize, ysize)
 
         """
-        if y_block == (self.n_y_tiles-1):
-            if x_block == (self.n_x_tiles-1):
+        if y_block == (self.n_y_blocks-1):
+            if x_block == (self.n_x_blocks-1):
                 # X,Y End Case
-                pxl_x = self.overlap_width - self.tile_size
-                pxl_y = self.overlap_height - self.tile_size
+                pxl_x = self.overlap_width - self.block_size
+                pxl_y = self.overlap_height - self.block_size
             else:
                 # Y End Case
-                pxl_x = self.tile_size * x_block
-                pxl_y = self.overlap_height - self.tile_size
-        elif x_block == (self.n_x_tiles-1):
+                pxl_x = self.block_size * x_block
+                pxl_y = self.overlap_height - self.block_size
+        elif x_block == (self.n_x_blocks-1):
             # X End Case.
-            pxl_x = self.overlap_width - self.tile_size
-            pxl_y = self.tile_size * y_block
+            pxl_x = self.overlap_width - self.block_size
+            pxl_y = self.block_size * y_block
         else:
             # Not End Case
-            pxl_x = self.tile_size * x_block
-            pxl_y = self.tile_size * y_block
+            pxl_x = self.block_size * x_block
+            pxl_y = self.block_size * y_block
         
         for img in img_blocks:
             if img in self.out_imgs_objs:
                 block_shp = img_blocks[img].shape
                 if block_shp[0] != self.out_imgs_objs[img]['nbands']:
-                    raise Exception("The number of image bands in the output file and returned data block do not match (block:{}; image:{})".format(block_shp[0], self.out_imgs_objs[img]['nbands']))
-                if (block_shp[1] != self.tile_size) and (block_shp[2] != self.tile_size):
-                    raise Exception("The block size is either not square or the same size as the size expected (block: {} x {}; tile: {}).".format(block_shp[1], block_shp[2], self.tile_size))
+                    raise Exception("The number of image bands in the output file and returned data block "
+                                    "do not match (block:{}; image:{})".format(block_shp[0],
+                                                                               self.out_imgs_objs[img]['nbands']))
+                if (block_shp[1] != self.block_size) and (block_shp[2] != self.block_size):
+                    raise Exception("The block size is either not square or the same size as the "
+                                    "size expected (block: {} x {}; parameterised block: {}).".format(block_shp[1],
+                                                                                                      block_shp[2],
+                                                                                                      self.block_size))
                 for band in range(block_shp[0]):
                     self.out_imgs_objs[img]['bands'][band+1].WriteArray(img_blocks[img][band], pxl_x, pxl_y)
                 
