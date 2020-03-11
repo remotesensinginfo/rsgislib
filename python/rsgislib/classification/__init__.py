@@ -401,4 +401,91 @@ def split_chip_sample_train_valid_test(input_sample_h5_file, train_h5_file, vali
     os.remove(tmp_train_valid_sample_file)
 
 
+def split_chip_sample_ref_train_valid_test(input_sample_h5_file, train_h5_file, valid_h5_file, test_h5_file,
+                                           test_sample, valid_sample, train_sample=None, rand_seed=42):
+    """
+    A function to split a chip HDF5 samples file (from rsgislib.imageutils.extractChipZoneImageBandValues2HDF)
+    into three (i.e., Training, Validation and Testing).
 
+    :param input_sample_h5_file: Input HDF file, probably from rsgislib.imageutils.extractZoneImageBandValues2HDF.
+    :param train_h5_file: Output file with the training data samples (this has the number of samples left following
+                          the removal of the test and valid samples if train_sample=None)
+    :param valid_h5_file: Output file with the valid data samples.
+    :param test_h5_file: Output file with the testing data samples.
+    :param test_sample: The size of the testing sample to be taken.
+    :param valid_sample: The size of the validation sample to be taken.
+    :param train_sample: The size of the training sample to be taken. If None then the remaining samples are returned.
+    :param rand_seed: The random seed to be used to randomly select the sub-samples.
+
+    """
+    import rsgislib
+    from rsgislib.imageutils import splitSampleRefChipHDF5File
+    import os
+    import os.path
+
+    rsgis_utils = rsgislib.RSGISPyUtils()
+    uid_str = rsgis_utils.uidGenerator()
+    out_dir = os.path.split(os.path.abspath(test_h5_file))[0]
+    tmp_train_valid_sample_file = os.path.join(out_dir, "train_valid_tmp_sample_{}.h5".format(uid_str))
+    splitSampleRefChipHDF5File(input_sample_h5_file, test_h5_file, tmp_train_valid_sample_file,
+                               test_sample, rand_seed)
+    if train_sample is not None:
+        tmp_train_sample_file = os.path.join(out_dir, "train_tmp_sample_{}.h5".format(uid_str))
+        splitSampleRefChipHDF5File(tmp_train_valid_sample_file, valid_h5_file, tmp_train_sample_file,
+                                   valid_sample, rand_seed)
+        tmp_remain_sample_file = os.path.join(out_dir, "remain_tmp_sample_{}.h5".format(uid_str))
+        splitSampleRefChipHDF5File(tmp_train_sample_file, train_h5_file, tmp_remain_sample_file,
+                                   train_sample, rand_seed)
+        os.remove(tmp_train_sample_file)
+        os.remove(tmp_remain_sample_file)
+    else:
+        splitSampleRefChipHDF5File(tmp_train_valid_sample_file, valid_h5_file, train_h5_file,
+                                   valid_sample, rand_seed)
+    os.remove(tmp_train_valid_sample_file)
+
+
+def flipRefChipHDF5File(input_h5_file, output_h5_file):
+    """
+    A function which flips each sample in both the x and y axis. So the
+    output file will have double the number of samples as the input file.
+
+    :param input_h5_file:
+    :param output_h5_file:
+
+    """
+    import tqdm
+    import h5py
+    import numpy
+    f = h5py.File(input_h5_file, 'r')
+    n_in_feats = f['DATA/REF'].shape[0]
+    chip_size = f['DATA/REF'].shape[1]
+    n_bands = f['DATA/DATA'].shape[3]
+
+    n_out_feats = n_in_feats * 2
+
+    feat_arr = numpy.zeros([n_out_feats, chip_size, chip_size, n_bands], dtype=numpy.float32)
+    feat_ref_arr = numpy.zeros([n_out_feats, chip_size, chip_size], dtype=numpy.uint16)
+
+    i_feat = 0
+    for n in tqdm.tqdm(range(n_in_feats)):
+        numpy.copyto(feat_ref_arr[i_feat], numpy.flip(f['DATA/REF'][n].T, axis=0).T, casting='safe')
+        numpy.copyto(feat_arr[i_feat], numpy.flip(f['DATA/DATA'][n].T, axis=1).T, casting='safe')
+        i_feat += 1
+        numpy.copyto(feat_ref_arr[i_feat], numpy.flip(f['DATA/REF'][n].T, axis=1).T, casting='safe')
+        numpy.copyto(feat_arr[i_feat], numpy.flip(f['DATA/DATA'][n].T, axis=2).T, casting='safe')
+        i_feat += 1
+
+    f.close()
+
+    ######################################################################
+    # Create the output HDF5 file and populate with data.
+    ######################################################################
+    fH5Out = h5py.File(output_h5_file, 'w')
+    dataGrp = fH5Out.create_group("DATA")
+    metaGrp = fH5Out.create_group("META-DATA")
+    dataGrp.create_dataset('DATA', data=feat_arr, chunks=True, compression="gzip", shuffle=True)
+    dataGrp.create_dataset('REF', data=feat_ref_arr, chunks=True, compression="gzip", shuffle=True)
+    describDS = metaGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
+    describDS[0] = 'IMAGE REF TILES'.encode()
+    fH5Out.close()
+    ######################################################################

@@ -1522,6 +1522,324 @@ def splitSampleChipHDF5File(input_h5_file, sample_h5_file, remain_h5_file, sampl
     fSampleH5Out.close()
 
 
+def extractRefChipZoneImageBandValues2HDF(inputImageInfo, refImg, refImgBand, imageMask, maskValue, chipSize, outputHDF,
+                                          rotateChips=None):
+    """
+A function which extracts a chip/window of image pixel values. The expectation is that
+this is used to train a classifer (see deep learning functions in classification) but it
+could be used to extract image 'chips' for other purposes.
+
+:param inputImageInfo: is a list of rsgislib.imageutils.ImageBandInfo objects specifying the input images and bands
+:param refImg: is an image file (same pixel size and projection as the other input images)
+               which is used as the class training
+:param refImgBand: is the image band in the reference image to be used (only a single reference band can be used).
+:param imageMask: is a single band input image to specify the regions of interest
+:param maskValue: is the pixel value within the imageMask to specify the region of interest
+:param chipSize: is the chip size .
+:param outputHDF: is the output HDF5 file. If it all ready exists then it is overwritten.
+:param rotateChips: specify whether you wish to have the image chips rotated during extraction to
+                    increase the number of samples. Default is None and will therefore be ignored.
+                    Otherwise, provide a list of rotation angles in degrees (e.g., [30, 60, 90, 120, 180])
+
+"""
+    # Import the RIOS image reader
+    from rios.imagereader import ImageReader
+    import h5py
+    import tqdm
+    import numpy
+    import math
+
+    chipHSize = math.floor(chipSize / 2)
+
+    rotate = False
+    n_rotations = 0
+    if rotateChips is not None:
+        import scipy.ndimage
+        img_win_h_size = math.floor(math.sqrt((chipHSize * chipHSize) + (chipHSize * chipHSize)))
+        img_win_size = (img_win_h_size * 2)
+        rotate = True
+        n_rotations = len(rotateChips)
+        minSub = img_win_h_size - chipHSize
+        maxSub = img_win_size - minSub
+    else:
+        img_win_h_size = chipHSize
+        img_win_size = chipSize
+
+    ######################################################################
+    # Count the number of features to extract so arrays can be initialised
+    # at the correct size.
+    ######################################################################
+    nFeats = 0
+    reader = ImageReader(imageMask, windowxsize=200, windowysize=200)
+    for (info, block) in tqdm.tqdm(reader):
+        nFeats = nFeats + numpy.sum(block[0] == maskValue)
+    ######################################################################
+    if rotate:
+        nFeats = nFeats * (n_rotations + 1)
+        print("There are {} pixel samples (inc. rotations) in the mask.".format(nFeats))
+    else:
+        print("There are {} pixel samples in the mask.".format(nFeats))
+
+    ######################################################################
+    # Initialise the numpy array for the feature data
+    ######################################################################
+    nBands = 0
+    for inImgInfo in inputImageInfo:
+        for band in inImgInfo.bands:
+            nBands = nBands + 1
+    featArr = numpy.zeros([nFeats, chipSize, chipSize, nBands],
+                          dtype=numpy.float32)  # [nFeats, chipSize, chipSize, nBands]
+    sgl_feat_arr = numpy.zeros([nBands, chipSize, chipSize], dtype=numpy.float32)  # [chipSize, chipSize, nBands]
+    featRefArr = numpy.zeros([nFeats, chipSize, chipSize], dtype=numpy.uint16)
+    ######################################################################
+
+    ######################################################################
+    # Populate the feature arrays with the input data
+    ######################################################################
+    inImgs = list()
+    inImgBands = list()
+
+    inImgs.append(imageMask)
+    inImgBands.append([1])
+    inImgs.append(refImg)
+    inImgBands.append([refImgBand])
+
+    for inImgInfo in inputImageInfo:
+        inImgs.append(inImgInfo.fileName)
+        inImgBands.append(inImgInfo.bands)
+    nImgs = len(inputImageInfo)
+
+    scnOverlap = img_win_h_size
+
+    reader = ImageReader(inImgs, windowxsize=200, windowysize=200, overlap=scnOverlap, layerselection=inImgBands)
+    iFeat = 0
+    for (info, block) in tqdm.tqdm(reader):
+        classMskArr = block[0]
+        blkShape = classMskArr.shape
+
+        if rotate:
+            xSize = blkShape[2] - (scnOverlap * 2)
+            ySize = blkShape[1] - (scnOverlap * 2)
+            xRange = numpy.arange(scnOverlap, scnOverlap + xSize, 1)
+            yRange = numpy.arange(scnOverlap, scnOverlap + ySize, 1)
+
+            for y in yRange:
+                yMin = y - chipHSize
+                yMax = y + chipHSize
+                yMinExt = y - scnOverlap
+                yMaxExt = y + scnOverlap + 1
+                for x in xRange:
+                    xMin = x - chipHSize
+                    xMax = x + chipHSize
+                    xMinExt = x - scnOverlap
+                    xMaxExt = x + scnOverlap
+                    if classMskArr[0][y][x] == 1:
+                        # Rotation 0...
+                        refImgBlk = block[1][0, yMin:yMax, xMin:xMax]
+                        numpy.copyto(featRefArr[iFeat], refImgBlk, casting='safe')
+                        sgl_feat_arr[...] = 0.0
+                        for nImg in range(nImgs):
+                            imgBlk = block[nImg + 2][..., yMin:yMax, xMin:xMax]
+                            for iBand in range(imgBlk.shape[0]):
+                                numpy.copyto(sgl_feat_arr[iBand], imgBlk[iBand], casting='safe')
+                        numpy.copyto(featArr[iFeat], sgl_feat_arr.T, casting='safe')
+                        iFeat = iFeat + 1
+                        # Iterate through rotation angles
+                        for rotate_angle in rotateChips:
+                            refImgBlk = block[1][0, yMinExt:yMaxExt, xMinExt:xMaxExt]
+                            # Perform Rotate
+                            refImgBlkRot = scipy.ndimage.rotate(refImgBlk, rotate_angle, reshape=False,
+                                                                output=numpy.uint16, order=0, mode='nearest')
+                            numpy.copyto(featRefArr[iFeat], refImgBlkRot[minSub:maxSub, minSub:maxSub], casting='safe')
+                            sgl_feat_arr[...] = 0.0
+                            for nImg in range(nImgs):
+                                imgBlk = block[nImg + 2][..., yMinExt:yMaxExt, xMinExt:xMaxExt]
+                                # Perform Rotate
+                                imgBlkRot = scipy.ndimage.rotate(imgBlk, rotate_angle, axes=[1, 2], reshape=False,
+                                                                 output=numpy.float32, mode='nearest')
+                                for iBand in range(imgBlk.shape[0]):
+                                    numpy.copyto(sgl_feat_arr[iBand], imgBlkRot[iBand, minSub:maxSub, minSub:maxSub],
+                                                 casting='safe')
+                            numpy.copyto(featArr[iFeat], sgl_feat_arr.T, casting='safe')
+                            iFeat = iFeat + 1
+        else:
+            xSize = blkShape[2] - (scnOverlap * 2)
+            ySize = blkShape[1] - (scnOverlap * 2)
+            xRange = numpy.arange(scnOverlap, scnOverlap + xSize, 1)
+            yRange = numpy.arange(scnOverlap, scnOverlap + ySize, 1)
+
+            for y in yRange:
+                yMin = y - scnOverlap
+                yMax = y + scnOverlap
+                for x in xRange:
+                    xMin = x - scnOverlap
+                    xMax = x + scnOverlap
+                    if classMskArr[0][y][x] == 1:
+                        refImgBlk = block[1][0, yMin:yMax, xMin:xMax]
+                        numpy.copyto(featRefArr[iFeat], refImgBlk, casting='safe')
+                        sgl_feat_arr[...] = 0.0
+                        for nImg in range(nImgs):
+                            imgBlk = block[nImg + 2][..., yMin:yMax, xMin:xMax]
+                            for iBand in range(imgBlk.shape[0]):
+                                numpy.copyto(sgl_feat_arr[iBand], imgBlk[iBand], casting='safe')
+                        numpy.copyto(featArr[iFeat], sgl_feat_arr.T, casting='safe')
+                        iFeat = iFeat + 1
+    ######################################################################
+
+    ######################################################################
+    # Create the output HDF5 file and populate with data.
+    ######################################################################
+    fH5Out = h5py.File(outputHDF, 'w')
+    dataGrp = fH5Out.create_group("DATA")
+    metaGrp = fH5Out.create_group("META-DATA")
+    dataGrp.create_dataset('DATA', data=featArr, chunks=True, compression="gzip", shuffle=True)
+    dataGrp.create_dataset('REF', data=featRefArr, chunks=True, compression="gzip", shuffle=True)
+    describDS = metaGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
+    describDS[0] = 'IMAGE REF TILES'.encode()
+    fH5Out.close()
+    ######################################################################
+
+
+def splitSampleRefChipHDF5File(input_h5_file, sample_h5_file, remain_h5_file, sample_size, rnd_seed):
+    """
+    A function to split the HDF5 outputs from the rsgislib.imageutils.extractChipZoneImageBandValues2HDF
+    function into two sets by taking a random set with the defined sample size from the input file,
+    saving the sample and the remainder to output HDF5 files.
+
+    :param input_h5_file: The input HDF5 file to the split.
+    :param sample_h5_file: The output HDF5 file with the sample outputted.
+    :param remain_h5_file: The output HDF5 file with the remainder outputted.
+    :param sample_size: An integer specifying the size of the sample to be taken.
+    :param rnd_seed: An integer specifying the seed for the random number generator,
+                     allowing the same 'random' sample to be taken.
+
+    """
+    import numpy
+    import h5py
+
+    f = h5py.File(input_h5_file, 'r')
+    n_rows = f['DATA/REF'].shape[0]
+    f.close()
+
+    if sample_size > n_rows:
+        raise Exception("The requested sample is larger than the number samples in the input file.")
+
+    rnd_obj = numpy.random.RandomState(rnd_seed)
+    # Find sufficient unique sample indexes.
+    smp_idxs = numpy.zeros(sample_size, dtype=int)
+    while numpy.unique(smp_idxs).shape[0] != sample_size:
+        tmp_idxs = rnd_obj.randint(0, n_rows, sample_size)
+        tmp_uniq_idxs = numpy.unique(tmp_idxs)
+        c_idx = 0
+        if numpy.sum(smp_idxs) > 0:
+            c_smp = smp_idxs[smp_idxs > 0]
+            tmp_idxs = numpy.concatenate((c_smp, tmp_uniq_idxs))
+            tmp_uniq_idxs = numpy.unique(tmp_idxs)
+
+        max_idx = (sample_size - 1)
+        if tmp_uniq_idxs.shape[0] < max_idx:
+            max_idx = tmp_uniq_idxs.shape[0]
+        smp_idxs[0:max_idx] = tmp_uniq_idxs[0:max_idx]
+    smp_idxs = numpy.sort(smp_idxs)
+
+    # Get the remaining indexes
+    remain_idxs = numpy.arange(0, n_rows)
+    remain_idxs = remain_idxs[numpy.isin(remain_idxs, smp_idxs, assume_unique=True, invert=True)]
+
+    # Read the input HDF5 file.
+    f = h5py.File(input_h5_file, 'r')
+    in_data_samples = f['DATA/DATA']
+    out_data_samples = in_data_samples[smp_idxs]
+    remain_data_samples = in_data_samples[remain_idxs]
+    in_ref_samples = f['DATA/REF']
+    out_ref_samples = in_ref_samples[smp_idxs]
+    remain_ref_samples = in_ref_samples[remain_idxs]
+    f.close()
+
+    # Create an output HDF5 file and populate with sample data.
+    fSampleH5Out = h5py.File(sample_h5_file, 'w')
+    dataSampleGrp = fSampleH5Out.create_group("DATA")
+    metaSampleGrp = fSampleH5Out.create_group("META-DATA")
+    dataSampleGrp.create_dataset('DATA', data=out_data_samples, chunks=True, compression="gzip", shuffle=True)
+    dataSampleGrp.create_dataset('REF', data=out_ref_samples, chunks=True, compression="gzip", shuffle=True)
+    describSampleDS = metaSampleGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
+    describSampleDS[0] = 'IMAGE REF TILES'.encode()
+    fSampleH5Out.close()
+
+    # Create an output HDF5 file and populate with remain data.
+    fSampleH5Out = h5py.File(remain_h5_file, 'w')
+    dataSampleGrp = fSampleH5Out.create_group("DATA")
+    metaSampleGrp = fSampleH5Out.create_group("META-DATA")
+    dataSampleGrp.create_dataset('DATA', data=remain_data_samples, chunks=True, compression="gzip", shuffle=True)
+    dataSampleGrp.create_dataset('REF', data=remain_ref_samples, chunks=True, compression="gzip", shuffle=True)
+    describSampleDS = metaSampleGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
+    describSampleDS[0] = 'IMAGE REF TILES'.encode()
+    fSampleH5Out.close()
+
+
+def mergeExtractedHDF5ChipRefData(h5Files, outH5File):
+    """
+A function to merge a list of HDF files
+(e.g., from rsgislib.imageutils.extractRefChipZoneImageBandValues2HDF)
+with the same number of variables (i.e., image bands) and chip size into
+a single file. For example, if class training regions have been sourced
+from multiple images.
+
+:param h5Files: a list of input files.
+:param outH5File: the output file.
+
+Example::
+
+    inTrainSamples = ['MSS_CloudTrain1.h5', 'MSS_CloudTrain2.h5', 'MSS_CloudTrain3.h5']
+    cloudTrainSamples = 'LandsatMSS_CloudTrainingSamples.h5'
+    rsgislib.imageutils.mergeExtractedHDF5Data(inTrainSamples, cloudTrainSamples)
+
+"""
+    import h5py
+    import numpy
+
+    first = True
+    n_feats = 0
+    chip_size = 0
+    n_bands = 0
+    for h5File in h5Files:
+        fH5 = h5py.File(h5File, 'r')
+        data_shp = fH5['DATA/DATA'].shape
+        if first:
+            n_bands = data_shp[3]
+            chip_size = data_shp[1]
+            first = False
+        else:
+            if n_bands != data_shp[3]:
+                raise rsgislib.RSGISPyException(
+                    "The number of bands (variables) within the inputted HDF5 files was not the same.")
+            if chip_size != data_shp[1]:
+                raise rsgislib.RSGISPyException("The chip size within the inputted HDF5 files was not the same.")
+        n_feats += data_shp[0]
+        fH5.close()
+
+    feat_arr = numpy.zeros([n_feats, chip_size, chip_size, n_bands], dtype=numpy.float32)
+    feat_ref_arr = numpy.zeros([n_feats, chip_size, chip_size], dtype=numpy.uint16)
+
+    row_init = 0
+    for h5File in h5Files:
+        fH5 = h5py.File(h5File, 'r')
+        n_rows = fH5['DATA/DATA'].shape[0]
+        feat_arr[row_init:(row_init + n_rows)] = fH5['DATA/DATA']
+        feat_ref_arr[row_init:(row_init + n_rows)] = fH5['DATA/REF']
+        row_init += n_rows
+        fH5.close()
+
+    fH5Out = h5py.File(outH5File, 'w')
+    dataGrp = fH5Out.create_group("DATA")
+    metaGrp = fH5Out.create_group("META-DATA")
+    dataGrp.create_dataset('DATA', data=feat_arr, chunks=True, compression="gzip", shuffle=True)
+    dataGrp.create_dataset('REF', data=feat_ref_arr, chunks=True, compression="gzip", shuffle=True)
+    describDS = metaGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
+    describDS[0] = 'Merged'.encode()
+    fH5Out.close()
+
+
 def getUniqueValues(img, img_band=1):
     """
 Find the unique image values within an image band.
