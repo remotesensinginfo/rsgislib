@@ -298,3 +298,57 @@ documentation https://keras.io/models/model/
         rat.writeColumn(ratDataset, "ClassName", ClassName)
         ratDataset = None
 
+
+def train_keras_chips_ref_classifer(cls_mdl, train_data_file, valid_data_file, test_data_file, n_classes,
+                                    out_mdl_file=None, train_epochs=5, train_batch_size=32):
+    """
+    A function which trains a neural network defined using the keras API for the classification of remotely sensed data.
+
+    This function requires that tensorflow and keras modules to be installed.
+
+    :param cls_mdl: The Keras model which has already been defined.
+    :param train_data_file: a HDF5 file with training data (needs to have elements /DATA/DATA and /DATA/REF)
+    :param valid_data_file: a HDF5 file with validation data (needs to have elements /DATA/DATA and /DATA/REF)
+    :param test_data_file: a HDF5 file with testing data (needs to have elements /DATA/DATA and /DATA/REF)
+    :param n_classes: integer specifying the number of classes within the system
+    :param out_mdl_file: A file path to save the trained model as a hdf5 file. If None then ignored.
+    :param train_epochs: The number of epochs to use for training
+    :param train_batch_size: The batch size to use for training.
+
+    """
+    f = h5py.File(train_data_file, 'r')
+    train_np = numpy.array(f['DATA/DATA'])
+    train_lbls_np = numpy.array(f['DATA/REF'])
+    f.close()
+    train_lbls_keras = keras.utils.to_categorical(train_lbls_np, num_classes=n_classes)
+
+    f = h5py.File(valid_data_file, 'r')
+    vaild_np = numpy.array(f['DATA/DATA'])
+    vaild_lbls_np = numpy.array(f['DATA/REF'])
+    f.close()
+    vaild_lbls_keras = keras.utils.to_categorical(vaild_lbls_np, num_classes=n_classes)
+
+    f = h5py.File(test_data_file, 'r')
+    test_np = numpy.array(f['DATA/DATA'])
+    test_lbls_np = numpy.array(f['DATA/REF'])
+    f.close()
+    test_lbls_keras = keras.utils.to_categorical(test_lbls_np, num_classes=n_classes)
+
+    print("Finished Reading Data")
+
+    print("Start Training Model")
+    cls_mdl.fit(train_np, train_lbls_keras, epochs=train_epochs, batch_size=train_batch_size,
+                validation_data=(vaild_np, vaild_lbls_keras))
+    print("Finished Training Model")
+    cls_mdl.summary()
+
+    if out_mdl_file is not None:
+        cls_mdl.save(out_mdl_file)
+
+    loss_and_metrics = cls_mdl.evaluate(test_np, test_lbls_keras, batch_size=train_batch_size)
+    eval_metric_names = cls_mdl.metrics_names
+    for eval_name, eval_val in zip(eval_metric_names, loss_and_metrics):
+        print("{} = {}".format(eval_name, eval_val))
+
+
+
