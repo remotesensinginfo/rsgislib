@@ -444,6 +444,49 @@ def split_chip_sample_ref_train_valid_test(input_sample_h5_file, train_h5_file, 
     os.remove(tmp_train_valid_sample_file)
 
 
+def flipChipHDF5File(input_h5_file, output_h5_file):
+    """
+    A function which flips each sample in both the x and y axis. So the
+    output file will have double the number of samples as the input file.
+
+    :param input_h5_file:
+    :param output_h5_file:
+
+    """
+    import tqdm
+    import h5py
+    import numpy
+    f = h5py.File(input_h5_file, 'r')
+    n_in_feats = f['DATA/DATA'].shape[0]
+    chip_size = f['DATA/DATA'].shape[1]
+    n_bands = f['DATA/DATA'].shape[3]
+
+    n_out_feats = n_in_feats * 2
+
+    feat_arr = numpy.zeros([n_out_feats, chip_size, chip_size, n_bands], dtype=numpy.float32)
+
+    i_feat = 0
+    for n in tqdm.tqdm(range(n_in_feats)):
+        numpy.copyto(feat_arr[i_feat], numpy.flip(f['DATA/DATA'][n].T, axis=1).T, casting='safe')
+        i_feat += 1
+        numpy.copyto(feat_arr[i_feat], numpy.flip(f['DATA/DATA'][n].T, axis=2).T, casting='safe')
+        i_feat += 1
+
+    f.close()
+
+    ######################################################################
+    # Create the output HDF5 file and populate with data.
+    ######################################################################
+    fH5Out = h5py.File(output_h5_file, 'w')
+    dataGrp = fH5Out.create_group("DATA")
+    metaGrp = fH5Out.create_group("META-DATA")
+    dataGrp.create_dataset('DATA', data=feat_arr, chunks=True, compression="gzip", shuffle=True)
+    describDS = metaGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
+    describDS[0] = 'IMAGE REF TILES'.encode()
+    fH5Out.close()
+    ######################################################################
+
+
 def flipRefChipHDF5File(input_h5_file, output_h5_file):
     """
     A function which flips each sample in both the x and y axis. So the
