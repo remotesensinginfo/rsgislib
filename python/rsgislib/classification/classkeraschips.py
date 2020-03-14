@@ -51,8 +51,6 @@ from rios.imagereader import ImageReader
 from rios.imagewriter import ImageWriter
 from rios import rat
 
-import keras.utils
-
 
 def train_keras_chips_pixel_classifer(cls_mdl, clsinfodict, out_mdl_file=None, train_epochs=5, train_batch_size=32):
     """
@@ -68,6 +66,11 @@ def train_keras_chips_pixel_classifer(cls_mdl, clsinfodict, out_mdl_file=None, t
     :param train_batch_size: The batch size to use for training.
 
     """
+    try:
+        from keras.utils import to_categorical
+    except:
+        from tensorflow.keras.utils import to_categorical
+
     n_classes = len(clsinfodict)
     for clsname in clsinfodict:
         if clsinfodict[clsname].id >= n_classes:
@@ -121,15 +124,15 @@ def train_keras_chips_pixel_classifer(cls_mdl, clsinfodict, out_mdl_file=None, t
 
     train_np = numpy.concatenate(train_data_lst)
     train_lbls_np = numpy.concatenate(train_lbls_lst)
-    train_lbls_keras = keras.utils.to_categorical(train_lbls_np, num_classes=n_classes)
+    train_lbls_keras = to_categorical(train_lbls_np, num_classes=n_classes)
 
     vaild_np = numpy.concatenate(valid_data_lst)
     vaild_lbls_np = numpy.concatenate(valid_lbls_lst)
-    vaild_lbls_keras = keras.utils.to_categorical(vaild_lbls_np, num_classes=n_classes)
+    vaild_lbls_keras = to_categorical(vaild_lbls_np, num_classes=n_classes)
 
     test_np = numpy.concatenate(test_data_lst)
     test_lbls_np = numpy.concatenate(test_lbls_lst)
-    test_lbls_keras = keras.utils.to_categorical(test_lbls_np, num_classes=n_classes)
+    test_lbls_keras = to_categorical(test_lbls_np, num_classes=n_classes)
 
     print("Start Training Model")
     cls_mdl.fit(train_np, train_lbls_keras, epochs=train_epochs, batch_size=train_batch_size,
@@ -316,24 +319,28 @@ def train_keras_chips_ref_classifer(cls_mdl, train_data_file, valid_data_file, t
     :param train_batch_size: The batch size to use for training.
 
     """
+    try:
+        from keras.utils import to_categorical
+    except:
+        from tensorflow.keras.utils import to_categorical
+
     f = h5py.File(train_data_file, 'r')
     train_np = numpy.array(f['DATA/DATA'])
     train_lbls_np = numpy.array(f['DATA/REF'])
     f.close()
-    train_lbls_keras = keras.utils.to_categorical(train_lbls_np, num_classes=n_classes)
+    train_lbls_keras = to_categorical(train_lbls_np, num_classes=n_classes)
 
     f = h5py.File(valid_data_file, 'r')
     vaild_np = numpy.array(f['DATA/DATA'])
     vaild_lbls_np = numpy.array(f['DATA/REF'])
     f.close()
-    vaild_lbls_keras = keras.utils.to_categorical(vaild_lbls_np, num_classes=n_classes)
+    vaild_lbls_keras = to_categorical(vaild_lbls_np, num_classes=n_classes)
 
     f = h5py.File(test_data_file, 'r')
     test_np = numpy.array(f['DATA/DATA'])
     test_lbls_np = numpy.array(f['DATA/REF'])
     f.close()
-    test_lbls_keras = keras.utils.to_categorical(test_lbls_np, num_classes=n_classes)
-
+    test_lbls_keras = to_categorical(test_lbls_np, num_classes=n_classes)
     print("Finished Reading Data")
 
     print("Start Training Model")

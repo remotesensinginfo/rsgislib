@@ -1559,6 +1559,18 @@ class RSGISPyUtils (object):
         import numpy
         return numpy.max(x) < 0
 
+    def isodd(self, number):
+        """
+        A function which tests whether a number is odd
+
+        :param number: number value to test.
+        :return: True = input number is odd; False = input number is even
+
+        """
+        if (number % 2) != 0:
+            return True
+        return False
+
 
 class RSGISTime (object):
     """ Class to calculate run time for a function, format and print out (similar to for XML interface).

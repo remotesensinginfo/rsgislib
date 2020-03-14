@@ -48,8 +48,6 @@ from rios import applier
 from rios import cuiprogress
 from rios import rat
 
-import keras.utils
-
 
 def train_keras_pixel_classifer(cls_mdl, clsinfodict, out_mdl_file=None, train_epochs=5, train_batch_size=32):
     """
@@ -63,6 +61,11 @@ def train_keras_pixel_classifer(cls_mdl, clsinfodict, out_mdl_file=None, train_e
     :param out_mdl_file: A file path to save the trained model as a hdf5 file. If None then ignored.
 
     """
+    try:
+        from keras.utils import to_categorical
+    except:
+        from tensorflow.keras.utils import to_categorical
+
     n_classes = len(clsinfodict)
     for clsname in clsinfodict:
         if clsinfodict[clsname].id >= n_classes:
@@ -116,15 +119,15 @@ def train_keras_pixel_classifer(cls_mdl, clsinfodict, out_mdl_file=None, train_e
     
     train_np = numpy.concatenate(train_data_lst)
     train_lbls_np = numpy.concatenate(train_lbls_lst)
-    train_lbls_keras = keras.utils.to_categorical(train_lbls_np, num_classes=n_classes)
+    train_lbls_keras = to_categorical(train_lbls_np, num_classes=n_classes)
     
     vaild_np = numpy.concatenate(valid_data_lst)
     vaild_lbls_np = numpy.concatenate(valid_lbls_lst)
-    vaild_lbls_keras = keras.utils.to_categorical(vaild_lbls_np, num_classes=n_classes)
+    vaild_lbls_keras = to_categorical(vaild_lbls_np, num_classes=n_classes)
 
     test_np = numpy.concatenate(test_data_lst)
     test_lbls_np = numpy.concatenate(test_lbls_lst)
-    test_lbls_keras = keras.utils.to_categorical(test_lbls_np, num_classes=n_classes)
+    test_lbls_keras = to_categorical(test_lbls_np, num_classes=n_classes)
     
     print("Start Training Model")
     cls_mdl.fit(train_np, train_lbls_keras, epochs=train_epochs, batch_size=train_batch_size,

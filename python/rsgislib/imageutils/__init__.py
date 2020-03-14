@@ -2290,3 +2290,144 @@ def create_valid_mask(imgBandInfo, out_msk_file, gdalformat, tmpdir):
         shutil.rmtree(tmp_lcl_dir)
 
 
+def get_image_pxl_values(image, band, x_coords, y_coords):
+    """
+    Function which gets pixel values from a image for specified
+    image pixels. The coordinate space is image pixels, i.e.,
+    (0 - xSize) and (0 - ySize).
+
+    :param image: The input image name and path
+    :param band: The band within the input image.
+    :param x_coords: A numpy array of image X coordinates (in the image pixel coordinates)
+    :param y_coords: A numpy array of image Y coordinates (in the image pixel coordinates)
+    :return: An array of image pixel values.
+    
+    """
+    from osgeo import gdal
+    import tqdm
+    import numpy
+
+    if x_coords.shape[0] != y_coords.shape[0]:
+        raise Exception("The X and Y image coordinates are not the same.")
+
+    image_ds = gdal.Open(image, gdal.GA_Update)
+    if image_ds is None:
+        raise Exception("Could not open the input image file: '{}'".format(image))
+    image_band = image_ds.GetRasterBand(band)
+    if image_band is None:
+        raise Exception("The image band wasn't opened")
+
+    out_pxl_vals = numpy.zeros(x_coords.shape[0], dtype=float)
+
+    img_data = image_band.ReadAsArray()
+    for i in tqdm.tqdm(range(x_coords.shape[0])):
+        out_pxl_vals[i] = img_data[y_coords[i], x_coords[i]]
+    image_ds = None
+    return out_pxl_vals
+
+
+def set_image_pxl_values(image, band, x_coords, y_coords, pxl_value=1):
+    """
+    A function which sets defined image pixels to a value.
+    The coordinate space is image pixels, i.e.,
+    (0 - xSize) and (0 - ySize).
+
+    :param image: The input image name and path
+    :param band: The band within the input image.
+    :param x_coords: A numpy array of image X coordinates (in the image pixel coordinates)
+    :param y_coords: A numpy array of image Y coordinates (in the image pixel coordinates)
+    :param pxl_value: The value to set the image pixel to (specified by the x/y coordinates)
+
+    """
+    from osgeo import gdal
+    import tqdm
+
+    if x_coords.shape[0] != y_coords.shape[0]:
+        raise Exception("The X and Y image coordinates are not the same.")
+
+    image_ds = gdal.Open(image, gdal.GA_Update)
+    if image_ds is None:
+        raise Exception("Could not open the input image file: '{}'".format(image))
+    image_band = image_ds.GetRasterBand(band)
+    if image_band is None:
+        raise Exception("The image band wasn't opened")
+
+    img_data = image_band.ReadAsArray()
+    for i in tqdm.tqdm(range(x_coords.shape[0])):
+        img_data[y_coords[i], x_coords[i]] = pxl_value
+    image_band.WriteArray(img_data)
+    image_ds = None
+
+
+def assign_random_pxls(input_img, output_img, n_pts, img_band=1, gdalformat='KEA', edge_pxl=0, use_no_data=True,
+                       seed=None):
+    """
+    A function which can generate a set of random pixels. Can honor the image no data value
+    and use an edge buffer so pixels are not identified near the image edge.
+
+    :param input_img: The input image providing the reference area and no data value.
+    :param output_img: The output image with the random pixels.
+    :param n_pts: The number of pixels to be sampled.
+    :param img_band: The image band from the input image used for the no data value.
+    :param gdalformat: The file format of the output image.
+    :param edge_pxl: The edge pixel buffer, in pixels. This is a buffer around the edge of
+                     the image within which pixels will not be identified. (Default: 0)
+    :param use_no_data: A boolean specifying whether the image no data value should be used. (Default: True)
+    :param seed: A random seed for generating the pixel locations. If None then a different
+                 seed is used each time the system is executed. (Default None)
+
+    Example::
+
+        input_img = 'LS5TM_20000108_latn531lonw37_r23p204_osgb_clouds_up.kea'
+        output_img = 'LS5TM_20000108_latn531lonw37_r23p204_osgb_samples.kea'
+        n_pts = 5000
+
+        assign_random_pxls(input_img, output_img, n_pts, img_band=1, gdalformat='KEA')
+        # Calculate the image stats and pyramids for display
+        import rsgislib.rastergis
+        rsgislib.rastergis.populateStats(output_img, True, True, True)
+
+    """
+    import numpy
+    import numpy.random
+
+    if seed is not None:
+        numpy.random.seed(seed)
+
+    if edge_pxl < 0:
+        raise Exception("edge_pxl value must be greater than 0.")
+
+    rsgis_utils = rsgislib.RSGISPyUtils()
+    xSize, ySize = rsgis_utils.getImageSize(input_img)
+
+    x_min = edge_pxl
+    x_max = xSize - edge_pxl
+
+    y_min = edge_pxl
+    y_max = ySize - edge_pxl
+
+    if use_no_data:
+        no_data_val = rsgis_utils.getImageNoDataValue(input_img, img_band)
+
+        out_x_coords = numpy.zeros(n_pts, dtype=numpy.uint16)
+        out_y_coords = numpy.zeros(n_pts, dtype=numpy.uint16)
+
+        out_n_pts = 0
+        pts_size = n_pts
+        while out_n_pts < n_pts:
+            x_coords = numpy.random.randint(x_min, high=x_max, size=pts_size, dtype=numpy.uint16)
+            y_coords = numpy.random.randint(y_min, high=y_max, size=pts_size, dtype=numpy.uint16)
+            pxl_vals = get_image_pxl_values(input_img, img_band, x_coords, y_coords)
+
+            for i in range(pts_size):
+                if pxl_vals[i] != no_data_val:
+                    out_x_coords[out_n_pts] = x_coords[i]
+                    out_y_coords[out_n_pts] = y_coords[i]
+                    out_n_pts += 1
+            pts_size = n_pts - out_n_pts
+    else:
+        out_x_coords = numpy.random.randint(x_min, high=x_max, size=n_pts, dtype=numpy.uint16)
+        out_y_coords = numpy.random.randint(y_min, high=y_max, size=n_pts, dtype=numpy.uint16)
+
+    rsgislib.imageutils.createCopyImage(input_img, output_img, 1, 0, gdalformat, rsgislib.TYPE_8UINT)
+    set_image_pxl_values(output_img, 1, out_x_coords, out_y_coords, 1)
