@@ -532,3 +532,112 @@ def flipRefChipHDF5File(input_h5_file, output_h5_file):
     describDS[0] = 'IMAGE REF TILES'.encode()
     fH5Out.close()
     ######################################################################
+
+
+def label_pxl_sample_chips(sample_pxls_img, cls_msk_img, output_image, gdalformat, chip_size, cls_lut,
+                           sample_pxl_img_band=1, cls_msk_img_band=1):
+    """
+    A function which labels image pixels based on the proportions of a class within a chip around the
+    pixel (can be used in combination with rsgislib.imageutils.assign_random_pxls). It is expected that
+    this function will be used when trying to use existing maps to create deep learning chip classification
+    training data.
+
+    Pixels are labelled if the proportion of pixels is >= the threshold provided in the LUT. If more than
+    one class meets the threshold then the one with the highest proportion is assigned.
+
+    :param sample_pxls_img: The input binary image with the pixel locations (value == 1)
+    :param cls_msk_img: The classification image used to assign the output pixel values.
+    :param output_image: The output image. Single pixels with the class value will be outputted.
+    :param gdalformat: The output image file format.
+    :param chip_size: The size of the chip used to identify the class - would probably correspond
+                      to the chip size being used for the deep learning classification. Areas used
+                      is half the chip size around the pixel (i.e., the pixel from the samples image
+                      will be at the centre of the chip).
+    :param cls_lut: A dict look up table (LUT) with the thresholds per class for the pixel to be
+                    classified as that class.
+    :param sample_pxl_img_band: Default 1. The image band in the sample image.
+    :param cls_msk_img_band: Default 1. The image band in the sample image.
+
+    Example::
+
+        sample_pxls_img = 'LS5TM_20000108_latn531lonw37_r23p204_osgb_samples.kea'
+        cls_msk_img = 'LS5TM_20000108_latn531lonw37_r23p204_osgb_clouds_up.kea'
+        output_image = 'LS5TM_20000108_latn531lonw37_r23p204_osgb_samples_lbld.kea'
+
+        cls_lut = dict()
+        cls_lut[1] = 0.2
+        cls_lut[2] = 0.2
+        cls_lut[3] = 0.99
+
+        label_pxl_sample_chips(sample_pxls_img, cls_msk_img, output_image, 'KEA', 21, cls_lut)
+
+    """
+    import rsgislib.rastergis
+    from rios.imagereader import ImageReader
+    from rios.imagewriter import ImageWriter
+    import tqdm
+    import numpy
+    import math
+
+    chip_size_odd = False
+    if (chip_size % 2) != 0:
+        chip_size_odd = True
+
+    img_win_h_size = math.floor(chip_size / 2)
+    img_win_size = chip_size
+    n_pxls = img_win_size * img_win_size
+
+    inImgs = list()
+    inImgBands = list()
+    inImgs.append(sample_pxls_img)
+    inImgBands.append([sample_pxl_img_band])
+    inImgs.append(cls_msk_img)
+    inImgBands.append([cls_msk_img_band])
+
+    writer = None
+    reader = ImageReader(inImgs, windowxsize=200, windowysize=200, overlap=img_win_h_size, layerselection=inImgBands)
+    for (info, block) in tqdm.tqdm(reader):
+        samples_msk_arr = block[0]
+        blk_shp = samples_msk_arr.shape
+
+        xSize = blk_shp[2] - (img_win_h_size * 2)
+        ySize = blk_shp[1] - (img_win_h_size * 2)
+        xRange = numpy.arange(img_win_h_size, img_win_h_size + xSize, 1)
+        yRange = numpy.arange(img_win_h_size, img_win_h_size + ySize, 1)
+        out_samp_arr = numpy.zeros_like(samples_msk_arr, dtype=numpy.uint8)
+        for y in yRange:
+            yMin = y - img_win_h_size
+            yMax = y + img_win_h_size
+            if chip_size_odd:
+                yMax += 1
+            for x in xRange:
+                xMin = x - img_win_h_size
+                xMax = x + img_win_h_size
+                if chip_size_odd:
+                    xMax += 1
+                if samples_msk_arr[0][y][x] == 1:
+                    img_blk = block[1][0, yMin:yMax, xMin:xMax]
+                    uniq_vals, uniq_counts = numpy.unique(img_blk, return_counts=True)
+                    uniq_dict = dict(zip(uniq_vals, uniq_counts))
+                    first = True
+                    for val in uniq_vals:
+                        if val in cls_lut:
+                            val_prop = uniq_dict[val] / n_pxls
+                            if val_prop >= cls_lut[val]:
+                                if first:
+                                    max_val = val
+                                    max_val_prop = val_prop
+                                    first = False
+                                elif val_prop > max_val_prop:
+                                    max_val = val
+                                    max_val_prop = val_prop
+                    if not first:
+                        out_samp_arr[0][y][x] = max_val
+
+        if writer is None:
+            writer = ImageWriter(output_image, info=info, firstblock=out_samp_arr, drivername=gdalformat)
+        else:
+            writer.write(out_samp_arr)
+    writer.close(calcStats=False)
+
+    rsgislib.rastergis.populateStats(output_image, True, True, True)
