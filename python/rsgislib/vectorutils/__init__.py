@@ -1309,9 +1309,11 @@ A function which splits the input vector layer into a number of output layers.
     datasrc = None
 
 
-def reProjVectorLayer(inputVec, outputVec, outProjWKT, outDriverName='ESRI Shapefile', outLyrName=None, inLyrName=None, inProjWKT=None, force=False):
+def reProjVectorLayer(inputVec, outputVec, outProjWKT, outDriverName='ESRI Shapefile', outLyrName=None,
+                      inLyrName=None, inProjWKT=None, force=False):
     """
-A function which reprojects a vector layer. 
+A function which reprojects a vector layer. You might also consider using rsgislib.vectorutils.vector_translate,
+particularly if you are reprojecting the data and changing between coordinate units (e.g., degrees to meters)
 
 :param inputVec: is a string with name and path to input vector file.
 :param outputVec: is a string with name and path to output vector file.
@@ -1326,8 +1328,8 @@ A function which reprojects a vector layer.
                   (Optional; taken from input file if not specified).
 
 """
-    ## This code has been editted from https://pcjericks.github.io/py-gdalogr-cookbook/projection.html#reproject-a-layer
-    ## Updated for GDAL 2.0
+    ## This code has been editted and updated for GDAL > version 2.0
+    ## https://pcjericks.github.io/py-gdalogr-cookbook/projection.html#reproject-a-layer
     gdal.UseExceptions()
         
     # get the input layer
@@ -1439,7 +1441,8 @@ A function which reprojects a vector layer.
 def reproj_vec_lyr(in_vec_lyr, out_vec_file, out_epsg, out_vec_drv='MEMORY', out_lyr_name=None, in_epsg=None,
                       print_feedback=True):
     """
-A function which reprojects a vector layer.
+A function which reprojects a vector layer. You might also consider using rsgislib.vectorutils.vector_translate,
+particularly if you are reprojecting the data and changing between coordinate units (e.g., degrees to meters)
 
 :param in_vec_lyr: is a GDAL vector layer object.
 :param out_vec_file: is a string with name and path to output vector file - is created.
@@ -3827,4 +3830,61 @@ def line_intersection_range(vec_line_file, vec_line_lyr, vec_objs_file, vec_objs
     ds_objs_sub_vec = None
 
 
+def vector_translate(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr=None, out_vec_drv='GPKG',
+                     drv_create_opts=[], lyr_create_opts=[], access_mode='overwrite', src_srs=None,
+                     dst_srs=None):
+    """
+    A function which translates a vector file to another format, similar to ogr2ogr. If you wish
+    to reproject the input file then provide a destination srs (e.g., "EPSG:27700", or wkt string,
+    or proj4 string).
+
+    :param in_vec_file: the input vector file.
+    :param in_vec_lyr: the input vector layer name
+    :param out_vec_file: the output vector file.
+    :param out_vec_lyr: the name of the output vector layer (if None then the same as the input).
+    :param out_vec_drv: the output vector file format (e.g., GPKG, GEOJSON, ESRI Shapefile, etc.)
+    :param drv_create_opts: a list of options for the creation of the output file.
+    :param lyr_create_opts: a list of options for the creation of the output layer.
+    :param access_mode: by default the function overwrites the output file but other
+                        options are: ['update', 'append', 'overwrite']
+    :param src_srs: provide a source spatial reference for the input vector file. Default=None.
+                    can be used to provide a projection where none has been specified or the
+                    information has gone missing. Can be used without performing a reprojection.
+    :param dst_srs: provide a spatial reference for the output image to be reprojected to. (Default=None)
+                    If specified then the file will be reprojected.
+
+    """
+    from osgeo import gdal
+    gdal.UseExceptions()
+
+    try:
+        import tqdm
+        pbar = tqdm.tqdm(total=100)
+        callback = lambda *args, **kw: pbar.update()
+    except:
+        callback = gdal.TermProgress
+
+    if out_vec_lyr is None:
+        out_vec_lyr = in_vec_lyr
+
+    reproject_lyr = False
+    if dst_srs is not None:
+        reproject_lyr = True
+
+    if src_srs is not None:
+        if dst_srs is None:
+            dst_srs = src_srs
+
+    opts = gdal.VectorTranslateOptions(options=drv_create_opts,
+                                       format=out_vec_drv,
+                                       accessMode=access_mode,
+                                       srcSRS=src_srs,
+                                       dstSRS=dst_srs,
+                                       reproject=reproject_lyr,
+                                       layerCreationOptions=lyr_create_opts,
+                                       layers=in_vec_lyr,
+                                       layerName=out_vec_lyr,
+                                       callback=callback)
+
+    gdal.VectorTranslate(out_vec_file, in_vec_file, options=opts)
 
