@@ -1433,7 +1433,31 @@ class RSGISPyUtils (object):
             f.close()
         except Exception as e:
             raise e
-    
+
+    def writeDict2JSON(self, data_dict, out_file):
+        """
+        Write some data to a JSON file. The data would commonly be structured as a dict but could also be a list.
+
+        :param data_dict: The dict (or list) to be written to the output JSON file.
+        :param out_file: The file path to the output file.
+
+        """
+        import json
+        with open(out_file, 'w') as fp:
+            json.dump(data_dict, fp, sort_keys=True, indent=4, separators=(',', ': '), ensure_ascii=False)
+
+    def readJSON2Dict(self, input_file):
+        """
+        Read a JSON file. Will return a list or dict.
+
+        :param input_file: input JSON file path.
+
+        """
+        import json
+        with open(input_file) as f:
+            data = json.load(f)
+        return data
+
     def findFile(self, dirPath, fileSearch):
         """
         Search for a single file with a path using glob. Therefore, the file 
