@@ -1100,7 +1100,7 @@ Example::
     fH5Out = h5py.File(outH5File, 'w')
     dataGrp = fH5Out.create_group("DATA")
     metaGrp = fH5Out.create_group("META-DATA")
-    dataGrp.create_dataset('DATA', data=dataArr, chunks=True, compression="gzip", shuffle=True)
+    dataGrp.create_dataset('DATA', data=dataArr, chunks=(1000, numVars), compression="gzip", shuffle=True)
     describDS = metaGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
     describDS[0] = 'Merged'.encode()
     fH5Out.close()
@@ -1524,7 +1524,7 @@ def extractChipZoneImageBandValues2HDF(inputImageInfo, imageMask, maskValue, chi
     fH5Out = h5py.File(outputHDF, 'w')
     dataGrp = fH5Out.create_group("DATA")
     metaGrp = fH5Out.create_group("META-DATA")
-    dataGrp.create_dataset('DATA', data=featArr, chunks=True, compression="gzip", shuffle=True)
+    dataGrp.create_dataset('DATA', data=featArr, chunks=(100, chipSize, chipSize, nBands), compression="gzip", shuffle=True)
     describDS = metaGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
     describDS[0] = 'IMAGE TILES'.encode()
     fH5Out.close()
@@ -1550,6 +1550,8 @@ def splitSampleChipHDF5File(input_h5_file, sample_h5_file, remain_h5_file, sampl
 
     f = h5py.File(input_h5_file, 'r')
     n_rows = f['DATA/DATA'].shape[0]
+    n_bands = f['DATA/DATA'].shape[3]
+    chip_size = f['DATA/DATA'].shape[1]
     f.close()
 
     if sample_size > n_rows:
@@ -1588,7 +1590,8 @@ def splitSampleChipHDF5File(input_h5_file, sample_h5_file, remain_h5_file, sampl
     fSampleH5Out = h5py.File(sample_h5_file, 'w')
     dataSampleGrp = fSampleH5Out.create_group("DATA")
     metaSampleGrp = fSampleH5Out.create_group("META-DATA")
-    dataSampleGrp.create_dataset('DATA', data=out_samples, chunks=True, compression="gzip", shuffle=True)
+    dataSampleGrp.create_dataset('DATA', data=out_samples, chunks=(100, chip_size, chip_size, n_bands),
+                                 compression="gzip", shuffle=True)
     describSampleDS = metaSampleGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
     describSampleDS[0] = 'IMAGE TILES'.encode()
     fSampleH5Out.close()
@@ -1597,7 +1600,8 @@ def splitSampleChipHDF5File(input_h5_file, sample_h5_file, remain_h5_file, sampl
     fSampleH5Out = h5py.File(remain_h5_file, 'w')
     dataSampleGrp = fSampleH5Out.create_group("DATA")
     metaSampleGrp = fSampleH5Out.create_group("META-DATA")
-    dataSampleGrp.create_dataset('DATA', data=remain_samples, chunks=True, compression="gzip", shuffle=True)
+    dataSampleGrp.create_dataset('DATA', data=remain_samples, chunks=(100, chip_size, chip_size, n_bands),
+                                 compression="gzip", shuffle=True)
     describSampleDS = metaSampleGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
     describSampleDS[0] = 'IMAGE TILES'.encode()
     fSampleH5Out.close()
@@ -1657,7 +1661,8 @@ Example::
     fH5Out = h5py.File(outH5File, 'w')
     dataGrp = fH5Out.create_group("DATA")
     metaGrp = fH5Out.create_group("META-DATA")
-    dataGrp.create_dataset('DATA', data=feat_arr, chunks=True, compression="gzip", shuffle=True)
+    dataGrp.create_dataset('DATA', data=feat_arr, chunks=(100, chip_size, chip_size, n_bands),
+                           compression="gzip", shuffle=True)
     describDS = metaGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
     describDS[0] = 'Merged'.encode()
     fH5Out.close()
@@ -1836,8 +1841,8 @@ could be used to extract image 'chips' for other purposes.
     fH5Out = h5py.File(outputHDF, 'w')
     dataGrp = fH5Out.create_group("DATA")
     metaGrp = fH5Out.create_group("META-DATA")
-    dataGrp.create_dataset('DATA', data=featArr, chunks=True, compression="gzip", shuffle=True)
-    dataGrp.create_dataset('REF', data=featRefArr, chunks=True, compression="gzip", shuffle=True)
+    dataGrp.create_dataset('DATA', data=featArr, chunks=(100, chipSize, chipSize, nBands), compression="gzip", shuffle=True)
+    dataGrp.create_dataset('REF', data=featRefArr, chunks=(100, chipSize, chipSize), compression="gzip", shuffle=True)
     describDS = metaGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
     describDS[0] = 'IMAGE REF TILES'.encode()
     fH5Out.close()
@@ -1862,7 +1867,9 @@ def splitSampleRefChipHDF5File(input_h5_file, sample_h5_file, remain_h5_file, sa
     import h5py
 
     f = h5py.File(input_h5_file, 'r')
-    n_rows = f['DATA/REF'].shape[0]
+    n_rows = f['DATA/DATA'].shape[0]
+    n_bands = f['DATA/DATA'].shape[3]
+    chip_size = f['DATA/DATA'].shape[1]
     f.close()
 
     if sample_size > n_rows:
@@ -1904,8 +1911,10 @@ def splitSampleRefChipHDF5File(input_h5_file, sample_h5_file, remain_h5_file, sa
     fSampleH5Out = h5py.File(sample_h5_file, 'w')
     dataSampleGrp = fSampleH5Out.create_group("DATA")
     metaSampleGrp = fSampleH5Out.create_group("META-DATA")
-    dataSampleGrp.create_dataset('DATA', data=out_data_samples, chunks=True, compression="gzip", shuffle=True)
-    dataSampleGrp.create_dataset('REF', data=out_ref_samples, chunks=True, compression="gzip", shuffle=True)
+    dataSampleGrp.create_dataset('DATA', data=out_data_samples, chunks=(100, chip_size, chip_size, n_bands),
+                                 compression="gzip", shuffle=True)
+    dataSampleGrp.create_dataset('REF', data=out_ref_samples, chunks=(100, chip_size, chip_size),
+                                 compression="gzip", shuffle=True)
     describSampleDS = metaSampleGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
     describSampleDS[0] = 'IMAGE REF TILES'.encode()
     fSampleH5Out.close()
@@ -1914,8 +1923,10 @@ def splitSampleRefChipHDF5File(input_h5_file, sample_h5_file, remain_h5_file, sa
     fSampleH5Out = h5py.File(remain_h5_file, 'w')
     dataSampleGrp = fSampleH5Out.create_group("DATA")
     metaSampleGrp = fSampleH5Out.create_group("META-DATA")
-    dataSampleGrp.create_dataset('DATA', data=remain_data_samples, chunks=True, compression="gzip", shuffle=True)
-    dataSampleGrp.create_dataset('REF', data=remain_ref_samples, chunks=True, compression="gzip", shuffle=True)
+    dataSampleGrp.create_dataset('DATA', data=remain_data_samples, chunks=(100, chip_size, chip_size, n_bands),
+                                 compression="gzip", shuffle=True)
+    dataSampleGrp.create_dataset('REF', data=remain_ref_samples, chunks=(100, chip_size, chip_size),
+                                 compression="gzip", shuffle=True)
     describSampleDS = metaSampleGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
     describSampleDS[0] = 'IMAGE REF TILES'.encode()
     fSampleH5Out.close()
@@ -1977,8 +1988,8 @@ Example::
     fH5Out = h5py.File(outH5File, 'w')
     dataGrp = fH5Out.create_group("DATA")
     metaGrp = fH5Out.create_group("META-DATA")
-    dataGrp.create_dataset('DATA', data=feat_arr, chunks=True, compression="gzip", shuffle=True)
-    dataGrp.create_dataset('REF', data=feat_ref_arr, chunks=True, compression="gzip", shuffle=True)
+    dataGrp.create_dataset('DATA', data=feat_arr, chunks=(100, chip_size, chip_size, n_bands), compression="gzip", shuffle=True)
+    dataGrp.create_dataset('REF', data=feat_ref_arr, chunks=(100, chip_size, chip_size), compression="gzip", shuffle=True)
     describDS = metaGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
     describDS[0] = 'Merged'.encode()
     fH5Out.close()
