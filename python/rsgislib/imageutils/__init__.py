@@ -1988,8 +1988,10 @@ Example::
     fH5Out = h5py.File(outH5File, 'w')
     dataGrp = fH5Out.create_group("DATA")
     metaGrp = fH5Out.create_group("META-DATA")
-    dataGrp.create_dataset('DATA', data=feat_arr, chunks=(100, chip_size, chip_size, n_bands), compression="gzip", shuffle=True)
-    dataGrp.create_dataset('REF', data=feat_ref_arr, chunks=(100, chip_size, chip_size), compression="gzip", shuffle=True)
+    dataGrp.create_dataset('DATA', data=feat_arr, chunks=(100, chip_size, chip_size, n_bands),
+                           compression="gzip", shuffle=True)
+    dataGrp.create_dataset('REF', data=feat_ref_arr, chunks=(100, chip_size, chip_size),
+                           compression="gzip", shuffle=True)
     describDS = metaGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
     describDS[0] = 'Merged'.encode()
     fH5Out.close()
