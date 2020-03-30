@@ -30,6 +30,56 @@ namespace rsgis{namespace utils{
     {
         
     }
+
+    H5::DataType RSGISExportColumnData2HDF::getH5DataType(RSGISLibDataType rsgis_datatype)
+    {
+        H5::DataType h5_dtype = H5::PredType::IEEE_F32LE;
+        if(rsgis_datatype == rsgis_8int)
+        {
+            h5_dtype = H5::PredType::STD_I8LE;
+        }
+        else if(rsgis_datatype == rsgis_16int)
+        {
+            h5_dtype = H5::PredType::STD_I16LE;
+        }
+        else if(rsgis_datatype == rsgis_32int)
+        {
+            h5_dtype = H5::PredType::STD_I32LE;
+        }
+        else if(rsgis_datatype == rsgis_64int)
+        {
+            h5_dtype = H5::PredType::STD_I64LE;
+        }
+        else if(rsgis_datatype == rsgis_8uint)
+        {
+            h5_dtype = H5::PredType::STD_U8LE;
+        }
+        else if(rsgis_datatype == rsgis_16uint)
+        {
+            h5_dtype = H5::PredType::STD_U16LE;
+        }
+        else if(rsgis_datatype == rsgis_32uint)
+        {
+            h5_dtype = H5::PredType::STD_U32LE;
+        }
+        else if(rsgis_datatype == rsgis_64uint)
+        {
+            h5_dtype = H5::PredType::STD_U64LE;
+        }
+        else if(rsgis_datatype == rsgis_32float)
+        {
+            h5_dtype = H5::PredType::IEEE_F32LE;
+        }
+        else if(rsgis_datatype == rsgis_64float)
+        {
+            h5_dtype = H5::PredType::IEEE_F64LE;
+        }
+        else
+        {
+            throw RSGISException("Do not recognise the input rsgislib data type so cannot convert to HDF5 data type.");
+        }
+        return h5_dtype;
+    }
     
     void RSGISExportColumnData2HDF::createFile(std::string filePath, unsigned int numCols, std::string description, H5::DataType dataType)
     {

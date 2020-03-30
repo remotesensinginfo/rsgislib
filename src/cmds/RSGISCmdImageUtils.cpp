@@ -1394,7 +1394,7 @@ void executeStretchImageWithStatsNoData(std::string inputImage, std::string outp
     }
 
 
-    void executeImageRasterZone2HDF(std::string imageFile, std::string maskImage, std::string outputHDF, float maskVal)
+    void executeImageRasterZone2HDF(std::string imageFile, std::string maskImage, std::string outputHDF, float maskVal, RSGISLibDataType dataType)
     {
         try
         {
@@ -1415,7 +1415,7 @@ void executeStretchImageWithStatsNoData(std::string inputImage, std::string outp
             }
 
             rsgis::img::RSGISExtractImageValues extractVals;
-            extractVals.extractDataWithinMask2HDF(maskDS, imageDS, outputHDF, maskVal);
+            extractVals.extractDataWithinMask2HDF(maskDS, imageDS, outputHDF, maskVal, dataType);
 
             GDALClose(maskDS);
             GDALClose(imageDS);
@@ -1435,12 +1435,12 @@ void executeStretchImageWithStatsNoData(std::string inputImage, std::string outp
     }
     
             
-    void executeImageBandRasterZone2HDF(std::vector<std::pair<std::string, std::vector<unsigned int> > > imageFiles, std::string maskImage, std::string outputHDF, float maskVal)
+    void executeImageBandRasterZone2HDF(std::vector<std::pair<std::string, std::vector<unsigned int> > > imageFiles, std::string maskImage, std::string outputHDF, float maskVal, RSGISLibDataType dataType)
     {
         try
         {
             rsgis::img::RSGISExtractImageValues extractVals;
-            extractVals.extractImgBandDataWithinMask2HDF(imageFiles, maskImage, outputHDF, maskVal);
+            extractVals.extractImgBandDataWithinMask2HDF(imageFiles, maskImage, outputHDF, maskVal, dataType);
         }
         catch (RSGISImageException& e)
         {
@@ -1456,12 +1456,12 @@ void executeStretchImageWithStatsNoData(std::string inputImage, std::string outp
         }
     }
                 
-    void executeRandomSampleH5File(std::string inputH5, std::string outputH5, unsigned int nSample, int seed)
+    void executeRandomSampleH5File(std::string inputH5, std::string outputH5, unsigned int nSample, int seed, RSGISLibDataType dataType)
     {
         try
         {
             rsgis::img::RSGISExtractImageValues extractVals;
-            extractVals.sampleExtractedHDFData(inputH5, outputH5, nSample, seed);
+            extractVals.sampleExtractedHDFData(inputH5, outputH5, nSample, seed, dataType);
         }
         catch (RSGISImageException& e)
         {
@@ -1477,12 +1477,12 @@ void executeStretchImageWithStatsNoData(std::string inputImage, std::string outp
         }
     }
 
-    void executeSplitSampleH5File(std::string inputH5, std::string outputP1H5, std::string outputP2H5, unsigned int nSample, int seed)
+    void executeSplitSampleH5File(std::string inputH5, std::string outputP1H5, std::string outputP2H5, unsigned int nSample, int seed, RSGISLibDataType dataType)
     {
         try
         {
             rsgis::img::RSGISExtractImageValues extractVals;
-            extractVals.splitExtractedHDFData(inputH5, outputP1H5, outputP2H5, nSample, seed);
+            extractVals.splitExtractedHDFData(inputH5, outputP1H5, outputP2H5, nSample, seed, dataType);
         }
         catch (RSGISImageException& e)
         {

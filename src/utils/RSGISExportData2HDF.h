@@ -29,6 +29,7 @@
 
 #include <boost/cstdint.hpp>
 
+#include "common/RSGISCommons.h"
 #include "common/RSGISFileException.h"
 
 #include "H5Cpp.h"
@@ -68,6 +69,7 @@ namespace rsgis{namespace utils{
 	{
 	public:
 		RSGISExportColumnData2HDF();
+        H5::DataType getH5DataType(RSGISLibDataType rsgis_datatype);
         void createFile(std::string filePath, unsigned int numCols, std::string description, H5::DataType dataType);
         void addDataRow(void *data, H5::DataType h5Datatype);
         void close();
