@@ -834,15 +834,18 @@ static PyObject *ImageUtils_ExtractZoneImageValues2HDF(PyObject *self, PyObject 
     const char *pszInputMaskImage;
     const char *pszOutputFile;
     float maskValue = 0;
+    int nDataType = 9;
     
-    if( !PyArg_ParseTuple(args, "sssf:extractZoneImageValues2HDF", &pszInputImage, &pszInputMaskImage, &pszOutputFile, &maskValue))
+    if( !PyArg_ParseTuple(args, "sssf|i:extractZoneImageValues2HDF", &pszInputImage, &pszInputMaskImage, &pszOutputFile, &maskValue, &nDataType))
     {
         return NULL;
     }
     
+    rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
+    
     try
     {
-        rsgis::cmds::executeImageRasterZone2HDF(std::string(pszInputImage), std::string(pszInputMaskImage), std::string(pszOutputFile), maskValue);
+        rsgis::cmds::executeImageRasterZone2HDF(std::string(pszInputImage), std::string(pszInputMaskImage), std::string(pszOutputFile), maskValue, type);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -859,8 +862,9 @@ static PyObject *ImageUtils_ExtractZoneImageBandValues2HDF(PyObject *self, PyObj
     const char *pszInputMaskImage;
     const char *pszOutputFile;
     float maskValue = 0;
+    int nDataType = 9;
     
-    if( !PyArg_ParseTuple(args, "Ossf:extractZoneImageBandValues2HDF", &inputImageFileInfoObj, &pszInputMaskImage, &pszOutputFile, &maskValue))
+    if( !PyArg_ParseTuple(args, "Ossf|i:extractZoneImageBandValues2HDF", &inputImageFileInfoObj, &pszInputMaskImage, &pszOutputFile, &maskValue, &nDataType))
     {
         return NULL;
     }
@@ -870,6 +874,8 @@ static PyObject *ImageUtils_ExtractZoneImageBandValues2HDF(PyObject *self, PyObj
         PyErr_SetString(GETSTATE(self)->error, "First argument (imageFileInfo) must be a sequence");
         return NULL;
     }
+    
+    rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
     
     Py_ssize_t nFileInfo = PySequence_Size(inputImageFileInfoObj);
     std::vector<std::pair<std::string, std::vector<unsigned int> > > imageFilesInfo;
@@ -932,7 +938,7 @@ static PyObject *ImageUtils_ExtractZoneImageBandValues2HDF(PyObject *self, PyObj
     
     try
     {
-        rsgis::cmds::executeImageBandRasterZone2HDF(imageFilesInfo, std::string(pszInputMaskImage), std::string(pszOutputFile), maskValue);
+        rsgis::cmds::executeImageBandRasterZone2HDF(imageFilesInfo, std::string(pszInputMaskImage), std::string(pszOutputFile), maskValue, type);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -2021,20 +2027,23 @@ static PyObject *ImageUtils_ExportSingleMergedImgBand(PyObject *self, PyObject *
 
 static PyObject *ImageUtils_RandomSampleHDF5File(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    static char *kwlist[] = {"inputh5", "outputh5", "sample", "seed", NULL};
+    static char *kwlist[] = {"inputh5", "outputh5", "sample", "seed", "datatype", NULL};
     const char *pInputH5 = "";
     const char *pOutputH5 = "";
     unsigned int sampleSize = 0;
     int seed = 0;
+    int nDataType = 9;
     
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssIi:randomSampleHDF5File", kwlist, &pInputH5, &pOutputH5, &sampleSize, &seed))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssIi|i:randomSampleHDF5File", kwlist, &pInputH5, &pOutputH5, &sampleSize, &seed, &nDataType))
     {
         return NULL;
     }
     
+    rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
+    
     try
     {
-        rsgis::cmds::executeRandomSampleH5File(std::string(pInputH5), std::string(pOutputH5), sampleSize, seed);
+        rsgis::cmds::executeRandomSampleH5File(std::string(pInputH5), std::string(pOutputH5), sampleSize, seed, type);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -2047,21 +2056,24 @@ static PyObject *ImageUtils_RandomSampleHDF5File(PyObject *self, PyObject *args,
 
 static PyObject *ImageUtils_SplitSampleHDF5File(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    static char *kwlist[] = {"inputh5", "outputp1h5", "outputp2h5", "sample", "seed", NULL};
+    static char *kwlist[] = {"inputh5", "outputp1h5", "outputp2h5", "sample", "seed", "datatype", NULL};
     const char *pInputH5 = "";
     const char *pOutputP1H5 = "";
     const char *pOutputP2H5 = "";
     unsigned int sampleSize = 0;
     int seed = 0;
+    int nDataType = 9;
 
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssIi:splitSampleHDF5File", kwlist, &pInputH5, &pOutputP1H5, &pOutputP2H5, &sampleSize, &seed))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssIi|i:splitSampleHDF5File", kwlist, &pInputH5, &pOutputP1H5, &pOutputP2H5, &sampleSize, &seed, &nDataType))
     {
         return NULL;
     }
-
+    
+    rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
+    
     try
     {
-        rsgis::cmds::executeSplitSampleH5File(std::string(pInputH5), std::string(pOutputP1H5), std::string(pOutputP2H5), sampleSize, seed);
+        rsgis::cmds::executeSplitSampleH5File(std::string(pInputH5), std::string(pOutputP1H5), std::string(pOutputP2H5), sampleSize, seed, type);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -2583,7 +2595,7 @@ static PyMethodDef ImageUtilsMethods[] = {
 "\n"},
     
 {"extractZoneImageValues2HDF", ImageUtils_ExtractZoneImageValues2HDF, METH_VARARGS,
-"rsgislib.imageutils.extractZoneImageValues2HDF(inputImage, imageMask, outputHDF, maskValue)\n"
+"rsgislib.imageutils.extractZoneImageValues2HDF(inputImage, imageMask, outputHDF, maskValue, datatype)\n"
 "Extract the all the pixel values for raster regions to a HDF5 file (1 column for each image band).\n"
 "\n"
 "Where:\n"
@@ -2592,10 +2604,11 @@ static PyMethodDef ImageUtilsMethods[] = {
 ":param imageMask: is a string containing the name and path of the input image mask file; the mask file must have only 1 image band.\n"
 ":param outputHDF: is a string containing the name and path of the output HDF5 file\n"
 ":param maskValue: is a float containing the value of the pixel within the mask for which values are to be extracted\n"
+":param datatype: is a rsgislib.TYPE_* value providing the data type of the output image.\n"
 "\n"},
     
 {"extractZoneImageBandValues2HDF", ImageUtils_ExtractZoneImageBandValues2HDF, METH_VARARGS,
-"rsgislib.imageutils.extractZoneImageBandValues2HDF(inputImageInfo, imageMask, outputHDF, maskValue)\n"
+"rsgislib.imageutils.extractZoneImageBandValues2HDF(inputImageInfo, imageMask, outputHDF, maskValue, datatype)\n"
 "Extract the all the pixel values for raster regions to a HDF5 file (1 column for each image band).\n"
 "Multiple input rasters can be provided and the bands extracted selected.\n"
 "\n"
@@ -2605,6 +2618,7 @@ static PyMethodDef ImageUtilsMethods[] = {
 ":param imageMask: is a string containing the name and path of the input image mask file; the mask file must have only 1 image band.\n"
 ":param outputHDF: is a string containing the name and path of the output HDF5 file\n"
 ":param maskValue: is a float containing the value of the pixel within the mask for which values are to be extracted\n"
+":param datatype: is a rsgislib.TYPE_* value providing the data type of the output image.\n"
 "\n"
 "Example::\n"
 "\n"
@@ -2616,7 +2630,7 @@ static PyMethodDef ImageUtilsMethods[] = {
 "\n"},
 
 {"randomSampleHDF5File", (PyCFunction)ImageUtils_RandomSampleHDF5File, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imageutils.randomSampleHDF5File(inputh5, outputh5, sample, seed)\n"
+"rsgislib.imageutils.randomSampleHDF5File(inputh5, outputh5, sample, seed, datatype)\n"
 "A function which randomly samples a HDF5 of extracted values.\n"
 "\n"
 "Where:\n"
@@ -2625,11 +2639,12 @@ static PyMethodDef ImageUtilsMethods[] = {
 ":param outputh5: is a string with the path to the output file.\n"
 ":param sample: is an integer with the number values to be sampled from the input file.\n"
 ":param seed: is an integer which seeds the random number generator\n."
+":param datatype: is a rsgislib.TYPE_* value providing the data type of the output image.\n"
 "\n\n"
 },
 
 {"splitSampleHDF5File", (PyCFunction)ImageUtils_SplitSampleHDF5File, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imageutils.splitSampleHDF5File(inputh5, outputp1h5, outputp2h5, sample, seed)\n"
+"rsgislib.imageutils.splitSampleHDF5File(inputh5, outputp1h5, outputp2h5, sample, seed, datatype)\n"
 "A function which splits samples a HDF5 of extracted values.\n"
 "\n"
 "Where:\n"
@@ -2639,6 +2654,7 @@ static PyMethodDef ImageUtilsMethods[] = {
 ":param outputp2h5: is a string with the path to the output file.\n"
 ":param sample: is an integer with the number values to be sampled from the input file.\n"
 ":param seed: is an integer which seeds the random number generator\n."
+":param datatype: is a rsgislib.TYPE_* value providing the data type of the output image.\n"
 "\n\n"
 },
 

@@ -99,6 +99,8 @@ import osgeo.osr as osr
 import osgeo.ogr as ogr
 import osgeo.gdal as gdal
 
+gdal.UseExceptions()
+
 TYPE_UNDEFINED = 0
 TYPE_8INT = 1
 TYPE_16INT = 2
@@ -478,7 +480,39 @@ class RSGISPyUtils (object):
             numpyDT = numpy.float64
         else:
             raise Exception('Datatype was not recognised.')
+        return numpyDT
 
+    def getNumpyCharCodesDataType(self, rsgislib_datatype):
+        """
+        Convert from RSGISLib data type to numpy datatype
+
+        :param rsgis_datatype:
+        :return: numpy character code datatype
+        """
+        import numpy
+        numpyDT = numpy.dtype(numpy.float32).char
+        if rsgislib_datatype == TYPE_8INT:
+            numpyDT = numpy.dtype(numpy.int8).char
+        elif rsgislib_datatype == TYPE_16INT:
+            numpyDT = numpy.dtype(numpy.int16).char
+        elif rsgislib_datatype == TYPE_32INT:
+            numpyDT = numpy.dtype(numpy.int32).char
+        elif rsgislib_datatype == TYPE_64INT:
+            numpyDT = numpy.dtype(numpy.int64).char
+        elif rsgislib_datatype == TYPE_8UINT:
+            numpyDT = numpy.dtype(numpy.uint8).char
+        elif rsgislib_datatype == TYPE_16UINT:
+            numpyDT = numpy.dtype(numpy.uint16).char
+        elif rsgislib_datatype == TYPE_32UINT:
+            numpyDT = numpy.dtype(numpy.uint32).char
+        elif rsgislib_datatype == TYPE_64UINT:
+            numpyDT = numpy.dtype(numpy.uint64).char
+        elif rsgislib_datatype == TYPE_32FLOAT:
+            numpyDT = numpy.dtype(numpy.float32).char
+        elif rsgislib_datatype == TYPE_64FLOAT:
+            numpyDT = numpy.dtype(numpy.float64).char
+        else:
+            raise Exception('Datatype was not recognised.')
         return numpyDT
     
     def getImageRes(self, inImg):
@@ -764,8 +798,7 @@ class RSGISPyUtils (object):
             inLayer = inDataSource.GetLayer()
         nFeats = inLayer.GetFeatureCount(computeCount)
         return nFeats
-        
-        
+
     def findCommonExtentOnGrid(self, baseExtent, baseGrid, otherExtent, fullContain=True):
         """
         A function which calculates the common extent between two extents but defines output on 
