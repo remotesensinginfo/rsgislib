@@ -62,7 +62,7 @@ import gc
 
 
 def train_xgboost_binary_classifer(out_mdl_file, cls1_train_file, cls1_valid_file, cls1_test_file, cls2_train_file,
-                                   cls2_valid_file, cls2_test_file, nthread=2, scale_pos_weight=None):
+                                   cls2_valid_file, cls2_test_file, nthread=2, scale_pos_weight=None, mdl_cls_obj=None):
     """
     A function which performs a bayesian optimisation of the hyper-parameters for a binary xgboost
     classifier. Class 1 is the class which you are interested in and Class 2 is the 'other class'.
@@ -79,6 +79,7 @@ def train_xgboost_binary_classifer(out_mdl_file, cls1_train_file, cls1_valid_fil
     :param nthread: The number of threads to use for the training.
     :param scale_pos_weight: Optional, default is None. If None then a value will automatically be calculated.
                              Parameter used to balance imbalanced training data.
+    :param mdl_cls_obj: XGBoost object to allow continue training with a new dataset.
 
     """
     print("Reading Class 1 Training")
@@ -170,7 +171,7 @@ def train_xgboost_binary_classifer(out_mdl_file, cls1_train_file, cls1_valid_fil
         watchlist = [(d_train, 'train'), (d_valid, 'validation')]
         evals_results = {}
         model_xgb = xgb.train(params, d_train, num_boost_round, evals=watchlist, evals_result=evals_results,
-                              verbose_eval=False)
+                              verbose_eval=False, xgb_model=mdl_cls_obj)
 
         auc = -roc_auc_score(vaild_lbl_np, model_xgb.predict(d_valid))
         print('\nAUROC.....', -auc, ".....iter.....")
@@ -201,7 +202,8 @@ def train_xgboost_binary_classifer(out_mdl_file, cls1_train_file, cls1_valid_fil
 
     evals_results = {}
     watchlist = [(d_train, 'train'), (d_valid, 'validation')]
-    model = xgb.train(params, d_train, num_boost_round, evals=watchlist, evals_result=evals_results, verbose_eval=False)
+    model = xgb.train(params, d_train, num_boost_round, evals=watchlist, evals_result=evals_results,
+                      verbose_eval=False, xgb_model=mdl_cls_obj)
     test_auc = roc_auc_score(test_lbl_np, model.predict(d_test))
     print("Testing AUC: {}".format(test_auc))
     print("Finish Training")
@@ -308,7 +310,7 @@ image and threshold can be applied to this image.
         rsgislib.rastergis.populateStats(outClassImg, addclrtab=True, calcpyramids=True, ignorezero=True)
 
 
-def train_xgboost_multiclass_classifer(out_mdl_file, clsinfodict, nthread=1):
+def train_xgboost_multiclass_classifer(out_mdl_file, clsinfodict, nthread=1, mdl_cls_obj=None):
     """
     A function which performs a bayesian optimisation of the hyper-parameters for a multiclass xgboost
     classifier. A dict of class information, as ClassInfoObj objects, is defined with the training data.
@@ -412,7 +414,7 @@ def train_xgboost_multiclass_classifer(out_mdl_file, clsinfodict, nthread=1):
         watchlist = [(d_train, 'train'), (d_valid, 'validation')]
         evals_results = {}
         model_xgb = xgb.train(params, d_train, num_boost_round, evals=watchlist, evals_result=evals_results,
-                              verbose_eval=False)
+                              verbose_eval=False, xgb_model=mdl_cls_obj)
 
         vld_preds_idxs = model_xgb.predict(d_valid)
 
@@ -444,7 +446,7 @@ def train_xgboost_multiclass_classifer(out_mdl_file, clsinfodict, nthread=1):
     watchlist = [(d_train, 'train'), (d_valid, 'validation')]
     evals_results = {}
     model_xgb = xgb.train(params, d_train, num_boost_round, evals=watchlist, evals_result=evals_results,
-                          verbose_eval=False)
+                          verbose_eval=False, xgb_model=mdl_cls_obj)
     model_xgb.save_model(out_mdl_file)
 
     vld_preds_idxs = model_xgb.predict(d_valid)
