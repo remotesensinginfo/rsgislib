@@ -63,10 +63,10 @@ namespace rsgis{namespace img{
     {
     public:
         RSGISExtractImageValues();
-        void extractDataWithinMask2HDF(GDALDataset *mask, GDALDataset *image, std::string outHDFFile, float maskValue);
-        void extractImgBandDataWithinMask2HDF(std::vector<std::pair<std::string, std::vector<unsigned int> > > imageFiles, std::string maskImage, std::string outHDFFile, float maskValue);
-        void sampleExtractedHDFData(std::string inputH5, std::string outputH5, unsigned int nSamples, int seed);
-        void splitExtractedHDFData(std::string inputH5, std::string outputP1H5, std::string outputP2H5, unsigned int nSamples, int seed);
+        void extractDataWithinMask2HDF(GDALDataset *mask, GDALDataset *image, std::string outHDFFile, float maskValue, RSGISLibDataType dataType);
+        void extractImgBandDataWithinMask2HDF(std::vector<std::pair<std::string, std::vector<unsigned int> > > imageFiles, std::string maskImage, std::string outHDFFile, float maskValue, RSGISLibDataType dataType);
+        void sampleExtractedHDFData(std::string inputH5, std::string outputH5, unsigned int nSamples, int seed, RSGISLibDataType dataType);
+        void splitExtractedHDFData(std::string inputH5, std::string outputP1H5, std::string outputP2H5, unsigned int nSamples, int seed, RSGISLibDataType dataType);
         ~RSGISExtractImageValues();
     };
     

@@ -1055,7 +1055,7 @@ Where:
 
     applier.apply(_getXYPxlLocs, infiles, outfiles, otherargs, controls=aControls)
 
-def mergeExtractedHDF5Data(h5Files, outH5File):
+def mergeExtractedHDF5Data(h5Files, outH5File, datatype=None):
     """
 A function to merge a list of HDF files (e.g., from rsgislib.imageutils.extractZoneImageBandValues2HDF)
 with the same number of variables (i.e., columns) into a single file. For example, if class training
@@ -1063,6 +1063,8 @@ regions have been sourced from multiple images.
 
 :param h5Files: a list of input files.
 :param outH5File: the output file.
+:param datatype: is the data type used for the output HDF5 file (e.g., rsgislib.TYPE_32FLOAT). If None (default)
+                     then the output data type will be float32.
 
 Example::
 
@@ -1072,7 +1074,12 @@ Example::
 
 """
     import h5py
-    
+    import rsgislib
+
+    rsgis_utils = rsgislib.RSGISPyUtils()
+    if datatype is None:
+        datatype = rsgislib.TYPE_32FLOAT
+
     first = True
     numVars = 0
     numVals = 0
@@ -1096,11 +1103,14 @@ Example::
         dataArr[rowInit:(rowInit+numRows)] = fH5['DATA/DATA']
         rowInit += numRows
         fH5.close()
-    
+
+    h5_dtype = rsgis_utils.getNumpyCharCodesDataType(datatype)
+
     fH5Out = h5py.File(outH5File, 'w')
     dataGrp = fH5Out.create_group("DATA")
     metaGrp = fH5Out.create_group("META-DATA")
-    dataGrp.create_dataset('DATA', data=dataArr, chunks=True, compression="gzip", shuffle=True)
+    dataGrp.create_dataset('DATA', data=dataArr, chunks=(1000, numVars), compression="gzip",
+                           shuffle=True, dtype=h5_dtype)
     describDS = metaGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
     describDS[0] = 'Merged'.encode()
     fH5Out.close()
@@ -1272,7 +1282,8 @@ A function which extracts a sample of pixels from the
 input image file to a number array.
 
 :param inputImg: the image from which the random sample will be taken.
-:param pxlNSample: the sample to be taken (e.g., a value of 100 will sample every 100th, valid (if noData specified), pixel)
+:param pxlNSample: the sample to be taken (e.g., a value of 100 will sample every 100th,
+                   valid (if noData specified), pixel)
 :param noData: provide a no data value which is to be ignored during processing. If None then ignored (Default: None)
 
 :return: outputs a numpy array (n sampled values, n bands)
@@ -1354,7 +1365,8 @@ A function which extracts the image values within a mask for the specified image
     return out_arr
 
 
-def extractChipZoneImageBandValues2HDF(inputImageInfo, imageMask, maskValue, chipSize, outputHDF, rotateChips=None):
+def extractChipZoneImageBandValues2HDF(inputImageInfo, imageMask, maskValue, chipSize, outputHDF,
+                                       rotateChips=None, datatype=None):
     """
     A function which extracts a chip/window of image pixel values. The expectation is that
     this is used to train a classifer (see deep learning functions in classification) but it
@@ -1368,6 +1380,8 @@ def extractChipZoneImageBandValues2HDF(inputImageInfo, imageMask, maskValue, chi
     :param rotateChips: specify whether you wish to have the image chips rotated during extraction to
                         increase the number of samples. Default is None and will therefore be ignored.
                         Otherwise, provide a list of rotation angles in degrees (e.g., [30, 60, 90, 120, 180])
+    :param datatype: is the data type used for the output HDF5 file (e.g., rsgislib.TYPE_32FLOAT). If None (default)
+                     then the output data type will be float32.
 
     """
     # Import the RIOS image reader
@@ -1376,6 +1390,11 @@ def extractChipZoneImageBandValues2HDF(inputImageInfo, imageMask, maskValue, chi
     import tqdm
     import numpy
     import math
+    import rsgislib
+
+    rsgis_utils = rsgislib.RSGISPyUtils()
+    if datatype is None:
+        datatype = rsgislib.TYPE_32FLOAT
 
     chip_size_odd = False
     if (chipSize % 2) != 0:
@@ -1524,14 +1543,16 @@ def extractChipZoneImageBandValues2HDF(inputImageInfo, imageMask, maskValue, chi
     fH5Out = h5py.File(outputHDF, 'w')
     dataGrp = fH5Out.create_group("DATA")
     metaGrp = fH5Out.create_group("META-DATA")
-    dataGrp.create_dataset('DATA', data=featArr, chunks=True, compression="gzip", shuffle=True)
+    h5_dtype = rsgis_utils.getNumpyCharCodesDataType(datatype)
+    dataGrp.create_dataset('DATA', data=featArr, chunks=(250, chipSize, chipSize, nBands),
+                           compression="gzip", shuffle=True, dtype=h5_dtype)
     describDS = metaGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
     describDS[0] = 'IMAGE TILES'.encode()
     fH5Out.close()
     ######################################################################
 
 
-def splitSampleChipHDF5File(input_h5_file, sample_h5_file, remain_h5_file, sample_size, rnd_seed):
+def splitSampleChipHDF5File(input_h5_file, sample_h5_file, remain_h5_file, sample_size, rnd_seed, datatype=None):
     """
     A function to split the HDF5 outputs from the rsgislib.imageutils.extractChipZoneImageBandValues2HDF
     function into two sets by taking a random set with the defined sample size from the input file,
@@ -1543,13 +1564,22 @@ def splitSampleChipHDF5File(input_h5_file, sample_h5_file, remain_h5_file, sampl
     :param sample_size: An integer specifying the size of the sample to be taken.
     :param rnd_seed: An integer specifying the seed for the random number generator,
                      allowing the same 'random' sample to be taken.
+    :param datatype: is the data type used for the output HDF5 file (e.g., rsgislib.TYPE_32FLOAT). If None (default)
+                     then the output data type will be float32.
 
     """
     import numpy
     import h5py
+    import rsgislib
+
+    rsgis_utils = rsgislib.RSGISPyUtils()
+    if datatype is None:
+        datatype = rsgislib.TYPE_32FLOAT
 
     f = h5py.File(input_h5_file, 'r')
     n_rows = f['DATA/DATA'].shape[0]
+    chip_size = f['DATA/DATA'].shape[1]
+    n_bands = f['DATA/DATA'].shape[3]
     f.close()
 
     if sample_size > n_rows:
@@ -1584,11 +1614,14 @@ def splitSampleChipHDF5File(input_h5_file, sample_h5_file, remain_h5_file, sampl
     remain_samples = in_samples[remain_idxs]
     f.close()
 
+    h5_dtype = rsgis_utils.getNumpyCharCodesDataType(datatype)
+
     # Create an output HDF5 file and populate with sample data.
     fSampleH5Out = h5py.File(sample_h5_file, 'w')
     dataSampleGrp = fSampleH5Out.create_group("DATA")
     metaSampleGrp = fSampleH5Out.create_group("META-DATA")
-    dataSampleGrp.create_dataset('DATA', data=out_samples, chunks=True, compression="gzip", shuffle=True)
+    dataSampleGrp.create_dataset('DATA', data=out_samples, chunks=(250, chip_size, chip_size, n_bands),
+                                 compression="gzip", shuffle=True, dtype=h5_dtype)
     describSampleDS = metaSampleGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
     describSampleDS[0] = 'IMAGE TILES'.encode()
     fSampleH5Out.close()
@@ -1597,13 +1630,14 @@ def splitSampleChipHDF5File(input_h5_file, sample_h5_file, remain_h5_file, sampl
     fSampleH5Out = h5py.File(remain_h5_file, 'w')
     dataSampleGrp = fSampleH5Out.create_group("DATA")
     metaSampleGrp = fSampleH5Out.create_group("META-DATA")
-    dataSampleGrp.create_dataset('DATA', data=remain_samples, chunks=True, compression="gzip", shuffle=True)
+    dataSampleGrp.create_dataset('DATA', data=remain_samples, chunks=(250, chip_size, chip_size, n_bands),
+                                 compression="gzip", shuffle=True, dtype=h5_dtype)
     describSampleDS = metaSampleGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
     describSampleDS[0] = 'IMAGE TILES'.encode()
     fSampleH5Out.close()
 
 
-def mergeExtractedHDF5ChipData(h5Files, outH5File):
+def mergeExtractedHDF5ChipData(h5Files, outH5File, datatype=None):
     """
 A function to merge a list of HDF files
 (e.g., from rsgislib.imageutils.extractChipZoneImageBandValues2HDF)
@@ -1613,6 +1647,8 @@ from multiple images.
 
 :param h5Files: a list of input files.
 :param outH5File: the output file.
+:param datatype: is the data type used for the output HDF5 file (e.g., rsgislib.TYPE_32FLOAT). If None (default)
+                     then the output data type will be float32.
 
 Example::
 
@@ -1623,6 +1659,11 @@ Example::
 """
     import h5py
     import numpy
+    import rsgislib
+
+    rsgis_utils = rsgislib.RSGISPyUtils()
+    if datatype is None:
+        datatype = rsgislib.TYPE_32FLOAT
 
     first = True
     n_feats = 0
@@ -1654,17 +1695,20 @@ Example::
         row_init += n_rows
         fH5.close()
 
+    h5_dtype = rsgis_utils.getNumpyCharCodesDataType(datatype)
+
     fH5Out = h5py.File(outH5File, 'w')
     dataGrp = fH5Out.create_group("DATA")
     metaGrp = fH5Out.create_group("META-DATA")
-    dataGrp.create_dataset('DATA', data=feat_arr, chunks=True, compression="gzip", shuffle=True)
+    dataGrp.create_dataset('DATA', data=feat_arr, chunks=(250, chip_size, chip_size, n_bands),
+                           compression="gzip", shuffle=True, dtype=h5_dtype)
     describDS = metaGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
     describDS[0] = 'Merged'.encode()
     fH5Out.close()
 
 
 def extractRefChipZoneImageBandValues2HDF(inputImageInfo, refImg, refImgBand, imageMask, maskValue, chipSize, outputHDF,
-                                          rotateChips=None):
+                                          rotateChips=None, datatype=None):
     """
 A function which extracts a chip/window of image pixel values. The expectation is that
 this is used to train a classifer (see deep learning functions in classification) but it
@@ -1681,6 +1725,8 @@ could be used to extract image 'chips' for other purposes.
 :param rotateChips: specify whether you wish to have the image chips rotated during extraction to
                     increase the number of samples. Default is None and will therefore be ignored.
                     Otherwise, provide a list of rotation angles in degrees (e.g., [30, 60, 90, 120, 180])
+:param datatype: is the data type used for the output HDF5 file (e.g., rsgislib.TYPE_32FLOAT). If None (default)
+                     then the output data type will be float32.
 
 """
     # Import the RIOS image reader
@@ -1689,6 +1735,11 @@ could be used to extract image 'chips' for other purposes.
     import tqdm
     import numpy
     import math
+    import rsgislib
+
+    rsgis_utils = rsgislib.RSGISPyUtils()
+    if datatype is None:
+        datatype = rsgislib.TYPE_32FLOAT
 
     if (chipSize % 2) != 0:
         raise Exception("The chip size must be an even number.")
@@ -1833,18 +1884,22 @@ could be used to extract image 'chips' for other purposes.
     ######################################################################
     # Create the output HDF5 file and populate with data.
     ######################################################################
+    h5_dtype = rsgis_utils.getNumpyCharCodesDataType(datatype)
+
     fH5Out = h5py.File(outputHDF, 'w')
     dataGrp = fH5Out.create_group("DATA")
     metaGrp = fH5Out.create_group("META-DATA")
-    dataGrp.create_dataset('DATA', data=featArr, chunks=True, compression="gzip", shuffle=True)
-    dataGrp.create_dataset('REF', data=featRefArr, chunks=True, compression="gzip", shuffle=True)
+    dataGrp.create_dataset('DATA', data=featArr, chunks=(250, chipSize, chipSize, nBands),
+                           compression="gzip", shuffle=True, dtype=h5_dtype)
+    dataGrp.create_dataset('REF', data=featRefArr, chunks=(250, chipSize, chipSize),
+                           compression="gzip", shuffle=True, dtype='H')
     describDS = metaGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
     describDS[0] = 'IMAGE REF TILES'.encode()
     fH5Out.close()
     ######################################################################
 
 
-def splitSampleRefChipHDF5File(input_h5_file, sample_h5_file, remain_h5_file, sample_size, rnd_seed):
+def splitSampleRefChipHDF5File(input_h5_file, sample_h5_file, remain_h5_file, sample_size, rnd_seed, datatype=None):
     """
     A function to split the HDF5 outputs from the rsgislib.imageutils.extractChipZoneImageBandValues2HDF
     function into two sets by taking a random set with the defined sample size from the input file,
@@ -1856,13 +1911,22 @@ def splitSampleRefChipHDF5File(input_h5_file, sample_h5_file, remain_h5_file, sa
     :param sample_size: An integer specifying the size of the sample to be taken.
     :param rnd_seed: An integer specifying the seed for the random number generator,
                      allowing the same 'random' sample to be taken.
+    :param datatype: is the data type used for the output HDF5 file (e.g., rsgislib.TYPE_32FLOAT). If None (default)
+                     then the output data type will be float32.
 
     """
     import numpy
     import h5py
+    import rsgislib
+
+    rsgis_utils = rsgislib.RSGISPyUtils()
+    if datatype is None:
+        datatype = rsgislib.TYPE_32FLOAT
 
     f = h5py.File(input_h5_file, 'r')
     n_rows = f['DATA/REF'].shape[0]
+    chip_size = f['DATA/REF'].shape[1]
+    n_bands = f['DATA/REF'].shape[3]
     f.close()
 
     if sample_size > n_rows:
@@ -1900,12 +1964,16 @@ def splitSampleRefChipHDF5File(input_h5_file, sample_h5_file, remain_h5_file, sa
     remain_ref_samples = in_ref_samples[remain_idxs]
     f.close()
 
+    h5_dtype = rsgis_utils.getNumpyCharCodesDataType(datatype)
+
     # Create an output HDF5 file and populate with sample data.
     fSampleH5Out = h5py.File(sample_h5_file, 'w')
     dataSampleGrp = fSampleH5Out.create_group("DATA")
     metaSampleGrp = fSampleH5Out.create_group("META-DATA")
-    dataSampleGrp.create_dataset('DATA', data=out_data_samples, chunks=True, compression="gzip", shuffle=True)
-    dataSampleGrp.create_dataset('REF', data=out_ref_samples, chunks=True, compression="gzip", shuffle=True)
+    dataSampleGrp.create_dataset('DATA', data=out_data_samples, chunks=(250, chip_size, chip_size, n_bands),
+                                 compression="gzip", shuffle=True, dtype=h5_dtype)
+    dataSampleGrp.create_dataset('REF', data=out_ref_samples, chunks=(250, chip_size, chip_size),
+                                 compression="gzip", shuffle=True, dtype='H')
     describSampleDS = metaSampleGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
     describSampleDS[0] = 'IMAGE REF TILES'.encode()
     fSampleH5Out.close()
@@ -1914,14 +1982,16 @@ def splitSampleRefChipHDF5File(input_h5_file, sample_h5_file, remain_h5_file, sa
     fSampleH5Out = h5py.File(remain_h5_file, 'w')
     dataSampleGrp = fSampleH5Out.create_group("DATA")
     metaSampleGrp = fSampleH5Out.create_group("META-DATA")
-    dataSampleGrp.create_dataset('DATA', data=remain_data_samples, chunks=True, compression="gzip", shuffle=True)
-    dataSampleGrp.create_dataset('REF', data=remain_ref_samples, chunks=True, compression="gzip", shuffle=True)
+    dataSampleGrp.create_dataset('DATA', data=remain_data_samples, chunks=(250, chip_size, chip_size, n_bands),
+                                 compression="gzip", shuffle=True, dtype=h5_dtype)
+    dataSampleGrp.create_dataset('REF', data=remain_ref_samples, chunks=(250, chip_size, chip_size),
+                                 compression="gzip", shuffle=True, dtype='H')
     describSampleDS = metaSampleGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
     describSampleDS[0] = 'IMAGE REF TILES'.encode()
     fSampleH5Out.close()
 
 
-def mergeExtractedHDF5ChipRefData(h5Files, outH5File):
+def mergeExtractedHDF5ChipRefData(h5Files, outH5File, datatype=None):
     """
 A function to merge a list of HDF files
 (e.g., from rsgislib.imageutils.extractRefChipZoneImageBandValues2HDF)
@@ -1931,6 +2001,8 @@ from multiple images.
 
 :param h5Files: a list of input files.
 :param outH5File: the output file.
+:param datatype: is the data type used for the output HDF5 file (e.g., rsgislib.TYPE_32FLOAT). If None (default)
+                     then the output data type will be float32.
 
 Example::
 
@@ -1941,6 +2013,11 @@ Example::
 """
     import h5py
     import numpy
+    import rsgislib
+
+    rsgis_utils = rsgislib.RSGISPyUtils()
+    if datatype is None:
+        datatype = rsgislib.TYPE_32FLOAT
 
     first = True
     n_feats = 0
@@ -1974,11 +2051,15 @@ Example::
         row_init += n_rows
         fH5.close()
 
+    h5_dtype = rsgis_utils.getNumpyCharCodesDataType(datatype)
+
     fH5Out = h5py.File(outH5File, 'w')
     dataGrp = fH5Out.create_group("DATA")
     metaGrp = fH5Out.create_group("META-DATA")
-    dataGrp.create_dataset('DATA', data=feat_arr, chunks=True, compression="gzip", shuffle=True)
-    dataGrp.create_dataset('REF', data=feat_ref_arr, chunks=True, compression="gzip", shuffle=True)
+    dataGrp.create_dataset('DATA', data=feat_arr, chunks=(250, chip_size, chip_size, n_bands),
+                           compression="gzip", shuffle=True, dtype=h5_dtype)
+    dataGrp.create_dataset('REF', data=feat_ref_arr, chunks=(250, chip_size, chip_size),
+                           compression="gzip", shuffle=True, dtype='H')
     describDS = metaGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
     describDS[0] = 'Merged'.encode()
     fH5Out.close()

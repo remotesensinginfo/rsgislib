@@ -146,19 +146,16 @@ DllExport void executeStretchImageWithStatsNoData(std::string inputImage, std::s
     DllExport void executeStackImageBands(std::string *imageFiles, std::string *imageBandNames, int numImages, std::string outputImage, bool skipPixels, float skipValue, float noDataValue, std::string gdalFormat, RSGISLibDataType outDataType, bool replaceBandNames);
     
     /** A function to extract image values to a HDF file */
-    DllExport void executeImageRasterZone2HDF(std::string imageFile, std::string maskImage, std::string outputHDF, float maskVal);
-    
+    DllExport void executeImageRasterZone2HDF(std::string imageFile, std::string maskImage, std::string outputHDF, float maskVal, RSGISLibDataType dataType);
+        
     /** A function to extract image band values to a HDF file */
-    DllExport void executeImageBandRasterZone2HDF(std::string imageFile, std::string maskImage, std::string outputHDF, float maskVal, std::vector<unsigned int> bands);
-    
-    /** A function to extract image band values to a HDF file */
-    DllExport void executeImageBandRasterZone2HDF(std::vector<std::pair<std::string, std::vector<unsigned int> > > imageFiles, std::string maskImage, std::string outputHDF, float maskVal);
+    DllExport void executeImageBandRasterZone2HDF(std::vector<std::pair<std::string, std::vector<unsigned int> > > imageFiles, std::string maskImage, std::string outputHDF, float maskVal, RSGISLibDataType dataType);
 
     /** A function to sample a list of values saved in a HDF5 file */
-    DllExport void executeRandomSampleH5File(std::string inputH5, std::string outputH5, unsigned int nSample, int seed);
+    DllExport void executeRandomSampleH5File(std::string inputH5, std::string outputH5, unsigned int nSample, int seed, RSGISLibDataType dataType);
 
     /** A function to sample a list of values saved in a HDF5 file */
-    DllExport void executeSplitSampleH5File(std::string inputH5, std::string outputP1H5, std::string outputP2H5, unsigned int nSample, int seed);
+    DllExport void executeSplitSampleH5File(std::string inputH5, std::string outputP1H5, std::string outputP2H5, unsigned int nSample, int seed, RSGISLibDataType dataType);
     
     /** A function to subset an image to the bounding box of a polygon */
     DllExport void executeSubset(std::string inputImage, std::string inputVector, std::string outputImage, std::string imageFormat, RSGISLibDataType outDataType);

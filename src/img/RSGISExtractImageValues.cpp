@@ -32,7 +32,7 @@ namespace rsgis{namespace img{
         
     }
     
-    void RSGISExtractImageValues::extractDataWithinMask2HDF(GDALDataset *mask, GDALDataset *image, std::string outHDFFile, float maskValue)
+    void RSGISExtractImageValues::extractDataWithinMask2HDF(GDALDataset *mask, GDALDataset *image, std::string outHDFFile, float maskValue, RSGISLibDataType dataType)
     {
         try
         {
@@ -57,7 +57,8 @@ namespace rsgis{namespace img{
             delete[] datasets;
             
             rsgis::utils::RSGISExportColumnData2HDF exportCols2HDF;
-            exportCols2HDF.createFile(outHDFFile, numImageBands, std::string("Pixels Extracted from ")+std::string(image->GetFileList()[0]), H5::PredType::IEEE_F32LE);
+            H5::DataType h5DataType = exportCols2HDF.getH5DataType(dataType);
+            exportCols2HDF.createFile(outHDFFile, numImageBands, std::string("Pixels Extracted from ")+std::string(image->GetFileList()[0]), h5DataType);
             float *row = new float[numImageBands];
             for(unsigned int j = 0; j < pxlVals->size(); ++j)
             {
@@ -90,7 +91,7 @@ namespace rsgis{namespace img{
         }
     }
     
-    void RSGISExtractImageValues::extractImgBandDataWithinMask2HDF(std::vector<std::pair<std::string, std::vector<unsigned int> > > imageFiles, std::string maskImage, std::string outHDFFile, float maskValue)
+    void RSGISExtractImageValues::extractImgBandDataWithinMask2HDF(std::vector<std::pair<std::string, std::vector<unsigned int> > > imageFiles, std::string maskImage, std::string outHDFFile, float maskValue, RSGISLibDataType dataType)
     {
         try
         {
@@ -154,7 +155,8 @@ namespace rsgis{namespace img{
             delete[] datasets;
             
             rsgis::utils::RSGISExportColumnData2HDF exportCols2HDF;
-            exportCols2HDF.createFile(outHDFFile, numOutImgBands, std::string("Pixels Extracted"), H5::PredType::IEEE_F32LE);
+            H5::DataType h5DataType = exportCols2HDF.getH5DataType(dataType);
+            exportCols2HDF.createFile(outHDFFile, numOutImgBands, std::string("Pixels Extracted"), h5DataType);
             float *row = new float[numOutImgBands];
             for(unsigned int j = 0; j < pxlVals->size(); ++j)
             {
@@ -188,7 +190,7 @@ namespace rsgis{namespace img{
         }
     }
     
-    void RSGISExtractImageValues::sampleExtractedHDFData(std::string inputH5, std::string outputH5, unsigned int nSamples, int seed)
+    void RSGISExtractImageValues::sampleExtractedHDFData(std::string inputH5, std::string outputH5, unsigned int nSamples, int seed, RSGISLibDataType dataType)
     {
         try
         {
@@ -208,10 +210,11 @@ namespace rsgis{namespace img{
 
                 unsigned int samplesPerBlock = (unsigned int)(ceil(((float)blockSize) * propSamples));
                 unsigned int samples4Remain = (unsigned int)(ceil(((float)remain) * propSamples));
-                unsigned int totalSamples = (samplesPerBlock * nFullBlocks) + samples4Remain;
+                //unsigned int totalSamples = (samplesPerBlock * nFullBlocks) + samples4Remain;
 
                 rsgis::utils::RSGISExportColumnData2HDF exportCols2HDF;
-                exportCols2HDF.createFile(outputH5, nCols, std::string("Sampled Pixels Extracted"), H5::PredType::IEEE_F32LE);
+                H5::DataType h5DataType = exportCols2HDF.getH5DataType(dataType);
+                exportCols2HDF.createFile(outputH5, nCols, std::string("Sampled Pixels Extracted"), h5DataType);
                 float *row = new float[nCols];
 
                 boost::mt19937 randomGen;
@@ -272,7 +275,7 @@ namespace rsgis{namespace img{
         }
     }
 
-    void RSGISExtractImageValues::splitExtractedHDFData(std::string inputH5, std::string outputP1H5, std::string outputP2H5, unsigned int nSamples, int seed)
+    void RSGISExtractImageValues::splitExtractedHDFData(std::string inputH5, std::string outputP1H5, std::string outputP2H5, unsigned int nSamples, int seed, RSGISLibDataType dataType)
     {
         try
         {
@@ -295,9 +298,10 @@ namespace rsgis{namespace img{
                 //unsigned int totalSamples = (samplesPerBlock * nFullBlocks) + samples4Remain;
 
                 rsgis::utils::RSGISExportColumnData2HDF exportCols2HDF_P1;
-                exportCols2HDF_P1.createFile(outputP1H5, nCols, std::string("Sampled Pixels Extracted"), H5::PredType::IEEE_F32LE);
+                H5::DataType h5DataType = exportCols2HDF_P1.getH5DataType(dataType);
+                exportCols2HDF_P1.createFile(outputP1H5, nCols, std::string("Sampled Pixels Extracted"), h5DataType);
                 rsgis::utils::RSGISExportColumnData2HDF exportCols2HDF_P2;
-                exportCols2HDF_P2.createFile(outputP2H5, nCols, std::string("Sampled Pixels Extracted"), H5::PredType::IEEE_F32LE);
+                exportCols2HDF_P2.createFile(outputP2H5, nCols, std::string("Sampled Pixels Extracted"), h5DataType);
                 float *row = new float[nCols];
                 unsigned int *ranIdxes = new unsigned int[samplesPerBlock];
 

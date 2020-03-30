@@ -317,7 +317,7 @@ def get_num_samples(input_sample_h5_file):
 
 
 def split_sample_train_valid_test(input_sample_h5_file, train_h5_file, valid_h5_file, test_h5_file, test_sample,
-                                  valid_sample, train_sample=None, rand_seed=42):
+                                  valid_sample, train_sample=None, rand_seed=42, datatype=None):
     """
     A function to split a HDF5 samples file (from rsgislib.imageutils.extractZoneImageBandValues2HDF)
     into three (i.e., Training, Validation and Testing).
@@ -331,6 +331,8 @@ def split_sample_train_valid_test(input_sample_h5_file, train_h5_file, valid_h5_
     :param valid_sample: The size of the validation sample to be taken.
     :param train_sample: The size of the training sample to be taken. If None then the remaining samples are returned.
     :param rand_seed: The random seed to be used to randomly select the sub-samples.
+    :param datatype: is the data type used for the output HDF5 file (e.g., rsgislib.TYPE_32FLOAT). If None (default)
+                     then the output data type will be float32.
 
     """
     import rsgislib
@@ -342,24 +344,24 @@ def split_sample_train_valid_test(input_sample_h5_file, train_h5_file, valid_h5_
     out_dir = os.path.split(os.path.abspath(test_h5_file))[0]
     tmp_train_valid_sample_file = os.path.join(out_dir, "train_valid_tmp_sample_{}.h5".format(uid_str))
     rsgislib.imageutils.splitSampleHDF5File(input_sample_h5_file, test_h5_file, tmp_train_valid_sample_file,
-                                            test_sample, rand_seed)
+                                            test_sample, rand_seed, datatype)
     if train_sample is not None:
         tmp_train_sample_file = os.path.join(out_dir, "train_tmp_sample_{}.h5".format(uid_str))
         rsgislib.imageutils.splitSampleHDF5File(tmp_train_valid_sample_file, valid_h5_file, tmp_train_sample_file,
-                                                valid_sample, rand_seed)
+                                                valid_sample, rand_seed, datatype)
         tmp_remain_sample_file = os.path.join(out_dir, "remain_tmp_sample_{}.h5".format(uid_str))
         rsgislib.imageutils.splitSampleHDF5File(tmp_train_sample_file, train_h5_file, tmp_remain_sample_file,
-                                                train_sample, rand_seed)
+                                                train_sample, rand_seed, datatype)
         os.remove(tmp_train_sample_file)
         os.remove(tmp_remain_sample_file)
     else:
         rsgislib.imageutils.splitSampleHDF5File(tmp_train_valid_sample_file, valid_h5_file, train_h5_file, valid_sample,
-                                                rand_seed)
+                                                rand_seed, datatype)
     os.remove(tmp_train_valid_sample_file)
 
 
 def split_chip_sample_train_valid_test(input_sample_h5_file, train_h5_file, valid_h5_file, test_h5_file,
-                                       test_sample, valid_sample, train_sample=None, rand_seed=42):
+                                       test_sample, valid_sample, train_sample=None, rand_seed=42, datatype=None):
     """
     A function to split a chip HDF5 samples file (from rsgislib.imageutils.extractChipZoneImageBandValues2HDF)
     into three (i.e., Training, Validation and Testing).
@@ -373,6 +375,8 @@ def split_chip_sample_train_valid_test(input_sample_h5_file, train_h5_file, vali
     :param valid_sample: The size of the validation sample to be taken.
     :param train_sample: The size of the training sample to be taken. If None then the remaining samples are returned.
     :param rand_seed: The random seed to be used to randomly select the sub-samples.
+    :param datatype: is the data type used for the output HDF5 file (e.g., rsgislib.TYPE_32FLOAT). If None (default)
+                     then the output data type will be float32.
 
     """
     import rsgislib
@@ -385,24 +389,24 @@ def split_chip_sample_train_valid_test(input_sample_h5_file, train_h5_file, vali
     out_dir = os.path.split(os.path.abspath(test_h5_file))[0]
     tmp_train_valid_sample_file = os.path.join(out_dir, "train_valid_tmp_sample_{}.h5".format(uid_str))
     rsgislib.imageutils.splitSampleChipHDF5File(input_sample_h5_file, test_h5_file, tmp_train_valid_sample_file,
-                                                test_sample, rand_seed)
+                                                test_sample, rand_seed, datatype)
     if train_sample is not None:
         tmp_train_sample_file = os.path.join(out_dir, "train_tmp_sample_{}.h5".format(uid_str))
         rsgislib.imageutils.splitSampleChipHDF5File(tmp_train_valid_sample_file, valid_h5_file, tmp_train_sample_file,
-                                                    valid_sample, rand_seed)
+                                                    valid_sample, rand_seed, datatype)
         tmp_remain_sample_file = os.path.join(out_dir, "remain_tmp_sample_{}.h5".format(uid_str))
         rsgislib.imageutils.splitSampleChipHDF5File(tmp_train_sample_file, train_h5_file, tmp_remain_sample_file,
-                                                    train_sample, rand_seed)
+                                                    train_sample, rand_seed, datatype)
         os.remove(tmp_train_sample_file)
         os.remove(tmp_remain_sample_file)
     else:
         rsgislib.imageutils.splitSampleChipHDF5File(tmp_train_valid_sample_file, valid_h5_file, train_h5_file,
-                                                    valid_sample, rand_seed)
+                                                    valid_sample, rand_seed, datatype)
     os.remove(tmp_train_valid_sample_file)
 
 
 def split_chip_sample_ref_train_valid_test(input_sample_h5_file, train_h5_file, valid_h5_file, test_h5_file,
-                                           test_sample, valid_sample, train_sample=None, rand_seed=42):
+                                           test_sample, valid_sample, train_sample=None, rand_seed=42, datatype=None):
     """
     A function to split a chip HDF5 samples file (from rsgislib.imageutils.extractChipZoneImageBandValues2HDF)
     into three (i.e., Training, Validation and Testing).
@@ -416,6 +420,8 @@ def split_chip_sample_ref_train_valid_test(input_sample_h5_file, train_h5_file, 
     :param valid_sample: The size of the validation sample to be taken.
     :param train_sample: The size of the training sample to be taken. If None then the remaining samples are returned.
     :param rand_seed: The random seed to be used to randomly select the sub-samples.
+    :param datatype: is the data type used for the output HDF5 file (e.g., rsgislib.TYPE_32FLOAT). If None (default)
+                     then the output data type will be float32.
 
     """
     import rsgislib
@@ -428,34 +434,41 @@ def split_chip_sample_ref_train_valid_test(input_sample_h5_file, train_h5_file, 
     out_dir = os.path.split(os.path.abspath(test_h5_file))[0]
     tmp_train_valid_sample_file = os.path.join(out_dir, "train_valid_tmp_sample_{}.h5".format(uid_str))
     splitSampleRefChipHDF5File(input_sample_h5_file, test_h5_file, tmp_train_valid_sample_file,
-                               test_sample, rand_seed)
+                               test_sample, rand_seed, datatype)
     if train_sample is not None:
         tmp_train_sample_file = os.path.join(out_dir, "train_tmp_sample_{}.h5".format(uid_str))
         splitSampleRefChipHDF5File(tmp_train_valid_sample_file, valid_h5_file, tmp_train_sample_file,
-                                   valid_sample, rand_seed)
+                                   valid_sample, rand_seed, datatype)
         tmp_remain_sample_file = os.path.join(out_dir, "remain_tmp_sample_{}.h5".format(uid_str))
         splitSampleRefChipHDF5File(tmp_train_sample_file, train_h5_file, tmp_remain_sample_file,
-                                   train_sample, rand_seed)
+                                   train_sample, rand_seed, datatype)
         os.remove(tmp_train_sample_file)
         os.remove(tmp_remain_sample_file)
     else:
         splitSampleRefChipHDF5File(tmp_train_valid_sample_file, valid_h5_file, train_h5_file,
-                                   valid_sample, rand_seed)
+                                   valid_sample, rand_seed, datatype)
     os.remove(tmp_train_valid_sample_file)
 
 
-def flipChipHDF5File(input_h5_file, output_h5_file):
+def flipChipHDF5File(input_h5_file, output_h5_file, datatype=None):
     """
     A function which flips each sample in both the x and y axis. So the
     output file will have double the number of samples as the input file.
 
-    :param input_h5_file:
-    :param output_h5_file:
+    :param input_h5_file: The input HDF5 file for chips extracted from images.
+    :param output_h5_file: The output HDF5 file for chips extracted from images.
+    :param datatype: is the data type used for the output HDF5 file (e.g., rsgislib.TYPE_32FLOAT). If None (default)
+                     then the output data type will be float32.
 
     """
     import tqdm
     import h5py
     import numpy
+    import rsgislib
+    rsgis_utils = rsgislib.RSGISPyUtils()
+    if datatype is None:
+        datatype = rsgislib.TYPE_32FLOAT
+
     f = h5py.File(input_h5_file, 'r')
     n_in_feats = f['DATA/DATA'].shape[0]
     chip_size = f['DATA/DATA'].shape[1]
@@ -477,28 +490,37 @@ def flipChipHDF5File(input_h5_file, output_h5_file):
     ######################################################################
     # Create the output HDF5 file and populate with data.
     ######################################################################
+    h5_dtype = rsgis_utils.getNumpyCharCodesDataType(datatype)
     fH5Out = h5py.File(output_h5_file, 'w')
     dataGrp = fH5Out.create_group("DATA")
     metaGrp = fH5Out.create_group("META-DATA")
-    dataGrp.create_dataset('DATA', data=feat_arr, chunks=True, compression="gzip", shuffle=True)
+    dataGrp.create_dataset('DATA', data=feat_arr, chunks=(250, chip_size, chip_size, n_bands),
+                           compression="gzip", shuffle=True, dtype=h5_dtype)
     describDS = metaGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
     describDS[0] = 'IMAGE REF TILES'.encode()
     fH5Out.close()
     ######################################################################
 
 
-def flipRefChipHDF5File(input_h5_file, output_h5_file):
+def flipRefChipHDF5File(input_h5_file, output_h5_file, datatype=None):
     """
     A function which flips each sample in both the x and y axis. So the
     output file will have double the number of samples as the input file.
 
-    :param input_h5_file:
-    :param output_h5_file:
+    :param input_h5_file: The input HDF5 file for chips extracted from images.
+    :param output_h5_file: The output HDF5 file for chips extracted from images.
+    :param datatype: is the data type used for the output HDF5 file (e.g., rsgislib.TYPE_32FLOAT). If None (default)
+                     then the output data type will be float32.
 
     """
     import tqdm
     import h5py
     import numpy
+    import rsgislib
+    rsgis_utils = rsgislib.RSGISPyUtils()
+    if datatype is None:
+        datatype = rsgislib.TYPE_32FLOAT
+
     f = h5py.File(input_h5_file, 'r')
     n_in_feats = f['DATA/REF'].shape[0]
     chip_size = f['DATA/REF'].shape[1]
@@ -523,11 +545,14 @@ def flipRefChipHDF5File(input_h5_file, output_h5_file):
     ######################################################################
     # Create the output HDF5 file and populate with data.
     ######################################################################
+    h5_dtype = rsgis_utils.getNumpyCharCodesDataType(datatype)
     fH5Out = h5py.File(output_h5_file, 'w')
     dataGrp = fH5Out.create_group("DATA")
     metaGrp = fH5Out.create_group("META-DATA")
-    dataGrp.create_dataset('DATA', data=feat_arr, chunks=True, compression="gzip", shuffle=True)
-    dataGrp.create_dataset('REF', data=feat_ref_arr, chunks=True, compression="gzip", shuffle=True)
+    dataGrp.create_dataset('DATA', data=feat_arr, chunks=(250, chip_size, chip_size, n_bands),
+                           compression="gzip", shuffle=True, dtype=h5_dtype)
+    dataGrp.create_dataset('REF', data=feat_ref_arr, chunks=(250, chip_size, chip_size),
+                           compression="gzip", shuffle=True, dtype='H')
     describDS = metaGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
     describDS[0] = 'IMAGE REF TILES'.encode()
     fH5Out.close()
