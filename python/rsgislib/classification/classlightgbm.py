@@ -63,7 +63,8 @@ import gc
 
 def train_lightgbm_binary_classifer(out_mdl_file, cls1_train_file, cls1_valid_file, cls1_test_file, cls2_train_file,
                                     cls2_valid_file, cls2_test_file, out_info_file=None, unbalanced=False, nthread=2,
-                                    scale_pos_weight=None):
+                                    scale_pos_weight=None, early_stopping_rounds=100, num_iterations=5000,
+                                    num_boost_round=100, learning_rate=0.05, mdl_cls_obj=None):
     """
     A function which performs a bayesian optimisation of the hyper-parameters for a binary lightgbm
     classifier. Class 1 is the class which you are interested in and Class 2 is the 'other class'.
@@ -139,19 +140,18 @@ def train_lightgbm_binary_classifer(out_mdl_file, cls1_train_file, cls1_valid_fi
     test_lbl_np = numpy.concatenate((test_cls2_lbl, test_cls1_lbl))
 
     space = [Integer(3, 10, name='max_depth'),
-             Integer(6, 30, name='num_leaves'),
-             Integer(50, 200, name='min_child_samples'),
-             Real(0.6, 0.9, name='subsample'),
-             Real(0.6, 0.9, name='colsample_bytree'),
-             Real(0.05, 0.5, name='learning_rate'),
-             Integer(50, 1000, name='max_bin'),
-             Real(0, 8, name='min_child_weight'),
+             Integer(6, 50, name='num_leaves'),
+             Integer(10, 50, name='min_data_in_leaf'),
+             Real(0, 5, name='lambda_l1'),
+             Real(0, 3, name='lambda_l2'),
+             Real(0.1, 0.9, name='feature_fraction'),
+             Real(0.8, 1.0, name='bagging_fraction'),
+             Real(0.001, 0.1, name='min_split_gain'),
+             Real(1, 50, name='min_child_weight'),
              Real(1, 1.2, name='reg_alpha'),
-             Real(1, 1.4, name='reg_lambda'),
-             Integer(10000, 250000, name='subsample_for_bin'),
-             Integer(10, 200, name='early_stopping_rounds'),
-             Integer(50, 1000, name='num_boost_round')
+             Real(1, 1.4, name='reg_lambda')
              ]
+
 
     if scale_pos_weight is None:
         scale_pos_weight = num_cls2_train_rows / num_cls1_train_rows
@@ -163,50 +163,46 @@ def train_lightgbm_binary_classifer(out_mdl_file, cls1_train_file, cls1_valid_fi
         if unbalanced:
             params = {'max_depth'         : values[0],
                       'num_leaves'        : values[1],
-                      'min_child_samples' : values[2],
-                      'subsample'         : values[3],
-                      'colsample_bytree'  : values[4],
+                      'min_data_in_leaf'  : values[2],
+                      'lambda_l1'         : values[3],
+                      'lambda_l2'         : values[4],
                       'metric'            : 'auc,binary_error',
                       'nthread'           : nthread,
                       'boosting_type'     : 'gbdt',
                       'objective'         : 'binary',
-                      'learning_rate'     : values[5],
-                      'max_bin'           : values[6],
-                      'min_child_weight'  : values[7],
-                      'min_split_gain'    : 0,
-                      'reg_alpha'         : values[8],
-                      'reg_lambda'        : values[9],
-                      'subsample_freq'    : 1,
-                      'subsample_for_bin' : values[10],
+                      'learning_rate'     : learning_rate,
+                      'feature_fraction'  : values[5],
+                      'bagging_fraction'  : values[6],
+                      'min_split_gain'    : values[7],
+                      'min_child_weight'  : values[8],
+                      'reg_alpha'         : values[9],
+                      'reg_lambda'        : values[10],
+                      'num_iterations'    : num_iterations,
                       'boost_from_average': True,
                       'is_unbalance'      : True}
         else:
             params = {'max_depth'         : values[0],
                       'num_leaves'        : values[1],
-                      'min_child_samples' : values[2],
-                      'scale_pos_weight'  : scale_pos_weight,
-                      'subsample'         : values[3],
-                      'colsample_bytree'  : values[4],
+                      'min_data_in_leaf'  : values[2],
+                      'lambda_l1'         : values[3],
+                      'lambda_l2'         : values[4],
                       'metric'            : 'auc,binary_error',
                       'nthread'           : nthread,
                       'boosting_type'     : 'gbdt',
                       'objective'         : 'binary',
-                      'learning_rate'     : values[5],
-                      'max_bin'           : values[6],
-                      'min_child_weight'  : values[7],
-                      'min_split_gain'    : 0,
-                      'reg_alpha'         : values[8],
-                      'reg_lambda'        : values[9],
-                      'subsample_freq'    : 1,
-                      'subsample_for_bin' : values[10],
+                      'learning_rate'     : learning_rate,
+                      'feature_fraction'  : values[5],
+                      'bagging_fraction'  : values[6],
+                      'min_split_gain'    : values[7],
+                      'min_child_weight'  : values[8],
+                      'reg_alpha'         : values[9],
+                      'reg_lambda'        : values[10],
+                      'num_iterations'    : num_iterations,
+                      'scale_pos_weight'  : scale_pos_weight,
                       'boost_from_average': True,
                       'is_unbalance'      : False}
 
         print('\nNext set of params.....', params)
-
-        early_stopping_rounds = values[11]
-        num_boost_round = values[12]
-        print("early_stopping_rounds = {}. \t num_boost_round = {}.".format(early_stopping_rounds, num_boost_round))
 
         evals_results = {}
         model_lgb = lgb.train(params, d_train, valid_sets=[d_train, d_valid],
@@ -214,7 +210,7 @@ def train_lightgbm_binary_classifer(out_mdl_file, cls1_train_file, cls1_valid_fi
                               evals_result=evals_results,
                               num_boost_round=num_boost_round,
                               early_stopping_rounds=early_stopping_rounds,
-                              verbose_eval=None, feval=None)
+                              verbose_eval=None, feval=None, init_model=mdl_cls_obj)
 
         auc = -roc_auc_score(vaild_lbl_np, model_lgb.predict(vaild_np))
         print('\nAUROC.....', -auc, ".....iter.....", model_lgb.current_iteration())
@@ -234,52 +230,51 @@ def train_lightgbm_binary_classifer(out_mdl_file, cls1_train_file, cls1_valid_fi
     if unbalanced:
         params = {'max_depth'         : best_params[0],
                   'num_leaves'        : best_params[1],
-                  'min_child_samples' : best_params[2],
-                  'subsample'         : best_params[3],
-                  'colsample_bytree'  : best_params[4],
-                  'metric'            : 'auc',
+                  'min_data_in_leaf'  : best_params[2],
+                  'lambda_l1'         : best_params[3],
+                  'lambda_l2'         : best_params[4],
+                  'metric'            : 'auc,binary_error',
                   'nthread'           : nthread,
                   'boosting_type'     : 'gbdt',
                   'objective'         : 'binary',
-                  'learning_rate'     : best_params[5],
-                  'max_bin'           : best_params[6],
-                  'min_child_weight'  : best_params[7],
-                  'min_split_gain'    : 0,
-                  'reg_alpha'         : best_params[8],
-                  'reg_lambda'        : best_params[9],
-                  'subsample_freq'    : 1,
-                  'subsample_for_bin' : best_params[10],
+                  'learning_rate'     : learning_rate,
+                  'feature_fraction'  : best_params[5],
+                  'bagging_fraction'  : best_params[6],
+                  'min_split_gain'    : best_params[7],
+                  'min_child_weight'  : best_params[8],
+                  'reg_alpha'         : best_params[9],
+                  'reg_lambda'        : best_params[10],
+                  'num_iterations'    : num_iterations,
+                  'scale_pos_weight'  : scale_pos_weight,
                   'boost_from_average': True,
                   'is_unbalance'      : True}
     else:
         params = {'max_depth'         : best_params[0],
                   'num_leaves'        : best_params[1],
-                  'min_child_samples' : best_params[2],
-                  'scale_pos_weight'  : scale_pos_weight,
-                  'subsample'         : best_params[3],
-                  'colsample_bytree'  : best_params[4],
-                  'metric'            : 'auc',
+                  'min_data_in_leaf'  : best_params[2],
+                  'lambda_l1'         : best_params[3],
+                  'lambda_l2'         : best_params[4],
+                  'metric'            : 'auc,binary_error',
                   'nthread'           : nthread,
                   'boosting_type'     : 'gbdt',
                   'objective'         : 'binary',
-                  'learning_rate'     : best_params[5],
-                  'max_bin'           : best_params[6],
-                  'min_child_weight'  : best_params[7],
-                  'min_split_gain'    : 0,
-                  'reg_alpha'         : best_params[8],
-                  'reg_lambda'        : best_params[9],
-                  'subsample_freq'    : 1,
-                  'subsample_for_bin' : best_params[10],
+                  'learning_rate'     : learning_rate,
+                  'feature_fraction'  : best_params[5],
+                  'bagging_fraction'  : best_params[6],
+                  'min_split_gain'    : best_params[7],
+                  'min_child_weight'  : best_params[8],
+                  'reg_alpha'         : best_params[9],
+                  'reg_lambda'        : best_params[10],
+                  'num_iterations'    : num_iterations,
+                  'scale_pos_weight'  : scale_pos_weight,
                   'boost_from_average': True,
                   'is_unbalance'      : False}
-
-    early_stopping_rounds = best_params[11]
-    num_boost_round = best_params[12]
 
     evals_results = {}
     model = lgb.train(params, d_train, valid_sets=[d_train, d_valid], valid_names=['train', 'valid'],
                       evals_result=evals_results, num_boost_round=num_boost_round,
-                      early_stopping_rounds=early_stopping_rounds, verbose_eval=None, feval=None)
+                      early_stopping_rounds=early_stopping_rounds, verbose_eval=None,
+                      feval=None, init_model=mdl_cls_obj)
     test_auc = roc_auc_score(test_lbl_np, model.predict(test_np))
     print("Testing AUC: {}".format(test_auc))
     print("Finish Training")
@@ -393,7 +388,9 @@ image and threshold can be applied to this image.
         rsgislib.rastergis.populateStats(outClassImg, addclrtab=True, calcpyramids=True, ignorezero=True)
 
 
-def train_lightgbm_multiclass_classifer(out_mdl_file, clsinfodict, out_info_file=None, unbalanced=False, nthread=2):
+def train_lightgbm_multiclass_classifer(out_mdl_file, clsinfodict, out_info_file=None, unbalanced=False,
+                                        nthread=2, early_stopping_rounds=100, num_iterations=5000,
+                                        num_boost_round=100, learning_rate=0.05, mdl_cls_obj=None):
     """
     A function which performs a bayesian optimisation of the hyper-parameters for a multiclass lightgbm
     classifier. A dict of class information, as ClassInfoObj objects, is defined with the training data.
@@ -539,7 +536,7 @@ def train_lightgbm_multiclass_classifer(out_mdl_file, clsinfodict, out_info_file
                               evals_result=evals_results,
                               num_boost_round=num_boost_round,
                               early_stopping_rounds=early_stopping_rounds,
-                              verbose_eval=None, feval=None)
+                              verbose_eval=None, feval=None, init_model=mdl_cls_obj)
 
         vld_preds_idxs = numpy.argmax(model_lgb.predict(vaild_np), axis=1)
 
@@ -604,7 +601,8 @@ def train_lightgbm_multiclass_classifer(out_mdl_file, clsinfodict, out_info_file
     evals_results = {}
     model = lgb.train(params, d_train, valid_sets=[d_train, d_valid], valid_names=['train', 'valid'],
                       evals_result=evals_results, num_boost_round=num_boost_round,
-                      early_stopping_rounds=early_stopping_rounds, verbose_eval=None, feval=None)
+                      early_stopping_rounds=early_stopping_rounds, verbose_eval=None,
+                      feval=None, init_model=mdl_cls_obj)
 
     vld_preds_idxs = numpy.argmax(model.predict(vaild_np), axis=1)
     valid_acc_scr = accuracy_score(vaild_lbl_np, vld_preds_idxs)
