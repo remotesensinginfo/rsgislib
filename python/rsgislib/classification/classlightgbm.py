@@ -302,13 +302,13 @@ def train_lightgbm_binary_classifer(out_mdl_file, cls1_train_file, cls1_valid_fi
             json.dump(out_info, outfile, sort_keys=True, indent=4, separators=(',', ': '), ensure_ascii=False)
 
 
-def apply_lightgbm_binary_classifier(model_file, imgMask, imgMaskVal, imgFileInfo, outProbImg, gdalformat,
+def apply_lightgbm_binary_classifier(model_file, imgMask, imgMaskVal, imgFileInfo, outScoreImg, gdalformat,
                                      outClassImg=None, class_thres=5000):
     """
 This function applies a trained binary (i.e., two classes) lightgbm model. The function train_lightgbm_binary_classifer
-can be used to train such as model. The output image will contain the probability of membership to the class of
-interest. You will need to threshold this image to get a final hard classification. Alternative, a hard class output
-image and threshold can be applied to this image.
+can be used to train such as model. The output image will contain the softmax score for the class of interest.
+You will need to threshold this image to get a final hard classification. Alternative, a hard class output
+image and threshold can be applied to this image. Note. the softmax score is not a probability.
 
 :param model_file: a trained lightgbm binary model which can be loaded with lgb.Booster(model_file=model_file).
 :param imgMask: is an image file providing a mask to specify where should be classified. Simplest mask is all the
@@ -318,7 +318,7 @@ image and threshold can be applied to this image.
 :param imgFileInfo: a list of rsgislib.imageutils.ImageBandInfo objects (also used within
                     rsgislib.imageutils.extractZoneImageBandValues2HDF) to identify which images and bands are to
                     be used for the classification so it adheres to the training data.
-:param outProbImg: output image file with the classification probabilities - this image is scaled by
+:param outScoreImg: output image file with the classification softmax score - this image is scaled by
                    multiplying by 10000.
 :param gdalformat: is the output image format - all GDAL supported formats are supported.
 :param outClassImg: Optional output image which will contain the hard classification, defined with a threshold on the
@@ -359,7 +359,7 @@ image and threshold can be applied to this image.
         numClassVars = numClassVars + len(imgFile.bands)
 
     outfiles = applier.FilenameAssociations()
-    outfiles.outimage = outProbImg
+    outfiles.outimage = outScoreImg
     otherargs = applier.OtherInputs()
     otherargs.classifier = classifier
     otherargs.mskVal = imgMaskVal
@@ -380,10 +380,10 @@ image and threshold can be applied to this image.
     print("Applying the Classifier")
     applier.apply(_applyLGBMClassifier, infiles, outfiles, otherargs, controls=aControls)
     print("Completed")
-    rsgislib.imageutils.popImageStats(outProbImg, usenodataval=True, nodataval=0, calcpyramids=True)
+    rsgislib.imageutils.popImageStats(outScoreImg, usenodataval=True, nodataval=0, calcpyramids=True)
 
     if outClassImg is not None:
-        rsgislib.imagecalc.imageMath(outProbImg, outClassImg, 'b1>{}?1:0'.format(class_thres), gdalformat,
+        rsgislib.imagecalc.imageMath(outScoreImg, outClassImg, 'b1>{}?1:0'.format(class_thres), gdalformat,
                                      rsgislib.TYPE_8UINT)
         rsgislib.rastergis.populateStats(outClassImg, addclrtab=True, calcpyramids=True, ignorezero=True)
 
@@ -466,69 +466,63 @@ def train_lightgbm_multiclass_classifer(out_mdl_file, clsinfodict, out_info_file
     test_lbl_np = numpy.concatenate(test_lbls_lst)
 
     space = [Integer(3, 10, name='max_depth'),
-             Integer(6, 30, name='num_leaves'),
-             Integer(50, 200, name='min_child_samples'),
-             Real(0.6, 0.9, name='subsample'),
-             Real(0.6, 0.9, name='colsample_bytree'),
-             Real(0.05, 0.5, name='learning_rate'),
-             Integer(50, 1000, name='max_bin'),
-             Real(0, 8, name='min_child_weight'),
+             Integer(6, 50, name='num_leaves'),
+             Integer(10, 50, name='min_data_in_leaf'),
+             Real(0, 5, name='lambda_l1'),
+             Real(0, 3, name='lambda_l2'),
+             Real(0.1, 0.9, name='feature_fraction'),
+             Real(0.8, 1.0, name='bagging_fraction'),
+             Real(0.001, 0.1, name='min_split_gain'),
+             Real(1, 50, name='min_child_weight'),
              Real(1, 1.2, name='reg_alpha'),
-             Real(1, 1.4, name='reg_lambda'),
-             Integer(10000, 250000, name='subsample_for_bin'),
-             Integer(10, 200, name='early_stopping_rounds'),
-             Integer(50, 1000, name='num_boost_round')
+             Real(1, 1.4, name='reg_lambda')
              ]
 
     def _objective(values):
         if unbalanced:
             params = {'max_depth'         : values[0],
                       'num_leaves'        : values[1],
-                      'min_child_samples' : values[2],
-                      'subsample'         : values[3],
-                      'colsample_bytree'  : values[4],
+                      'min_data_in_leaf'  : values[2],
+                      'lambda_l1'         : values[3],
+                      'lambda_l2'         : values[4],
                       'metric'            : 'multi_logloss',
                       'nthread'           : nthread,
                       'boosting_type'     : 'gbdt',
                       'objective'         : 'multiclass',
                       'num_class'         : n_classes,
-                      'learning_rate'     : values[5],
-                      'max_bin'           : values[6],
-                      'min_child_weight'  : values[7],
-                      'min_split_gain'    : 0,
-                      'reg_alpha'         : values[8],
-                      'reg_lambda'        : values[9],
-                      'subsample_freq'    : 1,
-                      'subsample_for_bin' : values[10],
+                      'learning_rate'     : learning_rate,
+                      'feature_fraction'  : values[5],
+                      'bagging_fraction'  : values[6],
+                      'min_split_gain'    : values[7],
+                      'min_child_weight'  : values[8],
+                      'reg_alpha'         : values[9],
+                      'reg_lambda'        : values[10],
+                      'num_iterations'    : num_iterations,
                       'boost_from_average': True,
                       'is_unbalance'      : True}
         else:
             params = {'max_depth'         : values[0],
                       'num_leaves'        : values[1],
-                      'min_child_samples' : values[2],
-                      'subsample'         : values[3],
-                      'colsample_bytree'  : values[4],
+                      'min_data_in_leaf'  : values[2],
+                      'lambda_l1'         : values[3],
+                      'lambda_l2'         : values[4],
                       'metric'            : 'multi_logloss',
                       'nthread'           : nthread,
                       'boosting_type'     : 'gbdt',
                       'objective'         : 'multiclass',
                       'num_class'         : n_classes,
-                      'learning_rate'     : values[5],
-                      'max_bin'           : values[6],
-                      'min_child_weight'  : values[7],
-                      'min_split_gain'    : 0,
-                      'reg_alpha'         : values[8],
-                      'reg_lambda'        : values[9],
-                      'subsample_freq'    : 1,
-                      'subsample_for_bin' : values[10],
+                      'learning_rate'     : learning_rate,
+                      'feature_fraction'  : values[5],
+                      'bagging_fraction'  : values[6],
+                      'min_split_gain'    : values[7],
+                      'min_child_weight'  : values[8],
+                      'reg_alpha'         : values[9],
+                      'reg_lambda'        : values[10],
+                      'num_iterations'    : num_iterations,
                       'boost_from_average': True,
                       'is_unbalance'      : False}
 
         print('\nNext set of params.....', params)
-
-        early_stopping_rounds = values[11]
-        num_boost_round = values[12]
-        print("early_stopping_rounds = {}. \t num_boost_round = {}.".format(early_stopping_rounds, num_boost_round))
 
         evals_results = {}
         model_lgb = lgb.train(params, d_train, valid_sets=[d_train, d_valid],
@@ -555,48 +549,45 @@ def train_lightgbm_multiclass_classifer(out_mdl_file, clsinfodict, out_info_file
     if unbalanced:
         params = {'max_depth'         : best_params[0],
                   'num_leaves'        : best_params[1],
-                  'min_child_samples' : best_params[2],
-                  'subsample'         : best_params[3],
-                  'colsample_bytree'  : best_params[4],
+                  'min_data_in_leaf'  : best_params[2],
+                  'lambda_l1'         : best_params[3],
+                  'lambda_l2'         : best_params[4],
                   'metric'            : 'multi_logloss',
                   'nthread'           : nthread,
                   'boosting_type'     : 'gbdt',
                   'objective'         : 'multiclass',
                   'num_class'         : n_classes,
-                  'learning_rate'     : best_params[5],
-                  'max_bin'           : best_params[6],
-                  'min_child_weight'  : best_params[7],
-                  'min_split_gain'    : 0,
-                  'reg_alpha'         : best_params[8],
-                  'reg_lambda'        : best_params[9],
-                  'subsample_freq'    : 1,
-                  'subsample_for_bin' : best_params[10],
+                  'learning_rate'     : learning_rate,
+                  'feature_fraction'  : best_params[5],
+                  'bagging_fraction'  : best_params[6],
+                  'min_split_gain'    : best_params[7],
+                  'min_child_weight'  : best_params[8],
+                  'reg_alpha'         : best_params[9],
+                  'reg_lambda'        : best_params[10],
+                  'num_iterations'    : num_iterations,
                   'boost_from_average': True,
                   'is_unbalance'      : True}
     else:
         params = {'max_depth'         : best_params[0],
                   'num_leaves'        : best_params[1],
-                  'min_child_samples' : best_params[2],
-                  'subsample'         : best_params[3],
-                  'colsample_bytree'  : best_params[4],
+                  'min_data_in_leaf'  : best_params[2],
+                  'lambda_l1'         : best_params[3],
+                  'lambda_l2'         : best_params[4],
                   'metric'            : 'multi_logloss',
                   'nthread'           : nthread,
                   'boosting_type'     : 'gbdt',
                   'objective'         : 'multiclass',
                   'num_class'         : n_classes,
-                  'learning_rate'     : best_params[5],
-                  'max_bin'           : best_params[6],
-                  'min_child_weight'  : best_params[7],
-                  'min_split_gain'    : 0,
-                  'reg_alpha'         : best_params[8],
-                  'reg_lambda'        : best_params[9],
-                  'subsample_freq'    : 1,
-                  'subsample_for_bin' : best_params[10],
+                  'learning_rate'     : learning_rate,
+                  'feature_fraction'  : best_params[5],
+                  'bagging_fraction'  : best_params[6],
+                  'min_split_gain'    : best_params[7],
+                  'min_child_weight'  : best_params[8],
+                  'reg_alpha'         : best_params[9],
+                  'reg_lambda'        : best_params[10],
+                  'num_iterations'    : num_iterations,
                   'boost_from_average': True,
                   'is_unbalance'      : False}
-
-    early_stopping_rounds = best_params[11]
-    num_boost_round = best_params[12]
 
     evals_results = {}
     model = lgb.train(params, d_train, valid_sets=[d_train, d_valid], valid_names=['train', 'valid'],
@@ -624,13 +615,12 @@ def train_lightgbm_multiclass_classifer(out_mdl_file, clsinfodict, out_info_file
             json.dump(out_info, outfile, sort_keys=True, indent=4, separators=(',', ': '), ensure_ascii=False)
 
 
-def apply_lightgbm_multiclass_classifier(classTrainInfo, model_file, imgMask, imgMaskVal, imgFileInfo, outProbImg,
+def apply_lightgbm_multiclass_classifier(classTrainInfo, model_file, imgMask, imgMaskVal, imgFileInfo,
                                          outClassImg, gdalformat, classClrNames=True):
     """
 This function applies a trained multiple classes lightgbm model. The function train_lightgbm_multiclass_classifer
-can be used to train such as model. The output image will contain the probability of membership to the class of
-interest. You will need to threshold this image to get a final hard classification. Alternative, a hard class
-output image and threshold can be applied to this image.
+can be used to train such as model. The output image will be a final hard classification using the class with
+the maximum softmax score.
 
 :param classTrainInfo: dict (where the key is the class name) of rsgislib.classification.ClassInfoObj
                        objects which will be used to train the classifier (i.e., train_lightgbm_multiclass_classifer()),
@@ -643,8 +633,6 @@ output image and threshold can be applied to this image.
 :param imgFileInfo: a list of rsgislib.imageutils.ImageBandInfo objects (also used within
                     rsgislib.imageutils.extractZoneImageBandValues2HDF) to identify which images and bands are to
                     be used for the classification so it adheres to the training data.
-:param outProbImg: Output image file with the classification probabilities - this image is scaled by
-                   multiplying by 10000.
 :param outClassImg: Output image which will contain the hard classification defined as the maximum probability.
 :param gdalformat: is the output image format - all GDAL supported formats are supported.
 :param classClrNames: default is True and therefore a colour table will the colours specified in ClassInfoObj
@@ -683,13 +671,9 @@ output image and threshold can be applied to this image.
                 preds_cls_ids[preds_idxs == idx] = cld_id
 
             outClassIdVals[ID] = preds_cls_ids
-            outClassVals = outClassVals.reshape(
-                    (inputs.imageMask.shape[1], inputs.imageMask.shape[2], otherargs.n_classes))
-            outClassVals = outClassVals.swapaxes(0, 2).swapaxes(1, 2)
             outClassIdVals = numpy.expand_dims(
                 outClassIdVals.reshape((inputs.imageMask.shape[1], inputs.imageMask.shape[2])), axis=0)
 
-        outputs.outprobimage = outClassVals
         outputs.outclsimage = outClassIdVals
 
     classifier = lgb.Booster(model_file=model_file)
@@ -710,7 +694,6 @@ output image and threshold can be applied to this image.
         cls_id_lut[classTrainInfo[clsname].id] = classTrainInfo[clsname].out_id
 
     outfiles = applier.FilenameAssociations()
-    outfiles.outprobimage = outProbImg
     outfiles.outclsimage = outClassImg
     otherargs = applier.OtherInputs()
     otherargs.classifier = classifier
@@ -734,7 +717,6 @@ output image and threshold can be applied to this image.
     print("Applying the Classifier")
     applier.apply(_applyLGMClassifier, infiles, outfiles, otherargs, controls=aControls)
     print("Completed Classification")
-    rsgislib.imageutils.popImageStats(outProbImg, usenodataval=True, nodataval=0, calcpyramids=True)
 
     if classClrNames:
         rsgislib.rastergis.populateStats(outClassImg, addclrtab=True, calcpyramids=True, ignorezero=True)
