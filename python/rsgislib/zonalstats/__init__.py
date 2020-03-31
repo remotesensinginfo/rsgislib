@@ -47,6 +47,7 @@ import osgeo.osr as osr
 import numpy
 import math
 import sys
+import tqdm
 
 METHOD_POLYCONTAINSPIXEL = 0           # Polygon completely contains pixel
 METHOD_POLYCONTAINSPIXELCENTER = 1     # Pixel center is within the polygon
@@ -62,7 +63,9 @@ METHOD_POLYAREAINPIXEL = 9             # Percent of polygon area that is within 
 class ZonalAttributes:
     """ Object, specifying which stats should be calculated and minimum / maximum thresholds. 
 This is passed to the pixelStats2SHP and pixelStats2TXT functions. """
-    def __init__(self, minThreshold=None, maxThreshold=None, calcCount=False, calcMin=False, calcMax=False, calcMean=False, calcStdDev=False, calcMode=False, calcSum=False):
+    def __init__(self, minThreshold=None, maxThreshold=None, calcCount=False,
+                 calcMin=False, calcMax=False, calcMean=False, calcStdDev=False,
+                 calcMode=False, calcSum=False):
         self.minThreshold = minThreshold
         self.maxThreshold = maxThreshold
         self.calcCount = calcCount
@@ -77,7 +80,9 @@ This is passed to the pixelStats2SHP and pixelStats2TXT functions. """
 class ZonalBandAttributes:
     """ Object, specifying which band, the band name and stats should be calculated and minimum / maximum thresholds. 
 This is passed to the polyPixelStatsVecLyr function. """
-    def __init__(self, band=0, basename="band", minThres=None, maxThres=None, calcCount=False, calcMin=False, calcMax=False, calcMean=False, calcStdDev=False, calcMode=False, calcMedian=False, calcSum=False):
+    def __init__(self, band=0, basename="band", minThres=None, maxThres=None,
+                 calcCount=False, calcMin=False, calcMax=False, calcMean=False,
+                 calcStdDev=False, calcMode=False, calcMedian=False, calcSum=False):
         self.band = band
         self.basename = basename
         self.minThres = minThres
@@ -91,24 +96,30 @@ This is passed to the polyPixelStatsVecLyr function. """
         self.calcMedian = calcMedian
         self.calcSum = calcSum
 
-def calcZonalBandStatsFile(vecfile, veclyrname, valsimg, imgbandidx, minthres, maxthres, minfield=None, maxfield=None, meanfield=None, stddevfield=None, sumfield=None, countfield=None, modefield=None, medianfield=None):
+def calcZonalBandStatsFile(vecfile, veclyrname, valsimg, imgbandidx, minthres, maxthres, out_no_data_val,
+                           minfield=None, maxfield=None, meanfield=None, stddevfield=None, sumfield=None,
+                           countfield=None, modefield=None, medianfield=None):
     """
 A function which calculates zonal statistics for a particular image band. 
 If you know that the pixels in the values image are small with respect to 
 the polygons then use this function.
 
 :param vecfile: input vector file
-:param veclyrname: input vector layer within the input file which specifies the features and where the output stats will be written.
+:param veclyrname: input vector layer within the input file which specifies the features and where the
+                   output stats will be written.
 :param valsimg: the values image
-:param imgbandidx: the index (starting at 1) of the image band for which the stats will be calculated. If defined the no data value of the band will be ignored.
+:param imgbandidx: the index (starting at 1) of the image band for which the stats will be calculated.
+                   If defined the no data value of the band will be ignored.
 :param minthres: a lower threshold for values which will be included in the stats calculation.
 :param maxthres: a upper threshold for values which will be included in the stats calculation.
+:param out_no_data_val: output no data value if no valid pixels are within the polygon.
 :param minfield: the name of the field for the min value (None or not specified to be ignored).
 :param maxfield: the name of the field for the max value (None or not specified to be ignored).
 :param meanfield: the name of the field for the mean value (None or not specified to be ignored).
 :param stddevfield: the name of the field for the standard deviation value (None or not specified to be ignored).
 :param sumfield: the name of the field for the sum value (None or not specified to be ignored).
-:param countfield: the name of the field for the count (of number of pixels) value (None or not specified to be ignored).
+:param countfield: the name of the field for the count (of number of pixels) value
+                   (None or not specified to be ignored).
 :param modefield: the name of the field for the mode value (None or not specified to be ignored).
 :param medianfield: the name of the field for the median value (None or not specified to be ignored).
 
@@ -125,7 +136,8 @@ the polygons then use this function.
             raise Exception("Could not open layer '{}'".format(veclyrname))
         veclyr_spatial_ref = veclyr.GetSpatialRef()
         
-        calcZonalBandStats(veclyr, valsimg, imgbandidx, minthres, maxthres, minfield, maxfield, meanfield, stddevfield, sumfield, countfield, modefield, medianfield)
+        calcZonalBandStats(veclyr, valsimg, imgbandidx, minthres, maxthres, out_no_data_val,
+                           minfield, maxfield, meanfield, stddevfield, sumfield, countfield, modefield, medianfield)
             
         vecDS = None
     except Exception as e:
@@ -135,23 +147,29 @@ the polygons then use this function.
         raise e
 
 
-def calcZonalBandStats(veclyr, valsimg, imgbandidx, minthres, maxthres, minfield=None, maxfield=None, meanfield=None, stddevfield=None, sumfield=None, countfield=None, modefield=None, medianfield=None):
+def calcZonalBandStats(veclyr, valsimg, imgbandidx, minthres, maxthres, out_no_data_val,
+                       minfield=None, maxfield=None, meanfield=None, stddevfield=None,
+                       sumfield=None, countfield=None, modefield=None, medianfield=None):
     """
 A function which calculates zonal statistics for a particular image band. 
 If you know that the pixels in the values image are small with respect to 
 the polygons then use this function.
 
-:param veclyr: OGR vector layer object containing the geometries being processed and to which the stats will be written.
+:param veclyr: OGR vector layer object containing the geometries being processed and to which
+               the stats will be written.
 :param valsimg: the values image
-:param imgbandidx: the index (starting at 1) of the image band for which the stats will be calculated. If defined the no data value of the band will be ignored.
+:param imgbandidx: the index (starting at 1) of the image band for which the stats will be calculated.
+                   If defined the no data value of the band will be ignored.
 :param minthres: a lower threshold for values which will be included in the stats calculation.
 :param maxthres: a upper threshold for values which will be included in the stats calculation.
+:param out_no_data_val: output no data value if no valid pixels are within the polygon.
 :param minfield: the name of the field for the min value (None or not specified to be ignored).
 :param maxfield: the name of the field for the max value (None or not specified to be ignored).
 :param meanfield: the name of the field for the mean value (None or not specified to be ignored).
 :param stddevfield: the name of the field for the standard deviation value (None or not specified to be ignored).
 :param sumfield: the name of the field for the sum value (None or not specified to be ignored).
-:param countfield: the name of the field for the count (of number of pixels) value (None or not specified to be ignored).
+:param countfield: the name of the field for the count (of number of pixels) value
+                   (None or not specified to be ignored).
 :param modefield: the name of the field for the mode value (None or not specified to be ignored).
 :param medianfield: the name of the field for the median value (None or not specified to be ignored).
 
@@ -163,8 +181,9 @@ the polygons then use this function.
     try:
         if veclyr is None:
             raise Exception("The inputted vector layer was None")
-    
-        if (minfield is None) and (maxfield is None) and (meanfield is None) and (stddevfield is None) and (sumfield is None) and (countfield is None) and (modefield is None) and (medianfield is None):
+
+        if (minfield is None) and (maxfield is None) and (meanfield is None) and (stddevfield is None) and (
+            sumfield is None) and (countfield is None) and (modefield is None) and (medianfield is None):
             raise Exception("At least one field needs to be specified for there is to an output.")
     
         imgDS = gdal.OpenEx(valsimg, gdal.GA_ReadOnly)
@@ -193,7 +212,8 @@ the polygons then use this function.
         if epsg_vec_spatial != epsg_img_spatial:
             imgDS = None
             vecDS = None
-            raise Exception("Inputted raster and vector layers have different projections: ('{0}' '{1}') ".format('Vector Layer Provided', valsimg))
+            raise Exception("Inputted raster and vector layers have different projections: ('{0}' '{1}') ".format(
+                'Vector Layer Provided', valsimg))
         
         veclyrDefn = veclyr.GetLayerDefn()
         
@@ -221,19 +241,11 @@ the polygons then use this function.
         transactionStep = 20000
         nextTransaction = transactionStep
         nFeats = veclyr.GetFeatureCount(True)
-        step = math.floor(nFeats/10)
-        feedback = 10
-        feedback_next = step
+        pbar = tqdm.tqdm(total=nFeats)
         counter = 0
-        print("Started .0.", end='', flush=True)
         veclyr.ResetReading()
         feat = veclyr.GetNextFeature()
         while feat is not None:
-            if (nFeats>10) and (counter == feedback_next):
-                print(".{}.".format(feedback), end='', flush=True)
-                feedback_next = feedback_next + step
-                feedback = feedback + 10
-            
             if not openTransaction:
                 veclyr.StartTransaction()
                 openTransaction = True
@@ -307,7 +319,8 @@ the polygons then use this function.
                     if (src_array is not None) and havepxls:
                 
                         # calculate new geotransform of the feature subset
-                        subGeoTrans = ((imgGeoTrans[0] + (src_offset[0] * imgGeoTrans[1])), imgGeoTrans[1], 0.0, (imgGeoTrans[3] + (src_offset[1] * imgGeoTrans[5])), 0.0, imgGeoTrans[5])
+                        subGeoTrans = ((imgGeoTrans[0] + (src_offset[0] * imgGeoTrans[1])), imgGeoTrans[1], 0.0,
+                                       (imgGeoTrans[3] + (src_offset[1] * imgGeoTrans[5])), 0.0, imgGeoTrans[5])
                 
                         # Create a temporary vector layer in memory
                         vec_mem_ds = vec_mem_drv.CreateDataSource('out')
@@ -321,37 +334,64 @@ the polygons then use this function.
                         gdal.RasterizeLayer(img_tmp_ds, [1], vec_mem_lyr, burn_values=[1])
                         rv_array = img_tmp_ds.ReadAsArray()
                 
-                        # Mask the data vals array to feature (logical_not to flip 0<->1 to get the correct mask effect).
+                        # Mask the data vals array to feature.
+                        mask_arr = numpy.ones_like(src_array, dtype=numpy.uint8)
                         if imgNoDataVal is not None:
-                            masked = numpy.ma.MaskedArray(src_array, mask=numpy.logical_or(src_array == imgNoDataVal, numpy.logical_not(rv_array), numpy.logical_and(src_array >= minthres, src_array < maxthres)))
+                            mask_arr[src_array == imgNoDataVal] = 0
+                            mask_arr[rv_array == 0] = 0
+                            mask_arr[src_array < minthres] = 0
+                            mask_arr[src_array > maxthres] = 0
                         else:
-                            masked = numpy.ma.MaskedArray(src_array, mask=numpy.logical_or(numpy.logical_not(rv_array), numpy.logical_and(src_array >= minthres, src_array < maxthres)))
-                        
-                        if minfield is not None:
-                            min_val = float(masked.min())
-                            feat.SetField(fieldAttIdxs[minfield], min_val)
-                        if maxfield is not None:
-                            max_val = float(masked.max())
-                            feat.SetField(fieldAttIdxs[maxfield], max_val)
-                        if meanfield is not None:
-                            mean_val = float(masked.mean())
-                            feat.SetField(fieldAttIdxs[meanfield], mean_val)
-                        if stddevfield is not None:
-                            stddev_val = float(masked.std())
-                            feat.SetField(fieldAttIdxs[stddevfield], stddev_val)
-                        if sumfield is not None:
-                            sum_val = float(masked.sum())
-                            feat.SetField(fieldAttIdxs[sumfield], sum_val)
-                        if countfield is not None:
-                            count_val = float(masked.count())
-                            feat.SetField(fieldAttIdxs[countfield], count_val)
-                        if modefield is not None:
-                            mode_val, mode_count = scipy.stats.mstats.mode(masked.flatten())
-                            mode_val = float(mode_val)
-                            feat.SetField(fieldAttIdxs[modefield], mode_val)
-                        if medianfield is not None:
-                            median_val = float(numpy.ma.median(masked))
-                            feat.SetField(fieldAttIdxs[medianfield], median_val)
+                            mask_arr[rv_array == 0] = 0
+                            mask_arr[src_array < minthres] = 0
+                            mask_arr[src_array > maxthres] = 0
+                        mask_arr = mask_arr.flatten()
+                        src_array_flat = src_array.flatten()
+                        src_array_flat = src_array_flat[mask_arr==1]
+
+                        if src_array_flat.shape[0] > 0:
+                            if minfield is not None:
+                                min_val = float(src_array_flat.min())
+                                feat.SetField(fieldAttIdxs[minfield], min_val)
+                            if maxfield is not None:
+                                max_val = float(src_array_flat.max())
+                                feat.SetField(fieldAttIdxs[maxfield], max_val)
+                            if meanfield is not None:
+                                mean_val = float(src_array_flat.mean())
+                                feat.SetField(fieldAttIdxs[meanfield], mean_val)
+                            if stddevfield is not None:
+                                stddev_val = float(src_array_flat.std())
+                                feat.SetField(fieldAttIdxs[stddevfield], stddev_val)
+                            if sumfield is not None:
+                                sum_val = float(src_array_flat.sum())
+                                feat.SetField(fieldAttIdxs[sumfield], sum_val)
+                            if countfield is not None:
+                                count_val = float(src_array_flat.shape[0])
+                                feat.SetField(fieldAttIdxs[countfield], count_val)
+                            if modefield is not None:
+                                mode_val, mode_count = scipy.stats.mstats.mode(src_array_flat)
+                                mode_val = float(mode_val)
+                                feat.SetField(fieldAttIdxs[modefield], mode_val)
+                            if medianfield is not None:
+                                median_val = float(numpy.ma.median(src_array_flat))
+                                feat.SetField(fieldAttIdxs[medianfield], median_val)
+                        else:
+                            if minfield is not None:
+                                feat.SetField(fieldAttIdxs[minfield], out_no_data_val)
+                            if maxfield is not None:
+                                feat.SetField(fieldAttIdxs[maxfield], out_no_data_val)
+                            if meanfield is not None:
+                                feat.SetField(fieldAttIdxs[meanfield], out_no_data_val)
+                            if stddevfield is not None:
+                                feat.SetField(fieldAttIdxs[stddevfield], out_no_data_val)
+                            if sumfield is not None:
+                                feat.SetField(fieldAttIdxs[sumfield], out_no_data_val)
+                            if countfield is not None:
+                                feat.SetField(fieldAttIdxs[countfield], out_no_data_val)
+                            if modefield is not None:
+                                feat.SetField(fieldAttIdxs[modefield], out_no_data_val)
+                            if medianfield is not None:
+                                feat.SetField(fieldAttIdxs[medianfield], out_no_data_val)
                         # Write the updated feature to the vector layer.
                         veclyr.SetFeature(feat)
             
@@ -365,11 +405,12 @@ the polygons then use this function.
             
             feat = veclyr.GetNextFeature()
             counter = counter + 1
+            pbar.update(counter)
         if openTransaction:
             veclyr.CommitTransaction()
             openTransaction = False
-        print(" Completed")
-    
+        pbar.close()
+
         imgDS = None
     except Exception as e:
         print("Error Image File: {}".format(valsimg), file=sys.stderr)
@@ -383,9 +424,11 @@ This is useful when you are intesecting a low resolution image with respect to
 the polygon resolution.
 
 :param vecfile: input vector file
-:param veclyrname: input vector layer within the input file which specifies the features and where the output stats will be written.
+:param veclyrname: input vector layer within the input file which specifies the features and
+                   where the output stats will be written.
 :param valsimg: the values image
-:param imgbandidx: the index (starting at 1) of the image band for which the stats will be calculated. If defined the no data value of the band will be ignored.
+:param imgbandidx: the index (starting at 1) of the image band for which the stats will be calculated.
+                   If defined the no data value of the band will be ignored.
 :param outfield: output field name within the vector layer.
 
 """
@@ -416,9 +459,11 @@ A funtion which extracts zonal stats for a polygon using the polygon centroid.
 This is useful when you are intesecting a low resolution image with respect to
 the polygon resolution.
 
-:param veclyr: OGR vector layer object containing the geometries being processed and to which the stats will be written.
+:param veclyr: OGR vector layer object containing the geometries being processed and to
+               which the stats will be written.
 :param valsimg: the values image
-:param imgbandidx: the index (starting at 1) of the image band for which the stats will be calculated. If defined the no data value of the band will be ignored.
+:param imgbandidx: the index (starting at 1) of the image band for which the stats will be calculated.
+                   If defined the no data value of the band will be ignored.
 :param outfield: output field name within the vector layer.
 
 """
@@ -450,7 +495,8 @@ the polygon resolution.
         if epsg_vec_spatial != epsg_img_spatial:
             imgDS = None
             vecDS = None
-            raise Exception("Inputted raster and vector layers have different projections: ('{0}' '{1}') ".format('Vector Layer Provided', valsimg))
+            raise Exception("Inputted raster and vector layers have different projections: ('{0}' '{1}') ".format(
+                'Vector Layer Provided', valsimg))
         
         veclyrDefn = veclyr.GetLayerDefn()
         
@@ -472,19 +518,11 @@ the polygon resolution.
         transactionStep = 20000
         nextTransaction = transactionStep
         nFeats = veclyr.GetFeatureCount(True)
-        step = math.floor(nFeats/10)
-        feedback = 10
-        feedback_next = step
+        pbar = tqdm.tqdm(total=nFeats)
         counter = 0
-        print("Started .0.", end='', flush=True)
         veclyr.ResetReading()
         feat = veclyr.GetNextFeature()
         while feat is not None:
-            if (nFeats>10) and (counter == feedback_next):
-                print(".{}.".format(feedback), end='', flush=True)
-                feedback_next = feedback_next + step
-                feedback = feedback + 10
-            
             if not openTransaction:
                 veclyr.StartTransaction()
                 openTransaction = True
@@ -591,19 +629,22 @@ the polygon resolution.
             
             feat = veclyr.GetNextFeature()
             counter = counter + 1
+            pbar.update(counter)
     
         if openTransaction:
             veclyr.CommitTransaction()
             openTransaction = False
-        print(" Completed")
-    
+        pbar.close()
+
         imgDS = None
     except Exception as e:
         print("Error Image File: {}".format(valsimg), file=sys.stderr)
         raise e
 
 
-def calcZonalBandStatsTestPolyPtsFile(vecfile, veclyrname, valsimg, imgbandidx, minthres, maxthres, minfield=None, maxfield=None, meanfield=None, stddevfield=None, sumfield=None, countfield=None, modefield=None, medianfield=None):
+def calcZonalBandStatsTestPolyPtsFile(vecfile, veclyrname, valsimg, imgbandidx, minthres, maxthres, out_no_data_val,
+                                      minfield=None, maxfield=None, meanfield=None, stddevfield=None, sumfield=None,
+                                      countfield=None, modefield=None, medianfield=None):
     """
 A function which calculates zonal statistics for a particular image band. If unsure then use this function. 
 This function tests whether 1 or more pixels has been found within the polygon and if not then the centroid 
@@ -613,17 +654,21 @@ If you are unsure as to whether the pixels are small enough to be contained with
 use this function.
 
 :param vecfile: input vector file
-:param veclyrname: input vector layer within the input file which specifies the features and where the output stats will be written.
+:param veclyrname: input vector layer within the input file which specifies the features and where the
+                   output stats will be written.
 :param valsimg: the values image
-:param imgbandidx: the index (starting at 1) of the image band for which the stats will be calculated. If defined the no data value of the band will be ignored.
+:param imgbandidx: the index (starting at 1) of the image band for which the stats will be calculated.
+                   If defined the no data value of the band will be ignored.
 :param minthres: a lower threshold for values which will be included in the stats calculation.
 :param maxthres: a upper threshold for values which will be included in the stats calculation.
+:param out_no_data_val: output no data value if no valid pixels are within the polygon.
 :param minfield: the name of the field for the min value (None or not specified to be ignored).
 :param maxfield: the name of the field for the max value (None or not specified to be ignored).
 :param meanfield: the name of the field for the mean value (None or not specified to be ignored).
 :param stddevfield: the name of the field for the standard deviation value (None or not specified to be ignored).
 :param sumfield: the name of the field for the sum value (None or not specified to be ignored).
-:param countfield: the name of the field for the count (of number of pixels) value (None or not specified to be ignored).
+:param countfield: the name of the field for the count (of number of pixels) value
+                   (None or not specified to be ignored).
 :param modefield: the name of the field for the mode value (None or not specified to be ignored).
 :param medianfield: the name of the field for the median value (None or not specified to be ignored).
 
@@ -639,7 +684,8 @@ use this function.
         if veclyr is None:
             raise Exception("Could not open layer '{}'".format(veclyrname))
             
-        calcZonalBandStatsTestPolyPts(veclyr, valsimg, imgbandidx, minthres, maxthres, minfield, maxfield, meanfield, stddevfield, sumfield, countfield, modefield, medianfield)
+        calcZonalBandStatsTestPolyPts(veclyr, valsimg, imgbandidx, minthres, maxthres, out_no_data_val, minfield,
+                                      maxfield, meanfield, stddevfield, sumfield, countfield, modefield, medianfield)
     
         vecDS = None
     except Exception as e:
@@ -649,7 +695,9 @@ use this function.
         raise e
 
 
-def calcZonalBandStatsTestPolyPts(veclyr, valsimg, imgbandidx, minthres, maxthres, minfield=None, maxfield=None, meanfield=None, stddevfield=None, sumfield=None, countfield=None, modefield=None, medianfield=None):
+def calcZonalBandStatsTestPolyPts(veclyr, valsimg, imgbandidx, minthres, maxthres, out_no_data_val,
+                                  minfield=None, maxfield=None, meanfield=None, stddevfield=None, sumfield=None,
+                                  countfield=None, modefield=None, medianfield=None):
     """
 A function which calculates zonal statistics for a particular image band. If unsure then use this function. 
 This function tests whether 1 or more pixels has been found within the polygon and if not then the centroid 
@@ -660,15 +708,18 @@ use this function.
 
 :param veclyr: OGR vector layer object containing the geometries being processed and to which the stats will be written.
 :param valsimg: the values image
-:param imgbandidx: the index (starting at 1) of the image band for which the stats will be calculated. If defined the no data value of the band will be ignored.
+:param imgbandidx: the index (starting at 1) of the image band for which the stats will be calculated.
+                   If defined the no data value of the band will be ignored.
 :param minthres: a lower threshold for values which will be included in the stats calculation.
 :param maxthres: a upper threshold for values which will be included in the stats calculation.
+:param out_no_data_val: output no data value if no valid pixels are within the polygon.
 :param minfield: the name of the field for the min value (None or not specified to be ignored).
 :param maxfield: the name of the field for the max value (None or not specified to be ignored).
 :param meanfield: the name of the field for the mean value (None or not specified to be ignored).
 :param stddevfield: the name of the field for the standard deviation value (None or not specified to be ignored).
 :param sumfield: the name of the field for the sum value (None or not specified to be ignored).
-:param countfield: the name of the field for the count (of number of pixels) value (None or not specified to be ignored).
+:param countfield: the name of the field for the count (of number of pixels) value
+                   (None or not specified to be ignored).
 :param modefield: the name of the field for the mode value (None or not specified to be ignored).
 :param medianfield: the name of the field for the median value (None or not specified to be ignored).
 
@@ -680,8 +731,9 @@ use this function.
     try:
         if veclyr is None:
             raise Exception("The inputted vector layer was None")
-    
-        if (minfield is None) and (maxfield is None) and (meanfield is None) and (stddevfield is None) and (sumfield is None) and (countfield is None) and (modefield is None) and (medianfield is None):
+
+        if (minfield is None) and (maxfield is None) and (meanfield is None) and (stddevfield is None) and (
+            sumfield is None) and (countfield is None) and (modefield is None) and (medianfield is None):
             raise Exception("At least one field needs to be specified for there is to an output.")
     
         imgDS = gdal.OpenEx(valsimg, gdal.GA_ReadOnly)
@@ -709,7 +761,8 @@ use this function.
         if epsg_vec_spatial != epsg_img_spatial:
             imgDS = None
             vecDS = None
-            raise Exception("Inputted raster and vector layers have different projections: ('{0}' '{1}') ".format('Vector Layer Provided', valsimg))
+            raise Exception("Inputted raster and vector layers have different projections: ('{0}' '{1}') ".format(
+                'Vector Layer Provided', valsimg))
         
         veclyrDefn = veclyr.GetLayerDefn()
         
@@ -737,19 +790,11 @@ use this function.
         transactionStep = 20000
         nextTransaction = transactionStep
         nFeats = veclyr.GetFeatureCount(True)
-        step = math.floor(nFeats/10)
-        feedback = 10
-        feedback_next = step
+        pbar = tqdm.tqdm(total=nFeats)
         counter = 0
-        print("Started .0.", end='', flush=True)
         veclyr.ResetReading()
         feat = veclyr.GetNextFeature()
         while feat is not None:
-            if (nFeats>10) and (counter == feedback_next):
-                print(".{}.".format(feedback), end='', flush=True)
-                feedback_next = feedback_next + step
-                feedback = feedback + 10
-            
             if not openTransaction:
                 veclyr.StartTransaction()
                 openTransaction = True
@@ -824,7 +869,8 @@ use this function.
                     if (src_array is not None) and havepxls:
                 
                         # calculate new geotransform of the feature subset
-                        subGeoTrans = ((imgGeoTrans[0] + (src_offset[0] * imgGeoTrans[1])), imgGeoTrans[1], 0.0, (imgGeoTrans[3] + (src_offset[1] * imgGeoTrans[5])), 0.0, imgGeoTrans[5])
+                        subGeoTrans = ((imgGeoTrans[0] + (src_offset[0] * imgGeoTrans[1])), imgGeoTrans[1], 0.0,
+                                       (imgGeoTrans[3] + (src_offset[1] * imgGeoTrans[5])), 0.0, imgGeoTrans[5])
                 
                         # Create a temporary vector layer in memory
                         vec_mem_ds = vec_mem_drv.CreateDataSource('out')
@@ -838,37 +884,46 @@ use this function.
                         gdal.RasterizeLayer(img_tmp_ds, [1], vec_mem_lyr, burn_values=[1])
                         rv_array = img_tmp_ds.ReadAsArray()
                 
-                        # Mask the data vals array to feature (logical_not to flip 0<->1 to get the correct mask effect).
+                        # Mask the data vals array to feature
+                        mask_arr = numpy.ones_like(src_array, dtype=numpy.uint8)
                         if imgNoDataVal is not None:
-                            masked = numpy.ma.MaskedArray(src_array, mask=numpy.logical_or(src_array == imgNoDataVal, numpy.logical_not(rv_array), numpy.logical_and(src_array >= minthres, src_array < maxthres)))
+                            mask_arr[src_array == imgNoDataVal] = 0
+                            mask_arr[rv_array == 0] = 0
+                            mask_arr[src_array < minthres] = 0
+                            mask_arr[src_array > maxthres] = 0
                         else:
-                            masked = numpy.ma.MaskedArray(src_array, mask=numpy.logical_or(numpy.logical_not(rv_array), numpy.logical_and(src_array >= minthres, src_array < maxthres)))
-                        
-                        if float(masked.count()) > 0:
+                            mask_arr[rv_array == 0] = 0
+                            mask_arr[src_array < minthres] = 0
+                            mask_arr[src_array > maxthres] = 0
+                        mask_arr = mask_arr.flatten()
+                        src_array_flat = src_array.flatten()
+                        src_array_flat = src_array_flat[mask_arr == 1]
+
+                        if src_array_flat.shape[0] > 0:
                             if minfield is not None:
-                                min_val = float(masked.min())
+                                min_val = float(src_array_flat.min())
                                 feat.SetField(fieldAttIdxs[minfield], min_val)
                             if maxfield is not None:
-                                max_val = float(masked.max())
+                                max_val = float(src_array_flat.max())
                                 feat.SetField(fieldAttIdxs[maxfield], max_val)
                             if meanfield is not None:
-                                mean_val = float(masked.mean())
+                                mean_val = float(src_array_flat.mean())
                                 feat.SetField(fieldAttIdxs[meanfield], mean_val)
                             if stddevfield is not None:
-                                stddev_val = float(masked.std())
+                                stddev_val = float(src_array_flat.std())
                                 feat.SetField(fieldAttIdxs[stddevfield], stddev_val)
                             if sumfield is not None:
-                                sum_val = float(masked.sum())
+                                sum_val = float(src_array_flat.sum())
                                 feat.SetField(fieldAttIdxs[sumfield], sum_val)
                             if countfield is not None:
-                                count_val = float(masked.count())
+                                count_val = float(src_array_flat.shape[0])
                                 feat.SetField(fieldAttIdxs[countfield], count_val)
                             if modefield is not None:
-                                mode_val, mode_count = scipy.stats.mstats.mode(masked.flatten())
+                                mode_val, mode_count = scipy.stats.mstats.mode(src_array_flat)
                                 mode_val = float(mode_val)
                                 feat.SetField(fieldAttIdxs[modefield], mode_val)
                             if medianfield is not None:
-                                median_val = float(numpy.ma.median(masked))
+                                median_val = float(numpy.ma.median(src_array_flat))
                                 feat.SetField(fieldAttIdxs[medianfield], median_val)
                         else:
                             subTLX = (imgGeoTrans[0] + (src_offset[0] * imgGeoTrans[1]))
@@ -890,24 +945,51 @@ use this function.
                                 yOff = 0
                             if yOff >= ysize:
                                 yOff = ysize - 1
-                            
+
                             out_val = float(src_array[yOff, xOff])
-                            if minfield is not None:
-                                feat.SetField(fieldAttIdxs[minfield], out_val)
-                            if maxfield is not None:
-                                feat.SetField(fieldAttIdxs[maxfield], out_val)
-                            if meanfield is not None:
-                                feat.SetField(fieldAttIdxs[meanfield], out_val)
-                            if stddevfield is not None:
-                                feat.SetField(fieldAttIdxs[stddevfield], 0.0)
-                            if sumfield is not None:
-                                feat.SetField(fieldAttIdxs[sumfield], out_val)
-                            if countfield is not None:
-                                feat.SetField(fieldAttIdxs[countfield], 1.0)
-                            if modefield is not None:
-                                feat.SetField(fieldAttIdxs[modefield], out_val)
-                            if medianfield is not None:
-                                feat.SetField(fieldAttIdxs[medianfield], out_val)
+                            invalid_val = False
+                            if imgNoDataVal is not None:
+                                if out_val == imgNoDataVal:
+                                    invalid_val = True
+                            if out_val < minthres:
+                                invalid_val = True
+                            if out_val > maxthres:
+                                invalid_val = True
+
+                            if invalid_val:
+                                if minfield is not None:
+                                    feat.SetField(fieldAttIdxs[minfield], out_no_data_val)
+                                if maxfield is not None:
+                                    feat.SetField(fieldAttIdxs[maxfield], out_no_data_val)
+                                if meanfield is not None:
+                                    feat.SetField(fieldAttIdxs[meanfield], out_no_data_val)
+                                if stddevfield is not None:
+                                    feat.SetField(fieldAttIdxs[stddevfield], out_no_data_val)
+                                if sumfield is not None:
+                                    feat.SetField(fieldAttIdxs[sumfield], out_no_data_val)
+                                if countfield is not None:
+                                    feat.SetField(fieldAttIdxs[countfield], 0.0)
+                                if modefield is not None:
+                                    feat.SetField(fieldAttIdxs[modefield], out_no_data_val)
+                                if medianfield is not None:
+                                    feat.SetField(fieldAttIdxs[medianfield], out_no_data_val)
+                            else:
+                                if minfield is not None:
+                                    feat.SetField(fieldAttIdxs[minfield], out_val)
+                                if maxfield is not None:
+                                    feat.SetField(fieldAttIdxs[maxfield], out_val)
+                                if meanfield is not None:
+                                    feat.SetField(fieldAttIdxs[meanfield], out_val)
+                                if stddevfield is not None:
+                                    feat.SetField(fieldAttIdxs[stddevfield], 0.0)
+                                if sumfield is not None:
+                                    feat.SetField(fieldAttIdxs[sumfield], out_val)
+                                if countfield is not None:
+                                    feat.SetField(fieldAttIdxs[countfield], 1.0)
+                                if modefield is not None:
+                                    feat.SetField(fieldAttIdxs[modefield], out_val)
+                                if medianfield is not None:
+                                    feat.SetField(fieldAttIdxs[medianfield], out_val)
                             
                         # Write the updated feature to the vector layer.
                         veclyr.SetFeature(feat)
@@ -922,10 +1004,11 @@ use this function.
             
             feat = veclyr.GetNextFeature()
             counter = counter + 1
+            pbar.update(counter)
         if openTransaction:
             veclyr.CommitTransaction()
             openTransaction = False
-        print(" Completed")
+        pbar.close()
     
         imgDS = None
     except Exception as e:
