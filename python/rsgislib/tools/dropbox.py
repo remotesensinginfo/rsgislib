@@ -38,7 +38,7 @@ import dropbox
 import os
 import tqdm
 
-class rsgis_dropbox_utils():
+class RSGISDropboxUtils():
 
     def __init__(self, dbx_key):
         """
@@ -173,4 +173,34 @@ class rsgis_dropbox_utils():
         return url_lst
 
 
+def upload_email_links(dbx_key, file_lst, dbx_dest_path, email_subject, receiver_email, timeout=900,
+                       chunk_size=4 * 1024 * 1024, sender_email=None, smtp_server=None,
+                       smtp_port=None, smtp_password=None):
+    """
 
+    :param dbx_key: string with the dropbox access token
+    :param file_lst: a list of local file paths.
+    :param dbx_dest_path: The directory remote file path on dropbox where the files will be uploaded
+                          (e.g., /my/dropbox/Transfer)
+    :param email_subject: The subject of the email to be sent.
+    :param receiver_email: The receivers email address.
+    :param timeout: dropbox timeout. Default: 900 seconds.
+    :param chunk_size: dropbox upload chunk size in bytes (Default: 4Mb)
+    :param sender_email: The email address of the sender. If None then will read variable from RSGIS_SENDER_EMAIL.
+    :param smtp_server: The SMTP server to send the email. If None then will read variable from RSGIS_SMPT_SERVER.
+    :param smtp_port: The SMTP server port. If None then will read variable from RSGIS_SMTP_PORT.
+    :param smtp_password: The password for the SMTP server. If None then will read variable from RSGIS_PASSWORD.
+
+    """
+    from rsgislib.tools.notify_utils import send_email_notification
+    dbx_utils = RSGISDropboxUtils(dbx_key)
+    file_info = dbx_utils.upload_files(file_lst, dbx_dest_path, share_link=True, timeout=timeout, chunk_size=chunk_size)
+    shared_urls = dbx_utils.get_shared_url_lst(file_info)
+    msg_txt = 'URLs for the shared files:\n'
+    for file_url in shared_urls:
+        msg_txt = "{}\t{}\n".format(msg_txt, file_url)
+    msg_txt = "{}\n\n This is an automated email, generated from the " \
+              "RSGISLib (https://www.rsgislib.org) software\n\n".format(msg_txt)
+
+    send_email_notification(msg_txt, email_subject, receiver_email, sender_email, smtp_server, smtp_port,
+                            smtp_password)
