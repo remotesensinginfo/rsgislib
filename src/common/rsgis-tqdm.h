@@ -2,11 +2,12 @@
 #define RSGIS_TQDM_H
 
 #if _MSC_VER
-#include <io.h>
-#define isatty _isatty
+    #include <io.h>
+    #define isatty _isatty
 #else
-#include <unistd.h>
+    #include <unistd.h>
 #endif
+
 #include <chrono>
 #include <ctime>
 #include <numeric>
@@ -38,6 +39,12 @@ namespace rsgis
         public:
             rsgis_tqdm() 
             {
+                this->t_first = std::chrono::system_clock::now();
+                this->t_old = std::chrono::system_clock::now();
+                this->in_screen = (system("test $STY") == 0);
+                this->in_tmux = (system("test $TMUX") == 0);
+                this->is_tty = isatty(1);
+                this->bars = {" ", "▏", "▎", "▍", "▌", "▋", "▊", "▉", "█"};
                 if (in_screen) 
                 {
                     set_theme_basic();
@@ -183,8 +190,8 @@ namespace rsgis
         
         private:
             // time, iteration counters and deques for rate calculations
-            std::chrono::time_point<std::chrono::system_clock> t_first = std::chrono::system_clock::now();
-            std::chrono::time_point<std::chrono::system_clock> t_old = std::chrono::system_clock::now();
+            std::chrono::time_point<std::chrono::system_clock> t_first;
+            std::chrono::time_point<std::chrono::system_clock> t_old;
             int n_old = 0;
             std::vector<double> deq_t;
             std::vector<int> deq_n;
@@ -195,11 +202,11 @@ namespace rsgis
             bool use_ema = true;
             float alpha_ema = 0.1;
     
-            std::vector<const char*> bars = {" ", "▏", "▎", "▍", "▌", "▋", "▊", "▉", "█"};
+            std::vector<const char*> bars;
     
-            bool in_screen = (system("test $STY") == 0);
-            bool in_tmux = (system("test $TMUX") == 0);
-            bool is_tty = isatty(1);
+            bool in_screen = false;
+            bool in_tmux = false;
+            bool is_tty = false;
             bool use_colors = false;
             bool color_transition = false;
             int width = 40;
