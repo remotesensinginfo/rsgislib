@@ -71,7 +71,8 @@ A function to find the 'optimal' parameters for classification using a Grid Sear
 (http://scikit-learn.org/stable/modules/grid_search.html).
 The returned classifier instance will be trained using all the inputted data.
 
-:param classTrainInfo: list of rsgislib.classification.ClassSimpleInfoObj objects which will be used to train the classifier.
+:param classTrainInfo: list of rsgislib.classification.ClassSimpleInfoObj objects which will be used to
+                       train the classifier.
 :param paramSearchSampNum: the number of samples that will be randomly sampled from the training data for each class
                            for applying the grid search (tend to use a small data sample as can take a long time).
                            A value of 500 would use 500 samples per class.
@@ -148,7 +149,8 @@ def train_sklearn_classifier(classTrainInfo, skClassifier):
     """
 This function trains the classifier.
 
-:param classTrainInfo: list of rsgislib.classification.ClassSimpleInfoObj objects which will be used to train the classifier.
+:param classTrainInfo: list of rsgislib.classification.ClassSimpleInfoObj objects which will be used to
+                       train the classifier.
 :param skClassifier: an instance of a parameterised scikit-learn classifier
                      (http://scikit-learn.org/stable/supervised_learning.html)
 
