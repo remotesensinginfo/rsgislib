@@ -11,7 +11,8 @@ if(APPLE)
     set(CMAKE_SHARED_LIBRARY_SUFFIX ".so")
 endif(APPLE)
 
-set(PYRSGIS_ROOT_PATH "${Python_SITELIB}")
+#set(PYRSGIS_ROOT_PATH "${Python_SITELIB}")
+file(TO_CMAKE_PATH "${Python_SITELIB}" PYRSGIS_ROOT_PATH)
 if(NOT CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     # user has set CMAKE_INSTALL_PREFIX - ensure we install
     # under there rather than the default Python install location.
@@ -21,7 +22,8 @@ if(NOT CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 endif(NOT CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 message(STATUS "installing Python libs to ${PYRSGIS_ROOT_PATH}")
 
-set(PYRSGIS_INSTALL_PATH "${PYRSGIS_ROOT_PATH}/rsgislib")
+#set(PYRSGIS_INSTALL_PATH "${PYRSGIS_ROOT_PATH}/rsgislib")
+file(TO_CMAKE_PATH "${PYRSGIS_ROOT_PATH}/rsgislib" PYRSGIS_INSTALL_PATH)
 
 include_directories(${Python_INCLUDE_DIRS})
 include_directories(../src/cmds ../src)
