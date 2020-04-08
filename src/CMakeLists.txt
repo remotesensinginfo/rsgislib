@@ -161,8 +161,8 @@ set(LIB_COMMANDS_CPP
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdZonalStats.h
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdHistoCube.cpp
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdHistoCube.h
-        ${RSGIS_SRC_CMDS_DIR}/RSGISCmdElevationTools.cpp
-        ${RSGIS_SRC_CMDS_DIR}/RSGISCmdElevationTools.h
+    ${RSGIS_SRC_CMDS_DIR}/RSGISCmdElevationTools.cpp
+    ${RSGIS_SRC_CMDS_DIR}/RSGISCmdElevationTools.h
 	)
 ###############################################################################
 
@@ -206,6 +206,8 @@ set(LIB_COMMON_CPP
 	${RSGIS_SRC_COMMON_DIR}/RSGISAttributeTableException.h
 	${RSGIS_SRC_COMMON_DIR}/RSGISHistoCubeException.cpp
 	${RSGIS_SRC_COMMON_DIR}/RSGISHistoCubeException.h
+	${RSGIS_SRC_COMMON_DIR}/rsgis-tqdm.cpp
+	${RSGIS_SRC_COMMON_DIR}/rsgis-tqdm.h
 	${CMAKE_BINARY_DIR}/src/${RSGIS_SRC_COMMON_DIR}/rsgis-config.h
 	)
 ###############################################################################

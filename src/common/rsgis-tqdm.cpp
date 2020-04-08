@@ -211,7 +211,7 @@ namespace rsgis {
         else if (i == 5) { r = vi; g = p;  b = q;  }
     }
 
-    void rsgis_tqdm::~rsgis_tqdm()
+    rsgis_tqdm::~rsgis_tqdm()
     {
 
     }

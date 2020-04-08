@@ -59,7 +59,7 @@ namespace rsgis
             void enable_colors();
             void finish();
             void progress(int curr, int tot);
-            void ~rsgis_tqdm();
+            ~rsgis_tqdm();
 
         private:
             // time, iteration counters and deques for rate calculations
