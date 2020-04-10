@@ -3888,3 +3888,264 @@ def vector_translate(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr=None, ou
 
     gdal.VectorTranslate(out_vec_file, in_vec_file, options=opts)
 
+def get_geom_pts(geom, pts_lst=None):
+    """
+    Recursive function which extracts all the points within the an OGR geometry.
+
+    :param geom: The geometry from with the points are extracted.
+    :param pts_lst: The list for the points, if None a list will be created.
+    :return: a list of points.
+
+    """
+    from osgeo import ogr
+    if pts_lst is None:
+        pts_lst = list()
+
+    if geom is not None:
+        if geom.GetGeometryType() == ogr.wkbPoint:
+            pts_lst.append(geom)
+        else:
+            n_geoms = geom.GetGeometryCount()
+            for n in range(0, n_geoms):
+                c_geom = geom.GetGeometryRef(n)
+                n_pts = c_geom.GetPointCount()
+                if n_pts == 0:
+                    get_geom_pts(c_geom, pts_lst)
+                else:
+                    for i in range(0, n_pts):
+                        pt = c_geom.GetPoint(i)
+                        pts_lst.append(pt)
+    return pts_lst
+
+
+def get_vec_lyr_as_pts(in_vec_file, in_vec_lyr):
+    """
+    Get a list of points from the vectors within an input file.
+
+    :param in_vec_file: Input vector file
+    :param in_vec_lyr: Input vector layer name
+    :return: returns a list of points.
+
+    """
+    from osgeo import gdal
+    import tqdm
+
+    gdal.UseExceptions()
+    vec_ds_obj = gdal.OpenEx(in_vec_file, gdal.OF_VECTOR)
+    vec_lyr_obj = vec_ds_obj.GetLayer(in_vec_lyr)
+
+    pts_lst = list()
+    n_feats = vec_lyr_obj.GetFeatureCount(True)
+    pbar = tqdm.tqdm(total=n_feats)
+    counter = 0
+    in_feature = vec_lyr_obj.GetNextFeature()
+    while in_feature:
+        geom = in_feature.GetGeometryRef()
+        if geom is not None:
+            get_geom_pts(geom, pts_lst)
+        in_feature = vec_lyr_obj.GetNextFeature()
+        counter = counter + 1
+        pbar.update(counter)
+    pbar.close()
+    return pts_lst
+
+
+def reproj_wgs84_vec_to_utm(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr=None, use_hemi=True,
+                            out_vec_drv='GPKG', drv_create_opts=[], lyr_create_opts=[],
+                            access_mode='overwrite'):
+    """
+    A function which reprojects an input file projected in WGS84 (EPSG:4326) to UTM, where the UTM zone is
+    automatically identified using the mean x and y.
+
+    :param in_vec_file: the input vector file.
+    :param in_vec_lyr: the input vector layer name
+    :param out_vec_file: the output vector file.
+    :param out_vec_lyr: the name of the output vector layer (if None then the same as the input).
+    :param use_hemi: True differentiate between Southern and Northern hemisphere. False use Northern hemisphere.
+    :param out_vec_drv: the output vector file format (e.g., GPKG, GEOJSON, ESRI Shapefile, etc.)
+    :param drv_create_opts: a list of options for the creation of the output file.
+    :param lyr_create_opts: a list of options for the creation of the output layer.
+    :param access_mode: by default the function overwrites the output file but other
+                        options are: ['update', 'append', 'overwrite']
+
+    """
+    import rsgislib.tools.utm
+    from rsgislib.vectorutils import vector_translate
+    from osgeo import gdal
+    import os
+    import tqdm
+
+    if os.path.exists(out_vec_file):
+        raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
+
+    if out_vec_lyr is None:
+        out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
+
+    gdal.UseExceptions()
+    vec_ds_obj = gdal.OpenEx(in_vec_file, gdal.OF_VECTOR)
+    vec_lyr_obj = vec_ds_obj.GetLayer(in_vec_lyr)
+
+    pts_lst = list()
+    n_feats = vec_lyr_obj.GetFeatureCount(True)
+    pbar = tqdm.tqdm(total=n_feats)
+    counter = 0
+    in_feature = vec_lyr_obj.GetNextFeature()
+    while in_feature:
+        geom = in_feature.GetGeometryRef()
+        if geom is not None:
+            get_geom_pts(geom, pts_lst)
+        in_feature = vec_lyr_obj.GetNextFeature()
+        counter = counter + 1
+        pbar.update(counter)
+    pbar.close()
+    vec_ds_obj = None
+    lon = 0.0
+    lat = 0.0
+    for pt in pts_lst:
+        lon += pt[0]
+        lat += pt[1]
+    n_pts = len(pts_lst)
+
+    lon = lon / n_pts
+    lat = lat / n_pts
+
+    print("{}, {}".format(lat, lon))
+
+    utm_zone = rsgislib.tools.utm.latlon_to_zone_number(lat, lon)
+    hemi = 'N'
+    if use_hemi and (lat < 0):
+        hemi = 'S'
+    print("UTM Zone: {}{}".format(utm_zone, hemi))
+
+    out_epsg = rsgislib.tools.utm.epsg_for_UTM(utm_zone, hemi)
+    print("EPSG: {}".format(out_epsg))
+
+    dst_srs_str = "EPSG:{}".format(out_epsg)
+    vector_translate(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr, out_vec_drv,
+                     drv_create_opts, lyr_create_opts, access_mode, src_srs='EPSG:4326',
+                     dst_srs=dst_srs_str)
+
+
+def create_alpha_shape(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr, out_vec_drv='GEOJSON', alpha_val=None,
+                       max_iter=10000):
+    """
+    Function which calculate an alpha shape for a set of vector features (which are converted to points).
+
+    For this function to work you need the alphashapes module installed:
+    https://alphashape.readthedocs.io
+    https://github.com/bellockk/alphashape
+
+    :param in_vec_file: the input vector file.
+    :param in_vec_lyr: the input vector layer name
+    :param out_vec_file: the output vector file.
+    :param out_vec_lyr: the name of the output vector layer (if None then the same as the input).
+    :param out_vec_drv: the output vector file format (e.g., GPKG, GEOJSON, ESRI Shapefile, etc.)
+    :param alpha_val: The alpha value to create the the alpha shape polygon. If None then a value will be
+                      automatically calculate but warning this can a significant amount of time (i.e., hours!!)
+    :param max_iter: The maximum number of iterations for automatically selecting the alpha value. Note if the number
+                     iteration is not sufficient to find an optimum value then no value is returned.
+
+    """
+    import alphashape
+    from osgeo import ogr
+    from osgeo import gdal
+
+    gdal.UseExceptions()
+
+    def _rescale_polygon(in_poly, min_x, min_y, ran_x, ran_y):
+        ext_ring = ogr.Geometry(ogr.wkbLinearRing)
+        for pt in in_poly.exterior.coords:
+            ext_ring.AddPoint(((pt[0] * ran_x) + min_x), ((pt[1] * ran_y) + min_y))
+        n_poly = ogr.Geometry(ogr.wkbPolygon)
+        n_poly.AddGeometry(ext_ring)
+
+        for int_ring in in_poly.interiors:
+            n_int_ring = ogr.Geometry(ogr.wkbLinearRing)
+            for pt in int_ring.coords:
+                n_int_ring.AddPoint(((pt[0] * ran_x) + min_x), ((pt[1] * ran_y) + min_y))
+            n_poly.AddGeometry(n_int_ring)
+        return n_poly
+
+    pts = get_vec_lyr_as_pts(in_vec_file, in_vec_lyr)
+    min_x = 0.0
+    min_y = 0.0
+    max_x = 0.0
+    max_y = 0.0
+    first = True
+    for pt in pts:
+        if first:
+            min_x = pt[0]
+            min_y = pt[1]
+            max_x = pt[0]
+            max_y = pt[1]
+            first = False
+        else:
+            if pt[0] < min_x:
+                min_x = pt[0]
+            if pt[1] < min_y:
+                min_y = pt[1]
+            if pt[0] > max_x:
+                max_x = pt[0]
+            if pt[1] > max_y:
+                max_y = pt[1]
+
+    print("Min: {}, {}".format(min_x, min_y))
+    print("Max: {}, {}".format(max_x, max_y))
+
+    ran_x = max_x - min_x
+    ran_y = max_y - min_y
+
+    print("Range: {}, {}".format(ran_x, ran_y))
+
+    norm_pts = list()
+    for pt in pts:
+        norm_x = (pt[0] - min_x) / ran_x
+        norm_y = (pt[1] - min_y) / ran_y
+        norm_pts.append((norm_x, norm_y))
+
+    if alpha_val is None:
+        alpha_val = alphashape.optimizealpha(norm_pts, max_iterations=max_iter)
+    print("Alpha: {}".format(alpha_val))
+
+    alpha_shape = alphashape.alphashape(norm_pts, alpha=alpha_val)
+
+    ogr_geom_type = ogr.wkbPolygon
+    if alpha_shape.geom_type == 'MultiPolygon':
+        ogr_geom_type = ogr.wkbMultiPolygon
+        out_alpha_shape = ogr.Geometry(ogr.wkbMultiPolygon)
+        for poly in alpha_shape:
+            out_alpha_shape.AddGeometry(_rescale_polygon(poly, min_x, min_y, ran_x, ran_y))
+    elif alpha_shape.geom_type == 'Polygon':
+        ogr_geom_type = ogr.wkbPolygon
+        out_alpha_shape = _rescale_polygon(alpha_shape, min_x, min_y, ran_x, ran_y)
+    else:
+        out_alpha_shape = None
+        print("No output, did not create an output polygon or multipolygon...")
+
+    if out_alpha_shape is not None:
+        vecDS = gdal.OpenEx(in_vec_file, gdal.OF_VECTOR)
+        if vecDS is None:
+            raise Exception("Could not open '{}'".format(in_vec_file))
+        veclyr = vecDS.GetLayerByName(in_vec_lyr)
+        if veclyr is None:
+            raise Exception("Could not open layer '{}'".format(in_vec_lyr))
+        lyr_spat_ref = veclyr.GetSpatialRef()
+        vecDS = None
+
+        out_driver = ogr.GetDriverByName(out_vec_drv)
+        result_ds = out_driver.CreateDataSource(out_vec_file)
+        if result_ds is None:
+            raise Exception("Could not open '{}'".format(out_vec_file))
+
+        result_lyr = result_ds.CreateLayer(out_vec_lyr, lyr_spat_ref, geom_type=ogr_geom_type)
+        if result_lyr is None:
+            raise Exception("Could not open layer '{}'".format(out_vec_lyr))
+
+        # Get the output Layer's Feature Definition
+        featureDefn = result_lyr.GetLayerDefn()
+        outFeature = ogr.Feature(featureDefn)
+        outFeature.SetGeometry(out_alpha_shape)
+        result_lyr.CreateFeature(outFeature)
+        outFeature = None
+        result_ds = None
+
