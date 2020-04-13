@@ -2489,9 +2489,12 @@ Create a vector layer of the polygon centroids.
 :param vecoutlyrname: output vector layer name.
 
 """
+    from osgeo import gdal
+    from osgeo import ogr
+    import tqdm
     gdal.UseExceptions()
-    
-    vecDS = gdal.OpenEx(vecfile, gdal.OF_VECTOR )
+
+    vecDS = gdal.OpenEx(vecfile, gdal.OF_VECTOR)
     if vecDS is None:
         raise Exception("Could not open '{}'".format(vecfile))
 
@@ -2499,54 +2502,49 @@ Create a vector layer of the polygon centroids.
     if veclyr is None:
         raise Exception("Could not open layer '{}'".format(veclyrname))
     lyr_spat_ref = veclyr.GetSpatialRef()
-    
+
     out_driver = ogr.GetDriverByName(outVecDrvr)
     result_ds = out_driver.CreateDataSource(vecoutfile)
     if result_ds is None:
-        raise Exception("Could not open '{}'".format(vecoutfile)) 
-    
+        raise Exception("Could not open '{}'".format(vecoutfile))
+
     result_lyr = result_ds.CreateLayer(vecoutlyrname, lyr_spat_ref, geom_type=ogr.wkbPoint)
     if result_lyr is None:
         raise Exception("Could not open layer '{}'".format(vecoutlyrname))
-    
+
     featDefn = result_lyr.GetLayerDefn()
-    
+
     openTransaction = False
-    nFeats = veclyr.GetFeatureCount(True)
-    step = math.floor(nFeats/10)
-    feedback = 10
-    feedback_next = step
+    veclyr.ResetReading()
+    n_feats = veclyr.GetFeatureCount(True)
+    print(n_feats)
     counter = 0
-    print("Started .0.", end='', flush=True)
+    pbar = tqdm.tqdm(total=n_feats)
     veclyr.ResetReading()
     feat = veclyr.GetNextFeature()
     while feat is not None:
-        if (nFeats>10) and (counter == feedback_next):
-            print(".{}.".format(feedback), end='', flush=True)
-            feedback_next = feedback_next + step
-            feedback = feedback + 10
-        
         if not openTransaction:
             result_lyr.StartTransaction()
             openTransaction = True
-            
+
         pt = feat.GetGeometryRef().Centroid()
         outFeat = ogr.Feature(featDefn)
         outFeat.SetGeometry(pt)
         result_lyr.CreateFeature(outFeat)
-            
+
         if ((counter % 20000) == 0) and openTransaction:
             result_lyr.CommitTransaction()
             openTransaction = False
-        
+
         feat = veclyr.GetNextFeature()
         counter = counter + 1
+        pbar.update(1)
 
     if openTransaction:
         result_lyr.CommitTransaction()
         openTransaction = False
     result_lyr.SyncToDisk()
-    print(" Completed")
+    pbar.close()
 
     vecDS = None
     result_ds = None
@@ -3260,7 +3258,7 @@ def convert_polygon2polyline(vec_poly_file, vec_poly_lyr, vec_line_file, vec_lin
 
         in_feature = vec_poly_lyr_obj.GetNextFeature()
         counter = counter + 1
-        pbar.update(counter)
+        pbar.update(1)
 
     if open_transaction:
         out_lyr_obj.CommitTransaction()
@@ -3473,7 +3471,7 @@ def create_orthg_lines(vec_file, vec_lyr, out_vec_file, out_vec_lyr=None, pt_ste
 
         in_feature = vec_lyr_obj.GetNextFeature()
         counter = counter + 1
-        pbar.update(counter)
+        pbar.update(1)
 
     if open_transaction:
         out_lyr_obj.CommitTransaction()
@@ -3945,7 +3943,7 @@ def get_vec_lyr_as_pts(in_vec_file, in_vec_lyr):
             get_geom_pts(geom, pts_lst)
         in_feature = vec_lyr_obj.GetNextFeature()
         counter = counter + 1
-        pbar.update(counter)
+        pbar.update(1)
     pbar.close()
     return pts_lst
 
@@ -3996,7 +3994,7 @@ def reproj_wgs84_vec_to_utm(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr=N
             get_geom_pts(geom, pts_lst)
         in_feature = vec_lyr_obj.GetNextFeature()
         counter = counter + 1
-        pbar.update(counter)
+        pbar.update(1)
     pbar.close()
     vec_ds_obj = None
     lon = 0.0
@@ -4148,4 +4146,444 @@ def create_alpha_shape(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr, out_v
         result_lyr.CreateFeature(outFeature)
         outFeature = None
         result_ds = None
+
+
+def convert_multi_geoms_to_single(vecfile, veclyrname, outVecDrvr, vecoutfile, vecoutlyrname):
+    """
+    A convert any multiple geometries into single geometries.
+
+    :param vecfile: input vector file
+    :param veclyrname: input vector layer within the input file.
+    :param outVecDrvr: the format driver for the output vector file (e.g., GPKG, ESRI Shapefile).
+    :param vecoutfile: output file path for the vector.
+    :param vecoutlyrname: output vector layer name.
+
+    """
+    from osgeo import gdal
+    from osgeo import ogr
+    import tqdm
+    gdal.UseExceptions()
+
+    vecDS = gdal.OpenEx(vecfile, gdal.OF_VECTOR)
+    if vecDS is None:
+        raise Exception("Could not open '{}'".format(vecfile))
+
+    veclyr = vecDS.GetLayerByName(veclyrname)
+    if veclyr is None:
+        raise Exception("Could not open layer '{}'".format(veclyrname))
+    lyr_spat_ref = veclyr.GetSpatialRef()
+    geom_type = veclyr.GetGeomType()
+    if geom_type == ogr.wkbMultiPoint:
+        geom_type = ogr.wkbPoint
+        print("Changing to Point Type from Multi-Point")
+    elif geom_type == ogr.wkbMultiLineString:
+        geom_type = ogr.wkbLineString
+        print("Changing to Line Type from Multi-Line")
+    elif geom_type == ogr.wkbMultiPolygon:
+        geom_type = ogr.wkbPolygon
+        print("Changing to Polygon Type from Multi-Polygon")
+
+    out_driver = ogr.GetDriverByName(outVecDrvr)
+    result_ds = out_driver.CreateDataSource(vecoutfile)
+    if result_ds is None:
+        raise Exception("Could not open '{}'".format(vecoutfile))
+
+    result_lyr = result_ds.CreateLayer(vecoutlyrname, lyr_spat_ref, geom_type=geom_type)
+    if result_lyr is None:
+        raise Exception("Could not open layer '{}'".format(vecoutlyrname))
+
+    featDefn = result_lyr.GetLayerDefn()
+
+    openTransaction = False
+    veclyr.ResetReading()
+    n_feats = veclyr.GetFeatureCount(True)
+    counter = 0
+    pbar = tqdm.tqdm(total=n_feats)
+    veclyr.ResetReading()
+    feat = veclyr.GetNextFeature()
+    while feat is not None:
+        if not openTransaction:
+            result_lyr.StartTransaction()
+            openTransaction = True
+
+        geom_ref = feat.GetGeometryRef()
+
+        if geom_ref.GetGeometryName().lower() == 'multipolygon':
+            for i in range(0, geom_ref.GetGeometryCount()):
+                g = geom_ref.GetGeometryRef(i)
+                outFeat = ogr.Feature(featDefn)
+                outFeat.SetGeometry(g)
+                result_lyr.CreateFeature(outFeat)
+        elif geom_ref.GetGeometryName().lower() == 'multilinestring':
+            for i in range(0, geom_ref.GetGeometryCount()):
+                g = geom_ref.GetGeometryRef(i)
+                outFeat = ogr.Feature(featDefn)
+                outFeat.SetGeometry(g)
+                result_lyr.CreateFeature(outFeat)
+        elif geom_ref.GetGeometryName().lower() == 'multipoint':
+            for i in range(0, geom_ref.GetGeometryCount()):
+                g = geom_ref.GetGeometryRef(i)
+                outFeat = ogr.Feature(featDefn)
+                outFeat.SetGeometry(g)
+                result_lyr.CreateFeature(outFeat)
+        elif geom_ref.GetGeometryName().lower() == 'geometrycollection':
+            for i in range(0, geom_ref.GetGeometryCount()):
+                g = geom_ref.GetGeometryRef(i)
+                outFeat = ogr.Feature(featDefn)
+                outFeat.SetGeometry(g)
+                result_lyr.CreateFeature(outFeat)
+        else:
+            outFeat = ogr.Feature(featDefn)
+            outFeat.SetGeometry(geom_ref)
+            result_lyr.CreateFeature(outFeat)
+
+        if ((counter % 20000) == 0) and openTransaction:
+            result_lyr.CommitTransaction()
+            openTransaction = False
+
+        feat = veclyr.GetNextFeature()
+        counter += 1
+        pbar.update(1)
+
+    if openTransaction:
+        result_lyr.CommitTransaction()
+        openTransaction = False
+    result_lyr.SyncToDisk()
+    pbar.close()
+
+    vecDS = None
+    result_ds = None
+
+
+def simplify_geometries(vecfile, veclyrname, tolerance, outVecDrvr, vecoutfile, vecoutlyrname):
+    """
+Create a simplified version of the input
+
+:param vecfile: input vector file
+:param veclyrname: input vector layer within the input file.
+:param tolerance: simplification tolerance
+:param outVecDrvr: the format driver for the output vector file (e.g., GPKG, ESRI Shapefile).
+:param vecoutfile: output file path for the vector.
+:param vecoutlyrname: output vector layer name.
+
+"""
+    from osgeo import gdal
+    from osgeo import ogr
+    import tqdm
+    gdal.UseExceptions()
+
+    vecDS = gdal.OpenEx(vecfile, gdal.OF_VECTOR)
+    if vecDS is None:
+        raise Exception("Could not open '{}'".format(vecfile))
+
+    veclyr = vecDS.GetLayerByName(veclyrname)
+    if veclyr is None:
+        raise Exception("Could not open layer '{}'".format(veclyrname))
+    lyr_spat_ref = veclyr.GetSpatialRef()
+    geom_type = veclyr.GetGeomType()
+
+    out_driver = ogr.GetDriverByName(outVecDrvr)
+    result_ds = out_driver.CreateDataSource(vecoutfile)
+    if result_ds is None:
+        raise Exception("Could not open '{}'".format(vecoutfile))
+
+    result_lyr = result_ds.CreateLayer(vecoutlyrname, lyr_spat_ref, geom_type=geom_type)
+    if result_lyr is None:
+        raise Exception("Could not open layer '{}'".format(vecoutlyrname))
+
+    featDefn = result_lyr.GetLayerDefn()
+
+    openTransaction = False
+    veclyr.ResetReading()
+    n_feats = veclyr.GetFeatureCount(True)
+    counter = 0
+    pbar = tqdm.tqdm(total=n_feats)
+    veclyr.ResetReading()
+    feat = veclyr.GetNextFeature()
+    while feat is not None:
+        if not openTransaction:
+            result_lyr.StartTransaction()
+            openTransaction = True
+
+        geom = feat.GetGeometryRef().Simplify(tolerance)
+        outFeat = ogr.Feature(featDefn)
+        outFeat.SetGeometry(geom)
+        result_lyr.CreateFeature(outFeat)
+
+        if ((counter % 20000) == 0) and openTransaction:
+            result_lyr.CommitTransaction()
+            openTransaction = False
+
+        feat = veclyr.GetNextFeature()
+        counter = counter + 1
+        pbar.update(1)
+
+    if openTransaction:
+        result_lyr.CommitTransaction()
+        openTransaction = False
+    result_lyr.SyncToDisk()
+    pbar.close()
+
+    vecDS = None
+    result_ds = None
+
+
+def delete_polygon_holes(vecfile, veclyrname, outVecDrvr, vecoutfile, vecoutlyrname, area_thres=None):
+    """
+Delete holes from the input polygons in below the area threshold.
+
+:param vecfile: input vector file
+:param veclyrname: input vector layer within the input file.
+:param outVecDrvr: the format driver for the output vector file (e.g., GPKG, ESRI Shapefile).
+:param vecoutfile: output file path for the vector.
+:param vecoutlyrname: output vector layer name.
+:param area_thres: threshold below which holes are removed. If threshold is None then all holes are removed.
+
+"""
+    from osgeo import gdal
+    from osgeo import ogr
+    import tqdm
+    gdal.UseExceptions()
+
+    def _remove_holes_polygon(polygon, area_thres=None):
+        if polygon.GetGeometryName().lower() != 'polygon':
+            raise Exception("Can only remove holes from polygon geometry.")
+        if polygon.GetGeometryCount() == 1:
+            return polygon
+
+        if area_thres is None:
+            outer_ring = polygon.GetGeometryRef(0)
+            poly = ogr.Geometry(ogr.wkbPolygon)
+            poly.AddGeometry(outer_ring)
+            return poly
+        else:
+            outer_ring = polygon.GetGeometryRef(0)
+            poly = ogr.Geometry(ogr.wkbPolygon)
+            poly.AddGeometry(outer_ring)
+            for i in range(polygon.GetGeometryCount()):
+                if i > 0:
+                    c_ring = polygon.GetGeometryRef(i)
+                    tmp_poly = ogr.Geometry(ogr.wkbPolygon)
+                    tmp_poly.AddGeometry(c_ring)
+                    if tmp_poly.Area() > area_thres:
+                        poly.AddGeometry(c_ring)
+            return poly
+        return polygon
+
+    vecDS = gdal.OpenEx(vecfile, gdal.OF_VECTOR)
+    if vecDS is None:
+        raise Exception("Could not open '{}'".format(vecfile))
+
+    veclyr = vecDS.GetLayerByName(veclyrname)
+    if veclyr is None:
+        raise Exception("Could not open layer '{}'".format(veclyrname))
+    lyr_spat_ref = veclyr.GetSpatialRef()
+    geom_type = veclyr.GetGeomType()
+
+    out_driver = ogr.GetDriverByName(outVecDrvr)
+    result_ds = out_driver.CreateDataSource(vecoutfile)
+    if result_ds is None:
+        raise Exception("Could not open '{}'".format(vecoutfile))
+
+    result_lyr = result_ds.CreateLayer(vecoutlyrname, lyr_spat_ref, geom_type=geom_type)
+    if result_lyr is None:
+        raise Exception("Could not open layer '{}'".format(vecoutlyrname))
+
+    featDefn = result_lyr.GetLayerDefn()
+
+    openTransaction = False
+    veclyr.ResetReading()
+    n_feats = veclyr.GetFeatureCount(True)
+    counter = 0
+    pbar = tqdm.tqdm(total=n_feats)
+    veclyr.ResetReading()
+    feat = veclyr.GetNextFeature()
+    while feat is not None:
+        if not openTransaction:
+            result_lyr.StartTransaction()
+            openTransaction = True
+
+        geom_ref = feat.GetGeometryRef()
+        if geom_ref.GetGeometryName().lower() == 'multipolygon':
+            out_geom = ogr.Geometry(ogr.wkbMultiPolygon)
+            for i in range(0, geom_ref.GetGeometryCount()):
+                g = geom_ref.GetGeometryRef(i)
+                out_geom.AddGeometry(_remove_holes_polygon(g, area_thres))
+        elif geom_ref.GetGeometryName().lower() == 'polygon':
+            out_geom = _remove_holes_polygon(geom_ref, area_thres)
+
+        if out_geom is not None:
+            outFeat = ogr.Feature(featDefn)
+            outFeat.SetGeometry(out_geom)
+            result_lyr.CreateFeature(outFeat)
+
+        if ((counter % 20000) == 0) and openTransaction:
+            result_lyr.CommitTransaction()
+            openTransaction = False
+
+        feat = veclyr.GetNextFeature()
+        counter = counter + 1
+        pbar.update(1)
+
+    if openTransaction:
+        result_lyr.CommitTransaction()
+        openTransaction = False
+    result_lyr.SyncToDisk()
+    pbar.close()
+
+    vecDS = None
+    result_ds = None
+
+
+def get_poly_hole_area(vecfile, veclyrname):
+    """
+Get an array of the areas of the polygon holes.
+
+:param vecfile: input vector file
+:param veclyrname: input vector layer within the input file.
+:returns: A list of areas.
+
+"""
+    from osgeo import gdal
+    from osgeo import ogr
+    import tqdm
+    gdal.UseExceptions()
+
+    def _calc_hole_area(polygon):
+        if polygon.GetGeometryName().lower() != 'polygon':
+            raise Exception("Can only remove holes from polygon geometry.")
+        if polygon.GetGeometryCount() == 1:
+            return []
+        else:
+            areas = []
+            for i in range(polygon.GetGeometryCount()):
+                if i > 0:
+                    c_ring = polygon.GetGeometryRef(i)
+                    tmp_poly = ogr.Geometry(ogr.wkbPolygon)
+                    tmp_poly.AddGeometry(c_ring)
+                    areas.append(tmp_poly.Area())
+            return areas
+        return []
+
+    vecDS = gdal.OpenEx(vecfile, gdal.OF_VECTOR)
+    if vecDS is None:
+        raise Exception("Could not open '{}'".format(vecfile))
+
+    veclyr = vecDS.GetLayerByName(veclyrname)
+    if veclyr is None:
+        raise Exception("Could not open layer '{}'".format(veclyrname))
+
+    veclyr.ResetReading()
+    n_feats = veclyr.GetFeatureCount(True)
+    pbar = tqdm.tqdm(total=n_feats)
+    veclyr.ResetReading()
+    feat = veclyr.GetNextFeature()
+    hole_areas = []
+    while feat is not None:
+        geom_ref = feat.GetGeometryRef()
+        if geom_ref.GetGeometryName().lower() == 'multipolygon':
+            out_geom = ogr.Geometry(ogr.wkbMultiPolygon)
+            for i in range(0, geom_ref.GetGeometryCount()):
+                g = geom_ref.GetGeometryRef(i)
+                areas = _calc_hole_area(g)
+                if len(areas) > 0:
+                    hole_areas += areas
+        elif geom_ref.GetGeometryName().lower() == 'polygon':
+            areas = _calc_hole_area(geom_ref)
+            if len(areas) > 0:
+                hole_areas += areas
+
+        feat = veclyr.GetNextFeature()
+        pbar.update(1)
+
+    pbar.close()
+    vecDS = None
+    return hole_areas
+
+
+def remove_polygon_area(vecfile, veclyrname, outVecDrvr, vecoutfile, vecoutlyrname, area_thres):
+    """
+Delete polygons with an area below a defined threshold.
+
+:param vecfile: input vector file
+:param veclyrname: input vector layer within the input file.
+:param outVecDrvr: the format driver for the output vector file (e.g., GPKG, ESRI Shapefile).
+:param vecoutfile: output file path for the vector.
+:param vecoutlyrname: output vector layer name.
+:param area_thres: threshold below which polygons are removed.
+
+"""
+    from osgeo import gdal
+    from osgeo import ogr
+    import tqdm
+    gdal.UseExceptions()
+
+    vecDS = gdal.OpenEx(vecfile, gdal.OF_VECTOR)
+    if vecDS is None:
+        raise Exception("Could not open '{}'".format(vecfile))
+
+    veclyr = vecDS.GetLayerByName(veclyrname)
+    if veclyr is None:
+        raise Exception("Could not open layer '{}'".format(veclyrname))
+    lyr_spat_ref = veclyr.GetSpatialRef()
+    geom_type = veclyr.GetGeomType()
+
+    out_driver = ogr.GetDriverByName(outVecDrvr)
+    result_ds = out_driver.CreateDataSource(vecoutfile)
+    if result_ds is None:
+        raise Exception("Could not open '{}'".format(vecoutfile))
+
+    result_lyr = result_ds.CreateLayer(vecoutlyrname, lyr_spat_ref, geom_type=geom_type)
+    if result_lyr is None:
+        raise Exception("Could not open layer '{}'".format(vecoutlyrname))
+
+    featDefn = result_lyr.GetLayerDefn()
+
+    openTransaction = False
+    veclyr.ResetReading()
+    n_feats = veclyr.GetFeatureCount(True)
+    counter = 0
+    pbar = tqdm.tqdm(total=n_feats)
+    veclyr.ResetReading()
+    feat = veclyr.GetNextFeature()
+    while feat is not None:
+        if not openTransaction:
+            result_lyr.StartTransaction()
+            openTransaction = True
+
+        geom_ref = feat.GetGeometryRef()
+        if geom_ref.GetGeometryName().lower() == 'multipolygon':
+            out_geom = ogr.Geometry(ogr.wkbMultiPolygon)
+            n_geoms = 0
+            for i in range(0, geom_ref.GetGeometryCount()):
+                g = geom_ref.GetGeometryRef(i)
+                if g.Area() > area_thres:
+                    out_geom.AddGeometry(g)
+                    n_geoms += 1
+            if n_geoms > 0:
+                outFeat = ogr.Feature(featDefn)
+                outFeat.SetGeometry(out_geom)
+                result_lyr.CreateFeature(outFeat)
+        elif geom_ref.GetGeometryName().lower() == 'polygon':
+            if geom_ref.Area() > area_thres:
+                outFeat = ogr.Feature(featDefn)
+                outFeat.SetGeometry(geom_ref)
+                result_lyr.CreateFeature(outFeat)
+
+        if ((counter % 20000) == 0) and openTransaction:
+            result_lyr.CommitTransaction()
+            openTransaction = False
+
+        feat = veclyr.GetNextFeature()
+        counter = counter + 1
+        pbar.update(1)
+
+    if openTransaction:
+        result_lyr.CommitTransaction()
+        openTransaction = False
+    result_lyr.SyncToDisk()
+    pbar.close()
+
+    vecDS = None
+    result_ds = None
 
