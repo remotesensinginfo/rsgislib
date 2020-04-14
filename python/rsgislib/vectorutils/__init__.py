@@ -4368,7 +4368,6 @@ Delete holes from the input polygons in below the area threshold.
                     if tmp_poly.Area() > area_thres:
                         poly.AddGeometry(c_ring)
             return poly
-        return polygon
 
     vecDS = gdal.OpenEx(vecfile, gdal.OF_VECTOR)
     if vecDS is None:
@@ -4463,7 +4462,6 @@ Get an array of the areas of the polygon holes.
                     tmp_poly.AddGeometry(c_ring)
                     areas.append(tmp_poly.Area())
             return areas
-        return []
 
     vecDS = gdal.OpenEx(vecfile, gdal.OF_VECTOR)
     if vecDS is None:

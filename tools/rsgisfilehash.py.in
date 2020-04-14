@@ -75,3 +75,5 @@ elif args.outhash == 'SHA3_512':
     hash = tools.createSHA3_512Hash(input_file, args.blocksize)
 else:
     raise Exception("The hash choice is unknown.")
+
+print(hash)
