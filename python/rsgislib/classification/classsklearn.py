@@ -281,6 +281,7 @@ This function uses a trained classifier and applies it to the provided input ima
         green = rat.readColumn(ratDataset, 'Green')
         blue = rat.readColumn(ratDataset, 'Blue')
         ClassName = numpy.empty_like(red, dtype=numpy.dtype('a255'))
+        ClassName[...] = ''
 
         for classKey in classTrainInfo:
             print("Apply Colour to class \'" + classKey + "\'")

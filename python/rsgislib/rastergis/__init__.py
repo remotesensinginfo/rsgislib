@@ -234,4 +234,47 @@ and end_row variables can be used to read a subset of the RAT.
     return neighbours_data
 
 
+def check_string_col_valid(clumps, str_col, rm_punc=False, rm_spaces=False):
+    """
+    A function which checks a string column to ensure nothing is invalid.
 
+    :param clumps: input clumps image.
+    :param str_col: the column to check
+
+    """
+    import string
+    import numpy
+    from rios import ratapplier
+
+    def _ratapplier_check_string_col_valid(info, inputs, outputs, otherargs):
+        str_col_vals = getattr(inputs.inrat, otherargs.str_col)
+        out_col_vals = numpy.empty_like(str_col_vals)
+        for i in range(str_col_vals.shape[0]):
+            try:
+                str_val_tmp = str_col_vals[i].decode("utf-8")
+            except:
+                str_val_tmp = ""
+            str_val_tmp = str_val_tmp.strip()
+
+            if rm_spaces:
+                str_val_tmp = str_val_tmp.replace(' ', '_')
+                str_val_tmp = str_val_tmp.replace('__', '_')
+
+            if rm_punc:
+                for punct in string.punctuation:
+                    if (punct != '_') and (punct != '-'):
+                        str_val_tmp = str_val_tmp.replace(punct, '')
+
+            out_col_vals[i] = str_val_tmp
+        setattr(outputs.outrat, otherargs.str_col, out_col_vals)
+
+    in_rats = ratapplier.RatAssociations()
+    out_rats = ratapplier.RatAssociations()
+
+    in_rats.inrat = ratapplier.RatHandle(clumps)
+    out_rats.outrat = ratapplier.RatHandle(clumps)
+
+    otherargs = ratapplier.OtherArguments()
+    otherargs.str_col = str_col
+
+    ratapplier.apply(_ratapplier_check_string_col_valid, in_rats, out_rats, otherargs)
