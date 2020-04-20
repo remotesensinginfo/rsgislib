@@ -4271,7 +4271,7 @@ def reproj_wgs84_vec_to_utm(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr=N
 
 
 def create_alpha_shape(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr, out_vec_drv='GEOJSON', alpha_val=None,
-                       max_iter=10000, force=False):
+                       alpha_vals=None, max_iter=10000, force=False):
     """
     Function which calculate an alpha shape for a set of vector features (which are converted to points).
 
@@ -4286,6 +4286,9 @@ def create_alpha_shape(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr, out_v
     :param out_vec_drv: the output vector file format (e.g., GPKG, GEOJSON, ESRI Shapefile, etc.)
     :param alpha_val: The alpha value to create the the alpha shape polygon. If None then a value will be
                       automatically calculate but warning this can a significant amount of time (i.e., hours!!)
+    :param alpha_vals: Alternatively, a list of alpha values can be provided (e.g., [75, 50, 25, 5, 2]) where
+                       first to produce a valid result will be outputted. i.e., the order you provide the alpha
+                       values will be the order they are tested. If None then the alpha_val parameter will be used.
     :param max_iter: The maximum number of iterations for automatically selecting the alpha value. Note if the number
                      iteration is not sufficient to find an optimum value then no value is returned.
     :param force: remove output file if it exists.
@@ -4294,6 +4297,7 @@ def create_alpha_shape(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr, out_v
     import alphashape
     from osgeo import ogr
     from osgeo import gdal
+    import os
 
     gdal.UseExceptions()
 
@@ -4345,7 +4349,6 @@ def create_alpha_shape(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr, out_v
 
     ran_x = max_x - min_x
     ran_y = max_y - min_y
-
     print("Range: {}, {}".format(ran_x, ran_y))
 
     norm_pts = list()
@@ -4354,11 +4357,20 @@ def create_alpha_shape(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr, out_v
         norm_y = (pt[1] - min_y) / ran_y
         norm_pts.append((norm_x, norm_y))
 
-    if alpha_val is None:
-        alpha_val = alphashape.optimizealpha(norm_pts, max_iterations=max_iter)
-    print("Alpha: {}".format(alpha_val))
+    if alpha_vals is not None:
+        for alpha_test_val in alpha_vals:
+            print("Trying Alpha: {}".format(alpha_test_val))
+            alpha_shape = alphashape.alphashape(norm_pts, alpha=alpha_test_val)
+            if alpha_shape.geom_type == 'MultiPolygon' or alpha_shape.geom_type == 'Polygon':
+                alpha_val = alpha_test_val
+                break
+        print("Final Alpha: {}".format(alpha_val))
+    else:
+        if alpha_val is None:
+            alpha_val = alphashape.optimizealpha(norm_pts, max_iterations=max_iter)
 
-    alpha_shape = alphashape.alphashape(norm_pts, alpha=alpha_val)
+        print("Alpha: {}".format(alpha_val))
+        alpha_shape = alphashape.alphashape(norm_pts, alpha=alpha_val)
 
     ogr_geom_type = ogr.wkbPolygon
     if alpha_shape.geom_type == 'MultiPolygon':
