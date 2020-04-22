@@ -182,6 +182,8 @@ def calc_acc_metrics_vecsamples(in_vec_file, in_vec_lyr, ref_col, cls_col, cls_i
     import rsgislib.rastergis
     import rsgislib.rastergis.ratutils
 
+    rsgis_utils = rsgislib.RSGISPyUtils()
+
     # Read columns from vector file.
     ref_vals = numpy.array(rsgislib.vectorutils.readVecColumn(in_vec_file, in_vec_lyr, ref_col))
     cls_vals = numpy.array(rsgislib.vectorutils.readVecColumn(in_vec_file, in_vec_lyr, cls_col))
@@ -227,13 +229,14 @@ def calc_acc_metrics_vecsamples(in_vec_file, in_vec_lyr, ref_col, cls_col, cls_i
     tot_area = 0.0
     cls_pxl_counts = numpy.zeros_like(unq_cls_names, dtype=int)
     for i, cls_name in enumerate(img_clsname_data):
-        cls_name = str(cls_name.decode())
-        if (i > 0) and (cls_name !=''):
-            if cls_name not in unq_cls_names:
-                raise Exception("Class ('{}') found in image which was not in point samples...".format(cls_name))
-            cls_pxl_counts[cls_name_lut[cls_name]] = img_hist_data[i]
-            cls_pxl_count_dict[cls_name] = img_hist_data[i]
-            cls_area_dict[cls_name] = img_hist_data[i] * pxl_area
+        cls_name_str = str(cls_name.decode())
+        cls_name_str = rsgis_utils.check_str(cls_name_str, rm_non_ascii=True)
+        if (i > 0) and (len(cls_name_str) > 0):
+            if cls_name_str not in unq_cls_names:
+                raise Exception("Class ('{}') found in image which was not in point samples...".format(cls_name_str))
+            cls_pxl_counts[cls_name_lut[cls_name_str]] = img_hist_data[i]
+            cls_pxl_count_dict[cls_name_str] = img_hist_data[i]
+            cls_area_dict[cls_name_str] = img_hist_data[i] * pxl_area
             tot_area = tot_area + (img_hist_data[i] * pxl_area)
 
     acc_metrics = calc_class_accuracy_metrics(ref_int_vals, cls_int_vals, cls_pxl_counts, unq_cls_names)
@@ -244,7 +247,8 @@ def calc_acc_metrics_vecsamples(in_vec_file, in_vec_lyr, ref_col, cls_col, cls_i
     if out_json_file is not None:
         import json
         with open(out_json_file, 'w') as out_json_file_obj:
-            json.dump(acc_metrics, out_json_file_obj, sort_keys=True, indent=4, separators=(',', ': '), ensure_ascii=False)
+            json.dump(acc_metrics, out_json_file_obj, sort_keys=True, indent=4, separators=(',', ': '),
+                      ensure_ascii=False)
 
     if out_csv_file is not None:
         import csv
@@ -258,29 +262,29 @@ def calc_acc_metrics_vecsamples(in_vec_file, in_vec_lyr, ref_col, cls_col, cls_i
 
             # Quantity Metrics
             acc_metrics_writer.writerow(
-                ['Allocation Disagreement (A)', acc_metrics['quantity_metrics']['Allocation Disagreement (A)']])
+                    ['Allocation Disagreement (A)', acc_metrics['quantity_metrics']['Allocation Disagreement (A)']])
             acc_metrics_writer.writerow(
-                ['Quantity Disagreement (Q)', acc_metrics['quantity_metrics']['Quantity Disagreement (Q)']])
+                    ['Quantity Disagreement (Q)', acc_metrics['quantity_metrics']['Quantity Disagreement (Q)']])
             acc_metrics_writer.writerow(
-                ['Proportion Correct (C)', acc_metrics['quantity_metrics']['Proportion Correct (C)']])
+                    ['Proportion Correct (C)', acc_metrics['quantity_metrics']['Proportion Correct (C)']])
             acc_metrics_writer.writerow(
-                ['Total Disagreement (D)', acc_metrics['quantity_metrics']['Total Disagreement (D)']])
+                    ['Total Disagreement (D)', acc_metrics['quantity_metrics']['Total Disagreement (D)']])
             acc_metrics_writer.writerow([''])
 
             # Individual Class Scores
             acc_metrics_writer.writerow(['class', 'f1-score', 'precision', 'recall', 'support'])
             for cls_name in unq_cls_names:
                 acc_metrics_writer.writerow(
-                    [cls_name, acc_metrics[cls_name]['f1-score'], acc_metrics[cls_name]['precision'],
-                     acc_metrics[cls_name]['recall'], acc_metrics[cls_name]['support']])
+                        [cls_name, acc_metrics[cls_name]['f1-score'], acc_metrics[cls_name]['precision'],
+                         acc_metrics[cls_name]['recall'], acc_metrics[cls_name]['support']])
             # Overall macro and weighted
             acc_metrics_writer.writerow([''])
             acc_metrics_writer.writerow(
-                ['macro avg', acc_metrics['macro avg']['f1-score'], acc_metrics['macro avg']['precision'],
-                 acc_metrics['macro avg']['recall'], acc_metrics['macro avg']['support']])
+                    ['macro avg', acc_metrics['macro avg']['f1-score'], acc_metrics['macro avg']['precision'],
+                     acc_metrics['macro avg']['recall'], acc_metrics['macro avg']['support']])
             acc_metrics_writer.writerow(
-                ['weighted avg', acc_metrics['weighted avg']['f1-score'], acc_metrics['weighted avg']['precision'],
-                 acc_metrics['weighted avg']['recall'], acc_metrics['weighted avg']['support']])
+                    ['weighted avg', acc_metrics['weighted avg']['f1-score'], acc_metrics['weighted avg']['precision'],
+                     acc_metrics['weighted avg']['recall'], acc_metrics['weighted avg']['support']])
             acc_metrics_writer.writerow([''])
 
             # Output the confusion matrix

@@ -1628,6 +1628,66 @@ class RSGISPyUtils (object):
             return True
         return False
 
+    def remove_repeated_chars(self, str_val, repeat_char):
+        """
+        A function which removes repeated characters within a string for the specified character
+
+        :param str_val: The input string.
+        :param repeat_char: The character
+        :return: string without repeat_char
+
+        """
+        if len(repeat_char) != 1:
+            raise Exception("The repeat character has multiple characters.")
+        out_str = ''
+        p = ''
+        for c in str_val:
+            if c == repeat_char:
+                if c != p:
+                    out_str += c
+            else:
+                out_str += c
+            p = c
+        return out_str
+
+    def check_str(self, str_val, rm_non_ascii=False, rm_dashs=False, rm_spaces=False, rm_punc=False):
+        """
+        A function which can check a string removing spaces (replaced with underscores),
+        remove punctuation and any non ascii characters.
+
+        :param str_val: the input string to be processed.
+        :param rm_non_ascii: If True (default False) remove any non-ascii characters from the string
+        :param rm_dashs: If True (default False) remove any dashs from the string and replace with underscores.
+        :param rm_spaces: If True (default False) remove any spaces from the string.
+        :param rm_punc: If True (default False) remove any punctuation (other than '_' or '-') from the string.
+        :return: returns a string outputted from the processing.
+
+        """
+        import string
+        str_val_tmp = str_val.strip()
+
+        if rm_non_ascii:
+            str_val_tmp_ascii = ""
+            for c in str_val_tmp:
+                if (c in string.ascii_letters) or (c in string.punctuation) or (c == ' '):
+                    str_val_tmp_ascii += c
+            str_val_tmp = str_val_tmp_ascii
+
+        if rm_dashs:
+            str_val_tmp = str_val_tmp.replace('-', '_')
+            str_val_tmp = self.remove_repeated_chars(str_val_tmp, '_')
+
+        if rm_spaces:
+            str_val_tmp = str_val_tmp.replace(' ', '_')
+            str_val_tmp = self.remove_repeated_chars(str_val_tmp, '_')
+
+        if rm_punc:
+            for punct in string.punctuation:
+                if (punct != '_') and (punct != '-'):
+                    str_val_tmp = str_val_tmp.replace(punct, '')
+
+        return str_val_tmp
+
 
 class RSGISTime (object):
     """ Class to calculate run time for a function, format and print out (similar to for XML interface).
