@@ -4292,6 +4292,9 @@ def create_alpha_shape(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr, out_v
     :param max_iter: The maximum number of iterations for automatically selecting the alpha value. Note if the number
                      iteration is not sufficient to find an optimum value then no value is returned.
     :param force: remove output file if it exists.
+    :return: (vec_output, alpha_val); vec_output is a boolean True an output produced; False no output,
+             alpha_val - the alpha value used for the analysis. If a single value was inputted then the
+             same value will be outputted.
 
     """
     import alphashape
@@ -4385,6 +4388,7 @@ def create_alpha_shape(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr, out_v
         out_alpha_shape = None
         print("No output, did not create an output polygon or multipolygon...")
 
+    vec_output = False
     if out_alpha_shape is not None:
         vecDS = gdal.OpenEx(in_vec_file, gdal.OF_VECTOR)
         if vecDS is None:
@@ -4411,6 +4415,9 @@ def create_alpha_shape(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr, out_v
         result_lyr.CreateFeature(outFeature)
         outFeature = None
         result_ds = None
+        vec_output = True
+
+    return vec_output, alpha_val
 
 
 def convert_multi_geoms_to_single(vecfile, veclyrname, outVecDrvr, vecoutfile, vecoutlyrname, force=False):
