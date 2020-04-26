@@ -3862,6 +3862,7 @@ def line_intersection_range(vec_line_file, vec_line_lyr, vec_objs_file, vec_objs
     ds_objs_sub_vec = None
 
 
+
 def scnd_line_intersection_range(vec_line_file, vec_line_lyr, vec_objs_file, vec_objs_lyr, out_vec_file,
                                  out_vec_lyr=None, start_x_field='start_x', start_y_field='start_y', uid_field='uid',
                                  out_format="GEOJSON", force=False):
@@ -3944,8 +3945,16 @@ def scnd_line_intersection_range(vec_line_file, vec_line_lyr, vec_objs_file, vec
     out_driver = ogr.GetDriverByName(out_format)
     out_ds_obj = out_driver.CreateDataSource(out_vec_file)
     out_lyr_obj = out_ds_obj.CreateLayer(out_vec_lyr, spat_ref, geom_type=ogr.wkbLineString)
-    uid_field_obj = ogr.FieldDefn('uid', ogr.OFTInteger)
-    out_lyr_obj.CreateField(uid_field_obj)
+    uid_field_out_obj = ogr.FieldDefn('uid', ogr.OFTInteger)
+    out_lyr_obj.CreateField(uid_field_out_obj)
+    start_x_out_field = ogr.FieldDefn('start_x', ogr.OFTReal)
+    out_lyr_obj.CreateField(start_x_out_field)
+    start_y_out_field = ogr.FieldDefn('start_y', ogr.OFTReal)
+    out_lyr_obj.CreateField(start_y_out_field)
+    end_x_out_field = ogr.FieldDefn('end_x', ogr.OFTReal)
+    out_lyr_obj.CreateField(end_x_out_field)
+    end_y_out_field = ogr.FieldDefn('end_y', ogr.OFTReal)
+    out_lyr_obj.CreateField(end_y_out_field)
     length_field = ogr.FieldDefn('len', ogr.OFTReal)
     out_lyr_obj.CreateField(length_field)
     feat_defn = out_lyr_obj.GetLayerDefn()
@@ -4041,6 +4050,10 @@ def scnd_line_intersection_range(vec_line_file, vec_line_lyr, vec_objs_file, vec
                 c_pt.SetPoint(0, sec_dist_pt_x, sec_dist_pt_y)
                 dist = start_pt.Distance(c_pt)
                 out_feat.SetField('len', dist)
+                out_feat.SetField('start_x', start_pt_x)
+                out_feat.SetField('start_y', start_pt_y)
+                out_feat.SetField('end_x', sec_dist_pt_x)
+                out_feat.SetField('end_y', sec_dist_pt_y)
                 out_lyr_obj.CreateFeature(out_feat)
                 out_feat = None
 
