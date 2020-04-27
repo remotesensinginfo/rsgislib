@@ -664,5 +664,101 @@ def label_pxl_sample_chips(sample_pxls_img, cls_msk_img, output_image, gdalforma
         else:
             writer.write(out_samp_arr)
     writer.close(calcStats=False)
-
     rsgislib.rastergis.populateStats(output_image, True, True, True)
+
+
+def plot_train_data(cls1_h5_file, cls2_h5_file, out_plots_dir, cls1_name="Class 1", cls2_name="Class 2",
+                    var_names=None):
+    """
+    A function which plots the training data (in HDF5 format) for two classes with histograms for the
+    two axis'. Note, this plot only works for training extracted for pixel or clumps and not chip based
+    training.
+
+    This function uses the plotly library (https://plotly.com). It saves the plots to disk as PNGs so
+    the plotly-orca package is also required.
+
+    :param cls1_h5_file: Input HDF5 file with the training for class 1.
+    :param cls2_h5_file: Input HDF5 file with the training for class 2.
+    :param out_plots_dir: Output directory for the plots
+    :param cls1_name: The name of the first class (Optional, default is 'Class 1')
+    :param cls2_name: The name of the second class (Optional, default is 'Class 2')
+    :param var_names: An optional list of variable names for the training. Optional,
+                      otherwise call 'Var #1', 'Var #2' ... 'Var #N' etc.
+
+    """
+    import plotly.express as px
+    import pandas
+    import h5py
+    import tqdm
+    import os
+    import numpy
+    import rsgislib
+
+    rsgis_utils = rsgislib.RSGISPyUtils()
+
+    if not os.path.exists(out_plots_dir):
+        raise Exception("The output directory does not exist")
+
+    cls1_h5_obj = h5py.File(cls1_h5_file, 'r')
+    cls2_h5_obj = h5py.File(cls2_h5_file, 'r')
+
+    cls1_data = numpy.array(cls1_h5_obj['DATA/DATA'])
+    cls2_data = numpy.array(cls2_h5_obj['DATA/DATA'])
+
+    cls1_n = cls1_data.shape[0]
+    cls2_n = cls2_data.shape[0]
+
+    cls1_n_vars = cls1_data.shape[1]
+    cls2_n_vars = cls2_data.shape[1]
+
+    if cls1_n_vars != cls2_n_vars:
+        raise Exception("The number of variables must be the same for the two classes.")
+
+    if var_names is not None:
+        if len(var_names) != cls1_n_vars:
+            raise Exception("The number of variable names provided is not the same as "
+                            "the number of variables within the HDF5 files.")
+    else:
+        var_names = list()
+        for var_n in range(cls1_n_vars):
+            var_names.append("Var #{}".format(var_n))
+
+    var_file_names = dict()
+    for var_name in var_names:
+        var_file_names[var_name] = rsgis_utils.check_str(var_name, rm_non_ascii=True, rm_dashs=True,
+                                                         rm_spaces=True, rm_punc=True)
+
+    cls1_data_name = numpy.empty(cls1_n, dtype=numpy.dtype('U255'))
+    cls1_data_name[...] = cls1_name
+
+    cls2_data_name = numpy.empty(cls2_n, dtype=numpy.dtype('U255'))
+    cls2_data_name[...] = cls2_name
+
+    cls_data = numpy.concatenate([cls1_data, cls2_data])
+    cls_data_name = numpy.concatenate([cls1_data_name, cls2_data_name])
+
+    df_data = dict()
+    for var_n in range(cls1_n_vars):
+        df_data[var_names[var_n]] = cls_data[..., var_n]
+    df_data["ClassName"] = cls_data_name
+
+    df = pandas.DataFrame(df_data)
+
+    for var1 in tqdm.tqdm(var_names):
+        for var2 in var_names:
+            out_title = "{} verses {}".format(var1, var2)
+            out_file_name = "{}_v_{}.png".format(var_file_names[var1], var_file_names[var2])
+            out_plot_file = os.path.join(out_plots_dir, out_file_name)
+
+            fig = px.scatter(df_data, x=var1, y=var2, color="ClassName", marginal_y="histogram", marginal_x="histogram",
+                             title=out_title)
+
+            fig.update_layout(plot_bgcolor='white')
+            fig.update_layout(width=1000, height=1000)
+            fig.update_xaxes(showline=True, linewidth=1, linecolor='black', ticks="inside", gridwidth=1,
+                             gridcolor='Grey', mirror=True)
+            fig.update_yaxes(showline=True, linewidth=1, linecolor='black', ticks="inside", col=1, gridwidth=1,
+                             gridcolor='Grey', mirror=True)
+            fig.write_image(out_plot_file)
+
+
