@@ -1381,6 +1381,27 @@ class RSGISPyUtils (object):
             except ValueError:
                 return False
         return True
+
+    def zero_pad_num_str(self, num_val, str_len=3, round_num=False, round_n_digts=0, integerise=False):
+        """
+        A function which zero pads a number to make a string
+
+        :param num_val: number value to be processed.
+        :param str_len: the number of characters in the output string.
+        :param round_num: boolean whether to round the input number value.
+        :param round_n_digts: If rounding, the number of digits following decimal points to round to.
+        :param integerise: boolean whether to integerise the input number
+        :return: string with the padded numeric value.
+
+        """
+        if round_num:
+            num_val = round(num_val, round_n_digts)
+        if integerise:
+            num_val = int(num_val)
+
+        num_str = "{}".format(num_val)
+        num_str = num_str.zfill(str_len)
+        return num_str
     
     def getEnvironmentVariable(self, var):
         """
