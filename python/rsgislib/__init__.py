@@ -1339,6 +1339,19 @@ class RSGISPyUtils (object):
         except Exception:
             wktString = None
         return wktString
+
+    def get_osr_prj_obj(self, epsg_code):
+        """
+        A function which returns an OSR SpatialReference object
+        for a given EPSG code.
+
+        :param epsg_code: An EPSG code for the projection. Must be an integer.
+        :return: osr.SpatialReference object.
+
+        """
+        spat_ref = osr.SpatialReference()
+        spat_ref.ImportFromEPSG(int(epsg_code))
+        return spat_ref
     
     def uidGenerator(self, size=6):
         """
