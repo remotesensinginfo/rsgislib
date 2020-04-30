@@ -88,7 +88,6 @@ Constants specifying how bands should be treated when sharpening (see rsgislib.i
 """
 from __future__ import print_function
 
-import os.path
 import os
 import time
 import datetime
@@ -1721,6 +1720,80 @@ class RSGISPyUtils (object):
                     str_val_tmp = str_val_tmp.replace(punct, '')
 
         return str_val_tmp
+
+    def get_file_lock(self, input_file, sleep_period=1, wait_iters=120, use_except=False):
+        """
+        A function which gets a lock on a file.
+
+        The lock file will be a unix hidden file (i.e., starts with a .) and it will have .lok added to the end.
+        E.g., for input file hello_world.txt the lock file will be .hello_world.txt.lok. The contents of the lock
+        file will be the time and date of creation.
+
+        Using the default parameters (sleep 1 second and wait 120 iterations) if the lock isn't available
+        it will be retried every second for 120 seconds (i.e., 2 mins).
+
+        :param input_file: The input file for which the lock will be created.
+        :param sleep_period: time in seconds to sleep for, if the lock isn't available. (Default=1 second)
+        :param wait_iters: the number of iterations to wait for before giving up. (Default=120)
+        :param use_except: Boolean. If True then an exception will be thrown if the lock is not
+                           available. If False (default) False will be returned if the lock is
+                           not successful.
+        :return: boolean. True: lock was successfully gained. False: lock was not gained.
+
+        """
+        file_path, file_name = os.path.split(input_file)
+        lock_file_name = ".{}.lok".format(file_name)
+        lock_file_path = os.path.join(file_path, lock_file_name)
+
+        got_lock = False
+        for i in range(wait_iters+1):
+            if not os.path.exists(lock_file_path):
+                got_lock = True
+                break
+            time.sleep(sleep_period)
+
+        if got_lock:
+            c_datetime = datetime.datetime.now()
+            f = open(lock_file_path, 'w')
+            f.write('{}\n'.format(c_datetime.c_datetime()))
+            f.flush()
+            f.close()
+        elif use_except:
+            raise Exception("Lock could not be gained for file: {}".format(input_file))
+
+        return got_lock
+
+    def release_file_lock(self, input_file):
+        """
+        A function which releases a lock file for the input file.
+
+        :param input_file: The input file for which the lock will be created.
+
+        """
+        file_path, file_name = os.path.split(input_file)
+        lock_file_name = ".{}.lok".format(file_name)
+        lock_file_path = os.path.join(file_path, lock_file_name)
+        if os.path.exists(lock_file_path):
+            os.remove(lock_file_path)
+
+    def clean_file_locks(self, dir_path, timeout=3600):
+        """
+        A function which cleans up any remaining lock file (i.e., if an application has crashed).
+        The timeout time will be compared with the time written within the file.
+
+        :param dir_path: the file path to search for lock files (i.e., ".*.lok")
+        :param timeout: the time (in seconds) for the timeout. Default: 3600 (1 hours)
+
+        """
+        import glob
+        c_dateime = datetime.datetime.now()
+        lock_files = glob.glob(os.path.join(dir_path, ".*.lok"))
+        for lock_file_path in lock_files:
+            create_date_str = self.readTextFileNoNewLines(lock_file_path)
+            create_date = datetime.datetime.fromisoformat(create_date_str)
+            time_since_create = (c_dateime - create_date).total_seconds()
+            if time_since_create > timeout:
+                os.remove(lock_file_path)
 
 
 class RSGISTime (object):

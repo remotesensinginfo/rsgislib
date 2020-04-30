@@ -87,7 +87,6 @@ def query_img_lut(scn_bbox, lutdbfile, lyrname):
     fileListLUT = rsgislib.vectorutils.getAttLstSelectBBoxFeats(lutdbfile, lyrname, ['path', 'filename'], scn_bbox)
     imgs = []
     for item in fileListLUT:
-        print(item)
         imgs.append(os.path.join(item['path'], item['filename']))
     return imgs
 
@@ -103,7 +102,6 @@ def get_all_lut_imgs(lutdbfile, lyrname):
     fileListLUT = rsgislib.vectorutils.readVecColumns(lutdbfile, lyrname, ['path', 'filename'])
     imgs = []
     for item in fileListLUT:
-        print(item)
         imgs.append(os.path.join(item['path'], item['filename']))
     return imgs
 
