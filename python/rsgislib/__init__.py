@@ -1755,7 +1755,7 @@ class RSGISPyUtils (object):
         if got_lock:
             c_datetime = datetime.datetime.now()
             f = open(lock_file_path, 'w')
-            f.write('{}\n'.format(c_datetime.c_datetime()))
+            f.write('{}\n'.format(c_datetime.isoformat()))
             f.flush()
             f.close()
         elif use_except:
