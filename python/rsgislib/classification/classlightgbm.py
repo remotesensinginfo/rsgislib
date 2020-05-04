@@ -53,8 +53,6 @@ from rios import rat
 
 import lightgbm as lgb
 
-from skopt.space import Real, Integer
-from skopt import gp_minimize
 from sklearn.metrics import roc_auc_score
 from sklearn.metrics import accuracy_score
 
@@ -87,6 +85,9 @@ def optimise_lightgbm_binary_classifer(out_params_file, cls1_train_file, cls1_va
                              Parameter used to balance imbalanced training data.
 
     """
+    from skopt.space import Real, Integer
+    from skopt import gp_minimize
+
     print("Reading Class 1 Training")
     f = h5py.File(cls1_train_file, 'r')
     num_cls1_train_rows = f['DATA/DATA'].shape[0]
@@ -410,6 +411,9 @@ def train_opt_lightgbm_binary_classifer(out_mdl_file, out_params_file, cls1_trai
                              Parameter used to balance imbalanced training data.
 
     """
+    from skopt.space import Real, Integer
+    from skopt import gp_minimize
+
     print("Reading Class 1 Training")
     f = h5py.File(cls1_train_file, 'r')
     num_cls1_train_rows = f['DATA/DATA'].shape[0]
@@ -743,6 +747,9 @@ def train_lightgbm_multiclass_classifer(out_mdl_file, clsinfodict, out_info_file
     :param scale_pos_weight:
 
     """
+    from skopt.space import Real, Integer
+    from skopt import gp_minimize
+
     n_classes = len(clsinfodict)
     for clsname in clsinfodict:
         if clsinfodict[clsname].id >= n_classes:

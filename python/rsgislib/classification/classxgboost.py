@@ -53,8 +53,6 @@ from rios import rat
 
 import xgboost as xgb
 
-from skopt.space import Real, Integer
-from skopt import gp_minimize
 from sklearn.metrics import roc_auc_score
 from sklearn.metrics import accuracy_score
 
@@ -83,6 +81,9 @@ def optimise_xgboost_binary_classifer(out_params_file, cls1_train_file, cls1_val
     :param mdl_cls_obj: XGBoost object to allow continue training with a new dataset.
 
     """
+    from skopt.space import Real, Integer
+    from skopt import gp_minimize
+
     print("Reading Class 1 Training")
     f = h5py.File(cls1_train_file, 'r')
     num_cls1_train_rows = f['DATA/DATA'].shape[0]
@@ -204,6 +205,9 @@ def train_xgboost_binary_classifer(out_mdl_file, cls_params_file, cls1_train_fil
     :param mdl_cls_obj: XGBoost object to allow continue training with a new dataset.
 
     """
+    from skopt.space import Real, Integer
+    from skopt import gp_minimize
+
     print("Reading Class 1 Training")
     f = h5py.File(cls1_train_file, 'r')
     num_cls1_train_rows = f['DATA/DATA'].shape[0]
@@ -322,6 +326,9 @@ def train_opt_xgboost_binary_classifer(out_mdl_file, cls1_train_file, cls1_valid
                             If None then no file will be outputted.
 
     """
+    from skopt.space import Real, Integer
+    from skopt import gp_minimize
+
     print("Reading Class 1 Training")
     f = h5py.File(cls1_train_file, 'r')
     num_cls1_train_rows = f['DATA/DATA'].shape[0]
@@ -577,6 +584,9 @@ def train_xgboost_multiclass_classifer(out_mdl_file, clsinfodict, nthread=1, mdl
     :param nthread: The number of threads to use to train the classifier.
 
     """
+    from skopt.space import Real, Integer
+    from skopt import gp_minimize
+
     n_classes = len(clsinfodict)
     for clsname in clsinfodict:
         if clsinfodict[clsname].id >= n_classes:
