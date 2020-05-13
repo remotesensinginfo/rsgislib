@@ -39,6 +39,58 @@ Where:
                 shutil.move(tmpFile, outFile)
 
 
+def create_dir_archive(in_dir, out_arch, arch_format):
+    """
+    A function which creates an archive from an input directory. This function uses
+    subprocess to call the appropriate command line function.
+
+    Please note that this function has similar functionality to shutil.make_archive
+    and I would recommend you use that but I found it sometimes produces an error so
+    I provided this function which uses the terminal functions as a drop in replacement.
+
+    :param in_dir: The input directory path for which the archive with be created.
+    :param out_arch: The output archive file path and name. Note this should not include an extension
+                     as this will be added automatically.
+    :param arch_format: The format for the archive. The options are: zip, tar, gztar, bztar, xztar
+    :return: a string with the full file path and name, including the file extension.
+
+    """
+    import os
+    import subprocess
+    c_pwd = os.getcwd()
+    out_arch = os.path.abspath(out_arch)
+    in_dir = os.path.abspath(in_dir)
+    base_dir = os.path.dirname(in_dir)
+    dir_name = os.path.split(in_dir)[1]
+    os.chdir(base_dir)
+
+    if arch_format == 'zip':
+        out_arch_file = "{}.zip".format(out_arch.strip())
+        cmd = "zip -r {} {}".format(out_arch_file, dir_name)
+        subprocess.call(cmd, shell=True)
+    elif arch_format == 'tar':
+        out_arch_file = "{}.tar".format(out_arch.strip())
+        cmd = "tar -cvf {} {}".format(out_arch_file, dir_name)
+        subprocess.call(cmd, shell=True)
+    elif arch_format == 'gztar':
+        out_arch_file = "{}.tar.gz".format(out_arch.strip())
+        cmd = "tar -cvzf {} {}".format(out_arch_file, dir_name)
+        subprocess.call(cmd, shell=True)
+    elif arch_format == 'bztar':
+        out_arch_file = "{}.tar.bz2".format(out_arch.strip())
+        cmd = "tar -cvjSf {} {}".format(out_arch_file, dir_name)
+        subprocess.call(cmd, shell=True)
+    elif arch_format == 'xztar':
+        out_arch_file = "{}.tar.xz".format(out_arch.strip())
+        cmd = "tar -cvJf {} {}".format(out_arch_file, dir_name)
+        subprocess.call(cmd, shell=True)
+    else:
+        raise Exception("Do not recognise the archive format specifed.")
+
+    os.chdir(c_pwd)
+    return out_arch_file
+
+
 def createSHA1Hash(input_file, block_size=4096):
     """
     A function which calculates finds the SHA1 hash string of the input file.

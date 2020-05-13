@@ -6,27 +6,36 @@ import shutil
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-f", "--file", type=str, required=False, help="The file or path to be uploaded to dropbox. If directory then an archive will be created and uploaded.")
-    parser.add_argument("--filelst", type=str, required=False, help="Text file with a list of file paths to be uploaded to dropbox. If directory then an archive will be created and uploaded.")
-    parser.add_argument("-p", "--path", type=str, required=True, help="The path in dropbox to where the files should be uploaded.")
-    parser.add_argument("-k", "--dbxkey", type=str, required=True, help="The dropbox api key for the account you are uploading to. If a file then the key will read from the file.")
+    parser.add_argument("-f", "--file", type=str, required=False,
+                        help="The file or path to be uploaded to dropbox. If directory then an archive will be created and uploaded.")
+    parser.add_argument("--filelst", type=str, required=False,
+                        help="Text file with a list of file paths to be uploaded to dropbox. If directory then an archive will be created and uploaded.")
+    parser.add_argument("-p", "--path", type=str, required=True,
+                        help="The path in dropbox to where the files should be uploaded.")
+    parser.add_argument("-k", "--dbxkey", type=str, required=True,
+                        help="The dropbox api key for the account you are uploading to. If a file then the key will read from the file.")
     parser.add_argument("--share", action='store_true', default=False, help="Share the file(s) being uploaded.")
-    parser.add_argument("-o", "--output", type=str, required=False, help="Output JSON file with the shared links to the file - only created when --share option selected.")
-    parser.add_argument("-t", "--tmpdir", type=str, required=False, help="A temp path where tar.gz files will be created.")
-    parser.add_argument("-a", "--archformat", type=str, required=False, choices=['zip', 'tar', 'gztar', 'bztar', 'xztar'], default='zip', help="The format of the archive if file path is a directory.")
-    
+    parser.add_argument("-o", "--output", type=str, required=False,
+                        help="Output JSON file with the shared links to the file - only created when --share option selected.")
+    parser.add_argument("-t", "--tmpdir", type=str, required=False,
+                        help="A temp path where tar.gz files will be created.")
+    parser.add_argument("-a", "--archformat", type=str, required=False,
+                        choices=['zip', 'tar', 'gztar', 'bztar', 'xztar'], default='zip',
+                        help="The format of the archive if file path is a directory.")
+    parser.add_argument("--externarch", action='store_true', default=False,
+                        help="If selected then the command line archive tool will be used rather than the .")
     args = parser.parse_args()
-    
+
     rsgis_utils = rsgislib.RSGISPyUtils()
-    
+
     if (args.file is None) and (args.filelst is None):
         raise Exception("You must provide an input file/path or list of input files/paths.")
-    
+
     if os.path.exists(args.dbxkey):
         dbxkey = rsgis_utils.readTextFileNoNewLines(args.dbxkey)
     else:
         dbxkey = args.dbxkey
-    
+
     if args.filelst is not None:
         if not os.path.exists(args.filelst):
             raise Exception("The input file ({}) is not present.".format(args.filelst))
@@ -35,30 +44,31 @@ if __name__ == "__main__":
         if not os.path.exists(args.file):
             raise Exception("The input file ({}) is not present.".format(args.file))
         file_lst = [args.file]
-    
+
     create_tmp = False
     tmp_dir = args.tmpdir
     if tmp_dir is not None:
         if not os.path.exists(tmp_dir):
             raise Exception("The input file ({}) is not present.".format(args.file))
-    
+
     dbx_utils = rsgislib.tools.dropbox.RSGISDropboxUtils(dbxkey)
-    
     share_lnks = dict()
     for c_file in file_lst:
         file_name = os.path.basename(c_file)
         print("Processing {}".format(file_name))
-        
         if os.path.isdir(c_file):
             if (tmp_dir is None) and (not create_tmp):
                 tmp_dir = os.path.join(os.getcwd(), ".tmp_{}".format(rsgis_utils.uidGenerator()))
                 create_tmp = True
                 os.mkdir(tmp_dir)
-            
             basename = rsgis_utils.get_file_basename(c_file, checkvalid=True)
             arch_name = os.path.join(tmp_dir, "{}_arch".format(basename))
             rt_dir = os.path.dirname(c_file)
-            arch_file = shutil.make_archive(arch_name, args.archformat, rt_dir, c_file)
+            if args.externarch:
+                from rsgislib.tools.filemanipulation import create_dir_archive
+                arch_file = create_dir_archive(c_file, arch_name, args.archformat)
+            else:
+                arch_file = shutil.make_archive(arch_name, args.archformat, rt_dir, c_file)
             arch_file_name = os.path.basename(arch_file)
             dbx_file_path = os.path.join(args.path, arch_file_name)
             share_link = dbx_utils.upload_file(arch_file, dbx_file_path, share_link=args.share)
@@ -70,10 +80,10 @@ if __name__ == "__main__":
             share_lnks[file_name] = share_link
         else:
             raise Exception("File path was not a directory or file: {}".format(c_file))
-    
+
     if create_tmp:
         shutil.rmtree(tmp_dir)
-    
+
     if (args.output is not None) and args.share:
         rsgis_utils.writeDict2JSON(share_lnks, args.output)
     elif args.share:
