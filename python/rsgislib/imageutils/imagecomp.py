@@ -84,7 +84,7 @@ the maximum NDVI.
             refImgTmpPresent = False
         
         if dataType is None:
-            rsgisUtils.getRSGISLibDataTypeFromImg(inImages[0])
+            dataType = rsgisUtils.getRSGISLibDataTypeFromImg(inImages[0])
         
         numInLyrs = len(inImages)
         
@@ -189,7 +189,7 @@ LS8 images are submitted to match the images bands of LS7 (i.e., coastal band re
             refImgTmpPresent = False
         
         if dataType is None:
-            rsgisUtils.getRSGISLibDataTypeFromImg(inImages[0])
+            dataType = rsgisUtils.getRSGISLibDataTypeFromImg(inImages[0])
         
         numInLyrs = len(inImages)
         

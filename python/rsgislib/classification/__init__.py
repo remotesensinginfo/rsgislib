@@ -342,6 +342,8 @@ def split_sample_train_valid_test(input_sample_h5_file, train_h5_file, valid_h5_
     rsgis_utils = rsgislib.RSGISPyUtils()
     uid_str = rsgis_utils.uidGenerator()
     out_dir = os.path.split(os.path.abspath(test_h5_file))[0]
+    if datatype is None:
+        datatype = rsgislib.TYPE_32FLOAT
     tmp_train_valid_sample_file = os.path.join(out_dir, "train_valid_tmp_sample_{}.h5".format(uid_str))
     rsgislib.imageutils.splitSampleHDF5File(input_sample_h5_file, test_h5_file, tmp_train_valid_sample_file,
                                             test_sample, rand_seed, datatype)
@@ -387,6 +389,9 @@ def split_chip_sample_train_valid_test(input_sample_h5_file, train_h5_file, vali
     rsgis_utils = rsgislib.RSGISPyUtils()
     uid_str = rsgis_utils.uidGenerator()
     out_dir = os.path.split(os.path.abspath(test_h5_file))[0]
+    if datatype is None:
+        datatype = rsgislib.TYPE_32FLOAT
+
     tmp_train_valid_sample_file = os.path.join(out_dir, "train_valid_tmp_sample_{}.h5".format(uid_str))
     rsgislib.imageutils.splitSampleChipHDF5File(input_sample_h5_file, test_h5_file, tmp_train_valid_sample_file,
                                                 test_sample, rand_seed, datatype)
@@ -432,6 +437,9 @@ def split_chip_sample_ref_train_valid_test(input_sample_h5_file, train_h5_file, 
     rsgis_utils = rsgislib.RSGISPyUtils()
     uid_str = rsgis_utils.uidGenerator()
     out_dir = os.path.split(os.path.abspath(test_h5_file))[0]
+    if datatype is None:
+        datatype = rsgislib.TYPE_32FLOAT
+
     tmp_train_valid_sample_file = os.path.join(out_dir, "train_valid_tmp_sample_{}.h5".format(uid_str))
     splitSampleRefChipHDF5File(input_sample_h5_file, test_h5_file, tmp_train_valid_sample_file,
                                test_sample, rand_seed, datatype)
