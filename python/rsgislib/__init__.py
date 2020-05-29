@@ -1702,7 +1702,7 @@ class RSGISPyUtils (object):
         if rm_non_ascii:
             str_val_tmp_ascii = ""
             for c in str_val_tmp:
-                if (c in string.ascii_letters) or (c in string.punctuation) or (c == ' '):
+                if (c in string.ascii_letters) or (c in string.punctuation) or (c in string.digits) or (c == ' '):
                     str_val_tmp_ascii += c
             str_val_tmp = str_val_tmp_ascii
 

@@ -234,16 +234,20 @@ and end_row variables can be used to read a subset of the RAT.
     return neighbours_data
 
 
-def check_string_col_valid(clumps, str_col, rm_punc=False, rm_spaces=False):
+def check_string_col_valid(clumps, str_col, rm_punc=False, rm_spaces=False, rm_non_ascii=False, rm_dashs=False):
     """
     A function which checks a string column to ensure nothing is invalid.
 
     :param clumps: input clumps image.
     :param str_col: the column to check
+    :param rm_punc: If True removes punctuation from column name other than dashs and underscores.
+    :param rm_spaces: If True removes spaces from the column name, replacing them with underscores.
+    :param rm_non_ascii: If True removes characters which are not in the ascii range of characters.
+    :param rm_dashs: If True then dashs are removed from the column name.
 
     """
-    import string
     import numpy
+    import rsgislib
     from rios import ratapplier
 
     def _ratapplier_check_string_col_valid(info, inputs, outputs, otherargs):
@@ -256,14 +260,9 @@ def check_string_col_valid(clumps, str_col, rm_punc=False, rm_spaces=False):
                 str_val_tmp = ""
             str_val_tmp = str_val_tmp.strip()
 
-            if rm_spaces:
-                str_val_tmp = str_val_tmp.replace(' ', '_')
-                str_val_tmp = str_val_tmp.replace('__', '_')
-
-            if rm_punc:
-                for punct in string.punctuation:
-                    if (punct != '_') and (punct != '-'):
-                        str_val_tmp = str_val_tmp.replace(punct, '')
+            rsgis_utils = rsgislib.RSGISPyUtils()
+            rsgis_utils.check_str(str_val_tmp, rm_non_ascii=rm_non_ascii, rm_dashs=rm_dashs,
+                                  rm_spaces=rm_spaces, rm_punc=rm_punc)
 
             out_col_vals[i] = str_val_tmp
         setattr(outputs.outrat, otherargs.str_col, out_col_vals)
