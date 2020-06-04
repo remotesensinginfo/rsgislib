@@ -182,6 +182,9 @@ def getRSGISLibVersion():
 
 __version__ = getRSGISLibVersion()
 
+py_sys_version_str = "{}.{}".format(sys.version_info.major, sys.version_info.minor)
+py_sys_version_flt = float(py_sys_version_str)
+
 class RSGISPyException(Exception):
     """
     A class representing the RSGIS exception.
