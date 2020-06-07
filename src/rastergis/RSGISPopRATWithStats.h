@@ -131,7 +131,7 @@ namespace rsgis{namespace rastergis{
     class DllExport RSGISCalcClusterPxlValueStats : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
-		RSGISCalcClusterPxlValueStats(double **statsData, std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats, bool *firstVal, unsigned int ratBand);
+		RSGISCalcClusterPxlValueStats(double **statsData, std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats, bool *firstVal, unsigned int ratBand, double *no_data_vals, bool *use_no_data_vals);
 		void calcImageValue(float *bandValues, int numBands, double *output) {throw rsgis::img::RSGISImageCalcException("No implemented");};
 		void calcImageValue(float *bandValues, int numBands) {throw rsgis::img::RSGISImageCalcException("No implemented");};
         void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals);
@@ -148,12 +148,14 @@ namespace rsgis{namespace rastergis{
         std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats;
         bool *firstVal;
         unsigned int ratBand;
+        double *no_data_vals;
+        bool *use_no_data_vals;
     };
     
     class DllExport RSGISCalcClusterPxlValueStdDev : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
-		RSGISCalcClusterPxlValueStdDev(double **stdDevData, double **statsData, std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats, bool *firstVal, unsigned int ratBand);
+		RSGISCalcClusterPxlValueStdDev(double **stdDevData, double **statsData, std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats, bool *firstVal, unsigned int ratBand, double *no_data_vals, bool *use_no_data_vals);
 		void calcImageValue(float *bandValues, int numBands, double *output) {throw rsgis::img::RSGISImageCalcException("No implemented");};
 		void calcImageValue(float *bandValues, int numBands) {throw rsgis::img::RSGISImageCalcException("Not implemented");};
         void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals);
@@ -171,6 +173,8 @@ namespace rsgis{namespace rastergis{
         std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats;
         bool *firstVal;
         unsigned int ratBand;
+        double *no_data_vals;
+        bool *use_no_data_vals;
 	};
     
     

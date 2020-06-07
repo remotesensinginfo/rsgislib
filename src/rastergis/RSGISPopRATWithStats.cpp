@@ -73,7 +73,6 @@ namespace rsgis{namespace rastergis{
                     throw rsgis::RSGISAttributeTableException("If the standard deviation is required to be calculated then the mean must also be calculated.");
                 }
 
-                
                 if((*iterBands)->calcMin)
                 {
                     (*iterBands)->minFieldIdx = attUtils.findColumnIndexOrCreate(rat, (*iterBands)->minField, GFT_Real);
@@ -117,7 +116,20 @@ namespace rsgis{namespace rastergis{
             GDALDataset **datasets = new GDALDataset*[2];
             datasets[0] = inputClumps;
             datasets[1] = inputValsImage;
-            
+
+            int n_bands = inputValsImage->GetRasterCount();
+            double *no_data_vals = new double[n_bands];
+            bool *use_no_data_vals = new bool[n_bands];
+            int use_no_data_val_int = 0;
+            for(unsigned int i = 0; i < n_bands; ++i)
+            {
+                use_no_data_vals[i] = false;
+                use_no_data_val_int = false;
+                GDALRasterBand *image_band = inputValsImage->GetRasterBand(i+1);
+                no_data_vals[i] = image_band->GetNoDataValue(&use_no_data_val_int);
+                use_no_data_vals[i] = (bool)use_no_data_val_int;
+            }
+
             double **statsData = new double*[numRows];
             for(unsigned int i = 0; i < numRows; ++i)
             {
@@ -128,7 +140,7 @@ namespace rsgis{namespace rastergis{
                 }
             }
             
-            RSGISCalcClusterPxlValueStats *calcImgValStats = new RSGISCalcClusterPxlValueStats(statsData, bandStats, firstVal, ratBand);
+            RSGISCalcClusterPxlValueStats *calcImgValStats = new RSGISCalcClusterPxlValueStats(statsData, bandStats, firstVal, ratBand, no_data_vals, use_no_data_vals);
             rsgis::img::RSGISCalcImage calcImageStats(calcImgValStats);
             calcImageStats.calcImage(datasets, 1, 1);
             delete calcImgValStats;
@@ -324,7 +336,7 @@ namespace rsgis{namespace rastergis{
                         stdDevData[i][j] = 0.0;
                     }
                 }
-                RSGISCalcClusterPxlValueStdDev *calcImgValStdDev = new RSGISCalcClusterPxlValueStdDev(stdDevData, statsData, bandStats, firstVal, ratBand);
+                RSGISCalcClusterPxlValueStdDev *calcImgValStdDev = new RSGISCalcClusterPxlValueStdDev(stdDevData, statsData, bandStats, firstVal, ratBand, no_data_vals, use_no_data_vals);
                 rsgis::img::RSGISCalcImage calcImageStdDev(calcImgValStdDev);
                 calcImageStdDev.calcImage(datasets, 1, 1);
                 delete calcImgValStdDev;
@@ -397,7 +409,8 @@ namespace rsgis{namespace rastergis{
             }
             delete[] statsData;
             delete[] firstVal;
-            
+            delete[] no_data_vals;
+            delete[] use_no_data_vals;
             
             delete[] dataBlock;
             delete[] histDataBlock;
@@ -1233,12 +1246,14 @@ namespace rsgis{namespace rastergis{
     }
     
     
-    RSGISCalcClusterPxlValueStats::RSGISCalcClusterPxlValueStats(double **statsData, std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats, bool *firstVal, unsigned int ratBand) : rsgis::img::RSGISCalcImageValue(0)
+    RSGISCalcClusterPxlValueStats::RSGISCalcClusterPxlValueStats(double **statsData, std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats, bool *firstVal, unsigned int ratBand, double *no_data_vals, bool *use_no_data_vals) : rsgis::img::RSGISCalcImageValue(0)
     {
         this->statsData = statsData;
         this->bandStats = bandStats;
         this->firstVal = firstVal;
         this->ratBand = ratBand;
+        this->no_data_vals = no_data_vals;
+        this->use_no_data_vals = use_no_data_vals;
     }
     
     void RSGISCalcClusterPxlValueStats::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) 
@@ -1251,51 +1266,59 @@ namespace rsgis{namespace rastergis{
             {
                 if((boost::math::isfinite)(floatBandValues[(*iterBands)->band-1]))
                 {
-                    if((*iterBands)->calcMin)
+                    bool useVal = true;
+                    if(this->use_no_data_vals[(*iterBands)->band-1] && (this->no_data_vals[(*iterBands)->band-1] == floatBandValues[(*iterBands)->band-1]))
                     {
-                        if(firstVal[fid])
-                        {
-                            statsData[fid][(*iterBands)->minLocalIdx] = floatBandValues[(*iterBands)->band-1];
-                        }
-                        else if(floatBandValues[(*iterBands)->band-1] < statsData[fid][(*iterBands)->minLocalIdx])
-                        {
-                            statsData[fid][(*iterBands)->minLocalIdx] = floatBandValues[(*iterBands)->band-1];
-                        }
+                        useVal = false;
                     }
-                    
-                    if((*iterBands)->calcMax)
+                    if(useVal)
                     {
-                        if(firstVal[fid])
+                        if((*iterBands)->calcMin)
                         {
-                            statsData[fid][(*iterBands)->maxLocalIdx] = floatBandValues[(*iterBands)->band-1];
+                            if(firstVal[fid])
+                            {
+                                statsData[fid][(*iterBands)->minLocalIdx] = floatBandValues[(*iterBands)->band-1];
+                            }
+                            else if(floatBandValues[(*iterBands)->band-1] < statsData[fid][(*iterBands)->minLocalIdx])
+                            {
+                                statsData[fid][(*iterBands)->minLocalIdx] = floatBandValues[(*iterBands)->band-1];
+                            }
                         }
-                        else if(floatBandValues[(*iterBands)->band-1] > statsData[fid][(*iterBands)->maxLocalIdx])
+
+                        if((*iterBands)->calcMax)
                         {
-                            statsData[fid][(*iterBands)->maxLocalIdx] = floatBandValues[(*iterBands)->band-1];
+                            if(firstVal[fid])
+                            {
+                                statsData[fid][(*iterBands)->maxLocalIdx] = floatBandValues[(*iterBands)->band-1];
+                            }
+                            else if(floatBandValues[(*iterBands)->band-1] > statsData[fid][(*iterBands)->maxLocalIdx])
+                            {
+                                statsData[fid][(*iterBands)->maxLocalIdx] = floatBandValues[(*iterBands)->band-1];
+                            }
                         }
-                    }
-                    
-                    if((*iterBands)->calcMean)
-                    {
-                        if(firstVal[fid])
+
+                        if((*iterBands)->calcMean)
                         {
-                            statsData[fid][(*iterBands)->meanLocalIdx] = floatBandValues[(*iterBands)->band-1];
+                            if(firstVal[fid])
+                            {
+                                statsData[fid][(*iterBands)->meanLocalIdx] = floatBandValues[(*iterBands)->band-1];
+                            }
+                            else
+                            {
+                                statsData[fid][(*iterBands)->meanLocalIdx] += floatBandValues[(*iterBands)->band-1];
+                            }
                         }
-                        else
+
+                        if((*iterBands)->calcSum)
                         {
-                            statsData[fid][(*iterBands)->meanLocalIdx] += floatBandValues[(*iterBands)->band-1];
-                        }
-                    }
-                    
-                    if((*iterBands)->calcSum)
-                    {
-                        if(firstVal[fid])
-                        {
-                            statsData[fid][(*iterBands)->sumLocalIdx] = floatBandValues[(*iterBands)->band-1];
-                        }
-                        else
-                        {
-                            statsData[fid][(*iterBands)->sumLocalIdx] += floatBandValues[(*iterBands)->band-1];
+                            if(firstVal[fid])
+                            {
+                                statsData[fid][(*iterBands)->sumLocalIdx] = floatBandValues[(*iterBands)->band-1];
+                            }
+                            else
+                            {
+                                statsData[fid][(*iterBands)->sumLocalIdx] += floatBandValues[(*iterBands)->band-1];
+                            }
                         }
                     }
                 }
@@ -1313,13 +1336,15 @@ namespace rsgis{namespace rastergis{
         
     }
     
-    RSGISCalcClusterPxlValueStdDev::RSGISCalcClusterPxlValueStdDev(double **stdDevData, double **statsData, std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats, bool *firstVal, unsigned int ratBand) : rsgis::img::RSGISCalcImageValue(0)
+    RSGISCalcClusterPxlValueStdDev::RSGISCalcClusterPxlValueStdDev(double **stdDevData, double **statsData, std::vector<rsgis::rastergis::RSGISBandAttStats*> *bandStats, bool *firstVal, unsigned int ratBand, double *no_data_vals, bool *use_no_data_vals) : rsgis::img::RSGISCalcImageValue(0)
     {
         this->stdDevData = stdDevData;
         this->statsData = statsData;
         this->bandStats = bandStats;
         this->firstVal = firstVal;
         this->ratBand = ratBand;
+        this->no_data_vals = no_data_vals;
+        this->use_no_data_vals = use_no_data_vals;
     }
     
     void RSGISCalcClusterPxlValueStdDev::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) 
@@ -1331,16 +1356,24 @@ namespace rsgis{namespace rastergis{
             {
                 if((boost::math::isfinite)(floatBandValues[(*iterBands)->band-1]))
                 {
-                    if((*iterBands)->calcStdDev)
+                    bool useVal = true;
+                    if(this->use_no_data_vals[(*iterBands)->band-1] && (this->no_data_vals[(*iterBands)->band-1] == floatBandValues[(*iterBands)->band-1]))
                     {
-                        double stdDevComp = pow(((double)(floatBandValues[(*iterBands)->band-1] - statsData[fid][(*iterBands)->meanLocalIdx])), 2.0);
-                        if(firstVal[fid])
+                        useVal = false;
+                    }
+                    if(useVal)
+                    {
+                        if((*iterBands)->calcStdDev)
                         {
-                            stdDevData[fid][(*iterBands)->stdDevLocalIdx] = stdDevComp;
-                        }
-                        else
-                        {
-                            stdDevData[fid][(*iterBands)->stdDevLocalIdx] += stdDevComp;
+                            double stdDevComp = pow(((double)(floatBandValues[(*iterBands)->band-1] - statsData[fid][(*iterBands)->meanLocalIdx])), 2.0);
+                            if(firstVal[fid])
+                            {
+                                stdDevData[fid][(*iterBands)->stdDevLocalIdx] = stdDevComp;
+                            }
+                            else
+                            {
+                                stdDevData[fid][(*iterBands)->stdDevLocalIdx] += stdDevComp;
+                            }
                         }
                     }
                 }

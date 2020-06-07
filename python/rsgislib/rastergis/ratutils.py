@@ -1788,3 +1788,16 @@ A function to read a column of data from a RAT.
     rat.writeColumn(ratDataset, columnName, columnData)
     ratDataset = None
 
+
+def create_uid_col(clumps_img, col_name='UID'):
+    """
+    A function which adds a unique ID value (starting at 0) to each clump within a RAT.
+
+    :param clumps_img: Input clumps image
+    :param col_name: The output column name (default is UID).
+
+    """
+    n_rows = rsgislib.rastergis.getRATLength(clumps_img)
+    uid_col = numpy.arange(0, n_rows, 1, dtype=numpy.uint32)
+    setColumnData(clumps_img, col_name, uid_col)
+
