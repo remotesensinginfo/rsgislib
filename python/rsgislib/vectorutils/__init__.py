@@ -5234,3 +5234,39 @@ def vec_lyr_difference(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_f
     ds_in_vec = None
     ds_over_vec = None
 
+
+def spatial_select(vec_file, vec_lyr, vec_roi_file, vec_roi_lyr, out_vec_file, out_vec_lyr, out_format="GPKG"):
+    """
+    A function to perform a spatial selection within the input vector using a ROI vector layer.
+    This function uses geopandas so ensure that is installed.
+
+    :param vec_file: Input vector file from which features are selected.
+    :param vec_lyr: Input vector file layer from which features are selected.
+    :param vec_roi_file: The ROI vector file used to select features within the input file.
+    :param vec_roi_lyr: The ROI vector layer used to select features within the input file.
+    :param out_vec_file: The output vector file with the selected features.
+    :param out_vec_lyr: The output layer file with the selected features.
+    :param out_format: the output vector format
+
+    """
+    import geopandas
+    import numpy
+    import tqdm
+    base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
+    roi_gpdf = geopandas.read_file(vec_roi_file, layer=vec_roi_lyr)
+    base_gpdf['msk'] = numpy.zeros((base_gpdf.shape[0]), dtype=bool)
+    geoms = list()
+    for i in tqdm.tqdm(range(roi_gpdf.shape[0])):
+        inter = base_gpdf['geometry'].intersects(roi_gpdf.iloc[i]['geometry'])
+        base_gpdf.loc[inter, 'msk'] = True
+    base_gpdf = base_gpdf[base_gpdf['msk']]
+    base_gpdf = base_gpdf.drop(['msk'], axis=1)
+    if base_gpdf.shape[0] > 0:
+        if out_format == 'GPKG':
+            base_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+        else:
+            base_gpdf.to_file(out_vec_file, driver=out_format)
+    else:
+        raise Exception("No output file as no features intersect.")
+
+

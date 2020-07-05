@@ -757,6 +757,31 @@ class RSGISPyUtils (object):
         out_bbox[2] = bbox[2] - buf
         out_bbox[3] = bbox[3] + buf
         return out_bbox
+
+    def find_bbox_union(self, bboxes):
+        """
+        A function which finds the union of all the bboxes inputted.
+
+        :param bboxes: a list of bboxes [(xMin, xMax, yMin, yMax), (xMin, xMax, yMin, yMax)]
+        :return: bbox (xMin, xMax, yMin, yMax)
+
+        """
+        if len(bboxes) == 1:
+            out_bbox = list(bboxes[0])
+        elif len(bboxes) > 1:
+            out_bbox = list(bboxes[0])
+            for bbox in bboxes:
+                if bbox[0] < out_bbox[0]:
+                    out_bbox[0] = bbox[0]
+                if bbox[1] > out_bbox[1]:
+                    out_bbox[1] = bbox[1]
+                if bbox[2] < out_bbox[2]:
+                    out_bbox[2] = bbox[2]
+                if bbox[3] > out_bbox[3]:
+                    out_bbox[3] = bbox[3]
+        else:
+            out_bbox = None
+        return out_bbox
         
     def getVecLayerExtent(self, inVec, layerName=None, computeIfExp=True):
         """
@@ -999,7 +1024,7 @@ class RSGISPyUtils (object):
         Reproject a point from 'inProjOSRObj' to 'outProjOSRObj' where they are gdal
         osgeo.osr.SpatialReference objects. 
         
-        :return: x, y. (note if returning long, lat you might need to invert)
+        :return: x, y.
 
         """
         if inProjOSRObj.EPSGTreatsAsLatLong():
@@ -1557,6 +1582,76 @@ class RSGISPyUtils (object):
         if len(files) != 1:
             return None
         return files[0]
+
+    def find_files_ext(self, dir_path, ending):
+        """
+        Find all the files within a directory structure with a specific file ending.
+        The files are return as dictionary using the file name as the dictionary key.
+        This means you cannot have files with the same name within the structure.
+
+        :param dir_path: the base directory path within which to search.
+        :param ending: the file ending (e.g., .txt, or txt or .kea, kea).
+        :return: dict with file name as key
+
+        """
+        out_file_dict = dict()
+        for root, dirs, files in os.walk(dir_path):
+            for file in files:
+                if file.endswith(ending):
+                    file_found = os.path.join(root, file)
+                    if os.path.isfile(file_found):
+                        out_file_dict[file] = file_found
+        return out_file_dict
+
+    def find_files_mpaths_ext(self, dir_paths, ending):
+        """
+        Find all the files within a list of input directories and the structure beneath
+        with a specific file ending. The files are return as dictionary using the file
+        name as the dictionary key. This means you cannot have files with the same name
+        within the structure.
+
+        :param dir_path: the base directory path within which to search.
+        :param ending: the file ending (e.g., .txt, or txt or .kea, kea).
+        :return: dict with file name as key
+
+        """
+        out_file_dict = dict()
+        for dir_path in dir_paths:
+            for root, dirs, files in os.walk(dir_path):
+                for file in files:
+                    if file.endswith(ending):
+                        file_found = os.path.join(root, file)
+                        if os.path.isfile(file_found):
+                            out_file_dict[file] = file_found
+        return out_file_dict
+
+    def find_first_file(self, dirPath, fileSearch, rtn_except=True):
+        """
+        Search for a single file with a path using glob. Therefore, the file
+        path returned is a true path. Within the fileSearch provide the file
+        name with '*' as wildcard(s).
+        :param dirPath: The directory within which to search, note that the search will be within
+                        sub-directories within the base directory until a file meeting the search
+                        criteria are met.
+        :param fileSearch: The file search string in the file name and must contain a wild character (i.e., *).
+        :param rtn_except: if True then an exception will be raised if no file or multiple files are found (default).
+                           If False then None will be returned rather than an exception raised.
+        :return: The file found (or None if rtn_except=False)
+
+        """
+        import glob
+        files = None
+        for root, dirs, files in os.walk(dirPath):
+            files = glob.glob(os.path.join(root, fileSearch))
+            if len(files) > 0:
+                break
+        out_file = None
+        if (files is not None) and (len(files) == 1):
+            out_file = files[0]
+        elif rtn_except:
+            raise Exception("Could not find a single file ({0}) in {1}; "
+                            "found {2} files.".format(fileSearch, dirPath, len(files)))
+        return out_file
 
     def createVarList(self, in_vals_lsts, val_dict=None):
         """
