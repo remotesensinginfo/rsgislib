@@ -5254,13 +5254,13 @@ def spatial_select(vec_file, vec_lyr, vec_roi_file, vec_roi_lyr, out_vec_file, o
     import tqdm
     base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
     roi_gpdf = geopandas.read_file(vec_roi_file, layer=vec_roi_lyr)
-    base_gpdf['msk'] = numpy.zeros((base_gpdf.shape[0]), dtype=bool)
+    base_gpdf['msk_rsgis_sel'] = numpy.zeros((base_gpdf.shape[0]), dtype=bool)
     geoms = list()
     for i in tqdm.tqdm(range(roi_gpdf.shape[0])):
         inter = base_gpdf['geometry'].intersects(roi_gpdf.iloc[i]['geometry'])
-        base_gpdf.loc[inter, 'msk'] = True
-    base_gpdf = base_gpdf[base_gpdf['msk']]
-    base_gpdf = base_gpdf.drop(['msk'], axis=1)
+        base_gpdf.loc[inter, 'msk_rsgis_sel'] = True
+    base_gpdf = base_gpdf[base_gpdf['msk_rsgis_sel']]
+    base_gpdf = base_gpdf.drop(['msk_rsgis_sel'], axis=1)
     if base_gpdf.shape[0] > 0:
         if out_format == 'GPKG':
             base_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
@@ -5268,5 +5268,104 @@ def spatial_select(vec_file, vec_lyr, vec_roi_file, vec_roi_lyr, out_vec_file, o
             base_gpdf.to_file(out_vec_file, driver=out_format)
     else:
         raise Exception("No output file as no features intersect.")
+
+
+def split_by_attribute(vec_file, vec_lyr, split_col_name, multi_layers=True, out_vec_file=None, out_file_path=None,
+                       out_file_ext=None, out_format="GPKG", dissolve=False):
+    """
+    A function which splits a vector layer by an attribute value into either different layers or different output
+    files.
+
+    :param vec_file: Input vector file
+    :param vec_lyr: Input vector layer
+    :param split_col_name: The column name by which the vector layer will be split.
+    :param multi_layers: Boolean (default True). If True then a mulitple layer output file will be created (e.g., GPKG).
+                         If False then individual files will be outputted.
+    :param out_vec_file: Output vector file - only used if multi_layers = True
+    :param out_file_path: Output file path (directory) if multi_layers = False.
+    :param out_file_ext: Output file extension is multi_layers = False
+    :param out_format: The output format (e.g., GPKG, ESRI Shapefile).
+    :param dissolve: Boolean (Default=False) if True then a dissolve on the specified variable will be run
+                     as layers are separated.
+
+    """
+
+    import geopandas
+    import tqdm
+    import os
+    if multi_layers:
+        if out_vec_file is None:
+            raise Exception("If a multiple layer output is specified then an output file needs to be specified "
+                            "to which the layer need to be added.")
+    if not multi_layers:
+        if (out_file_path is None) or (out_file_ext is None):
+            raise Exception("If a single layer output is specified then an output file path "
+                            "and file extention needs to be specified.")
+
+    base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
+    unq_col = base_gpdf[split_col_name]
+    unq_vals = unq_col.unique()
+
+    for val in tqdm.tqdm(unq_vals):
+        # Subset to value.
+        c_gpdf = base_gpdf.loc[base_gpdf[split_col_name] == val]
+        # Check for empty or NA geometries.
+        c_gpdf = c_gpdf[~c_gpdf.is_empty]
+        c_gpdf = c_gpdf[~c_gpdf.isna()]
+        # Dissolve if requested.
+        if dissolve:
+            # Test resolve if an error thrown then it it probably a topological error which
+            # can sometimes be solved using a 0 buffer, so try that to see if it works.
+            try:
+                c_gpdf.dissolve(by=split_col_name)
+            except:
+                c_gpdf['geometry'] = c_gpdf.buffer(0)
+                c_gpdf = c_gpdf.dissolve(by=split_col_name)
+        # Write output to disk.
+        if multi_layers and (out_format == 'GPKG'):
+            c_gpdf.to_file(out_vec_file, layer=val, driver='GPKG')
+        else:
+            out_vec_file = os.path.join(out_file_path, "vec_{}.{}".format(val, out_file_ext))
+            out_vec_lyr = "vec_{}".format(val)
+            if out_format == 'GPKG':
+                c_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+            else:
+                c_gpdf.to_file(out_vec_file, driver=out_format)
+
+
+def subset_by_attribute(vec_file, vec_lyr, sub_col, sub_vals, out_vec_file, out_vec_lyr, out_format="GPKG"):
+    """
+    A function which subsets an input vector layer based on a list of values.
+
+    :param vec_file: Input vector file.
+    :param vec_lyr: Input vector layer
+    :param sub_col: The column used to subset the layer.
+    :param sub_vals: A value of values used to subset the layer.
+    :param out_vec_file: The output vector file
+    :param out_vec_lyr: The output vector layer
+    :param out_format: The output vector format.
+
+    """
+    import geopandas
+    import pandas
+    base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
+
+    first = True
+    for val in sub_vals:
+        print(val)
+        tmp_gpdf = base_gpdf[base_gpdf[sub_col] == val]
+        if first:
+            out_gpdf = tmp_gpdf.copy(deep=True)
+            first = False
+        else:
+            out_gpdf = pandas.concat([out_gpdf, tmp_gpdf])
+
+    if out_gpdf.shape[0] > 0:
+        if out_format == 'GPKG':
+            out_gpdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+        else:
+            out_gpdf.to_file(out_vec_file, driver=out_format)
+    else:
+        raise Exception("No output file as no features selected.")
 
 
