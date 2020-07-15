@@ -5271,7 +5271,7 @@ def spatial_select(vec_file, vec_lyr, vec_roi_file, vec_roi_lyr, out_vec_file, o
 
 
 def split_by_attribute(vec_file, vec_lyr, split_col_name, multi_layers=True, out_vec_file=None, out_file_path=None,
-                       out_file_ext=None, out_format="GPKG", dissolve=False):
+                       out_file_ext=None, out_format="GPKG", dissolve=False, chk_lyr_names=True):
     """
     A function which splits a vector layer by an attribute value into either different layers or different output
     files.
@@ -5287,9 +5287,10 @@ def split_by_attribute(vec_file, vec_lyr, split_col_name, multi_layers=True, out
     :param out_format: The output format (e.g., GPKG, ESRI Shapefile).
     :param dissolve: Boolean (Default=False) if True then a dissolve on the specified variable will be run
                      as layers are separated.
+    :param chk_lyr_names: If True (default) layer names (from split_col_name) will be checked, which means
+                          punctuation removed and all characters being ascii characters.
 
     """
-
     import geopandas
     import tqdm
     import os
@@ -5301,6 +5302,8 @@ def split_by_attribute(vec_file, vec_lyr, split_col_name, multi_layers=True, out
         if (out_file_path is None) or (out_file_ext is None):
             raise Exception("If a single layer output is specified then an output file path "
                             "and file extention needs to be specified.")
+
+    rsgis_utils = rsgislib.RSGISPyUtils()
 
     base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
     unq_col = base_gpdf[split_col_name]
@@ -5323,8 +5326,12 @@ def split_by_attribute(vec_file, vec_lyr, split_col_name, multi_layers=True, out
                 c_gpdf = c_gpdf.dissolve(by=split_col_name)
         # Write output to disk.
         if multi_layers and (out_format == 'GPKG'):
+            if chk_lyr_names:
+                val = rsgis_utils.check_str(val, rm_non_ascii=True, rm_dashs=True, rm_spaces=False, rm_punc=True)
             c_gpdf.to_file(out_vec_file, layer=val, driver='GPKG')
         else:
+            if chk_lyr_names:
+                val = rsgis_utils.check_str(val, rm_non_ascii=True, rm_dashs=True, rm_spaces=False, rm_punc=True)
             out_vec_file = os.path.join(out_file_path, "vec_{}.{}".format(val, out_file_ext))
             out_vec_lyr = "vec_{}".format(val)
             if out_format == 'GPKG':
@@ -5333,27 +5340,45 @@ def split_by_attribute(vec_file, vec_lyr, split_col_name, multi_layers=True, out
                 c_gpdf.to_file(out_vec_file, driver=out_format)
 
 
-def subset_by_attribute(vec_file, vec_lyr, sub_col, sub_vals, out_vec_file, out_vec_lyr, out_format="GPKG"):
+def subset_by_attribute(vec_file, vec_lyr, sub_col, sub_vals, out_vec_file, out_vec_lyr, out_format="GPKG",
+                        match_type='equals'):
     """
     A function which subsets an input vector layer based on a list of values.
 
     :param vec_file: Input vector file.
     :param vec_lyr: Input vector layer
     :param sub_col: The column used to subset the layer.
-    :param sub_vals: A value of values used to subset the layer.
+    :param sub_vals: A list of values used to subset the layer. If using contains or start then regular expressions
+                     supported by the re library can be provided.
     :param out_vec_file: The output vector file
     :param out_vec_lyr: The output vector layer
     :param out_format: The output vector format.
+    :param match_type: The type of match for the subset. Options: equals (default) - the same value.
+                       contains - string is anywhere within attribute value.
+                       start - string matches the start of the attribute value.
 
     """
     import geopandas
     import pandas
+
+    match_type = match_type.lower()
+    if match_type not in ['equals', 'contains', 'start']:
+        raise Exception("The match_type must be either 'equals', 'contains' or 'start'")
+
     base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
 
     first = True
     for val in sub_vals:
         print(val)
-        tmp_gpdf = base_gpdf[base_gpdf[sub_col] == val]
+        if match_type == 'equals':
+            tmp_gpdf = base_gpdf[base_gpdf[sub_col] == val]
+        elif match_type == 'contains':
+            tmp_gpdf = base_gpdf[base_gpdf[sub_col].str.contains(val, na=False)]
+        elif match_type == 'start':
+            tmp_gpdf = base_gpdf[base_gpdf[sub_col].str.match(val, na=False)]
+        else:
+            raise Exception("The match_type must be either 'equals', 'contains' or 'start'")
+
         if first:
             out_gpdf = tmp_gpdf.copy(deep=True)
             first = False
@@ -5369,3 +5394,19 @@ def subset_by_attribute(vec_file, vec_lyr, sub_col, sub_vals, out_vec_file, out_
         raise Exception("No output file as no features selected.")
 
 
+def get_unq_col_values(vec_file, vec_lyr, col_name):
+    """
+    A function which splits a vector layer by an attribute value into either different layers or different output
+    files.
+
+    :param vec_file: Input vector file
+    :param vec_lyr: Input vector layer
+    :param col_name: The column name for which a list of unique values will be returned.
+
+    """
+    import geopandas
+
+    base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
+    unq_vals = base_gpdf[col_name].unique()
+    base_gpdf = None
+    return unq_vals
