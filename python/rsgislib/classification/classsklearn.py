@@ -194,7 +194,7 @@ This function trains the classifier.
 
 
 def apply_sklearn_classifer(classTrainInfo, skClassifier, imgMask, imgMaskVal, imgFileInfo, outputImg, gdalformat,
-                            classClrNames=True):
+                            classClrNames=True, outScoreImg=None):
     """
 This function uses a trained classifier and applies it to the provided input image.
 
@@ -215,8 +215,13 @@ This function uses a trained classifier and applies it to the provided input ima
 :param gdalformat: is the output image format - all GDAL supported formats are supported.
 :param classClrNames: default is True and therefore a colour table will the colours specified in classTrainInfo
                       and a ClassName column (from imgFileInfo) will be added to the output file.
+:param outScoreImg: A file path for a score image. If None then not outputted.
 
     """
+    out_score_img = False
+    if outScoreImg is not None:
+        out_score_img = True
+
     infiles = applier.FilenameAssociations()
     infiles.imageMask = imgMask
     numClassVars = 0
@@ -226,11 +231,15 @@ This function uses a trained classifier and applies it to the provided input ima
 
     outfiles = applier.FilenameAssociations()
     outfiles.outimage = outputImg
+    if out_score_img:
+        outfiles.out_score_img = outScoreImg
     otherargs = applier.OtherInputs()
     otherargs.classifier = skClassifier
     otherargs.mskVal = imgMaskVal
     otherargs.numClassVars = numClassVars
+    otherargs.n_classes = len(classTrainInfo)
     otherargs.imgFileInfo = imgFileInfo
+    otherargs.out_score_img = out_score_img
 
     try:
         import tqdm
@@ -250,8 +259,15 @@ This function uses a trained classifier and applies it to the provided input ima
         Internal function for rios applier. Used within applyClassifer.
         """
         outClassVals = numpy.zeros_like(inputs.imageMask, dtype=numpy.uint32)
+
+        if otherargs.out_score_img:
+            outScoreVals = numpy.zeros((otherargs.n_classes, inputs.imageMask.shape[1], inputs.imageMask.shape[2]),
+                                       dtype=numpy.float32)
+
         if numpy.any(inputs.imageMask == otherargs.mskVal):
             outClassVals = outClassVals.flatten()
+            if otherargs.out_score_img:
+                outScoreVals = outScoreVals.reshape(outClassVals.shape[0], otherargs.n_classes)
             imgMaskVals = inputs.imageMask.flatten()
             classVars = numpy.zeros((outClassVals.shape[0], otherargs.numClassVars), dtype=numpy.float)
             # Array index which can be used to populate the output array following masking etc.
@@ -268,12 +284,22 @@ This function uses a trained classifier and applies it to the provided input ima
             outClassVals[ID] = predClass
             outClassVals = numpy.expand_dims(
                 outClassVals.reshape((inputs.imageMask.shape[1], inputs.imageMask.shape[2])), axis=0)
+            if otherargs.out_score_img:
+                predClassScore = otherargs.classifier.predict_proba(classVars)
+                outScoreVals[ID] = predClassScore
+                outScoreVals = outScoreVals.T
+                outScoreVals = outScoreVals.reshape(
+                        (otherargs.n_classes, inputs.imageMask.shape[1], inputs.imageMask.shape[2]))
         outputs.outimage = outClassVals
+        if otherargs.out_score_img:
+            outputs.out_score_img = outScoreVals
 
     print("Applying the Classifier")
     applier.apply(_applySKClassifier, infiles, outfiles, otherargs, controls=aControls)
     print("Completed")
     rsgislib.rastergis.populateStats(clumps=outputImg, addclrtab=True, calcpyramids=True, ignorezero=True)
+    if out_score_img:
+        rsgislib.imageutils.popImageStats(outScoreImg, usenodataval=True, nodataval=0, calcpyramids=True)
 
     if classClrNames:
         ratDataset = gdal.Open(outputImg, gdal.GA_Update)
