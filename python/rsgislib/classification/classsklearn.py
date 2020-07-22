@@ -215,7 +215,10 @@ This function uses a trained classifier and applies it to the provided input ima
 :param gdalformat: is the output image format - all GDAL supported formats are supported.
 :param classClrNames: default is True and therefore a colour table will the colours specified in classTrainInfo
                       and a ClassName column (from imgFileInfo) will be added to the output file.
-:param outScoreImg: A file path for a score image. If None then not outputted.
+:param outScoreImg: A file path for a score image. If None then not outputted. Note, this function uses the
+                    predict_proba() function from the scikit-learn model which isn't available for all classifiers
+                    and therefore might produce an error if called on a model which doesn't have this function. For
+                    example, sklearn.svm.SVC.  
 
     """
     out_score_img = False
