@@ -680,7 +680,7 @@ class RSGISPyUtils (object):
         A function which tests whether two bboxes (MinX, MaxX, MinY, MaxY) intersect.
 
         :param bbox1: The first bounding box (MinX, MaxX, MinY, MaxY)
-        :param bbox2: The first bounding box (MinX, MaxX, MinY, MaxY)
+        :param bbox2: The second bounding box (MinX, MaxX, MinY, MaxY)
         :return: boolean (True they intersect; False they do not intersect)
 
         """
@@ -691,6 +691,34 @@ class RSGISPyUtils (object):
         intersect = ((bbox1[x_max] > bbox2[x_min]) and (bbox2[x_max] > bbox1[x_min]) and (
                     bbox1[y_max] > bbox2[y_min]) and (bbox2[y_max] > bbox1[y_min]))
         return intersect
+
+    def does_bbox_contain(self, bbox1, bbox2):
+        """
+        A function which tests whether bbox1 contains bbox2.
+
+        :param bbox1: The first bounding box (MinX, MaxX, MinY, MaxY)
+        :param bbox2: The second bounding box (MinX, MaxX, MinY, MaxY)
+        :return: boolean (True bbox1 contains bbox2; False bbox1 does not contain bbox2)
+
+        """
+        x_min = 0
+        x_max = 1
+        y_min = 2
+        y_max = 3
+        contains = ((bbox1[x_min] < bbox2[x_min]) and (bbox1[x_max] > bbox2[x_max]) and (
+                    bbox1[y_min] < bbox2[y_min]) and (bbox1[y_max] > bbox2[y_max]))
+        return contains
+
+    def calc_bbox_area(self, bbox):
+        """
+        Calculate the area of the bbox.
+
+        :param bbox: bounding box (MinX, MaxX, MinY, MaxY)
+        :return: area in projection of the bbox.
+
+        """
+        # width x height
+        return (bbox[1] - bbox[0]) * (bbox[3] - bbox[2])
 
     def bbox_intersection(self, bbox1, bbox2):
         """

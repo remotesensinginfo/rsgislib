@@ -85,6 +85,26 @@ Return EPSG code for given UTM zone and hemisphere using WGS84 datum.
     return int(32000 + ns + zone)
 
 
+def utm_from_epsg(epsg_code):
+    """
+Return UTM zone and hemisphere from a EPSG code using WGS84 datum.
+
+:param epsg_code: epsg code for the UTM projection.
+:return: zone, hemisphere
+
+"""
+    h_zone = epsg_code - 32000
+
+    if h_zone < 700:
+        hemisphere = 'N'
+        zone = h_zone - 600
+    else:
+        hemisphere = 'S'
+        zone = h_zone - 700
+
+    return zone, hemisphere
+
+
 def split_wgs84_bbox_utm_zones(wgs84_bbox):
     """
 Function which splits a bounding box (MinX, MaxX, MinY, MaxY) into

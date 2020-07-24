@@ -5410,3 +5410,399 @@ def get_unq_col_values(vec_file, vec_lyr, col_name):
     unq_vals = base_gpdf[col_name].unique()
     base_gpdf = None
     return unq_vals
+
+
+def vec_intersects_vec(vec_base_file, vec_base_lyr, vec_comp_file, vec_comp_lyr):
+    """
+    Function to test whether the comparison vector layer intersects with the
+    base vector layer.
+
+    Note. This function iterates through the geometries of both files performing
+    a comparison and therefore can be very slow to execute for large vector files.
+
+    :param vec_base_file: vector layer file used as the base layer
+    :param vec_base_lyr: vector layer used as the base layer
+    :param vec_comp_file: vector layer file used as the comparison layer
+    :param vec_comp_lyr: vector layer used as the comparison layer
+    :return: boolean
+
+    """
+    import osgeo.gdal as gdal
+    import tqdm
+
+    gdal.UseExceptions()
+
+    dsVecBaseObj = gdal.OpenEx(vec_base_file, gdal.OF_READONLY)
+    if dsVecBaseObj is None:
+        raise Exception("Could not open '{}'".format(vec_base_file))
+
+    lyrVecBaseObj = dsVecBaseObj.GetLayerByName(vec_base_lyr)
+    if lyrVecBaseObj is None:
+        raise Exception("Could not find layer '{}'".format(vec_base_lyr))
+
+    dsVecCompObj = gdal.OpenEx(vec_comp_file, gdal.OF_READONLY)
+    if dsVecCompObj is None:
+        raise Exception("Could not open '{}'".format(vec_comp_file))
+
+    lyrVecCompObj = dsVecCompObj.GetLayerByName(vec_comp_lyr)
+    if lyrVecCompObj is None:
+        raise Exception("Could not find layer '{}'".format(vec_comp_lyr))
+
+    n_feats = lyrVecBaseObj.GetFeatureCount(True)
+    pbar = tqdm.tqdm(total=n_feats)
+    does_intersect = False
+    lyrVecBaseObj.ResetReading()
+    base_feat = lyrVecBaseObj.GetNextFeature()
+    while base_feat is not None:
+        base_geom = base_feat.GetGeometryRef()
+        if base_geom is not None:
+            lyrVecCompObj.ResetReading()
+            comp_feat = lyrVecCompObj.GetNextFeature()
+            while comp_feat is not None:
+                comp_geom = comp_feat.GetGeometryRef()
+                if comp_geom is not None:
+                    if base_geom.Intersects(comp_geom):
+                        does_intersect = True
+                        break
+                comp_feat = lyrVecCompObj.GetNextFeature()
+        if does_intersect:
+            break
+        pbar.update(1)
+        base_feat = lyrVecBaseObj.GetNextFeature()
+
+    dsVecBaseObj = None
+    dsVecCompObj = None
+
+    return does_intersect
+
+
+def vec_overlaps_vec(vec_base_file, vec_base_lyr, vec_comp_file, vec_comp_lyr):
+    """
+    Function to test whether the comparison vector layer overlaps with the
+    base vector layer.
+
+    Note. This function iterates through the geometries of both files performing
+    a comparison and therefore can be very slow to execute for large vector files.
+
+    :param vec_base_file: vector layer file used as the base layer
+    :param vec_base_lyr: vector layer used as the base layer
+    :param vec_comp_file: vector layer file used as the comparison layer
+    :param vec_comp_lyr: vector layer used as the comparison layer
+    :return: boolean
+
+    """
+    import osgeo.gdal as gdal
+    import tqdm
+
+    gdal.UseExceptions()
+
+    dsVecBaseObj = gdal.OpenEx(vec_base_file, gdal.OF_READONLY)
+    if dsVecBaseObj is None:
+        raise Exception("Could not open '{}'".format(vec_base_file))
+
+    lyrVecBaseObj = dsVecBaseObj.GetLayerByName(vec_base_lyr)
+    if lyrVecBaseObj is None:
+        raise Exception("Could not find layer '{}'".format(vec_base_lyr))
+
+    dsVecCompObj = gdal.OpenEx(vec_comp_file, gdal.OF_READONLY)
+    if dsVecCompObj is None:
+        raise Exception("Could not open '{}'".format(vec_comp_file))
+
+    lyrVecCompObj = dsVecCompObj.GetLayerByName(vec_comp_lyr)
+    if lyrVecCompObj is None:
+        raise Exception("Could not find layer '{}'".format(vec_comp_lyr))
+
+    n_feats = lyrVecBaseObj.GetFeatureCount(True)
+    pbar = tqdm.tqdm(total=n_feats)
+    does_overlap = False
+    lyrVecBaseObj.ResetReading()
+    base_feat = lyrVecBaseObj.GetNextFeature()
+    while base_feat is not None:
+        base_geom = base_feat.GetGeometryRef()
+        if base_geom is not None:
+            lyrVecCompObj.ResetReading()
+            comp_feat = lyrVecCompObj.GetNextFeature()
+            while comp_feat is not None:
+                comp_geom = comp_feat.GetGeometryRef()
+                if comp_geom is not None:
+                    if comp_geom.Overlaps(base_geom):
+                        does_overlap = True
+                        break
+                comp_feat = lyrVecCompObj.GetNextFeature()
+        if does_overlap:
+            break
+        pbar.update(1)
+        base_feat = lyrVecBaseObj.GetNextFeature()
+
+    dsVecBaseObj = None
+    dsVecCompObj = None
+
+    return does_overlap
+
+
+def vec_within_vec(vec_base_file, vec_base_lyr, vec_comp_file, vec_comp_lyr):
+    """
+    Function to test whether the comparison vector layer within with the
+    base vector layer.
+
+    Note. This function iterates through the geometries of both files performing
+    a comparison and therefore can be very slow to execute for large vector files.
+
+    :param vec_base_file: vector layer file used as the base layer
+    :param vec_base_lyr: vector layer used as the base layer
+    :param vec_comp_file: vector layer file used as the comparison layer
+    :param vec_comp_lyr: vector layer used as the comparison layer
+    :return: boolean
+
+    """
+    import osgeo.gdal as gdal
+    import tqdm
+
+    gdal.UseExceptions()
+
+    dsVecBaseObj = gdal.OpenEx(vec_base_file, gdal.OF_READONLY)
+    if dsVecBaseObj is None:
+        raise Exception("Could not open '{}'".format(vec_base_file))
+
+    lyrVecBaseObj = dsVecBaseObj.GetLayerByName(vec_base_lyr)
+    if lyrVecBaseObj is None:
+        raise Exception("Could not find layer '{}'".format(vec_base_lyr))
+
+    dsVecCompObj = gdal.OpenEx(vec_comp_file, gdal.OF_READONLY)
+    if dsVecCompObj is None:
+        raise Exception("Could not open '{}'".format(vec_comp_file))
+
+    lyrVecCompObj = dsVecCompObj.GetLayerByName(vec_comp_lyr)
+    if lyrVecCompObj is None:
+        raise Exception("Could not find layer '{}'".format(vec_comp_lyr))
+
+    n_feats = lyrVecCompObj.GetFeatureCount(True)
+    pbar = tqdm.tqdm(total=n_feats)
+    is_within = True
+
+    lyrVecCompObj.ResetReading()
+    comp_feat = lyrVecCompObj.GetNextFeature()
+    while comp_feat is not None:
+        comp_geom = comp_feat.GetGeometryRef()
+        comp_feat_within = False
+        if comp_geom is not None:
+            lyrVecBaseObj.ResetReading()
+            base_feat = lyrVecBaseObj.GetNextFeature()
+            while base_feat is not None:
+                base_geom = base_feat.GetGeometryRef()
+                if base_geom is not None:
+                    if comp_geom.Within(base_geom):
+                        comp_feat_within = True
+                        break
+                base_feat = lyrVecBaseObj.GetNextFeature()
+
+        if not comp_feat_within:
+            is_within = False
+            break
+        pbar.update(1)
+        comp_feat = lyrVecCompObj.GetNextFeature()
+
+    dsVecBaseObj = None
+    dsVecCompObj = None
+
+    return is_within
+
+
+def vec_contains_vec(vec_base_file, vec_base_lyr, vec_comp_file, vec_comp_lyr):
+    """
+    Function to test whether the base vector layer contains with the
+    comparison vector layer.
+
+    Note. This function iterates through the geometries of both files performing
+    a comparison and therefore can be very slow to execute for large vector files.
+
+    :param vec_base_file: vector layer file used as the base layer
+    :param vec_base_lyr: vector layer used as the base layer
+    :param vec_comp_file: vector layer file used as the comparison layer
+    :param vec_comp_lyr: vector layer used as the comparison layer
+    :return: boolean
+
+    """
+    import osgeo.gdal as gdal
+    import tqdm
+
+    gdal.UseExceptions()
+
+    dsVecBaseObj = gdal.OpenEx(vec_base_file, gdal.OF_READONLY)
+    if dsVecBaseObj is None:
+        raise Exception("Could not open '{}'".format(vec_base_file))
+
+    lyrVecBaseObj = dsVecBaseObj.GetLayerByName(vec_base_lyr)
+    if lyrVecBaseObj is None:
+        raise Exception("Could not find layer '{}'".format(vec_base_lyr))
+
+    dsVecCompObj = gdal.OpenEx(vec_comp_file, gdal.OF_READONLY)
+    if dsVecCompObj is None:
+        raise Exception("Could not open '{}'".format(vec_comp_file))
+
+    lyrVecCompObj = dsVecCompObj.GetLayerByName(vec_comp_lyr)
+    if lyrVecCompObj is None:
+        raise Exception("Could not find layer '{}'".format(vec_comp_lyr))
+
+    n_feats = lyrVecCompObj.GetFeatureCount(True)
+    pbar = tqdm.tqdm(total=n_feats)
+    does_contain = True
+
+    lyrVecCompObj.ResetReading()
+    comp_feat = lyrVecCompObj.GetNextFeature()
+    while comp_feat is not None:
+        comp_geom = comp_feat.GetGeometryRef()
+        comp_feat_contained = False
+        if comp_geom is not None:
+            lyrVecBaseObj.ResetReading()
+            base_feat = lyrVecBaseObj.GetNextFeature()
+            while base_feat is not None:
+                base_geom = base_feat.GetGeometryRef()
+                if base_geom is not None:
+                    if base_geom.Contains(comp_geom):
+                        comp_feat_contained = True
+                        break
+                base_feat = lyrVecBaseObj.GetNextFeature()
+
+        if not comp_feat_contained:
+            does_contain = False
+            break
+        pbar.update(1)
+        comp_feat = lyrVecCompObj.GetNextFeature()
+
+    dsVecBaseObj = None
+    dsVecCompObj = None
+
+    return does_contain
+
+
+def vec_touches_vec(vec_base_file, vec_base_lyr, vec_comp_file, vec_comp_lyr):
+    """
+    Function to test whether the comparison vector layer touches the
+    base vector layer.
+
+    Note. This function iterates through the geometries of both files performing
+    a comparison and therefore can be very slow to execute for large vector files.
+
+    :param vec_base_file: vector layer file used as the base layer
+    :param vec_base_lyr: vector layer used as the base layer
+    :param vec_comp_file: vector layer file used as the comparison layer
+    :param vec_comp_lyr: vector layer used as the comparison layer
+    :return: boolean
+
+    """
+    import osgeo.gdal as gdal
+    import tqdm
+
+    gdal.UseExceptions()
+
+    dsVecBaseObj = gdal.OpenEx(vec_base_file, gdal.OF_READONLY)
+    if dsVecBaseObj is None:
+        raise Exception("Could not open '{}'".format(vec_base_file))
+
+    lyrVecBaseObj = dsVecBaseObj.GetLayerByName(vec_base_lyr)
+    if lyrVecBaseObj is None:
+        raise Exception("Could not find layer '{}'".format(vec_base_lyr))
+
+    dsVecCompObj = gdal.OpenEx(vec_comp_file, gdal.OF_READONLY)
+    if dsVecCompObj is None:
+        raise Exception("Could not open '{}'".format(vec_comp_file))
+
+    lyrVecCompObj = dsVecCompObj.GetLayerByName(vec_comp_lyr)
+    if lyrVecCompObj is None:
+        raise Exception("Could not find layer '{}'".format(vec_comp_lyr))
+
+    n_feats = lyrVecBaseObj.GetFeatureCount(True)
+    pbar = tqdm.tqdm(total=n_feats)
+    does_touch = False
+
+    lyrVecBaseObj.ResetReading()
+    base_feat = lyrVecBaseObj.GetNextFeature()
+    while base_feat is not None:
+        base_geom = base_feat.GetGeometryRef()
+        if base_geom is not None:
+            lyrVecCompObj.ResetReading()
+            comp_feat = lyrVecCompObj.GetNextFeature()
+            while comp_feat is not None:
+                comp_geom = comp_feat.GetGeometryRef()
+                if comp_geom is not None:
+                    if comp_geom.Touches(base_geom):
+                        does_touch = True
+                        break
+                comp_feat = lyrVecCompObj.GetNextFeature()
+        if does_touch:
+            break
+        pbar.update(1)
+        base_feat = lyrVecBaseObj.GetNextFeature()
+
+    dsVecBaseObj = None
+    dsVecCompObj = None
+
+    return does_touch
+
+
+def vec_crosses_vec(vec_base_file, vec_base_lyr, vec_comp_file, vec_comp_lyr):
+    """
+    Function to test whether the comparison vector layer touches the
+    base vector layer.
+
+    Note. This function iterates through the geometries of both files performing
+    a comparison and therefore can be very slow to execute for large vector files.
+
+    :param vec_base_file: vector layer file used as the base layer
+    :param vec_base_lyr: vector layer used as the base layer
+    :param vec_comp_file: vector layer file used as the comparison layer
+    :param vec_comp_lyr: vector layer used as the comparison layer
+    :return: boolean
+
+    """
+    import osgeo.gdal as gdal
+    import tqdm
+
+    gdal.UseExceptions()
+
+    dsVecBaseObj = gdal.OpenEx(vec_base_file, gdal.OF_READONLY)
+    if dsVecBaseObj is None:
+        raise Exception("Could not open '{}'".format(vec_base_file))
+
+    lyrVecBaseObj = dsVecBaseObj.GetLayerByName(vec_base_lyr)
+    if lyrVecBaseObj is None:
+        raise Exception("Could not find layer '{}'".format(vec_base_lyr))
+
+    dsVecCompObj = gdal.OpenEx(vec_comp_file, gdal.OF_READONLY)
+    if dsVecCompObj is None:
+        raise Exception("Could not open '{}'".format(vec_comp_file))
+
+    lyrVecCompObj = dsVecCompObj.GetLayerByName(vec_comp_lyr)
+    if lyrVecCompObj is None:
+        raise Exception("Could not find layer '{}'".format(vec_comp_lyr))
+
+    n_feats = lyrVecBaseObj.GetFeatureCount(True)
+    pbar = tqdm.tqdm(total=n_feats)
+    does_cross = False
+
+    lyrVecBaseObj.ResetReading()
+    base_feat = lyrVecBaseObj.GetNextFeature()
+    while base_feat is not None:
+        base_geom = base_feat.GetGeometryRef()
+        if base_geom is not None:
+            lyrVecCompObj.ResetReading()
+            comp_feat = lyrVecCompObj.GetNextFeature()
+            while comp_feat is not None:
+                comp_geom = comp_feat.GetGeometryRef()
+                if comp_geom is not None:
+                    if comp_geom.Crosses(base_geom):
+                        does_cross = True
+                        break
+                comp_feat = lyrVecCompObj.GetNextFeature()
+        if does_cross:
+            break
+        pbar.update(1)
+        base_feat = lyrVecBaseObj.GetNextFeature()
+
+    dsVecBaseObj = None
+    dsVecCompObj = None
+
+    return does_cross
+
+

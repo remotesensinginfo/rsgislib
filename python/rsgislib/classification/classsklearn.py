@@ -218,7 +218,7 @@ This function uses a trained classifier and applies it to the provided input ima
 :param outScoreImg: A file path for a score image. If None then not outputted. Note, this function uses the
                     predict_proba() function from the scikit-learn model which isn't available for all classifiers
                     and therefore might produce an error if called on a model which doesn't have this function. For
-                    example, sklearn.svm.SVC.  
+                    example, sklearn.svm.SVC.
 
     """
     out_score_img = False
