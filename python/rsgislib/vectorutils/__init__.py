@@ -5806,3 +5806,95 @@ def vec_crosses_vec(vec_base_file, vec_base_lyr, vec_comp_file, vec_comp_lyr):
     return does_cross
 
 
+def merge_vector_files(input_files, output_file, output_lyr=None, out_format='GPKG', out_epsg=None):
+    """
+    A function which merges the input files into a single output file using geopandas. If the input files
+    have multiple layers they are all merged into the output file.
+
+    :param input_files: list of input files
+    :param output_file: output vector file.
+    :param output_lyr: output vector layer.
+    :param out_format: output file format.
+    :param out_epsg: if input layers are different projections then option can be used to define the output
+                     projection.
+
+    """
+    import tqdm
+    import geopandas
+    first = True
+    for vec_file in tqdm.tqdm(input_files):
+        lyrs = rsgislib.vectorutils.getVecLyrsLst(vec_file)
+        for lyr in lyrs:
+            if first:
+                data_gdf = geopandas.read_file(vec_file, layer=lyr)
+                if out_epsg is not None:
+                    data_gdf = data_gdf.to_crs(epsg=out_epsg)
+                first = False
+            else:
+                tmp_data_gdf = geopandas.read_file(vec_file, layer=lyr)
+                if out_epsg is not None:
+                    tmp_data_gdf = tmp_data_gdf.to_crs(epsg=out_epsg)
+
+                data_gdf = data_gdf.append(tmp_data_gdf)
+
+    if not first:
+        if out_format == "GPKG":
+            if output_lyr is None:
+                raise Exception("If output format is GPKG then an output layer is required.")
+            data_gdf.to_file(output_file, layer=output_lyr, driver=out_format)
+        else:
+            data_gdf.to_file(output_file, driver=out_format)
+
+
+def explode_vec_lyr(vec_file, vec_lyr, vec_out_file, vec_out_lyr, out_format='GPKG'):
+    """
+    A function to explode a vector layer separating any multiple geometries (e.g., multipolygons)
+    to single geometries.
+
+    Note. this function uses geopandas and therefore the vector layer is loaded into memory.
+
+    :param vec_file: vector layer file
+    :param vec_lyr: vector layer name
+    :param vec_out_file: output vector layer file
+    :param vec_out_lyr: output vector layer name (Can be None if output format is not GPKG).
+    :param out_format: The output format for the vector file.
+
+    """
+    import geopandas
+    data_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
+    data_explode_gdf = data_gdf.explode()
+
+    if len(data_explode_gdf) > 0:
+        if out_format == "GPKG":
+            data_explode_gdf.to_file(vec_out_file, layer=vec_out_lyr, driver=out_format)
+        else:
+            data_explode_gdf.to_file(vec_out_file, driver=out_format)
+
+
+def explode_vec_files(input_vecs, output_dir, out_format='GPKG', out_file_ext='gpkg'):
+    """
+    A function which explodes the multiple geometries within a list of input layers.
+    The output directory must be different to the directory the input files as the
+    output file name will be the same as the input name.
+
+    Note. this function uses the explode_vec_lyr function which uses geopandas and therefore
+    the vector layer is loaded into memory.
+
+    :param input_vecs: A list of input files.
+    :param output_dir: The directory where the output files will be placed.
+    :param out_format: The vector format for the outputs.
+    :param out_file_ext: the file extension for the output files. There should not be a dot within the extension.
+                         e.g., gpkg, shp, geojson.
+
+    """
+    import tqdm
+    rsgis_utils = rsgislib.RSGISPyUtils()
+    for vec_file in tqdm.tqdm(input_vecs):
+        lyrs = getVecLyrsLst(vec_file)
+        basename = rsgis_utils.get_file_basename(vec_file)
+        out_vec_file = os.path.join(output_dir, "{}.{}".format(basename, out_file_ext))
+        for lyr in lyrs:
+            explode_vec_lyr(vec_file, lyr, out_vec_file, lyr, out_format)
+
+
+
