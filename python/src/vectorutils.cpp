@@ -899,7 +899,7 @@ static PyMethodDef VectorUtilsMethods[] = {
 "   vectorutils.splitFeatures(inputVector, outputVectorBase, True)\n"
 "\n"},
 
-{"exportPxls2Pts", VectorUtils_ExportPxls2Pts, METH_VARARGS,
+{"exportPxls2Pts", (PyCFunction)VectorUtils_ExportPxls2Pts, METH_VARARGS | METH_KEYWORDS,
 "vectorutils.exportPxls2Pts(image, outvecfile, mskval, force, outveclyr, vecdriver)\n"
 "A command to export image pixel which have a specific value to a vector file of points.\n"
 "Note. the output vector file will be overwritten even if the layer name is different.\n\n"
