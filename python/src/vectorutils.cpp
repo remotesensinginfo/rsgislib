@@ -387,13 +387,13 @@ static PyObject *VectorUtils_ExportPxls2Pts(PyObject *self, PyObject *args, PyOb
         return NULL;
     }
     
-    outVecLyr = std:string(pszOutputVecLyr);
+    outVecLyr = std::string(pszOutputVecLyr);
     if(outVecLyr == "")
     {
         outVecLyr = NULL;
     }
     
-    outVecFormat = std:string(pszOutputVecFormat);
+    outVecFormat = std::string(pszOutputVecFormat);
     if(outVecFormat == "")
     {
         outVecFormat = NULL;
