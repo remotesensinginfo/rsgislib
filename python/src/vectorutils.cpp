@@ -374,19 +374,35 @@ static PyObject *VectorUtils_SplitFeatures(PyObject *self, PyObject *args)
 }
 
 
-static PyObject *VectorUtils_ExportPxls2Pts(PyObject *self, PyObject *args)
+static PyObject *VectorUtils_ExportPxls2Pts(PyObject *self, PyObject *args, PyObject *keywds)
 {
+    static char *kwlist[] = {"image", "outvecfile", "mskval", "force", "outveclyr", "vecdriver", NULL};
     const char *pszInputImg, *pszOutputVector;
+    const char *pszOutputVecLyr = "";
+    const char *pszOutputVecFormat = "";
     int force = false;
     float maskVal = 0.0;
-    if( !PyArg_ParseTuple(args, "ssf|i:exportPxls2Pts", &pszInputImg, &pszOutputVector, &maskVal, &force))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds,"ssf|iss:exportPxls2Pts", kwlist, &pszInputImg, &pszOutputVector, &maskVal, &force, &pszOutputVecLyr, &pszOutputVecFormat))
     {
         return NULL;
     }
     
+    outVecLyr = std:string(pszOutputVecLyr);
+    if(outVecLyr == "")
+    {
+        outVecLyr = NULL;
+    }
+    
+    outVecFormat = std:string(pszOutputVecFormat);
+    if(outVecFormat == "")
+    {
+        outVecFormat = NULL;
+    }
+        
+    
     try
     {
-        rsgis::cmds::executeExportPxls2Pts(pszInputImg, pszOutputVector, force, maskVal);
+        rsgis::cmds::executeExportPxls2Pts(std::string(pszInputImg), std::string(pszOutputVector), force, maskVal, outVecLyr, outVecFormat);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -897,14 +913,17 @@ static PyMethodDef VectorUtilsMethods[] = {
 "\n"},
 
 {"exportPxls2Pts", VectorUtils_ExportPxls2Pts, METH_VARARGS,
-"vectorutils.exportPxls2Pts(inputimg, outputvector, maskVal, force)\n"
-"A command to export image pixel which have a specific value to a shapefile as points.\n\n"
+"vectorutils.exportPxls2Pts(image, outvecfile, mskval, force, outveclyr, vecdriver)\n"
+"A command to export image pixel which have a specific value to a vector file of points.\n"
+"Note. the output vector file will be overwritten even if the layer name is different.\n\n"
 "Where:\n"
 "\n"
-":param inputimg: is a string containing the name of the input image\n"
-":param outputvector: is a string containing the name of the output vector\n"
+":param image: is a string containing the name of the input image\n"
+":param outvecfile: is a string containing the name and path of the output vector file\n"
 ":param maskVal: is a float specifying the value of the image pixels to be exported\n"
-":param force: is a bool, specifying whether to force removal of the output vector if it exists\n"
+":param force: is a bool, specifying whether to force removal of the output vector if it exists (Only for ESRI Shapefile format)\n"
+":param outveclyr: is an optional layer name for the output vector file.\n"
+":param vecdriver: is the output vector format for the output vector file. (Optional, default: ESRI Shapefile)\n"
 "\n"},
 
 {"dist2NearestGeom", VectorUtils_Dist2NearestGeom, METH_VARARGS,

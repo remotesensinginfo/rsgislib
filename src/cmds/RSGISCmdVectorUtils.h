@@ -77,7 +77,7 @@ namespace rsgis{ namespace cmds{
     /** Function to split the polygons within a shapefile into different shapefiles using an attribute  */
     DllExport void executeSplitFeatures(std::string inputVector, std::string outputVectorBase, bool force);
     /** Function to export a binary image to points */
-    DllExport void executeExportPxls2Pts(std::string inputImage, std::string outputVec, bool force, float maskVal);
+    DllExport void executeExportPxls2Pts(std::string inputImage, std::string outputVecFile, bool force, float maskVal, std::string outputVecLyrName="", std::string outVecFormat="ESRI Shapefile");
     /** Function to calculate the distance to the nearest geometry */
     DllExport double executeCalcDist2NearestGeom(std::string inputVec, std::string outputVec, std::string outColName, bool force, bool useIdx=false, double idxMaxSearch=10);
     /** Function to calculate the distance to the nearest geometry */

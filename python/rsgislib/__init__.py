@@ -810,6 +810,24 @@ class RSGISPyUtils (object):
         else:
             out_bbox = None
         return out_bbox
+
+    def unwrap_wgs84_bbox(self, bbox):
+        """
+        A function which unwraps a bbox if it projected in WGS84 and over the 180/-180 boundary.
+
+        :param bbox: the bounding box (MinX, MaxX, MinY, MaxY)
+        :return: list of bounding boxes [(MinX, MaxX, MinY, MaxY), (MinX, MaxX, MinY, MaxY)...]
+
+        """
+        bboxes = []
+        if bbox[1] < bbox[0]:
+            bbox1 = [-180.0, bbox[1], bbox[2], bbox[3]]
+            bboxes.append(bbox1)
+            bbox2 = [bbox[0], 180.0, bbox[2], bbox[3]]
+            bboxes.append(bbox2)
+        else:
+            bboxes.append(bbox)
+        return bboxes
         
     def getVecLayerExtent(self, inVec, layerName=None, computeIfExp=True):
         """
