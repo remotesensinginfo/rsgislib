@@ -387,21 +387,9 @@ static PyObject *VectorUtils_ExportPxls2Pts(PyObject *self, PyObject *args, PyOb
         return NULL;
     }
     
-    std::string outVecLyr = std::string(pszOutputVecLyr);
-    if(outVecLyr == "")
-    {
-        outVecLyr = NULL;
-    }
-    
-    std::string outVecFormat = std::string(pszOutputVecFormat);
-    if(outVecFormat == "")
-    {
-        outVecFormat = NULL;
-    }
-    
     try
     {
-        rsgis::cmds::executeExportPxls2Pts(std::string(pszInputImg), std::string(pszOutputVector), force, maskVal, outVecLyr, outVecFormat);
+        rsgis::cmds::executeExportPxls2Pts(std::string(pszInputImg), std::string(pszOutputVector), force, maskVal, std::string(pszOutputVecLyr), std::string(pszOutputVecFormat));
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
