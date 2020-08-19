@@ -5960,3 +5960,159 @@ def add_numeric_col_lut(vec_file, vec_lyr, ref_col, val_lut, out_col, vec_out_fi
     else:
         base_gpdf.to_file(vec_out_file, driver=out_format)
 
+
+def geopd_check_polys_wgs84bounds_geometry(data_gdf, width_thres=350):
+    """
+    A function which checks a polygons within the geometry of a geopanadas dataframe
+    for specific case where they on the east/west edge (i.e., 180 / -180) and are therefore
+    being wrapped around the world. For example, this function would change a longitude
+    -179.91 to 180.01. The geopandas dataframe will be edit in place.
+
+    This function will import the shapely library.
+
+    :param data_gdf: geopandas dataframe.
+    :param width_thres: The threshold (default 350 degrees) for the width of a polygon for which
+                        the polygons will be checked, looping through all the coordinates
+    :return: geopandas dataframe
+
+    """
+    from shapely.geometry import Polygon, LinearRing
+
+    polys = []
+    for index, row in data_gdf.iterrows():
+        n_east = 0
+        n_west = 0
+        row_bbox = row['geometry'].bounds
+        row_width = row_bbox[2] - row_bbox[0]
+        if row_width > width_thres:
+            for coord in row['geometry'].exterior.coords:
+                if coord[0] < 0:
+                    n_west += 1
+                else:
+                    n_east += 1
+            east_focus = True
+            if n_west > n_east:
+                east_focus = False
+
+            out_coords = []
+            for coord in row['geometry'].exterior.coords:
+                out_coord = [coord[0], coord[1]]
+                if east_focus:
+                    if coord[0] < 0:
+                        diff = coord[0] - -180
+                        out_coord[0] = 180 + diff
+                else:
+                    if coord[0] > 0:
+                        diff = 180 - coord[0]
+                        out_coord[0] = -180 - diff
+                out_coords.append(out_coord)
+
+            out_holes = []
+            for hole in row['geometry'].interiors:
+                hole_coords = []
+                for coord in hole.coords:
+                    out_coord = [coord[0], coord[1]]
+                    if east_focus:
+                        if coord[0] < 0:
+                            diff = coord[0] - -180
+                            out_coord[0] = 180 + diff
+                    else:
+                        if coord[0] > 0:
+                            diff = 180 - coord[0]
+                            out_coord[0] = -180 - diff
+                    hole_coords.append(out_coord)
+                out_holes.append(LinearRing(hole_coords))
+            polys.append(Polygon(out_coords, holes=out_holes))
+        else:
+            polys.append(row['geometry'])
+    data_gdf['geometry'] = polys
+    return data_gdf
+
+
+def merge_utm_vecs_wgs84(input_files, output_file, output_lyr=None, out_format='GPKG',
+                         n_hemi_utm_file=None, s_hemi_utm_file=None, width_thres=350):
+    """
+    A function which merges input files in UTM projections to the WGS84 projection cutting
+    polygons which wrap from one side of the world to other (i.e., 180/-180 boundary).
+
+    :param input_files: list of input files
+    :param output_file: output vector file.
+    :param output_lyr: output vector layer - only used if output format is GPKG
+    :param out_format: output file format.
+    :param n_utm_zones_vec: GPKG file with layer per zone (layer names: 01, 02, ... 59, 60) each projected in
+                            the northern hemisphere UTM projections.
+    :param s_utm_zone_vec: GPKG file with layer per zone (layer names: 01, 02, ... 59, 60) each projected in
+                            the southern hemisphere UTM projections.
+    :param width_thres: The threshold (default 350 degrees) for the width of a polygon for which
+                        the polygons will be checked, looping through all the coordinates
+
+    """
+    import geopandas
+    import pandas
+    import rsgislib.tools.utm
+    import tqdm
+    
+    if n_hemi_utm_file is None:
+        install_prefix = __file__[:__file__.find('lib')]
+        n_hemi_utm_file = os.path.join(install_prefix, "share", "rsgislib", "utm_zone_boundaries_lyrs_north.gpkg")
+        if n_hemi_utm_file is None:
+            raise Exception("An input is needed for n_hemi_utm_file. The RSGISLib installed version was not be found.")
+    if s_hemi_utm_file is None:
+        install_prefix = __file__[:__file__.find('lib')]
+        s_hemi_utm_file = os.path.join(install_prefix, "share", "rsgislib", "utm_zone_boundaries_lyrs_south.gpkg")
+        if s_hemi_utm_file is None:
+            raise Exception("An input is needed for s_hemi_utm_file. The RSGISLib installed version was not be found.")
+    
+    rsgis_utils = rsgislib.RSGISPyUtils()
+    first = True
+    for file in tqdm.tqdm(input_files):
+        lyrs = getVecLyrsLst(file)
+        for lyr in lyrs:
+            bbox = rsgis_utils.getVecLayerExtent(file, layerName=lyr)
+            bbox_area = rsgis_utils.calc_bbox_area(bbox)
+            if bbox_area > 0:
+                vec_epsg = rsgis_utils.getProjEPSGFromVec(file, vecLyr=lyr)
+                zone, hemi = rsgislib.tools.utm.utm_from_epsg(int(vec_epsg))
+                zone_str = rsgis_utils.zero_pad_num_str(zone, str_len=2, round_num=False, round_n_digts=0, integerise=True)
+
+                if hemi.upper() == 'S':
+                    utm_zones_file = s_hemi_utm_file
+                else:
+                    utm_zones_file = n_hemi_utm_file
+
+                contained = vec_within_vec(utm_zones_file, zone_str, file, lyr)
+                if not contained:
+                    data_gdf = geopandas.read_file(file, layer=lyr)
+                    utm_gdf = geopandas.read_file(utm_zones_file, layer=zone_str)
+
+                    data_inter_gdf = geopandas.overlay(data_gdf, utm_gdf, how='intersection')
+                    data_diff_gdf = geopandas.overlay(data_gdf, utm_gdf, how='difference')
+                    if (len(data_inter_gdf) > 0) and (len(data_diff_gdf) > 0):
+                        data_split_gdf = pandas.concat([data_inter_gdf, data_diff_gdf])
+                    elif len(data_diff_gdf) > 0:
+                        data_split_gdf = data_diff_gdf
+                    else:
+                        data_split_gdf = data_inter_gdf
+
+                    if len(data_split_gdf) > 0:
+                        data_gdf = data_split_gdf.to_crs("EPSG:4326")
+                else:
+                    data_gdf = geopandas.read_file(file, layer=lyr)
+                    if len(data_gdf) > 0:
+                        data_gdf = data_gdf.to_crs("EPSG:4326")
+
+                if len(data_gdf) > 0:
+                    data_gdf = geopd_check_polys_wgs84bounds_geometry(data_gdf, width_thres)
+                    if first:
+                        out_gdf = data_gdf
+                        first = False
+                    else:
+                        out_gdf = out_gdf.append(data_gdf)
+
+    if not first:
+        if out_format == "GPKG":
+            if output_lyr is None:
+                raise Exception("If output format is GPKG then an output layer is required.")
+            out_gdf.to_file(output_file, layer=output_lyr, driver=out_format)
+        else:
+            out_gdf.to_file(output_file, driver=out_format)

@@ -569,7 +569,8 @@ image and threshold can be applied to this image.
     if outClassImg is not None:
         rsgislib.imagecalc.imageMath(outProbImg, outClassImg, 'b1>{}?1:0'.format(class_thres), gdalformat,
                                      rsgislib.TYPE_8UINT)
-        rsgislib.rastergis.populateStats(outClassImg, addclrtab=True, calcpyramids=True, ignorezero=True)
+        if gdalformat == 'KEA':
+            rsgislib.rastergis.populateStats(outClassImg, addclrtab=True, calcpyramids=True, ignorezero=True)
 
 
 def train_xgboost_multiclass_classifer(out_mdl_file, clsinfodict, nthread=1, mdl_cls_obj=None):

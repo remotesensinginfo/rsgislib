@@ -23,11 +23,12 @@ set (PROJECT_LIBRARY_DIR lib)
 set (PROJECT_DOC_DIR doc)
 set (PROJECT_SOURCE_DIR src)
 set (PROJECT_TOOLS_DIR tools)
+set (PROJECT_DATA_DIR share)
 
 # The version number.
 set (RSGISLIB_VERSION_MAJOR 4)
 set (RSGISLIB_VERSION_MINOR 2)
-set (RSGISLIB_VERSION_PATCH 28)
+set (RSGISLIB_VERSION_PATCH 29)
 set (RSGISLIB_VERSION "${RSGISLIB_VERSION_MAJOR}.${RSGISLIB_VERSION_MINOR}.${RSGISLIB_VERSION_PATCH}")
 set (RSGISLIB_PACKAGE_VERSION "${RSGISLIB_VERSION_MAJOR}.${RSGISLIB_VERSION_MINOR}.${RSGISLIB_VERSION_PATCH}")
 set (RSGISLIB_PACKAGE_STRING "RSGISLib ${RSGISLIB_VERSION_MAJOR}.${RSGISLIB_VERSION_MINOR}.${RSGISLIB_VERSION_PATCH}")
@@ -142,6 +143,7 @@ set(RSGISLIB_CMDSINTERFACE_LIB_NAME rsgis_cmds)
 option (BUILD_SHARED_LIBS "Build with shared library" ON)
 set(RSGISLIB_WITH_UTILTIES TRUE CACHE BOOL "Choose if RSGISLib utilities should be built")
 set(RSGISLIB_WITH_DOCUMENTS TRUE CACHE BOOL "Choose if RSGISLib documentation should be installed.")
+set(RSGISLIB_WITH_DATA TRUE CACHE BOOL "Choose if RSGISLib datasets should be installed.")
 
 set(BOOST_INCLUDE_DIR /usr/local/include CACHE PATH "Include PATH for Boost")
 set(BOOST_LIB_PATH /usr/local/lib CACHE PATH "Library PATH for Boost")
@@ -497,7 +499,10 @@ if (RSGISLIB_WITH_UTILTIES)
 	install (FILES "${CMAKE_BINARY_DIR}/${PROJECT_BINARY_DIR}/rsgisdbxupload.py" DESTINATION bin PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 endif(RSGISLIB_WITH_UTILTIES)
 
-
+if (RSGISLIB_WITH_DATA)
+	install (FILES "${PROJECT_DATA_DIR}/utm_zone_boundaries_lyrs_north.gpkg" DESTINATION share/rsgislib PERMISSIONS OWNER_READ GROUP_READ WORLD_READ)
+	install (FILES "${PROJECT_DATA_DIR}/utm_zone_boundaries_lyrs_south.gpkg" DESTINATION share/rsgislib PERMISSIONS OWNER_READ GROUP_READ WORLD_READ)
+endif(RSGISLIB_WITH_DATA)
 ###############################################################################
 
 ###############################################################################
