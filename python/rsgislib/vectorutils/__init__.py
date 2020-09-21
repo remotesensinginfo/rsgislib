@@ -3261,6 +3261,7 @@ def does_vmsk_img_intersect(input_vmsk_img, roi_vec_file, roi_vec_lyr, tmp_dir, 
         shutil.rmtree(tmp_file_dir)
     return img_intersect
 
+
 def merge_to_multi_layer_vec(input_file_lyrs, output_file, format='GPKG', overwrite=True):
     """
     A function which takes a list of vector files and layers (as VecLayersInfoObj objects)

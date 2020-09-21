@@ -2065,6 +2065,52 @@ Example::
     fH5Out.close()
 
 
+def msk_h5_smpls_to_finite_values(input_h5, output_h5, datatype=None, lower_limit=None, upper_limit=None):
+    """
+    A function to remove values from a HDF5 sample file which are not finite. Upper and lower values
+    can also be specified.
+
+    :param input_h5: Input HDF5 file.
+    :param output_h5: Output HDF5 file.
+    :param datatype: is the data type used for the output HDF5 file (e.g., rsgislib.TYPE_32FLOAT). If None (default)
+                     then the output data type will be float32.
+    :param lower_limit: Optional lower value threshold (if None then not used).
+    :param upper_limit: Optional upper value threshold (if None then not used).
+
+    """
+    import h5py
+    import numpy
+
+    rsgis_utils = rsgislib.RSGISPyUtils()
+    if datatype is None:
+        datatype = rsgislib.TYPE_32FLOAT
+    h5_dtype = rsgis_utils.getNumpyCharCodesDataType(datatype)
+
+    fH5 = h5py.File(input_h5, 'r')
+    data_shp = fH5['DATA/DATA'].shape
+    num_vars = data_shp[1]
+    data = numpy.array(fH5['DATA/DATA'])
+    data = data[numpy.isfinite(data).all(axis=1)]
+    if lower_limit is not None:
+        data = data[numpy.any(data > lower_limit, axis=1)]
+    if upper_limit is not None:
+        data = data[numpy.any(data < upper_limit, axis=1)]
+
+    n_samples = data.shape[0]
+    chunk_size = 1000
+    if n_samples < 1000:
+        chunk_size = n_samples
+
+    fH5Out = h5py.File(output_h5, 'w')
+    dataGrp = fH5Out.create_group("DATA")
+    metaGrp = fH5Out.create_group("META-DATA")
+    dataGrp.create_dataset('DATA', data=data, chunks=(chunk_size, num_vars), compression="gzip",
+                           shuffle=True, dtype=h5_dtype)
+    describDS = metaGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
+    describDS[0] = 'finite values'.encode()
+    fH5Out.close()
+
+
 def getUniqueValues(img, img_band=1):
     """
 Find the unique image values within an image band.
