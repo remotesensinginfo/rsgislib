@@ -89,6 +89,7 @@ def _array2raster(newRasterfn, rasterfn, array, outFormat):
     outRaster = None
     raster = None
 
+
 def performLeastCostPathCalc(costSurfaceImg, outputPathImg, startCoord, stopCoord, gdalformat="KEA", costImgBand=1):
     """
     Calculates least cost path for a raster surface from start coord to stop coord:
@@ -97,8 +98,8 @@ def performLeastCostPathCalc(costSurfaceImg, outputPathImg, startCoord, stopCoor
 
     :param costSurfaceImg: Input image to calculate cost path from
     :param outputPathImg: Output image
-    :param startCoord: Start coordinate
-    :param stopCoord: End coordinate
+    :param startCoord: Start coordinate (e.g., (263155.9, 291809.1))
+    :param stopCoord: End coordinate (e.g., (263000.1, 292263.7))
     :param gdalformat: GDAL format (default=KEA)
     :param costImgBand: Band in input image to use for cost analysis (default=1)
 
@@ -106,12 +107,12 @@ def performLeastCostPathCalc(costSurfaceImg, outputPathImg, startCoord, stopCoor
     # Read gdal raster as array.
     gdalRasterDS = gdal.Open(costSurfaceImg)
     costSurfaceArray = gdalRasterDS.GetRasterBand(costImgBand).ReadAsArray()
-    
+
     # Creates path array
-    pathArray = _createPath(CostSurfaceImg, costSurfaceArray, startCoord, stopCoord)
+    pathArray = _createPath(costSurfaceImg, costSurfaceArray, startCoord, stopCoord)
 
     # Converts path array to raster
-    _array2raster(outputPathImg, CostSurfaceImg, pathArray, gdalformat)
+    _array2raster(outputPathImg, costSurfaceImg, pathArray, gdalformat)
 
 
 

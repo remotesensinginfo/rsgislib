@@ -255,6 +255,20 @@ class RSGISPyUtils (object):
         
         return gdalStr
 
+    def set_envvars_lzw_gtiff_outs(self, bigtiff=True):
+        """
+        Set environmental variables such that outputted
+        GeoTIFF files are outputted as tiled and compressed.
+
+        :param bigtiff: If True GTIFF files will be outputted
+                        in big tiff format.
+
+        """
+        if bigtiff:
+            os.environ["RSGISLIB_IMG_CRT_OPTS_GTIFF"] = "TILED=YES:COMPRESS=LZW:BIGTIFF=YES"
+        else:
+            os.environ["RSGISLIB_IMG_CRT_OPTS_GTIFF"] = "TILED=YES:COMPRESS=LZW"
+
     def get_file_basename(self, filepath, checkvalid=False, n_comps=0):
         """
         Uses os.path module to return file basename (i.e., path and extension removed)
