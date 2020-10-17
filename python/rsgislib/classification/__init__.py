@@ -498,11 +498,16 @@ def flipChipHDF5File(input_h5_file, output_h5_file, datatype=None):
     ######################################################################
     # Create the output HDF5 file and populate with data.
     ######################################################################
+    # Chunk size needs to be less than number of features
+    if n_in_feats < 250:
+        chunk_features = n_in_feats
+    else:
+        chunk_features = 250
     h5_dtype = rsgis_utils.getNumpyCharCodesDataType(datatype)
     fH5Out = h5py.File(output_h5_file, 'w')
     dataGrp = fH5Out.create_group("DATA")
     metaGrp = fH5Out.create_group("META-DATA")
-    dataGrp.create_dataset('DATA', data=feat_arr, chunks=(250, chip_size, chip_size, n_bands),
+    dataGrp.create_dataset('DATA', data=feat_arr, chunks=(chunk_features, chip_size, chip_size, n_bands),
                            compression="gzip", shuffle=True, dtype=h5_dtype)
     describDS = metaGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
     describDS[0] = 'IMAGE REF TILES'.encode()
@@ -553,13 +558,18 @@ def flipRefChipHDF5File(input_h5_file, output_h5_file, datatype=None):
     ######################################################################
     # Create the output HDF5 file and populate with data.
     ######################################################################
+    # Chunk size needs to be less than number of features
+    if n_in_feats < 250:
+        chunk_features = n_in_feats
+    else:
+        chunk_features = 250
     h5_dtype = rsgis_utils.getNumpyCharCodesDataType(datatype)
     fH5Out = h5py.File(output_h5_file, 'w')
     dataGrp = fH5Out.create_group("DATA")
     metaGrp = fH5Out.create_group("META-DATA")
-    dataGrp.create_dataset('DATA', data=feat_arr, chunks=(250, chip_size, chip_size, n_bands),
+    dataGrp.create_dataset('DATA', data=feat_arr, chunks=(chunk_features, chip_size, chip_size, n_bands),
                            compression="gzip", shuffle=True, dtype=h5_dtype)
-    dataGrp.create_dataset('REF', data=feat_ref_arr, chunks=(250, chip_size, chip_size),
+    dataGrp.create_dataset('REF', data=feat_ref_arr, chunks=(chunk_features, chip_size, chip_size),
                            compression="gzip", shuffle=True, dtype='H')
     describDS = metaGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
     describDS[0] = 'IMAGE REF TILES'.encode()
