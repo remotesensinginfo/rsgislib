@@ -1622,20 +1622,28 @@ def splitSampleChipHDF5File(input_h5_file, sample_h5_file, remain_h5_file, sampl
     h5_dtype = rsgis_utils.getNumpyCharCodesDataType(datatype)
 
     # Create an output HDF5 file and populate with sample data.
+    if sample_size < 250:
+	    sample_chunks = sample_size
+    else:
+	    sample_chunks = 250
     fSampleH5Out = h5py.File(sample_h5_file, 'w')
     dataSampleGrp = fSampleH5Out.create_group("DATA")
     metaSampleGrp = fSampleH5Out.create_group("META-DATA")
-    dataSampleGrp.create_dataset('DATA', data=out_samples, chunks=(250, chip_size, chip_size, n_bands),
+    dataSampleGrp.create_dataset('DATA', data=out_samples, chunks=(sample_chunks, chip_size, chip_size, n_bands),
                                  compression="gzip", shuffle=True, dtype=h5_dtype)
     describSampleDS = metaSampleGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
     describSampleDS[0] = 'IMAGE TILES'.encode()
     fSampleH5Out.close()
 
     # Create an output HDF5 file and populate with remain data.
+    if (n_rows - sample_size) < 250:
+	    sample_chunks = (n_rows - sample_size)
+    else:
+	    sample_chunks = 250
     fSampleH5Out = h5py.File(remain_h5_file, 'w')
     dataSampleGrp = fSampleH5Out.create_group("DATA")
     metaSampleGrp = fSampleH5Out.create_group("META-DATA")
-    dataSampleGrp.create_dataset('DATA', data=remain_samples, chunks=(250, chip_size, chip_size, n_bands),
+    dataSampleGrp.create_dataset('DATA', data=remain_samples, chunks=(sample_chunks, chip_size, chip_size, n_bands),
                                  compression="gzip", shuffle=True, dtype=h5_dtype)
     describSampleDS = metaSampleGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
     describSampleDS[0] = 'IMAGE TILES'.encode()
