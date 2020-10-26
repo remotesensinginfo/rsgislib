@@ -5962,6 +5962,62 @@ def add_numeric_col_lut(vec_file, vec_lyr, ref_col, val_lut, out_col, vec_out_fi
         base_gpdf.to_file(vec_out_file, driver=out_format)
 
 
+def add_numeric_col(vec_file, vec_lyr, out_col, vec_out_file, vec_out_lyr, out_val=1, out_format='GPKG'):
+    """
+    A function which adds a numeric column with the same value for all the features.
+
+    :param vec_file: Input vector file.
+    :param vec_lyr: Input vector layer within the input file.
+    :param out_col: The output numeric column
+    :param vec_out_file: Output vector file
+    :param vec_out_lyr: output vector layer name.
+    :param out_val: output numeric value
+    :param out_format: output file format (default GPKG).
+
+    """
+    import geopandas
+    import numpy
+
+    base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
+
+    base_gpdf[out_col] = numpy.zeros((base_gpdf.shape[0]), dtype=int)
+    base_gpdf[out_col] = out_val
+
+    if out_format == 'GPKG':
+        base_gpdf.to_file(vec_out_file, layer=vec_out_lyr, driver=out_format)
+    else:
+        base_gpdf.to_file(vec_out_file, driver=out_format)
+
+
+def add_string_col(vec_file, vec_lyr, out_col, vec_out_file, vec_out_lyr, out_val='str_val', out_format='GPKG'):
+    """
+    A function which adds a string column with the same value for all the features.
+
+    :param vec_file: Input vector file.
+    :param vec_lyr: Input vector layer within the input file.
+    :param out_col: The output numeric column
+    :param vec_out_file: Output vector file
+    :param vec_out_lyr: output vector layer name.
+    :param out_val: output numeric value
+    :param out_format: output file format (default GPKG).
+
+    """
+    import geopandas
+    import numpy
+
+    base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
+
+    str_col = numpy.empty((base_gpdf.shape[0]), dtype=object)
+    str_col[...] = out_val
+
+    base_gpdf[out_col] = str_col
+
+    if out_format == 'GPKG':
+        base_gpdf.to_file(vec_out_file, layer=vec_out_lyr, driver=out_format)
+    else:
+        base_gpdf.to_file(vec_out_file, driver=out_format)
+
+
 def geopd_check_polys_wgs84bounds_geometry(data_gdf, width_thres=350):
     """
     A function which checks a polygons within the geometry of a geopanadas dataframe

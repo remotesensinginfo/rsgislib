@@ -1489,7 +1489,43 @@ class RSGISPyUtils (object):
         num_str = "{}".format(num_val)
         num_str = num_str.zfill(str_len)
         return num_str
-    
+
+    def powerset_iter(self, inset):
+        """
+        A function which returns an iterator (generator) for all the subsets
+        of the inputted set (i.e., the powerset)
+
+        :params inset: the input set for which the powerset will be produced
+
+        """
+        if len(inset) <= 1:
+            yield inset
+            yield []
+        else:
+            for item in self.powerset_iter(inset[1:]):
+                yield [inset[0]] + item
+                yield item
+
+    def powerset_lst(self, inset, min_items=0):
+        """
+        A function which returns a list for all the subsets
+        of the inputted set (i.e., the powerset)
+
+        :params inset: the input set for which the powerset will be produced
+        :params min_items: Optional parameter specifying the minimum number
+                           of items in the output sets. If 0 or below then
+                           ignored. Default is 0.
+
+        """
+        out_pset = []
+        for subset in self.powerset_iter(inset):
+            if min_items > 0:
+                if len(subset) >= min_items:
+                    out_pset.append(subset)
+            else:
+                out_pset.append(subset)
+        return out_pset
+
     def getEnvironmentVariable(self, var):
         """
         A function to get an environmental variable, if variable is not present returns None.
