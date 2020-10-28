@@ -927,3 +927,149 @@ def recodeIntRaster(input_img, output_img, recode_dict, keepvalsnotindict=True, 
     applier.apply(_recode, infiles, outfiles, otherargs, controls=aControls)
 
 
+def calc_fill_regions_knn(ref_img, ref_no_data, fill_regions_img, fill_region_val, out_img, k=5,
+                          summary=rsgislib.SUMTYPE_MODE, gdalformat='KEA', datatype=rsgislib.TYPE_32INT):
+    """
+    A function will fills regions (defined by having a value == fill_region_val) of the fill_regions_img
+    image using a KNN approach based of pixels within the ref_img image. The KNN distance is the spatial
+    distance based off the pixel locations.
+
+    The ref_img and fill_regions_img must both be in the same projection.
+
+    :param ref_img: The reference image (can be a different resolution) from which the KNN will be trained.
+    :param ref_no_data: The no data value used within the reference image.
+    :param fill_regions_img: A mask image defining the regions to be filled.
+    :param fill_region_val: The pixel value specifying the pixels in the fill_regions_img image for the KNN value
+                            will be calculated.
+    :param out_img: The output image file name and path.
+    :param k: The k parameter of the KNN.
+    :param summary: Summary method (rsgislib.SUMTYPE_*) to be used (Default is Mode).
+                    Options: Mode, Median, Sum, Mean, Range, Min, Max.
+    :param gdalformat: output file format (default: KEA)
+    :param datatype: is a rsgislib.TYPE_* value providing the data type of the output image.
+
+    """
+    from rios import applier
+    import numpy
+    import scipy
+    import scipy.stats
+    import rtree
+
+    rsgis_utils = rsgislib.RSGISPyUtils()
+    if not rsgis_utils.doGDALLayersHaveSameProj(ref_img, fill_regions_img):
+        raise Exception("The reference image and fill regions image do not have the same projection.")
+
+    try:
+        import tqdm
+        progress_bar = rsgislib.TQDMProgressBar()
+    except:
+        from rios import cuiprogress
+        progress_bar = cuiprogress.GDALProgressBar()
+
+    x_res, y_res = rsgis_utils.getImageRes(ref_img)
+    if x_res < 0:
+        x_res *= -1
+    if y_res < 0:
+        y_res *= -1
+
+    print("Building Spatial Index...")
+    # Create the index.
+    kd_idx = rtree.index.Index()
+
+    # Populate Index
+    infiles = applier.FilenameAssociations()
+    infiles.ref_img = ref_img
+    outfiles = applier.FilenameAssociations()
+    otherargs = applier.OtherInputs()
+    otherargs.kd_idx = kd_idx
+    otherargs.ref_no_data = ref_no_data
+    otherargs.w_box = x_res / 2
+    otherargs.h_box = y_res / 2
+    otherargs.n = 0
+    aControls = applier.ApplierControls()
+    aControls.progress = progress_bar
+
+    def _retrieve_idx_info(info, inputs, outputs, otherargs):
+        xBlock, yBlock = info.getBlockCoordArrays()
+        xBlock = xBlock.flatten()
+        yBlock = yBlock.flatten()
+        ref_data = inputs.ref_img[0].flatten()
+
+        x_coords = xBlock[ref_data != otherargs.ref_no_data]
+        y_coords = yBlock[ref_data != otherargs.ref_no_data]
+        val_data = ref_data[ref_data != otherargs.ref_no_data]
+
+        left_coords = x_coords - otherargs.w_box
+        right_coords = x_coords + otherargs.w_box
+
+        top_coords = y_coords + otherargs.h_box
+        bot_coords = y_coords - otherargs.h_box
+
+        coords = numpy.stack((left_coords, bot_coords, right_coords, top_coords), axis=1)
+        for coord, cls in zip(coords, val_data):
+            otherargs.kd_idx.insert(otherargs.n, coord, cls)
+            otherargs.n += 1
+
+    applier.apply(_retrieve_idx_info, infiles, outfiles, otherargs, controls=aControls)
+
+    print("\nFilling Image Regions using KNN (k={})".format(k))
+    x_res, y_res = rsgis_utils.getImageRes(fill_regions_img)
+    if x_res < 0:
+        x_res *= -1
+    if y_res < 0:
+        y_res *= -1
+
+    # Apply KNN fill.
+    infiles = applier.FilenameAssociations()
+    infiles.inimage = fill_regions_img
+    outfiles = applier.FilenameAssociations()
+    outfiles.outimage = out_img
+    otherargs = applier.OtherInputs()
+    otherargs.kd_idx = kd_idx
+    otherargs.k = k
+    otherargs.fill_region_val = fill_region_val
+    otherargs.np_dtype = rsgis_utils.getNumpyDataType(datatype)
+    otherargs.w_box = x_res / 2
+    otherargs.h_box = y_res / 2
+    aControls = applier.ApplierControls()
+    aControls.progress = progress_bar
+    aControls.drivername = gdalformat
+    aControls.omitPyramids = False
+    aControls.calcStats = False
+
+    def _knn_fill_regions(info, inputs, outputs, otherargs):
+        out_arr = numpy.zeros_like(inputs.inimage[0], dtype=otherargs.np_dtype)
+        xBlock, yBlock = info.getBlockCoordArrays()
+        data_shp = out_arr.shape
+        for i in range(data_shp[0]):
+            for j in range(data_shp[1]):
+                if inputs.inimage[0, i, j] == otherargs.fill_region_val:
+                    bbox = (
+                    xBlock[i, j] - otherargs.w_box, yBlock[i, j] - otherargs.h_box, xBlock[i, j] + otherargs.w_box,
+                    yBlock[i, j] + otherargs.h_box)
+
+                    vals = list(otherargs.kd_idx.nearest(bbox, otherargs.k, objects='raw'))
+                    int_vals = list()
+                    for val in vals:
+                        int_vals.append(int(val))
+                    if summary == rsgislib.SUMTYPE_MODE:
+                        out_arr[i, j] = scipy.stats.mode(int_vals).mode[0]
+                    elif summary == rsgislib.SUMTYPE_MEDIAN:
+                        out_arr[i, j] = scipy.median(int_vals)
+                    elif summary == rsgislib.SUMTYPE_MAX:
+                        out_arr[i, j] = scipy.amax(int_vals)
+                    elif summary == rsgislib.SUMTYPE_MIN:
+                        out_arr[i, j] = scipy.amin(int_vals)
+                    elif summary == rsgislib.SUMTYPE_MEAN:
+                        out_arr[i, j] = scipy.mean(int_vals)
+                    elif summary == rsgislib.SUMTYPE_SUM:
+                        out_arr[i, j] = scipy.sum(int_vals)
+                    elif summary == rsgislib.SUMTYPE_RANGE:
+                        out_arr[i, j] = scipy.amax(int_vals) - scipy.amin(int_vals)
+                    else:
+                        raise Exception("Summary method not recognised/available.")
+
+        outputs.outimage = numpy.expand_dims(out_arr, axis=0)
+
+    applier.apply(_knn_fill_regions, infiles, outfiles, otherargs, controls=aControls)
+    print("Finished fill")
