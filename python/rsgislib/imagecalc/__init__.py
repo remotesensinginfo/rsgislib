@@ -872,3 +872,58 @@ def normalise_image_band(input_img, band, output_img, gdal_format='KEA'):
     rsgislib.imagecalc.bandMath(output_img, exp, gdal_format, rsgislib.TYPE_32FLOAT, band_defns)
     rsgislib.imageutils.popImageStats(output_img, usenodataval=True, nodataval=0.0, calcpyramids=True)
 
+
+def recodeIntRaster(input_img, output_img, recode_dict, keepvalsnotindict=True, gdalformat='KEA',
+                    datatype=rsgislib.TYPE_32INT):
+    """
+    A function recodes an input image. Assuming image only has a single image band so
+    it will be band 1 which is recoded. The recode is provided as a dict where the key
+    is the value to be recoded and the value of the dict is the output value.
+
+    :param input_img: Input image file.
+    :param output_img: Output image file.
+    :param recode_dict: dict for recode (key: int to be recoded, value: int to recode to)
+    :param keepvalsnotindict: boolean whether pixels not being recoded should be copied to the output (True)
+                              or whether only those pixels recoded should be outputted (False) (default: True)
+    :param gdalformat: output file format (default: KEA)
+    :param datatype: is a rsgislib.TYPE_* value providing the data type of the output image.
+
+    """
+    from rios import applier
+    import numpy
+
+    rsgis_utils = rsgislib.RSGISPyUtils()
+    try:
+        import tqdm
+        progress_bar = rsgislib.TQDMProgressBar()
+    except:
+        from rios import cuiprogress
+        progress_bar = cuiprogress.GDALProgressBar()
+
+    # Generated the combined mask.
+    infiles = applier.FilenameAssociations()
+    infiles.inimage = input_img
+    outfiles = applier.FilenameAssociations()
+    outfiles.outimage = output_img
+    otherargs = applier.OtherInputs()
+    otherargs.np_dtype = rsgis_utils.getNumpyDataType(datatype)
+    otherargs.keepvalsnotindict = keepvalsnotindict
+    otherargs.recode_dict = recode_dict
+    aControls = applier.ApplierControls()
+    aControls.progress = progress_bar
+    aControls.drivername = gdalformat
+    aControls.omitPyramids = False
+    aControls.calcStats = False
+
+    def _recode(info, inputs, outputs, otherargs):
+        out_arr = numpy.zeros_like(inputs.inimage[0], dtype=otherargs.np_dtype)
+        if otherargs.keepvalsnotindict:
+            out_arr = inputs.inimage[0]
+
+        for rc_val in recode_dict:
+            out_arr[inputs.inimage[0] == rc_val] = recode_dict[rc_val]
+        outputs.outimage = numpy.expand_dims(out_arr, axis=0)
+
+    applier.apply(_recode, infiles, outfiles, otherargs, controls=aControls)
+
+
