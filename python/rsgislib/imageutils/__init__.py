@@ -2202,7 +2202,7 @@ masks. A JSON LUT is also generated to identify the image values to a
         for img in inputs.msk_imgs:
             for x in range(img.shape[1]):
                 for y in range(img.shape[2]):
-                    if img[0,x,y] > 1:
+                    if img[0,x,y] == 1:
                         out_bit_arr[0,x,(8*y)+img_n] = 1
             img_n = img_n + 1
         
