@@ -1488,7 +1488,7 @@ def extractChipZoneImageBandValues2HDF(inputImageInfo, imageMask, maskValue, chi
                     xMaxExt = x + scnOverlap
                     if chip_size_odd:
                         xMaxExt += 1
-                    if classMskArr[0][y][x] == 1:
+                    if classMskArr[0][y][x] == maskValue:
                         # Rotation 0...
                         sgl_feat_arr[...] = 0.0
                         for nImg in range(nImgs):
@@ -1527,7 +1527,7 @@ def extractChipZoneImageBandValues2HDF(inputImageInfo, imageMask, maskValue, chi
                     xMax = x + scnOverlap
                     if chip_size_odd:
                         xMax += 1
-                    if classMskArr[0][y][x] == 1:
+                    if classMskArr[0][y][x] == maskValue:
                         sgl_feat_arr[...] = 0.0
                         for nImg in range(nImgs):
                             imgBlk = block[nImg + 1][..., yMin:yMax, xMin:xMax]
@@ -1543,8 +1543,13 @@ def extractChipZoneImageBandValues2HDF(inputImageInfo, imageMask, maskValue, chi
     fH5Out = h5py.File(outputHDF, 'w')
     dataGrp = fH5Out.create_group("DATA")
     metaGrp = fH5Out.create_group("META-DATA")
+    # Chunk size needs to be less than number of data points
+    if nFeats < 250:
+        chunkFeatures = nFeats
+    else:
+        chunkFeatures = 250
     h5_dtype = rsgis_utils.getNumpyCharCodesDataType(datatype)
-    dataGrp.create_dataset('DATA', data=featArr, chunks=(250, chipSize, chipSize, nBands),
+    dataGrp.create_dataset('DATA', data=featArr, chunks=(chunkFeatures, chipSize, chipSize, nBands),
                            compression="gzip", shuffle=True, dtype=h5_dtype)
     describDS = metaGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
     describDS[0] = 'IMAGE TILES'.encode()
@@ -1617,20 +1622,28 @@ def splitSampleChipHDF5File(input_h5_file, sample_h5_file, remain_h5_file, sampl
     h5_dtype = rsgis_utils.getNumpyCharCodesDataType(datatype)
 
     # Create an output HDF5 file and populate with sample data.
+    if sample_size < 250:
+	    sample_chunks = sample_size
+    else:
+	    sample_chunks = 250
     fSampleH5Out = h5py.File(sample_h5_file, 'w')
     dataSampleGrp = fSampleH5Out.create_group("DATA")
     metaSampleGrp = fSampleH5Out.create_group("META-DATA")
-    dataSampleGrp.create_dataset('DATA', data=out_samples, chunks=(250, chip_size, chip_size, n_bands),
+    dataSampleGrp.create_dataset('DATA', data=out_samples, chunks=(sample_chunks, chip_size, chip_size, n_bands),
                                  compression="gzip", shuffle=True, dtype=h5_dtype)
     describSampleDS = metaSampleGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
     describSampleDS[0] = 'IMAGE TILES'.encode()
     fSampleH5Out.close()
 
     # Create an output HDF5 file and populate with remain data.
+    if (n_rows - sample_size) < 250:
+	    sample_chunks = (n_rows - sample_size)
+    else:
+	    sample_chunks = 250
     fSampleH5Out = h5py.File(remain_h5_file, 'w')
     dataSampleGrp = fSampleH5Out.create_group("DATA")
     metaSampleGrp = fSampleH5Out.create_group("META-DATA")
-    dataSampleGrp.create_dataset('DATA', data=remain_samples, chunks=(250, chip_size, chip_size, n_bands),
+    dataSampleGrp.create_dataset('DATA', data=remain_samples, chunks=(sample_chunks, chip_size, chip_size, n_bands),
                                  compression="gzip", shuffle=True, dtype=h5_dtype)
     describSampleDS = metaSampleGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
     describSampleDS[0] = 'IMAGE TILES'.encode()
@@ -1828,7 +1841,7 @@ could be used to extract image 'chips' for other purposes.
                     xMax = x + chipHSize
                     xMinExt = x - scnOverlap
                     xMaxExt = x + scnOverlap
-                    if classMskArr[0][y][x] == 1:
+                    if classMskArr[0][y][x] == maskValue:
                         # Rotation 0...
                         refImgBlk = block[1][0, yMin:yMax, xMin:xMax]
                         numpy.copyto(featRefArr[iFeat], refImgBlk, casting='safe')
@@ -1869,7 +1882,7 @@ could be used to extract image 'chips' for other purposes.
                 for x in xRange:
                     xMin = x - scnOverlap
                     xMax = x + scnOverlap
-                    if classMskArr[0][y][x] == 1:
+                    if classMskArr[0][y][x] == maskValue:
                         refImgBlk = block[1][0, yMin:yMax, xMin:xMax]
                         numpy.copyto(featRefArr[iFeat], refImgBlk, casting='safe')
                         sgl_feat_arr[...] = 0.0
@@ -1889,9 +1902,14 @@ could be used to extract image 'chips' for other purposes.
     fH5Out = h5py.File(outputHDF, 'w')
     dataGrp = fH5Out.create_group("DATA")
     metaGrp = fH5Out.create_group("META-DATA")
-    dataGrp.create_dataset('DATA', data=featArr, chunks=(250, chipSize, chipSize, nBands),
+    # Chunk size needs to be less than number of data points
+    if nFeats < 250:
+        chunkFeatures = nFeats
+    else:
+        chunkFeatures = 250
+    dataGrp.create_dataset('DATA', data=featArr, chunks=(chunkFeatures, chipSize, chipSize, nBands),
                            compression="gzip", shuffle=True, dtype=h5_dtype)
-    dataGrp.create_dataset('REF', data=featRefArr, chunks=(250, chipSize, chipSize),
+    dataGrp.create_dataset('REF', data=featRefArr, chunks=(chunkFeatures, chipSize, chipSize),
                            compression="gzip", shuffle=True, dtype='H')
     describDS = metaGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
     describDS[0] = 'IMAGE REF TILES'.encode()
