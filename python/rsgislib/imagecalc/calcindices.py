@@ -281,8 +281,33 @@ Where:
     rsgislib.RSGISPyUtils().setImageNoDataValue(outImage, -999)
     if stats:
         rsgislib.imageutils.popImageStats(outImage,False,-999.,True)
-        
 
+
+def calcNDSI(image, gBand, sBand, outImage, stats=True, gdalformat='KEA'):
+    """
+Helper function to calculate NDSI ((Green-SWIR)/(Green+SWIR)), note the output no data value is -999.
+
+Normalised Difference Snow Index (NDSI)
+
+Where:
+
+:param image: is a string specifying the input image file.
+:param gBand: is an int specifying the green band in the input image (band indexing starts at 1)
+:param sBand: is an int specifying the swir band (e.g., Landsat TM Band 5) in the input image (band indexing starts at 1)
+:param outImage: is a string specifying the output image file.
+:param stats: is a boolean specifying whether pyramids and stats should be calculated (Default: True)
+:param gdalformat: is a string specifing the output image file format (Default: KEA)
+
+"""
+    expression = '(green+swir)!=0?(green-swir)/(green+swir):-999'
+    bandDefns = []
+    bandDefns.append(rsgislib.imagecalc.BandDefn('swir', image, sBand))
+    bandDefns.append(rsgislib.imagecalc.BandDefn('green', image, gBand))
+    rsgislib.imagecalc.bandMath(outImage, expression, gdalformat, rsgislib.TYPE_32FLOAT, bandDefns)
+    # Set no data value
+    rsgislib.RSGISPyUtils().setImageNoDataValue(outImage, -999)
+    if stats:
+        rsgislib.imageutils.popImageStats(outImage, False, -999., True)
 
 
 """
