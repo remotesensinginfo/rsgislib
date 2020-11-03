@@ -573,10 +573,270 @@ image and threshold can be applied to this image.
             rsgislib.rastergis.populateStats(outClassImg, addclrtab=True, calcpyramids=True, ignorezero=True)
 
 
-def train_xgboost_multiclass_classifer(out_mdl_file, clsinfodict, nthread=1, mdl_cls_obj=None):
+def optimise_xgboost_multiclass_classifer(out_params_file, clsinfodict, nthread=1,
+                                          mdl_cls_obj=None, sub_train_smpls=None, rnd_seed=42):
     """
     A function which performs a bayesian optimisation of the hyper-parameters for a multiclass xgboost
-    classifier. A dict of class information, as ClassInfoObj objects, is defined with the training data.
+    classifier. A dict of class information, as ClassInfoObj objects, is defined with the training and
+    validation data. Note, the training data inputted into this function might well be a smaller subset
+    of the whole training dataset to speed up processing.
+
+    This function requires that xgboost and skopt modules to be installed.
+
+    :param out_params_file: The output model parameters which have been optimised.
+    :param clsinfodict: dict (key is string with class name) of ClassInfoObj objects defining the
+                        training and validation data.
+    :param nthread: The number of threads to use to train the classifier.
+    :param sub_train_smpls: Subset the training, if None or 0 then no sub-setting will occur. If
+                            between 0-1 then a ratio subset (e.g., 0.25 = 25 % subset) will be taken.
+                            If > 1 then that number of points will be taken per class.
+    :param rnd_seed: the seed for the random selection of the training data.
+
+    """
+    from skopt.space import Real, Integer
+    from skopt import gp_minimize
+
+    rnd_obj = numpy.random.RandomState(rnd_seed)
+
+    n_classes = len(clsinfodict)
+    for clsname in clsinfodict:
+        if clsinfodict[clsname].id >= n_classes:
+            raise ("ClassInfoObj '{}' id ({}) is not consecutive "
+                   "starting from 0.".format(clsname, clsinfodict[clsname].id))
+
+    cls_data_dict = {}
+    train_data_lst = []
+    train_lbls_lst = []
+    valid_data_lst = []
+    valid_lbls_lst = []
+    cls_ids = []
+    n_classes = 0
+    for clsname in clsinfodict:
+        sgl_cls_info = {}
+        print("Reading Class {} Training".format(clsname))
+        f = h5py.File(clsinfodict[clsname].trainfileH5, 'r')
+        sgl_cls_info['train_n_rows'] = f['DATA/DATA'].shape[0]
+        sgl_cls_info['train_data'] = numpy.array(f['DATA/DATA'])
+
+        if (sub_train_smpls is not None) and (sub_train_smpls > 0):
+            if sub_train_smpls < 1:
+                sub_n_rows = int(sgl_cls_info['train_n_rows'] * sub_train_smpls)
+            else:
+                sub_n_rows = sub_train_smpls
+            print("sub_n_rows = {}".format(sub_n_rows))
+            if sub_n_rows > 0:
+                sub_sel_rows = rnd_obj.choice(sgl_cls_info['train_n_rows'], sub_n_rows)
+                sgl_cls_info['train_data'] = sgl_cls_info['train_data'][sub_sel_rows]
+                sgl_cls_info['train_n_rows'] = sub_n_rows
+
+        sgl_cls_info['train_data_lbls'] = numpy.zeros(sgl_cls_info['train_n_rows'], dtype=int)
+        sgl_cls_info['train_data_lbls'][...] = clsinfodict[clsname].id
+        f.close()
+
+        train_data_lst.append(sgl_cls_info['train_data'])
+        train_lbls_lst.append(sgl_cls_info['train_data_lbls'])
+
+        print("Reading Class {} Validation".format(clsname))
+        f = h5py.File(clsinfodict[clsname].validfileH5, 'r')
+        sgl_cls_info['valid_n_rows'] = f['DATA/DATA'].shape[0]
+        sgl_cls_info['valid_data'] = numpy.array(f['DATA/DATA'])
+        sgl_cls_info['valid_data_lbls'] = numpy.zeros(sgl_cls_info['valid_n_rows'], dtype=int)
+        sgl_cls_info['valid_data_lbls'][...] = clsinfodict[clsname].id
+        f.close()
+        valid_data_lst.append(sgl_cls_info['valid_data'])
+        valid_lbls_lst.append(sgl_cls_info['valid_data_lbls'])
+
+        cls_data_dict[clsname] = sgl_cls_info
+        cls_ids.append(clsinfodict[clsname].id)
+        n_classes = n_classes + 1
+
+    print("Finished Reading Data")
+
+    vaild_np = numpy.concatenate(valid_data_lst)
+    vaild_lbl_np = numpy.concatenate(valid_lbls_lst)
+    d_valid = xgb.DMatrix(vaild_np, label=vaild_lbl_np)
+
+    d_train = xgb.DMatrix(numpy.concatenate(train_data_lst), label=numpy.concatenate(train_lbls_lst))
+
+    space = [Real(0.01, 0.9, name='eta'),
+             Integer(0, 100, name='gamma'),
+             Integer(2, 20, name='max_depth'),
+             Integer(1, 10, name='min_child_weight'),
+             Integer(0, 10, name='max_delta_step'),
+             Real(0.5, 1, name='subsample'),
+             Integer(2, 100, name='num_boost_round')
+             ]
+
+    def _objective(values):
+        params = {'eta'             : values[0],
+                  'gamma'           : values[1],
+                  'max_depth'       : values[2],
+                  'min_child_weight': values[3],
+                  'max_delta_step'  : values[4],
+                  'subsample'       : values[5],
+                  'nthread'         : nthread,
+                  'eval_metric'     : 'merror',
+                  'objective'       : 'multi:softmax',
+                  'num_class'       : n_classes}
+
+        print('\nNext set of params.....', params)
+
+        num_boost_round = values[6]
+        print("num_boost_round = {}.".format(num_boost_round))
+
+        watchlist = [(d_train, 'train'), (d_valid, 'validation')]
+        evals_results = {}
+        model_xgb = xgb.train(params, d_train, num_boost_round, evals=watchlist, evals_result=evals_results,
+                              verbose_eval=False, xgb_model=mdl_cls_obj)
+
+        vld_preds_idxs = model_xgb.predict(d_valid)
+
+        acc_score = -accuracy_score(vaild_lbl_np, vld_preds_idxs)
+        print('\nAccScore.....', -acc_score, ".....iter.....")
+        gc.collect()
+        return acc_score
+
+    res_gp = gp_minimize(_objective, space, n_calls=20, random_state=0, n_random_starts=10)
+
+    print("Best score={}".format(res_gp.fun))
+    best_params = res_gp.x
+    print("Best Params:\n{}".format(best_params))
+
+    params = {'eta': float(best_params[0]),
+              'gamma': int(best_params[1]),
+              'max_depth': int(best_params[2]),
+              'min_child_weight': int(best_params[3]),
+              'max_delta_step': int(best_params[4]),
+              'subsample': float(best_params[5]),
+              'nthread': int(nthread),
+              'eval_metric': 'merror',
+              'objective': 'multi:softmax',
+              'num_class': int(n_classes),
+              'num_boost_round': int(best_params[6])}
+
+    with open(out_params_file, 'w') as fp:
+        json.dump(params, fp, sort_keys=True, indent=4, separators=(',', ': '), ensure_ascii=False)
+
+
+def train_xgboost_multiclass_classifer(out_mdl_file, cls_params_file, clsinfodict, nthread=1, mdl_cls_obj=None):
+    """
+    A function which performs a bayesian optimisation of the hyper-parameters for a multiclass xgboost
+    classifier producing a full trained model at the end. A dict of class information, as ClassInfoObj
+    objects, is defined with the training data.
+
+    This function requires that xgboost modules to be installed.
+
+    :param out_mdl_file: The output model which can be loaded to perform a classification.
+    :param cls_params_file: A JSON file with the model parameters
+    :param clsinfodict: dict (key is string with class name) of ClassInfoObj objects defining the training data.
+    :param nthread: The number of threads to use to train the classifier.
+
+    """
+    n_classes = len(clsinfodict)
+    for clsname in clsinfodict:
+        if clsinfodict[clsname].id >= n_classes:
+            raise ("ClassInfoObj '{}' id ({}) is not consecutive starting from 0.".format(clsname,
+                                                                                          clsinfodict[clsname].id))
+
+    cls_data_dict = {}
+    train_data_lst = []
+    train_lbls_lst = []
+    valid_data_lst = []
+    valid_lbls_lst = []
+    test_data_lst = []
+    test_lbls_lst = []
+    cls_ids = []
+    n_classes = 0
+    for clsname in clsinfodict:
+        sgl_cls_info = {}
+        print("Reading Class {} Training".format(clsname))
+        f = h5py.File(clsinfodict[clsname].trainfileH5, 'r')
+        sgl_cls_info['train_n_rows'] = f['DATA/DATA'].shape[0]
+        sgl_cls_info['train_data'] = numpy.array(f['DATA/DATA'])
+        sgl_cls_info['train_data_lbls'] = numpy.zeros(sgl_cls_info['train_n_rows'], dtype=int)
+        sgl_cls_info['train_data_lbls'][...] = clsinfodict[clsname].id
+        f.close()
+        train_data_lst.append(sgl_cls_info['train_data'])
+        train_lbls_lst.append(sgl_cls_info['train_data_lbls'])
+
+        print("Reading Class {} Validation".format(clsname))
+        f = h5py.File(clsinfodict[clsname].validfileH5, 'r')
+        sgl_cls_info['valid_n_rows'] = f['DATA/DATA'].shape[0]
+        sgl_cls_info['valid_data'] = numpy.array(f['DATA/DATA'])
+        sgl_cls_info['valid_data_lbls'] = numpy.zeros(sgl_cls_info['valid_n_rows'], dtype=int)
+        sgl_cls_info['valid_data_lbls'][...] = clsinfodict[clsname].id
+        f.close()
+        valid_data_lst.append(sgl_cls_info['valid_data'])
+        valid_lbls_lst.append(sgl_cls_info['valid_data_lbls'])
+
+        print("Reading Class {} Testing".format(clsname))
+        f = h5py.File(clsinfodict[clsname].testfileH5, 'r')
+        sgl_cls_info['test_n_rows'] = f['DATA/DATA'].shape[0]
+        sgl_cls_info['test_data'] = numpy.array(f['DATA/DATA'])
+        sgl_cls_info['test_data_lbls'] = numpy.zeros(sgl_cls_info['test_n_rows'], dtype=int)
+        sgl_cls_info['test_data_lbls'][...] = clsinfodict[clsname].id
+        f.close()
+        test_data_lst.append(sgl_cls_info['test_data'])
+        test_lbls_lst.append(sgl_cls_info['test_data_lbls'])
+
+        cls_data_dict[clsname] = sgl_cls_info
+        cls_ids.append(clsinfodict[clsname].id)
+        n_classes = n_classes + 1
+
+    print("Finished Reading Data")
+
+    vaild_np = numpy.concatenate(valid_data_lst)
+    vaild_lbl_np = numpy.concatenate(valid_lbls_lst)
+    d_valid = xgb.DMatrix(vaild_np, label=vaild_lbl_np)
+
+    d_train = xgb.DMatrix(numpy.concatenate(train_data_lst), label=numpy.concatenate(train_lbls_lst))
+
+    test_np = numpy.concatenate(test_data_lst)
+    test_lbl_np = numpy.concatenate(test_lbls_lst)
+    d_test = xgb.DMatrix(test_np, label=test_lbl_np)
+
+    with open(cls_params_file) as f:
+        cls_params = json.load(f)
+
+    if n_classes != cls_params['num_class']:
+        raise Exception('The number of classes used to optimise the '
+                        'classifer and the number for training are different!')
+
+    print("Start Training Find Classifier")
+
+    params = {'eta'             : cls_params['eta'],
+              'gamma'           : cls_params['gamma'],
+              'max_depth'       : cls_params['max_depth'],
+              'min_child_weight': cls_params['min_child_weight'],
+              'max_delta_step'  : cls_params['max_delta_step'],
+              'subsample'       : cls_params['subsample'],
+              'nthread'         : nthread,
+              'eval_metric'     : cls_params['eval_metric'],
+              'objective'       : cls_params['objective'],
+              'num_class'       : n_classes}
+
+    num_boost_round = cls_params['num_boost_round']
+
+    watchlist = [(d_train, 'train'), (d_valid, 'validation')]
+    evals_results = {}
+    model_xgb = xgb.train(params, d_train, num_boost_round, evals=watchlist, evals_result=evals_results,
+                          verbose_eval=False, xgb_model=mdl_cls_obj)
+    model_xgb.save_model(out_mdl_file)
+
+    vld_preds_idxs = model_xgb.predict(d_valid)
+    valid_acc_scr = accuracy_score(vaild_lbl_np, vld_preds_idxs)
+    print("Validate Accuracy: {}".format(valid_acc_scr))
+
+    test_preds_idxs = model_xgb.predict(d_test)
+    test_acc_scr = accuracy_score(test_lbl_np, test_preds_idxs)
+    print("Testing Accuracy: {}".format(test_acc_scr))
+
+
+def train_opt_xgboost_multiclass_classifer(out_mdl_file, clsinfodict, nthread=1, mdl_cls_obj=None):
+    """
+    A function which performs a bayesian optimisation of the hyper-parameters for a multiclass xgboost
+    classifier producing a full trained model at the end. A dict of class information, as ClassInfoObj
+    objects, is defined with the training data.
 
     This function requires that xgboost and skopt modules to be installed.
 
