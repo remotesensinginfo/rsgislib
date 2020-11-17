@@ -36,7 +36,7 @@
 import rsgislib
 import rsgislib.imageutils
 import rsgislib.imagecalc
-
+import os
 
 def calcNDVI(image, rBand, nBand, outImage, stats=True, gdalformat='KEA'):
     """ 
@@ -197,6 +197,7 @@ Where:
     if stats:
         rsgislib.imageutils.popImageStats(outImage,False,-999.,True)
 
+
 def calcBrightness(image, bBand, gBand, rBand, outImage, stats=True, gdalformat='KEA', scalefac=1000):
     """ 
 Helper function to calculate visable brightness, note the output no data value is -999.
@@ -213,7 +214,7 @@ Where:
 :param scalefac: is a float which can be used retirved reflectance between 0-1 (Default: 1000 to match rsgislib/arcsi)
     
 """
-    expression = '(blue+green+red)!=0?((blue/'+str(scalefac)+')+(green/'+str(scalefac)+')+(red/'+str(scalefac)+'))/3:-999'
+    expression = '(blue+green+red)!=0?((blue/{})+(green/{})+(red/{}))/3:-999'.format(scalefac, scalefac, scalefac)
     bandDefns = []
     bandDefns.append(rsgislib.imagecalc.BandDefn('blue', image, bBand))
     bandDefns.append(rsgislib.imagecalc.BandDefn('green', image, gBand))
@@ -225,7 +226,7 @@ Where:
         rsgislib.imageutils.popImageStats(outImage,False,-999.,True)
         
 
-def calcBrightnessScaled(image, bBand, gBand, rBand, outImage, stats=True, gdalformat='KEA'):
+def calcBrightnessScaled(image, bBand, gBand, rBand, outImage, stats=True, gdalformat='KEA', scalefac=1000):
     """ 
 Helper function to calculate visable brightness, note the output no data value is -999.
     
@@ -238,12 +239,13 @@ Where:
 :param outImage: is a string specifying the output image file.
 :param stats: is a boolean specifying whether pyramids and stats should be calculated (Default: True)
 :param gdalformat: is a string specifing the output image file format (Default: KEA)
+:param scalefac: is a float which can be used retirved reflectance between 0-1 (Default: 1000 to match rsgislib/arcsi)
     
 """
     rsgisUtils = rsgislib.RSGISPyUtils()
     uidStr = rsgisUtils.uidGenerator()
     tmpImg = os.path.splitext(outImage)[0]+'_tmp'+uidStr+'.'+rsgisUtils.getFileExtension(gdalformat)
-    expression = '(blue+green+red)!=0?((blue/'+str(scalefac)+')+(green/'+str(scalefac)+')+(red/'+str(scalefac)+'))/3:-999'
+    expression = '(blue+green+red)!=0?((blue/{})+(green/{})+(red/{}))/3:-999'.format(scalefac, scalefac, scalefac)
     bandDefns = []
     bandDefns.append(rsgislib.imagecalc.BandDefn('blue', image, bBand))
     bandDefns.append(rsgislib.imagecalc.BandDefn('green', image, gBand))
@@ -303,6 +305,63 @@ Where:
     bandDefns = []
     bandDefns.append(rsgislib.imagecalc.BandDefn('swir', image, sBand))
     bandDefns.append(rsgislib.imagecalc.BandDefn('green', image, gBand))
+    rsgislib.imagecalc.bandMath(outImage, expression, gdalformat, rsgislib.TYPE_32FLOAT, bandDefns)
+    # Set no data value
+    rsgislib.RSGISPyUtils().setImageNoDataValue(outImage, -999)
+    if stats:
+        rsgislib.imageutils.popImageStats(outImage, False, -999., True)
+
+
+def calcNBR(image, nBand, s2Band, outImage, stats=True, gdalformat='KEA'):
+    """
+Helper function to calculate NBR ((NIR-SWIR#2)/(NIR+SWIR#2)), note the output no data value is -999.
+
+Normalised Burn Ratio (NBR)
+
+Where:
+
+:param image: is a string specifying the input image file.
+:param nBand: is an int specifying the nir band in the input image (band indexing starts at 1)
+:param s2Band: is an int specifying the swir #2 band (e.g., Landsat TM Band 7) in the input image (band indexing starts at 1)
+:param outImage: is a string specifying the output image file.
+:param stats: is a boolean specifying whether pyramids and stats should be calculated (Default: True)
+:param gdalformat: is a string specifing the output image file format (Default: KEA)
+
+"""
+    expression = '(nir+swir)!=0?(nir-swir)/(nir+swir):-999'
+    bandDefns = []
+    bandDefns.append(rsgislib.imagecalc.BandDefn('swir', image, s2Band))
+    bandDefns.append(rsgislib.imagecalc.BandDefn('nir', image, nBand))
+    rsgislib.imagecalc.bandMath(outImage, expression, gdalformat, rsgislib.TYPE_32FLOAT, bandDefns)
+    # Set no data value
+    rsgislib.RSGISPyUtils().setImageNoDataValue(outImage, -999)
+    if stats:
+        rsgislib.imageutils.popImageStats(outImage, False, -999., True)
+
+
+def calcBAI(image, nBand, rBand, outImage, stats=True, gdalformat='KEA', scalefac=1000):
+    """
+Helper function to calculate NBR 1/((0.1 - red)*(0.1 - red) + (0.006 - nir)*(0.006 - nir)), note the
+output no data value is -999.
+
+Burn Area Index (BAI)
+
+Where:
+
+:param image: is a string specifying the input image file.
+:param nBand: is an int specifying the nir band in the input image (band indexing starts at 1)
+:param rBand: is an int specifying the red band in the input image (band indexing starts at 1)
+:param outImage: is a string specifying the output image file.
+:param stats: is a boolean specifying whether pyramids and stats should be calculated (Default: True)
+:param gdalformat: is a string specifing the output image file format (Default: KEA)
+:param scalefac: is a float which can be used retirved reflectance between 0-1 (Default: 1000 to match rsgislib/arcsi)
+
+"""
+    expression = '(nir+red)!=0?(1/((0.1 - (red/{}))*(0.1 - (red/{})) + ' \
+                 '(0.006 - (nir/{}))*(0.006 - (nir/{})))):-999'.format(scalefac, scalefac, scalefac, scalefac)
+    bandDefns = []
+    bandDefns.append(rsgislib.imagecalc.BandDefn('red', image, rBand))
+    bandDefns.append(rsgislib.imagecalc.BandDefn('nir', image, nBand))
     rsgislib.imagecalc.bandMath(outImage, expression, gdalformat, rsgislib.TYPE_32FLOAT, bandDefns)
     # Set no data value
     rsgislib.RSGISPyUtils().setImageNoDataValue(outImage, -999)
