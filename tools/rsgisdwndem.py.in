@@ -1,0 +1,91 @@
+#!/usr/bin/env python
+
+#############################################
+# rsgisdwndem.py
+#
+#  Copyright 2020 RSGISLib.
+#
+#  RSGISLib: 'The remote sensing and GIS Software Library'
+#
+#  RSGISLib is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  RSGISLib is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with RSGISLib.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Purpose: A script to download SRTM data and mosaic it.
+#
+# Author: Pete Bunting
+# Email: petebunting@mac.com
+# Date: 24/11/2020
+# Version: 1.0
+#
+##############################################
+
+import rsgislib
+import os
+import os.path
+import elevation
+import argparse
+
+if __name__ == '__main__':
+    """
+    The command line user interface to RSGISLib DEM download tool.
+    """
+    parser = argparse.ArgumentParser(prog='rsgisdwndem.py',
+                                    description='''Download DEM for area of interest defined by input image or vector layer.''')
+    parser.add_argument("--image", type=str, required=False, help='''Specify the input image file defining extent.''')
+    parser.add_argument("--vecfile", type=str, required=False, help='''Specify the input vector file defining extent.''')
+    parser.add_argument("--veclyr", type=str, required=False, help='''Specify the input vector layer defining extent.''')
+    # Define the argument for specifying the output file.
+    parser.add_argument("-o", "--output", type=str, required=True, help='''The output DEM file - outputs as a GeoTIFF.''')
+    parser.add_argument("-b", "--buffer", type=float, default=0.5, help='''Specify the buffer around the image for which the DEM will be downloaded.''')
+    parser.add_argument("-l", "--limit", type=int, default=10, help="A limit on the number of tiles which can be downloaded.")
+    parser.add_argument("-t", "--tmp", type=str, required=True, help='''A temporary directory to do work in.''')
+    # Call the parser to parse the arguments.
+    args = parser.parse_args()
+
+    if (args.image is None) and (args.vecfile is None):
+        raise Exception("You must specify either an input image or input vector layer.")
+
+    rsgis_utils = rsgislib.RSGISPyUtils()
+
+    if args.image is not None:
+        roi_bbox_latlon = rsgis_utils.getImageBBOXInProj(args.image, 4326)
+    elif args.vecfile is not None:
+        if args.veclyr is None:
+            veclyr = rsgis_utils.get_file_basename(args.vecfile)
+        else:
+            veclyr = args.veclyr
+
+        bbox = rsgis_utils.getVecLayerExtent(args.vecfile, veclyr, True)
+        epsg_vec_code = rsgis_utils.getProjEPSGFromVec(args.vecfile, veclyr)
+        roi_bbox_latlon = rsgis_utils.reprojBBOX_epsg(bbox, epsg_vec_code, 4326)
+
+    output_img = os.path.abspath(args.output)
+    tmp_dir = os.path.abspath(args.tmp)
+    if not os.path.exists(tmp_dir):
+        os.mkdir(tmp_dir)
+    
+    bounds_ext = (roi_bbox_latlon[0]-args.buffer, roi_bbox_latlon[2]-args.buffer, roi_bbox_latlon[1]+args.buffer, roi_bbox_latlon[3]+args.buffer)
+    print(bounds_ext)
+    try:
+        elevation.clip(bounds=bounds_ext, output=output_img, max_download_tiles=args.limit, cache_dir=tmp_dir)
+    except Exception as e:
+        print("An error has occurred when downloading and processing the DEM data. Try re-running as data is cached.")
+        raise e
+    elevation.clean()
+
+
+
+
+
+
+
