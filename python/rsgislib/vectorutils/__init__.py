@@ -6173,3 +6173,30 @@ def merge_utm_vecs_wgs84(input_files, output_file, output_lyr=None, out_format='
             out_gdf.to_file(output_file, layer=output_lyr, driver=out_format)
         else:
             out_gdf.to_file(output_file, driver=out_format)
+
+
+def clip_vec_lyr(vec_file, vec_lyr, roi_file, roi_lyr, vec_out_file, vec_out_lyr, out_format='GPKG'):
+    """
+    A function which clips a vector layer using an input region of interest (ROI) polygon layer.
+
+    :param vec_file: Input vector file.
+    :param vec_lyr: Input vector layer within the input file.
+    :param roi_file: Input vector file defining the ROI polygon(s)
+    :param roi_lyr: Input vector layer within the roi input file.
+    :param vec_out_file: Output vector file
+    :param vec_out_lyr: output vector layer name.
+    :param out_format: output file format (default GPKG).
+
+    """
+    import geopandas
+
+    base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
+    roi_gpdf = geopandas.read_file(roi_file, layer=roi_lyr)
+
+    cliped_gpdf = geopandas.clip(base_gpdf, roi_gpdf, keep_geom_type=True)
+
+    if out_format == 'GPKG':
+        cliped_gpdf.to_file(vec_out_file, layer=vec_out_lyr, driver=out_format)
+    else:
+        cliped_gpdf.to_file(vec_out_file, driver=out_format)
+

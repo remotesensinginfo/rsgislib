@@ -2243,7 +2243,7 @@ def gdal_translate(input_img, output_img, gdal_format='KEA', options=''):
     :param gdal_format: The output image file format
     :param options: options for the output driver (e.g., "-co TILED=YES -co COMPRESS=LZW -co BIGTIFF=YES")
     """
-    if (gdal_format == 'GTIFF') and (options != ''):
+    if (gdal_format == 'GTIFF') and (options == ''):
         options = "-co TILED=YES -co INTERLEAVE=PIXEL -co BLOCKXSIZE=256 -co BLOCKYSIZE=256 -co COMPRESS=LZW -co BIGTIFF=YES -co COPY_SRC_OVERVIEWS=YES"
 
     try:
