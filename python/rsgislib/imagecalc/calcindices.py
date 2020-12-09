@@ -344,7 +344,8 @@ def calcBAI(image, nBand, rBand, outImage, stats=True, gdalformat='KEA', scalefa
 Helper function to calculate NBR 1/((0.1 - red)*(0.1 - red) + (0.006 - nir)*(0.006 - nir)), note the
 output no data value is -999.
 
-Burn Area Index (BAI)
+Burn Area Index (BAI): Chuvieco, E.; Martín, M.P.; Palacios, A. Assessment of different spectral indices
+in the red-near-infrared spectral domain for burned land discrimination. Int. J. Remote Sens. 2002, 23, 5103–5110.
 
 Where:
 
@@ -358,7 +359,7 @@ Where:
 
 """
     expression = '(nir+red)!=0?(1/((0.1 - (red/{}))*(0.1 - (red/{})) + ' \
-                 '(0.006 - (nir/{}))*(0.006 - (nir/{})))):-999'.format(scalefac, scalefac, scalefac, scalefac)
+                 '(0.06 - (nir/{}))*(0.06 - (nir/{})))):-999'.format(scalefac, scalefac, scalefac, scalefac)
     bandDefns = []
     bandDefns.append(rsgislib.imagecalc.BandDefn('red', image, rBand))
     bandDefns.append(rsgislib.imagecalc.BandDefn('nir', image, nBand))
