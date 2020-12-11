@@ -341,7 +341,7 @@ Where:
 
 def calcBAI(image, nBand, rBand, outImage, stats=True, gdalformat='KEA', scalefac=1000):
     """
-Helper function to calculate NBR 1/((0.1 - red)*(0.1 - red) + (0.006 - nir)*(0.006 - nir)), note the
+Helper function to calculate NBR 1/((0.1 - red)*(0.1 - red) + (0.06 - nir)*(0.06 - nir)), note the
 output no data value is -999.
 
 Burn Area Index (BAI): Chuvieco, E.; Martín, M.P.; Palacios, A. Assessment of different spectral indices
