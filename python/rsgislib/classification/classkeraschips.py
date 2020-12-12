@@ -150,39 +150,32 @@ def train_keras_chips_pixel_classifer(cls_mdl, clsinfodict, out_mdl_file=None, t
 
 
 def apply_keras_chips_pixel_classifier(classTrainInfo, keras_cls_mdl, imgMask, imgMaskVal, imgFileInfo,
-                                       chip_h_size, outClassImg, gdalformat, pred_batch_size=128,
-                                       pred_max_queue_size=10, pred_workers=1, pred_use_multiprocessing=False,
+                                       chip_size, outClassImg, norm_function=None, gdalformat="KEA",
                                        classClrNames=True):
     """
-This function applies a trained single pixel keras model to an image. The function train_keras_pixel_classifer
-can be used to train such as model. The output image will contain the hard membership of the predicted class.
+    This function applies a trained single pixel keras model to an image. The function train_keras_pixel_classifer
+    can be used to train such as model. The output image will contain the hard membership of the predicted class.
 
-For pred_batch_size, pred_max_queue_size, pred_workers and pred_use_multiprocessing options see the keras
-documentation https://keras.io/models/model/
 
-:param classTrainInfo: dict (where the key is the class name) of rsgislib.classification.ClassInfoObj
-                       objects which will be used to train the classifier (i.e., train_keras_pixel_classifer()),
-                       provide pixel value id and RGB class values.
-:param keras_cls_mdl: a trained keras model object, with a input dimensions equivlent to the number of image
-                      bands specified in the imgFileInfo input and output layer which provides an output array
-                      of the length of the number of classes.
-:param imgMask: is an image file providing a mask to specify where should be classified. Simplest mask is all the
-                valid data regions (rsgislib.imageutils.genValidMask)
-:param imgMaskVal: the pixel value within the imgMask to limit the region to which the classification is applied.
-                   Can be used to create a heirachical classification.
-:param imgFileInfo: a list of rsgislib.imageutils.ImageBandInfo objects (also used within
-                    rsgislib.imageutils.extractZoneImageBandValues2HDF) to identify which images and bands are to
-                    be used for the classification so it adheres to the training data.
-:param outClassImg: Output image which will contain the hard classification.
-:param chip_h_size: is half the chip size to be extracted (i.e., 10 with output image chips 21x21,
-                    10 pixels either size of the one of interest).
-:param gdalformat: is the output image format - all GDAL supported formats are supported.
-:param pred_batch_size: the batch size used for the classification prediction.
-:param pred_max_queue_size: the max queue size used for the classification prediction
-:param pred_workers: the number of workers used for the classification prediction
-:param pred_use_multiprocessing: whether to use a multiprocessing option for the classification prediction
-:param classClrNames: default is True and therefore a colour table will the colours specified in ClassInfoObj
-                      and a ClassName (from classTrainInfo) column will be added to the output file.
+    :param classTrainInfo: dict (where the key is the class name) of rsgislib.classification.ClassInfoObj
+                           objects which will be used to train the classifier (i.e., train_keras_pixel_classifer()),
+                           provide pixel value id and RGB class values.
+    :param keras_cls_mdl: a trained keras model object, with a input dimensions equivlent to the number of image
+                          bands specified in the imgFileInfo input and output layer which provides an output array
+                          of the length of the number of classes.
+    :param imgMask: is an image file providing a mask to specify where should be classified. Simplest mask is all the
+                    valid data regions (rsgislib.imageutils.genValidMask)
+    :param imgMaskVal: the pixel value within the imgMask to limit the region to which the classification is applied.
+                       Can be used to create a heirachical classification.
+    :param imgFileInfo: a list of rsgislib.imageutils.ImageBandInfo objects (also used within
+                        rsgislib.imageutils.extractZoneImageBandValues2HDF) to identify which images and bands are to
+                        be used for the classification so it adheres to the training data.
+    :param outClassImg: Output image which will contain the hard classification.
+    :param norm_function: Normalisation function to apply before running classification
+    :param chip_size: is the chip size to be extracted.
+    :param gdalformat: is the output image format - all GDAL supported formats are supported.
+    :param classClrNames: default is True and therefore a colour table will the colours specified in ClassInfoObj
+                          and a ClassName (from classTrainInfo) column will be added to the output file.
 
     """
     n_classes = len(classTrainInfo)
@@ -205,60 +198,53 @@ documentation https://keras.io/models/model/
         n_img_bands = n_img_bands + len(inImgInfo.bands)
     nImgs = len(imgFileInfo)
 
-    scn_overlap = chip_h_size
-    chip_size = (chip_h_size * 2) + 1
+    scn_overlap = chip_size // 2
 
     writer = None
-    reader = ImageReader(inImgs, windowxsize=200, windowysize=200, overlap=scn_overlap, layerselection=inImgBands)
+    reader = ImageReader(inImgs, windowxsize=chip_size, windowysize=chip_size, overlap=scn_overlap, layerselection=inImgBands)
+    feat2cls = None
+
     for (info, block) in tqdm.tqdm(reader):
         classMskArr = block[0]
-        blkShape = classMskArr.shape
 
-        vld_cls_arr = numpy.zeros_like(classMskArr, dtype=int)
+        blk_shape = classMskArr.shape
 
-        xSize = blkShape[2] - (scn_overlap * 2)
-        ySize = blkShape[1] - (scn_overlap * 2)
-        xRange = numpy.arange(scn_overlap, scn_overlap + xSize, 1)
-        yRange = numpy.arange(scn_overlap, scn_overlap + ySize, 1)
-        n_vld_pxls = 0
-        for y in yRange:
-            for x in xRange:
-                if classMskArr[0][y][x] == imgMaskVal:
-                    n_vld_pxls = n_vld_pxls + 1
-                    vld_cls_arr[0][y][x] = 1
+        if feat2cls is None:
+            feat2cls = numpy.zeros([1, chip_size, chip_size, n_img_bands], dtype=numpy.float32)
+        else:
+            feat2cls[...] = 0
 
-        feat2cls = numpy.zeros([n_vld_pxls, n_img_bands, chip_size, chip_size], dtype=numpy.float32)
-        iFeat = 0
-        for y in yRange:
-            yMin = y - scn_overlap
-            yMax = y + scn_overlap + 1
-            for x in xRange:
-                xMin = x - scn_overlap
-                xMax = x + scn_overlap + 1
-                if classMskArr[0][y][x] == imgMaskVal:
-                    for nImg in range(nImgs):
-                        imgBlk = block[nImg + 1][..., yMin:yMax, xMin:xMax]
-                        for iBand in range(imgBlk.shape[0]):
-                            numpy.copyto(feat2cls[iFeat, iBand], imgBlk[iBand], casting='safe')
-                        iFeat = iFeat + 1
+        chip_mask = classMskArr[0, scn_overlap:scn_overlap+chip_size,scn_overlap:scn_overlap+chip_size]
+        # If there are no valid pixels in the block at all then no point running prediction
+        # set all output valies to 0.
+        if numpy.all(chip_mask != imgMaskVal):
+            out_cls_arr = numpy.zeros_like(classMskArr, dtype=numpy.uint16)
+            out_cls_arr[...] = 0
+        else:
+            # Go through bands and reorder for prediction
+            for nImg in range(nImgs):
+                imgBlk = block[nImg + 1][:,:,:]
+                for iBand in range(imgBlk.shape[0]):
+                    feat2cls[0, :, :, iBand] = imgBlk[iBand,scn_overlap:scn_overlap+chip_size,scn_overlap:scn_overlap+chip_size]
 
-        preds_idxs = numpy.argmax(
-            keras_cls_mdl.predict(feat2cls, batch_size=pred_batch_size, max_queue_size=pred_max_queue_size,
-                                  workers=pred_workers, use_multiprocessing=pred_use_multiprocessing), axis=1)
-        feat2cls = None
+            image_chip = feat2cls[0:1,:,:,:]
+            # If a normalisation function has been specified then apply this
+            if norm_function is not None:
+                image_chip = norm_function(image_chip)
 
-        out_cls_arr = numpy.zeros_like(classMskArr, dtype=numpy.uint16)
-        out_cls_arr = out_cls_arr.flatten()
-        vld_cls_arr = vld_cls_arr.flatten()
-        ID = numpy.arange(out_cls_arr.shape[0])
-        ID = ID[vld_cls_arr == 1]
+            predict_class = numpy.argmax(keras_cls_mdl.predict(image_chip), axis=1)
 
-        preds_cls_ids = numpy.zeros_like(preds_idxs, dtype=numpy.uint16)
-        for cld_id, idx in zip(cls_id_lut, numpy.arange(0, len(cls_id_lut))):
-            preds_cls_ids[preds_idxs == idx] = cld_id
+            # Update based on output class
+            out_predict_class = numpy.empty_like(predict_class)
+            for cld_id, idx in zip(cls_id_lut, numpy.arange(0, len(cls_id_lut))):
+                out_predict_class[predict_class == idx] = cld_id
 
-        out_cls_arr[ID] = preds_cls_ids
-        out_cls_arr = numpy.expand_dims(out_cls_arr.reshape((classMskArr.shape[1], classMskArr.shape[2])), axis=0)
+            # Assign all pixels in block to predicted class
+            out_cls_arr = numpy.zeros_like(classMskArr, dtype=numpy.uint16)
+            out_cls_arr[...] = out_predict_class
+
+            # Apply mask to output pixels
+            out_cls_arr[classMskArr != imgMaskVal] = 0
 
         if writer is None:
             writer = ImageWriter(outClassImg, info=info, firstblock=out_cls_arr, drivername=gdalformat)
