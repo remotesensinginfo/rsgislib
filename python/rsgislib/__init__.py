@@ -734,6 +734,20 @@ class RSGISPyUtils (object):
         # width x height
         return (bbox[1] - bbox[0]) * (bbox[3] - bbox[2])
 
+    def bbox_equal(self, bbox1, bbox2):
+        """
+        A function which tests whether two bboxes (xMin, xMax, yMin, yMax) are equal.
+
+        :param bbox1: is a bbox (xMin, xMax, yMin, yMax)
+        :param bbox2: is a bbox (xMin, xMax, yMin, yMax)
+        :return: boolean
+
+        """
+        bbox_eql = False
+        if (bbox1[0] == bbox2[0]) and (bbox1[1] == bbox2[1]) and (bbox1[2] == bbox2[2]) and (bbox1[3] == bbox2[3]):
+            bbox_eql = True
+        return bbox_eql
+
     def bbox_intersection(self, bbox1, bbox2):
         """
         A function which calculates the intersection of the two bboxes (xMin, xMax, yMin, yMax).

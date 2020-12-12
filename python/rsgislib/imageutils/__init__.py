@@ -2576,3 +2576,90 @@ def assign_random_pxls(input_img, output_img, n_pts, img_band=1, gdalformat='KEA
 
     rsgislib.imageutils.createCopyImage(input_img, output_img, 1, 0, gdalformat, rsgislib.TYPE_8UINT)
     set_image_pxl_values(output_img, 1, out_x_coords, out_y_coords, 1)
+
+
+def check_img_lst(imglst, exp_x_res, exp_y_res, bbox=None, print_errors=True):
+    """
+    A function which checks a list of images to ensure they resolution and optionally
+    the bounding box is as expected.
+
+    :param imglst: a list of input images
+    :param exp_x_res: the expected image resolution in the x-axis
+    :param exp_y_res: the expected image resolution in the y-axis
+    :param bbox: a bbox (MinX, MaxX, MinY, MaxY) where intersection will be tested. Default None and ignored.
+    :param print_errors: if True then images with errors will be printed to the console. Default: True
+    :return: a list of images which have passed resolution and optional bbox intersection test.
+
+    """
+    out_imgs = list()
+    rsgis_utils = rsgislib.RSGISPyUtils()
+    for img in imglst:
+        img_res = rsgis_utils.getImageRes(img)
+        if bbox is not None:
+            img_bbox = rsgis_utils.getImageBBOX(img)
+        if (img_res[0] != exp_x_res) or (abs(img_res[1]) != exp_y_res):
+            if print_errors:
+                print("{} has resolution: {}".format(img, img_res))
+        elif (bbox is not None) and (not rsgis_utils.bbox_intersection(bbox, img_bbox)):
+            if print_errors:
+                print("{} has BBOX: {}".format(img, img_bbox))
+        else:
+            out_imgs.append(img)
+    return out_imgs
+
+
+def check_img_file_comparison(base_img, comp_img, test_n_bands=False, test_eql_bbox=False, print_errors=True):
+    """
+    A function which tests whether an image is comparable:
+     * Image resolution
+     * Intersecting bounding box
+     * Optionally the number of bands
+     * Optionally whether the BBOXs match rather than intersect
+
+    :param base_img: base input image which will be compared to
+    :param comp_img: the input image which will be compared to the base.
+    :param test_n_bands: if true the number of image bands will be checked (i.e., the same)
+    :parma test_eql_bbox: if true then the bboxes will need to be identical between the images.
+    :param print_errors: if True then images with errors will be printed to the console. Default: True
+    :return: Boolean (True; images are compariable)
+
+    """
+    rsgis_utils = rsgislib.RSGISPyUtils()
+
+    imgs_match = True
+
+    if not rsgis_utils.doImageResMatch(base_img, comp_img):
+        if print_errors:
+            base_img_res = rsgis_utils.getImageRes(base_img)
+            comp_img_res = rsgis_utils.getImageRes(comp_img)
+            print("Base Image Res: {}".format(base_img_res))
+            print("Comp Image Res: {}".format(comp_img_res))
+        imgs_match = False
+
+    base_img_bbox = rsgis_utils.getImageBBOX(base_img)
+    comp_img_bbox = rsgis_utils.getImageBBOX(comp_img)
+    if not rsgis_utils.bbox_intersection(base_img_bbox, comp_img_bbox):
+        if print_errors:
+            print("Base Image BBOX: {}".format(base_img_bbox))
+            print("Comp Image BBOX: {}".format(comp_img_bbox))
+        imgs_match = False
+
+    if test_eql_bbox:
+        if not rsgis_utils.bbox_equal(base_img_bbox, comp_img_bbox):
+            if print_errors:
+                print("Base Image BBOX: {}".format(base_img_bbox))
+                print("Comp Image BBOX: {}".format(comp_img_bbox))
+            imgs_match = False
+
+    if test_n_bands:
+        base_img_nbands = rsgis_utils.getImageBandCount(base_img)
+        comp_img_nbands = rsgis_utils.getImageBandCount(comp_img)
+        if base_img_nbands != comp_img_nbands:
+            if print_errors:
+                print("Base Image n-bands: {}".format(base_img_nbands))
+                print("Comp Image n-bands: {}".format(comp_img_nbands))
+            imgs_match = False
+
+    return imgs_match
+
+
