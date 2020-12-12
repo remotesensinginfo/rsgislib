@@ -1989,6 +1989,38 @@ class RSGISPyUtils (object):
             if time_since_create > timeout:
                 os.remove(lock_file_path)
 
+    def get_days_since(self, year, dayofyear, base_date):
+        """
+        Calculate the number of days from a base data to a defined year/day.
+
+        :param year: int with year XXXX (e.g., 2020)
+        :param dayofyear: int with the day within the year (1-365)
+        :param base_date: a datetime
+        :return: int (n days)
+
+        """
+        if year < base_date.year:
+            raise Exception("The year specified is before the base date.")
+        date_val = datetime.date(year=int(year), month=1, day=1)
+        date_val = date_val + datetime.timedelta(days=int(dayofyear - 1))
+        return (date_val - base_date).days
+
+    def get_days_since_date(self, year, month, day, base_date):
+        """
+        Calculate the number of days from a base data to a defined year/day.
+
+        :param year: int with year XXXX (e.g., 2020)
+        :param month: int month in year (1-12) (e.g., 6)
+        :param day: int with the day within the month (1-31) (e.g., 20)
+        :param base_date: a datetime
+        :return: int (n days)
+
+        """
+        if year < base_date.year:
+            raise Exception("The year specified is before the base date.")
+        date_val = datetime.date(year=int(year), month=int(month), day=int(day))
+        return (date_val - base_date).days
+
 
 class RSGISTime (object):
     """ Class to calculate run time for a function, format and print out (similar to for XML interface).
