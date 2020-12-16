@@ -2290,38 +2290,49 @@ A function which creates a regular grid across a defined area.
     createPolyVecBBOXs(outputVec, vecLyrName, vecDriver, epsgCode, bboxs)
 
 
-def writePts2Vec(vectorFile, vectorLyr, vecDriver, epsgCode, ptsX, ptsY, atts=None, attTypes=None):
+def writePts2Vec(vectorFile, vectorLyr, vecDriver, epsgCode, ptsX, ptsY, atts=None, attTypes=None, replace=True, file_opts=[], lyr_opts=[]):
     """
 This function creates a set of polygons for a set of bounding boxes.
 When creating an attribute the available data types are ogr.OFTString, ogr.OFTInteger, ogr.OFTReal
-    
+
 :param vectorFile: output vector file/path
 :param vectorLyr: output vector layer
 :param vecDriver: the output vector layer type.
 :param epsgCode: EPSG code specifying the projection of the data (e.g., 4326 is WSG84 Lat/Long).
 :param ptsX: is a list of x coordinates.
 :param ptsY: is a list of y coordinates.
-:param atts: is a dict of lists of attributes with the same length as the bboxs list.
+:param atts: is a dict of lists of attributes with the same length as the ptsX & ptsY lists.
              The dict should be named the same as the attTypes['names'] list.
 :param attTypes: is a dict with a list of attribute names (attTypes['names']) and types (attTypes['types']).
                  The list must be the same length as one another and the number of atts. Example type: ogr.OFTString
+:param replace: if the output vector file exists overwrite.
+:param file_opts: Options passed when creating the file. Default: []. Common value might be ["OVERWRITE=YES"]
+:param lyr_opts: Options passed when create the layer Default: []. Common value might be ["OVERWRITE=YES"]
 
 """
+    import osgeo.ogr as ogr
+    import osgeo.gdal as gdal
+    import osgeo.osr as osr
+
     try:
         if len(ptsX) != len(ptsY):
             raise Exception("The X and Y coordinates lists are not the same length.")
         nPts = len(ptsX)
-        
+
         gdal.UseExceptions()
-        # Create the output Driver
-        outDriver = ogr.GetDriverByName(vecDriver)
-        # create the spatial reference, WGS84
+
+        if os.path.exists(vectorFile) and (not replace):
+            vecDS = gdal.OpenEx(vectorFile, gdal.GA_Update )
+        else:
+            if os.path.exists(vectorFile):
+                rsgislib.vectorutils.delete_vector_file(vectorFile)
+            outdriver = ogr.GetDriverByName(vecDriver)
+            vecDS = outdriver.CreateDataSource(vectorFile, options=file_opts)
+
         srs = osr.SpatialReference()
         srs.ImportFromEPSG(int(epsgCode))
-        # Create the output Shapefile
-        outDataSource = outDriver.CreateDataSource(vectorFile)
-        outLayer = outDataSource.CreateLayer(vectorLyr, srs, geom_type=ogr.wkbPoint )
-        
+        outLayer = vecDS.CreateLayer(vectorLyr, srs, geom_type=ogr.wkbPoint, options=lyr_opts)
+
         addAtts = False
         if (atts is not None) and (attTypes is not None):
             nAtts = 0
@@ -2337,18 +2348,18 @@ When creating an attribute the available data types are ogr.OFTString, ogr.OFTIn
                     raise Exception('"{}" is not within atts'.format(attTypes['names'][i]))
                 if len(atts[attTypes['names'][i]]) != len(ptsX):
                     raise Exception('"{}" in atts does not have the same len as bboxs'.format(attTypes['names'][i]))
-                    
-            for i in range(nAtts):       
-                field_defn = ogr.FieldDefn( attTypes['names'][i], attTypes['types'][i] )
-                if outLayer.CreateField ( field_defn ) != 0:
+
+            for i in range(nAtts):
+                field_defn = ogr.FieldDefn(attTypes['names'][i], attTypes['types'][i])
+                if outLayer.CreateField(field_defn) != 0:
                     raise Exception("Creating '" + attTypes['names'][i] + "' field failed.\n")
             addAtts = True
-        elif not ((atts is None) and (attTypes is None)): 
-            raise Exception('If atts or attTypes is not None then the other should also not be none and equalivent in length.')
-            
+        elif not ((atts is None) and (attTypes is None)):
+            raise Exception('If atts or attTypes is not None then the other should also not be none and equivlent in length.')
+
         # Get the output Layer's Feature Definition
         featureDefn = outLayer.GetLayerDefn()
-        
+
         openTransaction = False
         for n in range(nPts):
             if not openTransaction:
@@ -2369,11 +2380,11 @@ When creating an attribute the available data types are ogr.OFTString, ogr.OFTIn
             if ((n % 20000) == 0) and openTransaction:
                 outLayer.CommitTransaction()
                 openTransaction = False
-            
+
         if openTransaction:
             outLayer.CommitTransaction()
             openTransaction = False
-        outDataSource = None
+        vecDS = None
     except Exception as e:
         raise e
 
