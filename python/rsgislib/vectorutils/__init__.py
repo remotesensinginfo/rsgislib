@@ -6195,8 +6195,8 @@ def clip_vec_lyr(vec_file, vec_lyr, roi_file, roi_lyr, vec_out_file, vec_out_lyr
     :param roi_file: Input vector file defining the ROI polygon(s)
     :param roi_lyr: Input vector layer within the roi input file.
     :param vec_out_file: Output vector file
-    :param vec_out_lyr: output vector layer name.
-    :param out_format: output file format (default GPKG).
+    :param vec_out_lyr: Output vector layer name.
+    :param out_format: Output file format (default GPKG).
 
     """
     import geopandas
@@ -6210,4 +6210,35 @@ def clip_vec_lyr(vec_file, vec_lyr, roi_file, roi_lyr, vec_out_file, vec_out_lyr
         cliped_gpdf.to_file(vec_out_file, layer=vec_out_lyr, driver=out_format)
     else:
         cliped_gpdf.to_file(vec_out_file, driver=out_format)
+
+
+def shiftxy_vec_lyr(vec_file, vec_lyr, x_shift, y_shift, vec_out_file, vec_out_lyr, out_format='GPKG'):
+    """
+    A function which shifts (translates) a vector layer in the x and y axis'.
+
+    :param vec_file: Input vector file.
+    :param vec_lyr: Input vector layer within the input file.
+    :param x_shift: The shift in the x axis. In the units of the coordinate system the file is projected in.
+    :param y_shift: The shift in the y axis. In the units of the coordinate system the file is projected in.
+    :param vec_out_file: Output vector file
+    :param vec_out_lyr: Output vector layer name.
+    :param out_format: Output file format (default GPKG).
+
+    """
+    import geopandas
+
+    base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
+
+    shifted_gseries = base_gpdf.translate(xoff=x_shift, yoff=y_shift)
+    shifted_gpdf = geopandas.GeoDataFrame(geometry=shifted_gseries)
+
+    col_names = base_gpdf.columns
+    for col_name in col_names:
+        if col_name != 'geometry':
+            shifted_gpdf[col_name] = base_gpdf[col_name]
+
+    if out_format == 'GPKG':
+        shifted_gpdf.to_file(vec_out_file, layer=vec_out_lyr, driver=out_format)
+    else:
+        shifted_gpdf.to_file(vec_out_file, driver=out_format)
 
