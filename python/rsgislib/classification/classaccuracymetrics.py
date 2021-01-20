@@ -34,7 +34,7 @@
 ###########################################################################
 
 import numpy
-
+import math
 
 def cls_quantity_accuracy(y_true, y_pred, cls_area):
     """
@@ -102,7 +102,7 @@ def cls_quantity_accuracy(y_true, y_pred, cls_area):
     return out_dict
 
 
-def calc_class_accuracy_metrics(ref_samples, pred_samples, cls_area=None, cls_names=None):
+def calc_class_accuracy_metrics(ref_samples, pred_samples, cls_area, cls_names):
     """
     A function which calculates a set of classification accuracy metrics for a set
     of reference and predicted samples. Optionally, the area classified for each
@@ -116,14 +116,55 @@ def calc_class_accuracy_metrics(ref_samples, pred_samples, cls_area=None, cls_na
     """
     import sklearn.metrics
 
-    acc_metrics = sklearn.metrics.classification_report(ref_samples, pred_samples, target_names=cls_names,
+    acc_metrics = sklearn.metrics.classification_report(ref_samples, pred_samples, 
+                                                        target_names=cls_names, 
                                                         output_dict=True)
+    
     cohen_kappa = sklearn.metrics.cohen_kappa_score(ref_samples, pred_samples)
     acc_metrics['cohen_kappa'] = cohen_kappa
-
+    
+    # Calculate weighted f1-score using area mapped
+    sum_area = 0.0
+    sum_f1 = 0.0
+    sum_recall = 0.0
+    sum_precision = 0.0
+    for clsname, clsarea in zip(cls_names, cls_area):
+        sum_area += clsarea
+        sum_f1 += (acc_metrics[clsname]['f1-score']*clsarea)
+        sum_recall += (acc_metrics[clsname]['recall']*clsarea)
+        sum_precision += (acc_metrics[clsname]['precision']*clsarea)
+    
+    weighted_area_f1 = sum_f1 / sum_area
+    recall_area_f1 = sum_recall / sum_area
+    precision_area_f1 = sum_precision / sum_area
+    
+    acc_metrics['weighted area avg'] = {'precision': precision_area_f1, 'recall': recall_area_f1, 'f1-score': weighted_area_f1, 'support': sum_area}
+    
     cm = sklearn.metrics.confusion_matrix(ref_samples, pred_samples)
     user_accuracy = [(row[idx] / row.sum()) * 100 for idx, row in enumerate(cm)]
     producer_accuracy = [(col[idx] / col.sum()) * 100 for idx, col in enumerate(cm.T)]
+    cls_conf_intervals = dict()
+    conf_int_consts = [1.64, 1.96, 2.33, 2.58]
+    sum_all_smpls = 0
+    for idx, col in enumerate(cm.T):
+        cls_acc = producer_accuracy[idx]/100
+        cls_err = 1 - cls_acc
+        sum_all_smpls += col.sum()
+        conf_int_part1 = math.sqrt((cls_acc*cls_err)/col.sum())
+        cls_conf_interval = []
+        for conf_int_const in conf_int_consts:
+            cls_conf_interval.append(conf_int_const * conf_int_part1)
+        cls_conf_intervals[cls_names[idx]] = cls_conf_interval
+    
+    acc_metrics['cls_confidence_intervals'] = cls_conf_intervals
+    
+    overall_acc = acc_metrics['accuracy']
+    overall_err = 1 - overall_acc
+    conf_int_part1 = math.sqrt((overall_acc*overall_err)/sum_all_smpls)
+    overall_acc_conf_interval = []
+    for conf_int_const in conf_int_consts:
+        overall_acc_conf_interval.append(conf_int_const * conf_int_part1)
+    acc_metrics['accuracy_conf_interval'] = overall_acc_conf_interval
 
     # convert absolute areas into proportional areas:
     prop_area = (cls_area / cls_area.sum()).reshape(-1, 1)  # same as Comparison Total (see Ref.)
@@ -146,10 +187,17 @@ def calc_class_accuracy_metrics(ref_samples, pred_samples, cls_area=None, cls_na
     acc_metrics['ommission'] = ommission.tolist()
     acc_metrics['est_prop_cls_area'] = cls_area_prop.tolist()
 
-    if cls_area is not None:
-        quantity_metrics = cls_quantity_accuracy(ref_samples, pred_samples, cls_area)
-        acc_metrics['quantity_metrics'] = quantity_metrics
-
+    quantity_metrics = cls_quantity_accuracy(ref_samples, pred_samples, cls_area)
+    acc_metrics['quantity_metrics'] = quantity_metrics
+    
+    overall_c = quantity_metrics['Proportion Correct (C)']
+    overall_d = quantity_metrics['Total Disagreement (D)']
+    c_conf_int_part1 = math.sqrt((overall_c*overall_d)/sum_all_smpls)
+    overall_quantity_conf_interval = []
+    for conf_int_const in conf_int_consts:
+        overall_quantity_conf_interval.append(conf_int_const * c_conf_int_part1)
+    acc_metrics['quantity_metrics']['C Conf Interval'] = overall_quantity_conf_interval
+    
     return acc_metrics
 
 
@@ -259,6 +307,14 @@ def calc_acc_metrics_vecsamples(in_vec_file, in_vec_lyr, ref_col, cls_col, cls_i
             acc_metrics_writer.writerow(['overall accuracy', acc_metrics['accuracy']])
             acc_metrics_writer.writerow(['cohen kappa', acc_metrics['cohen_kappa']])
             acc_metrics_writer.writerow([''])
+            
+            # Overall Accuracy Confidence Intervals
+            acc_metrics_writer.writerow(['Confidence Interval', '90%', '95%', '98%', '99%'])
+            overall_acc_conf_out = ['Overall Accuracy']
+            for conf_interval in acc_metrics['accuracy_conf_interval']:
+                overall_acc_conf_out.append(conf_interval)
+            acc_metrics_writer.writerow(overall_acc_conf_out)
+            acc_metrics_writer.writerow([''])
 
             # Quantity Metrics
             acc_metrics_writer.writerow(
@@ -269,6 +325,14 @@ def calc_acc_metrics_vecsamples(in_vec_file, in_vec_lyr, ref_col, cls_col, cls_i
                     ['Proportion Correct (C)', acc_metrics['quantity_metrics']['Proportion Correct (C)']])
             acc_metrics_writer.writerow(
                     ['Total Disagreement (D)', acc_metrics['quantity_metrics']['Total Disagreement (D)']])
+            acc_metrics_writer.writerow([''])
+            
+            # Area Normalised Overall Accuracy Confidence Intervals
+            acc_metrics_writer.writerow(['Confidence Interval', '90%', '95%', '98%', '99%'])
+            overall_acc_conf_out = ['Area Norm Accuracy']
+            for conf_interval in acc_metrics['quantity_metrics']['C Conf Interval']:
+                overall_acc_conf_out.append(conf_interval)
+            acc_metrics_writer.writerow(overall_acc_conf_out)
             acc_metrics_writer.writerow([''])
 
             # Individual Class Scores
@@ -283,10 +347,21 @@ def calc_acc_metrics_vecsamples(in_vec_file, in_vec_lyr, ref_col, cls_col, cls_i
                     ['macro avg', acc_metrics['macro avg']['f1-score'], acc_metrics['macro avg']['precision'],
                      acc_metrics['macro avg']['recall'], acc_metrics['macro avg']['support']])
             acc_metrics_writer.writerow(
-                    ['weighted avg', acc_metrics['weighted avg']['f1-score'], acc_metrics['weighted avg']['precision'],
+                    ['weighted (pixel) avg', acc_metrics['weighted avg']['f1-score'], acc_metrics['weighted avg']['precision'],
                      acc_metrics['weighted avg']['recall'], acc_metrics['weighted avg']['support']])
+            acc_metrics_writer.writerow(
+                    ['weighted (area) avg', acc_metrics['weighted area avg']['f1-score'], acc_metrics['weighted area avg']['precision'],
+                     acc_metrics['weighted area avg']['recall'], acc_metrics['weighted area avg']['support']])
             acc_metrics_writer.writerow([''])
-
+            
+            acc_metrics_writer.writerow(['Confidence Interval', '90%', '95%', '98%', '99%'])
+            for cls_name in unq_cls_names:
+                cls_acc_conf_out = [cls_name]
+                for conf_interval in acc_metrics['cls_confidence_intervals'][cls_name]:
+                    cls_acc_conf_out.append(conf_interval)
+                acc_metrics_writer.writerow(cls_acc_conf_out)
+            acc_metrics_writer.writerow([''])
+            
             # Output the confusion matrix
             acc_metrics_writer.writerow(['Point Count Confusion Matrix'])
             cm_top_row = ['']
