@@ -1763,6 +1763,30 @@ class RSGISPyUtils (object):
                             "found {2} files.".format(fileSearch, dirPath, len(files)))
         return out_file
 
+    def get_files_mtime(self, file_lst, dt_before=None, dt_after=None):
+        """
+        A function which subsets a list of files based on datetime of
+        last modification. The function also does a check as to whether
+        a file exists, files which don't exist will be ignored.
+
+        :param file_lst: The list of file path - represented as strings.
+        :param dt_before: a datetime object with a date/time where files modified before this will be returned
+        :param dt_after: a datetime object with a date/time where files modified after this will be returned
+
+        """
+        if (dt_before is None) and (dt_after is None):
+            raise Exception("You must define at least one of dt_before or dt_after")
+        out_file_lst = list()
+        for cfile in file_lst:
+            if os.path.exists(cfile):
+                mod_time_stamp = os.path.getmtime(cfile)
+                mod_time = datetime.datetime.fromtimestamp(mod_time_stamp)
+                if (dt_before is not None) and (mod_time < dt_before):
+                    out_file_lst.append(cfile)
+                if (dt_after is not None) and (mod_time > dt_after):
+                    out_file_lst.append(cfile)
+        return out_file_lst
+
     def createVarList(self, in_vals_lsts, val_dict=None):
         """
         A function which will produce a list of dictionaries with all the combinations 

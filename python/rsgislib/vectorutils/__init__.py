@@ -6045,40 +6045,30 @@ def geopd_check_polys_wgs84bounds_geometry(data_gdf, width_thres=350):
 
     """
     from shapely.geometry import Polygon, LinearRing
+    import geopandas
 
-    polys = []
+    out_gdf = geopandas.GeoDataFrame()
+    out_gdf['geometry'] = None
+    i_geom = 0
+
     for index, row in data_gdf.iterrows():
         n_east = 0
         n_west = 0
         row_bbox = row['geometry'].bounds
         row_width = row_bbox[2] - row_bbox[0]
         if row_width > width_thres:
-            for coord in row['geometry'].exterior.coords:
-                if coord[0] < 0:
-                    n_west += 1
-                else:
-                    n_east += 1
-            east_focus = True
-            if n_west > n_east:
-                east_focus = False
-
-            out_coords = []
-            for coord in row['geometry'].exterior.coords:
-                out_coord = [coord[0], coord[1]]
-                if east_focus:
+            if row['geometry'].geom_type == 'Polygon':
+                for coord in row['geometry'].exterior.coords:
                     if coord[0] < 0:
-                        diff = coord[0] - -180
-                        out_coord[0] = 180 + diff
-                else:
-                    if coord[0] > 0:
-                        diff = 180 - coord[0]
-                        out_coord[0] = -180 - diff
-                out_coords.append(out_coord)
+                        n_west += 1
+                    else:
+                        n_east += 1
+                east_focus = True
+                if n_west > n_east:
+                    east_focus = False
 
-            out_holes = []
-            for hole in row['geometry'].interiors:
-                hole_coords = []
-                for coord in hole.coords:
+                out_coords = []
+                for coord in row['geometry'].exterior.coords:
                     out_coord = [coord[0], coord[1]]
                     if east_focus:
                         if coord[0] < 0:
@@ -6088,13 +6078,71 @@ def geopd_check_polys_wgs84bounds_geometry(data_gdf, width_thres=350):
                         if coord[0] > 0:
                             diff = 180 - coord[0]
                             out_coord[0] = -180 - diff
-                    hole_coords.append(out_coord)
-                out_holes.append(LinearRing(hole_coords))
-            polys.append(Polygon(out_coords, holes=out_holes))
+                    out_coords.append(out_coord)
+
+                out_holes = []
+                for hole in row['geometry'].interiors:
+                    hole_coords = []
+                    for coord in hole.coords:
+                        out_coord = [coord[0], coord[1]]
+                        if east_focus:
+                            if coord[0] < 0:
+                                diff = coord[0] - -180
+                                out_coord[0] = 180 + diff
+                        else:
+                            if coord[0] > 0:
+                                diff = 180 - coord[0]
+                                out_coord[0] = -180 - diff
+                        hole_coords.append(out_coord)
+                    out_holes.append(LinearRing(hole_coords))
+                out_gdf.loc[i_geom, 'geometry'] = Polygon(out_coords, holes=out_holes)
+                i_geom += 1
+            elif row['geometry'].geom_type == 'MultiPolygon':
+                for poly in row['geometry']:
+                    for coord in poly.exterior.coords:
+                        if coord[0] < 0:
+                            n_west += 1
+                        else:
+                            n_east += 1
+                    east_focus = True
+                    if n_west > n_east:
+                        east_focus = False
+
+                    out_coords = []
+                    for coord in poly.exterior.coords:
+                        out_coord = [coord[0], coord[1]]
+                        if east_focus:
+                            if coord[0] < 0:
+                                diff = coord[0] - -180
+                                out_coord[0] = 180 + diff
+                        else:
+                            if coord[0] > 0:
+                                diff = 180 - coord[0]
+                                out_coord[0] = -180 - diff
+                        out_coords.append(out_coord)
+
+                    out_holes = []
+                    for hole in poly.interiors:
+                        hole_coords = []
+                        for coord in hole.coords:
+                            out_coord = [coord[0], coord[1]]
+                            if east_focus:
+                                if coord[0] < 0:
+                                    diff = coord[0] - -180
+                                    out_coord[0] = 180 + diff
+                            else:
+                                if coord[0] > 0:
+                                    diff = 180 - coord[0]
+                                    out_coord[0] = -180 - diff
+                            hole_coords.append(out_coord)
+                        out_holes.append(LinearRing(hole_coords))
+                    out_gdf.loc[i_geom, 'geometry'] = Polygon(out_coords, holes=out_holes)
+                    i_geom += 1
         else:
-            polys.append(row['geometry'])
-    data_gdf['geometry'] = polys
-    return data_gdf
+            out_gdf.loc[i_geom, 'geometry'] = row['geometry']
+            i_geom += 1
+
+    return out_gdf
 
 
 def merge_utm_vecs_wgs84(input_files, output_file, output_lyr=None, out_format='GPKG',
@@ -6170,7 +6218,10 @@ def merge_utm_vecs_wgs84(input_files, output_file, output_lyr=None, out_format='
                         data_gdf = data_gdf.to_crs("EPSG:4326")
 
                 if len(data_gdf) > 0:
-                    data_gdf = geopd_check_polys_wgs84bounds_geometry(data_gdf, width_thres)
+                    data_gdf_bounds = data_gdf.bounds
+                    widths = data_gdf_bounds['maxx'] - data_gdf_bounds['minx']
+                    if widths.max() > width_thres:
+                        data_gdf = geopd_check_polys_wgs84bounds_geometry(data_gdf, width_thres)
                     if first:
                         out_gdf = data_gdf
                         first = False
