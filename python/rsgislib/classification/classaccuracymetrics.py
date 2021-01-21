@@ -105,8 +105,8 @@ def cls_quantity_accuracy(y_true, y_pred, cls_area):
 def calc_class_accuracy_metrics(ref_samples, pred_samples, cls_area, cls_names):
     """
     A function which calculates a set of classification accuracy metrics for a set
-    of reference and predicted samples. Optionally, the area classified for each
-    class can be provided allowing further metrics to be calculated.
+    of reference and predicted samples. the area classified for each
+    class is used to allow further metrics to be calculated.
 
     :param ref_samples: a 1d array of reference samples represented by a numeric class id
     :param pred_samples: a 1d array of predicted samples represented by a numeric class id
@@ -201,11 +201,65 @@ def calc_class_accuracy_metrics(ref_samples, pred_samples, cls_area, cls_names):
     return acc_metrics
 
 
+def calc_class_pt_accuracy_metrics(ref_samples, pred_samples, cls_names):
+    """
+    A function which calculates a set of classification accuracy metrics for a set
+    of reference and predicted samples.
+
+    :param ref_samples: a 1d array of reference samples represented by a numeric class id
+    :param pred_samples: a 1d array of predicted samples represented by a numeric class id
+    :param cls_names: a 1d list of the class names (labels) in the order of the class ids.
+
+    """
+    import sklearn.metrics
+
+    acc_metrics = sklearn.metrics.classification_report(ref_samples, pred_samples, 
+                                                        target_names=cls_names, 
+                                                        output_dict=True)
+    
+    cohen_kappa = sklearn.metrics.cohen_kappa_score(ref_samples, pred_samples)
+    acc_metrics['cohen_kappa'] = cohen_kappa
+    
+    cm = sklearn.metrics.confusion_matrix(ref_samples, pred_samples)
+    user_accuracy = [(row[idx] / row.sum()) * 100 for idx, row in enumerate(cm)]
+    producer_accuracy = [(col[idx] / col.sum()) * 100 for idx, col in enumerate(cm.T)]
+    cls_conf_intervals = dict()
+    conf_int_consts = [1.64, 1.96, 2.33, 2.58]
+    sum_all_smpls = 0
+    for idx, col in enumerate(cm.T):
+        cls_acc = producer_accuracy[idx]/100
+        cls_err = 1 - cls_acc
+        sum_all_smpls += col.sum()
+        conf_int_part1 = math.sqrt((cls_acc*cls_err)/col.sum())
+        cls_conf_interval = []
+        for conf_int_const in conf_int_consts:
+            cls_conf_interval.append(conf_int_const * conf_int_part1)
+        cls_conf_intervals[cls_names[idx]] = cls_conf_interval
+    
+    acc_metrics['cls_confidence_intervals'] = cls_conf_intervals
+    
+    overall_acc = acc_metrics['accuracy']
+    overall_err = 1 - overall_acc
+    conf_int_part1 = math.sqrt((overall_acc*overall_err)/sum_all_smpls)
+    overall_acc_conf_interval = []
+    for conf_int_const in conf_int_consts:
+        overall_acc_conf_interval.append(conf_int_const * conf_int_part1)
+    acc_metrics['accuracy_conf_interval'] = overall_acc_conf_interval
+
+    acc_metrics['confusion_matrix'] = cm.tolist()
+    acc_metrics['user_accuracy'] = user_accuracy
+    acc_metrics['producer_accuracy'] = producer_accuracy
+    
+    return acc_metrics
+
+
+
 def calc_acc_metrics_vecsamples(in_vec_file, in_vec_lyr, ref_col, cls_col, cls_img, img_cls_name_col='ClassName',
                                 img_hist_col='Histogram', out_json_file=None, out_csv_file=None):
     """
     A function which calculates classification accuracy metrics using a set of
-    reference samples in a vector file.
+    reference samples in a vector file and the classification image defining
+    the area classified.
     This would be often be used alongside the ClassAccuracy QGIS plugin.
 
     :param in_vec_file: the input vector file with the reference points
@@ -409,3 +463,126 @@ def calc_acc_metrics_vecsamples(in_vec_file, in_vec_lyr, ref_col, cls_col, cls_i
     if (out_json_file is None) and (out_csv_file is None):
         import pprint
         pprint.pprint(acc_metrics)
+
+
+
+def calc_acc_ptonly_metrics_vecsamples(in_vec_file, in_vec_lyr, ref_col, cls_col, out_json_file=None, out_csv_file=None):
+    """
+    A function which calculates classification accuracy metrics using a set of
+    reference samples in a vector file.
+    This would be often be used alongside the ClassAccuracy QGIS plugin.
+
+    :param in_vec_file: the input vector file with the reference points
+    :param in_vec_lyr: the input vector layer name with the reference points.
+    :param ref_col: the name of the reference classification column in the input vector file.
+    :param cls_col: the name of the classification column in the input vector file.
+    :param out_json_file: if specified the generated metrics and confusion matrix are written to
+                          a JSON file (Default=None).
+    :param out_csv_file: if specified the generated metrics and confusion matrix are written to
+                         a CSV file (Default=None).
+
+    """
+    import rsgislib
+    import rsgislib.vectorutils
+    import rsgislib.rastergis
+    import rsgislib.rastergis.ratutils
+
+    rsgis_utils = rsgislib.RSGISPyUtils()
+
+    # Read columns from vector file.
+    ref_vals = numpy.array(rsgislib.vectorutils.readVecColumn(in_vec_file, in_vec_lyr, ref_col))
+    cls_vals = numpy.array(rsgislib.vectorutils.readVecColumn(in_vec_file, in_vec_lyr, cls_col))
+
+    # Find unique class values
+    unq_cls_names = numpy.unique(numpy.concatenate((numpy.unique(ref_vals), numpy.unique(cls_vals))))
+
+    # Create LUTs assigning each class a unique int ID.
+    cls_name_lut = dict()
+    cls_id_lut = dict()
+    for cls_id, cls_name in enumerate(unq_cls_names):
+        cls_name_lut[cls_name] = cls_id
+        cls_id_lut[cls_id] = cls_name
+
+    # Create cls_id arrays
+    ref_int_vals = numpy.zeros_like(ref_vals, dtype=int)
+    cls_int_vals = numpy.zeros_like(cls_vals, dtype=int)
+    for cls_name in unq_cls_names:
+        ref_int_vals[ref_vals == cls_name] = cls_name_lut[cls_name]
+        cls_int_vals[cls_vals == cls_name] = cls_name_lut[cls_name]
+
+    
+    acc_metrics = calc_class_pt_accuracy_metrics(ref_int_vals, cls_int_vals, unq_cls_names)
+
+
+    if out_json_file is not None:
+        import json
+        with open(out_json_file, 'w') as out_json_file_obj:
+            json.dump(acc_metrics, out_json_file_obj, sort_keys=True, indent=4, separators=(',', ': '),
+                      ensure_ascii=False)
+
+    if out_csv_file is not None:
+        import csv
+        with open(out_csv_file, mode='w') as out_csv_file_obj:
+            acc_metrics_writer = csv.writer(out_csv_file_obj, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+
+            # Overall Accuracy
+            acc_metrics_writer.writerow(['overall accuracy', acc_metrics['accuracy']])
+            acc_metrics_writer.writerow(['cohen kappa', acc_metrics['cohen_kappa']])
+            acc_metrics_writer.writerow([''])
+            
+            # Overall Accuracy Confidence Intervals
+            acc_metrics_writer.writerow(['Confidence Interval', '90%', '95%', '98%', '99%'])
+            overall_acc_conf_out = ['Overall Accuracy']
+            for conf_interval in acc_metrics['accuracy_conf_interval']:
+                overall_acc_conf_out.append(conf_interval)
+            acc_metrics_writer.writerow(overall_acc_conf_out)
+            acc_metrics_writer.writerow([''])
+
+            # Individual Class Scores
+            acc_metrics_writer.writerow(['class', 'f1-score', 'precision', 'recall', 'support'])
+            for cls_name in unq_cls_names:
+                acc_metrics_writer.writerow(
+                        [cls_name, acc_metrics[cls_name]['f1-score'], acc_metrics[cls_name]['precision'],
+                         acc_metrics[cls_name]['recall'], acc_metrics[cls_name]['support']])
+            # Overall macro and weighted
+            acc_metrics_writer.writerow([''])
+            acc_metrics_writer.writerow(
+                    ['macro avg', acc_metrics['macro avg']['f1-score'], acc_metrics['macro avg']['precision'],
+                     acc_metrics['macro avg']['recall'], acc_metrics['macro avg']['support']])
+            acc_metrics_writer.writerow(
+                    ['weighted (pixel) avg', acc_metrics['weighted avg']['f1-score'], acc_metrics['weighted avg']['precision'],
+                     acc_metrics['weighted avg']['recall'], acc_metrics['weighted avg']['support']])
+            acc_metrics_writer.writerow([''])
+            
+            acc_metrics_writer.writerow(['Confidence Interval', '90%', '95%', '98%', '99%'])
+            for cls_name in unq_cls_names:
+                cls_acc_conf_out = [cls_name]
+                for conf_interval in acc_metrics['cls_confidence_intervals'][cls_name]:
+                    cls_acc_conf_out.append(conf_interval)
+                acc_metrics_writer.writerow(cls_acc_conf_out)
+            acc_metrics_writer.writerow([''])
+            
+            # Output the confusion matrix
+            acc_metrics_writer.writerow(['Point Count Confusion Matrix'])
+            cm_top_row = ['']
+            for cls_name in unq_cls_names:
+                cm_top_row.append(cls_name)
+            cm_top_row.append('User Acc')
+            acc_metrics_writer.writerow(cm_top_row)
+            for cls_name, cm_row, user_acc in zip(unq_cls_names, acc_metrics['confusion_matrix'], acc_metrics['user_accuracy']):
+                row = [cls_name]
+                for val in cm_row:
+                    row.append(val)
+                row.append(user_acc)
+                acc_metrics_writer.writerow(row)
+            cm_bot_row = ['Producer']
+            for prod_val in acc_metrics['producer_accuracy']:
+                cm_bot_row.append(prod_val)
+            acc_metrics_writer.writerow(cm_bot_row)
+            acc_metrics_writer.writerow([''])
+
+    if (out_json_file is None) and (out_csv_file is None):
+        import pprint
+        pprint.pprint(acc_metrics)
+
+
