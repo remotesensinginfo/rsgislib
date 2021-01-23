@@ -1055,6 +1055,7 @@ Where:
 
     applier.apply(_getXYPxlLocs, infiles, outfiles, otherargs, controls=aControls)
 
+
 def mergeExtractedHDF5Data(h5Files, outH5File, datatype=None):
     """
 A function to merge a list of HDF files (e.g., from rsgislib.imageutils.extractZoneImageBandValues2HDF)
@@ -1074,6 +1075,7 @@ Example::
 
 """
     import h5py
+    import numpy
     import rsgislib
 
     rsgis_utils = rsgislib.RSGISPyUtils()
@@ -1093,23 +1095,27 @@ Example::
             raise rsgislib.RSGISPyException("The number of variables within the inputted HDF5 files was not the same.")
         numVals += dataShp[0]
         fH5.close()
-    
+
     dataArr = numpy.zeros([numVals, numVars], dtype=float)
-    
+
     rowInit = 0
     for h5File in h5Files:
         fH5 = h5py.File(h5File, 'r')
         numRows = fH5['DATA/DATA'].shape[0]
-        dataArr[rowInit:(rowInit+numRows)] = fH5['DATA/DATA']
+        dataArr[rowInit:(rowInit + numRows)] = fH5['DATA/DATA']
         rowInit += numRows
         fH5.close()
+
+    chunk_len = 1000
+    if numVals < chunk_len:
+        chunk_len = numVals
 
     h5_dtype = rsgis_utils.getNumpyCharCodesDataType(datatype)
 
     fH5Out = h5py.File(outH5File, 'w')
     dataGrp = fH5Out.create_group("DATA")
     metaGrp = fH5Out.create_group("META-DATA")
-    dataGrp.create_dataset('DATA', data=dataArr, chunks=(1000, numVars), compression="gzip",
+    dataGrp.create_dataset('DATA', data=dataArr, chunks=(chunk_len, numVars), compression="gzip",
                            shuffle=True, dtype=h5_dtype)
     describDS = metaGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
     describDS[0] = 'Merged'.encode()
