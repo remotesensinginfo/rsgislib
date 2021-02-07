@@ -2809,4 +2809,79 @@ def whitenImage(input_img, valid_msk_img, valid_msk_val, output_img, gdalformat)
     outImgDS = None
 
 
+def spectralSmoothing(input_img, valid_msk_img, valid_msk_val, output_img, win_len=5, polyorder=3, gdalformat='KEA',
+                      datatype=rsgislib.TYPE_32FLOAT, calc_stats=True):
+    """
+    This function performs spectral smoothing using a Savitzky-Golay filter.
+    Typically applied to hyperspectral data to remove noise.
+
+    :param input_img: input image file.
+    :param valid_msk_img: an image file representing the valid data region
+    :param valid_msk_val: image pixel value in the mask for the valid data region
+    :param output_img: the output image file
+    :param win_len: the window length for the Savitzky-Golay filter (Default: 5)
+    :param polyorder: the order of the polynomial for the Savitzky-Golay filter (Default: 3)
+    :param gdalformat: the output file format. (Default: KEA)
+    :param datatype: the output image datatype (Default: Float 32)
+    :param calc_stats: Boolean specifying whether to calculate pyramids and metadata stats (Default: True)
+
+    """
+    import scipy.signal
+    import rsgislib.imageutils
+
+    try:
+        import tqdm
+        progress_bar = rsgislib.TQDMProgressBar()
+    except:
+        from rios import cuiprogress
+        progress_bar = cuiprogress.GDALProgressBar()
+
+    rsgis_utils = rsgislib.RSGISPyUtils()
+    np_dtype = rsgis_utils.getNumpyDataType(datatype)
+    uid_str = rsgis_utils.uidGenerator()
+    in_no_date = rsgis_utils.getImageNoDataValue(input_img)
+
+    basename = rsgis_utils.get_file_basename(output_img)
+    out_path = os.path.dirname(os.path.abspath(output_img))
+    tmp_out_img = os.path.join(out_path, "{}_{}.kea".format(basename, uid_str))
+
+    infiles = applier.FilenameAssociations()
+    infiles.image = input_img
+    infiles.valid_msk = valid_msk_img
+    outfiles = applier.FilenameAssociations()
+    outfiles.outimage = tmp_out_img
+    otherargs = applier.OtherInputs()
+    otherargs.valid_msk_val = valid_msk_val
+    otherargs.win_len = win_len
+    otherargs.polyorder = polyorder
+    otherargs.np_dtype = np_dtype
+    aControls = applier.ApplierControls()
+    aControls.progress = progress_bar
+    aControls.drivername = "KEA"
+    aControls.omitPyramids = True
+    aControls.calcStats = False
+
+    def _applySmoothing(info, inputs, outputs, otherargs):
+        if numpy.any(inputs.valid_msk == otherargs.valid_msk_val):
+            img_flat = inputs.image.transpose().reshape(-1, inputs.image.shape[0])
+
+            img_flat_smooth = scipy.signal.savgol_filter(img_flat, otherargs.win_len, otherargs.polyorder, axis=1)
+
+            out_arr = img_flat_smooth.reshape(inputs.image.shape[2], inputs.image.shape[1], inputs.image.shape[0])
+            out_arr = numpy.moveaxis(numpy.moveaxis(out_arr, 2, 0), 1, 2)
+            out_arr = out_arr.astype(otherargs.np_dtype)
+            outputs.outimage = out_arr
+        else:
+            outputs.outimage = numpy.zeros_like(inputs.image, dtype=otherargs.np_dtype)
+
+    applier.apply(_applySmoothing, infiles, outfiles, otherargs, controls=aControls)
+
+    rsgislib.imageutils.maskImage(tmp_out_img, valid_msk_img, output_img, gdalformat, datatype, in_no_date, 0)
+    if calc_stats:
+        rsgislib.imageutils.popImageStats(output_img, usenodataval=True, nodataval=in_no_date, calcpyramids=True)
+
+    if os.path.exists(tmp_out_img):
+        os.remove(tmp_out_img)
+
+
 
