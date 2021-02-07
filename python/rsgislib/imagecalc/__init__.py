@@ -408,7 +408,7 @@ A function which performs a PCA on the input image.
 :param datatype: the output data type of the input image (Default: rsgislib.TYPE_32UINT)
 :param noData: provide a no data value which is to be ignored during processing. If None then ignored (Default: None)
 :param calcStats: Boolean specifying whether pyramids and statistics should be calculated for the output image. (Default: True)
-
+:returns: an array with the ratio of the explained variance per band.
 """
     import rsgislib.imageutils
     eigenVec, varExplain = rsgislib.imagecalc.getPCAEigenVector(inputImg, pxlNSample, noData, eigenVecFile)
@@ -426,6 +426,100 @@ A function which performs a PCA on the input image.
             usenodataval=True
             nodataval=noData
         rsgislib.imageutils.popImageStats(outputImg, usenodataval, nodataval, True)
+
+    return varExplain
+
+
+def performImageMNF(inputImg, outputImg, nComponents=None, pxlNSample=100, in_img_no_data=None, tmp_dir='./tmp',
+                    gdalformat='KEA', datatype=rsgislib.TYPE_32FLOAT, calcStats=True):
+    """
+A function which takes a sample from an input image and uses it to
+generate eigenvector for a MNF. Note. this can be used as input to rsgislib.imagecalc.pca
+
+:param inputImg: the image to which the MNF will be applied
+:param outputImg: the output image file with the MNF result
+:param nComponents: the number of components to be outputted
+:param pxlNSample: the sample to be taken (e.g., a value of 100 will sample every 100th pixel) for the PCA
+:param in_img_no_data: provide a no data value which is to be ignored during processing. If None then try to read from input image.
+:param tmp_dir: a directory where temporary output files will be stored. If it doesn't exist it will be created.
+:param gdalformat: output image file format
+:param datatype: data type for the output image. Note, it is common to have negative values.
+:param calcStats: whether image statistics and pyramids could be calculated.
+:returns: array with the ratio of the explained variance
+
+"""
+    from sklearn.decomposition import PCA
+    import rsgislib
+    import rsgislib.imageutils
+    import os
+    import shutil
+
+    created_tmp_dir = False
+    if not os.path.exists(tmp_dir):
+        os.mkdir(tmp_dir)
+        created_tmp_dir = True
+
+    rsgis_utils = rsgislib.RSGISPyUtils()
+    img_basename = rsgis_utils.get_file_basename(inputImg)
+
+    if in_img_no_data is None:
+        in_img_no_data = rsgis_utils.getImageNoDataValue(inputImg)
+        if in_img_no_data is None:
+            raise Exception("A no data value for the input image must be provided.")
+
+    valid_msk_img = os.path.join(tmp_dir, "{}_vld_msk.kea".format(img_basename))
+    rsgislib.imageutils.genValidMask(inputImg, valid_msk_img, "KEA", in_img_no_data)
+
+    whiten_img = os.path.join(tmp_dir, "{}_whiten.kea".format(img_basename))
+    rsgislib.imageutils.whitenImage(inputImg, valid_msk_img, 1, whiten_img, "KEA")
+
+    # Read input data from image file.
+    X = rsgislib.imageutils.extractImgPxlSample(whiten_img, pxlNSample, in_img_no_data)
+    print('{} values were extracted from the input image.'.format(X.shape[0]))
+
+    pca = PCA()
+    pca.fit(X)
+
+    eigenVecFile = os.path.join(tmp_dir, "{}_eigen_vec.txt".format(img_basename))
+    f = open(eigenVecFile, 'w')
+    f.write('m=' + str(pca.components_.shape[0]) + '\n')
+    f.write('n=' + str(pca.components_.shape[1]) + '\n')
+    first = True
+    for val in pca.components_.flatten():
+        if first:
+            f.write(str(val))
+            first = False
+        else:
+            f.write(',' + str(val))
+    f.write('\n\n')
+    f.flush()
+    f.close()
+
+    pcaComp = 1
+    print("Prop. of variance explained:")
+    for val in pca.explained_variance_ratio_:
+        print('\t PCA Component ' + str(pcaComp) + ' = ' + str(round(val, 4)))
+        pcaComp = pcaComp + 1
+    varExplain = pca.explained_variance_ratio_
+
+    outNComp = varExplain.shape[0]
+    if nComponents is not None:
+        if nComponents > varExplain.shape[0]:
+            raise Exception("You cannot output more components than the number of input image bands.")
+        outNComp = nComponents
+
+    rsgislib.imagecalc.pca(whiten_img, eigenVecFile, outputImg, outNComp, gdalformat, datatype)
+    if calcStats:
+        rsgislib.imageutils.popImageStats(outputImg, True, in_img_no_data, True)
+
+    if created_tmp_dir:
+        shutil.rmtree(tmp_dir)
+    else:
+        os.remove(valid_msk_img)
+        os.remove(whiten_img)
+        os.remove(eigenVecFile)
+
+    return varExplain
 
 
 def rescaleImgPxlVals(inputImg, outputImg, gdalformat, datatype, bandRescale, trim2Limits=True):
@@ -606,6 +700,7 @@ Boardman J.W., Kruse F.A, and Green R.O., "Mapping Target Signatures via
     # Check gdal is available
     import osgeo.gdal as gdal
     import rsgislib.imageutils
+    import tqdm
     
     imgDS = gdal.Open(inputimg)
     if imgDS is None:
@@ -617,8 +712,8 @@ Boardman J.W., Kruse F.A, and Green R.O., "Mapping Target Signatures via
     img_data_msk = numpy.ones((x_size*y_size), dtype=bool)
     img_data_mean = numpy.zeros(n_bands, dtype=numpy.float32)
 
-    for n in range(n_bands):
-        print("Importing Band {}".format(n+1))
+    print("Importing Bands:")
+    for n in tqdm.tqdm(range(n_bands)):
         imgBand = imgDS.GetRasterBand(n+1)
         if imgBand is None:
             raise Exception("Could not open image band ({})".format(n+1))
@@ -657,16 +752,7 @@ Boardman J.W., Kruse F.A, and Green R.O., "Mapping Target Signatures via
     img_data = img_data[img_data_msk]
     
     print("Perform PPI iterations.")
-    step = math.floor(niters/10)
-    feedback = 10
-    feedback_next = step
-    print("Started .0.", end='', flush=True)
-    
-    for i in range(niters):
-        if (niters>=10) and (i == feedback_next):
-            print(".{}.".format(feedback), end='', flush=True)
-            feedback_next = feedback_next + step
-            feedback = feedback + 10
+    for i in tqdm.tqdm(range(niters)):
         r = numpy.random.rand(n_bands) - 0.5
         s = numpy.dot(img_data, r)
 
@@ -681,8 +767,7 @@ Boardman J.W., Kruse F.A, and Green R.O., "Mapping Target Signatures via
             out_img_count[s >= (s[imax] - thres)] += 1
             out_img_count[s <= (s[imin] + thres)] += 1
     s = None
-    print(" Completed")
-    
+
     out_img_data[pxl_idxs] = out_img_count
     out_img_data = out_img_data.reshape((y_size, x_size))
     
@@ -1073,3 +1158,60 @@ def calc_fill_regions_knn(ref_img, ref_no_data, fill_regions_img, fill_region_va
 
     applier.apply(_knn_fill_regions, infiles, outfiles, otherargs, controls=aControls)
     print("Finished fill")
+
+
+def mask_bzero_vals(input_img, output_img, gdalformat, out_val=1):
+    """
+Function which identifies image pixels which have a value of zero
+all bands which are defined as true 'no data' regions while other
+pixels have a value of zero or less then zero for one or few pixels
+which causes confusion between valid data pixel and no data pixels.
+This function will identify and define those pixels which are valid
+but with a value <= 0 for isolate bands to a new output value (out_val).
+
+This function might be used for surface reflectance data where the
+atmospheric correction has resulted in value <=0 which isn't normally
+possible and where 0 is commonly used as a no data value. In this case
+setting those pixel band values to 1 (if data has been multiplied by
+100, 1000, or 10000, for example) or a small fraction (e.g., 0.001) if
+values are between 0-1.
+
+:param input_img: the input image
+:param output_img: the output image file name and path
+:param gdalformat: the GDAL image file format of the output image file.
+:param out_val: Output pixel band value (default: 1)
+
+"""
+    from rios import applier
+    import numpy
+
+    try:
+        import tqdm
+        progress_bar = rsgislib.TQDMProgressBar()
+    except:
+        from rios import cuiprogress
+        progress_bar = cuiprogress.GDALProgressBar()
+
+    infiles = applier.FilenameAssociations()
+    infiles.image = input_img
+    outfiles = applier.FilenameAssociations()
+    outfiles.outimage = output_img
+    otherargs = applier.OtherInputs()
+    otherargs.out_val = out_val
+    aControls = applier.ApplierControls()
+    aControls.progress = progress_bar
+    aControls.drivername = gdalformat
+    aControls.omitPyramids = True
+    aControls.calcStats = False
+
+    def _applyzeronodata(info, inputs, outputs, otherargs):
+        """
+        This is an internal rios function
+        """
+        img_sum = numpy.sum(inputs.image, axis=0)
+        vld_msk = img_sum > 0
+        outputs.outimage = inputs.image
+        outputs.outimage[(inputs.image <= 0) & vld_msk] = otherargs.out_val
+
+    applier.apply(_applyzeronodata, infiles, outfiles, otherargs, controls=aControls)
+

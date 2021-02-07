@@ -2669,3 +2669,144 @@ def check_img_file_comparison(base_img, comp_img, test_n_bands=False, test_eql_b
     return imgs_match
 
 
+def whitenImage(input_img, valid_msk_img, valid_msk_val, output_img, gdalformat):
+    """
+    A function which whitens the input image where the noise covariance matrix is
+    used to decorrelate and rescale the noise in the data (noise whitening).
+    This results in a transformed datset in which the noise has unit variance
+    and no band-to-band correlations. The valid mask is used to identify the
+    areas of valid data. This function is used to an MNF transformation.
+
+    WARNING: This function loads the whole image into memory and therefore
+             can use a lot of memory for the analysis.
+
+:param input_img: the input image
+:param valid_msk_img: a valid input image mask
+:param valid_msk_val: the pixel value in the mask image specifying valid image pixels.
+:param output_img: the output image file name and path (will be same dimensions as the input)
+:param gdalformat: the GDAL image file format of the output image file.
+
+"""
+    import osgeo.gdal as gdal
+    import rsgislib.imageutils
+    import tqdm
+    import numpy
+
+    def _cov(M):
+        """
+        Compute the sample covariance matrix of a 2D matrix.
+
+        Parameters:
+          M: `numpy array`
+            2d matrix of HSI data (N x p)
+
+        Returns: `numpy array`
+            sample covariance matrix
+        """
+        N = M.shape[0]
+        u = M.mean(axis=0)
+        M = M - numpy.kron(numpy.ones((N, 1)), u)
+        C = numpy.dot(M.T, M) / (N - 1)
+        return C
+
+    def _whiten(M):
+        """
+        Whitens a HSI cube. Use the noise covariance matrix to decorrelate
+        and rescale the noise in the data (noise whitening).
+        Results in transformed data in which the noise has unit variance
+        and no band-to-band correlations.
+
+        Parameters:
+            M: `numpy array`
+                2d matrix of HSI data (N x p).
+
+        Returns: `numpy array`
+            Whitened HSI data (N x p).
+
+        Reference:
+            Krizhevsky, Alex, Learning Multiple Layers of Features from
+            Tiny Images, MSc thesis, University of Toronto, 2009.
+            See Appendix A.
+        """
+        sigma = _cov(M)
+        U, S, V = numpy.linalg.svd(sigma)
+        S_1_2 = S ** (-0.5)
+        S = numpy.diag(S_1_2.T)
+        Aw = numpy.dot(V, numpy.dot(S, V.T))
+        return numpy.dot(M, Aw)
+
+    imgMskDS = gdal.Open(valid_msk_img)
+    if imgMskDS is None:
+        raise Exception("Could not open valid mask image")
+    n_msk_bands = imgMskDS.RasterCount
+    x_msk_size = imgMskDS.RasterXSize
+    y_msk_size = imgMskDS.RasterYSize
+
+    if n_msk_bands != 1:
+        raise Exception("Valid mask only expected to have a single band.")
+
+    imgMskBand = imgMskDS.GetRasterBand(1)
+    if imgMskBand is None:
+        raise Exception("Could not open image band ({}) in valid mask".format(n + 1))
+
+    vld_msk_band_arr = imgMskBand.ReadAsArray().flatten()
+    imgMskDS = None
+
+    imgDS = gdal.Open(input_img)
+    if imgDS is None:
+        raise Exception("Could not open input image")
+    n_bands = imgDS.RasterCount
+    x_size = imgDS.RasterXSize
+    y_size = imgDS.RasterYSize
+
+    if x_msk_size != x_size:
+        raise Exception("Mask and input image size in the x axis do not match.")
+
+    if y_msk_size != y_size:
+        raise Exception("Mask and input image size in the y axis do not match.")
+
+    img_data = numpy.zeros((n_bands, (x_size * y_size)), dtype=numpy.float32)
+
+    print("Importing Bands:")
+    for n in tqdm.tqdm(range(n_bands)):
+        imgBand = imgDS.GetRasterBand(n + 1)
+        if imgBand is None:
+            raise Exception("Could not open image band ({})".format(n + 1))
+        no_data_val = imgBand.GetNoDataValue()
+        band_arr = imgBand.ReadAsArray().flatten()
+        band_arr = band_arr.astype(numpy.float32)
+        img_data[n] = band_arr
+    imgDS = None
+    band_arr = None
+
+    img_data = img_data.T
+    pxl_idxs = numpy.arange(vld_msk_band_arr.shape[0])
+    pxl_idxs = pxl_idxs[vld_msk_band_arr == valid_msk_val]
+    img_data = img_data[vld_msk_band_arr == valid_msk_val]
+
+    img_flat_white = _whiten(img_data)
+
+    print("Create empty output image file")
+    rsgislib.imageutils.createCopyImage(input_img, output_img, n_bands, 0, gdalformat, rsgislib.TYPE_32FLOAT)
+
+    # Open output image
+    outImgDS = gdal.Open(output_img, gdal.GA_Update)
+    if outImgDS is None:
+        raise Exception("Could not open output image")
+
+    out_data_band = numpy.zeros_like(vld_msk_band_arr, dtype=numpy.float32)
+
+    print("Output Bands:")
+    for n in tqdm.tqdm(range(n_bands)):
+        out_data_band[...] = 0.0
+        out_data_band[pxl_idxs] = img_flat_white[..., n]
+        out_img_data = out_data_band.reshape((y_size, x_size))
+        outImgBand = outImgDS.GetRasterBand(n + 1)
+        if outImgBand is None:
+            raise Exception("Could not open output image band (1)")
+        outImgBand.WriteArray(out_img_data)
+        outImgBand = None
+    outImgDS = None
+
+
+
