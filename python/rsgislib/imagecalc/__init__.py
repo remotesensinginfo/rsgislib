@@ -678,10 +678,13 @@ A function which calculates the area (in metres) of the pixel projected in WGS84
     applier.apply(_calcPixelArea, infiles, outfiles, otherargs, controls=aControls)
 
 
-def calcPPI(inputimg, outputimg, gdalformat, niters=1000, thres=0, img_gain=1, seed=None, calcstats=True):
+def calcPPI(inputimg, outputimg, gdalformat, niters=1000, lthres=0, uthres=0, img_gain=1, seed=None, calcstats=True):
     """
 A function which calculate the pixel purity index (PPI). Using an appropriate number of iterations
 this can take a little while to run. Note, the whole input image is read into memory.
+
+It is recommended that you use the an MNF/PCA output and rescale that so all bands have the same range to improve
+the PPI result.
 
 Boardman J.W., Kruse F.A, and Green R.O., "Mapping Target Signatures via
     Partial Unmixing of AVIRIS Data," Pasadena, California, USA, 23 Jan 1995,
@@ -696,45 +699,46 @@ Boardman J.W., Kruse F.A, and Green R.O., "Mapping Target Signatures via
 :param seed: seed for the random squence of numbers being generated. Using the same seed will result in the same seqence and therefore the same output.
 :param calcstats: whether to calculate image statistics and pyramids on the output image.
 
-""" 
+"""
     # Check gdal is available
     import osgeo.gdal as gdal
     import rsgislib.imageutils
     import tqdm
-    
+    import numpy
+
     imgDS = gdal.Open(inputimg)
     if imgDS is None:
         raise Exception("Could not open input image")
     n_bands = imgDS.RasterCount
     x_size = imgDS.RasterXSize
     y_size = imgDS.RasterYSize
-    img_data = numpy.zeros((n_bands, (x_size*y_size)), dtype=numpy.float32)
-    img_data_msk = numpy.ones((x_size*y_size), dtype=bool)
+    img_data = numpy.zeros((n_bands, (x_size * y_size)), dtype=numpy.float32)
+    img_data_msk = numpy.ones((x_size * y_size), dtype=bool)
     img_data_mean = numpy.zeros(n_bands, dtype=numpy.float32)
 
     print("Importing Bands:")
     for n in tqdm.tqdm(range(n_bands)):
-        imgBand = imgDS.GetRasterBand(n+1)
+        imgBand = imgDS.GetRasterBand(n + 1)
         if imgBand is None:
-            raise Exception("Could not open image band ({})".format(n+1))
+            raise Exception("Could not open image band ({})".format(n + 1))
         no_data_val = imgBand.GetNoDataValue()
         band_arr = imgBand.ReadAsArray().flatten()
         band_arr = band_arr.astype(numpy.float32)
         img_data[n] = band_arr
-        img_data_msk[band_arr==no_data_val] = False
-        band_arr[band_arr==no_data_val] = numpy.nan
+        img_data_msk[band_arr == no_data_val] = False
+        band_arr[band_arr == no_data_val] = numpy.nan
         if img_gain > 1:
-            band_arr = band_arr/img_gain
-            img_data[n] = img_data[n]/img_gain
+            band_arr = band_arr / img_gain
+            img_data[n] = img_data[n] / img_gain
         img_data_mean[n] = numpy.nanmean(band_arr)
         img_data[n] = img_data[n] - img_data_mean[n]
     imgDS = None
     band_arr = None
-    
+
     print("Create empty output image file")
     rsgislib.imageutils.createCopyImage(inputimg, outputimg, 1, 0, gdalformat, rsgislib.TYPE_16UINT)
-    
-    # Open output image 
+
+    # Open output image
     outImgDS = gdal.Open(outputimg, gdal.GA_Update)
     if outImgDS is None:
         raise Exception("Could not open output image")
@@ -742,7 +746,7 @@ Boardman J.W., Kruse F.A, and Green R.O., "Mapping Target Signatures via
     if outImgBand is None:
         raise Exception("Could not open output image band (1)")
     out_img_data = outImgBand.ReadAsArray()
-    
+
     # Mask the datasets to obtain just the valid pixel values (i.e., using the no data value)
     img_data = img_data.T
     out_img_data = out_img_data.flatten()
@@ -750,7 +754,10 @@ Boardman J.W., Kruse F.A, and Green R.O., "Mapping Target Signatures via
     pxl_idxs = pxl_idxs[img_data_msk]
     out_img_count = out_img_data[img_data_msk]
     img_data = img_data[img_data_msk]
-    
+
+    if seed is not None:
+        numpy.random.seed(seed)
+
     print("Perform PPI iterations.")
     for i in tqdm.tqdm(range(niters)):
         r = numpy.random.rand(n_bands) - 0.5
@@ -758,26 +765,30 @@ Boardman J.W., Kruse F.A, and Green R.O., "Mapping Target Signatures via
 
         imin = numpy.argmin(s)
         imax = numpy.argmax(s)
-        if thres == 0:
+        if lthres == 0:
             # Only the two extreme pixels are incremented
             out_img_count[imin] += 1
+        else:
+            # All pixels within threshold distance from the two extremes
+            out_img_count[s <= (s[imin] + lthres)] += 1
+
+        if uthres == 0:
+            # Only the two extreme pixels are incremented
             out_img_count[imax] += 1
         else:
             # All pixels within threshold distance from the two extremes
-            out_img_count[s >= (s[imax] - thres)] += 1
-            out_img_count[s <= (s[imin] + thres)] += 1
+            out_img_count[s >= (s[imax] - uthres)] += 1
     s = None
 
     out_img_data[pxl_idxs] = out_img_count
     out_img_data = out_img_data.reshape((y_size, x_size))
-    
+
     outImgBand.WriteArray(out_img_data)
     outImgDS = None
-    
+
     if calcstats:
         print("Calculate Image stats and pyramids.")
         rsgislib.imageutils.popImageStats(outputimg, usenodataval=True, nodataval=0, calcpyramids=True)
-
 
 def calcImgsPxlMode(inputImgs, outputImg, gdalformat, no_data_val=0):
     """
