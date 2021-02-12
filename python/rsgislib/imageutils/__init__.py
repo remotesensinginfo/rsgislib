@@ -2826,6 +2826,8 @@ def spectralSmoothing(input_img, valid_msk_img, valid_msk_val, output_img, win_l
     :param calc_stats: Boolean specifying whether to calculate pyramids and metadata stats (Default: True)
 
     """
+    from rios import applier
+    import numpy
     import scipy.signal
     import rsgislib.imageutils
 
@@ -2838,50 +2840,51 @@ def spectralSmoothing(input_img, valid_msk_img, valid_msk_val, output_img, win_l
 
     rsgis_utils = rsgislib.RSGISPyUtils()
     np_dtype = rsgis_utils.getNumpyDataType(datatype)
-    uid_str = rsgis_utils.uidGenerator()
     in_no_date = rsgis_utils.getImageNoDataValue(input_img)
-
-    basename = rsgis_utils.get_file_basename(output_img)
-    out_path = os.path.dirname(os.path.abspath(output_img))
-    tmp_out_img = os.path.join(out_path, "{}_{}.kea".format(basename, uid_str))
 
     infiles = applier.FilenameAssociations()
     infiles.image = input_img
     infiles.valid_msk = valid_msk_img
     outfiles = applier.FilenameAssociations()
-    outfiles.outimage = tmp_out_img
+    outfiles.outimage = output_img
     otherargs = applier.OtherInputs()
     otherargs.valid_msk_val = valid_msk_val
     otherargs.win_len = win_len
     otherargs.polyorder = polyorder
+    otherargs.in_no_date = in_no_date
     otherargs.np_dtype = np_dtype
     aControls = applier.ApplierControls()
     aControls.progress = progress_bar
-    aControls.drivername = "KEA"
+    aControls.drivername = gdalformat
     aControls.omitPyramids = True
     aControls.calcStats = False
 
     def _applySmoothing(info, inputs, outputs, otherargs):
         if numpy.any(inputs.valid_msk == otherargs.valid_msk_val):
-            img_flat = inputs.image.transpose().reshape(-1, inputs.image.shape[0])
+            img_flat = numpy.moveaxis(inputs.image, 0, 2).reshape(-1, inputs.image.shape[0])
+
+            ID = numpy.arange(img_flat.shape[0])
+            n_feats = ID.shape[0]
+
+            ID = ID[inputs.valid_msk.flatten() == otherargs.valid_msk_val]
+            img_flat = img_flat[inputs.valid_msk.flatten() == otherargs.valid_msk_val]
 
             img_flat_smooth = scipy.signal.savgol_filter(img_flat, otherargs.win_len, otherargs.polyorder, axis=1)
 
-            out_arr = img_flat_smooth.reshape(inputs.image.shape[2], inputs.image.shape[1], inputs.image.shape[0])
-            out_arr = numpy.moveaxis(numpy.moveaxis(out_arr, 2, 0), 1, 2)
-            out_arr = out_arr.astype(otherargs.np_dtype)
+            img_flat_smooth_arr = numpy.zeros([n_feats, inputs.image.shape[0]], dtype=otherargs.np_dtype)
+            img_flat_smooth_arr[...] = in_no_date
+            img_flat_smooth_arr[ID] = img_flat_smooth
+
+            out_arr = img_flat_smooth_arr.reshape(inputs.image.shape[1], inputs.image.shape[2], inputs.image.shape[0])
+            out_arr = numpy.moveaxis(out_arr, 2, 0)
             outputs.outimage = out_arr
         else:
             outputs.outimage = numpy.zeros_like(inputs.image, dtype=otherargs.np_dtype)
 
     applier.apply(_applySmoothing, infiles, outfiles, otherargs, controls=aControls)
 
-    rsgislib.imageutils.maskImage(tmp_out_img, valid_msk_img, output_img, gdalformat, datatype, in_no_date, 0)
     if calc_stats:
         rsgislib.imageutils.popImageStats(output_img, usenodataval=True, nodataval=in_no_date, calcpyramids=True)
-
-    if os.path.exists(tmp_out_img):
-        os.remove(tmp_out_img)
 
 
 
