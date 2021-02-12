@@ -97,6 +97,12 @@ def spec_unmix_spts_ucls(input_img, valid_msk_img, valid_msk_val, output_img, en
                    adding a weight to the least squares optimisation to get the abundances to sum to 1.
     :param calc_stats: Boolean specifying whether to calculate pyramids and metadata stats (Default: True)
 
+    References:
+            Scarth, P., Roder, A., & Schmidt, M. (2010). Tracking grazing pressure and climate
+            interaction—The role of Landsat fractional cover in time series analysis. Proceedings of
+            the 15th Australasian Remote Sensing and Photogrammetry ConferenceAustralia: Alice Springs.
+            http://dx.doi.org/10.6084/m9.ﬁgshare.94250.
+
     """
     from rios import applier
     import numpy
@@ -187,6 +193,12 @@ def spec_unmix_spts_nnls(input_img, valid_msk_img, valid_msk_val, output_img, en
     :param weight: Optional (if None ignored) to provide a weight to implement the approach of Scarth et al (2010)
                    adding a weight to the least squares optimisation to get the abundances to sum to 1.
     :param calc_stats: Boolean specifying whether to calculate pyramids and metadata stats (Default: True)
+
+    References:
+            Scarth, P., Roder, A., & Schmidt, M. (2010). Tracking grazing pressure and climate
+            interaction—The role of Landsat fractional cover in time series analysis. Proceedings of
+            the 15th Australasian Remote Sensing and Photogrammetry ConferenceAustralia: Alice Springs.
+            http://dx.doi.org/10.6084/m9.ﬁgshare.94250.
 
     """
     from rios import applier
@@ -362,6 +374,12 @@ def spec_unmix_pymcr_nnls(input_img, valid_msk_img, valid_msk_val, output_img, e
                    adding a weight to the least squares optimisation to get the abundances to sum to 1.
     :param calc_stats: Boolean specifying whether to calculate pyramids and metadata stats (Default: True)
 
+    References:
+            Scarth, P., Roder, A., & Schmidt, M. (2010). Tracking grazing pressure and climate
+            interaction—The role of Landsat fractional cover in time series analysis. Proceedings of
+            the 15th Australasian Remote Sensing and Photogrammetry ConferenceAustralia: Alice Springs.
+            http://dx.doi.org/10.6084/m9.ﬁgshare.94250.
+
     """
     from rios import applier
     import numpy
@@ -525,7 +543,7 @@ def spec_unmix_pymcr_fcls(input_img, valid_msk_img, valid_msk_val, output_img, e
         rsgislib.imageutils.popImageStats(output_img, usenodataval=True, nodataval=0, calcpyramids=True)
 
 
-def rescale_unmixing_results(input_img, output_img, gdalformat, calc_stats=True):
+def rescale_unmixing_results(input_img, output_img, gdalformat='KEA', calc_stats=True):
     """
     A function which rescales an output from a spectral unmixing
     (e.g., rsgislib.imagecalc.specunmixing.spec_unmix_spts_ucls) so that
@@ -567,7 +585,7 @@ def rescale_unmixing_results(input_img, output_img, gdalformat, calc_stats=True)
         outputs.outimage = numpy.zeros_like(inputs.image, dtype=numpy.float32)
 
         for idx in range(inputs.image.shape[0]):
-            outputs.outimage[idx] = (inputs.image[idx] / numpy.sum(inputs.image, axis=0)) * otherargs.scale_factor
+            outputs.outimage[idx] = (inputs.image[idx] / numpy.sum(inputs.image, axis=0))
 
         outputs.outimage = numpy.where(numpy.isfinite(outputs.outimage), outputs.outimage, 0)
 
@@ -577,7 +595,7 @@ def rescale_unmixing_results(input_img, output_img, gdalformat, calc_stats=True)
         rsgislib.imageutils.popImageStats(output_img, usenodataval=True, nodataval=0, calcpyramids=True)
 
 
-def predict_refl_linear_unmixing(in_unmix_coefs_img, endmembers_file, output_img, gdalformat="KEA", calc_stats=True):
+def predict_refl_linear_unmixing(in_unmix_coefs_img, endmembers_file, output_img, gdalformat='KEA', calc_stats=True):
     """
     A function to calculate the predicted pixel value using the inputted abundances and endmembers.
 
@@ -635,7 +653,7 @@ def predict_refl_linear_unmixing(in_unmix_coefs_img, endmembers_file, output_img
         rsgislib.imageutils.popImageStats(output_img, usenodataval=True, nodataval=0, calcpyramids=True)
 
 
-def calc_unmixing_rmse_residualerr(input_img, input_unmix_img, endmembers_file, output_img, gdalformat,
+def calc_unmixing_rmse_residualerr(input_img, input_unmix_img, endmembers_file, output_img, gdalformat='KEA',
                                    calc_stats=True):
     """
     A function to calculate the prediction residual and RMSE using the defined abundances and endmembers.
@@ -645,7 +663,6 @@ def calc_unmixing_rmse_residualerr(input_img, input_unmix_img, endmembers_file, 
     :param endmembers_file: The endmembers file used for the unmixing in the RSGISLib mtxt format.
     :param output_image: The file path to the GDAL writable output image (Band 1: RMSE, Band 2: Residual)
     :param gdalformat: The output image format to be used.
-    :param scale_factor: Scale factor used to integerising the endmember abundances image.
     :param calc_stats: If True (default) then image statistics and pyramids are calculated for the output images
 
     """
