@@ -302,6 +302,181 @@ Copy the GCPs from the srcImg to the destImg
     destDS = None
 
 
+def setImgBandMetaData(image_file, band, meta_field_name, meta_field_value):
+    """
+    Function to set image band metadata value.
+
+    :param image_file: the input image data
+    :param band: the image band for the meta-data to be written to
+    :param meta_field_name: the field name of the meta-data
+    :param meta_field_value: the value of the meta-data to be written.
+
+    """
+    if band < 1:
+        raise Exception("The band number must be 1 or greater; note band numbering starts at 1.")
+
+    ds = gdal.Open(image_file, gdal.GA_Update)
+    if ds == None:
+        raise Exception("Could not open the image file: {}".format(image_file))
+
+    n_bands = ds.RasterCount
+    if band > n_bands:
+        raise Exception("Band {} is not within the image file, which has {} bands".format(band, n_bands))
+
+    band_obj = ds.GetRasterBand(band)
+    band_obj.SetMetadataItem(meta_field_name, "{}".format(meta_field_value))
+    ds = None
+
+
+def getImgBandMetaData(image_file, band, meta_field_name):
+    """
+    Function to get image band metadata value.
+
+    :param image_file: the input image data
+    :param band: the image band for the meta-data to be read
+    :param meta_field_name: the field name of the meta-data
+
+    """
+    if band < 1:
+        raise Exception("The band number must be 1 or greater; note band numbering starts at 1.")
+
+    ds = gdal.Open(image_file, gdal.GA_ReadOnly)
+    if ds == None:
+        raise Exception("Could not open the image file: {}".format(image_file))
+
+    n_bands = ds.RasterCount
+    if band > n_bands:
+        raise Exception("Band {} is not within the image file, which has {} bands".format(band, n_bands))
+
+    band_obj = ds.GetRasterBand(band)
+    meta_field_value = band_obj.GetMetadataItem(meta_field_name)
+    print(band_obj.GetMetadata_Dict())
+    ds = None
+
+    return meta_field_value
+
+
+def getImgBandMetaDataFields(image_file, band):
+    """
+    Function to get a list of the image band metadata names.
+
+    :param image_file: the input image data
+    :param band: the image band for the meta-data to be read
+
+    """
+    if band < 1:
+        raise Exception("The band number must be 1 or greater; note band numbering starts at 1.")
+
+    ds = gdal.Open(image_file, gdal.GA_ReadOnly)
+    if ds == None:
+        raise Exception("Could not open the image file: {}".format(image_file))
+
+    n_bands = ds.RasterCount
+    if band > n_bands:
+        raise Exception("Band {} is not within the image file, which has {} bands".format(band, n_bands))
+
+    band_obj = ds.GetRasterBand(band)
+    meta_data_dict = band_obj.GetMetadata_Dict()
+    ds = None
+
+    return list(meta_data_dict.keys())
+
+
+def getImgBandMetaDataFieldsDict(image_file, band):
+    """
+    Function to get image band metadata names and values as a dict.
+
+    :param image_file: the input image data
+    :param band: the image band for the meta-data to be read
+
+    """
+    if band < 1:
+        raise Exception("The band number must be 1 or greater; note band numbering starts at 1.")
+
+    ds = gdal.Open(image_file, gdal.GA_ReadOnly)
+    if ds == None:
+        raise Exception("Could not open the image file: {}".format(image_file))
+
+    n_bands = ds.RasterCount
+    if band > n_bands:
+        raise Exception("Band {} is not within the image file, which has {} bands".format(band, n_bands))
+
+    band_obj = ds.GetRasterBand(band)
+    meta_data_dict = band_obj.GetMetadata_Dict()
+    ds = None
+
+    return meta_data_dict
+
+
+def setImgMetaData(image_file, meta_field_name, meta_field_value):
+    """
+    Function to set image metadata value.
+
+    :param image_file: the input image data
+    :param meta_field_name: the field name of the meta-data
+    :param meta_field_value: the value of the meta-data to be written.
+
+    """
+    ds = gdal.Open(image_file, gdal.GA_Update)
+    if ds == None:
+        raise Exception("Could not open the image file: {}".format(image_file))
+
+    ds.SetMetadataItem(meta_field_name, "{}".format(meta_field_value))
+    ds = None
+
+
+def getImgMetaData(image_file, meta_field_name):
+    """
+    Function to get image metadata value.
+
+    :param image_file: the input image data
+    :param meta_field_name: the field name of the meta-data
+
+    """
+    ds = gdal.Open(image_file, gdal.GA_ReadOnly)
+    if ds == None:
+        raise Exception("Could not open the image file: {}".format(image_file))
+
+    meta_field_value = ds.GetMetadataItem(meta_field_name)
+    ds = None
+    return meta_field_value
+
+
+def getImgMetaDataFields(image_file):
+    """
+    Function to get a list of the image metadata names.
+
+    :param image_file: the input image data
+    :param band: the image band for the meta-data to be read
+
+    """
+    ds = gdal.Open(image_file, gdal.GA_ReadOnly)
+    if ds == None:
+        raise Exception("Could not open the image file: {}".format(image_file))
+
+    meta_data_dict = ds.GetMetadata_Dict()
+    ds = None
+
+    return list(meta_data_dict.keys())
+
+
+def getImgMetaDataFieldsDict(image_file):
+    """
+    Function to get image metadata names and values as a dict.
+
+    :param image_file: the input image data
+
+    """
+    ds = gdal.Open(image_file, gdal.GA_ReadOnly)
+    if ds == None:
+        raise Exception("Could not open the image file: {}".format(image_file))
+
+    meta_data_dict = ds.GetMetadata_Dict()
+    ds = None
+
+    return meta_data_dict
+
+
 def getWKTProjFromImage(inImg):
     """
 A function which returns the WKT string representing the projection of the input image.
