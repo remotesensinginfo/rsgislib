@@ -48,7 +48,7 @@
 namespace rsgis { namespace classifier {
 	    
 	/**
-	 This implements the Spectral Correlation mapper approach to calculate the correlation between image specta and a reffernce spectra.
+	 This implements the Spectral Correlation mapper approach to calculate the correlation between image specta and a reference spectra.
 	 As only correlation is importand not negative or positive values, the result is normallised to be between 0 and 1
 	 
 	 De Carvalho and Meneses. Spectral correlation mapper (SCM): <br>
