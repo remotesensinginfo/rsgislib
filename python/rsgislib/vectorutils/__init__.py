@@ -6293,3 +6293,29 @@ def shiftxy_vec_lyr(vec_file, vec_lyr, x_shift, y_shift, vec_out_file, vec_out_l
     else:
         shifted_gpdf.to_file(vec_out_file, driver=out_format)
 
+
+def split_feats_to_mlyrs(in_vec_file, in_vec_lyr, out_vec_file, out_format='GPKG'):
+    """
+    A function which splits an existing vector layer into multiple layers
+
+    :param in_vec_file: input vector file
+    :param in_vec_lyr: input vector layer
+    :param out_vec_file: output file, note the format must be one which
+                         supports multiple layers (e.g., GPKG).
+    :param out_format: The output format of the output file.
+
+    """
+    import geopandas
+    import tqdm
+    base_gpdf = geopandas.read_file(in_vec_file, layer=in_vec_lyr)
+
+    for i in tqdm.tqdm(range(base_gpdf.shape[0])):
+        tmp_gp_series = base_gpdf.loc[i]
+        tmp_gpdf = geopandas.GeoDataFrame([tmp_gp_series])
+        vec_out_lyr = "veclyr_{}".format(i)
+        tmp_gpdf.to_file(out_vec_file, layer=vec_out_lyr, driver=out_format)
+        tmp_gpdf = None
+    base_gpdf = None
+
+
+
