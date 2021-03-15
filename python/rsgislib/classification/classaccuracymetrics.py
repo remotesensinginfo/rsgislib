@@ -484,8 +484,6 @@ def calc_acc_ptonly_metrics_vecsamples(in_vec_file, in_vec_lyr, ref_col, cls_col
     """
     import rsgislib
     import rsgislib.vectorutils
-    import rsgislib.rastergis
-    import rsgislib.rastergis.ratutils
 
     rsgis_utils = rsgislib.RSGISPyUtils()
 
