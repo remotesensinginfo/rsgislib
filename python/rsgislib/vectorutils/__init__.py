@@ -5858,6 +5858,47 @@ def merge_vector_files(input_files, output_file, output_lyr=None, out_format='GP
             data_gdf.to_file(output_file, driver=out_format)
 
 
+def merge_vector_layers(inputs, output_file, output_lyr=None, out_format='GPKG', out_epsg=None):
+    """
+    A function which merges the input vector layers into a single output file using geopandas.
+
+    :param inputs: list of dicts with keys [{'file': '/file/path/to/file.gpkg', 'layer': 'layer_name'}]
+                        providing the file paths and layer names.
+    :param output_file: output vector file.
+    :param output_lyr: output vector layer.
+    :param out_format: output file format.
+    :param out_epsg: if input layers are different projections then option can be used to define the output
+                     projection.
+
+    """
+    import tqdm
+    import geopandas
+    first = True
+    for vec_info in tqdm.tqdm(inputs):
+        if ('file' in vec_info) and ('layer' in vec_info):
+            if first:
+                data_gdf = geopandas.read_file(vec_info['file'], layer=vec_info['layer'])
+                if out_epsg is not None:
+                    data_gdf = data_gdf.to_crs(epsg=out_epsg)
+                first = False
+            else:
+                tmp_data_gdf = geopandas.read_file(vec_info['file'], layer=vec_info['layer'])
+                if out_epsg is not None:
+                    tmp_data_gdf = tmp_data_gdf.to_crs(epsg=out_epsg)
+
+                data_gdf = data_gdf.append(tmp_data_gdf)
+        else:
+            raise Exception("The inputs should be a list of dicts with keys 'file' and 'layer'.")
+
+    if not first:
+        if out_format == "GPKG":
+            if output_lyr is None:
+                raise Exception("If output format is GPKG then an output layer is required.")
+            data_gdf.to_file(output_file, layer=output_lyr, driver=out_format)
+        else:
+            data_gdf.to_file(output_file, driver=out_format)
+
+
 def explode_vec_lyr(vec_file, vec_lyr, vec_out_file, vec_out_lyr, out_format='GPKG'):
     """
     A function to explode a vector layer separating any multiple geometries (e.g., multipolygons)

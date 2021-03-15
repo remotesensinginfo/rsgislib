@@ -370,6 +370,37 @@ Where:
         rsgislib.imageutils.popImageStats(outImage, False, -999., True)
 
 
+def calcMVI(image, gBand, nBand, sBand, outImage, stats=True, gdalformat='KEA'):
+    """
+Helper function to calculate Mangrove Vegetation Index (MFI) ((NIR-Green)/(SWIR-Green)),
+note the output no data value is -999.
+
+
+Baloloya, A.B, Blancoab, A.C, Ana, R.R.C.S,  Nadaokac, K (2020). Development and application of a
+new mangrove vegetation index (MVI) for rapid and accurate mangrove mapping. ISPRS Journal of Photogrammetry
+and Remote Sensing. 166. pp95-177. https://doi.org/10.1016/j.isprsjprs.2020.06.001
+
+:param image: is a string specifying the input image file.
+:param gBand: is an int specifying the red band in the input image (band indexing starts at 1)
+:param nBand: is an int specifying the nir band in the input image (band indexing starts at 1)
+:param sBand: is an int specifying the swir band in the input image (band indexing starts at 1)
+:param outImage: is a string specifying the output image file.
+:param stats: is a boolean specifying whether pyramids and stats should be calculated (Default: True)
+:param gdalformat: is a string specifing the output image file format (Default: KEA)
+
+"""
+    expression = '(nir+green)!=0?abs(nir-green)/abs(swir-green):-999'
+    bandDefns = []
+    bandDefns.append(rsgislib.imagecalc.BandDefn('green', image, gBand))
+    bandDefns.append(rsgislib.imagecalc.BandDefn('nir', image, nBand))
+    bandDefns.append(rsgislib.imagecalc.BandDefn('swir', image, sBand))
+    rsgislib.imagecalc.bandMath(outImage, expression, gdalformat, rsgislib.TYPE_32FLOAT, bandDefns)
+    # Set no data value
+    rsgislib.RSGISPyUtils().setImageNoDataValue(outImage, -999)
+    if stats:
+        rsgislib.imageutils.popImageStats(outImage, False, -999., True)
+
+
 """
 http://bleutner.github.io/RStoolbox/rstbx-docu/spectralIndices.html
 Index	Description	Source	Bands	Formula
