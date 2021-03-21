@@ -2844,6 +2844,61 @@ def check_img_file_comparison(base_img, comp_img, test_n_bands=False, test_eql_b
     return imgs_match
 
 
+def test_img_lst_intersects(imgs, stop_err=False):
+    """
+    A function which will test a list of image to check if they intersect, have matching image
+    resolution and projection. The first image in the list is used as the reference to which all
+    others are compared to.
+
+    :param imgs: list of images file paths
+    :param stop_err: boolean. Default: False.
+                     If True then an exception will be thrown if error found.
+                     If False then errors will just be printed to screen.
+
+    """
+    rsgis_utils = rsgislib.RSGISPyUtils()
+    first = True
+    for img in imgs:
+        print(img)
+        img_bbox = rsgis_utils.getImageBBOX(img)
+        img_proj = rsgis_utils.getEPSGCode(img)
+        img_res = rsgis_utils.getImageRes(img)
+        if first:
+            first = False
+            ref_img = img
+            ref_bbox = img_bbox
+            ref_proj = img_proj
+            ref_res = img_res
+            print("\tReference Image")
+        else:
+            if ref_proj != img_proj:
+                print("\tProjection does not match the reference (i.e., first image)")
+                print("\tRef (first) Image: {}".format(ref_img))
+                print("\tRef (first) EPSG: {}".format(ref_proj))
+                print("\tImage: {}".format(img))
+                print("\tImage EPSG: {}".format(img_proj))
+                if stop_err:
+                    raise Exception("Projection does not match the reference (i.e., first image)")
+            elif not rsgis_utils.do_bboxes_intersect(ref_bbox, img_bbox):
+                print("\tBBOX does not intersect the reference (i.e., first image)")
+                print("\tRef (first) Image: {}".format(ref_img))
+                print("\tRef (first) BBOX:", ref_bbox)
+                print("\tImage: {}".format(img))
+                print("\tImage BBOX: ", img_bbox)
+                if stop_err:
+                    raise Exception("BBOX does not intersect the reference (i.e., first image)")
+            elif (img_res[0] != ref_res[0]) or (img_res[1] != ref_res[0]):
+                print("\tImage resolution does not match the reference (i.e., first image)")
+                print("\tRef (first) Image: {}".format(ref_img))
+                print("\tRef (first) Res: ", ref_res)
+                print("\tImage: {}".format(img))
+                print("\tImage Res: ", img_res)
+                if stop_err:
+                    raise Exception("Image resolution does not match the reference (i.e., first image)")
+            else:
+                print("\tOK")
+
+
 def whitenImage(input_img, valid_msk_img, valid_msk_val, output_img, gdalformat):
     """
     A function which whitens the input image where the noise covariance matrix is
