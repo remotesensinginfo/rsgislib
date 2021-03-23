@@ -1950,6 +1950,7 @@ class RSGISPyUtils (object):
             for punct in string.punctuation:
                 if (punct != '_') and (punct != '-'):
                     str_val_tmp = str_val_tmp.replace(punct, '')
+            str_val_tmp = self.remove_repeated_chars(str_val_tmp, '_')
 
         return str_val_tmp
 

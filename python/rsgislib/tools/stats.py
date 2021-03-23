@@ -18,7 +18,7 @@ def calc_pandas_VIF(df, cols=None):
 
     :param df: pandas dataframe where the columns are the predictor variables
     :param cols: list of columns in the dataframe
-    :returns: A pandas series containing the VIF for each predictor variable.
+    :return: A pandas series containing the VIF for each predictor variable.
 
     Example::
         df = pandas.read_csv('metrics.csv')
@@ -97,7 +97,7 @@ def cqv_threshold(df, cols=None, lowthreshold=0.25, highthreshold=0.75):
     :param cols: list of columns in the dataframe
     :param lowthreshold: Float defining the CQV below which the predictors are uninfomative
     :param highthreshold: Float defining the CQV above which the predictors are unreliable
-    :returns: list of column names for good predictor variables
+    :return: list of column names for good predictor variables
 
     """
     import numpy
@@ -132,6 +132,228 @@ def cqv_threshold(df, cols=None, lowthreshold=0.25, highthreshold=0.75):
     print('Selected {} useful predictors...'.format(len(good_cols)))
 
     return good_cols
+
+
+def corr_feature_selection(df, dep_vars, ind_vars, n_min_clusters=3, n_max_clusters=25):
+    """
+    A function which performs a correlation based feature selection.
+    This analysis will cluster the independent (predictor) variables based
+    on the Pearson correlation distance metric. The Silhouette coefficient
+    (Rousseeuw, 1987) is used to find the optimal number of clusters.
+
+    :param df: pandas dataframe where the columns are the predictor variables
+    :param dep_vars: list of dependent variables within the dataframe
+    :param ind_vars: list of independent (predictor) variables within the dataframe
+    :param n_min_clusters: The minimum number of clusters within the search (Default: 3)
+    :param n_max_clusters: The maximum number of clusters within the search (Default: 25)
+    :return: list of column names for good predictor variables
+
+    """
+    import numpy
+    import tqdm
+    import scipy.stats
+    import sklearn.cluster
+    import sklearn.metrics
+
+    # Create a list for sorting the correlations for each dependent variable
+    corr_data = list()
+    # Loop through the dependent variables
+    for dep_var in dep_vars:
+        # Create a list for sorting the output correlation values
+        corr_vals = list()
+        # Loop through the independent variables
+        for ind_var in ind_vars:
+            # add the correlation values to the list
+            corr_vals.append(df[dep_var].corr(df[ind_var], method='pearson'))
+        # Add the list of correlation values to the overall list.
+        corr_data.append(corr_vals)
+
+    # Calculate the mean Pearson r value for each predictor variable,
+    # using the Fisher z-transform to standardise the Pearson r values.
+    # https://en.wikipedia.org/wiki/Fisher_transformation
+    pearson_corr = numpy.tanh(numpy.mean(numpy.arctanh(corr_data), axis=0))
+
+    def _cluster_features(X, n_clusters):
+        """
+        An internal function to cluster predictor variables using feature agglomeration.
+
+        :params X: a 2D numpy array of shape = (nSamples, nPredictors).
+        :params n_clusters: the number of clusters to output
+        :returns: the labels
+        """
+        # check inputs:
+        if X.ndim != 2:
+            raise Exception('Error: the input array must be 2D.')
+
+        def _pearson_affinity(a):
+            """ An utility function to generate an affinity matrix based on Pearson correlation."""
+            return 1 - numpy.array([[abs(scipy.stats.pearsonr(x, y)[0]) for x in a] for y in a])
+
+        clf = sklearn.cluster.FeatureAgglomeration(n_clusters=n_clusters, linkage='complete',
+                                                   affinity=_pearson_affinity)
+        clf.fit(X)
+
+        # Get the cluster id for each feature/predictor variable:
+        labels = (clf.labels_ + 1)
+
+        return labels
+
+    # Create the nd array from the pandas data range with all the predictor
+    # variables listed.
+    x = df[ind_vars].values
+
+    # Test for optimal number of clusters using the Silhouette Coefficient as a
+    # performance metric.
+
+    n_clusters = numpy.arange(n_min_clusters, n_max_clusters, dtype='uint8')
+    cluster_score = list()
+    for n in tqdm.tqdm(n_clusters):
+        x_lbls = _cluster_features(x, n)
+        cluster_score.append(sklearn.metrics.silhouette_score(x.T, x_lbls, metric='correlation'))
+
+    # find the maximum Silhouette Coefficient = best clustering:
+    best_idx = numpy.argmax(cluster_score)
+    opt_n_clusters = n_clusters[best_idx]
+    opt_n_clusters_scr = cluster_score[best_idx]
+    print('Found optimal number of clusters: {}'.format(opt_n_clusters))
+    print('Silhouette Coefficient: {}'.format(opt_n_clusters_scr))
+
+    # Perform clustering with optimal number of clusters
+    cluster_lbls = _cluster_features(x, opt_n_clusters)
+
+    # Select one predictor variable from each cluster using the maximum Pearson correlation:
+    best_predictors = []
+    for lbl in numpy.unique(cluster_lbls):
+        lbl_idx = numpy.where(cluster_lbls == lbl)[0]
+        best_corr = numpy.argmax(pearson_corr[lbl_idx])
+        best_predictors.append(ind_vars[lbl_idx[best_corr]])
+
+    return best_predictors
+
+
+def lassolars_feature_selection(df, dep_vars, ind_vars, alpha_val=None):
+    """
+    A function which undertake regularisation-based feature selection using
+    the LassoLars regressor in Scikit-Learn. the Lasso (least absolute shrinkage
+    and selection operator) regression algorithm is linear model that uses L1
+    regularisation to assign coefficients of zero to uninformative predictor
+    variables (effectively eliminating them from the regression model). The
+    LARS algorithm (Efron et al., 2004) provides a means of estimating which
+    variables to include in the model, as well as their coefficients.
+
+    :param df: pandas dataframe where the columns are the predictor variables
+    :param dep_vars: list of dependent variables within the dataframe
+    :param ind_vars: list of independent (predictor) variables within the dataframe
+    :param alpha_val: Value of the regularization parameter (alpha) for the Lasso estimator.
+                      If None then the value will be estimated using Bayes Information criterion
+                      (BIC) and cross-validation. (Default: None).
+    :return: list of column names for good predictor variables
+
+    """
+    import warnings
+    import sklearn.linear_model
+    import sklearn.feature_selection
+    import sklearn.exceptions
+    import numpy
+
+    # Create the nd array from the pandas data range with all the predictor
+    # variables listed.
+    x = df[ind_vars].values
+
+    # Create the nd array from the pandas data range with all the dependent
+    # variables listed.
+    y = df[dep_vars].values
+
+    if alpha_val is None:
+        # Use the Bayes Information criterion (BIC) and cross-validation to find the
+        # optimal value of the regularization parameter (alpha) for the Lasso estimator.
+        estimator = sklearn.linear_model.LassoLarsIC('bic')
+
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore', category=sklearn.exceptions.ConvergenceWarning)
+            estimator.fit(x, y[:, -1])
+
+        optimal_alpha = estimator.alpha_
+    else:
+        optimal_alpha = float(alpha_val)
+
+    print("Using regularization parameter (alpha) for the Lasso estimator of: {}".format(optimal_alpha))
+
+    # Fit the regressor using tuned regularisation parameter:
+    estimator = sklearn.linear_model.LassoLars(alpha=optimal_alpha)
+
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore', category=sklearn.exceptions.ConvergenceWarning)
+        estimator.fit(x, y)
+
+    # Select the variables with non-zero coefficients:
+    selector = sklearn.feature_selection.SelectFromModel(estimator, prefit=True)
+    ind_vars_arr = numpy.array(ind_vars)
+    best_predictors = ind_vars_arr[selector.get_support()]
+
+    return list(best_predictors)
+
+
+def breusch_pagan_test(x, y):
+    """"
+    A function to perform a Breusch-Pagan test for heteroskedasticity in a linear model:
+    H_0 = No heteroskedasticity.
+    H_1 = Heteroskedasticity is present.
+
+    Returns a list containing three elements:
+    1. the Breusch-Pagan test statistic.
+    2. the p-value for the test.
+    3. the test result.
+    
+    :param x: a numpy.ndarray containing the predictor variables. Shape = (nSamples, nPredictors).
+    :param y: a 1D numpy.ndarray containing the response variable. Shape = (nSamples, ).
+    :return: list containing 3 elements (Breusch-Pagan test statistic, p-value for the test, test result)
+
+    """
+    import sklearn.linear_model
+    import numpy
+
+    if x.shape[0] != y.shape[0]:
+        raise SystemExit('Error: the number of samples differs between x and y.')
+    else:
+        n_samples = x.shape[0]
+
+    # fit an OLS linear model to y using x:
+    lm = sklearn.linear_model.LinearRegression()
+    lm.fit(x, y)
+
+    # calculate the squared errors:
+    err = (y - lm.predict(x))**2
+
+    # fit an auxiliary regression to the squared errors:
+    # why?: to estimate the variance in err explained by x
+    lm.fit(x, err)
+    pred_err = lm.predict(x)
+
+    # calculate the coefficient of determination:
+    ss_tot = numpy.sum((err - numpy.mean(err, axis=0))**2)
+    ss_res = numpy.sum((err - pred_err)**2)
+    r2 = 1 - (ss_res / ss_tot)
+
+    # calculate the Lagrange multiplier:
+    LM = n_samples * r2
+
+    # calculate p-value. degrees of freedom = number of predictors.
+    # this is equivalent to (p - 1) parameter restrictions in Wikipedia entry.
+    try:
+        from scipy.stats import chisqprob
+        pval = chisqprob(LM, x.shape[1])
+    except Exception:
+        from scipy.stats.distributions import chi2
+        pval = chi2.sf(LM, x.shape[1])
+
+    if pval < 0.01:
+        test_result = 'Heteroskedasticity present at 99% CI.'
+    elif pval < 0.05:
+        test_result = 'Heteroskedasticity present at 95% CI.'
+    else:
+        test_result = 'No significant heteroskedasticity.'
+    return [LM, pval, test_result]
 
 
 def bin_accuracy_scores_prob(y_true, y_prob):
