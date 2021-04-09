@@ -4182,7 +4182,7 @@ def vector_translate(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr=None, ou
     :param src_srs: provide a source spatial reference for the input vector file. Default=None.
                     can be used to provide a projection where none has been specified or the
                     information has gone missing. Can be used without performing a reprojection.
-    :param dst_srs: provide a spatial reference for the output image to be reprojected to. (Default=None)
+    :param dst_srs: provide a spatial reference for the output vector file to be reprojected to. (Default=None)
                     If specified then the file will be reprojected.
     :param force: remove output file if it exists.
 
@@ -6359,4 +6359,123 @@ def split_feats_to_mlyrs(in_vec_file, in_vec_lyr, out_vec_file, out_format='GPKG
     base_gpdf = None
 
 
+def addGeomBBOXCols(vec_file, vec_lyr, vec_out_file, vec_out_lyr, out_format='GPKG',
+                    min_x_col='MinX', max_x_col='MaxX', min_y_col='MinY', max_y_col='MaxY'):
+    """
+    A function which adds columns to the vector layer with the bbox of each geometry.
+
+    :param vec_file: input vector file
+    :param vec_lyr: input vector layer name
+    :param vec_out_file: output vector file
+    :param vec_out_lyr: output vector layer name
+    :param out_format: The output format of the output file. (Default: GPKG)
+    :param min_x_col: Name of the MinX column (Default: MinX)
+    :param max_x_col: Name of the MaxX column (Default: MaxX)
+    :param min_y_col: Name of the MinY column (Default: MinY)
+    :param max_y_col: Name of the MaxY column (Default: MaxY)
+
+    """
+    import geopandas
+    # Read input vector file.
+    base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
+
+    # Get Geometry bounds
+    geom_bounds = base_gpdf['geometry'].bounds
+
+    # Add columns to the geodataframe
+    base_gpdf[min_x_col] = geom_bounds['minx']
+    base_gpdf[max_x_col] = geom_bounds['maxx']
+    base_gpdf[min_y_col] = geom_bounds['miny']
+    base_gpdf[max_y_col] = geom_bounds['maxy']
+
+    # Output the file.
+    if out_format == 'GPKG':
+        base_gpdf.to_file(vec_out_file, layer=vec_out_lyr, driver=out_format)
+    else:
+        base_gpdf.to_file(vec_out_file, driver=out_format)
+
+
+def createNameCol(vec_file, vec_lyr, vec_out_file, vec_out_lyr, out_format='GPKG', out_col='names', x_col='MinX',
+                  y_col='MaxY', prefix='', postfix='', latlong=True, int_coords=True, zero_x_pad=0, zero_y_pad=0,
+                  round_n_digts=0, non_neg=False):
+    """
+    A function which creates a column in the vector layer which can define a name using coordinates associated
+    with the feature. Often this is useful if a tiling has been created and from this a set of images are to
+    generated for example.
+
+    :param vec_file: input vector file
+    :param vec_lyr: input vector layer name
+    :param vec_out_file: output vector file
+    :param vec_out_lyr: output vector layer name
+    :param out_format: The output format of the output file. (Default: GPKG)
+    :param out_col: The name of the output column
+    :param x_col: The column with the x coordinate
+    :param y_col: The column with the y coordinate
+    :param prefix: A prefix to the name
+    :param postfix: A postfix to the name
+    :param latlong: A boolean specifying if the coordinates are lat / long
+    :param int_coords: A boolean specifying whether to integise the coordinates.
+    :param zero_x_pad: An integer, if larger than zero then the X coordinate will be zero padded.
+    :param zero_y_pad: An integer, if larger than zero then the Y coordinate will be zero padded.
+    :param round_n_digts: An integer, if larger than zero then the coordinates will be rounded to n significant digits
+    :param non_neg: boolean specifying whether an negative coordinates should be made positive. (Default: False)
+
+    """
+    import geopandas
+    import numpy
+    import tqdm
+    import rsgislib
+
+    rsgis_utils = rsgislib.RSGISPyUtils()
+
+    base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
+
+    names = list()
+    for i in tqdm.tqdm(range(base_gpdf.shape[0])):
+        x_col_val = base_gpdf.loc[i][x_col]
+        y_col_val = base_gpdf.loc[i][y_col]
+
+        x_col_val_neg = False
+        y_col_val_neg = False
+        if non_neg:
+            if x_col_val < 0:
+                x_col_val_neg = True
+                x_col_val = x_col_val * (-1)
+            if y_col_val < 0:
+                y_col_val_neg = True
+                y_col_val = y_col_val * (-1)
+
+        if zero_x_pad > 0:
+            x_col_val_str = rsgis_utils.zero_pad_num_str(x_col_val, str_len=zero_x_pad, round_num=False,
+                                                         round_n_digts=round_n_digts, integerise=int_coords)
+        else:
+            x_col_val = int(x_col_val)
+            x_col_val_str = '{}'.format(x_col_val)
+
+        if zero_y_pad > 0:
+            y_col_val_str = rsgis_utils.zero_pad_num_str(y_col_val, str_len=zero_y_pad, round_num=False,
+                                                         round_n_digts=round_n_digts, integerise=int_coords)
+        else:
+            y_col_val = int(y_col_val)
+            y_col_val_str = '{}'.format(y_col_val)
+
+        if latlong:
+            hemi = 'N'
+            if y_col_val_neg:
+                hemi = 'S'
+            east_west = 'E'
+            if x_col_val_neg:
+                east_west = 'W'
+            name = '{}{}{}{}{}{}'.format(prefix, hemi, y_col_val_str, east_west, x_col_val_str, postfix)
+        else:
+            name = '{}E{}N{}{}'.format(prefix, x_col_val_str, y_col_val_str, postfix)
+
+        names.append(name)
+
+    base_gpdf[out_col] = numpy.array(names)
+
+    if out_format == 'GPKG':
+        base_gpdf.to_file(vec_out_file, layer=vec_out_lyr, driver=out_format)
+    else:
+        base_gpdf.to_file(vec_out_file, driver=out_format)
 
