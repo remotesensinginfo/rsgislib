@@ -712,8 +712,8 @@ use this function.
 :param valsimg: the values image
 :param imgbandidx: the index (starting at 1) of the image band for which the stats will be calculated.
                    If defined the no data value of the band will be ignored.
-:param minthres: a lower threshold for values which will be included in the stats calculation.
-:param maxthres: a upper threshold for values which will be included in the stats calculation.
+:param minthres: a lower threshold (inclusive) for values which will be included in the stats calculation.
+:param maxthres: a upper threshold (inclusive) for values which will be included in the stats calculation.
 :param out_no_data_val: output no data value if no valid pixels are within the polygon.
 :param percentile: the percentile value to calculate.
 :param percentilefield: the name of the field for the percentile value (None or not specified to be ignored).
