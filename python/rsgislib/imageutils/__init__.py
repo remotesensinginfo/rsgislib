@@ -9,7 +9,6 @@ from ._imageutils import *
 import rsgislib 
 
 import os
-import os.path
 import math
 import shutil
 
@@ -2478,6 +2477,21 @@ def gdal_mosaic_images_vrt(input_imgs, output_vrt_file, vrt_extent=None):
     else:
         build_vrt_opt = gdal.BuildVRTOptions(callback=callback)
     gdal.BuildVRT(output_vrt_file, input_imgs, options=build_vrt_opt)
+
+
+def gdal_band_subset_vrt(input_img, bands, out_vrt):
+    """
+    A function which creates a GDAL VRT for the input image with the bands selected in the
+    input list.
+
+    :param input_img: the input GDAL image
+    :param bands: a list of bands (in the order they will be in the VRT). Note, band numbering starts at 1.
+    :param out_vrt: the output VRT file.
+
+    """
+    input_img = os.path.abspath(input_img)
+    vrt_options = gdal.BuildVRTOptions(bandList=bands)
+    gdal.BuildVRT(out_vrt, [input_img], options=vrt_options)
 
 
 def subset_to_vec(in_img, out_img, gdalformat, roi_vec_file, roi_vec_lyr, datatype=None, vec_epsg=None):

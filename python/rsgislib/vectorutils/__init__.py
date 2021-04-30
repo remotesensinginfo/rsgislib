@@ -6479,3 +6479,195 @@ def createNameCol(vec_file, vec_lyr, vec_out_file, vec_out_lyr, out_format='GPKG
     else:
         base_gpdf.to_file(vec_out_file, driver=out_format)
 
+
+def vec_lyr_intersection_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_file, out_vec_lyr=None, out_format="GPKG", force=False):
+    """
+    A function which performs an intersection between the vector layer and the overlain vector using Geopandas.
+
+    :param vec_file: Input vector file path.
+    :param vec_lyr: Input vector layer name.
+    :param vec_over_file: The vector file overlained on the input vector file.
+    :param vec_over_lyr: The vector layer overlained on the input vector file.
+    :param out_vec_file: The output vector file path.
+    :param out_vec_lyr: The output vector layer name.
+    :param out_format: The output file format of the vector file.
+    :param force: remove output file if it exists.
+    """
+    import os
+    import geopandas
+
+    if os.path.exists(out_vec_file):
+        if force:
+            delete_vector_file(out_vec_file)
+        else:
+            raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
+
+    if out_vec_lyr is None:
+        out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
+
+    data_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
+    over_data_gdf = geopandas.read_file(vec_over_file, layer=vec_over_lyr)
+    # Perform Intersection
+    data_inter_gdf = geopandas.overlay(data_gdf, over_data_gdf, how='intersection')
+
+    if out_format == "GPKG":
+        if out_vec_lyr is None:
+            raise Exception("If output format is GPKG then an output layer is required.")
+        data_inter_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        data_inter_gdf.to_file(out_vec_file, driver=out_format)
+
+
+def vec_lyr_difference_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_file, out_vec_lyr=None, out_format="GPKG", force=False):
+    """
+    A function which performs a difference between the vector layer and the overlain vector using Geopandas.
+
+    :param vec_file: Input vector file path.
+    :param vec_lyr: Input vector layer name.
+    :param vec_over_file: The vector file overlained on the input vector file.
+    :param vec_over_lyr: The vector layer overlained on the input vector file.
+    :param out_vec_file: The output vector file path.
+    :param out_vec_lyr: The output vector layer name.
+    :param out_format: The output file format of the vector file.
+    :param force: remove output file if it exists.
+    """
+    import os
+    import geopandas
+
+    if os.path.exists(out_vec_file):
+        if force:
+            delete_vector_file(out_vec_file)
+        else:
+            raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
+
+    if out_vec_lyr is None:
+        out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
+
+    data_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
+    over_data_gdf = geopandas.read_file(vec_over_file, layer=vec_over_lyr)
+    # Perform Difference
+    data_inter_gdf = geopandas.overlay(data_gdf, over_data_gdf, how='difference')
+
+    if out_format == "GPKG":
+        if out_vec_lyr is None:
+            raise Exception("If output format is GPKG then an output layer is required.")
+        data_inter_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        data_inter_gdf.to_file(out_vec_file, driver=out_format)
+
+
+def vec_lyr_sym_difference_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_file, out_vec_lyr=None, out_format="GPKG", force=False):
+    """
+    A function which performs a symmetric difference between the vector layer and the overlain vector using Geopandas.
+
+    :param vec_file: Input vector file path.
+    :param vec_lyr: Input vector layer name.
+    :param vec_over_file: The vector file overlained on the input vector file.
+    :param vec_over_lyr: The vector layer overlained on the input vector file.
+    :param out_vec_file: The output vector file path.
+    :param out_vec_lyr: The output vector layer name.
+    :param out_format: The output file format of the vector file.
+    :param force: remove output file if it exists.
+    """
+    import os
+    import geopandas
+
+    if os.path.exists(out_vec_file):
+        if force:
+            delete_vector_file(out_vec_file)
+        else:
+            raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
+
+    if out_vec_lyr is None:
+        out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
+
+    data_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
+    over_data_gdf = geopandas.read_file(vec_over_file, layer=vec_over_lyr)
+    # Perform symmetric difference
+    data_inter_gdf = geopandas.overlay(data_gdf, over_data_gdf, how='symmetric_difference')
+
+    if out_format == "GPKG":
+        if out_vec_lyr is None:
+            raise Exception("If output format is GPKG then an output layer is required.")
+        data_inter_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        data_inter_gdf.to_file(out_vec_file, driver=out_format)
+
+
+def vec_lyr_identity_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_file, out_vec_lyr=None, out_format="GPKG", force=False):
+    """
+    A function which performs a identity between the vector layer and the overlain vector using Geopandas.
+
+    The result consists of the surface of vec_file, but with the geometries obtained from overlaying vec_file with vec_over_file.
+
+    :param vec_file: Input vector file path.
+    :param vec_lyr: Input vector layer name.
+    :param vec_over_file: The vector file overlained on the input vector file.
+    :param vec_over_lyr: The vector layer overlained on the input vector file.
+    :param out_vec_file: The output vector file path.
+    :param out_vec_lyr: The output vector layer name.
+    :param out_format: The output file format of the vector file.
+    :param force: remove output file if it exists.
+    """
+    import os
+    import geopandas
+
+    if os.path.exists(out_vec_file):
+        if force:
+            delete_vector_file(out_vec_file)
+        else:
+            raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
+
+    if out_vec_lyr is None:
+        out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
+
+    data_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
+    over_data_gdf = geopandas.read_file(vec_over_file, layer=vec_over_lyr)
+    # Perform identity
+    data_inter_gdf = geopandas.overlay(data_gdf, over_data_gdf, how='identity')
+
+    if out_format == "GPKG":
+        if out_vec_lyr is None:
+            raise Exception("If output format is GPKG then an output layer is required.")
+        data_inter_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        data_inter_gdf.to_file(out_vec_file, driver=out_format)
+
+
+def vec_lyr_union_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_file, out_vec_lyr=None, out_format="GPKG", force=False):
+    """
+    A function which performs a union between the vector layer and the overlain vector using Geopandas.
+
+    :param vec_file: Input vector file path.
+    :param vec_lyr: Input vector layer name.
+    :param vec_over_file: The vector file overlained on the input vector file.
+    :param vec_over_lyr: The vector layer overlained on the input vector file.
+    :param out_vec_file: The output vector file path.
+    :param out_vec_lyr: The output vector layer name.
+    :param out_format: The output file format of the vector file.
+    :param force: remove output file if it exists.
+    """
+    import os
+    import geopandas
+
+    if os.path.exists(out_vec_file):
+        if force:
+            delete_vector_file(out_vec_file)
+        else:
+            raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
+
+    if out_vec_lyr is None:
+        out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
+
+    data_gdf = geopandas.read_file(vec_file, layer=vec_lyr)
+    over_data_gdf = geopandas.read_file(vec_over_file, layer=vec_over_lyr)
+    # Perform union
+    data_inter_gdf = geopandas.overlay(data_gdf, over_data_gdf, how='union')
+
+    if out_format == "GPKG":
+        if out_vec_lyr is None:
+            raise Exception("If output format is GPKG then an output layer is required.")
+        data_inter_gdf.to_file(out_vec_file, layer=out_vec_lyr, driver=out_format)
+    else:
+        data_inter_gdf.to_file(out_vec_file, driver=out_format)
+
