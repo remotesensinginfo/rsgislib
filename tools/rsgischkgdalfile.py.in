@@ -33,22 +33,28 @@ import rsgislib
 import argparse
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='A utility which can be used to check whether a GDAL compatible file is valid and if there are any errors or warnings.')
+    parser = argparse.ArgumentParser( description="A utility which can be used to check whether a GDAL "
+                                                  "compatible file is valid and if there are any errors or warnings.")
     parser.add_argument("-i", "--input", type=str, required=True, help="Input file path")
-    parser.add_argument("--vec", action='store_true', default=False, help="Specifiy that the input file is a vector layer (otherwise assumed to be a raster).")
-    
+    parser.add_argument("--vec", action='store_true', default=False, help="Specifiy that the input file is a "
+                                                                          "vector layer (otherwise assumed "
+                                                                          "to be a raster).")
+    parser.add_argument("--noband", action='store_true', default=False, help="Specifiy that the indiviudal raster "
+                                                                             "bands should NOT be checked (Default "
+                                                                             "False; i.e., bands are checked).")
+
     args = parser.parse_args()
-    
+
     rsgis_utils = rsgislib.RSGISPyUtils()
-    
+
     file_ok = True
     err_str = ''
-    
+
     if args.vec:
-        file_ok, err_str = rsgis_utils.check_gdal_vector_file(args.input)
+        file_ok, err_str = rsgis_utils.check_gdal_vector_file(args.input, (not args.noband))
     else:
         file_ok, err_str = rsgis_utils.check_gdal_image_file(args.input)
-    
+
     if file_ok:
         print("File is OK: {}".format(args.input))
     else:

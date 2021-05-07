@@ -2093,11 +2093,13 @@ class RSGISPyUtils (object):
         date_val = datetime.date(year=int(year), month=int(month), day=int(day))
         return (date_val - base_date).days
 
-    def check_gdal_image_file(self, gdal_img):
+    def check_gdal_image_file(self, gdal_img, check_bands=True):
         """
         A function which checks a GDAL compatible image file and returns an error message if appropriate.
 
         :param gdal_img: the file path to the gdal image file.
+        :param check_bands: boolean specifying whether individual image bands should be
+                            opened and checked (Default: True)
         :return: boolean (True: file OK; False: Error found), string (error message if required otherwise empty string)
 
         """
@@ -2114,6 +2116,14 @@ class RSGISPyUtils (object):
                 if raster_ds is None:
                     file_ok = False
                     err_str = 'GDAL could not open the dataset, returned None.'
+                elif check_bands:
+                    n_bands = raster_ds.RasterCount
+                    for n in range(n_bands):
+                        band = n + 1
+                        img_band = raster_ds.GetRasterBand(band)
+                        if img_band is None:
+                            file_ok = False
+                            err_str = 'GDAL could not open band {} in the dataset, returned None.'.format(band)
                 raster_ds = None
             except Exception as e:
                 file_ok = False
