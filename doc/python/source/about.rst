@@ -5,7 +5,7 @@ The Remote Sensing and Geographical Information Systems software Library (RSGISL
 
 `Dan Clewley <http://mixil.usc.edu/people/staff/daniel-clewley.htm>`_ joined the project in December 2008, shortly after starting his PhD within DGES, at Aberystwyth University (funded by a NERC studentship).
 
-Features were added to RSGISLib, as required by Pete and Dan or requested by other researches and students within Aberystwyth University and collaborators in other institutions. 
+Features were added to RSGISLib, as required by Pete and Dan or requested by other researches and students within Aberystwyth University and collaborators in other institutions.
 
 The project was released under the GPL license in November 2009 in the hope it would be useful to others working in remote sensing and GIS and has been actively developed since then. Currently there are over 300 commands to perform a number of tasks.
 
@@ -47,7 +47,7 @@ Bibtex::
 
 **How do I cite RSGISLib?**
 
-If you have used RSGISLib for published work then you should cite the following publication and / or the specific paper of the algorithm you used (if applicable). 
+If you have used RSGISLib for published work then you should cite the following publication and / or the specific paper of the algorithm you used (if applicable).
 
 Peter Bunting, Daniel Clewley, Richard M. Lucas and Sam Gillingham. 2014. The Remote Sensing and GIS Software Library (RSGISLib), Computers & Geosciences. Volume 62, Pages 216-226 http://dx.doi.org/10.1016/j.cageo.2013.08.007.
 
@@ -61,7 +61,7 @@ Bibtex::
     	Volume = {62},
     	Year = {2014}}
 
-    
+
 **Is RSGISLib intended to be a substitute for commercial GIS / RS packages or other open source packages?**
 
 No, RSGISLib is not being developed as a substitute for ArcMap / QGIS or ENVI. As stated above, RSGISLib is mainly developed to support our research, because of this there is a lot of advanced functionality in RSGISLib that is unavailable in other packages. Although RSGISLib works well on the desktop, it scales well to a High Performance Computing (HPC) environment, which is an area many of the previously mentioned software aren't focusing on.
@@ -78,8 +78,8 @@ The RSGISLib documentation, which contains tutorials for selected functions is a
 
 Help is available for RSGISLib through emailing our mailing list: rsgislib-support@googlegroups.com
 
-The archive is available to view at `groups.google.com <https://groups.google.com/forum/#!forum/rsgislib-support>`_ 
- 
+The archive is available to view at `groups.google.com <https://groups.google.com/forum/#!forum/rsgislib-support>`_
+
 **Do you offer training on RSGISLib?**
 
 RSGISLib is taught as part of the Masters course at Aberystwyth University. The notes for the Python course, which include a chapter using RSGISLib for object based classification are available `bitbucket.org/petebunting/python-tutorial-for-spatial-data-processing <https://bitbucket.org/petebunting/python-tutorial-for-spatial-data-processing>`_. We gave a training course at the 20th JAXA Kyoto & Carbon initiative meeting on object based classification, the notes are available to download from `Sourceforge <https://sourceforge.net/projects/rsgislib/files/Training/JAXA_GMW_RSGISLibCourse.zip>`_.
@@ -90,7 +90,7 @@ If you are interested in training sessions, please contact us.
 
 **How do I go about getting functionality added to RSGISLib?**
 
-For general suggestions submit a ticket on our `issues <https://bitbucket.org/petebunting/rsgislib/issues?status=new&status=open>`_ page on Bitbucket or post a suggestion to the Google groups mailing list. 
+For general suggestions submit a ticket on our `issues <https://github.com/remotesensinginfo/rsgislib/issues?status=new&status=open>`_ page on GitHub or post a suggestion to the Google groups mailing list.
 
 If you are preparing a research proposal or have a commercial project where you are likely use RSGISLib please contact us for collaborative opportunities or consultancy work to add new functions to RSGISLib, improve existing features or build custom software on top of RSGISLib.
 

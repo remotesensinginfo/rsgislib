@@ -9,7 +9,7 @@ The Remote Sensing and GIS Software Library (RSGISLib)
 ========================================================
 The Remote Sensing and GIS software library (RSGISLib) is a collection of tools for processing remote sensing and GIS datasets. The tools are accessed using Python bindings.
 
-The project is hosted on Bitbucket and is available to download from https://bitbucket.org/petebunting/rsgislib 
+The project is hosted on GitHub and is available to download from https://github.com/remotesensinginfo/rsgislib 
 
 The project is jointly led by Pete Bunting (`Earth Observation and Ecosystem Dynamics Group <http://www.aber.ac.uk/en/iges/research-groups/earth-observation-laboratory/>`_ , `Aberystwyth University <http://www.aber.ac.uk/>`_) and Dan Clewley (`Plymouth Marine Laboratory <http://pml.ac.uk>`_).
 
