@@ -3131,4 +3131,49 @@ def spectralSmoothing(input_img, valid_msk_img, valid_msk_val, output_img, win_l
         rsgislib.imageutils.popImageStats(output_img, usenodataval=True, nodataval=in_no_date, calcpyramids=True)
 
 
+def calcWSG84PixelSize(img, out_img, gdalformat='KEA'):
+    """
+A function which calculates the x and y pixel resolution (in metres) of each pixel projected in WGS84.
 
+:param img: input image, for which the per-pixel area will be calculated.
+:param out_img: output image file.
+
+"""
+    import rsgislib.tools
+    from rios import applier
+    import numpy
+
+    try:
+        import tqdm
+        progress_bar = rsgislib.TQDMProgressBar()
+    except:
+        from rios import cuiprogress
+        progress_bar = cuiprogress.GDALProgressBar()
+
+    rsgis_utils = rsgislib.RSGISPyUtils()
+    x_res, y_res = rsgis_utils.getImageRes(img)
+
+    infiles = applier.FilenameAssociations()
+    infiles.img = img
+    outfiles = applier.FilenameAssociations()
+    outfiles.outimage = out_img
+    otherargs = applier.OtherInputs()
+    otherargs.x_res = x_res
+    otherargs.y_res = y_res
+    aControls = applier.ApplierControls()
+    aControls.progress = progress_bar
+    aControls.drivername = gdalformat
+    aControls.omitPyramids = False
+    aControls.calcStats = False
+
+    def _calcPixelRes(info, inputs, outputs, otherargs):
+        xBlock, yBlock = info.getBlockCoordArrays()
+
+        x_res_arr = numpy.zeros_like(yBlock, dtype=float)
+        x_res_arr[...] = otherargs.x_res
+        y_res_arr = numpy.zeros_like(yBlock, dtype=float)
+        y_res_arr[...] = otherargs.y_res
+        x_res_arr_m, y_res_arr_m = rsgislib.tools.degrees_to_metres(yBlock, x_res_arr, y_res_arr)
+        outputs.outimage = numpy.stack((x_res_arr_m, y_res_arr_m), axis=0)
+
+    applier.apply(_calcPixelRes, infiles, outfiles, otherargs, controls=aControls)

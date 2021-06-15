@@ -240,7 +240,8 @@ def get_ST_model_coeffs(json_fp, output_fp, gdalformat='KEA', bands=None, num_pr
 Main function to run to generate the output image. Given an input JSON file
 and an output file path, generates a multi-band output image where each pixel
 contains the model details for that pixel. Opening/closing of files, generation
-of blocks and use of multiprocessing is all handled by RIOS.
+of blocks and use of multiprocessing is all handled by RIOS. No data value
+should be define in the image headers and be the same across all the images.
 
 :param json_fp:       Path to JSON file of date/filepath pairs.
 :param output_fp:     Path for output file.

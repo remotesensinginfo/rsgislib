@@ -437,6 +437,15 @@ swir2ccc	minimum swir2 value (completely closed forest canopy)	NDVIC
 swir2coc	maximum swir2 value (completely open canopy)	NDVIC
 The wavelength band names are defined following Schowengertd 2007, p10. The last column shows exemplarily which Landsat 5 TM bands correspond to which wavelength range definition.
 
+
+
+Automated Water Extraction Index (AWEI) - for landsat.
+AWEI = 4 * (Green - SWIR2) - (0.25 * NIR + 2.75 * SWIR1)
+https://www.sciencedirect.com/science/article/abs/pii/S0034425713002873
+
+Two versions in this article:
+https://www.tandfonline.com/doi/full/10.1080/10095020.2015.1017911
+
 """
 
 
