@@ -147,7 +147,7 @@ the polygons then use this function.
         raise e
 
 
-def calcZonalBandStats(veclyr, valsimg, imgbandidx, minthres, maxthres, calcZonalBandStats,
+def calcZonalBandStats(veclyr, valsimg, imgbandidx, minthres, maxthres, out_no_data_val,
                        minfield=None, maxfield=None, meanfield=None, stddevfield=None,
                        sumfield=None, countfield=None, modefield=None, medianfield=None):
     """
