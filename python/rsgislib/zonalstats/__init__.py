@@ -1016,4 +1016,206 @@ use this function.
         raise e
 
 
+def extPointBandValuesFile(vecfile, veclyrname, valsimg, imgbandidx, minthres, maxthres, out_no_data_val, outfield,
+                           reproj_vec=False):
+    """
+A function which extracts point values for an input vector file for a particular image band.
+
+:param vecfile: input vector file
+:param veclyrname: input vector layer within the input file which specifies the features and where the
+                   output stats will be written.
+:param valsimg: the values image
+:param imgbandidx: the index (starting at 1) of the image band for which the stats will be calculated.
+                   If defined the no data value of the band will be ignored.
+:param minthres: a lower threshold for values which will be included in the stats calculation.
+:param maxthres: a upper threshold for values which will be included in the stats calculation.
+:param out_no_data_val: output no data value if no valid pixels are within the polygon.
+:param outfield: the name of the field in the vector layer where the pixel values will be written.
+:param reproj_vec: boolean to specify whether the vector layer should be reprojected on the fly during processing
+                   if the projections are different. Default: False to ensure it is the users intention.
+
+"""
+    gdal.UseExceptions()
+
+    try:
+        vecDS = gdal.OpenEx(vecfile, gdal.OF_VECTOR | gdal.OF_UPDATE)
+        if vecDS is None:
+            raise Exception("Could not open '{}'".format(vecfile))
+
+        veclyr = vecDS.GetLayerByName(veclyrname)
+        if veclyr is None:
+            raise Exception("Could not open layer '{}'".format(veclyrname))
+        veclyr_spatial_ref = veclyr.GetSpatialRef()
+
+        extPointBandValues(veclyr, valsimg, imgbandidx, minthres, maxthres, out_no_data_val, outfield, reproj_vec)
+
+        vecDS = None
+    except Exception as e:
+        print("Error Vector File: {}".format(vecfile), file=sys.stderr)
+        print("Error Vector Layer: {}".format(veclyrname), file=sys.stderr)
+        print("Error Image File: {}".format(valsimg), file=sys.stderr)
+        raise e
+
+
+def extPointBandValues(veclyr, valsimg, imgbandidx, minthres, maxthres, out_no_data_val, outfield, reproj_vec=False):
+    """
+A function which extracts point values for an input vector file for a particular image band.
+
+:param veclyr: OGR vector layer object containing the geometries being processed and to which
+               the stats will be written.
+:param valsimg: the values image
+:param imgbandidx: the index (starting at 1) of the image band for which the stats will be calculated.
+                   If defined the no data value of the band will be ignored.
+:param minthres: a lower threshold for values which will be included in the stats calculation.
+:param maxthres: a upper threshold for values which will be included in the stats calculation.
+:param out_no_data_val: output no data value if no valid pixels are within the polygon.
+:param outfield: the name of the field in the vector layer where the pixel values will be written.
+:param reproj_vec: boolean to specify whether the vector layer should be reprojected on the fly during processing
+                   if the projections are different. Default: False to ensure it is the users intention.
+
+"""
+    gdal.UseExceptions()
+    if reproj_vec:
+        import rsgislib
+        rsgis_utils = rsgislib.RSGISPyUtils()
+    try:
+        if veclyr is None:
+            raise Exception("The inputted vector layer was None")
+
+        if outfield is None:
+            raise Exception("Output field specified as none, a name needs to be given.")
+        elif outfield == '':
+            raise Exception("Output field specified as an empty string, a name needs to be given.")
+
+        veclyrDefn = veclyr.GetLayerDefn()
+        lyr_geom_type = ogr.GeometryTypeToName(veclyrDefn.GetGeomType())
+        if lyr_geom_type.lower() != 'point':
+            raise Exception("The layer geometry type must be point.")
+
+        imgDS = gdal.OpenEx(valsimg, gdal.GA_ReadOnly)
+        if imgDS is None:
+            raise Exception("Could not open '{}'".format(valsimg))
+        imgband = imgDS.GetRasterBand(imgbandidx)
+        if imgband is None:
+            raise Exception("Could not find image band '{}'".format(imgbandidx))
+        imgGeoTrans = imgDS.GetGeoTransform()
+        img_wkt_str = imgDS.GetProjection()
+        img_spatial_ref = osr.SpatialReference()
+        img_spatial_ref.ImportFromWkt(img_wkt_str)
+        img_spatial_ref.AutoIdentifyEPSG()
+        epsg_img_spatial = img_spatial_ref.GetAuthorityCode(None)
+
+        pixel_width = imgGeoTrans[1]
+        pixel_height = imgGeoTrans[5]
+
+        imgSizeX = imgDS.RasterXSize
+        imgSizeY = imgDS.RasterYSize
+
+        imgNoDataVal = imgband.GetNoDataValue()
+        out_no_data_val = float(out_no_data_val)
+
+        veclyr_spatial_ref = veclyr.GetSpatialRef()
+        epsg_vec_spatial = veclyr_spatial_ref.GetAuthorityCode(None)
+        pt_reprj = False
+        if epsg_vec_spatial != epsg_img_spatial:
+            if reproj_vec:
+                pt_reprj = True
+            else:
+                raise Exception("Input vector and image datasets are in different projections (EPSG:{} / EPSG:{})."
+                                 "You can select option to reproject.".format(epsg_vec_spatial, epsg_img_spatial))
+
+        found = False
+        for i in range(veclyrDefn.GetFieldCount()):
+            if veclyrDefn.GetFieldDefn(i).GetName().lower() == outfield.lower():
+                found = True
+                break
+        if not found:
+            veclyr.CreateField(ogr.FieldDefn(outfield.lower(), ogr.OFTReal))
+
+        out_field_idx = veclyr.FindFieldIndex(outfield.lower(), True)
+
+        # Iterate through features.
+        openTransaction = False
+        transactionStep = 20000
+        nextTransaction = transactionStep
+        nFeats = veclyr.GetFeatureCount(True)
+        pbar = tqdm.tqdm(total=nFeats)
+        counter = 0
+        veclyr.ResetReading()
+        feat = veclyr.GetNextFeature()
+        while feat is not None:
+            if not openTransaction:
+                veclyr.StartTransaction()
+                openTransaction = True
+
+            if feat is not None:
+                feat_geom = feat.geometry()
+                if feat_geom is not None:
+                    pt_in_img = True
+                    x_pt = feat_geom.GetX()
+                    y_pt = feat_geom.GetY()
+
+                    if pt_reprj:
+                        if veclyr_spatial_ref.EPSGTreatsAsLatLong():
+                            x_pt, y_pt = rsgis_utils.reprojPoint(veclyr_spatial_ref, img_spatial_ref, y_pt, x_pt)
+                        else:
+                            x_pt, y_pt = rsgis_utils.reprojPoint(veclyr_spatial_ref, img_spatial_ref, x_pt, y_pt)
+
+                    x_pt_off = float(x_pt - imgGeoTrans[0])
+                    y_pt_off = float(y_pt - imgGeoTrans[3])
+
+                    if x_pt_off == 0.0:
+                        x_pxl = 0
+                    else:
+                        x_pxl = int(x_pt_off / pixel_width) - 1
+
+                    if y_pt_off == 0.0:
+                        y_pxl = 0
+                    else:
+                        y_pxl = int(y_pt_off / pixel_height) - 1
+
+                    if x_pxl < 0:
+                        pt_in_img = False
+                    elif x_pxl >= imgSizeX:
+                        pt_in_img = False
+
+                    if y_pxl < 0:
+                        pt_in_img = False
+                    elif y_pxl >= imgSizeY:
+                        pt_in_img = False
+
+                    if pt_in_img:
+                        src_offset = (x_pxl, y_pxl, 1, 1)
+                        src_array = imgband.ReadAsArray(*src_offset)
+                        pxl_val = src_array[0][0]
+                        out_val = float(pxl_val)
+                        if pxl_val == imgNoDataVal:
+                            out_val = out_no_data_val
+
+                        feat.SetField(out_field_idx, out_val)
+                    else:
+                        feat.SetField(out_field_idx, out_no_data_val)
+
+                    veclyr.SetFeature(feat)
+
+            if (counter == nextTransaction) and openTransaction:
+                veclyr.CommitTransaction()
+                openTransaction = False
+                nextTransaction = nextTransaction + transactionStep
+
+            feat = veclyr.GetNextFeature()
+            counter = counter + 1
+            pbar.update(1)
+        pbar.close()
+
+        if openTransaction:
+            veclyr.CommitTransaction()
+            openTransaction = False
+
+        imgDS = None
+
+    except Exception as e:
+        print("Error Image File: {}".format(valsimg), file=sys.stderr)
+        raise e
+
 
