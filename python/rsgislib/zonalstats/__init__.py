@@ -1191,6 +1191,10 @@ A function which extracts point values for an input vector file for a particular
                         out_val = float(pxl_val)
                         if pxl_val == imgNoDataVal:
                             out_val = out_no_data_val
+                        elif pxl_val < minthres:
+                            out_val = out_no_data_val
+                        elif pxl_val > maxthres:
+                            out_val = out_no_data_val
 
                         feat.SetField(out_field_idx, out_val)
                     else:
