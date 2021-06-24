@@ -1890,10 +1890,14 @@ Example::
 
     h5_dtype = rsgis_utils.getNumpyCharCodesDataType(datatype)
 
+    chunk_size = 250
+    if n_feats < chunk_size:
+        chunk_size = n_feats
+
     fH5Out = h5py.File(outH5File, 'w')
     dataGrp = fH5Out.create_group("DATA")
     metaGrp = fH5Out.create_group("META-DATA")
-    dataGrp.create_dataset('DATA', data=feat_arr, chunks=(250, chip_size, chip_size, n_bands),
+    dataGrp.create_dataset('DATA', data=feat_arr, chunks=(chunk_size, chip_size, chip_size, n_bands),
                            compression="gzip", shuffle=True, dtype=h5_dtype)
     describDS = metaGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
     describDS[0] = 'Merged'.encode()
@@ -2251,12 +2255,16 @@ Example::
 
     h5_dtype = rsgis_utils.getNumpyCharCodesDataType(datatype)
 
+    chunk_size = 250
+    if n_feats < chunk_size:
+        chunk_size = n_feats
+
     fH5Out = h5py.File(outH5File, 'w')
     dataGrp = fH5Out.create_group("DATA")
     metaGrp = fH5Out.create_group("META-DATA")
-    dataGrp.create_dataset('DATA', data=feat_arr, chunks=(250, chip_size, chip_size, n_bands),
+    dataGrp.create_dataset('DATA', data=feat_arr, chunks=(chunk_size, chip_size, chip_size, n_bands),
                            compression="gzip", shuffle=True, dtype=h5_dtype)
-    dataGrp.create_dataset('REF', data=feat_ref_arr, chunks=(250, chip_size, chip_size),
+    dataGrp.create_dataset('REF', data=feat_ref_arr, chunks=(chunk_size, chip_size, chip_size),
                            compression="gzip", shuffle=True, dtype='H')
     describDS = metaGrp.create_dataset("DESCRIPTION", (1,), dtype="S10")
     describDS[0] = 'Merged'.encode()

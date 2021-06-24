@@ -1820,6 +1820,45 @@ class RSGISPyUtils (object):
                     out_file_lst.append(cfile)
         return out_file_lst
 
+    def file_is_hidden(self, in_path):
+        """
+        A function to test whether a file or folder is 'hidden' or not on the
+        file system. Should be cross platform between Linux/UNIX and windows.
+
+        :param in_path: input file path to be tested
+        :return: boolean (True = hidden)
+
+        """
+        in_path = os.path.abspath(in_path)
+        if os.name == 'nt':
+            import win32api, win32con
+            attribute = win32api.GetFileAttributes(in_path)
+            return attribute & (win32con.FILE_ATTRIBUTE_HIDDEN | win32con.FILE_ATTRIBUTE_SYSTEM)
+        else:
+            file_name = os.path.basename(in_path)
+            return file_name.startswith('.')
+
+    def get_dir_list(self, input_path, inc_hidden=False):
+        """
+        Function which get the list of directories within the specified path.
+
+        :param input_path: file path to search within
+        :param inc_hidden: boolean specifying whether hidden files should be included (default=False)
+        :return: list of directory paths
+
+        """
+        out_dir_lst = list()
+        dir_listing = os.listdir(input_path)
+        for item in dir_listing:
+            c_path = os.path.join(input_path, item)
+            if os.path.isdir(c_path):
+                if not inc_hidden:
+                    if not self.file_is_hidden(c_path):
+                        out_dir_lst.append(c_path)
+                else:
+                    out_dir_lst.append(c_path)
+        return out_dir_lst
+
     def createVarList(self, in_vals_lsts, val_dict=None):
         """
         A function which will produce a list of dictionaries with all the combinations 
