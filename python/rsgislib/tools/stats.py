@@ -532,3 +532,305 @@ def accuracy_scores_binary(y_true, y_pred):
     else:
         raise SystemExit('ERROR: unable to calculate accuracy metrics.')
 
+
+def get_nbins_histogram(data):
+    """
+    Calculating the number of bins and the width of those bins for a histogram.
+
+    :param data: 1-d numpy array.
+    :return: (n_bins, bin_width) n_bins: int for the number of bins. bin_width: float with the width of the bins.
+
+    """
+    import numpy
+    n = data.shape[0]
+    lq = numpy.percentile(data, 25)
+    uq = numpy.percentile(data, 75)
+    iqr = uq - lq
+    bin_width = 2 * iqr * n ** (-1 / 3)
+    n_bins = int((numpy.max(data) - numpy.min(data)) / bin_width) + 2
+    return n_bins, float(bin_width)
+
+
+def get_bin_centres(bin_edges, geometric=False):
+    """
+    A function to calculate the centre points of bins from the bin edges from a histogram
+    e.g., numpy.histogram. My default the arithmetic mean is provided (max+min)/2 but the
+    geometric mean can also be calculated sqrt(min*max), this is useful for logarithmically
+    spaced bins.
+
+    :param bin_edges: numpy array of the bin edges
+    :param geometric: boolean, if False (default) then the arithmetic mean return if True
+                      then the geometric mean is returned.
+    :returns: bin_centres - numpy array
+
+    """
+    import numpy
+    if geometric:
+        bin_centres = numpy.sqrt(bin_edges[1:] * bin_edges[:-1])
+    else:
+        bin_centres = (bin_edges[1:] + bin_edges[:-1]) / 2
+    return bin_centres
+
+
+def calc_otsu_threshold(data):
+    """
+    A function to calculate otsu's threshold for a dataset. Input is expected
+    to be a 1d numpy array.
+
+    Wikipedia, https://en.wikipedia.org/wiki/Otsu's_Method
+
+    :param data: 1d numeric numpy array
+    :returns: float (threshold)
+
+    """
+    import numpy
+    # Note, this is based on the implementation within scikit-image
+
+    # Calculate the histogram
+    n_bins, bin_width = get_nbins_histogram(data)
+    hist, bin_edges = numpy.histogram(data, bins=n_bins)
+    bin_centres = get_bin_centres(bin_edges)
+    # print(bin_centres)
+
+    # Normalization so we have probabilities-like values (sum=1)
+    hist = hist.astype(numpy.float32)
+    hist = 1.0 * hist / numpy.sum(hist)
+
+    # class probabilities for all possible thresholds
+    weight1 = numpy.cumsum(hist)
+    weight2 = numpy.cumsum(hist[::-1])[::-1]
+    # class means for all possible thresholds
+    mean1 = numpy.cumsum(hist * bin_centres) / weight1
+    mean2 = (numpy.cumsum((hist * bin_centres)[::-1]) / weight2[::-1])[::-1]
+
+    # Clip ends to align class 1 and class 2 variables:
+    # The last value of ``weight1``/``mean1`` should pair with zero values in
+    # ``weight2``/``mean2``, which do not exist.
+    variance12 = weight1[:-1] * weight2[1:] * (mean1[:-1] - mean2[1:]) ** 2
+
+    return bin_centres[numpy.argmax(variance12)]
+
+
+def calc_yen_threshold(data):
+    """
+    A function to calculate yen threshold for a dataset. Input is expected
+    to be a 1d numpy array.
+
+    Yen J.C., Chang F.J., and Chang S. (1995) "A New Criterion
+    for Automatic Multilevel Thresholding" IEEE Trans. on Image
+    Processing, 4(3): 370-378. :DOI:`10.1109/83.366472`
+
+    :param data: 1d numeric numpy array
+    :returns: float (threshold)
+
+    """
+    import numpy
+    # Note, this is based on the implementation within scikit-image
+
+    # Calculate the histogram
+    n_bins, bin_width = get_nbins_histogram(data)
+    hist, bin_edges = numpy.histogram(data, bins=n_bins)
+    bin_centres = get_bin_centres(bin_edges)
+
+    # Normalization so we have probabilities-like values (sum=1)
+    hist = hist.astype(numpy.float32)
+    hist = 1.0 * hist / numpy.sum(hist)
+
+    # Calculate probability mass function
+    pmf = hist.astype(numpy.float32) / hist.sum()
+    p1 = numpy.cumsum(pmf)  # Cumulative normalized histogram
+    p1_sq = numpy.cumsum(pmf ** 2)
+    # Get cumsum calculated from end of squared array:
+    p2_sq = numpy.cumsum(pmf[::-1] ** 2)[::-1]
+    # P2_sq indexes is shifted +1. I assume, with P1[:-1] it's help avoid
+    # '-inf' in crit. ImageJ Yen implementation replaces those values by zero.
+    crit = numpy.log(((p1_sq[:-1] * p2_sq[1:]) ** -1) * (p1[:-1] * (1.0 - p1[:-1])) ** 2)
+    return bin_centres[crit.argmax()]
+
+
+def calc_isodata_threshold(data):
+    """
+    A function to calculate inter-means threshold for a dataset. Input is expected
+    to be a 1d numpy array. Histogram-based threshold, known as Ridler-Calvard method
+    or inter-means. Threshold values returned satisfy the following equality::
+
+    threshold = (data[data <= threshold].mean() + data[data > threshold].mean()) / 2.0
+
+    Ridler, TW & Calvard, S (1978), "Picture thresholding using an iterative selection method"
+    IEEE Transactions on Systems, Man and Cybernetics 8: 630-632, :DOI:`10.1109/TSMC.1978.4310039`
+
+    :param data: 1d numeric numpy array
+    :returns: float (threshold)
+
+    """
+    import numpy
+    # Note, this is based on the implementation within scikit-image
+
+    # Calculate the histogram
+    n_bins, bin_width = get_nbins_histogram(data)
+    hist, bin_edges = numpy.histogram(data, bins=n_bins)
+    bin_centres = get_bin_centres(bin_edges)
+
+    # Normalization so we have probabilities-like values (sum=1)
+    hist = hist.astype(numpy.float32)
+    hist = 1.0 * hist / numpy.sum(hist)
+
+    # csuml and csumh contain the count of pixels in that bin or lower, and
+    # in all bins strictly higher than that bin, respectively
+    csuml = numpy.cumsum(hist)
+    csumh = csuml[-1] - csuml
+
+    # intensity_sum contains the total pixel intensity from each bin
+    intensity_sum = hist * bin_centres
+
+    # l and h contain average value of all pixels in that bin or lower, and
+    # in all bins strictly higher than that bin, respectively.
+    # Note that since exp.histogram does not include empty bins at the low or
+    # high end of the range, csuml and csumh are strictly > 0, except in the
+    # last bin of csumh, which is zero by construction.
+    # So no worries about division by zero in the following lines, except
+    # for the last bin, but we can ignore that because no valid threshold
+    # can be in the top bin.
+    # To avoid the division by zero, we simply skip over the last element in
+    # all future computation.
+    csum_intensity = numpy.cumsum(intensity_sum)
+    lower = csum_intensity[:-1] / csuml[:-1]
+    higher = (csum_intensity[-1] - csum_intensity[:-1]) / csumh[:-1]
+
+    # isodata finds threshold values that meet the criterion t = (l + m)/2
+    # where l is the mean of all pixels <= t and h is the mean of all pixels
+    # > t, as calculated above. So we are looking for places where
+    # (l + m) / 2 equals the intensity value for which those l and m figures
+    # were calculated -- which is, of course, the histogram bin centers.
+    # We only require this equality to be within the precision of the bin
+    # width, of course.
+    all_mean = (lower + higher) / 2.0
+    bin_width = bin_centres[1] - bin_centres[0]
+
+    # Look only at thresholds that are below the actual all_mean value,
+    # for consistency with the threshold being included in the lower pixel
+    # group. Otherwise can get thresholds that are not actually fixed-points
+    # of the isodata algorithm. For float images, this matters less, since
+    # there really can't be any guarantees anymore anyway.
+    distances = all_mean - bin_centres[:-1]
+    thresholds = bin_centres[:-1][(distances >= 0) & (distances < bin_width)]
+
+    return thresholds[0]
+
+
+def calc_hist_cross_entropy(data, threshold):
+    """
+    A function which computes the cross-entropy between distributions
+    above and below a threshold. Cross-entropy is a measure of the difference
+    between two probability distributions for a given random variable or set of events.
+
+    See Li and Lee (1993); this is the objective function ``threshold_li``
+    minimizes. This function can be improved but this implementation most
+    closely matches equation 8 in Li and Lee (1993) and equations 1-3 in
+    Li and Tam (1998).
+
+    Li C.H. and Lee C.K. (1993) "Minimum Cross Entropy Thresholding"
+    Pattern Recognition, 26(4): 617-625 :DOI:`10.1016/0031-3203(93)90115-D`
+
+    Li C.H. and Tam P.K.S. (1998) "An Iterative Algorithm for Minimum
+    Cross Entropy Thresholding" Pattern Recognition Letters, 18(8): 771-776
+    :DOI:`10.1016/S0167-8655(98)00057-9`
+
+    :param data: 1d numeric numpy array
+    :param threshold: float spliting to the two parts of the histogram.
+    :returns: float (cross-entropy target value)
+
+    """
+    import numpy
+    # Note, this is based on the implementation within scikit-image
+
+    n_bins, bin_width = get_nbins_histogram(data)
+    histogram, bin_edges = numpy.histogram(data, bins=n_bins, density=True)
+    bin_centres = get_bin_centres(bin_edges)
+
+    # Make sure values are positive and not zero.
+    if numpy.min(bin_centres) < 1:
+        offset = abs(numpy.min(bin_centres)) + 1
+        bin_centres = bin_centres + offset
+        threshold = threshold + offset
+
+    t = numpy.flatnonzero(bin_centres > threshold)[0]
+    m0a = numpy.sum(histogram[:t])  # 0th moment, background
+    m0b = numpy.sum(histogram[t:])
+    m1a = numpy.sum(histogram[:t] * bin_centres[:t])  # 1st moment, background
+    m1b = numpy.sum(histogram[t:] * bin_centres[t:])
+    mua = m1a / m0a  # mean value, background
+    mub = m1b / m0b
+
+    nu = -m1a * numpy.log(mua) - m1b * numpy.log(mub)
+    return nu
+
+
+def calc_li_threshold(data, tolerance=None, initial_guess=None):
+    """
+    A function which calculates a threshold value by Li's iterative
+    Minimum Cross Entropy method.
+
+    Li C.H. and Lee C.K. (1993) "Minimum Cross Entropy Thresholding"
+    Pattern Recognition, 26(4): 617-625 :DOI:`10.1016/0031-3203(93)90115-D`
+
+
+    :param data: 1d numeric numpy array
+    :param tolerance: float (optional) - Finish the computation when the
+                     change in the threshold in an iteration is less than
+                     this value. By default, this is half the smallest
+                     difference between data values.
+    :param initial_guess: float (optional) - Li's iterative method uses
+                          gradient descent to find the optimal threshold.
+                          If the histogram contains more than two modes
+                          (peaks), the gradient descent could get stuck
+                          in a local optimum. An initial guess for the
+                          iteration can help the algorithm find the
+                          globally-optimal threshold.
+    :returns: float (threshold)
+
+    """
+    import numpy
+    # Note, this is based on the implementation within scikit-image
+
+    # At this point, the data only contains numpy.inf, -numpy.inf, or valid numbers
+    data = data[numpy.isfinite(data)]
+
+    # Li's algorithm requires positive image (because of log(mean))
+    offset = 0.0
+    if numpy.min(data) < 1:
+        offset = abs(numpy.min(data)) + 1
+        data = data + offset
+        if initial_guess is not None:
+            initial_guess = initial_guess + offset
+
+    # If not provided define the tolerance
+    if tolerance is None:
+        tolerance = numpy.min(numpy.diff(numpy.unique(data))) / 2
+
+    # Initial estimate for iteration. See "initial_guess" in the parameter list
+    if initial_guess is None:
+        t_next = numpy.mean(data)
+    else:
+        t_next = initial_guess
+
+    # initial value for t_curr must be different from t_next by at
+    # least the tolerance. Since the image is positive, we ensure this
+    # by setting to a large-enough negative number
+    t_curr = -2 * tolerance
+
+    # Stop the iterations when the difference between the
+    # new and old threshold values is less than the tolerance
+    while abs(t_next - t_curr) > tolerance:
+        t_curr = t_next
+        foreground = (data > t_curr)
+        mean_fore = numpy.mean(data[foreground])
+        mean_back = numpy.mean(data[~foreground])
+
+        t_next = ((mean_back - mean_fore) /
+                  (numpy.log(mean_back) - numpy.log(mean_fore)))
+
+    threshold = t_next - offset
+    return threshold
+
+
