@@ -834,3 +834,81 @@ def calc_li_threshold(data, tolerance=None, initial_guess=None):
     return threshold
 
 
+def calc_kurt_skew_threshold(data, max_val, min_val, init_thres, low_thres=True, contamination=10.0,
+                             only_kurtosis=False):
+    """
+    A function to calculate a threshold either side of the histogram based on
+    :param data:
+    :param max_val:
+    :param min_val:
+    :param init_thres:
+    :param low_thres:
+    :param contamination:
+    :param only_kurtosis:
+    :return:
+    """
+    import scipy.optimize
+    import scipy.stats
+    import numpy
+    if len(data.shape) > 1:
+        raise Exception("Expecting a single variable.")
+
+    if (contamination < 1) or (contamination > 100):
+        raise Exception("contamination parameter should have a value between 1 and 100.")
+
+    if low_thres:
+        low_percent = numpy.percentile(data, contamination)
+        if low_percent < max_val:
+            max_val = low_percent
+    else:
+        up_percent = numpy.percentile(data, 100 - contamination)
+        if up_percent > min_val:
+            min_val = up_percent
+
+    if min_val == max_val:
+        print("Min: {}".format(min_val))
+        print("Max: {}".format(max_val))
+        raise Exception("Min and Max values are the same.")
+    elif min_val > max_val:
+        print("Min: {}".format(min_val))
+        print("Max: {}".format(max_val))
+        raise Exception("Min value is greater than max - note this can happened if the "
+                        "contamination parameter caused threshold to be changed.")
+
+    if (init_thres < min_val) or (init_thres > max_val):
+        print("Min: {}".format(min_val))
+        print("Max: {}".format(max_val))
+        print("Initial: {}".format(init_thres))
+        raise Exception("The initial thresholds should be between the min/max values.")
+
+    def _opt_fun(x, *args):
+        data = args[0]
+        if low_thres:
+            # Subset by x threshold
+            data_sub = data[data > x]
+        else:
+            # Subset by x threshold
+            data_sub = data[data < x]
+
+        # Calculate kurtosis and skewness
+        kurtosis = scipy.stats.kurtosis(data_sub)
+        if only_kurtosis:
+            kur_skew = kurtosis
+        else:
+            skew = scipy.stats.skew(data_sub)
+            # Product of kurtosis and skewness
+            kur_skew = abs(kurtosis) + abs(skew)
+
+        return kur_skew
+
+    opt_rslt = scipy.optimize.dual_annealing(_opt_fun, bounds=[(min_val, max_val)], args=[data], x0=[init_thres])
+
+    out_thres = None
+    if opt_rslt.success:
+        out_thres = opt_rslt.x[0]
+    else:
+        raise Exception("Optimisation failed, no threshold found.")
+
+    return out_thres
+
+
