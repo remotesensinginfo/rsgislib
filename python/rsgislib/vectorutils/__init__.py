@@ -6671,3 +6671,91 @@ def vec_lyr_union_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_fil
     else:
         data_inter_gdf.to_file(out_vec_file, driver=out_format)
 
+
+def vectorise_pxls_to_pts(input_img, img_band, img_msk_val, vec_out_file, vec_out_lyr=None, out_format='GPKG',
+                          out_epsg_code=None, force=False):
+    """
+    Function which creates a new output vector file for the pixels within the input image file
+    with the value specified. Pixel locations will be the centroid of the the pixel
+
+    Where:
+
+    :param input_img: the input image
+    :param img_band: the band within the image to use
+    :param img_msk_val: the image value selecting the pixels to be converted to points
+    :param vec_out_file: Output vector file
+    :param vec_out_lyr: output vector layer name.
+    :param out_format: output file format (default GPKG).
+    :param out_epsg_code: optionally provide an EPSG code for the output layer. If None then taken from input image.
+    :param force: remove output file if it exists.
+
+    """
+    from rios import applier
+    import geopandas
+    import rsgislib
+
+    try:
+        import tqdm
+        progress_bar = rsgislib.TQDMProgressBar()
+    except:
+        from rios import cuiprogress
+        progress_bar = cuiprogress.GDALProgressBar()
+
+    if os.path.exists(vec_out_file):
+        if force:
+            delete_vector_file(vec_out_file)
+        else:
+            raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(vec_out_file))
+
+    if out_epsg_code is None:
+        rsgis_utils = rsgislib.RSGISPyUtils()
+        out_epsg_code = rsgis_utils.getEPSGCode(input_img)
+
+    if out_epsg_code is None:
+        raise Exception("The output ESPG code is None - tried to read from input image and "
+                        "returned None. Suggest providing the EPSG code to the function.")
+
+    pt_x_lst = list()
+    pt_y_lst = list()
+
+    infiles = applier.FilenameAssociations()
+    infiles.image = input_img
+    outfiles = applier.FilenameAssociations()
+    otherargs = applier.OtherInputs()
+    otherargs.img_band = img_band
+    otherargs.img_msk_val = img_msk_val
+    otherargs.pt_x_lst = pt_x_lst
+    otherargs.pt_y_lst = pt_y_lst
+    aControls = applier.ApplierControls()
+    aControls.progress = progress_bar
+
+    def _getXYPxlLocs(info, inputs, outputs, otherargs):
+        """
+        This is an internal rios function
+        """
+        x_block, y_block = info.getBlockCoordArrays()
+        msk_data = inputs.image[0, ...].flatten()
+        x_block = x_block.flatten()
+        y_block = y_block.flatten()
+
+        x_block = x_block[msk_data == otherargs.img_msk_val]
+        y_block = y_block[msk_data == otherargs.img_msk_val]
+
+        otherargs.pt_x_lst.extend(x_block.tolist())
+        otherargs.pt_y_lst.extend(y_block.tolist())
+
+    applier.apply(_getXYPxlLocs, infiles, outfiles, otherargs, controls=aControls)
+
+    if len(pt_x_lst) > 0:
+
+        gdf = geopandas.GeoDataFrame(geometry=geopandas.points_from_xy(pt_x_lst, pt_y_lst),
+                                     crs="EPSG:{}".format(out_epsg_code))
+
+        if out_format == "GPKG":
+            if vec_out_lyr is None:
+                raise Exception("If output format is GPKG then an output layer is required.")
+            gdf.to_file(vec_out_file, layer=vec_out_lyr, driver=out_format)
+        else:
+            gdf.to_file(vec_out_file, driver=out_format)
+
+
