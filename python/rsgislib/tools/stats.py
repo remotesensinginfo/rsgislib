@@ -838,7 +838,8 @@ def calc_kurt_skew_threshold(data, max_val, min_val, init_thres, low_thres=True,
                              only_kurtosis=False):
     """
     A function to calculate a threshold either side of the histogram based on
-    :param data:
+
+    :param data: 1d numeric numpy array
     :param max_val:
     :param min_val:
     :param init_thres:
@@ -846,6 +847,7 @@ def calc_kurt_skew_threshold(data, max_val, min_val, init_thres, low_thres=True,
     :param contamination:
     :param only_kurtosis:
     :return:
+
     """
     import scipy.optimize
     import scipy.stats
@@ -860,10 +862,16 @@ def calc_kurt_skew_threshold(data, max_val, min_val, init_thres, low_thres=True,
         low_percent = numpy.percentile(data, contamination)
         if low_percent < max_val:
             max_val = low_percent
+
+        if min_val >= max_val:
+            min_val = numpy.min(data)
     else:
         up_percent = numpy.percentile(data, 100 - contamination)
         if up_percent > min_val:
             min_val = up_percent
+
+        if max_val <= min_val:
+            max_val = numpy.max(data)
 
     if min_val == max_val:
         print("Min: {}".format(min_val))
@@ -876,10 +884,7 @@ def calc_kurt_skew_threshold(data, max_val, min_val, init_thres, low_thres=True,
                         "contamination parameter caused threshold to be changed.")
 
     if (init_thres < min_val) or (init_thres > max_val):
-        print("Min: {}".format(min_val))
-        print("Max: {}".format(max_val))
-        print("Initial: {}".format(init_thres))
-        raise Exception("The initial thresholds should be between the min/max values.")
+        init_thres = min_val + ((max_val - min_val) / 2)
 
     def _opt_fun(x, *args):
         data = args[0]
