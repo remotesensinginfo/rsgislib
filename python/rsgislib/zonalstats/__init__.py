@@ -667,8 +667,9 @@ the polygon resolution.
 
 
 def calcZonalBandStatsTestPolyPtsFile(vecfile, veclyrname, valsimg, imgbandidx, minthres, maxthres, out_no_data_val,
-                                      minfield=None, maxfield=None, meanfield=None, stddevfield=None, sumfield=None,
-                                      countfield=None, modefield=None, medianfield=None, vec_def_epsg=None):
+                                      percentile=None, percentilefield=None, minfield=None, maxfield=None, meanfield=None,
+                                      stddevfield=None, sumfield=None, countfield=None, modefield=None, medianfield=None,
+                                      vec_def_epsg=None):
     """
 A function which calculates zonal statistics for a particular image band. If unsure then use this function. 
 This function tests whether 1 or more pixels has been found within the polygon and if not then the centroid 
@@ -686,6 +687,8 @@ use this function.
 :param minthres: a lower threshold for values which will be included in the stats calculation.
 :param maxthres: a upper threshold for values which will be included in the stats calculation.
 :param out_no_data_val: output no data value if no valid pixels are within the polygon.
+:param percentile: the percentile value to calculate.
+:param percentilefield: the name of the field for the percentile value (None or not specified to be ignored).
 :param minfield: the name of the field for the min value (None or not specified to be ignored).
 :param maxfield: the name of the field for the max value (None or not specified to be ignored).
 :param meanfield: the name of the field for the mean value (None or not specified to be ignored).
@@ -709,10 +712,10 @@ use this function.
         veclyr = vecDS.GetLayerByName(veclyrname)
         if veclyr is None:
             raise Exception("Could not open layer '{}'".format(veclyrname))
-            
-        calcZonalBandStatsTestPolyPts(veclyr, valsimg, imgbandidx, minthres, maxthres, out_no_data_val, minfield,
-                                      maxfield, meanfield, stddevfield, sumfield, countfield, modefield, medianfield,
-                                      vec_def_epsg)
+
+        calcZonalBandStatsTestPolyPts(veclyr, valsimg, imgbandidx, minthres, maxthres, out_no_data_val, percentile,
+                                      percentilefield, minfield, maxfield, meanfield, stddevfield, sumfield,
+                                      countfield, modefield, medianfield, vec_def_epsg)
     
         vecDS = None
     except Exception as e:
@@ -723,8 +726,9 @@ use this function.
 
 
 def calcZonalBandStatsTestPolyPts(veclyr, valsimg, imgbandidx, minthres, maxthres, out_no_data_val,
-                                  minfield=None, maxfield=None, meanfield=None, stddevfield=None, sumfield=None,
-                                  countfield=None, modefield=None, medianfield=None, vec_def_epsg=None):
+                                  percentile=None, percentilefield=None, minfield=None, maxfield=None,
+                                  meanfield=None, stddevfield=None, sumfield=None, countfield=None,
+                                  modefield=None, medianfield=None, vec_def_epsg=None):
     """
 A function which calculates zonal statistics for a particular image band. If unsure then use this function. 
 This function tests whether 1 or more pixels has been found within the polygon and if not then the centroid 
@@ -737,9 +741,11 @@ use this function.
 :param valsimg: the values image
 :param imgbandidx: the index (starting at 1) of the image band for which the stats will be calculated.
                    If defined the no data value of the band will be ignored.
-:param minthres: a lower threshold for values which will be included in the stats calculation.
-:param maxthres: a upper threshold for values which will be included in the stats calculation.
+:param minthres: a lower threshold (inclusive) for values which will be included in the stats calculation.
+:param maxthres: a upper threshold (inclusive) for values which will be included in the stats calculation.
 :param out_no_data_val: output no data value if no valid pixels are within the polygon.
+:param percentile: the percentile value to calculate.
+:param percentilefield: the name of the field for the percentile value (None or not specified to be ignored).
 :param minfield: the name of the field for the min value (None or not specified to be ignored).
 :param maxfield: the name of the field for the max value (None or not specified to be ignored).
 :param meanfield: the name of the field for the mean value (None or not specified to be ignored).
@@ -762,7 +768,7 @@ use this function.
             raise Exception("The inputted vector layer was None")
 
         if (minfield is None) and (maxfield is None) and (meanfield is None) and (stddevfield is None) and (
-            sumfield is None) and (countfield is None) and (modefield is None) and (medianfield is None):
+            sumfield is None) and (countfield is None) and (modefield is None) and (medianfield is None) and (percentilefield is None):
             raise Exception("At least one field needs to be specified for there is to an output.")
     
         imgDS = gdal.OpenEx(valsimg, gdal.GA_ReadOnly)
@@ -803,7 +809,7 @@ use this function.
         
         veclyrDefn = veclyr.GetLayerDefn()
         
-        outFieldAtts = [minfield, maxfield, meanfield, stddevfield, sumfield, countfield, modefield, medianfield]
+        outFieldAtts = [minfield, maxfield, meanfield, stddevfield, sumfield, countfield, modefield, medianfield, percentilefield]
         for outattname in outFieldAtts:
             if outattname is not None:
                 found = False
@@ -962,6 +968,10 @@ use this function.
                             if medianfield is not None:
                                 median_val = float(numpy.ma.median(src_array_flat))
                                 feat.SetField(fieldAttIdxs[medianfield], median_val)
+                            if percentilefield is not None:
+                                perc_val = float(numpy.percentile(numpy.ma.compressed(src_array_flat), float(percentile)))
+                                feat.SetField(fieldAttIdxs[percentilefield], perc_val)
+                                
                         else:
                             subTLX = (imgGeoTrans[0] + (src_offset[0] * imgGeoTrans[1]))
                             subTLY = (imgGeoTrans[3] + (src_offset[1] * imgGeoTrans[5]))
@@ -1010,6 +1020,8 @@ use this function.
                                     feat.SetField(fieldAttIdxs[modefield], out_no_data_val)
                                 if medianfield is not None:
                                     feat.SetField(fieldAttIdxs[medianfield], out_no_data_val)
+                                if percentilefield is not None:
+                                    feat.SetField(fieldAttIdxs[percentilefield], perc_val)
                             else:
                                 if minfield is not None:
                                     feat.SetField(fieldAttIdxs[minfield], out_val)
@@ -1027,6 +1039,8 @@ use this function.
                                     feat.SetField(fieldAttIdxs[modefield], out_val)
                                 if medianfield is not None:
                                     feat.SetField(fieldAttIdxs[medianfield], out_val)
+                                if percentilefield is not None:
+                                    feat.SetField(fieldAttIdxs[percentilefield], perc_val)
                             
                         # Write the updated feature to the vector layer.
                         veclyr.SetFeature(feat)
