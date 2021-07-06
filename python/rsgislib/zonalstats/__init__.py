@@ -98,7 +98,7 @@ This is passed to the polyPixelStatsVecLyr function. """
 
 def calcZonalBandStatsFile(vecfile, veclyrname, valsimg, imgbandidx, minthres, maxthres, out_no_data_val,
                            minfield=None, maxfield=None, meanfield=None, stddevfield=None, sumfield=None,
-                           countfield=None, modefield=None, medianfield=None):
+                           countfield=None, modefield=None, medianfield=None, vec_def_epsg=None):
     """
 A function which calculates zonal statistics for a particular image band. 
 If you know that the pixels in the values image are small with respect to 
@@ -122,6 +122,8 @@ the polygons then use this function.
                    (None or not specified to be ignored).
 :param modefield: the name of the field for the mode value (None or not specified to be ignored).
 :param medianfield: the name of the field for the median value (None or not specified to be ignored).
+:param vec_def_epsg: an EPSG code can be specified for the vector layer is the projection is not well defined
+                     within the inputted vector layer.
 
 """
     gdal.UseExceptions()
@@ -134,10 +136,10 @@ the polygons then use this function.
         veclyr = vecDS.GetLayerByName(veclyrname)
         if veclyr is None:
             raise Exception("Could not open layer '{}'".format(veclyrname))
-        veclyr_spatial_ref = veclyr.GetSpatialRef()
-        
+
         calcZonalBandStats(veclyr, valsimg, imgbandidx, minthres, maxthres, out_no_data_val,
-                           minfield, maxfield, meanfield, stddevfield, sumfield, countfield, modefield, medianfield)
+                           minfield, maxfield, meanfield, stddevfield, sumfield, countfield,
+                           modefield, medianfield, vec_def_epsg)
             
         vecDS = None
     except Exception as e:
@@ -149,7 +151,8 @@ the polygons then use this function.
 
 def calcZonalBandStats(veclyr, valsimg, imgbandidx, minthres, maxthres, out_no_data_val,
                        minfield=None, maxfield=None, meanfield=None, stddevfield=None,
-                       sumfield=None, countfield=None, modefield=None, medianfield=None):
+                       sumfield=None, countfield=None, modefield=None, medianfield=None,
+                       vec_def_epsg=None):
     """
 A function which calculates zonal statistics for a particular image band. 
 If you know that the pixels in the values image are small with respect to 
@@ -172,6 +175,8 @@ the polygons then use this function.
                    (None or not specified to be ignored).
 :param modefield: the name of the field for the mode value (None or not specified to be ignored).
 :param medianfield: the name of the field for the median value (None or not specified to be ignored).
+:param vec_def_epsg: an EPSG code can be specified for the vector layer is the projection is not well defined
+                     within the inputted vector layer.
 
 """
     if modefield is not None:
@@ -207,8 +212,17 @@ the polygons then use this function.
     
         imgNoDataVal = imgband.GetNoDataValue()
 
-        veclyr_spatial_ref = veclyr.GetSpatialRef()
-        epsg_vec_spatial = veclyr_spatial_ref.GetAuthorityCode(None)
+        if vec_def_epsg is None:
+            veclyr_spatial_ref = veclyr.GetSpatialRef()
+            if veclyr_spatial_ref is None:
+                raise Exception("Could not retrieve a projection object from the vector layer - "
+                                "projection might not be be defined.")
+            epsg_vec_spatial = veclyr_spatial_ref.GetAuthorityCode(None)
+        else:
+            epsg_vec_spatial = vec_def_epsg
+            veclyr_spatial_ref = osr.SpatialReference()
+            veclyr_spatial_ref.ImportFromEPSG(int(vec_def_epsg))
+
         if epsg_vec_spatial != epsg_img_spatial:
             imgDS = None
             vecDS = None
@@ -417,7 +431,7 @@ the polygons then use this function.
         raise e
 
 
-def calcZonalPolyPtsBandStatsFile(vecfile, veclyrname, valsimg, imgbandidx, outfield):
+def calcZonalPolyPtsBandStatsFile(vecfile, veclyrname, valsimg, imgbandidx, outfield, vec_def_epsg=None):
     """
 A funtion which extracts zonal stats for a polygon using the polygon centroid.
 This is useful when you are intesecting a low resolution image with respect to
@@ -430,6 +444,8 @@ the polygon resolution.
 :param imgbandidx: the index (starting at 1) of the image band for which the stats will be calculated.
                    If defined the no data value of the band will be ignored.
 :param outfield: output field name within the vector layer.
+:param vec_def_epsg: an EPSG code can be specified for the vector layer is the projection is not well defined
+                     within the inputted vector layer.
 
 """
     gdal.UseExceptions()
@@ -441,9 +457,8 @@ the polygon resolution.
         veclyr = vecDS.GetLayerByName(veclyrname)
         if veclyr is None:
             raise Exception("Could not open layer '{}'".format(veclyrname))
-        veclyr_spatial_ref = veclyr.GetSpatialRef()
-        
-        calcZonalPolyPtsBandStats(veclyr, valsimg, imgbandidx, outfield)
+
+        calcZonalPolyPtsBandStats(veclyr, valsimg, imgbandidx, outfield, vec_def_epsg)
             
         vecDS = None
     except Exception as e:
@@ -453,7 +468,7 @@ the polygon resolution.
         raise e
 
 
-def calcZonalPolyPtsBandStats(veclyr, valsimg, imgbandidx, outfield):
+def calcZonalPolyPtsBandStats(veclyr, valsimg, imgbandidx, outfield, vec_def_epsg=None):
     """
 A funtion which extracts zonal stats for a polygon using the polygon centroid.
 This is useful when you are intesecting a low resolution image with respect to
@@ -465,6 +480,8 @@ the polygon resolution.
 :param imgbandidx: the index (starting at 1) of the image band for which the stats will be calculated.
                    If defined the no data value of the band will be ignored.
 :param outfield: output field name within the vector layer.
+:param vec_def_epsg: an EPSG code can be specified for the vector layer is the projection is not well defined
+                     within the inputted vector layer.
 
 """
     gdal.UseExceptions()
@@ -489,9 +506,16 @@ the polygon resolution.
         
         imgSizeX = imgDS.RasterXSize
         imgSizeY = imgDS.RasterYSize
-    
-        veclyr_spatial_ref = veclyr.GetSpatialRef()
-        epsg_vec_spatial = veclyr_spatial_ref.GetAuthorityCode(None)
+
+        if vec_def_epsg is None:
+            veclyr_spatial_ref = veclyr.GetSpatialRef()
+            if veclyr_spatial_ref is None:
+                raise Exception("Could not retrieve a projection object from the vector layer - "
+                                "projection not might be be defined.")
+            epsg_vec_spatial = veclyr_spatial_ref.GetAuthorityCode(None)
+        else:
+            epsg_vec_spatial = vec_def_epsg
+
         if epsg_vec_spatial != epsg_img_spatial:
             imgDS = None
             vecDS = None
@@ -644,7 +668,7 @@ the polygon resolution.
 
 def calcZonalBandStatsTestPolyPtsFile(vecfile, veclyrname, valsimg, imgbandidx, minthres, maxthres, out_no_data_val,
                                       minfield=None, maxfield=None, meanfield=None, stddevfield=None, sumfield=None,
-                                      countfield=None, modefield=None, medianfield=None):
+                                      countfield=None, modefield=None, medianfield=None, vec_def_epsg=None):
     """
 A function which calculates zonal statistics for a particular image band. If unsure then use this function. 
 This function tests whether 1 or more pixels has been found within the polygon and if not then the centroid 
@@ -671,6 +695,8 @@ use this function.
                    (None or not specified to be ignored).
 :param modefield: the name of the field for the mode value (None or not specified to be ignored).
 :param medianfield: the name of the field for the median value (None or not specified to be ignored).
+:param vec_def_epsg: an EPSG code can be specified for the vector layer is the projection is not well defined
+                     within the inputted vector layer.
 
 """
     gdal.UseExceptions()
@@ -685,7 +711,8 @@ use this function.
             raise Exception("Could not open layer '{}'".format(veclyrname))
             
         calcZonalBandStatsTestPolyPts(veclyr, valsimg, imgbandidx, minthres, maxthres, out_no_data_val, minfield,
-                                      maxfield, meanfield, stddevfield, sumfield, countfield, modefield, medianfield)
+                                      maxfield, meanfield, stddevfield, sumfield, countfield, modefield, medianfield,
+                                      vec_def_epsg)
     
         vecDS = None
     except Exception as e:
@@ -697,7 +724,7 @@ use this function.
 
 def calcZonalBandStatsTestPolyPts(veclyr, valsimg, imgbandidx, minthres, maxthres, out_no_data_val,
                                   minfield=None, maxfield=None, meanfield=None, stddevfield=None, sumfield=None,
-                                  countfield=None, modefield=None, medianfield=None):
+                                  countfield=None, modefield=None, medianfield=None, vec_def_epsg=None):
     """
 A function which calculates zonal statistics for a particular image band. If unsure then use this function. 
 This function tests whether 1 or more pixels has been found within the polygon and if not then the centroid 
@@ -722,6 +749,8 @@ use this function.
                    (None or not specified to be ignored).
 :param modefield: the name of the field for the mode value (None or not specified to be ignored).
 :param medianfield: the name of the field for the median value (None or not specified to be ignored).
+:param vec_def_epsg: an EPSG code can be specified for the vector layer is the projection is not well defined
+                     within the inputted vector layer.
 
 """
     if modefield is not None:
@@ -755,9 +784,17 @@ use this function.
         imgSizeY = imgDS.RasterYSize
             
         imgNoDataVal = imgband.GetNoDataValue()
-    
-        veclyr_spatial_ref = veclyr.GetSpatialRef()
-        epsg_vec_spatial = veclyr_spatial_ref.GetAuthorityCode(None)
+
+        if vec_def_epsg is None:
+            veclyr_spatial_ref = veclyr.GetSpatialRef()
+            if veclyr_spatial_ref is None:
+                raise Exception("Could not retrieve a projection object from the vector layer - projection might be be defined.")
+            epsg_vec_spatial = veclyr_spatial_ref.GetAuthorityCode(None)
+        else:
+            epsg_vec_spatial = vec_def_epsg
+            veclyr_spatial_ref = osr.SpatialReference()
+            veclyr_spatial_ref.ImportFromEPSG(int(vec_def_epsg))
+
         if epsg_vec_spatial != epsg_img_spatial:
             imgDS = None
             vecDS = None
@@ -1017,7 +1054,7 @@ use this function.
 
 
 def extPointBandValuesFile(vecfile, veclyrname, valsimg, imgbandidx, minthres, maxthres, out_no_data_val, outfield,
-                           reproj_vec=False):
+                           reproj_vec=False, vec_def_epsg=None):
     """
 A function which extracts point values for an input vector file for a particular image band.
 
@@ -1033,6 +1070,8 @@ A function which extracts point values for an input vector file for a particular
 :param outfield: the name of the field in the vector layer where the pixel values will be written.
 :param reproj_vec: boolean to specify whether the vector layer should be reprojected on the fly during processing
                    if the projections are different. Default: False to ensure it is the users intention.
+:param vec_def_epsg: an EPSG code can be specified for the vector layer is the projection is not well defined
+                     within the inputted vector layer.
 
 """
     gdal.UseExceptions()
@@ -1045,9 +1084,8 @@ A function which extracts point values for an input vector file for a particular
         veclyr = vecDS.GetLayerByName(veclyrname)
         if veclyr is None:
             raise Exception("Could not open layer '{}'".format(veclyrname))
-        veclyr_spatial_ref = veclyr.GetSpatialRef()
 
-        extPointBandValues(veclyr, valsimg, imgbandidx, minthres, maxthres, out_no_data_val, outfield, reproj_vec)
+        extPointBandValues(veclyr, valsimg, imgbandidx, minthres, maxthres, out_no_data_val, outfield, reproj_vec, vec_def_epsg)
 
         vecDS = None
     except Exception as e:
@@ -1057,7 +1095,8 @@ A function which extracts point values for an input vector file for a particular
         raise e
 
 
-def extPointBandValues(veclyr, valsimg, imgbandidx, minthres, maxthres, out_no_data_val, outfield, reproj_vec=False):
+def extPointBandValues(veclyr, valsimg, imgbandidx, minthres, maxthres, out_no_data_val, outfield, reproj_vec=False,
+                       vec_def_epsg=None):
     """
 A function which extracts point values for an input vector file for a particular image band.
 
@@ -1072,6 +1111,8 @@ A function which extracts point values for an input vector file for a particular
 :param outfield: the name of the field in the vector layer where the pixel values will be written.
 :param reproj_vec: boolean to specify whether the vector layer should be reprojected on the fly during processing
                    if the projections are different. Default: False to ensure it is the users intention.
+:param vec_def_epsg: an EPSG code can be specified for the vector layer is the projection is not well defined
+                     within the inputted vector layer.
 
 """
     gdal.UseExceptions()
@@ -1114,8 +1155,15 @@ A function which extracts point values for an input vector file for a particular
         imgNoDataVal = imgband.GetNoDataValue()
         out_no_data_val = float(out_no_data_val)
 
-        veclyr_spatial_ref = veclyr.GetSpatialRef()
-        epsg_vec_spatial = veclyr_spatial_ref.GetAuthorityCode(None)
+        if vec_def_epsg is None:
+            veclyr_spatial_ref = veclyr.GetSpatialRef()
+            if veclyr_spatial_ref is None:
+                raise Exception("Could not retrieve a projection object from the vector layer - projection might be be defined.")
+            epsg_vec_spatial = veclyr_spatial_ref.GetAuthorityCode(None)
+        else:
+            epsg_vec_spatial = vec_def_epsg
+            veclyr_spatial_ref = osr.SpatialReference()
+            veclyr_spatial_ref.ImportFromEPSG(int(vec_def_epsg))
         pt_reprj = False
         if epsg_vec_spatial != epsg_img_spatial:
             if reproj_vec:
