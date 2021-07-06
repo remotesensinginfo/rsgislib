@@ -1089,7 +1089,7 @@ namespace rsgis{namespace img{
 		}
 	}
     
-	void RSGISImageUtils::getImageOverlap(GDALDataset **datasets, int numDS,  int **dsOffsets, int *width, int *height, double *gdalTransform, geos::geom::Envelope *env) 
+	void RSGISImageUtils::getImageOverlap(GDALDataset **datasets, int numDS,  int **dsOffsets, int *width, int *height, double *gdalTransform, OGREnvelope *env) 
 	{
 		double **transformations = new double*[numDS];
 		int *xSize = new int[numDS];
@@ -1209,22 +1209,22 @@ namespace rsgis{namespace img{
 			// Changed from throwing exception (left old code) - Dan
 			bool process = true;
 			
-			if(minX > env->getMinX())
+			if(minX > env->MinX)
 			{
 				process = false;
 			}
 			
-			if(minY > env->getMinY())
+			if(minY > env->MinY)
 			{
 				process = false;
 			}
 			
-			if(maxX < env->getMaxX())
+			if(maxX < env->MaxX)
 			{
 				process = false;
 			}
 			
-			if(maxY < env->getMaxY())
+			if(maxY < env->MaxY)
 			{
 				process = false;
 			}
@@ -1232,10 +1232,10 @@ namespace rsgis{namespace img{
 			if(process)
 			{
 				// Trim to the envelope
-				minX = env->getMinX();
-				maxX = env->getMaxX();
-				minY = env->getMinY();
-				maxY = env->getMaxY();
+				minX = env->MinX;
+				maxX = env->MaxX;
+				minY = env->MinY;
+				maxY = env->MaxY;
                 
 				// Define output values.
 				gdalTransform[0] = minX;
@@ -1287,8 +1287,8 @@ namespace rsgis{namespace img{
 			else
 			{				
                 // Calculate centre of envelope
-                double centreEnvelopeX = (env->getMaxX() + env->getMinX()) / 2.0;
-                double centreEnvelopeY = (env->getMaxY() + env->getMinY()) / 2.0;
+                double centreEnvelopeX = (env->MaxX + env->MinX) / 2.0;
+                double centreEnvelopeY = (env->MaxY + env->MinY) / 2.0;
                 
                 if((centreEnvelopeX < maxX) && (centreEnvelopeY < maxY)) // If center of envolope within overlap proceed
                 {
@@ -1329,8 +1329,6 @@ namespace rsgis{namespace img{
                             dsOffsets[i][1] = 0;
                         }
                     }
-                    
-                    
                 }
 			}
 			
@@ -1441,7 +1439,7 @@ namespace rsgis{namespace img{
 		}
 	}
     
-    void RSGISImageUtils::getImageOverlapCut2Env(GDALDataset **datasets, int numDS,  int **dsOffsets, int *width, int *height, double *gdalTransform, geos::geom::Envelope *env) 
+    void RSGISImageUtils::getImageOverlapCut2Env(GDALDataset **datasets, int numDS,  int **dsOffsets, int *width, int *height, double *gdalTransform, OGREnvelope *env) 
 	{
 		double **transformations = new double*[numDS];
 		int *xSize = new int[numDS];
@@ -1558,24 +1556,24 @@ namespace rsgis{namespace img{
             
 			
 			// Cut to env extent
-			if(env->getMinX() > minX)
+			if(env->MinX > minX)
 			{
-                minX = env->getMinX();
+                minX = env->MinX;
 			}
 			
-			if(env->getMinY() > minY)
+			if(env->MinY > minY)
 			{
-				minY = env->getMinY();
+				minY = env->MinY;
 			}
 			
-			if(env->getMaxX() < maxX)
+			if(env->MaxX < maxX)
 			{
-				maxX = env->getMaxX();
+				maxX = env->MaxX;
 			}
 			
-			if(env->getMaxY() < maxY)
+			if(env->MaxY < maxY)
 			{
-				maxY = env->getMaxY();
+				maxY = env->MaxY;
 			}
 			
             if(maxX - minX <= 0)
@@ -1734,7 +1732,7 @@ namespace rsgis{namespace img{
 		}
 	}
     
-    void RSGISImageUtils::getImageOverlapCut2Env(GDALDataset **datasets, int numDS,  int **dsOffsets, int *width, int *height, double *gdalTransform, geos::geom::Envelope *env, int *maxBlockX, int *maxBlockY) 
+    void RSGISImageUtils::getImageOverlapCut2Env(GDALDataset **datasets, int numDS,  int **dsOffsets, int *width, int *height, double *gdalTransform, OGREnvelope *env, int *maxBlockX, int *maxBlockY) 
 	{
 		double **transformations = new double*[numDS];
 		int *xSize = new int[numDS];
@@ -1865,24 +1863,24 @@ namespace rsgis{namespace img{
 			}
 			
 			// Cut to env extent
-			if(env->getMinX() > minX)
+			if(env->MinX > minX)
 			{
-                minX = env->getMinX();
+                minX = env->MinX;
 			}
 			
-			if(env->getMinY() > minY)
+			if(env->MinY > minY)
 			{
-				minY = env->getMinY();
+				minY = env->MinY;
 			}
 			
-			if(env->getMaxX() < maxX)
+			if(env->MaxX < maxX)
 			{
-				maxX = env->getMaxX();
+				maxX = env->MaxX;
 			}
 			
-			if(env->getMaxY() < maxY)
+			if(env->MaxY < maxY)
 			{
-				maxY = env->getMaxY();
+				maxY = env->MaxY;
 			}
 			
             if(maxX - minX <= 0)
@@ -2043,7 +2041,7 @@ namespace rsgis{namespace img{
         delete[] yBlockSize;
 	}
 	
-	void RSGISImageUtils::getImageOverlap(GDALDataset **datasets, int numDS, int *width, int *height, geos::geom::Envelope *env) 
+	void RSGISImageUtils::getImageOverlap(GDALDataset **datasets, int numDS, int *width, int *height, OGREnvelope *env) 
 	{
 		double **transformations = new double*[numDS];
 		int *xSize = new int[numDS];
@@ -2155,30 +2153,30 @@ namespace rsgis{namespace img{
 			}
 			
 			// Trim to the envelope
-			if(minX > env->getMinX())
+			if(minX > env->MinX)
 			{
 				throw RSGISImageBandException("Envelope does not fit within the image overlap (MinX)");
 			}
 			
-			if(minY > env->getMinY())
+			if(minY > env->MinY)
 			{
 				throw RSGISImageBandException("Envelope does not fit within the image overlap (MinY)");
 			}
 			
-			if(maxX < env->getMaxX())
+			if(maxX < env->MaxX)
 			{
 				throw RSGISImageBandException("Envelope does not fit within the image overlap (MaxX)");
 			}
 			
-			if(maxY < env->getMaxY())
+			if(maxY < env->MaxY)
 			{
 				throw RSGISImageBandException("Envelope does not fit within the image overlap (MaxY)");
 			}
 			
-			minX = env->getMinX();
-			maxX = env->getMaxX();
-			minY = env->getMinY();
-			maxY = env->getMaxY();
+			minX = env->MinX;
+			maxX = env->MaxX;
+			minY = env->MinY;
+			maxY = env->MaxY;
 			
 			*width = floor(((maxX - minX)/pixelXRes)+0.5);
 			*height = floor(((maxY - minY)/pixelYResPos)+0.5);
@@ -2222,7 +2220,7 @@ namespace rsgis{namespace img{
 		}
 	}
     
-    void RSGISImageUtils::getImageOverlap(GDALDataset **datasets, int numDS, geos::geom::Envelope *env) 
+    void RSGISImageUtils::getImageOverlap(GDALDataset **datasets, int numDS, OGREnvelope *env) 
     {
         double **transformations = new double*[numDS];
         int *xSize = new int[numDS];
@@ -2325,7 +2323,10 @@ namespace rsgis{namespace img{
                 throw RSGISImageBandException("Images do not overlap in the Y axis");
             }
             
-            env->init(minX, maxX, minY, maxY);
+            env->MinX = minX;
+            env->MaxX = maxX;
+            env->MinY = minY;
+            env->MaxY = maxY;
         }
         catch(RSGISImageBandException& e)
         {
@@ -3533,7 +3534,7 @@ namespace rsgis{namespace img{
 		return outputImage;
 	}
 	
-	GDALDataset* RSGISImageUtils::createBlankImage(std::string imageFile, geos::geom::Envelope extent, double resolution, int numBands, std::string projection, float value, std::string gdalFormat, GDALDataType imgDataType)
+	GDALDataset* RSGISImageUtils::createBlankImage(std::string imageFile, OGREnvelope extent, double resolution, int numBands, std::string projection, float value, std::string gdalFormat, GDALDataType imgDataType)
 	{
 		GDALAllRegister();
 		GDALDriver *poDriver = NULL;
@@ -3555,8 +3556,8 @@ namespace rsgis{namespace img{
 		
 		try
 		{
-			xSize = ceil((extent.getMaxX() - extent.getMinX())/resolution);
-			ySize = ceil((extent.getMaxY() - extent.getMinY())/resolution);
+			xSize = ceil((extent.MaxX - extent.MinX)/resolution);
+			ySize = ceil((extent.MaxY - extent.MinY)/resolution);
 			
 			if(xSize <= 0)
 			{
@@ -3568,10 +3569,10 @@ namespace rsgis{namespace img{
 			}
 			
 			transformation = new double[6];
-			transformation[0] = extent.getMinX();
+			transformation[0] = extent.MinX;
 			transformation[1] = resolution;
 			transformation[2] = 0;
-			transformation[3] = extent.getMaxY();
+			transformation[3] = extent.MaxY;
 			transformation[4] = 0;
 			transformation[5] = resolution * (-1);
 			
@@ -5008,7 +5009,7 @@ namespace rsgis{namespace img{
         
     }
     
-    GDALDataset* RSGISImageUtils::createCopy(GDALDataset *inData, unsigned int numBands, std::string outputFilePath, std::string outputFormat, GDALDataType eType, geos::geom::Envelope extent, bool useImgProj, std::string proj)
+    GDALDataset* RSGISImageUtils::createCopy(GDALDataset *inData, unsigned int numBands, std::string outputFilePath, std::string outputFormat, GDALDataType eType, OGREnvelope extent, bool useImgProj, std::string proj)
     {
         GDALDataset *dataset = NULL;
         try
@@ -5033,28 +5034,28 @@ namespace rsgis{namespace img{
             double imgMinY = imgMaxY + (gdalTranslation[5] * height);
             
             // Check extent is within image.
-            if( (extent.getMinX() >= imgMinX) & (extent.getMaxX() <= imgMaxX) & (extent.getMinY() >= imgMinY) & (extent.getMaxY() <= imgMinY) )
+            if( (extent.MinX >= imgMinX) & (extent.MaxX <= imgMaxX) & (extent.MinY >= imgMinY) & (extent.MaxY <= imgMinY) )
             {
                 delete[] gdalTranslation;
                 throw RSGISImageException("Extent needs to be within the image extent.");
             }
             
             // Find Min X
-            double xMinDiff = extent.getMinX() - imgMinX;
+            double xMinDiff = extent.MinX - imgMinX;
             unsigned int numPxls2ExtXMin = floor(xMinDiff/xPxlSize);
             outImgMinX = imgMinX + (numPxls2ExtXMin * xPxlSize);
             
             // Find Max Y
-            double yMaxDiff = imgMaxY - extent.getMaxY();
+            double yMaxDiff = imgMaxY - extent.MaxY;
             unsigned int numPxls2ExtYMax = floor(yMaxDiff/yPxlSize);
             outImgMaxY = imgMaxY - (numPxls2ExtYMax * yPxlSize);
             
             // Find Max X and width
-            double xMaxDiff = extent.getMaxX() - outImgMinX;
+            double xMaxDiff = extent.MaxX - outImgMinX;
             outImgWidth = ceil(xMaxDiff/xPxlSize);
             
             // Find Min Y and height
-            double yMinDiff = outImgMaxY - extent.getMinY();
+            double yMinDiff = outImgMaxY - extent.MinY;
             outImgHeight = ceil(yMinDiff/yPxlSize);
             
             gdalTranslation[0] = outImgMinX;

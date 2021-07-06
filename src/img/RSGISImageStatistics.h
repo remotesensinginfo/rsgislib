@@ -90,11 +90,11 @@ namespace rsgis{namespace img{
         void calcImageValue(float *bandValues, int numBands);
         void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) {throw RSGISImageCalcException("Not implemented");};
         void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent){throw rsgis::img::RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) {throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, OGREnvelope extent){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, OGREnvelope extent) {throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, double *output, OGREnvelope extent) {throw RSGISImageCalcException("Not implemented");};
         void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) {throw RSGISImageCalcException("No implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, OGREnvelope extent) {throw RSGISImageCalcException("No implemented");};
         bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) {throw RSGISImageCalcException("Not implemented");};
         void getImageStats(ImageStats** inStats, int numInputBands);
         void calcStdDev();
@@ -127,11 +127,11 @@ namespace rsgis{namespace img{
         void calcImageValue(float *bandValues, int numBands);
         void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) {throw RSGISImageCalcException("Not implemented");};
         void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent){throw rsgis::img::RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) {throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, OGREnvelope extent){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, OGREnvelope extent) {throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, double *output, OGREnvelope extent) {throw RSGISImageCalcException("Not implemented");};
         void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) {throw RSGISImageCalcException("No implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, OGREnvelope extent) {throw RSGISImageCalcException("No implemented");};
         bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) {throw RSGISImageCalcException("Not implemented");};
         void getImageStats(ImageStats** inStats, int numInputBands);
         void calcStdDev();
@@ -164,11 +164,11 @@ namespace rsgis{namespace img{
         void calcImageValue(float *bandValues, int numBands);
         void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) {throw RSGISImageCalcException("Not implemented");};
         void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent){throw rsgis::img::RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) {throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, OGREnvelope extent){throw rsgis::img::RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, OGREnvelope extent) {throw RSGISImageCalcException("Not implemented");};
+        void calcImageValue(float *bandValues, int numBands, double *output, OGREnvelope extent) {throw RSGISImageCalcException("Not implemented");};
         void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) {throw RSGISImageCalcException("No implemented");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, OGREnvelope extent) {throw RSGISImageCalcException("No implemented");};
         bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) {throw RSGISImageCalcException("Not implemented");};
         void getImageStats(ImageStats *inStats);
         void calcStdDev();
@@ -198,7 +198,7 @@ namespace rsgis{namespace img{
         rsgis::math::Matrix* getPercentilesForAllBands(GDALDataset* dataset, float percentile, float noDataVal, bool noDataDefined);
         double getPercentile(GDALDataset *dataset, unsigned int band, float percentile, float noDataVal, bool noDataDefined);
         double getPercentile(GDALDataset *dataset, unsigned int band, GDALDataset *maskDS, int maskVal, float percentile, float noDataVal, bool noDataDefined);
-        double getPercentile(GDALDataset *dataset, unsigned int band, GDALDataset *maskDS, int maskVal, float percentile, float noDataVal, bool noDataDefined, geos::geom::Envelope *env, bool quiet=false);
+        double getPercentile(GDALDataset *dataset, unsigned int band, GDALDataset *maskDS, int maskVal, float percentile, float noDataVal, bool noDataDefined, OGREnvelope *env, bool quiet=false);
         ~RSGISImagePercentiles();
     };
     
@@ -216,16 +216,7 @@ namespace rsgis{namespace img{
             this->noDataVal = noDataVal;
             this->noDataDefined = noDataDefined;
         };
-        void calcImageValue(float *bandValues, int numBands, double *output) {throw RSGISImageCalcException("No implemented");};
-        void calcImageValue(float *bandValues, int numBands) {throw RSGISImageCalcException("Not implemented");};
         void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals);
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent){throw rsgis::img::RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent)  {throw RSGISImageCalcException("No implemented");};
-        void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) {throw RSGISImageCalcException("No implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output)  {throw RSGISImageCalcException("No implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) {throw RSGISImageCalcException("No implemented");};
-        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output)  {throw RSGISImageCalcException("No implemented");};
         ~RSGISGetPixelBandValues(){};
     protected:
         std::vector<double> *dataVals;
@@ -241,15 +232,6 @@ namespace rsgis{namespace img{
     public:
         RSGISImagePixelSummaries(unsigned int numOutBands, rsgis::math::RSGISStatsSummary *statsSummary, float noDataValue=0, bool useNoDataValue=false);
         void calcImageValue(float *bandValues, int numBands, double *output);
-        void calcImageValue(float *bandValues, int numBands) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent){throw rsgis::img::RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) {throw RSGISImageCalcException("No implemented");};
-        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) {throw RSGISImageCalcException("Not implemented");};
         ~RSGISImagePixelSummaries();
     protected:
         rsgis::math::RSGISStatsSummary *statsSummary;
@@ -261,16 +243,7 @@ namespace rsgis{namespace img{
     {
     public:
         RSGISCalcImageHistogramNoData(unsigned int imgBand, bool noDataSpecified, float noDataVal, unsigned int numBins, float *binRanges, unsigned int *binCounts);
-        void calcImageValue(float *bandValues, int numBands, double *output) {throw RSGISImageCalcException("Not implemented");};
         void calcImageValue(float *bandValues, int numBands);
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent){throw rsgis::img::RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) {throw RSGISImageCalcException("No implemented");};
-        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) {throw RSGISImageCalcException("Not implemented");};
         ~RSGISCalcImageHistogramNoData();
     protected:
         unsigned int imgBand;
@@ -285,16 +258,7 @@ namespace rsgis{namespace img{
     {
     public:
         RSGISCalcImageStatisticsMaskStatsNoData(int numberOutBands, int numInputBands, long maskVal, double *noDataVals, bool useNoData, bool calcSD, bool onePassSD = false);
-        void calcImageValue(float *bandValues, int numBands, double *output) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands){throw RSGISImageCalcException("Not implemented");};
         void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals);
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent){throw rsgis::img::RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) {throw RSGISImageCalcException("No implemented");};
-        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) {throw RSGISImageCalcException("Not implemented");};
         void getImageStats(ImageStats** inStats, int numInputBands);
         void calcStdDev();
         ~RSGISCalcImageStatisticsMaskStatsNoData();
@@ -325,15 +289,6 @@ namespace rsgis{namespace img{
     public:
         RSGISCalcMultiImageStatSummaries(unsigned int numOutBands, rsgis::math::rsgissummarytype sumType, unsigned int numInImgs, unsigned int numInImgBands, float noDataValue=0, bool useNoDataValue=false);
         void calcImageValue(float *bandValues, int numBands, double *output);
-        void calcImageValue(float *bandValues, int numBands) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent){throw rsgis::img::RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) {throw RSGISImageCalcException("No implemented");};
-        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) {throw RSGISImageCalcException("Not implemented");};
         ~RSGISCalcMultiImageStatSummaries();
     protected:
         rsgis::math::rsgissummarytype sumType;
@@ -353,15 +308,6 @@ namespace rsgis{namespace img{
     public:
         RSGISCalcImageDifference(unsigned int numOutBands);
         void calcImageValue(float *bandValues, int numBands, double *output);
-        void calcImageValue(float *bandValues, int numBands) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent){throw rsgis::img::RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) {throw RSGISImageCalcException("No implemented");};
-        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) {throw RSGISImageCalcException("Not implemented");};
         ~RSGISCalcImageDifference();
     };
     
@@ -371,15 +317,6 @@ namespace rsgis{namespace img{
     public:
         RSGISCalcImgStackIdxForStat(float noDataVal, rsgis::math::rsgissummarytype sumStat);
         void calcImageValue(float *bandValues, int numBands, double *output);
-        void calcImageValue(float *bandValues, int numBands) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent){throw rsgis::img::RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) {throw RSGISImageCalcException("No implemented");};
-        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) {throw RSGISImageCalcException("Not implemented");};
         ~RSGISCalcImgStackIdxForStat();
     protected:
         float noDataVal;

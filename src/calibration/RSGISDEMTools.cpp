@@ -540,7 +540,7 @@ namespace rsgis{namespace calib{
         extractPixels = new rsgis::img::RSGISExtractImagePixelsOnLine();
     }
 		
-    void RSGISCalcShadowBinaryMask::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) 
+    void RSGISCalcShadowBinaryMask::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, OGREnvelope extent)
     {
         
         if(winSize != 3)
@@ -674,8 +674,8 @@ namespace rsgis{namespace calib{
                     {
                         // do ray tracing...
                         // Location of active point.
-                        double x = extent.getMinX() + (extent.getMaxX() - extent.getMinX())/2;
-                        double y = extent.getMinY() + (extent.getMaxY() - extent.getMinY())/2;
+                        double x = extent.MinX + (extent.MaxX - extent.MinX)/2;
+                        double y = extent.MinY + (extent.MaxY - extent.MinY)/2;
                         double z = dataBlock[band][1][1];
                         
                         
@@ -694,20 +694,15 @@ namespace rsgis{namespace calib{
                         //double sunY = y + (sunRange * sin(sunZenRad) * sin(sunAzRad));
                         //double sunZ = z + (sunRange * cos(sunZenRad));
                         
-                        
                         // Create Ray Line
-                        geos::geom::Coordinate pxlPt;
-                        pxlPt.x = x;
-                        pxlPt.y = y;
-                        pxlPt.z = z;
-                        
-                        
-                        std::vector<rsgis::img::ImagePixelValuePt*> *imagePxlPts = extractPixels->getImagePixelValues(inputImage, band+1, &pxlPt, sunAzRad, sunZenRad, maxElevHeight);
+                        OGRPoint *pxlPt = new OGRPoint(x, y, z);
+                        std::vector<rsgis::img::ImagePixelValuePt*> *imagePxlPts = extractPixels->getImagePixelValues(inputImage, band+1, pxlPt, sunAzRad, sunZenRad, maxElevHeight);
+                        delete pxlPt;
                         
                         // Check whether pixel intersects with ray.
                         for(std::vector<rsgis::img::ImagePixelValuePt*>::iterator iterPxls = imagePxlPts->begin(); iterPxls != imagePxlPts->end(); ++iterPxls)
                         {
-                            if((*iterPxls)->pt->z < (*iterPxls)->value)
+                            if((*iterPxls)->pt->getZ() < (*iterPxls)->value)
                             {
                                 output[0] = 1;
                                 break;

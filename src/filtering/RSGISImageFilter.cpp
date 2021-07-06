@@ -50,26 +50,6 @@ namespace rsgis{namespace filter{
 		return new rsgis::img::RSGISCalcImage(this, "", true);
 	}
 	
-	void RSGISImageFilter::calcImageValue(float *bandValues, int numBands, double *output) 
-	{
-		throw rsgis::img::RSGISImageCalcException("Function not implemented");
-	}
-	
-	void RSGISImageFilter::calcImageValue(float *bandValues, int numBands) 
-	{
-		throw rsgis::img::RSGISImageCalcException("Function not implemented");
-	}
-	
-	void RSGISImageFilter::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) 
-	{
-		throw rsgis::img::RSGISImageCalcException("Not Implemented");
-	}
-	
-	void RSGISImageFilter::calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) 
-	{
-		throw rsgis::img::RSGISImageCalcException("Function not implemented");
-	}
-	
 	std::string RSGISImageFilter::getFileNameEnding()
 	{
 		return this->filenameEnding;

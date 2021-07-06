@@ -43,7 +43,7 @@
 #include "img/RSGISImageCalcException.h"
 #include "img/RSGISCalcImageValue.h"
 #include "img/RSGISImageUtils.h"
-#include "img/RSGISExtractImagePixelsInPolygon.h"
+//#include "img/RSGISExtractImagePixelsInPolygon.h"
 #include "img/RSGISImageStatistics.h"
 
 #include "math/RSGISMathsUtils.h"
@@ -109,16 +109,7 @@ namespace rsgis{namespace calib{
     {
     public:
         RSGISInitOutputImageSoilleGratin94(double noDataVal, double dataVal, double borderVal, std::list<Q2DPxl> *pxQ);
-        void calcImageValue(float *bandValues, int numBands, double *output) {throw rsgis::img::RSGISImageCalcException("Not implmented.");};
-        void calcImageValue(float *bandValues, int numBands) {throw rsgis::img::RSGISImageCalcException("Not implmented.");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) {throw rsgis::img::RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) {throw rsgis::img::RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent){throw rsgis::img::RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) {throw rsgis::img::RSGISImageCalcException("Not implmented.");};
-        void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) {throw rsgis::img::RSGISImageCalcException("Not implmented.");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) {throw rsgis::img::RSGISImageCalcException("No implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent);
-        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) {throw rsgis::img::RSGISImageCalcException("Not implmented.");};
+        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, OGREnvelope extent);
         ~RSGISInitOutputImageSoilleGratin94();
     protected:
         double noDataVal;

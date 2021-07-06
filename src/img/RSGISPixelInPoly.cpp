@@ -145,7 +145,7 @@ namespace rsgis{namespace img {
         this->nBands = nBands;
     }
 
-    void RSGISGetPixelsInPoly::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) 
+    void RSGISGetPixelsInPoly::calcImageValue(float *bandValues, int numBands, OGREnvelope extent)
     {
         if(numBands != nBands)
         {

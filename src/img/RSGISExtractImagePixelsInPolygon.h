@@ -36,9 +36,6 @@
 #include "common/RSGISImageException.h"
 #include "common/RSGISOutputStreamException.h"
 
-#include "utils/RSGISGEOSFactoryGenerator.h"
-#include "utils/RSGISExportForPlottingIncremental.h"
-
 #include "img/RSGISImageBandException.h"
 #include "img/RSGISImageUtils.h"
 #include "img/RSGISCalcImage.h"
@@ -46,13 +43,6 @@
 
 #include <boost/cstdint.hpp>
 #include <boost/numeric/conversion/cast.hpp>
-
-#include "geos/geom/Envelope.h"
-#include "geos/geom/Point.h"
-#include "geos/geom/Polygon.h"
-#include "geos/geom/Coordinate.h"
-#include "geos/geom/CoordinateArraySequence.h"
-#include "geos/geom/PrecisionModel.h"
 
 // mark all exported classes/functions with DllExport to have
 // them exported by Visual Studio
@@ -75,7 +65,7 @@ namespace rsgis
         {
         public:
             RSGISExtractImagePixelsOnLine();
-            std::vector<ImagePixelValuePt*>* getImagePixelValues(GDALDataset *image, unsigned int imageBand, geos::geom::Coordinate *pt1, float azimuthRad, float zenithRad, float rayElevThreshold);
+            std::vector<ImagePixelValuePt*>* getImagePixelValues(GDALDataset *image, unsigned int imageBand, OGRPoint *pt1, float azimuthRad, float zenithRad, float rayElevThreshold);
             void populateWithImageValues(GDALDataset *image, unsigned int imageBand, std::vector<ImagePixelValuePt*> *ptPxlValues);
             ~RSGISExtractImagePixelsOnLine();
         };

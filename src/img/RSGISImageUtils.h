@@ -44,9 +44,6 @@
 
 #include "utils/RSGISTextUtils.h"
 
-#include "geos/geom/Envelope.h"
-#include "geos/geom/Polygon.h"
-
 #include <boost/cstdint.hpp>
 #include <boost/algorithm/string.hpp>
 
@@ -75,7 +72,7 @@ namespace rsgis
         
         struct DllExport ImagePixelValuePt
         {
-            geos::geom::Coordinate *pt;
+            OGRPoint *pt;
             uint_fast32_t imgX;
             uint_fast32_t imgY;
             float value;
@@ -158,11 +155,11 @@ namespace rsgis
 				void getImageOverlap(std::vector<GDALDataset*> *datasets, int **dsOffsets, int *width, int *height, double *gdalTransform);
                 void getImageOverlap(GDALDataset **datasets, int numDS, int **dsOffsets, int *width, int *height, double *gdalTransform, int *maxBlockX, int *maxBlockY);
                 void getImageOverlap(std::vector<GDALDataset*> *datasets, int **dsOffsets, int *width, int *height, double *gdalTransform, int *maxBlockX, int *maxBlockY);
-				void getImageOverlap(GDALDataset **datasets, int numDS, int **dsOffsets, int *width, int *height, double *gdalTransform, geos::geom::Envelope *env);
-                void getImageOverlapCut2Env(GDALDataset **datasets, int numDS,  int **dsOffsets, int *width, int *height, double *gdalTransform, geos::geom::Envelope *env);
-                void getImageOverlapCut2Env(GDALDataset **datasets, int numDS,  int **dsOffsets, int *width, int *height, double *gdalTransform, geos::geom::Envelope *env, int *maxBlockX, int *maxBlockY);
-				void getImageOverlap(GDALDataset **datasets, int numDS, int *width, int *height, geos::geom::Envelope *env);
-                void getImageOverlap(GDALDataset **datasets, int numDS, geos::geom::Envelope *env);
+				void getImageOverlap(GDALDataset **datasets, int numDS, int **dsOffsets, int *width, int *height, double *gdalTransform, OGREnvelope *env);
+                void getImageOverlapCut2Env(GDALDataset **datasets, int numDS,  int **dsOffsets, int *width, int *height, double *gdalTransform, OGREnvelope *env);
+                void getImageOverlapCut2Env(GDALDataset **datasets, int numDS,  int **dsOffsets, int *width, int *height, double *gdalTransform, OGREnvelope *env, int *maxBlockX, int *maxBlockY);
+				void getImageOverlap(GDALDataset **datasets, int numDS, int *width, int *height, OGREnvelope *env);
+                void getImageOverlap(GDALDataset **datasets, int numDS, OGREnvelope *env);
 				void getImagesExtent(GDALDataset **datasets, int numDS, int *width, int *height, double *gdalTransform);
                 void getImagesExtent(std::string *inputImages, int numDS, int *width, int *height, double *gdalTransform);
                 void getImagesExtent(std::vector<std::string> inputImages, int *width, int *height, double *gdalTransform);
@@ -172,7 +169,7 @@ namespace rsgis
                 void exportImageToTextCol(GDALDataset *image, int band, std::string outputText);
 				GDALDataset* createBlankImage(std::string imageFile, double *transformation, int xSize, int ySize, int numBands, std::string projection, float value, std::string gdalFormat="ENVI", GDALDataType imgDataType=GDT_Float32);
                 GDALDataset* createBlankImage(std::string imageFile, double *transformation, int xSize, int ySize, int numBands, std::string projection, float value, std::vector<std::string> bandNames, std::string gdalFormat="ENVI", GDALDataType imgDataType=GDT_Float32);
-				GDALDataset* createBlankImage(std::string imageFile, geos::geom::Envelope extent, double resolution, int numBands, std::string projection, float value, std::string gdalFormat="ENVI", GDALDataType imgDataType=GDT_Float32);
+				GDALDataset* createBlankImage(std::string imageFile, OGREnvelope extent, double resolution, int numBands, std::string projection, float value, std::string gdalFormat="ENVI", GDALDataType imgDataType=GDT_Float32);
 				void exportImageBands(std::string imageFile, std::string outputFilebase, std::string format);
 				void exportImageStack(std::string *inputImages, std::string *outputImages, std::string outputFormat, int numImages) ;
 				void exportImageStackWithMask(std::string *inputImages, std::string *outputImages, std::string imageMask, std::string outputFormat, int numImages, float maskValue) ;
@@ -193,7 +190,7 @@ namespace rsgis
                 void assignValGDALDataset(GDALDataset *data, float value);
                 GDALDataset* createCopy(GDALDataset *inData, std::string outputFilePath, std::string outputFormat, GDALDataType eType, bool useImgProj=true, std::string proj="");
                 GDALDataset* createCopy(GDALDataset *inData, unsigned int numBands, std::string outputFilePath, std::string outputFormat, GDALDataType eType, bool useImgProj=true, std::string proj="");
-                GDALDataset* createCopy(GDALDataset *inData, unsigned int numBands, std::string outputFilePath, std::string outputFormat, GDALDataType eType, geos::geom::Envelope extent, bool useImgProj=true, std::string proj="");
+                GDALDataset* createCopy(GDALDataset *inData, unsigned int numBands, std::string outputFilePath, std::string outputFormat, GDALDataType eType, OGREnvelope extent, bool useImgProj=true, std::string proj="");
                 GDALDataset* createCopy(GDALDataset *inData, unsigned int numBands, std::string outputFilePath, std::string outputFormat, GDALDataType eType, double xMin, double xMax, double yMin, double yMax, double xRes, double yRes, bool useImgProj=true, std::string proj="");
                 GDALDataset* createCopy(GDALDataset **datasets, int numDS, unsigned int numBands, std::string outputFilePath, std::string outputFormat, GDALDataType eType, bool useImgProj=true, std::string proj="");
                 void createKMLText(std::string inputImage, std::string outKMLFile);
