@@ -61,72 +61,16 @@ namespace rsgis{namespace segment{
     
     inline int RSGISSegStatsTextProgress( double dfComplete, const char *pszMessage, void *pData)
     {
+        rsgis_tqdm *pbar = reinterpret_cast<rsgis_tqdm *>( pData );
         int nPercent = int(dfComplete*100);
-        int *pnLastComplete = (int*)pData;
-        
-        if(nPercent < 10)
+        if(nPercent >= 100)
         {
-            nPercent = 0;
-        }
-        else if(nPercent < 20)
-        {
-            nPercent = 10;
-        }
-        else if(nPercent < 30)
-        {
-            nPercent = 20;
-        }
-        else if(nPercent < 40)
-        {
-            nPercent = 30;
-        }
-        else if(nPercent < 50)
-        {
-            nPercent = 40;
-        }
-        else if(nPercent < 60)
-        {
-            nPercent = 50;
-        }
-        else if(nPercent < 70)
-        {
-            nPercent = 60;
-        }
-        else if(nPercent < 80)
-        {
-            nPercent = 70;
-        }
-        else if(nPercent < 90)
-        {
-            nPercent = 80;
-        }
-        else if(nPercent < 95)
-        {
-            nPercent = 90;
+            pbar->finish();
         }
         else
         {
-            nPercent = 100;
+            pbar->progress(nPercent, 100);
         }
-        
-        if( (pnLastComplete != NULL) && (nPercent != *pnLastComplete ))
-        {
-            if(nPercent == 0)
-            {
-                std::cout << "Started ." << nPercent << "." << std::flush;
-            }
-            else if(nPercent == 100)
-            {
-                std::cout << "." << nPercent << ". Complete." << std::endl;
-            }
-            else
-            {
-                std::cout << "." << nPercent << "." << std::flush;
-            }
-        }
-        
-        *pnLastComplete = nPercent;
-        
         return true;
     };
     
@@ -142,16 +86,7 @@ namespace rsgis{namespace segment{
     {
     public:
         RSGISAddWithSegOffset(unsigned long offset);
-        void calcImageValue(float *bandValues, int numBands, double *output) {throw rsgis::img::RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands) {throw rsgis::img::RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) {throw rsgis::img::RSGISImageCalcException("Not implemented");};
         void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output);
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent){throw rsgis::img::RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) {throw rsgis::img::RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) {throw rsgis::img::RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) {throw rsgis::img::RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) {throw rsgis::img::RSGISImageCalcException("No implemented");};
-        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) {throw rsgis::img::RSGISImageCalcException("Not implemented");};
         ~RSGISAddWithSegOffset();
     private:
         unsigned long offset;
