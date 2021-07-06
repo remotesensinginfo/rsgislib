@@ -32,12 +32,10 @@
 #include "common/RSGISClassificationException.h"
 #include "common/rsgis-tqdm.h"
 
-#include "utils/RSGIS_ENVI_ASCII_ROI.h"
-
 #include "math/RSGISMathsUtils.h"
 #include "math/RSGISMatrices.h"
 
-#include "vec/RSGISVectorUtils.h"
+//#include "vec/RSGISVectorUtils.h"
 
 #include "classifier/RSGISClassifier.h"
 
@@ -45,13 +43,6 @@
 #include "img/RSGISImageCalcException.h"
 
 #include "datastruct/SortedGenericList.cpp"
-
-#include <xercesc/dom/DOM.hpp>
-#include <xercesc/parsers/XercesDOMParser.hpp>
-#include <xercesc/sax/HandlerBase.hpp>
-#include <xercesc/util/XMLString.hpp>
-#include <xercesc/util/PlatformUtils.hpp>
-#include <xercesc/framework/LocalFileFormatTarget.hpp>
 
 #include "ogrsf_frmts.h"
 #include "ogr_api.h"
@@ -75,8 +66,8 @@ namespace rsgis{ namespace classifier{
     {
     public:
         RSGISClassificationUtils();
-        ClassData* convertROIs2ClassData(rsgis::utils::enviroi *enviroi, int id);
-        ClassData** parseClassificationInputFile(std::string inputFile, int *numClasses);
+        //ClassData* convertROIs2ClassData(rsgis::utils::enviroi *enviroi, int id);
+        //ClassData** parseClassificationInputFile(std::string inputFile, int *numClasses);
         void convertShapeFile2SpecLib(std::string vector, std::string outputFile, std::string classAttribute, std::vector<std::string> *attributes, bool group);
         ~RSGISClassificationUtils();
     };

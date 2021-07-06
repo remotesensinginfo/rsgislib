@@ -70,34 +70,6 @@ namespace rsgis{ namespace classifier{
 		}
 	}
 	
-	void RSGISApplyClassifier::calcImageValue(float *bandValues, int numBands) 
-	{
-		throw rsgis::img::RSGISImageCalcException("Not implemented");
-	}
-	
-	void RSGISApplyClassifier::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) 
-	{
-		throw rsgis::img::RSGISImageCalcException("Not Implemented");
-	}
-	
-	
-	void RSGISApplyClassifier::calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) 
-	{
-		throw rsgis::img::RSGISImageCalcException("Not implemented");
-	}
-	
-	
-	void RSGISApplyClassifier::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
-	{
-		throw rsgis::img::RSGISImageCalcException("Not implemented");
-	}
-
-	bool RSGISApplyClassifier::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) 
-	{
-		throw rsgis::img::RSGISImageCalcException("Not implemented");
-	}
-	
-	
 	RSGISApplyClassifier::~RSGISApplyClassifier()
 	{
 		

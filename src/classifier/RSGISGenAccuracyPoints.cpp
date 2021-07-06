@@ -1304,7 +1304,7 @@ namespace rsgis{namespace classifier{
         this->numClasses = numClasses;
     }
     
-    void RSGISExtractClassPxllocs::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent)
+    void RSGISExtractClassPxllocs::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, OGREnvelope extent)
     {
         if((numIntVals != 1) & (numfloatVals != 0))
         {
@@ -1315,8 +1315,8 @@ namespace rsgis{namespace classifier{
         {
             if(intBandValues[0] <= this->numClasses)
             {
-                double x = extent.getMinX() + (extent.getWidth()/2);
-                double y = extent.getMinY() + (extent.getHeight()/2);
+                double x = extent.MinX + ((extent.MaxX - extent.MinX)/2);
+                double y = extent.MinY + ((extent.MaxY - extent.MinY)/2);
                 this->classPxlLst[intBandValues[0]-1]->push_back(std::pair<double, double>(x, y));
             }
         }

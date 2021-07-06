@@ -29,7 +29,7 @@ namespace rsgis{ namespace classifier{
 	{
 		
 	}
-
+    /*
 	ClassData* RSGISClassificationUtils::convertROIs2ClassData(rsgis::utils::enviroi *enviroi, int id)
 	{
         rsgis::math::RSGISMatrices matrixUtils;
@@ -145,9 +145,11 @@ namespace rsgis{ namespace classifier{
 		
 		return classData;
 	}
+     */
 	
 	void RSGISClassificationUtils::convertShapeFile2SpecLib(std::string vector, std::string outputFile, std::string classAttribute, std::vector<std::string> *attributes, bool group)
 	{
+	    /*
 		OGRRegisterAll();
 		
         rsgis::vec::RSGISVectorUtils vecUtils;
@@ -286,6 +288,7 @@ namespace rsgis{ namespace classifier{
 		{
 			throw RSGISClassificationException(e.what());
 		}
+	     */
 	}
 
 	RSGISClassificationUtils::~RSGISClassificationUtils()
