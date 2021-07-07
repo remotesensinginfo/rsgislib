@@ -35,7 +35,6 @@
 
 #include "img/RSGISPopWithStats.h"
 #include "img/RSGISImageUtils.h"
-#include "img/RSGISCalcEditImage.h"
 #include "img/RSGISCalcImageValue.h"
 #include "img/RSGISImageCalcException.h"
 #include "img/RSGISCalcImage.h"

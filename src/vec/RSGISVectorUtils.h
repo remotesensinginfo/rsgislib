@@ -32,22 +32,7 @@
 #include "ogrsf_frmts.h"
 #include "ogr_api.h"
 
-#include "geos/geom/GeometryFactory.h"
-#include "geos/geom/Coordinate.h"
-#include "geos/geom/CoordinateArraySequence.h"
-#include "geos/geom/LinearRing.h"
-#include "geos/geom/LineString.h"
-#include "geos/geom/Point.h"
-#include "geos/geom/Polygon.h"
-#include "geos/geom/MultiPolygon.h"
-#include "geos/geom/CoordinateSequence.h"
-#include "geos/geom/LineString.h"
-
-#include "vec/RSGISPolygonData.h"
-
 #include "common/RSGISVectorException.h"
-
-#include "utils/RSGISGEOSFactoryGenerator.h"
 #include "utils/RSGISFileUtils.h"
 
 // mark all exported classes/functions with DllExport to have
@@ -64,19 +49,32 @@
 #endif
 
 namespace rsgis{namespace vec{
-    
+
+    /*
     struct RSGISGEOSGeomFID
     {
         OGRGeometry *geom;
         geos::geom::Envelope *env;
         unsigned long fid;
     };
-    
+    */
     
 	class DllExport RSGISVectorUtils
 		{
 		public:
 			std::string getLayerName(std::string filepath);
+            bool checkDIR4SHP(std::string dir, std::string shp);
+            void deleteSHP(std::string dir, std::string shp);
+            OGRPolygon* createOGRPolygon(double tlX, double tlY, double brX, double brY);
+            OGRPolygon* checkCloseOGRPolygon(OGRPolygon *poly);
+            OGRPolygon* removeHolesOGRPolygon(OGRPolygon *poly);
+            OGRPolygon* removeHolesOGRPolygon(OGRPolygon *poly, float areaThreshold);
+            OGRPolygon* moveOGRPolygon(OGRPolygon *poly, double shiftX, double shiftY, double shiftZ);
+            std::vector<std::string>* findUniqueVals(OGRLayer *layer, std::string attribute);
+            std::vector<std::string>* getColumnNames(OGRLayer *layer);
+            std::vector<OGRPoint*>* getRegularStepPoints(std::vector<OGRLineString*> *lines, double step);
+			/*
+			OGRPolygon* createOGRPolygon(geos::geom::Envelope *env);
             geos::geom::LineString* convertOGRLineString2GEOSLineString(OGRLineString *line);
 			OGRLineString* convertGEOSLineString2OGRLineString(geos::geom::LineString *line);
 			geos::geom::LinearRing* convertOGRLinearRing2GEOSLinearRing(OGRLinearRing *ring);
@@ -94,19 +92,9 @@ namespace rsgis{namespace vec{
 			geos::geom::Envelope* getEnvelope(OGRGeometry *geom);
 			geos::geom::Envelope* getEnvelopePixelBuffer(OGRGeometry *geom, double imageRes);
 			geos::geom::Point* createPoint(geos::geom::Coordinate *coord);
-			bool checkDIR4SHP(std::string dir, std::string shp);
-			void deleteSHP(std::string dir, std::string shp);
 			geos::geom::GeometryCollection* createGeomCollection(std::vector<geos::geom::Polygon*> *polys);
 			geos::geom::Polygon* createPolygon(double tlX, double tlY, double brX, double brY);
-			OGRPolygon* createOGRPolygon(double tlX, double tlY, double brX, double brY);
-            OGRPolygon* createOGRPolygon(geos::geom::Envelope *env);
-			OGRPolygon* checkCloseOGRPolygon(OGRPolygon *poly);
-			OGRPolygon* removeHolesOGRPolygon(OGRPolygon *poly);
-            OGRPolygon* removeHolesOGRPolygon(OGRPolygon *poly, float areaThreshold);
-			OGRPolygon* moveOGRPolygon(OGRPolygon *poly, double shiftX, double shiftY, double shiftZ);
-			std::vector<std::string>* findUniqueVals(OGRLayer *layer, std::string attribute);
-            std::vector<std::string>* getColumnNames(OGRLayer *layer);
-            std::vector<OGRPoint*>* getRegularStepPoints(std::vector<OGRLineString*> *lines, double step);
+			*/
 		};
 
     

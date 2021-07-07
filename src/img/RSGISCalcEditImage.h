@@ -28,11 +28,6 @@
 
 #include "gdal_priv.h"
 
-#include "geos/geom/Envelope.h"
-#include "geos/geom/Polygon.h"
-#include "geos/geom/Geometry.h"
-#include "geos/geom/Coordinate.h"
-
 #include "common/rsgis-tqdm.h"
 
 #include "img/RSGISPixelInPoly.h"

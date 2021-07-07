@@ -49,22 +49,7 @@ namespace rsgis{namespace img{
 		n++;
 		sum += ((bandValuesImageA[bandA]-aMeans->matrix[bandA])*(bandValuesImageB[bandB]-bMeans->matrix[bandB]));
 	}
-	
-	void RSGISCalcCovariance::calcImageValue(float *bandValuesImage, int numBands, int band) 
-	{
-		throw RSGISImageCalcException("Not implemented!");
-	}
-	
-	void RSGISCalcCovariance::calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) 
-	{
-		throw RSGISImageCalcException("Not implemented!");
-	}
-	
-	void RSGISCalcCovariance::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) 
-	{
-		throw RSGISImageCalcException("Not implemented!");
-	}
-	
+
 	double* RSGISCalcCovariance::getOutputValues()  
 	{
 		this->outputValues[0] = sum/(n-1);

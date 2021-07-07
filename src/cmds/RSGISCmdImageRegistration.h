@@ -58,18 +58,6 @@ namespace rsgis{ namespace cmds {
                                                   int maxNumIterations, float moveChangeThreshold, float pSmoothness, unsigned int metricTypeInt,
                                                   unsigned int outputType, std::string outputGCPFile);
 
-    /** Warp image using triangulation interpolation */
-    DllExport void excecuteTriangularWarp(std::string inputImage, std::string outputImage, std::string projFile, std::string inputGCPs,
-                        float resolution, std::string imageFormat = "KEA", bool genTransformImage = false);
-    
-    /** Warp image using NN interpolation */
-    DllExport void excecuteNNWarp(std::string inputImage, std::string outputImage, std::string projFile, std::string inputGCPs,
-                        float resolution, std::string imageFormat = "KEA", bool genTransformImage = false);
-    
-    /** Warp image using polynominal interpolation */
-    DllExport void excecutePolyWarp(std::string inputImage, std::string outputImage, std::string projFile, std::string inputGCPs,
-                        float resolution, int polyOrder = 3, std::string imageFormat = "KEA", bool genTransformImage = false);
-    
     /** Add tie points to GCP */
     DllExport void excecuteAddGCPsGDAL(std::string inputImage, std::string inputGCPs, std::string outputImage, std::string gdalFormat, RSGISLibDataType outDataType);
     

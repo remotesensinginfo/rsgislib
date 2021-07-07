@@ -66,10 +66,7 @@ namespace rsgis{namespace img{
     class DllExport RSGISCalcLinearSpectralUnmixing
     {
     public:
-        RSGISCalcLinearSpectralUnmixing(std::string gdalFormat="ENVI", GDALDataType gdalDataType=GDT_Float32, float gain=1, float offset=0);
-        void performUnconstainedLinearSpectralUnmixing(GDALDataset **datasets, int numDatasets, std::string outputImage, std::string endmembersFilePath);
-        void performPartConstainedLinearSpectralUnmixing(GDALDataset **datasets, int numDatasets, std::string outputImage, std::string endmembersFilePath, float weight);
-        void performConstainedNNLinearSpectralUnmixing(GDALDataset **datasets, int numDatasets, std::string outputImage, std::string endmembersFilePath, float weight);
+        RSGISCalcLinearSpectralUnmixing(std::string gdalFormat="KEA", GDALDataType gdalDataType=GDT_Float32, float gain=1, float offset=0);
         void performExhaustiveConstrainedSpectralUnmixing(GDALDataset **datasets, int numDatasets, std::string outputImage, std::string endmembersFilePath, float stepResolution);
         ~RSGISCalcLinearSpectralUnmixing();
     protected:
@@ -79,74 +76,11 @@ namespace rsgis{namespace img{
         float offset;
     };
     
-    
-    class DllExport RSGISUnconstrainedLinearSpectralUnmixing : public RSGISCalcImageValue
-    {
-    public: 
-        RSGISUnconstrainedLinearSpectralUnmixing(int numberOutBands, gsl_matrix *endmembers, gsl_matrix *V, gsl_vector *S, gsl_vector *work, gsl_vector *b, gsl_vector *x, float gain, float offset);
-        void calcImageValue(float *bandValues, int numBands, double *output);
-        void calcImageValue(float *bandValues, int numBands) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent){throw rsgis::img::RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) {throw RSGISImageCalcException("No implemented");};
-        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) {throw RSGISImageCalcException("Not implemented");};
-        ~RSGISUnconstrainedLinearSpectralUnmixing();
-    protected:
-        gsl_matrix *endmembers;
-        gsl_matrix *V;
-        gsl_vector *S;
-        gsl_vector *work;
-        gsl_vector *b;
-        gsl_vector *x;
-        float gain;
-        float offset;
-    };
-    
-    class DllExport RSGISPartConstrainedLinearSpectralUnmixing : public RSGISCalcImageValue
-    {
-    public: 
-        RSGISPartConstrainedLinearSpectralUnmixing(int numberOutBands, float weight, gsl_matrix *endmembers, gsl_matrix *V, gsl_vector *S, gsl_vector *work, gsl_vector *b, gsl_vector *x, float gain, float offset);
-        void calcImageValue(float *bandValues, int numBands, double *output);
-        void calcImageValue(float *bandValues, int numBands) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) {throw RSGISImageCalcException("Not implemented");};
-       void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent){throw rsgis::img::RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) {throw RSGISImageCalcException("No implemented");};
-        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) {throw RSGISImageCalcException("Not implemented");};
-        ~RSGISPartConstrainedLinearSpectralUnmixing();
-    protected:
-        float weight;
-        gsl_matrix *endmembers;
-        gsl_matrix *V;
-        gsl_vector *S;
-        gsl_vector *work;
-        gsl_vector *b;
-        gsl_vector *x;
-        float gain;
-        float offset;
-    };
-    
     class DllExport RSGISExhaustiveLinearSpectralUnmixing : public RSGISCalcImageValue
     {
     public: 
         RSGISExhaustiveLinearSpectralUnmixing(int numberOutBands, gsl_matrix *endmembers, float stepRes, float gain, float offset);
         void calcImageValue(float *bandValues, int numBands, double *output);
-        void calcImageValue(float *bandValues, int numBands) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, double *output) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent){throw rsgis::img::RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) {throw RSGISImageCalcException("Not implemented");};
-        void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output, geos::geom::Envelope extent) {throw RSGISImageCalcException("No implemented");};
-        bool calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) {throw RSGISImageCalcException("Not implemented");};
         ~RSGISExhaustiveLinearSpectralUnmixing();
     protected:
         float calcDistance2MeasuredSpectra(float em1Val, float em2Val, float em3Val, float *normSpectra, unsigned int numBands);

@@ -30,24 +30,9 @@ namespace rsgis{namespace img{
 		this->n = 0;
 	}
 	
-	void RSGISPolygonPixelCount::calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB) 
+	void RSGISPolygonPixelCount::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, OGRPolygon *poly, OGRPoint *pt)
 	{
-		throw RSGISImageCalcException("Not implemented!");
-	}
-	
-	void RSGISPolygonPixelCount::calcImageValue(float *bandValuesImage, int numBands, int band) 
-	{
-		throw RSGISImageCalcException("Not implemented!");
-	}
-	
-	void RSGISPolygonPixelCount::calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent) 
-	{
-		throw RSGISImageCalcException("Not implemented!");
-	}
-	
-	void RSGISPolygonPixelCount::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) 
-	{
-		if(poly->contains(pt))
+		if(poly->Contains(pt))
 		{
 			n++;
 		}

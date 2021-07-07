@@ -25,8 +25,6 @@
 #include "RSGISCmdImageUtils.h"
 #include "RSGISCmdParent.h"
 
-#include "geos/geom/Envelope.h"
-
 #include "common/RSGISImageException.h"
 
 #include "img/RSGISBandMath.h"
@@ -39,10 +37,8 @@
 #include "img/RSGISMaskImage.h"
 #include "img/RSGISImageMosaic.h"
 #include "img/RSGISPopWithStats.h"
-#include "img/RSGISAddBands.h"
 #include "img/RSGISExtractImageValues.h"
 #include "img/RSGISImageComposite.h"
-#include "img/RSGISAddBands.h"
 #include "img/RSGISSampleImage.h"
 #include "img/RSGISPanSharpen.h"
 #include "img/RSGISSharpenLowResImagery.h"
@@ -50,11 +46,13 @@
 #include "rastergis/RSGISCalcImageStatsAndPyramids.h"
 #include "rastergis/RSGISRasterAttUtils.h"
 
+/*
 #include "vec/RSGISImageTileVector.h"
 #include "vec/RSGISVectorOutputException.h"
 #include "vec/RSGISVectorIO.h"
 #include "vec/RSGISVectorUtils.h"
 #include "vec/RSGISPolygonData.h"
+ */
 
 #include "utils/RSGISTextUtils.h"
 

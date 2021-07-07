@@ -328,13 +328,13 @@ namespace rsgis{namespace img{
         this->imgBand = imgBand;
     }
     
-    void RSGISGetPxlLocAsVec::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, geos::geom::Envelope extent)
+    void RSGISGetPxlLocAsVec::calcImageValue(long *intBandValues, unsigned int numIntVals, float *floatBandValues, unsigned int numfloatVals, OGREnvelope extent)
     {
         for(size_t i = 0; i < maskVals.size(); ++i)
         {
             if(intBandValues[imgBand-1] == maskVals.at(i))
             {
-                maskPxlLocs[i].push_back(std::pair<double, double>(extent.getMinX(), extent.getMinY()));
+                maskPxlLocs[i].push_back(std::pair<double, double>(extent.MinX, extent.MinY));
                 break;
             }
         }

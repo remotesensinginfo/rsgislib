@@ -26,23 +26,13 @@
 namespace rsgis{namespace img{
 	
 
-	RSGISCreatePixelPolygons::RSGISCreatePixelPolygons(std::vector<geos::geom::Polygon*> *polys, float threshold) : RSGISCalcImageValue(0)
+	RSGISCreatePixelPolygons::RSGISCreatePixelPolygons(std::vector<OGRPolygon*> *polys, float threshold) : RSGISCalcImageValue(0)
 	{
 		this->polys = polys;
 		this->threshold = threshold;
 	}
 	
-	void RSGISCreatePixelPolygons::calcImageValue(float *bandValues, int numBands, double *output) 
-	{
-		throw RSGISImageCalcException("Not Implemented");
-	}
-	
-	void RSGISCreatePixelPolygons::calcImageValue(float *bandValues, int numBands) 
-	{
-		throw RSGISImageCalcException("Not Implemented");
-	}
-	
-	void RSGISCreatePixelPolygons::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) 
+	void RSGISCreatePixelPolygons::calcImageValue(float *bandValues, int numBands, OGREnvelope extent)
 	{
 		if(bandValues[0] < threshold)
 		{
@@ -50,43 +40,23 @@ namespace rsgis{namespace img{
 		}
 	}
 	
-	void RSGISCreatePixelPolygons::calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) 
-	{
-		throw RSGISImageCalcException("Not Implemented");
-	}
-	
-	void RSGISCreatePixelPolygons::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
-	{
-		throw RSGISImageCalcException("Not Implemented");
-	}
-	
-	bool RSGISCreatePixelPolygons::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) 
-	{
-		throw RSGISImageCalcException("Not Implemented");
-	}
-	
 	RSGISCreatePixelPolygons::~RSGISCreatePixelPolygons()
 	{
 		
 	}
 	
-	geos::geom::Polygon* RSGISCreatePixelPolygons::createPolygonFromEnv(geos::geom::Envelope env)
+	OGRPolygon* RSGISCreatePixelPolygons::createPolygonFromEnv(OGREnvelope env)
 	{
-        std::vector<geos::geom::Coordinate> *coords = new std::vector<geos::geom::Coordinate>();
-		
-		coords->push_back(geos::geom::Coordinate(env.getMaxX(), env.getMaxY(), 0));
-		coords->push_back(geos::geom::Coordinate(env.getMaxX(), env.getMinY(), 0));
-		coords->push_back(geos::geom::Coordinate(env.getMinX(), env.getMinY(), 0));
-		coords->push_back(geos::geom::Coordinate(env.getMinX(), env.getMaxY(), 0));
-		coords->push_back(geos::geom::Coordinate(env.getMaxX(), env.getMaxY(), 0));
-		
-		geos::geom::CoordinateArraySequence *coordSeq = new geos::geom::CoordinateArraySequence(coords);
-		
-		const geos::geom::GeometryFactory* geosGeomFactory = rsgis::utils::RSGISGEOSFactoryGenerator::getInstance()->getFactory();
-		geos::geom::LinearRing *linearRingShell = new geos::geom::LinearRing(coordSeq, geosGeomFactory);
-		geos::geom::Polygon *polygonGeom = geosGeomFactory->createPolygon(linearRingShell, NULL);
-		
-		return polygonGeom;
+        OGRLinearRing *ogrRing = new OGRLinearRing();
+        ogrRing->addPoint(env.MinX, env.MaxY, 0);
+        ogrRing->addPoint(env.MaxX, env.MaxY, 0);
+        ogrRing->addPoint(env.MaxX, env.MinY, 0);
+        ogrRing->addPoint(env.MinX, env.MinY, 0);
+        ogrRing->addPoint(env.MinX, env.MaxY, 0);
+
+        OGRPolygon *ogrPoly = new OGRPolygon();
+        ogrPoly->addRingDirectly(ogrRing);
+		return ogrPoly;
 	}
 
 }}

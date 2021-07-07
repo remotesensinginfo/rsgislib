@@ -27,8 +27,8 @@
 #include "common/RSGISImageException.h"
 
 #include "img/RSGISImageUtils.h"
-
 #include "vec/RSGISVectorUtils.h"
+#include "vec/RSGISVectorOutputException.h"
 
 #include "classifier/RSGISRATClassificationUtils.h"
 #include "classifier/RSGISGenAccuracyPoints.h"
@@ -116,7 +116,7 @@ namespace rsgis{ namespace cmds {
     }
     
     
-    void executeGenerateRandomAccuracyPts(std::string classImage, std::string outputShp, std::string classImgCol, std::string classImgVecCol, std::string classRefVecCol, unsigned int numPts, unsigned int seed, bool force)
+    void executeGenerateRandomAccuracyPts(std::string classImage, std::string outputVecFile, std::string outputVecLyr, std::string outVecFormat, std::string classImgCol, std::string classImgVecCol, std::string classRefVecCol, unsigned int numPts, unsigned int seed, bool force)
     {
         try
         {
@@ -132,28 +132,38 @@ namespace rsgis{ namespace cmds {
             
             rsgis::utils::RSGISFileUtils fileUtils;
             rsgis::vec::RSGISVectorUtils vecUtils;
-            
-            outputShp = boost::filesystem::absolute(outputShp).string();
-            std::string SHPFileOutLayer = vecUtils.getLayerName(outputShp);
-            
-            GDALDriver *shpFiledriver = NULL;
-            GDALDataset *outputSHPDS = NULL;
-            OGRLayer *outputSHPLayer = NULL;
+
+            outputVecFile = boost::filesystem::absolute(outputVecFile).string();
+
+            GDALDriver *vecDriver = NULL;
+            GDALDataset *outVecDS = NULL;
+            OGRLayer *outVecLyrObj = NULL;
             OGRSpatialReference* ogrSpatialRef = NULL;
-            
-            std::string outputDIR = "";
-            
-            outputDIR = fileUtils.getFileDirectoryPath(outputShp);
-            
-            if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
+
+            if(outVecFormat == "ESRI Shapefile")
             {
-                if(force)
+                std::string outputDIR = fileUtils.getFileDirectoryPath(outputVecFile);
+                if (vecUtils.checkDIR4SHP(outputDIR, outputVecLyr))
                 {
-                    vecUtils.deleteSHP(outputDIR, SHPFileOutLayer);
+                    if (force)
+                    {
+                        vecUtils.deleteSHP(outputDIR, outputVecLyr);
+                    }
+                    else
+                    {
+                        throw RSGISException("Vector file already exists, either delete or select force.");
+                    }
+                }
+            }
+            else
+            {
+                if(fileUtils.checkFilePresent(outputVecFile) & force)
+                {
+                    fileUtils.removeFileIfPresent(outputVecFile);
                 }
                 else
                 {
-                    throw RSGISException("Shapefile already exists, either delete or select force.");
+                    throw RSGISException("Vector file already exists, either delete or select force.");
                 }
             }
             ogrSpatialRef = new OGRSpatialReference(imgDataset->GetProjectionRef());
@@ -163,30 +173,29 @@ namespace rsgis{ namespace cmds {
             // Create Output Shapfile.
             //
             /////////////////////////////////////
-            const char *pszDriverName = "ESRI Shapefile";
-            shpFiledriver = GetGDALDriverManager()->GetDriverByName(pszDriverName);
-            if( shpFiledriver == NULL )
+            vecDriver = GetGDALDriverManager()->GetDriverByName(outVecFormat.c_str());
+            if( vecDriver == NULL )
             {
-                throw rsgis::vec::RSGISVectorOutputException("SHP driver not available.");
+                throw rsgis::vec::RSGISVectorOutputException("Vector driver not available: " + outVecFormat);
             }
-            outputSHPDS = shpFiledriver->Create(outputShp.c_str(), 0, 0, 0, GDT_Unknown, NULL);
-            if( outputSHPDS == NULL )
+            outVecDS = vecDriver->Create(outputVecFile.c_str(), 0, 0, 0, GDT_Unknown, NULL);
+            if( outVecDS == NULL )
             {
-                std::string message = std::string("Could not create vector file ") + outputShp;
+                std::string message = std::string("Could not create vector file ") + outputVecFile;
                 throw rsgis::vec::RSGISVectorOutputException(message.c_str());
             }
-            outputSHPLayer = outputSHPDS->CreateLayer(SHPFileOutLayer.c_str(), ogrSpatialRef, wkbPoint, NULL );
-            if( outputSHPLayer == NULL )
+            outVecLyrObj = outVecDS->CreateLayer(outputVecLyr.c_str(), ogrSpatialRef, wkbPoint, NULL );
+            if( outVecLyrObj == NULL )
             {
-                std::string message = std::string("Could not create vector layer ") + SHPFileOutLayer;
+                std::string message = std::string("Could not create vector layer ") + outputVecLyr;
                 throw rsgis::vec::RSGISVectorOutputException(message.c_str());
             }
             
             rsgis::classifier::RSGISGenAccuracyPoints genAccPts;
-            genAccPts.generateRandomPointsVecOut(imgDataset, outputSHPLayer, classImgCol, classImgVecCol, classRefVecCol, numPts, seed);
+            genAccPts.generateRandomPointsVecOut(imgDataset, outVecLyrObj, classImgCol, classImgVecCol, classRefVecCol, numPts, seed);
 
             GDALClose(imgDataset);
-            GDALClose(outputSHPDS);
+            GDALClose(outVecDS);
         }
         catch(rsgis::RSGISException &e)
         {
@@ -199,7 +208,7 @@ namespace rsgis{ namespace cmds {
     }
 
     
-    void executeGenerateStratifiedRandomAccuracyPts(std::string classImage, std::string outputShp, std::string classImgCol, std::string classImgVecCol, std::string classRefVecCol, unsigned int numPtsPerClass, unsigned int seed, bool force, bool usePxlLst)
+    void executeGenerateStratifiedRandomAccuracyPts(std::string classImage, std::string outputVecFile, std::string outputVecLyr, std::string outVecFormat, std::string classImgCol, std::string classImgVecCol, std::string classRefVecCol, unsigned int numPtsPerClass, unsigned int seed, bool force, bool usePxlLst)
     {
         try
         {
@@ -215,28 +224,38 @@ namespace rsgis{ namespace cmds {
             
             rsgis::utils::RSGISFileUtils fileUtils;
             rsgis::vec::RSGISVectorUtils vecUtils;
-            
-            outputShp = boost::filesystem::absolute(outputShp).string();
-            std::string SHPFileOutLayer = vecUtils.getLayerName(outputShp);
-            
-            GDALDriver *shpFiledriver = NULL;
-            GDALDataset *outputSHPDS = NULL;
-            OGRLayer *outputSHPLayer = NULL;
+
+            outputVecFile = boost::filesystem::absolute(outputVecFile).string();
+
+            GDALDriver *vecDriver = NULL;
+            GDALDataset *outputVecDS = NULL;
+            OGRLayer *outputVecLyrObj = NULL;
             OGRSpatialReference* ogrSpatialRef = NULL;
-            
-            std::string outputDIR = "";
-            
-            outputDIR = fileUtils.getFileDirectoryPath(outputShp);
-            
-            if(vecUtils.checkDIR4SHP(outputDIR, SHPFileOutLayer))
+
+            if(outVecFormat == "ESRI Shapefile")
             {
-                if(force)
+                std::string outputDIR = fileUtils.getFileDirectoryPath(outputVecFile);
+                if (vecUtils.checkDIR4SHP(outputDIR, outputVecLyr))
                 {
-                    vecUtils.deleteSHP(outputDIR, SHPFileOutLayer);
+                    if (force)
+                    {
+                        vecUtils.deleteSHP(outputDIR, outputVecLyr);
+                    }
+                    else
+                    {
+                        throw RSGISException("Vector file already exists, either delete or select force.");
+                    }
+                }
+            }
+            else
+            {
+                if(fileUtils.checkFilePresent(outputVecFile) & force)
+                {
+                    fileUtils.removeFileIfPresent(outputVecFile);
                 }
                 else
                 {
-                    throw RSGISException("Shapefile already exists, either delete or select force.");
+                    throw RSGISException("Vector file already exists, either delete or select force.");
                 }
             }
             ogrSpatialRef = new OGRSpatialReference(imgDataset->GetProjectionRef());
@@ -246,37 +265,36 @@ namespace rsgis{ namespace cmds {
             // Create Output Shapfile.
             //
             /////////////////////////////////////
-            const char *pszDriverName = "ESRI Shapefile";
-            shpFiledriver = GetGDALDriverManager()->GetDriverByName(pszDriverName);
-            if( shpFiledriver == NULL )
+            vecDriver = GetGDALDriverManager()->GetDriverByName(outVecFormat.c_str());
+            if( vecDriver == NULL )
             {
-                throw rsgis::vec::RSGISVectorOutputException("SHP driver not available.");
+                throw rsgis::vec::RSGISVectorOutputException("Vector driver not available: " + outVecFormat);
             }
-            outputSHPDS = shpFiledriver->Create(outputShp.c_str(), 0, 0, 0, GDT_Unknown, NULL );
-            if( outputSHPDS == NULL )
+            outputVecDS = vecDriver->Create(outputVecFile.c_str(), 0, 0, 0, GDT_Unknown, NULL );
+            if( outputVecDS == NULL )
             {
-                std::string message = std::string("Could not create vector file ") + outputShp;
+                std::string message = std::string("Could not create vector file ") + outputVecFile;
                 throw rsgis::vec::RSGISVectorOutputException(message.c_str());
             }
-            outputSHPLayer = outputSHPDS->CreateLayer(SHPFileOutLayer.c_str(), ogrSpatialRef, wkbPoint, NULL );
-            if( outputSHPLayer == NULL )
+            outputVecLyrObj = outputVecDS->CreateLayer(outputVecLyr.c_str(), ogrSpatialRef, wkbPoint, NULL );
+            if( outputVecLyrObj == NULL )
             {
-                std::string message = std::string("Could not create vector layer ") + SHPFileOutLayer;
+                std::string message = std::string("Could not create vector layer ") + outputVecLyr;
                 throw rsgis::vec::RSGISVectorOutputException(message.c_str());
             }
             
             rsgis::classifier::RSGISGenAccuracyPoints genAccPts;
             if(!usePxlLst)
             {
-                genAccPts.generateStratifiedRandomPointsVecOut(imgDataset, outputSHPLayer, classImgCol, classImgVecCol, classRefVecCol, numPtsPerClass, seed);
+                genAccPts.generateStratifiedRandomPointsVecOut(imgDataset, outputVecLyrObj, classImgCol, classImgVecCol, classRefVecCol, numPtsPerClass, seed);
             }
             else
             {
-                genAccPts.generateStratifiedRandomPointsVecOutUsePxlLst(imgDataset, outputSHPLayer, classImgCol, classImgVecCol, classRefVecCol, numPtsPerClass, seed);
+                genAccPts.generateStratifiedRandomPointsVecOutUsePxlLst(imgDataset, outputVecLyrObj, classImgCol, classImgVecCol, classRefVecCol, numPtsPerClass, seed);
             }
             
             GDALClose(imgDataset);
-            GDALClose(outputSHPDS);
+            GDALClose(outputVecDS);
         }
         catch(rsgis::RSGISException &e)
         {
@@ -288,7 +306,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    void executePopClassInfoAccuracyPts(std::string classImage, std::string shpFile, std::string classImgCol, std::string classImgVecCol, std::string classRefVecCol, bool addRefCol)
+    void executePopClassInfoAccuracyPts(std::string classImage, std::string vecFile, std::string vecLyr, std::string classImgCol, std::string classImgVecCol, std::string classRefVecCol, bool addRefCol)
     {
         try
         {
@@ -303,35 +321,33 @@ namespace rsgis{ namespace cmds {
             }
             
             rsgis::utils::RSGISFileUtils fileUtils;
-            rsgis::vec::RSGISVectorUtils vecUtils;
-            
-            shpFile = boost::filesystem::absolute(shpFile).string();
-            std::string SHPFileInLayer = vecUtils.getLayerName(shpFile);
-            
+
+            vecFile = boost::filesystem::absolute(vecFile).string();
+
             /////////////////////////////////////
             //
-            // Open Input Shapfile.
+            // Open Input Vector File.
             //
             /////////////////////////////////////
-            GDALDataset *inputSHPDS = NULL;
-            inputSHPDS = (GDALDataset*) GDALOpenEx(shpFile.c_str(), GDAL_OF_UPDATE, NULL, NULL, NULL);  
-            if(inputSHPDS == NULL)
+            GDALDataset *inputVecDS = NULL;
+            inputVecDS = (GDALDataset*) GDALOpenEx(vecFile.c_str(), GDAL_OF_UPDATE, NULL, NULL, NULL);
+            if(inputVecDS == NULL)
             {
-                std::string message = std::string("Could not open vector file ") + shpFile;
+                std::string message = std::string("Could not open vector file ") + vecFile;
                 throw RSGISFileException(message.c_str());
             }
-            OGRLayer *inputSHPLayer = inputSHPDS->GetLayerByName(SHPFileInLayer.c_str());
-            if(inputSHPLayer == NULL)
+            OGRLayer *inVecLyrObj = inputVecDS->GetLayerByName(vecLyr.c_str());
+            if(inVecLyrObj == NULL)
             {
-                std::string message = std::string("Could not open vector layer ") + SHPFileInLayer;
+                std::string message = std::string("Could not open vector layer ") + vecLyr;
                 throw RSGISFileException(message.c_str());
             }
             
             rsgis::classifier::RSGISGenAccuracyPoints genAccPts;
-            genAccPts.popClassInfo2Vec(imgDataset, inputSHPLayer, classImgCol, classImgVecCol, classRefVecCol, addRefCol);
+            genAccPts.popClassInfo2Vec(imgDataset, inVecLyrObj, classImgCol, classImgVecCol, classRefVecCol, addRefCol);
             
             GDALClose(imgDataset);
-            GDALClose(inputSHPDS);
+            GDALClose(inputVecDS);
         }
         catch(rsgis::RSGISException &e)
         {

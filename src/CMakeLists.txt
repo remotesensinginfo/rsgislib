@@ -138,24 +138,24 @@ set(LIB_COMMANDS_CPP
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdElevationTools.h
     ${RSGIS_SRC_CMDS_DIR}/RSGISCmdFilterImages.cpp
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdFilterImages.h
-	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageCalc.cpp 
-	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageCalc.h 
-	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageCalibration.cpp 
+	#${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageCalc.cpp
+	#${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageCalc.h
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageCalibration.cpp
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageCalibration.h
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageMorphology.cpp
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageMorphology.h
     ${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageRegistration.cpp
     ${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageRegistration.h
-	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageUtils.cpp	
-	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageUtils.h 
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageUtils.cpp
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageUtils.h
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdSegmentation.cpp
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdSegmentation.h
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdRasterGIS.cpp
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdRasterGIS.h
-	${RSGIS_SRC_CMDS_DIR}/RSGISCmdVectorUtils.cpp
-	${RSGIS_SRC_CMDS_DIR}/RSGISCmdVectorUtils.h
-	${RSGIS_SRC_CMDS_DIR}/RSGISCmdZonalStats.cpp
-	${RSGIS_SRC_CMDS_DIR}/RSGISCmdZonalStats.h
+	#${RSGIS_SRC_CMDS_DIR}/RSGISCmdVectorUtils.cpp
+	#${RSGIS_SRC_CMDS_DIR}/RSGISCmdVectorUtils.h
+	#${RSGIS_SRC_CMDS_DIR}/RSGISCmdZonalStats.cpp
+	#${RSGIS_SRC_CMDS_DIR}/RSGISCmdZonalStats.h
     ${RSGIS_SRC_CMDS_DIR}/RSGISCmdElevationTools.cpp
     ${RSGIS_SRC_CMDS_DIR}/RSGISCmdElevationTools.h
 	)
@@ -371,143 +371,106 @@ set(LIB_IMG_CPP
 	${RSGIS_SRC_IMG_DIR}/RSGISApplyEigenvectors.h
 	${RSGIS_SRC_IMG_DIR}/RSGISBandMath.cpp
 	${RSGIS_SRC_IMG_DIR}/RSGISBandMath.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISCalcCorrelationCoefficient.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISCalcCorrelationCoefficient.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISCalcCovariance.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISCalcCovariance.h
+	${RSGIS_SRC_IMG_DIR}/RSGISCalcCorrelationCoefficient.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISCalcCorrelationCoefficient.h
+	${RSGIS_SRC_IMG_DIR}/RSGISCalcCovariance.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISCalcCovariance.h
 	${RSGIS_SRC_IMG_DIR}/RSGISCalcImage.cpp 
 	${RSGIS_SRC_IMG_DIR}/RSGISCalcImage.h 
-	#${RSGIS_SRC_IMG_DIR}/RSGISCalcEditImage.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISCalcEditImage.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISCalcImageMatrix.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISCalcImageMatrix.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISCalcImageSingle.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISCalcImageSingle.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISCalcImageSingleValue.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISCalcImageSingleValue.h
+	${RSGIS_SRC_IMG_DIR}/RSGISCalcEditImage.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISCalcEditImage.h
+	${RSGIS_SRC_IMG_DIR}/RSGISCalcImageMatrix.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISCalcImageMatrix.h
+	${RSGIS_SRC_IMG_DIR}/RSGISCalcImageSingle.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISCalcImageSingle.h
+	${RSGIS_SRC_IMG_DIR}/RSGISCalcImageSingleValue.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISCalcImageSingleValue.h
 	${RSGIS_SRC_IMG_DIR}/RSGISCalcImageValue.cpp 
-	${RSGIS_SRC_IMG_DIR}/RSGISCalcImageValue.h 
-	#${RSGIS_SRC_IMG_DIR}/RSGISColourUpImage.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISColourUpImage.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISCopyImage.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISCopyImage.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISCopyImageBands.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISCopyImageBands.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISCreateTestImages.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISCreateTestImages.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISDarkTargetIdentification.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISDarkTargetIdentification.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISDefiniensCSVRasterise.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISDefiniensCSVRasterise.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISExport2DScatterPTxt.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISExport2DScatterPTxt.h
+	${RSGIS_SRC_IMG_DIR}/RSGISCalcImageValue.h
+	${RSGIS_SRC_IMG_DIR}/RSGISCopyImage.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISCopyImage.h
+	${RSGIS_SRC_IMG_DIR}/RSGISCopyImageBands.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISCopyImageBands.h
 	${RSGIS_SRC_IMG_DIR}/RSGISExtractImageValues.cpp
 	${RSGIS_SRC_IMG_DIR}/RSGISExtractImageValues.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISFFTException.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISFFTException.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISFFTProcessing.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISFFTProcessing.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISImageBand2Matrix.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISImageBand2Matrix.h
+	${RSGIS_SRC_IMG_DIR}/RSGISImageBand2Matrix.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISImageBand2Matrix.h
 	${RSGIS_SRC_IMG_DIR}/RSGISImageBandException.cpp
 	${RSGIS_SRC_IMG_DIR}/RSGISImageBandException.h
 	${RSGIS_SRC_IMG_DIR}/RSGISImageCalcException.cpp
 	${RSGIS_SRC_IMG_DIR}/RSGISImageCalcException.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISImageCalcValueBaysianNoPrior.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISImageCalcValueBaysianNoPrior.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISImageCalcValueBaysianPrior.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISImageCalcValueBaysianPrior.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISImageInterpolation.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISImageInterpolation.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISImageInterpolator.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISImageInterpolator.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISImageMosaic.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISImageMosaic.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISImageNormalisation.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISImageNormalisation.h
+	${RSGIS_SRC_IMG_DIR}/RSGISImageCalcValueBaysianNoPrior.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISImageCalcValueBaysianNoPrior.h
+	${RSGIS_SRC_IMG_DIR}/RSGISImageCalcValueBaysianPrior.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISImageCalcValueBaysianPrior.h
+	${RSGIS_SRC_IMG_DIR}/RSGISImageMosaic.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISImageMosaic.h
+	${RSGIS_SRC_IMG_DIR}/RSGISImageNormalisation.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISImageNormalisation.h
 	${RSGIS_SRC_IMG_DIR}/RSGISImageStatistics.cpp
 	${RSGIS_SRC_IMG_DIR}/RSGISImageStatistics.h
 	${RSGIS_SRC_IMG_DIR}/RSGISImageUtils.cpp
 	${RSGIS_SRC_IMG_DIR}/RSGISImageUtils.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISMaskImage.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISMaskImage.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISMeanVector.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISMeanVector.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISParseColourException.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISParseColourException.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISPolygonPixelCount.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISPolygonPixelCount.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISPopulateMatrix.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISPopulateMatrix.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISProjectionStrings.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISStandardiseImage.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISStandardiseImage.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISCreatePixelPolygons.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISCreatePixelPolygons.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISSavitzkyGolaySmoothingFilters.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISSavitzkyGolaySmoothingFilters.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISConvertSpectralToUnitArea.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISConvertSpectralToUnitArea.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISReplaceValuesLessThanGivenValue.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISReplaceValuesLessThanGivenValue.h
+	${RSGIS_SRC_IMG_DIR}/RSGISMaskImage.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISMaskImage.h
+	${RSGIS_SRC_IMG_DIR}/RSGISMeanVector.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISMeanVector.h
+	${RSGIS_SRC_IMG_DIR}/RSGISPolygonPixelCount.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISPolygonPixelCount.h
+	${RSGIS_SRC_IMG_DIR}/RSGISPopulateMatrix.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISPopulateMatrix.h
+	${RSGIS_SRC_IMG_DIR}/RSGISStandardiseImage.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISStandardiseImage.h
+	${RSGIS_SRC_IMG_DIR}/RSGISCreatePixelPolygons.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISCreatePixelPolygons.h
+	${RSGIS_SRC_IMG_DIR}/RSGISSavitzkyGolaySmoothingFilters.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISSavitzkyGolaySmoothingFilters.h
+	${RSGIS_SRC_IMG_DIR}/RSGISConvertSpectralToUnitArea.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISConvertSpectralToUnitArea.h
 	${RSGIS_SRC_IMG_DIR}/RSGISPixelInPoly.h
 	${RSGIS_SRC_IMG_DIR}/RSGISPixelInPoly.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISImageMaths.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISImageMaths.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISCumulativeArea.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISCumulativeArea.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISStretchImage.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISStretchImage.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISColourUsingHue.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISColourUsingHue.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISCalculateImageMovementSpeed.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISCalculateImageMovementSpeed.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISCountValsAboveThresInCol.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISCountValsAboveThresInCol.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISCalcRMSE.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISCalcRMSE.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISApplyFunction.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISApplyFunction.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISGenerateImageFromXYZData.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISGenerateImageFromXYZData.h
+	${RSGIS_SRC_IMG_DIR}/RSGISImageMaths.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISImageMaths.h
+	${RSGIS_SRC_IMG_DIR}/RSGISCumulativeArea.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISCumulativeArea.h
+	${RSGIS_SRC_IMG_DIR}/RSGISStretchImage.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISStretchImage.h
+	${RSGIS_SRC_IMG_DIR}/RSGISCountValsAboveThresInCol.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISCountValsAboveThresInCol.h
+	${RSGIS_SRC_IMG_DIR}/RSGISCalcRMSE.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISCalcRMSE.h
 	${RSGIS_SRC_IMG_DIR}/RSGISExtractImagePixelsInPolygon.cpp
 	${RSGIS_SRC_IMG_DIR}/RSGISExtractImagePixelsInPolygon.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISCalcDist2Geom.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISCalcDist2Geom.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISPanSharpen.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISPanSharpen.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISCalcImgAlongsideOut.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISCalcImgAlongsideOut.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISClumpImage.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISClumpImage.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISLinearSpectralUnmixing.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISLinearSpectralUnmixing.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISImageClustering.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISImageClustering.h
-    #${RSGIS_SRC_IMG_DIR}/RSGISImageComposite.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISImageComposite.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISRelabelPixelValuesFromLUT.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISRelabelPixelValuesFromLUT.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISPopWithStats.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISPopWithStats.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISGenHistogram.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISGenHistogram.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISSampleImage.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISSampleImage.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISImageWindowStats.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISImageWindowStats.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISFitFunction2Pxls.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISFitFunction2Pxls.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISCalcImgValProb.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISCalcImgValProb.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISApplyGainOffset2Img.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISApplyGainOffset2Img.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISSharpenLowResImagery.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISSharpenLowResImagery.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISImgSummaryStatsFromMultiResImgs.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISImgSummaryStatsFromMultiResImgs.h
-	#${RSGIS_SRC_IMG_DIR}/RSGISCalcImageLocalMin.cpp
-	#${RSGIS_SRC_IMG_DIR}/RSGISCalcImageLocalMin.h
+	${RSGIS_SRC_IMG_DIR}/RSGISPanSharpen.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISPanSharpen.h
+	${RSGIS_SRC_IMG_DIR}/RSGISLinearSpectralUnmixing.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISLinearSpectralUnmixing.h
+	${RSGIS_SRC_IMG_DIR}/RSGISImageClustering.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISImageClustering.h
+    ${RSGIS_SRC_IMG_DIR}/RSGISImageComposite.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISImageComposite.h
+	${RSGIS_SRC_IMG_DIR}/RSGISRelabelPixelValuesFromLUT.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISRelabelPixelValuesFromLUT.h
+	${RSGIS_SRC_IMG_DIR}/RSGISPopWithStats.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISPopWithStats.h
+	${RSGIS_SRC_IMG_DIR}/RSGISGenHistogram.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISGenHistogram.h
+	${RSGIS_SRC_IMG_DIR}/RSGISSampleImage.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISSampleImage.h
+	${RSGIS_SRC_IMG_DIR}/RSGISImageWindowStats.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISImageWindowStats.h
+	${RSGIS_SRC_IMG_DIR}/RSGISFitFunction2Pxls.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISFitFunction2Pxls.h
+	${RSGIS_SRC_IMG_DIR}/RSGISCalcImgValProb.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISCalcImgValProb.h
+	${RSGIS_SRC_IMG_DIR}/RSGISApplyGainOffset2Img.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISApplyGainOffset2Img.h
+	${RSGIS_SRC_IMG_DIR}/RSGISSharpenLowResImagery.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISSharpenLowResImagery.h
+	${RSGIS_SRC_IMG_DIR}/RSGISImgSummaryStatsFromMultiResImgs.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISImgSummaryStatsFromMultiResImgs.h
+	${RSGIS_SRC_IMG_DIR}/RSGISCalcImageLocalMin.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISCalcImageLocalMin.h
 	)
 ###############################################################################
 
@@ -919,74 +882,74 @@ set(LIB_VEC_ZONALSTATS_CPP
 )
 
 set(LIB_VEC_UTILS_CPP
-	${RSGIS_SRC_VEC_DIR}/RSGISAppendToVectorLayer.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISAppendToVectorLayer.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISCalcPolygonArea.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISCalcPolygonArea.h
-	${RSGIS_SRC_VEC_DIR}/RSGISCalcDistanceStats.cpp
-	${RSGIS_SRC_VEC_DIR}/RSGISCalcDistanceStats.h
-	${RSGIS_SRC_VEC_DIR}/RSGISClusterData.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISClusterData.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISClusteredClassificationPolygon.cpp
-	${RSGIS_SRC_VEC_DIR}/RSGISClusteredClassificationPolygon.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISConvertToASCII.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISConvertToASCII.h
-	${RSGIS_SRC_VEC_DIR}/RSGISCopyCheckPolygons.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISCopyCheckPolygons.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISCopyPolygonsInPolygon.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISCopyPolygonsInPolygon.h
-	${RSGIS_SRC_VEC_DIR}/RSGISCopyFeatures.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISCopyFeatures.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISAttCountPolyIntersect.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISAttCountPolyIntersect.h
-	${RSGIS_SRC_VEC_DIR}/RSGISCreateListOfAttributeValues.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISCreateListOfAttributeValues.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISDropSmallPolygons.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISDropSmallPolygons.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISGenerateConvexHullGroups.cpp
-	${RSGIS_SRC_VEC_DIR}/RSGISGenerateConvexHullGroups.h
-	${RSGIS_SRC_VEC_DIR}/RSGISGeometryRotateAroundFixedPoint.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISGeometryRotateAroundFixedPoint.h
-	${RSGIS_SRC_VEC_DIR}/RSGISGeometryToCircle.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISGeometryToCircle.h
-	${RSGIS_SRC_VEC_DIR}/RSGISGetAttributeValues.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISGetAttributeValues.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISGetOGRGeometries.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISGetOGRGeometries.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISIdentifyTopLayerAttributes.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISIdentifyTopLayerAttributes.h
-	${RSGIS_SRC_VEC_DIR}/RSGISLabelPolygonsFromClassification.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISLabelPolygonsFromClassification.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISParseLandXML.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISParseLandXML.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISPixelAreaCountInPolygon.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISPixelAreaCountInPolygon.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISPrintFIDs.cpp
-	${RSGIS_SRC_VEC_DIR}/RSGISPrintFIDs.h
-	${RSGIS_SRC_VEC_DIR}/RSGISRasterizeVector.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISRasterizeVector.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISRemoveContainedPolygons.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISRemoveContainedPolygons.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISRemovePolygonHoles.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISRemovePolygonHoles.h 
-	${RSGIS_SRC_VEC_DIR}/RSGIS2DScatterPlotVariables.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGIS2DScatterPlotVariables.h
-	${RSGIS_SRC_VEC_DIR}/RSGISSplitSmallLargePolygons.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISSplitSmallLargePolygons.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISVectorAttributeFindReplace.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISVectorAttributeFindReplace.h
-	${RSGIS_SRC_VEC_DIR}/RSGISVectorMaths.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISVectorMaths.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISVectorMorphology.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISVectorMorphology.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISVectorOutputException.cpp 
+	#${RSGIS_SRC_VEC_DIR}/RSGISAppendToVectorLayer.cpp
+	#${RSGIS_SRC_VEC_DIR}/RSGISAppendToVectorLayer.h
+	#${RSGIS_SRC_VEC_DIR}/RSGISCalcPolygonArea.cpp
+	#${RSGIS_SRC_VEC_DIR}/RSGISCalcPolygonArea.h
+	#${RSGIS_SRC_VEC_DIR}/RSGISCalcDistanceStats.cpp
+	#${RSGIS_SRC_VEC_DIR}/RSGISCalcDistanceStats.h
+	#${RSGIS_SRC_VEC_DIR}/RSGISClusterData.cpp
+	#${RSGIS_SRC_VEC_DIR}/RSGISClusterData.h
+	#${RSGIS_SRC_VEC_DIR}/RSGISClusteredClassificationPolygon.cpp
+	#${RSGIS_SRC_VEC_DIR}/RSGISClusteredClassificationPolygon.h
+	#${RSGIS_SRC_VEC_DIR}/RSGISConvertToASCII.cpp
+	#${RSGIS_SRC_VEC_DIR}/RSGISConvertToASCII.h
+	#${RSGIS_SRC_VEC_DIR}/RSGISCopyCheckPolygons.cpp
+	#${RSGIS_SRC_VEC_DIR}/RSGISCopyCheckPolygons.h
+	#${RSGIS_SRC_VEC_DIR}/RSGISCopyPolygonsInPolygon.cpp
+	#${RSGIS_SRC_VEC_DIR}/RSGISCopyPolygonsInPolygon.h
+	#${RSGIS_SRC_VEC_DIR}/RSGISCopyFeatures.cpp
+	#${RSGIS_SRC_VEC_DIR}/RSGISCopyFeatures.h
+	#${RSGIS_SRC_VEC_DIR}/RSGISAttCountPolyIntersect.cpp
+	#${RSGIS_SRC_VEC_DIR}/RSGISAttCountPolyIntersect.h
+	#${RSGIS_SRC_VEC_DIR}/RSGISCreateListOfAttributeValues.h
+	#${RSGIS_SRC_VEC_DIR}/RSGISCreateListOfAttributeValues.cpp
+	#${RSGIS_SRC_VEC_DIR}/RSGISDropSmallPolygons.cpp
+	#${RSGIS_SRC_VEC_DIR}/RSGISDropSmallPolygons.h
+	#${RSGIS_SRC_VEC_DIR}/RSGISGenerateConvexHullGroups.cpp
+	#${RSGIS_SRC_VEC_DIR}/RSGISGenerateConvexHullGroups.h
+	#${RSGIS_SRC_VEC_DIR}/RSGISGeometryRotateAroundFixedPoint.cpp
+	#${RSGIS_SRC_VEC_DIR}/RSGISGeometryRotateAroundFixedPoint.h
+	#${RSGIS_SRC_VEC_DIR}/RSGISGeometryToCircle.cpp
+	#${RSGIS_SRC_VEC_DIR}/RSGISGeometryToCircle.h
+	#${RSGIS_SRC_VEC_DIR}/RSGISGetAttributeValues.cpp
+	#${RSGIS_SRC_VEC_DIR}/RSGISGetAttributeValues.h
+	#${RSGIS_SRC_VEC_DIR}/RSGISGetOGRGeometries.cpp
+	#${RSGIS_SRC_VEC_DIR}/RSGISGetOGRGeometries.h
+	#${RSGIS_SRC_VEC_DIR}/RSGISIdentifyTopLayerAttributes.cpp
+	#${RSGIS_SRC_VEC_DIR}/RSGISIdentifyTopLayerAttributes.h
+	#${RSGIS_SRC_VEC_DIR}/RSGISLabelPolygonsFromClassification.cpp
+	#${RSGIS_SRC_VEC_DIR}/RSGISLabelPolygonsFromClassification.h
+	#${RSGIS_SRC_VEC_DIR}/RSGISParseLandXML.cpp
+	#${RSGIS_SRC_VEC_DIR}/RSGISParseLandXML.h
+	#${RSGIS_SRC_VEC_DIR}/RSGISPixelAreaCountInPolygon.cpp
+	#${RSGIS_SRC_VEC_DIR}/RSGISPixelAreaCountInPolygon.h
+	#${RSGIS_SRC_VEC_DIR}/RSGISPrintFIDs.cpp
+	#${RSGIS_SRC_VEC_DIR}/RSGISPrintFIDs.h
+	#${RSGIS_SRC_VEC_DIR}/RSGISRasterizeVector.cpp
+	#${RSGIS_SRC_VEC_DIR}/RSGISRasterizeVector.h
+	#${RSGIS_SRC_VEC_DIR}/RSGISRemoveContainedPolygons.cpp
+	#${RSGIS_SRC_VEC_DIR}/RSGISRemoveContainedPolygons.h
+	#${RSGIS_SRC_VEC_DIR}/RSGISRemovePolygonHoles.cpp
+	#${RSGIS_SRC_VEC_DIR}/RSGISRemovePolygonHoles.h
+	#${RSGIS_SRC_VEC_DIR}/RSGIS2DScatterPlotVariables.cpp
+	#${RSGIS_SRC_VEC_DIR}/RSGIS2DScatterPlotVariables.h
+	#${RSGIS_SRC_VEC_DIR}/RSGISSplitSmallLargePolygons.cpp
+	#${RSGIS_SRC_VEC_DIR}/RSGISSplitSmallLargePolygons.h
+	#${RSGIS_SRC_VEC_DIR}/RSGISVectorAttributeFindReplace.cpp
+	#${RSGIS_SRC_VEC_DIR}/RSGISVectorAttributeFindReplace.h
+	#${RSGIS_SRC_VEC_DIR}/RSGISVectorMaths.h
+	#${RSGIS_SRC_VEC_DIR}/RSGISVectorMaths.cpp
+	#${RSGIS_SRC_VEC_DIR}/RSGISVectorMorphology.cpp
+	#${RSGIS_SRC_VEC_DIR}/RSGISVectorMorphology.h
+	${RSGIS_SRC_VEC_DIR}/RSGISVectorOutputException.cpp
 	${RSGIS_SRC_VEC_DIR}/RSGISVectorOutputException.h
-	${RSGIS_SRC_VEC_DIR}/RSGISVectorSQLClassification.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISVectorSQLClassification.h 
-    ${RSGIS_SRC_VEC_DIR}/RSGISVectorUtils.cpp 
+	#${RSGIS_SRC_VEC_DIR}/RSGISVectorSQLClassification.cpp
+	#${RSGIS_SRC_VEC_DIR}/RSGISVectorSQLClassification.h
+    ${RSGIS_SRC_VEC_DIR}/RSGISVectorUtils.cpp
 	${RSGIS_SRC_VEC_DIR}/RSGISVectorUtils.h
-	${RSGIS_SRC_VEC_DIR}/RSGISPopulateFeatsElev.cpp
-	${RSGIS_SRC_VEC_DIR}/RSGISPopulateFeatsElev.h
+	#${RSGIS_SRC_VEC_DIR}/RSGISPopulateFeatsElev.cpp
+	#${RSGIS_SRC_VEC_DIR}/RSGISPopulateFeatsElev.h
 )
 
 
@@ -1127,13 +1090,14 @@ add_library( ${RSGISLIB_SEGMENTATION_LIB_NAME} ${LIB_SEGMENTATION_CPP} )
 target_link_libraries(${RSGISLIB_SEGMENTATION_LIB_NAME} ${RSGISLIB_COMMONS_LIB_NAME} ${RSGISLIB_MATHS_LIB_NAME}  ${RSGISLIB_UTILS_LIB_NAME} ${RSGISLIB_IMG_LIB_NAME} ${RSGISLIB_RASTERGIS_LIB_NAME} ${BOOST_LIBRARIES} ${GDAL_LIBRARIES} )
 
 #add_library( ${RSGISLIB_VECTOR_LIB_NAME} ${LIB_VEC_REPRESENTATION_CPP} ${LIB_VEC_PROCESSING_CPP} ${LIB_VEC_ZONALSTATS_CPP} ${LIB_VEC_UTILS_CPP} )
-#target_link_libraries(${RSGISLIB_VECTOR_LIB_NAME} ${RSGISLIB_COMMONS_LIB_NAME} ${RSGISLIB_MATHS_LIB_NAME}  ${RSGISLIB_UTILS_LIB_NAME} ${RSGISLIB_IMG_LIB_NAME} ${RSGISLIB_RASTERGIS_LIB_NAME} ${BOOST_LIBRARIES} ${GDAL_LIBRARIES} ${GEOS_LIBRARIES} ${XERCESC_LIBRARIES} ${MUPARSER_LIBRARIES} ${GMP_LIBRARIES} ${MPFR_LIBRARIES} ${KEA_LIBRARIES} )
+add_library( ${RSGISLIB_VECTOR_LIB_NAME} ${LIB_VEC_UTILS_CPP} )
+target_link_libraries(${RSGISLIB_VECTOR_LIB_NAME} ${RSGISLIB_COMMONS_LIB_NAME} ${RSGISLIB_MATHS_LIB_NAME}  ${RSGISLIB_UTILS_LIB_NAME} ${RSGISLIB_IMG_LIB_NAME} ${RSGISLIB_RASTERGIS_LIB_NAME} ${BOOST_LIBRARIES} ${GDAL_LIBRARIES} ${MUPARSER_LIBRARIES} )
 
 add_library( ${RSGISLIB_CLASSIFY_LIB_NAME} ${LIB_CLASSIFY_CPP} )
-target_link_libraries(${RSGISLIB_CLASSIFY_LIB_NAME} ${RSGISLIB_COMMONS_LIB_NAME} ${RSGISLIB_MATHS_LIB_NAME}  ${RSGISLIB_UTILS_LIB_NAME} ${RSGISLIB_IMG_LIB_NAME} ${RSGISLIB_RASTERGIS_LIB_NAME} ${BOOST_LIBRARIES} ${GDAL_LIBRARIES} ${GSL_LIBRARIES}  ) #${RSGISLIB_VECTOR_LIB_NAME}
+target_link_libraries(${RSGISLIB_CLASSIFY_LIB_NAME} ${RSGISLIB_COMMONS_LIB_NAME} ${RSGISLIB_MATHS_LIB_NAME}  ${RSGISLIB_UTILS_LIB_NAME} ${RSGISLIB_IMG_LIB_NAME} ${RSGISLIB_RASTERGIS_LIB_NAME} ${BOOST_LIBRARIES} ${GDAL_LIBRARIES} ${GSL_LIBRARIES}  )
 
 add_library( ${RSGISLIB_CMDSINTERFACE_LIB_NAME} ${LIB_COMMANDS_CPP} )
-target_link_libraries(${RSGISLIB_CMDSINTERFACE_LIB_NAME} ${RSGISLIB_COMMONS_LIB_NAME} ${RSGISLIB_MATHS_LIB_NAME} ${RSGISLIB_UTILS_LIB_NAME} ${RSGISLIB_IMG_LIB_NAME} ${RSGISLIB_VECTOR_LIB_NAME} ${RSGISLIB_CALIBRATION_LIB_NAME} ${RSGISLIB_CLASSIFY_LIB_NAME} ${RSGISLIB_DATASTRUCT_LIB_NAME} ${RSGISLIB_FILTERING_LIB_NAME} ${RSGISLIB_MODELING_LIB_NAME} ${RSGISLIB_RADAR_LIB_NAME} ${RSGISLIB_RASTERGIS_LIB_NAME} ${RSGISLIB_REGISTRATION_LIB_NAME} ${RSGISLIB_SEGMENTATION_LIB_NAME} ${BOOST_LIBRARIES} ${GDAL_LIBRARIES} ${GSL_LIBRARIES} ${MUPARSER_LIBRARIES} ${HDF5_LIBRARIES} ${GMP_LIBRARIES} ${MPFR_LIBRARIES} ${KEA_LIBRARIES} ${BOOST_LIBRARIES})
+target_link_libraries(${RSGISLIB_CMDSINTERFACE_LIB_NAME} ${RSGISLIB_COMMONS_LIB_NAME} ${RSGISLIB_MATHS_LIB_NAME} ${RSGISLIB_UTILS_LIB_NAME} ${RSGISLIB_IMG_LIB_NAME} ${RSGISLIB_CALIBRATION_LIB_NAME} ${RSGISLIB_CLASSIFY_LIB_NAME} ${RSGISLIB_DATASTRUCT_LIB_NAME} ${RSGISLIB_FILTERING_LIB_NAME} ${RSGISLIB_RASTERGIS_LIB_NAME} ${RSGISLIB_REGISTRATION_LIB_NAME} ${RSGISLIB_SEGMENTATION_LIB_NAME} ${RSGISLIB_VECTOR_LIB_NAME} ${BOOST_LIBRARIES} ${GDAL_LIBRARIES})
 
 ###############################################################################
 
@@ -1200,11 +1164,11 @@ PROPERTIES
         VERSION ${RSGISLIB_SEGMENTATION_VERSION}
 )
 
-#SET_TARGET_PROPERTIES(${RSGISLIB_VECTOR_LIB_NAME}
-#PROPERTIES
-#        SOVERSION ${RSGISLIB_VECTOR_VERSION}
-#        VERSION ${RSGISLIB_VECTOR_VERSION}
-#)
+SET_TARGET_PROPERTIES(${RSGISLIB_VECTOR_LIB_NAME}
+PROPERTIES
+        SOVERSION ${RSGISLIB_VECTOR_VERSION}
+        VERSION ${RSGISLIB_VECTOR_VERSION}
+)
 
 SET_TARGET_PROPERTIES(${RSGISLIB_CLASSIFY_LIB_NAME}
 PROPERTIES
@@ -1254,9 +1218,9 @@ install (TARGETS ${RSGISLIB_RASTERGIS_LIB_NAME} RUNTIME DESTINATION bin
 install (TARGETS ${RSGISLIB_SEGMENTATION_LIB_NAME} RUNTIME DESTINATION bin
             LIBRARY DESTINATION lib
             ARCHIVE DESTINATION lib)
-#install (TARGETS ${RSGISLIB_VECTOR_LIB_NAME} RUNTIME DESTINATION bin
-#            LIBRARY DESTINATION lib
-#            ARCHIVE DESTINATION lib)
+install (TARGETS ${RSGISLIB_VECTOR_LIB_NAME} RUNTIME DESTINATION bin
+            LIBRARY DESTINATION lib
+            ARCHIVE DESTINATION lib)
 install (TARGETS ${RSGISLIB_CLASSIFY_LIB_NAME} RUNTIME DESTINATION bin
             LIBRARY DESTINATION lib
             ARCHIVE DESTINATION lib)

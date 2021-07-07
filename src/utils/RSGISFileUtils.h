@@ -64,6 +64,7 @@ namespace rsgis{namespace utils{
             std::string getExtension(std::string filepath);
             std::string getFileDirectoryPath(std::string filepath);
             bool checkFilePresent(std::string file);
+            bool removeFileIfPresent(std::string file);
             ~RSGISFileUtils();
     };
     

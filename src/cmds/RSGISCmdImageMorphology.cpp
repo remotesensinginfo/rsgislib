@@ -157,7 +157,7 @@ namespace rsgis{ namespace cmds {
         }
     }
     
-    /** A function to calculate a morphological gradiance for an image */
+    /** A function to calculate a morphological gradiant for an image */
     void executeImageGradiant(std::string inImage, std::string outImage, std::string morphOperatorFile, bool useOperatorFile, unsigned int morphOpSize, std::string gdalFormat, RSGISLibDataType outDataType)
     {
         try

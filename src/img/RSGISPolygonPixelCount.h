@@ -48,10 +48,7 @@ namespace rsgis{namespace img{
 		{
 		public:
 			RSGISPolygonPixelCount(int numOutputValues);
-			void calcImageValue(float *bandValuesImageA, float *bandValuesImageB, int numBands, int bandA, int bandB);
-			void calcImageValue(float *bandValuesImage, int numBands, int band);
-			void calcImageValue(float *bandValuesImage, int numBands, geos::geom::Envelope *extent);
-			void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt);
+			void calcImageValue(float *bandValuesImage, double interceptArea, int numBands, OGRPolygon *poly, OGRPoint *pt);
 			double* getOutputValues();
 			void reset();
 			~RSGISPolygonPixelCount();

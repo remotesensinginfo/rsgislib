@@ -30,13 +30,6 @@
 
 #include "gdal_priv.h"
 
-#include "geos/geom/Envelope.h"
-#include "geos/geom/Point.h"
-#include "geos/geom/Polygon.h"
-#include "geos/geom/Coordinate.h"
-#include "geos/geom/CoordinateArraySequence.h"
-#include "geos/geom/PrecisionModel.h"
-
 #include "img/RSGISImageCalcException.h"
 #include "img/RSGISCalcImageValue.h"
 #include "img/RSGISImageUtils.h"
@@ -68,8 +61,7 @@
 #endif
 
 namespace rsgis{namespace calib{
-    
-    
+
     
     /***
      * If output type is set to 1 then output is radians if 0 then degrees.
@@ -88,7 +80,9 @@ namespace rsgis{namespace calib{
         int outType;
         double noDataVal;
 	};
-    
+
+
+
     class DllExport RSGISCalcAspect : public rsgis::img::RSGISCalcImageValue
 	{
 	public: 
@@ -101,7 +95,9 @@ namespace rsgis{namespace calib{
         float nsRes;
         double noDataVal;
 	};
-    
+
+
+
     class DllExport RSGISRecodeAspect : public rsgis::img::RSGISCalcImageValue
 	{
 	public:
@@ -109,19 +105,7 @@ namespace rsgis{namespace calib{
 		void calcImageValue(float *bandValues, int numBands, double *output);
 		~RSGISRecodeAspect();
 	};
-    
-    class DllExport RSGISCalcSlopeAspect : public rsgis::img::RSGISCalcImageValue
-	{
-	public: 
-		RSGISCalcSlopeAspect(int numberOutBands, unsigned int band, float ewRes, float nsRes, double noDataVal);
-		void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output);
-		~RSGISCalcSlopeAspect();
-    private:
-        unsigned int band;
-        float ewRes;
-        float nsRes;
-        double noDataVal;
-	};
+
     
     
 	class DllExport RSGISCalcHillShade : public rsgis::img::RSGISCalcImageValue
@@ -138,7 +122,9 @@ namespace rsgis{namespace calib{
         float sunAzimuth;
         double noDataVal;
 	};
-    
+
+
+
     class DllExport RSGISCalcShadowBinaryMask : public rsgis::img::RSGISCalcImageValue
 	{
 	public: 
@@ -161,7 +147,9 @@ namespace rsgis{namespace calib{
         double radiansToDegrees;
         rsgis::img::RSGISExtractImagePixelsOnLine *extractPixels;
 	};
-    
+
+
+
     class DllExport RSGISCalcRayIncidentAngle : public rsgis::img::RSGISCalcImageValue
 	{
 	public: 
@@ -176,7 +164,8 @@ namespace rsgis{namespace calib{
         float sunAzimuth;
         double noDataVal;
 	};
-    
+
+
     class DllExport RSGISCalcRayExitanceAngle : public rsgis::img::RSGISCalcImageValue
 	{
 	public: 
@@ -191,52 +180,8 @@ namespace rsgis{namespace calib{
         float viewAzimuth;
         double noDataVal;
 	};
-    
-    class DllExport RSGISCalcRayIncidentAndExitanceAngles : public rsgis::img::RSGISCalcImageValue
-	{
-	public: 
-		RSGISCalcRayIncidentAndExitanceAngles(int numberOutBands, unsigned int band, float ewRes, float nsRes, float sunZenith, float sunAzimuth, float viewZenith, float viewAzimuth, double noDataVal);
-		void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output);
-		~RSGISCalcRayIncidentAndExitanceAngles();
-    private:
-        unsigned int band;
-        float ewRes;
-        float nsRes;
-        float sunZenith;
-        float sunAzimuth;
-        float viewZenith;
-        float viewAzimuth;
-        double noDataVal;
-	};
-    
-    
-    
-    
-    class DllExport RSGISFillDEMHoles : public rsgis::img::RSGISCalcImageValue
-	{
-	public:
-		RSGISFillDEMHoles(float holeValue, float nodata);
-		void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output);
-		bool changeOccurred();
-        void resetChange();
-        ~RSGISFillDEMHoles();
-    private:
-        float holeValue;
-        float nodata;
-        bool change;
-	};
 
-    
-    
-    class DllExport RSGISInFillDerivedHoles : public rsgis::img::RSGISCalcImageValue
-	{
-	public:
-		RSGISInFillDerivedHoles(float holeValue);
-		void calcImageValue(float ***dataBlock, int numBands, int winSize, double *output);
-        ~RSGISInFillDerivedHoles();
-    private:
-        float holeValue;
-	};
+
     
     class DllExport RSGISFilterDTMWithAspectMedianFilter : public rsgis::img::RSGISCalcImageValue
 	{

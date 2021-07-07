@@ -30,11 +30,6 @@
 #include "registration/RSGISImageSimilarityMetric.h"
 #include "registration/RSGISStandardImageSimilarityMetrics.h"
 #include "registration/RSGISSingleConnectLayerImageRegistration.h"
-#include "registration/RSGISWarpImage.h"
-#include "registration/RSGISBasicNNGCPImageWarp.h"
-#include "registration/RSGISWarpImageInterpolator.h"
-#include "registration/RSGISWarpImageUsingTriangulation.h"
-#include "registration/RSGISPolynomialImageWarp.h"
 #include "registration/RSGISAddGCPsGDAL.h"
 
 #include "img/RSGISCalcImageValue.h"
@@ -221,118 +216,7 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-    
-    void excecuteNNWarp(std::string inputImage, std::string outputImage, std::string projFile, std::string inputGCPs, float resolution, std::string imageFormat, bool genTransformImage) 
-    {
-        
-        try
-        {
-            GDALAllRegister();
-            rsgis::reg::RSGISWarpImage *warp = NULL;
-            rsgis::reg::RSGISWarpImageInterpolator *interpolator = new rsgis::reg::RSGISWarpImageNNInterpolator();
-            
-            std::string projWKTStr = "";
-            if(projFile != "")
-            {
-                rsgis::utils::RSGISTextUtils textUtils;
-                projWKTStr = textUtils.readFileToString(projFile);
-            }
-            
-            warp = new rsgis::reg::RSGISBasicNNGCPImageWarp(inputImage, outputImage, projWKTStr, inputGCPs, resolution, interpolator, imageFormat);
-            if(genTransformImage)
-            {
-                warp->generateTransformImage();
-            }
-            else
-            {
-                warp->performWarp();
-            }
-            delete warp;
-        }
-        catch(RSGISException& e)
-        {
-            throw RSGISCmdException(e.what());
-        }
-        catch(std::exception& e)
-        {
-            throw RSGISCmdException(e.what());
-        }
-    }
-    
-    void excecuteTriangularWarp(std::string inputImage, std::string outputImage, std::string projFile, std::string inputGCPs, float resolution, std::string imageFormat, bool genTransformImage) 
-    {
-        
-        try
-        {
-            GDALAllRegister();
-            rsgis::reg::RSGISWarpImage *warp = NULL;
-            rsgis::reg::RSGISWarpImageInterpolator *interpolator = new rsgis::reg::RSGISWarpImageNNInterpolator();
-            
-            std::string projWKTStr = "";
-            if(projFile != "")
-            {
-                rsgis::utils::RSGISTextUtils textUtils;
-                projWKTStr = textUtils.readFileToString(projFile);
-            }
-            
-            warp = new rsgis::reg::RSGISWarpImageUsingTriangulation(inputImage, outputImage, projWKTStr, inputGCPs, resolution, interpolator, imageFormat);
-            if(genTransformImage)
-            {
-                warp->generateTransformImage();
-            }
-            else
-            {
-                warp->performWarp();
-            }
-            delete warp;
-        }
-        catch(RSGISException& e)
-        {
-            throw RSGISCmdException(e.what());
-        }
-        catch(std::exception& e)
-        {
-            throw RSGISCmdException(e.what());
-        }
-    }
-    
-    
-    void excecutePolyWarp(std::string inputImage, std::string outputImage, std::string projFile, std::string inputGCPs, float resolution, int polyOrder, std::string imageFormat, bool genTransformImage) 
-    {
-        
-        try
-        {
-            GDALAllRegister();
-            rsgis::reg::RSGISWarpImage *warp = NULL;
-            rsgis::reg::RSGISWarpImageInterpolator *interpolator = new rsgis::reg::RSGISWarpImageNNInterpolator();
-            
-            std::string projWKTStr = "";
-            if(projFile != "")
-            {
-                rsgis::utils::RSGISTextUtils textUtils;
-                projWKTStr = textUtils.readFileToString(projFile);
-            }
-            
-            warp = new rsgis::reg::RSGISPolynomialImageWarp(inputImage, outputImage, projWKTStr, inputGCPs, resolution, interpolator, polyOrder, imageFormat);
-            if(genTransformImage)
-            {
-                warp->generateTransformImage();
-            }
-            else
-            {
-                warp->performWarp();
-            }
-            delete warp;
-        }
-        catch(RSGISException& e)
-        {
-            throw RSGISCmdException(e.what());
-        }
-        catch(std::exception& e)
-        {
-            throw RSGISCmdException(e.what());
-        }
-    }
+
     
     void excecuteAddGCPsGDAL(std::string inputImage, std::string inputGCPs, std::string outputImage, std::string gdalFormat, RSGISLibDataType outDataType) 
     {

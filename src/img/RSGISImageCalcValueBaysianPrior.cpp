@@ -54,31 +54,6 @@ namespace rsgis{namespace img{
 		delete[] outputVals;
 	}
 	
-	void RSGISImageCalcValueBaysianPrior::calcImageValue(float *bandValues, int numBands) 
-	{
-		throw RSGISImageCalcException("Not implemented");
-	}
-	
-	void RSGISImageCalcValueBaysianPrior::calcImageValue(float *bandValues, int numBands, geos::geom::Envelope extent) 
-	{
-		throw RSGISImageCalcException("Not Implemented");
-	}
-	
-	void RSGISImageCalcValueBaysianPrior::calcImageValue(float *bandValues, int numBands, double *output, geos::geom::Envelope extent) 
-	{
-		throw RSGISImageCalcException("Not implemented");
-	}
-	
-	void RSGISImageCalcValueBaysianPrior::calcImageValue(float ***dataBlock, int numBands, int winSize, double *output) 
-	{
-		throw RSGISImageCalcException("Not implemented");
-	}
-
-	bool RSGISImageCalcValueBaysianPrior::calcImageValueCondition(float ***dataBlock, int numBands, int winSize, double *output) 
-	{
-		throw RSGISImageCalcException("Not implemented");
-	}
-	
 	RSGISImageCalcValueBaysianPrior::~RSGISImageCalcValueBaysianPrior()
 	{
 		delete baysianStats;

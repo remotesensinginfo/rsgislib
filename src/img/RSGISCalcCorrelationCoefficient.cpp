@@ -54,22 +54,7 @@ namespace rsgis{namespace img{
 		aSQ += (bandValuesImageA[bandA] * bandValuesImageA[bandA]);
 		bSQ += (bandValuesImageB[bandB] * bandValuesImageB[bandB]);
 	}
-	
-	void RSGISCalcCC::calcImageValue(float *bandValuesImageA, int numBands, int band) 
-	{
-		throw RSGISImageCalcException("Not implemented!");
-	}
-	
-	void RSGISCalcCC::calcImageValue(float *bandValuesImageA, int numBands, geos::geom::Envelope *extent) 
-	{
-		throw RSGISImageCalcException("Not implemented!");
-	}
-	
-	void RSGISCalcCC::calcImageValue(float *bandValuesImage, double interceptArea, int numBands, geos::geom::Polygon *poly, geos::geom::Point *pt) 
-	{
-		throw RSGISImageCalcException("Not implemented!");
-	}
-	
+
 	double* RSGISCalcCC::getOutputValues()  
 	{
 		double partA = n * ab;
@@ -93,7 +78,5 @@ namespace rsgis{namespace img{
 		this->aSQ = 0;
 		this->bSQ = 0;
 	}
-
-    
     
 }}
