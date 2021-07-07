@@ -27,6 +27,9 @@
 
 #include "common/RSGISImageException.h"
 
+#include "utils/RSGISGeometryUtils.h"
+
+#include "img/RSGISAddBands.h"
 #include "img/RSGISBandMath.h"
 #include "img/RSGISImageMaths.h"
 #include "img/RSGISImageCalcException.h"
@@ -392,6 +395,7 @@ void executeStretchImageWithStatsNoData(std::string inputImage, std::string outp
         try
         {
             rsgis::img::RSGISImageUtils imgUtils;
+            rsgis::utils::RSGISGeometryUtils geomUtils;
             // Open Image
             GDALDataset *dataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
             if(dataset == NULL)
@@ -401,7 +405,7 @@ void executeStretchImageWithStatsNoData(std::string inputImage, std::string outp
             }
             
             // Set up envlopes for image tiles
-            std::vector<geos::geom::Envelope*> *tileEnvelopes = new std::vector<geos::geom::Envelope*>;
+            std::vector<OGREnvelope*> *tileEnvelopes = new std::vector<OGREnvelope*>;
             
             int numImageBands = dataset->GetRasterCount();
             unsigned int imgSizeX = dataset->GetRasterXSize();
@@ -475,7 +479,7 @@ void executeStretchImageWithStatsNoData(std::string inputImage, std::string outp
                         tileTLY = imgTLY - (tileYMax*pxlYRes);
                         tileBRX = imgTLX + (tileXMax*pxlXRes);
                         tileBRY = imgTLY - (tileYMin*pxlYRes);
-                        tileEnvelopes->push_back(new geos::geom::Envelope(tileTLX, tileBRX, tileTLY, tileBRY));
+                        tileEnvelopes->push_back(geomUtils.createOGREnvelopePointer(tileTLX, tileBRX, tileTLY, tileBRY));
                         
                         cTileX += xOff;
                         ++numTiles;
@@ -508,7 +512,7 @@ void executeStretchImageWithStatsNoData(std::string inputImage, std::string outp
                         tileTLY = imgTLY - (tileYMax*pxlYRes);
                         tileBRX = imgTLX + (tileXMax*pxlXRes);
                         tileBRY = imgTLY - (tileYMin*pxlYRes);
-                        tileEnvelopes->push_back(new geos::geom::Envelope(tileTLX, tileBRX, tileTLY, tileBRY));
+                        tileEnvelopes->push_back(geomUtils.createOGREnvelopePointer(tileTLX, tileBRX, tileTLY, tileBRY));
                         
                         cTileX += width;
                         ++numTiles;
@@ -541,7 +545,7 @@ void executeStretchImageWithStatsNoData(std::string inputImage, std::string outp
                         tileTLY = imgTLY - (tileYMax*pxlYRes);
                         tileBRX = imgTLX + (tileXMax*pxlXRes);
                         tileBRY = imgTLY - (tileYMin*pxlYRes);
-                        tileEnvelopes->push_back(new geos::geom::Envelope(tileTLX, tileBRX, tileTLY, tileBRY));
+                        tileEnvelopes->push_back(geomUtils.createOGREnvelopePointer(tileTLX, tileBRX, tileTLY, tileBRY));
                         
                         ++numTiles;
                     }
@@ -578,7 +582,7 @@ void executeStretchImageWithStatsNoData(std::string inputImage, std::string outp
                         tileTLY = imgTLY - (tileYMax*pxlYRes);
                         tileBRX = imgTLX + (tileXMax*pxlXRes);
                         tileBRY = imgTLY - (tileYMin*pxlYRes);
-                        tileEnvelopes->push_back(new geos::geom::Envelope(tileTLX, tileBRX, tileTLY, tileBRY));
+                        tileEnvelopes->push_back(geomUtils.createOGREnvelopePointer(tileTLX, tileBRX, tileTLY, tileBRY));
                         
                         cTileX += xOff;
                         ++numTiles;
@@ -611,7 +615,7 @@ void executeStretchImageWithStatsNoData(std::string inputImage, std::string outp
                         tileTLY = imgTLY - (tileYMax*pxlYRes);
                         tileBRX = imgTLX + (tileXMax*pxlXRes);
                         tileBRY = imgTLY - (tileYMin*pxlYRes);
-                        tileEnvelopes->push_back(new geos::geom::Envelope(tileTLX, tileBRX, tileTLY, tileBRY));
+                        tileEnvelopes->push_back(geomUtils.createOGREnvelopePointer(tileTLX, tileBRX, tileTLY, tileBRY));
                         
                         cTileX += width;
                         ++numTiles;
@@ -644,7 +648,7 @@ void executeStretchImageWithStatsNoData(std::string inputImage, std::string outp
                         tileTLY = imgTLY - (tileYMax*pxlYRes);
                         tileBRX = imgTLX + (tileXMax*pxlXRes);
                         tileBRY = imgTLY - (tileYMin*pxlYRes);
-                        tileEnvelopes->push_back(new geos::geom::Envelope(tileTLX, tileBRX, tileTLY, tileBRY));
+                        tileEnvelopes->push_back(geomUtils.createOGREnvelopePointer(tileTLX, tileBRX, tileTLY, tileBRY));
                         
                         ++numTiles;
                     }
@@ -681,7 +685,7 @@ void executeStretchImageWithStatsNoData(std::string inputImage, std::string outp
                         tileTLY = imgTLY - (tileYMax*pxlYRes);
                         tileBRX = imgTLX + (tileXMax*pxlXRes);
                         tileBRY = imgTLY - (tileYMin*pxlYRes);
-                        tileEnvelopes->push_back(new geos::geom::Envelope(tileTLX, tileBRX, tileTLY, tileBRY));
+                        tileEnvelopes->push_back(geomUtils.createOGREnvelopePointer(tileTLX, tileBRX, tileTLY, tileBRY));
                         
                         cTileX += xOff;
                         ++numTiles;
@@ -714,7 +718,7 @@ void executeStretchImageWithStatsNoData(std::string inputImage, std::string outp
                         tileTLY = imgTLY - (tileYMax*pxlYRes);
                         tileBRX = imgTLX + (tileXMax*pxlXRes);
                         tileBRY = imgTLY - (tileYMin*pxlYRes);
-                        tileEnvelopes->push_back(new geos::geom::Envelope(tileTLX, tileBRX, tileTLY, tileBRY));
+                        tileEnvelopes->push_back(geomUtils.createOGREnvelopePointer(tileTLX, tileBRX, tileTLY, tileBRY));
                         
                         cTileX += width;
                         ++numTiles;
@@ -747,7 +751,7 @@ void executeStretchImageWithStatsNoData(std::string inputImage, std::string outp
                         tileTLY = imgTLY - (tileYMax*pxlYRes);
                         tileBRX = imgTLX + (tileXMax*pxlXRes);
                         tileBRY = imgTLY - (tileYMin*pxlYRes);
-                        tileEnvelopes->push_back(new geos::geom::Envelope(tileTLX, tileBRX, tileTLY, tileBRY));
+                        tileEnvelopes->push_back(geomUtils.createOGREnvelopePointer(tileTLX, tileBRX, tileTLY, tileBRY));
                         
                         ++numTiles;
                     }
@@ -808,7 +812,7 @@ void executeStretchImageWithStatsNoData(std::string inputImage, std::string outp
                         tileTLY = imgTLY - (tileYMax*pxlYRes);
                         tileBRX = imgTLX + (tileXMax*pxlXRes);
                         tileBRY = imgTLY - (tileYMin*pxlYRes);
-                        tileEnvelopes->push_back(new geos::geom::Envelope(tileTLX, tileBRX, tileTLY, tileBRY));
+                        tileEnvelopes->push_back(geomUtils.createOGREnvelopePointer(tileTLX, tileBRX, tileTLY, tileBRY));
                         
                         cTileX += width;
                         ++numTiles;
@@ -841,7 +845,7 @@ void executeStretchImageWithStatsNoData(std::string inputImage, std::string outp
                         tileTLY = imgTLY - (tileYMax*pxlYRes);
                         tileBRX = imgTLX + (tileXMax*pxlXRes);
                         tileBRY = imgTLY - (tileYMin*pxlYRes);
-                        tileEnvelopes->push_back(new geos::geom::Envelope(tileTLX, tileBRX, tileTLY, tileBRY));
+                        tileEnvelopes->push_back(geomUtils.createOGREnvelopePointer(tileTLX, tileBRX, tileTLY, tileBRY));
                         
                         ++numTiles;
                     }
@@ -878,7 +882,7 @@ void executeStretchImageWithStatsNoData(std::string inputImage, std::string outp
                         tileTLY = imgTLY - (tileYMax*pxlYRes);
                         tileBRX = imgTLX + (tileXMax*pxlXRes);
                         tileBRY = imgTLY - (tileYMin*pxlYRes);
-                        tileEnvelopes->push_back(new geos::geom::Envelope(tileTLX, tileBRX, tileTLY, tileBRY));
+                        tileEnvelopes->push_back(geomUtils.createOGREnvelopePointer(tileTLX, tileBRX, tileTLY, tileBRY));
                         
                         cTileX += width;
                         ++numTiles;
@@ -911,7 +915,7 @@ void executeStretchImageWithStatsNoData(std::string inputImage, std::string outp
                         tileTLY = imgTLY - (tileYMax*pxlYRes);
                         tileBRX = imgTLX + (tileXMax*pxlXRes);
                         tileBRY = imgTLY - (tileYMin*pxlYRes);
-                        tileEnvelopes->push_back(new geos::geom::Envelope(tileTLX, tileBRX, tileTLY, tileBRY));
+                        tileEnvelopes->push_back(geomUtils.createOGREnvelopePointer(tileTLX, tileBRX, tileTLY, tileBRY));
                         
                         ++numTiles;
                     }
@@ -1541,7 +1545,7 @@ void executeStretchImageWithStatsNoData(std::string inputImage, std::string outp
     }
 
 
-    void executeSubset(std::string inputImage, std::string inputVector, std::string outputImage, std::string imageFormat, RSGISLibDataType outDataType) 
+    void executeSubset(std::string inputImage, std::string inputVecFile, std::string inputVecLyr, std::string outputImage, std::string imageFormat, RSGISLibDataType outDataType)
     {
         try
         {
@@ -1555,12 +1559,6 @@ void executeStretchImageWithStatsNoData(std::string inputImage, std::string outp
             rsgis::img::RSGISCopyImage *copyImage = NULL;
             rsgis::img::RSGISCalcImage *calcImage = NULL;
 
-            rsgis::vec::RSGISVectorUtils vecUtils;
-
-            // Convert to absolute path
-            inputVector = boost::filesystem::absolute(inputVector).string();
-
-            std::string vectorLayerName = vecUtils.getLayerName(inputVector);
             int numImageBands = 0;
 
             // Open Image
@@ -1576,25 +1574,24 @@ void executeStretchImageWithStatsNoData(std::string inputImage, std::string outp
             std::cout << "Raster Band Count = " << numImageBands << std::endl;
 
             // Open vector
-            inputVecDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);
+            inputVecDS = (GDALDataset*) GDALOpenEx(inputVecFile.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);
             if(inputVecDS == NULL)
             {
-                std::string message = std::string("Could not open vector file ") + inputVector;
+                std::string message = std::string("Could not open vector file ") + inputVecFile;
                 throw RSGISFileException(message.c_str());
             }
-            inputVecLayer = inputVecDS->GetLayerByName(vectorLayerName.c_str());
+            inputVecLayer = inputVecDS->GetLayerByName(inputVecLyr.c_str());
             if(inputVecLayer == NULL)
             {
-                std::string message = std::string("Could not open vector layer ") + vectorLayerName;
+                std::string message = std::string("Could not open vector layer ") + inputVecLyr;
                 throw RSGISFileException(message.c_str());
             }
             OGREnvelope ogrExtent;
             inputVecLayer->GetExtent(&ogrExtent);
-            geos::geom::Envelope extent = geos::geom::Envelope(ogrExtent.MinX, ogrExtent.MaxX, ogrExtent.MinY, ogrExtent.MaxY);
 
             copyImage = new rsgis::img::RSGISCopyImage(numImageBands);
             calcImage = new rsgis::img::RSGISCalcImage(copyImage, "", true);
-            calcImage->calcImageInEnv(dataset, 1, outputImage, &extent, false, NULL, imageFormat, RSGIS_to_GDAL_Type(outDataType));
+            calcImage->calcImageInEnv(dataset, 1, outputImage, &ogrExtent, false, NULL, imageFormat, RSGIS_to_GDAL_Type(outDataType));
 
             GDALClose(dataset[0]);
             delete[] dataset;
@@ -1634,7 +1631,11 @@ void executeStretchImageWithStatsNoData(std::string inputImage, std::string outp
             int numImageBands = dataset->GetRasterCount();
             std::cout << "Raster Band Count = " << numImageBands << std::endl;
             
-            geos::geom::Envelope extent = geos::geom::Envelope(xMin, xMax, yMin, yMax);
+            OGREnvelope extent = OGREnvelope();
+            extent.MinX = xMin;
+            extent.MaxX = xMax;
+            extent.MinY = yMin;
+            extent.MaxY = yMax;
             
             rsgis::img::RSGISCopyImage *copyImage = new rsgis::img::RSGISCopyImage(numImageBands);
             rsgis::img::RSGISCalcImage calcImage = rsgis::img::RSGISCalcImage(copyImage, "", true);
@@ -1657,9 +1658,12 @@ void executeStretchImageWithStatsNoData(std::string inputImage, std::string outp
         }
     }
             
-    void executeSubset2Polys(std::string inputImage, std::string inputVector, std::string filenameAttribute, std::string outputImageBase,
-                              std::string imageFormat, RSGISLibDataType outDataType, std::string outFileExtension, std::vector<std::string> *outFileNames) 
+    void executeSubset2Polys(std::string inputImage, std::string inputVecFile, std::string inputVecLyr,
+                             std::string filenameAttribute, std::string outputImageBase, std::string imageFormat,
+                             RSGISLibDataType outDataType, std::string outFileExtension,
+                             std::vector<std::string> *outFileNames)
     {
+        /*
         try
         {
             GDALAllRegister();
@@ -1783,6 +1787,7 @@ void executeStretchImageWithStatsNoData(std::string inputImage, std::string outp
         {
             throw RSGISCmdException(e.what());
         }
+        */
     }
 
     void executeSubset2Img(std::string inputImage, std::string inputROIImage, std::string outputImage, std::string imageFormat, RSGISLibDataType outDataType) 
@@ -1821,15 +1826,14 @@ void executeStretchImageWithStatsNoData(std::string inputImage, std::string outp
 
             rsgis::img::RSGISImageUtils imgUtils;
 
-            OGREnvelope *ogrExtent = imgUtils.getSpatialExtent(roiDataset);
-            geos::geom::Envelope extent = geos::geom::Envelope(ogrExtent->MinX, ogrExtent->MaxX, ogrExtent->MinY, ogrExtent->MaxY);
+            OGREnvelope *extent = imgUtils.getSpatialExtent(roiDataset);
 
             std::cout.precision(12);
-            std::cout << "BBOX [" << ogrExtent->MinX << "," << ogrExtent->MaxX << "][" << ogrExtent->MinY << "," << ogrExtent->MaxY << "]\n";
+            std::cout << "BBOX [" << extent->MinX << "," << extent->MaxX << "][" << extent->MinY << "," << extent->MaxY << "]\n";
 
             copyImage = new rsgis::img::RSGISCopyImage(numImageBands);
             calcImage = new rsgis::img::RSGISCalcImage(copyImage, "", true);
-            calcImage->calcImageInEnv(dataset, 1, outputImage, &extent, false, NULL, imageFormat, RSGIS_to_GDAL_Type(outDataType));
+            calcImage->calcImageInEnv(dataset, 1, outputImage, extent, false, NULL, imageFormat, RSGIS_to_GDAL_Type(outDataType));
 
             GDALClose(dataset[0]);
             delete[] dataset;
@@ -1963,7 +1967,9 @@ void executeStretchImageWithStatsNoData(std::string inputImage, std::string outp
         }
     }
             
-    void executeCreateCopyBlankImageVecExtent(std::string inputImage, std::string inputVector, std::string outputImage, unsigned int numBands, float pxlVal, std::string gdalFormat, RSGISLibDataType outDataType) 
+    void executeCreateCopyBlankImageVecExtent(std::string inputImage, std::string inputVecFile, std::string inputVecLyr,
+                                              std::string outputImage, unsigned int numBands, float pxlVal,
+                                              std::string gdalFormat, RSGISLibDataType outDataType)
     {
         try
         {
@@ -1987,21 +1993,19 @@ void executeStretchImageWithStatsNoData(std::string inputImage, std::string outp
             GDALDataset *inputVecDS = NULL;
             OGRLayer *inputVecLayer = NULL;
             // Convert to absolute path
-            inputVector = boost::filesystem::absolute(inputVector).string();
-            rsgis::vec::RSGISVectorUtils vecUtils;
-            std::string vectorLayerName = vecUtils.getLayerName(inputVector);
+            inputVecFile = boost::filesystem::absolute(inputVecFile).string();
             
             // Open vector
-            inputVecDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);
+            inputVecDS = (GDALDataset*) GDALOpenEx(inputVecFile.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);
             if(inputVecDS == NULL)
             {
-                std::string message = std::string("Could not open vector file ") + inputVector;
+                std::string message = std::string("Could not open vector file ") + inputVecFile;
                 throw RSGISFileException(message.c_str());
             }
-            inputVecLayer = inputVecDS->GetLayerByName(vectorLayerName.c_str());
+            inputVecLayer = inputVecDS->GetLayerByName(inputVecLyr.c_str());
             if(inputVecLayer == NULL)
             {
-                std::string message = std::string("Could not open vector layer ") + vectorLayerName;
+                std::string message = std::string("Could not open vector layer ") + inputVecLyr;
                 throw RSGISFileException(message.c_str());
             }
             OGREnvelope ogrExtent;

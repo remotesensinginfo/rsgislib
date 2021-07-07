@@ -35,7 +35,6 @@
 #include "img/RSGISImageStatistics.h"
 #include "img/RSGISCalcCovariance.h"
 #include "img/RSGISCalcEditImage.h"
-#include "img/RSGISCalcDist2Geom.h"
 #include "img/RSGISCalcCorrelationCoefficient.h"
 #include "img/RSGISMeanVector.h"
 #include "img/RSGISCalcImageMatrix.h"
@@ -43,12 +42,10 @@
 #include "img/RSGISImageNormalisation.h"
 #include "img/RSGISStandardiseImage.h"
 #include "img/RSGISApplyEigenvectors.h"
-#include "img/RSGISReplaceValuesLessThanGivenValue.h"
 #include "img/RSGISConvertSpectralToUnitArea.h"
-#include "img/RSGISCalculateImageMovementSpeed.h"
 #include "img/RSGISCountValsAboveThresInCol.h"
 #include "img/RSGISCalcRMSE.h"
-#include "img/RSGISApplyFunction.h"
+//#include "img/RSGISApplyFunction.h"
 #include "img/RSGISLinearSpectralUnmixing.h"
 #include "img/RSGISGenHistogram.h"
 #include "img/RSGISCalcImgValProb.h"
@@ -64,10 +61,6 @@
 #include "utils/RSGISFileUtils.h"
 
 #include "vec/RSGISVectorUtils.h"
-#include "vec/RSGISGetOGRGeometries.h"
-#include "vec/RSGISProcessVector.h"
-
-#include "geom/RSGISGeometry.h"
 
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_vector.h>
@@ -718,60 +711,6 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeImageCalcDistance(std::string inputImage, std::string outputImage, std::string gdalFormat)
-    {
-        try
-        {
-            GDALAllRegister();
-            GDALDataset *imgDataset = (GDALDataset *) GDALOpenShared(inputImage.c_str(), GA_ReadOnly);
-            if(imgDataset == NULL)
-            {
-                std::string message = std::string("Could not open image ") + inputImage;
-                throw rsgis::RSGISImageException(message.c_str());
-            }
-
-            // Create blank image
-            rsgis::img::RSGISImageUtils imageUtils;
-            GDALDataset *outImage = imageUtils.createCopy(imgDataset, 1, outputImage, gdalFormat, GDT_Float32);
-            imageUtils.copyFloatGDALDataset(imgDataset, outImage);
-
-            double *transform = new double[6];
-            outImage->GetGeoTransform(transform);
-
-            rsgis::img::RSGISCalcDistViaIterativeGrowth *calcDist = new rsgis::img::RSGISCalcDistViaIterativeGrowth(transform[1]);
-            rsgis::img::RSGISCalcEditImage *calcEditImage = new rsgis::img::RSGISCalcEditImage(calcDist);
-
-            bool change = true;
-            unsigned int dist = 1;
-            while(change)
-            {
-                std::cout << "Distance " << dist << ":\t" << std::flush;
-                calcDist->resetChange();
-                calcEditImage->calcImageWindowData(outImage, 3, -2);
-                change = calcDist->changeOccurred();
-                calcDist->incrementCounter();
-                dist += 1;
-            }
-
-            // Translate to distance...
-            std::cout << "Multiple by pixel size\n";
-            calcEditImage->calcImageUseOut(outImage);
-
-            // Clean up memory.
-            GDALClose(outImage);
-            GDALClose(imgDataset);
-            delete[] transform;
-        }
-        catch(rsgis::RSGISException &e)
-        {
-            throw RSGISCmdException(e.what());
-        }
-        catch(std::exception &e)
-        {
-            throw RSGISCmdException(e.what());
-        }
-    }
-
     void executeImagePixelColumnSummary(std::string inputImage, std::string outputImage, rsgis::cmds::RSGISCmdStatsSummary summaryStats, std::string gdalFormat, RSGISLibDataType outDataType, float noDataValue, bool useNoDataValue)
     {
         try
@@ -1395,46 +1334,6 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeReplaceValuesLessThan(std::string inputImage, std::string outputImage, double threshold, double value)
-    {
-        GDALAllRegister();
-        GDALDataset **datasets = NULL;
-        rsgis::img::RSGISCalcImageValue *calcImageValue = NULL;
-        rsgis::img::RSGISCalcImage *calcImage = NULL;
-
-        try
-        {
-            datasets = new GDALDataset*[1];
-
-            datasets[0] = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
-            if(datasets[0] == NULL)
-            {
-                std::string message = std::string("Could not open image ") + inputImage;
-                throw rsgis::RSGISImageException(message.c_str());
-            }
-
-            int numImgBands = datasets[0]->GetRasterCount();
-
-
-            calcImageValue = new rsgis::img::RSGISReplaceValuesLessThanGivenValue(numImgBands, threshold, value);
-
-            calcImage = new rsgis::img::RSGISCalcImage(calcImageValue, "", true);
-            calcImage->calcImage(datasets, 1, outputImage);
-
-
-            GDALClose(datasets[0]);
-
-            delete calcImageValue;
-            delete calcImage;
-            delete [] datasets;
-        }
-        catch(rsgis::RSGISException &e)
-        {
-            throw RSGISCmdException(e.what());
-        }
-
-    }
-
     void executeUnitArea(std::string inputImage, std::string outputImage, std::string inMatrixfile)
     {
         GDALAllRegister();
@@ -1488,94 +1387,6 @@ namespace rsgis{ namespace cmds {
             delete calcImageValue;
             delete calcImage;
             delete [] datasets;
-        }
-        catch(rsgis::RSGISException &e)
-        {
-            throw RSGISCmdException(e.what());
-        }
-
-    }
-
-    void executeMovementSpeed(std::vector<std::string> inputImages, std::vector<unsigned int> imageBands, std::vector<float> imageTimes, float upper, float lower, std::string outputImage)
-    {
-        GDALAllRegister();
-        GDALDataset **datasets = NULL;
-        rsgis::img::RSGISCalcImage *calcImage = NULL;
-        rsgis::img::RSGISCalculateImageMovementSpeed *calcImageValue = NULL;
-
-        unsigned int numImages = inputImages.size();
-
-        // check that we have bands and times for each image
-        if(imageBands.size() != numImages || imageTimes.size() != numImages) {
-            throw RSGISCmdException("Bands and Times were not supplied for all images");
-        }
-
-        try
-        {
-            datasets = new GDALDataset*[numImages];
-
-            unsigned int numRasterBands = 0;
-            unsigned int totalNumRasterBands = 0;
-            unsigned int *imgBandsInStack = new unsigned int[numImages];
-
-            for(int i = 0; i < numImages; ++i)
-            {
-                datasets[i] = (GDALDataset *) GDALOpen(inputImages[i].c_str(), GA_ReadOnly);
-                if(datasets[i] == NULL)
-                {
-                    std::string message = std::string("Could not open image ") + inputImages[i];
-                    throw rsgis::RSGISImageException(message.c_str());
-                }
-
-                numRasterBands = datasets[i]->GetRasterCount();
-                imgBandsInStack[i] = totalNumRasterBands + imageBands[i];
-
-                std::cout << "Opened Image: " << inputImages[i] << " will be using band " << imgBandsInStack[i] << " in stack." << std::endl;
-
-                if(imageBands[i] > (numRasterBands-1))
-                {
-                    throw rsgis::RSGISImageException("You have specified a band which is not within the image");
-                }
-
-                totalNumRasterBands += numRasterBands;
-            }
-
-            int numOutputBands = ((numImages-1)*2) + 3;
-
-            rsgis::math::RSGISMathsUtils mathUtils;
-            std::string *outBandNames = new std::string[numOutputBands];
-            outBandNames[0] = std::string("Mean Movement Speed");
-            outBandNames[1] = std::string("Min Movement Speed");
-            outBandNames[2] = std::string("Max Movement Speed");
-
-            int idx = 0;
-            for(int i = 0; i < numImages-1; ++i)
-            {
-                idx = (i * 2) + 3;
-                outBandNames[idx] = std::string("Images ") + mathUtils.inttostring(i+1) + std::string("-") + mathUtils.inttostring(i+2) + std::string(" Displacement");
-                outBandNames[idx+1] = std::string("Images ") + mathUtils.inttostring(i+1) + std::string("-") + mathUtils.inttostring(i+2) + std::string(" Movement");
-            }
-
-            std::cout << "Number of Output Image bands = " << numOutputBands << std::endl;
-
-            float *timesArrayPointer = &imageTimes[0];  // WARNING WARNING - this may be bonkers, on the other hand, it may be a nice shorthand for passing a vector as array
-
-            calcImageValue = new rsgis::img::RSGISCalculateImageMovementSpeed(numOutputBands, numImages, imgBandsInStack, timesArrayPointer, upper, lower);
-            calcImage = new rsgis::img::RSGISCalcImage(calcImageValue, "", true);
-            calcImage->calcImage(datasets, numImages, outputImage, true, outBandNames);
-
-            for(int i = 0; i < numImages; ++i)
-            {
-                GDALClose(datasets[i]);
-            }
-
-            delete[] datasets;
-            delete[] outBandNames;
-
-            delete calcImage;
-            delete calcImageValue;
-            delete[] imgBandsInStack;
-
         }
         catch(rsgis::RSGISException &e)
         {
@@ -1685,175 +1496,6 @@ namespace rsgis{ namespace cmds {
         return rmse;
     }
 
-    void executeApply2VarFunction(std::string inputImage, void *twoVarFunction, std::string outputImage)
-    {
-        GDALAllRegister();
-        GDALDataset **datasets = NULL;
-        try
-        {
-            datasets = new GDALDataset*[1];
-            std::cout << inputImage << std::endl;
-            datasets[0] = (GDALDataset *) GDALOpenShared(inputImage.c_str(), GA_ReadOnly);
-            if(datasets[0] == NULL)
-            {
-                std::string message = std::string("Could not open image ") + inputImage;
-                throw rsgis::RSGISImageException(message.c_str());
-            }
-        }
-        catch(rsgis::RSGISException& e)
-        {
-            throw e;
-        }
-        rsgis::img::RSGISCalcImage *calcImg = NULL;
-        rsgis::img::RSGISApplyTwoVarFunction *applyFunction = NULL;
-
-        try
-        {
-            std::cout << "Applying two variable function" <<std::endl;
-            rsgis::math::RSGISMathTwoVariableFunction *twoVarFuncPointer = (rsgis::math::RSGISMathTwoVariableFunction*) twoVarFunction;
-            applyFunction = new rsgis::img::RSGISApplyTwoVarFunction(1, twoVarFuncPointer);
-            calcImg = new rsgis::img::RSGISCalcImage(applyFunction, "", true);
-            calcImg->calcImage(datasets, 1, outputImage);
-        }
-        catch(rsgis::RSGISException& e)
-        {
-            throw e;
-        }
-        if(datasets != NULL)
-        {
-            GDALClose(datasets[0]);
-            delete[] datasets;
-        }
-
-        delete calcImg;
-        delete applyFunction;
-    }
-
-    void executeApply3VarFunction(std::string inputImage, void *threeVarFunction, std::string outputImage)
-    {
-        GDALAllRegister();
-        GDALDataset **datasets = NULL;
-        try
-        {
-            datasets = new GDALDataset*[1];
-            std::cout << inputImage << std::endl;
-            datasets[0] = (GDALDataset *) GDALOpenShared(inputImage.c_str(), GA_ReadOnly);
-            if(datasets[0] == NULL)
-            {
-                std::string message = std::string("Could not open image ") + inputImage;
-                throw rsgis::RSGISImageException(message.c_str());
-            }
-        }
-        catch(rsgis::RSGISException& e)
-        {
-            throw e;
-        }
-        rsgis::img::RSGISCalcImage *calcImg = NULL;
-        rsgis::img::RSGISApplyThreeVarFunction *applyFunction = NULL;
-        try
-        {
-            std::cout << "Applying three variable function" <<std::endl;
-            rsgis::math::RSGISMathThreeVariableFunction *threeVarFuncPointer = (rsgis::math::RSGISMathThreeVariableFunction*) threeVarFunction;
-            applyFunction = new rsgis::img::RSGISApplyThreeVarFunction(1, threeVarFuncPointer);
-            calcImg = new rsgis::img::RSGISCalcImage(applyFunction, "", true);
-            calcImg->calcImage(datasets, 1, outputImage);
-        }
-        catch(rsgis::RSGISException& e)
-        {
-            throw RSGISCmdException(e.what());
-        }
-        if(datasets != NULL)
-        {
-            GDALClose(datasets[0]);
-            delete[] datasets;
-        }
-
-        delete calcImg;
-        delete applyFunction;
-
-    }
-
-    void executeDist2Geoms(std::string inputVector, float imgResolution, std::string outputImage)
-    {
-        OGRRegisterAll();
-
-        rsgis::utils::RSGISFileUtils fileUtils;
-        rsgis::vec::RSGISVectorUtils vecUtils;
-
-        std::string SHPFileInLayer = vecUtils.getLayerName(inputVector);
-
-        OGRSpatialReference* inputSpatialRef = NULL;
-        GDALDataset *inputSHPDS = NULL;
-        OGRLayer *inputSHPLayer = NULL;
-        try
-        {
-
-            /////////////////////////////////////
-            //
-            // Open Input Shapfile.
-            //
-            /////////////////////////////////////
-            inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);
-            
-            if(inputSHPDS == NULL)
-            {
-                std::string message = std::string("Could not open vector file ") + inputVector;
-                throw rsgis::RSGISFileException(message.c_str());
-            }
-            inputSHPLayer = inputSHPDS->GetLayerByName(SHPFileInLayer.c_str());
-            if(inputSHPLayer == NULL)
-            {
-                std::string message = std::string("Could not open vector layer ") + SHPFileInLayer;
-                throw rsgis::RSGISFileException(message.c_str());
-            }
-            inputSpatialRef = inputSHPLayer->GetSpatialRef();
-            char **wktString = new char*[1];    // TODO: check deletion
-            inputSpatialRef->exportToWkt(wktString);
-            std::string projection = std::string(wktString[0]);
-            CPLFree(wktString);
-            OGREnvelope ogrExtent;
-            inputSHPLayer->GetExtent(&ogrExtent);
-            geos::geom::Envelope extent = geos::geom::Envelope(ogrExtent.MinX, ogrExtent.MaxX, ogrExtent.MinY, ogrExtent.MaxY);
-
-            // Get Geometries into memory
-            std::vector<OGRGeometry*> *ogrGeoms = new std::vector<OGRGeometry*>();
-            rsgis::vec::RSGISGetOGRGeometries *getOGRGeoms = new rsgis::vec::RSGISGetOGRGeometries(ogrGeoms);
-            rsgis::vec::RSGISProcessVector processVector = rsgis::vec::RSGISProcessVector(getOGRGeoms);
-            processVector.processVectorsNoOutput(inputSHPLayer, false);
-            delete getOGRGeoms;
-
-            // Create Geometry Collection
-            OGRGeometryCollection *geomCollectionOrig = new OGRGeometryCollection();
-            for(std::vector<OGRGeometry*>::iterator iterGeoms = ogrGeoms->begin(); iterGeoms != ogrGeoms->end(); ++iterGeoms)
-            {
-                geomCollectionOrig->addGeometryDirectly(*iterGeoms);
-            }
-
-            OGRGeometryCollection *geomCollectionLines = new OGRGeometryCollection();
-            rsgis::geom::RSGISGeometry geomUtils;
-            geomUtils.convertGeometryCollection2Lines(geomCollectionOrig, geomCollectionLines);
-
-            // Create blank image
-            rsgis::img::RSGISImageUtils imageUtils;
-            GDALDataset *outImage = imageUtils.createBlankImage(outputImage, extent, imgResolution, 1, projection, 0);
-
-            rsgis::img::RSGISCalcDist2Geom *dist2GeomCalcValue = new rsgis::img::RSGISCalcDist2Geom(1, geomCollectionLines, geomCollectionOrig);
-            rsgis::img::RSGISCalcEditImage *calcEditImage = new rsgis::img::RSGISCalcEditImage(dist2GeomCalcValue);
-            calcEditImage->calcImage(outImage);
-
-            // Clean up memory.
-            delete geomCollectionOrig;
-            delete geomCollectionLines;
-            delete ogrGeoms;
-            GDALClose(inputSHPDS);
-            GDALClose(outImage);
-        }
-        catch (rsgis::RSGISException &e)
-        {
-            throw RSGISCmdException(e.what());
-        }
-    }
-
     void executeImageBandStats(std::string inputImage, std::string outputFile, bool ignoreZeros)
     {
         GDALAllRegister();
@@ -1951,34 +1593,6 @@ namespace rsgis{ namespace cmds {
 
     }
 
-    void executeUnconLinearSpecUnmix(std::string inputImage, std::string imageFormat, RSGISLibDataType outDataType, float lsumGain, float lsumOffset, std::string outputFile, std::string endmembersFile)
-    {
-        GDALAllRegister();
-        GDALDataset **datasets = NULL;
-
-        try
-        {
-            datasets = new GDALDataset*[1];
-            datasets[0] = (GDALDataset *) GDALOpenShared(inputImage.c_str(), GA_ReadOnly);
-            if(datasets[0] == NULL)
-            {
-                std::string message = std::string("Could not open image ") + inputImage;
-                    throw rsgis::RSGISImageException(message.c_str());
-            }
-
-            rsgis::img::RSGISCalcLinearSpectralUnmixing calcSpecUnmix(imageFormat, RSGIS_to_GDAL_Type(outDataType), lsumGain, lsumOffset);
-            calcSpecUnmix.performUnconstainedLinearSpectralUnmixing(datasets, 1, outputFile, endmembersFile);
-
-            GDALClose(datasets[0]);
-            delete[] datasets;
-        }
-        catch(rsgis::RSGISException &e)
-        {
-            throw RSGISCmdException(e.what());
-        }
-
-    }
-
     void executeExhconLinearSpecUnmix(std::string inputImage, std::string imageFormat, RSGISLibDataType outDataType, float lsumGain, float lsumOffset, std::string outputFile, std::string endmembersFile, float stepResolution)
     {
         GDALAllRegister();
@@ -1996,61 +1610,6 @@ namespace rsgis{ namespace cmds {
 
             rsgis::img::RSGISCalcLinearSpectralUnmixing calcSpecUnmix(imageFormat, RSGIS_to_GDAL_Type(outDataType), lsumGain, lsumOffset);
             calcSpecUnmix.performExhaustiveConstrainedSpectralUnmixing(datasets, 1, outputFile, endmembersFile, stepResolution);
-
-            GDALClose(datasets[0]);
-            delete[] datasets;
-        }
-        catch(rsgis::RSGISException &e)
-        {
-            throw RSGISCmdException(e.what());
-        }
-
-    }
-
-    void executeConSum1LinearSpecUnmix(std::string inputImage, std::string imageFormat, RSGISLibDataType outDataType, float lsumGain, float lsumOffset, float lsumWeight, std::string outputFile, std::string endmembersFile)
-    {
-        GDALAllRegister();
-        GDALDataset **datasets = NULL;
-
-        try
-        {
-            datasets = new GDALDataset*[1];
-            datasets[0] = (GDALDataset *) GDALOpenShared(inputImage.c_str(), GA_ReadOnly);
-            if(datasets[0] == NULL)
-            {
-                std::string message = std::string("Could not open image ") + inputImage;
-                throw rsgis::RSGISImageException(message.c_str());
-            }
-
-            rsgis::img::RSGISCalcLinearSpectralUnmixing calcSpecUnmix(imageFormat, RSGIS_to_GDAL_Type(outDataType), lsumGain, lsumOffset);
-            calcSpecUnmix.performPartConstainedLinearSpectralUnmixing(datasets, 1, outputFile, endmembersFile, lsumWeight);
-
-            GDALClose(datasets[0]);
-            delete[] datasets;
-        }
-        catch(rsgis::RSGISException &e)
-        {
-            throw RSGISCmdException(e.what());
-        }
-    }
-
-    void executeNnConSum1LinearSpecUnmix(std::string inputImage, std::string imageFormat, RSGISLibDataType outDataType, float lsumGain, float lsumOffset, float lsumWeight, std::string outputFile, std::string endmembersFile)
-    {
-        GDALAllRegister();
-        GDALDataset **datasets = NULL;
-
-        try
-        {
-            datasets = new GDALDataset*[1];
-            datasets[0] = (GDALDataset *) GDALOpenShared(inputImage.c_str(), GA_ReadOnly);
-            if(datasets[0] == NULL)
-            {
-                std::string message = std::string("Could not open image ") + inputImage;
-                throw rsgis::RSGISImageException(message.c_str());
-            }
-
-            rsgis::img::RSGISCalcLinearSpectralUnmixing calcSpecUnmix(imageFormat, RSGIS_to_GDAL_Type(outDataType), lsumGain, lsumOffset);
-            calcSpecUnmix.performConstainedNNLinearSpectralUnmixing(datasets, 1, outputFile, endmembersFile, lsumWeight);
 
             GDALClose(datasets[0]);
             delete[] datasets;
@@ -2249,89 +1808,6 @@ namespace rsgis{ namespace cmds {
         return outVals;
     }
 
-    void executeImageDist2Geoms(std::string inputImage, std::string inputVector, std::string imageFormat, std::string outputImage)
-    {
-        GDALAllRegister();
-        OGRRegisterAll();
-
-        rsgis::utils::RSGISFileUtils fileUtils;
-        rsgis::vec::RSGISVectorUtils vecUtils;
-
-        std::string SHPFileInLayer = vecUtils.getLayerName(inputVector);
-
-        GDALDataset *inputSHPDS = NULL;
-        OGRLayer *inputSHPLayer = NULL;
-        try
-        {
-
-            GDALDataset *imgDataset = (GDALDataset *) GDALOpenShared(inputImage.c_str(), GA_ReadOnly);
-            if(imgDataset == NULL)
-            {
-                std::string message = std::string("Could not open image ") + inputImage;
-                throw rsgis::RSGISImageException(message.c_str());
-            }
-
-
-            /////////////////////////////////////
-            //
-            // Open Input Shapfile.
-            //
-            /////////////////////////////////////
-            inputSHPDS = (GDALDataset*) GDALOpenEx(inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL);
-            if(inputSHPDS == NULL)
-            {
-                std::string message = std::string("Could not open vector file ") + inputVector;
-                throw rsgis::RSGISFileException(message.c_str());
-            }
-            inputSHPLayer = inputSHPDS->GetLayerByName(SHPFileInLayer.c_str());
-            if(inputSHPLayer == NULL)
-            {
-                std::string message = std::string("Could not open vector layer ") + SHPFileInLayer;
-                throw rsgis::RSGISFileException(message.c_str());
-            }
-
-
-            // Get Geometries into memory
-            std::vector<OGRGeometry*> *ogrGeoms = new std::vector<OGRGeometry*>();
-            rsgis::vec::RSGISGetOGRGeometries *getOGRGeoms = new rsgis::vec::RSGISGetOGRGeometries(ogrGeoms);
-            rsgis::vec::RSGISProcessVector processVector = rsgis::vec::RSGISProcessVector(getOGRGeoms);
-            processVector.processVectorsNoOutput(inputSHPLayer, false);
-            delete getOGRGeoms;
-
-            // Create Geometry Collection
-            OGRGeometryCollection *geomCollectionOrig = new OGRGeometryCollection();
-            for(std::vector<OGRGeometry*>::iterator iterGeoms = ogrGeoms->begin(); iterGeoms != ogrGeoms->end(); ++iterGeoms)
-            {
-                geomCollectionOrig->addGeometryDirectly(*iterGeoms);
-            }
-
-            OGRGeometryCollection *geomCollectionLines = new OGRGeometryCollection();
-            rsgis::geom::RSGISGeometry geomUtils;
-            geomUtils.convertGeometryCollection2Lines(geomCollectionOrig, geomCollectionLines);
-
-            // Create blank image
-            rsgis::img::RSGISImageUtils imageUtils;
-            GDALDataset *outImage = imageUtils.createCopy(imgDataset, 1, outputImage, imageFormat, GDT_Float32);
-
-            rsgis::img::RSGISCalcDist2Geom *dist2GeomCalcValue = new rsgis::img::RSGISCalcDist2Geom(1, geomCollectionLines, geomCollectionOrig);
-            rsgis::img::RSGISCalcEditImage *calcEditImage = new rsgis::img::RSGISCalcEditImage(dist2GeomCalcValue);
-            calcEditImage->calcImage(outImage);
-
-            // Clean up memory.
-            delete geomCollectionOrig;
-            delete geomCollectionLines;
-            delete ogrGeoms;
-            GDALClose(inputSHPDS);
-            GDALClose(outImage);
-            GDALClose(imgDataset);
-        }
-        catch (rsgis::RSGISException &e)
-        {
-            throw RSGISCmdException(e.what());
-        }
-
-    }
-                
     void executeCorrelationWindow(std::string inputImage, std::string outputImage, unsigned int winSize, unsigned int corrBandA, unsigned int corrBandB, std::string gdalFormat, RSGISLibDataType outDataType)
     {
         

@@ -138,8 +138,8 @@ set(LIB_COMMANDS_CPP
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdElevationTools.h
     ${RSGIS_SRC_CMDS_DIR}/RSGISCmdFilterImages.cpp
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdFilterImages.h
-	#${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageCalc.cpp
-	#${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageCalc.h
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageCalc.cpp
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageCalc.h
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageCalibration.cpp
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageCalibration.h
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdImageMorphology.cpp
@@ -365,6 +365,8 @@ set(LIB_IMG_H
 	)
 	
 set(LIB_IMG_CPP
+	${RSGIS_SRC_IMG_DIR}/RSGISAddBands.cpp
+	${RSGIS_SRC_IMG_DIR}/RSGISAddBands.h
 	${RSGIS_SRC_IMG_DIR}/RSGISAddNoise.cpp
 	${RSGIS_SRC_IMG_DIR}/RSGISAddNoise.h
 	${RSGIS_SRC_IMG_DIR}/RSGISApplyEigenvectors.cpp
@@ -789,7 +791,7 @@ set(LIB_UTILS_CPP
 	${RSGIS_SRC_UTILS_DIR}/RSGISAllometricEquations.h
 	${RSGIS_SRC_UTILS_DIR}/RSGISExportData2HDF.cpp
 	${RSGIS_SRC_UTILS_DIR}/RSGISExportData2HDF.h
-	)
+		utils/RSGISGeometryUtils.cpp utils/RSGISGeometryUtils.h)
 ###############################################################################
 
 ###############################################################################
