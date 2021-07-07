@@ -458,6 +458,33 @@ namespace rsgis{namespace vec{
             }
             return pts;
         }
+
+
+        OGREnvelope* RSGISVectorUtils::getEnvelope(OGRGeometry *geom)
+        {
+            OGREnvelope *env = new OGREnvelope();
+            geom->getEnvelope(env);
+            return env;
+        }
+
+        OGREnvelope* RSGISVectorUtils::getEnvelopePixelBuffer(OGRGeometry *geom, double imageRes)
+        {
+            /// Gets the envelope of an OGRGeometry buffered by one pixel.
+            // When rasterising small polygons, getEnvelope can return an envelope that is smaller than a pixel.
+            // This class buffers the envelope by a 1/2 a pixel to ensure the envelope covers at least 1 pixel
+
+            OGREnvelope *env = new OGREnvelope();
+            geom->getEnvelope(env);
+
+            double buffer = imageRes / 2;
+
+            env->MinX = env->MinX - buffer;
+            env->MaxX = env->MaxX + buffer;
+            env->MinY = env->MinY - buffer;
+            env->MaxY = env->MaxY + buffer;
+
+            return env;
+        }
 	
 	/*
 	geos::geom::LineString* RSGISVectorUtils::convertOGRLineString2GEOSLineString(OGRLineString *line)
