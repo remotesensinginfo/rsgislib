@@ -30,6 +30,8 @@
 
 #include "common/RSGISCommons.h"
 
+#define RSGIS_PY_C_TEXT( text ) (const_cast<char*>(text))
+
 // hides differences between Python2 and 3. 
 // PyString for Python2 - PyUnicode for Python3
 inline bool RSGISPY_CHECK_STRING(PyObject *o)
@@ -110,5 +112,6 @@ inline double RSGISPY_FLOAT_EXTRACT(PyObject *o)
     return PyFloat_AsDouble(o);
 #endif
 }
+
 
 #endif // RSGISPY_COMMON_H

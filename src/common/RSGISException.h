@@ -55,7 +55,7 @@ namespace rsgis
 			RSGISException(const char *message);
             RSGISException(std::string message);
 			virtual ~RSGISException();
-			virtual const char* what();
+			virtual const char* what() const noexcept;
 		protected:
             std::string msgs;
 	};

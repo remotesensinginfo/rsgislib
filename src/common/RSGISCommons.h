@@ -30,6 +30,8 @@
 #include <iostream>
 #include <string>
 
+#define RSGIS_C_TEXT( text ) (const_cast<char*>(text))
+
 namespace rsgis
 {
     enum RSGISLibDataType

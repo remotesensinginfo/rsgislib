@@ -194,7 +194,7 @@ namespace rsgis{namespace rastergis{
                     majBlockFirst[j] = true;
                     if(copyClassName)
                     {
-                        majClassNamesBlock[j] = "";
+                        majClassNamesBlock[j] = RSGIS_C_TEXT("");
                     }
                 }
                 for(std::map<size_t,CategoryField>::iterator iterCats = cats->begin(); iterCats != cats->end(); ++iterCats)
@@ -255,7 +255,7 @@ namespace rsgis{namespace rastergis{
                     majBlockFirst[j] = true;
                     if(copyClassName)
                     {
-                        majClassNamesBlock[j] = "";
+                        majClassNamesBlock[j] = RSGIS_C_TEXT("");
                     }
                 }
                 for(std::map<size_t,CategoryField>::iterator iterCats = cats->begin(); iterCats != cats->end(); ++iterCats)

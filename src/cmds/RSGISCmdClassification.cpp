@@ -116,7 +116,7 @@ namespace rsgis{ namespace cmds {
     }
     
     
-    void executeGenerateRandomAccuracyPts(std::string classImage, std::string outputVecFile, std::string outputVecLyr, std::string outVecFormat, std::string classImgCol, std::string classImgVecCol, std::string classRefVecCol, unsigned int numPts, unsigned int seed, bool force)
+    void executeGenerateRandomAccuracyPts(std::string classImage, std::string outputVecFile, std::string outputVecLyr, std::string outVecFormat, std::string classImgCol, std::string classImgVecCol, std::string classRefVecCol, unsigned int numPts, unsigned int seed, bool del_exist_vec)
     {
         try
         {
@@ -145,25 +145,25 @@ namespace rsgis{ namespace cmds {
                 std::string outputDIR = fileUtils.getFileDirectoryPath(outputVecFile);
                 if (vecUtils.checkDIR4SHP(outputDIR, outputVecLyr))
                 {
-                    if (force)
+                    if (del_exist_vec)
                     {
                         vecUtils.deleteSHP(outputDIR, outputVecLyr);
                     }
                     else
                     {
-                        throw RSGISException("Vector file already exists, either delete or select force.");
+                        throw RSGISException("Vector file already exists, either delete or select del_exist_vec.");
                     }
                 }
             }
             else
             {
-                if(fileUtils.checkFilePresent(outputVecFile) & force)
+                if(fileUtils.checkFilePresent(outputVecFile) & del_exist_vec)
                 {
                     fileUtils.removeFileIfPresent(outputVecFile);
                 }
                 else
                 {
-                    throw RSGISException("Vector file already exists, either delete or select force.");
+                    throw RSGISException("Vector file already exists, either delete or select del_exist_vec.");
                 }
             }
             ogrSpatialRef = new OGRSpatialReference(imgDataset->GetProjectionRef());
@@ -208,7 +208,7 @@ namespace rsgis{ namespace cmds {
     }
 
     
-    void executeGenerateStratifiedRandomAccuracyPts(std::string classImage, std::string outputVecFile, std::string outputVecLyr, std::string outVecFormat, std::string classImgCol, std::string classImgVecCol, std::string classRefVecCol, unsigned int numPtsPerClass, unsigned int seed, bool force, bool usePxlLst)
+    void executeGenerateStratifiedRandomAccuracyPts(std::string classImage, std::string outputVecFile, std::string outputVecLyr, std::string outVecFormat, std::string classImgCol, std::string classImgVecCol, std::string classRefVecCol, unsigned int numPtsPerClass, unsigned int seed, bool del_exist_vec, bool usePxlLst)
     {
         try
         {
@@ -237,25 +237,25 @@ namespace rsgis{ namespace cmds {
                 std::string outputDIR = fileUtils.getFileDirectoryPath(outputVecFile);
                 if (vecUtils.checkDIR4SHP(outputDIR, outputVecLyr))
                 {
-                    if (force)
+                    if (del_exist_vec)
                     {
                         vecUtils.deleteSHP(outputDIR, outputVecLyr);
                     }
                     else
                     {
-                        throw RSGISException("Vector file already exists, either delete or select force.");
+                        throw RSGISException("Vector file already exists, either delete or select del_exist_vec.");
                     }
                 }
             }
             else
             {
-                if(fileUtils.checkFilePresent(outputVecFile) & force)
+                if(fileUtils.checkFilePresent(outputVecFile) & del_exist_vec)
                 {
                     fileUtils.removeFileIfPresent(outputVecFile);
                 }
                 else
                 {
-                    throw RSGISException("Vector file already exists, either delete or select force.");
+                    throw RSGISException("Vector file already exists, either delete or select del_exist_vec.");
                 }
             }
             ogrSpatialRef = new OGRSpatialReference(imgDataset->GetProjectionRef());

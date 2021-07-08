@@ -140,7 +140,7 @@ namespace rsgis{namespace rastergis{
                     inStrData[i] = new char*[RAT_BLOCK_LENGTH];
                     for(int j = 0; j < RAT_BLOCK_LENGTH; ++j)
                     {
-                        inStrData[i][j] = "";
+                        inStrData[i][j] = RSGIS_C_TEXT("");
                     }
                 }
             }
@@ -153,7 +153,7 @@ namespace rsgis{namespace rastergis{
                     outStrData[i] = new char*[RAT_BLOCK_LENGTH];
                     for(int j = 0; j < RAT_BLOCK_LENGTH; ++j)
                     {
-                        outStrData[i][j] = "";
+                        outStrData[i][j] = RSGIS_C_TEXT("");
                     }
                 }
             }
@@ -246,7 +246,7 @@ namespace rsgis{namespace rastergis{
                     gdalRAT->ValuesIO(GF_Write, outStrColIdx[n], startRow, RAT_BLOCK_LENGTH, outStrData[n]);
                     for(int j = 0; j < RAT_BLOCK_LENGTH; ++j)
                     {
-                        outStrData[n][j] = "";
+                        outStrData[n][j] = RSGIS_C_TEXT("");
                     }
                 }
                 

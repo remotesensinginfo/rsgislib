@@ -1099,7 +1099,7 @@ Where:
                 out_lyr_names.append(out_lyr)
 
 
-def createPolySHP4LstBBOXs(csvFile, outSHP, epsgCode, minXCol=0, maxXCol=1, minYCol=2, maxYCol=3, ignoreRows=0, force=False):
+def createPolySHP4LstBBOXs(csvFile, outSHP, epsgCode, minXCol=0, maxXCol=1, minYCol=2, maxYCol=3, ignoreRows=0, del_exist_vec=False):
     """
 This function takes a CSV file of bounding boxes (1 per line) and creates a polygon shapefile.
 
@@ -1111,13 +1111,13 @@ This function takes a CSV file of bounding boxes (1 per line) and creates a poly
 :param minYCol: The index (starting at 0) for the column within the CSV file for the minimum Y coordinate.
 :param maxYCol: The index (starting at 0) for the column within the CSV file for the maximum Y coordinate.
 :param ignoreRows: The number of rows to ignore from the start of the CSV file (i.e., column headings)
-:param force: If the output file already exists delete it before proceeding.
+:param del_exist_vec: If the output file already exists delete it before proceeding.
 
 """
     gdal.UseExceptions()
     try:
         if os.path.exists(outSHP):
-            if force:
+            if del_exist_vec:
                 driver = ogr.GetDriverByName('ESRI Shapefile')
                 driver.DeleteDataSource(outSHP)
             else:
@@ -1322,7 +1322,7 @@ A function which splits the input vector layer into a number of output layers.
 
 
 def reProjVectorLayer(inputVec, outputVec, outProjWKT, outDriverName='ESRI Shapefile', outLyrName=None,
-                      inLyrName=None, inProjWKT=None, force=False):
+                      inLyrName=None, inProjWKT=None, del_exist_vec=False):
     """
 A function which reprojects a vector layer. You might also consider using rsgislib.vectorutils.vector_translate,
 particularly if you are reprojecting the data and changing between coordinate units (e.g., degrees to meters)
@@ -1373,7 +1373,7 @@ particularly if you are reprojecting the data and changing between coordinate un
     # create the output layer
     if os.path.exists(outputVec):
         if (outDriverName == 'ESRI Shapefile'):
-            if force:
+            if del_exist_vec:
                 driver.DeleteDataSource(outputVec)
             else:
                 raise Exception('Output shapefile already exists - stopping.')
@@ -3298,7 +3298,7 @@ def merge_to_multi_layer_vec(input_file_lyrs, output_file, format='GPKG', overwr
 
 
 def convert_polygon2polyline(vec_poly_file, vec_poly_lyr, vec_line_file, vec_line_lyr=None,
-                             out_format="ESRI Shapefile", force=False):
+                             out_format="ESRI Shapefile", del_exist_vec=False):
     """
     A function to convert a polygon vector file to a polyline file.
 
@@ -3307,7 +3307,7 @@ def convert_polygon2polyline(vec_poly_file, vec_poly_lyr, vec_line_file, vec_lin
     :param vec_line_file: The output vector file
     :param vec_line_lyr: The output vector layer name
     :param out_format: The output vector file format (default: ESRI Shapefile).
-    :param force: remove output file if it exists.
+    :param del_exist_vec: remove output file if it exists.
 
     """
     from osgeo import gdal
@@ -3316,7 +3316,7 @@ def convert_polygon2polyline(vec_poly_file, vec_poly_lyr, vec_line_file, vec_lin
     import tqdm
 
     if os.path.exists(vec_line_file):
-        if force:
+        if del_exist_vec:
             delete_vector_file(vec_line_file)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(vec_line_file))
@@ -3458,7 +3458,7 @@ def find_pt_to_side(pt_start, pt, pt_end, line_len, left_hand=False):
 
 
 def create_orthg_lines(vec_file, vec_lyr, out_vec_file, out_vec_lyr=None, pt_step=1000, line_len=10000, left_hand=False,
-                       out_format="GEOJSON", force=False):
+                       out_format="GEOJSON", del_exist_vec=False):
     """
     A function to create a set of lines which are orthogonal to the lines of the input
     vector file.
@@ -3473,7 +3473,7 @@ def create_orthg_lines(vec_file, vec_lyr, out_vec_file, out_vec_lyr=None, pt_ste
     :param left_hand: Specify which side the point is projected from the line (i.e., left or right side)
                       Default: False - project right-hand side of vector, True - project left-hand side of vector
     :param out_format: The output file format of the vector file.
-    :param force: remove output file if it exists.
+    :param del_exist_vec: remove output file if it exists.
 
     """
     from osgeo import gdal
@@ -3482,7 +3482,7 @@ def create_orthg_lines(vec_file, vec_lyr, out_vec_file, out_vec_lyr=None, pt_ste
     import tqdm
 
     if os.path.exists(out_vec_file):
-        if force:
+        if del_exist_vec:
             delete_vector_file(out_vec_file)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
@@ -3592,7 +3592,7 @@ def create_orthg_lines(vec_file, vec_lyr, out_vec_file, out_vec_lyr=None, pt_ste
 
 def closest_line_intersection(vec_line_file, vec_line_lyr, vec_objs_file, vec_objs_lyr, out_vec_file, out_vec_lyr=None,
                               start_x_field='start_x', start_y_field='start_y', uid_field='uid', out_format="GEOJSON",
-                              force=False):
+                              del_exist_vec=False):
     """
     A function which intersects each line within the input vector layer (vec_objs_file, vec_objs_lyr)
     creating a new line between the start point of the input layer (defined in the vector attribute table:
@@ -3608,7 +3608,7 @@ def closest_line_intersection(vec_line_file, vec_line_lyr, vec_objs_file, vec_ob
     :param start_y_field: The field name for the start point Y coordinate for the input lines.
     :param uid_field: The field name for the Unique ID (UID) of the input lines.
     :param out_format: The output file format of the vector file.
-    :param force: remove output file if it exists.
+    :param del_exist_vec: remove output file if it exists.
 
     """
     from osgeo import gdal
@@ -3618,7 +3618,7 @@ def closest_line_intersection(vec_line_file, vec_line_lyr, vec_objs_file, vec_ob
     import tqdm
 
     if os.path.exists(out_vec_file):
-        if force:
+        if del_exist_vec:
             delete_vector_file(out_vec_file)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
@@ -3764,7 +3764,7 @@ def closest_line_intersection(vec_line_file, vec_line_lyr, vec_objs_file, vec_ob
 
 def line_intersection_range(vec_line_file, vec_line_lyr, vec_objs_file, vec_objs_lyr, out_vec_file, out_vec_lyr=None,
                             start_x_field='start_x', start_y_field='start_y', uid_field='uid', out_format="GEOJSON",
-                            force=False):
+                            del_exist_vec=False):
     """
     A function which intersects each line within the input vector layer (vec_objs_file, vec_objs_lyr)
     creating a new line between the closest intersection to the start point of the input layer
@@ -3781,7 +3781,7 @@ def line_intersection_range(vec_line_file, vec_line_lyr, vec_objs_file, vec_objs
     :param start_y_field: The field name for the start point Y coordinate for the input lines.
     :param uid_field: The field name for the Unique ID (UID) of the input lines.
     :param out_format: The output file format of the vector file.
-    :param force: remove output file if it exists.
+    :param del_exist_vec: remove output file if it exists.
 
     """
     from osgeo import gdal
@@ -3791,7 +3791,7 @@ def line_intersection_range(vec_line_file, vec_line_lyr, vec_objs_file, vec_objs
     import tqdm
 
     if os.path.exists(out_vec_file):
-        if force:
+        if del_exist_vec:
             delete_vector_file(out_vec_file)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
@@ -3951,7 +3951,7 @@ def line_intersection_range(vec_line_file, vec_line_lyr, vec_objs_file, vec_objs
 
 def scnd_line_intersection_range(vec_line_file, vec_line_lyr, vec_objs_file, vec_objs_lyr, out_vec_file,
                                  out_vec_lyr=None, start_x_field='start_x', start_y_field='start_y', uid_field='uid',
-                                 out_format="GEOJSON", force=False):
+                                 out_format="GEOJSON", del_exist_vec=False):
     """
     A function which intersects a line with a set of polygons outputting the lines cut to their second point
     of intersection. Assume, first point of intersection would be entering the polygon and the second point
@@ -3967,7 +3967,7 @@ def scnd_line_intersection_range(vec_line_file, vec_line_lyr, vec_objs_file, vec
     :param start_y_field: The field name for the start point Y coordinate for the input lines.
     :param uid_field: The field name for the Unique ID (UID) of the input lines.
     :param out_format: The output file format of the vector file.
-    :param force: remove output file if it exists.
+    :param del_exist_vec: remove output file if it exists.
 
     """
     from osgeo import gdal
@@ -3978,7 +3978,7 @@ def scnd_line_intersection_range(vec_line_file, vec_line_lyr, vec_objs_file, vec
     import tqdm
 
     if os.path.exists(out_vec_file):
-        if force:
+        if del_exist_vec:
             delete_vector_file(out_vec_file)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
@@ -4164,7 +4164,7 @@ def scnd_line_intersection_range(vec_line_file, vec_line_lyr, vec_objs_file, vec
 
 def vector_translate(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr=None, out_vec_drv='GPKG',
                      drv_create_opts=[], lyr_create_opts=[], access_mode='overwrite', src_srs=None,
-                     dst_srs=None, force=False):
+                     dst_srs=None, del_exist_vec=False):
     """
     A function which translates a vector file to another format, similar to ogr2ogr. If you wish
     to reproject the input file then provide a destination srs (e.g., "EPSG:27700", or wkt string,
@@ -4184,14 +4184,14 @@ def vector_translate(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr=None, ou
                     information has gone missing. Can be used without performing a reprojection.
     :param dst_srs: provide a spatial reference for the output vector file to be reprojected to. (Default=None)
                     If specified then the file will be reprojected.
-    :param force: remove output file if it exists.
+    :param del_exist_vec: remove output file if it exists.
 
     """
     from osgeo import gdal
     gdal.UseExceptions()
 
     if os.path.exists(out_vec_file):
-        if force:
+        if del_exist_vec:
             delete_vector_file(out_vec_file)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
@@ -4291,7 +4291,7 @@ def get_vec_lyr_as_pts(in_vec_file, in_vec_lyr):
 
 def reproj_wgs84_vec_to_utm(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr=None, use_hemi=True,
                             out_vec_drv='GPKG', drv_create_opts=[], lyr_create_opts=[],
-                            access_mode='overwrite', force=False):
+                            access_mode='overwrite', del_exist_vec=False):
     """
     A function which reprojects an input file projected in WGS84 (EPSG:4326) to UTM, where the UTM zone is
     automatically identified using the mean x and y.
@@ -4306,7 +4306,7 @@ def reproj_wgs84_vec_to_utm(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr=N
     :param lyr_create_opts: a list of options for the creation of the output layer.
     :param access_mode: by default the function overwrites the output file but other
                         options are: ['update', 'append', 'overwrite']
-    :param force: remove output file if it exists.
+    :param del_exist_vec: remove output file if it exists.
 
     """
     import rsgislib.tools.utm
@@ -4316,7 +4316,7 @@ def reproj_wgs84_vec_to_utm(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr=N
     import tqdm
 
     if os.path.exists(out_vec_file):
-        if force:
+        if del_exist_vec:
             delete_vector_file(out_vec_file)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
@@ -4370,7 +4370,7 @@ def reproj_wgs84_vec_to_utm(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr=N
 
 
 def create_alpha_shape(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr, out_vec_drv='GEOJSON', alpha_val=None,
-                       alpha_vals=None, max_iter=10000, force=False):
+                       alpha_vals=None, max_iter=10000, del_exist_vec=False):
     """
     Function which calculate an alpha shape for a set of vector features (which are converted to points).
 
@@ -4390,7 +4390,7 @@ def create_alpha_shape(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr, out_v
                        values will be the order they are tested. If None then the alpha_val parameter will be used.
     :param max_iter: The maximum number of iterations for automatically selecting the alpha value. Note if the number
                      iteration is not sufficient to find an optimum value then no value is returned.
-    :param force: remove output file if it exists.
+    :param del_exist_vec: remove output file if it exists.
     :return: (vec_output, alpha_val); vec_output is a boolean True an output produced; False no output,
              alpha_val - the alpha value used for the analysis. If a single value was inputted then the
              same value will be outputted.
@@ -4404,7 +4404,7 @@ def create_alpha_shape(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr, out_v
     gdal.UseExceptions()
 
     if os.path.exists(out_vec_file):
-        if force:
+        if del_exist_vec:
             delete_vector_file(out_vec_file)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
@@ -4519,7 +4519,7 @@ def create_alpha_shape(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr, out_v
     return vec_output, alpha_val
 
 
-def convert_multi_geoms_to_single(vecfile, veclyrname, outVecDrvr, vecoutfile, vecoutlyrname, force=False):
+def convert_multi_geoms_to_single(vecfile, veclyrname, outVecDrvr, vecoutfile, vecoutlyrname, del_exist_vec=False):
     """
     A convert any multiple geometries into single geometries.
 
@@ -4528,7 +4528,7 @@ def convert_multi_geoms_to_single(vecfile, veclyrname, outVecDrvr, vecoutfile, v
     :param outVecDrvr: the format driver for the output vector file (e.g., GPKG, ESRI Shapefile).
     :param vecoutfile: output file path for the vector.
     :param vecoutlyrname: output vector layer name.
-    :param force: remove output file if it exists.
+    :param del_exist_vec: remove output file if it exists.
 
     """
     from osgeo import gdal
@@ -4537,7 +4537,7 @@ def convert_multi_geoms_to_single(vecfile, veclyrname, outVecDrvr, vecoutfile, v
     gdal.UseExceptions()
 
     if os.path.exists(vecoutfile):
-        if force:
+        if del_exist_vec:
             delete_vector_file(vecoutfile)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(vecoutfile))
@@ -4633,7 +4633,7 @@ def convert_multi_geoms_to_single(vecfile, veclyrname, outVecDrvr, vecoutfile, v
     result_ds = None
 
 
-def simplify_geometries(vecfile, veclyrname, tolerance, outVecDrvr, vecoutfile, vecoutlyrname, force=False):
+def simplify_geometries(vecfile, veclyrname, tolerance, outVecDrvr, vecoutfile, vecoutlyrname, del_exist_vec=False):
     """
 Create a simplified version of the input
 
@@ -4643,7 +4643,7 @@ Create a simplified version of the input
 :param outVecDrvr: the format driver for the output vector file (e.g., GPKG, ESRI Shapefile).
 :param vecoutfile: output file path for the vector.
 :param vecoutlyrname: output vector layer name.
-:param force: remove output file if it exists.
+:param del_exist_vec: remove output file if it exists.
 
 """
     from osgeo import gdal
@@ -4652,7 +4652,7 @@ Create a simplified version of the input
     gdal.UseExceptions()
 
     if os.path.exists(vecoutfile):
-        if force:
+        if del_exist_vec:
             delete_vector_file(vecoutfile)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(vecoutfile))
@@ -4713,7 +4713,7 @@ Create a simplified version of the input
     result_ds = None
 
 
-def delete_polygon_holes(vecfile, veclyrname, outVecDrvr, vecoutfile, vecoutlyrname, area_thres=None, force=False):
+def delete_polygon_holes(vecfile, veclyrname, outVecDrvr, vecoutfile, vecoutlyrname, area_thres=None, del_exist_vec=False):
     """
 Delete holes from the input polygons in below the area threshold.
 
@@ -4723,7 +4723,7 @@ Delete holes from the input polygons in below the area threshold.
 :param vecoutfile: output file path for the vector.
 :param vecoutlyrname: output vector layer name.
 :param area_thres: threshold below which holes are removed. If threshold is None then all holes are removed.
-:param force: remove output file if it exists.
+:param del_exist_vec: remove output file if it exists.
 
 """
     from osgeo import gdal
@@ -4732,7 +4732,7 @@ Delete holes from the input polygons in below the area threshold.
     gdal.UseExceptions()
 
     if os.path.exists(vecoutfile):
-        if force:
+        if del_exist_vec:
             delete_vector_file(vecoutfile)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(vecoutfile))
@@ -4891,7 +4891,7 @@ Get an array of the areas of the polygon holes.
     return hole_areas
 
 
-def remove_polygon_area(vecfile, veclyrname, outVecDrvr, vecoutfile, vecoutlyrname, area_thres, force=False):
+def remove_polygon_area(vecfile, veclyrname, outVecDrvr, vecoutfile, vecoutlyrname, area_thres, del_exist_vec=False):
     """
 Delete polygons with an area below a defined threshold.
 
@@ -4901,7 +4901,7 @@ Delete polygons with an area below a defined threshold.
 :param vecoutfile: output file path for the vector.
 :param vecoutlyrname: output vector layer name.
 :param area_thres: threshold below which polygons are removed.
-:param force: remove output file if it exists.
+:param del_exist_vec: remove output file if it exists.
 
 """
     from osgeo import gdal
@@ -4910,7 +4910,7 @@ Delete polygons with an area below a defined threshold.
     gdal.UseExceptions()
 
     if os.path.exists(vecoutfile):
-        if force:
+        if del_exist_vec:
             delete_vector_file(vecoutfile)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(vecoutfile))
@@ -4986,7 +4986,7 @@ Delete polygons with an area below a defined threshold.
 
 
 def vec_lyr_intersection(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_file, out_vec_lyr=None,
-                         out_format="GEOJSON", force=False):
+                         out_format="GEOJSON", del_exist_vec=False):
     """
     A function which performs an intersection between the vector layer and the overlain vector.
 
@@ -4997,7 +4997,7 @@ def vec_lyr_intersection(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec
     :param out_vec_file: The output vector file path.
     :param out_vec_lyr: The output vector layer name.
     :param out_format: The output file format of the vector file.
-    :param force: remove output file if it exists.
+    :param del_exist_vec: remove output file if it exists.
 
     """
     from osgeo import gdal
@@ -5007,7 +5007,7 @@ def vec_lyr_intersection(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec
     import tqdm
 
     if os.path.exists(out_vec_file):
-        if force:
+        if del_exist_vec:
             delete_vector_file(out_vec_file)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
@@ -5115,7 +5115,7 @@ def vec_lyr_intersection(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec
 
 
 def vec_lyr_difference(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_file, out_vec_lyr=None,
-                       out_format="GEOJSON", symmetric=False, force=False):
+                       out_format="GEOJSON", symmetric=False, del_exist_vec=False):
     """
     A function which performs an difference between the vector layer and the overlain vector.
 
@@ -5127,7 +5127,7 @@ def vec_lyr_difference(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_f
     :param out_vec_lyr: The output vector layer name.
     :param out_format: The output file format of the vector file.
     :param symmetric: If True then the symmetric difference will be taken.
-    :param force: remove output file if it exists.
+    :param del_exist_vec: remove output file if it exists.
 
     """
     from osgeo import gdal
@@ -5137,7 +5137,7 @@ def vec_lyr_difference(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_f
     import tqdm
 
     if os.path.exists(out_vec_file):
-        if force:
+        if del_exist_vec:
             delete_vector_file(out_vec_file)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
@@ -6480,7 +6480,7 @@ def createNameCol(vec_file, vec_lyr, vec_out_file, vec_out_lyr, out_format='GPKG
         base_gpdf.to_file(vec_out_file, driver=out_format)
 
 
-def vec_lyr_intersection_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_file, out_vec_lyr=None, out_format="GPKG", force=False):
+def vec_lyr_intersection_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_file, out_vec_lyr=None, out_format="GPKG", del_exist_vec=False):
     """
     A function which performs an intersection between the vector layer and the overlain vector using Geopandas.
 
@@ -6491,13 +6491,13 @@ def vec_lyr_intersection_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_
     :param out_vec_file: The output vector file path.
     :param out_vec_lyr: The output vector layer name.
     :param out_format: The output file format of the vector file.
-    :param force: remove output file if it exists.
+    :param del_exist_vec: remove output file if it exists.
     """
     import os
     import geopandas
 
     if os.path.exists(out_vec_file):
-        if force:
+        if del_exist_vec:
             delete_vector_file(out_vec_file)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
@@ -6518,7 +6518,7 @@ def vec_lyr_intersection_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_
         data_inter_gdf.to_file(out_vec_file, driver=out_format)
 
 
-def vec_lyr_difference_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_file, out_vec_lyr=None, out_format="GPKG", force=False):
+def vec_lyr_difference_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_file, out_vec_lyr=None, out_format="GPKG", del_exist_vec=False):
     """
     A function which performs a difference between the vector layer and the overlain vector using Geopandas.
 
@@ -6529,13 +6529,13 @@ def vec_lyr_difference_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_ve
     :param out_vec_file: The output vector file path.
     :param out_vec_lyr: The output vector layer name.
     :param out_format: The output file format of the vector file.
-    :param force: remove output file if it exists.
+    :param del_exist_vec: remove output file if it exists.
     """
     import os
     import geopandas
 
     if os.path.exists(out_vec_file):
-        if force:
+        if del_exist_vec:
             delete_vector_file(out_vec_file)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
@@ -6556,7 +6556,7 @@ def vec_lyr_difference_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_ve
         data_inter_gdf.to_file(out_vec_file, driver=out_format)
 
 
-def vec_lyr_sym_difference_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_file, out_vec_lyr=None, out_format="GPKG", force=False):
+def vec_lyr_sym_difference_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_file, out_vec_lyr=None, out_format="GPKG", del_exist_vec=False):
     """
     A function which performs a symmetric difference between the vector layer and the overlain vector using Geopandas.
 
@@ -6567,13 +6567,13 @@ def vec_lyr_sym_difference_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, ou
     :param out_vec_file: The output vector file path.
     :param out_vec_lyr: The output vector layer name.
     :param out_format: The output file format of the vector file.
-    :param force: remove output file if it exists.
+    :param del_exist_vec: remove output file if it exists.
     """
     import os
     import geopandas
 
     if os.path.exists(out_vec_file):
-        if force:
+        if del_exist_vec:
             delete_vector_file(out_vec_file)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
@@ -6594,7 +6594,7 @@ def vec_lyr_sym_difference_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, ou
         data_inter_gdf.to_file(out_vec_file, driver=out_format)
 
 
-def vec_lyr_identity_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_file, out_vec_lyr=None, out_format="GPKG", force=False):
+def vec_lyr_identity_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_file, out_vec_lyr=None, out_format="GPKG", del_exist_vec=False):
     """
     A function which performs a identity between the vector layer and the overlain vector using Geopandas.
 
@@ -6607,13 +6607,13 @@ def vec_lyr_identity_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_
     :param out_vec_file: The output vector file path.
     :param out_vec_lyr: The output vector layer name.
     :param out_format: The output file format of the vector file.
-    :param force: remove output file if it exists.
+    :param del_exist_vec: remove output file if it exists.
     """
     import os
     import geopandas
 
     if os.path.exists(out_vec_file):
-        if force:
+        if del_exist_vec:
             delete_vector_file(out_vec_file)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
@@ -6634,7 +6634,7 @@ def vec_lyr_identity_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_
         data_inter_gdf.to_file(out_vec_file, driver=out_format)
 
 
-def vec_lyr_union_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_file, out_vec_lyr=None, out_format="GPKG", force=False):
+def vec_lyr_union_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_file, out_vec_lyr=None, out_format="GPKG", del_exist_vec=False):
     """
     A function which performs a union between the vector layer and the overlain vector using Geopandas.
 
@@ -6645,13 +6645,13 @@ def vec_lyr_union_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_fil
     :param out_vec_file: The output vector file path.
     :param out_vec_lyr: The output vector layer name.
     :param out_format: The output file format of the vector file.
-    :param force: remove output file if it exists.
+    :param del_exist_vec: remove output file if it exists.
     """
     import os
     import geopandas
 
     if os.path.exists(out_vec_file):
-        if force:
+        if del_exist_vec:
             delete_vector_file(out_vec_file)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
@@ -6673,7 +6673,7 @@ def vec_lyr_union_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_fil
 
 
 def vectorise_pxls_to_pts(input_img, img_band, img_msk_val, vec_out_file, vec_out_lyr=None, out_format='GPKG',
-                          out_epsg_code=None, force=False):
+                          out_epsg_code=None, del_exist_vec=False):
     """
     Function which creates a new output vector file for the pixels within the input image file
     with the value specified. Pixel locations will be the centroid of the the pixel
@@ -6687,7 +6687,7 @@ def vectorise_pxls_to_pts(input_img, img_band, img_msk_val, vec_out_file, vec_ou
     :param vec_out_lyr: output vector layer name.
     :param out_format: output file format (default GPKG).
     :param out_epsg_code: optionally provide an EPSG code for the output layer. If None then taken from input image.
-    :param force: remove output file if it exists.
+    :param del_exist_vec: remove output file if it exists.
 
     """
     from rios import applier
@@ -6702,7 +6702,7 @@ def vectorise_pxls_to_pts(input_img, img_band, img_msk_val, vec_out_file, vec_ou
         progress_bar = cuiprogress.GDALProgressBar()
 
     if os.path.exists(vec_out_file):
-        if force:
+        if del_exist_vec:
             delete_vector_file(vec_out_file)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(vec_out_file))
