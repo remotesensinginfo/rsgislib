@@ -37,15 +37,21 @@ struct ImageRegistrationState
 static struct ImageRegistrationState _state;
 #endif
 
-static PyObject *ImageRegistration_BasicRegistration(PyObject *self, PyObject *args)
+static PyObject *ImageRegistration_BasicRegistration(PyObject *self, PyObject *args, PyObject *keywds)
 {
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("in_ref_img"), RSGIS_PY_C_TEXT("in_float_img"),
+                             RSGIS_PY_C_TEXT("out_gcp_file"), RSGIS_PY_C_TEXT("pixel_gap"),
+                             RSGIS_PY_C_TEXT("threshold"), RSGIS_PY_C_TEXT("win_size"),
+                             RSGIS_PY_C_TEXT("search_area"), RSGIS_PY_C_TEXT("sd_ref_thres"),
+                             RSGIS_PY_C_TEXT("sd_flt_thres"), RSGIS_PY_C_TEXT("sub_pxl_res"),
+                             RSGIS_PY_C_TEXT("metric_type"), RSGIS_PY_C_TEXT("output_type"),  NULL};
     const char *pszInputReferenceImage, *pszInputFloatingmage, *pszOutputGCPFile;
     int pixelGap, windowSize, searchArea, subPixelResolution, metricType, outputType;
     float threshold, stdDevRefThreshold, stdDevFloatThreshold;
     
-    if( !PyArg_ParseTuple(args, "ssifiiffiiis:basicregistration", &pszInputReferenceImage, &pszInputFloatingmage, &pixelGap, 
-                                &threshold, &windowSize, &searchArea, &stdDevRefThreshold, &stdDevFloatThreshold, &subPixelResolution, 
-                                &metricType, &outputType, &pszOutputGCPFile))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssifiiffiii:basicregistration", kwlist, &pszInputReferenceImage, &pszInputFloatingmage,
+                                     &pszOutputGCPFile, &pixelGap, &threshold, &windowSize, &searchArea, &stdDevRefThreshold,
+                                     &stdDevFloatThreshold, &subPixelResolution, &metricType, &outputType))
         return NULL;
 
     try
@@ -64,18 +70,26 @@ static PyObject *ImageRegistration_BasicRegistration(PyObject *self, PyObject *a
     Py_RETURN_NONE;
 }
 
-static PyObject *ImageRegistration_SingleLayerRegistration(PyObject *self, PyObject *args)
+static PyObject *ImageRegistration_SingleLayerRegistration(PyObject *self, PyObject *args, PyObject *keywds)
 {
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("in_ref_img"), RSGIS_PY_C_TEXT("in_float_img"),
+                             RSGIS_PY_C_TEXT("out_gcp_file"), RSGIS_PY_C_TEXT("pixel_gap"),
+                             RSGIS_PY_C_TEXT("threshold"), RSGIS_PY_C_TEXT("win_size"),
+                             RSGIS_PY_C_TEXT("search_area"), RSGIS_PY_C_TEXT("sd_ref_thres"),
+                             RSGIS_PY_C_TEXT("sd_flt_thres"), RSGIS_PY_C_TEXT("sub_pxl_res"),
+                             RSGIS_PY_C_TEXT("dist_threshold"), RSGIS_PY_C_TEXT("max_n_iters"),
+                             RSGIS_PY_C_TEXT("move_chng_thres"), RSGIS_PY_C_TEXT("p_smooth"),
+                             RSGIS_PY_C_TEXT("metric_type"), RSGIS_PY_C_TEXT("output_type"),  NULL};
     const char *pszInputReferenceImage, *pszInputFloatingmage, *pszOutputGCPFile;
     int pixelGap, windowSize, searchArea, subPixelResolution, metricType, 
         outputType, maxNumIterations, distanceThreshold;
     float threshold, stdDevRefThreshold, stdDevFloatThreshold, moveChangeThreshold,
         pSmoothness;
     
-    if( !PyArg_ParseTuple(args, "ssifiiffiiiffiis:singlelayerregistration", &pszInputReferenceImage, &pszInputFloatingmage, &pixelGap, 
-                                &threshold, &windowSize, &searchArea, &stdDevRefThreshold, &stdDevFloatThreshold, &subPixelResolution,
-                                &distanceThreshold, &maxNumIterations, &moveChangeThreshold, &pSmoothness,
-                                &metricType, &outputType, &pszOutputGCPFile))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssifiiffiiiffii:singlelayerregistration", kwlist, &pszInputReferenceImage,
+                                     &pszInputFloatingmage, &pszOutputGCPFile, &pixelGap, &threshold, &windowSize, &searchArea,
+                                     &stdDevRefThreshold, &stdDevFloatThreshold, &subPixelResolution, &distanceThreshold,
+                                     &maxNumIterations, &moveChangeThreshold, &pSmoothness, &metricType, &outputType))
         return NULL;
 
     try
@@ -95,85 +109,15 @@ static PyObject *ImageRegistration_SingleLayerRegistration(PyObject *self, PyObj
     Py_RETURN_NONE;
 }
 
-static PyObject *ImageRegistration_TriangularWarp(PyObject *self, PyObject *args)
+static PyObject *ImageRegistration_GCP2GDAL(PyObject *self, PyObject *args, PyObject *keywds)
 {
-	const char *pszInputImage, *pszInputGCPFile, *pszOutputFile, *pszProjFile, *pszGDALFormat;
-	float nResolution;
-	int genTransformImage = false;
-    
-    if( !PyArg_ParseTuple(args, "ssssfs|i:triangularwarp", &pszInputImage, &pszInputGCPFile, &pszOutputFile, &pszProjFile, 
-                        &nResolution, &pszGDALFormat, &genTransformImage))
-        return NULL;
-
-    try
-    {
-        rsgis::cmds::excecuteTriangularWarp(pszInputImage, pszOutputFile, pszProjFile, pszInputGCPFile,
-                        nResolution, pszGDALFormat, genTransformImage);
-    }
-    catch(rsgis::cmds::RSGISCmdException &e)
-    {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
-    }
-
-    Py_RETURN_NONE;
-}
-
-static PyObject *ImageRegistration_NNWarp(PyObject *self, PyObject *args)
-{
-	const char *pszInputImage, *pszInputGCPFile, *pszOutputFile, *pszProjFile, *pszGDALFormat;
-	float nResolution;
-	int genTransformImage = false;
-    
-    if( !PyArg_ParseTuple(args, "ssssfs|i:nnwarp", &pszInputImage, &pszInputGCPFile, &pszOutputFile, &pszProjFile, 
-                        &nResolution, &pszGDALFormat, &genTransformImage))
-        return NULL;
-
-    try
-    {
-        rsgis::cmds::excecuteNNWarp(pszInputImage, pszOutputFile, pszProjFile, pszInputGCPFile,
-                        nResolution, pszGDALFormat, genTransformImage);
-    }
-    catch(rsgis::cmds::RSGISCmdException &e)
-    {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
-    }
-
-    Py_RETURN_NONE;
-}
-
-static PyObject *ImageRegistration_PolyWarp(PyObject *self, PyObject *args)
-{
-	const char *pszInputImage, *pszInputGCPFile, *pszOutputFile, *pszProjFile, *pszGDALFormat;
-	float nResolution;
-	int nPolyOrder;
-	int genTransformImage = false;
-    
-    if( !PyArg_ParseTuple(args, "ssssfis|i:polywarp", &pszInputImage, &pszInputGCPFile, &pszOutputFile, &pszProjFile, 
-                        &nResolution, &nPolyOrder, &pszGDALFormat, &genTransformImage))
-        return NULL;
-
-    try
-    {
-        rsgis::cmds::excecutePolyWarp(pszInputImage, pszOutputFile, pszProjFile, pszInputGCPFile,
-                        nResolution, nPolyOrder, pszGDALFormat, genTransformImage);
-    }
-    catch(rsgis::cmds::RSGISCmdException &e)
-    {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
-    }
-
-    Py_RETURN_NONE;
-}
-
-static PyObject *ImageRegistration_GCP2GDAL(PyObject *self, PyObject *args)
-{
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("in_gcp_file"),
+                             RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"),
+                             RSGIS_PY_C_TEXT("datatype"), NULL};
 	const char *pszInputImage, *pszInputGCPFile, *pszOutputFile, *pszGDALFormat;
 	int nOutDataType;
     
-    if( !PyArg_ParseTuple(args, "ssssi:gcp2gdal", &pszInputImage, &pszInputGCPFile, &pszOutputFile, &pszGDALFormat, &nOutDataType))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssi:gcp2gdal", kwlist, &pszInputImage, &pszInputGCPFile, &pszOutputFile, &pszGDALFormat, &nOutDataType))
         return NULL;
 
     try
@@ -189,13 +133,15 @@ static PyObject *ImageRegistration_GCP2GDAL(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-static PyObject *ImageRegistration_ApplyOffset2Image(PyObject *self, PyObject *args)
+static PyObject *ImageRegistration_ApplyOffset2Image(PyObject *self, PyObject *args, PyObject *keywds)
 {
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"),
+                             RSGIS_PY_C_TEXT("datatype"), RSGIS_PY_C_TEXT("x_offset"), RSGIS_PY_C_TEXT("y_offset"), NULL};
     const char *pszInputImage, *pszOutputImage, *pszGDALFormat;
 	int nOutDataType;
     double xOff, yOff;
     
-    if( !PyArg_ParseTuple(args, "sssidd:applyOffset2Image", &pszInputImage, &pszOutputImage, &pszGDALFormat, &nOutDataType, &xOff, &yOff))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssidd:applyOffset2Image", kwlist, &pszInputImage, &pszOutputImage, &pszGDALFormat, &nOutDataType, &xOff, &yOff))
         return NULL;
     
     try
@@ -213,14 +159,15 @@ static PyObject *ImageRegistration_ApplyOffset2Image(PyObject *self, PyObject *a
 
 // Our list of functions in this module
 static PyMethodDef ImageRegistrationMethods[] = {
-    {"basicregistration", ImageRegistration_BasicRegistration, METH_VARARGS, 
-"imageregistration.basicregistration(reference, floating, pixelGap, threshold, window, search, stddevRef, stddevFloat, subpixelresolution, metric, outputType, output)\n"
+    {"basicregistration", (PyCFunction)ImageRegistration_BasicRegistration, METH_VARARGS | METH_KEYWORDS,
+"imageregistration.basicregistration(reference, floating, output, pixelGap, threshold, window, search, stddevRef, stddevFloat, subpixelresolution, metric, outputType)\n"
 "Generate tie points between floating and reference image using basic algorithm.\n"
 "\n"
 "Where:\n"
 "\n"
 ":param reference: is a string providing reference image which to which the floating image is to be registered.n"
 ":param floating: is a string providing the floating image to be registered to the reference image\n"
+":param output: is a string giving specifying the output file, containing the generated tie points\n"
 ":param pixelGap: is an int specifying the gap, in image pixels, between the initial tie points (this is for both the x and y axis) \n"
 ":param threshold: is a float providing the threshold for the image metric above/below (depending on image metric) which matching is consider insufficient to be reliable and therefore the match will be ignored.\n"
 ":param window: is an int providing the size of the window around each tie point which will be used for the matching \n"
@@ -230,7 +177,6 @@ static PyMethodDef ImageRegistrationMethods[] = {
 ":param subpixelresolution: is an int specifying the sub-pixel resolution to which the pixel shifts are estimated. Note that the values are positive integers such that a value of 2 will result in a sub pixel resolution of 0.5 of a pixel and a value 4 will be 0.25 of a pixel. \n"
 ":param metric: is an the similarity metric used to compare images of type rsgislib.imageregistration.METRIC_* \n"
 ":param outputType: is an the format of the output file of type rsgislib.imageregistration.TYPE_* \n"
-":param output: is a string giving specifying the output file, containing the generated tie points\n"
 "\n"
 "Example::\n"
 "\n"
@@ -250,14 +196,15 @@ static PyMethodDef ImageRegistrationMethods[] = {
 "\n"
 },
 
-    {"singlelayerregistration", ImageRegistration_SingleLayerRegistration, METH_VARARGS, 
-"imageregistration.singlelayerregistration(reference, floating, pixelGap, threshold, window, search, stddevRef, stddevFloat, subpixelresolution, distanceThreshold, maxiterations, movementThreshold, pSmoothness, metric, outputType, output)\n"
+    {"singlelayerregistration", (PyCFunction)ImageRegistration_SingleLayerRegistration, METH_VARARGS | METH_KEYWORDS,
+"imageregistration.singlelayerregistration(reference, floating, output, pixelGap, threshold, window, search, stddevRef, stddevFloat, subpixelresolution, distanceThreshold, maxiterations, movementThreshold, pSmoothness, metric, outputType)\n"
 "Generate tie points between floating and reference image using a single connected layer of tie points.\n"
 "\n"
 "Where:\n"
 "\n"
 ":param reference: is a string providing reference image which to which the floating image is to be registered.n"
 ":param floating: is a string providing the floating image to be registered to the reference image\n"
+":param output: is a string giving specifying the output file, containing the generated tie points\n"
 ":param pixelGap: is an int specifying the gap, in image pixels, between the initial tie points (this is for both the x and y axis) which matching is consider insufficient to be reliable and therefore the match will be ignored.\n"
 ":param window: is an int providing the size of the window around each tie point which will be used for the matching \n"
 ":param search: is an int providing the distance (in pixels) from the tie point start point which will be searched.\n"
@@ -270,7 +217,6 @@ static PyMethodDef ImageRegistrationMethods[] = {
 ":param pSmoothness: is a float providing the 'p' parameter for the inverse weighted distance calculation. A value of 2 should be used by default\n"
 ":param metric: is an the similarity metric used to compare images of type rsgislib.imageregistration.METRIC_* \n"
 ":param outputType: is an the format of the output file of type rsgislib.imageregistration.TYPE_* \n"
-":param output: is a string giving specifying the output file, containing the generated tie points\n"
 "\n"
 "Example::\n"
 "\n"
@@ -291,90 +237,8 @@ static PyMethodDef ImageRegistrationMethods[] = {
 "\n"
 },
 
-    {"triangularwarp", ImageRegistration_TriangularWarp, METH_VARARGS, 
-"imageregistration.triangularwarp(inputimage, inputgcps, outputimage, wktStringFile, resolution, gdalformat, transformImage=False)\n"
-"Warp image from tie points using triangular interpolation.\n"
-"\n"
-"Where:\n"
-"\n"
-":param inputimage: is a string providing the input image.\n"
-":param inputgcps: is a string providing the input text file containing the tie points.\n"
-":param outputimage: is a string providing the output image.\n"
-":param wktStringFile: is a file path to a text file containing the WKT string to use for the warped image.\n"
-":param resolution: is a float providing the resolution of the output file\n"
-":param gdalformat: is a string providing the output format (e.g., KEA).\n"
-":param transformImage: is a bool, if set to true will generate an image providing the transform for each pixel, rather than warping the input image \n"
-"\n"
-"Example::\n"
-"\n"
-"    from rsgislib import imageregistration\n"
-"    inputImage = './Rasters/injune_p142_casi_sub_utm_single_band_offset3x3y.vrt'\n"
-"    inputGCPs = './TestOutputs/injune_p142_casi_sub_utm_tie_points_basic.txt'\n"
-"    outputImage = './TestOutputs/injune_p142_casi_sub_utm_single_band_offset3x3y_twarp.kea'\n"
-"    wktStringFile = './Vectors/injune_p142_crowns_utm.prj'\n"
-"    resolution = 1\n"
-"    gdalformat = 'KEA'\n"
-"    imageregistration.triangularwarp(inputImage,inputGCPs, outputImage, wktStringFile, resolution, gdalformat)\n"
-"\n"
-},  
 
-    {"nnwarp", ImageRegistration_NNWarp, METH_VARARGS, 
-"imageregistration.nnwarp(inputimage, inputgcps, outputimage, wktStringFile, resolution, gdalformat, transformImage=False)\n"
-"Warp image from tie points using a nearest neighbour interpolation.\n"
-"\n"
-"Where:\n"
-"\n"
-":param inputimage: is a string providing the input image.\n"
-":param inputgcps: is a string providing the input text file containing the tie points.\n"
-":param outputimage: is a string providing the output image.\n"
-":param wktStringFile: is a file path to a text file containing the WKT string to use for the warped image.\n"
-":param resolution: is a float providing the resolution of the output file\n"
-":param gdalformat: is a string providing the output format (e.g., KEA).\n"
-":param transformImage: is a bool, if set to true will generate an image providing the transform for each pixel, rather than warping the input image \n"
-"\n"
-"Example::\n"
-"\n"
-"    from rsgislib import imageregistration\n"
-"    inputImage = './Rasters/injune_p142_casi_sub_utm_single_band_offset3x3y.vrt'\n"
-"    inputGCPs = './TestOutputs/injune_p142_casi_sub_utm_tie_points_basic.txt'\n"
-"    outputImage = './TestOutputs/injune_p142_casi_sub_utm_single_band_offset3x3y_nnwarp.kea'\n"
-"    wktStringFile = './Vectors/injune_p142_crowns_utm.prj'\n"
-"    resolution = 1\n"
-"    gdalformat = 'KEA'\n"
-"    imageregistration.nnwarp(inputImage,inputGCPs, outputImage, wktStringFile, resolution, gdalformat)\n"
-"\n"
-},  
-
-    {"polywarp", ImageRegistration_PolyWarp, METH_VARARGS, 
-"imageregistration.polywarp(inputimage, inputgcps, outputimage, wktStringFile, resolution, polyOrder, gdalformat, transformImage=False)\n"
-"Warp image from tie points using a polynomial interpolation.\n"
-"\n"
-"Where:\n"
-"\n"
-":param inputimage: is a string providing the input image.\n"
-":param inputgcps: is a string providing the input text file containing the tie points.\n"
-":param outputimage: is a string providing the output image.\n"
-":param wktStringFile: is a file path to a text file containing the WKT string to use for the warped image.\n"
-":param resolution: is a float providing the resolution of the output file\n"
-":param polyOrder: is an int specifying the order of polynomial to use.\n"
-":param gdalformat: is a string providing the output format (e.g., KEA).\n"
-":param transformImage: is a bool, if set to true will generate an image providing the transform for each pixel, rather than warping the input image \n"
-"\n"
-"Example::\n"
-"\n"
-"    from rsgislib import imageregistration\n"
-"    inputImage = './Rasters/injune_p142_casi_sub_utm_single_band_offset3x3y.vrt'\n"
-"    inputGCPs = './TestOutputs/injune_p142_casi_sub_utm_tie_points_basic.txt'\n"
-"    outputImage = './TestOutputs/injune_p142_casi_sub_utm_single_band_offset3x3y_polywarp.kea'\n"
-"    wktStringFile = './Vectors/injune_p142_crowns_utm.prj'\n"
-"    resolution = 1\n"
-"    polyOrder = 3\n"
-"    gdalformat = 'KEA'\n"
-"    imageregistration.polywarp(inputImage,inputGCPs, outputImage, wktStringFile, resolution, polyOrder, gdalformat)\n"
-"\n"
-},  
-
-    {"gcp2gdal", ImageRegistration_GCP2GDAL, METH_VARARGS, 
+    {"gcp2gdal", (PyCFunction)ImageRegistration_GCP2GDAL, METH_VARARGS | METH_KEYWORDS,
 "imageregistration.gcp2gdal(inputimage, inputgcps, outputimage, gdalformat, datatype)\n"
 "Adds tie points to GDAL file, suitable for warping using the gdalwarp command.\n"
 "\n"
@@ -398,7 +262,7 @@ static PyMethodDef ImageRegistrationMethods[] = {
 "\n"
 },
     
-{"applyOffset2Image", ImageRegistration_ApplyOffset2Image, METH_VARARGS,
+{"applyOffset2Image", (PyCFunction)ImageRegistration_ApplyOffset2Image, METH_VARARGS | METH_KEYWORDS,
 "imageregistration.applyOffset2Image(inputImage, outputImage, gdalformat, gdaltype, xOff, yOff)\n"
 "Apply a linear X,Y offset to the image header - does not change the pixel values.\n"
 "\n"

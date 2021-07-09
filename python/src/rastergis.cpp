@@ -81,7 +81,7 @@ static PyObject *RasterGIS_PopulateStats(PyObject *self, PyObject *args, PyObjec
     int calcImgPyramids = 1;
     int ignoreZeroVal = 1;
     unsigned int ratBand = 1;
-    static char *kwlist[] = {"clumps", "addclrtab", "calcpyramids", "ignorezero", "ratband", NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("clumps_img"), RSGIS_PY_C_TEXT("add_clr_tab"), RSGIS_PY_C_TEXT("calc_pyramids"), RSGIS_PY_C_TEXT("ignore_zero"), RSGIS_PY_C_TEXT("ratband"), NULL};
 
     if(!PyArg_ParseTupleAndKeywords(args, keywds, "s|iiiI:populateStats", kwlist, &clumpsImage, &addColourTable2Img, &calcImgPyramids, &ignoreZeroVal, &ratBand))
     {
@@ -105,7 +105,7 @@ static PyObject *RasterGIS_CopyRAT(PyObject *self, PyObject *args, PyObject *key
 {
     const char *clumpsImage, *inputImage;
     int ratBand = 1;
-    static char *kwlist[] = {"clumps", "outimage", "ratband", NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("clumps_img"), RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("ratband"), NULL};
 
     if(!PyArg_ParseTupleAndKeywords(args, keywds,"ss|i:copyRAT", kwlist, &inputImage, &clumpsImage, &ratBand))
         return NULL;
@@ -130,7 +130,8 @@ static PyObject *RasterGIS_CopyGDALATTColumns(PyObject *self, PyObject *args, Py
     int ratBand = 1;
     int copyColours = 1;
     int copyHist = 1;
-    static char *kwlist[] = {"clumps", "outimage", "fields","copycolours","copyhist","ratband", NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("clumps_img"), RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("fields"),
+                             RSGIS_PY_C_TEXT("copy_colours"), RSGIS_PY_C_TEXT("copy_hist"), RSGIS_PY_C_TEXT("ratband"), NULL};
 
     if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssO|iii:copyGDALATTColumns", kwlist, &inputImage, &clumpsImage, &pFields, &copyColours, &copyHist, &ratBand))
         return NULL;
@@ -142,8 +143,10 @@ static PyObject *RasterGIS_CopyGDALATTColumns(PyObject *self, PyObject *args, Py
     }
 
     std::vector<std::string> fields = ExtractVectorStringFromSequence(pFields);
-    if(fields.size() == 0) { return NULL; }
-
+    if(fields.size() == 0)
+    {
+        return NULL;
+    }
 
     try
     {
@@ -162,7 +165,7 @@ static PyObject *RasterGIS_SpatialLocation(PyObject *self, PyObject *args, PyObj
 {
     const char *inputImage, *eastingsField, *northingsField;
     unsigned int ratBand = 1;
-    static char *kwlist[] = {"clumps", "eastings", "northings","ratband", NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("clumps_img"), RSGIS_PY_C_TEXT("eastings"), RSGIS_PY_C_TEXT("northings"), RSGIS_PY_C_TEXT("ratband"), NULL};
 
     if(!PyArg_ParseTupleAndKeywords(args, keywds, "sss|I:spatialLocation", kwlist, &inputImage, &eastingsField, &northingsField, &ratBand))
     {
@@ -186,7 +189,9 @@ static PyObject *RasterGIS_SpatialExtent(PyObject *self, PyObject *args, PyObjec
 {
     const char *inputImage, *minXXCol, *minXYCol, *maxXXCol, *maxXYCol, *minYXCol, *minYYCol, *maxYXCol, *maxYYCol;
     unsigned int ratBand = 1;
-    static char *kwlist[] = {"clumps", "minXX", "minXY", "maxXX", "maxXY", "minYX", "minYY", "maxYX", "maxYY", "ratband", NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("clumps_img"), RSGIS_PY_C_TEXT("minXX"), RSGIS_PY_C_TEXT("minXY"),
+                             RSGIS_PY_C_TEXT("maxXX"), RSGIS_PY_C_TEXT("maxXY"), RSGIS_PY_C_TEXT("minYX"),
+                             RSGIS_PY_C_TEXT("minYY"), RSGIS_PY_C_TEXT("maxYX"), RSGIS_PY_C_TEXT("maxYY"), RSGIS_PY_C_TEXT("ratband"), NULL};
     
     if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssssssss|I:spatialExtent", kwlist, &inputImage, &minXXCol, &minXYCol, &maxXXCol, &maxXYCol, &minYXCol, &minYYCol, &maxYXCol, &maxYYCol, &ratBand))
     {
@@ -211,7 +216,7 @@ static PyObject *RasterGIS_PopulateRATWithStats(PyObject *self, PyObject *args, 
     const char *inputImage, *clumpsImage;
     PyObject *pBandAttStatsCmds;
     unsigned int ratBand = 1;
-    static char *kwlist[] = {"valsimage", "clumps", "bandstats", "ratband", NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("clumps_img"), RSGIS_PY_C_TEXT("band_stats"), RSGIS_PY_C_TEXT("ratband"), NULL};
 
     if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssO|I:populateRATWithStats", kwlist, &inputImage, &clumpsImage, &pBandAttStatsCmds, &ratBand))
     {
@@ -248,7 +253,7 @@ static PyObject *RasterGIS_PopulateRATWithStats(PyObject *self, PyObject *args, 
         {
             PyErr_SetString(GETSTATE(self)->error, "could not find int attribute \'band\'" );
             FreePythonObjects(extractedAttributes);
-            for(std::vector<rsgis::cmds::RSGISBandAttStatsCmds*>::iterator iter = bandStatsCmds.begin(); iter != bandStatsCmds.end(); ++iter) {
+            for(auto iter = bandStatsCmds.begin(); iter != bandStatsCmds.end(); ++iter) {
                 delete *iter;
             }
             delete cmdObj;
@@ -310,7 +315,7 @@ static PyObject *RasterGIS_PopulateRATWithStats(PyObject *self, PyObject *args, 
     catch (rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        for(std::vector<rsgis::cmds::RSGISBandAttStatsCmds*>::iterator iter = bandStatsCmds.begin(); iter != bandStatsCmds.end(); ++iter)
+        for(auto iter = bandStatsCmds.begin(); iter != bandStatsCmds.end(); ++iter)
         {
             delete *iter;
         }
@@ -318,7 +323,7 @@ static PyObject *RasterGIS_PopulateRATWithStats(PyObject *self, PyObject *args, 
     }
 
     // free temp structs
-    for(std::vector<rsgis::cmds::RSGISBandAttStatsCmds*>::iterator iter = bandStatsCmds.begin(); iter != bandStatsCmds.end(); ++iter)
+    for(auto iter = bandStatsCmds.begin(); iter != bandStatsCmds.end(); ++iter)
     {
         delete *iter;
     }
@@ -333,7 +338,8 @@ static PyObject *RasterGIS_PopulateRATWithPercentiles(PyObject *self, PyObject *
     unsigned int ratBand = 1;
     unsigned int band = 1;
     unsigned int numHistBins = 200;
-    static char *kwlist[] = {"valsimage", "clumps", "band", "bandstats", "histbins", "ratband", NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("clumps_img"), RSGIS_PY_C_TEXT("img_band"),
+                             RSGIS_PY_C_TEXT("band_stats"), RSGIS_PY_C_TEXT("n_hist_bins"), RSGIS_PY_C_TEXT("ratband"), NULL};
 
     if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssIO|II:populateRATWithPercentiles", kwlist, &inputImage, &clumpsImage, &band, &pBandPercentilesCmds, &numHistBins, &ratBand))
     {
@@ -370,7 +376,7 @@ static PyObject *RasterGIS_PopulateRATWithPercentiles(PyObject *self, PyObject *
         {
             PyErr_SetString(GETSTATE(self)->error, "could not find int attribute \'percentile\'" );
             FreePythonObjects(extractedAttributes);
-            for(std::vector<rsgis::cmds::RSGISBandAttPercentilesCmds*>::iterator iter = bandPercentilesCmds.begin(); iter != bandPercentilesCmds.end(); ++iter)
+            for(auto iter = bandPercentilesCmds.begin(); iter != bandPercentilesCmds.end(); ++iter)
             {
                 delete *iter;
             }
@@ -384,7 +390,7 @@ static PyObject *RasterGIS_PopulateRATWithPercentiles(PyObject *self, PyObject *
         {
             PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'fieldName\'" );
             FreePythonObjects(extractedAttributes);
-            for(std::vector<rsgis::cmds::RSGISBandAttPercentilesCmds*>::iterator iter = bandPercentilesCmds.begin(); iter != bandPercentilesCmds.end(); ++iter)
+            for(auto iter = bandPercentilesCmds.begin(); iter != bandPercentilesCmds.end(); ++iter)
             {
                 delete *iter;
             }
@@ -406,7 +412,7 @@ static PyObject *RasterGIS_PopulateRATWithPercentiles(PyObject *self, PyObject *
     catch (rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        for(std::vector<rsgis::cmds::RSGISBandAttPercentilesCmds*>::iterator iter = bandPercentilesCmds.begin(); iter != bandPercentilesCmds.end(); ++iter)
+        for(auto iter = bandPercentilesCmds.begin(); iter != bandPercentilesCmds.end(); ++iter)
         {
             delete *iter;
         }
@@ -414,7 +420,7 @@ static PyObject *RasterGIS_PopulateRATWithPercentiles(PyObject *self, PyObject *
     }
 
     // free temp structs
-    for(std::vector<rsgis::cmds::RSGISBandAttPercentilesCmds*>::iterator iter = bandPercentilesCmds.begin(); iter != bandPercentilesCmds.end(); ++iter)
+    for(auto iter = bandPercentilesCmds.begin(); iter != bandPercentilesCmds.end(); ++iter)
     {
         delete *iter;
     }
@@ -432,7 +438,9 @@ static PyObject *RasterGIS_PopulateCategoryProportions(PyObject *self, PyObject 
     unsigned int ratBandClumps = 1;
     unsigned int ratBandCats = 1;
 
-    static char *kwlist[] = {"catsimage", "clumps", "outcolsname", "majcolname", "cpclassnames", "majclassnamefield", "classnamefield", "ratbandclumps", "ratbandcats", NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("in_cats_img"), RSGIS_PY_C_TEXT("clumps_img"), RSGIS_PY_C_TEXT("out_cols_name"),
+                             RSGIS_PY_C_TEXT("maj_col_name"), RSGIS_PY_C_TEXT("cp_cls_names"), RSGIS_PY_C_TEXT("maj_cls_name_field"),
+                             RSGIS_PY_C_TEXT("cls_name_field"), RSGIS_PY_C_TEXT("ratband_clumps"), RSGIS_PY_C_TEXT("ratband_cats"), NULL};
 
     if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssss|issII:populateCategoryProportions", kwlist, &categoriesImage, &clumpsImage, &outColsName, &majorityColName, &copyClassNames, &majClassNameField, &classNameField, &ratBandClumps, &ratBandCats))
     {
@@ -462,7 +470,9 @@ static PyObject *RasterGIS_PopulateRATWithMode(PyObject *self, PyObject *args, P
     unsigned int ratBand = 1;
     unsigned int modeBand = 1;
     
-    static char *kwlist[] = {"valsimage", "clumps", "outcolsname", "usenodata", "nodataval", "outnodata", "modeband", "ratband", NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("clumps_img"), RSGIS_PY_C_TEXT("out_cols_name"),
+                             RSGIS_PY_C_TEXT("use_no_data"), RSGIS_PY_C_TEXT("no_data_val"), RSGIS_PY_C_TEXT("out_no_data"),
+                             RSGIS_PY_C_TEXT("modeband"), RSGIS_PY_C_TEXT("ratband"), NULL};
     
     if(!PyArg_ParseTupleAndKeywords(args, keywds, "sss|iliII:populateRATWithMode", kwlist, &inputImage, &clumpsImage, &outColsName, &useNoDataVal, &noDataVal, &outNoDataVal, &modeBand, &ratBand))
     {
@@ -484,30 +494,15 @@ static PyObject *RasterGIS_PopulateRATWithMode(PyObject *self, PyObject *args, P
     Py_RETURN_NONE;
 }
 
-/*
-static PyObject *RasterGIS_CopyCategoriesColours(PyObject *self, PyObject *args) {
-    const char *clumpsImage, *categoriesImage, *classField;
-
-    if(!PyArg_ParseTuple(args, "sss:copyCategoriesColours", &categoriesImage, &clumpsImage, &classField))
-        return NULL;
-
-    try {
-        rsgis::cmds::executeCopyCategoriesColours(std::string(categoriesImage), std::string(clumpsImage), std::string(classField));
-    } catch (rsgis::cmds::RSGISCmdException &e) {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
-    }
-
-    Py_RETURN_NONE;
-}
-*/
 static PyObject *RasterGIS_ExportCol2GDALImage(PyObject *self, PyObject *args, PyObject *keywds)
 {
     const char *inputImage, *outputFile, *imageFormat, *field;
     int dataType;
     int ratBand = 1;
 
-    static char *kwlist[] = {"clumps", "outimage", "gdalformat", "datatype", "field", "ratband", NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("clumps_img"), RSGIS_PY_C_TEXT("output_img"),
+                             RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("datatype"),
+                             RSGIS_PY_C_TEXT("field"), RSGIS_PY_C_TEXT("ratband"), NULL};
 
     if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssis|i:exportCol2GDALImage", kwlist, &inputImage, &outputFile, &imageFormat, &dataType, &field, &ratBand))
     {
@@ -534,20 +529,26 @@ static PyObject *RasterGIS_Export2Ascii(PyObject *self, PyObject *args, PyObject
     const char *inputImage, *outputFile;
     unsigned int ratBand = 1;
     PyObject *pFields;
-    static char *kwlist[] = {"clumps", "outfile","fields", "ratband", NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("clumps_img"), RSGIS_PY_C_TEXT("out_file"),
+                             RSGIS_PY_C_TEXT("fields"), RSGIS_PY_C_TEXT("ratband"), NULL};
 
     if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssO|i:export2Ascii", kwlist, &inputImage, &outputFile, &pFields, &ratBand))
     {
         return NULL;
     }
 
-    if(!PySequence_Check(pFields)) {
+    if(!PySequence_Check(pFields))
+    {
         PyErr_SetString(GETSTATE(self)->error, "last argument must be a sequence");
         return NULL;
     }
 
     std::vector<std::string> fields = ExtractVectorStringFromSequence(pFields);
-    if(fields.size() == 0) { return NULL; }
+    if(fields.empty())
+    {
+        return NULL;
+    }
+
     try
     {
         rsgis::cmds::executeExport2Ascii(std::string(inputImage), std::string(outputFile), fields, ratBand);
@@ -561,42 +562,6 @@ static PyObject *RasterGIS_Export2Ascii(PyObject *self, PyObject *args, PyObject
     Py_RETURN_NONE;
 }
 
-/*
-static PyObject *RasterGIS_ClassTranslate(PyObject *self, PyObject *args) {
-    const char *inputImage, *classInField, *classOutField;
-    PyObject *pClassPairs;
-
-    if(!PyArg_ParseTuple(args, "sssO:classTranslate", &inputImage, &classInField, &classOutField, &pClassPairs))
-        return NULL;
-
-    if(!PyDict_Check(pClassPairs)) {
-        PyErr_SetString(GETSTATE(self)->error, "last argument must be a dict");
-        return NULL;
-    }
-
-    std::map<size_t, size_t> classPairs;
-    PyObject *key, *value;
-    Py_ssize_t pos = 0;
-
-    while (PyDict_Next(pClassPairs, &pos, &key, &value)) {
-        if(!RSGISPY_CHECK_INT(key) || !RSGISPY_CHECK_INT(value)) {
-            PyErr_SetString(GETSTATE(self)->error, "dict key and values must be ints");
-            return NULL;
-        }
-        classPairs[(size_t)RSGISPY_INT_EXTRACT(key)] = (size_t)RSGISPY_INT_EXTRACT(value);
-    }
-
-    try {
-        rsgis::cmds::executeClassTranslate(std::string(inputImage), std::string(classInField), std::string(classOutField), classPairs);
-    } catch (rsgis::cmds::RSGISCmdException &e) {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
-    }
-
-    Py_RETURN_NONE;
-}
-*/
-
 static PyObject *RasterGIS_ColourClasses(PyObject *self, PyObject *args, PyObject *keywds)
 {
     const char *inputImage, *classInField;
@@ -604,13 +569,13 @@ static PyObject *RasterGIS_ColourClasses(PyObject *self, PyObject *args, PyObjec
     int ratBand = 1;
     bool intKet = true;
 
-    static char *kwlist[] = {"clumps", "class","field", "ratband", NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("clumps_img"), RSGIS_PY_C_TEXT("class"),
+                             RSGIS_PY_C_TEXT("field"), RSGIS_PY_C_TEXT("ratband"), NULL};
 
     if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssO|i:colourClasses", kwlist, &inputImage, &classInField, &pClassColourPairs, &ratBand))
     {
         return NULL;
     }
-
 
     if(!PyDict_Check(pClassColourPairs))
     {
@@ -626,8 +591,14 @@ static PyObject *RasterGIS_ColourClasses(PyObject *self, PyObject *args, PyObjec
 
     while (PyDict_Next(pClassColourPairs, &pos, &key, &value))
     {
-        if(RSGISPY_CHECK_INT(key)){intKet = true;}
-        else if(RSGISPY_CHECK_STRING(key)){intKet = false;}
+        if(RSGISPY_CHECK_INT(key))
+        {
+            intKet = true;
+        }
+        else if(RSGISPY_CHECK_STRING(key))
+        {
+            intKet = false;
+        }
         else
         {
             PyErr_SetString(GETSTATE(self)->error, "dict keys must be ints or strings");
@@ -641,7 +612,8 @@ static PyObject *RasterGIS_ColourClasses(PyObject *self, PyObject *args, PyObjec
 
         pRed = PyObject_GetAttrString(value, "red");
         extractedAttributes.push_back(pRed);
-        if( ( pRed == NULL ) || ( pRed == Py_None ) || !RSGISPY_CHECK_INT(pRed)) {
+        if( ( pRed == NULL ) || ( pRed == Py_None ) || !RSGISPY_CHECK_INT(pRed))
+        {
             PyErr_SetString(GETSTATE(self)->error, "could not find int attribute \'red\'" );
             FreePythonObjects(extractedAttributes);
             return NULL;
@@ -649,7 +621,8 @@ static PyObject *RasterGIS_ColourClasses(PyObject *self, PyObject *args, PyObjec
 
         pGreen = PyObject_GetAttrString(value, "green");
         extractedAttributes.push_back(pGreen);
-        if( ( pGreen == NULL ) || ( pGreen == Py_None ) || !RSGISPY_CHECK_INT(pGreen)) {
+        if( ( pGreen == NULL ) || ( pGreen == Py_None ) || !RSGISPY_CHECK_INT(pGreen))
+        {
             PyErr_SetString(GETSTATE(self)->error, "could not find int attribute \'green\'" );
             FreePythonObjects(extractedAttributes);
             return NULL;
@@ -657,7 +630,8 @@ static PyObject *RasterGIS_ColourClasses(PyObject *self, PyObject *args, PyObjec
 
         pBlue = PyObject_GetAttrString(value, "blue");
         extractedAttributes.push_back(pBlue);
-        if( ( pBlue == NULL ) || ( pBlue == Py_None ) || !RSGISPY_CHECK_INT(pBlue)) {
+        if( ( pBlue == NULL ) || ( pBlue == Py_None ) || !RSGISPY_CHECK_INT(pBlue))
+        {
             PyErr_SetString(GETSTATE(self)->error, "could not find int attribute \'blue\'" );
             FreePythonObjects(extractedAttributes);
             return NULL;
@@ -665,7 +639,8 @@ static PyObject *RasterGIS_ColourClasses(PyObject *self, PyObject *args, PyObjec
 
         pAlpha = PyObject_GetAttrString(value, "alpha");
         extractedAttributes.push_back(pAlpha);
-        if( ( pAlpha == NULL ) || ( pAlpha == Py_None ) || !RSGISPY_CHECK_INT(pAlpha)) {
+        if( ( pAlpha == NULL ) || ( pAlpha == Py_None ) || !RSGISPY_CHECK_INT(pAlpha))
+        {
             PyErr_SetString(GETSTATE(self)->error, "could not find int attribute \'alpha\'" );
             FreePythonObjects(extractedAttributes);
             return NULL;
@@ -704,35 +679,17 @@ static PyObject *RasterGIS_ColourClasses(PyObject *self, PyObject *args, PyObjec
     Py_RETURN_NONE;
 }
 
-/*
-static PyObject *RasterGIS_GenerateColourTable(PyObject *self, PyObject *args) {
-    const char *inputImage, *clumpsImage;
-    unsigned int redBand, greenBand, blueBand;
-
-    if(!PyArg_ParseTuple(args, "ssIII:generateColourTable", &inputImage, &clumpsImage, &redBand, &greenBand, &blueBand))
-        return NULL;
-
-
-    try {
-        rsgis::cmds::executeGenerateColourTable(std::string(inputImage), std::string(clumpsImage), redBand, greenBand, blueBand);
-    } catch (rsgis::cmds::RSGISCmdException &e) {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
-    }
-
-    Py_RETURN_NONE;
-}
-*/
 
 static PyObject *RasterGIS_StrClassMajority(PyObject *self, PyObject *args, PyObject *keywds)
 {
-
     const char *baseSegment, *infoSegment, *baseClassCol, *infoClassCol;
     int ignoreZero = 1;
     int baseRatBand = 1;
     int infoRatBand = 1;
 
-    static char *kwlist[] = {"baseclumps", "infoclumps" "baseclasscol","infoclasscol", "ignorezero","baseratband","inforatband", NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("base_clumps_img"), RSGIS_PY_C_TEXT("info_clumps_img"), RSGIS_PY_C_TEXT("base_class_col"),
+                             RSGIS_PY_C_TEXT("info_class_col"), RSGIS_PY_C_TEXT("ignore_zero"), RSGIS_PY_C_TEXT("ratband_base"),
+                             RSGIS_PY_C_TEXT("ratband_info"), NULL};
 
     if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssss|iii:strClassMajority", kwlist, &baseSegment, &infoSegment, &baseClassCol,
                                                                         &infoClassCol, &ignoreZero, &baseRatBand, &infoRatBand))
@@ -751,135 +708,15 @@ static PyObject *RasterGIS_StrClassMajority(PyObject *self, PyObject *args, PyOb
     Py_RETURN_NONE;
 }
 
-/*
-static PyObject *RasterGIS_SpecDistMajorityClassifier(PyObject *self, PyObject *args) {
-    const char *inputImage, *inClassNameField, *outClassNameField, *trainingSelectCol, *eastingsField, *northingsField, *areaField, *majWeightField;
-    int distMethod;
-    float distThreshold, specDistThreshold, specThreshOriginDist;
-    PyObject *pFields;
 
-    if(!PyArg_ParseTuple(args, "ssssssssOffif:specDistMajorityClassifier", &inputImage, &inClassNameField, &outClassNameField, &trainingSelectCol,
-                         &eastingsField, &northingsField, &areaField, &majWeightField, &pFields, &distThreshold, &specDistThreshold, &distMethod, &specThreshOriginDist))
-    {
-        return NULL;
-    }
-
-    if(!PySequence_Check(pFields)) {
-        PyErr_SetString(GETSTATE(self)->error, "9th argument must be a sequence");
-        return NULL;
-    }
-
-    std::vector<std::string> fields = ExtractVectorStringFromSequence(pFields);
-    if(fields.size() == 0) { return NULL; }
-
-    rsgis::cmds::SpectralDistanceMethodCmds method = (rsgis::cmds::SpectralDistanceMethodCmds)distMethod;
-
-    try {
-        rsgis::cmds::executeSpecDistMajorityClassifier(std::string(inputImage), std::string(inClassNameField), std::string(outClassNameField), std::string(trainingSelectCol), std::string(eastingsField), std::string(northingsField), std::string(areaField), std::string(majWeightField), fields, distThreshold, specDistThreshold, method, specThreshOriginDist);
-    } catch (rsgis::cmds::RSGISCmdException &e) {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
-    }
-
-    Py_RETURN_NONE;
-}
-
-
-static PyObject *RasterGIS_MaxLikelihoodClassifier(PyObject *self, PyObject *args) {
-    const char *inputImage, *inClassNameField, *outClassNameField, *trainingSelectCol, *classifySelectCol, *areaField;
-    int priorsMethod;
-    PyObject *pFields, *pPriorStrs;
-
-    if(!PyArg_ParseTuple(args, "ssssssOiO:maxLikelihoodClassifier", &inputImage, &inClassNameField, &outClassNameField, &trainingSelectCol, &classifySelectCol, &areaField, &pFields, &priorsMethod, &pPriorStrs)) {
-        return NULL;
-    }
-
-    if(!PySequence_Check(pFields) || !PySequence_Check(pPriorStrs)) {
-       PyErr_SetString(GETSTATE(self)->error, "6th and last arguments must be sequences");
-       return NULL;
-    }
-
-    std::vector<std::string> fields, priorStrs;
-    fields = ExtractVectorStringFromSequence(pFields);
-    priorStrs = ExtractVectorStringFromSequence(pPriorStrs);
-    if(fields.size() == 0 || priorStrs.size() == 0) { return NULL; }
-    rsgis::cmds::rsgismlpriorscmds method = (rsgis::cmds::rsgismlpriorscmds)priorsMethod;
-
-    try {
-        rsgis::cmds::executeMaxLikelihoodClassifier(std::string(inputImage), std::string(inClassNameField), std::string(outClassNameField), std::string(trainingSelectCol),
-            std::string(classifySelectCol), std::string(areaField), fields, method, priorStrs);
-    } catch (rsgis::cmds::RSGISCmdException &e) {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
-    }
-
-    Py_RETURN_NONE;
-
-}
-
-static PyObject *RasterGIS_MaxLikelihoodClassifierLocalPriors(PyObject *self, PyObject *args) {
-    const char *inputImage, *inClassNameField, *outClassNameField, *trainingSelectCol, *classifySelectCol, *areaField, *eastingsField, *northingsField;
-    float distThreshold, weightA;
-    int priorsMethod, iAllowZeroPriors, iforceChangeInClassification;
-    PyObject *pFields;
-
-    if(!PyArg_ParseTuple(args, "ssssssOssfifii:maxLikelihoodClassifierLocalPriors", &inputImage, &inClassNameField, &outClassNameField, &trainingSelectCol,
-            &classifySelectCol, &areaField, &pFields, &eastingsField, &northingsField, &distThreshold, &priorsMethod, &weightA, &iAllowZeroPriors, &iforceChangeInClassification)) {
-        return NULL;
-    }
-
-    if(!PySequence_Check(pFields)) {
-        PyErr_SetString(GETSTATE(self)->error, "6th argument must be a sequence");
-        return NULL;
-    }
-
-    std::vector<std::string> fields;
-    fields = ExtractVectorStringFromSequence(pFields);
-    if(fields.size() == 0) { return NULL; }
-
-    rsgis::cmds::rsgismlpriorscmds method = (rsgis::cmds::rsgismlpriorscmds)priorsMethod;
-    bool allowZeroPriors = (iAllowZeroPriors != 0);
-    bool forceChangeInClassification = (iforceChangeInClassification != 0);
-
-    try {
-        rsgis::cmds::executeMaxLikelihoodClassifierLocalPriors(std::string(inputImage), std::string(inClassNameField), std::string(outClassNameField), std::string(trainingSelectCol),
-            std::string(classifySelectCol), std::string(areaField), fields, std::string(eastingsField), std::string(northingsField), distThreshold, method, weightA, allowZeroPriors, forceChangeInClassification);
-    } catch (rsgis::cmds::RSGISCmdException &e) {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
-    }
-
-    Py_RETURN_NONE;
-
-}
-
-static PyObject *RasterGIS_ClassMask(PyObject *self, PyObject *args) {
-    const char *inputImage, *classField, *className, *outputFile, *imageFormat;
-    int dataType;
-
-    if(!PyArg_ParseTuple(args, "sssssi:classMask", &inputImage, &classField, &className, &outputFile, &imageFormat, &dataType)) {
-        return NULL;
-    }
-
-    rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType) dataType;
-
-    try {
-        rsgis::cmds::executeClassMask(std::string(inputImage), std::string(classField), std::string(className), std::string(outputFile), std::string(imageFormat), type);
-    } catch (rsgis::cmds::RSGISCmdException &e) {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
-    }
-
-    Py_RETURN_NONE;
-}
-*/
-
-static PyObject *RasterGIS_FindNeighbours(PyObject *self, PyObject *args)
+static PyObject *RasterGIS_FindNeighbours(PyObject *self, PyObject *args, PyObject *keywds)
 {
     const char *inputImage;
     unsigned int ratBand = 1;
 
-    if(!PyArg_ParseTuple(args, "s|I:findNeighbours", &inputImage, &ratBand))
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("clumps_img"), RSGIS_PY_C_TEXT("ratband"), NULL};
+
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "s|I:findNeighbours", kwlist, &inputImage, &ratBand))
     {
         return NULL;
     }
@@ -897,13 +734,16 @@ static PyObject *RasterGIS_FindNeighbours(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-static PyObject *RasterGIS_FindBoundaryPixels(PyObject *self, PyObject *args)
+
+static PyObject *RasterGIS_FindBoundaryPixels(PyObject *self, PyObject *args, PyObject *keywds)
 {
     const char *inputImage, *outputFile;
     const char *imageFormat = "KEA";
     unsigned int ratBand = 1;
 
-    if(!PyArg_ParseTuple(args, "ss|sI:findBoundaryPixels", &inputImage, &outputFile, &imageFormat, &ratBand))
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("clumps_img"), RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("ratband"), NULL};
+
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ss|sI:findBoundaryPixels", kwlist, &inputImage, &outputFile, &imageFormat, &ratBand))
     {
         return NULL;
     }
@@ -921,12 +761,15 @@ static PyObject *RasterGIS_FindBoundaryPixels(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-static PyObject *RasterGIS_CalcBorderLength(PyObject *self, PyObject *args)
+
+static PyObject *RasterGIS_CalcBorderLength(PyObject *self, PyObject *args, PyObject *keywds)
 {
     const char *inputImage, *outColsName;
     int iIgnoreZeroEdges;
 
-    if(!PyArg_ParseTuple(args, "sis:calcBorderLength", &inputImage, &iIgnoreZeroEdges, &outColsName))
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("clumps_img"), RSGIS_PY_C_TEXT("out_col"), RSGIS_PY_C_TEXT("ignore_zero_edges"), NULL};
+
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sis:calcBorderLength", kwlist, &inputImage, &iIgnoreZeroEdges, &outColsName))
     {
         return NULL;
     }
@@ -944,12 +787,15 @@ static PyObject *RasterGIS_CalcBorderLength(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-static PyObject *RasterGIS_CalcRelBorder(PyObject *self, PyObject *args)
+
+static PyObject *RasterGIS_CalcRelBorder(PyObject *self, PyObject *args, PyObject *keywds)
 {
     const char *inputImage, *outColsName, *classNameField, *className;
     int iIgnoreZeroEdges;
 
-    if(!PyArg_ParseTuple(args, "ssssi:calcRelBorder", &inputImage, &outColsName, &classNameField, &className, &iIgnoreZeroEdges))
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("clumps_img"), RSGIS_PY_C_TEXT("out_col"), RSGIS_PY_C_TEXT("class_names_col"), RSGIS_PY_C_TEXT("class_name"), RSGIS_PY_C_TEXT("ignore_zero_edges"), NULL};
+
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssssi:calcRelBorder", kwlist, &inputImage, &outColsName, &classNameField, &className, &iIgnoreZeroEdges))
     {
         return NULL;
     }
@@ -967,91 +813,26 @@ static PyObject *RasterGIS_CalcRelBorder(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-/*
-static PyObject *RasterGIS_CalcShapeIndices(PyObject *self, PyObject *args) {
-    const char *inputImage;
-    PyObject *pShapeIndexes;
 
-    if(!PyArg_ParseTuple(args, "sO:calcShapeIndices", &inputImage, &pShapeIndexes)) {
-        return NULL;
-    }
-
-    if(!PySequence_Check(pShapeIndexes)) {
-        PyErr_SetString(GETSTATE(self)->error, "6th argument must be a sequence");
-        return NULL;
-    }
-
-    // extract the attributes from the sequence of objects into our structs
-    Py_ssize_t nIndexes = PySequence_Size(pShapeIndexes);
-    std::vector<rsgis::cmds::RSGISShapeParamCmds> shapeIndexes;
-    shapeIndexes.reserve(nIndexes);
-
-    for(int i = 0; i < nIndexes; ++i) {
-        PyObject *o = PySequence_GetItem(pShapeIndexes, i);     // the python object
-
-        rsgis::cmds::RSGISShapeParamCmds shapeIndex;
-
-        // declare and initialise pointers for all the attributes of the struct
-        PyObject *pIdx, *pColName, *pColIdx;
-        pIdx = pColName = pColIdx = NULL;
-
-        std::vector<PyObject*> extractedAttributes;     // store a list of extracted pyobjects to dereference later
-        extractedAttributes.push_back(o);
-
-        pIdx = PyObject_GetAttrString(o, "idx");
-        extractedAttributes.push_back(pIdx);
-        if( ( pIdx == NULL ) || ( pIdx == Py_None ) || !RSGISPY_CHECK_INT(pIdx)) {
-            PyErr_SetString(GETSTATE(self)->error, "could not find int attribute \'idx\'" );
-            FreePythonObjects(extractedAttributes);
-            return NULL;
-        }
-
-        pColName = PyObject_GetAttrString(o, "colName");
-        extractedAttributes.push_back(pColName);
-        if( ( pColName == NULL ) || ( pColName == Py_None ) || !RSGISPY_CHECK_STRING(pColName)) {
-            PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'colName\'" );
-            FreePythonObjects(extractedAttributes);
-            return NULL;
-        }
-
-        pColIdx = PyObject_GetAttrString(o, "colIdx");
-        extractedAttributes.push_back(pColIdx);
-        if( ( pColIdx == NULL ) || ( pColIdx == Py_None ) || !RSGISPY_CHECK_INT(pColIdx)) {
-            PyErr_SetString(GETSTATE(self)->error, "could not find int attribute \'colIdx\'" );
-            FreePythonObjects(extractedAttributes);
-            return NULL;
-        }
-
-        shapeIndex.colIdx = RSGISPY_INT_EXTRACT(pColIdx);
-        shapeIndex.colName = RSGISPY_STRING_EXTRACT(pColName);
-        shapeIndex.idx = (rsgis::cmds::rsgisshapeindexcmds) RSGISPY_INT_EXTRACT(pIdx);
-
-        FreePythonObjects(extractedAttributes);
-        shapeIndexes.push_back(shapeIndex);
-    }
-
-    try {
-        rsgis::cmds::executeCalcShapeIndices(std::string(inputImage), shapeIndexes);
-    } catch (rsgis::cmds::RSGISCmdException &e) {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
-    }
-
-    Py_RETURN_NONE;
-}
-*/
-
-static PyObject *RasterGIS_DefineClumpTilePositions(PyObject *self, PyObject *args) {
+static PyObject *RasterGIS_DefineClumpTilePositions(PyObject *self, PyObject *args, PyObject *keywds)
+{
     const char *clumpsImage, *tileImage, *outColsName;
     unsigned int tileOverlap, tileBoundary, tileBody;
 
-    if(!PyArg_ParseTuple(args, "sssIII:defineClumpTilePositions", &clumpsImage, &tileImage, &outColsName, &tileOverlap, &tileBoundary, &tileBody)) {
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("clumps_img"), RSGIS_PY_C_TEXT("tile_img"), RSGIS_PY_C_TEXT("out_col"),
+                             RSGIS_PY_C_TEXT("tile_overlap"), RSGIS_PY_C_TEXT("tile_boundary"), RSGIS_PY_C_TEXT("tile_body"), NULL};
+
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssIII:defineClumpTilePositions", kwlist, &clumpsImage, &tileImage, &outColsName, &tileOverlap, &tileBoundary, &tileBody))
+    {
         return NULL;
     }
 
-    try {
+    try
+    {
         rsgis::cmds::executeDefineClumpTilePositions(std::string(clumpsImage), std::string(tileImage), std::string(outColsName), tileOverlap, tileBoundary, tileBody);
-    } catch (rsgis::cmds::RSGISCmdException &e) {
+    }
+    catch (rsgis::cmds::RSGISCmdException &e)
+    {
         PyErr_SetString(GETSTATE(self)->error, e.what());
         return NULL;
     }
@@ -1059,10 +840,14 @@ static PyObject *RasterGIS_DefineClumpTilePositions(PyObject *self, PyObject *ar
     Py_RETURN_NONE;
 }
 
-static PyObject *RasterGIS_DefineBorderClumps(PyObject *self, PyObject *args) {
+
+static PyObject *RasterGIS_DefineBorderClumps(PyObject *self, PyObject *args, PyObject *keywds)
+{
     const char *clumpsImage, *outColsName;
 
-    if(!PyArg_ParseTuple(args, "ss:defineBorderClumps", &clumpsImage, &outColsName))
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("clumps_img"), RSGIS_PY_C_TEXT("out_col"),  NULL};
+
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ss:defineBorderClumps", kwlist, &clumpsImage, &outColsName))
     {
         return NULL;
     }
@@ -1081,98 +866,15 @@ static PyObject *RasterGIS_DefineBorderClumps(PyObject *self, PyObject *args) {
 }
 
 
-static PyObject *RasterGIS_FindChangeClumpsFromStdDev(PyObject *self, PyObject *args, PyObject *keywds)
-{
-    const char *clumpsImage, *classField, *changeField;
-    PyObject *pAttFields, *pClassFields;
-    int ratBand = 1;
-
-    static char *kwlist[] = {"clumps", "classfield","change", "attributes", "classChangeFields", "ratband", NULL};
-
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssOO|i:findChangeClumpsFromStdDev", kwlist, &clumpsImage, &classField, &changeField, &pAttFields, &pClassFields, &ratBand))
-    {
-        return NULL;
-    }
-
-    if(!PySequence_Check(pAttFields) || !PySequence_Check(pClassFields))
-    {
-        PyErr_SetString(GETSTATE(self)->error, "last 2 arguments must be sequences");
-    }
-
-    std::vector<std::string> attFields = ExtractVectorStringFromSequence(pAttFields);
-
-    Py_ssize_t nFields = PySequence_Size(pClassFields);
-    std::vector<rsgis::cmds::RSGISClassChangeFieldsCmds> classFields;
-    classFields.reserve(nFields);
-
-    for(int i = 0; i < nFields; ++i)
-    {
-        PyObject *o = PySequence_GetItem(pClassFields, i);     // the python object
-
-        rsgis::cmds::RSGISClassChangeFieldsCmds classField;
-
-        // declare and initialise pointers for all the attributes of the struct
-        PyObject *name, *outName, *threshold;
-        name = outName = threshold = NULL;
-
-        std::vector<PyObject*> extractedAttributes;     // store a list of extracted pyobjects to dereference later
-        extractedAttributes.push_back(o);
-
-        name = PyObject_GetAttrString(o, "name");
-        extractedAttributes.push_back(name);
-        if( ( name == NULL ) || ( name == Py_None ) || !RSGISPY_CHECK_STRING(name))
-        {
-            PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'name\'" );
-            FreePythonObjects(extractedAttributes);
-            return NULL;
-        }
-
-        outName = PyObject_GetAttrString(o, "outName");
-        extractedAttributes.push_back(outName);
-        if( ( outName == NULL ) || ( outName == Py_None ) || !RSGISPY_CHECK_INT(outName))
-        {
-            PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'outName\'" );
-            FreePythonObjects(extractedAttributes);
-            return NULL;
-        }
-
-        threshold = PyObject_GetAttrString(o, "threshold");
-        extractedAttributes.push_back(threshold);
-        if( ( threshold == NULL ) || ( threshold == Py_None ) || !(RSGISPY_CHECK_FLOAT(threshold) || RSGISPY_CHECK_INT(threshold)))
-        {
-            PyErr_SetString(GETSTATE(self)->error, "could not find float attribute \'threshold\'" );
-            FreePythonObjects(extractedAttributes);
-            return NULL;
-        }
-
-        classField.name = RSGISPY_STRING_EXTRACT(name);
-        classField.outName = RSGISPY_INT_EXTRACT(outName);
-        classField.threshold = RSGISPY_FLOAT_EXTRACT(threshold);
-
-        classFields.push_back(classField);
-        FreePythonObjects(extractedAttributes);
-    }
-
-    try
-    {
-        rsgis::cmds::executeFindChangeClumpsFromStdDev(std::string(clumpsImage), std::string(classField), std::string(changeField), attFields, classFields, ratBand);
-    }
-    catch (rsgis::cmds::RSGISCmdException &e)
-    {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
-    }
-
-    Py_RETURN_NONE;
-}
-
 static PyObject *RasterGIS_GetGlobalClassStats(PyObject *self, PyObject *args, PyObject *keywds)
 {
     const char *clumpsImage, *classField;
     PyObject *pAttFields, *pClassFields;
     int ratBand = 1;
 
-    static char *kwlist[] = {"clumps", "classfield", "attributes", "classChangeFields", "ratband", NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("clumps_img"), RSGIS_PY_C_TEXT("class_field"),
+                             RSGIS_PY_C_TEXT("attributes"), RSGIS_PY_C_TEXT("cls_chg_cols"),
+                             RSGIS_PY_C_TEXT("ratband"), NULL};
 
     if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssOO|i:getGlobalClassStats", kwlist, &clumpsImage, &classField, &pAttFields, &pClassFields, &ratBand))
     {
@@ -1233,12 +935,19 @@ static PyObject *RasterGIS_GetGlobalClassStats(PyObject *self, PyObject *args, P
     Py_RETURN_NONE;
 }
 
-static PyObject *RasterGIS_SelectClumpsOnGrid(PyObject *self, PyObject *args)
+
+static PyObject *RasterGIS_SelectClumpsOnGrid(PyObject *self, PyObject *args, PyObject *keywds)
 {
     const char *clumpsImage, *inSelectField, *outSelectField, *eastingsCol, *northingsCol, *metricField, *methodStr;
     unsigned int rows, cols;
 
-    if(!PyArg_ParseTuple(args, "sssssssII:selectClumpsOnGrid", &clumpsImage, &inSelectField, &outSelectField, &eastingsCol, &northingsCol, &metricField, &methodStr, &rows, &cols))
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("clumps_img"), RSGIS_PY_C_TEXT("in_sel_col"),
+                             RSGIS_PY_C_TEXT("out_sel_col"), RSGIS_PY_C_TEXT("eastings_col"),
+                             RSGIS_PY_C_TEXT("northings_col"), RSGIS_PY_C_TEXT("metric_col"),
+                             RSGIS_PY_C_TEXT("method"), RSGIS_PY_C_TEXT("rows"),
+                             RSGIS_PY_C_TEXT("cols"), NULL};
+
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssssssII:selectClumpsOnGrid", kwlist, &clumpsImage, &inSelectField, &outSelectField, &eastingsCol, &northingsCol, &metricField, &methodStr, &rows, &cols))
     {
         return NULL;
     }
@@ -1256,32 +965,8 @@ static PyObject *RasterGIS_SelectClumpsOnGrid(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-static PyObject *RasterGIS_InterpolateClumpValues2Img(PyObject *self, PyObject *args)
-{
-    const char *clumpsImage, *selectField, *eastingsField, *northingsField, *methodStr, *valueField, *outputFile, *imageFormat;
-    int dataType, ratBand;
-    ratBand = 1;
 
-    if(!PyArg_ParseTuple(args, "ssssssssi|i:interpolateClumpValues2Image", &clumpsImage, &selectField, &eastingsField, &northingsField, &methodStr, &valueField, &outputFile, &imageFormat, &dataType, &ratBand))
-    {
-        return NULL;
-    }
-
-    try
-    {
-        rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType) dataType;
-        rsgis::cmds::executeInterpolateClumpValuesToImage(std::string(clumpsImage), std::string(selectField), std::string(eastingsField), std::string(northingsField), std::string(methodStr), std::string(valueField), std::string(outputFile), std::string(imageFormat), type, ratBand);
-    }
-    catch (rsgis::cmds::RSGISCmdException &e)
-    {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
-    }
-
-    Py_RETURN_NONE;
-}
-
-static PyObject *RasterGIS_CalcRelDiffNeighbourStats(PyObject *self, PyObject *args)
+static PyObject *RasterGIS_CalcRelDiffNeighbourStats(PyObject *self, PyObject *args, PyObject *keywds)
 {
     const char *clumpsImage;
     PyObject *fieldObj;
@@ -1289,8 +974,11 @@ static PyObject *RasterGIS_CalcRelDiffNeighbourStats(PyObject *self, PyObject *a
     useAbsDiff = 0;
     int ratBand;
     ratBand = 1;
+
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("clumps_img"), RSGIS_PY_C_TEXT("val_col"),
+                             RSGIS_PY_C_TEXT("use_abs_diff"), RSGIS_PY_C_TEXT("ratband"), NULL};
     
-    if(!PyArg_ParseTuple(args, "sOi|i:calcRelDiffNeighStats", &clumpsImage, &fieldObj, &useAbsDiff, &ratBand))
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sOi|i:calcRelDiffNeighStats", kwlist, &clumpsImage, &fieldObj, &useAbsDiff, &ratBand))
     {
         return NULL;
     }
@@ -1372,109 +1060,6 @@ static PyObject *RasterGIS_CalcRelDiffNeighbourStats(PyObject *self, PyObject *a
     Py_RETURN_NONE;
 }
 
-static PyObject *RasterGIS_BinaryClassification(PyObject *self, PyObject *args)
-{
-    const char *clumpsImage, *xmlBlock, *outColumn;
-    unsigned int ratBand = 1;
-    
-    if(!PyArg_ParseTuple(args, "sss|I:binaryClassification", &clumpsImage, &xmlBlock, &outColumn, &ratBand))
-    {
-        return NULL;
-    }
-    
-    try
-    {
-        rsgis::cmds::executeBinaryClassify(std::string(clumpsImage), ratBand, std::string(xmlBlock), std::string(outColumn));
-    }
-    catch (rsgis::cmds::RSGISCmdException &e)
-    {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
-    }
-    
-    Py_RETURN_NONE;
-}
-
-static PyObject *RasterGIS_RegionGrowClass(PyObject *self, PyObject *args)
-{
-    const char *clumpsImage, *xmlBlock, *classColumn, *classVal;
-    unsigned int ratBand = 1;
-    int maxNumIter = -1;
-    
-    if(!PyArg_ParseTuple(args, "ssss|iI:regionGrowClass", &clumpsImage, &xmlBlock, &classColumn, &classVal, &maxNumIter, &ratBand))
-    {
-        return NULL;
-    }
-    
-    try
-    {
-        rsgis::cmds::executeClassRegionGrowing(std::string(clumpsImage), ratBand, std::string(classColumn), std::string(classVal), maxNumIter, std::string(xmlBlock));
-    }
-    catch (rsgis::cmds::RSGISCmdException &e)
-    {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
-    }
-    
-    Py_RETURN_NONE;
-}
-
-/*
-
-static PyObject *RasterGIS_FindGlobalSegmentationScore(PyObject *self, PyObject *args) {
-    const char *clumpsImage, *inputImage, *colPrefix;
-    int calcNeighBool;
-    float minNormV, maxNormV, minNormMI, maxNormMI;
-
-    if(!PyArg_ParseTuple(args, "sssiffff:calcGlobalSegmentationScore", &clumpsImage, &inputImage, &colPrefix, &calcNeighBool, &minNormV, &maxNormV, &minNormMI, &maxNormMI))
-    {
-        return NULL;
-    }
-
-    PyObject *outList = PyList_New(2);
-    PyObject *scoreCompsList = NULL;
-    try
-    {
-        bool calcNeighbours = (bool)calcNeighBool;
-
-        std::vector<rsgis::cmds::RSGISJXSegQualityScoreBandCmds> *scoreBandComps = new std::vector<rsgis::cmds::RSGISJXSegQualityScoreBandCmds>();
-
-        float segScore = rsgis::cmds::executeFindGlobalSegmentationScore4Clumps(std::string(clumpsImage), std::string(inputImage), std::string(colPrefix), calcNeighbours, minNormV, maxNormV, minNormMI, maxNormMI, scoreBandComps);
-
-        Py_ssize_t listLen = scoreBandComps->size() * 4;
-        scoreCompsList = PyList_New(listLen);
-
-        unsigned int i = 0;
-        for(std::vector<rsgis::cmds::RSGISJXSegQualityScoreBandCmds>::iterator iterScoreComps = scoreBandComps->begin(); iterScoreComps != scoreBandComps->end(); ++iterScoreComps)
-        {
-            PyList_SetItem(scoreCompsList, i++, Py_BuildValue("f", (*iterScoreComps).bandVar));
-            PyList_SetItem(scoreCompsList, i++, Py_BuildValue("f", (*iterScoreComps).bandMI));
-            PyList_SetItem(scoreCompsList, i++, Py_BuildValue("f", (*iterScoreComps).bandVarNorm));
-            PyList_SetItem(scoreCompsList, i++, Py_BuildValue("f", (*iterScoreComps).bandMINorm));
-        }
-
-
-        if(PyList_SetItem(outList, 0, Py_BuildValue("f", segScore)) == -1)
-        {
-            throw rsgis::cmds::RSGISCmdException("Failed to add a segmentation score value to the list...");
-        }
-        else if(PyList_SetItem(outList, 1, scoreCompsList) == -1)
-        {
-            throw rsgis::cmds::RSGISCmdException("Failed to add a segmentation component score values to the list...");
-        }
-
-
-        //std::cout << "segScore = " << segScore << std::endl;
-    }
-    catch (rsgis::cmds::RSGISCmdException &e)
-    {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
-    }
-
-    return outList;
-}
-*/
 
 static PyObject *RasterGIS_PopulateRATWithMeanLitStats(PyObject *self, PyObject *args, PyObject *keywds)
 {
@@ -1482,9 +1067,13 @@ static PyObject *RasterGIS_PopulateRATWithMeanLitStats(PyObject *self, PyObject 
     PyObject *pBandAttStatsCmds;
     unsigned int ratBand = 1;
     unsigned int meanlitBand = 1;
-    static char *kwlist[] = {"valsimage", "clumps", "meanLitImage", "meanlitBand", "meanLitCol", "pxlCountCol", "bandstats", "ratband", NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("in_vals_img"), RSGIS_PY_C_TEXT("clumps_img"),
+                             RSGIS_PY_C_TEXT("mean_lit_img"), RSGIS_PY_C_TEXT("mean_lit_band"),
+                             RSGIS_PY_C_TEXT("mean_lit_col"), RSGIS_PY_C_TEXT("pxl_count_col"),
+                             RSGIS_PY_C_TEXT("band_stats"), RSGIS_PY_C_TEXT("ratband"), NULL};
     
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssIssO|I:populateRATWithMeanLitStats", kwlist, &inputImage, &clumpsImage, &meanLitImage, &meanlitBand, &meanLitCol, &pxlCountCol, &pBandAttStatsCmds, &ratBand))
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssIssO|I:populateRATWithMeanLitStats", kwlist, &inputImage, &clumpsImage,
+                                    &meanLitImage, &meanlitBand, &meanLitCol, &pxlCountCol, &pBandAttStatsCmds, &ratBand))
     {
         return NULL;
     }
@@ -1519,7 +1108,7 @@ static PyObject *RasterGIS_PopulateRATWithMeanLitStats(PyObject *self, PyObject 
         {
             PyErr_SetString(GETSTATE(self)->error, "could not find int attribute \'band\'" );
             FreePythonObjects(extractedAttributes);
-            for(std::vector<rsgis::cmds::RSGISBandAttStatsCmds*>::iterator iter = bandStatsCmds.begin(); iter != bandStatsCmds.end(); ++iter) {
+            for(auto iter = bandStatsCmds.begin(); iter != bandStatsCmds.end(); ++iter) {
                 delete *iter;
             }
             delete cmdObj;
@@ -1581,7 +1170,7 @@ static PyObject *RasterGIS_PopulateRATWithMeanLitStats(PyObject *self, PyObject 
     catch (rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        for(std::vector<rsgis::cmds::RSGISBandAttStatsCmds*>::iterator iter = bandStatsCmds.begin(); iter != bandStatsCmds.end(); ++iter)
+        for(auto iter = bandStatsCmds.begin(); iter != bandStatsCmds.end(); ++iter)
         {
             delete *iter;
         }
@@ -1589,7 +1178,7 @@ static PyObject *RasterGIS_PopulateRATWithMeanLitStats(PyObject *self, PyObject 
     }
     
     // free temp structs
-    for(std::vector<rsgis::cmds::RSGISBandAttStatsCmds*>::iterator iter = bandStatsCmds.begin(); iter != bandStatsCmds.end(); ++iter)
+    for(auto iter = bandStatsCmds.begin(); iter != bandStatsCmds.end(); ++iter)
     {
         delete *iter;
     }
@@ -1597,13 +1186,17 @@ static PyObject *RasterGIS_PopulateRATWithMeanLitStats(PyObject *self, PyObject 
     Py_RETURN_NONE;
 }
 
-static PyObject *RasterGIS_CollapseRAT(PyObject *self, PyObject *args)
+static PyObject *RasterGIS_CollapseRAT(PyObject *self, PyObject *args, PyObject *keywds)
 {
     const char *clumpsImage, *selectField, *outputFile, *imageFormat;
     int ratBand;
     ratBand = 1;
+
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("clumps_img"), RSGIS_PY_C_TEXT("select_col"),
+                             RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"),
+                             RSGIS_PY_C_TEXT("ratband"), NULL};
     
-    if(!PyArg_ParseTuple(args, "ssss|i:collapseRAT", &clumpsImage, &selectField, &outputFile, &imageFormat, &ratBand))
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssss|i:collapseRAT", kwlist, &clumpsImage, &selectField, &outputFile, &imageFormat, &ratBand))
     {
         return NULL;
     }
@@ -1628,7 +1221,8 @@ static PyObject *RasterGIS_ImportVecAtts(PyObject *self, PyObject *args, PyObjec
     int ratBand;
     ratBand = 1;
     
-    static char *kwlist[] = {"clumps", "vector", "veclyr", "fidcol", "colnames", "ratband", NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("clumps_img"), RSGIS_PY_C_TEXT("vec_file"), RSGIS_PY_C_TEXT("vec_lyr"),
+                             RSGIS_PY_C_TEXT("fid_col"), RSGIS_PY_C_TEXT("col_names"), RSGIS_PY_C_TEXT("ratband"), NULL};
     
     if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssssO|i:importVecAtts", kwlist, &clumpsImage, &vectorFile, &vectorLyrName, &fidColName, &pColNamesList, &ratBand))
     {
@@ -1664,30 +1258,6 @@ static PyObject *RasterGIS_ImportVecAtts(PyObject *self, PyObject *args, PyObjec
     Py_RETURN_NONE;
 }
 
-static PyObject *RasterGIS_RegionGrowClassNeighCritera(PyObject *self, PyObject *args)
-{
-    const char *clumpsImage, *xmlBlockGrowCriteria, *xmlBlockNeighCriteria, *classColumn, *classVal;
-    unsigned int ratBand = 1;
-    int maxNumIter = -1;
-    
-    if(!PyArg_ParseTuple(args, "sssss|iI:regionGrowClassNeighCritera", &clumpsImage, &xmlBlockGrowCriteria, &xmlBlockNeighCriteria, &classColumn, &classVal, &maxNumIter, &ratBand))
-    {
-        return NULL;
-    }
-    
-    try
-    {
-        rsgis::cmds::executeClassRegionGrowingNeighCritera(std::string(clumpsImage), ratBand, std::string(classColumn), std::string(classVal), maxNumIter, std::string(xmlBlockGrowCriteria), std::string(xmlBlockNeighCriteria));
-    }
-    catch (rsgis::cmds::RSGISCmdException &e)
-    {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
-    }
-    
-    Py_RETURN_NONE;
-}
-
 
 static PyObject *RasterGIS_ApplyKNN(PyObject *self, PyObject *args, PyObject *keywds)
 {
@@ -1703,7 +1273,12 @@ static PyObject *RasterGIS_ApplyKNN(PyObject *self, PyObject *args, PyObject *ke
     int distKNNInt = rsgis::cmds::rsgisKNNMahalanobis;
     int summeriseKNNInt = rsgis::cmds::rsgisKNNMean;
     
-    static char *kwlist[] = {"clumps", "inExtrapField", "outExtrapField", "trainRegionsField", "applyRegionsField", "fields", "kFeat", "distKNN", "summeriseKNN", "distThres", "ratband", NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("clumps_img"), RSGIS_PY_C_TEXT("in_extrap_col"),
+                             RSGIS_PY_C_TEXT("out_extrap_col"), RSGIS_PY_C_TEXT("train_regions_col"),
+                             RSGIS_PY_C_TEXT("apply_regions_col"), RSGIS_PY_C_TEXT("val_cols"),
+                             RSGIS_PY_C_TEXT("k_feat"), RSGIS_PY_C_TEXT("dist_knn"),
+                             RSGIS_PY_C_TEXT("summerise_knn"), RSGIS_PY_C_TEXT("dist_thres"),
+                             RSGIS_PY_C_TEXT("ratband"), NULL};
     
     if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssssOO|IiifI:applyKNN", kwlist, &inClumpsImage, &inExtrapField, &outExtrapField, &trainRegionsField, &applyRegionsFieldObj, &pFields, &kFeatures, &distKNNInt, &summeriseKNNInt, &distThreshold, &ratBand))
     {
@@ -1757,7 +1332,9 @@ static PyObject *RasterGIS_HistoSampling(PyObject *self, PyObject *args, PyObjec
     float binWidth = 1;
     float propOfSample = 0.1;
     
-    static char *kwlist[] = {"clumps", "varCol", "outSelectCol", "propOfSample", "binWidth", "classColumn", "classVal", "ratband", NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("clumps_img"), RSGIS_PY_C_TEXT("val_col"), RSGIS_PY_C_TEXT("out_sel_col"),
+                             RSGIS_PY_C_TEXT("prop_sample"), RSGIS_PY_C_TEXT("bin_width"), RSGIS_PY_C_TEXT("cls_col"),
+                             RSGIS_PY_C_TEXT("class_val"), RSGIS_PY_C_TEXT("ratband"), NULL};
     
     if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssff|OsI:histoSampling", kwlist, &inClumpsImage, &varCol, &outSelectCol, &propOfSample, &binWidth, &classColumnObj, &classVal, &ratBand))
     {
@@ -1797,14 +1374,16 @@ static PyObject *RasterGIS_FitHistGausianMixtureModel(PyObject *self, PyObject *
     const char *classColumn = "";
     float binWidth = 1;
     
-    static char *kwlist[] = {"clumps", "outH5File", "outHistFile", "varCol", "binWidth", "classColumn", "classVal", "ratband", NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("clumps_img"), RSGIS_PY_C_TEXT("out_h5_file"), RSGIS_PY_C_TEXT("out_hist_file"),
+                             RSGIS_PY_C_TEXT("val_col"), RSGIS_PY_C_TEXT("bin_width"), RSGIS_PY_C_TEXT("cls_col"),
+                             RSGIS_PY_C_TEXT("cls_val"), RSGIS_PY_C_TEXT("ratband"), NULL};
     
     if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssOsfss|I:fitHistGausianMixtureModel", kwlist, &inClumpsImage, &outH5File, &outHistFileObj, &varCol, &binWidth, &classColumn, &classVal, &ratBand))
     {
         return NULL;
     }
     
-    std::string outHistFile = "";
+    std::string outHistFile = std::string();
     bool outputHist = false;
     if(RSGISPY_CHECK_STRING(outHistFileObj))
     {
@@ -1836,7 +1415,9 @@ static PyObject *RasterGIS_ClassSplitFitHistGausianMixtureModel(PyObject *self, 
     const char *classColumn = "";
     float binWidth = 1;
     
-    static char *kwlist[] = {"clumps", "outCol", "varCol", "binWidth", "classColumn", "classVal", "ratband", NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("clumps_img"), RSGIS_PY_C_TEXT("out_col"), RSGIS_PY_C_TEXT("val_col"),
+                             RSGIS_PY_C_TEXT("bin_width"), RSGIS_PY_C_TEXT("cls_col"), RSGIS_PY_C_TEXT("cls_val"),
+                             RSGIS_PY_C_TEXT("ratband"), NULL};
     
     if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssfss|I:classSplitFitHistGausianMixtureModel", kwlist, &inClumpsImage, &outColumn, &varCol, &binWidth, &classColumn, &classVal, &ratBand))
     {
@@ -1862,7 +1443,9 @@ static PyObject *RasterGIS_PopulateRATWithPropValidPxls(PyObject *self, PyObject
     float noDataVal = 0;
     unsigned int ratBand = 1;
     
-    static char *kwlist[] = {"valsimage", "clumps", "outcolsname","nodataval", "ratband", NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("clumps_img"),
+                             RSGIS_PY_C_TEXT("out_col"), RSGIS_PY_C_TEXT("no_data_val"),
+                             RSGIS_PY_C_TEXT("ratband"), NULL};
     
     if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssf|I:populateRATWithPropValidPxls", kwlist, &inputImage, &clumpsImage, &outColsName, &noDataVal, &ratBand))
     {
@@ -1889,7 +1472,10 @@ static PyObject *RasterGIS_Calc1DJMDistance(PyObject *self, PyObject *args, PyOb
     float binWidth = 0;
     unsigned int ratBand = 1;
 
-    static char *kwlist[] = {"clumps", "varcol", "binwidth", "classcol", "class1", "class2", "ratband", NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("clumps_img"), RSGIS_PY_C_TEXT("val_col"),
+                             RSGIS_PY_C_TEXT("bin_width"), RSGIS_PY_C_TEXT("cls_col"),
+                             RSGIS_PY_C_TEXT("class1"), RSGIS_PY_C_TEXT("class2"),
+                             RSGIS_PY_C_TEXT("ratband"), NULL};
 
     if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssfsss|I:calc1DJMDistance", kwlist, &clumpsImage, &varCol, &binWidth, &classCol, &class1Val, &class2Val, &ratBand))
     {
@@ -1922,7 +1508,10 @@ static PyObject *RasterGIS_Calc2DJMDistance(PyObject *self, PyObject *args, PyOb
     float var2BinWidth = 0;
     unsigned int ratBand = 1;
     
-    static char *kwlist[] = {"clumps", "var1col", "var2col", "var1binwidth", "var2binwidth", "classcol", "class1", "class2", "ratband", NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("clumps_img"), RSGIS_PY_C_TEXT("val1_col"), RSGIS_PY_C_TEXT("val2_col"),
+                             RSGIS_PY_C_TEXT("val1_bin_width"), RSGIS_PY_C_TEXT("val2_bin_width"),
+                             RSGIS_PY_C_TEXT("cls_col"), RSGIS_PY_C_TEXT("class1"), RSGIS_PY_C_TEXT("class2"),
+                             RSGIS_PY_C_TEXT("ratband"), NULL};
     
     if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssffsss|I:calc2DJMDistance", kwlist, &clumpsImage, &var1Col, &var2Col, &var1BinWidth, &var2BinWidth, &classCol, &class1Val, &class2Val, &ratBand))
     {
@@ -1953,7 +1542,8 @@ static PyObject *RasterGIS_CalcBhattacharyyaDistance(PyObject *self, PyObject *a
     const char *clumpsImage, *varCol, *classCol, *class1Val, *class2Val;
     unsigned int ratBand = 1;
     
-    static char *kwlist[] = {"clumps", "varcol", "classcol", "class1", "class2", "ratband", NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("clumps_img"), RSGIS_PY_C_TEXT("val_col"), RSGIS_PY_C_TEXT("cls_col"),
+                             RSGIS_PY_C_TEXT("class1"), RSGIS_PY_C_TEXT("class2"), RSGIS_PY_C_TEXT("ratband"), NULL};
     
     if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssss|I:calcBhattacharyyaDistance", kwlist, &clumpsImage, &varCol, &classCol, &class1Val, &class2Val, &ratBand))
     {
@@ -1985,7 +1575,9 @@ static PyObject *RasterGIS_ExportClumps2Images(PyObject *self, PyObject *args, P
     int binaryOut = false;
     int ratBand = 1;
     
-    static char *kwlist[] = {"clumps", "outimgbase", "binout", "outimgext", "gdalformat", "ratband", NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("clumps_img"), RSGIS_PY_C_TEXT("out_img_base"),
+                             RSGIS_PY_C_TEXT("bin_out"), RSGIS_PY_C_TEXT("out_img_ext"),
+                             RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("ratband"), NULL};
     
     if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssiss|i:exportClumps2Images", kwlist, &inputImage, &outputBaseName, &binaryOut, &outFileExt, &imageFormat, &ratBand))
     {
@@ -2222,17 +1814,7 @@ static PyMethodDef RasterGISMethods[] = {
 ":param modeband: is an optional (default = 1) integer parameter specifying the image band for which the mode is to be calculated.\n"
 ":param ratband: is an optional (default = 1) integer parameter specifying the image band to which the RAT is associated in the clumps image.\n"
 "\n"},
-/*
-   {"copyCategoriesColours", RasterGIS_CopyCategoriesColours, METH_VARARGS,
-"rastergis.copyCategoriesColours(categoriesImage, clumpsImage, classField)\n"
-"Copies an attribute tables colour table to another table based on class column\n"
-"Where:\n"
-"\n"
- ":param categoriesImage: is a string containing the name of the categories image file TODO: check and expand\n"
- ":param clumpsImage: is a string containing the name of the input clump file\n"
- ":param outColsName: is a string containing the name of the class field\n"
-"\n"},
-*/
+
    {"exportCol2GDALImage", (PyCFunction)RasterGIS_ExportCol2GDALImage, METH_VARARGS | METH_KEYWORDS,
 "rastergis.exportCol2GDALImage(clumps, outimage, gdalformat, datatype, field, ratband=1)\n"
 "Exports column of the raster attribute table as bands in a GDAL image.\n"
@@ -2275,18 +1857,7 @@ static PyMethodDef RasterGISMethods[] = {
 "   fields = ['BlueAvg', 'GreenAvg', 'RedAvg']\n"
 "   rastergis.export2Ascii(clumps, outfile, fields)\n"
 "\n"},
-/*
-    {"classTranslate", RasterGIS_ClassTranslate, METH_VARARGS,
-"rastergis.classTranslate(inputImage, classInField, classOutField, classPairs)\n"
-"Translates a set of classes to another.\n"
-"Where:\n"
-"\n"
- ":param inputImage: is a string containing the name of the input image file TODO: check and expand\n"
- ":param classInField: is a string containing the name of the input class field\n"
- ":param classOutField: is a string containing the name of the output class field\n"
- ":param classPairs: is a dict of int key value pairs mapping the classes. TODO: Fixme\n"
-"\n"},
-*/
+
 {"colourClasses", (PyCFunction)RasterGIS_ColourClasses, METH_VARARGS | METH_KEYWORDS,
 "rastergis.colourClasses(clumps, field, classcolours, ratband)\n"
 "Sets a colour table for a set of classes within the attribute table\n"
@@ -2314,23 +1885,7 @@ static PyMethodDef RasterGISMethods[] = {
 "   classcolours[1] = colourCat(red=200, green=240, blue=50, alpha=255)\n"
 "   rastergis.colourClasses(clumps, field, classcolours)\n"
 "\n"},
-/*
-    {"generateColourTable", RasterGIS_GenerateColourTable, METH_VARARGS,
-"rastergis.generateColourTable(inputImage, classInField, classColourPairs)\n"
-"Generates a colour table using an input image.\n"
-"Where:\n"
-"\n"
- " :param inputImage: is a string containing the name of the input image file TODO: check and expand\n"
- " :param classInField: is a string containing the name of the input class field\n"
- " :param classColourPairs: is dict mapping string class columns to an object having attributes matching rsgis.cmds.RSGISColourIntCmds TODO: Fixme\n"
-" :param Requires:\n"
-"\n"
-"   * red: int defining the red colour component (0 - 255)\n"
-"   * green: int defining the green colour component (0 - 255)\n"
-"   * blue: int defining the bluecolour component (0 - 255)\n"
-"   * alpha: int defining the alpha colour component (0 - 255)\n"
-"\n"},
-*/
+
     {"strClassMajority", (PyCFunction)RasterGIS_StrClassMajority, METH_VARARGS | METH_KEYWORDS,
 "rastergis.strClassMajority(baseclumps, infoclumps, baseclasscol, infoclasscol, ignorezero=True, baseratband=1, inforatband=1)\n"
 "Finds the majority for class (string - field) from a set of small objects to large objects\n"
@@ -2352,76 +1907,8 @@ static PyMethodDef RasterGISMethods[] = {
 "	classRAT='./TestOutputs/RasterGIS/reInt_rat.kea'\n"
 "	rastergis.strClassMajority(clumps, classRAT, 'class_dst', 'class_src')\n"
 "\n"},
-/*
-    {"specDistMajorityClassifier", RasterGIS_SpecDistMajorityClassifier, METH_VARARGS,
-"rastergis.specDistMajorityClassifier(inputImage, inClassNameField, outClassNameField, trainingSelectCol, eastingsField, northingsField, areaField, majWeightField, fields, distThreshold, specDistThreshold, distMethod, specThreshOriginDist)\n"
-"Classifies segments using a spectral distance majority classification.\n"
-"Where:\n"
-"\n"
-"* inputImage is a string containing the name of the input image file TODO: expand\n"
-"* inClassNameField is a string\n"
-"* outClassNameField is a string\n"
-"* trainingSelectCol is a string\n"
-"* eastingsField is a string\n"
-"* northingsField is a string\n"
-"* areaField is a string\n"
-"* majWeightField is a string\n"
-"* fields is a sequence of strings containing field names\n"
-"* distThreshold is a float\n"
-"* specDistThreshold is a float\n"
-"* specThreshOriginDist is a float\n"
-"\n"},
 
-    {"maxLikelihoodClassifier", RasterGIS_MaxLikelihoodClassifier, METH_VARARGS,
-"rastergis.maxLikelihoodClassifier(inputImage, inClassNameField, outClassNameField, trainingSelectCol, classifySelectCol, areaField, fields, priorsMethod, priorStrs)\n"
-"Classifies segments using a maximum likelihood classification\n"
-"Where:\n"
-"\n"
-"* inputImage is a string containing the name of the input image file. The RAT of the first band is used.\n"
-"* inClassNameField is a string containing the classification column to train on - should be an integer column specifying the class of each row\n"
-"* outClassNameField is a string - the output classification column\n"
-"* trainingSelectCol is a string - the name of the column containing 1's where a row should be used in the training. 0 otherwise\n"
-"* classifySelectCol is a string - the name of the column containing 1's where a row should be used in the classification. 0 otherwise. 0 will be put in outClassCol where this is 0.\n"
-"* areaField is a string - the name of the column containing the relative area - usually the histogram column. Used when priorsMethod == METHOD_AREA\n"
-"* fields is a sequence of strings containing field names for training the classifier\n"
-"* priorsMethod is an int containing one of the values from rsgislib.METHOD_*. Should be either METHOD_EQUAL, METHOD_SAMPLES, METHOD_AREA or METHOD_USERDEFINED\n"
-"* priorStrs is a sequence of strings - containing the priors for METHOD_USERDEFINED - will be converted to floats\n"
-"\n"},
-
-    {"maxLikelihoodClassifierLocalPriors", RasterGIS_MaxLikelihoodClassifierLocalPriors, METH_VARARGS,
-"rastergis.maxLikelihoodClassifierLocalPriors(inputImage, inClassNameField, outClassNameField, trainingSelectCol, classifySelectCol, areaField, fields, eastingsField, northingsField, distThreshold, priorsMethod, weightA, allowZeroPriors)\n"
-"Classifies segments using a maximum likelihood classification and local priors\n"
-"Where:\n"
-"\n"
-"* inputImage is a string containing the name of the input image file. The RAT of the first band is used.\n"
-"* inClassNameField is a string containing the classification column to train on - should be an integer column specifying the class of each row\n"
-"* outClassNameField is a string - the output classification column\n"
-"* trainingSelectCol is a string - the name of the column containing 1's where a row should be used in the training. 0 otherwise\n"
-"* classifySelectCol is a string - the name of the column containing 1's where a row should be used in the classification. 0 otherwise. 0 will be put in outClassCol where this is 0.\n"
-"* areaField is a string - the name of the column containing the relative area - usually the histogram column.\n"
-"* fields is a sequence of strings containing field names for training the classifier\n"
-"* eastingsField is a string containing the name of the field holding the eastings\n"
-"* northingsField is a string containing the name of the field holding the northings\n"
-"* distThreshold is a float - the radius in image units to search when setting the priors from the neighbouring clumps\n"
-"* priorsMethod is an int containing one of the values from rsgislib.METHOD_*. Should be either METHOD_AREA or METHOD_WEIGHTED\n"
-"* weightA is a float. If priorsMethod == METHOD_WEIGHTED this is the weight to use\n"
-"* allowZeroPriors is a bool. If true resets the priors that are zero to the minimum prior value (excluding zero).\n"
-"\n"},
-
-    {"classMask", RasterGIS_ClassMask, METH_VARARGS,
-"rastergis.classMask(inputImage, classField, className, outputFile, gdalformat, gdalType)\n"
-"Generates a mask for a particular class\n"
-"Where:\n"
-"\n"
-"* inputImage is a string containing the name of the input image file TODO: expand\n"
-"* classField is a string\n"
-"* className is a string\n"
-"* outputFile is a string containing the name of the output file\n"
-"* gdalformat is a string containing the GDAL format for the output file - eg 'KEA'\n"
-"* datatype is an int containing one of the values from rsgislib.TYPE_*\n"
-"\n"},
-*/
-    {"findNeighbours", RasterGIS_FindNeighbours, METH_VARARGS,
+    {"findNeighbours", (PyCFunction)RasterGIS_FindNeighbours, METH_VARARGS | METH_KEYWORDS,
 "rastergis.findNeighbours(inputImage, ratBand)\n"
 "Finds the clump neighbours from an image\n"
 "\n"
@@ -2431,7 +1918,7 @@ static PyMethodDef RasterGISMethods[] = {
 ":param ratBand: is an int containing band for which the neighbours are to be calculated for (Optional, Default = 1)\n"
 "\n"},
 
-    {"findBoundaryPixels", RasterGIS_FindBoundaryPixels, METH_VARARGS,
+    {"findBoundaryPixels", (PyCFunction)RasterGIS_FindBoundaryPixels, METH_VARARGS | METH_KEYWORDS,
 "rastergis.findBoundaryPixels(inputImage, outputFile, gdalformat, ratBand)\n"
 "Identifies the pixels on the boundary of the clumps\n"
 "\n"
@@ -2443,7 +1930,7 @@ static PyMethodDef RasterGISMethods[] = {
 ":param ratBand: is an int containing band for which the neighbours are to be calculated for (Optional, Default = 1)\n"
 "\n"},
 
-    {"calcBorderLength", RasterGIS_CalcBorderLength, METH_VARARGS,
+    {"calcBorderLength", (PyCFunction)RasterGIS_CalcBorderLength, METH_VARARGS | METH_KEYWORDS,
 "rastergis.calcBorderLength(inputImage, ignoreZeroEdges, outColsName)\n"
 "Calculate the border length of clumps\n"
 "\n"
@@ -2454,7 +1941,7 @@ static PyMethodDef RasterGISMethods[] = {
 ":param outColsName: is a string\n"
 "\n"},
 
-    {"calcRelBorder", RasterGIS_CalcRelBorder, METH_VARARGS,
+    {"calcRelBorder", (PyCFunction)RasterGIS_CalcRelBorder, METH_VARARGS | METH_KEYWORDS,
 "rastergis.calcRelBorder(inputImage, outColsName, classNameField, className, ignoreZeroEdges)\n"
 "Calculates the relative border length of the clumps to a class\n"
 "\n"
@@ -2466,41 +1953,8 @@ static PyMethodDef RasterGISMethods[] = {
 ":param className: is a string\n"
 ":param ignoreZeroEdges: is a bool\n"
 "\n"},
-/*
-    {"calcShapeIndices", RasterGIS_CalcShapeIndices, METH_VARARGS,
-"rastergis.calcShapeIndices(inputImage, shapeIndices)\n"
-"Calculates shape indices for clumps\n"
-"Where:\n"
-"\n"
-"* inputImage is a string containing the name of the input image file\n"
-"* shapeIndices is a sequence of rsgislib.rastergis.ShapeIndex objects that have the following attributes:\n"
-"\n"
-"   * colName - a string holding the column name\n"
-"   * colIdx - an int holding the column index\n"
-"   * idx - an int containing one of the values from rsgis.SHAPE_*\n"
-"\n\n"
-"Example::\n"
-"\n"
-"   from rsgislib import rastergis\n"
-"   clumps = './TestOutputs/RasterGIS/injune_p142_casi_sub_utm_segs_shape.kea'\n"
-"   shapes = []\n"
-"   shapes.append(rastergis.ShapeIndex(colName='Area', idx=rsgislib.SHAPE_SHAPEAREA))\n"
-"   shapes.append(rastergis.ShapeIndex(colName='Length', idx=rsgislib.SHAPE_LENGTH))\n"
-"   shapes.append(rastergis.ShapeIndex(colName='Width', idx=rsgislib.SHAPE_WIDTH))\n"
-"   shapes.append(rastergis.ShapeIndex(colName='BorderLengthIdx', idx=rsgislib.SHAPE_BORDERLENGTH))\n"
-"   shapes.append(rastergis.ShapeIndex(colName='Asymmetry', idx=rsgislib.SHAPE_ASYMMETRY))\n"
-"   shapes.append(rastergis.ShapeIndex(colName='ShapeIndex', idx=rsgislib.SHAPE_SHAPEINDEX))\n"
-"   shapes.append(rastergis.ShapeIndex(colName='Density', idx=rsgislib.SHAPE_DENSITY))\n"
-"   shapes.append(rastergis.ShapeIndex(colName='LengthWidthRatio', idx=rsgislib.SHAPE_LENGTHWIDTH))\n"
-"   shapes.append(rastergis.ShapeIndex(colName='BorderIndex', idx=rsgislib.SHAPE_BORDERINDEX))\n"
-"   shapes.append(rastergis.ShapeIndex(colName='Compactness', idx=rsgislib.SHAPE_COMPACTNESS))\n"
-"   shapes.append(rastergis.ShapeIndex(colName='MainDirection', idx=rsgislib.SHAPE_MAINDIRECTION))\n"
-"   rastergis.calcShapeIndices(clumps, shapes)\n"
-"\n"
-"\n"},
-*/
 
-    {"defineClumpTilePositions", RasterGIS_DefineClumpTilePositions, METH_VARARGS,
+    {"defineClumpTilePositions", (PyCFunction)RasterGIS_DefineClumpTilePositions, METH_VARARGS | METH_KEYWORDS,
 "rastergis.defineClumpTilePositions(clumpsImage, tileImage, outColsName, tileOverlap, tileBoundary, tileBody)\n"
 "Defines the position within the file of the clumps.\n"
 "\n"
@@ -2514,7 +1968,7 @@ static PyMethodDef RasterGISMethods[] = {
 ":param tileBody: is an unsigned int\n"
 "\n"},
 
-    {"defineBorderClumps", RasterGIS_DefineBorderClumps, METH_VARARGS,
+    {"defineBorderClumps", (PyCFunction)RasterGIS_DefineBorderClumps, METH_VARARGS | METH_KEYWORDS,
 "rastergis.defineBorderClumps(clumpsImage, tileImage, outColsName, tileOverlap, tileBoundary, tileBody)\n"
 "Defines the clumps which are on the border within the file of the clumps using a mask\n"
 "\n"
@@ -2526,34 +1980,6 @@ static PyMethodDef RasterGISMethods[] = {
 ":param tileOverlap: is an unsigned int defining the overlap between tiles\n"
 ":param tileBoundary: is an unsigned int\n"
 ":param tileBody: is an unsigned int\n"
-"\n"},
-
-    {"findChangeClumpsFromStdDev", (PyCFunction)RasterGIS_FindChangeClumpsFromStdDev, METH_VARARGS | METH_KEYWORDS,
-"rastergis.findChangeClumpsFromStdDev(clumpsImage, classfield, changeField, attFields, classChangeFields)\n"
-"Identifies segments which have changed by looking for statistical outliers (std dev) from class population.\n\n"
-"\n"
-"Where:\n"
-"\n"
-":param clumps: is a string containing the name of the input clump file\n"
-":param classfield: is a string providing the name of the column containing classes.\n"
-":param change: is a string providing the output name of the change field\n"
-":param attributes: is a sequence of strings containing the columns to use when detecting change.\n"
-":param classChangeFields: is a sequence of python objects having the following attributes:\n"
-"        * name - The class name in which change is going to be search for\n"
-"        * outName - An integer to uniquely identify the clumps identify as change\n"
-"        * threshold - The number of standard deviations away from the mean above which segments are identified as change.\n"
-":param ratBand: is an int containing band for which the neighbours are to be calculated for (Optional, Default = 1)\n"
-"\n"
-"Example::\n"
-"\n"
-"   import collections\n"
-"   from rsgislib import rastergis\n"
-"   clumpsImage='injune_p142_casi_sub_utm_segs_popstats.kea'\n"
-"   ChangeFeat = collections.namedtuple('ChangeFeats', ['name', 'outName', 'threshold'])\n"
-"   changeFeatVals = []\n"
-"   changeFeatVals.append(ChangeFeat(name='Forest', outName=1, threshold=thresholdAll))\n"
-"   changeFeatVals.append(ChangeFeat(name='Scrub-Shrub', outName=1, threshold=thresholdAll))\n"
-"   rastergis.findChangeClumpsFromStdDev(clumpsImage, 'ClassName', 'ChangeFeats', ['NDVI'], changeFeatVals)\n"
 "\n"},
 
    {"getGlobalClassStats", (PyCFunction)RasterGIS_GetGlobalClassStats, METH_VARARGS | METH_KEYWORDS,
@@ -2581,7 +2007,7 @@ static PyMethodDef RasterGISMethods[] = {
 "   rastergis.getGlobalClassStats(clumpsImage, 'ClassName', ['NDVI'], changeFeatVals)\n"
 "\n"},
 
-{"selectClumpsOnGrid", RasterGIS_SelectClumpsOnGrid, METH_VARARGS,
+{"selectClumpsOnGrid", (PyCFunction)RasterGIS_SelectClumpsOnGrid, METH_VARARGS | METH_KEYWORDS,
 "rsgislib.rastergis.selectClumpsOnGrid(clumpsImage, inSelectField, outSelectField, eastingsCol, northingsCol, metricField, methodStr, rows, cols)\n"
 "Selects a segment within a regular grid pattern across the scene. The clump is selected based on the minimum, maximum or closest to the mean.\n"
 "\n"
@@ -2598,26 +2024,7 @@ static PyMethodDef RasterGISMethods[] = {
 ":param cols: is an unsigned integer which defines the number of columns within which a clump will be selected.\n"
 "\n"},
 
-{"interpolateClumpValues2Image", RasterGIS_InterpolateClumpValues2Img, METH_VARARGS,
-"rsgislib.rastergis.interpolateClumpValues2Image(clumpsImage, selectField, eastingsField, northingsField, methodStr, valueField, outputFile, gdalformat, gdaltype, ratBand)\n"
-"Interpolates values from clumps to the whole image of pixels.\n"
-"\n"
-"Where:\n"
-"\n"
-":param clumpsImage: is a string containing the name of the input clump file\n"
-":param selectField: is a string which defines the column name where a value of 1 defines the clumps which will be included in the analysis.\n"
-":param eastingsField: is a string which defines a column with a eastings for each clump.\n"
-":param northingsField: is a string which defines a column with a northings for each clump.\n"
-":param methodStr: is a string which defines a column with a value for each clump which will be used for the distance, nearestneighbour or naturalneighbour or naturalnearestneighbour or knearestneighbour or idwall anaylsis.\n"
-":param valueField: is a string which defines a column containing the values to be interpolated creating the new image.\n"
-":param outputFile: is a string for the path to the output image file.\n"
-":param gdalformat: is string defining the GDAL format of the output image.\n"
-":param datatype: is an containing one of the values from rsgislib.TYPE_*\n"
-":param ratBand: is the image band with which the RAT is associated."
-"\n"},
-    
-
-{"calcRelDiffNeighStats", RasterGIS_CalcRelDiffNeighbourStats, METH_VARARGS,
+{"calcRelDiffNeighStats", (PyCFunction)RasterGIS_CalcRelDiffNeighbourStats, METH_VARARGS | METH_KEYWORDS,
 "rsgislib.rastergis.calcRelDiffNeighStats(clumpsImage, fieldstats, ratBand)\n"
 "Calculates the difference (relative or absolute) between each clump and it's\n"
 "neighbours. The differences can be summarised as min, max, mean, std dev or sum.\n"
@@ -2643,94 +2050,6 @@ static PyMethodDef RasterGISMethods[] = {
 "    fieldInfo = rsgislib.rastergis.FieldAttStats(field='NIRMean', minField='MinNIRMeanDiff', maxField='MaxNIRMeanDiff')\n"
 "    rsgislib.rastergis.calcRelDiffNeighStats(inputImage, fieldInfo, False, ratBand)\n"
 "\n"},
-    
-    
-{"binaryClassification", RasterGIS_BinaryClassification, METH_VARARGS,
-"rsgislib.rastergis.binaryClassification(clumpsImage, xmlBlock, outColumn, ratBand)\n"
-"Calculates a binary classification (1, 0) given a set of logical conditions.\n"
-"\n"
-"Where:\n"
-"\n"
-":param clumpsImage: is a string containing the name of the input clump file\n"
-":param xmlBlock: is a string with a block of XML which is to be parsed for the logical expression.\n"
-":param outColumn: is a string with the name out of the output column.\n"
-":param ratBand: is an (optional; default 1) integer with the image band with which the RAT is associated.\n"
-"\n"
-"Example::\n"
-"\n"
-"    #!/usr/bin/env python\n"
-"\n"
-"    from rsgislib import rastergis\n"
-"    import xml.etree.cElementTree as ET\n"
-"\n"
-"    ET.register_namespace(\"rsgis\", \"http://www.rsgislib.org/xml/\")\n"
-"    rootElem = ET.Element(\"{http://www.rsgislib.org/xml/}ratlogicexps\")\n"
-"    expRoot = ET.SubElement(rootElem, \"{http://www.rsgislib.org/xml/}expression\", {'operation':'and'})\n"
-"    ET.SubElement(expRoot, \"{http://www.rsgislib.org/xml/}expression\", {'operation':'evaluate','operator':'eq','column':'ClustersClass','threshold':'6'})\n"
-"    ET.SubElement(expRoot, \"{http://www.rsgislib.org/xml/}expression\", {'operation':'evaluate','operator':'gt','column':'NIRMean','threshold':'300'})\n"
-"\n"
-"    xmlBlock = ET.tostring(rootElem, encoding='utf8', method='xml').decode(\"utf-8\")\n"
-"    print(xmlBlock)\n"
-"\n"
-"    inputimage = \"RapidEye_20130625_lat53lon389_tid3063312_oid167771_rad_toa_segs.kea\"\n"
-"    outClassColumn = \"Classification\"\n"
-"\n"
-"    rastergis.binaryClassification(inputimage, xmlBlock, outClassColumn)\n"
-"\n"},
-    
-{"regionGrowClass", RasterGIS_RegionGrowClass, METH_VARARGS,
-"rsgislib.rastergis.regionGrowClass(clumpsImage, xmlBlock, classColumn, classVal, maxNumIter, ratBand)\n"
-"Using a logical expression a class (classVal) defined within the classColumn is grown until.\n"
-"either the maximum number of iterations (maxNumIter) is reached or there all clumps meeting the\n"
-"criteria have been met (set maxNumIter to be -1).\n"
-"\n"
-"Where:\n"
-"\n"
-":param clumpsImage: is a string containing the name of the input clump file\n"
-":param xmlBlock: is a string with a block of XML which is to be parsed for the logical expression.\n"
-":param classColumn: is a string with the name column containing the classification.\n"
-":param classVal: is a string with the name of the class to be grown\n"
-":param maxNumIter: is the maximum number of iterations to used for the growth (optional; default is -1, i.e., no max number of iterations\n"
-":param ratBand: is an (optional; default 1) integer with the image band with which the RAT is associated.\n"
-"\n"
-"Example::\n"
-"\n"
-"    from rsgislib import rastergis\n"
-"    import xml.etree.cElementTree as ET\n"
-"    ET.register_namespace(\"rsgis\", \"http://www.rsgislib.org/xml/\")\n"
-"    rootElem = ET.Element(\"{http://www.rsgislib.org/xml/}ratlogicexps\")\n"
-"    expRoot = ET.SubElement(rootElem, \"{http://www.rsgislib.org/xml/}expression\", {'operation':'or'})\n"
-"    ET.SubElement(expRoot, \"{http://www.rsgislib.org/xml/}expression\", {'operation':'evaluate','operator':'gt','column':'GreenMean','threshold':'150'})\n"
-"    ET.SubElement(expRoot, \"{http://www.rsgislib.org/xml/}expression\", {'operation':'evaluate','operator':'gt','column':'RedMean','threshold':'150'})\n"
-"    xmlBlock = ET.tostring(rootElem, encoding='utf8', method='xml').decode(\"utf-8\")\n"
-"    print(xmlBlock)\n"
-"    inputimage = \"RapidEye_20130625_lat53lon389_tid3063312_oid167771_rad_toa_segs.kea\"\n"
-"    classColumn = \"ClustersClass\"\n"
-"    classVal = \"6\"\n"
-"    maxIters = -1\n"
-"    rastergis.findNeighbours(inputimage)\n"
-"    rastergis.regionGrowClass(inputimage, xmlBlock, classColumn, classVal, maxIters)\n"
-"\n"},
-
-/*
-{"calcGlobalSegmentationScore", RasterGIS_FindGlobalSegmentationScore, METH_VARARGS,
-    "rsgislib.rastergis.calcGlobalSegmentationScore(clumpsImage, inputImage, colsPrefix, calcNeighbours, minNormV, maxNormV, minNormMI, maxNormMI)\n"
-    "Calculates the Global Score defined in Johnson and Xie 2011 'Unsupervised image segmentation evaluation and "
-    " refinement using a multi-scale approach', ISPRS Journal of Photogrammetery and Remote Sensing.\n"
-    "Where:\n"
-    "\n"
-    "* clumpsImage is a string containing the name and path to the input clump file to be tested.\n"
-    "* inputImage is a string containing the name and path to the input image file the homogeneity is to be tested on.\n"
-    "* colsPrefix is a string which defines a prefix (e.g., 'gs') for the columns created during this processing.\n"
-    "* calcNeighbours is a boolean which defines whether the clump neighbours need to be calculated (note, if they are not pre-calculated this must be true or processing will fail).\n"
-    "* minNormV is a float which defines a minimum value for normalising the variance component of the score.\n"
-    "* maxNormV is a float which defines a maximum value for normalising the variance component of the score.\n"
-    "* minNormMI is a float which defines a minimum value for normalising the Moran's I component of the score.\n"
-    "* maxNormMI is a float which defines a maximum value for normalising the Moran's I component of the score.\n"
-    "Returns:\n"
-    "float - The global segmentation score. (higher == worse and lower == better)."
-    "\n"},
-    */
 
 {"populateRATWithMeanLitStats", (PyCFunction)RasterGIS_PopulateRATWithMeanLitStats, METH_VARARGS | METH_KEYWORDS,
 "rsgislib.rastergis.populateRATWithMeanLitStats(valsimage=string, clumps=string, meanLitImage=string, meanlitBand=int, meanLitCol=string, pxlCountCol=string, bandstats=rsgislib.rastergis.BandAttStats, ratband=int)\n"
@@ -2769,7 +2088,7 @@ static PyMethodDef RasterGISMethods[] = {
 "   rastergis.populateRATWithMeanLitStats(valsimage=inputImage, clumps=segmentClumps, meanLitImage=ndviImage, meanlitBand=1, meanLitCol='NDVIMean', pxlCountCol='MLPxlCount', bandstats=bandStats, ratband=1)\n"
 "\n"},
 
-{"collapseRAT", RasterGIS_CollapseRAT, METH_VARARGS,
+{"collapseRAT", (PyCFunction)RasterGIS_CollapseRAT, METH_VARARGS | METH_KEYWORDS,
 "rsgislib.rastergis.collapseRAT(clumpsImage, selectField, outputFile, gdalformat, ratBand)\n"
 "Collapses the image and rat to a set of selected rows (defined with a value of 1 in the selected column).\n"
 "\n"
@@ -2803,51 +2122,6 @@ static PyMethodDef RasterGISMethods[] = {
 "   vectorFile = 'vectorFile.shp'\n"
 "   veclyr = 'vectorFile'\n"
 "   rastergis.importVecAtts(clumps, vectorFile, veclyr, 'pxlval', None)\n"
-"\n"},
-
-{"regionGrowClassNeighCritera", RasterGIS_RegionGrowClassNeighCritera, METH_VARARGS,
-"rsgislib.rastergis.regionGrowClassNeighCritera(clumpsImage, xmlBlockGrowCriteria, xmlBlockNeighCriteria, classColumn, classVal, maxNumIter, ratBand)\n"
-"Using a logical expression a class (classVal) defined within the classColumn is grown until.\n"
-"either the maximum number of iterations (maxNumIter) is reached or there all clumps meeting the\n"
-"criteria have been met (set maxNumIter to be -1).\n"
-"\n"
-"Where:\n"
-"\n"
-":param clumpsImage: is a string containing the name of the input clump file\n"
-":param xmlBlockGrowCriteria: is a string with a block of XML which is to be parsed for the logical expression for the region growing.\n"
-":param xmlBlockNeighCriteria: is a string with a block of XML which is to be parsed for the logical expression for stating whether a feature is a neighbour which can be considered.\n"
-":param classColumn: is a string with the name column containing the classification.\n"
-":param classVal: is a string with the name of the class to be grown\n"
-":param maxNumIter: is the maximum number of iterations to used for the growth (optional; default is -1, i.e., no max number of iterations\n"
-":param ratBand: is an (optional; default 1) integer with the image band with which the RAT is associated.\n"
-"\n"
-"Example::\n"
-"\n"
-"    from rsgislib import rastergis\n"
-"    import xml.etree.cElementTree as ET\n"
-"\n"
-"    ET.register_namespace(\"rsgis\", \"http://www.rsgislib.org/xml/\")\n"
-"    rootElemCriteria = ET.Element(\"{http://www.rsgislib.org/xml/}ratlogicexps\")\n"
-"    andElem = ET.SubElement(rootElemCriteria, \"{http://www.rsgislib.org/xml/}expression\", {'operation':'and'})\n"
-"    ET.SubElement(andElem, \"{http://www.rsgislib.org/xml/}expression\", {'operation':'evaluate','operator':'gt','column':'HHdB','threshold':'-10'})\n"
-"    ET.SubElement(andElem, \"{http://www.rsgislib.org/xml/}expression\", {'operation':'evaluate','operator':'lt','column':'dist2Sea','threshold':'2000'})\n"
-"    xmlBlockGrowCriteria = ET.tostring(rootElemCriteria, encoding='utf8', method='xml').decode(\"utf-8\")\n"
-"\n"
-"    print(xmlBlockGrowCriteria)\n"
-"\n"
-"    ET.register_namespace(\"rsgis\", \"http://www.rsgislib.org/xml/\")\n"
-"    rootElemNeigh = ET.Element(\"{http://www.rsgislib.org/xml/}ratlogicexps\")\n"
-"    ET.SubElement(rootElemNeigh, \"{http://www.rsgislib.org/xml/}expression\", {'operation':'evaluate','operator':'lt','column':'dist2Sea'})\n"
-"    xmlBlockNeighCriteria = ET.tostring(rootElemNeigh, encoding='utf8', method='xml').decode(\"utf-8\")\n"
-"\n"
-"    print(xmlBlockNeighCriteria)\n"
-"\n"
-"    inputimage = \"N00E103_classification_grown.kea\"\n"
-"    classColumn = \"Classification\"\n"
-"    classVal = \"Mangroves\"\n"
-"    maxIters = -1\n"
-"    rastergis.findNeighbours(inputimage)\n"
-"    rastergis.regionGrowClassNeighCritera(inputimage, xmlBlockGrowCriteria, xmlBlockNeighCriteria, classColumn, classVal, maxIters)\n"
 "\n"},
 
 {"applyKNN", (PyCFunction)RasterGIS_ApplyKNN, METH_VARARGS | METH_KEYWORDS,
@@ -3014,6 +2288,7 @@ static PyMethodDef RasterGISMethods[] = {
 "\n"
 ":return: double for distance\n"
 "\n"},
+
 {"exportClumps2Images", (PyCFunction)RasterGIS_ExportClumps2Images, METH_VARARGS | METH_KEYWORDS,
 "rastergis.exportClumps2Images(clumps, outimgbase, binout, outimgext, gdalformat, ratband=1)\n"
 "Exports each clump to a seperate raster which is the minimum extent for the clump.\n"
