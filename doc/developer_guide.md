@@ -56,9 +56,10 @@ functions:
 | output_img | An output image when there is only a single output image within the function. |
 | in_XXX_img | An input image where there are multiple input images with XXX used to indicate the input image type (e.g., dem) |
 | clumps_img | An input clumps image (i.e., with a raster attribute table) such as used in there rastergis module|
-|gdalformat| The output image file format using the GDAL format shorthands (e.g., GTIFF, KEA, ENVI, HFA) - note for legacy reasons this is not snake_case|
-|datatype| The output image data type (e.g., rsgis.TYPE_16INT) of the image - note for legacy reasons this is not snake_case|
-
+| gdalformat | The output image file format using the GDAL format shorthands (e.g., GTIFF, KEA, ENVI, HFA) - note for legacy reasons this is not snake_case|
+| datatype | The output image data type (e.g., rsgis.TYPE_16INT) of the image - note for legacy reasons this is not snake_case|
+| out_img_base | The base file path and name for a set of output images (e.g., tiles) |
+| out_img_ext | The file extension for a output image (i.e., when using out_img_base) |
 
 ### Vectors
 
