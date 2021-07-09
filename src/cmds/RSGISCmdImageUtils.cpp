@@ -1736,18 +1736,18 @@ namespace rsgis{ namespace cmds {
         }
     }
 
-    void executeCreateBlankImage(std::string outputImage, unsigned int numBands, unsigned int width, unsigned int height, double tlX, double tlY, double resolution, float pxlVal, std::string wktFile, std::string wktStr, std::string gdalFormat, RSGISLibDataType outDataType) 
+    void executeCreateBlankImage(std::string outputImage, unsigned int numBands, unsigned int width, unsigned int height, double tlX, double tlY, double res_x, double res_y, float pxlVal, std::string wktFile, std::string wktStr, std::string gdalFormat, RSGISLibDataType outDataType)
     {
         try
         {
 			GDALAllRegister();
             double *transformation = new double[6];
             transformation[0] = tlX;
-            transformation[1] = resolution;
+            transformation[1] = res_x;
             transformation[2] = 0;
             transformation[3] = tlY;
             transformation[4] = 0;
-            transformation[5] = resolution * (-1);
+            transformation[5] = res_y;
 
             std::string projection = "";
             if(wktFile != "")

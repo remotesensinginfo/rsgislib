@@ -54,12 +54,17 @@ functions:
 | ----------- | ----------- |
 | input_img | An input image when there is only a single input image within the function. |
 | output_img | An output image when there is only a single output image within the function. |
+| input_imgs | A list of input images |
 | in_XXX_img | An input image where there are multiple input images with XXX used to indicate the input image type (e.g., dem) |
 | clumps_img | An input clumps image (i.e., with a raster attribute table) such as used in there rastergis module|
 | gdalformat | The output image file format using the GDAL format shorthands (e.g., GTIFF, KEA, ENVI, HFA) - note for legacy reasons this is not snake_case|
 | datatype | The output image data type (e.g., rsgis.TYPE_16INT) of the image - note for legacy reasons this is not snake_case|
 | out_img_base | The base file path and name for a set of output images (e.g., tiles) |
 | out_img_ext | The file extension for a output image (i.e., when using out_img_base) |
+| use_no_data | boolean variable to specify whether a specified no data value should be used |
+| no_data_val | numeric variable specifying a no data value |
+| out_no_data | numeric variable specifying an output no data value if different from the input no data value (i.e., no_data_val) |
+| n_bands | the number of bands (i.e., output bands)
 
 ### Vectors
 
@@ -81,7 +86,13 @@ functions:
 | in_h5_file | An input HDF5 file |
 | out_h5_file | An output HDF5 file. |
 | h5_XXX_file | Where there are multiple input and/or output HDF5 files then XXX is used to specify the purpose. |
-
+| min_x, max_x | Min and Max x values |
+| min_y, max_y | Min and Max y values |
+| wkt_file | Path to a text file containing a WKT string for a projection |
+| wkt_str | A WKT representation of a projection |
+| rnd_seed | Seed for random number generator |
+| win_size | specify a window size, normally for filtering |
+| win_h_size | specify a half window size used in some places to ensure window size is odd |
 
 
 
@@ -91,6 +102,10 @@ functions:
 ## C++ Coding Style
 
 1. When creating iterators use the `auto` keyword for cleaner code.
+2. Curly brackets on new lines 
+3. Use curly brackets even for single line if-statements.
+
+
 
 ## C++ Test Implementation
 

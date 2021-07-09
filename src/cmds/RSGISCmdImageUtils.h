@@ -154,13 +154,13 @@ namespace rsgis{ namespace cmds {
     DllExport void executeSplitSampleH5File(std::string inputH5, std::string outputP1H5, std::string outputP2H5, unsigned int nSample, int seed, RSGISLibDataType dataType);
     
     /** A function to subset an image to the bounding box of a polygon */
-    DllExport void executeSubset(std::string inputImage, std::string inputVector, std::string outputImage, std::string imageFormat, RSGISLibDataType outDataType);
+    DllExport void executeSubset(std::string inputImage, std::string inputVecFile, std::string inputVecLyr, std::string outputImage, std::string imageFormat, RSGISLibDataType outDataType);
     
     /** A function to subset an image to a bounding box */
     DllExport void executeSubsetBBox(std::string inputImage, std::string outputImage, std::string imageFormat, RSGISLibDataType outDataType, double xMin, double xMax, double yMin, double yMax);
     
     /** A function to subset an image to polygons within shapefile */
-    DllExport void executeSubset2Polys(std::string inputImage, std::string inputVector, std::string filenameAttribute, std::string outputImageBase, std::string imageFormat, RSGISLibDataType outDataType, std::string outFileExtension, std::vector<std::string> *outFileNames = NULL);
+    DllExport void executeSubset2Polys(std::string inputImage, std::string inputVecFile, std::string inputVecLyr, std::string filenameAttribute, std::string outputImageBase, std::string imageFormat, RSGISLibDataType outDataType, std::string outFileExtension, std::vector<std::string> *outFileNames = NULL);
     
     /** A function to subset an image to another image*/
     DllExport void executeSubset2Img(std::string inputImage, std::string inputROIImage, std::string outputImage, std::string imageFormat, RSGISLibDataType outDataType);
@@ -169,7 +169,7 @@ namespace rsgis{ namespace cmds {
     DllExport void executeSubsetImageBands(std::string inputImage, std::string outputImage, std::vector<unsigned int> bands, std::string gdalFormat, RSGISLibDataType outDataType);
     
     /** A function to create a new blank image */
-    DllExport void executeCreateBlankImage(std::string outputImage, unsigned int numBands, unsigned int width, unsigned int height, double tlX, double tlY, double resolution, float pxlVal, std::string wktFile, std::string wktStr, std::string gdalFormat, RSGISLibDataType outDataType);
+    DllExport void executeCreateBlankImage(std::string outputImage, unsigned int numBands, unsigned int width, unsigned int height, double tlX, double tlY, double res_x, double res_y, float pxlVal, std::string wktFile, std::string wktStr, std::string gdalFormat, RSGISLibDataType outDataType);
 
     /** A function to create a new blank image using an exising image as a base. */
     DllExport void executeCreateCopyBlankImage(std::string inputImage, std::string outputImage, unsigned int numBands, float pxlVal, std::string gdalFormat, RSGISLibDataType outDataType);
@@ -177,8 +177,8 @@ namespace rsgis{ namespace cmds {
     /** A function to create a new blank image using an exising image as a base. */
     DllExport void executeCreateCopyBlankImage(std::string inputImage, std::string outputImage, unsigned int numBands, double xMin, double xMax, double yMin, double yMax, double resX, double resY, float pxlVal, std::string gdalFormat, RSGISLibDataType outDataType);
     
-    /** A function to create a new blank image using an exising image as a base but cutting to extent of shapefile. */
-    DllExport void executeCreateCopyBlankImageVecExtent(std::string inputImage, std::string inputVector, std::string outputImage, unsigned int numBands, float pxlVal, std::string gdalFormat, RSGISLibDataType outDataType);
+    /** A function to create a new blank image using an exising image as a base but cutting to extent of vector layer. */
+    DllExport void executeCreateCopyBlankImageVecExtent(std::string inputImage, std::string inputVecFile, std::string inputVecLyr, std::string outputImage, unsigned int numBands, float pxlVal, std::string gdalFormat, RSGISLibDataType outDataType);
     
     /** A function to calculate summary statistics for every band in a stack or every n bands */
     DllExport void executeStackStats(std::string inputImage, std::string outputImage, std::string calcStat, bool allBands, unsigned int numBands, std::string gdalFormat, RSGISLibDataType outDataType);

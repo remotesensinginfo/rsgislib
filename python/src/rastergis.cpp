@@ -189,9 +189,9 @@ static PyObject *RasterGIS_SpatialExtent(PyObject *self, PyObject *args, PyObjec
 {
     const char *inputImage, *minXXCol, *minXYCol, *maxXXCol, *maxXYCol, *minYXCol, *minYYCol, *maxYXCol, *maxYYCol;
     unsigned int ratBand = 1;
-    static char *kwlist[] = {RSGIS_PY_C_TEXT("clumps_img"), RSGIS_PY_C_TEXT("minXX"), RSGIS_PY_C_TEXT("minXY"),
-                             RSGIS_PY_C_TEXT("maxXX"), RSGIS_PY_C_TEXT("maxXY"), RSGIS_PY_C_TEXT("minYX"),
-                             RSGIS_PY_C_TEXT("minYY"), RSGIS_PY_C_TEXT("maxYX"), RSGIS_PY_C_TEXT("maxYY"), RSGIS_PY_C_TEXT("ratband"), NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("clumps_img"), RSGIS_PY_C_TEXT("min_xx"), RSGIS_PY_C_TEXT("min_xy"),
+                             RSGIS_PY_C_TEXT("max_xx"), RSGIS_PY_C_TEXT("max_xy"), RSGIS_PY_C_TEXT("min_yx"),
+                             RSGIS_PY_C_TEXT("min_yy"), RSGIS_PY_C_TEXT("max_yx"), RSGIS_PY_C_TEXT("max_yy"), RSGIS_PY_C_TEXT("ratband"), NULL};
     
     if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssssssss|I:spatialExtent", kwlist, &inputImage, &minXXCol, &minXYCol, &maxXXCol, &maxXYCol, &minYXCol, &minYYCol, &maxYXCol, &maxYYCol, &ratBand))
     {
