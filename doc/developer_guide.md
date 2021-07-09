@@ -42,6 +42,8 @@ The main coding style things to be aware of when providing a function for RSGISL
 1. Variables should be in snake_case and all characters should be in lower case
 2. Class names should be in CamelCase
 3. Module names should be lower case with no underscores between words.
+4. Functions should have keyword specified through the C++ interface
+5. Pure python functions should provide type hints.
 
 For consistency, we try to keep the following commonly used input variable names the same across different
 functions:
