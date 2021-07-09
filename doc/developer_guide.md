@@ -90,6 +90,7 @@ functions:
 
 ## C++ Coding Style
 
+1. When creating iterators use the `auto` keyword for cleaner code.
 
 ## C++ Test Implementation
 
