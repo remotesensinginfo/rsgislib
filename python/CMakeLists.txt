@@ -214,21 +214,6 @@ endif(MSVC)
 
 install(TARGETS _imagemorphology DESTINATION "${PYRSGIS_INSTALL_PATH}/imagemorphology")
 
-# _histocube
-add_library(_histocube SHARED src/histocube.cpp)
-if(APPLE)
-    set_target_properties(_histocube PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
-    target_link_libraries(_histocube ${RSGISLIB_CMDSINTERFACE_LIB_NAME}) 
-else()
-    target_link_libraries(_histocube ${RSGISLIB_CMDSINTERFACE_LIB_NAME} ${Python_LIBRARIES}) 
-endif(APPLE)
-set_target_properties(_histocube PROPERTIES PREFIX "")
-if(MSVC)
-    set_target_properties(_histocube PROPERTIES SUFFIX ".pyd")
-endif(MSVC)
-
-install(TARGETS _histocube DESTINATION "${PYRSGIS_INSTALL_PATH}/histocube")
-
 # custom install step to create .pyc files
 install(CODE "execute_process(COMMAND ${Python_EXECUTABLE} -m compileall ${PYRSGIS_INSTALL_PATH})")
 

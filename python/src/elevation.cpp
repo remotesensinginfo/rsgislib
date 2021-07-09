@@ -38,11 +38,15 @@ struct ElevationState
 static struct ElevationState _state;
 #endif
 
-static PyObject *Elevation_calcSlope(PyObject *self, PyObject *args)
+static PyObject *Elevation_calcSlope(PyObject *self, PyObject *args, PyObject *keywds)
 {
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
+                             RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("unit"), NULL};
     const char *pszInputImage, *pszOutputFile, *pszGDALFormat, *pszOutUnit;
-    if( !PyArg_ParseTuple(args, "ssss:slope", &pszInputImage, &pszOutputFile, &pszOutUnit, &pszGDALFormat))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssss:slope", kwlist, &pszInputImage, &pszOutputFile, &pszOutUnit, &pszGDALFormat))
+    {
         return NULL;
+    }
 
     try
     {
@@ -58,7 +62,7 @@ static PyObject *Elevation_calcSlope(PyObject *self, PyObject *args)
         }
         else
         {
-            throw rsgis::cmds::RSGISCmdException("The unit option needs to be specified as either \'degrees\' or \'radians\'.");
+            throw rsgis::cmds::RSGISCmdException("The unit option needs to be specified as either 'degrees' or 'radians'.");
         }
         
         rsgis::cmds::executeCalcSlope(std::string(pszInputImage), std::string(pszOutputFile), outAngleUnit, std::string(pszGDALFormat));
@@ -72,10 +76,12 @@ static PyObject *Elevation_calcSlope(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-static PyObject *Elevation_calcAspect(PyObject *self, PyObject *args)
+static PyObject *Elevation_calcAspect(PyObject *self, PyObject *args, PyObject *keywds)
 {
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
+                             RSGIS_PY_C_TEXT("gdalformat"), NULL};
     const char *pszInputImage, *pszOutputFile, *pszGDALFormat;
-    if( !PyArg_ParseTuple(args, "sss:aspect", &pszInputImage, &pszOutputFile, &pszGDALFormat))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sss:aspect", kwlist, &pszInputImage, &pszOutputFile, &pszGDALFormat))
         return NULL;
     
     try
@@ -91,10 +97,12 @@ static PyObject *Elevation_calcAspect(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-static PyObject *Elevation_catAspect(PyObject *self, PyObject *args)
+static PyObject *Elevation_catAspect(PyObject *self, PyObject *args, PyObject *keywds)
 {
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
+                             RSGIS_PY_C_TEXT("gdalformat"), NULL};
     const char *pszInputImage, *pszOutputFile, *pszGDALFormat;
-    if( !PyArg_ParseTuple(args, "sss:catagoriseAspect", &pszInputImage, &pszOutputFile, &pszGDALFormat))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sss:catagoriseAspect", kwlist, &pszInputImage, &pszOutputFile, &pszGDALFormat))
         return NULL;
     
     try
@@ -110,11 +118,14 @@ static PyObject *Elevation_catAspect(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-static PyObject *Elevation_calcHillshade(PyObject *self, PyObject *args)
+static PyObject *Elevation_calcHillshade(PyObject *self, PyObject *args, PyObject *keywds)
 {
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
+                             RSGIS_PY_C_TEXT("azimuth"), RSGIS_PY_C_TEXT("zenith"),
+                             RSGIS_PY_C_TEXT("gdalformat"), NULL};
     const char *pszInputImage, *pszOutputFile, *pszGDALFormat;
     float azimuth, zenith = 0.0;
-    if( !PyArg_ParseTuple(args, "ssffs:hillshade", &pszInputImage, &pszOutputFile, &azimuth, &zenith, &pszGDALFormat))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssffs:hillshade", kwlist, &pszInputImage, &pszOutputFile, &azimuth, &zenith, &pszGDALFormat))
         return NULL;
     
     try
@@ -130,11 +141,14 @@ static PyObject *Elevation_calcHillshade(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-static PyObject *Elevation_calcShadowMask(PyObject *self, PyObject *args)
+static PyObject *Elevation_calcShadowMask(PyObject *self, PyObject *args, PyObject *keywds)
 {
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
+                             RSGIS_PY_C_TEXT("azimuth"), RSGIS_PY_C_TEXT("zenith"),
+                             RSGIS_PY_C_TEXT("max_height"), RSGIS_PY_C_TEXT("gdalformat"), NULL};
     const char *pszInputImage, *pszOutputFile, *pszGDALFormat;
     float azimuth, zenith, maxHeight = 0.0;
-    if( !PyArg_ParseTuple(args, "ssfffs:shadowmask", &pszInputImage, &pszOutputFile, &azimuth, &zenith, &maxHeight, &pszGDALFormat))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssfffs:shadowmask", kwlist, &pszInputImage, &pszOutputFile, &azimuth, &zenith, &maxHeight, &pszGDALFormat))
         return NULL;
     
     try
@@ -150,11 +164,14 @@ static PyObject *Elevation_calcShadowMask(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-static PyObject *Elevation_calcLocalIncidenceAngle(PyObject *self, PyObject *args)
+static PyObject *Elevation_calcLocalIncidenceAngle(PyObject *self, PyObject *args, PyObject *keywds)
 {
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
+                             RSGIS_PY_C_TEXT("azimuth"), RSGIS_PY_C_TEXT("zenith"),
+                             RSGIS_PY_C_TEXT("gdalformat"), NULL};
     const char *pszInputImage, *pszOutputFile, *pszGDALFormat;
     float azimuth, zenith = 0.0;
-    if( !PyArg_ParseTuple(args, "ssffs:localIncidenceAngle", &pszInputImage, &pszOutputFile, &azimuth, &zenith, &pszGDALFormat))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssffs:localIncidenceAngle", kwlist, &pszInputImage, &pszOutputFile, &azimuth, &zenith, &pszGDALFormat))
         return NULL;
     
     try
@@ -170,11 +187,14 @@ static PyObject *Elevation_calcLocalIncidenceAngle(PyObject *self, PyObject *arg
     Py_RETURN_NONE;
 }
 
-static PyObject *Elevation_calcLocalExistanceAngle(PyObject *self, PyObject *args)
+static PyObject *Elevation_calcLocalExistanceAngle(PyObject *self, PyObject *args, PyObject *keywds)
 {
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
+                             RSGIS_PY_C_TEXT("azimuth"), RSGIS_PY_C_TEXT("zenith"),
+                             RSGIS_PY_C_TEXT("gdalformat"), NULL};
     const char *pszInputImage, *pszOutputFile, *pszGDALFormat;
     float azimuth, zenith = 0.0;
-    if( !PyArg_ParseTuple(args, "ssffs:localExistanceAngle", &pszInputImage, &pszOutputFile, &azimuth, &zenith, &pszGDALFormat))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssffs:localExistanceAngle", kwlist, &pszInputImage, &pszOutputFile, &azimuth, &zenith, &pszGDALFormat))
         return NULL;
     
     try
@@ -190,12 +210,15 @@ static PyObject *Elevation_calcLocalExistanceAngle(PyObject *self, PyObject *arg
     Py_RETURN_NONE;
 }
 
-static PyObject *Elevation_dtmAspectMedianFilter(PyObject *self, PyObject *args)
+static PyObject *Elevation_dtmAspectMedianFilter(PyObject *self, PyObject *args, PyObject *keywds)
 {
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("in_dem_img"), RSGIS_PY_C_TEXT("in_aspect_img"),
+                             RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("aspect_range"),
+                             RSGIS_PY_C_TEXT("win_h_size"), RSGIS_PY_C_TEXT("gdalformat"), NULL};
     const char *pszInputDTMImage, *pszInputAspectImage, *pszOutputFile, *pszGDALFormat;
     float aspectRange = 0.0;
     int winHSize = 0;
-    if( !PyArg_ParseTuple(args, "sssfis:dtmAspectMedianFilter", &pszInputDTMImage, &pszInputAspectImage, &pszOutputFile, &aspectRange, &winHSize, &pszGDALFormat))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssfis:dtmAspectMedianFilter", kwlist, &pszInputDTMImage, &pszInputAspectImage, &pszOutputFile, &aspectRange, &winHSize, &pszGDALFormat))
         return NULL;
     
     try
@@ -211,11 +234,13 @@ static PyObject *Elevation_dtmAspectMedianFilter(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-static PyObject *Elevation_fillDEMSoilleGratin1994(PyObject *self, PyObject *args)
+static PyObject *Elevation_fillDEMSoilleGratin1994(PyObject *self, PyObject *args, PyObject *keywds)
 {
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("in_dem_img"), RSGIS_PY_C_TEXT("in_vld_img"),
+                             RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"), NULL};
     const char *pszInputDTMImage, *pszValidMaskImage, *pszOutputFile, *pszGDALFormat;
 
-    if( !PyArg_ParseTuple(args, "ssss:fillDEMSoilleGratin1994", &pszInputDTMImage, &pszValidMaskImage, &pszOutputFile, &pszGDALFormat))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssss:fillDEMSoilleGratin1994", kwlist, &pszInputDTMImage, &pszValidMaskImage, &pszOutputFile, &pszGDALFormat))
         return NULL;
     
     try
@@ -231,12 +256,13 @@ static PyObject *Elevation_fillDEMSoilleGratin1994(PyObject *self, PyObject *arg
     Py_RETURN_NONE;
 }
 
-static PyObject *Elevation_planeFitDetreadDEM(PyObject *self, PyObject *args)
+static PyObject *Elevation_planeFitDetreadDEM(PyObject *self, PyObject *args, PyObject *keywds)
 {
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("win_size"), NULL};
     const char *pszInputDEMImage, *pszOutputFile, *pszGDALFormat;
     int winSize;
     
-    if( !PyArg_ParseTuple(args, "sssi:planeFitDetreatDEM", &pszInputDEMImage, &pszOutputFile, &pszGDALFormat, &winSize))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssi:planeFitDetreatDEM", kwlist, &pszInputDEMImage, &pszOutputFile, &pszGDALFormat, &winSize))
         return NULL;
     
     try
@@ -255,7 +281,7 @@ static PyObject *Elevation_planeFitDetreadDEM(PyObject *self, PyObject *args)
 
 // Our list of functions in this module
 static PyMethodDef ElevationMethods[] = {
-{"slope", Elevation_calcSlope, METH_VARARGS,
+{"slope", (PyCFunction)Elevation_calcSlope, METH_VARARGS | METH_KEYWORDS,
 "rsgislib.elevation.slope(inputImage, outputImage, outAngleUnit, gdalformat)\n"
 "Calculates a slope layer given an input elevation model.\n"
 "\n"
@@ -266,7 +292,7 @@ static PyMethodDef ElevationMethods[] = {
 ":param outAngleUnit: is a string specifying the output unit ('degrees' or 'radians').\n"
 ":param gdalformat: is a string with the output image format for the GDAL driver.\n"},
 
-{"aspect", Elevation_calcAspect, METH_VARARGS,
+{"aspect", (PyCFunction)Elevation_calcAspect, METH_VARARGS | METH_KEYWORDS,
 "rsgislib.elevation.aspect(inputImage, outputImage, gdalformat)\n"
 "Calculates a aspect layer given an input elevation model\n"
 "\n"
@@ -276,7 +302,7 @@ static PyMethodDef ElevationMethods[] = {
 ":param outputImage: is a string containing the name and path of the output file.\n"
 ":param gdalformat: is a string with the output image format for the GDAL driver.\n"},
     
-{"catagoriseAspect", Elevation_catAspect, METH_VARARGS,
+{"catagoriseAspect", (PyCFunction)Elevation_catAspect, METH_VARARGS | METH_KEYWORDS,
 "rsgislib.elevation.catagoriseAspect(inputImage, outputImage, gdalformat)\n"
 "Creates an aspect layer which is categorised into 8 catergories from 0-45, \n"
 "45-90, 90-135, 135-180, 180-225, 225-270, 270-315 and 315-360.\n"
@@ -287,7 +313,7 @@ static PyMethodDef ElevationMethods[] = {
 ":param outputImage: is a string containing the name and path of the output file.\n"
 ":param gdalformat: is a string with the output image format for the GDAL driver.\n"},
     
-{"hillshade", Elevation_calcHillshade, METH_VARARGS,
+{"hillshade", (PyCFunction)Elevation_calcHillshade, METH_VARARGS | METH_KEYWORDS,
 "rsgislib.elevation.hillshade(inputImage, outputImage, solarAzimuth, solarZenith, gdalformat)\n"
 "Calculates a hillshade layer given an input elevation model\n"
 "\n"
@@ -299,7 +325,7 @@ static PyMethodDef ElevationMethods[] = {
 ":param solarZenith: is a float with the solar zenith in degrees (Good value is 45).\n"
 ":param gdalformat: is a string with the output image format for the GDAL driver.\n"},
     
-{"shadowmask", Elevation_calcShadowMask, METH_VARARGS,
+{"shadowmask", (PyCFunction)Elevation_calcShadowMask, METH_VARARGS | METH_KEYWORDS,
 "rsgislib.elevation.shadowmask(inputImage, outputImage, solarAzimuth, solarZenith, maxHeight, gdalformat)\n"
 "Calculates a shadow mask given an input elevation model\n"
 "\n"
@@ -313,7 +339,7 @@ static PyMethodDef ElevationMethods[] = {
 ":param gdalformat: is a string with the output image format for the GDAL driver.\n"},
     
     
-{"localIncidenceAngle", Elevation_calcLocalIncidenceAngle, METH_VARARGS,
+{"localIncidenceAngle", (PyCFunction)Elevation_calcLocalIncidenceAngle, METH_VARARGS | METH_KEYWORDS,
 "rsgislib.elevation.localIncidenceAngle(inputImage, outputImage, solarAzimuth, solarZenith, gdalformat)\n"
 "Calculates a local solar incidence angle layer given an input elevation model\n"
 "\n"
@@ -325,7 +351,7 @@ static PyMethodDef ElevationMethods[] = {
 ":param solarZenith: is a float with the solar zenith in degrees.\n"
 ":param gdalformat: is a string with the output image format for the GDAL driver.\n"},
     
-{"localExistanceAngle", Elevation_calcLocalExistanceAngle, METH_VARARGS,
+{"localExistanceAngle", (PyCFunction)Elevation_calcLocalExistanceAngle, METH_VARARGS | METH_KEYWORDS,
 "rsgislib.elevation.localExistanceAngle(inputImage, outputImage, azimuth, zenith, gdalformat)\n"
 "Calculates a local solar existance angle layer given an input elevation model\n"
 "\n"
@@ -337,7 +363,7 @@ static PyMethodDef ElevationMethods[] = {
 ":param zenith: is a float with the solar zenith in degrees.\n"
 ":param gdalformat: is a string with the output image format for the GDAL driver.\n"},
     
-{"dtmAspectMedianFilter", Elevation_dtmAspectMedianFilter, METH_VARARGS,
+{"dtmAspectMedianFilter", (PyCFunction)Elevation_dtmAspectMedianFilter, METH_VARARGS | METH_KEYWORDS,
 "rsgislib.elevation.dtmAspectMedianFilter(inputDTMImage, inputAspectImage, outputImage, aspectRange, winHSize, gdalformat)\n"
 "Filter the DTM for noise using a median filter with an aspect restriction (i.e., only pixels"
 " within the aspect range of the centre pixel will be used within the median filter).\n"
@@ -351,7 +377,7 @@ static PyMethodDef ElevationMethods[] = {
 ":param winHSize: is an integer for half the window size.\n"
 ":param gdalformat: is a string with the output image format for the GDAL driver.\n"},
 
-{"fillDEMSoilleGratin1994", Elevation_fillDEMSoilleGratin1994, METH_VARARGS,
+{"fillDEMSoilleGratin1994", (PyCFunction)Elevation_fillDEMSoilleGratin1994, METH_VARARGS | METH_KEYWORDS,
 "rsgislib.elevation.fillDEMSoilleGratin1994(inputDEMImage, validMaskImage, outputImage, gdalformat)\n"
 "Filter the local minima in a DEM using the Soille and Gratin 1994 algorithm.\n\n"
 "Soille, P., and Gratin, C. (1994). An efficient algorithm for drainage network\n"
@@ -374,7 +400,7 @@ static PyMethodDef ElevationMethods[] = {
 "\n"
 },
     
-{"planeFitDetreatDEM", Elevation_planeFitDetreadDEM, METH_VARARGS,
+{"planeFitDetreatDEM", (PyCFunction)Elevation_planeFitDetreadDEM, METH_VARARGS | METH_KEYWORDS,
 "rsgislib.elevation.planeFitDetreatDEM(inputDEMImage, outputImage, gdalformat, winSize)\n"
 "An algorithm to detread a DEM using local plane fitting. The winSize will define the scale\n"
 "at which the DEM will be detreaded.\n"

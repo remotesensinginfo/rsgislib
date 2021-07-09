@@ -38,35 +38,15 @@ struct ClassificationState
 static struct ClassificationState _state;
 #endif
 
-// Helper function to extract python sequence to array of strings
-static std::string *ExtractStringArrayFromSequence(PyObject *sequence, int *nElements) {
-    Py_ssize_t nFields = PySequence_Size(sequence);
-    *nElements = nFields;
-    std::string *stringsArray = new std::string[nFields];
-
-    for(int i = 0; i < nFields; ++i) {
-        PyObject *stringObj = PySequence_GetItem(sequence, i);
-
-        if(!RSGISPY_CHECK_STRING(stringObj))
-        {
-            PyErr_SetString(GETSTATE(sequence)->error, "Fields must be strings");
-            Py_DECREF(stringObj);
-            return stringsArray;
-        }
-
-        stringsArray[i] = RSGISPY_STRING_EXTRACT(stringObj);
-        Py_DECREF(stringObj);
-    }
-
-    return stringsArray;
-}
-
 static PyObject *Classification_CollapseClasses(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("class_col"), RSGIS_PY_C_TEXT("class_int_col"), NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
+                             RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("class_col"),
+                             RSGIS_PY_C_TEXT("class_int_col"), NULL};
     const char *pszInputImage, *pszOutputFile, *pszGDALFormat, *pszClassesColumn;
     PyObject *pClassIntCol = Py_None;
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssss|O:collapseClasses", kwlist, &pszInputImage, &pszOutputFile, &pszGDALFormat, &pszClassesColumn, &pClassIntCol))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssss|O:collapseClasses", kwlist, &pszInputImage, &pszOutputFile,
+                                     &pszGDALFormat, &pszClassesColumn, &pClassIntCol))
     {
         return NULL;
     }
@@ -95,7 +75,9 @@ static PyObject *Classification_CollapseClasses(PyObject *self, PyObject *args, 
     
     try
     {
-        rsgis::cmds::executeCollapseRAT2Class(std::string(pszInputImage), std::string(pszOutputFile), std::string(pszGDALFormat), std::string(pszClassesColumn), classIntColStr, classIntColPresent);
+        rsgis::cmds::executeCollapseRAT2Class(std::string(pszInputImage), std::string(pszOutputFile),
+                                              std::string(pszGDALFormat), std::string(pszClassesColumn),
+                                              classIntColStr, classIntColPresent);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -108,7 +90,8 @@ static PyObject *Classification_CollapseClasses(PyObject *self, PyObject *args, 
 
 static PyObject *Classification_Colour3Bands(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"), NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
+                             RSGIS_PY_C_TEXT("gdalformat"), NULL};
     const char *pszInputImage, *pszOutputFile, *pszGDALFormat;
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "sss:colour3Band", kwlist, &pszInputImage, &pszOutputFile, &pszGDALFormat))
     {
@@ -117,7 +100,8 @@ static PyObject *Classification_Colour3Bands(PyObject *self, PyObject *args, PyO
     
     try
     {
-        rsgis::cmds::executeGenerate3BandFromColourTable(std::string(pszInputImage), std::string(pszOutputFile), std::string(pszGDALFormat));
+        rsgis::cmds::executeGenerate3BandFromColourTable(std::string(pszInputImage), std::string(pszOutputFile),
+                                                         std::string(pszGDALFormat));
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -140,14 +124,19 @@ static PyObject *Classification_GenRandomAccuracyPts(PyObject *self, PyObject *a
     int del_exist_vec = false;
     int seed = 10;
 
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssssi|ii:generateRandomAccuracyPts", kwlist, &pszInputImage, &pszOutputVecFile, &pszOutputVecLyr, &pszFormat, &pszClassImgCol, &pszClassImgVecCol, &pszClassRefVecCol, &numPts, &seed, &del_exist_vec))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssssi|ii:generateRandomAccuracyPts", kwlist, &pszInputImage,
+                                     &pszOutputVecFile, &pszOutputVecLyr, &pszFormat, &pszClassImgCol, &pszClassImgVecCol,
+                                     &pszClassRefVecCol, &numPts, &seed, &del_exist_vec))
     {
         return NULL;
     }
     
     try
     {
-        rsgis::cmds::executeGenerateRandomAccuracyPts(std::string(pszInputImage), std::string(pszOutputVecFile), std::string(pszOutputVecLyr), std::string(pszFormat), std::string(pszClassImgCol), std::string(pszClassImgVecCol), std::string(pszClassRefVecCol), numPts, seed, del_exist_vec);
+        rsgis::cmds::executeGenerateRandomAccuracyPts(std::string(pszInputImage), std::string(pszOutputVecFile),
+                                                      std::string(pszOutputVecLyr), std::string(pszFormat),
+                                                      std::string(pszClassImgCol), std::string(pszClassImgVecCol),
+                                                      std::string(pszClassRefVecCol), numPts, seed, del_exist_vec);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -172,14 +161,20 @@ static PyObject *Classification_GenStratifiedRandomAccuracyPts(PyObject *self, P
     int seed = 10;
     int usePxlLst = false;
     
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssssi|iii:generateStratifiedRandomAccuracyPts", kwlist, &pszInputImage, &pszOutputVecFile, &pszOutputVecLyr, &pszFormat, &pszClassImgCol, &pszClassImgVecCol, &pszClassRefVecCol, &numPts, &seed, &del_exist_vec, &usePxlLst))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssssi|iii:generateStratifiedRandomAccuracyPts", kwlist, &pszInputImage,
+                                     &pszOutputVecFile, &pszOutputVecLyr, &pszFormat, &pszClassImgCol, &pszClassImgVecCol,
+                                     &pszClassRefVecCol, &numPts, &seed, &del_exist_vec, &usePxlLst))
     {
         return NULL;
     }
     
     try
     {
-        rsgis::cmds::executeGenerateStratifiedRandomAccuracyPts(std::string(pszInputImage), std::string(pszOutputVecFile), std::string(pszOutputVecLyr), std::string(pszFormat), std::string(pszClassImgCol), std::string(pszClassImgVecCol), std::string(pszClassRefVecCol), numPts, seed, del_exist_vec, usePxlLst);
+        rsgis::cmds::executeGenerateStratifiedRandomAccuracyPts(std::string(pszInputImage), std::string(pszOutputVecFile),
+                                                                std::string(pszOutputVecLyr), std::string(pszFormat),
+                                                                std::string(pszClassImgCol), std::string(pszClassImgVecCol),
+                                                                std::string(pszClassRefVecCol), numPts, seed, del_exist_vec,
+                                                                usePxlLst);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -198,7 +193,8 @@ static PyObject *Classification_PopClassInfoAccuracyPts(PyObject *self, PyObject
     const char *pszInputImage, *pszVecFile, *pszVecLyr, *pszClassImgCol, *pszClassImgVecCol;
     PyObject *classRefVecColObj;
     
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssss|O:popClassInfoAccuracyPts", kwlist, &pszInputImage, &pszVecFile, &pszVecLyr, &pszClassImgCol, &pszClassImgVecCol, &classRefVecColObj))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssss|O:popClassInfoAccuracyPts", kwlist, &pszInputImage, &pszVecFile,
+                                     &pszVecLyr, &pszClassImgCol, &pszClassImgVecCol, &classRefVecColObj))
     {
         return NULL;
     }
@@ -214,7 +210,10 @@ static PyObject *Classification_PopClassInfoAccuracyPts(PyObject *self, PyObject
     
     try
     {
-        rsgis::cmds::executePopClassInfoAccuracyPts(std::string(pszInputImage), std::string(pszVecFile), std::string(pszVecLyr), std::string(pszClassImgCol), std::string(pszClassImgVecCol), pszClassRefVecCol, addRefCol);
+        rsgis::cmds::executePopClassInfoAccuracyPts(std::string(pszInputImage), std::string(pszVecFile),
+                                                    std::string(pszVecLyr), std::string(pszClassImgCol),
+                                                    std::string(pszClassImgVecCol),
+                                                    pszClassRefVecCol, addRefCol);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {

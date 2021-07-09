@@ -44,15 +44,20 @@ static void FreePythonObjects(std::vector<PyObject*> toFree) {
     }
 }
 
-static PyObject *ImageFilter_Filter(PyObject *self, PyObject *args)
+static PyObject *ImageFilter_Filter(PyObject *self, PyObject *args, PyObject *keywds)
 {
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("out_img_base"),
+                             RSGIS_PY_C_TEXT("image_filters"), RSGIS_PY_C_TEXT("gdalformat"),
+                             RSGIS_PY_C_TEXT("out_img_ext"), RSGIS_PY_C_TEXT("datatype"), NULL};
     const char *pszInputImage, *pszOutputImageBase;
     const char *pszImageFormat = "KEA";
     const char *pszImageExt = "kea";
     int dataType = 9; // Default to 32 bit float
     PyObject *pImageFilterCmds;
-    if( !PyArg_ParseTuple(args, "ssO|ssi:applyfilters", &pszInputImage, &pszOutputImageBase, &pImageFilterCmds, &pszImageFormat, &pszImageExt, &dataType))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssO|ssi:applyfilters", kwlist, &pszInputImage, &pszOutputImageBase, &pImageFilterCmds, &pszImageFormat, &pszImageExt, &dataType))
+    {
         return NULL;
+    }
 
     // extract the attributes from the sequence of objects into our structs
     Py_ssize_t nFilters = PySequence_Size(pImageFilterCmds);
@@ -82,7 +87,7 @@ static PyObject *ImageFilter_Filter(PyObject *self, PyObject *args)
         {
             PyErr_SetString(GETSTATE(self)->error, "Need to provide filter 'type'" );
             FreePythonObjects(extractedAttributes);
-            for(std::vector<rsgis::cmds::RSGISFilterParameters*>::iterator iter = filterParameters->begin(); iter != filterParameters->end(); ++iter) 
+            for(auto iter = filterParameters->begin(); iter != filterParameters->end(); ++iter)
             {
                 delete *iter;
             }
@@ -99,7 +104,7 @@ static PyObject *ImageFilter_Filter(PyObject *self, PyObject *args)
         {
             PyErr_SetString(GETSTATE(self)->error, "Need to provide 'fileEnding'" );
             FreePythonObjects(extractedAttributes);
-            for(std::vector<rsgis::cmds::RSGISFilterParameters*>::iterator iter = filterParameters->begin(); iter != filterParameters->end(); ++iter) 
+            for(auto iter = filterParameters->begin(); iter != filterParameters->end(); ++iter)
             {
                 delete *iter;
             }
@@ -115,7 +120,7 @@ static PyObject *ImageFilter_Filter(PyObject *self, PyObject *args)
         {
             PyErr_SetString(GETSTATE(self)->error, "Need to provide filter 'size'" );
             FreePythonObjects(extractedAttributes);
-            for(std::vector<rsgis::cmds::RSGISFilterParameters*>::iterator iter = filterParameters->begin(); iter != filterParameters->end(); ++iter) 
+            for(auto iter = filterParameters->begin(); iter != filterParameters->end(); ++iter)
             {
                 delete *iter;
             }
@@ -189,7 +194,7 @@ static PyObject *ImageFilter_Filter(PyObject *self, PyObject *args)
         rsgis::cmds::executeFilter(pszInputImage, filterParameters, pszOutputImageBase, pszImageFormat, pszImageExt, type);
 
         // Delete filter parameters
-        for(std::vector<rsgis::cmds::RSGISFilterParameters*>::iterator iterFilter = filterParameters->begin(); iterFilter != filterParameters->end(); ++iterFilter)
+        for(auto iterFilter = filterParameters->begin(); iterFilter != filterParameters->end(); ++iterFilter)
         {
             delete *iterFilter;
         }
@@ -205,14 +210,19 @@ static PyObject *ImageFilter_Filter(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-static PyObject *ImageFilter_LeungMalikFilterBank(PyObject *self, PyObject *args)
+static PyObject *ImageFilter_LeungMalikFilterBank(PyObject *self, PyObject *args, PyObject *keywds)
 {
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("out_img_base"),
+                             RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("out_img_ext"),
+                             RSGIS_PY_C_TEXT("datatype"), NULL};
     const char *pszInputImage, *pszOutputImageBase;
     const char *pszImageFormat = "KEA";
     const char *pszImageExt = "kea";
     int dataType = 9; // Default to 32 bit float
-    if( !PyArg_ParseTuple(args, "ss|ssi:LeungMalikFilterBank", &pszInputImage, &pszOutputImageBase, &pszImageFormat, &pszImageExt, &dataType))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ss|ssi:LeungMalikFilterBank", kwlist, &pszInputImage, &pszOutputImageBase, &pszImageFormat, &pszImageExt, &dataType))
+    {
         return NULL;
+    }
 
     try
     {
@@ -228,7 +238,7 @@ static PyObject *ImageFilter_LeungMalikFilterBank(PyObject *self, PyObject *args
         rsgis::cmds::executeFilter(pszInputImage, filterParameters, pszOutputImageBase, pszImageFormat, pszImageExt, type);
 
         // Delete filter parameters
-        for(std::vector<rsgis::cmds::RSGISFilterParameters*>::iterator iterFilter = filterParameters->begin(); iterFilter != filterParameters->end(); ++iterFilter)
+        for(auto iterFilter = filterParameters->begin(); iterFilter != filterParameters->end(); ++iterFilter)
         {
             delete *iterFilter;
         }
@@ -246,7 +256,7 @@ static PyObject *ImageFilter_LeungMalikFilterBank(PyObject *self, PyObject *args
 
 // Our list of functions in this module
 static PyMethodDef ImageFilterMethods[] = {
-    {"applyfilters", ImageFilter_Filter, METH_VARARGS, 
+{"applyfilters", (PyCFunction)ImageFilter_Filter, METH_VARARGS | METH_KEYWORDS,
 "imagefilter.applyfilters(inputimage, outputImageBase, filterparameters, gdalformat, outExt, datatype)\n"
 "Filters images\n"
 "\n"
@@ -301,7 +311,7 @@ static PyMethodDef ImageFilterMethods[] = {
 "   imagefilter.applyfilters(inputImage, outputImageBase, filters, gdalformat, outExt, datatype)\n"
 "\n"},
 
-    {"LeungMalikFilterBank", ImageFilter_LeungMalikFilterBank, METH_VARARGS, 
+{"LeungMalikFilterBank", (PyCFunction)ImageFilter_LeungMalikFilterBank, METH_VARARGS | METH_KEYWORDS,
 "imagefilter.(inputimage, outputImageBase, gdalformat, outExt, datatype)\n"
 "Implements the Leung-Malik filter bank described in:\n"
 "Leung, T., Malik, J., 2001. Representing and recognizing the visual appearance of materials using three-dimensional textons.\n"
