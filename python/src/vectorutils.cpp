@@ -38,6 +38,7 @@ struct VectorUtilsState
 static struct VectorUtilsState _state;
 #endif
 
+/*
 static std::vector<std::string> ExtractStringVectorFromSequence(PyObject *sequence, int *nElements) {
     Py_ssize_t nFields = PySequence_Size(sequence);
     *nElements = nFields;
@@ -60,163 +61,28 @@ static std::vector<std::string> ExtractStringVectorFromSequence(PyObject *sequen
     
     return stringsArray;
 }
+*/
 
-static PyObject *VectorUtils_GenerateConvexHullsGroups(PyObject *self, PyObject *args)
+static PyObject *VectorUtils_PopulateGeomZField(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    const char *pszInputFile, *pszOutputVector, *pszOutVecProj;
-    int force, eastingsColIdx, northingsColIdx, attributeColIdx;
-    if( !PyArg_ParseTuple(args, "sssiiii:generateConvexHullsGroups", &pszInputFile, &pszOutputVector, &pszOutVecProj, 
-                                &force, &eastingsColIdx, &northingsColIdx, &attributeColIdx))
-        return nullptr;
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("vec_file"), RSGIS_PY_C_TEXT("vec_lyr"), RSGIS_PY_C_TEXT("input_img"),
+                             RSGIS_PY_C_TEXT("img_band"), RSGIS_PY_C_TEXT("out_vec_file"), RSGIS_PY_C_TEXT("out_vec_lyr"),
+                             RSGIS_PY_C_TEXT("out_format"), RSGIS_PY_C_TEXT("del_exist_vec"), nullptr};
 
-    try
-    {
-        rsgis::cmds::executeGenerateConvexHullsGroups(pszInputFile, pszOutputVector, pszOutVecProj, force, 
-                eastingsColIdx, northingsColIdx, attributeColIdx);
-     
-    }
-    catch(rsgis::cmds::RSGISCmdException &e)
-    {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return nullptr;
-    }
-
-    Py_RETURN_NONE;
-}
-
-static PyObject *VectorUtils_RemoveAttributes(PyObject *self, PyObject *args)
-{
-    const char *pszInputVector, *pszOutputVector;
-    int force = false;
-    if( !PyArg_ParseTuple(args, "ss|i:removeattributes", &pszInputVector, &pszOutputVector, &force))
-        return nullptr;
-
-    try
-    {
-        rsgis::cmds::executeRemoveAttributes(pszInputVector, pszOutputVector, force);
-     
-    }
-    catch(rsgis::cmds::RSGISCmdException &e)
-    {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return nullptr;
-    }
-
-    Py_RETURN_NONE;
-}
-
-static PyObject *VectorUtils_PrintPolyGeom(PyObject *self, PyObject *args)
-{
-    const char *pszInputVector;
-    if( !PyArg_ParseTuple(args, "s:printpolygeom", &pszInputVector))
-        return nullptr;
-
-    try
-    {
-        rsgis::cmds::executePrintPolyGeom(pszInputVector);
-    }
-    catch(rsgis::cmds::RSGISCmdException &e)
-    {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return nullptr;
-    }
-
-    Py_RETURN_NONE;
-}
-
-static PyObject *VectorUtils_BufferVector(PyObject *self, PyObject *args)
-{
-    const char *pszInputVector, *pszOutputVector;
-    const char *pszVectorLyrName, *pszVectorOutLyrName;
-    const char *pszDriver;
-    float bufferDist;
-    if( !PyArg_ParseTuple(args, "sssssf:buffervector", &pszInputVector, &pszVectorLyrName, &pszOutputVector, &pszVectorOutLyrName, &pszDriver, &bufferDist))
-        return nullptr;
-
-    try
-    {
-        rsgis::cmds::executeBufferVector(std::string(pszInputVector), std::string(pszVectorLyrName), std::string(pszOutputVector), std::string(pszVectorOutLyrName), std::string(pszDriver), bufferDist);
-    }
-    catch(rsgis::cmds::RSGISCmdException &e)
-    {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return nullptr;
-    }
-
-    Py_RETURN_NONE;
-}
-
-static PyObject *VectorUtils_FindReplaceText(PyObject *self, PyObject *args)
-{
-    const char *pszInputVector, *pszAttribute, *pszFind, *pszReplace;
-    if( !PyArg_ParseTuple(args, "ssss:findreplacetext", &pszInputVector, &pszAttribute, &pszFind, &pszReplace))
-        return nullptr;
-
-    try
-    {
-        rsgis::cmds::executeFindReplaceText(pszInputVector, pszAttribute, pszFind, pszReplace);
-     
-    }
-    catch(rsgis::cmds::RSGISCmdException &e)
-    {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return nullptr;
-    }
-
-    Py_RETURN_NONE;
-}
-
-static PyObject *VectorUtils_CalcArea(PyObject *self, PyObject *args)
-{
-    const char *pszInputVector, *pszOutputVector;
-    int force = false;
-    if( !PyArg_ParseTuple(args, "ss|i:calcarea", &pszInputVector, &pszOutputVector, &force))
-        return nullptr;
-
-    try
-    {
-        rsgis::cmds::executeCalcPolyArea(pszInputVector, pszOutputVector, force);
-    }
-    catch(rsgis::cmds::RSGISCmdException &e)
-    {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return nullptr;
-    }
-
-    Py_RETURN_NONE;
-}
-
-static PyObject *VectorUtils_PolygonsInPolygon(PyObject *self, PyObject *args)
-{
-    const char *pszInputVector, *pszInputCoverVector, *pszOutputDIR, *pszAttributeName;
-    int force = false;
-    if( !PyArg_ParseTuple(args, "ssss|i:polygonsInPolygon", &pszInputVector, &pszInputCoverVector, &pszOutputDIR, &pszAttributeName, &force))
-        return nullptr;
-
-    try
-    {
-        rsgis::cmds::executePolygonsInPolygon(pszInputVector, pszInputCoverVector, pszOutputDIR, pszAttributeName, force);
-    }
-    catch(rsgis::cmds::RSGISCmdException &e)
-    {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return nullptr;
-    }
-
-    Py_RETURN_NONE;
-}
-
-static PyObject *VectorUtils_PopulateGeomZField(PyObject *self, PyObject *args)
-{
-    const char *pszInputVector, *pszInputImage, *pszOutputVector;
-    int force = false;
+    const char *pszInputVectorFile, *pszInputVectorLyr, *pszInputImage, *pszOutputVectorFile, *pszOutputVectorLyr, *pszOutFormat;
+    int delExistVec = false;
     unsigned int imgBand;
-    if( !PyArg_ParseTuple(args, "ssIs|i:populateGeomZField", &pszInputVector, &pszInputImage, &imgBand, &pszOutputVector, &force))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssIsss|i:populateGeomZField", kwlist, &pszInputVectorFile, &pszInputVectorLyr,
+                                     &pszInputImage, &imgBand, &pszOutputVectorFile, &pszOutputVectorLyr, &pszOutFormat, &delExistVec))
+    {
         return nullptr;
+    }
     
     try
     {
-        rsgis::cmds::executePopulateGeomZField(pszInputVector, pszInputImage, imgBand, pszOutputVector, force);
+        rsgis::cmds::executePopulateGeomZField(std::string(pszInputVectorFile), std::string(pszInputVectorLyr),
+                                               std::string(pszInputImage), imgBand, std::string(pszOutputVectorFile),
+                                               std::string(pszOutputVectorLyr), std::string(pszOutFormat), delExistVec);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -227,12 +93,18 @@ static PyObject *VectorUtils_PopulateGeomZField(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-static PyObject *VectorUtils_VectorMaths(PyObject *self, PyObject *args)
+static PyObject *VectorUtils_VectorMaths(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    const char *pszInputVector, *pszOutputVector, *pszExpression, *pszOutColName;
-    int force = false;
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("vec_file"), RSGIS_PY_C_TEXT("vec_lyr"),
+                             RSGIS_PY_C_TEXT("out_vec_file"), RSGIS_PY_C_TEXT("out_vec_lyr"),
+                             RSGIS_PY_C_TEXT("out_format"), RSGIS_PY_C_TEXT("out_col"), RSGIS_PY_C_TEXT("exp"),
+                             RSGIS_PY_C_TEXT("vars"), RSGIS_PY_C_TEXT("del_exist_vec"), nullptr};
+    const char *pszInputVectorFile, *pszInputVectorLyr, *pszOutputVectorFile, *pszOutputVectorLyr, *pszOutFormat, *pszOutColName, *pszExpression;
+    int delExistVec = false;
     PyObject *pVarsObj;
-    if( !PyArg_ParseTuple(args, "ssssO|i:vectorMaths", &pszInputVector, &pszOutputVector, &pszOutColName, &pszExpression, &pVarsObj, &force))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssssssO|i:vectorMaths", kwlist, &pszInputVectorFile, &pszInputVectorLyr,
+                                     &pszOutputVectorFile, &pszOutputVectorLyr, &pszOutFormat, &pszOutColName,
+                                     &pszExpression, &pVarsObj, &delExistVec))
     {
         return nullptr;
     }
@@ -284,7 +156,10 @@ static PyObject *VectorUtils_VectorMaths(PyObject *self, PyObject *args)
     
     try
     {
-        rsgis::cmds::executeVectorMaths(std::string(pszInputVector), std::string(pszOutputVector), std::string(pszOutColName), std::string(pszExpression), force, vars);
+        rsgis::cmds::executeVectorMaths(std::string(pszInputVectorFile), std::string(pszInputVectorLyr),
+                                        std::string(pszOutputVectorFile), std::string(pszOutputVectorLyr),
+                                        std::string(pszOutFormat), std::string(pszOutColName),
+                                        std::string(pszExpression), (bool)delExistVec, vars);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -296,325 +171,28 @@ static PyObject *VectorUtils_VectorMaths(PyObject *self, PyObject *args)
 }
 
 
-static PyObject *VectorUtils_AddFIDColumn(PyObject *self, PyObject *args)
+
+static PyObject *VectorUtils_CreateLinesOfPoints(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    const char *pszInputVector, *pszOutputVector;
-    int force = false;
-    if( !PyArg_ParseTuple(args, "ss|i:addFIDColumn", &pszInputVector, &pszOutputVector, &force))
-    {
-        return nullptr;
-    }
-    
-    try
-    {
-        rsgis::cmds::executeAddFIDColumn(std::string(pszInputVector), std::string(pszOutputVector), force);
-    }
-    catch(rsgis::cmds::RSGISCmdException &e)
-    {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return nullptr;
-    }
-    
-    Py_RETURN_NONE;
-}
-
-static PyObject *VectorUtils_FindCommonImgExtent(PyObject *self, PyObject *args)
-{
-    PyObject *pInputImages;
-    const char *pszOutputVector;
-    int force = false;
-    if( !PyArg_ParseTuple(args, "Os|i:findCommonImgExtent", &pInputImages, &pszOutputVector, &force))
-    {
-        return nullptr;
-    }
-    
-    // Extract list of images to array of strings.
-    int numImages = 0;
-    std::vector<std::string> inputImages = ExtractStringVectorFromSequence(pInputImages, &numImages);
-    if(numImages == 0)
-    {
-        PyErr_SetString(GETSTATE(self)->error, "No input images provided");
-        return nullptr;
-    }
-    
-    try
-    {
-        rsgis::cmds::executeFindCommonImgExtent(inputImages, std::string(pszOutputVector), force);
-    }
-    catch(rsgis::cmds::RSGISCmdException &e)
-    {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return nullptr;
-    }
-    
-    Py_RETURN_NONE;
-}
-
-
-static PyObject *VectorUtils_SplitFeatures(PyObject *self, PyObject *args)
-{
-    const char *pszInputVector, *pszOutputVectorBase;
-    int force = false;
-    if( !PyArg_ParseTuple(args, "ss|i:splitFeatures", &pszInputVector, &pszOutputVectorBase, &force))
-    {
-        return nullptr;
-    }
-    
-    try
-    {
-        rsgis::cmds::executeSplitFeatures(std::string(pszInputVector), std::string(pszOutputVectorBase), ((bool)force));
-    }
-    catch(rsgis::cmds::RSGISCmdException &e)
-    {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return nullptr;
-    }
-    
-    Py_RETURN_NONE;
-}
-
-
-static PyObject *VectorUtils_ExportPxls2Pts(PyObject *self, PyObject *args, PyObject *keywds)
-{
-    static char *kwlist[] = {"image", "outvecfile", "mskval", "force", "outveclyr", "vecdriver", nullptr};
-    const char *pszInputImg, *pszOutputVector;
-    const char *pszOutputVecLyr = "";
-    const char *pszOutputVecFormat = "";
-    int force = false;
-    float maskVal = 0.0;
-    if( !PyArg_ParseTupleAndKeywords(args, keywds,"ssf|iss:exportPxls2Pts", kwlist, &pszInputImg, &pszOutputVector, &maskVal, &force, &pszOutputVecLyr, &pszOutputVecFormat))
-    {
-        return nullptr;
-    }
-    
-    try
-    {
-        rsgis::cmds::executeExportPxls2Pts(std::string(pszInputImg), std::string(pszOutputVector), force, maskVal, std::string(pszOutputVecLyr), std::string(pszOutputVecFormat));
-    }
-    catch(rsgis::cmds::RSGISCmdException &e)
-    {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return nullptr;
-    }
-    
-    Py_RETURN_NONE;
-}
-
-static PyObject *VectorUtils_Dist2NearestGeom(PyObject *self, PyObject *args)
-{
-    const char *pszInputVector, *pszOutputVector, *pszOutColName;
-    int forceInt = false;
-    int useIdxInt = false;
-    double maxSearchDist = 100;
-    
-    if( !PyArg_ParseTuple(args, "sss|iid:dist2NearestGeom", &pszInputVector, &pszOutputVector, &pszOutColName, &forceInt, &useIdxInt, &maxSearchDist))
-    {
-        return nullptr;
-    }
-    
-    PyObject *outVal = PyTuple_New(1);
-    try
-    {
-        bool force = (bool) forceInt;
-        bool useIdx = (bool) useIdxInt;
-        double dist = rsgis::cmds::executeCalcDist2NearestGeom(std::string(pszInputVector), std::string(pszOutputVector), std::string(pszOutColName), force, useIdx, maxSearchDist);
-        if(PyTuple_SetItem(outVal, 0, Py_BuildValue("d", dist)) == -1)
-        {
-            throw rsgis::cmds::RSGISCmdException("Failed to add \'distance\' value to the list...");
-        }
-    }
-    catch(rsgis::cmds::RSGISCmdException &e)
-    {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return nullptr;
-    }
-    
-    return outVal;
-}
-
-static PyObject *VectorUtils_Dist2NearestSecGeomSet(PyObject *self, PyObject *args)
-{
-    const char *pszInputVector, *pszInDistToVector, *pszOutputVector, *pszOutColName;
-    int forceInt = false;
-    int useIdxInt = false;
-    double maxSearchDist = 100;
-    
-    if( !PyArg_ParseTuple(args, "ssss|iid:dist2NearestSecGeomSet", &pszInputVector, &pszInDistToVector, &pszOutputVector, &pszOutColName, &forceInt, &useIdxInt, &maxSearchDist))
-    {
-        return nullptr;
-    }
-    
-    PyObject *outVal = PyTuple_New(1);
-    try
-    {
-        bool force = (bool) forceInt;
-        bool useIdx = (bool) useIdxInt;
-        double dist = rsgis::cmds::executeCalcDist2NearestGeom(std::string(pszInputVector), std::string(pszInDistToVector), std::string(pszOutputVector), std::string(pszOutColName), force, useIdx, maxSearchDist);
-        if(PyTuple_SetItem(outVal, 0, Py_BuildValue("d", dist)) == -1)
-        {
-            throw rsgis::cmds::RSGISCmdException("Failed to add \'distance\' value to the list...");
-        }
-    }
-    catch(rsgis::cmds::RSGISCmdException &e)
-    {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return nullptr;
-    }
-    
-    return outVal;
-}
-
-static PyObject *VectorUtils_CalcMaxDist2NearestGeom(PyObject *self, PyObject *args)
-{
-    const char *pszInputVector;
-    
-    if( !PyArg_ParseTuple(args, "s:calcMaxDist2NearestGeom", &pszInputVector))
-    {
-        return nullptr;
-    }
-    
-    PyObject *outVal = PyTuple_New(1);
-    try
-    {
-        double dist = rsgis::cmds::executeCalcMaxDist2NearestGeom(std::string(pszInputVector));
-        if(PyTuple_SetItem(outVal, 0, Py_BuildValue("d", dist)) == -1)
-        {
-            throw rsgis::cmds::RSGISCmdException("Failed to add \'distance\' value to the list...");
-        }
-
-    }
-    catch(rsgis::cmds::RSGISCmdException &e)
-    {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return nullptr;
-    }
-    
-    return outVal;
-}
-
-static PyObject *VectorUtils_SpatialGraphClusterGeoms(PyObject *self, PyObject *args)
-{
-    const char *pszInputVector;
-    const char *pszOutputVector;
-    float sdEdgeLen = 0.0;
-    double maxEdgeLen = 0.0;
-    int force = false;
-    int useMinSpanTree = true;
-    PyObject *pszOutShpEdgesObj;
-    PyObject *pszOutH5EdgeLensObj;
-    
-    if( !PyArg_ParseTuple(args, "ssifd|iOO:spatialGraphClusterGeoms", &pszInputVector, &pszOutputVector, &useMinSpanTree, &sdEdgeLen, &maxEdgeLen, &force, &pszOutShpEdgesObj, &pszOutH5EdgeLensObj))
-    {
-        return nullptr;
-    }
-    
-    std::string shpFileEdges="";
-    bool outShpEdges=false;
-    std::string h5EdgeLengths="";
-    bool outH5EdgeLens=false;
-    
-    if( ( pszOutShpEdgesObj == nullptr ) || ( pszOutShpEdgesObj == Py_None ) || !RSGISPY_CHECK_STRING(pszOutShpEdgesObj) )
-    {
-        outShpEdges = false;
-    }
-    else
-    {
-        outShpEdges = true;
-        shpFileEdges = RSGISPY_STRING_EXTRACT(pszOutShpEdgesObj);
-    }
-    
-    if( ( pszOutH5EdgeLensObj == nullptr ) || ( pszOutH5EdgeLensObj == Py_None ) || !RSGISPY_CHECK_STRING(pszOutH5EdgeLensObj) )
-    {
-        outH5EdgeLens = false;
-    }
-    else
-    {
-        outH5EdgeLens = true;
-        h5EdgeLengths = RSGISPY_STRING_EXTRACT(pszOutH5EdgeLensObj);
-    }
-    
-    try
-    {
-        rsgis::cmds::executeSpatialGraphClusterGeoms(std::string(pszInputVector), std::string(pszOutputVector), useMinSpanTree, sdEdgeLen, maxEdgeLen, force, shpFileEdges, outShpEdges, h5EdgeLengths, outH5EdgeLens);
-    }
-    catch(rsgis::cmds::RSGISCmdException &e)
-    {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return nullptr;
-    }
-    
-    Py_RETURN_NONE;
-}
-
-
-static PyObject *VectorUtils_FitPolygon2Points(PyObject *self, PyObject *args)
-{
-    const char *pszInputVector;
-    const char *pszOutputVector;
-    int force = false;
-    double alphaVal = -1.0;
-    
-    if( !PyArg_ParseTuple(args, "ss|di:fitPolygon2Points", &pszInputVector, &pszOutputVector, &alphaVal, &force))
-    {
-        return nullptr;
-    }
-    
-    try
-    {
-        rsgis::cmds::executeFitPolygonToPoints(std::string(pszInputVector), std::string(pszOutputVector), alphaVal, force);
-    }
-    catch(rsgis::cmds::RSGISCmdException &e)
-    {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return nullptr;
-    }
-    
-    Py_RETURN_NONE;
-}
-
-
-static PyObject *VectorUtils_FitPolygons2PointClusters(PyObject *self, PyObject *args)
-{
-    const char *pszInputVector;
-    const char *pszOutputVector;
-    const char *clustersField;
-    int force = false;
-    double alphaVal = -1.0;
-    
-    if( !PyArg_ParseTuple(args, "sss|di:fitPolygons2PointClusters", &pszInputVector, &pszOutputVector, &clustersField, &alphaVal, &force))
-    {
-        return nullptr;
-    }
-    
-    try
-    {
-        rsgis::cmds::executeFitPolygonsToPointClusters(std::string(pszInputVector), std::string(pszOutputVector), std::string(clustersField), alphaVal, force);
-    }
-    catch(rsgis::cmds::RSGISCmdException &e)
-    {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return nullptr;
-    }
-    
-    Py_RETURN_NONE;
-}
-
-
-static PyObject *VectorUtils_CreateLinesOfPoints(PyObject *self, PyObject *args)
-{
-    const char *pszInputVector;
-    const char *pszOutputVector;
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("vec_file"), RSGIS_PY_C_TEXT("vec_lyr"),
+                             RSGIS_PY_C_TEXT("out_vec_file"), RSGIS_PY_C_TEXT("out_vec_lyr"),
+                             RSGIS_PY_C_TEXT("out_format"), RSGIS_PY_C_TEXT("step"),
+                             RSGIS_PY_C_TEXT("del_exist_vec"), nullptr};
+    const char *pszInputVectorFile, *pszInputVectorLyr, *pszOutputVectorFile, *pszOutputVectorLyr, *pszOutFormat;
     double step;
-    int force = false;
+    int delExistVec = false;
     
-    if( !PyArg_ParseTuple(args, "ssd|i:createLinesOfPoints", &pszInputVector, &pszOutputVector, &step, &force))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssssd|i:createLinesOfPoints", kwlist, &pszInputVectorFile, &pszInputVectorLyr,
+                                     &pszOutputVectorFile, &pszOutputVectorLyr, &pszOutFormat, &step, &delExistVec))
     {
         return nullptr;
     }
     
     try
     {
-        rsgis::cmds::executeCreateLinesOfPoints(std::string(pszInputVector), std::string(pszOutputVector), step, force);
+        rsgis::cmds::executeCreateLinesOfPoints(std::string(pszInputVectorFile), std::string(pszInputVectorLyr),
+                                                std::string(pszOutputVectorFile), std::string(pszOutputVectorLyr),
+                                                std::string(pszOutFormat), step, (bool)delExistVec);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -625,44 +203,18 @@ static PyObject *VectorUtils_CreateLinesOfPoints(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-static PyObject *VectorUtils_FitActiveContourBoundaries(PyObject *self, PyObject *args)
+static PyObject *VectorUtils_CheckValidateGeometries(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    const char *pszInputVector;
-    const char *pszOutputVector;
-    const char *pszExterForceImg;
-    int force = false;
-    double alphaVal;
-    double betaVal;
-    double gammaVal;
-    double minExtThresVal;
-    
-    if( !PyArg_ParseTuple(args, "sssdddd|i:fitActiveContourBoundaries", &pszInputVector, &pszOutputVector, &pszExterForceImg, &alphaVal, &betaVal, &gammaVal, &minExtThresVal, &force))
-    {
-        return nullptr;
-    }
-    
-    try
-    {
-        rsgis::cmds::executeFitActiveContourBoundaries(std::string(pszInputVector), std::string(pszOutputVector), std::string(pszExterForceImg), alphaVal, betaVal, gammaVal, minExtThresVal, bool(force));
-    }
-    catch(rsgis::cmds::RSGISCmdException &e)
-    {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return nullptr;
-    }
-    
-    Py_RETURN_NONE;
-}
-
-static PyObject *VectorUtils_CheckValidateGeometries(PyObject *self, PyObject *args)
-{
-    const char *pszInputVector;
-    const char *pszOutputVector;
-    const char *pszVectorLyrName;
-    const char *pszDriver;
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("vec_file"), RSGIS_PY_C_TEXT("vec_lyr"),
+                             RSGIS_PY_C_TEXT("out_vec_file"), RSGIS_PY_C_TEXT("out_vec_lyr"),
+                             RSGIS_PY_C_TEXT("out_format"), RSGIS_PY_C_TEXT("print_err_geoms"),
+                             RSGIS_PY_C_TEXT("del_exist_vec"), nullptr};
+    const char *pszInputVectorFile, *pszInputVectorLyr, *pszOutputVectorFile, *pszOutputVectorLyr, *pszOutFormat;
     int printGeomErrsInt = false;
+    int delExistVec = false;
 
-    if( !PyArg_ParseTuple(args, "ssss|i:checkValidateGeometries", &pszInputVector, &pszVectorLyrName, &pszOutputVector, &pszDriver, &printGeomErrsInt))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssss|ii:checkValidateGeometries", kwlist, &pszInputVectorFile, &pszInputVectorLyr,
+                                     &pszOutputVectorFile, &pszOutputVectorLyr, &pszOutFormat, &printGeomErrsInt, &delExistVec))
     {
         return nullptr;
     }
@@ -670,7 +222,9 @@ static PyObject *VectorUtils_CheckValidateGeometries(PyObject *self, PyObject *a
     try
     {
         bool printGeomErrs = (bool) printGeomErrsInt;
-        rsgis::cmds::executeCheckValidateGeometries(std::string(pszInputVector), std::string(pszVectorLyrName), std::string(pszOutputVector), std::string(pszDriver), printGeomErrs);
+        rsgis::cmds::executeCheckValidateGeometries(std::string(pszInputVectorFile), std::string(pszInputVectorLyr),
+                                                    std::string(pszOutputVectorFile), std::string(pszOutputVectorLyr),
+                                                    std::string(pszOutFormat), printGeomErrs, (bool)delExistVec);
     }
     catch(rsgis::cmds::RSGISCmdException &e)
     {
@@ -685,133 +239,7 @@ static PyObject *VectorUtils_CheckValidateGeometries(PyObject *self, PyObject *a
 // Our list of functions in this module
 static PyMethodDef VectorUtilsMethods[] = {
 
-{"generateConvexHullsGroups", VectorUtils_GenerateConvexHullsGroups, METH_VARARGS,
-"vectorutils.generateConvexHullsGroups(inputfile, outputvector, outVecProj, force, eastingsColIdx, northingsColIdx, attributeColIdx)\n"
-"A command to produce convex hulls for groups of (X, Y, Attribute) point locations.\n\n"
-"Where:\n"
-"\n"
-":param inputfile: is a string containing the name of the input file\n"
-":param outputvector: is a string containing the name of the output vector\n"
-":param outVecProj: is a string specifying the projection of the output vector\n"
-":param force: is a bool, specifying whether to force removal of the output vector if it exists\n"
-":param eastingsColIdx: an integer specifying the easting column in the input text file \n"
-":param northingsColIdx: an integer specifying the northing column in the input text file \n"
-":param attributeColIdx: an integer specifying the attribute column in the input text file \n"
-"\n"},
-
-{"removeattributes", VectorUtils_RemoveAttributes, METH_VARARGS, 
-"vectorutils.removeattributes(inputvector, outputvector, force)\n"
-"A command to copy the geometry, dropping attributes.\n\n"
-"Where:\n"
-"\n"
-":param inputvector: is a string containing the name of the input vector\n"
-":param outputvector: is a string containing the name of the output vector\n"
-":param force: is a bool, specifying whether to force removal of the output vector if it exists\n"
-"\n"
-"Example::\n"
-"\n"
-"   from rsgislib import vectorutils\n"
-"   inputVector = './Vectors/injune_p142_stem_locations.shp'\n"
-"   outputVector = './TestOutputs/injune_p142_stem_locations_noatts.shp'\n"
-"   vectorutils.removeattributes(inputVector, outputVector, True)\n"
-"\n"},
-
-{"buffervector", VectorUtils_BufferVector, METH_VARARGS, 
-"vectorutils.buffervector(inputvector, veclayername outputvector, outlayername, ogrdriver, bufferDist)\n"
-"A command to buffer a vector by a specified distance.\n\n"
-"Where:\n"
-"\n"
-":param inputvector: is a string containing the name of the input vector\n"
-":param veclayername: is a string with the name of the vector layer name\n"
-":param outputvector: is a string containing the name of the output vector\n"
-":param outlayername: is a string containing the name of the output vector layer."
-":param ogrdriver: is a string with the gdal/ogr driver specified (e.g., GPKG)\n"
-":param bufferDist: is a float specifying the distance of the buffer, in map units.\n"
-"\n"
-"Example::\n"
-"\n"
-"   from rsgislib import vectorutils\n"
-"   inputVector = './Vectors/injune_p142_stem_locations.gpkg'\n"
-"   lyrName = 'polygons'\n"
-"   outputVector = './TestOutputs/injune_p142_stem_locations_1mbuffer.gpkg'\n"
-"   bufferDist = 1\n"
-"   vectorutils.buffervector(inputVector, lyrName, outputVector, lyrName, 'GPKG', bufferDist)\n"
-"\n"},
-
-{"printpolygeom", VectorUtils_PrintPolyGeom, METH_VARARGS, 
-"vectorutils.printpolygeom(inputvector)\n"
-"A command to print the polygon geometries (to the console) of the inputted shapefile\n\n"
-"Where:\n"
-"\n"
-":param inputvector: is a string containing the name of the input vector\n"
-"\n"
-"Example::\n"
-"\n"
-"   from rsgislib import vectorutils\n"
-"   inputVector = './Vectors/injune_p142_psu_utm.shp'\n"
-"   vectorutils.printpolygeom(inputVector)\n"
-"\n"},
-
-{"findreplacetext", VectorUtils_FindReplaceText, METH_VARARGS,
-"vectorutils.findreplacetext(inputvector, attribute, find, replace)\n"
-"A command to undertake find and replace on a given attribute with the shapefile\n\n"
-"Where:\n"
-"\n"
-":param inputvector: is a string containing the name of the input vector.\n"
-":param attribute: is a string containing the name of field in the attribute table.\n"
-":param find: is a string to find.\n"
-":param replace: is a string to replace 'find'.\n"
-"\n"
-"Example::\n"
-"\n"
-"   from rsgislib import vectorutils\n"
-"   inputVector = './TestOutputs/injune_p142_psu_utm_findreplace.shp'\n"
-"   attribute = 'PSU'\n"
-"   find = '142'\n"
-"   replace = '142'\n"
-"   vectorutils.findreplacetext(inputVector, attribute, find, replace)\n"
-"\n"},
-
-{"calcarea", VectorUtils_CalcArea, METH_VARARGS, 
-"vectorutils.calcarea(inputvector, outputvector, force)\n"
-"A command to add the area of each polygon to the attribute table, area in the same units \n"
-"as the input dataset (likely m^2 or degrees^2).\n\n"
-"Where:\n"
-"\n"
-":param inputvector: is a string containing the name of the input vector\n"
-":param outputvector: is a string containing the name of the output vector\n"
-":param force: is a bool, specifying whether to force removal of the output vector if it exists\n"
-"\n"
-"Example::\n"
-"\n"
-"   from rsgislib import vectorutils\n"
-"   inputVector = './Vectors/injune_p142_psu_utm.shp'\n"
-"   outputVector = './TestOutputs/injune_p142_psu_utm_area.shp'\n"
-"   vectorutils.calcarea(inputVector, outputVector, True)\n"
-"\n"},
-
-{"polygonsInPolygon", VectorUtils_PolygonsInPolygon, METH_VARARGS, 
-"vectorutils.polygonsInPolygon(inputvector, inputcovervector, outputDIR, attributeName, force)\n"
-"A command to create a new polygon containing only polygons within cover vector. \n"
-"Loops through attributes and creates a new shapefile for each polygon in the cover vector.\n\n"
-"Where:\n"
-"\n"
-":param inputvector: is a string containing the name of the input vector\n"
-":param inputcovervector: is a string containing the name of the cover vector vector\n"
-":param outputDIR: is a string containing the name of the output directory\n"
-":param force: is a bool, specifying whether to force removal of the output vector if it exists\n"
-"\n"
-"Example::\n"
-"\n"
-"   from rsgislib import vectorutils\n"
-"   inputVector = './Vectors/injune_p142_stem_locations.shp'\n"
-"   coverVector = './Vectors/injune_p142_psu_utm.shp'\n"
-"   outDIR = '/TestOutputs'\n"
-"   attribute = 'PSU'\n"
-"   vectorutils.polygonsInPolygon(inputVector, coverVector, outDIR, attribute, True)\n"
-"\n"},
-
-{"populateGeomZField", VectorUtils_PopulateGeomZField, METH_VARARGS,
+{"populateGeomZField", (PyCFunction)VectorUtils_PopulateGeomZField, METH_VARARGS | METH_KEYWORDS,
 "vectorutils.populateGeomZField(InputVector, InputImage, imgBand, OutputVector, force)\n"
 "A command to populate the z field within the vector file making it a 3D vector rather \n"
 "than just a 2d file.\n\n"
@@ -834,7 +262,7 @@ static PyMethodDef VectorUtilsMethods[] = {
 "    rsgislib.vectorutils.populateGeomZField(inputVector, inputImage, imgBand, outputVector, force)\n"
 "\n"},
 
-{"vectorMaths", VectorUtils_VectorMaths, METH_VARARGS,
+{"vectorMaths", (PyCFunction)VectorUtils_VectorMaths, METH_VARARGS | METH_KEYWORDS,
 "vectorutils.vectorMaths(inputVector, outputVector, outputColName, expression, variables, force)\n"
 "A command to calculate a number column from data in existing columns.\n\n"
 "Where:\n"
@@ -847,148 +275,7 @@ static PyMethodDef VectorUtilsMethods[] = {
 ":param force: is a bool, specifying whether to force removal of the output vector if it exists\n"
 "\n"},
 
-{"addFIDColumn", VectorUtils_AddFIDColumn, METH_VARARGS,
-"vectorutils.addFIDColumn(inputvector, outputvector, force)\n"
-"A command to add an explicit FID column to a copy of a shapefile.\n\n"
-"Where:\n"
-"\n"
-":param inputvector: is a string containing the name of the input vector\n"
-":param outputvector: is a string containing the name of the output vector\n"
-":param force: is a bool, specifying whether to force removal of the output vector if it exists\n"
-"\n"
-"Example::\n"
-"\n"
-"   from rsgislib import vectorutils\n"
-"   inputVector = './Vectors/injune_p142_psu_utm.shp'\n"
-"   outputVector = './TestOutputs/injune_p142_psu_utm_fid.shp'\n"
-"   vectorutils.addFIDColumn(inputVector, outputVector, True)\n"
-"\n"},
-
-{"findCommonImgExtent", VectorUtils_FindCommonImgExtent, METH_VARARGS,
-"vectorutils.findCommonImgExtent(inputImages, outputvector, force)\n"
-"A command to create a shapefile representing the region of common extent\n"
-"for the list of input images.\n\n"
-"Where:\n"
-"\n"
-":param inputImages: is a list of strings containing the names of the input image files\n"
-":param outputvector: is a string containing the name of the output vector\n"
-":param force: is a bool, specifying whether to force removal of the output vector if it exists\n"
-"\n"
-"Example::\n"
-"\n"
-"   from rsgislib import vectorutils\n"
-"   inputImages = ['img1.kea', 'img2.kea', 'img3.kea', 'img4.kea', 'img5.kea']\n"
-"   outputVector = 'imgSubExtent.shp'\n"
-"   vectorutils.findCommonImgExtent(inputImages, outputVector, True)\n"
-"\n"},
-
-{"splitFeatures", VectorUtils_SplitFeatures, METH_VARARGS,
-"vectorutils.splitFeatures(inputvector, outputvectorbase, force)\n"
-"A command to split features into seperate shapefiles.\n\n"
-"Where:\n"
-"\n"
-":param inputvector: is a string containing the name of the input vector\n"
-":param outputvectorbase: is a string containing the base path and name of the output vectors\n"
-":param force: is a bool, specifying whether to force removal of the output vector if it exists\n"
-"\n"
-"Example::\n"
-"\n"
-"   from rsgislib import vectorutils\n"
-"   inputVector = './Vectors/injune_p142_psu_utm.shp'\n"
-"   outputVectorBase = './TestOutputs/injune_p142_psu_utm_'\n"
-"   vectorutils.splitFeatures(inputVector, outputVectorBase, True)\n"
-"\n"},
-
-{"exportPxls2Pts", (PyCFunction)VectorUtils_ExportPxls2Pts, METH_VARARGS | METH_KEYWORDS,
-"vectorutils.exportPxls2Pts(image, outvecfile, mskval, force, outveclyr, vecdriver)\n"
-"A command to export image pixel which have a specific value to a vector file of points.\n"
-"Note. the output vector file will be overwritten even if the layer name is different.\n\n"
-"Where:\n"
-"\n"
-":param image: is a string containing the name of the input image\n"
-":param outvecfile: is a string containing the name and path of the output vector file\n"
-":param maskVal: is a float specifying the value of the image pixels to be exported\n"
-":param force: is a bool, specifying whether to force removal of the output vector if it exists (Only for ESRI Shapefile format)\n"
-":param outveclyr: is an optional layer name for the output vector file.\n"
-":param vecdriver: is the output vector format for the output vector file. (Optional, default: ESRI Shapefile)\n"
-"\n"},
-
-{"dist2NearestGeom", VectorUtils_Dist2NearestGeom, METH_VARARGS,
-"vectorutils.dist2NearestGeom(inputVector, outputVector, minDistCol, force, useIdx, maxSearchDist)\n"
-"A command to calculate the distance from each geometry to its nearest neighbouring geometry.\n"
-"The function also returns the maximum minimum distance between the geometries.\n\n"
-"Where:\n"
-"\n"
-":param inputVector: is a string containing the name of the input vector\n"
-":param outputVector: is a string containing the name of the output vector\n"
-":param minDistCol: is a string with the name of the output column name\n"
-":param force: is a bool, specifying whether to force removal of the output vector if it exists\n"
-":param useIdx: is a bool, specifying whether a spatial index and max search limit should be used\n"
-":param maxSearchDist: is a float, with maximum search distance from each feature - only used within a spatial index.\n"
-"\n"},
-    
-{"dist2NearestSecGeomSet", VectorUtils_Dist2NearestSecGeomSet, METH_VARARGS,
-"vectorutils.dist2NearestSecGeomSet(inputVector, inDistToVector, outputVector, minDistCol, force, useIdx, maxSearchDist)\n"
-"A command to calculate the distance from each geometry to its nearest neighbouring geometry.\n"
-"The function also returns the maximum minimum distance between the geometries.\n\n"
-"Where:\n"
-"\n"
-":param inputVector: is a string containing the name of the input vector\n"
-":param inDistToVector: is a string containing the name of the input vector for which the distance to features from the input vector will be calculated.\n"
-":param outputVector: is a string containing the name of the output vector\n"
-":param minDistCol: is a string with the name of the output column name\n"
-":param force: is a bool, specifying whether to force removal of the output vector if it exists\n"
-":param useIdx: is a bool, specifying whether a spatial index and max search limit should be used\n"
-":param maxSearchDist: is a float, with maximum search distance from each feature - only used within a spatial index.\n"
-"\n"},
-
-{"calcMaxDist2NearestGeom", VectorUtils_CalcMaxDist2NearestGeom, METH_VARARGS,
-"vectorutils.calcMaxDist2NearestGeom(inputVector)\n"
-"A command to calculate the maximum minimum distance between the geometries.\n\n"
-"Where:\n"
-"\n"
-":param inputVector: is a string containing the name of the input vector\n"
-"\n"},
-
-{"spatialGraphClusterGeoms", VectorUtils_SpatialGraphClusterGeoms, METH_VARARGS,
-"vectorutils.spatialGraphClusterGeoms(inputVector, outputVector, useMinSpanTree, sdEdgeLen, maxEdgeLen, force, outShpEdges, outH5EdgeLens)\n"
-"A command to spatial cluster using a minimum spanning tree approach (Bunting et al 2010).\n\n"
-"Where:\n"
-"\n"
-":param inputVector: is a string containing the name of the input vector\n"
-":param outputVector: is a string containing the name of the output vector\n"
-":param useMinSpanTree: is a boolean specifying whether a minimum spanning tree should be used rather than just a graph.\n"
-":param sdEdgeLen: is a float\n"
-":param maxEdgeLen: is a double\n"
-":param force: is a bool, specifying whether to force removal of the output vector if it exists\n"
-":param outShpEdges: is a string containing the path for an output vector to export minimum spanning tree edges as a shapefile.\n"
-":param outH5EdgeLens: is a string containing the path for an output hdf5 file to export the minimum spanning tree edge lengths.\n"
-"\n"},
-
-{"fitPolygon2Points", VectorUtils_FitPolygon2Points, METH_VARARGS,
-"vectorutils.fitPolygon2Points(inputVector, outputVector, alphaVal, force)\n"
-"A command fit a polygon to the points inputted.\n\n"
-"Where:\n"
-"\n"
-":param inputVector: is a string containing the name of the input vector (must be points)\n"
-":param outputVector: is a string containing the name of the output vector\n"
-":param alphaVal: is a double specifying the alpha value to use for the calculation (if negative optimal will be calculated; default)\n"
-":param force: is a bool, specifying whether to force removal of the output vector if it exists\n"
-"\n"},
-
-{"fitPolygons2PointClusters", VectorUtils_FitPolygons2PointClusters, METH_VARARGS,
-"vectorutils.fitPolygons2PointClusters(inputVector, outputVector, clusterField, alphaVal, force)\n"
-"A command fit a polygon to the points inputted.\n\n"
-"Where:\n"
-"\n"
-":param inputVector: is a string containing the name of the input vector (must be points)\n"
-":param outputVector: is a string containing the name of the output vector\n"
-":param clusterField: is a string specifying the column in the input shapefile which specifies the clusters\n"
-":param alphaVal: is a double specifying the alpha value to use for the calculation (if negative optimal will be calculated; default)\n"
-":param force: is a bool, specifying whether to force removal of the output vector if it exists\n"
-"\n"},
-
-{"createLinesOfPoints", VectorUtils_CreateLinesOfPoints, METH_VARARGS,
+{"createLinesOfPoints", (PyCFunction)VectorUtils_CreateLinesOfPoints, METH_VARARGS | METH_KEYWORDS,
 "vectorutils.createLinesOfPoints(inputVector, outputVector, step, force)\n"
 "A function to create a regularly spaced set of points following a set of lines.\n\n"
 "Where:\n"
@@ -999,22 +286,7 @@ static PyMethodDef VectorUtilsMethods[] = {
 ":param force: is a bool, specifying whether to force removal of the output vector if it exists\n"
 "\n"},
 
-{"fitActiveContourBoundaries", VectorUtils_FitActiveContourBoundaries, METH_VARARGS,
-"vectorutils.fitActiveContourBoundaries(inputVector, outputVector, exterForceImg, intAlphaVal, intBetaVal, intGammaVal, minExtThresVal, force)\n"
-"A command fit a polygon to the points inputted.\n\n"
-"Where:\n"
-"\n"
-":param inputVector: is a string containing the name of the input vector (must be polygons)\n"
-":param outputVector: is a string containing the name of the output vector\n"
-":param exterForceImg: is a string containing the name and path for the image file representing the external energy for the active contours\n"
-":param intAlphaVal: is a double specifying the alpha value for the active contour internal energy.\n"
-":param intBetaVal: is a double specifying the beta value for the active contour internal energy.\n"
-":param intGammaVal: is a double specifying the gamma value for the active contour internal energy.\n"
-":param minExtThresVal: is a double specifying a hard boundary for the external energy which can't be crossed.\n"
-":param force: is a bool, specifying whether to force removal of the output vector if it exists\n"
-"\n"},
-
-{"checkValidateGeometries", VectorUtils_CheckValidateGeometries, METH_VARARGS,
+{"checkValidateGeometries", (PyCFunction)VectorUtils_CheckValidateGeometries, METH_VARARGS | METH_KEYWORDS,
 "vectorutils.checkValidateGeometries(inputVector, veclayer, outputVector, outVecDriver, printGeomErrs)\n"
 "A command fit a polygon to the points inputted.\n\n"
 "Where:\n"

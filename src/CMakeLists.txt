@@ -152,8 +152,8 @@ set(LIB_COMMANDS_CPP
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdSegmentation.h
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdRasterGIS.cpp
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdRasterGIS.h
-	#${RSGIS_SRC_CMDS_DIR}/RSGISCmdVectorUtils.cpp
-	#${RSGIS_SRC_CMDS_DIR}/RSGISCmdVectorUtils.h
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdVectorUtils.cpp
+	${RSGIS_SRC_CMDS_DIR}/RSGISCmdVectorUtils.h
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdZonalStats.cpp
 	${RSGIS_SRC_CMDS_DIR}/RSGISCmdZonalStats.h
     ${RSGIS_SRC_CMDS_DIR}/RSGISCmdElevationTools.cpp

@@ -50,52 +50,18 @@ namespace rsgis{ namespace cmds{
         std::string name;
         std::string fieldName;
     };
-    
-    
-    /** Function to produce convex hulls for groups of (X, Y, Attribute) point locations */
-    DllExport void executeGenerateConvexHullsGroups(std::string inputFile, std::string outputVector, std::string outVecProj, bool force, unsigned int eastingsColIdx, unsigned int northingsColIdx, unsigned int attributeColIdx);
-    /** Function to copy geometry but remove attributes */
-    DllExport void executeRemoveAttributes(std::string inputVector, std::string outputVector, bool force);
-    /** Function to buffer vector */
-    DllExport void executeBufferVector(std::string inputVector, std::string lyrName, std::string outputVector, std::string outLyrName, std::string vecDriver, float bufferDist);
-    /** Function to print polygon geometry */
-    DllExport void executePrintPolyGeom(std::string inputVector);
-    /** Function to find and replace text within an attribute table */
-    DllExport void executeFindReplaceText(std::string inputVector, std::string attribute, std::string find, std::string replace);
-    /** Function to calculate polygon area */
-    DllExport void executeCalcPolyArea(std::string inputVector, std::string outputVector, bool force);
-    /** Split polygons in in vector by polygons in cover vector */
-    DllExport void executePolygonsInPolygon(std::string inputVector, std::string inputCoverVector, std::string output_DIR, std::string attributeName, bool force);
+
     /** Populate the Z field on the vector geometries */
-    DllExport void executePopulateGeomZField(std::string inputVector, std::string inputImage, unsigned int imgBand, std::string outputVector, bool force);
+    DllExport void executePopulateGeomZField(std::string inputVectorFile, std::string inputVectorLyr, std::string inputImage, unsigned int imgBand, std::string outputVectorFile, std::string outputVectorLyr, std::string outFormat, bool delExistVec);
+
     /** Function to calculate a maths functions between  */
-    DllExport void executeVectorMaths(std::string inputVector, std::string outputVector, std::string outColumn, std::string expression, bool force, std::vector<RSGISVariableFieldCmds> vars);
-    /** Function to add a FID column to a shapefile  */
-    DllExport void executeAddFIDColumn(std::string inputVector, std::string outputVector, bool force);
-    /** Function to find the common extent of list of images and create a shapefile for the extent  */
-    DllExport void executeFindCommonImgExtent(std::vector<std::string> inputImages, std::string outputVector, bool force);
-    /** Function to split the polygons within a shapefile into different shapefiles using an attribute  */
-    DllExport void executeSplitFeatures(std::string inputVector, std::string outputVectorBase, bool force);
-    /** Function to export a binary image to points */
-    DllExport void executeExportPxls2Pts(std::string inputImage, std::string outputVecFile, bool force, float maskVal, std::string outputVecLyrName="", std::string outVecFormat="ESRI Shapefile");
-    /** Function to calculate the distance to the nearest geometry */
-    DllExport double executeCalcDist2NearestGeom(std::string inputVec, std::string outputVec, std::string outColName, bool force, bool useIdx=false, double idxMaxSearch=10);
-    /** Function to calculate the distance to the nearest geometry */
-    DllExport double executeCalcMaxDist2NearestGeom(std::string inputVec);
-    /** Function to calculate the distance to the nearest geometry */
-    DllExport double executeCalcDist2NearestGeom(std::string inputVec, std::string inDist2Vec, std::string outputVec, std::string outColName, bool force, bool useIdx=false, double idxMaxSearch=10);
-    /** Function spaitally cluster points using a graph */
-    DllExport void executeSpatialGraphClusterGeoms(std::string inputVec, std::string outputVec, bool useMinSpanTree, float edgeLenSDThres, double maxEdgeLen, bool force, std::string shpFileEdges="", bool outShpEdges=false, std::string h5EdgeLengths="", bool outH5EdgeLens=false);
-    /** Function to create a polygon from a set of points */
-    DllExport void executeFitPolygonToPoints(std::string inputVec, std::string outputVec, double alphaVal, bool force);
-    /** Function to create a set of polygons from a set of point which have been clustered */
-    DllExport void executeFitPolygonsToPointClusters(std::string inputVec, std::string outputVec, std::string clusterField, double alphaVal, bool force);
+    DllExport void executeVectorMaths(std::string inputVectorFile, std::string inputVectorLyr, std::string outputVectorFile, std::string outputVectorLyr, std::string outFormat, std::string outColumn, std::string expression, bool delExistVec, std::vector<RSGISVariableFieldCmds> vars);
+
     /** Function to convert a set of lines into regularly spaced set of points */
-    DllExport void executeCreateLinesOfPoints(std::string inputLinesVec, std::string outputPtsVec, double step, bool force);
-    /** Function to adjust polygon boundaries using active contours */
-    DllExport void executeFitActiveContourBoundaries(std::string inputPolysVec, std::string outputPolysVec, std::string externalForceImg, double interAlpha, double interBeta, double interGamma, double minExtThres, bool force);
+    DllExport void executeCreateLinesOfPoints(std::string inputVectorFile, std::string inputVectorLyr, std::string outputVectorFile, std::string outputVectorLyr, std::string outFormat, double step, bool delExistVec);
+
     /** Function to check and validate the geometries within the vector file */
-    DllExport void executeCheckValidateGeometries(std::string inputVec, std::string lyrName, std::string outputVec, std::string vecDriver, bool printGeomErrs);
+    DllExport void executeCheckValidateGeometries(std::string inputVectorFile, std::string inputVectorLyr, std::string outputVectorFile, std::string outputVectorLyr, std::string outFormat, bool printGeomErrs, bool delExistVec);
 }}
 
 
