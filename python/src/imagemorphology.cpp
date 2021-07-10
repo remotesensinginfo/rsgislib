@@ -37,6 +37,7 @@ struct ImageMorphologyState
 static struct ImageMorphologyState _state;
 #endif
 
+/*
 static void FreePythonObjects(std::vector<PyObject*> toFree)
 {
     std::vector<PyObject*>::iterator iter;
@@ -45,6 +46,7 @@ static void FreePythonObjects(std::vector<PyObject*> toFree)
         Py_XDECREF(*iter);
     }
 }
+*/
 
 static PyObject *ImageMorphology_CreateCircularOp(PyObject *self, PyObject *args, PyObject *keywds)
 {
