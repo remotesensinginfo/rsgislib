@@ -83,6 +83,8 @@ functions:
 ### Others
 | Variable Name | Description |
 | ----------- | ----------- |
+| in_file | Generic input file (e.g., text file) |
+| out_file | Generic output file (e.g., text file) |
 | in_h5_file | An input HDF5 file |
 | out_h5_file | An output HDF5 file. |
 | h5_XXX_file | Where there are multiple input and/or output HDF5 files then XXX is used to specify the purpose. |

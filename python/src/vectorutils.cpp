@@ -67,7 +67,7 @@ static PyObject *VectorUtils_GenerateConvexHullsGroups(PyObject *self, PyObject 
     int force, eastingsColIdx, northingsColIdx, attributeColIdx;
     if( !PyArg_ParseTuple(args, "sssiiii:generateConvexHullsGroups", &pszInputFile, &pszOutputVector, &pszOutVecProj, 
                                 &force, &eastingsColIdx, &northingsColIdx, &attributeColIdx))
-        return NULL;
+        return nullptr;
 
     try
     {
@@ -78,7 +78,7 @@ static PyObject *VectorUtils_GenerateConvexHullsGroups(PyObject *self, PyObject 
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
 
     Py_RETURN_NONE;
@@ -89,7 +89,7 @@ static PyObject *VectorUtils_RemoveAttributes(PyObject *self, PyObject *args)
     const char *pszInputVector, *pszOutputVector;
     int force = false;
     if( !PyArg_ParseTuple(args, "ss|i:removeattributes", &pszInputVector, &pszOutputVector, &force))
-        return NULL;
+        return nullptr;
 
     try
     {
@@ -99,7 +99,7 @@ static PyObject *VectorUtils_RemoveAttributes(PyObject *self, PyObject *args)
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
 
     Py_RETURN_NONE;
@@ -109,7 +109,7 @@ static PyObject *VectorUtils_PrintPolyGeom(PyObject *self, PyObject *args)
 {
     const char *pszInputVector;
     if( !PyArg_ParseTuple(args, "s:printpolygeom", &pszInputVector))
-        return NULL;
+        return nullptr;
 
     try
     {
@@ -118,7 +118,7 @@ static PyObject *VectorUtils_PrintPolyGeom(PyObject *self, PyObject *args)
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
 
     Py_RETURN_NONE;
@@ -131,7 +131,7 @@ static PyObject *VectorUtils_BufferVector(PyObject *self, PyObject *args)
     const char *pszDriver;
     float bufferDist;
     if( !PyArg_ParseTuple(args, "sssssf:buffervector", &pszInputVector, &pszVectorLyrName, &pszOutputVector, &pszVectorOutLyrName, &pszDriver, &bufferDist))
-        return NULL;
+        return nullptr;
 
     try
     {
@@ -140,7 +140,7 @@ static PyObject *VectorUtils_BufferVector(PyObject *self, PyObject *args)
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
 
     Py_RETURN_NONE;
@@ -150,7 +150,7 @@ static PyObject *VectorUtils_FindReplaceText(PyObject *self, PyObject *args)
 {
     const char *pszInputVector, *pszAttribute, *pszFind, *pszReplace;
     if( !PyArg_ParseTuple(args, "ssss:findreplacetext", &pszInputVector, &pszAttribute, &pszFind, &pszReplace))
-        return NULL;
+        return nullptr;
 
     try
     {
@@ -160,7 +160,7 @@ static PyObject *VectorUtils_FindReplaceText(PyObject *self, PyObject *args)
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
 
     Py_RETURN_NONE;
@@ -171,7 +171,7 @@ static PyObject *VectorUtils_CalcArea(PyObject *self, PyObject *args)
     const char *pszInputVector, *pszOutputVector;
     int force = false;
     if( !PyArg_ParseTuple(args, "ss|i:calcarea", &pszInputVector, &pszOutputVector, &force))
-        return NULL;
+        return nullptr;
 
     try
     {
@@ -180,7 +180,7 @@ static PyObject *VectorUtils_CalcArea(PyObject *self, PyObject *args)
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
 
     Py_RETURN_NONE;
@@ -191,7 +191,7 @@ static PyObject *VectorUtils_PolygonsInPolygon(PyObject *self, PyObject *args)
     const char *pszInputVector, *pszInputCoverVector, *pszOutputDIR, *pszAttributeName;
     int force = false;
     if( !PyArg_ParseTuple(args, "ssss|i:polygonsInPolygon", &pszInputVector, &pszInputCoverVector, &pszOutputDIR, &pszAttributeName, &force))
-        return NULL;
+        return nullptr;
 
     try
     {
@@ -200,7 +200,7 @@ static PyObject *VectorUtils_PolygonsInPolygon(PyObject *self, PyObject *args)
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
 
     Py_RETURN_NONE;
@@ -212,7 +212,7 @@ static PyObject *VectorUtils_PopulateGeomZField(PyObject *self, PyObject *args)
     int force = false;
     unsigned int imgBand;
     if( !PyArg_ParseTuple(args, "ssIs|i:populateGeomZField", &pszInputVector, &pszInputImage, &imgBand, &pszOutputVector, &force))
-        return NULL;
+        return nullptr;
     
     try
     {
@@ -221,7 +221,7 @@ static PyObject *VectorUtils_PopulateGeomZField(PyObject *self, PyObject *args)
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -234,13 +234,13 @@ static PyObject *VectorUtils_VectorMaths(PyObject *self, PyObject *args)
     PyObject *pVarsObj;
     if( !PyArg_ParseTuple(args, "ssssO|i:vectorMaths", &pszInputVector, &pszOutputVector, &pszOutColName, &pszExpression, &pVarsObj, &force))
     {
-        return NULL;
+        return nullptr;
     }
     
     if( !PySequence_Check(pVarsObj))
     {
         PyErr_SetString(GETSTATE(self)->error, "variables argument must be a sequence");
-        return NULL;
+        return nullptr;
     }
     
     Py_ssize_t nVarsDefns = PySequence_Size(pVarsObj);
@@ -253,22 +253,22 @@ static PyObject *VectorUtils_VectorMaths(PyObject *self, PyObject *args)
         PyObject *o = PySequence_GetItem(pVarsObj, n);
         
         PyObject *pName = PyObject_GetAttrString(o, "name");
-        if( ( pName == NULL ) || ( pName == Py_None ) || !RSGISPY_CHECK_STRING(pName) )
+        if( ( pName == nullptr ) || ( pName == Py_None ) || !RSGISPY_CHECK_STRING(pName) )
         {
             PyErr_SetString(GETSTATE(self)->error, "Could not find string attribute \'name\'" );
             Py_DECREF(pName);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
         
         PyObject *pFieldName = PyObject_GetAttrString(o, "fieldName");
-        if( ( pFieldName == NULL ) || ( pFieldName == Py_None ) || !RSGISPY_CHECK_STRING(pFieldName) )
+        if( ( pFieldName == nullptr ) || ( pFieldName == Py_None ) || !RSGISPY_CHECK_STRING(pFieldName) )
         {
             PyErr_SetString(GETSTATE(self)->error, "Could not find string attribute \'fieldName\'" );
             Py_DECREF(pName);
             Py_DECREF(pFieldName);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
         
         rsgis::cmds::RSGISVariableFieldCmds var;
@@ -289,7 +289,7 @@ static PyObject *VectorUtils_VectorMaths(PyObject *self, PyObject *args)
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -302,7 +302,7 @@ static PyObject *VectorUtils_AddFIDColumn(PyObject *self, PyObject *args)
     int force = false;
     if( !PyArg_ParseTuple(args, "ss|i:addFIDColumn", &pszInputVector, &pszOutputVector, &force))
     {
-        return NULL;
+        return nullptr;
     }
     
     try
@@ -312,7 +312,7 @@ static PyObject *VectorUtils_AddFIDColumn(PyObject *self, PyObject *args)
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -325,7 +325,7 @@ static PyObject *VectorUtils_FindCommonImgExtent(PyObject *self, PyObject *args)
     int force = false;
     if( !PyArg_ParseTuple(args, "Os|i:findCommonImgExtent", &pInputImages, &pszOutputVector, &force))
     {
-        return NULL;
+        return nullptr;
     }
     
     // Extract list of images to array of strings.
@@ -334,7 +334,7 @@ static PyObject *VectorUtils_FindCommonImgExtent(PyObject *self, PyObject *args)
     if(numImages == 0)
     {
         PyErr_SetString(GETSTATE(self)->error, "No input images provided");
-        return NULL;
+        return nullptr;
     }
     
     try
@@ -344,7 +344,7 @@ static PyObject *VectorUtils_FindCommonImgExtent(PyObject *self, PyObject *args)
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -357,7 +357,7 @@ static PyObject *VectorUtils_SplitFeatures(PyObject *self, PyObject *args)
     int force = false;
     if( !PyArg_ParseTuple(args, "ss|i:splitFeatures", &pszInputVector, &pszOutputVectorBase, &force))
     {
-        return NULL;
+        return nullptr;
     }
     
     try
@@ -367,7 +367,7 @@ static PyObject *VectorUtils_SplitFeatures(PyObject *self, PyObject *args)
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -376,7 +376,7 @@ static PyObject *VectorUtils_SplitFeatures(PyObject *self, PyObject *args)
 
 static PyObject *VectorUtils_ExportPxls2Pts(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    static char *kwlist[] = {"image", "outvecfile", "mskval", "force", "outveclyr", "vecdriver", NULL};
+    static char *kwlist[] = {"image", "outvecfile", "mskval", "force", "outveclyr", "vecdriver", nullptr};
     const char *pszInputImg, *pszOutputVector;
     const char *pszOutputVecLyr = "";
     const char *pszOutputVecFormat = "";
@@ -384,7 +384,7 @@ static PyObject *VectorUtils_ExportPxls2Pts(PyObject *self, PyObject *args, PyOb
     float maskVal = 0.0;
     if( !PyArg_ParseTupleAndKeywords(args, keywds,"ssf|iss:exportPxls2Pts", kwlist, &pszInputImg, &pszOutputVector, &maskVal, &force, &pszOutputVecLyr, &pszOutputVecFormat))
     {
-        return NULL;
+        return nullptr;
     }
     
     try
@@ -394,7 +394,7 @@ static PyObject *VectorUtils_ExportPxls2Pts(PyObject *self, PyObject *args, PyOb
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -409,7 +409,7 @@ static PyObject *VectorUtils_Dist2NearestGeom(PyObject *self, PyObject *args)
     
     if( !PyArg_ParseTuple(args, "sss|iid:dist2NearestGeom", &pszInputVector, &pszOutputVector, &pszOutColName, &forceInt, &useIdxInt, &maxSearchDist))
     {
-        return NULL;
+        return nullptr;
     }
     
     PyObject *outVal = PyTuple_New(1);
@@ -426,7 +426,7 @@ static PyObject *VectorUtils_Dist2NearestGeom(PyObject *self, PyObject *args)
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     return outVal;
@@ -441,7 +441,7 @@ static PyObject *VectorUtils_Dist2NearestSecGeomSet(PyObject *self, PyObject *ar
     
     if( !PyArg_ParseTuple(args, "ssss|iid:dist2NearestSecGeomSet", &pszInputVector, &pszInDistToVector, &pszOutputVector, &pszOutColName, &forceInt, &useIdxInt, &maxSearchDist))
     {
-        return NULL;
+        return nullptr;
     }
     
     PyObject *outVal = PyTuple_New(1);
@@ -458,7 +458,7 @@ static PyObject *VectorUtils_Dist2NearestSecGeomSet(PyObject *self, PyObject *ar
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     return outVal;
@@ -470,7 +470,7 @@ static PyObject *VectorUtils_CalcMaxDist2NearestGeom(PyObject *self, PyObject *a
     
     if( !PyArg_ParseTuple(args, "s:calcMaxDist2NearestGeom", &pszInputVector))
     {
-        return NULL;
+        return nullptr;
     }
     
     PyObject *outVal = PyTuple_New(1);
@@ -486,7 +486,7 @@ static PyObject *VectorUtils_CalcMaxDist2NearestGeom(PyObject *self, PyObject *a
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     return outVal;
@@ -505,7 +505,7 @@ static PyObject *VectorUtils_SpatialGraphClusterGeoms(PyObject *self, PyObject *
     
     if( !PyArg_ParseTuple(args, "ssifd|iOO:spatialGraphClusterGeoms", &pszInputVector, &pszOutputVector, &useMinSpanTree, &sdEdgeLen, &maxEdgeLen, &force, &pszOutShpEdgesObj, &pszOutH5EdgeLensObj))
     {
-        return NULL;
+        return nullptr;
     }
     
     std::string shpFileEdges="";
@@ -513,7 +513,7 @@ static PyObject *VectorUtils_SpatialGraphClusterGeoms(PyObject *self, PyObject *
     std::string h5EdgeLengths="";
     bool outH5EdgeLens=false;
     
-    if( ( pszOutShpEdgesObj == NULL ) || ( pszOutShpEdgesObj == Py_None ) || !RSGISPY_CHECK_STRING(pszOutShpEdgesObj) )
+    if( ( pszOutShpEdgesObj == nullptr ) || ( pszOutShpEdgesObj == Py_None ) || !RSGISPY_CHECK_STRING(pszOutShpEdgesObj) )
     {
         outShpEdges = false;
     }
@@ -523,7 +523,7 @@ static PyObject *VectorUtils_SpatialGraphClusterGeoms(PyObject *self, PyObject *
         shpFileEdges = RSGISPY_STRING_EXTRACT(pszOutShpEdgesObj);
     }
     
-    if( ( pszOutH5EdgeLensObj == NULL ) || ( pszOutH5EdgeLensObj == Py_None ) || !RSGISPY_CHECK_STRING(pszOutH5EdgeLensObj) )
+    if( ( pszOutH5EdgeLensObj == nullptr ) || ( pszOutH5EdgeLensObj == Py_None ) || !RSGISPY_CHECK_STRING(pszOutH5EdgeLensObj) )
     {
         outH5EdgeLens = false;
     }
@@ -540,7 +540,7 @@ static PyObject *VectorUtils_SpatialGraphClusterGeoms(PyObject *self, PyObject *
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -556,7 +556,7 @@ static PyObject *VectorUtils_FitPolygon2Points(PyObject *self, PyObject *args)
     
     if( !PyArg_ParseTuple(args, "ss|di:fitPolygon2Points", &pszInputVector, &pszOutputVector, &alphaVal, &force))
     {
-        return NULL;
+        return nullptr;
     }
     
     try
@@ -566,7 +566,7 @@ static PyObject *VectorUtils_FitPolygon2Points(PyObject *self, PyObject *args)
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -583,7 +583,7 @@ static PyObject *VectorUtils_FitPolygons2PointClusters(PyObject *self, PyObject 
     
     if( !PyArg_ParseTuple(args, "sss|di:fitPolygons2PointClusters", &pszInputVector, &pszOutputVector, &clustersField, &alphaVal, &force))
     {
-        return NULL;
+        return nullptr;
     }
     
     try
@@ -593,7 +593,7 @@ static PyObject *VectorUtils_FitPolygons2PointClusters(PyObject *self, PyObject 
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -609,7 +609,7 @@ static PyObject *VectorUtils_CreateLinesOfPoints(PyObject *self, PyObject *args)
     
     if( !PyArg_ParseTuple(args, "ssd|i:createLinesOfPoints", &pszInputVector, &pszOutputVector, &step, &force))
     {
-        return NULL;
+        return nullptr;
     }
     
     try
@@ -619,7 +619,7 @@ static PyObject *VectorUtils_CreateLinesOfPoints(PyObject *self, PyObject *args)
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -638,7 +638,7 @@ static PyObject *VectorUtils_FitActiveContourBoundaries(PyObject *self, PyObject
     
     if( !PyArg_ParseTuple(args, "sssdddd|i:fitActiveContourBoundaries", &pszInputVector, &pszOutputVector, &pszExterForceImg, &alphaVal, &betaVal, &gammaVal, &minExtThresVal, &force))
     {
-        return NULL;
+        return nullptr;
     }
     
     try
@@ -648,7 +648,7 @@ static PyObject *VectorUtils_FitActiveContourBoundaries(PyObject *self, PyObject
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -664,7 +664,7 @@ static PyObject *VectorUtils_CheckValidateGeometries(PyObject *self, PyObject *a
 
     if( !PyArg_ParseTuple(args, "ssss|i:checkValidateGeometries", &pszInputVector, &pszVectorLyrName, &pszOutputVector, &pszDriver, &printGeomErrsInt))
     {
-        return NULL;
+        return nullptr;
     }
 
     try
@@ -675,7 +675,7 @@ static PyObject *VectorUtils_CheckValidateGeometries(PyObject *self, PyObject *a
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
 
     Py_RETURN_NONE;
@@ -1026,7 +1026,7 @@ static PyMethodDef VectorUtilsMethods[] = {
 ":param printGeomErrs: is a bool, specifying whether were errors are found they are printed to the console.\n"
 "\n"},
     
-{NULL}        /* Sentinel */
+{nullptr}        /* Sentinel */
 };
 
 
@@ -1047,16 +1047,16 @@ static int VectorUtils_clear(PyObject *m)
 static struct PyModuleDef moduledef = {
         PyModuleDef_HEAD_INIT,
         "_vectorutils",
-        NULL,
+        nullptr,
         sizeof(struct VectorUtilsState),
         VectorUtilsMethods,
-        NULL,
+        nullptr,
         VectorUtils_traverse,
         VectorUtils_clear,
-        NULL
+        nullptr
 };
 
-#define INITERROR return NULL
+#define INITERROR return nullptr
 
 PyMODINIT_FUNC 
 PyInit__vectorutils(void)
@@ -1073,14 +1073,14 @@ init_vectorutils(void)
 #else
     PyObject *pModule = Py_InitModule("_vectorutils", VectorUtilsMethods);
 #endif
-    if( pModule == NULL )
+    if( pModule == nullptr )
         INITERROR;
 
     struct VectorUtilsState *state = GETSTATE(pModule);
 
     // Create and add our exception type
-    state->error = PyErr_NewException("_vectorutils.error", NULL, NULL);
-    if( state->error == NULL )
+    state->error = PyErr_NewException("_vectorutils.error", nullptr, nullptr);
+    if( state->error == nullptr )
     {
         Py_DECREF(pModule);
         INITERROR;

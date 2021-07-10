@@ -50,12 +50,12 @@ static PyObject *ZonalStats_ImageZoneToHDF(PyObject *self, PyObject *args, PyObj
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("vec_file"),
                              RSGIS_PY_C_TEXT("vec_lyr"), RSGIS_PY_C_TEXT("out_h5_file"),
-                             RSGIS_PY_C_TEXT("no_prj_warn"), RSGIS_PY_C_TEXT("pxl_in_poly_method"), NULL};
+                             RSGIS_PY_C_TEXT("no_prj_warn"), RSGIS_PY_C_TEXT("pxl_in_poly_method"), nullptr};
     const char *pszInputImage, *pszInputVector, *pszInputVecLyr, *pszOutputHDF;
     int pixelInPolyMethod = 1;
     int noProjWarning = false;
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssss|ii:imageZoneToHDF", kwlist, &pszInputImage, &pszInputVector, &pszInputVecLyr, &pszOutputHDF, &noProjWarning, &pixelInPolyMethod))
-        return NULL;
+        return nullptr;
     try
     {
         rsgis::cmds::executeZonesImage2HDF5(std::string(pszInputImage), std::string(pszInputVector), std::string(pszInputVecLyr),
@@ -64,7 +64,7 @@ static PyObject *ZonalStats_ImageZoneToHDF(PyObject *self, PyObject *args, PyObj
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -75,12 +75,12 @@ static PyObject *ZonalStats_ExtractAvgEndMembers(PyObject *self, PyObject *args,
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("vec_file"),
                              RSGIS_PY_C_TEXT("vec_lyr"), RSGIS_PY_C_TEXT("out_file"),
-                             RSGIS_PY_C_TEXT("pxl_in_poly_method"), NULL};
+                             RSGIS_PY_C_TEXT("pxl_in_poly_method"), nullptr};
     const char *pszInputImage, *pszInputVector, *pszInputVecLyr, *pszOutputMatrix;
     int pixelInPolyMethod = 1;
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssss|i:extractAvgEndMembers", kwlist, &pszInputImage, &pszInputVector, &pszInputVecLyr, &pszOutputMatrix, &pixelInPolyMethod))
     {
-        return NULL;
+        return nullptr;
     }
     
     try
@@ -91,7 +91,7 @@ static PyObject *ZonalStats_ExtractAvgEndMembers(PyObject *self, PyObject *args,
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -143,7 +143,7 @@ static PyMethodDef ZonalStatsMethods[] = {
 "    zonalstats.imageZoneToHDF(inputimage, inputvector, outputHDF, True, zonalstats.METHOD_POLYCONTAINSPIXELCENTER)\n"
 "\n"},
 
-    {NULL}        /* Sentinel */
+    {nullptr}        /* Sentinel */
 };
 
 
@@ -164,16 +164,16 @@ static int ZonalStats_clear(PyObject *m)
 static struct PyModuleDef moduledef = {
         PyModuleDef_HEAD_INIT,
         "_zonalstats",
-        NULL,
+        nullptr,
         sizeof(struct ZonalStatsState),
         ZonalStatsMethods,
-        NULL,
+        nullptr,
         ZonalStats_traverse,
         ZonalStats_clear,
-        NULL
+        nullptr
 };
 
-#define INITERROR return NULL
+#define INITERROR return nullptr
 
 PyMODINIT_FUNC 
 PyInit__zonalstats(void)
@@ -190,14 +190,14 @@ init_zonalstats(void)
 #else
     PyObject *pModule = Py_InitModule("_zonalstats", ZonalStatsMethods);
 #endif
-    if( pModule == NULL )
+    if( pModule == nullptr )
         INITERROR;
 
     struct ZonalStatsState *state = GETSTATE(pModule);
 
     // Create and add our exception type
-    state->error = PyErr_NewException("_zonalstats.error", NULL, NULL);
-    if( state->error == NULL )
+    state->error = PyErr_NewException("_zonalstats.error", nullptr, nullptr);
+    if( state->error == nullptr )
     {
         Py_DECREF(pModule);
         INITERROR;

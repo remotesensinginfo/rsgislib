@@ -48,24 +48,24 @@ namespace rsgis{ namespace cmds {
         try
         {
             GDALAllRegister();
-            GDALDataset *inRefDataset = NULL;
-            GDALDataset *inFloatDataset = NULL;
+            GDALDataset *inRefDataset = nullptr;
+            GDALDataset *inFloatDataset = nullptr;
             
             inRefDataset = (GDALDataset *) GDALOpenShared(inputReferenceImage.c_str(), GA_ReadOnly);
-            if(inRefDataset == NULL)
+            if(inRefDataset == nullptr)
             {
                 std::string message = std::string("Could not open image ") + inputReferenceImage;
                 throw rsgis::RSGISException(message.c_str());
             }
             
             inFloatDataset = (GDALDataset *) GDALOpenShared(inputFloatingmage.c_str(), GA_ReadOnly);
-            if(inFloatDataset == NULL)
+            if(inFloatDataset == nullptr)
             {
                 std::string message = std::string("Could not open image ") + inputFloatingmage;
                 throw rsgis::RSGISException(message.c_str());
             }
             
-            rsgis::reg::RSGISImageSimilarityMetric *similarityMetric = NULL;
+            rsgis::reg::RSGISImageSimilarityMetric *similarityMetric = nullptr;
             if(metricTypeInt == 1) // euclidean
             {
                 similarityMetric = new rsgis::reg::RSGISEuclideanSimilarityMetric();
@@ -136,24 +136,24 @@ namespace rsgis{ namespace cmds {
         try
         {
             GDALAllRegister();
-            GDALDataset *inRefDataset = NULL;
-            GDALDataset *inFloatDataset = NULL;
+            GDALDataset *inRefDataset = nullptr;
+            GDALDataset *inFloatDataset = nullptr;
             
             inRefDataset = (GDALDataset *) GDALOpenShared(inputReferenceImage.c_str(), GA_ReadOnly);
-            if(inRefDataset == NULL)
+            if(inRefDataset == nullptr)
             {
                 std::string message = std::string("Could not open image ") + inputReferenceImage;
                 throw rsgis::RSGISException(message.c_str());
             }
             
             inFloatDataset = (GDALDataset *) GDALOpenShared(inputFloatingmage.c_str(), GA_ReadOnly);
-            if(inFloatDataset == NULL)
+            if(inFloatDataset == nullptr)
             {
                 std::string message = std::string("Could not open image ") + inputFloatingmage;
                 throw rsgis::RSGISException(message.c_str());
             }
             
-            rsgis::reg::RSGISImageSimilarityMetric *similarityMetric = NULL;
+            rsgis::reg::RSGISImageSimilarityMetric *similarityMetric = nullptr;
             if(metricTypeInt == 1) // euclidean
             {
                 similarityMetric = new rsgis::reg::RSGISEuclideanSimilarityMetric();
@@ -245,7 +245,7 @@ namespace rsgis{ namespace cmds {
             
             std::cout << inputImage << std::endl;
             GDALDataset *dataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
-            if(dataset == NULL)
+            if(dataset == nullptr)
             {
                 std::string message = std::string("Could not open image ") + inputImage;
                 throw rsgis::RSGISImageException(message.c_str());
@@ -255,13 +255,13 @@ namespace rsgis{ namespace cmds {
             
             rsgis::img::RSGISCopyImage copyImage = rsgis::img::RSGISCopyImage(numBands);
             rsgis::img::RSGISCalcImage *calcImage = new rsgis::img::RSGISCalcImage(&copyImage, "", true);
-            calcImage->calcImage(&dataset, 1, outputImage, false, NULL, gdalFormat, RSGIS_to_GDAL_Type(outDataType));
+            calcImage->calcImage(&dataset, 1, outputImage, false, nullptr, gdalFormat, RSGIS_to_GDAL_Type(outDataType));
             
             delete calcImage;
             GDALClose(dataset);
             
             GDALDataset *outDataset = (GDALDataset *) GDALOpen(outputImage.c_str(), GA_Update);
-            if(outDataset == NULL)
+            if(outDataset == nullptr)
             {
                 std::string message = std::string("Could not open image ") + outputImage;
                 throw rsgis::RSGISImageException(message.c_str());

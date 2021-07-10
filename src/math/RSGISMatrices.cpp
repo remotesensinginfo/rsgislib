@@ -53,7 +53,7 @@ namespace rsgis{namespace math{
 	
 	Matrix* RSGISMatrices::createMatrix(Matrix *matrix)
 	{
-		if(matrix == NULL)
+		if(matrix == nullptr)
 		{
 			throw RSGISMatricesException("The matrix to be copied is NULL.");
 		}
@@ -75,7 +75,7 @@ namespace rsgis{namespace math{
 	
 	Matrix* RSGISMatrices::copyMatrix(Matrix *matrix)
 	{
-		if(matrix == NULL)
+		if(matrix == nullptr)
 		{
 			throw RSGISMatricesException("The matrix to be copied is NULL.");
 		}
@@ -96,9 +96,9 @@ namespace rsgis{namespace math{
 	
 	void RSGISMatrices::freeMatrix(Matrix *matrix)
 	{
-		if(matrix != NULL)
+		if(matrix != nullptr)
 		{
-			if(matrix->matrix != NULL)
+			if(matrix->matrix != nullptr)
 			{
 				delete matrix->matrix;
 			}
@@ -129,7 +129,7 @@ namespace rsgis{namespace math{
 		}
 		else
 		{
-			Matrix *tmpMatrix = NULL;
+			Matrix *tmpMatrix = nullptr;
 			double value = 0;
 			int index = 0;
 			for(int i = 0; i < matrix->n; i++)
@@ -170,7 +170,7 @@ namespace rsgis{namespace math{
 		{
 			throw RSGISMatricesException("To calculate cofactors the matrix needs to be symatical");
 		}
-		Matrix *newMatrix = NULL;
+		Matrix *newMatrix = nullptr;
 		newMatrix = this->createMatrix(matrix->n, matrix->m);
 		
 		int index = 0;
@@ -205,7 +205,7 @@ namespace rsgis{namespace math{
 	
 	Matrix* RSGISMatrices::transpose(Matrix *matrix)
 	{
-		Matrix *newMatrix = NULL;
+		Matrix *newMatrix = nullptr;
 		newMatrix = this->createMatrix(matrix->m, matrix->n);
 		for(int i = 0; i < matrix->n; i++)
 		{

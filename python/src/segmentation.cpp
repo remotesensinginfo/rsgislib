@@ -42,13 +42,13 @@ static PyObject *Segmentation_labelPixelsFromClusterCentres(PyObject *self, PyOb
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
                              RSGIS_PY_C_TEXT("cluster_centres_file"), RSGIS_PY_C_TEXT("ignore_zeros"),
-                             RSGIS_PY_C_TEXT("gdalformat"),  NULL};
+                             RSGIS_PY_C_TEXT("gdalformat"),  nullptr};
     const char *pszInputImage, *pszOutputImage, *pszClusterCentres, *pszgdalformat;
     int ignoreZeros;
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssis:labelPixelsFromClusterCentres", kwlist, &pszInputImage, &pszOutputImage,
                                 &pszClusterCentres, &ignoreZeros, &pszgdalformat ))
     {
-        return NULL;
+        return nullptr;
     }
 
     try
@@ -60,7 +60,7 @@ static PyObject *Segmentation_labelPixelsFromClusterCentres(PyObject *self, PyOb
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
 
     Py_RETURN_NONE;
@@ -71,13 +71,13 @@ static PyObject *Segmentation_eliminateSinglePixels(PyObject *self, PyObject *ar
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("clumps_img"), RSGIS_PY_C_TEXT("output_img"),
                              RSGIS_PY_C_TEXT("tmp_img"), RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("in_memory"),
-                             RSGIS_PY_C_TEXT("ignore_zeros"),  NULL};
+                             RSGIS_PY_C_TEXT("ignore_zeros"),  nullptr};
     const char *pszInputImage, *pszOutputImage, *pszClumpsImage, *pszgdalformat, *pszTempImage;
     int processInMemory, ignoreZeros;
 
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssssii:eliminateSinglePixels", kwlist, &pszInputImage, &pszClumpsImage, &pszOutputImage, &pszTempImage, &pszgdalformat, &processInMemory, &ignoreZeros ))
     {
-        return NULL;
+        return nullptr;
     }
 
     try
@@ -89,7 +89,7 @@ static PyObject *Segmentation_eliminateSinglePixels(PyObject *self, PyObject *ar
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
 
     Py_RETURN_NONE;
@@ -99,7 +99,7 @@ static PyObject *Segmentation_eliminateSinglePixels(PyObject *self, PyObject *ar
 static PyObject *Segmentation_clump(PyObject *self, PyObject *args, PyObject *keywds)
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"),
-                             RSGIS_PY_C_TEXT("in_memory"), RSGIS_PY_C_TEXT("no_data_val"), RSGIS_PY_C_TEXT("add_to_rat"),  NULL};
+                             RSGIS_PY_C_TEXT("in_memory"), RSGIS_PY_C_TEXT("no_data_val"), RSGIS_PY_C_TEXT("add_to_rat"),  nullptr};
     const char *pszInputImage, *pszOutputImage, *pszgdalformat;
     int processInMemory = false;
     bool nodataprovided;
@@ -108,9 +108,9 @@ static PyObject *Segmentation_clump(PyObject *self, PyObject *args, PyObject *ke
     PyObject *pNoData = Py_None; //could be none or a number
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "sss|iOi:clump", kwlist, &pszInputImage, &pszOutputImage, &pszgdalformat, &processInMemory, &pNoData, &addRatPxlVals))
     {
-        return NULL;
+        return nullptr;
     }
-    
+
     if( pNoData == Py_None )
     {
         nodataprovided = false;
@@ -120,10 +120,10 @@ static PyObject *Segmentation_clump(PyObject *self, PyObject *args, PyObject *ke
     {
         // convert to a float if needed
         PyObject *pFloatNoData = PyNumber_Float(pNoData);
-        if( pFloatNoData == NULL )
+        if( pFloatNoData == nullptr )
         {
             PyErr_SetString(GETSTATE(self)->error, "nodata parameter must be None or a valid number\n");
-            return NULL;
+            return nullptr;
         }
 
         nodataprovided = true;
@@ -139,7 +139,7 @@ static PyObject *Segmentation_clump(PyObject *self, PyObject *args, PyObject *ke
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
 
     Py_RETURN_NONE;
@@ -152,17 +152,17 @@ static PyObject *Segmentation_RMSmallClumpsStepwise(PyObject *self, PyObject *ar
                              RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"),
                              RSGIS_PY_C_TEXT("use_stch_stats"), RSGIS_PY_C_TEXT("stch_stats_file"),
                              RSGIS_PY_C_TEXT("store_mean"), RSGIS_PY_C_TEXT("in_memory"),
-                             RSGIS_PY_C_TEXT("min_clump_size"), RSGIS_PY_C_TEXT("pxl_val_thres"), NULL};
+                             RSGIS_PY_C_TEXT("min_clump_size"), RSGIS_PY_C_TEXT("pxl_val_thres"), nullptr};
     const char *pszInputImage, *pszClumpsImage, *pszOutputImage, *pszgdalformat, *pszStretchStatsFile;
     int storeMean,processInMemory,stretchStatsAvail;
     unsigned int minClumpSize;
-    float specThreshold;                   
+    float specThreshold;
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssisiiIf:rmSmallClumpsStepwise", kwlist, &pszInputImage, &pszClumpsImage, &pszOutputImage, &pszgdalformat,
                     &stretchStatsAvail, &pszStretchStatsFile, &storeMean, &processInMemory, &minClumpSize, &specThreshold))
     {
-        return NULL;
+        return nullptr;
     }
-    
+
     try
     {
         rsgis::cmds::executeRMSmallClumpsStepwise(std::string(pszInputImage), std::string(pszClumpsImage),
@@ -173,23 +173,23 @@ static PyObject *Segmentation_RMSmallClumpsStepwise(PyObject *self, PyObject *ar
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
 
     Py_RETURN_NONE;
 }
 
- 
+
 static PyObject *Segmentation_relabelClumps(PyObject *self, PyObject *args, PyObject *keywds)
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
-                             RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("in_memory"), NULL};
+                             RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("in_memory"), nullptr};
     const char *pszInputImage, *pszOutputImage, *pszgdalformat;
     int processInMemory;
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssi:relabelClumps", kwlist, &pszInputImage,
                         &pszOutputImage, &pszgdalformat, &processInMemory ))
     {
-        return NULL;
+        return nullptr;
     }
 
     try
@@ -200,7 +200,7 @@ static PyObject *Segmentation_relabelClumps(PyObject *self, PyObject *args, PyOb
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
 
     Py_RETURN_NONE;
@@ -211,7 +211,7 @@ static PyObject *Segmentation_unionOfClumps(PyObject *self, PyObject *args, PyOb
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_imgs"), RSGIS_PY_C_TEXT("output_img"),
                              RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("no_data_val"),
-                             RSGIS_PY_C_TEXT("add_to_rat"), NULL};
+                             RSGIS_PY_C_TEXT("add_to_rat"), nullptr};
     const char *pszOutputImage, *pszgdalformat;
     std::string inputImage;
     bool nodataprovided;
@@ -221,7 +221,7 @@ static PyObject *Segmentation_unionOfClumps(PyObject *self, PyObject *args, PyOb
     int addRatPxlVals = false;
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "OssOi:unionOfClumps", kwlist, &pInputListObj, &pszOutputImage, &pszgdalformat, &pNoData, &addRatPxlVals))
     {
-        return NULL;
+        return nullptr;
     }
 
     if( pNoData == Py_None )
@@ -233,10 +233,10 @@ static PyObject *Segmentation_unionOfClumps(PyObject *self, PyObject *args, PyOb
     {
         // convert to a float if needed
         PyObject *pFloatNoData = PyNumber_Float(pNoData);
-        if( pFloatNoData == NULL )
+        if( pFloatNoData == nullptr )
         {
             PyErr_SetString(GETSTATE(self)->error, "nodata parameter must be None or a valid number\n");
-            return NULL;
+            return nullptr;
         }
 
         nodataprovided = true;
@@ -248,27 +248,27 @@ static PyObject *Segmentation_unionOfClumps(PyObject *self, PyObject *args, PyOb
     if( nInputImages < 0)
     {
         PyErr_SetString(GETSTATE(self)->error, "last argument must be a list");
-        return NULL;
+        return nullptr;
     }
-    
+
     std::vector<std::string> inputImagePaths;
     for(Py_ssize_t n = 0; n < nInputImages; n++)
     {
-        
+
         PyObject *strObj;
         strObj = PyList_GetItem(pInputListObj, n);
         if( !RSGISPY_CHECK_STRING(strObj) )
         {
             PyErr_SetString(GETSTATE(self)->error, "must pass a list of strings");
             Py_DECREF(strObj);
-            return NULL;
+            return nullptr;
         }
         inputImage = RSGISPY_STRING_EXTRACT(strObj);
-        inputImagePaths.push_back(inputImage);      
+        inputImagePaths.push_back(inputImage);
         //Py_DECREF(strObj);
-    
-    }    
-    
+
+    }
+
     try
     {
         rsgis::cmds::executeUnionOfClumps(inputImagePaths, std::string(pszOutputImage),
@@ -277,7 +277,7 @@ static PyObject *Segmentation_unionOfClumps(PyObject *self, PyObject *args, PyOb
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
 
     Py_RETURN_NONE;
@@ -289,7 +289,7 @@ static PyObject *Segmentation_mergeSegmentationTiles(PyObject *self, PyObject *a
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_imgs"), RSGIS_PY_C_TEXT("output_img"),
                              RSGIS_PY_C_TEXT("border_msk_img"), RSGIS_PY_C_TEXT("tile_boundary"),
                              RSGIS_PY_C_TEXT("tile_overlap"), RSGIS_PY_C_TEXT("tile_body"),
-                             RSGIS_PY_C_TEXT("col_name"), NULL};
+                             RSGIS_PY_C_TEXT("col_name"), nullptr};
     const char *pszOutputImage, *pszBorderMaskImage, *pszColsName;
     std::string inputImage;
     unsigned int tileBoundary, tileOverlap, tileBody;
@@ -297,34 +297,34 @@ static PyObject *Segmentation_mergeSegmentationTiles(PyObject *self, PyObject *a
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "OssIIIs:mergeSegmentationTiles", kwlist, &pInputListObj, &pszOutputImage,
                                      &pszBorderMaskImage, &tileBoundary, &tileOverlap, &tileBody, &pszColsName))
     {
-        return NULL;
+        return nullptr;
     }
 
     Py_ssize_t nInputImages = PyList_Size(pInputListObj);
     if( nInputImages < 0)
     {
         PyErr_SetString(GETSTATE(self)->error, "last argument must be a list");
-        return NULL;
+        return nullptr;
     }
-    
+
     std::vector<std::string> inputImagePaths;
     for(Py_ssize_t n = 0; n < nInputImages; n++)
     {
-        
+
         PyObject *strObj;
         strObj = PyList_GetItem(pInputListObj, n);
         if( !RSGISPY_CHECK_STRING(strObj) )
         {
             PyErr_SetString(GETSTATE(self)->error, "must pass a list of strings");
             Py_DECREF(strObj);
-            return NULL;
+            return nullptr;
         }
         inputImage = RSGISPY_STRING_EXTRACT(strObj);
-        inputImagePaths.push_back(inputImage);      
+        inputImagePaths.push_back(inputImage);
         //Py_DECREF(strObj);
-    
-    }    
-    
+
+    }
+
     try
     {
         rsgis::cmds::executeMergeSegmentationTiles(std::string(pszOutputImage), std::string(pszBorderMaskImage),
@@ -333,7 +333,7 @@ static PyObject *Segmentation_mergeSegmentationTiles(PyObject *self, PyObject *a
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
 
     Py_RETURN_NONE;
@@ -343,39 +343,39 @@ static PyObject *Segmentation_mergeSegmentationTiles(PyObject *self, PyObject *a
 static PyObject *Segmentation_mergeClumpImages(PyObject *self, PyObject *args, PyObject *keywds)
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_imgs"), RSGIS_PY_C_TEXT("output_img"),
-                             RSGIS_PY_C_TEXT("merge_rats"), NULL};
+                             RSGIS_PY_C_TEXT("merge_rats"), nullptr};
     const char *pszOutputImage;
     PyObject *pInputListObj;
     std::string inputImage;
     int mergeRATs = false;
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "Os|i:mergeClumpImages", kwlist, &pInputListObj, &pszOutputImage, &mergeRATs))
     {
-        return NULL;
+        return nullptr;
     }
 
     Py_ssize_t nInputImages = PyList_Size(pInputListObj);
     if( nInputImages < 0)
     {
         PyErr_SetString(GETSTATE(self)->error, "last argument must be a list");
-        return NULL;
+        return nullptr;
     }
-    
+
     std::vector<std::string> inputImagePaths;
     for(Py_ssize_t n = 0; n < nInputImages; n++)
     {
-        
+
         PyObject *strObj;
         strObj = PyList_GetItem(pInputListObj, n);
         if( !RSGISPY_CHECK_STRING(strObj) )
         {
             PyErr_SetString(GETSTATE(self)->error, "must pass a list of strings");
             Py_DECREF(strObj);
-            return NULL;
+            return nullptr;
         }
         inputImage = RSGISPY_STRING_EXTRACT(strObj);
         inputImagePaths.push_back(inputImage);
-    }    
-    
+    }
+
     try
     {
         rsgis::cmds::executeMergeClumpImages(inputImagePaths, std::string(pszOutputImage), mergeRATs);
@@ -383,7 +383,7 @@ static PyObject *Segmentation_mergeClumpImages(PyObject *self, PyObject *args, P
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
 
     Py_RETURN_NONE;
@@ -394,7 +394,7 @@ static PyObject *Segmentation_findTileBordersMask(PyObject *self, PyObject *args
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_imgs"), RSGIS_PY_C_TEXT("border_msk_img"),
                              RSGIS_PY_C_TEXT("tile_boundary"), RSGIS_PY_C_TEXT("tile_overlap"),
-                             RSGIS_PY_C_TEXT("tile_body"), RSGIS_PY_C_TEXT("col_name"), NULL};
+                             RSGIS_PY_C_TEXT("tile_body"), RSGIS_PY_C_TEXT("col_name"), nullptr};
     const char *pszBorderMaskImage, *pszColsName;
     std::string inputImage;
     unsigned int tileBoundary, tileOverlap, tileBody;
@@ -402,37 +402,37 @@ static PyObject *Segmentation_findTileBordersMask(PyObject *self, PyObject *args
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "OsIIIs:findTileBordersMask", kwlist, &pInputListObj, &pszBorderMaskImage,
                                 &tileBoundary, &tileOverlap, &tileBody, &pszColsName))
     {
-        return NULL;
+        return nullptr;
     }
 
     Py_ssize_t nInputImages = PyList_Size(pInputListObj);
     if( nInputImages < 0)
     {
         PyErr_SetString(GETSTATE(self)->error, "last argument must be a list");
-        return NULL;
+        return nullptr;
     }
-    
+
     std::vector<std::string> inputImagePaths;
     for(Py_ssize_t n = 0; n < nInputImages; n++)
     {
-        
+
         PyObject *strObj;
         strObj = PyList_GetItem(pInputListObj, n);
         if( !RSGISPY_CHECK_STRING(strObj) )
         {
             PyErr_SetString(GETSTATE(self)->error, "must pass a list of strings");
             Py_DECREF(strObj);
-            return NULL;
+            return nullptr;
         }
         inputImage = RSGISPY_STRING_EXTRACT(strObj);
-        inputImagePaths.push_back(inputImage);      
+        inputImagePaths.push_back(inputImage);
         //Py_DECREF(strObj);
-    
-    }    
-    
+
+    }
+
     try
     {
-                        
+
         rsgis::cmds::executeFindTileBordersMask(inputImagePaths, std::string(pszBorderMaskImage),
                         tileBoundary, tileOverlap, tileBody, std::string(pszColsName));
 
@@ -440,7 +440,7 @@ static PyObject *Segmentation_findTileBordersMask(PyObject *self, PyObject *args
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
 
     Py_RETURN_NONE;
@@ -450,14 +450,14 @@ static PyObject *Segmentation_findTileBordersMask(PyObject *self, PyObject *args
 static PyObject *Segmentation_rmSmallClumps(PyObject *self, PyObject *args, PyObject *keywds)
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("clumps_img"), RSGIS_PY_C_TEXT("output_img"),
-                             RSGIS_PY_C_TEXT("area_threshold"), RSGIS_PY_C_TEXT("gdalformat"), NULL};
+                             RSGIS_PY_C_TEXT("area_threshold"), RSGIS_PY_C_TEXT("gdalformat"), nullptr};
     const char *pszInputClumps, *pszOutputClumps, *pszgdalformat;
     float areaThreshold;
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssfs:rmSmallClumps", kwlist, &pszInputClumps, &pszOutputClumps, &areaThreshold, &pszgdalformat))
     {
-        return NULL;
+        return nullptr;
     }
-    
+
     try
     {
         rsgis::cmds::executeRMSmallClumps(std::string(pszInputClumps), std::string(pszOutputClumps), areaThreshold, std::string(pszgdalformat));
@@ -465,9 +465,9 @@ static PyObject *Segmentation_rmSmallClumps(PyObject *self, PyObject *args, PyOb
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
-    
+
     Py_RETURN_NONE;
 }
 
@@ -476,14 +476,14 @@ static PyObject *Segmentation_meanImage(PyObject *self, PyObject *args, PyObject
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("clumps_img"),
                              RSGIS_PY_C_TEXT("output_img"),  RSGIS_PY_C_TEXT("gdalformat"),
-                             RSGIS_PY_C_TEXT("datatype"), NULL};
+                             RSGIS_PY_C_TEXT("datatype"), nullptr};
     const char *pszInputImage, *pszInputClumps, *pszOutputImage, *pszgdalformat;
     int nDataType;
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssi:mergeImage", kwlist, &pszInputImage, &pszInputClumps, &pszOutputImage, &pszgdalformat, &nDataType))
     {
-        return NULL;
+        return nullptr;
     }
-    
+
     try
     {
         rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)nDataType;
@@ -493,9 +493,9 @@ static PyObject *Segmentation_meanImage(PyObject *self, PyObject *args, PyObject
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
-    
+
     Py_RETURN_NONE;
 }
 
@@ -504,15 +504,15 @@ static PyObject *Segmentation_GenerateRegularGrid(PyObject *self, PyObject *args
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
                              RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("num_x_pxls"),
-                             RSGIS_PY_C_TEXT("num_y_pxls"), RSGIS_PY_C_TEXT("offset"), NULL};
+                             RSGIS_PY_C_TEXT("num_y_pxls"), RSGIS_PY_C_TEXT("offset"), nullptr};
     const char *pszInputImage, *pszOutputImage, *pszgdalformat;
     unsigned int numXPxls, numYPxls;
     int offset = 0;
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssII|i:generateRegularGrid", kwlist, &pszInputImage, &pszOutputImage, &pszgdalformat, &numXPxls, &numYPxls, &offset))
     {
-        return NULL;
+        return nullptr;
     }
-    
+
     try
     {
         rsgis::cmds::executeGenerateRegularGrid(std::string(pszInputImage), std::string(pszOutputImage),
@@ -521,9 +521,9 @@ static PyObject *Segmentation_GenerateRegularGrid(PyObject *self, PyObject *args
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
-    
+
     Py_RETURN_NONE;
 }
 
@@ -531,14 +531,14 @@ static PyObject *Segmentation_GenerateRegularGrid(PyObject *self, PyObject *args
 static PyObject *Segmentation_IncludeRegionsInClumps(PyObject *self, PyObject *args, PyObject *keywds)
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("clumps_img"), RSGIS_PY_C_TEXT("regions_img"),
-                             RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"), NULL};
+                             RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"), nullptr};
     const char *pszClumpsImage, *pszRegionsImage, *pszOutputImage, *pszgdalformat;
 
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssss:includeRegionsInClumps", kwlist, &pszClumpsImage, &pszRegionsImage, &pszOutputImage, &pszgdalformat ))
     {
-        return NULL;
+        return nullptr;
     }
-    
+
     try
     {
         rsgis::cmds::executeIncludeClumpedRegion(std::string(pszClumpsImage), std::string(pszRegionsImage),
@@ -547,9 +547,9 @@ static PyObject *Segmentation_IncludeRegionsInClumps(PyObject *self, PyObject *a
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
-    
+
     Py_RETURN_NONE;
 }
 
@@ -557,12 +557,12 @@ static PyObject *Segmentation_mergeSegments2Neighbours(PyObject *self, PyObject 
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("clumps_img"), RSGIS_PY_C_TEXT("input_vals_img"),
                              RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"),
-                             RSGIS_PY_C_TEXT("sel_clumps_col"), RSGIS_PY_C_TEXT("no_data_clumps_col"), NULL};
+                             RSGIS_PY_C_TEXT("sel_clumps_col"), RSGIS_PY_C_TEXT("no_data_clumps_col"), nullptr};
     const char *pszInputClumpsImage, *pszInputSpecImage, *pszOutputImage, *pszgdalformat, *selectClumpsCol, *noDataClumpsCol;
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssss:mergeSegments2Neighbours", kwlist, &pszInputClumpsImage, &pszInputSpecImage,
                                      &pszOutputImage, &pszgdalformat, &selectClumpsCol, &noDataClumpsCol))
     {
-        return NULL;
+        return nullptr;
     }
     
     try
@@ -574,7 +574,7 @@ static PyObject *Segmentation_mergeSegments2Neighbours(PyObject *self, PyObject 
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -583,12 +583,12 @@ static PyObject *Segmentation_mergeSegments2Neighbours(PyObject *self, PyObject 
 static PyObject *Segmentation_dropSelectedSegments(PyObject *self, PyObject *args, PyObject *keywds)
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("clumps_img"), RSGIS_PY_C_TEXT("output_img"),
-                             RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("sel_clumps_col"), NULL};
+                             RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("sel_clumps_col"), nullptr};
     const char *pszInputClumpsImage, *pszOutputImage, *pszgdalformat, *selectClumpsCol;
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssss:dropSelectedClumps", kwlist, &pszInputClumpsImage,
                                      &pszOutputImage, &pszgdalformat, &selectClumpsCol ))
     {
-        return NULL;
+        return nullptr;
     }
     
     try
@@ -599,7 +599,7 @@ static PyObject *Segmentation_dropSelectedSegments(PyObject *self, PyObject *arg
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -608,19 +608,19 @@ static PyObject *Segmentation_dropSelectedSegments(PyObject *self, PyObject *arg
 static PyObject *Segmentation_mergeEquivalentClumps(PyObject *self, PyObject *args, PyObject *keywds)
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("clumps_img"), RSGIS_PY_C_TEXT("output_img"),
-                             RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("val_columns"), NULL};
+                             RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("val_columns"), nullptr};
     const char *pszInputClumpsImage, *pszOutputImage, *pszgdalformat;
     PyObject *valClumpsCols;
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssO:mergeEquivClumps", kwlist, &pszInputClumpsImage, &pszOutputImage, &pszgdalformat, &valClumpsCols))
     {
-        return NULL;
+        return nullptr;
     }
     
     Py_ssize_t nValCols = PyList_Size(valClumpsCols);
     if( nValCols < 0)
     {
         PyErr_SetString(GETSTATE(self)->error, "last argument must be a list");
-        return NULL;
+        return nullptr;
     }
     
     std::vector<std::string> cols;
@@ -631,7 +631,7 @@ static PyObject *Segmentation_mergeEquivalentClumps(PyObject *self, PyObject *ar
         {
             PyErr_SetString(GETSTATE(self)->error, "must pass a list of strings");
             Py_DECREF(strObj);
-            return NULL;
+            return nullptr;
         }
         std::string colName = RSGISPY_STRING_EXTRACT(strObj);
         cols.push_back(colName);
@@ -645,7 +645,7 @@ static PyObject *Segmentation_mergeEquivalentClumps(PyObject *self, PyObject *ar
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -873,7 +873,7 @@ static PyMethodDef SegmentationMethods[] = {
 ":param valClumpsCol: is a list of strings defining the value(s) used to define equivalence (typically it might be the original pixel values when clumping through tiling).\n"
 "\n"},
 
-    {NULL}        /* Sentinel */
+    {nullptr}        /* Sentinel */
 };
                                 
 #if PY_MAJOR_VERSION >= 3
@@ -893,16 +893,16 @@ static int Segmentation_clear(PyObject *m)
 static struct PyModuleDef moduledef = {
         PyModuleDef_HEAD_INIT,
         "_segmentation",
-        NULL,
+        nullptr,
         sizeof(struct SegmentationState),
         SegmentationMethods,
-        NULL,
+        nullptr,
         Segmentation_traverse,
         Segmentation_clear,
-        NULL
+        nullptr
 };
 
-#define INITERROR return NULL
+#define INITERROR return nullptr
 
 PyMODINIT_FUNC 
 PyInit__segmentation(void)
@@ -919,14 +919,14 @@ init_segmentation(void)
 #else
     PyObject *pModule = Py_InitModule("_segmentation", SegmentationMethods);
 #endif
-    if( pModule == NULL )
+    if( pModule == nullptr )
         INITERROR;
 
     struct SegmentationState *state = GETSTATE(pModule);
 
     // Create and add our exception type
-    state->error = PyErr_NewException("_segmentation.error", NULL, NULL);
-    if( state->error == NULL )
+    state->error = PyErr_NewException("_segmentation.error", nullptr, nullptr);
+    if( state->error == nullptr )
     {
         Py_DECREF(pModule);
         INITERROR;

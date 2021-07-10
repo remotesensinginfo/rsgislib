@@ -41,11 +41,11 @@ static struct ElevationState _state;
 static PyObject *Elevation_calcSlope(PyObject *self, PyObject *args, PyObject *keywds)
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
-                             RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("unit"), NULL};
+                             RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("unit"), nullptr};
     const char *pszInputImage, *pszOutputFile, *pszGDALFormat, *pszOutUnit;
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssss:slope", kwlist, &pszInputImage, &pszOutputFile, &pszOutUnit, &pszGDALFormat))
     {
-        return NULL;
+        return nullptr;
     }
 
     try
@@ -70,7 +70,7 @@ static PyObject *Elevation_calcSlope(PyObject *self, PyObject *args, PyObject *k
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
 
     Py_RETURN_NONE;
@@ -79,10 +79,10 @@ static PyObject *Elevation_calcSlope(PyObject *self, PyObject *args, PyObject *k
 static PyObject *Elevation_calcAspect(PyObject *self, PyObject *args, PyObject *keywds)
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
-                             RSGIS_PY_C_TEXT("gdalformat"), NULL};
+                             RSGIS_PY_C_TEXT("gdalformat"), nullptr};
     const char *pszInputImage, *pszOutputFile, *pszGDALFormat;
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "sss:aspect", kwlist, &pszInputImage, &pszOutputFile, &pszGDALFormat))
-        return NULL;
+        return nullptr;
     
     try
     {
@@ -91,7 +91,7 @@ static PyObject *Elevation_calcAspect(PyObject *self, PyObject *args, PyObject *
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -100,10 +100,10 @@ static PyObject *Elevation_calcAspect(PyObject *self, PyObject *args, PyObject *
 static PyObject *Elevation_catAspect(PyObject *self, PyObject *args, PyObject *keywds)
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
-                             RSGIS_PY_C_TEXT("gdalformat"), NULL};
+                             RSGIS_PY_C_TEXT("gdalformat"), nullptr};
     const char *pszInputImage, *pszOutputFile, *pszGDALFormat;
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "sss:catagoriseAspect", kwlist, &pszInputImage, &pszOutputFile, &pszGDALFormat))
-        return NULL;
+        return nullptr;
     
     try
     {
@@ -112,7 +112,7 @@ static PyObject *Elevation_catAspect(PyObject *self, PyObject *args, PyObject *k
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -122,11 +122,11 @@ static PyObject *Elevation_calcHillshade(PyObject *self, PyObject *args, PyObjec
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
                              RSGIS_PY_C_TEXT("azimuth"), RSGIS_PY_C_TEXT("zenith"),
-                             RSGIS_PY_C_TEXT("gdalformat"), NULL};
+                             RSGIS_PY_C_TEXT("gdalformat"), nullptr};
     const char *pszInputImage, *pszOutputFile, *pszGDALFormat;
     float azimuth, zenith = 0.0;
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssffs:hillshade", kwlist, &pszInputImage, &pszOutputFile, &azimuth, &zenith, &pszGDALFormat))
-        return NULL;
+        return nullptr;
     
     try
     {
@@ -135,7 +135,7 @@ static PyObject *Elevation_calcHillshade(PyObject *self, PyObject *args, PyObjec
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -145,11 +145,11 @@ static PyObject *Elevation_calcShadowMask(PyObject *self, PyObject *args, PyObje
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
                              RSGIS_PY_C_TEXT("azimuth"), RSGIS_PY_C_TEXT("zenith"),
-                             RSGIS_PY_C_TEXT("max_height"), RSGIS_PY_C_TEXT("gdalformat"), NULL};
+                             RSGIS_PY_C_TEXT("max_height"), RSGIS_PY_C_TEXT("gdalformat"), nullptr};
     const char *pszInputImage, *pszOutputFile, *pszGDALFormat;
     float azimuth, zenith, maxHeight = 0.0;
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssfffs:shadowmask", kwlist, &pszInputImage, &pszOutputFile, &azimuth, &zenith, &maxHeight, &pszGDALFormat))
-        return NULL;
+        return nullptr;
     
     try
     {
@@ -158,7 +158,7 @@ static PyObject *Elevation_calcShadowMask(PyObject *self, PyObject *args, PyObje
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -168,11 +168,11 @@ static PyObject *Elevation_calcLocalIncidenceAngle(PyObject *self, PyObject *arg
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
                              RSGIS_PY_C_TEXT("azimuth"), RSGIS_PY_C_TEXT("zenith"),
-                             RSGIS_PY_C_TEXT("gdalformat"), NULL};
+                             RSGIS_PY_C_TEXT("gdalformat"), nullptr};
     const char *pszInputImage, *pszOutputFile, *pszGDALFormat;
     float azimuth, zenith = 0.0;
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssffs:localIncidenceAngle", kwlist, &pszInputImage, &pszOutputFile, &azimuth, &zenith, &pszGDALFormat))
-        return NULL;
+        return nullptr;
     
     try
     {
@@ -181,7 +181,7 @@ static PyObject *Elevation_calcLocalIncidenceAngle(PyObject *self, PyObject *arg
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -191,11 +191,11 @@ static PyObject *Elevation_calcLocalExistanceAngle(PyObject *self, PyObject *arg
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
                              RSGIS_PY_C_TEXT("azimuth"), RSGIS_PY_C_TEXT("zenith"),
-                             RSGIS_PY_C_TEXT("gdalformat"), NULL};
+                             RSGIS_PY_C_TEXT("gdalformat"), nullptr};
     const char *pszInputImage, *pszOutputFile, *pszGDALFormat;
     float azimuth, zenith = 0.0;
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssffs:localExistanceAngle", kwlist, &pszInputImage, &pszOutputFile, &azimuth, &zenith, &pszGDALFormat))
-        return NULL;
+        return nullptr;
     
     try
     {
@@ -204,7 +204,7 @@ static PyObject *Elevation_calcLocalExistanceAngle(PyObject *self, PyObject *arg
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -214,12 +214,12 @@ static PyObject *Elevation_dtmAspectMedianFilter(PyObject *self, PyObject *args,
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("in_dem_img"), RSGIS_PY_C_TEXT("in_aspect_img"),
                              RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("aspect_range"),
-                             RSGIS_PY_C_TEXT("win_h_size"), RSGIS_PY_C_TEXT("gdalformat"), NULL};
+                             RSGIS_PY_C_TEXT("win_h_size"), RSGIS_PY_C_TEXT("gdalformat"), nullptr};
     const char *pszInputDTMImage, *pszInputAspectImage, *pszOutputFile, *pszGDALFormat;
     float aspectRange = 0.0;
     int winHSize = 0;
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssfis:dtmAspectMedianFilter", kwlist, &pszInputDTMImage, &pszInputAspectImage, &pszOutputFile, &aspectRange, &winHSize, &pszGDALFormat))
-        return NULL;
+        return nullptr;
     
     try
     {
@@ -228,7 +228,7 @@ static PyObject *Elevation_dtmAspectMedianFilter(PyObject *self, PyObject *args,
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -237,11 +237,11 @@ static PyObject *Elevation_dtmAspectMedianFilter(PyObject *self, PyObject *args,
 static PyObject *Elevation_fillDEMSoilleGratin1994(PyObject *self, PyObject *args, PyObject *keywds)
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("in_dem_img"), RSGIS_PY_C_TEXT("in_vld_img"),
-                             RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"), NULL};
+                             RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"), nullptr};
     const char *pszInputDTMImage, *pszValidMaskImage, *pszOutputFile, *pszGDALFormat;
 
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssss:fillDEMSoilleGratin1994", kwlist, &pszInputDTMImage, &pszValidMaskImage, &pszOutputFile, &pszGDALFormat))
-        return NULL;
+        return nullptr;
     
     try
     {
@@ -250,7 +250,7 @@ static PyObject *Elevation_fillDEMSoilleGratin1994(PyObject *self, PyObject *arg
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -258,12 +258,12 @@ static PyObject *Elevation_fillDEMSoilleGratin1994(PyObject *self, PyObject *arg
 
 static PyObject *Elevation_planeFitDetreadDEM(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("win_size"), NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("win_size"), nullptr};
     const char *pszInputDEMImage, *pszOutputFile, *pszGDALFormat;
     int winSize;
     
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssi:planeFitDetreatDEM", kwlist, &pszInputDEMImage, &pszOutputFile, &pszGDALFormat, &winSize))
-        return NULL;
+        return nullptr;
     
     try
     {
@@ -272,7 +272,7 @@ static PyObject *Elevation_planeFitDetreadDEM(PyObject *self, PyObject *args, Py
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -421,7 +421,7 @@ static PyMethodDef ElevationMethods[] = {
 "\n"
 },
     
-    {NULL}        /* Sentinel */
+    {nullptr}        /* Sentinel */
 };
 
 
@@ -442,16 +442,16 @@ static int Elevation_clear(PyObject *m)
 static struct PyModuleDef moduledef = {
         PyModuleDef_HEAD_INIT,
         "_elevation",
-        NULL,
+        nullptr,
         sizeof(struct ElevationState),
         ElevationMethods,
-        NULL,
+        nullptr,
         Elevation_traverse,
         Elevation_clear,
-        NULL
+        nullptr
 };
 
-#define INITERROR return NULL
+#define INITERROR return nullptr
 
 PyMODINIT_FUNC 
 PyInit__elevation(void)
@@ -468,14 +468,14 @@ init_elevation(void)
 #else
     PyObject *pModule = Py_InitModule("_elevation", ElevationMethods);
 #endif
-    if( pModule == NULL )
+    if( pModule == nullptr )
         INITERROR;
 
     struct ElevationState *state = GETSTATE(pModule);
 
     // Create and add our exception type
-    state->error = PyErr_NewException("_elevation.error", NULL, NULL);
-    if( state->error == NULL )
+    state->error = PyErr_NewException("_elevation.error", nullptr, nullptr);
+    if( state->error == nullptr )
     {
         Py_DECREF(pModule);
         INITERROR;

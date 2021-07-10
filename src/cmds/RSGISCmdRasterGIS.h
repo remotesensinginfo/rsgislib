@@ -298,7 +298,7 @@ namespace rsgis{ namespace cmds {
     DllExport void executeCollapseRAT(std::string clumpsImage, unsigned int ratBand, std::string selectColumn, std::string outImage, std::string gdalFormat);
     
     /** Function for importing attribute table from a shapefile into a RAT */
-    DllExport void executeImportShpAtts(std::string clumpsImage, unsigned int ratBand, std::string inputVector, std::string inputVectorLyr, std::string fidColStr, std::vector<std::string> *colNames=NULL);
+    DllExport void executeImportShpAtts(std::string clumpsImage, unsigned int ratBand, std::string inputVector, std::string inputVectorLyr, std::string fidColStr, std::vector<std::string> *colNames=nullptr);
 
     /** Function to statistically sample the RAT using a histogram method for a single variable. */
     DllExport void executeHistSampling(std::string clumpsImage, unsigned int ratBand, std::string varCol, std::string outSelectCol, float propOfSample, float binWidth, bool classRestrict=false, std::string classColumn="", std::string classVal="");

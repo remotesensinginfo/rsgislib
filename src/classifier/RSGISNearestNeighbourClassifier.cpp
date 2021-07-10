@@ -45,7 +45,7 @@ namespace rsgis{ namespace classifier{
 	{
 		double distance = 0;
 		double minDistance = 0;
-		ClassData *minDistData = NULL;
+		ClassData *minDistData = nullptr;
 		for(int i = 0; i < this->numClasses; i++)
 		{
 			if(i == 0)

@@ -35,14 +35,14 @@ namespace rsgis{namespace vec{
 	{
 		RSGISVectorUtils vecUtils;
 		
-		OGRFeature *feature = NULL;
-		OGRGeometry *geometry = NULL;
+		OGRFeature *feature = nullptr;
+		OGRGeometry *geometry = nullptr;
 		
 		geos::geom::Envelope *env = new geos::geom::Envelope();
-		geos::geom::Envelope *tmpEnv = NULL;
+		geos::geom::Envelope *tmpEnv = nullptr;
 		
 		layer->ResetReading();
-		while( (feature = layer->GetNextFeature()) != NULL )
+		while( (feature = layer->GetNextFeature()) != nullptr )
 		{
 			geometry = feature->GetGeometryRef();
 			
@@ -155,8 +155,8 @@ namespace rsgis{namespace vec{
 		
 		try
 		{
-			OGRFeature *feature = NULL;
-			OGRGeometry *geometry = NULL;
+			OGRFeature *feature = nullptr;
+			OGRGeometry *geometry = nullptr;
 			
 			geos::geom::Envelope *envImage = new geos::geom::Envelope();
 			double *gdalTranslation = new double[6];
@@ -164,7 +164,7 @@ namespace rsgis{namespace vec{
 			envImage->init(gdalTranslation[0], (gdalTranslation[0]+(image->GetRasterXSize()*gdalTranslation[1])), (gdalTranslation[3]-image->GetRasterYSize()*gdalTranslation[1]), gdalTranslation[3]);
 			delete[] gdalTranslation;
 			
-			geos::geom::Envelope *env = NULL;
+			geos::geom::Envelope *env = nullptr;
 			
 			bool useFID = false;
 			int fieldIdx = -1;
@@ -197,7 +197,7 @@ namespace rsgis{namespace vec{
 			std::cout << "Started" << std::flush;
 			
 			layer->ResetReading();
-			while( (feature = layer->GetNextFeature()) != NULL )
+			while( (feature = layer->GetNextFeature()) != nullptr )
 			{
 				if((numFeatures >= 10) && ((i % feedback) == 0))
 				{

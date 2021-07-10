@@ -51,10 +51,10 @@ static PyObject *ImageMorphology_CreateCircularOp(PyObject *self, PyObject *args
     const char *pszOutputFile;
     int morphOpSize;
     
-    static char *kwlist[] = {RSGIS_PY_C_TEXT("output_file"), RSGIS_PY_C_TEXT("op_size"), NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("output_file"), RSGIS_PY_C_TEXT("op_size"), nullptr};
     if(!PyArg_ParseTupleAndKeywords(args, keywds, "si:createCircularOp", kwlist, &pszOutputFile, &morphOpSize))
     {
-        return NULL;
+        return nullptr;
     }
     
     try
@@ -64,7 +64,7 @@ static PyObject *ImageMorphology_CreateCircularOp(PyObject *self, PyObject *args
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -82,11 +82,11 @@ static PyObject *ImageMorphology_ImageDilate(PyObject *self, PyObject *args, PyO
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
                              RSGIS_PY_C_TEXT("morph_op_file"), RSGIS_PY_C_TEXT("use_op_file"),
                              RSGIS_PY_C_TEXT("op_size"), RSGIS_PY_C_TEXT("gdalformat"),
-                             RSGIS_PY_C_TEXT("datatype"), NULL};
+                             RSGIS_PY_C_TEXT("datatype"), nullptr};
     if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssiisi:imageDilate", kwlist, &pszInputImage, &pszOutputImage,
                                     &pszMorphOperator, &useOperatorFile, &morphOpSize, &pszImageFormat, &datatype))
     {
-        return NULL;
+        return nullptr;
     }
 
     try
@@ -98,7 +98,7 @@ static PyObject *ImageMorphology_ImageDilate(PyObject *self, PyObject *args, PyO
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
 
     Py_RETURN_NONE;
@@ -116,11 +116,11 @@ static PyObject *ImageMorphology_ImageErode(PyObject *self, PyObject *args, PyOb
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
                              RSGIS_PY_C_TEXT("morph_op_file"), RSGIS_PY_C_TEXT("use_op_file"),
                              RSGIS_PY_C_TEXT("op_size"), RSGIS_PY_C_TEXT("gdalformat"),
-                             RSGIS_PY_C_TEXT("datatype"), NULL};
+                             RSGIS_PY_C_TEXT("datatype"), nullptr};
     if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssiisi:imageErode", kwlist, &pszInputImage, &pszOutputImage,
                                     &pszMorphOperator, &useOperatorFile, &morphOpSize, &pszImageFormat, &datatype))
     {
-        return NULL;
+        return nullptr;
     }
     
     try
@@ -132,7 +132,7 @@ static PyObject *ImageMorphology_ImageErode(PyObject *self, PyObject *args, PyOb
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -150,11 +150,11 @@ static PyObject *ImageMorphology_ImageGradiant(PyObject *self, PyObject *args, P
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
                              RSGIS_PY_C_TEXT("morph_op_file"), RSGIS_PY_C_TEXT("use_op_file"),
                              RSGIS_PY_C_TEXT("op_size"), RSGIS_PY_C_TEXT("gdalformat"),
-                             RSGIS_PY_C_TEXT("datatype"), NULL};
+                             RSGIS_PY_C_TEXT("datatype"), nullptr};
     if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssiisi:imageGradiant", kwlist, &pszInputImage, &pszOutputImage,
                                     &pszMorphOperator, &useOperatorFile, &morphOpSize, &pszImageFormat, &datatype))
     {
-        return NULL;
+        return nullptr;
     }
     
     try
@@ -167,7 +167,7 @@ static PyObject *ImageMorphology_ImageGradiant(PyObject *self, PyObject *args, P
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -185,12 +185,12 @@ static PyObject *ImageMorphology_ImageDilateCombinedOut(PyObject *self, PyObject
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
                              RSGIS_PY_C_TEXT("morph_op_file"), RSGIS_PY_C_TEXT("use_op_file"),
                              RSGIS_PY_C_TEXT("op_size"), RSGIS_PY_C_TEXT("gdalformat"),
-                             RSGIS_PY_C_TEXT("datatype"), NULL};
+                             RSGIS_PY_C_TEXT("datatype"), nullptr};
     if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssiisi:imageDilateCombinedOut", kwlist, &pszInputImage,
                                     &pszOutputImage, &pszMorphOperator, &useOperatorFile, &morphOpSize,
                                     &pszImageFormat, &datatype))
     {
-        return NULL;
+        return nullptr;
     }
     
     try
@@ -203,7 +203,7 @@ static PyObject *ImageMorphology_ImageDilateCombinedOut(PyObject *self, PyObject
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -221,12 +221,12 @@ static PyObject *ImageMorphology_ImageErodeCombinedOut(PyObject *self, PyObject 
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
                              RSGIS_PY_C_TEXT("morph_op_file"), RSGIS_PY_C_TEXT("use_op_file"),
                              RSGIS_PY_C_TEXT("op_size"), RSGIS_PY_C_TEXT("gdalformat"),
-                             RSGIS_PY_C_TEXT("datatype"), NULL};
+                             RSGIS_PY_C_TEXT("datatype"), nullptr};
     if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssiisi:imageErodeCombinedOut", kwlist, &pszInputImage,
                                     &pszOutputImage, &pszMorphOperator, &useOperatorFile, &morphOpSize,
                                     &pszImageFormat, &datatype))
     {
-        return NULL;
+        return nullptr;
     }
     
     try
@@ -238,7 +238,7 @@ static PyObject *ImageMorphology_ImageErodeCombinedOut(PyObject *self, PyObject 
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -256,11 +256,11 @@ static PyObject *ImageMorphology_ImageGradiantCombinedOut(PyObject *self, PyObje
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
                              RSGIS_PY_C_TEXT("morph_op_file"), RSGIS_PY_C_TEXT("use_op_file"),
                              RSGIS_PY_C_TEXT("op_size"), RSGIS_PY_C_TEXT("gdalformat"),
-                             RSGIS_PY_C_TEXT("datatype"), NULL};
+                             RSGIS_PY_C_TEXT("datatype"), nullptr};
     if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssiisi:imageGradiantCombinedOut", kwlist, &pszInputImage, &pszOutputImage,
                                     &pszMorphOperator, &useOperatorFile, &morphOpSize, &pszImageFormat, &datatype))
     {
-        return NULL;
+        return nullptr;
     }
     
     try
@@ -272,7 +272,7 @@ static PyObject *ImageMorphology_ImageGradiantCombinedOut(PyObject *self, PyObje
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -293,12 +293,12 @@ static PyObject *ImageMorphology_ImageLocalMinima(PyObject *self, PyObject *args
                              RSGIS_PY_C_TEXT("sequencial_out"), RSGIS_PY_C_TEXT("allow_equal"),
                              RSGIS_PY_C_TEXT("morph_op_file"), RSGIS_PY_C_TEXT("use_op_file"),
                              RSGIS_PY_C_TEXT("op_size"), RSGIS_PY_C_TEXT("gdalformat"),
-                             RSGIS_PY_C_TEXT("datatype"), NULL};
+                             RSGIS_PY_C_TEXT("datatype"), nullptr};
     if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssiisiisi:imageLocalMinima", kwlist, &pszInputImage, &pszOutputImage,
                                     &outputSequencial, &allowEquals, &pszMorphOperator, &useOperatorFile, &morphOpSize,
                                     &pszImageFormat, &datatype))
     {
-        return NULL;
+        return nullptr;
     }
     
     try
@@ -311,7 +311,7 @@ static PyObject *ImageMorphology_ImageLocalMinima(PyObject *self, PyObject *args
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -332,12 +332,12 @@ static PyObject *ImageMorphology_ImageLocalMinimaCombinedOut(PyObject *self, PyO
                              RSGIS_PY_C_TEXT("sequencial_out"), RSGIS_PY_C_TEXT("allow_equal"),
                              RSGIS_PY_C_TEXT("morph_op_file"), RSGIS_PY_C_TEXT("use_op_file"),
                              RSGIS_PY_C_TEXT("op_size"), RSGIS_PY_C_TEXT("gdalformat"),
-                             RSGIS_PY_C_TEXT("datatype"), NULL};
+                             RSGIS_PY_C_TEXT("datatype"), nullptr};
     if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssiisiisi:imageLocalMinimaCombinedOut", kwlist, &pszInputImage,
                                     &pszOutputImage, &outputSequencial, &allowEquals, &pszMorphOperator, &useOperatorFile,
                                     &morphOpSize, &pszImageFormat, &datatype))
     {
-        return NULL;
+        return nullptr;
     }
     
     try
@@ -350,7 +350,7 @@ static PyObject *ImageMorphology_ImageLocalMinimaCombinedOut(PyObject *self, PyO
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -370,12 +370,12 @@ static PyObject *ImageMorphology_ImageOpening(PyObject *self, PyObject *args, Py
                              RSGIS_PY_C_TEXT("tmp_img"), RSGIS_PY_C_TEXT("morph_op_file"),
                              RSGIS_PY_C_TEXT("use_op_file"), RSGIS_PY_C_TEXT("op_size"),
                              RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("datatype"),
-                             RSGIS_PY_C_TEXT("niters"), NULL};
+                             RSGIS_PY_C_TEXT("niters"), nullptr};
     if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssssiisi|i:imageOpening", kwlist, &pszInputImage, &pszOutputImage,
                                     &pszTempImage, &pszMorphOperator, &useOperatorFile, &morphOpSize, &pszImageFormat,
                                     &datatype, &numIterations))
     {
-        return NULL;
+        return nullptr;
     }
     
     try
@@ -388,7 +388,7 @@ static PyObject *ImageMorphology_ImageOpening(PyObject *self, PyObject *args, Py
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -408,12 +408,12 @@ static PyObject *ImageMorphology_ImageClosing(PyObject *self, PyObject *args, Py
                              RSGIS_PY_C_TEXT("tmp_img"), RSGIS_PY_C_TEXT("morph_op_file"),
                              RSGIS_PY_C_TEXT("use_op_file"), RSGIS_PY_C_TEXT("op_size"),
                              RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("datatype"),
-                             RSGIS_PY_C_TEXT("niters"), NULL};
+                             RSGIS_PY_C_TEXT("niters"), nullptr};
     if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssssiisi|i:imageClosing", kwlist, &pszInputImage, &pszOutputImage,
                                     &pszTempImage, &pszMorphOperator, &useOperatorFile, &morphOpSize, &pszImageFormat,
                                     &datatype, &numIterations))
     {
-        return NULL;
+        return nullptr;
     }
     
     try
@@ -426,7 +426,7 @@ static PyObject *ImageMorphology_ImageClosing(PyObject *self, PyObject *args, Py
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -444,12 +444,12 @@ static PyObject *ImageMorphology_ImageBlackTopHat(PyObject *self, PyObject *args
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
                              RSGIS_PY_C_TEXT("tmp_img"), RSGIS_PY_C_TEXT("morph_op_file"),
                              RSGIS_PY_C_TEXT("use_op_file"), RSGIS_PY_C_TEXT("op_size"),
-                             RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("datatype"), NULL};
+                             RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("datatype"), nullptr};
     if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssssiisi:imageBlackTopHat", kwlist, &pszInputImage, &pszOutputImage,
                                     &pszTempImage, &pszMorphOperator, &useOperatorFile, &morphOpSize,
                                     &pszImageFormat, &datatype))
     {
-        return NULL;
+        return nullptr;
     }
     
     try
@@ -462,7 +462,7 @@ static PyObject *ImageMorphology_ImageBlackTopHat(PyObject *self, PyObject *args
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -480,12 +480,12 @@ static PyObject *ImageMorphology_ImageWhiteTopHat(PyObject *self, PyObject *args
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
                              RSGIS_PY_C_TEXT("tmp_img"), RSGIS_PY_C_TEXT("morph_op_file"),
                              RSGIS_PY_C_TEXT("use_op_file"), RSGIS_PY_C_TEXT("op_size"),
-                             RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("datatype"), NULL};
+                             RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("datatype"), nullptr};
     if(!PyArg_ParseTupleAndKeywords(args, keywds, "ssssiisi:imageWhiteTopHat", kwlist, &pszInputImage, &pszOutputImage,
                                     &pszTempImage, &pszMorphOperator, &useOperatorFile, &morphOpSize,
                                     &pszImageFormat, &datatype))
     {
-        return NULL;
+        return nullptr;
     }
     
     try
@@ -498,7 +498,7 @@ static PyObject *ImageMorphology_ImageWhiteTopHat(PyObject *self, PyObject *args
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -725,7 +725,7 @@ static PyMethodDef ImageMorphologyMethods[] = {
 ":param datatype: is an int containing one of the values from rsgislib.TYPE_*\n"
 "\n"},
     
-{NULL}        /* Sentinel */
+{nullptr}        /* Sentinel */
 };
 
 
@@ -746,16 +746,16 @@ static int ImageMorphology_clear(PyObject *m)
 static struct PyModuleDef moduledef = {
         PyModuleDef_HEAD_INIT,
         "_imagemorphology",
-        NULL,
+        nullptr,
         sizeof(struct ImageMorphologyState),
         ImageMorphologyMethods,
-        NULL,
+        nullptr,
         ImageMorphology_traverse,
         ImageMorphology_clear,
-        NULL
+        nullptr
 };
 
-#define INITERROR return NULL
+#define INITERROR return nullptr
 
 PyMODINIT_FUNC 
 PyInit__imagemorphology(void)
@@ -772,14 +772,14 @@ init_imagemorphology(void)
 #else
     PyObject *pModule = Py_InitModule("_imagemorphology", ImageMorphologyMethods);
 #endif
-    if( pModule == NULL )
+    if( pModule == nullptr )
         INITERROR;
 
     struct ImageMorphologyState *state = GETSTATE(pModule);
 
     // Create and add our exception type
-    state->error = PyErr_NewException("_imagemorphology.error", NULL, NULL);
-    if( state->error == NULL )
+    state->error = PyErr_NewException("_imagemorphology.error", nullptr, nullptr);
+    if( state->error == nullptr )
     {
         Py_DECREF(pModule);
         INITERROR;

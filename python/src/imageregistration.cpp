@@ -44,7 +44,7 @@ static PyObject *ImageRegistration_BasicRegistration(PyObject *self, PyObject *a
                              RSGIS_PY_C_TEXT("threshold"), RSGIS_PY_C_TEXT("win_size"),
                              RSGIS_PY_C_TEXT("search_area"), RSGIS_PY_C_TEXT("sd_ref_thres"),
                              RSGIS_PY_C_TEXT("sd_flt_thres"), RSGIS_PY_C_TEXT("sub_pxl_res"),
-                             RSGIS_PY_C_TEXT("metric_type"), RSGIS_PY_C_TEXT("output_type"),  NULL};
+                             RSGIS_PY_C_TEXT("metric_type"), RSGIS_PY_C_TEXT("output_type"),  nullptr};
     const char *pszInputReferenceImage, *pszInputFloatingmage, *pszOutputGCPFile;
     int pixelGap, windowSize, searchArea, subPixelResolution, metricType, outputType;
     float threshold, stdDevRefThreshold, stdDevFloatThreshold;
@@ -52,7 +52,7 @@ static PyObject *ImageRegistration_BasicRegistration(PyObject *self, PyObject *a
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssifiiffiii:basicregistration", kwlist, &pszInputReferenceImage, &pszInputFloatingmage,
                                      &pszOutputGCPFile, &pixelGap, &threshold, &windowSize, &searchArea, &stdDevRefThreshold,
                                      &stdDevFloatThreshold, &subPixelResolution, &metricType, &outputType))
-        return NULL;
+        return nullptr;
 
     try
     {
@@ -64,7 +64,7 @@ static PyObject *ImageRegistration_BasicRegistration(PyObject *self, PyObject *a
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
 
     Py_RETURN_NONE;
@@ -79,7 +79,7 @@ static PyObject *ImageRegistration_SingleLayerRegistration(PyObject *self, PyObj
                              RSGIS_PY_C_TEXT("sd_flt_thres"), RSGIS_PY_C_TEXT("sub_pxl_res"),
                              RSGIS_PY_C_TEXT("dist_threshold"), RSGIS_PY_C_TEXT("max_n_iters"),
                              RSGIS_PY_C_TEXT("move_chng_thres"), RSGIS_PY_C_TEXT("p_smooth"),
-                             RSGIS_PY_C_TEXT("metric_type"), RSGIS_PY_C_TEXT("output_type"),  NULL};
+                             RSGIS_PY_C_TEXT("metric_type"), RSGIS_PY_C_TEXT("output_type"),  nullptr};
     const char *pszInputReferenceImage, *pszInputFloatingmage, *pszOutputGCPFile;
     int pixelGap, windowSize, searchArea, subPixelResolution, metricType, 
         outputType, maxNumIterations, distanceThreshold;
@@ -90,7 +90,7 @@ static PyObject *ImageRegistration_SingleLayerRegistration(PyObject *self, PyObj
                                      &pszInputFloatingmage, &pszOutputGCPFile, &pixelGap, &threshold, &windowSize, &searchArea,
                                      &stdDevRefThreshold, &stdDevFloatThreshold, &subPixelResolution, &distanceThreshold,
                                      &maxNumIterations, &moveChangeThreshold, &pSmoothness, &metricType, &outputType))
-        return NULL;
+        return nullptr;
 
     try
     {
@@ -103,7 +103,7 @@ static PyObject *ImageRegistration_SingleLayerRegistration(PyObject *self, PyObj
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
 
     Py_RETURN_NONE;
@@ -113,12 +113,12 @@ static PyObject *ImageRegistration_GCP2GDAL(PyObject *self, PyObject *args, PyOb
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("in_gcp_file"),
                              RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"),
-                             RSGIS_PY_C_TEXT("datatype"), NULL};
+                             RSGIS_PY_C_TEXT("datatype"), nullptr};
 	const char *pszInputImage, *pszInputGCPFile, *pszOutputFile, *pszGDALFormat;
 	int nOutDataType;
     
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssi:gcp2gdal", kwlist, &pszInputImage, &pszInputGCPFile, &pszOutputFile, &pszGDALFormat, &nOutDataType))
-        return NULL;
+        return nullptr;
 
     try
     {
@@ -127,7 +127,7 @@ static PyObject *ImageRegistration_GCP2GDAL(PyObject *self, PyObject *args, PyOb
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
 
     Py_RETURN_NONE;
@@ -136,13 +136,13 @@ static PyObject *ImageRegistration_GCP2GDAL(PyObject *self, PyObject *args, PyOb
 static PyObject *ImageRegistration_ApplyOffset2Image(PyObject *self, PyObject *args, PyObject *keywds)
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"),
-                             RSGIS_PY_C_TEXT("datatype"), RSGIS_PY_C_TEXT("x_offset"), RSGIS_PY_C_TEXT("y_offset"), NULL};
+                             RSGIS_PY_C_TEXT("datatype"), RSGIS_PY_C_TEXT("x_offset"), RSGIS_PY_C_TEXT("y_offset"), nullptr};
     const char *pszInputImage, *pszOutputImage, *pszGDALFormat;
 	int nOutDataType;
     double xOff, yOff;
     
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssidd:applyOffset2Image", kwlist, &pszInputImage, &pszOutputImage, &pszGDALFormat, &nOutDataType, &xOff, &yOff))
-        return NULL;
+        return nullptr;
     
     try
     {
@@ -151,7 +151,7 @@ static PyObject *ImageRegistration_ApplyOffset2Image(PyObject *self, PyObject *a
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -286,7 +286,7 @@ static PyMethodDef ImageRegistrationMethods[] = {
 "\n"
 },
     
-	{NULL}        /* Sentinel */
+	{nullptr}        /* Sentinel */
 };
 
 
@@ -307,16 +307,16 @@ static int ImageRegistration_clear(PyObject *m)
 static struct PyModuleDef moduledef = {
         PyModuleDef_HEAD_INIT,
         "_imageregistration",
-        NULL,
+        nullptr,
         sizeof(struct ImageRegistrationState),
         ImageRegistrationMethods,
-        NULL,
+        nullptr,
         ImageRegistration_traverse,
         ImageRegistration_clear,
-        NULL
+        nullptr
 };
 
-#define INITERROR return NULL
+#define INITERROR return nullptr
 
 PyMODINIT_FUNC 
 PyInit__imageregistration(void)
@@ -333,14 +333,14 @@ init_imageregistration(void)
 #else
     PyObject *pModule = Py_InitModule("_imageregistration", ImageRegistrationMethods);
 #endif
-    if( pModule == NULL )
+    if( pModule == nullptr )
         INITERROR;
 
     struct ImageRegistrationState *state = GETSTATE(pModule);
 
     // Create and add our exception type
-    state->error = PyErr_NewException("_imageregistration.error", NULL, NULL);
-    if( state->error == NULL )
+    state->error = PyErr_NewException("_imageregistration.error", nullptr, nullptr);
+    if( state->error == nullptr )
     {
         Py_DECREF(pModule);
         INITERROR;

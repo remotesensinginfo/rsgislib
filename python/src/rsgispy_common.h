@@ -50,7 +50,7 @@ inline std::string RSGISPY_STRING_EXTRACT(PyObject *o)
     std::string sVal;
 #if PY_MAJOR_VERSION >= 3
     // convert from a unicode to a bytes
-    PyObject *pBytes = PyUnicode_AsEncodedString(o, NULL, NULL);
+    PyObject *pBytes = PyUnicode_AsEncodedString(o, nullptr, nullptr);
     sVal = PyBytes_AsString(pBytes);
     Py_DECREF(pBytes);
 #else

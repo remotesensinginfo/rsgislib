@@ -42,18 +42,18 @@ static struct ImageCalibrationState _state;
 
 static PyObject *ImageCalibration_landsat2Radiance(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    static char *kwlist[] = {RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("band_defs"), NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("band_defs"), nullptr};
     const char *pszOutputFile, *pszGDALFormat;
     PyObject *pBandDefnObj;
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssO:landsat2Radiance", kwlist, &pszOutputFile, &pszGDALFormat, &pBandDefnObj))
     {
-        return NULL;
+        return nullptr;
     }
 
     if( !PySequence_Check(pBandDefnObj))
     {
         PyErr_SetString(GETSTATE(self)->error, "Last argument must be a sequence");
-        return NULL;
+        return nullptr;
     }
 
     Py_ssize_t nBandDefns = PySequence_Size(pBandDefnObj);
@@ -65,37 +65,37 @@ static PyObject *ImageCalibration_landsat2Radiance(PyObject *self, PyObject *arg
         PyObject *o = PySequence_GetItem(pBandDefnObj, n);
 
         PyObject *pBandName = PyObject_GetAttrString(o, "bandName");
-        if( ( pBandName == NULL ) || ( pBandName == Py_None ) || !RSGISPY_CHECK_STRING(pBandName) )
+        if( ( pBandName == nullptr ) || ( pBandName == Py_None ) || !RSGISPY_CHECK_STRING(pBandName) )
         {
             PyErr_SetString(GETSTATE(self)->error, "Could not find string attribute \'bandName\'" );
             Py_XDECREF(pBandName);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
 
         PyObject *pFileName = PyObject_GetAttrString(o, "fileName");
-        if( ( pFileName == NULL ) || ( pFileName == Py_None ) || !RSGISPY_CHECK_STRING(pFileName) )
+        if( ( pFileName == nullptr ) || ( pFileName == Py_None ) || !RSGISPY_CHECK_STRING(pFileName) )
         {
             PyErr_SetString(GETSTATE(self)->error, "Could not find string attribute \'fileName\'" );
             Py_DECREF(pBandName);
             Py_XDECREF(pFileName);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
 
         PyObject *pBandIndex = PyObject_GetAttrString(o, "bandIndex");
-        if( ( pBandIndex == NULL ) || ( pBandIndex == Py_None ) || !RSGISPY_CHECK_INT(pBandIndex) )
+        if( ( pBandIndex == nullptr ) || ( pBandIndex == Py_None ) || !RSGISPY_CHECK_INT(pBandIndex) )
         {
             PyErr_SetString(GETSTATE(self)->error, "Could not find integer attribute \'bandIndex\'" );
             Py_DECREF(pBandName);
             Py_DECREF(pFileName);
             Py_XDECREF(pBandIndex);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
         
         PyObject *pLMin = PyObject_GetAttrString(o, "lMin");
-        if( ( pLMin == NULL ) || ( pLMin == Py_None ) || !RSGISPY_CHECK_FLOAT(pLMin) )
+        if( ( pLMin == nullptr ) || ( pLMin == Py_None ) || !RSGISPY_CHECK_FLOAT(pLMin) )
         {
             PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'lMin\'" );
             Py_DECREF(pBandName);
@@ -103,11 +103,11 @@ static PyObject *ImageCalibration_landsat2Radiance(PyObject *self, PyObject *arg
             Py_XDECREF(pBandIndex);
             Py_XDECREF(pLMin);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
         
         PyObject *pLMax = PyObject_GetAttrString(o, "lMax");
-        if( ( pLMax == NULL ) || ( pLMax == Py_None ) || !RSGISPY_CHECK_FLOAT(pLMax) )
+        if( ( pLMax == nullptr ) || ( pLMax == Py_None ) || !RSGISPY_CHECK_FLOAT(pLMax) )
         {
             PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'lMax\'" );
             Py_DECREF(pBandName);
@@ -116,11 +116,11 @@ static PyObject *ImageCalibration_landsat2Radiance(PyObject *self, PyObject *arg
             Py_XDECREF(pLMin);
             Py_XDECREF(pLMax);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
         
         PyObject *pQCalMin = PyObject_GetAttrString(o, "qCalMin");
-        if( ( pQCalMin == NULL ) || ( pQCalMin == Py_None ) || !RSGISPY_CHECK_FLOAT(pQCalMin) )
+        if( ( pQCalMin == nullptr ) || ( pQCalMin == Py_None ) || !RSGISPY_CHECK_FLOAT(pQCalMin) )
         {
             PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'qCalMin\'" );
             Py_DECREF(pBandName);
@@ -130,11 +130,11 @@ static PyObject *ImageCalibration_landsat2Radiance(PyObject *self, PyObject *arg
             Py_XDECREF(pLMax);
             Py_XDECREF(pQCalMin);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
         
         PyObject *pQCalMax = PyObject_GetAttrString(o, "qCalMax");
-        if( ( pQCalMax == NULL ) || ( pQCalMax == Py_None ) || !RSGISPY_CHECK_FLOAT(pQCalMax) )
+        if( ( pQCalMax == nullptr ) || ( pQCalMax == Py_None ) || !RSGISPY_CHECK_FLOAT(pQCalMax) )
         {
             PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'qCalMax\'" );
             Py_DECREF(pBandName);
@@ -145,7 +145,7 @@ static PyObject *ImageCalibration_landsat2Radiance(PyObject *self, PyObject *arg
             Py_XDECREF(pQCalMin);
             Py_XDECREF(pQCalMax);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
                 
         rsgis::cmds::CmdsLandsatRadianceGainsOffsets radVals;
@@ -176,7 +176,7 @@ static PyObject *ImageCalibration_landsat2Radiance(PyObject *self, PyObject *arg
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
 
     Py_RETURN_NONE;
@@ -184,18 +184,18 @@ static PyObject *ImageCalibration_landsat2Radiance(PyObject *self, PyObject *arg
 
 static PyObject *ImageCalibration_landsat2RadianceMultiAdd(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    static char *kwlist[] = {RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("band_defs"), NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("band_defs"), nullptr};
     const char *pszOutputFile, *pszGDALFormat;
     PyObject *pBandDefnObj;
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssO:landsat2RadianceMultiAdd", kwlist, &pszOutputFile, &pszGDALFormat, &pBandDefnObj))
     {
-        return NULL;
+        return nullptr;
     }
     
     if( !PySequence_Check(pBandDefnObj))
     {
         PyErr_SetString(GETSTATE(self)->error, "Last argument must be a sequence");
-        return NULL;
+        return nullptr;
     }
     
     Py_ssize_t nBandDefns = PySequence_Size(pBandDefnObj);
@@ -207,37 +207,37 @@ static PyObject *ImageCalibration_landsat2RadianceMultiAdd(PyObject *self, PyObj
         PyObject *o = PySequence_GetItem(pBandDefnObj, n);
         
         PyObject *pBandName = PyObject_GetAttrString(o, "bandName");
-        if( ( pBandName == NULL ) || ( pBandName == Py_None ) || !RSGISPY_CHECK_STRING(pBandName) )
+        if( ( pBandName == nullptr ) || ( pBandName == Py_None ) || !RSGISPY_CHECK_STRING(pBandName) )
         {
             PyErr_SetString(GETSTATE(self)->error, "Could not find string attribute \'bandName\'" );
             Py_XDECREF(pBandName);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
         
         PyObject *pFileName = PyObject_GetAttrString(o, "fileName");
-        if( ( pFileName == NULL ) || ( pFileName == Py_None ) || !RSGISPY_CHECK_STRING(pFileName) )
+        if( ( pFileName == nullptr ) || ( pFileName == Py_None ) || !RSGISPY_CHECK_STRING(pFileName) )
         {
             PyErr_SetString(GETSTATE(self)->error, "Could not find string attribute \'fileName\'" );
             Py_DECREF(pBandName);
             Py_XDECREF(pFileName);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
         
         PyObject *pBandIndex = PyObject_GetAttrString(o, "bandIndex");
-        if( ( pBandIndex == NULL ) || ( pBandIndex == Py_None ) || !RSGISPY_CHECK_INT(pBandIndex) )
+        if( ( pBandIndex == nullptr ) || ( pBandIndex == Py_None ) || !RSGISPY_CHECK_INT(pBandIndex) )
         {
             PyErr_SetString(GETSTATE(self)->error, "Could not find integer attribute \'bandIndex\'" );
             Py_DECREF(pBandName);
             Py_DECREF(pFileName);
             Py_XDECREF(pBandIndex);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
         
         PyObject *pAddVal = PyObject_GetAttrString(o, "addVal");
-        if( ( pAddVal == NULL ) || ( pAddVal == Py_None ) || !RSGISPY_CHECK_FLOAT(pAddVal) )
+        if( ( pAddVal == nullptr ) || ( pAddVal == Py_None ) || !RSGISPY_CHECK_FLOAT(pAddVal) )
         {
             PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'addVal\'" );
             Py_DECREF(pBandName);
@@ -245,11 +245,11 @@ static PyObject *ImageCalibration_landsat2RadianceMultiAdd(PyObject *self, PyObj
             Py_XDECREF(pBandIndex);
             Py_XDECREF(pAddVal);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
         
         PyObject *pMultiVal = PyObject_GetAttrString(o, "multiVal");
-        if( ( pMultiVal == NULL ) || ( pMultiVal == Py_None ) || !RSGISPY_CHECK_FLOAT(pMultiVal) )
+        if( ( pMultiVal == nullptr ) || ( pMultiVal == Py_None ) || !RSGISPY_CHECK_FLOAT(pMultiVal) )
         {
             PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'multiVal\'" );
             Py_DECREF(pBandName);
@@ -258,7 +258,7 @@ static PyObject *ImageCalibration_landsat2RadianceMultiAdd(PyObject *self, PyObj
             Py_XDECREF(pAddVal);
             Py_XDECREF(pMultiVal);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
         
         
@@ -286,7 +286,7 @@ static PyObject *ImageCalibration_landsat2RadianceMultiAdd(PyObject *self, PyObj
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -298,20 +298,20 @@ static PyObject *ImageCalibration_Radiance2TOARefl(PyObject *self, PyObject *arg
                              RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("datatype"),
                              RSGIS_PY_C_TEXT("scale_factor"), RSGIS_PY_C_TEXT("year"),
                              RSGIS_PY_C_TEXT("month"), RSGIS_PY_C_TEXT("day"),
-                             RSGIS_PY_C_TEXT("solar_zenith"), RSGIS_PY_C_TEXT("solar_irradiance"), NULL};
+                             RSGIS_PY_C_TEXT("solar_zenith"), RSGIS_PY_C_TEXT("solar_irradiance"), nullptr};
     const char *pszInputFile, *pszOutputFile, *pszGDALFormat;
     int nDataType, year, month, day;
     float scaleFactor, solarZenith;
     PyObject *pSolarIrrObj;
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssifiiifO:radiance2TOARefl", kwlist, &pszInputFile, &pszOutputFile, &pszGDALFormat, &nDataType, &scaleFactor, &year, &month, &day, &solarZenith, &pSolarIrrObj))
     {
-        return NULL;
+        return nullptr;
     }
     
     if( !PySequence_Check(pSolarIrrObj))
     {
         PyErr_SetString(GETSTATE(self)->error, "Last argument must be a sequence");
-        return NULL;
+        return nullptr;
     }
     
     Py_ssize_t nSolarIrrDefns = PySequence_Size(pSolarIrrObj);
@@ -323,12 +323,12 @@ static PyObject *ImageCalibration_Radiance2TOARefl(PyObject *self, PyObject *arg
         PyObject *o = PySequence_GetItem(pSolarIrrObj, n);
         
         PyObject *pIrradiance = PyObject_GetAttrString(o, "irradiance");
-        if( ( pIrradiance == NULL ) || ( pIrradiance == Py_None ) || !RSGISPY_CHECK_FLOAT(pIrradiance) )
+        if( ( pIrradiance == nullptr ) || ( pIrradiance == Py_None ) || !RSGISPY_CHECK_FLOAT(pIrradiance) )
         {
             PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'irradiance\'" );
             Py_XDECREF(pIrradiance);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
         
         solarIrradiance[n] = RSGISPY_FLOAT_EXTRACT(pIrradiance);
@@ -345,7 +345,7 @@ static PyObject *ImageCalibration_Radiance2TOARefl(PyObject *self, PyObject *arg
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -356,7 +356,7 @@ static PyObject *ImageCalibration_TOARefl2Radiance(PyObject *self, PyObject *arg
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_imgs"), RSGIS_PY_C_TEXT("output_img"),
                              RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("datatype"),
                              RSGIS_PY_C_TEXT("scale_factor"), RSGIS_PY_C_TEXT("solar_dist"),
-                             RSGIS_PY_C_TEXT("solar_zenith"), RSGIS_PY_C_TEXT("solar_irradiance"), NULL};
+                             RSGIS_PY_C_TEXT("solar_zenith"), RSGIS_PY_C_TEXT("solar_irradiance"), nullptr};
     const char *pszOutputFile, *pszGDALFormat;
     int nDataType;
     float scaleFactor, solarZenith, solarDistance;
@@ -364,7 +364,7 @@ static PyObject *ImageCalibration_TOARefl2Radiance(PyObject *self, PyObject *arg
     PyObject *pInputImgsObj;
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "OssifffO:toaRefl2Radiance", kwlist, &pInputImgsObj, &pszOutputFile, &pszGDALFormat, &nDataType, &scaleFactor, &solarDistance, &solarZenith, &pSolarIrrObj))
     {
-        return NULL;
+        return nullptr;
     }
     
     // Get input image files
@@ -382,7 +382,7 @@ static PyObject *ImageCalibration_TOARefl2Radiance(PyObject *self, PyObject *arg
             else
             {
                 PyErr_SetString(GETSTATE(self)->error, "Input images sequence must contain a list of strings");
-                return NULL;
+                return nullptr;
             }
         }
     }
@@ -395,14 +395,14 @@ static PyObject *ImageCalibration_TOARefl2Radiance(PyObject *self, PyObject *arg
         else
         {
             PyErr_SetString(GETSTATE(self)->error, "Input images parameter must be either a single string or a sequence of strings");
-            return NULL;
+            return nullptr;
         }
     }
     
     if( !PySequence_Check(pSolarIrrObj))
     {
         PyErr_SetString(GETSTATE(self)->error, "Last argument must be a sequence");
-        return NULL;
+        return nullptr;
     }
     
     Py_ssize_t nSolarIrrDefns = PySequence_Size(pSolarIrrObj);
@@ -414,12 +414,12 @@ static PyObject *ImageCalibration_TOARefl2Radiance(PyObject *self, PyObject *arg
         PyObject *o = PySequence_GetItem(pSolarIrrObj, n);
         
         PyObject *pIrradiance = PyObject_GetAttrString(o, "irradiance");
-        if( ( pIrradiance == NULL ) || ( pIrradiance == Py_None ) || !RSGISPY_CHECK_FLOAT(pIrradiance) )
+        if( ( pIrradiance == nullptr ) || ( pIrradiance == Py_None ) || !RSGISPY_CHECK_FLOAT(pIrradiance) )
         {
             PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'irradiance\'" );
             Py_XDECREF(pIrradiance);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
         
         solarIrradiance[n] = RSGISPY_FLOAT_EXTRACT(pIrradiance);
@@ -436,7 +436,7 @@ static PyObject *ImageCalibration_TOARefl2Radiance(PyObject *self, PyObject *arg
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -447,20 +447,20 @@ static PyObject *ImageCalibration_Apply6SCoefficentsSingleParam(PyObject *self, 
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
                              RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("datatype"),
                              RSGIS_PY_C_TEXT("scale_factor"), RSGIS_PY_C_TEXT("no_data_val"),
-                             RSGIS_PY_C_TEXT("use_no_data"), RSGIS_PY_C_TEXT("band_coeffs"), NULL};
+                             RSGIS_PY_C_TEXT("use_no_data"), RSGIS_PY_C_TEXT("band_coeffs"), nullptr};
     const char *pszInputFile, *pszOutputFile, *pszGDALFormat;
     int nDataType, useNoDataVal;
     float scaleFactor, noDataVal;
     PyObject *pBandValuesObj;
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssiffiO:apply6SCoeffSingleParam", kwlist, &pszInputFile, &pszOutputFile, &pszGDALFormat, &nDataType, &scaleFactor, &noDataVal, &useNoDataVal, &pBandValuesObj))
     {
-        return NULL;
+        return nullptr;
     }
     
     if( !PySequence_Check(pBandValuesObj))
     {
         PyErr_SetString(GETSTATE(self)->error, "Last argument must be a sequence");
-        return NULL;
+        return nullptr;
     }
     
     Py_ssize_t nBandValDefns = PySequence_Size(pBandValuesObj);
@@ -477,37 +477,37 @@ static PyObject *ImageCalibration_Apply6SCoefficentsSingleParam(PyObject *self, 
         PyObject *o = PySequence_GetItem(pBandValuesObj, n);
         
         PyObject *pBand = PyObject_GetAttrString(o, "band");
-        if( ( pBand == NULL ) || ( pBand == Py_None ) || !RSGISPY_CHECK_INT(pBand) )
+        if( ( pBand == nullptr ) || ( pBand == Py_None ) || !RSGISPY_CHECK_INT(pBand) )
         {
             PyErr_SetString(GETSTATE(self)->error, "Could not find int attribute \'band\'" );
             Py_XDECREF(pBand);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
         
         PyObject *pAX = PyObject_GetAttrString(o, "aX");
-        if( ( pAX == NULL ) || ( pAX == Py_None ) || !RSGISPY_CHECK_FLOAT(pAX) )
+        if( ( pAX == nullptr ) || ( pAX == Py_None ) || !RSGISPY_CHECK_FLOAT(pAX) )
         {
             PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'aX\'" );
             Py_XDECREF(pBand);
             Py_XDECREF(pAX);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
         
         PyObject *pBX = PyObject_GetAttrString(o, "bX");
-        if( ( pBX == NULL ) || ( pBX == Py_None ) || !RSGISPY_CHECK_FLOAT(pBX) )
+        if( ( pBX == nullptr ) || ( pBX == Py_None ) || !RSGISPY_CHECK_FLOAT(pBX) )
         {
             PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'bX\'" );
             Py_XDECREF(pBand);
             Py_XDECREF(pAX);
             Py_XDECREF(pBX);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
         
         PyObject *pCX = PyObject_GetAttrString(o, "cX");
-        if( ( pCX == NULL ) || ( pCX == Py_None ) || !RSGISPY_CHECK_FLOAT(pCX) )
+        if( ( pCX == nullptr ) || ( pCX == Py_None ) || !RSGISPY_CHECK_FLOAT(pCX) )
         {
             PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'cX\'" );
             Py_XDECREF(pBand);
@@ -515,7 +515,7 @@ static PyObject *ImageCalibration_Apply6SCoefficentsSingleParam(PyObject *self, 
             Py_XDECREF(pBX);
             Py_XDECREF(pCX);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
         
         imageBands[n] = RSGISPY_INT_EXTRACT(pBand);
@@ -538,7 +538,7 @@ static PyObject *ImageCalibration_Apply6SCoefficentsSingleParam(PyObject *self, 
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     delete[] aX;
@@ -554,20 +554,20 @@ static PyObject *ImageCalibration_Apply6SCoefficentsElevLUTParam(PyObject *self,
     static char *kwlist[] = {RSGIS_PY_C_TEXT("in_rad_img"), RSGIS_PY_C_TEXT("in_dem_img"), RSGIS_PY_C_TEXT("output_img"),
                              RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("datatype"),
                              RSGIS_PY_C_TEXT("scale_factor"), RSGIS_PY_C_TEXT("no_data_val"),
-                             RSGIS_PY_C_TEXT("use_no_data"), RSGIS_PY_C_TEXT("band_lut_coeffs"), NULL};
+                             RSGIS_PY_C_TEXT("use_no_data"), RSGIS_PY_C_TEXT("band_lut_coeffs"), nullptr};
     const char *pszInputRadFile, *pszInputDEMFile, *pszOutputFile, *pszGDALFormat;
     int nDataType, useNoDataVal;
     float scaleFactor, noDataVal;
     PyObject *pLUTObj;
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssiffiO:apply6SCoeffElevLUTParam", kwlist, &pszInputRadFile, &pszInputDEMFile, &pszOutputFile, &pszGDALFormat, &nDataType, &scaleFactor, &noDataVal, &useNoDataVal, &pLUTObj))
     {
-        return NULL;
+        return nullptr;
     }
     
     if( !PySequence_Check(pLUTObj))
     {
         PyErr_SetString(GETSTATE(self)->error, "Last argument must be a sequence");
-        return NULL;
+        return nullptr;
     }
     
     Py_ssize_t nLUTDefns = PySequence_Size(pLUTObj);
@@ -580,12 +580,12 @@ static PyObject *ImageCalibration_Apply6SCoefficentsElevLUTParam(PyObject *self,
         rsgis::cmds::Cmds6SElevationLUT lutVal = rsgis::cmds::Cmds6SElevationLUT();
         
         PyObject *pElev = PyObject_GetAttrString(pLUTValuesObj, "Elev");
-        if( ( pElev == NULL ) || ( pElev == Py_None ) || !RSGISPY_CHECK_FLOAT(pElev) )
+        if( ( pElev == nullptr ) || ( pElev == Py_None ) || !RSGISPY_CHECK_FLOAT(pElev) )
         {
             PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'Elev\' for the LUT (make sure it is a float!)" );
             Py_XDECREF(pElev);
             Py_DECREF(pLUTValuesObj);
-            return NULL;
+            return nullptr;
         }
         lutVal.elev = RSGISPY_FLOAT_EXTRACT(pElev);
         Py_DECREF(pElev);
@@ -595,7 +595,7 @@ static PyObject *ImageCalibration_Apply6SCoefficentsElevLUTParam(PyObject *self,
         if( !PySequence_Check(pBandValuesObj))
         {
             PyErr_SetString(GETSTATE(self)->error, "Each element in the LUT have a sequence \'Coeffs\' be a sequence.");
-            return NULL;
+            return nullptr;
         }
         Py_ssize_t nBandValDefns = PySequence_Size(pBandValuesObj);
         
@@ -609,37 +609,37 @@ static PyObject *ImageCalibration_Apply6SCoefficentsElevLUTParam(PyObject *self,
         {
             PyObject *o = PySequence_GetItem(pBandValuesObj, m);
             PyObject *pBand = PyObject_GetAttrString(o, "band");
-            if( ( pBand == NULL ) || ( pBand == Py_None ) || !RSGISPY_CHECK_INT(pBand) )
+            if( ( pBand == nullptr ) || ( pBand == Py_None ) || !RSGISPY_CHECK_INT(pBand) )
             {
                 PyErr_SetString(GETSTATE(self)->error, "Could not find int attribute \'band\'" );
                 Py_XDECREF(pBand);
                 Py_DECREF(o);
-                return NULL;
+                return nullptr;
             }
         
             PyObject *pAX = PyObject_GetAttrString(o, "aX");
-            if( ( pAX == NULL ) || ( pAX == Py_None ) || !RSGISPY_CHECK_FLOAT(pAX) )
+            if( ( pAX == nullptr ) || ( pAX == Py_None ) || !RSGISPY_CHECK_FLOAT(pAX) )
             {
                 PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'aX\'" );
                 Py_XDECREF(pBand);
                 Py_XDECREF(pAX);
                 Py_DECREF(o);
-                return NULL;
+                return nullptr;
             }
         
             PyObject *pBX = PyObject_GetAttrString(o, "bX");
-            if( ( pBX == NULL ) || ( pBX == Py_None ) || !RSGISPY_CHECK_FLOAT(pBX) )
+            if( ( pBX == nullptr ) || ( pBX == Py_None ) || !RSGISPY_CHECK_FLOAT(pBX) )
             {
                 PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'bX\'" );
                 Py_XDECREF(pBand);
                 Py_XDECREF(pAX);
                 Py_XDECREF(pBX);
                 Py_DECREF(o);
-                return NULL;
+                return nullptr;
             }
         
             PyObject *pCX = PyObject_GetAttrString(o, "cX");
-            if( ( pCX == NULL ) || ( pCX == Py_None ) || !RSGISPY_CHECK_FLOAT(pCX) )
+            if( ( pCX == nullptr ) || ( pCX == Py_None ) || !RSGISPY_CHECK_FLOAT(pCX) )
             {
                 PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'cX\'" );
                 Py_XDECREF(pBand);
@@ -647,7 +647,7 @@ static PyObject *ImageCalibration_Apply6SCoefficentsElevLUTParam(PyObject *self,
                 Py_XDECREF(pBX);
                 Py_XDECREF(pCX);
                 Py_DECREF(o);
-                return NULL;
+                return nullptr;
             }
         
             lutVal.imageBands[m] = RSGISPY_INT_EXTRACT(pBand);
@@ -676,7 +676,7 @@ static PyObject *ImageCalibration_Apply6SCoefficentsElevLUTParam(PyObject *self,
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     for(auto iterLUT = elevLUT->begin(); iterLUT != elevLUT->end(); ++iterLUT)
@@ -697,20 +697,20 @@ static PyObject *ImageCalibration_Apply6SCoefficentsElevAOTLUTParam(PyObject *se
                              RSGIS_PY_C_TEXT("in_aot_img"), RSGIS_PY_C_TEXT("output_img"),
                              RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("datatype"),
                              RSGIS_PY_C_TEXT("scale_factor"), RSGIS_PY_C_TEXT("no_data_val"),
-                             RSGIS_PY_C_TEXT("use_no_data"), RSGIS_PY_C_TEXT("band_lut_coeffs"), NULL};
+                             RSGIS_PY_C_TEXT("use_no_data"), RSGIS_PY_C_TEXT("band_lut_coeffs"), nullptr};
     const char *pszInputRadFile, *pszInputDEMFile, *pszInputAOTFile, *pszOutputFile, *pszGDALFormat;
     int nDataType, useNoDataVal;
     float scaleFactor, noDataVal;
     PyObject *pLUTObj;
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssssiffiO:apply6SCoeffElevAOTLUTParam", kwlist, &pszInputRadFile, &pszInputDEMFile, &pszInputAOTFile, &pszOutputFile, &pszGDALFormat, &nDataType, &scaleFactor, &noDataVal, &useNoDataVal, &pLUTObj))
     {
-        return NULL;
+        return nullptr;
     }
     
     if( !PySequence_Check(pLUTObj))
     {
         PyErr_SetString(GETSTATE(self)->error, "Last argument must be a sequence");
-        return NULL;
+        return nullptr;
     }
     
     Py_ssize_t nLUTDefns = PySequence_Size(pLUTObj);
@@ -724,12 +724,12 @@ static PyObject *ImageCalibration_Apply6SCoefficentsElevAOTLUTParam(PyObject *se
         rsgis::cmds::Cmds6SBaseElevAOTLUT lutElevVal = rsgis::cmds::Cmds6SBaseElevAOTLUT();
         
         PyObject *pElev = PyObject_GetAttrString(pElevLUTValuesObj, "Elev");
-        if( ( pElev == NULL ) || ( pElev == Py_None ) || !RSGISPY_CHECK_FLOAT(pElev) )
+        if( ( pElev == nullptr ) || ( pElev == Py_None ) || !RSGISPY_CHECK_FLOAT(pElev) )
         {
             PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'Elev\' for the LUT (make sure it is a float!)" );
             Py_XDECREF(pElev);
             Py_DECREF(pElevLUTValuesObj);
-            return NULL;
+            return nullptr;
         }
         lutElevVal.elev = RSGISPY_FLOAT_EXTRACT(pElev);
         Py_DECREF(pElev);
@@ -740,7 +740,7 @@ static PyObject *ImageCalibration_Apply6SCoefficentsElevAOTLUTParam(PyObject *se
         if( !PySequence_Check(pAOTLUTValuesObj))
         {
             PyErr_SetString(GETSTATE(self)->error, "Each element in the Elevation LUT have a sequence of AOT \'Coeffs\'.");
-            return NULL;
+            return nullptr;
         }
         Py_ssize_t nAOTLUTDefns = PySequence_Size(pAOTLUTValuesObj);
         lutElevVal.aotLUT = std::vector<rsgis::cmds::Cmds6SAOTLUT>();
@@ -752,13 +752,13 @@ static PyObject *ImageCalibration_Apply6SCoefficentsElevAOTLUTParam(PyObject *se
             rsgis::cmds::Cmds6SAOTLUT lutAOTVal = rsgis::cmds::Cmds6SAOTLUT();
             
             PyObject *pAOT = PyObject_GetAttrString(pAOTValuesObj, "AOT");
-            if( ( pAOT == NULL ) || ( pAOT == Py_None ) || !RSGISPY_CHECK_FLOAT(pAOT) )
+            if( ( pAOT == nullptr ) || ( pAOT == Py_None ) || !RSGISPY_CHECK_FLOAT(pAOT) )
             {
                 PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'AOT\' for the LUT (make sure it is a float!)" );
                 Py_XDECREF(pAOT);
                 Py_DECREF(pAOTValuesObj);
                 Py_DECREF(pElevLUTValuesObj);
-                return NULL;
+                return nullptr;
             }
             lutAOTVal.aot = RSGISPY_FLOAT_EXTRACT(pAOT);
             Py_DECREF(pAOT);
@@ -770,7 +770,7 @@ static PyObject *ImageCalibration_Apply6SCoefficentsElevAOTLUTParam(PyObject *se
                 PyErr_SetString(GETSTATE(self)->error, "Each element in the AOT LUT have a sequence \'Coeffs\'.");
                 Py_DECREF(pAOTValuesObj);
                 Py_DECREF(pElevLUTValuesObj);
-                return NULL;
+                return nullptr;
             }
             Py_ssize_t nBandValDefns = PySequence_Size(pBandValuesObj);
             
@@ -784,18 +784,18 @@ static PyObject *ImageCalibration_Apply6SCoefficentsElevAOTLUTParam(PyObject *se
             {
                 PyObject *o = PySequence_GetItem(pBandValuesObj, m);
                 PyObject *pBand = PyObject_GetAttrString(o, "band");
-                if( ( pBand == NULL ) || ( pBand == Py_None ) || !RSGISPY_CHECK_INT(pBand) )
+                if( ( pBand == nullptr ) || ( pBand == Py_None ) || !RSGISPY_CHECK_INT(pBand) )
                 {
                     PyErr_SetString(GETSTATE(self)->error, "Could not find int attribute \'band\'" );
                     Py_XDECREF(pBand);
                     Py_DECREF(o);
                     Py_DECREF(pAOTValuesObj);
                     Py_DECREF(pElevLUTValuesObj);
-                    return NULL;
+                    return nullptr;
                 }
                 
                 PyObject *pAX = PyObject_GetAttrString(o, "aX");
-                if( ( pAX == NULL ) || ( pAX == Py_None ) || !RSGISPY_CHECK_FLOAT(pAX) )
+                if( ( pAX == nullptr ) || ( pAX == Py_None ) || !RSGISPY_CHECK_FLOAT(pAX) )
                 {
                     PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'aX\'" );
                     Py_XDECREF(pBand);
@@ -803,11 +803,11 @@ static PyObject *ImageCalibration_Apply6SCoefficentsElevAOTLUTParam(PyObject *se
                     Py_DECREF(o);
                     Py_DECREF(pAOTValuesObj);
                     Py_DECREF(pElevLUTValuesObj);
-                    return NULL;
+                    return nullptr;
                 }
                 
                 PyObject *pBX = PyObject_GetAttrString(o, "bX");
-                if( ( pBX == NULL ) || ( pBX == Py_None ) || !RSGISPY_CHECK_FLOAT(pBX) )
+                if( ( pBX == nullptr ) || ( pBX == Py_None ) || !RSGISPY_CHECK_FLOAT(pBX) )
                 {
                     PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'bX\'" );
                     Py_XDECREF(pBand);
@@ -816,11 +816,11 @@ static PyObject *ImageCalibration_Apply6SCoefficentsElevAOTLUTParam(PyObject *se
                     Py_DECREF(o);
                     Py_DECREF(pAOTValuesObj);
                     Py_DECREF(pElevLUTValuesObj);
-                    return NULL;
+                    return nullptr;
                 }
                 
                 PyObject *pCX = PyObject_GetAttrString(o, "cX");
-                if( ( pCX == NULL ) || ( pCX == Py_None ) || !RSGISPY_CHECK_FLOAT(pCX) )
+                if( ( pCX == nullptr ) || ( pCX == Py_None ) || !RSGISPY_CHECK_FLOAT(pCX) )
                 {
                     PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'cX\'" );
                     Py_XDECREF(pBand);
@@ -830,7 +830,7 @@ static PyObject *ImageCalibration_Apply6SCoefficentsElevAOTLUTParam(PyObject *se
                     Py_DECREF(o);
                     Py_DECREF(pAOTValuesObj);
                     Py_DECREF(pElevLUTValuesObj);
-                    return NULL;
+                    return nullptr;
                 }
                 
                 lutAOTVal.imageBands[m] = RSGISPY_INT_EXTRACT(pBand);
@@ -862,7 +862,7 @@ static PyObject *ImageCalibration_Apply6SCoefficentsElevAOTLUTParam(PyObject *se
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     for(auto iterLUT = elevAOTLUT->begin(); iterLUT != elevAOTLUT->end(); ++iterLUT)
@@ -886,14 +886,14 @@ static PyObject *ImageCalibration_ApplySubtractOffsets(PyObject *self, PyObject 
                              RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"),
                              RSGIS_PY_C_TEXT("datatype"), RSGIS_PY_C_TEXT("non_neg_int"),
                              RSGIS_PY_C_TEXT("use_no_data"), RSGIS_PY_C_TEXT("no_data_val"),
-                             RSGIS_PY_C_TEXT("dark_refl_val"), NULL};
+                             RSGIS_PY_C_TEXT("dark_refl_val"), nullptr};
     const char *pszInputFile, *pszInputOffsetsFile, *pszOutputFile, *pszGDALFormat;
     int nDataType, useNoDataValInt, nonNegativeInt;
     float noDataVal, darkObjReflVal;
 
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssiiiff:applySubtractOffsets", kwlist, &pszInputFile, &pszInputOffsetsFile, &pszOutputFile, &pszGDALFormat, &nDataType, &nonNegativeInt, &useNoDataValInt, &noDataVal, &darkObjReflVal))
     {
-        return NULL;
+        return nullptr;
     }
     
     try
@@ -904,7 +904,7 @@ static PyObject *ImageCalibration_ApplySubtractOffsets(PyObject *self, PyObject 
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -915,7 +915,7 @@ static PyObject *ImageCalibration_ApplySubtractSingleOffsets(PyObject *self, PyO
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"),
                              RSGIS_PY_C_TEXT("datatype"), RSGIS_PY_C_TEXT("non_neg_int"),
                              RSGIS_PY_C_TEXT("use_no_data"), RSGIS_PY_C_TEXT("no_data_val"),
-                             RSGIS_PY_C_TEXT("dark_refl_val"), RSGIS_PY_C_TEXT("bands_offsets"), NULL};
+                             RSGIS_PY_C_TEXT("dark_refl_val"), RSGIS_PY_C_TEXT("bands_offsets"), nullptr};
     const char *pszInputFile, *pszOutputFile, *pszGDALFormat;
     int nDataType, useNoDataValInt, nonNegativeInt;
     float noDataVal, darkObjReflVal;
@@ -923,13 +923,13 @@ static PyObject *ImageCalibration_ApplySubtractSingleOffsets(PyObject *self, PyO
     
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssiiiffO:applySubtractSingleOffsets", kwlist, &pszInputFile, &pszOutputFile, &pszGDALFormat, &nDataType, &nonNegativeInt, &useNoDataValInt, &noDataVal, &darkObjReflVal, &pImageOffsetsObj))
     {
-        return NULL;
+        return nullptr;
     }
     
     if( !PySequence_Check(pImageOffsetsObj))
     {
         PyErr_SetString(GETSTATE(self)->error, "Last argument must be a sequence");
-        return NULL;
+        return nullptr;
     }
     
     Py_ssize_t nImageOffsDefns = PySequence_Size(pImageOffsetsObj);
@@ -942,12 +942,12 @@ static PyObject *ImageCalibration_ApplySubtractSingleOffsets(PyObject *self, PyO
         PyObject *o = PySequence_GetItem(pImageOffsetsObj, n);
         
         PyObject *pOffset = PyObject_GetAttrString(o, "offset");
-        if( ( pOffset == NULL ) || ( pOffset == Py_None ) || !RSGISPY_CHECK_FLOAT(pOffset) )
+        if( ( pOffset == nullptr ) || ( pOffset == Py_None ) || !RSGISPY_CHECK_FLOAT(pOffset) )
         {
             PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'offset\'" );
             Py_XDECREF(pOffset);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
         
         imageOffsVals.push_back(RSGISPY_FLOAT_EXTRACT(pOffset));
@@ -965,7 +965,7 @@ static PyObject *ImageCalibration_ApplySubtractSingleOffsets(PyObject *self, PyO
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -973,18 +973,18 @@ static PyObject *ImageCalibration_ApplySubtractSingleOffsets(PyObject *self, PyO
 
 static PyObject *ImageCalibration_SaturatedPixelsMask(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    static char *kwlist[] = {RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("band_defs"), NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("band_defs"), nullptr};
     const char *pszOutputFile, *pszGDALFormat;
     PyObject *pBandDefnObj;
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssO:saturatedPixelsMask", kwlist, &pszOutputFile, &pszGDALFormat, &pBandDefnObj))
     {
-        return NULL;
+        return nullptr;
     }
     
     if( !PySequence_Check(pBandDefnObj))
     {
         PyErr_SetString(GETSTATE(self)->error, "Last argument must be a sequence");
-        return NULL;
+        return nullptr;
     }
     
     Py_ssize_t nBandDefns = PySequence_Size(pBandDefnObj);
@@ -996,37 +996,37 @@ static PyObject *ImageCalibration_SaturatedPixelsMask(PyObject *self, PyObject *
         PyObject *o = PySequence_GetItem(pBandDefnObj, n);
         
         PyObject *pBandName = PyObject_GetAttrString(o, "bandName");
-        if( ( pBandName == NULL ) || ( pBandName == Py_None ) || !RSGISPY_CHECK_STRING(pBandName) )
+        if( ( pBandName == nullptr ) || ( pBandName == Py_None ) || !RSGISPY_CHECK_STRING(pBandName) )
         {
             PyErr_SetString(GETSTATE(self)->error, "Could not find string attribute \'bandName\'" );
             Py_XDECREF(pBandName);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
         
         PyObject *pFileName = PyObject_GetAttrString(o, "fileName");
-        if( ( pFileName == NULL ) || ( pFileName == Py_None ) || !RSGISPY_CHECK_STRING(pFileName) )
+        if( ( pFileName == nullptr ) || ( pFileName == Py_None ) || !RSGISPY_CHECK_STRING(pFileName) )
         {
             PyErr_SetString(GETSTATE(self)->error, "Could not find string attribute \'fileName\'" );
             Py_DECREF(pBandName);
             Py_XDECREF(pFileName);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
         
         PyObject *pBandIndex = PyObject_GetAttrString(o, "bandIndex");
-        if( ( pBandIndex == NULL ) || ( pBandIndex == Py_None ) || !RSGISPY_CHECK_INT(pBandIndex) )
+        if( ( pBandIndex == nullptr ) || ( pBandIndex == Py_None ) || !RSGISPY_CHECK_INT(pBandIndex) )
         {
             PyErr_SetString(GETSTATE(self)->error, "Could not find integer attribute \'bandIndex\'" );
             Py_DECREF(pBandName);
             Py_DECREF(pFileName);
             Py_XDECREF(pBandIndex);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
         
         PyObject *pSatVal = PyObject_GetAttrString(o, "satVal");
-        if( ( pSatVal == NULL ) || ( pSatVal == Py_None ) || !RSGISPY_CHECK_FLOAT(pSatVal) )
+        if( ( pSatVal == nullptr ) || ( pSatVal == Py_None ) || !RSGISPY_CHECK_FLOAT(pSatVal) )
         {
             PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'satVal\'" );
             Py_DECREF(pBandName);
@@ -1034,7 +1034,7 @@ static PyObject *ImageCalibration_SaturatedPixelsMask(PyObject *self, PyObject *
             Py_XDECREF(pBandIndex);
             Py_XDECREF(pSatVal);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
         
         rsgis::cmds::CmdsSaturatedPixel satVals;
@@ -1059,7 +1059,7 @@ static PyObject *ImageCalibration_SaturatedPixelsMask(PyObject *self, PyObject *
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -1069,20 +1069,20 @@ static PyObject *ImageCalibration_landsatThermalRad2Brightness(PyObject *self, P
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
                              RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("datatype"),
-                             RSGIS_PY_C_TEXT("scale_factor"), RSGIS_PY_C_TEXT("band_defs"), NULL};
+                             RSGIS_PY_C_TEXT("scale_factor"), RSGIS_PY_C_TEXT("band_defs"), nullptr};
     const char *pszInputFile, *pszOutputFile, *pszGDALFormat;
     int nDataType;
     float scaleFactor;
     PyObject *pBandDefnObj;
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssifO:landsatThermalRad2Brightness", kwlist, &pszInputFile, &pszOutputFile, &pszGDALFormat, &nDataType, &scaleFactor, &pBandDefnObj))
     {
-        return NULL;
+        return nullptr;
     }
     
     if( !PySequence_Check(pBandDefnObj))
     {
         PyErr_SetString(GETSTATE(self)->error, "Last argument must be a sequence");
-        return NULL;
+        return nullptr;
     }
     
     Py_ssize_t nBandDefns = PySequence_Size(pBandDefnObj);
@@ -1094,37 +1094,37 @@ static PyObject *ImageCalibration_landsatThermalRad2Brightness(PyObject *self, P
         PyObject *o = PySequence_GetItem(pBandDefnObj, n);
         
         PyObject *pBandName = PyObject_GetAttrString(o, "bandName");
-        if( ( pBandName == NULL ) || ( pBandName == Py_None ) || !RSGISPY_CHECK_STRING(pBandName) )
+        if( ( pBandName == nullptr ) || ( pBandName == Py_None ) || !RSGISPY_CHECK_STRING(pBandName) )
         {
             PyErr_SetString(GETSTATE(self)->error, "Could not find string attribute \'bandName\'" );
             Py_XDECREF(pBandName);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
         
         PyObject *pBandIndex = PyObject_GetAttrString(o, "bandIndex");
-        if( ( pBandIndex == NULL ) || ( pBandIndex == Py_None ) || !RSGISPY_CHECK_INT(pBandIndex) )
+        if( ( pBandIndex == nullptr ) || ( pBandIndex == Py_None ) || !RSGISPY_CHECK_INT(pBandIndex) )
         {
             PyErr_SetString(GETSTATE(self)->error, "Could not find integer attribute \'bandIndex\'" );
             Py_DECREF(pBandName);
             Py_XDECREF(pBandIndex);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
         
         PyObject *pK1 = PyObject_GetAttrString(o, "k1");
-        if( ( pK1 == NULL ) || ( pK1 == Py_None ) || !RSGISPY_CHECK_FLOAT(pK1) )
+        if( ( pK1 == nullptr ) || ( pK1 == Py_None ) || !RSGISPY_CHECK_FLOAT(pK1) )
         {
             PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'k1\'" );
             Py_DECREF(pBandName);
             Py_XDECREF(pBandIndex);
             Py_XDECREF(pK1);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
         
         PyObject *pK2 = PyObject_GetAttrString(o, "k2");
-        if( ( pK2 == NULL ) || ( pK2 == Py_None ) || !RSGISPY_CHECK_FLOAT(pK2) )
+        if( ( pK2 == nullptr ) || ( pK2 == Py_None ) || !RSGISPY_CHECK_FLOAT(pK2) )
         {
             PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'k2\'" );
             Py_DECREF(pBandName);
@@ -1132,7 +1132,7 @@ static PyObject *ImageCalibration_landsatThermalRad2Brightness(PyObject *self, P
             Py_XDECREF(pK1);
             Py_XDECREF(pK2);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
         
         rsgis::cmds::CmdsLandsatThermalCoeffs thermVals;
@@ -1158,7 +1158,7 @@ static PyObject *ImageCalibration_landsatThermalRad2Brightness(PyObject *self, P
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -1166,18 +1166,18 @@ static PyObject *ImageCalibration_landsatThermalRad2Brightness(PyObject *self, P
 
 static PyObject *ImageCalibration_worldview2ToRadiance(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("band_defs"), NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("band_defs"), nullptr};
     const char *pszInputFile, *pszOutputFile, *pszGDALFormat;
     PyObject *pBandDefnObj;
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssO:worldview2ToRadiance", kwlist, &pszInputFile, &pszOutputFile, &pszGDALFormat, &pBandDefnObj))
     {
-        return NULL;
+        return nullptr;
     }
     
     if( !PySequence_Check(pBandDefnObj))
     {
         PyErr_SetString(GETSTATE(self)->error, "Last argument must be a sequence");
-        return NULL;
+        return nullptr;
     }
     
     Py_ssize_t nBandDefns = PySequence_Size(pBandDefnObj);
@@ -1189,37 +1189,37 @@ static PyObject *ImageCalibration_worldview2ToRadiance(PyObject *self, PyObject 
         PyObject *o = PySequence_GetItem(pBandDefnObj, n);
         
         PyObject *pBandName = PyObject_GetAttrString(o, "bandName");
-        if( ( pBandName == NULL ) || ( pBandName == Py_None ) || !RSGISPY_CHECK_STRING(pBandName) )
+        if( ( pBandName == nullptr ) || ( pBandName == Py_None ) || !RSGISPY_CHECK_STRING(pBandName) )
         {
             PyErr_SetString(GETSTATE(self)->error, "Could not find string attribute \'bandName\'" );
             Py_XDECREF(pBandName);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
         
         PyObject *pBandIndex = PyObject_GetAttrString(o, "bandIndex");
-        if( ( pBandIndex == NULL ) || ( pBandIndex == Py_None ) || !RSGISPY_CHECK_INT(pBandIndex) )
+        if( ( pBandIndex == nullptr ) || ( pBandIndex == Py_None ) || !RSGISPY_CHECK_INT(pBandIndex) )
         {
             PyErr_SetString(GETSTATE(self)->error, "Could not find integer attribute \'bandIndex\'" );
             Py_DECREF(pBandName);
             Py_XDECREF(pBandIndex);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
         
         PyObject *pAbsCalFact = PyObject_GetAttrString(o, "absCalFact");
-        if( ( pAbsCalFact == NULL ) || ( pAbsCalFact == Py_None ) || !RSGISPY_CHECK_FLOAT(pAbsCalFact) )
+        if( ( pAbsCalFact == nullptr ) || ( pAbsCalFact == Py_None ) || !RSGISPY_CHECK_FLOAT(pAbsCalFact) )
         {
             PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'absCalFact\'" );
             Py_DECREF(pBandName);
             Py_XDECREF(pBandIndex);
             Py_XDECREF(pAbsCalFact);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
         
         PyObject *pEffBandWidth = PyObject_GetAttrString(o, "effBandWidth");
-        if( ( pEffBandWidth == NULL ) || ( pEffBandWidth == Py_None ) || !RSGISPY_CHECK_FLOAT(pEffBandWidth) )
+        if( ( pEffBandWidth == nullptr ) || ( pEffBandWidth == Py_None ) || !RSGISPY_CHECK_FLOAT(pEffBandWidth) )
         {
             PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'effBandWidth\'" );
             Py_DECREF(pBandName);
@@ -1227,7 +1227,7 @@ static PyObject *ImageCalibration_worldview2ToRadiance(PyObject *self, PyObject 
             Py_XDECREF(pAbsCalFact);
             Py_XDECREF(pEffBandWidth);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
         
         
@@ -1253,7 +1253,7 @@ static PyObject *ImageCalibration_worldview2ToRadiance(PyObject *self, PyObject 
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -1261,18 +1261,18 @@ static PyObject *ImageCalibration_worldview2ToRadiance(PyObject *self, PyObject 
 
 static PyObject *ImageCalibration_spot5ToRadiance(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("band_defs"), NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("band_defs"), nullptr};
     const char *pszInputFile, *pszOutputFile, *pszGDALFormat;
     PyObject *pBandDefnObj;
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssO:spot5ToRadiance", kwlist, &pszInputFile, &pszOutputFile, &pszGDALFormat, &pBandDefnObj))
     {
-        return NULL;
+        return nullptr;
     }
     
     if( !PySequence_Check(pBandDefnObj))
     {
         PyErr_SetString(GETSTATE(self)->error, "Last argument must be a sequence");
-        return NULL;
+        return nullptr;
     }
     
     Py_ssize_t nBandDefns = PySequence_Size(pBandDefnObj);
@@ -1284,37 +1284,37 @@ static PyObject *ImageCalibration_spot5ToRadiance(PyObject *self, PyObject *args
         PyObject *o = PySequence_GetItem(pBandDefnObj, n);
         
         PyObject *pBandName = PyObject_GetAttrString(o, "bandName");
-        if( ( pBandName == NULL ) || ( pBandName == Py_None ) || !RSGISPY_CHECK_STRING(pBandName) )
+        if( ( pBandName == nullptr ) || ( pBandName == Py_None ) || !RSGISPY_CHECK_STRING(pBandName) )
         {
             PyErr_SetString(GETSTATE(self)->error, "Could not find string attribute \'bandName\'" );
             Py_XDECREF(pBandName);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
         
         PyObject *pBandIndex = PyObject_GetAttrString(o, "bandIndex");
-        if( ( pBandIndex == NULL ) || ( pBandIndex == Py_None ) || !RSGISPY_CHECK_INT(pBandIndex) )
+        if( ( pBandIndex == nullptr ) || ( pBandIndex == Py_None ) || !RSGISPY_CHECK_INT(pBandIndex) )
         {
             PyErr_SetString(GETSTATE(self)->error, "Could not find integer attribute \'bandIndex\'" );
             Py_DECREF(pBandName);
             Py_XDECREF(pBandIndex);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
         
         PyObject *pGain = PyObject_GetAttrString(o, "gain");
-        if( ( pGain == NULL ) || ( pGain == Py_None ) || !RSGISPY_CHECK_FLOAT(pGain) )
+        if( ( pGain == nullptr ) || ( pGain == Py_None ) || !RSGISPY_CHECK_FLOAT(pGain) )
         {
             PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'gain\'" );
             Py_DECREF(pBandName);
             Py_XDECREF(pBandIndex);
             Py_XDECREF(pGain);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
         
         PyObject *pBias = PyObject_GetAttrString(o, "bias");
-        if( ( pBias == NULL ) || ( pBias == Py_None ) || !RSGISPY_CHECK_FLOAT(pBias) )
+        if( ( pBias == nullptr ) || ( pBias == Py_None ) || !RSGISPY_CHECK_FLOAT(pBias) )
         {
             PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'bias\'" );
             Py_DECREF(pBandName);
@@ -1322,7 +1322,7 @@ static PyObject *ImageCalibration_spot5ToRadiance(PyObject *self, PyObject *args
             Py_XDECREF(pGain);
             Py_XDECREF(pBias);
             Py_DECREF(o);
-            return NULL;
+            return nullptr;
         }
         
         
@@ -1348,7 +1348,7 @@ static PyObject *ImageCalibration_spot5ToRadiance(PyObject *self, PyObject *args
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -1361,14 +1361,14 @@ static PyObject *ImageCalibration_calcNadirImgViewAngle(PyObject *self, PyObject
                              RSGIS_PY_C_TEXT("min_xx_col"), RSGIS_PY_C_TEXT("min_xy_col"),
                              RSGIS_PY_C_TEXT("max_xx_col"), RSGIS_PY_C_TEXT("max_xy_col"),
                              RSGIS_PY_C_TEXT("min_yx_col"), RSGIS_PY_C_TEXT("min_yy_col"),
-                             RSGIS_PY_C_TEXT("max_yx_col"), RSGIS_PY_C_TEXT("max_yy_col"), NULL};
+                             RSGIS_PY_C_TEXT("max_yx_col"), RSGIS_PY_C_TEXT("max_yy_col"), nullptr};
     const char *pszImgFootprint, *pszOutViewAngleImg, *pszGDALFormat;
     float sateAltitude = 0.0;
     const char *pszMinXXCol, *pszMinXYCol, *pszMaxXXCol, *pszMaxXYCol, *pszMinYXCol, *pszMinYYCol, *pszMaxYXCol, *pszMaxYYCol;
     
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssfssssssss:calcNadirImgViewAngle", kwlist, &pszImgFootprint, &pszOutViewAngleImg, &pszGDALFormat, &sateAltitude, &pszMinXXCol, &pszMinXYCol, &pszMaxXXCol, &pszMaxXYCol, &pszMinYXCol, &pszMinYYCol, &pszMaxYXCol, &pszMaxYYCol))
     {
-        return NULL;
+        return nullptr;
     }
     
     try
@@ -1378,7 +1378,7 @@ static PyObject *ImageCalibration_calcNadirImgViewAngle(PyObject *self, PyObject
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -1391,7 +1391,7 @@ static PyObject *ImageCalibration_CalcIrradianceElevLUT(PyObject *self, PyObject
                              RSGIS_PY_C_TEXT("in_sref_img"), RSGIS_PY_C_TEXT("in_shadow_img"),
                              RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"),
                              RSGIS_PY_C_TEXT("solar_zenith"), RSGIS_PY_C_TEXT("scale_factor"),
-                             RSGIS_PY_C_TEXT("coeff_lut"), NULL};
+                             RSGIS_PY_C_TEXT("coeff_lut"), nullptr};
     const char *pszInputDataMaskImg, *pszInputDEMFile, *pszInputIncidenceAngleImg, *pszInputSlopeImg, *pszSrefInputImage, *pszShadowMaskImg, *pszOutputFile, *pszGDALFormat;
     float solarZenith, reflScaleFactor = 0.0;
     PyObject *pLUTObj;
@@ -1399,13 +1399,13 @@ static PyObject *ImageCalibration_CalcIrradianceElevLUT(PyObject *self, PyObject
                                      &pszInputIncidenceAngleImg, &pszInputSlopeImg, &pszSrefInputImage, &pszShadowMaskImg, &pszOutputFile,
                                      &pszGDALFormat, &solarZenith, &reflScaleFactor, &pLUTObj))
     {
-        return NULL;
+        return nullptr;
     }
     
     if( !PySequence_Check(pLUTObj))
     {
         PyErr_SetString(GETSTATE(self)->error, "Last argument must be a sequence");
-        return NULL;
+        return nullptr;
     }
     
     Py_ssize_t nLUTDefns = PySequence_Size(pLUTObj);
@@ -1418,12 +1418,12 @@ static PyObject *ImageCalibration_CalcIrradianceElevLUT(PyObject *self, PyObject
         rsgis::cmds::Cmds6SElevationLUT lutVal = rsgis::cmds::Cmds6SElevationLUT();
         
         PyObject *pElev = PyObject_GetAttrString(pLUTValuesObj, "Elev");
-        if( ( pElev == NULL ) || ( pElev == Py_None ) || !RSGISPY_CHECK_FLOAT(pElev) )
+        if( ( pElev == nullptr ) || ( pElev == Py_None ) || !RSGISPY_CHECK_FLOAT(pElev) )
         {
             PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'Elev\' for the LUT (make sure it is a float!)" );
             Py_XDECREF(pElev);
             Py_DECREF(pLUTValuesObj);
-            return NULL;
+            return nullptr;
         }
         lutVal.elev = RSGISPY_FLOAT_EXTRACT(pElev);
         Py_DECREF(pElev);
@@ -1433,7 +1433,7 @@ static PyObject *ImageCalibration_CalcIrradianceElevLUT(PyObject *self, PyObject
         if( !PySequence_Check(pBandValuesObj))
         {
             PyErr_SetString(GETSTATE(self)->error, "Each element in the LUT have a sequence \'Coeffs\' be a sequence.");
-            return NULL;
+            return nullptr;
         }
         Py_ssize_t nBandValDefns = PySequence_Size(pBandValuesObj);
         
@@ -1450,37 +1450,37 @@ static PyObject *ImageCalibration_CalcIrradianceElevLUT(PyObject *self, PyObject
         {
             PyObject *o = PySequence_GetItem(pBandValuesObj, m);
             PyObject *pBand = PyObject_GetAttrString(o, "band");
-            if( ( pBand == NULL ) || ( pBand == Py_None ) || !RSGISPY_CHECK_INT(pBand) )
+            if( ( pBand == nullptr ) || ( pBand == Py_None ) || !RSGISPY_CHECK_INT(pBand) )
             {
                 PyErr_SetString(GETSTATE(self)->error, "Could not find int attribute \'band\'" );
                 Py_XDECREF(pBand);
                 Py_DECREF(o);
-                return NULL;
+                return nullptr;
             }
             
             PyObject *pDirIrr = PyObject_GetAttrString(o, "DirIrr");
-            if( ( pDirIrr == NULL ) || ( pDirIrr == Py_None ) || !RSGISPY_CHECK_FLOAT(pDirIrr) )
+            if( ( pDirIrr == nullptr ) || ( pDirIrr == Py_None ) || !RSGISPY_CHECK_FLOAT(pDirIrr) )
             {
                 PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'DirIrr\'" );
                 Py_XDECREF(pBand);
                 Py_XDECREF(pDirIrr);
                 Py_DECREF(o);
-                return NULL;
+                return nullptr;
             }
             
             PyObject *pDifIrr = PyObject_GetAttrString(o, "DifIrr");
-            if( ( pDifIrr == NULL ) || ( pDifIrr == Py_None ) || !RSGISPY_CHECK_FLOAT(pDifIrr) )
+            if( ( pDifIrr == nullptr ) || ( pDifIrr == Py_None ) || !RSGISPY_CHECK_FLOAT(pDifIrr) )
             {
                 PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'DifIrr\'" );
                 Py_XDECREF(pBand);
                 Py_XDECREF(pDirIrr);
                 Py_XDECREF(pDifIrr);
                 Py_DECREF(o);
-                return NULL;
+                return nullptr;
             }
             
             PyObject *pEnvIrr = PyObject_GetAttrString(o, "EnvIrr");
-            if( ( pEnvIrr == NULL ) || ( pEnvIrr == Py_None ) || !RSGISPY_CHECK_FLOAT(pEnvIrr) )
+            if( ( pEnvIrr == nullptr ) || ( pEnvIrr == Py_None ) || !RSGISPY_CHECK_FLOAT(pEnvIrr) )
             {
                 PyErr_SetString(GETSTATE(self)->error, "Could not find float attribute \'EnvIrr\'" );
                 Py_XDECREF(pBand);
@@ -1488,7 +1488,7 @@ static PyObject *ImageCalibration_CalcIrradianceElevLUT(PyObject *self, PyObject
                 Py_XDECREF(pDifIrr);
                 Py_XDECREF(pEnvIrr);
                 Py_DECREF(o);
-                return NULL;
+                return nullptr;
             }
             
             lutVal.imageBands[m] = RSGISPY_INT_EXTRACT(pBand);
@@ -1520,7 +1520,7 @@ static PyObject *ImageCalibration_CalcIrradianceElevLUT(PyObject *self, PyObject
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     for(std::vector<rsgis::cmds::Cmds6SElevationLUT>::iterator iterLUT = elevLUT->begin(); iterLUT != elevLUT->end(); ++iterLUT)
@@ -1545,7 +1545,7 @@ static PyObject *ImageCalibration_CalcStandardisedReflectanceSD2010(PyObject *se
                              RSGIS_PY_C_TEXT("in_exit_angle_img"), RSGIS_PY_C_TEXT("output_img"),
                              RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("scale_factor"),
                              RSGIS_PY_C_TEXT("brdf_beta"), RSGIS_PY_C_TEXT("out_inc_angle"),
-                             RSGIS_PY_C_TEXT("out_exit_angle"), NULL};
+                             RSGIS_PY_C_TEXT("out_exit_angle"), nullptr};
     const char *pszInputDataMaskImg, *pszSrefInputImage, *pszInputSolarIrradiance, *pszInputIncidenceAngleImg, *pszInputExitanceAngleImg, *pszOutputFile, *pszGDALFormat;
     float reflScaleFactor = 1.0;
     float brdfBeta = 1.0;
@@ -1556,7 +1556,7 @@ static PyObject *ImageCalibration_CalcStandardisedReflectanceSD2010(PyObject *se
                                      &pszInputSolarIrradiance, &pszInputIncidenceAngleImg, &pszInputExitanceAngleImg, &pszOutputFile,
                                      &pszGDALFormat, &reflScaleFactor, &brdfBeta, &outIncidenceAngle, &outExitanceAngle))
     {
-        return NULL;
+        return nullptr;
     }
     
     try
@@ -1566,7 +1566,7 @@ static PyObject *ImageCalibration_CalcStandardisedReflectanceSD2010(PyObject *se
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -1574,11 +1574,11 @@ static PyObject *ImageCalibration_CalcStandardisedReflectanceSD2010(PyObject *se
 
 static PyObject *ImageCalibration_GetJulianDay(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    static char *kwlist[] = {RSGIS_PY_C_TEXT("year"), RSGIS_PY_C_TEXT("month"), RSGIS_PY_C_TEXT("day"),  NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("year"), RSGIS_PY_C_TEXT("month"), RSGIS_PY_C_TEXT("day"),  nullptr};
     unsigned int year, month, day;
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "III:getJulianDay", kwlist, &year, &month, &day))
     {
-        return NULL;
+        return nullptr;
     }
     
     unsigned int julianDay = 0;
@@ -1589,7 +1589,7 @@ static PyObject *ImageCalibration_GetJulianDay(PyObject *self, PyObject *args, P
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     return Py_BuildValue("I", julianDay);
@@ -1597,11 +1597,11 @@ static PyObject *ImageCalibration_GetJulianDay(PyObject *self, PyObject *args, P
 
 static PyObject *ImageCalibration_CalcSolarDistance(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    static char *kwlist[] = {RSGIS_PY_C_TEXT("julian_day"),  NULL};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("julian_day"),  nullptr};
     unsigned int julianDay;
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "I:calcSolarDistance", kwlist, &julianDay))
     {
-        return NULL;
+        return nullptr;
     }
     
     float solarDistance = 0;
@@ -1612,7 +1612,7 @@ static PyObject *ImageCalibration_CalcSolarDistance(PyObject *self, PyObject *ar
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     return Py_BuildValue("f", solarDistance);
@@ -1627,7 +1627,7 @@ static PyObject *ImageCalibration_calcCloudShadowMask(PyObject *self, PyObject *
                              RSGIS_PY_C_TEXT("scale_factor"), RSGIS_PY_C_TEXT("tmp_img_base"),
                              RSGIS_PY_C_TEXT("tmp_img_ext"), RSGIS_PY_C_TEXT("solar_azimuth"),
                              RSGIS_PY_C_TEXT("solar_zenith"), RSGIS_PY_C_TEXT("sensor_azimuth"),
-                             RSGIS_PY_C_TEXT("sensor_zenith"),  RSGIS_PY_C_TEXT("rm_tmp_imgs"), NULL};
+                             RSGIS_PY_C_TEXT("sensor_zenith"),  RSGIS_PY_C_TEXT("rm_tmp_imgs"), nullptr};
 
     const char *pszInputReflFile, *pszInputCloudMaskFile, *pszValidAreaImg, *pszOutputFile, *pszTmpImgsBase, *pszTmpImgsFileExt, *pszGDALFormat;
     float sunAz, sunZen, senAz, senZen = 0.0;
@@ -1640,7 +1640,7 @@ static PyObject *ImageCalibration_calcCloudShadowMask(PyObject *self, PyObject *
                                      &pszValidAreaImg, &pszOutputFile, &darkImgBand, &pszGDALFormat, &scaleFactor, &pszTmpImgsBase,
                                      &pszTmpImgsFileExt, &sunAz, &sunZen, &senAz, &senZen, &rmTmpImages))
     {
-        return NULL;
+        return nullptr;
     }
     
     try
@@ -1651,7 +1651,7 @@ static PyObject *ImageCalibration_calcCloudShadowMask(PyObject *self, PyObject *
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -2006,7 +2006,7 @@ static PyMethodDef ImageCalibrationMethods[] = {
 "\n"
 },
     
-    {NULL}        /* Sentinel */
+    {nullptr}        /* Sentinel */
 };
 
 #if PY_MAJOR_VERSION >= 3
@@ -2026,16 +2026,16 @@ static int ImageCalibration_clear(PyObject *m)
 static struct PyModuleDef moduledef = {
         PyModuleDef_HEAD_INIT,
         "_imagecalibration",
-        NULL,
+        nullptr,
         sizeof(struct ImageCalibrationState),
         ImageCalibrationMethods,
-        NULL,
+        nullptr,
         ImageCalibration_traverse,
         ImageCalibration_clear,
-        NULL
+        nullptr
 };
 
-#define INITERROR return NULL
+#define INITERROR return nullptr
 
 PyMODINIT_FUNC 
 PyInit__imagecalibration(void)
@@ -2052,14 +2052,14 @@ init_imagecalibration(void)
 #else
     PyObject *pModule = Py_InitModule("_imagecalibration", ImageCalibrationMethods);
 #endif
-    if( pModule == NULL )
+    if( pModule == nullptr )
         INITERROR;
 
     struct ImageCalibrationState *state = GETSTATE(pModule);
 
     // Create and add our exception type
-    state->error = PyErr_NewException("_imagecalibration.error", NULL, NULL);
-    if( state->error == NULL )
+    state->error = PyErr_NewException("_imagecalibration.error", nullptr, nullptr);
+    if( state->error == nullptr )
     {
         Py_DECREF(pModule);
         INITERROR;

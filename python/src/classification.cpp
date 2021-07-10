@@ -42,13 +42,13 @@ static PyObject *Classification_CollapseClasses(PyObject *self, PyObject *args, 
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
                              RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("class_col"),
-                             RSGIS_PY_C_TEXT("class_int_col"), NULL};
+                             RSGIS_PY_C_TEXT("class_int_col"), nullptr};
     const char *pszInputImage, *pszOutputFile, *pszGDALFormat, *pszClassesColumn;
     PyObject *pClassIntCol = Py_None;
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssss|O:collapseClasses", kwlist, &pszInputImage, &pszOutputFile,
                                      &pszGDALFormat, &pszClassesColumn, &pClassIntCol))
     {
-        return NULL;
+        return nullptr;
     }
     
     bool classIntColPresent = false;
@@ -69,7 +69,7 @@ static PyObject *Classification_CollapseClasses(PyObject *self, PyObject *args, 
         else
         {
             PyErr_SetString(GETSTATE(self)->error, "ClassIntCol name must be a string if provided.\n");
-            return NULL;
+            return nullptr;
         }
     }
     
@@ -82,7 +82,7 @@ static PyObject *Classification_CollapseClasses(PyObject *self, PyObject *args, 
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
 
     Py_RETURN_NONE;
@@ -91,11 +91,11 @@ static PyObject *Classification_CollapseClasses(PyObject *self, PyObject *args, 
 static PyObject *Classification_Colour3Bands(PyObject *self, PyObject *args, PyObject *keywds)
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
-                             RSGIS_PY_C_TEXT("gdalformat"), NULL};
+                             RSGIS_PY_C_TEXT("gdalformat"), nullptr};
     const char *pszInputImage, *pszOutputFile, *pszGDALFormat;
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "sss:colour3Band", kwlist, &pszInputImage, &pszOutputFile, &pszGDALFormat))
     {
-        return NULL;
+        return nullptr;
     }
     
     try
@@ -106,7 +106,7 @@ static PyObject *Classification_Colour3Bands(PyObject *self, PyObject *args, PyO
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -118,7 +118,7 @@ static PyObject *Classification_GenRandomAccuracyPts(PyObject *self, PyObject *a
                              RSGIS_PY_C_TEXT("out_vec_lyr"), RSGIS_PY_C_TEXT("out_format"),
                              RSGIS_PY_C_TEXT("rat_class_col"), RSGIS_PY_C_TEXT("vec_class_col"),
                              RSGIS_PY_C_TEXT("vec_ref_col"), RSGIS_PY_C_TEXT("num_pts"),
-                             RSGIS_PY_C_TEXT("seed"), RSGIS_PY_C_TEXT("del_exist_vec"), NULL};
+                             RSGIS_PY_C_TEXT("seed"), RSGIS_PY_C_TEXT("del_exist_vec"), nullptr};
     const char *pszInputImage, *pszOutputVecFile, *pszOutputVecLyr, *pszFormat, *pszClassImgCol, *pszClassImgVecCol, *pszClassRefVecCol;
     int numPts;
     int del_exist_vec = false;
@@ -128,7 +128,7 @@ static PyObject *Classification_GenRandomAccuracyPts(PyObject *self, PyObject *a
                                      &pszOutputVecFile, &pszOutputVecLyr, &pszFormat, &pszClassImgCol, &pszClassImgVecCol,
                                      &pszClassRefVecCol, &numPts, &seed, &del_exist_vec))
     {
-        return NULL;
+        return nullptr;
     }
     
     try
@@ -141,7 +141,7 @@ static PyObject *Classification_GenRandomAccuracyPts(PyObject *self, PyObject *a
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -154,7 +154,7 @@ static PyObject *Classification_GenStratifiedRandomAccuracyPts(PyObject *self, P
                              RSGIS_PY_C_TEXT("rat_class_col"), RSGIS_PY_C_TEXT("vec_class_col"),
                              RSGIS_PY_C_TEXT("vec_ref_col"), RSGIS_PY_C_TEXT("num_pts"),
                              RSGIS_PY_C_TEXT("seed"), RSGIS_PY_C_TEXT("del_exist_vec"),
-                             RSGIS_PY_C_TEXT("use_pxl_lst"), NULL};
+                             RSGIS_PY_C_TEXT("use_pxl_lst"), nullptr};
     const char *pszInputImage, *pszOutputVecFile, *pszOutputVecLyr, *pszFormat, *pszClassImgCol, *pszClassImgVecCol, *pszClassRefVecCol;
     int numPts;
     int del_exist_vec = false;
@@ -165,7 +165,7 @@ static PyObject *Classification_GenStratifiedRandomAccuracyPts(PyObject *self, P
                                      &pszOutputVecFile, &pszOutputVecLyr, &pszFormat, &pszClassImgCol, &pszClassImgVecCol,
                                      &pszClassRefVecCol, &numPts, &seed, &del_exist_vec, &usePxlLst))
     {
-        return NULL;
+        return nullptr;
     }
     
     try
@@ -179,7 +179,7 @@ static PyObject *Classification_GenStratifiedRandomAccuracyPts(PyObject *self, P
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -189,14 +189,14 @@ static PyObject *Classification_PopClassInfoAccuracyPts(PyObject *self, PyObject
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("vec_file"),
                              RSGIS_PY_C_TEXT("vec_lyr"), RSGIS_PY_C_TEXT("rat_class_col"),
-                             RSGIS_PY_C_TEXT("vec_class_col"), RSGIS_PY_C_TEXT("vec_ref_col"), NULL};
+                             RSGIS_PY_C_TEXT("vec_class_col"), RSGIS_PY_C_TEXT("vec_ref_col"), nullptr};
     const char *pszInputImage, *pszVecFile, *pszVecLyr, *pszClassImgCol, *pszClassImgVecCol;
     PyObject *classRefVecColObj;
     
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssss|O:popClassInfoAccuracyPts", kwlist, &pszInputImage, &pszVecFile,
                                      &pszVecLyr, &pszClassImgCol, &pszClassImgVecCol, &classRefVecColObj))
     {
-        return NULL;
+        return nullptr;
     }
     
     bool addRefCol = false;
@@ -218,7 +218,7 @@ static PyObject *Classification_PopClassInfoAccuracyPts(PyObject *self, PyObject
     catch(rsgis::cmds::RSGISCmdException &e)
     {
         PyErr_SetString(GETSTATE(self)->error, e.what());
-        return NULL;
+        return nullptr;
     }
     
     Py_RETURN_NONE;
@@ -298,7 +298,7 @@ static PyMethodDef ClassificationMethods[] = {
 ":param classRefVecCol: is an optional string specifiying an output column in the shapefile which can be used in the accuracy assessment for the reference data.\n"
 },
 
-    {NULL}        /* Sentinel */
+    {nullptr}        /* Sentinel */
 };
 
 
@@ -319,16 +319,16 @@ static int Classification_clear(PyObject *m)
 static struct PyModuleDef moduledef = {
         PyModuleDef_HEAD_INIT,
         "_classification",
-        NULL,
+        nullptr,
         sizeof(struct ClassificationState),
         ClassificationMethods,
-        NULL,
+        nullptr,
         Classification_traverse,
         Classification_clear,
-        NULL
+        nullptr
 };
 
-#define INITERROR return NULL
+#define INITERROR return nullptr
 
 PyMODINIT_FUNC 
 PyInit__classification(void)
@@ -345,14 +345,14 @@ init_classification(void)
 #else
     PyObject *pModule = Py_InitModule("_classification", ClassificationMethods);
 #endif
-    if( pModule == NULL )
+    if( pModule == nullptr )
         INITERROR;
 
     struct ClassificationState *state = GETSTATE(pModule);
 
     // Create and add our exception type
-    state->error = PyErr_NewException("_classification.error", NULL, NULL);
-    if( state->error == NULL )
+    state->error = PyErr_NewException("_classification.error", nullptr, nullptr);
+    if( state->error == nullptr )
     {
         Py_DECREF(pModule);
         INITERROR;
