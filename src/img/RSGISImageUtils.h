@@ -187,6 +187,7 @@ namespace rsgis
                 void zerosUIntGDALDataset(GDALDataset *data);
                 void zerosFloatGDALDataset(GDALDataset *data);
                 void zerosByteGDALDataset(GDALDataset *data);
+                void defineImageEdge(GDALDataset *data, unsigned int nEdgePxls, unsigned int outEdgeVal=1,  unsigned int outInnerVal=0);
                 void assignValGDALDataset(GDALDataset *data, float value);
                 GDALDataset* createCopy(GDALDataset *inData, std::string outputFilePath, std::string outputFormat, GDALDataType eType, bool useImgProj=true, std::string proj="");
                 GDALDataset* createCopy(GDALDataset *inData, unsigned int numBands, std::string outputFilePath, std::string outputFormat, GDALDataType eType, bool useImgProj=true, std::string proj="");

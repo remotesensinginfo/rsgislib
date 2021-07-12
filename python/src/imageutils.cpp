@@ -1507,6 +1507,33 @@ static PyObject *ImageUtils_GenValidMask(PyObject *self, PyObject *args, PyObjec
     Py_RETURN_NONE;
 }
 
+static PyObject *ImageUtils_GenImageEdgeMask(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
+                             RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("n_edge_pxls"), nullptr};
+    const char *pInputImage = "";
+    const char *pszOutputImage = "";
+    const char *pszGDALFormat = "";
+    unsigned int nEdgePixels = 0.0;
+
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssI:genImageEdgeMask", kwlist, &pInputImage, &pszOutputImage, &pszGDALFormat, &nEdgePixels))
+    {
+        return nullptr;
+    }
+
+    try
+    {
+        rsgis::cmds::executeImageEdgeMask(std::string(pInputImage), std::string(pszOutputImage), std::string(pszGDALFormat), nEdgePixels);
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return nullptr;
+    }
+
+    Py_RETURN_NONE;
+}
+
 static PyObject *ImageUtils_CombineImages2Band(PyObject *self, PyObject *args, PyObject *keywds)
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_imgs"), RSGIS_PY_C_TEXT("output_imgs"), RSGIS_PY_C_TEXT("gdalformat"),
@@ -2915,6 +2942,21 @@ For example, can be used to produce monthly composite images from a stack with i
 "   outputImage = './injune_p142_casi_sub_utm.kea'\n"
 "   imageutils.genValidMask(inputImage, outputImage, \'KEA\', 0.0)\n"
 "\n"},
+
+{"genImageEdgeMask", (PyCFunction)ImageUtils_GenImageEdgeMask, METH_VARARGS | METH_KEYWORDS,
+"rsgislib.imageutils.genImageEdgeMask(input_img=string, output_img=string, gdalformat=string, n_edge_pxls=int)\n"
+"Generate a binary image mask defining the edges of the pixel. The n_edge_pxls parameter specifies the \n"
+" number of pixels from the edge of the input image which will be provided as the output mask.\n"
+"\n"
+"Where:\n"
+"\n"
+":param input_img: the input image\n"
+":param output_img: is a string containing the name of the output file.\n"
+":param gdalformat: is a string with the GDAL output file format.\n"
+":param n_edge_pxls: is int specifying the number of pixels from the edge to create the mask for.\n"
+"\n"
+"\n"},
+
    
 {"combineImages2Band", (PyCFunction)ImageUtils_CombineImages2Band, METH_VARARGS | METH_KEYWORDS,
 "rsgislib.imageutils.combineImages2Band(inimages=list, outimage=string, gdalformat=string, datatype=int, nodata=float)\n"

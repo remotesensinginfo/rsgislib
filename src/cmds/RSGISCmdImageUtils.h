@@ -191,7 +191,10 @@ namespace rsgis{ namespace cmds {
         
     /** A function to produce a binary image for valid regions within all the input images (i.e., not the no data value) */
     DllExport void executeValidImageMask(std::vector<std::string> inputImages, std::string outputImage, std::string gdalFormat, float noDataVal=0.0);
-    
+
+    /** A function to produce a binary mask with the edge pixels of the input image identified */
+    DllExport void executeImageEdgeMask(std::string inputImage, std::string outputImage, std::string gdalFormat, unsigned int nEdgePxls);
+
     /** A function to combine images together into a single image band by excluding the no data value */
     DllExport void executeCombineImagesSingleBandIgnoreNoData(std::vector<std::string> inputImages, std::string outputImage, float noDataVal, std::string gdalFormat, RSGISLibDataType outDataType);
     

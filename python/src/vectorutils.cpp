@@ -63,36 +63,6 @@ static std::vector<std::string> ExtractStringVectorFromSequence(PyObject *sequen
 }
 */
 
-static PyObject *VectorUtils_PopulateGeomZField(PyObject *self, PyObject *args, PyObject *keywds)
-{
-    static char *kwlist[] = {RSGIS_PY_C_TEXT("vec_file"), RSGIS_PY_C_TEXT("vec_lyr"), RSGIS_PY_C_TEXT("input_img"),
-                             RSGIS_PY_C_TEXT("img_band"), RSGIS_PY_C_TEXT("out_vec_file"), RSGIS_PY_C_TEXT("out_vec_lyr"),
-                             RSGIS_PY_C_TEXT("out_format"), RSGIS_PY_C_TEXT("del_exist_vec"), nullptr};
-
-    const char *pszInputVectorFile, *pszInputVectorLyr, *pszInputImage, *pszOutputVectorFile, *pszOutputVectorLyr, *pszOutFormat;
-    int delExistVec = false;
-    unsigned int imgBand;
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssIsss|i:populateGeomZField", kwlist, &pszInputVectorFile, &pszInputVectorLyr,
-                                     &pszInputImage, &imgBand, &pszOutputVectorFile, &pszOutputVectorLyr, &pszOutFormat, &delExistVec))
-    {
-        return nullptr;
-    }
-    
-    try
-    {
-        rsgis::cmds::executePopulateGeomZField(std::string(pszInputVectorFile), std::string(pszInputVectorLyr),
-                                               std::string(pszInputImage), imgBand, std::string(pszOutputVectorFile),
-                                               std::string(pszOutputVectorLyr), std::string(pszOutFormat), delExistVec);
-    }
-    catch(rsgis::cmds::RSGISCmdException &e)
-    {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return nullptr;
-    }
-    
-    Py_RETURN_NONE;
-}
-
 static PyObject *VectorUtils_VectorMaths(PyObject *self, PyObject *args, PyObject *keywds)
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("vec_file"), RSGIS_PY_C_TEXT("vec_lyr"),
@@ -238,29 +208,6 @@ static PyObject *VectorUtils_CheckValidateGeometries(PyObject *self, PyObject *a
 
 // Our list of functions in this module
 static PyMethodDef VectorUtilsMethods[] = {
-
-{"populateGeomZField", (PyCFunction)VectorUtils_PopulateGeomZField, METH_VARARGS | METH_KEYWORDS,
-"vectorutils.populateGeomZField(InputVector, InputImage, imgBand, OutputVector, force)\n"
-"A command to populate the z field within the vector file making it a 3D vector rather \n"
-"than just a 2d file.\n\n"
-"Where:\n"
-"\n"
-":param InputVector: is a string containing the name of the input vector\n"
-":param InputImage: is a string containing the name of the image (DEM) image\n"
-":param imgBand: is an unsigned int specifying the image band in the image file to be used (note image bands indexes start at 1)\n"
-":param OutputVector: is a string containing the name of the output vector file\n"
-":param force: is a bool, specifying whether to force removal of the output vector if it exists\n"
-"\n"
-"Example::\n"
-"\n"
-"    import rsgislib.vectorutils\n"
-"    inputVector = './Polys2D.shp'\n"
-"    inputImage = './SRTM_90m.kea'\n"
-"    imgBand = 1\n"
-"    outputVector = './Polys3D.shp'\n"
-"    force = True\n"
-"    rsgislib.vectorutils.populateGeomZField(inputVector, inputImage, imgBand, outputVector, force)\n"
-"\n"},
 
 {"vectorMaths", (PyCFunction)VectorUtils_VectorMaths, METH_VARARGS | METH_KEYWORDS,
 "vectorutils.vectorMaths(inputVector, outputVector, outputColName, expression, variables, force)\n"

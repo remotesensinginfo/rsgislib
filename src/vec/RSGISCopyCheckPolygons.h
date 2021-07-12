@@ -32,7 +32,7 @@
 
 #include "common/rsgis-tqdm.h"
 #include "common/RSGISVectorException.h"
-
+#include "vec/RSGISVectorOutputException.h"
 #include "vec/RSGISVectorUtils.h"
 
 // mark all exported classes/functions with DllExport to have

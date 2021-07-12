@@ -4865,6 +4865,79 @@ namespace rsgis{namespace img{
             throw e;
         }
     }
+
+    void RSGISImageUtils::defineImageEdge(GDALDataset *data, unsigned int nEdgePxls, unsigned int outEdgeVal, unsigned int outInnerVal)
+    {
+        try
+        {
+            unsigned long xSize = data->GetRasterXSize();
+            unsigned long ySize = data->GetRasterYSize();
+            int xBlockSize = 0;
+            int yBlockSize = 0;
+
+            GDALRasterBand *rasterBand = data->GetRasterBand(1);
+            rasterBand->GetBlockSize(&xBlockSize, &yBlockSize);
+
+            // Define all the pixels to the inner value.
+            // Allocate memory
+            int *dataVals = new int[xSize*yBlockSize];
+
+            for(unsigned int i = 0; i < (xSize*yBlockSize); ++i)
+            {
+                dataVals[i] = outInnerVal;
+            }
+
+            int nYBlocks = ySize / yBlockSize;
+            int remainRows = ySize - (nYBlocks * yBlockSize);
+            int rowOffset = 0;
+
+            rsgis_tqdm pbar;
+            // Loop images to process data
+            for(int i = 0; i < nYBlocks; i++)
+            {
+                pbar.progress(i, nYBlocks);
+
+                rowOffset = yBlockSize * i;
+                rasterBand->RasterIO(GF_Write, 0, rowOffset, xSize, yBlockSize, dataVals, xSize, yBlockSize, GDT_UInt32, 0, 0);
+            }
+
+            if(remainRows > 0)
+            {
+                rowOffset = (yBlockSize * nYBlocks);
+                rasterBand->RasterIO(GF_Write, 0, rowOffset, xSize, remainRows, dataVals, xSize, remainRows, GDT_UInt32, 0, 0);
+            }
+            pbar.finish();
+            delete[] dataVals;
+
+            // Define the outer top and bottom edges:
+            // Allocate memory and define the
+            dataVals = new int[xSize*nEdgePxls];
+            for(unsigned int i = 0; i < (xSize*nEdgePxls); ++i)
+            {
+                dataVals[i] = outEdgeVal;
+            }
+            rasterBand->RasterIO(GF_Write, 0, 0, xSize, nEdgePxls, dataVals, xSize, nEdgePxls, GDT_UInt32, 0, 0);
+            rasterBand->RasterIO(GF_Write, 0, ySize-nEdgePxls, xSize, nEdgePxls, dataVals, xSize, nEdgePxls, GDT_UInt32, 0, 0);
+            delete[] dataVals;
+
+            // Define the outer top and bottom edges:
+            // Allocate memory and define the
+            dataVals = new int[nEdgePxls*ySize];
+            for(unsigned int i = 0; i < (nEdgePxls*ySize); ++i)
+            {
+                dataVals[i] = outEdgeVal;
+            }
+            rasterBand->RasterIO(GF_Write, 0, 0, nEdgePxls, ySize, dataVals, nEdgePxls, ySize, GDT_UInt32, 0, 0);
+            rasterBand->RasterIO(GF_Write, xSize-nEdgePxls, 0, nEdgePxls, ySize, dataVals, nEdgePxls, ySize, GDT_UInt32, 0, 0);
+           delete[] dataVals;
+
+        }
+        catch(RSGISImageException &e)
+        {
+            throw e;
+        }
+    }
+
     
     void RSGISImageUtils::assignValGDALDataset(GDALDataset *data, float value)
     {
@@ -5470,7 +5543,6 @@ namespace rsgis{namespace img{
     
     void RSGISImageUtils::createImageGrid(GDALDataset *inData, unsigned int numXPxls, unsigned int numYPxls, bool offset)
     {
-        //std::cerr << "WARNING: RSGISImageUtils::createImageGrid shouldn't be used; use rsgis::segment::RSGISCreateImageGrid\n";
         try
         {
             unsigned long width = inData->GetRasterXSize();

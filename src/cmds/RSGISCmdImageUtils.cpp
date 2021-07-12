@@ -2144,7 +2144,41 @@ namespace rsgis{ namespace cmds {
             throw RSGISCmdException(e.what());
         }
     }
-            
+
+
+    void executeImageEdgeMask(std::string inputImage, std::string outputImage, std::string gdalFormat, unsigned int nEdgePxls)
+    {
+        try
+        {
+            GDALAllRegister();
+            GDALDataset *dataset = (GDALDataset *) GDALOpen(inputImage.c_str(), GA_ReadOnly);
+            rsgis::img::RSGISMaskImage maskImg;
+            maskImg.genImgEdgeMask(dataset, outputImage, gdalFormat, nEdgePxls);
+            GDALDataset *outDataset = (GDALDataset *) GDALOpen(outputImage.c_str(), GA_Update);
+            if(outDataset == NULL)
+            {
+                std::string message = std::string("Could not open image ") + outputImage;
+                throw RSGISImageException(message.c_str());
+            }
+            outDataset->GetRasterBand(1)->SetMetadataItem("LAYER_TYPE", "thematic");
+
+            GDALClose(outDataset);
+            GDALClose(dataset);
+        }
+        catch (RSGISImageException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch (RSGISException& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+        catch(std::exception& e)
+        {
+            throw RSGISCmdException(e.what());
+        }
+    }
+
     void executeCombineImagesSingleBandIgnoreNoData(std::vector<std::string> inputImages, std::string outputImage, float noDataVal, std::string gdalFormat, RSGISLibDataType outDataType) 
     {
         try

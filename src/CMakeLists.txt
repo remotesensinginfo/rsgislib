@@ -294,17 +294,11 @@ set(LIB_FILTERING_CPP
 set(LIB_IMG_H
 	${RSGIS_SRC_IMG_DIR}/RSGISImageBandException.h 
 	${RSGIS_SRC_IMG_DIR}/RSGISImageCalcException.h 
-	${RSGIS_SRC_IMG_DIR}/RSGISParseColourException.h 
-	${RSGIS_SRC_IMG_DIR}/RSGISFFTException.h 
-	${RSGIS_SRC_IMG_DIR}/RSGISProjectionStrings.h 
-	${RSGIS_SRC_IMG_DIR}/RSGISCalcImageValue.h  
+	${RSGIS_SRC_IMG_DIR}/RSGISCalcImageValue.h
 	${RSGIS_SRC_IMG_DIR}/RSGISCalcImageSingleValue.h 
 	${RSGIS_SRC_IMG_DIR}/RSGISImageUtils.h 
 	${RSGIS_SRC_IMG_DIR}/RSGISCalcImage.h 
-	${RSGIS_SRC_IMG_DIR}/RSGISCalcImageSingle.h 
-	${RSGIS_SRC_IMG_DIR}/RSGISDarkTargetIdentification.h 
-	${RSGIS_SRC_IMG_DIR}/RSGISImageInterpolator.h 
-	${RSGIS_SRC_IMG_DIR}/RSGISImageInterpolation.h 
+	${RSGIS_SRC_IMG_DIR}/RSGISCalcImageSingle.h
 	${RSGIS_SRC_IMG_DIR}/RSGISAddBands.h 
 	${RSGIS_SRC_IMG_DIR}/RSGISAddNoise.h 
 	${RSGIS_SRC_IMG_DIR}/RSGISApplyEigenvectors.h 
@@ -319,35 +313,23 @@ set(LIB_IMG_H
 	${RSGIS_SRC_IMG_DIR}/RSGISMeanVector.h 
 	${RSGIS_SRC_IMG_DIR}/RSGISPolygonPixelCount.h 
 	${RSGIS_SRC_IMG_DIR}/RSGISPopulateMatrix.h 
-	${RSGIS_SRC_IMG_DIR}/RSGISColourUpImage.h 
-	${RSGIS_SRC_IMG_DIR}/RSGISCopyImage.h 
+	${RSGIS_SRC_IMG_DIR}/RSGISCopyImage.h
 	${RSGIS_SRC_IMG_DIR}/RSGISCopyImageBands.h 
 	${RSGIS_SRC_IMG_DIR}/RSGISStandardiseImage.h 
-	${RSGIS_SRC_IMG_DIR}/RSGISFFTProcessing.h  
-	${RSGIS_SRC_IMG_DIR}/RSGISImageCalcValueBaysianNoPrior.h 
+	${RSGIS_SRC_IMG_DIR}/RSGISImageCalcValueBaysianNoPrior.h
 	${RSGIS_SRC_IMG_DIR}/RSGISImageCalcValueBaysianPrior.h 
-	${RSGIS_SRC_IMG_DIR}/RSGISCreateTestImages.h 
-	${RSGIS_SRC_IMG_DIR}/RSGISImageBand2Matrix.h 
-	${RSGIS_SRC_IMG_DIR}/RSGISDefiniensCSVRasterise.h 
-	${RSGIS_SRC_IMG_DIR}/RSGISExport2DScatterPTxt.h 
-	${RSGIS_SRC_IMG_DIR}/RSGISCreatePixelPolygons.h 
+	${RSGIS_SRC_IMG_DIR}/RSGISImageBand2Matrix.h
+	${RSGIS_SRC_IMG_DIR}/RSGISCreatePixelPolygons.h
 	${RSGIS_SRC_IMG_DIR}/RSGISSavitzkyGolaySmoothingFilters.h 
 	${RSGIS_SRC_IMG_DIR}/RSGISConvertSpectralToUnitArea.h 
-	${RSGIS_SRC_IMG_DIR}/RSGISReplaceValuesLessThanGivenValue.h 
-	${RSGIS_SRC_IMG_DIR}/RSGISPixelInPoly.h 
+	${RSGIS_SRC_IMG_DIR}/RSGISPixelInPoly.h
 	${RSGIS_SRC_IMG_DIR}/RSGISImageMaths.h 
 	${RSGIS_SRC_IMG_DIR}/RSGISCumulativeArea.h 
 	${RSGIS_SRC_IMG_DIR}/RSGISStretchImage.h 
-	${RSGIS_SRC_IMG_DIR}/RSGISColourUsingHue.h 
-	${RSGIS_SRC_IMG_DIR}/RSGISCalculateImageMovementSpeed.h 
-	${RSGIS_SRC_IMG_DIR}/RSGISCountValsAboveThresInCol.h 
+	${RSGIS_SRC_IMG_DIR}/RSGISCountValsAboveThresInCol.h
 	${RSGIS_SRC_IMG_DIR}/RSGISCalcRMSE.h 
-	${RSGIS_SRC_IMG_DIR}/RSGISApplyFunction.h 
-	${RSGIS_SRC_IMG_DIR}/RSGISGenerateImageFromXYZData.h 
-	${RSGIS_SRC_IMG_DIR}/RSGISExtractImagePixelsInPolygon.h 
+	${RSGIS_SRC_IMG_DIR}/RSGISExtractImagePixelsInPolygon.h
 	${RSGIS_SRC_IMG_DIR}/RSGISPanSharpen.h 
-	${RSGIS_SRC_IMG_DIR}/RSGISCalcImgAlongsideOut.h 
-	${RSGIS_SRC_IMG_DIR}/RSGISClumpImage.h 
 	${RSGIS_SRC_IMG_DIR}/RSGISLinearSpectralUnmixing.h
 	${RSGIS_SRC_IMG_DIR}/RSGISImageClustering.h
 	${RSGIS_SRC_IMG_DIR}/RSGISImageComposite.h
@@ -509,7 +491,6 @@ set(LIB_MATH_H
 	${RSGIS_SRC_MATH_DIR}/RSGISClustering.h 
 	${RSGIS_SRC_MATH_DIR}/RSGISMaximumLikelihood.h
 	${RSGIS_SRC_MATH_DIR}/RSGISMaximumLikelihoodException.h
-	${RSGIS_SRC_MATH_DIR}/RSGIS2DInterpolation.h
 	${RSGIS_SRC_MATH_DIR}/RSGISLogicExpEvaluation.h
 	${RSGIS_SRC_MATH_DIR}/RSGISDistMetrics.h
 	${RSGIS_SRC_MATH_DIR}/RSGISFitGaussianMixModel.h
@@ -602,7 +583,6 @@ set(LIB_RASTERGIS_H
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindChangeClumps.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISFindInfoBetweenLayers.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISClumpBorders.h
-	${RSGIS_SRC_RASTERGIS_DIR}/RSGISInterpolateClumpValues2Image.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISCalcNeighbourStats.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISClumpRegionGrowing.h
 	${RSGIS_SRC_RASTERGIS_DIR}/RSGISBinaryClassifyClumps.h
@@ -669,18 +649,12 @@ set(LIB_RASTERGIS_CPP
 ###############################################################################
 # Files within the registration Library.
 set(LIB_REGISTRATION_H
-	${RSGIS_SRC_REGISTRATION_DIR}/RSGISImageWarpException.h 
-	${RSGIS_SRC_REGISTRATION_DIR}/RSGISImageSimilarityMetric.h 
+	${RSGIS_SRC_REGISTRATION_DIR}/RSGISImageSimilarityMetric.h
 	${RSGIS_SRC_REGISTRATION_DIR}/RSGISImageRegistration.h 
 	${RSGIS_SRC_REGISTRATION_DIR}/RSGISBasicImageRegistration.h 
 	${RSGIS_SRC_REGISTRATION_DIR}/RSGISStandardImageSimilarityMetrics.h 
 	${RSGIS_SRC_REGISTRATION_DIR}/RSGISSingleConnectLayerImageRegistration.h 
-	${RSGIS_SRC_REGISTRATION_DIR}/RSGISWarpImageInterpolator.h 
-	${RSGIS_SRC_REGISTRATION_DIR}/RSGISGCPImg2MapNode.h 
-	${RSGIS_SRC_REGISTRATION_DIR}/RSGISWarpImage.h 
-	${RSGIS_SRC_REGISTRATION_DIR}/RSGISWarpImageUsingTriangulation.h 
-	${RSGIS_SRC_REGISTRATION_DIR}/RSGISBasicNNGCPImageWarp.h
-	${RSGIS_SRC_REGISTRATION_DIR}/RSGISPolynomialImageWarp.h
+	${RSGIS_SRC_REGISTRATION_DIR}/RSGISGCPImg2MapNode.h
 	${RSGIS_SRC_REGISTRATION_DIR}/RSGISImagePixelRegistration.h
 	${RSGIS_SRC_REGISTRATION_DIR}/RSGISAddGCPsGDAL.h
 	)
@@ -708,19 +682,15 @@ set(LIB_REGISTRATION_CPP
 # Files within the segmentation Library.
 set(LIB_SEGMENTATION_H
 	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISGenMeanSegImage.h 
-	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISSpecGroupSegmentation.h 
-	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISEliminateSmallClumps.h 
+	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISEliminateSmallClumps.h
 	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISClumpPxls.h 
 	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISRandomColourClumps.h 
-	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISRegionGrowingFromClumps.h 
 	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISMergeSmallClumps.h
 	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISLabelPixelsUsingClusters.h
 	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISLabelPixelsUsingPixels.h
-	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISRegionGrowAttributeTable.h
 	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISDefineSpectralDivision.h
 	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISEliminateSinglePixels.h
 	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISMergeSegmentationTiles.h
-	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISBottomUpShapeFeatureExtraction.h
 	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISMergeSegmentations.h
 	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISMergeSegments.h
 	${RSGIS_SRC_SEGMENTATION_DIR}/RSGISCreateImageGrid.h
@@ -790,239 +760,54 @@ set(LIB_UTILS_CPP
 
 ###############################################################################
 # Files within the vector Library.
-set(LIB_VEC_REPRESENTATION_CPP
-	${RSGIS_SRC_VEC_DIR}/RSGISCirclePoint.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISCirclePoint.h 
-    ${RSGIS_SRC_VEC_DIR}/RSGISCirclePolygon.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISCirclePolygon.h
-	${RSGIS_SRC_VEC_DIR}/RSGISClassificationPolygon.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISClassificationPolygon.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISClassificationPolygonReader.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISClassificationPolygonReader.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISClassPolygon.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISClassPolygon.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISEmptyPolygon.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISEmptyPolygon.h
-	${RSGIS_SRC_VEC_DIR}/RSGISImageTileVector.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISImageTileVector.h
-	${RSGIS_SRC_VEC_DIR}/RSGISIntValuePolygon.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISIntValuePolygon.h
-    ${RSGIS_SRC_VEC_DIR}/RSGISPolygonData.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISPolygonData.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISPointData.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISPointData.h
-	${RSGIS_SRC_VEC_DIR}/RSGISZonalPolygons.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISZonalPolygons.h 
-)
 
 set(LIB_VEC_PROCESSING_CPP
-	${RSGIS_SRC_VEC_DIR}/RSGISAddAttributes.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISAddAttributes.h
-	${RSGIS_SRC_VEC_DIR}/RSGISOGRPolygonReader.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISOGRPolygonReader.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISGEOSMultiPolygonReader.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISGEOSMultiPolygonReader.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISGEOSPolygonReader.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISGEOSPolygonReader.h
-	${RSGIS_SRC_VEC_DIR}/RSGISIntValuePolygonReader.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISIntValuePolygonReader.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISPointsInterpolator.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISPointsInterpolator.h
-	${RSGIS_SRC_VEC_DIR}/RSGISPolygonReader.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISPolygonReader.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISProcessFeatureCopyVector.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISProcessFeatureCopyVector.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISProcessGeometry.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISProcessGeometry.h 
+	${RSGIS_SRC_VEC_DIR}/RSGISProcessGeometry.cpp
+	${RSGIS_SRC_VEC_DIR}/RSGISProcessGeometry.h
 	${RSGIS_SRC_VEC_DIR}/RSGISProcessOGRFeature.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISProcessOGRGeometry.h 
+	${RSGIS_SRC_VEC_DIR}/RSGISProcessOGRGeometry.h
 	${RSGIS_SRC_VEC_DIR}/RSGISProcessVector.cpp 
 	${RSGIS_SRC_VEC_DIR}/RSGISProcessVector.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISProcessVectorSQL.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISProcessVectorSQL.h 
-    ${RSGIS_SRC_VEC_DIR}/RSGISVectorBuffer.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISVectorBuffer.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISVectorIO.cpp 
+	${RSGIS_SRC_VEC_DIR}/RSGISProcessVectorSQL.cpp
+	${RSGIS_SRC_VEC_DIR}/RSGISProcessVectorSQL.h
+	${RSGIS_SRC_VEC_DIR}/RSGISVectorIO.cpp
 	${RSGIS_SRC_VEC_DIR}/RSGISVectorIO.h
-	${RSGIS_SRC_VEC_DIR}/RSGISVectorProcessing.cpp 
-	${RSGIS_SRC_VEC_DIR}/RSGISVectorProcessing.h 
-    ${RSGIS_SRC_VEC_DIR}/RSGISFitActiveContour4Polys.cpp
-	${RSGIS_SRC_VEC_DIR}/RSGISFitActiveContour4Polys.h
 )
 
 set(LIB_VEC_ZONALSTATS_CPP
 	${RSGIS_SRC_VEC_DIR}/RSGISExtractEndMembers2Matrix.cpp
 	${RSGIS_SRC_VEC_DIR}/RSGISExtractEndMembers2Matrix.h
-	#${RSGIS_SRC_VEC_DIR}/RSGISFuzzyZonalStats.cpp
-	#${RSGIS_SRC_VEC_DIR}/RSGISFuzzyZonalStats.h
-	#${RSGIS_SRC_VEC_DIR}/RSGISPopulateTopPowerSet.cpp
-	#${RSGIS_SRC_VEC_DIR}/RSGISPopulateTopPowerSet.h
     ${RSGIS_SRC_VEC_DIR}/RSGISVectorZonalException.cpp
 	${RSGIS_SRC_VEC_DIR}/RSGISVectorZonalException.h
-	#${RSGIS_SRC_VEC_DIR}/RSGISVectorZonalStats.cpp
-	#${RSGIS_SRC_VEC_DIR}/RSGISVectorZonalStats.h
-	#${RSGIS_SRC_VEC_DIR}/RSGISVectorZonalStatsPtxtOut.cpp
-	#${RSGIS_SRC_VEC_DIR}/RSGISVectorZonalStatsPtxtOut.h
-	#${RSGIS_SRC_VEC_DIR}/RSGISZonalCountStats.cpp
-	#${RSGIS_SRC_VEC_DIR}/RSGISZonalCountStats.h
-	#${RSGIS_SRC_VEC_DIR}/RSGISZonalLocalSpatialStats.cpp
-	#${RSGIS_SRC_VEC_DIR}/RSGISZonalLocalSpatialStats.h
-	#${RSGIS_SRC_VEC_DIR}/RSGISZonalMeanStats.cpp
-	#${RSGIS_SRC_VEC_DIR}/RSGISZonalMeanStats.h
-	#${RSGIS_SRC_VEC_DIR}/RSGISZonalStats.cpp
-	#${RSGIS_SRC_VEC_DIR}/RSGISZonalStats.h
-	#${RSGIS_SRC_VEC_DIR}/RSGISZonalStats2Matrix.cpp
-	#${RSGIS_SRC_VEC_DIR}/RSGISZonalStats2Matrix.h
 	${RSGIS_SRC_VEC_DIR}/RSGISZonalImage2HDF.cpp
 	${RSGIS_SRC_VEC_DIR}/RSGISZonalImage2HDF.h 
 )
 
 set(LIB_VEC_UTILS_CPP
-	#${RSGIS_SRC_VEC_DIR}/RSGISAppendToVectorLayer.cpp
-	#${RSGIS_SRC_VEC_DIR}/RSGISAppendToVectorLayer.h
-	#${RSGIS_SRC_VEC_DIR}/RSGISCalcPolygonArea.cpp
-	#${RSGIS_SRC_VEC_DIR}/RSGISCalcPolygonArea.h
-	#${RSGIS_SRC_VEC_DIR}/RSGISCalcDistanceStats.cpp
-	#${RSGIS_SRC_VEC_DIR}/RSGISCalcDistanceStats.h
-	#${RSGIS_SRC_VEC_DIR}/RSGISClusterData.cpp
-	#${RSGIS_SRC_VEC_DIR}/RSGISClusterData.h
-	#${RSGIS_SRC_VEC_DIR}/RSGISClusteredClassificationPolygon.cpp
-	#${RSGIS_SRC_VEC_DIR}/RSGISClusteredClassificationPolygon.h
-	#${RSGIS_SRC_VEC_DIR}/RSGISConvertToASCII.cpp
-	#${RSGIS_SRC_VEC_DIR}/RSGISConvertToASCII.h
-	#${RSGIS_SRC_VEC_DIR}/RSGISCopyCheckPolygons.cpp
-	#${RSGIS_SRC_VEC_DIR}/RSGISCopyCheckPolygons.h
-	#${RSGIS_SRC_VEC_DIR}/RSGISCopyPolygonsInPolygon.cpp
-	#${RSGIS_SRC_VEC_DIR}/RSGISCopyPolygonsInPolygon.h
-	#${RSGIS_SRC_VEC_DIR}/RSGISCopyFeatures.cpp
-	#${RSGIS_SRC_VEC_DIR}/RSGISCopyFeatures.h
-	#${RSGIS_SRC_VEC_DIR}/RSGISAttCountPolyIntersect.cpp
-	#${RSGIS_SRC_VEC_DIR}/RSGISAttCountPolyIntersect.h
-	#${RSGIS_SRC_VEC_DIR}/RSGISCreateListOfAttributeValues.h
-	#${RSGIS_SRC_VEC_DIR}/RSGISCreateListOfAttributeValues.cpp
-	#${RSGIS_SRC_VEC_DIR}/RSGISDropSmallPolygons.cpp
-	#${RSGIS_SRC_VEC_DIR}/RSGISDropSmallPolygons.h
-	#${RSGIS_SRC_VEC_DIR}/RSGISGenerateConvexHullGroups.cpp
-	#${RSGIS_SRC_VEC_DIR}/RSGISGenerateConvexHullGroups.h
-	#${RSGIS_SRC_VEC_DIR}/RSGISGeometryRotateAroundFixedPoint.cpp
-	#${RSGIS_SRC_VEC_DIR}/RSGISGeometryRotateAroundFixedPoint.h
-	#${RSGIS_SRC_VEC_DIR}/RSGISGeometryToCircle.cpp
-	#${RSGIS_SRC_VEC_DIR}/RSGISGeometryToCircle.h
-	#${RSGIS_SRC_VEC_DIR}/RSGISGetAttributeValues.cpp
-	#${RSGIS_SRC_VEC_DIR}/RSGISGetAttributeValues.h
-	#${RSGIS_SRC_VEC_DIR}/RSGISGetOGRGeometries.cpp
-	#${RSGIS_SRC_VEC_DIR}/RSGISGetOGRGeometries.h
-	#${RSGIS_SRC_VEC_DIR}/RSGISIdentifyTopLayerAttributes.cpp
-	#${RSGIS_SRC_VEC_DIR}/RSGISIdentifyTopLayerAttributes.h
-	#${RSGIS_SRC_VEC_DIR}/RSGISLabelPolygonsFromClassification.cpp
-	#${RSGIS_SRC_VEC_DIR}/RSGISLabelPolygonsFromClassification.h
-	#${RSGIS_SRC_VEC_DIR}/RSGISParseLandXML.cpp
-	#${RSGIS_SRC_VEC_DIR}/RSGISParseLandXML.h
-	#${RSGIS_SRC_VEC_DIR}/RSGISPixelAreaCountInPolygon.cpp
-	#${RSGIS_SRC_VEC_DIR}/RSGISPixelAreaCountInPolygon.h
-	#${RSGIS_SRC_VEC_DIR}/RSGISPrintFIDs.cpp
-	#${RSGIS_SRC_VEC_DIR}/RSGISPrintFIDs.h
-	#${RSGIS_SRC_VEC_DIR}/RSGISRasterizeVector.cpp
-	#${RSGIS_SRC_VEC_DIR}/RSGISRasterizeVector.h
-	#${RSGIS_SRC_VEC_DIR}/RSGISRemoveContainedPolygons.cpp
-	#${RSGIS_SRC_VEC_DIR}/RSGISRemoveContainedPolygons.h
-	#${RSGIS_SRC_VEC_DIR}/RSGISRemovePolygonHoles.cpp
-	#${RSGIS_SRC_VEC_DIR}/RSGISRemovePolygonHoles.h
-	#${RSGIS_SRC_VEC_DIR}/RSGIS2DScatterPlotVariables.cpp
-	#${RSGIS_SRC_VEC_DIR}/RSGIS2DScatterPlotVariables.h
-	#${RSGIS_SRC_VEC_DIR}/RSGISSplitSmallLargePolygons.cpp
-	#${RSGIS_SRC_VEC_DIR}/RSGISSplitSmallLargePolygons.h
-	#${RSGIS_SRC_VEC_DIR}/RSGISVectorAttributeFindReplace.cpp
-	#${RSGIS_SRC_VEC_DIR}/RSGISVectorAttributeFindReplace.h
-	#${RSGIS_SRC_VEC_DIR}/RSGISVectorMaths.h
-	#${RSGIS_SRC_VEC_DIR}/RSGISVectorMaths.cpp
-	#${RSGIS_SRC_VEC_DIR}/RSGISVectorMorphology.cpp
-	#${RSGIS_SRC_VEC_DIR}/RSGISVectorMorphology.h
+	${RSGIS_SRC_VEC_DIR}/RSGISCopyCheckPolygons.cpp
+	${RSGIS_SRC_VEC_DIR}/RSGISCopyCheckPolygons.h
+	${RSGIS_SRC_VEC_DIR}/RSGISVectorMaths.h
+	${RSGIS_SRC_VEC_DIR}/RSGISVectorMaths.cpp
 	${RSGIS_SRC_VEC_DIR}/RSGISVectorOutputException.cpp
 	${RSGIS_SRC_VEC_DIR}/RSGISVectorOutputException.h
-	#${RSGIS_SRC_VEC_DIR}/RSGISVectorSQLClassification.cpp
-	#${RSGIS_SRC_VEC_DIR}/RSGISVectorSQLClassification.h
     ${RSGIS_SRC_VEC_DIR}/RSGISVectorUtils.cpp
 	${RSGIS_SRC_VEC_DIR}/RSGISVectorUtils.h
-	#${RSGIS_SRC_VEC_DIR}/RSGISPopulateFeatsElev.cpp
-	#${RSGIS_SRC_VEC_DIR}/RSGISPopulateFeatsElev.h
 )
-
 
 set(LIB_VEC_H
 	${RSGIS_SRC_VEC_DIR}/RSGISVectorZonalException.h 
     ${RSGIS_SRC_VEC_DIR}/RSGISVectorOutputException.h 
 	${RSGIS_SRC_VEC_DIR}/RSGISProcessOGRFeature.h 
 	${RSGIS_SRC_VEC_DIR}/RSGISProcessVector.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISVectorUtils.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISPolygonData.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISPointData.h 
+	${RSGIS_SRC_VEC_DIR}/RSGISVectorUtils.h
 	${RSGIS_SRC_VEC_DIR}/RSGISVectorIO.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISEmptyPolygon.h
-	${RSGIS_SRC_VEC_DIR}/RSGISClassPolygon.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISZonalPolygons.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISCirclePolygon.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISCalcPolygonArea.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISClassificationPolygon.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISImageTileVector.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISPointsInterpolator.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISZonalStats.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISZonalStats2Matrix.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISVectorBuffer.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISCirclePoint.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISVectorProcessing.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISAddAttributes.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISVectorSQLClassification.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISVectorAttributeFindReplace.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISIdentifyTopLayerAttributes.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISFuzzyZonalStats.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISZonalCountStats.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISZonalMeanStats.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISProcessFeatureCopyVector.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISPrintFIDs.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISPixelAreaCountInPolygon.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISPopulateTopPowerSet.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISProcessOGRGeometry.h 
+	${RSGIS_SRC_VEC_DIR}/RSGISZonalStats2Matrix.h
+	${RSGIS_SRC_VEC_DIR}/RSGISProcessOGRGeometry.h
 	${RSGIS_SRC_VEC_DIR}/RSGISProcessGeometry.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISGeometryRotateAroundFixedPoint.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISConvertToASCII.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISGeometryToCircle.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISClassificationPolygonReader.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISGEOSPolygonReader.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISParseLandXML.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISPolygonReader.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISGetAttributeValues.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISClusteredClassificationPolygon.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISVectorMorphology.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISRasterizeVector.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISGEOSMultiPolygonReader.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISClusterData.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISIntValuePolygon.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISIntValuePolygonReader.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISVectorZonalStats.h 
-	${RSGIS_SRC_VEC_DIR}/RSGIS2DScatterPlotVariables.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISVectorZonalStatsPtxtOut.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISCopyCheckPolygons.h 
+	${RSGIS_SRC_VEC_DIR}/RSGISCopyCheckPolygons.h
 	${RSGIS_SRC_VEC_DIR}/RSGISProcessVectorSQL.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISCopyPolygonsInPolygon.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISCreateListOfAttributeValues.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISOGRPolygonReader.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISRemoveContainedPolygons.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISCopyFeatures.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISSplitSmallLargePolygons.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISAppendToVectorLayer.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISLabelPolygonsFromClassification.h
-	${RSGIS_SRC_VEC_DIR}/RSGISRemovePolygonHoles.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISDropSmallPolygons.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISZonalLocalSpatialStats.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISVectorMaths.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISGetOGRGeometries.h 
-	${RSGIS_SRC_VEC_DIR}/RSGISExtractEndMembers2Matrix.h
-	${RSGIS_SRC_VEC_DIR}/RSGISAttCountPolyIntersect.h
-	${RSGIS_SRC_VEC_DIR}/RSGISGenerateConvexHullGroups.h
+	${RSGIS_SRC_VEC_DIR}/RSGISVectorMaths.h
 	${RSGIS_SRC_VEC_DIR}/RSGISZonalImage2HDF.h
-	${RSGIS_SRC_VEC_DIR}/RSGISPopulateFeatsElev.h
-	${RSGIS_SRC_VEC_DIR}/RSGISFitActiveContour4Polys.h
 	)
 
 ###############################################################################
@@ -1047,7 +832,6 @@ source_group("Registration" FILES ${LIB_REGISTRATION_CPP})
 source_group("Segmentation" FILES ${LIB_SEGMENTATION_CPP})
 source_group("Utilities" FILES ${LIB_UTILS_CPP})
 source_group("Processing" FILES ${LIB_VEC_PROCESSING_CPP})
-source_group("Representation" FILES ${LIB_VEC_REPRESENTATION_CPP})
 source_group("Utils" FILES ${LIB_VEC_UTILS_CPP})
 source_group("ZonalStats" FILES ${LIB_VEC_ZONALSTATS_CPP})
 ###############################################################################
@@ -1086,7 +870,7 @@ add_library( ${RSGISLIB_SEGMENTATION_LIB_NAME} ${LIB_SEGMENTATION_CPP} )
 target_link_libraries(${RSGISLIB_SEGMENTATION_LIB_NAME} ${RSGISLIB_COMMONS_LIB_NAME} ${RSGISLIB_MATHS_LIB_NAME}  ${RSGISLIB_UTILS_LIB_NAME} ${RSGISLIB_IMG_LIB_NAME} ${RSGISLIB_RASTERGIS_LIB_NAME} ${BOOST_LIBRARIES} ${GDAL_LIBRARIES} )
 
 #add_library( ${RSGISLIB_VECTOR_LIB_NAME} ${LIB_VEC_REPRESENTATION_CPP} ${LIB_VEC_PROCESSING_CPP} ${LIB_VEC_ZONALSTATS_CPP} ${LIB_VEC_UTILS_CPP} )
-add_library( ${RSGISLIB_VECTOR_LIB_NAME} ${LIB_VEC_UTILS_CPP} ${LIB_VEC_ZONALSTATS_CPP})
+add_library( ${RSGISLIB_VECTOR_LIB_NAME} ${LIB_VEC_PROCESSING_CPP} ${LIB_VEC_UTILS_CPP} ${LIB_VEC_ZONALSTATS_CPP})
 target_link_libraries(${RSGISLIB_VECTOR_LIB_NAME} ${RSGISLIB_COMMONS_LIB_NAME} ${RSGISLIB_MATHS_LIB_NAME}  ${RSGISLIB_UTILS_LIB_NAME} ${RSGISLIB_IMG_LIB_NAME} ${RSGISLIB_RASTERGIS_LIB_NAME} ${BOOST_LIBRARIES} ${GDAL_LIBRARIES} ${MUPARSER_LIBRARIES} )
 
 add_library( ${RSGISLIB_CLASSIFY_LIB_NAME} ${LIB_CLASSIFY_CPP} )

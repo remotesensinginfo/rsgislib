@@ -51,9 +51,6 @@ namespace rsgis{ namespace cmds{
         std::string fieldName;
     };
 
-    /** Populate the Z field on the vector geometries */
-    DllExport void executePopulateGeomZField(std::string inputVectorFile, std::string inputVectorLyr, std::string inputImage, unsigned int imgBand, std::string outputVectorFile, std::string outputVectorLyr, std::string outFormat, bool delExistVec);
-
     /** Function to calculate a maths functions between  */
     DllExport void executeVectorMaths(std::string inputVectorFile, std::string inputVectorLyr, std::string outputVectorFile, std::string outputVectorLyr, std::string outFormat, std::string outColumn, std::string expression, bool delExistVec, std::vector<RSGISVariableFieldCmds> vars);
 
