@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import rsgislib
 import rsgislib.imageutils
 import pprint
@@ -99,16 +101,16 @@ class StdImgBlockIter:
         An internal function used to calculate the amount of overlap between the input images.
 
         """
-        rsgis_utils = rsgislib.RSGISPyUtils()
+        import rsgislib.tools.geometrytools
         bboxes = []
         self.img_epsg = None
         self.img_pxl_res = None
         for img in self.img_info_lst:
             self.img_info[img.name] = dict()
-            self.img_info[img.name]['res'] = rsgis_utils.getImageRes(img.fileName)
-            self.img_info[img.name]['bbox'] = rsgis_utils.getImageBBOX(img.fileName)
-            self.img_info[img.name]['pxl_size'] = rsgis_utils.getImageSize(img.fileName)
-            self.img_info[img.name]['epsg'] = rsgis_utils.getEPSGCode(img.fileName)
+            self.img_info[img.name]['res'] = rsgislib.imageutils.getImageRes(img.fileName)
+            self.img_info[img.name]['bbox'] = rsgislib.imageutils.getImageBBOX(img.fileName)
+            self.img_info[img.name]['pxl_size'] = rsgislib.imageutils.getImageSize(img.fileName)
+            self.img_info[img.name]['epsg'] = rsgislib.imageutils.getEPSGProjFromImage(img.fileName)
             if self.img_info[img.name]['epsg'] is None:
                 raise Exception("The input image ({}) does not have a defined projection - please correct.".format(img.fileName))
             if self.img_epsg is None:
@@ -125,7 +127,7 @@ class StdImgBlockIter:
             
             bboxes.append(self.img_info[img.name]['bbox'])
         
-        self.bbox_intersect = rsgis_utils.bboxes_intersection(bboxes)
+        self.bbox_intersect = rsgislib.tools.geometrytools.bboxes_intersection(bboxes)
         
         self.overlap_width = 0
         self.overlap_height = 0
@@ -217,8 +219,7 @@ class StdImgBlockIter:
         :param out_imgs_info: a list of rsgislib.imageutils.OutImageInfo objects specifying the output image(s).
 
         """
-        rsgis_utils = rsgislib.RSGISPyUtils()
-        out_wkt_str = rsgis_utils.getWKTFromEPSGCode(int(self.img_epsg))
+        out_wkt_str = rsgislib.imageutils.getWKTFromEPSGCode(int(self.img_epsg))
         if out_wkt_str is None:
             raise Exception("Did not have a projection string for the EPSG code: {}".format(self.img_epsg))
         if math.fabs(self.img_pxl_res[0]) != math.fabs(self.img_pxl_res[1]):

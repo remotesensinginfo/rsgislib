@@ -66,11 +66,9 @@ Where:
     if not rsgislib.imageutils.hasGCPs(inProcessImg):
         raise Exception("Input process image does not have GCPs within it's header - this is required.")
 
-    rsgisUtils = rsgislib.RSGISPyUtils() 
-    
-    numBands = rsgisUtils.getImageBandCount(inProcessImg)
-    noDataVal = rsgisUtils.getImageNoDataValue(inProcessImg)
-    datatype = rsgisUtils.getRSGISLibDataTypeFromImg(inProcessImg)
+    numBands = rsgislib.imageutils.getImageBandCount(inProcessImg)
+    noDataVal = rsgislib.imageutils.getImageNoDataValue(inProcessImg)
+    datatype = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inProcessImg)
     
     interpolationMethod = gdal.GRA_NearestNeighbour
     if interpMethod == 'bilinear':

@@ -72,16 +72,14 @@ the outliners will related to class changes.
     if not haveRIOS:
         raise Exception("The rios module is required for this function could not be imported\n\t" + riosErr)
 
-    rsgis_utils = rsgislib.RSGISPyUtils()
-
     if img_bands is not None:
         if not ((type(img_bands) is list) or (type(img_bands) is tuple)):
             raise rsgislib.RSGISPyException("If provided then img_bands should be a list (or None)")
     else:
-        n_bands = rsgis_utils.getImageBandCount(img)
+        n_bands = rsgislib.imageutils.getImageBandCount(img)
         img_bands = numpy.arange(1, n_bands + 1)
     num_vars = len(img_bands)
-    img_val_no_data = rsgis_utils.getImageNoDataValue(img)
+    img_val_no_data = rsgislib.imageutils.getImageNoDataValue(img)
 
     msk_arr_vals = rsgislib.imageutils.extractImgPxlValsInMsk(img, img_bands, img_mask, img_mask_val, img_val_no_data)
     print("There were {} pixels within the mask.".format(msk_arr_vals.shape[0]))

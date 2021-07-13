@@ -220,6 +220,8 @@ Example::
     import shutil    
     from multiprocessing import Pool
     import rsgislib.imageutils
+    import rsgislib.tools.utils
+    import rsgislib.tools.filetools
     
     haveListVals = False
     if type(pxlVals) is list:
@@ -230,15 +232,13 @@ Example::
         print("WARNING: \'" + tmpDIR + "\' directory does not exist so creating it...")
         os.makedirs(tmpDIR)
         tmpPresent = False
-    
-    rsgisUtils = rsgislib.RSGISPyUtils()
-    
+
     if nCores <= 0:
-        nCores = rsgisUtils.numProcessCores()
+        nCores = rsgislib.tools.utils.numProcessCores()
     
-    uid = rsgisUtils.uidGenerator()
+    uid = rsgislib.tools.utils.uidGenerator()
     
-    xRes, yRes = rsgisUtils.getImageRes(inputValsImg)    
+    xRes, yRes = rsgislib.imageutils.getImageRes(inputValsImg)
     if unitGEO:
         xMaxDistPxl = math.ceil(maxDist/xRes)
         yMaxDistPxl = math.ceil(maxDist/yRes)
@@ -309,13 +309,13 @@ Example::
     rsgislib.imageutils.popImageStats(outputDistImg, usenodataval=True, nodataval=0, calcpyramids=True)
     
     for imgFile in distTiles:
-        rsgisUtils.deleteFileWithBasename(imgFile)
+        rsgislib.tools.filetools.deleteFileWithBasename(imgFile)
     
     if not imgTilesDIRPresent:
         shutil.rmtree(imgTilesDIR, ignore_errors=True)
     else:
         for tileFile in imgTileFiles:
-            rsgisUtils.deleteFileWithBasename(tileFile)
+            rsgislib.tools.filetools.deleteFileWithBasename(tileFile)
     
     if not distTilesDIRPresent:
         shutil.rmtree(distTilesDIR, ignore_errors=True)
@@ -449,7 +449,7 @@ generate eigenvector for a MNF. Note. this can be used as input to rsgislib.imag
 
 """
     from sklearn.decomposition import PCA
-    import rsgislib
+    import rsgislib.tools.filetools
     import rsgislib.imageutils
     import os
     import shutil
@@ -459,11 +459,10 @@ generate eigenvector for a MNF. Note. this can be used as input to rsgislib.imag
         os.mkdir(tmp_dir)
         created_tmp_dir = True
 
-    rsgis_utils = rsgislib.RSGISPyUtils()
-    img_basename = rsgis_utils.get_file_basename(inputImg)
+    img_basename = rsgislib.tools.filetools.get_file_basename(inputImg)
 
     if in_img_no_data is None:
-        in_img_no_data = rsgis_utils.getImageNoDataValue(inputImg)
+        in_img_no_data = rsgislib.imageutils.getImageNoDataValue(inputImg)
         if in_img_no_data is None:
             raise Exception("A no data value for the input image must be provided.")
 
@@ -539,8 +538,7 @@ Function which rescales an input image base on a list of rescaling parameters.
     for rescaleObj in bandRescale:
         bandRescaleDict[rescaleObj.band-1] = rescaleObj
 
-    rsgis_utils = rsgislib.RSGISPyUtils()
-    numpyDT = rsgis_utils.getNumpyDataType(datatype)
+    numpyDT = rsgislib.getNumpyDataType(datatype)
 
     try:
         import tqdm
@@ -648,8 +646,7 @@ A function which calculates the area (in metres) of the pixel projected in WGS84
         from rios import cuiprogress
         progress_bar = cuiprogress.GDALProgressBar()
 
-    rsgis_utils = rsgislib.RSGISPyUtils()
-    x_res, y_res = rsgis_utils.getImageRes(img)
+    x_res, y_res = rsgislib.imagecalc.getImageRes(img)
     
     infiles = applier.FilenameAssociations()
     infiles.img = img
@@ -801,13 +798,12 @@ Warning, this function can be very slow. Use rsgislib.imagecalc.imagePixelColumn
 :param gdalformat: the GDAL image file format of the output image file.
 
 """
+    import rsgislib.imageutils
     import scipy.stats
     from rios import applier
 
-    rsgis_utils = rsgislib.RSGISPyUtils()
-
-    datatype = rsgis_utils.getRSGISLibDataTypeFromImg(inputImgs[0])
-    numpyDT = rsgis_utils.getNumpyDataType(datatype)
+    datatype = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inputImgs[0])
+    numpyDT = rsgislib.getNumpyDataType(datatype)
 
     try:
         import tqdm
@@ -867,20 +863,19 @@ order:
     import rsgislib.imageutils
     from rios import applier
 
-    rsgis_utils = rsgislib.RSGISPyUtils()
     first = True
     n_bands = 0
     no_data_val = 0
     for img in stats_imgs:
         print(img)
         if first:
-            n_bands = rsgis_utils.getImageBandCount(img)
-            no_data_val = rsgis_utils.getImageNoDataValue(img)
+            n_bands = rsgislib.imageutils.getImageBandCount(img)
+            no_data_val = rsgislib.imageutils.getImageNoDataValue(img)
             first = False
         else:
-            if n_bands != rsgis_utils.getImageBandCount(img):
+            if n_bands != rsgislib.imageutils.getImageBandCount(img):
                 raise Exception("The number of bands must be the same in all input images.")
-            if no_data_val != rsgis_utils.getImageNoDataValue(img):
+            if no_data_val != rsgislib.imageutils.getImageNoDataValue(img):
                 raise Exception("The no data value should be the same in all input images.")
 
     # RIOS internal function to calculate  mean and standard deviation of the input images
@@ -953,8 +948,8 @@ def normalise_image_band(input_img, band, output_img, gdal_format='KEA'):
     """
     import rsgislib
     import rsgislib.imageutils
-    rsgis_utils = rsgislib.RSGISPyUtils()
-    no_data_val = rsgis_utils.getImageNoDataValue(input_img, band)
+
+    no_data_val = rsgislib.imageutils.getImageNoDataValue(input_img, band)
     use_no_data_val = True
     if no_data_val is None:
         use_no_data_val = False
@@ -988,7 +983,6 @@ def recodeIntRaster(input_img, output_img, recode_dict, keepvalsnotindict=True, 
     from rios import applier
     import numpy
 
-    rsgis_utils = rsgislib.RSGISPyUtils()
     try:
         import tqdm
         progress_bar = rsgislib.TQDMProgressBar()
@@ -1002,7 +996,7 @@ def recodeIntRaster(input_img, output_img, recode_dict, keepvalsnotindict=True, 
     outfiles = applier.FilenameAssociations()
     outfiles.outimage = output_img
     otherargs = applier.OtherInputs()
-    otherargs.np_dtype = rsgis_utils.getNumpyDataType(datatype)
+    otherargs.np_dtype = rsgislib.getNumpyDataType(datatype)
     otherargs.keepvalsnotindict = keepvalsnotindict
     otherargs.recode_dict = recode_dict
     aControls = applier.ApplierControls()
@@ -1045,14 +1039,14 @@ def calc_fill_regions_knn(ref_img, ref_no_data, fill_regions_img, fill_region_va
     :param datatype: is a rsgislib.TYPE_* value providing the data type of the output image.
 
     """
+    import rsgislib.imageutils
     from rios import applier
     import numpy
     import scipy
     import scipy.stats
     import rtree
 
-    rsgis_utils = rsgislib.RSGISPyUtils()
-    if not rsgis_utils.doGDALLayersHaveSameProj(ref_img, fill_regions_img):
+    if not rsgislib.imageutils.doGDALLayersHaveSameProj(ref_img, fill_regions_img):
         raise Exception("The reference image and fill regions image do not have the same projection.")
 
     try:
@@ -1062,7 +1056,7 @@ def calc_fill_regions_knn(ref_img, ref_no_data, fill_regions_img, fill_region_va
         from rios import cuiprogress
         progress_bar = cuiprogress.GDALProgressBar()
 
-    x_res, y_res = rsgis_utils.getImageRes(ref_img)
+    x_res, y_res = rsgislib.imageutils.getImageRes(ref_img)
     if x_res < 0:
         x_res *= -1
     if y_res < 0:
@@ -1109,7 +1103,7 @@ def calc_fill_regions_knn(ref_img, ref_no_data, fill_regions_img, fill_region_va
     applier.apply(_retrieve_idx_info, infiles, outfiles, otherargs, controls=aControls)
 
     print("\nFilling Image Regions using KNN (k={})".format(k))
-    x_res, y_res = rsgis_utils.getImageRes(fill_regions_img)
+    x_res, y_res = rsgislib.imageutils.getImageRes(fill_regions_img)
     if x_res < 0:
         x_res *= -1
     if y_res < 0:
@@ -1124,7 +1118,7 @@ def calc_fill_regions_knn(ref_img, ref_no_data, fill_regions_img, fill_region_va
     otherargs.kd_idx = kd_idx
     otherargs.k = k
     otherargs.fill_region_val = fill_region_val
-    otherargs.np_dtype = rsgis_utils.getNumpyDataType(datatype)
+    otherargs.np_dtype = rsgislib.getNumpyDataType(datatype)
     otherargs.w_box = x_res / 2
     otherargs.h_box = y_res / 2
     aControls = applier.ApplierControls()

@@ -64,8 +64,8 @@ the maximum NDVI.
 :param calcStats: calculate image statics and pyramids (Default=True)
 
     """
-    rsgisUtils = rsgislib.RSGISPyUtils()
-    uidStr = rsgisUtils.uidGenerator()
+    import rsgislib.tools.utils
+    uidStr = rsgislib.tools.utils.uidGenerator()
     
     # Get List of input images:
     inImages = glob.glob(inImgsPattern)
@@ -84,7 +84,7 @@ the maximum NDVI.
             refImgTmpPresent = False
         
         if dataType is None:
-            dataType = rsgisUtils.getRSGISLibDataTypeFromImg(inImages[0])
+            dataType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inImages[0])
         
         numInLyrs = len(inImages)
         
@@ -169,8 +169,8 @@ LS8 images are submitted to match the images bands of LS7 (i.e., coastal band re
 :param use_mode: True: the land/water masks are combined using the mode and False: the land water masks are combined using median.
 
     """
-    rsgisUtils = rsgislib.RSGISPyUtils()
-    uidStr = rsgisUtils.uidGenerator()
+    import rsgislib.tools.utils
+    uidStr = rsgislib.tools.utils.uidGenerator()
     
     # Get List of input images:
     inImages = glob.glob(inImgsPattern)
@@ -189,7 +189,7 @@ LS8 images are submitted to match the images bands of LS7 (i.e., coastal band re
             refImgTmpPresent = False
         
         if dataType is None:
-            dataType = rsgisUtils.getRSGISLibDataTypeFromImg(inImages[0])
+            dataType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inImages[0])
         
         numInLyrs = len(inImages)
         
@@ -368,8 +368,8 @@ used to define the spatial extent of the output images and spatial projection.
 :param use_mode: True: the land/water masks are combined using the mode and False: the land water masks are combined using median.
 
     """
-    rsgisUtils = rsgislib.RSGISPyUtils()
-    uidStr = rsgisUtils.uidGenerator()
+    import rsgislib.tools.utils
+    uidStr = rsgislib.tools.utils.uidGenerator()
     
     if len(inImages) > 1:
         init_in_images = inImages
@@ -380,17 +380,17 @@ used to define the spatial extent of the output images and spatial projection.
         first = True
         for img in init_in_images:
             if first:
-                nBands = rsgisUtils.getImageBandCount(img)
+                nBands = rsgislib.imageutils.getImageBandCount(img)
                 first = False
             else:
-                cBands = rsgisUtils.getImageBandCount(img)
+                cBands = rsgislib.imageutils.getImageBandCount(img)
                 if cBands != nBands:
                     raise rsgislib.RSGISPyException("The number of image bands is not consistent (Bands: {0} and {1})".format(nBands, cBands))
 
-            sameProj = rsgisUtils.doGDALLayersHaveSameProj(refImg, img)
+            sameProj = rsgislib.imageutils.doGDALLayersHaveSameProj(refImg, img)
             if rsgislib.imageutils.doImagesOverlap(refImg, img):
                 if sameProj:
-                    if rsgisUtils.doImageResMatch(refImg, img):
+                    if rsgislib.imageutils.doImageResMatch(refImg, img):
                         inImagesOverlap.append(img)
                     else:
                         inImages2ReProj.append(img)
@@ -402,9 +402,9 @@ used to define the spatial extent of the output images and spatial projection.
         if nImgs > 1:
             if dataType is None:
                 if len(inImagesOverlap) > 0:
-                    dataType = rsgisUtils.getRSGISLibDataTypeFromImg(inImagesOverlap[0])
+                    dataType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inImagesOverlap[0])
                 else:
-                    dataType = rsgisUtils.getRSGISLibDataTypeFromImg(inImages2ReProj[0])
+                    dataType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inImages2ReProj[0])
         
             tmpPresent = True
             if not os.path.exists(tmpPath):
@@ -553,9 +553,9 @@ used to define the spatial extent of the output images and spatial projection.
 
     elif len(inImages) == 1:
         print("Only 1 Input Image, Just Copying File to output")
-        nBands = rsgisUtils.getImageBandCount(inImages[0])
+        nBands = rsgislib.imageutils.getImageBandCount(inImages[0])
         if dataType is None:
-            dataType = rsgisUtils.getRSGISLibDataTypeFromImg(inImages[0])
+            dataType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inImages[0])
         rsgislib.imageutils.createCopyImage(refImg, outCompImg, nBands, 0, gdalformat, dataType)
         rsgislib.imageutils.includeImagesIndImgIntersect(outCompImg, [inImages[0]])
     else:
@@ -587,8 +587,8 @@ used to define the spatial extent of the output images and spatial projection.
 :param use_mode: True: the land/water masks are combined using the mode and False: the land water masks are combined using median.
 
     """
-    rsgisUtils = rsgislib.RSGISPyUtils()
-    uidStr = rsgisUtils.uidGenerator()
+    import rsgislib.tools.utils
+    uidStr = rsgislib.tools.utils.uidGenerator()
 
     if len(inImages) > 1:
         init_in_images = inImages
@@ -599,18 +599,18 @@ used to define the spatial extent of the output images and spatial projection.
         first = True
         for img in init_in_images:
             if first:
-                nBands = rsgisUtils.getImageBandCount(img)
+                nBands = rsgislib.imageutils.getImageBandCount(img)
                 first = False
             else:
-                cBands = rsgisUtils.getImageBandCount(img)
+                cBands = rsgislib.imageutils.getImageBandCount(img)
                 if cBands != nBands:
                     raise rsgislib.RSGISPyException(
                         "The number of image bands is not consistent (Bands: {0} and {1})".format(nBands, cBands))
 
-            sameProj = rsgisUtils.doGDALLayersHaveSameProj(refImg, img)
+            sameProj = rsgislib.imageutils.doGDALLayersHaveSameProj(refImg, img)
             if rsgislib.imageutils.doImagesOverlap(refImg, img):
                 if sameProj:
-                    if rsgisUtils.doImageResMatch(refImg, img):
+                    if rsgislib.imageutils.doImageResMatch(refImg, img):
                         inImagesOverlap.append(img)
                     else:
                         inImages2ReProj.append(img)
@@ -622,9 +622,9 @@ used to define the spatial extent of the output images and spatial projection.
         if nImgs > 1:
             if dataType is None:
                 if len(inImagesOverlap) > 0:
-                    dataType = rsgisUtils.getRSGISLibDataTypeFromImg(inImagesOverlap[0])
+                    dataType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inImagesOverlap[0])
                 else:
-                    dataType = rsgisUtils.getRSGISLibDataTypeFromImg(inImages2ReProj[0])
+                    dataType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inImages2ReProj[0])
 
             tmpPresent = True
             if not os.path.exists(tmpPath):
@@ -802,9 +802,9 @@ used to define the spatial extent of the output images and spatial projection.
 
     elif len(inImages) == 1:
         print("Only 1 Input Image, Just Copying File to output")
-        nBands = rsgisUtils.getImageBandCount(inImages[0])
+        nBands = rsgislib.imageutils.getImageBandCount(inImages[0])
         if dataType is None:
-            dataType = rsgisUtils.getRSGISLibDataTypeFromImg(inImages[0])
+            dataType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inImages[0])
         rsgislib.imageutils.createCopyImage(refImg, outCompImg, nBands, 0, gdalformat, dataType)
         rsgislib.imageutils.includeImagesIndImgIntersect(outCompImg, [inImages[0]])
     else:

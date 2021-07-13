@@ -107,8 +107,7 @@ class RSGISTiledShepherdSegmentationSingleThread (object):
     def performStage1Tiling(self, inputImage, tileShp, tilesRat, tilesBase, tilesMetaDIR, tilesImgDIR, tmpDIR, width, height, validDataThreshold):
         tilingutils.createMinDataTiles(inputImage, tileShp, tilesRat, width, height, validDataThreshold, None, False, True, tmpDIR)
         tilingutils.createTileMaskImagesFromClumps(tilesRat, tilesBase, tilesMetaDIR, "KEA")
-        rsgisUtils = rsgislib.RSGISPyUtils()
-        dataType = rsgisUtils.getRSGISLibDataTypeFromImg(inputImage)
+        dataType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inputImage)
         tilingutils.createTilesFromMasks(inputImage, tilesBase, tilesMetaDIR, tilesImgDIR, dataType, 'KEA')
     
     def performStage1TilesSegmentation(self, tilesImgDIR, stage1TilesSegsDIR, tmpDIR, tilesBase, tileSegInfoJSON, strchStatsBase, kCentresBase, numClustersVal, minPxlsVal, distThresVal, bandsVal, samplingVal, kmMaxIterVal):
@@ -156,18 +155,16 @@ class RSGISTiledShepherdSegmentationSingleThread (object):
     def performStage2Tiling(self, inputImage, tileShp, tilesRat, tilesBase, tilesMetaDIR, tilesImgDIR, tmpDIR, width, height, validDataThreshold, bordersImage):
         tilingutils.createMinDataTiles(inputImage, tileShp, tilesRat, width, height, validDataThreshold, bordersImage, True, True, tmpDIR)
         tilingutils.createTileMaskImagesFromClumps(tilesRat, tilesBase, tilesMetaDIR, "KEA")
-        rsgisUtils = rsgislib.RSGISPyUtils()
-        dataType = rsgisUtils.getRSGISLibDataTypeFromImg(inputImage)
+        dataType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inputImage)
         tilingutils.createTilesFromMasks(inputImage, tilesBase, tilesMetaDIR, tilesImgDIR, dataType, 'KEA')
     
     
     def performStage2TilesSegmentation(self, tilesImgDIR, tilesMaskedDIR, tilesSegsDIR, tilesSegBordersDIR, tmpDIR, tilesBase, s1BordersImage, segStatsInfo, minPxlsVal, distThresVal, bandsVal):
-        rsgisUtils = rsgislib.RSGISPyUtils()
         imgTiles = glob.glob(os.path.join(tilesImgDIR, tilesBase+"*.kea"))
         for imgTile in imgTiles:
             baseName = os.path.splitext(os.path.basename(imgTile))[0]        
             maskedFile = os.path.join(tilesMaskedDIR, baseName + '_masked.kea')
-            dataType = rsgisUtils.getRSGISLibDataTypeFromImg(imgTile)
+            dataType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(imgTile)
             imageutils.maskImage(imgTile, s1BordersImage, maskedFile, 'KEA', dataType, 0, 0)
             
         imgTiles = glob.glob(os.path.join(tilesMaskedDIR, tilesBase+"*_masked.kea"))
@@ -200,8 +197,7 @@ class RSGISTiledShepherdSegmentationSingleThread (object):
             
         rastergis.spatialExtent(s3BordersClumps, 'minXX', 'minXY', 'maxXX', 'maxXY', 'minYX', 'minYY', 'maxYX', 'maxYY')
         
-        rsgisUtils = rsgislib.RSGISPyUtils()
-        dataType = rsgisUtils.getRSGISLibDataTypeFromImg(inputImage)
+        dataType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inputImage)
         
         ratDS = gdal.Open(s3BordersClumps, gdal.GA_Update)
         minX = rat.readColumn(ratDS, "minXX")
@@ -268,12 +264,13 @@ Example::
     tiledsegsingle.performTiledSegmentation(inputImage, clumpsImage, tmpDIR='./rsgislibsegtmp', tileWidth=2000, tileHeight=2000, validDataThreshold=0.3, numClusters=60, minPxls=100, distThres=100, bands=[4,5,3], sampling=100, kmMaxIter=200)
 
     """
+    import rsgislib.tools.utils
+    import rsgislib.tools.filetools
     createdTmp = False
     if not os.path.exists(tmpDIR):
         os.makedirs(tmpDIR)
         createdTmp = True
-    rsgisUtils = rsgislib.RSGISPyUtils()
-    uidStr = rsgisUtils.uidGenerator()
+    uidStr = rsgislib.tools.utils.uidGenerator()
     
     baseName = os.path.splitext(os.path.basename(inputImage))[0]+"_"+uidStr
         
@@ -397,14 +394,13 @@ Example::
     ########################################################
     
     shutil.rmtree(segStatsDIR)
-    rsgisUtils = rsgislib.RSGISPyUtils()
-    rsgisUtils.deleteFileWithBasename(stage1BordersImage)
-    rsgisUtils.deleteFileWithBasename(stage2BordersImage)
-    rsgisUtils.deleteFileWithBasename(stage3BordersClumps)
-    rsgisUtils.deleteFileWithBasename(stage1TileShp)
-    rsgisUtils.deleteFileWithBasename(stage1TileRAT)
-    rsgisUtils.deleteFileWithBasename(stage2TileShp)
-    rsgisUtils.deleteFileWithBasename(stage2TileRAT)
+    rsgislib.tools.filetools.deleteFileWithBasename(stage1BordersImage)
+    rsgislib.tools.filetools.deleteFileWithBasename(stage2BordersImage)
+    rsgislib.tools.filetools.deleteFileWithBasename(stage3BordersClumps)
+    rsgislib.tools.filetools.deleteFileWithBasename(stage1TileShp)
+    rsgislib.tools.filetools.deleteFileWithBasename(stage1TileRAT)
+    rsgislib.tools.filetools.deleteFileWithBasename(stage2TileShp)
+    rsgislib.tools.filetools.deleteFileWithBasename(stage2TileRAT)
     os.remove(tileSegInfo)
     if createdTmp:
         shutil.rmtree(tmpDIR)

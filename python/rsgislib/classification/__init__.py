@@ -196,17 +196,16 @@ def get_class_training_data(imgBandInfo, classVecSampleInfo, tmpdir, sub_sample=
     :return: dictionary of ClassSimpleInfoObj objects.
 
     """
-    import rsgislib
+    import rsgislib.tools.filetools
+    import rsgislib.tools.utils
     import rsgislib.imageutils
     import rsgislib.vectorutils
     import os
-    import os.path
     import random
     import shutil
 
     # Get valid mask, rasterised to this
-    rsgis_utils = rsgislib.RSGISPyUtils()
-    uid_str = rsgis_utils.uidGenerator()
+    uid_str = rsgislib.tools.utils.uidGenerator()
     tmp_lcl_dir = os.path.join(tmpdir, "get_class_training_data_{}".format(uid_str))
     if not os.path.exists(tmp_lcl_dir):
         os.makedirs(tmp_lcl_dir)
@@ -218,7 +217,7 @@ def get_class_training_data(imgBandInfo, classVecSampleInfo, tmpdir, sub_sample=
 
     classInfo = dict()
     for class_sample_info in classVecSampleInfo:
-        cls_basename = rsgis_utils.get_file_basename(class_sample_info.fileH5)
+        cls_basename = rsgislib.tools.filetools.get_file_basename(class_sample_info.fileH5)
         out_vec_img = os.path.join(tmp_lcl_dir, "{}_img.kea".format(cls_basename))
         rsgislib.vectorutils.rasteriseVecLyr(class_sample_info.vecfile, class_sample_info.veclyr, rasterise_ref_img,
                                              out_vec_img, gdalformat="KEA", burnVal=class_sample_info.id,
@@ -262,17 +261,16 @@ def get_class_training_chips_data(imgBandInfo, classVecSampleInfo, chip_h_size, 
     :return: dictionary of ClassSimpleInfoObj objects.
 
     """
-    import rsgislib
+    import rsgislib.tools.filetools
+    import rsgislib.tools.utils
     import rsgislib.imageutils
     import rsgislib.vectorutils
     import os
-    import os.path
     import random
     import shutil
 
     # Get valid mask, rasterised to this
-    rsgis_utils = rsgislib.RSGISPyUtils()
-    uid_str = rsgis_utils.uidGenerator()
+    uid_str = rsgislib.tools.utils.uidGenerator()
     tmp_lcl_dir = os.path.join(tmpdir, "get_class_training_chips_data_{}".format(uid_str))
     if not os.path.exists(tmp_lcl_dir):
         os.makedirs(tmp_lcl_dir)
@@ -284,7 +282,7 @@ def get_class_training_chips_data(imgBandInfo, classVecSampleInfo, chip_h_size, 
 
     classInfo = dict()
     for class_sample_info in classVecSampleInfo:
-        cls_basename = rsgis_utils.get_file_basename(class_sample_info.fileH5)
+        cls_basename = rsgislib.tools.filetools.get_file_basename(class_sample_info.fileH5)
         out_vec_img = os.path.join(tmp_lcl_dir, "{}_img.kea".format(cls_basename))
         rsgislib.vectorutils.rasteriseVecLyr(class_sample_info.vecfile, class_sample_info.veclyr, rasterise_ref_img,
                                              out_vec_img, gdalformat="KEA", burnVal=class_sample_info.id,
@@ -335,12 +333,11 @@ def split_sample_train_valid_test(input_sample_h5_file, train_h5_file, valid_h5_
                      then the output data type will be float32.
 
     """
-    import rsgislib
+    import rsgislib.tools.utils
     import rsgislib.imageutils
     import os
-    import os.path
-    rsgis_utils = rsgislib.RSGISPyUtils()
-    uid_str = rsgis_utils.uidGenerator()
+
+    uid_str = rsgislib.tools.utils.uidGenerator()
     out_dir = os.path.split(os.path.abspath(test_h5_file))[0]
     if datatype is None:
         datatype = rsgislib.TYPE_32FLOAT
@@ -381,13 +378,11 @@ def split_chip_sample_train_valid_test(input_sample_h5_file, train_h5_file, vali
                      then the output data type will be float32.
 
     """
-    import rsgislib
+    import rsgislib.tools.utils
     import rsgislib.imageutils
     import os
-    import os.path
 
-    rsgis_utils = rsgislib.RSGISPyUtils()
-    uid_str = rsgis_utils.uidGenerator()
+    uid_str = rsgislib.tools.utils.uidGenerator()
     out_dir = os.path.split(os.path.abspath(test_h5_file))[0]
     if datatype is None:
         datatype = rsgislib.TYPE_32FLOAT
@@ -430,12 +425,11 @@ def split_chip_sample_ref_train_valid_test(input_sample_h5_file, train_h5_file, 
 
     """
     import rsgislib
+    import rsgislib.tools.utils
     from rsgislib.imageutils import splitSampleRefChipHDF5File
     import os
-    import os.path
 
-    rsgis_utils = rsgislib.RSGISPyUtils()
-    uid_str = rsgis_utils.uidGenerator()
+    uid_str = rsgislib.tools.utils.uidGenerator()
     out_dir = os.path.split(os.path.abspath(test_h5_file))[0]
     if datatype is None:
         datatype = rsgislib.TYPE_32FLOAT
@@ -473,7 +467,7 @@ def flipChipHDF5File(input_h5_file, output_h5_file, datatype=None):
     import h5py
     import numpy
     import rsgislib
-    rsgis_utils = rsgislib.RSGISPyUtils()
+
     if datatype is None:
         datatype = rsgislib.TYPE_32FLOAT
 
@@ -503,7 +497,7 @@ def flipChipHDF5File(input_h5_file, output_h5_file, datatype=None):
         chunk_features = n_in_feats
     else:
         chunk_features = 250
-    h5_dtype = rsgis_utils.getNumpyCharCodesDataType(datatype)
+    h5_dtype = rsgislib.getNumpyCharCodesDataType(datatype)
     fH5Out = h5py.File(output_h5_file, 'w')
     dataGrp = fH5Out.create_group("DATA")
     metaGrp = fH5Out.create_group("META-DATA")
@@ -530,7 +524,7 @@ def flipRefChipHDF5File(input_h5_file, output_h5_file, datatype=None):
     import h5py
     import numpy
     import rsgislib
-    rsgis_utils = rsgislib.RSGISPyUtils()
+
     if datatype is None:
         datatype = rsgislib.TYPE_32FLOAT
 
@@ -563,7 +557,7 @@ def flipRefChipHDF5File(input_h5_file, output_h5_file, datatype=None):
         chunk_features = n_in_feats
     else:
         chunk_features = 250
-    h5_dtype = rsgis_utils.getNumpyCharCodesDataType(datatype)
+    h5_dtype = rsgislib.getNumpyCharCodesDataType(datatype)
     fH5Out = h5py.File(output_h5_file, 'w')
     dataGrp = fH5Out.create_group("DATA")
     metaGrp = fH5Out.create_group("META-DATA")
@@ -710,9 +704,7 @@ def plot_train_data(cls1_h5_file, cls2_h5_file, out_plots_dir, cls1_name="Class 
     import tqdm
     import os
     import numpy
-    import rsgislib
-
-    rsgis_utils = rsgislib.RSGISPyUtils()
+    import rsgislib.tools.utils
 
     if not os.path.exists(out_plots_dir):
         raise Exception("The output directory does not exist")
@@ -743,8 +735,8 @@ def plot_train_data(cls1_h5_file, cls2_h5_file, out_plots_dir, cls1_name="Class 
 
     var_file_names = dict()
     for var_name in var_names:
-        var_file_names[var_name] = rsgis_utils.check_str(var_name, rm_non_ascii=True, rm_dashs=True,
-                                                         rm_spaces=True, rm_punc=True)
+        var_file_names[var_name] = rsgislib.tools.utils.check_str(var_name, rm_non_ascii=True, rm_dashs=True,
+                                                                  rm_spaces=True, rm_punc=True)
 
     cls1_data_name = numpy.empty(cls1_n, dtype=numpy.dtype('U255'))
     cls1_data_name[...] = cls1_name

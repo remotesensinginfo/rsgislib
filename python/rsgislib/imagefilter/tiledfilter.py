@@ -625,19 +625,18 @@ Example::
     imageutils.popImageStats(outputImage, usenodataval=False, nodataval=0, calcpyramids=True)
     
     """
-    rsgisUtils = rsgislib.RSGISPyUtils()
-    
+    import rsgislib.tools.utils
     createdTmp = False
     if not os.path.exists(tmpDIR):
         os.makedirs(tmpDIR)
         createdTmp = True
     
     if nCores <= 0:
-        nCores = rsgisUtils.numProcessCores()
+        nCores = rsgislib.tools.utils.numProcessCores()
         
-    uidStr = rsgisUtils.uidGenerator()
+    uidStr = rsgislib.tools.utils.uidGenerator()
     if dataType == None:
-        dataType = rsgisUtils.getRSGISLibDataTypeFromImg(inputImg)
+        dataType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inputImg)
     
     baseName = os.path.splitext(os.path.basename(inputImg))[0]+"_"+uidStr
     
@@ -667,7 +666,7 @@ Example::
     
     imgFilterTiles = glob.glob(os.path.join(tilesFilterDIR,"*_filter.kea"))
     
-    numOutBands = rsgisUtils.getImageBandCount(inputImg)
+    numOutBands = rsgislib.imageutils.getImageBandCount(inputImg)
     
     imageutils.createCopyImage(inputImg, outputImg, numOutBands, 0, gdalformat, dataType)
     
@@ -707,25 +706,23 @@ Example::
     imageutils.popImageStats(outputImage, usenodataval=False, nodataval=0, calcpyramids=True)
     
     """
-    
+    import rsgislib.tools.utils
     if (len(outputImgs) != len(filterInsts)):
         raise rsgislib.RSGISPyException('The same number of filters and output images need to be provided.')
     
     numFilters = len(outputImgs)
-    
-    rsgisUtils = rsgislib.RSGISPyUtils()
-    
+
     createdTmp = False
     if not os.path.exists(tmpDIR):
         os.makedirs(tmpDIR)
         createdTmp = True
     
     if nCores <= 0:
-        nCores = rsgisUtils.numProcessCores()
+        nCores = rsgislib.tools.utils.numProcessCores()
         
-    uidStr = rsgisUtils.uidGenerator()
+    uidStr = rsgislib.tools.utils.uidGenerator()
     if dataType == None:
-        dataType = rsgisUtils.getRSGISLibDataTypeFromImg(inputImg)
+        dataType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inputImg)
     
     baseName = os.path.splitext(os.path.basename(inputImg))[0]+"_"+uidStr
     
@@ -768,7 +765,7 @@ Example::
         
         imgFilterTiles = glob.glob(os.path.join(tilesFilterDIR,"*_filter.kea"))
         
-        numOutBands = rsgisUtils.getImageBandCount(inputImg)
+        numOutBands = rsgislib.imageutils.getImageBandCount(inputImg)
         
         imageutils.createCopyImage(inputImg, outputImg, numOutBands, 0, gdalformat, dataType)
         

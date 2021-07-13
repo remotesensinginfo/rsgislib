@@ -228,9 +228,9 @@ Where:
 :param gdalformat: is the output image file format of the tile masks
 
 """
+    import rsgislib.tools.filetools
     outBaseImg = os.path.join(tilesMaskDIR, tilesNameBase)
-    rsgisUtils = rsgislib.RSGISPyUtils()
-    outImgExt = rsgisUtils.getFileExtension(gdalformat)[1:]
+    outImgExt = rsgislib.tools.filetools.getFileExtension(gdalformat)[1:]
     rastergis.exportClumps2Images(clumpsImage, outBaseImg, True, outImgExt, gdalformat, 1)
 
 

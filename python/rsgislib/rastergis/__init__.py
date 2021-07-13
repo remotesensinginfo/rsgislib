@@ -73,10 +73,8 @@ Example::
 
 """
     import os
-    import rsgislib
+    import rsgislib.tools.filetools
     from rsgislib import imageutils
-
-    rsgisUtils = rsgislib.RSGISPyUtils()
 
     if tempDIR is None:
         tempDIR = os.path.split(outimage)[0]
@@ -98,7 +96,7 @@ Example::
     # Remove temp files
     print('Removing temp files')
     for tempFile in tempFileList:
-        rsgisUtils.deleteFileWithBasename(tempFile)
+        rsgislib.tools.filetools.deleteFileWithBasename(tempFile)
 
 
 def getRATLength(clumps_img, rat_band=1):
@@ -247,7 +245,7 @@ def check_string_col_valid(clumps, str_col, rm_punc=False, rm_spaces=False, rm_n
 
     """
     import numpy
-    import rsgislib
+    import rsgislib.tools.utils
     from rios import ratapplier
 
     def _ratapplier_check_string_col_valid(info, inputs, outputs, otherargs):
@@ -259,11 +257,7 @@ def check_string_col_valid(clumps, str_col, rm_punc=False, rm_spaces=False, rm_n
             except:
                 str_val_tmp = ""
             str_val_tmp = str_val_tmp.strip()
-
-            rsgis_utils = rsgislib.RSGISPyUtils()
-            rsgis_utils.check_str(str_val_tmp, rm_non_ascii=rm_non_ascii, rm_dashs=rm_dashs,
-                                  rm_spaces=rm_spaces, rm_punc=rm_punc)
-
+            str_val_tmp = rsgislib.tools.utils.check_str(str_val_tmp, rm_non_ascii=rm_non_ascii, rm_dashs=rm_dashs, rm_spaces=rm_spaces, rm_punc=rm_punc)
             out_col_vals[i] = str_val_tmp
         setattr(outputs.outrat, otherargs.str_col, out_col_vals)
 

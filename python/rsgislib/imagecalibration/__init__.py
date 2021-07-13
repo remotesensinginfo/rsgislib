@@ -87,8 +87,7 @@ Example::
     import rsgislib.imageutils
     import collections
     
-    rsgisUtils = rsgislib.RSGISPyUtils()
-    outDataType = rsgisUtils.getRSGISLibDataTypeFromImg(inputFile)
+    outDataType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inputFile)
     
     percentList = rsgislib.imagecalc.bandPercentile(inputFile, darkObjPercentile, noDataVal)
         
@@ -212,20 +211,20 @@ Example::
     rsgislib.imagecalc.imageMath(tmpClearSkyRegionsFullExtentSelectClumpsOpenClumpRMSmall, outputClearSkyMask, "b1>0?1:0", outFormat, rsgislib.TYPE_8UINT)
         
     if deleteTmpFiles:
-        rsgisUtils = rsgislib.RSGISPyUtils()
-        rsgisUtils.deleteFileWithBasename(tmpCloudsImgDist2Clouds)
-        rsgisUtils.deleteFileWithBasename(tmpCloudsImgDist2CloudsNoData)
-        rsgisUtils.deleteFileWithBasename(tmpInitClearSkyRegions)
-        rsgisUtils.deleteFileWithBasename(tmpInitClearSkyRegionsClumps)
-        rsgisUtils.deleteFileWithBasename(tmpInitClearSkyRegionsRmSmall)
-        rsgisUtils.deleteFileWithBasename(tmpInitClearSkyRegionsFinal)
-        rsgisUtils.deleteFileWithBasename(tmpClearSkyRegionsFullExtent)
-        rsgisUtils.deleteFileWithBasename(tmpClearSkyRegionsFullExtentClumps)
-        rsgisUtils.deleteFileWithBasename(tmpClearSkyRegionsFullExtentSelectClumps)
-        rsgisUtils.deleteFileWithBasename(tmpClearSkyRegionsFullExtentSelectClumpsOpen)
-        rsgisUtils.deleteFileWithBasename(tmpClearSkyRegionsFullExtentSelectClumpsOpenClump)
-        rsgisUtils.deleteFileWithBasename(tmpClearSkyRegionsFullExtentSelectClumpsOpenClumpRMSmall)
-        rsgisUtils.deleteFileWithBasename(tmpMorphOperator)
+        import rsgislib.tools.filetools
+        rsgislib.tools.filetools.deleteFileWithBasename(tmpCloudsImgDist2Clouds)
+        rsgislib.tools.filetools.deleteFileWithBasename(tmpCloudsImgDist2CloudsNoData)
+        rsgislib.tools.filetools.deleteFileWithBasename(tmpInitClearSkyRegions)
+        rsgislib.tools.filetools.deleteFileWithBasename(tmpInitClearSkyRegionsClumps)
+        rsgislib.tools.filetools.deleteFileWithBasename(tmpInitClearSkyRegionsRmSmall)
+        rsgislib.tools.filetools.deleteFileWithBasename(tmpInitClearSkyRegionsFinal)
+        rsgislib.tools.filetools.deleteFileWithBasename(tmpClearSkyRegionsFullExtent)
+        rsgislib.tools.filetools.deleteFileWithBasename(tmpClearSkyRegionsFullExtentClumps)
+        rsgislib.tools.filetools.deleteFileWithBasename(tmpClearSkyRegionsFullExtentSelectClumps)
+        rsgislib.tools.filetools.deleteFileWithBasename(tmpClearSkyRegionsFullExtentSelectClumpsOpen)
+        rsgislib.tools.filetools.deleteFileWithBasename(tmpClearSkyRegionsFullExtentSelectClumpsOpenClump)
+        rsgislib.tools.filetools.deleteFileWithBasename(tmpClearSkyRegionsFullExtentSelectClumpsOpenClumpRMSmall)
+        rsgislib.tools.filetools.deleteFileWithBasename(tmpMorphOperator)
 
 
 def getESUNValue(radiance, toaRefl, day, month, year, solarZenith):

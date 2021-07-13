@@ -419,15 +419,14 @@ Example::
         apply_sklearn_classifer(classTrainInfo, skClassifier, classAreaMask, classMaskPxlVal, imgFileInfo,
                                 tmpClassImgOut, gdalformat)
 
-    rsgisUtils = rsgislib.RSGISPyUtils()
-
     if type(skClassifiers) is not list:
         raise rsgislib.RSGISPyException("A list of classifiers must be provided")
 
     numOfVotes = len(skClassifiers)
 
     if numCores <= 0:
-        numCores = rsgisUtils.numProcessCores()
+        import rsgislib.tools.utils
+        numCores = rsgislib.tools.utils.numProcessCores()
 
     tmpPresent = True
     if not os.path.exists(tmpDIR):

@@ -123,11 +123,11 @@ def getRasterLyr(scn_bbox, lutdbfile, lyrname, tmp_path):
     if not haveGDALPy:
         raise Exception("Need to have GDAL library available for getRasterLyr function to work.")
     import rsgislib.vectorutils
+    import rsgislib.tools.utils
 
-    rsgis_utils = rsgislib.RSGISPyUtils()
     fileListLUT = rsgislib.vectorutils.getAttLstSelectBBoxFeats(lutdbfile, lyrname, ['path', 'filename'], scn_bbox)
 
-    imgbase = "imglyr_{}".format(rsgis_utils.uidGenerator())
+    imgbase = "imglyr_{}".format(rsgislib.tools.utils.uidGenerator())
     # if number of scenes available is > 0 then create VRT
     if len(fileListLUT) > 1:
         imgs = []

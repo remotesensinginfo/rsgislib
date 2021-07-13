@@ -57,14 +57,14 @@ Clump the input image using a tiled processing chain allowing large images to be
 :param gdalformat: string with the GDAL image format for the output image (Default = KEA). NOTE. KEA is used as intermediate format internally and therefore needs to be available.
 
     """
+    import rsgislib.tools.utils
     createdTmp = False
     if not os.path.exists(tmpDIR):
         os.makedirs(tmpDIR)
         createdTmp = True
     
-    rsgisUtils = rsgislib.RSGISPyUtils()
-    uidStr = rsgisUtils.uidGenerator()
-    dataType = rsgisUtils.getRSGISLibDataTypeFromImg(inputImage)
+    uidStr = rsgislib.tools.utils.uidGenerator()
+    dataType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inputImage)
     baseName = os.path.splitext(os.path.basename(inputImage))[0]+"_"+uidStr
     imgTilesDIR = os.path.join(tmpDIR, "imgtiles_"+uidStr)
     tilesClumpsDIR = os.path.join(tmpDIR, "imgclumpstiles_"+uidStr)
@@ -118,6 +118,7 @@ Clump the input image using a tiled processing chain allowing large images to be
 :param nCores: is an int specifying the number of cores to be used for clumping processing.
 
     """
+    import rsgislib.tools.utils
     createdTmp = False
     if not os.path.exists(tmpDIR):
         os.makedirs(tmpDIR)
@@ -126,9 +127,8 @@ Clump the input image using a tiled processing chain allowing large images to be
     if nCores <= 0:
         nCores = multiprocessing.cpu_count()
     
-    rsgisUtils = rsgislib.RSGISPyUtils()
-    uidStr = rsgisUtils.uidGenerator()
-    dataType = rsgisUtils.getRSGISLibDataTypeFromImg(inputImage)
+    uidStr = rsgislib.tools.utils.uidGenerator()
+    dataType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inputImage)
     baseName = os.path.splitext(os.path.basename(inputImage))[0]+"_"+uidStr
     imgTilesDIR = os.path.join(tmpDIR, "imgtiles_"+uidStr)
     tilesClumpsDIR = os.path.join(tmpDIR, "imgclumpstiles_"+uidStr)
@@ -182,14 +182,14 @@ Clump and union with the reference image the input image using a tiled processin
 :param gdalformat: string with the GDAL image format for the output image (Default = KEA). NOTE. KEA is used as intermediate format internally and therefore needs to be available.
 
     """
+    import rsgislib.tools.utils
     createdTmp = False
     if not os.path.exists(tmpDIR):
         os.makedirs(tmpDIR)
         createdTmp = True
     
-    rsgisUtils = rsgislib.RSGISPyUtils()
-    uidStr = rsgisUtils.uidGenerator()
-    dataType = rsgisUtils.getRSGISLibDataTypeFromImg(inputImage)
+    uidStr = rsgislib.tools.utils.uidGenerator()
+    dataType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inputImage)
     baseName = os.path.splitext(os.path.basename(inputImage))[0]+"_"+uidStr
     imgTilesDIR = os.path.join(tmpDIR, "imgtiles_"+uidStr)
     tilesClumpsDIR = os.path.join(tmpDIR, "imgclumpstiles_"+uidStr)
@@ -242,6 +242,7 @@ Clump and union with the reference image the input image using a tiled processin
 :param nCores: is an int specifying the number of cores to be used for clumping processing.
 
     """
+    import rsgislib.tools.utils
     createdTmp = False
     if not os.path.exists(tmpDIR):
         os.makedirs(tmpDIR)
@@ -250,9 +251,8 @@ Clump and union with the reference image the input image using a tiled processin
     if nCores <= 0:
         nCores = multiprocessing.cpu_count()
     
-    rsgisUtils = rsgislib.RSGISPyUtils()
-    uidStr = rsgisUtils.uidGenerator()
-    dataType = rsgisUtils.getRSGISLibDataTypeFromImg(inputImage)
+    uidStr = rsgislib.tools.utils.uidGenerator()
+    dataType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inputImage)
     baseName = os.path.splitext(os.path.basename(inputImage))[0]+"_"+uidStr
     imgTilesDIR = os.path.join(tmpDIR, "imgtiles_"+uidStr)
     tilesClumpsDIR = os.path.join(tmpDIR, "imgclumpstiles_"+uidStr)

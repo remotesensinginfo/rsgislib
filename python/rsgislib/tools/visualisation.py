@@ -25,6 +25,7 @@ def createKMZImg(inputImg, outputFile, bands, reprojLatLong=True, finiteMsk=Fals
     :param finiteMsk: specify whether the image data should be masked so all values are finite before stretching.
     
     """
+    import rsgislib.tools.utils
     bandLst = bands.split(',')
     multiBand = False
     if len(bandLst) == 3:
@@ -34,10 +35,10 @@ def createKMZImg(inputImg, outputFile, bands, reprojLatLong=True, finiteMsk=Fals
     else:
         print(bandLst)
         raise rsgislib.RSGISPyException('You need to either provide 1 or 3 bands.')
-    rsgisUtils = rsgislib.RSGISPyUtils()
-    nImgBands = rsgisUtils.getImageBandCount(inputImg)
 
-    uid_str = rsgisUtils.uidGenerator()
+    nImgBands = rsgislib.imageutils.getImageBandCount(inputImg)
+
+    uid_str = rsgislib.tools.utils.uidGenerator()
     tmpDIR = os.path.join(os.path.dirname(inputImg), uid_str)
     if not os.path.exists(tmpDIR):
         os.makedirs(tmpDIR)
@@ -53,14 +54,14 @@ def createKMZImg(inputImg, outputFile, bands, reprojLatLong=True, finiteMsk=Fals
         for strBand in bandLst:
             sBands.append(int(strBand))
         selImgBandsImg = os.path.join(tmpDIR, baseName+'_sband.kea')
-        rsgislib.imageutils.selectImageBands(inputImg, selImgBandsImg, 'KEA', rsgisUtils.getRSGISLibDataTypeFromImg(inputImg), sBands)
+        rsgislib.imageutils.selectImageBands(inputImg, selImgBandsImg, 'KEA', rsgislib.imageutils.getRSGISLibDataTypeFromImg(inputImg), sBands)
     
     img2Stch = selImgBandsImg
     if finiteMsk:
         finiteMskImg = os.path.join(tmpDIR, baseName+'_FiniteMsk.kea')
         rsgislib.imageutils.genFiniteMask(selImgBandsImg, finiteMskImg, 'KEA')
         img2Stch = os.path.join(tmpDIR, baseName+'_Msk2FiniteRegions.kea')
-        rsgislib.imageutils.maskImage(selImgBandsImg, finiteMskImg, img2Stch, 'KEA', rsgisUtils.getRSGISLibDataTypeFromImg(inputImg), 0, 0)
+        rsgislib.imageutils.maskImage(selImgBandsImg, finiteMskImg, img2Stch, 'KEA', rsgislib.imageutils.getRSGISLibDataTypeFromImg(inputImg), 0, 0)
     
     stretchImg = os.path.join(tmpDIR, baseName+'_stretch.kea')
     rsgislib.imageutils.stretchImage(img2Stch, stretchImg, False, '', True, False, 'KEA', rsgislib.TYPE_8UINT, rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
@@ -69,7 +70,7 @@ def createKMZImg(inputImg, outputFile, bands, reprojLatLong=True, finiteMsk=Fals
     if reprojLatLong:
         latLongImg = os.path.join(tmpDIR, baseName+'_latlong.kea')
         outWKT = os.path.join(tmpDIR, baseName+'_latlong.wkt')
-        rsgisUtils.writeList2File(['GEOGCS["WGS_1984",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.2572235630016],TOWGS84[0,0,0,0,0,0,0]],PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433],AUTHORITY["EPSG","4326"]]'], outWKT)
+        rsgislib.tools.utils.writeList2File(['GEOGCS["WGS_1984",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.2572235630016],TOWGS84[0,0,0,0,0,0,0]],PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433],AUTHORITY["EPSG","4326"]]'], outWKT)
         rsgislib.imageutils.reprojectImage(stretchImg, latLongImg, outWKT, gdalformat='KEA', interp='cubic', inWKT=None, noData=0.0, outPxlRes='auto', snap2Grid=True)
         gdalInFile = latLongImg
     
@@ -102,6 +103,7 @@ def createWebTilesImg(inputImg, outputDIR, bands, zoomLevels='2-10', resample='a
                 (TMS: gdal2tiles.py native. XYZ: GIS Compatible)
     
     """
+    import rsgislib.tools.utils
     bandLst = bands.split(',')
     multiBand = False
     if len(bandLst) == 3:
@@ -111,10 +113,9 @@ def createWebTilesImg(inputImg, outputDIR, bands, zoomLevels='2-10', resample='a
     else:
         print(bandLst)
         raise rsgislib.RSGISPyException('You need to either provide 1 or 3 bands.')
-    rsgisUtils = rsgislib.RSGISPyUtils()
-    nImgBands = rsgisUtils.getImageBandCount(inputImg)
+    nImgBands = rsgislib.imageutils.getImageBandCount(inputImg)
     
-    tmpDIR = os.path.join(os.path.dirname(inputImg), rsgisUtils.uidGenerator())
+    tmpDIR = os.path.join(os.path.dirname(inputImg), rsgislib.tools.utils.uidGenerator())
     os.makedirs(tmpDIR)
     baseName = os.path.splitext(os.path.basename(inputImg))[0]
     
@@ -128,14 +129,14 @@ def createWebTilesImg(inputImg, outputDIR, bands, zoomLevels='2-10', resample='a
         for strBand in bandLst:
             sBands.append(int(strBand))
         selImgBandsImg = os.path.join(tmpDIR, baseName+'_sband.kea')
-        rsgislib.imageutils.selectImageBands(inputImg, selImgBandsImg, 'KEA', rsgisUtils.getRSGISLibDataTypeFromImg(inputImg), sBands)
+        rsgislib.imageutils.selectImageBands(inputImg, selImgBandsImg, 'KEA', rsgislib.imageutils.getRSGISLibDataTypeFromImg(inputImg), sBands)
     
     img2Stch = selImgBandsImg
     if finiteMsk:
         finiteMskImg = os.path.join(tmpDIR, baseName+'_FiniteMsk.kea')
         rsgislib.imageutils.genFiniteMask(selImgBandsImg, finiteMskImg, 'KEA')
         img2Stch = os.path.join(tmpDIR, baseName+'_Msk2FiniteRegions.kea')
-        rsgislib.imageutils.maskImage(selImgBandsImg, finiteMskImg, img2Stch, 'KEA', rsgisUtils.getRSGISLibDataTypeFromImg(inputImg), 0, 0)
+        rsgislib.imageutils.maskImage(selImgBandsImg, finiteMskImg, img2Stch, 'KEA', rsgislib.imageutils.getRSGISLibDataTypeFromImg(inputImg), 0, 0)
     
     stretchImg = os.path.join(tmpDIR, baseName+'_stretch.kea')
     rsgislib.imageutils.stretchImage(img2Stch, stretchImg, False, '', True, False, 'KEA', rsgislib.TYPE_8UINT, rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
@@ -177,6 +178,7 @@ def createWebTilesImg(inputImg, bands, outputDIR, zoomLevels='2-10', img_stats_m
                 (TMS: gdal2tiles.py native. XYZ: GIS Compatible)
 
     """
+    import rsgislib.tools.utils
     bandLst = bands.split(',')
     multiBand = False
     if len(bandLst) == 3:
@@ -186,11 +188,10 @@ def createWebTilesImg(inputImg, bands, outputDIR, zoomLevels='2-10', img_stats_m
     else:
         print(bandLst)
         raise rsgislib.RSGISPyException('You need to either provide 1 or 3 bands.')
-    rsgisUtils = rsgislib.RSGISPyUtils()
-    nImgBands = rsgisUtils.getImageBandCount(inputImg)
-    img_no_data_val = rsgisUtils.getImageNoDataValue(inputImg)
+    nImgBands = rsgislib.imageutils.getImageBandCount(inputImg)
+    img_no_data_val = rsgislib.imageutils.getImageNoDataValue(inputImg)
 
-    uid_str = rsgisUtils.uidGenerator()
+    uid_str = rsgislib.tools.utils.uidGenerator()
     tmpDIR = os.path.join(os.path.dirname(inputImg), uid_str)
     if tmp_dir is not None:
         tmpDIR = os.path.join(tmp_dir, uid_str)
@@ -209,14 +210,14 @@ def createWebTilesImg(inputImg, bands, outputDIR, zoomLevels='2-10', img_stats_m
             sBands.append(int(strBand))
         selImgBandsImg = os.path.join(tmpDIR, baseName + '_sband.kea')
         rsgislib.imageutils.selectImageBands(inputImg, selImgBandsImg, 'KEA',
-                                             rsgisUtils.getRSGISLibDataTypeFromImg(inputImg), sBands)
+                                             rsgislib.imageutils.getRSGISLibDataTypeFromImg(inputImg), sBands)
 
     img2Stch = selImgBandsImg
     stretchImg = os.path.join(tmpDIR, baseName + '_stretch.kea')
     if img_stats_msk is not None:
         img2StchMskd = os.path.join(tmpDIR, baseName + '_MskdImg.kea')
         rsgislib.imageutils.maskImage(selImgBandsImg, img_stats_msk, img2StchMskd, 'KEA',
-                                      rsgisUtils.getRSGISLibDataTypeFromImg(inputImg), img_no_data_val, img_msk_vals)
+                                      rsgislib.imageutils.getRSGISLibDataTypeFromImg(inputImg), img_no_data_val, img_msk_vals)
         stretchImgStats = os.path.join(tmpDIR, baseName + '_stretch_statstmp.txt')
         stretchImgTmp = os.path.join(tmpDIR, baseName + '_stretch_tmp.kea')
         rsgislib.imageutils.stretchImageNoData(img2StchMskd, stretchImgTmp, True, stretchImgStats, img_no_data_val,
@@ -266,6 +267,7 @@ def createQuicklookImgs(inputImg, bands, outputImgs='quicklook.jpg', output_img_
                     image.
 
     """
+    import rsgislib.tools.utils
     if scale_axis not in ['width', 'height', 'auto']:
         raise rsgislib.RSGISPyException("Input parameter 'scale_axis' must have the value 'width', 'height' or 'auto'.")
 
@@ -290,13 +292,12 @@ def createQuicklookImgs(inputImg, bands, outputImgs='quicklook.jpg', output_img_
     else:
         print(bandLst)
         raise rsgislib.RSGISPyException('You need to either provide 1 or 3 bands.')
-    rsgisUtils = rsgislib.RSGISPyUtils()
-    nImgBands = rsgisUtils.getImageBandCount(inputImg)
-    img_no_data_val = rsgisUtils.getImageNoDataValue(inputImg)
+    nImgBands = rsgislib.imageutils.getImageBandCount(inputImg)
+    img_no_data_val = rsgislib.imageutils.getImageNoDataValue(inputImg)
 
-    tmpDIR = os.path.join(os.path.dirname(inputImg), rsgisUtils.uidGenerator())
+    tmpDIR = os.path.join(os.path.dirname(inputImg), rsgislib.tools.utils.uidGenerator())
     if tmp_dir is not None:
-        tmpDIR = os.path.join(tmp_dir, rsgisUtils.uidGenerator())
+        tmpDIR = os.path.join(tmp_dir, rsgislib.tools.utils.uidGenerator())
     os.makedirs(tmpDIR)
     baseName = os.path.splitext(os.path.basename(inputImg))[0]
 
@@ -311,7 +312,7 @@ def createQuicklookImgs(inputImg, bands, outputImgs='quicklook.jpg', output_img_
             sBands.append(int(strBand))
         selImgBandsImg = os.path.join(tmpDIR, baseName + '_sband.kea')
         rsgislib.imageutils.selectImageBands(inputImg, selImgBandsImg, 'KEA',
-                                             rsgisUtils.getRSGISLibDataTypeFromImg(inputImg), sBands)
+                                             rsgislib.imageutils.getRSGISLibDataTypeFromImg(inputImg), sBands)
 
     img2Stch = selImgBandsImg
     stretchImg = os.path.join(tmpDIR, baseName + '_stretch.kea')
@@ -321,7 +322,7 @@ def createQuicklookImgs(inputImg, bands, outputImgs='quicklook.jpg', output_img_
     elif img_stats_msk is not None:
         img2StchMskd = os.path.join(tmpDIR, baseName + '_MskdImg.kea')
         rsgislib.imageutils.maskImage(selImgBandsImg, img_stats_msk, img2StchMskd, 'KEA',
-                                      rsgisUtils.getRSGISLibDataTypeFromImg(inputImg), img_no_data_val, img_msk_vals)
+                                      rsgislib.imageutils.getRSGISLibDataTypeFromImg(inputImg), img_no_data_val, img_msk_vals)
         stretchImgStats = os.path.join(tmpDIR, baseName + '_stretch_statstmp.txt')
         stretchImgTmp = os.path.join(tmpDIR, baseName + '_stretch_tmp.kea')
         rsgislib.imageutils.stretchImageNoData(img2StchMskd, stretchImgTmp, True, stretchImgStats, img_no_data_val,
@@ -336,7 +337,7 @@ def createQuicklookImgs(inputImg, bands, outputImgs='quicklook.jpg', output_img_
                                                rsgislib.TYPE_8UINT, rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
 
     if scale_axis == 'auto':
-        x_size, y_size = rsgisUtils.getImageSize(stretchImg)
+        x_size, y_size = rsgislib.imageutils.getImageSize(stretchImg)
         if x_size > y_size:
             scale_axis = 'width'
         else:
@@ -391,6 +392,7 @@ def createMBTileFile(input_img, bands, output_mbtiles, scale_input_img=50, img_s
     :param tile_format: Specify the tile file format to use, options: PNG, PNG8 and JPG. Default: PNG
 
     """
+    import rsgislib.tools.utils
     from osgeo import gdal
     bandLst = bands.split(',')
     multiBand = False
@@ -401,11 +403,10 @@ def createMBTileFile(input_img, bands, output_mbtiles, scale_input_img=50, img_s
     else:
         print(bandLst)
         raise rsgislib.RSGISPyException('You need to either provide 1 or 3 bands.')
-    rsgisUtils = rsgislib.RSGISPyUtils()
-    nImgBands = rsgisUtils.getImageBandCount(input_img)
-    img_no_data_val = rsgisUtils.getImageNoDataValue(input_img)
+    nImgBands = rsgislib.imageutils.getImageBandCount(input_img)
+    img_no_data_val = rsgislib.imageutils.getImageNoDataValue(input_img)
 
-    uid_str = rsgisUtils.uidGenerator()
+    uid_str = rsgislib.tools.utils.uidGenerator()
     tmpDIR = os.path.join(os.path.dirname(input_img), uid_str)
     if tmp_dir is not None:
         tmpDIR = os.path.join(tmp_dir, uid_str)
@@ -424,14 +425,14 @@ def createMBTileFile(input_img, bands, output_mbtiles, scale_input_img=50, img_s
             sBands.append(int(strBand))
         selImgBandsImg = os.path.join(tmpDIR, baseName + '_sband.kea')
         rsgislib.imageutils.selectImageBands(input_img, selImgBandsImg, 'KEA',
-                                             rsgisUtils.getRSGISLibDataTypeFromImg(input_img), sBands)
+                                             rsgislib.imageutils.getRSGISLibDataTypeFromImg(input_img), sBands)
 
     img2Stch = selImgBandsImg
     stretchImg = os.path.join(tmpDIR, baseName + '_stretch.kea')
     if img_stats_msk is not None:
         img2StchMskd = os.path.join(tmpDIR, baseName + '_MskdImg.kea')
         rsgislib.imageutils.maskImage(selImgBandsImg, img_stats_msk, img2StchMskd, 'KEA',
-                                      rsgisUtils.getRSGISLibDataTypeFromImg(input_img), img_no_data_val, img_msk_vals)
+                                      rsgislib.imageutils.getRSGISLibDataTypeFromImg(input_img), img_no_data_val, img_msk_vals)
         stretchImgStats = os.path.join(tmpDIR, baseName + '_stretch_statstmp.txt')
         stretchImgTmp = os.path.join(tmpDIR, baseName + '_stretch_tmp.kea')
         rsgislib.imageutils.stretchImageNoData(img2StchMskd, stretchImgTmp, True, stretchImgStats, img_no_data_val,
@@ -488,6 +489,7 @@ def createWebTilesVisGTIFFImg(input_img, bands, output_dir, scaled_gtiff_img, zo
                 (TMS: gdal2tiles.py native. XYZ: GIS Compatible)
 
     """
+    import rsgislib.tools.utils
     from osgeo import gdal
     bandLst = bands.split(',')
     multiBand = False
@@ -498,11 +500,10 @@ def createWebTilesVisGTIFFImg(input_img, bands, output_dir, scaled_gtiff_img, zo
     else:
         print(bandLst)
         raise rsgislib.RSGISPyException('You need to either provide 1 or 3 bands.')
-    rsgisUtils = rsgislib.RSGISPyUtils()
-    nImgBands = rsgisUtils.getImageBandCount(input_img)
-    img_no_data_val = rsgisUtils.getImageNoDataValue(input_img)
+    nImgBands = rsgislib.imageutils.getImageBandCount(input_img)
+    img_no_data_val = rsgislib.imageutils.getImageNoDataValue(input_img)
 
-    uid_str = rsgisUtils.uidGenerator()
+    uid_str = rsgislib.tools.utils.uidGenerator()
     tmpDIR = os.path.join(os.path.dirname(input_img), uid_str)
     if tmp_dir is not None:
         tmpDIR = os.path.join(tmp_dir, uid_str)
@@ -521,7 +522,7 @@ def createWebTilesVisGTIFFImg(input_img, bands, output_dir, scaled_gtiff_img, zo
             sBands.append(int(strBand))
         selImgBandsImg = os.path.join(tmpDIR, baseName + '_sband.kea')
         rsgislib.imageutils.selectImageBands(input_img, selImgBandsImg, 'KEA',
-                                             rsgisUtils.getRSGISLibDataTypeFromImg(input_img), sBands)
+                                             rsgislib.imageutils.getRSGISLibDataTypeFromImg(input_img), sBands)
 
     img2Stch = selImgBandsImg
     stretchImg = os.path.join(tmpDIR, baseName + '_stretch.kea')
@@ -531,7 +532,7 @@ def createWebTilesVisGTIFFImg(input_img, bands, output_dir, scaled_gtiff_img, zo
     elif img_stats_msk is not None:
         img2StchMskd = os.path.join(tmpDIR, baseName + '_MskdImg.kea')
         rsgislib.imageutils.maskImage(selImgBandsImg, img_stats_msk, img2StchMskd, 'KEA',
-                                      rsgisUtils.getRSGISLibDataTypeFromImg(input_img), img_no_data_val, img_msk_vals)
+                                      rsgislib.imageutils.getRSGISLibDataTypeFromImg(input_img), img_no_data_val, img_msk_vals)
         stretchImgStats = os.path.join(tmpDIR, baseName + '_stretch_statstmp.txt')
         stretchImgTmp = os.path.join(tmpDIR, baseName + '_stretch_tmp.kea')
         rsgislib.imageutils.stretchImageNoData(img2StchMskd, stretchImgTmp, True, stretchImgStats, img_no_data_val,
@@ -589,6 +590,8 @@ def createQuicklookOverviewImgs(input_imgs, bands, tmp_dir, outputImgs='quickloo
     :param stretch_file: a stretch stats file to standardise the stretch between a number of input files.
 
     """
+    import rsgislib.tools.utils
+    import rsgislib.tools.filetools
     if scale_axis not in ['width', 'height', 'auto']:
         raise rsgislib.RSGISPyException("Input parameter 'scale_axis' must have the value 'width', 'height' or 'auto'.")
 
@@ -608,13 +611,12 @@ def createQuicklookOverviewImgs(input_imgs, bands, tmp_dir, outputImgs='quickloo
             outputImgs = outputImgs[0]
             output_img_sizes = output_img_sizes[0]
 
-    rsgis_utils = rsgislib.RSGISPyUtils()
-    uid_str = rsgis_utils.uidGenerator()
+    uid_str = rsgislib.tools.utils.uidGenerator()
     usr_tmp_dir = os.path.join(tmp_dir, "qklk_tmp_{}".format(uid_str))
     if not os.path.exists(usr_tmp_dir):
         os.makedirs(usr_tmp_dir)
 
-    img_basename = rsgis_utils.get_file_basename(input_imgs[0], checkvalid=True)
+    img_basename = rsgislib.tools.filetools.get_file_basename(input_imgs[0], check_valid=True)
 
     bandLst = bands.split(',')
     multiBand = False
@@ -630,13 +632,13 @@ def createQuicklookOverviewImgs(input_imgs, bands, tmp_dir, outputImgs='quickloo
     for strBand in bandLst:
         sBands.append(int(strBand))
 
-    nImgBands = rsgis_utils.getImageBandCount(input_imgs[0])
-    img_no_data_val = rsgis_utils.getImageNoDataValue(input_imgs[0])
+    nImgBands = rsgislib.imageutils.getImageBandCount(input_imgs[0])
+    img_no_data_val = rsgislib.imageutils.getImageNoDataValue(input_imgs[0])
 
     b_sel_imgs = []
     for img in input_imgs:
-        tmp_n_bands = rsgis_utils.getImageBandCount(img)
-        tmp_no_data_val = rsgis_utils.getImageNoDataValue(img)
+        tmp_n_bands = rsgislib.imageutils.getImageBandCount(img)
+        tmp_no_data_val = rsgislib.imageutils.getImageNoDataValue(img)
 
         if tmp_n_bands != nImgBands:
             raise rsgislib.RSGISPyException('The number of bands in the input images is different.')
@@ -650,11 +652,11 @@ def createQuicklookOverviewImgs(input_imgs, bands, tmp_dir, outputImgs='quickloo
         elif (nImgBands == 3) and (multiBand) and (bandLst[0] == '1') and (bandLst[1] == '2') and (bandLst[2] == '3'):
             selImgBandsImg = img
         else:
-            lcl_img_basename = rsgis_utils.get_file_basename(img, checkvalid=True)
+            lcl_img_basename = rsgislib.tools.filetools.get_file_basename(img, check_valid=True)
             selImgBandsImg = os.path.join(usr_tmp_dir, '{}_sband.kea'.format(lcl_img_basename))
             rsgislib.imageutils.selectImageBands(img, selImgBandsImg, 'KEA',
-                                                 rsgis_utils.getRSGISLibDataTypeFromImg(img), sBands)
-            rsgis_utils.setImageNoDataValue(selImgBandsImg, img_no_data_val)
+                                                 rsgislib.imageutils.getRSGISLibDataTypeFromImg(img), sBands)
+            rsgislib.imageutils.setImageNoDataValue(selImgBandsImg, img_no_data_val)
         b_sel_imgs.append(selImgBandsImg)
 
     tmp_vrt_img = os.path.join(usr_tmp_dir, "{}_{}.vrt".format(img_basename, uid_str))
@@ -670,7 +672,7 @@ def createQuicklookOverviewImgs(input_imgs, bands, tmp_dir, outputImgs='quickloo
                                                rsgislib.TYPE_8UINT, rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
 
     if scale_axis == 'auto':
-        x_size, y_size = rsgis_utils.getImageSize(stretchImg)
+        x_size, y_size = rsgislib.imageutils.getImageSize(stretchImg)
         if x_size > y_size:
             scale_axis = 'width'
         else:
@@ -725,8 +727,7 @@ Where:
     from rios import applier
     import numpy
 
-    rsgis_utils = rsgislib.RSGISPyUtils()
-    n_img_bands = rsgis_utils.getImageBandCount(base_image)
+    n_img_bands = rsgislib.imageutils.getImageBandCount(base_image)
     if msk_colour is None:
         msk_colour = list()
         for i in range(n_img_bands):
@@ -785,6 +786,8 @@ def createQuicklookOverviewImgsVecOverlay(input_imgs, bands, tmp_dir, vec_overla
     :param overlay_clr: output colour for the overlay image (value between 0-255). Default all values are 255.
 
     """
+    import rsgislib.tools.utils
+    import rsgislib.tools.filetools
     import rsgislib.vectorutils
     if scale_axis not in ['width', 'height', 'auto']:
         raise rsgislib.RSGISPyException("Input parameter 'scale_axis' must have the value 'width', 'height' or 'auto'.")
@@ -805,13 +808,12 @@ def createQuicklookOverviewImgsVecOverlay(input_imgs, bands, tmp_dir, vec_overla
             outputImgs = outputImgs[0]
             output_img_sizes = output_img_sizes[0]
 
-    rsgis_utils = rsgislib.RSGISPyUtils()
-    uid_str = rsgis_utils.uidGenerator()
+    uid_str = rsgislib.tools.utils.uidGenerator()
     usr_tmp_dir = os.path.join(tmp_dir, "qklk_tmp_{}".format(uid_str))
     if not os.path.exists(usr_tmp_dir):
         os.makedirs(usr_tmp_dir)
 
-    img_basename = rsgis_utils.get_file_basename(input_imgs[0], checkvalid=True)
+    img_basename = rsgislib.tools.filetools.get_file_basename(input_imgs[0], checkvalid=True)
     bandLst = bands.split(',')
     multiBand = False
     if len(bandLst) == 3:
@@ -826,13 +828,13 @@ def createQuicklookOverviewImgsVecOverlay(input_imgs, bands, tmp_dir, vec_overla
     for strBand in bandLst:
         sBands.append(int(strBand))
 
-    nImgBands = rsgis_utils.getImageBandCount(input_imgs[0])
-    img_no_data_val = rsgis_utils.getImageNoDataValue(input_imgs[0])
+    nImgBands = rsgislib.imageutils.getImageBandCount(input_imgs[0])
+    img_no_data_val = rsgislib.imageutils.getImageNoDataValue(input_imgs[0])
 
     b_sel_imgs = []
     for img in input_imgs:
-        tmp_n_bands = rsgis_utils.getImageBandCount(img)
-        tmp_no_data_val = rsgis_utils.getImageNoDataValue(img)
+        tmp_n_bands = rsgislib.imageutils.getImageBandCount(img)
+        tmp_no_data_val = rsgislib.imageutils.getImageNoDataValue(img)
 
         if tmp_n_bands != nImgBands:
             raise rsgislib.RSGISPyException('The number of bands in the input images is different.')
@@ -846,11 +848,11 @@ def createQuicklookOverviewImgsVecOverlay(input_imgs, bands, tmp_dir, vec_overla
         elif (nImgBands == 3) and (multiBand) and (bandLst[0] == '1') and (bandLst[1] == '2') and (bandLst[2] == '3'):
             selImgBandsImg = img
         else:
-            lcl_img_basename = rsgis_utils.get_file_basename(img, checkvalid=True)
+            lcl_img_basename = rsgislib.tools.filetools.get_file_basename(img, checkvalid=True)
             selImgBandsImg = os.path.join(usr_tmp_dir, '{}_sband.kea'.format(lcl_img_basename))
             rsgislib.imageutils.selectImageBands(img, selImgBandsImg, 'KEA',
-                                                 rsgis_utils.getRSGISLibDataTypeFromImg(img), sBands)
-            rsgis_utils.setImageNoDataValue(selImgBandsImg, img_no_data_val)
+                                                 rsgislib.imageutils.getRSGISLibDataTypeFromImg(img), sBands)
+            rsgislib.imageutils.setImageNoDataValue(selImgBandsImg, img_no_data_val)
         b_sel_imgs.append(selImgBandsImg)
 
     if overlay_clr is None:
@@ -871,7 +873,7 @@ def createQuicklookOverviewImgsVecOverlay(input_imgs, bands, tmp_dir, vec_overla
                                                rsgislib.TYPE_8UINT, rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
 
     if scale_axis == 'auto':
-        x_size, y_size = rsgis_utils.getImageSize(stretchImg)
+        x_size, y_size = rsgislib.imageutils.getImageSize(stretchImg)
         if x_size > y_size:
             scale_axis = 'width'
         else:
@@ -883,7 +885,7 @@ def createQuicklookOverviewImgsVecOverlay(input_imgs, bands, tmp_dir, vec_overla
         else:
             out_size = '-outsize 0 {0}'.format(output_img_sizes)
         # Create the resized output image.
-        lcl_img_basename = rsgis_utils.get_file_basename(outputImgs, checkvalid=True)
+        lcl_img_basename = rsgislib.tools.filetools.get_file_basename(outputImgs, check_valid=True)
         tmp_resized_img = os.path.join(usr_tmp_dir, '{}_resized.kea'.format(lcl_img_basename))
         cmd = 'gdal_translate -of KEA -ot Byte -scale {0} -r average {1} {2}'.format(out_size, stretchImg,
                                                                                      tmp_resized_img)
@@ -911,7 +913,7 @@ def createQuicklookOverviewImgsVecOverlay(input_imgs, bands, tmp_dir, vec_overla
                 out_size = '-outsize 0 {0}'.format(output_img_sizes[i])
 
             # Create the resized output image.
-            lcl_img_basename = rsgis_utils.get_file_basename(outputImgs[i], checkvalid=True)
+            lcl_img_basename = rsgislib.tools.filetools.get_file_basename(outputImgs[i], check_valid=True)
             tmp_resized_img = os.path.join(usr_tmp_dir, '{}_resized.kea'.format(lcl_img_basename))
             cmd = 'gdal_translate -of KEA -ot Byte -scale {0} -r average {1} {2}'.format(out_size, stretchImg,
                                                                                          tmp_resized_img)
@@ -956,6 +958,10 @@ def createVisualOverviewImgsVecExtent(input_imgs, bands, tmp_dir, vec_extent_fil
                                 by stretch_file.
 
     """
+    import rsgislib.vectorutils
+    import rsgislib.tools.filetools
+    import rsgislib.tools.utils
+    import rsgislib.imageutils
     if scale_axis not in ['width', 'height', 'auto']:
         raise rsgislib.RSGISPyException("Input parameter 'scale_axis' must have the value 'width', 'height' or 'auto'.")
 
@@ -978,13 +984,12 @@ def createVisualOverviewImgsVecExtent(input_imgs, bands, tmp_dir, vec_extent_fil
             outputImgs = outputImgs[0]
             output_img_sizes = output_img_sizes[0]
 
-    rsgis_utils = rsgislib.RSGISPyUtils()
-    uid_str = rsgis_utils.uidGenerator()
+    uid_str = rsgislib.tools.utils.uidGenerator()
     usr_tmp_dir = os.path.join(tmp_dir, "qklk_tmp_{}".format(uid_str))
     if not os.path.exists(usr_tmp_dir):
         os.makedirs(usr_tmp_dir)
 
-    img_basename = rsgis_utils.get_file_basename(input_imgs[0], checkvalid=True)
+    img_basename = rsgislib.tools.filetools.get_file_basename(input_imgs[0], check_valid=True)
     bandLst = bands.split(',')
     multiBand = False
     if len(bandLst) == 3:
@@ -999,13 +1004,13 @@ def createVisualOverviewImgsVecExtent(input_imgs, bands, tmp_dir, vec_extent_fil
     for strBand in bandLst:
         sBands.append(int(strBand))
 
-    nImgBands = rsgis_utils.getImageBandCount(input_imgs[0])
-    img_no_data_val = rsgis_utils.getImageNoDataValue(input_imgs[0])
+    nImgBands = rsgislib.imageutils.getImageBandCount(input_imgs[0])
+    img_no_data_val = rsgislib.imageutils.getImageNoDataValue(input_imgs[0])
 
     b_sel_imgs = []
     for img in input_imgs:
-        tmp_n_bands = rsgis_utils.getImageBandCount(img)
-        tmp_no_data_val = rsgis_utils.getImageNoDataValue(img)
+        tmp_n_bands = rsgislib.imageutils.getImageBandCount(img)
+        tmp_no_data_val = rsgislib.imageutils.getImageNoDataValue(img)
 
         if tmp_n_bands != nImgBands:
             raise rsgislib.RSGISPyException('The number of bands in the input images is different.')
@@ -1019,18 +1024,18 @@ def createVisualOverviewImgsVecExtent(input_imgs, bands, tmp_dir, vec_extent_fil
         elif (nImgBands == 3) and (multiBand) and (bandLst[0] == '1') and (bandLst[1] == '2') and (bandLst[2] == '3'):
             selImgBandsImg = img
         else:
-            lcl_img_basename = rsgis_utils.get_file_basename(img, checkvalid=True)
+            lcl_img_basename = rsgislib.tools.filetools.get_file_basename(img, checkvalid=True)
             selImgBandsImg = os.path.join(usr_tmp_dir, '{}_sband.kea'.format(lcl_img_basename))
             rsgislib.imageutils.selectImageBands(img, selImgBandsImg, 'KEA',
-                                                 rsgis_utils.getRSGISLibDataTypeFromImg(img), sBands)
-            rsgis_utils.setImageNoDataValue(selImgBandsImg, img_no_data_val)
+                                                 rsgislib.imageutils.getRSGISLibDataTypeFromImg(img), sBands)
+            rsgislib.imageutils.setImageNoDataValue(selImgBandsImg, img_no_data_val)
         b_sel_imgs.append(selImgBandsImg)
 
     tmp_vrt_img = os.path.join(usr_tmp_dir, "{}_{}.vrt".format(img_basename, uid_str))
     if vec_extent_file is None:
         rsgislib.imageutils.gdal_mosaic_images_vrt(b_sel_imgs, tmp_vrt_img)
     else:
-        vec_extent_bbox = rsgis_utils.getVecLayerExtent(vec_extent_file, vec_extent_lyr, computeIfExp=True)
+        vec_extent_bbox = rsgislib.vectorutils.getVecLayerExtent(vec_extent_file, vec_extent_lyr, computeIfExp=True)
         vrt_extent = [vec_extent_bbox[0], vec_extent_bbox[2], vec_extent_bbox[1], vec_extent_bbox[3]]
         rsgislib.imageutils.gdal_mosaic_images_vrt(b_sel_imgs, tmp_vrt_img, vrt_extent)
 
@@ -1044,7 +1049,7 @@ def createVisualOverviewImgsVecExtent(input_imgs, bands, tmp_dir, vec_extent_fil
                                                img_no_data_val, False, 'KEA', rsgislib.TYPE_8UINT,
                                                rsgislib.imageutils.STRETCH_LINEARSTDDEV, 2)
     if scale_axis == 'auto':
-        x_size, y_size = rsgis_utils.getImageSize(stretchImg)
+        x_size, y_size = rsgislib.imageutils.getImageSize(stretchImg)
         if x_size > y_size:
             scale_axis = 'width'
         else:
@@ -1100,10 +1105,11 @@ def overlay_vec_on_img(input_img, output_img, vec_overlay_file, vec_overlay_lyr,
 
     """
     import rsgislib.vectorutils
-    rsgis_utils = rsgislib.RSGISPyUtils()
+    import rsgislib.tools.utils
+    import rsgislib.tools.filetools
 
     # Check the overlay colour is defined and correct.
-    n_img_bands = rsgis_utils.getImageBandCount(input_img)
+    n_img_bands = rsgislib.imageutils.getImageBandCount(input_img)
     if overlay_clr is None:
         overlay_clr = list()
         for i in range(n_img_bands):
@@ -1113,8 +1119,8 @@ def overlay_vec_on_img(input_img, output_img, vec_overlay_file, vec_overlay_lyr,
                         "values as the number of bands within the input image.")
 
     # Create a tempory directory for processing stage outputs.
-    img_basename = rsgis_utils.get_file_basename(input_img)
-    uid_str = rsgis_utils.uidGenerator()
+    img_basename = rsgislib.tools.filetools.get_file_basename(input_img)
+    uid_str = rsgislib.tools.utils.uidGenerator()
     usr_tmp_dir = os.path.join(tmp_dir, "{}_qklk_overlay_tmp_{}".format(img_basename, uid_str))
     if not os.path.exists(usr_tmp_dir):
         os.makedirs(usr_tmp_dir)

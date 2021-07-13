@@ -39,21 +39,19 @@ scikit-image library (http://scikit-image.org/docs/stable/api/skimage.segmentati
     if usePCA and (nPCABands == 1) and (gdalDS.RasterCount > 1):
         # Perform PCA
         gdalDS = None
-        rsgisUtils = rsgislib.RSGISPyUtils()
         inImgBaseName = os.path.splitext(os.path.basename(inputImg))[0]
         pcaImg = os.path.join(tmpDIR, inImgBaseName+'_pca.kea')
         pcaEigenValsFile = os.path.join(tmpDIR, inImgBaseName+'_eigen.mtxt')
-        inDType = rsgisUtils.getRSGISLibDataTypeFromImg(inputImg)
+        inDType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inputImg)
         rsgislib.imagecalc.performImagePCA(inputImg, pcaImg, pcaEigenValsFile, 1, pcaPxlSample, 'KEA', inDType, noDataVal, False)
         gdalDS = gdal.Open(pcaImg, gdal.GA_ReadOnly)
     elif usePCA and (nPCABands == 3) and (gdalDS.RasterCount > 3):
         # Perform PCA
         gdalDS = None
-        rsgisUtils = rsgislib.RSGISPyUtils()
         inImgBaseName = os.path.splitext(os.path.basename(inputImg))[0]
         pcaImg = os.path.join(tmpDIR, inImgBaseName+'_pca.kea')
         pcaEigenValsFile = os.path.join(tmpDIR, inImgBaseName+'_eigen.mtxt')
-        inDType = rsgisUtils.getRSGISLibDataTypeFromImg(inputImg)
+        inDType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inputImg)
         rsgislib.imagecalc.performImagePCA(inputImg, pcaImg, pcaEigenValsFile, 3, pcaPxlSample, 'KEA', inDType, noDataVal, False)
         gdalDS = gdal.Open(pcaImg, gdal.GA_ReadOnly)
     elif usePCA:
@@ -117,11 +115,10 @@ scikit-image library (http://scikit-image.org/docs/stable/api/skimage.segmentati
     if usePCA and (gdalDS.RasterCount > 3):
         # Perform PCA
         gdalDS = None
-        rsgisUtils = rsgislib.RSGISPyUtils()
         inImgBaseName = os.path.splitext(os.path.basename(inputImg))[0]
         pcaImg = os.path.join(tmpDIR, inImgBaseName+'_pca.kea')
         pcaEigenValsFile = os.path.join(tmpDIR, inImgBaseName+'_eigen.mtxt')
-        inDType = rsgisUtils.getRSGISLibDataTypeFromImg(inputImg)
+        inDType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inputImg)
         rsgislib.imagecalc.performImagePCA(inputImg, pcaImg, pcaEigenValsFile, 3, pcaPxlSample, 'KEA', inDType, noDataVal, False)
         gdalDS = gdal.Open(pcaImg, gdal.GA_ReadOnly)
     elif usePCA:
@@ -186,21 +183,19 @@ scikit-image library (http://scikit-image.org/docs/stable/api/skimage.segmentati
     if usePCA and (nPCABands == 1) and (gdalDS.RasterCount > 1):
         # Perform PCA
         gdalDS = None
-        rsgisUtils = rsgislib.RSGISPyUtils()
         inImgBaseName = os.path.splitext(os.path.basename(inputImg))[0]
         pcaImg = os.path.join(tmpDIR, inImgBaseName+'_pca.kea')
         pcaEigenValsFile = os.path.join(tmpDIR, inImgBaseName+'_eigen.mtxt')
-        inDType = rsgisUtils.getRSGISLibDataTypeFromImg(inputImg)
+        inDType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inputImg)
         rsgislib.imagecalc.performImagePCA(inputImg, pcaImg, pcaEigenValsFile, 1, pcaPxlSample, 'KEA', inDType, noDataVal, False)
         gdalDS = gdal.Open(pcaImg, gdal.GA_ReadOnly)
     elif usePCA and (nPCABands == 3) and (gdalDS.RasterCount > 3):
         # Perform PCA
         gdalDS = None
-        rsgisUtils = rsgislib.RSGISPyUtils()
         inImgBaseName = os.path.splitext(os.path.basename(inputImg))[0]
         pcaImg = os.path.join(tmpDIR, inImgBaseName+'_pca.kea')
         pcaEigenValsFile = os.path.join(tmpDIR, inImgBaseName+'_eigen.mtxt')
-        inDType = rsgisUtils.getRSGISLibDataTypeFromImg(inputImg)
+        inDType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inputImg)
         rsgislib.imagecalc.performImagePCA(inputImg, pcaImg, pcaEigenValsFile, 3, pcaPxlSample, 'KEA', inDType, noDataVal, False)
         gdalDS = gdal.Open(pcaImg, gdal.GA_ReadOnly)
     elif usePCA:
@@ -271,21 +266,19 @@ scikit-image library (http://scikit-image.org/docs/stable/api/skimage.segmentati
     if usePCA and (nPCABands == 1) and (gdalDS.RasterCount > 1):
         # Perform PCA
         gdalDS = None
-        rsgisUtils = rsgislib.RSGISPyUtils()
         inImgBaseName = os.path.splitext(os.path.basename(inputImg))[0]
         pcaImg = os.path.join(tmpDIR, inImgBaseName+'_pca.kea')
         pcaEigenValsFile = os.path.join(tmpDIR, inImgBaseName+'_eigen.mtxt')
-        inDType = rsgisUtils.getRSGISLibDataTypeFromImg(inputImg)
+        inDType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inputImg)
         rsgislib.imagecalc.performImagePCA(inputImg, pcaImg, pcaEigenValsFile, 1, pcaPxlSample, 'KEA', inDType, noDataVal, False)
         gdalDS = gdal.Open(pcaImg, gdal.GA_ReadOnly)
     elif usePCA and (nPCABands == 3) and (gdalDS.RasterCount > 3):
         # Perform PCA
         gdalDS = None
-        rsgisUtils = rsgislib.RSGISPyUtils()
         inImgBaseName = os.path.splitext(os.path.basename(inputImg))[0]
         pcaImg = os.path.join(tmpDIR, inImgBaseName+'_pca.kea')
         pcaEigenValsFile = os.path.join(tmpDIR, inImgBaseName+'_eigen.mtxt')
-        inDType = rsgisUtils.getRSGISLibDataTypeFromImg(inputImg)
+        inDType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inputImg)
         rsgislib.imagecalc.performImagePCA(inputImg, pcaImg, pcaEigenValsFile, 3, pcaPxlSample, 'KEA', inDType, noDataVal, False)
         gdalDS = gdal.Open(pcaImg, gdal.GA_ReadOnly)
     elif usePCA:
@@ -359,21 +352,19 @@ scikit-image library (http://scikit-image.org/docs/stable/api/skimage.segmentati
     if usePCA and (nPCABands == 1) and (gdalDS.RasterCount > 1):
         # Perform PCA
         gdalDS = None
-        rsgisUtils = rsgislib.RSGISPyUtils()
         inImgBaseName = os.path.splitext(os.path.basename(inputImg))[0]
         pcaImg = os.path.join(tmpDIR, inImgBaseName+'_pca.kea')
         pcaEigenValsFile = os.path.join(tmpDIR, inImgBaseName+'_eigen.mtxt')
-        inDType = rsgisUtils.getRSGISLibDataTypeFromImg(inputImg)
+        inDType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inputImg)
         rsgislib.imagecalc.performImagePCA(inputImg, pcaImg, pcaEigenValsFile, 1, pcaPxlSample, 'KEA', inDType, noDataVal, False)
         gdalDS = gdal.Open(pcaImg, gdal.GA_ReadOnly)
     elif usePCA and (nPCABands == 3) and (gdalDS.RasterCount > 3):
         # Perform PCA
         gdalDS = None
-        rsgisUtils = rsgislib.RSGISPyUtils()
         inImgBaseName = os.path.splitext(os.path.basename(inputImg))[0]
         pcaImg = os.path.join(tmpDIR, inImgBaseName+'_pca.kea')
         pcaEigenValsFile = os.path.join(tmpDIR, inImgBaseName+'_eigen.mtxt')
-        inDType = rsgisUtils.getRSGISLibDataTypeFromImg(inputImg)
+        inDType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inputImg)
         rsgislib.imagecalc.performImagePCA(inputImg, pcaImg, pcaEigenValsFile, 3, pcaPxlSample, 'KEA', inDType, noDataVal, False)
         gdalDS = gdal.Open(pcaImg, gdal.GA_ReadOnly)
     elif usePCA:

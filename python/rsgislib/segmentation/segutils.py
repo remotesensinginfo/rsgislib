@@ -96,17 +96,16 @@ Example::
 
 
     """
-    
+    import rsgislib.tools.filetools
+
     if saveProcessStats:
         if (imgStretchStats=="") or (kMeansCentres=="") or (imgStatsJSONFile==""):
             raise rsgislib.RSGISPyException("if image stretch and kmeans centres are to be saved then all file names (imgStretchStats, kMeansCentres, imgStatsJSONFile) need to be provided.")
-    
-    rsgisUtils = rsgislib.RSGISPyUtils()
-    
+
     basefile = os.path.basename(inputImg)
     basename = os.path.splitext(basefile)[0]
     
-    outFileExt = rsgisUtils.getFileExtension(gdalformat)
+    outFileExt = rsgislib.tools.filetools.getFileExtension(gdalformat)
     
     createdDIR = False
     if not os.path.isdir(tmpath):
@@ -115,8 +114,7 @@ Example::
 
     # Get data type of input image
     gdalDS = gdal.Open(inputImg, gdal.GA_ReadOnly)
-    rsgisUtils = rsgislib.RSGISPyUtils()
-    input_datatype = rsgisUtils.getRSGISLibDataType(gdal.GetDataTypeName(gdalDS.GetRasterBand(1).DataType))
+    input_datatype = rsgislib.imageutils.getRSGISLibDataType(gdal.GetDataTypeName(gdalDS.GetRasterBand(1).DataType))
     gdalDS = None
         
     # Select Image Bands if required
@@ -286,17 +284,15 @@ Example::
     segutils.runShepherdSegmentationPreCalcdStats(inputImg, outputClumps, kMeansCentres, imgStretchStats, outputMeanImg, minPxls=100)
 
     """
-    
+    import rsgislib.tools.filetools
     if not noStretch:
         if (imgStretchStats=="") or (imgStretchStats==None):
             raise rsgislib.RSGISPyException("A stretch stats file must be provided")
-    
-    rsgisUtils = rsgislib.RSGISPyUtils()
-    
+
     basefile = os.path.basename(inputImg)
     basename = os.path.splitext(basefile)[0]
     
-    outFileExt = rsgisUtils.getFileExtension(gdalformat)
+    outFileExt = rsgislib.tools.filetools.getFileExtension(gdalformat)
     
     createdDIR = False
     if not os.path.isdir(tmpath):
@@ -305,8 +301,7 @@ Example::
 
     # Get data type of input image
     gdalDS = gdal.Open(inputImg, gdal.GA_ReadOnly)
-    rsgisUtils = rsgislib.RSGISPyUtils()
-    input_datatype = rsgisUtils.getRSGISLibDataType(gdal.GetDataTypeName(gdalDS.GetRasterBand(1).DataType))
+    input_datatype = rsgislib.imageutils.getRSGISLibDataType(gdal.GetDataTypeName(gdalDS.GetRasterBand(1).DataType))
     gdalDS = None
         
     # Select Image Bands if required

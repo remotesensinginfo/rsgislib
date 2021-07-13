@@ -68,6 +68,52 @@ def delete_vector_file(vec_file: str, feedback:bool =True):
             print("Deleting: {}".format(cfile))
         os.remove(cfile)
 
+def getProjWKTFromVec(inVec, vecLyr=None):
+    """
+    A function which gets the WKT projection from the inputted vector file.
+
+    :param inVec: is a string with the input vector file name and path.
+    :param vecLyr: is a string with the input vector layer name, if None then first layer read. (default: None)
+
+    :return: WKT representation of projection
+
+    """
+    dataset = gdal.OpenEx(inVec, gdal.OF_VECTOR)
+    if dataset is None:
+        raise Exception("Could not open file: {}".format(inVec))
+    if vecLyr is None:
+        layer = dataset.GetLayer()
+    else:
+        layer = dataset.GetLayer(vecLyr)
+    if layer is None:
+        raise Exception("Could not open layer within file: {}".format(inVec))
+    spatialRef = layer.GetSpatialRef()
+    return spatialRef.ExportToWkt()
+
+
+def getProjEPSGFromVec(inVec, vecLyr=None):
+    """
+    A function which gets the EPSG projection from the inputted vector file.
+
+    :param inVec: is a string with the input vector file name and path.
+    :param vecLyr: is a string with the input vector layer name, if None then first layer read. (default: None)
+
+    :return: EPSG representation of projection
+
+    """
+    dataset = gdal.OpenEx(inVec, gdal.OF_VECTOR)
+    if dataset is None:
+        raise Exception("Could not open file: {}".format(inVec))
+    if vecLyr is None:
+        layer = dataset.GetLayer()
+    else:
+        layer = dataset.GetLayer(vecLyr)
+    if layer is None:
+        raise Exception("Could not open layer within file: {}".format(inVec))
+    spatialRef = layer.GetSpatialRef()
+    spatialRef.AutoIdentifyEPSG()
+    return spatialRef.GetAuthorityCode(None)
+
 
 def rasteriseVecLyr(vec_file, vec_lyr, inputImage, outImage, gdalformat="KEA", burnVal=1, datatype=rsgislib.TYPE_8UINT, vecAtt=None, vecExt=False, thematic=True, nodata=0):
     """ 
@@ -102,9 +148,8 @@ Example::
         gdal.UseExceptions()
         
         if vecExt:
-            print("Creating output image from shapefile extent")
-            rsgisUtils = rsgislib.RSGISPyUtils()
-            xRes, yRes = rsgisUtils.getImageRes(inputImage)
+            import rsgislib.imageutils
+            xRes, yRes = rsgislib.imageutils.getImageRes(inputImage)
             if yRes < -1:
                 yRes = yRes * (-1)
             outRes = xRes
@@ -325,9 +370,9 @@ Example::
     from rsgislib import vectorutils
     import rsgislib
     import osgeo.ogr as ogr
-    
-    rsgisUtils = rsgislib.RSGISPyUtils()
-    requiredScenes = rsgisUtils.readTextFile2List("GMW_JERS-1_ScenesRequired.txt")
+    import rsgislib.tools.utils
+
+    requiredScenes = rsgislib.tools.utils.readTextFile2List("GMW_JERS-1_ScenesRequired.txt")
     requiredScenesShp = "JERS-1_Scenes_Requred_shp"
     vectorutils.writeVecColumn(requiredScenesShp+'.shp', requiredScenesShp, 'ScnName', ogr.OFTString, requiredScenes)
 
@@ -675,10 +720,9 @@ A function to extract an image footprint as a vector.
 
 """
     gdal.UseExceptions()
-
-    rsgisUtils = rsgislib.RSGISPyUtils()
+    import rsgislib.tools.utils
     
-    uidStr = rsgisUtils.uidGenerator()
+    uidStr = rsgislib.tools.utils.uidGenerator()
     
     createdTmp = False
     if not os.path.exists(tmpDIR):
@@ -688,7 +732,7 @@ A function to extract an image footprint as a vector.
     inImgBase = os.path.splitext(os.path.basename(inputImg))[0]
     
     validOutImg = os.path.join(tmpDIR, inImgBase+'_'+uidStr+'_validimg.kea')
-    inImgNoData = rsgisUtils.getImageNoDataValue(inputImg)
+    inImgNoData = rsgislib.imageutils.getImageNoDataValue(inputImg)
     rsgislib.imageutils.genValidMask(inimages=inputImg, outimage=validOutImg, gdalformat='KEA', nodata=inImgNoData)
     
     outVecTmpFile = outVec
@@ -949,7 +993,7 @@ Where:
 :param geom_type: Force the output vector to have a particular geometry type (e.g., 'POLYGON'). Same options as ogr2ogr.
 
 """
-    rsgis_utils = rsgislib.RSGISPyUtils()
+    import rsgislib.tools.utils
     out_lyr_names = []
 
     out_geom_type = ''
@@ -964,7 +1008,7 @@ Where:
             out_lyr = lyr
             if lyr in out_lyr_names:
                 if rename_dup_lyrs:
-                    out_lyr = '{}_{}'.format(lyr, rsgis_utils.uidGenerator())
+                    out_lyr = '{}_{}'.format(lyr, rsgislib.tools.utils.uidGenerator())
                 else:
                     raise Exception("Input files have layers with the same name, these will be over written.")
             print("Processing Layer: {0} has {1} features to copy - output layer name: {2}".format(lyr, nFeat, out_lyr))
@@ -1920,7 +1964,7 @@ multiple layers. A shapefile which only supports 1 layer will not work.
 
 """
     import rsgislib.tools.utm
-    rsgis_utils = rsgislib.RSGISPyUtils()
+    import rsgislib.tools.geometrytools
     if (out_epsg_code is not None) and utm_grid:
         raise Exception("Cannot specify both new output projection and UTM grid.")
     elif utm_grid:
@@ -1930,7 +1974,7 @@ multiple layers. A shapefile which only supports 1 layer will not work.
             in_proj_obj.ImportFromEPSG(in_epsg_code)
             out_proj_obj = osr.SpatialReference()
             out_proj_obj.ImportFromEPSG(4326)
-            wgs84_bbox = rsgis_utils.reprojBBOX(bbox, in_proj_obj, out_proj_obj)
+            wgs84_bbox = rsgislib.tools.geometrytools.reprojBBOX(bbox, in_proj_obj, out_proj_obj)
 
         multi_zones = False
         if (wgs84_bbox[0] < -180) and (wgs84_bbox[1] < -180):
@@ -1993,8 +2037,8 @@ multiple layers. A shapefile which only supports 1 layer will not work.
                 out_proj_obj = osr.SpatialReference()
                 out_proj_obj.ImportFromEPSG(utm_proj_epsg)
 
-                utm_bbox = rsgis_utils.reprojBBOX(zone_roi[1], in_proj_obj, out_proj_obj)
-                bboxs = rsgis_utils.getBBoxGrid(utm_bbox, x_size, y_size)
+                utm_bbox = rsgislib.tools.geometrytools.reprojBBOX(zone_roi[1], in_proj_obj, out_proj_obj)
+                bboxs = rsgislib.tools.geometrytools.getBBoxGrid(utm_bbox, x_size, y_size)
 
                 utm_out_vec_lyr = out_vec_lyr + '_utm{0}{1}'.format(zone_roi[0], utm_top_hemi.lower())
                 createPolyVecBBOXs(out_vec, utm_out_vec_lyr, vec_drv, utm_proj_epsg, bboxs, overwrite=first)
@@ -2005,11 +2049,11 @@ multiple layers. A shapefile which only supports 1 layer will not work.
             in_proj_obj.ImportFromEPSG(in_epsg_code)
             out_proj_obj = osr.SpatialReference()
             out_proj_obj.ImportFromEPSG(out_epsg_code)
-            proj_bbox = rsgis_utils.reprojBBOX(bbox, in_proj_obj, out_proj_obj)
+            proj_bbox = rsgislib.tools.geometrytools.reprojBBOX(bbox, in_proj_obj, out_proj_obj)
         else:
             proj_bbox = bbox
 
-        bboxs = rsgis_utils.getBBoxGrid(proj_bbox, x_size, y_size)
+        bboxs = rsgislib.tools.geometrytools.getBBoxGrid(proj_bbox, x_size, y_size)
 
         if out_epsg_code is None:
             createPolyVecBBOXs(out_vec, out_vec_lyr, vec_drv, in_epsg_code, bboxs)
@@ -2408,8 +2452,7 @@ Example::
 """
     import tqdm
     gdal.UseExceptions()
-    rsgisUtils = rsgislib.RSGISPyUtils()
-    
+
     bboxs = []
     atts=dict()
     atts['filename'] = []
@@ -2424,7 +2467,7 @@ Example::
     first = True
     baseImg = ''
     for img in tqdm.tqdm(imgList):
-        epsgCodeTmp = rsgisUtils.getEPSGCode(img)
+        epsgCodeTmp = rsgislib.imageutils.getEPSGProjFromImage(img)
         epsg_found = True
         if epsgCodeTmp is None:
             epsg_found = False
@@ -2444,9 +2487,9 @@ Example::
                         raise Exception("The EPSG codes ({0} & {1}) do not match. (Base: '{2}', Img: '{3}')".format(epsgCode, epsgCodeTmp, baseImg, img))
 
             if out_proj_wgs84:
-                img_bbox = rsgisUtils.getImageBBOXInProj(img, 4326)
+                img_bbox = rsgislib.imageutils.getImageBBOXInProj(img, 4326)
             else:
-                img_bbox = rsgisUtils.getImageBBOX(img)
+                img_bbox = rsgislib.imageutils.getImageBBOX(img)
 
             bboxs.append(img_bbox)
             baseName = os.path.basename(img)
@@ -3102,24 +3145,26 @@ def does_vmsk_img_intersect(input_vmsk_img, roi_vec_file, roi_vec_lyr, tmp_dir, 
     :param vec_epsg: If projection is poorly defined by the vector layer then it can be specified.
     """
     import rsgislib.imagecalc
-    rsgis_utils = rsgislib.RSGISPyUtils()
+    import rsgislib.tools.utils
+    import rsgislib.tools.filetools
+    import rsgislib.tools.geometrytools
 
     # Does the input image BBOX intersect the BBOX of the ROI vector?
     if vec_epsg is None:
-        vec_epsg = rsgis_utils.getProjEPSGFromVec(roi_vec_file, roi_vec_lyr)
-    img_epsg = rsgis_utils.getEPSGCode(input_vmsk_img)
+        vec_epsg = getProjEPSGFromVec(roi_vec_file, roi_vec_lyr)
+    img_epsg = rsgislib.imageutils.getEPSGProjFromImage(input_vmsk_img)
     if img_epsg == vec_epsg:
-        img_bbox = rsgis_utils.getImageBBOX(input_vmsk_img)
+        img_bbox = rsgislib.imageutils.getImageBBOX(input_vmsk_img)
         projs_match = True
     else:
-        img_bbox = rsgis_utils.getImageBBOXInProj(input_vmsk_img, vec_epsg)
+        img_bbox = rsgislib.imageutils.getImageBBOXInProj(input_vmsk_img, vec_epsg)
         projs_match = False
-    vec_bbox = rsgis_utils.getVecLayerExtent(roi_vec_file, roi_vec_lyr, computeIfExp=True)
+    vec_bbox = getVecLayerExtent(roi_vec_file, roi_vec_lyr, computeIfExp=True)
 
     img_intersect = False
-    if rsgis_utils.do_bboxes_intersect(img_bbox, vec_bbox):
-        uid_str = rsgis_utils.uidGenerator()
-        base_vmsk_img = rsgis_utils.get_file_basename(input_vmsk_img)
+    if rsgislib.tools.geometrytools.do_bboxes_intersect(img_bbox, vec_bbox):
+        uid_str = rsgislib.tools.utils.uidGenerator()
+        base_vmsk_img = rsgislib.tools.filetools.get_file_basename(input_vmsk_img)
 
         tmp_file_dir = os.path.join(tmp_dir, "{}_{}".format(base_vmsk_img, uid_str))
         if not os.path.exists(tmp_file_dir):
@@ -3513,8 +3558,7 @@ def closest_line_intersection(vec_line_file, vec_line_lyr, vec_objs_file, vec_ob
         out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
 
     gdal.UseExceptions()
-    rsgis_utils = rsgislib.RSGISPyUtils()
-    vec_bbox = rsgis_utils.getVecLayerExtent(vec_line_file, vec_line_lyr)
+    vec_bbox = getVecLayerExtent(vec_line_file, vec_line_lyr)
 
     ds_line_vec = gdal.OpenEx(vec_line_file, gdal.OF_READONLY)
     if ds_line_vec is None:
@@ -3686,8 +3730,7 @@ def line_intersection_range(vec_line_file, vec_line_lyr, vec_objs_file, vec_objs
         out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
 
     gdal.UseExceptions()
-    rsgis_utils = rsgislib.RSGISPyUtils()
-    vec_bbox = rsgis_utils.getVecLayerExtent(vec_line_file, vec_line_lyr)
+    vec_bbox = getVecLayerExtent(vec_line_file, vec_line_lyr)
 
     ds_line_vec = gdal.OpenEx(vec_line_file, gdal.OF_READONLY)
     if ds_line_vec is None:
@@ -3873,8 +3916,7 @@ def scnd_line_intersection_range(vec_line_file, vec_line_lyr, vec_objs_file, vec
         out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
 
     gdal.UseExceptions()
-    rsgis_utils = rsgislib.RSGISPyUtils()
-    vec_bbox = rsgis_utils.getVecLayerExtent(vec_line_file, vec_line_lyr)
+    vec_bbox = getVecLayerExtent(vec_line_file, vec_line_lyr)
 
     ds_line_vec = gdal.OpenEx(vec_line_file, gdal.OF_READONLY)
     if ds_line_vec is None:
@@ -4902,8 +4944,7 @@ def vec_lyr_intersection(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec
         out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
 
     gdal.UseExceptions()
-    rsgis_utils = rsgislib.RSGISPyUtils()
-    vec_bbox = rsgis_utils.getVecLayerExtent(vec_file, vec_lyr)
+    vec_bbox = getVecLayerExtent(vec_file, vec_lyr)
 
     ds_in_vec = gdal.OpenEx(vec_file, gdal.OF_READONLY)
     if ds_in_vec is None:
@@ -5032,8 +5073,7 @@ def vec_lyr_difference(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_f
         out_vec_lyr = os.path.splitext(os.path.basename(out_vec_file))[0]
 
     gdal.UseExceptions()
-    rsgis_utils = rsgislib.RSGISPyUtils()
-    vec_bbox = rsgis_utils.getVecLayerExtent(vec_file, vec_lyr)
+    vec_bbox = getVecLayerExtent(vec_file, vec_lyr)
 
     ds_in_vec = gdal.OpenEx(vec_file, gdal.OF_READONLY)
     if ds_in_vec is None:
@@ -5192,6 +5232,7 @@ def split_by_attribute(vec_file, vec_lyr, split_col_name, multi_layers=True, out
     import geopandas
     import tqdm
     import os
+    import rsgislib.tools.utils
     if multi_layers:
         if out_vec_file is None:
             raise Exception("If a multiple layer output is specified then an output file needs to be specified "
@@ -5200,8 +5241,6 @@ def split_by_attribute(vec_file, vec_lyr, split_col_name, multi_layers=True, out
         if (out_file_path is None) or (out_file_ext is None):
             raise Exception("If a single layer output is specified then an output file path "
                             "and file extention needs to be specified.")
-
-    rsgis_utils = rsgislib.RSGISPyUtils()
 
     base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
     unq_col = base_gpdf[split_col_name]
@@ -5225,11 +5264,11 @@ def split_by_attribute(vec_file, vec_lyr, split_col_name, multi_layers=True, out
         # Write output to disk.
         if multi_layers and (out_format == 'GPKG'):
             if chk_lyr_names:
-                val = rsgis_utils.check_str(val, rm_non_ascii=True, rm_dashs=True, rm_spaces=False, rm_punc=True)
+                val = rsgislib.tools.utils.check_str(val, rm_non_ascii=True, rm_dashs=True, rm_spaces=False, rm_punc=True)
             c_gpdf.to_file(out_vec_file, layer=val, driver='GPKG')
         else:
             if chk_lyr_names:
-                val = rsgis_utils.check_str(val, rm_non_ascii=True, rm_dashs=True, rm_spaces=False, rm_punc=True)
+                val = rsgislib.tools.utils.check_str(val, rm_non_ascii=True, rm_dashs=True, rm_spaces=False, rm_punc=True)
             out_vec_file = os.path.join(out_file_path, "vec_{}.{}".format(val, out_file_ext))
             out_vec_lyr = "vec_{}".format(val)
             if out_format == 'GPKG':
@@ -5827,10 +5866,10 @@ def explode_vec_files(input_vecs, output_dir, out_format='GPKG', out_file_ext='g
 
     """
     import tqdm
-    rsgis_utils = rsgislib.RSGISPyUtils()
+    import rsgislib.tools.filetools
     for vec_file in tqdm.tqdm(input_vecs):
         lyrs = getVecLyrsLst(vec_file)
-        basename = rsgis_utils.get_file_basename(vec_file)
+        basename = rsgislib.tools.filetools.get_file_basename(vec_file)
         out_vec_file = os.path.join(output_dir, "{}.{}".format(basename, out_file_ext))
         for lyr in lyrs:
             explode_vec_lyr(vec_file, lyr, out_vec_file, lyr, out_format)
@@ -6093,6 +6132,8 @@ def merge_utm_vecs_wgs84(input_files, output_file, output_lyr=None, out_format='
     import geopandas
     import pandas
     import rsgislib.tools.utm
+    import rsgislib.tools.utils
+    import rsgislib.tools.geometrytools
     import tqdm
     
     if n_hemi_utm_file is None:
@@ -6106,17 +6147,16 @@ def merge_utm_vecs_wgs84(input_files, output_file, output_lyr=None, out_format='
         if s_hemi_utm_file is None:
             raise Exception("An input is needed for s_hemi_utm_file. The RSGISLib installed version was not be found.")
     
-    rsgis_utils = rsgislib.RSGISPyUtils()
     first = True
     for file in tqdm.tqdm(input_files):
         lyrs = getVecLyrsLst(file)
         for lyr in lyrs:
-            bbox = rsgis_utils.getVecLayerExtent(file, layerName=lyr)
-            bbox_area = rsgis_utils.calc_bbox_area(bbox)
+            bbox = getVecLayerExtent(file, layerName=lyr)
+            bbox_area = rsgislib.tools.geometrytools.calc_bbox_area(bbox)
             if bbox_area > 0:
-                vec_epsg = rsgis_utils.getProjEPSGFromVec(file, vecLyr=lyr)
+                vec_epsg = getProjEPSGFromVec(file, vecLyr=lyr)
                 zone, hemi = rsgislib.tools.utm.utm_from_epsg(int(vec_epsg))
-                zone_str = rsgis_utils.zero_pad_num_str(zone, str_len=2, round_num=False, round_n_digts=0, integerise=True)
+                zone_str = rsgislib.tools.utils.zero_pad_num_str(zone, str_len=2, round_num=False, round_n_digts=0, integerise=True)
 
                 if hemi.upper() == 'S':
                     utm_zones_file = s_hemi_utm_file
@@ -6310,9 +6350,7 @@ def createNameCol(vec_file, vec_lyr, vec_out_file, vec_out_lyr, out_format='GPKG
     import geopandas
     import numpy
     import tqdm
-    import rsgislib
-
-    rsgis_utils = rsgislib.RSGISPyUtils()
+    import rsgislib.tools.utils
 
     base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
 
@@ -6332,14 +6370,14 @@ def createNameCol(vec_file, vec_lyr, vec_out_file, vec_out_lyr, out_format='GPKG
                 y_col_val = y_col_val * (-1)
 
         if zero_x_pad > 0:
-            x_col_val_str = rsgis_utils.zero_pad_num_str(x_col_val, str_len=zero_x_pad, round_num=False,
+            x_col_val_str = rsgislib.tools.utils.zero_pad_num_str(x_col_val, str_len=zero_x_pad, round_num=False,
                                                          round_n_digts=round_n_digts, integerise=int_coords)
         else:
             x_col_val = int(x_col_val)
             x_col_val_str = '{}'.format(x_col_val)
 
         if zero_y_pad > 0:
-            y_col_val_str = rsgis_utils.zero_pad_num_str(y_col_val, str_len=zero_y_pad, round_num=False,
+            y_col_val_str = rsgislib.tools.utils.zero_pad_num_str(y_col_val, str_len=zero_y_pad, round_num=False,
                                                          round_n_digts=round_n_digts, integerise=int_coords)
         else:
             y_col_val = int(y_col_val)
@@ -6594,8 +6632,7 @@ def vectorise_pxls_to_pts(input_img, img_band, img_msk_val, vec_out_file, vec_ou
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(vec_out_file))
 
     if out_epsg_code is None:
-        rsgis_utils = rsgislib.RSGISPyUtils()
-        out_epsg_code = rsgis_utils.getEPSGCode(input_img)
+        out_epsg_code = rsgislib.imageutils.getEPSGProjFromImage(input_img)
 
     if out_epsg_code is None:
         raise Exception("The output ESPG code is None - tried to read from input image and "

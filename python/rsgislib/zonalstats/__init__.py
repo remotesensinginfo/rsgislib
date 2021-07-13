@@ -1130,9 +1130,7 @@ A function which extracts point values for an input vector file for a particular
 
 """
     gdal.UseExceptions()
-    if reproj_vec:
-        import rsgislib
-        rsgis_utils = rsgislib.RSGISPyUtils()
+    import rsgislib.tools.geometrytools
     try:
         if veclyr is None:
             raise Exception("The inputted vector layer was None")
@@ -1219,9 +1217,9 @@ A function which extracts point values for an input vector file for a particular
 
                     if pt_reprj:
                         if veclyr_spatial_ref.EPSGTreatsAsLatLong():
-                            x_pt, y_pt = rsgis_utils.reprojPoint(veclyr_spatial_ref, img_spatial_ref, y_pt, x_pt)
+                            x_pt, y_pt = rsgislib.tools.geometrytools.reprojPoint(veclyr_spatial_ref, img_spatial_ref, y_pt, x_pt)
                         else:
-                            x_pt, y_pt = rsgis_utils.reprojPoint(veclyr_spatial_ref, img_spatial_ref, x_pt, y_pt)
+                            x_pt, y_pt = rsgislib.tools.geometrytools.reprojPoint(veclyr_spatial_ref, img_spatial_ref, x_pt, y_pt)
 
                     x_pt_off = float(x_pt - imgGeoTrans[0])
                     y_pt_off = float(y_pt - imgGeoTrans[3])

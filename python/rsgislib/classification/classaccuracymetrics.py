@@ -279,12 +279,11 @@ def calc_acc_metrics_vecsamples(in_vec_file, in_vec_lyr, ref_col, cls_col, cls_i
                          a CSV file (Default=None).
 
     """
-    import rsgislib
+    import rsgislib.tools.utils
     import rsgislib.vectorutils
     import rsgislib.rastergis
     import rsgislib.rastergis.ratutils
-
-    rsgis_utils = rsgislib.RSGISPyUtils()
+    import rsgislib.imageutils
 
     # Read columns from vector file.
     ref_vals = numpy.array(rsgislib.vectorutils.readVecColumn(in_vec_file, in_vec_lyr, ref_col))
@@ -321,8 +320,7 @@ def calc_acc_metrics_vecsamples(in_vec_file, in_vec_lyr, ref_col, cls_col, cls_i
     img_clsname_data = rsgislib.rastergis.ratutils.getColumnData(cls_img, img_cls_name_col)
     img_clsname_data[0] = ''
 
-    rsgis_utils = rsgislib.RSGISPyUtils()
-    pxl_size_x, pxl_size_y = rsgis_utils.getImageRes(cls_img)
+    pxl_size_x, pxl_size_y = rsgislib.imageutils.getImageRes(cls_img)
     pxl_area = pxl_size_x * pxl_size_y
 
     # Find the class areas (pixel counts)
@@ -332,7 +330,7 @@ def calc_acc_metrics_vecsamples(in_vec_file, in_vec_lyr, ref_col, cls_col, cls_i
     cls_pxl_counts = numpy.zeros_like(unq_cls_names, dtype=int)
     for i, cls_name in enumerate(img_clsname_data):
         cls_name_str = str(cls_name.decode())
-        cls_name_str = rsgis_utils.check_str(cls_name_str, rm_non_ascii=True)
+        cls_name_str = rsgislib.tools.utils.check_str(cls_name_str, rm_non_ascii=True)
         if (i > 0) and (len(cls_name_str) > 0):
             if cls_name_str not in unq_cls_names:
                 raise Exception("Class ('{}') found in image which was not in point samples...".format(cls_name_str))
@@ -482,10 +480,7 @@ def calc_acc_ptonly_metrics_vecsamples(in_vec_file, in_vec_lyr, ref_col, cls_col
                          a CSV file (Default=None).
 
     """
-    import rsgislib
     import rsgislib.vectorutils
-
-    rsgis_utils = rsgislib.RSGISPyUtils()
 
     # Read columns from vector file.
     ref_vals = numpy.array(rsgislib.vectorutils.readVecColumn(in_vec_file, in_vec_lyr, ref_col))
@@ -507,10 +502,8 @@ def calc_acc_ptonly_metrics_vecsamples(in_vec_file, in_vec_lyr, ref_col, cls_col
     for cls_name in unq_cls_names:
         ref_int_vals[ref_vals == cls_name] = cls_name_lut[cls_name]
         cls_int_vals[cls_vals == cls_name] = cls_name_lut[cls_name]
-
     
     acc_metrics = calc_class_pt_accuracy_metrics(ref_int_vals, cls_int_vals, unq_cls_names)
-
 
     if out_json_file is not None:
         import json

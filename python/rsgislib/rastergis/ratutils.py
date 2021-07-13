@@ -1203,13 +1203,14 @@ Where:
 :param classesNameCol: Output column name for string class names.
 
     """
+    import rsgislib.tools.utils
+    import rsgislib.tools.filetools
     createdDIR = False
     if not os.path.isdir(tmpPath):
         os.makedirs(tmpPath)
         createdDIR = True
     
-    rsPyUtils = rsgislib.RSGISPyUtils()
-    uid = rsPyUtils.uidGenerator(10)
+    uid = rsgislib.tools.utils.uidGenerator(10)
     
     classLayerSeq = list()
     tmpClassImgLayers = list()
@@ -1234,8 +1235,8 @@ Where:
     defineClassNames(clumpsImg, classesIntCol, classesNameCol, classNamesDict)
     
     for file in tmpClassImgLayers:
-        rsPyUtils.deleteFileWithBasename(file)
-    rsPyUtils.deleteFileWithBasename(combinedClassesImage)
+        rsgislib.tools.filetools.deleteFileWithBasename(file)
+    rsgislib.tools.filetools.deleteFileWithBasename(combinedClassesImage)
     
     if createdDIR:
         shutil.rmtree(tmpPath)
@@ -1363,7 +1364,6 @@ Example::
     rastergis.identifySmallUnits(clumpsImg, classCol, tmpPath, outColName, smallClumpsThres)
 
     """
-    
     # Check numpy is available
     if not haveNumpy:
         raise Exception("The numpy module is required for this function could not be imported\n\t" + numErr)
@@ -1373,7 +1373,9 @@ Example::
     # Check rios rat is available
     if not haveRIOSRat:
         raise Exception("The RIOS rat tools are required for this function could not be imported\n\t" + riosRatErr)
-    
+
+    import rsgislib.tools.filetools
+
     if len(outColName) is not len(smallClumpsThres):
         print("The number of threshold values and output column names should be the same.")
         sys.exit(-1)
@@ -1416,10 +1418,10 @@ Example::
         bs.append(rastergis.BandAttStats(band=1, maxField=outColName[i]))
         rastergis.populateRATWithStats(smallClumpsMask, clumpsImg, bs)
     
-    rsgisUtils = rsgislib.RSGISPyUtils()
-    rsgisUtils.deleteFileWithBasename(classMaskImg)
-    rsgisUtils.deleteFileWithBasename(classMaskClumps)
-    rsgisUtils.deleteFileWithBasename(smallClumpsMask)
+
+    rsgislib.tools.filetools.deleteFileWithBasename(classMaskImg)
+    rsgislib.tools.filetools.deleteFileWithBasename(classMaskClumps)
+    rsgislib.tools.filetools.deleteFileWithBasename(smallClumpsMask)
     if createdDIR:
         shutil.rmtree(tmpPath)
 
@@ -1462,6 +1464,8 @@ def calcDist2Classes(clumpsImg, classCol, outImgBase, tmpDIR='./tmp', tileSize=2
     :param nCores: is the number of processing cores which are available to be used for this processing. If -1 all available cores will be used. (Default: -1)
 
     """
+    import rsgislib.tools.utils
+    import rsgislib.tools.filetools
     tmpPresent = True
     if not os.path.exists(tmpDIR):
         print("WARNING: \'" + tmpDIR + "\' directory does not exist so creating it...")
@@ -1471,8 +1475,7 @@ def calcDist2Classes(clumpsImg, classCol, outImgBase, tmpDIR='./tmp', tileSize=2
     if nCores <= 0:
         nCores = multiprocessing.cpu_count()
     
-    rsgisUtils = rsgislib.RSGISPyUtils()
-    uid = rsgisUtils.uidGenerator()
+    uid = rsgislib.tools.utils.uidGenerator()
         
     classesImg = os.path.join(tmpDIR, 'ClassImg_'+uid+'.kea')
     rastergis.exportCol2GDALImage(clumpsImg, classesImg, 'KEA', rsgislib.TYPE_32UINT, classCol)
@@ -1483,7 +1486,7 @@ def calcDist2Classes(clumpsImg, classCol, outImgBase, tmpDIR='./tmp', tileSize=2
 
     classIDs = numpy.unique(classColInt)
     
-    xRes, yRes = rsgisUtils.getImageRes(classesImg)
+    xRes, yRes = rsgislib.imageutils.getImageRes(classesImg)
     
     #print("Image Res {} x {}".format(xRes, yRes))
     
@@ -1536,13 +1539,13 @@ def calcDist2Classes(clumpsImg, classCol, outImgBase, tmpDIR='./tmp', tileSize=2
         imageutils.createImageMosaic(distTiles, distImage, nodata, nodata, 1, 1, 'KEA', rsgislib.TYPE_32FLOAT)
         imageutils.popImageStats(distImage, usenodataval=True, nodataval=nodata, calcpyramids=True)
         for imgFile in distTiles:
-            rsgisUtils.deleteFileWithBasename(imgFile)
+            rsgislib.tools.filetools.deleteFileWithBasename(imgFile)
     
     if not classTilesDIRPresent:
         shutil.rmtree(classTilesDIR, ignore_errors=True)
     else:
         for classTileFile in imgTileFiles:
-            rsgisUtils.deleteFileWithBasename(classTileFile)
+            rsgislib.tools.filetools.deleteFileWithBasename(classTileFile)
     
     if not distTilesDIRPresent:
         shutil.rmtree(distTilesDIR, ignore_errors=True)
@@ -1564,14 +1567,14 @@ Calculate the distance between all clumps
 :param maxDistThres: if using an index than an upper limit on the distance between clumps can be defined.
 
 """
+    import rsgislib.tools.utils
+    import rsgislib.tools.filetools
     tmpPresent = True
     if not os.path.exists(tmpDIR):
         os.makedirs(tmpDIR)
         tmpPresent = False 
-    
-    rsgisUtils = rsgislib.RSGISPyUtils()
-    
-    baseName = os.path.splitext(os.path.basename(clumpsImg))[0]+'_'+rsgisUtils.uidGenerator()
+
+    baseName = '{}_{}'.format(rsgislib.tools.filetools.get_file_basename(clumpsImg), rsgislib.tools.utils.uidGenerator())
     
     polysShp = os.path.join(tmpDIR, baseName+'_shp.shp')
     vectorutils.polygoniseRaster(clumpsImg, polysShp, imgBandNo=1, maskImg=clumpsImg, imgMaskBandNo=1)
@@ -1601,15 +1604,14 @@ Calculate the distance from each small clump to a large clump. Split defined by 
 :param maxDistThres: if using an index than an upper limit on the distance between clumps can be defined.
 
 """
+    import rsgislib.tools.utils
     tmpPresent = True
     if not os.path.exists(tmpDIR):
         os.makedirs(tmpDIR)
         tmpPresent = False 
     
-    rsgisUtils = rsgislib.RSGISPyUtils()
-    uidStr = rsgisUtils.uidGenerator()
-    
-    baseName = os.path.splitext(os.path.basename(clumpsImg))[0]+'_'+uidStr
+    uidStr = rsgislib.tools.utils.uidGenerator()
+    baseName = '{}_{}'.format(rsgislib.tools.filetools.get_file_basename(clumpsImg), uidStr)
     
     ratDataset = gdal.Open(clumpsImg, gdal.GA_Update)
     Histogram = rat.readColumn(ratDataset, "Histogram")

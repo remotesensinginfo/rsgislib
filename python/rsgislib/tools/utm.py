@@ -183,8 +183,8 @@ This function convert an UTM coordinate into Latitude and Longitude
 :param northern: bool: You can set True or False to set this parameter. Default is None
 
 """
-    import rsgislib
-    rsgis_utils = rsgislib.RSGISPyUtils()
+    import rsgislib.tools.utils
+
     if not zone_letter and northern is None:
         raise ValueError('either zone_letter or northern needs to be set')
 
@@ -192,9 +192,9 @@ This function convert an UTM coordinate into Latitude and Longitude
         raise ValueError('set either zone_letter or northern, but not both')
 
     if strict:
-        if not rsgis_utils.in_bounds(easting, 100000, 1000000, upper_strict=True):
+        if not rsgislib.tools.utils.in_bounds(easting, 100000, 1000000, upper_strict=True):
             raise Exception('easting out of range (must be between 100.000 m and 999.999 m)')
-        if not rsgis_utils.in_bounds(northing, 0, 10000000):
+        if not rsgislib.tools.utils.in_bounds(northing, 0, 10000000):
             raise Exception('northing out of range (must be between 0 m and 10.000.000 m)')
 
     check_valid_zone(zone_number, zone_letter)
@@ -267,11 +267,11 @@ This function convert Latitude and Longitude to UTM coordinate
     More information see http://www.jaworski.ca/utmzones.htm
 
 """
-    import rsgislib
-    rsgis_utils = rsgislib.RSGISPyUtils()
-    if not rsgis_utils.in_bounds(latitude, -80.0, 84.0):
+    import rsgislib.tools.utils
+
+    if not rsgislib.tools.utils.in_bounds(latitude, -80.0, 84.0):
         raise Exception('latitude out of range (must be between 80 deg S and 84 deg N)')
-    if not rsgis_utils.in_bounds(longitude, -180.0, 180.0):
+    if not rsgislib.tools.utils.in_bounds(longitude, -180.0, 180.0):
         raise Exception('longitude out of range (must be between 180 deg W and 180 deg E)')
     if force_zone_number is not None:
         check_valid_zone(force_zone_number, force_zone_letter)
@@ -321,9 +321,9 @@ This function convert Latitude and Longitude to UTM coordinate
                                         a4 / 24 * (5 - lat_tan2 + 9 * c + 4 * c ** 2) +
                                         a6 / 720 * (61 - 58 * lat_tan2 + lat_tan4 + 600 * c - 330 * E_P2)))
 
-    if rsgis_utils.mixed_signs(latitude):
+    if rsgislib.tools.utils.mixed_signs(latitude):
         raise ValueError("latitudes must all have the same sign")
-    elif rsgis_utils.negative(latitude):
+    elif rsgislib.tools.utils.negative(latitude):
         northing += 10000000
 
     return easting, northing, zone_number, zone_letter
