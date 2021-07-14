@@ -79,6 +79,7 @@ functions:
 | out_format | Provide the output OGR format (e.g., GPKG, GeoJSON) for the output vector file. |
 | del_exist_vec | In some cases GDAL/OGR cannot simply overwrite an existing vector layer, this variable is provided by many RSGISLib function to allow the user to specify that is the output vector layer exists it should be deleted before the main processing starts| 
 | out_epsg | If there is an option to specify the output projection then generally use an EPSG code |
+| vec_lyr_obj | An OGR input vector layer object |
 
 ### Others
 | Variable Name | Description |
