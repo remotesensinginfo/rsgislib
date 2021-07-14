@@ -359,18 +359,19 @@ def getNumpyCharCodesDataType(rsgislib_datatype):
 
 
 class RSGISTime (object):
-    """ Class to calculate run time for a function, format and print out (similar to for XML interface).
+    """
+    Class to calculate run time for a function, format and print out (similar to for XML interface).
 
-        Need to call start before running function and end immediately after.
-        Example::
+    Need to call start before running function and end immediately after.
+    Example::
 
-            t = RSGISTime()
-            t.start()
-            rsgislib.segmentation.clump(kMeansFileZonesNoSgls, initClumpsFile, gdalformat, False, 0) 
-            t.end()
-        
-        Note, this is only designed to provide some general feedback, for benchmarking the timeit module
-        is better suited.
+        t = RSGISTime()
+        t.start()
+        rsgislib.segmentation.clump(kMeansFileZonesNoSgls, initClumpsFile, gdalformat, False, 0)
+        t.end()
+
+    Note, this is only designed to provide some general feedback, for benchmarking the timeit module
+    is better suited.
 
     """
 
@@ -378,50 +379,50 @@ class RSGISTime (object):
         self.startTime = time.time()
         self.endTime = time.time()
 
-    def start(self, printStartTime=False):
+    def start(self, print_start_time=False):
         """
         Start timer, optionally printing start time
 
-        :param printStartTime: A boolean specifiying whether the start time should be printed to console.
+        :param print_start_time: A boolean specifying whether the start time should be printed to console.
 
         """
         self.startTime = time.time()
-        if printStartTime:
+        if print_start_time:
             print(time.strftime('Start Time: %H:%M:%S, %a %b %m %Y.'))
 
-    def end(self, reportDiff=True, preceedStr="", postStr=""):
+    def end(self, report_diff=True, precede_str="", post_str=""):
         """ 
         End timer and optionally print difference.
-        If preceedStr or postStr have a value then they will be used instead
-        of the generic wording around the time. 
+        If precedeStr or postStr have a value then they will be used instead of the generic wording around the time.
         
-        preceedStr + time + postStr
+        precede_str + " " + time + " " + postStr
 
-        :param reportDiff: A boolean specifiying whether time difference should be printed to console.
-        :param preceedStr: A string which is printed ahead of time difference
-        :param postStr: A string which is printed after the time difference
+        :param report_diff: A boolean specifiying whether time difference should be printed to console.
+        :param precede_str: A string which is printed ahead of time difference
+        :param post_str: A string which is printed after the time difference
 
         """
         self.endTime = time.time()
-        if reportDiff:
-            self.calcDiff(preceedStr, postStr)
+        if report_diff:
+            self.calcDiff(precede_str, post_str)
 
-    def calcDiff(self, preceedStr="", postStr=""):
+    def calcDiff(self, precede_str="", post_str=""):
         """
         Calculate time difference, format and print.
-        :param preceedStr: A string which is printed ahead of time difference
-        :param postStr: A string which is printed after the time difference
+
+        :param precede_str: A string which is printed ahead of time difference
+        :param post_str: A string which is printed after the time difference
 
         """
         timeDiff = self.endTime - self.startTime
         
         useCustomMss = False
-        if (len(preceedStr) > 0) or (len(postStr) > 0):
+        if (len(precede_str) > 0) or (len(post_str) > 0):
             useCustomMss = True
         
         if timeDiff <= 1:
             if useCustomMss:
-                outStr = preceedStr + str("in less than a second") + postStr
+                outStr = "{} in less than a second {}".format(precede_str, post_str)
                 print(outStr)
             else:
                 print("Algorithm Completed in less than a second.")
@@ -429,9 +430,9 @@ class RSGISTime (object):
             timeObj = datetime.datetime.utcfromtimestamp(timeDiff)
             timeDiffStr = timeObj.strftime('%H:%M:%S')
             if useCustomMss:
-                print(preceedStr + timeDiffStr + postStr)
+                print("{} {} {}".format(precede_str, timeDiffStr, post_str))
             else:
-                print('Algorithm Completed in %s.'%(timeDiffStr))
+                print('Algorithm Completed in {}.'.format(timeDiffStr))
         
 class TQDMProgressBar(object):
     """
@@ -440,7 +441,7 @@ class TQDMProgressBar(object):
     def __init__(self):
         self.lprogress = 0
 
-    def setTotalSteps(self,steps):
+    def setTotalSteps(self, steps):
         import tqdm
         self.pbar = tqdm.tqdm(total=steps)
         self.lprogress = 0
@@ -456,20 +457,20 @@ class TQDMProgressBar(object):
         self.pbar = tqdm.tqdm(total=100)
         self.lprogress = 0
 
-    def setLabelText(self,text):
+    def setLabelText(self, text):
         sys.stdout.write('\n%s\n' % text)
 
     def wasCancelled(self):
         return False
 
-    def displayException(self,trace):
+    def displayException(self, trace):
         sys.stdout.write(trace)
 
-    def displayWarning(self,text):
+    def displayWarning(self, text):
         sys.stdout.write("Warning: %s\n" % text)
 
-    def displayError(self,text):
+    def displayError(self, text):
         sys.stdout.write("Error: %s\n" % text)
 
-    def displayInfo(self,text):
+    def displayInfo(self, text):
         sys.stdout.write("Info: %s\n" % text)
