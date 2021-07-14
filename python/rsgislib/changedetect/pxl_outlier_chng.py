@@ -51,7 +51,7 @@ except ImportError as riosErr:
     haveRIOS = False
 
 
-def find_class_outliers(pyod_obj, img, img_mask, out_lbls_img, out_scores_img=None, img_mask_val=1, img_bands=None,
+def find_class_outliers(pyod_obj, input_img, in_msk_img, out_lbls_img, out_scores_img=None, img_mask_val=1, img_bands=None,
                         gdalformat="KEA"):
     """
 This function uses the pyod (https://github.com/yzhao062/pyod) library to find outliers within a class.
@@ -59,8 +59,8 @@ It is assumed that the input images are from a different date than the mask (cla
 the outliners will related to class changes.
 
 :param pyod_obj: an instance of a pyod.models (e.g., pyod.models.knn.KNN) pass parameters to the constructor
-:param img: input image used for analysis
-:param img_mask: input image mask use to define the region of interest.
+:param input_img: input image used for analysis
+:param in_msk_img: input image mask use to define the region of interest.
 :param out_lbls_img: output image with pixel over of 1 for within mask but not outlier and 2 for in mask and outlier.
 :param out_scores_img: output image (optional, None and won't be provided; Default None) providing the probability of
                        each pixel being an outlier
@@ -76,12 +76,12 @@ the outliners will related to class changes.
         if not ((type(img_bands) is list) or (type(img_bands) is tuple)):
             raise rsgislib.RSGISPyException("If provided then img_bands should be a list (or None)")
     else:
-        n_bands = rsgislib.imageutils.getImageBandCount(img)
+        n_bands = rsgislib.imageutils.getImageBandCount(input_img)
         img_bands = numpy.arange(1, n_bands + 1)
     num_vars = len(img_bands)
-    img_val_no_data = rsgislib.imageutils.getImageNoDataValue(img)
+    img_val_no_data = rsgislib.imageutils.getImageNoDataValue(input_img)
 
-    msk_arr_vals = rsgislib.imageutils.extractImgPxlValsInMsk(img, img_bands, img_mask, img_mask_val, img_val_no_data)
+    msk_arr_vals = rsgislib.imageutils.extractImgPxlValsInMsk(input_img, img_bands, in_msk_img, img_mask_val, img_val_no_data)
     print("There were {} pixels within the mask.".format(msk_arr_vals.shape[0]))
 
     print("Fitting oulier detector")
@@ -102,8 +102,8 @@ the outliners will related to class changes.
                 out_scores_vals = out_scores_vals.flatten()
             ID = numpy.arange(img_msk_vals.shape[0])
 
-            img_shape = inputs.img.shape
-            img_bands = inputs.img.reshape((img_shape[0], (img_shape[1] * img_shape[2])))
+            img_shape = inputs.input_img.shape
+            img_bands = inputs.input_img.reshape((img_shape[0], (img_shape[1] * img_shape[2])))
 
             band_lst = []
             for band in otherargs.img_bands:
@@ -141,8 +141,8 @@ the outliners will related to class changes.
             outputs.out_scores_img = out_scores_vals
 
     infiles = applier.FilenameAssociations()
-    infiles.image_mask = img_mask
-    infiles.img = img
+    infiles.image_mask = in_msk_img
+    infiles.input_img = input_img
 
     otherargs = applier.OtherInputs()
     otherargs.pyod_obj = pyod_obj

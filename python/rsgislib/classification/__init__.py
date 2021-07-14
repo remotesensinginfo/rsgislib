@@ -300,27 +300,27 @@ def get_class_training_chips_data(imgBandInfo, classVecSampleInfo, chip_h_size, 
     return classInfo
 
 
-def get_num_samples(input_sample_h5_file):
+def get_num_samples(in_h5_file):
     """
     A function to return the number of samples within the input HDF5 file.
 
-    :param input_sample_h5_file: Input HDF file, probably from rsgislib.imageutils.extractZoneImageBandValues2HDF.
+    :param in_h5_file: Input HDF file, probably from rsgislib.imageutils.extractZoneImageBandValues2HDF.
     :return: the number of samples in the hdf5 file.
     """
     import h5py
-    f = h5py.File(input_sample_h5_file, 'r')
+    f = h5py.File(in_h5_file, 'r')
     n_samples = f['DATA/DATA'].shape[0]
     f.close()
     return n_samples
 
 
-def split_sample_train_valid_test(input_sample_h5_file, train_h5_file, valid_h5_file, test_h5_file, test_sample,
+def split_sample_train_valid_test(in_h5_file, train_h5_file, valid_h5_file, test_h5_file, test_sample,
                                   valid_sample, train_sample=None, rand_seed=42, datatype=None):
     """
     A function to split a HDF5 samples file (from rsgislib.imageutils.extractZoneImageBandValues2HDF)
     into three (i.e., Training, Validation and Testing).
 
-    :param input_sample_h5_file: Input HDF file, probably from rsgislib.imageutils.extractZoneImageBandValues2HDF.
+    :param in_h5_file: Input HDF file, probably from rsgislib.imageutils.extractZoneImageBandValues2HDF.
     :param train_h5_file: Output file with the training data samples (this has the number of samples left following
                           the removal of the test and valid samples if train_sample=None)
     :param valid_h5_file: Output file with the valid data samples.
@@ -342,7 +342,7 @@ def split_sample_train_valid_test(input_sample_h5_file, train_h5_file, valid_h5_
     if datatype is None:
         datatype = rsgislib.TYPE_32FLOAT
     tmp_train_valid_sample_file = os.path.join(out_dir, "train_valid_tmp_sample_{}.h5".format(uid_str))
-    rsgislib.imageutils.splitSampleHDF5File(input_sample_h5_file, test_h5_file, tmp_train_valid_sample_file,
+    rsgislib.imageutils.splitSampleHDF5File(in_h5_file, test_h5_file, tmp_train_valid_sample_file,
                                             test_sample, rand_seed, datatype)
     if train_sample is not None:
         tmp_train_sample_file = os.path.join(out_dir, "train_tmp_sample_{}.h5".format(uid_str))
@@ -359,13 +359,13 @@ def split_sample_train_valid_test(input_sample_h5_file, train_h5_file, valid_h5_
     os.remove(tmp_train_valid_sample_file)
 
 
-def split_chip_sample_train_valid_test(input_sample_h5_file, train_h5_file, valid_h5_file, test_h5_file,
+def split_chip_sample_train_valid_test(in_h5_file, train_h5_file, valid_h5_file, test_h5_file,
                                        test_sample, valid_sample, train_sample=None, rand_seed=42, datatype=None):
     """
     A function to split a chip HDF5 samples file (from rsgislib.imageutils.extractChipZoneImageBandValues2HDF)
     into three (i.e., Training, Validation and Testing).
 
-    :param input_sample_h5_file: Input HDF file, probably from rsgislib.imageutils.extractZoneImageBandValues2HDF.
+    :param in_h5_file: Input HDF file, probably from rsgislib.imageutils.extractZoneImageBandValues2HDF.
     :param train_h5_file: Output file with the training data samples (this has the number of samples left following
                           the removal of the test and valid samples if train_sample=None)
     :param valid_h5_file: Output file with the valid data samples.
@@ -388,7 +388,7 @@ def split_chip_sample_train_valid_test(input_sample_h5_file, train_h5_file, vali
         datatype = rsgislib.TYPE_32FLOAT
 
     tmp_train_valid_sample_file = os.path.join(out_dir, "train_valid_tmp_sample_{}.h5".format(uid_str))
-    rsgislib.imageutils.splitSampleChipHDF5File(input_sample_h5_file, test_h5_file, tmp_train_valid_sample_file,
+    rsgislib.imageutils.splitSampleChipHDF5File(in_h5_file, test_h5_file, tmp_train_valid_sample_file,
                                                 test_sample, rand_seed, datatype)
     if train_sample is not None:
         tmp_train_sample_file = os.path.join(out_dir, "train_tmp_sample_{}.h5".format(uid_str))
@@ -405,13 +405,13 @@ def split_chip_sample_train_valid_test(input_sample_h5_file, train_h5_file, vali
     os.remove(tmp_train_valid_sample_file)
 
 
-def split_chip_sample_ref_train_valid_test(input_sample_h5_file, train_h5_file, valid_h5_file, test_h5_file,
+def split_chip_sample_ref_train_valid_test(in_h5_file, train_h5_file, valid_h5_file, test_h5_file,
                                            test_sample, valid_sample, train_sample=None, rand_seed=42, datatype=None):
     """
     A function to split a chip HDF5 samples file (from rsgislib.imageutils.extractChipZoneImageBandValues2HDF)
     into three (i.e., Training, Validation and Testing).
 
-    :param input_sample_h5_file: Input HDF file, probably from rsgislib.imageutils.extractZoneImageBandValues2HDF.
+    :param in_h5_file: Input HDF file, probably from rsgislib.imageutils.extractZoneImageBandValues2HDF.
     :param train_h5_file: Output file with the training data samples (this has the number of samples left following
                           the removal of the test and valid samples if train_sample=None)
     :param valid_h5_file: Output file with the valid data samples.
@@ -435,7 +435,7 @@ def split_chip_sample_ref_train_valid_test(input_sample_h5_file, train_h5_file, 
         datatype = rsgislib.TYPE_32FLOAT
 
     tmp_train_valid_sample_file = os.path.join(out_dir, "train_valid_tmp_sample_{}.h5".format(uid_str))
-    splitSampleRefChipHDF5File(input_sample_h5_file, test_h5_file, tmp_train_valid_sample_file,
+    splitSampleRefChipHDF5File(in_h5_file, test_h5_file, tmp_train_valid_sample_file,
                                test_sample, rand_seed, datatype)
     if train_sample is not None:
         tmp_train_sample_file = os.path.join(out_dir, "train_tmp_sample_{}.h5".format(uid_str))
