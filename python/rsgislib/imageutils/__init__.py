@@ -201,9 +201,12 @@ def renameGDALLayer(input_img, output_img):
     layerDS = None
     gdalDriver.Rename(output_img, input_img)
 
-def getImageRes(input_img):
+def getImageRes(input_img, abs_vals=False):
     """
     A function to retrieve the image resolution.
+
+    :param input_img: input image file
+    :param abs_vals: if True then returned x/y values will be positive (default: False)
 
     :return: xRes, yRes
 
@@ -215,8 +218,9 @@ def getImageRes(input_img):
     geotransform = rasterDS.GetGeoTransform()
     xRes = geotransform[1]
     yRes = geotransform[5]
-    if yRes < 0:
-        yRes = yRes * -1
+    if abs_vals:
+        yRes = abs(yRes)
+        xRes = abs(xRes)
     rasterDS = None
     return xRes, yRes
 
@@ -894,6 +898,66 @@ def createBlankImagePy(output_img, n_bands, width, height, tlX, tlY, out_img_res
     out_img_ds_obj = None
 
 
+def createBlankBufImgFromRefImg(input_img, output_img, gdalformat, datatype, buf_pxl_ext=None, buf_spt_ext=None,
+                                no_data_val=None):
+    """
+    A function to create a new image file based on the input image but buffered by the specified amount
+    (e.g., 100 pixels bigger on all sides. The buffer amount can ba specified in pixels or spatial units.
+    If non-None value is given for both inputs then an error will be produced. By default the no data value
+    will be taken from the input image header but if not available or specified within the function call
+    then that value will be used.
+
+    :param input_img: input reference image
+    :param output_img: output image file.
+    :param gdalformat: output image file format.
+    :param datatype: is a rsgislib.TYPE_* value providing the data type of the output image.
+    :param buf_pxl_ext: the amount the input image will be buffered in pixels.
+    :param buf_spt_ext: the amount the input image will be buffered in spatial distance,
+                    units are defined from the projection of the input image.
+    :param no_data_val: Optional no data value. If None then the no data value will be
+                    taken from the input image.
+
+    """
+    if (buf_pxl_ext is None) and (buf_spt_ext is None):
+        raise Exception("You must specify either the buf_pxl_ext or buf_spt_ext value.")
+
+    if (buf_pxl_ext is not None) and (buf_spt_ext is not None):
+        raise Exception("You cannot specify both the buf_pxl_ext or buf_spt_ext value.")
+
+    if no_data_val is None:
+        no_data_val = getImageNoDataValue(input_img)
+
+        if no_data_val is None:
+            raise Exception("You must specify a no data value ")
+
+    x_res, y_res = getImageRes(input_img, abs_vals=True)
+    x_res_abs = abs(x_res)
+    y_res_abs = abs(y_res)
+    x_in_size, y_in_size = getImageSize(input_img)
+    in_img_bbox = getImageBBOX(input_img)
+    n_bands = getImageBandCount(input_img)
+    wkt_str = getWKTProjFromImage(input_img)
+
+    if buf_spt_ext is not None:
+        buf_pxl_ext_x = ceil(buf_spt_ext / x_res_abs)
+        buf_pxl_ext_y = ceil(buf_spt_ext / y_res_abs)
+
+        x_out_size = x_in_size + (2 * buf_pxl_ext_x)
+        y_out_size = y_in_size + (2 * buf_pxl_ext_y)
+
+        out_tl_x = in_img_bbox[0] - (buf_pxl_ext_x * x_res_abs)
+        out_tl_y = in_img_bbox[3] + (buf_pxl_ext_y * y_res_abs)
+    else:
+        x_out_size = x_in_size + (2 * buf_pxl_ext)
+        y_out_size = y_in_size + (2 * buf_pxl_ext)
+
+        out_tl_x = in_img_bbox[0] - (buf_pxl_ext * x_res_abs)
+        out_tl_y = in_img_bbox[3] + (buf_pxl_ext * y_res_abs)
+
+    createBlankImage(output_img, n_bands, x_out_size, y_out_size, out_tl_x, out_tl_y, x_res, y_res,
+                                         no_data_val, '', wkt_str, gdalformat, datatype)
+
+
 def createBlankImgFromRefVector(inVecFile, inVecLyr, outputImg, outImgRes, outImgNBands, gdalformat, datatype):
     """
 A function to create a new image file based on a vector layer to define the extent and projection
@@ -926,7 +990,8 @@ of the output image.
     
     wktString = rsgislib.vectorutils.getProjWKTFromVec(inVecFile)
 
-    rsgislib.imageutils.createBlankImage(outputImg, outImgNBands, width, height, tlX, tlY, outImgRes, 0.0, '', wktString, gdalformat, datatype)
+    rsgislib.imageutils.createBlankImage(outputImg, outImgNBands, width, height, tlX, tlY,
+                                         outImgRes, (outImgRes*-1), 0.0, '', wktString, gdalformat, datatype)
     
 
 def createCopyImageVecExtentSnap2Grid(inVecFile, inVecLyr, outputImg, outImgRes, outImgNBands, gdalformat, datatype, bufnpxl=0):
@@ -966,7 +1031,7 @@ of the output image. The image file extent is snapped on to the grid defined by 
     
     wktString = rsgislib.vectorutils.getProjWKTFromVec(inVecFile)
     
-    rsgislib.imageutils.createBlankImage(outputImg, outImgNBands, width, height, tlX, tlY, outImgRes, 0.0, '', wktString, gdalformat, datatype)
+    rsgislib.imageutils.createBlankImage(outputImg, outImgNBands, width, height, tlX, tlY, outImgRes, (outImgRes*-1), 0.0, '', wktString, gdalformat, datatype)
     
 
 def createBlankImgFromBBOX(bbox, wktstr, outputImg, outImgRes, outImgPxlVal, outImgNBands, gdalformat, datatype, snap2grid=False):
@@ -1002,7 +1067,7 @@ A function to create a new image file based on a bbox to define the extent.
     width = int(math.ceil(widthCoord/outImgRes))
     height = int(math.ceil(heightCoord/outImgRes))
     
-    rsgislib.imageutils.createBlankImage(outputImg, outImgNBands, width, height, tlX, tlY, outImgRes, outImgPxlVal, '', wktstr, gdalformat, datatype)
+    rsgislib.imageutils.createBlankImage(outputImg, outImgNBands, width, height, tlX, tlY, outImgRes, (outImgRes*-1), outImgPxlVal, '', wktstr, gdalformat, datatype)
 
    
 def createImageForEachVecFeat(vectorFile, vectorLyr, fileNameCol, outImgPath, outImgExt, outImgPxlVal, outImgNBands, outImgRes, gdalformat, datatype, snap2grid=False):
@@ -1380,7 +1445,7 @@ Function to subset an input image using a defined pixel bbox.
 
 """
     bbox = getImageBBOX(input_img)
-    xRes, yRes = getImageRes(input_img)
+    xRes, yRes = getImageRes(input_img, abs_vals=True)
     xSize, ySize = getImageSize(input_img)
     
     if (xMaxPxl > xSize) or (yMaxPxl > ySize):
@@ -3141,7 +3206,7 @@ def assign_random_pxls(input_img, output_img, n_pts, img_band=1, gdalformat='KEA
     set_image_pxl_values(output_img, 1, out_x_coords, out_y_coords, 1)
 
 
-def check_img_lst(imglst, exp_x_res, exp_y_res, bbox=None, print_errors=True):
+def check_img_lst(imglst, exp_x_res, exp_y_res, bbox=None, print_errors=True, abs_res=True):
     """
     A function which checks a list of images to ensure they resolution and optionally
     the bounding box is as expected.
@@ -3155,12 +3220,15 @@ def check_img_lst(imglst, exp_x_res, exp_y_res, bbox=None, print_errors=True):
 
     """
     import rsgislib.tools.geometrytools
+    if abs_res:
+        exp_x_res = abs(exp_x_res)
+        exp_y_res = abs(exp_y_res)
     out_imgs = list()
     for img in imglst:
-        img_res = getImageRes(img)
+        img_res = getImageRes(img, abs_vals=abs_res)
         if bbox is not None:
             img_bbox = getImageBBOX(img)
-        if (img_res[0] != exp_x_res) or (abs(img_res[1]) != exp_y_res):
+        if (img_res[0] != exp_x_res) or (img_res[1] != exp_y_res):
             if print_errors:
                 print("{} has resolution: {}".format(img, img_res))
         elif (bbox is not None) and (not rsgislib.tools.geometrytools.bbox_intersection(bbox, img_bbox)):
@@ -3268,7 +3336,7 @@ def test_img_lst_intersects(imgs, stop_err=False):
                 print("\tImage BBOX: ", img_bbox)
                 if stop_err:
                     raise Exception("BBOX does not intersect the reference (i.e., first image)")
-            elif (img_res[0] != ref_res[0]) or (img_res[1] != ref_res[0]):
+            elif (img_res[0] != ref_res[0]) or (img_res[1] != ref_res[1]):
                 print("\tImage resolution does not match the reference (i.e., first image)")
                 print("\tRef (first) Image: {}".format(ref_img))
                 print("\tRef (first) Res: ", ref_res)
@@ -3516,7 +3584,7 @@ A function which calculates the x and y pixel resolution (in metres) of each pix
         from rios import cuiprogress
         progress_bar = cuiprogress.GDALProgressBar()
 
-    x_res, y_res = getImageRes(img)
+    x_res, y_res = getImageRes(img, abs_vals=True)
 
     infiles = applier.FilenameAssociations()
     infiles.img = img

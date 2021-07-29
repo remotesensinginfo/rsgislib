@@ -539,7 +539,7 @@ static PyObject *ImageUtils_PopImageStats(PyObject *self, PyObject *args, PyObje
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("use_no_data"),
                              RSGIS_PY_C_TEXT("no_data_val"), RSGIS_PY_C_TEXT("calc_pyramids"), nullptr};
 
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "s|ifiO:popImageStats", kwlist, &pszInputImage,
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "s|ifi:popImageStats", kwlist, &pszInputImage,
                     &useNoDataValue, &noDataValue, &buildPyramids))
     {
         return nullptr;
@@ -1167,7 +1167,7 @@ static PyObject *ImageUtils_CreateBlankImage(PyObject *self, PyObject *args, PyO
     double tlX, tlY, res_x, res_y = 0;
     float pxlVal = 0;
     
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sIIIdddfsssi:createBlankImage", kwlist, &pszOutputImage, &numBands, &width,
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sIIIddddfsssi:createBlankImage", kwlist, &pszOutputImage, &numBands, &width,
                                      &height, &tlX, &tlY, &res_x, &res_y, &pxlVal, &wktFile, &wktString, &pszGDALFormat, &nOutDataType))
     {
         return nullptr;

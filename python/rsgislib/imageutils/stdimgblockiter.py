@@ -107,7 +107,7 @@ class StdImgBlockIter:
         self.img_pxl_res = None
         for img in self.img_info_lst:
             self.img_info[img.name] = dict()
-            self.img_info[img.name]['res'] = rsgislib.imageutils.getImageRes(img.fileName)
+            self.img_info[img.name]['res'] = rsgislib.imageutils.getImageRes(img.fileName, abs_vals=True)
             self.img_info[img.name]['bbox'] = rsgislib.imageutils.getImageBBOX(img.fileName)
             self.img_info[img.name]['pxl_size'] = rsgislib.imageutils.getImageSize(img.fileName)
             self.img_info[img.name]['epsg'] = rsgislib.imageutils.getEPSGProjFromImage(img.fileName)
