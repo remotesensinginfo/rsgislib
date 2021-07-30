@@ -23,7 +23,7 @@
 #ifndef RSGISCumulativeArea_H
 #define RSGISCumulativeArea_H
 
-#include <math.h>
+#include <cmath>
 #include <limits>
 
 #include "img/RSGISCalcImage.h"

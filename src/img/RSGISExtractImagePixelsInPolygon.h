@@ -29,7 +29,7 @@
 #include <fstream>
 #include <string>
 #include <sstream>
-#include <math.h>
+#include <cmath>
 #include "gdal_priv.h"
 #include "ogrsf_frmts.h"
 

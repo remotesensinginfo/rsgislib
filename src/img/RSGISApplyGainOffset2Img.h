@@ -26,7 +26,7 @@
 
 #include <iostream>
 #include <stdio.h>
-#include <math.h>
+#include <cmath>
 
 #include "img/RSGISCalcImage.h"
 #include "img/RSGISCalcImageValue.h"

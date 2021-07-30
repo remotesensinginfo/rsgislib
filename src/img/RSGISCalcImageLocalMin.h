@@ -24,7 +24,7 @@
 #define RSGISCalcImageLocalMin_H
 
 #include <iostream>
-#include <math.h>
+#include <cmath>
 #include <stdlib.h>
 
 #include "img/RSGISImageCalcException.h"

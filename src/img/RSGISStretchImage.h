@@ -26,7 +26,7 @@
 
 #include <iostream>
 #include <fstream>
-#include <math.h>
+#include <cmath>
 #include <float.h>
 
 #include "common/RSGISFileException.h"

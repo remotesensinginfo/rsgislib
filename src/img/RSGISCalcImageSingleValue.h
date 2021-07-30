@@ -23,7 +23,7 @@
 #ifndef RSGISCalcImageSingleValue_H
 #define RSGISCalcImageSingleValue_H
 
-#include <math.h>
+#include <cmath>
 #include <iostream>
 #include <string>
 #include "img/RSGISImageCalcException.h"

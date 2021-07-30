@@ -28,7 +28,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
-#include <math.h>
+#include <cmath>
 #include <list>
 
 #include "gdal_priv.h"

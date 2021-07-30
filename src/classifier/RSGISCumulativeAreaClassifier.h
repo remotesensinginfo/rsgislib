@@ -24,7 +24,7 @@
 #ifndef RSGISCumulativeAreaClassifier_H
 #define RSGISCumulativeAreaClassifier_H
 
-#include <math.h>
+#include <cmath>
 #include <limits>
 
 #include "img/RSGISCalcImage.h"

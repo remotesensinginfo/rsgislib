@@ -25,7 +25,7 @@
 #ifndef RSGISImageSimilarityMetric_H
 #define RSGISImageSimilarityMetric_H
 
-#include <math.h>
+#include <cmath>
 
 #include "math/RSGISMathException.h"
 

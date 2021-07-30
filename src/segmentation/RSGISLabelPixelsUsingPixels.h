@@ -24,7 +24,7 @@
 #define RSGISLabelPixelsUsingPixels_H
 
 #include <iostream>
-#include <math.h>
+#include <cmath>
 
 #include "common/RSGISImageException.h"
 

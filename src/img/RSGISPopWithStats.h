@@ -32,7 +32,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctime>
-#include <math.h>
+#include <cmath>
 
 #include "gdal_priv.h"
 #include "gdal_rat.h"

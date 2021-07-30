@@ -22,7 +22,7 @@
 
 #ifndef RSGISProbabilityDistributions_H
 #define RSGISProbabilityDistributions_H
-#include <math.h>
+#include <cmath>
 #include <time.h>
 #include <gsl/gsl_sf_gamma.h>
 #include <gsl/gsl_rng.h>

@@ -24,7 +24,7 @@
 #ifndef RSGISSpectralAngleMapper_H
 #define RSGISSpectralAngleMapper_H
 
-#include <math.h>
+#include <cmath>
 #include <gsl/gsl_matrix.h>
 
 #include "img/RSGISCalcImage.h"

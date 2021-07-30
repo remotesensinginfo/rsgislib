@@ -26,7 +26,7 @@
 
 #include <iostream>
 #include <string>
-#include <math.h>
+#include <cmath>
 
 #include "gdal_priv.h"
 

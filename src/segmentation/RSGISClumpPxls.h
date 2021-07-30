@@ -26,7 +26,7 @@
 #include <iostream>
 #include <vector>
 #include <queue>
-#include <math.h>
+#include <cmath>
 
 #include "gdal_priv.h"
 

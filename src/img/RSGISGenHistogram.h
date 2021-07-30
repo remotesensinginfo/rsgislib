@@ -25,7 +25,7 @@
 #define RSGISGenHistogram_H
 
 #include <iostream>
-#include <math.h>
+#include <cmath>
 #include <limits>
 
 #include "img/RSGISCalcImage.h"

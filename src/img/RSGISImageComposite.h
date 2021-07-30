@@ -21,7 +21,7 @@
  *
  */
 
-#include <math.h>
+#include <cmath>
 
 #include "common/RSGISException.h"
 #include "common/RSGISImageException.h"

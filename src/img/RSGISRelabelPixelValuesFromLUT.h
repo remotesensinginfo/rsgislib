@@ -24,7 +24,7 @@
 #ifndef RSGISRelabelPixelValuesFromLUT_H
 #define RSGISRelabelPixelValuesFromLUT_H
 
-#include <math.h>
+#include <cmath>
 #include <limits>
 
 #include "img/RSGISCalcImage.h"

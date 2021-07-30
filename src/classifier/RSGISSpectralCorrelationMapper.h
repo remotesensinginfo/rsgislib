@@ -24,7 +24,7 @@
 #ifndef RSGISSpectralCorrelationMapper_H
 #define RSGISSpectralCorrelationMapper_H
 
-#include <math.h>
+#include <cmath>
 #include <gsl/gsl_matrix.h>
 
 #include "img/RSGISCalcImage.h"

@@ -29,7 +29,7 @@
 #include <queue>
 #include <deque>
 #include <list>
-#include <math.h>
+#include <cmath>
 
 #include "gdal_priv.h"
 
