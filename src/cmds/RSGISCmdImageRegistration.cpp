@@ -31,13 +31,120 @@
 #include "registration/RSGISStandardImageSimilarityMetrics.h"
 #include "registration/RSGISSingleConnectLayerImageRegistration.h"
 #include "registration/RSGISAddGCPsGDAL.h"
+#include "registration/RSGISFindImageOffset.h"
+
 
 #include "img/RSGISCalcImageValue.h"
 #include "img/RSGISCalcImage.h"
 #include "img/RSGISCopyImage.h"
 
+#include "utils/RSGISTextUtils.h"
+
+
 
 namespace rsgis{ namespace cmds {
+
+    std::pair<double, double> excecuteFindImageOffice(std::string inputReferenceImage, std::string inputFloatingmage,
+                                                      std::vector<unsigned int> refImageBands,
+                                                      std::vector<unsigned int> fltImageBands,
+                                                      unsigned int xSearch, unsigned int ySearch,
+                                                      unsigned int metricTypeInt,
+                                                      int subPixelResolution)
+    {
+        rsgis::utils::RSGISTextUtils txtUtils;
+        GDALAllRegister();
+        GDALDataset *inRefDataset = nullptr;
+        GDALDataset *inFloatDataset = nullptr;
+
+        inRefDataset = (GDALDataset *) GDALOpenShared(inputReferenceImage.c_str(), GA_ReadOnly);
+        if(inRefDataset == nullptr)
+        {
+            std::string message = std::string("Could not open image ") + inputReferenceImage;
+            throw rsgis::RSGISException(message.c_str());
+        }
+        int nRefBands = inRefDataset->GetRasterCount();
+
+        inFloatDataset = (GDALDataset *) GDALOpenShared(inputFloatingmage.c_str(), GA_ReadOnly);
+        if(inFloatDataset == nullptr)
+        {
+            std::string message = std::string("Could not open image ") + inputFloatingmage;
+            throw rsgis::RSGISException(message.c_str());
+        }
+        int nFltBands = inFloatDataset->GetRasterCount();
+
+        if(refImageBands.size() != fltImageBands.size())
+        {
+            throw rsgis::RSGISException("The number of bands specified from the reference and floating images must be the same.");
+        }
+
+        for(auto iterBand = refImageBands.begin(); iterBand != refImageBands.end(); ++iterBand)
+        {
+            if((*iterBand) < 1)
+            {
+                throw rsgis::RSGISException("Image band indexing starts at 1");
+            }
+            if((*iterBand) > nRefBands)
+            {
+                std::string message = std::string("Image band ") + txtUtils.uInttostring((*iterBand)) + std::string(" is not within the reference image.");
+                throw rsgis::RSGISException(message.c_str());
+            }
+        }
+
+        for(auto iterBand = fltImageBands.begin(); iterBand != fltImageBands.end(); ++iterBand)
+        {
+            if((*iterBand) < 1)
+            {
+                throw rsgis::RSGISException("Image band indexing starts at 1");
+            }
+            if((*iterBand) > nFltBands)
+            {
+                std::string message = std::string("Image band ") + txtUtils.uInttostring((*iterBand)) + std::string(" is not within the floating image.");
+                throw rsgis::RSGISException(message.c_str());
+            }
+        }
+
+        rsgis::reg::RSGISImageSimilarityMetric *similarityMetric = nullptr;
+        if(metricTypeInt == 1) // euclidean
+        {
+            similarityMetric = new rsgis::reg::RSGISEuclideanSimilarityMetric();
+        }
+        else if(metricTypeInt == 2) // sqdiff
+        {
+            similarityMetric = new rsgis::reg::RSGISSquaredDifferenceSimilarityMetric();
+        }
+        else if(metricTypeInt == 3) // manhatten
+        {
+            similarityMetric = new rsgis::reg::RSGISManhattanSimilarityMetric();
+        }
+        else if(metricTypeInt == 4) // correlation
+        {
+            similarityMetric = new rsgis::reg::RSGISCorrelationSimilarityMetric();
+        }
+        else
+        {
+            throw rsgis::cmds::RSGISCmdException("Metric not recognised!");
+        }
+
+        bool calcSubPxl = false;
+        if(subPixelResolution > 0)
+        {
+            calcSubPxl = true;
+        }
+
+        // DO ANALYSIS!!
+        rsgis::reg::RSGISFindImageOffset findImageOffset;
+        std::pair<double, double> imgOffsets = findImageOffset.findImageOffset(inRefDataset, inFloatDataset,
+                                                                               refImageBands,
+                                                                               fltImageBands,
+                                                                               xSearch, ySearch,
+                                                                               similarityMetric,
+                                                                               calcSubPxl, subPixelResolution);
+
+        GDALClose(inRefDataset);
+        GDALClose(inFloatDataset);
+
+        return imgOffsets;
+    }
 
     void excecuteBasicRegistration(std::string inputReferenceImage, std::string inputFloatingmage, int gcpGap,
                                                   float metricThreshold, int windowSize, int searchArea, float stdDevRefThreshold,

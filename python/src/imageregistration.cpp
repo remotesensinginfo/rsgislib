@@ -37,6 +37,81 @@ struct ImageRegistrationState
 static struct ImageRegistrationState _state;
 #endif
 
+static PyObject *ImageRegistration_FindImageOffset(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("in_ref_img"), RSGIS_PY_C_TEXT("in_float_img"),
+                             RSGIS_PY_C_TEXT("ref_img_bands"), RSGIS_PY_C_TEXT("flt_img_bands"),
+                             RSGIS_PY_C_TEXT("metric_type"), RSGIS_PY_C_TEXT("x_search"),
+                             RSGIS_PY_C_TEXT("y_search"), RSGIS_PY_C_TEXT("sub_pxl_res"),  nullptr};
+    const char *pszInputRefImage, *pszInputFloatImage;
+    int subPixelResolution = 0;
+    int metricType = 0;
+    int xImgSearch, yImgSearch = 0;
+    PyObject *pRefImageBandsObj;
+    PyObject *pFltImageBandsObj;
+
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssOOiii|i:findImageOffset", kwlist, &pszInputRefImage,
+                                     &pszInputFloatImage, &pRefImageBandsObj, &pFltImageBandsObj, &metricType,
+                                     &xImgSearch, &yImgSearch, &subPixelResolution))
+    {
+        return nullptr;
+    }
+
+    std::vector<unsigned int> refImageBands;
+    if( !PySequence_Check(pRefImageBandsObj))
+    {
+        PyErr_SetString(GETSTATE(self)->error, "ref_img_bands argument must be a sequence");
+        return nullptr;
+    }
+    Py_ssize_t nRefImgBands = PySequence_Size(pRefImageBandsObj);
+    for(Py_ssize_t n = 0; n < nRefImgBands; ++n)
+    {
+        PyObject *o = PySequence_GetItem(pRefImageBandsObj, n);
+        refImageBands.push_back(RSGISPY_UINT_EXTRACT(o));
+    }
+
+    std::vector<unsigned int> fltImageBands;
+    if( !PySequence_Check(pFltImageBandsObj))
+    {
+        PyErr_SetString(GETSTATE(self)->error, "flt_img_bands argument must be a sequence");
+        return nullptr;
+    }
+    Py_ssize_t nFltImgBands = PySequence_Size(pFltImageBandsObj);
+    for(Py_ssize_t n = 0; n < nFltImgBands; ++n)
+    {
+        PyObject *o = PySequence_GetItem(pFltImageBandsObj, n);
+        fltImageBands.push_back(RSGISPY_UINT_EXTRACT(o));
+    }
+
+    PyObject *outVal = PyTuple_New(2);
+    try
+    {
+        std::pair<double, double> offsets = rsgis::cmds::excecuteFindImageOffice(std::string(pszInputRefImage),
+                                                                                 std::string(pszInputFloatImage),
+                                                                                 refImageBands, fltImageBands,
+                                                                                 xImgSearch, yImgSearch,
+                                                                                 metricType, subPixelResolution);
+
+        if(PyTuple_SetItem(outVal, 0, Py_BuildValue("d", offsets.first)) == -1)
+        {
+            throw rsgis::cmds::RSGISCmdException("Failed to add \'X Offset\' value to the list...");
+        }
+
+        if(PyTuple_SetItem(outVal, 1, Py_BuildValue("d", offsets.second)) == -1)
+        {
+            throw rsgis::cmds::RSGISCmdException("Failed to add \'Y Offset\' value to the list...");
+        }
+    }
+    catch(rsgis::cmds::RSGISCmdException &e)
+    {
+        PyErr_SetString(GETSTATE(self)->error, e.what());
+        return nullptr;
+    }
+
+    return outVal;
+}
+
+
 static PyObject *ImageRegistration_BasicRegistration(PyObject *self, PyObject *args, PyObject *keywds)
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("in_ref_img"), RSGIS_PY_C_TEXT("in_float_img"),
@@ -52,7 +127,9 @@ static PyObject *ImageRegistration_BasicRegistration(PyObject *self, PyObject *a
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssifiiffiii:basicregistration", kwlist, &pszInputReferenceImage, &pszInputFloatingmage,
                                      &pszOutputGCPFile, &pixelGap, &threshold, &windowSize, &searchArea, &stdDevRefThreshold,
                                      &stdDevFloatThreshold, &subPixelResolution, &metricType, &outputType))
+    {
         return nullptr;
+    }
 
     try
     {
@@ -90,7 +167,9 @@ static PyObject *ImageRegistration_SingleLayerRegistration(PyObject *self, PyObj
                                      &pszInputFloatingmage, &pszOutputGCPFile, &pixelGap, &threshold, &windowSize, &searchArea,
                                      &stdDevRefThreshold, &stdDevFloatThreshold, &subPixelResolution, &distanceThreshold,
                                      &maxNumIterations, &moveChangeThreshold, &pSmoothness, &metricType, &outputType))
+    {
         return nullptr;
+    }
 
     try
     {
@@ -118,7 +197,9 @@ static PyObject *ImageRegistration_GCP2GDAL(PyObject *self, PyObject *args, PyOb
 	int nOutDataType;
     
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssi:gcp2gdal", kwlist, &pszInputImage, &pszInputGCPFile, &pszOutputFile, &pszGDALFormat, &nOutDataType))
+    {
         return nullptr;
+    }
 
     try
     {
@@ -142,7 +223,9 @@ static PyObject *ImageRegistration_ApplyOffset2Image(PyObject *self, PyObject *a
     double xOff, yOff;
     
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssidd:applyOffset2Image", kwlist, &pszInputImage, &pszOutputImage, &pszGDALFormat, &nOutDataType, &xOff, &yOff))
+    {
         return nullptr;
+    }
     
     try
     {
@@ -159,7 +242,27 @@ static PyObject *ImageRegistration_ApplyOffset2Image(PyObject *self, PyObject *a
 
 // Our list of functions in this module
 static PyMethodDef ImageRegistrationMethods[] = {
-    {"basicregistration", (PyCFunction)ImageRegistration_BasicRegistration, METH_VARARGS | METH_KEYWORDS,
+{"findImageOffset", (PyCFunction)ImageRegistration_FindImageOffset, METH_VARARGS | METH_KEYWORDS,
+"imageregistration.findImageOffset(in_ref_img, in_float_img, ref_img_bands, flt_img_bands, metric_type, x_search,  y_search, sub_pxl_res)\n"
+"Calculate and X/Y offset between the input reference and float images.\n"
+"This function will calculate the similarity intersecting regions of the\n"
+"two images and identified an X/Y where the similarity is greatest.\n"
+"\n"
+"Where:\n"
+"\n"
+":param in_ref_img: is a string providing reference image which to which the floating image is to be registered.n"
+":param in_float_img: is a string providing the floating image to be registered to the reference image\n"
+":param ref_img_bands: is a list of image bands which are to be used to calculate the image similarity from the reference image.\n"
+":param flt_img_bands: is a list of image bands which are to be used to calculate the image similarity from the floating image.\n"
+":param metric_type: is an the similarity metric used to compare images of type rsgislib.imageregistration.METRIC_* \n"
+":param x_search: is the number of pixels in the x-axis the image can be moved either side of the centre.\n"
+":param y_search: is the number of pixels in the y-axis the image can be moved either side of the centre.\n"
+":param sub_pxl_res: is an optional (if not specified then no sub-pixel component will be estimated) int specifying the sub-pixel resolution to which the pixel shifts are estimated. Note that the values are positive integers such that a value of 2 will result in a sub pixel resolution of 0.5 of a pixel and a value 4 will be 0.25 of a pixel. \n"
+"\n"
+"\n"
+},
+
+{"basicregistration", (PyCFunction)ImageRegistration_BasicRegistration, METH_VARARGS | METH_KEYWORDS,
 "imageregistration.basicregistration(reference, floating, output, pixelGap, threshold, window, search, stddevRef, stddevFloat, subpixelresolution, metric, outputType)\n"
 "Generate tie points between floating and reference image using basic algorithm.\n"
 "\n"

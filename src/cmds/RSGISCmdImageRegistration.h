@@ -45,6 +45,14 @@
 
 namespace rsgis{ namespace cmds {
 
+    /** Find simple image offsets */
+    DllExport std::pair<double, double> excecuteFindImageOffice(std::string inputReferenceImage, std::string inputFloatingmage,
+                                                                std::vector<unsigned int> refImageBands,
+                                                                std::vector<unsigned int> fltImageBands,
+                                                                unsigned int xSearch, unsigned int ySearch,
+                                                                unsigned int metricTypeInt,
+                                                                int subPixelResolution);
+
     /** Basic image registration */
     DllExport void excecuteBasicRegistration(std::string inputReferenceImage, std::string inputFloatingmage, int gcpGap,
                                    float metricThreshold, int windowSize, int searchArea, float stdDevRefThreshold,
