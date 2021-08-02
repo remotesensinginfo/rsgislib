@@ -30,8 +30,6 @@
 
 #include "math/RSGISMathsUtils.h"
 
-#include "utils/RSGISTextUtils.h"
-
 #include "img/RSGISCalcImage.h"
 
 #include "vec/RSGISVectorUtils.h"
@@ -49,8 +47,6 @@
 #include "rastergis/RSGISFindInfoBetweenLayers.h"
 #include "rastergis/RSGISClumpBorders.h"
 #include "rastergis/RSGISCalcNeighbourStats.h"
-#include "rastergis/RSGISBinaryClassifyClumps.h"
-#include "rastergis/RSGISClumpRegionGrowing.h"
 #include "rastergis/RSGISCollapseRAT.h"
 #include "rastergis/RSGISInputShapefileAttributes2RAT.h"
 #include "rastergis/RSGISRATKNN.h"
