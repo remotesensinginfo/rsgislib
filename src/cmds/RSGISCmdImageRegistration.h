@@ -46,7 +46,7 @@
 namespace rsgis{ namespace cmds {
 
     /** Find simple image offsets */
-    DllExport std::pair<double, double> excecuteFindImageOffice(std::string inputReferenceImage, std::string inputFloatingmage,
+    DllExport std::pair<double, double> excecuteFindImageOffset(std::string inputReferenceImage, std::string inputFloatingmage,
                                                                 std::vector<unsigned int> refImageBands,
                                                                 std::vector<unsigned int> fltImageBands,
                                                                 unsigned int xSearch, unsigned int ySearch,

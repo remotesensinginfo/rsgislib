@@ -28,6 +28,7 @@
 #include <cmath>
 
 #include "math/RSGISMathException.h"
+#include "img/RSGISCalcImageValue.h"
 
 // mark all exported classes/functions with DllExport to have
 // them exported by Visual Studio
@@ -51,6 +52,38 @@ namespace rsgis{namespace reg{
 		virtual bool findMin()=0;
 		virtual ~RSGISImageSimilarityMetric(){};
 	};
+
+    class DllExport RSGISImageCalcSimilarityMetric : public rsgis::img::RSGISCalcImageValue
+    {
+    public:
+        RSGISImageCalcSimilarityMetric(std::vector<unsigned int> imgABands, std::vector<unsigned int> imgBBands, float imgANoData, bool useImgANoData, float imgBNoData, bool useImgBNoData):rsgis::img::RSGISCalcImageValue(0)
+        {
+            this->imgABands = imgABands;
+            this->imgBBands = imgBBands;
+            this->imgANoData = imgANoData;
+            this->useImgANoData = useImgANoData;
+            this->imgBNoData = imgBNoData;
+            this->useImgBNoData = useImgBNoData;
+
+            if(imgABands.size() != imgBBands.size())
+            {
+                throw rsgis::RSGISException("There are a different number of bands for the two images.");
+            }
+
+            this->nBands = imgABands.size();
+        };
+        virtual bool findMin()=0;
+        virtual void reset()=0;
+        virtual double metricVal()=0;
+    protected:
+        std::vector<unsigned int> imgABands;
+        std::vector<unsigned int> imgBBands;
+        float imgANoData;
+        bool useImgANoData;
+        float imgBNoData;
+        bool useImgBNoData;
+        unsigned int nBands;
+    };
 }}
 									  
 #endif

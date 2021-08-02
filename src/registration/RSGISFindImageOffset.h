@@ -32,9 +32,13 @@
 
 #include "gdal_priv.h"
 
-#include "math/RSGISMathException.h"
-
+#include "img/RSGISImageUtils.h"
+#include "img/RSGISCalcImage.h"
 #include "registration/RSGISImageSimilarityMetric.h"
+#include "math/RSGISPolyFit.h"
+
+#include <gsl/gsl_vector.h>
+#include <gsl/gsl_matrix.h>
 
 #include "boost/math/special_functions/fpclassify.hpp"
 
@@ -58,11 +62,11 @@ namespace rsgis{namespace reg{
     public:
         RSGISFindImageOffset();
         std::pair<double, double> findImageOffset(GDALDataset *refDataset, GDALDataset *fltDataset,
-                                                  std::vector<unsigned int> refImageBands,
-                                                  std::vector<unsigned int> fltImageBands,
                                                   unsigned int xSearch, unsigned int ySearch,
-                                                  RSGISImageSimilarityMetric *metric,
+                                                  RSGISImageCalcSimilarityMetric *metric,
                                                   bool calcSubPixelRes=false, unsigned int subPixelRes=0);
+        float findExtreme(bool findMin, gsl_vector *coefficients, unsigned int order, float minRange,
+                          float maxRange, unsigned int resolution, float *extremeVal);
         ~RSGISFindImageOffset();
     };
 

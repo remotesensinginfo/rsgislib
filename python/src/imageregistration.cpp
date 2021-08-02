@@ -86,7 +86,7 @@ static PyObject *ImageRegistration_FindImageOffset(PyObject *self, PyObject *arg
     PyObject *outVal = PyTuple_New(2);
     try
     {
-        std::pair<double, double> offsets = rsgis::cmds::excecuteFindImageOffice(std::string(pszInputRefImage),
+        std::pair<double, double> offsets = rsgis::cmds::excecuteFindImageOffset(std::string(pszInputRefImage),
                                                                                  std::string(pszInputFloatImage),
                                                                                  refImageBands, fltImageBands,
                                                                                  xImgSearch, yImgSearch,
