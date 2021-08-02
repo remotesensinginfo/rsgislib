@@ -22,6 +22,7 @@
  */
 
 #include <cmath>
+#include <set>
 
 #include "common/RSGISException.h"
 #include "common/RSGISImageException.h"
