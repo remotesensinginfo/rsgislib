@@ -235,7 +235,8 @@ def createVarList(in_vals_lsts, val_dict=None):
     :param val_dict: variable used in iterative nature of function which lists
                      the variable for which are still to be looped through. Would
                      normally not be provided by the user as default is None. Be
-                     careful if you set as otherwise.
+                     careful if you set as otherwise you might not get a correct
+                     or valid result.
 
     :returns: list of dictionaries with the same keys are the input but only a
               single value will be associate with key rather than a list.
