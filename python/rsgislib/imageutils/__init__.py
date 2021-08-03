@@ -930,7 +930,7 @@ def createBlankBufImgFromRefImg(input_img, output_img, gdalformat, datatype, buf
         if no_data_val is None:
             raise Exception("You must specify a no data value ")
 
-    x_res, y_res = getImageRes(input_img, abs_vals=True)
+    x_res, y_res = getImageRes(input_img, abs_vals=False)
     x_res_abs = abs(x_res)
     y_res_abs = abs(y_res)
     x_in_size, y_in_size = getImageSize(input_img)
@@ -939,8 +939,8 @@ def createBlankBufImgFromRefImg(input_img, output_img, gdalformat, datatype, buf
     wkt_str = getWKTProjFromImage(input_img)
 
     if buf_spt_ext is not None:
-        buf_pxl_ext_x = ceil(buf_spt_ext / x_res_abs)
-        buf_pxl_ext_y = ceil(buf_spt_ext / y_res_abs)
+        buf_pxl_ext_x = math.ceil(buf_spt_ext / x_res_abs)
+        buf_pxl_ext_y = math.ceil(buf_spt_ext / y_res_abs)
 
         x_out_size = x_in_size + (2 * buf_pxl_ext_x)
         y_out_size = y_in_size + (2 * buf_pxl_ext_y)
