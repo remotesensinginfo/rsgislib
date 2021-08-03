@@ -283,13 +283,12 @@ def createVarList(in_vals_lsts, val_dict=None):
 
 def in_bounds(x, lower, upper, upper_strict=False):
     """
-    Checks whether a value is within specified bounds.
+    Checks whether a value or array of values is within specified bounds.
 
-    :param x: value or array of values to check.
+    :param x: value or numpy array of values to check.
     :param lower: lower bound
     :param upper: upper bound
     :param upper_strict: True is less than upper; False is less than equal to upper
-
     :return: boolean
 
     """
@@ -302,10 +301,9 @@ def in_bounds(x, lower, upper, upper_strict=False):
 
 def mixed_signs(x):
     """
-    Check whether a list of numbers has a mix of postive and negative values.
+    Check whether an array of numbers has a mix of postive and negative values.
 
     :param x: list of values.
-
     :return: boolean
 
     """
