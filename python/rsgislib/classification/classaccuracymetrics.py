@@ -278,6 +278,22 @@ def calc_acc_metrics_vecsamples(in_vec_file, in_vec_lyr, ref_col, cls_col, cls_i
     :param out_csv_file: if specified the generated metrics and confusion matrix are written to
                          a CSV file (Default=None).
 
+    Example::
+    
+    import rsgislib
+    from rsgislib.classification import classaccuracymetrics
+    
+    in_vec_file = "Sonoma_county_classification_refPoints.gpkg"
+    in_vec_lyr = "ref_points"
+    ref_col = "reference_classes"
+    cls_col = "classes"
+    cls_img = "Sonoma_county_Landsat8_2015_utm_RandomForest.kea"
+    img_cls_name_col = "RF_classes"
+    img_hist_col = "Histogram"
+    out_json_file = "Sonoma_county_class_acc_metrics.json"
+    
+    classaccuracymetrics.calc_acc_metrics_vecsamples(in_vec_file, in_vec_lyr, ref_col, cls_col, cls_img, img_cls_name_col, img_hist_col, out_json_file)
+    
     """
     import rsgislib.tools.utils
     import rsgislib.vectorutils
