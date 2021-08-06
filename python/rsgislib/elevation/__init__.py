@@ -19,10 +19,22 @@ Karkee, M., Steward, B. L., & Aziz, S. A. (2008). Improving quality
 of public domain digital elevation models through data fusion. 
 Biosystems Engineering, 101(3), 293–305.
 
-:param highResDEMImg: is an input image file for the high resolution DEM file.
-:param lowResDEMImg: is an input image file for the low resolution DEM file.
-:param fusedDEMImg: is an output image file for the resulting fused DEM.
-:param cSize: is the threshold (int) defining the high and low frequencies.
+:param high_res_DEM_img: is an input image file for the high resolution DEM file.
+:param low_res_DEM_img: is an input image file for the low resolution DEM file.
+:param fused_DEM_img: is an output image file for the resulting fused DEM.
+:param c_size: is the threshold (int) defining the high and low frequencies.
+
+Example::
+
+import rsgislib
+from rsgislib import elevation
+
+high_res_DEM_img = "N09E009_TDX_12m_EGM08.tif"
+low_res_DEM_img = "N09E009_SRTM_30m_EGM08.tif"
+fused_DEM_img = "NO9E009_SRTM_TDX_EGM08_fusion.tif"
+c_size = 10
+
+elevation.fftDEMFusion(highResDEMImg, lowResDEMImg, fusedDEMImg, cSize=20)
 
 """
     import numpy
