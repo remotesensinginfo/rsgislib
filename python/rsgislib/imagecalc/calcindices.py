@@ -42,13 +42,27 @@ def calcNDVI(image, rBand, nBand, outImage, stats=True, gdalformat='KEA'):
     """ 
 Helper function to calculate NDVI ((NIR-RED)/(NIR+RED)), note the output no data value is -999.
 
-:param image: is a string specifying the input image file.
-:param rBand: is an int specifying the red band in the input image (band indexing starts at 1)
-:param nBand: is an int specifying the nir band in the input image (band indexing starts at 1)
-:param outImage: is a string specifying the output image file.
+:param input_image: is a string specifying the input image file.
+:param red_band: is an int specifying the red band in the input image (band indexing starts at 1)
+:param nir_band: is an int specifying the nir band in the input image (band indexing starts at 1)
+:param out_image: is a string specifying the output image file.
 :param stats: is a boolean specifying whether pyramids and stats should be calculated (Default: True)
 :param gdalformat: is a string specifing the output image file format (Default: KEA)
-    
+
+Example::
+
+import rsgislib
+from rsgislib import imagecalc
+
+input_image = "L1C_T45RYH_A019936_20201230T044924.tif"
+red_band = 4
+nir_band = 5
+out_image = "L1C_T45RYH_A019936_20201230T044924_NIR.kea:
+stats = True
+gdalformat = "KEA"
+
+calcNDVI(input_image, red_band, nir_band, out_image, stats, gdalformat)
+
 """
     expression = '(nir+red)!=0?(nir-red)/(nir+red):-999'
     bandDefns = []
