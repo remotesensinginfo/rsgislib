@@ -64,7 +64,7 @@ def train_keras_chips_pixel_classifer(cls_mdl, clsinfodict, out_mdl_file=None, t
     :param out_mdl_file: A file path to save the trained model as a hdf5 file. If None then ignored.
     :param train_epochs: The number of epochs to use for training
     :param train_batch_size: The batch size to use for training.
-
+    
     """
     try:
         from keras.utils import to_categorical

@@ -693,15 +693,27 @@ Example::
 def balanceSampleTrainingRandom(clumpsImg, trainCol, outTrainCol, minNoSamples, maxNoSamples):
     """
 A function to balance the number of training samples for classification so the number is above
-a minimum threshold (minNoSamples) and all equal to the class with the smallest number of samples
-unless that is above a set maximum (maxNoSamples).
+a minimum threshold (min_no_samples) and all equal to the class with the smallest number of samples
+unless that is above a set maximum (max_no_samples).
 
-:param clumpsImg: is a string with the file path to the input image with RAT
-:param trainCol: is a string for the name of the input column specifying the training samples (zero is no data)
-:param outTrainCol: is a string with the name of the outputted training samples.
-:param minNoSamples: is an int specifying the minimum number of training samples for a class (if below threshold class is removed).
-:param maxNoSamples: is an int specifiying the maximum number of training samples per class.
+:param clumps_img: is a string with the file path to the input image with RAT
+:param train_col: is a string for the name of the input column specifying the training samples (zero is no data)
+:param out_train_col: is a string with the name of the outputted training samples.
+:param min_no_samples: is an int specifying the minimum number of training samples for a class (if below threshold class is removed).
+:param max_no_samples: is an int specifiying the maximum number of training samples per class.
 
+Example::
+
+import rsgislib
+from rsgislib.classification import classratutils
+    
+clumps_img = FrenchGuiana_Mangrove_classification_RandomForest.kea'
+train_col = "training_classes"
+out_train_col = "sampled_training"
+min_no_sample = 20
+max_no_samples = 50
+
+balanceSampleTrainingRandom(clumps_img, train_col, out_train_col, min_no_sample, max_no_samples)
 """
      # Check gdal is available
     if not haveGDALPy:
