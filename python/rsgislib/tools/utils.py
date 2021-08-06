@@ -281,7 +281,7 @@ def createVarList(in_vals_lsts, val_dict=None):
     return out_vars
 
 
-def in_bounds(x, lower, upper, upper_strict=False):
+def inBounds(x, lower, upper, upper_strict=False):
     """
     Checks whether a value or array of values is within specified bounds.
 
@@ -299,7 +299,7 @@ def in_bounds(x, lower, upper, upper_strict=False):
         return lower <= numpy.min(x) and numpy.max(x) <= upper
 
 
-def mixed_signs(x):
+def mixedSigns(x):
     """
     Check whether an array of numbers has a mix of postive and negative values.
 
@@ -323,7 +323,7 @@ def negative(x):
     return numpy.max(x) < 0
 
 
-def isodd(number):
+def isOdd(number):
     """
     A function which tests whether a number is odd
 
@@ -336,7 +336,7 @@ def isodd(number):
     return False
 
 
-def remove_repeated_chars(str_val, repeat_char):
+def removeRepeatedChars(str_val, repeat_char):
     """
     A function which removes repeated characters within a string for the specified character
 
@@ -359,7 +359,7 @@ def remove_repeated_chars(str_val, repeat_char):
     return out_str
 
 
-def check_str(str_val, rm_non_ascii=False, rm_dashs=False, rm_spaces=False, rm_punc=False):
+def checkStr(str_val, rm_non_ascii=False, rm_dashs=False, rm_spaces=False, rm_punc=False):
     """
     A function which can check a string removing spaces (replaced with underscores),
     remove punctuation and any non ascii characters.
@@ -384,28 +384,28 @@ def check_str(str_val, rm_non_ascii=False, rm_dashs=False, rm_spaces=False, rm_p
 
     if rm_dashs:
         str_val_tmp = str_val_tmp.replace('-', '_')
-        str_val_tmp = remove_repeated_chars(str_val_tmp, '_')
+        str_val_tmp = removeRepeatedChars(str_val_tmp, '_')
 
     if rm_spaces:
         str_val_tmp = str_val_tmp.replace(' ', '_')
-        str_val_tmp = remove_repeated_chars(str_val_tmp, '_')
+        str_val_tmp = removeRepeatedChars(str_val_tmp, '_')
 
     if rm_punc:
         for punct in string.punctuation:
             if (punct != '_') and (punct != '-'):
                 str_val_tmp = str_val_tmp.replace(punct, '')
-        str_val_tmp = remove_repeated_chars(str_val_tmp, '_')
+        str_val_tmp = removeRepeatedChars(str_val_tmp, '_')
 
     return str_val_tmp
 
 
-def get_days_since(year, dayofyear, base_date):
+def getDaysSince(year, day_of_year, base_date):
     """
     Calculate the number of days from a base data to a defined year/day.
 
     :param year: int with year XXXX (e.g., 2020)
-    :param dayofyear: int with the day within the year (1-365)
-    :param base_date: a datetime
+    :param day_of_year: int with the day within the year (1-365)
+    :param base_date: a datetime.date object
     :return: int (n days)
 
     """
@@ -413,18 +413,18 @@ def get_days_since(year, dayofyear, base_date):
     if year < base_date.year:
         raise Exception("The year specified is before the base date.")
     date_val = datetime.date(year=int(year), month=1, day=1)
-    date_val = date_val + datetime.timedelta(days=int(dayofyear - 1))
+    date_val = date_val + datetime.timedelta(days=int(day_of_year - 1))
     return (date_val - base_date).days
 
 
-def get_days_since_date(year, month, day, base_date):
+def getDaysSinceDate(year, month, day, base_date):
     """
     Calculate the number of days from a base data to a defined year/day.
 
     :param year: int with year XXXX (e.g., 2020)
     :param month: int month in year (1-12) (e.g., 6)
     :param day: int with the day within the month (1-31) (e.g., 20)
-    :param base_date: a datetime
+    :param base_date: a datetime.date object
     :return: int (n days)
 
     """
