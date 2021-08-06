@@ -34,7 +34,8 @@ import argparse
 import glob
 import os.path
 import subprocess
-import rsgislib
+import rsgislib.tools.utils
+import rsgislib.tools.filetools
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -45,12 +46,11 @@ if __name__ == "__main__":
                                                                            GeoTIFF files will be written.""")
     args = parser.parse_args()
 
-    rsgis_utils = rsgislib.RSGISPyUtils()
     imgs = glob.glob(args.input)
 
     for img in imgs:
-        basename = rsgis_utils.get_file_basename(img, checkvalid=True)
-        basename = rsgis_utils.check_str(basename, rm_non_ascii=True, rm_dashs=False, rm_spaces=True, rm_punc=True)
+        basename = rsgislib.tools.filetools.get_file_basename(img, check_valid=True)
+        basename = rsgislib.tools.utils.check_str(basename, rm_non_ascii=True, rm_dashs=False, rm_spaces=True, rm_punc=True)
         
         out_img = os.path.join(args.output, "{}.tif".format(basename))
         cmd = "gdal_translate -of GTIFF -co TILED=YES -co COMPRESS=LZW -co " \

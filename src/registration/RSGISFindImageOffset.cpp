@@ -178,7 +178,7 @@ namespace rsgis{namespace reg{
         double outShiftY = opYShift;
 
         std::cout << "Optimal Metric: " << opMetricVal << std::endl;
-        std::cout << "Pixel Shift [: " << outShiftX << ", " << outShiftY <<"]\n\n";
+        std::cout << "Pixel Shift: [" << outShiftX << ", " << outShiftY <<"]\n\n";
 
 
         if(calcSubPixelRes)
@@ -273,7 +273,7 @@ namespace rsgis{namespace reg{
             // Calculate value for which first order derivative equals 0.
             extremeX = (-1.0*gsl_vector_get(coefficients,1)) / (2.0*gsl_vector_get(coefficients,2));
 
-            // Predict coresponding y value.
+            // Predict corresponding y value.
             double yPredicted = 0;
             for(unsigned int j = 0; j < order; j++)
             {
@@ -283,8 +283,6 @@ namespace rsgis{namespace reg{
                 yPredicted = yPredicted + coeffXPow;
             }
             extremeY=yPredicted;
-
-
         }
         else if(order == 4)
         {
@@ -295,7 +293,7 @@ namespace rsgis{namespace reg{
             double xValue1 = ((-1.0*b)+sqrt(b*b - 4*a*c))/(2.0*a);
             double xValue2 = ((-1.0*b)-sqrt(b*b - 4*a*c))/(2.0*a);
 
-            // Predict coresponding y value.
+            // Predict corresponding y value.
             double yPredicted1 = 0;
             for(unsigned int j = 0; j < order; j++)
             {
