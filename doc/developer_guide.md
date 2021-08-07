@@ -48,7 +48,20 @@ The main coding style things to be aware of when providing a function for RSGISL
 Before code is committed to the RSGISLib git repo the [black](https://black.readthedocs.io) 
 code formatter should be run to ensure that the code formatting is standard with the rest of the 
 modules. The [flake8](https://flake8.pycqa.org/) static code checker should also be run
-and relevant issues addressed.
+and relevant issues addressed. 
+
+For imports, they should be at the top of the file for widely used modules (e.g., GDAL, 
+Numpy, Scipy) but for imports which are only specifically used in just a one or a few  
+functions then the important should be within the function. When importing modules should
+be grouped in the following order:
+
+* Standard library imports.
+* Related third party imports.
+* Local application/library specific imports.
+
+Note, you need some care when importing RSGISLib modules within RSGISLib so module level
+circular importing is not introduced. Therefore, we would recommend avoiding importing
+other RSGISLib modules at the module level within RSGISLib.
 
 For consistency, we try to keep the following commonly used input variable names the same across different
 functions:
