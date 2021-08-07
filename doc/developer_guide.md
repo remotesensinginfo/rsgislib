@@ -64,7 +64,10 @@ functions:
 | use_no_data | boolean variable to specify whether a specified no data value should be used |
 | no_data_val | numeric variable specifying a no data value |
 | out_no_data | numeric variable specifying an output no data value if different from the input no data value (i.e., no_data_val) |
+| img_band | the index (start at 1; GDAL convention) of the input image band
+| img_band_idx | the index (start at 0; array convention) of the input image band
 | n_bands | the number of bands (i.e., output bands)
+| calc_stats | boolean to specify whether image metadata statistics and pyramids should be created. 
 
 ### Vectors
 
@@ -96,7 +99,8 @@ functions:
 | rnd_seed | Seed for random number generator |
 | win_size | specify a window size, normally for filtering |
 | win_h_size | specify a half window size used in some places to ensure window size is odd |
-
+| x_size | a size in the X axis |
+| y_size | a size in the Y axis |
 
 
 ## Python Tests Implementation

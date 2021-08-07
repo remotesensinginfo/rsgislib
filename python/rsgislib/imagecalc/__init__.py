@@ -324,35 +324,75 @@ Example::
         shutil.rmtree(tmpDIR, ignore_errors=True)
 
 
-def countPxlsOfVal(inputImg, vals=[0]):
+def countPxlsOfVal(input_img, vals, img_band=None):
     """
-Function which counts the number of pixels of a set of values returning a list in the same order as the list of values provided.
+    Function which counts the number of pixels of a set of values returning a list in the same order as
+    the list of values provided.
 
-:param inputImg: the input image
-:param vals: is a list of pixel values to be counted
+    :param input_img: the input image
+    :param vals: is a list of pixel values to be counted
+    :param img_band: specify the image band for which the analysis is to be undertaken.
+                    If None (default) then all bands will be used.
+    :returns list of pixel counts in same order as the vals input list
 
-"""
-    if len(vals) == 0:
-        raise Exception('At least 1 value should be provided within the vals input varable.')
-    numVals = len(vals)
-    outVals = numpy.zeros(numVals,dtype=numpy.int64)
-    
+    """
     from rios.imagereader import ImageReader
+    import rsgislib.imageutils
+    if vals is None:
+        raise Exception("Input vals list must not be None.")
+    if len(vals) == 0:
+        raise Exception('At least 1 value should be provided within the vals input variable.')
+    n_bands = rsgislib.imageutils.getImageBandCount(input_img)
+    if (img_band is not None) and ((img_band < 1) or (img_band > n_bands)):
+        raise Exception("The specified input image band is not within the input image.")
+    if img_band is not None:
+        img_band_idx = img_band - 1
 
-    reader = ImageReader(inputImg) 
+    numVals = len(vals)
+    outVals = numpy.zeros(numVals, dtype=numpy.int64)
+    
+    reader = ImageReader(input_img)
     for (info, block) in reader:     
         for idx in range(numVals):
-            outVals[idx] = outVals[idx] + (block == vals[idx]).sum()
+            if img_band is None:
+                outVals[idx] = outVals[idx] + (block == vals[idx]).sum()
+            else:
+                outVals[idx] = outVals[idx] + (block[img_band_idx,] == vals[idx]).sum()
 
     return outVals
 
 
-def getPCAEigenVector(inputImg, pxlNSample, noData=None, outMatrixFile=None):
+def getUniqueValues(input_img, img_band=1):
+    """
+Find the unique image values within an image band.
+Note, the whole image band gets read into memory.
+
+:param input_img: input image file path
+:param img_band: image band to be processed (starts at 1)
+
+:return: array of unique values.
+
+"""
+    import osgeo.gdal as gdal
+    imgDS = gdal.Open(input_img)
+    if imgDS is None:
+        raise Exception("Could not open output image")
+    imgBand = imgDS.GetRasterBand(img_band)
+    if imgBand is None:
+        raise Exception("Could not open output image band ({})".format(img_band))
+    valsArr = imgBand.ReadAsArray()
+    imgDS = None
+
+    uniq_vals = numpy.unique(valsArr)
+    return uniq_vals
+
+
+def getPCAEigenVector(input_img, pxlNSample, noData=None, outMatrixFile=None):
     """
 A function which takes a sample from an input image and uses it to 
 generate eigenvector for a PCA. Note. this can be used as input to rsgislib.imagecalc.pca
 
-:param inputImg: the image from which the random sample will be taken.
+:param input_img: the image from which the random sample will be taken.
 :param pxlNSample: the sample to be taken (e.g., a value of 100 will sample every 100th pixel)
 :param noData: provide a no data value which is to be ignored during processing. If None then ignored (Default: None)
 :param outMatrixFile: path and name for the output rsgislib matrix file. If None file is not created (Default: None)
@@ -364,7 +404,7 @@ generate eigenvector for a PCA. Note. this can be used as input to rsgislib.imag
     import rsgislib.imageutils
     
     # Read input data from image file.
-    X = rsgislib.imageutils.extractImgPxlSample(inputImg, pxlNSample, noData)
+    X = rsgislib.imageutils.extractImgPxlSample(input_img, pxlNSample, noData)
     
     print(str(X.shape[0]) + ' values were extracted from the input image.')
     
@@ -395,11 +435,11 @@ generate eigenvector for a PCA. Note. this can be used as input to rsgislib.imag
     return pca.components_, pca.explained_variance_ratio_
 
 
-def performImagePCA(inputImg, outputImg, eigenVecFile, nComponents=None, pxlNSample=100, gdalformat='KEA', datatype=rsgislib.TYPE_32UINT, noData=None, calcStats=True):
+def performImagePCA(input_img, outputImg, eigenVecFile, nComponents=None, pxlNSample=100, gdalformat='KEA', datatype=rsgislib.TYPE_32UINT, noData=None, calcStats=True):
     """
 A function which performs a PCA on the input image.
 
-:param inputImg: the image from which the random sample will be taken.
+:param input_img: the image from which the random sample will be taken.
 :param outputImg: the output image transformed using the calculated PCA
 :param eigenVecFile: path and name for the output rsgislib matrix file containing the eigenvector for the PCA.
 :param nComponents: the number of PCA compoents outputted. A value of None is all components (Default: None)
@@ -411,14 +451,14 @@ A function which performs a PCA on the input image.
 :returns: an array with the ratio of the explained variance per band.
 """
     import rsgislib.imageutils
-    eigenVec, varExplain = rsgislib.imagecalc.getPCAEigenVector(inputImg, pxlNSample, noData, eigenVecFile)
+    eigenVec, varExplain = rsgislib.imagecalc.getPCAEigenVector(input_img, pxlNSample, noData, eigenVecFile)
     outNComp = varExplain.shape[0]
     if nComponents is not None:
         if nComponents > varExplain.shape[0]:
             raise Exception("You cannot output more components than the number of input image bands.")
         outNComp = nComponents
     
-    rsgislib.imagecalc.pca(inputImg, eigenVecFile, outputImg, outNComp, gdalformat, datatype)
+    rsgislib.imagecalc.pca(input_img, eigenVecFile, outputImg, outNComp, gdalformat, datatype)
     if calcStats:
         usenodataval=False
         nodataval=0
@@ -430,13 +470,13 @@ A function which performs a PCA on the input image.
     return varExplain
 
 
-def performImageMNF(inputImg, outputImg, nComponents=None, pxlNSample=100, in_img_no_data=None, tmp_dir='./tmp',
+def performImageMNF(input_img, outputImg, nComponents=None, pxlNSample=100, in_img_no_data=None, tmp_dir='./tmp',
                     gdalformat='KEA', datatype=rsgislib.TYPE_32FLOAT, calcStats=True):
     """
 A function which takes a sample from an input image and uses it to
 generate eigenvector for a MNF. Note. this can be used as input to rsgislib.imagecalc.pca
 
-:param inputImg: the image to which the MNF will be applied
+:param input_img: the image to which the MNF will be applied
 :param outputImg: the output image file with the MNF result
 :param nComponents: the number of components to be outputted
 :param pxlNSample: the sample to be taken (e.g., a value of 100 will sample every 100th pixel) for the PCA
@@ -459,18 +499,18 @@ generate eigenvector for a MNF. Note. this can be used as input to rsgislib.imag
         os.mkdir(tmp_dir)
         created_tmp_dir = True
 
-    img_basename = rsgislib.tools.filetools.get_file_basename(inputImg)
+    img_basename = rsgislib.tools.filetools.get_file_basename(input_img)
 
     if in_img_no_data is None:
-        in_img_no_data = rsgislib.imageutils.getImageNoDataValue(inputImg)
+        in_img_no_data = rsgislib.imageutils.getImageNoDataValue(input_img)
         if in_img_no_data is None:
             raise Exception("A no data value for the input image must be provided.")
 
     valid_msk_img = os.path.join(tmp_dir, "{}_vld_msk.kea".format(img_basename))
-    rsgislib.imageutils.genValidMask(inputImg, valid_msk_img, "KEA", in_img_no_data)
+    rsgislib.imageutils.genValidMask(input_img, valid_msk_img, "KEA", in_img_no_data)
 
     whiten_img = os.path.join(tmp_dir, "{}_whiten.kea".format(img_basename))
-    rsgislib.imageutils.whitenImage(inputImg, valid_msk_img, 1, whiten_img, "KEA")
+    rsgislib.imageutils.whitenImage(input_img, valid_msk_img, 1, whiten_img, "KEA")
 
     # Read input data from image file.
     X = rsgislib.imageutils.extractImgPxlSample(whiten_img, pxlNSample, in_img_no_data)
@@ -521,11 +561,11 @@ generate eigenvector for a MNF. Note. this can be used as input to rsgislib.imag
     return varExplain
 
 
-def rescaleImgPxlVals(inputImg, outputImg, gdalformat, datatype, bandRescale, trim2Limits=True):
+def rescaleImgPxlVals(input_img, outputImg, gdalformat, datatype, bandRescale, trim2Limits=True):
     """
 Function which rescales an input image base on a list of rescaling parameters.
 
-:param inputImg: the input image
+:param input_img: the input image
 :param outputImg: the output image file name and path (will be same dimensions as the input)
 :param gdalformat: the GDAL image file format of the output image file.
 :param bandRescale: list of ImageBandRescale objects
@@ -548,7 +588,7 @@ Function which rescales an input image base on a list of rescaling parameters.
         progress_bar = cuiprogress.GDALProgressBar()
 
     infiles = applier.FilenameAssociations()
-    infiles.image = inputImg
+    infiles.image = input_img
     outfiles = applier.FilenameAssociations()
     outfiles.outimage = outputImg
     otherargs = applier.OtherInputs()
@@ -575,12 +615,12 @@ Function which rescales an input image base on a list of rescaling parameters.
     applier.apply(_applyRescale, infiles, outfiles, otherargs, controls=aControls)
 
 
-def calcHistograms4MskVals(inputImg, imgBand, imgMsk, mskBand, minVal, maxVal, binWidth, mskvals=None):
+def calcHistograms4MskVals(input_img, imgBand, imgMsk, mskBand, minVal, maxVal, binWidth, mskvals=None):
     """
 A function which reads the image bands (values and mask) into memory and creates a 
 histogram for each value within the mask value. Within the mask 0 is considered to be no data.
 
-:param inputImg: image values image file path.
+:param input_img: image values image file path.
 :param imgBand: values image band
 :param imgMsk: file path for image mask.
 :param mskBand: mask image band
@@ -598,7 +638,7 @@ histogram for each value within the mask value. Within the mask 0 is considered 
     nBins = math.ceil((maxVal - minVal)/binWidth)
     maxVal = float(minVal + (binWidth * nBins))
     
-    imgValsDS = gdal.Open(inputImg)
+    imgValsDS = gdal.Open(input_img)
     imgValsBand = imgValsDS.GetRasterBand(imgBand)
     valsArr = imgValsBand.ReadAsArray()
     imgValsDS = None
@@ -675,7 +715,7 @@ A function which calculates the area (in metres) of the pixel projected in WGS84
     applier.apply(_calcPixelArea, infiles, outfiles, otherargs, controls=aControls)
 
 
-def calcPPI(inputimg, outputimg, gdalformat, niters=1000, lthres=0, uthres=0, img_gain=1, seed=None, calcstats=True):
+def calcPPI(input_img, outputimg, gdalformat, niters=1000, lthres=0, uthres=0, img_gain=1, seed=None, calcstats=True):
     """
 A function which calculate the pixel purity index (PPI). Using an appropriate number of iterations
 this can take a little while to run. Note, the whole input image is read into memory.
@@ -687,7 +727,7 @@ Boardman J.W., Kruse F.A, and Green R.O., "Mapping Target Signatures via
     Partial Unmixing of AVIRIS Data," Pasadena, California, USA, 23 Jan 1995,
     URI: http://hdl.handle.net/2014/33635
 
-:param inputImg: image values image file path.
+:param input_img: image values image file path.
 :param outputimg: output image
 :param gdalformat: GDAL file format (e.g., KEA) of the output image.
 :param niters: number of iterations
@@ -703,7 +743,7 @@ Boardman J.W., Kruse F.A, and Green R.O., "Mapping Target Signatures via
     import tqdm
     import numpy
 
-    imgDS = gdal.Open(inputimg)
+    imgDS = gdal.Open(input_img)
     if imgDS is None:
         raise Exception("Could not open input image")
     n_bands = imgDS.RasterCount
@@ -733,7 +773,7 @@ Boardman J.W., Kruse F.A, and Green R.O., "Mapping Target Signatures via
     band_arr = None
 
     print("Create empty output image file")
-    rsgislib.imageutils.createCopyImage(inputimg, outputimg, 1, 0, gdalformat, rsgislib.TYPE_16UINT)
+    rsgislib.imageutils.createCopyImage(input_img, outputimg, 1, 0, gdalformat, rsgislib.TYPE_16UINT)
 
     # Open output image
     outImgDS = gdal.Open(outputimg, gdal.GA_Update)
@@ -936,7 +976,7 @@ order:
     rsgislib.imageutils.popImageStats(output_img, usenodataval=True, nodataval=no_data_val, calcpyramids=True)
 
 
-def normalise_image_band(input_img, band, output_img, gdal_format='KEA'):
+def normaliseImageBand(input_img, band, output_img, gdal_format='KEA'):
     """
     Perform a simple normalisation a single image band (val - min)/range.
 
@@ -1017,7 +1057,7 @@ def recodeIntRaster(input_img, output_img, recode_dict, keepvalsnotindict=True, 
     applier.apply(_recode, infiles, outfiles, otherargs, controls=aControls)
 
 
-def calc_fill_regions_knn(ref_img, ref_no_data, fill_regions_img, fill_region_val, out_img, k=5,
+def calcFillRegionsKNN(ref_img, ref_no_data, fill_regions_img, fill_region_val, out_img, k=5,
                           summary=rsgislib.SUMTYPE_MODE, gdalformat='KEA', datatype=rsgislib.TYPE_32INT):
     """
     A function will fills regions (defined by having a value == fill_region_val) of the fill_regions_img
@@ -1164,59 +1204,4 @@ def calc_fill_regions_knn(ref_img, ref_no_data, fill_regions_img, fill_region_va
     applier.apply(_knn_fill_regions, infiles, outfiles, otherargs, controls=aControls)
     print("Finished fill")
 
-
-def mask_bzero_vals(input_img, output_img, gdalformat, out_val=1):
-    """
-Function which identifies image pixels which have a value of zero
-all bands which are defined as true 'no data' regions while other
-pixels have a value of zero or less then zero for one or few pixels
-which causes confusion between valid data pixel and no data pixels.
-This function will identify and define those pixels which are valid
-but with a value <= 0 for isolate bands to a new output value (out_val).
-
-This function might be used for surface reflectance data where the
-atmospheric correction has resulted in value <=0 which isn't normally
-possible and where 0 is commonly used as a no data value. In this case
-setting those pixel band values to 1 (if data has been multiplied by
-100, 1000, or 10000, for example) or a small fraction (e.g., 0.001) if
-values are between 0-1.
-
-:param input_img: the input image
-:param output_img: the output image file name and path
-:param gdalformat: the GDAL image file format of the output image file.
-:param out_val: Output pixel band value (default: 1)
-
-"""
-    from rios import applier
-    import numpy
-
-    try:
-        import tqdm
-        progress_bar = rsgislib.TQDMProgressBar()
-    except:
-        from rios import cuiprogress
-        progress_bar = cuiprogress.GDALProgressBar()
-
-    infiles = applier.FilenameAssociations()
-    infiles.image = input_img
-    outfiles = applier.FilenameAssociations()
-    outfiles.outimage = output_img
-    otherargs = applier.OtherInputs()
-    otherargs.out_val = out_val
-    aControls = applier.ApplierControls()
-    aControls.progress = progress_bar
-    aControls.drivername = gdalformat
-    aControls.omitPyramids = True
-    aControls.calcStats = False
-
-    def _applyzeronodata(info, inputs, outputs, otherargs):
-        """
-        This is an internal rios function
-        """
-        img_sum = numpy.sum(inputs.image, axis=0)
-        vld_msk = img_sum > 0
-        outputs.outimage = inputs.image
-        outputs.outimage[(inputs.image <= 0) & vld_msk] = otherargs.out_val
-
-    applier.apply(_applyzeronodata, infiles, outfiles, otherargs, controls=aControls)
 
