@@ -45,6 +45,11 @@ The main coding style things to be aware of when providing a function for RSGISL
 4. Functions should have keyword specified through the C++ interface
 5. Pure python functions should provide type hints.
 
+Before code is committed to the RSGISLib git repo the [black](https://black.readthedocs.io) 
+code formatter should be run to ensure that the code formatting is standard with the rest of the 
+modules. The [flake8](https://flake8.pycqa.org/) static code checker should also be run
+and relevant issues addressed.
+
 For consistency, we try to keep the following commonly used input variable names the same across different
 functions:
 
@@ -104,7 +109,7 @@ functions:
 
 
 ## Python Tests Implementation
-
+Python testing is undertaken using the pytest tool and are within the python_tests directory.
 
 ## C++ Coding Style
 
