@@ -350,7 +350,7 @@ def countPxlsOfVal(input_img, vals, img_band=None):
 
     numVals = len(vals)
     outVals = numpy.zeros(numVals, dtype=numpy.int64)
-    
+
     reader = ImageReader(input_img)
     for (info, block) in reader:     
         for idx in range(numVals):
@@ -1204,4 +1204,59 @@ def calcFillRegionsKNN(ref_img, ref_no_data, fill_regions_img, fill_region_val, 
     applier.apply(_knn_fill_regions, infiles, outfiles, otherargs, controls=aControls)
     print("Finished fill")
 
+
+def areImgsEqual(in_ref_img, in_cmp_img, prop_eql=1.0, flt_dif=0.0001):
+    """
+    A function to check whether two images have equal pixel values within the spatial overlap.
+    Note, if the two input images only have a partial overlap (i.e., one is a subset of the other)
+    then they are still be equal if the overlapping region has matching pixel values.
+
+    :param in_ref_img: The input reference image for the comparison.
+    :param in_cmp_img: The input comparison image to be compared to the reference image.
+    :param prop_eql: The proportion of pixels within the scene which need to be identified as identical to return True.
+                     Range is 0 - 1. Default is 1.0 (i.e., 100 % of pixels have to be identical to return True).
+    :param flt_dif: A threshold for comparing two floating point numbers as being identical - this avoids issues with
+                    rounding and the number of decimal figures stored.
+    :return: Boolean (match), float (proportion of pixels which matched)
+
+    """
+    import rsgislib.imageutils
+    from rios import applier
+    import numpy
+
+    if rsgislib.imageutils.getImageBandCount(in_ref_img) != rsgislib.imageutils.getImageBandCount(in_cmp_img):
+        raise Exception("The number of image bands is not the same between the two images.")
+
+    try:
+        import tqdm
+        progress_bar = rsgislib.TQDMProgressBar()
+    except:
+        from rios import cuiprogress
+        progress_bar = cuiprogress.GDALProgressBar()
+
+    # Generated the combined mask.
+    infiles = applier.FilenameAssociations()
+    infiles.in_ref_img = in_ref_img
+    infiles.in_cmp_img = in_cmp_img
+    outfiles = applier.FilenameAssociations()
+    otherargs = applier.OtherInputs()
+    otherargs.flt_dif = flt_dif
+    otherargs.n_pxls = 0.0
+    otherargs.n_eq_pxls = 0.0
+    aControls = applier.ApplierControls()
+    aControls.progress = progress_bar
+
+    def _calcPropEqual(info, inputs, outputs, otherargs):
+        ref_pxls = inputs.in_ref_img.flatten()
+        cmp_pxls = inputs.in_cmp_img.flatten()
+        pxl_diff = numpy.abs(ref_pxls - cmp_pxls)
+        eql_pxls = numpy.where(pxl_diff < otherargs.flt_dif, 1, 0)
+
+        otherargs.n_eq_pxls += eql_pxls.sum()
+        otherargs.n_pxls += ref_pxls.shape[0]
+
+    applier.apply(_calcPropEqual, infiles, outfiles, otherargs, controls=aControls)
+
+    prop_pxls_eq = otherargs.n_eq_pxls / otherargs.n_pxls
+    return (prop_pxls_eq >= prop_eql), prop_pxls_eq
 

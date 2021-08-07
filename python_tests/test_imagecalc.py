@@ -30,3 +30,15 @@ def test_getUniqueValues():
             assert False
     assert True
 
+def test_areImgsEqual_True():
+    import rsgislib.imagecalc
+    input_img = os.path.join(DATA_DIR, "test_int_pxls.kea")
+    img_eq, prop_match = rsgislib.imagecalc.areImgsEqual(input_img, input_img)
+    assert img_eq
+
+def test_areImgsEqual_False():
+    import rsgislib.imagecalc
+    in_ref_img = os.path.join(DATA_DIR, "test_int_pxls.kea")
+    in_cmp_img = os.path.join(DATA_DIR, "test_int_pxls_v2.kea")
+    img_eq, prop_match = rsgislib.imagecalc.areImgsEqual(in_ref_img, in_cmp_img)
+    assert not img_eq
