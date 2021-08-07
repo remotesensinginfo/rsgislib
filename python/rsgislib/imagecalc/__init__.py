@@ -161,30 +161,6 @@ Example::
     classImgDS = None
 
 
-def _computeProximityArrArgsFunc(argVals):
-    """
-This function is used internally within calcDist2Classes for the multiprocessing Pool
-"""
-    import rsgislib.imageutils
-    try:
-        import tqdm
-        pbar = tqdm.tqdm(total=100)
-        callback = lambda *args, **kw: pbar.update()
-    except:
-        callback = gdal.TermProgress
-    classImgDS = gdal.Open(argVals[0], gdal.GA_ReadOnly)
-    classImgBand = classImgDS.GetRasterBand(1)
-    rsgislib.imageutils.createCopyImage(argVals[0], argVals[1], 1, argVals[3], argVals[4], rsgislib.TYPE_32FLOAT)
-    distImgDS = gdal.Open(argVals[1], gdal.GA_Update)
-    distImgBand = distImgDS.GetRasterBand(1)
-    gdal.ComputeProximity(classImgBand, distImgBand, argVals[2], callback=callback)
-    distImgBand = None
-    distImgDS = None
-    classImgBand = None
-    classImgDS = None
-
-
-
 def calcDist2ImgValsTiled(inputValsImg, outputDistImg, pxlVals, valsImgBand=1, maxDist=1000, noDataVal=1000, gdalformat='KEA', unitGEO=True, tmpDIR='./tmp', tileSize=2000,  nCores=-1):
     """ 
 A function to calculate the distance to the nearest pixel value with one of the specified values.
@@ -259,7 +235,7 @@ Example::
         imgTilesDIRPresent = False
         
     imgTileBase = os.path.join(imgTilesDIR, 'ImgTile')
-    rsgislib.imageutils.createTiles(inputValsImg, imgTileBase, tileSize, tileSize, tileOverlap, 0, 'KEA', rsgisUtils.getRSGISLibDataTypeFromImg(inputValsImg), 'kea')
+    rsgislib.imageutils.createTiles(inputValsImg, imgTileBase, tileSize, tileSize, tileOverlap, 0, 'KEA', rsgislib.imageutils.getRSGISLibDataTypeFromImg(inputValsImg), 'kea')
     imgTileFiles = glob.glob(imgTileBase+'*.kea')
     
     distTilesDIR = os.path.join(tmpDIR, 'DistTiles_'+uid)
@@ -300,6 +276,28 @@ Example::
         tileArgs = [tileFile, distTileFile, proxOptions, noDataVal, 'KEA']
         distTiles.append(distTileFile)
         distTileArgs.append(tileArgs)
+
+    def _computeProximityArrArgsFunc(argVals):
+        """
+    This function is used internally within calcDist2Classes for the multiprocessing Pool
+    """
+        import rsgislib.imageutils
+        try:
+            import tqdm
+            pbar = tqdm.tqdm(total=100)
+            callback = lambda *args, **kw: pbar.update()
+        except:
+            callback = gdal.TermProgress
+        classImgDS = gdal.Open(argVals[0], gdal.GA_ReadOnly)
+        classImgBand = classImgDS.GetRasterBand(1)
+        rsgislib.imageutils.createCopyImage(argVals[0], argVals[1], 1, argVals[3], argVals[4], rsgislib.TYPE_32FLOAT)
+        distImgDS = gdal.Open(argVals[1], gdal.GA_Update)
+        distImgBand = distImgDS.GetRasterBand(1)
+        gdal.ComputeProximity(classImgBand, distImgBand, argVals[2], callback=callback)
+        distImgBand = None
+        distImgDS = None
+        classImgBand = None
+        classImgDS = None
     
     with Pool(nCores) as p:
         p.map(_computeProximityArrArgsFunc, distTileArgs)
