@@ -1,15 +1,25 @@
 #!/usr/bin/env python
 """
-The tools.test_images module contains some functions to create images which can be used for testing other functions
-or generate example datasets
+The tools.test_images module contains some functions to create images which can be
+used for testing other functions or generate example datasets
 
 """
 import rsgislib
 
-def create_random_int_img(output_img, n_bands, x_size, y_size, out_vals, gdalformat="KEA", datatype=rsgislib.TYPE_8UINT, calc_stats=True):
+
+def create_random_int_img(
+    output_img,
+    n_bands,
+    x_size,
+    y_size,
+    out_vals,
+    gdalformat="KEA",
+    datatype=rsgislib.TYPE_8UINT,
+    calc_stats=True,
+):
     """
-    A function which creates an image with pixels values randomly assigned from the list in the out_vals
-    input list.
+    A function which creates an image with pixels values randomly assigned from the
+    list in the out_vals input list.
 
     :param output_img: The output image file name and path
     :param n_bands: the number of bands in the output image
@@ -24,14 +34,28 @@ def create_random_int_img(output_img, n_bands, x_size, y_size, out_vals, gdalfor
     import rsgislib.imageutils
     from rios import applier
     import numpy.random
-    rsgislib.imageutils.createBlankImagePy(output_img, n_bands, x_size, y_size, 100000, 500000, 1, 1, "",
-                                           gdalformat, datatype, options=[], no_data_val=0)
+
+    rsgislib.imageutils.createBlankImagePy(
+        output_img,
+        n_bands,
+        x_size,
+        y_size,
+        100000,
+        500000,
+        1,
+        1,
+        "",
+        gdalformat,
+        datatype,
+        options=[],
+        no_data_val=0,
+    )
 
     try:
-        import tqdm
         progress_bar = rsgislib.TQDMProgressBar()
     except:
         from rios import cuiprogress
+
         progress_bar = cuiprogress.GDALProgressBar()
 
     infiles = applier.FilenameAssociations()
@@ -52,13 +76,11 @@ def create_random_int_img(output_img, n_bands, x_size, y_size, out_vals, gdalfor
         """
         in_img_shp = inputs.image.shape
         outputs.out_image = numpy.random.choice(otherargs.out_vals, in_img_shp).astype(
-            rsgislib.getNumpyDataType(datatype))
+            rsgislib.getNumpyDataType(datatype)
+        )
 
     applier.apply(_applyPopVals, infiles, outfiles, otherargs, controls=aControls)
     if calc_stats:
         import rsgislib.rastergis
+
         rsgislib.rastergis.populateStats(output_img, True, True, True)
-
-
-
-
