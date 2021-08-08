@@ -33,7 +33,7 @@ jobs:
             pip install pytest-html
             pytest -v python_tests --junitxml=pytest_reports/junit.xml --html=pytest_reports/rsgisib_tests_report.html --self-contained-html
       - store_test_results:
-          path: test_results
+          path: pytest_reports
       - store_artifacts:
           path: pytest_reports
           destination: pytest_reports
