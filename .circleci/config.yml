@@ -26,7 +26,7 @@ jobs:
       - run:
         name: Run tests.
         command: |
-          pytest -v python_tests
+          pytest -v python_tests --junitxml=tests_out_report.xml
 
 
 # Orchestrate our job run sequence
