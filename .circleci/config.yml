@@ -29,9 +29,15 @@ jobs:
       - run:
           name: Run tests.
           command: |
-            pytest -v python_tests --junitxml=rsgisib_tests_report.xml
+            mkdir pytest_reports
+            pip install pytest-html
+            pytest -v python_tests --junitxml=pytest_reports/junit.xml --html=pytest_reports/rsgisib_tests_report.html --self-contained-html
       - store_test_results:
-          path: rsgisib_tests_report.xml
+          path: test_results
+      - store_artifacts:
+          path: pytest_reports
+          destination: pytest_reports
+
 
 # Orchestrate our job run sequence
 workflows:
