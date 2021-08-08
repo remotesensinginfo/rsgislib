@@ -5,8 +5,9 @@ executors: #(1)
     docker:
       - image: petebunting/rsinfo_rsgislib_build:latest #(2)
 
+# Testing needs to be part of build command as environment needed following build and installation.
 jobs:
-  build:
+  build_test:
     executor: exectr #(1)
     steps:
       - checkout
@@ -21,25 +22,16 @@ jobs:
             cmake -DCMAKE_INSTALL_PREFIX=/opt/miniconda -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_SKIP_RPATH=OFF -DGDAL_INCLUDE_DIR=/opt/miniconda/include -DGDAL_LIB_PATH=/opt/miniconda/lib -DBOOST_INCLUDE_DIR=/opt/miniconda/include -DBOOST_LIB_PATH=/opt/miniconda/lib -DGSL_INCLUDE_DIR=/opt/miniconda/include -DGSL_LIB_PATH=/opt/miniconda/lib -DMUPARSER_INCLUDE_DIR=/opt/miniconda/include -DMUPARSER_LIB_PATH=/opt/miniconda/lib -DHDF5_INCLUDE_DIR=/opt/miniconda/include -DHDF5_LIB_PATH=/opt/miniconda/lib -DKEA_INCLUDE_DIR=/opt/miniconda/include -DKEA_LIB_PATH=/opt/miniconda/lib ..
             make
             make install
-  test:
-    executor: exectr #(1)
-    steps:
-      - checkout
       - run:
           name: Run tests.
           command: |
-            pytest -v python_tests --junitxml=tests_out_report.xml
-      - store_artifacts:
-          path: tests_out_report.xml
-          destination: rsgisib_tests_report.xml
-
+            pytest -v python_tests --junitxml=rsgisib_tests_report.xml
+            - store_test_results:
+                path: rsgisib_tests_report.xml
 
 # Orchestrate our job run sequence
 workflows:
   version: 2
   build-and-test:
     jobs:
-      - build
-      - test:
-          requires:
-            - build
+      - build_test
