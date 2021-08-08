@@ -14,10 +14,10 @@ jobs:
           name: Create build directories
           command: |
             mkdir -p build_dir
-            cd build_dir
       - run:
           name: Setup cmake, build and install
           command: |
+            cd build_dir
             cmake -DCMAKE_INSTALL_PREFIX=/opt/miniconda -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_SKIP_RPATH=OFF -DGDAL_INCLUDE_DIR=/opt/miniconda/include -DGDAL_LIB_PATH=/opt/miniconda/lib -DBOOST_INCLUDE_DIR=/opt/miniconda/include -DBOOST_LIB_PATH=/opt/miniconda/lib -DGSL_INCLUDE_DIR=/opt/miniconda/include -DGSL_LIB_PATH=/opt/miniconda/lib -DMUPARSER_INCLUDE_DIR=/opt/miniconda/include -DMUPARSER_LIB_PATH=/opt/miniconda/lib -DHDF5_INCLUDE_DIR=/opt/miniconda/include -DHDF5_LIB_PATH=/opt/miniconda/lib -DKEA_INCLUDE_DIR=/opt/miniconda/include -DKEA_LIB_PATH=/opt/miniconda/lib ..
             make
             make install
@@ -29,6 +29,9 @@ jobs:
           name: Run tests.
           command: |
             pytest -v python_tests --junitxml=tests_out_report.xml
+      - store_artifacts:
+          path: tests_out_report.xml
+          destination: rsgisib_tests_report.xml
 
 
 # Orchestrate our job run sequence
