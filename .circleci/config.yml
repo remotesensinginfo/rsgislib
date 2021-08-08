@@ -1,0 +1,39 @@
+version: 2.1
+
+# Define the jobs we want to run for this project
+jobs:
+  build:
+    docker:
+      - image: petebunting/rsinfo_rsgislib_build:latest
+    steps:
+      - checkout rsgislib_v5_dev
+      - run:
+        name: Create build directories
+        command: |
+          mkdir -p build_dir
+          cd build_dir
+      - run:
+        name: Setup cmake, build and install
+        command: |
+          cmake -DCMAKE_INSTALL_PREFIX=/opt/miniconda -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_SKIP_RPATH=OFF -DGDAL_INCLUDE_DIR=/opt/miniconda/include -DGDAL_LIB_PATH=/opt/miniconda/lib -DBOOST_INCLUDE_DIR=/opt/miniconda/include -DBOOST_LIB_PATH=/opt/miniconda/lib -DGSL_INCLUDE_DIR=/opt/miniconda/include -DGSL_LIB_PATH=/opt/miniconda/lib -DMUPARSER_INCLUDE_DIR=/opt/miniconda/include -DMUPARSER_LIB_PATH=/opt/miniconda/lib -DHDF5_INCLUDE_DIR=/opt/miniconda/include -DHDF5_LIB_PATH=/opt/miniconda/lib -DKEA_INCLUDE_DIR=/opt/miniconda/include -DKEA_LIB_PATH=/opt/miniconda/lib ..
+          make
+          make install
+  test:
+    docker:
+      - image: petebunting/rsinfo_rsgislib_build:latest
+    steps:
+      - checkout rsgislib_v5_dev
+      - run:
+        name: Run tests.
+        command: |
+          pytest -v python_tests
+
+
+# Orchestrate our job run sequence
+workflows:
+  build_and_test:
+    jobs:
+      - build
+      - test:
+          requires:
+            - build
