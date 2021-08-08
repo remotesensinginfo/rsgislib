@@ -7,36 +7,28 @@ executors: #(1)
 
 # Testing needs to be part of build command as environment needed following build and installation.
 jobs:
-  build:
+  build_and_test:
     executor: exectr #(1)
     steps:
       - checkout
       - run:
-          name: Create build directories
+          name: Create build directory
           command: |
             mkdir -p build_dir
       - run:
-          name: Setup cmake, build and install
+          name: Setup cmake and build
           command: |
             cd build_dir
             cmake -DCMAKE_INSTALL_PREFIX=/opt/miniconda -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_SKIP_RPATH=OFF -DGDAL_INCLUDE_DIR=/opt/miniconda/include -DGDAL_LIB_PATH=/opt/miniconda/lib -DBOOST_INCLUDE_DIR=/opt/miniconda/include -DBOOST_LIB_PATH=/opt/miniconda/lib -DGSL_INCLUDE_DIR=/opt/miniconda/include -DGSL_LIB_PATH=/opt/miniconda/lib -DMUPARSER_INCLUDE_DIR=/opt/miniconda/include -DMUPARSER_LIB_PATH=/opt/miniconda/lib -DHDF5_INCLUDE_DIR=/opt/miniconda/include -DHDF5_LIB_PATH=/opt/miniconda/lib -DKEA_INCLUDE_DIR=/opt/miniconda/include -DKEA_LIB_PATH=/opt/miniconda/lib ..
             make
-      - persist_to_workspace:
-          root: .
-          paths:
-            - build_dir
-  test:
-    executor: exectr #(1)
-    steps:
-      - checkout
-      - attach_workspace:
-          at: .
       - run:
-          name: Run tests.
+          name: Run installation.
           command: |
             cd build_dir
             make install
-            cd ..
+      - run:
+          name: Run tests.
+          command: |
             pytest -v python_tests --junitxml=rsgisib_tests_report.xml
       - store_test_results:
           path: rsgisib_tests_report.xml
@@ -46,7 +38,4 @@ workflows:
   version: 2
   build-and-test:
     jobs:
-      - build
-      - test:
-          requires:
-            - build
+      - build_and_test
