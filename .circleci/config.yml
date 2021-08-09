@@ -1,5 +1,8 @@
 version: 2.1
 
+orbs:
+  codecov: codecov/codecov@1.2.5
+
 executors: #(1)
   exectr:
     docker:
@@ -31,12 +34,15 @@ jobs:
           command: |
             mkdir -p pytest_reports/coverage
             pip install pytest-html coverage pytest-cov
-            pytest -v python_tests --cov=/opt/miniconda/lib/python3.9/site-packages/rsgislib --cov-report=html:pytest_reports/coverage/ --junitxml=pytest_reports/junit.xml --html=pytest_reports/rsgisib_tests_report.html --self-contained-html
+            pytest -v python_tests --cov=/opt/miniconda/lib/python3.9/site-packages/rsgislib --cov-report=xml:pytest_reports/coverage.xml --cov-report=html:pytest_reports/coverage/ --junitxml=pytest_reports/junit.xml --html=pytest_reports/rsgisib_tests_report.html --self-contained-html
       - store_test_results:
           path: pytest_reports
       - store_artifacts:
           path: pytest_reports
           destination: pytest_reports
+      - codecov/upload:
+          file: pytest_reports/coverage.xml
+          token: 816c1f2c-8490-4a4a-a4f6-64d76ef35fc6
 
 
 # Orchestrate our job run sequence

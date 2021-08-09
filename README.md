@@ -1,6 +1,7 @@
 # RSGISLib #
 
 [![<remotesensinginfo>](https://circleci.com/gh/remotesensinginfo/rsgislib/tree/rsgislib_v5_dev.svg?style=shield)](https://app.circleci.com/pipelines/github/remotesensinginfo/rsgislib)
+[![codecov](https://codecov.io/gh/remotesensinginfo/rsgislib/branch/rsgislib_v5_dev/graph/badge.svg?token=EHTF2G1KCL)](https://codecov.io/gh/remotesensinginfo/rsgislib)
 
 The Remote Sensing and GIS software library (RSGISLib) is a collection of tools for processing remote sensing and GIS datasets.
 For more details see the project website: http://rsgislib.org/
