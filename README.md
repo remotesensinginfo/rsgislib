@@ -20,7 +20,7 @@ You need to be a member of the group to post.
 Please check through existing posts to see if there is already an answer to your question before emailing.
 To help us answer your question provide as much information as possible (RSGISLib version and how you installed it, OS, things you have already tried to solve the problem etc.,).
 
-We occasionally post tutorials on RSGISLib to our [blog](https://spectraldifferences.wordpress.com/tag/rsgislib/).
+We occasionally post tutorials on RSGISLib and other useful bits and pieces to our [website remotesensing.info](https://remotesensing.info).
 
 ## Citing ##
 
