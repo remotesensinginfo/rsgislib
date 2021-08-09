@@ -45,6 +45,24 @@ The main coding style things to be aware of when providing a function for RSGISL
 4. Functions should have keyword specified through the C++ interface
 5. Pure python functions should provide type hints.
 
+Before code is committed to the RSGISLib git repo the [black](https://black.readthedocs.io) 
+code formatter should be run to ensure that the code formatting is standard with the rest of the 
+modules. The [flake8](https://flake8.pycqa.org/) static code checker should also be run
+and relevant issues addressed. 
+
+For imports, they should be at the top of the file for widely used modules (e.g., GDAL, 
+Numpy, Scipy) but for imports which are only specifically used in just a one or a few  
+functions then the important should be within the function. When importing modules should
+be grouped in the following order:
+
+* Standard library imports.
+* Related third party imports.
+* Local application/library specific imports.
+
+Note, you need some care when importing RSGISLib modules within RSGISLib so module level
+circular importing is not introduced. Therefore, we would recommend avoiding importing
+other RSGISLib modules at the module level within RSGISLib.
+
 For consistency, we try to keep the following commonly used input variable names the same across different
 functions:
 
@@ -64,7 +82,10 @@ functions:
 | use_no_data | boolean variable to specify whether a specified no data value should be used |
 | no_data_val | numeric variable specifying a no data value |
 | out_no_data | numeric variable specifying an output no data value if different from the input no data value (i.e., no_data_val) |
+| img_band | the index (start at 1; GDAL convention) of the input image band
+| img_band_idx | the index (start at 0; array convention) of the input image band
 | n_bands | the number of bands (i.e., output bands)
+| calc_stats | boolean to specify whether image metadata statistics and pyramids should be created. 
 
 ### Vectors
 
@@ -96,11 +117,12 @@ functions:
 | rnd_seed | Seed for random number generator |
 | win_size | specify a window size, normally for filtering |
 | win_h_size | specify a half window size used in some places to ensure window size is odd |
-
+| x_size | a size in the X axis |
+| y_size | a size in the Y axis |
 
 
 ## Python Tests Implementation
-
+Python testing is undertaken using the pytest tool and are within the python_tests directory.
 
 ## C++ Coding Style
 

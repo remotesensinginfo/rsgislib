@@ -49,24 +49,24 @@ This class is used within the StdImgBlockIter class.
 :param name: is a name associated with this layer - doesn't really matter what you use but needs to be unique; this is used as a dict key in some functions.
 :param nbands: is an int with the number of output image bands.
 :param no_data_val: is a no data value for the output image
-:param gdal_format: is the output image file format
+:param gdalformat: is the output image file format
 :param datatype: is the output datatype rsgislib.TYPE_*
 
 """
-    def __init__(self, file_name=None, name=None, nbands=None, no_data_val=None, gdal_format=None, datatype=None):
+    def __init__(self, file_name=None, name=None, nbands=None, no_data_val=None, gdalformat=None, datatype=None):
         """
         :param file_name: is the input image file name and path.
         :param name: is a name associated with this layer - doesn't really matter what you use but needs to be unique; this is used as a dict key in some functions.
         :param nbands: is an int with the number of output image bands.
         :param no_data_val: is a no data value for the output image
-        :param gdal_format: is the output image file format
+        :param gdalformat: is the output image file format
         :param datatype: is the output datatype rsgislib.TYPE_*
         """
         self.file_name = file_name
         self.name = name
         self.nbands = nbands
         self.no_data_val = no_data_val
-        self.gdal_format = gdal_format
+        self.gdalformat = gdalformat
         self.datatype = datatype
 
 
@@ -864,7 +864,7 @@ def getImgMetaDataFieldsDict(input_img):
 
 
 def createBlankImagePy(output_img, n_bands, width, height, tlX, tlY, out_img_res_x, out_img_res_y, wkt_string,
-                       gdal_format, data_type, options=[], no_data_val=0):
+                       gdalformat, datatype, options=[], no_data_val=0):
     """
     Create a blank output image file - this is a pure python implementation of rsgislib.imageutils.createBlankImage
 
@@ -877,19 +877,19 @@ def createBlankImagePy(output_img, n_bands, width, height, tlX, tlY, out_img_res
     :param out_img_res_x: the output image resolution in the x axis
     :param out_img_res_y: the output image resolution in the y axis
     :param wkt_string: a WKT string with the output image projection
-    :param gdal_format: the output image file format.
-    :param data_type: the output image data type - needs to be a rsgislib datatype (e.g., )
+    :param gdalformat: the output image file format.
+    :param datatype: the output image data type - needs to be a rsgislib datatype (e.g., )
     :param options: image creation options e.g., ["TILED=YES", "INTERLEAVE=PIXEL", "COMPRESS=LZW", "BIGTIFF=YES"]
     :param no_data_val: the output image no data value.
 
     """
-    gdal_data_type = rgsislib.getGDALDataType(data_type)
-    gdal_driver = gdal.GetDriverByName(gdal_format)
+    gdal_data_type = rsgislib.getGDALDataType(datatype)
+    gdal_driver = gdal.GetDriverByName(gdalformat)
     out_img_ds_obj = gdal_driver.Create(output_img, width, height, n_bands, gdal_data_type, options=options)
     out_img_ds_obj.SetGeoTransform((tlX, out_img_res_x, 0, tlY, 0, out_img_res_y))
     out_img_ds_obj.SetProjection(wkt_string)
 
-    raster = numpy.zeros((height, width), dtype=rgsislib.getNumpyDataType(data_type))
+    raster = numpy.zeros((height, width), dtype=rsgislib.getNumpyDataType(datatype))
     raster[...] = no_data_val
     for band in range(n_bands):
         band_obj = out_img_ds_obj.GetRasterBand(band + 1)
@@ -2739,31 +2739,6 @@ def msk_h5_smpls_to_finite_values(input_h5, output_h5, datatype=None, lower_limi
     fH5Out.close()
 
 
-def getUniqueValues(img, img_band=1):
-    """
-Find the unique image values within an image band.
-Note, the whole image band gets read into memory.
-
-:param img: input image file path
-:param img_band: image band to be processed (starts at 1)
-
-:return: array of unique values.
-
-"""
-    imgDS = gdal.Open(img)
-    if imgDS is None:
-        raise Exception("Could not open output image")
-    imgBand = imgDS.GetRasterBand(img_band)
-    if imgBand is None:
-        raise Exception("Could not open output image band ({})".format(img_band))
-    valsArr = imgBand.ReadAsArray()
-    imgDS = None
-    
-    uniq_vals = numpy.unique(valsArr)
-
-    return uniq_vals
-
-
 def combineBinaryMasks(msk_imgs_dict, out_img, output_lut, gdalformat='KEA'):
     """
 A function which combines up to 8 binary image masks to create a single 
@@ -2779,6 +2754,7 @@ masks. A JSON LUT is also generated to identify the image values to a
 """ 
     import json
     import rsgislib.tools.utils
+    import rsgislib.imagecalc
     try:
         import tqdm
         progress_bar = rsgislib.TQDMProgressBar()
@@ -2821,7 +2797,7 @@ masks. A JSON LUT is also generated to identify the image values to a
     applier.apply(_combineMsks, infiles, outfiles, otherargs, controls=aControls)
     
     # find the unique output image files.
-    uniq_vals = getUniqueValues(out_img, img_band=1)
+    uniq_vals = rsgislib.imagecalc.getUniqueValues(out_img, img_band=1)
     
     # find the powerset of the inputs
     possible_outputs = rsgislib.tools.utils.createVarList(in_vals_dict, val_dict=None)
@@ -2842,17 +2818,17 @@ masks. A JSON LUT is also generated to identify the image values to a
         json.dump(out_poss_lut, outJSONfile, sort_keys=True,indent=4, separators=(',', ': '), ensure_ascii=False)
 
 
-def gdal_translate(input_img, output_img, gdal_format='KEA', options=''):
+def gdal_translate(input_img, output_img, gdalformat='KEA', options=''):
     """
     Using GDAL translate to convert input image to a different format, if GTIFF selected
     and no options are provided then a cloud optimised GeoTIFF will be outputted.
 
     :param input_img: Input image which is GDAL readable.
     :param output_img: The output image file.
-    :param gdal_format: The output image file format
+    :param gdalformat: The output image file format
     :param options: options for the output driver (e.g., "-co TILED=YES -co COMPRESS=LZW -co BIGTIFF=YES")
     """
-    if (gdal_format == 'GTIFF') and (options == ''):
+    if (gdalformat == 'GTIFF') and (options == ''):
         options = "-co TILED=YES -co INTERLEAVE=PIXEL -co BLOCKXSIZE=256 -co BLOCKYSIZE=256 -co COMPRESS=LZW -co BIGTIFF=YES -co COPY_SRC_OVERVIEWS=YES"
 
     try:
@@ -2862,7 +2838,7 @@ def gdal_translate(input_img, output_img, gdal_format='KEA', options=''):
     except:
         callback = gdal.TermProgress
 
-    trans_opt = gdal.TranslateOptions(format=gdal_format, options=options, callback=callback)
+    trans_opt = gdal.TranslateOptions(format=gdalformat, options=options, callback=callback)
     gdal.Translate(output_img, input_img, options=trans_opt)
 
 
@@ -3610,3 +3586,61 @@ A function which calculates the x and y pixel resolution (in metres) of each pix
         outputs.outimage = numpy.stack((x_res_arr_m, y_res_arr_m), axis=0)
 
     applier.apply(_calcPixelRes, infiles, outfiles, otherargs, controls=aControls)
+
+
+def maskAllBZeroVals(input_img, output_img, gdalformat, out_val=1):
+    """
+Function which identifies image pixels which have a value of zero
+all bands which are defined as true 'no data' regions while other
+pixels have a value of zero or less then zero for one or few pixels
+which causes confusion between valid data pixel and no data pixels.
+This function will identify and define those pixels which are valid
+but with a value <= 0 for isolate bands to a new output value (out_val).
+
+This function might be used for surface reflectance data where the
+atmospheric correction has resulted in value <=0 which isn't normally
+possible and where 0 is commonly used as a no data value. In this case
+setting those pixel band values to 1 (if data has been multiplied by
+100, 1000, or 10000, for example) or a small fraction (e.g., 0.001) if
+values are between 0-1.
+
+:param input_img: the input image
+:param output_img: the output image file name and path
+:param gdalformat: the GDAL image file format of the output image file.
+:param out_val: Output pixel band value (default: 1)
+
+"""
+    from rios import applier
+    import numpy
+
+    try:
+        import tqdm
+        progress_bar = rsgislib.TQDMProgressBar()
+    except:
+        from rios import cuiprogress
+        progress_bar = cuiprogress.GDALProgressBar()
+
+    infiles = applier.FilenameAssociations()
+    infiles.image = input_img
+    outfiles = applier.FilenameAssociations()
+    outfiles.outimage = output_img
+    otherargs = applier.OtherInputs()
+    otherargs.out_val = out_val
+    aControls = applier.ApplierControls()
+    aControls.progress = progress_bar
+    aControls.drivername = gdalformat
+    aControls.omitPyramids = True
+    aControls.calcStats = False
+
+    def _applyzeronodata(info, inputs, outputs, otherargs):
+        """
+        This is an internal rios function
+        """
+        img_sum = numpy.sum(inputs.image, axis=0)
+        vld_msk = img_sum > 0
+        outputs.outimage = inputs.image
+        outputs.outimage[(inputs.image <= 0) & vld_msk] = otherargs.out_val
+
+    applier.apply(_applyzeronodata, infiles, outfiles, otherargs, controls=aControls)
+
+

@@ -3,16 +3,24 @@
 The tools.utils module contains some useful tools
 """
 
+import datetime
+import os
+import string
+
+import numpy
+
 
 def uidGenerator(size=6):
     """
-    A function which will generate a 'random' string of the specified length based on the UUID
+    A function which will generate a 'random' string of the specified length
+    based on the UUID
 
     :param size: the length of the returned string.
     :return: string of length size.
 
     """
     import uuid
+
     randomStr = str(uuid.uuid4())
     randomStr = randomStr.replace("-", "")
     return randomStr[0:size]
@@ -35,14 +43,17 @@ def isNumber(str_val):
     return True
 
 
-def zero_pad_num_str(num_val, str_len=3, round_num=False, round_n_digts=0, integerise=False):
+def zero_pad_num_str(
+    num_val, str_len=3, round_num=False, round_n_digts=0, integerise=False
+):
     """
     A function which zero pads a number to make a string
 
     :param num_val: number value to be processed.
     :param str_len: the number of characters in the output string.
     :param round_num: boolean whether to round the input number value.
-    :param round_n_digts: If rounding, the number of digits following decimal points to round to.
+    :param round_n_digts: If rounding, the number of digits following decimal
+                          points to round to.
     :param integerise: boolean whether to integerise the input number
     :return: string with the padded numeric value.
 
@@ -97,12 +108,13 @@ def powerset_lst(in_set, min_items=0):
 
 def getEnvironmentVariable(var):
     """
-    A function to get an environmental variable, if variable is not present returns None.
+    A function to get an environmental variable, if variable is not present
+    returns None.
 
+    :param var: the name of the environmental variable to get the value for.
     :return: value of env var.
 
     """
-    import os
     outVar = None
     try:
         outVar = os.environ[var]
@@ -119,13 +131,13 @@ def numProcessCores():
 
     """
     import multiprocessing
+
     return multiprocessing.cpu_count()
 
 
 def readTextFileNoNewLines(input_file):
     """
-    Read a text file into a single string
-    removing new lines.
+    Read a text file into a single string removing new lines.
 
     :param input_file: File path to the input file.
     :return: string
@@ -133,7 +145,7 @@ def readTextFileNoNewLines(input_file):
     """
     txtStr = ""
     try:
-        dataFile = open(input_file, 'r')
+        dataFile = open(input_file, "r")
         for line in dataFile:
             txtStr += line.strip()
         dataFile.close()
@@ -144,8 +156,7 @@ def readTextFileNoNewLines(input_file):
 
 def readTextFile2List(input_file):
     """
-    Read a text file into a list where each line
-    is an element in the list.
+    Read a text file into a list where each line is an element in the list.
 
     :param input_file: File path to the input file.
     :return: list
@@ -153,7 +164,7 @@ def readTextFile2List(input_file):
     """
     outList = []
     try:
-        dataFile = open(input_file, 'r')
+        dataFile = open(input_file, "r")
         for line in dataFile:
             line = line.strip()
             if line != "":
@@ -173,9 +184,9 @@ def writeList2File(data_lst, out_file):
 
     """
     try:
-        f = open(out_file, 'w')
+        f = open(out_file, "w")
         for item in data_lst:
-            f.write(str(item) + '\n')
+            f.write(str(item) + "\n")
         f.flush()
         f.close()
     except Exception as e:
@@ -192,8 +203,8 @@ def writeData2File(data_val, out_file):
 
     """
     try:
-        f = open(out_file, 'w')
-        f.write(str(data_val) + '\n')
+        f = open(out_file, "w")
+        f.write(str(data_val) + "\n")
         f.flush()
         f.close()
     except Exception as e:
@@ -202,15 +213,24 @@ def writeData2File(data_val, out_file):
 
 def writeDict2JSON(data_dict, out_file):
     """
-    Write some data to a JSON file. The data would commonly be structured as a dict but could also be a list.
+    Write some data to a JSON file. The data would commonly be structured as a dict
+    but could also be a list.
 
     :param data_dict: The dict (or list) to be written to the output JSON file.
     :param out_file: The file path to the output file.
 
     """
     import json
-    with open(out_file, 'w') as fp:
-        json.dump(data_dict, fp, sort_keys=True, indent=4, separators=(',', ': '), ensure_ascii=False)
+
+    with open(out_file, "w") as fp:
+        json.dump(
+            data_dict,
+            fp,
+            sort_keys=True,
+            indent=4,
+            separators=(",", ": "),
+            ensure_ascii=False,
+        )
 
 
 def readJSON2Dict(input_file):
@@ -221,6 +241,7 @@ def readJSON2Dict(input_file):
 
     """
     import json
+
     with open(input_file) as f:
         data = json.load(f)
     return data
@@ -281,7 +302,7 @@ def createVarList(in_vals_lsts, val_dict=None):
     return out_vars
 
 
-def in_bounds(x, lower, upper, upper_strict=False):
+def inBounds(x, lower, upper, upper_strict=False):
     """
     Checks whether a value or array of values is within specified bounds.
 
@@ -292,22 +313,20 @@ def in_bounds(x, lower, upper, upper_strict=False):
     :return: boolean
 
     """
-    import numpy
     if upper_strict:
         return lower <= numpy.min(x) and numpy.max(x) < upper
     else:
         return lower <= numpy.min(x) and numpy.max(x) <= upper
 
 
-def mixed_signs(x):
+def mixedSigns(x):
     """
-    Check whether an array of numbers has a mix of postive and negative values.
+    Check whether an array of numbers has a mix of positive and negative values.
 
     :param x: list of values.
     :return: boolean
 
     """
-    import numpy
     return numpy.min(x) < 0 and numpy.max(x) >= 0
 
 
@@ -319,11 +338,10 @@ def negative(x):
     :return: boolean
 
     """
-    import numpy
     return numpy.max(x) < 0
 
 
-def isodd(number):
+def isOdd(number):
     """
     A function which tests whether a number is odd
 
@@ -336,9 +354,10 @@ def isodd(number):
     return False
 
 
-def remove_repeated_chars(str_val, repeat_char):
+def removeRepeatedChars(str_val, repeat_char):
     """
-    A function which removes repeated characters within a string for the specified character
+    A function which removes repeated characters within a string for the
+    specified character
 
     :param str_val: The input string.
     :param repeat_char: The character
@@ -347,8 +366,8 @@ def remove_repeated_chars(str_val, repeat_char):
     """
     if len(repeat_char) != 1:
         raise Exception("The repeat character has multiple characters.")
-    out_str = ''
-    p = ''
+    out_str = ""
+    p = ""
     for c in str_val:
         if c == repeat_char:
             if c != p:
@@ -359,79 +378,84 @@ def remove_repeated_chars(str_val, repeat_char):
     return out_str
 
 
-def check_str(str_val, rm_non_ascii=False, rm_dashs=False, rm_spaces=False, rm_punc=False):
+def checkStr(
+    str_val, rm_non_ascii=False, rm_dashs=False, rm_spaces=False, rm_punc=False
+):
     """
     A function which can check a string removing spaces (replaced with underscores),
     remove punctuation and any non ascii characters.
 
     :param str_val: the input string to be processed.
-    :param rm_non_ascii: If True (default False) remove any non-ascii characters from the string
-    :param rm_dashs: If True (default False) remove any dashs from the string and replace with underscores.
+    :param rm_non_ascii: If True (default False) remove any non-ascii characters
+                         from the string
+    :param rm_dashs: If True (default False) remove any dashs from the string
+                     and replace with underscores.
     :param rm_spaces: If True (default False) remove any spaces from the string.
-    :param rm_punc: If True (default False) remove any punctuation (other than '_' or '-') from the string.
+    :param rm_punc: If True (default False) remove any punctuation
+                    (other than '_' or '-') from the string.
     :return: returns a string outputted from the processing.
 
     """
-    import string
     str_val_tmp = str_val.strip()
 
     if rm_non_ascii:
         str_val_tmp_ascii = ""
         for c in str_val_tmp:
-            if (c in string.ascii_letters) or (c in string.punctuation) or (c in string.digits) or (c == ' '):
+            if (
+                (c in string.ascii_letters)
+                or (c in string.punctuation)
+                or (c in string.digits)
+                or (c == " ")
+            ):
                 str_val_tmp_ascii += c
         str_val_tmp = str_val_tmp_ascii
 
     if rm_dashs:
-        str_val_tmp = str_val_tmp.replace('-', '_')
-        str_val_tmp = remove_repeated_chars(str_val_tmp, '_')
+        str_val_tmp = str_val_tmp.replace("-", "_")
+        str_val_tmp = removeRepeatedChars(str_val_tmp, "_")
 
     if rm_spaces:
-        str_val_tmp = str_val_tmp.replace(' ', '_')
-        str_val_tmp = remove_repeated_chars(str_val_tmp, '_')
+        str_val_tmp = str_val_tmp.replace(" ", "_")
+        str_val_tmp = removeRepeatedChars(str_val_tmp, "_")
 
     if rm_punc:
         for punct in string.punctuation:
-            if (punct != '_') and (punct != '-'):
-                str_val_tmp = str_val_tmp.replace(punct, '')
-        str_val_tmp = remove_repeated_chars(str_val_tmp, '_')
+            if (punct != "_") and (punct != "-"):
+                str_val_tmp = str_val_tmp.replace(punct, "")
+        str_val_tmp = removeRepeatedChars(str_val_tmp, "_")
 
     return str_val_tmp
 
 
-def get_days_since(year, dayofyear, base_date):
+def getDaysSince(year, day_of_year, base_date):
     """
     Calculate the number of days from a base data to a defined year/day.
 
     :param year: int with year XXXX (e.g., 2020)
-    :param dayofyear: int with the day within the year (1-365)
-    :param base_date: a datetime
+    :param day_of_year: int with the day within the year (1-365)
+    :param base_date: a datetime.date object
     :return: int (n days)
 
     """
-    import datetime
     if year < base_date.year:
         raise Exception("The year specified is before the base date.")
     date_val = datetime.date(year=int(year), month=1, day=1)
-    date_val = date_val + datetime.timedelta(days=int(dayofyear - 1))
+    date_val = date_val + datetime.timedelta(days=int(day_of_year - 1))
     return (date_val - base_date).days
 
 
-def get_days_since_date(year, month, day, base_date):
+def getDaysSinceDate(year, month, day, base_date):
     """
     Calculate the number of days from a base data to a defined year/day.
 
     :param year: int with year XXXX (e.g., 2020)
     :param month: int month in year (1-12) (e.g., 6)
     :param day: int with the day within the month (1-31) (e.g., 20)
-    :param base_date: a datetime
+    :param base_date: a datetime.date object
     :return: int (n days)
 
     """
-    import datetime
     if year < base_date.year:
         raise Exception("The year specified is before the base date.")
     date_val = datetime.date(year=int(year), month=int(month), day=int(day))
     return (date_val - base_date).days
-
-
