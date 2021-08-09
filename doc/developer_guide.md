@@ -40,16 +40,48 @@ are accepted into the library:
 The main coding style things to be aware of when providing a function for RSGISLib are:
 
 1. Variables should be in snake_case and all characters should be in lower case
-2. Class names should be in CamelCase
+2. Class and function names should be in CamelCase
 3. Module names should be lower case with no underscores between words.
 4. Functions should have keyword specified through the C++ interface
 5. Pure python functions should provide type hints.
 
+### Python Code Style Tools
 Before code is committed to the RSGISLib git repo the [black](https://black.readthedocs.io) 
 code formatter should be run to ensure that the code formatting is standard with the rest of the 
-modules. The [flake8](https://flake8.pycqa.org/) static code checker should also be run
-and relevant issues addressed. 
+modules. The [flake8](https://flake8.pycqa.org/) and [pylint](https://www.pylint.org) static code 
+checkers should also be run and relevant issues addressed. 
 
+To run those tools you can use the following commands:
+
+```shell
+black path/to/python/script.py
+```
+
+```shell
+flake8 path/to/python/script.py
+```
+
+```shell
+pylint --function-naming-style=camelCase --max-line-length=88 path/to/python/script.py
+```
+
+Note. for flake8 you will want to create a config file `~/.config/flake8` specifying the
+line length of 88 characters to match the black formatting:
+
+```
+[flake8]
+max-line-length = 88
+```
+
+If you don't have these tools installed then they can be installed with the following commands:
+
+```shell
+pip install black
+pip install flake8
+pip install pylint
+```
+
+### Python Module Imports
 For imports, they should be at the top of the file for widely used modules (e.g., GDAL, 
 Numpy, Scipy) but for imports which are only specifically used in just a one or a few  
 functions then the important should be within the function. When importing modules should
@@ -63,10 +95,12 @@ Note, you need some care when importing RSGISLib modules within RSGISLib so modu
 circular importing is not introduced. Therefore, we would recommend avoiding importing
 other RSGISLib modules at the module level within RSGISLib.
 
+### Python Function Variable Names 
+
 For consistency, we try to keep the following commonly used input variable names the same across different
 functions:
 
-### Images
+#### Images
 
 | Variable Name | Description |
 | ----------- | ----------- |
@@ -87,7 +121,7 @@ functions:
 | n_bands | the number of bands (i.e., output bands)
 | calc_stats | boolean to specify whether image metadata statistics and pyramids should be created. 
 
-### Vectors
+#### Vectors
 
 | Variable Name | Description |
 | ----------- | ----------- |
@@ -102,7 +136,7 @@ functions:
 | out_epsg | If there is an option to specify the output projection then generally use an EPSG code |
 | vec_lyr_obj | An OGR input vector layer object |
 
-### Others
+#### Others
 | Variable Name | Description |
 | ----------- | ----------- |
 | in_file | Generic input file (e.g., text file) |
@@ -122,7 +156,18 @@ functions:
 
 
 ## Python Tests Implementation
-Python testing is undertaken using the pytest tool and are within the python_tests directory.
+Python testing is undertaken using the [pytest](https://docs.pytest.org) tool and are within the 
+python_tests directory. You can install pytest using the following command:
+
+```shell
+pip install pytest
+```
+
+The tests can be run from within the rsgislib top level directory using the following command:
+
+```shell
+pytest -v  python_tests
+```
 
 ## C++ Coding Style
 
