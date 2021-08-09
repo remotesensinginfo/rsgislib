@@ -42,12 +42,11 @@ jobs:
           destination: pytest_reports
       - codecov/upload:
           file: pytest_reports/coverage.xml
-          token: 816c1f2c-8490-4a4a-a4f6-64d76ef35fc6
 
 
 # Orchestrate our job run sequence
 workflows:
-  version: 2
   build-and-test:
     jobs:
-      - build_and_test
+      - build_and_test:
+        context: RSGISLib
