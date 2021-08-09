@@ -48,5 +48,4 @@ jobs:
 workflows:
   build-and-test:
     jobs:
-      - build_and_test:
-        context: RSGISLib
+      - build_and_test
