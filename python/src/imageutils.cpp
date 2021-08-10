@@ -950,7 +950,7 @@ static PyObject *ImageUtils_Subset(PyObject *self, PyObject *args, PyObject *key
     const char *pszInputImage, *pszInputVectorFile, *pszInputVectorLyr, *pszOutputImage, *pszGDALFormat;
     int nOutDataType;
 
-    if( !PyArg_ParseTupleAndKeywords(args, keywds, "ssssi:subset", kwlist, &pszInputImage, &pszInputVectorFile, &pszInputVectorLyr, &pszOutputImage, &pszGDALFormat, &nOutDataType))
+    if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssssi:subset", kwlist, &pszInputImage, &pszInputVectorFile, &pszInputVectorLyr, &pszOutputImage, &pszGDALFormat, &nOutDataType))
     {
         return nullptr;
     }

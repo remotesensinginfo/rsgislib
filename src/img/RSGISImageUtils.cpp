@@ -28,6 +28,59 @@ namespace rsgis{namespace img{
 	{
 		 this->resDiffThresh = resDiffThresh;
 	}
+
+    void RSGISImageUtils::snap2ImageGrid(GDALDataset *dataset, OGREnvelope *env)
+    {
+	    double outMinX = 0.0;
+	    double outMaxX = 0.0;
+	    double outMinY = 0.0;
+	    double outMaxY = 0.0;
+
+        double *imgTransform = new double[6];
+        dataset->GetGeoTransform(imgTransform);
+
+        double pxlXRes = imgTransform[1];
+        double pxlYRes = abs(imgTransform[5]);
+
+        double tlX = imgTransform[0];
+        double tlY = imgTransform[3];
+
+        double absDiffMinX = abs(tlX - env->MinX);
+        double absDiffMaxY = abs(tlY - env->MaxY);
+
+        unsigned int nXPxls = ceil((absDiffMinX / pxlXRes)+0.5);
+        unsigned int nYPxls = ceil((absDiffMaxY / pxlYRes)+0.5);
+
+        if(tlX > env->MinX)
+        {
+            outMinX = tlX - (nXPxls * pxlXRes);
+        }
+        else
+        {
+            outMinX = tlX + (nXPxls * pxlXRes);
+        }
+
+        if(tlY > env->MaxY)
+        {
+            outMaxY = tlY - (nYPxls * pxlYRes);
+        }
+        else
+        {
+            outMaxY = tlY + (nYPxls * pxlYRes);
+        }
+
+        unsigned int envWidthPxls = ceil(((env->MaxX - env->MinX)/pxlXRes)+0.5);
+        unsigned int envHeightPxls = ceil(((env->MaxY - env->MinY)/pxlYRes)+0.5);
+
+        outMaxX = outMinX + (envWidthPxls * pxlXRes);
+        outMinY = outMaxY - (envHeightPxls * pxlYRes);
+
+        env->MinX = outMinX;
+        env->MaxX = outMaxX;
+        env->MinY = outMinY;
+        env->MaxY = outMaxY;
+    }
+
 	
 	void RSGISImageUtils::getImageOverlap(GDALDataset **datasets, int numDS, int **dsOffsets, int *width, int *height, double *gdalTransform) 
 	{
@@ -1441,6 +1494,8 @@ namespace rsgis{namespace img{
     
     void RSGISImageUtils::getImageOverlapCut2Env(GDALDataset **datasets, int numDS,  int **dsOffsets, int *width, int *height, double *gdalTransform, OGREnvelope *env) 
 	{
+        this->snap2ImageGrid(datasets[0], env);
+
 		double **transformations = new double*[numDS];
 		int *xSize = new int[numDS];
 		int *ySize = new int[numDS];
@@ -1734,6 +1789,8 @@ namespace rsgis{namespace img{
     
     void RSGISImageUtils::getImageOverlapCut2Env(GDALDataset **datasets, int numDS,  int **dsOffsets, int *width, int *height, double *gdalTransform, OGREnvelope *env, int *maxBlockX, int *maxBlockY) 
 	{
+        this->snap2ImageGrid(datasets[0], env);
+
 		double **transformations = new double*[numDS];
 		int *xSize = new int[numDS];
 		int *ySize = new int[numDS];
@@ -2043,6 +2100,8 @@ namespace rsgis{namespace img{
 	
 	void RSGISImageUtils::getImageOverlap(GDALDataset **datasets, int numDS, int *width, int *height, OGREnvelope *env) 
 	{
+        this->snap2ImageGrid(datasets[0], env);
+
 		double **transformations = new double*[numDS];
 		int *xSize = new int[numDS];
 		int *ySize = new int[numDS];
@@ -2222,6 +2281,8 @@ namespace rsgis{namespace img{
     
     void RSGISImageUtils::getImageOverlap(GDALDataset **datasets, int numDS, OGREnvelope *env) 
     {
+        this->snap2ImageGrid(datasets[0], env);
+
         double **transformations = new double*[numDS];
         int *xSize = new int[numDS];
         int *ySize = new int[numDS];
