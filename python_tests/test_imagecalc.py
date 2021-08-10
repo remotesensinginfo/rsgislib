@@ -153,7 +153,9 @@ def test_bandMaths_BinaryOut(tmp_path):
     )
     output_img = os.path.join(tmp_path, "ndvi_cats_test_bandMaths.kea")
     exp = "ndvi>0.95?1:ndvi>0.85?2:ndvi>0.75?3:0"
-    rsgislib.imagecalc.bandMath(output_img, exp, "KEA", rsgislib.TYPE_8UINT, band_defs=band_def_seq)
+    rsgislib.imagecalc.bandMath(
+        output_img, exp, "KEA", rsgislib.TYPE_8UINT, band_defs=band_def_seq
+    )
 
     img_eq, prop_match = rsgislib.imagecalc.areImgBandsEqual(
         ref_ndvi_cats_img, 1, output_img, 1
@@ -184,7 +186,9 @@ def test_imageBandMath_MultiBand(tmp_path):
     ref_ndvi_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi.kea")
     output_img = os.path.join(tmp_path, "ndvi_test_imageBandMath.kea")
     exp = "(b8-b3)/(b8+b3)"
-    rsgislib.imagecalc.imageBandMath(input_img, output_img, exp, "KEA", rsgislib.TYPE_32FLOAT)
+    rsgislib.imagecalc.imageBandMath(
+        input_img, output_img, exp, "KEA", rsgislib.TYPE_32FLOAT
+    )
     img_eq, prop_match = rsgislib.imagecalc.areImgBandsEqual(
         ref_ndvi_img, 1, output_img, 1
     )
@@ -195,7 +199,9 @@ def test_imageMath_BinaryOut(tmp_path):
     import rsgislib.imagecalc
 
     input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi.kea")
-    ref_ndvi_cats_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.kea")
+    ref_ndvi_cats_img = os.path.join(
+        IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.kea"
+    )
     output_img = os.path.join(tmp_path, "ndvi_cats_test_imageBandMath.kea")
     exp = "b1>0.95?1:b1>0.85?2:b1>0.75?3:0"
     rsgislib.imagecalc.imageMath(input_img, output_img, exp, "KEA", rsgislib.TYPE_8UINT)

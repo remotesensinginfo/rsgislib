@@ -141,6 +141,7 @@ functions:
 | ----------- | ----------- |
 | in_file | Generic input file (e.g., text file) |
 | out_file | Generic output file (e.g., text file) |
+| tmp_dir | directory to store temporary outputs during processing |
 | in_h5_file | An input HDF5 file |
 | out_h5_file | An output HDF5 file. |
 | h5_XXX_file | Where there are multiple input and/or output HDF5 files then XXX is used to specify the purpose. |
@@ -153,7 +154,7 @@ functions:
 | win_h_size | specify a half window size used in some places to ensure window size is odd |
 | x_size | a size in the X axis |
 | y_size | a size in the Y axis |
-
+| n_cores | the number of processing core to use when using python multiprocessing module |
 
 ## Python Tests Implementation
 Python testing is undertaken using the [pytest](https://docs.pytest.org) tool and are within the 
