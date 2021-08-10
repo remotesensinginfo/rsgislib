@@ -1,0 +1,48 @@
+
+# Consider dependencies only in project.
+set(CMAKE_DEPENDS_IN_PROJECT_ONLY OFF)
+
+# The set of languages for which implicit dependencies are needed:
+set(CMAKE_DEPENDS_LANGUAGES
+  )
+
+# The set of dependency files which are needed:
+set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "/Users/nmthoma1/OneDrive - NASA/Developer/rsgislib/src/filtering/RSGISCalcImageFilters.cpp" "src/CMakeFiles/rsgis_filter.dir/filtering/RSGISCalcImageFilters.cpp.o" "gcc" "src/CMakeFiles/rsgis_filter.dir/filtering/RSGISCalcImageFilters.cpp.o.d"
+  "/Users/nmthoma1/OneDrive - NASA/Developer/rsgislib/src/filtering/RSGISFilterBank.cpp" "src/CMakeFiles/rsgis_filter.dir/filtering/RSGISFilterBank.cpp.o" "gcc" "src/CMakeFiles/rsgis_filter.dir/filtering/RSGISFilterBank.cpp.o.d"
+  "/Users/nmthoma1/OneDrive - NASA/Developer/rsgislib/src/filtering/RSGISGenerateFilter.cpp" "src/CMakeFiles/rsgis_filter.dir/filtering/RSGISGenerateFilter.cpp.o" "gcc" "src/CMakeFiles/rsgis_filter.dir/filtering/RSGISGenerateFilter.cpp.o.d"
+  "/Users/nmthoma1/OneDrive - NASA/Developer/rsgislib/src/filtering/RSGISImageFilter.cpp" "src/CMakeFiles/rsgis_filter.dir/filtering/RSGISImageFilter.cpp.o" "gcc" "src/CMakeFiles/rsgis_filter.dir/filtering/RSGISImageFilter.cpp.o.d"
+  "/Users/nmthoma1/OneDrive - NASA/Developer/rsgislib/src/filtering/RSGISImageFilterException.cpp" "src/CMakeFiles/rsgis_filter.dir/filtering/RSGISImageFilterException.cpp.o" "gcc" "src/CMakeFiles/rsgis_filter.dir/filtering/RSGISImageFilterException.cpp.o.d"
+  "/Users/nmthoma1/OneDrive - NASA/Developer/rsgislib/src/filtering/RSGISImageKernelFilter.cpp" "src/CMakeFiles/rsgis_filter.dir/filtering/RSGISImageKernelFilter.cpp.o" "gcc" "src/CMakeFiles/rsgis_filter.dir/filtering/RSGISImageKernelFilter.cpp.o.d"
+  "/Users/nmthoma1/OneDrive - NASA/Developer/rsgislib/src/filtering/RSGISMorphologyClosing.cpp" "src/CMakeFiles/rsgis_filter.dir/filtering/RSGISMorphologyClosing.cpp.o" "gcc" "src/CMakeFiles/rsgis_filter.dir/filtering/RSGISMorphologyClosing.cpp.o.d"
+  "/Users/nmthoma1/OneDrive - NASA/Developer/rsgislib/src/filtering/RSGISMorphologyDilate.cpp" "src/CMakeFiles/rsgis_filter.dir/filtering/RSGISMorphologyDilate.cpp.o" "gcc" "src/CMakeFiles/rsgis_filter.dir/filtering/RSGISMorphologyDilate.cpp.o.d"
+  "/Users/nmthoma1/OneDrive - NASA/Developer/rsgislib/src/filtering/RSGISMorphologyErode.cpp" "src/CMakeFiles/rsgis_filter.dir/filtering/RSGISMorphologyErode.cpp.o" "gcc" "src/CMakeFiles/rsgis_filter.dir/filtering/RSGISMorphologyErode.cpp.o.d"
+  "/Users/nmthoma1/OneDrive - NASA/Developer/rsgislib/src/filtering/RSGISMorphologyFindExtrema.cpp" "src/CMakeFiles/rsgis_filter.dir/filtering/RSGISMorphologyFindExtrema.cpp.o" "gcc" "src/CMakeFiles/rsgis_filter.dir/filtering/RSGISMorphologyFindExtrema.cpp.o.d"
+  "/Users/nmthoma1/OneDrive - NASA/Developer/rsgislib/src/filtering/RSGISMorphologyGradient.cpp" "src/CMakeFiles/rsgis_filter.dir/filtering/RSGISMorphologyGradient.cpp.o" "gcc" "src/CMakeFiles/rsgis_filter.dir/filtering/RSGISMorphologyGradient.cpp.o.d"
+  "/Users/nmthoma1/OneDrive - NASA/Developer/rsgislib/src/filtering/RSGISMorphologyOpening.cpp" "src/CMakeFiles/rsgis_filter.dir/filtering/RSGISMorphologyOpening.cpp.o" "gcc" "src/CMakeFiles/rsgis_filter.dir/filtering/RSGISMorphologyOpening.cpp.o.d"
+  "/Users/nmthoma1/OneDrive - NASA/Developer/rsgislib/src/filtering/RSGISMorphologyTopHat.cpp" "src/CMakeFiles/rsgis_filter.dir/filtering/RSGISMorphologyTopHat.cpp.o" "gcc" "src/CMakeFiles/rsgis_filter.dir/filtering/RSGISMorphologyTopHat.cpp.o.d"
+  "/Users/nmthoma1/OneDrive - NASA/Developer/rsgislib/src/filtering/RSGISNonLocalDenoising.cpp" "src/CMakeFiles/rsgis_filter.dir/filtering/RSGISNonLocalDenoising.cpp.o" "gcc" "src/CMakeFiles/rsgis_filter.dir/filtering/RSGISNonLocalDenoising.cpp.o.d"
+  "/Users/nmthoma1/OneDrive - NASA/Developer/rsgislib/src/filtering/RSGISPrewittFilter.cpp" "src/CMakeFiles/rsgis_filter.dir/filtering/RSGISPrewittFilter.cpp.o" "gcc" "src/CMakeFiles/rsgis_filter.dir/filtering/RSGISPrewittFilter.cpp.o.d"
+  "/Users/nmthoma1/OneDrive - NASA/Developer/rsgislib/src/filtering/RSGISSARTextureFilters.cpp" "src/CMakeFiles/rsgis_filter.dir/filtering/RSGISSARTextureFilters.cpp.o" "gcc" "src/CMakeFiles/rsgis_filter.dir/filtering/RSGISSARTextureFilters.cpp.o.d"
+  "/Users/nmthoma1/OneDrive - NASA/Developer/rsgislib/src/filtering/RSGISSobelFilter.cpp" "src/CMakeFiles/rsgis_filter.dir/filtering/RSGISSobelFilter.cpp.o" "gcc" "src/CMakeFiles/rsgis_filter.dir/filtering/RSGISSobelFilter.cpp.o.d"
+  "/Users/nmthoma1/OneDrive - NASA/Developer/rsgislib/src/filtering/RSGISSpeckleFilters.cpp" "src/CMakeFiles/rsgis_filter.dir/filtering/RSGISSpeckleFilters.cpp.o" "gcc" "src/CMakeFiles/rsgis_filter.dir/filtering/RSGISSpeckleFilters.cpp.o.d"
+  "/Users/nmthoma1/OneDrive - NASA/Developer/rsgislib/src/filtering/RSGISStatsFilters.cpp" "src/CMakeFiles/rsgis_filter.dir/filtering/RSGISStatsFilters.cpp.o" "gcc" "src/CMakeFiles/rsgis_filter.dir/filtering/RSGISStatsFilters.cpp.o.d"
+  )
+
+# Pairs of files generated by the same build rule.
+set(CMAKE_MULTIPLE_OUTPUT_PAIRS
+  "/Users/nmthoma1/OneDrive - NASA/Developer/rsgislib/local_build/src/librsgis_filter.dylib" "/Users/nmthoma1/OneDrive - NASA/Developer/rsgislib/local_build/src/librsgis_filter.1.0.0.dylib"
+  )
+
+
+# Targets to which this target links.
+set(CMAKE_TARGET_LINKED_INFO_FILES
+  "/Users/nmthoma1/OneDrive - NASA/Developer/rsgislib/local_build/src/CMakeFiles/rsgis_img.dir/DependInfo.cmake"
+  "/Users/nmthoma1/OneDrive - NASA/Developer/rsgislib/local_build/src/CMakeFiles/rsgis_utils.dir/DependInfo.cmake"
+  "/Users/nmthoma1/OneDrive - NASA/Developer/rsgislib/local_build/src/CMakeFiles/rsgis_maths.dir/DependInfo.cmake"
+  "/Users/nmthoma1/OneDrive - NASA/Developer/rsgislib/local_build/src/CMakeFiles/rsgis_datastruct.dir/DependInfo.cmake"
+  "/Users/nmthoma1/OneDrive - NASA/Developer/rsgislib/local_build/src/CMakeFiles/rsgis_commons.dir/DependInfo.cmake"
+  )
+
+# Fortran module output directory.
+set(CMAKE_Fortran_TARGET_MODULE_DIR "")

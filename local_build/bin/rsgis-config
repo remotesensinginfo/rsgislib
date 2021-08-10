@@ -1,0 +1,51 @@
+#!/bin/sh
+
+usage()
+{
+    cat <<EOF
+Usage: rsgis-config [OPTIONS]
+Options:
+     [--prefix]
+     [--version]
+     [--libs]
+     [--cflags]
+     [--ldflags]
+     [--libdir]
+     [--includes]
+EOF
+    exit $1
+}
+if test $# -eq 0; then
+  usage 1 1>&2
+fi
+while test $# -gt 0; do
+case "$1" in
+    -*=*) optarg=`echo "$1" | sed 's/[-_a-zA-Z0-9]*=//'` ;;
+    *) optarg= ;;
+esac
+case $1 in
+    --prefix)
+      echo /Users/nmthoma1/Documents/tmp/rsgislib_builds
+     ;;
+    --version)
+      echo 5.0.0
+     ;;
+    --cflags)
+      echo -I/Users/nmthoma1/Documents/tmp/rsgislib_builds/include 
+      ;;
+    --libs)
+      echo -L/Users/nmthoma1/Documents/tmp/rsgislib_builds/lib -lrsgis_calib  -lrsgis_classify -lrsgis_commons -lrsgis_datastruct -lrsgis_filter -l -lrsgis_img -lrsgis_maths -l -l -lrsgis_rastergis -lrsgis_registration -lrsgis_segmentation -lrsgis_utils -lrsgis_vec
+      ;;
+    --ldflags)
+      echo /Users/nmthoma1/Documents/tmp/rsgislib_builds/lib
+      ;;
+    --libdir)
+      echo /Users/nmthoma1/Documents/tmp/rsgislib_builds/lib
+      ;;
+    --includes)
+      echo /Users/nmthoma1/Documents/tmp/rsgislib_builds/include
+      ;;
+  esac
+  shift
+done
+
