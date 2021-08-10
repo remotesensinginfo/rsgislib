@@ -151,6 +151,7 @@ namespace rsgis
 			{
 			public:
 				RSGISImageUtils(double resDiffThresh = 0.0001);
+                void snap2ImageGrid(GDALDataset *dataset, OGREnvelope *env);
 				void getImageOverlap(GDALDataset **datasets, int numDS, int **dsOffsets, int *width, int *height, double *gdalTransform);
 				void getImageOverlap(std::vector<GDALDataset*> *datasets, int **dsOffsets, int *width, int *height, double *gdalTransform);
                 void getImageOverlap(GDALDataset **datasets, int numDS, int **dsOffsets, int *width, int *height, double *gdalTransform, int *maxBlockX, int *maxBlockY);
