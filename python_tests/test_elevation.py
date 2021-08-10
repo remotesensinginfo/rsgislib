@@ -82,7 +82,7 @@ def test_planeFitDetreatDEM(tmp_path):
     gdalformat = "KEA"
     window_size = 5
     rsgislib.elevation.planeFitDetreatDEM(input_img, output_img, gdalformat, window_size)
-    
+
     plane_fit_ref_img = os.path.join(DATA_DIR, "SRTM_aber_planeFitDetreatDEM.kea")
     img_eq, prop_match = rsgislib.imagecalc.areImgsEqual(output_img, plane_fit_ref_img)
     print(prop_match)
