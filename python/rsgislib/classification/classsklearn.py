@@ -97,7 +97,7 @@ The returned classifier instance will be trained using all the inputted data.
     dataArr = numpy.zeros([numVals, numVars], dtype=float)
     classArr = numpy.zeros([numVals], dtype=int)
 
-    if paramSearchSampNum is not 0:
+    if paramSearchSampNum != 0:
         dataArrSamp = numpy.zeros([(len(classTrainInfo) * paramSearchSampNum), numVars], dtype=float)
         classArrSamp = numpy.zeros([(len(classTrainInfo) * paramSearchSampNum)], dtype=int)
 
@@ -110,7 +110,7 @@ The returned classifier instance will be trained using all the inputted data.
         # Copy data and populate classid array
         dataArr[rowInit:(rowInit + numRows)] = f['DATA/DATA']
         classArr[rowInit:(rowInit + numRows)] = classTrainInfo[key].id
-        if paramSearchSampNum is not 0:
+        if paramSearchSampNum != 0:
             # Create random index to sample the whole dataset.
             sampleIdxs = numpy.random.randint(0, high=numRows, size=paramSearchSampNum)
             # Sample the input data for classifier optimisation.
@@ -121,7 +121,7 @@ The returned classifier instance will be trained using all the inputted data.
         rowInit += numRows
         f.close()
 
-    if paramSearchSampNum is 0:
+    if paramSearchSampNum == 0:
         dataArrSamp = dataArr
         classArrSamp = classArr
 

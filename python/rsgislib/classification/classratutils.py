@@ -207,7 +207,7 @@ Example::
         classNameIDs = dict()
         for className in classNames:
             classNameStr = str(className.decode())
-            if not classNameStr is '':
+            if classNameStr != '':
                 classes[i] = classesInt[classesStr == className][0]
                 classNameIDs[classNameStr] = classes[i]
                 print("Class \'" + classNameStr + "\' has numerical " + str(classes[i]))  
@@ -405,7 +405,7 @@ Example::
     classNameIDs = dict()
     for className in classNames:
         classNameStr = str(className.decode())
-        if not classNameStr is '':
+        if classNameStr != '':
             #print(validClassInt[validClassStr == className])
             classes[i] = validClassInt[validClassStr == className][0]
             classNameIDs[classNameStr] = classes[i]
