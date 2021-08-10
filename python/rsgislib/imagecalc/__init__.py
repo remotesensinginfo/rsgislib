@@ -1538,6 +1538,13 @@ def areImgsEqual(in_ref_img, in_cmp_img, prop_eql=1.0, flt_dif=0.0001):
     def _calcPropEqual(info, inputs, outputs, otherargs):
         ref_pxls = inputs.in_ref_img.flatten()
         cmp_pxls = inputs.in_cmp_img.flatten()
+
+        cmp_pxls = cmp_pxls[~numpy.isnan(ref_pxls)]
+        ref_pxls = ref_pxls[~numpy.isnan(ref_pxls)]
+
+        ref_pxls = ref_pxls[~numpy.isnan(cmp_pxls)]
+        cmp_pxls = cmp_pxls[~numpy.isnan(cmp_pxls)]
+
         pxl_diff = numpy.abs(ref_pxls - cmp_pxls)
         eql_pxls = numpy.where(pxl_diff < otherargs.flt_dif, 1, 0)
 
