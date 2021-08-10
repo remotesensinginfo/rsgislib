@@ -66,20 +66,20 @@ static PyObject *ImageCalc_BandMath(PyObject *self, PyObject *args, PyObject *ke
     {
         PyObject *o = PySequence_GetItem(pBandDefnObj, n);
 
-        PyObject *pBandName = PyObject_GetAttrString(o, "bandName");
+        PyObject *pBandName = PyObject_GetAttrString(o, "band_name");
         if( ( pBandName == nullptr ) || ( pBandName == Py_None ) || !RSGISPY_CHECK_STRING(pBandName) )
         {
-            PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'bandName\'" );
+            PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'band_name\'" );
             Py_XDECREF(pBandName);
             Py_DECREF(o);
             delete[] pRSGISStruct;
             return nullptr;
         }
 
-        PyObject *pFileName = PyObject_GetAttrString(o, "fileName");
+        PyObject *pFileName = PyObject_GetAttrString(o, "input_img");
         if( ( pFileName == nullptr ) || ( pFileName == Py_None ) || !RSGISPY_CHECK_STRING(pFileName) )
         {
-            PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'fileName\'" );
+            PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'input_img\'" );
             Py_DECREF(pBandName);
             Py_XDECREF(pFileName);
             Py_DECREF(o);
@@ -87,10 +87,10 @@ static PyObject *ImageCalc_BandMath(PyObject *self, PyObject *args, PyObject *ke
             return nullptr;
         }
 
-        PyObject *pBandIndex = PyObject_GetAttrString(o, "bandIndex");
+        PyObject *pBandIndex = PyObject_GetAttrString(o, "img_band");
         if( ( pBandIndex == nullptr ) || ( pBandIndex == Py_None ) || !RSGISPY_CHECK_INT(pBandIndex) )
         {
-            PyErr_SetString(GETSTATE(self)->error, "could not find integer attribute \'bandIndex\'" );
+            PyErr_SetString(GETSTATE(self)->error, "could not find integer attribute \'img_band\'" );
             Py_DECREF(pBandName);
             Py_DECREF(pFileName);
             Py_XDECREF(pBandIndex);
@@ -1196,20 +1196,20 @@ static PyObject *ImageCalc_CalcPropTrueExp(PyObject *self, PyObject *args, PyObj
     {
         PyObject *o = PySequence_GetItem(pBandDefnObj, n);
         
-        PyObject *pBandName = PyObject_GetAttrString(o, "bandName");
+        PyObject *pBandName = PyObject_GetAttrString(o, "band_name");
         if( ( pBandName == nullptr ) || ( pBandName == Py_None ) || !RSGISPY_CHECK_STRING(pBandName) )
         {
-            PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'bandName\'" );
+            PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'band_name\'" );
             Py_XDECREF(pBandName);
             Py_DECREF(o);
             delete[] pRSGISStruct;
             return nullptr;
         }
         
-        PyObject *pFileName = PyObject_GetAttrString(o, "fileName");
+        PyObject *pFileName = PyObject_GetAttrString(o, "input_img");
         if( ( pFileName == nullptr ) || ( pFileName == Py_None ) || !RSGISPY_CHECK_STRING(pFileName) )
         {
-            PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'fileName\'" );
+            PyErr_SetString(GETSTATE(self)->error, "could not find string attribute \'input_img\'" );
             Py_DECREF(pBandName);
             Py_XDECREF(pFileName);
             Py_DECREF(o);
@@ -1217,10 +1217,10 @@ static PyObject *ImageCalc_CalcPropTrueExp(PyObject *self, PyObject *args, PyObj
             return nullptr;
         }
         
-        PyObject *pBandIndex = PyObject_GetAttrString(o, "bandIndex");
+        PyObject *pBandIndex = PyObject_GetAttrString(o, "img_band");
         if( ( pBandIndex == nullptr ) || ( pBandIndex == Py_None ) || !RSGISPY_CHECK_INT(pBandIndex) )
         {
-            PyErr_SetString(GETSTATE(self)->error, "could not find integer attribute \'bandIndex\'" );
+            PyErr_SetString(GETSTATE(self)->error, "could not find integer attribute \'img_band\'" );
             Py_DECREF(pBandName);
             Py_DECREF(pFileName);
             Py_XDECREF(pBandIndex);
