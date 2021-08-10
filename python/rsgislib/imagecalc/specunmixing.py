@@ -32,33 +32,34 @@
 #
 ############################################################################
 
+import numpy
 
 import rsgislib
-import os
 
 
-def read_endmembers_mtxt(endmembers_file, gain=1, weight=None):
+def readEndmembersMTXT(endmembers_file, gain=1, weight=None):
     """
     A function to read endmembers mtxt file
     :param endmembers_file: File path to the mtxt input file.
-    :param gain: A gain for the endmembers (input endmember / gain = output endmember). If 1 then ignored.
-    :param weight: Optional (if None ignored) to provide a weight to implement the approach of Scarth et al (2010)
-                   adding a weight to the least squares optimisation to get the abundances to sum to 1.
+    :param gain: A gain for the endmembers (input endmember / gain = output endmember).
+                 If 1 then ignored.
+    :param weight: Optional (if None ignored) to provide a weight to implement the
+                   approach of Scarth et al (2010) adding a weight to the least squares
+                   optimisation to get the abundances to sum to 1.
     :return: [m, n, endmemarr]; m size, n size and a numpy array with the end members
 
     """
-    import numpy
     dataList = []
-    dataFile = open(endmembers_file, 'r')
+    dataFile = open(endmembers_file, "r")
     for line in dataFile:
         line = line.strip()
         if line != "":
             dataList.append(line)
     dataFile.close()
-    m = int(dataList[0].split('=')[-1])
-    n = int(dataList[1].split('=')[-1])
+    m = int(dataList[0].split("=")[-1])
+    n = int(dataList[1].split("=")[-1])
     endmemarr = numpy.zeros((m, n))
-    datavals = dataList[2].split(',')
+    datavals = dataList[2].split(",")
 
     i = 0
 
@@ -79,10 +80,20 @@ def read_endmembers_mtxt(endmembers_file, gain=1, weight=None):
     return m, n, endmemarr
 
 
-def spec_unmix_spts_ucls(input_img, valid_msk_img, valid_msk_val, output_img, endmembers_file, gdalformat='KEA', gain=1,
-                         weight=None, calc_stats=True):
+def specUnmixSpTsUCLS(
+    input_img,
+    valid_msk_img,
+    valid_msk_val,
+    output_img,
+    endmembers_file,
+    gdalformat="KEA",
+    gain=1,
+    weight=None,
+    calc_stats=True,
+):
     """
-    This function performs spectral unmixing using an unconstrain model using the pysptools module
+    This function performs spectral unmixing using an unconstrain model
+    using the pysptools module
 
     Note, pysptools needs to be installed to use this function.
 
@@ -90,34 +101,38 @@ def spec_unmix_spts_ucls(input_img, valid_msk_img, valid_msk_val, output_img, en
     :param valid_msk_img: an image file representing the valid data region
     :param valid_msk_val: image pixel value in the mask for the valid data region
     :param output_img: the output image file
-    :param endmembers_file: the endmembers (*.mtxt) file extracted using the rsgislib.zonalstats.extractAvgEndMembers function
+    :param endmembers_file: the endmembers (*.mtxt) file extracted using the
+                            rsgislib.zonalstats.extractAvgEndMembers function
     :param gdalformat: the output file format. (Default: KEA)
-    :param gain: A gain for the endmembers and image spectra (input spectra / gain = output spectra). If 1 then ignored.
-    :param weight: Optional (if None ignored) to provide a weight to implement the approach of Scarth et al (2010)
-                   adding a weight to the least squares optimisation to get the abundances to sum to 1.
-    :param calc_stats: Boolean specifying whether to calculate pyramids and metadata stats (Default: True)
+    :param gain: A gain for the endmembers and image spectra (input spectra / gain =
+                 output spectra). If 1 then ignored.
+    :param weight: Optional (if None ignored) to provide a weight to implement the
+                   approach of Scarth et al (2010) adding a weight to the least squares
+                   optimisation to get the abundances to sum to 1.
+    :param calc_stats: Boolean specifying whether to calculate pyramids and
+                       metadata stats (Default: True)
 
     References:
-            Scarth, P., Roder, A., & Schmidt, M. (2010). Tracking grazing pressure and climate
-            interaction—The role of Landsat fractional cover in time series analysis. Proceedings of
-            the 15th Australasian Remote Sensing and Photogrammetry ConferenceAustralia: Alice Springs.
+            Scarth, P., Roder, A., & Schmidt, M. (2010). Tracking grazing pressure
+            and climate interaction—The role of Landsat fractional cover in time
+            series analysis. Proceedings of the 15th Australasian Remote Sensing
+            and Photogrammetry Conference Australia: Alice Springs.
             http://dx.doi.org/10.6084/m9.ﬁgshare.94250.
 
     """
     from rios import applier
-    import numpy
-    import rsgislib
+
     import rsgislib.imageutils
     import pysptools.abundance_maps.amaps
 
     try:
-        import tqdm
         progress_bar = rsgislib.TQDMProgressBar()
     except:
         from rios import cuiprogress
+
         progress_bar = cuiprogress.GDALProgressBar()
 
-    m, n, endmembers_arr = read_endmembers_mtxt(endmembers_file, gain, weight)
+    m, n, endmembers_arr = readEndmembersMTXT(endmembers_file, gain, weight)
 
     infiles = applier.FilenameAssociations()
     infiles.image = input_img
@@ -138,7 +153,9 @@ def spec_unmix_spts_ucls(input_img, valid_msk_img, valid_msk_val, output_img, en
 
     def _applyUCLS(info, inputs, outputs, otherargs):
         if numpy.any(inputs.valid_msk == otherargs.valid_msk_val):
-            img_flat = numpy.moveaxis(inputs.image, 0, 2).reshape(-1, inputs.image.shape[0])
+            img_flat = numpy.moveaxis(inputs.image, 0, 2).reshape(
+                -1, inputs.image.shape[0]
+            )
 
             ID = numpy.arange(img_flat.shape[0])
             n_feats = ID.shape[0]
@@ -158,28 +175,46 @@ def spec_unmix_spts_ucls(input_img, valid_msk_img, valid_msk_val, output_img, en
                 weights[...] = weight
                 img_flat = numpy.hstack([img_flat, weights])
 
-            unmix_sub_arr = pysptools.abundance_maps.amaps.UCLS(img_flat, otherargs.endmembers_arr)
+            unmix_sub_arr = pysptools.abundance_maps.amaps.UCLS(
+                img_flat, otherargs.endmembers_arr
+            )
 
             unmix_arr = numpy.zeros([n_feats, otherargs.n_endmembers])
             unmix_arr[ID] = unmix_sub_arr
 
-            out_arr = unmix_arr.reshape(inputs.image.shape[1], inputs.image.shape[2], otherargs.n_endmembers)
+            out_arr = unmix_arr.reshape(
+                inputs.image.shape[1], inputs.image.shape[2], otherargs.n_endmembers
+            )
             out_arr = numpy.moveaxis(out_arr, 2, 0)
             outputs.outimage = out_arr
         else:
-            outputs.outimage = numpy.zeros([otherargs.n_endmembers, inputs.image.shape[1], inputs.image.shape[2]],
-                                           dtype=numpy.float32)
+            outputs.outimage = numpy.zeros(
+                [otherargs.n_endmembers, inputs.image.shape[1], inputs.image.shape[2]],
+                dtype=numpy.float32,
+            )
 
     applier.apply(_applyUCLS, infiles, outfiles, otherargs, controls=aControls)
 
     if calc_stats:
-        rsgislib.imageutils.popImageStats(output_img, usenodataval=True, nodataval=0, calcpyramids=True)
+        rsgislib.imageutils.popImageStats(
+            output_img, use_no_data=True, no_data_val=0, calc_pyramids=True
+        )
 
 
-def spec_unmix_spts_nnls(input_img, valid_msk_img, valid_msk_val, output_img, endmembers_file, gdalformat='KEA', gain=1,
-                         weight=None, calc_stats=True):
+def specUnmixSpTsNNLS(
+    input_img,
+    valid_msk_img,
+    valid_msk_val,
+    output_img,
+    endmembers_file,
+    gdalformat="KEA",
+    gain=1,
+    weight=None,
+    calc_stats=True,
+):
     """
-    This function performs spectral unmixing using non-negative least squares using the pysptools module
+    This function performs spectral unmixing using non-negative least squares
+    using the pysptools module
 
     Note, pysptools needs to be installed to use this function.
 
@@ -187,34 +222,37 @@ def spec_unmix_spts_nnls(input_img, valid_msk_img, valid_msk_val, output_img, en
     :param valid_msk_img: an image file representing the valid data region
     :param valid_msk_val: image pixel value in the mask for the valid data region
     :param output_img: the output image file
-    :param endmembers_file: the endmembers (*.mtxt) file extracted using the rsgislib.zonalstats.extractAvgEndMembers function
+    :param endmembers_file: the endmembers (*.mtxt) file extracted using the
+                            rsgislib.zonalstats.extractAvgEndMembers function
     :param gdalformat: the output file format. (Default: KEA)
-    :param gain: A gain for the endmembers and image spectra (input spectra / gain = output spectra). If 1 then ignored.
-    :param weight: Optional (if None ignored) to provide a weight to implement the approach of Scarth et al (2010)
-                   adding a weight to the least squares optimisation to get the abundances to sum to 1.
-    :param calc_stats: Boolean specifying whether to calculate pyramids and metadata stats (Default: True)
+    :param gain: A gain for the endmembers and image spectra (input spectra / gain =
+                 output spectra). If 1 then ignored.
+    :param weight: Optional (if None ignored) to provide a weight to implement the
+                   approach of Scarth et al (2010) adding a weight to the least
+                   squares optimisation to get the abundances to sum to 1.
+    :param calc_stats: Boolean specifying whether to calculate pyramids and
+                       metadata stats (Default: True)
 
     References:
-            Scarth, P., Roder, A., & Schmidt, M. (2010). Tracking grazing pressure and climate
-            interaction—The role of Landsat fractional cover in time series analysis. Proceedings of
-            the 15th Australasian Remote Sensing and Photogrammetry ConferenceAustralia: Alice Springs.
+            Scarth, P., Roder, A., & Schmidt, M. (2010). Tracking grazing pressure
+            and climate interaction—The role of Landsat fractional cover in time
+            series analysis. Proceedings of the 15th Australasian Remote Sensing
+            and Photogrammetry Conference Australia: Alice Springs.
             http://dx.doi.org/10.6084/m9.ﬁgshare.94250.
 
     """
     from rios import applier
-    import numpy
-    import rsgislib
     import rsgislib.imageutils
     import pysptools.abundance_maps.amaps
 
     try:
-        import tqdm
         progress_bar = rsgislib.TQDMProgressBar()
     except:
         from rios import cuiprogress
+
         progress_bar = cuiprogress.GDALProgressBar()
 
-    m, n, endmembers_arr = read_endmembers_mtxt(endmembers_file, gain, weight)
+    m, n, endmembers_arr = readEndmembersMTXT(endmembers_file, gain, weight)
 
     infiles = applier.FilenameAssociations()
     infiles.image = input_img
@@ -235,7 +273,9 @@ def spec_unmix_spts_nnls(input_img, valid_msk_img, valid_msk_val, output_img, en
 
     def _applyNNLS(info, inputs, outputs, otherargs):
         if numpy.any(inputs.valid_msk == otherargs.valid_msk_val):
-            img_flat = numpy.moveaxis(inputs.image, 0, 2).reshape(-1, inputs.image.shape[0])
+            img_flat = numpy.moveaxis(inputs.image, 0, 2).reshape(
+                -1, inputs.image.shape[0]
+            )
 
             ID = numpy.arange(img_flat.shape[0])
             n_feats = ID.shape[0]
@@ -255,28 +295,45 @@ def spec_unmix_spts_nnls(input_img, valid_msk_img, valid_msk_val, output_img, en
                 weights[...] = weight
                 img_flat = numpy.hstack([img_flat, weights])
 
-            unmix_sub_arr = pysptools.abundance_maps.amaps.NNLS(img_flat, otherargs.endmembers_arr)
+            unmix_sub_arr = pysptools.abundance_maps.amaps.NNLS(
+                img_flat, otherargs.endmembers_arr
+            )
 
             unmix_arr = numpy.zeros([n_feats, otherargs.n_endmembers])
             unmix_arr[ID] = unmix_sub_arr
 
-            out_arr = unmix_arr.reshape(inputs.image.shape[1], inputs.image.shape[2], otherargs.n_endmembers)
+            out_arr = unmix_arr.reshape(
+                inputs.image.shape[1], inputs.image.shape[2], otherargs.n_endmembers
+            )
             out_arr = numpy.moveaxis(out_arr, 2, 0)
             outputs.outimage = out_arr
         else:
-            outputs.outimage = numpy.zeros([otherargs.n_endmembers, inputs.image.shape[1], inputs.image.shape[2]],
-                                           dtype=numpy.float32)
+            outputs.outimage = numpy.zeros(
+                [otherargs.n_endmembers, inputs.image.shape[1], inputs.image.shape[2]],
+                dtype=numpy.float32,
+            )
 
     applier.apply(_applyNNLS, infiles, outfiles, otherargs, controls=aControls)
 
     if calc_stats:
-        rsgislib.imageutils.popImageStats(output_img, usenodataval=True, nodataval=0, calcpyramids=True)
+        rsgislib.imageutils.popImageStats(
+            output_img, use_no_data=True, no_data_val=0, calc_pyramids=True
+        )
 
 
-def spec_unmix_spts_fcls(input_img, valid_msk_img, valid_msk_val, output_img, endmembers_file, gdalformat='KEA', gain=1,
-                         calc_stats=True):
+def specUnmixSpTsFCLS(
+    input_img,
+    valid_msk_img,
+    valid_msk_val,
+    output_img,
+    endmembers_file,
+    gdalformat="KEA",
+    gain=1,
+    calc_stats=True,
+):
     """
-    This function performs spectral unmixing using a full constrained (non-negative and sum to 1) module using the pysptools module
+    This function performs spectral unmixing using a full constrained (non-negative
+    and sum to 1) module using the pysptools module
 
     Note, pysptools and cvxopt modules need to be installed to use this function.
 
@@ -284,26 +341,27 @@ def spec_unmix_spts_fcls(input_img, valid_msk_img, valid_msk_val, output_img, en
     :param valid_msk_img: an image file representing the valid data region
     :param valid_msk_val: image pixel value in the mask for the valid data region
     :param output_img: the output image file
-    :param endmembers_file: the endmembers (*.mtxt) file extracted using the rsgislib.zonalstats.extractAvgEndMembers function
+    :param endmembers_file: the endmembers (*.mtxt) file extracted using the
+                            rsgislib.zonalstats.extractAvgEndMembers function
     :param gdalformat: the output file format. (Default: KEA)
-    :param gain: A gain for the endmembers and image spectra (input spectra / gain = output spectra). If 1 then ignored.
-    :param calc_stats: Boolean specifying whether to calculate pyramids and metadata stats (Default: True)
+    :param gain: A gain for the endmembers and image spectra (input spectra / gain =
+                 output spectra). If 1 then ignored.
+    :param calc_stats: Boolean specifying whether to calculate pyramids and metadata
+                       stats (Default: True)
 
     """
     from rios import applier
-    import numpy
-    import rsgislib
     import rsgislib.imageutils
     import pysptools.abundance_maps.amaps
 
     try:
-        import tqdm
         progress_bar = rsgislib.TQDMProgressBar()
     except:
         from rios import cuiprogress
+
         progress_bar = cuiprogress.GDALProgressBar()
 
-    m, n, endmembers_arr = read_endmembers_mtxt(endmembers_file, gain)
+    m, n, endmembers_arr = readEndmembersMTXT(endmembers_file, gain)
 
     infiles = applier.FilenameAssociations()
     infiles.image = input_img
@@ -323,7 +381,9 @@ def spec_unmix_spts_fcls(input_img, valid_msk_img, valid_msk_val, output_img, en
 
     def _applyFCLS(info, inputs, outputs, otherargs):
         if numpy.any(inputs.valid_msk == otherargs.valid_msk_val):
-            img_flat = numpy.moveaxis(inputs.image, 0, 2).reshape(-1, inputs.image.shape[0])
+            img_flat = numpy.moveaxis(inputs.image, 0, 2).reshape(
+                -1, inputs.image.shape[0]
+            )
 
             ID = numpy.arange(img_flat.shape[0])
             n_feats = ID.shape[0]
@@ -338,28 +398,46 @@ def spec_unmix_spts_fcls(input_img, valid_msk_img, valid_msk_val, output_img, en
             if otherargs.gain > 1:
                 img_flat = img_flat / otherargs.gain
 
-            unmix_sub_arr = pysptools.abundance_maps.amaps.FCLS(img_flat, otherargs.endmembers_arr)
+            unmix_sub_arr = pysptools.abundance_maps.amaps.FCLS(
+                img_flat, otherargs.endmembers_arr
+            )
 
             unmix_arr = numpy.zeros([n_feats, otherargs.n_endmembers])
             unmix_arr[ID] = unmix_sub_arr
 
-            out_arr = unmix_arr.reshape(inputs.image.shape[1], inputs.image.shape[2], otherargs.n_endmembers)
+            out_arr = unmix_arr.reshape(
+                inputs.image.shape[1], inputs.image.shape[2], otherargs.n_endmembers
+            )
             out_arr = numpy.moveaxis(out_arr, 2, 0)
             outputs.outimage = out_arr
         else:
-            outputs.outimage = numpy.zeros([otherargs.n_endmembers, inputs.image.shape[1], inputs.image.shape[2]],
-                                           dtype=numpy.float32)
+            outputs.outimage = numpy.zeros(
+                [otherargs.n_endmembers, inputs.image.shape[1], inputs.image.shape[2]],
+                dtype=numpy.float32,
+            )
 
     applier.apply(_applyFCLS, infiles, outfiles, otherargs, controls=aControls)
 
     if calc_stats:
-        rsgislib.imageutils.popImageStats(output_img, usenodataval=True, nodataval=0, calcpyramids=True)
+        rsgislib.imageutils.popImageStats(
+            output_img, use_no_data=True, no_data_val=0, calc_pyramids=True
+        )
 
 
-def spec_unmix_pymcr_nnls(input_img, valid_msk_img, valid_msk_val, output_img, endmembers_file, gdalformat='KEA',
-                          gain=1, weight=None, calc_stats=True):
+def specUnmixPyMcrNNLS(
+    input_img,
+    valid_msk_img,
+    valid_msk_val,
+    output_img,
+    endmembers_file,
+    gdalformat="KEA",
+    gain=1,
+    weight=None,
+    calc_stats=True,
+):
     """
-    This function performs spectral unmixing using non-negative least squares using the pymcr module
+    This function performs spectral unmixing using non-negative least squares
+    using the pymcr module
 
     Note, pymcr needs to be installed to use this function.
 
@@ -367,36 +445,39 @@ def spec_unmix_pymcr_nnls(input_img, valid_msk_img, valid_msk_val, output_img, e
     :param valid_msk_img: an image file representing the valid data region
     :param valid_msk_val: image pixel value in the mask for the valid data region
     :param output_img: the output image file
-    :param endmembers_file: the endmembers (*.mtxt) file extracted using the rsgislib.zonalstats.extractAvgEndMembers function
+    :param endmembers_file: the endmembers (*.mtxt) file extracted using the
+                            rsgislib.zonalstats.extractAvgEndMembers function
     :param gdalformat: the output file format. (Default: KEA)
-    :param gain: A gain for the endmembers and image spectra (input spectra / gain = output spectra). If 1 then ignored.
-    :param weight: Optional (if None ignored) to provide a weight to implement the approach of Scarth et al (2010)
-                   adding a weight to the least squares optimisation to get the abundances to sum to 1.
-    :param calc_stats: Boolean specifying whether to calculate pyramids and metadata stats (Default: True)
+    :param gain: A gain for the endmembers and image spectra (input spectra / gain =
+                 output spectra). If 1 then ignored.
+    :param weight: Optional (if None ignored) to provide a weight to implement the
+                   approach of Scarth et al (2010) adding a weight to the least squares
+                   optimisation to get the abundances to sum to 1.
+    :param calc_stats: Boolean specifying whether to calculate pyramids and metadata
+                       stats (Default: True)
 
     References:
-            Scarth, P., Roder, A., & Schmidt, M. (2010). Tracking grazing pressure and climate
-            interaction—The role of Landsat fractional cover in time series analysis. Proceedings of
-            the 15th Australasian Remote Sensing and Photogrammetry ConferenceAustralia: Alice Springs.
+            Scarth, P., Roder, A., & Schmidt, M. (2010). Tracking grazing pressure
+            and climate interaction—The role of Landsat fractional cover in time
+            series analysis. Proceedings of the 15th Australasian Remote Sensing
+            and Photogrammetry Conference Australia: Alice Springs.
             http://dx.doi.org/10.6084/m9.ﬁgshare.94250.
 
     """
     from rios import applier
-    import numpy
-    import rsgislib
     import rsgislib.imageutils
     from pymcr.mcr import McrAR
-    from pymcr.regressors import OLS, NNLS
-    from pymcr.constraints import ConstraintNonneg, ConstraintNorm
+    from pymcr.regressors import NNLS
+    from pymcr.constraints import ConstraintNonneg
 
     try:
-        import tqdm
         progress_bar = rsgislib.TQDMProgressBar()
     except:
         from rios import cuiprogress
+
         progress_bar = cuiprogress.GDALProgressBar()
 
-    m, n, endmembers_arr = read_endmembers_mtxt(endmembers_file, gain, weight)
+    m, n, endmembers_arr = readEndmembersMTXT(endmembers_file, gain, weight)
 
     infiles = applier.FilenameAssociations()
     infiles.image = input_img
@@ -417,7 +498,9 @@ def spec_unmix_pymcr_nnls(input_img, valid_msk_img, valid_msk_val, output_img, e
 
     def _apply_pymcr_nnls(info, inputs, outputs, otherargs):
         if numpy.any(inputs.valid_msk == otherargs.valid_msk_val):
-            img_flat = numpy.moveaxis(inputs.image, 0, 2).reshape(-1, inputs.image.shape[0])
+            img_flat = numpy.moveaxis(inputs.image, 0, 2).reshape(
+                -1, inputs.image.shape[0]
+            )
 
             ID = numpy.arange(img_flat.shape[0])
             n_feats = ID.shape[0]
@@ -437,29 +520,49 @@ def spec_unmix_pymcr_nnls(input_img, valid_msk_img, valid_msk_val, output_img, e
                 weights[...] = weight
                 img_flat = numpy.hstack([img_flat, weights])
 
-            mcrar = McrAR(max_iter=100, st_regr=NNLS(), c_regr=NNLS(), c_constraints=[ConstraintNonneg()])
+            mcrar = McrAR(
+                max_iter=100,
+                st_regr=NNLS(),
+                c_regr=NNLS(),
+                c_constraints=[ConstraintNonneg()],
+            )
             mcrar.fit(img_flat, ST=otherargs.endmembers_arr)
 
             unmix_arr = numpy.zeros([n_feats, otherargs.n_endmembers])
             unmix_arr[ID] = mcrar.C_opt_
 
-            out_arr = unmix_arr.reshape(inputs.image.shape[1], inputs.image.shape[2], otherargs.n_endmembers)
+            out_arr = unmix_arr.reshape(
+                inputs.image.shape[1], inputs.image.shape[2], otherargs.n_endmembers
+            )
             out_arr = numpy.moveaxis(out_arr, 2, 0)
             outputs.outimage = out_arr
         else:
-            outputs.outimage = numpy.zeros([otherargs.n_endmembers, inputs.image.shape[1], inputs.image.shape[2]],
-                                           dtype=numpy.float32)
+            outputs.outimage = numpy.zeros(
+                [otherargs.n_endmembers, inputs.image.shape[1], inputs.image.shape[2]],
+                dtype=numpy.float32,
+            )
 
     applier.apply(_apply_pymcr_nnls, infiles, outfiles, otherargs, controls=aControls)
 
     if calc_stats:
-        rsgislib.imageutils.popImageStats(output_img, usenodataval=True, nodataval=0, calcpyramids=True)
+        rsgislib.imageutils.popImageStats(
+            output_img, use_no_data=True, no_data_val=0, calc_pyramids=True
+        )
 
 
-def spec_unmix_pymcr_fcls(input_img, valid_msk_img, valid_msk_val, output_img, endmembers_file, gdalformat='KEA',
-                          gain=1, calc_stats=True):
+def specUnmixPyMcrFCLS(
+    input_img,
+    valid_msk_img,
+    valid_msk_val,
+    output_img,
+    endmembers_file,
+    gdalformat="KEA",
+    gain=1,
+    calc_stats=True,
+):
     """
-    This function performs spectral unmixing using a full constrained (non-negative and sum to 1) module using the pymcr module
+    This function performs spectral unmixing using a full constrained (non-negative
+    and sum to 1) module using the pymcr module
 
     Note, pymcr needs to be installed to use this function.
 
@@ -467,28 +570,29 @@ def spec_unmix_pymcr_fcls(input_img, valid_msk_img, valid_msk_val, output_img, e
     :param valid_msk_img: an image file representing the valid data region
     :param valid_msk_val: image pixel value in the mask for the valid data region
     :param output_img: the output image file
-    :param endmembers_file: the endmembers (*.mtxt) file extracted using the rsgislib.zonalstats.extractAvgEndMembers function
+    :param endmembers_file: the endmembers (*.mtxt) file extracted using the
+                            rsgislib.zonalstats.extractAvgEndMembers function
     :param gdalformat: the output file format. (Default: KEA)
-    :param gain: A gain for the endmembers and image spectra (input spectra / gain = output spectra). If 1 then ignored.
-    :param calc_stats: Boolean specifying whether to calculate pyramids and metadata stats (Default: True)
+    :param gain: A gain for the endmembers and image spectra (input spectra / gain =
+                 output spectra). If 1 then ignored.
+    :param calc_stats: Boolean specifying whether to calculate pyramids and metadata
+                       stats (Default: True)
 
     """
     from rios import applier
-    import numpy
-    import rsgislib
     import rsgislib.imageutils
     from pymcr.mcr import McrAR
-    from pymcr.regressors import OLS, NNLS
+    from pymcr.regressors import NNLS
     from pymcr.constraints import ConstraintNonneg, ConstraintNorm
 
     try:
-        import tqdm
         progress_bar = rsgislib.TQDMProgressBar()
     except:
         from rios import cuiprogress
+
         progress_bar = cuiprogress.GDALProgressBar()
 
-    m, n, endmembers_arr = read_endmembers_mtxt(endmembers_file, gain)
+    m, n, endmembers_arr = readEndmembersMTXT(endmembers_file, gain)
 
     infiles = applier.FilenameAssociations()
     infiles.image = input_img
@@ -508,7 +612,9 @@ def spec_unmix_pymcr_fcls(input_img, valid_msk_img, valid_msk_val, output_img, e
 
     def _apply_pymcr_fcls(info, inputs, outputs, otherargs):
         if numpy.any(inputs.valid_msk == otherargs.valid_msk_val):
-            img_flat = numpy.moveaxis(inputs.image, 0, 2).reshape(-1, inputs.image.shape[0])
+            img_flat = numpy.moveaxis(inputs.image, 0, 2).reshape(
+                -1, inputs.image.shape[0]
+            )
 
             ID = numpy.arange(img_flat.shape[0])
             n_feats = ID.shape[0]
@@ -523,47 +629,57 @@ def spec_unmix_pymcr_fcls(input_img, valid_msk_img, valid_msk_val, output_img, e
             if otherargs.gain > 1:
                 img_flat = img_flat / otherargs.gain
 
-            mcrar = McrAR(max_iter=200, st_regr=NNLS(), c_regr=NNLS(),
-                          c_constraints=[ConstraintNonneg(), ConstraintNorm()])
+            mcrar = McrAR(
+                max_iter=200,
+                st_regr=NNLS(),
+                c_regr=NNLS(),
+                c_constraints=[ConstraintNonneg(), ConstraintNorm()],
+            )
             mcrar.fit(img_flat, ST=otherargs.endmembers_arr)
 
             unmix_arr = numpy.zeros([n_feats, otherargs.n_endmembers])
             unmix_arr[ID] = mcrar.C_opt_
 
-            out_arr = unmix_arr.reshape(inputs.image.shape[1], inputs.image.shape[2], otherargs.n_endmembers)
+            out_arr = unmix_arr.reshape(
+                inputs.image.shape[1], inputs.image.shape[2], otherargs.n_endmembers
+            )
             out_arr = numpy.moveaxis(out_arr, 2, 0)
             outputs.outimage = out_arr
         else:
-            outputs.outimage = numpy.zeros([otherargs.n_endmembers, inputs.image.shape[1], inputs.image.shape[2]],
-                                           dtype=numpy.float32)
+            outputs.outimage = numpy.zeros(
+                [otherargs.n_endmembers, inputs.image.shape[1], inputs.image.shape[2]],
+                dtype=numpy.float32,
+            )
 
     applier.apply(_apply_pymcr_fcls, infiles, outfiles, otherargs, controls=aControls)
 
     if calc_stats:
-        rsgislib.imageutils.popImageStats(output_img, usenodataval=True, nodataval=0, calcpyramids=True)
+        rsgislib.imageutils.popImageStats(
+            output_img, use_no_data=True, no_data_val=0, calc_pyramids=True
+        )
 
 
-def rescale_unmixing_results(input_img, output_img, gdalformat='KEA', calc_stats=True):
+def rescaleUnmixingResults(input_img, output_img, gdalformat="KEA", calc_stats=True):
     """
     A function which rescales an output from a spectral unmixing
-    (e.g., rsgislib.imagecalc.specunmixing.spec_unmix_spts_ucls) so that
+    (e.g., rsgislib.imagecalc.specunmixing.specUnmixSpTsUCLS) so that
     negative values are removed (set to 0) and each pixel sums to 1.
 
-    :param inputImg: Input image with the spectral unmixing result (pixels need to range from 0-1)
-    :param outputImg: Output image with the result of the rescaling (pixel values will be in range 0-1 without scale factor > 1)
+    :param inputImg: Input image with the spectral unmixing result
+                     (pixels need to range from 0-1)
+    :param outputImg: Output image with the result of the rescaling (pixel values
+                      will be in range 0-1 without scale factor > 1)
     :param gdalformat: the file format of the output file.
     :param calc_stats: if true then image statistics and pyramids for the output image.
 
     """
     from rios import applier
-    import numpy
-    import rsgislib
 
     try:
-        import tqdm
         progress_bar = rsgislib.TQDMProgressBar()
     except:
         from rios import cuiprogress
+
         progress_bar = cuiprogress.GDALProgressBar()
 
     infiles = applier.FilenameAssociations()
@@ -585,38 +701,45 @@ def rescale_unmixing_results(input_img, output_img, gdalformat='KEA', calc_stats
         outputs.outimage = numpy.zeros_like(inputs.image, dtype=numpy.float32)
 
         for idx in range(inputs.image.shape[0]):
-            outputs.outimage[idx] = (inputs.image[idx] / numpy.sum(inputs.image, axis=0))
+            outputs.outimage[idx] = inputs.image[idx] / numpy.sum(inputs.image, axis=0)
 
-        outputs.outimage = numpy.where(numpy.isfinite(outputs.outimage), outputs.outimage, 0)
+        outputs.outimage = numpy.where(
+            numpy.isfinite(outputs.outimage), outputs.outimage, 0
+        )
 
     applier.apply(_applyUnmixRescale, infiles, outfiles, otherargs, controls=aControls)
 
     if calc_stats:
-        rsgislib.imageutils.popImageStats(output_img, usenodataval=True, nodataval=0, calcpyramids=True)
+        rsgislib.imageutils.popImageStats(
+            output_img, use_no_data=True, no_data_val=0, calc_pyramids=True
+        )
 
 
-def predict_refl_linear_unmixing(in_unmix_coefs_img, endmembers_file, output_img, gdalformat='KEA', calc_stats=True):
+def predictReflLinearUnmixing(
+    in_unmix_coefs_img, endmembers_file, output_img, gdalformat="KEA", calc_stats=True
+):
     """
-    A function to calculate the predicted pixel value using the inputted abundances and endmembers.
+    A function to calculate the predicted pixel value using the inputted
+    abundances and endmembers.
 
     :param in_unmix_coefs_img: The unmixed abundance coefficients.
-    :param endmembers_file: The endmembers file used for the unmixing in the RSGISLib mtxt format.
+    :param endmembers_file: The endmembers file used for the unmixing in the
+                            RSGISLib mtxt format.
     :param output_img: The file path to the GDAL writable output image
     :param gdalformat: The output image format to be used.
-    :param calc_stats: If True (default) then image statistics and pyramids are calculated for the output images
+    :param calc_stats: If True (default) then image statistics and pyramids are
+                       calculated for the output images
 
     """
     from rios import applier
-    import numpy
-    import rsgislib
 
     try:
-        import tqdm
         progress_bar = rsgislib.TQDMProgressBar()
     except:
         from rios import cuiprogress
+
         progress_bar = cuiprogress.GDALProgressBar()
-    endmembers_info = read_endmembers_mtxt(endmembers_file)
+    endmembers_info = readEndmembersMTXT(endmembers_file)
 
     infiles = applier.FilenameAssociations()
     infiles.image_unmix = in_unmix_coefs_img
@@ -636,48 +759,69 @@ def predict_refl_linear_unmixing(in_unmix_coefs_img, endmembers_file, output_img
         """
         This is an internal rios function
         """
-        img_flat = numpy.moveaxis(inputs.image_unmix, 0, 2).reshape(-1, inputs.image_unmix.shape[0])
+        img_flat = numpy.moveaxis(inputs.image_unmix, 0, 2).reshape(
+            -1, inputs.image_unmix.shape[0]
+        )
 
-        pred_refl = numpy.zeros((img_flat.shape[0], otherargs.endmembers_p), dtype=numpy.float32)
+        pred_refl = numpy.zeros(
+            (img_flat.shape[0], otherargs.endmembers_p), dtype=numpy.float32
+        )
         for i in range(img_flat.shape[0]):
             for q in range(otherargs.endmembers_q):
-                pred_refl[i] = pred_refl[i] + (img_flat[i, q] * otherargs.endmembers_arr[q])
+                pred_refl[i] = pred_refl[i] + (
+                    img_flat[i, q] * otherargs.endmembers_arr[q]
+                )
 
-        out_arr = pred_refl.reshape(inputs.image_unmix.shape[1], inputs.image_unmix.shape[2], otherargs.endmembers_p)
+        out_arr = pred_refl.reshape(
+            inputs.image_unmix.shape[1],
+            inputs.image_unmix.shape[2],
+            otherargs.endmembers_p,
+        )
         outputs.outimage = numpy.moveaxis(out_arr, 2, 0)
 
     applier.apply(_predict_refl_img, infiles, outfiles, otherargs, controls=aControls)
 
     if calc_stats:
         import rsgislib.imageutils
-        rsgislib.imageutils.popImageStats(output_img, usenodataval=True, nodataval=0, calcpyramids=True)
+
+        rsgislib.imageutils.popImageStats(
+            output_img, use_no_data=True, no_data_val=0, calc_pyramids=True
+        )
 
 
-def calc_unmixing_rmse_residualerr(input_img, input_unmix_img, endmembers_file, output_img, gdalformat='KEA',
-                                   calc_stats=True):
+def calcUnmixingRMSEResidualErr(
+    input_img,
+    input_unmix_img,
+    endmembers_file,
+    output_img,
+    gdalformat="KEA",
+    calc_stats=True,
+):
     """
-    A function to calculate the prediction residual and RMSE using the defined abundances and endmembers.
+    A function to calculate the prediction residual and RMSE using the defined
+    abundances and endmembers.
 
     :param input_refl_img: The original input reference image.
     :param input_unmix_coef_img: The unmixed abundance coefficients.
-    :param endmembers_file: The endmembers file used for the unmixing in the RSGISLib mtxt format.
-    :param output_image: The file path to the GDAL writable output image (Band 1: RMSE, Band 2: Residual)
+    :param endmembers_file: The endmembers file used for the unmixing in the
+                            RSGISLib mtxt format.
+    :param output_image: The file path to the GDAL writable output image
+                         (Band 1: RMSE, Band 2: Residual)
     :param gdalformat: The output image format to be used.
-    :param calc_stats: If True (default) then image statistics and pyramids are calculated for the output images
+    :param calc_stats: If True (default) then image statistics and pyramids are
+                       calculated for the output images
 
     """
     from rios import applier
-    import numpy
-    import rsgislib
 
     try:
-        import tqdm
         progress_bar = rsgislib.TQDMProgressBar()
     except:
         from rios import cuiprogress
+
         progress_bar = cuiprogress.GDALProgressBar()
 
-    endmembers_info = read_endmembers_mtxt(endmembers_file)
+    endmembers_info = readEndmembersMTXT(endmembers_file)
 
     infiles = applier.FilenameAssociations()
     infiles.image_orig = input_img
@@ -699,24 +843,34 @@ def calc_unmixing_rmse_residualerr(input_img, input_unmix_img, endmembers_file, 
         This is an internal rios function
         """
         block_refl_shp = inputs.image_orig.shape
-        img_orig_refl_flat = numpy.moveaxis(inputs.image_orig, 0, 2).reshape(-1, inputs.image_orig.shape[0])
-        img_unmix_coef_flat = numpy.moveaxis(inputs.image_unmix, 0, 2).reshape(-1, inputs.image_unmix.shape[0])
+        img_orig_refl_flat = numpy.moveaxis(inputs.image_orig, 0, 2).reshape(
+            -1, inputs.image_orig.shape[0]
+        )
+        img_unmix_coef_flat = numpy.moveaxis(inputs.image_unmix, 0, 2).reshape(
+            -1, inputs.image_unmix.shape[0]
+        )
         img_flat_shp = img_orig_refl_flat.shape
 
         img_orig_refl_nodata = numpy.where(img_orig_refl_flat == 0, True, False)
         img_orig_refl_flat_nodata = numpy.all(img_orig_refl_nodata, axis=1)
 
         ID = numpy.arange(img_flat_shp[0])
-        ID = ID[img_orig_refl_flat_nodata == False]
-        img_orig_refl_flat_data = img_orig_refl_flat[img_orig_refl_flat_nodata == False, ...]
-        img_unmix_coef_flat_data = img_unmix_coef_flat[img_orig_refl_flat_nodata == False, ...]
+        ID = ID[numpy.logical_not(img_orig_refl_flat_nodata)]
+        img_orig_refl_flat_data = img_orig_refl_flat[
+            numpy.logical_not(img_orig_refl_flat_nodata), ...
+        ]
+        img_unmix_coef_flat_data = img_unmix_coef_flat[
+            numpy.logical_not(img_orig_refl_flat_nodata), ...
+        ]
 
         img_nodata_flat_shp = img_unmix_coef_flat_data.shape
 
         pred_refl = numpy.zeros_like(img_orig_refl_flat_data, dtype=float)
         for i in range(img_nodata_flat_shp[0]):
             for q in range(otherargs.endmembers_q):
-                pred_refl[i] = pred_refl[i] + (img_unmix_coef_flat_data[i, q] * otherargs.endmembers_arr[q])
+                pred_refl[i] = pred_refl[i] + (
+                    img_unmix_coef_flat_data[i, q] * otherargs.endmembers_arr[q]
+                )
 
         # Calc Diff
         diff = img_orig_refl_flat_data - pred_refl
@@ -735,10 +889,16 @@ def calc_unmixing_rmse_residualerr(input_img, input_unmix_img, endmembers_file, 
         outarr = outarr.T
         outputs.outimage = outarr.reshape((2, block_refl_shp[1], block_refl_shp[2]))
 
-    applier.apply(_calc_unmix_err_rmse, infiles, outfiles, otherargs, controls=aControls)
+    applier.apply(
+        _calc_unmix_err_rmse, infiles, outfiles, otherargs, controls=aControls
+    )
 
     if calc_stats:
         import rsgislib.imageutils
-        rsgislib.imageutils.setBandNames(output_img, ['RMSE', 'Residual'], feedback=False)
-        rsgislib.imageutils.popImageStats(output_img, usenodataval=False, nodataval=0, calcpyramids=True)
 
+        rsgislib.imageutils.setBandNames(
+            output_img, ["RMSE", "Residual"], feedback=False
+        )
+        rsgislib.imageutils.popImageStats(
+            output_img, use_no_data=False, no_data_val=0, calc_pyramids=True
+        )

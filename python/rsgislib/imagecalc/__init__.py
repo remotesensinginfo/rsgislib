@@ -1615,6 +1615,13 @@ def areImgBandsEqual(
     def _calcBandPropEqual(info, inputs, outputs, otherargs):
         ref_pxls = inputs.in_ref_img[otherargs.ref_band_idx, ...].flatten()
         cmp_pxls = inputs.in_cmp_img[otherargs.cmp_band_idx, ...].flatten()
+
+        cmp_pxls = cmp_pxls[~numpy.isnan(ref_pxls)]
+        ref_pxls = ref_pxls[~numpy.isnan(ref_pxls)]
+
+        ref_pxls = ref_pxls[~numpy.isnan(cmp_pxls)]
+        cmp_pxls = cmp_pxls[~numpy.isnan(cmp_pxls)]
+
         pxl_diff = numpy.abs(ref_pxls - cmp_pxls)
         eql_pxls = numpy.where(pxl_diff < otherargs.flt_dif, 1, 0)
 
