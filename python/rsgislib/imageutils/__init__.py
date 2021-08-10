@@ -3643,4 +3643,20 @@ values are between 0-1.
 
     applier.apply(_applyzeronodata, infiles, outfiles, otherargs, controls=aControls)
 
+def createVRTBandSubset(input_img, bands, out_vrt_img):
+    """
+    A function which creates a GDAL VRT for the input image with the bands selected in
+    the input list.
 
+    :param input_img: the input GDAL image
+    :param bands: a list of bands (in the order they will be in the VRT). Note, band
+                  numbering starts at 1.
+    :param out_vrt_img: the output VRT file.
+
+    """
+    from osgeo import gdal
+    import os
+    input_img = os.path.abspath(input_img)
+    vrt_options = gdal.BuildVRTOptions(bandList=bands)
+    my_vrt = gdal.BuildVRT(out_vrt_img, [input_img], options=vrt_options)
+    my_vrt = None
