@@ -2,7 +2,6 @@
 """
 The imagecalc module contains functions for performing a number of calculating on images.
 """
-from __future__ import print_function
 
 # import the C++ extension into this level
 from ._imagecalc import *
@@ -576,7 +575,6 @@ Function which rescales an input image base on a list of rescaling parameters.
     numpyDT = rsgislib.getNumpyDataType(datatype)
 
     try:
-        import tqdm
         progress_bar = rsgislib.TQDMProgressBar()
     except:
         from rios import cuiprogress
@@ -839,7 +837,6 @@ Warning, this function can be very slow. Use rsgislib.imagecalc.imagePixelColumn
     numpyDT = rsgislib.getNumpyDataType(datatype)
 
     try:
-        import tqdm
         progress_bar = rsgislib.TQDMProgressBar()
     except:
         from rios import cuiprogress
@@ -939,7 +936,6 @@ order:
             outputs.output_img[band * 2 + 1][numpy.isnan(outputs.output_img[band * 2 + 1])] = 0.0
 
     try:
-        import tqdm
         progress_bar = rsgislib.TQDMProgressBar()
     except:
         from rios import cuiprogress
@@ -1017,7 +1013,6 @@ def recodeIntRaster(input_img, output_img, recode_dict, keepvalsnotindict=True, 
 
 
     try:
-        import tqdm
         progress_bar = rsgislib.TQDMProgressBar()
     except:
         from rios import cuiprogress
@@ -1083,7 +1078,6 @@ def calcFillRegionsKNN(ref_img, ref_no_data, fill_regions_img, fill_region_val, 
         raise Exception("The reference image and fill regions image do not have the same projection.")
 
     try:
-        import tqdm
         progress_bar = rsgislib.TQDMProgressBar()
     except:
         from rios import cuiprogress
@@ -1220,7 +1214,6 @@ def areImgsEqual(in_ref_img, in_cmp_img, prop_eql=1.0, flt_dif=0.0001):
         raise Exception("The number of image bands is not the same between the two images.")
 
     try:
-        import tqdm
         progress_bar = rsgislib.TQDMProgressBar()
     except:
         from rios import cuiprogress
