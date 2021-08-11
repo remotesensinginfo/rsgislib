@@ -911,20 +911,26 @@ def calcUnmixingRMSEResidualErr(
 
         # Calc Diff
         diff = img_orig_refl_flat_data - pred_refl
+        norm_diff = diff / img_orig_refl_flat_data
 
         # Calc RMSE
-        diff_sq = diff * diff
+        diff_sq = numpy.square(diff)
         mean_sum_diff_sq = numpy.sum(diff_sq, axis=1) / otherargs.endmembers_p
         rmse_arr = numpy.sqrt(mean_sum_diff_sq)
+
+        # Calc RMSPE
+        norm_diff_sq = numpy.square(norm_diff)
+        norm_mean_sum_diff_sq = numpy.sum(norm_diff_sq, axis=1) / otherargs.endmembers_p
+        rmspe_arr = numpy.sqrt(norm_mean_sum_diff_sq) * 100.0
 
         # Calc Residual Error
         abs_diff = numpy.absolute(diff)
         residual_arr = numpy.sum(abs_diff, axis=1) / otherargs.endmembers_p
 
-        outarr = numpy.zeros((img_flat_shp[0], 2))
-        outarr[ID] = numpy.stack([rmse_arr, residual_arr], axis=-1)
+        outarr = numpy.zeros((img_flat_shp[0], 3))
+        outarr[ID] = numpy.stack([rmse_arr, rmspe_arr, residual_arr], axis=-1)
         outarr = outarr.T
-        outputs.outimage = outarr.reshape((2, block_refl_shp[1], block_refl_shp[2]))
+        outputs.outimage = outarr.reshape((3, block_refl_shp[1], block_refl_shp[2]))
 
     applier.apply(
         _calc_unmix_err_rmse, infiles, outfiles, otherargs, controls=aControls
@@ -934,7 +940,7 @@ def calcUnmixingRMSEResidualErr(
         import rsgislib.imageutils
 
         rsgislib.imageutils.setBandNames(
-            output_img, ["RMSE", "Residual"], feedback=False
+            output_img, ["RMSE", "RMSPE", "Residual"], feedback=False
         )
         rsgislib.imageutils.popImageStats(
             output_img, use_no_data=False, no_data_val=0, calc_pyramids=True
