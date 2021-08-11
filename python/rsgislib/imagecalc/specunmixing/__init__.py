@@ -32,11 +32,40 @@
 #
 ############################################################################
 
+import os
+
+import osgeo.gdal as gdal
 import numpy
 
 # import the C++ extension into this level
 from ._specunmixing import *
 import rsgislib
+
+
+class ImageEndmemberInfo(object):
+    """
+    Create a list of these objects to pass to the summariseMultiEndmemberLinearUnmixing
+    function
+
+    :param in_unmix_img: is the input image file with the linear unmixed results.
+    :param endmembers_file: is the endmembers file (.mtxt) used to produce
+                            the in_unmix_img.
+    :param endmember_names: is the names of the endmembers in the order they are
+                            provided within the endmembers_file.
+
+    """
+
+    def __init__(self, in_unmix_img, endmembers_file, endmember_names):
+        """
+        :param in_unmix_img: is the input image file with the linear unmixed results.
+        :param endmembers_file: is the endmembers file (.mtxt) used to produce
+                                the in_unmix_img.
+        :param endmember_names: is the names of the endmembers in the order they are
+                                provided within the endmembers_file.
+        """
+        self.in_unmix_img = in_unmix_img
+        self.endmembers_file = endmembers_file
+        self.endmember_names = endmember_names
 
 
 def readEndmembersMTXT(endmembers_file, gain=1, weight=None):
@@ -107,11 +136,7 @@ def plotEndmembers(
     """
     import matplotlib.pyplot as plt
 
-    (
-        n_endmembers,
-        n_bands,
-        endmembers,
-    ) = rsgislib.imagecalc.specunmixing.readEndmembersMTXT(endmembers_file, gain=gain)
+    n_endmembers, n_bands, endmembers = readEndmembersMTXT(endmembers_file, gain=gain)
 
     x_axis_lbl = "Wavelength"
 
@@ -205,7 +230,7 @@ def specUnmixSpTsUCLS(
     :param valid_msk_val: image pixel value in the mask for the valid data region
     :param output_img: the output image file
     :param endmembers_file: the endmembers (*.mtxt) file extracted using the
-                            rsgislib.zonalstats.extractAvgEndMembers function
+                            specunmixing.extractAvgEndMembers function
     :param gdalformat: the output file format. (Default: KEA)
     :param gain: A gain for the endmembers and image spectra (input spectra / gain =
                  output spectra). If 1 then ignored.
@@ -326,7 +351,7 @@ def specUnmixSpTsNNLS(
     :param valid_msk_val: image pixel value in the mask for the valid data region
     :param output_img: the output image file
     :param endmembers_file: the endmembers (*.mtxt) file extracted using the
-                            rsgislib.zonalstats.extractAvgEndMembers function
+                            specunmixing.extractAvgEndMembers function
     :param gdalformat: the output file format. (Default: KEA)
     :param gain: A gain for the endmembers and image spectra (input spectra / gain =
                  output spectra). If 1 then ignored.
@@ -445,7 +470,7 @@ def specUnmixSpTsFCLS(
     :param valid_msk_val: image pixel value in the mask for the valid data region
     :param output_img: the output image file
     :param endmembers_file: the endmembers (*.mtxt) file extracted using the
-                            rsgislib.zonalstats.extractAvgEndMembers function
+                            specunmixing.extractAvgEndMembers function
     :param gdalformat: the output file format. (Default: KEA)
     :param gain: A gain for the endmembers and image spectra (input spectra / gain =
                  output spectra). If 1 then ignored.
@@ -549,7 +574,7 @@ def specUnmixPyMcrNNLS(
     :param valid_msk_val: image pixel value in the mask for the valid data region
     :param output_img: the output image file
     :param endmembers_file: the endmembers (*.mtxt) file extracted using the
-                            rsgislib.zonalstats.extractAvgEndMembers function
+                            specunmixing.extractAvgEndMembers function
     :param gdalformat: the output file format. (Default: KEA)
     :param gain: A gain for the endmembers and image spectra (input spectra / gain =
                  output spectra). If 1 then ignored.
@@ -674,7 +699,7 @@ def specUnmixPyMcrFCLS(
     :param valid_msk_val: image pixel value in the mask for the valid data region
     :param output_img: the output image file
     :param endmembers_file: the endmembers (*.mtxt) file extracted using the
-                            rsgislib.zonalstats.extractAvgEndMembers function
+                            specunmixing.extractAvgEndMembers function
     :param gdalformat: the output file format. (Default: KEA)
     :param gain: A gain for the endmembers and image spectra (input spectra / gain =
                  output spectra). If 1 then ignored.
@@ -903,15 +928,22 @@ def calcUnmixingRMSEResidualErr(
     calc_stats=True,
 ):
     """
-    A function to calculate the prediction residual and RMSE using the defined
+    A function to calculate the prediction residual, RMSE and RMSPE using the defined
     abundances and endmembers.
+
+    RMSE: Root Mean Squared Error
+    RMSPE: Root Mean Squared Percentage Error
+
+    Note. the residual and RMSE will be scaled with the input data so if you have
+    multiplied your reflectance values by 1000 (i.e., range 0 - 1000) then the
+    residual and RMSE values will also be in this range.
 
     :param input_refl_img: The original input reference image.
     :param input_unmix_coef_img: The unmixed abundance coefficients.
     :param endmembers_file: The endmembers file used for the unmixing in the
                             RSGISLib mtxt format.
     :param output_image: The file path to the GDAL writable output image
-                         (Band 1: RMSE, Band 2: Residual)
+                         (Band 1: RMSE,  Band 2: RMSPE, Band 3: Residual)
     :param gdalformat: The output image format to be used.
     :param calc_stats: If True (default) then image statistics and pyramids are
                        calculated for the output images
@@ -1012,4 +1044,195 @@ def calcUnmixingRMSEResidualErr(
         )
         rsgislib.imageutils.popImageStats(
             output_img, use_no_data=False, no_data_val=0, calc_pyramids=True
+        )
+
+
+def summariseMultiEndmemberLinearUnmixing(
+    input_img,
+    in_unmixed_datasets,
+    out_unmix_img,
+    out_ref_img,
+    tmp_dir="./tmp",
+    gdalformat="KEA",
+    calc_stats=True,
+):
+    """
+    A function which merges multiple linear spectral unmixing results using different
+    methods of unmixing, endmembers and number of endmembers so create a single
+    combined unmixed result. The Root Mean Square Percentage Error (RMSPE) is used
+    to identified which unmixing is the 'best' on a per-pixel basis.
+
+    :param input_img: the original input reflectance image file.
+    :param in_unmixed_datasets: a list of ImageEndmemberInfo objects with the unmixed
+                                image, endmember file and list of endmember names.
+    :param out_unmix_img: the output summarised unmixed image.
+    :param out_ref_img: the output reference image referencing the image/endmembers
+                        associated with each pixel. If the KEA format is used then
+                        the RAT will be populated with the file path to the endmembers
+    :param tmp_dir: a tmp directory where outputs will be written during processing and
+                    can be deleted once processing is finished.
+    :param gdalformat: output image file format (Default: KEA)
+    :param calc_stats: Specify whether image pyramids and statistics will be calculated.
+                       (Default: True). If True and the output file format is KEA then
+                       the reference image RAT will be populated with the endmember
+                       file names.
+
+    """
+
+    from rsgislib.tools import filetools
+    import rsgislib.imagecalc
+    import rsgislib.imageutils
+    import rsgislib.rastergis
+
+    if not os.path.exists(tmp_dir):
+        os.mkdir(tmp_dir)
+
+    if not isinstance(in_unmixed_datasets, list):
+        raise Exception("in_unmixed_datasets must be a list")
+
+    endmember_names = list()
+    for unmixed_dataset in in_unmixed_datasets:
+        if not isinstance(unmixed_dataset, ImageEndmemberInfo):
+            raise Exception(
+                "in_unmixed_datasets must contain a list of "
+                "ImageEndmemberInfo instances."
+            )
+        if not isinstance(unmixed_dataset.endmember_names, list):
+            raise Exception("unmixed_dataset.endmember_names must be a list")
+
+        if rsgislib.imageutils.getImageBandCount(unmixed_dataset.in_unmix_img) != len(
+            unmixed_dataset.endmember_names
+        ):
+            print(unmixed_dataset.in_unmix_img)
+            print(unmixed_dataset.endmember_names)
+            raise Exception(
+                "The number of bands in the unmixed_dataset.in_unmix_img "
+                " and the number of endmember names do not match"
+            )
+
+        for endmember_name in unmixed_dataset.endmember_names:
+            if endmember_name not in endmember_names:
+                endmember_names.append(endmember_name)
+    print("There are {} endmembers: {}".format(len(endmember_names), endmember_names))
+
+    endmember_name_bands = dict()
+    band = 0
+    for endmember_name in endmember_names:
+        endmember_name_bands[endmember_name] = band
+        band += 1
+
+    print(endmember_name_bands)
+
+    err_imgs_lst = list()
+    endmember_files = list()
+    for unmixed_dataset in in_unmixed_datasets:
+        basename = filetools.getFileBasename(unmixed_dataset.in_unmix_img)
+        out_err_img = os.path.join(tmp_dir, "{}_err_img.kea".format(basename))
+        calcUnmixingRMSEResidualErr(
+            input_img,
+            unmixed_dataset.in_unmix_img,
+            unmixed_dataset.endmembers_file,
+            out_err_img,
+            gdalformat="KEA",
+            calc_stats=False,
+        )
+        out_rmspe_img = os.path.join(tmp_dir, "{}_rmspe_img.vrt".format(basename))
+        rsgislib.imageutils.createVRTBandSubset(out_err_img, [2], out_rmspe_img)
+        err_imgs_lst.append(out_rmspe_img)
+        endmember_files.append(unmixed_dataset.endmembers_file)
+
+    rsgislib.imagecalc.getImgIdxForStat(
+        err_imgs_lst, out_ref_img, gdalformat, -999, rsgislib.SUMTYPE_MIN
+    )
+
+    if calc_stats and gdalformat == "KEA":
+        import rios.rat
+
+        # Pop Ref Image with stats
+        rsgislib.rastergis.populateStats(out_ref_img, True, True, True)
+
+        # Open the clumps dataset as a gdal dataset
+        ratDataset = gdal.Open(out_ref_img, gdal.GA_Update)
+        # Write colours to RAT
+        rios.rat.writeColumn(ratDataset, "Endmembers", endmember_files)
+        ratDataset = None
+    elif calc_stats:
+        rsgislib.imageutils.popImageStats(
+            out_ref_img, use_no_data=True, no_data_val=0, calc_pyramids=True
+        )
+
+    band_matched_unmixed_imgs = list()
+    for unmixed_dataset in in_unmixed_datasets:
+        basename = filetools.getFileBasename(unmixed_dataset.in_unmix_img)
+
+        band_order_matches = True
+        n_bands = rsgislib.imageutils.getImageBandCount(unmixed_dataset.in_unmix_img)
+        if n_bands != len(endmember_names):
+            band_order_matches = False
+
+        if band_order_matches:
+            for endmember_name, i in zip(
+                unmixed_dataset.endmember_names, range(n_bands)
+            ):
+                if endmember_name_bands[endmember_name] != i:
+                    band_order_matches = False
+                    break
+
+        if band_order_matches:
+            band_matched_unmixed_imgs.append(unmixed_dataset.in_unmix_img)
+        else:
+            img_band_to_stack = dict()
+            for endmember_name in endmember_name_bands:
+                img_band_to_stack[endmember_name_bands[endmember_name]] = ""
+
+            for endmember_name, i in zip(
+                unmixed_dataset.endmember_names, range(n_bands)
+            ):
+                band_img = os.path.join(tmp_dir, "{}_band_{}.vrt".format(basename, i))
+                rsgislib.imageutils.createVRTBandSubset(
+                    unmixed_dataset.in_unmix_img, [i + 1], band_img
+                )
+                img_band_to_stack[endmember_name_bands[endmember_name]] = band_img
+
+            first = True
+            zeros_img = os.path.join(tmp_dir, "{}_zeros_img.kea".format(basename))
+            for img_band_idx in img_band_to_stack:
+                if img_band_to_stack[img_band_idx] == "":
+                    if first:
+                        rsgislib.imageutils.createCopyImage(
+                            unmixed_dataset.in_unmix_img,
+                            zeros_img,
+                            1,
+                            0.0,
+                            "KEA",
+                            rsgislib.TYPE_32FLOAT,
+                        )
+                        first = False
+                    img_band_to_stack[img_band_idx] = zeros_img
+
+            band_to_stack = list()
+            for img_band_idx in sorted(img_band_to_stack):
+                band_to_stack.append(img_band_to_stack[img_band_idx])
+
+            band_ordered_unmix_stack_img = os.path.join(
+                tmp_dir, "{}_band_ordered_stack.vrt".format(basename)
+            )
+            rsgislib.imageutils.gdalStackImagesVRT(
+                band_to_stack, band_ordered_unmix_stack_img
+            )
+            band_matched_unmixed_imgs.append(band_ordered_unmix_stack_img)
+
+    rsgislib.imageutils.createRefImgCompositeImg(
+        band_matched_unmixed_imgs,
+        out_unmix_img,
+        out_ref_img,
+        gdalformat,
+        datatype=rsgislib.TYPE_32FLOAT,
+        out_no_data=0.0,
+    )
+
+    if calc_stats:
+        rsgislib.imageutils.setBandNames(out_unmix_img, endmember_names, feedback=False)
+        rsgislib.imageutils.popImageStats(
+            out_unmix_img, use_no_data=True, no_data_val=999, calc_pyramids=True
         )
