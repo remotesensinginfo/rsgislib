@@ -38,6 +38,7 @@ import numpy
 from ._specunmixing import *
 import rsgislib
 
+
 def readEndmembersMTXT(endmembers_file, gain=1, weight=None):
     """
     A function to read endmembers mtxt file
@@ -81,6 +82,70 @@ def readEndmembersMTXT(endmembers_file, gain=1, weight=None):
     return m, n, endmemarr
 
 
+def plotEndmembers(
+    endmembers_file,
+    endmember_names,
+    out_plot_file,
+    plot_title=None,
+    gain=1,
+    wavelengths=None,
+):
+    """
+    A function to plot endmembers for visualisation.
+
+    :param endmembers_file: input endmembers file (.mtxt)
+    :param endmember_names: the names of the endmembers in the same order as the
+                            endmembers_file.
+    :param out_plot_file: the output plot file.
+    :param plot_title: A title for the plot (Optional)
+    :param gain: A gain to get the reflectance values as a percentage (Optional)
+                 (e.g., if multiplied by 1000 then the gain would be 10
+                        if multiplied by 10,000 then the gain would be 100 )
+    :param wavelengths: A list of wavelengths for the image bands. Optional, if not
+                        provided then band numbers will be used.
+
+    """
+    import matplotlib.pyplot as plt
+
+    (
+        n_endmembers,
+        n_bands,
+        endmembers,
+    ) = rsgislib.imagecalc.specunmixing.readEndmembersMTXT(endmembers_file, gain=gain)
+
+    x_axis_lbl = "Wavelength"
+
+    if len(endmember_names) != n_endmembers:
+        raise Exception(
+            "The list of names provide does not match "
+            "the number of endmembers in the input file."
+        )
+    if (wavelengths is not None) and (not isinstance(wavelengths, list)):
+        raise Exception("If provided the wavelength variable must be a list")
+    elif (wavelengths is not None) and (len(wavelengths) != n_bands):
+        raise Exception(
+            "The number of wavelengths provided is not equal"
+            " to the number of image bands in the endmembers"
+        )
+    elif wavelengths is None:
+        wavelengths = range(n_bands)
+        x_axis_lbl = "Band"
+
+    fig = plt.figure(figsize=(7, 5), dpi=300)
+    ax1 = fig.add_subplot(111)
+
+    for i in range(n_endmembers):
+        ax1.plot(wavelengths, endmembers[i], label=endmember_names[i])
+
+    if plot_title is not None:
+        plt.title(plot_title)
+    plt.xlabel(x_axis_lbl)
+    plt.ylabel("Reflectance (%)")
+    plt.legend()
+
+    plt.savefig(out_plot_file)
+
+
 def areEndmembersEqual(ref_endmember_file, cmp_endmember_file, flt_dif=0.0001):
     """
     A function which compares two endmembers files to check whether they are
@@ -95,9 +160,11 @@ def areEndmembersEqual(ref_endmember_file, cmp_endmember_file, flt_dif=0.0001):
 
     """
     n_ref_endmembers, n_ref_bands, ref_endmembers = readEndmembersMTXT(
-        ref_endmember_file, gain=1, weight=None)
+        ref_endmember_file, gain=1, weight=None
+    )
     n_cmp_endmembers, n_cmp_bands, cmp_endmembers = readEndmembersMTXT(
-        cmp_endmember_file, gain=1, weight=None)
+        cmp_endmember_file, gain=1, weight=None
+    )
 
     if n_ref_endmembers != n_cmp_endmembers:
         return False
@@ -747,6 +814,7 @@ def rescaleUnmixingResults(input_img, output_img, gdalformat="KEA", calc_stats=T
 
     if calc_stats:
         import rsgislib.imageutils
+
         rsgislib.imageutils.popImageStats(
             output_img, use_no_data=True, no_data_val=0, calc_pyramids=True
         )
@@ -832,7 +900,7 @@ def calcUnmixingRMSEResidualErr(
     endmembers_file,
     output_img,
     gdalformat="KEA",
-    calc_stats=True
+    calc_stats=True,
 ):
     """
     A function to calculate the prediction residual and RMSE using the defined

@@ -168,6 +168,58 @@ def test_readEndmembersMTXT_gain():
             assert False
 
 
+def test_plotEndmembers_basic(tmp_path):
+    from rsgislib.imagecalc import specunmixing
+
+    endmembers_file = os.path.join(SPECUNMIX_DATA_DIR, "sen2_endmembers.mtxt")
+    endmember_names = ["PhotoVeg", "NonPhotoVeg", "Water"]
+    out_plot_file = os.path.join(tmp_path, "plot.png")
+    specunmixing.plotEndmembers(endmembers_file, endmember_names, out_plot_file)
+    assert os.path.exists(out_plot_file)
+
+
+def test_plotEndmembers_gain(tmp_path):
+    from rsgislib.imagecalc import specunmixing
+
+    endmembers_file = os.path.join(SPECUNMIX_DATA_DIR, "sen2_endmembers.mtxt")
+    endmember_names = ["PhotoVeg", "NonPhotoVeg", "Water"]
+    out_plot_file = os.path.join(tmp_path, "plot.png")
+    specunmixing.plotEndmembers(
+        endmembers_file, endmember_names, out_plot_file, gain=10
+    )
+    assert os.path.exists(out_plot_file)
+
+
+def test_plotEndmembers_title(tmp_path):
+    from rsgislib.imagecalc import specunmixing
+
+    endmembers_file = os.path.join(SPECUNMIX_DATA_DIR, "sen2_endmembers.mtxt")
+    endmember_names = ["PhotoVeg", "NonPhotoVeg", "Water"]
+    title = "Endmembers Plot"
+    out_plot_file = os.path.join(tmp_path, "plot.png")
+    specunmixing.plotEndmembers(
+        endmembers_file, endmember_names, out_plot_file, plot_title=title, gain=10
+    )
+    assert os.path.exists(out_plot_file)
+
+
+def test_plotEndmembers_wavelengths(tmp_path):
+    from rsgislib.imagecalc import specunmixing
+
+    endmembers_file = os.path.join(SPECUNMIX_DATA_DIR, "sen2_endmembers.mtxt")
+    endmember_names = ["PhotoVeg", "NonPhotoVeg", "Water"]
+    wavelengths = [490, 560, 665, 705, 740, 783, 842, 865, 1610, 2190]
+    out_plot_file = os.path.join(tmp_path, "plot.png")
+    specunmixing.plotEndmembers(
+        endmembers_file,
+        endmember_names,
+        out_plot_file,
+        gain=10,
+        wavelengths=wavelengths,
+    )
+    assert os.path.exists(out_plot_file)
+
+
 def test_areEndmembersEqual_True():
     from rsgislib.imagecalc import specunmixing
 
