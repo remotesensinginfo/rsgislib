@@ -122,7 +122,7 @@ Create a list of these objects to pass to the fillTimeSeriesGaps function
     def __repr__(self):
         return repr((self.year, self.day, self.compImg, self.imgRef, self.outRef))
 
-def set_envvars_lzw_gtiff_outs(bigtiff=True):
+def setEnvVarsLZWGTiffOuts(bigtiff=True):
     """
     Set environmental variables such that outputted
     GeoTIFF files are outputted as tiled and compressed.
