@@ -34,8 +34,9 @@
 
 import numpy
 
+# import the C++ extension into this level
+from ._specunmixing import *
 import rsgislib
-
 
 def readEndmembersMTXT(endmembers_file, gain=1, weight=None):
     """
@@ -78,6 +79,41 @@ def readEndmembersMTXT(endmembers_file, gain=1, weight=None):
         n += 1
 
     return m, n, endmemarr
+
+
+def areEndmembersEqual(ref_endmember_file, cmp_endmember_file, flt_dif=0.0001):
+    """
+    A function which compares two endmembers files to check whether they are
+    equal or not.
+
+    :param ref_endmember_file: File path to the mtxt input file.
+    :param cmp_endmember_file: File path to the mtxt input file.
+    :param flt_dif: A threshold for comparing two floating point numbers as being
+                    identical - this avoids issues with rounding and the number of
+                    decimal figures stored.
+    :return: boolean
+
+    """
+    n_ref_endmembers, n_ref_bands, ref_endmembers = readEndmembersMTXT(
+        ref_endmember_file, gain=1, weight=None)
+    n_cmp_endmembers, n_cmp_bands, cmp_endmembers = readEndmembersMTXT(
+        cmp_endmember_file, gain=1, weight=None)
+
+    if n_ref_endmembers != n_cmp_endmembers:
+        return False
+
+    if n_ref_bands != n_cmp_bands:
+        return False
+
+    endmembers_eq = True
+    for i in range(n_ref_endmembers):
+        for j in range(n_ref_bands):
+            if abs(ref_endmembers[i][j] - cmp_endmembers[i][j]) > flt_dif:
+                endmembers_eq = False
+                break
+        if not endmembers_eq:
+            break
+    return endmembers_eq
 
 
 def specUnmixSpTsUCLS(
@@ -710,6 +746,7 @@ def rescaleUnmixingResults(input_img, output_img, gdalformat="KEA", calc_stats=T
     applier.apply(_applyUnmixRescale, infiles, outfiles, otherargs, controls=aControls)
 
     if calc_stats:
+        import rsgislib.imageutils
         rsgislib.imageutils.popImageStats(
             output_img, use_no_data=True, no_data_val=0, calc_pyramids=True
         )
@@ -795,7 +832,7 @@ def calcUnmixingRMSEResidualErr(
     endmembers_file,
     output_img,
     gdalformat="KEA",
-    calc_stats=True,
+    calc_stats=True
 ):
     """
     A function to calculate the prediction residual and RMSE using the defined
