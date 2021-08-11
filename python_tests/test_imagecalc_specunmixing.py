@@ -581,35 +581,63 @@ def test_calcUnmixingRMSEResidualErr(tmp_path):
     img_eq, prop_match = rsgislib.imagecalc.areImgsEqual(ref_unmix_img, output_img)
     assert img_eq
 
+
 def test_summariseMultiEndmemberLinearUnmixing(tmp_path):
     from rsgislib.imagecalc import specunmixing
     import rsgislib.imagecalc
 
     input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset.kea")
 
-    endmembers_set1_file = os.path.join(SPECUNMIX_DATA_DIR, "endmember_rois_set1_extracted.mtxt")
-    endmembers_set2_file = os.path.join(SPECUNMIX_DATA_DIR, "endmember_rois_set2_extracted.mtxt")
-    endmembers_set3_file = os.path.join(SPECUNMIX_DATA_DIR, "endmember_rois_set3_extracted.mtxt")
+    endmembers_set1_file = os.path.join(
+        SPECUNMIX_DATA_DIR, "endmember_rois_set1_extracted.mtxt"
+    )
+    endmembers_set2_file = os.path.join(
+        SPECUNMIX_DATA_DIR, "endmember_rois_set2_extracted.mtxt"
+    )
+    endmembers_set3_file = os.path.join(
+        SPECUNMIX_DATA_DIR, "endmember_rois_set3_extracted.mtxt"
+    )
 
     unmix_set1_img = os.path.join(SPECUNMIX_DATA_DIR, "endmember_rois_set1_unmixed.kea")
     unmix_set2_img = os.path.join(SPECUNMIX_DATA_DIR, "endmember_rois_set2_unmixed.kea")
     unmix_set3_img = os.path.join(SPECUNMIX_DATA_DIR, "endmember_rois_set3_unmixed.kea")
 
     in_unmixed_datasets = list()
-    in_unmixed_datasets.append(specunmixing.ImageEndmemberInfo(unmix_set1_img, endmembers_set1_file, ["PhotoVeg", "NonPhotoVeg", "Water"]))
-    in_unmixed_datasets.append(specunmixing.ImageEndmemberInfo(unmix_set2_img, endmembers_set2_file, ["PhotoVeg", "NonPhotoVeg", "Water"]))
-    in_unmixed_datasets.append(specunmixing.ImageEndmemberInfo(unmix_set3_img, endmembers_set3_file, ["PhotoVeg", "NonPhotoVeg", "Water"]))
+    in_unmixed_datasets.append(
+        specunmixing.ImageEndmemberInfo(
+            unmix_set1_img, endmembers_set1_file, ["PhotoVeg", "NonPhotoVeg", "Water"]
+        )
+    )
+    in_unmixed_datasets.append(
+        specunmixing.ImageEndmemberInfo(
+            unmix_set2_img, endmembers_set2_file, ["PhotoVeg", "NonPhotoVeg", "Water"]
+        )
+    )
+    in_unmixed_datasets.append(
+        specunmixing.ImageEndmemberInfo(
+            unmix_set3_img, endmembers_set3_file, ["PhotoVeg", "NonPhotoVeg", "Water"]
+        )
+    )
 
     out_unmix_img = os.path.join(tmp_path, "multi_endmember_unmix_img.kea")
     out_ref_img = os.path.join(tmp_path, "multi_endmember_unmix_ref.kea")
     tmp_dir = os.path.join(tmp_path, "tmp")
-    specunmixing.summariseMultiEndmemberLinearUnmixing(input_img, in_unmixed_datasets, out_unmix_img, out_ref_img, tmp_dir)
+    specunmixing.summariseMultiEndmemberLinearUnmixing(
+        input_img, in_unmixed_datasets, out_unmix_img, out_ref_img, tmp_dir
+    )
 
-    unmix_multi_ref_img = os.path.join(SPECUNMIX_DATA_DIR, "sen2_20210527_aber_subset_multi_endmember_unmix_img.kea")
-    unmix_img_eq, prop_match_unmix = rsgislib.imagecalc.areImgsEqual(unmix_multi_ref_img, out_unmix_img)
+    unmix_multi_ref_img = os.path.join(
+        SPECUNMIX_DATA_DIR, "sen2_20210527_aber_subset_multi_endmember_unmix_img.kea"
+    )
+    unmix_img_eq, prop_match_unmix = rsgislib.imagecalc.areImgsEqual(
+        unmix_multi_ref_img, out_unmix_img
+    )
 
-    unmix_multi_ref_ref_img = os.path.join(SPECUNMIX_DATA_DIR, "sen2_20210527_aber_subset_multi_endmember_unmix_ref.kea")
-    ref_img_eq, prop_match_ref = rsgislib.imagecalc.areImgsEqual(unmix_multi_ref_ref_img, out_ref_img)
+    unmix_multi_ref_ref_img = os.path.join(
+        SPECUNMIX_DATA_DIR, "sen2_20210527_aber_subset_multi_endmember_unmix_ref.kea"
+    )
+    ref_img_eq, prop_match_ref = rsgislib.imagecalc.areImgsEqual(
+        unmix_multi_ref_ref_img, out_ref_img
+    )
 
     assert unmix_img_eq and ref_img_eq
-
