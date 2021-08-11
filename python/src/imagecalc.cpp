@@ -661,39 +661,6 @@ static PyObject *ImageCalc_CalculateRMSE(PyObject *self, PyObject *args, PyObjec
     return outVal;
 }
 
-static PyObject *ImageCalc_ExhconLinearSpecUnmix(PyObject *self, PyObject *args, PyObject *keywds)
-{
-    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
-                             RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("datatype"),
-                             RSGIS_PY_C_TEXT("endmember_file"), RSGIS_PY_C_TEXT("step_res"),
-                             RSGIS_PY_C_TEXT("gain"), RSGIS_PY_C_TEXT("offset"), nullptr};
-
-    const char *inputImage, *imageFormat, *outputFile, *endmembersFile;
-    float lsumGain = 1;
-    float lsumOffset = 0;
-    float stepResolution;
-    int datatype;
-
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "sssisf|ff:exhconLinearSpecUnmix", kwlist, &inputImage, &outputFile, &imageFormat, &datatype, &endmembersFile, &stepResolution, &lsumGain, &lsumOffset))
-    {
-        return nullptr;
-    }
-
-    rsgis::RSGISLibDataType type = (rsgis::RSGISLibDataType)datatype;
-
-    try
-    {
-        rsgis::cmds::executeExhconLinearSpecUnmix(inputImage, imageFormat, type, lsumGain, lsumOffset, outputFile, endmembersFile, stepResolution);
-    }
-    catch (rsgis::cmds::RSGISCmdException &e)
-    {
-        PyErr_SetString(GETSTATE(self)->error, e.what());
-        return nullptr;
-    }
-
-    Py_RETURN_NONE;
-}
-
 
 static PyObject *ImageCalc_AllBandsEqualTo(PyObject *self, PyObject *args, PyObject *keywds)
 {
@@ -2093,47 +2060,6 @@ static PyMethodDef ImageCalcMethods[] = {
 ":param inputImageB: is a string containing the name of the second input image file\n"
 ":param inputBandB: is an integer defining which band should be processed from inputImageB\n"
 ":return: float\n"
-"\n"
-},
-
-{"exhconLinearSpecUnmix", (PyCFunction)ImageCalc_ExhconLinearSpecUnmix, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imagecalc.exhconLinearSpecUnmix(inputImage, gdalformat, datatype, outputFile, endmembersFile, stepResolution, lsumGain, lsumOffset)\n"
-"Performs an exhaustive constrained linear spectral unmixing of the input image for a set of endmembers.\n"
-"\n**Warning. This methods is slow (!!) to execute**\n\n"
-"Endmember polygons are extracted using rsgislib.zonalstats.extractAvgEndMembers() where each polygon \n"
-"defines an endmember.\n"
-"\n"
-"Where:\n"
-"\n"
-":param inputImage: is a string containing the name of the input image file\n"
-":param gdalformat: is a string containing the GDAL format for the output file - eg KEA\n"
-":param datatype: is an containing one of the values from rsgislib.TYPE_*\n"
-":param outputFile: is a string containing the name of the output file\n"
-":param endmembersFile: is a string containing the names of the file containing the end members\n"
-":param stepResolution: is a float specifying the gap between steps in the search space. Value needs to be between 0 and 1. (i.e., 0.05)\n"
-":param lsumGain: is a float specifying a gain which can be applied to the output pixel values (outvalue = offset + (gain * value)). Optional, default = 1.\n"
-":param lsumOffset: is a float specifying an offset which can be applied to the output pixel values (outvalue = offset + (gain * value)). Optional, default = 0.\n"
-"\n"
-"Example::\n"
-"\n"
-"    import rsgislib.zonalstats\n"
-"    import rsgislib.imagecalc\n"
-"    import rsgislib\n"
-"\n"
-"    imageLSImage = \"./LS8_20130519_lat52lon42_r24p204_rad_srefstdmdl.kea\"\n"
-"    unmixedImage = \"./LS8_20130519_lat52lon42_r24p204_rad_srefstdmdl_unmix.kea\"\n"
-"    roiSHP = \"./ROIs.shp\"\n"
-"    endmembersFile = \"./endmembers\"\n"
-"\n"
-"    rsgislib.zonalstats.extractAvgEndMembers(imageLSImage, roiSHP, endmembersFile)\n"
-"\n"
-"    lsumGain = 1.0\n"
-"    lsumOffset = 0.0\n"
-"\n"
-"    endmembersFile = \"./endmembers.mtxt\"\n"
-"    stepResolution = 0.1\n"
-"    rsgislib.imagecalc.exhconLinearSpecUnmix(imageLSImage, \"KEA\", rsgislib.TYPE_32FLOAT, unmixedImage, endmembersFile, stepResolution, lsumGain, lsumOffset)\n"
-"\n"
 "\n"
 },
 
