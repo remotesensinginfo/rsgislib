@@ -64,7 +64,7 @@ def getGDALFormatFromExt(input_file):
     return gdalStr
 
 
-def get_file_basename(input_file, check_valid=False, n_comps=0):
+def getFileBasename(input_file, check_valid=False, n_comps=0):
     """
     Uses os.path module to return file basename (i.e., path and extension removed)
 
@@ -104,7 +104,7 @@ def get_file_basename(input_file, check_valid=False, n_comps=0):
     return basename
 
 
-def get_dir_name(input_file):
+def getDIRName(input_file):
     """
     A function which returns just the name of the directory of the input file
     without the rest of the path.
