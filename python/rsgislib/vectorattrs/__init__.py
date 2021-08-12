@@ -11,19 +11,19 @@ import osgeo.ogr as ogr
 
 def writeVecColumn(vec_file, vec_lyr, att_column, att_col_datatype, att_col_data):
     """
-A function which will write a column to a vector file
+    A function which will write a column to a vector file
 
-Where:
+    Where:
 
-:param vec_file: The file / path to the vector data 'file'.
-:param vec_lyr: The layer to which the data is to be added.
-:param att_column: Name of the output column
-:param att_col_datatype: ogr data type for the output column
-                        (e.g., ogr.OFTString, ogr.OFTInteger, ogr.OFTReal)
-:param att_col_data: A list of the same length as the number of features in vector file.
+    :param vec_file: The file / path to the vector data 'file'.
+    :param vec_lyr: The layer to which the data is to be added.
+    :param att_column: Name of the output column
+    :param att_col_datatype: ogr data type for the output column
+                            (e.g., ogr.OFTString, ogr.OFTInteger, ogr.OFTReal)
+    :param att_col_data: A list of the same length as the number of features
+                        in vector file.
 
-
-"""
+    """
     gdal.UseExceptions()
 
     ds = gdal.OpenEx(vec_file, gdal.OF_UPDATE)
@@ -38,8 +38,9 @@ Where:
     if not len(att_col_data) == numFeats:
         print("Number of Features: {}".format(numFeats))
         print("Length of Data: {}".format(len(att_col_data)))
-        raise Exception("The number of features and size of "
-                        "the input data is not equal.")
+        raise Exception(
+            "The number of features and size of " "the input data is not equal."
+        )
 
     colExists = False
     lyrDefn = lyr.GetLayerDefn()
@@ -51,9 +52,11 @@ Where:
     if not colExists:
         field_defn = ogr.FieldDefn(att_column, att_col_datatype)
         if lyr.CreateField(field_defn) != 0:
-            raise Exception("Creating '{}' field failed; becareful with case, "
-                            "some drivers are case insensitive but column might "
-                            "not be found.".format(att_column))
+            raise Exception(
+                "Creating '{}' field failed; becareful with case, "
+                "some drivers are case insensitive but column might "
+                "not be found.".format(att_column)
+            )
 
     lyr.ResetReading()
     # WORK AROUND AS SQLITE GETS STUCK IN LOOP ON FIRST FEATURE WHEN USE SETFEATURE.
@@ -85,24 +88,26 @@ Where:
         ds = None
     except Exception as e:
         if i < numFeats:
-            print("Data type of the value being "
-                  "written is '{}'".format(type(att_col_data[i])))
+            print(
+                "Data type of the value being "
+                "written is '{}'".format(type(att_col_data[i]))
+            )
         raise e
 
 
 def writeVecColumn2Layer(lyr, att_column, att_col_datatype, att_col_data):
     """
-A function which will write a column to a vector layer.
+    A function which will write a column to a vector layer.
 
-Where:
+    Where:
 
-:param lyr: GDAL/OGR vector layer object
-:param att_column: Name of the output column
-:param att_col_datatype: ogr data type for the output column
-                        (e.g., ogr.OFTString, ogr.OFTInteger, ogr.OFTReal)
-:param att_col_data: A list of the same length as the number of features in vector file.
-
-"""
+    :param lyr: GDAL/OGR vector layer object
+    :param att_column: Name of the output column
+    :param att_col_datatype: ogr data type for the output column
+                            (e.g., ogr.OFTString, ogr.OFTInteger, ogr.OFTReal)
+    :param att_col_data: A list of the same length as the number of features
+                         in vector file.
+    """
     gdal.UseExceptions()
 
     if lyr is None:
@@ -113,7 +118,8 @@ Where:
         print("Number of Features: {}".format(numFeats))
         print("Length of Data: {}".format(len(att_col_data)))
         raise Exception(
-            "The number of features and size of the input data is not equal.")
+            "The number of features and size of the input data is not equal."
+        )
 
     colExists = False
     lyrDefn = lyr.GetLayerDefn()
@@ -125,9 +131,11 @@ Where:
     if not colExists:
         field_defn = ogr.FieldDefn(att_column, att_col_datatype)
         if lyr.CreateField(field_defn) != 0:
-            raise Exception("Creating '{}' field failed; be careful with case, some "
-                            "drivers are case insensitive but column might not "
-                            "be found.".format(att_column))
+            raise Exception(
+                "Creating '{}' field failed; be careful with case, some "
+                "drivers are case insensitive but column might not "
+                "be found.".format(att_column)
+            )
 
     lyr.ResetReading()
     # WORK AROUND AS SQLITE GETS STUCK IN LOOP ON FIRST FEATURE WHEN USE SETFEATURE.
@@ -158,15 +166,14 @@ Where:
 
 def readVecColumn(vec_file, vec_lyr, att_column):
     """
-A function which will reads a column from a vector file
+    A function which will reads a column from a vector file
 
-Where:
+    Where:
 
-:param vec_file: The file / path to the vector data 'file'.
-:param vec_lyr: The layer to which the data is to be read from.
-:param att_column: Name of the input column
-
-"""
+    :param vec_file: The file / path to the vector data 'file'.
+    :param vec_lyr: The layer to which the data is to be read from.
+    :param att_column: Name of the input column
+    """
     gdal.UseExceptions()
 
     ds = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
@@ -186,8 +193,10 @@ Where:
 
     if not colExists:
         ds = None
-        raise Exception("The specified column does not exist in the input layer; "
-                        "check case as some drivers are case sensitive.")
+        raise Exception(
+            "The specified column does not exist in the input layer; "
+            "check case as some drivers are case sensitive."
+        )
 
     outVal = list()
     lyr.ResetReading()
@@ -200,15 +209,14 @@ Where:
 
 def readVecColumns(vec_file, vec_lyr, att_columns):
     """
-A function which will reads a column from a vector file
+    A function which will reads a column from a vector file
 
-Where:
+    Where:
 
-:param vec_file: The file / path to the vector data 'file'.
-:param vec_lyr: The layer to which the data is to be read from.
-:param att_columns: List of input attribute column names to be read in.
-
-"""
+    :param vec_file: The file / path to the vector data 'file'.
+    :param vec_lyr: The layer to which the data is to be read from.
+    :param att_columns: List of input attribute column names to be read in.
+    """
     gdal.UseExceptions()
 
     ds = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
@@ -237,8 +245,10 @@ Where:
     for attName in att_columns:
         if not found_atts[attName]:
             ds = None
-            raise Exception("Could not find the attribute ({}) specified "
-                            "within the vector layer.".format(attName))
+            raise Exception(
+                "Could not find the attribute ({}) specified "
+                "within the vector layer.".format(attName)
+            )
 
     outvals = []
     lyr.ResetReading()
