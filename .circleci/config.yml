@@ -43,6 +43,7 @@ jobs:
           destination: pytest_reports
       - codecov/upload:
           file: pytest_reports/coverage.xml
+      - sonarcloud/scan
 
 
 # Orchestrate our job run sequence
