@@ -135,6 +135,9 @@ functions:
 | del_exist_vec | In some cases GDAL/OGR cannot simply overwrite an existing vector layer, this variable is provided by many RSGISLib function to allow the user to specify that is the output vector layer exists it should be deleted before the main processing starts| 
 | out_epsg | If there is an option to specify the output projection then generally use an EPSG code |
 | vec_lyr_obj | An OGR input vector layer object |
+| att_column | The name of a column within the attribute table of the vector layer |
+| att_col_data | A list or array of data read or to be written to vector layer attribute table. |
+| att_col_datatype | The OGR datatype (i.e., ogr.OFTString, ogr.OFTInteger, ogr.OFTReal) for a attribute table column | 
 
 #### Others
 | Variable Name | Description |
