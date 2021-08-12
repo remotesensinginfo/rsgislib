@@ -2,6 +2,7 @@ version: 2.1
 
 orbs:
   codecov: codecov/codecov@1.2.5
+  sonarcloud: sonarsource/sonarcloud@1.0.1
 
 executors: #(1)
   exectr:
@@ -42,10 +43,12 @@ jobs:
           destination: pytest_reports
       - codecov/upload:
           file: pytest_reports/coverage.xml
+      - sonarcloud/scan
 
 
 # Orchestrate our job run sequence
 workflows:
   build-and-test:
     jobs:
-      - build_and_test
+      - build_and_test:
+          context: SonarCloud

@@ -601,11 +601,11 @@ def performImagePCA(
     )
     if calc_stats:
         use_no_data = False
-        no_data_val = 0
+        lcl_no_data_val = 0
         if no_data_val is not None:
             use_no_data = True
-            no_data_val = no_data_val
-        rsgislib.imageutils.popImageStats(output_img, use_no_data, no_data_val, True)
+            lcl_no_data_val = no_data_val
+        rsgislib.imageutils.popImageStats(output_img, use_no_data, lcl_no_data_val, True)
 
     return varExplain
 

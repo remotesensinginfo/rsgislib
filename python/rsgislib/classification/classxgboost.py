@@ -601,7 +601,7 @@ def optimise_xgboost_multiclass_classifer(out_params_file, clsinfodict, nthread=
     n_classes = len(clsinfodict)
     for clsname in clsinfodict:
         if clsinfodict[clsname].id >= n_classes:
-            raise ("ClassInfoObj '{}' id ({}) is not consecutive "
+            raise Exception("ClassInfoObj '{}' id ({}) is not consecutive "
                    "starting from 0.".format(clsname, clsinfodict[clsname].id))
 
     cls_data_dict = {}
@@ -735,8 +735,8 @@ def train_xgboost_multiclass_classifer(out_mdl_file, cls_params_file, clsinfodic
     n_classes = len(clsinfodict)
     for clsname in clsinfodict:
         if clsinfodict[clsname].id >= n_classes:
-            raise ("ClassInfoObj '{}' id ({}) is not consecutive starting from 0.".format(clsname,
-                                                                                          clsinfodict[clsname].id))
+            raise Exception("ClassInfoObj '{}' id ({}) is not consecutive "
+                            "starting from 0.".format(clsname, clsinfodict[clsname].id))
 
     cls_data_dict = {}
     train_data_lst = []

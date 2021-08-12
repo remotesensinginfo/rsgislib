@@ -528,7 +528,7 @@ def add_numeric_col_lut(vec_file, vec_lyr, ref_col, val_lut, out_col, vec_out_fi
         base_gpdf.to_file(vec_out_file, driver=out_format)
 
 
-def add_numeric_col(vec_file, vec_lyr, out_col, vec_out_file, vec_out_lyr, out_val=1, out_format='GPKG'):
+def add_numeric_col(vec_file, vec_lyr, out_col, vec_out_file, vec_out_lyr, out_val=1, out_format='GPKG', out_col_int=False):
     """
     A function which adds a numeric column with the same value for all the features.
 
@@ -539,15 +539,19 @@ def add_numeric_col(vec_file, vec_lyr, out_col, vec_out_file, vec_out_lyr, out_v
     :param vec_out_lyr: output vector layer name.
     :param out_val: output numeric value
     :param out_format: output file format (default GPKG).
+    :param out_col_int: Specify whether the output column should be an int datatype.
+                        If True (default: False) then the output column will be of
+                        type int. If False then it will be type float.
 
     """
     import geopandas
     import numpy
 
     base_gpdf = geopandas.read_file(vec_file, layer=vec_lyr)
-
-    base_gpdf[out_col] = numpy.zeros((base_gpdf.shape[0]), dtype=int)
-    base_gpdf[out_col] = out_val
+    if out_col_int:
+        base_gpdf[out_col] = numpy.full((base_gpdf.shape[0]), out_val, dtype=int)
+    else:
+        base_gpdf[out_col] = numpy.full((base_gpdf.shape[0]), out_val, dtype=float)
 
     if out_format == 'GPKG':
         base_gpdf.to_file(vec_out_file, layer=vec_out_lyr, driver=out_format)

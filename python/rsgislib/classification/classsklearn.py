@@ -41,10 +41,10 @@ import numpy.random
 
 from osgeo import gdal
 
+import rsgislib
 import rsgislib.imageutils
 import rsgislib.imagecalc
 import rsgislib.rastergis
-import rsgislib
 from rsgislib.classification import ClassSimpleInfoObj
 
 import os
@@ -420,7 +420,7 @@ Example::
                                 tmpClassImgOut, gdalformat)
 
     if type(skClassifiers) is not list:
-        raise rsgislib.RSGISPyException("A list of classifiers must be provided")
+        raise Exception("A list of classifiers must be provided")
 
     numOfVotes = len(skClassifiers)
 
