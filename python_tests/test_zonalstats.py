@@ -35,7 +35,7 @@ def test_extPointBandValuesFile_ReProj(tmp_path):
     import rsgislib.vectorutils
     import rsgislib.vectorattrs
 
-    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber_utm30n.kea")
     vec_file = os.path.join(ZONALSTATS_DATA_DIR, "sen2_20210527_aber_wgs84_pt_samples.geojson")
     vec_lyr = "sen2_20210527_aber_wgs84_pt_samples"
 
@@ -47,10 +47,10 @@ def test_extPointBandValuesFile_ReProj(tmp_path):
 
     vals = rsgislib.vectorattrs.readVecColumn(out_vec_file, out_vec_lyr, "testcolval")
     print(vals)
-    ref_vals = [33.0, 271.0, 33.0, 26.0, 80.0, 68.0]
+    ref_vals = [33.0, 188.0, 34.0, 26.0, 79.0, 67.0]
     vals_eq = True
     for val, ref_val in zip(vals, ref_vals):
-        if abs(val - ref_val) > 0.0001:
+        if abs(val - ref_val) > 1:
             vals_eq = False
             break
     assert vals_eq
