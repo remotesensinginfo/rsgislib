@@ -19,7 +19,7 @@ def test_reprojPoint_OSGB_UTM():
 
     ref_utm_x = 425966.1
     ref_utm_y = 5807642.0
-    assert (abs(ref_utm_x - utm_x) < 0.1) and (abs(ref_utm_y - utm_y) < 0.1)
+    assert (abs(ref_utm_x - utm_x) < 1) and (abs(ref_utm_y - utm_y) < 1)
 
 
 def test_reprojPoint_OSGB_WGS84():
@@ -63,7 +63,7 @@ def test_reprojPoint_WGS84_OSGB():
 
     ref_osgb_x = 258051.3
     ref_osgb_y = 281606.4
-    assert (abs(ref_osgb_x - osgb_x) < 0.1) and (abs(ref_osgb_y - osgb_y) < 0.1)
+    assert (abs(ref_osgb_x - osgb_x) < 1) and (abs(ref_osgb_y - osgb_y) < 1)
 
 
 def test_reprojPoint_WGS84_UTM():
