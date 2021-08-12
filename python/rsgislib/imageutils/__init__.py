@@ -675,8 +675,8 @@ Copy the GCPs from the input_img to the output_img
         raise Exception("Could not open the input_img.")
     destDS = gdal.Open(output_img, gdal.GA_Update)
     if destDS == None:
-        raise Exception("Could not open the output_img.")
         srcDS = None
+        raise Exception("Could not open the output_img.")
 
     numGCPs = srcDS.GetGCPCount()
     if numGCPs > 0:
@@ -3404,7 +3404,7 @@ def whitenImage(input_img, valid_msk_img, valid_msk_val, output_img, gdalformat)
 
     imgMskBand = imgMskDS.GetRasterBand(1)
     if imgMskBand is None:
-        raise Exception("Could not open image band ({}) in valid mask".format(n + 1))
+        raise Exception("Could not open image band (1) in valid mask")
 
     vld_msk_band_arr = imgMskBand.ReadAsArray().flatten()
     imgMskDS = None
