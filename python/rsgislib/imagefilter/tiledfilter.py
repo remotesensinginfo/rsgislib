@@ -47,28 +47,28 @@ from abc import ABCMeta, abstractmethod
 
 class RSGISAbstractFilter:
     """
-    Abstract class for filter defining the interface to be used within the performTiledImgFilter function.
-    Must define:
-    
-    :param self.filterSize: size of the image filter (must be an odd number)
+    Abstract class for filter defining the interface to be used within the
+    performTiledImgFilter function.
+
+    :param self.filter_size: size of the image filter (must be an odd number)
     :param self.gdalformat: the output image file format
-    :param self.dataType: the output image data type (e.g., rsgislib.TYPE_16UINT)
+    :param self.datatype: the output image data type (e.g., rsgislib.TYPE_16UINT)
     """
     __metaclass__ = ABCMeta
     
     def __init__(self):
-        self.filterSize = 3
+        self.filter_size = 3
         self.gdalformat = 'KEA'
-        self.dataType = rsgislib.TYPE_32FLOAT
+        self.datatype = rsgislib.TYPE_32FLOAT
     
     @abstractmethod
-    def applyFilter(self, inputimage, outputImage): 
+    def applyFilter(self, input_img, output_img): 
         """
         Abstract function through which the input image
         is filtered to produce the output image.
         
-        :param inputimage: is the name and path of the input image.
-        :param outputimage: is the name and path of the output image.
+        :param input_img: is the name and path of the input image.
+        :param output_img: is the name and path of the output image.
         """
         pass
     
@@ -77,517 +77,517 @@ class RSGISAbstractFilter:
         """
         return the size of the image filter
         """
-        return self.filterSize
+        return self.filter_size
     
     def getFilterHSize(self):
         """
-        return the hald size of the image filter (i.e., (filterSize-1)/2)
+        return the hald size of the image filter (i.e., (filter_size-1)/2)
         """
-        hSize = (self.filterSize-1)/2
+        hSize = (self.filter_size-1)/2
         return hSize
 
 
 class RSGISMedianFilter(RSGISAbstractFilter):
     """ A class to apply a median filter """
     
-    def __init__(self, filterSize, gdalformat, dataType):
-        self.filterSize = filterSize
+    def __init__(self, filter_size, gdalformat, datatype):
+        self.filter_size = filter_size
         self.gdalformat = gdalformat
-        self.dataType = dataType
+        self.datatype = datatype
     
-    def applyFilter(self, inputimage, outputImage):
+    def applyFilter(self, input_img, output_img):
         """ Apply a median filter to the specified input image."""
-        outputImageBase, outExt = os.path.splitext(outputImage)
-        outExt = outExt.replace(".", "").strip()
+        out_image_base, out_img_ext = os.path.splitext(output_img)
+        out_img_ext = out_img_ext.replace(".", "").strip()
         filters = []
-        filters.append(imagefilter.FilterParameters(filterType = 'Median', fileEnding = '', size=self.filterSize) )
-        imagefilter.applyfilters(inputimage, outputImageBase, filters, self.gdalformat, outExt, self.dataType)
+        filters.append(imagefilter.FilterParameters(filter_type = 'Median', file_ending = '', size=self.filter_size) )
+        imagefilter.applyfilters(input_img, out_image_base, filters, self.gdalformat, out_img_ext, self.datatype)
 
 
 class RSGISMeanFilter(RSGISAbstractFilter):
     """ A class to apply a mean filter """
     
-    def __init__(self, filterSize, gdalformat, dataType):
-        self.filterSize = filterSize
+    def __init__(self, filter_size, gdalformat, datatype):
+        self.filter_size = filter_size
         self.gdalformat = gdalformat
-        self.dataType = dataType
+        self.datatype = datatype
     
-    def applyFilter(self, inputimage, outputImage):
+    def applyFilter(self, input_img, output_img):
         """ Apply a mean filter to the specified input image."""
-        outputImageBase, outExt = os.path.splitext(outputImage)
-        outExt = outExt.replace(".", "").strip()
+        out_image_base, out_img_ext = os.path.splitext(output_img)
+        out_img_ext = out_img_ext.replace(".", "").strip()
         filters = []
-        filters.append(imagefilter.FilterParameters(filterType = 'Mean', fileEnding = '', size=self.filterSize) )
-        imagefilter.applyfilters(inputimage, outputImageBase, filters, self.gdalformat, outExt, self.dataType)
+        filters.append(imagefilter.FilterParameters(filter_type = 'Mean', file_ending = '', size=self.filter_size) )
+        imagefilter.applyfilters(input_img, out_image_base, filters, self.gdalformat, out_img_ext, self.datatype)
 
 
 class RSGISMinFilter(RSGISAbstractFilter):
     """ A class to apply a min filter """
 
-    def __init__(self, filterSize, gdalformat, dataType):
-        self.filterSize = filterSize
+    def __init__(self, filter_size, gdalformat, datatype):
+        self.filter_size = filter_size
         self.gdalformat = gdalformat
-        self.dataType = dataType
+        self.datatype = datatype
 
-    def applyFilter(self, inputimage, outputImage):
+    def applyFilter(self, input_img, output_img):
         """ Apply a min filter to the specified input image."""
-        outputImageBase, outExt = os.path.splitext(outputImage)
-        outExt = outExt.replace(".", "").strip()
+        out_image_base, out_img_ext = os.path.splitext(output_img)
+        out_img_ext = out_img_ext.replace(".", "").strip()
         filters = []
-        filters.append(imagefilter.FilterParameters(filterType = 'Min', fileEnding = '', size=self.filterSize) )
-        imagefilter.applyfilters(inputimage, outputImageBase, filters, self.gdalformat, outExt, self.dataType)
+        filters.append(imagefilter.FilterParameters(filter_type = 'Min', file_ending = '', size=self.filter_size) )
+        imagefilter.applyfilters(input_img, out_image_base, filters, self.gdalformat, out_img_ext, self.datatype)
     
 
 class RSGISMaxFilter(RSGISAbstractFilter):
     """ A class to apply a max filter """
 
-    def __init__(self, filterSize, gdalformat, dataType):
-        self.filterSize = filterSize
+    def __init__(self, filter_size, gdalformat, datatype):
+        self.filter_size = filter_size
         self.gdalformat = gdalformat
-        self.dataType = dataType
+        self.datatype = datatype
 
-    def applyFilter(self, inputimage, outputImage):
+    def applyFilter(self, input_img, output_img):
         """ Apply a max filter to the specified input image."""
-        outputImageBase, outExt = os.path.splitext(outputImage)
-        outExt = outExt.replace(".", "").strip()
+        out_image_base, out_img_ext = os.path.splitext(output_img)
+        out_img_ext = out_img_ext.replace(".", "").strip()
         filters = []
-        filters.append(imagefilter.FilterParameters(filterType = 'Max', fileEnding = '', size=self.filterSize) )
-        imagefilter.applyfilters(inputimage, outputImageBase, filters, self.gdalformat, outExt, self.dataType)
+        filters.append(imagefilter.FilterParameters(filter_type = 'Max', file_ending = '', size=self.filter_size) )
+        imagefilter.applyfilters(input_img, out_image_base, filters, self.gdalformat, out_img_ext, self.datatype)
 
 
 class RSGISModeFilter(RSGISAbstractFilter):
     """ A class to apply a mode filter """
 
-    def __init__(self, filterSize, gdalformat, dataType):
-        self.filterSize = filterSize
+    def __init__(self, filter_size, gdalformat, datatype):
+        self.filter_size = filter_size
         self.gdalformat = gdalformat
-        self.dataType = dataType
+        self.datatype = datatype
 
-    def applyFilter(self, inputimage, outputImage):
+    def applyFilter(self, input_img, output_img):
         """ Apply a mode filter to the specified input image."""
-        outputImageBase, outExt = os.path.splitext(outputImage)
-        outExt = outExt.replace(".", "").strip()
+        out_image_base, out_img_ext = os.path.splitext(output_img)
+        out_img_ext = out_img_ext.replace(".", "").strip()
         filters = []
-        filters.append(imagefilter.FilterParameters(filterType = 'Mode', fileEnding = '', size=self.filterSize) )
-        imagefilter.applyfilters(inputimage, outputImageBase, filters, self.gdalformat, outExt, self.dataType)
+        filters.append(imagefilter.FilterParameters(filter_type = 'Mode', file_ending = '', size=self.filter_size) )
+        imagefilter.applyfilters(input_img, out_image_base, filters, self.gdalformat, out_img_ext, self.datatype)
 
     
 class RSGISStdDevFilter(RSGISAbstractFilter):
     """ A class to apply a standard deviation filter """
 
-    def __init__(self, filterSize, gdalformat, dataType):
-        self.filterSize = filterSize
+    def __init__(self, filter_size, gdalformat, datatype):
+        self.filter_size = filter_size
         self.gdalformat = gdalformat
-        self.dataType = dataType
+        self.datatype = datatype
     
-    def applyFilter(self, inputimage, outputImage):
+    def applyFilter(self, input_img, output_img):
         """ Apply a std dev filter to the specified input image."""
-        outputImageBase, outExt = os.path.splitext(outputImage)
-        outExt = outExt.replace(".", "").strip()
+        out_image_base, out_img_ext = os.path.splitext(output_img)
+        out_img_ext = out_img_ext.replace(".", "").strip()
         filters = []
-        filters.append(imagefilter.FilterParameters(filterType = 'StdDev', fileEnding = '', size=self.filterSize) )
-        imagefilter.applyfilters(inputimage, outputImageBase, filters, self.gdalformat, outExt, self.dataType)    
+        filters.append(imagefilter.FilterParameters(filter_type = 'StdDev', file_ending = '', size=self.filter_size) )
+        imagefilter.applyfilters(input_img, out_image_base, filters, self.gdalformat, out_img_ext, self.datatype)    
 
 
 class RSGISRangeFilter(RSGISAbstractFilter):
     """ A class to apply a range filter """
 
-    def __init__(self, filterSize, gdalformat, dataType):
-        self.filterSize = filterSize
+    def __init__(self, filter_size, gdalformat, datatype):
+        self.filter_size = filter_size
         self.gdalformat = gdalformat
-        self.dataType = dataType
+        self.datatype = datatype
 
-    def applyFilter(self, inputimage, outputImage):
+    def applyFilter(self, input_img, output_img):
         """ Apply a range filter to the specified input image."""
-        outputImageBase, outExt = os.path.splitext(outputImage)
-        outExt = outExt.replace(".", "").strip()
+        out_image_base, out_img_ext = os.path.splitext(output_img)
+        out_img_ext = out_img_ext.replace(".", "").strip()
         filters = []
-        filters.append(imagefilter.FilterParameters(filterType = 'Range', fileEnding = '', size=self.filterSize) )
-        imagefilter.applyfilters(inputimage, outputImageBase, filters, self.gdalformat, outExt, self.dataType)       
+        filters.append(imagefilter.FilterParameters(filter_type = 'Range', file_ending = '', size=self.filter_size) )
+        imagefilter.applyfilters(input_img, out_image_base, filters, self.gdalformat, out_img_ext, self.datatype)       
     
 
 class RSGISMeanDiffFilter(RSGISAbstractFilter):
     """ A class to apply a mean difference filter """
 
-    def __init__(self, filterSize, gdalformat, dataType):
-        self.filterSize = filterSize
+    def __init__(self, filter_size, gdalformat, datatype):
+        self.filter_size = filter_size
         self.gdalformat = gdalformat
-        self.dataType = dataType
+        self.datatype = datatype
 
-    def applyFilter(self, inputimage, outputImage):
+    def applyFilter(self, input_img, output_img):
         """ Apply a mean difference filter to the specified input image."""
-        outputImageBase, outExt = os.path.splitext(outputImage)
-        outExt = outExt.replace(".", "").strip()
+        out_image_base, out_img_ext = os.path.splitext(output_img)
+        out_img_ext = out_img_ext.replace(".", "").strip()
         filters = []
-        filters.append(imagefilter.FilterParameters(filterType = 'MeanDiff', fileEnding = '', size=self.filterSize) )
-        imagefilter.applyfilters(inputimage, outputImageBase, filters, self.gdalformat, outExt, self.dataType)
+        filters.append(imagefilter.FilterParameters(filter_type = 'MeanDiff', file_ending = '', size=self.filter_size) )
+        imagefilter.applyfilters(input_img, out_image_base, filters, self.gdalformat, out_img_ext, self.datatype)
 
 
 class RSGISMeanDiffAbsFilter(RSGISAbstractFilter):
     """ A class to apply a mean absolute difference filter """
 
-    def __init__(self, filterSize, gdalformat, dataType):
-        self.filterSize = filterSize
+    def __init__(self, filter_size, gdalformat, datatype):
+        self.filter_size = filter_size
         self.gdalformat = gdalformat
-        self.dataType = dataType
+        self.datatype = datatype
     
-    def applyFilter(self, inputimage, outputImage):
+    def applyFilter(self, input_img, output_img):
         """ Apply a mean absolute difference filter to the specified input image."""
-        outputImageBase, outExt = os.path.splitext(outputImage)
-        outExt = outExt.replace(".", "").strip()
+        out_image_base, out_img_ext = os.path.splitext(output_img)
+        out_img_ext = out_img_ext.replace(".", "").strip()
         filters = []
-        filters.append(imagefilter.FilterParameters(filterType = 'MeanDiffAbs', fileEnding = '', size=self.filterSize) )
-        imagefilter.applyfilters(inputimage, outputImageBase, filters, self.gdalformat, outExt, self.dataType)
+        filters.append(imagefilter.FilterParameters(filter_type = 'MeanDiffAbs', file_ending = '', size=self.filter_size) )
+        imagefilter.applyfilters(input_img, out_image_base, filters, self.gdalformat, out_img_ext, self.datatype)
 
 
 class RSGISTotalDiffFilter(RSGISAbstractFilter):
     """ A class to apply a total difference filter """
     
-    def __init__(self, filterSize, gdalformat, dataType):
-        self.filterSize = filterSize
+    def __init__(self, filter_size, gdalformat, datatype):
+        self.filter_size = filter_size
         self.gdalformat = gdalformat
-        self.dataType = dataType
+        self.datatype = datatype
 
-    def applyFilter(self, inputimage, outputImage):
+    def applyFilter(self, input_img, output_img):
         """ Apply a total (i.e., sum) difference filter to the specified input image."""
-        outputImageBase, outExt = os.path.splitext(outputImage)
-        outExt = outExt.replace(".", "").strip()
+        out_image_base, out_img_ext = os.path.splitext(output_img)
+        out_img_ext = out_img_ext.replace(".", "").strip()
         filters = []
-        filters.append(imagefilter.FilterParameters(filterType = 'TotalDiff', fileEnding = '', size=self.filterSize) )
-        imagefilter.applyfilters(inputimage, outputImageBase, filters, self.gdalformat, outExt, self.dataType)
+        filters.append(imagefilter.FilterParameters(filter_type = 'TotalDiff', file_ending = '', size=self.filter_size) )
+        imagefilter.applyfilters(input_img, out_image_base, filters, self.gdalformat, out_img_ext, self.datatype)
 
 
 class RSGISTotalDiffAbsFilter(RSGISAbstractFilter):
     """ A class to apply a total absolution difference filter """
 
-    def __init__(self, filterSize, gdalformat, dataType):
-        self.filterSize = filterSize
+    def __init__(self, filter_size, gdalformat, datatype):
+        self.filter_size = filter_size
         self.gdalformat = gdalformat
-        self.dataType = dataType
+        self.datatype = datatype
 
-    def applyFilter(self, inputimage, outputImage):
+    def applyFilter(self, input_img, output_img):
         """ Apply a total absolute difference filter to the specified input image."""
-        outputImageBase, outExt = os.path.splitext(outputImage)
-        outExt = outExt.replace(".", "").strip()
+        out_image_base, out_img_ext = os.path.splitext(output_img)
+        out_img_ext = out_img_ext.replace(".", "").strip()
         filters = []
-        filters.append(imagefilter.FilterParameters(filterType = 'TotalDiffAbs', fileEnding = '', size=self.filterSize) )
-        imagefilter.applyfilters(inputimage, outputImageBase, filters, self.gdalformat, outExt, self.dataType)
+        filters.append(imagefilter.FilterParameters(filter_type = 'TotalDiffAbs', file_ending = '', size=self.filter_size) )
+        imagefilter.applyfilters(input_img, out_image_base, filters, self.gdalformat, out_img_ext, self.datatype)
 
 
 class RSGISCoeffOfVarFilter(RSGISAbstractFilter):
     """ A class to apply a coefficient of variance filter """
 
-    def __init__(self, filterSize, gdalformat, dataType):
-        self.filterSize = filterSize
+    def __init__(self, filter_size, gdalformat, datatype):
+        self.filter_size = filter_size
         self.gdalformat = gdalformat
-        self.dataType = dataType
+        self.datatype = datatype
 
-    def applyFilter(self, inputimage, outputImage):
+    def applyFilter(self, input_img, output_img):
         """ Apply a coefficient of variance filter to the specified input image."""
-        outputImageBase, outExt = os.path.splitext(outputImage)
-        outExt = outExt.replace(".", "").strip()
+        out_image_base, out_img_ext = os.path.splitext(output_img)
+        out_img_ext = out_img_ext.replace(".", "").strip()
         filters = []
-        filters.append(imagefilter.FilterParameters(filterType = 'CoeffOfVar', fileEnding = '', size=self.filterSize) )
-        imagefilter.applyfilters(inputimage, outputImageBase, filters, self.gdalformat, outExt, self.dataType)
+        filters.append(imagefilter.FilterParameters(filter_type = 'CoeffOfVar', file_ending = '', size=self.filter_size) )
+        imagefilter.applyfilters(input_img, out_image_base, filters, self.gdalformat, out_img_ext, self.datatype)
 
 
 class RSGISTotalFilter(RSGISAbstractFilter):
     """ A class to apply a total filter """
     
-    def __init__(self, filterSize, gdalformat, dataType):
-        self.filterSize = filterSize
+    def __init__(self, filter_size, gdalformat, datatype):
+        self.filter_size = filter_size
         self.gdalformat = gdalformat
-        self.dataType = dataType
+        self.datatype = datatype
 
-    def applyFilter(self, inputimage, outputImage):
+    def applyFilter(self, input_img, output_img):
         """ Apply a total filter to the specified input image."""
-        outputImageBase, outExt = os.path.splitext(outputImage)
-        outExt = outExt.replace(".", "").strip()
+        out_image_base, out_img_ext = os.path.splitext(output_img)
+        out_img_ext = out_img_ext.replace(".", "").strip()
         filters = []
-        filters.append(imagefilter.FilterParameters(filterType = 'Total', fileEnding = '', size=self.filterSize) )
-        imagefilter.applyfilters(inputimage, outputImageBase, filters, self.gdalformat, outExt, self.dataType)
+        filters.append(imagefilter.FilterParameters(filter_type = 'Total', file_ending = '', size=self.filter_size) )
+        imagefilter.applyfilters(input_img, out_image_base, filters, self.gdalformat, out_img_ext, self.datatype)
 
 
 class RSGISNormVarFilter(RSGISAbstractFilter):
     """ A class to apply a normalised variance filter """
 
-    def __init__(self, filterSize, gdalformat, dataType):
-        self.filterSize = filterSize
+    def __init__(self, filter_size, gdalformat, datatype):
+        self.filter_size = filter_size
         self.gdalformat = gdalformat
-        self.dataType = dataType
+        self.datatype = datatype
 
-    def applyFilter(self, inputimage, outputImage):
+    def applyFilter(self, input_img, output_img):
         """ Apply a normalised variance filter to the specified input image."""
-        outputImageBase, outExt = os.path.splitext(outputImage)
-        outExt = outExt.replace(".", "").strip()
+        out_image_base, out_img_ext = os.path.splitext(output_img)
+        out_img_ext = out_img_ext.replace(".", "").strip()
         filters = []
-        filters.append(imagefilter.FilterParameters(filterType = 'NormVar', fileEnding = '', size=self.filterSize) )
-        imagefilter.applyfilters(inputimage, outputImageBase, filters, self.gdalformat, outExt, self.dataType)
+        filters.append(imagefilter.FilterParameters(filter_type = 'NormVar', file_ending = '', size=self.filter_size) )
+        imagefilter.applyfilters(input_img, out_image_base, filters, self.gdalformat, out_img_ext, self.datatype)
 
 
 class RSGISNormVarSqrtFilter(RSGISAbstractFilter):
     """ A class to apply a normalised variance square root filter """
 
-    def __init__(self, filterSize, gdalformat, dataType):
-        self.filterSize = filterSize
+    def __init__(self, filter_size, gdalformat, datatype):
+        self.filter_size = filter_size
         self.gdalformat = gdalformat
-        self.dataType = dataType
+        self.datatype = datatype
 
-    def applyFilter(self, inputimage, outputImage):
+    def applyFilter(self, input_img, output_img):
         """ Apply a normalised variance square root filter to the specified input image."""
-        outputImageBase, outExt = os.path.splitext(outputImage)
-        outExt = outExt.replace(".", "").strip()
+        out_image_base, out_img_ext = os.path.splitext(output_img)
+        out_img_ext = out_img_ext.replace(".", "").strip()
         filters = []
-        filters.append(imagefilter.FilterParameters(filterType = 'NormVarSqrt', fileEnding = '', size=self.filterSize) )
-        imagefilter.applyfilters(inputimage, outputImageBase, filters, self.gdalformat, outExt, self.dataType)
+        filters.append(imagefilter.FilterParameters(filter_type = 'NormVarSqrt', file_ending = '', size=self.filter_size) )
+        imagefilter.applyfilters(input_img, out_image_base, filters, self.gdalformat, out_img_ext, self.datatype)
 
 
 class RSGISNormVarLnFilter(RSGISAbstractFilter):
     """ A class to apply a normalised variance log filter """
 
-    def __init__(self, filterSize, gdalformat, dataType):
-        self.filterSize = filterSize
+    def __init__(self, filter_size, gdalformat, datatype):
+        self.filter_size = filter_size
         self.gdalformat = gdalformat
-        self.dataType = dataType
+        self.datatype = datatype
 
-    def applyFilter(self, inputimage, outputImage):
+    def applyFilter(self, input_img, output_img):
         """ Apply a normalised variance natural log filter to the specified input image."""
-        outputImageBase, outExt = os.path.splitext(outputImage)
-        outExt = outExt.replace(".", "").strip()
+        out_image_base, out_img_ext = os.path.splitext(output_img)
+        out_img_ext = out_img_ext.replace(".", "").strip()
         filters = []
-        filters.append(imagefilter.FilterParameters(filterType = 'NormVarLn', fileEnding = '', size=self.filterSize) )
-        imagefilter.applyfilters(inputimage, outputImageBase, filters, self.gdalformat, outExt, self.dataType)
+        filters.append(imagefilter.FilterParameters(filter_type = 'NormVarLn', file_ending = '', size=self.filter_size) )
+        imagefilter.applyfilters(input_img, out_image_base, filters, self.gdalformat, out_img_ext, self.datatype)
 
 
 class RSGISTextureVarFilter(RSGISAbstractFilter):
     """ A class to apply a texture variance filter """
 
-    def __init__(self, filterSize, gdalformat, dataType):
-        self.filterSize = filterSize
+    def __init__(self, filter_size, gdalformat, datatype):
+        self.filter_size = filter_size
         self.gdalformat = gdalformat
-        self.dataType = dataType
+        self.datatype = datatype
 
-    def applyFilter(self, inputimage, outputImage):
+    def applyFilter(self, input_img, output_img):
         """ Apply a texture variance filter to the specified input image."""
-        outputImageBase, outExt = os.path.splitext(outputImage)
-        outExt = outExt.replace(".", "").strip()
+        out_image_base, out_img_ext = os.path.splitext(output_img)
+        out_img_ext = out_img_ext.replace(".", "").strip()
         filters = []
-        filters.append(imagefilter.FilterParameters(filterType = 'TextureVar', fileEnding = '', size=self.filterSize) )
-        imagefilter.applyfilters(inputimage, outputImageBase, filters, self.gdalformat, outExt, self.dataType)
+        filters.append(imagefilter.FilterParameters(filter_type = 'TextureVar', file_ending = '', size=self.filter_size) )
+        imagefilter.applyfilters(input_img, out_image_base, filters, self.gdalformat, out_img_ext, self.datatype)
 
 
 class RSGISKuwaharaFilter(RSGISAbstractFilter):
     """ A class to apply a kuwahara filter """
 
-    def __init__(self, filterSize, gdalformat, dataType):
-        self.filterSize = filterSize
+    def __init__(self, filter_size, gdalformat, datatype):
+        self.filter_size = filter_size
         self.gdalformat = gdalformat
-        self.dataType = dataType
+        self.datatype = datatype
 
-    def applyFilter(self, inputimage, outputImage):
+    def applyFilter(self, input_img, output_img):
         """ Apply a kuwahara filter to the specified input image."""
-        outputImageBase, outExt = os.path.splitext(outputImage)
-        outExt = outExt.replace(".", "").strip()
+        out_image_base, out_img_ext = os.path.splitext(output_img)
+        out_img_ext = out_img_ext.replace(".", "").strip()
         filters = []
-        filters.append(imagefilter.FilterParameters(filterType = 'Kuwahara', fileEnding = '', size=self.filterSize) )
-        imagefilter.applyfilters(inputimage, outputImageBase, filters, self.gdalformat, outExt, self.dataType)
+        filters.append(imagefilter.FilterParameters(filter_type = 'Kuwahara', file_ending = '', size=self.filter_size) )
+        imagefilter.applyfilters(input_img, out_image_base, filters, self.gdalformat, out_img_ext, self.datatype)
 
 
 class RSGISSobelFilter(RSGISAbstractFilter):
     """ A class to apply a sobel filter """
 
-    def __init__(self, gdalformat, dataType):
-        self.filterSize = 3
+    def __init__(self, gdalformat, datatype):
+        self.filter_size = 3
         self.gdalformat = gdalformat
-        self.dataType = dataType
+        self.datatype = datatype
 
-    def applyFilter(self, inputimage, outputImage):
+    def applyFilter(self, input_img, output_img):
         """ Apply a sobel filter to the specified input image."""
-        outputImageBase, outExt = os.path.splitext(outputImage)
-        outExt = outExt.replace(".", "").strip()
+        out_image_base, out_img_ext = os.path.splitext(output_img)
+        out_img_ext = out_img_ext.replace(".", "").strip()
         filters = []
-        filters.append(imagefilter.FilterParameters(filterType = 'Sobel', fileEnding = '', option = 'xy') )
-        imagefilter.applyfilters(inputimage, outputImageBase, filters, self.gdalformat, outExt, self.dataType)    
+        filters.append(imagefilter.FilterParameters(filter_type = 'Sobel', file_ending = '', option = 'xy') )
+        imagefilter.applyfilters(input_img, out_image_base, filters, self.gdalformat, out_img_ext, self.datatype)    
 
 
 class RSGISSobelXFilter(RSGISAbstractFilter):
     """ A class to apply a sobel X filter """
 
-    def __init__(self, gdalformat, dataType):
-        self.filterSize = 3
+    def __init__(self, gdalformat, datatype):
+        self.filter_size = 3
         self.gdalformat = gdalformat
-        self.dataType = dataType
+        self.datatype = datatype
 
-    def applyFilter(self, inputimage, outputImage):
+    def applyFilter(self, input_img, output_img):
         """ Apply a sobel filter in X axis to the specified input image."""
-        outputImageBase, outExt = os.path.splitext(outputImage)
-        outExt = outExt.replace(".", "").strip()
+        out_image_base, out_img_ext = os.path.splitext(output_img)
+        out_img_ext = out_img_ext.replace(".", "").strip()
         filters = []
-        filters.append(imagefilter.FilterParameters(filterType = 'Sobel', fileEnding = '', option = 'x') )
-        imagefilter.applyfilters(inputimage, outputImageBase, filters, self.gdalformat, outExt, self.dataType)
+        filters.append(imagefilter.FilterParameters(filter_type = 'Sobel', file_ending = '', option = 'x') )
+        imagefilter.applyfilters(input_img, out_image_base, filters, self.gdalformat, out_img_ext, self.datatype)
 
 
 class RSGISSobelYFilter(RSGISAbstractFilter):
     """ A class to apply a sobel Y filter """
 
-    def __init__(self, gdalformat, dataType):
-        self.filterSize = 3
+    def __init__(self, gdalformat, datatype):
+        self.filter_size = 3
         self.gdalformat = gdalformat
-        self.dataType = dataType
+        self.datatype = datatype
 
-    def applyFilter(self, inputimage, outputImage):
+    def applyFilter(self, input_img, output_img):
         """ Apply a sobel filter in Y axis to the specified input image."""
-        outputImageBase, outExt = os.path.splitext(outputImage)
-        outExt = outExt.replace(".", "").strip()
+        out_image_base, out_img_ext = os.path.splitext(output_img)
+        out_img_ext = out_img_ext.replace(".", "").strip()
         filters = []
-        filters.append(imagefilter.FilterParameters(filterType = 'Sobel', fileEnding = '', option = 'y') )
-        imagefilter.applyfilters(inputimage, outputImageBase, filters, self.gdalformat, outExt, self.dataType)
+        filters.append(imagefilter.FilterParameters(filter_type = 'Sobel', file_ending = '', option = 'y') )
+        imagefilter.applyfilters(input_img, out_image_base, filters, self.gdalformat, out_img_ext, self.datatype)
 
 
 class RSGISPrewittFilter(RSGISAbstractFilter):
     """ A class to apply a Prewitt filter """
 
-    def __init__(self, gdalformat, dataType):
-        self.filterSize = 3
+    def __init__(self, gdalformat, datatype):
+        self.filter_size = 3
         self.gdalformat = gdalformat
-        self.dataType = dataType
+        self.datatype = datatype
     
-    def applyFilter(self, inputimage, outputImage):
+    def applyFilter(self, input_img, output_img):
         """ Apply a Prewitt filter to the specified input image."""
-        outputImageBase, outExt = os.path.splitext(outputImage)
-        outExt = outExt.replace(".", "").strip()
+        out_image_base, out_img_ext = os.path.splitext(output_img)
+        out_img_ext = out_img_ext.replace(".", "").strip()
         filters = []
-        filters.append(imagefilter.FilterParameters(filterType = 'Prewitt', fileEnding = '', option = 'xy') )
-        imagefilter.applyfilters(inputimage, outputImageBase, filters, self.gdalformat, outExt, self.dataType)
+        filters.append(imagefilter.FilterParameters(filter_type = 'Prewitt', file_ending = '', option = 'xy') )
+        imagefilter.applyfilters(input_img, out_image_base, filters, self.gdalformat, out_img_ext, self.datatype)
     
   
 class RSGISPrewittXFilter(RSGISAbstractFilter):
     """ A class to apply a Prewitt X filter """
 
-    def __init__(self, gdalformat, dataType):
-        self.filterSize = 3
+    def __init__(self, gdalformat, datatype):
+        self.filter_size = 3
         self.gdalformat = gdalformat
-        self.dataType = dataType
+        self.datatype = datatype
    
-    def applyFilter(self, inputimage, outputImage):
+    def applyFilter(self, input_img, output_img):
         """ Apply a Prewitt filter in X axis to the specified input image."""
-        outputImageBase, outExt = os.path.splitext(outputImage)
-        outExt = outExt.replace(".", "").strip()
+        out_image_base, out_img_ext = os.path.splitext(output_img)
+        out_img_ext = out_img_ext.replace(".", "").strip()
         filters = []
-        filters.append(imagefilter.FilterParameters(filterType = 'Prewitt', fileEnding = '', option = 'x') )
-        imagefilter.applyfilters(inputimage, outputImageBase, filters, self.gdalformat, outExt, self.dataType)
+        filters.append(imagefilter.FilterParameters(filter_type = 'Prewitt', file_ending = '', option = 'x') )
+        imagefilter.applyfilters(input_img, out_image_base, filters, self.gdalformat, out_img_ext, self.datatype)
 
 
 class RSGISPrewittYFilter(RSGISAbstractFilter):
     """ A class to apply a Prewitt Y filter """
 
-    def __init__(self, gdalformat, dataType):
-        self.filterSize = 3
+    def __init__(self, gdalformat, datatype):
+        self.filter_size = 3
         self.gdalformat = gdalformat
-        self.dataType = dataType
+        self.datatype = datatype
 
-    def applyFilter(self, inputimage, outputImage):
+    def applyFilter(self, input_img, output_img):
         """ Apply a Prewitt filter in Y axis to the specified input image."""
-        outputImageBase, outExt = os.path.splitext(outputImage)
-        outExt = outExt.replace(".", "").strip()
+        out_image_base, out_img_ext = os.path.splitext(output_img)
+        out_img_ext = out_img_ext.replace(".", "").strip()
         filters = []
-        filters.append(imagefilter.FilterParameters(filterType = 'Prewitt', fileEnding = '', option = 'y') )
-        imagefilter.applyfilters(inputimage, outputImageBase, filters, self.gdalformat, outExt, self.dataType)
+        filters.append(imagefilter.FilterParameters(filter_type = 'Prewitt', file_ending = '', option = 'y') )
+        imagefilter.applyfilters(input_img, out_image_base, filters, self.gdalformat, out_img_ext, self.datatype)
 
 
 class RSGISGaussianSmoothFilter(RSGISAbstractFilter):
     """ A class to apply a Gaussian smoothing filter """
 
-    def __init__(self, filterSize, stddevX, stddevY, filterAngle, gdalformat, dataType):
-        self.filterSize = filterSize
-        self.stddevX = stddevX
-        self.stddevY = stddevY
-        self.filterAngle = filterAngle
+    def __init__(self, filter_size, stddev_x, stddev_y, filter_angle, gdalformat, datatype):
+        self.filter_size = filter_size
+        self.stddev_x = stddev_x
+        self.stddev_y = stddev_y
+        self.filter_angle = filter_angle
         self.gdalformat = gdalformat
-        self.dataType = dataType
+        self.datatype = datatype
 
-    def applyFilter(self, inputimage, outputImage):
+    def applyFilter(self, input_img, output_img):
         """ Apply a Gaussian smoothing filter to the specified input image."""
-        outputImageBase, outExt = os.path.splitext(outputImage)
-        outExt = outExt.replace(".", "").strip()
+        out_image_base, out_img_ext = os.path.splitext(output_img)
+        out_img_ext = out_img_ext.replace(".", "").strip()
         filters = []
-        filters.append(imagefilter.FilterParameters(filterType = 'GaussianSmooth', fileEnding = '', size=self.filterSize, stddevX=self.stddevX, stddevY=self.stddevY, angle=self.filterAngle) )
-        imagefilter.applyfilters(inputimage, outputImageBase, filters, self.gdalformat, outExt, self.dataType)
+        filters.append(imagefilter.FilterParameters(filter_type = 'GaussianSmooth', file_ending = '', size=self.filter_size, stddev_x=self.stddev_x, stddev_y=self.stddev_y, angle=self.filter_angle) )
+        imagefilter.applyfilters(input_img, out_image_base, filters, self.gdalformat, out_img_ext, self.datatype)
     
 
 class RSGISGaussian1stDerivFilter(RSGISAbstractFilter):
     """ A class to apply a Gaussian first derivative filter """
 
-    def __init__(self, filterSize, stddevX, stddevY, filterAngle, gdalformat, dataType):
-        self.filterSize = filterSize
-        self.stddevX = stddevX
-        self.stddevY = stddevY
-        self.filterAngle = filterAngle
+    def __init__(self, filter_size, stddev_x, stddev_y, filter_angle, gdalformat, datatype):
+        self.filter_size = filter_size
+        self.stddev_x = stddev_x
+        self.stddev_y = stddev_y
+        self.filter_angle = filter_angle
         self.gdalformat = gdalformat
-        self.dataType = dataType
+        self.datatype = datatype
     
-    def applyFilter(self, inputimage, outputImage):
+    def applyFilter(self, input_img, output_img):
         """ Apply a Gaussian first derivative filter to the specified input image."""
-        outputImageBase, outExt = os.path.splitext(outputImage)
-        outExt = outExt.replace(".", "").strip()
+        out_image_base, out_img_ext = os.path.splitext(output_img)
+        out_img_ext = out_img_ext.replace(".", "").strip()
         filters = []
-        filters.append(imagefilter.FilterParameters(filterType = 'Gaussian1st', fileEnding = '', size=self.filterSize, stddevX=self.stddevX, stddevY=self.stddevY, angle=self.filterAngle) )
-        imagefilter.applyfilters(inputimage, outputImageBase, filters, self.gdalformat, outExt, self.dataType)
+        filters.append(imagefilter.FilterParameters(filter_type = 'Gaussian1st', file_ending = '', size=self.filter_size, stddev_x=self.stddev_x, stddev_y=self.stddev_y, angle=self.filter_angle) )
+        imagefilter.applyfilters(input_img, out_image_base, filters, self.gdalformat, out_img_ext, self.datatype)
 
 
 class RSGISGaussian2ndDerivFilter(RSGISAbstractFilter):
     """ A class to apply a Gaussian second derivative filter """
 
-    def __init__(self, filterSize, stddevX, stddevY, filterAngle, gdalformat, dataType):
-        self.filterSize = filterSize
-        self.stddevX = stddevX
-        self.stddevY = stddevY
-        self.filterAngle = filterAngle
+    def __init__(self, filter_size, stddev_x, stddev_y, filter_angle, gdalformat, datatype):
+        self.filter_size = filter_size
+        self.stddev_x = stddev_x
+        self.stddev_y = stddev_y
+        self.filter_angle = filter_angle
         self.gdalformat = gdalformat
-        self.dataType = dataType
+        self.datatype = datatype
     
-    def applyFilter(self, inputimage, outputImage):
+    def applyFilter(self, input_img, output_img):
         """ Apply a Gaussian second derivative filter to the specified input image."""
-        outputImageBase, outExt = os.path.splitext(outputImage)
-        outExt = outExt.replace(".", "").strip()
+        out_image_base, out_img_ext = os.path.splitext(output_img)
+        out_img_ext = out_img_ext.replace(".", "").strip()
         filters = []
-        filters.append(imagefilter.FilterParameters(filterType = 'Gaussian2nd', fileEnding = '', size=self.filterSize, stddevX=self.stddevX, stddevY=self.stddevY, angle=self.filterAngle) )
-        imagefilter.applyfilters(inputimage, outputImageBase, filters, self.gdalformat, outExt, self.dataType)
+        filters.append(imagefilter.FilterParameters(filter_type = 'Gaussian2nd', file_ending = '', size=self.filter_size, stddev_x=self.stddev_x, stddev_y=self.stddev_y, angle=self.filter_angle) )
+        imagefilter.applyfilters(input_img, out_image_base, filters, self.gdalformat, out_img_ext, self.datatype)
 
 class RSGISLaplacianFilter(RSGISAbstractFilter):
     """ A class to apply a Laplacian filter """
 
-    def __init__(self, filterSize, stddev, gdalformat, dataType):
-        self.filterSize = filterSize
+    def __init__(self, filter_size, stddev, gdalformat, datatype):
+        self.filter_size = filter_size
         self.stddev = stddev
         self.gdalformat = gdalformat
-        self.dataType = dataType
+        self.datatype = datatype
 
-    def applyFilter(self, inputimage, outputImage):
+    def applyFilter(self, input_img, output_img):
         """ Apply a Laplacian filter to the specified input image."""
-        outputImageBase, outExt = os.path.splitext(outputImage)
-        outExt = outExt.replace(".", "").strip()
+        out_image_base, out_img_ext = os.path.splitext(output_img)
+        out_img_ext = out_img_ext.replace(".", "").strip()
         filters = []
-        filters.append(imagefilter.FilterParameters(filterType = 'Laplacian', fileEnding = '', size=self.filterSize, stddev=self.stddev) )
-        imagefilter.applyfilters(inputimage, outputImageBase, filters, self.gdalformat, outExt, self.dataType)
+        filters.append(imagefilter.FilterParameters(filter_type = 'Laplacian', file_ending = '', size=self.filter_size, stddev=self.stddev) )
+        imagefilter.applyfilters(input_img, out_image_base, filters, self.gdalformat, out_img_ext, self.datatype)
     
     
 class RSGISLeeFilter(RSGISAbstractFilter):
     """ A class to apply a SAR Lee filter """
 
-    def __init__(self, filterSize, nLooks, gdalformat, dataType):
-        self.filterSize = filterSize
-        self.nLooks = nLooks
+    def __init__(self, filter_size, n_looks, gdalformat, datatype):
+        self.filter_size = filter_size
+        self.n_looks = n_looks
         self.gdalformat = gdalformat
-        self.dataType = dataType
+        self.datatype = datatype
  
-    def applyFilter(self, inputimage, outputImage):
+    def applyFilter(self, input_img, output_img):
         """ Apply a Lee SAR filter to the specified input image."""
-        outputImageBase, outExt = os.path.splitext(outputImage)
-        outExt = outExt.replace(".", "").strip()
+        out_image_base, out_img_ext = os.path.splitext(output_img)
+        out_img_ext = out_img_ext.replace(".", "").strip()
         filters = []
-        filters.append(imagefilter.FilterParameters(filterType = 'Lee', fileEnding = '', size=self.filterSize, nLooks=self.nLooks) )
-        imagefilter.applyfilters(inputimage, outputImageBase, filters, self.gdalformat, outExt, self.dataType)
+        filters.append(imagefilter.FilterParameters(filter_type = 'Lee', file_ending = '', size=self.filter_size, n_looks=self.n_looks) )
+        imagefilter.applyfilters(input_img, out_image_base, filters, self.gdalformat, out_img_ext, self.datatype)
 
 
 def _performFilteringFunc(filterParams):
@@ -597,51 +597,61 @@ def _performFilteringFunc(filterParams):
     filterParams[2].applyFilter(filterParams[0], filterParams[1])
 
 
-def performTiledImgFilter(inputImg, outputImg, filterInst, dataType=None, gdalformat='KEA', tmpDIR='tmp', width=2000, height=2000, nCores=-1):
+def performTiledImgFilter(input_img, output_img, filter_inst, datatype=None, gdalformat='KEA', tmp_dir='tmp', width=2000, height=2000, n_cores=-1):
     """
-This function will perform a filtering of an input image where the input image will be tiled and the tiles executed on multiple processing cores. This function is primarily of use for larger images or when using very large filter windows otherwise the over head of tiling and mosaicking are not worth it.
+    This function will perform a filtering of an input image where the input image
+    will be tiled and the tiles executed on multiple processing cores. This function
+    is primarily of use for larger images or when using very large filter windows
+    otherwise the over head of tiling and mosaicking are not worth it.
 
-:param inputImg: is the file name and path for the input image file.
-:param outputImg: is the file name and path for the output image file.
-:param filterInst: is an instance of a filter class available within rsgislib.imagefilter.tiledfilter.
-:param datatype: is the output image data type (e.g., rsgislib.TYPE_32FLOAT; Default is None). If None then data type of input image is used.
-:param gdalformat: string with the GDAL image format for the output image (Default = KEA). NOTE. KEA is used as intermediate format internally and therefore needs to be available.
-:param tmpDIR: the temporary directory where intermediate files will be written (default is 'tmp'). Directory will be created and deleted if does not exist.
-:param width: int for width of the image tiles used for processing (Default = 2000).
-:param height: int for height of the image tiles used for processing (Default = 2000).
-:param nCores: is an int specifying the number of cores to be used for clumping processing.
+    :param input_img: is the file name and path for the input image file.
+    :param output_img: is the file name and path for the output image file.
+    :param filter_inst: is an instance of a filter class available within
+                        rsgislib.imagefilter.tiledfilter.
+    :param datatype: is the output image data type (e.g., rsgislib.TYPE_32FLOAT;
+                     Default is None). If None then data type of input image is used.
+    :param gdalformat: string with the GDAL image format for the output image
+                       (Default = KEA). NOTE. KEA is used as intermediate format
+                       internally and therefore needs to be available.
+    :param tmp_dir: the temporary directory where intermediate files will be written
+                    (default is 'tmp'). Directory will be created and deleted if does
+                    not exist.
+    :param width: int for width of the image tiles used for processing (Default = 2000).
+    :param height: int for height of the image tiles used for processing
+                   (Default = 2000).
+    :param n_cores: is an int specifying the number of cores to be used for processing.
 
-Example::
+    Example::
 
-    import rsgislib
-    from rsgislib.imagefilter import tiledfilter
-    from rsgislib import imageutils
-    
-    inputImage = 'LandsatImg.kea'
-    outputImage = 'LandsatImgMedianFilter.kea'
-    
-    medianFilter = tiledfilter.RSGISMedianFilter(7, "KEA", rsgislib.TYPE_16UINT)
-    tiledfilter.performTiledImgFilter(inputImage, outputImage, medianFilter, width=2000, height=2000)
-    imageutils.popImageStats(outputImage, usenodataval=False, nodataval=0, calcpyramids=True)
-    
+        import rsgislib
+        from rsgislib.imagefilter import tiledfilter
+        from rsgislib import imageutils
+
+        input_img = 'LandsatImg.kea'
+        output_img = 'LandsatImgMedianFilter.kea'
+
+        medianFilter = tiledfilter.RSGISMedianFilter(7, "KEA", rsgislib.TYPE_16UINT)
+        tiledfilter.performTiledImgFilter(input_img, output_img, medianFilter, width=2000, height=2000)
+        imageutils.popImageStats(output_img, usenodataval=False, nodataval=0, calcpyramids=True)
+
     """
     import rsgislib.tools.utils
     createdTmp = False
-    if not os.path.exists(tmpDIR):
-        os.makedirs(tmpDIR)
+    if not os.path.exists(tmp_dir):
+        os.makedirs(tmp_dir)
         createdTmp = True
     
-    if nCores <= 0:
-        nCores = rsgislib.tools.utils.numProcessCores()
+    if n_cores <= 0:
+        n_cores = rsgislib.tools.utils.numProcessCores()
         
     uidStr = rsgislib.tools.utils.uidGenerator()
-    if dataType == None:
-        dataType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inputImg)
+    if datatype == None:
+        datatype = rsgislib.imageutils.getRSGISLibDataTypeFromImg(input_img)
     
-    baseName = os.path.splitext(os.path.basename(inputImg))[0]+"_"+uidStr
+    baseName = os.path.splitext(os.path.basename(input_img))[0]+"_"+uidStr
     
-    imgTilesDIR = os.path.join(tmpDIR, "imgTiles_"+uidStr)
-    tilesFilterDIR = os.path.join(tmpDIR, "imgFilterTiles_"+uidStr)
+    imgTilesDIR = os.path.join(tmp_dir, "imgTiles_"+uidStr)
+    tilesFilterDIR = os.path.join(tmp_dir, "imgFilterTiles_"+uidStr)
     tilesImgBase = os.path.join(imgTilesDIR, baseName)
 
     if not os.path.exists(imgTilesDIR):
@@ -650,84 +660,97 @@ Example::
     if not os.path.exists(tilesFilterDIR):
         os.makedirs(tilesFilterDIR)
     
-    tileOverlap = math.ceil(filterInst.getFilterHSize())
+    tileOverlap = math.ceil(filter_inst.getFilterHSize())
     
-    imageutils.createTiles(inputImg, tilesImgBase, int(width), int(height), int(tileOverlap), False, 'KEA', rsgisUtils.getRSGISLibDataTypeFromImg(inputImg), 'kea')
+    imageutils.createTiles(input_img, tilesImgBase, int(width), int(height), int(tileOverlap), False, 'KEA', datatype, 'kea')
     imageTiles = glob.glob(tilesImgBase+"*.kea")    
     
     filterImgsVals = []
     for tile in imageTiles:
         tileBaseName = os.path.splitext(os.path.basename(tile))[0]
         filterTile = os.path.join(tilesFilterDIR, tileBaseName+'_filter.kea')
-        filterImgsVals.append([tile, filterTile, filterInst])    
+        filterImgsVals.append([tile, filterTile, filter_inst])    
     
-    with Pool(nCores) as p:
+    with Pool(n_cores) as p:
         p.map(_performFilteringFunc, filterImgsVals)
     
     imgFilterTiles = glob.glob(os.path.join(tilesFilterDIR,"*_filter.kea"))
     
-    numOutBands = rsgislib.imageutils.getImageBandCount(inputImg)
+    numOutBands = rsgislib.imageutils.getImageBandCount(input_img)
     
-    imageutils.createCopyImage(inputImg, outputImg, numOutBands, 0, gdalformat, dataType)
+    imageutils.createCopyImage(input_img, output_img, numOutBands, 0, gdalformat, datatype)
     
-    imageutils.includeImagesWithOverlap(outputImg, imgFilterTiles, int(tileOverlap))
+    imageutils.includeImagesWithOverlap(output_img, imgFilterTiles, int(tileOverlap))
     
     shutil.rmtree(imgTilesDIR)
     shutil.rmtree(tilesFilterDIR)
     if createdTmp:
-        shutil.rmtree(tmpDIR)
+        shutil.rmtree(tmp_dir)
 
 
-def performTiledImgMultiFilter(inputImg, outputImgs, filterInsts, dataType=None, gdalformat='KEA', tmpDIR='tmp', width=2000, height=2000, nCores=-1):
+def performTiledImgMultiFilter(input_img, output_imgs, filter_insts, datatype=None, gdalformat='KEA', tmp_dir='tmp', width=2000, height=2000, n_cores=-1):
     """
-This function will perform the filtering using multiple filters of an input image where the input image will be tiled and the tiles executed on multiple processing cores. This function is primarily of use for larger images or when using very large filter windows otherwise the over head of tiling and mosaicking are not worth it.
+    This function will perform the filtering using multiple filters of an input image
+    where the input image will be tiled and the tiles executed on multiple processing
+    cores. This function is primarily of use for larger images or when using very large
+    filter windows otherwise the over head of tiling and mosaicking are not worth it.
 
-:param inputImg: is the file name and path for the input image file.
-:param outputImgs: is a list of file names and paths for the output image files - Note, must be the same length as filterInsts.
-:param filterInsts: is a list of filter instances of the classes available within rsgislib.imagefilter.tiledfilter  - Note, must be the same length as filterInsts.
-:param datatype: is the output image data type (e.g., rsgislib.TYPE_32FLOAT; Default is None). If None then data type of input image is used.
-:param gdalformat: string with the GDAL image format for the output image (Default = KEA). NOTE. KEA is used as intermediate format internally and therefore needs to be available.
-:param tmpDIR: the temporary directory where intermediate files will be written (default is 'tmp'). Directory will be created and deleted if does not exist.
-:param width: int for width of the image tiles used for processing (Default = 2000).
-:param height: int for height of the image tiles used for processing (Default = 2000).
-:param nCores: is an int specifying the number of cores to be used for clumping processing.
+    :param input_img: is the file name and path for the input image file.
+    :param output_imgs: is a list of file names and paths for the output image files -
+                       Note, must be the same length as filter_insts.
+    :param filter_insts: is a list of filter instances of the classes available
+                         within rsgislib.imagefilter.tiledfilter  - Note, must be the
+                         same length as filter_insts.
+    :param datatype: is the output image data type (e.g., rsgislib.TYPE_32FLOAT;
+                     Default is None). If None then data type of input image is used.
+    :param gdalformat: string with the GDAL image format for the output image
+                       (Default = KEA). NOTE. KEA is used as intermediate format
+                       internally and therefore needs to be available.
+    :param tmp_dir: the temporary directory where intermediate files will be
+                    written (default is 'tmp'). Directory will be created and
+                    deleted if does not exist.
+    :param width: int for width of the image tiles used for processing (Default = 2000).
+    :param height: int for height of the image tiles used for processing
+                   (Default = 2000).
+    :param n_cores: is an int specifying the number of cores to be used for processing.
 
-Example::
+    Example::
 
-    import rsgislib
-    from rsgislib.imagefilter import tiledfilter
-    from rsgislib import imageutils
-    
-    inputImage = 'LandsatImg.kea'
-    outputImages = ['LandsatImgMedianFilter.kea', 'LandsatImgNormVarFilter.kea']
-    
-    filters = [tiledfilter.RSGISMedianFilter(7, "KEA", rsgislib.TYPE_16UINT), tiledfilter.RSGISNormVarFilter(7, "KEA", rsgisUtils.getRSGISLibDataTypeFromImg(inputImage))]
-    tiledfilter.performTiledImgMultiFilter(inputImage, outputImages, filters, width=2000, height=2000)
-    imageutils.popImageStats(outputImage, usenodataval=False, nodataval=0, calcpyramids=True)
+        import rsgislib
+        from rsgislib.imagefilter import tiledfilter
+        from rsgislib import imageutils
+
+        input_img = 'LandsatImg.kea'
+        outputImages = ['LandsatImgMedianFilter.kea', 'LandsatImgNormVarFilter.kea']
+
+        filters = [tiledfilter.RSGISMedianFilter(7, "KEA", rsgislib.TYPE_16UINT), tiledfilter.RSGISNormVarFilter(7, "KEA", rsgisUtils.getRSGISLibDataTypeFromImg(input_img))]
+        tiledfilter.performTiledImgMultiFilter(input_img, outputImages, filters, width=2000, height=2000)
+        imageutils.popImageStats(output_img, usenodataval=False, nodataval=0, calcpyramids=True)
     
     """
     import rsgislib.tools.utils
-    if (len(outputImgs) != len(filterInsts)):
-        raise rsgislib.RSGISPyException('The same number of filters and output images need to be provided.')
+    if (len(output_imgs) != len(filter_insts)):
+        raise rsgislib.RSGISPyException('The same number of filters and '
+                                        'output images need to be provided.')
     
-    numFilters = len(outputImgs)
+    numFilters = len(output_imgs)
 
     createdTmp = False
-    if not os.path.exists(tmpDIR):
-        os.makedirs(tmpDIR)
+    if not os.path.exists(tmp_dir):
+        os.makedirs(tmp_dir)
         createdTmp = True
     
-    if nCores <= 0:
-        nCores = rsgislib.tools.utils.numProcessCores()
+    if n_cores <= 0:
+        n_cores = rsgislib.tools.utils.numProcessCores()
         
     uidStr = rsgislib.tools.utils.uidGenerator()
-    if dataType == None:
-        dataType = rsgislib.imageutils.getRSGISLibDataTypeFromImg(inputImg)
+    if datatype == None:
+        datatype = rsgislib.imageutils.getRSGISLibDataTypeFromImg(input_img)
     
-    baseName = os.path.splitext(os.path.basename(inputImg))[0]+"_"+uidStr
+    baseName = os.path.splitext(os.path.basename(input_img))[0]+"_"+uidStr
     
-    imgTilesDIR = os.path.join(tmpDIR, "imgTiles_"+uidStr)
-    tilesFilterDIR = os.path.join(tmpDIR, "imgFilterTiles_"+uidStr)
+    imgTilesDIR = os.path.join(tmp_dir, "imgTiles_"+uidStr)
+    tilesFilterDIR = os.path.join(tmp_dir, "imgFilterTiles_"+uidStr)
     tilesImgBase = os.path.join(imgTilesDIR, baseName)
 
     if not os.path.exists(imgTilesDIR):
@@ -736,20 +759,20 @@ Example::
     first = True
     tileOverlap = 0
     
-    for filterInst in filterInsts:
-        tmpOverlap = math.ceil(filterInst.getFilterHSize())
+    for filter_inst in filter_insts:
+        tmpOverlap = math.ceil(filter_inst.getFilterHSize())
         if first:
             tileOverlap = tmpOverlap
             first = False
         elif tmpOverlap > tileOverlap:
             tileOverlap = tmpOverlap
         
-    imageutils.createTiles(inputImg, tilesImgBase, int(width), int(height), int(tileOverlap), False, 'KEA', rsgisUtils.getRSGISLibDataTypeFromImg(inputImg), 'kea')
+    imageutils.createTiles(input_img, tilesImgBase, int(width), int(height), int(tileOverlap), False, 'KEA', datatype, 'kea')
     imageTiles = glob.glob(tilesImgBase+"*.kea")    
     
     for i in range(numFilters):
-        filterInst = filterInsts[i]
-        outputImg = outputImgs[i]
+        filter_inst = filter_insts[i]
+        output_img = output_imgs[i]
         
         if not os.path.exists(tilesFilterDIR):
             os.makedirs(tilesFilterDIR)
@@ -758,22 +781,22 @@ Example::
         for tile in imageTiles:
             tileBaseName = os.path.splitext(os.path.basename(tile))[0]
             filterTile = os.path.join(tilesFilterDIR, tileBaseName+'_filter.kea')
-            filterImgsVals.append([tile, filterTile, filterInst])    
+            filterImgsVals.append([tile, filterTile, filter_inst])    
         
-        with Pool(nCores) as p:
+        with Pool(n_cores) as p:
             p.map(_performFilteringFunc, filterImgsVals)
         
         imgFilterTiles = glob.glob(os.path.join(tilesFilterDIR,"*_filter.kea"))
         
-        numOutBands = rsgislib.imageutils.getImageBandCount(inputImg)
+        numOutBands = rsgislib.imageutils.getImageBandCount(input_img)
         
-        imageutils.createCopyImage(inputImg, outputImg, numOutBands, 0, gdalformat, dataType)
+        imageutils.createCopyImage(input_img, output_img, numOutBands, 0, gdalformat, datatype)
         
-        imageutils.includeImagesWithOverlap(outputImg, imgFilterTiles, int(filterInst.getFilterHSize()))
+        imageutils.includeImagesWithOverlap(output_img, imgFilterTiles, int(filter_inst.getFilterHSize()))
         
         shutil.rmtree(tilesFilterDIR)
         
     shutil.rmtree(imgTilesDIR)
     if createdTmp:
-        shutil.rmtree(tmpDIR)
+        shutil.rmtree(tmp_dir)
 
