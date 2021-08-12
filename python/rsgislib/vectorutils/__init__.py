@@ -2,12 +2,10 @@
 """
 The vector utils module performs geometry / attribute table operations on vectors.
 """
-from __future__ import print_function
 
 # import the C++ extension into this level
 from ._vectorutils import *
 
-import os.path
 import os
 import sys
 import shutil
@@ -32,24 +30,24 @@ class VecLayersInfoObj(object):
     """
     This is a class to store the information associated within the rsgislib.vectorutils.merge_to_multi_layer_vec function.
 
-    :param vecfile: input vector file.
-    :param veclyr: input vector layer name
+    :param vec_file: input vector file.
+    :param vec_lyr: input vector layer name
     :param outlyr: output vector layer name
 
     """
 
-    def __init__(self, vecfile=None, veclyr=None, outlyr=None):
+    def __init__(self, vec_file=None, vec_lyr=None, outlyr=None):
         """
-        :param vecfile: input vector file.
-        :param veclyr: input vector layer name
+        :param vec_file: input vector file.
+        :param vec_lyr: input vector layer name
         :param outlyr: output vector layer name
 
         """
-        self.vecfile = vecfile
-        self.veclyr = veclyr
+        self.vec_file = vec_file
+        self.vec_lyr = vec_lyr
         self.outlyr = outlyr
 
-def delete_vector_file(vec_file: str, feedback:bool =True):
+def deleteVectorFile(vec_file: str, feedback:bool =True):
     """
     Function to delete an existing vector file.
 
@@ -68,48 +66,48 @@ def delete_vector_file(vec_file: str, feedback:bool =True):
             print("Deleting: {}".format(cfile))
         os.remove(cfile)
 
-def getProjWKTFromVec(inVec, vecLyr=None):
+def getProjWKTFromVec(vec_file, vec_lyr=None):
     """
     A function which gets the WKT projection from the inputted vector file.
 
-    :param inVec: is a string with the input vector file name and path.
-    :param vecLyr: is a string with the input vector layer name, if None then first layer read. (default: None)
+    :param vec_file: is a string with the input vector file name and path.
+    :param vec_lyr: is a string with the input vector layer name, if None then first layer read. (default: None)
 
     :return: WKT representation of projection
 
     """
-    dataset = gdal.OpenEx(inVec, gdal.OF_VECTOR)
+    dataset = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
     if dataset is None:
-        raise Exception("Could not open file: {}".format(inVec))
-    if vecLyr is None:
+        raise Exception("Could not open file: {}".format(vec_file))
+    if vec_lyr is None:
         layer = dataset.GetLayer()
     else:
-        layer = dataset.GetLayer(vecLyr)
+        layer = dataset.GetLayer(vec_lyr)
     if layer is None:
-        raise Exception("Could not open layer within file: {}".format(inVec))
+        raise Exception("Could not open layer within file: {}".format(vec_file))
     spatialRef = layer.GetSpatialRef()
     return spatialRef.ExportToWkt()
 
 
-def getProjEPSGFromVec(inVec, vecLyr=None):
+def getProjEPSGFromVec(vec_file, vec_lyr=None):
     """
     A function which gets the EPSG projection from the inputted vector file.
 
-    :param inVec: is a string with the input vector file name and path.
-    :param vecLyr: is a string with the input vector layer name, if None then first layer read. (default: None)
+    :param vec_file: is a string with the input vector file name and path.
+    :param vec_lyr: is a string with the input vector layer name, if None then first layer read. (default: None)
 
     :return: EPSG representation of projection
 
     """
-    dataset = gdal.OpenEx(inVec, gdal.OF_VECTOR)
+    dataset = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
     if dataset is None:
-        raise Exception("Could not open file: {}".format(inVec))
-    if vecLyr is None:
+        raise Exception("Could not open file: {}".format(vec_file))
+    if vec_lyr is None:
         layer = dataset.GetLayer()
     else:
-        layer = dataset.GetLayer(vecLyr)
+        layer = dataset.GetLayer(vec_lyr)
     if layer is None:
-        raise Exception("Could not open layer within file: {}".format(inVec))
+        raise Exception("Could not open layer within file: {}".format(vec_file))
     spatialRef = layer.GetSpatialRef()
     spatialRef.AutoIdentifyEPSG()
     return spatialRef.GetAuthorityCode(None)
@@ -166,15 +164,15 @@ Example::
         print("Running Rasterise now...")
         out_img_ds = gdal.Open(outImage, gdal.GA_Update)
         if out_img_ds is None:
-            raise Exception("Could not open '" + outImage + "'")
+            raise Exception("Could not open '{}'".format(outImage))
             
         vec_ds = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
         if vec_ds is None:
-            raise Exception("Could not open '" + vec_file + "'")
+            raise Exception("Could not open '{}'".format(vec_file))
         
         vec_lyr_obj = vec_ds.GetLayerByName( vec_lyr )
         if vec_lyr_obj is None:
-            raise Exception("Could not find layer '" + vec_lyr + "'")
+            raise Exception("Could not find layer '{}'".format(vec_lyr))
         
         # Run the algorithm.
         err = 0
@@ -353,273 +351,26 @@ Where:
         gdalImgMaskDS = None
 
 
-def writeVecColumn(vectorFile, vectorLayer, colName, colDataType, colData):
-    """
-A function which will write a column to a vector file
 
-Where:
-
-:param vectorFile: The file / path to the vector data 'file'.
-:param vectorLayer: The layer to which the data is to be added.
-:param colName: Name of the output column
-:param colDataType: ogr data type (e.g., ogr.OFTString, ogr.OFTInteger, ogr.OFTReal)
-:param colData: A list of the same length as the number of features in vector file.
-
-Example::
-
-    from rsgislib import vectorutils
-    import rsgislib
-    import osgeo.ogr as ogr
-    import rsgislib.tools.utils
-
-    requiredScenes = rsgislib.tools.utils.readTextFile2List("GMW_JERS-1_ScenesRequired.txt")
-    requiredScenesShp = "JERS-1_Scenes_Requred_shp"
-    vectorutils.writeVecColumn(requiredScenesShp+'.shp', requiredScenesShp, 'ScnName', ogr.OFTString, requiredScenes)
-
-"""
-    gdal.UseExceptions()
-    
-    ds = gdal.OpenEx(vectorFile, gdal.OF_UPDATE )
-    if ds is None:
-        raise Exception("Could not open '" + vectorFile + "'")
-
-    lyr = ds.GetLayerByName( vectorLayer )
-    if lyr is None:
-        raise Exception("Could not find layer '" + vectorLayer + "'")
-
-    numFeats = lyr.GetFeatureCount()
-    if not len(colData) == numFeats:
-        print("Number of Features: " + str(numFeats))
-        print("Length of Data: " + str(len(colData)))
-        raise Exception( "The number of features and size of the input data is not equal." )
-
-    colExists = False
-    lyrDefn = lyr.GetLayerDefn()
-    for i in range( lyrDefn.GetFieldCount() ):
-        if lyrDefn.GetFieldDefn(i).GetName().lower() == colName.lower():
-            colExists = True
-            break
-
-    if not colExists:
-        field_defn = ogr.FieldDefn( colName, colDataType )
-        if lyr.CreateField ( field_defn ) != 0:
-            raise Exception("Creating '" + colName + "' field failed; becareful with case, some drivers are case insensitive but column might not be found.")
-
-    lyr.ResetReading()
-    # WORK AROUND AS SQLITE GETS STUCK IN LOOP ON FIRST FEATURE WHEN USE SETFEATURE.
-    fids=[]
-    for feat in lyr:
-        fids.append(feat.GetFID())
-
-    openTransaction = False
-    lyr.ResetReading()
-    i = 0
-    try:
-        # WORK AROUND AS SQLITE GETS STUCK IN LOOP ON FIRST FEATURE WHEN USE SETFEATURE.
-        for fid in fids:
-            if not openTransaction:
-                lyr.StartTransaction()
-                openTransaction = True
-            feat = lyr.GetFeature(fid)
-            if feat is not None:
-                feat.SetField(colName, colData[i])
-                lyr.SetFeature(feat)
-            if ((i % 20000) == 0) and openTransaction:
-                lyr.CommitTransaction()
-                openTransaction = False
-            i = i + 1
-        if openTransaction:
-            lyr.CommitTransaction()
-            openTransaction = False
-        lyr.SyncToDisk()
-        ds = None
-    except Exception as e:
-        if i < numFeats:
-            print("Data type of the value being written is '{}'".format(type(colData[i])))
-        raise e
-    
-def writeVecColumn2Layer(lyr, colName, colDataType, colData):
-    """
-A function which will write a column to a vector layer.
-
-Where:
-
-:param lyr: GDAL/OGR vector layer object
-:param colName: Name of the output column
-:param colDataType: ogr data type (e.g., ogr.OFTString, ogr.OFTInteger, ogr.OFTReal)
-:param colData: A list of the same length as the number of features in vector file.
-
-"""
-    gdal.UseExceptions()
-    
-    if lyr is None:
-        raise Exception("The layer passed in is None...")
-    
-    numFeats = lyr.GetFeatureCount()
-    if not len(colData) == numFeats:
-        print("Number of Features: " + str(numFeats))
-        print("Length of Data: " + str(len(colData)))
-        raise Exception( "The number of features and size of the input data is not equal." )
-
-    colExists = False
-    lyrDefn = lyr.GetLayerDefn()
-    for i in range( lyrDefn.GetFieldCount() ):
-        if lyrDefn.GetFieldDefn(i).GetName().lower() == colName.lower():
-            colExists = True
-            break
-
-    if not colExists:
-        field_defn = ogr.FieldDefn( colName, colDataType )
-        if lyr.CreateField ( field_defn ) != 0:
-            raise Exception("Creating '" + colName + "' field failed; becareful with case, some drivers are case insensitive but column might not be found.\n")
-    
-    lyr.ResetReading()
-    # WORK AROUND AS SQLITE GETS STUCK IN LOOP ON FIRST FEATURE WHEN USE SETFEATURE.
-    fids=[]
-    for feat in lyr:
-        fids.append(feat.GetFID())
-    
-    openTransaction = False
-    lyr.ResetReading()
-    i = 0
-    # WORK AROUND AS SQLITE GETS STUCK IN LOOP ON FIRST FEATURE WHEN USE SETFEATURE.
-    for fid in fids:
-        if not openTransaction:
-            lyr.StartTransaction()
-            openTransaction = True
-        feat = lyr.GetFeature(fid)
-        if feat is not None:
-            feat.SetField(colName, colData[i])
-            lyr.SetFeature(feat)
-        if ((i % 20000) == 0) and openTransaction:
-            lyr.CommitTransaction()
-            openTransaction = False
-        i = i + 1
-    if openTransaction:
-        lyr.CommitTransaction()
-        openTransaction = False
-
-
-def readVecColumn(vectorFile, vectorLayer, colName):
-    """
-A function which will reads a column from a vector file
-
-Where:
-
-:param vectorFile: The file / path to the vector data 'file'.
-:param vectorLayer: The layer to which the data is to be read from.
-:param colName: Name of the input column
-
-"""
-    gdal.UseExceptions()
-    
-    ds = gdal.OpenEx(vectorFile, gdal.OF_VECTOR )
-    if ds is None:
-        raise Exception("Could not open '" + vectorFile + "'")
-    
-    lyr = ds.GetLayerByName( vectorLayer )
-    if lyr is None:
-        raise Exception("Could not find layer '" + vectorLayer + "'")
-
-    colExists = False
-    lyrDefn = lyr.GetLayerDefn()
-    for i in range( lyrDefn.GetFieldCount() ):
-        if lyrDefn.GetFieldDefn(i).GetName() == colName:
-            colExists = True
-            break
-    
-    if not colExists:
-        ds = None
-        raise Exception("The specified column does not exist in the input layer; check case as some drivers are case sensitive.")
-    
-    outVal = list()
-    lyr.ResetReading()
-    for feat in lyr:
-        outVal.append(feat.GetField(colName))
-    ds = None
-    
-    return outVal
-
-
-def readVecColumns(vectorFile, vectorLayer, attNames):
-    """
-A function which will reads a column from a vector file
-
-Where:
-
-:param vectorFile: The file / path to the vector data 'file'.
-:param vectorLayer: The layer to which the data is to be read from.
-:param attNames: List of input attribute column names to be read in.
-
-"""
-    gdal.UseExceptions()
-    
-    ds = gdal.OpenEx(vectorFile, gdal.OF_VECTOR )
-    if ds is None:
-        raise Exception("Could not open '{}'".format(vectorFile))
-    
-    lyr = ds.GetLayerByName( vectorLayer )
-    if lyr is None:
-        raise Exception("Could not find layer '{}'".format(vectorLayer))
-    
-    lyrDefn = lyr.GetLayerDefn()
-    
-    feat_idxs = dict()
-    feat_types= dict()
-    found_atts = dict()
-    for attName in attNames:
-        found_atts[attName] = False
-    
-    for i in range(lyrDefn.GetFieldCount()):
-        if lyrDefn.GetFieldDefn(i).GetName() in attNames:
-            attName = lyrDefn.GetFieldDefn(i).GetName()
-            feat_idxs[attName] = i
-            feat_types[attName] = lyrDefn.GetFieldDefn(i).GetType()
-            found_atts[attName] = True
-            
-    for attName in attNames:
-        if not found_atts[attName]:
-            ds = None
-            raise Exception("Could not find the attribute ({}) specified within the vector layer.".format(attName))
-    
-    outvals = []
-    lyr.ResetReading()
-    for feat in lyr:
-        outdict = dict()
-        for attName in attNames:
-            if feat_types[attName] == ogr.OFTString:
-                outdict[attName] = feat.GetFieldAsString(feat_idxs[attName])
-            elif feat_types[attName] == ogr.OFTReal:
-                outdict[attName] = feat.GetFieldAsDouble(feat_idxs[attName])
-            elif feat_types[attName] == ogr.OFTInteger:
-                outdict[attName] = feat.GetFieldAsInteger(feat_idxs[attName])
-            else:
-                outdict[attName] = feat.GetField(feat_idxs[attName])
-        outvals.append(outdict)
-    ds = None
-    
-    return outvals
-
-
-def popBBOXCols(vecFile, vecLyr, xminCol='xmin', xmaxCol='xmax', yminCol='ymin', ymaxCol='ymax'):
+def popBBOXCols(vec_file, vec_lyr, xminCol='xmin', xmaxCol='xmax', yminCol='ymin', ymaxCol='ymax'):
     """
 A function which adds a polygons boundary bbox as attributes to each feature.
 
-:param vecFile: vector file.
-:param vecLyr: layer within the vector file.
+:param vec_file: vector file.
+:param vec_lyr: layer within the vector file.
 :param xminCol: column name.
 :param xmaxCol: column name.
 :param yminCol: column name.
 :param ymaxCol: column name.
 
 """
-    dsVecFile = gdal.OpenEx(vecFile, gdal.OF_UPDATE )
+    dsVecFile = gdal.OpenEx(vec_file, gdal.OF_UPDATE )
     if dsVecFile is None:
-        raise Exception("Could not open '" + vecFile + "'")
+        raise Exception("Could not open '" + vec_file + "'")
         
-    vec_lyr_obj = dsVecFile.GetLayerByName( vecLyr )
+    vec_lyr_obj = dsVecFile.GetLayerByName( vec_lyr )
     if vec_lyr_obj is None:
-        raise Exception("Could not find layer '" + vecLyr + "'")
+        raise Exception("Could not find layer '" + vec_lyr + "'")
     
     xminCol_exists = False
     xmaxCol_exists = False
@@ -777,12 +528,12 @@ A function to extract an image footprint as a vector.
             driver.DeleteDataSource(outVecTmpFile)
 
 
-def getVecFeatCount(inVec, layerName=None, computeCount=True):
+def getVecFeatCount(vec_file, vec_lyr=None, computeCount=True):
     """
 Get a count of the number of features in the vector layers.
 
-:param inVec: is a string with the input vector file name and path.
-:param layerName: is the layer for which extent is to be calculated (Default: None). if None assume there is only one layer and that will be read.
+:param vec_file: is a string with the input vector file name and path.
+:param vec_lyr: is the layer for which extent is to be calculated (Default: None). if None assume there is only one layer and that will be read.
 :param computeCount: is a boolean which specifies whether the layer extent
                      should be calculated (rather than estimated from header)
                      even if that operation is computationally expensive.
@@ -791,9 +542,9 @@ Get a count of the number of features in the vector layers.
 
 """
     gdal.UseExceptions()
-    inDataSource = gdal.OpenEx(inVec, gdal.OF_VECTOR )
-    if layerName is not None:
-        inLayer = inDataSource.GetLayer(layerName)
+    inDataSource = gdal.OpenEx(vec_file, gdal.OF_VECTOR )
+    if vec_lyr is not None:
+        inLayer = inDataSource.GetLayer(vec_lyr)
     else:
         inLayer = inDataSource.GetLayer()
     if inLayer is None:
@@ -1093,16 +844,16 @@ This function takes a CSV file of bounding boxes (1 per line) and creates a poly
         raise e
 
 
-def getVecLyrsLst(vecFile):
+def getVecLyrsLst(vec_file):
     """
 A function which returns a list of available layers within the inputted vector file.
 
-:param vecFile: file name and path to input vector layer.
+:param vec_file: file name and path to input vector layer.
 
 :return: list of layer names (can be used with gdal.Dataset.GetLayerByName()).
 
 """
-    gdalDataset = gdal.OpenEx(vecFile, gdal.OF_VECTOR )
+    gdalDataset = gdal.OpenEx(vec_file, gdal.OF_VECTOR )
     layerList = []
     for lyr_idx in range(gdalDataset.GetLayerCount()):
         lyr = gdalDataset.GetLayerByIndex(lyr_idx)
@@ -1113,12 +864,12 @@ A function which returns a list of available layers within the inputted vector f
     return layerList
 
 
-def getVecLayerExtent(inVec, layerName=None, computeIfExp=True):
+def getVecLayerExtent(vec_file, vec_lyr=None, computeIfExp=True):
     """
 Get the extent of the vector layer.
 
-:param inVec: is a string with the input vector file name and path.
-:param layerName: is the layer for which extent is to be calculated (Default: None)
+:param vec_file: is a string with the input vector file name and path.
+:param vec_lyr: is the layer for which extent is to be calculated (Default: None)
                   if None assume there is only one layer and that will be read.
 :param computeIfExp: is a boolean which specifies whether the layer extent
                      should be calculated (rather than estimated from header)
@@ -1129,49 +880,49 @@ Get the extent of the vector layer.
 """
     gdal.UseExceptions()
     # Get a Layer's Extent
-    inDataSource = gdal.OpenEx(inVec, gdal.OF_VECTOR )
-    if layerName is not None:
-        inLayer = inDataSource.GetLayer(layerName)
+    inDataSource = gdal.OpenEx(vec_file, gdal.OF_VECTOR )
+    if vec_lyr is not None:
+        inLayer = inDataSource.GetLayer(vec_lyr)
     else:
         inLayer = inDataSource.GetLayer()
     extent = inLayer.GetExtent(computeIfExp)
     return extent
 
 
-def getProjWKTFromVec(inVec, layerName=None):
+def getProjWKTFromVec(vec_file, vec_lyr=None):
     """
-:param inVec: is a string with the input vector file name and path.
+:param vec_file: is a string with the input vector file name and path.
 
 :return: WKT representation of projection
 
 """
     gdal.UseExceptions()
     # Get shapefile projection as WKT
-    dataset = gdal.OpenEx(inVec, gdal.OF_VECTOR )
-    if layerName is not None:
-        layer = dataset.GetLayer(layerName)
+    dataset = gdal.OpenEx(vec_file, gdal.OF_VECTOR )
+    if vec_lyr is not None:
+        layer = dataset.GetLayer(vec_lyr)
     else:
         layer = dataset.GetLayer()
     spatialRef = layer.GetSpatialRef()
     return spatialRef.ExportToWkt()
 
 
-def splitVecLyr(vecFile, vecLyr, nfeats, outVecDrvr, outdir, outvecbase, outvecend):
+def splitVecLyr(vec_file, vec_lyr, nfeats, out_format, outdir, outvecbase, outvecend):
     """
 A function which splits the input vector layer into a number of output layers.
 
-:param vecFile: input vector file.
-:param vecLyr: input layer name.
+:param vec_file: input vector file.
+:param vec_lyr: input layer name.
 :param nfeats: number of features within each output file.
-:param outVecDrvr: output file driver.
+:param out_format: output file driver.
 :param outdir: output directory for the created output files.
 :param outvecbase: output layer name will be the same as the base file name.
 :param outvecend: file ending (e.g., .shp).
 
 """
     gdal.UseExceptions()
-    datasrc = gdal.OpenEx(vecFile, gdal.OF_VECTOR )
-    srcLyr = datasrc.GetLayer(vecLyr)
+    datasrc = gdal.OpenEx(vec_file, gdal.OF_VECTOR )
+    srcLyr = datasrc.GetLayer(vec_lyr)
     nInFeats = srcLyr.GetFeatureCount(True)
     print(nInFeats)
     
@@ -1180,7 +931,7 @@ A function which splits the input vector layer into a number of output layers.
     print(nOutFiles)
     print(remainFeats)
     
-    out_driver = ogr.GetDriverByName(outVecDrvr)
+    out_driver = ogr.GetDriverByName(out_format)
     src_lyr_spat_ref = srcLyr.GetSpatialRef()
     
     cFeatN = 0
@@ -1247,14 +998,14 @@ A function which splits the input vector layer into a number of output layers.
     datasrc = None
 
 
-def reProjVectorLayer(in_vec_file, outputVec, outProjWKT, outDriverName='ESRI Shapefile', outLyrName=None,
+def reProjVectorLayer(in_vec_file, out_vec_file, outProjWKT, outDriverName='ESRI Shapefile', outLyrName=None,
                       inLyrName=None, inProjWKT=None, del_exist_vec=False):
     """
 A function which reprojects a vector layer. You might also consider using rsgislib.vectorutils.vector_translate,
 particularly if you are reprojecting the data and changing between coordinate units (e.g., degrees to meters)
 
 :param in_vec_file: is a string with name and path to input vector file.
-:param outputVec: is a string with name and path to output vector file.
+:param out_vec_file: is a string with name and path to output vector file.
 :param outProjWKT: is a string with the WKT string for the output vector file.
 :param outDriverName: is the output vector file format. Default is ESRI Shapefile.
 :param outLyrName: is a string for the output layer name. If None then ignored and
@@ -1297,20 +1048,20 @@ particularly if you are reprojecting the data and changing between coordinate un
     driver = gdal.GetDriverByName( outDriverName )
     
     # create the output layer
-    if os.path.exists(outputVec):
+    if os.path.exists(out_vec_file):
         if (outDriverName == 'ESRI Shapefile'):
             if del_exist_vec:
-                driver.DeleteDataSource(outputVec)
+                driver.DeleteDataSource(out_vec_file)
             else:
                 raise Exception('Output shapefile already exists - stopping.')
-            outDataSet = driver.Create(outputVec, 0, 0, 0, gdal.GDT_Unknown )
+            outDataSet = driver.Create(out_vec_file, 0, 0, 0, gdal.GDT_Unknown )
         else:
-            outDataSet = gdal.OpenEx(outputVec, gdal.OF_UPDATE )
+            outDataSet = gdal.OpenEx(out_vec_file, gdal.OF_UPDATE )
     else:
-        outDataSet = driver.Create(outputVec, 0, 0, 0, gdal.GDT_Unknown )
+        outDataSet = driver.Create(out_vec_file, 0, 0, 0, gdal.GDT_Unknown )
     
     if outLyrName is None:
-        outLyrName = os.path.splitext(os.path.basename(outputVec))[0]
+        outLyrName = os.path.splitext(os.path.basename(out_vec_file))[0]
     outLayer = outDataSet.CreateLayer(outLyrName, outSpatialRef, inLayer.GetGeomType() )
     
     # add fields
@@ -1376,7 +1127,7 @@ particularly if you are reprojecting the data and changing between coordinate un
     outDataSet = None
 
 
-def reproj_vec_lyr(in_vec_lyr, out_vec_file, out_epsg, out_vec_drv='MEMORY', out_lyr_name=None, in_epsg=None,
+def reproj_vec_lyr(in_vec_lyr, out_vec_file, out_epsg, out_format='MEMORY', out_lyr_name=None, in_epsg=None,
                       print_feedback=True):
     """
 A function which reprojects a vector layer. You might also consider using rsgislib.vectorutils.vector_translate,
@@ -1385,7 +1136,7 @@ particularly if you are reprojecting the data and changing between coordinate un
 :param in_vec_lyr: is a GDAL vector layer object.
 :param out_vec_file: is a string with name and path to output vector file - is created.
 :param out_epsg: is an int with the EPSG code to which the input vector layer is to be reprojected to.
-:param out_vec_drv: is the output vector file format. Default is MEMORY - i.e., nothing written to disk.
+:param out_format: is the output vector file format. Default is MEMORY - i.e., nothing written to disk.
 :param out_lyr_name: is a string for the output layer name. If None then ignored and
                    assume there is just a single layer in the vector and layer name
                    is the same as the file name.
@@ -1419,7 +1170,7 @@ particularly if you are reprojecting the data and changing between coordinate un
     coord_trans = osr.CoordinateTransformation(in_spat_ref, out_spat_ref)
 
     # Create shapefile driver
-    driver = ogr.GetDriverByName(out_vec_drv)
+    driver = ogr.GetDriverByName(out_format)
     if driver == None:
         raise Exception("Driver has not be recognised.")
 
@@ -1499,13 +1250,13 @@ particularly if you are reprojecting the data and changing between coordinate un
     return result_ds, result_lyr
 
 
-def getAttLstSelectFeats(vecFile, vecLyr, attNames, selVecFile, selVecLyr):
+def getAttLstSelectFeats(vec_file, vec_lyr, attNames, selVecFile, selVecLyr):
     """
 Function to get a list of attribute values from features which intersect
 with the select layer.
 
-:param vecFile: vector layer from which the attribute data comes from.
-:param vecLyr: the layer name from which the attribute data comes from.
+:param vec_file: vector layer from which the attribute data comes from.
+:param vec_lyr: the layer name from which the attribute data comes from.
 :param attNames: a list of attribute names to be outputted.
 :param selVecFile: the vector file which will be intersected within the vector file.
 :param selVecLyr: the layer name which will be intersected within the vector file.
@@ -1515,13 +1266,13 @@ with the select layer.
     gdal.UseExceptions()
     att_vals = []
     try:
-        dsVecFile = gdal.OpenEx(vecFile, gdal.OF_READONLY )
+        dsVecFile = gdal.OpenEx(vec_file, gdal.OF_READONLY )
         if dsVecFile is None:
-            raise Exception("Could not open '" + vecFile + "'")
+            raise Exception("Could not open '" + vec_file + "'")
         
-        vec_lyr_obj = dsVecFile.GetLayerByName( vecLyr )
+        vec_lyr_obj = dsVecFile.GetLayerByName( vec_lyr )
         if vec_lyr_obj is None:
-            raise Exception("Could not find layer '" + vecLyr + "'")
+            raise Exception("Could not find layer '" + vec_lyr + "'")
             
         dsSelVecFile = gdal.OpenEx(selVecFile, gdal.OF_READONLY )
         if dsSelVecFile is None:
@@ -1682,11 +1433,11 @@ with the select layer.
 """
     dsVecFile = gdal.OpenEx(vec_file, gdal.OF_READONLY)
     if dsVecFile is None:
-        raise Exception("Could not open '" + vec_file + "'")
+        raise Exception("Could not open '{}'".format(vec_file))
 
     vec_lyr_obj = dsVecFile.GetLayerByName(vec_lyr)
     if vec_lyr_obj is None:
-        raise Exception("Could not find layer '" + vec_lyr + "'")
+        raise Exception("Could not find layer '{}'".format(vec_lyr))
 
     outvals = getAttLstSelectBBoxFeatsLyrObjs(vec_lyr_obj, attNames, bbox, bbox_epsg)
     dsVecFile = None
@@ -1795,13 +1546,13 @@ with the select layer.
     return outvals
 
 
-def selectIntersectFeats(vecFile, vecLyr, roiVecFile, roiVecLyr, out_vec_file, out_vec_lyr, out_vec_format='GPKG'):
+def selectIntersectFeats(vec_file, vec_lyr, roiVecFile, roiVecLyr, out_vec_file, out_vec_lyr, out_vec_format='GPKG'):
     """
 Function to select the features which intersect with region of interest (ROI) features which will be outputted
 into a new vector layer.
 
-:param vecFile: vector layer from which the attribute data comes from.
-:param vecLyr: the layer name from which the attribute data comes from.
+:param vec_file: vector layer from which the attribute data comes from.
+:param vec_lyr: the layer name from which the attribute data comes from.
 :param roiVecFile: the vector file which will be intersected within the vector file.
 :param roiVecLyr: the layer name which will be intersected within the vector file.
 :param out_vec_file: the vector file which will be outputted.
@@ -1810,13 +1561,13 @@ into a new vector layer.
 
 """
     gdal.UseExceptions()
-    dsVecFile = gdal.OpenEx(vecFile, gdal.OF_READONLY)
+    dsVecFile = gdal.OpenEx(vec_file, gdal.OF_READONLY)
     if dsVecFile is None:
-        raise Exception("Could not open '" + vecFile + "'")
+        raise Exception("Could not open '" + vec_file + "'")
 
-    vec_lyr_obj = dsVecFile.GetLayerByName(vecLyr)
+    vec_lyr_obj = dsVecFile.GetLayerByName(vec_lyr)
     if vec_lyr_obj is None:
-        raise Exception("Could not find layer '" + vecLyr + "'")
+        raise Exception("Could not find layer '" + vec_lyr + "'")
 
     in_vec_lyr_spat_ref = vec_lyr_obj.GetSpatialRef()
 
@@ -1846,30 +1597,30 @@ into a new vector layer.
     result_ds = None
 
 
-def exportSpatialSelectFeats(vecFile, vecLyr, selVecFile, selVecLyr, outputVec, outVecLyrName, outVecDrvr):
+def exportSpatialSelectFeats(vec_file, vec_lyr, selVecFile, selVecLyr, out_vec_file, out_vec_lyr, out_format):
     """
 Function to get a list of attribute values from features which intersect
 with the select layer.
 
-:param vecFile: vector layer from which the attribute data comes from.
-:param vecLyr: the layer name from which the attribute data comes from.
+:param vec_file: vector layer from which the attribute data comes from.
+:param vec_lyr: the layer name from which the attribute data comes from.
 :param selVecFile: the vector file which will be intersected within the vector file.
 :param selVecLyr: the layer name which will be intersected within the vector file.
-:param outputVec: output vector file/path
-:param outVecLyrName: output vector layer
-:param outVecDrvr: the output vector layer type.
+:param out_vec_file: output vector file/path
+:param out_vec_lyr: output vector layer
+:param out_format: the output vector layer type.
 
 """
     gdal.UseExceptions()
     att_vals = []
     try:
-        dsVecFile = gdal.OpenEx(vecFile, gdal.OF_READONLY )
+        dsVecFile = gdal.OpenEx(vec_file, gdal.OF_READONLY )
         if dsVecFile is None:
-            raise Exception("Could not open '" + vecFile + "'")
+            raise Exception("Could not open '" + vec_file + "'")
         
-        vec_lyr_obj = dsVecFile.GetLayerByName( vecLyr )
+        vec_lyr_obj = dsVecFile.GetLayerByName( vec_lyr )
         if vec_lyr_obj is None:
-            raise Exception("Could not find layer '" + vecLyr + "'")
+            raise Exception("Could not find layer '" + vec_lyr + "'")
         
         lyr_spatial_ref = vec_lyr_obj.GetSpatialRef()
         
@@ -1901,9 +1652,9 @@ with the select layer.
                 if geom.Intersects(vec_lyr_bbox_poly):
                     geom_collect.AddGeometry(geom)
         
-        out_driver = ogr.GetDriverByName(outVecDrvr)        
-        result_ds = out_driver.CreateDataSource(outputVec)
-        result_lyr = result_ds.CreateLayer(outVecLyrName, lyr_spatial_ref, geom_type=vec_lyr_obj.GetGeomType())
+        out_driver = ogr.GetDriverByName(out_format)
+        result_ds = out_driver.CreateDataSource(out_vec_file)
+        result_lyr = result_ds.CreateLayer(out_vec_lyr, lyr_spatial_ref, geom_type=vec_lyr_obj.GetGeomType())
         
         srcLayerDefn = vec_lyr_obj.GetLayerDefn()
         for i in range(srcLayerDefn.GetFieldCount()):
@@ -2061,14 +1812,14 @@ multiple layers. A shapefile which only supports 1 layer will not work.
             createPolyVecBBOXs(out_vec, out_vec_lyr, vec_drv, out_epsg_code, bboxs)
 
 
-def createPolyVecBBOXs(vectorFile, vectorLyr, vecDriver, epsgCode, bboxs, atts=None, attTypes=None, overwrite=True):
+def createPolyVecBBOXs(vec_file, vectorLyr, out_format, epsgCode, bboxs, atts=None, attTypes=None, overwrite=True):
     """
 This function creates a set of polygons for a set of bounding boxes.
 When creating an attribute the available data types are ogr.OFTString, ogr.OFTInteger, ogr.OFTReal
 
-:param vectorFile: output vector file/path
+:param vec_file: output vector file/path
 :param vectorLyr: output vector layer
-:param vecDriver: the output vector layer type.
+:param out_format: the output vector layer type.
 :param epsgCode: EPSG code specifying the projection of the data (e.g., 4326 is WSG84 Lat/Long).
 :param bboxs: is a list of bounding boxes ([xMin, xMax, yMin, yMax]) to be saved to the output vector.
 :param atts: is a dict of lists of attributes with the same length as the bboxs list. The dict should be named
@@ -2081,14 +1832,14 @@ When creating an attribute the available data types are ogr.OFTString, ogr.OFTIn
     try:
         gdal.UseExceptions()
 
-        if os.path.exists(vectorFile) and (not overwrite):
+        if os.path.exists(vec_file) and (not overwrite):
             # Open the output file.
-            outDataSource = gdal.OpenEx(vectorFile, gdal.GA_Update)
+            outDataSource = gdal.OpenEx(vec_file, gdal.GA_Update)
         else:
             # Create the output Driver
-            outDriver = ogr.GetDriverByName(vecDriver)
+            outDriver = ogr.GetDriverByName(out_format)
             # Create the output vector file
-            outDataSource = outDriver.CreateDataSource(vectorFile)
+            outDataSource = outDriver.CreateDataSource(vec_file)
 
         # create the spatial reference
         srs = osr.SpatialReference()
@@ -2161,17 +1912,17 @@ When creating an attribute the available data types are ogr.OFTString, ogr.OFTIn
         raise e
 
 
-def createVectorGrid(outputVec, vecDriver, vecLyrName, epsgCode, grid_x, grid_y, bbox):
+def createVectorGrid(out_vec_file, out_format, out_vec_lyr, epsgCode, grid_x, grid_y, bbox):
     """
 A function which creates a regular grid across a defined area.
 
-:param outputVec: outout file
+:param out_vec_file: outout file
 :param epsgCode: EPSG code of the output projection
 :param grid_x: the size in the x axis of the grid cells.
 :param grid_y: the size in the y axis of the grid cells.
 :param bbox: the area for which cells will be defined (MinX, MaxX, MinY, MaxY).
-:param vecDriver: the output vector layer type.
-:param vecLyrName: output vector layer
+:param out_format: the output vector layer type.
+:param out_vec_lyr: output vector layer
 
 """    
     minX = float(bbox[0])
@@ -2213,17 +1964,17 @@ A function which creates a regular grid across a defined area.
             cMaxX = cMinX + x_remain
             bboxs.append([cMinX, cMaxX, cMinY, cMaxY])
     
-    createPolyVecBBOXs(outputVec, vecLyrName, vecDriver, epsgCode, bboxs)
+    createPolyVecBBOXs(out_vec_file, out_vec_lyr, out_format, epsgCode, bboxs)
 
 
-def writePts2Vec(vectorFile, vectorLyr, vecDriver, epsgCode, ptsX, ptsY, atts=None, attTypes=None, replace=True, file_opts=[], lyr_opts=[]):
+def writePts2Vec(vec_file, vectorLyr, out_format, epsgCode, ptsX, ptsY, atts=None, attTypes=None, replace=True, file_opts=[], lyr_opts=[]):
     """
 This function creates a set of polygons for a set of bounding boxes.
 When creating an attribute the available data types are ogr.OFTString, ogr.OFTInteger, ogr.OFTReal
 
-:param vectorFile: output vector file/path
+:param vec_file: output vector file/path
 :param vectorLyr: output vector layer
-:param vecDriver: the output vector layer type.
+:param out_format: the output vector layer type.
 :param epsgCode: EPSG code specifying the projection of the data (e.g., 4326 is WSG84 Lat/Long).
 :param ptsX: is a list of x coordinates.
 :param ptsY: is a list of y coordinates.
@@ -2247,13 +1998,13 @@ When creating an attribute the available data types are ogr.OFTString, ogr.OFTIn
 
         gdal.UseExceptions()
 
-        if os.path.exists(vectorFile) and (not replace):
-            vecDS = gdal.OpenEx(vectorFile, gdal.GA_Update )
+        if os.path.exists(vec_file) and (not replace):
+            vecDS = gdal.OpenEx(vec_file, gdal.GA_Update )
         else:
-            if os.path.exists(vectorFile):
-                rsgislib.vectorutils.delete_vector_file(vectorFile)
-            outdriver = ogr.GetDriverByName(vecDriver)
-            vecDS = outdriver.CreateDataSource(vectorFile, options=file_opts)
+            if os.path.exists(vec_file):
+                deleteVectorFile(vec_file)
+            outdriver = ogr.GetDriverByName(out_format)
+            vecDS = outdriver.CreateDataSource(vec_file, options=file_opts)
 
         srs = osr.SpatialReference()
         srs.ImportFromEPSG(int(epsgCode))
@@ -2315,20 +2066,20 @@ When creating an attribute the available data types are ogr.OFTString, ogr.OFTIn
         raise e
 
 
-def bboxIntersectsVecLyr(vectorFile, vectorLyr, bbox):
+def bboxIntersectsVecLyr(vec_file, vectorLyr, bbox):
     """
 A function which tests whether a feature within an inputted vector layer intersects
 with a bounding box. 
 
-:param vectorFile: vector file/path
+:param vec_file: vector file/path
 :param vectorLyr: vector layer name
 :param bbox: the bounding box (xMin, xMax, yMin, yMax). Same projection as vector layer.
 :returns: boolean (True = Intersection)
 
 """
-    dsVecFile = gdal.OpenEx(vectorFile, gdal.OF_READONLY )
+    dsVecFile = gdal.OpenEx(vec_file, gdal.OF_READONLY )
     if dsVecFile is None:
-        raise Exception("Could not open '" + vectorFile + "'")
+        raise Exception("Could not open '{}'".format(vec_file))
     
     vec_lyr_obj = dsVecFile.GetLayerByName( vectorLyr )
     if vec_lyr_obj is None:
@@ -2429,15 +2180,15 @@ def bboxIntersectsIndex(rt_idx, geom_lst, bbox):
     return bbox_intersects
 
 
-def createImgExtentLUT(imgList, vectorFile, vectorLyr, vecDriver, ignore_none_imgs=False, out_proj_wgs84=False,
+def createImgExtentLUT(imgList, vec_file, vectorLyr, out_format, ignore_none_imgs=False, out_proj_wgs84=False,
                        overwrite_lut_file=False):
     """
 Create a vector layer look up table (LUT) for a directory of images.
 
 :param imgList: list of input images for the LUT. All input images should be the same projection/coordinate system.
-:param vectorFile: output vector file/path
+:param vec_file: output vector file/path
 :param vectorLyr: output vector layer
-:param vecDriver: the output vector layer type (e.g., GPKG).
+:param out_format: the output vector layer type (e.g., GPKG).
 :param ignore_none_imgs: if a NULL epsg is returned from an image then ignore and don't include in LUT else throw exception.
 :param out_proj_wgs84: if True then the image bounding boxes will be re-projected to EPSG:4326.
 :param overwrite_lut_file: if True then output file will be overwritten. If false then not, e.g., can add extra layer to GPKG
@@ -2497,16 +2248,16 @@ Example::
             atts['filename'].append(baseName)
             atts['path'].append(filePath)
     # Create vector layer
-    createPolyVecBBOXs(vectorFile, vectorLyr, vecDriver, epsgCode, bboxs, atts, attTypes, overwrite=overwrite_lut_file)
+    createPolyVecBBOXs(vec_file, vectorLyr, out_format, epsgCode, bboxs, atts, attTypes, overwrite=overwrite_lut_file)
 
 
-def calcPolyCentroids(vecfile, veclyrname, outVecDrvr, vecoutfile, vecoutlyrname):
+def calcPolyCentroids(vec_file, vec_lyr, out_format, vecoutfile, vecoutlyrname):
     """
 Create a vector layer of the polygon centroids.
 
-:param vecfile: input vector file
-:param veclyrname: input vector layer within the input file.
-:param outVecDrvr: the format driver for the output vector file (e.g., GPKG, ESRI Shapefile).
+:param vec_file: input vector file
+:param vec_lyr: input vector layer within the input file.
+:param out_format: the format driver for the output vector file (e.g., GPKG, ESRI Shapefile).
 :param vecoutfile: output file path for the vector.
 :param vecoutlyrname: output vector layer name.
 
@@ -2516,16 +2267,16 @@ Create a vector layer of the polygon centroids.
     import tqdm
     gdal.UseExceptions()
 
-    vecDS = gdal.OpenEx(vecfile, gdal.OF_VECTOR)
+    vecDS = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
     if vecDS is None:
-        raise Exception("Could not open '{}'".format(vecfile))
+        raise Exception("Could not open '{}'".format(vec_file))
 
-    veclyr = vecDS.GetLayerByName(veclyrname)
-    if veclyr is None:
-        raise Exception("Could not open layer '{}'".format(veclyrname))
-    lyr_spat_ref = veclyr.GetSpatialRef()
+    vec_lyr_obj = vecDS.GetLayerByName(vec_lyr)
+    if vec_lyr_obj is None:
+        raise Exception("Could not open layer '{}'".format(vec_lyr))
+    lyr_spat_ref = vec_lyr_obj.GetSpatialRef()
 
-    out_driver = ogr.GetDriverByName(outVecDrvr)
+    out_driver = ogr.GetDriverByName(out_format)
     result_ds = out_driver.CreateDataSource(vecoutfile)
     if result_ds is None:
         raise Exception("Could not open '{}'".format(vecoutfile))
@@ -2537,13 +2288,13 @@ Create a vector layer of the polygon centroids.
     featDefn = result_lyr.GetLayerDefn()
 
     openTransaction = False
-    veclyr.ResetReading()
-    n_feats = veclyr.GetFeatureCount(True)
+    vec_lyr_obj.ResetReading()
+    n_feats = vec_lyr_obj.GetFeatureCount(True)
     print(n_feats)
     counter = 0
     pbar = tqdm.tqdm(total=n_feats)
-    veclyr.ResetReading()
-    feat = veclyr.GetNextFeature()
+    vec_lyr_obj.ResetReading()
+    feat = vec_lyr_obj.GetNextFeature()
     while feat is not None:
         if not openTransaction:
             result_lyr.StartTransaction()
@@ -2558,7 +2309,7 @@ Create a vector layer of the polygon centroids.
             result_lyr.CommitTransaction()
             openTransaction = False
 
-        feat = veclyr.GetNextFeature()
+        feat = vec_lyr_obj.GetNextFeature()
         counter = counter + 1
         pbar.update(1)
 
@@ -2572,25 +2323,25 @@ Create a vector layer of the polygon centroids.
     result_ds = None
 
 
-def lstveclyrcols(vecfile, veclyr):
+def getVecLyrCols(vec_file, vec_lyr):
     """
 A function which returns a list of columns from the input vector layer.
 
-:param vecfile: input vector file.
-:param veclyr: input vector layer
+:param vec_file: input vector file.
+:param vec_lyr: input vector layer
 :returns: list of column names
 
 """
     gdal.UseExceptions()
     atts = []
     
-    dsVecFile = gdal.OpenEx(vecfile, gdal.OF_READONLY )
+    dsVecFile = gdal.OpenEx(vec_file, gdal.OF_READONLY )
     if dsVecFile is None:
-        raise Exception("Could not open '" + vecfile + "'")
+        raise Exception("Could not open '" + vec_file + "'")
     
-    vec_lyr_obj = dsVecFile.GetLayerByName( veclyr )
+    vec_lyr_obj = dsVecFile.GetLayerByName( vec_lyr )
     if vec_lyr_obj is None:
-        raise Exception("Could not find layer '" + veclyr + "'")
+        raise Exception("Could not find layer '" + vec_lyr + "'")
     
     lyrDefn = vec_lyr_obj.GetLayerDefn()
     for i in range(lyrDefn.GetFieldCount()):
@@ -2598,23 +2349,23 @@ A function which returns a list of columns from the input vector layer.
     return atts
 
 
-def getFeatEnvs(vecFile, vecLyr):
+def getFeatEnvs(vec_file, vec_lyr):
     """
 A function which returns a list of bounding boxes for each feature
 within the vector layer.
 
-:param vecFile: vector file.
-:param vecLyr: layer within the vector file.
+:param vec_file: vector file.
+:param vec_lyr: layer within the vector file.
 :returns: list of BBOXs
 
 """
-    dsVecFile = gdal.OpenEx(vecFile, gdal.OF_VECTOR )
+    dsVecFile = gdal.OpenEx(vec_file, gdal.OF_VECTOR )
     if dsVecFile is None:
-        raise Exception("Could not open '" + vecFile + "'")
+        raise Exception("Could not open '" + vec_file + "'")
         
-    vec_lyr_obj = dsVecFile.GetLayerByName( vecLyr )
+    vec_lyr_obj = dsVecFile.GetLayerByName( vec_lyr )
     if vec_lyr_obj is None:
-        raise Exception("Could not find layer '" + vecLyr + "'")
+        raise Exception("Could not find layer '" + vec_lyr + "'")
     
     openTransaction = False
     nFeats = vec_lyr_obj.GetFeatureCount(True)
@@ -2751,39 +2502,39 @@ def subset_veclyr_to_featboxs(vec_file_bbox, vec_lyr_bbox, vec_file_tosub, vec_l
         grid_02d_ds = None
 
 
-def readVecLyr2Mem(vecfile, veclyrname):
+def readVecLyr2Mem(vec_file, vec_lyr):
     """
 A function which reads a vector layer to an OGR in memory layer.
 
-:param vecfile: input vector file
-:param veclyrname: input vector layer within the input file.
+:param vec_file: input vector file
+:param vec_lyr: input vector layer within the input file.
 
 :return: ogr_dataset, ogr_layer
 
 """
     gdal.UseExceptions()
     try:
-        vecDS = gdal.OpenEx(vecfile, gdal.OF_READONLY )
+        vecDS = gdal.OpenEx(vec_file, gdal.OF_READONLY )
         if vecDS is None:
-            raise Exception("Could not open '" + vecfile + "'")
+            raise Exception("Could not open '" + vec_file + "'")
         
-        veclyr = vecDS.GetLayerByName( veclyrname )
-        if veclyr is None:
-            raise Exception("Could not find layer '" + veclyrname + "'")
+        vec_lyr_obj = vecDS.GetLayerByName( vec_lyr )
+        if vec_lyr_obj is None:
+            raise Exception("Could not find layer '" + vec_lyr + "'")
             
         mem_driver = ogr.GetDriverByName('MEMORY')
         
         mem_ds = mem_driver.CreateDataSource('MemSelData')
-        mem_lyr = mem_ds.CopyLayer(veclyr, veclyrname, ['OVERWRITE=YES'])
+        mem_lyr = mem_ds.CopyLayer(vec_lyr_obj, vec_lyr, ['OVERWRITE=YES'])
             
     except Exception as e:
-        print("Error Vector File: {}".format(vecfile), file=sys.stderr)
-        print("Error Vector Layer: {}".format(veclyrname), file=sys.stderr)
+        print("Error Vector File: {}".format(vec_file), file=sys.stderr)
+        print("Error Vector Layer: {}".format(vec_lyr), file=sys.stderr)
         raise e
     return mem_ds, mem_lyr
 
 
-def open_gdal_vec_lyr(vec_file, vec_lyr=None):
+def openGDALVecLyr(vec_file, vec_lyr=None):
     """
     A function which opens a GDAL/OGR vector layer and returns
     the Dataset and Layer objects. Note, the file must be closed
@@ -2809,13 +2560,13 @@ def open_gdal_vec_lyr(vec_file, vec_lyr=None):
     return vec_obj_ds, lyr_obj
 
 
-def getMemVecLyrSubset(vecFile, vecLyr, bbox):
+def getMemVecLyrSubset(vec_file, vec_lyr, bbox):
     """
 Function to get an ogr vector layer for the defined bounding box. The returned
 layer is returned as an in memory ogr Layer object.
 
-:param vecFile: vector layer from which the attribute data comes from.
-:param vecLyr: the layer name from which the attribute data comes from.
+:param vec_file: vector layer from which the attribute data comes from.
+:param vec_lyr: the layer name from which the attribute data comes from.
 :param bbox: region of interest (bounding box). Define as [xMin, xMax, yMin, yMax].
 
 :return: OGR Layer and Dataset objects.
@@ -2823,52 +2574,82 @@ layer is returned as an in memory ogr Layer object.
 """
     gdal.UseExceptions()
     try:
-        dsVecFile = gdal.OpenEx(vecFile, gdal.OF_READONLY )
+        dsVecFile = gdal.OpenEx(vec_file, gdal.OF_READONLY )
         if dsVecFile is None:
-            raise Exception("Could not open '" + vecFile + "'")
+            raise Exception("Could not open '" + vec_file + "'")
         
-        vec_lyr_obj = dsVecFile.GetLayerByName( vecLyr )
+        vec_lyr_obj = dsVecFile.GetLayerByName( vec_lyr )
         if vec_lyr_obj is None:
-            raise Exception("Could not find layer '" + vecLyr + "'")
+            raise Exception("Could not find layer '" + vec_lyr + "'")
             
         mem_result_ds, mem_result_lyr = subsetEnvsVecLyrObj(vec_lyr_obj, bbox)
         
     except Exception as e:
-        print("Error: Layer: {} File: {}".format(vecLyr, vecFile))
+        print("Error: Layer: {} File: {}".format(vec_lyr, vec_file))
         raise e
     return mem_result_ds, mem_result_lyr
 
 
-def writeVecLyr2File(veclyr, vecfile, veclyrname, vecDriver, options=['OVERWRITE=YES'], replace=False):
+def writeVecLyr2File(vec_lyr_obj, out_vec_file, out_vec_lyr, out_format, options=[], replace=False):
     """
-A function which reads a vector layer to an OGR in memory layer.
+    A function which reads a vector layer to an OGR in memory layer.
 
-:param veclyr: OGR vector layer object
-:param vecfile: output vector file
-:param veclyrname: output vector layer within the input file.
-:param vecDriver: the OGR driver for the output file.
-:param options: provide a list of driver specific options; see https://www.gdal.org/ogr_formats.html
-:param replace: if true the output file is replaced (i.e., overwritten to anything in an existing file will be lost).
+    :param vec_lyr_obj: OGR vector layer object
+    :param out_vec_file: output vector file
+    :param out_vec_lyr: output vector layer within the input file.
+    :param out_format: the OGR driver for the output file.
+    :param options: provide a list of driver specific options (e.g., 'OVERWRITE=YES');
+                    see https://www.gdal.org/ogr_formats.html
+    :param replace: if true the output file is replaced (i.e., overwritten to anything
+                    in an existing file will be lost).
 
-"""
+    """
     gdal.UseExceptions()
     try:
-        if os.path.exists(vecfile) and (not replace):
-            vecDS = gdal.OpenEx(vecfile, gdal.GA_Update )
-        else:            
-            outdriver = ogr.GetDriverByName(vecDriver)
-            vecDS = outdriver.CreateDataSource(vecfile)
+        if os.path.exists(out_vec_file) and replace:
+            deleteVectorFile(out_vec_file)
+
+        if os.path.exists(out_vec_file) and (not replace):
+            vecDS = gdal.OpenEx(out_vec_file, gdal.GA_Update )
+        else:
+            outdriver = ogr.GetDriverByName(out_format)
+            vecDS = outdriver.CreateDataSource(out_vec_file)
         
         if vecDS is None:
-            raise Exception("Could not open or create '{}'".format(vecfile))            
+            raise Exception("Could not open or create '{}'".format(out_vec_file))
 
-        vecDS_lyr = vecDS.CopyLayer(veclyr, veclyrname, options)
+        vecDS_lyr = vecDS.CopyLayer(vec_lyr_obj, out_vec_lyr, options)
         vecDS = None
             
     except Exception as e:
-        print("Error Vector File: {}".format(vecfile), file=sys.stderr)
-        print("Error Vector Layer: {}".format(veclyrname), file=sys.stderr)
+        print("Error Vector File: {}".format(out_vec_file), file=sys.stderr)
+        print("Error Vector Layer: {}".format(out_vec_lyr), file=sys.stderr)
         raise e
+
+def createCopyVectorLyr(vec_file, vec_lyr, out_vec_file, out_vec_lyr, out_format, options=[], replace=False, in_memory=False):
+    """
+    A function which creates a copy of the input vector layer.
+
+    :param vec_file: the file path to the vector file.
+    :param vec_lyr: the name of the vector layer. If None then first layer is returned.
+    :param out_vec_file: output vector file
+    :param out_vec_lyr: output vector layer within the input file.
+    :param out_format: the OGR driver for the output file.
+    :param options: provide a list of driver specific options (e.g., 'OVERWRITE=YES');
+                    see https://www.gdal.org/ogr_formats.html
+    :param replace: if true the output file is replaced (i.e., overwritten to anything
+                    in an existing file will be lost).
+    :param in_memory: If true vector layer will be read into memory and then outputted.
+
+    """
+    if in_memory:
+        vec_obj_ds, vec_lyr_obj = readVecLyr2Mem(vec_file, vec_lyr)
+    else:
+        vec_obj_ds, vec_lyr_obj = openGDALVecLyr(vec_file, vec_lyr)
+
+    writeVecLyr2File(vec_lyr_obj, out_vec_file, out_vec_lyr, out_format, options, replace)
+
+    vec_obj_ds = None
 
 
 def queryFileLUT(lut_file, lut_lyr, roi_file, roi_lyr, out_dest, targz_out, cp_cmds):
@@ -2989,7 +2770,7 @@ def copyRATCols2VectorLyr(vec_file, vec_lyr, rat_row_col, clumps_img, ratcols, o
 
     vec_lyr_obj = vecDS.GetLayerByName(vec_lyr)
     if vec_lyr_obj is None:
-        raise Exception("Could not find layer '" + vec_file + "'")
+        raise Exception("Could not find layer '{}'".format(vec_file))
 
     rat_cols_all = rsgislib.rastergis.getRATColumnsInfo(clumps_img)
 
@@ -3001,8 +2782,8 @@ def copyRATCols2VectorLyr(vec_file, vec_lyr, rat_row_col, clumps_img, ratcols, o
 
     if outcoltypes is None:
         outcoltypes = []
-        for colname in ratcols:
-            rat_type = rat_cols_all[colname]['type']
+        for att_column in ratcols:
+            rat_type = rat_cols_all[att_column]['type']
             ogr_type = ogrVectorColDataTypeFromGDALRATColType(rat_type)
             outcoltypes.append(ogr_type)
 
@@ -3018,28 +2799,28 @@ def copyRATCols2VectorLyr(vec_file, vec_lyr, rat_row_col, clumps_img, ratcols, o
 
     for i in range(lyrDefn.GetFieldCount()):
         col_n = 0
-        for colname in outcolnames:
-            if lyrDefn.GetFieldDefn(i).GetName().lower() == colname.lower():
+        for att_column in outcolnames:
+            if lyrDefn.GetFieldDefn(i).GetName().lower() == att_column.lower():
                 cols_exist[col_n] = True
                 break
             col_n = col_n + 1
 
     col_n = 0
-    for colname in outcolnames:
+    for att_column in outcolnames:
         if not cols_exist[col_n]:
-            field_defn = ogr.FieldDefn(colname, outcoltypes[col_n])
+            field_defn = ogr.FieldDefn(att_column, outcoltypes[col_n])
             if vec_lyr_obj.CreateField(field_defn) != 0:
                 raise Exception(
                     "Creating '{}' field failed; becareful with case, some drivers are case insensitive but column might not be found.".format(
-                        colname))
+                        att_column))
 
             cols_exist[col_n] = True
         col_n = col_n + 1
 
     # Read in the RAT columns
     rat_cols_data = []
-    for colname in ratcols:
-        rat_cols_data.append(rat.readColumn(clumps_img_ds, colname))
+    for att_column in ratcols:
+        rat_cols_data.append(rat.readColumn(clumps_img_ds, att_column))
 
     vec_lyr_obj.ResetReading()
     # WORK AROUND AS SQLITE GETS STUCK IN LOOP ON FIRST FEATURE WHEN USE SETFEATURE.
@@ -3081,7 +2862,7 @@ def copyRATCols2VectorLyr(vec_file, vec_lyr, rat_row_col, clumps_img, ratcols, o
 
 
 def performSpatialJoin(base_vec_file, join_vec_file, output_vec_file, base_lyr=None, join_lyr=None, output_lyr=None,
-                           outVecDrvr=None, join_how="inner", join_op="within"):
+                           out_format=None, join_how="inner", join_op="within"):
     """
     A function to perform a spatial join between two vector layers. This function uses geopandas so this needs
     to be installed. You also need to have the rtree package to generate the index used to perform the intersection.
@@ -3094,7 +2875,7 @@ def performSpatialJoin(base_vec_file, join_vec_file, output_vec_file, base_lyr=N
     :param base_lyr: the layer name for the base vector, not needed if input file is a shapefile (Default None).
     :param join_lyr: the layer name for the join vector, not needed if input file is a shapefile (Default None).
     :param output_lyr: the layer name for the output vector, not needed if input file is a shapefile (Default None).
-    :param outVecDrvr: The output vector file format, if none then shapefile outputted (Default None)
+    :param out_format: The output vector file format, if none then shapefile outputted (Default None)
     :param join_how: Specifies the type of join that will occur and which geometry is retained. The options are
                     [left, right, inner]. The default is 'inner'
     :param join_op: Defines whether or not to join the attributes of one object to another.
@@ -3122,13 +2903,13 @@ def performSpatialJoin(base_vec_file, join_vec_file, output_vec_file, base_lyr=N
 
     join_gpg_df = geopandas.sjoin(base_gpd_df, join_gpg_df, how=join_how, op=join_op)
 
-    if outVecDrvr is None:
+    if out_format is None:
         join_gpg_df.to_file(output_vec_file)
     else:
         if output_lyr is None:
-            join_gpg_df.to_file(output_vec_file, driver=outVecDrvr)
+            join_gpg_df.to_file(output_vec_file, driver=out_format)
         else:
-            join_gpg_df.to_file(output_vec_file, layer=output_lyr, driver=outVecDrvr)
+            join_gpg_df.to_file(output_vec_file, layer=output_lyr, driver=out_format)
 
 
 def does_vmsk_img_intersect(input_vmsk_img, roi_vec_file, roi_vec_lyr, tmp_dir, vec_epsg=None):
@@ -3175,7 +2956,7 @@ def does_vmsk_img_intersect(input_vmsk_img, roi_vec_file, roi_vec_lyr, tmp_dir, 
 
         if not projs_match:
             mem_result_ds, mem_result_lyr = reproj_vec_lyr(mem_lyr, 'mem_vec', img_epsg,
-                                                           out_vec_drv='MEMORY', out_lyr_name=None,
+                                                           out_format='MEMORY', out_lyr_name=None,
                                                            in_epsg=None, print_feedback=False)
             mem_ds = None
         else:
@@ -3214,7 +2995,7 @@ def merge_to_multi_layer_vec(input_file_lyrs, output_file, format='GPKG', overwr
     """
     first = True
     for vec in input_file_lyrs:
-        vec_lyr_obj = open_gdal_vec_lyr(vec.vecfile, vec.veclyr)
+        vec_lyr_obj = openGDALVecLyr(vec.vec_file, vec.vec_lyr)
         if first and overwrite:
             rsgislib.vectorutils.writeVecLyr2File(vec_lyr_obj, output_file, vec.outlyr, format,
                                                   options=['OVERWRITE=YES'], replace=True)
@@ -3244,7 +3025,7 @@ def convert_polygon2polyline(vec_poly_file, vec_poly_lyr, vec_line_file, vec_lin
 
     if os.path.exists(vec_line_file):
         if del_exist_vec:
-            delete_vector_file(vec_line_file)
+            deleteVectorFile(vec_line_file)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(vec_line_file))
 
@@ -3410,7 +3191,7 @@ def create_orthg_lines(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr=None, 
 
     if os.path.exists(out_vec_file):
         if del_exist_vec:
-            delete_vector_file(out_vec_file)
+            deleteVectorFile(out_vec_file)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
 
@@ -3550,7 +3331,7 @@ def closest_line_intersection(vec_line_file, vec_line_lyr, vec_objs_file, vec_ob
 
     if os.path.exists(out_vec_file):
         if del_exist_vec:
-            delete_vector_file(out_vec_file)
+            deleteVectorFile(out_vec_file)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
 
@@ -3722,7 +3503,7 @@ def line_intersection_range(vec_line_file, vec_line_lyr, vec_objs_file, vec_objs
 
     if os.path.exists(out_vec_file):
         if del_exist_vec:
-            delete_vector_file(out_vec_file)
+            deleteVectorFile(out_vec_file)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
 
@@ -3908,7 +3689,7 @@ def scnd_line_intersection_range(vec_line_file, vec_line_lyr, vec_objs_file, vec
 
     if os.path.exists(out_vec_file):
         if del_exist_vec:
-            delete_vector_file(out_vec_file)
+            deleteVectorFile(out_vec_file)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
 
@@ -4090,8 +3871,8 @@ def scnd_line_intersection_range(vec_line_file, vec_line_lyr, vec_objs_file, vec
     ds_objs_sub_vec = None
 
 
-def vector_translate(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr=None, out_vec_drv='GPKG',
-                     drv_create_opts=[], lyr_create_opts=[], access_mode='overwrite', src_srs=None,
+def vectorTranslate(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr=None, out_format='GPKG',
+                     drv_create_opts=[], lyr_create_opts=[], access_mode=None, src_srs=None,
                      dst_srs=None, del_exist_vec=False):
     """
     A function which translates a vector file to another format, similar to ogr2ogr. If you wish
@@ -4102,11 +3883,11 @@ def vector_translate(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr=None, ou
     :param in_vec_lyr: the input vector layer name
     :param out_vec_file: the output vector file.
     :param out_vec_lyr: the name of the output vector layer (if None then the same as the input).
-    :param out_vec_drv: the output vector file format (e.g., GPKG, GEOJSON, ESRI Shapefile, etc.)
+    :param out_format: the output vector file format (e.g., GPKG, GEOJSON, ESRI Shapefile, etc.)
     :param drv_create_opts: a list of options for the creation of the output file.
     :param lyr_create_opts: a list of options for the creation of the output layer.
-    :param access_mode: by default the function overwrites the output file but other
-                        options are: ['update', 'append', 'overwrite']
+    :param access_mode: default is None for creatoion but other but other options are:
+                        [None (creation), 'update', 'append', 'overwrite']
     :param src_srs: provide a source spatial reference for the input vector file. Default=None.
                     can be used to provide a projection where none has been specified or the
                     information has gone missing. Can be used without performing a reprojection.
@@ -4118,9 +3899,14 @@ def vector_translate(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr=None, ou
     from osgeo import gdal
     gdal.UseExceptions()
 
+    if access_mode is not None:
+        if access_mode not in ['update', 'append', 'overwrite']:
+            raise Exception("access_mode must be one of: [None (creation), "
+                            "'update', 'append', 'overwrite']")
+
     if os.path.exists(out_vec_file):
         if del_exist_vec:
-            delete_vector_file(out_vec_file)
+            deleteVectorFile(out_vec_file)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
 
@@ -4143,7 +3929,7 @@ def vector_translate(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr=None, ou
             dst_srs = src_srs
 
     opts = gdal.VectorTranslateOptions(options=drv_create_opts,
-                                       format=out_vec_drv,
+                                       format=out_format,
                                        accessMode=access_mode,
                                        srcSRS=src_srs,
                                        dstSRS=dst_srs,
@@ -4218,7 +4004,7 @@ def get_vec_lyr_as_pts(in_vec_file, in_vec_lyr):
 
 
 def reproj_wgs84_vec_to_utm(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr=None, use_hemi=True,
-                            out_vec_drv='GPKG', drv_create_opts=[], lyr_create_opts=[],
+                            out_format='GPKG', drv_create_opts=[], lyr_create_opts=[],
                             access_mode='overwrite', del_exist_vec=False):
     """
     A function which reprojects an input file projected in WGS84 (EPSG:4326) to UTM, where the UTM zone is
@@ -4229,7 +4015,7 @@ def reproj_wgs84_vec_to_utm(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr=N
     :param out_vec_file: the output vector file.
     :param out_vec_lyr: the name of the output vector layer (if None then the same as the input).
     :param use_hemi: True differentiate between Southern and Northern hemisphere. False use Northern hemisphere.
-    :param out_vec_drv: the output vector file format (e.g., GPKG, GEOJSON, ESRI Shapefile, etc.)
+    :param out_format: the output vector file format (e.g., GPKG, GEOJSON, ESRI Shapefile, etc.)
     :param drv_create_opts: a list of options for the creation of the output file.
     :param lyr_create_opts: a list of options for the creation of the output layer.
     :param access_mode: by default the function overwrites the output file but other
@@ -4245,7 +4031,7 @@ def reproj_wgs84_vec_to_utm(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr=N
 
     if os.path.exists(out_vec_file):
         if del_exist_vec:
-            delete_vector_file(out_vec_file)
+            deleteVectorFile(out_vec_file)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
 
@@ -4292,12 +4078,12 @@ def reproj_wgs84_vec_to_utm(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr=N
     print("EPSG: {}".format(out_epsg))
 
     dst_srs_str = "EPSG:{}".format(out_epsg)
-    vector_translate(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr, out_vec_drv,
+    vector_translate(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr, out_format,
                      drv_create_opts, lyr_create_opts, access_mode, src_srs='EPSG:4326',
                      dst_srs=dst_srs_str)
 
 
-def create_alpha_shape(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr, out_vec_drv='GEOJSON', alpha_val=None,
+def create_alpha_shape(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr, out_format='GEOJSON', alpha_val=None,
                        alpha_vals=None, max_iter=10000, del_exist_vec=False):
     """
     Function which calculate an alpha shape for a set of vector features (which are converted to points).
@@ -4310,7 +4096,7 @@ def create_alpha_shape(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr, out_v
     :param in_vec_lyr: the input vector layer name
     :param out_vec_file: the output vector file.
     :param out_vec_lyr: the name of the output vector layer (if None then the same as the input).
-    :param out_vec_drv: the output vector file format (e.g., GPKG, GEOJSON, ESRI Shapefile, etc.)
+    :param out_format: the output vector file format (e.g., GPKG, GEOJSON, ESRI Shapefile, etc.)
     :param alpha_val: The alpha value to create the the alpha shape polygon. If None then a value will be
                       automatically calculate but warning this can a significant amount of time (i.e., hours!!)
     :param alpha_vals: Alternatively, a list of alpha values can be provided (e.g., [75, 50, 25, 5, 2]) where
@@ -4333,7 +4119,7 @@ def create_alpha_shape(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr, out_v
 
     if os.path.exists(out_vec_file):
         if del_exist_vec:
-            delete_vector_file(out_vec_file)
+            deleteVectorFile(out_vec_file)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
 
@@ -4420,13 +4206,13 @@ def create_alpha_shape(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr, out_v
         vecDS = gdal.OpenEx(in_vec_file, gdal.OF_VECTOR)
         if vecDS is None:
             raise Exception("Could not open '{}'".format(in_vec_file))
-        veclyr = vecDS.GetLayerByName(in_vec_lyr)
-        if veclyr is None:
+        vec_lyr_obj = vecDS.GetLayerByName(in_vec_lyr)
+        if vec_lyr_obj is None:
             raise Exception("Could not open layer '{}'".format(in_vec_lyr))
-        lyr_spat_ref = veclyr.GetSpatialRef()
+        lyr_spat_ref = vec_lyr_obj.GetSpatialRef()
         vecDS = None
 
-        out_driver = ogr.GetDriverByName(out_vec_drv)
+        out_driver = ogr.GetDriverByName(out_format)
         result_ds = out_driver.CreateDataSource(out_vec_file)
         if result_ds is None:
             raise Exception("Could not open '{}'".format(out_vec_file))
@@ -4447,13 +4233,13 @@ def create_alpha_shape(in_vec_file, in_vec_lyr, out_vec_file, out_vec_lyr, out_v
     return vec_output, alpha_val
 
 
-def convert_multi_geoms_to_single(vecfile, veclyrname, outVecDrvr, vecoutfile, vecoutlyrname, del_exist_vec=False):
+def convert_multi_geoms_to_single(vec_file, vec_lyr, out_format, vecoutfile, vecoutlyrname, del_exist_vec=False):
     """
     A convert any multiple geometries into single geometries.
 
-    :param vecfile: input vector file
-    :param veclyrname: input vector layer within the input file.
-    :param outVecDrvr: the format driver for the output vector file (e.g., GPKG, ESRI Shapefile).
+    :param vec_file: input vector file
+    :param vec_lyr: input vector layer within the input file.
+    :param out_format: the format driver for the output vector file (e.g., GPKG, ESRI Shapefile).
     :param vecoutfile: output file path for the vector.
     :param vecoutlyrname: output vector layer name.
     :param del_exist_vec: remove output file if it exists.
@@ -4466,19 +4252,19 @@ def convert_multi_geoms_to_single(vecfile, veclyrname, outVecDrvr, vecoutfile, v
 
     if os.path.exists(vecoutfile):
         if del_exist_vec:
-            delete_vector_file(vecoutfile)
+            deleteVectorFile(vecoutfile)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(vecoutfile))
 
-    vecDS = gdal.OpenEx(vecfile, gdal.OF_VECTOR)
+    vecDS = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
     if vecDS is None:
-        raise Exception("Could not open '{}'".format(vecfile))
+        raise Exception("Could not open '{}'".format(vec_file))
 
-    veclyr = vecDS.GetLayerByName(veclyrname)
-    if veclyr is None:
-        raise Exception("Could not open layer '{}'".format(veclyrname))
-    lyr_spat_ref = veclyr.GetSpatialRef()
-    geom_type = veclyr.GetGeomType()
+    vec_lyr_obj = vecDS.GetLayerByName(vec_lyr)
+    if vec_lyr_obj is None:
+        raise Exception("Could not open layer '{}'".format(vec_lyr))
+    lyr_spat_ref = vec_lyr_obj.GetSpatialRef()
+    geom_type = vec_lyr_obj.GetGeomType()
     if geom_type == ogr.wkbMultiPoint:
         geom_type = ogr.wkbPoint
         print("Changing to Point Type from Multi-Point")
@@ -4489,7 +4275,7 @@ def convert_multi_geoms_to_single(vecfile, veclyrname, outVecDrvr, vecoutfile, v
         geom_type = ogr.wkbPolygon
         print("Changing to Polygon Type from Multi-Polygon")
 
-    out_driver = ogr.GetDriverByName(outVecDrvr)
+    out_driver = ogr.GetDriverByName(out_format)
     result_ds = out_driver.CreateDataSource(vecoutfile)
     if result_ds is None:
         raise Exception("Could not open '{}'".format(vecoutfile))
@@ -4501,12 +4287,12 @@ def convert_multi_geoms_to_single(vecfile, veclyrname, outVecDrvr, vecoutfile, v
     featDefn = result_lyr.GetLayerDefn()
 
     openTransaction = False
-    veclyr.ResetReading()
-    n_feats = veclyr.GetFeatureCount(True)
+    vec_lyr_obj.ResetReading()
+    n_feats = vec_lyr_obj.GetFeatureCount(True)
     counter = 0
     pbar = tqdm.tqdm(total=n_feats)
-    veclyr.ResetReading()
-    feat = veclyr.GetNextFeature()
+    vec_lyr_obj.ResetReading()
+    feat = vec_lyr_obj.GetNextFeature()
     while feat is not None:
         if not openTransaction:
             result_lyr.StartTransaction()
@@ -4547,7 +4333,7 @@ def convert_multi_geoms_to_single(vecfile, veclyrname, outVecDrvr, vecoutfile, v
             result_lyr.CommitTransaction()
             openTransaction = False
 
-        feat = veclyr.GetNextFeature()
+        feat = vec_lyr_obj.GetNextFeature()
         counter += 1
         pbar.update(1)
 
@@ -4561,14 +4347,14 @@ def convert_multi_geoms_to_single(vecfile, veclyrname, outVecDrvr, vecoutfile, v
     result_ds = None
 
 
-def simplify_geometries(vecfile, veclyrname, tolerance, outVecDrvr, vecoutfile, vecoutlyrname, del_exist_vec=False):
+def simplify_geometries(vec_file, vec_lyr, tolerance, out_format, vecoutfile, vecoutlyrname, del_exist_vec=False):
     """
 Create a simplified version of the input
 
-:param vecfile: input vector file
-:param veclyrname: input vector layer within the input file.
+:param vec_file: input vector file
+:param vec_lyr: input vector layer within the input file.
 :param tolerance: simplification tolerance
-:param outVecDrvr: the format driver for the output vector file (e.g., GPKG, ESRI Shapefile).
+:param out_format: the format driver for the output vector file (e.g., GPKG, ESRI Shapefile).
 :param vecoutfile: output file path for the vector.
 :param vecoutlyrname: output vector layer name.
 :param del_exist_vec: remove output file if it exists.
@@ -4581,21 +4367,21 @@ Create a simplified version of the input
 
     if os.path.exists(vecoutfile):
         if del_exist_vec:
-            delete_vector_file(vecoutfile)
+            deleteVectorFile(vecoutfile)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(vecoutfile))
 
-    vecDS = gdal.OpenEx(vecfile, gdal.OF_VECTOR)
+    vecDS = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
     if vecDS is None:
-        raise Exception("Could not open '{}'".format(vecfile))
+        raise Exception("Could not open '{}'".format(vec_file))
 
-    veclyr = vecDS.GetLayerByName(veclyrname)
-    if veclyr is None:
-        raise Exception("Could not open layer '{}'".format(veclyrname))
-    lyr_spat_ref = veclyr.GetSpatialRef()
-    geom_type = veclyr.GetGeomType()
+    vec_lyr_obj = vecDS.GetLayerByName(vec_lyr)
+    if vec_lyr_obj is None:
+        raise Exception("Could not open layer '{}'".format(vec_lyr))
+    lyr_spat_ref = vec_lyr_obj.GetSpatialRef()
+    geom_type = vec_lyr_obj.GetGeomType()
 
-    out_driver = ogr.GetDriverByName(outVecDrvr)
+    out_driver = ogr.GetDriverByName(out_format)
     result_ds = out_driver.CreateDataSource(vecoutfile)
     if result_ds is None:
         raise Exception("Could not open '{}'".format(vecoutfile))
@@ -4607,12 +4393,12 @@ Create a simplified version of the input
     featDefn = result_lyr.GetLayerDefn()
 
     openTransaction = False
-    veclyr.ResetReading()
-    n_feats = veclyr.GetFeatureCount(True)
+    vec_lyr_obj.ResetReading()
+    n_feats = vec_lyr_obj.GetFeatureCount(True)
     counter = 0
     pbar = tqdm.tqdm(total=n_feats)
-    veclyr.ResetReading()
-    feat = veclyr.GetNextFeature()
+    vec_lyr_obj.ResetReading()
+    feat = vec_lyr_obj.GetNextFeature()
     while feat is not None:
         if not openTransaction:
             result_lyr.StartTransaction()
@@ -4627,7 +4413,7 @@ Create a simplified version of the input
             result_lyr.CommitTransaction()
             openTransaction = False
 
-        feat = veclyr.GetNextFeature()
+        feat = vec_lyr_obj.GetNextFeature()
         counter = counter + 1
         pbar.update(1)
 
@@ -4641,13 +4427,13 @@ Create a simplified version of the input
     result_ds = None
 
 
-def delete_polygon_holes(vecfile, veclyrname, outVecDrvr, vecoutfile, vecoutlyrname, area_thres=None, del_exist_vec=False):
+def delete_polygon_holes(vec_file, vec_lyr, out_format, vecoutfile, vecoutlyrname, area_thres=None, del_exist_vec=False):
     """
 Delete holes from the input polygons in below the area threshold.
 
-:param vecfile: input vector file
-:param veclyrname: input vector layer within the input file.
-:param outVecDrvr: the format driver for the output vector file (e.g., GPKG, ESRI Shapefile).
+:param vec_file: input vector file
+:param vec_lyr: input vector layer within the input file.
+:param out_format: the format driver for the output vector file (e.g., GPKG, ESRI Shapefile).
 :param vecoutfile: output file path for the vector.
 :param vecoutlyrname: output vector layer name.
 :param area_thres: threshold below which holes are removed. If threshold is None then all holes are removed.
@@ -4661,7 +4447,7 @@ Delete holes from the input polygons in below the area threshold.
 
     if os.path.exists(vecoutfile):
         if del_exist_vec:
-            delete_vector_file(vecoutfile)
+            deleteVectorFile(vecoutfile)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(vecoutfile))
 
@@ -4689,17 +4475,17 @@ Delete holes from the input polygons in below the area threshold.
                         poly.AddGeometry(c_ring)
             return poly
 
-    vecDS = gdal.OpenEx(vecfile, gdal.OF_VECTOR)
+    vecDS = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
     if vecDS is None:
-        raise Exception("Could not open '{}'".format(vecfile))
+        raise Exception("Could not open '{}'".format(vec_file))
 
-    veclyr = vecDS.GetLayerByName(veclyrname)
-    if veclyr is None:
-        raise Exception("Could not open layer '{}'".format(veclyrname))
-    lyr_spat_ref = veclyr.GetSpatialRef()
-    geom_type = veclyr.GetGeomType()
+    vec_lyr_obj = vecDS.GetLayerByName(vec_lyr)
+    if vec_lyr_obj is None:
+        raise Exception("Could not open layer '{}'".format(vec_lyr))
+    lyr_spat_ref = vec_lyr_obj.GetSpatialRef()
+    geom_type = vec_lyr_obj.GetGeomType()
 
-    out_driver = ogr.GetDriverByName(outVecDrvr)
+    out_driver = ogr.GetDriverByName(out_format)
     result_ds = out_driver.CreateDataSource(vecoutfile)
     if result_ds is None:
         raise Exception("Could not open '{}'".format(vecoutfile))
@@ -4711,12 +4497,12 @@ Delete holes from the input polygons in below the area threshold.
     featDefn = result_lyr.GetLayerDefn()
 
     openTransaction = False
-    veclyr.ResetReading()
-    n_feats = veclyr.GetFeatureCount(True)
+    vec_lyr_obj.ResetReading()
+    n_feats = vec_lyr_obj.GetFeatureCount(True)
     counter = 0
     pbar = tqdm.tqdm(total=n_feats)
-    veclyr.ResetReading()
-    feat = veclyr.GetNextFeature()
+    vec_lyr_obj.ResetReading()
+    feat = vec_lyr_obj.GetNextFeature()
     while feat is not None:
         if not openTransaction:
             result_lyr.StartTransaction()
@@ -4740,7 +4526,7 @@ Delete holes from the input polygons in below the area threshold.
             result_lyr.CommitTransaction()
             openTransaction = False
 
-        feat = veclyr.GetNextFeature()
+        feat = vec_lyr_obj.GetNextFeature()
         counter = counter + 1
         pbar.update(1)
 
@@ -4754,12 +4540,12 @@ Delete holes from the input polygons in below the area threshold.
     result_ds = None
 
 
-def get_poly_hole_area(vecfile, veclyrname):
+def get_poly_hole_area(vec_file, vec_lyr):
     """
 Get an array of the areas of the polygon holes.
 
-:param vecfile: input vector file
-:param veclyrname: input vector layer within the input file.
+:param vec_file: input vector file
+:param vec_lyr: input vector layer within the input file.
 :returns: A list of areas.
 
 """
@@ -4783,19 +4569,19 @@ Get an array of the areas of the polygon holes.
                     areas.append(tmp_poly.Area())
             return areas
 
-    vecDS = gdal.OpenEx(vecfile, gdal.OF_VECTOR)
+    vecDS = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
     if vecDS is None:
-        raise Exception("Could not open '{}'".format(vecfile))
+        raise Exception("Could not open '{}'".format(vec_file))
 
-    veclyr = vecDS.GetLayerByName(veclyrname)
-    if veclyr is None:
-        raise Exception("Could not open layer '{}'".format(veclyrname))
+    vec_lyr_obj = vecDS.GetLayerByName(vec_lyr)
+    if vec_lyr_obj is None:
+        raise Exception("Could not open layer '{}'".format(vec_lyr))
 
-    veclyr.ResetReading()
-    n_feats = veclyr.GetFeatureCount(True)
+    vec_lyr_obj.ResetReading()
+    n_feats = vec_lyr_obj.GetFeatureCount(True)
     pbar = tqdm.tqdm(total=n_feats)
-    veclyr.ResetReading()
-    feat = veclyr.GetNextFeature()
+    vec_lyr_obj.ResetReading()
+    feat = vec_lyr_obj.GetNextFeature()
     hole_areas = []
     while feat is not None:
         geom_ref = feat.GetGeometryRef()
@@ -4811,7 +4597,7 @@ Get an array of the areas of the polygon holes.
             if len(areas) > 0:
                 hole_areas += areas
 
-        feat = veclyr.GetNextFeature()
+        feat = vec_lyr_obj.GetNextFeature()
         pbar.update(1)
 
     pbar.close()
@@ -4819,13 +4605,13 @@ Get an array of the areas of the polygon holes.
     return hole_areas
 
 
-def remove_polygon_area(vecfile, veclyrname, outVecDrvr, vecoutfile, vecoutlyrname, area_thres, del_exist_vec=False):
+def remove_polygon_area(vec_file, vec_lyr, out_format, vecoutfile, vecoutlyrname, area_thres, del_exist_vec=False):
     """
 Delete polygons with an area below a defined threshold.
 
-:param vecfile: input vector file
-:param veclyrname: input vector layer within the input file.
-:param outVecDrvr: the format driver for the output vector file (e.g., GPKG, ESRI Shapefile).
+:param vec_file: input vector file
+:param vec_lyr: input vector layer within the input file.
+:param out_format: the format driver for the output vector file (e.g., GPKG, ESRI Shapefile).
 :param vecoutfile: output file path for the vector.
 :param vecoutlyrname: output vector layer name.
 :param area_thres: threshold below which polygons are removed.
@@ -4839,21 +4625,21 @@ Delete polygons with an area below a defined threshold.
 
     if os.path.exists(vecoutfile):
         if del_exist_vec:
-            delete_vector_file(vecoutfile)
+            deleteVectorFile(vecoutfile)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(vecoutfile))
 
-    vecDS = gdal.OpenEx(vecfile, gdal.OF_VECTOR)
+    vecDS = gdal.OpenEx(vec_file, gdal.OF_VECTOR)
     if vecDS is None:
-        raise Exception("Could not open '{}'".format(vecfile))
+        raise Exception("Could not open '{}'".format(vec_file))
 
-    veclyr = vecDS.GetLayerByName(veclyrname)
-    if veclyr is None:
-        raise Exception("Could not open layer '{}'".format(veclyrname))
-    lyr_spat_ref = veclyr.GetSpatialRef()
-    geom_type = veclyr.GetGeomType()
+    vec_lyr_obj = vecDS.GetLayerByName(vec_lyr)
+    if vec_lyr_obj is None:
+        raise Exception("Could not open layer '{}'".format(vec_lyr))
+    lyr_spat_ref = vec_lyr_obj.GetSpatialRef()
+    geom_type = vec_lyr_obj.GetGeomType()
 
-    out_driver = ogr.GetDriverByName(outVecDrvr)
+    out_driver = ogr.GetDriverByName(out_format)
     result_ds = out_driver.CreateDataSource(vecoutfile)
     if result_ds is None:
         raise Exception("Could not open '{}'".format(vecoutfile))
@@ -4865,12 +4651,12 @@ Delete polygons with an area below a defined threshold.
     featDefn = result_lyr.GetLayerDefn()
 
     openTransaction = False
-    veclyr.ResetReading()
-    n_feats = veclyr.GetFeatureCount(True)
+    vec_lyr_obj.ResetReading()
+    n_feats = vec_lyr_obj.GetFeatureCount(True)
     counter = 0
     pbar = tqdm.tqdm(total=n_feats)
-    veclyr.ResetReading()
-    feat = veclyr.GetNextFeature()
+    vec_lyr_obj.ResetReading()
+    feat = vec_lyr_obj.GetNextFeature()
     while feat is not None:
         if not openTransaction:
             result_lyr.StartTransaction()
@@ -4899,7 +4685,7 @@ Delete polygons with an area below a defined threshold.
             result_lyr.CommitTransaction()
             openTransaction = False
 
-        feat = veclyr.GetNextFeature()
+        feat = vec_lyr_obj.GetNextFeature()
         counter = counter + 1
         pbar.update(1)
 
@@ -4936,7 +4722,7 @@ def vec_lyr_intersection(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec
 
     if os.path.exists(out_vec_file):
         if del_exist_vec:
-            delete_vector_file(out_vec_file)
+            deleteVectorFile(out_vec_file)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
 
@@ -5065,7 +4851,7 @@ def vec_lyr_difference(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_f
 
     if os.path.exists(out_vec_file):
         if del_exist_vec:
-            delete_vector_file(out_vec_file)
+            deleteVectorFile(out_vec_file)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
 
@@ -6151,10 +5937,10 @@ def merge_utm_vecs_wgs84(input_files, output_file, output_lyr=None, out_format='
     for file in tqdm.tqdm(input_files):
         lyrs = getVecLyrsLst(file)
         for lyr in lyrs:
-            bbox = getVecLayerExtent(file, layerName=lyr)
+            bbox = getVecLayerExtent(file, vec_lyr=lyr)
             bbox_area = rsgislib.tools.geometrytools.calc_bbox_area(bbox)
             if bbox_area > 0:
-                vec_epsg = getProjEPSGFromVec(file, vecLyr=lyr)
+                vec_epsg = getProjEPSGFromVec(file, vec_lyr=lyr)
                 zone, hemi = rsgislib.tools.utm.utm_from_epsg(int(vec_epsg))
                 zone_str = rsgislib.tools.utils.zero_pad_num_str(zone, str_len=2, round_num=False, round_n_digts=0, integerise=True)
 
@@ -6422,7 +6208,7 @@ def vec_lyr_intersection_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_
 
     if os.path.exists(out_vec_file):
         if del_exist_vec:
-            delete_vector_file(out_vec_file)
+            deleteVectorFile(out_vec_file)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
 
@@ -6460,7 +6246,7 @@ def vec_lyr_difference_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_ve
 
     if os.path.exists(out_vec_file):
         if del_exist_vec:
-            delete_vector_file(out_vec_file)
+            deleteVectorFile(out_vec_file)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
 
@@ -6498,7 +6284,7 @@ def vec_lyr_sym_difference_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, ou
 
     if os.path.exists(out_vec_file):
         if del_exist_vec:
-            delete_vector_file(out_vec_file)
+            deleteVectorFile(out_vec_file)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
 
@@ -6538,7 +6324,7 @@ def vec_lyr_identity_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_
 
     if os.path.exists(out_vec_file):
         if del_exist_vec:
-            delete_vector_file(out_vec_file)
+            deleteVectorFile(out_vec_file)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
 
@@ -6576,7 +6362,7 @@ def vec_lyr_union_gp(vec_file, vec_lyr, vec_over_file, vec_over_lyr, out_vec_fil
 
     if os.path.exists(out_vec_file):
         if del_exist_vec:
-            delete_vector_file(out_vec_file)
+            deleteVectorFile(out_vec_file)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(out_vec_file))
 
@@ -6627,7 +6413,7 @@ def vectorise_pxls_to_pts(input_img, img_band, img_msk_val, vec_out_file, vec_ou
 
     if os.path.exists(vec_out_file):
         if del_exist_vec:
-            delete_vector_file(vec_out_file)
+            deleteVectorFile(vec_out_file)
         else:
             raise Exception("The output vector file ({}) already exists, remove it and re-run.".format(vec_out_file))
 
