@@ -40,7 +40,7 @@ def writeVecColumn(vec_file, vec_lyr, att_column, att_col_datatype, att_col_data
         print("Number of Features: {}".format(numFeats))
         print("Length of Data: {}".format(len(att_col_data)))
         raise Exception(
-            "The number of features and size of " "the input data is not equal."
+            "The number of features and size of the input data is not equal."
         )
 
     colExists = False
@@ -54,7 +54,7 @@ def writeVecColumn(vec_file, vec_lyr, att_column, att_col_datatype, att_col_data
         field_defn = ogr.FieldDefn(att_column, att_col_datatype)
         if lyr.CreateField(field_defn) != 0:
             raise Exception(
-                "Creating '{}' field failed; becareful with case, "
+                "Creating '{}' field failed; be careful with case, "
                 "some drivers are case insensitive but column might "
                 "not be found.".format(att_column)
             )

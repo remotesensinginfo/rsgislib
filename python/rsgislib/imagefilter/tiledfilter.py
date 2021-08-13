@@ -1121,7 +1121,7 @@ def performTiledImgMultiFilter(
 
     if len(output_imgs) != len(filter_insts):
         raise rsgislib.RSGISPyException(
-            "The same number of filters and " "output images need to be provided."
+            "The same number of filters and output images need to be provided."
         )
 
     numFilters = len(output_imgs)
