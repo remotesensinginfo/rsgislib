@@ -55,8 +55,6 @@ Example::
 #
 ############################################################################
 
-import sys
-import math
 import glob
 import os.path
 import shutil
@@ -69,20 +67,20 @@ from rsgislib import vectorutils
 
 haveGDALPy = True
 try:
-    import osgeo.gdal as gdal, ogr
-except ImportError as gdalErr:
+    from osgeo import gdal, ogr
+except ImportError:
     haveGDALPy = False
-    
+
 haveRIOS = True
 try:
     from rios import rat
-except ImportError as riosErr:
+except ImportError:
     haveRIOS = False
-    
+
 haveNumpy = True
 try:
     import numpy
-except ImportError as numpyErr:
+except ImportError:
     haveNumpy = False
 
 
