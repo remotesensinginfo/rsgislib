@@ -36,13 +36,12 @@ RSGISLib.
 #
 ############################################################################
 
-import rsgislib
 import os.path
 
 haveGDALPy = True
 try:
-    import osgeo.gdal as gdal, ogr
-except ImportError as gdalErr:
+    from osgeo import gdal
+except ImportError:
     haveGDALPy = False
 
 
