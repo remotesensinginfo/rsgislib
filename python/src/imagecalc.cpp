@@ -575,7 +575,7 @@ static PyObject *ImageCalc_ImagePixelColumnSummary(PyObject *self, PyObject *arg
 static PyObject *ImageCalc_ImagePixelLinearFit(PyObject *self, PyObject *args, PyObject *keywds)
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
-                             RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("datatype"),
+                             RSGIS_PY_C_TEXT("gdalformat"),
                              RSGIS_PY_C_TEXT("band_values"), RSGIS_PY_C_TEXT("no_data_val"),
                              RSGIS_PY_C_TEXT("use_no_data"), nullptr};
     const char *inputImage, *outputImage, *gdalFormat, *bandValues;
@@ -1056,7 +1056,7 @@ static PyObject *ImageCalc_CalcMaskImgPxlValProb(PyObject *self, PyObject *args,
                              RSGIS_PY_C_TEXT("in_msk_img"), RSGIS_PY_C_TEXT("msk_val"),
                              RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"),
                              RSGIS_PY_C_TEXT("bin_widths"), RSGIS_PY_C_TEXT("use_no_data"),
-                             RSGIS_PY_C_TEXT("no_data_val"), nullptr};
+                             RSGIS_PY_C_TEXT("rescale_probs"), nullptr};
 
     const char *pszInputImage, *pszMaskImage, *pszOutputImage, *pszGDALFormat;
     int maskImgVal;
@@ -1401,8 +1401,9 @@ static PyObject *ImageCalc_CalcImageRescale(PyObject *self, PyObject *args, PyOb
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_imgs"), RSGIS_PY_C_TEXT("output_img"),
                              RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("datatype"),
-                             RSGIS_PY_C_TEXT("no_data_val"),
+                             RSGIS_PY_C_TEXT("c_no_data_val"),
                              RSGIS_PY_C_TEXT("c_offset"), RSGIS_PY_C_TEXT("c_gain"),
+                             RSGIS_PY_C_TEXT("n_no_data_val"),
                              RSGIS_PY_C_TEXT("n_offset"), RSGIS_PY_C_TEXT("n_gain"), nullptr};
     PyObject *pInputImgsObj;
     const char *outputImage, *gdalFormat;
@@ -1643,7 +1644,7 @@ static PyObject *ImageCalc_GetImgSumStatsInPxl(PyObject *self, PyObject *args, P
 static PyObject *ImageCalc_IdentifyMinPxlValueInWin(PyObject *self, PyObject *args, PyObject *keywds)
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
-                             RSGIS_PY_C_TEXT("out_ref_img"), RSGIS_PY_C_TEXT("bands"),
+                             RSGIS_PY_C_TEXT("out_ref_img"), RSGIS_PY_C_TEXT("img_bands"),
                              RSGIS_PY_C_TEXT("win_size"), RSGIS_PY_C_TEXT("gdalformat"),
                              RSGIS_PY_C_TEXT("no_data_val"), RSGIS_PY_C_TEXT("use_no_data"), nullptr};
     const char *pInputImage = "";
@@ -1708,7 +1709,7 @@ static PyObject *ImageCalc_IdentifyMinPxlValueInWin(PyObject *self, PyObject *ar
 static PyObject *ImageCalc_CalcImgMeanInMask(PyObject *self, PyObject *args, PyObject *keywds)
 {
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("in_msk_img"),
-                             RSGIS_PY_C_TEXT("msk_val"), RSGIS_PY_C_TEXT("bands"),
+                             RSGIS_PY_C_TEXT("msk_val"), RSGIS_PY_C_TEXT("img_bands"),
                              RSGIS_PY_C_TEXT("no_data_val"), RSGIS_PY_C_TEXT("use_no_data"), nullptr};
     const char *pInputImage = "";
     const char *pInputImageMsk = "";
@@ -1772,19 +1773,19 @@ static PyObject *ImageCalc_CalcImgMeanInMask(PyObject *self, PyObject *args, PyO
 // Our list of functions in this module
 static PyMethodDef ImageCalcMethods[] = {
     {"bandMath", (PyCFunction)ImageCalc_BandMath, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imagecalc.bandMath(outputimg, exp, gdalformat, datatype, banddefseq, expbandname, outputexists)\n"
+"rsgislib.imagecalc.bandMath(output_img, exp, gdalformat, datatype, band_defs, exp_band_name, output_exists)\n"
 "Performs band math calculation.\n"
 "The syntax for the expression is from the muparser library ('http://muparser.beltoforion.de <http://muparser.beltoforion.de>`): `see here <http://beltoforion.de/article.php?a=muparser&hl=en&p=features&s=idPageTop>`\n."
 "\n"
 "Where:\n"
 "\n"
-":param outputimg: is a string containing the name of the output file\n"
+":param output_img: is a string containing the name of the output file\n"
 ":param exp: is a string containing the expression to run over the images, uses muparser syntax.\n"
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
 ":param datatype: is an containing one of the values from rsgislib.TYPE_*\n"
-":param banddefseq: is a sequence of rsgislib.imagecalc.BandDefn objects that define the inputs\n"
-":param expbandname: is an optional bool specifying whether the band name should be the expression (Default = False).\n"
-":param outputexists: is an optional bool specifying whether the output image already exists and it should be editted rather than overwritten (Default=False)."
+":param band_defs: is a sequence of rsgislib.imagecalc.BandDefn objects that define the inputs\n"
+":param exp_band_name: is an optional bool specifying whether the band name should be the expression (Default = False).\n"
+":param output_exists: is an optional bool specifying whether the output image already exists and it should be editted rather than overwritten (Default=False)."
 "\n"
 "\n"
 "Example::\n"
@@ -1813,20 +1814,20 @@ static PyMethodDef ImageCalcMethods[] = {
 "\n"},
 
 {"imageMath", (PyCFunction)ImageCalc_ImageMath, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imagecalc.imageMath(inputimg, outputimg, exp, gdalformat, datatype, expbandname, outputexists)\n"
+"rsgislib.imagecalc.imageMath(input_img, output_img, exp, gdalformat, datatype, exp_band_name, output_exists)\n"
 "Performs image math calculations. Produces an output image file with the same number of bands as the input image.\n"
 "This function applies the same calculation to each image band (i.e., b1 is the only variable).\n"
 "The syntax for the expression is from the muparser library ('http://muparser.beltoforion.de <http://muparser.beltoforion.de>`): `see here <http://beltoforion.de/article.php?a=muparser&hl=en&p=features&s=idPageTop>`\n."
 "\n"
 "Where:\n"
 "\n"
-":param inputimg: is a string containing the name of the input file\n"
-":param outputimg: is a string containing the name of the output file\n"
+":param input_img: is a string containing the name of the input file\n"
+":param output_img: is a string containing the name of the output file\n"
 ":param exp: is a string containing the expression to run over the images, uses myparser syntax.\n"
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
 ":param datatype: is an containing one of the values from rsgislib.TYPE_*\n"
-":param expbandname: is an optional bool specifying whether the band name should be the expression (Default = False).\n"
-":param outputexists: is an optional bool specifying whether the output image already exists and it should be editted rather than overwritten (Default=False)."
+":param exp_band_name: is an optional bool specifying whether the band name should be the expression (Default = False).\n"
+":param output_exists: is an optional bool specifying whether the output image already exists and it should be editted rather than overwritten (Default=False)."
 "\n"
 "\n"
 "Example::\n"
@@ -1842,20 +1843,20 @@ static PyMethodDef ImageCalcMethods[] = {
 "\n"},
 
 {"imageBandMath", (PyCFunction)ImageCalc_ImageBandMath, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imagecalc.imageBandMath(inputimg, outputimg, exp, gdalformat, datatype, expbandname, outputexists)\n"
+"rsgislib.imagecalc.imageBandMath(input_img, output_img, exp, gdalformat, datatype, exp_band_name, output_exists)\n"
 "Performs image band math calculations. Produces a single output file with a single image band.\n"
 "The image bands can be referred to individually using b1, b2 ... bn. where n is the number of image bands, starting at 1.\n"
 "The syntax for the expression is from the muparser library ('http://muparser.beltoforion.de <http://muparser.beltoforion.de>`): `see here <http://beltoforion.de/article.php?a=muparser&hl=en&p=features&s=idPageTop>`\n."
 "\n"
 "Where:\n"
 "\n"
-":param inputimg: is a string containing the name of the input file\n"
-":param outputimg: is a string containing the name of the output file\n"
+":param input_img: is a string containing the name of the input file\n"
+":param output_img: is a string containing the name of the output file\n"
 ":param exp: is a string containing the expression to run over the images, uses myparser syntax.\n"
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
 ":param datatype: is an containing one of the values from rsgislib.TYPE_*\n"
-":param expbandname: is an optional bool specifying whether the band name should be the expression (Default = False).\n"
-":param outputexists: is an optional bool specifying whether the output image already exists and it should be editted rather than overwritten (Default=False)."
+":param exp_band_name: is an optional bool specifying whether the band name should be the expression (Default = False).\n"
+":param output_exists: is an optional bool specifying whether the output image already exists and it should be editted rather than overwritten (Default=False)."
 "\n"
 "\n"
 "Example::\n"
@@ -1876,19 +1877,19 @@ static PyMethodDef ImageCalcMethods[] = {
 "\n"},
 
 {"kMeansClustering", (PyCFunction)ImageCalc_KMeansClustering, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imagecalc.kMeansClustering(inputImage, outputMatrix, numClusters, maxIterations, subSample, ignoreZeros, degreeOfChange, initMethod)\n"
+"rsgislib.imagecalc.kMeansClustering(input_img, out_file, n_clusters, max_n_iters, sub_sample, ignore_zeros, degree_change, init_cluster_method)\n"
 "Performs K Means Clustering and saves cluster centres to a text file.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputImage: is a string providing the input image\n"
-":param outputMatrix: is a string providing the output matrix (text file) to save the cluster centres to.\n"
-":param numClusters: is the number of clusters to use.\n"
-":param maxIterations: is the maximum number of itterations.\n"
-":param subSample: is an int specifying what fraction of the total pixels should be considered (e.g., 100 = 1/100 pixels).\n"
-":param ignoreZeros: is a bool specifying if zeros in the image should be treated as no data.\n"
-":param degreeofChange: is a float providing the minimum change between itterations before terminating.\n"
-":param initMethod: the method for initialising the clusters and is one of INITCLUSTER_* values\n"
+":param input_img: is a string providing the input image\n"
+":param out_file: is a string providing the output matrix (text file) to save the cluster centres to.\n"
+":param n_clusters: is the number of clusters to use.\n"
+":param max_n_iters: is the maximum number of itterations.\n"
+":param sub_sample: is an int specifying what fraction of the total pixels should be considered (e.g., 100 = 1/100 pixels).\n"
+":param ignore_zeros: is a bool specifying if zeros in the image should be treated as no data.\n"
+":param degree_change: is a float providing the minimum change between iterations before terminating.\n"
+":param init_cluster_method: the method for initialising the clusters and is one of INITCLUSTER_* values\n"
 "\n"
 "Example::\n"
 "\n"
@@ -1905,24 +1906,25 @@ static PyMethodDef ImageCalcMethods[] = {
 "\n"},
 
 {"isoDataClustering", (PyCFunction)ImageCalc_ISODataClustering, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imagecalc.isoDataClustering(inputImage, outputMatrix, numClusters, maxIterations, subSample, ignoreZeros, degreeOfChange, initMethod, minDistBetweenClusters, minNumFeatures, maxStdDev, minNumClusters, startIteration, endIteration)\n"
+"rsgislib.imagecalc.isoDataClustering(input_img, out_file, n_clusters, max_n_iters, sub_sample, ignore_zeros, degree_change, init_cluster_method, min_dist_clusters, min_n_feats, max_std_dev, min_n_clusters, start_iter, end_iter)\n"
 "Performs ISO Data Clustering and saves cluster centres to a text file.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputImage: is a string providing the input image\n"
-":param outputMatrix: is a string providing the output matrix (text file) to save the cluster centres to.\n"
-":param numClusters: is the number of clusters to start with.\n"
-":param maxIterations: is the maximum number of iterations.\n"
-":param subSample: is an int specifying what fraction of the total pixels should be considered (e.g., 100 = 1/100 pixels).\n"
-":param ignoreZeros: is a bool specifying if zeros in the image should be treated as no data.\n"
-":param initMethod: the method for initialising the clusters and is one of INITCLUSTER_:param values\n"
-":param minDistBetweenClusters: is a float\n"
-":param minNumFeatures: is an int\n"
-":param maxStdDev: is a float\n"
-":param minNumClusters: is an int\n"
-":param startIteration: is an int\n"
-":param endIteration: is an int\n"
+":param input_img: is a string providing the input image\n"
+":param out_file: is a string providing the output matrix (text file) to save the cluster centres to.\n"
+":param n_clusters: is the number of clusters to start with.\n"
+":param max_n_iters: is the maximum number of iterations.\n"
+":param sub_sample: is an int specifying what fraction of the total pixels should be considered (e.g., 100 = 1/100 pixels).\n"
+":param ignore_zeros: is a bool specifying if zeros in the image should be treated as no data.\n"
+":param degree_change: is a float providing the minimum change between iterations before terminating.\n"
+":param init_cluster_method: the method for initialising the clusters and is one of INITCLUSTER_:param values\n"
+":param min_dist_clusters: is a float\n"
+":param min_n_feats: is an int\n"
+":param max_std_dev: is a float\n"
+":param min_n_clusters: is an int\n"
+":param start_iter: is an int\n"
+":param end_iter: is an int\n"
 "\n"
 "Example::\n"
 "\n"
@@ -1934,42 +1936,42 @@ static PyMethodDef ImageCalcMethods[] = {
 "\n"},
 
 {"mahalanobisDistFilter", (PyCFunction)ImageCalc_MahalanobisDistFilter, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imagecalc.mahalanobisDistFilter(inputImage, outputImage, windowSize, gdalFormat, datatype)\n"
+"rsgislib.imagecalc.mahalanobisDistFilter(input_img, output_img, win_size, gdalformat, datatype)\n"
 "Performs mahalanobis distance window filter.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputImage: is a string containing the name of the input file\n"
-":param outputImage: is a string containing the name of the output file\n"
-":param windowSize: is an int defining the size of the window to be used\n"
-":param gdalFormat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
+":param input_img: is a string containing the name of the input file\n"
+":param output_img: is a string containing the name of the output file\n"
+":param win_size: is an int defining the size of the window to be used\n"
+":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
 ":param dataType: is an int containing one of the values from rsgislib.TYPE_*\n"
 "\n"
 },
 
 {"mahalanobisDist2ImgFilter", (PyCFunction)ImageCalc_MahalanobisDist2ImgFilter, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imagecalc.mahalanobisDist2ImgFilter(inputImage, outputImage, windowSize, gdalformat, datatype)\n"
+"rsgislib.imagecalc.mahalanobisDist2ImgFilter(input_img, output_img, win_size, gdalformat, datatype)\n"
 "Performs mahalanobis distance image to window filter.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputImage: is a string containing the name of the input file\n"
-":param outputImage: is a string containing the name of the output file\n"
-":param windowSize: is an int defining the size of the window to be used\n"
+":param input_img: is a string containing the name of the input file\n"
+":param output_img: is a string containing the name of the output file\n"
+":param win_size: is an int defining the size of the window to be used\n"
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
 ":param datatype: is an int containing one of the values from rsgislib.TYPE_*\n"
 "\n"
 },
 
 {"imagePixelColumnSummary", (PyCFunction)ImageCalc_ImagePixelColumnSummary, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imagecalc.imagePixelColumnSummary(inputImage, outputImage, summaryStats, gdalformat, datatype, noDataValue, useNoDataValue)\n"
+"rsgislib.imagecalc.imagePixelColumnSummary(input_img, output_img, sum_stats, gdalformat, datatype, no_data_val, use_no_data)\n"
 "Calculates summary statistics for a column of pixels.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputImage: is a string containing the name of the input file\n"
-":param outputImage: is a string containing the name of the output file\n"
-":param summaryStats: is an rsgislib.imagecalc.StatsSummary object that has attributes matching rsgis.cmds.RSGISCmdStatsSummary\n"
+":param input_img: is a string containing the name of the input file\n"
+":param output_img: is a string containing the name of the output file\n"
+":param sum_stats: is an rsgislib.imagecalc.StatsSummary object that has attributes matching rsgis.cmds.RSGISCmdStatsSummary\n"
 "        * calcMin: boolean defining if the min value should be calculated\n"
 "        * calcMax: boolean defining if the max value should be calculated\n"
 "        * calcSum: boolean defining if the sum value should be calculated\n"
@@ -1986,23 +1988,23 @@ static PyMethodDef ImageCalcMethods[] = {
 "        * mode: float defining the mode value to use\n"
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
 ":param datatype: is an int containing one of the values from rsgislib.TYPE_*\n"
-":param noDataValue: is a float specifying what value is used to signify no data\n"
-":param useNoDataValue: is a boolean specifying whether the noDataValue should be used\n"
+":param no_data_val: is a float specifying what value is used to signify no data\n"
+":param use_no_data: is a boolean specifying whether the noDataValue should be used\n"
 "\n"
 },
 
 {"imagePixelLinearFit", (PyCFunction)ImageCalc_ImagePixelLinearFit, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imagecalc.imagePixelLinearFit(inputImage, outputImage, gdalformat, bandValues, noDataValue, useNoDataValue)\n"
+"rsgislib.imagecalc.imagePixelLinearFit(input_img, output_img, gdalformat, band_values, no_data_val, use_no_data)\n"
 "Performs a linear regression on each column of pixels.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputImage: is a string containing the name of the input file\n"
-":param outputImage: is a string containing the name of the output file\n"
+":param input_img: is a string containing the name of the input file\n"
+":param output_img: is a string containing the name of the output file\n"
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
-":param bandValues: is text file containing the value of each band (e.g. wavelength, day of year) with a separate line for each band\n"
-":param noDataValue: is a float specifying what value is used to signify no data\n"
-":param useNoDataValue: is a boolean specifying whether the noDataValue should be used\n"
+":param band_values: is text file containing the value of each band (e.g. wavelength, day of year) with a separate line for each band\n"
+":param no_data_val: is a float specifying what value is used to signify no data\n"
+":param use_no_data: is a boolean specifying whether the noDataValue should be used\n"
 "\n"
 "Example::\n"
 "\n"
@@ -2022,16 +2024,16 @@ static PyMethodDef ImageCalcMethods[] = {
 },
 
 {"pca", (PyCFunction)ImageCalc_PCA, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imagecalc.pca(inputImage, eigenVectors, outputImage, numComponents, gdalformat, dataType)\n"
+"rsgislib.imagecalc.pca(input_img, eigen_vec_file, output_img, n_comps, gdalformat, dataType)\n"
 "Performs a principal components analysis of an image using a defined set of eigenvectors.\n"
 "The eigenvectors can be calculated using the rsgislib.imagecalc.getPCAEigenVector function.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputImage: is a string containing the name of the input image file\n"
-":param eigenVectors: is a string containing the name of the file of eigen vectors for the PCA\n"
-":param outputImage: is a string containing the name of the output image file\n"
-":param numComponents: is an int containing number of components to use for PCA\n"
+":param input_img: is a string containing the name of the input image file\n"
+":param eigen_vec_file: is a string containing the name of the file of eigen vectors for the PCA\n"
+":param output_img: is a string containing the name of the output image file\n"
+":param n_comps: is an int containing number of components to use for PCA\n"
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
 ":param datatype: is an int containing one of the values from rsgislib.TYPE_*\n"
 "\n"
@@ -2050,78 +2052,79 @@ static PyMethodDef ImageCalcMethods[] = {
 },
 
 {"calculateRMSE", (PyCFunction)ImageCalc_CalculateRMSE, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imagecalc.calculateRMSE(inputImageA, inputBandA, inputImageB, inputBandB)\n"
+"rsgislib.imagecalc.calculateRMSE(in_a_img, img_a_band, in_b_img, img_b_band)\n"
 "Calculates the root mean squared error between two images\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputImageA: is a string containing the name of the first input image file\n"
-":param inputBandA: is an integer defining which band should be processed from inputImageA\n"
-":param inputImageB: is a string containing the name of the second input image file\n"
-":param inputBandB: is an integer defining which band should be processed from inputImageB\n"
+":param in_a_img: is a string containing the name of the first input image file\n"
+":param img_a_band: is an integer defining which band should be processed from inputImageA\n"
+":param in_b_img: is a string containing the name of the second input image file\n"
+":param img_b_band: is an integer defining which band should be processed from inputImageB\n"
 ":return: float\n"
 "\n"
 },
 
 {"allBandsEqualTo", (PyCFunction)ImageCalc_AllBandsEqualTo, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imagecalc.allBandsEqualTo(inputImage, imgValue, outputTrueVal, outputFalseVal, outputImage, gdalformat, datatype)\n"
+"rsgislib.imagecalc.allBandsEqualTo(input_img, output_img,  img_val, out_true_val, out_false_val, gdalformat, datatype)\n"
 "Tests whether all bands are equal to the same value\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputImage: is a string containing the name of the input image file\n"
-":param imgValue: is a float specifying the value against which others are tested for equality TODO: Check this and below\n"
-":param ouputTrueVal: is a float specifying the value in the output image representing true \n"
-":param outputFalseVal: is a float specifying the value in the output image representing false \n"
-":param outputImage: is a string containing the name of the output image file\n"
+":param input_img: is a string containing the name of the input image file\n"
+":param output_img: is a string containing the name of the output image file\n"
+":param img_val: is a float specifying the value against which others are tested for equality TODO: Check this and below\n"
+":param out_true_val: is a float specifying the value in the output image representing true \n"
+":param out_false_val: is a float specifying the value in the output image representing false \n"
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
 ":param datatype: is an containing one of the values from rsgislib.TYPE_*\n"
 "\n"
 },
 
 {"histogram", (PyCFunction)ImageCalc_Histogram, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imagecalc.histogram(inputImage, imageMask, outputFile, imgBand, imgValue, binWidth, calcInMinMax, inMin, inMax)\n"
+"rsgislib.imagecalc.histogram(input_img, in_msk_img, output_file, img_band, msk_val, bin_width, calc_min_max, min_val, max_val)\n"
 "Generates a histogram for the region of the mask selected\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputImage: is a string containing the name of the input image file\n"
-":param imageMask: is a string containing the name of the image mask file\n"
-":param outputFile: is a string containing the name of the file for histogram output\n"
-":param imgValue: is a float\n"
-":param binWidth: is a float specifying the width of the histogram bins\n"
-":param calcInMinMax: is a boolean specifying whether inMin and inMax should be calculated\n"
-":param inMin: is a float for the minimum image value to be included in the histogram\n"
-":param inMax: is a floatf or the maximum image value to be included in the histogram\n"
+":param input_img: is a string containing the name of the input image file\n"
+":param in_msk_img: is a string containing the name of the image mask file\n"
+":param output_file: is a string containing the name of the file for histogram output\n"
+":param img_band: is an integer for the band within the image (band indexing start at 1)\n"
+":param msk_val: is a float for the value within the input mask for the regions the histogram will be calculated\n"
+":param bin_width: is a float specifying the width of the histogram bins\n"
+":param calc_min_max: is a boolean specifying whether inMin and inMax should be calculated\n"
+":param min_val: is a float for the minimum image value to be included in the histogram\n"
+":param max_val: is a floatf or the maximum image value to be included in the histogram\n"
 "\n"
 },
     
 {"getHistogram", (PyCFunction)ImageCalc_GetHistogram, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imagecalc.getHistogram(inputImage, imgBand, binWidth, calcInMinMax, inMin, inMax)\n"
+"rsgislib.imagecalc.getHistogram(input_img, img_band, bin_width, calc_min_max, min_val, max_val)\n"
 "Generates and returns a histogram for the image.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputImage: is a string containing the name of the input image file\n"
-":param imgBand: is an unsigned int specifying the image band starting from 1.\n"
-":param binWidth: is a float specifying the width of the histogram bins\n"
-":param calcInMinMax: is a boolean specifying whether inMin and inMax should be calculated\n"
-":param inMin: is a float for the minimum image value to be included in the histogram\n"
-":param inMax: is a floatf or the maximum image value to be included in the histogram\n"
+":param input_img: is a string containing the name of the input image file\n"
+":param img_band: is an unsigned int specifying the image band starting from 1.\n"
+":param bin_width: is a float specifying the width of the histogram bins\n"
+":param calc_min_max: is a boolean specifying whether inMin and inMax should be calculated\n"
+":param min_val: is a float for the minimum image value to be included in the histogram\n"
+":param max_val: is a float or the maximum image value to be included in the histogram\n"
 "\n"
 ":return: list of ints"
 "\n"
 },
 
 {"bandPercentile", (PyCFunction)ImageCalc_BandPercentile, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imagecalc.bandPercentile(inputImage, percentile, noDataValue)\n"
+"rsgislib.imagecalc.bandPercentile(input_img, percentile, no_data_val)\n"
 "Calculates image band percentiles for the input image and results a list of values\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputImage: is a string containing the name of the input image file\n"
+":param input_img: is a string containing the name of the input image file\n"
 ":param percentile: is a float between 0 -- 1 specifying the percentile to be calculated.\n"
-":param noDataValue: is a float specifying the value used to represent no data (used None when no value is to be specified).\n"
+":param no_data_val: is a float specifying the value used to represent no data (used None when no value is to be specified).\n"
 "\n"
 ":return: list of floats\n"
 "\n"
@@ -2129,16 +2132,16 @@ static PyMethodDef ImageCalcMethods[] = {
 
 
 {"correlationWindow", (PyCFunction)ImageCalc_CorrelationWindow, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imagecalc.correlationWindow(inputImage, outputImage, windowSize, bandA, bandB, gdalformat, datatype)\n"
-"Tests whether all bands are equal to the same value\n"
+"rsgislib.imagecalc.correlationWindow(input_img, output_img, win_size, band_a, band_b, gdalformat, datatype)\n"
+"Calculates the correlation between two image bands within a window.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputImage: is a string containing the name of the input image file\n"
-":param outputImage: is a string containing the name of the output image file\n"
-":param windowSize: is an int providing the size of the window to calculate the correlation over\n"
-":param bandA: is an int providing the first band to use.\n"
-":param bandB: is an int providing the second band to use.\n"
+":param input_img: is a string containing the name of the input image file\n"
+":param output_img: is a string containing the name of the output image file\n"
+":param win_size: is an int providing the size of the window to calculate the correlation over\n"
+":param band_a: is an int providing the first band to use.\n"
+":param band_b: is an int providing the second band to use.\n"
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
 ":param datatype: is an containing one of the values from rsgislib.TYPE_*\n"
 "\n"
@@ -2155,7 +2158,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "\n"},
 
 {"getImageStatsInEnv", (PyCFunction)ImageCalc_GetImageStatsInEnv, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imagecalc.getImageStatsInEnv(inputImage, imgBand, noDataVal, longMin, longMax, latMin, latMax)\n"
+"rsgislib.imagecalc.getImageStatsInEnv(input_img, img_band, no_data_val, lon_min, lon_max, lat_min, lat_max)\n"
 "Calculates and returns statistics (min, max, mean, stddev, sum) for a region.\n"
 "defined by the bounding box (longMin, longMax, latMin, latMax) which is specified\n"
 "geographic latitude and longitude. The coordinates are converted to the projection\n"
@@ -2164,13 +2167,13 @@ static PyMethodDef ImageCalcMethods[] = {
 "\n"
 "Where:\n"
 "\n"
-":param inputImage: is a string containing the name of the input image file\n"
-":param imgBand: is an unsigned int specifying the image band starting from 1.\n"
-":param noDataVal: is a float specifying a no data value, to be ignored in the calculation. If a value of \'None\' is provided then a no data value is not used.\n"
-":param longMin: is a double specifying the minimum longitude of the BBOX\n"
-":param longMax: is a double specifying the maximum longitude of the BBOX\n"
-":param latMin: is a double specifying the minimum latitude of the BBOX\n"
-":param latMax: is a double specifying the maximum latitude of the BBOX\n"
+":param input_img: is a string containing the name of the input image file\n"
+":param img_band: is an unsigned int specifying the image band starting from 1.\n"
+":param no_data_val: is a float specifying a no data value, to be ignored in the calculation. If a value of \'None\' is provided then a no data value is not used.\n"
+":param lon_min: is a double specifying the minimum longitude of the BBOX\n"
+":param lon_max: is a double specifying the maximum longitude of the BBOX\n"
+":param lat_min: is a double specifying the minimum latitude of the BBOX\n"
+":param lat_max: is a double specifying the maximum latitude of the BBOX\n"
 "\n"
 ":return: list with 5 values (min, max, mean, stddev, sum)\n"
 "\n"
@@ -2186,7 +2189,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "\n"},
     
 {"getImageBandModeInEnv", (PyCFunction)ImageCalc_GetImageBandModeInEnv, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imagecalc.getImageBandModeInEnv(inputImage, imgBand, binWidth, noDataVal, longMin, longMax, latMin, latMax)\n"
+"rsgislib.imagecalc.getImageBandModeInEnv(input_img, img_band, bin_width, no_data_val, lon_min, lon_max, lat_min, lat_max)\n"
 "Calculates and returns the image mode for a region.\n"
 "defined by the bounding box (longMin, longMax, latMin, latMax) which is specified\n"
 "geographic latitude and longitude. The coordinates are converted to the projection\n"
@@ -2195,39 +2198,43 @@ static PyMethodDef ImageCalcMethods[] = {
 "\n"
 "Where:\n"
 "\n"
-":param inputImage: is a string containing the name of the input image file\n"
-":param imgBand: is an unsigned int specifying the image band starting from 1.\n"
-":param binWidth: is a float specifying the binWidth for the histogram generated to calculate the mode.\n"
-":param noDataVal: is a float specifying a no data value, to be ignored in the calculation.\n"
+":param input_img: is a string containing the name of the input image file\n"
+":param img_band: is an unsigned int specifying the image band starting from 1.\n"
+":param bin_width: is a float specifying the binWidth for the histogram generated to calculate the mode.\n"
+":param no_data_val: is a float specifying a no data value, to be ignored in the calculation.\n"
 "            If a value of \'None\' is provided then a no data value is not used.\n"
-":param longMin: is a double specifying the minimum longitude of the BBOX\n"
-":param longMax: is a double specifying the maximum longitude of the BBOX\n"
-":param latMin: is a double specifying the minimum latitude of the BBOX\n"
-":param latMax: is a double specifying the maximum latitude of the BBOX\n"
+":param lon_min: is a double specifying the minimum longitude of the BBOX\n"
+":param lon_max: is a double specifying the maximum longitude of the BBOX\n"
+":param lat_min: is a double specifying the minimum latitude of the BBOX\n"
+":param lat_max: is a double specifying the maximum latitude of the BBOX\n"
 "\n"
 ":return: float with image mode for the region within the BBOX.\n"
 "\n"
 },
 
 {"get2DImageHistogram", (PyCFunction)ImageCalc_Get2DImageHistogram, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imagecalc.get2DImageHistogram(inputImage1, inputImage2, outputImage, gdalFormat, img1Band, img2Band, numBins, img1Min, img1Max, img2Min, img2Max, normOutput)\n"
+"rsgislib.imagecalc.get2DImageHistogram(in_a_img, in_b_img, output_img, gdalformat, img_a_band, img_b_band, n_bins, img_a_min, img_a_max, img_b_min, img_b_max, img_a_scale, img_b_scale, img_a_offset, img_b_offset, normalise)\n"
 "Calculates at 2D histogram between two bands of two input images\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputImage1: is a string containing the name of the first input image file\n"
-":param inputImage2: is a string containing the name of the second input image file\n"
-":param outputImage: is a string containing the name of the output image file containing the histogram.\n"
-":param gdalFormat: is a string specifying output image format.\n"
-":param img1Band: is an unsigned integer specifying the image band from image 1 to be used.\n"
-":param img2Band: is an unsigned integer specifying the image band from image 2 to be used.\n"
-":param numBins: is an unsigned integer specifying the number of bins to be used on each histogram axis\n"
+":param in_a_img: is a string containing the name of the first input image file\n"
+":param in_b_img: is a string containing the name of the second input image file\n"
+":param output_img: is a string containing the name of the output image file containing the histogram.\n"
+":param gdalformat: is a string specifying output image format.\n"
+":param img_a_band: is an unsigned integer specifying the image band from image a to be used.\n"
+":param img_b_band: is an unsigned integer specifying the image band from image b to be used.\n"
+":param n_bins: is an unsigned integer specifying the number of bins to be used on each histogram axis\n"
 "          (it'll produce a square histogram).\n"
-":param img1Min: is a double specifying the minimum image value for image 1 to be used in the histogram.\n"
-":param img1Max: is a double specifying the maximum image value for image 1 to be used in the histogram.\n"
-":param img2Min: is a double specifying the minimum image value for image 2 to be used in the histogram.\n"
-":param img2Max: is a double specifying the maximum image value for image 2 to be used in the histogram.\n"
-":param normOutput: is a boolean specifying whether the output histogram should be normalised to unit volume.\n"
+":param img_a_min: is a double specifying the minimum image value for image a to be used in the histogram.\n"
+":param img_a_max: is a double specifying the maximum image value for image a to be used in the histogram.\n"
+":param img_b_min: is a double specifying the minimum image value for image b to be used in the histogram.\n"
+":param img_b_max: is a double specifying the maximum image value for image b to be used in the histogram.\n"
+":param img_a_scale: is a double specifying a scale for the pixel value in image a.\n"
+":param img_b_scale: is a double specifying a scale for the pixel value in image b.\n"
+":param img_a_offset: is a double specifying an offset value for the pixel values in image a.\n"
+":param img_b_offset: is a double specifying an offset value for the pixel values in image b.\n"
+":param normalise: is a boolean specifying whether the output histogram should be normalised to unit volume.\n"
 "\n"
 ":return: (double with bin width of the axis of image 1), (double with bin width of the axis of image 2)\n"
 "\n"
@@ -2235,40 +2242,40 @@ static PyMethodDef ImageCalcMethods[] = {
 
 
 {"calcMaskImgPxlValProb", (PyCFunction)ImageCalc_CalcMaskImgPxlValProb, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imagecalc.calcMaskImgPxlValProb(inputImage, inImgBands, maskImg, maskImgVal, outputImage, gdalformat, histBinWidths, useImgNoData, rescaleProbs)\n"
-"Calculates the probability of each image pixel value occuring as defined by the distrubution\n"
+"rsgislib.imagecalc.calcMaskImgPxlValProb(input_img, img_bands, in_msk_img, msk_val, output_img, gdalformat, bin_widths, use_no_data, rescale_probs)\n"
+"Calculates the probability of each image pixel value occurring as defined by the distribution\n"
 "of image pixel values within the masked region of the image.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputImage: is a string containing the name/path of the input image file.\n"
-":param inImgBands: is a list containing the image bands for which the probability will be calculated.\n"
+":param input_img: is a string containing the name/path of the input image file.\n"
+":param img_bands: is a list containing the image bands for which the probability will be calculated.\n"
 "             (Note. number of output bands will equal number of bands specified here.\n"
-":param maskImg: is a string containing the name/path of the input mask image file.\n"
-":param maskImgVal: is an integer corresponding to the pixel value in the mask image defining mask used for this calculation.\n"
-":param outputImage: is a string containing the name of the output image file.\n"
+":param in_msk_img: is a string containing the name/path of the input mask image file.\n"
+":param msk_val: is an integer corresponding to the pixel value in the mask image defining mask used for this calculation.\n"
+":param output_img: is a string containing the name of the output image file.\n"
 ":param gdalformat: is a string specifying output image format.\n"
-":param histBinWidths: is list of floating point values for the width of the histogram bins used to calculate the probability (one value for each band specified) \n"
+":param bin_widths: is list of floating point values for the width of the histogram bins used to calculate the probability (one value for each band specified) \n"
 "               (Note. larger bin widths will increase the difference between high and low probabilities) \n"
 "               This parameter is optional and if not specified or value is less than 0 then the bin width will\n"
 "               be estimated from the data.\n"
-":param useImgNoData: is a boolean specifying whether (if specified) the no data value specified in the band header\n"
-"               should be excluded from the histogram (Optional and if not specfied defaults to True).\n"
-":param rescaleProbs: is a boolean specifying whether the probabilities should be rescaled to a range of 0-1 as values\n"
+":param use_no_data: is a boolean specifying whether (if specified) the no data value specified in the band header\n"
+"               should be excluded from the histogram (Optional and if not specified defaults to True).\n"
+":param rescale_probs: is a boolean specifying whether the probabilities should be rescaled to a range of 0-1 as values\n"
 "              can be very small when a number of variables are used. (Optional and if not specified the default is True)."
 "\n"
 },
 
 {"calcPropTrueExp", (PyCFunction)ImageCalc_CalcPropTrueExp, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imagecalc.calcPropTrueExp(expression, bandDefnSeq, validImgMask)\n"
+"rsgislib.imagecalc.calcPropTrueExp(exp, band_defs, in_vld_img)\n"
 "Calculates the proportion of the image where the expression is true. Optionally a mask defining the valid area \n"
 "can be used to restrict the area of the image used as the total number of pixels within the scene.\n"
 "\n"
 "Where:\n"
 "\n"
-":param expression: is a string containing the expression to run over the images, uses muparser syntax. Must output a value of 1 to be true.\n"
-":param bandDefnSeq: is a sequence of rsgislib.imagecalc.BandDefn objects that define the inputs\n"
-":param validImgMask: is an optional string specifying a valid area image mask. If not specified then it won't be used.\n"
+":param exp: is a string containing the expression to run over the images, uses muparser syntax. Must output a value of 1 to be true.\n"
+":param band_defs: is a sequence of rsgislib.imagecalc.BandDefn objects that define the inputs\n"
+":param in_vld_img: is an optional string specifying a valid area image mask (assume valid is pixel values 1 in band 1). If not specified then it won't be used.\n"
 "\n"
 ":return: Returns a float value with the proportion\n"
 "\n"
@@ -2285,31 +2292,31 @@ static PyMethodDef ImageCalcMethods[] = {
 "\n"},
     
 {"calcMultiImgBandStats", (PyCFunction)ImageCalc_calcMultiImgBandStats, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imagecalc.calcMultiImgBandStats(inputImages, outputImage, summaryStatOption, gdalformat, datatype, noDataVal, useNoDataVal)\n"
+"rsgislib.imagecalc.calcMultiImgBandStats(input_imgs, output_img, summary_stat, gdalformat, datatype, no_data_val, use_no_data)\n"
 "Calculates the summary statistic (rsgislib.SUMTYPE_*) across multiple images on a per band basis\n."
 "For example, if rsgislib.SUMTYPE_MIN is selected then for all the images the minimum value for band 1 (across all the images) and then band 2 etc.\n"
 "will be outputted as a new image with the same number of bands as the inputs (Note. all the input images must have the same number of bands).\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputImages: is a list of input images (note. all inputs must have the same number of image bands).\n"
-":param outputImage: is a string with the name and path of the output image.\n"
-":param summaryStatOption: is of type rsgislib.SUMTYPE_* and specifies which summary statistic is used to sumamrise the images.\n"
+":param input_imgs: is a list of input images (note. all inputs must have the same number of image bands).\n"
+":param output_img: is a string with the name and path of the output image.\n"
+":param summary_stat: is of type rsgislib.SUMTYPE_* and specifies which summary statistic is used to sumamrise the images.\n"
 ":param gdalformat: is a string specifying the output image format (e.g., KEA).\n"
 ":param datatype: is an containing one of the values from rsgislib.TYPE_*\n"
-":param noDataVal: float with the value of the no data value, the same value for all the input images (Optional)\n"
-":param useNoDataVal: is a boolean specifying whether the no data value should be used (Optional, default False)\n"
+":param no_data_val: float with the value of the no data value, the same value for all the input images (Optional)\n"
+":param use_no_data: is a boolean specifying whether the no data value should be used (Optional, default False)\n"
 "\n"},
 
 {"calcImageDifference", (PyCFunction)ImageCalc_CalcImageDifference, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imagecalc.calcImageDifference(inputImage1, inputImage2, outputImage, gdalformat, datatype)\n"
+"rsgislib.imagecalc.calcImageDifference(in_a_img, in_b_img, output_img, gdalformat, datatype)\n"
 "Calculate the difference between two images (Image1 - Image2). Note the two images must have the same number of image bands.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputImage1: is a string containing the name of the first input file\n"
-":param inputImage2: is a string containing the name of the second input file\n"
-":param outputImage: is a string containing the name of the output file\n"
+":param in_a_img: is a string containing the name of the first input file\n"
+":param in_b_img: is a string containing the name of the second input file\n"
+":param output_img: is a string containing the name of the output file\n"
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
 ":param datatype: is an containing one of the values from rsgislib.TYPE_*\n"
 "\n"
@@ -2329,15 +2336,15 @@ static PyMethodDef ImageCalcMethods[] = {
 "\n"},
     
 {"getImageBandMinMax", (PyCFunction)ImageCalc_GetImageBandMinMax, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imagecalc.getImageBandMinMax(inputImage, imageBand, useNoDataVal, noDataVal)\n"
+"rsgislib.imagecalc.getImageBandMinMax(input_img, img_band, use_no_data, no_data_val)\n"
 "Calculate and reutrn the maximum and minimum values of the input image.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputImage: is a string containing the name of the input file\n"
-":param imageBand: is an int specifying the image band\n"
-":param useNoDataVal: is a boolean specifying whether the no data value should be used (Optional, default is False)\n"
-":param noDataVal: is a string containing the GDAL format for the output file - eg 'KEA'\n"
+":param input_img: is a string containing the name of the input file\n"
+":param img_band: is an int specifying the image band\n"
+":param use_no_data: is a boolean specifying whether the no data value should be used (Optional, default is False)\n"
+":param no_data_val: is a string containing the GDAL format for the output file - eg 'KEA'\n"
 "\n"
 "Example::\n"
 "\n"
@@ -2354,7 +2361,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "\n"},
     
 {"calcImageRescale", (PyCFunction)ImageCalc_CalcImageRescale, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imagecalc.calcImageRescale(inputImgs, outputImage, gdalformat, datatype, cNoDataVal, cOffset, cGain, nNoDataVal, nOffset, nGain)\n"
+"rsgislib.imagecalc.calcImageRescale(input_imgs, output_img, gdalformat, datatype, c_no_data_val, c_offset, c_gain, n_no_data_val, n_offset, n_gain)\n"
 "A function which can take either a list of images or a single image to produce a single stacked output image.\n"
 "The image values are rescaled applying the input (current; c) gain and offset and then applying the new (n) gain"
 " and offset to the output image. Note, the nodata image value is also defined and can be changed. \n"
@@ -2366,27 +2373,27 @@ static PyMethodDef ImageCalcMethods[] = {
 ":param outputImage: is the output image file.\n"
 ":param gdalformat: output raster format (e.g., KEA)\n"
 ":param datatype: is an containing one of the values from rsgislib.TYPE_\n"
-":param cNoDataVal: is a float for the current (existing) no-data value for the imagery (note, all input images have the same no-data value).\n"
-":param cOffset: is a float for the current offset value.\n"
-":param cGain:is a float for the current gain value.\n"
-":param nNoDataVal: is a float for the new no-data value for the imagery (note, all input images have the same no-data value).\n"
-":param nOffset: is a float for the new offset value.\n"
-":param nGain: is a float for the new gain value.\n"
+":param c_no_data_val: is a float for the current (existing) no-data value for the imagery (note, all input images have the same no-data value).\n"
+":param c_offset: is a float for the current offset value.\n"
+":param c_gain: is a float for the current gain value.\n"
+":param n_no_data_val: is a float for the new no-data value for the imagery (note, all input images have the same no-data value).\n"
+":param n_offset: is a float for the new offset value.\n"
+":param n_gain: is a float for the new gain value.\n"
 "\n"
 "\n"},
     
     
 {"getImgIdxForStat", (PyCFunction)ImageCalc_GetImgIdxForStat, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imagecalc.getImgIdxForStat(inimages=list, outimage=string, gdalformat=string, nodata=float, stat=rsgislib.SUMTYPE_)\n"
+"rsgislib.imagecalc.getImgIdxForStat(input_imgs=list, output_img=string, gdalformat=string, no_data_val=float, stat=rsgislib.SUMTYPE_)\n"
 "A function which calculates the index (starting at 1) of the image in the list of input images which has the stat selected. \n"
 "The output image can be used within the rsgislib.imageutils.createMaxNDVICompositeImg function."
 "\n"
 "Where:\n"
 "\n"
-":param inimages: is a list of input images, which must each just have single image band.\n"
-":param outputImage: is a string with the name and path of the output image. No data value is 0 and indexes start at 1.\n"
+":param input_imgs: is a list of input images, which must each just have single image band.\n"
+":param output_img: is a string with the name and path of the output image. No data value is 0 and indexes start at 1.\n"
 ":param gdalformat: is a string with the GDAL output file format.\n"
-":param nodata: is the no data value in the input images (all images have the same no data value).\n"
+":param no_data_val: is the no data value in the input images (all images have the same no data value).\n"
 ":param stat: is of type rsgislib.SUMTYPE_* and specifies how the index is calculated. Available options are: rsgislib.SUMTYPE_MEDIAN, rsgislib.SUMTYPE_MIN, rsgislib.SUMTYPE_MAX.\n"
 "\n"
 "Example::\n"
@@ -2432,7 +2439,7 @@ static PyMethodDef ImageCalcMethods[] = {
 },
     
 {"getImgSumStatsInPxl", (PyCFunction)ImageCalc_GetImgSumStatsInPxl, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imagecalc.getImgSumStatsInPxl(refimage=string, statsimage=string, outimage=string, gdalformat=string, datatype=int, sumstats=list, statsimageband=int, usenodata=bool, iogridx=int, iogridy=int)\n"
+"rsgislib.imagecalc.getImgSumStatsInPxl(in_ref_img=string, in_stats_img=string, output_img=string, gdalformat=string, datatype=int, sum_stats=list, stats_img_band=int, use_no_data=bool, io_grid_x=int, io_grid_y=int)\n"
 "A function which calculates a summary of the pixel values from the high resolution statsimage for\n"
 "the regions defined by the pixels in the lower resolution refimage. This is similar to zonal stats.\n"
 "Please note that the statsimage needs to have a pixel size which is a multiple of the refimage pixel size.\n"
@@ -2441,17 +2448,17 @@ static PyMethodDef ImageCalcMethods[] = {
 "\n"
 "Where:\n"
 "\n"
-":param refimage: is a string specifying the name and path for the reference image. Note, this is only used to define the\n"
+":param in_ref_img: is a string specifying the name and path for the reference image. Note, this is only used to define the\n"
 "           summary areas and output image extent.\n"
-":param statsimage: is a string specifying the name and path to the higher resolution image which will be summarised.\n"
-":param outimage: is a string specifying the output image file name and path.\n"
+":param in_stats_img: is a string specifying the name and path to the higher resolution image which will be summarised.\n"
+":param output_img: is a string specifying the output image file name and path.\n"
 ":param gdalformat: is a string with the GDAL output file format.\n"
 ":param datatype: is an containing one of the values from rsgislib.TYPE_*\n"
-":param sumstats: is a list of the type rsgislib.SUMTYPE_* and specifies the summary is calculated.\n"
-"           Each summary statastic is saved as a different image band."
-":param statsimageband: is an integer specifying the image band in the stats image to be used for the analysis. (Default: 1)\n"
-":param usenodata: is a boolean specifying whether the image band no data value should be used. (Default: True)\n"
-":param iogridx: and iogridy are integers which control the image processing block size. The unit is pixels in the refimage. (Default: 16)\n"
+":param sum_stats: is a list of the type rsgislib.SUMTYPE_* and specifies the summary is calculated.\n"
+"                  Each summary statastic is saved as a different image band."
+":param stats_img_band: is an integer specifying the image band in the stats image to be used for the analysis. (Default: 1)\n"
+":param use_no_data: is a boolean specifying whether the image band no data value should be used. (Default: True)\n"
+":param io_grid_x: and io_grid_y are integers which control the image processing block size. The unit is pixels in the refimage. (Default: 16)\n"
 "                      where the pixel resolution between the two images is closer together these values can be increased but \n"
 "                      but where the statsimage pixel size is much smaller than the ref image reducing this will reduce the memory\n"
 "                      footprint significantly.\n"
@@ -2459,34 +2466,34 @@ static PyMethodDef ImageCalcMethods[] = {
 "\n"},
     
 {"identifyMinPxlValueInWin", (PyCFunction)ImageCalc_IdentifyMinPxlValueInWin, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imagecalc.identifyMinPxlValueInWin(inputimg=string, outimage=string, outrefimg=string, bands=list, winsize=int, gdalformat=string, nodataval=float, usenodata=boolean)\n"
+"rsgislib.imagecalc.identifyMinPxlValueInWin(input_img=string, output_img=string, out_ref_img=string, img_bands=list, win_size=int, gdalformat=string, no_data_val=float, use_no_data=boolean)\n"
 "A function to identify the minimum value across the image bands specified within a window.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputimg: is a string specifying input image file.\n"
-":param outimage: is a string specifying image with the minimum pixel value.\n"
-":param outrefimg: is a string specifying the output file for the reference image - i.e., the band index.\n"
-":param bands: is a list of image bands (indexing starts at 1).\n"
-":param winsize: is an integer specifying the window size (must be an odd number).\n"
+":param input_img: is a string specifying input image file.\n"
+":param output_img: is a string specifying image with the minimum pixel value.\n"
+":param out_ref_img: is a string specifying the output file for the reference image - i.e., the band index.\n"
+":param img_bands: is a list of image bands (indexing starts at 1) from the input image.\n"
+":param win_size: is an integer specifying the window size (must be an odd number).\n"
 ":param gdalformat: is a string with the GDAL output file format.\n"
-":param nodataval: is a float specifying the no data value.\n"
-":param usenodata: is a boolean specifiying whether to use the no data value.\n"
+":param no_data_val: is a float specifying the no data value.\n"
+":param use_no_data: is a boolean specifiying whether to use the no data value.\n"
 "\n"},
     
 {"calcImgMeanInMask", (PyCFunction)ImageCalc_CalcImgMeanInMask, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.imagecalc.calcImgMeanInMask(inputimg=string, inputImgMsk=string, mskValue=int, bands=list, nodataval=float, usenodata=boolean)\n"
+"rsgislib.imagecalc.calcImgMeanInMask(input_img=string, in_msk_img=string, msk_val=int, img_bands=list, no_data_val=float, use_no_data=boolean)\n"
 "A function to calculate the mean value of all the pixels specified within\n"
 "the mask and across all the image bounds. \n"
 "\n"
 "Where:\n"
 "\n"
-":param inputimg: is a string specifying input image file.\n"
-":param inputImgMsk: is a string specifying image with the mask file.\n"
-":param mskValue: the mask value (integer), within the input image mask, specifying the pixels over which the mean will be taken.\n"
-":param bands: is a list of image bands (indexing starts at 1).\n"
-":param nodataval: is a float specifying the no data value.\n"
-":param usenodata: is a boolean specifiying whether to use the no data value.\n"
+":param input_img: is a string specifying input image file.\n"
+":param in_msk_img: is a string specifying image with the mask file.\n"
+":param msk_val: the mask value (integer), within the input image mask, specifying the pixels over which the mean will be taken.\n"
+":param img_bands: is a list of image bands (indexing starts at 1).\n"
+":param no_data_val: is a float specifying the no data value.\n"
+":param use_no_data: is a boolean specifiying whether to use the no data value.\n"
 "\n"
 ":return: float with mean value.\n"
 "\n"},
