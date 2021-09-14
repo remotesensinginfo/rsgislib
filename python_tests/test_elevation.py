@@ -109,7 +109,7 @@ def test_planeFitDetreatDEM(tmp_path):
     assert img_eq
 
 
-def test_shadowmask(tmp_path):
+def test_shadowMask(tmp_path):
     import rsgislib.elevation
     import rsgislib.imagecalc
 
@@ -119,7 +119,7 @@ def test_shadowmask(tmp_path):
     solar_zenith = 35.67
     max_height = 5000
     gdalformat = "KEA"
-    rsgislib.elevation.shadowmask(
+    rsgislib.elevation.shadowMask(
         input_img, output_img, solar_azimuth, solar_zenith, max_height, gdalformat
     )
 
