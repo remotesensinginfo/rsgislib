@@ -210,39 +210,47 @@ static PyObject *VectorUtils_CheckValidateGeometries(PyObject *self, PyObject *a
 static PyMethodDef VectorUtilsMethods[] = {
 
 {"vectorMaths", (PyCFunction)VectorUtils_VectorMaths, METH_VARARGS | METH_KEYWORDS,
-"vectorutils.vectorMaths(inputVector, outputVector, outputColName, expression, variables, force)\n"
+"vectorutils.vectorMaths(vec_file, vec_lyr, out_vec_file, out_vec_lyr, out_col, exp, vars, del_exist_vec)\n"
 "A command to calculate a number column from data in existing columns.\n\n"
 "Where:\n"
 "\n"
-":param inputVector: is a string containing the name of the input vector\n"
-":param outputVector: is a string containing the name of the output vector file\n"
-":param outputColName: is a string containing the name of the output column\n"
-":param expression: is a string containing the muparser expression to be calculated.\n"
-":param variables: is a list defining the names of the variables used within the expression and defining which columns they are in the inputVector. The must be a list and contain two fields \'name\' and \'fieldName\'.\n"
-":param force: is a bool, specifying whether to force removal of the output vector if it exists\n"
+":param vec_file: is a string containing the input vector file path\n"
+":param vec_lyr: is a string containing the name of the input vector layer name\n"
+":param out_vec_file: is a string containing the output vector file path\n"
+":param out_vec_lyr: is a string containing the name of the output vector layer name\n"
+":param out_format: is a string containing the output file format\n"
+":param out_col: is a string containing the name of the output column\n"
+":param exp: is a string containing the muparser expression to be calculated.\n"
+":param vars: is a list defining the names of the variables used within the expression and defining which columns they are in the inputVector. The must be a list and contain two fields \'name\' and \'fieldName\'.\n"
+":param del_exist_vec: is a bool, specifying whether to force removal of the output vector if it exists\n"
 "\n"},
 
 {"createLinesOfPoints", (PyCFunction)VectorUtils_CreateLinesOfPoints, METH_VARARGS | METH_KEYWORDS,
-"vectorutils.createLinesOfPoints(inputVector, outputVector, step, force)\n"
+"vectorutils.createLinesOfPoints(vec_file, vec_lyr, out_vec_file, out_vec_lyr, out_format, step, del_exist_vec)\n"
 "A function to create a regularly spaced set of points following a set of lines.\n\n"
 "Where:\n"
 "\n"
-":param inputVector: is a string containing the name of the input vector (must be lines)\n"
-":param outputVector: is a string containing the name of the output vector (will be points)\n"
+":param vec_file: is a string containing the input vector file path (must be lines)\n"
+":param vec_lyr: is a string containing the name of the input vector layer name\n"
+":param out_vec_file: is a string containing the output vector file path (will be points)\n"
+":param out_vec_lyr: is a string containing the name of the output vector layer name\n"
+":param out_format: is a string containing the output file format\n"
 ":param step: is a double specifying the distance between points along the line.\n"
-":param force: is a bool, specifying whether to force removal of the output vector if it exists\n"
+":param del_exist_vec: is a bool, specifying whether to force removal of the output vector if it exists\n"
 "\n"},
 
 {"checkValidateGeometries", (PyCFunction)VectorUtils_CheckValidateGeometries, METH_VARARGS | METH_KEYWORDS,
-"vectorutils.checkValidateGeometries(inputVector, veclayer, outputVector, outVecDriver, printGeomErrs)\n"
+"vectorutils.checkValidateGeometries(vec_file, vec_lyr, out_vec_file, out_vec_lyr, out_format, print_err_geoms, del_exist_vec)\n"
 "A command fit a polygon to the points inputted.\n\n"
 "Where:\n"
 "\n"
-":param inputVector: is a string containing the name and path of the input vector.\n"
-":param veclayer: is a string specifying name of the vector layer to be processed.\n"
-":param outputVector: is a string containing the name and path of the output vector.\n"
-":param outVecDriver: is a string specifying the output vector GDAL/OGR driver (e.g., GPKG).\n"
-":param printGeomErrs: is a bool, specifying whether were errors are found they are printed to the console.\n"
+":param vec_file: is a string containing the input vector file path\n"
+":param vec_lyr: is a string containing the name of the input vector layer name\n"
+":param out_vec_file: is a string containing the output vector file path\n"
+":param out_vec_lyr: is a string containing the name of the output vector layer name\n"
+":param out_format: is a string specifying the output vector GDAL/OGR driver (e.g., GPKG).\n"
+":param print_err_geoms: is a bool, specifying whether were errors are found they are printed to the console.\n"
+":param del_exist_vec: is a bool, specifying whether to force removal of the output vector if it exists\n"
 "\n"},
     
 {nullptr}        /* Sentinel */

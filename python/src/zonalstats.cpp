@@ -75,15 +75,16 @@ static PyObject *ZonalStats_ImageZoneToHDF(PyObject *self, PyObject *args, PyObj
 static PyMethodDef ZonalStatsMethods[] = {
 
 {"imageZoneToHDF", (PyCFunction)ZonalStats_ImageZoneToHDF, METH_VARARGS | METH_KEYWORDS,
-"rsgislib.zonalstats.imageZoneToHDF(inputimage, inputvector, outputHDF, noProjWarning=False, pixelInPolyMethod=METHOD_POLYCONTAINSPIXELCENTER)\n"
+"rsgislib.zonalstats.imageZoneToHDF(input_img, vec_file, vec_lyr, out_h5_file, no_prj_warn=False, pxl_in_poly_method=METHOD_POLYCONTAINSPIXELCENTER)\n"
 "Extract the all the pixel values for regions to a HDF5 file (1 column for each image band).\n\n"
 "Where:\n"
 "\n"
-":param inputimage: is a string containing the name of the input image.\n"
-":param inputvector: is a string containing the name of the input vector.\n"
-":param outputHDF: is a string containing name of the output HDF file.\n"
-":param noProjWarning: is a bool, specifying whether to skip printing a warning if the vector and image have a different projections.\n"
-":param pixelInPolyMethod: is the method for determining if a pixel is included with a polygon of type rsgislib.zonalstats.METHOD_*.\n"
+":param input_img: is a string containing the name of the input image.\n"
+":param vec_file: is a string containing the input vector file path.\n"
+":param vec_lyr: is a string containing the name of the input vector layer.\n"
+":param out_h5_file: is a string containing name of the output HDF file.\n"
+":param no_prj_warn: is a bool, specifying whether to skip printing a warning if the vector and image have a different projections.\n"
+":param pxl_in_poly_method: is the method for determining if a pixel is included with a polygon of type rsgislib.zonalstats.METHOD_*.\n"
 "\n"
 "Example::\n"
 "\n"
