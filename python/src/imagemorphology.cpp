@@ -523,7 +523,7 @@ static PyMethodDef ImageMorphologyMethods[] = {
 "\n"
 "   import rsgislib.imagemorphology\n"
 "   \n"
-"   rsgislib.imagemorphology.createCircularOp(outputFile='CircularOp5.gmtxt', op_size=5)\n"
+"   rsgislib.imagemorphology.createCircularOp(output_file='CircularOp5.gmtxt', op_size=5)\n"
 "\n"},
     
     
