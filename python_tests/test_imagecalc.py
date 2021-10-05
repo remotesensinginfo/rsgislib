@@ -97,7 +97,6 @@ def test_areImgBandsEqual_False():
     assert not img_eq
 
 
-
 def test_bandMaths_SglBand(tmp_path):
     import rsgislib.imagecalc
 
@@ -211,14 +210,26 @@ def test_imageMath_BinaryOut(tmp_path):
     )
     assert img_eq
 
+
 def test_calcDist2ImgVals_sglVal_Geo(tmp_path):
     import rsgislib.imagecalc
 
     input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.kea")
-    ref_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats_dist2_val2_geo.kea")
+    ref_img = os.path.join(
+        IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats_dist2_val2_geo.kea"
+    )
 
     output_img = os.path.join(tmp_path, "test_calcDist2ImgVals.kea")
-    rsgislib.imagecalc.calcDist2ImgVals(input_img, output_img, 2, img_band=1, gdalformat="KEA", max_dist=100, no_data_val=0, unit_geo=True)
+    rsgislib.imagecalc.calcDist2ImgVals(
+        input_img,
+        output_img,
+        2,
+        img_band=1,
+        gdalformat="KEA",
+        max_dist=100,
+        no_data_val=0,
+        unit_geo=True,
+    )
 
     img_eq, prop_match = rsgislib.imagecalc.areImgBandsEqual(ref_img, 1, output_img, 1)
     assert img_eq
@@ -228,10 +239,21 @@ def test_calcDist2ImgVals_sglVal_Pxl(tmp_path):
     import rsgislib.imagecalc
 
     input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.kea")
-    ref_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats_dist2_val2_pxl.kea")
+    ref_img = os.path.join(
+        IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats_dist2_val2_pxl.kea"
+    )
 
     output_img = os.path.join(tmp_path, "test_calcDist2ImgVals.kea")
-    rsgislib.imagecalc.calcDist2ImgVals(input_img, output_img, 2, img_band=1, gdalformat="KEA", max_dist=10, no_data_val=0, unit_geo=False)
+    rsgislib.imagecalc.calcDist2ImgVals(
+        input_img,
+        output_img,
+        2,
+        img_band=1,
+        gdalformat="KEA",
+        max_dist=10,
+        no_data_val=0,
+        unit_geo=False,
+    )
 
     img_eq, prop_match = rsgislib.imagecalc.areImgBandsEqual(ref_img, 1, output_img, 1)
     assert img_eq
@@ -241,10 +263,21 @@ def test_calcDist2ImgVals_multiVal_Geo(tmp_path):
     import rsgislib.imagecalc
 
     input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.kea")
-    ref_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats_dist2_vals23_geo.kea")
+    ref_img = os.path.join(
+        IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats_dist2_vals23_geo.kea"
+    )
 
     output_img = os.path.join(tmp_path, "test_calcDist2ImgVals.kea")
-    rsgislib.imagecalc.calcDist2ImgVals(input_img, output_img, [2,3], img_band=1, gdalformat="KEA", max_dist=100, no_data_val=0, unit_geo=True)
+    rsgislib.imagecalc.calcDist2ImgVals(
+        input_img,
+        output_img,
+        [2, 3],
+        img_band=1,
+        gdalformat="KEA",
+        max_dist=100,
+        no_data_val=0,
+        unit_geo=True,
+    )
 
     img_eq, prop_match = rsgislib.imagecalc.areImgBandsEqual(ref_img, 1, output_img, 1)
     assert img_eq
@@ -254,10 +287,21 @@ def test_calcDist2ImgVals_multiVal_Pxl(tmp_path):
     import rsgislib.imagecalc
 
     input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.kea")
-    ref_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats_dist2_vals23_pxl.kea")
+    ref_img = os.path.join(
+        IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats_dist2_vals23_pxl.kea"
+    )
 
     output_img = os.path.join(tmp_path, "test_calcDist2ImgVals.kea")
-    rsgislib.imagecalc.calcDist2ImgVals(input_img, output_img, [2,3], img_band=1, gdalformat="KEA", max_dist=10, no_data_val=0, unit_geo=False)
+    rsgislib.imagecalc.calcDist2ImgVals(
+        input_img,
+        output_img,
+        [2, 3],
+        img_band=1,
+        gdalformat="KEA",
+        max_dist=10,
+        no_data_val=0,
+        unit_geo=False,
+    )
 
     img_eq, prop_match = rsgislib.imagecalc.areImgBandsEqual(ref_img, 1, output_img, 1)
     assert img_eq
@@ -267,54 +311,109 @@ def test_calcDist2ImgValsTiled_sglVal_Geo(tmp_path):
     import rsgislib.imagecalc
 
     input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.kea")
-    ref_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats_dist2_val2_geo.kea")
+    ref_img = os.path.join(
+        IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats_dist2_val2_geo.kea"
+    )
 
     output_img = os.path.join(tmp_path, "test_calcDist2ImgValsTiled.kea")
-    tmp_dist_dir = os.path.join(tmp_path, 'dist_tmp')
-    rsgislib.imagecalc.calcDist2ImgValsTiled(input_img, output_img, 2, img_band=1, max_dist=100, no_data_val=0, gdalformat="KEA", unit_geo=True, tmp_dir=tmp_dist_dir, tile_size=250, n_cores=1)
+    tmp_dist_dir = os.path.join(tmp_path, "dist_tmp")
+    rsgislib.imagecalc.calcDist2ImgValsTiled(
+        input_img,
+        output_img,
+        2,
+        img_band=1,
+        max_dist=100,
+        no_data_val=0,
+        gdalformat="KEA",
+        unit_geo=True,
+        tmp_dir=tmp_dist_dir,
+        tile_size=250,
+        n_cores=1,
+    )
 
     img_eq, prop_match = rsgislib.imagecalc.areImgBandsEqual(ref_img, 1, output_img, 1)
-    assert prop_match>0.99
+    assert prop_match > 0.99
 
 
 def test_calcDist2ImgValsTiled_sglVal_Pxl(tmp_path):
     import rsgislib.imagecalc
 
     input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.kea")
-    ref_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats_dist2_val2_pxl.kea")
+    ref_img = os.path.join(
+        IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats_dist2_val2_pxl.kea"
+    )
 
     output_img = os.path.join(tmp_path, "test_calcDist2ImgValsTiled.kea")
-    tmp_dist_dir = os.path.join(tmp_path, 'dist_tmp')
-    rsgislib.imagecalc.calcDist2ImgValsTiled(input_img, output_img, 2, img_band=1, max_dist=10, no_data_val=0, gdalformat="KEA", unit_geo=False, tmp_dir=tmp_dist_dir, tile_size=250, n_cores=1)
+    tmp_dist_dir = os.path.join(tmp_path, "dist_tmp")
+    rsgislib.imagecalc.calcDist2ImgValsTiled(
+        input_img,
+        output_img,
+        2,
+        img_band=1,
+        max_dist=10,
+        no_data_val=0,
+        gdalformat="KEA",
+        unit_geo=False,
+        tmp_dir=tmp_dist_dir,
+        tile_size=250,
+        n_cores=1,
+    )
 
     img_eq, prop_match = rsgislib.imagecalc.areImgBandsEqual(ref_img, 1, output_img, 1)
-    assert prop_match>0.99
+    assert prop_match > 0.99
 
 
 def test_calcDist2ImgValsTiled_multiVal_Geo(tmp_path):
     import rsgislib.imagecalc
 
     input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.kea")
-    ref_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats_dist2_vals23_geo.kea")
+    ref_img = os.path.join(
+        IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats_dist2_vals23_geo.kea"
+    )
 
     output_img = os.path.join(tmp_path, "test_calcDist2ImgValsTiled.kea")
-    tmp_dist_dir = os.path.join(tmp_path, 'dist_tmp')
-    rsgislib.imagecalc.calcDist2ImgValsTiled(input_img, output_img, [2,3], img_band=1, max_dist=100, no_data_val=0, gdalformat="KEA", unit_geo=True, tmp_dir=tmp_dist_dir, tile_size=250, n_cores=1)
+    tmp_dist_dir = os.path.join(tmp_path, "dist_tmp")
+    rsgislib.imagecalc.calcDist2ImgValsTiled(
+        input_img,
+        output_img,
+        [2, 3],
+        img_band=1,
+        max_dist=100,
+        no_data_val=0,
+        gdalformat="KEA",
+        unit_geo=True,
+        tmp_dir=tmp_dist_dir,
+        tile_size=250,
+        n_cores=1,
+    )
 
     img_eq, prop_match = rsgislib.imagecalc.areImgBandsEqual(ref_img, 1, output_img, 1)
-    assert prop_match>0.99
+    assert prop_match > 0.99
 
 
 def test_calcDist2ImgValsTiled_multiVal_Pxl(tmp_path):
     import rsgislib.imagecalc
 
     input_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats.kea")
-    ref_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats_dist2_vals23_pxl.kea")
+    ref_img = os.path.join(
+        IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi_cats_dist2_vals23_pxl.kea"
+    )
 
     output_img = os.path.join(tmp_path, "test_calcDist2ImgValsTiled.kea")
-    tmp_dist_dir = os.path.join(tmp_path, 'dist_tmp')
-    rsgislib.imagecalc.calcDist2ImgValsTiled(input_img, output_img, [2,3], img_band=1, max_dist=10, no_data_val=0, gdalformat="KEA", unit_geo=False, tmp_dir=tmp_dist_dir, tile_size=250, n_cores=1)
+    tmp_dist_dir = os.path.join(tmp_path, "dist_tmp")
+    rsgislib.imagecalc.calcDist2ImgValsTiled(
+        input_img,
+        output_img,
+        [2, 3],
+        img_band=1,
+        max_dist=10,
+        no_data_val=0,
+        gdalformat="KEA",
+        unit_geo=False,
+        tmp_dir=tmp_dist_dir,
+        tile_size=250,
+        n_cores=1,
+    )
 
     img_eq, prop_match = rsgislib.imagecalc.areImgBandsEqual(ref_img, 1, output_img, 1)
-    assert prop_match>0.99
-
+    assert prop_match > 0.99
