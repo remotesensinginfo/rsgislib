@@ -417,3 +417,24 @@ def test_calcDist2ImgValsTiled_multiVal_Pxl(tmp_path):
 
     img_eq, prop_match = rsgislib.imagecalc.areImgBandsEqual(ref_img, 1, output_img, 1)
     assert prop_match > 0.99
+
+def test_calcPropTrueExp_NoVldMsk():
+    import rsgislib.imagecalc
+
+    ndvi_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi.kea")
+
+    band_defns = [rsgislib.imagecalc.BandDefn('ndvi', ndvi_img, 1)]
+    prop = rsgislib.imagecalc.calcPropTrueExp("ndvi>0.5?1:0", band_defns)
+
+    assert abs(prop - 0.855) < 0.001
+
+def test_calcPropTrueExp_VldMsk():
+    import rsgislib.imagecalc
+
+    ndvi_img = os.path.join(IMGCALC_DATA_DIR, "sen2_20210527_aber_ndvi.kea")
+    vld_img = os.path.join(DATA_DIR, "sen2_20210527_aber_subset_vldmsk.kea")
+
+    band_defns = [rsgislib.imagecalc.BandDefn('ndvi', ndvi_img, 1)]
+    prop = rsgislib.imagecalc.calcPropTrueExp("ndvi>0.5?1:0", band_defns, vld_img)
+
+    assert abs(prop - 0.655) < 0.001

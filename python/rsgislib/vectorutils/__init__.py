@@ -416,23 +416,6 @@ Get the extent of the vector layer.
     return extent
 
 
-def getProjWKTFromVec(vec_file, vec_lyr=None):
-    """
-:param vec_file: is a string with the input vector file name and path.
-
-:return: WKT representation of projection
-
-"""
-    gdal.UseExceptions()
-    # Get shapefile projection as WKT
-    dataset = gdal.OpenEx(vec_file, gdal.OF_VECTOR )
-    if vec_lyr is not None:
-        layer = dataset.GetLayer(vec_lyr)
-    else:
-        layer = dataset.GetLayer()
-    spatialRef = layer.GetSpatialRef()
-    return spatialRef.ExportToWkt()
-
 
 def splitVecLyr(vec_file, vec_lyr, nfeats, out_format, outdir, outvecbase, outvecend):
     """

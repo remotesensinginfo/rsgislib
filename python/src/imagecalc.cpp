@@ -1143,13 +1143,13 @@ static PyObject *ImageCalc_CalcPropTrueExp(PyObject *self, PyObject *args, PyObj
                              RSGIS_PY_C_TEXT("in_vld_img"), nullptr};
 
     const char *pszExpression;
-    PyObject *pBandDefnObj;
-    PyObject *pInValidImageObj;
+    PyObject *pBandDefnObj = nullptr;
+    PyObject *pInValidImageObj = nullptr;
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "sO|O:calcPropTrueExp", kwlist, &pszExpression, &pBandDefnObj, &pInValidImageObj))
     {
         return nullptr;
     }
-    
+
     if( !PySequence_Check(pBandDefnObj))
     {
         PyErr_SetString(GETSTATE(self)->error, "band defs argument must be a sequence");
@@ -1158,7 +1158,7 @@ static PyObject *ImageCalc_CalcPropTrueExp(PyObject *self, PyObject *args, PyObj
     
     Py_ssize_t nBandDefns = PySequence_Size(pBandDefnObj);
     rsgis::cmds::VariableStruct *pRSGISStruct = new rsgis::cmds::VariableStruct[nBandDefns];
-    
+
     for( Py_ssize_t n = 0; n < nBandDefns; n++ )
     {
         PyObject *o = PySequence_GetItem(pBandDefnObj, n);
@@ -1205,15 +1205,16 @@ static PyObject *ImageCalc_CalcPropTrueExp(PyObject *self, PyObject *args, PyObj
         Py_DECREF(pBandIndex);
         Py_DECREF(o);
     }
-    
+
     bool useValidImg = false;
     std::string inValidImage = "";
+
     if(RSGISPY_CHECK_STRING(pInValidImageObj))
     {
         useValidImg = true;
         inValidImage = RSGISPY_STRING_EXTRACT(pInValidImageObj);
     }
-    
+
     float prop = 0.0;
     try
     {
@@ -2287,7 +2288,7 @@ static PyMethodDef ImageCalcMethods[] = {
 "   bandDefns = []\n"
 "   bandDefns.append(BandDefn('b1', inFileName, 1))\n"
 "   bandDefns.append(BandDefn('b2', inFileName, 2))\n"
-"   prop = imagecalc.calcPropTrueExp(bandDefns, expression)\n"
+"   prop = imagecalc.calcPropTrueExp(expression, bandDefns)\n"
 "   print(prop)\n"
 "\n"},
     

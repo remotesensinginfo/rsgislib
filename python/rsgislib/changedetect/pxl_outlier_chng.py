@@ -38,40 +38,32 @@ from __future__ import print_function
 
 import numpy
 
+from rios import applier
+from rios import cuiprogress
+
 import rsgislib
 import rsgislib.rastergis
 import rsgislib.imageutils
-
-haveRIOS = True
-try:
-    from rios import applier
-    from rios import cuiprogress
-    from rios import rat
-except ImportError as riosErr:
-    haveRIOS = False
 
 
 def find_class_outliers(pyod_obj, input_img, in_msk_img, out_lbls_img, out_scores_img=None, img_mask_val=1, img_bands=None,
                         gdalformat="KEA"):
     """
-This function uses the pyod (https://github.com/yzhao062/pyod) library to find outliers within a class.
-It is assumed that the input images are from a different date than the mask (classification) and therefore
-the outliners will related to class changes.
+    This function uses the pyod (https://github.com/yzhao062/pyod) library to find outliers within a class.
+    It is assumed that the input images are from a different date than the mask (classification) and therefore
+    the outliners will related to class changes.
 
-:param pyod_obj: an instance of a pyod.models (e.g., pyod.models.knn.KNN) pass parameters to the constructor
-:param input_img: input image used for analysis
-:param in_msk_img: input image mask use to define the region of interest.
-:param out_lbls_img: output image with pixel over of 1 for within mask but not outlier and 2 for in mask and outlier.
-:param out_scores_img: output image (optional, None and won't be provided; Default None) providing the probability of
-                       each pixel being an outlier
-:param img_mask_val: the pixel value within the mask image for the class of interest. (Default 1)
-:param img_bands: the image bands to be used for the analysis. If None then all used (Default: None)
-:param gdalformat: file format for the output image(s). Default KEA.
+    :param pyod_obj: an instance of a pyod.models (e.g., pyod.models.knn.KNN) pass parameters to the constructor
+    :param input_img: input image used for analysis
+    :param in_msk_img: input image mask use to define the region of interest.
+    :param out_lbls_img: output image with pixel over of 1 for within mask but not outlier and 2 for in mask and outlier.
+    :param out_scores_img: output image (optional, None and won't be provided; Default None) providing the probability of
+                           each pixel being an outlier
+    :param img_mask_val: the pixel value within the mask image for the class of interest. (Default 1)
+    :param img_bands: the image bands to be used for the analysis. If None then all used (Default: None)
+    :param gdalformat: file format for the output image(s). Default KEA.
 
-"""
-    if not haveRIOS:
-        raise Exception("The rios module is required for this function could not be imported\n\t" + riosErr)
-
+    """
     if img_bands is not None:
         if not ((type(img_bands) is list) or (type(img_bands) is tuple)):
             raise rsgislib.RSGISPyException("If provided then img_bands should be a list (or None)")

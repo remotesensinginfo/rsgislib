@@ -36,6 +36,10 @@
 // PyString for Python2 - PyUnicode for Python3
 inline bool RSGISPY_CHECK_STRING(PyObject *o)
 {
+    if(o == nullptr)
+    {
+        return false;
+    }
 #if PY_MAJOR_VERSION >= 3
     return PyUnicode_Check(o);
 #else
