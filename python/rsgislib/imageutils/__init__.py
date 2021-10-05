@@ -19,6 +19,7 @@ import osgeo.osr as osr
 
 from rios import applier
 
+gdal.UseExceptions()
 
 class ImageBandInfo(object):
     """

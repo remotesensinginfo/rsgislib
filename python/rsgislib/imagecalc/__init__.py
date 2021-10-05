@@ -14,6 +14,7 @@ import rsgislib
 # import the C++ extension into this level
 from ._imagecalc import *
 
+gdal.UseExceptions()
 
 # define our own classes
 class BandDefn(object):
@@ -213,7 +214,7 @@ def calcDist2ImgVals(
     valsImgDS = gdal.Open(input_img, gdal.GA_ReadOnly)
     valsImgBand = valsImgDS.GetRasterBand(img_band)
     rsgislib.imageutils.createCopyImage(
-        input_img, output_img, 1, 0.0, gdalformat, rsgislib.TYPE_32FLOAT
+        input_img, output_img, 1, no_data_val, gdalformat, rsgislib.TYPE_32FLOAT
     )
     distImgDS = gdal.Open(output_img, gdal.GA_Update)
     distImgBand = distImgDS.GetRasterBand(1)
@@ -223,6 +224,38 @@ def calcDist2ImgVals(
     valsImgBand = None
     valsImgDS = None
 
+
+def _computeProximityArrArgsFunc(argVals):
+    """
+    This function is used internally within calcDist2Classes
+    for the multiprocessing Pool
+    """
+    import rsgislib.imageutils
+    # 0: tileFile
+    # 1: distTileFile
+    # 2: proxOptions
+    # 3: no_data_val,
+    # 4: format (e.g., KEA)
+    # 5: img_band
+    try:
+        import tqdm
+
+        pbar = tqdm.tqdm(total=100)
+        callback = lambda *args, **kw: pbar.update()
+    except:
+        callback = gdal.TermProgress
+    classImgDS = gdal.Open(argVals[0], gdal.GA_ReadOnly)
+    classImgBand = classImgDS.GetRasterBand(argVals[5])
+    rsgislib.imageutils.createCopyImage(
+        argVals[0], argVals[1], 1, argVals[3], argVals[4], rsgislib.TYPE_32FLOAT
+    )
+    distImgDS = gdal.Open(argVals[1], gdal.GA_Update)
+    distImgBand = distImgDS.GetRasterBand(argVals[5])
+    gdal.ComputeProximity(classImgBand, distImgBand, argVals[2], callback=callback)
+    distImgBand = None
+    distImgDS = None
+    classImgBand = None
+    classImgDS = None
 
 def calcDist2ImgValsTiled(
     input_img,
@@ -303,13 +336,11 @@ def calcDist2ImgValsTiled(
 
     xRes, yRes = rsgislib.imageutils.getImageRes(input_img)
     if unit_geo:
-        xMaxDistPxl = math.ceil(max_dist / xRes)
-        yMaxDistPxl = math.ceil(max_dist / yRes)
+        xMaxDistPxl = math.ceil(max_dist / xRes) + 10
+        yMaxDistPxl = math.ceil(max_dist / yRes) + 10
     else:
-        xMaxDistPxl = max_dist
-        yMaxDistPxl = max_dist
-
-    print("Max Dist Pxls X = {}, Y = {}".format(xMaxDistPxl, yMaxDistPxl))
+        xMaxDistPxl = max_dist + 10
+        yMaxDistPxl = max_dist + 10
 
     tileOverlap = xMaxDistPxl
     if yMaxDistPxl > xMaxDistPxl:
@@ -374,32 +405,7 @@ def calcDist2ImgValsTiled(
         distTiles.append(distTileFile)
         distTileArgs.append(tileArgs)
 
-    def _computeProximityArrArgsFunc(argVals):
-        """
-        This function is used internally within calcDist2Classes
-        for the multiprocessing Pool
-        """
-        import rsgislib.imageutils
 
-        try:
-            import tqdm
-
-            pbar = tqdm.tqdm(total=100)
-            callback = lambda *args, **kw: pbar.update()
-        except:
-            callback = gdal.TermProgress
-        classImgDS = gdal.Open(argVals[0], gdal.GA_ReadOnly)
-        classImgBand = classImgDS.GetRasterBand(argVals[5])
-        rsgislib.imageutils.createCopyImage(
-            argVals[0], argVals[1], 1, argVals[3], argVals[4], rsgislib.TYPE_32FLOAT
-        )
-        distImgDS = gdal.Open(argVals[1], gdal.GA_Update)
-        distImgBand = distImgDS.GetRasterBand(1)
-        gdal.ComputeProximity(classImgBand, distImgBand, argVals[2], callback=callback)
-        distImgBand = None
-        distImgDS = None
-        classImgBand = None
-        classImgDS = None
 
     with Pool(n_cores) as p:
         p.map(_computeProximityArrArgsFunc, distTileArgs)
