@@ -16,10 +16,10 @@ class BandDefn(object):
     """
 Create a list of these objects to pass to the bandMath function as the 'bands' parameter.
 """
-    def __init__(self, bandName=None, fileName=None, bandIndex=None):
-        self.bandName = bandName
-        self.fileName = fileName
-        self.bandIndex = bandIndex
+    def __init__(self, band_name=None, input_img=None, img_band=None):
+        self.band_name = band_name
+        self.input_img = input_img
+        self.img_band = img_band
 
 
 class StatsSummary:
