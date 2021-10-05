@@ -68,7 +68,7 @@ def checkGDALImageFile(gdal_img, check_bands=True, nbands=0, chk_proj=False, eps
                     if proj_obj is None:
                         file_ok = False
                         err_str = 'Image projection is None.'
-                    elif proj_obj is '':
+                    elif proj_obj == '':
                         file_ok = False
                         err_str = 'Image projection is empty.'
 

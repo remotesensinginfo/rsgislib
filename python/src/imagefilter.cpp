@@ -257,15 +257,16 @@ static PyObject *ImageFilter_LeungMalikFilterBank(PyObject *self, PyObject *args
 // Our list of functions in this module
 static PyMethodDef ImageFilterMethods[] = {
 {"applyfilters", (PyCFunction)ImageFilter_Filter, METH_VARARGS | METH_KEYWORDS,
-"imagefilter.applyfilters(inputimage, outputImageBase, filterparameters, gdalformat, outExt, datatype)\n"
+"imagefilter.applyfilters(input_img, out_img_base, image_filters, gdalformat, out_img_ext, datatype)\n"
 "Filters images\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputimage: is a string containing the name of the input image\n"
-":param outputImageBase: is a string containing the base name of the output images\n"
-":param filterparameters: is list of rsgislib.imagefilter.FilterParameters objects providing the type of filter and required parameters (see example)\n"
+":param input_img: is a string containing the name of the input image\n"
+":param out_img_base: is a string containing the base name of the output images\n"
+":param image_filters: is list of rsgislib.imagefilter.FilterParameters objects providing the type of filter and required parameters (see example)\n"
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
+":param out_img_ext: is a string with the output image file extention (e.g., kea)"
 ":param datatype: is an int containing one of the values from rsgislib.TYPE_*\n"
 "\n"
 "Example::\n"
@@ -312,15 +313,16 @@ static PyMethodDef ImageFilterMethods[] = {
 "\n"},
 
 {"LeungMalikFilterBank", (PyCFunction)ImageFilter_LeungMalikFilterBank, METH_VARARGS | METH_KEYWORDS,
-"imagefilter.(inputimage, outputImageBase, gdalformat, outExt, datatype)\n"
+"imagefilter.(input_img, out_img_base, gdalformat, out_img_ext, datatype)\n"
 "Implements the Leung-Malik filter bank described in:\n"
 "Leung, T., Malik, J., 2001. Representing and recognizing the visual appearance of materials using three-dimensional textons.\n"
 "International Journal of Computer Vision 43 (1), 29-44.\n"
 "Where:\n"
 "\n"
-":param inputimage: is a string containing the name of the input image\n"
-":param outputImageBase: is a string containing the base name of the output images\n"
+":param input_img: is a string containing the name of the input image\n"
+":param out_img_base: is a string containing the base name of the output images\n"
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
+":param out_img_ext: is a string with the output image file extention (e.g., kea)"
 ":param datatype: is an int containing one of the values from rsgislib.TYPE_*\n"
 "\n"
 "Example::\n"

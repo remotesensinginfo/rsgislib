@@ -915,7 +915,7 @@ static PyObject *ImageCalibration_ApplySubtractSingleOffsets(PyObject *self, PyO
     static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"),
                              RSGIS_PY_C_TEXT("datatype"), RSGIS_PY_C_TEXT("non_neg_int"),
                              RSGIS_PY_C_TEXT("use_no_data"), RSGIS_PY_C_TEXT("no_data_val"),
-                             RSGIS_PY_C_TEXT("dark_refl_val"), RSGIS_PY_C_TEXT("bands_offsets"), nullptr};
+                             RSGIS_PY_C_TEXT("dark_refl_val"), RSGIS_PY_C_TEXT("band_offsets"), nullptr};
     const char *pszInputFile, *pszOutputFile, *pszGDALFormat;
     int nDataType, useNoDataValInt, nonNegativeInt;
     float noDataVal, darkObjReflVal;
@@ -1166,7 +1166,8 @@ static PyObject *ImageCalibration_landsatThermalRad2Brightness(PyObject *self, P
 
 static PyObject *ImageCalibration_worldview2ToRadiance(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("band_defs"), nullptr};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
+                             RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("band_defs"), nullptr};
     const char *pszInputFile, *pszOutputFile, *pszGDALFormat;
     PyObject *pBandDefnObj;
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssO:worldview2ToRadiance", kwlist, &pszInputFile, &pszOutputFile, &pszGDALFormat, &pBandDefnObj))
@@ -1261,7 +1262,8 @@ static PyObject *ImageCalibration_worldview2ToRadiance(PyObject *self, PyObject 
 
 static PyObject *ImageCalibration_spot5ToRadiance(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"), RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("band_defs"), nullptr};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("input_img"), RSGIS_PY_C_TEXT("output_img"),
+                             RSGIS_PY_C_TEXT("gdalformat"), RSGIS_PY_C_TEXT("band_defs"), nullptr};
     const char *pszInputFile, *pszOutputFile, *pszGDALFormat;
     PyObject *pBandDefnObj;
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "sssO:spot5ToRadiance", kwlist, &pszInputFile, &pszOutputFile, &pszGDALFormat, &pBandDefnObj))
@@ -1574,7 +1576,8 @@ static PyObject *ImageCalibration_CalcStandardisedReflectanceSD2010(PyObject *se
 
 static PyObject *ImageCalibration_GetJulianDay(PyObject *self, PyObject *args, PyObject *keywds)
 {
-    static char *kwlist[] = {RSGIS_PY_C_TEXT("year"), RSGIS_PY_C_TEXT("month"), RSGIS_PY_C_TEXT("day"),  nullptr};
+    static char *kwlist[] = {RSGIS_PY_C_TEXT("year"), RSGIS_PY_C_TEXT("month"),
+                             RSGIS_PY_C_TEXT("day"),  nullptr};
     unsigned int year, month, day;
     if( !PyArg_ParseTupleAndKeywords(args, keywds, "III:getJulianDay", kwlist, &year, &month, &day))
     {
@@ -1660,12 +1663,12 @@ static PyObject *ImageCalibration_calcCloudShadowMask(PyObject *self, PyObject *
 // Our list of functions in this module
 static PyMethodDef ImageCalibrationMethods[] = {
 {"landsat2Radiance", (PyCFunction)ImageCalibration_landsat2Radiance, METH_VARARGS | METH_KEYWORDS,
-"imagecalibration.landsat2Radiance(outputImage, gdalformat, bandDefnSeq)\n"
+"imagecalibration.landsat2Radiance(output_img, gdalformat, bandDefnSeq)\n"
 "Converts Landsat DN values to at sensor radiance.\n"
 "\n"
 "Where:\n"
 "\n"
-":param outputImage: is a string containing the name of the output file\n"
+":param output_img: is a string containing the name of the output file\n"
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
 ":param bandDefnSeq: is a sequence of rsgislib.imagecalibration.CmdsLandsatRadianceGainsOffsets objects that define the inputs\n"
 "        * bandName - Name of image band in output file.\n"
@@ -1678,12 +1681,12 @@ static PyMethodDef ImageCalibrationMethods[] = {
 "\n"},
 
 {"landsat2RadianceMultiAdd", (PyCFunction)ImageCalibration_landsat2RadianceMultiAdd, METH_VARARGS | METH_KEYWORDS,
-"imagecalibration.landsat2RadianceMultiAdd(outputImage, gdalformat, bandDefnSeq)\n"
+"imagecalibration.landsat2RadianceMultiAdd(output_img, gdalformat, bandDefnSeq)\n"
 "Converts Landsat DN values to at sensor radiance.\n"
 "\n"
 "Where:\n"
 "\n"
-":param outputImage: is a string containing the name of the output file\n"
+":param output_img: is a string containing the name of the output file\n"
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
 ":param bandDefnSeq: is a sequence of rsgislib.imagecalibration.CmdsLandsatRadianceGainsOffsets objects that define the inputs\n"
 "        * bandName - Name of image band in output file.\n"
@@ -1694,54 +1697,54 @@ static PyMethodDef ImageCalibrationMethods[] = {
 "\n"},
 
 {"radiance2TOARefl", (PyCFunction)ImageCalibration_Radiance2TOARefl, METH_VARARGS | METH_KEYWORDS,
-"imagecalibration.radiance2TOARefl(inputFile, outputFile, gdalFormat, datatype, scaleFactor, year, month, day, solarZenith, solarIrradianceVals)\n"
+"imagecalibration.radiance2TOARefl(input_img, output_img, gdalformat, datatype, scale_factor, year, month, day, solar_zenith, solar_irradiance)\n"
 "Converts at sensor radiance values to Top of Atmosphere Reflectance.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputFile: is a string containing the name of the input image file\n"
-":param outputFile: is a string containing the name of the output image file\n"
+":param input_img: is a string containing the name of the input image file\n"
+":param output_img: is a string containing the name of the output image file\n"
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
 ":param datatype: is an containing one of the values from rsgislib.TYPE_*\n"
-":param scaleFactor: is a float which can be used to scale the output pixel values (e.g., multiple by 1000), set as 1 if not wanted.\n"
+":param scale_factor: is a float which can be used to scale the output pixel values (e.g., multiple by 1000), set as 1 if not wanted.\n"
 ":param year: is an int with the year of the sensor acquisition.\n"
 ":param month: is an int with the month of the sensor acquisition.\n"
 ":param day: is an int with the day of the sensor acquisition.\n"
-":param solarZenith: is a a float with the solar zenith in degrees at the time of the acquisition (note 90-solarElevation = solarZenith).\n"
-":param solarIrradianceVals: is a sequence of floats each with the name \'irradiance\' which is in order of the bands in the input image.\n"
+":param solar_zenith: is a a float with the solar zenith in degrees at the time of the acquisition (note 90-solarElevation = solarZenith).\n"
+":param solar_irradiance: is a sequence of floats each with the name \'irradiance\' which is in order of the bands in the input image.\n"
 "\n"},
 
 {"toaRefl2Radiance", (PyCFunction)ImageCalibration_TOARefl2Radiance, METH_VARARGS | METH_KEYWORDS,
-"imagecalibration.toaRefl2Radiance(inputFiles, outputFile, gdalFormat, datatype, scaleFactor, solarDistance, solarZenith, solarIrradianceVals)\n"
+"imagecalibration.toaRefl2Radiance(input_imgs, output_img, gdalformat, datatype, scale_factor, solar_dist, solar_zenith, solar_irradiance)\n"
 "Converts at sensor (Top of Atmosphere; TOA) reflectance values to at sensor radiance.\n"
 "This is the inverse of imagecalibration.radiance2TOARefl().\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputFiles: can be either a single input image file with the same number of bands as the list of ESUN values or a list of single band images (same number of as the number of ESUN values).\n"
-":param outputFile: is a string containing the name of the output image file\n"
+":param input_imgs: can be either a single input image file with the same number of bands as the list of ESUN values or a list of single band images (same number of as the number of ESUN values).\n"
+":param output_img: is a string containing the name of the output image file\n"
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
 ":param datatype: is an containing one of the values from rsgislib.TYPE_*\n"
-":param scaleFactor: is a float which can be used to scale the output pixel values (e.g., multiple by 1000), set as 1 if not wanted.\n"
-":param solarDistance: is a float specifying the solar-earth distance (see imagecalibration.calcSolarDistance).\n"
-":param solarZenith: is a a float with the solar zenith in degrees at the time of the acquisition (note 90-solarElevation = solarZenith).\n"
-":param solarIrradianceVals: is a sequence of floats each with the name \'irradiance\' (ESUN) which is in order of the bands in the input image.\n"
+":param scale_factor: is a float which can be used to scale the output pixel values (e.g., multiple by 1000), set as 1 if not wanted.\n"
+":param solar_dist: is a float specifying the solar-earth distance (see imagecalibration.calcSolarDistance).\n"
+":param solar_zenith: is a a float with the solar zenith in degrees at the time of the acquisition (note 90-solarElevation = solarZenith).\n"
+":param solar_irradiance: is a sequence of floats each with the name \'irradiance\' (ESUN) which is in order of the bands in the input image.\n"
 "\n"},
 
 {"apply6SCoeffSingleParam", (PyCFunction)ImageCalibration_Apply6SCoefficentsSingleParam, METH_VARARGS | METH_KEYWORDS,
-"imagecalibration.apply6SCoeffSingleParam(inputFile, outputFile, gdalFormat, datatype, scaleFactor, noDataValue, useNoDataValue, bandCoeffs)\n"
+"imagecalibration.apply6SCoeffSingleParam(input_img, output_img, gdalformat, datatype, scale_factor, no_data_val, use_no_data, band_coeffs)\n"
 "Converts at sensor radiance values to surface reflectance by applying coefficients from the 6S model for each band (aX, bX, cX).\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputFile: is a string containing the name of the input image file\n"
-":param outputFile: is a string containing the name of the output image file\n"
+":param input_img: is a string containing the name of the input image file\n"
+":param output_img: is a string containing the name of the output image file\n"
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
 ":param datatype: is an containing one of the values from rsgislib.TYPE_*\n"
-":param scaleFactor: is a float which can be used to scale the output pixel values (e.g., multiple by 1000), set as 1 for no scaling.\n"
-":param noDataValue: is a float which if all bands contain that value will be ignored.\n"
-":param useNoDataValue: is a boolean as to whether the no data value specified is to be used.\n"
-":param bandCoeffs: is a sequence of objects with the following named fields.\n"
+":param scale_factor: is a float which can be used to scale the output pixel values (e.g., multiple by 1000), set as 1 for no scaling.\n"
+":param no_data_val: is a float which if all bands contain that value will be ignored.\n"
+":param use_no_data: is a boolean as to whether the no data value specified is to be used.\n"
+":param band_coeffs: is a sequence of objects with the following named fields.\n"
 "                    * band - An integer specifying the image band in the input file.\n"
 "                    * aX - A float for the aX coefficient.\n"
 "                    * bX - A float for the bX coefficient.\n"
@@ -1749,20 +1752,20 @@ static PyMethodDef ImageCalibrationMethods[] = {
 "\n"},
 
 {"apply6SCoeffElevLUTParam", (PyCFunction)ImageCalibration_Apply6SCoefficentsElevLUTParam, METH_VARARGS | METH_KEYWORDS,
-"imagecalibration.apply6SCoeffElevLUTParam(inputRadFile, inputDEMFile, outputFile, gdalFormat, datatype, scaleFactor, noDataValue, useNoDataValue, lutElev)\n"
+"imagecalibration.apply6SCoeffElevLUTParam(in_rad_img, in_dem_img, output_img, gdalformat, datatype, scale_factor, no_data_val, use_no_data, band_lut_coeffs)\n"
 "Converts at sensor radiance values to surface reflectance by applying coefficients from the 6S model for each band (aX, bX, cX), where the coefficients can be varied for surface elevation.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputRadFile: is a string containing the name of the input Radiance image file\n"
-":param inputDEMFile: is a string containing the name of the input DEM image file (needs to be the same projection and resolution as radiance image.)\n"
-":param outputFile: is a string containing the name of the output image file\n"
+":param in_rad_img: is a string containing the name of the input Radiance image file\n"
+":param in_dem_img: is a string containing the name of the input DEM image file (needs to be the same projection and resolution as radiance image.)\n"
+":param output_img: is a string containing the name of the output image file\n"
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
 ":param datatype: is an containing one of the values from rsgislib.TYPE_*\n"
-":param scaleFactor: is a float which can be used to scale the output pixel values (e.g., multiple by 1000), set as 1 for no scaling.\n"
-":param noDataValue: is a float which if all bands contain that value will be ignored.\n"
-":param useNoDataValue: is a boolean as to whether the no data value specified is to be used.\n"
-":param lutElev: is a sequence of objects with the following named fields - note these are expected to be in elevation order (low to high).\n"
+":param scale_factor: is a float which can be used to scale the output pixel values (e.g., multiple by 1000), set as 1 for no scaling.\n"
+":param no_data_val: is a float which if all bands contain that value will be ignored.\n"
+":param use_no_data: is a boolean as to whether the no data value specified is to be used.\n"
+":param band_lut_coeffs: is a sequence of objects with the following named fields - note these are expected to be in elevation order (low to high).\n"
 "                    * \'Elev\' - The elevation for the element in the LUT (in metres).\n"
 "                    * \'Coeffs\' - The sequence of 6S coeffecients for the given elevation for the element in the LUT.\n"
 "                        * \'band\' - An integer specifying the image band in the input file (band numbers start at 1).\n"
@@ -1772,21 +1775,21 @@ static PyMethodDef ImageCalibrationMethods[] = {
 "\n"},
 
 {"apply6SCoeffElevAOTLUTParam", (PyCFunction)ImageCalibration_Apply6SCoefficentsElevAOTLUTParam, METH_VARARGS | METH_KEYWORDS,
-"imagecalibration.apply6SCoeffElevLUTParam(inputRadFile, inputDEMFile, inputAOTImage, outputFile, gdalFormat, datatype, scaleFactor, noDataValue, useNoDataValue, lutElevAOT)\n"
+"imagecalibration.apply6SCoeffElevLUTParam(in_rad_img, in_dem_img, in_aot_img, output_img, gdalformat, datatype, scale_factor, no_data_val, use_no_data, band_lut_coeffs)\n"
 "Converts at sensor radiance values to surface reflectance by applying coefficients from the 6S model for each band (aX, bX, cX), where the coefficients can be varied for surface elevation.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputRadFile: is a string containing the name of the input Radiance image file\n"
-":param inputDEMFile: is a string containing the name of the input DEM image file (needs to be the same projection and resolution as radiance image.)\n"
-":param inputAOTImage: is a string containing the name of the input AOT image file (needs to be the same projection and resolution as radiance image.)\n"
-":param outputFile: is a string containing the name of the output image file\n"
+":param in_rad_img: is a string containing the name of the input Radiance image file\n"
+":param in_dem_img: is a string containing the name of the input DEM image file (needs to be the same projection and resolution as radiance image.)\n"
+":param in_aot_img: is a string containing the name of the input AOT image file\n"
+":param output_img: is a string containing the name of the output image file\n"
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
 ":param datatype: is an containing one of the values from rsgislib.TYPE_*\n"
-":param scaleFactor: is a float which can be used to scale the output pixel values (e.g., multiple by 1000), set as 1 for no scaling.\n"
-":param noDataValue: is a float which if all bands contain that value will be ignored.\n"
-":param useNoDataValue: is a boolean as to whether the no data value specified is to be used.\n"
-":param lutElevAOT: is a sequence of objects with the following named fields - note these are expected to be in elevation order (low to high and then AOT order (low to high).\n"
+":param scale_factor: is a float which can be used to scale the output pixel values (e.g., multiple by 1000), set as 1 for no scaling.\n"
+":param no_data_val: is a float which if all bands contain that value will be ignored.\n"
+":param use_no_data: is a boolean as to whether the no data value specified is to be used.\n"
+":param band_lut_coeffs: is a sequence of objects with the following named fields - note these are expected to be in elevation order (low to high and then AOT order (low to high).\n"
 "                    * \'Elev\' - The elevation for the element in the LUT (in metres).\n"
 "                        * \'AOT\' - The AOT value for this element within the LUT.\n"
 "                        * \'Coeffs\' - The sequence of 6S coeffecients for the given elevation and AOT for the element in the LUT.\n"
@@ -1797,48 +1800,48 @@ static PyMethodDef ImageCalibrationMethods[] = {
 "\n"},
 
 {"applySubtractSingleOffsets", (PyCFunction)ImageCalibration_ApplySubtractSingleOffsets, METH_VARARGS | METH_KEYWORDS,
-"imagecalibration.applySubtractSingleOffsets(inputFile, outputFile, gdalformat, datatype, nonNegative, useNoDataVal, noDataVal, darkObjReflVal, offsetsList)\n"
-"This function performs a dark obejct subtraction (DOS) using a set of defined offsets for retriving surface reflectance.\n"
+"imagecalibration.applySubtractSingleOffsets(input_img, output_img, gdalformat, datatype, non_neg_int, use_no_data, no_data_val, dark_refl_val, band_offsets)\n"
+"This function performs a dark object subtraction (DOS) using a set of defined offsets for retriving surface reflectance.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputFile: is a string containing the name of the input image file\n"
+":param input_img: is a string containing the name of the input image file\n"
 ":param outputFile: is a string containing the name of the output image file\n"
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
 ":param datatype: is an containing one of the values from rsgislib.TYPE_*\n"
-":param nonNegative: is a boolean specifying whether any negative values from the offset application should be removed (i.e., set to 1; 0 being no data).\n"
-":param useNoDataVal: a boolean specifying whether a no data value is present within the input image.\n"
-":param noDataVal: is a float specifying the no data value for the input image.\n"
-":param darkObjReflVal: is a float specifying the minimum value within the reflectance value used for the dark targets used for the subtraction"
-":param offsetsList: is a list of offset values to be applied to the input image bands (specified with keyword 'offset')."
+":param non_neg_int: is a boolean specifying whether any negative values from the offset application should be removed (i.e., set to 1; 0 being no data).\n"
+":param use_no_data: a boolean specifying whether a no data value is present within the input image.\n"
+":param no_data_val: is a float specifying the no data value for the input image.\n"
+":param dark_refl_val: is a float specifying the minimum value within the reflectance value used for the dark targets used for the subtraction"
+":param band_offsets: is a list of offset values to be applied to the input image bands (specified with keyword 'offset')."
 "\n"},
 
 {"applySubtractOffsets", (PyCFunction)ImageCalibration_ApplySubtractOffsets, METH_VARARGS | METH_KEYWORDS,
-"imagecalibration.applySubtractOffsets(inputFile, inputOffsetsFile, outputFile, gdalformat, datatype, nonNegative, useNoDataVal, noDataVal, darkObjReflVal)\n"
+"imagecalibration.applySubtractOffsets(input_img, in_offs_img, output_img, gdalformat, datatype, non_neg_int, use_no_data, no_data_val, dark_refl_val)\n"
 "This function performs a dark obejct subtraction (DOS) using a set of defined offsets for retriving surface reflectance.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputFile: is a string containing the name of the input image file\n"
-":param inputOffsetsFile: is a string containing the name of the input offsets image file, which must have the same number of bands as the input image."
-":param outputFile: is a string containing the name of the output image file\n"
+":param input_img: is a string containing the name of the input image file\n"
+":param in_offs_img: is a string containing the name of the input offsets image file, which must have the same number of bands as the input image."
+":param output_img: is a string containing the name of the output image file\n"
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
 ":param datatype: is an containing one of the values from rsgislib.TYPE_*\n"
-":param nonNegative: is a boolean specifying whether any negative values from the offset application should be removed (i.e., set to 1; 0 being no data).\n"
-":param useNoDataVal: a boolean specifying whether a no data value is present within the input image.\n"
-":param noDataVal: is a float specifying the no data value for the input image.\n"
-":param darkObjReflVal: is a float specifying the minimum value within the reflectance value used for the dark targets used for the subtraction"
+":param non_neg_int: is a boolean specifying whether any negative values from the offset application should be removed (i.e., set to 1; 0 being no data).\n"
+":param use_no_data: a boolean specifying whether a no data value is present within the input image.\n"
+":param no_data_val: is a float specifying the no data value for the input image.\n"
+":param dark_refl_val: is a float specifying the minimum value within the reflectance value used for the dark targets used for the subtraction"
 "\n"},
 
 {"saturatedPixelsMask", (PyCFunction)ImageCalibration_SaturatedPixelsMask, METH_VARARGS | METH_KEYWORDS,
-"imagecalibration.saturatedPixelsMask(outputImage, gdalformat, bandDefnSeq)\n"
+"imagecalibration.saturatedPixelsMask(output_img, gdalformat, band_defs)\n"
 "Creates a mask of the saturated image pixels on a per band basis.\n"
 "\n"
 "Where:\n"
 "\n"
-":param outputImage: is a string containing the name of the output file\n"
+":param output_img: is a string containing the name of the output file\n"
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
-":param bandDefnSeq: is a sequence of rsgislib.imagecalibration.CmdsSaturatedPixel objects that define the inputs\n"
+":param band_defs: is a sequence of rsgislib.imagecalibration.CmdsSaturatedPixel objects that define the inputs\n"
 "        *  bandName - Name of image band in output file.\n"
 "        *  fileName - input image file.\n"
 "        *  bandIndex - Index (starting from 1) of the band in the image file.\n"
@@ -1846,17 +1849,17 @@ static PyMethodDef ImageCalibrationMethods[] = {
 "\n"},
 
 {"landsatThermalRad2Brightness", (PyCFunction)ImageCalibration_landsatThermalRad2Brightness, METH_VARARGS | METH_KEYWORDS,
-"imagecalibration.landsatThermalRad2Brightness(inputImage, outputImage, gdalformat, datatype, scaleFactor, bandDefnSeq)\n"
+"imagecalibration.landsatThermalRad2Brightness(input_img, output_img, gdalformat, datatype, scale_factor, band_defs)\n"
 "Converts Landsat TM thermal radiation to degrees celsius for at sensor temperature.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputImage: is a string containing the name of the input file path.\n"
-":param outputImage: is a string containing the name of the output file path.\n"
+":param input_img: is a string containing the name of the input file path.\n"
+":param output_img: is a string containing the name of the output file path.\n"
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
 ":param datatype: is an containing one of the values from rsgislib.TYPE_*\n"
-":param scaleFactor: is a float which can be used to scale the output pixel values (e.g., multiple by 1000), set as 1 for no scaling.\n"
-":param bandDefnSeq: is a sequence of rsgislib.imagecalibration.CmdsLandsatThermalCoeffs objects that define the inputs\n"
+":param scale_factor: is a float which can be used to scale the output pixel values (e.g., multiple by 1000), set as 1 for no scaling.\n"
+":param band_defs: is a sequence of rsgislib.imagecalibration.CmdsLandsatThermalCoeffs objects that define the inputs\n"
 "        *  bandName - Name of image band in output file.\n"
 "        *  bandIndex - Index (starting from 1) of the band in the image file.\n"
 "        *  k1 - k1 coefficient from Landsat header.\n"
@@ -1864,15 +1867,15 @@ static PyMethodDef ImageCalibrationMethods[] = {
 "\n"},
     
 {"worldview2ToRadiance", (PyCFunction)ImageCalibration_worldview2ToRadiance, METH_VARARGS | METH_KEYWORDS,
-"imagecalibration.worldview2ToRadiance(inputImage, outputImage, gdalformat, bandDefnSeq)\n"
+"imagecalibration.worldview2ToRadiance(input_img, output_img, gdalformat, band_defs)\n"
 "Converts WorldView2 DN values to at sensor radiance.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputImage: is a string containing the name of the input file\n"
-":param outputImage: is a string containing the name of the output file\n"
+":param input_img: is a string containing the name of the input file\n"
+":param output_img: is a string containing the name of the output file\n"
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
-":param bandDefnSeq: is a sequence of rsgislib.imagecalibration.CmdsWorldView2RadianceGainsOffsets objects that define the inputs\n"
+":param band_defs: is a sequence of rsgislib.imagecalibration.CmdsWorldView2RadianceGainsOffsets objects that define the inputs\n"
 "                        * bandName - Name of image band in output file.\n"
 "                        * bandIndex - Index (starting from 1) of the band in the image file.\n"
 "                        * absCalFact - ABSCALFACTOR value from WorldView2 XML header.\n"
@@ -1880,15 +1883,15 @@ static PyMethodDef ImageCalibrationMethods[] = {
 "\n"},
 
 {"spot5ToRadiance", (PyCFunction)ImageCalibration_spot5ToRadiance, METH_VARARGS | METH_KEYWORDS,
-"imagecalibration.spot5ToRadiance(inputImage, outputImage, gdalformat, bandDefnSeq)\n"
+"imagecalibration.spot5ToRadiance(input_img, output_img, gdalformat, band_defs)\n"
 "Converts WorldView2 DN values to at sensor radiance.\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputImage: is a string containing the name of the input file\n"
-":param outputImage: is a string containing the name of the output file\n"
+":param input_img: is a string containing the name of the input file\n"
+":param output_img: is a string containing the name of the output file\n"
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
-":param bandDefnSeq: is a sequence of rsgislib.imagecalibration.CmdsSPOT5RadianceGainsOffsets objects in order of the input image bands that define the inputs\n"
+":param band_defs: is a sequence of rsgislib.imagecalibration.CmdsSPOT5RadianceGainsOffsets objects in order of the input image bands that define the inputs\n"
 "                        * bandName - Name of image band in output file.\n"
 "                        * bandIndex - Index (starting from 1) of the output image band order (i.e., to reorder the image bands).\n"
 "                        * gain - PHYSICAL_GAIN value from SPOT5 XML header.\n"
@@ -1896,42 +1899,42 @@ static PyMethodDef ImageCalibrationMethods[] = {
 "\n"},
 
 {"calcNadirImgViewAngle", (PyCFunction)ImageCalibration_calcNadirImgViewAngle, METH_VARARGS | METH_KEYWORDS,
-"imagecalibration.calcNadirImgViewAngle(inImgFootprint, outViewAngleImg, gdalFormat, sateAltitude, minXXCol, minXYCol, maxXXCol, maxXYCol, minYXCol, minYYCol, maxYXCol, maxYYCol)\n"
+"imagecalibration.calcNadirImgViewAngle(input_img, output_img, gdalformat, altitude, min_xx_col, min_xy_col, max_xx_col, max_xy_col, min_yx_col, min_yy_col, max_yx_col, max_yy_col)\n"
 "Calculate the sensor view angle for each pixel for a nadir sensor. Need to provide the satellite altitude in metres, for Landsat this is 705000.0. \n"
 "\n"
 "Where:\n"
 "\n"
-":param inImgFootprint: is a string containing the name/path of the input file. This file needs to be to have a RAT with only one clump with pixel value 1.\n"
-":param outViewAngleImg: is a string for the name/path of the output file.\n"
-":param gdalFormat: is a string for the GDAL format\n"
-":param sateAltitude: is a float in metres for the satellite altitude.\n"
-":param minXXCol: is a string for the minXX column in the RAT.\n"
-":param minXYCol: is a string for the minXY column in the RAT.\n"
-":param maxXXCol: is a string for the maxXX column in the RAT.\n"
-":param maxXYCol: is a string for the maxXY column in the RAT.\n"
-":param minYXCol: is a string for the minYX column in the RAT.\n"
-":param minYYCol: is a string for the minYY column in the RAT.\n"
-":param maxYXCol: is a string for the maxYX column in the RAT.\n"
-":param maxYYCol: is a string for the maxYY column in the RAT.\n"
+":param input_img: is a string containing the name/path of the input file for the image footprint. This file needs to be to have a RAT with only one clump with pixel value 1.\n"
+":param output_img: is a string for the name/path of the output file with the view angles.\n"
+":param gdalformat: is a string for the GDAL format\n"
+":param altitude: is a float in metres for the satellite altitude.\n"
+":param min_xx_col: is a string for the minXX column in the RAT.\n"
+":param min_xy_col: is a string for the minXY column in the RAT.\n"
+":param max_xx_col: is a string for the maxXX column in the RAT.\n"
+":param max_xy_col: is a string for the maxXY column in the RAT.\n"
+":param min_yx_col: is a string for the minYX column in the RAT.\n"
+":param min_yy_col: is a string for the minYY column in the RAT.\n"
+":param max_yx_col: is a string for the maxYX column in the RAT.\n"
+":param max_yy_col: is a string for the maxYY column in the RAT.\n"
 "\n"},
 
 {"calcIrradianceImageElevLUT", (PyCFunction)ImageCalibration_CalcIrradianceElevLUT, METH_VARARGS | METH_KEYWORDS,
-"imagecalibration.calcIrradianceImageElevLUT(inputDataMaskImg, inputDEMFile, inputIncidenceAngleImg, inputSlopeImg, srefInputImage, shadowMaskImg, outputFile, gdalFormat, solarZenith, reflScaleFactor, lutElev)\n"
+"imagecalibration.calcIrradianceImageElevLUT(in_data_msk_img, in_dem_img, in_inc_angle_img, in_slope_img, in_sref_img, in_shadow_img, output_img, gdalformat, solar_zenith, scale_factor, coeff_lut)\n"
 "Calculate the incoming irradiance (Direct, Diffuse, Environment and Total) for sloped surfaces (Eq 1. Shepherd and Dymond 2010).\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputDataMaskImg: is a string containing the name and path to a binary mask specifying the region to be calculated (1 = True)\n"
-":param inputDEMFile: is a string containing the name of the input DEM image file.\n"
-":param inputIncidenceAngleImg: is a string containing the name and path to a file with the incidence angle for each pixel.\n"
-":param inputSlopeImg: is a string containing the name and path to a file with the slope in degrees for each pixel.\n"
-":param srefInputImage: is a surface reflectance image with the same number of bands for measurements are provided for in the LUT\n"
-":param shadowMaskImg: is a binary mask image for the areas of the image in direct shadow (pixel value 1) and therefore don't recieve any direct irradiance.\n"
-":param outputFile: is a string containing the name of the output image file\n"
-":param gdalFormat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
-":param solarZenith: is a float with the solar zenith for the whole scene.\n"
-":param reflScaleFactor: is a float with the scale factor to convert the SREF image to a range of 0-1\n"
-":param lutElev: is a sequence of objects with the following named fields - note these are expected to be in elevation order (low to high).\n"
+":param in_data_msk_img: is a string containing the name and path to a binary mask specifying the region to be calculated (1 = True)\n"
+":param in_dem_img: is a string containing the name of the input DEM image file.\n"
+":param in_inc_angle_img: is a string containing the name and path to a file with the incidence angle for each pixel.\n"
+":param in_slope_img: is a string containing the name and path to a file with the slope in degrees for each pixel.\n"
+":param in_sref_img: is a surface reflectance image with the same number of bands for measurements are provided for in the LUT\n"
+":param in_shadow_img: is a binary mask image for the areas of the image in direct shadow (pixel value 1) and therefore don't recieve any direct irradiance.\n"
+":param output_img: is a string containing the name of the output image file\n"
+":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
+":param solar_zenith: is a float with the solar zenith for the whole scene.\n"
+":param scale_factor: is a float with the scale factor to convert the SREF image to a range of 0-1\n"
+":param coeff_lut: is a sequence of objects with the following named fields - note these are expected to be in elevation order (low to high).\n"
 "                    * \'Elev\' - The elevation for the element in the LUT (in metres).\n"
 "                    * \'BandVals\' - The sequence of solar irradiance values for the bands in the SREF image.\n"
 "                        * \'band\' - An integer specifying the image band in the input file (band numbers start at 1).\n"
@@ -1941,22 +1944,22 @@ static PyMethodDef ImageCalibrationMethods[] = {
 "\n"},
 
 {"calcStandardisedReflectanceSD2010", (PyCFunction)ImageCalibration_CalcStandardisedReflectanceSD2010, METH_VARARGS | METH_KEYWORDS,
-"imagecalibration.calcStandardisedReflectanceSD2010(inputDataMaskImg, srefInputImage, inputSolarIrradiance, inputIncidenceAngleImg, inputExitanceAngleImg, outputFile, gdalFormat, reflScaleFactor, brdfBeta, outIncidenceAngle, outExitanceAngle)\n"
+"imagecalibration.calcStandardisedReflectanceSD2010(in_data_msk_img, in_sref_img, in_solar_irr_img, in_inc_angle_img, in_exit_angle_img, output_img, gdalformat, scale_factor, brdf_beta, out_inc_angle, out_exit_angle)\n"
 "Calculate standardised reflectance, with respect to solar and view angles, as defined by Shepherd and Dymond (2010)\n"
 "\n"
 "Where:\n"
 "\n"
-":param inputDataMaskImg: is a string containing the name and path to a binary mask specifying the region to be calculated (1 = True)\n"
-":param srefInputImage: is a surface reflectance image\n"
-":param inputSolarIrradiance: is the solar irradiance for each band of the SREF image. The image will have four times the number of bands as the SREF with Direct, Diffuse, Environment and Total irradiance for each (generated by imagecalibration.calcIrradianceImageElevLUT).\n"
-":param inputIncidenceAngleImg: is a string containing the name and path to a file with the incidence angle for each pixel.\n"
-":param inputExitanceAngleImg: is a string containing the name and path to a file with the existance angle for each pixel.\n"
-":param outputFile: is a string containing the name of the output image file\n"
-":param gdalFormat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
-":param reflScaleFactor: is a float with the scale factor to convert the SREF image to a range of 0-1 (e.g., 1000)\n"
-":param brdfBeta: is the beta parameters in equation 8 in Shepherd and Dymond (2010) for solar elevations between 50 - 70 degrees a value of 1 can be used.\n"
-":param outIncidenceAngle: is the incidence angle to which the output image is standardised to (Recommend: 0).\n"
-":param outExitanceAngle: is the exitance angle to which the output image is standardised to (Recommend: 0).\n"
+":param in_data_msk_img: is a string containing the name and path to a binary mask specifying the region to be calculated (1 = True)\n"
+":param in_sref_img: is a surface reflectance image\n"
+":param in_solar_irr_img: is the solar irradiance for each band of the SREF image. The image will have four times the number of bands as the SREF with Direct, Diffuse, Environment and Total irradiance for each (generated by imagecalibration.calcIrradianceImageElevLUT).\n"
+":param in_inc_angle_img: is a string containing the name and path to a file with the incidence angle for each pixel.\n"
+":param in_exit_angle_img: is a string containing the name and path to a file with the existance angle for each pixel.\n"
+":param output_img: is a string containing the name of the output image file\n"
+":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
+":param scale_factor: is a float with the scale factor to convert the SREF image to a range of 0-1 (e.g., 1000)\n"
+":param brdf_beta: is the beta parameters in equation 8 in Shepherd and Dymond (2010) for solar elevations between 50 - 70 degrees a value of 1 can be used.\n"
+":param out_inc_angle: is the incidence angle to which the output image is standardised to (Recommend: 0).\n"
+":param out_exit_angle: is the exitance angle to which the output image is standardised to (Recommend: 0).\n"
 "\n"},
     
 {"getJulianDay", (PyCFunction)ImageCalibration_GetJulianDay, METH_VARARGS | METH_KEYWORDS,
@@ -1973,36 +1976,36 @@ static PyMethodDef ImageCalibrationMethods[] = {
 "\n"},
     
 {"calcSolarDistance", (PyCFunction)ImageCalibration_CalcSolarDistance, METH_VARARGS | METH_KEYWORDS,
-"imagecalibration.calcSolarDistance(julianDay)\n"
+"imagecalibration.calcSolarDistance(julian_day)\n"
 "Calculates the earth-solar distance from the given julian day.\n"
 "\n"
 "Where:\n"
 "\n"
-":param julianDay: is an int with the julian day of the sensor acquisition.\n"
+":param julian_day: is an int with the julian day of the sensor acquisition.\n"
 "\n"
 ":return: solarDistance - float\n"
 "\n"},
 
     
 {"calcCloudShadowMask", (PyCFunction)ImageCalibration_calcCloudShadowMask, METH_VARARGS | METH_KEYWORDS,
-"imagecalibration.calcCloudShadowMask(inputCloudMask, inputReflImage, inValidAreaImage, outputImage, darkImgBand, gdalFormat, scaleFactor, tmpImgsBase, tmpImgsFileExt, sunAz, sunZen, senAz, senZen, rmTmpImgs)\n"
+"imagecalibration.calcCloudShadowMask(in_cld_msk_img, in_refl_img, in_vld_img, output_img, dark_band, gdalformat, scale_factor, tmp_img_base, tmp_img_ext, solar_azimuth, solar_zenith, sensor_azimuth, sensor_zenith, rm_tmp_imgs)\n"
 "Calculate a cloud shadow mask from an inputted cloud mask.\n"
 "Where:\n"
 "\n"
-":param inputCloudMask: is a string containing the name of the input cloud mask\n"
-":param inputTOAImage: is a string containing the name of the input image TOA reflectance file\n"
-":param inValidAreaImage: is a string containing the name of a binary image specifying the valid area of the image data (1 is valid area)\n"
-":param outputImage: is a string containing the name of the output image file\n"
-":param darkImgBand: is an integer specifying the image band from the reflectance image which is to used to find the shadows (the NIR is often recommended).\n"
+":param in_cld_msk_img: is a string containing the name of the input cloud mask\n"
+":param in_refl_img: is a string containing the name of the input image TOA reflectance file\n"
+":param in_vld_img: is a string containing the name of a binary image specifying the valid area of the image data (1 is valid area)\n"
+":param output_img: is a string containing the name of the output image file\n"
+":param dark_band: is an integer specifying the image band from the reflectance image which is to used to find the shadows (the NIR is often recommended).\n"
 ":param gdalformat: is a string containing the GDAL format for the output file - eg 'KEA'\n"
-":param scaleFactor: is a float with the scale factor used to multiple the input image reflectance data.\n"
-":param tmpImgsBase: is a string specifying a base path and name for the tmp images used for this processing\n"
-":param tmpImgsFileExt: is a string for the file extention of the output images (e.g., .kea)\n"
-":param sunAz: is the solar azimuth of the input image\n"
-":param sunZen: is the solar azimuth of the input image\n"
-":param senAz: is the sensor azimuth of the input image\n"
-":param senZen: is the sensor azimuth of the input image\n"
-":param rmTmpImgs: is a bool specifying whether the tmp images should be deleted at the end of the processing (Optional; Default = True)\n"
+":param scale_factor: is a float with the scale factor used to multiple the input image reflectance data.\n"
+":param tmp_img_base: is a string specifying a base path and name for the tmp images used for this processing\n"
+":param tmp_img_ext: is a string for the file extention of the output images (e.g., .kea)\n"
+":param solar_azimuth: is the solar azimuth of the input image\n"
+":param solar_zenith: is the solar azimuth of the input image\n"
+":param sensor_azimuth: is the sensor azimuth of the input image\n"
+":param sensor_zenith: is the sensor azimuth of the input image\n"
+":param rm_tmp_imgs: is a bool specifying whether the tmp images should be deleted at the end of the processing (Optional; Default = True)\n"
 "\n"
 },
     

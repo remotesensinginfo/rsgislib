@@ -277,8 +277,8 @@ def calc_acc_metrics_vecsamples(in_vec_file, in_vec_lyr, ref_col, cls_col, cls_i
                           a JSON file (Default=None).
     :param out_csv_file: if specified the generated metrics and confusion matrix are written to
                          a CSV file (Default=None).
-
-    Example::
+    
+    Example:
     
     import rsgislib
     from rsgislib.classification import classaccuracymetrics

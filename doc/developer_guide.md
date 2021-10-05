@@ -135,12 +135,16 @@ functions:
 | del_exist_vec | In some cases GDAL/OGR cannot simply overwrite an existing vector layer, this variable is provided by many RSGISLib function to allow the user to specify that is the output vector layer exists it should be deleted before the main processing starts| 
 | out_epsg | If there is an option to specify the output projection then generally use an EPSG code |
 | vec_lyr_obj | An OGR input vector layer object |
+| att_column | The name of a column within the attribute table of the vector layer |
+| att_col_data | A list or array of data read or to be written to vector layer attribute table. |
+| att_col_datatype | The OGR datatype (i.e., ogr.OFTString, ogr.OFTInteger, ogr.OFTReal) for a attribute table column | 
 
 #### Others
 | Variable Name | Description |
 | ----------- | ----------- |
 | in_file | Generic input file (e.g., text file) |
 | out_file | Generic output file (e.g., text file) |
+| tmp_dir | directory to store temporary outputs during processing |
 | in_h5_file | An input HDF5 file |
 | out_h5_file | An output HDF5 file. |
 | h5_XXX_file | Where there are multiple input and/or output HDF5 files then XXX is used to specify the purpose. |
@@ -153,7 +157,7 @@ functions:
 | win_h_size | specify a half window size used in some places to ensure window size is odd |
 | x_size | a size in the X axis |
 | y_size | a size in the Y axis |
-
+| n_cores | the number of processing core to use when using python multiprocessing module |
 
 ## Python Tests Implementation
 Python testing is undertaken using the [pytest](https://docs.pytest.org) tool and are within the 

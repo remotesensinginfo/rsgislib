@@ -122,7 +122,7 @@ Create a list of these objects to pass to the fillTimeSeriesGaps function
     def __repr__(self):
         return repr((self.year, self.day, self.compImg, self.imgRef, self.outRef))
 
-def set_envvars_lzw_gtiff_outs(bigtiff=True):
+def setEnvVarsLZWGTiffOuts(bigtiff=True):
     """
     Set environmental variables such that outputted
     GeoTIFF files are outputted as tiled and compressed.
@@ -675,8 +675,8 @@ Copy the GCPs from the input_img to the output_img
         raise Exception("Could not open the input_img.")
     destDS = gdal.Open(output_img, gdal.GA_Update)
     if destDS == None:
-        raise Exception("Could not open the output_img.")
         srcDS = None
+        raise Exception("Could not open the output_img.")
 
     numGCPs = srcDS.GetGCPCount()
     if numGCPs > 0:
@@ -2842,7 +2842,7 @@ def gdal_translate(input_img, output_img, gdalformat='KEA', options=''):
     gdal.Translate(output_img, input_img, options=trans_opt)
 
 
-def gdal_stack_images_vrt(input_imgs, output_vrt_file):
+def gdalStackImagesVRT(input_imgs, output_vrt_file):
     """
     A function which creates a GDAL VRT file from a set of input images by stacking the input images
     in a multi-band output file.
@@ -2861,7 +2861,7 @@ def gdal_stack_images_vrt(input_imgs, output_vrt_file):
     gdal.BuildVRT(output_vrt_file, input_imgs, options=build_vrt_opt)
 
 
-def gdal_mosaic_images_vrt(input_imgs, output_vrt_file, vrt_extent=None):
+def gdalMosaicImagesVRT(input_imgs, output_vrt_file, vrt_extent=None):
     """
     A function which creates a GDAL VRT file from a set of input images by mosaicking
     the input images.
@@ -2884,19 +2884,21 @@ def gdal_mosaic_images_vrt(input_imgs, output_vrt_file, vrt_extent=None):
     gdal.BuildVRT(output_vrt_file, input_imgs, options=build_vrt_opt)
 
 
-def gdal_band_subset_vrt(input_img, bands, out_vrt):
+def createVRTBandSubset(input_img, bands, out_vrt_img):
     """
-    A function which creates a GDAL VRT for the input image with the bands selected in the
-    input list.
+    A function which creates a GDAL VRT for the input image with the bands selected in
+    the input list.
 
     :param input_img: the input GDAL image
-    :param bands: a list of bands (in the order they will be in the VRT). Note, band numbering starts at 1.
-    :param out_vrt: the output VRT file.
+    :param bands: a list of bands (in the order they will be in the VRT). Note, band
+                  numbering starts at 1.
+    :param out_vrt_img: the output VRT file.
 
     """
     input_img = os.path.abspath(input_img)
     vrt_options = gdal.BuildVRTOptions(bandList=bands)
-    gdal.BuildVRT(out_vrt, [input_img], options=vrt_options)
+    my_vrt = gdal.BuildVRT(out_vrt_img, [input_img], options=vrt_options)
+    my_vrt = None
 
 
 def subset_to_vec(in_img, out_img, gdalformat, roi_vec_file, roi_vec_lyr, datatype=None, vec_epsg=None):
@@ -3402,7 +3404,7 @@ def whitenImage(input_img, valid_msk_img, valid_msk_val, output_img, gdalformat)
 
     imgMskBand = imgMskDS.GetRasterBand(1)
     if imgMskBand is None:
-        raise Exception("Could not open image band ({}) in valid mask".format(n + 1))
+        raise Exception("Could not open image band (1) in valid mask")
 
     vld_msk_band_arr = imgMskBand.ReadAsArray().flatten()
     imgMskDS = None
@@ -3643,20 +3645,4 @@ values are between 0-1.
 
     applier.apply(_applyzeronodata, infiles, outfiles, otherargs, controls=aControls)
 
-def createVRTBandSubset(input_img, bands, out_vrt_img):
-    """
-    A function which creates a GDAL VRT for the input image with the bands selected in
-    the input list.
 
-    :param input_img: the input GDAL image
-    :param bands: a list of bands (in the order they will be in the VRT). Note, band
-                  numbering starts at 1.
-    :param out_vrt_img: the output VRT file.
-
-    """
-    from osgeo import gdal
-    import os
-    input_img = os.path.abspath(input_img)
-    vrt_options = gdal.BuildVRTOptions(bandList=bands)
-    my_vrt = gdal.BuildVRT(out_vrt_img, [input_img], options=vrt_options)
-    my_vrt = None

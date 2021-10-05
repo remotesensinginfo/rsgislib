@@ -2,6 +2,8 @@ version: 2.1
 
 orbs:
   codecov: codecov/codecov@1.2.5
+  sonarcloud: sonarsource/sonarcloud@1.0.1
+  aws-s3: circleci/aws-s3@3.0.0
 
 executors: #(1)
   exectr:
@@ -42,10 +44,25 @@ jobs:
           destination: pytest_reports
       - codecov/upload:
           file: pytest_reports/coverage.xml
-
+      - sonarcloud/scan
+      - run:
+          name: build documentation
+          command: |
+            cd doc/python
+            sh run_doc_gen.sh
+      - aws-s3/sync:
+          arguments: |
+            --acl public-read
+          aws-access-key-id: AWS_ACCESS_KEY_ID_RSGISLIB_WEB
+          aws-region: AWS_REGION_RSGISLIB_WEB
+          aws-secret-access-key: AWS_SECRET_ACCESS_KEY_RSGISLIB_WEB
+          from: doc/python/html
+          to: 's3://rsgislib-website/dev'
+      
 
 # Orchestrate our job run sequence
 workflows:
   build-and-test:
     jobs:
-      - build_and_test
+      - build_and_test:
+          context: SonarCloud
