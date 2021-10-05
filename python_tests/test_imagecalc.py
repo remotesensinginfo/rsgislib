@@ -66,3 +66,14 @@ def test_areImgsEqual_False():
     in_cmp_img = os.path.join(IMGCALC_DATA_DIR, "test_int_pxls_v2.kea")
     img_eq, prop_match = rsgislib.imagecalc.areImgsEqual(in_ref_img, in_cmp_img)
     assert not img_eq
+
+
+def test_BandMaths_SglBand(tmp_path):
+    import rsgislib.imagecalc
+
+    input_img = os.path.join(DATA_DIR, "sen2_20210527_aber.kea")
+    band_def_seq = list()
+    band_def_seq.append(rsgislib.imagecalc.BandDefn(rsgislib.imagecalc.BandDefn(band_name="Blue", input_img=input_img, img_band=1)))
+    output_img = os.path.join(tmp_path, "sen2_20210527_aber_b1.kea")
+    rsgislib.imagecalc.bandMath(output_img, "Blue", "KEA", rsgislib.TYPE_16UINT, band_def_seq)
+
