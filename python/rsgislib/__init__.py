@@ -67,7 +67,7 @@ Methods of calculating distance:
     * DIST_CHEBYSHEV = 5
     * DIST_MUTUALINFO = 6
     
-Methods of summerising data:
+Methods of summarising data:
 
     * SUMTYPE_UNDEFINED = 0
     * SUMTYPE_MODE = 1

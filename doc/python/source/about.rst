@@ -3,7 +3,7 @@ About
 
 The Remote Sensing and Geographical Information Systems software Library (RSGISLib) was started by `Pete Bunting <http://users.aber.ac.uk/pfb/>`_, a lecturer in the Department of Geography and Earth Sciences (DGES) at Aberystwyth University (Wales, UK) in April 2008 as a means of grouping together code developed as part of his research and to provide a better platform for development of new functions.
 
-`Dan Clewley <http://mixil.usc.edu/people/staff/daniel-clewley.htm>`_ joined the project in December 2008, shortly after starting his PhD within DGES, at Aberystwyth University (funded by a NERC studentship).
+`Dan Clewley <https://www.pml.ac.uk/People/Science_Staff/Dr_Daniel_Clewley>`_ joined the project in December 2008, shortly after starting his PhD within DGES, at Aberystwyth University (funded by a NERC studentship).
 
 Features were added to RSGISLib, as required by Pete and Dan or requested by other researches and students within Aberystwyth University and collaborators in other institutions. 
 
@@ -28,8 +28,6 @@ For storing and processing laser scanning data the Sorted Pulse Data Library (SP
 To date RSGISLib been used as part of a number of publications and theses, for more details see:
 
 Peter Bunting, Daniel Clewley, Richard M. Lucas and Sam Gillingham. 2014. The Remote Sensing and GIS Software Library (RSGISLib), Computers & Geosciences. Volume 62, Pages 216-226 http://dx.doi.org/10.1016/j.cageo.2013.08.007.
-
-A pre-print is available to download from `here <http://rsgislib.org/publications/pbunting_etal_RSGISLib.pdf>`_.
 
 For details of an open source system for Object-Based Image Analysis, using RSGISLib in combination with other libraries see the following open access paper:
 
@@ -82,7 +80,7 @@ The archive is available to view at `groups.google.com <https://groups.google.co
  
 **Do you offer training on RSGISLib?**
 
-RSGISLib is taught as part of the Masters course at Aberystwyth University. The notes for the Python course, which include a chapter using RSGISLib for object based classification are available `bitbucket.org/petebunting/python-tutorial-for-spatial-data-processing <https://bitbucket.org/petebunting/python-tutorial-for-spatial-data-processing>`_. We gave a training course at the 20th JAXA Kyoto & Carbon initiative meeting on object based classification, the notes are available to download from `Sourceforge <https://sourceforge.net/projects/rsgislib/files/Training/JAXA_GMW_RSGISLibCourse.zip>`_.
+RSGISLib is taught as part of the `Masters course at Aberystwyth University <https://courses.aber.ac.uk/postgraduate/gis-remote-sensing-masters/>`_ but we can also offer bespoke training and have hosted people here Aberystwyth who have been interested in collaborating and learning more about RSGISLib and associated tools.
 
 We also write a blog (`spectraldifferences <http://spectraldifferences.wordpress.com/>`_) which contains some tutorials on using RSGISLib as well as other open source software we're involved with.
 
@@ -90,7 +88,7 @@ If you are interested in training sessions, please contact us.
 
 **How do I go about getting functionality added to RSGISLib?**
 
-For general suggestions submit a ticket on our `issues <https://bitbucket.org/petebunting/rsgislib/issues?status=new&status=open>`_ page on Bitbucket or post a suggestion to the Google groups mailing list. 
+For general suggestions submit a ticket on our `issues <https://github.com/remotesensinginfo/rsgislib/issues>`_ page on GitHub or post a suggestion to the Google groups mailing list.
 
 If you are preparing a research proposal or have a commercial project where you are likely use RSGISLib please contact us for collaborative opportunities or consultancy work to add new functions to RSGISLib, improve existing features or build custom software on top of RSGISLib.
 
@@ -110,4 +108,6 @@ GDAL allows creation options to be defined and these are defined on a per format
     export RSGISLIB_IMG_CRT_OPTS_HFA=COMPRESSED=YES:USE_SPILL=YES:AUX=NO:STATISTICS=YES
 
 See the GDAL pages for the options available for an individual format.
+
+NOTE, some commands use `RIOS <http://www.rioshome.org>`_ and therefore you might also need to set the `environmental variables for RIOS <http://www.rioshome.org/en/latest/environmentvars.html>`_ to ensure all images are outputted within the options you require.
 

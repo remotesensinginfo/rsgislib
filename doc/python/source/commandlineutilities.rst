@@ -13,7 +13,7 @@ Batch Processing
 
 Data Processing
 ----------------
-* rsgislibsegmentation.py - Run image segmentation
+* rsgislibsegmentation.py - Run an image segmentation using the Shepherd et al., algorithm.
 * rsgislibattributerat.py - Attribute Raster Attribute Table
 * rsgislibmosaic.py - Mosaic a set of input image files.
 * rsgislibcalcindices.py - Easy tool for calculating image indicies
@@ -37,5 +37,5 @@ Post Processing
 
 Other
 -----
-* flip - Convert line endings (e.g., Windows to UNIX, UNIX to Mac Classic).
+* flip - Convert line endings (e.g., Windows to UNIX, UNIX to Mac Classic etc.).
 * rsgis-config - developer tool to find the installation paths and build options.
